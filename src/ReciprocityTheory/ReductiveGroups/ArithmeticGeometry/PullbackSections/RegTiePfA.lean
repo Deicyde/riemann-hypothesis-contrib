@@ -44,8 +44,6 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections

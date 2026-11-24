@@ -51,6 +51,9 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactlySupportedBanachModel
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedLocSec
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PolynomialProperness.HermitianXiOrthogonal
 
 @[expose] public section
 
@@ -68,7 +71,7 @@ variable {k r : ℕ}
 theorem herm_nondeg (x : Fin (2 * r + k + 1) → ℂ) (h : ∀ u, herm (Hpk k r) x u = 0) : x = 0 := by
   have hH : Hpk k r *ᵥ x = 0 := by
     funext i
-    rw [← JfS.Sym.herm_bvec]
+    rw [← _root_.PI.StabPairsW.herm_bvec]
     exact h _
   have h2 := (hpkFacts k r).2.1
   calc
@@ -136,7 +139,7 @@ theorem perp_zero
   have hyy : herm (Hpk k r) y y ≠ 0 := by
     intro h
     exact hy0 (JfS.Sym.wb_definite hz hT hy hyz (by rw [h]; simp))
-  have hzz := JfS.Sym.herm_self_ne_zero hT
+  have hzz := _root_.Formalism.FourierDecayAlt.P.C2x5.hzz_ne hT
   have hBz : ∀ b, herm (Hpk k r) (Bs b) z = 0 := fun b => hB.2.2 b z (List.mem_singleton_self z)
   let f : Option (Option (Fin k)) → Fin (2 * r + k + 1) → ℂ := fun o =>
     match o with
@@ -154,15 +157,15 @@ theorem perp_zero
     rcases o with _ | _ | b <;> rcases o' with _ | _ | b'
     · exact absurd rfl hne
     · show herm _ z y = 0
-      rw [JfS.Sym.herm_swap, hyz, star_zero]
+      rw [_root_.PI.StabPairsW.herm_swap, hyz, star_zero]
     · show herm _ z (Bs b') = 0
-      rw [JfS.Sym.herm_swap, hBz, star_zero]
+      rw [_root_.PI.StabPairsW.herm_swap, hBz, star_zero]
     · exact hyz
     · exact absurd rfl hne
     · exact hyB b'
     · exact hBz b
     · show herm _ (Bs b) y = 0
-      rw [JfS.Sym.herm_swap, hyB, star_zero]
+      rw [_root_.PI.StabPairsW.herm_swap, hyB, star_zero]
     · show herm _ (Bs b) (Bs b') = 0
       rw [hB.2.1 b b', if_neg (fun e => hne (by rw [e]))]
   have hfs : ∀ o, herm (Hpk k r) (f o) (f o) ≠ 0 := by
@@ -177,7 +180,8 @@ theorem perp_zero
     rw [Fintype.linearIndependent_iff]
     intro g hg o
     have hsum : (∑ o', g o' • f o') = 0 := by
-      apply psiW_inj (inWb_sum _ _ (fun o' _ => JfS.Sym.inWb_smul _ (hfW o')))
+      apply psiW_inj (inWb_sum _ _
+        (fun o' _ => _root_.Formalism.FourierDecayAlt.P.NFRadRedLocSec.inWb_smul _ (hfW o')))
 
       rw [map_sum]
       simpa only [map_smul] using hg
@@ -208,17 +212,19 @@ theorem col_in (w : Fin (2 * r + k + 1) → ℂ)
     intro i hi
     rcases hi with hi | hi
     · have e : i = eI k r ⟨i.val, hi⟩ := Fin.ext rfl
-      rw [e, ← JfS.Sym.herm_es (X *ᵥ w) ⟨i.val, hi⟩, JfS.Sym.herm_skew hL, (hE _).2,
+      rw [e, ← _root_.PI.StabPairsW.herm_es (X *ᵥ w) ⟨i.val, hi⟩, JfS.Sym.herm_skew hL, (hE _).2,
         JfS.Sym.herm_zero_right, neg_zero]
     · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by
         apply Fin.ext
         simp only [esI]
         omega
-      rw [e, ← JfS.Sym.herm_e (X *ᵥ w) ⟨2 * r + k - i.val, by omega⟩, JfS.Sym.herm_skew hL,
-        (hE _).1, JfS.Sym.herm_zero_right, neg_zero]
+      rw [e, ← _root_.PI.StabPairsW.herm_e (X *ᵥ w) ⟨2 * r + k - i.val, by omega⟩,
+        JfS.Sym.herm_skew hL, (hE _).1, JfS.Sym.herm_zero_right, neg_zero]
   set q := X *ᵥ w - ∑ a, herm (Hpk k r) (X *ᵥ w) (Bs a) • Bs a with hq
   have hqW : inWb k r q :=
-    JfS.Sym.inWb_sub hXw (inWb_sum _ _ (fun a _ => JfS.Sym.inWb_smul _ (hB.1 a)))
+    JfS.Sym.inWb_sub hXw
+      (inWb_sum _ _
+        (fun a _ => _root_.Formalism.FourierDecayAlt.P.NFRadRedLocSec.inWb_smul _ (hB.1 a)))
   have h1 : herm (Hpk k r) (X *ᵥ w) z = 0 := by
     rw [JfS.Sym.herm_skew hL, hXz, JfS.Sym.herm_zero_right, neg_zero]
   have hqz : herm (Hpk k r) q z = 0 := by
@@ -265,7 +271,8 @@ theorem smul_mulVec'' (c : ℂ) (M : B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ
 
 theorem trace_vmv (ξ : B.Mat k r) (a b : Fin (2 * r + k + 1) → ℂ)
     : Matrix.trace (ξ * vecMulVec a (star (Hpk k r *ᵥ b))) = herm (Hpk k r) (ξ *ᵥ a) b := by
-  have hb : star (Hpk k r *ᵥ b) = star b ᵥ* Hpk k r := by rw [star_mulVec, JfS.Sym.hpk_conjT]
+  have hb : star (Hpk k r *ᵥ b) = star b ᵥ* Hpk k r := by
+    rw [star_mulVec, _root_.Formalism.FourierDecayAlt.P.Ux1.hpk_herm]
   rw [hb, herm, dotProduct_mulVec]
   simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, vecMulVec_apply, dotProduct, mulVec]
   refine Finset.sum_congr rfl (fun i _ => ?_)
@@ -339,7 +346,7 @@ theorem compact_zero_holds : CmpZero := by
   have hskew : (cmp Ξ Bs)ᴴ = -(cmp Ξ Bs) := by
     ext a b
     rw [Matrix.conjTranspose_apply, Matrix.neg_apply, cmp_eq, cmp_eq,
-      JfS.Sym.herm_skew hΞ (Bs a) (Bs b), JfS.Sym.herm_swap (Bs a), neg_neg]
+      JfS.Sym.herm_skew hΞ (Bs a) (Bs b), _root_.PI.StabPairsW.herm_swap (Bs a), neg_neg]
   have hzero := skew_nil_zero _ hskew k hnil
   have hc : ∀ a b, herm (Hpk k r) (Ξ *ᵥ Bs a) (Bs b) = 0 := by
     intro a b
@@ -350,7 +357,8 @@ theorem compact_zero_holds : CmpZero := by
   have hv : ∀ v, X *ᵥ v = Y *ᵥ v := by
     intro v
     rw [row_in hz hT hB hX v, hY]
-    simp only [sum_mulVec', smul_mulVec'', JfS.Sym.vmv_mulVec, JfS.Sym.star_hpk_dot]
+    simp only [sum_mulVec', smul_mulVec'', _root_.PI.PolynomialProperness.TauN.vmv_mulVec,
+      JfS.Sym.star_hpk_dot]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun b _ => ?_)
     conv_lhs => rw [col_in hz hT hB hX (Bs b)]
@@ -372,6 +380,6 @@ end Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity.CmpZeroPf
 
 namespace Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity
 
-theorem compact_zero_holds : CmpZero := CmpZeroPf.compact_zero_holds
+alias compact_zero_holds := _root_.Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity.CmpZeroPf.compact_zero_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity

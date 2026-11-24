@@ -74,7 +74,7 @@ theorem signs_alternate_inert
     simp only [pos]
     rw [key i]
     rcases Int.units_eq_one_or (letter τ φ i).1.2 with h | h
-      <;> rcases Int.units_eq_one_or ε with h' | h' <;> simp [h, h'] <;> decide
+      <;> rcases Int.units_eq_one_or ε with h' | h' <;> simp [h, h']
   refine ⟨hA, fun i => ?_⟩
   have h := hA i
   simp only at h ⊢

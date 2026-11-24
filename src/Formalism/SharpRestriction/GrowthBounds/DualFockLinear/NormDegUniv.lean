@@ -68,12 +68,6 @@ theorem normDeg_univ (r : ℕ) (m : TV n' k →₀ ℕ)
   rw [Finsupp.notMem_support_iff] at hv
   simp [hv]
 
-theorem normDeg_add (r : ℕ) (m m' : TV n' k →₀ ℕ)
-    : normDeg r (m + m') = normDeg r m + normDeg r m' := by
-  simp only [normDeg_univ, Finsupp.coe_add, Pi.add_apply, ← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun v _ => ?_
-  split_ifs <;> simp
-
 def NDsub (R : Type) [CommRing R] (n' k r T : ℕ) : Submodule R (MvPolynomial (TV n' k) R) :=
   restrictSupport R {mm | normDeg r mm ≤ T}
 
@@ -90,7 +84,7 @@ theorem NDsub_mono {r T T' : ℕ} (h : T ≤ T') : NDsub R n' k r T ≤ NDsub R 
 
 theorem nd_move (r : ℕ) (mm : TV n' k →₀ ℕ) (v v' : TV n' k)
     : normDeg r (Finsupp.single v 1 + (mm - Finsupp.single v' 1)) ≤ normDeg r mm + 1 := by
-  rw [normDeg_add]
+  rw [_root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.bx_normDeg_add]
   have h1 : normDeg r (Finsupp.single v 1 : TV n' k →₀ ℕ) ≤ 1 := by
     rw [normDeg_univ]
     calc
@@ -128,7 +122,7 @@ theorem nd_mul
   have h1 := support_mul P Q hmm
   rw [Finset.mem_add] at h1
   obtain ⟨a, ha, b, hb, rfl⟩ := h1
-  rw [normDeg_add]
+  rw [_root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.bx_normDeg_add]
   exact Nat.add_le_add (hP a ha) (hQ b hb)
 
 theorem Lin_pderiv
@@ -188,7 +182,7 @@ theorem word_length {τ : Type} (TT : Finset (Fin n')) (c : ℕ)
             ((z :: l).filter fun w => w.1 = s).length
               = (l.filter fun w => w.1 = s).length + if z.1 = s then 1 else 0 := by
         intro s
-        by_cases hs : z.1 = s <;> simp [List.filter_cons, hs]
+        by_cases hs : z.1 = s <;> simp [hs]
       rw [List.length_cons, ih (fun w hw => hl w (List.mem_cons_of_mem _ hw)),
         Finset.sum_congr rfl (fun s _ => e s), Finset.sum_add_distrib, Finset.sum_ite_eq]
       simp [hl z (by simp)]

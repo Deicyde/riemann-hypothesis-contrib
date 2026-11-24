@@ -2,7 +2,8 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoordForm
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -73,7 +74,7 @@ theorem hCo_continuousAddEquiv
             e S = hCo R σ b S := by
   intro F E _ _ _ _ _ σ hCM R _ _ _ _ _ _ _ d b n
   obtain ⟨t1, t2, t3, t4, t5, t6, t7, -, -, -⟩ :=
-    GlobalTheory.T.tensor_locally_compact_ring F E σ hCM R
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM R
   obtain ⟨hinv, δ, hδ, hσδ⟩ := GlobalTheory.CompanionTheory.SW.HaarCoord.conj_facts hCM
   have hfin : Module.finrank F E = 2 := hCM.2.2.1
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩

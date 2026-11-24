@@ -308,9 +308,7 @@ theorem exists_kap [IsNoetherianRing R] (hM : MulPullSt) (n : ℕ)
         apply Additive.ofMul.injective
         simp [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
         module)
-      (fun y J hJ => by
-        beta_reduce
-        rw [Category.comp_id, MonObj.comp_one, mul_inv_cancel])
+      (fun y J hJ => by rw [Category.comp_id, MonObj.comp_one, mul_inv_cancel])
   exact ⟨s, hs⟩
 
 theorem exists_nu [IsNoetherianRing R] (hM : MulPullSt) (n : ℕ)
@@ -326,9 +324,7 @@ theorem exists_nu [IsNoetherianRing R] (hM : MulPullSt) (n : ℕ)
         apply Additive.ofMul.injective
         simp [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
         module)
-      (fun y J hJ => by
-        beta_reduce
-        rw [Category.comp_id, normd_one hκ hJ, normd_one hκ' hJ, mul_inv_cancel])
+      (fun y J hJ => by rw [Category.comp_id, normd_one hκ hJ, normd_one hκ' hJ, mul_inv_cancel])
   exact ⟨s, hs⟩
 
 theorem comp_id_pow (x : Y ⟶ D.P.A) (n : ℕ) : x ≫ 𝟙 D.P.A ^ n = x ^ n :=
@@ -389,7 +385,6 @@ theorem univ_identity
       (fun y J hJ => by
         have C : IsCub (cubV D.cub (T := 𝟙_ _) y J) := isCub_cubV D.cub hJ
         have e : (1 : 𝟙_ _ ⟶ D.P.A) ≫ 𝟙 D.P.A ^ N = 1 := (comp_id_pow _ _).trans (one_pow _)
-        beta_reduce
         rw [e, C.face₃, C.N_one, Category.comp_id, normd_one hν hJ, normd_one hκ hJ,
           normd_one (u := D.sym) ⟨D.sym_gen, D.sym_rig⟩ hJ]
         simp)
@@ -523,7 +518,7 @@ theorem main
         have hk' : (N : ℤ) = 2 * k + 1 := by exact_mod_cast hk
         rw [hk']
         apply Additive.ofMul.injective
-        simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, ofMul_one]
+        simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
         module)
   have key
       : ∀ z J,

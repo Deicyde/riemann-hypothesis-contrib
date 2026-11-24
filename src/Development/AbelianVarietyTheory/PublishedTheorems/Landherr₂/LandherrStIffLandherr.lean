@@ -60,29 +60,49 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 
 namespace GlobalTheory.Published
 
-def LandherrSt : Prop := (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G G' : Matrix (Fin r) (Fin r) E), (∀ a b, FD.cc (G a b) = G b a) → (∀ a b, FD.cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0 → (∀ τ : E →+* ℂ, ∃ p0 : ℕ, (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ G' Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))) → (∃ z : E, G'.det = z * FD.cc z * G.det) → ∃ γ : GL (Fin r) E, ∀ x y, FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ x) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ y) = FD.herm G' x y)
+def LandherrSt : Prop :=
+  (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G G' : Matrix (Fin r) (Fin r) E),
+    (∀ a b, FD.cc (G a b) = G b a) → (∀ a b, FD.cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0
+      → (∀ τ : E →+* ℂ, ∃ p0 : ℕ,
+        (∃ Q : Matrix (Fin r) (Fin r) ℂ,
+            Q.det ≠ 0
+              ∧ FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))
+          ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ,
+            Q.det ≠ 0
+              ∧ FD.gram τ G' Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)))
+      → (∃ z : E, G'.det = z * FD.cc z * G.det)
+      → ∃ γ : GL (Fin r) E, ∀ x y,
+        FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ x) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ y)
+          = FD.herm G' x y)
 
 namespace LandherrSt
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.Published.LandherrSt.herm_eq (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) :
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G x y = x ⬝ᵥ (G *ᵥ fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (y b)) := by
+theorem _root_.GlobalTheory.Published.LandherrSt.herm_eq
+    (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E)
+    : _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G x y
+      = x ⬝ᵥ (G *ᵥ fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (y b)) := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.herm
   simp only [dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.Published.LandherrSt.herm_mulVec (G P : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) :
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G (P *ᵥ x) (P *ᵥ y) = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Pᵀ * G * P.map _root_.ReciprocityTheory.ChartRestriction.G.FD.cc) x y := by
-  rw [_root_.GlobalTheory.Published.LandherrSt.herm_eq, _root_.GlobalTheory.Published.LandherrSt.herm_eq]
-  have h : (fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ((P *ᵥ y) b)) = P.map _root_.ReciprocityTheory.ChartRestriction.G.FD.cc *ᵥ fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (y b) := by
+theorem _root_.GlobalTheory.Published.LandherrSt.herm_mulVec
+    (G P : Matrix (Fin r) (Fin r) E) (x y : Fin r → E)
+    : _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G (P *ᵥ x) (P *ᵥ y)
+      = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm
+        (Pᵀ * G * P.map _root_.ReciprocityTheory.ChartRestriction.G.FD.cc) x y := by
+  rw [_root_.GlobalTheory.Published.LandherrSt.herm_eq,
+    _root_.GlobalTheory.Published.LandherrSt.herm_eq]
+  have h
+      : (fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ((P *ᵥ y) b))
+        = P.map _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
+          *ᵥ fun b => _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (y b) := by
     funext b
     unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
 
@@ -98,11 +118,11 @@ private lemma cc_inv' {E : Type} [Field E] [NumberField E] [IsCMField E] (z : E)
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
   exact map_inv₀ _ _
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.Published.landherrSt_of_landherr (H : _root_.GlobalTheory.Published.Landherr) :
-    _root_.GlobalTheory.Published.LandherrSt := by
+theorem _root_.GlobalTheory.Published.landherrSt_of_landherr
+    (H : _root_.GlobalTheory.Published.Landherr)
+    : _root_.GlobalTheory.Published.LandherrSt := by
   intro E _ _ _ r G G' hG hG' hd hd' hsig hdet
   obtain ⟨z, hz⟩ := hdet
   have hz0 : z ≠ 0 := by
@@ -110,13 +130,20 @@ theorem _root_.GlobalTheory.Published.landherrSt_of_landherr (H : _root_.GlobalT
     rw [zero_mul, zero_mul] at hz
     exact hd' hz
   obtain ⟨P, hP, hPG⟩ :=
-    _root_.GlobalTheory.Published.Landherr.of_signature H hG hG'
-      hd hd' Set.univ (fun _ => Or.inl trivial) (fun τ _ => hsig τ) ⟨z⁻¹, by
-        rw [hz, cc_inv']
-        field_simp [_root_.GlobalTheory.Published.cc_ne_zero hz0]⟩
+    _root_.GlobalTheory.Published.Landherr.of_signature H hG hG' hd hd' Set.univ
+      (fun _ => Or.inl trivial)
+      (fun τ _ => hsig τ)
+      ⟨
+        z⁻¹,
+        by
+          rw [hz, cc_inv']
+          field_simp [_root_.GlobalTheory.Published.cc_ne_zero hz0]
+      ⟩
   refine ⟨nonsingInvUnit P (isUnit_iff_ne_zero.2 hP), fun x y => ?_⟩
-  rw [show ((nonsingInvUnit P (isUnit_iff_ne_zero.2 hP) : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) = P
-    from rfl, _root_.GlobalTheory.Published.LandherrSt.herm_mulVec, ← hPG]
+  rw [show ((nonsingInvUnit P (isUnit_iff_ne_zero.2 hP) : GL (Fin r) E) : Matrix (Fin r) (Fin r) E)
+        = P from
+      rfl,
+    _root_.GlobalTheory.Published.LandherrSt.herm_mulVec, ← hPG]
 
 namespace LandherrSt
 
@@ -205,14 +232,18 @@ private lemma sgn_ne_zero_published_landherr (p a : ℕ) : _root_.ReciprocityThe
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
   split_ifs <;> norm_num
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn {G : Matrix (Fin r) (Fin r) E}
-    (hG : ∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (G a b) = G b a) (hd : G.det ≠ 0) (τ : E →+* ℂ) :
-    ∃ (p : ℕ) (Q : Matrix (Fin r) (Fin r) ℂ), Q.det ≠ 0 ∧
-      _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
+theorem _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn
+    {G : Matrix (Fin r) (Fin r) E}
+    (hG : ∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (G a b) = G b a) (hd : G.det ≠ 0)
+    (τ : E →+* ℂ)
+    : ∃ (p : ℕ) (Q : Matrix (Fin r) (Fin r) ℂ),
+      Q.det ≠ 0
+        ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G Q
+          = Matrix.diagonal fun a : Fin r =>
+            ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
   have hA : (G.map τ).IsHermitian := by
     ext i j
     simp [conjTranspose_apply, ← _root_.GlobalTheory.Published.embedding_cc, hG]
@@ -222,8 +253,10 @@ theorem _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn {G : Matrix 
     rw [← h]
     exact (map_ne_zero τ).2 hd
   obtain ⟨p, M, hM⟩ := exists_conjTranspose_mul_mul_eq_sgn_diagonal _ hA hAd
-  have hg : _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G (M.map (starRingEnd ℂ)) =
-      diagonal fun a : Fin r => ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
+  have hg
+      : _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G (M.map (starRingEnd ℂ))
+        = diagonal fun a : Fin r =>
+          ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
     rw [_root_.GlobalTheory.Published.gram_eq, show (M.map (starRingEnd ℂ))ᵀ = Mᴴ from rfl]
     convert hM using 2
     ext i j
@@ -231,8 +264,9 @@ theorem _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn {G : Matrix 
   refine ⟨p, M.map (starRingEnd ℂ), ?_, hg⟩
   intro h0
   have h := congrArg det hg
-  rw [_root_.GlobalTheory.Published.gram_eq, det_mul, det_mul, det_transpose, h0, zero_mul, zero_mul,
-    det_diagonal] at h
+  rw [_root_.GlobalTheory.Published.gram_eq, det_mul, det_mul, det_transpose, h0, zero_mul,
+      zero_mul, det_diagonal]
+    at h
   refine absurd h.symm (Finset.prod_ne_zero_iff.2 ?_)
   intro a _
   exact Complex.ofReal_ne_zero.2 (sgn_ne_zero_published_landherr p (a : ℕ))
@@ -246,39 +280,47 @@ private lemma one_map_cc {E : Type} [Field E] [NumberField E] [IsCMField E] {r :
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
   exact Matrix.map_one _ (map_zero _) (map_one _)
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.Published.landherr_of_landherrSt (H : _root_.GlobalTheory.Published.LandherrSt) :
-    _root_.GlobalTheory.Published.Landherr := by
+theorem _root_.GlobalTheory.Published.landherr_of_landherrSt
+    (H : _root_.GlobalTheory.Published.LandherrSt)
+    : _root_.GlobalTheory.Published.Landherr := by
   intro E _ _ _ r G G' hG hG' hd hd' hcong hdet
   obtain ⟨x, hx⟩ := hdet
   have hx0 : x ≠ 0 := by
     rintro rfl
     rw [zero_mul] at hx
     exact div_ne_zero hd hd' hx
-  have hsig : ∀ τ : E →+* ℂ, ∃ p0 : ℕ, (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
-      _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) ∧
-      (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
-      _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G' Q = Matrix.diagonal fun a : Fin r => ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
+  have hsig
+      : ∀ τ : E →+* ℂ, ∃ p0 : ℕ,
+        (∃ Q : Matrix (Fin r) (Fin r) ℂ,
+            Q.det ≠ 0
+              ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G Q
+                = Matrix.diagonal fun a : Fin r =>
+                  ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p0 (a : ℕ) : ℝ) : ℂ))
+          ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ,
+            Q.det ≠ 0
+              ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G' Q
+                = Matrix.diagonal fun a : Fin r =>
+                  ((_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
     intro τ
-    obtain ⟨p, Q, hQ, hgram⟩ :=
-      _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn hG hd τ
+    obtain ⟨p, Q, hQ, hgram⟩ := _root_.GlobalTheory.Published.LandherrSt.exists_gram_eq_sgn hG hd τ
     obtain ⟨R, hR, hR'⟩ := hcong τ
     have hRu : IsUnit R.det := isUnit_iff_ne_zero.2 hR
     refine ⟨p, ⟨Q, hQ, hgram⟩, R⁻¹ * Q, ?_, ?_⟩
     · rw [det_mul, det_nonsing_inv, Ring.inverse_eq_inv']
       exact mul_ne_zero (inv_ne_zero hR) hQ
-    · have h1 : (R⁻¹)ᵀ * Rᵀ = 1 := by
-        rw [← transpose_mul, mul_nonsing_inv _ hRu, transpose_one]
+    · have h1 : (R⁻¹)ᵀ * Rᵀ = 1 := by rw [← transpose_mul, mul_nonsing_inv _ hRu, transpose_one]
       have h2 : R.map (starRingEnd ℂ) * (R⁻¹).map (starRingEnd ℂ) = 1 := by
         rw [← Matrix.map_mul, mul_nonsing_inv _ hRu, Matrix.map_one _ (map_zero _) (map_one _)]
       rw [_root_.GlobalTheory.Published.gram_eq] at hgram ⊢
       rw [hR', transpose_mul, Matrix.map_mul, ← hgram]
-      calc Qᵀ * (R⁻¹)ᵀ * (Rᵀ * G.map τ * R.map (starRingEnd ℂ)) *
-            ((R⁻¹).map (starRingEnd ℂ) * Q.map (starRingEnd ℂ))
-          = Qᵀ * ((R⁻¹)ᵀ * Rᵀ) * G.map τ * (R.map (starRingEnd ℂ) * (R⁻¹).map (starRingEnd ℂ)) *
-            Q.map (starRingEnd ℂ) := by simp only [Matrix.mul_assoc]
+      calc
+        Qᵀ * (R⁻¹)ᵀ * (Rᵀ * G.map τ * R.map (starRingEnd ℂ))
+              * ((R⁻¹).map (starRingEnd ℂ) * Q.map (starRingEnd ℂ))
+            = Qᵀ * ((R⁻¹)ᵀ * Rᵀ) * G.map τ * (R.map (starRingEnd ℂ) * (R⁻¹).map (starRingEnd ℂ))
+              * Q.map (starRingEnd ℂ) := by
+          simp only [Matrix.mul_assoc]
         _ = Qᵀ * G.map τ * Q.map (starRingEnd ℂ) := by rw [h1, h2, Matrix.mul_one, Matrix.mul_one]
   have hdet' : G'.det = x⁻¹ * _root_.ReciprocityTheory.ChartRestriction.G.FD.cc x⁻¹ * G.det := by
     rw [div_eq_iff hd'] at hx
@@ -287,11 +329,11 @@ theorem _root_.GlobalTheory.Published.landherr_of_landherrSt (H : _root_.GlobalT
   obtain ⟨γ, hγ⟩ := H E r G G' hG hG' hd hd' hsig ⟨x⁻¹, hdet'⟩
   · refine ⟨γ, ((Matrix.isUnit_iff_isUnit_det _).1 γ.isUnit).ne_zero, ?_⟩
     ext a b
-    have h := hγ (fun k => (1 : Matrix (Fin r) (Fin r) E) k a)
-      (fun k => (1 : Matrix (Fin r) (Fin r) E) k b)
+    have h :=
+      hγ (fun k => (1 : Matrix (Fin r) (Fin r) E) k a) (fun k => (1 : Matrix (Fin r) (Fin r) E) k b)
     rw [_root_.GlobalTheory.Published.LandherrSt.herm_mulVec,
-      _root_.GlobalTheory.Published.herm_col, _root_.GlobalTheory.Published.herm_col,
-      one_map_cc] at h
+        _root_.GlobalTheory.Published.herm_col, _root_.GlobalTheory.Published.herm_col, one_map_cc]
+      at h
     simpa using h.symm
 
 end GlobalTheory.Published

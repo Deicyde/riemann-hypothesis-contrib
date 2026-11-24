@@ -98,8 +98,7 @@ theorem gm_inj
         rfl
       )
   have hinj : Function.Injective (κ.stalkMap z).hom := by
-    first
-    | exact (ConcreteCategory.bijective_of_isIso (κ.stalkMap z)).1
+    first | exact (ConcreteCategory.bijective_of_isIso (κ.stalkMap z)).1
   apply Units.ext
   apply hinj
   rw [key U h a, key U' h' b]
@@ -230,8 +229,7 @@ theorem surj_comp
     {X Y Z : Scheme.{0}} {p : X ⟶ Y} {q : Y ⟶ Z}
     (hp : Function.Surjective p.appTop.hom) (hq : Function.Surjective q.appTop.hom)
     : Function.Surjective (p ≫ q).appTop.hom := by
-  first
-  | (rw [Scheme.Hom.comp_appTop]; exact hp.comp hq)
+  first | (rw [Scheme.Hom.comp_appTop]; exact hp.comp hq)
 
 variable [IsCommMonObj A] {L : LB A.left}
 
@@ -253,13 +251,11 @@ theorem prod_ros
       : ∀ a b : A ⊗ A ⟶ A,
         (lift x y ≫ padd A a b).left = ((lift x y ≫ a) * (lift x y ≫ b)).left := by
     intro a b
-    first
-    | (simp only [padd, comp_lift_assoc]; rfl)
+    first | (simp only [padd, comp_lift_assoc]; rfl)
   simp only [Fin.prod_univ_succ, Fin.prod_univ_zero, rosatiφ, rosatiε, Matrix.cons_val_zero,
     Matrix.cons_val_succ, e, m1, lift_fst, lift_snd, lift_fst_assoc, lift_snd_assoc, zpow_one,
     zpow_neg, mul_one]
-  first
-  | ac_rfl
+  first | ac_rfl
 
 theorem exists_ros
     (hG : GlobalFnsSt) (hA : IsAbelianScheme A) (hL : L.IsLB)

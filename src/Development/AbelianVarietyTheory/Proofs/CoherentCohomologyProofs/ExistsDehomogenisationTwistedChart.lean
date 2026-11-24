@@ -281,7 +281,7 @@ theorem exists_dehom_chart
                 GrSum.of (hx V) t' (SecOnR.restrict f _ le_top a)
                   = xProd R {i} ^ k • GrSum.of (hx V) t y := by
     rintro _ rfl
-    exact GlobalTheory.T.twistedSections_localise_to_charts R Y f H m s M hH hM hs hx {i}
+    exact _root_.GlobalTheory.AbLaw.twisted_sections_localise R Y f H m s M hH hM hs hx {i}
   obtain ⟨h₁, h₂⟩ := key (nonzeroLocus (s i)) (by simp)
   exact ⟨ratio_self s i le_rfl r hr, exists_dehom_top f s hx i le_rfl r hr h₁ h₂⟩
 

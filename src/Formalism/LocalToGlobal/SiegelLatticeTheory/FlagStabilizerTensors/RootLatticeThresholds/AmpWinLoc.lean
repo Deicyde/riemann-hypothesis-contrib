@@ -114,10 +114,7 @@ theorem eT_lmul (τ : D.what₂.Tau) (v : InfinitePlace X.B.I.F) (s : Formalism.
   funext x
   simp only [Function.comp]
   rw [eT_mul]
-  first
-  | rfl
-  | (unfold lmulM eT; simp only [Equiv.apply_symm_apply])
-  | (unfold lmulM; exact (rfl : (0 : ℕ) = 0))
+  first | rfl
 
 end Defs
 

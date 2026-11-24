@@ -39,9 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open UpperTheory.V.Af UpperTheory.V.Af.Gu
 theorem UpperTheory.satake_galois_link_of_printed_hida

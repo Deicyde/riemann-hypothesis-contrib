@@ -45,6 +45,7 @@ open AlgebraicGeometry CategoryTheory Limits NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
   ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.tangentTranslate_lifts_semiAbelianTripleMap
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X X' : Scheme.{0})
         (t : SAB H X) (t' : SAB H X') (j : X' ⟶ X) (m : SABMap t' t j) (R R' : Type) [CommRing R]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.tangentTranslate_lifts_semiAbelianTripleMap
                   IsTranslate t (φS.comp ψ) (g₀' ≫ m.φ) u w
                     → ∃ w' : Sp (DualNumber S) ⟶ t'.G.left,
                       w' ≫ m.φ = w ∧ IsTranslate t' φS g₀' u' w' := by
-  first
-  | exact @GlobalTheory.TransLift.lift_isTranslate
-  | exact GlobalTheory.TransLift.lift_isTranslate
-  | (intros; apply GlobalTheory.TransLift.lift_isTranslate <;> assumption)
+  first | exact @GlobalTheory.TransLift.lift_isTranslate

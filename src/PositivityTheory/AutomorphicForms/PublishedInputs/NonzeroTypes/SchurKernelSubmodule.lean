@@ -71,11 +71,11 @@ theorem schurInjective_holds : SchurInjectiveFromIrreducible := by
   rcases eq_bot_or_eq_top (kerSub ξ ρ g hint) with h | h
   · rw [← LinearMap.ker_eq_bot]
     have hk := congrArg Subrepresentation.toSubmodule h
-    first | exact hk | simpa [kerSub] using hk
+    first | exact hk
   · exfalso
     apply hg
     rw [← LinearMap.ker_eq_top]
     have hk := congrArg Subrepresentation.toSubmodule h
-    first | exact hk | simpa [kerSub] using hk
+    first | exact hk
 
 end UpperTheory.NonzeroTypeTheory

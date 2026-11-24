@@ -6,15 +6,16 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditional
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOfValILeOne
 public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.MemNonzeroLocusOfUnit
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ArcFrameChangeByConstantsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ArcFrameChangeByConstants
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsArcBasisBaseChange
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantEigenbasisTangentArc
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroup
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsIsArcFr
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArcStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FrameChangeComposeInvertBaseChangeTriangular
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FrameChangeExistsUniqueInvertible
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieCombStatement
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroup
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArc
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieComb
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsLieBasisEigen
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -154,13 +155,13 @@ theorem arcBasis_change
     rwa [RingHom.map_det] at this
   have ht : ∀ τ i, IsTangent (v τ i) := fun τ i => ((hb τ).1 i).1
   have img : ∀ τ i, LieImg W (e' τ i) (prodPts (k' τ i) (v τ)) := fun τ i =>
-    (GlobalTheory.T.lieImg_iff_isLieComb_of_gtComb hG E H Dw l Xo c O β Y A b a χ W _ _ (e τ) _
+    (_root_.GlobalTheory.ConstLin.lieImg_iff_isLieComb hG E H Dw l Xo c O β Y A b a χ W _ _ (e τ) _
       (v τ) _ (hi τ) (he τ i)).2 ((Chart.isLieComb_iff _ _ _).2 rfl)
   refine ⟨
     ⟨_, img, fun τ => ⟨fun i => ⟨isTangent_prodPts (ht τ) _, fun x => ?_⟩, fun w hw hw' => ?_⟩⟩,
     fun τ i =>
-      ((GlobalTheory.T.exists_unique_constant_tangent_vectors_along_arc hG E H Dw l Xo c O β Y A b a
-        χ W _).2 _ (img τ i)).2 (isTangent_prodPts (ht τ) _)
+      ((_root_.GlobalTheory.ConstLie.main hG E H Dw l Xo c O β Y A b a χ W _).2 _ (img τ i)).2
+        (isTangent_prodPts (ht τ) _)
   ⟩
   · exact eig_prodPts W.t.act (ht τ) x _ (fun j => ((hb τ).1 j).2 x) _
   · exact existsUnique_change (ht τ) (k' τ) (hk' τ) ((hb τ).2 w hw hw')
@@ -260,8 +261,8 @@ theorem exists_arcFrame
     ?_,
     ?_
   ⟩
-  · refine GlobalTheory.T.arcFrame_change_by_constants hL hL₂ E H Dw l Xo c _ _ Y T.V b a χ W e₁ e
-      th th k 1 hth he (ThMul.refl th) T.Fr _ y₁ y₀ hm hy₁ ?_
+  · refine _root_.GlobalTheory.ArcQ.isArcFr_of_frChg_const hL hL₂ E H Dw l Xo c _ _ Y T.V b a χ W e₁
+      e th th k 1 hth he (ThMul.refl th) T.Fr _ y₁ y₀ hm hy₁ ?_
     rw [hC, map_one, map_one]
     exact hy₀
   · refine (hbor _ _ _).2 ⟨L, fun _ _ => rfl, hL0, (hcomp _ L _ _ y₁ y₀ y hy₀).2 ?_⟩

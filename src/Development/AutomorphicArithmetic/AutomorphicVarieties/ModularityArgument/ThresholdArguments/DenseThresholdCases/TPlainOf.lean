@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL
   GlobalTheory.SplitWeil GlobalTheory.LocGL

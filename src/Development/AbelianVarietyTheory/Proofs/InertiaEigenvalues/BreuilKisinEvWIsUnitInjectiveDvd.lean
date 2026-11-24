@@ -46,7 +46,9 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -68,8 +70,8 @@ theorem flat_ne_zero : bk.flat ≠ 0 := by
   obtain ⟨w, hw⟩ := bk.coeff_zero
   have hE : bk.ev bk.E = (l : Ainf l) * wA l bk.a (w : Wq l bk.a) := by
     conv_lhs => rw [eq_X_mul_shift_add_const bk.E]
-    rw [map_add (f := _), map_mul, hX, zero_mul, zero_add, bk.ev_C, Polynomial.constantCoeff_coe, hw, map_mul,
-      map_natCast]
+    rw [map_add (f := _), map_mul, hX, zero_mul, zero_add, bk.ev_C, Polynomial.constantCoeff_coe,
+      hw, map_mul, map_natCast]
   have hl' : (l : Ainf l) ∈ RingHom.ker (Per.θ l) := by
     rw [← bk.span_ev, hE, Ideal.span_singleton_mul_right_unit ((w.isUnit).map (wA l bk.a))]
     exact Ideal.mem_span_singleton_self _
@@ -95,11 +97,13 @@ theorem dvd_of_evRed_eq_zero (x : bk.S) (hx : bk.evRed x = 0) : (l : bk.S) ∣ x
       simp [v, ← coeff_zero_eq_constantCoeff]
     rw [this]
     exact (Ne.isUnit hvb).map _
-  obtain ⟨y, hy⟩ := dvd_of_map_eq_zero l bk.a (x - X ^ m * v) (by
-    rw [map_sub, map_mul, map_pow, PowerSeries.map_X, hv, X_pow_order_mul_divXPowOrder, sub_self])
+  obtain ⟨y, hy⟩ :=
+    dvd_of_map_eq_zero l bk.a (x - X ^ m * v) (by
+      rw [map_sub, map_mul, map_pow, PowerSeries.map_X, hv, X_pow_order_mul_divXPowOrder, sub_self])
   have h1 : bk.evRed x = bk.flat ^ m * bk.evRed v := by
     have : x = X ^ m * v + (l : bk.S) * y := by linear_combination hy
-    rw [this, map_add (f := _), map_mul, map_mul, map_pow, evRed_X, map_natCast, CharP.cast_eq_zero, zero_mul, add_zero]
+    rw [this, map_add (f := _), map_mul, map_mul, map_pow, evRed_X, map_natCast, CharP.cast_eq_zero,
+      zero_mul, add_zero]
   rw [hx] at h1
   exact mul_ne_zero (pow_ne_zero _ bk.flat_ne_zero) (hvu.map bk.evRed).ne_zero h1.symm
 
@@ -108,13 +112,15 @@ theorem dvd_of_dvd_ev (x : bk.S) (h : (l : Ainf l) ∣ bk.ev x) : (l : bk.S) ∣
   obtain ⟨z, hz⟩ := h
   simp only [evRed, RingHom.comp_apply, hz, map_mul, map_natCast, CharP.cast_eq_zero, zero_mul]
 
-theorem eq_zero_of_forall_pow_dvd (w : Wq l bk.a) (h : ∀ n : ℕ, (l : Wq l bk.a) ^ n ∣ w) : w = 0 := by
+theorem eq_zero_of_forall_pow_dvd (w : Wq l bk.a) (h : ∀ n : ℕ, (l : Wq l bk.a) ^ n ∣ w)
+    : w = 0 := by
   by_contra hw
   obtain ⟨m, b, hb0, hb⟩ := WittVector.exists_eq_pow_p_mul w hw
   obtain ⟨c, hc⟩ := h (m + 1)
   have hbc : b = (l : Wq l bk.a) * c := by
     apply mul_left_cancel₀ (pow_ne_zero m (WittVector.p_nonzero l (Fq l bk.a)))
-    rw [← hb, hc]; ring
+    rw [← hb, hc]
+    ring
   apply hb0
   have := congrArg (WittVector.constantCoeff (p := l) (R := Fq l bk.a)) hbc
   rwa [map_mul, map_natCast, CharP.cast_eq_zero, zero_mul, WittVector.constantCoeff_apply] at this
@@ -124,10 +130,13 @@ theorem ev_injective : Function.Injective bk.ev := by
 
 end Red
 
-theorem evW_isUnit_injective_dvd : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
-    IsUnit (bk.evW bk.E) ∧ Function.Injective bk.evW ∧
-      ∀ x : bk.S, ((l : ℕ) : Ainf l) ∣ bk.ev x → ((l : ℕ) : bk.S) ∣ x :=
-  fun _ _ _ bk => ⟨isUnit_inclW_of_span bk.span_ev, GlobalTheory.Prism.inclW_injective.comp bk.ev_injective,
-    bk.dvd_of_dvd_ev⟩
+theorem evW_isUnit_injective_dvd
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
+      IsUnit (bk.evW bk.E) ∧ Function.Injective bk.evW
+        ∧ ∀ x : bk.S, ((l : ℕ) : Ainf l) ∣ bk.ev x → ((l : ℕ) : bk.S) ∣ x := fun _ _ _ bk => ⟨
+  isUnit_inclW_of_span bk.span_ev,
+  GlobalTheory.Prism.inclW_injective.comp bk.ev_injective,
+  bk.dvd_of_dvd_ev
+⟩
 
 end GlobalTheory.BSP.BK

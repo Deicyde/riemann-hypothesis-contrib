@@ -57,8 +57,8 @@ def eta₃
   app U := ModuleCat.freeDesc (TypeCat.ofHom (fun y => a U.unop y.down))
   naturality U V g := by
     refine ModuleCat.free_hom_ext (fun y => ?_)
-    simp only [freeP, Functor.whiskeringRight_obj_obj, Functor.whiskeringRight_obj_map,
-      Functor.comp_obj, Functor.comp_map, ModuleCat.hom_comp, LinearMap.comp_apply]
+    simp only [freeP, Functor.whiskeringRight_obj_obj, Functor.comp_obj, Functor.comp_map,
+      ModuleCat.hom_comp, LinearMap.comp_apply]
     erw [ModuleCat.free_map_apply, ModuleCat.freeDesc_apply, ModuleCat.freeDesc_apply]
     exact (ha _ _ g.unop y.down).symm
 
@@ -81,7 +81,7 @@ theorem phi_gen
     congrArg
       (fun t => (t.app (op U)).hom (ModuleCat.freeMk (R := ULift.{1} R) (ULift.up.{1} x)))
       (toSheafify_sheafifyLift Scheme.etaleTopology (eta₃ R P F a ha) F.property)
-  simp only [NatTrans.comp_app, ModuleCat.hom_comp, LinearMap.comp_apply] at e
+  simp only [NatTrans.comp_app, ModuleCat.hom_comp] at e
   refine e.trans ?_
   erw [ModuleCat.freeDesc_apply]
   rfl

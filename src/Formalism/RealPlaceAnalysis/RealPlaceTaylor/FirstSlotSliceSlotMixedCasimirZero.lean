@@ -218,8 +218,7 @@ variable {W : Type*} [AddCommGroup W] [Module ℂ W] {n : ℕ}
 
 theorem compactCasimir_apply (ε : Fin n → Bool) (T : Fin n → Fin n → Module.End ℂ W) (x : W)
     : CasK ε T x = ∑ a, ∑ b, if ε a = ε b then T a b (T b a x) else 0 := by
-  first
-  | simp only [CasK, LinearMap.sum_apply]
+  first | simp only [CasK, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   split_ifs <;> rfl
 
@@ -345,9 +344,7 @@ theorem casArr_of (hk : KCasSpan) : CasArr := by
       have hre
           : (⟪positionsE V n j b a F, positionsE V n j b a F⟫_ℂ).re
             = ‖positionsE V n j b a F‖ ^ 2 := by
-        first
-        | exact inner_self_eq_norm_sq _
-        | exact inner_self_eq_norm_sq (𝕜 := ℂ) _
+        first | exact inner_self_eq_norm_sq _ | exact inner_self_eq_norm_sq (𝕜 := ℂ) _
       rw [hre]
       positivity
     · simp
@@ -364,7 +361,7 @@ theorem update_comp_perm {X : Type*} (σ : Equiv.Perm (Fin j)) (α : Fin j → X
   · subst hk
     simp
   · have hk' : σ k ≠ i := fun h => hk (by rw [← h, Equiv.symm_apply_apply])
-    simp [Function.update_apply, hk, hk']
+    simp [hk, hk']
 
 theorem factorAction_mul_permuteFactors (σ : Equiv.Perm (Fin j)) (i : Fin j) (c d : Fin n)
     : factorAction (V := V) i c d * permArr V n σ
@@ -425,8 +422,7 @@ theorem firstPositionSlice_positionMixedCasimir_zero
     (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (α' : Fin j → Fin n × Fin n)
     (F : Arr V n (j + 1))
     : sliceLin V n α' (OmS ε E 0 F) = OmS ε E 0 (sliceLin V n α' F) := by
-  first
-  | simp only [OmS, LinearMap.sum_apply, map_sum]
+  first | simp only [OmS, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
   split_ifs
   · change sliceLin V n α' (factorAction 0 c d (ptE E d c F))
@@ -531,7 +527,7 @@ theorem factorAction_mem_admissibleArrays
         · rw [hki] at hk hk'
           simp at hk'
           exact hk' (by rw [← hab, ← h1, hk])
-        · simp [Function.update_apply, hki] at hk'
+        · simp [hki] at hk'
           exact hk' hk
       · rfl
     have t2 : (if (α i).2 = b then F (Function.update α i ((α i).1, a)) else 0) = 0 := by
@@ -542,7 +538,7 @@ theorem factorAction_mem_admissibleArrays
         · rw [hki] at hk hk'
           simp at hk'
           exact hk' (by rw [hk, h2, hab])
-        · simp [Function.update_apply, hki] at hk'
+        · simp [hki] at hk'
           exact hk' hk
       · rfl
     rw [t1, t2, sub_zero]
@@ -564,8 +560,7 @@ theorem admissibleArrays_invariant
     (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (u : V) (j : ℕ)
     : KStable ε (arrE E j) (arrV0 ε E u j) := by
   intro a b hab F hF
-  first
-  | simp only [arrE, LinearMap.add_apply, LinearMap.sum_apply]
+  first | simp only [arrE, LinearMap.add_apply, LinearMap.sum_apply]
   exact Submodule.add_mem _
     (Submodule.sum_mem _ fun i _ => factorAction_mem_admissibleArrays hF i hab)
     (pointwiseAction_mem_admissibleArrays hF hab)
@@ -644,9 +639,7 @@ section U3NPos
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n j : ℕ}
 
 theorem re_inner_self_indexArray (F : Arr V n j) : (⟪F, F⟫_ℂ).re = ‖F‖ ^ 2 := by
-  first
-  | exact inner_self_eq_norm_sq F
-  | exact inner_self_eq_norm_sq (𝕜 := ℂ) F
+  first | exact inner_self_eq_norm_sq F | exact inner_self_eq_norm_sq (𝕜 := ℂ) F
 
 theorem norm_sq_eq_sum_firstPositionSlice (F : Arr V n (j + 1))
     : ‖F‖ ^ 2 = ∑ α' : Fin j → Fin n × Fin n, ‖sliceLin V n α' F‖ ^ 2 := by
@@ -666,10 +659,7 @@ theorem nPos_of (hca : CasArr) (hs : OmSymSlice) (hp : OmPlus) : NPos := by
     calc
       ∑ i : Fin (j+1), ⟪F, OmS ε E i F⟫_ℂ = ∑ _i : Fin (j+1), ⟪F, OmS ε E 0 F⟫_ℂ :=
         Finset.sum_congr rfl fun i _ => (hs V n ε E j F).1 hsym i
-      _ = _ := by
-        first
-        | simp
-        | (rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; push_cast; ring)
+      _ = _ := by first | simp
   have hom : (g - 2 * (n : ℝ)) * ‖F‖ ^ 2 ≤ (⟪F, OmS ε E 0 F⟫_ℂ).re := by
     rw [(hs V n ε E j F).2, Complex.re_sum, norm_sq_eq_sum_firstPositionSlice, Finset.mul_sum]
     exact Finset.sum_le_sum fun α' _ => hp V n ε E lam g u hgl hu hk hfd hg _ (hv α')

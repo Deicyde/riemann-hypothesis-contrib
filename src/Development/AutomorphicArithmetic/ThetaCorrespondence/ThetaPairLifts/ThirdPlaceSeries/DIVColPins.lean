@@ -43,8 +43,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Module NumberField IsDedekindDomain
 open scoped Matrix ComplexOrder

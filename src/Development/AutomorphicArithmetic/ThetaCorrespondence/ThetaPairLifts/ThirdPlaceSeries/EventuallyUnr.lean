@@ -45,8 +45,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain ValuativeRel Matrix Formalism.ConjugateSelfDual
@@ -74,18 +72,14 @@ variable {h : IsPlaceOver A w} {rc : IrrGL (k := w.adicCompletion E) → WD h}
 theorem reciprocity_unramified_iff_spherical
     (H : _root_.UpperTheory.Zero.LLC.IsRecT h rc) (σ : IrrRep (GL (Fin a) (w.adicCompletion E)))
     : (rc (cls σ)).unr ↔ IsSpherical σ.ρ := by
-  first
-  | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨_, _, _, H⟩ := hOpn)
-  | obtain ⟨_, _, _, -, H⟩ := H
+  first | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨_, _, _, H⟩ := hOpn)
   rw [← H.sph]
   exact ⟨fixed_ne_bot_of_equiv (equivRep σ).symm, fixed_ne_bot_of_equiv (equivRep σ)⟩
 theorem reciprocity_eq_diagonal_inv_of_has_satake
     (H : _root_.UpperTheory.Zero.LLC.IsRecT h rc)
     {σ : IrrRep (GL (Fin a) (w.adicCompletion E))} {α : Fin a → ℂˣ} (hα : HasSatake σ.ρ α)
     : rc (cls σ) = WD.mk (WDRep.diag h fun i => (α i)⁻¹) := by
-  first
-  | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨_, _, _, H⟩ := hOpn)
-  | obtain ⟨_, _, _, -, H⟩ := H
+  first | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨_, _, _, H⟩ := hOpn)
   have φ := equivRep σ
   exact H.sat (cls σ) α ⟨
     IrrRep.irr _,
@@ -112,7 +106,6 @@ theorem dim_local_parameter_eq_rank (π : CG E a) (h : IsPlaceOver A w)
         UpperTheory.One.M.opn _ (_root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h)
       obtain ⟨_, _, _, H⟩ := hOpn
     )
-  | obtain ⟨_, _, _, -, H⟩ := _root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h
   exact H.dim _
 include hF in
 theorem eventually_unramified_local_parameter (π : CG E a)

@@ -59,11 +59,14 @@ open Module NumberField Formalism.HermitianLatticeCounting.LocalIntegralStructur
 
 namespace Formalism.HermitianLatticeCounting.P
 
-theorem integer_group_preservation : Formalism.HermitianLatticeCounting.LocalIntegralStructure.ZZgPreserve := by
+theorem integer_group_preservation
+    : Formalism.HermitianLatticeCounting.LocalIntegralStructure.ZZgPreserve := by
   intro E _ _ g a b c d h
   have hI : ∀ y : 𝓞 E, IsInt (y : E) := fun y => by unfold IsInt; exact ⟨y, rfl⟩
-  have mem : ∀ x y : E, IsInt x → IsInt y → (∃ w : 𝓞 E, x + y = (g : E) * (w : E)) →
-      (x, y) ∈ (ZZ g : Set (E × E)) := by
+  have mem
+      : ∀ x y : E,
+        IsInt x → IsInt y → (∃ w : 𝓞 E, x + y = (g : E) * (w : E))
+          → (x, y) ∈ (ZZ g : Set (E × E)) := by
     intro x y hx hy hw
     simp only [ZZ, Set.mem_setOf_eq]
     exact ⟨hx, hy, hw⟩
@@ -85,32 +88,35 @@ theorem integer_group_preservation : Formalism.HermitianLatticeCounting.LocalInt
   · rw [mul_comm]; exact p1.2
   · rw [mul_comm]; exact p2.2
 
-theorem local_congruence_condition : Formalism.HermitianLatticeCounting.LocalIntegralStructure.LocalCongr := by
+theorem local_congruence_condition
+    : Formalism.HermitianLatticeCounting.LocalIntegralStructure.LocalCongr := by
   intro E _ _ P T T' a b c d hP hT hT' h
   have hT0 : (T : E) ≠ 0 := Nat.cast_ne_zero.mpr hT.ne'
   have hT'0 : (T' : E) ≠ 0 := Nat.cast_ne_zero.mpr hT'.ne'
   have h1P : (1 : 𝓞 E) ∉ P := (Ideal.ne_top_iff_one P).mp hP.ne_top
   have one : ∀ x : E, x = 1 → LocIn P x 1 := by
-    intro x hx; unfold LocIn
+    intro x hx
+    unfold LocIn
     exact ⟨1, 1, h1P, by simp [hx]⟩
   have zer : ∀ x : E, x = 0 → LocIn P x 1 := by
-    intro x hx; unfold LocIn
+    intro x hx
+    unfold LocIn
     exact ⟨1, 0, h1P, by simp [hx]⟩
   have back : ∀ (x : E) (N : ℕ), (N : E) ≠ 0 → LocIn P (x * (1 / (N : E))) 1 → LocIn P x N := by
     intro x N hN hx
     unfold LocIn at hx ⊢
     obtain ⟨y, z, hy, hyz⟩ := hx
     refine ⟨y, z, hy, ?_⟩
-    have e : (y : E) * x = (N : E) * ((y : E) * (x * (1 / (N : E)))) := by
-      first
-      | field_simp
-    rw [e, hyz]; simp
+    have e : (y : E) * x = (N : E) * ((y : E) * (x * (1 / (N : E)))) := by first | field_simp
+    rw [e, hyz]
+    simp
   obtain ⟨ha, hc⟩ := h (1 / (T : E)) 0 (one _ (by field_simp)) (zer _ (by simp))
   obtain ⟨hb, hd⟩ := h 0 (1 / (T' : E)) (zer _ (by simp)) (one _ (by field_simp))
   simp only [mul_zero, add_zero, zero_add] at ha hc hb hd
   exact ⟨back _ _ hT0 ha, back _ _ hT0 hc, back _ _ hT'0 hb, back _ _ hT'0 hd⟩
 
-theorem complex_multiplication_root : Formalism.HermitianLatticeCounting.LocalIntegralStructure.CMRoot := by
+theorem complex_multiplication_root
+    : Formalism.HermitianLatticeCounting.LocalIntegralStructure.CMRoot := by
   intro E _ _ q x hc hq hx h
   have hm : ∀ w : InfinitePlace E, w.mult = 2 := fun w =>
     NumberField.InfinitePlace.mult_isComplex ⟨w, hc w⟩
@@ -123,18 +129,20 @@ theorem complex_multiplication_root : Formalism.HermitianLatticeCounting.LocalIn
   have hP : ∏ w : InfinitePlace E, (x w ^ 2) ^ 2 = (∏ w : InfinitePlace E, x w) ^ 4 := by
     rw [← Finset.prod_pow]
     exact Finset.prod_congr rfl (fun w _ => by ring)
-  have hA : (q ^ ((Fintype.card (InfinitePlace E) : ℝ) / 2)) ^ 4 =
-      q ^ (2 * Fintype.card (InfinitePlace E)) := by
+  have hA
+      : (q ^ ((Fintype.card (InfinitePlace E) : ℝ) / 2)) ^ 4
+        = q ^ (2 * Fintype.card (InfinitePlace E)) := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul hq.le, ← Real.rpow_natCast]
     congr 1
     push_cast
     ring
-  have key : (q ^ ((Fintype.card (InfinitePlace E) : ℝ) / 2)) ^ 4 ≤ (∏ w : InfinitePlace E, x w) ^ 4 := by
+  have key
+      : (q ^ ((Fintype.card (InfinitePlace E) : ℝ) / 2)) ^ 4
+        ≤ (∏ w : InfinitePlace E, x w) ^ 4 := by
     rw [hA, ← hP]; exact h
   have h0 : 0 ≤ ∏ w : InfinitePlace E, x w := Finset.prod_nonneg fun w _ => hx w
   have hq0 : 0 ≤ q ^ ((Fintype.card (InfinitePlace E) : ℝ) / 2) := (Real.rpow_pos_of_pos hq _).le
-  first
-  | exact le_of_pow_le_pow_left₀ (by norm_num) h0 key
+  first | exact le_of_pow_le_pow_left₀ (by norm_num) h0 key
 
 namespace IntegralityLocalGlobal
 
@@ -142,13 +150,9 @@ variable {E : Type} [Field E] [NumberField E]
 
 lemma isInt_mul {a b : E} (ha : IsInt a) (hb : IsInt b) : IsInt (a * b) := by
   first
-  | exact ha.mul hb
-  | exact IsIntegral.mul ha hb
   | (obtain ⟨x, hx⟩ := ha; obtain ⟨y, hy⟩ := hb; exact ⟨x * y, by rw [← hx, ← hy]; push_cast; ring⟩)
 lemma isInt_add {a b : E} (ha : IsInt a) (hb : IsInt b) : IsInt (a + b) := by
   first
-  | exact ha.add hb
-  | exact IsIntegral.add ha hb
   | (obtain ⟨x, hx⟩ := ha; obtain ⟨y, hy⟩ := hb; exact ⟨x + y, by rw [← hx, ← hy]; push_cast; ring⟩)
 lemma isInt_coe (y : 𝓞 E) : IsInt (y : E) := by
   first
@@ -211,32 +215,32 @@ end IntegralityLocalGlobal
 
 open IntegralityLocalGlobal
 
-private theorem exists_not_mem_prime_mul_eq_of_locIn {E : Type} [Field E] [NumberField E] (σ : E →+* E) (M M' g : ℕ) (u e : E)
+private theorem exists_not_mem_prime_mul_eq_of_locIn
+    {E : Type} [Field E] [NumberField E]
+    (σ : E →+* E)
+    (M M' g : ℕ)
+    (u e : E)
     (hM : 0 < M) (he : e = (g : E) ^ 2 * ((M' : E) * u * σ u / (M : E)))
     (hu : ∀ P : Ideal (𝓞 E), P.IsPrime → (M : 𝓞 E) ∈ P → LocIn P u M)
-    (P : Ideal (𝓞 E)) (hP : P.IsPrime) (hMP : (M : 𝓞 E) ∈ P) :
-    ∃ y z : 𝓞 E, y ∉ P ∧ (y : E) * e = (M : E) * (M' : E) * (g : E) ^ 2 * (z : E) := by
+    (P : Ideal (𝓞 E)) (hP : P.IsPrime) (hMP : (M : 𝓞 E) ∈ P)
+    : ∃ y z : 𝓞 E, y ∉ P ∧ (y : E) * e = (M : E) * (M' : E) * (g : E) ^ 2 * (z : E) := by
   have hM0 : (M : E) ≠ 0 := Nat.cast_ne_zero.mpr hM.ne'
   let f : 𝓞 E →+* 𝓞 E := NumberField.RingOfIntegers.mapRingHom σ
   have hf : ∀ y : 𝓞 E, ((f y : 𝓞 E) : E) = σ (y : E) := fun y => rfl
   have hQ : (P.comap f).IsPrime := by
     haveI := hP
-    first
-    | exact Ideal.comap_isPrime f P
-    | infer_instance
-  have hMQ : (M : 𝓞 E) ∈ P.comap f := by
-    rw [Ideal.mem_comap, map_natCast]; exact hMP
+    first | exact Ideal.comap_isPrime f P | infer_instance
+  have hMQ : (M : 𝓞 E) ∈ P.comap f := by rw [Ideal.mem_comap, map_natCast]; exact hMP
   obtain ⟨y1, z1, hy1, h1⟩ := hu P hP hMP
   obtain ⟨y2, z2, hy2, h2⟩ := hu _ hQ hMQ
   have h2' : ((f y2 : 𝓞 E) : E) * σ u = (M : E) * ((f z2 : 𝓞 E) : E) := by
     have h3 := congrArg σ h2
     rw [map_mul, map_mul, map_natCast] at h3
-    rw [hf, hf]; exact h3
+    rw [hf, hf]
+    exact h3
   have hE : e * (M : E) = (g : E) ^ 2 * ((M' : E) * u * σ u) := by
     rw [he]
-    first
-    | rw [mul_div_assoc', div_mul_cancel₀ _ hM0]
-    | field_simp
+    first | rw [mul_div_assoc', div_mul_cancel₀ _ hM0] | field_simp
   have c1 : ((y1 * f y2 : 𝓞 E) : E) = (y1 : E) * ((f y2 : 𝓞 E) : E) := by
     first | rfl | (push_cast; rfl) | simp
   have c2 : ((z1 * f z2 : 𝓞 E) : E) = (z1 : E) * ((f z2 : 𝓞 E) : E) := by
@@ -266,31 +270,36 @@ theorem s_integrality : Formalism.HermitianLatticeCounting.LocalIntegralStructur
       refine ⟨y, hy, ?_⟩
       rw [hyz]
       convert isInt_coe ((T : 𝓞 E) * (T' : 𝓞 E) * (g : 𝓞 E) ^ 2 * z) using 1
-      push_cast; ring
+      push_cast
+      ring
     · refine ⟨(T : 𝓞 E), hTP, ?_⟩
       have hh := isInt_mul (isInt_mul (isInt_coe (T' : 𝓞 E)) hgc) (isInt_map σ hgc)
       convert hh using 1
       rw [hs1, map_mul, map_natCast]
       push_cast
-      first
-      | (rw [mul_div_assoc', mul_div_assoc', mul_div_cancel_left₀ _ hT0]; ring)
-      | (field_simp; ring)
-      | field_simp
-  have hloc : ∀ P : Ideal (𝓞 E), P.IsPrime → ((T * T' : ℕ) : 𝓞 E) ∈ P →
-      LocIn P ((g : E) ^ 2 * s) (T * T') := by
+      first | (rw [mul_div_assoc', mul_div_assoc', mul_div_cancel_left₀ _ hT0]; ring)
+  have hloc
+      : ∀ P : Ideal (𝓞 E),
+        P.IsPrime → ((T * T' : ℕ) : 𝓞 E) ∈ P → LocIn P ((g : E) ^ 2 * s) (T * T') := by
     intro P hP hmem
     rw [Nat.cast_mul] at hmem
     unfold LocIn
     rcases hP.mem_or_mem hmem with h | h
     · obtain ⟨y, z, hy, hyz⟩ := exists_not_mem_prime_mul_eq_of_locIn σ T T' g c _ hT e1 hc P hP h
       refine ⟨y, (g : 𝓞 E) ^ 2 * z, hy, ?_⟩
-      rw [hyz]; push_cast; ring
+      rw [hyz]
+      push_cast
+      ring
     · obtain ⟨y, z, hy, hyz⟩ := exists_not_mem_prime_mul_eq_of_locIn σ T' T g b _ hT' e2 hb P hP h
       refine ⟨y, (g : 𝓞 E) ^ 2 * z, hy, ?_⟩
-      rw [hyz]; push_cast; ring
+      rw [hyz]
+      push_cast
+      ring
   obtain ⟨β, hβ⟩ := divGlob _ (T * T') hTT hint hloc
   refine ⟨β, ?_⟩
-  rw [hβ]; push_cast; ring
+  rw [hβ]
+  push_cast
+  ring
 
 namespace IntegralityLocalGlobal
 
@@ -326,12 +335,7 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
     rw [← NumberField.InfinitePlace.sum_mult_eq]
     simp only [hm, Finset.sum_const, Finset.card_univ, smul_eq_mul]
     ring
-  have hne : Nonempty (InfinitePlace E) := by
-    first
-    | infer_instance
-    | (apply Fintype.card_pos_iff.mp
-       have := Module.finrank_pos (R := ℚ) (M := E)
-       omega)
+  have hne : Nonempty (InfinitePlace E) := by first | infer_instance
   obtain ⟨w0⟩ := hne
   have hcard : 1 ≤ Fintype.card (InfinitePlace E) := Fintype.card_pos_iff.mpr ⟨w0⟩
   have hnw : ∀ (w : InfinitePlace E) (y : E), w y = ‖w.embedding y‖ := fun w y =>
@@ -347,13 +351,16 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
     have hn0 : Algebra.norm ℤ β ≠ 0 := Algebra.norm_ne_zero_iff.mpr hβ
     have h2 : (1 : ℤ) ≤ |Algebra.norm ℤ β| := Int.one_le_abs hn0
     exact_mod_cast h2
-  have hwn : ∀ w : InfinitePlace E,
-      (T : ℝ) ^ 2 * ‖w.embedding b‖ ^ 2 = (T' : ℝ) ^ 2 * ‖w.embedding c‖ ^ 2 := fun w =>
+  have hwn
+      : ∀ w : InfinitePlace E,
+        (T : ℝ) ^ 2 * ‖w.embedding b‖ ^ 2 = (T' : ℝ) ^ 2 * ‖w.embedding c‖ ^ 2 := fun w =>
     formEq _ _ _ _ _ _ (hiso w.embedding)
   have zz := integer_group_preservation E g a b c d hZZ
-  have unit1 : ∀ (y : E) (N : ℕ), 3 ≤ N → IsInt (y - 1) →
-      (∀ P : Ideal (𝓞 E), P.IsPrime → (N : 𝓞 E) ∈ P → LocIn P (y - 1) N) →
-      (∀ w : InfinitePlace E, ‖w.embedding y‖ = 1) → y = 1 := by
+  have unit1
+      : ∀ (y : E) (N : ℕ),
+        3 ≤ N → IsInt (y - 1) → (∀ P : Ideal (𝓞 E), P.IsPrime → (N : 𝓞 E) ∈ P → LocIn P (y - 1) N)
+          → (∀ w : InfinitePlace E, ‖w.embedding y‖ = 1)
+          → y = 1 := by
     intro y N hN hi hl hy
     obtain ⟨β, hβ⟩ := divGlob (y - 1) N (by omega) hi hl
     by_contra hne
@@ -371,11 +378,12 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
         rw [h5, norm_mul]
         simp
       have e2 : ‖w.embedding y - 1‖ ≤ 2 := by
-        calc ‖w.embedding y - 1‖ ≤ ‖w.embedding y‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
+        calc
+          ‖w.embedding y - 1‖
+            ≤ ‖w.embedding y‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
           _ = 2 := by rw [hy w, norm_one]; norm_num
       have e3 : 0 ≤ ‖w.embedding (β : E)‖ := norm_nonneg _
-      have e4 : ‖w.embedding (β : E)‖ ≤ 2 / 3 := by
-        nlinarith [mul_nonneg (sub_nonneg.mpr hNr) e3]
+      have e4 : ‖w.embedding (β : E)‖ ≤ 2 / 3 := by nlinarith [mul_nonneg (sub_nonneg.mpr hNr) e3]
       rw [hnw]
       nlinarith [mul_nonneg e3 (sub_nonneg.mpr e4)]
     have hprod : ∏ w : InfinitePlace E, (w (β : E)) ^ 2 ≤ ∏ _w : InfinitePlace E, (4 / 9 : ℝ) :=
@@ -397,7 +405,7 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
       intro w
       have h := hiso w.embedding 1 0
       rw [hb0, hc0] at h
-      simp only [map_zero, mul_one, mul_zero, zero_mul, add_zero, zero_add, norm_zero, norm_one] at h
+      simp only [map_zero, mul_one, mul_zero, add_zero, norm_zero, norm_one] at h
       have h2 : (T : ℝ) * (‖w.embedding a‖ ^ 2 - 1) = 0 := by linear_combination h
       have h3 := (mul_eq_zero.mp h2).resolve_left hTr.ne'
       nlinarith [norm_nonneg (w.embedding a)]
@@ -405,24 +413,26 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
       intro w
       have h := hiso w.embedding 0 1
       rw [hb0, hc0] at h
-      simp only [map_zero, mul_one, mul_zero, zero_mul, add_zero, zero_add, norm_zero, norm_one] at h
+      simp only [map_zero, mul_one, mul_zero, add_zero, zero_add, norm_zero, norm_one] at h
       have h2 : (T' : ℝ) * (‖w.embedding d‖ ^ 2 - 1) = 0 := by linear_combination -h
       have h3 := (mul_eq_zero.mp h2).resolve_left hT'r.ne'
       nlinarith [norm_nonneg (w.embedding d)]
-    have ha : a = 1 := unit1 a T hT
-      (by convert isInt_add zz.2.2.2.2.1 hm1 using 1; rw [hb0]; ring)
-      (fun P hP h => (hloc P hP (Or.inl h)).1) ha1
-    have hd : d = 1 := unit1 d T' hT'
-      (by convert isInt_mul hm1 (isInt_add zz.2.2.2.2.2 h1) using 1; rw [hc0]; ring)
-      (fun P hP h => (hloc P hP (Or.inr h)).2.2.2) hd1
+    have ha : a = 1 :=
+      unit1 a T hT (by convert isInt_add zz.2.2.2.2.1 hm1 using 1; rw [hb0]; ring)
+        (fun P hP h => (hloc P hP (Or.inl h)).1)
+        ha1
+    have hd : d = 1 :=
+      unit1 d T' hT' (by convert isInt_mul hm1 (isInt_add zz.2.2.2.2.2 h1) using 1; rw [hc0]; ring)
+        (fun P hP h => (hloc P hP (Or.inr h)).2.2.2)
+        hd1
     exact ⟨ha, hb0, hc0, hd⟩
   · right
     obtain ⟨s, hs1⟩ : ∃ s : E, s = (T' : E) * c * σ c / (T : E) := ⟨_, rfl⟩
     have hs2 : s = (T : E) * b * σ b / (T' : E) := by
       rw [hs1]
       apply w0.embedding.injective
-      have hconj : ∀ z : E,
-          w0.embedding z * w0.embedding (σ z) = ((‖w0.embedding z‖ ^ 2 : ℝ) : ℂ) := by
+      have hconj
+          : ∀ z : E, w0.embedding z * w0.embedding (σ z) = ((‖w0.embedding z‖ ^ 2 : ℝ) : ℂ) := by
         intro z
         rw [hσ, Complex.mul_conj, Complex.normSq_eq_norm_sq]
       simp only [map_div₀, map_mul, map_natCast]
@@ -433,8 +443,10 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
       have h' := congrArg (fun r : ℝ => (r : ℂ)) (hwn w0)
       push_cast at h' ⊢
       linear_combination -h'
-    obtain ⟨β, hβ⟩ := s_integrality E σ T T' g s b c hTpos hT'pos hs1 hs2 zz.2.1 zz.2.2.1
-      (fun P hP h => (hloc P hP (Or.inl h)).2.1) (fun P hP h => (hloc P hP (Or.inr h)).2.2.1)
+    obtain ⟨β, hβ⟩ :=
+      s_integrality E σ T T' g s b c hTpos hT'pos hs1 hs2 zz.2.1 zz.2.2.1
+        (fun P hP h => (hloc P hP (Or.inl h)).2.1)
+        (fun P hP h => (hloc P hP (Or.inr h)).2.2.1)
     have hs0 : s ≠ 0 := by
       rw [hs1]
       have hσc : σ c ≠ 0 := fun h => hc0 (σ.injective (by rw [h, map_zero]))
@@ -455,7 +467,7 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
         simpa [map_mul, map_pow, map_natCast, norm_mul, norm_pow] using h
       have B : ‖w.embedding s‖ = (T' : ℝ) * ‖w.embedding c‖ ^ 2 / T := by
         rw [hs1]
-        simp [hσ, norm_div] <;> ring
+        simp [hσ] <;> ring
       have C := hxw w
       rw [hnw w c] at C
       have hs_le : ‖w.embedding s‖ ≤ x w ^ 2 := by rw [B]; exact C
@@ -463,15 +475,12 @@ theorem theorem_B_statement : Formalism.HermitianLatticeCounting.LocalIntegralSt
         rw [hq_def, div_mul_eq_mul_div, eq_div_iff (pow_ne_zero 2 hgr.ne')]
         linear_combination A
       rw [hnw w, ← mul_pow, ← hs_eq]
-      first
-      | exact pow_le_pow_left (norm_nonneg _) hs_le 2
-      | exact pow_le_pow_left₀ (norm_nonneg _) hs_le 2
-      | nlinarith [norm_nonneg (w.embedding s)]
+      first | exact pow_le_pow_left₀ (norm_nonneg _) hs_le 2
     apply complex_multiplication_root E q x hcx hq hx
     simp only [hm]
     rw [hn, pow_mul]
-    have hprod : ∏ w : InfinitePlace E, q ^ 2 * (w (β : E)) ^ 2 ≤
-        ∏ w : InfinitePlace E, (x w ^ 2) ^ 2 :=
+    have hprod
+        : ∏ w : InfinitePlace E, q ^ 2 * (w (β : E)) ^ 2 ≤ ∏ w : InfinitePlace E, (x w ^ 2) ^ 2 :=
       Finset.prod_le_prod₀ (fun w _ => by positivity) (fun w _ => key w)
     rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ] at hprod
     have hqn : 0 ≤ (q ^ 2) ^ Fintype.card (InfinitePlace E) := by positivity

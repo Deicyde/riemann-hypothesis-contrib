@@ -57,36 +57,41 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.C
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
 open MvPolynomial
 
 namespace GlobalTheory.CompanionTheory.Ar.ChartDehom
 
-theorem den_mul_algebraMap {F : Type} [Field F] [CharZero F] (q : ℚ) :
-    (q.den : F) * algebraMap ℚ F q = (q.num : F) := by
+theorem den_mul_algebraMap {F : Type} [Field F] [CharZero F] (q : ℚ)
+    : (q.den : F) * algebraMap ℚ F q = (q.num : F) := by
   have hd : (q.den : F) ≠ 0 := by exact_mod_cast q.den_nz
   rw [eq_ratCast, Rat.cast_def]
   field_simp
 
-theorem exists_homog {K : Type} [Fintype K] {J : K → Type} {Ω : Type} [Field Ω] [CharZero Ω]
+theorem exists_homog
+    {K : Type} [Fintype K]
+    {J : K → Type} {Ω : Type} [Field Ω] [CharZero Ω]
     (y : (Σ k, J k) → Ω) (c : (k : K) → J k) (hy : ∀ k, y ⟨k, c k⟩ ≠ 0)
-    {Q : Type} [CommRing Q] (ρ : MvPolynomial (Σ k, J k) ℤ →+* Q)
-    (τ : MvPolynomial (Σ k, J k) ℚ →+* Q)
+    {Q : Type} [CommRing Q]
+    (ρ : MvPolynomial (Σ k, J k) ℤ →+* Q) (τ : MvPolynomial (Σ k, J k) ℚ →+* Q)
     (hρ : ∀ k, ρ (X ⟨k, c k⟩) = 1) (hX : ∀ p, ρ (X p) = τ (X p))
-    (hQ : ∀ q : ℚ, (q.den : Q) * τ (MvPolynomial.C q) = (q.num : Q))
-    (G : MvPolynomial (Σ k, J k) ℚ) :
-    ∃ (N : ℤ) (D : K → ℕ) (H : MvPolynomial (Σ k, J k) ℤ), N ≠ 0 ∧
-      mConeMap y H = MvPolynomial.C (N : Ω) *
-        (∏ k, (MvPolynomial.C (y ⟨k, c k⟩) * X k : MvPolynomial K Ω) ^ D k) *
-        MvPolynomial.C (aeval (fun p : Σ k, J k => y p / y ⟨p.1, c p.1⟩) G) ∧
-      ρ H = (N : Q) * τ G := by
+    (hQ : ∀ q : ℚ, (q.den : Q) * τ (MvPolynomial.C q) = (q.num : Q)) (G : MvPolynomial (Σ k, J k) ℚ)
+    : ∃ (N : ℤ) (D : K → ℕ) (H : MvPolynomial (Σ k, J k) ℤ),
+      N ≠ 0
+        ∧ mConeMap y H
+          = MvPolynomial.C (N : Ω)
+            * (∏ k, (MvPolynomial.C (y ⟨k, c k⟩) * X k : MvPolynomial K Ω) ^ D k)
+            * MvPolynomial.C (aeval (fun p : Σ k, J k => y p / y ⟨p.1, c p.1⟩) G)
+        ∧ ρ H = (N : Q) * τ G := by
   classical
   set u : (Σ k, J k) → Ω := fun p => y p / y ⟨p.1, c p.1⟩ with hu
   set w : K → MvPolynomial K Ω := fun k => MvPolynomial.C (y ⟨k, c k⟩) * X k with hw
   let M : (K → ℕ) → MvPolynomial (Σ k, J k) ℤ := fun D => ∏ k, X ⟨k, c k⟩ ^ D k
-  have hXc : ∀ p, mConeMap y (X p) = MvPolynomial.C (y p) * X p.1 := by
-    intro p; simp [mConeMap]
+  have hXc : ∀ p, mConeMap y (X p) = MvPolynomial.C (y p) * X p.1 := by intro p; simp [mConeMap]
   have hMc : ∀ D, mConeMap y (M D) = ∏ k, w k ^ D k := by
     intro D
     simp only [M, map_prod, map_pow, hXc, hw]
@@ -124,14 +129,21 @@ theorem exists_homog {K : Type} [Fintype K] {J : K → Type} {Ω : Type} [Field 
   | add f g hf hg =>
     obtain ⟨N₁, D₁, H₁, h₁, c₁, r₁⟩ := hf
     obtain ⟨N₂, D₂, H₂, h₂, c₂, r₂⟩ := hg
-    refine ⟨N₁ * N₂, D₁ + D₂,
-      MvPolynomial.C N₂ * H₁ * M D₂ + MvPolynomial.C N₁ * H₂ * M D₁, mul_ne_zero h₁ h₂, ?_, ?_⟩
-    · rw [map_add (f := _), map_mul, map_mul, map_mul, map_mul, c₁, c₂, hMc, hMc, hCc, hCc, ← hW, map_add (f := _),
-        map_add]
+    refine ⟨
+      N₁ * N₂,
+      D₁ + D₂,
+      MvPolynomial.C N₂ * H₁ * M D₂ + MvPolynomial.C N₁ * H₂ * M D₁,
+      mul_ne_zero h₁ h₂,
+      ?_,
+      ?_
+    ⟩
+    · rw [map_add (f := _), map_mul, map_mul, map_mul, map_mul, c₁, c₂, hMc, hMc, hCc, hCc, ← hW,
+        map_add (f := _), map_add]
       push_cast
       rw [MvPolynomial.C_mul]
       ring
-    · rw [map_add (f := _), map_mul, map_mul, map_mul, map_mul, r₁, r₂, hMρ, hMρ, hCρ, hCρ, map_add (f := _)]
+    · rw [map_add (f := _), map_mul, map_mul, map_mul, map_mul, r₁, r₂, hMρ, hMρ, hCρ, hCρ,
+        map_add (f := _)]
       push_cast
       ring
   | mul_X f p hf =>
@@ -148,10 +160,14 @@ theorem exists_homog {K : Type} [Fintype K] {J : K → Type} {Ω : Type} [Field 
     · rw [map_mul, map_mul, r₁, hX]
       ring
 
-theorem map_mem_chartIdeal : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (Ω : Type) [Field Ω] [CharZero Ω]
-    (y : (Σ k, J k) → Ω) (c : (k : K) → J k), (∀ k, y ⟨k, c k⟩ ≠ 0) → ∀ G : MvPolynomial (Σ k, J k) ℚ,
-    aeval (fun p : Σ k, J k => y p / y ⟨p.1, c p.1⟩) G = (0 : Ω) →
-    map (algebraMap ℚ ℂ) G ∈ ReciprocityTheory.AnForm.R.chartIdeal (pC (mCoordIdeal y)) c := by
+theorem map_mem_chartIdeal
+    : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (Ω : Type) [Field Ω] [CharZero Ω]
+        (y : (Σ k, J k) → Ω) (c : (k : K) → J k),
+      (∀ k, y ⟨k, c k⟩ ≠ 0)
+        → ∀ G : MvPolynomial (Σ k, J k) ℚ,
+          aeval (fun p : Σ k, J k => y p / y ⟨p.1, c p.1⟩) G = (0 : Ω)
+            → map (algebraMap ℚ ℂ) G
+              ∈ ReciprocityTheory.AnForm.R.chartIdeal (pC (mCoordIdeal y)) c := by
   apply GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Reg.ker_le_chart <;> assumption
 
 end GlobalTheory.CompanionTheory.Ar.ChartDehom

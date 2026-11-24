@@ -51,6 +51,7 @@ import Mathlib.Topology.Sheaves.Init
 
 open ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up GlobalTheory.CompanionTheory.Ar.GR
 open scoped Matrix
+
 theorem _root_.GlobalTheory.T.character_ideal_principal_eigen
     : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
         (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],

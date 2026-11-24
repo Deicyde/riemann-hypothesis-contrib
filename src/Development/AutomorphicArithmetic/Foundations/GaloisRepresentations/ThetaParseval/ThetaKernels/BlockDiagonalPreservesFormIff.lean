@@ -53,8 +53,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
 section
 set_option linter.unusedSectionVars false
 noncomputable section
@@ -111,7 +109,7 @@ theorem uA_mul_neg_k (L : _root_.PositivityTheory.SiegelWeilFormula.LD_k d) (u :
         = 0 := by
     simp
       only [_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.unipotentNilpotentPart,
-        ← Finset.sum_add_distrib, Pi.neg_apply, ← Matrix.single_add, add_neg_cancel, neg_add_cancel,
+        ← Finset.sum_add_distrib, Pi.neg_apply, ← Matrix.single_add, add_neg_cancel,
         Matrix.single_zero, Finset.sum_const_zero]
   rw [e, e]
   calc
@@ -218,12 +216,8 @@ theorem eA_eq_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d)
 theorem sB_i0i0_k (b : Fin L.n → AE F E)
     : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k R L b L.i₀ L.i₀ = 0 := by
   simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k, Matrix.sum_apply, Matrix.add_apply,
-    Matrix.single_apply,
     fun j =>
-      (_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.em_ne_k L j),
-    fun j =>
-      (_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.em_ne_k L
-        j).symm]
+      (_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.em_ne_k L j)]
 theorem sB_i0em_k (b : Fin L.n → AE F E) (l : Fin L.n)
     : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k R L b L.i₀ (L.em l) = b l := by
   simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k, Matrix.sum_apply, Matrix.add_apply,
@@ -248,9 +242,6 @@ theorem section_entry_embedded_row (b : Fin L.n → AE F E) (k : Fin L.n)
 theorem sB_emem_k (b : Fin L.n → AE F E) (k l : Fin L.n)
     : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k R L b (L.em k) (L.em l) = 0 := by
   simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k, Matrix.sum_apply, Matrix.add_apply,
-    Matrix.single_apply,
-    fun j =>
-      (_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.em_ne_k L j),
     fun j =>
       (_root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.em_ne_k L
         j).symm]
@@ -265,12 +256,11 @@ theorem sB_cond_k (b : Fin L.n → AE F E)
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_i0i0_k,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_i0em_k,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.section_entry_embedded_row,
-      _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_emem_k, map_zero, smul_zero, neg_zero,
-      smul_eq_mul, map_neg, map_mul, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.cc_k d,
+      _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_emem_k, map_zero, smul_eq_mul, map_neg,
+      map_mul, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.cc_k d,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eA_eq_k]
   all_goals (try simp only [map_intCast])
-  all_goals
-    first | (simp; done) | (simp only [mul_neg, neg_neg, neg_mul]; rw [← mul_assoc, e2, one_mul])
+  all_goals first | (simp; done) | (simp only [mul_neg, neg_neg]; rw [← mul_assoc, e2, one_mul])
 theorem continuous_sB_k
     : Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k R L) := by
   unfold _root_.PositivityTheory.SiegelWeilFormula.Act.C5.sB_k
@@ -369,8 +359,7 @@ theorem eig_k
         linear_combination (-(σ e)) * hε2
       have hl := hline _ he'
       simp only [ellA, LinearMap.coe_comp, Function.comp_apply, LinearMap.baseChange_tmul,
-        AlgEquiv.toLinearMap_apply, Algebra.TensorProduct.rid_tmul, inclR, RingHom.coe_coe,
-        Algebra.TensorProduct.includeRight_apply]
+        AlgEquiv.toLinearMap_apply, Algebra.TensorProduct.rid_tmul, inclR]
       rw [show (Algebra.TensorProduct.includeRight.toRingHom δ : AE F E) = (1 : AF F) ⊗ₜ[F] δ from
           rfl,
         TensorProduct.smul_tmul', smul_eq_mul, mul_one, TensorProduct.smul_tmul]
@@ -389,8 +378,7 @@ theorem ellA_inclR_k
     (h : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.Hyp_k L nb uM nb' w₁ cM δ) (e : E)
     : ellA δ (inclR (F := F) (AF F) e) ∈ (algebraMap F (AF F)).range := by
   refine ⟨(Classical.epsilon fun ℓ : E →ₗ[F] F => δ ≠ 0 → ℓ δ = 1) e, ?_⟩
-  simp [ellA, inclR, LinearMap.baseChange_tmul, Algebra.TensorProduct.rid_tmul,
-    Algebra.algebraMap_eq_smul_one]
+  simp [ellA, inclR, LinearMap.baseChange_tmul, Algebra.algebraMap_eq_smul_one]
 theorem continuous_sM'_k
     : Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.C5.sM_k R L) := by
   have hσ := _root_.PositivityTheory.SiegelWeilFormula.Act.C5.nilpotentMap_add d

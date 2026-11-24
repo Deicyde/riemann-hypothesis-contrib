@@ -71,7 +71,4 @@ theorem _root_.GlobalTheory.T.fockMonomial_at_origin_gaussian_entire_orthonormal
                 = (((Real.sqrt (2 * Real.pi * Formalism.L2.Pj.xiR D) : ℝ) : ℂ)⁻¹)
                     ^ (k.sum fun _ n => n)
                   * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) Φ := by
-  first
-  | exact @GlobalTheory.FockPos.fock_monomial_zero_of_on
-  | exact GlobalTheory.FockPos.fock_monomial_zero_of_on
-  | (intros; apply GlobalTheory.FockPos.fock_monomial_zero_of_on <;> assumption)
+  first | exact @GlobalTheory.FockPos.fock_monomial_zero_of_on

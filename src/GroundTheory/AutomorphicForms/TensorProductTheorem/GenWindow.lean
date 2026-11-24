@@ -298,10 +298,9 @@ variable (e : End ℂ V) (N : Submodule ℂ V)
 
 def mGenKernel : Submodule ℂ (mGenSubrep ρ N).toSubmodule where
   carrier := {u | ∀ g, e (ρ g u) = 0}
-  add_mem' {a b} ha hb g := by
-    simp only [mem_setOf_eq, Submodule.coe_add, map_add (f := _), ha g, hb g, add_zero]
+  add_mem' {a b} ha hb g := by simp only [Submodule.coe_add, map_add (f := _), ha g, hb g, add_zero]
   zero_mem' g := by simp
-  smul_mem' c a ha g := by simp only [mem_setOf_eq, Submodule.coe_smul, map_smul, ha g, smul_zero]
+  smul_mem' c a ha g := by simp only [Submodule.coe_smul, map_smul, ha g, smul_zero]
 
 theorem mGenKernel_le_comap (g : M)
     : mGenKernel ρ e N ≤ (mGenKernel ρ e N).comap ((mGenSubrep ρ N).toRepresentation g) := by

@@ -97,7 +97,7 @@ theorem equation_gen
             (CoordinateRing.mk W (C (C a)))
           = algebraMap F W.toAffine.FunctionField a := fun a =>
     rfl
-  simp only [C_add, C_mul, map_add (f := _), map_mul, e] at h1
+  simp only [e] at h1
   linear_combination h1
 
 end Generic

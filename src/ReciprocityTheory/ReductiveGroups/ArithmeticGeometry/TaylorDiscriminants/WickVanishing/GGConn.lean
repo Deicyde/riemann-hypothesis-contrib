@@ -54,7 +54,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
 
-open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
+open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
 open scoped ComplexConjugate ComplexOrder
 
 noncomputable section

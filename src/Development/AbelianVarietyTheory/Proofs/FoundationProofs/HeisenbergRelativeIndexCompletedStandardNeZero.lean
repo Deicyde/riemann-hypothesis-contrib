@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ActAApply
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CompletedStandardAdelicLatticePropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CompletedStandardAdelicLatticeProperties
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryHeckeCharacterValues
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -95,7 +95,7 @@ theorem idx_latA_ne_zero
                   (∀ ζ ∈ T, m • ζ ∈ latA D cc N N') → idx (latA D cc N N') T ≠ 0 := by
   intro D hD cc δ hc N N' m hm T hT
   obtain ⟨-, -, -, -, ⟨m₁, hm₁, h₁⟩, m₂, hm₂, h₂⟩ :=
-    GlobalTheory.T.completedStandardAdelicLattice_properties D hD cc δ hc N N'
+    _root_.GlobalTheory.CompletedLattice.completed_lattice D hD cc δ hc N N'
   have hk : 0 < m₁ * m := Nat.mul_pos hm₁ hm
   have hu : IsUnit ((m₁ * m : ℕ) : AE D) := by
     have := (IsUnit.mk0 ((m₁ * m : ℕ) : D.host.E) (Nat.cast_ne_zero.2 hk.ne')).map (inc D)

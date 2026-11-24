@@ -42,8 +42,6 @@ import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf

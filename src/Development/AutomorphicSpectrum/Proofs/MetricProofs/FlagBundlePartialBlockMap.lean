@@ -110,10 +110,7 @@ theorem exists_res
     ⟩
   · exact Proj.orbit_trans (C.φ_ρ _ hx) (Proj.orbit_symm (ho x))
 
-theorem not_mem_top {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (z : (Σ k, ι k) → ℂ)
-    : z ∉ mcPts (⊤ : Ideal (MRing ι)) := fun h => by
-  have := h.2 1 trivial
-  simp at this
+alias not_mem_top := _root_.GlobalTheory.CompanionTheory.Ar.PB.Proj.not_mem_mcPts_top
 
 theorem main
     : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]

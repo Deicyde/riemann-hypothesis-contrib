@@ -83,7 +83,6 @@ theorem hermPart_rat {x : Mx D r r} (hx : x ∈ ratMx D r r) : hermPart D r x �
   rw [rat_smul, rat_add, rat_conjTranspose]
   rfl
 
-
 theorem continuous_hermPart : Continuous (hermPart D r) :=
   haveI : IsTopologicalAddGroup (Mx D r r) := (lattice_Mx D r r).1
   show Continuous fun x => half D • (x + adj x) from

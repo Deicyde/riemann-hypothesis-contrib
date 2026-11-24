@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.baseFrameBorel_acts_extremalVector_by_weight
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S)
         (w : D.what₂.Tau → Fin V.rank → ℤ) (v : M.Vec),
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.baseFrameBorel_acts_extremalVector_by_weight
                 → dRepC (gramAt D V τ) (M.rep τ) (x0Mat M τ * Matrix.single a c 1 * (x0Mat M τ)⁻¹)
                     (v τ : M.H τ)
                   = if a = c then (w τ a : ℂ) • (v τ : M.H τ) else 0 := by
-  first
-  | exact @GlobalTheory.HolDict.VKill.borel_extVec
-  | exact GlobalTheory.HolDict.VKill.borel_extVec
-  | (intros; apply GlobalTheory.HolDict.VKill.borel_extVec <;> assumption)
+  first | exact @GlobalTheory.HolDict.VKill.borel_extVec

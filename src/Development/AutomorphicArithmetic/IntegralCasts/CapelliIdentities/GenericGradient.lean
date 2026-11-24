@@ -179,7 +179,6 @@ private theorem UpperTheory.Reformulated.B.Qf34.mem_sup_sq
       p f c hp hf hc
   choose a ha using fun i => Ideal.Quotient.mk_surjective (I := m * m) (σ (c i))
   have h2 : φ p - ∑ i, a i * φ (f i) ∈ m * m := by
-
     rw [← Ideal.Quotient.eq, map_sum]
     simpa [← ha] using key
   rw [← add_sub_cancel (∑ i, a i * φ (f i)) (φ p)]

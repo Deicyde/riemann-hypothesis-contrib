@@ -64,9 +64,7 @@ theorem conjT_mul (σ : R →+* R) (g h : Matrix (Fin n) (Fin n) R)
   unfold conjT
   rw [Matrix.map_mul, Matrix.transpose_mul]
 
-theorem conjT_one (σ : R →+* R) : conjT σ (1 : Matrix (Fin n) (Fin n) R) = 1 := by
-  unfold conjT
-  simp
+theorem conjT_one (σ : R →+* R) : conjT σ (1 : Matrix (Fin n) (Fin n) R) = 1 := by simp [conjT]
 
 theorem conjT_conjT (σ : R →+* R) (hσ : ∀ x, σ (σ x) = x) (g : Matrix (Fin n) (Fin n) R)
     : conjT σ (conjT σ g) = g := by
@@ -159,7 +157,7 @@ theorem conjAL_mem_ALint {x : AL L} (hx : x ∈ ALint L) : conjAL L x ∈ ALint 
     rintro x (⟨y, rfl⟩ | ⟨a, ha, rfl⟩)
     · refine Subring.subset_closure (Or.inl
         ⟨RingOfIntegers.mapRingEquiv (IsCMField.complexConj L).toRingEquiv y, ?_⟩)
-      simp [conjAL] <;> rfl
+      simp [conjAL]
     · refine Subring.subset_closure (Or.inr ⟨a, ha, ?_⟩)
       simp [conjAL]
   exact key hx

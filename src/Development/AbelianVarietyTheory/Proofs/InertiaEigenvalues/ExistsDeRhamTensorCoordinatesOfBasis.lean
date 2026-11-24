@@ -78,7 +78,7 @@ theorem exists_tensor_coord_of_basis
   rw [Finset.sum_eq_single j]
   · simp
   · intro i _ hij
-    simp [Finsupp.single_apply, hij]
+    simp [hij]
   · simp
 
 theorem exists_coord_tensor_dR

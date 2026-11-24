@@ -79,7 +79,6 @@ private theorem eq_of_res_eq
       map_one]
   have hzm : ((x * y⁻¹ : Oˣ) : O) ^ m = 1 := by rw [← Units.val_pow_eq_pow_val, hw, Units.val_one]
   have hs : IsUnit (∑ i ∈ Finset.range m, ((x * y⁻¹ : Oˣ) : O) ^ i) := by
-
     rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_sum]
     simp only [map_pow, hr, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
     rw [← map_natCast (IsLocalRing.residue O) m]

@@ -3,12 +3,14 @@ module
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RigidForFan
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsInvDer
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.DenseInterior
-import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUnitExtendOfGeneric
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPolAVInterior
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GroupPullbackTangentVectorsCompat
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAffineHomOfField
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCechOneCoboundaryOfRefinementStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCechOneCoboundaryOfRefinement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GradedLineBundleExists
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsBlockMetricDiagForm
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsLinearHomPull
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUnitExtendOfGeneric
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAffineHomOfField
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueInvariantVectorFieldOfTangent
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LeISupInfPreimage
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelLabelExtendsOfOrthogonalToExtended
@@ -47,9 +49,8 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsBlockMetricDiagForm
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsLinearHomPull
 import Development.AbelianVarietyTheory.Definitions.Divisors.HasDefect
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -190,7 +191,7 @@ theorem theta_eq_fibre
       linear_combination E1 - E2 - E3 + E4
   funext a
   refine sub_eq_zero.1 (hcob (θ a - θ' a) ?_)
-  refine GlobalTheory.T.isCechOneCoboundary_of_refinement
+  refine _root_.GlobalTheory.KS.Refine.isCob_of_refine
     (fun i => m ⁻¹ᵁ L.U i)
     (lc P₀.A.hom (θ a - θ' a) φ) (isCoc_lc _ _ _ hcoc)
     (fun p => m ⁻¹ᵁ Wp p)
@@ -263,8 +264,7 @@ theorem theta_eq_fibre
     have k8 : m ⁻¹ᵁ Wp p ⊓ m ⁻¹ᵁ Wp p' ≤ m ⁻¹ᵁ L.U (j' p.2) ⊓ m ⁻¹ᵁ L.U (j p.1) := k2.trans k6
     have k9 : m ⁻¹ᵁ Wp p ⊓ m ⁻¹ᵁ Wp p' ≤ m ⁻¹ᵁ L.U (j' p'.2) ⊓ m ⁻¹ᵁ L.U (j p'.1) := k3.trans k7
     have k10 : m ⁻¹ᵁ Wp p ⊓ m ⁻¹ᵁ Wp p' ≤ m ⁻¹ᵁ L.U (j p.1) ⊓ m ⁻¹ᵁ L.U (j p'.1) := k4
-    simp (disch := assumption) only [lc, rsT_sub, rsT_neg, rsT_sum, rsT_mul, rsT_rsT, rsT_constFn,
-      constFn_sub, sub_mul, Finset.sum_sub_distrib]
+    simp (disch := assumption) only [lc, rsT_sub, rsT_neg, rsT_sum, rsT_mul, rsT_rsT, rsT_constFn]
     have E'
         : ∑ b, (constFn P₀.A.hom (m ⁻¹ᵁ Wp p ⊓ m ⁻¹ᵁ Wp p') (θ a b) *
               rsT (φ b (j p.1) (j p'.1)) (m ⁻¹ᵁ Wp p ⊓ m ⁻¹ᵁ Wp p') -
@@ -326,7 +326,8 @@ theorem isKS_unique_model
       GlobalTheory.FlagMod.spMap_ev x0 U.2 hU
     have hv' := fun i => GlobalTheory.LieMet.isTan_map (GlobalTheory.FlagMod.ev x0 U.1 hU) hx (hv i)
     have hb' := GlobalTheory.GradedPieces.basis_map (GlobalTheory.FlagMod.ev x0 U.1 hU) hx hv hb
-    obtain ⟨u, hu, hu'⟩ := GlobalTheory.LiePull.lieBasis_of_tanBasis Y.t x0 P₀.A θm hpb _ hv' hb'
+    obtain ⟨u, hu, hu'⟩ :=
+      _root_.GlobalTheory.LiePull.exists_lieBasis_of_tanBasis Y.t x0 P₀.A θm hpb _ hv' hb'
     choose dd hdd using fun a => (GlobalTheory.KS.InvField.main K P₀.A (u a) (hu.1 a)).1
     obtain ⟨⟨φ, hφ⟩, -⟩ :=
       GlobalTheory.KS.DlogPol.dlog_independent K P₀ n u dd hu hdd _ θm Y.t.PP.L Y.t.PP.isLB hiso

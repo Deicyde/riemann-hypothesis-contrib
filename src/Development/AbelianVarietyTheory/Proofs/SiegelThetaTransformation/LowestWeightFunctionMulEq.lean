@@ -65,43 +65,49 @@ section Mat
 
 variable {r : ℕ}
 
-theorem quad_eq {p : ℕ} (e : Fin p → Fin r) (s : Fin r → ℝ) (Y : Matrix (Fin r) (Fin r) ℂ)
-    (v : Fin p → ℂ) :
-    star v ⬝ᵥ ((Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)).submatrix e e *ᵥ v) =
-      ((∑ k, s k * ‖∑ a, Y k (e a) * conj (v a)‖ ^ 2 : ℝ) : ℂ) := by
-  have h : ∀ a b, (Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)) a b =
-      ∑ k, Y k a * s k * conj (Y k b) := by
+theorem quad_eq
+    {p : ℕ} (e : Fin p → Fin r) (s : Fin r → ℝ) (Y : Matrix (Fin r) (Fin r) ℂ) (v : Fin p → ℂ)
+    : star v ⬝ᵥ ((Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)).submatrix e e *ᵥ v)
+      = ((∑ k, s k * ‖∑ a, Y k (e a) * conj (v a)‖ ^ 2 : ℝ) : ℂ) := by
+  have h
+      : ∀ a b,
+        (Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)) a b
+          = ∑ k, Y k a * s k * conj (Y k b) := by
     intro a b
     rw [Matrix.mul_apply]
     simp [Matrix.mul_diagonal]
   push_cast
 
   simp only [dotProduct, mulVec, submatrix_apply, h, Pi.star_apply, Complex.star_def,
-  ← Complex.mul_conj', map_sum, map_mul, Complex.conj_conj, Finset.mul_sum, Finset.sum_mul]
+    ← Complex.mul_conj', map_sum, map_mul, Complex.conj_conj, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun a _ => by ring
 
-theorem signed_isHermitian (s : Fin r → ℝ) (Y : Matrix (Fin r) (Fin r) ℂ) :
-    (Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)).IsHermitian := by
-  have h : Yᵀ = (Y.map (starRingEnd ℂ))ᴴ := by
-    ext a b; simp
+theorem signed_isHermitian (s : Fin r → ℝ) (Y : Matrix (Fin r) (Fin r) ℂ)
+    : (Yᵀ * diagonal (fun a => (s a : ℂ)) * Y.map (starRingEnd ℂ)).IsHermitian := by
+  have h : Yᵀ = (Y.map (starRingEnd ℂ))ᴴ := by ext a b; simp
   rw [h]
   refine isHermitian_conjTranspose_mul_mul _ ?_
   rw [isHermitian_diagonal_iff]
   intro i
   simp [IsSelfAdjoint]
 
-theorem posDef_contract {p : ℕ} (e : Fin p → Fin r) (p0 : ℕ) (Y : Matrix (Fin r) (Fin r) ℂ)
-    (t : Fin r → ℂ) {ρ : ℝ} (hρ : 0 < ρ) (h1 : ∀ a : Fin r, (a : ℕ) < p0 → ρ ≤ ‖t a‖)
+theorem posDef_contract
+    {p : ℕ} (e : Fin p → Fin r)
+    (p0 : ℕ)
+    (Y : Matrix (Fin r) (Fin r) ℂ)
+    (t : Fin r → ℂ)
+    {ρ : ℝ} (hρ : 0 < ρ) (h1 : ∀ a : Fin r, (a : ℕ) < p0 → ρ ≤ ‖t a‖)
     (h2 : ∀ a : Fin r, p0 ≤ (a : ℕ) → ‖t a‖ ≤ ρ)
-    (hY : ((Yᵀ * diagonal (fun a : Fin r => (sgn p0 a : ℂ)) *
-      Y.map (starRingEnd ℂ)).submatrix e e).PosDef) :
-    (((diagonal t * Y)ᵀ * diagonal (fun a : Fin r => (sgn p0 a : ℂ)) *
-      (diagonal t * Y).map (starRingEnd ℂ)).submatrix e e).PosDef := by
-  refine Matrix.PosDef.of_dotProduct_mulVec_pos ((signed_isHermitian _ _).submatrix e) fun v hv => ?_
+    (hY : ((Yᵀ * diagonal (fun a : Fin r => (sgn p0 a : ℂ)) * Y.map (starRingEnd ℂ)).submatrix e
+      e).PosDef)
+    : (((diagonal t * Y)ᵀ * diagonal (fun a : Fin r => (sgn p0 a : ℂ))
+      * (diagonal t * Y).map (starRingEnd ℂ)).submatrix e e).PosDef := by
+  refine Matrix.PosDef.of_dotProduct_mulVec_pos ((signed_isHermitian _ _).submatrix e) fun v hv =>
+    ?_
   have h := hY.dotProduct_mulVec_pos hv
   rw [quad_eq] at h ⊢
   rw [Complex.zero_lt_real] at h ⊢
@@ -120,17 +126,18 @@ theorem posDef_contract {p : ℕ} (e : Fin p → Fin r) (p0 : ℕ) (Y : Matrix (
   · have : ‖t k‖ ^ 2 ≤ ρ ^ 2 := by gcongr; exact h2 k (not_lt.1 hk)
     nlinarith
 
-theorem exists_lower (Y : Matrix (Fin r) (Fin r) ℂ) (hY : ∀ i, lminor Y i ≠ 0) :
-    ∃ B : Matrix (Fin r) (Fin r) ℂ, (∀ a, B a a = 1) ∧ (∀ a c, c < a → B a c = 0) ∧
-      ∀ a c, a < c → (Y * B) a c = 0 := by
-  have key : ∀ c : Fin r, ∃ u : Fin r → ℂ, u c = 1 ∧ (∀ a, c < a → u a = 0) ∧
-      ∀ a, a < c → (Y *ᵥ u) a = 0 := by
+theorem exists_lower (Y : Matrix (Fin r) (Fin r) ℂ) (hY : ∀ i, lminor Y i ≠ 0)
+    : ∃ B : Matrix (Fin r) (Fin r) ℂ,
+      (∀ a, B a a = 1) ∧ (∀ a c, c < a → B a c = 0) ∧ ∀ a c, a < c → (Y * B) a c = 0 := by
+  have key
+      : ∀ c : Fin r, ∃ u : Fin r → ℂ,
+        u c = 1 ∧ (∀ a, c < a → u a = 0) ∧ ∀ a, a < c → (Y *ᵥ u) a = 0 := by
     intro c
     have hc : (c : ℕ) ≤ r := c.isLt.le
     set A := Y.submatrix (Fin.castLE hc) (Fin.castLE hc) with hA
     have hdet : IsUnit A.det := isUnit_iff_ne_zero.2 (hY c.castSucc)
     set w : Fin c → ℂ := A⁻¹ *ᵥ fun a => -Y (Fin.castLE hc a) c with hw
-    have hAw : A *ᵥ w = fun a => -Y (Fin.castLE hc a) c := by
+    have hAw : A *ᵥ w = fun a => - Y (Fin.castLE hc a) c := by
       rw [hw, mulVec_mulVec, mul_nonsing_inv _ hdet, one_mulVec]
     have hne : ∀ (j : Fin c) (a : Fin r), c ≤ a → a ≠ Fin.castLE hc j := by
       intro j a ha h
@@ -155,19 +162,19 @@ theorem exists_lower (Y : Matrix (Fin r) (Fin r) ℂ) (hY : ∀ i, lminor Y i �
   choose u h1 h2 h3 using key
   exact ⟨Matrix.of fun a c => u c a, h1, fun a c h => h2 c a h, fun a c h => h3 c a h⟩
 
-theorem finite_lminor (Y : Matrix (Fin r) (Fin r) ℂ) (i : Fin (r + 1)) :
-    {s : ℂ | lminor (Y + s • (1 : Matrix (Fin r) (Fin r) ℂ)) i = 0}.Finite := by
+theorem finite_lminor (Y : Matrix (Fin r) (Fin r) ℂ) (i : Fin (r + 1))
+    : {s : ℂ | lminor (Y + s • (1 : Matrix (Fin r) (Fin r) ℂ)) i = 0}.Finite := by
   have hi := Nat.le_of_lt_succ i.isLt
-  refine (Polynomial.finite_setOf_isRoot
-    (Matrix.charpoly_monic (-(Y.submatrix (Fin.castLE hi) (Fin.castLE hi)))).ne_zero).subset ?_
+  refine (Polynomial.finite_setOf_isRoot (Matrix.charpoly_monic (-(Y.submatrix (Fin.castLE hi)
+    (Fin.castLE hi)))).ne_zero).subset ?_
   intro s hs
   simp only [Set.mem_setOf_eq, Polynomial.IsRoot.def, Matrix.eval_charpoly] at hs ⊢
   rw [← hs, lminor]
   congr 1
   ext a b
-  simp only [submatrix_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.one_apply, Matrix.sub_apply,
-    scalar_apply, Matrix.diagonal_apply, Matrix.neg_apply, sub_neg_eq_add, smul_eq_mul, mul_ite,
-    mul_one, mul_zero, (Fin.castLE_injective hi).eq_iff]
+  simp only [submatrix_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.one_apply,
+    Matrix.sub_apply, scalar_apply, Matrix.diagonal_apply, Matrix.neg_apply, sub_neg_eq_add,
+    smul_eq_mul, mul_ite, mul_one, mul_zero, (Fin.castLE_injective hi).eq_iff]
   exact add_comm _ _
 
 end Mat
@@ -176,22 +183,26 @@ section Frames
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem gramPos_rmul {x₀ : Frame X.Ψ r}
-    (hx₀ : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x₀ τ) =
-      Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
-    (y : Frame X.Ψ r) (τ : X.Ψ) :
-    X.gramPos (rmul x₀ y) τ = ((mat y τ)ᵀ * diagonal (fun a : Fin r => (sgn X.p0 a : ℂ)) *
-      (mat y τ).map (starRingEnd ℂ)).submatrix (Fin.castLE X.p0_le) (Fin.castLE X.p0_le) := by
+theorem gramPos_rmul
+    {x₀ : Frame X.Ψ r}
+    (hx₀ : ∀ τ : X.Ψ,
+      gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+    (y : Frame X.Ψ r) (τ : X.Ψ)
+    : X.gramPos (rmul x₀ y) τ
+      = ((mat y τ)ᵀ * diagonal (fun a : Fin r => (sgn X.p0 a : ℂ))
+        * (mat y τ).map (starRingEnd ℂ)).submatrix (Fin.castLE X.p0_le) (Fin.castLE X.p0_le) := by
   rw [← hx₀ τ, ← FrameDegreeData.gram_mul]
   rfl
 
-theorem contract_mem_dom {x₀ : Frame X.Ψ r}
-    (hx₀ : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x₀ τ) =
-      Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
-    {y : Frame X.Ψ r} (hy : rmul x₀ y ∈ X.dom) (t : Fin r → ℂ) (ht : ∀ a, t a ≠ 0) {ρ : ℝ}
-    (hρ : 0 < ρ) (h1 : ∀ a : Fin r, (a : ℕ) < X.p0 → ρ ≤ ‖t a‖)
-    (h2 : ∀ a : Fin r, X.p0 ≤ (a : ℕ) → ‖t a‖ ≤ ρ) :
-    rmul x₀ (fun τ => (diagonal t * mat y τ : Matrix (Fin r) (Fin r) ℂ)) ∈ X.dom := by
+theorem contract_mem_dom
+    {x₀ : Frame X.Ψ r}
+    (hx₀ : ∀ τ : X.Ψ,
+      gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+    {y : Frame X.Ψ r} (hy : rmul x₀ y ∈ X.dom)
+    (t : Fin r → ℂ) (ht : ∀ a, t a ≠ 0)
+    {ρ : ℝ} (hρ : 0 < ρ) (h1 : ∀ a : Fin r, (a : ℕ) < X.p0 → ρ ≤ ‖t a‖)
+    (h2 : ∀ a : Fin r, X.p0 ≤ (a : ℕ) → ‖t a‖ ≤ ρ)
+    : rmul x₀ (fun τ => (diagonal t * mat y τ : Matrix (Fin r) (Fin r) ℂ)) ∈ X.dom := by
   refine ReciprocityTheory.ChartRestriction.G.AR.Up.ExF.mem_dom_of_gramPos X fun τ => ⟨?_, ?_⟩
   · have h : (mat x₀ τ * mat y τ).det ≠ 0 := (hy τ).1
     change (mat x₀ τ * (diagonal t * mat y τ)).det ≠ 0
@@ -203,24 +214,30 @@ theorem contract_mem_dom {x₀ : Frame X.Ψ r}
     rw [gramPos_rmul X hx₀] at h
     exact (gramPos_rmul X hx₀ _ τ).symm ▸ posDef_contract _ _ _ t hρ h1 h2 h
 
-theorem diagonal_mem_bor (d : X.Ψ → Fin r → ℂ) (hd : ∀ τ a, d τ a ≠ 0) :
-    (fun τ => (diagonal (d τ) : Matrix (Fin r) (Fin r) ℂ)) ∈ Bor X.Ψ r := by
+theorem diagonal_mem_bor (d : X.Ψ → Fin r → ℂ) (hd : ∀ τ a, d τ a ≠ 0)
+    : (fun τ => (diagonal (d τ) : Matrix (Fin r) (Fin r) ℂ)) ∈ Bor X.Ψ r := by
   intro τ
   refine ⟨?_, fun a c h => diagonal_apply_ne _ h.ne'⟩
   change (diagonal (d τ)).det ≠ 0
   rw [det_diagonal]
   exact Finset.prod_ne_zero_iff.2 fun a _ => hd τ a
 
-theorem eq_zero_lower (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
-    (hx₀ : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x₀ τ) =
-      Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
-    (hx₀' : x₀ ∈ X.dom) (m : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom)
+theorem eq_zero_lower
+    (la : Wt X.Ψ r)
+    (x₀ : Frame X.Ψ r)
+    (hx₀ : ∀ τ : X.Ψ,
+      gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+    (hx₀' : x₀ ∈ X.dom)
+    (m : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom)
     (hB : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, m (rmul x b) = bchar la b * m x)
-    (hT : ∀ t : X.Ψ → Fin r → ℂ, (∀ τ i, ‖t τ i‖ = 1) → ∀ x ∈ X.dom,
-      m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x) =
-        (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
-    (h0 : m x₀ = 0) {L : Frame X.Ψ r} (hL : ∀ τ a c, a < c → L τ a c = 0)
-    (hLd : rmul x₀ L ∈ X.dom) : m (rmul x₀ L) = 0 := by
+    (hT : ∀ t : X.Ψ → Fin r → ℂ,
+      (∀ τ i, ‖t τ i‖ = 1)
+        → ∀ x ∈ X.dom,
+          m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x)
+            = (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
+    (h0 : m x₀ = 0)
+    {L : Frame X.Ψ r} (hL : ∀ τ a c, a < c → L τ a c = 0) (hLd : rmul x₀ L ∈ X.dom)
+    : m (rmul x₀ L) = 0 := by
   set F : ℂ → Frame X.Ψ r := fun ζ => rmul x₀ fun τ a c => ζ ^ ((a : ℕ) - c) * L τ a c with hF
   have hFd : Differentiable ℂ F := by
     refine differentiable_pi.2 fun τ => differentiable_pi.2 fun a => differentiable_pi.2 fun c => ?_
@@ -242,14 +259,20 @@ theorem eq_zero_lower (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
     · simp
     · rw [zero_pow (Nat.sub_ne_zero_of_lt h), zero_mul, diagonal_apply_ne _ h.ne']
   have hb0 := diagonal_mem_bor X _ hdiag
-  have hFne : ∀ ζ : ℂ, ζ ≠ 0 → F ζ = rmul (rmul x₀ fun τ =>
-      (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ))
-      (fun _ => (diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹ : Matrix (Fin r) (Fin r) ℂ)) := by
+  have hFne
+      : ∀ ζ : ℂ,
+        ζ ≠ 0
+          → F ζ
+            = rmul
+              (rmul x₀ fun τ =>
+                (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ))
+              (fun _ =>
+                (diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹ : Matrix (Fin r) (Fin r) ℂ)) := by
     intro ζ hζ
     funext τ
-    change mat x₀ τ * Matrix.of (fun a c : Fin r => ζ ^ ((a : ℕ) - c) * L τ a c) =
-      mat x₀ τ * (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ) *
-        diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹
+    change mat x₀ τ * Matrix.of (fun a c : Fin r => ζ ^ ((a : ℕ) - c) * L τ a c)
+      = mat x₀ τ * (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ)
+        * diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹
     rw [Matrix.mul_assoc]
     congr 1
     ext a c
@@ -258,15 +281,24 @@ theorem eq_zero_lower (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
     · simp [hL τ a c h]
     · rw [pow_sub₀ _ hζ h]
       ring
-  have hbζ : ∀ ζ : ℂ, ζ ≠ 0 → (fun _ : X.Ψ =>
-      (diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹ : Matrix (Fin r) (Fin r) ℂ)) ∈ Bor X.Ψ r :=
-    fun ζ hζ => diagonal_mem_bor X (fun _ a => (ζ ^ (a : ℕ))⁻¹)
-      fun _ a => inv_ne_zero (pow_ne_zero _ hζ)
-  have hctr : ∀ ζ : ℂ, ζ ≠ 0 → ‖ζ‖ ≤ 1 → (rmul x₀ fun τ =>
-      (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ)) ∈ X.dom := by
+  have hbζ
+      : ∀ ζ : ℂ,
+        ζ ≠ 0
+          → (fun _ : X.Ψ => (diagonal fun a : Fin r => (ζ ^ (a : ℕ))⁻¹ : Matrix (Fin r) (Fin r) ℂ))
+            ∈ Bor X.Ψ r := fun ζ hζ =>
+    diagonal_mem_bor X (fun _ a => (ζ ^ (a : ℕ))⁻¹) fun _ a => inv_ne_zero (pow_ne_zero _ hζ)
+  have hctr
+      : ∀ ζ : ℂ,
+        ζ ≠ 0 → ‖ζ‖ ≤ 1
+          → (rmul x₀ fun τ =>
+              (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ))
+            ∈ X.dom := by
     intro ζ hζ hζ1
-    refine contract_mem_dom X hx₀ hLd _ (fun a => pow_ne_zero _ hζ) (ρ := ‖ζ‖ ^ X.p0)
-      (pow_pos (norm_pos_iff.2 hζ) _) (fun a ha => ?_) (fun a ha => ?_)
+    refine contract_mem_dom X hx₀ hLd _
+      (fun a => pow_ne_zero _ hζ)
+      (ρ := ‖ζ‖ ^ X.p0) (pow_pos (norm_pos_iff.2 hζ) _)
+      (fun a ha => ?_)
+      (fun a ha => ?_)
     · rw [norm_pow]; exact pow_le_pow_of_le_one (norm_nonneg _) hζ1 ha.le
     · rw [norm_pow]; exact pow_le_pow_of_le_one (norm_nonneg _) hζ1 ha
   have hFmem : ∀ ζ ∈ Metric.closedBall (0 : ℂ) 1, F ζ ∈ X.dom := by
@@ -284,14 +316,18 @@ theorem eq_zero_lower (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
     rw [frontier_ball _ one_ne_zero, mem_sphere_zero_iff_norm] at hζ
     have hζ0 : ζ ≠ 0 := norm_ne_zero_iff.1 (by rw [hζ]; exact one_ne_zero)
     have h1 := hT (fun _ a => ζ ^ (a : ℕ)) (fun _ a => by rw [norm_pow, hζ, one_pow]) _ hLd
-    have e : X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (fun a : Fin r => ζ ^ (a : ℕ)) *
-        (mat x₀ τ)⁻¹) (rmul x₀ L) = rmul x₀ fun τ =>
-      (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ) := by
+    have e
+        : X.lmulC
+            (fun τ => mat x₀ τ * Matrix.diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * (mat x₀ τ)⁻¹)
+            (rmul x₀ L)
+          = rmul x₀ fun τ =>
+            (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ : Matrix (Fin r) (Fin r) ℂ) := by
       funext τ
-      change mat x₀ τ * Matrix.diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * (mat x₀ τ)⁻¹ *
-        (mat x₀ τ * mat L τ) = mat x₀ τ * (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ)
-      rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _
-        (isUnit_iff_ne_zero.2 (hx₀' τ).1), Matrix.mul_assoc]
+      change mat x₀ τ * Matrix.diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * (mat x₀ τ)⁻¹
+          * (mat x₀ τ * mat L τ)
+        = mat x₀ τ * (diagonal (fun a : Fin r => ζ ^ (a : ℕ)) * mat L τ)
+      rw [Matrix.mul_assoc,
+        Matrix.nonsing_inv_mul_cancel_left _ _ (isUnit_iff_ne_zero.2 (hx₀' τ).1), Matrix.mul_assoc]
     rw [e] at h1
     change m (F ζ) = m (rmul x₀ L)
     rw [hFne ζ hζ0, hB _ (hctr ζ hζ0 hζ.le) _ (hbζ ζ hζ0), h1, ← mul_assoc]
@@ -301,8 +337,9 @@ theorem eq_zero_lower (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_eq_one fun a _ => ?_
     rw [diagonal_apply_eq, ← mul_zpow, inv_mul_cancel₀ (pow_ne_zero _ hζ0), _root_.one_zpow]
-  have key := Complex.eqOn_of_eqOn_frontier Metric.isBounded_ball hg diffContOnCl_const hsph
-    (Metric.mem_ball_self one_pos)
+  have key :=
+    Complex.eqOn_of_eqOn_frontier Metric.isBounded_ball hg diffContOnCl_const hsph
+      (Metric.mem_ball_self one_pos)
   change m (F 0) = m (rmul x₀ L) at key
   rw [← key, hF0, hB _ hx₀' _ hb0, h0, mul_zero]
 
@@ -312,15 +349,22 @@ end LowestWeight
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem lowest_weight_function_unique {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
-    (hx₀ : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)) (hx₀' : x₀ ∈ X.dom)
-    (m : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom) (hB : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, m (rmul x b) = bchar la b * m x)
-    (hT : ∀ t : X.Ψ → Fin r → ℂ, (∀ τ i, ‖t τ i‖ = 1) → ∀ x ∈ X.dom,
-      m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x) = (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
-    (h0 : m x₀ = 0) : ∀ x ∈ X.dom, m x = 0 := by
-
-  have hcell : ∀ y : Frame X.Ψ r, rmul x₀ y ∈ X.dom → (∀ τ i, lminor (mat y τ) i ≠ 0) →
-      m (rmul x₀ y) = 0 := by
+theorem lowest_weight_function_unique
+    {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
+    (hx₀ : ∀ τ : X.Ψ,
+      gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+    (hx₀' : x₀ ∈ X.dom) (m : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom)
+    (hB : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, m (rmul x b) = bchar la b * m x)
+    (hT : ∀ t : X.Ψ → Fin r → ℂ,
+      (∀ τ i, ‖t τ i‖ = 1)
+        → ∀ x ∈ X.dom,
+          m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x)
+            = (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
+    (h0 : m x₀ = 0)
+    : ∀ x ∈ X.dom, m x = 0 := by
+  have hcell
+      : ∀ y : Frame X.Ψ r,
+        rmul x₀ y ∈ X.dom → (∀ τ i, lminor (mat y τ) i ≠ 0) → m (rmul x₀ y) = 0 := by
     intro y hy hmin
     choose B hB1 hB2 hB3 using fun τ => LowestWeight.exists_lower (mat y τ) (hmin τ)
     have hBb : (fun τ => B τ : Frame X.Ψ r) ∈ Bor X.Ψ r := by
@@ -329,8 +373,9 @@ theorem lowest_weight_function_unique {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) 
       change (B τ).det ≠ 0
       rw [Matrix.det_of_isUpperTriangular (fun a c h => hB2 τ a c h)]
       simp [hB1]
-    have e : rmul (rmul x₀ y) (fun τ => B τ) =
-        rmul x₀ (fun τ => (mat y τ * B τ : Matrix (Fin r) (Fin r) ℂ)) := by
+    have e
+        : rmul (rmul x₀ y) (fun τ => B τ)
+          = rmul x₀ (fun τ => (mat y τ * B τ : Matrix (Fin r) (Fin r) ℂ)) := by
       funext τ
       exact Matrix.mul_assoc (mat x₀ τ) (mat y τ) (B τ)
     have h1 := hB _ hy _ hBb
@@ -341,8 +386,11 @@ theorem lowest_weight_function_unique {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) 
 
   intro x hx
   set y : X.Ψ → Matrix (Fin r) (Fin r) ℂ := fun τ => (mat x₀ τ)⁻¹ * mat x τ with hy
-  have e : ∀ s : ℂ, x + s • x₀ =
-      rmul x₀ fun τ => (y τ + s • (1 : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) := by
+  have e
+      : ∀ s : ℂ,
+        x + s • x₀
+          = rmul x₀ fun τ =>
+            (y τ + s • (1 : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) := by
     intro s
     funext τ
     change mat x τ + s • mat x₀ τ = mat x₀ τ * ((mat x₀ τ)⁻¹ * mat x τ + s • 1)
@@ -351,8 +399,9 @@ theorem lowest_weight_function_unique {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) 
   have hlim : Tendsto (fun s : ℂ => x + s • x₀) (𝓝[≠] 0) (𝓝 x) :=
     (Continuous.tendsto' (by fun_prop) _ _ (by simp)).mono_left nhdsWithin_le_nhds
   have hn : X.dom ∈ 𝓝 x := (FourierCoefficientDomain.isOpen_dom X).mem_nhds hx
-  have hgood : ∀ᶠ s : ℂ in 𝓝[≠] 0, ∀ τ i,
-      lminor (y τ + s • (1 : Matrix (Fin r) (Fin r) ℂ)) i ≠ 0 := by
+  have hgood
+      : ∀ᶠ s : ℂ in 𝓝[≠] 0, ∀ τ i,
+        lminor (y τ + s • (1 : Matrix (Fin r) (Fin r) ℂ)) i ≠ 0 := by
     simp only [eventually_all]
     intro τ i
     exact nhdsNE_le_cofinite _ (LowestWeight.finite_lminor (y τ) i).eventually_cofinite_notMem
@@ -363,23 +412,32 @@ theorem lowest_weight_function_unique {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) 
   exact tendsto_nhds_unique ((hm.differentiableAt hn).continuousAt.tendsto.comp hlim)
     (tendsto_const_nhds.congr' (hz.mono fun s hs => hs.symm))
 
-theorem lowest_weight_function_mul_eq {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
-    (hx₀ : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x₀ τ) =
-      Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)) (hx₀' : x₀ ∈ X.dom)
-    (m m' : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom) (hm' : DifferentiableOn ℂ m' X.dom)
+theorem lowest_weight_function_mul_eq
+    {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (x₀ : Frame X.Ψ r)
+    (hx₀ : ∀ τ : X.Ψ,
+      gram τ.1 X.Gm (mat x₀ τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+    (hx₀' : x₀ ∈ X.dom) (m m' : Frame X.Ψ r → ℂ) (hm : DifferentiableOn ℂ m X.dom)
+    (hm' : DifferentiableOn ℂ m' X.dom)
     (hB : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, m (rmul x b) = bchar la b * m x)
     (hB' : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, m' (rmul x b) = bchar la b * m' x)
-    (hT : ∀ t : X.Ψ → Fin r → ℂ, (∀ τ i, ‖t τ i‖ = 1) → ∀ x ∈ X.dom,
-      m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x) =
-        (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
-    (hT' : ∀ t : X.Ψ → Fin r → ℂ, (∀ τ i, ‖t τ i‖ = 1) → ∀ x ∈ X.dom,
-      m' (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x) =
-        (∏ τ, ∏ i, t τ i ^ la τ i) * m' x) :
-    ∀ x ∈ X.dom, m x * m' x₀ = m' x * m x₀ := by
+    (hT : ∀ t : X.Ψ → Fin r → ℂ,
+      (∀ τ i, ‖t τ i‖ = 1)
+        → ∀ x ∈ X.dom,
+          m (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x)
+            = (∏ τ, ∏ i, t τ i ^ la τ i) * m x)
+    (hT' : ∀ t : X.Ψ → Fin r → ℂ,
+      (∀ τ i, ‖t τ i‖ = 1)
+        → ∀ x ∈ X.dom,
+          m' (X.lmulC (fun τ => mat x₀ τ * Matrix.diagonal (t τ) * (mat x₀ τ)⁻¹) x)
+            = (∏ τ, ∏ i, t τ i ^ la τ i) * m' x)
+    : ∀ x ∈ X.dom, m x * m' x₀ = m' x * m x₀ := by
   intro x hx
   refine sub_eq_zero.1 (lowest_weight_function_unique X la x₀ hx₀ hx₀'
-    (fun x => m x * m' x₀ - m' x * m x₀) ((hm.mul_const _).sub (hm'.mul_const _))
-    (fun x hx b hb => ?_) (fun t ht x hx => ?_) (by ring) x hx)
+    (fun x => m x * m' x₀ - m' x * m x₀)
+    ((hm.mul_const _).sub (hm'.mul_const _))
+    (fun x hx b hb => ?_)
+    (fun t ht x hx => ?_)
+    (by ring) x hx)
   · rw [hB x hx b hb, hB' x hx b hb]; ring
   · rw [hT t ht x hx, hT' t ht x hx]; ring
 

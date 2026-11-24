@@ -72,7 +72,4 @@ theorem _root_.GlobalTheory.T.exists_splitPlace_adelicMatrix_given_components
               ∧ u.map (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piW τ) = P₀
               ∧ u.map (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piW (τ.comp σ))
                 = P₁ := by
-  first
-  | exact @GlobalTheory.SplitComps.exists_mat_comps
-  | exact GlobalTheory.SplitComps.exists_mat_comps
-  | (intros; apply GlobalTheory.SplitComps.exists_mat_comps <;> assumption)
+  first | exact @GlobalTheory.SplitComps.exists_mat_comps

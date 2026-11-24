@@ -109,9 +109,9 @@ theorem isMultiHomog_xpow (i : ∀ k, ι k) (e : K → ℕ) : IsMultiHomog (xpow
       rw [Finset.sum_eq_single (i k')]
       · simp
       · intro j _ hj
-        simp [Finsupp.single_apply, Sigma.mk.inj_iff, Ne.symm hj]
+        simp [Ne.symm hj]
       · simp
-    · simp [Finsupp.single_apply, Sigma.mk.inj_iff, hk, Ne.symm hk]
+    · simp [hk]
   have h :=
     isMultiHomog_prod Finset.univ
       (fun k => (X ⟨k, i k⟩ : MRing ι) ^ e k)

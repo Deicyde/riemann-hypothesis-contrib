@@ -64,6 +64,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.conjugatedThetaCharacters_restriction_ramification
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]

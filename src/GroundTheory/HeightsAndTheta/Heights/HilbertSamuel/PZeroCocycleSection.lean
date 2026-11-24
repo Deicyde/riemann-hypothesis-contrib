@@ -199,7 +199,6 @@ variable (y) in
 theorem aeval_div_mem (c : ∀ k, ι k) {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d)
     : aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k ∈ chartRingZ y c := by
   classical
-
   rw [g.as_sum, map_sum, Finset.sum_div]
   refine Subalgebra.sum_mem _ fun m hm => ?_
   rw [aeval_monomial, mul_div_assoc]

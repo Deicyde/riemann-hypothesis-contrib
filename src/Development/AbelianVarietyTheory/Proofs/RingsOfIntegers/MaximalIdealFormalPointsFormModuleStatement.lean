@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.maximal_ideal_formal_points_form_module
     : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
         [IsAdicComplete (maximalIdeal V) V] [CharZero V] (d : ℕ) (O : Type) [CommRing O]
@@ -66,7 +68,4 @@ theorem _root_.GlobalTheory.T.maximal_ideal_formal_points_form_module
                 = addV B.G.F (compV (B.A.act a) x) (compV (B.A.act a) y)
               ∧ compV (B.A.act (a + b)) x = addV B.G.F (compV (B.A.act a) x) (compV (B.A.act b) x)
               ∧ compV (B.A.act (a * b)) x = compV (B.A.act a) (compV (B.A.act b) x) := by
-  first
-  | exact @GlobalTheory.PlaceInt.smallPts_module
-  | exact GlobalTheory.PlaceInt.smallPts_module
-  | (intros; apply GlobalTheory.PlaceInt.smallPts_module <;> assumption)
+  first | exact @GlobalTheory.PlaceInt.smallPts_module

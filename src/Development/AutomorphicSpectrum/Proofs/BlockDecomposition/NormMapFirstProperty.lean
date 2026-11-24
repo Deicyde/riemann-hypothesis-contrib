@@ -63,9 +63,11 @@ open Finset
 
 namespace GlobalTheory.CompanionTheory.NormOnto
 
-theorem field_norm_onto {L : Type*} [Field L] [Finite L] (ρ : RingAut L) (e : ℕ) (he : 0 < e)
-    (h1 : ρ ^ e = 1) (hne : ∀ j, 0 < j → j < e → ρ ^ j ≠ 1) (a : L) (ha0 : a ≠ 0) (hfix : ρ a = a) :
-    ∃ w : L, w ≠ 0 ∧ ∏ j ∈ range e, (ρ ^ j) w = a := by
+theorem field_norm_onto
+    {L : Type*} [Field L] [Finite L]
+    (ρ : RingAut L) (e : ℕ) (he : 0 < e) (h1 : ρ ^ e = 1) (hne : ∀ j, 0 < j → j < e → ρ ^ j ≠ 1)
+    (a : L) (ha0 : a ≠ 0) (hfix : ρ a = a)
+    : ∃ w : L, w ≠ 0 ∧ ∏ j ∈ range e, (ρ ^ j) w = a := by
   have hord : orderOf ρ = e := by
     rw [orderOf_eq_iff he]
     exact ⟨h1, fun m hm hm0 => hne m hm0 hm⟩
@@ -98,9 +100,9 @@ theorem field_norm_onto {L : Type*} [Field L] [Finite L] (ρ : RingAut L) (e : �
   rw [h3, h4, Fin.prod_univ_eq_prod_range (fun i => (ρ ^ i) (v : L)), hord] at h2
   exact h2.symm
 
-theorem prod_range_stride {M : Type*} [CommMonoid M] (f : ℕ → M) (d e : ℕ) (hd : 0 < d)
-    (h : ∀ i, ¬ d ∣ i → f i = 1) :
-    ∏ i ∈ range (d * e), f i = ∏ j ∈ range e, f (d * j) := by
+theorem prod_range_stride
+    {M : Type*} [CommMonoid M] (f : ℕ → M) (d e : ℕ) (hd : 0 < d) (h : ∀ i, ¬ d ∣ i → f i = 1)
+    : ∏ i ∈ range (d * e), f i = ∏ j ∈ range e, f (d * j) := by
   induction e with
   | zero => simp
   | succ e ih =>
@@ -127,8 +129,8 @@ variable {B : Type*} [CommRing B]
 
 def pull (T : RingAut B) (I : Ideal B) : Ideal B := I.comap (T : B →+* B)
 
-theorem mem_pull_iter (T : RingAut B) (i : ℕ) (I : Ideal B) (b : B) :
-    b ∈ (pull T)^[i] I ↔ (T ^ i) b ∈ I := by
+theorem mem_pull_iter (T : RingAut B) (i : ℕ) (I : Ideal B) (b : B)
+    : b ∈ (pull T)^[i] I ↔ (T ^ i) b ∈ I := by
   induction i generalizing I with
   | zero => simp
   | succ i ih =>
@@ -136,14 +138,14 @@ theorem mem_pull_iter (T : RingAut B) (i : ℕ) (I : Ideal B) (b : B) :
     simp only [pull, Ideal.mem_comap, pow_succ']
     rfl
 
-theorem pull_iter_period (T : RingAut B) (ℓ : ℕ) (hT : T ^ ℓ = 1) (I : Ideal B) :
-    (pull T)^[ℓ] I = I := by
+theorem pull_iter_period (T : RingAut B) (ℓ : ℕ) (hT : T ^ ℓ = 1) (I : Ideal B)
+    : (pull T)^[ℓ] I = I := by
   ext b
   rw [mem_pull_iter, hT]
   rfl
 
-theorem pull_iter_max (T : RingAut B) (i : ℕ) (I : Ideal B) (hI : I.IsMaximal) :
-    ((pull T)^[i] I).IsMaximal := by
+theorem pull_iter_max (T : RingAut B) (i : ℕ) (I : Ideal B) (hI : I.IsMaximal)
+    : ((pull T)^[i] I).IsMaximal := by
   induction i generalizing I with
   | zero => simpa
   | succ i ih =>
@@ -151,23 +153,26 @@ theorem pull_iter_max (T : RingAut B) (i : ℕ) (I : Ideal B) (hI : I.IsMaximal)
     apply ih
     exact Ideal.comap_isMaximal_of_surjective (T : B →+* B) (RingEquiv.surjective T)
 
-theorem norm_fixed (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1) (c : B) :
-    T (∏ i ∈ range ℓ, (T ^ i) c) = ∏ i ∈ range ℓ, (T ^ i) c := by
+theorem norm_fixed (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1) (c : B)
+    : T (∏ i ∈ range ℓ, (T ^ i) c) = ∏ i ∈ range ℓ, (T ^ i) c := by
   obtain ⟨k, rfl⟩ : ∃ k, ℓ = k + 1 := ⟨ℓ - 1, by omega⟩
-  have hs : ∀ i, T ((T ^ i) c) = (T ^ (i + 1)) c := fun i => by
-    rw [pow_succ']; rfl
+  have hs : ∀ i, T ((T ^ i) c) = (T ^ (i + 1)) c := fun i => by rw [pow_succ']; rfl
   rw [map_prod]
   simp only [hs]
   rw [prod_range_succ, prod_range_succ' (fun i => (T ^ i) c), hT]
   simp
 
-theorem local_step [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1)
-    (n : ℕ) (x y : Fin n → B)
-    (hxy : ∀ j < ℓ, ∑ i, x i * (T ^ j) (y i) = if j = 0 then 1 else 0)
-    (a : B) (ha : IsUnit a) (hfix : T a = a) (m : Ideal B) (hm : m.IsMaximal) :
-    ∃ w : B, w ∉ m ∧ ∀ c : B, c - w ∈ m →
-      (∀ i, ¬ Function.minimalPeriod (pull T) m ∣ i → c - 1 ∈ (pull T)^[i] m) →
-      ∏ i ∈ range ℓ, (T ^ i) c - a ∈ m := by
+theorem local_step
+    [Finite B]
+    (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1)
+    (n : ℕ) (x y : Fin n → B) (hxy : ∀ j < ℓ, ∑ i, x i * (T ^ j) (y i) = if j = 0 then 1 else 0)
+    (a : B) (ha : IsUnit a) (hfix : T a = a)
+    (m : Ideal B) (hm : m.IsMaximal)
+    : ∃ w : B,
+      w ∉ m
+        ∧ ∀ c : B,
+          c - w ∈ m → (∀ i, ¬ Function.minimalPeriod (pull T) m ∣ i → c - 1 ∈ (pull T)^[i] m)
+            → ∏ i ∈ range ℓ, (T ^ i) c - a ∈ m := by
   classical
   letI : Field (B ⧸ m) := Ideal.Quotient.field m
   haveI : Finite (B ⧸ m) := Finite.of_surjective _ (Ideal.Quotient.mk_surjective (I := m))
@@ -192,8 +197,9 @@ theorem local_step [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT :
     · rintro ⟨z, hz, rfl⟩
       exact (hdm z).2 hz
   let ρ : RingAut (B ⧸ m) := Ideal.quotientEquiv m m ((T ^ d : RingAut B) : B ≃+* B) hmap
-  have hρ : ∀ (j : ℕ) (b : B), (ρ ^ j) (Ideal.Quotient.mk m b) =
-      Ideal.Quotient.mk m ((T ^ (d * j)) b) := by
+  have hρ
+      : ∀ (j : ℕ) (b : B),
+        (ρ ^ j) (Ideal.Quotient.mk m b) = Ideal.Quotient.mk m ((T ^ (d * j)) b) := by
     intro j
     induction j with
     | zero => intro b; simp
@@ -271,30 +277,35 @@ section Core2
 
 variable {B : Type*} [CommRing B]
 
-theorem norm_mod_max [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1)
-    (n : ℕ) (x y : Fin n → B)
-    (hxy : ∀ j < ℓ, ∑ i, x i * (T ^ j) (y i) = if j = 0 then 1 else 0)
-    (a : B) (ha : IsUnit a) (hfix : T a = a) :
-    ∃ c : Bˣ, ∀ m : Ideal B, m.IsMaximal → ∏ i ∈ range ℓ, (T ^ i) (c : B) - a ∈ m := by
+theorem norm_mod_max
+    [Finite B]
+    (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT : T ^ ℓ = 1)
+    (n : ℕ) (x y : Fin n → B) (hxy : ∀ j < ℓ, ∑ i, x i * (T ^ j) (y i) = if j = 0 then 1 else 0)
+    (a : B) (ha : IsUnit a) (hfix : T a = a)
+    : ∃ c : Bˣ, ∀ m : Ideal B, m.IsMaximal → ∏ i ∈ range ℓ, (T ^ i) (c : B) - a ∈ m := by
   classical
-  have hmul : ∀ (k i : ℕ) (I : Ideal B), (pull T)^[i * k] ((pull T)^[k] I) = (pull T)^[(i + 1) * k] I := by
+  have hmul
+      : ∀ (k i : ℕ) (I : Ideal B),
+        (pull T)^[i * k] ((pull T)^[k] I) = (pull T)^[(i + 1) * k] I := by
     intro k i I
     rw [← Function.iterate_add_apply]
     congr 1
     ring
-  let s : Setoid (Ideal B) :=
-    { r := fun I J => ∃ i, (pull T)^[i] I = J
-      iseqv :=
-        { refl := fun I => ⟨0, rfl⟩
-          symm := by
-            rintro I J ⟨i, rfl⟩
-            refine ⟨(ℓ - 1) * i, ?_⟩
-            rw [hmul, Nat.sub_add_cancel hℓ]
-            rw [Nat.mul_comm]
-            exact Function.IsPeriodicPt.const_mul (pull_iter_period T ℓ hT I) i
-          trans := by
-            rintro I J K ⟨i, rfl⟩ ⟨j, rfl⟩
-            exact ⟨j + i, Function.iterate_add_apply _ _ _ _⟩ } }
+  let s : Setoid (Ideal B) := {
+    r := fun I J => ∃ i, (pull T)^[i] I = J
+    iseqv := {
+      refl := fun I => ⟨0, rfl⟩
+      symm := by
+        rintro I J ⟨i, rfl⟩
+        refine ⟨(ℓ - 1) * i, ?_⟩
+        rw [hmul, Nat.sub_add_cancel hℓ]
+        rw [Nat.mul_comm]
+        exact Function.IsPeriodicPt.const_mul (pull_iter_period T ℓ hT I) i
+      trans := by
+        rintro I J K ⟨i, rfl⟩ ⟨j, rfl⟩
+        exact ⟨j + i, Function.iterate_add_apply _ _ _ _⟩
+    }
+  }
   let rep : Ideal B → Ideal B := fun I => (Quotient.mk s I).out
   have hrep : ∀ I, ∃ i, (pull T)^[i] (rep I) = I := fun I => Quotient.mk_out (s := s) I
   have hrep_eq : ∀ I J, (∃ i, (pull T)^[i] I = J) → rep I = rep J := by
@@ -342,8 +353,7 @@ theorem norm_mod_max [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT
       simpa [W, hII] using h1
     · intro i hi
       have hmax' := pull_iter_max T i I hImax
-      have hne : (pull T)^[i] I ≠ I := fun h =>
-        hi (Function.IsPeriodicPt.minimalPeriod_dvd h)
+      have hne : (pull T)^[i] I ≠ I := fun h => hi (Function.IsPeriodicPt.minimalPeriod_dvd h)
       have hr : rep ((pull T)^[i] I) ≠ (pull T)^[i] I := by
         rw [← hrep_eq I _ ⟨i, rfl⟩, hII]
         exact hne.symm
@@ -351,8 +361,9 @@ theorem norm_mod_max [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT
       simpa [W, hr] using h1
   have hzfix : T (∏ i ∈ range ℓ, (T ^ i) (cu : B) - a) = ∏ i ∈ range ℓ, (T ^ i) (cu : B) - a := by
     rw [map_sub, norm_fixed T ℓ hℓ hT, hfix]
-  have hz : ∀ k : ℕ, (T ^ k) (∏ i ∈ range ℓ, (T ^ i) (cu : B) - a) =
-      ∏ i ∈ range ℓ, (T ^ i) (cu : B) - a := by
+  have hz
+      : ∀ k : ℕ,
+        (T ^ k) (∏ i ∈ range ℓ, (T ^ i) (cu : B) - a) = ∏ i ∈ range ℓ, (T ^ i) (cu : B) - a := by
     intro k
     induction k with
     | zero => rfl
@@ -365,10 +376,11 @@ theorem norm_mod_max [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT
 
 end Core2
 
-theorem fixed_tensor {κ κ' A : Type*} [Field κ] [CommRing κ'] [Algebra κ κ'] [CommRing A] [Algebra κ A]
+theorem fixed_tensor
+    {κ κ' A : Type*} [Field κ] [CommRing κ'] [Algebra κ κ'] [CommRing A] [Algebra κ A]
     (τ : κ' ≃ₐ[κ] κ') (hfix : ∀ z : κ', τ z = z → z ∈ Set.range (algebraMap κ κ'))
-    (s : κ' ⊗[κ] A) (hs : Algebra.TensorProduct.map τ.toAlgHom (AlgHom.id κ A) s = s) :
-    ∃ t : A, s = 1 ⊗ₜ[κ] t := by
+    (s : κ' ⊗[κ] A) (hs : Algebra.TensorProduct.map τ.toAlgHom (AlgHom.id κ A) s = s)
+    : ∃ t : A, s = 1 ⊗ₜ[κ] t := by
   classical
   let C := Module.Basis.ofVectorSpace κ A
   obtain ⟨b, rfl⟩ := TensorProduct.eq_repr_basis_right C s
@@ -376,8 +388,8 @@ theorem fixed_tensor {κ κ' A : Type*} [Field κ] [CommRing κ'] [Algebra κ κ
   have hbb : b.mapRange τ (map_zero τ) = b := by
     apply hinj
     simp only [Finsupp.coe_lsum]
-    change (Finsupp.mapRange τ (map_zero τ) b).sum (fun i m => m ⊗ₜ[κ] C i) =
-      b.sum (fun i m => m ⊗ₜ[κ] C i)
+    change (Finsupp.mapRange τ (map_zero τ) b).sum (fun i m => m ⊗ₜ[κ] C i)
+      = b.sum (fun i m => m ⊗ₜ[κ] C i)
     rw [Finsupp.sum_mapRange_index (by simp)]
     conv_rhs => rw [← hs]
 
@@ -425,8 +437,10 @@ theorem norm_onto : PositivityTheory.Rg.Tf.Loc.N1 := by
       rw [pow_succ', pow_succ']
       show T ((T ^ i) _) = τ ((τ ^ i) z) ⊗ₜ[κ] b
       rw [ih, hT1]
-  have hTi : ∀ (i : ℕ) (s : κ' ⊗[κ] A),
-      Algebra.TensorProduct.map ((τ ^ i : κ' ≃ₐ[κ] κ').toAlgHom) (AlgHom.id κ A) s = (T ^ i) s := by
+  have hTi
+      : ∀ (i : ℕ) (s : κ' ⊗[κ] A),
+        Algebra.TensorProduct.map ((τ ^ i : κ' ≃ₐ[κ] κ').toAlgHom) (AlgHom.id κ A) s
+          = (T ^ i) s := by
     intro i s
     induction s with
     | tmul z b => rw [hTm]; rfl
@@ -437,8 +451,9 @@ theorem norm_onto : PositivityTheory.Rg.Tf.Loc.N1 := by
     induction s with
     | tmul z b => rfl
     | add u v hu hv => rw [map_add (f := _), hu, hv]; rfl
-  have hXY : ∀ j < ℓ, ∑ i, (x i ⊗ₜ[κ] (1 : A)) * (T ^ j) (y i ⊗ₜ[κ] (1 : A)) =
-      if j = 0 then 1 else 0 := by
+  have hXY
+      : ∀ j < ℓ,
+        ∑ i, (x i ⊗ₜ[κ] (1 : A)) * (T ^ j) (y i ⊗ₜ[κ] (1 : A)) = if j = 0 then 1 else 0 := by
     intro j hj
     have h := congrArg (fun z : κ' => z ⊗ₜ[κ] (1 : A)) (hxy j hj)
     simp only [TensorProduct.sum_tmul] at h
@@ -449,18 +464,19 @@ theorem norm_onto : PositivityTheory.Rg.Tf.Loc.N1 := by
     · exact TensorProduct.zero_tmul _ _
   have haU : IsUnit ((1 : κ') ⊗ₜ[κ] (a : A)) :=
     a.isUnit.map (Algebra.TensorProduct.includeRight : A →ₐ[κ] κ' ⊗[κ] A)
-  obtain ⟨c, hc⟩ := norm_mod_max T ℓ hℓ hT ℓ (fun i => x i ⊗ₜ[κ] (1 : A))
-    (fun i => y i ⊗ₜ[κ] (1 : A)) hXY _ haU (by rw [hT1, map_one])
+  obtain ⟨c, hc⟩ :=
+    norm_mod_max T ℓ hℓ hT ℓ (fun i => x i ⊗ₜ[κ] (1 : A)) (fun i => y i ⊗ₜ[κ] (1 : A)) hXY _ haU (by
+      rw [hT1, map_one])
   refine ⟨c, ?_⟩
   simp only [hTi]
   rw [Algebra.TensorProduct.includeRight_apply, ← sub_eq_zero]
   set z := ∏ i ∈ range ℓ, (T ^ i) (c : κ' ⊗[κ] A) - (1 : κ') ⊗ₜ[κ] (a : A) with hz
-  have hzfix : T z = z := by
-    rw [hz, map_sub, norm_fixed T ℓ hℓ hT, hT1, map_one]
-  obtain ⟨t, ht⟩ := fixed_tensor τ hfix z (by
-    have := hTi 1 z
-    rw [pow_one, pow_one] at this
-    exact this.trans hzfix)
+  have hzfix : T z = z := by rw [hz, map_sub, norm_fixed T ℓ hℓ hT, hT1, map_one]
+  obtain ⟨t, ht⟩ :=
+    fixed_tensor τ hfix z (by
+      have := hTi 1 z
+      rw [pow_one, pow_one] at this
+      exact this.trans hzfix)
   have hznil : IsNilpotent z := by
     have hj : z ∈ (⊥ : Ideal (κ' ⊗[κ] A)).jacobson := by
       rw [Ideal.jacobson, Ideal.mem_sInf]
@@ -469,8 +485,7 @@ theorem norm_onto : PositivityTheory.Rg.Tf.Loc.N1 := by
     rw [IsArtinianRing.jacobson_eq_radical] at hj
     obtain ⟨k, hk⟩ := hj
     exact ⟨k, by simpa using hk⟩
-  have hinj : Function.Injective
-      (Algebra.TensorProduct.includeRight : A →ₐ[κ] κ' ⊗[κ] A) :=
+  have hinj : Function.Injective (Algebra.TensorProduct.includeRight : A →ₐ[κ] κ' ⊗[κ] A) :=
     Algebra.TensorProduct.includeRight_injective (FaithfulSMul.algebraMap_injective κ κ')
   have htn : IsNilpotent t := by
     obtain ⟨k, hk⟩ := hznil

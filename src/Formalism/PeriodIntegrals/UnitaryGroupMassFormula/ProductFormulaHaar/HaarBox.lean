@@ -187,7 +187,7 @@ theorem image_eq_smul (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] 
     · rintro ⟨y, hy, rfl⟩; simpa using hy
   have h' : (μ.map L.symm) S = _ := DFunLike.congr_fun h S
   rw [← h2, h']
-  first | rfl | exact (nnreal_smul_coe_apply _ _ _) | simp
+  first | rfl
 
 theorem image_eq_of_box
     (b : Basis ι K E)

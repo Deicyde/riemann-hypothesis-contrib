@@ -95,8 +95,7 @@ section Point
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y} (hI : SIso D.s (sOf hF))
 
-theorem tu_ne (u' : D.what₂.Word) : ((Tu D u' : ℕ) : D.host.E) ≠ 0 :=
-  Nat.cast_ne_zero.2 (D.mem u').A.T_prime.ne_zero
+alias tu_ne := _root_.Formalism.L2.SG.Corank.tu_ne_zero
 
 def IsFrameLift {u u' : D.what₂.Word} (t : D.s.Term u u') (g : (VS D).V ≃ₗ[D.host.E] (VS D).V)
     : Prop :=
@@ -220,7 +219,6 @@ theorem hsNormSq_nonneg
   first
   | (rw [inner_self_eq_norm_sq_to_K, ← Complex.ofReal_pow, Complex.ofReal_re]; positivity)
   | exact inner_self_nonneg (𝕜 := ℂ)
-  | simp
 
 theorem hsNormSq_smul
     {Wp Wq : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
@@ -233,7 +231,7 @@ theorem hsNormSq_smul
     rw [← mul_assoc, Complex.normSq_eq_conj_mul_self]
   have hy : ∀ z : ℂ, c * ((starRingEnd ℂ) c * z) = (Complex.normSq c : ℂ) * z := fun z => by
     rw [← mul_assoc, Complex.mul_conj]
-  simp only [hx, hy]
+  simp only [hy]
   rw [← Finset.mul_sum, Complex.re_ofReal_mul]
 
 theorem isQuotMeas_smul
@@ -411,9 +409,7 @@ variable
 theorem star_dot_conjT
     {n m : Type*} [Fintype n] [Fintype m] (Q : Matrix n m ℂ) (x : m → ℂ) (y : n → ℂ)
     : star x ⬝ᵥ (Qᴴ *ᵥ y) = star (Q *ᵥ x) ⬝ᵥ y := by
-  first
-  | rw [Matrix.dotProduct_mulVec, Matrix.star_mulVec]
-  | rw [dotProduct_mulVec, Matrix.star_mulVec]
+  first | rw [Matrix.dotProduct_mulVec, Matrix.star_mulVec]
 
 theorem hJ_smul_real {n : ℕ} (ε : Fin n → Bool) (r s : ℝ) (x y : Fin n → ℂ)
     : hJ ε ((r : ℂ) • x) ((s : ℂ) • y) = ((r * s : ℝ) : ℂ) * hJ ε x y := by
@@ -530,12 +526,6 @@ theorem tau_nonempty (D : D7) : Nonempty D.what₂.Tau := by
   first
   | (unfold Formalism.BasicNotions.Ranks.f Formalism.BasicNotions.Ranks.n; positivity)
   | (unfold Formalism.BasicNotions.Ranks.f Formalism.BasicNotions.Ranks.n; omega)
-  | (simp [Formalism.BasicNotions.Ranks.f, Formalism.BasicNotions.Ranks.n]; omega)
-  | (simp [Formalism.BasicNotions.Ranks.f, Formalism.BasicNotions.Ranks.n])
-  | (unfold Formalism.BasicNotions.Ranks.f Formalism.HC.Frame.n; positivity)
-  | (unfold Formalism.BasicNotions.Ranks.f Formalism.HC.Frame.n; omega)
-  | (simp [Formalism.BasicNotions.Ranks.f, Formalism.HC.Frame.n])
-  | (unfold Formalism.BasicNotions.Ranks.f; positivity)
 
 end Witt
 
@@ -577,10 +567,7 @@ end UHmem
 
 section Scale
 
-theorem rdE_pos (D : D7) : 0 < D.host.rdE := by
-  unfold Formalism.BasicNotions.Host.rdE
-  apply Real.rpow_pos_of_pos
-  exact abs_pos.2 (Int.cast_ne_zero.2 (NumberField.discr_ne_zero _))
+alias rdE_pos := _root_.Formalism.MainNotions.S.rdE_pos
 
 variable {K : Type*} [Field K] (e : K →+* ℂ) (c : ℕ → ℂ)
 
@@ -907,7 +894,8 @@ def loopTermOf
     rmeas_nuR hI C hB hPin hCv t τ (hR t hg hr τ)
   ⟩
   J_irr := fun t _ hn =>
-    jt_irr hI Formalism.L2.SG.Closed.AvgCore_holds Formalism.L2.SG.Closed.ChiTrivialC_holds
+    jt_irr hI _root_.Formalism.L2.SG.TermOp.Vanish.avgCore
+      _root_.Formalism.L2.SG.Pf.chiTrivialC_outright
       Formalism.L2.SG.TermOp.Vanish.rational_cocompact_holds
       Formalism.L2.SG.NonRelPf.nonRelCharC_holds t hn
   J_norm := fun t hg hr => jnorm hI C hB hPin hCv hZ (tau_nonempty D) t hg hr
@@ -1073,13 +1061,9 @@ theorem stInf_conj_inv
   obtain ⟨hy1, hy2⟩ := hy
   subst hf
   have hsi : s⁻¹ ∈ X.SinfU u := by
-    first
-    | exact (Formalism.L2.SG.Pf.SinfSub X.B.I X.eR (X.zR u)).inv_mem hs
-    | exact (Formalism.L2.SG.Pf.SinfSub X.eR (X.zR u)).inv_mem hs
+    first | exact (Formalism.L2.SG.Pf.SinfSub X.B.I X.eR (X.zR u)).inv_mem hs
   have hs'i : s'⁻¹ ∈ X.SinfU u' := by
-    first
-    | exact (Formalism.L2.SG.Pf.SinfSub X.B.I X.eR (X.zR u')).inv_mem hs'
-    | exact (Formalism.L2.SG.Pf.SinfSub X.eR (X.zR u')).inv_mem hs'
+    first | exact (Formalism.L2.SG.Pf.SinfSub X.B.I X.eR (X.zR u')).inv_mem hs'
   show s⁻¹ * y * s ∈ X.NinfU u ∧ γw⁻¹ * (s⁻¹ * y * s) * γw ∈ X.NinfU u'
   refine ⟨?_, ?_⟩
   · have h1 := sinf_norm hsi hy1

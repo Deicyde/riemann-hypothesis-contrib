@@ -209,7 +209,7 @@ theorem stmtNumE_of (C₀ : ℝ) (h : nc_Need C₀)
     refine hasSum_le (fun e => ?_) (hf1.hasSum.sub hf2.hasSum) hm
     show min (a / (p : ℝ) ^ (2 * e + 1)) (C e) - min (b / (p : ℝ) ^ (2 * e + 1)) (Z e) ≤
       (a - b) * (1 / (p : ℝ) ^ (2 * e + 1))
-    have hbq : b / (p : ℝ) ^ (2 * e + 1) ≤ a / (p : ℝ) ^ (2 * e + 1) := by gcongr <;> exact hba
+    have hbq : b / (p : ℝ) ^ (2 * e + 1) ≤ a / (p : ℝ) ^ (2 * e + 1) := by gcongr
     have h1 : min (b / (p : ℝ) ^ (2 * e + 1)) (C e) ≤ min (b / (p : ℝ) ^ (2 * e + 1)) (Z e) :=
       min_le_min_left _ (hCZ e)
     have h2

@@ -66,7 +66,4 @@ theorem _root_.GlobalTheory.T.existsUnique_isMonHom_lift_of_grpPullback_abelian
             → IsAbelianScheme B
             → ∀ (f₀ : A₀ ⟶ B₀) [IsMonHom f₀] (φ : A ⟶ B),
               i ≫ φ.left = f₀.left ≫ j → ∃! f : A ⟶ B, IsMonHom f ∧ i ≫ f.left = f₀.left ≫ j := by
-  first
-  | exact @GlobalTheory.HomLift.existsUnique_isMonHom_lift
-  | exact GlobalTheory.HomLift.existsUnique_isMonHom_lift
-  | (intros; apply GlobalTheory.HomLift.existsUnique_isMonHom_lift <;> assumption)
+  first | exact @GlobalTheory.HomLift.existsUnique_isMonHom_lift

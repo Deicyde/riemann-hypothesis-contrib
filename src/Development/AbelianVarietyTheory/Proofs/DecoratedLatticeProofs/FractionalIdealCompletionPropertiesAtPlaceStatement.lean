@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Spl
   GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.fractionalIdealCompletion_properties_at_place
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.fractionalIdealCompletion_properties_at_place
               y ∈ latA S L (· = v)
                 ↔ (∀ i, y i ∈ idAt D (· = v))
                   ∧ ∀ s ∈ idV D.host.AA⁻¹ v, s • y ∈ latV S L (· = v) := by
-  first
-  | exact @GlobalTheory.SeeSaw.idV_props
-  | exact GlobalTheory.SeeSaw.idV_props
-  | (intros; apply GlobalTheory.SeeSaw.idV_props <;> assumption)
+  first | exact @GlobalTheory.SeeSaw.idV_props

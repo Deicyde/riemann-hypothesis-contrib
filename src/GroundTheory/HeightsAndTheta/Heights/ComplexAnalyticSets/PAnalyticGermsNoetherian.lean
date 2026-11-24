@@ -63,15 +63,23 @@ open Topology Filter
 
 noncomputable section
 
-theorem tendsto_nhds_of_analyticAt_eq {σ τ : Type} [Fintype σ] [Fintype τ] {h : (σ → ℂ) → (τ → ℂ)} {a : σ → ℂ} {b : τ → ℂ}
-    (hh : AnalyticAt ℂ h a) (hab : h a = b) : Tendsto h (𝓝 a) (𝓝 b) := by
+theorem tendsto_nhds_of_analyticAt_eq
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    {h : (σ → ℂ) → (τ → ℂ)} {a : σ → ℂ} {b : τ → ℂ} (hh : AnalyticAt ℂ h a) (hab : h a = b)
+    : Tendsto h (𝓝 a) (𝓝 b) := by
   rw [← hab]; exact hh.continuousAt.tendsto
 
-def germPull {σ τ : Type} [Fintype σ] [Fintype τ] (h : (σ → ℂ) → (τ → ℂ)) {a : σ → ℂ} {b : τ → ℂ}
-    (hh : AnalyticAt ℂ h a) (hab : h a = b) : holGerms b →+* holGerms a where
-  toFun φ := ⟨(φ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab), by
+def germPull
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    (h : (σ → ℂ) → (τ → ℂ))
+    {a : σ → ℂ} {b : τ → ℂ} (hh : AnalyticAt ℂ h a) (hab : h a = b)
+    : holGerms b →+* holGerms a where
+  toFun φ := ⟨
+    (φ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab),
+    by
       obtain ⟨f, hf, hφ⟩ := φ.2
-      exact ⟨f ∘ h, hf.comp_of_eq hh hab, by rw [← hφ]; rfl⟩⟩
+      exact ⟨f ∘ h, hf.comp_of_eq hh hab, by rw [← hφ]; rfl⟩
+  ⟩
   map_one' := rfl
   map_mul' φ ψ := by
     obtain ⟨f, -, hf⟩ := φ.2
@@ -80,7 +88,8 @@ def germPull {σ τ : Type} [Fintype σ] [Fintype τ] (h : (σ → ℂ) → (τ 
     show ((φ * ψ : holGerms b) : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab) =
       (φ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab) *
         (ψ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab)
-    rw [Subring.coe_mul, ← hf, ← hg]; rfl
+    rw [Subring.coe_mul, ← hf, ← hg]
+    rfl
   map_zero' := rfl
   map_add' φ ψ := by
     obtain ⟨f, -, hf⟩ := φ.2
@@ -89,18 +98,26 @@ def germPull {σ τ : Type} [Fintype σ] [Fintype τ] (h : (σ → ℂ) → (τ 
     show ((φ + ψ : holGerms b) : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab) =
       (φ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab) +
         (ψ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab)
-    rw [Subring.coe_add, ← hf, ← hg]; rfl
+    rw [Subring.coe_add, ← hf, ← hg]
+    rfl
 
-theorem germPull_coe {σ τ : Type} [Fintype σ] [Fintype τ] (h : (σ → ℂ) → (τ → ℂ)) {a : σ → ℂ} {b : τ → ℂ}
-    (hh : AnalyticAt ℂ h a) (hab : h a = b) (φ : holGerms b) (f : (τ → ℂ) → ℂ)
-    (hφ : (f : Germ (𝓝 b) ℂ) = φ) : ((germPull h hh hab φ : holGerms a) : Germ (𝓝 a) ℂ) = ↑(f ∘ h) := by
+theorem germPull_coe
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    (h : (σ → ℂ) → (τ → ℂ))
+    {a : σ → ℂ} {b : τ → ℂ} (hh : AnalyticAt ℂ h a) (hab : h a = b) (φ : holGerms b)
+    (f : (τ → ℂ) → ℂ) (hφ : (f : Germ (𝓝 b) ℂ) = φ)
+    : ((germPull h hh hab φ : holGerms a) : Germ (𝓝 a) ℂ) = ↑(f ∘ h) := by
   show (φ : Germ (𝓝 b) ℂ).compTendsto h (tendsto_nhds_of_analyticAt_eq hh hab) = _
-  rw [← hφ]; rfl
+  rw [← hφ]
+  rfl
 
-theorem germPull_germPull {σ τ : Type} [Fintype σ] [Fintype τ] (h₁ : (σ → ℂ) → (τ → ℂ))
-    (h₂ : (τ → ℂ) → (σ → ℂ)) {a : σ → ℂ} {b : τ → ℂ} (hh₁ : AnalyticAt ℂ h₁ a) (hab : h₁ a = b)
-    (hh₂ : AnalyticAt ℂ h₂ b) (hba : h₂ b = a) (h₁₂ : ∀ y, h₁ (h₂ y) = y) (φ : holGerms b) :
-    germPull h₂ hh₂ hba (germPull h₁ hh₁ hab φ) = φ := by
+theorem germPull_germPull
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    (h₁ : (σ → ℂ) → (τ → ℂ)) (h₂ : (τ → ℂ) → (σ → ℂ))
+    {a : σ → ℂ} {b : τ → ℂ}
+    (hh₁ : AnalyticAt ℂ h₁ a) (hab : h₁ a = b) (hh₂ : AnalyticAt ℂ h₂ b) (hba : h₂ b = a)
+    (h₁₂ : ∀ y, h₁ (h₂ y) = y) (φ : holGerms b)
+    : germPull h₂ hh₂ hba (germPull h₁ hh₁ hab φ) = φ := by
   obtain ⟨f, hf, hφ⟩ := φ.2
   apply Subtype.ext
   have e1 := germPull_coe h₁ hh₁ hab φ f hφ
@@ -109,8 +126,8 @@ theorem germPull_germPull {σ τ : Type} [Fintype σ] [Fintype τ] (h₁ : (σ �
   funext y
   simp [h₁₂]
 
-def germAffineEquiv {σ τ : Type} [Fintype σ] [Fintype τ] (e : (σ → ℂ) ≃L[ℂ] (τ → ℂ)) (c : τ → ℂ) :
-    holGerms c ≃+* holGerms (0 : σ → ℂ) :=
+def germAffineEquiv {σ τ : Type} [Fintype σ] [Fintype τ] (e : (σ → ℂ) ≃L[ℂ] (τ → ℂ)) (c : τ → ℂ)
+    : holGerms c ≃+* holGerms (0 : σ → ℂ) :=
   have h1 : AnalyticAt ℂ (fun z : σ → ℂ => e z + c) 0 := (e.analyticAt 0).add analyticAt_const
   have h1e : (fun z : σ → ℂ => e z + c) 0 = c := by simp
   have h2 : AnalyticAt ℂ (fun y : τ → ℂ => e.symm (y - c)) c :=
@@ -120,9 +137,10 @@ def germAffineEquiv {σ τ : Type} [Fintype σ] [Fintype τ] (e : (σ → ℂ) �
     (RingHom.ext fun φ => germPull_germPull _ _ h2 h2e h1 h1e (fun z => by simp) φ)
     (RingHom.ext fun φ => germPull_germPull _ _ h1 h1e h2 h2e (fun y => by simp) φ)
 
-theorem isNoetherianRing_holGerms_transfer {σ τ : Type} [Fintype σ] [Fintype τ]
-    (e : (σ → ℂ) ≃L[ℂ] (τ → ℂ)) (c : τ → ℂ) (h : IsNoetherianRing (holGerms (0 : σ → ℂ))) :
-    IsNoetherianRing (holGerms c) :=
+theorem isNoetherianRing_holGerms_transfer
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    (e : (σ → ℂ) ≃L[ℂ] (τ → ℂ)) (c : τ → ℂ) (h : IsNoetherianRing (holGerms (0 : σ → ℂ)))
+    : IsNoetherianRing (holGerms c) :=
   isNoetherianRing_of_ringEquiv _ (germAffineEquiv e c).symm
 
 theorem isField_holGerms_fin_zero : IsField (holGerms (0 : Fin 0 → ℂ)) := by
@@ -145,10 +163,11 @@ theorem isField_holGerms_fin_zero : IsField (holGerms (0 : Fin 0 → ℂ)) := by
       rw [hall x]
       exact mul_inv_cancel₀ h0)
 
-theorem isNoetherianRing_holGerms_option (hD : WeierstrassDivision.Statement)
-    (hG : GeneralLinearCoordinates.Statement) (σ : Type) [Fintype σ]
-    (hR : IsNoetherianRing (holGerms (0 : σ → ℂ))) :
-    IsNoetherianRing (holGerms (0 : Option σ → ℂ)) := by
+theorem isNoetherianRing_holGerms_option
+    (hD : WeierstrassDivision.Statement) (hG : GeneralLinearCoordinates.Statement)
+    (σ : Type) [Fintype σ]
+    (hR : IsNoetherianRing (holGerms (0 : σ → ℂ)))
+    : IsNoetherianRing (holGerms (0 : Option σ → ℂ)) := by
   classical
   refine ⟨fun I => ?_⟩
   by_cases hI : I = ⊥
@@ -164,31 +183,37 @@ theorem isNoetherianRing_holGerms_option (hD : WeierstrassDivision.Statement)
   obtain ⟨A, d, hAd⟩ := hG σ f hf hnz
 
   let Pl : (Option σ → ℂ) →L[ℂ] (σ → ℂ) :=
-    (ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Option σ => ℂ) (some i)).comp
+    (ContinuousLinearMap.pi fun i =>
+        ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Option σ => ℂ) (some i)).comp
       (A.symm : (Option σ → ℂ) →L[ℂ] (Option σ → ℂ))
   let Tl : (Option σ → ℂ) →L[ℂ] ℂ :=
     (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Option σ => ℂ) none).comp
       (A.symm : (Option σ → ℂ) →L[ℂ] (Option σ → ℂ))
-  let ι : holGerms (0 : σ → ℂ) →+* holGerms (0 : Option σ → ℂ) := germPull Pl (Pl.analyticAt 0) (map_zero Pl)
+  let ι : holGerms (0 : σ → ℂ) →+* holGerms (0 : Option σ → ℂ) :=
+    germPull Pl (Pl.analyticAt 0) (map_zero Pl)
   let τ : holGerms (0 : Option σ → ℂ) := ⟨↑(Tl : (Option σ → ℂ) → ℂ), Tl, Tl.analyticAt 0, rfl⟩
-  let Φ : (Fin d → holGerms (0 : σ → ℂ)) → holGerms (0 : Option σ → ℂ) :=
-    fun a => ∑ j : Fin d, ι (a j) * τ ^ (j : ℕ)
+  let Φ : (Fin d → holGerms (0 : σ → ℂ)) → holGerms (0 : Option σ → ℂ) := fun a =>
+    ∑ j : Fin d, ι (a j) * τ ^ (j : ℕ)
   have Φ_add : ∀ a b, Φ (a + b) = Φ a + Φ b := fun a b => by
     simp only [Φ, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
   have Φ_smul : ∀ (r : holGerms (0 : σ → ℂ)) a, Φ (r • a) = ι r * Φ a := fun r a => by
     simp only [Φ, Pi.smul_apply, smul_eq_mul, map_mul, mul_assoc, Finset.mul_sum]
   have Φ_zero : Φ 0 = 0 := by simp [Φ]
-  let N : Submodule (holGerms (0 : σ → ℂ)) (Fin d → holGerms (0 : σ → ℂ)) :=
-    { carrier := {a | Φ a ∈ I}
-      add_mem' := fun {a b} ha hb => by
-        change Φ (a + b) ∈ I
-        rw [Φ_add]; exact I.add_mem ha hb
-      zero_mem' := by
-        change Φ 0 ∈ I
-        rw [Φ_zero]; exact I.zero_mem
-      smul_mem' := fun r a ha => by
-        change Φ (r • a) ∈ I
-        rw [Φ_smul]; exact Ideal.mul_mem_left I _ ha }
+  let N : Submodule (holGerms (0 : σ → ℂ)) (Fin d → holGerms (0 : σ → ℂ)) := {
+    carrier := {a | Φ a ∈ I}
+    add_mem' := fun {a b} ha hb => by
+      change Φ (a + b) ∈ I
+      rw [Φ_add]
+      exact I.add_mem ha hb
+    zero_mem' := by
+      change Φ 0 ∈ I
+      rw [Φ_zero]
+      exact I.zero_mem
+    smul_mem' := fun r a ha => by
+      change Φ (r • a) ∈ I
+      rw [Φ_smul]
+      exact Ideal.mul_mem_left I _ ha
+  }
   obtain ⟨s, hs⟩ : N.FG := IsNoetherian.noetherian N
   refine ⟨insert φ (s.image Φ), le_antisymm ?_ ?_⟩
   · rw [Submodule.span_le]
@@ -208,21 +233,26 @@ theorem isNoetherianRing_holGerms_option (hD : WeierstrassDivision.Statement)
     have hqB : AnalyticAt ℂ (q ∘ A.symm) 0 := hq.comp_of_eq (A.symm.analyticAt 0) (map_zero _)
     let Q : holGerms (0 : Option σ → ℂ) := ⟨↑(q ∘ A.symm), q ∘ A.symm, hqB, rfl⟩
     let a' : Fin d → holGerms (0 : σ → ℂ) := fun j => ⟨↑(a j), a j, ha j, rfl⟩
-    have hev' : ∀ᶠ y in 𝓝 (0 : Option σ → ℂ),
-        g y = q (A.symm y) * f y + ∑ j : Fin d, a j (Pl y) * Tl y ^ (j : ℕ) := by
+    have hev'
+        : ∀ᶠ y in 𝓝 (0 : Option σ → ℂ),
+          g y = q (A.symm y) * f y + ∑ j : Fin d, a j (Pl y) * Tl y ^ (j : ℕ) := by
       have hB : Tendsto A.symm (𝓝 0) (𝓝 0) := by
         simpa using A.symm.continuous.tendsto (0 : Option σ → ℂ)
       filter_upwards [hB.eventually hev] with y hy
       simpa [Pl, Tl] using hy
     have key : ψ = Q * φ + Φ a' := by
       apply Subtype.ext
-      have hι : ∀ j, ((ι (a' j) : holGerms (0 : Option σ → ℂ)) : Germ (𝓝 (0 : Option σ → ℂ)) ℂ) =
-          ↑(a j ∘ Pl) := fun j => germPull_coe _ _ _ (a' j) (a j) rfl
+      have hι
+          : ∀ j,
+            ((ι (a' j) : holGerms (0 : Option σ → ℂ)) : Germ (𝓝 (0 : Option σ → ℂ)) ℂ)
+              = ↑(a j ∘ Pl) := fun j =>
+        germPull_coe _ _ _ (a' j) (a j) rfl
       simp only [Φ, Subring.coe_add, Subring.coe_mul, ← hfφ, ← hgψ]
       rw [AddSubmonoidClass.coe_finsetSum]
       simp only [Subring.coe_mul, Subring.coe_pow, hι]
-      change (↑g : Germ (𝓝 (0 : Option σ → ℂ)) ℂ) = Germ.coeRingHom _ (q ∘ A.symm) * Germ.coeRingHom _ f +
-        ∑ j : Fin d, Germ.coeRingHom _ (a j ∘ Pl) * Germ.coeRingHom _ (Tl : (Option σ → ℂ) → ℂ) ^ (j : ℕ)
+      change (↑g : Germ (𝓝 (0 : Option σ → ℂ)) ℂ)
+        = Germ.coeRingHom _ (q ∘ A.symm) * Germ.coeRingHom _ f
+          + ∑ j : Fin d, Germ.coeRingHom _ (a j ∘ Pl) * Germ.coeRingHom _ (Tl : (Option σ → ℂ) → ℂ) ^ (j : ℕ)
 
       simp only [← map_mul, ← map_pow, ← map_sum, ← map_add (f := _)]
       refine Germ.coe_eq.2 ?_
@@ -230,11 +260,14 @@ theorem isNoetherianRing_holGerms_option (hD : WeierstrassDivision.Statement)
       simp [hy, Finset.sum_apply]
     have hΦ : Φ a' ∈ I := by
       have : Φ a' = ψ - Q * φ := by rw [key]; ring
-      rw [this]; exact I.sub_mem hψ (Ideal.mul_mem_left I _ hφI)
-    have ha'N : a' ∈ Submodule.span (holGerms (0 : σ → ℂ)) (s : Set (Fin d → holGerms (0 : σ → ℂ))) := by
+      rw [this]
+      exact I.sub_mem hψ (Ideal.mul_mem_left I _ hφI)
+    have ha'N
+        : a' ∈ Submodule.span (holGerms (0 : σ → ℂ)) (s : Set (Fin d → holGerms (0 : σ → ℂ))) := by
       rw [hs]; exact hΦ
-    have hgen : ∀ x ∈ Submodule.span (holGerms (0 : σ → ℂ)) (s : Set (Fin d → holGerms (0 : σ → ℂ))),
-        Φ x ∈ Ideal.span (↑(insert φ (s.image Φ)) : Set (holGerms (0 : Option σ → ℂ))) := by
+    have hgen
+        : ∀ x ∈ Submodule.span (holGerms (0 : σ → ℂ)) (s : Set (Fin d → holGerms (0 : σ → ℂ))),
+          Φ x ∈ Ideal.span (↑(insert φ (s.image Φ)) : Set (holGerms (0 : Option σ → ℂ))) := by
       intro x hx
       induction hx using Submodule.span_induction with
       | mem x hx =>
@@ -248,8 +281,9 @@ theorem isNoetherianRing_holGerms_option (hD : WeierstrassDivision.Statement)
     rw [key]
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (Ideal.subset_span (by simp))) hspan
 
-theorem AnalyticGermsNoetherian.proof (hD : WeierstrassDivision.Statement)
-    (hG : GeneralLinearCoordinates.Statement) : AnalyticGermsNoetherian.Statement := by
+theorem AnalyticGermsNoetherian.proof
+    (hD : WeierstrassDivision.Statement) (hG : GeneralLinearCoordinates.Statement)
+    : AnalyticGermsNoetherian.Statement := by
   have hfin : ∀ n : ℕ, IsNoetherianRing (holGerms (0 : Fin n → ℂ)) := by
     intro n
     induction n with

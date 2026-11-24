@@ -50,6 +50,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.admissibleRep_hasTrace_finiteAdelicPureTensorFunction
     : ∀ (D : D7) (V : HSp D) (ν : Measure (GfC V)) [ν.IsHaarMeasure]
         (ff : ∀ v, GLoc D.sp.cm.sig V.gram v → ℂ),
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.admissibleRep_hasTrace_finiteAdelicPureTensorFunct
                   → ¬ GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.IsIntegralOp ν σ
                     (finFn V ff) 0
                   → ∃ x : W, x ≠ 0 ∧ ∀ k ∈ K, σ k x = x := by
-  first
-  | exact @GlobalTheory.FinTrace.hasTrace_finFn
-  | exact GlobalTheory.FinTrace.hasTrace_finFn
-  | (intros; apply GlobalTheory.FinTrace.hasTrace_finFn <;> assumption)
+  first | exact @GlobalTheory.FinTrace.hasTrace_finFn

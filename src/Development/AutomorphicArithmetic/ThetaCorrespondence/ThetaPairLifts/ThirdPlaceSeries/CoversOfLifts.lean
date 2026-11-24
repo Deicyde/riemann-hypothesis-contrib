@@ -44,8 +44,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
 
-
-
 section
 open CategoryTheory AlgebraicGeometry NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor

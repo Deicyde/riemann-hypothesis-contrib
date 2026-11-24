@@ -5,14 +5,19 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNb
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartPshPhMu
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComponentDataHodgeFourth
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CuspVolumeLimit
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUniqueLeftBasisCoordsAdicCompletion
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreLatticeLinearEquiv
+public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointLatticeData
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreLatticeLinearEquivStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GramMatrixChangeFrameStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptAwayFromPrimesStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorGenericStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeHermitianFormExistsStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointLatticeDataStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarisedStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ContDiffUncentre
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GramMatrixChangeFrame
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptAwayFromPrimes
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorGeneric
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeHermitianFormExists
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PairSumFrameAtPoint
 import Development.WeilBound.CoreStatements.HodgeTatePoints.HtatLie
 import Mathlib.Algebra.Order.Floor.Extended
@@ -245,12 +250,14 @@ theorem exists_gram
   have hβ : Function.Injective (algebraMap (𝓞 c.F) c.F) := NumberField.RingOfIntegers.coe_injective
   have hξ : IsCptGen 𝔐.ξ := 𝔐.tie.gen
   obtain ⟨-, -, hc0, -, -, -, hind, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
   have := hc0
-  have hpol := GlobalTheory.T.interior_point_polarised E H D l Xo c Y S Ω K J y 𝔐 z hz
+  have hpol :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.polarisedAt_of_interior E H D l Xo c Y S Ω K
+      J y 𝔐 z hz
   obtain ⟨hV, -, hlat⟩ :=
-    GlobalTheory.T.hodge_cpt_away_from_primes E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ ⟨centre z, hgen⟩
-      fun r hr => not_inFibre_centre hgen hr
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeChar0.lattices_of_char_zero E H D l Xo c _ _ Y S Ω K
+      J y 𝔐 hβ ⟨centre z, hgen⟩ fun r hr => not_inFibre_centre hgen hr
   have hdR : ∀ k, b k ∈ 𝔐.dR s ⟨centre z, hgen⟩ := fun k => by
     have h1 : b k ∈ 𝔐.V s ⟨centre z, hgen⟩ := by
       rw [hb.2]
@@ -281,7 +288,8 @@ theorem exists_gram
       exact ⟨x, hx, rfl⟩
   have hsm : Smooth 𝔐.t.G.hom := 𝔐.t.semi.smooth
   obtain ⟨Vz, _, _, ⟨MR⟩⟩ := lieModel_exists 𝔐.X 𝔐.t.G ℂ z
-  obtain ⟨f, hHI, hh, hp⟩ := GlobalTheory.T.hodge_hermitian_form_exists E H 𝔐.X 𝔐.t z Vz MR hpol
+  obtain ⟨f, hHI, hh, hp⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.exists_hodgeInnerProduct_form E H 𝔐.X 𝔐.t z Vz MR hpol
   obtain ⟨π, hπ, hreg⟩ := exists_dual_sum 𝔐 hind ⟨centre z, hgen⟩ hV hlat s s bb hfr
   have hval : ∀ k, ∃ x : Vz, 𝔐.M.ValAt z (b k) (MR.pt x) := fun k => by
     obtain ⟨w, hw⟩ := (𝔐.M.exists_valAt_iff z _).2 ⟨hgen, (hdR k).1⟩
@@ -350,12 +358,15 @@ theorem frameVals : FrameVals := by
     fun p q => MuPsh.hodgeInnerProduct_of_fibreLatticeVector hf (fun a => (hv a).isTanAt) p q
   ⟩
   obtain ⟨-, -, hc0, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c _ _ Y ∅ Ω K J y 𝔐
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c _ _ Y ∅ Ω K J y 𝔐
       NumberField.RingOfIntegers.coe_injective
   have := hc0
   have e :=
-    GlobalTheory.T.gram_matrix_change_frame E H D l Xo c Y ∅ Ω K J y 𝔐 z _ b _ _
-      (GlobalTheory.T.interior_point_polarised E H D l Xo c Y ∅ Ω K J y 𝔐 z hz) hgram hΓ₀
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.gramAt_unique_of_polarisedAt E H D l Xo c Y ∅
+      Ω K J y 𝔐 z _ b _ _
+      (_root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.polarisedAt_of_interior E H D l Xo c Y ∅ Ω
+        K J y 𝔐 z hz)
+      hgram hΓ₀
   have hpos : (R.gram x).PosDef := by
     have h2 : R.gram x = ((Real.pi⁻¹ : ℝ) : ℂ) • Γ₀ := by
       rw [← e, smul_smul, ← Complex.ofReal_mul, inv_mul_cancel₀ Real.pi_ne_zero, Complex.ofReal_one,
@@ -375,10 +386,11 @@ theorem frameVals : FrameVals := by
       (fun p => hact a p)
       (hv i).isTanAt (c := σ s a) (by rw [← hr]; exact hsc) e₁ d₁
   obtain ⟨g', Λ', _, _, R', x', hf', -, hrk⟩ :=
-    GlobalTheory.T.interior_point_lattice_data hG.2.2.2.2.1 E H D l Xo c Y ∅ Ω K J y 𝔐 z h1 hz hG _
-      v fun i => (hv i).isTanAt
+    _root_.GlobalTheory.CompanionTheory.Ar.Cusp.FibreEx.exists_riemLat_of_interior hG.2.2.2.2.1 E H
+      D l Xo c Y ∅ Ω K J y 𝔐 z h1 hz hG _ v fun i => (hv i).isTanAt
   obtain ⟨φ, -, -, hφ, -⟩ :=
-    GlobalTheory.T.fibre_lattice_linear_equiv E H 𝔐.X 𝔐.t z g g' Λ Λ' R R' _ x x' v hf hf'
+    _root_.GlobalTheory.CompanionTheory.Ar.Cusp.FibreUnique.exists_linearEquiv_of_fibreLatVec E H
+      𝔐.X 𝔐.t z g g' Λ Λ' R R' _ x x' v hf hf'
   refine ⟨hli, ?_, hgram, hpos⟩
   refine Submodule.eq_of_le_of_finrank_eq (Submodule.span_le.2 (Set.range_subset_iff.2 hmem)) ?_
   rw [finrank_span_eq_card hli, Fintype.card_fin, FV.finrank_eig_eq R.B R'.B φ hφ, hrk σ hσ s]

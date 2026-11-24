@@ -58,18 +58,6 @@ noncomputable section
 
 namespace GlobalTheory.CoefScale
 
-lemma weight_colW_apply {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (t : Fin n) :
-    Finsupp.weight (Formalism.GradedWeylDivisibility.colW r n) m t = ∑ a : Fin r, m (a, t) := by
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
-    Fintype.sum_prod_type_right]
-  rw [Finset.sum_eq_single t]
-  · refine Finset.sum_congr rfl fun a _ => ?_
-    simp [Formalism.GradedWeylDivisibility.colW]
-  · intro s _ hs
-    refine Finset.sum_eq_zero fun a _ => ?_
-    simp [Formalism.GradedWeylDivisibility.colW, Pi.single_apply, Ne.symm hs]
-  · simp
-
 theorem rowAct_scalar_dualWeyl
     {r n : ℕ} (ν : Fin n → ℕ)
     (c : ℂ)
@@ -80,7 +68,8 @@ theorem rowAct_scalar_dualWeyl
   have hw : IsWeightedHomogeneous (Formalism.GradedWeylDivisibility.colW r n) F ν :=
     (mem_weightedHomogeneousSubmodule _ _ _ _).1 (Submodule.mem_inf.1 hF).1
   ext m
-  rw [Formalism.GradedWeylDivisibility.ldrow_coeff_rowAct_diag, MvPolynomial.coeff_smul, smul_eq_mul]
+  rw [Formalism.GradedWeylDivisibility.ldrow_coeff_rowAct_diag, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   by_cases h : AddMonoidAlgebra.coeff F m = 0
   · simp [h]
   · have hm := hw h
@@ -89,7 +78,7 @@ theorem rowAct_scalar_dualWeyl
     simp only [Formalism.GradedWeylDivisibility.rowDeg]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun t _ => ?_
-    rw [← weight_colW_apply, hm]
+    rw [← _root_.Formalism.GradedWeylDivisibility.lccomp_weight_colW_apply, hm]
 
 end GlobalTheory.CoefScale
 

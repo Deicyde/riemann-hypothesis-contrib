@@ -161,7 +161,7 @@ theorem UpperTheory.V.Pa.sel_lin
           Matrix.mul_smul, Matrix.smul_mul, smul_add]
         abel
       · simp only [Pi.add_apply, Pi.smul_apply, x4 g, y4 g, Matrix.transpose_add,
-          Matrix.transpose_smul, Matrix.transpose_neg, smul_neg]
+          Matrix.transpose_smul, smul_neg]
         abel
       · simp [x5 u g hg, y5 u g hg]
       · obtain ⟨Y, hY, hYl⟩ := x6 v

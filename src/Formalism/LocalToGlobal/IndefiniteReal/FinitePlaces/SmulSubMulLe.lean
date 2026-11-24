@@ -116,13 +116,7 @@ theorem avg_comp_surj
     (π : A →+ B) (hπ : Function.Surjective π)
     (G : B → ℂ)
     : (Fintype.card A : ℂ)⁻¹ * ∑ a, G (π a) = (Fintype.card B : ℂ)⁻¹ * ∑ b, G b := by
-  first
-  | exact Bl.SecondBlockLemmaD.goal1 ..
-  | (apply Bl.SecondBlockLemmaD.goal1 <;> assumption)
-  | (intros; apply Bl.SecondBlockLemmaD.goal1 <;> assumption)
-  | (apply @Bl.SecondBlockLemmaD.goal1 <;> assumption)
-  | (intros; apply @Bl.SecondBlockLemmaD.goal1 <;> assumption)
-  | (apply @Bl.SecondBlockLemmaD.goal1 <;> first | assumption | infer_instance)
+  first | (apply Bl.SecondBlockLemmaD.goal1 <;> assumption)
 
 theorem avg_mul
     (k j : ℕ) (H : AddSubgroup W) [Finite (Qt k H)] [Finite (Qt (k * j) H)]

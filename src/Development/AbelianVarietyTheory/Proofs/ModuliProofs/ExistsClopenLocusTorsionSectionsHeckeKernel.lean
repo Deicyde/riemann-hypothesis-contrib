@@ -181,7 +181,7 @@ theorem finite_range
   have : AddGroup.FG O := Module.Finite.iff_addGroup_fg.1 inferInstance
   have : Group.FG φ.range := inferInstance
   have : Finite φ.range :=
-    CommGroup.finite_of_fg_torsion _ (by
+    CommGroup.finite_of_fg_isMulTorsion _ (by
       rintro ⟨_, a, rfl⟩
       exact isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, Subtype.ext (h _)⟩)
   exact Set.Finite.subset (Set.toFinite (φ.range : Set M))

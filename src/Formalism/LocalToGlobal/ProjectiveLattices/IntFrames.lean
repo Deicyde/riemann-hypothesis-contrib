@@ -47,8 +47,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace Formalism.L2.Pj
@@ -159,10 +157,7 @@ theorem intFrames_of
         (Scheme.Hom.appLE (𝟙 X) U U h).hom v = v := by
     intro X U h v
     simp [Scheme.Hom.appLE]
-    first
-    | (erw [Category.id_comp, CategoryTheory.Functor.map_id]; rfl)
-    | (erw [Category.id_comp, CategoryTheory.Functor.map_id]; simp; done)
-    | (erw [CategoryTheory.Functor.map_id]; simp; done)
+    first | (erw [Category.id_comp, CategoryTheory.Functor.map_id]; rfl)
   have key
       : ∀ {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (s s0 : LB.Sec (PPx x)) (a : S),
         (∀ i, s.f i = scal x a i * s0.f i)

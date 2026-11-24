@@ -52,6 +52,7 @@ attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.RowVacScalar
+
 theorem _root_.GlobalTheory.T.weilLatticeVacuum_eq_prod_splitPlace_factors
     : ∀ {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}
         {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)},
@@ -86,7 +87,4 @@ theorem _root_.GlobalTheory.T.weilLatticeVacuum_eq_prod_splitPlace_factors
                           = (∏ w ∈ P, ((splitFacO χS χT (GlobalTheory.RowVacScalar.detIdl (GlobalTheory.RowVacScalar.idemAt w) S g)
                               (GlobalTheory.RowVacScalar.detIdl (GlobalTheory.RowVacScalar.idemAt w) T h) : Circle) : ℂ))
                             • f := by
-  first
-  | exact @GlobalTheory.LatStabScalar.om_eq_prod_splitFac
-  | exact GlobalTheory.LatStabScalar.om_eq_prod_splitFac
-  | (intros; apply GlobalTheory.LatStabScalar.om_eq_prod_splitFac <;> assumption)
+  first | exact @GlobalTheory.LatStabScalar.om_eq_prod_splitFac

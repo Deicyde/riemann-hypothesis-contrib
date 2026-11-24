@@ -482,7 +482,7 @@ theorem GlobalTheory.CrisSec.phiSection
     intro f
     rw [← Matrix.map_mul, hA]
     ext i j
-    by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
+    by_cases hij : i = j <;> simp [hij]
   have hfE : fB bk.E = (l : Per.Acris l) * v := hv
   have hfE0 : fB0 bk.E = (l : Per.Acris l) * w0 := hP0
   have hcoef

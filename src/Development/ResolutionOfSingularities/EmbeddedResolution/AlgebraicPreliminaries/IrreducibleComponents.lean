@@ -52,26 +52,30 @@ namespace FunctorialResolution.EmbeddedResolution
 
 open Set TopologicalSpace
 
-theorem isClosed_sUnion_of_subset_irreducibleComponents {X : Type*} [TopologicalSpace X]
-    [NoetherianSpace X] {𝒜 : Set (Set X)} (h𝒜 : ∀ C ∈ 𝒜, C ∈ irreducibleComponents X) :
-    IsClosed (⋃₀ 𝒜) := by
+theorem isClosed_sUnion_of_subset_irreducibleComponents
+    {X : Type*} [TopologicalSpace X] [NoetherianSpace X]
+    {𝒜 : Set (Set X)} (h𝒜 : ∀ C ∈ 𝒜, C ∈ irreducibleComponents X)
+    : IsClosed (⋃₀𝒜) := by
   have hfin : (irreducibleComponents X).Finite := NoetherianSpace.finite_irreducibleComponents ..
   have hsub : 𝒜 ⊆ irreducibleComponents X := fun C hC => h𝒜 C hC
   rw [Set.sUnion_eq_biUnion]
   exact (hfin.subset hsub).isClosed_biUnion
     (fun C hC => isClosed_of_mem_irreducibleComponents _ (h𝒜 C hC))
 
-theorem isOpen_sUnion_of_subset_irreducibleComponents {X : Type*} [TopologicalSpace X]
-    [NoetherianSpace X]
+theorem isOpen_sUnion_of_subset_irreducibleComponents
+    {X : Type*} [TopologicalSpace X] [NoetherianSpace X]
     (hsep : ∀ C₁ ∈ irreducibleComponents X, ∀ C₂ ∈ irreducibleComponents X,
       (C₁ ∩ C₂).Nonempty → C₁ = C₂)
-    {𝒜 : Set (Set X)} (h𝒜 : ∀ C ∈ 𝒜, C ∈ irreducibleComponents X) :
-    IsOpen (⋃₀ 𝒜) := by
-  have key : (⋃₀ 𝒜)ᶜ = ⋃₀ (irreducibleComponents X \ 𝒜) := by
+    {𝒜 : Set (Set X)} (h𝒜 : ∀ C ∈ 𝒜, C ∈ irreducibleComponents X)
+    : IsOpen (⋃₀𝒜) := by
+  have key : (⋃₀𝒜)ᶜ = ⋃₀(irreducibleComponents X \ 𝒜) := by
     apply Set.Subset.antisymm
     · intro y hy
-      refine ⟨irreducibleComponent y, ⟨irreducibleComponent_mem_irreducibleComponents .., ?_⟩,
-        mem_irreducibleComponent ..⟩
+      refine ⟨
+        irreducibleComponent y,
+        ⟨irreducibleComponent_mem_irreducibleComponents .., ?_⟩,
+        mem_irreducibleComponent ..
+      ⟩
       intro hmem
       exact hy ⟨irreducibleComponent y, hmem, mem_irreducibleComponent ..⟩
     · intro y hyc
@@ -85,10 +89,11 @@ theorem isOpen_sUnion_of_subset_irreducibleComponents {X : Type*} [TopologicalSp
   rw [← isClosed_compl_iff, key]
   exact isClosed_sUnion_of_subset_irreducibleComponents (fun C hC => hC.1)
 
-theorem irreducibleComponents_eq_of_stalk_isDomain (X : AlgebraicGeometry.Scheme)
-    (hX : ∀ x : X, IsDomain (X.presheaf.stalk x)) {C₁ C₂ : Set X}
-    (h₁ : C₁ ∈ irreducibleComponents X) (h₂ : C₂ ∈ irreducibleComponents X)
-    {x : X} (hx₁ : x ∈ C₁) (hx₂ : x ∈ C₂) : C₁ = C₂ := by
+theorem irreducibleComponents_eq_of_stalk_isDomain
+    (X : AlgebraicGeometry.Scheme) (hX : ∀ x : X, IsDomain (X.presheaf.stalk x))
+    {C₁ C₂ : Set X} (h₁ : C₁ ∈ irreducibleComponents X) (h₂ : C₂ ∈ irreducibleComponents X)
+    {x : X} (hx₁ : x ∈ C₁) (hx₂ : x ∈ C₂)
+    : C₁ = C₂ := by
   have := hX x
   obtain ⟨ξ₁, hg₁⟩ := QuasiSober.sober h₁.1 (isClosed_of_mem_irreducibleComponents _ h₁)
   obtain ⟨ξ₂, hg₂⟩ := QuasiSober.sober h₂.1 (isClosed_of_mem_irreducibleComponents _ h₂)

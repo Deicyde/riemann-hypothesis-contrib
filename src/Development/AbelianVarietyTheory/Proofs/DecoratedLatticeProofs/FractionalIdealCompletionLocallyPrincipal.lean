@@ -54,8 +54,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
 namespace GlobalTheory.IdVGen
 
 open GlobalTheory.SemiLocalFrame

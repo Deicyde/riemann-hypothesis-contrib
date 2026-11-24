@@ -41,8 +41,6 @@ import Formalism.LocalToGlobal.IndefiniteRealisationChoice
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.Fc

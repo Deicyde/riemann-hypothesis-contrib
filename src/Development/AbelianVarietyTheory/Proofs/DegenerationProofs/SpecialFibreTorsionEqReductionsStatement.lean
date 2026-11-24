@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
+
 theorem _root_.GlobalTheory.T.specialFibre_torsion_eq_reductions
     : GlobalTheory.UT.LL
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.specialFibre_torsion_eq_reductions
             ∧ ∀ a ∈ l.yy.ker, ∃ (c : Sp (OO p) ⟶ u.G.left) (a' : u.PtC) (x : md.Φ.Pt),
               c ≫ u.G.hom = spMap u.j ∧ gPt p ≫ c = u.toG a' ∧ u.toA a' = spMap y₀ ≫ (ρ.pt a).left
                 ∧ rPt p ≫ c = x.left ≫ md.r ∧ x ^ (S.r * S.N) = 1 := by
-  first
-  | exact @GlobalTheory.ZH.special_torsion_eq_reduction
-  | exact GlobalTheory.ZH.special_torsion_eq_reduction
-  | (intros; apply GlobalTheory.ZH.special_torsion_eq_reduction <;> assumption)
+  first | exact @GlobalTheory.ZH.special_torsion_eq_reduction

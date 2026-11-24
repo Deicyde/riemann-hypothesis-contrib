@@ -48,6 +48,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.flatThetaIntegrand_locallyUniform_majorant
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V V₀ W W₀ : HSp D) (ρ σ : ℕ) (dV : HypDec V V₀ ρ)
         (dW : HypDec W W₀ σ) (vS : VolM D W.rank ρ) (vT : VolM D σ V₀.rank)
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.flatThetaIntegrand_locallyUniform_majorant
                       Integrable M vU.ν
                         ∧ ∀ p ∈ K, ∀ y w u,
                           ‖flatFun ψ dV dW vS.μ vS.𝓕 vT.μ vT.𝓕 (rat x) y (om p Φ) w u‖ ≤ M u := by
-  first
-  | exact @GlobalTheory.Unf.flatFun_majorant
-  | exact GlobalTheory.Unf.flatFun_majorant
-  | (intros; apply GlobalTheory.Unf.flatFun_majorant <;> assumption)
+  first | exact @GlobalTheory.Unf.flatFun_majorant

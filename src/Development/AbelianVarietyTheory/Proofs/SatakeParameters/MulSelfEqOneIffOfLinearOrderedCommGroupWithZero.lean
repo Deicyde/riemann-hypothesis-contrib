@@ -58,21 +58,13 @@ namespace GlobalTheory.Hk3.Inh
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem v_two {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (hq : Odd q) : Valued.v (2 : L) = 1 := by
+theorem v_two {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (hq : Odd q)
+    : Valued.v (2 : L) = 1 := by
   apply Formalism.IndefR.LocBrg.two_val <;> assumption
-
-
-
 
 section Main
 
 variable {ϖ : L} {σ : L →+* L} {q : ℕ} {δ : L} {ψ : AddChar L ℂ}
-
-
-
-
-
-
 
 end Main
 

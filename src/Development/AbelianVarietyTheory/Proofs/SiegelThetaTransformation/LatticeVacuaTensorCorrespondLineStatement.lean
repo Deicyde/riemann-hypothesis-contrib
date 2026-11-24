@@ -51,6 +51,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.latticeVacua_tensor_correspond_line
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ w : D.host.E,
       IsIntegral ℤ w → w + cc w = 1 → IdemTwo w
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.latticeVacua_tensor_correspond_line
                       → ∀ f,
                         C.IsTh f → C.IsFock B f → IsLatVac (heisO C.ψ S T) (hatA S T (tens Λ L)) f
                           → ∃ t : ℂ, f = t • (C.Th (C.xB B) v) := by
-  first
-  | exact @GlobalTheory.Ker.latVac_th_line
-  | exact GlobalTheory.Ker.latVac_th_line
-  | (intros; apply GlobalTheory.Ker.latVac_th_line <;> assumption)
+  first | exact @GlobalTheory.Ker.latVac_th_line

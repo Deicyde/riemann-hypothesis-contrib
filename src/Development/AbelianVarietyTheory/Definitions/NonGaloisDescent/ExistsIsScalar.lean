@@ -58,9 +58,6 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

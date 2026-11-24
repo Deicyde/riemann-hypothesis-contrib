@@ -52,32 +52,35 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section Per
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r] {F : Frames n' r} {L₁ N₁ : ℕ}
 
-theorem fr_period (hV : F.Valid L₁ N₁) (j : ℤ) (i : ℕ) (m : ℤ) :
-    F.fr (j + m * F.J) i = F.fr j i + m * n' := by
+theorem fr_period (hV : F.Valid L₁ N₁) (j : ℤ) (i : ℕ) (m : ℤ)
+    : F.fr (j + m * F.J) i = F.fr j i + m * n' := by
   induction m using Int.induction_on with
   | zero => simp
   | succ k ih =>
     have := hV.2.1 (j + (k : ℤ) * F.J) i
-    rw [show j + ((k : ℤ) + 1) * F.J = j + (k : ℤ) * F.J + F.J by ring, this, ih]; ring
+    rw [show j + ((k : ℤ) + 1) * F.J = j + (k : ℤ) * F.J + F.J by ring, this, ih]
+    ring
   | pred k ih =>
     have := hV.2.1 (j + (-(k : ℤ) - 1) * F.J) i
     rw [show j + (-(k : ℤ) - 1) * F.J + F.J = j + -(k : ℤ) * F.J by ring, ih] at this
     linarith
 
 theorem posOf_add_mul (x m : ℤ) : posOf n' (x + m * n') = posOf n' x := by
-  unfold posOf
-  congr 2
-  rw [Int.add_mul_emod_self_right]
+  simp [posOf, Int.add_mul_emod_self_right]
 
-theorem late_reduce (hV : F.Valid L₁ N₁) (j x : ℤ) (hx : x ∈ F.letters j) (hW : ¬ F.IsW j x) :
-    ∃ j' : ℕ, j' < F.J ∧ ∃ x' : ℤ, x' ∈ F.letters (j' : ℤ) ∧ ¬ F.IsW (j' : ℤ) x' ∧ posOf n' x' = posOf n' x ∧
-      F.dist (j' : ℤ) x' = F.dist j x := by
+theorem late_reduce (hV : F.Valid L₁ N₁) (j x : ℤ) (hx : x ∈ F.letters j) (hW : ¬ F.IsW j x)
+    : ∃ j' : ℕ,
+      j' < F.J
+        ∧ ∃ x' : ℤ,
+          x' ∈ F.letters (j' : ℤ) ∧ ¬ F.IsW (j' : ℤ) x' ∧ posOf n' x' = posOf n' x
+            ∧ F.dist (j' : ℤ) x' = F.dist j x := by
   have hJ : (1 : ℤ) ≤ F.J := by exact_mod_cast hV.1
   obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = j % F.J :=
     ⟨_, Int.toNat_of_nonneg (Int.emod_nonneg _ (by omega))⟩
@@ -120,7 +123,6 @@ section Lab
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r] (X : Dat n' r) (p K : ℕ)
 
-
 open Classical in
 def ellExp (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) : ℤ × Fin (r + K) →₀ ℕ :=
   Finsupp.onFinset (X.toLate j ×ˢ (Finset.univ : Finset (Fin (r + K))))
@@ -132,39 +134,51 @@ def ellExp (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) : ℤ × Fin (r + K)
       exact hv (if_neg h))
 
 open Classical in
-theorem ellExp_apply (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) (v : ℤ × Fin (r + K)) :
-    ellExp X p K l j v = if v.1 ∈ X.toLate j then l (posOf n' v.1, v.2) / p ^ X.F.dist j v.1 else 0 := rfl
+theorem ellExp_apply (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) (v : ℤ × Fin (r + K))
+    : ellExp X p K l j v
+      = if v.1 ∈ X.toLate j then l (posOf n' v.1, v.2) / p ^ X.F.dist j v.1 else 0 :=
+  rfl
 
 open Classical in
-theorem img_ellExp (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) (t : Fin n') (c : Fin (r + K)) :
-    imgMon (fun v : ℤ × Fin (r + K) => (posOf n' v.1, v.2)) (fun v => p ^ X.F.dist j v.1) (ellExp X p K l j) (t, c) =
-      ∑ x ∈ X.toLate j, if posOf n' x = t then p ^ X.F.dist j x * (l (t, c) / p ^ X.F.dist j x) else 0 := by
-  unfold imgMon ellExp
-  rw [Finsupp.sum_apply, Finsupp.onFinset_sum _ (fun v => by simp)]
-  rw [Finset.sum_product]
-  refine Finset.sum_congr rfl (fun x hx => ?_)
-  rw [Finset.sum_eq_single c]
-  · by_cases h : posOf n' x = t
-    · subst h
-      simp [hx]
-    · simp [hx, h, Finsupp.single_apply, Prod.ext_iff]
-  · intro b _ hb
-    simp [Finsupp.single_apply, Prod.ext_iff, hb]
-  · simp
+theorem img_ellExp (l : Fin n' × Fin (r + K) →₀ ℕ) (j : ℤ) (t : Fin n') (c : Fin (r + K))
+    : imgMon
+        (fun v : ℤ × Fin (r + K) => (posOf n' v.1, v.2))
+        (fun v => p ^ X.F.dist j v.1)
+        (ellExp X p K l j) (t, c)
+      = ∑ x ∈ X.toLate j, if posOf n' x = t then p ^ X.F.dist j x * (l (t, c) / p ^ X.F.dist j x) else 0 :=
+  by
+    unfold imgMon ellExp
+    rw [Finsupp.sum_apply, Finsupp.onFinset_sum _ (fun v => by simp)]
+    rw [Finset.sum_product]
+    refine Finset.sum_congr rfl (fun x hx => ?_)
+    rw [Finset.sum_eq_single c]
+    · by_cases h : posOf n' x = t
+      · subst h
+        simp [hx]
+      · simp [hx, h, Prod.ext_iff]
+    · intro b _ hb
+      simp [Prod.ext_iff, hb]
+    · simp
 
 end Lab
 
-private theorem phSeg_monomial_one {O : Type} [CommRing O] {n' r : ℕ} [NeZero n'] (K p : ℕ)
-    (F : Frames n' r) (j : ℤ) (e : ℤ × Fin (r + K) →₀ ℕ) :
-    phSeg O K p F j (monomial e 1) =
-      monomial (imgMon (fun v : ℤ × Fin (r + K) => (posOf n' v.1, v.2))
-        (fun v => p ^ F.dist j v.1) e) (1 : O) := by
+private theorem phSeg_monomial_one
+    {O : Type} [CommRing O]
+    {n' r : ℕ} [NeZero n']
+    (K p : ℕ)
+    (F : Frames n' r) (j : ℤ) (e : ℤ × Fin (r + K) →₀ ℕ)
+    : phSeg O K p F j (monomial e 1)
+      = monomial
+        (imgMon (fun v : ℤ × Fin (r + K) => (posOf n' v.1, v.2)) (fun v => p ^ F.dist j v.1) e)
+        (1 : O) := by
   rw [phSeg, aeval_monomial, map_one, one_mul, imgMon, Finsupp.sum, monomial_sum_one, Finsupp.prod]
   refine Finset.prod_congr rfl (fun v _ => ?_)
   rw [← X_pow_eq_monomial, ← pow_mul]
 
-private theorem eq_of_posOf_eq_of_dist_lt {n' : ℕ} [NeZero n'] {x y : ℤ} (hxy : posOf n' x = posOf n' y)
-    (h1 : x - y < n') (h2 : y - x < n') : x = y := by
+private theorem eq_of_posOf_eq_of_dist_lt
+    {n' : ℕ} [NeZero n']
+    {x y : ℤ} (hxy : posOf n' x = posOf n' y) (h1 : x - y < n') (h2 : y - x < n')
+    : x = y := by
   have hn : (0 : ℤ) < n' := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne n')
   have hm : x % (n' : ℤ) = y % (n' : ℤ) := by
     have h := congrArg Fin.val hxy
@@ -184,19 +198,25 @@ private theorem eq_of_posOf_eq_of_dist_lt {n' : ℕ} [NeZero n'] {x y : ℤ} (hx
     linarith
   · nlinarith
 
-private theorem eq_of_posOf_eq_of_mem_letters_not_isW {n' r : ℕ} [NeZero n'] [NeZero r] {F : Frames n' r} {L₁ N₁ : ℕ}
-    (hV : F.Valid L₁ N₁) {j1 j2 : ℕ} (hj1 : j1 < F.J) (hj2 : j2 < F.J) {x1 x2 : ℤ}
-    (h1 : x1 ∈ F.letters (j1 : ℤ)) (h1' : ¬ F.IsW (j1 : ℤ) x1)
-    (h2 : x2 ∈ F.letters (j2 : ℤ)) (h2' : ¬ F.IsW (j2 : ℤ) x2)
-    (hp : posOf n' x1 = posOf n' x2) : j1 = j2 ∧ x1 = x2 := by
+private theorem eq_of_posOf_eq_of_mem_letters_not_isW
+    {n' r : ℕ} [NeZero n'] [NeZero r]
+    {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁)
+    {j1 j2 : ℕ} (hj1 : j1 < F.J) (hj2 : j2 < F.J)
+    {x1 x2 : ℤ} (h1 : x1 ∈ F.letters (j1 : ℤ)) (h1' : ¬ F.IsW (j1 : ℤ) x1)
+    (h2 : x2 ∈ F.letters (j2 : ℤ)) (h2' : ¬ F.IsW (j2 : ℤ) x2) (hp : posOf n' x1 = posOf n' x2)
+    : j1 = j2 ∧ x1 = x2 := by
   have hmono := eFr_strictMono hV
   have hper : F.fr ((F.J : ℤ) - 1) (r - 1) = F.fr (-1) (r - 1) + n' := by
     have h := fr_period hV (-1) (r - 1) 1
     rw [show (-1 : ℤ) + 1 * F.J = F.J - 1 by ring, one_mul] at h
     exact h
-  have bnd : ∀ (j : ℕ), j < F.J → ∀ x, x ∈ F.letters (j : ℤ) → ¬ F.IsW (j : ℤ) x →
-      F.fr ((j : ℤ) - 1) (r - 1) < x ∧ x ≤ F.fr (j : ℤ) (r - 1) ∧
-        F.fr (-1) (r - 1) < x ∧ x ≤ F.fr (-1) (r - 1) + n' := by
+  have bnd
+      : ∀ (j : ℕ),
+        j < F.J
+          → ∀ x,
+            x ∈ F.letters (j : ℤ) → ¬ F.IsW (j : ℤ) x
+              → F.fr ((j : ℤ) - 1) (r - 1) < x ∧ x ≤ F.fr (j : ℤ) (r - 1) ∧ F.fr (-1) (r - 1) < x
+                ∧ x ≤ F.fr (-1) (r - 1) + n' := by
     intro j hj x hx hW
     simp only [Frames.letters, Finset.mem_filter, Finset.mem_Icc] at hx
     simp only [Frames.IsW, not_le] at hW
@@ -225,20 +245,27 @@ theorem coarse_label_factorisation : CoarseLabelFactorisation := by
   set S : Fin n' × Fin (r + K) →₀ ℕ := ∑ j ∈ Finset.range D.F.J,
     imgMon (fun v : ℤ × Fin (r + K) => (posOf n' v.1, v.2))
       (fun v => p ^ D.F.dist (j : ℤ) v.1) (ellExp D p K l j) with hS
-  have hSval : ∀ t c, S (t, c) = ∑ j ∈ Finset.range D.F.J, ∑ x ∈ D.toLate (j : ℤ),
-      if posOf n' x = t then p ^ D.F.dist (j : ℤ) x * (l (t, c) / p ^ D.F.dist (j : ℤ) x) else 0 := by
-    intro t c
-    rw [hS, Finsupp.finsetSum_apply]
-    exact Finset.sum_congr rfl (fun j _ => img_ellExp D p K l j t c)
-  have hS1 : ∀ t c (j0 : ℕ) (x0 : ℤ), j0 < D.F.J → x0 ∈ D.toLate (j0 : ℤ) → posOf n' x0 = t →
-      S (t, c) = p ^ D.F.dist (j0 : ℤ) x0 * (l (t, c) / p ^ D.F.dist (j0 : ℤ) x0) := by
+  have hSval
+      : ∀ t c,
+        S (t, c)
+          = ∑ j ∈ Finset.range D.F.J, ∑ x ∈ D.toLate (j : ℤ),
+            if posOf n' x = t then p ^ D.F.dist (j : ℤ) x * (l (t, c) / p ^ D.F.dist (j : ℤ) x) else 0 :=
+    by
+      intro t c
+      rw [hS, Finsupp.finsetSum_apply]
+      exact Finset.sum_congr rfl (fun j _ => img_ellExp D p K l j t c)
+  have hS1
+      : ∀ t c (j0 : ℕ) (x0 : ℤ),
+        j0 < D.F.J → x0 ∈ D.toLate (j0 : ℤ) → posOf n' x0 = t
+          → S (t, c) = p ^ D.F.dist (j0 : ℤ) x0 * (l (t, c) / p ^ D.F.dist (j0 : ℤ) x0) := by
     intro t c j0 x0 hj0 hx0 ht
     rw [hSval, Finset.sum_eq_single j0, Finset.sum_eq_single x0, if_pos ht]
     · intro x hx hne
       rw [if_neg]
       intro hxt
       rw [hmem] at hx hx0
-      exact hne (eq_of_posOf_eq_of_mem_letters_not_isW hV hj0 hj0 hx.1 hx.2 hx0.1 hx0.2 (hxt.trans ht.symm)).2
+      exact hne (eq_of_posOf_eq_of_mem_letters_not_isW hV hj0 hj0 hx.1 hx.2 hx0.1 hx0.2
+        (hxt.trans ht.symm)).2
     · intro h
       exact absurd hx0 h
     · intro b hb hne
@@ -246,12 +273,12 @@ theorem coarse_label_factorisation : CoarseLabelFactorisation := by
       rw [if_neg]
       intro hxt
       rw [hmem] at hx hx0
-      exact hne (eq_of_posOf_eq_of_mem_letters_not_isW hV (Finset.mem_range.1 hb) hj0 hx.1 hx.2 hx0.1 hx0.2
-        (hxt.trans ht.symm)).1
+      exact hne (eq_of_posOf_eq_of_mem_letters_not_isW hV (Finset.mem_range.1 hb) hj0 hx.1 hx.2
+        hx0.1 hx0.2 (hxt.trans ht.symm)).1
     · intro h
       exact absurd (Finset.mem_range.2 hj0) h
-  have hS0 : ∀ t c, (∀ (j : ℕ), j < D.F.J → ∀ x ∈ D.toLate (j : ℤ), posOf n' x ≠ t) →
-      S (t, c) = 0 := by
+  have hS0
+      : ∀ t c, (∀ (j : ℕ), j < D.F.J → ∀ x ∈ D.toLate (j : ℤ), posOf n' x ≠ t) → S (t, c) = 0 := by
     intro t c h
     rw [hSval]
     refine Finset.sum_eq_zero (fun j hj => Finset.sum_eq_zero (fun x hx => ?_))

@@ -45,26 +45,31 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped TensorProduct NNReal Matrix
 open scoped Classical
 namespace PositivityTheory.ThKF0.LatSum
 
 open mixedEmbedding
 
-theorem evI_algebraMap (F : Type) [Field F] [NumberField F] (x : F) :
-    evI F (algebraMap F (AF F) x) = mixedEmbedding F x := by
+theorem evI_algebraMap (F : Type) [Field F] [NumberField F] (x : F)
+    : evI F (algebraMap F (AF F) x) = mixedEmbedding F x := by
   unfold evI
   simp [InfiniteAdeleRing.ringEquiv_mixedSpace]
   rfl
 
-noncomputable abbrev latPi (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] :
-    Submodule ℤ (κ → mixedSpace F) :=
+noncomputable abbrev latPi (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
+    : Submodule ℤ (κ → mixedSpace F) :=
   Submodule.span ℤ (Set.range (Pi.basis (fun _ : κ => latticeBasis F)))
 
-theorem mem_latPi (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (y : κ → F)
-    (hy : ∀ i, IsIntegral ℤ (y i)) : (fun i => mixedEmbedding F (y i)) ∈ latPi F κ := by
+theorem mem_latPi
+    (F : Type) [Field F] [NumberField F]
+    (κ : Type) [Fintype κ]
+    (y : κ → F) (hy : ∀ i, IsIntegral ℤ (y i))
+    : (fun i => mixedEmbedding F (y i)) ∈ latPi F κ := by
   rw [Module.Basis.mem_span_iff_repr_mem]
   intro ji
   rw [Pi.basis_repr]
@@ -73,8 +78,8 @@ theorem mem_latPi (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] 
   have h2 := (mem_span_latticeBasis F).mpr h1
   exact (Module.Basis.mem_span_iff_repr_mem ℤ _ _).mp h2 ji.2
 
-theorem summable_inv_one_add_pow (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] :
-    Summable fun z : latPi F κ =>
+theorem summable_inv_one_add_pow (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
+    : Summable fun z : latPi F κ =>
       ((1 + ‖(z : κ → mixedSpace F)‖) ^ (Module.finrank ℤ (latPi F κ) + 1))⁻¹ := by
   set N : ℕ := Module.finrank ℤ (latPi F κ) + 1 with hN
   have h0 := ZLattice.summable_norm_rpow (latPi F κ) (-(N : ℝ)) (by rw [hN]; push_cast; linarith)
@@ -102,21 +107,21 @@ namespace PositivityTheory.ThKF0.LatSum
 
 open mixedEmbedding
 
-theorem thetaSum_norm_le_pow :
-    ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ], ∃ (N₀ k : ℕ) (C : ℝ), ∀ (A : ℝ) (m : ℕ) (Ψ : (κ → AF F) → ℂ), 1 ≤ m →
-    (∀ ξ : κ → F, ‖Ψ (fun i => algebraMap F (AF F) (ξ i))‖ * (1 + ‖fun i => evI F (algebraMap F (AF F) (ξ i))‖) ^ N₀ ≤ A) →
-    (∀ ξ : κ → F, Ψ (fun i => algebraMap F (AF F) (ξ i)) ≠ 0 → ∀ i, IsIntegral ℤ ((m : F) * ξ i)) →
-    ‖thetaSum F Ψ‖ ≤ C * A * (m : ℝ) ^ k := by
+theorem thetaSum_norm_le_pow
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ], ∃ (N₀ k : ℕ) (C : ℝ),
+      ∀ (A : ℝ) (m : ℕ) (Ψ : (κ → AF F) → ℂ),
+        1 ≤ m
+          → (∀ ξ : κ → F,
+            ‖Ψ (fun i => algebraMap F (AF F) (ξ i))‖
+                * (1 + ‖fun i => evI F (algebraMap F (AF F) (ξ i))‖) ^ N₀
+              ≤ A)
+          → (∀ ξ : κ → F,
+            Ψ (fun i => algebraMap F (AF F) (ξ i)) ≠ 0 → ∀ i, IsIntegral ℤ ((m : F) * ξ i))
+          → ‖thetaSum F Ψ‖ ≤ C * A * (m : ℝ) ^ k := by
   apply GlobalTheory.LatScaleSum.thetaSum_norm_le_pow <;> assumption
 
 end PositivityTheory.ThKF0.LatSum
 
 namespace PositivityTheory.ThKF0
-
-theorem theta_sum_norm_bound_denominator : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ], ∃ (N₀ k : ℕ) (C : ℝ), ∀ (A : ℝ) (m : ℕ) (Ψ : (κ → AF F) → ℂ), 1 ≤ m →
-    (∀ ξ : κ → F, ‖Ψ (fun i => algebraMap F (AF F) (ξ i))‖ * (1 + ‖fun i => evI F (algebraMap F (AF F) (ξ i))‖) ^ N₀ ≤ A) →
-    (∀ ξ : κ → F, Ψ (fun i => algebraMap F (AF F) (ξ i)) ≠ 0 → ∀ i, IsIntegral ℤ ((m : F) * ξ i)) →
-    ‖thetaSum F Ψ‖ ≤ C * A * (m : ℝ) ^ k :=
-  LatSum.thetaSum_norm_le_pow
 
 end PositivityTheory.ThKF0

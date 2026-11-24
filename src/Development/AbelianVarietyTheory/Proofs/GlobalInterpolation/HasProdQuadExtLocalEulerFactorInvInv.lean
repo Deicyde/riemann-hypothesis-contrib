@@ -630,10 +630,7 @@ theorem _root_.GlobalTheory.EtaEulerProduct.hasProd_eulerInv_inv
         _ ≤ 2 * (2 * (Ideal.absNorm v.asIdeal : ℝ) ^ (-(2 : ℝ))) := by gcongr
         _ = 4 * (Ideal.absNorm v.asIdeal : ℝ) ^ (-(2 : ℝ)) := by ring
   obtain ⟨S, hS⟩ := hsum
-  have hprod : HasProd g (Real.exp S) := by
-    first
-    | exact Real.hasProd_of_hasSum_log hgpos hS
-    | exact hasProd_of_hasSum_log (fun P => (hgpos P).ne') hS
+  have hprod : HasProd g (Real.exp S) := by first | exact Real.hasProd_of_hasSum_log hgpos hS
   have hval : _root_.Formalism.HermitianLatticesTheory.lValEta E M = Real.exp S := by
     unfold _root_.Formalism.HermitianLatticesTheory.lValEta
     exact hprod.tprod_eq

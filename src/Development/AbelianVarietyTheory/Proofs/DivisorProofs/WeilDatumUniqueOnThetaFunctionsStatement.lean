@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilDatum_unique_on_thetaFunctions
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.weilDatum_unique_on_thetaFunctions
             (om om' : (GA D S × GA D T →* Module.End ℂ (WO S T → ℂ))),
           IsWeilDatumO ψ S T χS χT om → IsWeilDatumO ψ S T χS χT om'
             → ∀ p f, IsThetaFunO ψ S T f → om p f = om' p f := by
-  first
-  | exact @GlobalTheory.WeilUniq.weilDatum_unique
-  | exact GlobalTheory.WeilUniq.weilDatum_unique
-  | (intros; apply GlobalTheory.WeilUniq.weilDatum_unique <;> assumption)
+  first | exact @GlobalTheory.WeilUniq.weilDatum_unique

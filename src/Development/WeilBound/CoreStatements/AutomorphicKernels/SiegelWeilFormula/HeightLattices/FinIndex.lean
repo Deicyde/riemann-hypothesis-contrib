@@ -223,7 +223,7 @@ theorem fin_index
       rw [Matrix.mulVec_add, hD1, hD2, hsvadd, hsvsmul, hsvsmul, hsvM, hsvM, hsvM, hsvsv, hβs,
         hsvneg, hsvsv, Matrix.smul_mulVec, Matrix.one_mulVec, hηu]
       simp only [Matrix.neg_mulVec, Matrix.mulVec_neg, neg_neg, Matrix.smul_mulVec,
-        Matrix.mulVec_smul, smul_add, smul_neg]
+        Matrix.mulVec_smul, smul_add]
     · rintro ⟨_, ⟨z, hz, rfl⟩, rfl⟩
       obtain ⟨y₁, y₂, hy₁, hy₂, hyz⟩ :=
         bottom_onto (OEsub E v) k k' hkk hk hk' z ((mem_lat v z).1 hz)
@@ -241,9 +241,8 @@ theorem fin_index
       dsimp only
       rw [← hyz, Matrix.mulVec_add D, hD1, hD2, hsvadd, hsvsmul, hsvsmul, hsvM, hsvM, hsvM, hβs,
         hηu]
-      simp only [Matrix.mulVec_add, Matrix.smul_mulVec, Matrix.one_mulVec, Matrix.neg_mulVec,
-        Matrix.mulVec_neg, Matrix.mulVec_smul, smul_add, smul_neg, neg_neg, Matrix.mulVec_mulVec,
-        Matrix.mul_smul, Matrix.smul_mul]
+      simp only [Matrix.mulVec_add, Matrix.smul_mulVec, Matrix.mulVec_neg, Matrix.mulVec_smul,
+        Matrix.mulVec_mulVec, Matrix.smul_mul]
       rw [Matrix.one_mul, Matrix.one_mul, Matrix.neg_mul, Matrix.smul_mul, Matrix.neg_mulVec,
         smul_neg, smul_comm (sg η) (sg e)]
       simp only [Matrix.smul_mulVec]

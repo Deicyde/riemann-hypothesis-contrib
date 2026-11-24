@@ -52,8 +52,9 @@ namespace PI.CntNotIntW
 open scoped TensorProduct
 open ValuativeRel
 
-theorem t2Space_of_nonarchimedeanLocalField' (Fp : Type) [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp] :
-    T2Space Fp := by
+theorem t2Space_of_nonarchimedeanLocalField'
+    (Fp : Type) [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp]
+    : T2Space Fp := by
   apply PI.LocDualGen.FpU.t2 <;> assumption
 
 theorem tensorLiftSurjective : PiSurj := by

@@ -138,7 +138,7 @@ theorem dir_tan
   rw [← Category.assoc, h2, h1]
   have hobj : spMap (algebraMap V V) ≫ 𝟙 (Sp V) = 𝟙 (Sp V) := by
     rw [Category.comp_id]
-    first | (rw [Algebra.algebraMap_self]; exact Spec.map_id _) | simp [spMap]
+    first | (rw [Algebra.algebraMap_self]; exact Spec.map_id _)
   have h3
       : ∀ (f g : Sp V ⟶ Sp V), f = g → (1 : Over.mk f ⟶ t.G).left = (1 : Over.mk g ⟶ t.G).left := by
     rintro f g rfl; rfl

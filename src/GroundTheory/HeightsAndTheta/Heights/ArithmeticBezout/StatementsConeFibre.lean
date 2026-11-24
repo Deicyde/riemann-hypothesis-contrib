@@ -71,7 +71,7 @@ def fibreCount
 def ConeFibreDegree.Statement : Prop :=
   ∀ (n e δ : ℕ) (h : HermNorm n) (W : Ideal (MvPolynomial (Fin n) ℂ))
       (f : MvPolynomial (Fin (e + 1) × Fin n) ℂ),
-    IsProjPrime W → IsChowForm W (e + 1) f → IsMultiHomog δ f
+    IsProjPrime W → IsChowForm W (e + 1) f → Heights.IsMultiHomog δ f
       → ∀ᵐ π : Fin (e + 1) → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin (e + 1)),
           fibreCount h W π w = δ
 

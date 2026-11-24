@@ -1,10 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCombAt
-import Development.AbelianVarietyTheory.Definitions.Foundations.SecondCountableAndT2LocalField
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLocalModelSliceSourceLineStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLocalModelSliceTargetLineStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ExistsUnitarySupportedAtPlaceOfMulEqIdem
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLocalModelSliceSourceLine
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLocalModelSliceTargetLine
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SpanSchwartzBruhatProductEqTop
+import Development.AbelianVarietyTheory.Definitions.Foundations.SecondCountableAndT2LocalField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -141,7 +142,7 @@ theorem source_slice_model
                     ∧ ∀ (Ξ : SB (Matrix n n' k)) (Ψ : SB (Matrix n (n' ⊕ Unit) k)),
                       (∀ x, Ψ.1 x = Ξ.1 x.toCols₁ * a fun r => x r (Sum.inr ()))
                         → ∀ u, T₀ Ψ ((B.o.resS S).symm (u, v)) = T₁ Ξ u :=
-  GlobalTheory.T.exists_local_model_slice_source_line
+  _root_.GlobalTheory.SliceModel.exists_isModel_slice
 
 theorem target_slice_model
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
@@ -159,7 +160,7 @@ theorem target_slice_model
                     ∧ ∀ (Ξ : SB (Matrix n' n k)) (Ψ : SB (Matrix (n' ⊕ Unit) n k)),
                       (∀ x, Ψ.1 x = Ξ.1 x.toRows₁ * a (x (Sum.inr ())))
                         → ∀ u, T₀ Ψ ((B.o.resT S).symm (u, v)) = T₁ Ξ u :=
-  GlobalTheory.T.exists_local_model_slice_target_line
+  _root_.GlobalTheory.SliceModelT.main
 
 theorem comb_bimodel_and_line
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
@@ -219,7 +220,8 @@ theorem comb_bimodel_and_line
     · intro T₀ c Ξ a Ψ O hT hc hΞ ha hΨ hO
       funext x
       obtain ⟨T₁, hT₁, e⟩ :=
-        source_slice_model D k p ψ n n' ρ B S s FA F₀ FS hF T₀ hT a ha (B.o.resS S x).2
+        _root_.GlobalTheory.SliceModel.exists_isModel_slice D k p ψ n n' ρ B S s FA F₀ FS hF T₀ hT a
+          ha (B.o.resS S x).2
       obtain ⟨O₁, hO₁⟩ := exists_isOne (k := k) n n'
       have h1 := hc.2 T₁ hT₁ O₁ ⟨Ξ, hΞ⟩ hO₁ rfl
       have hx : x = (B.o.resS S).symm ((B.o.resS S x).1, (B.o.resS S x).2) := by simp
@@ -230,7 +232,8 @@ theorem comb_bimodel_and_line
     · intro T₀ c Ξ a Ψ O hT hc hΞ ha hΨ hO
       funext x
       obtain ⟨T₁, hT₁, e⟩ :=
-        target_slice_model D k p ψ n n' ρ B S s FA F₀ FS hF T₀ hT a ha (B.o.resT S x).2
+        _root_.GlobalTheory.SliceModelT.main D k p ψ n n' ρ B S s FA F₀ FS hF T₀ hT a ha
+          (B.o.resT S x).2
       obtain ⟨O₁, hO₁⟩ := exists_isOne (k := k) n' n
       have h1 := hc.2 T₁ hT₁ O₁ ⟨Ξ, hΞ⟩ hO₁ rfl
       have hx : x = (B.o.resT S).symm ((B.o.resT S x).1, (B.o.resT S x).2) := by simp

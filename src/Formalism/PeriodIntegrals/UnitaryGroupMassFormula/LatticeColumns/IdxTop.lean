@@ -61,11 +61,7 @@ variable
 
 theorem isTopRing_tens : IsTopologicalRing (Af F ⊗[F] E) := by
   haveI : IsModuleTopology (Af F) (Af F ⊗[F] E) := ⟨rfl⟩
-  first
-  | exact IsModuleTopology.topologicalRing (Af F) (Af F ⊗[F] E)
-  | exact IsModuleTopology.isTopologicalRing (Af F) (Af F ⊗[F] E)
-  | exact IsModuleTopology.Module.isTopologicalRing (Af F) (Af F ⊗[F] E)
-  | exact ModuleTopology.topologicalRing (Af F) (Af F ⊗[F] E)
+  first | exact IsModuleTopology.isTopologicalRing (Af F) (Af F ⊗[F] E)
 
 private theorem subgroup_isTopologicalGroup
     {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (S : Subgroup G)

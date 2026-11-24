@@ -84,15 +84,6 @@ theorem mem_span_pi_pow (A : PAlg l) (k : ℕ) (f : (A.cont ℤ_[l]).A)
     : f ∈ Ideal.span {(A.cont ℤ_[l]).pi ^ k} ↔ ∀ z, Hom.f (A.evCont z) f ∈ Ideal.span {A.pi ^ k} :=
   (RL.cont_ex A ℤ_[l]).2.2.2 k f
 
-theorem sharp_zero (A : PAlg l) : A.sharp 0 = 0 := by
-  have h : WittVector.teichmuller l (0 : A.A) = 0 := by
-    ext n
-    cases n with
-    | zero => simp [WittVector.teichmuller_coeff_zero]
-    | succ n => simp [WittVector.teichmuller_coeff_pos]
-  change A.th (WittVector.teichmuller l (0 : A.A)) = 0
-  rw [h, map_zero]
-
 theorem sharp_add
     (A : PAlg l) {e f : A.A} (he : IsIdempotentElem e) (hf : IsIdempotentElem f) (h : e * f = 0)
     : A.sharp (e + f) = A.sharp e + A.sharp f := by
@@ -106,7 +97,8 @@ theorem sharp_add
     have : (1 - e) * (1 - f) = 1 - e - f + e * f := by ring
     rw [this, h]
     ring
-  have h5 : A.sharp e * A.sharp f = 0 := by rw [← map_mul, h, sharp_zero]
+  have h5 : A.sharp e * A.sharp f = 0 := by
+    rw [← map_mul, h, _root_.GlobalTheory.CompanionTheory.RootsLC.sharp_zero]
   rw [h4, map_mul, h2, h3] at h1
   have : (1 - A.sharp e) * (1 - A.sharp f) = 1 - A.sharp e - A.sharp f + A.sharp e * A.sharp f := by
     ring
@@ -122,7 +114,11 @@ theorem sharp_sum
     : A.sharp (∑ i ∈ s, e i) = ∑ i ∈ s, A.sharp (e i) ∧ IsIdempotentElem (∑ i ∈ s, e i) := by
   classical
   induction s using Finset.induction_on with
-  | empty => exact ⟨by simpa using sharp_zero A, by simp [IsIdempotentElem]⟩
+  | empty =>
+    exact ⟨
+      by simpa using _root_.GlobalTheory.CompanionTheory.RootsLC.sharp_zero A,
+      by simp [IsIdempotentElem]
+    ⟩
   | insert a s ha ih =>
     obtain ⟨h1, h2⟩ :=
       ih

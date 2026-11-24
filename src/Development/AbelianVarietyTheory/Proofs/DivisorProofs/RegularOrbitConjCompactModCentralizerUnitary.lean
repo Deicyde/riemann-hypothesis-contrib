@@ -2,8 +2,13 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwistedTraceFormulaStable
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CommuteOfCommuteSeparableCharpoly
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompactModNormOneKernelInvolutionStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMatrixSqrtNearOneUltrametricStatement
+public import Mathlib.Topology.Algebra.Group.Defs
+public import Mathlib.Topology.Separation.Hausdorff
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompactModNormOneKernelInvolution
+public import Mathlib.Analysis.Normed.Field.Basic
+public import Mathlib.Topology.Instances.Matrix
+public import Mathlib.Topology.MetricSpace.Ultra.Basic
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMatrixSqrtNearOneUltrametric
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OrbitCompactModCentralizerSeparableLocal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmField
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RelIndexNeZeroOfSubsetCpt
@@ -178,7 +183,7 @@ theorem orbit_cpt_U
               ∧ ((s.map σ)ᵀ = s → (r.map σ)ᵀ = r) := by
       haveI : CharZero (w.adicCompletion E) := charZero_of_injective_algebraMap (algebraMap E (w.adicCompletion E)).injective
       letI : NontriviallyNormedField (w.adicCompletion E) := Valued.toNontriviallyNormedField _ _
-      exact GlobalTheory.T.exists_matrix_sqrt_near_one_ultrametric (w.adicCompletion E) n σ hσc
+      exact _root_.GlobalTheory.matrix_sqrt_near_one_ultrametric (w.adicCompletion E) n σ hσc
     refine ⟨
       (fun z : Z => (z.1 : Matrix (Fin n) (Fin n) _)) ⁻¹' W,
       (Units.continuous_val.comp continuous_subtype_val).continuousAt.preimage_mem_nhds
@@ -199,7 +204,7 @@ theorem orbit_cpt_U
     hZc.isClosedEmbedding_subtypeVal.isCompact_preimage (hD.image ((hstarc.comp continuous_inv).mul
       continuous_inv))
   obtain ⟨B, hB, hBz⟩ :=
-    GlobalTheory.T.exists_compact_mod_normOneKernel_involution Z hcomm τ hτc hτi hsq DZ hDZ
+    _root_.GlobalTheory.InvolutionNorm.exists_compact_mod_kernel Z hcomm τ hτc hτi hsq DZ hDZ
   refine ⟨
     Subtype.val ⁻¹' ((Subtype.val '' B : Set (GLw n w)) * D),
     hcl.isCompact_preimage ((hB.image continuous_subtype_val).mul hD),

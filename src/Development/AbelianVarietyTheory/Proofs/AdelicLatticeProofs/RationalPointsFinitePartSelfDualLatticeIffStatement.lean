@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.FockCompare GlobalTheory.VacUnique
+
 theorem _root_.GlobalTheory.T.rationalPoints_finitePart_selfDual_lattice_iff
     : ∀ (D : D7) (S T : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (Λ : AddSubgroup (WO S T)),
       IsStdChar D ψ (-1) → (∀ u ∈ Λ, u.map (infPart D) = 0)
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.rationalPoints_finitePart_selfDual_lattice_iff
           finRat S T x ∈ Λ
             ↔ ∀ y : Matrix (Fin T.rank) (Fin S.rank) D.host.E,
               finRat S T y ∈ Λ → ∃ k : ℤ, omO S T (infRat S T x) (infRat S T y) = k := by
-  first
-  | exact @GlobalTheory.RatSelfDual.finRat_mem_iff
-  | exact GlobalTheory.RatSelfDual.finRat_mem_iff
-  | (intros; apply GlobalTheory.RatSelfDual.finRat_mem_iff <;> assumption)
+  first | exact @GlobalTheory.RatSelfDual.finRat_mem_iff

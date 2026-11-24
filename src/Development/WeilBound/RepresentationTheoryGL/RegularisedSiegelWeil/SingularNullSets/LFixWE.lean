@@ -42,9 +42,6 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-
-
-
 open scoped Matrix NNReal TensorProduct
 open IsDedekindDomain NumberField Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta

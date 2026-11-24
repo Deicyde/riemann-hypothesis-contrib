@@ -52,8 +52,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 set_option linter.style.haveILetI false
 noncomputable section

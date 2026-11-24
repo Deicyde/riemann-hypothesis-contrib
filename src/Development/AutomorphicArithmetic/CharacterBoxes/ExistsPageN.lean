@@ -52,6 +52,11 @@ namespace UpperTheory.Top
 
 open Formalism.HC
 
+/--
+Bounds the Tate-Shafarevich length sum over a number field `E`: for every prime `p` and
+`0 < e < t`, `shaLen` is finite, and `∑_{l ∈ S} log l * ∑_{1 ≤ e < t} shaLen(l, e) ≤ B` for every
+finite set of primes `S`.
+-/
 def VVle (E : Type) [Field E] [NumberField E] (t : ℕ) (B : ℝ) : Prop :=
   ∀ (Ω : Type) [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
       (ld : ∀ (p : ℕ) [Fact p.Prime], Formalism.GaloisCohomology.LData E Ω p),
@@ -62,6 +67,11 @@ def VVle (E : Type) [Field E] [NumberField E] (t : ℕ) (B : ℝ) : Prop :=
           ∑ e ∈ Finset.Ico 1 t, ((@Formalism.GaloisCohomology.shaLen E Ω _ _ _ _ _ l ⟨l.2⟩ (@ld l ⟨l.2⟩) (e : ℤ)).toNat : ℝ)
           ≤ B
 
+/--
+Characterizes a `χ`-field `E ⊂ ℚ(ζ_N)` associated to a primitive character `ψ`, 2-adic level
+`e`, and auxiliary primes `q, d`: `E` is the fixed field of the automorphisms `ζ ↦ ζ^a` with
+`a ≡ ±1 (mod 2^(e+2))`, `ψ(a) = 1`, and Jacobi symbols `(a / q) = (a / d) = 1`.
+-/
 def IsChiField (ψ : PChar) (e q d : ℕ) (E : Type) [Field E] [NumberField E] : Prop :=
   ∃ (N : ℕ) (_ : NeZero N) (j : E →ₐ[ℚ] CyclotomicField N ℚ) (ζ : CyclotomicField N ℚ),
     2 ^ (e + 2) ∣ N ∧ ψ.N ∣ N ∧ q ∣ N ∧ d ∣ N ∧ IsPrimitiveRoot ζ N
@@ -90,6 +100,12 @@ def VAt (ψ : PChar) (eps Ct : ℝ) (q d e : ℕ) (x : ℝ) : Prop :=
   ∀ (E : Type) [Field E] [NumberField E],
     IsChiField ψ e q d E → VVle E ⌊x ^ Ct⌋₊ (Real.sqrt (Real.exp (x ^ eps)))
 
+/--
+Windowed `Sha` bound for a primitive character `ψ` and exponent `Ct`: for every
+`eps ∈ (0, 1/52)` and page choice `2^(e x) ∈ [x^(2 + 8*eps), 2 * x^(2 + 8*eps)]`, every large
+`X` and window prime pair `(q, d)` admits a window `[Y, Y^2] ⊆ [X^(1/J), X]` on which every
+`χ`-field `E` satisfies `VVle E ⌊x^Ct⌋ √(exp (x^eps))`.
+-/
 def VWinAt (ψ : PChar) (Ct : ℝ) : Prop :=
   ∀ eps : ℝ,
     0 < eps → eps < 1 / 52
@@ -103,6 +119,10 @@ def VWinAt (ψ : PChar) (Ct : ℝ) : Prop :=
                     X ^ (1 / J) ≤ Y ∧ Y ^ (2 : ℝ) ≤ X
                       ∧ ∀ x : ℝ, Y ≤ x → x ≤ Y ^ (2 : ℝ) → VAt ψ eps Ct q d (e x) x
 
+/--
+The global `Sha`-window statement consumed by the main endgame: `VWinAt ψ 401` for every
+primitive Dirichlet character `ψ`.
+-/
 def VWin : Prop := ∀ ψ : PChar, VWinAt ψ 401
 
 theorem VVle.mono

@@ -96,7 +96,7 @@ theorem isSelfDualC_inV
     · rintro ⟨x, hx, rfl⟩
       simpa [f, Matrix.toLin'_apply, hinv'] using hx
     · intro h
-      exact ⟨_, h, by simp [f, Matrix.toLin'_apply, hinv]⟩
+      exact ⟨_, h, by simp [f, Matrix.toLin'_apply]⟩
   have hform
       : ∀ x y : Fin S.rank → D.host.E,
         ∑ i, ∑ j, star (x i) * S.gram i j * y j

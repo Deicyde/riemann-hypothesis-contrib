@@ -109,7 +109,7 @@ theorem adAt_conjP_eq_one
             ((u : Matrix (Fin n) (Fin n) (AfE F E)) - 1)
           = cT (sigR hc.sig (FiniteAdeleRing (𝓞 F) F)) u.1 := by
       ext i j
-      by_cases h : i = j <;> simp [cT, Matrix.one_apply, map_sub, h, eq_comm]
+      by_cases h : i = j <;> simp [cT, map_sub, h, eq_comm]
     rw [hcT]
     exact (mul_eq_one_comm).1 hunit
   have hC

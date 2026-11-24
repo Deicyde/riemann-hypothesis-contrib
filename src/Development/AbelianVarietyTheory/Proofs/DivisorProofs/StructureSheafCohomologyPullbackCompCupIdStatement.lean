@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.structureSheafCohomology_pullback_comp_cup_id
     : (∀ (R R' : Type) [CommRing R] [CommRing R'] (X X' : Scheme.{0}) (s : X ⟶ Sp R)
           (s' : X' ⟶ Sp R') (σ : R →+* R') (φ : X' ⟶ X) (h : φ ≫ s = s' ≫ spMap σ) (R'' : Type)
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.structureSheafCohomology_pullback_comp_cup_id
       ∧ ∀ (R : Type) [CommRing R] (A : Over (Sp R)),
         (∀ a, pO1 (𝟙 A) a = a) ∧ (∀ a, structureSheafH2Pullback (𝟙 A) a = a) ∧ (∀ a, pF (𝟙 A) a = a)
           ∧ (∀ a, deRhamH1Pullback (𝟙 A) a = a) ∧ ∀ a, deRhamH2Pullback (𝟙 A) a = a := by
-  first
-  | exact @GlobalTheory.AbCoh.pull_comp_cup_id
-  | exact GlobalTheory.AbCoh.pull_comp_cup_id
-  | (intros; apply GlobalTheory.AbCoh.pull_comp_cup_id <;> assumption)
+  first | exact @GlobalTheory.AbCoh.pull_comp_cup_id

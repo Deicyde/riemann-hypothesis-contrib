@@ -110,7 +110,7 @@ theorem repr_tv (v : AwayP p) (y : AfP p ⊗[ℚ] G.C) (i : Fin (Module.finrank 
     : (basV G v).repr (tv G v y) i = AfP.eval v ((basA G).repr y i) := by
   induction y using TensorProduct.induction_on with
   | zero => simp
-  | tmul a c => simp [tv, basV, basA, Algebra.TensorProduct.basis_repr_tmul, Algebra.smul_def]
+  | tmul a c => simp [tv, basV, basA, Algebra.TensorProduct.basis_repr_tmul]
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
 
 theorem continuous_eval (v : AwayP p) : Continuous (AfP.eval (p := p) v) :=

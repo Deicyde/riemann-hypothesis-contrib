@@ -53,6 +53,7 @@ open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto
   GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_keyDatumBaseChange_thetaJets
     : ∀ (K C : Type) [Field K] [Field C] (f : K →+* C) (x : KeyIn K),
       ∃ (xC : KeyIn C) (hg : xC.P.g = x.P.g)
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.exists_keyDatumBaseChange_thetaJets
                   ∧ y j ≫ (snd (Over.mk (spMap f)) x.P.A).left = spMap (dualMap f) ≫ (x.v j).left)
               → ThJetT x.P x.rig m (spMap f) th pt y ϑ J
               → ThJet xC hg m (fun i => io (pt i)) ϑ J := by
-  first
-  | exact @GlobalTheory.MBLow.exists_keyPB_thJet
-  | exact GlobalTheory.MBLow.exists_keyPB_thJet
-  | (intros; apply GlobalTheory.MBLow.exists_keyPB_thJet <;> assumption)
+  first | exact @GlobalTheory.MBLow.exists_keyPB_thJet

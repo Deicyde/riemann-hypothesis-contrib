@@ -1,7 +1,9 @@
 module
 
+public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsIsomScale
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SplitAtOf
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot
+public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsOrthTransfer
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.MemSpanSSelf
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -24,7 +26,6 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.Radical.NatInt
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -45,9 +46,15 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.Tactic.Basify
 import Std.Tactic.BVDecide.Normalize.Prop
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsIsomScale
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot, Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.UniPart
+
+-- ===== clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot", "h": "module\n\npublic import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsIsomScale\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SplitAtOf\npublic import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsOrthTransfer\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.MemSpanSSelf\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Henselian\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.RegularLocalRing.Defs\nimport Mathlib.RingTheory.SimpleRing.Principal\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
 @[expose] public section
 
 open Module
@@ -56,33 +63,162 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G3
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
-private theorem mem_iff_lemma {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] (b : ι → V) (v : V) :
-    v ∈ spanS S b ↔ ∃ c : ι → K, (∀ i, c i ∈ S) ∧ v = ∑ i, c i • b i := Iff.rfl
+section
 
-private theorem smul_mem_lemma_2 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] {g : ι → V} {a : K} (ha : a ∈ S)
-    {v : V} (hv : v ∈ spanS S g) : a • v ∈ spanS S g := by
+variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+variable {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K}
+
+theorem sd_basis_bot {W : Submodule K V} {M : AddSubgroup V} (hM : IsSD S h W M) (hW : W = ⊥)
+    : ∃ (k : ℕ) (f : Fin k → V),
+      (∀ i j, i ≠ j → h (f i) (f j) = 0) ∧ (∀ i, IsUnitIn S (h (f i) (f i)))
+        ∧ (∀ v, v ∈ spanS S f ↔ v ∈ M) ∧ Submodule.span K (Set.range f) = W := by
+  refine ⟨0, Fin.elim0, fun i => Fin.elim0 i, fun i => Fin.elim0 i, fun v => ?_, ?_⟩
+  · rw [spanS_empty]
+    constructor
+    · rintro rfl
+      exact M.zero_mem
+    · intro hv
+      have := hM.le v hv
+      rwa [hW, Submodule.mem_bot] at this
+  · rw [hW, Set.range_eq_empty, Submodule.span_empty]
+
+theorem sup_cutW {W : Submodule K V} {x : V} (hx : x ∈ W) (hxx : h x x ≠ 0)
+    : K ∙ x ⊔ cutW h W x = W := by
+  apply le_antisymm
+  · exact sup_le ((Submodule.span_singleton_le_iff_mem _ _).mpr hx) inf_le_left
+  · intro w hw
+    have e : w = (h x w * (h x x)⁻¹) • x + (w - (h x w * (h x x)⁻¹) • x) := by abel
+    rw [e]
+    refine Submodule.add_mem_sup (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x)) ?_
+    refine mem_cutW.mpr ⟨W.sub_mem hw (W.smul_mem _ hx), ?_⟩
+    rw [map_sub, map_smul, smul_eq_mul, mul_assoc, inv_mul_cancel₀ hxx, mul_one, sub_self]
+
+theorem sd_basis
+    (hS : IsHermSemilocal S) (hπ : IsUnif S π) (hs : h.IsSymm) (hd : ∀ x, h x x = 0 → x = 0)
+    : ∀ (n : ℕ) (W : Submodule K V) (M : AddSubgroup V),
+      finrank K W ≤ n → IsSD S h W M
+        → ∃ (k : ℕ) (f : Fin k → V),
+          (∀ i j, i ≠ j → h (f i) (f j) = 0) ∧ (∀ i, IsUnitIn S (h (f i) (f i)))
+            ∧ (∀ v, v ∈ spanS S f ↔ v ∈ M) ∧ Submodule.span K (Set.range f) = W := by
+  intro n
+  induction n with
+  | zero =>
+    intro W M hn hM
+    exact sd_basis_bot hM (Submodule.finrank_eq_zero.mp (Nat.le_zero.mp hn))
+  | succ n ih =>
+    intro W M hn hM
+    by_cases hbot : W = ⊥
+    · exact sd_basis_bot hM hbot
+    obtain ⟨ξ, hξ, hξ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hbot
+    obtain ⟨x, hx, hu⟩ := hM.exists_unit_norm hS hπ hs hd hξ hξ0
+    have hxW := hM.le x hx
+    obtain ⟨k, f, hfo, hfu, hfM, hfW⟩ :=
+      ih _ _ (by have := finrank_cutW_lt (h := h) hxW hu.1; omega) (hM.cut hx hu)
+    have hfc : ∀ i, f i ∈ cutW h W x := fun i => by
+      rw [← hfW]
+      exact Submodule.subset_span ⟨i, rfl⟩
+    have hfm : ∀ i, f i ∈ M := fun i => (mem_cutM.mp ((hfM (f i)).mp (mem_spanS_self f i))).1
+    refine ⟨k + 1, Fin.cons x f, ?_, ?_, fun v => ?_, ?_⟩
+    · intro i j hij
+      cases i using Fin.cases with
+      | zero =>
+        cases j using Fin.cases with
+        | zero => exact absurd rfl hij
+        | succ j => simpa using (mem_cutW.mp (hfc j)).2
+      | succ i =>
+        cases j using Fin.cases with
+        | zero => simpa using symm_zero hs (mem_cutW.mp (hfc i)).2
+        | succ j => simpa using hfo i j (fun h' => hij (by rw [h']))
+    · intro i
+      cases i using Fin.cases with
+      | zero => simpa using hu
+      | succ i => simpa using hfu i
+    · constructor
+      · rintro ⟨c, hc, rfl⟩
+        refine M.sum_mem fun i _ => hM.smul_mem _ (hc i) _ ?_
+        cases i using Fin.cases with
+        | zero => simpa using hx
+        | succ i => simpa using hfm i
+      · intro hv
+        obtain ⟨d, hd', hdv⟩ := (hfM _).mpr (proj_mem hM.toIsLatIn hx hu hv)
+        refine ⟨Fin.cons (h x v * (h x x)⁻¹) d, fun i => ?_, ?_⟩
+        · cases i using Fin.cases with
+          | zero => simpa using S.mul_mem (hM.int _ hx _ hv) hu.2.2
+          | succ i => simpa using hd' i
+        · rw [Fin.sum_univ_succ]
+          simp only [Fin.cons_zero, Fin.cons_succ]
+          rw [← hdv]
+          abel
+    · rw [Fin.range_cons, Submodule.span_insert, hfW]
+      exact sup_cutW hxW hu.1
+
+end
+
+end Formalism.L2.SG.Pf.G3
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot =====
+
+-- ===== clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.UniPart =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.UniPart", "h": "module\n\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SplitAtOf\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SdBasisBot\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Henselian\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.RegularLocalRing.Defs\nimport Mathlib.RingTheory.SimpleRing.Principal\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\npublic import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsIsomScale\n\n"}
+section -- clump:auto
+@[expose] public section
+
+open Module
+
+noncomputable section
+
+namespace Formalism.L2.SG.Pf.G3
+
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
+
+private theorem mem_iff_lemma
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    (b : ι → V) (v : V)
+    : v ∈ spanS S b ↔ ∃ c : ι → K, (∀ i, c i ∈ S) ∧ v = ∑ i, c i • b i :=
+  Iff.rfl
+
+private theorem smul_mem_lemma_2
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    {g : ι → V} {a : K} (ha : a ∈ S)
+    {v : V} (hv : v ∈ spanS S g)
+    : a • v ∈ spanS S g := by
   rw [mem_iff_lemma] at hv ⊢
   obtain ⟨d, hd, rfl⟩ := hv
   exact ⟨fun i => a * d i, fun i => S.mul_mem ha (hd i), by simp [Finset.smul_sum, mul_smul]⟩
 
-private theorem spanS_le_lemma_3 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι] {f : κ → V}
-    {g : ι → V} (hfg : ∀ k, f k ∈ spanS S g) {v : V} (hv : v ∈ spanS S f) : v ∈ spanS S g := by
+private theorem spanS_le_lemma_3
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι]
+    {f : κ → V} {g : ι → V} (hfg : ∀ k, f k ∈ spanS S g)
+    {v : V} (hv : v ∈ spanS S f)
+    : v ∈ spanS S g := by
   rw [mem_iff_lemma] at hv
   obtain ⟨c, hc, rfl⟩ := hv
   exact AddSubgroup.sum_mem _ fun k _ => smul_mem_lemma_2 (hc k) (hfg k)
 
-private theorem mem_span_lemma_4 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] {g : ι → V} {v : V}
-    (hv : v ∈ spanS S g) : v ∈ Submodule.span K (Set.range g) := by
+private theorem mem_span_lemma_4
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    {g : ι → V} {v : V} (hv : v ∈ spanS S g)
+    : v ∈ Submodule.span K (Set.range g) := by
   rw [mem_iff_lemma] at hv
   obtain ⟨c, -, rfl⟩ := hv
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-private theorem spans_eq_lemma_5 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι] {f : κ → V}
-    {g : ι → V} (h1 : ∀ k, f k ∈ spanS S g) (h2 : ∀ i, g i ∈ spanS S f) :
-    Submodule.span K (Set.range f) = Submodule.span K (Set.range g) ∧
-      ∀ v, v ∈ spanS S f ↔ v ∈ spanS S g := by
+private theorem spans_eq_lemma_5
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι]
+    {f : κ → V} {g : ι → V} (h1 : ∀ k, f k ∈ spanS S g) (h2 : ∀ i, g i ∈ spanS S f)
+    : Submodule.span K (Set.range f) = Submodule.span K (Set.range g)
+      ∧ ∀ v, v ∈ spanS S f ↔ v ∈ spanS S g := by
   refine ⟨le_antisymm ?_ ?_, fun v => ⟨spanS_le_lemma_3 h1, spanS_le_lemma_3 h2⟩⟩
   · rw [Submodule.span_le]
     rintro _ ⟨k, rfl⟩
@@ -91,9 +227,11 @@ private theorem spans_eq_lemma_5 {K V : Type} [Field K] [StarRing K] [AddCommGro
     rintro _ ⟨i, rfl⟩
     exact mem_span_lemma_4 (h2 i)
 
-private theorem linInd_lemma_6 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} {f : ι → V} (ho : ∀ i j, i ≠ j → h (f i) (f j) = 0)
-    (hn : ∀ i, h (f i) (f i) ≠ 0) : LinearIndependent K f := by
+private theorem linInd_lemma_6
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} {f : ι → V}
+    (ho : ∀ i j, i ≠ j → h (f i) (f j) = 0) (hn : ∀ i, h (f i) (f i) ≠ 0)
+    : LinearIndependent K f := by
   rw [linearIndependent_iff']
   intro s g hg i hi
   have h1 := congrArg (h (f i)) hg
@@ -106,11 +244,12 @@ private theorem linInd_lemma_6 {K V : Type} [Field K] [StarRing K] [AddCommGroup
   · intro h'
     exact absurd hi h'
 
-private theorem form_sum_lemma_7 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι] {b : ι → V}
-    (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (a c : ι → K) :
-    h (∑ i, a i • b i) (∑ j, c j • b j) = ∑ i, star (a i) * c i * h (b i) (b i) := by
-
+private theorem form_sum_lemma_7
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι]
+    {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
+    (a c : ι → K)
+    : h (∑ i, a i • b i) (∑ j, c j • b j) = ∑ i, star (a i) * c i * h (b i) (b i) := by
   rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
 
@@ -122,22 +261,13 @@ private theorem form_sum_lemma_7 {K V : Type} [Field K] [StarRing K] [AddCommGro
   · intro h'
     exact absurd (Finset.mem_univ i) h'
 
-private theorem mem_self_lemma_9 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] [DecidableEq ι] (b : ι → V) (i : ι) :
-    b i ∈ spanS S b := by
-  refine (mem_iff_lemma b (b i)).2 ⟨fun j => if j = i then 1 else 0, fun j => ?_, ?_⟩
-  · dsimp only
-    split_ifs
-    · exact S.one_mem
-    · exact S.zero_mem
-  · simp [ite_smul]
-
-private theorem isSD_lemma_8 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {S : Subring K} (hS : IsHermSemilocal S) {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι]
-    [DecidableEq ι] {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
-    (hu : ∀ i, IsUnitIn S (h (b i) (b i))) :
-    IsSD S h (Submodule.span K (Set.range b)) (spanS S b) := by
-  refine ⟨⟨fun _ hm => mem_span_lemma_4 hm, fun _ ha _ hm => smul_mem_lemma_2 ha hm,
-    ?_, ?_⟩, ?_⟩
+private theorem isSD_lemma_8
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} (hS : IsHermSemilocal S)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι] [DecidableEq ι]
+    {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (hu : ∀ i, IsUnitIn S (h (b i) (b i)))
+    : IsSD S h (Submodule.span K (Set.range b)) (spanS S b) := by
+  refine ⟨⟨fun _ hm => mem_span_lemma_4 hm, fun _ ha _ hm => smul_mem_lemma_2 ha hm, ?_, ?_⟩, ?_⟩
   · intro x hx y hy
     rw [mem_iff_lemma] at hx hy
     obtain ⟨a, ha, rfl⟩ := hx
@@ -159,7 +289,7 @@ private theorem isSD_lemma_8 {K V : Type} [Field K] [StarRing K] [AddCommGroup V
     obtain ⟨g, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hx
     rw [mem_iff_lemma]
     refine ⟨g, fun i => ?_, rfl⟩
-    have h1 := hdual (b i) (mem_self_lemma_9 b i)
+    have h1 := hdual (b i) (_root_.Formalism.L2.SG.Pf.G3.mem_spanS_self b i)
 
     rw [map_sum, Finset.sum_eq_single i] at h1
     · rw [map_smul, smul_eq_mul] at h1
@@ -170,17 +300,24 @@ private theorem isSD_lemma_8 {K V : Type} [Field K] [StarRing K] [AddCommGroup V
     · intro h'
       exact absurd (Finset.mem_univ i) h'
 
-theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K} (hS : IsHermSemilocal S) (hπ : IsUnif S π)
-    (hs : h.IsSymm) (hd : ∀ x, h x x = 0 → x = 0) {ι : Type} [Fintype ι] [DecidableEq ι] {b : ι → V}
-    {e : ι → ℕ} {i₀ : ι} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
-    (hu : ∀ i, IsUnitIn S (h (b i) (b i) * (π ^ e i)⁻¹)) (x : ι → K) (hx : ∀ i, x i ∈ S)
-    (hX : IsUnitIn S (h (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
-      (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i) * (π ^ e i₀)⁻¹)) :
-    ∃ c : ι → V, (∀ i j, i ≠ j → h (c i) (c j) = 0) ∧ (∀ i, IsUnitIn S (h (c i) (c i) * (π ^ e i)⁻¹)) ∧
-      c i₀ = ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i ∧ (∀ k, e k ≠ e i₀ → c k = b k) ∧
-      Submodule.span K (Set.range c) = Submodule.span K (Set.range b) ∧
-      ∀ v, v ∈ spanS S c ↔ v ∈ spanS S b := by
+theorem uni_part
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K}
+    (hS : IsHermSemilocal S) (hπ : IsUnif S π) (hs : h.IsSymm) (hd : ∀ x, h x x = 0 → x = 0)
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {b : ι → V} {e : ι → ℕ} {i₀ : ι}
+    (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (hu : ∀ i, IsUnitIn S (h (b i) (b i) * (π ^ e i)⁻¹))
+    (x : ι → K) (hx : ∀ i, x i ∈ S)
+    (hX : IsUnitIn S
+      (h (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
+          (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
+        * (π ^ e i₀)⁻¹))
+    : ∃ c : ι → V,
+      (∀ i j, i ≠ j → h (c i) (c j) = 0) ∧ (∀ i, IsUnitIn S (h (c i) (c i) * (π ^ e i)⁻¹))
+        ∧ c i₀ = ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i
+        ∧ (∀ k, e k ≠ e i₀ → c k = b k)
+        ∧ Submodule.span K (Set.range c) = Submodule.span K (Set.range b)
+        ∧ ∀ v, v ∈ spanS S c ↔ v ∈ spanS S b := by
   set Xs := ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i with hXs
   have hπ0 : π ≠ 0 := hπ.ne
   have hp0 : π ^ e i₀ ≠ 0 := pow_ne_zero _ hπ0
@@ -190,8 +327,9 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
     rw [← starRingEnd_apply]
     exact hs.eq v w
   have hpstar : star ((π ^ e i₀)⁻¹) = (π ^ e i₀)⁻¹ := by rw [star_inv₀, star_pow, hπ.fix]
-  have hs' : h'.IsSymm := LinearMap.IsSymm.mk fun v w => by
-    rw [hh', hh', starRingEnd_apply, star_mul, hstar, hpstar, mul_comm]
+  have hs' : h'.IsSymm :=
+    LinearMap.IsSymm.mk fun v w => by
+      rw [hh', hh', starRingEnd_apply, star_mul, hstar, hpstar, mul_comm]
   have hz : ∀ v w, h' v w = 0 → h v w = 0 := fun v w hvw => by
     rw [hh'] at hvw
     exact (mul_eq_zero.1 hvw).resolve_left (inv_ne_zero hp0)
@@ -215,9 +353,9 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
   have hXX : h' Xs Xs ≠ 0 := hXu'.1
   have hX0 : Xs ≠ 0 := fun h0 => hXX (by rw [h0, map_zero])
   have hXW : Xs ∈ Submodule.span K (Set.range bP) := mem_span_lemma_4 hXL
-  obtain ⟨k, f, hof, huf, hspf, hspanf⟩ := sd_basis hS hπ hs' hd' _
-    (cutW h' (Submodule.span K (Set.range bP)) Xs) (cutM h' (spanS S bP) Xs) le_rfl
-    (hSD.cut hXL hXu')
+  obtain ⟨k, f, hof, huf, hspf, hspanf⟩ :=
+    sd_basis hS hπ hs' hd' _ (cutW h' (Submodule.span K (Set.range bP)) Xs)
+      (cutM h' (spanS S bP) Xs) le_rfl (hSD.cut hXL hXu')
   have hinf : K ∙ Xs ⊓ cutW h' (Submodule.span K (Set.range bP)) Xs = ⊥ := by
     rw [eq_bot_iff]
     intro v hv
@@ -228,24 +366,28 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
     rw [map_smul, smul_eq_mul] at ht
     rw [(mul_eq_zero.1 ht).resolve_right hXX, zero_smul]
     exact Submodule.zero_mem _
-  have e1 := Submodule.finrank_sup_add_finrank_inf_eq (K ∙ Xs)
-    (cutW h' (Submodule.span K (Set.range bP)) Xs)
+  have e1 :=
+    Submodule.finrank_sup_add_finrank_inf_eq (K ∙ Xs) (cutW h' (Submodule.span K (Set.range bP)) Xs)
   rw [sup_cutW hXW hXX, hinf, finrank_bot, finrank_span_singleton hX0, ← hspanf,
-    finrank_span_eq_card (linInd_lemma_6 hof (fun j => (huf j).1)),
-    finrank_span_eq_card (linInd_lemma_6 hoP (fun p => (huP p).1)), Fintype.card_fin] at e1
+      finrank_span_eq_card (linInd_lemma_6 hof (fun j => (huf j).1)),
+      finrank_span_eq_card (linInd_lemma_6 hoP (fun p => (huP p).1)), Fintype.card_fin]
+    at e1
   set p₀ : {i // e i = e i₀} := ⟨i₀, rfl⟩ with hp₀
   have hQ : Fintype.card {p : {i // e i = e i₀} // p ≠ p₀} = k := by
     rw [Fintype.card_subtype, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _),
       Finset.card_univ]
     omega
   let σ := Fintype.equivFinOfCardEq hQ
-  obtain ⟨gP, hg0, hgq⟩ : ∃ gP : {i // e i = e i₀} → V, gP p₀ = Xs ∧
-      ∀ q : {p : {i // e i = e i₀} // p ≠ p₀}, gP q.1 = f (σ q) :=
+  obtain ⟨gP, hg0, hgq⟩
+      : ∃ gP : {i // e i = e i₀} → V,
+        gP p₀ = Xs ∧ ∀ q : {p : {i // e i = e i₀} // p ≠ p₀}, gP q.1 = f (σ q) :=
     ⟨fun p => if hp : p = p₀ then Xs else f (σ ⟨p, hp⟩), dif_pos rfl, fun q => dif_neg q.2⟩
-  obtain ⟨c, hcP, hcn⟩ : ∃ c : ι → V, (∀ p : {i // e i = e i₀}, c p = gP p) ∧
-      ∀ i, e i ≠ e i₀ → c i = b i :=
-    ⟨fun i => if hi : e i = e i₀ then gP ⟨i, hi⟩ else b i, fun p => dif_pos p.2,
-      fun i hi => dif_neg hi⟩
+  obtain ⟨c, hcP, hcn⟩
+      : ∃ c : ι → V, (∀ p : {i // e i = e i₀}, c p = gP p) ∧ ∀ i, e i ≠ e i₀ → c i = b i := ⟨
+    fun i => if hi : e i = e i₀ then gP ⟨i, hi⟩ else b i,
+    fun p => dif_pos p.2,
+    fun i hi => dif_neg hi
+  ⟩
   have hc0 : c i₀ = Xs := (hcP p₀).trans hg0
   have hXf : ∀ j, h Xs (f j) = 0 := fun j => by
     have hm : f j ∈ cutW h' (Submodule.span K (Set.range bP)) Xs := by
@@ -266,15 +408,16 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
       · rw [show gP p = f (σ ⟨p, hp⟩) from hgq ⟨p, hp⟩,
           show gP p' = f (σ ⟨p', hp'⟩) from hgq ⟨p', hp'⟩]
         exact hz _ _ (hof _ _ (fun hq => hpp (congrArg Subtype.val (σ.injective hq))))
-  have hfL : ∀ j, f j ∈ spanS S bP := fun j => (mem_cutM.1 ((hspf _).1 (mem_self_lemma_9 f j))).1
+  have hfL : ∀ j, f j ∈ spanS S bP := fun j =>
+    (mem_cutM.1 ((hspf _).1 (_root_.Formalism.L2.SG.Pf.G3.mem_spanS_self f j))).1
   have hgL : ∀ p, gP p ∈ spanS S bP := fun p => by
     by_cases hp : p = p₀
     · rw [hp, hg0]
       exact hXL
     · rw [show gP p = f (σ ⟨p, hp⟩) from hgq ⟨p, hp⟩]
       exact hfL _
-  have hperp : ∀ w ∈ Submodule.span K (Set.range bP), ∀ j, e j ≠ e i₀ →
-      h w (b j) = 0 ∧ h (b j) w = 0 := by
+  have hperp
+      : ∀ w ∈ Submodule.span K (Set.range bP), ∀ j, e j ≠ e i₀ → h w (b j) = 0 ∧ h (b j) w = 0 := by
     intro w hw j hj
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hw
     have hne : ∀ p : {i // e i = e i₀}, (p : ι) ≠ j := fun p hq => hj (hq ▸ p.2)
@@ -285,8 +428,7 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
         rw [map_smulₛₗ, LinearMap.smul_apply, hbP, ho _ _ (hne p), smul_zero]
 
     · rw [map_sum]
-      exact Finset.sum_eq_zero fun p _ => by
-        rw [map_smul, hbP, ho _ _ (hne p).symm, smul_zero]
+      exact Finset.sum_eq_zero fun p _ => by rw [map_smul, hbP, ho _ _ (hne p).symm, smul_zero]
   have hoc : ∀ i j, i ≠ j → h (c i) (c j) = 0 := by
     intro i j hij
     by_cases hi : e i = e i₀
@@ -316,30 +458,38 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
     intro i
     by_cases hi : e i = e i₀
     · rw [show c i = gP ⟨i, hi⟩ from hcP ⟨i, hi⟩]
-      exact spanS_le_lemma_3 (fun p => by rw [hbP]; exact mem_self_lemma_9 b p) (hgL _)
+      exact spanS_le_lemma_3
+        (fun p => by rw [hbP]; exact _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self b p)
+        (hgL _)
     · rw [hcn i hi]
-      exact mem_self_lemma_9 b i
+      exact _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self b i
   have hfc : ∀ j, f j ∈ spanS S c := fun j => by
     have hfj : f j = c (σ.symm j).1.1 := by rw [hcP, hgq, Equiv.apply_symm_apply]
     rw [hfj]
-    exact mem_self_lemma_9 c _
+    exact _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self c _
   have h2 : ∀ i, b i ∈ spanS S c := by
     intro i
     by_cases hi : e i = e i₀
     · have hbi : b i ∈ spanS S bP := by
-        have hm := mem_self_lemma_9 (S := S) bP ⟨i, hi⟩
+        have hm := _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self (S := S) bP ⟨i, hi⟩
         rwa [hbP] at hm
       have hr := (hspf _).2 (proj_mem hSD.toIsLatIn hXL hXu' hbi)
       have ha : h' Xs (b i) * (h' Xs Xs)⁻¹ ∈ S := S.mul_mem (hSD.int _ hXL _ hbi) hXu'.2.2
-      have key : b i = (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs
-          + (b i - (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs) := by abel
+      have key
+          : b i
+            = (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs + (b i - (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs) := by
+        abel
       rw [key]
       refine add_mem (smul_mem_lemma_2 ha ?_) (spanS_le_lemma_3 hfc hr)
       rw [← hc0]
-      exact mem_self_lemma_9 c i₀
+      exact _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self c i₀
     · rw [← hcn i hi]
-      exact mem_self_lemma_9 c i
+      exact _root_.Formalism.L2.SG.Pf.G3.mem_spanS_self c i
   obtain ⟨hspc, hiffc⟩ := spans_eq_lemma_5 h1 h2
   exact ⟨c, hoc, huc, hc0, hcn, hspc, hiffc⟩
 
 end Formalism.L2.SG.Pf.G3
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.UniPart =====

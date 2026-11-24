@@ -45,6 +45,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.inert_integral_twistedConjugates_twistedCentralizer_mul_maxCompact
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
       Unr E
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.inert_integral_twistedConjugates_twistedCentralize
                     ∧ u * (nrmL n w y).val.charpoly + v * derivative (nrmL n w y).val.charpoly = 1)
                 → g⁻¹ * y * thL n w g ∈ GlobalTheory.LFun.KGL w (n := n)
                 → ∃ t ∈ twCent (thL n w) y, ∃ k ∈ GlobalTheory.LFun.KGL w (n := n), g = t * k := by
-  first
-  | exact @GlobalTheory.InertUniq.eq_twCent_mul_KGL
-  | exact GlobalTheory.InertUniq.eq_twCent_mul_KGL
-  | (intros; apply GlobalTheory.InertUniq.eq_twCent_mul_KGL <;> assumption)
+  first | exact @GlobalTheory.InertUniq.eq_twCent_mul_KGL

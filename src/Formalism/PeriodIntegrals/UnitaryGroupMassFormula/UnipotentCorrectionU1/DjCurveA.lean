@@ -140,12 +140,7 @@ theorem hasDerivAt_det_of_one
     (h0 : A 0 = 1) (h : ∀ i j, HasDerivAt (fun t => A t i j) (A' i j) 0)
     : HasDerivAt (fun t => (A t).det) A'.trace 0 := by
   first
-  | exact Bl.b110.goal1 ..
   | (apply Bl.b110.goal1 <;> assumption)
-  | (intros; apply Bl.b110.goal1 <;> assumption)
-  | (apply @Bl.b110.goal1 <;> assumption)
-  | (intros; apply @Bl.b110.goal1 <;> assumption)
-  | (apply @Bl.b110.goal1 <;> first | assumption | infer_instance)
   | exact @Bl.b110.goal1 n ‹_› ‹_› A A' h0 h
   | exact @Bl.b110.goal1 n ‹_› ‹_› A A' h0
   | exact @Bl.b110.goal1 n ‹_› ‹_› A A'

@@ -115,7 +115,6 @@ theorem graphPatch : GraphPatch := by
     exact Finset.sum_congr rfl hf
   refine ⟨S, fg_sup s Sh hfg, r, ?_, ?_⟩
   · have : φ r.1 = 1 := by
-
       rw [hr, map_sum]
       have e1 : φ y = 1 := by
         have : φ k = 0 := hk

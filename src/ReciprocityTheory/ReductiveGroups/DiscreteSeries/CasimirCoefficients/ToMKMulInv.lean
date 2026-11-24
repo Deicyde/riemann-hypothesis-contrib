@@ -110,15 +110,12 @@ theorem psiM_equiv
   rw [← _root_.mul_assoc (T.op k₂) (T.op k₂⁻¹), ← op_mul', mul_inv_cancel, op_one', _root_.one_mul]
 
 theorem psiM_one (T : KType ε Λ) (μ : Fin n → ℤ) : PsiM T μ 1 = 1 := by
-  have h0 : inP ε (0 : Matrix (Fin n) (Fin n) ℂ) := by
-    first
-    | exact ⟨by simp [inG], by simp⟩
-    | exact ⟨by first | exact inG_zero ε | exact inG_zero, by simp⟩
+  have h0 : inP ε (0 : Matrix (Fin n) (Fin n) ℂ) := by first | exact ⟨by simp [inG], by simp⟩
   have h1
       : (1 : Matrix (Fin n) (Fin n) ℂ)
         = toMK (1 : KG ε) * NormedSpace.exp (0 : Matrix (Fin n) (Fin n) ℂ) := by
     rw [toMK_one', NormedSpace.exp_zero, one_mul]
   rw [h1, psiM_kexp T μ 1 h0, op_one', one_mul, NormedSpace.exp_zero]
-  first | exact psM_one T μ | exact psM_one | simp [psM_one]
+  first | exact psM_one T μ
 
 end ReciprocityTheory.ChartRestriction.DS.S7

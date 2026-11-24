@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZHAbove
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIsIsoMorphismRestrictOfIsHomIdStatement
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.InducedModelMorphismCompStructureMap
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIsIsoMorphismRestrictOfIsHomId
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibrePreconnected
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -40,6 +41,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.TypeStar
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -168,7 +170,8 @@ theorem fibre_chain
   intro g n F W Z i X₁ z₁ Y πY hZH y y' hy hy'
   obtain ⟨U₀, EE, -, -, -, hHom, hProp⟩ := hZH
   obtain ⟨U, hU, hiso⟩ :=
-    GlobalTheory.T.exists_nonempty_isIso_morphismRestrict_of_isHom_id X₁.o₁ X₁.Ω₁ Y X₁.M πY hHom
+    _root_.GlobalTheory.ZH.RatModel.exists_isIso_morphismRestrict_of_isHom_id X₁.o₁ X₁.Ω₁ Y X₁.M πY
+      hHom
   haveI : IsDedekindDomain X₁.o₁ := X₁.ar.ded
   haveI : IsLocallyNoetherian (Sp X₁.o₁) :=
     inferInstanceAs (IsLocallyNoetherian (Spec (CommRingCat.of X₁.o₁)))

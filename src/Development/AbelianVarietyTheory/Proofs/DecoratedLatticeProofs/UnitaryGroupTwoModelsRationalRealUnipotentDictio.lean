@@ -2,7 +2,8 @@ module
 
 public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.UnimodInst
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicTransportMeasureFirst
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StrongApproximationUnitaryUnipotentRadicalStatement
+import Formalism.SharpRestriction.CuspSpanNormBounds.GlobAut
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StrongApproximationUnitaryUnipotentRadical
 import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements.AdelicIsomorphismStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -187,7 +188,7 @@ theorem bridge_dict
     unfold NI at hx
     have :=
       (GlobalTheory.CuspCompare.mem_closure_iff_of_equiv T
-        (GlobalTheory.T.strong_approximation_unitaryUnipotentRadical _ _ hW).1
+        (_root_.GlobalTheory.UnipApprox.strong_approximation _ _ hW).1
         (fun g => ?_)
         _).1 hx
     · exact ((Formalism.IndefR.Eqv.UI.brg fr).symm_apply_apply x) ▸ this

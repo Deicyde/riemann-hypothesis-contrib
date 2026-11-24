@@ -49,7 +49,7 @@ open CategoryTheory NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.Com
 theorem transport : Transport := by
   intro E _ _ _ H X t z g Λ _ _ R R' h A₀ x v hf hP hF
   obtain ⟨A, _, φ, u, χ, hpb, hAH, hact, hinj, hmem, hvec⟩ := hF
-  have hs := SheetDecomposition.Riem.span_top R
+  have hs := _root_.LevelTowerAlt.span_top R
   have hi :=
     PeriodIso.isometry_of_periods R R' hs (LinearEquiv.refl _ _) h (fun a b => by rw [hf]; rfl) hP
   have hc := PeriodIso.commutes_of_periods R R' hs (LinearEquiv.refl _ _) h hP
@@ -64,7 +64,7 @@ theorem transport : Transport := by
     hpb,
     h3,
     fun a p => ?_,
-    SheetDecomposition.Riem.inj R,
+    _root_.LevelTowerAlt.precomp_injective R,
     fun p => ?_,
     fun i => ?_
   ⟩

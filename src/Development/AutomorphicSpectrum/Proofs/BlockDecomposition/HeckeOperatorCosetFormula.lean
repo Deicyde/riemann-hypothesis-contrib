@@ -1,7 +1,9 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.LocalBaseChange.TwistedIndependenceLemma.TwistedIndependence
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactFixedVectorProjectionStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactFixedVectorProjection
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -67,7 +69,7 @@ theorem heckeG_eq_average
                       ((U v : fixed π J) : V) = ((r : ℂ)⁻¹) • ∑ i, π (x i * g) (v : V) := by
   intro G _ _ _ J _ hJc V _ _ π hπ g U hU r x hr hxJ hx v
   obtain ⟨E, _hE1, hE2, _hE3, hE4, hE5⟩ :=
-    GlobalTheory.T.compact_fixed_vector_projection G J hJc V π hπ
+    _root_.GlobalTheory.CompanionTheory.CompactAvg.exists_average G J hJc V π hπ
   have hcomp : ∀ (a b : G) (w : V), π a (π b w) = π (a * b) w := by
     intro a b w
     rw [map_mul]

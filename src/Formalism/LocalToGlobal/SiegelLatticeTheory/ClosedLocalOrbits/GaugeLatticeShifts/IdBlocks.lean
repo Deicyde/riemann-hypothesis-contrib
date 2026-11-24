@@ -833,7 +833,7 @@ theorem rk1_smul_right
     (v : V) (c : ℂ) (w : V')
     : rk1 v (c • w) = starRingEnd ℂ c • rk1 v w := by
   ext ξ
-  simp [rankOneInnerOperator_apply, inner_smul_left, smul_smul, mul_comm]
+  simp [rankOneInnerOperator_apply, smul_smul, mul_comm]
 
 theorem oot_eq
     {u : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}

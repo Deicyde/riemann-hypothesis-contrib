@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.hypercohomology_longExact_first_of_injective
     : ∀ (R : Type) [CommRing R] (I : Cx R),
       (∀ n, Injective (I.X n))

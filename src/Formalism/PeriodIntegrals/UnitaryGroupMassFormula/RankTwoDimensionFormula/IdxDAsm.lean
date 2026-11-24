@@ -122,12 +122,7 @@ theorem one_sub_int
 theorem fmat_inv_fix (x : X.B.I.Gf) (w : VA X.B.I) (h : X.B.I.fmat x *ᵥ w = w)
     : X.B.I.fmat x⁻¹ *ᵥ w = w := by
   have h1 : X.B.I.fmat x⁻¹ * X.B.I.fmat x = 1 := by
-    first
-    | simp [Formalism.MainNotions.S.AutInst.fmat]
-    | (
-        simp only [Formalism.MainNotions.S.AutInst.fmat]
-        rw [← Units.val_mul, ← Subgroup.coe_mul, inv_mul_cancel, Subgroup.coe_one, Units.val_one]
-      )
+    first | simp [Formalism.MainNotions.S.AutInst.fmat]
   calc
     X.B.I.fmat x⁻¹ *ᵥ w
       = X.B.I.fmat x⁻¹ *ᵥ (X.B.I.fmat x *ᵥ w) := by rw [h]

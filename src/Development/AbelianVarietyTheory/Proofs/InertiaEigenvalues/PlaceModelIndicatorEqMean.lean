@@ -53,9 +53,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
   GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.DivPtFourier
 
 open scoped Classical

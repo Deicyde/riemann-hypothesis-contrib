@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_cubical_bundle_of_symmetric_semiAbelian
             IsMonHom gen.hom
               → ∀ (L : RigLB G) (c : CubicalStr G L),
                 L.IsSymmetric → ∃ P : CP G, P.L = L ∧ HEq P.c c := by
-  first
-  | exact @GlobalTheory.UU.exists_cp_of_isSymmetric
-  | exact GlobalTheory.UU.exists_cp_of_isSymmetric
-  | (intros; apply GlobalTheory.UU.exists_cp_of_isSymmetric <;> assumption)
+  first | exact @GlobalTheory.UU.exists_cp_of_isSymmetric

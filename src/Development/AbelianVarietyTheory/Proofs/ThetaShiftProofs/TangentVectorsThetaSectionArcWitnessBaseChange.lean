@@ -126,7 +126,7 @@ theorem genRelR_baseChange
     by_cases hz : r z ∈ h ⁻¹ᵁ V
     · have hz' : (r ≫ h) z ∈ V := hz
       simp only [gm, dif_pos hz, dif_pos hz']
-      all_goals first | rfl | (ext; simp [pullU, Scheme.comp_app])
+      all_goals first | rfl
     · have hz' : (r ≫ h) z ∉ V := hz
       simp only [gm, dif_neg hz, dif_neg hz', MonoidHom.one_apply]
 
@@ -142,7 +142,7 @@ theorem genRelR_baseChange
     · exact (gm_res r z _ hz (pullU h _ (t.s j))).trans (gm_pullU_eq_gm_comp h r z _ _)
     · have hz' : (r ≫ h) z ∉ LB.wchart L φ j := fun H =>
         hz (Set.mem_iInter.2 fun k => Set.mem_iInter.1 H k)
-      simp only [gm, dif_neg hz, dif_neg hz', MonoidHom.one_apply]
+      simp only [gm, dif_neg hz, dif_neg hz']
       rfl
 
   have P :=

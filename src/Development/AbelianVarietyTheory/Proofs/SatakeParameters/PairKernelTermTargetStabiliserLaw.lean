@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.FormsA
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ApplyAtOriginMinorProductLinear
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ApplyAt0PolDEquivariant
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ThetaDistributionUnfolded
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TrueWeightConsecutiveStepsPartitionStatement
+public import Formalism.LocalToGlobal.KernelLattices.FirstKernelLawReading
+public import Formalism.LocalToGlobal.HermitianForms.TiedTwGen
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TrueWeightConsecutiveStepsPartition
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -126,8 +128,7 @@ theorem lawAt_Kmap
                   IsVal (O.frm i) (lamTG M i) (RingHom.id ℂ) f
                     → LawAt O (i + 1) g (C.Kmap i c c' f) := by
   intro D u C A Pm M O i hi h c c' hd g ⟨hdet, k, hk, hg⟩ f ⟨P, hP, hf⟩ y y' hy
-  obtain ⟨n, hw, hn, -, -⟩ :=
-    GlobalTheory.T.trueWeight_consecutive_steps_partition D u C A Pm M i hi
+  obtain ⟨n, hw, hn, -, -⟩ := _root_.GlobalTheory.KerWtStep.trueWt_step D u C A Pm M i hi
   have hs
       : C.sharp i f
         = frPoly O i (MvPolynomial.map (RingHom.id ℂ) P * ∏ τ, frDet ℂ (D.R.N i) τ ^ n τ) := by

@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   GlobalTheory.Mem.ColAd Matrix
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.isPtOf_mul_J0_decoration
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
         (hc : CMData F E) (n : ℕ) [NeZero n] (ST SG Q : Finset (HeightOneSpectrum (𝓞 E)))

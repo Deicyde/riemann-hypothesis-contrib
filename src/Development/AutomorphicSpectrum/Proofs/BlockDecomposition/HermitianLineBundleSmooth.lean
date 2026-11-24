@@ -53,8 +53,9 @@ set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.MPSmooth
 
-theorem smooth_of_isHermRep : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (M : HermLB (mpStr ℤ m n)) (A : Geo.HermLine (Bk n)),
-    IsHermRep M A → Geo.IsSmoothHerm A :=
+theorem smooth_of_isHermRep
+    : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (M : HermLB (mpStr ℤ m n)) (A : Geo.HermLine (Bk n)),
+      IsHermRep M A → Geo.IsSmoothHerm A :=
   GlobalTheory.CompanionTheory.MPDict.SmoothRep.isSmoothHerm_of_isHermRep
 
 end GlobalTheory.CompanionTheory.MPSmooth

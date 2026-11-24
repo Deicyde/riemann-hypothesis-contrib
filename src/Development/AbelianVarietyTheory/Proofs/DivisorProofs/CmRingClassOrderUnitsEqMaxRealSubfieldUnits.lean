@@ -61,19 +61,23 @@ open NumberField IsDedekindDomain GlobalTheory.CMVal
 
 namespace GlobalTheory.CMVal.OrderUnits
 
-theorem prime_not_mem_sq {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E)
-    (w : HeightOneSpectrum (𝓞 E)) (hv : (p : 𝓞 E) ∈ w.asIdeal) : (p : 𝓞 E) ∉ w.asIdeal ^ 2 := by
+theorem prime_not_mem_sq
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E)
+    (w : HeightOneSpectrum (𝓞 E)) (hv : (p : 𝓞 E) ∈ w.asIdeal)
+    : (p : 𝓞 E) ∉ w.asIdeal ^ 2 := by
   apply GlobalTheory.LamTie.ExpCond.not_mem_sq_of_not_dvd_discr <;> assumption
 
-theorem pow_first_order {R : Type} [CommRing R] (t : R) (i : ℕ) : ∃ r, (1 + t) ^ i = 1 + i * t + t ^ 2 * r := by
+theorem pow_first_order {R : Type} [CommRing R] (t : R) (i : ℕ)
+    : ∃ r, (1 + t) ^ i = 1 + i * t + t ^ 2 * r := by
   induction i with
   | zero => exact ⟨0, by simp⟩
   | succ i ih =>
     obtain ⟨r, hr⟩ := ih
     exact ⟨r + i + t * r, by rw [pow_succ, hr]; push_cast; ring⟩
 
-theorem geom_first_order {R : Type} [CommRing R] (t : R) (n : ℕ) :
-    ∃ r, ∑ i ∈ Finset.range n, (1 + t) ^ i = n + (n.choose 2 : ℕ) * t + t ^ 2 * r := by
+theorem geom_first_order {R : Type} [CommRing R] (t : R) (n : ℕ)
+    : ∃ r, ∑ i ∈ Finset.range n, (1 + t) ^ i = n + (n.choose 2 : ℕ) * t + t ^ 2 * r := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -81,10 +85,15 @@ theorem geom_first_order {R : Type} [CommRing R] (t : R) (n : ℕ) :
     obtain ⟨s, hs⟩ := pow_first_order t n
     refine ⟨r + s, ?_⟩
     rw [Finset.sum_range_succ, hr, hs, Nat.choose_succ_succ' n 1, Nat.choose_one_right]
-    push_cast; ring
+    push_cast
+    ring
 
-theorem root_of_unity_eq_one {R : Type} [CommRing R] [IsDomain R] {P : Ideal R} (hP : P ≠ ⊤) {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2)
-    (hlP : (l : R) ∈ P) (hlP2 : (l : R) ∉ P ^ 2) {ζ : R} (hζ : IsOfFinOrder ζ) (h1 : ζ - 1 ∈ P) : ζ = 1 := by
+theorem root_of_unity_eq_one
+    {R : Type} [CommRing R] [IsDomain R]
+    {P : Ideal R} (hP : P ≠ ⊤)
+    {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hlP : (l : R) ∈ P) (hlP2 : (l : R) ∉ P ^ 2)
+    {ζ : R} (hζ : IsOfFinOrder ζ) (h1 : ζ - 1 ∈ P)
+    : ζ = 1 := by
   by_contra hne
   have hn : orderOf ζ ≠ 1 := fun h => hne (orderOf_eq_one_iff.1 h)
   obtain ⟨p, hp, m, hm⟩ := Nat.exists_prime_and_dvd hn
@@ -94,7 +103,8 @@ theorem root_of_unity_eq_one {R : Type} [CommRing R] [IsDomain R] {P : Ideal R} 
   have hηp : (ζ ^ m) ^ p = 1 := by rw [← pow_mul, mul_comm, ← hm, pow_orderOf_eq_one]
   have ht : ζ ^ m - 1 ∈ P := by
     obtain ⟨s, hs⟩ := sub_one_dvd_pow_sub_one ζ m
-    rw [hs]; exact P.mul_mem_right _ h1
+    rw [hs]
+    exact P.mul_mem_right _ h1
   have hsum : ∑ i ∈ Finset.range p, (ζ ^ m) ^ i = 0 := by
     have := mul_geom_sum (ζ ^ m) p
     rw [hηp, sub_self] at this
@@ -105,12 +115,14 @@ theorem root_of_unity_eq_one {R : Type} [CommRing R] [IsDomain R] {P : Ideal R} 
   have hpe : (p : R) = -((p.choose 2 : ℕ) * t) - t ^ 2 * r := by linear_combination -hr
   have hpP : (p : R) ∈ P := by
     rw [hpe]
-    exact sub_mem (neg_mem (P.mul_mem_left _ ht)) (P.mul_mem_right _ (P.pow_mem_of_mem ht 2 two_pos))
+    exact sub_mem (neg_mem (P.mul_mem_left _ ht))
+      (P.mul_mem_right _ (P.pow_mem_of_mem ht 2 two_pos))
   have hpl : p = l := by
     by_contra h
     have hc : IsCoprime (p : R) (l : R) := Nat.Coprime.cast ((Nat.coprime_primes hp hl).2 h)
     obtain ⟨a, b, hab⟩ := hc
-    exact hP ((Ideal.eq_top_iff_one P).2 (hab ▸ add_mem (P.mul_mem_left _ hpP) (P.mul_mem_left _ hlP)))
+    exact hP ((Ideal.eq_top_iff_one P).2
+      (hab ▸ add_mem (P.mul_mem_left _ hpP) (P.mul_mem_left _ hlP)))
   subst hpl
   obtain ⟨k, hk⟩ := hp.dvd_choose_self two_ne_zero (lt_of_le_of_ne hp.two_le (Ne.symm hl2))
   apply hlP2
@@ -120,12 +132,16 @@ theorem root_of_unity_eq_one {R : Type} [CommRing R] [IsDomain R] {P : Ideal R} 
   push_cast
   exact Ideal.mul_mem_mul (P.mul_mem_right _ hlP) ht
 
-theorem orderC_units (E : Type) [Field E] [NumberField E] [IsCMField E] (𝔣 c : Ideal (OF E)) (h𝔣 : IsBaseCond 𝔣) (hc : 𝔣 ∣ c)
-    (x : E) (hx0 : x ≠ 0) (hx : x ∈ orderC c) (hx' : x⁻¹ ∈ orderC c) : ∃ u : (OF E)ˣ, x = algebraMap (OF E) E u := by
+theorem orderC_units
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (𝔣 c : Ideal (OF E)) (h𝔣 : IsBaseCond 𝔣) (hc : 𝔣 ∣ c)
+    (x : E) (hx0 : x ≠ 0) (hx : x ∈ orderC c) (hx' : x⁻¹ ∈ orderC c)
+    : ∃ u : (OF E)ˣ, x = algebraMap (OF E) E u := by
   obtain ⟨h0, h1, h⟩ := h𝔣
   obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal 𝔣 h1
   have hM0 : M ≠ ⊥ := fun h => h0 (le_bot_iff.1 (h ▸ hle))
-  obtain ⟨⟨P, -, -, hP, -⟩, -, l, hl, hl2, hlv, hd, -⟩ := h ⟨M, hM.isPrime, hM0⟩ (Ideal.dvd_iff_le.2 hle)
+  obtain ⟨⟨P, -, -, hP, -⟩, -, l, hl, hl2, hlv, hd, -⟩ :=
+    h ⟨M, hM.isPrime, hM0⟩ (Ideal.dvd_iff_le.2 hle)
   have hP' : P.asIdeal.comap (algebraMap (OF E) (𝓞 E)) = M := hP
   have hlP : (l : 𝓞 E) ∈ P.asIdeal := by
     have : (l : OF E) ∈ P.asIdeal.comap (algebraMap (OF E) (𝓞 E)) := by rw [hP']; exact hlv
@@ -134,37 +150,46 @@ theorem orderC_units (E : Type) [Field E] [NumberField E] [IsCMField E] (𝔣 c 
     Ideal.map_le_iff_le_comap.2 (hP' ▸ (Ideal.le_of_dvd hc).trans hle)
   obtain ⟨a, b, hb, hab⟩ := mem_orderC.1 hx
   obtain ⟨a', b', -, hab'⟩ := mem_orderC.1 hx'
-  have e1 : x = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a + b) := by rw [hab, map_add (f := _)]; rfl
-  have e2 : x⁻¹ = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a' + b') := by rw [hab', map_add (f := _)]; rfl
+  have e1 : x = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a + b) := by
+    rw [hab, map_add (f := _)]; rfl
+  have e2 : x⁻¹ = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a' + b') := by
+    rw [hab', map_add (f := _)]; rfl
   have hu : (algebraMap (OF E) (𝓞 E) a + b) * (algebraMap (OF E) (𝓞 E) a' + b') = 1 := by
     apply FaithfulSMul.algebraMap_injective (𝓞 E) E
     rw [map_mul, ← e1, ← e2, mul_inv_cancel₀ hx0, map_one]
   let u : (𝓞 E)ˣ := Units.mkOfMulEqOne _ _ hu
   have huv : (u : 𝓞 E) = algebraMap (OF E) (𝓞 E) a + b := rfl
   have hbc : IsCMField.ringOfIntegersComplexConj E b ∈ Ideal.map (algebraMap (OF E) (𝓞 E)) c := by
-    have : Ideal.map (algebraMap (OF E) (𝓞 E)) c ≤
-        (Ideal.map (algebraMap (OF E) (𝓞 E)) c).comap (IsCMField.ringOfIntegersComplexConj E) := by
+    have : Ideal.map (algebraMap (OF E) (𝓞 E)) c
+        ≤ (Ideal.map (algebraMap (OF E) (𝓞 E)) c).comap
+          (IsCMField.ringOfIntegersComplexConj E) := by
       rw [Ideal.map_le_iff_le_comap]
       intro y hy
       rw [Ideal.mem_comap, Ideal.mem_comap, AlgEquiv.commutes]
       exact Ideal.mem_map_of_mem _ hy
     exact this hb
-  have hcu : ((IsCMField.unitsComplexConj E u : (𝓞 E)ˣ) : 𝓞 E) =
-      algebraMap (OF E) (𝓞 E) a + IsCMField.ringOfIntegersComplexConj E b := by
-    have : ((IsCMField.unitsComplexConj E u : (𝓞 E)ˣ) : 𝓞 E) = IsCMField.ringOfIntegersComplexConj E u := rfl
+  have hcu
+      : ((IsCMField.unitsComplexConj E u : (𝓞 E)ˣ) : 𝓞 E)
+        = algebraMap (OF E) (𝓞 E) a + IsCMField.ringOfIntegersComplexConj E b := by
+    have : ((IsCMField.unitsComplexConj E u : (𝓞 E)ˣ) : 𝓞 E)
+        = IsCMField.ringOfIntegersComplexConj E u :=
+      rfl
     rw [this, huv, map_add (f := _), AlgEquiv.commutes]
   let ζ : (𝓞 E)ˣ := u * (IsCMField.unitsComplexConj E u)⁻¹
   have hfin : IsOfFinOrder ζ := (IsCMField.unitsMulComplexConjInv E u).2
   have hfin' : IsOfFinOrder (ζ : 𝓞 E) := (Units.coeHom (𝓞 E)).isOfFinOrder hfin
   have hζ : (ζ : 𝓞 E) - 1 ∈ P.asIdeal := by
-    have : (ζ : 𝓞 E) - 1 = (b - IsCMField.ringOfIntegersComplexConj E b) * ↑(IsCMField.unitsComplexConj E u)⁻¹ := by
+    have : (ζ : 𝓞 E) - 1
+        = (b - IsCMField.ringOfIntegersComplexConj E b) * ↑(IsCMField.unitsComplexConj E u)⁻¹ := by
       have h3 := (IsCMField.unitsComplexConj E u).mul_inv
       rw [hcu] at h3
       simp only [ζ, Units.val_mul, huv]
       linear_combination h3
     rw [this]
     exact P.asIdeal.mul_mem_right _ (hcP (sub_mem hb hbc))
-  have hone : ζ = 1 := Units.ext (root_of_unity_eq_one P.isPrime.ne_top hl hl2 hlP (prime_not_mem_sq hl hd P hlP) hfin' hζ)
+  have hone : ζ = 1 :=
+    Units.ext (root_of_unity_eq_one P.isPrime.ne_top hl hl2 hlP (prime_not_mem_sq hl hd P hlP) hfin'
+      hζ)
   have hreal := (IsCMField.unitsComplexConj_eq_self_iff E u).1 (mul_inv_eq_one.1 hone).symm
   obtain ⟨v, hv⟩ := (IsCMField.mem_realUnits_iff E u).1 hreal
   refine ⟨v, ?_⟩

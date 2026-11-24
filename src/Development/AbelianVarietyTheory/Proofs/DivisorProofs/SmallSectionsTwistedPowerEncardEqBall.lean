@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CharZeroFunctionField
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentedBundleSectionsRationalFunctionsDictStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentsHermitianLineBundlePowStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentedBundleSectionsRationalFunctionsDict
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentsHermitianLineBundlePow
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -87,8 +87,7 @@ theorem encard_eq_Bl
     (R : ℝ)
     (hR : 0 ≤ R) (hS : ∀ u, u ∈ S ↔ ∀ σ (y : CxPts p σ), (N.φ σ).nsq (secVal p σ u) y ≤ R ^ 2)
     : S.encard = (P.Bl a b R).encard := by
-  obtain ⟨e, he, hr, hn, -⟩ :=
-    GlobalTheory.T.representedBundle_sections_rationalFunctions_dict k X p P a b N h
+  obtain ⟨e, he, hr, hn, -⟩ := _root_.GlobalTheory.VolBr.RepDict.rep_dict k X p P a b N h
   have hi : e '' S = P.Bl a b R := by
     ext f
     constructor
@@ -119,17 +118,17 @@ theorem main
               ∧ (M.shift (fun _ => t) fun _ => rfl).smallSec.encard
                 = (P.Bl a b (Real.exp t)).encard := by
   intro k _ X _ p P a b M hM t m
-  have hm := GlobalTheory.T.represents_hermitianLineBundle_pow k X p P a b M m hM
+  have hm := _root_.GlobalTheory.VolBr.Pair.rep_pow k X p P a b M m hM
   refine ⟨?_, ?_, ?_⟩
   · refine encard_eq_Bl P hm _ _ (Real.exp_pos _).le fun u => ?_
-    simp only [HermLB.smallSec, Set.mem_setOf_eq]
+    simp only [HermLB.smallSec]
     refine forall_congr' fun σ => forall_congr' fun y => ?_
     have e := nsq_shift_pow M (fun _ => t) (fun _ => rfl) m σ (secVal p σ u) y
     exact (iff_of_eq (congrArg (· ≤ (1 : ℝ)) e)).trans (mul_exp_le_one_iff _ _ _ (by ring))
   · refine encard_eq_Bl P hm _ _ zero_le_one fun u => ?_
     simp only [HermLB.smallSec, Set.mem_setOf_eq, one_pow]
   · refine encard_eq_Bl P hM _ _ (Real.exp_pos _).le fun u => ?_
-    simp only [HermLB.smallSec, Set.mem_setOf_eq]
+    simp only [HermLB.smallSec]
     refine forall_congr' fun σ => forall_congr' fun y => ?_
     have e := HermLB.nsq_shift M (fun _ => t) (fun _ => rfl) (σ := σ) (secVal p σ u) y
     exact (iff_of_eq (congrArg (· ≤ (1 : ℝ)) e)).trans (mul_exp_le_one_iff _ _ _ (by ring))

@@ -77,7 +77,7 @@ variable {u u' F0 what₂}
 
 theorem normRepExists_ctx (h : CtxP u u' F0 what₂) : PairVal.NormRepExists D u u' F0 what₂ :=
   normRepExists_of (NormRepX.norm_representative_holds D u u' h.2.2)
-    (Formalism.L2.SG.Closed.TermFun_holds D u u') h.2.1
+    (_root_.term_function_const D u u') h.2.1
 
 theorem frCount_ctx
     (hG : FrGlobP Zd u u' F0 what₂) (hI : IntGenP Zd) (hτ : TauOneReduction Zd u u' F0 what₂)

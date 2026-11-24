@@ -163,11 +163,11 @@ theorem inflates_units
   have h1
       : Matrix.GeneralLinearGroup.det (GlobalTheory.GLp.inc g 1 k)
         = Units.map (algebraMap ℤ_[g] ℚ_[g]).toMonoidHom (Matrix.GeneralLinearGroup.det k) := by
-    ext; simp [GlobalTheory.GLp.inc, RingHom.map_det]
+    ext; simp [GlobalTheory.GLp.inc]
   have h2
       : Matrix.GeneralLinearGroup.det (GlobalTheory.GLp.red g 1 k)
         = Units.map (PadicInt.toZMod (p := g)).toMonoidHom (Matrix.GeneralLinearGroup.det k) := by
-    ext; simp [GlobalTheory.GLp.red, RingHom.map_det]
+    ext; simp [GlobalTheory.GLp.red]
   have e2
       : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map i.toRingHom
           (GlobalTheory.GLp.inc g 1 k))

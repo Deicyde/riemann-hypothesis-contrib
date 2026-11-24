@@ -90,7 +90,7 @@ theorem exists_GLw_lat_eq
     omega
   let v' : Fin m → B.A := v ∘ finCongr hnm.symm
   let bE' := bE.reindex (finCongr hnm)
-  have hv' : ∀ j, bE' j = v' j := by intro j; simp [bE', v', bE, Module.Basis.mk_apply]
+  have hv' : ∀ j, bE' j = v' j := by intro j; simp [bE', v', bE]
   let M : Matrix (Fin m) (Fin m) K.E := b.toMatrix bE'
   have hM : IsUnit M := by
     haveI := b.invertibleToMatrix bE'

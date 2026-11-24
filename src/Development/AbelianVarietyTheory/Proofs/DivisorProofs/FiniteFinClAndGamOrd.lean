@@ -51,12 +51,17 @@ import Mathlib.Tactic.ReduceModChar
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField Matrix MeasureTheory
 open scoped TensorProduct nonZeroDivisors ComplexOrder
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StepData GlobalTheory.StdFrames Formalism.L2.Host Formalism.L2.DIV ValuativeRel
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StepData GlobalTheory.StdFrames Formalism.L2.Host Formalism.L2.DIV ValuativeRel
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw GlobalTheory.FunObj.borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw GlobalTheory.FunObj.borelSpaceKw
 
 namespace GlobalTheory.FunObj.ClassFin
 
@@ -67,8 +72,9 @@ def gfcToGf (V : HSp D) : GfC V →* Bridge.Gf V := (finHom V).rangeRestrict.com
 theorem gfcToGf_surjective (V : HSp D) : Function.Surjective (gfcToGf V) := by
   apply GlobalTheory.FunObj.gfcToGf_surjective <;> assumption
 
-theorem bc_swapAE_injective (n : ℕ) :
-    Function.Injective (Formalism.UG.bc (Lev.swapAE D) : GL (Fin n) (Af D.host.F ⊗[D.host.F] D.host.E) →* _) := by
+theorem bc_swapAE_injective (n : ℕ)
+    : Function.Injective
+      (Formalism.UG.bc (Lev.swapAE D) : GL (Fin n) (Af D.host.F ⊗[D.host.F] D.host.E) →* _) := by
   apply GlobalTheory.FunObj.bc_swapAE_injective <;> assumption
 
 theorem finG_injective (V : HSp D) : Function.Injective (finG V) := by
@@ -77,27 +83,33 @@ theorem finG_injective (V : HSp D) : Function.Injective (finG V) := by
 def finLev (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) : Subgroup (Bridge.Gf V) :=
   (K.comap (Formalism.UG.bc (Lev.swapAE D))).comap (Bridge.Gf V).subtype
 
-theorem mem_finLev_iff (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (g : GfC V) :
-    gfcToGf V g ∈ finLev V K ↔ g ∈ K.comap (finG V) := by
+theorem mem_finLev_iff (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (g : GfC V)
+    : gfcToGf V g ∈ finLev V K ↔ g ∈ K.comap (finG V) := by
   apply GlobalTheory.FunObj.mem_finLev_iff <;> assumption
 
-theorem isOpenLev_finLev (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (hK : IsCO V K) :
-    GlobalTheory.IndefiniteRowSideFullHecke.SublevelSplitting.IsOpenLev V (finLev V K) := by
+theorem isOpenLev_finLev (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (hK : IsCO V K)
+    : GlobalTheory.IndefiniteRowSideFullHecke.SublevelSplitting.IsOpenLev V (finLev V K) := by
   apply GlobalTheory.FunObj.isOpenLev_finLev <;> assumption
 
-theorem finite_finCl (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D)))
-    (hV : ∀ τ, (gramAt D V τ).PosDef) (hK : IsCO V K) : Finite (FinCl V K) := by
+theorem finite_finCl
+    (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D)))
+    (hV : ∀ τ, (gramAt D V τ).PosDef) (hK : IsCO V K)
+    : Finite (FinCl V K) := by
   apply GlobalTheory.FunObj.finite_finCl <;> assumption
 
 theorem continuous_finHom (V : HSp D) : Continuous (finHom V) := by
   apply GlobalTheory.FunObj.continuous_finHom <;> assumption
 
-theorem gamOrd_ne_zero (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D)))
-    (hV : ∀ τ, (gramAt D V τ).PosDef) (hK : IsCO V K) (x : GfC V) : gamOrd V K x ≠ 0 := by
+theorem gamOrd_ne_zero
+    (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D)))
+    (hV : ∀ τ, (gramAt D V τ).PosDef) (hK : IsCO V K) (x : GfC V)
+    : gamOrd V K x ≠ 0 := by
   apply GlobalTheory.FunObj.gamOrd_ne_zero <;> assumption
 
-theorem finite_finCl_and_gamOrd : ∀ {D : D7} (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))),
-    (∀ φ : D.host.E →+* ℂ, (V.gram.map φ).PosDef) → IsCO V K → Finite (FinCl V K) ∧ ∀ x, gamOrd V K x ≠ 0 := by
+theorem finite_finCl_and_gamOrd
+    : ∀ {D : D7} (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))),
+      (∀ φ : D.host.E →+* ℂ, (V.gram.map φ).PosDef) → IsCO V K
+        → Finite (FinCl V K) ∧ ∀ x, gamOrd V K x ≠ 0 := by
   apply GlobalTheory.FunObj.finite_finCl_and_gamOrd <;> assumption
 
 end GlobalTheory.FunObj.ClassFin

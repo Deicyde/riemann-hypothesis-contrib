@@ -1,9 +1,10 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Imports
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComparisonMatrixFrobeniusDiscStatement
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormBreuilKisinHomUniformizerFrobeniusLeStatement
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopBasisDiscRegularStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComparisonMatrixFrobeniusDisc
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormBreuilKisinHomUniformizerFrobeniusLe
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopBasisDiscRegular
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -94,15 +95,14 @@ theorem phi_eq_of_rel_pow
                 → BK.hf g bk.E ^ (ht.a + s.N) • (ht.A.map (BK.hf f) * x.map B.D.φ)
                   = BK.hf f bk.E ^ (ht.a + s.N) • (x * ht.A.map (BK.hf g)) := by
   intro l _ K bk d ρ τ s ht hper B f g ι hb k x ε hrel hx
-  obtain ⟨hinj, hE, -, -⟩ :=
-    GlobalTheory.T.toDisc_injective_and_nonZeroDivisors_of_topBasis l K bk B.A (BK.hf f) ι hb
+  obtain ⟨hinj, hE, -, -⟩ := _root_.GlobalTheory.BSP.topBasis_disc_regular l K bk B.A (BK.hf f) ι hb
   have hφ : ‖toDisc l (BK.hf f X) bk.ρ₀ (B.D.φ (BK.hf f X))‖ ≤ bk.ρ₀ :=
-    (GlobalTheory.T.norm_breuilKisinHom_uniformizer_frobenius_le l K bk B f f).2
+    (_root_.GlobalTheory.BSP.norm_hf_g_X_and_φ_le l K bk B f f).2
   obtain ⟨Φ, hΦ⟩
       : ∃ Φ : Disc l (BK.hf f X) bk.ρ₀ →+* Disc l (BK.hf f X) bk.ρ₀,
         IsDiscMap (l := _) (u := _) (ρ := _) B.D.φ Φ :=
     ⟨_, isDiscMap_map B.D.φ hφ⟩
   exact frobenius_height_matrix_relation _ hinj B.D.φ Φ hΦ.ext l k _ _ _ _ _ x ε hx
-    (GlobalTheory.T.comparisonMatrix_frobenius_disc l K bk d ρ τ s ht hper B f hE f g ε hrel Φ hΦ)
+    (_root_.GlobalTheory.BSP.Height.rel_frob l K bk d ρ τ s ht hper B f hE f g ε hrel Φ hΦ)
 
 end GlobalTheory.BSP.Height

@@ -71,11 +71,12 @@ def intAdeles : Subring (FiniteAdeleRing (𝓞 E) E) where
   zero_mem' v := zero_mem (v.adicCompletionIntegers E)
   neg_mem' ha v := neg_mem (ha v)
 
-theorem mem_intAdeles {a : FiniteAdeleRing (𝓞 E) E} :
-    a ∈ intAdeles E ↔ ∀ v, a v ∈ v.adicCompletionIntegers E := Iff.rfl
+theorem mem_intAdeles {a : FiniteAdeleRing (𝓞 E) E}
+    : a ∈ intAdeles E ↔ ∀ v, a v ∈ v.adicCompletionIntegers E :=
+  Iff.rfl
 
-theorem algebraMap_mem_iff (x : E) :
-    algebraMap E (FiniteAdeleRing (𝓞 E) E) x ∈ intAdeles E ↔ ∃ r : 𝓞 E, (r : E) = x := by
+theorem algebraMap_mem_iff (x : E)
+    : algebraMap E (FiniteAdeleRing (𝓞 E) E) x ∈ intAdeles E ↔ ∃ r : 𝓞 E, (r : E) = x := by
   rw [mem_intAdeles, ← GlobalTheory.AdLat.mem_adelicIdeal_one_iff_integral,
     GlobalTheory.Idele.algebraMap_mem_adelicIdeal (GlobalTheory.AdLat.one_ne_zero_fracIdeal E),
     FractionalIdeal.mem_one_iff]
@@ -86,18 +87,18 @@ theorem exists_nat_denom (x : E) : ∃ d : ℕ, 0 < d ∧ ∃ r : 𝓞 E, (r : E
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 (Ideal.absNorm_mem (Ideal.span {b}))
   refine ⟨Ideal.absNorm (Ideal.span {b}), Nat.pos_of_ne_zero ?_, c * a, ?_⟩
   · simpa [Ideal.absNorm_eq_zero_iff] using hb0
-  · have h1 : ((Ideal.absNorm (Ideal.span {b}) : ℕ) : E) =
-        algebraMap (𝓞 E) E c * algebraMap (𝓞 E) E b := by
+  · have h1
+        : ((Ideal.absNorm (Ideal.span {b}) : ℕ) : E)
+          = algebraMap (𝓞 E) E c * algebraMap (𝓞 E) E b := by
       rw [← map_mul, hc, map_natCast]
-    have h2 : algebraMap (𝓞 E) E b ≠ 0 := by
-      simpa using hb0
+    have h2 : algebraMap (𝓞 E) E b ≠ 0 := by simpa using hb0
     rw [h1]
     change algebraMap (𝓞 E) E (c * a) = _
     rw [map_mul]
     field_simp
 
-theorem exists_nat_mul_mem (a : FiniteAdeleRing (𝓞 E) E) :
-    ∃ d : ℕ, 0 < d ∧ (d : FiniteAdeleRing (𝓞 E) E) * a ∈ intAdeles E := by
+theorem exists_nat_mul_mem (a : FiniteAdeleRing (𝓞 E) E)
+    : ∃ d : ℕ, 0 < d ∧ (d : FiniteAdeleRing (𝓞 E) E) * a ∈ intAdeles E := by
   obtain ⟨x, b, hb, rfl⟩ := GlobalTheory.AdLat.exists_eq_algebraMap_add_nsmul E 1 one_pos a
   obtain ⟨d, hd, r, hr⟩ := exists_nat_denom E x
   refine ⟨d, hd, ?_⟩
@@ -106,8 +107,8 @@ theorem exists_nat_mul_mem (a : FiniteAdeleRing (𝓞 E) E) :
   rw [← map_natCast (algebraMap E (FiniteAdeleRing (𝓞 E) E)), ← map_mul, algebraMap_mem_iff]
   exact ⟨r, hr⟩
 
-theorem exists_nat_mul_mem_family {ι : Type} [Fintype ι] (a : ι → FiniteAdeleRing (𝓞 E) E) :
-    ∃ d : ℕ, 0 < d ∧ ∀ i, (d : FiniteAdeleRing (𝓞 E) E) * a i ∈ intAdeles E := by
+theorem exists_nat_mul_mem_family {ι : Type} [Fintype ι] (a : ι → FiniteAdeleRing (𝓞 E) E)
+    : ∃ d : ℕ, 0 < d ∧ ∀ i, (d : FiniteAdeleRing (𝓞 E) E) * a i ∈ intAdeles E := by
   classical
   choose d hd h using fun i => exists_nat_mul_mem E (a i)
   refine ⟨∏ i, d i, Finset.prod_pos fun i _ => hd i, fun i => ?_⟩
@@ -119,7 +120,8 @@ variable {E} {n : ℕ}
 def lat (β : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) : Submodule (𝓞 E) (Fin n → E) where
   carrier := {x | ∀ j, ∑ k, algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) * β k j ∈ intAdeles E}
   add_mem' {x y} hx hy j := by
-    simpa only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib] using add_mem (hx j) (hy j)
+    simpa only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib] using
+      add_mem (hx j) (hy j)
   zero_mem' j := by simp
   smul_mem' c x hx j := by
     have h : algebraMap E (FiniteAdeleRing (𝓞 E) E) (c : E) ∈ intAdeles E :=
@@ -130,8 +132,8 @@ def lat (β : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) : Submodule (
     rw [← mul_assoc, ← map_mul]
     rfl
 
-theorem span_lat (β : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) :
-    Submodule.span E (lat β : Set (Fin n → E)) = ⊤ := by
+theorem span_lat (β : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E))
+    : Submodule.span E (lat β : Set (Fin n → E)) = ⊤ := by
   classical
   obtain ⟨d, hd, h⟩ := exists_nat_mul_mem_family E (fun p : Fin n × Fin n => β p.1 p.2)
   rw [eq_top_iff, ← (Pi.basisFun E (Fin n)).span_eq, Submodule.span_le]
@@ -150,17 +152,21 @@ theorem fg_lat (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) : (lat β.1).FG :=
   classical
   obtain ⟨d, hd, h⟩ := exists_nat_mul_mem_family E (fun p : Fin n × Fin n => β⁻¹.1 p.1 p.2)
   have hd' : (d : E) ≠ 0 := Nat.cast_ne_zero.2 hd.ne'
-  have hle : lat β.1 ≤ Submodule.span (𝓞 E)
-      (Set.range fun i : Fin n => (Pi.single i (d : E)⁻¹ : Fin n → E)) := by
+  have hle
+      : lat β.1
+        ≤ Submodule.span (𝓞 E)
+          (Set.range fun i : Fin n => (Pi.single i (d : E)⁻¹ : Fin n → E)) := by
     intro x hx
     have h1 : ∀ j, ∃ r : 𝓞 E, (r : E) = d * x j := by
       intro j
       rw [← algebraMap_mem_iff]
-      have h2 : algebraMap E (FiniteAdeleRing (𝓞 E) E) (d * x j) =
-          ∑ l, (∑ k, algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) * β.1 k l) *
-            ((d : FiniteAdeleRing (𝓞 E) E) * β⁻¹.1 l j) := by
-        have h3 : ((fun k => algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k)) ᵥ* β.1) ᵥ* β⁻¹.1 =
-            fun k => algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) := by
+      have h2
+          : algebraMap E (FiniteAdeleRing (𝓞 E) E) (d * x j)
+            = ∑ l, (∑ k, algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) * β.1 k l) *
+                ((d : FiniteAdeleRing (𝓞 E) E) * β⁻¹.1 l j) := by
+        have h3
+            : ((fun k => algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k)) ᵥ* β.1) ᵥ* β⁻¹.1
+              = fun k => algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) := by
           rw [Matrix.vecMul_vecMul, Units.mul_inv, Matrix.vecMul_one]
         rw [map_mul, map_natCast, ← congrFun h3 j]
         simp only [Matrix.vecMul, dotProduct]
@@ -171,8 +177,8 @@ theorem fg_lat (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) : (lat β.1).FG :=
     choose r hr using h1
     have h4 : x = ∑ i, r i • (Pi.single i (d : E)⁻¹ : Fin n → E) := by
       ext j
-      rw [Finset.sum_apply, Finset.sum_eq_single j
-        (by intro k _ hk; simp [Pi.single_eq_of_ne hk.symm]) (by simp)]
+      rw [Finset.sum_apply,
+        Finset.sum_eq_single j (by intro k _ hk; simp [Pi.single_eq_of_ne hk.symm]) (by simp)]
       rw [Pi.smul_apply, Pi.single_eq_same]
       change x j = (r j : E) * (d : E)⁻¹
       rw [hr]
@@ -183,27 +189,31 @@ theorem fg_lat (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) : (lat β.1).FG :=
     (Set.finite_range fun i : Fin n => (Pi.single i (d : E)⁻¹ : Fin n → E))
   exact Submodule.FG.of_le_of_isNoetherian hle
 
-theorem isLattice_lat (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) :
-    Submodule.IsFullLattice E (lat β.1) := by
-  exact { toIsLattice := Submodule.IsLattice.of_fg E (fg_lat β)
-          span_eq_top := span_lat β.1 }
+theorem isLattice_lat (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E))
+    : Submodule.IsFullLattice E (lat β.1) := by
+  exact { toIsLattice := Submodule.IsLattice.of_fg E (fg_lat β), span_eq_top := span_lat β.1 }
 
-theorem inv_mul_mem (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (M : ℕ) (δ : GL (Fin n) E)
+theorem inv_mul_mem
+    (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (M : ℕ) (δ : GL (Fin n) E)
     (hδ : ∀ x ∈ lat β.1, ∃ y : Fin n → 𝓞 E, (M : E) • x = (fun i => (y i : E)) ᵥ* δ.1)
-    (i j : Fin n) :
-    (M : FiniteAdeleRing (𝓞 E) E) *
-      (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j ∈ intAdeles E := by
+    (i j : Fin n)
+    : (M : FiniteAdeleRing (𝓞 E) E)
+        * (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j
+      ∈ intAdeles E := by
   classical
   obtain ⟨d₁, hd₁, h₁⟩ := exists_nat_mul_mem_family E (fun p : Fin n × Fin n => β.1 p.1 p.2)
-  obtain ⟨d₂, hd₂, h₂⟩ := exists_nat_mul_mem_family E
-    (fun p : Fin n × Fin n => algebraMap E (FiniteAdeleRing (𝓞 E) E) (δ⁻¹.1 p.1 p.2))
+  obtain ⟨d₂, hd₂, h₂⟩ :=
+    exists_nat_mul_mem_family E
+      (fun p : Fin n × Fin n => algebraMap E (FiniteAdeleRing (𝓞 E) E) (δ⁻¹.1 p.1 p.2))
   choose x b hb hx using fun k => GlobalTheory.AdLat.exists_eq_algebraMap_add_nsmul E (d₁ * d₂)
     (Nat.mul_pos hd₁ hd₂) (β⁻¹.1 i k)
   have hxl : x ∈ lat β.1 := by
     intro l
-    have h3 : ∑ k, algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) * β.1 k l =
-        (β⁻¹.1 * β.1) i l - ∑ k, ((d₂ : FiniteAdeleRing (𝓞 E) E) * b k) *
-          ((d₁ : FiniteAdeleRing (𝓞 E) E) * β.1 k l) := by
+    have h3
+        : ∑ k, algebraMap E (FiniteAdeleRing (𝓞 E) E) (x k) * β.1 k l
+          = (β⁻¹.1 * β.1) i l
+            - ∑ k, ((d₂ : FiniteAdeleRing (𝓞 E) E) * b k) *
+              ((d₁ : FiniteAdeleRing (𝓞 E) E) * β.1 k l) := by
       rw [Matrix.mul_apply, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hx k, nsmul_eq_mul, Nat.cast_mul]
@@ -220,22 +230,36 @@ theorem inv_mul_mem (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (M : ℕ) (δ
       rw [hy, Matrix.vecMul_vecMul, Units.mul_inv, Matrix.vecMul_one]
     rw [← congrFun h5 j]
     rfl
-  have h6 : (M : FiniteAdeleRing (𝓞 E) E) *
-      (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j =
-      algebraMap E (FiniteAdeleRing (𝓞 E) E) (y j : E) +
-        ∑ k, ((M : FiniteAdeleRing (𝓞 E) E) * ((d₁ : FiniteAdeleRing (𝓞 E) E) * b k)) *
-          ((d₂ : FiniteAdeleRing (𝓞 E) E) *
-            algebraMap E (FiniteAdeleRing (𝓞 E) E) (δ⁻¹.1 k j)) := by
-
+  have h6
+      : (M : FiniteAdeleRing (𝓞 E) E)
+          * (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j
+        = algebraMap E (FiniteAdeleRing (𝓞 E) E) (y j : E)
+          + ∑ k, ((M : FiniteAdeleRing (𝓞 E) E) * ((d₁ : FiniteAdeleRing (𝓞 E) E) * b k)) *
+              ((d₂ : FiniteAdeleRing (𝓞 E) E) *
+                algebraMap E (FiniteAdeleRing (𝓞 E) E) (δ⁻¹.1 k j)) := by
     rw [h4, map_sum, Matrix.mul_apply, Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [hx k, nsmul_eq_mul, Nat.cast_mul, Matrix.map_apply, map_mul, map_mul, map_natCast]
     ring
   rw [h6]
-  exact add_mem ((algebraMap_mem_iff E _).2 ⟨y j, rfl⟩) (sum_mem fun k _ =>
-    mul_mem (mul_mem (natCast_mem _ _) (mul_mem (natCast_mem _ _) (hb k))) (h₂ (k, j)))
+  exact add_mem ((algebraMap_mem_iff E _).2 ⟨y j, rfl⟩)
+    (sum_mem fun k _ =>
+      mul_mem (mul_mem (natCast_mem _ _) (mul_mem (natCast_mem _ _) (hb k))) (h₂ (k, j)))
 
-theorem exists_lattice_integral : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)), ∃ Λ : Submodule (𝓞 E) (Fin n → E), Submodule.IsFullLattice E Λ ∧ ∀ (M : ℕ) (δ : GL (Fin n) E), (∀ i, δ.1 i ∈ Λ) → (∀ x ∈ Λ, ∃ y : Fin n → 𝓞 E, (M : E) • x = (fun i => (y i : E)) ᵥ* δ.1) → ∀ (i j : Fin n) (v : HeightOneSpectrum (𝓞 E)), (δ.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E)) * β.1) i j v ∈ v.adicCompletionIntegers E ∧ ((M : FiniteAdeleRing (𝓞 E) E) * (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j) v ∈ v.adicCompletionIntegers E := by
+theorem exists_lattice_integral
+    : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (β : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)),
+      ∃ Λ : Submodule (𝓞 E) (Fin n → E),
+        Submodule.IsFullLattice E Λ
+          ∧ ∀ (M : ℕ) (δ : GL (Fin n) E),
+            (∀ i, δ.1 i ∈ Λ)
+              → (∀ x ∈ Λ, ∃ y : Fin n → 𝓞 E, (M : E) • x = (fun i => (y i : E)) ᵥ* δ.1)
+              → ∀ (i j : Fin n) (v : HeightOneSpectrum (𝓞 E)),
+                (δ.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E)) * β.1) i j v
+                    ∈ v.adicCompletionIntegers E
+                  ∧ ((M : FiniteAdeleRing (𝓞 E) E)
+                        * (β⁻¹.1 * δ⁻¹.1.map (algebraMap E (FiniteAdeleRing (𝓞 E) E))) i j)
+                      v
+                    ∈ v.adicCompletionIntegers E := by
   intro E _ _ n β
   refine ⟨lat β.1, isLattice_lat β, fun M δ h1 h2 i j v => ⟨?_, inv_mul_mem β M δ h2 i j v⟩⟩
   rw [Matrix.mul_apply]

@@ -64,10 +64,6 @@ namespace GlobalTheory.CompanionTheory.BasePsi.Den
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem valued_algebraMap (v : HeightOneSpectrum (𝓞 F)) (t : F)
-    : Valued.v (algebraMap F (Fv F v) t) = v.valuation F t :=
-  HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v t
-
 theorem exists_valued_bound (v : HeightOneSpectrum (𝓞 F)) {C : Set (Fv F v)} (hC : IsCompact C)
     : ∃ γ : WithZero (Multiplicative ℤ), γ ≠ 0 ∧ ∀ x ∈ C, Valued.v x ≤ γ := by
   have hO : IsOpen (v.adicCompletionIntegers F : Set (Fv F v)) := Valued.isOpen_valuationSubring _
@@ -157,7 +153,7 @@ theorem exists_bound
       : v.valuation F t
         = Valued.v (algebraMap F (Fv F v) t * (u : AF F).2 v)
           * Valued.v (((u⁻¹ : (AF F)ˣ) : AF F).2 v) := by
-    rw [← valued_algebraMap, ← map_mul, ← hx]
+    rw [← _root_.GlobalTheory.CompanionTheory.SW.GoodInt.valued_algebraMap, ← map_mul, ← hx]
   have hfirst : Valued.v (algebraMap F (Fv F v) t * (u : AF F).2 v) ≤ max (G v) 1 := by
     by_cases hv : v ∈ S
     · exact (hG v hv _ (h1 v hv)).trans (le_max_left _ _)

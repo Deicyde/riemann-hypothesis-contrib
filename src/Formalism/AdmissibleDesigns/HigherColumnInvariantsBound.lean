@@ -144,7 +144,6 @@ theorem inequality_of_finite_terms
     simp only [qU, ENat.toNat_natCast]
     push_cast
     field_simp
-    try ring
   have hs3
       : ∑ k ∈ Finset.Ioo 0 t, qU e (Sha k)
         = ((∑ k ∈ Finset.Ioo 0 t, (Sha k).toNat : ℕ) : ℚ) / e := by
@@ -160,7 +159,6 @@ theorem inequality_of_finite_terms
   refine hq.trans (le_of_eq ?_)
   push_cast
   field_simp
-  try ring
 
 end Arith
 
@@ -483,7 +481,7 @@ theorem qU_vdel
   obtain ⟨e, he, hE⟩ := eON_eq i
   rw [hvδ, hE, ENat.toNat_natCast, qU_eO_mul he, ENat.toNat_natCast]
   push_cast
-  first | rfl | simp [Finset.sum_add_distrib] | ring
+  first | rfl
 
 theorem selmer_length_inequality
     (lenRow : HeightOneSpectrum (𝓞 D.host.E) → ℚ) (e' : HeightOneSpectrum (𝓞 D.host.E) → ℕ) (cB : ℕ)

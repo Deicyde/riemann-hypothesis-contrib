@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.isSelfDual_image_orthonormalFrame_lattice
             → ∃ Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E),
               (Λ : Set (Fin S.rank → D.host.E)) = GlobalTheory.MovedDict.inV fr Ls
                 ∧ IsSelfDualC S Λ := by
-  first
-  | exact @GlobalTheory.MovedDict.isSelfDualC_inV
-  | exact GlobalTheory.MovedDict.isSelfDualC_inV
-  | (intros; apply GlobalTheory.MovedDict.isSelfDualC_inV <;> assumption)
+  first | exact @GlobalTheory.MovedDict.isSelfDualC_inV

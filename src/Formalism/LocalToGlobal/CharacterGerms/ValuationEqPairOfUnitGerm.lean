@@ -67,10 +67,12 @@ namespace VP
 
 variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ}
 
-theorem subst_zeroPt {σ τ : Type} [Finite σ] (f : MvPowerSeries σ C) :
-    MvPowerSeries.subst (fun _ : σ => (0 : MvPowerSeries τ C)) f = MvPowerSeries.C (MvPowerSeries.constantCoeff f) := by
+theorem subst_zeroPt {σ τ : Type} [Finite σ] (f : MvPowerSeries σ C)
+    : MvPowerSeries.subst (fun _ : σ => (0 : MvPowerSeries τ C)) f
+      = MvPowerSeries.C (MvPowerSeries.constantCoeff f) := by
   ext e
-  rw [MvPowerSeries.coeff_subst (hs (fun _ => MvPowerSeries.constantCoeff_zero)), finsum_eq_single _ 0]
+  rw [MvPowerSeries.coeff_subst (hs (fun _ => MvPowerSeries.constantCoeff_zero)),
+    finsum_eq_single _ 0]
   · by_cases he : e = 0 <;> simp [he, MvPowerSeries.coeff_C, MvPowerSeries.coeff_one]
   · intro d hd
     obtain ⟨s, hs'⟩ : ∃ s, d s ≠ 0 := by
@@ -113,17 +115,22 @@ theorem lgex (m : Fin dd) : MvPowerSeries.subst (e Y) (l Y m) = MvPowerSeries.X 
 theorem cc_F (k : Fin dd) : MvPowerSeries.constantCoeff (Y.B.G.F k) = 0 := Y.B.G.const k
 
 theorem ev_id (f : PS C 2 dd) : ev (n := 2) ![pt C dd 0, pt C dd 1] f = f := by
-  have h : (fun q : Fin 2 × Fin dd => (![pt C dd 0, pt C dd 1] : Fin 2 → Pt C 2 dd) q.1 q.2) =
-      MvPowerSeries.X := by
+  have h
+      : (fun q : Fin 2 × Fin dd => (![pt C dd 0, pt C dd 1] : Fin 2 → Pt C 2 dd) q.1 q.2)
+        = MvPowerSeries.X := by
     funext ⟨i, k⟩; fin_cases i <;> rfl
   unfold ev
   rw [h, MvPowerSeries.subst_self]
   rfl
 
-theorem l_add (m : Fin dd) :
-    MvPowerSeries.subst (fun k => Y.B.G.F k) (l Y m) =
-      MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd)) (l Y m) +
-        MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd)) (l Y m) := by
+theorem l_add (m : Fin dd)
+    : MvPowerSeries.subst (fun k => Y.B.G.F k) (l Y m)
+      = MvPowerSeries.subst
+          (fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd))
+          (l Y m)
+        + MvPowerSeries.subst
+          (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
+          (l Y m) := by
   have hF : addOf Y.B.G.F (pt C dd 0) (pt C dd 1) = fun k => Y.B.G.F k :=
     funext fun k => ev_id (Y.B.G.F k)
   have h := Y.lg_add m
@@ -131,26 +138,27 @@ theorem l_add (m : Fin dd) :
   show MvPowerSeries.subst (fun k => Y.B.G.F k) (un1 (Y.lg m)) =
     MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd)) (un1 (Y.lg m)) +
       MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd)) (un1 (Y.lg m))
-  rw [subst_singlePointUncurry (fun k => Y.B.G.const k), subst_singlePointUncurry (fun k => MvPowerSeries.constantCoeff_X _),
+  rw [subst_singlePointUncurry (fun k => Y.B.G.const k),
+    subst_singlePointUncurry (fun k => MvPowerSeries.constantCoeff_X _),
     subst_singlePointUncurry (fun k => MvPowerSeries.constantCoeff_X _)]
   exact h
 
 theorem F_exZero (k : Fin dd) : MvPowerSeries.subst (exZero Y) (Y.B.G.F k) = e Y k := by
-
   set u : Fin 1 × Fin dd → MvPowerSeries (Fin dd) C := fun q => un1 (Y.ex q.2) with hu_def
   have hu : MvPowerSeries.HasSubst u := hs (fun q => cc_e Y q.2)
-  have hz : MvPowerSeries.HasSubst (exZero Y) := hs (fun q => by
-    unfold exZero
-    split_ifs
-    · exact cc_e Y q.2
-    · simp)
-  have hsw : MvPowerSeries.HasSubst
-      (fun q : Fin 2 × Fin dd => (![pt C dd 1, pt C dd 0] : Fin 2 → Pt C 2 dd) q.1 q.2) :=
+  have hz : MvPowerSeries.HasSubst (exZero Y) :=
+    hs (fun q => by
+      unfold exZero
+      split_ifs
+      · exact cc_e Y q.2
+      · simp)
+  have hsw : MvPowerSeries.HasSubst (fun q : Fin 2 × Fin dd =>
+      (![pt C dd 1, pt C dd 0] : Fin 2 → Pt C 2 dd) q.1 q.2) :=
     hs (fun q => by
       rcases q with ⟨i, j⟩
       fin_cases i <;> exact MvPowerSeries.constantCoeff_X _)
-  have hun : MvPowerSeries.HasSubst
-      (fun q : Fin 2 × Fin dd => (![0, pt C dd 0] : Fin 2 → Pt C 1 dd) q.1 q.2) :=
+  have hun : MvPowerSeries.HasSubst (fun q : Fin 2 × Fin dd =>
+      (![0, pt C dd 0] : Fin 2 → Pt C 1 dd) q.1 q.2) :=
     hs (fun q => by
       rcases q with ⟨i, j⟩
       fin_cases i
@@ -176,14 +184,17 @@ theorem F_exZero (k : Fin dd) : MvPowerSeries.subst (exZero Y) (Y.B.G.F k) = e Y
     rw [MvPowerSeries.subst_X hz, MvPowerSeries.subst_X hu]
     simp [exZero, u]
 
-def J (m k : Fin dd) : MvPowerSeries (Fin dd) C := MvPowerSeries.subst (e Y) (MvPowerSeries.pderiv (R := C) k (l Y m))
+def J (m k : Fin dd) : MvPowerSeries (Fin dd) C :=
+  MvPowerSeries.subst (e Y) (MvPowerSeries.pderiv (R := C) k (l Y m))
 
-theorem pderiv_l_zero (m i : Fin dd) :
-    MvPowerSeries.constantCoeff (MvPowerSeries.pderiv (R := C) i (l Y m)) = if m = i then 1 else 0 := by
+theorem pderiv_l_zero (m i : Fin dd)
+    : MvPowerSeries.constantCoeff (MvPowerSeries.pderiv (R := C) i (l Y m))
+      = if m = i then 1 else 0 := by
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_pderiv]
-  simp only [Finsupp.coe_zero, Pi.zero_apply, zero_add, Nat.cast_zero, Nat.cast_one, one_mul, mul_one]
-  change MvPowerSeries.coeff (Finsupp.mapDomain (fun x : Fin dd => ((0 : Fin 1), x)) (Finsupp.single i 1))
-    (Y.lg m) = _
+  simp only [Finsupp.coe_zero, Pi.zero_apply, zero_add, Nat.cast_zero, mul_one]
+  change MvPowerSeries.coeff
+      (Finsupp.mapDomain (fun x : Fin dd => ((0 : Fin 1), x)) (Finsupp.single i 1)) (Y.lg m)
+    = _
   rw [Finsupp.mapDomain_single, Y.lg_lin m _ (by simp), MvPowerSeries.coeff_X]
   by_cases hmi : m = i
   · subst hmi; simp
@@ -192,35 +203,40 @@ theorem pderiv_l_zero (m i : Fin dd) :
     have := Finsupp.single_left_injective (one_ne_zero) h
     exact hmi (congrArg Prod.snd this).symm
 
-theorem eqA (m i : Fin dd) :
-    ∑ k, MvPowerSeries.subst (exZero Y) (MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (Y.B.G.F k)) * J Y m k =
-      if m = i then 1 else 0 := by
-
+theorem eqA (m i : Fin dd)
+    : ∑ k, MvPowerSeries.subst (exZero Y) (MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (Y.B.G.F k)) * J Y m k
+      = if m = i then 1 else 0 := by
   have hF := fun w => (ordGE_one_iff (Y.B.G.F w)).2 (Y.B.G.const w)
   have hX := fun (b : Fin 2) (w : Fin dd) =>
     (ordGE_one_iff (MvPowerSeries.X (b, w) : PS C 2 dd)).2 (MvPowerSeries.constantCoeff_X _)
-  have hz : MvPowerSeries.HasSubst (exZero Y) := hs (fun q => by
-    unfold exZero
-    split_ifs
-    · exact cc_e Y q.2
-    · simp)
+  have hz : MvPowerSeries.HasSubst (exZero Y) :=
+    hs (fun q => by
+      unfold exZero
+      split_ifs
+      · exact cc_e Y q.2
+      · simp)
   have hsF : MvPowerSeries.HasSubst (fun k => Y.B.G.F k) := hs (fun k => Y.B.G.const k)
-  have hsX1 : MvPowerSeries.HasSubst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd)) :=
+  have hsX1
+      : MvPowerSeries.HasSubst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd)) :=
     hs (fun k => MvPowerSeries.constantCoeff_X _)
   have h := congrArg (MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i)) (l_add Y m)
   rw [map_add (f := _), pderiv_subst hF, pderiv_subst (hX 0), pderiv_subst (hX 1)] at h
-  beta_reduce at h
-  have s0 : ∑ w : Fin dd, MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (MvPowerSeries.X ((0 : Fin 2), w) : PS C 2 dd) *
-      MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd))
-        (MvPowerSeries.pderiv (R := C) w (l Y m)) = 0 :=
+  have s0
+      : ∑ w : Fin dd, MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (MvPowerSeries.X ((0 : Fin 2), w) : PS C 2 dd) *
+          MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd))
+            (MvPowerSeries.pderiv (R := C) w (l Y m))
+        = 0 :=
     Finset.sum_eq_zero (fun w _ => by rw [MvPowerSeries.pderiv_X_of_ne (by simp), zero_mul])
-  have s1 : ∑ w : Fin dd, MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (MvPowerSeries.X ((1 : Fin 2), w) : PS C 2 dd) *
-      MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
-        (MvPowerSeries.pderiv (R := C) w (l Y m)) =
-      MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
-        (MvPowerSeries.pderiv (R := C) i (l Y m)) := by
-    rw [Finset.sum_eq_single i (fun w _ hw => by
-        rw [MvPowerSeries.pderiv_X_of_ne (by simpa using hw), zero_mul]) (by simp),
+  have s1
+      : ∑ w : Fin dd, MvPowerSeries.pderiv (R := C) ((1 : Fin 2), i) (MvPowerSeries.X ((1 : Fin 2), w) : PS C 2 dd) *
+          MvPowerSeries.subst (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
+            (MvPowerSeries.pderiv (R := C) w (l Y m))
+        = MvPowerSeries.subst
+          (fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
+          (MvPowerSeries.pderiv (R := C) i (l Y m)) := by
+    rw [Finset.sum_eq_single i
+        (fun w _ hw => by rw [MvPowerSeries.pderiv_X_of_ne (by simpa using hw), zero_mul])
+        (by simp),
       MvPowerSeries.pderiv_X_self, one_mul]
   rw [s0, s1, zero_add] at h
   have h2 := congrArg (MvPowerSeries.subst (exZero Y)) h
@@ -229,14 +245,14 @@ theorem eqA (m i : Fin dd) :
   simp only [map_mul, MvPowerSeries.coe_substAlgHom] at h2
   rw [MvPowerSeries.subst_comp_subst_apply hsX1 hz] at h2
   simp only [MvPowerSeries.subst_comp_subst_apply hsF hz, F_exZero, MvPowerSeries.subst_X hz] at h2
-  have hz1 : (fun s : Fin dd => exZero Y ((1 : Fin 2), s)) = fun _ => 0 := funext fun s => by simp [exZero]
+  have hz1 : (fun s : Fin dd => exZero Y ((1 : Fin 2), s)) = fun _ => 0 :=
+    funext fun s => by simp [exZero]
   rw [hz1, subst_zeroPt, pderiv_l_zero] at h2
   refine h2.trans ?_
   split_ifs <;> simp
 
-theorem eqK (n k : Fin dd) :
-    ∑ m, J Y m k * MvPowerSeries.pderiv (R := C) m (e Y n) = if n = k then 1 else 0 := by
-
+theorem eqK (n k : Fin dd)
+    : ∑ m, J Y m k * MvPowerSeries.pderiv (R := C) m (e Y n) = if n = k then 1 else 0 := by
   have hl := fun w => (ordGE_one_iff (l Y w)).2 (cc_l Y w)
   have hsE : MvPowerSeries.HasSubst (e Y) := hs (cc_e Y)
   have hsL : MvPowerSeries.HasSubst (l Y) := hs (cc_l Y)
@@ -245,7 +261,8 @@ theorem eqK (n k : Fin dd) :
     simp_rw [lgex Y]
     rw [MvPowerSeries.subst_self]
     rfl
-  have h := congrArg (MvPowerSeries.subst (e Y)) (congrArg (MvPowerSeries.pderiv (R := C) k) (exlg Y n))
+  have h :=
+    congrArg (MvPowerSeries.subst (e Y)) (congrArg (MvPowerSeries.pderiv (R := C) k) (exlg Y n))
 
   rw [pderiv_subst hl k, ← MvPowerSeries.coe_substAlgHom hsE, map_sum] at h
   simp only [map_mul, MvPowerSeries.coe_substAlgHom, key] at h
@@ -257,8 +274,11 @@ theorem eqK (n k : Fin dd) :
 
 end VP
 
-theorem expODE {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ}
-    (Y : FBChart C V O dd) : ExpODESt Y := by
+theorem expODE
+    {C : Type} [Field C] [CharZero C]
+    {V : VF C} {O : Type} [CommRing O] [StarRing O]
+    {dd : ℕ} (Y : FBChart C V O dd)
+    : ExpODESt Y := by
   intro i j
   have hFK : Y.B.FK C = Y.B.G.F := by
     funext q
@@ -285,10 +305,11 @@ theorem expODE {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing
     by_cases h : n = k
     · subst h; simp
     · simp [h, Ne.symm h]
-  have hDA : D = A := calc
-    D = (A * Jt) * D := by rw [hAJ, Matrix.one_mul]
-    _ = A * (Jt * D) := Matrix.mul_assoc A Jt D
-    _ = A := by rw [hJD, Matrix.mul_one]
+  have hDA : D = A :=
+    calc
+      D = (A * Jt) * D := by rw [hAJ, Matrix.one_mul]
+      _ = A * (Jt * D) := Matrix.mul_assoc A Jt D
+      _ = A := by rw [hJD, Matrix.mul_one]
   exact congrFun (congrFun hDA i) j
 
 end Formalism.L2.FormalSeriesBounds

@@ -80,9 +80,7 @@ theorem generic_haar_subgroup : GenHaarSub := by
       rfl
     rw [hcomp, ← Measure.map_map hmeas (measurable_const_mul _)]
     congr 1
-    first
-    | exact map_mul_left_eq_self (Measure.haar : Measure K) _
-    | exact Measure.IsMulLeftInvariant.map_mul_left_eq_self _
+    first | exact map_mul_left_eq_self (Measure.haar : Measure K) _
   · intro U hU h1
     rw [hm, Measure.map_apply hmeas hU.measurableSet]
     exact (hU.preimage continuous_subtype_val).measure_pos (Measure.haar : Measure K)

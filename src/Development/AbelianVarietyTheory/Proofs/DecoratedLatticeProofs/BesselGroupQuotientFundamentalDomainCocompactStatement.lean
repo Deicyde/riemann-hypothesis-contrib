@@ -58,6 +58,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
   GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.besselGroup_quotient_fundamentalDomain_cocompact
     : ∀ (D : D7) (ρ : ℕ) (B : BesLev D ρ),
       B.μR.IsHaarMeasure ∧ IsClosed (besGrp B.d B.o : Set (GA D B.V))

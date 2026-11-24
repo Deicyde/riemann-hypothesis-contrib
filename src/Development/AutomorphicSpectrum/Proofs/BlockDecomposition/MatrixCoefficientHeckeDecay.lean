@@ -180,7 +180,7 @@ theorem coeff_bound
   intro k _ _ _ _ N V _ _ π hsm hadm hsp m hm v hv l hl
   have hfd : FiniteDimensional ℂ (fixed π (Zls.Km k N m)) :=
     hadm.2 _ (GlobalTheory.CompanionTheory.KmTop.isOpen_Km N m)
-      (GlobalTheory.CompanionTheory.KmTop.isCompact_Km N m)
+      (_root_.GlobalTheory.CompanionTheory.HeckeKm.isCompact_Km N m)
   have hq : (0 : ℝ) < (Nat.card 𝓀[k] : ℝ) := by exact_mod_cast Nat.card_pos
   obtain ⟨d, e, φ, hφ, hev⟩ := exists_coordinates (fixed π (Zls.Km k N m))
   choose T hT using fun j : Fin (N - 1) =>

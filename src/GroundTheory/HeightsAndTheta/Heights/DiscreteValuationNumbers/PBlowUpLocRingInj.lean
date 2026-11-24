@@ -169,7 +169,8 @@ theorem exists_eq_div_of_mem_blowUpLocRing
     simp only [RingHom.map_add, RingHom.map_mul]
   | neg x _ hx =>
     obtain ⟨b, F, G, hF, hG, hGQ, rfl⟩ := hx
-    refine ⟨b, -F, G, fun d hd => hF (by rwa [MvPolynomial.coeff_neg, neg_ne_zero] at hd), hG, hGQ, ?_⟩
+    refine
+      ⟨b, -F, G, fun d hd => hF (by rwa [MvPolynomial.coeff_neg, neg_ne_zero] at hd), hG, hGQ, ?_⟩
     rw [RingHom.map_neg, RingHom.map_neg, neg_div]
   | mul x y _ _ hx hy =>
     obtain ⟨b₁, F₁, G₁, hF₁, hG₁, hG₁Q, rfl⟩ := hx

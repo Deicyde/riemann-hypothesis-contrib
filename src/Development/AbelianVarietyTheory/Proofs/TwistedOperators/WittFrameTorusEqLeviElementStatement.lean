@@ -58,6 +58,7 @@ open GlobalTheory.SquareComm
 open scoped Pointwise
 open Formalism.IndefR.Datum
 open GlobalTheory.Grid
+
 theorem _root_.GlobalTheory.T.wittFrame_torus_eq_levi_element
     : ∀ {D : D7} (θ : InfFam D),
       IsInfFam θ
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.wittFrame_torus_eq_levi_element
                       α.1.map (finPart D) = 1
                         ∧ (∀ τ, compAt θ τ α.1 = diagonal (fun i => (t i : ℂ)))
                         ∧ (ofSgn ε M).symm a = d.levi α := by
-  first
-  | exact @GlobalTheory.WittLevi.witt_levi
-  | exact GlobalTheory.WittLevi.witt_levi
-  | (intros; apply GlobalTheory.WittLevi.witt_levi <;> assumption)
+  first | exact @GlobalTheory.WittLevi.witt_levi

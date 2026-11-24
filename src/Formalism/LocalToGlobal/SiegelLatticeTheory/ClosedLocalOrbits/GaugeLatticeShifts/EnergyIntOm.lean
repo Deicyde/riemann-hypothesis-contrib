@@ -110,7 +110,6 @@ theorem zhat_tr
   have eb := q_fvec X hQ hsc u' b
   unfold ZX Formalism.QuantumDeterminants.Zhat trG
   unfold Formalism.L2.SG.RealObj.Zhat
-  beta_reduce
   unfold Formalism.QuantumDeterminants.herm Formalism.L2.SG.HidaSetting.hJ
   rw [← h3]
   have hm

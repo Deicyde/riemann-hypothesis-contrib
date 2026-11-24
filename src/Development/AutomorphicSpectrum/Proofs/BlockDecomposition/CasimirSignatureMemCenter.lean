@@ -166,7 +166,6 @@ theorem span_famZ : Submodule.span ℝ (Set.range (famZ (E := E) (a := a))) = �
     rw [e]
     exact S.smul_mem _ (S.add_mem (hz _) (hz _))
   have hx : ∀ i j (x : Cinf E), sgl (a := a) i j x ∈ S := fun i j x => by
-
     rw [sum_atEmb x, map_sum]
     refine S.sum_mem fun w _ => ?_
     rw [map_add (f := _), map_smul, map_smul]

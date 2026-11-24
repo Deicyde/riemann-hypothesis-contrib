@@ -71,7 +71,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 theorem UpperTheory.V.Hi.levelUR2EigPart
     : ∀ (K W ι : Type) [Field K] [AddCommGroup W] [Module K W] (J : Type 1)
         (op : ι → Module.End K W) (Z : J → Submodule K W) (μ : J → ι → K),

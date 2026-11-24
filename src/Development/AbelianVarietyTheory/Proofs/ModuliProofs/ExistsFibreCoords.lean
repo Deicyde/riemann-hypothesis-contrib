@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSymm
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueUniformisingVectorVerticalTangentStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueUniformisingVectorVerticalTangent
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -150,8 +150,7 @@ theorem exists_fibre_coords
     have hδ : PtDer ((u.ex z).left ≫ m) (fun _ _ => (0 : ℂ)) :=
       ⟨fun _ _ _ _ => by simp, fun _ _ _ _ => by simp, fun _ _ _ _ _ => rfl⟩
     obtain ⟨w₀, _, huniq⟩ :=
-      GlobalTheory.T.existsUnique_uniformising_vector_vertical_tangent P₀ u Hm χ hG R x₀ X p m hsm
-        hpb z
+      _root_.GlobalTheory.KS.VertFamily.existsUnique_vector P₀ u Hm χ hG R x₀ X p m hsm hpb z
         (fun _ _ => 0)
         hδ
         (fun _ => rfl)

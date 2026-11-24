@@ -90,12 +90,6 @@ def step (z z' : Fin (2 * r + k + 1) → ℂ) (X : B.Mat k r) (t : Tm k r) : Lis
   (t.1, t.2.1, t.2.2.1, X :: t.2.2.2)
 ]
 
-theorem sum_flatMap {α β M : Type*} [AddCommMonoid M] (L : List α) (f : α → List β) (g : β → M)
-    : ((L.flatMap f).map g).sum = (L.map fun a => ((f a).map g).sum).sum := by
-  induction L with
-  | nil => simp
-  | cons a L ih => simp [ih]
-
 theorem term_deriv
     (z z' : Fin (2 * r + k + 1) → ℂ)
     (Ψ : ℕ → ℝ → ℝ) (hΨ : ThChain Ψ)
@@ -241,7 +235,7 @@ theorem exp_main
                 • B.Rw t.2.2.2 F (x * NormedSpace.exp ((s : ℂ) • X))).sum)
           0
         = _
-      rw [hd.deriv, sum_flatMap]
+      rw [hd.deriv, _root_.Formalism.FourierDecayAlt.P.ListSumInequalities.list_sum_flatMap]
 
 end
 

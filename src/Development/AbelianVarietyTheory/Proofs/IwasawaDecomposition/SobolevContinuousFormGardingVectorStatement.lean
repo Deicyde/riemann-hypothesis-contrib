@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix Filter
 open scoped TensorProduct ContDiff InnerProductSpace Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.sobolevContinuous_form_gardingVector
     : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
@@ -60,8 +61,4 @@ theorem _root_.GlobalTheory.T.sobolevContinuous_form_gardingVector
                     IsTest φ
                       → ℓ (gard ε σ φ w)
                         = ∫ g : Formalism.REAL.UJ ε, φ (umat g) • ℓ (σ (umat g) w) ∂(Formalism.REAL.muG ε) :=
-  by
-    first
-    | exact @GlobalTheory.SobGarding.sobCont_gard
-    | exact GlobalTheory.SobGarding.sobCont_gard
-    | (intros; apply GlobalTheory.SobGarding.sobCont_gard <;> assumption)
+  by first | exact @GlobalTheory.SobGarding.sobCont_gard

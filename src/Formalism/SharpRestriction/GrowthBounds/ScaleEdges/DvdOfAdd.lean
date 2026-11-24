@@ -61,9 +61,13 @@ namespace Formalism.MainNotions.Pf14
 
 open Module
 
-theorem smith_mem {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [IsLocalRing O]
-    {I : Type*} [Fintype I] (S : Submodule O (I → O)) (a : O)
-    (h : ∀ φ : I → O, (∃ i, IsUnit (φ i)) → ∃ s ∈ S, (∑ i, φ i * s i) ∣ a) (x : I → O) : a • x ∈ S := by
+theorem smith_mem
+    {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [IsLocalRing O]
+    {I : Type*} [Fintype I]
+    (S : Submodule O (I → O)) (a : O)
+    (h : ∀ φ : I → O, (∃ i, IsUnit (φ i)) → ∃ s ∈ S, (∑ i, φ i * s i) ∣ a)
+    (x : I → O)
+    : a • x ∈ S := by
   classical
   obtain ⟨n, snf⟩ := S.smithNormalForm (Pi.basisFun O I)
   have key : ∀ j, a • snf.bM j ∈ S := by
@@ -91,11 +95,12 @@ theorem smith_mem {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
       have := congrArg Subtype.val (snf.bN.sum_repr ⟨s, hs⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul, snf.snf] at this
       exact this.symm
-    have hc : snf.bM.coord j s =
-        ∑ k, snf.bN.repr ⟨s, hs⟩ k * snf.a k * (if snf.f k = j then 1 else 0) := by
+    have hc
+        : snf.bM.coord j s
+          = ∑ k, snf.bN.repr ⟨s, hs⟩ k * snf.a k * (if snf.f k = j then 1 else 0) := by
       conv_lhs => rw [hs']
 
-      simp [map_sum, map_smul, Finsupp.single_apply, mul_assoc]
+      simp [map_sum, map_smul, Finsupp.single_apply]
     by_cases hj : ∃ k, snf.f k = j
     · obtain ⟨k0, rfl⟩ := hj
       have hc0 : snf.bM.coord (snf.f k0) s = snf.bN.repr ⟨s, hs⟩ k0 * snf.a k0 := by
@@ -105,7 +110,8 @@ theorem smith_mem {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
           simp [snf.f.injective.ne hk]
         · simp
       rw [hc0] at hsd
-      obtain ⟨t, ht⟩ := (Dvd.intro_left _ rfl : snf.a k0 ∣ snf.bN.repr ⟨s, hs⟩ k0 * snf.a k0).trans hsd
+      obtain ⟨t, ht⟩ :=
+        (Dvd.intro_left _ rfl : snf.a k0 ∣ snf.bN.repr ⟨s, hs⟩ k0 * snf.a k0).trans hsd
       rw [ht, mul_comm, mul_smul, ← snf.snf k0]
       exact S.smul_mem t (snf.bN k0).2
     · push_neg at hj
@@ -119,19 +125,20 @@ theorem smith_mem {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
   rw [smul_comm]
   exact S.smul_mem _ (key j)
 
-theorem dvd_of_add {O : Type*} [CommRing O] [IsLocalRing O] (π : O) (hπ : ¬ IsUnit π) (D : ℕ) (a z : O)
-    (ha : a ∣ π ^ D) : (a + π ^ (D + 1) * z) ∣ π ^ D := by
+theorem dvd_of_add
+    {O : Type*} [CommRing O] [IsLocalRing O]
+    (π : O) (hπ : ¬ IsUnit π)
+    (D : ℕ) (a z : O) (ha : a ∣ π ^ D)
+    : (a + π ^ (D + 1) * z) ∣ π ^ D := by
   obtain ⟨c, hc⟩ := ha
   have hu : IsUnit (1 + π * c * z) := by
     by_contra h1
     have hm : π * c * z ∈ IsLocalRing.maximalIdeal O :=
       Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ ((IsLocalRing.mem_maximalIdeal _).2 hπ))
     have h2 : 1 + π * c * z ∈ IsLocalRing.maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).2 h1
-    have h3 : (1 : O) ∈ IsLocalRing.maximalIdeal O := by
-      simpa using Ideal.sub_mem _ h2 hm
+    have h3 : (1 : O) ∈ IsLocalRing.maximalIdeal O := by simpa using Ideal.sub_mem _ h2 hm
     exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).2 h3)
-  have hx : a + π ^ (D + 1) * z = a * (1 + π * c * z) := by
-    rw [pow_succ, hc]; ring
+  have hx : a + π ^ (D + 1) * z = a * (1 + π * c * z) := by rw [pow_succ, hc]; ring
   rw [hx, hu.mul_right_dvd]
   exact ⟨c, hc⟩
 

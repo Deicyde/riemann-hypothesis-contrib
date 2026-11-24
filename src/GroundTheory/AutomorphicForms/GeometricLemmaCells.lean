@@ -73,8 +73,8 @@ section Rank
 
 variable {K : Type*} [Field K] {m l : Type*} [Fintype m] [Fintype l] [DecidableEq m]
 
-theorem exists_mul_mul_eq_one_of_rank (A : Matrix m l K) :
-    ∃ (L : Matrix (Fin A.rank) m K) (R : Matrix l (Fin A.rank) K), L * A * R = 1 := by
+theorem exists_mul_mul_eq_one_of_rank (A : Matrix m l K)
+    : ∃ (L : Matrix (Fin A.rank) m K) (R : Matrix l (Fin A.rank) K), L * A * R = 1 := by
   classical
   set f := A.mulVecLin with hf
   have hr : Module.finrank K (LinearMap.range f) = A.rank := Matrix.finrank_range_mulVecLin A
@@ -105,8 +105,7 @@ theorem exists_mul_mul_eq_one_of_rank (A : Matrix m l K) :
     exact Fintype.linearIndependent_iff.1 hli c h1 i
   obtain ⟨h, hh⟩ := LinearMap.exists_leftInverse_of_injective _ hker
   refine ⟨LinearMap.toMatrix' h, R, ?_⟩
-  have h2 : LinearMap.toMatrix' (h.comp (A * R).mulVecLin) = 1 := by
-    rw [hh, LinearMap.toMatrix'_id]
+  have h2 : LinearMap.toMatrix' (h.comp (A * R).mulVecLin) = 1 := by rw [hh, LinearMap.toMatrix'_id]
   rw [LinearMap.toMatrix'_comp, ← Matrix.toLin'_apply', LinearMap.toMatrix'_toLin'] at h2
   rw [Matrix.mul_assoc]
   exact h2
@@ -119,10 +118,8 @@ theorem isOpen_setOf_le_rank (k : ℕ) : IsOpen {A : Matrix m l K | k ≤ A.rank
   intro A₀ hA₀
   obtain ⟨L, R, hLR⟩ := exists_mul_mul_eq_one_of_rank A₀
   refine ⟨{A | (L * A * R).det ≠ 0}, fun A hA => ?_, ?_, ?_⟩
-  · have hu : IsUnit (L * A * R) :=
-      (Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 hA)
-    have h1 : (L * A * R).rank = A₀.rank := by
-      rw [Matrix.rank_of_isUnit _ hu, Fintype.card_fin]
+  · have hu : IsUnit (L * A * R) := (Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 hA)
+    have h1 : (L * A * R).rank = A₀.rank := by rw [Matrix.rank_of_isUnit _ hu, Fintype.card_fin]
     have h2 : (L * A * R).rank ≤ A.rank :=
       (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
     exact le_trans hA₀ (h1 ▸ h2)
@@ -142,17 +139,24 @@ section Invariants
 variable (β γ : Fin n → ℕ)
 
 def cellRank (g : GL (Fin n) F) (a b : ℕ) : ℕ :=
-  ((g : Matrix (Fin n) (Fin n) F).submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+  ((g : Matrix (Fin n) (Fin n) F).submatrix
+    (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
     (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))).rank
 
 variable {β γ}
 
-theorem submatrix_mul_of_mem_blockUpper {p : GL (Fin n) F} (hp : p ∈ blockUpper F n β)
-    (M : Matrix (Fin n) (Fin n) F) {ι : Type*} (c : ι → Fin n) (a : ℕ) :
-    ((p : Matrix (Fin n) (Fin n) F) * M).submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) c =
-      (p : Matrix (Fin n) (Fin n) F).submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
-          (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) *
-        M.submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) c := by
+theorem submatrix_mul_of_mem_blockUpper
+    {p : GL (Fin n) F} (hp : p ∈ blockUpper F n β)
+    (M : Matrix (Fin n) (Fin n) F)
+    {ι : Type*} (c : ι → Fin n)
+    (a : ℕ)
+    : ((p : Matrix (Fin n) (Fin n) F) * M).submatrix
+        (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+        c
+      = (p : Matrix (Fin n) (Fin n) F).submatrix
+          (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+          (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+        * M.submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) c := by
   ext i j
   simp only [submatrix_apply, Matrix.mul_apply]
   rw [← Fintype.sum_subtype_add_sum_subtype (fun k => a ≤ β k)]
@@ -162,11 +166,16 @@ theorem submatrix_mul_of_mem_blockUpper {p : GL (Fin n) F} (hp : p ∈ blockUppe
       rw [hp hk, zero_mul]
   rw [h0, add_zero]
 
-theorem mul_submatrix_of_mem_blockUpper {q : GL (Fin n) F} (hq : q ∈ blockUpper F n γ)
-    (M : Matrix (Fin n) (Fin n) F) {ι : Type*} (r : ι → Fin n) (b : ℕ) :
-    (M * (q : Matrix (Fin n) (Fin n) F)).submatrix r (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)) =
-      M.submatrix r (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)) *
-        (q : Matrix (Fin n) (Fin n) F).submatrix (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
+theorem mul_submatrix_of_mem_blockUpper
+    {q : GL (Fin n) F} (hq : q ∈ blockUpper F n γ)
+    (M : Matrix (Fin n) (Fin n) F)
+    {ι : Type*} (r : ι → Fin n)
+    (b : ℕ)
+    : (M * (q : Matrix (Fin n) (Fin n) F)).submatrix r
+        (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
+      = M.submatrix r (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
+        * (q : Matrix (Fin n) (Fin n) F).submatrix
+          (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
           (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)) := by
   ext i j
   simp only [submatrix_apply, Matrix.mul_apply]
@@ -177,29 +186,40 @@ theorem mul_submatrix_of_mem_blockUpper {q : GL (Fin n) F} (hq : q ∈ blockUppe
       rw [hq hk, mul_zero]
   rw [h0, add_zero]
 
-theorem isUnit_det_submatrix_of_mem_blockUpper {p : GL (Fin n) F} (hp : p ∈ blockUpper F n β)
-    (a : ℕ) :
-    IsUnit ((p : Matrix (Fin n) (Fin n) F).submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
-      (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))).det := by
+theorem isUnit_det_submatrix_of_mem_blockUpper
+    {p : GL (Fin n) F} (hp : p ∈ blockUpper F n β) (a : ℕ)
+    : IsUnit
+      ((p : Matrix (Fin n) (Fin n) F).submatrix
+        (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+        (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))).det := by
   classical
-  apply Matrix.isUnit_det_of_right_inverse (B := ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).submatrix
-    (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)))
+  apply Matrix.isUnit_det_of_right_inverse
+    (B :=
+      ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).submatrix
+        (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+        (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)))
   rw [← submatrix_mul_of_mem_blockUpper hp, ← Units.val_mul, mul_inv_cancel, Units.val_one]
   exact Matrix.submatrix_one _ Subtype.val_injective
 
-theorem isUnit_det_submatrix_of_mem_blockUpper' {q : GL (Fin n) F} (hq : q ∈ blockUpper F n γ)
-    (b : ℕ) :
-    IsUnit ((q : Matrix (Fin n) (Fin n) F).submatrix (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
-      (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))).det := by
+theorem isUnit_det_submatrix_of_mem_blockUpper'
+    {q : GL (Fin n) F} (hq : q ∈ blockUpper F n γ) (b : ℕ)
+    : IsUnit
+      ((q : Matrix (Fin n) (Fin n) F).submatrix
+        (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
+        (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))).det := by
   classical
-  apply Matrix.isUnit_det_of_left_inverse (B := ((q⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).submatrix
-    (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)) (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)))
+  apply Matrix.isUnit_det_of_left_inverse
+    (B :=
+      ((q⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).submatrix
+        (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
+        (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n)))
   rw [← mul_submatrix_of_mem_blockUpper hq, ← Units.val_mul, inv_mul_cancel, Units.val_one]
   exact Matrix.submatrix_one _ Subtype.val_injective
 
-theorem cellRank_mul_mul {p q : GL (Fin n) F} (hp : p ∈ blockUpper F n β)
-    (hq : q ∈ blockUpper F n γ) (g : GL (Fin n) F) (a b : ℕ) :
-    cellRank β γ (p * g * q) a b = cellRank β γ g a b := by
+theorem cellRank_mul_mul
+    {p q : GL (Fin n) F} (hp : p ∈ blockUpper F n β) (hq : q ∈ blockUpper F n γ)
+    (g : GL (Fin n) F) (a b : ℕ)
+    : cellRank β γ (p * g * q) a b = cellRank β γ g a b := by
   classical
   unfold cellRank
   rw [Units.val_mul, Units.val_mul, Matrix.mul_assoc, submatrix_mul_of_mem_blockUpper hp,
@@ -207,9 +227,11 @@ theorem cellRank_mul_mul {p q : GL (Fin n) F} (hp : p ∈ blockUpper F n β)
     Matrix.rank_mul_eq_right_of_isUnit_det _ _ (isUnit_det_submatrix_of_mem_blockUpper hp a),
     Matrix.rank_mul_eq_left_of_isUnit_det _ _ (isUnit_det_submatrix_of_mem_blockUpper' hq b)]
 
-theorem cellRank_of_mem_doubleCoset {g x : GL (Fin n) F}
-    (hx : x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)) (a b : ℕ) :
-    cellRank β γ x a b = cellRank β γ g a b := by
+theorem cellRank_of_mem_doubleCoset
+    {g x : GL (Fin n) F}
+    (hx : x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+    (a b : ℕ)
+    : cellRank β γ x a b = cellRank β γ g a b := by
   obtain ⟨p, hp, q, hq, rfl⟩ := mem_doubleCoset.1 hx
   exact cellRank_mul_mul hp hq g a b
 
@@ -219,20 +241,21 @@ section Permutations
 
 variable {β γ : Fin n → ℕ}
 
-theorem cellRank_permGL (w : Equiv.Perm (Fin n)) (a b : ℕ) :
-    cellRank β γ (permGL F w) a b = (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card := by
+theorem cellRank_permGL (w : Equiv.Perm (Fin n)) (a b : ℕ)
+    : cellRank β γ (permGL F w) a b = (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card := by
   classical
   unfold cellRank
   set X := ((permGL F w : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).submatrix
     (fun i : {i : Fin n // a ≤ β i} => (i : Fin n)) (fun j : {j : Fin n // γ j ≤ b} => (j : Fin n))
     with hX
   rw [← Matrix.finrank_span_range_col]
-  let v : {j : Fin n // γ j ≤ b ∧ a ≤ β (w j)} → ({i : Fin n // a ≤ β i} → F) :=
-    fun t => Pi.single ⟨w t, t.2.2⟩ 1
+  let v : {j : Fin n // γ j ≤ b ∧ a ≤ β (w j)} → ({i : Fin n // a ≤ β i} → F) := fun t =>
+    Pi.single ⟨w t, t.2.2⟩ 1
   have hv : LinearIndependent F v := by
-    have := (Pi.basisFun F {i : Fin n // a ≤ β i}).linearIndependent.comp
-      (fun t : {j : Fin n // γ j ≤ b ∧ a ≤ β (w j)} => (⟨w t, t.2.2⟩ : {i : Fin n // a ≤ β i}))
-      (fun s t hst => Subtype.ext (w.injective (congrArg Subtype.val hst)))
+    have :=
+      (Pi.basisFun F {i : Fin n // a ≤ β i}).linearIndependent.comp
+        (fun t : {j : Fin n // γ j ≤ b ∧ a ≤ β (w j)} => (⟨w t, t.2.2⟩ : {i : Fin n // a ≤ β i}))
+        (fun s t hst => Subtype.ext (w.injective (congrArg Subtype.val hst)))
     convert this using 1
     funext t
     simp [v, Pi.basisFun_apply]
@@ -264,8 +287,8 @@ theorem cellRank_permGL (w : Equiv.Perm (Fin n)) (a b : ℕ) :
   rw [show Set.range X.col = Set.range Xᵀ from rfl, hspan, finrank_span_eq_card hv,
     Fintype.card_subtype]
 
-theorem permGL_mem_blockUpper {u : Equiv.Perm (Fin n)} (hu : ∀ x, β (u x) = β x) :
-    permGL F u ∈ blockUpper F n β := by
+theorem permGL_mem_blockUpper {u : Equiv.Perm (Fin n)} (hu : ∀ x, β (u x) = β x)
+    : permGL F u ∈ blockUpper F n β := by
   intro i j hij
   show ((permGL F u : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j = 0
   rw [permGL_apply, if_neg]
@@ -273,22 +296,27 @@ theorem permGL_mem_blockUpper {u : Equiv.Perm (Fin n)} (hu : ∀ x, β (u x) = �
   rw [hu] at hij
   exact lt_irrefl _ hij
 
-theorem permGL_mem_doubleCoset_of_card {w w' : Equiv.Perm (Fin n)}
-    (h : ∀ a b, (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card =
-      (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w' j)).card) :
-    permGL F w' ∈ doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ) := by
+theorem permGL_mem_doubleCoset_of_card
+    {w w' : Equiv.Perm (Fin n)}
+    (h : ∀ a b,
+      (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card
+        = (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w' j)).card)
+    : permGL F w'
+      ∈ doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
   classical
-  have h1 : ∀ a b, (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (w j)).card =
-      (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (w' j)).card := by
+  have h1
+      : ∀ a b,
+        (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (w j)).card
+          = (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (w' j)).card := by
     intro a b
     cases b with
     | zero => simpa using h a 0
     | succ b =>
-      have key : ∀ u : Equiv.Perm (Fin n),
-          (Finset.univ.filter fun j => γ j ≤ b + 1 ∧ a ≤ β (u j)).card =
-            (Finset.univ.filter fun j => γ j = b + 1 ∧ a ≤ β (u j)).card +
-              (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (u j)).card := by
+      have key
+          : ∀ u : Equiv.Perm (Fin n),
+            (Finset.univ.filter fun j => γ j ≤ b + 1 ∧ a ≤ β (u j)).card
+              = (Finset.univ.filter fun j => γ j = b + 1 ∧ a ≤ β (u j)).card
+                + (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (u j)).card := by
         intro u
         rw [← Finset.card_union_of_disjoint]
         · congr 1
@@ -301,13 +329,16 @@ theorem permGL_mem_doubleCoset_of_card {w w' : Equiv.Perm (Fin n)}
       have := h a (b + 1)
       rw [key w, key w', h a b] at this
       omega
-  have h2 : ∀ a b, (Finset.univ.filter fun j => γ j = b ∧ β (w j) = a).card =
-      (Finset.univ.filter fun j => γ j = b ∧ β (w' j) = a).card := by
+  have h2
+      : ∀ a b,
+        (Finset.univ.filter fun j => γ j = b ∧ β (w j) = a).card
+          = (Finset.univ.filter fun j => γ j = b ∧ β (w' j) = a).card := by
     intro a b
-    have key : ∀ u : Equiv.Perm (Fin n),
-        (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (u j)).card =
-          (Finset.univ.filter fun j => γ j = b ∧ β (u j) = a).card +
-            (Finset.univ.filter fun j => γ j = b ∧ a + 1 ≤ β (u j)).card := by
+    have key
+        : ∀ u : Equiv.Perm (Fin n),
+          (Finset.univ.filter fun j => γ j = b ∧ a ≤ β (u j)).card
+            = (Finset.univ.filter fun j => γ j = b ∧ β (u j) = a).card
+              + (Finset.univ.filter fun j => γ j = b ∧ a + 1 ≤ β (u j)).card := by
       intro u
       rw [← Finset.card_union_of_disjoint]
       · congr 1
@@ -321,17 +352,21 @@ theorem permGL_mem_doubleCoset_of_card {w w' : Equiv.Perm (Fin n)}
     rw [key w, key w', h1 (a + 1) b] at this
     omega
 
-  have hcard : ∀ c : ℕ × ℕ, Fintype.card {j : Fin n // (β (w j), γ j) = c} =
-      Fintype.card {j : Fin n // (β (w' j), γ j) = c} := by
+  have hcard
+      : ∀ c : ℕ × ℕ,
+        Fintype.card {j : Fin n // (β (w j), γ j) = c}
+          = Fintype.card {j : Fin n // (β (w' j), γ j) = c} := by
     intro c
     rw [Fintype.card_subtype, Fintype.card_subtype]
-    have e1 : (Finset.univ.filter fun j => (β (w j), γ j) = c) =
-        Finset.univ.filter fun j => γ j = c.2 ∧ β (w j) = c.1 := by
+    have e1
+        : (Finset.univ.filter fun j => (β (w j), γ j) = c)
+          = Finset.univ.filter fun j => γ j = c.2 ∧ β (w j) = c.1 := by
       ext j
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.ext_iff]
       tauto
-    have e2 : (Finset.univ.filter fun j => (β (w' j), γ j) = c) =
-        Finset.univ.filter fun j => γ j = c.2 ∧ β (w' j) = c.1 := by
+    have e2
+        : (Finset.univ.filter fun j => (β (w' j), γ j) = c)
+          = Finset.univ.filter fun j => γ j = c.2 ∧ β (w' j) = c.1 := by
       ext j
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.ext_iff]
       tauto
@@ -353,18 +388,20 @@ theorem permGL_mem_doubleCoset_of_card {w w' : Equiv.Perm (Fin n)}
     have h' : v ((v⁻¹ : Equiv.Perm (Fin n)) x) = x := Equiv.apply_symm_apply v x
     rw [h'] at this
     exact this.symm
-  refine mem_doubleCoset.2 ⟨permGL F u, permGL_mem_blockUpper hu, permGL F v⁻¹,
-    permGL_mem_blockUpper hv', ?_⟩
+  refine mem_doubleCoset.2
+    ⟨permGL F u, permGL_mem_blockUpper hu, permGL F v⁻¹, permGL_mem_blockUpper hv', ?_⟩
   rw [← map_mul, ← map_mul]
   congr 1
   simp only [u]
   group
 
-theorem conj_permGL_mem_blockUpper_iff {α : Type*} [LinearOrder α] {β : Fin n → α}
-    (s : Equiv.Perm (Fin n)) {g : GL (Fin n) F} :
-    permGL F s * g * (permGL F s)⁻¹ ∈ blockUpper F n β ↔ g ∈ blockUpper F n (β ∘ s) := by
-  have key : ∀ r c, ((permGL F s * g * (permGL F s)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) r c =
-      (g : Matrix (Fin n) (Fin n) F) (s⁻¹ r) (s⁻¹ c) := by
+theorem conj_permGL_mem_blockUpper_iff
+    {α : Type*} [LinearOrder α] {β : Fin n → α} (s : Equiv.Perm (Fin n)) {g : GL (Fin n) F}
+    : permGL F s * g * (permGL F s)⁻¹ ∈ blockUpper F n β ↔ g ∈ blockUpper F n (β ∘ s) := by
+  have key
+      : ∀ r c,
+        ((permGL F s * g * (permGL F s)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) r c
+          = (g : Matrix (Fin n) (Fin n) F) (s⁻¹ r) (s⁻¹ c) := by
     intro r c
     rw [← map_inv, Units.val_mul, Units.val_mul, mul_permGL_apply, permGL_mul_apply]
   constructor
@@ -378,34 +415,44 @@ theorem conj_permGL_mem_blockUpper_iff {α : Type*} [LinearOrder α] {β : Fin n
     apply h
     simpa using hrc
 
-theorem exists_permGL_mem_doubleCoset (g : GL (Fin n) F) :
-    ∃ w : Equiv.Perm (Fin n), g ∈ doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ) := by
+theorem exists_permGL_mem_doubleCoset (g : GL (Fin n) F)
+    : ∃ w : Equiv.Perm (Fin n),
+      g ∈ doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
   set s := Tuple.sort β
   set t := Tuple.sort γ
-  have hB : ∀ {δ : Fin n → ℕ} {u : Equiv.Perm (Fin n)}, Monotone (δ ∘ u) →
-      ∀ b ∈ GroundTheory.Automorphic.borel n F, b ∈ blockUpper F n (δ ∘ u) := by
+  have hB
+      : ∀ {δ : Fin n → ℕ} {u : Equiv.Perm (Fin n)},
+        Monotone (δ ∘ u)
+          → ∀ b ∈ GroundTheory.Automorphic.borel n F, b ∈ blockUpper F n (δ ∘ u) := by
     intro δ u hm b hb i j hij
     apply (mem_borel_iff b).1 hb
     by_contra hle
     exact absurd (hm (not_lt.1 hle)) (not_le.2 hij)
   obtain ⟨w, hw⟩ := exists_mem_doubleCoset_permGL (k := F) ((permGL F s)⁻¹ * g * permGL F t)
   obtain ⟨b₁, hb₁, b₂, hb₂, heq⟩ := mem_doubleCoset.1 hw
-  refine ⟨s * w * t⁻¹, mem_doubleCoset.2 ⟨permGL F s * b₁ * (permGL F s)⁻¹,
-    (conj_permGL_mem_blockUpper_iff s).2 (hB (Tuple.monotone_sort β) b₁ hb₁),
-    permGL F t * b₂ * (permGL F t)⁻¹,
-    (conj_permGL_mem_blockUpper_iff t).2 (hB (Tuple.monotone_sort γ) b₂ hb₂), ?_⟩⟩
+  refine ⟨
+    s * w * t⁻¹,
+    mem_doubleCoset.2 ⟨
+      permGL F s * b₁ * (permGL F s)⁻¹,
+      (conj_permGL_mem_blockUpper_iff s).2 (hB (Tuple.monotone_sort β) b₁ hb₁),
+      permGL F t * b₂ * (permGL F t)⁻¹,
+      (conj_permGL_mem_blockUpper_iff t).2 (hB (Tuple.monotone_sort γ) b₂ hb₂),
+      ?_
+    ⟩
+  ⟩
   have hg : g = permGL F s * ((permGL F s)⁻¹ * g * permGL F t) * (permGL F t)⁻¹ := by group
   rw [hg, heq, map_mul, map_mul, map_inv]
   group
 
-theorem mem_doubleCoset_of_cellRank_eq {g x : GL (Fin n) F}
-    (h : ∀ a b, cellRank β γ x a b = cellRank β γ g a b) :
-    x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
+theorem mem_doubleCoset_of_cellRank_eq
+    {g x : GL (Fin n) F} (h : ∀ a b, cellRank β γ x a b = cellRank β γ g a b)
+    : x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
   obtain ⟨w, hw⟩ := exists_permGL_mem_doubleCoset (β := β) (γ := γ) g
   obtain ⟨w', hw'⟩ := exists_permGL_mem_doubleCoset (β := β) (γ := γ) x
-  have hcnt : ∀ a b, (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card =
-      (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w' j)).card := by
+  have hcnt
+      : ∀ a b,
+        (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w j)).card
+          = (Finset.univ.filter fun j => γ j ≤ b ∧ a ≤ β (w' j)).card := by
     intro a b
     rw [← cellRank_permGL (F := F), ← cellRank_permGL (F := F), ← cellRank_of_mem_doubleCoset hw,
       ← cellRank_of_mem_doubleCoset hw', h]
@@ -425,20 +472,24 @@ def cellHeight (g : GL (Fin n) F) : ℕ :=
 
 variable {β γ}
 
-theorem cellRank_eq_zero_of_lt {a : ℕ} (ha : Finset.univ.sup β < a) (g : GL (Fin n) F) (b : ℕ) :
-    cellRank β γ g a b = 0 := by
+theorem cellRank_eq_zero_of_lt {a : ℕ} (ha : Finset.univ.sup β < a) (g : GL (Fin n) F) (b : ℕ)
+    : cellRank β γ g a b = 0 := by
   unfold cellRank
   have hcard : Fintype.card {i : Fin n // a ≤ β i} = 0 := by
     rw [Fintype.card_eq_zero_iff]
     exact ⟨fun i => absurd (lt_of_le_of_lt (Finset.le_sup (Finset.mem_univ i.1)) ha) (not_lt.2 i.2)⟩
   exact Nat.le_zero.1 (hcard ▸ Matrix.rank_le_card_height _)
 
-theorem cellRank_eq_of_le {b : ℕ} (hb : Finset.univ.sup γ ≤ b) (g : GL (Fin n) F) (a : ℕ) :
-    cellRank β γ g a b = cellRank β γ g a (Finset.univ.sup γ) := by
+theorem cellRank_eq_of_le {b : ℕ} (hb : Finset.univ.sup γ ≤ b) (g : GL (Fin n) F) (a : ℕ)
+    : cellRank β γ g a b = cellRank β γ g a (Finset.univ.sup γ) := by
   classical
-  have key : ∀ c, Finset.univ.sup γ ≤ c → cellRank β γ g a c =
-      ((g : Matrix (Fin n) (Fin n) F).submatrix (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
-        id).rank := by
+  have key
+      : ∀ c,
+        Finset.univ.sup γ ≤ c
+          → cellRank β γ g a c
+            = ((g : Matrix (Fin n) (Fin n) F).submatrix
+              (fun i : {i : Fin n // a ≤ β i} => (i : Fin n))
+              id).rank := by
     intro c hc
     have hall : ∀ j, γ j ≤ c := fun j => (Finset.le_sup (Finset.mem_univ j)).trans hc
     unfold cellRank
@@ -446,9 +497,9 @@ theorem cellRank_eq_of_le {b : ℕ} (hb : Finset.univ.sup γ ≤ b) (g : GL (Fin
     rfl
   rw [key b hb, key _ le_rfl]
 
-theorem cellRank_clip (g : GL (Fin n) F) (a b : ℕ) :
-    cellRank β γ g a b =
-      cellRank β γ g (min a (Finset.univ.sup β + 1)) (min b (Finset.univ.sup γ)) := by
+theorem cellRank_clip (g : GL (Fin n) F) (a b : ℕ)
+    : cellRank β γ g a b
+      = cellRank β γ g (min a (Finset.univ.sup β + 1)) (min b (Finset.univ.sup γ)) := by
   rcases le_or_gt a (Finset.univ.sup β + 1) with ha | ha
   · rw [min_eq_left ha]
     rcases le_or_gt b (Finset.univ.sup γ) with hb | hb
@@ -456,16 +507,19 @@ theorem cellRank_clip (g : GL (Fin n) F) (a b : ℕ) :
     · rw [min_eq_right hb.le, cellRank_eq_of_le hb.le]
   · rw [min_eq_right ha.le, cellRank_eq_zero_of_lt (by omega), cellRank_eq_zero_of_lt (by omega)]
 
-theorem cellRank_eq_of_le_of_cellHeight_le {g x : GL (Fin n) F}
-    (h : ∀ a b, cellRank β γ x a b ≤ cellRank β γ g a b)
-    (hh : cellHeight β γ g ≤ cellHeight β γ x) : ∀ a b, cellRank β γ x a b = cellRank β γ g a b := by
-  have hbox : ∀ a ∈ Finset.range (Finset.univ.sup β + 2),
-      ∀ b ∈ Finset.range (Finset.univ.sup γ + 1), cellRank β γ x a b = cellRank β γ g a b := by
+theorem cellRank_eq_of_le_of_cellHeight_le
+    {g x : GL (Fin n) F}
+    (h : ∀ a b, cellRank β γ x a b ≤ cellRank β γ g a b) (hh : cellHeight β γ g ≤ cellHeight β γ x)
+    : ∀ a b, cellRank β γ x a b = cellRank β γ g a b := by
+  have hbox
+      : ∀ a ∈ Finset.range (Finset.univ.sup β + 2), ∀ b ∈ Finset.range (Finset.univ.sup γ + 1),
+        cellRank β γ x a b = cellRank β γ g a b := by
     by_contra hne
     push Not at hne
     obtain ⟨a, ha, b, hb, hne⟩ := hne
     have : cellHeight β γ x < cellHeight β γ g :=
-      Finset.sum_lt_sum (fun a _ => Finset.sum_le_sum fun b _ => h a b)
+      Finset.sum_lt_sum
+        (fun a _ => Finset.sum_le_sum fun b _ => h a b)
         ⟨a, ha, Finset.sum_lt_sum (fun b _ => h a b) ⟨b, hb, lt_of_le_of_ne (h a b) hne⟩⟩
     omega
   intro a b
@@ -474,36 +528,35 @@ theorem cellRank_eq_of_le_of_cellHeight_le {g x : GL (Fin n) F}
 
 variable [TopologicalSpace F] [IsTopologicalRing F] [T1Space F]
 
-theorem isOpen_setOf_le_cellRank (a b k : ℕ) :
-    IsOpen {x : GL (Fin n) F | k ≤ cellRank β γ x a b} :=
+theorem isOpen_setOf_le_cellRank (a b k : ℕ) : IsOpen {x : GL (Fin n) F | k ≤ cellRank β γ x a b} :=
   (isOpen_setOf_le_rank k).preimage (Units.continuous_val.matrix_submatrix _ _)
 
-theorem closure_doubleCoset_subset (g : GL (Fin n) F) :
-    closure (doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)) ⊆
-      doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) ∪
-        {x | cellHeight β γ x < cellHeight β γ g} := by
+theorem closure_doubleCoset_subset (g : GL (Fin n) F)
+    : closure (doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+      ⊆ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)
+        ∪ {x | cellHeight β γ x < cellHeight β γ g} := by
   set Z := {x : GL (Fin n) F | ∀ a b, cellRank β γ x a b ≤ cellRank β γ g a b}
   have hZ : IsClosed Z := by
     have : Z = ⋂ a, ⋂ b, {x : GL (Fin n) F | cellRank β γ g a b + 1 ≤ cellRank β γ x a b}ᶜ := by
       ext x
       simp only [Z, Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_compl_iff, not_le, Nat.lt_succ_iff]
     rw [this]
-    exact isClosed_iInter fun a => isClosed_iInter fun b =>
-      (isOpen_setOf_le_cellRank a b _).isClosed_compl
+    exact isClosed_iInter fun a =>
+      isClosed_iInter fun b => (isOpen_setOf_le_cellRank a b _).isClosed_compl
   have hsub : doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) ⊆ Z :=
     fun x hx a b => (cellRank_of_mem_doubleCoset hx a b).le
   intro x hx
   have hxZ : x ∈ Z := closure_minimal hsub hZ hx
   by_cases hlt : cellHeight β γ x < cellHeight β γ g
   · exact Or.inr hlt
-  · exact Or.inl (mem_doubleCoset_of_cellRank_eq
-      (cellRank_eq_of_le_of_cellHeight_le hxZ (not_lt.1 hlt)))
-
+  · exact Or.inl (mem_doubleCoset_of_cellRank_eq (cellRank_eq_of_le_of_cellHeight_le hxZ
+      (not_lt.1 hlt)))
 
 omit [TopologicalSpace F] [IsTopologicalRing F] [T1Space F] in
-theorem cellHeight_of_mem_doubleCoset {g x : GL (Fin n) F}
-    (hx : x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)) :
-    cellHeight β γ x = cellHeight β γ g := by
+theorem cellHeight_of_mem_doubleCoset
+    {g x : GL (Fin n) F}
+    (hx : x ∈ doubleCoset g (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+    : cellHeight β γ x = cellHeight β γ g := by
   unfold cellHeight
   simp only [cellRank_of_mem_doubleCoset hx]
 

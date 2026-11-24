@@ -1,14 +1,15 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2SpaceNumberFieldInfiniteAdeles
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralPointsFinitePlaceTensorPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MeasurableEmbeddingAdelicTupleLocalComponentsStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralPointsFinitePlaceTensorProperties
+public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MeasurableEmbeddingAdelicTupleLocalComponents
+public import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-public import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
@@ -278,10 +279,8 @@ theorem isProd_map_lrAct
             (fun v => (mv v).map (lrAct (g.val.map (prV v)) (γ.val.map (prV v)))) := by
   intro F E _ _ _ _ _ d b n M ν mi mv g γ ⟨⟨hmi, hmv, hsum⟩, H⟩
   classical
-  obtain ⟨-, -, -, hcv⟩ :=
-    GlobalTheory.T.measurableEmbedding_adelicTuple_localComponents F E d b n M
-  obtain ⟨hco, hsr, hz, -⟩ :=
-    GlobalTheory.T.integralPointsFinitePlaceTensor_properties F E (AlgHom.id F E) d b
+  obtain ⟨-, -, -, hcv⟩ := _root_.GlobalTheory.GaugeGlue.adelicTuple_measurableEmbedding F E d b n M
+  obtain ⟨hco, hsr, hz, -⟩ := _root_.GlobalTheory.GaugeEx.IntBasis.main F E (AlgHom.id F E) d b
   let eI :=
     lrHomeo (Matrix.GeneralLinearGroup.map (prInf (F := F) (E := E)) g)
       (Matrix.GeneralLinearGroup.map (prInf (F := F) (E := E)) γ)

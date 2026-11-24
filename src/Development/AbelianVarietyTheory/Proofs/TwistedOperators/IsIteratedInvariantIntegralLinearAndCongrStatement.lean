@@ -48,6 +48,7 @@ open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid Glob
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf
   GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.isIteratedInvariantIntegral_linear_and_congr
     : ∀ (ι : Type) [DecidableEq ι] (H : ι → Type) [∀ i, Group (H i)] [∀ i, MeasurableSpace (H i)]
         (R : ∀ i, Subgroup (H i)) (ρ : ∀ i, Measure (R i)) (μ : ∀ i, Measure (H i)) (l : List ι)
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.isIteratedInvariantIntegral_linear_and_congr
         ∧ ∀ q q' z,
           (∀ g : ∀ i, H i, (∀ i, i ∉ l → g i = h i) → q g = q' g) → NIter ρ μ q l h z
             → NIter ρ μ q' l h z := by
-  first
-  | exact @GlobalTheory.RowVal.niter_lin_congr
-  | exact GlobalTheory.RowVal.niter_lin_congr
-  | (intros; apply GlobalTheory.RowVal.niter_lin_congr <;> assumption)
+  first | exact @GlobalTheory.RowVal.niter_lin_congr

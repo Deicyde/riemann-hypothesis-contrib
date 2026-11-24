@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_weilDatum_twist_heckeCharacters
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_weilDatum_twist_heckeCharacters
                 ∧ ∀ g h x y,
                   IsDetRoot S g x → IsDetRoot T h y
                     → om' (g, h) = ((((νT x)⁻¹ * νS y : Circle) : ℂ)) • om (g, h) := by
-  first
-  | exact @GlobalTheory.WeilChange.exists_weilDatum_twist
-  | exact GlobalTheory.WeilChange.exists_weilDatum_twist
-  | (intros; apply GlobalTheory.WeilChange.exists_weilDatum_twist <;> assumption)
+  first | exact @GlobalTheory.WeilChange.exists_weilDatum_twist

@@ -189,7 +189,7 @@ theorem exists_levIs
     exact Ideal.map_comap_le
   have hlift : Lev.LiftsExist (Wc D i) (R.βW i) (R.datWp i R.triv) := by
     obtain ⟨c, hc⟩ := hβ
-    refine GlobalTheory.T.parahoricLevel_liftsExist _ _ _ _ _ hc
+    refine _root_.GlobalTheory.ParahoricLift.liftsExist _ _ _ _ _ hc
       (fun PP h PP' h' => ?_)
       (Finset.disjoint_empty_right _)
     rcases h' with h' | h'

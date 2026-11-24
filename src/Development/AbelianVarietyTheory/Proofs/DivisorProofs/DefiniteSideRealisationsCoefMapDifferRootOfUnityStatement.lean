@@ -53,7 +53,6 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
 
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem _root_.GlobalTheory.T.definiteSideRealisations_coefMap_differ_rootOfUnity
@@ -73,7 +72,4 @@ theorem _root_.GlobalTheory.T.definiteSideRealisations_coefMap_differ_rootOfUnit
         → Bridge.FamTie B pl S Qt tauL lamR lamL gramR' c0R' c0L'
         → ∀ i : Fin m, ∃ a : D.what₂.LL,
           (∃ k : ℕ, k ≠ 0 ∧ a ^ k = 1) ∧ ∀ F, c0L' i F = D.what₂.embLL a • c0L i F := by
-  first
-  | exact @GlobalTheory.CoefRoot.coef_root
-  | exact GlobalTheory.CoefRoot.coef_root
-  | (intros; apply GlobalTheory.CoefRoot.coef_root <;> assumption)
+  first | exact @GlobalTheory.CoefRoot.coef_root

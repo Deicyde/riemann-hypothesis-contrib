@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heckeElement_component_mem_standardDoubleCoset
     : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
       IsSplitIdem D e → Chart e v π
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.heckeElement_component_mem_standardDoubleCoset
             → ∀ (ϖ : D.host.E) (p : Ov D v) (k : ℕ) (α : GA D V),
               algebraMap (Ov D v) (Fv D.host.F v) p = π (incA D ϖ) → IsHeckeElt V e ϖ k α
                 → Hk (Ov D v) p k (rho V π β α) := by
-  first
-  | exact @GlobalTheory.SplitHecke.HeckeComp.hk_of_isHeckeElt
-  | exact GlobalTheory.SplitHecke.HeckeComp.hk_of_isHeckeElt
-  | (intros; apply GlobalTheory.SplitHecke.HeckeComp.hk_of_isHeckeElt <;> assumption)
+  first | exact @GlobalTheory.SplitHecke.HeckeComp.hk_of_isHeckeElt

@@ -64,10 +64,7 @@ theorem side_well_formed
     (Zs : DefSub A3.fam3.amb3) (hst : Zs.Stable) (hin : Zs.InBlock)
     (hsep : A3.fam3.TypesSep3)
     : (A3.side3 P ψ Zs).WF := by
-  first
-  | exact DefFam3.side_well_formed h P ψ Zs hst hin hsep
-  | exact A3.fam3.side_well_formed h P ψ Zs hst hin hsep
-  | exact DefFam3.side_well_formed (F3 := A3.fam3) h P ψ Zs hst hin hsep
+  first | exact A3.fam3.side_well_formed h P ψ Zs hst hin hsep
 
 end FamIn3
 

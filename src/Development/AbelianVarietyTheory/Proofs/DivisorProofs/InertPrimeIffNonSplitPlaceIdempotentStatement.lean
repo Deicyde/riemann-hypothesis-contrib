@@ -62,7 +62,4 @@ theorem _root_.GlobalTheory.T.inertPrime_iff_nonSplitPlaceIdempotent
           IsPlaceIdem D v η → (q : 𝓞 D.host.F) ∈ v.asIdeal
             → (Formalism.MainNotions.StandardLatticesGL3.InertQ D q
               ↔ GlobalTheory.WeilParts.NonSplitAt D v η) := by
-  first
-  | exact @GlobalTheory.InertPlace.inertQ_iff_nonSplitAt
-  | exact GlobalTheory.InertPlace.inertQ_iff_nonSplitAt
-  | (intros; apply GlobalTheory.InertPlace.inertQ_iff_nonSplitAt <;> assumption)
+  first | exact @GlobalTheory.InertPlace.inertQ_iff_nonSplitAt

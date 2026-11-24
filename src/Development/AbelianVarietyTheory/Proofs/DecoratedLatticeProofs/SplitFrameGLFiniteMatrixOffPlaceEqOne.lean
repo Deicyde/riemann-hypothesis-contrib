@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MidChart
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceHermitianFramePropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceHermitianFrameProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,8 +59,6 @@ open GlobalTheory.AdForm
 
 namespace GlobalTheory.StabOff
 
-
-
 theorem prV_comm_tmul {D : D7} (v : Pl D) (a : Af ↥D.host.F) (e : D.host.E)
     : Formalism.UG.prV (E := D.host.E) v
         ((Algebra.TensorProduct.comm (↥D.host.F) (Af ↥D.host.F) D.host.E) (a ⊗ₜ e))
@@ -104,7 +102,7 @@ theorem compAt_mt
         (Formalism.L2.Theta.mt S (β.gl g) i j - (1 : Matrix (Fin S.rank) (Fin S.rank) (AE D)) i j)
       = 0 := by
   have hmem : β.gl g ∈ grpAt S (· = p.v) :=
-    ((GlobalTheory.T.splitPlaceHermitianFrame_properties D k p S n β).1 _).2 ⟨g, rfl⟩
+    ((_root_.GlobalTheory.FrameAt.frame_facts D k p S n β).1 _).2 ⟨g, rfl⟩
   unfold grpAt congGrp at hmem
   rw [MonoidHom.mem_ker, MonoidHom.comp_apply] at hmem
   have h1 := congrArg (fun u => u.1 i j) hmem
@@ -141,9 +139,9 @@ theorem bc_prV_finM_eq_one
   rw [h]
   by_cases hij : i = j
   · subst hij
-    simp [Matrix.one_apply]
+    simp
   · have hij' : (finCongr hm).symm i ≠ (finCongr hm).symm j := fun e =>
       hij ((finCongr hm).symm.injective e)
-    simp [Matrix.one_apply, hij, hij']
+    simp [hij]
 
 end GlobalTheory.StabOff

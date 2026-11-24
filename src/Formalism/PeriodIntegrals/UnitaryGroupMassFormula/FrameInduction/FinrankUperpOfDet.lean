@@ -123,7 +123,8 @@ theorem finrank_Uperp_of_det
     simp at this
     omega
   have hrn := LinearMap.finrank_range_add_finrank_ker (Matrix.mulVecLin R)
-  have hrank : R.rank = Module.finrank ℂ (LinearMap.range (Matrix.mulVecLin R)) := (Matrix.finrank_range_mulVecLin R).symm
+  have hrank : R.rank = Module.finrank ℂ (LinearMap.range (Matrix.mulVecLin R)) :=
+    (Matrix.finrank_range_mulVecLin R).symm
   rw [Uperp_mat, ← hR]
   simp only [Module.finrank_fin_fun] at hrn
   omega

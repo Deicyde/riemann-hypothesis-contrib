@@ -75,9 +75,6 @@ theorem bij_transport
     rw [h, hx']
     simp
 
-theorem nsmul_zmod {Y : Type*} [AddCommGroup Y] [Module (ZMod n) Y] (y : Y) : n • y = 0 := by
-  rw [← Nat.cast_smul_eq_nsmul (ZMod n), ZMod.natCast_self, zero_smul]
-
 theorem bij_flip
     [NeZero n]
     {X Y Z : Type*} [AddCommGroup X] [AddCommGroup Y] [AddCommGroup Z] [Module (ZMod n) X]
@@ -87,7 +84,8 @@ theorem bij_flip
     : Function.Bijective c.flip := by
   let β : Y →+ X →+ ZMod n := (AddMonoidHom.compHom τ.toAddMonoidHom).comp (bilinAddHom c.flip)
   refine bij_transport c.flip β (AddEquiv.refl _) (AddEquiv.refl _) τ (fun _ _ => rfl) ?_
-  refine bijective_of_bijective_flip (X := Y) nsmul_zmod (bilinAddHom c.flip) τ.toAddMonoidHom ?_
+  refine bijective_of_bijective_flip (X := Y) (ZModModule.char_nsmul_eq_zero n) (bilinAddHom c.flip)
+    τ.toAddMonoidHom ?_
   refine ⟨fun x₁ x₂ hx => hc.1 (LinearMap.ext fun y => τ.injective ?_), fun χ => ?_⟩
   · exact DFunLike.congr_fun hx y
   · obtain ⟨x, hx⟩ := hc.2 ((τ.symm.toAddMonoidHom.comp χ).toZModLinearMap n)

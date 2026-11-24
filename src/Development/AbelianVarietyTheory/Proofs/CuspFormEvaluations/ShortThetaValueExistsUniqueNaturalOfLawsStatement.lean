@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.shortThetaValue_existsUnique_natural_of_laws
     : Laws → ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.shortThetaValue_existsUnique_natural_of_laws
                           → ∀ v0 v,
                             ShortValAt Xo c nab w Λ β N P y0 v0 → ShortValAt Xo c nab w Λ β N P y v
                               → φ v0 = v := by
-  first
-  | exact @GlobalTheory.shortThetaValue_existsUnique_natural
-  | exact GlobalTheory.shortThetaValue_existsUnique_natural
-  | (intros; apply GlobalTheory.shortThetaValue_existsUnique_natural <;> assumption)
+  first | exact @GlobalTheory.shortThetaValue_existsUnique_natural

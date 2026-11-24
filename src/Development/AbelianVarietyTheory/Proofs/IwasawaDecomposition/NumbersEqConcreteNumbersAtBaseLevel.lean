@@ -144,10 +144,10 @@ theorem numTie_of_read
         → NumTie D A3.A (A3.indefDown (s0Of R F)) Y.tup := by
   intro D G _ _ Pl0 I0 T A3 Ks _ _ _ R F cG X0 Y Z Xd JM hP hH hM hI
   obtain ⟨-, hθ⟩ :=
-    GlobalTheory.T.liftCuspFormSpace_thetaMap_eq_data D G Pl0 I0 T A3 Ks R F cG X0 Y Z hP hH
+    _root_.GlobalTheory.Mem.ThRead.thDef3_thTheta D G Pl0 I0 T A3 Ks R F cG X0 Y Z hP hH
   have hZ0 :=
-    GlobalTheory.T.zeroSubspace_spanned_by_dataZeroSubspace_lifts D G Pl0 I0 T A3 Ks R F cG X0 Y Z
-      hP hH
+    _root_.GlobalTheory.Mem.R3.DivisionRationalLift.divisionRows_rationalLift D G Pl0 I0 T A3 Ks R F
+      cG X0 Y Z hP hH
   have hok := hH.ok.ok2
   have hB : ∀ i t, BlockHyp (A3.A.fam.L i t) (A3.A.fam.lvlA F.P0 F.ψ0) A3.A.fam.v0 1 := fun i t =>
     ⟨hok.conj, hok.irr, hok.lifts i t⟩

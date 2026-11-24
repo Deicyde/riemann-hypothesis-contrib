@@ -127,7 +127,7 @@ theorem mir_exists_row
       · subst e1
         simp only [v, Matrix.one_apply, h1.symm, if_false]
         rw [dite_eq_right (by omega)]
-      · simp [e2, Matrix.one_apply, Ne.symm h2]
+      · simp [e2, Ne.symm h2]
       · rfl
   · intro t
     rw [IsUnit.unit_spec]

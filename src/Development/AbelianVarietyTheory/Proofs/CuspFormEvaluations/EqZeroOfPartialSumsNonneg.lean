@@ -249,7 +249,7 @@ theorem _root_.GlobalTheory.Harm.casimir_value_mixedWeight
     _root_.GlobalTheory.Harm.sum_dite_rev_lt hq
       (fun j : Fin q => (b j : ℤ) * (b j + m - 1 - 2 * (j : ℕ)))
   beta_reduce at h1 h2
-  simp only [Fin.val_mk] at h1 h2
+  simp only at h1 h2
   have hpt
       : ∀ k : Fin m,
         _root_.GlobalTheory.Harm.mixedWeight m a b k

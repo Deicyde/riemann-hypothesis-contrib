@@ -367,21 +367,15 @@ theorem comb_le
   rw [h3] at h4
   exact mul_le_mul (ht j) (Real.le_sqrt_of_sq_le h4) (norm_nonneg _) ((norm_nonneg _).trans (ht j))
 
-theorem emb_cc (τ : E →+* ℂ) (x : E) : τ (cc x) = conj (τ x) :=
-  IsCMField.complexEmbedding_complexConj E τ x
+alias emb_cc := _root_.GlobalTheory.SW.Base.map_cc
 
-theorem ccT_mul {α β γ : Type} [Fintype β] (A : Matrix α β E) (B : Matrix β γ E)
-    : ccT (A * B) = ccT B * ccT A := by
-  ext i j
-  simp [ccT, cc, Matrix.mul_apply, mul_comm]
+alias ccT_mul := _root_.GlobalTheory.SW.Base.ccT_mul
 
 theorem ccT_smul {α β : Type} (k : ℤ) (A : Matrix α β E) : ccT ((k : E) • A) = (k : E) • ccT A := by
   ext i j
   simp [ccT, cc]
 
-theorem ccT_one {α : Type} [DecidableEq α] : ccT (1 : Matrix α α E) = 1 := by
-  ext i j
-  simp [ccT, cc, Matrix.one_apply, apply_ite, eq_comm]
+alias ccT_one := _root_.GlobalTheory.SW.Base.ccT_one
 
 omit [NumberField E] [IsCMField E] in
 theorem intM_mul
@@ -502,8 +496,7 @@ theorem GlobalTheory.SW.exists_shortIso
           : τ.1 (Γ i j)
             = D * ((fun a => τ.1 (V i a)) ⬝ᵥ G.map τ.1 *ᵥ star fun a => τ.1 (V j a)) := by
         rw [hΓ, Matrix.mul_assoc]
-        simp [Matrix.mul_apply, ccT, emb_cc, dotProduct, mulVec, Finset.mul_sum, mul_assoc,
-          mul_left_comm]
+        simp [Matrix.mul_apply, ccT, emb_cc, dotProduct, mulVec, Finset.mul_sum, mul_left_comm]
       rw [h4, norm_mul, Complex.norm_natCast]
       gcongr
     intro σ

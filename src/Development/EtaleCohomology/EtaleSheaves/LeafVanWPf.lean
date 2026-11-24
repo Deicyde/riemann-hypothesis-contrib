@@ -80,8 +80,6 @@ theorem desc_eq_zero
     rw [H, Cochain.comp_zero] at this
     exact this.symm
 
-theorem units_mul_self' (u : ℤˣ) : u * u = 1 := Int.units_mul_self u
-
 theorem cone_zero
     (hinj : ∀ (n : ℤ) (x : Cocycle L M n),
       CohomologyClass.mk (zcomp (Cocycle.ofHom φ) x (zero_add n)) = 0 → CohomologyClass.mk x = 0)
@@ -104,7 +102,7 @@ theorem cone_zero
     apply hinj
     rw [CohomologyClass.mk_eq_zero_iff, mem_coboundaries_iff _ (n - 1) (by omega)]
     refine ⟨-((n + 1).negOnePow • a), ?_⟩
-    rw [δ_neg, δ_units_smul, hda, smul_neg, neg_neg, smul_smul, units_mul_self', one_smul]
+    rw [δ_neg, δ_units_smul, hda, smul_neg, neg_neg, smul_smul, Int.units_mul_self, one_smul]
     simp [zcomp, bc]
   rw [CohomologyClass.mk_eq_zero_iff, mem_coboundaries_iff _ (n - 1) (by omega)] at hb0
   obtain ⟨γ, hγ⟩ := hb0
@@ -140,12 +138,11 @@ theorem cone_zero
   ⟩
   rw [δ_sub, δ_add, δ_units_smul, hw, desc_δ φ _ _ _ n (by omega), desc_δ φ _ _ _ n (by omega), hγ',
     hdx]
-  change _ = z.1
   rw [hz, mappingCone.ext_cochain_from_iff φ (n - 1) n (by omega)]
   constructor
   · simp only [mappingCone.inl_descCochain, Cochain.comp_add, Cochain.comp_sub,
       Cochain.comp_units_smul, δ_zero, zero_add, Cochain.comp_zero, smul_zero, add_zero, smul_smul,
-      units_mul_self', one_smul, ha']
+      Int.units_mul_self, one_smul, ha']
     abel
   · simp
 end Cone
@@ -229,24 +226,20 @@ theorem commGroup_inv_eq_conj_twist_identity
   ⟩⟩
   · apply pullback.hom_ext
     · apply pullback.hom_ext
-      · simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_snd,
-          pullback.lift_fst_assoc, pullback.lift_snd_assoc]
+      · simp only [Category.assoc, Category.id_comp, pullback.lift_fst]
       · rw [← cancel_mono ι]
         simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_snd,
-          pullback.lift_fst_assoc, pullback.lift_snd_assoc, hw]
+          pullback.lift_snd_assoc, hw]
         have e3 : pullback.fst (pA ≫ s) ι ≫ pA ≫ s = pullback.snd (pA ≫ s) ι ≫ ι :=
           pullback.condition
         have e4 := pullback.condition_assoc (f := pullback.fst (pA ≫ s) ι ≫ pA) (g := r) s
         simp only [Category.assoc] at e4
         rw [← e3]
-        first | exact e4 | exact e4.symm
-    · simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_snd,
-        pullback.lift_fst_assoc, pullback.lift_snd_assoc]
+        first | exact e4.symm
+    · simp only [Category.assoc, Category.id_comp, pullback.lift_snd]
   · apply pullback.hom_ext
-    · simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_snd,
-        pullback.lift_fst_assoc, pullback.lift_snd_assoc]
-    · simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_snd,
-        pullback.lift_fst_assoc, pullback.lift_snd_assoc]
+    · simp only [Category.assoc, Category.id_comp, pullback.lift_fst, pullback.lift_fst_assoc]
+    · simp only [Category.assoc, Category.id_comp, pullback.lift_snd]
 
 theorem closed_eq {A : Type} [CommRing A] [IsLocalRing A] (x : Sp A) (hx : ∀ z : Sp A, z ⤳ x)
     : x = IsLocalRing.closedPoint A :=

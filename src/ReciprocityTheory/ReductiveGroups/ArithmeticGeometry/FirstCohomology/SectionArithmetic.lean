@@ -112,7 +112,7 @@ theorem sval_pullSec
   have hm2 := hJ.mem φ (r ≫ h)
   simp only [Category.assoc] at hm2
   unfold sval
-  simp only [Category.assoc]
+  simp only
   exact (gs_res r z _ hm1 _).trans (gs_pull r h z _ hm2 _)
 
 def mulSec
@@ -227,7 +227,7 @@ theorem germ_eq_sval
   erw [gs_eq (𝟙 Y) y _ hy] at h1
   unfold sval
   rw [← h1]
-  first | rfl | simp
+  first | rfl
 
 theorem isUnit_sval
     {φ : K → (Y ⟶ X)} {ε : K → ℤ} (s : LB.Sec (LB.LinComb L φ ε))

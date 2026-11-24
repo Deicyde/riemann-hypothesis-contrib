@@ -55,9 +55,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.LevelPlaces
 
 open GlobalTheory.IdemModTwo GlobalTheory.SplitIdem

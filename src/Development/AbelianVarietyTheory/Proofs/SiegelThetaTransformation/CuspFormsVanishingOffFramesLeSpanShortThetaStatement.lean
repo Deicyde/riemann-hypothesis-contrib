@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -53,6 +54,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.cuspForms_vanishing_off_frames_le_span_shortTheta
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -69,7 +71,4 @@ theorem _root_.GlobalTheory.T.cuspForms_vanishing_off_frames_le_span_shortTheta
               → holSub0 U.X (Formalism.L2.PjFree.laU U a n)
                 ≤ Submodule.span ℂ
                   (Formalism.L2.PjFree.rdU U '' shortGen Xo c nab bad nV a n d) := by
-  first
-  | exact @GlobalTheory.Dict.holSub0_le_span_shortGen
-  | exact GlobalTheory.Dict.holSub0_le_span_shortGen
-  | (intros; apply GlobalTheory.Dict.holSub0_le_span_shortGen <;> assumption)
+  first | exact @GlobalTheory.Dict.holSub0_le_span_shortGen

@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.UnipVal
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianMatrixColumnPairingAlgebraicPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitUnitarySiegelParabolicBlockRelationsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryCharacterAbsScalarBasicPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianMatrixColumnPairingAlgebraicProperties
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitUnitarySiegelParabolicBlockRelations
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryCharacterAbsScalarBasicProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -67,10 +67,8 @@ theorem GlobalTheory.KSp.parFun_sieg_mul
           parFun c ψ χ Q (mat c (p * q)) φ
             = parFun c ψ χ Q (mat c p) (parFun c ψ χ Q (mat c q) φ) := by
   intro F _ _ _ _ _ E _ _ _ _ c δ hE α _ _ ν _ _ Q hQ ψ hψ hψ1 hψ0 χ hχ hres
-  obtain ⟨β, hβ, hsymm, -, hadj, -⟩ :=
-    GlobalTheory.T.hermitianMatrixColumnPairing_algebraic_properties F E c δ hE α ν Q hQ
-  obtain ⟨hsc1, hscmul, -⟩ :=
-    GlobalTheory.T.unitaryCharacterAbsScalar_basic_properties F E c δ hE (Fintype.card α) χ hres
+  obtain ⟨β, hβ, hsymm, -, hadj, -⟩ := _root_.GlobalTheory.KSp.pr_alg F E c δ hE α ν Q hQ
+  obtain ⟨hsc1, hscmul, -⟩ := _root_.GlobalTheory.KSp.sc_basic F E c δ hE (Fintype.card α) χ hres
   refine ⟨?_, ?_⟩
   · intro φ
     funext x
@@ -78,16 +76,14 @@ theorem GlobalTheory.KSp.parFun_sieg_mul
     have h11 : (1 : Matrix (ν ⊕ ν) (ν ⊕ ν) E).toBlocks₁₁ = 1 := by
       ext i j
       by_cases h : i = j <;> simp [toBlocks₁₁, Matrix.one_apply, h]
-    have h12 : (1 : Matrix (ν ⊕ ν) (ν ⊕ ν) E).toBlocks₁₂ = 0 := by
-      ext i j; simp [toBlocks₁₂, one_apply]
+    have h12 : (1 : Matrix (ν ⊕ ν) (ν ⊕ ν) E).toBlocks₁₂ = 0 := by ext i j; simp [toBlocks₁₂]
     have hp0 : pr c Q x 0 = 0 := by rw [← hβ]; simp
     simp only [parFun, h1, h11, h12, det_one, hsc1, Matrix.mul_one, Matrix.mul_zero, hp0, mul_zero,
       AddChar.map_zero_eq_one, one_mul]
   · intro p hp q hq φ
     funext x
     have hmul : mat c (p * q) = mat c p * mat c q := rfl
-    obtain ⟨hq1, -, -⟩ :=
-      GlobalTheory.T.splitUnitarySiegelParabolic_block_relations F E c δ hE ν q hq
+    obtain ⟨hq1, -, -⟩ := _root_.GlobalTheory.KSp.sieg_blocks F E c δ hE ν q hq
     have hP
         : mat c p
           = fromBlocks (mat c p).toBlocks₁₁ (mat c p).toBlocks₁₂ 0 (mat c p).toBlocks₂₂ := by

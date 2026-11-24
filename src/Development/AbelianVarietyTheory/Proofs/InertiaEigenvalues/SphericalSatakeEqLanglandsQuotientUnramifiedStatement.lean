@@ -51,6 +51,7 @@ open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.Conju
   ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
   GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.spherical_satake_eq_langlandsQuotient_unramified
     : LanglandsExhaustionGL → LanglandsMultisegments → StandardCosocleGL → ZelevinskyPolynomialRing
       → GeometricLemma → BernsteinZelevinskyFiniteness
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.spherical_satake_eq_langlandsQuotient_unramified
                   (isSmoothChar_of_isUnram (isUnram_unrChar k (α i))))
                 (IrrGL.isCusp_ofChar _ _))
             x.rep := by
-  first
-  | exact @GlobalTheory.LocLanglands.SatakeL.isL_single_unrChar
-  | exact GlobalTheory.LocLanglands.SatakeL.isL_single_unrChar
-  | (intros; apply GlobalTheory.LocLanglands.SatakeL.isL_single_unrChar <;> assumption)
+  first | exact @GlobalTheory.LocLanglands.SatakeL.isL_single_unrChar

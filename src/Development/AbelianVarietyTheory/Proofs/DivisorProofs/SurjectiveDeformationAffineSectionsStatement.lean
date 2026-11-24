@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.surjective_deformation_affine_sections
     : ∀ (R R' R₀ : Type) [CommRing R] [CommRing R'] [CommRing R₀] (t : R) (σ : R →+* R')
         (σ₀ : R →+* R₀) (X X' X₀ : Scheme.{0}) (s : X ⟶ Sp R) (s' : X' ⟶ Sp R') (s₀ : X₀ ⟶ Sp R₀)
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.surjective_deformation_affine_sections
           Function.Surjective (preα φ s s' U) ∧ (∀ b, preα φ s s' U b = 0 ↔ ∃ c, b = t • c)
             ∧ Function.Surjective (preα φ₀ s s₀ U)
             ∧ ∀ b : (OAff s).obj U, preα φ₀ s s₀ U b = 0 ↔ t • b = 0 := by
-  first
-  | exact @GlobalTheory.AbCoh.preα_surjective_and_ker
-  | exact GlobalTheory.AbCoh.preα_surjective_and_ker
-  | (intros; apply GlobalTheory.AbCoh.preα_surjective_and_ker <;> assumption)
+  first | exact @GlobalTheory.AbCoh.preα_surjective_and_ker

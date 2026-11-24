@@ -127,7 +127,6 @@ theorem hermMap_hR
       = hR R' σ J
         (fun i => Algebra.TensorProduct.map f (AlgHom.id F E) (x i))
         (fun i => Algebra.TensorProduct.map f (AlgHom.id F E) (y i)) := by
-
   simp only [hR, Formalism.UG.hform, map_sum, map_mul, sigR_map]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp [JR, inclR]

@@ -208,7 +208,7 @@ theorem UpperTheory.Gal.Join.subQuot : UpperTheory.Gal.Join.SubQuot := by
       intro φ
       rw [pow_succ', Module.End.mul_apply, ih, pow_succ]
       ext x
-      simp [g, Module.Dual.transpose_apply, Module.End.mul_apply, smul_eq_mul]
+      simp [g, Module.Dual.transpose_apply, smul_eq_mul]
   obtain ⟨l, hl0, hl⟩ :=
     jointEig g c hg (by
       refine (Submodule.ne_bot_iff _).mpr ⟨l0, ?_, hl00⟩

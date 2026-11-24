@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open scoped Classical

@@ -194,7 +194,7 @@ theorem aF_add
     (P : AF F) (hP : (InfiniteAdeleRing.ringEquiv_mixedSpace F P.1).1 i₀ = - c ^ 2)
     (s t : ℝ)
     : aF F i₀ (s + t) = aF F i₀ s * aF F i₀ t + P * (bF F i₀ c s * bF F i₀ c t) := by
-  simp only [aF, bF, mk_mul, mul_zero, mul_mk_zero, mk_add, mul_one, add_zero, mk_fst]
+  simp only [aF, bF, mk_mul, mul_mk_zero, mk_add, mul_one, add_zero, mk_fst]
   congr 1
   refine Prod.ext (funext fun j => ?_) ?_
   · by_cases h : j = i₀
@@ -462,7 +462,7 @@ theorem exists_central_line
         ext i j
         by_cases hij : i = j
         · subst hij; simp [Complex.real_smul]
-        · simp [Matrix.one_apply, Matrix.diagonal_apply, hij]
+        · simp [hij]
       rw [e, Matrix.exp_diagonal]
       ext i j
       simp [Matrix.diagonal_mul, Matrix.mul_diagonal, Complex.exp_eq_exp_ℂ, mul_comm]

@@ -80,7 +80,4 @@ theorem _root_.GlobalTheory.T.schrodingerModel_halfLatticeVolume_mul_inner_eq_in
                                     : ℂ)
                                   * ipO μ 𝓕 (Tm (pull a κ Φ₁)) (Tm (pull a κ Φ₂))
                                 = GlobalTheory.SplitWeil.ip ν Φ₁ Φ₂ := by
-  first
-  | exact @GlobalTheory.PlaceIsometry.placeModel_isometry
-  | exact GlobalTheory.PlaceIsometry.placeModel_isometry
-  | (intros; apply GlobalTheory.PlaceIsometry.placeModel_isometry <;> assumption)
+  first | exact @GlobalTheory.PlaceIsometry.placeModel_isometry

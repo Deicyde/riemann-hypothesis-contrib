@@ -424,7 +424,9 @@ structure DivisorReductionStepProperties
               ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) J
               ((T.boundary.eraseIdx j).map
                 (fun D => D.comap (T.boundary.get ⟨j, hj⟩).subschemeι))).IsAdmissible
-            → T.ideal = imageIdealSheaf (T.boundary.get ⟨j, hj⟩).subschemeι J
+            → T.ideal
+              = _root_.FunctorialResolution.Blowup.schemeImageIdeal
+                (T.boundary.get ⟨j, hj⟩).subschemeι J
             → DivisorReduction.containedComponentsIdeal T j hj = ⊤
   smooth_preIdeal
     : ∀ (T : MarkedIdealWithBoundary.{u}),

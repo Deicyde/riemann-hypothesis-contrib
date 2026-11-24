@@ -75,7 +75,4 @@ theorem _root_.GlobalTheory.T.schroedinger_fixed_functions_proportional_of_selfD
             → ∀ f g : (κ → Fv F v) → ℂ,
               (∀ s ∈ S, schr ψk s f = f) → (∀ s ∈ S, schr ψk s g = g) → f ≠ 0
                 → ∃ a : ℂ, g = a • f := by
-  first
-  | exact @GlobalTheory.SchrFixUniq.proportional_of_fixed
-  | exact GlobalTheory.SchrFixUniq.proportional_of_fixed
-  | (intros; apply GlobalTheory.SchrFixUniq.proportional_of_fixed <;> assumption)
+  first | exact @GlobalTheory.SchrFixUniq.proportional_of_fixed

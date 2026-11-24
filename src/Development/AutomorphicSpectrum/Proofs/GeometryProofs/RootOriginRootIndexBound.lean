@@ -98,7 +98,7 @@ theorem flag_change
     rw [← Set.image_univ]
     congr 2
     ext k
-    simp [k.isLt]
+    simp
   have hc : LinearIndependent Ω c := by
     rw [linearIndependent_iff_card_eq_finrank_span]
     show Fintype.card (Fin r) = Module.finrank Ω (Submodule.span Ω (Set.range c))

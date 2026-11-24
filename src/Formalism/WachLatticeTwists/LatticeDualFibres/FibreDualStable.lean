@@ -138,11 +138,7 @@ theorem pairKO_cont
     (b : V →ₗ[O] V' →ₗ[O] FractionRing O) (hb : Continuous fun p : V × V' => b p.1 p.2)
     (T : Submodule O V)
     : Continuous fun p : (V ⧸ T) × dualLat b T => pairKO b T p.1 p.2 := by
-  have hm : IsOpenQuotientMap T.mkQ := by
-    first
-    | exact Submodule.isOpenQuotientMap_mkQ T
-    | exact QuotientAddGroup.isOpenQuotientMap_mk
-    | exact QuotientAddGroup.isOpenQuotientMap_mk (N := T.toAddSubgroup)
+  have hm : IsOpenQuotientMap T.mkQ := by first | exact Submodule.isOpenQuotientMap_mkQ T
   have hq : IsOpenQuotientMap (Prod.map T.mkQ (id : dualLat b T → dualLat b T)) :=
     hm.prodMap IsOpenQuotientMap.id
   rw [hq.isQuotientMap.continuous_iff]

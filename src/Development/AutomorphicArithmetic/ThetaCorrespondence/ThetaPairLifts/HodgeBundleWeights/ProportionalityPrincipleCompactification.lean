@@ -78,7 +78,8 @@ theorem hirzebruch_proportionality_toroidal
   obtain ⟨X, h1, h2, h3, h4⟩ := hT.exists_model_charts hS hr Y.d.Xo₂ Y.d.c₂
   obtain ⟨TF, hc⟩ := exists_torFlag_charts hr X h1 h2 h3 h4
   exact _root_.GlobalTheory.CompProport.proportionality_of_local_charts
-    (_root_.GlobalTheory.T.covering_topology_refinement hP) hP.q7 hL hY hf TF hc
+    (_root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems.toClassicalTheorems hP) hP.q7 hL hY hf
+    TF hc
 end GlobalTheory.CompProport
 end
 
@@ -95,6 +96,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
+
 theorem _root_.GlobalTheory.T.proportionality_principle_compactification
     : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems
       → GlobalTheory.Published.SiegelToroidalIntegral → GlobalTheory.Published.ToroidalForFanKS
@@ -105,11 +107,5 @@ theorem _root_.GlobalTheory.T.proportionality_principle_compactification
             1 ≤ (T.Q.Dw j).p → 1 ≤ (T.Q.Dw j).q → 2 < Module.finrank ℚ D.host.E / 2 → InR D j
               → ∀ (Y : Deep T.toCore j) (e : ℕ) (o : ℝ),
                 Y.Good e o → Proport Y.U ∧ ∀ Z, 0 < CompHt.vZero Y.U Z := by
-  first
-  | exact @_root_.GlobalTheory.CompProport.hirzebruch_proportionality_toroidal
-  | exact _root_.GlobalTheory.CompProport.hirzebruch_proportionality_toroidal
-  | (
-      intros
-      apply _root_.GlobalTheory.CompProport.hirzebruch_proportionality_toroidal <;> assumption
-    )
+  first | exact @_root_.GlobalTheory.CompProport.hirzebruch_proportionality_toroidal
 end

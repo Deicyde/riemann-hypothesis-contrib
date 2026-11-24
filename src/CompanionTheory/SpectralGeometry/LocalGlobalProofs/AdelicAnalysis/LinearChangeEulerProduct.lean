@@ -2,8 +2,10 @@ module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GlobalUnitScalingHaarProductFormulaStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HaarMapLinearScalingByDeterminantStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GlobalUnitScalingHaarProductFormula
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.MeasureTheory.Group.Measure
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HaarMapLinearScalingByDeterminant
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.AdeleLC
 import GroundTheory.GlobalFields.LocalAtPlace
 import GroundTheory.GlobalFields.LocalFieldAtPlace
@@ -73,16 +75,16 @@ theorem modulus_matrix
                   → μ.map (fun x => A.map (algebraMap F (Fv F v)) *ᵥ x) = c v • μ) := by
   intro F _ _ ι _ _ A hA
   obtain ⟨cinf, c, hU, hinf, hv⟩ :=
-    GlobalTheory.T.global_unit_scaling_haar_product_formula F A.det hA
+    _root_.GlobalTheory.CompanionTheory.SW.ProdFormula.unitProd_scalar F A.det hA
   refine ⟨cinf, c, hU, ?_, ?_⟩
   · intro μ hμ
     haveI : BorelSpace (Ainf F) := ⟨rfl⟩
-    exact GlobalTheory.T.haar_map_linear_scaling_by_determinant F (Ainf F) ι A hA Measure.addHaar
-      inferInstance cinf (hinf Measure.addHaar inferInstance) μ hμ
+    exact _root_.GlobalTheory.CompanionTheory.SW.DetScale.map_mulVec_eq_smul F (Ainf F) ι A hA
+      Measure.addHaar inferInstance cinf (hinf Measure.addHaar inferInstance) μ hμ
   · intro v μ hμ
     haveI : BorelSpace (Fv F v) := ⟨rfl⟩
     haveI : SecondCountableTopology (Fv F v) := (GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v).2.2.1
-    exact GlobalTheory.T.haar_map_linear_scaling_by_determinant F (Fv F v) ι A hA Measure.addHaar
-      inferInstance (c v) (hv v Measure.addHaar inferInstance) μ hμ
+    exact _root_.GlobalTheory.CompanionTheory.SW.DetScale.map_mulVec_eq_smul F (Fv F v) ι A hA
+      Measure.addHaar inferInstance (c v) (hv v Measure.addHaar inferInstance) μ hμ
 
 end GlobalTheory.CompanionTheory.SW.ProdFormula

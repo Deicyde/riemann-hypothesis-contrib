@@ -636,8 +636,6 @@ section Host
 
 open Formalism.BasicNotions
 
-
-
 variable
   {R : Ranks} {H : Formalism.BasicNotions.Host R} {Ω : Type}
   [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω]

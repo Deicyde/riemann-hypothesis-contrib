@@ -49,6 +49,7 @@ import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.Ba
 import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.ContinuousResP
 import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.RepAlg
+import Mathlib.RingTheory.PicardGroup
 
 @[expose] public section
 
@@ -164,9 +165,7 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple
     exact htrace _ y.2
   have hI : IsIdempotentElem (e : Module.End k (Fin n → k)) := congrArg Subtype.val hidem
   have he0 : (e : Module.End k (Fin n → k)) = 0 := by
-    first
-    | exact (LinearMap.IsIdempotentElem.trace_eq_zero_iff hI).mp htr_e
-    | exact (IsIdempotentElem.trace_eq_zero_iff hI).mp htr_e
+    first | exact (LinearMap.IsIdempotentElem.trace_eq_zero_iff hI).mp htr_e
   have he0' : e = 0 := Subtype.ext he0
   have hx0 : x' = 0 := by rw [← key x' (Submodule.mem_span_singleton_self x'), he0', mul_zero]
   have hx1 : σ g - 1 = 0 := congrArg Subtype.val hx0

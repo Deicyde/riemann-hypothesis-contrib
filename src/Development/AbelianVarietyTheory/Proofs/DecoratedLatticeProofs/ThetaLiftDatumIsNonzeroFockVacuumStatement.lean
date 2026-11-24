@@ -49,6 +49,7 @@ open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.LiftRows GlobalTheory.AdelicScalar
   GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaLiftDatum_isNonzeroFockVacuum
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.thetaLiftDatum_isNonzeroFockVacuum
                 ∧ ∀ τ,
                   IsFockVacAt (heisO R.ψ (Vc D i) (Wc D i)) R.θ τ (cplxO 1 (cart (R.MW i σ) τ))
                     f := by
-  first
-  | exact @GlobalTheory.LiftFockVac.levVec_fockVac
-  | exact GlobalTheory.LiftFockVac.levVec_fockVac
-  | (intros; apply GlobalTheory.LiftFockVac.levVec_fockVac <;> assumption)
+  first | exact @GlobalTheory.LiftFockVac.levVec_fockVac

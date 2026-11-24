@@ -226,8 +226,7 @@ theorem lat_iff
                 = fnOf G (shiftOf lam)
                   (Formalism.L2.Forms.atInf (embAt σ emb) (B⁻¹ : GL (Fin n) E).1) Q) := by
     intro w c B hB
-    refine (BwLat.mem_localization_delAtr_fn emb σ lam (pl w)
-      (by first | exact hfull c | exact (hfull c).toIsLattice)
+    refine (BwLat.mem_localization_delAtr_fn emb σ lam (pl w) (by first | exact hfull c)
       (fun _ => B)
       (fun τ =>
         BwLat.isBasisAt_of_isLocBasis (hrc w) _
@@ -417,7 +416,8 @@ theorem clsP_tie
     lat := fun x =>
       lat_iff (I.stX I.mu0) B.fields.emb B.embLL (I.perIn u I.mu0).sgT (l.fmL u I.mu0).famP hS hsh
         hemb (I.rec7 l Z).plEq (I.rec7 l Z).what₂.places.resChar
-        (I.rec7 l Z).what₂.places.resChar_prime (GlobalTheory.LvT.Inh.resChar_mem_plEq (I.rec7 l Z))
+        (I.rec7 l Z).what₂.places.resChar_prime
+        (_root_.Formalism.BasicNotions.resChar_mem (I.rec7 l Z))
         (fun w => IntSpan (I.rec7 l Z) w B.wts.sgW)
         (fun w Q => by
           have h :=

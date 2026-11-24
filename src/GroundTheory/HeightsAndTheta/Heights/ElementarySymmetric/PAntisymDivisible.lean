@@ -101,7 +101,7 @@ lemma dvd_of_vanish (u v : σ) (P : MvPolynomial σ ℝ)
     intro x
     rw [eval_rename, map_zero]
     apply h
-    simp only [Function.comp, collapse, if_pos rfl]
+    simp only [Function.comp, collapse]
     split_ifs <;> rfl
   have := sub_rename_collapse_mem u v P
   rw [h0, sub_zero] at this
@@ -176,7 +176,7 @@ lemma vanish_of_open [Fintype σ] (u v : σ) (P : MvPolynomial σ ℝ) (O : Set 
       apply h
       refine ⟨hball hy, ?_⟩
       show (y ∘ collapse u v) u = (y ∘ collapse u v) v
-      simp only [Function.comp, collapse, if_pos rfl]
+      simp only [Function.comp, collapse]
       split_ifs <;> rfl
   intro x hx
   have := congrArg (eval x) hQ
@@ -394,8 +394,8 @@ theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
             (Finsupp.single u 1)
           = ∑ w, if g w = u then c w else 0 := by
     intro g u
-    simp only [coeff_sum, MvPolynomial.coeff_smul, coeff_X, Finsupp.single_left_inj one_ne_zero, smul_eq_mul,
-      mul_ite, mul_one, mul_zero]
+    simp only [coeff_sum, MvPolynomial.coeff_smul, coeff_X, Finsupp.single_left_inj one_ne_zero,
+      smul_eq_mul, mul_ite, mul_one, mul_zero]
   have const
       : ∀ (τ : T) (a b : Fin N), a.val < b.val → (b.val < j ∨ j ≤ a.val) → c (τ, a) = c (τ, b) := by
     intro τ a b hab hbl

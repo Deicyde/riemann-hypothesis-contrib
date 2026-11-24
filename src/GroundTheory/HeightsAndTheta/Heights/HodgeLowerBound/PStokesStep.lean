@@ -62,7 +62,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.AnForm.M Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.AnForm.M Filter
+  Topology
 
 namespace StokesStep
 
@@ -72,18 +73,22 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 theorem isOpen_multicone : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   simp only [Set.ofPred_forall, Set.ofPred_exists]
-  exact isOpen_iInter_of_finite fun k => isOpen_iUnion fun i =>
-    isOpen_ne_fun (continuous_apply _) continuous_const
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_iUnion fun i => isOpen_ne_fun (continuous_apply _) continuous_const
 
-theorem ptsIntegral_congr_g (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
-    {g g' : ((Σ k, ι k) → ℂ) → ℝ} (hg : ∀ z ∈ mcPts P, g z = g' z) :
-    ptsIntegral P φ g = ptsIntegral P φ g' := by
-  apply _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.StokesTelescope.ptsIntegral_congr_g <;> assumption
+theorem ptsIntegral_congr_g
+    (P : Ideal (MRing ι))
+    {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
+    {g g' : ((Σ k, ι k) → ℂ) → ℝ} (hg : ∀ z ∈ mcPts P, g z = g' z)
+    : ptsIntegral P φ g = ptsIntegral P φ g' := by
+  apply _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.StokesTelescope.ptsIntegral_congr_g
+    <;> assumption
 
-theorem isConeTangent_lift {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J e) (x : R.X)
-    (j : Fin R.A.n) {y : Fin e → ℂ}
-    (hy : y ∈ (R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x) (w : Fin e → ℂ) :
-    IsConeTangent (Int.castRingHom ℂ) P (R.lift x ((R.A.chart j).symm y))
+theorem isConeTangent_lift
+    {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J e) (x : R.X) (j : Fin R.A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x)
+    (w : Fin e → ℂ)
+    : IsConeTangent (Int.castRingHom ℂ) P (R.lift x ((R.A.chart j).symm y))
       (fderiv ℂ (fun y' => R.lift x ((R.A.chart j).symm y')) y w) := by
   set τ : (Fin e → ℂ) → (Σ k, ι k) → ℂ := fun y' => R.lift x ((R.A.chart j).symm y') with hτdef
   have hO : IsOpen ((R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x) :=
@@ -94,14 +99,17 @@ theorem isConeTangent_lift {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J 
   have h0 : (fun y' => eval (τ y') F) =ᶠ[𝓝 y] fun _ => (0 : ℂ) := by
     filter_upwards [hO.mem_nhds hy] with y' hy'
     exact (R.mem x _ hy'.2).2 f hf
-  have hD := (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_hasFDerivAt_eval F (τ y)).comp y hτ.differentiableAt.hasFDerivAt
+  have hD :=
+    (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_hasFDerivAt_eval F (τ y)).comp y
+      hτ.differentiableAt.hasFDerivAt
   have hD0 : HasFDerivAt (fun y' => eval (τ y') F) (0 : (Fin e → ℂ) →L[ℂ] ℂ) y :=
     (hasFDerivAt_const (0 : ℂ) y).congr_of_eventuallyEq h0
   have h1 := congrArg (fun L => L w) (hD.unique hD0)
   simpa [smul_eq_mul, mul_comm] using h1
 
-theorem isPsh_potOf {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J e) {A : HermLine ι}
-    (hA : IsSemipositiveH P A) : IsPsh R.A (potOf R A) := by
+theorem isPsh_potOf
+    {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J e) {A : HermLine ι} (hA : IsSemipositiveH P A)
+    : IsPsh R.A (potOf R A) := by
   intro x j y hy w
   have hy' : y ∈ (R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x := hy
   set τ : (Fin e → ℂ) → (Σ k, ι k) → ℂ := fun y' => R.lift x ((R.A.chart j).symm y') with hτdef
@@ -117,7 +125,6 @@ theorem isPsh_potOf {P J : Ideal (MRing ι)} {e : ℕ} (R : AnLogRes P J e) {A :
 
 end StokesStep
 
-
 open StokesStep in
 theorem StokesStep.proof (hE : ResExistsStatement) : StokesStep.Statement := by
   intro K _ ι _ P n i A A' hP ha hA hA' hi
@@ -126,8 +133,9 @@ theorem StokesStep.proof (hE : ResExistsStatement) : StokesStep.Statement := by
   set C := A'.tensor A.inv with hCdef
   have hC0 : C.a = 0 := by simp [C, HermLine.tensor, HermLine.inv, ha]
   have hCs : IsSmoothHerm C := hA'.1.mul (isSmoothHerm_inv hA.1)
-  have hlogC : ∀ z, (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) →
-      Real.log (C.h z) = Real.log (A'.h z) - Real.log (A.h z) := by
+  have hlogC
+      : ∀ z,
+        (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) → Real.log (C.h z) = Real.log (A'.h z) - Real.log (A.h z) := by
     intro z hz
     show Real.log (A'.h z * (A.h z)⁻¹) = _
     rw [Real.log_mul (A'.pos z hz).ne' (inv_ne_zero (A.pos z hz).ne'), Real.log_inv]
@@ -145,12 +153,14 @@ theorem StokesStep.proof (hE : ResExistsStatement) : StokesStep.Statement := by
   have hL : ∀ l j, IsSmoothHerm (L l j) := fun l j => (hLsp l j).1
   have hs := isSectionOn_inv_one hP.2.1.1 hC0
   set v : R.X → ℝ := fun x => Real.log (C.h (R.lift x x)) with hvdef
-  have key : ∀ l, ptsIntegral P (stokesMixPot A A' (m + 1) l)
-      (fun z => Real.log (A'.h z) - Real.log (A.h z)) = mInt R.A (fun j => potOf R (L l j)) v := by
+  have key
+      : ∀ l,
+        ptsIntegral P (stokesMixPot A A' (m + 1) l) (fun z => Real.log (A'.h z) - Real.log (A.h z))
+          = mInt R.A (fun j => potOf R (L l j)) v := by
     intro l
     rw [ptsIntegral_congr_g P _ (g' := logNorm C.inv 1) fun z hz => by
-      rw [logNorm_inv_one, hlogC z hz.1], hpot,
-      ptsIntegral_eq_mInt' hE resBridge R hP (hL l) (isSmoothHerm_inv hCs) hs]
+        rw [logNorm_inv_one, hlogC z hz.1],
+      hpot, ptsIntegral_eq_mInt' hE resBridge R hP (hL l) (isSmoothHerm_inv hCs) hs]
     congr 1
     funext x
     exact logNorm_inv_one C _
@@ -185,9 +195,11 @@ theorem StokesStep.proof (hE : ResExistsStatement) : StokesStep.Statement := by
   rw [e1, e0]
 
   have hv : R.A.Smooth v := smooth_diag R hCs hC0
-  have hgerm : mInt R.A (Fin.cons (potOf R A') T) v =
-      mInt R.A (Fin.cons (potOf R A + LocPot.ofFun v) T) v := by
-    refine ReciprocityTheory.ChartRestriction.G.Geo.mInt_congr R.A (locDens_cons_congr R.A T fun j y hy => ?_) fun _ => rfl
+  have hgerm
+      : mInt R.A (Fin.cons (potOf R A') T) v
+        = mInt R.A (Fin.cons (potOf R A + LocPot.ofFun v) T) v := by
+    refine ReciprocityTheory.ChartRestriction.G.Geo.mInt_congr R.A
+      (locDens_cons_congr R.A T fun j y hy => ?_) fun _ => rfl
     set x0 := (R.A.chart j).symm y
     filter_upwards [((R.A.chart j).isOpen_inter_preimage_symm (R.isOpen_U x0)).mem_nhds
       ⟨hy, R.mem_U x0⟩] with y' hy'
@@ -201,14 +213,17 @@ theorem StokesStep.proof (hE : ResExistsStatement) : StokesStep.Statement := by
   have hpv : IsPotential R.A (LocPot.ofFun v) := isPotential_ofFun R.A v hv
   have hTp : ∀ k, IsPotential R.A (T k) := fun k => isPotential_potOf R (hL i _)
   have hTpsh : ∀ k, IsPsh R.A (T k) := fun k => isPsh_potOf R (hLsp i _)
-  have hcons : ∀ Q, IsPotential R.A Q → ∀ k, IsPotential R.A ((Fin.cons Q T : Fin (m + 1) → LocPot R.X) k) :=
-    fun Q hQ k => by
-      refine Fin.cases ?_ (fun k => ?_) k
-      · simpa using hQ
-      · simpa using hTp k
+  have hcons
+      : ∀ Q,
+        IsPotential R.A Q
+          → ∀ k, IsPotential R.A ((Fin.cons Q T : Fin (m + 1) → LocPot R.X) k) := fun Q hQ k => by
+    refine Fin.cases ?_ (fun k => ?_) k
+    · simpa using hQ
+    · simpa using hTp k
   have hvc : Continuous v := PLC.continuous_of_smooth R.A hv
-  have hadd := mIntAdd R.A (potOf R A) (LocPot.ofFun v) T hpA hpv hTp v
-    (mIntegrableCont R.A _ (hcons _ hpA) v hvc) (mIntegrableCont R.A _ (hcons _ hpv) v hvc)
+  have hadd :=
+    mIntAdd R.A (potOf R A) (LocPot.ofFun v) T hpA hpv hTp v
+      (mIntegrableCont R.A _ (hcons _ hpA) v hvc) (mIntegrableCont R.A _ (hcons _ hpv) v hvc)
   have hneg := byPartsNonpos R.A v hv T hTp hTpsh
   rw [hgerm, hadd]
   linarith

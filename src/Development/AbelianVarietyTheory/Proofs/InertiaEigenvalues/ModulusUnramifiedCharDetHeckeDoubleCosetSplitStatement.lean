@@ -48,6 +48,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix GlobalTheory.ExportSeries
 open Formalism.L2.NTheta (IsIdemAt IsHeckeElt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.modulus_unramifiedChar_det_heckeDoubleCoset_split
     : ∀ (D : D7) (V : HSp D) (P : Pl D.host.E) (e : AE D),
       IsIdemAt e P
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.modulus_unramifiedChar_det_heckeDoubleCoset_split
                                     → finPart D (e * ((y⁻¹ : (AE D)ˣ) : AE D)) ∈ intAE D
                                     → χ y = 1)
                                 → χ z = χ x ^ k := by
-  first
-  | exact @GlobalTheory.SplitDetValue.det_modulus_chi
-  | exact GlobalTheory.SplitDetValue.det_modulus_chi
-  | (intros; apply GlobalTheory.SplitDetValue.det_modulus_chi <;> assumption)
+  first | exact @GlobalTheory.SplitDetValue.det_modulus_chi

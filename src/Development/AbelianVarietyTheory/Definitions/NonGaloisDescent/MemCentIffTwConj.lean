@@ -73,7 +73,8 @@ theorem Phi_mul_transpose : Phi n R * (Phi n R)ᵀ = 1 := by
     Finset.sum_ite_eq', Finset.mem_univ, if_true, Fin.rev_inj, Matrix.one_apply]
   split_ifs with h
   · subst h
-    rw [← pow_add, ← two_mul, pow_mul]; simp
+    rw [← pow_add, ← two_mul, pow_mul]
+    simp
   · simp
 
 omit [StarRing R] in
@@ -91,30 +92,30 @@ theorem Phi_transpose : (Phi n R)ᵀ = ((-1 : R) ^ (n - 1)) • Phi n R := by
   by_cases h : (i : ℕ) + (j : ℕ) + 1 = n
   · rw [if_pos h, if_pos (by omega)]
     have : n - 1 = i + j := by omega
-    rw [this, ← pow_add, show (i : ℕ) + j + i = 2 * i + j by ring, pow_add, pow_mul]; simp
+    rw [this, ← pow_add, show (i : ℕ) + j + i = 2 * i + j by ring, pow_add, pow_mul]
+    simp
   · rw [if_neg h, if_neg (by omega)]; simp
 
-theorem theta_one : theta (1 : Matrix (Fin n) (Fin n) R) = 1 := by
-  simp [theta, Phi_mul_transpose]
+theorem theta_one : theta (1 : Matrix (Fin n) (Fin n) R) = 1 := by simp [theta, Phi_mul_transpose]
 
 theorem theta_mul (g h : Matrix (Fin n) (Fin n) R) : theta (g * h) = theta g * theta h := by
   simp only [theta, Matrix.mul_inv_rev, Matrix.conjTranspose_mul, Matrix.mul_assoc]
   rw [← Matrix.mul_assoc (Phi n R)ᵀ (Phi n R), transpose_mul_Phi, Matrix.one_mul]
 
-theorem theta_mul_theta_inv {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g) :
-    theta g * theta g⁻¹ = 1 := by
+theorem theta_mul_theta_inv {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g)
+    : theta g * theta g⁻¹ = 1 := by
   rw [← theta_mul, Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det g).mp hg), theta_one]
 
-theorem theta_inv_eq {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g) :
-    (theta g)⁻¹ = Phi n R * gᴴ * (Phi n R)ᵀ := by
+theorem theta_inv_eq {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g)
+    : (theta g)⁻¹ = Phi n R * gᴴ * (Phi n R)ᵀ := by
   rw [Matrix.inv_eq_right_inv (theta_mul_theta_inv hg), theta,
     Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det g).mp hg)]
 
 theorem theta_theta {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g) : theta (theta g) = g := by
   apply GlobalTheory.Tw.PhiConjugateTranspose.theta_theta <;> assumption
 
-theorem adj_eq {δ g : Matrix (Fin n) (Fin n) R} (hδ : IsUnit δ) (hg : IsUnit g) :
-    adj δ g = (δ * theta g * δ⁻¹)⁻¹ := by
+theorem adj_eq {δ g : Matrix (Fin n) (Fin n) R} (hδ : IsUnit δ) (hg : IsUnit g)
+    : adj δ g = (δ * theta g * δ⁻¹)⁻¹ := by
   rw [Matrix.mul_inv_rev, Matrix.mul_inv_rev, theta_inv_eq hg,
     Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det δ).mp hδ), adj]
   simp only [Matrix.mul_assoc]

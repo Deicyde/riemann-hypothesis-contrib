@@ -74,15 +74,6 @@ theorem psd_smul {α : Type} {Y : Finset α} {k : α → α → ℂ} (c : ℝ) (
       rw [e]
       exact h.smul hc
     )
-  | (
-      have e
-          : (Matrix.of fun x y : Y => (c : ℂ) * k x y)
-            = (c : ℂ) • Matrix.of fun x y : Y => k x y := by
-        ext x y
-        simp
-      rw [e]
-      exact h.smul (Complex.zero_le_real.mpr hc)
-    )
 
 theorem domScaleTop : DomScaleTop := by
   intro E W _ D T Th lam hlam he hD
@@ -230,7 +221,7 @@ theorem sq_sum (M : ℕ) : ∑ m ∈ Icc 2 (M + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹
         : ∑ m ∈ Icc 2 (M + 1 + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹
           = ∑ m ∈ Icc 2 (M + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹ + (((M : ℝ) + 3) ^ 2)⁻¹ := by
       rw [show M + 1 + 2 = (M + 2) + 1 by omega, Finset.sum_Icc_succ_top (by omega)]
-      first | (push_cast; ring) | (congr 1; push_cast; ring)
+      first | (push_cast; ring)
     have hc2 : ((M + 1 : ℕ) : ℝ) + 2 = (M : ℝ) + 3 := by push_cast; ring
     rw [hs, hc2]
     have h2 : (0 : ℝ) < (M : ℝ) + 2 := by positivity
@@ -253,7 +244,7 @@ theorem pow_bd (m n : ℕ) (hm : 2 ≤ m) (hn : 2 ≤ n)
   have hL : ((m : ℝ) ^ (2 + k))⁻¹ = ((m : ℝ) ^ 2)⁻¹ * ((m : ℝ) ^ k)⁻¹ := by rw [pow_add, mul_inv]
   have hR : 4 * ((2 : ℝ) ^ (2 + k))⁻¹ * ((m : ℝ) ^ 2)⁻¹ = ((m : ℝ) ^ 2)⁻¹ * ((2 : ℝ) ^ k)⁻¹ := by
     rw [pow_add, mul_inv]
-    first | ring | (norm_num; ring)
+    first | ring
   rw [hL, hR]
   exact mul_le_mul_of_nonneg_left (inv_anti₀ (by positivity) hpk) (by positivity)
 
@@ -271,7 +262,7 @@ theorem densSum : DensSum := by
     rw [nsmul_eq_mul]
     refine mul_le_mul_of_nonneg_right ?_ (by positivity)
     have h := hf m
-    first | exact_mod_cast h | (norm_cast; convert h) | norm_cast
+    first | exact_mod_cast h
   have hC
       : ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹
         ≤ ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹ := by
@@ -331,19 +322,6 @@ theorem densChain : DensChain := by
 end Formalism.FourierDecayAlt.P.DensitySumsAndDomination
 
 namespace Formalism.FourierDecayAlt.P
-
-theorem domination_scale_top : Formalism.FourierDecayAlt.TC.DomScaleTop :=
-  DensitySumsAndDomination.domScaleTop
-
-theorem recursion_hypothesis_scale_top : Formalism.FourierDecayAlt.TC.RecHypScaleTop :=
-  DensitySumsAndDomination.recHypScaleTop
-
-theorem domination_after_of_local : Formalism.FourierDecayAlt.TC.DomAfterOfLocal :=
-  DensitySumsAndDomination.domAfterOfLocal
-
-theorem density_sum : Formalism.FourierDecayAlt.TC.DensSum := DensitySumsAndDomination.densSum
-
-theorem density_chain : Formalism.FourierDecayAlt.TC.DensChain := DensitySumsAndDomination.densChain
 
 end Formalism.FourierDecayAlt.P
 

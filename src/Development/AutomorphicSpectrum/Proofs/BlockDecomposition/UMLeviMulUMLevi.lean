@@ -87,7 +87,7 @@ theorem uM_injective (n : ℕ) : Function.Injective (uM k n) := by
           = z a := by
     intro z
     change (1 + GlobalTheory.BZMir.colMat k n z) (Fin.castSucc a) (Fin.last n) = z a
-    simp [GlobalTheory.BZMir.colMat, Matrix.one_apply, Fin.castSucc_ne_last]
+    simp [GlobalTheory.BZMir.colMat, Fin.castSucc_ne_last]
   rw [← entry y, ← entry y', h]
 
 theorem uM_levi_inj
@@ -96,7 +96,7 @@ theorem uM_levi_inj
     : y = y' ∧ g = g' := by
   have hg : g = g' := by
     have hp := congrArg (GlobalTheory.BZMir.mirabolicProjection k n) h
-    simpa only [map_mul, GlobalTheory.CompanionTheory.BZPsiPG.FibOnto.mirProj_levi_eq,
+    simpa only [map_mul, _root_.GlobalTheory.CompanionTheory.MirLevi.mirProj_levi,
         GlobalTheory.CompanionTheory.BZPsiPG.FibOnto.mirProj_uM, one_mul]
       using hp
   subst hg

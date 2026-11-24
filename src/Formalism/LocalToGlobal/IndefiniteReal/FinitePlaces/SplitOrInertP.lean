@@ -50,14 +50,11 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-
-
 namespace Formalism.IndefR.Fin
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open Formalism.IndefR.Datum
-
 
 theorem splitOrInert (D : D7) : LevelGroupLemmas.SplitOrInert D := by
   intro v ε hε

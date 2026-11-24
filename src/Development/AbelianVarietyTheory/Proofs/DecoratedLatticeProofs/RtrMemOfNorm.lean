@@ -191,7 +191,6 @@ theorem ram_rtr
     hB.1 (((hsum T.1 T.2).symm.trans h0).trans (map_zero (colDictL X Tr hK)).symm)
   have hz' : ∑ a, rtr X (d a) T.1 = 0 := congrArg Subtype.val hz
   have e : ∑ a, rtr X (d a) S.1 = rtr X δ (∑ a, rtr X (d a) T.1) := by
-
     rw [map_sum, hS]
     exact Finset.sum_congr rfl fun a _ => rtr_comm (hδ (d a)) T.1
   show (D.mem u).A.Nm v (dictA X Tr S.1) = 0

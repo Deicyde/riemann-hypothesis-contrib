@@ -56,8 +56,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
 
-
-
 namespace GlobalTheory.ConjHalfSplitInt
 
 theorem frMapAdj_int_iff

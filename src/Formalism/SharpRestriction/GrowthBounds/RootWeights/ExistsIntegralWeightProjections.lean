@@ -72,11 +72,7 @@ theorem findim_exists_finite_weights
     [FiniteDimensional (KK O) V] (E : GLOps n (KK O) V) (hE : (⨆ mu : Fin n → ℤ, weightSp E mu) = ⊤)
     : ∃ F : Finset (Fin n → ℤ), (⊤ : Submodule (KK O) V) ≤ ⨆ nu ∈ F, weightSp E nu := by
   have hc := (Submodule.fg_iff_compact (⊤ : Submodule (KK O) V)).1 Module.Finite.fg_top
-  first
-  | exact IsCompactElement.exists_finset_of_le_iSup hc _ hE.ge
-  | exact IsCompactElement.exists_finset_of_le_iSup _ hc _ hE.ge
-  | exact CompleteLattice.IsCompactElement.exists_finset_of_le_iSup _ hc _ hE.ge
-  | exact CompleteLattice.IsCompactElement.exists_finset_of_le_iSup hc _ hE.ge
+  first | exact IsCompactElement.exists_finset_of_le_iSup hc _ hE.ge
 
 theorem linear_map_ext_on_weights
     {E : GLOps n (KK O) V} {F : Finset (Fin n → ℤ)}
@@ -186,7 +182,7 @@ def adjointEndAction (E : GLOps n (KK O) V) : GLOps n (KK O) (Module.End (KK O) 
 
 theorem adjointEndAction_apply (E : GLOps n (KK O) V) (a b : Fin n) (f : Module.End (KK O) V)
     : adjointEndAction E a b f = E a b * f - f * E a b := by
-  first | rfl | simp [adjointEndAction]
+  first | rfl
 
 private theorem end_one_apply {W : Type*} [AddCommGroup W] [Module (KK O) W] (x : W)
     : (1 : Module.End (KK O) W) x = x :=

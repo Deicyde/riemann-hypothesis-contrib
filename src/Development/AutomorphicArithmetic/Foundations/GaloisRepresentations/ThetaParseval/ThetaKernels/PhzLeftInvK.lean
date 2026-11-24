@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ThetaParseval.ThetaKernels.SiegelWeilActDefs
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.UnfoldingCompactness.MatrixOfUnipotentFrame
 public import Development.WeilBound.ThetaLifts.LatticeBasics.ContinuousFlat
@@ -42,8 +41,6 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
-
-
 
 section
 noncomputable section

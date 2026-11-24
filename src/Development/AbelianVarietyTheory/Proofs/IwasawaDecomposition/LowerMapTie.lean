@@ -44,8 +44,6 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.Mem.Col2.LowerTie
 
 theorem lowerMap_tie

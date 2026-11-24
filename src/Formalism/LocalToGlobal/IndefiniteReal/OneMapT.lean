@@ -66,7 +66,7 @@ abbrev sOv (C : Core D) (c' : Coeff C.Q.l) (hle : C.Q.c.F ≤ c'.F) : C.Q.c.F �
   (inC c').comp (incF C.Q.c c' hle)
 
 theorem sOv_eq (C : Core D) (c' : Coeff C.Q.l) (hle : C.Q.c.F ≤ c'.F) : sOv C c' hle = C.σ₀ := by
-  first | rfl | (ext x; rfl) | (ext x; simp [sOv, inC, incF])
+  first | rfl
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in

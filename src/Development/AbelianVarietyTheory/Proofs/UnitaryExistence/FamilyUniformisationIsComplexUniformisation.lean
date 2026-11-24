@@ -4,7 +4,8 @@ public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.N
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.BlockTriangularOfMulEqOne
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsInverseBlock
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedModuliAlgebraicLawsChartWeightIntegralityStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.UnitIndepOfCharts
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedModuliAlgebraicLawsChartWeightIntegrality
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LowerTriIsUnitDet
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -177,8 +178,7 @@ theorem isUnf_built
       (GlobalTheory.CoverFrame.coverTri E H Dw l Xo c σ g e F r M hσ hM hN),
     fibre_unfOf e F M un hun hM (GlobalTheory.FibreFlag.fibTri E H Dw l Xo c σ g e F r M hσ hM hN),
     readSec_unfOf e F M un hun hM
-      ((GlobalTheory.T.framedModuli_algebraicLaws_chart_weight_integrality hS E H Dw l Xo
-        c).2.2.2.2.2.2 (CAt σ) hred),
+      ((_root_.GlobalTheory.Frames.algebraic_laws hS E H Dw l Xo c).2.2.2.2.2.2 (CAt σ) hred),
     g,
     e,
     F,

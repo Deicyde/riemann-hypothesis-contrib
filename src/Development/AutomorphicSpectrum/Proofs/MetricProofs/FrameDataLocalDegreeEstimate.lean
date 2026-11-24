@@ -2,7 +2,7 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.UpVApply
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameDataLocalResolutionOpenStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameDataLocalResolutionOpen
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -71,8 +71,8 @@ theorem main
           z ∘ v = pPhi M F keep v bl h ε w ∧ basePart M.blk z = bl (pB ε w) := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n e Rb keep Kk _ ιk _ κ v F kb V bl r h ε hctx w hw
   have hT :=
-    GlobalTheory.T.frameData_local_resolution_open K ι Φ y Ψ N j M n e Rb keep Kk ιk κ v F kb V bl r
-      h ε hctx w hw
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.PFl.Exact.chart_points K ι Φ y Ψ N j M n e Rb keep Kk
+      ιk κ v F kb V bl r h ε hctx w hw
   have hc2 := hctx
   unfold GlobalTheory.CompanionTheory.Ar.PB.PFl.IsPCtx at hc2
   obtain ⟨-, -, hframe, hchart, -⟩ := hc2

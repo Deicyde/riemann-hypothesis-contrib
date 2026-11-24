@@ -54,6 +54,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
 open scoped TensorProduct InnerProductSpace ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DefLift
+
 theorem _root_.GlobalTheory.T.exists_weilDatum_generator_realOneParamGroup
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.exists_weilDatum_generator_realOneParamGroup
                     HasDerivAt
                       (fun t : ℝ => om (p * (1, oneP θ T τ X t)) f w)
                       (om p (Gn f) w) 0 := by
-  first
-  | exact @GlobalTheory.DefLift.Gen.exists_generator
-  | exact GlobalTheory.DefLift.Gen.exists_generator
-  | (intros; apply GlobalTheory.DefLift.Gen.exists_generator <;> assumption)
+  first | exact @GlobalTheory.DefLift.Gen.exists_generator

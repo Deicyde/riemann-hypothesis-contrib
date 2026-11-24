@@ -97,9 +97,7 @@ theorem exists_prime_colon [IsNoetherianRing R] (s a : R) (ha : a ∉ Ideal.span
                 colonI s a ≤ colonI s b ∧ colonI s b = J}
               : Set (Ideal R)),
           ¬ M < I := by
-    first
-    | exact set_has_maximal_iff_noetherian.mpr inferInstance _ hS
-    | exact WellFounded.has_min (wellFounded_submodule_gt R R) _ hS
+    first | exact set_has_maximal_iff_noetherian.mpr inferInstance _ hS
   obtain ⟨b, hb, hab, rfl⟩ := hM
   refine ⟨b, hb, hab, fun q1 q2 h => ?_⟩
   by_cases h1 : q1 ∈ colonI s b
@@ -193,18 +191,13 @@ theorem mem_of_mem_heightOne_localizations
           have hv2 : algebraMap R K v * algebraMap R K b = algebraMap R K q * algebraMap R K c := by
             rw [← map_mul, ← map_mul, hv]
           simp only [Algebra.linearMap_apply, smul_eq_mul]
-          first
-          | (rw [div_mul_eq_mul_div, eq_div_iff hbK]; linear_combination hv2)
-          | (field_simp; linear_combination hv2)
-          | (field_simp; linear_combination -hv2)
+          first | (rw [div_mul_eq_mul_div, eq_div_iff hbK]; linear_combination hv2)
       obtain ⟨r, hr⟩ : ∃ r : R, algebraMap R K r = algebraMap R K c / algebraMap R K b := by
-        first
-        | exact IsIntegrallyClosed.isIntegral_iff.1 hint
-        | exact IsIntegrallyClosed.algebraMap_eq_of_integral hint
+        first | exact IsIntegrallyClosed.isIntegral_iff.1 hint
       have hrc : r * b = c := by
         apply IsFractionRing.injective R K
         rw [map_mul, hr]
-        first | exact div_mul_cancel₀ _ hbK | field_simp
+        first | exact div_mul_cancel₀ _ hbK
       exact Ideal.mem_span_singleton'.2 ⟨r, hrc⟩
     obtain ⟨q0, hq0, u, hu, huq⟩ := key
     have huP : ∀ q ∈ colonI b c, u * q ∈ Ideal.span {q0} := by

@@ -60,14 +60,18 @@ variable {n : ℕ}
 
 section Slot
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : P ∈ ncV ε V k)
-    (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0) :
-    ∀ κ, slice i κ P ∈ Wp ε E V := by
+theorem position_perp
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
+    {k : ℕ} (i : Fin k)
+    {P : Big n k M}
+    (hP : P ∈ ncV ε V k) (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0)
+    : ∀ κ, slice i κ P ∈ Wp ε E V := by
   intro κ
   rw [slice_eq_slt]
   set r := (slRest i κ).2 with hr
@@ -95,8 +99,8 @@ theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW �
     have h2 := hkey
     rw [hx0, inner_zero_right] at h2
     simpa using h2.symm
-  let F : Big n k M := WithLp.toLp 2 (fun κ' =>
-    if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0)
+  let F : Big n k M :=
+    WithLp.toLp 2 (fun κ' => if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0)
   have hFapp : ∀ κ', F κ' = if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0 :=
     fun κ' => rfl
   have hsltF : ∀ r', slt i r' F = if r' = r then xm else 0 := by
@@ -140,18 +144,22 @@ theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW �
     simp only [hsltF]
     rw [Finset.sum_eq_single r (fun b _ hb => by simp [hb]) (by simp)]
     simp
-  have hF0 := hperp F hFmem (fun κ' => by
-    rw [slice_eq_slt, hsltF]
-    split_ifs
-    · exact hxm
-    · exact zero_mem _)
+  have hF0 :=
+    hperp F hFmem (fun κ' => by
+      rw [slice_eq_slt, hsltF]
+      split_ifs
+      · exact hxm
+      · exact zero_mem _)
   rw [hinner, hkey] at hF0
   simpa using hF0
 
-theorem crossOp_position_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V) :
-    2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
+theorem crossOp_position_bound
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
+    {k : ℕ} (i : Fin k)
+    {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V)
+    : 2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
   have hr : ∀ r, slt i r P ∈ Wp ε E V := by
     intro r
     by_cases hne : IsEmpty (Fin n × Fin n)
@@ -165,9 +173,9 @@ theorem crossOp_position_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : I
     have h1 : (inner ℂ P P : ℂ) = ∑ r, inner ℂ (slt i r P) (slt i r P) := slt_inner_eq_sum i P P
     simp only [inner_self_eq_norm_sq_to_K] at h1
     exact_mod_cast h1
-  have hc : RCLike.re (inner ℂ (crossOp ε E k i P) P) =
-      ∑ r, RCLike.re (inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P)) := by
-
+  have hc
+      : RCLike.re (inner ℂ (crossOp ε E k i P) P)
+        = ∑ r, RCLike.re (inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P)) := by
     rw [slt_inner_eq_sum i, map_sum]
     simp only [slt_crossOp]
   rw [hn, hc, Finset.mul_sum, Finset.mul_sum]

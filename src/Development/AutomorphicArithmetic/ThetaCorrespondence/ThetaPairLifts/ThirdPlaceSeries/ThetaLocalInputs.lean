@@ -46,8 +46,6 @@ import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.IsobaricDiscr
 
 @[expose] public section
 
-
-
 section
 section
 noncomputable section

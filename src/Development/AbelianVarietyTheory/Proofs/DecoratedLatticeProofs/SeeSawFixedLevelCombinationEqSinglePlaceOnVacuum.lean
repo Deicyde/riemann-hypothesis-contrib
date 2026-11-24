@@ -71,7 +71,7 @@ theorem foldr_extract
         rcases List.mem_cons.1 hi with h | h
         · exact absurd h.symm ha
         · exact h
-      have he : (a :: t).erase i = a :: t.erase i := by simp [List.erase_cons, ha]
+      have he : (a :: t).erase i = a :: t.erase i := by simp [ha]
       rw [he, List.foldr_cons, List.foldr_cons, ih hit, hc a ha]
 
 variable {D : D7}

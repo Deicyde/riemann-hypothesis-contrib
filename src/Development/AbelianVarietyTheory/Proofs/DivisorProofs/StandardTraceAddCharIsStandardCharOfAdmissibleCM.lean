@@ -67,13 +67,18 @@ variable {F : Type} [Field F] [NumberField F]
 
 theorem at_pairA (x : Ainf F) : At (evI F) (pairA F x 0) := by
   intro u hu
-  have h1 : u.1 = 0 := (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
+  have h1 : u.1 = 0 :=
+    (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
   show (u.1 * x, u.2 * 0) = ((0 : Ainf F), (0 : Af F))
   rw [h1, zero_mul, mul_zero]
 
-theorem psi_pairA {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (x : Ainf F) :
-    ψ (pairA F x 0) = Complex.exp (-(2 * Real.pi * Complex.I) *
-      (Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x) : ℝ)) :=
+theorem psi_pairA {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (x : Ainf F)
+    : ψ (pairA F x 0)
+      = Complex.exp
+        (-(2 * Real.pi * Complex.I)
+          * (Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+              (InfiniteAdeleRing.ringEquiv_mixedSpace F x)
+            : ℝ)) :=
   hψ.2.2 _ (at_pairA x)
 
 theorem norm_exp_real (r : ℝ) : ‖Complex.exp (-(2 * Real.pi * Complex.I) * (r : ℂ))‖ = 1 := by
@@ -81,7 +86,8 @@ theorem norm_exp_real (r : ℝ) : ‖Complex.exp (-(2 * Real.pi * Complex.I) * (
     push_cast; ring
   rw [this, Complex.norm_exp_ofReal_mul_I]
 
-theorem norm_psi_inf {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (x : Ainf F) : ‖ψ (pairA F x 0)‖ = 1 := by
+theorem norm_psi_inf {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (x : Ainf F)
+    : ‖ψ (pairA F x 0)‖ = 1 := by
   rw [psi_pairA hψ]; exact norm_exp_real _
 
 theorem pairA_split (x : AF F) : x = pairA F x.1 0 + pairA F 0 x.2 := by
@@ -119,9 +125,10 @@ section Trace
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem sum_eq_trace (x : Ainf F) :
-    ∑ v : InfinitePlace F, (v.mult : ℝ) * (InfinitePlace.Completion.extensionEmbedding v (x v)).re =
-      Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x) := by
+theorem sum_eq_trace (x : Ainf F)
+    : ∑ v : InfinitePlace F, (v.mult : ℝ) * (InfinitePlace.Completion.extensionEmbedding v (x v)).re
+      = Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+        (InfiniteAdeleRing.ringEquiv_mixedSpace F x) := by
   classical
   rw [Algebra.trace_prod_apply, PI.ProdFormulaE.Tr.trace_pi, PI.ProdFormulaE.Tr.trace_pi,
     InfiniteAdeleRing.ringEquiv_mixedSpace_apply]
@@ -129,10 +136,11 @@ theorem sum_eq_trace (x : Ainf F) :
   rw [← Fintype.sum_subtype_add_sum_subtype (fun w : InfinitePlace F => w.IsReal)]
   congr 1
   · refine Fintype.sum_congr _ _ fun w => ?_
-    rw [InfinitePlace.mult_isReal, Nat.cast_one, one_mul, ← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply w.2,
-      Complex.ofReal_re]
+    rw [InfinitePlace.mult_isReal, Nat.cast_one, one_mul,
+      ← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply w.2, Complex.ofReal_re]
     simp
-  · refine Fintype.sum_equiv (Equiv.subtypeEquivRight fun w => InfinitePlace.not_isReal_iff_isComplex) _ _ fun w => ?_
+  · refine Fintype.sum_equiv
+      (Equiv.subtypeEquivRight fun w => InfinitePlace.not_isReal_iff_isComplex) _ _ fun w => ?_
     have h := InfinitePlace.mult_isComplex ⟨w.1, InfinitePlace.not_isReal_iff_isComplex.1 w.2⟩
     simp only at h
     rw [h]
@@ -143,22 +151,29 @@ end Trace
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem sum_infFam [IsTotallyReal F] (B : Base F E) (θ : InfinitePlace F → (Ainf F ⊗[F] E →+* ℂ))
-    (hθ : Formalism.IndefR.DatumF.IsInfFamF (fun w : InfinitePlace F => (B.emb w).1) θ) (x : Ainf F) :
-    ∑ w, θ w (x ⊗ₜ[F] (1 : E)) =
-      ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x) : ℝ) : ℂ) := by
+theorem sum_infFam
+    [IsTotallyReal F]
+    (B : Base F E) (θ : InfinitePlace F → (Ainf F ⊗[F] E →+* ℂ))
+    (hθ : Formalism.IndefR.DatumF.IsInfFamF (fun w : InfinitePlace F => (B.emb w).1) θ)
+    (x : Ainf F)
+    : ∑ w, θ w (x ⊗ₜ[F] (1 : E))
+      = ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x)
+          : ℝ)
+        : ℂ) := by
   rw [← sum_eq_trace]
   push_cast
   refine Fintype.sum_congr _ _ fun w => ?_
   have hv : w.IsReal := IsTotallyReal.isReal w
   rw [GlobalTheory.DualPairCompare.gen_inf_val (B.emb w).1 w (B.emb w).2.symm (θ w) (hθ w) x,
-    InfinitePlace.mult_isReal ⟨_, hv⟩, ← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply hv,
-    Complex.ofReal_re]
+    InfinitePlace.mult_isReal ⟨_, hv⟩,
+    ← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply hv, Complex.ofReal_re]
   simp
 
-theorem isStdCharF_of_isGood : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (B : Base F E),
-    B.IsGood σ → Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) := by
+theorem isStdCharF_of_isGood
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      B.IsGood σ
+        → Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) := by
   intro F E _ _ _ _ _ σ B hB
   haveI : IsTotallyReal F := hB.cm.1
   refine ⟨isCharAF hB.std, ⟨?_, fun θ hθ x => ?_⟩⟩

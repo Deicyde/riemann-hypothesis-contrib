@@ -45,6 +45,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -60,6 +61,7 @@ open GlobalTheory.Poinc GlobalTheory.Poinc.Eq8 Formalism.L2.Pj
 open scoped TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
 open Classical
+
 theorem _root_.GlobalTheory.T.lineBundleIso_eighthPower_groupPullback
     : ∀ {T T' : Scheme.{0}} {B C : Over T} {B' C' : Over T'} {φB : B'.left ⟶ B.left}
         {χ : C'.left ⟶ C.left} {χ₂ : (C' ⊗ C').left ⟶ (C ⊗ C).left} (Q : LB (C ⊗ C).left)
@@ -75,7 +77,4 @@ theorem _root_.GlobalTheory.T.lineBundleIso_eighthPower_groupPullback
           (LB.LinComb Q' (K := Fin 8 × Fin 8)
             (fun ab => (lift (pr' ab.1) (pr' ab.2)).left)
             (fun ab => W ab.1 ab.2)) := by
-  first
-  | exact @GlobalTheory.Poinc.Eq8.lbIso_eighth_pull
-  | exact GlobalTheory.Poinc.Eq8.lbIso_eighth_pull
-  | (intros; apply GlobalTheory.Poinc.Eq8.lbIso_eighth_pull <;> assumption)
+  first | exact @GlobalTheory.Poinc.Eq8.lbIso_eighth_pull

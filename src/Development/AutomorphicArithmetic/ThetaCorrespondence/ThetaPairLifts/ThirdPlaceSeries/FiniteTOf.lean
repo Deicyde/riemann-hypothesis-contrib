@@ -41,9 +41,6 @@ import Formalism.LocalToGlobal.Divisibility.EigenvalueSumLeClosedOf
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open Module NumberField IsDedekindDomain

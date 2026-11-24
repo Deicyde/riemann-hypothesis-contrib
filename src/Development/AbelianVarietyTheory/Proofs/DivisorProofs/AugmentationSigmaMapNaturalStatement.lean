@@ -48,6 +48,7 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.augmentation_sigma_map_natural
     : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
         (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (R₁ : Type) [CommRing R₁]
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.augmentation_sigma_map_natural
         → ∀ (σ : R₁ ⊗[R₀] B₀ →+ B) (σ' : R₁ ⊗[R₀] B₀' →+ B'),
           α.IsSig p σ → α.IsSig p' σ'
             → (∀ y, ρ (σ y) = σ' (extHom R₁ φ y)) ∧ ∀ y, α.KerQ y → α.KerQ (extHom R₁ φ y) := by
-  first
-  | exact @GlobalTheory.Obs.sig_natural
-  | exact GlobalTheory.Obs.sig_natural
-  | (intros; apply GlobalTheory.Obs.sig_natural <;> assumption)
+  first | exact @GlobalTheory.Obs.sig_natural

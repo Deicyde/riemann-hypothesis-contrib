@@ -294,7 +294,7 @@ theorem cf_good
       show (if p.1 = List.ofFn w then p.2 y else 0) + cf L n w y = 0
       rw [ih2 y hy]
       by_cases hc : p.1 = List.ofFn w
-      · simp [if_pos hc, hp.2.2 y hy]
+      · simp [hp.2.2 y hy]
       · simp [if_neg hc]
 
 theorem single_term

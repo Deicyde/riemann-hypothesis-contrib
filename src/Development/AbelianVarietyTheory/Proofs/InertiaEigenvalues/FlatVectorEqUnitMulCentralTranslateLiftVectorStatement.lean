@@ -51,6 +51,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.flatVector_eq_unit_mul_centralTranslate_liftVector
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.flatVector_eq_unit_mul_centralTranslate_liftVector
                 → ∃ (z : GA D (Vc D i)) (c : ℂ),
                   IsCentAt i (R.Q t) z ∧ UnitOff (GlobalTheory.TwistField.tupPrime R t) c
                     ∧ f = c • R.ωP i t (z, 1) (R.vP i t) := by
-  first
-  | exact @GlobalTheory.FlatLift.flat_eq_unit_smul_om
-  | exact GlobalTheory.FlatLift.flat_eq_unit_smul_om
-  | (intros; apply GlobalTheory.FlatLift.flat_eq_unit_smul_om <;> assumption)
+  first | exact @GlobalTheory.FlatLift.flat_eq_unit_smul_om

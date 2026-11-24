@@ -52,6 +52,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram SphOp hyp)
 open GlobalTheory.StdFrame (StdPsi)
 attribute [local instance] Formalism.IndefR.principalLevelFrame.instCMHostI
+
 theorem _root_.GlobalTheory.T.rowTypePart_le_eigensystemPart
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.rowTypePart_le_eigensystemPart
                             (levChi _ (R.βY 0) (R.dat0 (R.levR F b))) R.e0 π,
                         ∃ x ∈ EEc R SF c,
                           R.HE.e x = U := by
-  first
-  | exact @GlobalTheory.TypePart.isotE_sub_eigenpart
-  | exact GlobalTheory.TypePart.isotE_sub_eigenpart
-  | (intros; apply GlobalTheory.TypePart.isotE_sub_eigenpart <;> assumption)
+  first | exact @GlobalTheory.TypePart.isotE_sub_eigenpart

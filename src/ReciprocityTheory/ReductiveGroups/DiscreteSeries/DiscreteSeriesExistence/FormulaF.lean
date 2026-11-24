@@ -124,8 +124,7 @@ theorem formulaF
       : ∫ k, inner ℂ (T.op k (Ψ g v - q)) v₀ •
           rreg ε (S7.toMK k) (rreg ε g (uniformisationL2 ε Ψ v₀ v) - uniformisationL2 ε Ψ v₀ q) ∂(dk ε)
         = 0 := by
-    have := LinearMap.congr_fun hB0 v₀
-    rwa [ffaB_apply, LinearMap.zero_apply] at this
+    simpa [ffaB_apply] using LinearMap.congr_fun hB0 v₀
   obtain ⟨yg, hyg⟩ := ffa_UJ_lift hg
   have hxae
       : ((rreg ε g (uniformisationL2 ε Ψ v₀ v) - uniformisationL2 ε Ψ v₀ q : L2 ε) : Formalism.REAL.UJ ε → ℂ) =ᵐ[Formalism.REAL.muG ε]
@@ -150,8 +149,7 @@ theorem formulaF
     rwa [show S7.toMK (1 : S7.KG ε) = 1 from rfl, mul_one, ffa_op_one, mul_one] at e
   have hΨk1 : ∀ k : S7.KG ε, Ψ (S7.toMK k) = T.op k := by
     intro k
-    have e := hΨk k 1 (ffa_toMK_mem (1 : S7.KG ε))
-    rwa [mul_one, hP.2.1, mul_one] at e
+    simpa [hP.2.1] using hΨk k 1 (ffa_toMK_mem (1 : S7.KG ε))
   have hint
       : ∀ k : S7.KG ε,
         inner ℂ (T.op k (Ψ g v - q)) v₀ * (jfun Ψ v₀ v (S7.toMK k * g) - jfun Ψ v₀ q (S7.toMK k))
@@ -191,12 +189,9 @@ theorem datumEmbedding_highest_ne_zero
     : uniformisationL2 ε Ψ v₀ T.w ≠ 0 := by
   intro h
   have hz : uniformisationL2 ε Ψ v₀ (0 : T.V) = 0 := by
-    have := datumEmbedding_smul hP v₀ (0 : ℂ) (0 : T.V)
-    simpa using this
+    simpa using datumEmbedding_smul hP v₀ (0 : ℂ) (0 : T.V)
   have hw : T.w = 0 := uniformisationL2_injective hP hv₀ (h.trans hz.symm)
-  have hn := T.w_norm
-  rw [hw, norm_zero] at hn
-  exact zero_ne_one hn
+  simpa [hw] using T.w_norm
 
 theorem formulaF_sigLam
     (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
@@ -216,17 +211,7 @@ theorem formulaF_sigLam
     rfl
   rw [hs, Submodule.coe_inner]
   have horth : y - (K.orthogonalProjectionOnto y : L2 ε) ∈ Kᗮ := by
-    first
-    | exact Submodule.sub_orthogonalProjectionOnto_mem_orthogonal y
-    | exact K.sub_orthogonalProjectionOnto_mem_orthogonal y
-    | exact sub_orthogonalProjection_mem_orthogonal y
-    | exact Submodule.sub_starProjection_mem_orthogonal y
-    | exact K.sub_starProjection_mem_orthogonal y
-    | (
-        rw [Submodule.mem_orthogonal']
-        intro u hu
-        exact K.orthogonalProjectionOnto_inner_eq_zero y u hu
-      )
+    first | exact Submodule.sub_starProjection_mem_orthogonal y
   have h0 : inner ℂ a (y - (K.orthogonalProjectionOnto y : L2 ε)) = 0 :=
     Submodule.inner_right_of_mem_orthogonal ha horth
   rw [inner_sub_right, sub_eq_zero] at h0
@@ -269,12 +254,7 @@ theorem dec_sigLam
         Matrix.mul_assoc (Jm ε * NormedSpace.exp (-X)) (Jm ε) (Jm ε), hJJ, Matrix.mul_one,
         Matrix.mul_assoc, ← Matrix.exp_add_of_commute _ _ (Commute.refl X).neg_left, neg_add_cancel,
         NormedSpace.exp_zero, Matrix.mul_one]
-    have hk : (S7.toMK k)ᴴ * Jm ε * S7.toMK k = Jm ε := by
-      first
-      | exact (k : S7.UJ ε).2
-      | exact (k : S7.UJ ε).prop
-      | (simp only [S7.toMK]; exact (k : S7.UJ ε).2)
-      | (unfold S7.toMK; clear * - k; done)
+    have hk : (S7.toMK k)ᴴ * Jm ε * S7.toMK k = Jm ε := by first | exact (k : S7.UJ ε).2
     calc
       (NormedSpace.exp X)ᴴ * (S7.toMK k)ᴴ * Jm ε * (S7.toMK k * NormedSpace.exp X)
           = (NormedSpace.exp X)ᴴ * ((S7.toMK k)ᴴ * Jm ε * S7.toMK k) * NormedSpace.exp X := by

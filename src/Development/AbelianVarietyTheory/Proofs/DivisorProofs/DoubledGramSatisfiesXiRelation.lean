@@ -73,8 +73,7 @@ theorem dblGram_xi
         GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM, Matrix.map_apply,
         Matrix.smul_apply, Matrix.submatrix_apply, h1, h2, Matrix.fromBlocks_apply₁₁,
         Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂,
-        Matrix.zero_apply, Matrix.neg_apply, smul_zero, map_zero, smul_neg, map_neg, smul_eq_mul,
-        mul_zero, mul_neg]
+        Matrix.zero_apply, Matrix.neg_apply, map_zero, map_neg, smul_eq_mul, mul_zero, mul_neg]
       at hij ⊢
   · exact hij i' j'
   · exact congrArg Neg.neg (hij i' j')

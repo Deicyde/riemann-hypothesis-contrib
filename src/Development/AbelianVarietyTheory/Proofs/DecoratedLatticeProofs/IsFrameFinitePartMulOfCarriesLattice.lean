@@ -69,9 +69,6 @@ open GlobalTheory.SeeSaw (idV dI FI)
 open ValuativeRel
 open GlobalTheory.Core.Mi.LatMatch
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.Core.Mi.FrameMove

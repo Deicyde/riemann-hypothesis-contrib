@@ -353,7 +353,6 @@ theorem hasDirichletDensity_primesAbove_iff
     rw [primeIdealZetaSum_primesAbove hT hs]
     field_simp
     rw [hndef]
-    try ring
   · intro h
     have := (h.const_mul n).mul hKL
     rw [mul_one] at this

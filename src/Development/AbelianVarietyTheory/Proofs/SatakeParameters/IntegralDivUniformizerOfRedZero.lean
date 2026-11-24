@@ -89,7 +89,7 @@ theorem _root_.GlobalTheory.TypePrimeUnif.typePrime_mem_and_notMem_sq
     have h : P.asIdeal ^ 2 ∣ Ideal.span {Pr.piG i} * Ideal.span {X.conjO (Pr.piG i)} := by
       rw [Ideal.span_singleton_mul_span_singleton, hP.piG_norm i, Ideal.dvd_span_singleton]
       exact hsq
-    first | exact hcop.dvd_of_dvd_mul_left h | exact hcop.dvd_of_dvd_mul_right h
+    first | exact hcop.dvd_of_dvd_mul_left h
   let e : HeightOneSpectrum (𝓞 X.E) → ℕ := fun Q => if Q = P then 2 else 1
   have hall : ∏ Q ∈ Pr.vG i, Q.asIdeal ^ e Q ∣ Ideal.span {X.conjO (Pr.piG i)} := by
     apply Finset.prod_dvd_of_coprime

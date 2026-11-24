@@ -73,8 +73,7 @@ theorem inG_blocks (g : M2 n) (h : InG g)
   rw [← fromBlocks_toBlocks g, fromBlocks_conjTranspose, JJ, fromBlocks_multiply,
       fromBlocks_multiply, fromBlocks_inj]
     at h'
-  simp only [Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, Matrix.one_mul, Matrix.mul_neg,
-      Matrix.neg_mul, add_zero, zero_add]
+  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul, add_zero, zero_add]
     at h'
   obtain ⟨h1, h2, h3, h4⟩ := h'
   refine ⟨?_, ?_, ?_⟩

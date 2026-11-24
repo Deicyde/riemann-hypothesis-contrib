@@ -299,8 +299,7 @@ theorem cusp_decay
 
 theorem dia_dg (α : ℚˣ) : dia2 (dg2 α 1) = dg2 (pri α) 1 := by
   refine Units.ext (Matrix.ext fun i j => ?_)
-  fin_cases i <;> fin_cases j
-    <;> simp [dg2, pri, GroundTheory.Automorphic.AdelicGLn.diagonal, Matrix.GeneralLinearGroup.map]
+  fin_cases i <;> fin_cases j <;> simp [dg2, pri]
 
 theorem compact_split (κ : KA)
     : ∃ (r : GL (Fin 2) ℝ),
@@ -325,7 +324,7 @@ theorem dg_split (p : Jd)
   refine Prod.ext (Units.ext (Matrix.ext fun i j => ?_)) (Units.ext (Matrix.ext fun i j => ?_))
   · change ((dg2 p 1 : G2).val i j).1
       = RationalIdeles.realEquiv.symm ((dg2 (RationalIdeles.realPart p) 1 : GL (Fin 2) ℝ).val i j)
-    fin_cases i <;> fin_cases j <;> simp [dg2, RationalIdeles.coe_realPart] <;> rfl
+    fin_cases i <;> fin_cases j <;> simp [dg2, RationalIdeles.coe_realPart]
   · change ((dg2 p 1 : G2).val i j).2 = ((dg2 (IdeleGroup.toFinite ℚ p) 1 : GL (Fin 2) Af).val i j)
     fin_cases i <;> fin_cases j <;> simp [dg2] <;> rfl
 
@@ -386,9 +385,9 @@ theorem uni_split (y : 𝔸[ℚ])
   refine Prod.ext (Units.ext (Matrix.ext fun i j => ?_)) (Units.ext (Matrix.ext fun i j => ?_))
   · change ((uni2 y : G2).val i j).1
       = RationalIdeles.realEquiv.symm ((uni2 (RationalIdeles.realEquiv y.1) : GL (Fin 2) ℝ).val i j)
-    fin_cases i <;> fin_cases j <;> simp [uni2] <;> rfl
+    fin_cases i <;> fin_cases j <;> simp [uni2]
   · change ((uni2 y : G2).val i j).2 = ((uni2 y.2 : GL (Fin 2) Af).val i j)
-    fin_cases i <;> fin_cases j <;> simp [uni2] <;> rfl
+    fin_cases i <;> fin_cases j <;> simp [uni2]
 
 theorem uni_add {R : Type*} [CommRing R] (a b : R)
     : (uni2 (a + b) : GL (Fin 2) R) = uni2 a * uni2 b := by
@@ -397,8 +396,7 @@ theorem uni_add {R : Type*} [CommRing R] (a b : R)
 
 theorem dia_uni (q : ℚ) : dia2 (uni2 q) = uni2 (algebraMap ℚ 𝔸[ℚ] q) := by
   refine Units.ext (Matrix.ext fun i j => ?_)
-  fin_cases i <;> fin_cases j
-    <;> simp [uni2, GroundTheory.Automorphic.AdelicGLn.diagonal, Matrix.GeneralLinearGroup.map]
+  fin_cases i <;> fin_cases j <;> simp [uni2]
 
 theorem adele_split (x : 𝔸[ℚ])
     : ∃ (q : ℚ) (ρ : ℝ) (e : Af),
@@ -614,7 +612,7 @@ theorem main : B0 → F5 := by
         rfl
       have h4 : (h.val i j).1 w = (infAt w h).val i j := rfl
       rw [h3, h4, hh w]
-      rcases eq_or_ne i j with rfl | hij <;> simp [Matrix.one_apply, *] <;> rfl
+      rcases eq_or_ne i j with rfl | hij <;> simp [*] <;> rfl
     have hr : GroundTheory.Automorphic.GL2Classical.realPart h = 1 := by
       rw [GroundTheory.Automorphic.GL2Classical.realPart, hp, map_one]
     conv_lhs => rw [← realEmb_realPart_mul_finEmb h, hr, map_one, one_mul]

@@ -53,8 +53,6 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
 
-
-
 namespace UpperTheory.Zero.ConvolutionTheory.EB
 
 attribute [local instance] borelG borelF borelA borelH
@@ -65,8 +63,8 @@ private theorem herm_chi
     (v : InfinitePlace E)
     : IsHerm (chi l v) := by
   refine ⟨Equiv.refl _, fun i => ?_⟩
-  simp [chi, infOf, Complex.conj_ofReal, map_sub, map_add (f := _), map_div₀, map_natCast,
-    map_intCast, map_one, map_ofNat]
+  simp [chi, infOf, map_sub, map_add (f := _), map_div₀, map_natCast, map_intCast, map_one,
+    map_ofNat]
 
 private theorem mult_of_ker
     {n : ℕ} [MeasurableSpace (G n)]

@@ -170,7 +170,7 @@ private lemma res_res_toroidal_compactification {A : Scheme.{0}} {U V W : A.Open
   ext1
   have e := congrArg (fun g => g.hom (u : Γ(A, U))) (A.presheaf.map_comp (homOfLE h2).op (homOfLE h1).op)
   simp only [CommRingCat.hom_comp, RingHom.comp_apply] at e
-  simp only [res, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe]
+  simp only [res, Units.coe_map, MonoidHom.coe_coe]
   exact e.symm
 
 theorem pull_isLB {L : LB X} (hL : L.IsLB) (F : Y ⟶ X) : (L.pull F).IsLB := by
@@ -295,8 +295,7 @@ theorem gm_pullGen
     Set.mem_iInter.2 fun k => Set.mem_iInter.1 hy k
   ext1
   rw [gm, gm, dite_eq_left hz, dite_eq_left (show (r ≫ h) z ∈ LB.wchart L φ j from hz')]
-  simp only [LB.pullGen, MonoidHom.comp_apply, Units.coe_map, res, pullU,
-    RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe]
+  simp only [LB.pullGen, res, pullU, RingHom.toMonoidHom_eq_coe]
   exact (germ_app_presheaf_map_eq_germ_app r z hle hz _).trans
     (germ_app_app_eq_germ_app_comp r h z _ hz' _)
 
@@ -314,9 +313,7 @@ theorem top_le_iff_mem (x : Sp F ⟶ X) (U : X.Opens) (z : Sp F) : ⊤ ≤ x ⁻
   · intro hle
     exact hle (show z ∈ (⊤ : (Sp F).Opens) from trivial)
   · intro hz w _
-    have hwz : w = z := by
-      first
-      | exact Subsingleton.elim _ _
+    have hwz : w = z := by first | exact Subsingleton.elim _ _
     subst hwz
     exact hz
 

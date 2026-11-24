@@ -99,8 +99,8 @@ theorem prod_isAddFundamentalDomain
               ×ˢ ((⟨(k : V × V).2, ((hΓ _).1 k.2).2⟩ : Γ₁) +ᵥ 𝓕₁) := by
       intro k
       ext ⟨x, y⟩
-      simp only [Set.mem_vadd_set_iff_neg_vadd_mem, Set.mem_prod, AddSubgroup.vadd_def,
-        AddSubgroup.coe_neg, vadd_eq_add, Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg]
+      simp only [Set.mem_vadd_set_iff_neg_vadd_mem, Set.mem_prod, AddSubgroup.vadd_def, vadd_eq_add,
+        Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg]
     show μ.prod μ ((g +ᵥ (𝓕₁ ×ˢ 𝓕₁)) ∩ (g' +ᵥ (𝓕₁ ×ˢ 𝓕₁))) = 0
     rw [hset g, hset g', Set.prod_inter_prod, Measure.prod_prod]
     by_cases h1 : (g : V × V).1 = (g' : V × V).1

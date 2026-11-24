@@ -118,7 +118,7 @@ theorem exists_vac
         (fun _ => 1)
         (intVec _ _) (intVec _ _) f := by
   obtain ⟨f, hf⟩ :=
-    GlobalTheory.Member.vacuum_oriented_exists (I.rec7 l Z) ψ θ hψ hθ ((I.rec7 l Z).sp.X i)
+    _root_.GlobalTheory.VacuumO.vacExists (I.rec7 l Z) ψ θ hψ hθ ((I.rec7 l Z).sp.X i)
       ((I.rec7 l Z).sp.X (i + 1))
       (fun _ => 1)
       (fun _ => 1)

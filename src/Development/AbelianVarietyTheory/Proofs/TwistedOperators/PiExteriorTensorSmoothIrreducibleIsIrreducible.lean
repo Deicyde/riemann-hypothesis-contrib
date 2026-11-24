@@ -64,7 +64,7 @@ theorem piTensor_isIrreducible
     (fun j => (s j).ρ)
     (fun j => (s j).irr)
     fun j φ hφ =>
-      GlobalTheory.SchurAdm.schur_admissible (GL (c j) k) (KO k (c j))
+      _root_.GlobalTheory.SchurAdmissibility.schur_admissible (GL (c j) k) (KO k (c j))
         GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO (s j).V (s j).ρ
         (s j).irr (hAdm (c j) (s j).V (s j).ρ (s j).smooth (s j).irr) φ hφ
 

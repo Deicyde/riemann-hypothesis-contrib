@@ -210,7 +210,7 @@ theorem GramBasic_of (hG : GramTransfer) (hI : IotaOK) : GramBasic := by
         ∑ x, ∑ y, ext B1 x * W x y * ext B2 y
           = ∑ j, ∑ k, B1 j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B2 k := by
     intro B1 B2
-    simp [ext, W, Fintype.sum_prod_type, Fin.sum_univ_four]
+    simp [ext, W, Fintype.sum_prod_type]
   have hbb := fun B1 B2 =>
     bb_eq W q0 D (ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ))) hQ (ext B1) (ext B2)
   have hPn

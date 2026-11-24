@@ -1,8 +1,10 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Jets.EmbShortThLeThetaPlain
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ActLevFullLevelGroupFramedPointsStatement
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IntegralFramedPointOfLevelMoveStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ActLevFullLevelGroupFramedPoints
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsLevMove
+public import Formalism.LocalToGlobal.ProjectiveLattices.VAtVNeBot
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IntegralFramedPointOfLevelMove
 public import Formalism.LocalToGlobal.ProjectiveLattices.SpMapAlgHomId
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -82,7 +84,7 @@ theorem levAct_mem_Mlat
     have := D.R.m_add_three_le_k
     simp only [Ranks.sigW]
     omega
-  have hL := GlobalTheory.T.actLev_full_level_group_framedPoints D T.Q j hpq hp.2.1.2
+  have hL := _root_.GlobalTheory.FullLevelAction.actLev_levFull D T.Q j hpq hp.2.1.2
   have hc : (F.1 : T.R j) ∈ T.C j w := cutR_le T.C j w F.2
   have hnat := ((mem_cusp _ _ _ _ _ _).1 hc).1.1
   rintro la _ ⟨⟨q, S, io, e, ho, y, hy, η, hη, rfl⟩, rfl⟩
@@ -91,8 +93,8 @@ theorem levAct_mem_Mlat
   let y' : IntFr (T.Q.Xo j) T.Q.c S io := ⟨
     _,
     fromTest_mvPt hL (ℓ g) y.2.1,
-    GlobalTheory.T.integral_framedPoint_of_level_move _ _ _ _ _ _ (levFull (T.Q.Dw j) T.Q.l (ℓ g)) S
-      io y.1 _ hmv y.2.2
+    _root_.GlobalTheory.FormTies.LevelMove.integral_of_levR _ _ _ _ _ _
+      (levFull (T.Q.Dw j) T.Q.l (ℓ g)) S io y.1 _ hmv y.2.2
   ⟩
   have h0 : 0 ≤ nval S.V e (evI y' F.1) := hF la _ ⟨PtV.mk la ho y' hy () trivial, rfl⟩
   have e1 : evI y (act g F).1 = evI y' F.1 := by

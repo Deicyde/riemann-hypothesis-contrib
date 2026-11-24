@@ -173,8 +173,7 @@ theorem height_standard_le
         simp [Finset.sum_neg_distrib, Finset.mul_sum]
       _ = Fintype.card ι * (d * Real.log δ) := by rw [h3, neg_neg]
 
-  have : Algebra.IsAlgebraic ℚ (AlgebraicClosure ℚ) := by
-    convert AlgebraicClosure.isAlgebraic ℚ <;> rfl
+  have : Algebra.IsAlgebraic ℚ (AlgebraicClosure ℚ) := by convert AlgebraicClosure.isAlgebraic ℚ
   have : Algebra.IsAlgebraic K (AlgebraicClosure ℚ) := Algebra.IsAlgebraic.tower_top (K := ℚ) K
   have harchK
       : ∀ σ : K →+* ℂ,

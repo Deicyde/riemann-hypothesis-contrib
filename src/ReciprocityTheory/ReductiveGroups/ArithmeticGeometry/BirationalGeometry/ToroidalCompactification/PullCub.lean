@@ -93,8 +93,7 @@ theorem unit_ext {V : X.Opens} {a b : Γ(X, V)ˣ} (h : ∀ x ∈ V, gm (𝟙 X) 
   apply TopCat.Presheaf.section_ext X.sheaf V
   intro x hx
   have e := congrArg Units.val (h x hx)
-  rw [gm_val _ _ _ hx, gm_val _ _ _ hx] at e
-  exact e
+  rwa [gm_val _ _ _ hx, gm_val _ _ _ hx] at e
 
 theorem glue_unit
     {J : Type}
@@ -306,9 +305,7 @@ def Tri
 
 theorem mem_pull₂ {x : X''} {J : PUnit → L.ι}
     : x ∈ (L.pull (F' ≫ F)).U J ↔ F (F' x) ∈ L.U (J PUnit.unit) := by
-  simp only [LB.pull, LB.LinComb, LB.wchart]
-  simp
-  exact ⟨fun h => h _, fun h _ => h⟩
+  simpa only [Scheme.Hom.comp_apply] using (mem_pull (F := F' ≫ F) (x := x) (J := J))
 
 theorem indep_comp
     (w : LB.Iso L' (L.pull F)) (w' : LB.Iso L'' (L'.pull F'))
@@ -455,17 +452,12 @@ variable
 
 theorem Tri.pgen_comp (T : Tri w w' w'') (hL' : L'.IsLB) (hw : PGen w) (hw' : PGen w')
     : PGen w'' := by
-  have key
-      : ∀ {G : Type _} [CommGroup G] (b c p q : G),
-        b * 1⁻¹ * p * (1 * c⁻¹ * q) = b * c⁻¹ * (p * q) := by
-    intro G _ b c p q
-    simp only [inv_one, mul_one, one_mul]
-    exact mul_mul_mul_comm _ _ _ _
   intro Y f y j j' k k' hj hj' hk hk'
   obtain ⟨i, hi⟩ := exists_chart hL' (F' (f y))
   rw [T Y f y j i k hj hi hk, T Y f y j' i k' hj' hi hk', hw Y (f ≫ F') y j j' i i hj hj' hi hi,
     hw' Y f y i i k k' hi hi hk hk', gm_self hL' (f ≫ F') y hi, Category.assoc]
-  exact key _ _ _ _
+  simp only [inv_one, mul_one, one_mul]
+  exact mul_mul_mul_comm _ _ _ _
 
 theorem Tri.pgen_cancel (T : Tri w w' w'') (hL : L.IsLB) (hw : PGen w) (hw'' : PGen w'')
     : PGen w' := by
@@ -500,13 +492,11 @@ theorem Tri.prod
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun k _ => ?_
   rw [← mul_zpow, T Z (r ≫ φ'' k) z (p k) (i k) (q k) (hp k) (hi k) (hq k)]
-  have e : (r ≫ φ'' k) ≫ F' = (r ≫ h') ≫ φ' k := by rw [Category.assoc, hc k, Category.assoc]
-  rw [e]
+  rw [Category.assoc, hc k, Category.assoc]
 
 theorem pt_eq (hc : ∀ k, φ'' k ≫ F' = h' ≫ φ' k) (k : K) (y : Y'')
     : φ' k (h' y) = F' (φ'' k y) := by
-  rw [← Scheme.Hom.comp_apply, ← hc k]
-  rfl
+  rw [← Scheme.Hom.comp_apply, ← hc k, Scheme.Hom.comp_apply]
 
 theorem Tri.pmaps_comp
     (T : Tri w w' w'') (hL' : L'.IsLB) (hc : ∀ k, φ'' k ≫ F' = h' ≫ φ' k)

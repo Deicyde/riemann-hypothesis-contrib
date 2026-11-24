@@ -59,8 +59,12 @@ import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ
@@ -72,7 +76,8 @@ namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.CoordCM
 
 section Field
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem exists_moved (h : IsCMExt F E σ) : ∃ θ : E, σ θ ≠ θ := by
   by_contra hc
@@ -93,13 +98,14 @@ theorem im_ne_zero (h : IsCMExt F E σ) {θ : E} (hθ : σ θ ≠ θ) (τ : E �
   rw [h.2.2.2]
   exact Complex.conj_eq_iff_im.2 h0
 
-theorem linInd_one (h : IsCMExt F E σ) {θ : E} (hθ : σ θ ≠ θ) :
-    LinearIndependent F ![(1 : E), θ] := by
+theorem linInd_one (h : IsCMExt F E σ) {θ : E} (hθ : σ θ ≠ θ)
+    : LinearIndependent F ![(1 : E), θ] := by
   rw [LinearIndependent.pair_iff]
   intro s t hst
   have h1 : s • (1 : E) + t • σ θ = 0 := by
     have := congrArg σ hst
-    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, map_zero] at this ⊢
+    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, map_zero]
+      at this ⊢
     exact this
   have h2 : t • (σ θ - θ) = 0 := by
     rw [smul_sub, sub_eq_zero]
@@ -128,15 +134,21 @@ section Top
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-def coordHomeo (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] {d : ℕ}
-    (b : Module.Basis (Fin d) F E) : (R ⊗[F] E) ≃ₜ (Fin d → R) :=
+def coordHomeo
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    : (R ⊗[F] E) ≃ₜ (Fin d → R) :=
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R _
-  { (Algebra.TensorProduct.basis R b).equivFun.toEquiv with
+  {
+    (Algebra.TensorProduct.basis R b).equivFun.toEquiv with
     continuous_toFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.toLinearMap
     continuous_invFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.symm.toLinearMap }
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.symm.toLinearMap
+  }
 
 def planeHomeo {W : Type} (t : W → ℂ) (ht : ∀ w, (t w).im ≠ 0) : (Fin 2 → W → ℝ) ≃ₜ (W → ℂ) where
   toFun f w := (f 0 w : ℂ) + (f 1 w : ℂ) * t w
@@ -159,13 +171,18 @@ def planeHomeo {W : Type} (t : W → ℂ) (ht : ∀ w, (t w).im ≠ 0) : (Fin 2 
       field_simp
   continuous_toFun := by
     refine continuous_pi fun w => ?_
-    have h0 : Continuous fun f : Fin 2 → W → ℝ => f 0 w := (continuous_apply w).comp (continuous_apply 0)
-    have h1 : Continuous fun f : Fin 2 → W → ℝ => f 1 w := (continuous_apply w).comp (continuous_apply 1)
-    exact (Complex.continuous_ofReal.comp h0).add ((Complex.continuous_ofReal.comp h1).mul continuous_const)
+    have h0 : Continuous fun f : Fin 2 → W → ℝ => f 0 w :=
+      (continuous_apply w).comp (continuous_apply 0)
+    have h1 : Continuous fun f : Fin 2 → W → ℝ => f 1 w :=
+      (continuous_apply w).comp (continuous_apply 1)
+    exact (Complex.continuous_ofReal.comp h0).add
+      ((Complex.continuous_ofReal.comp h1).mul continuous_const)
   continuous_invFun := by
     refine continuous_pi fun k => continuous_pi fun w => ?_
-    have hr : Continuous fun g : W → ℂ => (g w).re := Complex.continuous_re.comp (continuous_apply w)
-    have hi : Continuous fun g : W → ℂ => (g w).im := Complex.continuous_im.comp (continuous_apply w)
+    have hr : Continuous fun g : W → ℂ => (g w).re :=
+      Complex.continuous_re.comp (continuous_apply w)
+    have hi : Continuous fun g : W → ℂ => (g w).im :=
+      Complex.continuous_im.comp (continuous_apply w)
     fin_cases k
     · exact hr.sub ((hi.div_const _).mul continuous_const)
     · exact hi.div_const _
@@ -176,22 +193,27 @@ section Map
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem exists_hom (e : Ainf F ≃+* (InfinitePlace F → ℝ)) (τ : InfinitePlace F → (E →+* ℂ))
-    (hc : ∀ x w, ((e (algebraMap F (Ainf F) x) w : ℝ) : ℂ) = τ w (algebraMap F E x)) :
-    ∃ Θ : Ainf F ⊗[F] E →+* (InfinitePlace F → ℂ),
-      ∀ a x w, Θ (a ⊗ₜ[F] x) w = (e a w : ℂ) * τ w x := by
+theorem exists_hom
+    (e : Ainf F ≃+* (InfinitePlace F → ℝ)) (τ : InfinitePlace F → (E →+* ℂ))
+    (hc : ∀ x w, ((e (algebraMap F (Ainf F) x) w : ℝ) : ℂ) = τ w (algebraMap F E x))
+    : ∃ Θ : Ainf F ⊗[F] E →+* (InfinitePlace F → ℂ), ∀ a x w,
+      Θ (a ⊗ₜ[F] x) w = (e a w : ℂ) * τ w x := by
   letI : Algebra F (InfinitePlace F → ℂ) :=
     (Pi.ringHom fun w => (τ w).comp (algebraMap F E)).toAlgebra
-  let fA : Ainf F →ₐ[F] (InfinitePlace F → ℂ) :=
-    { toRingHom := Pi.ringHom fun w =>
-        Complex.ofRealHom.comp ((Pi.evalRingHom (fun _ => ℝ) w).comp (e : Ainf F →+* (InfinitePlace F → ℝ)))
-      commutes' := fun x => funext fun w => hc x w }
-  let fE : E →ₐ[F] (InfinitePlace F → ℂ) :=
-    { toRingHom := Pi.ringHom τ
-      commutes' := fun _ => rfl }
-  exact ⟨(Algebra.TensorProduct.productMap fA fE).toRingHom, fun a x w => by
-    simp [Algebra.TensorProduct.productMap_apply_tmul, fA, fE]
-    rfl⟩
+  let fA : Ainf F →ₐ[F] (InfinitePlace F → ℂ) := {
+    toRingHom :=
+      Pi.ringHom fun w =>
+        Complex.ofRealHom.comp ((Pi.evalRingHom (fun _ => ℝ) w).comp
+          (e : Ainf F →+* (InfinitePlace F → ℝ)))
+    commutes' := fun x => funext fun w => hc x w
+  }
+  let fE : E →ₐ[F] (InfinitePlace F → ℂ) := { toRingHom := Pi.ringHom τ, commutes' := fun _ => rfl }
+  exact ⟨
+    (Algebra.TensorProduct.productMap fA fE).toRingHom,
+    fun a x w => by
+      simp [Algebra.TensorProduct.productMap_apply_tmul, fA, fE]
+      rfl
+  ⟩
 
 end Map
 
@@ -200,11 +222,15 @@ end GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.CoordCM
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Arch
 
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.CoordCM in
-theorem exists_isCoord : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-  IsCMExt F E σ → ∀ (ρ : InfinitePlace F → (F →+* ℝ)) (e : Ainf F ≃+* (InfinitePlace F → ℝ)),
-  (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → IsHomeomorph e → (∀ x w, e (algebraMap F (Ainf F) x) w = ρ w x) →
-  ∃ (τ : InfinitePlace F → (E →+* ℂ)) (Θ : Ainf F ⊗[F] E ≃+* (InfinitePlace F → ℂ)),
-    IsCoord σ e τ Θ := by
+theorem exists_isCoord
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (ρ : InfinitePlace F → (F →+* ℝ)) (e : Ainf F ≃+* (InfinitePlace F → ℝ)),
+          (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → IsHomeomorph e
+            → (∀ x w, e (algebraMap F (Ainf F) x) w = ρ w x)
+            → ∃ (τ : InfinitePlace F → (E →+* ℂ)) (Θ : Ainf F ⊗[F] E ≃+* (InfinitePlace F → ℂ)),
+              IsCoord σ e τ Θ := by
   intro F E _ _ _ _ _ σ h ρ e hρ he hx
   classical
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [h.2.2.1]; norm_num)
@@ -213,8 +239,7 @@ theorem exists_isCoord : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [N
     letI : Algebra F ℂ := w.embedding.toAlgebra
     let t : E →ₐ[F] ℂ := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     exact ⟨t, fun x => t.commutes x⟩
   choose τ hτ using hex
@@ -223,12 +248,15 @@ theorem exists_isCoord : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [N
   let eH : Ainf F ≃ₜ (InfinitePlace F → ℝ) := he.homeomorph
   let b := basisOne h hθ
   let H : (Ainf F ⊗[F] E) ≃ₜ (InfinitePlace F → ℂ) :=
-    (coordHomeo (Ainf F) b).trans ((Homeomorph.piCongrRight fun _ => eH).trans
-      (planeHomeo (fun w => τ w θ) (fun w => im_ne_zero h hθ (τ w))))
+    (coordHomeo (Ainf F) b).trans
+      ((Homeomorph.piCongrRight fun _ => eH).trans
+        (planeHomeo (fun w => τ w θ) (fun w => im_ne_zero h hθ (τ w))))
   have hH : ∀ y, H y = Θ y := by
     intro y
-    have hy : y = (Algebra.TensorProduct.basis (Ainf F) b).repr y 0 ⊗ₜ[F] (1 : E) +
-        (Algebra.TensorProduct.basis (Ainf F) b).repr y 1 ⊗ₜ[F] θ := by
+    have hy
+        : y
+          = (Algebra.TensorProduct.basis (Ainf F) b).repr y 0 ⊗ₜ[F] (1 : E)
+            + (Algebra.TensorProduct.basis (Ainf F) b).repr y 1 ⊗ₜ[F] θ := by
       conv_lhs => rw [← (Algebra.TensorProduct.basis (Ainf F) b).sum_repr y]
       rw [Fin.sum_univ_two, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.basis_apply,
         basisOne_zero, basisOne_one, TensorProduct.smul_tmul', TensorProduct.smul_tmul']
@@ -266,8 +294,8 @@ theorem exists_isCoord : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [N
       have h1 : τ w x + conj (τ w x) = ((ρ w (Algebra.trace F E x) : ℝ) : ℂ) := by
         rw [hρ, ← hτ, ← GlobalTheory.GaussMean.OneVec.add_sigma h, map_add (f := _), h.2.2.2]
         rfl
-      rw [GlobalTheory.GaussMean.OneVec.trace_tmul, map_mul, Pi.mul_apply, hx, hΘ, map_mul, Complex.conj_ofReal,
-        Complex.ofReal_mul, ← h1]
+      rw [GlobalTheory.GaussMean.OneVec.trace_tmul, map_mul, Pi.mul_apply, hx, hΘ, map_mul,
+        Complex.conj_ofReal, Complex.ofReal_mul, ← h1]
       ring
     | add y y' hy hy' =>
       simp only [map_add (f := _), Pi.add_apply, Complex.ofReal_add, hy, hy']

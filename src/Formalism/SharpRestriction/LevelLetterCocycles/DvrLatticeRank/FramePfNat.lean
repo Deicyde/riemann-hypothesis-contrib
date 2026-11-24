@@ -305,7 +305,7 @@ theorem framepf_JLA_sat
       apply hA
       have h2 := congrArg (W.γA δ) hb'
       rw [map_mul, map_mul, map_pow, map_natCast, hb δ hδ,
-          Formalism.MainNotions.LiftingTheory.wmap_γA_letE]
+          _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent]
         at h2
       rw [mul_sub, ← h2, hb', sub_self]
     refine ⟨b', hb'Δ, ?_⟩
@@ -317,7 +317,8 @@ theorem framepf_JLA_sat
       apply W.EE_inj
       have h4
           : ((PD.p : ℕ) : LetA O n) ^ j * ((letE c : LetA O n) * b') = (letE c : LetA O n) * b := by
-        rw [mul_left_comm, ← hb', ← mul_assoc, Formalism.MainNotions.LiftingTheory.wmap_letE_idem]
+        rw [mul_left_comm, ← hb', ← mul_assoc,
+          _root_.Formalism.MainNotions.LiftingTheory.letter_idempotent_sq]
       rw [mul_sub, mul_left_comm _ (Eπ ^ h' * _), h4, map_sub, map_mul, ← hae,
         map_mul (algebraMap (LetA O n) W.EE) (Eπ ^ h' * _),
         map_mul (algebraMap (LetA O n) W.EE) (Eπ ^ h'), ← hbe, ← hge, ← hΛe, map_pow, map_natCast,
@@ -372,11 +373,12 @@ theorem framepf_Ψα_nat
       · show _ ∈ DelS W T₂
         rw [mem_DelS]
         intro δ hδ
-        rw [gradNPf_γD_smul, ← W.φγ_comm, hdΔ.2 δ hδ, map_mul, map_mul, huΔ δ hδ, a.2 δ hδ,
-          Formalism.MainNotions.LiftingTheory.wmap_γA_letE]
+        rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ← W.φγ_comm, hdΔ.2 δ hδ,
+          map_mul, map_mul, huΔ δ hδ, a.2 δ hδ,
+          _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent]
       · show _ ∈ letS W T₂ c
         rw [mem_letS, smul_smul, ← mul_assoc, ← mul_assoc,
-          Formalism.MainNotions.LiftingTheory.wmap_letE_idem]
+          _root_.Formalism.MainNotions.LiftingTheory.letter_idempotent_sq]
       · rw [e, LinearMap.lTensor_tmul, hΨ₂, hΨ₁, map_smul, W.map_φ, ← smul_sub, ← map_sub, ← hde,
           Formalism.MainNotions.LiftingTheory.wmap_φD_smul, map_pow, hφ, algebraMap_smul, smul_smul,
           smul_smul]

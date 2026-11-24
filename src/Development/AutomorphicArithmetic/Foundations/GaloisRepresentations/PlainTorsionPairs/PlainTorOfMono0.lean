@@ -130,8 +130,8 @@ theorem UpperTheory.Gal.projectedFormsSystemPart.plainTor_of_mono0
   have hgτ : IsGeneric (algNorm σ).rep :=
     hnu _ _ ((isGeneric_congr (IrrGL.equivOf σ.ρ σ.smooth σ.irred)).1 hg)
   obtain ⟨c, Δ, y, hd, hun, hL, ⟨e⟩⟩ :=
-    GlobalTheory.genericUnlinkedGL_outright (w.adicCompletion E) (algNorm σ).1 _ (algNorm σ).rep
-      (algNorm σ).2.rep.smooth (algNorm σ).2.rep.irr hgτ
+    _root_.GlobalTheory.RgGu.Holds.genericUnlinkedGL_holds (w.adicCompletion E) (algNorm σ).1 _
+      (algNorm σ).rep (algNorm σ).2.rep.smooth (algNorm σ).2.rep.irr hgτ
   have hIsL : IsL
       ((List.ofFn Δ : List (Segment (w.adicCompletion E)))
         : Multiset (Segment (w.adicCompletion E)))

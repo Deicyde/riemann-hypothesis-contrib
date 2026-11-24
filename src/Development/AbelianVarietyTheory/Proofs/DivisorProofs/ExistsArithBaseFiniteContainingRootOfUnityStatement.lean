@@ -57,6 +57,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_arithBase_finite_containing_rootOfUnity
     : ∀ {o₁ Ω₁ : Type} [CommRing o₁] [Field Ω₁] [Algebra o₁ Ω₁] [ArithBase o₁ Ω₁] (Ω₂ : Type)
         [Field Ω₂] [Algebra Ω₁ Ω₂] (K : ℕ) (ζ : Ω₂ˣ),
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.exists_arithBase_finite_containing_rootOfUnity
             (ze : o₂ˣ),
           κ.Finite ∧ (algebraMap o₂ Ω₂).comp κ = (algebraMap Ω₁ Ω₂).comp (algebraMap o₁ Ω₁)
             ∧ Units.map (algebraMap o₂ Ω₂ : o₂ →* Ω₂) ze = ζ := by
-  first
-  | exact @GlobalTheory.Poinc.exists_arithBase_rootOfUnity
-  | exact GlobalTheory.Poinc.exists_arithBase_rootOfUnity
-  | (intros; apply GlobalTheory.Poinc.exists_arithBase_rootOfUnity <;> assumption)
+  first | exact @GlobalTheory.Poinc.exists_arithBase_rootOfUnity

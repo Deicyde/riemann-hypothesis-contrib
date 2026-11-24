@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.CompactCasimirLeTensorOperatorRaiseStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.CompactCasimirLeTensorOperatorRaise
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -71,7 +71,7 @@ theorem casKLe_proj_single
         → ∀ s d, CasKLe ε (F s) (c + Real.sqrt n) (pr s (Pi.single d w)) := by
   intro M _ _ n ε E N _ _ F io pr c w hE hF hT hc hw s d
   have key :=
-    GlobalTheory.T.compactCasimirLe_tensorOperator_raise M n ε E (N s) (Fin n) (F s)
+    _root_.GlobalTheory.TensOp.casKLe_tensor_operator M n ε E (N s) (Fin n) (F s)
       (fun j => (pr s) ∘ₗ (LinearMap.single ℂ (fun _ : Fin n => M) j))
       (fun a b => Matrix.of fun i j => if i = b ∧ j = a then (-1 : ℂ) else 0)
       c (Real.sqrt n) (kUnit_of_isUnitary_proj hE) (kUnit_of_isUnitary_proj (hF s)) hc

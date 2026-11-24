@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   Formalism.L2.JoinChr Formalism.L2.Host
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.idelicCharacter_eq_prod_unramifiedValue_zpow
     : ∀ (D : D7) (ι : (Af D.host.F ⊗[D.host.F] D.host.E) ≃+* FiniteAdeleRing (𝓞 D.host.E) D.host.E),
       (∀ x : D.host.E,
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.idelicCharacter_eq_prod_unramifiedValue_zpow
                       χ.UnrAt Q ∧ Valued.v (ι (finPart D (x : AE D)) Q) = WithZero.exp (- m Q))
                     → (∀ Q, Q ∉ S → ι (finPart D (x : AE D)) Q = 1)
                     → ((c x : Circle) : ℂ) = ((∏ Q ∈ S, χ.val Q ^ m Q : ℂˣ) : ℂ) := by
-  first
-  | exact @GlobalTheory.CharUnramVal.char_eq_prod_val_zpow
-  | exact GlobalTheory.CharUnramVal.char_eq_prod_val_zpow
-  | (intros; apply GlobalTheory.CharUnramVal.char_eq_prod_val_zpow <;> assumption)
+  first | exact @GlobalTheory.CharUnramVal.char_eq_prod_val_zpow

@@ -165,7 +165,6 @@ def secLin {X : Scheme.{0}} {L : LB X} {n : ℕ} (c : Fin n → Γ(X, ⊤)) (t :
     : LB.Sec L where
   f := fun j => ∑ i, resTop _ (c i) * (t i).f j
   compat := fun j j' => by
-
     rw [map_sum, map_sum, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => (SecOps.secScale (c i) (t i)).compat j j'
 

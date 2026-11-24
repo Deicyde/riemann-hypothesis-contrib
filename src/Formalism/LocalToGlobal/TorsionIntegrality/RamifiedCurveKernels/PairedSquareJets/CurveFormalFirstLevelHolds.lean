@@ -80,7 +80,7 @@ theorem endoCurve_neg_one {K : Type} [Field K] [CharZero K] (W : WeierstrassCurv
 theorem inv_mem_unitBall {K : Type} [NormedField K] [IsUltrametricDist K] {x : K} (h : ‖x‖ = 1)
     : x⁻¹ ∈ unitBall K := by
   have h1 : ‖x⁻¹‖ ≤ 1 := by rw [norm_inv, h, inv_one]
-  first | exact h1 | simpa [Formalism.G.unitBall] using h1
+  first | exact h1
 
 theorem endInt_int
     {K : Type} [Field K]

@@ -73,7 +73,7 @@ private theorem equiv_prinSeries
     (hs : HasSupport ρ (GlobalTheory.RoadU.chars ξ hξ))
     (hu : GlobalTheory.RoadU.Unlinked (GlobalTheory.RoadU.chars ξ hξ))
     : Nonempty (ρ.Equiv (prinSeries ξ)) := by
-  obtain ⟨hi, hq⟩ := (UpperTheory.Gal.LocD.ofSupport_holds k n V ρ ξ hξ).1 hs
+  obtain ⟨hi, hq⟩ := (_root_.UpperTheory.Gal.LocD.ofSupport k n V ρ ξ hξ).1 hs
   let y : Fin n → IrrGL (k := k) := fun i => IrrGL.ofChar (ξ i) (hξ i)
   have hy : ∀ i, (y i).IsCusp := fun i => IrrGL.isCusp_ofChar _ _
   have hd : ∑ i, (y i).1 = n := by simp [y, IrrGL.ofChar]

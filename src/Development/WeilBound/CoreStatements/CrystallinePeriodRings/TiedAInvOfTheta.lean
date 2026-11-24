@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFinExt
 
 @[expose] public section
 
@@ -76,10 +77,6 @@ theorem tiedA_inv
   refine ⟨_, (tie_fil_zero T K _).2 ⟨z, e⟩, T.eD.injective ?_⟩
   rw [map_mul, e, h, ← map_mul, hz, map_one, map_one]
 
-theorem tiedA_ι_injective (P : LocPrime l) : Function.Injective P.ιB := fun a b h =>
-  (P.PD (MainNotions.LocalSituation.botExt l)).ι_inj
-    (((P.PD_ι _ a).trans h).trans (P.PD_ι _ b).symm)
-
 theorem tiedA_φ_injective (P : LocPrime l) : Function.Injective P.φB := fun a b h =>
   (P.PD (MainNotions.LocalSituation.botExt l)).φ_inj
     (((P.PD_φ _ a).trans h).trans (P.PD_φ _ b).symm)
@@ -104,8 +101,8 @@ theorem tied_field
   have hD : IsDomain P.R.BdR := hF.isDomain
   refine ⟨
     hF,
-    (tiedA_ι_injective P).isDomain P.ιB.toRingHom,
-    tiedA_ι_injective P,
+    (_root_.GlobalTheory.MemLoc.FitsEx.iota_inj P).isDomain P.ιB.toRingHom,
+    _root_.GlobalTheory.MemLoc.FitsEx.iota_inj P,
     tiedA_φ_injective P,
     fun K x h0 h1 => ?_
   ⟩

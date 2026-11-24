@@ -255,12 +255,7 @@ theorem uw_inv
       _ = w := by rw [Matrix.mulVec_mulVec, h2, Matrix.one_mulVec]
   exact ⟨⟨hi, fun a => ⟨key _ (hfix a).1, key _ (hfix a).2⟩, key _ hz⟩, h1, h2⟩
 
-theorem uh_inv
-    {g : Formalism.FourierDecayAlt.ThreeDimData.Mx k r}
-    (hg : g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
-    : g⁻¹ ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧ g * g⁻¹ = 1
-      ∧ g⁻¹ * g = 1 := by
-  exact inv_mem_UH_Hpk_and_mul_inv_of_mem hg
+alias uh_inv := _root_.Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity.inv_mem_UH_Hpk_and_mul_inv_of_mem
 
 end Groups
 
@@ -358,9 +353,8 @@ theorem piW_inner
   have hm := hmul h hh h⁻¹ hi
   rw [hhi, h1] at hm
   have hs : ∀ x, π h (π h⁻¹ x) = x := fun x => by
-    have h3 := congrArg (fun T : Wp →L[ℂ] Wp => T x) hm
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.one_apply] at h3
-    exact h3.symm
+    simpa only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.one_apply] using
+      (congrArg (fun T : Wp →L[ℂ] Wp => T x) hm).symm
   let L : Wp →ₗᵢ[ℂ] Wp := { toLinearMap := (π h : Wp →ₗ[ℂ] Wp), norm_map' := hnorm h hh }
   calc
     ⟪η, π h w⟫_ℂ = ⟪L (π h⁻¹ η), L w⟫_ℂ := by
@@ -409,8 +403,7 @@ theorem sigma_facts
   have hdet : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).mp hPu
   have hPiP : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hdet
   refine ⟨?_, fun g hg v => ?_⟩
-  · simp only [Matrix.mul_one, hPiP] at h1
-    exact h1
+  · simpa only [Matrix.mul_one, hPiP] using h1
   · have hmem := cayley_maps hP hg
     have hv := hnorm _ hmem v
     have e : P⁻¹ * (P * g * P⁻¹) * P = g := by
@@ -447,7 +440,7 @@ theorem sigma_inner
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc P⁻¹ P, hPiP, Matrix.one_mul]
   have hm := hmul _ hm1 _ hm2
-  simp only [prod, hggi, conj, Matrix.mul_one, Matrix.one_mul, hPiP, hPPi] at hm h1
+  simp only [prod, hggi, conj, Matrix.mul_one, hPiP, hPPi] at hm h1
 
   have hsg : ∀ w, σ g (σ g⁻¹ w) = w := fun w => by
     have := congrArg (fun T : H →L[ℂ] H => T w) hm

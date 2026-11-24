@@ -58,8 +58,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-
-
 namespace Formalism.IndefR.Fin
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -327,7 +325,6 @@ theorem plOf_split
   exact not_two_primes_F w.isPrime.ne_top D.host.hyp.2.1 D.host.hyp.1
     (fun h => D.host.hypOdd.2.2.1 h.symm)
     hdw hqw
-
 
 theorem splitIdem_int {e : AE D} (he : IsSplitIdem D e) : finPart D e ∈ intAE D := by
   obtain ⟨h1, h2, w, ε, hpl, hsε⟩ := he

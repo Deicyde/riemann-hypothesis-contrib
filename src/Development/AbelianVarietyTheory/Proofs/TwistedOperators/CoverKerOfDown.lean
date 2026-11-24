@@ -302,7 +302,6 @@ theorem coverKer_of_down
   · intro n a b hsum
     have hwN : ∑ i, B' (a i) (b i) ∈ N := Submodule.sum_mem _ fun i _ => memN (a i) (b i)
     have h1 : ψ₁ (∑ i, B' (a i) (b i)) = 0 := by
-
       rw [map_sum]
       simp only [hψ₁]
       exact hsum

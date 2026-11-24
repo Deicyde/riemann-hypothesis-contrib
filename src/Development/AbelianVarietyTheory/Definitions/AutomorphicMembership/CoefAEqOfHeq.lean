@@ -55,7 +55,6 @@ variable
   {w' : ColW B' f' T'} {Z : w.Lt} {Z' : w'.Lt} {hX : B.fields.Ok} {hX' : B'.fields.Ok}
   {Wt : Set B.places.Pl} {Wt' : Set B'.places.Pl}
 
-
 structure Ext (z : Dat (w.st Z) w.I hX T Wt) (z' : Dat (w'.st Z') w'.I hX' T' Wt') : Prop where
   H : HEq z'.core.Q.H z.core.Q.H
   l : HEq z'.core.Q.l z.core.Q.l

@@ -58,18 +58,20 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 ReciprocityTheory.AnForm.M Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  ReciprocityTheory.AnForm.M Filter Topology
 open ReciprocityTheory.ChartRestriction.G.AI.I1 (IsBlockMap pullDeg)
 open Algebra GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.CoordinateConeArithVar
 
 section Dim
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
-
+variable
+  {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem ratioField_eq_blockFnField (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) :
-    ratioField y c = blockFnField y := by
+theorem ratioField_eq_blockFnField (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    : ratioField y c = blockFnField y := by
   apply le_antisymm
   · refine IntermediateField.adjoin_le_iff.mpr ?_
     rintro _ ⟨p, rfl⟩
@@ -87,33 +89,34 @@ theorem ratioField_eq_blockFnField (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (
     rw [key]
     exact div_mem hp hq
 
-theorem ringKrullDim_coord (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) :
-    ringKrullDim (MRing ι ⧸ mCoordIdeal y) =
-      (((Algebra.trdeg ℤ (blockFnField y) + (Fintype.card K : Cardinal)).toENat + 1 : ℕ∞) : WithBot ℕ∞) := by
+theorem ringKrullDim_coord (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    : ringKrullDim (MRing ι ⧸ mCoordIdeal y)
+      = (((Algebra.trdeg ℤ (blockFnField y) + (Fintype.card K : Cardinal)).toENat + 1 : ℕ∞)
+        : WithBot ℕ∞) := by
   haveI hP : (mCoordIdeal y).IsPrime := RingHom.ker_isPrime (mConeMap y)
-  have hdim := GroundTheory.Heights₂.Heights.IntDomainDim.full (MRing ι ⧸ mCoordIdeal y)
-    (algebraMap_injective _ (horizontal y))
+  have hdim :=
+    GroundTheory.Heights₂.Heights.IntDomainDim.full (MRing ι ⧸ mCoordIdeal y)
+      (algebraMap_injective _ (horizontal y))
   have hne : ∀ k, ∃ i, ratioPtL y c ⟨k, i⟩ ≠ 0 := by
     intro k
     refine ⟨c k, fun h0 => ?_⟩
     have h1 := congrArg Subtype.val h0
     change ratioPt y c ⟨k, c k⟩ = 0 at h1
     simp [ratioPt, hc k] at h1
-  have htr := GroundTheory.Heights₂.Heights.ConeTrdeg.full K ι (ratioField y c) (ratioPtL y c)
-    (birational y c hc) hne (horizontal _)
+  have htr :=
+    GroundTheory.Heights₂.Heights.ConeTrdeg.full K ι (ratioField y c) (ratioPtL y c)
+      (birational y c hc) hne (horizontal _)
   rw [mCoordIdeal_ratioPtL y c hc] at htr
   rw [hdim, htr, ratioField_eq_blockFnField y c hc]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem trdeg_eq_of_le_of_isAlgebraic {L₁ L₂ : IntermediateField ℚ Ω} (h : L₁ ≤ L₂)
-    (halg : ∀ t ∈ L₂, IsAlgebraic L₁ t) : Algebra.trdeg ℤ L₂ = Algebra.trdeg ℤ L₁ := by
+theorem trdeg_eq_of_le_of_isAlgebraic
+    {L₁ L₂ : IntermediateField ℚ Ω} (h : L₁ ≤ L₂) (halg : ∀ t ∈ L₂, IsAlgebraic L₁ t)
+    : Algebra.trdeg ℤ L₂ = Algebra.trdeg ℤ L₁ := by
   letI : Algebra L₁ L₂ := (IntermediateField.inclusion h).toRingHom.toAlgebra
   letI : FaithfulSMul L₁ L₂ :=
     (faithfulSMul_iff_algebraMap_injective L₁ L₂).2 (RingHom.injective _)
-  let f : L₂ →ₐ[L₁] Ω :=
-    { toRingHom := L₂.val.toRingHom
-      commutes' := fun _ => rfl }
+  let f : L₂ →ₐ[L₁] Ω := { toRingHom := L₂.val.toRingHom, commutes' := fun _ => rfl }
   haveI : Algebra.IsAlgebraic L₁ L₂ :=
     ⟨fun x => (isAlgebraic_algHom_iff f Subtype.val_injective).mp (halg x x.2)⟩
   have h0 : trdeg L₁ L₂ = 0 := trdeg_eq_zero
@@ -121,11 +124,17 @@ theorem trdeg_eq_of_le_of_isAlgebraic {L₁ L₂ : IntermediateField ℚ Ω} (h 
 
 end Dim
 
-theorem isArithVar_of_isAlgebraic_image (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (K' : Type)
-    [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (κ : K → K') (v : (Σ k, ι k) → Σ k, ι' k) (Ω : Type)
-    [Field Ω] [CharZero Ω] (y : (Σ k, ι' k) → Ω) (d : ℕ) (hv : IsBlockMap κ v)
-    (hy : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) (hz : IsArithVar (mCoordIdeal (y ∘ v)) d)
-    (halg : ∀ t ∈ blockFnField y, IsAlgebraic (blockFnField (y ∘ v)) t) : IsArithVar (mCoordIdeal y) d := by
+theorem isArithVar_of_isAlgebraic_image
+    (K : Type) [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (K' : Type) [Fintype K']
+    (ι' : K' → Type) [∀ k, Fintype (ι' k)]
+    (κ : K → K') (v : (Σ k, ι k) → Σ k, ι' k)
+    (Ω : Type) [Field Ω] [CharZero Ω]
+    (y : (Σ k, ι' k) → Ω) (d : ℕ)
+    (hv : IsBlockMap κ v) (hy : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) (hz : IsArithVar (mCoordIdeal (y ∘ v)) d)
+    (halg : ∀ t ∈ blockFnField y, IsAlgebraic (blockFnField (y ∘ v)) t)
+    : IsArithVar (mCoordIdeal y) d := by
   classical
   obtain ⟨hK, -, -, hdz⟩ := hz
   obtain ⟨hκ, -, hfst, hsurj⟩ := hv
@@ -148,8 +157,12 @@ theorem isArithVar_of_isAlgebraic_image (K : Type) [Fintype K] (ι : K → Type)
     exact IntermediateField.subset_adjoin _ _ ⟨v p, v q, by rw [hfst, hfst, hpq], rfl⟩
   have htr := trdeg_eq_of_le_of_isAlgebraic hle halg
   unfold IsArithVar IsMultiProjPrime
-  refine ⟨⟨κ hK.some⟩, ⟨RingHom.ker_isPrime (mConeMap y), isMultiHomogIdeal y, relevant y c' hc'⟩,
-    horizontal y, ?_⟩
+  refine ⟨
+    ⟨κ hK.some⟩,
+    ⟨RingHom.ker_isPrime (mConeMap y), isMultiHomogIdeal y, relevant y c' hc'⟩,
+    horizontal y,
+    ?_
+  ⟩
   rw [ringKrullDim_coord y c' hc', htr]
   generalize Algebra.trdeg ℤ ↥(blockFnField (y ∘ v)) = T at e1 ⊢
   simp only [map_add (f := _), map_natCast] at e1 ⊢

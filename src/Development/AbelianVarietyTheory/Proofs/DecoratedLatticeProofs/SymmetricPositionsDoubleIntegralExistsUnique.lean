@@ -2,16 +2,18 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ToOneSucc
 public import Mathlib.CategoryTheory.Category.Basic
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsBilinearPositionMiddleVertexStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLinearIsQuotIntTIntStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FourierJacobiTargetBilinearFormIntegralStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SchwartzBruhatSelfAverageHeisenbergStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsBilinearPositionMiddleVertex
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FourierJacobiTargetBilinearFormIntegral
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SchwartzBruhatSelfAverageHeisenberg
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLinearIsQuotIntTInt
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegrableOfMemSB
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegralMulOfSupport
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OrbitLocallyConstant
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.QuotientIntegralParabolicUnfolding
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExchangeSupportAndFourierRelation
-import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SchwartzFourierTransformPiSurjectiveSchwartzBruhStatement
+import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FourierJacobiAverage
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SchwartzFourierTransformPiSurjectiveSchwartzBruh
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -55,7 +57,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
 
 @[expose] public section
 
@@ -178,8 +179,7 @@ theorem exists_fj_of_exUp
     have fj_apply : ∀ φ v Φ₀, fj φ v Φ₀ = f φ v Φ₀ := fun _ _ _ => rfl
     refine ⟨fj, ⟨hB, fun φ v Φ₀ => ⟨hI φ v Φ₀, fj_apply φ v Φ₀⟩⟩, fun φ v Φ₀ => ?_⟩
     obtain ⟨s1, -, s3⟩ := (hS (b φ) v).1 (hb φ)
-    have hh :=
-      (GlobalTheory.T.schwartzFourierTransformPi_surjective_schwartzBruhat k n ψ hψ hψ1 ν hν).1 Φ₀
+    have hh := (_root_.GlobalTheory.SplitWeil.FourierSurj.hat_surjective k n ψ hψ hψ1 ν hν).1 Φ₀
     rw [fj_apply]
     simp only [f, hBb, s3, GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage.hat,
       ← integral_const_mul, ← integral_mul_const]
@@ -239,8 +239,8 @@ theorem symDbl_existsUnique
   have hρ₀s : IsSrc μ₁ ρ₀ := fun _ _ => rfl
 
   obtain ⟨b, hbpos, hbq, -⟩ :=
-    GlobalTheory.T.exists_bilinear_position_middle_vertex k n₀ n₁ n₂ c ρ hcρ ψ hψ hψ1 ν hν μ₁ μ₂ hμ₁
-      hμ₂ m₁ G₁ m₂ G₂ A σ hσ T hT F ρ₁ hρ₁s
+    _root_.GlobalTheory.PosOne.MidVertex.exists_bilPos_mid k n₀ n₁ n₂ c ρ hcρ ψ hψ hψ1 ν hν μ₁ μ₂
+      hμ₁ hμ₂ m₁ G₁ m₂ G₂ A σ hσ T hT F ρ₁ hρ₁s
 
   obtain ⟨B, hBpos, hBb⟩ := bilPos_exUp_exists (c := c + 1) h1 (by omega) hψ hψ1 ν hρ₁ hbpos
   obtain ⟨fj, hrep, hfj⟩ :=
@@ -253,7 +253,7 @@ theorem symDbl_existsUnique
           (fj Ψ (ρ₁ h Φ₂) Φ₀) := by
     intro h Ψ Φ₀
     obtain ⟨-, hav⟩ :=
-      GlobalTheory.T.schwartzBruhat_self_average_heisenberg k n₂ n₁ c ρ h1 hρc ψ hψ hψ1 ν hν μ₂ hμ₂
+      _root_.GlobalTheory.PosOne.avg_self_and_props k n₂ n₁ c ρ h1 hρc ψ hψ hψ1 ν hν μ₂ hμ₂
         (ρ₁ h Φ₂)
     obtain ⟨hmem, hop, hL⟩ := hav Φ₀
     have e1 := hbq Ψ ⟨_, hmem⟩
@@ -271,11 +271,11 @@ theorem symDbl_existsUnique
     exact this.symm
 
   have hiff :=
-    GlobalTheory.T.fourierJacobi_target_bilinear_form_integral k n₁ n₀ (c + 1) ρ h1 (by omega) ψ hψ
-      hψ1 ν hν μ₁ hμ₁ m₁ G₁ _ ρ₁ hρ₁ fj B hrep hBpos Φ₂ Φ₁
+    _root_.GlobalTheory.PosOne.FJTarget.target_bilinear k n₁ n₀ (c + 1) ρ h1 (by omega) ψ hψ hψ1 ν
+      hν μ₁ hμ₁ m₁ G₁ _ ρ₁ hρ₁ fj B hrep hBpos Φ₂ Φ₁
   obtain ⟨Rr, hRr, -⟩ :=
-    GlobalTheory.T.exists_linear_isQuotInt_tInt_alt k n₁ n₀ (c + 1) (ρ + 1) (by omega) (by omega) ψ
-      hψ hψ1 ν μ₁ hμ₁ m₁ G₁ _ ρ₁ hρ₁ B hBpos Φ₂ ρ₀ hρ₀s
+    _root_.GlobalTheory.PosOne.RrLin.exists_linear_isQuotInt_tInt k n₁ n₀ (c + 1) (ρ + 1) (by omega)
+      (by omega) ψ hψ hψ1 ν μ₁ hμ₁ m₁ G₁ _ ρ₁ hρ₁ B hBpos Φ₂ ρ₀ hρ₀s
   refine ⟨Rr Φ₁, ⟨_, hw, (hiff _).1 (hRr Φ₁)⟩, ?_⟩
   rintro z ⟨w, hw', hz⟩
   have ew : w = fun h Ψ Φ₀ => fj Ψ (ρ₁ h Φ₂) Φ₀ := by

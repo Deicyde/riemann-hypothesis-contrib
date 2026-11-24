@@ -195,7 +195,7 @@ theorem exists_phi
           exact (Quotient.eq''.2 (MulAction.orbitRel_apply.2 ⟨γ⁻¹, by simp⟩))⟩
       have h0 : cnt Γ x y = 0 := Nat.card_of_isEmpty
       rw [h0, EuclideanSpace.inner_single_left]
-      simp [hne, Ne.symm hne]
+      simp [hne]
 
 end Action
 

@@ -119,7 +119,9 @@ theorem exists_norm
   obtain ⟨c, hc, vc⟩ :=
     FrameGeo.exists_ratio Lr.isLB (𝟙 _) (𝟙 _) (Category.comp_id _)
       (by rw [Scheme.Hom.id_appTop]; exact Function.surjective_id)
-      (FrameGeo.powGen_isGen Lr.L _ _ Lr.rig Lr.rigGen (N - 1)) ht
+      (_root_.ReciprocityTheory.ChartRestriction.G.DVR.powGen_isGen Lr.L _ _ Lr.rig Lr.rigGen
+        (N - 1))
+      ht
   refine ⟨
     scaleGen (hc.map G.hom.appTop.hom).unit mu,
     scaleGen_isGen _ _ hmu,
@@ -163,7 +165,8 @@ theorem exists_generic
         simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Category.comp_id, endK_gK,
           Nat.cast_mul, mul_neg, _root_.mul_one])
       (LB.pullGen Lr.L _ _ (GeneratorPullback.powGen Lr.L _ _ mu k) gK)
-      (DVR.pullGen_isGen _ _ _ _ (FrameGeo.powGen_isGen _ _ _ _ hmu k) _)
+      (DVR.pullGen_isGen _ _ _ _
+        (_root_.ReciprocityTheory.ChartRestriction.G.DVR.powGen_isGen _ _ _ _ hmu k) _)
   have vu'
       : ∀ (Z : Scheme.{0}) (r : Z ⟶ pullback G.hom (jK V)) (z : Z) (J),
         Good Lr.L z J → val u r z J = val mu (r ≫ gK) z J ^ k := fun Z r z J hJ => by
@@ -191,7 +194,7 @@ theorem sval_of_generic
     (J) (hJ : Good L z J)
     : sval σ' r z J
       = constVal (r ≫ G.hom) z t * (sval σ (r ≫ f.left) z J * (val mu r z J).val ^ k) := by
-  have hk := FrameGeo.powGen_isGen _ _ _ _ hmu k
+  have hk := _root_.ReciprocityTheory.ChartRestriction.G.DVR.powGen_isGen _ _ _ _ hmu k
   obtain ⟨τ, hτ⟩ :=
     exists_sec hL
       (φ' := fun _ : Fin 1 => 𝟙 G.left)
@@ -250,10 +253,6 @@ theorem gs_eq_germ_fnVal
 
 variable {R : Type} [CommRing R] {G : Over (Spec (CommRingCat.of R))} [GrpObj G] {d : ℕ}
 
-theorem ev_pt_zero (s : PS R 1 d) : ev (n := 1) ![pt R d 0] s = s := by
-  have : (![pt R d 0] : Fin 1 → Pt R 1 d) = fun j => pt R d j := by funext j; fin_cases j; rfl
-  rw [this, FBOf.ev_self]
-
 theorem exists_evHom
     {m n : ℕ} {a : Fin m → Pt R n d} (ha : ∀ j i, MvPowerSeries.constantCoeff (a j i) = 0)
     : ∃ Ψ : PS R m d →+* PS R n d,
@@ -274,7 +273,9 @@ theorem isSer1_unique
   obtain ⟨Y, hY, -⟩ := r1 (pt R (n := 1) d 0) (TB.WickVanishing.gp_pt 0)
   refine j3 g g' fun m => ?_
   have := (h 1 _ _ hY m).2.symm.trans (h' 1 _ _ hY m).2
-  rwa [ev_pt_zero, ev_pt_zero] at this
+  rwa [_root_.ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gt_ev_pt_self,
+      _root_.ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gt_ev_pt_self]
+    at this
 
 theorem series_pull
     (hJet : JetAlgSt) (hRep : RepSt)
@@ -333,7 +334,7 @@ theorem series_pull
         (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap R
           (JetR R (Fin 1 × Fin d) m))))
     exact congrArg _ ((congrArg _ a₁).trans a₂)
-  rw [ev_pt_zero] at e₁ e₃
+  rw [_root_.ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gt_ev_pt_self] at e₁ e₃
   show Φ S' = Φ _
   rw [map_mul, map_mul, map_pow, e₁, e₂, e₃, e₄]
   exact H _ _ z J hJ

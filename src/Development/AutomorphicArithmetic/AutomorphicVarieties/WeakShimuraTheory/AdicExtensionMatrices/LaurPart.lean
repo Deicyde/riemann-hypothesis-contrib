@@ -102,7 +102,6 @@ theorem UpperTheory.V.Ws.sxLaurPart
     rw [MvPowerSeries.coeff_truncTotal_eq_ite, hg d hne, ite_self]
   obtain ⟨y, hy⟩ := laurPart_prod e (fun s => τ (W.wt s)) (fun s => F (W.z s)) hF d d.support
   have hs : (∑ i ∈ d.support, d i • τ (W.wt i)) = τ j := by
-
     rw [← hw, Finsupp.weight_apply, Finsupp.sum, map_sum]
     simp only [map_nsmul]
   rw [hs] at hy

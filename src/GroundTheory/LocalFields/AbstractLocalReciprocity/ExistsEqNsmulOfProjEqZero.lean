@@ -51,21 +51,23 @@ open scoped GroundTheory.LocalField.Abstract
 
 namespace ProfiniteInteger
 
-def multiples (n : ℕ) : AddSubgroup ℤ̂ := (AddMonoidHom.mulLeft (n : ℤ̂)).range
+def multiples (n : ℕ) : AddSubgroup ℤ̂ :=
+  (AddMonoidHom.mulLeft (n : ℤ̂)).range
 
 theorem mem_multiples {n : ℕ} {x : ℤ̂} : x ∈ multiples n ↔ ∃ y : ℤ̂, x = n • y := by
   simp only [multiples, AddMonoidHom.mem_range, AddMonoidHom.coe_mulLeft, nsmul_eq_mul]
   exact ⟨fun ⟨y, hy⟩ => ⟨y, hy.symm⟩, fun ⟨y, hy⟩ => ⟨y, hy.symm⟩⟩
 
-theorem proj_eq_val_cast {n k : ℕ+} (h : (n : ℕ) ∣ k) (x : ℤ̂)
-    : proj n x = ((proj k x).val : ZMod n) := by
+theorem proj_eq_val_cast {n k : ℕ+} (h : (n : ℕ) ∣ k) (x : ℤ̂) :
+    proj n x = ((proj k x).val : ZMod n) := by
   rw [← castHom_proj h x, ZMod.castHom_apply, ZMod.cast_eq_val]
 
 theorem proj_surjective (n : ℕ+) : Function.Surjective (proj n) := fun z =>
   ⟨((z.val : ℕ) : ℤ̂), by rw [map_natCast, ZMod.natCast_zmod_val]⟩
 
-theorem exists_eq_nsmul_of_proj_eq_zero {n : ℕ+} {x : ℤ̂} (hx : proj n x = 0)
-    : ∃ y : ℤ̂, x = (n : ℕ) • y := by
+theorem exists_eq_nsmul_of_proj_eq_zero {n : ℕ+} {x : ℤ̂} (hx : proj n x = 0) :
+    ∃ y : ℤ̂, x = (n : ℕ) • y := by
+
   let v : ℕ+ → ℕ := fun m => (proj (n * m) x).val
   have hdvd : ∀ m : ℕ+, (n : ℕ) ∣ v m := by
     intro m
@@ -74,8 +76,7 @@ theorem exists_eq_nsmul_of_proj_eq_zero {n : ℕ+} {x : ℤ̂} (hx : proj n x = 
     exact h
   have hmod : ∀ m k : ℕ+, (m : ℕ) ∣ (k : ℕ) → v k ≡ v m [MOD (n : ℕ) * m] := by
     intro m k hmk
-    have h :=
-      proj_eq_val_cast (n := n * m) (k := n * k) (by simpa using Nat.mul_dvd_mul_left _ hmk) x
+    have h := proj_eq_val_cast (n := n * m) (k := n * k) (by simpa using Nat.mul_dvd_mul_left _ hmk) x
     have h2 : ((v m : ℕ) : ZMod ((n * m : ℕ+) : ℕ)) = proj (n * m) x := ZMod.natCast_zmod_val _
     rw [← h2, ZMod.natCast_eq_natCast_iff, PNat.mul_coe] at h
     exact h.symm
@@ -145,8 +146,8 @@ theorem eq_multiples_index {H : AddSubgroup ℤ̂} (hH : H.index ≠ 0) : H = mu
   have h1 : (multiples H.index).relIndex H = 1 := (Nat.mul_eq_right hH).1 hidx
   exact le_antisymm (AddSubgroup.relIndex_eq_one.1 h1) hle
 
-theorem intCast_mem_multiples_iff {n : ℕ} (hn : 0 < n) {k : ℤ}
-    : (k : ℤ̂) ∈ multiples n ↔ (n : ℤ) ∣ k := by
+theorem intCast_mem_multiples_iff {n : ℕ} (hn : 0 < n) {k : ℤ} :
+    (k : ℤ̂) ∈ multiples n ↔ (n : ℤ) ∣ k := by
   rw [mem_multiples]
   refine ⟨fun ⟨w, hw⟩ => dvd_of_intCast_eq_nsmul hn hw, ?_⟩
   rintro ⟨c, rfl⟩

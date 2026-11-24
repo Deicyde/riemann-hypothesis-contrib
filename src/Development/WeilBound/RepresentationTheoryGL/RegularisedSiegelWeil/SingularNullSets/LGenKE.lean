@@ -128,8 +128,7 @@ theorem unit_col
       = fromBlocks 0 1 (-1) 0)
     : cj s a * c = cj s c * a ∧ cj s a * d - cj s c * b = 1 ∧ cj s b * d = cj s d * b := by
   rw [cj_fromBlocks, fromBlocks_multiply, fromBlocks_multiply] at h
-  simp only [Matrix.zero_mul, Matrix.mul_zero, Matrix.one_mul, Matrix.mul_one, Matrix.neg_mul,
-      Matrix.mul_neg, zero_add, add_zero]
+  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.neg_mul, Matrix.mul_neg, zero_add, add_zero]
     at h
   obtain ⟨h1, h2, h3, h4⟩ := Matrix.fromBlocks_inj.1 h
   refine ⟨?_, ?_, ?_⟩
@@ -150,7 +149,7 @@ theorem Jst_map : (Jst D n).map (inclR (AF D.host.F)) = Jm D n := by
   have e
       : ((-1 : Matrix (Fin n) (Fin n) D.host.E)).map (inclR (F := D.host.F) (AF D.host.F))
         = -1 := by
-    ext i j; by_cases h : i = j <;> simp [Matrix.one_apply, h]
+    ext i j; by_cases h : i = j <;> simp [h]
   simp [e]
 
 theorem mat_unit (g : G D n) : cj (cA D) (mat g) * Jm D n * mat g = Jm D n := by

@@ -62,7 +62,7 @@ variable
 theorem genusBasic_gmap_one (L : Submodule R V) : gmap (1 : V ≃ₗ[K] V) L = L := by
   ext x
   rw [isomAct_mem_gmap]
-  first | rfl | simp | exact Iff.rfl
+  first | rfl
 
 theorem genusBasic_gmap_mul (g₁ g₂ : V ≃ₗ[K] V) (L : Submodule R V)
     : gmap (g₂ * g₁) L = gmap g₂ (gmap g₁ L) := by
@@ -71,7 +71,7 @@ theorem genusBasic_gmap_mul (g₁ g₂ : V ≃ₗ[K] V) (L : Submodule R V)
   rfl
 
 theorem genusBasic_gmap_inv (g : V ≃ₗ[K] V) (L : Submodule R V) : gmap g⁻¹ (gmap g L) = L := by
-  first | exact isomAct_gmap_symm g L | (ext x; simp only [isomAct_mem_gmap]; simp)
+  first | exact isomAct_gmap_symm g L
 
 theorem genusBasic_mem_one_mul (x : K) (hx : x ∈ (1 : Submodule R K)) (r : R)
     : algebraMap R K r * x ∈ (1 : Submodule R K) := by

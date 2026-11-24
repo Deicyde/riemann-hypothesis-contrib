@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormBaseRingToClosedDiscJPowSmall
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopBasisDiscRegularStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopBasisDiscRegular
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -69,7 +69,7 @@ theorem GlobalTheory.BSP.eq_of_hasSum_toDisc_of_J_adic
       NNReal.rpow_lt_one_of_one_lt_of_neg hl1 (neg_neg_of_pos he)
     ⟩
   have hinj : Function.Injective (toDisc l (bk.ev X) bk.ρ₀) :=
-    (GlobalTheory.T.toDisc_injective_and_nonZeroDivisors_of_topBasis l K bk (Ainf l) bk.ev ι tb).1
+    (_root_.GlobalTheory.BSP.topBasis_disc_regular l K bk (Ainf l) bk.ev ι tb).1
   have hiA : bk.iA = toDisc l (bk.ev X) bk.ρ₀ := rfl
   apply hinj
   rw [← hiA]

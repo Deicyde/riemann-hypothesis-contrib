@@ -116,7 +116,6 @@ theorem latGL_genX
       fun hl => MassDataIdxCore.ker_fwd O θ J P c (m h) hl
     ⟩
 
-
 theorem latCoreX_holds : LatCoreX := by
   intro D X p θ hθ Q hQ K hK
   obtain ⟨P, hPdef⟩ : ∃ P, P = reindex₂ X p Q := ⟨_, rfl⟩

@@ -57,9 +57,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.TypeSupportLift
 
 variable {D : D7}
@@ -84,7 +81,6 @@ theorem idem_add_conj_mul
     rw [idem, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => hP.mul_conj hq hPP
   have e3 : cA D (idem P) * idemAt PP = 0 := by
-
     rw [idem, map_sum, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => by rw [mul_comm]; exact hP.mul_conj hPP hq
   have e4 : cA D (idem P) * cA D (idemAt PP) = cA D (idemAt PP) := by rw [← RingHom.map_mul, e1]

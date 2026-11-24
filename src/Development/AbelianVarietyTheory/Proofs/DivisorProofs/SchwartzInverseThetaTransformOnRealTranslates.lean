@@ -220,7 +220,7 @@ theorem continuous_embR {N : ℕ}
 theorem fin_embR {N : ℕ} (t : Fin N → mixedEmbedding.mixedSpace F)
     : fin (embR t : Fin N → AF F) = 0 := by
   funext l
-  first | rfl | simp [fin, embR, pairA, sndA]
+  first | rfl
 
 def lineR {N : ℕ} (v : Fin N → mixedEmbedding.mixedSpace F) : ℝ →+ VA F N where
   toFun s := (embR (s • v), 0)
@@ -233,7 +233,7 @@ theorem isRealLine_lineR {N : ℕ} (v : Fin N → mixedEmbedding.mixedSpace F)
   · show Continuous fun s : ℝ => ((embR (s • v), 0) : VA F N)
     exact (continuous_embR.comp (continuous_id.smul continuous_const)).prodMk continuous_const
   · funext l
-    first | rfl | simp [fin, sndA]
+    first | rfl
 
 end GlobalTheory.ThetaTransform.RealSchwartz
 

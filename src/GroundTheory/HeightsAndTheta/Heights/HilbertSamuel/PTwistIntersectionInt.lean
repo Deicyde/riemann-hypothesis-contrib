@@ -55,14 +55,17 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology
 
 noncomputable section
 
 namespace TwistIntersectionInt
 
-theorem proof (hPc : EmbeddingPieces.Statement) (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement) :
-    TwistIntersectionInt.Statement := by
+theorem proof
+    (hPc : EmbeddingPieces.Statement)
+    (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement)
+    : TwistIntersectionInt.Statement := by
   apply GroundTheory.Heights₂.Heights.HilbertSamuel.TwistIntersectionAnyDegree.proof <;> assumption
 
 end TwistIntersectionInt

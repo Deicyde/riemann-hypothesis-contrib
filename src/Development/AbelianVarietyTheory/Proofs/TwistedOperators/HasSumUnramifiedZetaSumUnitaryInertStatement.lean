@@ -56,6 +56,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.hasSum_unramifiedZetaSum_unitary_inert
     : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L)
         (σ : L →+* L) (q r t : ℕ),
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.hasSum_unramifiedZetaSum_unitary_inert
                       (eulerFac (bcParam r α) ((z : ℂ) * ((q : ℂ) ^ (t + 1))⁻¹)
                         * (∏ j ∈ Finset.range r, (1 - (-(q : ℂ)) ^ j * ((z : ℂ) * ((q : ℂ) ^ (r + t))⁻¹)))
                         * ℓ x) := by
-  first
-  | exact @GlobalTheory.ZetaSumU.hasSum_zetaSum_inert
-  | exact GlobalTheory.ZetaSumU.hasSum_zetaSum_inert
-  | (intros; apply GlobalTheory.ZetaSumU.hasSum_zetaSum_inert <;> assumption)
+  first | exact @GlobalTheory.ZetaSumU.hasSum_zetaSum_inert

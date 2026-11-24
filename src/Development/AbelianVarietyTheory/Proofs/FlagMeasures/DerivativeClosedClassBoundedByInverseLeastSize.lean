@@ -188,7 +188,7 @@ theorem derivative_closed_class_bound
   intro W hW f hf
 
   choose E hE using fun v : InfinitePlace B.I.F => exists_re_trace_orthonormal_gLie (B.I.ε v)
-  choose c hc using fun v : InfinitePlace B.I.F => GlobalTheory.GaugeConst.gauge_exists_pos_unique B.I.n (B.I.ε v)
+  choose c hc using fun v : InfinitePlace B.I.F => _root_.GlobalTheory.GaugeConst.exists_unique_isGauge B.I.n (B.I.ε v)
   let e : Fin (Fintype.card (InfinitePlace B.I.F)) ≃ InfinitePlace B.I.F :=
     (Fintype.equivFin (InfinitePlace B.I.F)).symm
 

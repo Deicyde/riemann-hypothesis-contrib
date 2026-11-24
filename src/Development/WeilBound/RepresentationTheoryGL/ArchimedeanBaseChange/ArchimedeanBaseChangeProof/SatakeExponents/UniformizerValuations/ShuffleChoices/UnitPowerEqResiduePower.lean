@@ -49,7 +49,6 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
   PositivityTheory.Rg.BcB.F.Tail
 open scoped Classical TensorProduct
 
-
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Rg.BcB.F.Choice

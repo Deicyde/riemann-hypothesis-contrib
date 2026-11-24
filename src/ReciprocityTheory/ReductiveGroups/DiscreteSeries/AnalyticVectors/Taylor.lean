@@ -135,7 +135,6 @@ theorem norm_orbit_sub_partial_le
     exact_mod_cast this.contDiffOn
   obtain ⟨x', -, heq⟩ := taylor_mean_remainder_lagrange_iteratedDeriv htt hf
   have hφsum : φ R = g t - taylorWithinEval g N (Set.uIcc t₀ t) t₀ t := by
-
     rw [taylor_within_apply, hR, map_sub, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun k _ => ?_

@@ -321,7 +321,7 @@ theorem UpperTheory.Esk.hyperbolic_orbit_summable_proof
     by_cases hw : w = v
     · subst hw
       simp [iv, Matrix.single, ite_apply]
-    · simp [iv, Matrix.single, ite_apply, Pi.single_apply, hw]
+    · simp [iv, Matrix.single, ite_apply, hw]
   constructor
   · refine Subtype.ext (funext fun G => ?_)
     obtain ⟨F0, F', h0, hD⟩ := at_point hB k f φ h (fun x => hform.hol x) hrel v G
@@ -329,8 +329,8 @@ theorem UpperTheory.Esk.hyperbolic_orbit_summable_proof
       = Complex.I * k v * φ G
     rw [E, E, hD, hD, h0]
     simp only [sv, eq_false (show (1 : Fin 2) ≠ 0 by decide),
-      eq_false (show (0 : Fin 2) ≠ 1 by decide), eq_self_iff_true, and_true, true_and, and_false,
-      false_and, and_self, if_true, if_false, Complex.ofReal_zero, Complex.ofReal_one]
+      eq_false (show (0 : Fin 2) ≠ 1 by decide), and_true, and_false, and_self, if_true, if_false,
+      Complex.ofReal_zero, Complex.ofReal_one]
     ring
   · refine Subtype.ext (funext fun G => ?_)
     obtain ⟨F0, F', h0, hD⟩ := at_point hB k f φ h (fun x => hform.hol x) hrel v G
@@ -339,6 +339,6 @@ theorem UpperTheory.Esk.hyperbolic_orbit_summable_proof
         * ((TR.Eop v 0 1 (⟨φ, h⟩ : TR.Sm F 2)).1 G + (TR.Eop v 1 0 (⟨φ, h⟩ : TR.Sm F 2)).1 G)
     rw [E, E, E, E, hD, hD, hD, hD]
     simp only [sv, eq_false (show (1 : Fin 2) ≠ 0 by decide),
-      eq_false (show (0 : Fin 2) ≠ 1 by decide), eq_self_iff_true, and_true, true_and, and_false,
-      false_and, and_self, if_true, if_false, Complex.ofReal_zero, Complex.ofReal_one]
+      eq_false (show (0 : Fin 2) ≠ 1 by decide), and_true, and_false, and_self, if_true, if_false,
+      Complex.ofReal_zero, Complex.ofReal_one]
     linear_combination (k v * F0) * Complex.I_mul_I

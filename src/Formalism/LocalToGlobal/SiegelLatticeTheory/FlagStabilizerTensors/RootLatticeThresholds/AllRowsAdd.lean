@@ -278,7 +278,6 @@ theorem finrank_map_sum {ι : Type} [DecidableEq ι] (Q : ι → V →ₗ[ℂ] V
           (hQ t (Finset.mem_insert_self t F) t (Finset.mem_insert_self t F))
       simpa using this
     have htF : ∀ x, Q t (QF x) = 0 := fun x => by
-
       rw [hQF, LinearMap.sum_apply, map_sum]
       refine Finset.sum_eq_zero fun i hi => ?_
       have :=

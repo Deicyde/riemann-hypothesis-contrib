@@ -67,7 +67,7 @@ theorem sh_laws
     simp only [sh, map_pow]; norm_cast
   refine ⟨
     by simp [sh],
-    by simp [sh, untilt_zero],
+    by simp [sh],
     hmul,
     hpow,
     fun x => (GlobalTheory.RingBasics.mem_OC _).1 (x.untilt).2,

@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IntMIffInt
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ComplexPhaseCalculusRootOfUnityStatement
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ComplexPhaseCalculusRootOfUnity
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.FinsumQuotientOfLe
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.IsZeroOrPosMulRootOfUnityFiniteGaussSumStatement
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.IsZeroOrPosMulRootOfUnityFiniteGaussSum
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -141,7 +141,7 @@ theorem ph_finsum_quotient
     exact Finset.sum_congr rfl fun m _ => hval m
   rw [hsum]
   refine Ph.mul hc
-    (GlobalTheory.T.isZeroOrPosMulRootOfUnity_finite_gaussSum (S ⧸ ψ.ker) fb
+    (_root_.GlobalTheory.Phase.GaussSum.ph_sum (S ⧸ ψ.ker) fb
       ⟨fun x _ => hf.1 _ (x.out).2, fun x _ y _ z _ => ?_⟩)
   obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective x
   obtain ⟨v, rfl⟩ := QuotientAddGroup.mk_surjective y
@@ -167,7 +167,7 @@ theorem ph_haar_of_shape
       hc hf hφx)
 
   have h :=
-    GlobalTheory.T.complex_phase_calculus_rootOfUnity.2.2.1 (((hsb.choose : ℝ)
+    _root_.GlobalTheory.Phase.Calc.calculus.2.2.1 (((hsb.choose : ℝ)
       ^ (Module.finrank ℚ ℚ * (Fintype.card κ * Fintype.card ι)))⁻¹)
   convert h using 1
   push_cast

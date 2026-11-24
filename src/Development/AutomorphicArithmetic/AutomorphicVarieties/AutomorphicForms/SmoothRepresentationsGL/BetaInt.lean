@@ -59,7 +59,7 @@ private theorem slice_int
     convert this using 1
     ext ξ <;> simp
   have h2 : AntilipschitzWith 1 (fun ξ : V => (ξ, y)) :=
-    (Isometry.antilipschitz (by
+    (Isometry.antilipschitzWith (by
       refine Isometry.of_dist_eq fun a b => ?_
       simp [Prod.dist_eq]))
   exact (SchwartzMap.compCLMOfAntilipschitz ℝ h1 h2 G).integrable

@@ -141,7 +141,9 @@ theorem core
   · rw [← hM]
     exact (LinearEquiv.isUnit_det f bX bY).ne_zero
   · intro x y hx hy hxy
-    have h := Formalism.LatticeIndexTer.idxDet O K _ _ ι bX bY f x y hx hy (by rw [hM]; exact hxy)
+    have h :=
+      _root_.Formalism.LatticeIndexTer.lattice_index_eq_det_valuation O K _ _ ι bX bY f x y hx hy
+        (by rw [hM]; exact hxy)
     let s : Submodule.span K (Set.range b) →ₗ[O] V :=
       (Submodule.span K (Set.range b)).subtype.restrictScalars O
     have hs : Function.Injective s := Subtype.val_injective
@@ -178,9 +180,7 @@ theorem exists_indep
   let e : Module.Free.ChooseBasisIndex O A → V := fun i => (bA i : V)
   have hliO : LinearIndependent O e := bA.linearIndependent.map' A.subtype (Submodule.ker_subtype A)
   have hli : LinearIndependent K e := by
-    first
-    | exact (LinearIndependent.iff_fractionRing O K).1 hliO
-    | exact LinearIndependent.iff_fractionRing.1 hliO
+    first | exact (LinearIndependent.iff_fractionRing O K).1 hliO
   have hAe : A = Submodule.span O (Set.range e) := by
     conv_lhs => rw [← Submodule.map_subtype_top A]
     rw [← bA.span_eq, Submodule.map_span, ← Set.range_comp] <;> rfl
@@ -194,11 +194,7 @@ theorem exists_indep
   have hcard : Fintype.card (Module.Free.ChooseBasisIndex O A) = Module.finrank K U := by
     rw [← hspan, finrank_span_eq_card hli]
   let σ := Fintype.equivFinOfCardEq hcard
-  have hr : Set.range (e ∘ σ.symm) = Set.range e := by
-    first
-    | exact EquivLike.range_comp e σ.symm
-    | exact Equiv.range_comp e σ.symm
-    | rw [Set.range_comp, σ.symm.range_eq_univ, Set.image_univ]
+  have hr : Set.range (e ∘ σ.symm) = Set.range e := by first | exact EquivLike.range_comp e σ.symm
   refine ⟨e ∘ σ.symm, hli.comp _ σ.symm.injective, ?_, ?_⟩
   · rw [hr]
     exact hAe
@@ -227,10 +223,7 @@ theorem indep_baseChange
     : LinearIndependent K' (fun i => j (a i)) := by
   classical
   have hs : LinearIndepOn K id (Set.range a) := by
-    first
-    | exact (linearIndepOn_id_range_iff ha.injective).2 ha
-    | exact ha.to_subtype_range
-    | exact (linearIndependent_subtype_range ha.injective).2 ha
+    first | exact (linearIndepOn_id_range_iff ha.injective).2 ha
   let B := Module.Basis.extend hs
   let B' := hj.basis B
   have hB' : LinearIndependent K' (fun i : hs.extend (Set.subset_univ _) => j (i : V)) := by
@@ -259,9 +252,7 @@ theorem index_baseChange_lattice : RelIndexSpanImage := by
       : ∀ i, ∃ c : Fin (Module.finrank K (Submodule.span K (A : Set V))) → K,
         ∑ k, c k • a k = b i := by
     intro i
-    first
-    | exact (Submodule.mem_span_range_iff_exists_fun K).1 (hmem i)
-    | exact Submodule.mem_span_range_iff_exists_fun.1 (hmem i)
+    first | exact (Submodule.mem_span_range_iff_exists_fun K).1 (hmem i)
   choose c hc using hc0
   let P : Matrix (Fin (Module.finrank K (Submodule.span K (A : Set V))))
       (Fin (Module.finrank K (Submodule.span K (A : Set V)))) K := fun k i =>
@@ -318,7 +309,6 @@ theorem index_baseChange_lattice : RelIndexSpanImage := by
     rw [← hc i, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, Matrix.map_apply, algebraMap_smul]
-    all_goals rfl
   have hdetmap : (P.map (algebraMap K K')).det = algebraMap K K' P.det := by
     rw [RingHom.map_det]
     rfl

@@ -2,10 +2,11 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsImg
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PtsOverPt
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishingStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticFirstStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticThirdStatement
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPointsStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishing
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticFirst
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticThird
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
 import Development.AutomorphicSpectrum.Proofs.MetricProofs.SameOrbitRefl
 import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PCoordConeArithVar
 import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.CoordinateIdeals.MemMCoordIdealOfAevalEqZero
@@ -75,46 +76,13 @@ section Orbits
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem basePart_orbit {σ : Type} (blk : σ → Option K) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : SameOrbit (basePart blk z) (basePart blk z') := by
-  obtain ⟨c, hc, rfl⟩ := h
-  exact ⟨fun k => c k.1, fun k => hc k.1, rfl⟩
+alias basePart_orbit := _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.sameOrbit_basePart
 
-theorem comp_orbit
-    {K' : Type} [Fintype K']
-    {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-    {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v)
-    {b b' : (Σ k, ι' k) → ℂ} (h : SameOrbit b b')
-    : SameOrbit (b ∘ v) (b' ∘ v) := by
-  obtain ⟨c, hc, rfl⟩ := h
-  refine ⟨fun k => c (κ k), fun k => hc _, ?_⟩
-  funext p
-  simp only [Function.comp]
-  rw [hv.2.2.1 p]
+alias comp_orbit := _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg.comp_orbit
 
-theorem mCoordIdeal_le_of_orbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : mCoordIdeal z' ≤ mCoordIdeal z := by
-  obtain ⟨c, hc, rfl⟩ := h
-  intro f hf
-  let φ : MvPolynomial K ℂ →ₐ[ℂ] MvPolynomial K ℂ := aeval fun k => C (c k) * X k
-  have e
-      : mConeMap (fun p : Σ k, ι k => c p.1 * z' p) = (φ.restrictScalars ℤ).comp (mConeMap z') := by
-    apply MvPolynomial.algHom_ext
-    intro p
-    simp [mConeMap, φ, mul_left_comm, mul_assoc]
-  have h0 : mConeMap z' f = 0 := hf
-  show mConeMap _ f = 0
-  rw [e, AlgHom.comp_apply, h0, map_zero]
+alias mCoordIdeal_eq_of_orbit := _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg.ideal_orbit
 
-theorem mCoordIdeal_eq_of_orbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : mCoordIdeal z = mCoordIdeal z' :=
-  le_antisymm (mCoordIdeal_le_of_orbit (Cj.sameOrbit_symm h)) (mCoordIdeal_le_of_orbit h)
-
-theorem chart_ne {z : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal z)
-    : z q ≠ 0 := fun h0 =>
-  h (by
-    show mConeMap z (X q) = 0
-    rw [mConeMap, aeval_X, h0, map_zero, zero_mul])
+alias chart_ne := _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.coord_ne
 
 theorem exists_normal (c : ∀ k, ι k) (z : (Σ k, ι k) → ℂ) (hc : ∀ k, z ⟨k, c k⟩ ≠ 0)
     : ∃ z₁, SameOrbit z₁ z ∧ ∀ k, z₁ ⟨k, c k⟩ = 1 := ⟨
@@ -236,8 +204,8 @@ theorem minor_off_step
     {h : Matrix (Fin N) (Fin N) ℂ} (hh : IsBlockDiag j h)
     {I : Finset (Fin N)} (hI : ¬ IsStepRows N j i I)
     : minorIJ h I (stepCols N j i) = 0 :=
-  ((GlobalTheory.T.block_diagonal_minor_vanishing ℂ N j i hj).2.1 h I hh hI).resolve_right
-    (stepCols_nonempty hp).ne_empty
+  ((_root_.GlobalTheory.CompanionTheory.Ar.PB.MinorCalc.minors_main ℂ N j i hj).2.1 h I hh
+    hI).resolve_right (stepCols_nonempty hp).ne_empty
 
 theorem minors_of_mul
     (hj : j ≤ N) (i : Fin N)
@@ -245,7 +213,7 @@ theorem minors_of_mul
     {C : Finset (Fin N)} {c : ℂ} (h : ∀ I, minorIJ (T * h₁) I C = c * minorIJ (T * h₂) I C)
     (I : Finset (Fin N))
     : minorIJ h₁ I C = c * minorIJ h₂ I C := by
-  have cb := (GlobalTheory.T.block_diagonal_minor_vanishing ℂ N j i hj).1
+  have cb := (_root_.GlobalTheory.CompanionTheory.Ar.PB.MinorCalc.minors_main ℂ N j i hj).1
   have hu : IsUnit T.det := hT.isUnit
   calc
     minorIJ h₁ I C
@@ -434,8 +402,8 @@ theorem img_inj
     (i₁ : CovMap.IsImg Cv z₁ w) (i₂ : CovMap.IsImg Cv z₂ w)
     (hb : SameOrbit (basePart M'.blk z₁) (basePart M'.blk z₂))
     : SameOrbit z₁ z₂ := by
-  have P := GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M
-  have P' := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
+  have P := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K ι Φ y Ψ N j M
+  have P' := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K' ι' Φ' y' Ψ N j M'
   obtain ⟨F', hF', hg'⟩ := P'.2.1 _ (P'.1 z₁ h₁)
   obtain ⟨a₁, o₁, n₁⟩ := exists_normal_base M'.blk F'.c z₁ fun k => chart_ne (hg'.1 k)
   obtain ⟨a₂, o₂, n₂⟩ :=
@@ -454,8 +422,8 @@ theorem img_inj
   have ha₂ := mem_mcPts_of_sameOrbit hy'.2.1.2.1 o₂ h₂
   have hbw : SameOrbit (basePart M'.blk a₁ ∘ Cv.v) (basePart M.blk w) :=
     Cj.sameOrbit_trans (comp_orbit Cv.block ob₁)
-      (Cj.sameOrbit_symm (GlobalTheory.T.flag_cover_arithmetic_third K ι Φ y Ψ N j M K' ι' Φ' y' M'
-        Cv d hy hy' z₁ h₁ w i₁))
+      (Cj.sameOrbit_symm (_root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.img_lies_over K ι
+        Φ y Ψ N j M K' ι' Φ' y' M' Cv d hy hy' z₁ h₁ w i₁))
   have hbv := mem_mcPts_of_sameOrbit (CoordinateConeArithVar.isMultiHomogIdeal _) hbw (P.1 w hw)
   obtain ⟨F, hF, hg⟩ := P.2.1 _ hbv
   obtain ⟨g₁, fl₁⟩ := (P'.2.2 F' hF' a₁ hbm hgb n₁).1 ha₁
@@ -521,8 +489,8 @@ theorem img_surj
     {b' : (Σ k, baseIdx ι' M'.blk k) → ℂ}
     (hb' : b' ∈ mcPts (mCoordIdeal M'.x)) (ho : SameOrbit (fun p => b' (Cv.v p)) (basePart M.blk w))
     : ∃ z, z ∈ mcPts (mCoordIdeal y') ∧ SameOrbit (basePart M'.blk z) b' ∧ CovMap.IsImg Cv z w := by
-  have P := GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M
-  have P' := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
+  have P := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K ι Φ y Ψ N j M
+  have P' := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K' ι' Φ' y' Ψ N j M'
   obtain ⟨F', hF', hg'0⟩ := P'.2.1 b' hb'
   obtain ⟨b, ob, nb⟩ := exists_normal F'.c b' fun k => chart_ne (hg'0.1 k)
   have hbm := mem_mcPts_of_sameOrbit (CoordinateConeArithVar.isMultiHomogIdeal _) ob hb'
@@ -558,7 +526,8 @@ theorem img_surj
     (P'.2.2 F' hF' z (by rw [ez]; exact hbm) (by rw [ez]; exact hg')
       (fun k => by rw [ez]; exact nb k)).2 ⟨_, flz⟩
   obtain ⟨V, f, -, hzV, -, hf⟩ :=
-    GlobalTheory.T.flag_cover_arithmetic_first K ι Φ y Ψ N j M K' ι' Φ' y' M' Cv d hy hy' z hz
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg.local_img K ι Φ y Ψ N j M K' ι' Φ' y' M'
+      Cv d hy hy' z hz
   obtain ⟨-, hi⟩ := hf z ⟨hzV, hz⟩
   obtain ⟨z₀, s, t, f₀⟩ :=
     hi z (Cj.sameOrbit_refl z) F' F hF' hF (by rw [ez]; exact hg') (by rw [ez]; exact hg) _ flz
@@ -591,7 +560,7 @@ theorem fibre_count
             = (GroundTheory.Heights₂.Heights.Inter.ptsOverPt (mCoordIdeal M'.x) Cv.v
               (basePart M.blk w)).ncard := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv d hy hy' w hw
-  have P' := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
+  have P' := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K' ι' Φ' y' Ψ N j M'
   have hS
       : ∀ O : Set ((Σ k, ι' k) → ℂ),
         (∃ z ∈ mcPts (mCoordIdeal y'), O = {z'' | SameOrbit z'' z} ∧ CovMap.IsImg Cv z w)
@@ -605,8 +574,8 @@ theorem fibre_count
       _,
       P'.1 _ hz,
       rfl,
-      Cj.sameOrbit_symm (GlobalTheory.T.flag_cover_arithmetic_third K ι Φ y Ψ N j M K' ι' Φ' y' M'
-        Cv d hy hy' _ hz w hi)
+      Cj.sameOrbit_symm (_root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.img_lies_over K ι
+        Φ y Ψ N j M K' ι' Φ' y' M' Cv d hy hy' _ hz w hi)
     ⟩
   · intro O O' hO hO' e
     obtain ⟨hz, e₁, hi⟩ := hg O hO

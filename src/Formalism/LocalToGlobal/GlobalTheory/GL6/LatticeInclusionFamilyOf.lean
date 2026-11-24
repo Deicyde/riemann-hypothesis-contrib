@@ -65,7 +65,7 @@ theorem eval_subP
   | add p q hp hq => simp [hp, hq]
   | mul_X p x hp =>
     simp only [map_mul, MvPolynomial.eval_X, hp]
-    simp [Formalism.L2.Forms.subP, Matrix.mul_apply, MvPolynomial.eval_sum]
+    simp [Formalism.L2.Forms.subP, Matrix.mul_apply]
 
 theorem fnOf_mul
     {ι : Type} [Fintype ι]

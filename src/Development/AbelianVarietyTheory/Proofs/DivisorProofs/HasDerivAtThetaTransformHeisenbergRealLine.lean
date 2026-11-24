@@ -167,9 +167,7 @@ theorem schr_smul_add
   congr 2
   simp only [Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, add_dotProduct,
     dotProduct_add, smul_dotProduct, dotProduct_smul, smul_eq_mul]
-  first
-  | linear_combination (a * b * (v.1 ⬝ᵥ v.2)) * invOf_mul_self (2 : R)
-  | linear_combination (-(a * b * (v.1 ⬝ᵥ v.2))) * invOf_mul_self (2 : R)
+  first | linear_combination (a * b * (v.1 ⬝ᵥ v.2)) * invOf_mul_self (2 : R)
 
 variable [Invertible (2 : AF F)] {κ : Type} [Fintype κ]
 

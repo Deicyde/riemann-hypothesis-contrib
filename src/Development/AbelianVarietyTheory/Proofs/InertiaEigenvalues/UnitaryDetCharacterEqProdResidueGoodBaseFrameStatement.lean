@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix GlobalTheory.ExportSeries GlobalTheory.ExportSeries.DualType
 open Formalism.IndefR.Links (PolF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitaryDetCharacter_eq_prod_residue_goodBaseFrame
     : ∀ {D : D7} {S T : HSp D} (B : Base S T),
       B.Good

@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WhitMulLocGL
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocFacOfNeg
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnipMulMemCell
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AutomorphicFormGLContinuous
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShintaniFormulaStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WhittakerEqZeroOfNotAntitoneStatement
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsAddHaarMeasureVolumeLie
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatVecUOfIsSphericalU
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.NotIsGenericDetRepTwo
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShintaniFormula
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WhittakerEqZeroOfNotAntitone
 import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 import GroundTheory.AutomorphicForms.MultiplicityOne.Equivariance
 import Mathlib.Algebra.Order.Floor.Extended
@@ -222,7 +225,7 @@ theorem main_of_fixed
     · have hpos : ∀ i, 0 ≤ ν i := fun i => hν.trans (hanti (Fin.le_last i))
       have hsat := hα.2 φ hφ h0
       have hmain :=
-        GlobalTheory.T.shintani_formula_alt E w (m + 1) _ hψ (f φ) α hN hK ?_ ϖ hϖ
+        _root_.GlobalTheory.JSW.shintani_formula E w (m + 1) _ hψ (f φ) α hN hK ?_ ϖ hϖ
           (fun i => (ν i).toNat)
       · rw [GlobalTheory.RSCell.sphZ, if_pos hanti, tD_eq_diagPow ϖ ν hpos]
         exact hmain
@@ -250,7 +253,7 @@ theorem main_of_fixed
         simp only [ν'] at this h1 h2
         omega
       have hz :=
-        GlobalTheory.T.whittaker_diagonal_eq_zero_of_not_antitone E w (m + 1) _ hψ
+        _root_.GlobalTheory.JSW.whittaker_eq_zero_of_not_antitone E w (m + 1) _ hψ
           (fun h => f φ (h * z))
           (fun u hu h => by simp only [mul_assoc]; exact hN u hu (h * z))
           (fun h k hk => by

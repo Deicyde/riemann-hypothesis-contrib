@@ -62,7 +62,4 @@ theorem _root_.GlobalTheory.T.exists_weilDatum_transport_schwartzBruhat_standard
                 → ∀ κ : GA D (dblSp A) ≃* G D A.rank,
                   ∃ omS : G D A.rank →* Module.End ℂ (schwartzA θ B.rank A.rank),
                     IsTransport ψ θ A B ν 𝓨 omh κ omS := by
-  first
-  | exact @GlobalTheory.StdUnn.exists_transport_std
-  | exact GlobalTheory.StdUnn.exists_transport_std
-  | (intros; apply GlobalTheory.StdUnn.exists_transport_std <;> assumption)
+  first | exact @GlobalTheory.StdUnn.exists_transport_std

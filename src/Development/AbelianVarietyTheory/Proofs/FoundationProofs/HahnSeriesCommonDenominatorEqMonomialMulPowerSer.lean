@@ -74,7 +74,6 @@ theorem fnShape
     have hnn : n₀ ≤ n := by exact_mod_cast this
     apply hr (n - n₀).toNat
     congr 2
-    push_cast
     rw [Int.toNat_of_nonneg (by omega)]
     ring
 

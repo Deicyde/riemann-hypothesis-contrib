@@ -50,6 +50,7 @@ open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCate
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
   ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.cube_theorem_and_sections_finite_growth_abelianVariety
     : (∀ (S : Scheme.{0}) (P : PolAV S) (M : LB P.A.left),
         M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.cube_theorem_and_sections_finite_growth_abelianVar
                     ∧ Module.finrank Γ((baseOver (Spec (CommRingCat.of K))).left, ⊤)
                         (SecM P.A P.L ((N * t : ℕ) : ℤ) (baseOver (Spec (CommRingCat.of K))))
                       ≤ C * t ^ P.g) := by
-  first
-  | exact @GlobalTheory.AbLaw.CubeAssembly.cube_and_sections
-  | exact GlobalTheory.AbLaw.CubeAssembly.cube_and_sections
-  | (intros; apply GlobalTheory.AbLaw.CubeAssembly.cube_and_sections <;> assumption)
+  first | exact @GlobalTheory.AbLaw.CubeAssembly.cube_and_sections

@@ -143,7 +143,9 @@ theorem coeff_X_pderiv_self
 theorem weightOfEigenvector : WtOfEig := by
   intro K _ _ k a w f h m hm
   have h1 := congrArg (AddMonoidAlgebra.coeff · m) h
-  rw [rop_apply_eq, MvPolynomial.coeff_sub, coeff_X_pderiv_self, coeff_X_pderiv_self, MvPolynomial.coeff_smul] at h1
+  rw [rop_apply_eq, MvPolynomial.coeff_sub, coeff_X_pderiv_self, coeff_X_pderiv_self,
+      MvPolynomial.coeff_smul]
+    at h1
   have hc : AddMonoidAlgebra.coeff f m ≠ 0 := MvPolynomial.mem_support_iff.1 hm
   have h2 : (((m (Sum.inl a) : ℤ) - m (Sum.inr a) : ℤ) : K) = (w : K) := by
     apply mul_left_cancel₀ hc

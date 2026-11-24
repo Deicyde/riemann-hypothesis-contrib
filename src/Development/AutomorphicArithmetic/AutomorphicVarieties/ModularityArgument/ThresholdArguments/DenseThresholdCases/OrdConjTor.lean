@@ -58,9 +58,6 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SmoothCon
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing

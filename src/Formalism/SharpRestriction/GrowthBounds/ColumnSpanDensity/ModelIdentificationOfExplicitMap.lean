@@ -108,7 +108,6 @@ theorem model_identification_of_explicit_map (h : TiePsi) : TwoLetterModelIdenti
         rfl,
       rename_id, AlgHom.id_apply]
   have hh0 : deltaB R.Kf m (PsiXY R.Kf m (hXY R.Kf (m + 1))) = 0 := by
-
     simp only [hXY, map_sum, map_mul, ha, hc]
     exact sum_covY R.Kf m (by omega)
   refine ⟨α, β, ?_, ?_, ?_⟩

@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
   GlobalTheory.MixModel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitaryUnn_subgroup_eq_top_of_leviUnipotentWeyl
     : ∀ (D : D7) (n : ℕ) (S : Subgroup (GlobalTheory.StdUnn.G D n)),
       (∀ (g : GlobalTheory.StdUnn.G D n) (a : GL (Fin n) (AE D)),
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.unitaryUnn_subgroup_eq_top_of_leviUnipotentWeyl
         → (∀ g : GlobalTheory.StdUnn.G D n,
           GlobalTheory.StdUnn.mat g = GlobalTheory.StdUnn.blk4 0 1 (-1) 0 → g ∈ S)
         → S = ⊤ := by
-  first
-  | exact @GlobalTheory.StdUnn.eq_top_of_levi_unip_weyl
-  | exact GlobalTheory.StdUnn.eq_top_of_levi_unip_weyl
-  | (intros; apply GlobalTheory.StdUnn.eq_top_of_levi_unip_weyl <;> assumption)
+  first | exact @GlobalTheory.StdUnn.eq_top_of_levi_unip_weyl

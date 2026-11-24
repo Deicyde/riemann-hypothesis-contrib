@@ -102,7 +102,7 @@ theorem intersection_multilinear_expansion
     by_cases h : j' = j
     · subst h
       simp
-    · simp [Pi.single_apply, h]
+    · simp [h]
   calc
     II K ι P d (fun k => combLine ℓ (n k))
         = f (fun k => ∑ j, n k j • (Pi.single j (1 : ℤ) : J → ℤ)) := by

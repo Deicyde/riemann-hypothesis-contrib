@@ -154,7 +154,7 @@ theorem UpperTheory.Gal.W2.Seed.pRealIso : TraceType → RealIso := by
       · subst hq
         simp only [Pi.add_apply, Pi.smul_apply, Pi.single_eq_same]
         apply Complex.ext <;> simp
-      · simp [Pi.single_apply, hq]
+      · simp [hq]
     rw [hw, map_add (f := _), map_smul, map_smul, smul_eq_mul, smul_eq_mul]
   have hg : Function.Injective
       (Sum.elim (fun τ : Phi A => τ.1) (fun τ : Phi A => ComplexEmbedding.conjugate τ.1)) := by
@@ -201,9 +201,9 @@ theorem UpperTheory.Gal.W2.Seed.pRealIso : TraceType → RealIso := by
           rw [Finset.sum_eq_single τ']
           · simp [F]
           · intro τ _ hτ
-            simp [Pi.single_apply, hτ]
+            simp [hτ]
           · simp
-        · simp [F, Pi.single_apply, hi]
+        · simp [F, hi]
 
       rw [hFx, map_sum] at h1
       rw [← h1]

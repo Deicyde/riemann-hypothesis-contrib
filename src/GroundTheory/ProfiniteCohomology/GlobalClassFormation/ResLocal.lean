@@ -139,7 +139,6 @@ theorem continuous_fieldConjHom : Continuous (fieldConjHom Kv L e hL) := by
       calc
         x = M.val (∑ i, b.repr ⟨x, hx⟩ i • b i) := by rw [b.sum_repr]; rfl
         _ = ∑ i, (b.repr ⟨x, hx⟩ i) • (b i : Ωv) := by
-
           rw [map_sum]
           exact Finset.sum_congr rfl fun i _ => map_smul M.val _ _
 

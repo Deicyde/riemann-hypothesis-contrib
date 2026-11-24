@@ -40,9 +40,6 @@ import Development.AutomorphicArithmetic.CharacterBoxes.ExistsPageN
 
 @[expose] public section
 
-
-
-
 section
 open Formalism.GaloisCohomology UpperTheory.Top GlobalTheory.Mem.LiteralAutomorphy
 namespace UpperTheory.V.HV.U

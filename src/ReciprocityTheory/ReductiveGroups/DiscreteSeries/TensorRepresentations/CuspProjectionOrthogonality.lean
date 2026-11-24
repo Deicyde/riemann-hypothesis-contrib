@@ -72,7 +72,8 @@ variable
 
 theorem continuous_spherical_psi (hP : IsPsiFor ε lam T Ψ)
     : Continuous (fun g : Formalism.REAL.UJ ε => Ψ (Formalism.MainNotions.S.umat g)) :=
-  (ffa_continuousOn hP.2.2.1).comp_continuous continuous_umat' (fun g => g.2)
+  (_root_.ReciprocityTheory.ChartRestriction.DS.dinj_continuousOn_of_smoothOnGV
+    hP.2.2.1).comp_continuous continuous_umat' (fun g => g.2)
 
 theorem psi_twist_coef_memLp
     (dual : Bool) (hP : IsPsiFor ε lam T Ψ)

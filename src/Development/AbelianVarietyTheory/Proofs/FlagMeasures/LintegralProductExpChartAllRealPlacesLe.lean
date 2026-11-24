@@ -162,7 +162,7 @@ theorem dOp_chart_le
 
   have hmul : uMat (a * a'⁻¹) = uMat a * uMat a'⁻¹ := rfl
   have hr : uMat a' * uMat a'⁻¹ = 1 := by
-    first | exact Units.mul_inv (a' : (Matrix (Fin n) (Fin n) ℂ)ˣ) | simp [uMat]
+    first | exact Units.mul_inv (a' : (Matrix (Fin n) (Fin n) ℂ)ˣ)
   have hinv : T (uMat a'⁻¹) = B := by
     calc
       T (uMat a'⁻¹)

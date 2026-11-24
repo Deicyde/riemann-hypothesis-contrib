@@ -73,7 +73,7 @@ theorem GlobalTheory.BSP.matrix_phi_eq_family
   have hQm : Q.map i * Q'.map i = (i e') ^ b • (1 : Matrix (Fin d) (Fin d) C) := by
     rw [← Matrix.map_mul, hQ]
     ext x y
-    by_cases hxy : x = y <;> simp [Matrix.one_apply, hxy]
+    by_cases hxy : x = y <;> simp [hxy]
   have key
       : (i e' ^ a • (P.map i * Δ.map φ)) * Q'.map i = (i e ^ a' • (Δ * Q.map i)) * Q'.map i := by
     rw [hΔ]

@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacuaStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemHomLatticeCompletionIffSupportedMapsStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacua
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.MarkSpec
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemHomLatticeCompletionIffSupportedMaps
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,11 +55,6 @@ noncomputable section
 namespace GlobalTheory.VacMove
 
 variable {D : D7}
-
-theorem mt_mul_inv' (V : HSp D) (g : GA D V)
-    : Formalism.L2.Theta.mt V g * Formalism.L2.Theta.mt V g⁻¹ = 1 := by
-  unfold Formalism.L2.Theta.mt
-  rw [← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one]
 
 theorem mem_ideal_mul_mul
     {m n k l : ℕ}
@@ -122,12 +118,10 @@ theorem mulVec_latA_mem
     have hy' : y' ∈ GlobalTheory.FinPl.latV T MT P :=
       AddSubgroup.subset_closure ⟨α, hα, hP, 1, rfl, x, hx, rfl⟩
     have hent : ∀ i, y' i ∈ idAt D P :=
-      (((GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).2 T).2.2.2 MT y'
-          hMT.1).1 hy'
-        |>.1
+      (((_root_.GlobalTheory.FinPl.localComponents D P).2 T).2.2.2 MT y' hMT.1).1 hy' |>.1
     have hy'' : Formalism.L2.Theta.mt T h⁻¹ *ᵥ y' ∈ GlobalTheory.FinPl.latV T LT P := by
-      rw [hmov _ (mem_ideal_mulVec _ _ _ hent), Matrix.mulVec_mulVec, mt_mul_inv',
-        Matrix.one_mulVec]
+      rw [hmov _ (mem_ideal_mulVec _ _ _ hent), Matrix.mulVec_mulVec,
+        _root_.GlobalTheory.MixModel.mt_mul_inv, Matrix.one_mulVec]
       exact hy'
     have hgen
         : (fun i => pairA D.host.F 0 α ⊗ₜ[D.host.F] (a * x i))
@@ -156,15 +150,11 @@ theorem vac_of_moves
       : ∀ u ∈ latO S T (MS : Set _) (MT : Set _) P,
         pull g h u ∈ latO S T (LS : Set _) (LT : Set _) P := by
     intro u hu
-    have hu' :=
-      (GlobalTheory.T.mem_homLatticeCompletion_iff_supported_maps D S T MS MT hMS hMT P u).1 hu
-    refine (GlobalTheory.T.mem_homLatticeCompletion_iff_supported_maps D S T LS LT hLS hLT P _).2
-      ⟨?_, ?_⟩
+    have hu' := (_root_.GlobalTheory.FinPl.LatMem.mem_latO_iff D S T MS MT hMS hMT P u).1 hu
+    refine (_root_.GlobalTheory.FinPl.LatMem.mem_latO_iff D S T LS LT hLS hLT P _).2 ⟨?_, ?_⟩
     · exact mem_ideal_mul_mul (idAt D P) _ _ _ hu'.1
     · intro y hy
-      have hent :=
-        ((((GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).2 S).2.2.2 LS y
-          hLS.1).1 hy).1
+      have hent := ((((_root_.GlobalTheory.FinPl.localComponents D P).2 S).2.2.2 LS y hLS.1).1 hy).1
       have h1 : Formalism.L2.Theta.mt S g *ᵥ y ∈ GlobalTheory.FinPl.latV S MS P := (hmS y hent).1 hy
       have h2 := hu'.2 _ h1
       have h3 := mulVec_latA_mem T LT MT P h hMT hmT _ h2
@@ -174,8 +164,8 @@ theorem vac_of_moves
   have hact : ∀ u : WO S T, actO S T g h (pull g h u) = u := by
     intro u
     unfold actO pull
-    simp only [← Matrix.mul_assoc, mt_mul_inv', Matrix.one_mul]
-    simp only [Matrix.mul_assoc, mt_mul_inv', Matrix.mul_one]
+    simp only [← Matrix.mul_assoc, _root_.GlobalTheory.MixModel.mt_mul_inv, Matrix.one_mul]
+    simp only [Matrix.mul_assoc, _root_.GlobalTheory.MixModel.mt_mul_inv, Matrix.mul_one]
   have hhalf : ∀ e (u : WO S T), IsHalf e u → IsHalf e (pull g h u) := by
     intro e u hu i j
     unfold pull

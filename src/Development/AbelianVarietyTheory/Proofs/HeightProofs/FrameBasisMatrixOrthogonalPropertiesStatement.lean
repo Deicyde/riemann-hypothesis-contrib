@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.frame_basis_matrix_orthogonal_properties
     : ∀ (D : D7) (V : HSp D),
       (∀ Q : Matrix (Fin V.rank) (Fin V.rank) D.host.E,
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.frame_basis_matrix_orthogonal_properties
                       → thAt V τ s * (V.frame.toMatrix b).map (tauE D τ)
                         = (V.frame.toMatrix b).map (tauE D τ) * Matrix.diagonal (fun i =>
                           if 0 < (tauE D τ (V.hT (b i) (b i))).re then (1 : ℂ) else -1)) := by
-  first
-  | exact @GlobalTheory.FockBasisMatrix.basis_matrix
-  | exact GlobalTheory.FockBasisMatrix.basis_matrix
-  | (intros; apply GlobalTheory.FockBasisMatrix.basis_matrix <;> assumption)
+  first | exact @GlobalTheory.FockBasisMatrix.basis_matrix

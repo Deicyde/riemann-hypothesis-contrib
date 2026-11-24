@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.isThetaFunction_thetaTransform_rationalDarboux
                 → ∀ φ ∈ GlobalTheory.WeilM.schA D.host.F κ,
                   Formalism.IndefR.Datum.IsThetaFunO ψ S T
                     (GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ φ) := by
-  first
-  | exact @GlobalTheory.ThetaTransformTheta.isThetaFunO_thetaTr
-  | exact GlobalTheory.ThetaTransformTheta.isThetaFunO_thetaTr
-  | (intros; apply GlobalTheory.ThetaTransformTheta.isThetaFunO_thetaTr <;> assumption)
+  first | exact @GlobalTheory.ThetaTransformTheta.isThetaFunO_thetaTr

@@ -48,8 +48,6 @@ noncomputable section
 
 namespace GlobalTheory.HeckeLocN
 
-
-
 section Transport
 
 variable

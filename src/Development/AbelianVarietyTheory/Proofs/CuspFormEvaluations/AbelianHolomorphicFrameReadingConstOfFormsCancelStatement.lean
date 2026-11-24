@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
   Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.abelianHolomorphicFrame_reading_const_of_forms_cancel
     : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (L : RigLB A) (x0 : Sp ℂ ⟶ S)
         (g : ℕ) (Φ : AnFr A L x0 g),
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.abelianHolomorphicFrame_reading_const_of_forms_can
               → (∀ z w, ∑ k, (ε k : ℂ) * hermForm Φ.Hm (Λ k z) (Λ k w) = 0)
               → (∃ v : ℂ, v ≠ 0 ∧ ∀ z, Φ.GenRd φ ε t (q z) (fun k => Λ k z) v)
                 ∧ ∀ gm ∈ Ga, ∏ k, Φ.χ (Λ k gm) ^ ε k = 1 := by
-  first
-  | exact @GlobalTheory.AnVal.genRd_const
-  | exact GlobalTheory.AnVal.genRd_const
-  | (intros; apply GlobalTheory.AnVal.genRd_const <;> assumption)
+  first | exact @GlobalTheory.AnVal.genRd_const

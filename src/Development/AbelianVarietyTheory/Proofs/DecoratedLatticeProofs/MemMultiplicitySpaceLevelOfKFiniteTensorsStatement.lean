@@ -52,6 +52,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_multiplicitySpace_level_of_KFinite_tensors
     : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (θ : InfFam D),
       IsInfFam θ

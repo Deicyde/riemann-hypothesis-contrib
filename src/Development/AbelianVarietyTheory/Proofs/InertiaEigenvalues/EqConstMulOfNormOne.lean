@@ -2,7 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntFormsSubset
 public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevelCoverComponentReadingsUnitModulusScalarStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevelCoverComponentReadingsUnitModulusScalar
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EqZeroOfMulEqZero
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.ExistsBorelOrthonormalMove
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.WickVanishing.GGConn
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -45,9 +48,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FourierCoefficientDomain
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EqZeroOfMulEqZero
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.ExistsBorelOrthonormalMove
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.WickVanishing.GGConn
 
 @[expose] public section
 
@@ -181,7 +181,7 @@ theorem cover_scalar_const
                                               → rdU C.U₂ f₂ k₂ x = u * rdU (T.U j σ) f k x' := by
   intro D T hL j hj σ hσ C hC n k₂
   obtain ⟨k, γ, hΛ, hh, hd, hx⟩ :=
-    GlobalTheory.T.levelCover_component_readings_unit_modulus_scalar D T hL j hj σ hσ C hC k₂
+    _root_.GlobalTheory.CoverFrameMod.comp_over_comp_norm D T hL j hj σ hσ C hC k₂
   obtain ⟨hΨ, hla⟩ := psi_and_weight_eq D T hL j hj σ hσ C hC k₂ k
   refine ⟨k, γ, hΛ, hh, hd, ?_⟩
   have hU₂ : IsUnf C.U₂ := hC.2.2.2.1

@@ -135,7 +135,7 @@ theorem exists_remb_eq_of_mem_dual
     rw [finrank_euclideanSpace, GlobalTheory.card_realEmbeddings, Module.finrank_eq_card_basis b]
   haveI : Nonempty ι := b.index_nonempty
   let E := basisOfLinearIndependentOfCardEqFinrank hind hcard
-  have hz : innerₛₗ ℝ (μ - remb F ν) = 0 := E.ext fun i => by simp [E, inner_sub_left, hνb, hc]
+  have hz : innerₛₗ ℝ (μ - remb F ν) = 0 := E.ext fun i => by simp [E, hνb, hc]
   have h0 := LinearMap.congr_fun hz (μ - remb F ν)
   have h1 : ⟪μ - remb F ν, μ - remb F ν⟫ = 0 := by rw [LinearMap.zero_apply] at h0; exact h0
   rw [inner_self_eq_zero, sub_eq_zero] at h1

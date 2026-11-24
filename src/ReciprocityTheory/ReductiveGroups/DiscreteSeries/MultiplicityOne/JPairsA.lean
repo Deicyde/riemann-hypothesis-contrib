@@ -79,17 +79,23 @@ theorem gN_nonneg {k r : ℕ} (A : Mat k r) : 0 ≤ gN A := Real.sqrt_nonneg _
 section hpk
 variable (k r : ℕ)
 
-theorem Hpk_out {i : Fin (2 * r + k + 1)} (h : i.val < r ∨ r + k < i.val) (j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j.val = 2 * r + k - i.val then 1 else 0 :=
+theorem Hpk_out {i : Fin (2 * r + k + 1)} (h : i.val < r ∨ r + k < i.val) (j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j.val = 2 * r + k - i.val then 1 else 0 :=
   ReciprocityTheory.ChartRestriction.DS.Xi.StepA.Hpk_out k r h j
 
-theorem Hpk_mid {i : Fin (2 * r + k + 1)} (h : ¬(i.val < r ∨ r + k < i.val)) (j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j.val = i.val then (if i.val = r + k then -1 else 1) else 0 :=
+theorem Hpk_mid
+    {i : Fin (2 * r + k + 1)} (h : ¬(i.val < r ∨ r + k < i.val)) (j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j.val = i.val then (if i.val = r + k then -1 else 1) else 0 :=
   ReciprocityTheory.ChartRestriction.DS.Xi.StepA.Hpk_mid k r h j
 
-theorem Hpk_mulVec (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) :
-    (Hpk k r *ᵥ v) i = if i.val < r ∨ r + k < i.val then v ⟨2 * r + k - i.val, by omega⟩
-      else if i.val = r + k then -v i else v i :=
+theorem Hpk_mulVec (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1))
+    : (Hpk k r *ᵥ v) i
+      = if i.val < r ∨ r + k < i.val then
+          v ⟨2 * r + k - i.val, by omega⟩
+        else if i.val = r + k then
+          - v i
+        else
+          v i :=
   ReciprocityTheory.ChartRestriction.DS.Xi.StepA.Hpk_mulVec k r v i
 
 theorem Hpk_mulVec_mulVec (v : Fin (2 * r + k + 1) → ℂ) : Hpk k r *ᵥ (Hpk k r *ᵥ v) = v :=
@@ -99,8 +105,7 @@ theorem mat_eq_of_mulVec' {A B : Mat k r} (h : ∀ v, A *ᵥ v = B *ᵥ v) : A =
   ext i j
   simpa [Matrix.mulVec_single_one] using congrFun (h (Pi.single j 1)) i
 
-theorem Hpk_sq : Hpk k r * Hpk k r = 1 :=
-  ReciprocityTheory.ChartRestriction.DS.Xi.StepA.Hpk_sq k r
+theorem Hpk_sq : Hpk k r * Hpk k r = 1 := ReciprocityTheory.ChartRestriction.DS.Xi.StepA.Hpk_sq k r
 
 theorem UH_left_inv {g : Mat k r} (hg : g ∈ GV k r) : Hpk k r * gᴴ * Hpk k r * g = 1 :=
   ReciprocityTheory.ChartRestriction.DS.Xi.StepA.UH_left_inv k r hg
@@ -110,29 +115,36 @@ theorem GV_mul {g x : Mat k r} (hg : g ∈ GV k r) (hx : x ∈ GV k r) : g * x �
   have hx' : xᴴ * Hpk k r * x = Hpk k r := hx
   show (g * x)ᴴ * Hpk k r * (g * x) = Hpk k r
   rw [conjTranspose_mul]
-  calc xᴴ * gᴴ * Hpk k r * (g * x) = xᴴ * (gᴴ * Hpk k r * g) * x := by simp only [Matrix.mul_assoc]
+  calc
+    xᴴ * gᴴ * Hpk k r * (g * x)
+      = xᴴ * (gᴴ * Hpk k r * g) * x := by simp only [Matrix.mul_assoc]
     _ = Hpk k r := by rw [hg', hx']
 
 end hpk
 
-theorem gN_le_mul {k r : ℕ} {g : Mat k r} (hg : g ∈ GV k r) (x : Mat k r) :
-    gN x ≤ gN (Hpk k r) ^ 2 * (gN g * gN (g * x)) := by
+theorem gN_le_mul {k r : ℕ} {g : Mat k r} (hg : g ∈ GV k r) (x : Mat k r)
+    : gN x ≤ gN (Hpk k r) ^ 2 * (gN g * gN (g * x)) := by
   have hx : x = Hpk k r * gᴴ * Hpk k r * (g * x) := by
     rw [← Matrix.mul_assoc, UH_left_inv k r hg, Matrix.one_mul]
   have h0 := gN_nonneg (Hpk k r)
-  calc gN x = gN (Hpk k r * gᴴ * Hpk k r * (g * x)) := by rw [← hx]
+  calc
+    gN x
+      = gN (Hpk k r * gᴴ * Hpk k r * (g * x)) := by rw [← hx]
     _ ≤ gN (Hpk k r * gᴴ * Hpk k r) * gN (g * x) := gN_mul_le _ _
     _ ≤ gN (Hpk k r) * gN g * gN (Hpk k r) * gN (g * x) := by
-        gcongr
-        · exact gN_nonneg _
-        · calc gN (Hpk k r * gᴴ * Hpk k r) ≤ gN (Hpk k r * gᴴ) * gN (Hpk k r) := gN_mul_le _ _
-            _ ≤ gN (Hpk k r) * gN gᴴ * gN (Hpk k r) := by gcongr; exact gN_mul_le _ _
-            _ = gN (Hpk k r) * gN g * gN (Hpk k r) := by rw [gN_conjTranspose]
+      gcongr
+      · exact gN_nonneg _
+      · calc
+          gN (Hpk k r * gᴴ * Hpk k r)
+            ≤ gN (Hpk k r * gᴴ) * gN (Hpk k r) := gN_mul_le _ _
+          _ ≤ gN (Hpk k r) * gN gᴴ * gN (Hpk k r) := by gcongr; exact gN_mul_le _ _
+          _ = gN (Hpk k r) * gN g * gN (Hpk k r) := by rw [gN_conjTranspose]
     _ = gN (Hpk k r) ^ 2 * (gN g * gN (g * x)) := by ring
 
-theorem real_key {A B X c a b : ℝ} (hA : 1 ≤ A) (hB : 1 ≤ B) (hX : 0 < X) (hc : 0 < c) (hb : 0 ≤ b)
-    (hab : b ≤ a) (hXle : X ≤ c * (B * A)) :
-    A ^ (-a) * B ^ (-a) ≤ (X * c⁻¹) ^ (-(a - b)) * B ^ (-b) := by
+theorem real_key
+    {A B X c a b : ℝ} (hA : 1 ≤ A) (hB : 1 ≤ B) (hX : 0 < X) (hc : 0 < c) (hb : 0 ≤ b) (hab : b ≤ a)
+    (hXle : X ≤ c * (B * A))
+    : A ^ (-a) * B ^ (-a) ≤ (X * c⁻¹) ^ (-(a - b)) * B ^ (-b) := by
   have hA0 : 0 < A := by linarith
   have hB0 : 0 < B := by linarith
   have hP : 0 < B * A := mul_pos hB0 hA0
@@ -142,7 +154,8 @@ theorem real_key {A B X c a b : ℝ} (hA : 1 ≤ A) (hB : 1 ≤ B) (hX : 0 < X) 
   have hXc : 0 < X * c⁻¹ := mul_pos hX (inv_pos.2 hc)
   have h1 : (B * A) ^ (-(a - b)) ≤ (X * c⁻¹) ^ (-(a - b)) := by
     refine Real.rpow_le_rpow_of_nonpos hXc ?_ (by linarith)
-    rw [mul_inv_le_iff₀ hc]; linarith [hXle]
+    rw [mul_inv_le_iff₀ hc]
+    linarith [hXle]
   have h2 : (B * A) ^ (-b) ≤ B ^ (-b) :=
     Real.rpow_le_rpow_of_nonpos hB0 (by nlinarith) (by linarith)
   exact mul_le_mul h1 h2 (Real.rpow_nonneg hP.le _) (Real.rpow_nonneg hXc.le _)

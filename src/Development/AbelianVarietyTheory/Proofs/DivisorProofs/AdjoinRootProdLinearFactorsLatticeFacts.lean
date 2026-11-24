@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreEig
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjoinRootProdLinearFactorsStructureStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.MultiplicationKernelIdentity
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjoinRootProdLinearFactorsStructure
 import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -79,7 +80,7 @@ theorem GlobalTheory.herbrand_lattice_facts
                   ev a τ (cofac a τ) • x = cofac a τ • x - g • (lin a τ • x)) := by
   intro C _ v S _ _ a ha N Fil hFil τ
   obtain ⟨hfree, hfin, hlc, hev, hker, ⟨g, hg⟩, hann⟩ :=
-    GlobalTheory.T.adjoinRootProdLinearFactors_structure (Int0 v) S a τ
+    _root_.GlobalTheory.RingFacts.ring_facts (Int0 v) S a τ
   have hd : ev a τ (cofac a τ) ≠ 0 := by
     rw [hev]
     exact Finset.prod_ne_zero_iff.mpr fun s hs =>

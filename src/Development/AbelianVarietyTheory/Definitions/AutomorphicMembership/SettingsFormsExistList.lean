@@ -48,9 +48,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 def ListPin (D : D7) {I : Type} (Lc : Formalism.IndefR.Links.LevCh D I) (CF b : ℝ) : Prop :=
   ∃ G : GlobalTheory.ChiGrid.GridData Lc ⟨1, CF, b⟩,
     GlobalTheory.BigTop.Fun.FieldHas G (embLL0 D)

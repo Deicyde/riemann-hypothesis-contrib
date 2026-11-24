@@ -45,8 +45,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 noncomputable section
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH

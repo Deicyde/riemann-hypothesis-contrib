@@ -69,7 +69,6 @@ variable
 abbrev chrK (W : RealPack ex) (t : W.P.T) (j : ℕ) : (AE (I.rec7 l Z))ˣ →* Circle :=
   (pk W).toLevCh.mu t (j + 1)
 
-
 structure QJ (a : GeoAll W u) (t : W.P.T) where
   Ch₀ : ℕ → Type
   A : TwDat I l Z u (W.P.I.tup t) Ch₀

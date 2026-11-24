@@ -154,7 +154,7 @@ theorem multidegree_polarization_move
     by_cases hi : i = l
     · subst hi
       simp [Finsupp.single_apply]
-    · simp [Finsupp.single_apply, Ne.symm hi]
+    · simp [Ne.symm hi]
   have key
       : ∀ c : Fin n,
         (m - Finsupp.single (l, b) 1 + Finsupp.single (l, a) 1 : ι × Fin n →₀ ℕ) (i, c)
@@ -175,7 +175,6 @@ theorem gl_operator_preserves_multidegree
     (F : MvPolynomial (ι × Fin n) K) (hF : F ∈ Pol K n d)
     : glOps K n LL S a b F ∈ Pol K n d := by
   classical
-
   rw [gl_operator_apply_derivation, F.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   have hm' : ∀ i, multideg m i = d i :=

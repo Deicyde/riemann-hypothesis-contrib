@@ -59,12 +59,12 @@ theorem oSmulW
     {W : Type*} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
     (o : 𝓞 E) (w : W)
     : o • w = (o : E) • w := by
-  first | exact (algebraMap_smul E o w).symm | rfl | simp [Algebra.smul_def]
+  first | exact (algebraMap_smul E o w).symm
 
 private theorem coe_ne_zero_of_ne_zero (o : 𝓞 E) (h : o ≠ 0) : (o : E) ≠ 0 := by
   intro h'
   apply h
-  first | exact_mod_cast h' | exact RingOfIntegers.ext h' | simpa using h'
+  first | exact_mod_cast h'
 
 private theorem inv_smul_apply_smul_eq_of_smul_mem
     {W : Type*} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
@@ -96,7 +96,7 @@ theorem ext_lat
     intro u a b h
     rw [mul_smul]
     exact P.smul_mem b h
-  have hal : ∀ o : 𝓞 E, algebraMap (𝓞 E) E o = (o : E) := fun o => by first | rfl | simp
+  have hal : ∀ o : 𝓞 E, algebraMap (𝓞 E) E o = (o : E) := fun o => by first | rfl
   refine ⟨
     {
       toFun := fun x => ((d x.1 x.2 : E))⁻¹ • f ⟨d x.1 x.2 • x.1, hdP x.1 x.2⟩
@@ -226,7 +226,7 @@ theorem dual_sum
       simp
     obtain ⟨d, hd, hdu⟩ := hfull u
     have h1 := hm _ hdu (by rw [oSmul]; exact U.smul_mem _ hu)
-    rw [oSmul, hT_smulL] at h1
+    rw [oSmul, _root_.PI.ScalarPairDr.W.hT_smul_left] at h1
     have hd' : star ((d : E)) ≠ 0 := by rw [star_ne_zero]; exact coe_ne_zero hd
     exact (mul_eq_zero.1 h1).resolve_left hd'
 

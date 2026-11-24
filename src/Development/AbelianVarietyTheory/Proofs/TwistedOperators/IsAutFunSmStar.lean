@@ -70,7 +70,6 @@ theorem map_gelfA_mem
     (k : ℕ)
     : κ (gelfA E k) ∈ Algebra.adjoin ℂ (Set.range (gelfA E)) := by
   have h1 : κ (gelfA E k) ∈ Algebra.adjoin ℂ (Set.range fun p : Fin n × Fin n => E p.1 p.2) := by
-
     rw [gelfA, map_sum]
     refine Subalgebra.sum_mem _ fun idx _ => ?_
     rw [map_list_prod]

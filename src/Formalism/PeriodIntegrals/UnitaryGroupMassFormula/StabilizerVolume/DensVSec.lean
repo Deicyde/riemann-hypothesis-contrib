@@ -49,12 +49,14 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct
 
-theorem exists_leftInv_of_linIndep {K : Type} [CommRing K] [IsSemisimpleRing K] {a M : ℕ}
-    (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z) :
-    ∃ q : Fin M → Fin a → K, ∀ i i', ∑ k, Z i k * q k i' = if i = i' then 1 else 0 := by
+theorem exists_leftInv_of_linIndep
+    {K : Type} [CommRing K] [IsSemisimpleRing K]
+    {a M : ℕ} (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z)
+    : ∃ q : Fin M → Fin a → K, ∀ i i', ∑ k, Z i k * q k i' = if i = i' then 1 else 0 := by
   apply PI.VolStabSW.exists_leftInv_of_linIndep <;> assumption
 
 theorem secGram_holds : SecGram := by
@@ -79,7 +81,8 @@ theorem secGram_holds : SecGram := by
       funext j
       have := congrFun hg j
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Z, Matrix.vecMul, dotProduct,
-        Finset.mul_sum, Pi.zero_apply] at this
+          Finset.mul_sum, Pi.zero_apply]
+        at this
       simp only [Matrix.vecMul, dotProduct, v, Finset.sum_mul, Pi.zero_apply]
       rw [Finset.sum_comm]
       rw [← this]
@@ -87,7 +90,8 @@ theorem secGram_holds : SecGram := by
     have hv : v = 0 := by
       have := congrArg (fun u => Matrix.vecMul u (JR (F := F) R J)⁻¹) hv0
       simp only [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hJu, Matrix.vecMul_one,
-        Matrix.zero_vecMul] at this
+          Matrix.zero_vecMul]
+        at this
       exact this
     have hX0 : ∑ i, s (g i) • x i = 0 := by
       funext l
@@ -105,21 +109,25 @@ theorem secGram_holds : SecGram := by
     rw [← map_add (f := _), show (1 / 2 : F) + 1 / 2 = 1 by norm_num, map_one]
   have hsh : sigR R σ (algebraMap F (R ⊗[F] E) (1 / 2)) = algebraMap F (R ⊗[F] E) (1 / 2) :=
     (Algebra.TensorProduct.map (AlgHom.id F R) σ).commutes _
-  have h1 : ∀ i j, hR R σ J (x i)
-      (fun k => ∑ i', (algebraMap F (R ⊗[F] E) (1 / 2) * S i' j) * q k i') =
-        algebraMap F (R ⊗[F] E) (1 / 2) * S i j := by
+  have h1
+      : ∀ i j,
+        hR R σ J (x i) (fun k => ∑ i', (algebraMap F (R ⊗[F] E) (1 / 2) * S i' j) * q k i')
+          = algebraMap F (R ⊗[F] E) (1 / 2) * S i j := by
     intro i j
     rw [hZh]
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
-    have e3 : ∀ i', ∑ k, Z i k * (algebraMap F (R ⊗[F] E) (1 / 2) * S i' j * q k i') =
-        algebraMap F (R ⊗[F] E) (1 / 2) * S i' j * (if i = i' then 1 else 0) := fun i' => by
+    have e3
+        : ∀ i',
+          ∑ k, Z i k * (algebraMap F (R ⊗[F] E) (1 / 2) * S i' j * q k i')
+            = algebraMap F (R ⊗[F] E) (1 / 2) * S i' j * (if i = i' then 1 else 0) := fun i' => by
       rw [← hq i i', Finset.mul_sum]
       exact Finset.sum_congr rfl fun k _ => by ring
     simp only [e3, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-  have h2 : ∀ i j, hR R σ J
-      (fun k => ∑ i', (algebraMap F (R ⊗[F] E) (1 / 2) * S i' i) * q k i') (x j) =
-        algebraMap F (R ⊗[F] E) (1 / 2) * S i j := by
+  have h2
+      : ∀ i j,
+        hR R σ J (fun k => ∑ i', (algebraMap F (R ⊗[F] E) (1 / 2) * S i' i) * q k i') (x j)
+          = algebraMap F (R ⊗[F] E) (1 / 2) * S i j := by
     intro i j
     rw [← hR_herm R σ hσ J hJ (x j), h1 j i, map_mul, hsh, hS i j]
   funext i j

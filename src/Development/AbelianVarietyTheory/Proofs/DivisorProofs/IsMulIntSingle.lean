@@ -64,7 +64,7 @@ theorem IsMulInt.mono
   refine ⟨h.1, fun v i => (h.2 v i).trans ?_⟩
   rw [Nat.cast_mul, norm_mul]
   exact mul_le_of_le_one_left (norm_nonneg _)
-    (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v k)
+    (_root_.GlobalTheory.AdicNatCastNorm.norm_natCast_adicCompletion_le_one v k)
 
 def sand
     {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]

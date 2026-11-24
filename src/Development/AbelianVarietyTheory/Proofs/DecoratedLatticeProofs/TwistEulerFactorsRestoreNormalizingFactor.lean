@@ -89,8 +89,7 @@ theorem dSfun_twist_restore
                 * ((∏ PP ∈ w.Q, zinv PP D.R.t (a + D.R.t) : ℝ) : ℂ) := by
   intro D c w hw a
   classical
-  obtain ⟨hS, hQS₀, hinj, hsplit, -⟩ :=
-    GlobalTheory.T.chainTwistPlaces_split_unramifiedQuotients D c w hw
+  obtain ⟨hS, hQS₀, hinj, hsplit, -⟩ := _root_.GlobalTheory.ChainTw.twist_places D c w hw
   have ht : 0 < ((D.R.t : ℂ) / 2).re := by
     have h3 := D.R.three_m_lt_t
     have h1 : (1 : ℝ) ≤ D.R.t := by exact_mod_cast (by omega : 1 ≤ D.R.t)

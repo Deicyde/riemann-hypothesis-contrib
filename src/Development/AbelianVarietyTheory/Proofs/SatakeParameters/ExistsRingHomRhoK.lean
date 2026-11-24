@@ -172,6 +172,6 @@ theorem norm_sigma_eq
     (hσ : UnrOK (MaximalUnramifiedExtension p) p σ)
     (x : MaximalUnramifiedExtension p)
     : ‖σ x‖ = ‖x‖ :=
-  Formalism.L2.Th1.D.sigmaIsom (MaximalUnramifiedExtension p) p σ hσ x
+  _root_.Formalism.L2.Th1.D.sigma_isometry (MaximalUnramifiedExtension p) p σ hσ x
 
 end GlobalTheory.KerStd.HypCoord

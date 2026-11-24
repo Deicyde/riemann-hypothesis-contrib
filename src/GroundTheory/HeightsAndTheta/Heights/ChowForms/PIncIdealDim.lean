@@ -58,8 +58,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLinearTrdeg.Statement)
-    (h₃ : AffineChartTrdeg.Statement) : IncIdealDim.Statement := by
+theorem IncIdealDim.proof
+    (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLinearTrdeg.Statement)
+    (h₃ : AffineChartTrdeg.Statement)
+    : IncIdealDim.Statement := by
   intro F _ n k d P hP hdim
   have := hP.isPrime
   obtain ⟨j, hj⟩ := hP.isRelevant
@@ -71,8 +73,7 @@ theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLin
     rw [Ne, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
     exact hj
   set c : Fin (n' + 1) → K := fun m => if m = j then (ξ j)⁻¹ else 0 with hc_def
-  have hc : ∑ m, c m * ξ m = 1 := by
-    simp [c, inv_mul_cancel₀ hξj]
+  have hc : ∑ m, c m * ξ m = 1 := by simp [c, inv_mul_cancel₀ hξj]
 
   let τ : Fin k × Fin n' → Fin k × Fin (n' + 1) := fun im => (im.1, j.succAbove im.2)
   have hτ : Function.Injective τ := by
@@ -93,9 +94,9 @@ theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLin
     intro i
     have h1 : (C (ξ j) * C (ξ j)⁻¹ : MvPolynomial (Fin k × Fin (n' + 1)) K) = 1 := by
       rw [← map_mul, mul_inv_cancel₀ hξj, map_one]
-    have h2 : ψ (∑ m, X (i, m) * C (η m)) =
-        -((∑ m, X (i, j.succAbove m) * C (ξ (j.succAbove m))) * C (ξ j)⁻¹) := by
-
+    have h2
+        : ψ (∑ m, X (i, m) * C (η m))
+          = -((∑ m, X (i, j.succAbove m) * C (ξ (j.succAbove m))) * C (ξ j)⁻¹) := by
       simp only [ψ, AlgHom.restrictScalars_apply, map_sum, map_mul, rename_X, rename_C, τ]
       rw [Finset.sum_mul, ← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun m _ => ?_
@@ -119,8 +120,8 @@ theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLin
       · exact ⟨(i, j), hB i⟩
 
   have hη : Algebra.trdeg F (Algebra.adjoin F (Set.range η)) = ((d : ℕ) : Cardinal) := by
-    have heq : Algebra.adjoin F (Set.range η) =
-        Algebra.adjoin F (Set.range fun m => ξ m * (ξ j)⁻¹) := by
+    have heq
+        : Algebra.adjoin F (Set.range η) = Algebra.adjoin F (Set.range fun m => ξ m * (ξ j)⁻¹) := by
       apply le_antisymm
       · rw [Algebra.adjoin_le_iff]
         rintro _ ⟨m, rfl⟩
@@ -132,7 +133,7 @@ theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLin
           rw [hm, mul_inv_cancel₀ hξj]
           exact one_mem _
         · obtain ⟨m', rfl⟩ := Fin.exists_succAbove_eq hm
-          have : ξ (j.succAbove m') * (ξ j)⁻¹ = -η m' := (neg_neg _).symm
+          have : ξ (j.succAbove m') * (ξ j)⁻¹ = - η m' := (neg_neg _).symm
           beta_reduce
           rw [this]
           exact neg_mem (Algebra.subset_adjoin ⟨m', rfl⟩)
@@ -150,8 +151,9 @@ theorem IncIdealDim.proof (h₁ : IncidenceGeneric.Statement) (h₂ : GenericLin
   haveI : Algebra.FiniteType F φ.range :=
     Algebra.FiniteType.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
   have htr : Algebra.trdeg F φ.range = ((k * n' + min k d : ℕ) : Cardinal) := by
-    rw [hφrange, ← AlgEquiv.trdeg_eq (A := ↥(Algebra.adjoin F G))
-      (Subalgebra.equivMapOfInjective (Algebra.adjoin F G) ψ hψ)]
+    rw [hφrange,
+      ← AlgEquiv.trdeg_eq (A := ↥(Algebra.adjoin F G))
+        (Subalgebra.equivMapOfInjective (Algebra.adjoin F G) ψ hψ)]
     exact h₂ F K n' k d η hη
   rw [hker, ringKrullDim_eq_of_ringEquiv (AlgEquiv.toRingEquiv (Ideal.quotientKerEquivRange φ)),
     GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_eq_trdeg F (A := ↥φ.range), htr]

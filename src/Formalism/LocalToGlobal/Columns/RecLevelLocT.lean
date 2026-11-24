@@ -284,10 +284,7 @@ theorem rll_mem_loc_dLat
     change z ∈ Submodule.span (Formalism.BasicNotions.intV E v)
       ((fun x : Fin n → E => fun i => inclE (F := F) (v.adicCompletion F) (x i))
         '' (rll_dLat n c : Set (Fin n → E)))
-    have hz : z = ∑ i, Pi.single i (z i) := by
-      first
-      | exact (Finset.univ_sum_single z).symm
-      | (funext j; simp [Finset.sum_apply, Pi.single_apply])
+    have hz : z = ∑ i, Pi.single i (z i) := by first | exact (Finset.univ_sum_single z).symm
     rw [hz]
     refine Submodule.sum_mem _ fun i _ => ?_
     have hgen
@@ -358,9 +355,7 @@ theorem BasePi.ne_zero (h : BasePi ST π) : π ≠ 0 := by
 theorem BasePi.coe_ne_zero (h : BasePi ST π) : algebraMap (𝓞 E) E π ≠ 0 := by
   intro h0
   apply h.ne_zero
-  first
-  | exact (injective_iff_map_eq_zero _).mp (FaithfulSMul.algebraMap_injective (𝓞 E) E) _ h0
-  | exact RingOfIntegers.coe_eq_zero_iff.mp h0
+  first | exact (injective_iff_map_eq_zero _).mp (FaithfulSMul.algebraMap_injective (𝓞 E) E) _ h0
 
 theorem BasePi.star_ne_zero (h : BasePi ST π) : star (algebraMap (𝓞 E) E π) ≠ 0 :=
   _root_.star_ne_zero.mpr h.coe_ne_zero
@@ -509,7 +504,7 @@ theorem rll_baseKer_eq (h : BasePi ST π)
     : baseKer E n ST = rll_dLat n (star (algebraMap (𝓞 E) E π) / algebraMap (𝓞 E) E π) := by
   have hI : ∀ a : E, a ∈ intOE E ↔ ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = a := fun a => Iff.rfl
   have hinj : Function.Injective (algebraMap (𝓞 E) E) := by
-    first | exact FaithfulSMul.algebraMap_injective (𝓞 E) E | exact RingOfIntegers.coe_injective
+    first | exact FaithfulSMul.algebraMap_injective (𝓞 E) E
   have ha := h.coe_ne_zero
   have hb : star (algebraMap (𝓞 E) E π) = algebraMap (𝓞 E) E (cO E π) := rfl
   have hloc
@@ -535,7 +530,6 @@ theorem rll_baseKer_eq (h : BasePi ST π)
         simp only [map_mul]
         rw [hr, ← hb, ht, Pi.smul_apply, Algebra.smul_def]
         field_simp
-        try ring
       have hmem : s * r ∈ P.asIdeal := by
         rw [e]
         exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ (h.mem hP))
@@ -545,7 +539,6 @@ theorem rll_baseKer_eq (h : BasePi ST π)
     rw [hq, map_mul] at hr
     rw [div_mul_eq_mul_div, ← hr]
     field_simp
-    try ring
   · rintro ⟨h1, h2⟩
     obtain ⟨q, hq⟩ := (hI _).mp h2
     refine ⟨
@@ -555,7 +548,6 @@ theorem rll_baseKer_eq (h : BasePi ST π)
     · refine (hI _).mpr ⟨π * q, ?_⟩
       rw [map_mul, hq]
       field_simp
-      try ring
     · rw [rll_baseLb_eq n h, rll_mem_dLat]
       refine ⟨fun i hi => ?_, ?_⟩
       · rw [Pi.smul_apply, Algebra.smul_def]
@@ -564,7 +556,6 @@ theorem rll_baseKer_eq (h : BasePi ST π)
         refine (hI _).mpr ⟨q, ?_⟩
         rw [hq]
         field_simp
-        try ring
 
 end Pi2
 

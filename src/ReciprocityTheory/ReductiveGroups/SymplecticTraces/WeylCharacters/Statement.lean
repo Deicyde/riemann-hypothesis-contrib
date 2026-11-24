@@ -97,10 +97,7 @@ theorem ne_zero_of_toMK_diag
   unfold toMK toM at hk
   have hu : IsUnit (Matrix.diagonal t) := by
     rw [← hk]
-    first
-    | exact Units.isUnit _
-    | exact (unitary.toUnits _).isUnit
-    | exact (Matrix.isUnit_iff_isUnit_det _).mpr (Units.isUnit _)
+    first | exact Units.isUnit _
   have hdet := (Matrix.isUnit_iff_isUnit_det _).mp hu
   rw [Matrix.det_diagonal] at hdet
   exact Finset.prod_ne_zero_iff.mp hdet.ne_zero i (Finset.mem_univ i)

@@ -100,7 +100,7 @@ theorem normalizing_constants_all
     Formalism.L2.SG.Pf.Rescale.standard_gram_nondegenerate T.X.B.I.F T.X.B.I.E T.X.B.I.cm.sig
       T.X.B.I.n T.X.B.I.J _ _ _
       (fun x => star_star x)
-      hStd.2.1 (Formalism.L2.SG.Pf.Rescale.frame_stdX T.X u')
+      hStd.2.1 (_root_.MassDataLevelSSteps.FrameW.frameOf_isStd T.X u')
   have hPC := Formalism.L2.SG.Pf.ProdConvCut2.prodConvAll_holds D T u u' hne hSt
   have hL :=
     locTieX_of T.X T.ψ u (T.locCompat u) (Formalism.L2.SG.Pf.LocVolPrim.primX T.X u locFramePrim)

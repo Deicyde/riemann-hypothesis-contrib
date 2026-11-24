@@ -99,7 +99,6 @@ theorem aeval_C_mul_X
     : eval₂ (Int.castRingHom (Polynomial S)) (fun p => Polynomial.C (r p) * Polynomial.X) f
       = Polynomial.C (eval₂ (Int.castRingHom S) r f) * Polynomial.X ^ d := by
   classical
-
   rw [eval₂_eq, eval₂_eq, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hmd : ∑ i, m ⟨(), i⟩ = d := hf m hm ()

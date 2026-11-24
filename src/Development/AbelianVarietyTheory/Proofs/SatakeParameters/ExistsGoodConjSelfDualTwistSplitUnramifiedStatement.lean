@@ -46,6 +46,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.Published
+
 theorem _root_.GlobalTheory.T.exists_good_conjSelfDual_twist_split_unramified
     : AutomorphicFormsFiniteGL
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (l a : ℕ),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_good_conjSelfDual_twist_split_unramified
                 GlobalTheory.UnitaryBC.IsSplitAt w₀
                   → ∃ (κ : HChar E) (m : (E →+* ℂ) → ℤ),
                     κ.IsAlg m ∧ κ.UnrAt w₀ ∧ InScope .csd l (π.twist κ) (quadChar E ^ a) := by
-  first
-  | exact @GlobalTheory.GoodCsdTwist.exists_goodCsd_twist
-  | exact GlobalTheory.GoodCsdTwist.exists_goodCsd_twist
-  | (intros; apply GlobalTheory.GoodCsdTwist.exists_goodCsd_twist <;> assumption)
+  first | exact @GlobalTheory.GoodCsdTwist.exists_goodCsd_twist

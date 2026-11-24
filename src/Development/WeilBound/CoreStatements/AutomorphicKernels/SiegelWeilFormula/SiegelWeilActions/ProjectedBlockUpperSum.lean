@@ -98,8 +98,7 @@ theorem uA_mul_neg (L : LD d) (u : Fin L.n → AE F E) : uA L u * uA L (-u) = 1 
           + ComplexParameterFamilyContinuity.nilpotentFrameMatrix L (-u)
         = 0 := by
     simp only [ComplexParameterFamilyContinuity.nilpotentFrameMatrix, ← Finset.sum_add_distrib,
-      Pi.neg_apply, ← Matrix.single_add, add_neg_cancel, neg_add_cancel, Matrix.single_zero,
-      Finset.sum_const_zero]
+      Pi.neg_apply, ← Matrix.single_add, add_neg_cancel, Matrix.single_zero, Finset.sum_const_zero]
   rw [e, e]
   calc
     (1 + ComplexParameterFamilyContinuity.nilpotentFrameMatrix L u)
@@ -188,9 +187,8 @@ theorem eA_eq (R : RD d) : eA R = ((R.ε : ℤ) : AE F E) := map_intCast _ _
 theorem cA_eA (R : RD d) : cA σ (eA R) = eA R := by rw [eA_eq]; exact map_intCast _ _
 
 theorem sB_i0i0 (b : Fin L.n → AE F E) : sB R L b L.i₀ L.i₀ = 0 := by
-  simp [sB, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply,
-    fun j => (ComplexParameterFamilyContinuity.em_ne L j),
-    fun j => (ComplexParameterFamilyContinuity.em_ne L j).symm]
+  simp [sB, Matrix.sum_apply, Matrix.add_apply,
+    fun j => (ComplexParameterFamilyContinuity.em_ne L j)]
 
 theorem sB_i0em (b : Fin L.n → AE F E) (l : Fin L.n) : sB R L b L.i₀ (L.em l) = b l := by
   simp [sB, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply,
@@ -204,8 +202,7 @@ theorem siegel_block_embedded_row (b : Fin L.n → AE F E) (k : Fin L.n)
     fun j => (ComplexParameterFamilyContinuity.em_ne L j).symm, L.inj.eq_iff]
 
 theorem sB_emem (b : Fin L.n → AE F E) (k l : Fin L.n) : sB R L b (L.em k) (L.em l) = 0 := by
-  simp [sB, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply,
-    fun j => (ComplexParameterFamilyContinuity.em_ne L j),
+  simp [sB, Matrix.sum_apply, Matrix.add_apply,
     fun j => (ComplexParameterFamilyContinuity.em_ne L j).symm]
 
 theorem sB_cond (b : Fin L.n → AE F E) : sB R L b ∈ kfour.nCond σ d.n R.ε := by
@@ -214,11 +211,10 @@ theorem sB_cond (b : Fin L.n → AE F E) : sB R L b ∈ kfour.nCond σ d.n R.ε 
   ext i j
   rcases idx L i with rfl | ⟨k, rfl⟩ <;> rcases idx L j with rfl | ⟨l, rfl⟩
     <;> simp only [Matrix.transpose_apply, Matrix.neg_apply, Matrix.smul_apply, Matrix.map_apply,
-      sB_i0i0, sB_i0em, siegel_block_embedded_row, sB_emem, map_zero, smul_zero, neg_zero,
-      smul_eq_mul, map_neg, map_mul, cA_eA, cc d, eA_eq]
+      sB_i0i0, sB_i0em, siegel_block_embedded_row, sB_emem, map_zero, smul_eq_mul, map_neg, map_mul,
+      cc d, eA_eq]
   all_goals (try simp only [map_intCast])
-  all_goals
-    first | (simp; done) | (simp only [mul_neg, neg_neg, neg_mul]; rw [← mul_assoc, e2, one_mul])
+  all_goals first | (simp; done) | (simp only [mul_neg, neg_neg]; rw [← mul_assoc, e2, one_mul])
 
 theorem continuous_sB : Continuous (sB R L) := by
   unfold sB
@@ -261,18 +257,6 @@ theorem sig_delta (h : Hyp L nb uM nb' w₁ cM δ) : σ δ = -(((R.ε : ℤ) : E
   have e2 := eps_mulE R
   linear_combination (((R.ε : ℤ) : E)) * hδ - σ δ * e2
 
-theorem sigNeId (hcm : IsCMExt F E σ) : ∃ x, σ x ≠ x := by
-  obtain ⟨-, htc, -, h⟩ := hcm
-  by_contra hn
-  push Not at hn
-  let τ : E →+* ℂ := Classical.arbitrary _
-  refine @IsTotallyComplex.complexEmbedding_not_isReal E _ htc τ (ComplexEmbedding.isReal_iff.2 ?_)
-  ext x
-  rw [ComplexEmbedding.conjugate_coe_eq]
-  have := h τ x
-  rw [hn x] at this
-  exact this.symm
-
 theorem eigLine
     (hcm : IsCMExt F E σ)
     (ε : ℤˣ)
@@ -292,7 +276,7 @@ theorem eigLine
     intro htop
     have h1 : (1 : E) ∈ V := htop ▸ Submodule.mem_top
     rw [hmem, map_one, mul_one] at h1
-    obtain ⟨x, hx⟩ := sigNeId hcm
+    obtain ⟨x, hx⟩ := _root_.GlobalTheory.AdelicU.exists_cm_conj_ne hcm
     have hx' : x ∈ V := htop ▸ Submodule.mem_top
     rw [hmem] at hx'
     apply hx
@@ -349,8 +333,7 @@ theorem eig (h : Hyp L nb uM nb' w₁ cM δ) (y : AE F E) (hy : cA σ y = -(((R.
         linear_combination (-(σ e)) * hε2
       have hl := hline _ he'
       simp only [ellA, LinearMap.coe_comp, Function.comp_apply, LinearMap.baseChange_tmul,
-        AlgEquiv.toLinearMap_apply, Algebra.TensorProduct.rid_tmul, inclR, RingHom.coe_coe,
-        Algebra.TensorProduct.includeRight_apply]
+        AlgEquiv.toLinearMap_apply, Algebra.TensorProduct.rid_tmul, inclR]
       rw [show (Algebra.TensorProduct.includeRight.toRingHom δ : AE F E) = (1 : AF F) ⊗ₜ[F] δ from
           rfl,
         TensorProduct.smul_tmul', smul_eq_mul, mul_one, TensorProduct.smul_tmul]
@@ -368,8 +351,7 @@ theorem eig (h : Hyp L nb uM nb' w₁ cM δ) (y : AE F E) (hy : cA σ y = -(((R.
 theorem ellA_inclR (h : Hyp L nb uM nb' w₁ cM δ) (e : E)
     : ellA δ (inclR (F := F) (AF F) e) ∈ (algebraMap F (AF F)).range := by
   refine ⟨(Classical.epsilon fun ℓ : E →ₗ[F] F => δ ≠ 0 → ℓ δ = 1) e, ?_⟩
-  simp [ellA, inclR, LinearMap.baseChange_tmul, Algebra.TensorProduct.rid_tmul,
-    Algebra.algebraMap_eq_smul_one]
+  simp [ellA, inclR, LinearMap.baseChange_tmul, Algebra.algebraMap_eq_smul_one]
 
 theorem continuous_sM' : Continuous (sM R L) := by
   have hσ := sig2 d

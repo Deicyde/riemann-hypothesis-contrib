@@ -51,7 +51,9 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
 @[expose] public section
 
 open scoped TensorProduct Matrix Classical GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
 
 namespace GlobalTheory.HeisDerivLaws
 
@@ -66,13 +68,12 @@ lemma evI_realAd' (r : ℝ) : evI F (realAd F r) = algebraMap ℝ (mixedEmbeddin
   change (InfiniteAdeleRing.ringEquiv_mixedSpace F) ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (algebraMap ℝ _ r)) = _
   exact (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply _
 
-noncomputable def trPair (w : κ → mixedEmbedding.mixedSpace F) :
-    (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℂ where
+noncomputable def trPair (w : κ → mixedEmbedding.mixedSpace F)
+    : (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℂ where
   toFun y := ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, y i * w i) : ℝ) : ℂ)
   map_add' a b := by
     simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, map_add (f := _), Complex.ofReal_add]
-  map_smul' c a := by
-    simp [smul_mul_assoc, ← Finset.smul_sum, Complex.real_smul]
+  map_smul' c a := by simp [← Finset.smul_sum, Complex.real_smul]
 
 lemma trPair_apply (w y : κ → mixedEmbedding.mixedSpace F) :
     trPair w y = ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, y i * w i) : ℝ) : ℂ) := rfl
@@ -83,7 +84,7 @@ lemma trPair_add (w w' y : κ → mixedEmbedding.mixedSpace F) :
 
 lemma trPair_smul (r : ℝ) (w y : κ → mixedEmbedding.mixedSpace F) :
     trPair (r • w) y = (r : ℂ) * trPair w y := by
-  simp [trPair_apply, mul_smul_comm, ← Finset.smul_sum]
+  simp [trPair_apply, ← Finset.smul_sum]
 
 lemma hasFDerivAt_trPair (w x : κ → mixedEmbedding.mixedSpace F) :
     HasFDerivAt (fun y => trPair w y) (LinearMap.toContinuousLinearMap (trPair w)) x :=
@@ -119,26 +120,60 @@ lemma evV_smul (r : ℝ) (a : κ → AF F) :
 lemma isSymm (f : SInf F κ) (x : κ → mixedEmbedding.mixedSpace F) : IsSymmSndFDerivAt ℝ (⇑f) x :=
   ((f.smooth ⊤).contDiffAt).isSymmSndFDerivAt (by simp)
 
-theorem heis_deriv_laws : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) {α β κ : Type}
-    [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β] [Fintype κ] (JA : Matrix α α (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
-    (JB : Matrix β β (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) (d : Darboux (symp (R := AF F) (cA σ) (-1) JA JB) κ)
-    (D : Matrix α β (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → (SInf F κ →L[ℂ] SInf F κ)),
-    (∀ u, At (evI F) u → ∀ (f : SInf F κ) x, D u f x =
-        fderiv ℝ f x (fun i => evI F ((d.e u).1 i)) - 2 * Real.pi * Complex.I *
-          (Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, x i * evI F ((d.e u).2 i)) : ℝ) * f x) →
-    (∀ u u', At (evI F) u → At (evI F) u' → D (u + u') = D u + D u') ∧
-    (∀ u (r : ℝ), At (evI F) u → D (realAd F r • u) = (r : ℂ) • D u) ∧
-    (∀ u u', At (evI F) u → At (evI F) u' → ∀ f, D u (D u' f) - D u' (D u f) =
-      ((-2 * Real.pi * Complex.I : ℂ) *
-        ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F (symp (R := AF F) (cA σ) (-1) JA JB u u')) : ℝ) : ℂ)) • f) := by
+theorem heis_deriv_laws
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) {α β κ : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+        [Fintype κ]
+        (JA : Matrix α α
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+        (JB : Matrix β β
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+        (d : Darboux (symp (R := AF F) (cA σ) (-1) JA JB) κ)
+        (D : Matrix α β
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+          → (SInf F κ →L[ℂ] SInf F κ)),
+      (∀ u,
+          At (evI F) u
+            → ∀ (f : SInf F κ) x,
+              D u f x
+                = fderiv ℝ f x (fun i => evI F ((d.e u).1 i))
+                  - 2 * Real.pi * Complex.I
+                    * (Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+                        (∑ i, x i * evI F ((d.e u).2 i))
+                      : ℝ)
+                    * f x)
+        → (∀ u u', At (evI F) u → At (evI F) u' → D (u + u') = D u + D u')
+          ∧ (∀ u (r : ℝ), At (evI F) u → D (realAd F r • u) = (r : ℂ) • D u)
+          ∧ (∀ u u',
+            At (evI F) u → At (evI F) u'
+              → ∀ f,
+                D u (D u' f) - D u' (D u f)
+                  = ((-2 * Real.pi * Complex.I : ℂ)
+                      * ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+                            (evI F (symp (R := AF F) (cA σ) (-1) JA JB u u'))
+                          : ℝ)
+                        : ℂ))
+                    • f) := by
   intro F E _ _ _ _ _ σ α β κ _ _ _ _ _ JA JB d D hD
-  have at_add : ∀ u u' : Matrix α β (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)), At (evI F) u → At (evI F) u' → At (evI F) (u + u') :=
-    fun u u' h h' a ha => by rw [smul_add, h a ha, h' a ha, add_zero]
-  have at_smul : ∀ (u : Matrix α β (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) (r : AF F), At (evI F) u → At (evI F) (r • u) :=
-    fun u r h a ha => by rw [smul_comm, h a ha, smul_zero]
-  have hD' : ∀ u, At (evI F) u → ∀ (f : SInf F κ) x, D u f x =
-      fderiv ℝ (⇑f) x (fun i => evI F ((d.e u).1 i)) - 2 * Real.pi * Complex.I *
-        trPair (fun i => evI F ((d.e u).2 i)) x * f x := hD
+  have at_add
+      : ∀ u u' : Matrix α β
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)),
+        At (evI F) u → At (evI F) u' → At (evI F) (u + u') := fun u u' h h' a ha => by
+    rw [smul_add, h a ha, h' a ha, add_zero]
+  have at_smul
+      : ∀ (u : Matrix α β
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+          (r : AF F),
+        At (evI F) u → At (evI F) (r • u) := fun u r h a ha => by
+    rw [smul_comm, h a ha, smul_zero]
+  have hD'
+      : ∀ u,
+        At (evI F) u
+          → ∀ (f : SInf F κ) x,
+            D u f x
+              = fderiv ℝ (⇑f) x (fun i => evI F ((d.e u).1 i))
+                - 2 * Real.pi * Complex.I * trPair (fun i => evI F ((d.e u).2 i)) x * f x :=
+    hD
   refine ⟨fun u u' hu hu' => ?_, fun u r hu => ?_, fun u u' hu hu' f => ?_⟩
   · ext f x
     rw [ContinuousLinearMap.add_apply, SchwartzMap.add_apply, hD' _ (at_add u u' hu hu'), hD' u hu,
@@ -149,15 +184,25 @@ theorem heis_deriv_laws : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
       map_smul, Prod.smul_fst, Prod.smul_snd, evV_smul, evV_smul, map_smul, trPair_smul]
     simp only [Complex.real_smul, smul_eq_mul]
     ring
-  · have e : ⇑(D u f) = fun y => fderiv ℝ (⇑f) y (fun i => evI F ((d.e u).1 i)) -
-        2 * Real.pi * Complex.I * trPair (fun i => evI F ((d.e u).2 i)) y * f y := funext (hD' u hu f)
-    have e' : ⇑(D u' f) = fun y => fderiv ℝ (⇑f) y (fun i => evI F ((d.e u').1 i)) -
-        2 * Real.pi * Complex.I * trPair (fun i => evI F ((d.e u').2 i)) y * f y :=
+  · have e
+        : ⇑(D u f)
+          = fun y =>
+            fderiv ℝ (⇑f) y (fun i => evI F ((d.e u).1 i))
+              - 2 * Real.pi * Complex.I * trPair (fun i => evI F ((d.e u).2 i)) y * f y :=
+      funext (hD' u hu f)
+    have e'
+        : ⇑(D u' f)
+          = fun y =>
+            fderiv ℝ (⇑f) y (fun i => evI F ((d.e u').1 i))
+              - 2 * Real.pi * Complex.I * trPair (fun i => evI F ((d.e u').2 i)) y * f y :=
       funext (hD' u' hu' f)
-    have key : ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
-        (evI F (symp (R := AF F) (cA σ) (-1) JA JB u u')) : ℝ) : ℂ) =
-        trPair (fun i => evI F ((d.e u').2 i)) (fun i => evI F ((d.e u).1 i)) -
-        trPair (fun i => evI F ((d.e u).2 i)) (fun i => evI F ((d.e u').1 i)) := by
+    have key
+        : ((Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+                (evI F (symp (R := AF F) (cA σ) (-1) JA JB u u'))
+              : ℝ)
+            : ℂ)
+          = trPair (fun i => evI F ((d.e u').2 i)) (fun i => evI F ((d.e u).1 i))
+            - trPair (fun i => evI F ((d.e u).2 i)) (fun i => evI F ((d.e u').1 i)) := by
       rw [d.form u u', evI_eq, map_sub]
 
       simp only [dotProduct, map_sum, map_mul, ← evI_eq, trPair_apply]

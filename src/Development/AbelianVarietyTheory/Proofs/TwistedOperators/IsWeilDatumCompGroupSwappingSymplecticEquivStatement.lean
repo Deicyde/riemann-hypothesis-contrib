@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.isWeilDatum_comp_group_swapping_symplectic_equiv
                   IsWeilDatumO ψ S' T' χT χS ω'
                     ∧ ∀ g h (f : WO S T → ℂ),
                       ω' (g, h) (fun u => f (L u)) = fun u => ω (φ' h, φ g) f (L u) := by
-  first
-  | exact @GlobalTheory.SwapWeil.isWeilDatumO_swap
-  | exact GlobalTheory.SwapWeil.isWeilDatumO_swap
-  | (intros; apply GlobalTheory.SwapWeil.isWeilDatumO_swap <;> assumption)
+  first | exact @GlobalTheory.SwapWeil.isWeilDatumO_swap

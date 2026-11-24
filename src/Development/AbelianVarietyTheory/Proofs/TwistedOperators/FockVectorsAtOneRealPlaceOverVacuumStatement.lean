@@ -54,6 +54,7 @@ open MeasureTheory Matrix
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ArchRec
+
 theorem _root_.GlobalTheory.T.fockVectors_at_one_realPlace_over_vacuum
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (τ : D.what₂.Tau),
       IsStdChar D ψ (-1) → IsInfFam θ
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.fockVectors_at_one_realPlace_over_vacuum
                           → ∃ N,
                             Fischer (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f) (ipTh μ 𝓕)
                               (LinearEquiv.refl ℂ _) N) := by
-  first
-  | exact @GlobalTheory.OnePlaceFock.fock_at_one_place
-  | exact GlobalTheory.OnePlaceFock.fock_at_one_place
-  | (intros; apply GlobalTheory.OnePlaceFock.fock_at_one_place <;> assumption)
+  first | exact @GlobalTheory.OnePlaceFock.fock_at_one_place

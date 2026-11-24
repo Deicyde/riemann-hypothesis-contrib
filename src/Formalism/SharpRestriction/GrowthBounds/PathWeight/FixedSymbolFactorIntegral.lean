@@ -246,7 +246,7 @@ theorem core
       have hp : (p : O) ^ c' = X.S.w ^ c' * X.S.w ^ c' := by
         rw [← X.hO.1, ← pow_mul, ← pow_add]; congr 1; omega
       rw [hp, pow_add]
-      simp only [map_mul, C_mul]
+      simp only [map_mul]
       ring
     rw [e2]
     have :=

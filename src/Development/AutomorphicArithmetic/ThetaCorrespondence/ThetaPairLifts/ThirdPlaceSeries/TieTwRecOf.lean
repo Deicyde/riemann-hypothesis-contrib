@@ -43,8 +43,6 @@ import Formalism.SharpRestriction.GlobalSchurBounds.TheoremThreeUnderScaleOfGene
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.Lnk

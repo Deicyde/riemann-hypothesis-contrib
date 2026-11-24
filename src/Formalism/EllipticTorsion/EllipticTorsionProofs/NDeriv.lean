@@ -60,9 +60,11 @@ section Chain
 
 variable {R : Type*} [CommRing R] {σ : Type*}
 
-private theorem coeff_subst_congr_lemma {R : Type*} [CommRing R] {σ : Type*}
-    {a : MvPowerSeries σ R} (ha : MvPowerSeries.constantCoeff a = 0) (n : ℕ) :
-    ∀ e : σ →₀ ℕ, e.degree < n → MvPowerSeries.coeff e (a ^ n) = 0 := by
+private theorem coeff_subst_congr_lemma
+    {R : Type*} [CommRing R]
+    {σ : Type*} {a : MvPowerSeries σ R} (ha : MvPowerSeries.constantCoeff a = 0)
+    (n : ℕ)
+    : ∀ e : σ →₀ ℕ, e.degree < n → MvPowerSeries.coeff e (a ^ n) = 0 := by
   classical
   induction n with
   | zero => intro e he; exact absurd he (Nat.not_lt_zero _)
@@ -80,10 +82,10 @@ private theorem coeff_subst_congr_lemma {R : Type*} [CommRing R] {σ : Type*}
       have h1 : x.1.degree < n := by omega
       rw [ih x.1 h1, zero_mul]
 
-theorem coeff_subst_congr {g h : PowerSeries R} {a : MvPowerSeries σ R}
-    (ha : MvPowerSeries.constantCoeff a = 0) (e : σ →₀ ℕ)
-    (hgh : ∀ k ≤ e.degree, coeff k g = coeff k h) :
-    MvPowerSeries.coeff e (g.subst a) = MvPowerSeries.coeff e (h.subst a) := by
+theorem coeff_subst_congr
+    {g h : PowerSeries R} {a : MvPowerSeries σ R} (ha : MvPowerSeries.constantCoeff a = 0)
+    (e : σ →₀ ℕ) (hgh : ∀ k ≤ e.degree, coeff k g = coeff k h)
+    : MvPowerSeries.coeff e (g.subst a) = MvPowerSeries.coeff e (h.subst a) := by
   classical
   have hs : PowerSeries.HasSubst a := PowerSeries.HasSubst.of_constantCoeff_zero ha
   rw [PowerSeries.coeff_subst hs, PowerSeries.coeff_subst hs]
@@ -92,22 +94,24 @@ theorem coeff_subst_congr {g h : PowerSeries R} {a : MvPowerSeries σ R}
   · rw [hgh k hk]
   · rw [coeff_subst_congr_lemma ha k e (by omega), smul_zero, smul_zero]
 
-theorem pderiv_subst_coe (p : Polynomial R) {a : MvPowerSeries σ R}
-    (ha : MvPowerSeries.constantCoeff a = 0) (i : σ) :
-    MvPowerSeries.pderiv (R := R) i ((p : PowerSeries R).subst a) =
-      (derivative (p : PowerSeries R)).subst a * MvPowerSeries.pderiv (R := R) i a := by
+theorem pderiv_subst_coe
+    (p : Polynomial R) {a : MvPowerSeries σ R} (ha : MvPowerSeries.constantCoeff a = 0) (i : σ)
+    : MvPowerSeries.pderiv (R := R) i ((p : PowerSeries R).subst a)
+      = (derivative (p : PowerSeries R)).subst a * MvPowerSeries.pderiv (R := R) i a := by
   apply Formalism.L2.Th1.C.IntegralMvPolynomialLemmas.pderiv_subst_coe <;> assumption
 
-theorem degree_le_of_mem_antidiagonal [DecidableEq σ] {d : σ →₀ ℕ} {x : (σ →₀ ℕ) × (σ →₀ ℕ)}
-    (hx : x ∈ Finset.HasAntidiagonal.antidiagonal d) : x.1.degree ≤ d.degree := by
+theorem degree_le_of_mem_antidiagonal
+    [DecidableEq σ]
+    {d : σ →₀ ℕ} {x : (σ →₀ ℕ) × (σ →₀ ℕ)} (hx : x ∈ Finset.HasAntidiagonal.antidiagonal d)
+    : x.1.degree ≤ d.degree := by
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
   rw [← hx, map_add (f := _)]
   exact Nat.le_add_right _ _
 
-theorem pderiv_subst (g : PowerSeries R) {a : MvPowerSeries σ R}
-    (ha : MvPowerSeries.constantCoeff a = 0) (i : σ) :
-    MvPowerSeries.pderiv (R := R) i (g.subst a) =
-      (derivative g).subst a * MvPowerSeries.pderiv (R := R) i a := by
+theorem pderiv_subst
+    (g : PowerSeries R) {a : MvPowerSeries σ R} (ha : MvPowerSeries.constantCoeff a = 0) (i : σ)
+    : MvPowerSeries.pderiv (R := R) i (g.subst a)
+      = (derivative g).subst a * MvPowerSeries.pderiv (R := R) i a := by
   apply Formalism.L2.Th1.C.IntegralMvPolynomialLemmas.pderiv_subst <;> assumption
 
 end Chain
@@ -124,30 +128,33 @@ theorem integral_one : Formalism.G.IntegralMv (1 : MvPowerSeries σ K) := by
   rw [MvPowerSeries.coeff_one]
   split_ifs <;> simp
 
-theorem integral_mul {F G : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F)
-    (hG : Formalism.G.IntegralMv G) : Formalism.G.IntegralMv (F * G) := by
+theorem integral_mul
+    {F G : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F) (hG : Formalism.G.IntegralMv G)
+    : Formalism.G.IntegralMv (F * G) := by
   classical
   intro d
   rw [← mem_unitBall, MvPowerSeries.coeff_mul]
   exact Subring.sum_mem _ fun x _ =>
     Subring.mul_mem _ (mem_unitBall.2 (hF _)) (mem_unitBall.2 (hG _))
 
-theorem integral_pow {F : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F) (n : ℕ) :
-    Formalism.G.IntegralMv (F ^ n) := by
+theorem integral_pow {F : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F) (n : ℕ)
+    : Formalism.G.IntegralMv (F ^ n) := by
   induction n with
   | zero => rw [pow_zero]; exact integral_one
   | succ n ih => rw [pow_succ]; exact integral_mul ih hF
 
-theorem integral_pderiv {F : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F) (i : σ) :
-    Formalism.G.IntegralMv (MvPowerSeries.pderiv (R := K) i F) := by
+theorem integral_pderiv {F : MvPowerSeries σ K} (hF : Formalism.G.IntegralMv F) (i : σ)
+    : Formalism.G.IntegralMv (MvPowerSeries.pderiv (R := K) i F) := by
   intro d
   rw [← mem_unitBall, MvPowerSeries.coeff_pderiv]
   refine Subring.mul_mem _ (mem_unitBall.2 (hF _)) ?_
   exact Subring.add_mem _ (natCast_mem _ _) (Subring.one_mem _)
 
-theorem integral_subst {c : PowerSeries K} (hc : ∀ n, ‖coeff n c‖ ≤ 1)
-    {f : MvPowerSeries σ K} (hf0 : MvPowerSeries.constantCoeff f = 0)
-    (hf : Formalism.G.IntegralMv f) : Formalism.G.IntegralMv (c.subst f) := by
+theorem integral_subst
+    {c : PowerSeries K} (hc : ∀ n, ‖coeff n c‖ ≤ 1)
+    {f : MvPowerSeries σ K}
+    (hf0 : MvPowerSeries.constantCoeff f = 0) (hf : Formalism.G.IntegralMv f)
+    : Formalism.G.IntegralMv (c.subst f) := by
   classical
   have hs : PowerSeries.HasSubst f := PowerSeries.HasSubst.of_constantCoeff_zero hf0
   intro e
@@ -173,7 +180,8 @@ theorem N_partial_derivative : NPderiv := by
   obtain ⟨f, hf0, hf, rfl⟩ := hG
   unfold logOnePlus
   rw [SubstitutionCoefficientCongruence.pderiv_subst _ hf0]
-  refine SubstitutionCoefficientCongruence.integral_mul ?_ (SubstitutionCoefficientCongruence.integral_pderiv hf i)
+  refine SubstitutionCoefficientCongruence.integral_mul ?_
+    (SubstitutionCoefficientCongruence.integral_pderiv hf i)
   refine SubstitutionCoefficientCongruence.integral_subst ?_ hf0 hf
   intro n
   unfold PowerSeries.log

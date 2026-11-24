@@ -6,43 +6,37 @@ public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.Poinc
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ArakelovCycleHeights.QpSndStr
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.BlowupProjections.BlowupProjStatement
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArithIntersectionCalculusOfFormMixedProjectionStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NontrivialIsomClassInt
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanIntegrableOnStatement
+public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ArFormExists
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArithIntersectionCalculusOfFormMixedProjection
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothHermCombLine
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanIntegrableOn
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanIntegralEq
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArithmeticVarietyPointDimension
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DimClosureGenericPt
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DimOfIsArithVar
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvProdBlockUnit
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsPermOfCntEq
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightEqOfFullIntersectionSystem
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightEqOfFullIntersectionSystemStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianLineBundleSmooth
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianLineBundleSmoothStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ImageZMCoordIdealOfEq
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCurveIntersectionFormula
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCurveIntersectionFormulaStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleCodimensionOne
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleCodimensionOneStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleOfRationalStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCyclePointDictionary
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCyclePointDictionaryStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleRationalExistsStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleOfRational
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleRationalExists
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleReadCombination
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleReadCombinationStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleReadExists
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleReadExistsStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCycleReadExists
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedPointLengthFormula
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedPointLengthFormulaStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedPolarizationIdentityStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedPolarizationIdentity
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProdNormPull
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ResidueFieldMapPtCoordSndM
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.VertEq
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ArithIntersectionSystemOfPoincareLelongStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ArithIntersectionSystemOfPoincareLelong
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RationalityOfResolutionStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RationalityOfResolutionStatementStatement
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ArakelovCycleHeights.CycleHeightFormulas.CombLineSingle
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ArakelovCycleHeights.HeightsOfFormMix
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NontrivialIsomClassInt
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArithmeticVarietyPointDimension
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ImageZMCoordIdealOfEq
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MixedCyclePointDictionary
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ResidueFieldMapPtCoordSndM
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -108,7 +102,7 @@ theorem formZ_direct
     : Geo.ArithIntersectionSystemStatement → ResKStatement
       → GlobalTheory.ArithmeticHeightTower.FormZ := by
   rintro ⟨II, hII⟩ hK m n X _ i _ D hX ι _ M tM
-  have h₈ := GlobalTheory.T.archimedean_integrable_on hK
+  have h₈ := _root_.GlobalTheory.CompanionTheory.MixZ.archIntegrableOn_of_resK hK
   have h₇ := GlobalTheory.CompanionTheory.MixZ.archIntEq_of_integrable h₈
   have hR := GlobalTheory.CompanionTheory.Ar.Giv.ratR_of_resK hK
   have h₃ := GlobalTheory.CompanionTheory.MixZ.ptDict
@@ -125,8 +119,9 @@ theorem formZ_direct
   have Rc := GlobalTheory.CompanionTheory.MixZ.readComb m n ι M A RA a
   have sC := isSmoothHerm_combLine sA a
   have H :=
-    exists_height h₃ codimOne_holds GlobalTheory.T.mixed_cycle_rational_exists
-      GlobalTheory.T.mixed_cycle_of_rational h₇ h₈ GlobalTheory.CompanionTheory.MixZ.Vert.vertEq
+    exists_height h₃ codimOne_holds _root_.GlobalTheory.CompanionTheory.MixZ.ExRat.existsRat
+      _root_.GlobalTheory.CompanionTheory.MixZ.CycleRat.cycleOfRat h₇ h₈
+      GlobalTheory.CompanionTheory.MixZ.Vert.vertEq
       GlobalTheory.CompanionTheory.MixZ.PtLenProof.ptLen curveInt hR II hII (comb M a)
       (combLine A a) Rc sC
   refine
@@ -147,17 +142,23 @@ theorem mixZ_direct
       → GlobalTheory.ArithmeticHeightTower.MixZ := by
   rintro ⟨II, hII⟩ hK
   have hR := GlobalTheory.T.rationality_of_resolution_statement hK
-  have hI := GlobalTheory.T.archimedean_integrable_on hK
+  have hI := _root_.GlobalTheory.CompanionTheory.MixZ.archIntegrableOn_of_resK hK
   have hE := GlobalTheory.CompanionTheory.MixZ.archIntEq_of_integrable hI
-  exact mixZ_of GlobalTheory.T.mixed_cycle_read_exists GlobalTheory.T.mixed_cycle_read_combination
-    GlobalTheory.T.mixed_cycle_point_dictionary GlobalTheory.T.mixed_cycle_codimension_one
-    GlobalTheory.T.mixed_cycle_rational_exists GlobalTheory.T.mixed_cycle_of_rational hE hI
-    GlobalTheory.T.mixed_polarization_identity hR II hII
-    (GlobalTheory.T.height_eq_of_full_intersection_system
-      GlobalTheory.T.mixed_cycle_point_dictionary GlobalTheory.T.mixed_cycle_codimension_one
-      GlobalTheory.T.mixed_cycle_rational_exists GlobalTheory.T.mixed_cycle_of_rational hE
-      GlobalTheory.CompanionTheory.MixZ.Vert.vertEq GlobalTheory.T.mixed_point_length_formula
-      GlobalTheory.T.mixed_curve_intersection_formula hR II hII)
+  exact mixZ_of _root_.GlobalTheory.CompanionTheory.MixZ.existsRead
+    _root_.GlobalTheory.CompanionTheory.MixZ.readComb
+    _root_.GlobalTheory.CompanionTheory.MixZ.ptDict
+    _root_.GlobalTheory.CompanionTheory.MixZ.codimOne_holds
+    _root_.GlobalTheory.CompanionTheory.MixZ.ExRat.existsRat
+    _root_.GlobalTheory.CompanionTheory.MixZ.CycleRat.cycleOfRat hE hI
+    _root_.GlobalTheory.CompanionTheory.MixZ.PolarProof.polar hR II hII
+    (_root_.GlobalTheory.CompanionTheory.MixZ.heightEq_holds
+      _root_.GlobalTheory.CompanionTheory.MixZ.ptDict
+      _root_.GlobalTheory.CompanionTheory.MixZ.codimOne_holds
+      _root_.GlobalTheory.CompanionTheory.MixZ.ExRat.existsRat
+      _root_.GlobalTheory.CompanionTheory.MixZ.CycleRat.cycleOfRat hE
+      GlobalTheory.CompanionTheory.MixZ.Vert.vertEq
+      _root_.GlobalTheory.CompanionTheory.MixZ.PtLenProof.ptLen
+      _root_.GlobalTheory.CompanionTheory.MixZ.curveInt hR II hII)
 
 end GlobalTheory.CompanionTheory.MixZ
 
@@ -177,22 +178,26 @@ theorem height_eq_direct
                     Geo.IsArithVar (ptIdeal x) d
                       → h x = II (Fin (m + 1)) (Bk n) (ptIdeal x) d (fun _ => A) := by
   intro hK II hII m n M A hA h H x d hd
-  have hI := GlobalTheory.T.archimedean_integrable_on hK
+  have hI := _root_.GlobalTheory.CompanionTheory.MixZ.archIntegrableOn_of_resK hK
   have hE := GlobalTheory.CompanionTheory.MixZ.archIntEq_of_integrable hI
   have hH : GlobalTheory.CompanionTheory.MixZ.HeightEq II :=
-    GlobalTheory.T.height_eq_of_full_intersection_system GlobalTheory.T.mixed_cycle_point_dictionary
-      GlobalTheory.T.mixed_cycle_codimension_one GlobalTheory.T.mixed_cycle_rational_exists
-      GlobalTheory.T.mixed_cycle_of_rational hE GlobalTheory.CompanionTheory.MixZ.Vert.vertEq
-      GlobalTheory.T.mixed_point_length_formula GlobalTheory.T.mixed_curve_intersection_formula
+    _root_.GlobalTheory.CompanionTheory.MixZ.heightEq_holds
+      _root_.GlobalTheory.CompanionTheory.MixZ.ptDict
+      _root_.GlobalTheory.CompanionTheory.MixZ.codimOne_holds
+      _root_.GlobalTheory.CompanionTheory.MixZ.ExRat.existsRat
+      _root_.GlobalTheory.CompanionTheory.MixZ.CycleRat.cycleOfRat hE
+      GlobalTheory.CompanionTheory.MixZ.Vert.vertEq
+      _root_.GlobalTheory.CompanionTheory.MixZ.PtLenProof.ptLen
+      _root_.GlobalTheory.CompanionTheory.MixZ.curveInt
       (GlobalTheory.T.rationality_of_resolution_statement hK) II hII
   have hX := isArithVar_mpStr m n
   obtain ⟨Z, i, _, _, rfl⟩ := exists_isClosedImmersion_genericPoint x
   haveI : IsNoetherian Z := hX.isNoetherian_sub i
   have e :=
-    hH m n M A hA (GlobalTheory.T.hermitian_line_bundle_smooth m n M A hA) Z i _
-      (H.restrict hX i rfl) (genericPoint Z) d
+    hH m n M A hA (_root_.GlobalTheory.CompanionTheory.MPSmooth.smooth_of_isHermRep m n M A hA) Z i
+      _ (H.restrict hX i rfl) (genericPoint Z) d
       ((GlobalTheory.CompanionTheory.MixZ.dim_closure_generic Z).trans
-        (dim_of_isArithVar GlobalTheory.T.mixed_cycle_point_dictionary i hd))
+        (dim_of_isArithVar _root_.GlobalTheory.CompanionTheory.MixZ.ptDict i hd))
   refine e.trans ?_
   rw [GlobalTheory.CompanionTheory.MixZ.cycVal]
   exact if_pos hd.2.2.1
@@ -257,13 +262,14 @@ theorem arCalc_direct
     (hP : GlobalTheory.CompanionTheory.Ar.Pub.PoincareLelong)
     (hR : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement)
     : GlobalTheory.Published.ArCalc :=
-  have H := GlobalTheory.T.arith_intersection_system_of_poincare_lelong hP hR
+  have H :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Pub.arithIntersectionSystem_of_poincareLelong_resK hP hR
   have P :=
     GlobalTheory.ArithmeticHeightTower.Read1.bridge3
       (GlobalTheory.ArithmeticHeightTower.FormZc.formZ_direct H hR)
       (GlobalTheory.CompanionTheory.MixZ.mixZ_direct H hR)
       (GlobalTheory.CompanionTheory.MPDict.projQ_direct H hR)
-  GlobalTheory.T.arithIntersectionCalculus_of_form_mixed_projection P.1 P.2.1 P.2.2
+  _root_.GlobalTheory.Published.arCalc_of_form_mix_projection P.1 P.2.1 P.2.2
 
 theorem cycleHeights_direct
     (hP : GlobalTheory.CompanionTheory.Ar.Pub.PoincareLelong)

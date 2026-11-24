@@ -48,8 +48,6 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Stable
 
 @[expose] public section
 
-
-
 section
 section
 noncomputable section

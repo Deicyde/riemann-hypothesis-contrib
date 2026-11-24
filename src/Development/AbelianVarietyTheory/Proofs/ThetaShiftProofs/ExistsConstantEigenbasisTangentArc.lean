@@ -8,15 +8,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCompletionPointClosedPointMemOfSmooth
 public import Development.AbelianVarietyTheory.Proofs.HermitianTraceForms.ExistsIsComplEigenSubOfValuationRing
 public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.HomBaseChangeBijectiveOfLeNilradical
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsPushEquiv
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.CommonEigenvectorsFlatBaseChange
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroup
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroupStatement
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArc
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieCombStatement
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsPullbackPullbackMap
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsLieBasisBaseChange
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsLieBasisEigen
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsPushEquiv
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArc
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieComb
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -438,7 +437,7 @@ theorem exists_arcBasis
   intro hL _ E _ _ _ H Dw l Xo c O _ β Y A _ _ _ _ b a χ W _ _ ρ f hf hρ ⟨r, z, hr, hz⟩
   have hG := hL.globalFns
   obtain ⟨g, e, v, M, hev, hv, -, hM⟩ :=
-    T.exists_constantLieBasis_arcGroup hG E H Dw l Xo c O β Y A b a χ W
+    _root_.GlobalTheory.ConstLie.exists_const_basis hG E H Dw l Xo c O β Y A b a χ W
   have := W.t.semi.smooth
   let F := AlgebraicClosure (FractionRing A)
   have :=
@@ -481,11 +480,12 @@ theorem exists_arcBasis
       exact ⟨u, hu, flat (PowerSeries A)⟩
   choose u hu hu' using key
   choose ν hν using fun τ k => ConstLie.exists_gtComb (u τ k) e
-  have img : ∀ τ k, LieImg W (ν τ k) (prodPts (fun j => PowerSeries.C (R := A) (u τ k j)) v) :=
-    fun τ k =>
-      (T.lieImg_iff_isLieComb_of_gtComb hG E H Dw l Xo c O β Y A b a χ W g _ e _ v _
-        (fun i => (hev i).2)
-        (hν τ k)).2 ((Chart.isLieComb_iff _ _ _).2 rfl)
+  have img
+      : ∀ τ k,
+        LieImg W (ν τ k) (prodPts (fun j => PowerSeries.C (R := A) (u τ k j)) v) := fun τ k =>
+    (_root_.GlobalTheory.ConstLin.lieImg_iff_isLieComb hG E H Dw l Xo c O β Y A b a χ W g _ e _ v _
+      (fun i => (hev i).2)
+      (hν τ k)).2 ((Chart.isLieComb_iff _ _ _).2 rfl)
   refine ⟨
     ν,
     fun τ k =>

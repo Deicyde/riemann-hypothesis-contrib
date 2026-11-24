@@ -75,7 +75,7 @@ theorem UpperTheory.V.Z.Gam.secDiff : UpperTheory.V.Z.Gam.SecDiff := by
   have hc : c = 1 := by
     have h0 := congrArg (Polynomial.eval 0) h
     simp [Polynomial.eval_comp, hP, hP'] at h0
-    first | exact h0.symm | exact h0
+    first | exact h0.symm
   subst hc
   have hPne : P ≠ 0 := by
     rintro rfl

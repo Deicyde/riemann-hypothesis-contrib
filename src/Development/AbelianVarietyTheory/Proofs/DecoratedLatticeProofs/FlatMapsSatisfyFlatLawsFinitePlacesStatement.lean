@@ -41,9 +41,7 @@ import Mathlib.Topology.Sheaves.Init
 @[expose] public section
 
 open Formalism.BasicNotions
+
 theorem _root_.GlobalTheory.T.flatMapsSatisfyFlatLaws_finitePlaces
     : ∀ D : D7, GlobalTheory.FinPl.FlatLaws D := by
-  first
-  | exact @GlobalTheory.FinPl.flatLaws_all
-  | exact GlobalTheory.FinPl.flatLaws_all
-  | (intros; apply GlobalTheory.FinPl.flatLaws_all <;> assumption)
+  first | exact @GlobalTheory.FinPl.flatLaws_all

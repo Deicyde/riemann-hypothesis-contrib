@@ -134,7 +134,6 @@ theorem hR_self
     show (1 : R) ⊗ₜ[F] σ (J j i) = (1 : R) ⊗ₜ[F] J i j
     rw [hJ.1]
   have hs : sigR R σ (hR R σ J x x) = hR R σ J x x := by
-
     simp only [hR, Formalism.UG.hform, map_sum, map_mul, sigR_sigR R h]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

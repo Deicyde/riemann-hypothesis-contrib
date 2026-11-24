@@ -3,7 +3,8 @@ module
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SmallPair
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HeisenbergCombinationDisjointPlacesCommuteVacua
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceBaseVacuumDatumExistsUniqueStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceChangeBaseVacuumHeisenbergCombinationStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CombAtSingleZero
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceChangeBaseVacuumHeisenbergCombination
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -113,8 +114,8 @@ theorem over_comb
     {g f : WO S T → ℂ} (h : Over ψ (α i) (β i) LS LT g (Ψ i) f)
     : Over ψ (α i) (β i) LS LT (comb ψ S T d g) (Ψ i) (comb ψ S T d f) := by
   obtain ⟨c, hc, hcf⟩ :=
-    (GlobalTheory.T.splitPlace_changeBaseVacuum_heisenbergCombination D k (p i) n n' ψ hψ hu S T
-      (α i) (β i) LS LS LT LT h.1 h.2.1 h.1 h.2.1).2 (Ψ i) h.2.2.2.1
+    (_root_.GlobalTheory.FinPl.Rebase.rebase D k (p i) n n' ψ hψ hu S T (α i) (β i) LS LS LT LT h.1
+      h.2.1 h.1 h.2.1).2 (Ψ i) h.2.2.2.1
   have M := GlobalTheory.DisjComb.main D ψ hψ S T Q (· = (p i).v) (fun x hx hx' => hQ (hx' ▸ hx))
   have hf : f = comb ψ S T c g := over_unique hψ h (hcf g h.2.2.1)
   rw [hf, M.1 d c hd hc g]
@@ -155,8 +156,8 @@ theorem exists_comb
     obtain ⟨hi, hJ'⟩ := List.nodup_cons.1 hJ
     obtain ⟨c', hc', hf'⟩ := ih hJ'
     obtain ⟨c, hc, hcf⟩ :=
-      (GlobalTheory.T.splitPlace_changeBaseVacuum_heisenbergCombination D k (p i) n n' ψ hψ (hu i) S
-        T (α i) (β i) LS LS LT LT hLS hLT hLS hLT).2 (Ψ i) (hΨ i)
+      (_root_.GlobalTheory.FinPl.Rebase.rebase D k (p i) n n' ψ hψ (hu i) S T (α i) (β i) LS LS LT
+        LT hLS hLT hLS hLT).2 (Ψ i) (hΨ i)
     have M :=
       GlobalTheory.DisjComb.main D ψ hψ S T (fun x => ∃ j ∈ J, x = (p j).v) (· = (p i).v) (by
         rintro x ⟨j, hj, rfl⟩ hx

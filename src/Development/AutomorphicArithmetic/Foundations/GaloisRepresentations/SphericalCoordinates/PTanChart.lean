@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -73,14 +74,12 @@ theorem UpperTheory.Gal.W2.tanChart_of
     intro ω
     set ω' := ω - ∑ l, (φ ω) l • KaehlerDifferential.D ℂ (Sec s' W) (e₁ l) with hω'
     have hφω' : φ ω' = 0 := by
-
       rw [hω', map_sub, map_sum]
       simp only [map_smul, hφ2']
       funext i
       simp [Finset.sum_apply, Pi.single_apply]
     obtain ⟨m, b, ω'', hb0, hωeq⟩ := hφ4 ω' hφω'
     have hψω' : ψ ω' = 0 := by
-
       rw [hωeq, map_sum]
       refine Finset.sum_eq_zero (fun i _ => ?_)
       rw [hψ1, hb0 i, zero_smul]

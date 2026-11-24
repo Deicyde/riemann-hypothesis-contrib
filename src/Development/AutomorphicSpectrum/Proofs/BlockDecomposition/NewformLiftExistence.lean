@@ -144,7 +144,7 @@ theorem heckeCharacter_ofFinite_mul
     · rw [show pOf w = prime w from absNorm_asIdeal w]
       exact hw
   rw [← key, HeckeCharacter.toIdele_apply, ← Circle.coe_mul, ← map_mul, ← map_mul, ← map_mul]
-  simp [y]
+  simp
 
 theorem f0 : Ad3.R.B0 → Ad3.R.F0 := fun _ _ _ χ => ⟨
   heckeCharacter χ,

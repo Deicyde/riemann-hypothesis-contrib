@@ -59,7 +59,6 @@ open scoped TensorProduct
 
 noncomputable section
 
-
 namespace GlobalTheory.NonSplitLevel
 
 theorem comp_swapCast

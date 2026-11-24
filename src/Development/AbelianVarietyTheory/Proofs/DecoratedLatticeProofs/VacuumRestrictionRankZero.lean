@@ -52,9 +52,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.RankZeroVac
 
 variable {D : D7}

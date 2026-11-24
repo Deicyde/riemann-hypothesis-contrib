@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AcrisTorsionFreeCompleteFrobeniusPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrimePowDvdTiltUniformizerPowAcrisEventuallyStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AcrisTorsionFreeCompleteFrobeniusProperties
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrimePowDvdTiltUniformizerPowAcrisEventually
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -89,8 +89,7 @@ theorem GlobalTheory.BKLim.acris_frob_eq_zero
         → (l : Per.Acris l) ^ c • D₀ = F * D₀.map (phiA l) * F'
         → D₀ = 0 := by
   intro l _ K bk d c D₀ F F' hdiv hfr
-  obtain ⟨htor, hcomp, -, hphi, -⟩ :=
-    GlobalTheory.T.acris_torsionFree_complete_frobenius_properties l K bk
+  obtain ⟨htor, hcomp, -, hphi, -⟩ := _root_.GlobalTheory.AcrisFrobE.main l K bk
   set u := ((algebraMap (Ainf l) (Per.Acris l)).comp bk.ev) X with hu
   have hφu : phiA l u = u ^ l := by
     rw [hu, RingHom.comp_apply, hphi, ← bk.ev_frob]
@@ -106,8 +105,7 @@ theorem GlobalTheory.BKLim.acris_frob_eq_zero
     | zero =>
       refine ⟨Matrix.of fun i j => (hdiv i j).choose, ?_⟩
       ext i j
-      simp only [mul_zero, pow_zero, pow_one, one_smul, Matrix.smul_apply, Matrix.of_apply,
-        smul_eq_mul]
+      simp only [mul_zero, pow_zero, pow_one, Matrix.smul_apply, Matrix.of_apply, smul_eq_mul]
       rw [one_mul]
       exact (hdiv i j).choose_spec
     | succ n ih =>
@@ -130,7 +128,7 @@ theorem GlobalTheory.BKLim.acris_frob_eq_zero
   ext i j
   have hH : IsHausdorff (Ideal.span {(l : Per.Acris l)}) (Per.Acris l) := hcomp.toIsHausdorff
   refine eq_zero_of_forall_dvd _ hH _ fun M => ?_
-  obtain ⟨n₀, hn₀⟩ := GlobalTheory.T.primePow_dvd_tiltUniformizer_pow_acris_eventually l K bk c M
+  obtain ⟨n₀, hn₀⟩ := _root_.GlobalTheory.AcrisPow.main l K bk c M
   obtain ⟨N, hN⟩ := key n₀
   obtain ⟨y, hy⟩ := hn₀ n₀ le_rfl
   have hent : (l : Per.Acris l) ^ (c * n₀) * D₀ i j = u ^ (l ^ n₀) * N i j := by

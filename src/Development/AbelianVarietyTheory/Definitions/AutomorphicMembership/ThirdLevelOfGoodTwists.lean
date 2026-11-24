@@ -49,9 +49,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 variable
   {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base}
   {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}

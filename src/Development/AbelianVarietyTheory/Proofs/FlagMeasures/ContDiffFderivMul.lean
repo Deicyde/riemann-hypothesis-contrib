@@ -50,6 +50,7 @@ import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ActSingleNeZero
 import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.EigenfunctionFiniteCoefficients
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactHaarRightInvariantInst
 
 @[expose] public section
 
@@ -265,14 +266,14 @@ theorem garding_step
     exact Matrix.coe_units_inv _
   have he : Continuous e := by
     rw [(isClosedEmbeddingMatrix n ε).1.isInducing.continuous_iff]
-    exact GlobalTheory.GardingVec.continuous_exp_curve X
+    exact _root_.Formalism.REAL.continuous_exp_real_smul X
   have he0 : e 0 = 1 := by
     apply Subtype.ext
     apply Units.ext
     show umat (e 0) = 1
     rw [hev]
     simp
-  have hcE := GlobalTheory.GardingVec.continuous_exp_curve (-X)
+  have hcE := _root_.Formalism.REAL.continuous_exp_real_smul (-X)
   have key :=
     hasDerivAt_orbit (muG ε)
       (fun g => σ (umat g))

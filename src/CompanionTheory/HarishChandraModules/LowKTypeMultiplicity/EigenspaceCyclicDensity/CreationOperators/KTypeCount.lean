@@ -56,25 +56,28 @@ noncomputable section
 
 namespace CompanionTheory.D.LK
 
-open GlobalTheory.CompanionTheory.DSNormLt (sig sig_anti sig_mul pair_eq term_le normSq_le pair_lt abs_sig rho_eq)
+open GlobalTheory.CompanionTheory.DSNormLt
+  (sig sig_anti sig_mul pair_eq term_le normSq_le pair_lt abs_sig rho_eq)
 open PI.UpqRep
 
 variable {n : ℕ}
 
 def ind (A : Finset (Pos n)) (a b : Fin n) : ℝ := ∑ i ∈ A, if i.1 = (a, b) then 1 else 0
 
-theorem ind_eq (A : Finset (Pos n)) (a b : Fin n) :
-    ind A a b = if h : a < b then (if (⟨(a, b), h⟩ : Pos n) ∈ A then 1 else 0) else 0 := by
+theorem ind_eq (A : Finset (Pos n)) (a b : Fin n)
+    : ind A a b = if h : a < b then (if (⟨(a, b), h⟩ : Pos n) ∈ A then 1 else 0) else 0 := by
   unfold ind
   split_ifs with h h1
-  · rw [Finset.sum_eq_single_of_mem _ h1 fun i _ hi => if_neg fun e => hi (Subtype.ext e), if_pos rfl]
+  · rw [Finset.sum_eq_single_of_mem _ h1 fun i _ hi => if_neg fun e => hi (Subtype.ext e),
+      if_pos rfl]
   · exact Finset.sum_eq_zero fun i hi => if_neg fun e => h1 ((Subtype.ext e : i = ⟨(a, b), h⟩) ▸ hi)
   · exact Finset.sum_eq_zero fun i _ => if_neg fun e => h (by have := i.2; rwa [e] at this)
 
 theorem wt_eq (A : Finset (Pos n)) (c : Fin n) : wt A c = ∑ b, (ind A c b - ind A b c) := by
   rw [Finset.sum_sub_distrib]
   unfold wt ind
-  rw [Finset.sum_comm, Finset.sum_comm (s := univ), card_filter, card_filter, Nat.cast_sum, Nat.cast_sum]
+  rw [Finset.sum_comm, Finset.sum_comm (s := univ), card_filter, card_filter, Nat.cast_sum,
+    Nat.cast_sum]
   congr 1 <;> refine Finset.sum_congr rfl fun i _ => ?_
   · simp only [Prod.ext_iff, ite_and]
     split_ifs <;> simp
@@ -83,7 +86,7 @@ theorem wt_eq (A : Finset (Pos n)) (c : Fin n) : wt A c = ∑ b, (ind A c b - in
 
 def sc (ε : Fin n → Bool) (a b : Fin n) : ℝ := if ε a = ε b then sig a b else 0
 
-theorem sc_anti (ε : Fin n → Bool) (a b : Fin n) : sc ε b a = -sc ε a b := by
+theorem sc_anti (ε : Fin n → Bool) (a b : Fin n) : sc ε b a = - sc ε a b := by
   unfold sc
   by_cases h : ε a = ε b
   · rw [if_pos h, if_pos h.symm, sig_anti]
@@ -100,20 +103,29 @@ theorem rhoC_eq (ε : Fin n → Bool) (a : Fin n) : rhoC ε a = (∑ b, sc ε a 
   · simp [h]
   · by_cases h2 : ε b = ε a <;> simp [h, h.not_gt, h2, eq_comm (a := ε a)]
 
-theorem exists_sort (ε : Fin n → Bool) (κ : Fin n → ℝ) : ∃ w : Equiv.Perm (Fin n), (∀ c, ε (w c) = ε c) ∧
-    ∀ a b, a < b → ε a = ε b → κ (w b) ≤ κ (w a) := by
-  obtain ⟨w, hw, hmin⟩ := Finset.exists_min_image (univ.filter fun w : Equiv.Perm (Fin n) => ∀ c, ε (w c) = ε c)
-    (fun w => ∑ c, κ (w c) * ((c : ℕ) : ℝ)) ⟨1, by simp⟩
+theorem exists_sort (ε : Fin n → Bool) (κ : Fin n → ℝ)
+    : ∃ w : Equiv.Perm (Fin n),
+      (∀ c, ε (w c) = ε c) ∧ ∀ a b, a < b → ε a = ε b → κ (w b) ≤ κ (w a) := by
+  obtain ⟨w, hw, hmin⟩ :=
+    Finset.exists_min_image (univ.filter fun w : Equiv.Perm (Fin n) => ∀ c, ε (w c) = ε c)
+      (fun w => ∑ c, κ (w c) * ((c : ℕ) : ℝ))
+      ⟨1, by simp⟩
   have hw' := (mem_filter.1 hw).2
   refine ⟨w, hw', fun a b hab h => ?_⟩
-  have := hmin (w * Equiv.swap a b) (mem_filter.2 ⟨mem_univ _, fun c => by
-    rw [Equiv.Perm.mul_apply, hw', Equiv.swap_apply_def]
-    split_ifs with h1 h2
-    · rw [h1, h]
-    · rw [h2, h]
-    · rfl⟩)
-  have e : ∑ c, κ ((w * Equiv.swap a b) c) * ((c : ℕ) : ℝ) - ∑ c, κ (w c) * ((c : ℕ) : ℝ) =
-      (κ (w a) - κ (w b)) * (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
+  have :=
+    hmin (w * Equiv.swap a b)
+      (mem_filter.2 ⟨
+        mem_univ _,
+        fun c => by
+          rw [Equiv.Perm.mul_apply, hw', Equiv.swap_apply_def]
+          split_ifs with h1 h2
+          · rw [h1, h]
+          · rw [h2, h]
+          · rfl
+      ⟩)
+  have e
+      : ∑ c, κ ((w * Equiv.swap a b) c) * ((c : ℕ) : ℝ) - ∑ c, κ (w c) * ((c : ℕ) : ℝ)
+        = (κ (w a) - κ (w b)) * (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
     rw [← Finset.sum_sub_distrib, Finset.sum_eq_add_of_mem a b (mem_univ _) (mem_univ _) hab.ne]
     · simp only [Equiv.Perm.mul_apply, Equiv.swap_apply_left, Equiv.swap_apply_right]; ring
     · intro c _ hc
@@ -122,16 +134,21 @@ theorem exists_sort (ε : Fin n → Bool) (κ : Fin n → ℝ) : ∃ w : Equiv.P
   have : 0 ≤ (κ (w a) - κ (w b)) * (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by rw [← e]; linarith
   linarith [nonneg_of_mul_nonneg_left this hp]
 
-theorem sorted_weight_eq_of_norm_eq (ε : Fin n → Bool) (κ μ ν : Fin n → ℝ)
-    (C : Finset (Pos n)) (hC : ∀ i ∈ C, cpt ε i) (w : Equiv.Perm (Fin n))
-    (hw : ∀ c, ε (w c) = ε c) (hs : ∀ a b, a < b → ε a = ε b → κ (w b) ≤ κ (w a))
-    (hdom : CDom ε (μ ∘ w) ν) (hκ : ∀ a, κ a = μ a + (wt C a - rhoC ε a))
-    (hn : nsq (ν + rhoC ε) = nsq κ) :
-    ∀ a, κ (w a) = ν a + rhoC ε a := by
+theorem sorted_weight_eq_of_norm_eq
+    (ε : Fin n → Bool)
+    (κ μ ν : Fin n → ℝ)
+    (C : Finset (Pos n)) (hC : ∀ i ∈ C, cpt ε i)
+    (w : Equiv.Perm (Fin n)) (hw : ∀ c, ε (w c) = ε c)
+    (hs : ∀ a b, a < b → ε a = ε b → κ (w b) ≤ κ (w a)) (hdom : CDom ε (μ ∘ w) ν)
+    (hκ : ∀ a, κ a = μ a + (wt C a - rhoC ε a)) (hn : nsq (ν + rhoC ε) = nsq κ)
+    : ∀ a, κ (w a) = ν a + rhoC ε a := by
   obtain ⟨m, hm, hm2⟩ := hdom
   have i1 : ∑ a, κ (w a) * μ (w a) ≤ ∑ a, κ (w a) * ν a := by
     rw [← sub_nonneg, ← Finset.sum_sub_distrib]
-    have e : ∀ a, κ (w a) * ν a - κ (w a) * μ (w a) = ∑ c, ∑ d, (m c d : ℝ) * (κ (w a) * root c d a) := fun a => by
+    have e
+        : ∀ a,
+          κ (w a) * ν a - κ (w a) * μ (w a)
+            = ∑ c, ∑ d, (m c d : ℝ) * (κ (w a) * root c d a) := fun a => by
       have := congrFun hm2 a
       simp only [Pi.sub_apply, Function.comp, Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at this
       rw [← mul_sub, this, Finset.mul_sum]
@@ -147,8 +164,8 @@ theorem sorted_weight_eq_of_norm_eq (ε : Fin n → Bool) (κ μ ν : Fin n → 
     by_cases h0 : m c d = 0
     · simp [h0]
     · refine mul_nonneg (Nat.cast_nonneg _) ?_
-      simp only [root, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib, Pi.single_apply, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', mem_univ, if_true, sub_nonneg]
+      simp only [root, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib, Pi.single_apply, mul_ite,
+        mul_one, mul_zero, Finset.sum_ite_eq', mem_univ, if_true, sub_nonneg]
       exact hs c d (hm c d h0).1 (hm c d h0).2
   let tC : Fin n → Fin n → ℝ := fun a b => 2 * (ind C a b - ind C b a) - sc ε a b
   have htC : ∀ a b, |tC a b| ≤ if ε a = ε b then 1 else 0 := fun a b => by
@@ -157,40 +174,46 @@ theorem sorted_weight_eq_of_norm_eq (ε : Fin n → Bool) (κ μ ν : Fin n → 
     · simp only [dif_pos h, dif_neg h.not_gt, if_pos h]
       by_cases h1 : (⟨(a, b), h⟩ : Pos n) ∈ C
       · have : ε a = ε b := hC _ h1
-        simp [h1, this]; norm_num
+        simp [h1, this]
+        norm_num
       · simp only [h1, if_false]; split_ifs <;> simp
     · subst h; simp
     · simp only [dif_pos h, dif_neg h.not_gt, if_pos h, if_neg h.not_gt]
       by_cases h1 : (⟨(b, a), h⟩ : Pos n) ∈ C
       · have : ε a = ε b := (hC _ h1).symm
-        simp [h1, this]; norm_num
+        simp [h1, this]
+        norm_num
       · simp only [h1, if_false]; split_ifs <;> simp
   have i2 : ∑ a, κ a * (wt C a - rhoC ε a) ≤ ∑ a, κ (w a) * rhoC ε a := by
     have p1 := pair_eq tC (fun a b => by simp only [tC]; rw [sc_anti ε a b]; ring) κ
     have p2 := pair_eq (sc ε) (sc_anti ε) fun a => κ (w a)
     have e : ∀ a, wt C a - rhoC ε a = (∑ b, tC a b) / 2 := fun a => by
       simp only [tC]
-      rw [wt_eq, rhoC_eq, Finset.sum_sub_distrib (f := fun b => 2 * (ind C a b - ind C b a)), ← Finset.mul_sum]
+      rw [wt_eq, rhoC_eq, Finset.sum_sub_distrib (f := fun b => 2 * (ind C a b - ind C b a)),
+        ← Finset.mul_sum]
       ring
     simp only [e]
     simp only [rhoC_eq]
     have : ∑ a, ∑ b, tC a b * (κ a - κ b) ≤ ∑ a, ∑ b, sc ε a b * (κ (w a) - κ (w b)) := by
-      calc _ ≤ ∑ a, ∑ b, (if ε a = ε b then 1 else 0) * |κ a - κ b| :=
-            Finset.sum_le_sum fun a _ => Finset.sum_le_sum fun b _ => (le_abs_self _).trans (by
-              rw [abs_mul]; exact mul_le_mul_of_nonneg_right (htC a b) (abs_nonneg _))
+      calc
+        _ ≤ ∑ a, ∑ b, (if ε a = ε b then 1 else 0) * |κ a - κ b| :=
+          Finset.sum_le_sum fun a _ =>
+            Finset.sum_le_sum fun b _ =>
+              (le_abs_self _).trans
+                (by rw [abs_mul]; exact mul_le_mul_of_nonneg_right (htC a b) (abs_nonneg _))
         _ = ∑ a, ∑ b, (if ε (w a) = ε (w b) then 1 else 0) * |κ (w a) - κ (w b)| := by
-            rw [← Equiv.sum_comp w]
-            refine Finset.sum_congr rfl fun a _ => ?_
-            rw [← Equiv.sum_comp w]
+          rw [← Equiv.sum_comp w]
+          refine Finset.sum_congr rfl fun a _ => ?_
+          rw [← Equiv.sum_comp w]
         _ = _ := by
-            refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-            rw [hw, hw, sc, sig]
-            by_cases h : ε a = ε b
-            · rcases lt_trichotomy a b with h1 | h1 | h1
-              · simp [h, h1, abs_of_nonneg (sub_nonneg.2 (hs a b h1 h))]
-              · simp [h1]
-              · simp [h, h1, h1.not_gt, abs_of_nonpos (sub_nonpos.2 (hs b a h1 h.symm))]
-            · simp [h]
+          refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+          rw [hw, hw, sc, sig]
+          by_cases h : ε a = ε b
+          · rcases lt_trichotomy a b with h1 | h1 | h1
+            · simp [h, h1, abs_of_nonneg (sub_nonneg.2 (hs a b h1 h))]
+            · simp [h1]
+            · simp [h, h1, h1.not_gt, abs_of_nonpos (sub_nonpos.2 (hs b a h1 h.symm))]
+          · simp [h]
     linarith
   have e1 : ∑ a, κ a * κ a = ∑ a, κ (w a) * μ (w a) + ∑ a, κ a * (wt C a - rhoC ε a) := by
     rw [Equiv.sum_comp w fun a => κ a * μ a, ← Finset.sum_add_distrib]
@@ -198,8 +221,10 @@ theorem sorted_weight_eq_of_norm_eq (ε : Fin n → Bool) (κ μ ν : Fin n → 
     rw [hκ a]
     ring
   have e2 : ∑ a, κ (w a) * κ (w a) = ∑ a, κ a * κ a := Equiv.sum_comp w fun a => κ a * κ a
-  have e3 : ∑ a, (κ (w a) - (ν a + rhoC ε a)) ^ 2 = ∑ a, κ (w a) * κ (w a) - 2 * ∑ a, κ (w a) * ν a -
-      2 * ∑ a, κ (w a) * rhoC ε a + ∑ a, (ν a + rhoC ε a) * (ν a + rhoC ε a) := by
+  have e3
+      : ∑ a, (κ (w a) - (ν a + rhoC ε a)) ^ 2
+        = ∑ a, κ (w a) * κ (w a) - 2 * ∑ a, κ (w a) * ν a - 2 * ∑ a, κ (w a) * rhoC ε a
+          + ∑ a, (ν a + rhoC ε a) * (ν a + rhoC ε a) := by
     simp only [Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun a _ => by ring
   have hn' : ∑ a, (ν a + rhoC ε a) * (ν a + rhoC ε a) = ∑ a, κ a * κ a := hn
@@ -214,12 +239,14 @@ theorem K_type_count : NumK := by
   set κ := lowK ε lam + rhoC ε - wt B with hκ
   set μ := lowK ε lam + (2 : ℝ) • rhoC ε - wt B - wt C with hμ
   obtain ⟨w, hw, hs⟩ := exists_sort ε κ
-  have hκw := sorted_weight_eq_of_norm_eq ε κ μ ν C hC w hw hs (hdom w hw)
-    (fun a => by simp only [hκ, hμ, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]; ring) hn
+  have hκw :=
+    sorted_weight_eq_of_norm_eq ε κ μ ν C hC w hw hs (hdom w hw)
+      (fun a => by simp only [hκ, hμ, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]; ring)
+      hn
   let t : Fin n → Fin n → ℝ := fun a b =>
     (sig a b - sc ε a b) - 2 * (ind B a b - ind B b a) + sc ε (w.symm a) (w.symm b)
   have hws : ∀ c, ε (w.symm c) = ε c := fun c => by rw [← hw, Equiv.apply_symm_apply]
-  have ta : ∀ a b, t b a = -t a b := fun a b => by
+  have ta : ∀ a b, t b a = - t a b := fun a b => by
     simp only [t]; rw [sig_anti a b, sc_anti ε a b, sc_anti ε (w.symm a)]; ring
   have tb : ∀ a b, a < b → |t a b| ≤ 1 := fun a b h => by
     simp only [t, ind_eq, dif_pos h, dif_neg h.not_gt, sc, hws]
@@ -233,13 +260,15 @@ theorem K_type_count : NumK := by
     · exact tb a b h
     · subst h
       have := ta a a
-      rw [show t a a = 0 by linarith]; simp
+      rw [show t a a = 0 by linarith]
+      simp
     · rw [ta, abs_neg]; exact tb b a h
   obtain ⟨⟨⟨c, d⟩, hcd⟩, hi⟩ := hB
-  have hne : t c d = -sig c d := by
-    have h1 : ¬ε c = ε d := hBn _ hi
+  have hne : t c d = - sig c d := by
+    have h1 : ¬ ε c = ε d := hBn _ hi
     have hcd' : c < d := hcd
-    simp only [t, ind_eq, dif_pos hcd', dif_neg hcd'.not_gt, sc, hws, if_neg h1, if_pos hi, sig, if_pos hcd']
+    simp only [t, ind_eq, dif_pos hcd', dif_neg hcd'.not_gt, sc, hws, if_neg h1, if_pos hi, sig,
+      if_pos hcd']
     norm_num
   have j1 := pair_lt t ta tb' hl c d (ne_of_lt hcd) hne
   have j2 := normSq_le t ta tb'
@@ -252,15 +281,17 @@ theorem K_type_count : NumK := by
     have h5 := wt_eq B a
     simp only [hκ, lowK, Equiv.apply_symm_apply, Pi.add_apply, Pi.sub_apply] at h1
     simp only [t, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_add_distrib]
-    rw [Finset.sum_sub_distrib (f := fun b => sig a b - sc ε a b), Finset.sum_sub_distrib (f := fun b => sig a b),
-      ← Finset.mul_sum]
+    rw [Finset.sum_sub_distrib (f := fun b => sig a b - sc ε a b),
+      Finset.sum_sub_distrib (f := fun b => sig a b), ← Finset.mul_sum]
     linarith
   have f2 : ∀ a, (lowK ε lam + (2 : ℝ) • rhoC ε) a = lam a + (∑ b, sig a b) / 2 := fun a => by
     have := rho_eq ε a
     simp only [lowK, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
     linarith
-  have ex : ∀ y : Fin n → ℝ, ∑ a, (lam a + y a) * (lam a + y a) =
-      ∑ a, lam a ^ 2 + 2 * ∑ a, lam a * y a + ∑ a, y a ^ 2 := fun y => by
+  have ex
+      : ∀ y : Fin n → ℝ,
+        ∑ a, (lam a + y a) * (lam a + y a)
+          = ∑ a, lam a ^ 2 + 2 * ∑ a, lam a * y a + ∑ a, y a ^ 2 := fun y => by
     rw [Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun a _ => by ring
   unfold vNormSq nsq dot

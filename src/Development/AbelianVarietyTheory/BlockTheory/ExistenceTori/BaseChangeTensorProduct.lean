@@ -40,8 +40,6 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.Lat
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.BaseChangeTensorProduct

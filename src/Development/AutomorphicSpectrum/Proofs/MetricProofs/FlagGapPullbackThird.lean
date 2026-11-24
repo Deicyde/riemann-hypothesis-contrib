@@ -2,16 +2,17 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HasStepCharts
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AevalNeZeroOfNotMem
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricExplicitMatrixFormStatement
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricGrassmannChartLocalStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricRowEchelonLocalStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricExplicitMatrixForm
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricRowEchelonLocal
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsPermOfRange
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagGapPullbackFirst
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPointsStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HoloOnDivCongr
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsValueAtOfTorus
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogBlockMetricOffBoundaryStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SumSqCompBlockMap
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricGrassmannChartLocal
+import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsValueAtOfTorus
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogBlockMetricOffBoundary
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -218,7 +219,7 @@ theorem base_mem (hyp : IsStepHyp M BM p κ v R pr) {x t : R.X} (ht : t ∈ R.U 
     : basePart M.blk (zc v R x t) ∈ mcPts (mCoordIdeal M.x) := by
   obtain ⟨z, hz, hv, -⟩ := exists_pt hyp x t ht
   rw [base_eq hyp hv]
-  exact (GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M).1 z hz
+  exact (_root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K ι Φ y Ψ N j M).1 z hz
 
 theorem good_at
     (hyp : IsStepHyp M BM p κ v R pr)
@@ -329,8 +330,8 @@ theorem chart_none
     exact one_ne_zero h1
   · obtain ⟨z, hz, hv, ho⟩ := exists_pt hyp x t (hsub ht).1
     rw [log_side hyp (hsub ht).1 hbd hz hv,
-      GlobalTheory.T.log_block_metric_off_boundary K ι Φ y Ψ N j M n BM p l (pr t) z hp
-        ⟨(hsub ht).2, hbd⟩ hz ho]
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.BaseLine.main K ι Φ y Ψ N j M n BM p l (pr t)
+        z hp ⟨(hsub ht).2, hbd⟩ hz ho]
     show _ = blockPot j p.2 (BM.G l p.1 (pr t)) 1 + Real.log ‖baseMono M (BM.F l) p (zc v R x t) *
       valAt M.x ((BM.F l).υ p)⁻¹ (basePart M.blk (zc v R x t))‖
     rw [base_eq hyp hv, baseMono_eq (BM.F l) (base_eq hyp hv)]
@@ -359,8 +360,8 @@ theorem chart_some
     · exact holo_mono (zc_holo hyp.1 x _) fun t ht => (hs₁ ht).1
   obtain ⟨z₀, hz₀, hv₀, ho₀⟩ := exists_pt hyp x y₀ hy₀
   obtain ⟨I₀, hI₀, hne₀⟩ :=
-    GlobalTheory.T.block_metric_row_echelon_local K ι Φ y Ψ N j M n BM p k₀ l (pr y₀) z₀ hp hl hz₀
-      ho₀
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.exists_plk_ne_zero K ι Φ y Ψ N j M n BM p k₀ l
+      (pr y₀) z₀ hp hl hz₀ ho₀
   rw [← plk_eq hyp _ hp hv₀] at hne₀
   obtain ⟨C, B, hCB⟩ := GrChart.exists_isGrChart N j p.2 I₀ M.j_le hI₀
   let W : Set R.X := W₁ ∩ (fun t => w t I₀) ⁻¹' {0}ᶜ
@@ -391,8 +392,8 @@ theorem chart_some
     exact holo_div (holo_mono (hw I) hs) (holo_mono (hw I₀) hs) hne
   · obtain ⟨z, hz, hv, ho⟩ := exists_pt hyp x t (hs₁ (hs ht)).1
     obtain ⟨h, a, hh, hd, ha, hw', -⟩ :=
-      GlobalTheory.T.block_metric_grassmann_chart_local K ι Φ y Ψ N j M n BM p k₀ l (pr t) z hp
-        (hs₁ (hs ht)).2 hz ho
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.FlagPoint.main K ι Φ y Ψ N j M n BM p k₀ l
+        (pr t) z hp (hs₁ (hs ht)).2 hz ho
     have e := plk_eq hyp (BM.F l) hp hv
     have := hCB h a (w t) hh hd ha (fun I hI => by rw [← hw' I hI]; exact congrFun e I) (hne t ht)
     exact ⟨this.1, this.2.1⟩
@@ -400,8 +401,8 @@ theorem chart_some
     have e := plk_eq hyp (BM.F l) hp hv
     have hnz : plk M (BM.F l) k₀ z I₀ ≠ 0 := by rw [← e]; exact hne t ht
     rw [log_side hyp (hs₁ (hs ht)).1 hbd hz hv,
-      GlobalTheory.T.block_metric_explicit_matrix_form K ι Φ y Ψ N j M n BM p k₀ l (pr t) z I₀ C B
-        hp hCB ⟨(hs₁ (hs ht)).2, hbd⟩ hz ho hnz]
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.ExactStep.main K ι Φ y Ψ N j M n BM p k₀ l
+        (pr t) z I₀ C B hp hCB ⟨(hs₁ (hs ht)).2, hbd⟩ hz ho hnz]
     simp only [w]
     rw [e, baseMono_eq (BM.F l) (base_eq hyp hv)]
 

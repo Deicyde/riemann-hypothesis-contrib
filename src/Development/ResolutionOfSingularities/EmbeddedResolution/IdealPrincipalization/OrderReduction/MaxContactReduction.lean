@@ -128,7 +128,7 @@ def FiniteOpenCoverWithIdeals.ι
 def FiniteOpenCoverWithIdeals.iInfImageIdeal
     {T : MarkedIdealWithBoundary.{u}} (D : FiniteOpenCoverWithIdeals T)
     : D.disjointUnion.IdealSheafData :=
-  ⨅ i : D.idx, imageIdealSheaf (D.ι i) (D.localIdeal i)
+  ⨅ i : D.idx, _root_.FunctorialResolution.Blowup.schemeImageIdeal (D.ι i) (D.localIdeal i)
 
 def FiniteOpenCoverWithIdeals.markedTriple
     {T : MarkedIdealWithBoundary.{u}}

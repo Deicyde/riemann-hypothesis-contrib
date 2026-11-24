@@ -129,9 +129,7 @@ theorem grouping
     · rw [Finset.sum_smul]
       refine Finset.sum_congr rfl (fun σ _ => ?_)
       rw [hF C σ, mul_smul]
-      first
-      | rw [Int.cast_smul_eq_zsmul ℂ, zsmul_eq_mul, mul_smul_comm]
-      | simp only [Algebra.smul_def, map_intCast, ← mul_assoc, (Int.cast_commute _ _).eq]
+      first | rw [Int.cast_smul_eq_zsmul ℂ, zsmul_eq_mul, mul_smul_comm]
     · simp
   simp only [hR]
   rw [← Fintype.sum_prod_type']
@@ -152,9 +150,7 @@ theorem grouping
       funext x
       exact congrArg κ (congrFun heq' x)
     have e2 : (fun l => κ (C l)) = (fun l => κ (C' l)) := by
-      first
-      | exact (StrictMono.range_inj hC hC').1 e1
-      | exact (WellFounded.eq_strictMono_iff_eq_range wellFounded_lt hC hC').1 e1
+      first | exact (StrictMono.range_inj hC hC').1 e1
     have e3 : C = C' := funext fun l => hκ (congrFun e2 l)
     subst e3
     have e4 : σ = σ' := Equiv.ext fun x => hC.injective (congrArg κ (congrFun heq' x))

@@ -1,13 +1,14 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCharLab
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharacterDecompositionAndClassFunctionExpansionStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharacterDecompositionAndClassFunctionExpansion
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharacterPairingHarishChandraCuspidalMackey
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DetCharacterIrreducibleLabel
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsCuspidalListHarishChandraPairingNeZero
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraInductionCharacterRestrictionDecompStatement
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraProductListIsCharacterAndPermInvariStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraSeriesLabelMulOfConstituent
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraInductionCharacterRestrictionDecomp
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraProductListIsCharacterAndPermInvari
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,15 +66,6 @@ open scoped Classical
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem ip_list_sum_left {G : Type} [Group G] [Fintype G] (L : List (G → ℂ)) (B : G → ℂ)
-    : ip L.sum B = (L.map fun ρ => ip ρ B).sum := by
-  induction L with
-  | nil => simp [ip]
-  | cons ρ L ih =>
-    rw [List.sum_cons, List.map_cons, List.sum_cons, ← ih]
-    unfold ip
-    simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, mul_add]
-
 theorem list_nat_sum
     {G : Type} [Group G] [Fintype G]
     (L : List (G → ℂ)) (hL : ∀ ρ ∈ L, IsIrr ρ)
@@ -98,19 +90,18 @@ theorem ip_ne_zero_of_common
     {ψ A B : G → ℂ}
     (hψ : IsIrr ψ) (hA : IsChar A) (hB : IsChar B) (hψA : ip ψ A ≠ 0) (hψB : ip ψ B ≠ 0)
     : ip A B ≠ 0 := by
-  obtain ⟨L, hL, rfl⟩ :=
-    (GlobalTheory.T.character_decomposition_and_classFunction_expansion G A).1 hA
+  obtain ⟨L, hL, rfl⟩ := (_root_.GlobalTheory.charDec G A).1 hA
   rw [GlobalTheory.GLq.LabelMul.ip_sum_eq_count hψ L hL] at hψA
   have hm : ψ ∈ L := List.count_pos_iff.1 (Nat.pos_of_ne_zero (by exact_mod_cast hψA))
   obtain ⟨N, hN, hN0⟩ := list_nat_sum L hL B hB
-  rw [ip_list_sum_left, hN]
+  rw [_root_.GlobalTheory.CharDec.ip_list_sum_left, hN]
   exact_mod_cast hN0 ψ hm hψB
 
 theorem ip_add_ne_zero
     {G : Type} [Group G] [Fintype G]
     {ψ X Y : G → ℂ} (hψ : IsIrr ψ) (hX : IsChar X) (hY : IsChar Y) (h : ip ψ X ≠ 0)
     : ip ψ (X + Y) ≠ 0 := by
-  rw [GlobalTheory.GLq.LabelMul.ip_add_right]
+  rw [_root_.GlobalTheory.CharDec.ip_add_right]
   obtain ⟨k, hk⟩ := GlobalTheory.GLq.LabelMul.ip_nat hψ hX
   obtain ⟨l, hl⟩ := GlobalTheory.GLq.LabelMul.ip_nat hψ hY
   rw [hk] at h
@@ -120,7 +111,7 @@ theorem ip_add_ne_zero
 
 theorem isChar_hcL_cusp (K : List (Pc g)) (hK : ∀ p ∈ K, IsCusp p.2) (m : ℕ) (hm : degL K = m)
     : IsChar (hcL K m) :=
-  (GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g K K m hm.symm
+  (_root_.GlobalTheory.gl_list_product_perm_char g K K m hm.symm
     (fun p hp => GlobalTheory.GLq.IpCuspProd.isChar_of_isCusp (hK p hp))).1
 
 theorem ip_hc_left
@@ -132,8 +123,7 @@ theorem ip_hc_left
   obtain ⟨R, hR, he⟩ :=
     GlobalTheory.GLq.LabelMul.exists_add_of_ip_ne_zero hσ (isChar_hcL_cusp K hK m hd) hσK
   rw [he, GlobalTheory.GLq.LabelMul.hc_add_left]
-  have hc :=
-    (GlobalTheory.T.harishChandra_induction_character_restriction_decomp g m 1 (m + 1) rfl).1
+  have hc := (_root_.GlobalTheory.GLq.HCChar.hc_isChar_and_res_decomp g m 1 (m + 1) rfl).1
   exact ip_add_ne_zero hψ (hc σ β (GlobalTheory.GLq.LabelMul.isChar_of_isIrr hσ) hβ) (hc R β hR hβ)
     h
 
@@ -146,8 +136,7 @@ theorem ip_hc_right
   obtain ⟨R, hR, he⟩ :=
     GlobalTheory.GLq.LabelMul.exists_add_of_ip_ne_zero hσ (isChar_hcL_cusp K hK m hd) hσK
   rw [he, GlobalTheory.GLq.LabelMul.hc_add_right]
-  have hc :=
-    (GlobalTheory.T.harishChandra_induction_character_restriction_decomp g 1 m (m + 1) (by omega)).1
+  have hc := (_root_.GlobalTheory.GLq.HCChar.hc_isChar_and_res_decomp g 1 m (m + 1) (by omega)).1
   exact ip_add_ne_zero hψ (hc β σ hβ (GlobalTheory.GLq.LabelMul.isChar_of_isIrr hσ)) (hc β R hβ hR)
     h
 
@@ -162,8 +151,7 @@ theorem eq_of_isCuspOf_det
   obtain ⟨u, hu⟩ := GlobalTheory.GLq.LabelDet.gen_one_mem L
   let y : Gn g 1 := Units.map (Matrix.scalar (Fin 1) : ZMod g →+* Mt g 1).toMonoidHom u
   have hy00 : (y : Mt g 1) 0 0 = u := by simp [y]
-  have hcp : (y : Mt g 1).charpoly = X - C ((y : Mt g 1) 0 0) := by
-    simp [Matrix.charpoly, Matrix.det_fin_one]
+  have hcp : (y : Mt g 1).charpoly = X - C ((y : Mt g 1) 0 0) := by simp [Matrix.charpoly]
   have hx
       : algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g) (- P.coeff 0)
         ∈ Formalism.CyclotomicNorms.rootsBar P := by
@@ -178,7 +166,7 @@ theorem eq_of_isCuspOf_det
     rw [← map_pow, pow_one, ZMod.pow_card_sub_one_eq_one hc'0, map_one]
   have hth := GlobalTheory.GLq.LabelDet.theta_gen_pow L hxp 1
   rw [pow_one, pow_one] at hth
-  have hdet : Matrix.GeneralLinearGroup.det y = u := by ext; simp [y, Matrix.det_fin_one]
+  have hdet : Matrix.GeneralLinearGroup.det y = u := by ext; simp [y]
   simp only [hdet, Nat.sub_self, pow_zero, one_mul, Finset.sum_range_one, pow_one, hth] at key
   rw [h.2 u hu] at key
   have := L.teich_inj _ _ ((_root_.map_ne_zero _).2 h.1) ((_root_.map_ne_zero _).2 hc'0) key

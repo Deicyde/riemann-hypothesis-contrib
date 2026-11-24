@@ -46,25 +46,32 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.CoeEqAlgebraMapZeroEquiv
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-private theorem ringHom_eq_of_eq_on_ringOfIntegers {F : Type} [Field F] [NumberField F] (τ₁ τ₂ : F →+* ℂ)
-    (h : ∀ c : 𝓞 F, τ₁ c = τ₂ c) : τ₁ = τ₂ :=
+private theorem ringHom_eq_of_eq_on_ringOfIntegers
+    {F : Type} [Field F] [NumberField F] (τ₁ τ₂ : F →+* ℂ) (h : ∀ c : 𝓞 F, τ₁ c = τ₂ c)
+    : τ₁ = τ₂ :=
   IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 F)) (RingHom.ext fun c => h c)
 
-private theorem det_one_sub_smul_eq_prod_of_diagonal {d : ℕ} {κ : Type} [Fintype κ] [DecidableEq κ]
+private theorem det_one_sub_smul_eq_prod_of_diagonal
+    {d : ℕ} {κ : Type} [Fintype κ] [DecidableEq κ]
     (T : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) (e : (Fin d → ℂ) ≃ₗ[ℂ] (κ → ℂ)) (w : κ → ℂ)
-    (h : ∀ b j, e (T b) j = w j * e b j) (y : ℂ) :
-    LinearMap.det (1 - y • T) = ∏ j, (1 - y * w j) := by
+    (h : ∀ b j, e (T b) j = w j * e b j)
+    (y : ℂ)
+    : LinearMap.det (1 - y • T) = ∏ j, (1 - y * w j) := by
   rw [← LinearMap.det_conj (1 - y • T) e]
-  have hc : (e : (Fin d → ℂ) →ₗ[ℂ] (κ → ℂ)) ∘ₗ (1 - y • T) ∘ₗ (e.symm : (κ → ℂ) →ₗ[ℂ] (Fin d → ℂ)) =
-      Matrix.toLin' (Matrix.diagonal fun j => 1 - y * w j) := by
+  have hc
+      : (e : (Fin d → ℂ) →ₗ[ℂ] (κ → ℂ)) ∘ₗ (1 - y • T) ∘ₗ (e.symm : (κ → ℂ) →ₗ[ℂ] (Fin d → ℂ))
+        = Matrix.toLin' (Matrix.diagonal fun j => 1 - y * w j) := by
     apply LinearMap.ext
     intro v
     funext j
@@ -72,24 +79,29 @@ private theorem det_one_sub_smul_eq_prod_of_diagonal {d : ℕ} {κ : Type} [Fint
     ring
   rw [hc, LinearMap.det_toLin', Matrix.det_diagonal]
 
-private theorem transpose_rho_mul_herm_eq_herm_mul_bar {O : Type} [Ring O] {bar : O → O} {g : ℕ} (D : PLat O bar)
-    (ρ : O →+* Matrix (Fin g) (Fin g) ℂ) (P₀ : D.La →+ Fin g → ℂ) (M₀ : Matrix (Fin g) (Fin g) ℂ)
-    (hP : PELU.IsPeriod D ρ P₀) (hM : IsHermOf D P₀ M₀) (x : O) :
-    (ρ x)ᵀ * M₀ = M₀ * (ρ (bar x)).map star := by
-  have hL : ∀ (R : Matrix (Fin g) (Fin g) ℂ) (u w : Fin g → ℂ),
-      hermForm M₀ (R *ᵥ u) w = u ⬝ᵥ (Rᵀ * M₀) *ᵥ star w := by
+private theorem transpose_rho_mul_herm_eq_herm_mul_bar
+    {O : Type} [Ring O]
+    {bar : O → O} {g : ℕ}
+    (D : PLat O bar) (ρ : O →+* Matrix (Fin g) (Fin g) ℂ) (P₀ : D.La →+ Fin g → ℂ)
+    (M₀ : Matrix (Fin g) (Fin g) ℂ) (hP : PELU.IsPeriod D ρ P₀) (hM : IsHermOf D P₀ M₀)
+    (x : O)
+    : (ρ x)ᵀ * M₀ = M₀ * (ρ (bar x)).map star := by
+  have hL
+      : ∀ (R : Matrix (Fin g) (Fin g) ℂ) (u w : Fin g → ℂ),
+        hermForm M₀ (R *ᵥ u) w = u ⬝ᵥ (Rᵀ * M₀) *ᵥ star w := by
     intro R u w
     unfold hermForm
     rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec u Rᵀ, Matrix.vecMul_transpose]
-  have hR : ∀ (R : Matrix (Fin g) (Fin g) ℂ) (u w : Fin g → ℂ),
-      hermForm M₀ u (R *ᵥ w) = u ⬝ᵥ (M₀ * R.map star) *ᵥ star w := by
+  have hR
+      : ∀ (R : Matrix (Fin g) (Fin g) ℂ) (u w : Fin g → ℂ),
+        hermForm M₀ u (R *ᵥ w) = u ⬝ᵥ (M₀ * R.map star) *ᵥ star w := by
     intro R u w
     unfold hermForm
     rw [← Matrix.mulVec_mulVec]
     congr 2
     funext i
 
-    simp [Matrix.mulVec, dotProduct, map_sum, Pi.star_apply]
+    simp [Matrix.mulVec, dotProduct, Pi.star_apply]
   set A := (ρ x)ᵀ * M₀ - M₀ * (ρ (bar x)).map star with hA
   have key : ∀ p q : D.La, (P₀ p ⬝ᵥ A *ᵥ star (P₀ q)).im = 0 := by
     intro p q
@@ -107,11 +119,13 @@ private theorem transpose_rho_mul_herm_eq_herm_mul_bar {O : Type} [Ring O] {bar 
     | mem y hy =>
       obtain ⟨q, rfl⟩ := hy
       exact key p q
-    | zero => simp
+    | zero =>
+      simp
     | add y z _ _ hy hz =>
       rw [star_add, Matrix.mulVec_add, dotProduct_add, Complex.add_im, hy, hz, add_zero]
     | smul r y _ hy =>
-      rw [star_smul, star_trivial, Matrix.mulVec_smul, dotProduct_smul, Complex.smul_im, hy, smul_zero]
+      rw [star_smul, star_trivial, Matrix.mulVec_smul, dotProduct_smul, Complex.smul_im, hy,
+        smul_zero]
   have step2 : ∀ u v : Fin g → ℂ, (u ⬝ᵥ A *ᵥ star v).im = 0 := by
     intro u v
     have hu : u ∈ Submodule.span ℝ (Set.range P₀) := by rw [hspan]; trivial
@@ -120,10 +134,8 @@ private theorem transpose_rho_mul_herm_eq_herm_mul_bar {O : Type} [Ring O] {bar 
       obtain ⟨p, rfl⟩ := hy
       exact step1 p v
     | zero => simp
-    | add y z _ _ hy hz =>
-      rw [add_dotProduct, Complex.add_im, hy, hz, add_zero]
-    | smul r y _ hy =>
-      rw [smul_dotProduct, Complex.smul_im, hy, smul_zero]
+    | add y z _ _ hy hz => rw [add_dotProduct, Complex.add_im, hy, hz, add_zero]
+    | smul r y _ hy => rw [smul_dotProduct, Complex.smul_im, hy, smul_zero]
   have hA0 : A = 0 := by
     ext k l
     have e1 := step2 (Pi.single k 1) (Pi.single l 1)
@@ -133,14 +145,16 @@ private theorem transpose_rho_mul_herm_eq_herm_mul_bar {O : Type} [Ring O] {bar 
   rw [hA, sub_eq_zero] at hA0
   exact hA0
 
-theorem UpperTheory.Gal.W2.ballChar_of :
-    UpperTheory.Gal.W2.TypeCount → UpperTheory.Gal.W2.TspDiag → UpperTheory.Gal.W2.BallChar := by
+theorem UpperTheory.Gal.W2.ballChar_of
+    : UpperTheory.Gal.W2.TypeCount → UpperTheory.Gal.W2.TspDiag → UpperTheory.Gal.W2.BallChar := by
   intro hTC hTD
   unfold UpperTheory.Gal.W2.BallChar
   intro F _ _ O _ bar g ρ a n t₀ ε hS D P₀ M₀ hP hM H hH Sb ty ev hD mu hmu d co hco T hT
   classical
-  have hD' : Sb.det ≠ 0 ∧ (∀ c : 𝓞 F, ρ (a c) * Sb = Sb * Matrix.diagonal fun i => ty i c) ∧
-      H * Sb = Sb * Matrix.diagonal ev := hD
+  have hD'
+      : Sb.det ≠ 0 ∧ (∀ c : 𝓞 F, ρ (a c) * Sb = Sb * Matrix.diagonal fun i => ty i c)
+        ∧ H * Sb = Sb * Matrix.diagonal ev :=
+    hD
   obtain ⟨hSb, hρ, hHS⟩ := hD'
   have hcnt := hTC F O bar g ρ a n t₀ ε hS H Sb ty ev hD
   have hcard : ∀ τ : F →+* ℂ, (Finset.univ.filter fun i => ty i = τ).card = typeMult n t₀ ε τ := by
@@ -192,32 +206,35 @@ theorem UpperTheory.Gal.W2.ballChar_of :
       rw [h, mul_zero] at c2
       omega
     omega
-  let W : Submodule ℂ (Matrix (Fin g) (Fin g) ℂ) :=
-    { carrier := {S | Sᵀ = S ∧ ∀ (c : 𝓞 F) (i j : Fin g),
+  let W : Submodule ℂ (Matrix (Fin g) (Fin g) ℂ) := {
+    carrier :=
+      {S | Sᵀ = S ∧ ∀ (c : 𝓞 F) (i j : Fin g),
         S i j * ty j c = starRingEnd ℂ (ty i c) * S i j}
-      add_mem' := by
-        rintro A B ⟨hA1, hA2⟩ ⟨hB1, hB2⟩
-        refine ⟨by rw [Matrix.transpose_add, hA1, hB1], fun c i j => ?_⟩
-        simp only [Matrix.add_apply, add_mul, mul_add, hA2 c i j, hB2 c i j]
-      zero_mem' := by
-        refine ⟨Matrix.transpose_zero, fun c i j => ?_⟩
-        simp
-      smul_mem' := by
-        rintro r A ⟨hA1, hA2⟩
-        refine ⟨by rw [Matrix.transpose_smul, hA1], fun c i j => ?_⟩
-        simp only [Matrix.smul_apply, smul_eq_mul]
-        rw [_root_.mul_assoc, hA2 c i j]
-        ring }
+    add_mem' := by
+      rintro A B ⟨hA1, hA2⟩ ⟨hB1, hB2⟩
+      refine ⟨by rw [Matrix.transpose_add, hA1, hB1], fun c i j => ?_⟩
+      simp only [Matrix.add_apply, add_mul, mul_add, hA2 c i j, hB2 c i j]
+    zero_mem' := by
+      refine ⟨Matrix.transpose_zero, fun c i j => ?_⟩
+      simp
+    smul_mem' := by
+      rintro r A ⟨hA1, hA2⟩
+      refine ⟨by rw [Matrix.transpose_smul, hA1], fun c i j => ?_⟩
+      simp only [Matrix.smul_apply, smul_eq_mul]
+      rw [_root_.mul_assoc, hA2 c i j]
+      ring
+  }
   have hbij := hTD F g ty t₀ i₀ (hS.cx t₀) hi₀ hpair W (fun S => Iff.rfl)
   have hmapmul : ∀ A B : Matrix (Fin g) (Fin g) ℂ, (A * B).map star = A.map star * B.map star := by
     intro A B
     ext i j
     simp [Matrix.mul_apply]
-  have hdiagmap : ∀ v : Fin g → ℂ, (Matrix.diagonal v).map star =
-      Matrix.diagonal fun i => starRingEnd ℂ (v i) := by
+  have hdiagmap
+      : ∀ v : Fin g → ℂ,
+        (Matrix.diagonal v).map star = Matrix.diagonal fun i => starRingEnd ℂ (v i) := by
     intro v
     ext i j
-    by_cases h : i = j <;> simp [Matrix.diagonal_apply, h]
+    by_cases h : i = j <;> simp [h]
   set P := Sb.map star with hPdef
   have hPdet : P.det ≠ 0 := by
     have : P.det = starRingEnd ℂ Sb.det := by
@@ -251,9 +268,10 @@ theorem UpperTheory.Gal.W2.ballChar_of :
   have hcan : ∀ X Y : Matrix (Fin g) (Fin g) ℂ, Pᵀ * X * P = Pᵀ * Y * P → X = Y := by
     intro X Y h
     exact Matrix.mul_right_injective_of_invertible Pᵀ (Matrix.mul_left_injective_of_invertible P h)
-  have hent : ∀ (Q : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F),
-      (∀ i j, Q i j * ty j c = starRingEnd ℂ (ty i c) * Q i j) ↔
-        Q * Matrix.diagonal (fun i => ty i c) = (Matrix.diagonal fun i => ty i c)ᴴ * Q := by
+  have hent
+      : ∀ (Q : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F),
+        (∀ i j, Q i j * ty j c = starRingEnd ℂ (ty i c) * Q i j)
+          ↔ Q * Matrix.diagonal (fun i => ty i c) = (Matrix.diagonal fun i => ty i c)ᴴ * Q := by
     intro Q c
     constructor
     · intro h
@@ -264,13 +282,16 @@ theorem UpperTheory.Gal.W2.ballChar_of :
       have := congrFun (congrFun h i) j
       simp only [Matrix.mul_diagonal, Matrix.diagonal_conjTranspose, Matrix.diagonal_mul] at this
       exact this
-  have hQD : ∀ (S : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F), Pᵀ * S * P * Matrix.diagonal (fun i => ty i c) =
-      Pᵀ * (S * (ρ (bar (a c))).map star) * P := by
+  have hQD
+      : ∀ (S : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F),
+        Pᵀ * S * P * Matrix.diagonal (fun i => ty i c)
+          = Pᵀ * (S * (ρ (bar (a c))).map star) * P := by
     intro S c
     rw [Matrix.mul_assoc (Pᵀ * S), ← hDc c]
     simp only [Matrix.mul_assoc]
-  have hDQ : ∀ (S : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F), (Matrix.diagonal fun i => ty i c)ᴴ * (Pᵀ * S * P) =
-      Pᵀ * ((ρ (a c))ᴴ * S) * P := by
+  have hDQ
+      : ∀ (S : Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F),
+        (Matrix.diagonal fun i => ty i c)ᴴ * (Pᵀ * S * P) = Pᵀ * ((ρ (a c))ᴴ * S) * P := by
     intro S c
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← hPt c]
     simp only [Matrix.mul_assoc]
@@ -279,8 +300,7 @@ theorem UpperTheory.Gal.W2.ballChar_of :
     show (Sᵀ = S ∧ ∀ x, S * (ρ (bar x)).map star = (ρ x)ᴴ * S) ↔
       ((Pᵀ * S * P)ᵀ = Pᵀ * S * P ∧ ∀ (c : 𝓞 F) (i j : Fin g),
         (Pᵀ * S * P) i j * ty j c = starRingEnd ℂ (ty i c) * (Pᵀ * S * P) i j)
-    have htr : (Pᵀ * S * P)ᵀ = Pᵀ * Sᵀ * P := by
-      simp [Matrix.transpose_mul, Matrix.mul_assoc]
+    have htr : (Pᵀ * S * P)ᵀ = Pᵀ * Sᵀ * P := by simp [Matrix.transpose_mul, Matrix.mul_assoc]
     constructor
     · rintro ⟨h1, h2⟩
       refine ⟨by rw [htr, h1], fun c => (hent _ c).2 ?_⟩
@@ -298,24 +318,28 @@ theorem UpperTheory.Gal.W2.ballChar_of :
     simp [hermForm, hv0] at h1
   have hRos := transpose_rho_mul_herm_eq_herm_mul_bar D ρ P₀ M₀ hP hM
   set N := Sbᵀ * M₀ * P with hNdef
-  have hNc : ∀ c : 𝓞 F, N * Matrix.diagonal (fun i => ty i c) = Matrix.diagonal (fun i => ty i c) * N := by
+  have hNc
+      : ∀ c : 𝓞 F,
+        N * Matrix.diagonal (fun i => ty i c) = Matrix.diagonal (fun i => ty i c) * N := by
     intro c
-    calc N * Matrix.diagonal (fun i => ty i c) = Sbᵀ * (M₀ * (ρ (bar (a c))).map star) * P := by
-          rw [hNdef, Matrix.mul_assoc (Sbᵀ * M₀) P, ← hDc c]
-          simp only [Matrix.mul_assoc]
+    calc
+      N * Matrix.diagonal (fun i => ty i c) = Sbᵀ * (M₀ * (ρ (bar (a c))).map star) * P := by
+        rw [hNdef, Matrix.mul_assoc (Sbᵀ * M₀) P, ← hDc c]
+        simp only [Matrix.mul_assoc]
       _ = (ρ (a c) * Sb)ᵀ * M₀ * P := by
-          rw [← hRos, Matrix.transpose_mul]
-          simp only [Matrix.mul_assoc]
+        rw [← hRos, Matrix.transpose_mul]
+        simp only [Matrix.mul_assoc]
       _ = Matrix.diagonal (fun i => ty i c) * N := by
-          rw [hρ c, Matrix.transpose_mul, Matrix.diagonal_transpose, hNdef]
-          simp only [Matrix.mul_assoc]
+        rw [hρ c, Matrix.transpose_mul, Matrix.diagonal_transpose, hNdef]
+        simp only [Matrix.mul_assoc]
   have hNcol : ∀ m, m ≠ i₀ → N m i₀ = 0 := by
     intro m hm
     by_contra hne
-    have e : ty m = ty i₀ := ringHom_eq_of_eq_on_ringOfIntegers _ _ (fun c => by
-      have e := congrFun (congrFun (hNc c) m) i₀
-      rw [Matrix.mul_diagonal, Matrix.diagonal_mul] at e
-      exact (mul_left_cancel₀ hne (e.trans (mul_comm _ _))).symm)
+    have e : ty m = ty i₀ :=
+      ringHom_eq_of_eq_on_ringOfIntegers _ _ (fun c => by
+        have e := congrFun (congrFun (hNc c) m) i₀
+        rw [Matrix.mul_diagonal, Matrix.diagonal_mul] at e
+        exact (mul_left_cancel₀ hne (e.trans (mul_comm _ _))).symm)
     exact hm ((hi₀ m).1 (e.trans ((hi₀ i₀).2 rfl)))
   have hN0 : N i₀ i₀ ≠ 0 := by
     have hv : (fun k => Sb k i₀) ≠ 0 := by
@@ -324,8 +348,8 @@ theorem UpperTheory.Gal.W2.ballChar_of :
       rw [← Matrix.det_transpose]
       exact Matrix.det_eq_zero_of_row_eq_zero i₀ (fun k => by simpa using congrFun h k)
     have hNh : N i₀ i₀ = hermForm M₀ (fun k => Sb k i₀) (fun k => Sb k i₀) := by
-      simp only [hNdef, hPdef, hermForm, Matrix.mul_apply, dotProduct, Matrix.mulVec, Matrix.transpose_apply,
-        Matrix.map_apply, Finset.mul_sum, Finset.sum_mul, Pi.star_apply]
+      simp only [hNdef, hPdef, hermForm, Matrix.mul_apply, dotProduct, Matrix.mulVec,
+        Matrix.transpose_apply, Matrix.map_apply, Finset.mul_sum, Finset.sum_mul, Pi.star_apply]
       rw [Finset.sum_comm]
       simp only [_root_.mul_assoc]
     intro h0
@@ -381,45 +405,56 @@ theorem UpperTheory.Gal.W2.ballChar_of :
     exact isUnit_iff_ne_zero.2 (by simpa using hH)
   haveI : Invertible (H.map star) := (H.map star).invertibleOfIsUnitDet hHbu
   have h1 : Sb⁻¹ * H = Matrix.diagonal ev * Sb⁻¹ := by
-    calc Sb⁻¹ * H = Sb⁻¹ * (H * Sb) * Sb⁻¹ := by simp [Matrix.mul_assoc]
-      _ = Matrix.diagonal ev * Sb⁻¹ := by rw [hHS]; simp [Matrix.mul_assoc]
+    calc
+      Sb⁻¹ * H
+        = Sb⁻¹ * (H * Sb) * Sb⁻¹ := by simp [Matrix.mul_assoc]
+      _ = Matrix.diagonal ev * Sb⁻¹ := by rw [hHS]; simp
   have h2 : H.map star * P = P * Eb := by
     have := congrArg (fun M : Matrix (Fin g) (Fin g) ℂ => M.map star) hHS
     simp only [hmapmul, hdiagmap] at this
     rw [hPdef, hEbdef]
     exact this
   have h3 : (H.map star)⁻¹ * P = P * Eb⁻¹ := by
-    calc (H.map star)⁻¹ * P = (H.map star)⁻¹ * (P * Eb) * Eb⁻¹ := by simp [Matrix.mul_assoc]
-      _ = P * Eb⁻¹ := by rw [← h2, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hHbu, Matrix.one_mul]
-  have hTrel : ∀ b j, (Sb⁻¹ * co (T b) * P) i₀ j = mu / starRingEnd ℂ (ev j) * (Sb⁻¹ * co b * P) i₀ j := by
+    calc
+      (H.map star)⁻¹ * P
+        = (H.map star)⁻¹ * (P * Eb) * Eb⁻¹ := by simp [Matrix.mul_assoc]
+      _ = P * Eb⁻¹ := by
+        rw [← h2, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hHbu, Matrix.one_mul]
+  have hTrel
+      : ∀ b j, (Sb⁻¹ * co (T b) * P) i₀ j = mu / starRingEnd ℂ (ev j) * (Sb⁻¹ * co b * P) i₀ j := by
     intro b j
     rw [hT b]
-    have e : Sb⁻¹ * (H * co b * (H.map star)⁻¹) * P = Matrix.diagonal ev * (Sb⁻¹ * co b * P) * Eb⁻¹ := by
-      calc Sb⁻¹ * (H * co b * (H.map star)⁻¹) * P = (Sb⁻¹ * H) * co b * ((H.map star)⁻¹ * P) := by
-            simp only [Matrix.mul_assoc]
+    have e
+        : Sb⁻¹ * (H * co b * (H.map star)⁻¹) * P
+          = Matrix.diagonal ev * (Sb⁻¹ * co b * P) * Eb⁻¹ := by
+      calc
+        Sb⁻¹ * (H * co b * (H.map star)⁻¹) * P
+          = (Sb⁻¹ * H) * co b * ((H.map star)⁻¹ * P) := by simp only [Matrix.mul_assoc]
         _ = _ := by rw [h1, h3]; simp only [Matrix.mul_assoc]
     rw [e, hEinv, Matrix.mul_diagonal, Matrix.diagonal_mul, hmu0]
     ring
-  let ψ : (Fin d → ℂ) →ₗ[ℂ] ({j // ty j = ComplexEmbedding.conjugate t₀} → ℂ) :=
-    { toFun := fun b j => (Sb⁻¹ * co b * P) i₀ j.val
-      map_add' := by
-        intro b b'
-        funext j
-        simp [Matrix.mul_add, Matrix.add_mul]
-      map_smul' := by
-        intro r b
-        funext j
-        simp [Matrix.mul_smul, Matrix.smul_mul] }
+  let ψ : (Fin d → ℂ) →ₗ[ℂ] ({j // ty j = ComplexEmbedding.conjugate t₀} → ℂ) := {
+    toFun := fun b j => (Sb⁻¹ * co b * P) i₀ j.val
+    map_add' := by
+      intro b b'
+      funext j
+      simp [Matrix.mul_add, Matrix.add_mul]
+    map_smul' := by
+      intro r b
+      funext j
+      simp
+  }
   have hinj : Function.Injective ψ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro b hb
-    have h0 : (⟨_, hin b⟩ : W) = 0 := hbij.1 (by
-      funext j
-      have hj := congrFun hb j
-      change (Sb⁻¹ * co b * P) i₀ j.val = 0 at hj
-      change (Pᵀ * ((co b)ᵀ * M₀) * P) i₀ j.val = (0 : Matrix (Fin g) (Fin g) ℂ) i₀ j.val
-      rw [hrow, hj, zero_mul]
-      rfl)
+    have h0 : (⟨_, hin b⟩ : W) = 0 :=
+      hbij.1 (by
+        funext j
+        have hj := congrFun hb j
+        change (Sb⁻¹ * co b * P) i₀ j.val = 0 at hj
+        change (Pᵀ * ((co b)ᵀ * M₀) * P) i₀ j.val = (0 : Matrix (Fin g) (Fin g) ℂ) i₀ j.val
+        rw [hrow, hj, zero_mul]
+        rfl)
     have hQ : Pᵀ * ((co b)ᵀ * M₀) * P = 0 := congrArg Subtype.val h0
     have hQ2 : (co b)ᵀ * M₀ = 0 := hcan _ _ (by rw [hQ]; simp)
     have hQ3 : (co b)ᵀ = 0 := Matrix.mul_left_injective_of_invertible M₀ (by simpa using hQ2)
@@ -452,7 +487,10 @@ theorem UpperTheory.Gal.W2.ballChar_of :
       exact h1.symm
     exact mul_left_cancel₀ hN0 h3
   let e := LinearEquiv.ofBijective ψ ⟨hinj, hsurj⟩
-  have hdet := det_one_sub_smul_eq_prod_of_diagonal T e (fun j => mu / starRingEnd ℂ (ev j.val)) (fun b j => hTrel b j.val)
+  have hdet :=
+    det_one_sub_smul_eq_prod_of_diagonal T e
+      (fun j => mu / starRingEnd ℂ (ev j.val))
+      (fun b j => hTrel b j.val)
   have hd : d = Fintype.card {j // ty j = ComplexEmbedding.conjugate t₀} := by
     have := LinearEquiv.finrank_eq e
     simpa using this
@@ -461,6 +499,8 @@ theorem UpperTheory.Gal.W2.ballChar_of :
     simp [typeMult, hS.cx t₀]
   refine ⟨hd.trans hJ, fun y => ?_⟩
   rw [hdet y, evAt, Multiset.map_map, ← Finset.prod_eq_multiset_prod]
-  rw [Finset.prod_subtype (p := fun x => ty x = ComplexEmbedding.conjugate t₀) (Finset.univ.filter fun x => ty x = ComplexEmbedding.conjugate t₀)
+  rw [Finset.prod_subtype
+    (p := fun x => ty x = ComplexEmbedding.conjugate t₀)
+    (Finset.univ.filter fun x => ty x = ComplexEmbedding.conjugate t₀)
     (fun x => by simp)]
   rfl

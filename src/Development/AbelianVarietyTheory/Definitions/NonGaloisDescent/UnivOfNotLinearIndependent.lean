@@ -57,37 +57,41 @@ section Flat
 
 variable {k R : Type} [CommRing k] [CommRing R] {r n : ℕ}
 
-
 open Classical in
 def flat (ν : kˣ →* Rˣ) (y : Matrix (Fin r) (Fin n) k) : R :=
   if h : IsUnit (topL r y).det then ((ν h.unit : Rˣ) : R) else 0
 
-theorem flat_of_isUnit (ν : kˣ →* Rˣ) {y : Matrix (Fin r) (Fin n) k} {u : kˣ} (h : (topL r y).det = u) :
-    flat ν y = ((ν u : Rˣ) : R) := by
+theorem flat_of_isUnit
+    (ν : kˣ →* Rˣ) {y : Matrix (Fin r) (Fin n) k} {u : kˣ} (h : (topL r y).det = u)
+    : flat ν y = ((ν u : Rˣ) : R) := by
   have hu : IsUnit (topL r y).det := h ▸ u.isUnit
   have hu' : hu.unit = u := Units.ext (by rw [IsUnit.unit_spec, h])
   unfold flat
   rw [dite_eq_left hu, hu']
 
-theorem flat_of_not_isUnit (ν : kˣ →* Rˣ) {y : Matrix (Fin r) (Fin n) k} (h : ¬ IsUnit (topL r y).det) :
-    flat ν y = 0 := by
+theorem flat_of_not_isUnit
+    (ν : kˣ →* Rˣ) {y : Matrix (Fin r) (Fin n) k} (h : ¬ IsUnit (topL r y).det)
+    : flat ν y = 0 := by
   unfold flat
   rw [dite_eq_right h]
 
-theorem topL_mul (hr : r ≤ n) (g : Matrix (Fin r) (Fin r) k) (y : Matrix (Fin r) (Fin n) k) :
-    topL r (g * y) = g * topL r y := by
+theorem topL_mul (hr : r ≤ n) (g : Matrix (Fin r) (Fin r) k) (y : Matrix (Fin r) (Fin n) k)
+    : topL r (g * y) = g * topL r y := by
   ext i j
   have hj : j.val < n := lt_of_lt_of_le j.isLt hr
   simp [topL, Matrix.mul_apply, hj]
 
-theorem flat_mul (hr : r ≤ n) (ν : kˣ →* Rˣ) (g : GL (Fin r) k) (y : Matrix (Fin r) (Fin n) k) :
-    flat ν ((g : Matrix (Fin r) (Fin r) k) * y) = ((ν (GeneralLinearGroup.det g) : Rˣ) : R) * flat ν y := by
-  have hdet : (topL r ((g : Matrix (Fin r) (Fin r) k) * y)).det =
-      (GeneralLinearGroup.det g : k) * (topL r y).det := by
+theorem flat_mul (hr : r ≤ n) (ν : kˣ →* Rˣ) (g : GL (Fin r) k) (y : Matrix (Fin r) (Fin n) k)
+    : flat ν ((g : Matrix (Fin r) (Fin r) k) * y)
+      = ((ν (GeneralLinearGroup.det g) : Rˣ) : R) * flat ν y := by
+  have hdet
+      : (topL r ((g : Matrix (Fin r) (Fin r) k) * y)).det
+        = (GeneralLinearGroup.det g : k) * (topL r y).det := by
     rw [topL_mul hr, Matrix.det_mul]
     rfl
   by_cases hu : IsUnit (topL r y).det
-  · rw [flat_of_isUnit ν (u := GeneralLinearGroup.det g * hu.unit) (by rw [hdet, Units.val_mul, hu.unit_spec]),
+  · rw [flat_of_isUnit ν (u := GeneralLinearGroup.det g * hu.unit)
+        (by rw [hdet, Units.val_mul, hu.unit_spec]),
       flat_of_isUnit ν (u := hu.unit) hu.unit_spec.symm, map_mul, Units.val_mul]
   · have hu' : ¬ IsUnit (topL r ((g : Matrix (Fin r) (Fin r) k) * y)).det := by
       rw [hdet, Units.isUnit_units_mul]
@@ -99,7 +103,6 @@ end Flat
 section Univ
 
 variable {k : Type} [Field k] {r n : ℕ}
-
 
 open Classical in
 def prim (y : Matrix (Fin r) (Fin n) k) : ℚ := if LinearIndependent k y.row then 1 else 0
@@ -120,10 +123,8 @@ theorem finrank_quot (U : Planes k r n) : Module.finrank k ((Fin n → k) ⧸ U.
   rw [Module.finrank_fin_fun] at h1
   omega
 
-
 variable (k r n) in
 structure DetBases where
-
   form : ∀ U : Planes k r n, ((Fin n → k) ⧸ U.1) [⋀^Fin r]→ₗ[k] k
   ne : ∀ U, form U ≠ 0
 
@@ -134,8 +135,8 @@ def DetBases.std (k : Type) [Field k] (r n : ℕ) : DetBases k r n where
 def dU (β : DetBases k r n) (U : Planes k r n) (y : Matrix (Fin r) (Fin n) k) : k :=
   β.form U fun i => U.1.mkQ (y.row i)
 
-theorem dU_ne_zero_iff (β : DetBases k r n) (U : Planes k r n) (y : Matrix (Fin r) (Fin n) k) :
-    dU β U y ≠ 0 ↔ Compl U.1 y := by
+theorem dU_ne_zero_iff (β : DetBases k r n) (U : Planes k r n) (y : Matrix (Fin r) (Fin n) k)
+    : dU β U y ≠ 0 ↔ Compl U.1 y := by
   have hspan : Submodule.span k (Set.range fun i => U.1.mkQ (y.row i)) = ⊤ ↔ Compl U.1 y := by
     have hr : (Set.range fun i => U.1.mkQ (y.row i)) = U.1.mkQ '' Set.range y.row := by
       rw [← Set.range_comp]
@@ -158,8 +159,10 @@ theorem dU_ne_zero_iff (β : DetBases k r n) (U : Planes k r n) (y : Matrix (Fin
     rw [Module.Basis.coe_mk] at hb
     exact hb.2 (β.ne U)
 
-theorem dU_mul (β : DetBases k r n) (U : Planes k r n) (g : Matrix (Fin r) (Fin r) k) (y : Matrix (Fin r) (Fin n) k) :
-    dU β U (g * y) = g.det * dU β U y := by
+theorem dU_mul
+    (β : DetBases k r n) (U : Planes k r n) (g : Matrix (Fin r) (Fin r) k)
+    (y : Matrix (Fin r) (Fin n) k)
+    : dU β U (g * y) = g.det * dU β U y := by
   let e := Module.finBasisOfFinrankEq k ((Fin n → k) ⧸ U.1) (finrank_quot U)
   have hrow : ∀ i, U.1.mkQ ((g * y).row i) = ∑ j, g i j • U.1.mkQ (y.row j) := by
     intro i
@@ -169,42 +172,53 @@ theorem dU_mul (β : DetBases k r n) (U : Planes k r n) (g : Matrix (Fin r) (Fin
 
     rw [hgy, map_sum]
     simp only [map_smul]
-  have hM : e.toMatrix (fun i => U.1.mkQ ((g * y).row i)) =
-      e.toMatrix (fun i => U.1.mkQ (y.row i)) * g.transpose := by
+  have hM
+      : e.toMatrix (fun i => U.1.mkQ ((g * y).row i))
+        = e.toMatrix (fun i => U.1.mkQ (y.row i)) * g.transpose := by
     ext a i
 
     simp only [Module.Basis.toMatrix_apply, hrow, map_sum, map_smul, Finsupp.finsetSum_apply,
-    Finsupp.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.transpose_apply]
+      Finsupp.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.transpose_apply]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   unfold dU
   rw [(β.form U).eq_smul_basis_det e]
-  simp only [AlternatingMap.smul_apply, Module.Basis.det_apply, hM, Matrix.det_mul, Matrix.det_transpose, smul_eq_mul]
+  simp only [AlternatingMap.smul_apply, Module.Basis.det_apply, hM, Matrix.det_mul,
+    Matrix.det_transpose, smul_eq_mul]
   ring
 
 variable [Finite k] {C : Type} [AddCommGroup C]
 
-
 open Classical in
-def univTerm (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k) (U : Planes k r n) :
-    AddMonoidAlgebra ℚ C :=
+def univTerm
+    (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k)
+    (U : Planes k r n)
+    : AddMonoidAlgebra ℚ C :=
   if h : Compl U.1 y then
     AddMonoidAlgebra.single (Multiplicative.toAdd (κ (Units.mk0 _ ((dU_ne_zero_iff β U y).2 h)))) 1
-  else 0
+  else
+    0
 
-def univ (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k) : AddMonoidAlgebra ℚ C :=
+def univ (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k)
+    : AddMonoidAlgebra ℚ C :=
   haveI := Fintype.ofFinite (Planes k r n)
   ((Nat.card k : ℚ) ^ (r * (n - r)))⁻¹ • ∑ U : Planes k r n, univTerm β κ y U
 
-def univCoef (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (c : C) (y : Matrix (Fin r) (Fin n) k) : ℚ :=
+def univCoef
+    (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (c : C) (y : Matrix (Fin r) (Fin n) k)
+    : ℚ :=
   (univ β κ y).coeff c
 
-theorem univCoef_eq (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (c : C) (y : Matrix (Fin r) (Fin n) k) :
-    univCoef β κ c y = ((Nat.card k : ℚ) ^ (r * (n - r)))⁻¹ *
-      Nat.card {U : Planes k r n // ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c} := by
+theorem univCoef_eq
+    (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (c : C) (y : Matrix (Fin r) (Fin n) k)
+    : univCoef β κ c y
+      = ((Nat.card k : ℚ) ^ (r * (n - r)))⁻¹ * Nat.card
+        {U : Planes k r n // ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c} := by
   classical
   haveI := Fintype.ofFinite (Planes k r n)
-  have hterm : ∀ U : Planes k r n, (univTerm β κ y U).coeff c =
-      if ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c then 1 else 0 := by
+  have hterm
+      : ∀ U : Planes k r n,
+        (univTerm β κ y U).coeff c
+          = if ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c then 1 else 0 := by
     intro U
     unfold univTerm
     by_cases hC : Compl U.1 y
@@ -227,17 +241,24 @@ theorem univCoef_eq (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (c : 
   rw [← Nat.card_eq_finsetCard]
   exact Nat.card_congr (Equiv.subtypeEquivRight fun U => by simp)
 
-structure IsAdmissible (κ : kˣ →* Multiplicative C) (Φ : C → Matrix (Fin r) (Fin n) k → ℚ) : Prop where
+structure IsAdmissible (κ : kˣ →* Multiplicative C) (Φ : C → Matrix (Fin r) (Fin n) k → ℚ)
+    : Prop where
   den : ∀ c y, ∃ (m : ℕ) (z : ℤ), Φ c y * (Nat.card k : ℚ) ^ m = z
-  equiv : ∀ (g : GL (Fin r) k) c y,
-    Φ c (((g⁻¹ : GL (Fin r) k) : Matrix (Fin r) (Fin r) k) * y) =
-      Φ (c + Multiplicative.toAdd (κ (GeneralLinearGroup.det g))) y
+  equiv
+    : ∀ (g : GL (Fin r) k) c y,
+      Φ c (((g⁻¹ : GL (Fin r) k) : Matrix (Fin r) (Fin r) k) * y)
+        = Φ (c + Multiplicative.toAdd (κ (GeneralLinearGroup.det g))) y
 
-theorem isAdmissible_univCoef (β : DetBases k r n) (κ : kˣ →* Multiplicative C) : IsAdmissible κ (univCoef β κ) := by
+theorem isAdmissible_univCoef (β : DetBases k r n) (κ : kˣ →* Multiplicative C)
+    : IsAdmissible κ (univCoef β κ) := by
   refine { den := ?_, equiv := ?_ }
   · intro c y
     have hq : (Nat.card k : ℚ) ≠ 0 := Nat.cast_ne_zero.2 Nat.card_pos.ne'
-    refine ⟨r * (n - r), Nat.card {U : Planes k r n // ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c}, ?_⟩
+    refine ⟨
+      r * (n - r),
+      Nat.card {U : Planes k r n // ∃ u : kˣ, (u : k) = dU β U y ∧ Multiplicative.toAdd (κ u) = c},
+      ?_
+    ⟩
     rw [univCoef_eq, mul_comm, mul_inv_cancel_left₀ (pow_ne_zero _ hq)]
     simp
   · intro g c y
@@ -247,7 +268,9 @@ theorem isAdmissible_univCoef (β : DetBases k r n) (κ : kˣ →* Multiplicativ
     apply Equiv.subtypeEquivRight
     intro U
     set a := GeneralLinearGroup.det g
-    have hd : dU β U (((g⁻¹ : GL (Fin r) k) : Matrix (Fin r) (Fin r) k) * y) = ((a⁻¹ : kˣ) : k) * dU β U y := by
+    have hd
+        : dU β U (((g⁻¹ : GL (Fin r) k) : Matrix (Fin r) (Fin r) k) * y)
+          = ((a⁻¹ : kˣ) : k) * dU β U y := by
       rw [dU_mul]
       congr 1
     rw [hd]

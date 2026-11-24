@@ -98,10 +98,6 @@ theorem Wm_perp_Wp (hU : IsInfUnitary ε E) {x y : Big n 1 M} (hx : x ∈ Wm ε 
     exact inner_crossOp_eig_eq_zero hU (ne_of_lt (hθ.trans hθ')) hu.1 hv.1
   exact Submodule.isOrtho_iff_inner_eq.mp h x hx y hy
 
-theorem mem_V_of_mem_ncV {k : ℕ} {F : Big n k M} (hF : F ∈ ncV ε V k) (κ : Fin k → Fin n × Fin n)
-    : F κ ∈ V := by
-  exact ncV_mem hF κ
-
 private theorem casimirK_eq_casValK_smul_of_isKHWVec
     {X : Type*} [AddCommGroup X] [Module ℂ X]
     {A : Fin n → Fin n → Module.End ℂ X} (hA : IsGlRep A)
@@ -126,8 +122,8 @@ private theorem casimirK_eq_casValK_smul_of_isKHWVec
       rw [if_pos rfl, if_neg (lt_irrefl b), add_zero, hw.1 b, map_smul, hw.1 b, smul_smul,
         ← Complex.ofReal_mul, ← sq]
     · have e := LinearMap.congr_fun (hA' a b b a) w
-      simp only [LinearMap.sub_apply, Module.End.mul_apply, eq_self_iff_true, if_true,
-          hw.2 a b h hab.symm, map_zero, sub_zero]
+      simp only [LinearMap.sub_apply, Module.End.mul_apply, if_true, hw.2 a b h hab.symm, map_zero,
+          sub_zero]
         at e
       rw [e, if_neg (ne_of_gt h), if_pos h, hw.1 a, hw.1 b]
       simp [sub_smul]
@@ -200,8 +196,7 @@ theorem crossOp_khw
       rfl
     have hcas := LinearMap.congr_fun (casimirK_bAct (ε := ε) (E := E) 1) x
     rw [casimirK_eq_casValK_smul_of_isKHWVec (bAct_isGlRep hE 1) hν] at hcas
-    simp only [LinearMap.add_apply, LinearMap.smul_apply, Fin.sum_univ_one,
-        factorCasimir_ncV_one hx, hm, two_smul]
+    simp only [LinearMap.add_apply, Fin.sum_univ_one, factorCasimir_ncV_one hx, hm, two_smul]
       at hcas
     rw [two_smul]
     push_cast

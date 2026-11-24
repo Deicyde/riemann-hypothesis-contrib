@@ -64,7 +64,7 @@ def trPairL {κ : Type} [Fintype κ] (z : κ → mixedEmbedding.mixedSpace F)
 
 theorem trPairL_apply {κ : Type} [Fintype κ] (z w : κ → mixedEmbedding.mixedSpace F)
     : trPairL z w = Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, z i * w i) := by
-  simp [trPairL, LinearMap.sum_apply]
+  simp [trPairL]
 
 theorem fderiv_basis
     {κ : Type} [Fintype κ]
@@ -168,7 +168,7 @@ theorem heisLine_deriv_finite_span
     ext z
     rw [heisD_apply, fderiv_basis b f z v, mult_basis b y z, Finset.sum_mul]
     simp only [SchwartzMap.add_apply, SchwartzMap.sum_apply, SchwartzMap.smul_apply, smul_eq_mul, A,
-      B, ContinuousLinearMap.coe_coe, SchwartzMap.lineDerivOp_apply_eq_fderiv]
+      B, ContinuousLinearMap.coe_coe]
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [SchwartzMap.smulLeftCLM_apply_apply (mult F (liftV (F := F) (b j))).hasTemperateGrowth]

@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.thetaEmbeddingSections_baseChange_affine
             t.Emb m T' σ'
               ∧ ∀ (R : Type) [CommRing R] (y : Sp R ⟶ (T' ⊗ t.A).left) (w : Ix g (N' ^ 2) → R),
                 SecCoord _ σ' y w ↔ SecCoord _ σ (y ≫ (h ▷ t.A).left) w := by
-  first
-  | exact @GlobalTheory.emb_baseChange
-  | exact GlobalTheory.emb_baseChange
-  | (intros; apply GlobalTheory.emb_baseChange <;> assumption)
+  first | exact @GlobalTheory.emb_baseChange

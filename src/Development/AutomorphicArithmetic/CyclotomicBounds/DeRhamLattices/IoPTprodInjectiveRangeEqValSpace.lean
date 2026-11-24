@@ -57,7 +57,6 @@ open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
@@ -127,7 +126,7 @@ theorem _root_.UpperTheory.KN.ioP_tprod_injective_and_range_eq_valSpace
   · rintro _ ⟨x, rfl⟩
     exact hval x
   · obtain ⟨u1, cc, κ, hu1, -, hκ0, hv, hκ, -⟩ :=
-      GlobalTheory.T.exists_scale_twisted_place_coefficient_map D X X0 Y S YS Z c w j H
+      _root_.GlobalTheory.PlaceScale.exists_scale D X X0 Y S YS Z c w j H
     have e : u1 = u := funext fun ρ => Subtype.ext ((hu1 ρ).trans (hu ρ).symm)
     subst e
     intro P hP

@@ -51,7 +51,7 @@ namespace GlobalTheory.RecT
 
 theorem geometricLemma_holds : GlobalTheory.Published.GeometricLemma :=
   GlobalTheory.geometricLemma_of_filtration GlobalTheory.bernsteinZelevinskyFiniteness_holds
-    GlobalTheory.geometricLemmaFiltration_holds
+    _root_.CompanionTheory.Geo.geometricLemmaFiltration
 
 theorem good_toral_of_isSubquotient_prodIrr
     : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]

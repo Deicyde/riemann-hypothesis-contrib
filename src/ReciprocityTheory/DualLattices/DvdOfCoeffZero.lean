@@ -259,7 +259,7 @@ private theorem preTilt_eq_zero_of_untilt_eq_zero (x : PreTilt O p) (h : x.until
     rw [map_zero]
     have h2 := congrArg (algebraMap O C) (sh_pow x n)
     rw [h, map_zero, map_pow] at h2
-    first | exact pow_eq_zero h2 | exact pow_eq_zero_iff (pow_ne_zero n hp.out.ne_zero) |>.1 h2
+    first | exact pow_eq_zero_iff (pow_ne_zero n hp.out.ne_zero) |>.1 h2
   apply preTilt_ext_coeff
   intro n
   rw [map_zero, ← mk_sh x n, hs n, map_zero]

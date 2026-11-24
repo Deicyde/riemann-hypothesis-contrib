@@ -144,7 +144,7 @@ private theorem norm_shift {G : Type} [Group G] (c : Fin (m + 1) → G) (j : Fin
       = c j * (List.ofFn fun i => c (j + 1 + i)).prod := by
   rw [List.ofFn_succ, List.ofFn_succ' (f := fun i => c (j + 1 + i))]
   simp only [List.prod_cons, List.concat_eq_append, List.prod_append, List.prod_nil, mul_one,
-    List.prod_singleton, add_zero, Fin.zero_eta]
+    add_zero]
   have h1 : ∀ i : Fin m, j + i.succ = j + 1 + i.castSucc := fun i => by
     rw [← Fin.coeSucc_eq_succ]
     abel

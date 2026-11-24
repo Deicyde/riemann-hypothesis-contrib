@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_fraction_ringOn_of_mem_modelLocalRing
       IsAffineOpen U
         → ∀ z ∈ U, ∀ x ∈ M.O z, ∃ a ∈ M.ringOn (U : Set M.Z), ∃ b ∈ M.ringOn (U : Set M.Z),
           b ≠ 0 ∧ b⁻¹ ∈ M.O z ∧ x = a / b := by
-  first
-  | exact @GlobalTheory.Poinc.exists_eq_div_of_mem_O_affine
-  | exact GlobalTheory.Poinc.exists_eq_div_of_mem_O_affine
-  | (intros; apply GlobalTheory.Poinc.exists_eq_div_of_mem_O_affine <;> assumption)
+  first | exact @GlobalTheory.Poinc.exists_eq_div_of_mem_O_affine

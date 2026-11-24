@@ -181,8 +181,7 @@ theorem exists_solve_matrix
     exact mul_entries_mem _ (fun a b => hV a b) i j
   refine ⟨X * R, fun i j => mul_entries_mem X hRmem i j, ?_⟩
   intro i j
-  have e : Xᴴ * H * (X * R) - W = (Xᴴ * H * X - H) * R + (H * R - W) := by
-    first | noncomm_ring | (simp only [Matrix.sub_mul, Matrix.mul_assoc]; abel)
+  have e : Xᴴ * H * (X * R) - W = (Xᴴ * H * X - H) * R + (H * R - W) := by first | noncomm_ring
   have e1 : H * R = H.det • Matrix.of V := by
     rw [hR, ← Matrix.mul_assoc, Matrix.mul_adjugate, Matrix.smul_mul, Matrix.one_mul]
   rw [e, Matrix.add_apply]

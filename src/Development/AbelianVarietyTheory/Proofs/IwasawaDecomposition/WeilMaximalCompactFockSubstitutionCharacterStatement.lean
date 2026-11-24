@@ -48,6 +48,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum GlobalTheory.JointHarm
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weil_maximalCompact_fock_substitution_character
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
         (χS χT : (AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ))
@@ -85,7 +86,4 @@ theorem _root_.GlobalTheory.T.weil_maximalCompact_fock_substitution_character
                                       (fun τ =>
                                         (BS τ)⁻¹ * compAt θ τ (Formalism.L2.Theta.mt S g) * BS τ)
                                       P) := by
-  first
-  | exact @GlobalTheory.FockCompactAction.om_pureTensorO_eq_fact
-  | exact GlobalTheory.FockCompactAction.om_pureTensorO_eq_fact
-  | (intros; apply GlobalTheory.FockCompactAction.om_pureTensorO_eq_fact <;> assumption)
+  first | exact @GlobalTheory.FockCompactAction.om_pureTensorO_eq_fact

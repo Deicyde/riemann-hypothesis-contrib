@@ -68,15 +68,7 @@ theorem isotypic_stable_gl_operator
     (E : GLOps n K V) (mu : Fin n → ℤ) (a b : Fin n) (x : V) (hx : x ∈ isoSub E mu)
     : E a b x ∈ isoSub E mu := by
   first
-  | exact UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator ..
   | (apply UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator n K V ‹_› ‹_› ‹_› E mu a b x
       hx
   | exact @UpperTheory.Reformulated.B.Qe29.isotypic_stable_gl_operator n K V ‹_› ‹_› ‹_› E mu a b x

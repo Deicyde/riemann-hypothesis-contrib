@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.DivPowerCompatTwoFormDerivativeCompOneForm
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContractionLieDerivativeDivPowerCompatFiltrationStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DerivationContractionLieDerivativeDeRhamRulesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DivPowerCompatRelFiltrationTwoSidedRelEqBotOfBasStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContractionLieDerivativeDivPowerCompatFiltration
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DerivationContractionLieDerivativeDeRhamRules
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DivPowerCompatRelFiltrationTwoSidedRelEqBotOfBas
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -60,14 +60,12 @@ theorem hot_fil
           ∧ (∀ x ∈ rel R δ, hot v e N x ∈ rel R δ)
           ∧ ∀ n, ∀ x ∈ filDR R δ n, hot v e N x ∈ filDR R δ (n + 1) := by
   intro R B _ _ _ J δ v e N hv he
-  obtain ⟨hc0, -, -, -, -, hcdeg⟩ :=
-    (GlobalTheory.T.derivationContraction_lieDerivative_deRham_rules).1 R B v
-  obtain ⟨-, -, -, -, -, hldeg⟩ :=
-    (GlobalTheory.T.derivationContraction_lieDerivative_deRham_rules).2 R B v
-  have hrel := (GlobalTheory.T.contraction_lieDerivative_divPowerCompat_filtration_rules).1
-  have hfil := (GlobalTheory.T.contraction_lieDerivative_divPowerCompat_filtration_rules).2
+  obtain ⟨hc0, -, -, -, -, hcdeg⟩ := (_root_.GlobalTheory.PDForm.ctr_lie_rules).1 R B v
+  obtain ⟨-, -, -, -, -, hldeg⟩ := (_root_.GlobalTheory.PDForm.ctr_lie_rules).2 R B v
+  have hrel := (_root_.GlobalTheory.PDForm.ctr_lie_rel_filDR).1
+  have hfil := (_root_.GlobalTheory.PDForm.ctr_lie_rel_filDR).2
   obtain ⟨-, -, -, -, hfil0, hanti, hsmul⟩ :=
-    (GlobalTheory.T.divPowerCompatRel_filtration_twoSided_rel_eq_bot_of_base).1 R B J δ
+    (_root_.GlobalTheory.PDForm.rel_two_sided_and_bot).1 R B J δ
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro x y
     simp only [hot, map_add (f := _), smul_add, Finset.sum_add_distrib]

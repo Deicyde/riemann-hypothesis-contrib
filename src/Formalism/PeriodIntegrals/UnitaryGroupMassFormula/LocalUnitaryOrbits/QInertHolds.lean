@@ -52,13 +52,16 @@ noncomputable section
 
 namespace PI.OmLocU.Red
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
 open PI.VolStabSW PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
 
 theorem sig_ne (h : IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
   intro hs
@@ -70,19 +73,20 @@ theorem sig_ne (h : IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
     rw [ComplexEmbedding.conjugate_coe_eq]
     have := h4 τ x
     rw [hs, AlgHom.id_apply] at this
-    rw [starRingEnd_apply]; exact this.symm
+    rw [starRingEnd_apply]
+    exact this.symm
   exact InfinitePlace.not_isReal_iff_isComplex.2 (htc.isComplex (InfinitePlace.mk τ))
     (InfinitePlace.isReal_mk_iff.2 hr)
 
 theorem fix_range (h : IsCMExt F E σ) {y : E} (hy : σ y = y) : ∃ c : F, algebraMap F E c = y := by
   apply PI.OmLocU.NormOneUnitFixedPoints.gr_fix_range <;> assumption
 
-theorem fix_int (h : IsCMExt F E σ) (y : 𝓞 E) (hy : sigO σ y = y) :
-    ∃ a : 𝓞 F, algebraMap (𝓞 F) (𝓞 E) a = y := by
+theorem fix_int (h : IsCMExt F E σ) (y : 𝓞 E) (hy : sigO σ y = y)
+    : ∃ a : 𝓞 F, algebraMap (𝓞 F) (𝓞 E) a = y := by
   have hy' : σ (y : E) = y := by rw [← sigO_coe, hy]
   obtain ⟨c, hc⟩ := fix_range σ h hy'
   have hint : IsIntegral ℤ c := by
-    rw [← isIntegral_algebraMap_iff (A := F) (B := E) , hc]
+    rw [← isIntegral_algebraMap_iff (A := F) (B := E), hc]
     exact y.isIntegral_coe
   refine ⟨⟨c, (mem_integralClosure_iff ℤ F).2 hint⟩, RingOfIntegers.ext ?_⟩
   exact hc
@@ -99,13 +103,16 @@ theorem qInert_holds : QInert σ J ψ v := by
     exact hstd.1.2.2.1
   have hsig : ∀ x : QE (E := E) v, sigQ σ v x = x := fun x => by rw [hid]; rfl
 
-  have hmem : ∀ x : QE (E := E) v, (∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x + x) ∧
-      ∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x * x := by
+  have hmem
+      : ∀ x : QE (E := E) v,
+        (∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x + x)
+          ∧ ∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x * x := by
     intro x
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
     have hs : Ideal.Quotient.mk (IE (E := E) v) (sigO σ y) = Ideal.Quotient.mk _ y := by
       rw [← sigQ_mk]; exact hsig _
-    have hss : sigO σ (sigO σ y) = y := RingOfIntegers.ext (by simp only [sigO_coe]; exact sig_sig σ hstd.1 _)
+    have hss : sigO σ (sigO σ y) = y :=
+      RingOfIntegers.ext (by simp only [sigO_coe]; exact sig_sig σ hstd.1 _)
     obtain ⟨a, ha⟩ := fix_int σ hstd.1 (y + sigO σ y) (by rw [map_add (f := _), hss, add_comm])
     obtain ⟨b, hb⟩ := fix_int σ hstd.1 (y * sigO σ y) (by rw [map_mul, hss, mul_comm])
     refine ⟨⟨Ideal.Quotient.mk _ a, ?_⟩, ⟨Ideal.Quotient.mk _ b, ?_⟩⟩

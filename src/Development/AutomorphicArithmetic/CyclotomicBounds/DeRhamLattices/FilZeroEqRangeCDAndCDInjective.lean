@@ -49,8 +49,6 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
   GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
-
-
 private theorem mem_FilD_zero (l : ℕ) [Fact l.Prime] (x : Per.BdR l)
     : x ∈ Per.FilD l 0 ↔ ∃ y : Per.BdRp l, algebraMap (Per.BdRp l) (Per.BdR l) y = x := ⟨
   fun h => let ⟨z, _, e⟩ := GlobalTheory.RingIface.exists_of_mem_FilD_nat l (n := 0) h; ⟨z, e⟩,

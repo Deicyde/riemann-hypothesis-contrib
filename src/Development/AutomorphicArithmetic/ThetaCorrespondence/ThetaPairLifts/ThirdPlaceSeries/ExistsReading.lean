@@ -40,8 +40,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.EigTie
@@ -109,7 +107,8 @@ theorem ResTiedAlt.exists_reading
   obtain ⟨ι, red, hι⟩ := h w hw (X.l i) (resChar_eq (X.lPrime i).out hl)
   have key : ∀ x : ↥D.LL0, 0 ≤ D.what₂.places.val w x ↔ ‖ρ.κ (X.emb0 i x)‖ ≤ 1 := fun x =>
     (hι.1 x).trans
-      (ball_of_int (ι.symm.toRingHom.comp (embLL0 D)) (ρ.κ.comp (X.emb0 i))
+      (_root_.GlobalTheory.SmallPrimeIdeal.norm_le_one_iff (ι.symm.toRingHom.comp (embLL0 D))
+        (ρ.κ.comp (X.emb0 i))
         (fun y => ((hι.1.lt_iff _).symm.trans (H y).symm).trans (norm_lt_iff ρ _))
         x)
   cases b

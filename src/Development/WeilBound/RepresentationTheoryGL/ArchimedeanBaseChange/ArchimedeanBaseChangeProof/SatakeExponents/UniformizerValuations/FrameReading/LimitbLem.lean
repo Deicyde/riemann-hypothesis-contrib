@@ -182,7 +182,7 @@ theorem isKer_zero_rank
 
 theorem ent_smul {n : ℕ} (M : KMod n) (c : ℂ) (A : M.V →L[ℂ] M.V) (i j : Ix M)
     : ent M (c • A) i j = c * ent M A i j := by
-  simp [ent, inner_smul_right]
+  simp [ent]
 
 theorem tens_update_smul
     {E : Type} [Field E] [NumberField E] [IsCMField E]
@@ -191,7 +191,7 @@ theorem tens_update_smul
     (v : InfinitePlace E) (c : ℂ)
     : tens (Function.update ka v (c • ka v)) kb ψ = c • tens ka kb ψ := by
   funext i j y
-  simp only [tens, entA, Pi.smul_apply, smul_eq_mul]
+  simp only [tens, entA]
   have e
       : ∀ w,
         ent (Ma w) (Function.update ka v (c • ka v) w (gInf w y.1).val) (i.1.1 w) (j.1.1 w)
@@ -199,7 +199,7 @@ theorem tens_update_smul
     intro w
     by_cases h : w = v
     · subst h; simp [ent_smul]
-    · simp [Function.update_of_ne h, h]
+    · simp [h]
   simp only [e, Finset.prod_mul_distrib, Finset.prod_ite_eq', Finset.mem_univ, if_true]
   simp only [Matrix.smul_apply, Pi.smul_apply, smul_eq_mul, tens, entA]
   ring
@@ -211,7 +211,7 @@ theorem tens_update_smul_b
     (v : InfinitePlace E) (c : ℂ)
     : tens ka (Function.update kb v (c • kb v)) ψ = c • tens ka kb ψ := by
   funext i j y
-  simp only [tens, entA, Pi.smul_apply, smul_eq_mul]
+  simp only [tens, entA]
   have e
       : ∀ w,
         ent (Mb w) (Function.update kb v (c • kb v) w (gInf w y.2).val) (i.1.2 w) (j.1.2 w)
@@ -219,7 +219,7 @@ theorem tens_update_smul_b
     intro w
     by_cases h : w = v
     · subst h; simp [ent_smul]
-    · simp [Function.update_of_ne h, h]
+    · simp [h]
   simp only [e, Finset.prod_mul_distrib, Finset.prod_ite_eq', Finset.mem_univ, if_true]
   simp only [Matrix.smul_apply, Pi.smul_apply, smul_eq_mul, tens, entA]
   ring

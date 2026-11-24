@@ -160,7 +160,6 @@ theorem decomp
     rfl
   · rw [hμ, integral_smul_measure, hemb.integral_map]
     simp only [ENNReal.coe_toReal, Complex.real_smul, NNReal.coe_inv, Complex.ofReal_inv]
-    push_cast
     rfl
 
 end PositivityTheory.Rg.Rsw.L.LApproxId

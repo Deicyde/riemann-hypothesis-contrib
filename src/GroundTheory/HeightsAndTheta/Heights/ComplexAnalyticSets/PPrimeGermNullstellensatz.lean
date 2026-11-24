@@ -61,10 +61,11 @@ namespace PrimeGermNullstellensatz
 
 variable {σ : Type} [Fintype σ] {w : σ → ℂ}
 
-theorem exists_of_mem_holGermIdeal {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ) {φ : holGerms w}
-    (hφ : φ ∈ holGermIdeal w p) :
-    ∃ h : Fin k → (σ → ℂ) → ℂ, (∀ i, AnalyticAt ℂ (h i) w) ∧
-      (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
+theorem exists_of_mem_holGermIdeal
+    {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ) {φ : holGerms w} (hφ : φ ∈ holGermIdeal w p)
+    : ∃ h : Fin k → (σ → ℂ) → ℂ,
+      (∀ i, AnalyticAt ℂ (h i) w)
+        ∧ (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
   induction hφ using Submodule.span_induction with
   | mem φ hφ =>
     obtain ⟨i, hi⟩ := hφ
@@ -75,7 +76,8 @@ theorem exists_of_mem_holGermIdeal {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ
     simp
   | zero =>
     refine ⟨fun _ _ => 0, fun _ => analyticAt_const, ?_⟩
-    rw [show (fun z => ∑ i, (fun (_ : Fin k) (_ : σ → ℂ) => (0 : ℂ)) i z * p i z) = (0 : (σ → ℂ) → ℂ) by
+    rw [show (fun z => ∑ i, (fun (_ : Fin k) (_ : σ → ℂ) => (0 : ℂ)) i z * p i z)
+        = (0 : (σ → ℂ) → ℂ) by
       funext z; simp]
     rfl
   | add x y _ _ hx hy =>
@@ -97,26 +99,35 @@ theorem exists_of_mem_holGermIdeal {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ
     funext z
     simp [Finset.mul_sum, mul_assoc]
 
-theorem mem_holGermIdeal_of_eq {k : ℕ} {p : Fin k → (σ → ℂ) → ℂ} (hp : ∀ i, AnalyticAt ℂ (p i) w)
-    {h : Fin k → (σ → ℂ) → ℂ} (hh : ∀ i, AnalyticAt ℂ (h i) w) (φ : holGerms w)
-    (hφ : (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)) :
-    φ ∈ holGermIdeal w p := by
-  have hsum : φ = ∑ i, (⟨(h i : Germ (𝓝 w) ℂ), h i, hh i, rfl⟩ : holGerms w) *
-      ⟨(p i : Germ (𝓝 w) ℂ), p i, hp i, rfl⟩ := by
+theorem mem_holGermIdeal_of_eq
+    {k : ℕ} {p : Fin k → (σ → ℂ) → ℂ} (hp : ∀ i, AnalyticAt ℂ (p i) w)
+    {h : Fin k → (σ → ℂ) → ℂ} (hh : ∀ i, AnalyticAt ℂ (h i) w)
+    (φ : holGerms w)
+    (hφ : (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ))
+    : φ ∈ holGermIdeal w p := by
+  have hsum
+      : φ
+        = ∑ i, (⟨(h i : Germ (𝓝 w) ℂ), h i, hh i, rfl⟩ : holGerms w) *
+          ⟨(p i : Germ (𝓝 w) ℂ), p i, hp i, rfl⟩ := by
     apply Subtype.ext
-    rw [hφ, show (fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) = ∑ i, h i * p i by
-      funext z; simp [Finset.sum_apply]]
+    rw [hφ,
+      show (fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) = ∑ i, h i * p i by
+        funext z; simp [Finset.sum_apply]]
 
-    rw [show ((∑ i, h i * p i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) = Germ.coeRingHom (𝓝 w) (∑ i, h i * p i) from rfl,
-    map_sum, AddSubmonoidClass.coe_finsetSum]
+    rw [show ((∑ i, h i * p i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)
+          = Germ.coeRingHom (𝓝 w) (∑ i, h i * p i) from
+        rfl,
+      map_sum, AddSubmonoidClass.coe_finsetSum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul]
     rfl
   rw [hsum]
   exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem coeff_eq_zero_of_distinct_roots {N : ℕ} (c t : Fin N → ℂ) (ht : Function.Injective t)
-    (hroot : ∀ m, ∑ j, c j * t m ^ (j : ℕ) = 0) : ∀ j, c j = 0 := by
+theorem coeff_eq_zero_of_distinct_roots
+    {N : ℕ}
+    (c t : Fin N → ℂ) (ht : Function.Injective t) (hroot : ∀ m, ∑ j, c j * t m ^ (j : ℕ) = 0)
+    : ∀ j, c j = 0 := by
   rcases Nat.eq_zero_or_pos N with hN | hN
   · subst hN
     exact fun j => j.elim0
@@ -129,15 +140,19 @@ theorem coeff_eq_zero_of_distinct_roots {N : ℕ} (c t : Fin N → ℂ) (ht : Fu
     refine lt_of_le_of_lt (Polynomial.natDegree_sum_le_of_forall_le _ _ (n := N - 1) fun j _ => ?_)
       (Nat.sub_lt hN Nat.one_pos)
     exact (Polynomial.natDegree_C_mul_X_pow_le _ _).trans (Nat.le_sub_one_of_lt j.isLt)
-  have hQ : Q = 0 := Polynomial.eq_zero_of_natDegree_lt_card_of_eval_eq_zero Q ht
-    (fun m => by rw [hQe]; exact hroot m) hdeg
+  have hQ : Q = 0 :=
+    Polynomial.eq_zero_of_natDegree_lt_card_of_eval_eq_zero Q ht
+      (fun m => by rw [hQe]; exact hroot m)
+      hdeg
   intro j
   have hj := congrArg (fun q : Polynomial ℂ => q.coeff (j : ℕ)) hQ
   simp only [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow, Polynomial.coeff_zero,
-    Fin.val_inj] at hj
+      Fin.val_inj]
+    at hj
   simpa using hj
 
-theorem proof (hCover : PrimeGermCanonicalCover.Statement) : PrimeGermNullstellensatz.Statement := by
+theorem proof (hCover : PrimeGermCanonicalCover.Statement)
+    : PrimeGermNullstellensatz.Statement := by
   intro σ _ w k p g hp hg hP hvan
   obtain ⟨d, A, ℓ, N, δ, hδ, hδP, hdiv, hsheet⟩ := hCover σ w k p hp hP
   obtain ⟨M, a, h, ha, hh, hrel⟩ := hdiv g hg
@@ -154,7 +169,7 @@ theorem proof (hCover : PrimeGermCanonicalCover.Statement) : PrimeGermNullstelle
     rw [hg0, mul_zero, zero_sub, neg_eq_zero, hAx] at h0
     exact h0
 
-  have hδne : ¬ (δ =ᶠ[𝓝 (A w)] 0) := by
+  have hδne : ¬(δ =ᶠ[𝓝 (A w)] 0) := by
     intro h0
     apply hδP
     refine ⟨fun _ _ => 0, fun _ => analyticAt_const, ?_⟩
@@ -162,9 +177,11 @@ theorem proof (hCover : PrimeGermCanonicalCover.Statement) : PrimeGermNullstelle
     simpa using hz
 
   have hzero : ∀ᶠ y in 𝓝 (A w), ∀ j, a j y = 0 := by
-    have hall : ∀ᶠ y in 𝓝 (A w), AnalyticAt ℂ δ y ∧ (∀ j, AnalyticAt ℂ (a j) y) ∧
-        (δ y ≠ 0 → ∀ j, a j y = 0) :=
-      hδ.eventually_analyticAt.and ((eventually_all.2 fun j => (ha j).eventually_analyticAt).and hoff)
+    have hall
+        : ∀ᶠ y in 𝓝 (A w), AnalyticAt ℂ δ y ∧ (∀ j, AnalyticAt ℂ (a j) y) ∧
+          (δ y ≠ 0 → ∀ j, a j y = 0) :=
+      hδ.eventually_analyticAt.and ((eventually_all.2 fun j => (ha j).eventually_analyticAt).and
+        hoff)
     obtain ⟨r, hr0, hrB⟩ := Metric.eventually_nhds_iff_ball.1 hall
     filter_upwards [Metric.ball_mem_nhds (A w) hr0] with y₀ hy₀ j
     by_contra hne
@@ -175,7 +192,8 @@ theorem proof (hCover : PrimeGermCanonicalCover.Statement) : PrimeGermNullstelle
       by_contra hδy
       exact hy ((hrB y hyB).2.2 hδy j)
     have hon : AnalyticOnNhd ℂ δ (Metric.ball (A w) r) := fun y hy => (hrB y hy).1
-    have hEq := hon.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball _ _).isPreconnected hy₀ hnear
+    have hEq :=
+      hon.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball _ _).isPreconnected hy₀ hnear
     filter_upwards [Metric.ball_mem_nhds (A w) hr0] with y hy using hEq hy
 
   have hrel' : ∀ᶠ z in 𝓝 w, δ (A z) ^ M * g z = ∑ i, h i z * p i z := by
@@ -187,8 +205,8 @@ theorem proof (hCover : PrimeGermCanonicalCover.Statement) : PrimeGermNullstelle
   let Dg : holGerms w := ⟨((fun z => δ (A z) : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ), _, hδA, rfl⟩
   have hmem : Dg ^ M * G ∈ holGermIdeal w p := by
     refine mem_holGermIdeal_of_eq hp hh _ ?_
-    rw [show ((Dg ^ M * G : holGerms w) : Germ (𝓝 w) ℂ) =
-        (((fun z => δ (A z)) ^ M * g : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) by
+    rw [show ((Dg ^ M * G : holGerms w) : Germ (𝓝 w) ℂ)
+        = (((fun z => δ (A z)) ^ M * g : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) by
       rw [Germ.coe_mul, Germ.coe_pow]
       rfl]
     exact Germ.coe_eq.2 (hrel'.mono fun z hz => by simpa using hz)

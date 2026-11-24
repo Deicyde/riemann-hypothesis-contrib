@@ -43,8 +43,6 @@ import Development.AbelianVarietyTheory.Definitions.PlaceAdaptation.AdaptStd
 
 @[expose] public section
 
-
-
 section
 open AlgebraicGeometry CategoryTheory NumberField IsLocalRing IsDedekindDomain
   Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.PGsh
@@ -75,8 +73,8 @@ theorem _root_.GlobalTheory.RefSum.NumPtAlt.numbers_at_point
                   ≤ C * unitE p := by
   intro hS
   refine Closed.imp
-    (Closed.and (_root_.GlobalTheory.T.quotient_weight_gap_bounds' hS)
-      (_root_.GlobalTheory.T.lenT_zBase_unitE_nCol_bounds hS))
+    (Closed.and (_root_.GlobalTheory.RefSum.QuoShape.quo_shape_dom_lastPos_weight_eq hS)
+      (_root_.GlobalTheory.RefSum.SizeTZ.parameters_scale_rank_gap_bounds hS))
     ?_
   rintro eps Fm CH - ⟨⟨_, _, hA⟩, ⟨_, _, hB⟩⟩
   obtain ⟨x0, h⟩ := _root_.GlobalTheory.CovTop.EventuallyAtAllPoints.and hA hB
@@ -88,8 +86,8 @@ theorem _root_.GlobalTheory.RefSum.NumPtAlt.numbers_at_point
   · have hev : Even (nCol (dat p i)) :=
       even_iff_two_dvd.2 (Dvd.dvd.trans (by norm_num) eight_dvd_nCol)
     have :=
-      (GlobalTheory.T.thetaExponents_dominant_lastEntry_one_degree _ _ (dat p i) u1 (nCol (dat p i))
-        _ a1 hev a4 a5 a6).2.2.2.2
+      (_root_.GlobalTheory.RefSum.thA_dominant_lastPos_degree _ _ (dat p i) u1 (nCol (dat p i)) _ a1
+        hev a4 a5 a6).2.2.2.2
     rw [finrank_host, a3, Nat.mul_div_cancel_left _ two_pos] at this
     exact this
   · have hg := log_g_le (Fm.params x hx ι) b2 b5 b6

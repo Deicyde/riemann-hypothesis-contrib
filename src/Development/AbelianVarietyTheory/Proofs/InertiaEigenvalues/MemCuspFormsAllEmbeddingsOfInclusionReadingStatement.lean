@@ -51,6 +51,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT
   Formalism.L2.Pj GlobalTheory.CoverRead
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_cuspForms_allEmbeddings_of_inclusion_reading
     : ∀ (D : D7) (T : CoreJ D),
       LawsJ T
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.mem_cuspForms_allEmbeddings_of_inclusion_reading
                 → ∀ f ∈ sec (T.Q.Xo j) T.Q.c (wtA w) w.n,
                   rdU (T.U j T.σ₀) f ∈ holSub0 (T.U j T.σ₀).X (laU (T.U j T.σ₀) (wtA w) w.n)
                     → f ∈ T.cuspA j (wtA w) w.n := by
-  first
-  | exact @GlobalTheory.CuspAllEmb.mem_cuspA_of_rdU_mem_holSub0
-  | exact GlobalTheory.CuspAllEmb.mem_cuspA_of_rdU_mem_holSub0
-  | (intros; apply GlobalTheory.CuspAllEmb.mem_cuspA_of_rdU_mem_holSub0 <;> assumption)
+  first | exact @GlobalTheory.CuspAllEmb.mem_cuspA_of_rdU_mem_holSub0

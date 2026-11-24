@@ -174,7 +174,7 @@ private theorem step
           = 1 + single j i d := by
       ext a b
       rw [conj_apply, hz]
-      simp only [Matrix.add_apply, one_apply, single_apply, Equiv.apply_eq_iff_eq]
+      simp only [Matrix.add_apply, single_apply]
       congr 2
       · change (1 : Matrix (Fin n) (Fin n) k) _ _ = (1 : Matrix (Fin n) (Fin n) k) _ _
         simp [Matrix.one_apply]

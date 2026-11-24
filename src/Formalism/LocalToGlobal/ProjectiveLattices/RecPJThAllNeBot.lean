@@ -92,22 +92,12 @@ theorem recPJ_vAt_inc
   dsimp only [recPJ, mkX, vG, incG]
   refine le_antisymm (iInf_le_of_le (deg w) (le_of_eq ?_)) (le_iInf fun m => ?_)
   · change vAtV y ((AddMonoidAlgebra.single (deg w) F.1).coeff (deg w)) = _
-    first
-    | simp [AddMonoidAlgebra.coeff_single]
-    | simp [AddMonoidAlgebra.single_apply]
-    | simp [Finsupp.single_apply]
-    | exact (0 : Nat)
+    first | simp [AddMonoidAlgebra.coeff_single]
   · change _ ≤ vAtV y ((AddMonoidAlgebra.single (deg w) F.1).coeff m)
     by_cases hm : deg w = m
     · subst hm
-      first
-      | simp [AddMonoidAlgebra.coeff_single]
-      | simp [AddMonoidAlgebra.single_apply]
-      | simp [Finsupp.single_apply]
-    · first
-      | simp [AddMonoidAlgebra.coeff_single, hm]
-      | simp [AddMonoidAlgebra.single_apply, hm]
-      | simp [Finsupp.single_apply, hm]
+      first | simp [AddMonoidAlgebra.coeff_single]
+    · first | simp [AddMonoidAlgebra.coeff_single, hm]
       rw [(isVal_vAt y).zero]
       exact le_top
 

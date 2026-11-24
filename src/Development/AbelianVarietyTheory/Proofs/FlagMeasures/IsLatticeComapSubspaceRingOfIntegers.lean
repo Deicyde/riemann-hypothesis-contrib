@@ -72,14 +72,7 @@ theorem exists_ne_zero_smul_mem_of_span_eq_top
     (v : V)
     : ∃ d : 𝓞 K, d ≠ 0 ∧ d • v ∈ Λ := by
   first
-  | exact @_root_.GlobalTheory.TargetStatementBis.target
-  | exact _root_.GlobalTheory.TargetStatementBis.target
   | (apply _root_.GlobalTheory.TargetStatementBis.target <;> assumption)
-  | (intros; apply _root_.GlobalTheory.TargetStatementBis.target <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.TargetStatementBis.target <;> first | assumption | infer_instance
-    )
   | (intros; exact _root_.GlobalTheory.TargetStatementBis.target ..)
 
 theorem isLattice_comap_subtype_ringOfIntegers

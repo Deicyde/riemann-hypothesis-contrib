@@ -1,9 +1,9 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CentreSetDominatingPointStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartPrimeExistsUniquePointStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtChartLocalizationStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CentreSetDominatingPoint
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartPrimeExistsUniquePoint
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtChartLocalization
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -63,21 +63,6 @@ theorem isLocalRing_regAt
   show IsLocalRing (genMap ξ p).range
   exact IsLocalRing.of_surjective' (genMap ξ p).rangeRestrict (genMap ξ p).rangeRestrict_surjective
 
-theorem isUnit_regAt_iff
-    {X : Scheme.{0}} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) (a : regAt ξ p)
-    : IsUnit a ↔ unitAt ξ p (a : Ω) := by
-  constructor
-  · intro h
-    obtain ⟨b, hb⟩ := h.exists_right_inv
-    have e : (a : Ω) * (b : Ω) = 1 := congrArg Subtype.val hb
-    have ha : (a : Ω) ≠ 0 := fun h0 => by simp [h0] at e
-    refine ⟨ha, a.2, ?_⟩
-    rw [inv_eq_of_mul_eq_one_right e]
-    exact b.2
-  · rintro ⟨h0, -, h2⟩
-    exact isUnit_iff_exists_inv.2 ⟨⟨_, h2⟩, Subtype.ext (mul_inv_cancel₀ h0)⟩
-
 theorem unitAt_iff_of_dominated
     {X X' : Scheme.{0}} {Ω Ω' : Type} [Field Ω] [Field Ω']
     {ξ : Spec (CommRingCat.of Ω) ⟶ X} {ξ' : Spec (CommRingCat.of Ω') ⟶ X'} {i : Ω →+* Ω'}
@@ -102,8 +87,8 @@ theorem eq_of_dominated_of_inChart
     (dr : (∀ a ∈ regAt M.ξ r, i a ∈ regAt ξ' p')
       ∧ ∀ a ∈ regAt M.ξ r, unitAt ξ' p' (i a) → unitAt M.ξ r a)
     : q = r := by
-  have cq := (GlobalTheory.T.regAt_chart_localization o Ω κ x M c q hq).1
-  have cr := (GlobalTheory.T.regAt_chart_localization o Ω κ x M c r hr).1
+  have cq := (_root_.GlobalTheory.CompanionTheory.Ar.chart_regAt_localisation o Ω κ x M c q hq).1
+  have cr := (_root_.GlobalTheory.CompanionTheory.Ar.chart_regAt_localisation o Ω κ x M c r hr).1
   haveI := isLocalRing_regAt M.ξ q
   let f : chRing o x c →+* regAt M.ξ q :=
     ((chRing o x c).val : chRing o x c →+* Ω).codRestrict (regAt M.ξ q) fun u => cq _ u.2
@@ -111,10 +96,11 @@ theorem eq_of_dominated_of_inChart
       : ∀ u : chRing o x c,
         u ∈ (IsLocalRing.maximalIdeal (regAt M.ξ q)).comap f ↔ ¬ unitAt M.ξ q (u : Ω) := by
     intro u
-    rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_regAt_iff]
+    rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
+      _root_.GlobalTheory.CompanionTheory.Ar.Centre.isUnit_regAt_iff]
     rfl
   obtain ⟨p, -, huniq⟩ :=
-    GlobalTheory.T.chart_prime_existsUnique_point o Ω κ x M c hq.1 _
+    _root_.GlobalTheory.CompanionTheory.Ar.chart_prime_point o Ω κ x M c hq.1 _
       (inferInstance : ((IsLocalRing.maximalIdeal (regAt M.ξ q)).comap f).IsPrime)
   have e1 := huniq q ⟨hq, hP⟩
   have e2 :=
@@ -140,9 +126,13 @@ theorem eq_of_dominated
   have hctr : p' ∈ ctrSet o x i ξ' := ⟨
     c₁,
     hc₁.1,
-    fun a ha => d₁.1 a ((GlobalTheory.T.regAt_chart_localization o Ω κ x M c₁ q₁ hc₁).1 a ha)
+    fun a ha =>
+      d₁.1 a
+        ((_root_.GlobalTheory.CompanionTheory.Ar.chart_regAt_localisation o Ω κ x M c₁ q₁ hc₁).1 a
+          ha)
   ⟩
-  obtain ⟨p₀, d₀, -, hp₀⟩ := GlobalTheory.T.centre_set_dominating_point o Ω κ x M X' Ω' ξ' i p' hctr
+  obtain ⟨p₀, d₀, -, hp₀⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Centre.exists_centre o Ω κ x M X' Ω' ξ' i p' hctr
   have e₁ : q₁ = p₀ :=
     eq_of_dominated_of_inChart M hc₁ (hp₀ c₁ hc₁.1 fun j => d₁.1 _ (hc₁.2 j)) d₁ d₀
   have e₂ : q₂ = p₀ :=

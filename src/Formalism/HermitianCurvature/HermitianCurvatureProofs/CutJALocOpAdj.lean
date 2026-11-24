@@ -84,11 +84,6 @@ variable
   {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem wR_lie {w : List (B.Mat k r)} (hw : ∀ X ∈ w, B.inLie k r X)
-    : ∀ x ∈ Formalism.FourierDecayAlt.P.BetaSesquilinearity.wR w, B.inLie k r x.2 := fun x hx =>
-  Formalism.FourierDecayAlt.P.BetaSesquilinearity.lie_LR (u := []) (by simp) hw x
-    (by simpa [Formalism.FourierDecayAlt.P.BetaSesquilinearity.wL] using hx)
-
 theorem rw_congr_GV
     {F₀ : Type} [NormedAddCommGroup F₀] [NormedSpace ℂ F₀]
     {O : Set (B.Mat k r)} (hO : IsOpen O)
@@ -98,7 +93,8 @@ theorem rw_congr_GV
   intro g hg hgO
   rw [← Formalism.FourierDecayAlt.P.BetaSesquilinearity.Dw_wR,
     ← Formalism.FourierDecayAlt.P.BetaSesquilinearity.Dw_wR]
-  exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.Dw_congr_loc (wR_lie hw) hO h g hg hgO
+  exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.Dw_congr_loc
+    (_root_.PI.UnitaryGroupMassFormula.UsCost.GrothendieckCommutativity.lie_wR hw) hO h g hg hgO
 
 theorem opApply_congr_GV
     (Θ : B.DiffOp k r Wp Wq)

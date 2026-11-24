@@ -51,6 +51,7 @@ open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
   ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
   GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.flag_adjacent_swap_varieties_arithmetic
     : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
         (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
@@ -68,4 +69,4 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.flag_adjacent_swap_varieties_a
             (∀ p : (Σ k, ι k), p.1 ≠ k₀ → v₁ p = ⟨some p.1, p.2⟩)
               → (∀ m : ι k₀, v₁ ⟨k₀, m⟩ = ⟨none, m⟩)
               → imageZ v₁ (mCoordIdeal (M.wCo (τ, a) k₀ ca cb RatFunc.X)) = mCoordIdeal y := by
-  first | exact @PositivityTheory.Xgp.t_c_w_arith | exact PositivityTheory.Xgp.t_c_w_arith
+  first | exact @PositivityTheory.Xgp.t_c_w_arith

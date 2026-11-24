@@ -47,9 +47,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Admis
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal

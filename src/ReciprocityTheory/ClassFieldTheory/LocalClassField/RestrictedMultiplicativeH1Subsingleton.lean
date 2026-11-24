@@ -125,7 +125,6 @@ theorem exists_units_of_cocycle
     calc
       b = ∑ s, a (m s) * (m s).1 c := (hmbij.sum_comp (fun s => a s * s.1 c)).symm
       _ = f h * (h : L ≃ₐ[K] L) b := by
-
         rw [hb, map_sum, Finset.mul_sum]
         refine Finset.sum_congr rfl fun s _ => ?_
         rw [hma, hm1, map_mul, mul_assoc]

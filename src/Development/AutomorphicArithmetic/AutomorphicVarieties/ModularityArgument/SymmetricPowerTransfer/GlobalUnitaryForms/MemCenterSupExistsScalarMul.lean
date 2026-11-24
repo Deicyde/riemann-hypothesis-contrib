@@ -133,7 +133,7 @@ theorem emb_map
     : mt (j' z') = (mt (j z)).map (lmap f Δ) := by
   rw [h, h', e, ez]
   ext a b <;> by_cases hab : a = b
-    <;> simp [lmap, emap, hab, Matrix.one_apply, QuadraticAlgebra.re_one, QuadraticAlgebra.im_one]
+    <;> simp [lmap, emap, hab, QuadraticAlgebra.re_one, QuadraticAlgebra.im_one]
 
 theorem emb_comm {γ : DX Δ} {j} (h : IsEmb τ γ j) (z) : j z * γ = γ * j z := by
   refine dx_ext ?_

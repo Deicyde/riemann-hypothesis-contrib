@@ -103,7 +103,6 @@ instance : CommGroup IdeleLimit :=
   inferInstanceAs
     (CommGroup (DirectLimit (fun F : FiniteSubfield ↦ IdeleGroup F.1) (fun _ _ h ↦ ideleMap h)))
 
-
 def of (F : FiniteSubfield) : IdeleGroup F.1 →* IdeleLimit where
   toFun x :=
     (⟦⟨F, x⟩⟧ : DirectLimit (fun F : FiniteSubfield ↦ IdeleGroup F.1) (fun _ _ h ↦ ideleMap h))

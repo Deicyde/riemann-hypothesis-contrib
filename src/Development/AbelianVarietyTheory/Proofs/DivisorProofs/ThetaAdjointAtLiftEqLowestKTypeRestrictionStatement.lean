@@ -45,6 +45,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.L2.Indef Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev
   Formalism.IndefR.Datum Formalism.IndefR
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaAdjoint_at_lift_eq_lowestKType_restriction
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.thetaAdjoint_at_lift_eq_lowestKType_restriction
         R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → R.IsThP → A.v0 = InfinitePlace.mk D.what₂.embLL
           → ∀ IL : RecTie.LiftIds (RecTie.toLiftReal R F tupT hm hTop hinj),
             RecTie.ThetaFireL (RecTie.toLiftReal R F tupT hm hTop hinj) IL := by
-  first
-  | exact @GlobalTheory.ThetaFireLift.thetaFireL
-  | exact GlobalTheory.ThetaFireLift.thetaFireL
-  | (intros; apply GlobalTheory.ThetaFireLift.thetaFireL <;> assumption)
+  first | exact @GlobalTheory.ThetaFireLift.thetaFireL

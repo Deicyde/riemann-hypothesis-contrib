@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
 open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
   GlobalTheory.RowClaim MeasureTheory
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.besselPeriodCorank_converges_column
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} (W : G.Weil)
         (M : Vol G) (_hM : M.IsRow)
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.besselPeriodCorank_converges_column
       BplusConv W M
         (pairVec (GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.coefPlus G W.θ) ξ Ψ)
         F := by
-  first
-  | exact @GlobalTheory.RowBplus.bplusConv_col
-  | exact GlobalTheory.RowBplus.bplusConv_col
-  | (intros; apply GlobalTheory.RowBplus.bplusConv_col <;> assumption)
+  first | exact @GlobalTheory.RowBplus.bplusConv_col

@@ -90,7 +90,6 @@ theorem lamTG_w
     rw [e, ← h2]; ring
   split_ifs with hk
   · simp only [hcToWeightQ, rhoVec, lamZ, dif_pos hk]
-    push_cast
     ring
   · simp only [wJ, eJ, dif_pos (D.R.blk_lt hj r hk)]
 

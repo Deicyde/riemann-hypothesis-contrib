@@ -68,7 +68,7 @@ theorem exists_complete_dvr_centre
     have : CharZero (PowerSeries Ω) :=
       charZero_of_injective_ringHom (PowerSeries.C_injective (R := Ω))
     have hc : IsAdicComplete (IsLocalRing.maximalIdeal (PowerSeries Ω)) (PowerSeries Ω) := by
-      first | infer_instance | (rw [PowerSeries.maximalIdeal_eq_span_X]; infer_instance)
+      first | infer_instance
     refine ⟨
       PowerSeries Ω,
       inferInstance,

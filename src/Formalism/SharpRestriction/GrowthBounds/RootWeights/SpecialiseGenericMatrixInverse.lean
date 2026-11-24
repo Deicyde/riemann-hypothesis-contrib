@@ -95,11 +95,11 @@ theorem torus_acts_through_weight : TorusActsThroughWeight := by
     · rw [Finset.sum_eq_single v.2
         (fun b _ hb => by simp [Matrix.diagonal_apply, hb, Ne.symm hb])
         (fun h => absurd (Finset.mem_univ _) h)]
-      simp [Matrix.diagonal_apply]
+      simp
     · rw [Finset.sum_eq_single v.2
         (fun b _ hb => by simp [Matrix.diagonal_apply, hb, Ne.symm hb])
         (fun h => absurd (Finset.mem_univ _) h)]
-      simp [Matrix.diagonal_apply]
+      simp
     · simp
 
 theorem specialise_coefficientMap

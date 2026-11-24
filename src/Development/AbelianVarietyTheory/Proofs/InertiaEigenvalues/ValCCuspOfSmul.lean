@@ -44,8 +44,6 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.GeoTie
 open scoped TensorProduct
 
-
-
 namespace GlobalTheory.GeoTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

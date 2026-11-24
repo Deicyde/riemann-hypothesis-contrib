@@ -135,7 +135,7 @@ theorem sum_lw_vw_natCast_le (T : Finset (HeightOneSpectrum (𝓞 K))) (n : ℕ)
     intro w
     have h := vw_coe_eq_count_factors_span_of_ne_zero w _ hn0
     rw [he w]
-    have hc : (((n : ℕ) : 𝓞 K) : K) = (n : K) := by first | (push_cast; rfl) | push_cast | simp
+    have hc : (((n : ℕ) : 𝓞 K) : K) = (n : K) := by first | (push_cast; rfl)
     rw [hc] at h
     exact h
 

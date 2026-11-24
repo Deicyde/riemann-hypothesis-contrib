@@ -56,12 +56,14 @@ public import Mathlib.AlgebraicGeometry.Geometrically.Basic
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField UpperTheory.Et.Sel LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField
+  UpperTheory.Et.Sel LateralTheory.E.E4
 open scoped TensorProduct
 
-private theorem exists_point {k R : Type} [Field k] [IsAlgClosed k] [CommRing R] [Algebra k R]
-    [Algebra.FiniteType k R] (m : Ideal R) [m.IsMaximal] :
-    ∃ φ : R →ₐ[k] k, ∀ r, φ r = 0 → r ∈ m := by
+private theorem exists_point
+    {k R : Type} [Field k] [IsAlgClosed k] [CommRing R] [Algebra k R] [Algebra.FiniteType k R]
+    (m : Ideal R) [m.IsMaximal]
+    : ∃ φ : R →ₐ[k] k, ∀ r, φ r = 0 → r ∈ m := by
   letI : Field (R ⧸ m) := Ideal.Quotient.field m
   haveI : Algebra.FiniteType k (R ⧸ m) := inferInstance
   haveI : Module.Finite k (R ⧸ m) := finite_of_finite_type_of_isJacobsonRing k (R ⧸ m)
@@ -73,11 +75,12 @@ private theorem exists_point {k R : Type} [Field k] [IsAlgClosed k] [CommRing R]
   have h0 : e.symm (Ideal.Quotient.mk m r) = 0 := hr
   exact (map_eq_zero_iff e.symm e.symm.injective).mp h0
 
-private theorem dom_fg {k R A ι : Type} [Field k] [IsAlgClosed k] [CommRing R] [IsDomain R] [Algebra k R]
-    [Algebra.FiniteType k R] [CommRing A] [IsDomain A] [Algebra k A] (e : Module.Basis ι k A)
-    (s t : Finset ι) (a b : ι → R)
-    (h : (∑ i ∈ s, a i ⊗ₜ[k] e i) * (∑ j ∈ t, b j ⊗ₜ[k] e j) = 0) :
-    (∀ i ∈ s, a i = 0) ∨ (∀ j ∈ t, b j = 0) := by
+private theorem dom_fg
+    {k R A ι : Type} [Field k] [IsAlgClosed k] [CommRing R] [IsDomain R] [Algebra k R]
+    [Algebra.FiniteType k R] [CommRing A] [IsDomain A] [Algebra k A]
+    (e : Module.Basis ι k A) (s t : Finset ι) (a b : ι → R)
+    (h : (∑ i ∈ s, a i ⊗ₜ[k] e i) * (∑ j ∈ t, b j ⊗ₜ[k] e j) = 0)
+    : (∀ i ∈ s, a i = 0) ∨ (∀ j ∈ t, b j = 0) := by
   classical
   by_contra hcon
   push_neg at hcon
@@ -101,9 +104,9 @@ private theorem dom_fg {k R A ι : Type} [Field k] [IsAlgClosed k] [CommRing R] 
   have hφa : φ (a i0) ≠ 0 := fun h0 => hnm (m.mul_mem_right _ (hφ _ h0))
   have hφb : φ (b j0) ≠ 0 := fun h0 => hnm (m.mul_mem_left _ (hφ _ h0))
   let ψ : R ⊗[k] A →ₐ[k] A :=
-    Algebra.TensorProduct.lift ((Algebra.ofId k A).comp φ) (AlgHom.id k A) (fun _ _ => Commute.all _ _)
-  have hψ : ∀ (c : ι → R) (u : Finset ι),
-      ψ (∑ i ∈ u, c i ⊗ₜ[k] e i) = ∑ i ∈ u, φ (c i) • e i := by
+    Algebra.TensorProduct.lift ((Algebra.ofId k A).comp φ) (AlgHom.id k A)
+      (fun _ _ => Commute.all _ _)
+  have hψ : ∀ (c : ι → R) (u : Finset ι), ψ (∑ i ∈ u, c i ⊗ₜ[k] e i) = ∑ i ∈ u, φ (c i) • e i := by
     intro c u
 
     simp [ψ, map_sum, Algebra.TensorProduct.lift_tmul, Algebra.smul_def]
@@ -113,8 +116,9 @@ private theorem dom_fg {k R A ι : Type} [Field k] [IsAlgClosed k] [CommRing R] 
   · exact hφa ((linearIndependent_iff'.mp e.linearIndependent) s (fun i => φ (a i)) h3 i0 hi0)
   · exact hφb ((linearIndependent_iff'.mp e.linearIndependent) t (fun j => φ (b j)) h3 j0 hj0)
 
-private theorem dom_tensor (k K L : Type) [Field k] [IsAlgClosed k] [Field K] [Field L] [Algebra k K]
-    [Algebra k L] : IsDomain (L ⊗[k] K) := by
+private theorem dom_tensor
+    (k K L : Type) [Field k] [IsAlgClosed k] [Field K] [Field L] [Algebra k K] [Algebra k L]
+    : IsDomain (L ⊗[k] K) := by
   classical
   let e := Module.Basis.ofVectorSpace k K
   haveI : Nontrivial (L ⊗[k] K) := inferInstance
@@ -141,16 +145,16 @@ private theorem dom_tensor (k K L : Type) [Field k] [IsAlgClosed k] [Field K] [F
   let b : Module.Basis.ofVectorSpaceIndex k K → R := fun i => ⟨(E y) i, hmem y (Or.inr rfl) i⟩
   let j : R ⊗[k] K →ₐ[k] L ⊗[k] K := Algebra.TensorProduct.map R.val (AlgHom.id k K)
   have hj : Function.Injective j := by
-    have := Module.Flat.rTensor_preserves_injective_linearMap (M := K) R.val.toLinearMap Subtype.val_injective
+    have :=
+      Module.Flat.rTensor_preserves_injective_linearMap (M := K) R.val.toLinearMap
+        Subtype.val_injective
     exact this
   have hja : j (∑ i ∈ (E x).support, a i ⊗ₜ[k] e i) = x := by
-
     rw [map_sum]
     conv_rhs => rw [hrep x]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [j, a]
   have hjb : j (∑ i ∈ (E y).support, b i ⊗ₜ[k] e i) = y := by
-
     rw [map_sum]
     conv_rhs => rw [hrep y]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -172,8 +176,8 @@ private theorem dom_tensor (k K L : Type) [Field k] [IsAlgClosed k] [Field K] [F
     simp only [b, ZeroMemClass.coe_zero] at this
     rw [this, TensorProduct.zero_tmul]
 
-private theorem gi (k L : Type) [Field k] [IsAlgClosed k] [Field L] [Algebra k L] :
-    GeometricallyIntegral (Spec.map (CommRingCat.ofHom (algebraMap k L))) := by
+private theorem gi (k L : Type) [Field k] [IsAlgClosed k] [Field L] [Algebra k L]
+    : GeometricallyIntegral (Spec.map (CommRingCat.ofHom (algebraMap k L))) := by
   constructor
   rw [geometrically_iff_of_commRing]
   intro K _ _ Y fst snd h
@@ -182,8 +186,10 @@ private theorem gi (k L : Type) [Field k] [IsAlgClosed k] [Field L] [Algebra k L
   haveI : Nonempty Y := ⟨e.inv (Nonempty.some inferInstance)⟩
   exact isIntegral_of_isOpenImmersion e.hom
 
-theorem UpperTheory.isCurve_pullback_of_isCurve_baseChange :
-    ∀ (k L : Type) [Field k] [IsAlgClosed k] [Field L] [Algebra k L] {C : Scheme.{0}} (c : C ⟶ Sp k), IsCurve c → IsCurve (pullback.snd c (Spec.map (CommRingCat.ofHom (algebraMap k L)))) := by
+theorem UpperTheory.isCurve_pullback_of_isCurve_baseChange
+    : ∀ (k L : Type) [Field k] [IsAlgClosed k] [Field L] [Algebra k L] {C : Scheme.{0}}
+        (c : C ⟶ Sp k),
+      IsCurve c → IsCurve (pullback.snd c (Spec.map (CommRingCat.ofHom (algebraMap k L)))) := by
   intro k L _ _ _ _ C c hc
   obtain ⟨h1, h2, h3⟩ := hc
   haveI := gi k L
@@ -217,4 +223,5 @@ theorem UpperTheory.isCurve_pullback_of_isCurve_baseChange :
     exact isIrreducible_singleton.closure
   haveI := smoothOfRelativeDimension_isStableUnderBaseChange 1
   refine ⟨isIntegral_of_irreducibleSpace_of_isReduced _, inferInstance, ?_⟩
-  exact MorphismProperty.of_isPullback (P := @SmoothOfRelativeDimension 1) (IsPullback.of_hasPullback c g) h3
+  exact MorphismProperty.of_isPullback (P := @SmoothOfRelativeDimension 1)
+    (IsPullback.of_hasPullback c g) h3

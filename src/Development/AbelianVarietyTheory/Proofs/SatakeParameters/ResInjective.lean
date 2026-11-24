@@ -99,7 +99,7 @@ theorem algSat_pow (a q f : ℕ) (B : Multiset ℂˣ)
     rw [Nat.cast_pow, ← Real.rpow_natCast_mul (Nat.cast_nonneg q), mul_comm,
       Real.rpow_mul_natCast (Nat.cast_nonneg q), Complex.ofReal_pow]
   simp only [algSat, hq]
-  simp [Multiset.map_map, Function.comp_def, mul_pow, Multiset.bind_map, Multiset.map_bind]
+  simp [Multiset.map_map, mul_pow]
 
 theorem tower
     (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
@@ -127,7 +127,7 @@ theorem tower
   rw [Multiset.map_map] at h3
   rw [hff]
   convert h3 using 2
-  simp [Function.comp_def, pow_mul]
+  simp [pow_mul]
 
 theorem uniq
     (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]

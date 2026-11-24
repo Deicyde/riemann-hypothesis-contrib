@@ -273,10 +273,7 @@ theorem gObjMap_cancel
 
 end Cancel
 
-theorem spMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f :=
-  Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)
+alias spMap_comp' := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem exists_ext
     {R₁ R₂ R' : Type} [CommRing R₁] [CommRing R₂] [CommRing R']

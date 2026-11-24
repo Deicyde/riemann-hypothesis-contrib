@@ -68,12 +68,6 @@ private noncomputable def ofMat {G R : Type} [Group G] [CommRing R] (ρ : G →*
     map_mul' := fun g h => by simp [Matrix.mul_apply]
   }
 
-private theorem lc_of_open
-    {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
-    (f : G →* H) (h : IsOpen (f.ker : Set G))
-    : IsLocallyConstant f :=
-  _root_.UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker f h
-
 private theorem eq_one_of_pow
     {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (x : k) (m : ℕ) (h : x ^ l ^ m = 1)
     : x = 1 := by
@@ -118,7 +112,8 @@ theorem UpperTheory.V.CA.universalDeformationRing_localCharacters
             ∧ ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (ψ' : F.Gv v →* R'ˣ),
               r.IsPsi v i ψ' → ∃! f : R →ₐ[O] R', pushCh (f : R →+* R') ψ = ψ' := by
   intro l _ F O _ _ _ _ _ _ _ n r v i hΦ
-  have hlc : IsLocallyConstant (r.psib v i) := lc_of_open _ (r.psib_open v i)
+  have hlc : IsLocallyConstant (r.psib v i) :=
+    _root_.UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker _ (r.psib_open v i)
   have hlc' : IsLocallyConstant (toMat (r.psib v i)) :=
     hlc.comp fun x =>
       (Matrix.of fun _ _ => (x : ResidueField O) : Matrix Unit Unit (ResidueField O))

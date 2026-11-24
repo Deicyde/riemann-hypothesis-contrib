@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.fockVector_negHermitianSpace_conj_monomial
               (pureTensorO ψ θ S T sS sT BS BT
                 (fun w => starRingEnd ℂ (f w))
                 (MvPolynomial.monomial k 1) x) := by
-  first
-  | exact @GlobalTheory.FockConj.pureTensorO_negSp_monomial
-  | exact GlobalTheory.FockConj.pureTensorO_negSp_monomial
-  | (intros; apply GlobalTheory.FockConj.pureTensorO_negSp_monomial <;> assumption)
+  first | exact @GlobalTheory.FockConj.pureTensorO_negSp_monomial

@@ -53,6 +53,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.mem_completedLattice_half_iff_frameMatrix_integral
     : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
         (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (βS : GL (Fin S.rank) (EAf D))
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.mem_completedLattice_half_iff_frameMatrix_integral
               ((D.host.QS * D.host.q * Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∉ PP.asIdeal)
             → ∀ w : WO S T,
               IsHalf e w → (w ∈ latO S T ΛS ΛT (fun _ => True) ↔ IsIntM (frMapO S T βS βT w)) := by
-  first
-  | exact @GlobalTheory.HalfOInt.mem_latO_iff_frMapO_int
-  | exact GlobalTheory.HalfOInt.mem_latO_iff_frMapO_int
-  | (intros; apply GlobalTheory.HalfOInt.mem_latO_iff_frMapO_int <;> assumption)
+  first | exact @GlobalTheory.HalfOInt.mem_latO_iff_frMapO_int

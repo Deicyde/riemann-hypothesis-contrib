@@ -48,6 +48,7 @@ open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRes
   Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory GlobalTheory.DeRham GlobalTheory.Cris
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_frame_tangentVectors_of_isGrpPullback
     : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
         {Xo : Moduli Dw l} {c : Coeff l} {K : Type} [Field K] [Algebra c.F K] (y : FrPt Xo c K)
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_frame_tangentVectors_of_isGrpPullback
                       w ≫ a.act z
                         = GlobalTheory.GrpTangent.epsScale (algebraMap c.F K (embK c σ z)) ≫ w)
                     → ∃ cf, IsLieComb cf (ub σ) w := by
-  first
-  | exact @GlobalTheory.KSExist.exists_frame_of_isGrpPullback
-  | exact GlobalTheory.KSExist.exists_frame_of_isGrpPullback
-  | (intros; apply GlobalTheory.KSExist.exists_frame_of_isGrpPullback <;> assumption)
+  first | exact @GlobalTheory.KSExist.exists_frame_of_isGrpPullback

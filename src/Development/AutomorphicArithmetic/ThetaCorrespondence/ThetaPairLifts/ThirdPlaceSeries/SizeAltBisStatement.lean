@@ -36,15 +36,3 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
-
-
-
-section
-open GlobalTheory.CovTop GlobalTheory.BigTop
-
-theorem _root_.GlobalTheory.T.cov_size_bound : _root_.GlobalTheory.CovTop.SizeCondition := by
-  first
-  | exact @_root_.GlobalTheory.CovTop.SizeRows.size_alt_bis
-  | exact _root_.GlobalTheory.CovTop.SizeRows.size_alt_bis
-  | (intros; apply _root_.GlobalTheory.CovTop.SizeRows.size_alt_bis <;> assumption)
-end

@@ -189,8 +189,8 @@ theorem key_slice
     have hq := hQR c hc ζ' hζ'
     rw [hsumv]
     have hmem :=
-      (Formalism.FourierDecayAlt.P.radical_reduction_mem Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π'
-        hRB _ Φ.2).2.1 (c, ζ') hq
+      (_root_.Formalism.FourierDecayAlt.P.NFRadRedA.radRedMem Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π
+        Bs.π' hRB _ Φ.2).2.1 (c, ζ') hq
     simp only [NF.radR, Set.indicator_of_mem hq] at hmem
     rw [(he.2 ζ' hζ').2.2 _ hmem]
     refine Finset.sum_congr rfl fun ρ _ => ?_

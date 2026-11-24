@@ -53,6 +53,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.moduli_model_ultrametric_points
     : HV → Laws6 → GlobalTheory.LN.UDvrSt → GlobalTheory.LN.HomExtSt → ThetaPtDeterminesSt
       → EndDeterminedOnTorsionSt → ThetaUnifAV
@@ -77,7 +78,4 @@ theorem _root_.GlobalTheory.T.moduli_model_ultrametric_points
                                 = algebraMap (FractionRing W) C (algebraMap _ _ x))
                             ∧ jFK (R := M.W) C ≫ jK M.W ≫ χ = spMap gam ≫ y ≫ Y.j
                             ∧ M.P.U.LG = M.t.PP := by
-  first
-  | exact @GlobalTheory.Ex.UnifModel.exists_mdl
-  | exact GlobalTheory.Ex.UnifModel.exists_mdl
-  | (intros; apply GlobalTheory.Ex.UnifModel.exists_mdl <;> assumption)
+  first | exact @GlobalTheory.Ex.UnifModel.exists_mdl

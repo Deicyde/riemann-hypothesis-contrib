@@ -151,7 +151,7 @@ theorem iwasawa_finite_cosets
     hl,
     ga_ext ?_ ?_
   ⟩
-  · simp only [map_mul, map_unip, map_lev, e1, pInf_infGL, pInf_finGL, mul_one, one_mul]
+  · simp only [map_mul, map_unip, map_lev, e1, pInf_infGL, pInf_finGL, mul_one]
     rw [hy, hbi]
   · simp only [map_mul, map_unip, map_lev, e2, pFin_infGL, pFin_finGL, mul_one, one_mul]
     rw [hf, mul_assoc, mul_assoc, mul_assoc]

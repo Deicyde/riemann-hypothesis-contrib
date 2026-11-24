@@ -64,7 +64,6 @@ theorem sum_act_act (x : R) (g : H) : ∑ k : H, act k (act g x) = ∑ k : H, ac
   simp [← act_mul_apply]
 
 theorem act_sum_act (x : R) (g : H) : act g (∑ k : H, act k x) = ∑ k : H, act k x := by
-
   rw [map_sum]
   rw [← Equiv.sum_comp (Equiv.mulLeft g⁻¹)]
   refine Finset.sum_congr rfl fun k _ => ?_

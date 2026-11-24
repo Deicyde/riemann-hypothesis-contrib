@@ -84,6 +84,6 @@ theorem pushInvertible_of_hasTheta
 theorem one_le_of_dimFlag (h : 1 ≤ dimFlag Dw) : 1 ≤ Dw.p + Dw.q := by
   by_contra h0
   have : Dw.p + Dw.q = 0 := by omega
-  simp [dimFlag, Formalism.DegreeFormula.dimFl, this] at h
+  simp [dimFlag, this] at h
 
 end GlobalTheory.CompHS.TorFlagEx

@@ -60,8 +60,8 @@ theorem adjugate_mul_eq_plk
   ext l l'
   by_cases h : l' = i
   · subst h
-    simp [Matrix.updateCol_apply]
-  · simp [Matrix.updateCol_apply, Function.update_of_ne h, h]
+    simp
+  · simp [h]
 
 theorem mem_span_of_plk_eq_smul
     (K : Type) [Field K]

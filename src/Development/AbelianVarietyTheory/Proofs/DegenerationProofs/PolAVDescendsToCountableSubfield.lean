@@ -74,9 +74,7 @@ theorem subset_closure_of_subset {K : Type} [Field K] {s s' : Finset K} (h : s �
     : (s : Set K) ⊆ Subfield.closure (s' : Set K) := fun _ hx =>
   Subfield.subset_closure (h hx)
 
-theorem spMap_subtype_comp {K : Type} [Field K] {K₀ K₁ : Subfield K} (h : K₀ ≤ K₁)
-    : spMap K₁.subtype ≫ spMap (Subfield.inclusion h) = spMap K₀.subtype := by
-  rw [← Spec.map_comp]; rfl
+alias spMap_subtype_comp := _root_.GlobalTheory.GrpDescent.spMap_subtype
 
 theorem polAV_descends_to_countable_subfield
     : ∀ (K : Type) [Field K] (P : PolAV (Sp K)) (J I : Type) [Finite J] [Finite I]

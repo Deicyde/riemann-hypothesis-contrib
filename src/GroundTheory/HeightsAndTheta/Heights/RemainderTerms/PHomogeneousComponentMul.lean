@@ -53,17 +53,20 @@ noncomputable section
 
 theorem HomogeneousComponentMul.proof : HomogeneousComponentMul.Statement := by
   intro σ R _ p a m d hp
-  have hterm : ∀ i, homogeneousComponent d (p * homogeneousComponent i a) =
-      if d = m + i then p * homogeneousComponent i a else 0 := fun i =>
-    homogeneousComponent_of_mem
-      ((mem_homogeneousSubmodule _ _).mpr (hp.mul (homogeneousComponent_isHomogeneous i a)))
+  have hterm
+      : ∀ i,
+        homogeneousComponent d (p * homogeneousComponent i a)
+          = if d = m + i then p * homogeneousComponent i a else 0 := fun i =>
+    homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).mpr
+      (hp.mul (homogeneousComponent_isHomogeneous i a)))
 
   conv_lhs => rw [← sum_homogeneousComponent a, Finset.mul_sum, map_sum]
   simp_rw [hterm]
   split_ifs with hmd
-  · have hcongr : ∀ i ∈ range (a.totalDegree + 1),
-        (if d = m + i then p * homogeneousComponent i a else 0) =
-          if d - m = i then p * homogeneousComponent i a else 0 := by
+  · have hcongr
+        : ∀ i ∈ range (a.totalDegree + 1),
+          (if d = m + i then p * homogeneousComponent i a else 0)
+            = if d - m = i then p * homogeneousComponent i a else 0 := by
       intro i _
       congr 1
       exact propext ⟨fun h => by omega, fun h => by omega⟩

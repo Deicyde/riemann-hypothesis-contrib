@@ -53,8 +53,8 @@ open scoped ComplexOrder ComplexConjugate nonZeroDivisors
 
 namespace Formalism.FourierDecayAlt.P.Jx1
 
-theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F k) :
-    TA.PSDOn F (fun x y => k y x) := by
+theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F k)
+    : TA.PSDOn F (fun x y => k y x) := by
   unfold TB.PSDOn at h
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at h
   obtain ⟨hH, hN⟩ := h
@@ -76,12 +76,13 @@ theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F
     simp only [Complex.star_def, Complex.conj_conj]
     ring
 
-private theorem im_quadratic_form_eq_zero_of_hermitian {α : Type} (F : Finset α) (k : α → α → ℂ)
-    (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
-  have h : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
-
+private theorem im_quadratic_form_eq_zero_of_hermitian
+    {α : Type}
+    (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ)
+    : (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
+  have h
+      : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y)
+        = ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
     simp only [map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun u hu => Finset.sum_congr rfl fun v hv => ?_
@@ -89,8 +90,8 @@ private theorem im_quadratic_form_eq_zero_of_hermitian {α : Type} (F : Finset �
     ring
   exact Complex.conj_eq_iff_im.mp h
 
-private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k) :
-    TB.PSDOn F k := by
+private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k)
+    : TB.PSDOn F k := by
   classical
   unfold TB.PSDOn
   rw [Matrix.posSemidef_iff_dotProduct_mulVec]
@@ -100,14 +101,15 @@ private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α 
     rw [h.1 i i.2 j j.2]
     simp
   · set a : α → ℂ := fun u => if hu : u ∈ F then x ⟨u, hu⟩ else 0 with ha
-    have hQ : star x ⬝ᵥ (Matrix.of fun u v : F => k u v).mulVec x =
-        ∑ u ∈ F, ∑ v ∈ F, conj (a u) * k u v * a v := by
+    have hQ
+        : star x ⬝ᵥ (Matrix.of fun u v : F => k u v).mulVec x
+          = ∑ u ∈ F, ∑ v ∈ F, conj (a u) * k u v * a v := by
       rw [← Finset.sum_coe_sort F]
       simp only [dotProduct, Matrix.mulVec, Matrix.of_apply, Pi.star_apply, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← Finset.sum_coe_sort F]
       refine Finset.sum_congr rfl fun j _ => ?_
-      simp [ha, Complex.star_def, mul_assoc]
+      simp [ha, mul_assoc]
     rw [hQ, Complex.le_def]
     simp only [Complex.zero_re, Complex.zero_im]
     exact ⟨h.2 a, (im_quadratic_form_eq_zero_of_hermitian F k h.1 a).symm⟩
@@ -117,38 +119,18 @@ theorem t_PSDTranspose : PSDTranspose := by
   intro α F k h
   exact tb_psdOn_of_ta_psdOn F _ (conv F k h)
 
-section Tower
-variable {E : Type} [Field E]
-
-end Tower
-
 section Agree
 variable {α : Type}
 
-theorem q_im (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
-  have h : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
-
-    simp only [map_sum, map_mul, Complex.conj_conj]
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun u hu => Finset.sum_congr rfl fun v hv => ?_
-    rw [← hh v hv u hu]
-    ring
-  exact Complex.conj_eq_iff_im.mp h
-
-theorem ta_to_tb (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k) : TB.PSDOn F k := by
-  exact tb_psdOn_of_ta_psdOn F k h
-
-theorem psd_form_conj_rewrite (F : Finset α) (k : α → α → ℂ) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k x y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj ((fun z => conj (a z)) x) * k x y * (fun z => conj (a z)) y := by
+theorem psd_form_conj_rewrite (F : Finset α) (k : α → α → ℂ) (a : α → ℂ)
+    : (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k x y)
+      = ∑ x ∈ F, ∑ y ∈ F, conj ((fun z => conj (a z)) x) * k x y * (fun z => conj (a z)) y := by
   refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
   simp only [Complex.conj_conj]
   ring
 
-theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsPSD F k) :
-    ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y) := by
+theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsPSD F k)
+    : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y) := by
   classical
   intro x hx y hy
   set B : (α → ℂ) → (α → ℂ) → ℂ := fun a b => ∑ u ∈ F, ∑ v ∈ F, a u * conj (b v) * k u v with hB
@@ -173,8 +155,10 @@ theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsP
     simp only [hB, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => ?_
     ring
-  have hBe : ∀ p q, p ∈ F → q ∈ F →
-      B (fun u => if u = p then 1 else 0) (fun u => if u = q then 1 else 0) = k p q := by
+  have hBe
+      : ∀ p q,
+        p ∈ F → q ∈ F
+          → B (fun u => if u = p then 1 else 0) (fun u => if u = q then 1 else 0) = k p q := by
     intro p q hp hq
     simp [hB, apply_ite (starRingEnd ℂ), ite_mul, hp, hq]
   have h1 := hpol (fun u => if u = x then 1 else 0) (fun u => if u = y then 1 else 0)
@@ -186,7 +170,13 @@ theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsP
 theorem t_PSDAgree : PSDAgree := by
   unfold PSDAgree
   intro α F k
-  refine ⟨⟨fun h => conv F _ (t_PSDTranspose α F k h), ta_to_tb F k⟩, ⟨fun h => ⟨psd_kernel_hermitian F k h, fun a => ?_⟩, fun h => ?_⟩⟩
+  refine ⟨
+    ⟨
+      fun h => conv F _ (t_PSDTranspose α F k h),
+      _root_.Formalism.FourierDecayAlt.P.Jx1.tb_psdOn_of_ta_psdOn F k
+    ⟩,
+    ⟨fun h => ⟨psd_kernel_hermitian F k h, fun a => ?_⟩, fun h => ?_⟩
+  ⟩
   · have h2 := (h (fun z => conj (a z))).2
     refine le_of_le_of_eq h2 ?_
     congr 1
@@ -195,7 +185,10 @@ theorem t_PSDAgree : PSDAgree := by
     ring
   · intro a
     rw [psd_form_conj_rewrite F k a]
-    exact ⟨q_im F k h.1 _, h.2 _⟩
+    exact ⟨
+      _root_.Formalism.FourierDecayAlt.P.Jx1.im_quadratic_form_eq_zero_of_hermitian F k h.1 _,
+      h.2 _
+    ⟩
 
 end Agree
 
@@ -205,9 +198,5 @@ theorem t_BoxSumLattice : BoxSumLattice := by
 end Formalism.FourierDecayAlt.P.Jx1
 
 namespace Formalism.FourierDecayAlt.P
-
-theorem psd_agree : Formalism.FourierDecayAlt.J.PSDAgree := Jx1.t_PSDAgree
-
-theorem box_sum_lattice : Formalism.FourierDecayAlt.J.BoxSumLattice := Jx1.t_BoxSumLattice
 
 end Formalism.FourierDecayAlt.P

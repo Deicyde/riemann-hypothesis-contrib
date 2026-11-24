@@ -49,7 +49,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem norm_hom
     {l : ℕ} [Fact l.Prime]
     {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (σ : K →ₐ[ℚ_[l]] PadicAlgCl l) (x : K)

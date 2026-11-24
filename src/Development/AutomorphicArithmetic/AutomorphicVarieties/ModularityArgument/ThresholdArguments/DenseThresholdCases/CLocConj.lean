@@ -46,9 +46,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep

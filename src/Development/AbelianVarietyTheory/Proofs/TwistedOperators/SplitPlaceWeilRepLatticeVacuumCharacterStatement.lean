@@ -51,6 +51,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitPlace_weilRep_latticeVacuum_character
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
         (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.splitPlace_weilRep_latticeVacuum_character
                             (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
                           f
                         → om (g, h) f = ((splitFacO χS χT x y : Circle) : ℂ) • f := by
-  first
-  | exact @GlobalTheory.VecInv.om_latVac_split
-  | exact GlobalTheory.VecInv.om_latVac_split
-  | (intros; apply GlobalTheory.VecInv.om_latVac_split <;> assumption)
+  first | exact @GlobalTheory.VecInv.om_latVac_split

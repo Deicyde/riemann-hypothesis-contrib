@@ -79,8 +79,7 @@ theorem apply_mem_iff_of_mem_Dec
     : σ x ∈ A ↔ x ∈ A := by
   have h := mem_Dec.mp hσ
   have key : σ • x ∈ σ • A ↔ x ∈ A := ValuationSubring.smul_mem_pointwise_smul_iff
-  rw [h] at key
-  exact key
+  rwa [h] at key
 
 theorem valuation_lt_one_iff' (A : ValuationSubring (Ω)) (y : Ω)
     : A.valuation y < 1 ↔ y ∈ A ∧ (y = 0 ∨ y⁻¹ ∉ A) := by
@@ -89,7 +88,7 @@ theorem valuation_lt_one_iff' (A : ValuationSubring (Ω)) (y : Ω)
   · rw [← A.valuation_le_one_iff, ← A.valuation_le_one_iff, not_le,
       Valuation.one_lt_val_iff _ (inv_ne_zero hy), inv_inv]
     simp only [hy, false_or]
-    exact ⟨fun h => ⟨h.le, h⟩, fun h => h.2⟩
+    exact ⟨fun h => ⟨h.le, h⟩, And.right⟩
 
 theorem valuation_apply_lt_one_iff
     {A : ValuationSubring (Ω)} {σ : G F Ω} (hσ : σ ∈ Dec (F := F) A) (y : Ω)
@@ -135,8 +134,8 @@ theorem conj_mem_Ine
     fun x hx => ?_
   ⟩
   have hy : A.valuation ((g⁻¹ : G F Ω) x) ≤ 1 := by
-    rw [A.valuation_le_one_iff, ← apply_mem_iff_of_mem_Dec hg, mul_inv_apply]
-    exact (A.valuation_le_one_iff x).mp hx
+    rwa [A.valuation_le_one_iff, ← apply_mem_iff_of_mem_Dec hg, mul_inv_apply,
+      ← A.valuation_le_one_iff]
   have e : (g * σ * g⁻¹) x - x = g (σ ((g⁻¹ : G F Ω) x) - (g⁻¹ : G F Ω) x) := by
     rw [map_sub, mul_inv_apply]; rfl
   rw [e, valuation_apply_lt_one_iff hg]
@@ -198,9 +197,7 @@ variable (Ω) in
 def toGS : G F Ω →* GS Ω S := QuotientGroup.mk' (NS Ω S)
 
 variable (Ω) in
-theorem continuous_toGS : Continuous (toGS Ω S) := by
-  unfold toGS
-  exact continuous_quot_mk
+theorem continuous_toGS : Continuous (toGS Ω S) := by exact continuous_quot_mk
 
 def locHom (A : ValuationSubring (Ω)) : Dec (F := F) A →* GS Ω S :=
   (toGS Ω S).comp (Dec (F := F) A).subtype
@@ -228,9 +225,8 @@ theorem unramOutside_iff
         simp only [Set.mem_iUnion, Set.mem_setOf_eq, Set.mem_compl_iff, exists_prop] at hτ
         obtain ⟨v, hv, A, hA, hτ⟩ := hτ
         exact MonoidHom.mem_ker.mpr (h v hv A hA τ hτ)
-      · rw [MonoidHom.coe_ker]
-        exact isClosed_singleton.preimage hρ
-    exact MonoidHom.mem_ker.mp (hker hσ)
+      · simpa [MonoidHom.coe_ker] using isClosed_singleton.preimage hρ
+    simpa only [MonoidHom.mem_ker] using hker hσ
 
 end unram
 
@@ -246,9 +242,9 @@ theorem not_valuation_lt_one_of_isPlaceOver
     : ¬ A.valuation (((l ^ n : ℕ) : Ω)) < 1 := by
   unfold Formalism.ConjugateSelfDual.IsPlaceOver at h
   intro hlt
-  have hc : algebraMap F Ω (((l ^ n : ℕ) : 𝓞 F) : F) = ((l ^ n : ℕ) : Ω) := by simp
-  rw [← hc, h] at hlt
-  exact hl (v.isPrime.mem_of_pow_mem n (by simpa using hlt))
+  refine hl (v.isPrime.mem_of_pow_mem n ?_)
+  rw [← h]
+  simpa using hlt
 
 theorem cycZ_toZModPow_eq
     [IsAlgClosure F Ω]
@@ -268,10 +264,9 @@ theorem cycZ_toZModPow_eq
     cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G F Ω) (Ω) σ) ζ hζ.pow_eq_one
   set m := (((cyclotomicCharacter (Ω) l)
     (MulSemiringAction.toRingAut (G F Ω) (Ω) σ)) : ℤ_[l]).toZModPow n |>.val with hm
-  have hσζ : σ ζ = ζ ^ m := hspec
   have hζA : A.valuation ζ ≤ 1 := (valuation_eq_one_of_pow_eq_one A hN0 hζ.pow_eq_one).le
   have hlt := hσ ζ hζA
-  rw [hσζ] at hlt
+  rw [show σ ζ = ζ ^ m from hspec] at hlt
   have heq : ζ ^ m = ζ ^ q := by
     refine eq_of_pow_eq_one A (not_valuation_lt_one_of_isPlaceOver hl h n) ?_ ?_ hlt
     · rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]
@@ -294,20 +289,20 @@ theorem eq_of_isPlaceOver
     (h : IsPlaceOver A v) (h' : IsPlaceOver A v')
     : v = v' := by
   unfold Formalism.ConjugateSelfDual.IsPlaceOver at h h'
-  have e : v.asIdeal = v'.asIdeal := by
-    ext x
-    rw [← h x, ← h' x]
-  exact IsDedekindDomain.HeightOneSpectrum.ext e
+  apply IsDedekindDomain.HeightOneSpectrum.ext
+  ext x
+  rw [← h x, ← h' x]
 
 theorem inv_mul_mem_Ine_of_isFrob
     {A : ValuationSubring (Ω)} {q : ℕ} {σ τ : G F Ω} (hσ : IsFrob A q σ) (hτ : IsFrob A q τ)
     : σ⁻¹ * τ ∈ Ine (F := F) A := by
   obtain ⟨hσD, hσF⟩ := hσ
   obtain ⟨hτD, hτF⟩ := hτ
-  have hσD' : σ ∈ Dec (F := F) A := mem_Dec.mpr hσD
-  have hτD' : τ ∈ Dec (F := F) A := mem_Dec.mpr hτD
-  refine mem_Ine.mpr ⟨(Dec (F := F) A).mul_mem ((Dec (F := F) A).inv_mem hσD') hτD', fun x hx => ?_⟩
-  rw [← valuation_apply_lt_one_iff hσD']
+  refine mem_Ine.mpr ⟨
+    (Dec (F := F) A).mul_mem ((Dec (F := F) A).inv_mem (mem_Dec.mpr hσD)) (mem_Dec.mpr hτD),
+    fun x hx => ?_
+  ⟩
+  rw [← valuation_apply_lt_one_iff (mem_Dec.mpr hσD)]
   have e : σ ((σ⁻¹ * τ) x - x) = (τ x - x ^ q) - (σ x - x ^ q) := by
     rw [map_sub, AlgEquiv.mul_apply, mul_inv_apply]; ring
   rw [e]
@@ -318,12 +313,12 @@ theorem isFrob_mul_of_mem_Ine
     : IsFrob A q (σ * ι) := by
   obtain ⟨hσD, hσF⟩ := hσ
   obtain ⟨hιD, hιI⟩ := mem_Ine.mp hι
-  have hσD' : σ ∈ Dec (F := F) A := mem_Dec.mpr hσD
-  refine ⟨mem_Dec.mp ((Dec (F := F) A).mul_mem hσD' hιD), fun x hx => ?_⟩
+  refine ⟨mem_Dec.mp ((Dec (F := F) A).mul_mem (mem_Dec.mpr hσD) hιD), fun x hx => ?_⟩
   have e : (σ * ι) x - x ^ q = σ (ι x - x) + (σ x - x ^ q) := by
     rw [AlgEquiv.mul_apply, map_sub]; ring
   rw [e]
-  exact Valuation.map_add_lt _ ((valuation_apply_lt_one_iff hσD' _).mpr (hιI x hx)) (hσF x hx)
+  exact Valuation.map_add_lt _ ((valuation_apply_lt_one_iff (mem_Dec.mpr hσD) _).mpr (hιI x hx))
+    (hσF x hx)
 
 variable (Ω) in
 theorem exists_isPlaceOver (v : HeightOneSpectrum (𝓞 F))
@@ -450,8 +445,7 @@ theorem cycZ_of_isFrob
     (hl : ((l : ℕ) : 𝓞 F) ∉ v.asIdeal) (h : IsPlaceOver A v)
     {σ : G F Ω} (hσ : IsFrob A (normV v) σ)
     : ((cycZ F Ω l σ : ℤ_[l]ˣ) : ℤ_[l]) = (normV v : ℤ_[l]) := by
-  obtain ⟨-, hF⟩ := hσ
-  exact PadicInt.ext_of_toZModPow.mp (cycZ_toZModPow_eq hl h hF)
+  exact PadicInt.ext_of_toZModPow.mp (cycZ_toZModPow_eq hl h hσ.2)
 
 private theorem isClosed_setOf_apply_lemma [IsAlgClosure F Ω] (x : Ω) (P : Ω → Prop)
     : IsClosed {τ : G F Ω | P (τ x)} := by

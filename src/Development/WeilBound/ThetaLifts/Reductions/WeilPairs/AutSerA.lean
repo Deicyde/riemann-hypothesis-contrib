@@ -75,12 +75,6 @@ theorem sig_sig' (hB : B.IsGood σ) (x : E) : σ (σ x) = x := by
   apply τ.injective
   rw [hB.cm.2.2.2 τ, hB.cm.2.2.2 τ, star_star]
 
-theorem piWF_fin {u : WOF F E nS nT} (hu : u.map (infPartF F E) = 0) : piWF θ u = 0 := by
-  funext p
-  have h : infPartF F E (u p.1.1 p.1.2) = 0 := congrFun (congrFun hu p.1.1) p.1.2
-  show θ p.2 (infPartF F E (u p.1.1 p.1.2)) = 0
-  rw [h, map_zero]
-
 theorem symplOHF_two' (x y : WOF F E nS nT)
     : symplOHF σ JS JT ξ₀ x (2 • y) = symplOF σ JS JT ξ₀ x y := by
   rw [two_nsmul, GlobalTheory.HeisLineF.symplOHF_add_right, symplOHF_add_self]
@@ -128,11 +122,14 @@ theorem chi_add_lat
       = chiLatF σ JS JT ξ₀ B.ψ Λ w x := by
   have hσ := sig_sig' C.good
   have e : finIdem F E • (x + (u : WOF F E nS nT)) = finIdem F E • x + u := by
-    rw [smul_add, finIdem_smul_of_fin u.fin]
+    rw [smul_add, _root_.PositivityTheory.ThKW.TauSpanIdentities.finIdem_smul_of_fin u.fin]
   have e2 : B.ψ (symplOHF σ JS JT ξ₀ x u) = B.ψ (symplOHF σ JS JT ξ₀ (finIdem F E • x) u) := by
     have hx := finIdem_add_iota C.chart x
-    have h3 := beta_iota_left C (piWF θ x) (u : WOF F E nS nT)
-    rw [piWF_fin u.fin, map_zero, Complex.ofReal_zero, mul_zero, Complex.exp_zero] at h3
+    have h3 :=
+      _root_.PositivityTheory.ThKW.TauSpanIdentities.beta_iota_left C (piWF θ x) (u : WOF F E nS nT)
+    rw [_root_.PositivityTheory.ThKW.TauSpanIdentities.piWF_of_fin u.fin, map_zero,
+        Complex.ofReal_zero, mul_zero, Complex.exp_zero]
+      at h3
     conv_lhs => rw [hx]
     rw [GlobalTheory.HeisLineF.symplOHF_add_left, AddChar.map_add_eq_mul, h3, mul_one]
   unfold chiLatF
@@ -170,7 +167,8 @@ theorem main
     · rw [conjTranspose_smul, RealC.herm_map (hτ _) C.hT]
       simp
     · rw [conjTranspose_nonsing_inv, RealC.herm_map (hτ _) C.hS]
-  obtain ⟨-, hJ, hsym, hpos⟩ := omV_laws hH hs.sq hs.pos
+  obtain ⟨-, hJ, hsym, hpos⟩ :=
+    _root_.PositivityTheory.ThKW.TauSpanIdentities.omV_laws hH hs.sq hs.pos
   have hl
       : ∀ x y z : WOF F E nS nT,
         B.ψ (symplOHF σ JS JT ξ₀ (x + y) z)
@@ -188,7 +186,7 @@ theorem main
       : ∀ (x : WOF F E nS nT) (v : IxF F nS nT → ℂ),
         B.ψ (symplOHF σ JS JT ξ₀ x (iotaA ι v))
           = Complex.exp (-(Real.pi * Complex.I) * (omV (HMF JS JT ξ₀ (tauB B)) (piWA θ x) v : ℝ)) :=
-    fun x v => beta_iota_right C x v
+    fun x v => _root_.PositivityTheory.ThKW.TauSpanIdentities.beta_iota_right C x v
   have fl
       : ∀ u ∈ latF F E nS nT Λ, ∀ x : WOF F E nS nT,
         phaseF σ JS JT ξ₀ B.ψ w u
@@ -196,7 +194,8 @@ theorem main
           = serF σ JS JT ξ₀ B θ ι s Λ w a x := fun u hu x =>
     GlobalTheory.GaussSeriesVacuum.series_inv_scalar (G := WOF F E nS nT)
       (β := fun x y => B.ψ (symplOHF σ JS JT ξ₀ x y))
-      hl hr hd hβ a u (piWF_fin u.fin) _ (chi_add_lat C hA hw hu) x
+      hl hr hd hβ a u (_root_.PositivityTheory.ThKW.TauSpanIdentities.piWF_of_fin u.fin) _
+      (chi_add_lat C hA hw hu) x
   obtain ⟨U, hUo, hlev⟩ := exists_level (F := F) (E := E) (nS := nS) (nT := nT) hG 2 two_pos
   let U₀ : AddSubgroup (WOF F E nS nT) :=
     (latOF F E nS nT Λ).comap (DistribSMul.toAddMonoidHom (WOF F E nS nT) (finIdem F E))
@@ -204,7 +203,8 @@ theorem main
     GlobalTheory.GaussSeriesVacuum.series_regular (piWA θ) (iotaA ι)
       (fun x y => B.ψ (symplOHF σ JS JT ξ₀ x y))
       (omV (HMF JS JT ξ₀ (tauB B))) (jV s) (ratLF F E nS nT) U₀ U (chiLatF σ JS JT ξ₀ B.ψ Λ w)
-      (continuous_piWF C) (continuous_iotaVF C.chart) (piWF_iotaVF C.chart) hl hr hd
+      (_root_.PositivityTheory.ThKW.TauSpanIdentities.continuous_piWF C) (continuous_iotaVF C.chart)
+      (piWF_iotaVF C.chart) hl hr hd
       (fun x y => hψ.2.1 _)
       (hψ.1.comp (GlobalTheory.RealWeilF.continuous_symplOHF σ JS JT ξ₀ continuous_fst
         continuous_snd))
@@ -212,15 +212,18 @@ theorem main
       (by
         rintro _ ⟨y, rfl⟩ h
         have e : piWF θ (ratWF (F := F) y) = 0 := h
-        rw [piWF_ratWF C] at e
-        have : y = 0 := infRatF_injective B (by rw [e, map_zero])
+        rw [_root_.PositivityTheory.ThKW.TauSpanIdentities.piWF_ratWF C] at e
+        have : y = 0 :=
+          _root_.PositivityTheory.ThKW.TauSpanIdentities.infRatF_injective B (by rw [e, map_zero])
         subst this
         exact map_zero _)
       (fun R => by
-        refine ((finite_lat C.good hG R).image (fun y => ratWF (F := F) y)).subset ?_
+        refine ((_root_.PositivityTheory.ThKW.AutLatA.finLat C.good hG R).image
+          (fun y => ratWF (F := F) y)).subset ?_
         rintro _ ⟨⟨y, rfl⟩, h1, h2⟩
         refine ⟨y, ⟨(finRatF_mem_iff C hG hR hA y).1 h1, ?_⟩, rfl⟩
-        have e : piWF θ (ratWF (F := F) y) = infRatF (tauB B) y := piWF_ratWF C y
+        have e : piWF θ (ratWF (F := F) y) = infRatF (tauB B) y :=
+          _root_.PositivityTheory.ThKW.TauSpanIdentities.piWF_ratWF C y
         rw [← e]
         exact h2)
       (fun x hx => by unfold chiLatF; exact if_neg hx)
@@ -232,7 +235,10 @@ theorem main
       (fun x v => by
         show chiLatF σ JS JT ξ₀ B.ψ Λ w (x + iotaVF ι v) = _
         unfold chiLatF
-        rw [smul_add, finIdem_smul_of_real (real_iotaVF C.chart v), add_zero])
+        rw [smul_add,
+          _root_.PositivityTheory.ThKW.TauSpanIdentities.finIdem_smul_of_real (real_iotaVF C.chart
+            v),
+          add_zero])
       hUo
       (fun u hu x => by
         obtain ⟨l, hl', e⟩ := hlev u hu
@@ -266,7 +272,7 @@ theorem main
             = serF σ JS JT ξ₀ B θ ι s Λ w a := by
     intro u hu h
     obtain ⟨l, hl', e⟩ := hlev u hu
-    rw [finIdem_smul_of_fin h] at e
+    rw [_root_.PositivityTheory.ThKW.TauSpanIdentities.finIdem_smul_of_fin h] at e
     subst e
     funext x
     have e2 := fl _ (nsmul_mem hl' 2) x
@@ -278,10 +284,12 @@ theorem main
           → ∀ x, ContDiff ℝ ∞ fun t => serF σ JS JT ξ₀ B θ ι s Λ w a (x + L t) := by
     intro k L hL hL0 x
     let c : (Fin k → ℝ) →+ (IxF F nS nT → ℂ) := (piWA θ).comp L
-    have hc : Continuous c := (continuous_piWF C).comp hL
+    have hc : Continuous c :=
+      (_root_.PositivityTheory.ThKW.TauSpanIdentities.continuous_piWF C).comp hL
     have hLc : ∀ t, L t = iotaA ι (c t) := fun t => by
       have := finIdem_add_iota C.chart (L t)
-      rw [finIdem_smul_of_real (hL0 t), zero_add] at this
+      rw [_root_.PositivityTheory.ThKW.TauSpanIdentities.finIdem_smul_of_real (hL0 t), zero_add]
+        at this
       exact this
     have h := (fs x).comp (c.toRealLinearMap hc).contDiff
     refine (congrArg (ContDiff ℝ ∞) (funext fun t => ?_)).mp h

@@ -3,7 +3,9 @@ module
 public import Formalism.LocalToGlobal.ProjectiveLattices.CuspFree
 public import Formalism.LocalToGlobal.ProjectiveLattices.IsGenFrGenFr
 public import Formalism.LocalToGlobal.ProjectiveLattices.VAtVNeBot
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.EvaluationLawsGenericFramesAtlasHoldStatement
+public import Development.AbelianVarietyTheory.Definitions.RegularCharts.ModelAt
+public import Development.AbelianVarietyTheory.Definitions.RegularCharts.Reframe
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.EvaluationLawsGenericFramesAtlasHold
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIdempotentWeightZeroSectionOfComponent
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.IdemMulMemCusp
 import Mathlib.Algebra.Order.Floor.Extended
@@ -67,7 +69,7 @@ theorem exists_cusp_restrict_comp_int
                 ∧ ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io),
                   evI y g' = evI y g ∨ evI y g' = 0 := by
   intro E _ _ _ H Dw l Xo c r U hU h Z a n g hg
-  obtain ⟨hL, -, -, hA⟩ := GlobalTheory.T.evaluation_laws_generic_frames_atlas_hold E H Dw l Xo c
+  obtain ⟨hL, -, -, hA⟩ := _root_.GlobalTheory.Reg.evLaws_genFr_atlas E H Dw l Xo c
   obtain ⟨χ, hχ, hidem, h1, h0⟩ := exists_idem_section E H Dw l Xo c hL h (hA h) Z
 
   have hm

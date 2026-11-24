@@ -118,7 +118,7 @@ theorem finrank_K0_eq_one_of_le_Kur
   rw [finrank_eq_one_iff_of_nonzero' (1 : ↥K.1) one_ne_zero]
   intro x
   refine ⟨⟨(x : Om l), IntermediateField.mem_inf.mpr ⟨x.2, hK x.2⟩⟩, ?_⟩
-  first | exact Subtype.ext (mul_one _) | exact Subtype.ext (by simp) | rfl
+  first | exact Subtype.ext (mul_one _)
 
 theorem ring_condition_uniformizer_polynomial
     (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)

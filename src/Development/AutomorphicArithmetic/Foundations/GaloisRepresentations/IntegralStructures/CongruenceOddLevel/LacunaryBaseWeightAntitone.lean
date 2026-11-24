@@ -155,7 +155,7 @@ theorem dGen_ne_zero (a : ℕ) : DGen a ≠ 0 := by
       rw [X_pow_eq_monomial, X_pow_eq_monomial]
       refine hm _ _ fun e => ?_
       have := DFunLike.congr_fun e i
-      simp [Finsupp.single_apply, Ne.symm h] at this
+      simp [Ne.symm h] at this
   · refine Finset.prod_ne_zero_iff.2 fun i _ =>
       Finset.prod_ne_zero_iff.2 fun j _ => Finset.prod_ne_zero_iff.2 fun k _ => ?_
     split_ifs with h
@@ -164,7 +164,7 @@ theorem dGen_ne_zero (a : ℕ) : DGen a ≠ 0 := by
       rw [X_pow_eq_monomial, X, X, monomial_mul, one_mul]
       refine hm _ _ fun e => ?_
       have := DFunLike.congr_fun e j
-      simp [Finsupp.single_apply, Ne.symm h.1, Ne.symm h.2] at this
+      simp [Ne.symm h.1, Ne.symm h.2] at this
   · refine Finset.prod_ne_zero_iff.2 fun m hm' => ?_
     have h1
         : ∀ s : Fin a → ℕ,

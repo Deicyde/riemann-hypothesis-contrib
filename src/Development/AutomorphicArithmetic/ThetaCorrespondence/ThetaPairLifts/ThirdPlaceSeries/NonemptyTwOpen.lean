@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
@@ -49,6 +47,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 noncomputable section
 namespace GlobalTheory.HeightCounting.FitTw
 variable {D : D7}
+
 def chrL_alt
     {L : LocAll (lay0 D)} {cf : CharFrame D} {jE : D.host.E →+* Qb}
     {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : MtFam D}
@@ -59,6 +58,7 @@ def chrL_alt
   A.chr with
   muC := Au.muC
 }
+
 theorem nonempty_twOpen_alt
     : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
         (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (low : Finset ℕ)

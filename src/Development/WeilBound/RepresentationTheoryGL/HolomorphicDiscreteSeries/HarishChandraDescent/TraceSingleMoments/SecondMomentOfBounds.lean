@@ -113,7 +113,6 @@ private theorem conj_lemma_2
   rw [hi, ← Matrix.mul_assoc, ← Matrix.mul_assoc, h1, Matrix.one_mul, Matrix.mul_assoc, h1,
     Matrix.mul_one]
 
-
 open Mom2Aux in
 theorem second_moment_of_bounds : RootBd → MatBd → AdEq → Mom2 := by
   intro hRoot hMat hAd n ε e lam d d' g hOver

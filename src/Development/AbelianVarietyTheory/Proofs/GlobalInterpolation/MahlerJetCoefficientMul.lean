@@ -243,8 +243,7 @@ theorem split_single_inl (e : κ ⊕ κ →₀ ℕ) (i : κ)
         (Finsupp.sumFinsuppAddEquivProdFinsupp e).2
       ) := by
   classical
-  ext j <;> simp [Finsupp.fst_sumFinsuppAddEquivProdFinsupp,
-    Finsupp.snd_sumFinsuppAddEquivProdFinsupp, Finsupp.single_apply]
+  ext j <;> simp [Finsupp.single_apply]
 
 theorem split_single_inr (e : κ ⊕ κ →₀ ℕ) (i : κ)
     : Finsupp.sumFinsuppAddEquivProdFinsupp (e + Finsupp.single (Sum.inr i) 1)
@@ -253,8 +252,7 @@ theorem split_single_inr (e : κ ⊕ κ →₀ ℕ) (i : κ)
         (Finsupp.sumFinsuppAddEquivProdFinsupp e).2 + Finsupp.single i 1
       ) := by
   classical
-  ext j <;> simp [Finsupp.fst_sumFinsuppAddEquivProdFinsupp,
-    Finsupp.snd_sumFinsuppAddEquivProdFinsupp, Finsupp.single_apply]
+  ext j <;> simp [Finsupp.single_apply]
 
 theorem BJ_mul_X_inl
     (v : κ → V) {F : V → ℂ} (G : V → ℂ) (hF : ContDiff ℂ ∞ F) (Q : MvPolynomial (κ ⊕ κ) ℂ) (i : κ)
@@ -358,10 +356,8 @@ theorem split_rename (a b : κ →₀ ℕ)
         (Finsupp.mapDomain Sum.inl a + Finsupp.mapDomain Sum.inr b)
       = (a, b) := by
   ext j
-  · simp [Finsupp.fst_sumFinsuppAddEquivProdFinsupp,
-      Finsupp.mapDomain_apply_of_injective Sum.inl_injective, Finsupp.mapDomain_notin_range]
-  · simp [Finsupp.snd_sumFinsuppAddEquivProdFinsupp,
-      Finsupp.mapDomain_apply_of_injective Sum.inr_injective, Finsupp.mapDomain_notin_range]
+  · simp [Finsupp.mapDomain_apply_of_injective Sum.inl_injective, Finsupp.mapDomain_notin_range]
+  · simp [Finsupp.mapDomain_apply_of_injective Sum.inr_injective, Finsupp.mapDomain_notin_range]
 
 theorem BJ_rename (v : κ → V) (F G : V → ℂ) (p q : MvPolynomial κ ℂ)
     : BJ v F G (rename Sum.inl p * rename Sum.inr q) = LJ v F p * LJ v G q := by

@@ -60,8 +60,6 @@ def ListTailLog.Statement : Prop :=
 
 section Inhabitants
 
-open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (projLineChartData)
-
 end Inhabitants
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

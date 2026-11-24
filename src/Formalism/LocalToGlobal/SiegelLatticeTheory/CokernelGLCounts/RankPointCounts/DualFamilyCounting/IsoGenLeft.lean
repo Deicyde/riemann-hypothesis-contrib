@@ -88,7 +88,7 @@ theorem g_ww (hxs : ∀ b, InW X (xs b)) {w w' : (VS D).V} (hw : InW X w) (hw' :
     : (VS D).hT (nL X X0 xs M w) (nL X X0 xs M w') = (VS D).hT w w' := by
   rw [nL_w X X0 xs M hw, nL_w X X0 xs M hw', LinearMap.map_add₂, map_add (f := _), map_add (f := _),
     h_sum_left, h_sum_left, h_sum_right]
-  simp [h_sum_right, (hw' _).1, (inW_left X hw _).1, X.ee]
+  simp [(hw' _).1, (inW_left X hw _).1, X.ee]
 
 theorem iso_gen_left
     (hinv : X0⁻¹ * X0 = 1) (hxs : ∀ b, InW X (xs b)) (hM : M + Mᴴ = - Gp D X0 xs)

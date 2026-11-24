@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.UG GlobalTheory.LFun Matrix
 open scoped ContDiff
+
 theorem _root_.GlobalTheory.T.kirillov_semilocal_smooth_bump
     : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ)
         (S : Finset (HeightOneSpectrum (𝓞 E))) (b : GA E (m + 1) → ℂ),
@@ -82,7 +83,4 @@ theorem _root_.GlobalTheory.T.kirillov_semilocal_smooth_bump
                       GlobalTheory.JSW.whit φ.1 (x * t) = c * GlobalTheory.JSW.whit φ.1 x)
                     → ∀ x ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S,
                       GlobalTheory.JSW.whit F (x * t) = c * GlobalTheory.JSW.whit F x := by
-  first
-  | (exact @GlobalTheory.JSW.KirSemi.kirillov_semilocal_bump)
-  | (exact GlobalTheory.JSW.KirSemi.kirillov_semilocal_bump)
-  | (intros; apply GlobalTheory.JSW.KirSemi.kirillov_semilocal_bump <;> assumption)
+  first | (exact @GlobalTheory.JSW.KirSemi.kirillov_semilocal_bump)

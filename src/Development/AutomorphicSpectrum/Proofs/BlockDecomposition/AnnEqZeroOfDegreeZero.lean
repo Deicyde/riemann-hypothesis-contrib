@@ -304,7 +304,7 @@ theorem Ts_comm
   cases s <;> cases t
     <;> simp only [Ts, Bool.false_eq_true, if_false, if_true, e1, e2, e3, e4, h1, h2, b1, b2, b3,
       b4]
-    <;> split_ifs <;> first | abel | (simp; done) | (simp; abel)
+    <;> split_ifs <;> first | abel
 
 theorem Tl_comm {E1 E2 : Fin n → Fin n → Module.End ℂ V} (h : PairRel E1 E2) (i j : Lt n)
     : Tl E1 E2 i * Tl E1 E2 j - Tl E1 E2 j * Tl E1 E2 i = ∑ k, cq i j k • Tl E1 E2 k := by
@@ -423,7 +423,7 @@ theorem bd_apply (E1 E2 : Fin n → Fin n → Module.End ℂ V) (x : Cq n V)
         + (1 / 2 : ℂ)
           • ∑ i : Lt n, ∑ j : Lt n, ∑ k : Lt n, cq i j k • creq k (annq j (annq i x)) := by
   rw [bdq_eq]
-  simp [Module.End.mul_apply, LinearMap.sum_apply]
+  simp [LinearMap.sum_apply]
 
 def supSub (V : Type) [AddCommGroup V] [Module ℂ V] (P : Finset (Lt n) → Prop)
     : Submodule ℂ (Cq n V) where

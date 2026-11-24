@@ -3,9 +3,15 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ThetaValues.GamAt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.SupGenTies
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.EqOrEqNegOfPurelyImaginaryOfNormEq
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsRankOneCuspLatticeDataOfPrincipalStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsClearingIntegersPrincipalDatumHostStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ModelWeightSizeSpreadBoundStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
+public import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
+public import Development.AbelianVarietyTheory.Definitions.RegularCharts.BaseNorm
+public import Formalism.LocalToGlobal.ProjectiveLattices.CuspidalL2Subspace
+public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsRankOneCuspLatticeDataOfPrincipal
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsClearingIntegersPrincipalDatumHost
+public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ModelWeightSizeSpreadBound
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.TransvMem
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -45,7 +51,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
-public import Development.AbelianVarietyTheory.Definitions.RegularCharts.BaseNorm
 
 @[expose] public section
 
@@ -200,8 +205,8 @@ theorem cusp_data_bounds
       -,
       hxiabs
     ⟩ :=
-    GlobalTheory.T.exists_clearing_integers_principalDatum_host D large₂.sc.L hL hlrd hdd hcc
-  have h10 := GlobalTheory.T.modelWeight_size_spread_bound D T h j hj w σ hσ
+    _root_.GlobalTheory.HostClear.host_clear D large₂.sc.L hL hlrd hdd hcc
+  have h10 := _root_.GlobalTheory.RunIn.WtSize.laU_wtA_size D T h j hj w σ hσ
   obtain ⟨hW1, hW2, hW3⟩ :=
     weight_bounds large₂.sc.L (D.R.f : ℝ) (D.R.r : ℝ) (w.n : ℝ) (WeightAlgebra.DF w : ℝ) hL
       (by exact_mod_cast hf1) (by exact_mod_cast hfr) (by exact_mod_cast hrn) (by positivity) hn hDF
@@ -233,7 +238,7 @@ theorem cusp_data_bounds
     ⟩
   have hPr : GlobalTheory.FrameNorm.HasPrinc (Formalism.L2.PjFree.Unf.ofPj (T.U j σ)) T.Q.l.M :=
     fun k γ h1 h2 => hGam j hj σ hσ k γ h1 h2
-  choose Xx hXx hXg hXΛ hXk0 hXNA hXNC using GlobalTheory.T.exists_rankOneCuspLatticeData_of_principal D T.toCore h.toLawsCore j hj σ hσ hPr
+  choose Xx hXx hXg hXΛ hXk0 hXNA hXNC using _root_.GlobalTheory.LatticeData.exists_dataX_of_hasPrinc D T.toCore h.toLawsCore j hj σ hσ hPr
   choose e heNA heNC heg hek0 using fun k => exists_ext (Xx k) _ (hXx k) _ (hXΛ k) NA
     (Ideal.absNorm D.host.ccK) hNA0 hcc0 hNAi hccA
   have hMpos : 0 < T.Q.l.M := by rw [← hXg k₁]; exact (Xx k₁).g_pos

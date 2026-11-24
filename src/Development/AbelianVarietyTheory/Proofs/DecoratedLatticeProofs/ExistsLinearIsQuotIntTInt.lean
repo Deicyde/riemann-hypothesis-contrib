@@ -57,21 +57,24 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.PosOne
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.PosOne
 open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage (app app_coe)
 open scoped Topology
 
 noncomputable section
 namespace GlobalTheory.PosOne.RrLin
 
-theorem exists_open_translations {M : Type*} [AddCommGroup M] [TopologicalSpace M]
-    [IsTopologicalAddGroup M] {Φ : M → ℂ} (hΦ : Φ ∈ SB M) :
-    ∃ Λ : AddSubgroup M, IsOpen (Λ : Set M) ∧ ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
-  let Λ : AddSubgroup M :=
-    { carrier := {y | ∀ x, Φ (x + y) = Φ x}
-      zero_mem' := fun x => by simp
-      add_mem' := fun {y z} hy hz x => by rw [← add_assoc, hz, hy]
-      neg_mem' := fun {y} hy x => by rw [← hy (x + -y)]; simp }
+theorem exists_open_translations
+    {M : Type*} [AddCommGroup M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+    {Φ : M → ℂ} (hΦ : Φ ∈ SB M)
+    : ∃ Λ : AddSubgroup M, IsOpen (Λ : Set M) ∧ ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
+  let Λ : AddSubgroup M := {
+    carrier := {y | ∀ x, Φ (x + y) = Φ x}
+    zero_mem' := fun x => by simp
+    add_mem' := fun {y z} hy hz x => by rw [← add_assoc, hz, hy]
+    neg_mem' := fun {y} hy x => by rw [← hy (x + -y)]; simp
+  }
   refine ⟨Λ, Λ.isOpen_of_mem_nhds (g := 0) ?_, fun x y hy => hy x⟩
   have h1 : ∀ᶠ y in 𝓝 (0 : M), ∀ x ∈ tsupport Φ, Φ (x + y) = Φ x := by
     refine IsCompact.eventually_forall_of_forall_eventually hΦ.2 fun x _ => ?_
@@ -92,39 +95,65 @@ theorem exists_open_translations {M : Type*} [AddCommGroup M] [TopologicalSpace 
   · rw [← hs' _ hx']; simp
   · rw [image_eq_zero_of_notMem_tsupport hx, image_eq_zero_of_notMem_tsupport hx']
 
-theorem exists_isQuotInt_tInt {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] {n n' : Type} [Fintype n] [DecidableEq n]
-    [Fintype n'] [DecidableEq n'] {c p : ℕ} (hp : 1 ≤ p) (hpc : p ≤ c) {ψ : AddChar k Circle} (hψ : Continuous ψ)
-    (hψ1 : ψ ≠ 1) (ν : Measure k) [ν.IsAddHaarMeasure] {μ : kˣ →* ℂˣ} (hμ : IsOpen (μ.ker : Set kˣ))
-    (μX : Measure (GL n k)) [μX.IsHaarMeasure] (μG : Measure (GL (n ⊕ Fin c) k)) [μG.IsHaarMeasure]
-    {A : Type} [AddCommGroup A] [Module ℂ A] {σ : Representation ℂ (GL (n ⊕ Fin c) k) A} (hσ : IsSmoothRep σ)
-    {B : SB (Matrix n n' k) →ₗ[ℂ] A →ₗ[ℂ] ℂ} (hB : BilPos ψ μ p σ B) (F : A)
-    (Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)) :
-    ∃ z, IsQuotInt ν μX μG p (tInt ψ ν μ p σ B F Φ.1) z := by
+theorem exists_isQuotInt_tInt
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    [MeasurableSpace k] [BorelSpace k]
+    {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+    {c p : ℕ} (hp : 1 ≤ p) (hpc : p ≤ c)
+    {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    {μ : kˣ →* ℂˣ} (hμ : IsOpen (μ.ker : Set kˣ))
+    (μX : Measure (GL n k)) [μX.IsHaarMeasure]
+    (μG : Measure (GL (n ⊕ Fin c) k)) [μG.IsHaarMeasure]
+    {A : Type} [AddCommGroup A] [Module ℂ A]
+    {σ : Representation ℂ (GL (n ⊕ Fin c) k) A} (hσ : IsSmoothRep σ)
+    {B : SB (Matrix n n' k) →ₗ[ℂ] A →ₗ[ℂ] ℂ} (hB : BilPos ψ μ p σ B)
+    (F : A) (Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k))
+    : ∃ z, IsQuotInt ν μX μG p (tInt ψ ν μ p σ B F Φ.1) z := by
   apply GlobalTheory.PosOne.FJTarget.exists_isQuotInt_tInt <;> assumption
 
 end GlobalTheory.PosOne.RrLin
 
 namespace GlobalTheory.PosOne.RrLin
-open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage (HasTensorVal fl opEFJ IsQuotIntFJ IsFJ Represents)
+open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+  (HasTensorVal fl opEFJ IsQuotIntFJ IsFJ Represents)
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO rescale)
 
-theorem exists_linear_isQuotInt_tInt : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] (c p : ℕ) (_ : 1 ≤ p) (_ : p ≤ c) (ψ : AddChar k Circle) (_ : Continuous ψ) (_ : ψ ≠ 1) (ν : Measure k) [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ) (_ : IsOpen (μ.ker : Set kˣ)) (μX : Measure (GL n k)) [μX.IsHaarMeasure] (μG : Measure (GL (n ⊕ Fin c) k)) [μG.IsHaarMeasure] (A : Type) [AddCommGroup A] [Module ℂ A] (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (_ : IsSmoothRep σ) (B : SB (Matrix n n' k) →ₗ[ℂ] A →ₗ[ℂ] ℂ) (_ : BilPos ψ μ p σ B) (F : A) (ρ' : Representation ℂ (GL (n' ⊕ Fin (c + 1)) k) (SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k))) (_ : IsSrc μ ρ'), ∃ Rr : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k) →ₗ[ℂ] ℂ, (∀ Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k), IsQuotInt ν μX μG p (tInt ψ ν μ p σ B F Φ.1) (Rr Φ)) ∧ IsNEquiv ψ p ρ' Rr := by
+theorem exists_linear_isQuotInt_tInt
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n']
+        [DecidableEq n'] (c p : ℕ) (_ : 1 ≤ p) (_ : p ≤ c) (ψ : AddChar k Circle) (_ : Continuous ψ)
+        (_ : ψ ≠ 1) (ν : Measure k) [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ)
+        (_ : IsOpen (μ.ker : Set kˣ)) (μX : Measure (GL n k)) [μX.IsHaarMeasure]
+        (μG : Measure (GL (n ⊕ Fin c) k)) [μG.IsHaarMeasure] (A : Type) [AddCommGroup A]
+        [Module ℂ A] (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (_ : IsSmoothRep σ)
+        (B : SB (Matrix n n' k) →ₗ[ℂ] A →ₗ[ℂ] ℂ) (_ : BilPos ψ μ p σ B) (F : A)
+        (ρ' : Representation ℂ (GL (n' ⊕ Fin (c + 1)) k)
+          (SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)))
+        (_ : IsSrc μ ρ'),
+      ∃ Rr : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k) →ₗ[ℂ] ℂ,
+        (∀ Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k),
+            IsQuotInt ν μX μG p (tInt ψ ν μ p σ B F Φ.1) (Rr Φ))
+          ∧ IsNEquiv ψ p ρ' Rr := by
   intro k _ _ _ _ _ _ n n' _ _ _ _ c p hp hpc ψ hψ hψ1 ν _ μ hμ μX _ μG _ A _ _ σ hσ B hB F ρ' hρ'
   have uniq := (GlobalTheory.QuotInt.quotInt_unique_exists k n c p hp hpc ν μX μG · |>.1)
   have hE := (opE_SB_and_linear k n n' c p ψ hψ ν).1
 
-  have hfE : ∀ (Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)) h,
-      tInt ψ ν μ p σ B F Φ.1 h =
-        B ⟨opE ψ ν p (om μ 1 h Φ.1), hE _ (om_mem_SB μ 1 h Φ.2)⟩ (σ h F) := fun Φ h => by
+  have hfE
+      : ∀ (Φ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)) h,
+        tInt ψ ν μ p σ B F Φ.1 h
+          = B ⟨opE ψ ν p (om μ 1 h Φ.1), hE _ (om_mem_SB μ 1 h Φ.2)⟩ (σ h F) := fun Φ h => by
     rw [tInt]
     exact congrArg (fun l : A →ₗ[ℂ] ℂ => l (σ h F)) (app_coe B ⟨_, hE _ (om_mem_SB μ 1 h Φ.2)⟩)
 
-  have hlinf : ∀ (a : ℂ) (Φ Ψ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)),
-      tInt ψ ν μ p σ B F (a • Φ + Ψ).1 = fun h => a * tInt ψ ν μ p σ B F Φ.1 h + tInt ψ ν μ p σ B F Ψ.1 h := by
+  have hlinf
+      : ∀ (a : ℂ) (Φ Ψ : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k)),
+        tInt ψ ν μ p σ B F (a • Φ + Ψ).1
+          = fun h => a * tInt ψ ν μ p σ B F Φ.1 h + tInt ψ ν μ p σ B F Ψ.1 h := by
     intro a Φ Ψ
     funext h
-    rw [hfE, hfE, hfE, ← smul_eq_mul, ← LinearMap.smul_apply, ← LinearMap.add_apply, ← map_smul, ← map_add (f := _)]
+    rw [hfE, hfE, hfE, ← smul_eq_mul, ← LinearMap.smul_apply, ← LinearMap.add_apply, ← map_smul,
+      ← map_add (f := _)]
     congr 2
     apply Subtype.ext
     show opE ψ ν p (om μ 1 h (a • Φ.1 + Ψ.1)) =
@@ -138,15 +167,18 @@ theorem exists_linear_isQuotInt_tInt : ∀ (k : Type) [Field k] [ValuativeRel k]
   have hlin : ∀ (a : ℂ) Φ Ψ, Rr (a • Φ + Ψ) = a * Rr Φ + Rr Ψ := fun a Φ Ψ => by
     refine uniq _ _ _ (hRr _) ?_
     rw [hlinf]
-    exact GlobalTheory.RootEx.QuotLinear.isQuotInt_linear k n c p hp hpc ν μX μG _ _ a _ _ (hRr Φ) (hRr Ψ)
+    exact GlobalTheory.RootEx.QuotLinear.isQuotInt_linear k n c p hp hpc ν μX μG _ _ a _ _ (hRr Φ)
+      (hRr Ψ)
   have h0 : Rr 0 = 0 := by simpa using hlin 1 0 0
-  let RL : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k) →ₗ[ℂ] ℂ :=
-    { toFun := Rr
-      map_add' := fun Φ Ψ => by simpa using hlin 1 Φ Ψ
-      map_smul' := fun a Φ => by simpa [h0] using hlin a Φ 0 }
+  let RL : SB (Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k) →ₗ[ℂ] ℂ := {
+    toFun := Rr
+    map_add' := fun Φ Ψ => by simpa using hlin 1 Φ Ψ
+    map_smul' := fun a Φ => by simpa [h0] using hlin a Φ 0
+  }
   refine ⟨RL, hRr, fun g hg Φ => ?_⟩
   show Rr (ρ' g Φ) = (ψ (simpleSum g) : ℂ) * Rr Φ
-  have e : tInt ψ ν μ p σ B F (ρ' g Φ).1 = tInt ψ ν μ p σ B F ((ψ (simpleSum g) : ℂ) • Φ + 0).1 := by
+  have e
+      : tInt ψ ν μ p σ B F (ρ' g Φ).1 = tInt ψ ν μ p σ B F ((ψ (simpleSum g) : ℂ) • Φ + 0).1 := by
     funext h
     rw [hfE, hfE]
     congr 2

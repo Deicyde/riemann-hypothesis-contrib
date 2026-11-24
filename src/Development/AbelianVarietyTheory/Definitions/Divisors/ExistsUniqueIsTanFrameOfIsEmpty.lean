@@ -53,7 +53,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField TensorProduct

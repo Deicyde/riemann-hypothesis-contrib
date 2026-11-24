@@ -53,9 +53,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
@@ -232,7 +229,7 @@ private theorem eig_loc
     · have e
           : (Finset.univ.filter fun i : Fin n => (i : ℕ) < j + 1)
             = Finset.univ.filter fun i => i ≤ j := by
-        ext i; simp [Nat.lt_succ_iff]
+        ext i; simp
       rw [h2 j s hs, psEig, e, hs, map_prod ι, map_prod ι, ← Finset.prod_inv_distrib,
         ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_

@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 open ReciprocityTheory.ChartRestriction.G.TB (dLin transF IsInvPair dAct)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ChartCmp
+
 theorem _root_.GlobalTheory.T.jetEq_formalExp_iff_and_exists_log
     : ∀ (k : Type) [CommRing k] [Algebra ℚ k] (n d m : ℕ),
       (∀ f g : PS k n d,
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.jetEq_formalExp_iff_and_exists_log
         ∧ ∀ u : PS k n d,
           MvPowerSeries.constantCoeff u = 1
             → ∃ lam : PS k n d, MvPowerSeries.constantCoeff lam = 0 ∧ FB.expS k lam = u := by
-  first
-  | exact @GlobalTheory.ChartCmp.jeq_expS_iff_and_exists_log
-  | exact GlobalTheory.ChartCmp.jeq_expS_iff_and_exists_log
-  | (intros; apply GlobalTheory.ChartCmp.jeq_expS_iff_and_exists_log <;> assumption)
+  first | exact @GlobalTheory.ChartCmp.jeq_expS_iff_and_exists_log

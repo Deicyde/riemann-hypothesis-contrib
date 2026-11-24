@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR GlobalTheory.WeilParts
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.schrodingerIntertwiner_schwartzBruhat_isTheta
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.schrodingerIntertwiner_schwartzBruhat_isTheta
                                 (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
                               Φ
                             → IsThetaFunO ψ S T (Tm Φ) := by
-  first
-  | exact @GlobalTheory.SchrTheta.isTheta_placeModel
-  | exact GlobalTheory.SchrTheta.isTheta_placeModel
-  | (intros; apply GlobalTheory.SchrTheta.isTheta_placeModel <;> assumption)
+  first | exact @GlobalTheory.SchrTheta.isTheta_placeModel

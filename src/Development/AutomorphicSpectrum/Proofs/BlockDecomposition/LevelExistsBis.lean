@@ -456,8 +456,6 @@ theorem step
   }
   have hWst : ∀ (g : locU n w), ∀ v ∈ W, (GlobalTheory.UnitaryBC.SatEx.pull π hst j g) v ∈ W := by
     intro g v hv q hq
-    change RU E n q (((GlobalTheory.UnitaryBC.SatEx.pull π hst j g) v : π) : UA E n → ℂ)
-      = (((GlobalTheory.UnitaryBC.SatEx.pull π hst j g) v : π) : UA E n → ℂ)
     rw [key, ← Module.End.mul_apply, ← map_mul, hQ q hq g g.2, map_mul, Module.End.mul_apply,
       hv q hq]
   have hne

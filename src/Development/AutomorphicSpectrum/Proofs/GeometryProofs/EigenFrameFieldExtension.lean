@@ -2,9 +2,13 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeGram
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModelBaseChangeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelEigenvectorsActionStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModelBaseChange
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelEigenvectorsAction
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueAct
+public import Mathlib.RingTheory.TensorProduct.IsBaseChangeFree
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -25,7 +29,6 @@ import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.Radical.NatInt
 import Mathlib.RingTheory.RegularLocalRing.Defs
-public import Mathlib.RingTheory.TensorProduct.IsBaseChangeFree
 import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
@@ -180,7 +183,7 @@ theorem eigFrame_base
     : IsEigFrame act (spMap (algebraMap F F') ≫ x) ((algebraMap F F').comp σ) v' := by
   obtain ⟨V, _, _, ⟨M⟩⟩ := lieModel_exists S G F x
   obtain ⟨T, _, _, _, _, M', j, hl, hj⟩ :=
-    GlobalTheory.T.exists_lie_model_base_change S G F F' x V M
+    _root_.GlobalTheory.CompanionTheory.Ar.FlagFib.lieModel_liftBaseChange S G F F' x V M
   obtain ⟨ρ, hρ, -⟩ :=
     lieModel_exists_unique_act S G F x V M P act.act act.hom act.one act.mul act.add
   obtain ⟨ρ', hρ', -⟩ :=
@@ -194,13 +197,13 @@ theorem eigFrame_base
       rw [hρ' a (j e), Over.comp_left, hl', hl', hρ a e, Over.comp_left, Category.assoc]))
   choose u hu using fun i => M.onto (v i) (h.1 i).1
   obtain rfl : (fun k => M.pt (u k)) = v := funext hu
-  obtain ⟨-, hf⟩ := GlobalTheory.T.lie_model_eigenvectors_action S F G x V M
+  obtain ⟨-, hf⟩ := _root_.GlobalTheory.CompanionTheory.Ar.Fl.Bridge.comb_eig_frame S F G x V M
   obtain ⟨hli, hsp⟩ := ((hf P act ρ σ hρ).2 n u).1 h
   have hvv : v' = fun k => M'.pt (j (u k)) :=
     funext fun k => Over.OverMorphism.ext (by rw [hv k, hl'])
   rw [hvv]
-  exact (((GlobalTheory.T.lie_model_eigenvectors_action S F' G _ T M').2 P act ρ' _ hρ').2 n _).2
-    (frame_base hj σ hact hli hsp)
+  exact (((_root_.GlobalTheory.CompanionTheory.Ar.Fl.Bridge.comb_eig_frame S F' G _ T M').2 P act ρ'
+    _ hρ').2 n _).2 (frame_base hj σ hact hli hsp)
 
 theorem isEigFrame_base
     : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (F : Type) [Field F]

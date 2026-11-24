@@ -72,20 +72,13 @@ theorem orthonormalChartNormControl_holds : OrthonormalChartNormControl (E := E)
         : ∀ {f : Fin r → X.Coord → ℂ},
           (∀ j, Differentiable ℂ (f j)) → Differentiable ℂ (fun Z => ∑ j, f j Z) := by
       intro f hf
-      first
-      | exact Differentiable.fun_sum fun j _ => hf j
-      | simpa [Finset.sum_fn] using Differentiable.sum (u := Finset.univ) (fun j _ => hf j)
-      | fun_prop
+      first | exact Differentiable.fun_sum fun j _ => hf j
     refine hsum fun k => ?_
     refine Differentiable.const_mul ?_ _
     refine (differentiable_const _).add ?_
     by_cases h : X.p0 ≤ (k : ℕ) ∧ (b : ℕ) < X.p0
     · simp only [dif_pos h]
-      first
-      | fun_prop
-      | exact (differentiable_pi.mp
-            ((differentiable_pi.mp ((differentiable_pi.mp differentiable_id) τ)) _))
-          _
+      first | fun_prop
     · simp only [dif_neg h]
       exact differentiable_const _
   refine hG.comp hd.differentiableOn ?_

@@ -666,8 +666,7 @@ theorem nonempty_biTriv
           lift 1 1,
           fun z J hJ => by
             simp only [MonObj.comp_mul, Category.assoc, lift_fst_assoc, lift_snd_assoc, lift_fst,
-              lift_snd, MonObj.one_comp, (isCub_cubV c hJ).face₃, _root_.one_mul, _root_.mul_one,
-              h₂ Z _ z J hJ]
+              lift_snd, MonObj.one_comp, (isCub_cubV c hJ).face₃, _root_.mul_one, h₂ Z _ z J hJ]
         ⟩)
         Z t (lift t' x) z J hJ
     simpa only [MonObj.comp_mul, Category.assoc, lift_fst_assoc, lift_snd_assoc, lift_fst, lift_snd]
@@ -691,9 +690,8 @@ theorem nonempty_biTriv
         (fun Z τ => ⟨
           lift 1 1,
           fun z J hJ => by
-            simp only [MonObj.comp_mul, Category.assoc, lift_fst_assoc, lift_snd_assoc, lift_fst,
-              lift_snd, MonObj.one_comp, (isCub_cubV c hJ).face₃, _root_.one_mul, _root_.mul_one,
-              h₂ Z _ z J hJ]
+            simp only [MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc, lift_fst, lift_snd,
+              (isCub_cubV c hJ).face₃, _root_.mul_one, h₂ Z _ z J hJ]
         ⟩)
         Z t (lift x x') z J hJ
     simpa only [MonObj.comp_mul, Category.assoc, lift_fst_assoc, lift_snd_assoc, lift_fst, lift_snd]

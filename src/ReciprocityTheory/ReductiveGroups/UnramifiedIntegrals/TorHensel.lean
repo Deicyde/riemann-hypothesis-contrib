@@ -190,7 +190,7 @@ theorem sqrt_mem
   · rw [Polynomial.coeff_sub, Polynomial.coeff_X_pow, Polynomial.coeff_C]
     split_ifs <;> first | (exfalso; omega) | simp [hc1]
   · simp [h]
-  · simp [Polynomial.derivative_X_pow, norm_mul, hy]
+  · simp [norm_mul, hy]
     rw [one_add_one_eq_two]
     exact h2
 

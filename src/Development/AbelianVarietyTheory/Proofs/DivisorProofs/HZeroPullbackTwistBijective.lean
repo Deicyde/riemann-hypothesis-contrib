@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.PullHlComp
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCohomologyNegativeVanishingDegreeZeroStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSupportCondition
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCohomologyNegativeVanishingDegreeZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocallyIffAffineEtalePointCover
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSheafSectionsExtAndGlue
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistSectionsLocallyGeneratedStatement
@@ -55,19 +56,13 @@ namespace GlobalTheory.EtC.ConnectedGlobalSections
 
 variable {q : ℕ} [NeZero q] {i : ℤ}
 
-theorem res_comp
-    {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (k : W ⟶ V) (g : V ⟶ U) (y : Sec F U)
-    : Sec.res (k ≫ g) y = Sec.res k (Sec.res g y) := by
-  simp [Sec.res]
+alias res_comp := _root_.GlobalTheory.TwSec.res_comp
 
-theorem res_nsmul
-    {R : Type} [CommRing R] {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (n : ℕ) (t : Sec F U)
-    : Sec.res g (n • t) = n • Sec.res g t :=
-  map_nsmul ((F.obj.map g.op).hom) n t
+alias res_nsmul := _root_.GlobalTheory.TwSec.res_nsmul
 
 theorem res_twGen {V U : Scheme.{0}} (g : V ⟶ U) (ζ : Prim q Γ(U, ⊤))
     : Sec.res g (twGen i ζ) = twGen i (ζ.map g.appTop.hom) :=
-  (GlobalTheory.T.tateTwist_sections_locally_generated q i).2.2.2.1 V U g ζ
+  (_root_.GlobalTheory.EtC.twist_sections q i).2.2.2.1 V U g ζ
 
 theorem prim_map_comp {W V U : Scheme.{0}} (k : W ⟶ V) (g : V ⟶ U) (ζ : Prim q Γ(U, ⊤))
     : (ζ.map g.appTop.hom).map k.appTop.hom = ζ.map (k ≫ g).appTop.hom := by
@@ -89,7 +84,7 @@ theorem scalar_eq
     rw [nsmul_eq_up, nsmul_eq_up, ZMod.natCast_zmod_val, ZMod.natCast_zmod_val] at h
     have : (ULift.up (c - d) : ULift.{1} (ZMod q)) = ULift.up c - ULift.up d := rfl
     rw [this, sub_smul, h, sub_self]
-  have hd := (GlobalTheory.T.tateTwist_sections_locally_generated q i).2.2.1 U ζ _ h0
+  have hd := (_root_.GlobalTheory.EtC.twist_sections q i).2.2.1 U ζ _ h0
   have hv : (c - d).val = 0 := Nat.eq_zero_of_dvd_of_lt hd (ZMod.val_lt _)
   exact sub_eq_zero.1 ((ZMod.val_eq_zero _).1 hv)
 
@@ -114,7 +109,7 @@ theorem sec_eq_nsmul
     (loc_iff_etale_affine_points X
         (fun V g => ∃ c, P V g c)
         (fun V W g k ⟨c, h⟩ => ⟨c, hstab c V W g k h⟩)).1
-      ((GlobalTheory.T.tateTwist_sections_locally_generated q i).2.1 X ζ y)
+      ((_root_.GlobalTheory.EtC.twist_sections q i).2.1 X ζ y)
   let S : ZMod q → Set X := fun c =>
     {x | ∃ (V : Scheme.{0}) (g : V ⟶ X), IsAffine V ∧ Etale g ∧ x ∈ Set.range g ∧ P V g c.val}
   have hopen : ∀ c, IsOpen (S c) := by
@@ -180,11 +175,9 @@ theorem clopen_of_idem
   obtain ⟨e, he, h⟩ := PrimeSpectrum.isClopen_iff.1 (show IsClopen (X := PrimeSpectrum B) s from hs)
   rcases hB e he with rfl | rfl
   · left
-    change (s : Set (PrimeSpectrum B)) = ∅
     rw [h]
     simp <;> rfl
   · right
-    change (s : Set (PrimeSpectrum B)) = Set.univ
     rw [h]
     simp <;> rfl
 
@@ -200,7 +193,7 @@ theorem GlobalTheory.EtC.h_zero_pull_bijective
   intro q _ A A' _ _ f hq ⟨ζ0, hζ0⟩ hA' hidA hidA' i
   haveI : Nontrivial A := f.domain_nontrivial
   obtain ⟨-, e, he, -⟩ :=
-    GlobalTheory.T.etaleCohomology_negative_vanishing_degree_zero (ZMod q) (tw q i)
+    _root_.GlobalTheory.EtC.etale_cohomology_vanishing_negative_degree_zero (ZMod q) (tw q i)
   let g : Spec (CommRingCat.of A') ⟶ Spec (CommRingCat.of A) := Spec.map (CommRingCat.ofHom f)
   haveI : Nonempty (Spec (CommRingCat.of A)) := inferInstance
   haveI : Nonempty (Spec (CommRingCat.of A')) := inferInstance
@@ -214,7 +207,7 @@ theorem GlobalTheory.EtC.h_zero_pull_bijective
       intro y hy
       obtain ⟨c, rfl⟩ := sec_eq_nsmul _ (clopen_of_idem A hidA) ζ y
       have h0 : c • twGen i (ζ.map g.appTop.hom) = 0 := by rw [← res_twGen, ← res_nsmul]; exact hy
-      obtain ⟨k, rfl⟩ := (GlobalTheory.T.tateTwist_sections_locally_generated q i).2.2.1 _ _ _ h0
+      obtain ⟨k, rfl⟩ := (_root_.GlobalTheory.EtC.twist_sections q i).2.2.1 _ _ _ h0
       exact q_nsmul _ k
     · intro y
       obtain ⟨c, rfl⟩ := sec_eq_nsmul _ (clopen_of_idem A' hidA') (ζ.map g.appTop.hom) y

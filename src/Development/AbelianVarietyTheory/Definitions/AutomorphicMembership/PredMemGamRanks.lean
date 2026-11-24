@@ -859,7 +859,6 @@ variable
   {E K : Type} [Field E] [NumberField E] [Field K]
   {n : ℕ} {S : GStep E K n} {ST : Finset (HeightOneSpectrum (𝓞 E))} (A : TDat S ST)
 
-
 structure Laws (T : ℕ) : Prop where
   lv_rank : ∀ P c, Module.finrank (Res P.1) (A.lv P c) = n
   lk_rank : ∀ P c, Module.finrank (Res P.1) (A.lk P c) = n

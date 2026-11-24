@@ -2,9 +2,13 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.FiniteDimensionalOfSz
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.RayFieldTheta
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.CompleteSplittingCompositumDegreeOnePrimeStatement
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Mathlib.RingTheory.Ideal.Norm.AbsNorm
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.CompleteSplittingCompositumDegreeOnePrime
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LeOfFiniteSplitNotSplitBauer
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.PrincipalRayPrimesSplitCompletelyWeberValuesStatement
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.TotallyRealComplex
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.PrincipalRayPrimesSplitCompletelyWeberValues
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -104,7 +108,7 @@ theorem weberSet_subset
                 → weberSet P n ⊆ L := by
   intro K L _ _ _ h h2 hd P hP n hn hR
   obtain ⟨inst, S, hS⟩ :=
-    GlobalTheory.T.principalRayPrimes_splitCompletely_weberValues K h2 hd P hP n hn
+    _root_.GlobalTheory.WeberSplitAny.splits_completely_of_three_le K h2 hd P hP n hn
   haveI := numberField_adjoin K L (weberSet P n)
   have hn0 : (n : 𝓞 L) ≠ 0 := by exact_mod_cast (show n ≠ 0 by omega)
   haveI : NumberField (⊥ : IntermediateField L ℂ) := NumberField.of_module_finite L _
@@ -135,7 +139,7 @@ theorem weberSet_subset
       hne
     ⟩
     apply hnot
-    refine GlobalTheory.T.completeSplitting_compositum_degreeOnePrime K L h (weberSet P n) 𝔭 𝔓 rfl
+    refine _root_.GlobalTheory.SplitCompositum.ncard_eq_finrank_adjoin K L h (weberSet P n) 𝔭 𝔓 rfl
       hN ?_
     have h𝔭 : 𝔭.asIdeal = Ideal.span {α} := hα
     rw [h𝔭]

@@ -74,11 +74,7 @@ theorem lawA3'_of
   have ha : a ≠ 0 := by
     rintro rfl
     exact hf0 (zero_smul _ _)
-  have hcoeff : (a • (AddMonoidAlgebra.single G (1 : Om Z))).coeff G = a := by
-    first
-    | simp
-    | simp [AddMonoidAlgebra.smul_single']
-    | (rw [AddMonoidAlgebra.smul_single', mul_one]; rfl)
+  have hcoeff : (a • (AddMonoidAlgebra.single G (1 : Om Z))).coeff G = a := by first | simp
   refine ((hD Z a ha).union (hF Z)).subset ?_
   rintro v ⟨hadm, hne⟩
   rw [hord] at hne

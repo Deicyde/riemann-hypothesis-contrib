@@ -79,7 +79,4 @@ theorem _root_.GlobalTheory.T.traceSymplectic_self_zero_splitSupported
               (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM D.host.F Γ.V'.J)
               (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM D.host.F Γ.W.J) u u
             = 0 := by
-  first
-  | exact @GlobalTheory.VacIso.symp_self_eq_zero
-  | exact GlobalTheory.VacIso.symp_self_eq_zero
-  | (intros; apply GlobalTheory.VacIso.symp_self_eq_zero <;> assumption)
+  first | exact @GlobalTheory.VacIso.symp_self_eq_zero

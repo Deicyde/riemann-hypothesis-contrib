@@ -109,22 +109,11 @@ theorem sum_mul_left_eq
 
 variable {D : D7}
 
-theorem mt_mul (V : HSp D) (a b : GA D V) : mt V (a * b) = mt V a * mt V b := by
-  unfold Formalism.L2.Theta.mt
-  rw [map_mul, Units.val_mul]
-
-theorem mt_one (V : HSp D) : mt V 1 = 1 := by
-  unfold Formalism.L2.Theta.mt
-  rw [map_one, Units.val_one]
-
-theorem mt_injective (V : HSp D) {a b : GA D V} (h : mt V a = mt V b) : a = b :=
-  Subtype.val_injective (Units.ext h)
-
 theorem suppF_mul {V : HSp D} {f : AE D} {a b : GA D V} (ha : SuppF V f a) (hb : SuppF V f b)
     : SuppF V f (a * b) := by
   intro i j
   have e : mt V (a * b) - 1 = (mt V a - 1) * mt V b + (mt V b - 1) := by
-    rw [mt_mul, sub_mul, one_mul]; abel
+    rw [_root_.GlobalTheory.BesselCompare.mt_mul, sub_mul, one_mul]; abel
   rw [e, Matrix.add_apply, Matrix.mul_apply, mul_add, Finset.mul_sum, hb i j]
   congr 1
   refine Finset.sum_congr rfl fun l _ => ?_
@@ -133,7 +122,9 @@ theorem suppF_mul {V : HSp D} {f : AE D} {a b : GA D V} (ha : SuppF V f a) (hb :
 theorem suppF_inv {V : HSp D} {f : AE D} {a : GA D V} (ha : SuppF V f a) : SuppF V f a⁻¹ := by
   intro i j
   have e : mt V a⁻¹ - 1 = -(mt V a⁻¹ * (mt V a - 1)) := by
-    rw [mul_sub, ← mt_mul, inv_mul_cancel, mt_one, mul_one]; abel
+    rw [mul_sub, ← _root_.GlobalTheory.BesselCompare.mt_mul, inv_mul_cancel,
+      _root_.GlobalTheory.BesselCompare.mt_one, mul_one]
+    abel
   rw [e, Matrix.neg_apply, Matrix.mul_apply, mul_neg, Finset.mul_sum]
   congr 1
   refine Finset.sum_congr rfl fun l _ => ?_
@@ -141,7 +132,7 @@ theorem suppF_inv {V : HSp D} {f : AE D} {a : GA D V} (ha : SuppF V f a) : SuppF
 
 theorem suppF_one (V : HSp D) (f : AE D) : SuppF V f (1 : GA D V) := by
   intro i j
-  simp [mt_one]
+  simp [_root_.GlobalTheory.BesselCompare.mt_one]
 
 def suppSub (V : HSp D) (f : AE D) : Subgroup (GA D V) where
   carrier := {g | SuppF V f g}
@@ -152,7 +143,7 @@ def suppSub (V : HSp D) (f : AE D) : Subgroup (GA D V) where
 theorem comm_of_suppF_trivAt
     {V : HSp D} {f : AE D} {a b : GA D V} (ha : SuppF V f a) (hb : TrivAt V f b)
     : a * b = b * a := by
-  apply mt_injective
+  apply _root_.GlobalTheory.IdemSupport.mt_inj
   have hAB : (mt V a - 1) * (mt V b - 1) = 0 := by
     ext i j
     rw [Matrix.mul_apply, Matrix.zero_apply]
@@ -165,7 +156,8 @@ theorem comm_of_suppF_trivAt
     rw [← ha l j, mul_left_comm, ← mul_assoc, hb i l, zero_mul]
   have e1 : mt V a * mt V b = (mt V a - 1) * (mt V b - 1) + mt V a + mt V b - 1 := by noncomm_ring
   have e2 : mt V b * mt V a = (mt V b - 1) * (mt V a - 1) + mt V b + mt V a - 1 := by noncomm_ring
-  rw [mt_mul, mt_mul, e1, e2, hAB, hBA, zero_add, zero_add, add_comm (mt V a)]
+  rw [_root_.GlobalTheory.BesselCompare.mt_mul, _root_.GlobalTheory.BesselCompare.mt_mul, e1, e2,
+    hAB, hBA, zero_add, zero_add, add_comm (mt V a)]
 
 theorem heckeOn_mem_wall
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}

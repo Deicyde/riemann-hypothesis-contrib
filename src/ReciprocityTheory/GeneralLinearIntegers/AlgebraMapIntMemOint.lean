@@ -59,7 +59,7 @@ theorem isCompact_integers (v : HeightOneSpectrum (𝓞 F))
 
 theorem isOpen_integers (v : HeightOneSpectrum (𝓞 F))
     : IsOpen (v.adicCompletionIntegers F : Set (v.adicCompletion F)) := by
-  first | exact Valued.isOpen_valuationSubring _ | exact Valued.isOpen_integer _
+  first | exact Valued.isOpen_valuationSubring _
 
 def Oint (F : Type) [Field F] [NumberField F] : Set (FiniteAdeleRing (𝓞 F) F) :=
   {x | ∀ v : HeightOneSpectrum (𝓞 F), x v ∈ v.adicCompletionIntegers F}
@@ -69,7 +69,6 @@ theorem isOpen_Oint : IsOpen (Oint F) := by
 
 theorem algebraMap_int_mem_Oint (m : 𝓞 F)
     : algebraMap F (FiniteAdeleRing (𝓞 F) F) (m : F) ∈ Oint F := by
-  intro v
-  exact coe_algebraMap_mem (𝓞 F) F v m
+  exact fun v => coe_algebraMap_mem (𝓞 F) F v m
 
 end ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact

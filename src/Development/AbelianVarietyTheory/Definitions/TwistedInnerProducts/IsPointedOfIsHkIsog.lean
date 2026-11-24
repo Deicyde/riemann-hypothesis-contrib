@@ -85,8 +85,7 @@ theorem translT_mul (a b : T ⟶ A) : translT A (a * b) = translT A b ≫ transl
   rw [translT, translT, translT] at *
   rw [h, translPt_eq, translPt_eq, MonObj.comp_mul, _root_.mul_assoc]
 
-theorem translT_one : translT A (1 : T ⟶ A) = 𝟙 _ := by
-  rw [translT, translPt_eq, MonObj.comp_one, _root_.one_mul, lift_fst_snd]
+alias translT_one := _root_.GlobalTheory.MulSplit.translT_one
 
 variable (A) in
 def transKer {Z : Scheme.{0}} (Ψ : (T ⊗ A).left ⟶ Z) : Subgroup (T ⟶ A) where
@@ -205,8 +204,7 @@ theorem isCarried_of_val
   (secRel_iff L.isLB _ _ t _ _ s' Ψ _ _ β).2 h
 
 omit [GrpObj A] in
-theorem sec_ext {X : Scheme.{0}} {M : LB X} {a b : LB.Sec M} (h : ∀ j, a.f j = b.f j) : a = b := by
-  cases a; cases b; congr; exact funext h
+alias sec_ext := _root_.ReciprocityTheory.ChartRestriction.G.DVR.SecOps.sec_ext
 
 theorem IsCarried.unique (h : IsCarried A L Ψ k β s' t) (h' : IsCarried A L Ψ k β s' t') : t = t' :=
   sec_ext (sec_ext_val (L := L.L)

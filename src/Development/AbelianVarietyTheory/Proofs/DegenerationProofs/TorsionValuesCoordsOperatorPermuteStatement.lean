@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.torsionValues_coords_operator_permute
           ∧ ∀ a h : S.Gam, ∃ e : ℕ, ∀ i,
             ∑ n, algebraMap o Ω (S.ρ a n i) * S.ev h n
               = algebraMap o Ω (S.ζ ^ e) * S.ev (h + S.r • a) i := by
-  first
-  | exact @GlobalTheory.ZH.EvCrd.ev_crd_act
-  | exact GlobalTheory.ZH.EvCrd.ev_crd_act
-  | (intros; apply GlobalTheory.ZH.EvCrd.ev_crd_act <;> assumption)
+  first | exact @GlobalTheory.ZH.EvCrd.ev_crd_act

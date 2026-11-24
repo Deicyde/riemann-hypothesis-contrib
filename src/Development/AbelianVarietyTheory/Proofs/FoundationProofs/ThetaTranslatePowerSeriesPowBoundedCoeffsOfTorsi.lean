@@ -2,15 +2,16 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DifferentiableSqTh
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Cval
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AlgebraicTaylorCombinationParameterSeriesAlgebraStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AlgebraicTaylorCombinationParameterSeriesAlgebra
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaTaylorCoeffAlgebraicAndConjugate
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsSigmaStarTranslatePowDecompositionStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SqThD
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsSigmaStarTranslatePowDecomposition
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntSerOfIsWq
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SigmaStarCubeDerivWeierstrassPParameterSeriesBou
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IdealPeriodLatticeOfCurveDatum
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InducedTypeThetaGenusOnePermutes
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntSerOfIsWq
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralJAndAlgebraicData
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicComplexIntegralBoundedSeriesLaws
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SigmaStarCubeDerivWeierstrassPParameterSeriesBouStatement
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SigmaStarSquareQuotientInModelParameter
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TaylorSeriesInParameterRescaleOfAlgebraic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -91,10 +92,7 @@ theorem bdd_sum {ι : Type*} (s : Finset ι) (f : ι → PowerSeries ℂ_[p]) (h
     exact bdd_add (h a (Finset.mem_insert_self a s))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem lamC_one (lam : Qbar →+* ℂ_[p]) : lamC lam 1 = 1 := by
-  have h : (1 : ℂ) ∈ Qbar := one_mem _
-  rw [lamC, dite_eq_left h]
-  exact map_one lam
+alias lamC_one := _root_.GlobalTheory.ThetaParam.lamC_one
 
 theorem good_mul {g : GL3Theta.G1 p} {k l : ℕ} {F G : ℂ → ℂ} (hF : GoodAt g k F) (hG : GoodAt g l G)
     : GoodAt g (k + l) (fun z => F z * G z) := by
@@ -194,11 +192,10 @@ theorem tau_pow_bdd
     hSe
   ⟩
   obtain ⟨hTa, w, hw, hTe⟩ :=
-    GlobalTheory.T.sigmaStarCubeDerivWeierstrassP_parameterSeries_bounded p g hok hlat' h2 h3 hdisc
-      hsg t htn hwt
+    _root_.GlobalTheory.ThetaTransl.CubeSer.sqThD_atU p g hok hlat' h2 h3 hdisc hsg t htn hwt
   have gT : GoodAt g 3 (sqThD g.abelian₂ t) := ⟨hTa, w, hw, hTe⟩
   obtain ⟨I, a, b, hle, hid⟩ :=
-    GlobalTheory.T.exists_sigmaStar_translate_pow_decomposition g.abelian₂ hlat' t N hN hNt t htn
+    _root_.GlobalTheory.ThetaTranslDecomp.exists_decomp g.abelian₂ hlat' t N hN hNt t htn
   let φ : Fin (I + 1) ⊕ Fin (I + 1) → ℂ → ℂ :=
     Sum.elim
       (fun i z => sgStar g.abelian₂ z ^ (2 * (I - (i : ℕ)) + 3) * sqTh g.abelian₂ t z ^ (i : ℕ))
@@ -225,9 +222,7 @@ theorem tau_pow_bdd
     · rw [← Fin.sum_univ_eq_sum_range]; rfl
     · rw [← Fin.sum_univ_eq_sum_range]; rfl
   obtain ⟨a', -, hlin⟩ :=
-    GlobalTheory.T.algebraicTaylorCombination_parameterSeries_algebraic p g _ φ c _ hEa
-      (fun k => (gφ k).1)
-      hEq
+    _root_.GlobalTheory.TranslLin.transl_lin p g _ φ c _ hEa (fun k => (gφ k).1) hEq
   choose B hB hBe using fun k => (gφ k).2
   have hS : BddSer (∑ k, PowerSeries.C (lamC g.lam (a' k)) * B k) :=
     bdd_sum _ _ fun k _ => bdd_mul (bdd_C _) (hB k)

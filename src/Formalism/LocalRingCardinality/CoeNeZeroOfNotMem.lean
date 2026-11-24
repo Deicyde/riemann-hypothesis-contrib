@@ -610,11 +610,7 @@ theorem det_ne_zero_of_li
     simp
   exact hv (funext fun i => Fintype.linearIndependent_iff.1 h v hy i)
 
-theorem vAdd_mul (w : HeightOneSpectrum (𝓞 K)) {x y : K} (hx : x ≠ 0) (hy : y ≠ 0)
-    : vAdd w (x * y) = vAdd w x + vAdd w y := by
-  unfold vAdd
-  rw [map_mul, WithZero.log_mul ((map_ne_zero _).2 hx) ((map_ne_zero _).2 hy)]
-  ring
+alias vAdd_mul := _root_.Formalism.BasicNotions.Examples₂.PlacesToy.vAdd_mul
 
 theorem li_of_semilinear
     {M : Type} [AddCommGroup M] [Module ℂ M]

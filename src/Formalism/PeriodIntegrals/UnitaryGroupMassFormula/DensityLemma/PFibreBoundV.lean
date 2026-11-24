@@ -298,8 +298,8 @@ theorem nb_UH (hS : Sᴴ = -S) : unipotentBlockMatrix k r Bm S ∈ UH (Hpk k r) 
     <;> simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, mul_one, mul_zero,
       zero_mul, nb_ee, nb_we, nb_se, nb_ew, nb_ww, nb_sw, nb_es, nb_ws, nb_ss, star_ite_one_zero,
       star_zero, Finset.sum_const_zero, add_zero, zero_add, Hpk_ee, Hpk_ew, Hpk_es, Hpk_we, Hpk_ww,
-      Hpk_ws, Hpk_se, Hpk_sw, Hpk_ss, ite_mul, mul_ite, Finset.sum_ite_eq, Finset.sum_ite_eq',
-      Finset.mem_univ, ↓ reduceIte]
+      Hpk_ws, Hpk_se, Hpk_sw, Hpk_ss, ite_mul, mul_ite, Finset.sum_ite_eq', Finset.mem_univ,
+      ↓ reduceIte]
   all_goals
     first
     | exact aux1 _ _
@@ -394,19 +394,16 @@ theorem nb_Nset (hS : Sᴴ = -S) : unipotentBlockMatrix k r Bm S ∈ Nset k r :=
 theorem nb_mem
     {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm *ᵥ zW k r z = 0) (hS : Sᴴ = -S)
     : unipotentBlockMatrix k r Bm S ∈ C2.N0set k r z := by
-  show _ ∧ _
   exact ⟨nb_Nset Bm S hS, nb_uMap Bm S hz hB⟩
 
 omit Bm S in
 lemma um_lt (z : Fin (2 * r + k + 1) → ℂ) (n : B.Mat k r) (a : Fin r) (b : Fin (r + 1)) :
     C2.uMap k r z n ⟨a.val, by omega⟩ b = (n *ᵥ fvec k r z b) (eI k r a) := by
-  simp only [C2.uMap]
-  rw [dif_pos a.isLt, herm_esI]
+  simp only [C2.uMap, dif_pos a.isLt, herm_esI]
 
 omit Bm S in
 lemma fvec_lt (z : Fin (2 * r + k + 1) → ℂ) (b : Fin r) : fvec k r z ⟨b.val, by omega⟩ = bvec (eI k r b) := by
-  simp only [fvec]
-  rw [dif_pos b.isLt]
+  simp only [fvec, dif_pos b.isLt]
 
 omit Bm S in
 lemma fvec_last (z : Fin (2 * r + k + 1) → ℂ) : fvec k r z (Fin.last r) = z := by
@@ -451,7 +448,7 @@ theorem nb_fwd
     · exact h1
     · intro h
       have h2 := congrArg Fin.val h
-      simp only [Fin.val_last, Fin.val_mk] at h2
+      simp only [Fin.val_last] at h2
       have := a.isLt
       omega
   obtain ⟨B0, hB0⟩
@@ -494,7 +491,7 @@ theorem nb_fwd
     rw [sum_split] at h
     simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hee, hwe, hse,
         star_ite_one_zero, star_zero, zero_mul, ite_mul, Finset.sum_const_zero, add_zero,
-        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, ↓ reduceIte, Hpk_es]
+        Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte, Hpk_es]
       at h
     exact h
   have hws : ∀ j b, n (wI k r j) (esI k r b) = -(hW k j) * star (B0 b j) := by
@@ -503,8 +500,7 @@ theorem nb_fwd
     rw [sum_split] at h
     simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hww, hsw,
         star_ite_one_zero, star_zero, zero_mul, mul_zero, mul_one, ite_mul, mul_ite,
-        Finset.sum_const_zero, add_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ,
-        ↓ reduceIte, Hpk_ws]
+        Finset.sum_const_zero, add_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte, Hpk_ws]
       at h
     rw [hB0]
     linear_combination (hW k j) * h - n (wI k r j) (esI k r b) * hW_sq j
@@ -513,8 +509,8 @@ theorem nb_fwd
     have h := hE (esI k r a) (esI k r b)
     rw [sum_split] at h
     simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hws,
-        star_ite_one_zero, mul_one, mul_zero, zero_mul, ite_mul, mul_ite, Finset.sum_const_zero,
-        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, ↓ reduceIte, Hpk_ss]
+        star_ite_one_zero, mul_one, mul_zero, zero_mul, ite_mul, mul_ite, Finset.sum_ite_eq',
+        Finset.mem_univ, ↓ reduceIte, Hpk_ss]
       at h
     rw [mid_sum] at h
     rw [hC0, hC0]

@@ -45,6 +45,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDede
   GlobalTheory.LFun
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.doubledUnitaryElement_acts_localOperatorAtPlace
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a'),
@@ -85,7 +86,4 @@ theorem _root_.GlobalTheory.T.doubledUnitaryElement_acts_localOperatorAtPlace
                 → ∀ φ ∈ SB ((Fin a' × Fin (a + a')) ⊕ (Fin a' × Fin (a + a')) → Fv F v),
                   ∃ φ₁ ∈ SB ((Fin a' × Fin (a + a')) ⊕ (Fin a' × Fin (a + a')) → Fv F v),
                     Acts (evFin F v) (omd p) φ φ₁ := by
-  first
-  | exact @GlobalTheory.DblActs.dbl_acts
-  | exact GlobalTheory.DblActs.dbl_acts
-  | (intros; apply GlobalTheory.DblActs.dbl_acts <;> assumption)
+  first | exact @GlobalTheory.DblActs.dbl_acts

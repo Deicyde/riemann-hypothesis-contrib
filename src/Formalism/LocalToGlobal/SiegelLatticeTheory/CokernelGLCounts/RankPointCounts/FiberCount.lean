@@ -154,8 +154,8 @@ theorem ptT_eq
   obtain ⟨hRep, -, hL, hU, e⟩ := hex.choose_spec
   obtain ⟨F₁, hR₁, -, hc₁⟩ := hat
   have hw : w = hex.choose.1 :=
-    pt_eq_of_cells cell_point_uniqueness (Formalism.L2.SG.Closed.TermFun_holds D u u') hrows γ hR₁
-      hRep hc₁ ⟨_, _, hL, hU, e⟩
+    pt_eq_of_cells cell_point_uniqueness (_root_.term_function_const D u u') hrows γ hR₁ hRep hc₁
+      ⟨_, _, hL, hU, e⟩
   unfold ptT
   rw [hn]
   exact hw.symm

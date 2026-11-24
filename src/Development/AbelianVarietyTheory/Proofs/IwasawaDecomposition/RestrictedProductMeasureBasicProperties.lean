@@ -1,9 +1,10 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2SpaceNumberFieldInfiniteAdeles
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicTupleMeasureExtOfPureTensorIntegralsStatement
+public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicTupleMeasureExtOfPureTensorIntegrals
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RestrictedProductIntegralPureTensorEqProd
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MeasurableEmbeddingAdelicTupleLocalComponents
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RestrictedProductIntegralPureTensorEqProdStatement
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdelicUnitaryGroup
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -274,12 +275,12 @@ theorem GlobalTheory.GaugeEx.isProd_basic
                 → ν {X | ¬ (projInf X ∈ Ai ∧ ∀ v, projV v (projFin X) ∈ Av v)} = 0 := by
   intro F E _ _ _ _ _ d b n M ν mi mv h
   refine ⟨ProdBasic.finiteOnCompacts h, ProdBasic.ne_zero h, fun ν' h' => ?_, ProdBasic.null h⟩
-  refine GlobalTheory.T.adelicTupleMeasure_ext_of_pureTensor_integrals F E d b n M ν' ν
+  refine _root_.GlobalTheory.GaugeEx.PureUniq.measure_ext_of_pure F E d b n M ν' ν
     fun Φ Φi Φf Φv h1 h2 h3 h4 => ?_
   have k :=
-    GlobalTheory.T.restrictedProduct_integral_pureTensor_eq_prod F E d b n M ν mi mv h d b Φ Φi Φf
-      Φv h1 h2 h3 h4
+    _root_.GlobalTheory.GaugeEx.ProdInt.integral_pure F E d b n M ν mi mv h d b Φ Φi Φf Φv h1 h2 h3
+      h4
   have k' :=
-    GlobalTheory.T.restrictedProduct_integral_pureTensor_eq_prod F E d b n M ν' mi mv h' d b Φ Φi Φf
-      Φv h1 h2 h3 h4
+    _root_.GlobalTheory.GaugeEx.ProdInt.integral_pure F E d b n M ν' mi mv h' d b Φ Φi Φf Φv h1 h2
+      h3 h4
   exact ⟨k'.1, k.1, k'.2.2.trans k.2.2.symm⟩

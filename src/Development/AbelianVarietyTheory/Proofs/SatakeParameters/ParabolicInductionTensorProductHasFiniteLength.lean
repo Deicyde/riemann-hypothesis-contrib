@@ -63,7 +63,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 
-
 noncomputable section
 
 namespace GlobalTheory.ProdFiniteLength
@@ -85,7 +84,7 @@ theorem piTensor_mulSingle_eq_map
   funext b
   by_cases h : b = a
   · subst h; simp
-  · simp [h, Pi.mulSingle_eq_of_ne h]
+  · simp [h]
 
 theorem exists_mem_adjoin_eq
     {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
@@ -283,9 +282,9 @@ theorem multiProd_hasFiniteLength
       (fun a => (σ a).π)
       (fun a => (σ a).irr)
       fun a φ hφ =>
-        GlobalTheory.SchurAdm.schur_admissible (GL (Fin (d a)) k) (KO k (Fin (d a)))
-          GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO (σ a).V (σ a).π
-          (σ a).irr (hAdm (Fin (d a)) (σ a).V (σ a).π (σ a).smooth (σ a).irr) φ hφ
+        _root_.GlobalTheory.SchurAdmissibility.schur_admissible (GL (Fin (d a)) k)
+          (KO k (Fin (d a))) GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO
+          (σ a).V (σ a).π (σ a).irr (hAdm (Fin (d a)) (σ a).V (σ a).π (σ a).smooth (σ a).irr) φ hφ
   exact hInd (Fin s) (Fin n)
     (fun a => Fin (d a))
     e _ _ (isSmooth_piTensor fun a => (σ a).smooth) (hasFiniteLength_of_isIrreducible hirr)

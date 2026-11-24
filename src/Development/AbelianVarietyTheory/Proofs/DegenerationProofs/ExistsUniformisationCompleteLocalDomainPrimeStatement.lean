@@ -53,6 +53,7 @@ open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 open GlobalTheory.LN
+
 theorem _root_.GlobalTheory.T.exists_uniformisation_completeLocalDomain_prime
     : Laws → Laws2 → Laws3 → Ega → USt
       → ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (I : Ideal R),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_uniformisation_completeLocalDomain_prime
                 IsMonHom gen.hom
                   → LBIso (A.L.pull gen.hom.left) (P.L.L.pull (pullback.fst G.hom (jK R)))
                   → ∃ (D : DegData R I) (U : Unif I D A G), U.LG = P.L ∧ U.gen = gen := by
-  first
-  | exact @GlobalTheory.PrimeUnif.exists_unif
-  | exact GlobalTheory.PrimeUnif.exists_unif
-  | (intros; apply GlobalTheory.PrimeUnif.exists_unif <;> assumption)
+  first | exact @GlobalTheory.PrimeUnif.exists_unif

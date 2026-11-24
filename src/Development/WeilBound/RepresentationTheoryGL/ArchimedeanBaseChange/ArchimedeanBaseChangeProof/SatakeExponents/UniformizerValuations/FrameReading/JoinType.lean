@@ -54,7 +54,6 @@ open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 namespace PositivityTheory.Rg.BcB.F.Tail
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n a b N : ℕ}

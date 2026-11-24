@@ -53,6 +53,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenI
 import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmConstantEqAtAllEmbeddings
 public import Development.AbelianVarietyTheory.Definitions.Divisors.UnitaryWeightExponentVectorSignatureWeightMuZero
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapGeSubKapBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -70,6 +71,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.OrbitSep
 open MonoidalCategory CartesianMonoidalCategory MonObj
 attribute [local instance] Over.cartesianMonoidalCategory CategoryTheory.Hom.group
+
 theorem _root_.GlobalTheory.T.exists_small_torsion_set_for_endomorphism
     : ∀ (E : Type) [Field E] [NumberField E] (k : Type) [Field k] [IsAlgClosed k] [CharZero k]
         (G : Over (Sp k)) [GrpObj G] (act : OAct (𝓞 E) G) (α : G ⟶ G) (n m g r : ℕ)
@@ -82,7 +84,4 @@ theorem _root_.GlobalTheory.T.exists_small_torsion_set_for_endomorphism
         → (∀ x : 𝟙_ (Over (Sp k)) ⟶ G,
           (∀ a ∈ I, x ≫ act.act a = 1) → (fun z : 𝟙_ (Over (Sp k)) ⟶ G => (z ≫ α) * z⁻¹)^[m] x = 1)
         → α = 𝟙 G := by
-  first
-  | exact @GlobalTheory.NeatUnip.finite_order_unipotent_eq_id
-  | exact GlobalTheory.NeatUnip.finite_order_unipotent_eq_id
-  | (intros; apply GlobalTheory.NeatUnip.finite_order_unipotent_eq_id <;> assumption)
+  first | exact @GlobalTheory.NeatUnip.finite_order_unipotent_eq_id

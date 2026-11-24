@@ -2,9 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TranslateMomentsAll
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.AddSubgroupRepsExistenceCardSum
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HeisenbergCocycleFormIntegralSelfDualStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PerLatticeFactsStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.WeylHeisenbergOperatorCalculusRationalStatement
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HeisenbergCocycleFormIntegralSelfDual
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PerLatticeFacts
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.WeylHeisenbergOperatorCalculusRational
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -268,10 +268,10 @@ theorem loc_index_ne_zero
         (localization₂ P.asIdeal (per A N N')).toAddSubgroup
       ≠ 0 := by
   obtain ⟨h1, -, h3, -⟩ :=
-    GlobalTheory.T.per_relIndex_ne_zero_and_mem_locP_iff X A a b N N' hFG hAA hN hN'
+    _root_.GlobalTheory.MomT.LatFin.per_lattice_facts X A a b N N' hFG hAA hN hN'
   obtain ⟨r, hr, h⟩ :=
     exists_smul_le h1
-      (GlobalTheory.T.per_relIndex_ne_zero_and_mem_locP_iff X A a b L L' hFG hAA hL hL').2.1
+      (_root_.GlobalTheory.MomT.LatFin.per_lattice_facts X A a b L L' hFG hAA hL hL').2.1
   intro h0
   have h4 := AddSubgroup.relIndex_eq_zero_of_le_right (loc_le_sup P hr h) h0
   rw [AddSubgroup.relIndex_sup_left] at h4
@@ -293,7 +293,7 @@ theorem volC_pos
 theorem Wx_mul {x y : HomE X.E a b} (h : ∃ n : ℤ, coc A x y = n) (F : VCx X.Tau a b → ℂ)
     : Wx A x (Wx A y F) = Wx A (x + y) F := by
   obtain ⟨n, hn⟩ := h
-  rw [(GlobalTheory.T.weylHeisenbergOperator_calculus_rational X A a b).1, hn]
+  rw [(_root_.GlobalTheory.MomT.Heis.calculus X A a b).1, hn]
   funext z
   have : Complex.exp (-(2 * (Real.pi : ℂ)) * Complex.I * (((n : ℤ) : ℝ) : ℂ)) = 1 := by
     rw [← Complex.exp_int_mul_two_pi_mul_I (-n)]
@@ -308,7 +308,7 @@ theorem Wx_sum {κ : Type} (x : HomE X.E a b) (T : Finset κ) (F : κ → VCx X.
   simp only [Wx, opU, Finset.sum_mul, Finset.mul_sum]
 
 theorem coc_neg_sub (t s : HomE X.E a b) : coc A (-t) (t - s) = coc A t s - coc A t t := by
-  have h := (GlobalTheory.T.weylHeisenbergOperator_calculus_rational X A a b).2.2.2.1
+  have h := (_root_.GlobalTheory.MomT.Heis.calculus X A a b).2.2.2.1
   have h0 : coc A 0 (t - s) = 0 := by
     have := (h 0 0 (t - s)).1
     rw [add_zero] at this
@@ -329,9 +329,8 @@ theorem coc_int_twO
     {e : HeightOneSpectrum (𝓞 X.E) → ℤ} (he : ∀ Q, e (conjPrime₂ Q) = - e Q)
     {x y : HomE X.E a b} (hx : x ∈ twist₂ (per A N N') c e) (hy : y ∈ twist₂ (per A N N') c e)
     : ∃ n : ℤ, coc A x y = n := by
-  refine (GlobalTheory.T.heisenbergCocycleForm_integral_selfDual X A a b N N' hX hδ hL).2.2 x y
-    fun Q =>
-      ⟨(c : X.E) ^ e Q, zpow_ne_zero _ (Nat.cast_ne_zero.2 hc.ne'), (mem_twO _ _ _ _).1 hx Q, ?_⟩
+  refine (_root_.GlobalTheory.MomT.CocInt.cocycle_integral X A a b N N' hX hδ hL).2.2 x y fun Q =>
+    ⟨(c : X.E) ^ e Q, zpow_ne_zero _ (Nat.cast_ne_zero.2 hc.ne'), (mem_twO _ _ _ _).1 hx Q, ?_⟩
   have := (mem_twO _ _ _ _).1 hy (conjPrime₂ Q)
   rwa [he, zpow_neg, inv_inv, ← star_natCast (R := X.E) c, ← star_zpow₀] at this
 
@@ -362,7 +361,7 @@ theorem two_lifts
       exact sub_mem h2 h1
   · obtain ⟨n₁, h₁⟩ := coc_int_twO A hX hδ hL hD (fun Q => by rw [expS_conj hS]) ht ht
     obtain ⟨n₂, h₂⟩ : ∃ n : ℤ, coc A t s = n := by
-      refine (GlobalTheory.T.heisenbergCocycleForm_integral_selfDual X A a b N N' hX hδ hL).2.2 t s
+      refine (_root_.GlobalTheory.MomT.CocInt.cocycle_integral X A a b N N' hX hδ hL).2.2 t s
         fun Q => ?_
       have h1 := hs' Q
       have h2 := ht' Q
@@ -401,7 +400,7 @@ theorem thInd_shape
   intro X A a b S N N' cA c hX ⟨hδ, hT, hS, hU, hFG, hLa⟩ hAA hN hN' hcA hc
   obtain ⟨hfix, hL⟩ := hLa N N' hN hN'
   obtain ⟨-, -, hidx, hloc⟩ :=
-    GlobalTheory.T.per_relIndex_ne_zero_and_mem_locP_iff X A a b N N' hFG hAA hN hN'
+    _root_.GlobalTheory.MomT.LatFin.per_lattice_facts X A a b N N' hFG hAA hN hN'
   have hinj := embH_injective A (a := a) (b := b) hδ hT
   have hc0 : (c : X.E) ≠ 0 := Nat.cast_ne_zero.2 hc.ne'
   have hBB : ∀ x ∈ halfBO S (per A N N') c, ∀ y ∈ halfBO S (per A N N') c, ∃ n : ℤ, coc A x y = n :=
@@ -498,12 +497,9 @@ theorem thInd_shape
     rintro _ ⟨u, hu, rfl⟩
     obtain ⟨n₁, h₁⟩ := hBB u hu y hy
     obtain ⟨n₂, h₂⟩ := hBB y hy u hu
-    exact ((GlobalTheory.T.weylHeisenbergOperator_calculus_rational X A a b).2.2.2.2.2.1 y u).2 ⟨
+    exact ((_root_.GlobalTheory.MomT.Heis.calculus X A a b).2.2.2.2.2.1 y u).2 ⟨
       n₁ - n₂,
-      by
-        rw [(GlobalTheory.T.weylHeisenbergOperator_calculus_rational X A a b).2.2.1, h₁, h₂]
-        push_cast
-        ring
+      by rw [(_root_.GlobalTheory.MomT.Heis.calculus X A a b).2.2.1, h₁, h₂]; push_cast; ring
     ⟩
 
   have hlift : A.IsLift S N N' c x (A.liftW S N N' c x) :=

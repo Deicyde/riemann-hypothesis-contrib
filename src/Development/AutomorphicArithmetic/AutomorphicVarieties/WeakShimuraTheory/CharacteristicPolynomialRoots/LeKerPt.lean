@@ -85,7 +85,6 @@ theorem Link.le_ker_pt
     : J₀ ≤ RingHom.ker (Link.pt φ y) := by
   intro b hb
   rw [RingHom.mem_ker]
-  change Link.pt φ y b = 0
   rw [Link.pt_apply]
   exact hy (φ b) (Ideal.mem_map_of_mem _ hb)
 

@@ -161,7 +161,7 @@ def act (q : ℕ) : Representation ℂ Γ (G.Om q) where
         fun p hp => by beta_reduce; rw [(w.2 _).2 _ (mt (G.ρ_mem_iff _ _).1 hp), map_zero]
       ⟩
     ⟩
-    map_add' := fun w w' => by ext s p v; simp [Matrix.mulVec_add]
+    map_add' := fun w w' => by ext s p v; simp
     map_smul' := fun c w => by ext s p v; simp [Matrix.mulVec_smul]
   }
   map_one' := by ext w s p v; simp
@@ -204,7 +204,7 @@ def dOm (q : ℕ) : G.Om q →ₗ[ℂ] G.Om (q + 1) where
         extDeriv]
       rw [fderiv_const_smul (differentiableAt_Om w s hp)]
       ext v j
-      simp [ContinuousAlternatingMap.alternatizeUncurryFin_apply, Finset.mul_sum, mul_left_comm]
+      simp [ContinuousAlternatingMap.alternatizeUncurryFin_apply, Finset.mul_sum]
     · simp [Set.indicator_of_notMem hp]
 
 theorem dOm_apply {q : ℕ} (w : G.Om q) (s : S) {p : V} (hp : p ∈ G.Y)

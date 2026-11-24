@@ -37,8 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 set_option autoImplicit false
 

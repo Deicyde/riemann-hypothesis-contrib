@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
   Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
@@ -51,6 +49,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up
 open GlobalTheory.Mem.R3.Tr
+
 variable
   {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {K : Ctx} {B : Base}
   {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}

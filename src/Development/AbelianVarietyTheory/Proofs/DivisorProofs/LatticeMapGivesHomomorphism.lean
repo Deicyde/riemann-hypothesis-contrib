@@ -94,8 +94,8 @@ theorem exists_polAV_retract_dim
     fun T x hx => SiegelOfPolarised.eq_one_of_lam hM hK x hx
   ⟩
   obtain ⟨t, ⟨pr, hpr, hu, -⟩, -, -, -⟩ :=
-    exists_isSharp_and_prim L₁ L₂ Moduli.cube_of_isLB g _ W _ a w w' bas hW hb hw hw' hs 1 k b _
-      (𝟙 _) (siegOne L₁.globalFns hB hM g) (one_pow _) odd_one hc hd
+    exists_isSharp_and_prim L₁ L₂ _root_.GlobalTheory.AbLaw.CubeAssembly.cube_gen g _ W _ a w w' bas
+      hW hb hw hw' hs 1 k b _ (𝟙 _) (siegOne L₁.globalFns hB hM g) (one_pow _) odd_one hc hd
   obtain ⟨i, hi, -⟩ := hu B fun _ => 𝟙 B
   refine ⟨t.pol, i, pr 0, rfl, isMonHom_of_coord hpr hu fun u => ?_, hpr 0, hi 0⟩
   rw [hi u]

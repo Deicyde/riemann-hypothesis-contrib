@@ -75,7 +75,4 @@ theorem _root_.GlobalTheory.T.adelicMatrixRealSize_bounds_along_real_parametrisa
                     ≤ C
                       * (GlobalTheory.Unf.realSize θ (x + L t)
                         + GlobalTheory.Unf.realSize θ x)) := by
-  first
-  | exact @GlobalTheory.Unf.realParam_size_bounds
-  | exact GlobalTheory.Unf.realParam_size_bounds
-  | (intros; apply GlobalTheory.Unf.realParam_size_bounds <;> assumption)
+  first | exact @GlobalTheory.Unf.realParam_size_bounds

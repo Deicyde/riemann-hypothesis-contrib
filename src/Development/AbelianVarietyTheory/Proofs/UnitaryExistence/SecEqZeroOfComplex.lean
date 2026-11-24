@@ -2,12 +2,14 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ThetaValues.ExistsRootNotMem
 public import Formalism.LocalToGlobal.ProjectiveLattices.PetersonNormSubspace
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ConjugateSectionValuesSemilinearStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThClassPins
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ConjugateSectionValuesSemilinear
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EqZeroOfForallAlgHom
+public import Formalism.LocalToGlobal.ProjectiveLattices.UnFree
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.WeightZeroSectionValueConjPoint
 import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFramedPointBaseChangeAlgebraMap
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedModuliAlgebraicLawsChartWeightIntegrality
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.WeightZeroSectionValueConjPointStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -92,7 +94,7 @@ theorem conj_value
     (y : FrPt Xo c (CAt σ)) (y' : FrPt Xo c (CAt σ')) (h : y'.x = spMap (τ : ℂ →+* ℂ) ≫ y.x)
     : toC (evR Xo c f y') = τ (toC (evR Xo c f y)) := by
   subst hσ
-  exact GlobalTheory.T.weightZeroSection_value_conj_point E H Dw l Xo c σ τ f hf y y' h
+  exact _root_.GlobalTheory.WeightZeroValue.evR_conj E H Dw l Xo c σ τ f hf y y' h
 
 theorem exists_conj_point
     (σ : c.F →+* ℂ)
@@ -124,8 +126,8 @@ theorem exists_conj_point
       ((congrArg (· ≫ y.x) h2).trans (Category.id_comp _))).symm
   refine ⟨z, hx, fun f hf => ?_⟩
   have e1 :=
-    (((GlobalTheory.T.conjugateSection_values_semilinear E H Dw l Xo c ta hta).1 0 0 f hf).2 (CAt σ)
-      y)
+    (((_root_.GlobalTheory.GalTw.galRul_sec_val_semilinear E H Dw l Xo c ta hta).1 0 0 f hf).2
+      (CAt σ) y)
   have e2 := conj_value σ (σ.comp ta.toRingHom) τ (RingHom.ext fun a => (hτ a).symm) hf z y' hx
   rw [e1]
   exact e2

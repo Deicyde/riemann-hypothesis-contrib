@@ -92,7 +92,8 @@ theorem _root_.GlobalTheory.mulVec_firstCols_eq_zero_of_rank_eq_card
     · rw [← hx, hQ]; exact Matrix.rank_mul_le_left _ _
     · rw [← hx, hP]; exact Matrix.rank_mul_le_left _ _
   have hrn := LinearMap.finrank_range_add_finrank_ker x'.mulVecLin
-  have hxr : finrank k (LinearMap.range x'.mulVecLin) = Fintype.card a := by simpa only [Matrix.finrank_range_mulVecLin] using hr
+  have hxr : finrank k (LinearMap.range x'.mulVecLin) = Fintype.card a := by
+    simpa only [Matrix.finrank_range_mulVecLin] using hr
   rw [hxr, finrank_fintype_fun_eq_card] at hrn
   have hker : LinearMap.ker x'.mulVecLin = ⊥ := Submodule.finrank_eq_zero.1 (by omega)
   have hvk : v ∈ LinearMap.ker x'.mulVecLin := hv

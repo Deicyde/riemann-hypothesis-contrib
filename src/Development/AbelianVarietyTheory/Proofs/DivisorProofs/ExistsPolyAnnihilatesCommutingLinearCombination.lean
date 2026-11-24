@@ -101,7 +101,6 @@ theorem exists_poly_annihilates_linear_combination
     rw [aeval_subalgebra_coe]
     exact hv i
   have hs : IsIntegral ℂ (q (∑ i, c i • t i)) := by
-
     rw [map_sum]
     exact IsIntegral.sum _ (fun i _ => by rw [map_smul]; exact (hint i).smul _)
   obtain ⟨p, hpm, hp⟩ := hs
@@ -113,7 +112,6 @@ theorem exists_poly_annihilates_linear_combination
   have h := (hI _).mp hmem v hv
   rw [aeval_subalgebra_coe] at h
   have hsum : ((∑ i, c i • t i : S) : Module.End ℂ M) = ∑ i, c i • A i := by
-
     rw [show ((∑ i, c i • t i : S) : Module.End ℂ M) = S.val (∑ i, c i • t i) from rfl, map_sum]
     simp [t]
   rw [hsum] at h

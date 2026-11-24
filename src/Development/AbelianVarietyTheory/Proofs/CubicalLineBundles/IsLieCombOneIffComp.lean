@@ -82,8 +82,7 @@ theorem scaleD_comp (a b : R) : (Chart.scaleD a).comp (Chart.scaleD b) = Chart.s
   congr 1
   rw [← TrivSqZeroExt.inr_smul, smul_eq_mul, _root_.mul_comm]
 
-theorem scaleD_one : Chart.scaleD (1 : R) = AlgHom.id R _ :=
-  DualNumber.algHom_ext (by rw [SqZero.scaleD_eq, SqZero.epsTo_eps]; rfl)
+alias scaleD_one := _root_.ReciprocityTheory.ChartRestriction.G.Chart.scaleD_one
 
 theorem lieMultiple_calculus
     : ∀ (R : Type) [CommRing R] (G G' : Over (Sp R)) [GrpObj G] [GrpObj G'] (v x y : epsR R ⟶ G)

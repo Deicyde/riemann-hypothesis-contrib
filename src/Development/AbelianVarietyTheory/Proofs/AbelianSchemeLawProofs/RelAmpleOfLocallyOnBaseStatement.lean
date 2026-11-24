@@ -53,7 +53,4 @@ theorem _root_.GlobalTheory.T.relAmple_of_locally_on_base
         → (∀ s : S, ∃ (U : S.Opens) (_ : s ∈ U),
           RelAmple (Over.mk (A.hom ∣_ U)) (L.pull (A.hom ⁻¹ᵁ U).ι))
         → RelAmple A L := by
-  first
-  | exact @GlobalTheory.AmpleLocal.relAmple_of_locally
-  | exact GlobalTheory.AmpleLocal.relAmple_of_locally
-  | (intros; apply GlobalTheory.AmpleLocal.relAmple_of_locally <;> assumption)
+  first | exact @GlobalTheory.AmpleLocal.relAmple_of_locally

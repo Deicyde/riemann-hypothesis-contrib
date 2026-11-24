@@ -40,14 +40,13 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
   Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
   GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem GlobalTheory.NPin.exists_character_choice_of_nTrue_split
     : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (cf : CharFrame D) (C : NChoice D)
         (tp : TupTied D cf C)
@@ -103,8 +102,8 @@ theorem GlobalTheory.NPin.exists_character_choice_of_nTrue_split
     _root_.GlobalTheory.HeightCounting.typesOpen_withLoc_alt D0 cf0 jE A low Pq S hLm eig θ Bs M C0
       tp0 ch mt hstar hexp hsplit hcheb big L Sp Au ss
   obtain ⟨tw⟩ :=
-    _root_.GlobalTheory.T.side_multiplicity_character_alt D0 cf0 jE A low Pq S hLm eig θ Bs M C0 tp0
-      ch mt hstar hexp hsplit hcheb big L Sp Au
+    _root_.GlobalTheory.HeightCounting.FitTw.nonempty_twOpen_alt D0 cf0 jE A low Pq S hLm eig θ Bs M
+      C0 tp0 ch mt hstar hexp hsplit hcheb big L Sp Au
   refine ⟨
     {
       cf := cfL L cf0

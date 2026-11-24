@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.finitePart_preserves_form_det_norm_one
     : ∀ (D : D7) (V : HSp D), ∀ g : GA D V,
       (∀ x y,
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.finitePart_preserves_form_det_norm_one
         ∧ ((matHom V g).1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)).det * sigR (AF D.host.F)
             D.sp.cm.sig ((matHom V g).1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)).det
           = 1 := by
-  first
-  | exact @GlobalTheory.Member.finHom_herm_det
-  | exact GlobalTheory.Member.finHom_herm_det
-  | (intros; apply GlobalTheory.Member.finHom_herm_det <;> assumption)
+  first | exact @GlobalTheory.Member.finHom_herm_det

@@ -71,8 +71,7 @@ def h (x y : n → A) : A := hform D.σA D.JA x y
 
 def hL (x : n → A) : (n → A) →ₗ[A] A where
   toFun y := D.h x y
-  map_add' y y' := by
-    simp only [h, hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+  map_add' y y' := by simp only [h, hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   map_smul' c y := by
     simp only [h, hform, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
@@ -88,12 +87,10 @@ theorem h_smul_right (x y : n → A) (c : A) : D.h x (c • y) = c * D.h x y := 
 theorem h_sub_right (x y y' : n → A) : D.h x (y - y') = D.h x y - D.h x y' := by
   simpa only [hL_apply] using (D.hL x).map_sub y y'
 
-theorem h_zero_right (x : n → A) : D.h x 0 = 0 := by
-  simpa only [hL_apply] using (D.hL x).map_zero
+theorem h_zero_right (x : n → A) : D.h x 0 = 0 := by simpa only [hL_apply] using (D.hL x).map_zero
 
-theorem h_sum_right {ι : Type} (s : Finset ι) (x : n → A) (y : ι → n → A) :
-    D.h x (∑ i ∈ s, y i) = ∑ i ∈ s, D.h x (y i) := by
-
+theorem h_sum_right {ι : Type} (s : Finset ι) (x : n → A) (y : ι → n → A)
+    : D.h x (∑ i ∈ s, y i) = ∑ i ∈ s, D.h x (y i) := by
   simpa only [hL_apply] using map_sum (D.hL x) y s
 
 theorem h_add_left (x x' y : n → A) : D.h (x + x') y = D.h x y + D.h x' y := by
@@ -106,8 +103,8 @@ theorem h_smul_left (x y : n → A) (c : A) : D.h (c • x) y = D.σA c * D.h x 
 theorem h_sub_left (x x' y : n → A) : D.h (x - x') y = D.h x y - D.h x' y := by
   simp only [h, hform, Pi.sub_apply, map_sub, sub_mul, Finset.sum_sub_distrib]
 
-theorem h_sum_left {ι : Type} (s : Finset ι) (x : ι → n → A) (y : n → A) :
-    D.h (∑ i ∈ s, x i) y = ∑ i ∈ s, D.h (x i) y := by
+theorem h_sum_left {ι : Type} (s : Finset ι) (x : ι → n → A) (y : n → A)
+    : D.h (∑ i ∈ s, x i) y = ∑ i ∈ s, D.h (x i) y := by
   exact map_sum (AddMonoidHom.mk' (fun x => D.h x y) fun a b => D.h_add_left a b y) x s
 
 structure Hyp : Prop where
@@ -123,7 +120,6 @@ structure Hyp : Prop where
 variable {D}
 
 theorem h_symm (H : D.Hyp) (x y : n → A) : D.h y x = D.σA (D.h x y) := by
-
   simp only [h, hform, map_sum, map_mul, H.σσ, H.herm]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
@@ -135,11 +131,9 @@ theorem fe (H : D.Hyp) (a b : Fin r) : D.h (D.f a) (D.e b) = if a = b then 1 els
     simp
   · simp [hab, Ne.symm hab]
 
-theorem ze (H : D.Hyp) (a : Fin r) : D.h D.z (D.e a) = 0 := by
-  rw [h_symm H, H.ez, map_zero]
+theorem ze (H : D.Hyp) (a : Fin r) : D.h D.z (D.e a) = 0 := by rw [h_symm H, H.ez, map_zero]
 
-theorem zf (H : D.Hyp) (a : Fin r) : D.h D.z (D.f a) = 0 := by
-  rw [h_symm H, H.fz, map_zero]
+theorem zf (H : D.Hyp) (a : Fin r) : D.h D.z (D.f a) = 0 := by rw [h_symm H, H.fz, map_zero]
 
 variable (D)
 
@@ -168,29 +162,33 @@ theorem pU_apply (v : n → A) : D.pU v = D.pX v + D.pXv v + D.pz v := rfl
 
 theorem pW_apply (v : n → A) : D.pW v = v - D.pU v := rfl
 
-theorem Pi_apply (S : (n → A) →ₗ[A] (n → A)) (v : n → A) :
-    D.Pi S v = D.pU v + D.pW (S (D.pW v)) := rfl
+theorem Pi_apply (S : (n → A) →ₗ[A] (n → A)) (v : n → A) : D.Pi S v = D.pU v + D.pW (S (D.pW v)) :=
+  rfl
 
 variable {D}
 
 theorem h_e_pU (H : D.Hyp) (a : Fin r) (v : n → A) : D.h (D.e a) (D.pU v) = D.h (D.e a) v := by
-  simp [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, H.ee, H.ef, H.ez]
+  simp [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, H.ee, H.ef,
+    H.ez]
 
 theorem h_f_pU (H : D.Hyp) (a : Fin r) (v : n → A) : D.h (D.f a) (D.pU v) = D.h (D.f a) v := by
-  simp [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, fe H, H.ff, H.fz]
+  simp [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, fe H, H.ff,
+    H.fz]
 
 theorem h_z_pU (H : D.Hyp) (v : n → A) : D.h D.z (D.pU v) = D.h D.z v := by
-  simp only [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, ze H, zf H,
-    mul_zero, Finset.sum_const_zero, zero_add]
+  simp only [pU_apply, pX_apply, pXv_apply, pz_apply, h_add_right, h_sum_right, h_smul_right, ze H,
+    zf H, mul_zero, Finset.sum_const_zero, zero_add]
   linear_combination (D.h D.z v) * H.zz
 
 def IsW (D : Dat A n r) (w : n → A) : Prop :=
   (∀ a, D.h (D.e a) w = 0) ∧ (∀ a, D.h (D.f a) w = 0) ∧ D.h D.z w = 0
 
 theorem isW_pW (H : D.Hyp) (v : n → A) : IsW D (D.pW v) := by
-  exact ⟨fun a => by rw [pW_apply, h_sub_right, h_e_pU H, sub_self],
+  exact ⟨
+    fun a => by rw [pW_apply, h_sub_right, h_e_pU H, sub_self],
     fun a => by rw [pW_apply, h_sub_right, h_f_pU H, sub_self],
-    by rw [pW_apply, h_sub_right, h_z_pU H, sub_self]⟩
+    by rw [pW_apply, h_sub_right, h_z_pU H, sub_self]
+  ⟩
 
 theorem pU_of_isW {w : n → A} (hw : IsW D w) : D.pU w = 0 := by
   obtain ⟨he, hf, hz⟩ := hw
@@ -206,8 +204,7 @@ theorem pU_pU (H : D.Hyp) (v : n → A) : D.pU (D.pU v) = D.pU v := by
 
 theorem pW_pW (H : D.Hyp) (v : n → A) : D.pW (D.pW v) = D.pW v := pW_of_isW (isW_pW H v)
 
-theorem pW_pU (H : D.Hyp) (v : n → A) : D.pW (D.pU v) = 0 := by
-  rw [pW_apply, pU_pU H, sub_self]
+theorem pW_pU (H : D.Hyp) (v : n → A) : D.pW (D.pU v) = 0 := by rw [pW_apply, pU_pU H, sub_self]
 
 theorem pU_e (H : D.Hyp) (b : Fin r) : D.pU (D.e b) = D.e b := by
   simp [pU_apply, pX_apply, pXv_apply, pz_apply, fe H, H.ee, ze H, ite_smul]
@@ -218,11 +215,9 @@ theorem pU_f (H : D.Hyp) (b : Fin r) : D.pU (D.f b) = D.f b := by
 theorem pU_z_eq (H : D.Hyp) : D.pU D.z = D.z := by
   simp [pU_apply, pX_apply, pXv_apply, pz_apply, H.fz, H.ez, H.zz]
 
-theorem pW_e (H : D.Hyp) (b : Fin r) : D.pW (D.e b) = 0 := by
-  rw [pW_apply, pU_e H, sub_self]
+theorem pW_e (H : D.Hyp) (b : Fin r) : D.pW (D.e b) = 0 := by rw [pW_apply, pU_e H, sub_self]
 
-theorem pW_f (H : D.Hyp) (b : Fin r) : D.pW (D.f b) = 0 := by
-  rw [pW_apply, pU_f H, sub_self]
+theorem pW_f (H : D.Hyp) (b : Fin r) : D.pW (D.f b) = 0 := by rw [pW_apply, pU_f H, sub_self]
 
 theorem orthogonal_proj_normal_zero (H : D.Hyp) : D.pW D.z = 0 := by
   rw [pW_apply, pU_z_eq H, sub_self]

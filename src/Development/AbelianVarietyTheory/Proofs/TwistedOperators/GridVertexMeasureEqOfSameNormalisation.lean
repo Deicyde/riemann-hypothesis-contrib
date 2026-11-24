@@ -85,10 +85,7 @@ theorem measLevW_unique
     exact ⟨
       C,
       hC.measurableSet,
-      (by
-        first
-        | exact (Measure.measure_pos_of_mem_nhds (m ρ) hC1).ne'
-        | exact (measure_pos_of_nonempty_interior (m ρ) ⟨1, mem_interior_iff_mem_nhds.2 hC1⟩).ne'),
+      (by first | exact (Measure.measure_pos_of_mem_nhds (m ρ) hC1).ne'),
       hC.measure_lt_top.ne
     ⟩
   choose B hBm hB0 hBt using hB

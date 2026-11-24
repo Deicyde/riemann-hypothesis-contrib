@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.LowerParabolicCoordinates
 
 @[expose] public section
 
@@ -52,11 +53,6 @@ open MeasureTheory Matrix Formalism.BasicNotions Formalism.QuantumDeterminants
 open scoped ENNReal
 
 namespace GlobalTheory.CellRep
-
-lemma det_upUni {m : ℕ} {u : Matrix (Fin m) (Fin m) ℂ} (hu : u ∈ Formalism.FourierDecayAlt.C2.UTset m) : u.det = 1 := by
-  have hb : u.BlockTriangular id := fun i j h => hu.1 i j h
-  rw [Matrix.det_of_upperTriangular hb]
-  simp [hu.2]
 
 theorem cell_rep
     : ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : MatKR k r) (p : Point ℂ (r + 1)),
@@ -117,12 +113,13 @@ theorem cell_rep
     rw [← hZ, hO, hO γ, hE]
     simp only [Matrix.mul_assoc, hDD, Matrix.mul_one]
   have hLu : IsUnit L.det := by
-    have := det_upUni hLU
+    have := _root_.Formalism.FourierDecayAlt.P.C2x2.ut_det hLU
     rw [Matrix.det_conjTranspose] at this
     have h2 : L.det = 1 := by simpa using congrArg star this
     rw [h2]
     exact isUnit_one
-  have hUu : IsUnit U.det := by rw [det_upUni hUU]; exact isUnit_one
+  have hUu : IsUnit U.det := by
+    rw [_root_.Formalism.FourierDecayAlt.P.C2x2.ut_det hUU]; exact isUnit_one
   have h2 := congrArg (fun X => L⁻¹ * (X * U⁻¹)) h1
   simpa only [Matrix.mul_nonsing_inv_cancel_right _ _ hUu,
       Matrix.nonsing_inv_mul_cancel_left _ _ hLu]

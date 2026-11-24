@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsAlgebraMapOfSigRFixed
 
 @[expose] public section
 
@@ -69,15 +70,6 @@ theorem eq_one_of_finPart_eq_one
   rw [map_pow]
   exact key y
 
-theorem isDetRoot_mul'
-    {D : D7}
-    (V : HSp D) (g g' : GA D V) (x x' : (AE D)ˣ) (hx : IsDetRoot V g x) (hx' : IsDetRoot V g' x')
-    : IsDetRoot V (g * g') (x * x') := by
-  unfold IsDetRoot at *
-  rw [Units.val_mul, (matHom V).map_mul, Units.val_mul, Matrix.det_mul, RingHom.map_mul]
-  conv_lhs => rw [hx, hx']
-  ring
-
 theorem exists_isDetRoot_finPart_one
     {D : D7} (V : HSp D) (a : GA D V) (ha : finHom V a = 1) (z : (AE D)ˣ) (hz : IsDetRoot V a z)
     : ∃ y : (AE D)ˣ, finPart D (y : AE D) = 1 ∧ IsDetRoot V a y := by
@@ -106,7 +98,6 @@ theorem exists_isDetRoot_finPart_one
   show y = (matHom V a).1.det * sigR (AF D.host.F) D.sp.cm.sig y
   refine GlobalTheory.PlaceIdem.parts_inj D _ _ ?_ ?_
   · have h1 := congrArg (infPart D) hz
-    unfold IsDetRoot at h1
     rw [RingHom.map_mul, hc] at h1
     rw [RingHom.map_mul, hc, hyi]
     exact h1
@@ -121,7 +112,7 @@ theorem eq_of_finHom_of_triv
   obtain ⟨x, hx⟩ := hd.1 h
   obtain ⟨z, hz⟩ := hd.1 (h⁻¹ * h')
   obtain ⟨y, hy1, hy⟩ := exists_isDetRoot_finPart_one V _ ha z hz
-  have hxy := isDetRoot_mul' V h (h⁻¹ * h') x y hx hy
+  have hxy := _root_.GlobalTheory.Member.isDetRoot_mul V h (h⁻¹ * h') x y hx hy
   rw [mul_inv_cancel_left] at hxy
   rw [hd.2 h x hx, hd.2 h' _ hxy, map_mul, hχ y hy1, mul_one]
 

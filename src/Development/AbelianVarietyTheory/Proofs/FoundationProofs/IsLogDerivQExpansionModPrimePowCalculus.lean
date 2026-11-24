@@ -5,8 +5,8 @@ public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
 public import Mathlib.RingTheory.Flat.TorsionFree
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.RegularLocalRing.Defs
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulOfIsPrimitiveIntegralHahnGaussStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaDerivationHahnSeriesLeibnizAddConstStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulOfIsPrimitiveIntegralHahnGauss
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaDerivationHahnSeriesLeibnizAddConst
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -122,8 +122,7 @@ theorem isDl_calc
                 ∧ (∀ κ : Ω, κ ≠ 0 → IsDl X A l n s (algebraMap Ω X.K κ) 0)
                 ∧ (∀ n', n' ≤ n → IsDl X A l n s f φ → IsDl X A l n' s f φ) := by
   intro Ω _ _ _ ε X _ l _ A _ n s f g φ ψ
-  have lei := fun P Q =>
-    (GlobalTheory.T.thetaDerivationHahnSeries_leibniz_add_const (Ω := Ω) s P Q).1
+  have lei := fun P Q => (_root_.GlobalTheory.Glue.theta_leibniz_add_const (Ω := Ω) s P Q).1
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rintro ⟨hφ, a, b, κ, hκ, hfb, hpa, hpb, hc⟩ ⟨hψ, a2, b2, κ2, hκ2, hgb, hpa2, hpb2, hc2⟩
     refine ⟨
@@ -141,8 +140,8 @@ theorem isDl_calc
         f * g * (b * b2)
           = (f * b) * (g * b2) := by ring
         _ = _ := by rw [hfb, hgb, map_mul]; ring
-    · rw [map_mul]; exact GlobalTheory.T.mul_of_isPrimitiveIntegral_hahn_gauss A _ _ hpa hpa2
-    · rw [map_mul]; exact GlobalTheory.T.mul_of_isPrimitiveIntegral_hahn_gauss A _ _ hpb hpb2
+    · rw [map_mul]; exact _root_.GlobalTheory.Glue.Prim.mul A _ _ hpa hpa2
+    · rw [map_mul]; exact _root_.GlobalTheory.Glue.Prim.mul A _ _ hpb hpb2
     · rw [cgA_iff] at hc hc2 ⊢
       rw [map_mul, map_mul, lei, lei]
       have key

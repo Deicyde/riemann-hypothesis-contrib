@@ -72,9 +72,7 @@ theorem exists_ne_zero_aeval_eq_zero
     exact hcon ⟨w, hw0, hw⟩
   haveI : Fact (Irreducible p) := ⟨hp⟩
   have hunit : IsUnit (aeval g p) := by
-    first
-    | exact (Module.End.isUnit_iff _).2 ⟨hinj, LinearMap.injective_iff_surjective.1 hinj⟩
-    | exact (LinearMap.isUnit_iff_ker_eq_bot _).2 (LinearMap.ker_eq_bot.2 hinj)
+    first | exact (Module.End.isUnit_iff _).2 ⟨hinj, LinearMap.injective_iff_surjective.1 hinj⟩
   have hunitL := hunit.map (Module.End.baseChangeHom K (AdjoinRoot p) V)
   have hE
       : Module.End.baseChangeHom K (AdjoinRoot p) V (aeval g p)
@@ -92,9 +90,7 @@ theorem exists_ne_zero_aeval_eq_zero
     rw [Module.End.aeval_apply_of_hasEigenvector hv, hpr, zero_smul]
   rw [← hE] at h0
   have hbij : Function.Injective (Module.End.baseChangeHom K (AdjoinRoot p) V (aeval g p)) := by
-    first
-    | exact ((Module.End.isUnit_iff _).1 hunitL).1
-    | exact LinearMap.ker_eq_bot.1 ((LinearMap.isUnit_iff_ker_eq_bot _).1 hunitL)
+    first | exact ((Module.End.isUnit_iff _).1 hunitL).1
   exact hv.2 (hbij (h0.trans (map_zero _).symm))
 
 theorem exists_annihilator_eq
@@ -121,9 +117,7 @@ theorem exists_annihilator_eq
     obtain ⟨ea, hea0, hea⟩ := ih ha
     obtain ⟨w, hw0, hw⟩ := exists_ne_zero_aeval_eq_zero g i hi hid
     have hcopOf : ∀ n : K[X], ¬ i ∣ n → IsCoprime i n := fun n h => by
-      first
-      | exact (Irreducible.coprime_iff_not_dvd hi).2 h
-      | exact (Irreducible.isCoprime_iff_not_dvd hi).2 h
+      first | exact (Irreducible.coprime_iff_not_dvd hi).2 h
     have hcop : IsCoprime i a :=
       hcopOf a fun hia => hi.1 (hsq i (dvd_trans (mul_dvd_mul_left i hia) hdvd))
     refine ⟨ea + w, ?_, fun q hq => ?_⟩
@@ -136,9 +130,7 @@ theorem exists_annihilator_eq
         rwa [map_add, hw', add_zero] at h1
       have haq : a ∣ q := by
         have h2 : a ∣ i * q := hea _ hqi
-        first
-        | exact hcop.symm.dvd_of_dvd_mul_left h2
-        | exact hcop.symm.dvd_of_dvd_mul_right (by rwa [mul_comm] at h2)
+        first | exact hcop.symm.dvd_of_dvd_mul_left h2
       have hea' : aeval g (a * q) ea = 0 := by
         rw [mul_comm]
         exact hkill a q ea hea0
@@ -152,10 +144,7 @@ theorem exists_annihilator_eq
         have h2 : aeval g (u * i + t * (a * q)) w = 0 := by
           rw [map_add (f := _), hadd, hkill i u w hw, hkill (a * q) t w hwq, add_zero]
         rwa [hut, map_one, hone] at h2
-      have hiq : i ∣ q := by
-        first
-        | exact hcop.dvd_of_dvd_mul_left hiaq
-        | exact hcop.dvd_of_dvd_mul_right (by rwa [mul_comm] at hiaq)
+      have hiq : i ∣ q := by first | exact hcop.dvd_of_dvd_mul_left hiaq
       exact hcop.mul_dvd hiq haq
 
 theorem base_change_cyclic_vector : BCCyclicVector := by

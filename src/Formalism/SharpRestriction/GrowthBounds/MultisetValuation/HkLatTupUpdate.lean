@@ -200,7 +200,6 @@ theorem hk_latTup_update
           = A := by
       first
       | exact Function.update_self (β := fun v => Submodule (P.W v) (Fin (P.m + 1) → P.Qq v)) w A L
-      | exact Function.update_same (β := fun v => Submodule (P.W v) (Fin (P.m + 1) → P.Qq v)) w A L
     exact (congrArg (fun Z => IsLattice (P.W w) Z) e).mpr hA
   · have e
         : Function.update (β := fun v => Submodule (P.W v) (Fin (P.m + 1) → P.Qq v)) L v A w

@@ -118,7 +118,7 @@ theorem exists_dop_fin
       convert Submodule.smul_mem _ (t : ℂ) h
       ext x
       simp only [dop_apply, Prod.smul_fst, Prod.smul_snd, map_smul, ContinuousLinearMap.smul_apply,
-        SchwartzMap.smul_apply, smul_eq_mul, Complex.real_smul]
+        smul_eq_mul, Complex.real_smul]
       push_cast
       ring
   exact this (a, L) (b.span_eq ▸ trivial)
@@ -182,7 +182,7 @@ theorem vacSp_fin
             (fun g : SInf F (Fin n × Fin d) => g y)
             (f.2 (S p) (S (J p)) (sAt _) (sAt _) fun w => sJ p w)
         simp only [dopL, LinearMap.coe_mk, AddHom.coe_mk, SchwartzMap.smul_apply, smul_eq_mul,
-            dop_apply, aOf, lOf]
+            dop_apply, lOf]
           at this
         rw [show aOf M (S p) = p.1 from (sev _).1, show aOf M (S (J p)) = (J p).1 from (sev _).1,
             (sev _).2, (sev _).2]

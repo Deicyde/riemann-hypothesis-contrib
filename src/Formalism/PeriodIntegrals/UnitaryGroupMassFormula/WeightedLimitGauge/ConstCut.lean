@@ -164,7 +164,7 @@ theorem testJ (k : ℕ) (T T' : ℝ) (hTT : 0 < T * T')
         exact pow_le_pow_left₀ hTT.le (by linarith [hζ.1]) _
       · have hV : ζ ∉ {ζ : ℂ | 2 * (T * T') < Complex.normSq ζ ∧ Complex.normSq ζ < 3 * (T * T')} :=
           hζ
-        simp [Set.indicator_apply, hV]
+        simp [hV]
     calc
       (0 : ℝ≥0∞)
           < ENNReal.ofReal ((T * T') ^ (k - 1))
@@ -187,7 +187,7 @@ theorem testJ (k : ℕ) (T T' : ℝ) (hTT : 0 < T * T')
         unfold zWeight
         rw [if_pos hζ.1.le]
         exact pow_le_pow_left₀ (by linarith [hζ.1]) (by linarith [hζ.2]) _
-      · simp [Set.indicator_apply, hζ]
+      · simp [hζ]
     have hsub : annU T T' ⊆ Metric.ball 0 (2 * Real.sqrt (T * T') + 1) := by
       intro ζ hζ
       rw [Metric.mem_ball, dist_zero_right]

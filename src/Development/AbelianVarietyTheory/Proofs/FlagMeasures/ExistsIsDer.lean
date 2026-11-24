@@ -206,7 +206,7 @@ theorem exists_isDer
     intro a b v y g hg
     unfold Eab Ec
     rw [hR _ (hc a b).1 v y g hg, hR _ (hc a b).2.1 v y g hg]
-    simp [hE, inner_add_right, inner_smul_right]
+    simp [hE]
   have hsm
       : ∀ X (r : ℝ),
         inG ε X → inG ε ((r : ℂ) • X)
@@ -231,9 +231,8 @@ theorem exists_isDer
     have s2 := skew hσ (hc a b).2.1 (hD _ (hc a b).2.1 x) (hD _ (hc a b).2.1 y)
     rw [e1, inner_smul_right] at s1
     rw [e2, inner_smul_right] at s2
-    simp only [hE, Submodule.coe_inner, LinearMap.add_apply, LinearMap.smul_apply,
-      Submodule.coe_add, Submodule.coe_smul, inner_add_left, inner_add_right, inner_smul_left,
-      inner_smul_right, s1, s2, Complex.conj_I]
+    simp only [hE, Submodule.coe_inner, LinearMap.add_apply, LinearMap.smul_apply, inner_add_left,
+      inner_add_right, inner_smul_left, inner_smul_right, s1, s2, Complex.conj_I]
     push_cast
     ring
   · intro X hX v

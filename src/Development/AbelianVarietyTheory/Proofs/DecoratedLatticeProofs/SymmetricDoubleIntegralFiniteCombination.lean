@@ -1,6 +1,6 @@
 module
 
-public import Mathlib
+import Mathlib.Tactic
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SchwartzBruhatSelfAverageHeisenberg
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsWeilSourceActionAndSmooth
@@ -135,8 +135,7 @@ theorem tensorVal_unique
         (fun t : A →ₗ[ℂ] ℂ => t F)
         (GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage.app_coe (T Ψ)
           (opL hψ ν ρ ⟨_, hmem⟩))).trans l
-  have hh :=
-    (GlobalTheory.T.schwartzFourierTransformPi_surjective_schwartzBruhat k n₁ ψ hψ hψ1 ν hν).1
+  have hh := (GlobalTheory.SplitWeil.FourierSurj.hat_surjective k n₁ ψ hψ hψ1 ν hν).1
   have int1
       : ∀ Ψ (Φ₀ : SB (n₁ → k)),
         Integrable

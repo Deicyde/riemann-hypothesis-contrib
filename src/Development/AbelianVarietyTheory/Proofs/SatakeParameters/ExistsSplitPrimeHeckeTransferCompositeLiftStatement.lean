@@ -50,6 +50,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_splitPrime_heckeTransfer_compositeLift
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_splitPrime_heckeTransfer_compositeLift
                 = (Formalism.L2.Col.heckePolyOf (Yc D 0).rank (A.q P) a).comp
                     (C ((A.q P : ℂ) ^ (D.R.m / 2 * D.R.t)) * X)
                   * ((A.fam.R t).blockProd P).map D.what₂.embLL := by
-  first
-  | exact @GlobalTheory.Hk3.SplitChain.exists_transfer
-  | exact GlobalTheory.Hk3.SplitChain.exists_transfer
-  | (intros; apply GlobalTheory.Hk3.SplitChain.exists_transfer <;> assumption)
+  first | exact @GlobalTheory.Hk3.SplitChain.exists_transfer

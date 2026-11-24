@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.holomorphicShape_integralWeight_goodEmbedding
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.holomorphicShape_integralWeight_goodEmbedding
           GoodEmb T.Q.c (res T σ)
             → HolShape (R.MW i σ) ∧ (∀ ρ, nNeg ((R.MW i σ).ε ρ) = (D.R.sigW ((i : ℕ) + 1)).2)
               ∧ ∃ w, WtIs (R.MW i σ) w := by
-  first
-  | exact @GlobalTheory.HolDict.holShape_of_good
-  | exact GlobalTheory.HolDict.holShape_of_good
-  | (intros; apply GlobalTheory.HolDict.holShape_of_good <;> assumption)
+  first | exact @GlobalTheory.HolDict.holShape_of_good

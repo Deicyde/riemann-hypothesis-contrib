@@ -128,8 +128,7 @@ theorem L_col (c : R →+* R) {r : R} (hr : 2 * r = 1) (J a b : Matrix ι ι R)
         = Matrix.fromRows (1 : Matrix ι ι R) (0 : Matrix ι ι R) := by
     rw [Matrix.smul_mul, Pm, Matrix.fromBlocks_mul_fromRows]
     ext i j
-    rcases i with i | i <;> by_cases h : i = j <;> (try simp [Matrix.one_apply, h])
-      <;> linear_combination hr
+    rcases i with i | i <;> by_cases h : i = j <;> (try simp [h]) <;> linear_combination hr
   simp only [L]
   rw [Matrix.mul_assoc, Matrix.mul_assoc, q1, Matrix.fromBlocks_mul_fromRows, Pm,
     Matrix.fromBlocks_mul_fromRows, Matrix.fromRows_mul]
@@ -244,10 +243,10 @@ def leviGL
   ⟩
   map_one' := by
     ext1
-    simp only [Units.val_one, inv_one, Units.val_mk, L_one c hr hJu, Matrix.submatrix_one_equiv]
+    simp only [Units.val_one, inv_one, L_one c hr hJu, Matrix.submatrix_one_equiv]
   map_mul' s t := by
     ext1
-    simp only [Units.val_mul, mul_inv_rev, Units.val_mk]
+    simp only [Units.val_mul, mul_inv_rev]
     rw [Matrix.submatrix_mul_equiv, L_mul c hr hJu]
 
 theorem leviGL_val

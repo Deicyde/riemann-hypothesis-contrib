@@ -362,10 +362,10 @@ theorem isLagr_diagCols (JB : Matrix β β E)
   · simp [dbl, h3, h1', transpose_fromRows, fromCols_mul_fromBlocks, fromCols_mul_fromRows]
   · rw [diagCols, fromCols_fromRows_eq_fromBlocks, Matrix.mul_smul, fromBlocks_multiply,
       fromBlocks_smul, ← fromBlocks_one]
-    simp [← add_smul, h2]
+    simp [← add_smul]
   · rw [diagCols, fromCols_fromRows_eq_fromBlocks, Matrix.smul_mul, fromBlocks_multiply,
       fromBlocks_smul, ← fromBlocks_one]
-    simp [← add_smul, h2]
+    simp [← add_smul]
 
 def SiegelRule
     (C : TestClass R) (ψ : AddChar R ℂ)

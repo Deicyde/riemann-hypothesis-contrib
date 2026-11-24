@@ -58,8 +58,10 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR
 
 variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
 
-theorem exists_valOver {ϖ : V} (hϖ : Irreducible ϖ) (F : Type) [Field F] [Algebra (FractionRing V) F]
-    [Algebra.IsAlgebraic (FractionRing V) F] : ∃ v : AddValuation F (WithTop ℚ), ValOver ϖ F v := by
+theorem exists_valOver
+    {ϖ : V} (hϖ : Irreducible ϖ)
+    (F : Type) [Field F] [Algebra (FractionRing V) F] [Algebra.IsAlgebraic (FractionRing V) F]
+    : ∃ v : AddValuation F (WithTop ℚ), ValOver ϖ F v := by
   apply GlobalTheory.exists_valOver_of_isAlgebraic <;> assumption
 
 end ReciprocityTheory.ChartRestriction.G.DVR

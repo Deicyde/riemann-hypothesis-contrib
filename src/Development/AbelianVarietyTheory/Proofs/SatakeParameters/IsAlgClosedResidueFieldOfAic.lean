@@ -184,7 +184,6 @@ theorem pullHl_bijective
   · intro y
     choose x hx using fun k => (hf k).2 (y.1 k)
     refine ⟨⟨x, fun k => (hf k).1 ?_⟩, Subtype.ext (funext hx)⟩
-    change pull _ f _ n (red (l ^ (k + 1)) (l ^ k) E' n i (x (k + 1))) = pull _ f _ n (x k)
     rw [pull_red, hx, hx]
     exact y.2 k
 

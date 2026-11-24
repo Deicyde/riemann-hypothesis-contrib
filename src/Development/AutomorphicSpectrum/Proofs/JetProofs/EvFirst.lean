@@ -79,8 +79,7 @@ private theorem ev_swap
   simp only [ev, List.map_append, List.map_cons, List.prod_append, List.prod_cons, List.map_nil,
     List.prod_nil, mul_one]
   rw [← mul_assoc (D x.1 x.2), h2]
-  split_ifs
-    <;> simp [mul_add, add_mul, mul_sub, sub_mul, mul_assoc, inner_add_right, inner_sub_right]
+  split_ifs <;> simp [mul_add, add_mul, mul_sub, sub_mul, mul_assoc]
 
 private theorem ev_last
     {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]

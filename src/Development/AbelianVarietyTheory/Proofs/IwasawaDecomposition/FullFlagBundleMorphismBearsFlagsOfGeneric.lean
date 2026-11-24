@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoBear
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FullFlagCommonClosedPointOfGenericStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointsCarryCommonFlagSpectrumMapFieldExtStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FullFlagCommonClosedPointOfGeneric
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointsCarryCommonFlagSpectrumMapFieldExt
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -76,7 +76,7 @@ theorem coBear_comp_of_isHom
   have hpt : spMap (algebraMap R Y₁.Fn) ≫ v₁ = (ratOf Y₁).pt :=
     Scheme.SpecMap_stalkSpecializes_fromSpecStalk (genericPoint_specializes y)
   have hinc :=
-    GlobalTheory.T.fullFlag_common_closedPoint_of_generic F ι m X Y₁ Y₂ Eb S₁ φ₁ f₁ S₂ φ₂ f₂ h₁ h₂ R
+    _root_.GlobalTheory.FlagBundle.coBear_closedPoint F ι m X Y₁ Y₂ Eb S₁ φ₁ f₁ S₂ φ₂ f₂ h₁ h₂ R
       Y₁.Fn v₁ (v₁ ≫ g) (by rw [Category.assoc, hgf])
       (by
         have e1 : spMap (algebraMap R Y₁.Fn) ≫ v₁ ≫ f₁ = (ratOf Y₁).pt ≫ f₁ := by
@@ -94,8 +94,8 @@ theorem coBear_comp_of_isHom
     rw [← Category.assoc, ← spMap_comp, hσ]
     exact spMap_stalkClosedPointTo p
   have hbc :=
-    GlobalTheory.T.pointsCarryCommonFlag_spectrumMap_field_ext F ι m X Y₁ Y₂ Eb S₁ φ₁ f₁ S₂ φ₂ f₂ h₁
-      h₂ (IsLocalRing.ResidueField R) K σ _ _ _ hinc
+    _root_.GlobalTheory.FlagBundle.coBear_spMap F ι m X Y₁ Y₂ Eb S₁ φ₁ f₁ S₂ φ₂ f₂ h₁ h₂
+      (IsLocalRing.ResidueField R) K σ _ _ _ hinc
   rw [← hp]
   simpa only [Category.assoc] using hbc
 

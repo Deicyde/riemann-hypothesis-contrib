@@ -54,7 +54,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem neu_comm
     {L : Type} [Field L] [NumberField L] [IsCMField L]
     {n : ℕ} {w : Plc L} {j : GLw n w →* UA L n} (hj : ∀ x ∈ locU n w, x = j (cLoc w x))

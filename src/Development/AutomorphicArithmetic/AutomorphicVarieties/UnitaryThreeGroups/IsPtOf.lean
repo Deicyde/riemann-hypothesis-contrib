@@ -174,7 +174,7 @@ private theorem diagonal_rep_map_entries
   simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply,
     MonoidHom.comp_apply]
   split_ifs
-  · first | (rw [← map_zpow, Units.coe_map]; rfl) | (rw [← map_pow, Units.coe_map]; rfl)
+  · first | (rw [← map_zpow, Units.coe_map]; rfl)
   · simp
 
 theorem UpperTheory.V.U3.isPt_push

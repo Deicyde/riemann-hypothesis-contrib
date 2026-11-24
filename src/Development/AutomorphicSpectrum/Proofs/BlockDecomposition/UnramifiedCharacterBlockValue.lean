@@ -69,7 +69,7 @@ theorem ord_eq_ordL_unit
   rw [dite_eq_right h]
   congr 1
   conv_lhs => rw [← WithZero.coe_unzero h]
-  first | rfl | simp [WithZero.log]
+  first | rfl
 
 theorem unrChar_twist
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E) (c : ℂˣ) (i j : ℕ)

@@ -58,9 +58,10 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K]
 variable {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [StarRing K] in
-theorem exists_det_span (b : Basis (Fin (finrank K V)) K V) {x : Fin (finrank K V) → V}
-    (hx : ∀ i, x i ∈ Submodule.span (𝓞 K) (Set.range b)) :
-    ∃ d : 𝓞 K, algebraMap (𝓞 K) K d = b.det x := by
+theorem exists_det_span
+    (b : Basis (Fin (finrank K V)) K V)
+    {x : Fin (finrank K V) → V} (hx : ∀ i, x i ∈ Submodule.span (𝓞 K) (Set.range b))
+    : ∃ d : 𝓞 K, algebraMap (𝓞 K) K d = b.det x := by
   choose c hc using fun j => (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).1 (hx j)
   have hrepr : ∀ j i, b.repr (x j) i = algebraMap (𝓞 K) K (c j i) := by
     intro j i
@@ -73,17 +74,18 @@ theorem exists_det_span (b : Basis (Fin (finrank K V)) K V) {x : Fin (finrank K 
   ext i j
   simp [Basis.toMatrix_apply, hrepr]
 
-theorem discrIdeal_span {h : V →ₗ⋆[K] V →ₗ[K] K} (b : Basis (Fin (finrank K V)) K V) {g₀ : 𝓞 K}
-    (hg : algebraMap (𝓞 K) K g₀ = gdet h b) :
-    discrIdeal h (Submodule.span (𝓞 K) (Set.range b)) = Ideal.span {g₀} := by
+theorem discrIdeal_span
+    {h : V →ₗ⋆[K] V →ₗ[K] K}
+    (b : Basis (Fin (finrank K V)) K V)
+    {g₀ : 𝓞 K} (hg : algebraMap (𝓞 K) K g₀ = gdet h b)
+    : discrIdeal h (Submodule.span (𝓞 K) (Set.range b)) = Ideal.span {g₀} := by
   apply le_antisymm
   · refine discrIdeal_le b ?_
     intro x hx z hz
     obtain ⟨d, hd⟩ := exists_det_span b hx
     have hz' : z = conjO K d * g₀ * d := by
       apply IsFractionRing.injective (𝓞 K) K
-      have e1 : algebraMap (𝓞 K) K (conjO K d) = star (algebraMap (𝓞 K) K d) := by
-        first | rfl | simp [conjO]
+      have e1 : algebraMap (𝓞 K) K (conjO K d) = star (algebraMap (𝓞 K) K d) := by first | rfl
       rw [hz, map_mul, map_mul, e1, hd, hg]
     rw [hz', Ideal.mem_span_singleton]
     exact ⟨conjO K d * d, by ring⟩
@@ -93,12 +95,12 @@ theorem discrIdeal_span {h : V →ₗ⋆[K] V →ₗ[K] K} (b : Basis (Fin (finr
     simp
 
 omit [StarRing K] in
-theorem absNorm_span_singleton_eq [_root_.NumberField.IsTotallyComplex K] (g₀ : 𝓞 K) :
-    (Ideal.absNorm (Ideal.span {g₀}) : ℝ) =
-      (∏ w : InfinitePlace K, w (algebraMap (𝓞 K) K g₀)) ^ 2 := by
+theorem absNorm_span_singleton_eq [_root_.NumberField.IsTotallyComplex K] (g₀ : 𝓞 K)
+    : (Ideal.absNorm (Ideal.span {g₀}) : ℝ)
+      = (∏ w : InfinitePlace K, w (algebraMap (𝓞 K) K g₀)) ^ 2 := by
   have hm : ∀ w : InfinitePlace K, w.mult = 2 := by
     intro w
-    have hw : ¬ w.IsReal := by
+    have hw : ¬w.IsReal := by
       rw [InfinitePlace.not_isReal_iff_isComplex]
       exact IsTotallyComplex.isComplex w
     simp [InfinitePlace.mult, hw]
@@ -109,12 +111,14 @@ theorem absNorm_span_singleton_eq [_root_.NumberField.IsTotallyComplex K] (g₀ 
   rw [← h3]
   norm_cast
 
-theorem normD_mul_relIndex (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {h : V →ₗ⋆[K] V →ₗ[K] K}
-    {L : Submodule (𝓞 K) V} (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (b : Basis (Fin (finrank K V)) K V)
-    (hb : ∀ i, b i ∈ L)
-    (hidx : (Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup ≠ 0) :
-    normD h L * ((Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup : ℝ) =
-      ∏ w : InfinitePlace K, w (gdet h b) := by
+theorem normD_mul_relIndex
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (b : Basis (Fin (finrank K V)) K V) (hb : ∀ i, b i ∈ L)
+    (hidx : (Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup ≠ 0)
+    : normD h L * ((Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup : ℝ)
+      = ∏ w : InfinitePlace K, w (gdet h b) := by
   haveI : IsTotallyComplex K := hK.1
   have hint : ∀ i j, ∃ c : 𝓞 K, algebraMap (𝓞 K) K c = h (b i) (b j) := fun i j =>
     Submodule.mem_one.1 (hLi _ (hb i) _ (hb j))
@@ -127,7 +131,8 @@ theorem normD_mul_relIndex (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) 
     simp [hc]
   have hle : Submodule.span (𝓞 K) (Set.range b) ≤ L :=
     Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hb i)
-  obtain ⟨n, hn⟩ : ∃ n, (Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup = n :=
+  obtain ⟨n, hn⟩
+      : ∃ n, (Submodule.span (𝓞 K) (Set.range b)).toAddSubgroup.relIndex L.toAddSubgroup = n :=
     ⟨_, rfl⟩
   rw [hn] at hidx ⊢
   have hN := absNorm_discrIdeal_of_le hK hLi b n (Submodule.span (𝓞 K) (Set.range b)) hle hn hidx
@@ -136,8 +141,9 @@ theorem normD_mul_relIndex (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) 
   rw [hg] at hS
   have hprod : (0 : ℝ) ≤ ∏ w : InfinitePlace K, w (gdet h b) :=
     Finset.prod_nonneg (fun w _ => w.1.nonneg _)
-  have key : ((n : ℝ) * Real.sqrt (Ideal.absNorm (discrIdeal h L) : ℝ)) ^ 2 =
-      (∏ w : InfinitePlace K, w (gdet h b)) ^ 2 := by
+  have key
+      : ((n : ℝ) * Real.sqrt (Ideal.absNorm (discrIdeal h L) : ℝ)) ^ 2
+        = (∏ w : InfinitePlace K, w (gdet h b)) ^ 2 := by
     rw [mul_pow, Real.sq_sqrt (Nat.cast_nonneg _), ← hS, hN]
     push_cast
     ring

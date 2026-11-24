@@ -50,6 +50,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.thetaFunction_products_slices_orthogonalDecomposition
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.thetaFunction_products_slices_orthogonalDecomposit
               IsThetaFunO ψ S T f
                 → (∀ v, IsThetaFunO ψ A T fun u => f ((o.resS T).symm (u, v)))
                   ∧ ∀ u, IsThetaFunO ψ B T fun v => f ((o.resS T).symm (u, v)) := by
-  first
-  | exact @GlobalTheory.BoxSlice.main
-  | exact GlobalTheory.BoxSlice.main
-  | (intros; apply GlobalTheory.BoxSlice.main <;> assumption)
+  first | exact @GlobalTheory.BoxSlice.main

@@ -55,9 +55,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Plain
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing

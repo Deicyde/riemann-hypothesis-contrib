@@ -46,9 +46,6 @@ import Formalism.SharpRestriction.LevelLetterCocycles.DeltaInvariantLattices
 
 @[expose] public section
 
-
-
-
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
   TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 

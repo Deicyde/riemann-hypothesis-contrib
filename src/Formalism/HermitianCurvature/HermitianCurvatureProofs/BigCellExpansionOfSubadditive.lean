@@ -156,7 +156,7 @@ theorem big_cell_expansion_of_subadditive
     have hGp : 0 ≤ Gam ^ (P.r + 1) := pow_nonneg hGam _
     calc
       (Gam ^ (P.r + 1)) ^ a ≤ (b ^ (C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2)) ^ a := by
-        first | exact pow_le_pow_left₀ hGp hGb a | exact pow_le_pow_left hGp hGb a
+        first | exact pow_le_pow_left₀ hGp hGb a
       _ = b ^ (C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * (a : ℝ)) := by
         rw [← Real.rpow_natCast, ← Real.rpow_mul hb]
   · intro c _ _

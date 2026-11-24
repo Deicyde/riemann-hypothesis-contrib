@@ -45,22 +45,32 @@ import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 noncomputable section
 namespace GlobalTheory.GrpLoc
 
-theorem hom_ext_loc {X Y : Scheme.{0}} {f g : X ⟶ Y}
-    (h : ∀ p : X, ∃ (W : Scheme.{0}) (a : W ⟶ X), IsOpenImmersion a ∧ p ∈ Set.range a ∧ a ≫ f = a ≫ g) : f = g := by
+theorem hom_ext_loc
+    {X Y : Scheme.{0}} {f g : X ⟶ Y}
+    (h : ∀ p : X, ∃ (W : Scheme.{0}) (a : W ⟶ X),
+      IsOpenImmersion a ∧ p ∈ Set.range a ∧ a ≫ f = a ≫ g)
+    : f = g := by
   choose W a ha hp hfg using h
-  exact Scheme.Cover.hom_ext (Scheme.Cover.mkOfCovers (P := @IsOpenImmersion) X W a
-    (fun x => by obtain ⟨y, hy⟩ := hp x; exact ⟨x, y, hy⟩) ha) f g hfg
+  exact Scheme.Cover.hom_ext
+    (Scheme.Cover.mkOfCovers (P := @IsOpenImmersion) X W a
+      (fun x => by obtain ⟨y, hy⟩ := hp x; exact ⟨x, y, hy⟩)
+      ha)
+    f g hfg
 
-theorem range_of_isPullback {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
-    (h : IsPullback a b f g) (x : X) : x ∈ Set.range a ↔ f x ∈ Set.range g := by
+theorem range_of_isPullback
+    {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
+    (h : IsPullback a b f g) (x : X)
+    : x ∈ Set.range a ↔ f x ∈ Set.range g := by
   constructor
   · rintro ⟨p, rfl⟩
     exact ⟨b p, by rw [← Scheme.Hom.comp_apply, ← h.w, Scheme.Hom.comp_apply]⟩
@@ -69,22 +79,33 @@ theorem range_of_isPullback {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {
     refine ⟨h.isoPullback.inv q, ?_⟩
     rw [← Scheme.Hom.comp_apply, h.isoPullback_inv_fst, hq₁]
 
-theorem mul_left_pre {S : Scheme.{0}} {G : Over S} [GrpObj G] {T T' : Over S} (k : T'.left ⟶ T.left)
-    (hk : k ≫ T.hom = T'.hom) (x y : T ⟶ G) (x' y' : T' ⟶ G) (hx : x'.left = k ≫ x.left)
-    (hy : y'.left = k ≫ y.left) : (x' * y').left = k ≫ (x * y).left := by
+theorem mul_left_pre
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {T T' : Over S} (k : T'.left ⟶ T.left) (hk : k ≫ T.hom = T'.hom) (x y : T ⟶ G) (x' y' : T' ⟶ G)
+    (hx : x'.left = k ≫ x.left) (hy : y'.left = k ≫ y.left)
+    : (x' * y').left = k ≫ (x * y).left := by
   have ex : x' = Over.homMk k hk ≫ x := by ext; simp [hx]
   have ey : y' = Over.homMk k hk ≫ y := by ext; simp [hy]
   rw [ex, ey, ← MonObj.comp_mul, Over.comp_left]
   rfl
 
-theorem isGrpPullback_id_of_loc {S : Scheme.{0}} {A A' : Over S} [GrpObj A] [GrpObj A'] (φ : A.left ⟶ A'.left) [IsIso φ]
+theorem isGrpPullback_id_of_loc
+    {S : Scheme.{0}} {A A' : Over S} [GrpObj A] [GrpObj A']
+    (φ : A.left ⟶ A'.left) [IsIso φ]
     (w : φ ≫ A'.hom = A.hom)
     (h : ∀ p : S, ∃ (W : Scheme.{0}) (x : W ⟶ S) (B : Over W) (_ : GrpObj B) (a : B.left ⟶ A.left),
-      IsOpenImmersion x ∧ p ∈ Set.range x ∧ IsGrpPullback B A x a ∧ IsGrpPullback B A' x (a ≫ φ)) :
-    IsGrpPullback A A' (𝟙 S) φ := by
+      IsOpenImmersion x ∧ p ∈ Set.range x ∧ IsGrpPullback B A x a ∧ IsGrpPullback B A' x (a ≫ φ))
+    : IsGrpPullback A A' (𝟙 S) φ := by
   apply GlobalTheory.FamRep.isGrpPullback_of_loc <;> assumption
 
-theorem isGrpPullback_local_on_base : ∀ (S : Scheme.{0}) (A A' : Over S) [GrpObj A] [GrpObj A'] (φ : A.left ⟶ A'.left), IsIso φ → φ ≫ A'.hom = A.hom → (∀ p : S, ∃ (V : Scheme.{0}) (x : V ⟶ S) (B : Over V) (_ : GrpObj B) (a : B.left ⟶ A.left), IsOpenImmersion x ∧ p ∈ Set.range x ∧ IsGrpPullback B A x a ∧ IsGrpPullback B A' x (a ≫ φ)) → IsGrpPullback A A' (𝟙 S) φ := by
+theorem isGrpPullback_local_on_base
+    : ∀ (S : Scheme.{0}) (A A' : Over S) [GrpObj A] [GrpObj A'] (φ : A.left ⟶ A'.left),
+      IsIso φ → φ ≫ A'.hom = A.hom
+        → (∀ p : S,
+          ∃ (V : Scheme.{0}) (x : V ⟶ S) (B : Over V) (_ : GrpObj B) (a : B.left ⟶ A.left),
+            IsOpenImmersion x ∧ p ∈ Set.range x ∧ IsGrpPullback B A x a
+              ∧ IsGrpPullback B A' x (a ≫ φ))
+        → IsGrpPullback A A' (𝟙 S) φ := by
   intro S A A' _ _ φ hφ w h
   exact isGrpPullback_id_of_loc φ w h
 

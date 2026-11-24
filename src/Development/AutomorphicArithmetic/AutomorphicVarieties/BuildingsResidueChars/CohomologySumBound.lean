@@ -76,7 +76,6 @@ theorem UpperTheory.cohomology_sum_bound : UpperTheory.V.Af.CohB.SumBound := by
     groupCohomology.cochainsFunctor ℂ Γ
       ⋙ HomologicalComplex.homologyFunctor (ModuleCat.{0} ℂ) (ComplexShape.up ℕ) q
   have hF : ∑ i, F.map (π i) ≫ F.map (ι i) = 𝟙 (F.obj A) := by
-
     rw [← F.map_id, ← h, F.map_sum]
     simp only [Functor.map_comp]
   change Module.rank ℂ (F.obj A) ≤ ∑ i, Module.rank ℂ (F.obj (B i))

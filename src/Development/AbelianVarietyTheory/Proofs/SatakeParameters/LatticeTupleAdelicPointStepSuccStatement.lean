@@ -47,6 +47,7 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
   Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.lattice_tuple_adelic_point_step_succ
     : ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D}
         {Kc : G.Consts} {Dx : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Dx cX}
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.lattice_tuple_adelic_point_step_succ
             (basesAt (chainAt H hT) std _ (sysS H X std).unif _ (sysS H X std).eO_spec _
               (sysS H X std).dG_spec (sysS H X std).om (j + 1) La.2)
             (J.pt std (j + 1) hj La).1 := by
-  first
-  | exact @GlobalTheory.TwV.Joint.pt_succ_isPt
-  | exact GlobalTheory.TwV.Joint.pt_succ_isPt
-  | (intros; apply GlobalTheory.TwV.Joint.pt_succ_isPt <;> assumption)
+  first | exact @GlobalTheory.TwV.Joint.pt_succ_isPt

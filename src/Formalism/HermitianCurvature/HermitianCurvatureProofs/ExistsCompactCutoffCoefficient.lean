@@ -289,8 +289,9 @@ theorem dmin_gaXi
     {p ρ : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (ξ : U.Xi k p 0 ρ σ)
     (Z : G.Mat 0) (γ : B.Mat k ρ) (z z' : Fin (2 * (p + 0 + ρ) + k + 1) → ℂ)
     : Dmin k (p + 0 + ρ) z z' (U.gaXi k ρ σ d ξ Z γ) ⟨p + 0, by omega⟩ = (U.hMat σ d).det := by
-  rw [Formalism.FourierDecayAlt.P.hat_z_minimum_degree k (p + 0) ρ z z' _,
-    Formalism.FourierDecayAlt.P.Ux10.DjU_gaXi Formalism.FourierDecayAlt.P.hat_z_on_slice σ d ξ Z γ]
+  rw [_root_.Formalism.FourierDecayAlt.P.Ux3.zhDmin k (p + 0) ρ z z' _,
+    Formalism.FourierDecayAlt.P.Ux10.DjU_gaXi _root_.Formalism.FourierDecayAlt.P.Ux3.zhSlice σ d ξ Z
+      γ]
   simp [G.detM]
 
 theorem sliceAt_congr_Dr

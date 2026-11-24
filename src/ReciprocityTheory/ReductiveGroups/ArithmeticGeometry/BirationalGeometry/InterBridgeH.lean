@@ -114,15 +114,12 @@ theorem integrableOn_chart
   have hI2 : IntegrableOn
       (fun u => Pt.χ j ((A.chart j).symm u) * (g ((A.chart j).symm u) * locDens A Φ j u))
       ((A.chart j) '' tsupport (Pt.χ j)) := by
-    first
-    | exact hI.continuousOn_mul (hχc.mono hKt) hKc
-    | exact IntegrableOn.continuousOn_mul (hχc.mono hKt) hI hKc
+    first | exact hI.continuousOn_mul (hχc.mono hKt) hKc
   simp only [mul_assoc]
   refine hI2.of_forall_diff_eq_zero (A.chart j).open_target.measurableSet ?_
   rintro u ⟨hut, huK⟩
   have hn : (A.chart j).symm u ∉ tsupport (Pt.χ j) := fun h => huK ⟨_, h, (A.chart j).right_inv hut⟩
-  have h0 : Pt.χ j ((A.chart j).symm u) = 0 := by
-    first | exact image_eq_zero_of_nmem_tsupport hn | exact image_eq_zero_of_notMem_tsupport hn
+  have h0 : Pt.χ j ((A.chart j).symm u) = 0 := by first | exact image_eq_zero_of_notMem_tsupport hn
   rw [h0, zero_mul]
 
 theorem goodT_fibre_eq

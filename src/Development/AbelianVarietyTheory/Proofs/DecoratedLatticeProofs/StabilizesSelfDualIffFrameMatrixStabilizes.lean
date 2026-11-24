@@ -2,9 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.BaseMatrixGlApply
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacua
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HomLatticeIndicatorOnSplitHalfEqHalfIndicator
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceHermitianFramePropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceHermitianFrameProperties
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacua
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -123,7 +123,7 @@ theorem moves_iff_smul
           (GlobalTheory.FinPl.Moves A κ L L (· = p.v)
             ↔ coordHom A p.pr β.b β.b' β.bb' β.b'b κ • Λ = Λ) := by
   intro D k _ _ _ _ p A n _ _ β L Λ hL hΛ κ
-  obtain ⟨h1, -, -, h4, -, -⟩ := GlobalTheory.T.splitPlaceHermitianFrame_properties D k p A n β
+  obtain ⟨h1, -, -, h4, -, -⟩ := _root_.GlobalTheory.FrameAt.frame_facts D k p A n β
   obtain ⟨Λ', -, hΛ', hK⟩ := h4 L hL
   have hΛeq : Λ' = Λ := by
     ext x

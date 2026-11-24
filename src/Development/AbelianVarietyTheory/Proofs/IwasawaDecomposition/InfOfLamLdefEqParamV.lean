@@ -151,7 +151,7 @@ theorem infOf_lamLdef_eq_paramV
         push_cast
         ring
     · refine Multiset.map_congr rfl fun c _ => ?_
-      have he : (D.hc τ).e j = (W.e : ℚ) := by rw [hWe]; congr 1; try (ext; simp)
+      have he : (D.hc τ).e j = (W.e : ℚ) := by rw [hWe]; congr 1
       simp only [Function.comp, ge, he]
       push_cast
       ring

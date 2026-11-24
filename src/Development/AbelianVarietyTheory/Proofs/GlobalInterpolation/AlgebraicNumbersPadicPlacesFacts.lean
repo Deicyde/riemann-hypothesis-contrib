@@ -71,8 +71,7 @@ theorem exists_extension
   let : Algebra K ℂ_[p] := ι.toAlgebra
   have : IsScalarTower ℚ K TaylorLogMetric.Qbar :=
     IsScalarTower.of_algebraMap_eq fun q => by rw [eq_ratCast, eq_ratCast, map_ratCast]
-  have : Algebra.IsAlgebraic ℚ TaylorLogMetric.Qbar := by
-    convert algebraicClosure.isAlgebraic ℚ ℂ <;> first | rfl | exact Subsingleton.elim _ _
+  have : Algebra.IsAlgebraic ℚ TaylorLogMetric.Qbar := by convert algebraicClosure.isAlgebraic ℚ ℂ
   have : Algebra.IsAlgebraic K TaylorLogMetric.Qbar := Algebra.IsAlgebraic.tower_top (K := ℚ) K
   let f : TaylorLogMetric.Qbar →ₐ[K] ℂ_[p] := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_

@@ -55,7 +55,8 @@ open GlobalTheory
 
 namespace Gp91
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal ContDiff
 
 noncomputable section
@@ -79,14 +80,16 @@ lemma eq_of_capP {n : ℕ} (mu mu' : Fin n → ℝ) (h : StrictAnti mu) (h' : St
   exact (h.range_inj_of_wellFoundedGT h').mp ((key _ _ e).antisymm (key _ _ fun Y => (e Y).symm))
 
 section
-variable {n : ℕ} {ε : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H H' : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
   {τ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {τ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')}
 
-def toReal (V : H ≃L[ℂ] H') : H ≃L[ℝ] H' :=
-  { V.toLinearEquiv.restrictScalars ℝ with
-    continuous_toFun := V.continuous
-    continuous_invFun := V.symm.continuous }
+def toReal (V : H ≃L[ℂ] H') : H ≃L[ℝ] H' := {
+  V.toLinearEquiv.restrictScalars ℝ with
+  continuous_toFun := V.continuous
+  continuous_invFun := V.symm.continuous
+}
 
 lemma dsig_equiv (V : H ≃L[ℂ] H') (hV : ∀ g, Formalism.REAL.inUJ ε g → ∀ x, V (τ g x) = τ' g (V x))
     (X : Matrix (Fin n) (Fin n) ℂ) (hX : Formalism.REAL.inG ε X) (v : H) :
@@ -208,7 +211,12 @@ lemma exists_kfin {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {mu : Fin (2 *
     simp only [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left P _ hd, hPP, Matrix.mul_one]
   simpa only [e] using hst _ hK x hx
 
-theorem param_eq_of_equiv : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (mu' : Fin (2 * r + k + 1) → ℝ) (R R' : Rep k r), R.IsDG ε mu → R'.IsDG ε mu' → ∀ U : R.H ≃ₗᵢ[ℂ] R'.H, (∀ g ∈ GG k r, ∀ x, U (R.σ g x) = R'.σ g (U x)) → mu = mu' := by
+theorem param_eq_of_equiv
+    : HypsG
+      → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ)
+          (mu' : Fin (2 * r + k + 1) → ℝ) (R R' : Rep k r),
+        R.IsDG ε mu → R'.IsDG ε mu'
+          → ∀ U : R.H ≃ₗᵢ[ℂ] R'.H, (∀ g ∈ GG k r, ∀ x, U (R.σ g x) = R'.σ g (U x)) → mu = mu' := by
   intro hy k r ε mu mu' R R' hR hR' U hU
   obtain ⟨hm, ⟨P, hP, h⟩, hgp⟩ := hR
   obtain ⟨hm', ⟨Q, hQ, h'⟩, hgp'⟩ := hR'
@@ -227,13 +235,17 @@ theorem param_eq_of_equiv : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) 
   have hb := cayley_quot hP.1.1 hQ.1.2 hP.1.2
   obtain ⟨⟨hone, hmul⟩, -⟩ := h'.2.2.1
   set τ' : Mx k r → (R'.H →L[ℂ] R'.H) := fun g => R'.σ (Q⁻¹ * g * Q) with hτ'
-  have hmul' : ∀ a ∈ PI.UpqRep.UJset ε, ∀ b ∈ PI.UpqRep.UJset ε, ∀ x, τ' a (τ' b x) = τ' (a * b) x :=
+  have hmul'
+      : ∀ a ∈ PI.UpqRep.UJset ε, ∀ b ∈ PI.UpqRep.UJset ε, ∀ x, τ' a (τ' b x) = τ' (a * b) x :=
     fun a ha b hb x => (DFunLike.congr_fun (hmul a ha b hb) x).symm
   have hab : (P * Q⁻¹) * (Q * P⁻¹) = 1 := by simp only [Matrix.mul_assoc, q3, p1]
   have hba : (Q * P⁻¹) * (P * Q⁻¹) = 1 := by simp only [Matrix.mul_assoc, p3, q1]
-  let A : R'.H ≃L[ℂ] R'.H := ContinuousLinearEquiv.equivOfInverse (τ' (P * Q⁻¹)) (τ' (Q * P⁻¹))
-    (fun x => by rw [hmul' _ hb _ ha, hba, hone]; rfl) (fun x => by rw [hmul' _ ha _ hb, hab, hone]; rfl)
-  refine eq_of_equiv hm hm' (hy.2.2.1 k r ε mu _ _ ⟨P, hP⟩ hgp hm h) (hy.2.2.1 k r ε mu' _ _ ⟨P, hP⟩ hgp' hm' h') (U.toContinuousLinearEquiv.trans A) ?_ hs' hv0
+  let A : R'.H ≃L[ℂ] R'.H :=
+    ContinuousLinearEquiv.equivOfInverse (τ' (P * Q⁻¹)) (τ' (Q * P⁻¹))
+      (fun x => by rw [hmul' _ hb _ ha, hba, hone]; rfl)
+      (fun x => by rw [hmul' _ ha _ hb, hab, hone]; rfl)
+  refine eq_of_equiv hm hm' (hy.2.2.1 k r ε mu _ _ ⟨P, hP⟩ hgp hm h)
+    (hy.2.2.1 k r ε mu' _ _ ⟨P, hP⟩ hgp' hm' h') (U.toContinuousLinearEquiv.trans A) ?_ hs' hv0
   intro g hg x
   have hg' : g ∈ PI.UpqRep.UJset ε := hg
   have hG : P⁻¹ * g * P ∈ GG k r := dsParamUniq_conj_mem hP.1.1 hP.1.2 hg

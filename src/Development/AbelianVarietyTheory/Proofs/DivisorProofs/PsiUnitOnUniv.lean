@@ -130,7 +130,7 @@ theorem act_iff
   have a
       : ((Over.pullback (specOf φ)).map f).left ≫ pullback.fst D.P.A.hom (specOf φ)
         = pullback.fst D.P.A.hom (specOf φ) ≫ f.left := by
-    simp [Over.pullback_map_left, pullback.lift_fst]
+    simp [Over.pullback_map_left]
   constructor
   · intro H
     have := congrArg (fun q => q.left ≫ pullback.fst D.P.A.hom (specOf φ)) H

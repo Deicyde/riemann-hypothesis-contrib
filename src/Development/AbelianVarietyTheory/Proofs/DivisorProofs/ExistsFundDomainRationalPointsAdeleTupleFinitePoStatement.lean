@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_fundDomain_rationalPointsAdeleTuple_finite_
         → ∃ 𝓕₁ : Set (κ → AF F),
           @IsAddFundamentalDomain (GlobalTheory.ThetaParseval.ratVec F κ) _ _ _ (borel _) 𝓕₁ μ
             ∧ μ 𝓕₁ ≠ 0 ∧ μ 𝓕₁ ≠ ⊤ := by
-  first
-  | exact @GlobalTheory.RatVecDomain.exists_fundamentalDomain
-  | exact GlobalTheory.RatVecDomain.exists_fundamentalDomain
-  | (intros; apply GlobalTheory.RatVecDomain.exists_fundamentalDomain <;> assumption)
+  first | exact @GlobalTheory.RatVecDomain.exists_fundamentalDomain

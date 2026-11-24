@@ -177,7 +177,6 @@ theorem linearIndependent_secPull
   let R : (Fin n → F) →ₗ[F] (∀ i, SecOnR S.str S.L (D i)) :=
     LinearMap.pi fun i => ∑ j, (LinearMap.proj j).smulRight (resTo S.str S.L (D i) (b j))
   have hRi : ∀ u i, R u i = resTo S.str S.L (D i) (∑ j, u j • b j) := fun u i => by
-
     rw [map_sum]
     simp only [R, LinearMap.pi_apply, LinearMap.sum_apply, LinearMap.smulRight_apply,
       LinearMap.proj_apply]
@@ -230,8 +229,7 @@ theorem linearIndependent_secPull
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [Φ, LinearMap.comp_apply, LinearEquiv.coe_coe,
       TensorProduct.piScalarRight_symm_single, LinearMap.baseChange_tmul,
-      TensorProduct.piRight_apply, TensorProduct.piRightHom_tmul, LinearMap.pi_apply,
-      LinearMap.proj_apply, Bc, SecOnR.baseChangeHom_tmul]
+      TensorProduct.piRight_apply, TensorProduct.piRightHom_tmul, LinearMap.pi_apply, Bc]
     change SecOnR.baseChangeHom S.L H.w (D i) (S.bcFst E ⁻¹ᵁ D i) le_rfl
         (c j ⊗ₜ[F] R (Pi.single j 1) i)
       = _

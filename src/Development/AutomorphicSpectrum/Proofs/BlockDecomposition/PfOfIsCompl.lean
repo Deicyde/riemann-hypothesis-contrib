@@ -126,7 +126,6 @@ theorem pf_of_isCompl
       hC.compl.toIsPrecomplete.prec
         (f := fun n => g (e n))
         (fun {m n} hmn => by
-          beta_reduce
           rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
             Ideal.mem_span_singleton, ← map_sub, ← map_pow]
           exact map_dvd g (cauchy m n hmn))

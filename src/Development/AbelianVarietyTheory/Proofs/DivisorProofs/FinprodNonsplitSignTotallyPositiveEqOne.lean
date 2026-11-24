@@ -47,6 +47,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 public import Development.AbelianVarietyTheory.Definitions.Foundations.NotIsSplitOfIsInertAt
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTUnitsLeft
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIdealWeight
 
 @[expose] public section
 
@@ -107,15 +108,6 @@ theorem ordL_congr
       (Valued.v y)
   rw [h]
 
-theorem valued_eq_exp
-    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {x : L} (hx : x ≠ 0)
-    : Valued.v x = WithZero.exp (- ordL x) := by
-  have h0 : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
-  unfold ordL
-  rw [dite_eq_right h0, neg_neg]
-  conv_lhs => rw [← WithZero.coe_unzero h0]
-  rfl
-
 theorem eta_inert
     [Algebra.IsQuadraticExtension F E]
     {v : HeightOneSpectrum (𝓞 F)} (hv : ¬ Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) v)
@@ -132,8 +124,8 @@ theorem eta_inert
   set u := x * π ^ (-k)
   have hu1 : IsUnitAt v u := by
     unfold IsUnitAt
-    rw [Units.val_mul, Units.val_zpow_eq_zpow_val, map_mul, map_zpow₀, hπ, valued_eq_exp x.ne_zero,
-      ← WithZero.exp_zsmul, ← WithZero.exp_add]
+    rw [Units.val_mul, Units.val_zpow_eq_zpow_val, map_mul, map_zpow₀, hπ,
+      _root_.GlobalTheory.BorelUMod.v_eq_exp x.ne_zero, ← WithZero.exp_zsmul, ← WithZero.exp_add]
     simp [k]
   have hx : x = u * π ^ k := by simp [u]
   have e1 : χ u = 1 :=

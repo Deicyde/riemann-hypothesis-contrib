@@ -3,16 +3,20 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.TopAmpExists
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.WeilIsAlternatingSkewNatural
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.DeterminantConditionSpreadsOfDensePointsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.DeterminantConditionSpreadsOfDensePoints
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsEquivStdSymp
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLevelIsometryOfDenseGeometricPointsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLevelIsometryOfDenseGeometricPoints
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianSchemeDimRigidifiedSym
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PushEquivSymmLeft
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TateIsometryOfFiniteLevelIsometries
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionIsometryPrimitiveRootBijectiveModNStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilIsIffOfIsGrpPullbackComm
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionIsometryPrimitiveRootBijectiveModN
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ConstGen
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilIsGrpPullbackOfCommute
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsMulEquivOfIsGrpPullback
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInjectiveOfCommRing
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PushEquivSymmLeft
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -154,8 +158,8 @@ theorem GeomAt.push
     apply Over.OverMorphism.ext
     show (g.left ≫ _) ≫ _ = (g.left ≫ _) ≫ _
     rw [Category.assoc, ← ν.act, Category.assoc]
-  · exact (weilIs_iff_of_isGrpPullback_comm S S' t.G t'.G f ν.cm.F t.PP.L t'.PP.L t.PP.isLB
-      t'.PP.isLB ν.cart hL (Over.mk y) m _ _ g g' _
+  · exact (_root_.GlobalTheory.weilIs_grpPullback_of_comm S S' t.G t'.G f ν.cm.F t.PP.L t'.PP.L
+      t.PP.isLB t'.PP.isLB ν.cart hL (Over.mk y) m _ _ g g' _
       (ObjPull.pushEquiv_symm_left ν.cart (Over.mk y) g).symm
       (ObjPull.pushEquiv_symm_left ν.cart (Over.mk y) g').symm).1 hc
   · apply Over.OverMorphism.ext
@@ -193,8 +197,7 @@ theorem geomAt_of_dense
     sym := ObjDim.sym
   }
   have hdet : DetCond D t.act x (β (RZ.rt H n N)) :=
-    GlobalTheory.T.determinantCondition_spreads_of_dense_points E H D S t.G g t.act _ s _ hg
-      (rt_sq H n N)
+    _root_.GlobalTheory.DetSpread.detCond_of_dense E H D S t.G g t.act _ s _ hg (rt_sq H n N)
       (hd.mono fun p hp => by
         obtain ⟨K, _, _, _, x, β, h₁, h₂, h₃, -⟩ := hp
         exact ⟨K, inferInstance, inferInstance, inferInstance, x, β, h₁, h₂, h₃⟩)
@@ -233,8 +236,8 @@ theorem geomAt_of_dense
       (fun m hm => by
         have hn := Nat.mul_pos hN hm
         obtain ⟨ζ, ev, h₁, h₂, h₃, h₄, h₅, h₆, h₇⟩ :=
-          GlobalTheory.T.exists_level_isometry_of_dense_geometric_points hL E H D S P t.act.act _ s
-            (RZ.ze H n N) _ id lev (N * m) m hn
+          _root_.GlobalTheory.exists_levelIsometry_of_dense hL E H D S P t.act.act _ s (RZ.ze H n N)
+            _ id lev (N * m) m hn
             (hd.mono fun p hp => by
               obtain ⟨K, _, _, _, x, β, h₁, h₂, -, I, h₃, h₄⟩ := hp
               exact ⟨
@@ -258,7 +261,7 @@ theorem geomAt_of_dense
               ⟩)
             K x β (Nat.cast_ne_zero.2 hn.ne') hx
         obtain ⟨h₈, h₉⟩ :=
-          GlobalTheory.T.torsionIsometry_primitiveRoot_bijective_mod_n E H D K (Over.mk x ⟶ t.G)
+          _root_.GlobalTheory.TorsIsometry.ker_and_onto E H D K (Over.mk x ⟶ t.G)
             (fun z z' c => Out.WeilIs t.G t.PP.L (N * m : ℕ) z z' (unitOn c))
             (N * m) ζ ev hn (hcard _ hn)
             (fun _ _ _ h => eq_one_of_weilIs_one P hL.weil h)

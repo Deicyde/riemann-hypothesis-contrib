@@ -219,7 +219,7 @@ theorem pairingO_inj
     intro w
     simp only [IndefiniteRowSideFullHecke.EpsilonPairingZeta.pairingO, h1,
       LinearEquiv.apply_symm_apply]
-    rw [Finset.sum_eq_single i] <;> simp +contextual [Pi.single_apply, eq_comm]
+    rw [Finset.sum_eq_single i] <;> simp +contextual [eq_comm]
   rw [← h2 y, ← h2 z, H]
 
 variable

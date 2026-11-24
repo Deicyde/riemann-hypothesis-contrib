@@ -52,6 +52,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory ReciprocityTheory.ChartRe
   GlobalTheory.HolRead
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.smoothVectors_unitaryRep_stable_conj_skewAdjoint
     : ∀ (n : ℕ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         (J : Matrix (Fin n) (Fin n) ℂ) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.smoothVectors_unitaryRep_stable_conj_skewAdjoint
                     SmoothVec {X : Matrix (Fin n) (Fin n) ℂ | Xᴴ * J + J * X = 0} π w
                       → ⟪dRep π X v, w⟫_ℂ = - ⟪v, dRep π X w⟫_ℂ
                         ∧ ∀ c : ℂ, dRep π X (v + c • w) = dRep π X v + c • dRep π X w := by
-  first
-  | exact @GlobalTheory.SmVecCalc.smooth_calculus
-  | exact GlobalTheory.SmVecCalc.smooth_calculus
-  | (intros; apply GlobalTheory.SmVecCalc.smooth_calculus <;> assumption)
+  first | exact @GlobalTheory.SmVecCalc.smooth_calculus

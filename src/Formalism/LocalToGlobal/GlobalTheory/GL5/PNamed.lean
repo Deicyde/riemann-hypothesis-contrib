@@ -75,15 +75,7 @@ def band (m a b : ℕ) : Fin m → Bool := fun i => decide (a ≤ (i : ℕ) ∧ 
 theorem card_band (m a b : ℕ) (hb : b ≤ m)
     : (Finset.univ.filter (fun i : Fin m => band m a b i = true)).card = b - a := by
   first
-  | exact UpperTheory.Reformulated.B.CardinalityOfBand.card_band ..
   | (apply UpperTheory.Reformulated.B.CardinalityOfBand.card_band <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.CardinalityOfBand.card_band <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.CardinalityOfBand.card_band <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.CardinalityOfBand.card_band <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.CardinalityOfBand.card_band
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.CardinalityOfBand.card_band m a b hb
   | exact @UpperTheory.Reformulated.B.CardinalityOfBand.card_band m a b
   | exact @UpperTheory.Reformulated.B.CardinalityOfBand.card_band m a

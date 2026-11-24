@@ -236,7 +236,6 @@ def Side0.p0 {o : q.Over} (s : Side0 o) : BaseLevelRowSide (w.D o.Z) := ⟨{
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure Moved (o : q.Over) : Type 1 where
   z : Dat (w.st o.Z) w.I hX T Wt
   intersectionNumber_baseChange : Holds z.R z.F
@@ -254,7 +253,6 @@ structure Moved (o : q.Over) : Type 1 where
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure ReadPk {o : q.Over} (m : Moved o) (s : Side0 o) : Type 1 where
   Y : Read m.z.R.toRealDat m.z.F.lv2 s.p0
   Z : RationalReadingWithoutCongruence m.z.R m.z.F s.p0 Y

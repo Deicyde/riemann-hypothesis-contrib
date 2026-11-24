@@ -4,7 +4,7 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsS
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
 public import Mathlib.Order.CompletePartialOrder
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigenProjectorsSplitActionStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigenProjectorsSplitAction
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
 public import Development.WeilBound.CoreStatements.HodgeTatePoints.EigFrob
@@ -168,7 +168,7 @@ theorem eig_val
   classical
   have : Module.Finite K Vz := (PositivityTheory.HtPt.Htat.lie_fin X G K z Vz Mz).1
   obtain ⟨e, -, -, he3, -, he5⟩ :=
-    GlobalTheory.T.eigen_projectors_split_action K (emptyCurve K) Vz
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.SplitProj.split_proj K (emptyCurve K) Vz
       (fun i => i.elim)
       O k S χ hχ
       (fun i => i.elim)
@@ -215,7 +215,6 @@ theorem eig_val
     induction hv using Submodule.iSup_induction' with
     | mem t x hx =>
       have h1 : e s x = algebraMap k K (if t = s then 1 else 0) • x := by
-
         rw [← hc t, hes, LinearMap.sum_apply, map_sum, Finset.sum_smul]
         refine Finset.sum_congr rfl fun j _ => ?_
         rw [LinearMap.smul_apply, mem_eig.1 (hU t hx) (a j), map_mul, mul_smul]

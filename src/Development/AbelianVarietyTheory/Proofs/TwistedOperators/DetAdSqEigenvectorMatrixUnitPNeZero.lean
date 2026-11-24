@@ -60,10 +60,7 @@ theorem det_ne_zero_of_add_conjTranspose
 
   have hquad : star v ⬝ᵥ ((P + Pᴴ) *ᵥ v) = 2 * (star v ⬝ᵥ v) := by
     rw [h]
-    first
-    | simp [smul_mulVec, dotProduct_smul, smul_eq_mul]
-    | simp [Matrix.smul_mulVec_assoc, dotProduct_smul, smul_eq_mul]
-    | simp [dotProduct_smul, smul_eq_mul]
+    first | simp [smul_mulVec, dotProduct_smul, smul_eq_mul]
 
   have hzero : star v ⬝ᵥ ((P + Pᴴ) *ᵥ v) = 0 := by
     have hstar : star v ᵥ* Pᴴ = star (P *ᵥ v) := (star_mulVec P v).symm

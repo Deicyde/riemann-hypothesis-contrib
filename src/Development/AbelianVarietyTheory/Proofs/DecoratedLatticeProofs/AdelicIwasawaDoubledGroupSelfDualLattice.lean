@@ -74,8 +74,8 @@ theorem hasIwasawa_KAd_selfDual
     (fun v => ?_)
     (fun w => GlobalTheory.T.iwasawa_doubled_hermitian_space_real_place D A a ha w)
   by_cases hv : Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v
-  · exact GlobalTheory.T.hasIwasawaDecomposition_doubled_split_place D A L hL v hv
-  · exact GlobalTheory.T.iwasawa_doubled_hermitian_space_nonsplit_place D A L hL v hv
+  · exact _root_.GlobalTheory.Core.Rk.IwSplit.hasIwasawa_split D A L hL v hv
+  · exact _root_.GlobalTheory.InertIwasawa.hasIwasawa_inert D A L hL v hv
 
 theorem hasIwasawa_Khat (D : D7) (A : HSp D) (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a)
     : HasIwasawa D.sp.cm.sig (dblSp A).gram (Khat A a) :=

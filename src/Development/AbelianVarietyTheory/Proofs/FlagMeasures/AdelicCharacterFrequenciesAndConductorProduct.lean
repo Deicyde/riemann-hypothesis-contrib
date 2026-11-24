@@ -243,8 +243,7 @@ theorem exists_scaling [IsTotallyReal F] {ψ : AddChar (AF F) ℂ} (h : IsCharAF
                   : ℂ)) := by
   obtain ⟨lam, hlam⟩ := exists_psiInf_eq h
   obtain ⟨N, hN, hU⟩ :=
-    GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _
-      (GlobalTheory.FinTranslate.eventually_fin_eq_one h)
+    _root_.GlobalTheory.LocalNormBound.main F _ (GlobalTheory.FinTranslate.eventually_fin_eq_one h)
   obtain ⟨a, ha⟩ :=
     exists_eq_embedding lam fun r => by
       have h1 : ψ (pairA F 0 (N • algebraMap F (Af F) (r : F))) = 1 :=

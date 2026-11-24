@@ -200,7 +200,7 @@ theorem v_ratio_gt
     simp only [q₀, q₁, q₂, q₃] at e
     rw [e, hmk, _root_.one_mul, _root_.one_mul, mul_comm (cP D.toPre (TO hϖ hv) p.y), mul_comm m]
     apply Additive.ofMul.injective
-    simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, gtφO, DegPre.gtε]
+    simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_pow, gtφO, DegPre.gtε]
     module
   have pψ
       : ∀ (U : Type) [CommGroup U] (h : ((TO hϖ hv).left ⟶ D.toPre.P.A.left) → U),

@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_powerSeries_of_natural_nilpotentPoints
     : ∀ (R : Type) [CommRing R] (I : Ideal R),
       IsAdicComplete I R
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.exists_powerSeries_of_natural_nilpotentPoints
                 → ∃ f : PS R n d, ∀ (S : Type) [CommRing S] [Algebra R S] (a : Fin n → Fin d → S),
                   L S → (∃ k, Kills I k S) → (∀ i j, IsNilpotent (a i j))
                     → c S a = nv (algebraMap R S) f a := by
-  first
-  | exact @GlobalTheory.ChF.exists_series_of_natural
-  | exact GlobalTheory.ChF.exists_series_of_natural
-  | (intros; apply GlobalTheory.ChF.exists_series_of_natural <;> assumption)
+  first | exact @GlobalTheory.ChF.exists_series_of_natural

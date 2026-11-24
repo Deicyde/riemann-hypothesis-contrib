@@ -67,7 +67,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem UpperTheory.V.Hi.projective_transport_along_equiv
     {Λ₀ Λ V₀ V Q : Type} [CommRing Λ₀] [CommRing Λ] [AddCommGroup V₀] [AddCommGroup V]
     [Module Λ₀ V₀] [Module Λ V] [Group Q]

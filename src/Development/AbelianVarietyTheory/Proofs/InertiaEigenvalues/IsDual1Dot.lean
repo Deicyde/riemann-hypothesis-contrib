@@ -2,8 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CentralIdemCoeff
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocChiEpsU
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PotentiallyCrystallineModuleEqCrystallineRestricStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistedDualFamiliesContinuousStatement
+public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PotentiallyCrystallineModuleEqCrystallineRestric
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistedDualFamiliesContinuous
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -141,13 +142,12 @@ theorem jump_dual
                       (matRep (Br.loc D.nbr i w hw (rTwO D.nd i r x))) τ (-a - 1) := by
   intro D hJ hP i r hr Xs w hw n hF x τ a
   obtain ⟨K', h, hN, hI, hS, Sig, Fr, -, -, -, -, hx⟩ := hF
-  have hc := GlobalTheory.T.twisted_dual_families_continuous D i r hr x
+  have hc := _root_.GlobalTheory.Pass.FamCont.stepCont D i r hr x
   have cT := loc_cont D i w hw _ hc.1
   have cU := loc_cont D i w hw _ hc.2
   have hcr :=
-    (GlobalTheory.T.potentiallyCrystalline_module_eq_crystalline_restriction (D.nd.l i)
-      (D.loc (D.nd.l i)) (D.nbr i w hw).Kw K' (D.nbr i w hw).LL h hN hI hS _
-      (matRep (Br.loc D.nbr i w hw (rTwO D.nd i r x)))).2.1 (hx x).1
+    (_root_.GlobalTheory.PcRes.main (D.nd.l i) (D.loc (D.nd.l i)) (D.nbr i w hw).Kw K'
+      (D.nbr i w hw).LL h hN hI hS _ (matRep (Br.loc D.nbr i w hw (rTwO D.nd i r x)))).2.1 (hx x).1
   have hdR :=
     hP (D.nd.l i) (D.nbr i w hw).Kw K' (D.nbr i w hw).LL h
       (matG ℚ_[D.nd.l i] (Br.OLL D.nbr i w hw) _ cT) hcr

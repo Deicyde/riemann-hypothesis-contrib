@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GridMovedTensorBoundedSupportLocallyConstantStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GridMovedTensorBoundedSupportLocallyConstant
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -218,8 +218,7 @@ theorem GlobalTheory.FunObj.FlatDep.flatTensor_dep_and_per
               → flatTensor hs ψ ν (moved G keep g T) (x + a) (y + b)
                 = flatTensor hs ψ ν (moved G keep g T) x y := by
   intro k _ _ _ _ _ _ G hs ψ ν ϖ e T keep g hϖ hψ hT
-  obtain ⟨n, hA, hB⟩ :=
-    GlobalTheory.T.gridMovedTensor_bounded_support_locallyConstant G ϖ e T keep g hϖ hT
+  obtain ⟨n, hA, hB⟩ := _root_.GlobalTheory.MovedBound.moved_bounded_locConst G ϖ e T keep g hϖ hT
   refine ⟨fun x x' y y' hx hy => ?_, n, fun x a y b ha hb => ?_⟩
   · unfold flatTensor
     refine integral_congr_ae (Filter.Eventually.of_forall fun u => ?_)

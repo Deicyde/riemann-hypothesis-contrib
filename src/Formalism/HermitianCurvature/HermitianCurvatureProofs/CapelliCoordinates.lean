@@ -90,14 +90,7 @@ theorem hpart1_smul (H Z : Matrix (Fin n) (Fin n) ℂ) (c : ℂ)
   simp only [hpart1, hpart2, conjTranspose_smul, Matrix.mul_smul, Matrix.smul_mul,
     ← Complex.coe_smul, inv2I]
   rw [hs]
-  match_scalars <;> first
-    | ring1
-    | linear_combination (1 / 2 : ℂ) * hc
-    | linear_combination (-1 / 2 : ℂ) * hc
-    | linear_combination (-Complex.I / 2) * hc + (-(c.im : ℂ) / 2) * Complex.I_sq
-    | linear_combination ((c.im : ℂ) / 2) * Complex.I_sq
-    | linear_combination (Complex.I / 2) * hc + ((c.im : ℂ) / 2) * Complex.I_sq
-    | linear_combination (-(c.im : ℂ) / 2) * Complex.I_sq
+  match_scalars <;> first | ring1 | linear_combination (1 / 2 : ℂ) * hc
 
 theorem hpart2_smul (H Z : Matrix (Fin n) (Fin n) ℂ) (c : ℂ)
     : hpart2 H (c • Z) = c.re • hpart2 H Z + c.im • hpart1 H Z := by
@@ -112,8 +105,6 @@ theorem hpart2_smul (H Z : Matrix (Fin n) (Fin n) ℂ) (c : ℂ)
     | linear_combination (-1 / 2 : ℂ) * hc
     | linear_combination (-Complex.I / 2) * hc + (-(c.im : ℂ) / 2) * Complex.I_sq
     | linear_combination ((c.im : ℂ) / 2) * Complex.I_sq
-    | linear_combination (Complex.I / 2) * hc + ((c.im : ℂ) / 2) * Complex.I_sq
-    | linear_combination (-(c.im : ℂ) / 2) * Complex.I_sq
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
@@ -178,7 +169,7 @@ private theorem sup_single_of_inV
   refine ⟨?_, ?_⟩
   · ext y
     rw [hcol]
-    simp [Matrix.single_apply, hne]
+    simp [hne]
   · ext y
     rw [hcol, Matrix.mul_apply]
     apply Finset.sum_eq_zero
@@ -188,7 +179,7 @@ private theorem sup_single_of_inV
       rw [hz _ _ hp hx, mul_zero]
     · rw [Matrix.mul_apply, Finset.sum_eq_zero, zero_mul]
       intro w _
-      simp [Matrix.conjTranspose_apply, Matrix.single_apply, Ne.symm hz']
+      simp [Matrix.conjTranspose_apply, Ne.symm hz']
 
 theorem sup_sum {ι : Type*} (s : Finset ι) (Z : ι → Mx k r) (h : ∀ j ∈ s, Sup k r i (Z j))
     : Sup k r i (∑ j ∈ s, Z j) := by
@@ -558,11 +549,8 @@ private theorem intCast_mul'
     {X : Module.End ℂ (SV k r i D E)} {T : (Mx k r → E) → Mx k r → E}
     (z : ℤ) (h : OperatorRepresentations.Rep X T)
     : OperatorRepresentations.Rep ((z : Module.End ℂ (SV k r i D E)) * X)
-      (fun f x => (z : ℂ) • T f x) := ⟨
-  h.1.smul _,
-  fun φ g hg => by
-    simp [Module.End.mul_apply, Module.End.intCast_apply, h.2 φ g hg, Int.cast_smul_eq_zsmul]
-⟩
+      (fun f x => (z : ℂ) • T f x) :=
+  ⟨h.1.smul _, fun φ g hg => by simp [h.2 φ g hg, Int.cast_smul_eq_zsmul]⟩
 
 theorem frame_minor : Formalism.FourierDecayAlt.Qr.FrameMinor := by
   intro E _ _ k r m D hD Bs hB P Q ι hι hP hQ w φ g hg

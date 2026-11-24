@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.HermitianCompactForm
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSectionOfChg
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -78,7 +79,7 @@ theorem exists_affine_frame
     exists_bc f (io.appLE U W hWU).hom (φ' := (io.appLE U W hWU).hom.comp φ)
       (x' := ((show Sp Γ(T, W) ⟶ T from hW.fromSpec) ≫ io) ≫ genι Y) rfl (by rw [e, Category.assoc])
   refine ⟨W, hW, _, g, hyW, ?_⟩
-  rw [e, Category.assoc, spMap_comp₂]
+  rw [e, Category.assoc, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
   exact congrArg _ hφ
 
 open GlobalTheory.Points GlobalTheory.ShFam.EigLoc in
@@ -128,7 +129,8 @@ theorem exists_affine_holFrames
     · obtain ⟨g, hg⟩ :=
         exists_bc (fr y) (GlobalTheory.CxPts.evHom h) (φ' := e)
           (spMap_inj (by
-            rw [spMap_comp₂, ← hφ y, ← hov p, ← hp y p h]
+            rw [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, ← hφ y, ← hov p,
+              ← hp y p h]
             simp only [Category.assoc]))
           (hx y p h)
       exact ⟨g, fun _ => hg⟩

@@ -318,7 +318,7 @@ private theorem cont_toGL
   refine (?_ : Continuous fun t => ((f t)⁻¹).1 i j).congr fun t =>
     (congrFun (congrFun (e (f t)) i) j).symm
   simp only [Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two]
-  fin_cases i <;> fin_cases j <;> simp <;> first | exact hf _ _ | exact (hf _ _).neg
+  fin_cases i <;> fin_cases j <;> simp <;> first | exact hf _ _
 
 private theorem cont_rot : Continuous rot := by
   refine cont_infGL2.comp (cont_toGL fun i j => ?_)

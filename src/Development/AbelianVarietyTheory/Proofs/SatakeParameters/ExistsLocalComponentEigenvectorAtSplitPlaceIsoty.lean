@@ -105,7 +105,6 @@ theorem exists_eigen_of_sum
     conv_rhs => rw [← QuotientGroup.out_eq' q]
     rfl
   have htot : ∑ i ∈ s, T i (e (u i)) = (Fintype.card (G ⧸ H) : ℂ) • f := by
-
     simp only [e, map_sum]
     rw [Finset.sum_comm]
     have : ∀ q : G ⧸ H, ∑ i ∈ s, T i (F (u i) q.out) = f := by

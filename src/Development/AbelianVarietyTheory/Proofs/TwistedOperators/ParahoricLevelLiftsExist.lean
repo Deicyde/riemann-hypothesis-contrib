@@ -404,7 +404,7 @@ variable {D : D7}
 
 theorem mem_L0c_iff_mem_intVec_of_span_frame (V : HSp D) (x : Fin V.rank → D.host.E)
     : x ∈ L0c D V ↔ x ∈ GlobalTheory.Member.latC V := by
-  rw [GlobalTheory.Member.mem_latC, Module.Basis.equivFun_symm_apply]
+  rw [_root_.GlobalTheory.Member.mem_latC_iff_symm_mem, Module.Basis.equivFun_symm_apply]
   rfl
 
 theorem base_lattice

@@ -78,7 +78,7 @@ theorem blockMat_mul {n : ℕ} (g h : Mir k n)
       : ((h : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.last n)
           (Fin.castSucc j)
         = 0 := by
-    rw [hh]; simp [eLast, Pi.single_apply, Fin.castSucc_ne_last]
+    rw [hh]; simp [eLast, Fin.castSucc_ne_last]
   simp [blockMat, Units.val_mul, Matrix.mul_apply, Fin.sum_univ_castSucc, e]
 
 def mirabolicProjection (n : ℕ) : Mir k n →* GL (Fin n) k :=
@@ -117,7 +117,7 @@ theorem colMat_mul_glEmbMat (n : ℕ) (A : Matrix (Fin n) (Fin n) k) (w : Fin n 
     : colMat k n w * glEmbMat k n A = colMat k n w := by
   ext i j
   induction j using Fin.lastCases
-    <;> simp [colMat, glEmbMat, Matrix.mul_apply, Fin.sum_univ_castSucc, Fin.castSucc_ne_last]
+    <;> simp [colMat, glEmbMat, Matrix.mul_apply, Fin.castSucc_ne_last]
 
 theorem glEmb_mul_unip' (n : ℕ) (g : GL (Fin n) k) (v : Multiplicative (Fin n → k))
     : glEmb k n g * unip k n v
@@ -182,7 +182,7 @@ theorem qEntry_mul (n : ℕ) (a b : Mir k (n + 1)) (ha : mirabolicProjection k (
 
 def qChar (ψ : AddChar k Circle) (n : ℕ) : Q k n →* ℂˣ where
   toFun q := Circle.toUnits (ψ (qEntry k n ((q : Mir k (n + 1)) : GL (Fin (n + 2)) k)))
-  map_one' := by simp [qEntry, one_apply, Fin.castSucc_ne_last]
+  map_one' := by simp [qEntry, Fin.castSucc_ne_last]
   map_mul' a b := by
     simp only [Subgroup.coe_mul, qEntry_mul k n (a : Mir k (n + 1)) (b : Mir k (n + 1)) a.2,
       AddChar.map_add_eq_mul, map_mul]

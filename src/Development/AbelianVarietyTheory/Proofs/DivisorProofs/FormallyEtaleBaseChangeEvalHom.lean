@@ -80,7 +80,7 @@ theorem formallyEtale_mvPolynomial_eval₂_tensor
         MvPolynomial.eval₂Hom_X']
       rfl
   haveI : IsScalarTower k (MvPolynomial (Fin r) k) B := IsScalarTower.of_algebraMap_eq fun x => by
-    simp [RingHom.algebraMap_toAlgebra, f, MvPolynomial.algebraMap_eq, MvPolynomial.algebraMap_def]
+    simp [RingHom.algebraMap_toAlgebra, f, MvPolynomial.algebraMap_eq]
   haveI : IsScalarTower k B (R ⊗[k] B) := IsScalarTower.of_algebraMap_eq fun x =>
     ((Algebra.TensorProduct.includeRight : B →ₐ[k] R ⊗[k] B).commutes x).symm
   haveI : IsScalarTower (MvPolynomial (Fin r) k) B (R ⊗[k] B) :=
@@ -90,8 +90,7 @@ theorem formallyEtale_mvPolynomial_eval₂_tensor
     IsScalarTower.of_algebraMap_eq fun x => rfl
   haveI : IsScalarTower k (MvPolynomial (Fin r) R) (R ⊗[k] B) :=
     IsScalarTower.of_algebraMap_eq fun x => by
-      simp [RingHom.algebraMap_toAlgebra, g, MvPolynomial.algebraMap_eq,
-        Algebra.TensorProduct.algebraMap_apply]
+      simp [RingHom.algebraMap_toAlgebra, g, Algebra.TensorProduct.algebraMap_apply]
   haveI : IsScalarTower R (MvPolynomial (Fin r) R) (R ⊗[k] B) :=
     IsScalarTower.of_algebraMap_eq fun x => by
       simp [RingHom.algebraMap_toAlgebra, g, MvPolynomial.algebraMap_eq,

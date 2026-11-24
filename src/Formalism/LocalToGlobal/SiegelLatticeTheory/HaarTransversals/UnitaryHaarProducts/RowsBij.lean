@@ -84,9 +84,7 @@ theorem map_lin_of_inner
 
 theorem map_zero_of_inner (ψ : E → F) (C : ℂ) (h : ∀ y y', ⟪ψ y, ψ y'⟫_ℂ = C * ⟪y, y'⟫_ℂ)
     : ψ 0 = 0 := by
-  have h0 := h 0 0
-  rw [inner_zero_left, mul_zero, inner_self_eq_zero] at h0
-  exact h0
+  simpa only [inner_zero_left, mul_zero, inner_self_eq_zero] using h 0 0
 
 def linOfInner (ψ : E → F) (C : ℂ) (h : ∀ y y', ⟪ψ y, ψ y'⟫_ℂ = C * ⟪y, y'⟫_ℂ) : E →L[ℂ] F :=
   LinearMap.mkContinuous
@@ -155,13 +153,10 @@ theorem tens_continuous
             ((∏ i, ⟪x i, x i⟫_ℂ) - (∏ i, ⟪x i, y i⟫_ℂ) - (∏ i, ⟪y i, x i⟫_ℂ)
               + ∏ i, ⟪y i, y i⟫_ℂ) := by
     intro x y
-    rw [← htin, ← htin, ← htin, ← htin, ← inner_self_eq_norm_sq (𝕜 := ℂ)]
-    have e
-        : ⟪tens x - tens y, tens x - tens y⟫_ℂ
-          = ⟪tens x, tens x⟫_ℂ - ⟪tens x, tens y⟫_ℂ - ⟪tens y, tens x⟫_ℂ + ⟪tens y, tens y⟫_ℂ := by
-      simp only [inner_sub_left, inner_sub_right]
-      ring
-    rw [e]
+    rw [← inner_self_eq_norm_sq (𝕜 := ℂ)]
+    simp only [inner_sub_left, inner_sub_right, htin]
+    congr 1
+    ring
   rw [continuous_iff_continuousAt]
   intro x0
   rw [ContinuousAt, tendsto_iff_norm_sub_tendsto_zero]
@@ -243,13 +238,10 @@ theorem reg_alg
   have h1 : Formalism.MainNotions.LeviCoordinates.rr_FD (I.muA μf)
       (Formalism.MainNotions.LeviCoordinates.rr_GF I) fund :=
     ⟨hfund.1, hfund.2.1, hfund.2.2⟩
-  have h2 : Formalism.MainNotions.LeviCoordinates.rr_IsReg (I.muA μf)
-      (Formalism.MainNotions.LeviCoordinates.rr_GF I) fund R :=
-    hR
   exact ⟨
-    fun a b => Formalism.MainNotions.LeviCoordinates.rr_mul h1 h2 a b,
-    Formalism.MainNotions.LeviCoordinates.rr_one h1 h2,
-    fun a F => Formalism.MainNotions.LeviCoordinates.rr_norm h1 h2 a F
+    fun a b => Formalism.MainNotions.LeviCoordinates.rr_mul h1 hR a b,
+    Formalism.MainNotions.LeviCoordinates.rr_one h1 hR,
+    fun a F => Formalism.MainNotions.LeviCoordinates.rr_norm h1 hR a F
   ⟩
 
 theorem loc_schur
@@ -267,9 +259,7 @@ theorem loc_schur
     simp only [Formalism.L2.SG.ProjRows.phLoc, coefOn]
     ring
   simp_rw [hph]
-  have hww : ⟪w, w⟫_ℂ = 1 := by
-    rw [inner_self_eq_norm_sq_to_K, hw]
-    simp
+  have hww : ⟪w, w⟫_ℂ = 1 := by simp [inner_self_eq_norm_sq_to_K, hw]
   rw [MeasureTheory.integral_const_mul, (hF2 w x w w).2, hww, one_mul]
   field_simp
 

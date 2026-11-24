@@ -130,7 +130,6 @@ theorem finiteGroupAction_preserves_principalFlagMultiplicity
       have hl := hT.lev v _ hmem (g * hk.choose)
       rw [hchi] at hl
       rw [← hl]
-      congr 1
       simp [mul_assoc]
   · have hEq : U = 0 := by
       ext v h

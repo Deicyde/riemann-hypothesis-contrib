@@ -124,11 +124,11 @@ theorem trF_const (mu : D.X) (ζ : F) (W : (DegPre.BF D F).left.Opens)
   clear_value f p c0
   clear hf hp hc0
   have e3 : Scheme.Hom.app p ⊤ ≫ Scheme.Hom.app f ⊤ = Scheme.Hom.app (f ≫ p) ⊤ := by
-    first | exact (Scheme.Hom.comp_app f p ⊤).symm | exact (Scheme.comp_app f p ⊤).symm | simp
+    first | exact (Scheme.Hom.comp_app f p ⊤).symm
   have e2
       : Scheme.Hom.app (f ≫ p) ⊤
         = Scheme.Hom.app p ⊤ ≫ (D.BF F).left.presheaf.map (eqToHom (by rw [hfp])).op := by
-    first | exact Scheme.Hom.congr_app hfp ⊤ | exact Scheme.congr_app hfp ⊤
+    first | exact Scheme.Hom.congr_app hfp ⊤
   have key
       : Scheme.Hom.appTop p ≫ (D.BF F).left.presheaf.map (homOfLE (le_top : W ≤ ⊤)).op
           ≫ Scheme.Hom.app f W

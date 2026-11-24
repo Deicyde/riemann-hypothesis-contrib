@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlESymmApply
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSmulMemLatticeOfMemCompletionStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelPrimeUnramifiedUniformizerStatement
+public import Formalism.LocalRingCardinality.DataLevel
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSmulMemLatticeOfMemCompletion
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelPrimeUnramifiedUniformizer
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryCompletionMapsDualLattices
 public import Formalism.LocalToGlobal.GlobalTheory.GL6.PBwLocBases
 import Formalism.LocalToGlobal.GlobalTheory.GL6.PRLocV
@@ -137,7 +138,7 @@ theorem nsmul_dual_mem_loc
     convert h3 using 1
     funext a
     simp only [zV, Pi.smul_apply, map_nsmul]
-  exact GlobalTheory.T.exists_smul_mem_lattice_of_mem_completion F E v n L hL (T • z) h4
+  exact _root_.GlobalTheory.LatticeDescent.exists_smul_mem_of_mem_latS F E v n L hL (T • z) h4
 
 theorem nsmul_dual_mem_loc_adelic
     {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {T f : ℕ}
@@ -191,7 +192,7 @@ theorem loc_lk_eq_loc_cls
       loc (A.res v) (Lk A i hi v c) = loc (A.res v) (clsCrd D u i hi c) := by
   intro D u A i hi K v c
   refine loc_sup_ker_smul (A.res v) (((D.mem u).A.T : ℕ) : 𝓞 D.host.E)
-    (GlobalTheory.T.levelPrime_unramifiedUniformizer D u A v) _ _ ?_
+    (_root_.GlobalTheory.LevelUnram.unram D u A v) _ _ ?_
   intro z hz
   obtain ⟨r, hr, hrz⟩ :=
     nsmul_dual_mem_loc_adelic K.lev (bwB_gramN_det D i hi) (A.eV v).1 (clsCrd D u i hi c)

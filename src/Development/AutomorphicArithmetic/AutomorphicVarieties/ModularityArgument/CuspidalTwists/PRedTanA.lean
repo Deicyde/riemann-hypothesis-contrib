@@ -102,17 +102,15 @@ theorem limA {k : Type} [Field k] {n : M4 k} (h : IsLow n)
   obtain ⟨h1, h2, h3⟩ := h
   have h32 : n 3 2 = - n 1 0 := by
     have := congrFun (congrFun h1 1) 0
-    simp [Matrix.mul_apply, Fin.sum_univ_four, adj_apply, sgn, Fin.rev, h2, h3 0 1 (by decide),
-        h3 0 2 (by decide), h3 0 3 (by decide), h3 1 2 (by decide), h3 1 3 (by decide),
-        h3 2 3 (by decide)]
+    simp [Matrix.mul_apply, Fin.sum_univ_four, adj_apply, sgn, Fin.rev, h2, h3 0 2 (by decide),
+        h3 1 2 (by decide)]
       at this
     linear_combination this
   refine ⟨fun i j hij => ?_, ?_⟩
   · fin_cases i <;> fin_cases j <;> first | exact h3 _ _ (by decide) | (simp at hij)
   · ext i j
     fin_cases i <;> fin_cases j
-      <;> simp [cmp_apply, xMA, Matrix.one_apply, Matrix.single_apply, h2, h32, h3 0 1 (by decide),
-        h3 2 3 (by decide)]
+      <;> simp [cmp_apply, xMA, h2, h32, h3 0 1 (by decide), h3 2 3 (by decide)]
 
 theorem gsp_A {k : Type} [Field k] (b : k) : IsGSp 1 (1 + b • xMA k) := by
   ext i j
@@ -167,7 +165,6 @@ theorem rel_A
   refine ⟨by linear_combination h10, h21, by linear_combination h30 - b * e20 - b * h31⟩
 
 set_option synthInstance.maxSize 4000 in
-
 set_option maxRecDepth 20000 in
 theorem keyA
     : ∀ S ∈ redTypes,

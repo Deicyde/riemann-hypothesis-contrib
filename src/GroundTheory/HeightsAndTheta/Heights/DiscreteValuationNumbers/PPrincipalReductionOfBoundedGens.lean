@@ -330,7 +330,6 @@ theorem exists_relation
   · rw [← hc i]
     exact Ideal.Quotient.eq_zero_iff_mem.2 h
   · have hsum : (maximalIdeal A • (⊤ : Submodule A N)).mkQ (∑ i, c i • (⟨v i, hv i⟩ : N)) = 0 := by
-
       rw [map_sum, ← hg]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, ← hc i, ← Ideal.Quotient.algebraMap_eq, algebraMap_smul]
@@ -514,7 +513,7 @@ theorem proof : PrincipalReductionOfBoundedGens.Statement.{u} := by
     rw [cls_of_mem hx, cls_of_mem hc, ← map_mul, toFC_eq_iff] at hf
     have h2 := coeff_mem_of_mem_map hf (L + m)
     simp only [AddSubgroupClass.coe_sub, Subalgebra.coe_mul, coeff_sub, coeff_mul_monomial,
-        coeff_monomial, if_true]
+        coeff_monomial]
       at h2
     refine Submodule.mem_sup.2 ⟨
       c * (f' : A[X]).coeff L,

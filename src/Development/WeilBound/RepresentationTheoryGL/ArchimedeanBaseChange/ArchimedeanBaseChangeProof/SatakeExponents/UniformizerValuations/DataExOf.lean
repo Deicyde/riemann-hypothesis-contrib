@@ -47,8 +47,6 @@ open NumberField IsDedekindDomain
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.One
   PositivityTheory.Rg.BcB.F.F5
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}

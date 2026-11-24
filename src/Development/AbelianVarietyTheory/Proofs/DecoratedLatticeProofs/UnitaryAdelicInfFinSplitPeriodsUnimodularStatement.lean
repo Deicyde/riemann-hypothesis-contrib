@@ -52,6 +52,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitaryAdelic_inf_fin_split_periods_unimodular
     : ∀ (D : D7) (V : HSp D),
       IsClosed (GinfC V : Set (GA D V)) ∧ IsClosed (GfC V : Set (GA D V))
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.unitaryAdelic_inf_fin_split_periods_unimodular
                 ∧ (∀ μ : Measure (besGrp d o), μ.IsHaarMeasure → μ.IsInvInvariant)
                 ∧ ∀ μ : Measure ((besGrp d o).subgroupOf (GfC V)),
                   μ.IsHaarMeasure → μ.IsInvInvariant := by
-  first
-  | exact @GlobalTheory.AdelicSplit.adelic_split
-  | exact GlobalTheory.AdelicSplit.adelic_split
-  | (intros; apply GlobalTheory.AdelicSplit.adelic_split <;> assumption)
+  first | exact @GlobalTheory.AdelicSplit.adelic_split

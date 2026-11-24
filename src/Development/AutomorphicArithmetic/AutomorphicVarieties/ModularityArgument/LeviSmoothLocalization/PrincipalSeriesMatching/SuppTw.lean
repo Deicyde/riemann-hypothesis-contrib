@@ -106,8 +106,7 @@ section Glob
 
 variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 
-private theorem smooth_loc (χ : HChar K) (v : HeightOneSpectrum (𝓞 K)) : IsSmoothChar (χ.loc v) :=
-  GlobalTheory.HeckeComp.smooth_loc χ v
+private alias smooth_loc := _root_.GlobalTheory.HeckeComp.smooth_loc
 
 private theorem supp_twist
     [_root_.NumberField.IsTotallyComplex K]

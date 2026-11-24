@@ -68,7 +68,7 @@ private theorem winDiff
       : ∑ j ∈ T, padicValInt ℓ (j₀ - j) = ∑ i ∈ T.image (fun j : ℤ => j₀ - j), padicValInt ℓ i :=
     (Finset.sum_image hinj).symm
   rw [hre]
-  apply Formalism.WindowSums.arc_WindowSum ℓ lo L D
+  apply _root_.Formalism.WindowSums.sum_padicValInt_le ℓ lo L D
   · intro i hi
     obtain ⟨j, hj, rfl⟩ := Finset.mem_image.1 hi
     have := hT j hj
@@ -96,7 +96,8 @@ theorem g_ideal_valuation_statement : LemmaGIdeal := by
     have := m2 r hr2
     omega
   have hlag :=
-    Formalism.LIFT.lift_LagrangeIdealInt ℓ R S₁ S₂ c hdisj (fun x _ y _ hxy => hc x y hxy)
+    _root_.Formalism.LIFT.lagrangian_ideal_integral_holds ℓ R S₁ S₂ c hdisj
+      (fun x _ y _ hxy => hc x y hxy)
   refine ⟨
     S₁.sup fun j₀ => (∑ j ∈ S₂, padicValInt ℓ (j₀ - j)) + ∑ j ∈ S₁.erase j₀, padicValInt ℓ (j₀ - j),
     ?_,

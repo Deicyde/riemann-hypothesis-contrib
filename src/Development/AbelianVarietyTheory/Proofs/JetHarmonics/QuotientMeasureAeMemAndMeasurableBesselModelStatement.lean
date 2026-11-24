@@ -46,6 +46,7 @@ import Mathlib.Topology.Sheaves.Init
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.GlobalTheory.T.quotientMeasure_ae_mem_and_measurable_besselModel
     : PI.KFinSmooth
       → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r)
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.quotientMeasure_ae_mem_and_measurable_besselModel
                   AEStronglyMeasurable
                     (fun x : Formalism.QuantumDeterminants.Mt k r => l (R.σ (Matrix.of x) w))
                     νq := by
-  first
-  | exact @GlobalTheory.quotMeas_ae_mem_and_measurable
-  | exact GlobalTheory.quotMeas_ae_mem_and_measurable
-  | (intros; apply GlobalTheory.quotMeas_ae_mem_and_measurable <;> assumption)
+  first | exact @GlobalTheory.quotMeas_ae_mem_and_measurable

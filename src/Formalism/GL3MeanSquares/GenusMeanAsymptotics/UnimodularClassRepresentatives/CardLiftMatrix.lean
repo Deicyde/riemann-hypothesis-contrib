@@ -334,14 +334,13 @@ theorem quad_eq_zero
     (H : Matrix m m A)
     {Y : Matrix m r A} (hY : Y ∈ entSub m r 𝔟)
     : Yᴴ * H * Y = 0 := by
-  have hY' := mem_entSub.mp hY
   ext i j
   rw [Matrix.mul_apply, Matrix.zero_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
   rw [Matrix.mul_apply, Finset.sum_mul]
   refine Finset.sum_eq_zero fun k _ => ?_
   rw [Matrix.conjTranspose_apply, mul_comm (star _) (H k l), mul_assoc,
-    h𝔟2 _ (h𝔟s _ (hY' k i)) _ (hY' l j), mul_zero]
+    h𝔟2 _ (h𝔟s _ (mem_entSub.mp hY k i)) _ (mem_entSub.mp hY l j), mul_zero]
 
 theorem card_lift_matrix
     [Finite A]

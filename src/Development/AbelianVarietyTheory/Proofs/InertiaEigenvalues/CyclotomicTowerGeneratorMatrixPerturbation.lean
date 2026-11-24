@@ -198,19 +198,6 @@ theorem surj_of_lattice
   rw [← this]
   rfl
 
-theorem norm_zpow_sub_one_le (u : C) (hu : ‖u - 1‖ < 1) (i : ℤ) : ‖u ^ i - 1‖ ≤ ‖u - 1‖ := by
-  first
-  | exact @_root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le
-  | exact _root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le
-  | (apply _root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le <;> assumption)
-  | (intros; apply _root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le
-        <;> first | assumption | infer_instance
-    )
-  | (intros; exact _root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le ..)
-
 end Abstract
 
 variable {l : ℕ} [hl : Fact l.Prime]
@@ -269,7 +256,7 @@ theorem norm_chiC_sub_one
     (i : ℤ)
     : ‖chiC χ i g - 1‖ < rho1 l := by
   have h1 : ‖(χ g : ℚ_[l]) - 1‖ < rho1 l := hg.2 ▸ pow_lt_rho hj
-  have h2 := norm_zpow_sub_one_le _ (h1.trans rho_lt_one) i
+  have h2 := _root_.GlobalTheory.CloseToUnitNorm.norm_zpow_sub_one_le _ (h1.trans rho_lt_one) i
   have e : chiC χ i g - 1 = algebraMap ℚ_[l] (PadicComplex l) ((χ g : ℚ_[l]) ^ i - 1) := by
     simp [chiC]
   rw [e, norm_algebraMap']

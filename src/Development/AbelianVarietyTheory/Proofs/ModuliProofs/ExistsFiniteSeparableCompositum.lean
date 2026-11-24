@@ -79,7 +79,6 @@ theorem exists_finite_separable_compositum
     (IntermediateField.isSeparable_adjoin_iff_isSeparable _ _).2
       (by rintro _ ⟨i, rfl⟩; exact sepσ _)
   have hmem : ∀ z : k, σ z ∈ k' := fun z => by
-
     rw [← bs.sum_repr z, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul, Algebra.smul_def, IsScalarTower.algebraMap_apply K K' Ω]

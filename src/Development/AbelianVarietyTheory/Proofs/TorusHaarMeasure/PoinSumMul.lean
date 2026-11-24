@@ -50,6 +50,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.OntoStatementPfH
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.OntoStatementPfS
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.BoundedSectionAlgebra
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.PoinStatementPfA
 
 @[expose] public section
 
@@ -68,19 +69,13 @@ section
 
 variable {r : ℕ} (X : Data E r)
 
-theorem chi_ne_zero (la : Wt X.Ψ r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) : X.χ la γ ≠ 0 := by
-  obtain ⟨n, hn, h⟩ := X.χ_fin la
-  intro h0
-  have := h γ hγ
-  rw [h0, zero_pow hn.ne'] at this
-  exact zero_ne_one this
-
 theorem isSec_one : X.IsSec 0 (fun _ => (1 : ℂ)) := by
   refine ⟨differentiableOn_const _, fun x _ b _ => by simp [bchar], fun γ hγ x _ => ?_⟩
   have h := X.χ_add 0 0 γ hγ
   rw [add_zero] at h
   rw [mul_one]
-  exact mul_left_cancel₀ (chi_ne_zero X 0 hγ) (by rw [mul_one]; exact h)
+  exact mul_left_cancel₀ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.chi_ne X 0 hγ)
+    (by rw [mul_one]; exact h)
 
 variable {X}
 
@@ -145,8 +140,8 @@ theorem poin_sum_mul
     intro γ
     rw [hP _ (OntoS.dom_lact X γ.2 hx), Finset.mul_sum]
     refine Finset.sum_congr rfl fun i hi => ?_
-    have h1 := chi_ne_zero X la γ.2
-    have h2 := chi_ne_zero X la' γ.2
+    have h1 := _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.chi_ne X la γ.2
+    have h2 := _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.chi_ne X la' γ.2
     rw [(hg i hi).2.2 γ.1 γ.2 x hx, X.χ_add la la' γ.1 γ.2]
     field_simp
   rw [tsum_congr e, Summable.tsum_finsetSum fun i hi => ((hQ i hi).of_norm).mul_left (g i x)]

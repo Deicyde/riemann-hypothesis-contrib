@@ -83,23 +83,27 @@ theorem DerivationMinorOfDetection.proof : DerivationMinorOfDetection.Statement 
     choose b hb using fun i => hs i (Finset.mem_univ i)
     have hπb : ∀ i, π (b i) = π s * φ (Pi.single i 1) := fun i => by
       simp only [π, RingHom.comp_apply, hb i, Algebra.smul_def, map_mul, ha]
-    have hsq := hdet (∑ i, b i * f i) (Ideal.sum_mem _ fun i _ => P.mul_mem_left _ (hfP i)) fun D => by
-      have h1 : ∑ i, b i * D (f i) ∈ P := by
-        have hD : φ (v D) = 0 := hφ (Submodule.subset_span ⟨D, rfl⟩)
-        rw [hφv] at hD
+    have hsq :=
+      hdet (∑ i, b i * f i) (Ideal.sum_mem _ fun i _ => P.mul_mem_left _ (hfP i)) fun D => by
+        have h1 : ∑ i, b i * D (f i) ∈ P := by
+          have hD : φ (v D) = 0 := hφ (Submodule.subset_span ⟨D, rfl⟩)
+          rw [hφv] at hD
 
-        rw [← hπ, map_sum]
-        simp only [map_mul, hπb]
-        rw [show ∑ i, π s * φ (Pi.single i 1) * π (D (f i)) = π s * ∑ i, v D i * φ (Pi.single i 1) by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun i _ => by simp only [v]; ring, hD, mul_zero]
-      have hl : ∀ i, D (b i * f i) = b i * D (f i) + f i * D (b i) := fun i => by
-        rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
+          rw [← hπ, map_sum]
+          simp only [map_mul, hπb]
+          rw [show ∑ i, π s * φ (Pi.single i 1) * π (D (f i))
+                = π s * ∑ i, v D i * φ (Pi.single i 1) by
+              rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun i _ => by simp only [v]; ring,
+            hD, mul_zero]
+        have hl : ∀ i, D (b i * f i) = b i * D (f i) + f i * D (b i) := fun i => by
+          rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
 
-      rw [map_sum]
-      simp only [hl, Finset.sum_add_distrib]
-      exact P.add_mem h1 (Ideal.sum_mem _ fun i _ => P.mul_mem_right _ (hfP i))
-    have hbP : ∀ i, b i ∈ P := fun i => (IsLocalization.AtPrime.to_map_mem_maximal_iff A P _).1
-      (hind (fun i => algebraMap T A (b i)) (by simpa only [map_sum, map_mul] using hsq) i)
+        rw [map_sum]
+        simp only [hl, Finset.sum_add_distrib]
+        exact P.add_mem h1 (Ideal.sum_mem _ fun i _ => P.mul_mem_right _ (hfP i))
+    have hbP : ∀ i, b i ∈ P := fun i =>
+      (IsLocalization.AtPrime.to_map_mem_maximal_iff A P _).1
+        (hind (fun i => algebraMap T A (b i)) (by simpa only [map_sum, map_mul] using hsq) i)
     have hsP : π s ≠ 0 := fun h0 => s.2 ((hπ s).1 h0)
     have he : ∀ i, φ (Pi.single i 1) = 0 := fun i => by
       have := (hπ (b i)).2 (hbP i)

@@ -251,7 +251,6 @@ theorem exists_matrix
   choose s hs using hr
   refine ⟨Matrix.of fun i j => c (T (b j)) i, fun y => ?_⟩
   have h0 : c (y - ∑ j, s (c y j) • b j) = 0 := by
-
     rw [map_sub, map_sum, sub_eq_zero]
     simp only [map_smulₛₗ, hs, hb]
     exact pi_eq_sum_univ' _

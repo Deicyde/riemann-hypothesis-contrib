@@ -56,7 +56,4 @@ theorem _root_.GlobalTheory.T.theta_integral_continuous
       IsCharAF D.host.F ψ → IsInfFam θ → (∃ 𝓕, IsCovolOne (ratMx D V.rank r) μ 𝓕)
         → φ ∈ schwartzA θ V.rank r
         → Continuous (Jt ψ V μ φ) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.BigCellJ.jt_continuous
-  | exact GlobalTheory.CompanionTheory.BigCellJ.jt_continuous
-  | (intros; apply GlobalTheory.CompanionTheory.BigCellJ.jt_continuous <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.BigCellJ.jt_continuous

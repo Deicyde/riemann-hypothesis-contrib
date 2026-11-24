@@ -37,8 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
@@ -46,6 +44,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   NumberField IsDedekindDomain Polynomial
 noncomputable section
 namespace GlobalTheory.HeightCounting
+
 theorem typesOpen_withLoc_alt
     : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
         (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (low : Finset ℕ)

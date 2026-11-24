@@ -49,6 +49,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 public import Mathlib.Analysis.Calculus.DSlope
 public import Mathlib.Analysis.Calculus.Deriv.Mul
+import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.AnalyticDeterminants.SecondCayleyBlockMulConjTransposeEq
 
 @[expose] public section
 
@@ -65,33 +66,12 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-private theorem JJ_sq_eq_neg_one : JJ n * JJ n = -1 := by
-  rw [JJ, fromBlocks_multiply, ← fromBlocks_one, fromBlocks_neg]
-  simp
-
-private theorem inG_mul_JJ_mul_conjTranspose_eq_JJ {x : M2 n} (hx : InG x)
-    : x * JJ n * xᴴ = JJ n := by
-  have hJ := (JJ_sq_eq_neg_one (n := n))
-  have hx' : xᴴ * JJ n * x = JJ n := hx
-  have h1 : (-(JJ n * xᴴ * JJ n)) * x = 1 := by
-    calc
-      (-(JJ n * xᴴ * JJ n)) * x
-        = -(JJ n * (xᴴ * JJ n * x)) := by simp only [Matrix.neg_mul, Matrix.mul_assoc]
-      _ = 1 := by rw [hx', hJ, neg_neg]
-  have h2 : x * (-(JJ n * xᴴ * JJ n)) = 1 := mul_eq_one_comm.mp h1
-  calc
-    x * JJ n * xᴴ = x * (-(JJ n * xᴴ * JJ n)) * JJ n := by
-      simp only [Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc, hJ, Matrix.mul_one, neg_neg]
-    _ = JJ n := by rw [h2, Matrix.one_mul]
-
 private theorem toBlocks₂_relations_of_inG {x : M2 n} (hx : InG x)
     : toBlocks₂₁ x * (toBlocks₂₂ x)ᴴ = toBlocks₂₂ x * (toBlocks₂₁ x)ᴴ
       ∧ toBlocks₂₁ x * (toBlocks₁₂ x)ᴴ - toBlocks₂₂ x * (toBlocks₁₁ x)ᴴ = -1 := by
-  have e := inG_mul_JJ_mul_conjTranspose_eq_JJ hx
+  have e := _root_.PositivityTheory.Rg.Sw.LVs.mul_JJ_conjTranspose hx
   rw [← fromBlocks_toBlocks x] at e
-  simp only [JJ, fromBlocks_conjTranspose, fromBlocks_multiply, fromBlocks_inj,
-      toBlocks_fromBlocks₁₁, toBlocks_fromBlocks₁₂, toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₂₂]
-    at e
+  simp only [JJ, fromBlocks_conjTranspose, fromBlocks_multiply, fromBlocks_inj] at e
   simp at e
   refine ⟨?_, ?_⟩
   · have h := e.2.2.2
@@ -142,16 +122,6 @@ private theorem det_smul_toBlocks₂₁_add_toBlocks₂₂_ne_zero
     at h5
   exact hv (neg_eq_zero.mp h5.symm)
 
-theorem det_second_cayley_block_ne {x : M2 n} (hx : InG x) : (u2 x).det ≠ 0 := by
-  have h :=
-    det_smul_toBlocks₂₁_add_toBlocks₂₂_ne_zero hx (-Complex.I) (by
-      rw [star_neg, Complex.star_def, Complex.conj_I, neg_neg]
-      intro h
-      have := congrArg Complex.im h
-      norm_num at this)
-  rw [neg_smul] at h
-  exact h
-
 theorem inG_of_inK {g : M2 n} (h : InK g) : InG g := h.1
 
 private theorem det_ne_zero_of_inG' {x : M2 n} (hx : InG x) : x.det ≠ 0 := by
@@ -193,7 +163,8 @@ theorem continuous_rhoP
     intro k
     refine (continuousAt_matrix_inv _ ?_).comp hu2.continuousAt
     rw [Ring.inverse_eq_inv']
-    exact continuousAt_inv₀ (det_second_cayley_block_ne (hK k))
+    exact continuousAt_inv₀ (_root_.PositivityTheory.Rg.Sw.LVs.det_second_cayley_block_ne_zero (hK
+      k))
   have hdet : Continuous fun k => (ι k).det := hι.matrix_det
   unfold rhoP fz
   simp only [neg_zero, Complex.cpow_zero, mul_one]
@@ -204,8 +175,7 @@ theorem continuous_rhoP
 
 theorem one_upper_left_block : (1 : M2 n).toBlocks₁₁ = 1 := by
   ext i j; simp [toBlocks₁₁, Matrix.one_apply]
-theorem one_lower_left_block : (1 : M2 n).toBlocks₂₁ = 0 := by
-  ext i j; simp [toBlocks₂₁, Matrix.one_apply]
+theorem one_lower_left_block : (1 : M2 n).toBlocks₂₁ = 0 := by ext i j; simp [toBlocks₂₁]
 theorem one_lower_right_block : (1 : M2 n).toBlocks₂₂ = 1 := by
   ext i j; simp [toBlocks₂₂, Matrix.one_apply]
 
@@ -266,7 +236,7 @@ theorem asmLT : AsmLT := by
           (K0 * (β ^ (-(0 : ℂ)) * Complex.log β * (-1))) 0 :=
         (((hasDerivAt_id' (0 : ℂ)).neg).const_cpow (Or.inl hβ)).const_mul K0
       have h := ((hc 0).hasDerivAt.mul hg).deriv
-      simp only [hd0, hc0, zero_mul, mul_zero, add_zero] at h
+      simp only [hd0, hc0, zero_mul, add_zero] at h
       exact h
   refine ⟨
     1,
@@ -302,6 +272,6 @@ end PositivityTheory.Rg.Sw.HSt.LoweringDerivative
 
 namespace PositivityTheory.Rg.Sw.HSt
 
-theorem asmLT : AsmLT := LoweringDerivative.asmLT
+alias asmLT := _root_.PositivityTheory.Rg.Sw.HSt.LoweringDerivative.asmLT
 
 end PositivityTheory.Rg.Sw.HSt

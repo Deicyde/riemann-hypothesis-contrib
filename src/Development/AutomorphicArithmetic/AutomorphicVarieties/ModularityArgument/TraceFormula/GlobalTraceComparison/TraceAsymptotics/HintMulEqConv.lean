@@ -78,10 +78,10 @@ private theorem ind_eq_dosetInd (K : Subgroup G)
   funext x
   by_cases hx : x ∈ K
   · rw [Formalism.UG.P.dosetInd_of_mem ℂ K 1 x ((Formalism.UG.P.mem_dc_one K x).2 hx)]
-    simp [Set.indicator_apply, hx]
+    simp [hx]
   · rw [Formalism.UG.P.dosetInd_of_not_mem ℂ K 1 x fun h =>
       hx ((Formalism.UG.P.mem_dc_one K x).1 h)]
-    simp [Set.indicator_apply, hx]
+    simp [hx]
 
 private theorem fn_mem
     {ι : Type}

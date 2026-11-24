@@ -51,6 +51,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_real_discreteSeries_data_theta_properties
     : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules
       → ∃ X : ProvA,
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_real_discreteSeries_data_theta_properties
           ∧ Formalism.MainNotions.SchurIrreducible.ArchimedeanRallisUpDownLine X
           ∧ Formalism.MainNotions.SchurIrreducible.ArchimedeanRallisFourth X
           ∧ Formalism.MainNotions.SchurIrreducible.ArchimedeanRallisFifth X := by
-  first
-  | exact @GlobalTheory.RealPlaceTheta.exists_record_theta_all
-  | exact GlobalTheory.RealPlaceTheta.exists_record_theta_all
-  | (intros; apply GlobalTheory.RealPlaceTheta.exists_record_theta_all <;> assumption)
+  first | exact @GlobalTheory.RealPlaceTheta.exists_record_theta_all

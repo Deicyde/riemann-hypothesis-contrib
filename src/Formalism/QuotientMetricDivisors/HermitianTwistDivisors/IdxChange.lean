@@ -81,18 +81,15 @@ theorem idxChange_cnt_mul (v : HeightOneSpectrum R) {x y : K} (hx : x ≠ 0) (hy
 
 theorem idxChange_cnt_one (v : HeightOneSpectrum R)
     : FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ (1 : K)) = 0 := by
-  rw [FractionalIdeal.spanSingleton_one]
-  exact FractionalIdeal.count_one K v
+  simpa [FractionalIdeal.spanSingleton_one] using FractionalIdeal.count_one K v
 
 theorem idxChange_cnt_ideal_zero
     (v : HeightOneSpectrum R) (J : Ideal R) (hJ : J ≠ 0) (h : ¬ J ≤ v.asIdeal)
     : FractionalIdeal.count K v (J : FractionalIdeal R⁰ K) = 0 := by
   rw [FractionalIdeal.count_coe K v hJ]
   by_contra hne
-  have hne' : (Associates.mk v.asIdeal).count (Associates.mk J).factors ≠ 0 := by exact_mod_cast hne
-  have hd := (Associates.count_ne_zero_iff_dvd hJ v.irreducible).mp hne'
-  rw [Ideal.dvd_iff_le] at hd
-  exact h hd
+  exact h (Ideal.dvd_iff_le.mp ((Associates.count_ne_zero_iff_dvd hJ v.irreducible).mp
+    (by exact_mod_cast hne)))
 
 theorem idxChange_cnt_ideal_pos
     (v : HeightOneSpectrum R) (J : Ideal R) (hJ : J ≠ 0) (h : J ≤ v.asIdeal)
@@ -111,21 +108,18 @@ theorem idxChange_cnt_unit (v : HeightOneSpectrum R) {s : R} (hs : s ∉ v.asIde
     : FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ (algebraMap R K s)) = 0 := by
   have hs0 : s ≠ 0 := fun h => hs (h ▸ v.asIdeal.zero_mem)
   rw [idxChange_span_alg]
-  refine idxChange_cnt_ideal_zero v _ ?_ ?_
-  · simpa [Ideal.span_singleton_eq_bot] using hs0
-  · rwa [Ideal.span_singleton_le_iff_mem]
+  exact idxChange_cnt_ideal_zero v _ (by simpa [Ideal.span_singleton_eq_bot] using hs0)
+    (by rwa [Ideal.span_singleton_le_iff_mem])
 
 theorem idxChange_cnt_mem (v : HeightOneSpectrum R) {a : R} (ha : a ≠ 0) (hp : a ∈ v.asIdeal)
     : 1 ≤ FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ (algebraMap R K a)) := by
   rw [idxChange_span_alg]
-  refine idxChange_cnt_ideal_pos v _ ?_ ?_
-  · simpa [Ideal.span_singleton_eq_bot] using ha
-  · rwa [Ideal.span_singleton_le_iff_mem]
+  exact idxChange_cnt_ideal_pos v _ (by simpa [Ideal.span_singleton_eq_bot] using ha)
+    (by rwa [Ideal.span_singleton_le_iff_mem])
 
 theorem idxChange_cnt_nonneg (v : HeightOneSpectrum R) (a : R)
     : 0 ≤ FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ (algebraMap R K a)) := by
-  rw [idxChange_span_alg]
-  exact FractionalIdeal.count_coe_nonneg K v _
+  simpa only [idxChange_span_alg] using FractionalIdeal.count_coe_nonneg K v (Ideal.span {a})
 
 theorem idxChange_unif (v : HeightOneSpectrum R)
     : ∃ ϖ : R,
@@ -206,10 +200,8 @@ theorem idxChange_linIndep_act
   intro g hg
   rw [idxChange_sum_smul_act] at hg
   have h0 : γ *ᵥ g = 0 := funext (he _ hg)
-  have := Matrix.eq_zero_of_mulVec_eq_zero hγ h0
   intro i
-  rw [this]
-  rfl
+  simpa using congr_fun (Matrix.eq_zero_of_mulVec_eq_zero hγ h0) i
 
 theorem idxChange_det_ne_zero
     {e : Fin d → Fin d → K} {γ : Matrix (Fin d) (Fin d) K}
@@ -220,9 +212,7 @@ theorem idxChange_det_ne_zero
   rw [Fintype.linearIndependent_iff] at he
   apply hg0
   funext i
-  refine he g ?_ i
-  rw [idxChange_sum_smul_act, hg]
-  simp
+  exact he g (by rw [idxChange_sum_smul_act, hg]; simp) i
 
 theorem idxChange_span_top {e : Fin d → Fin d → K} (he : LinearIndependent K e)
     : Submodule.span K (Set.range e) = ⊤ := by
@@ -259,8 +249,7 @@ theorem idxChange_lidx_congr
 
 theorem idxChange_lidx_self (p : Ideal R) [p.IsPrime] (A : Submodule R (Fin d → K))
     : lidx p A A = 0 := by
-  unfold lidx
-  exact sub_self _
+  simp [lidx]
 
 theorem idxChange_lidx_add
     (p : Ideal R) [p.IsPrime]
@@ -346,8 +335,7 @@ abbrev idxChangeDg (i : Fin d) (x : K) : Matrix (Fin d) (Fin d) K :=
   Matrix.diagonal (Function.update (1 : Fin d → K) i x)
 
 theorem idxChange_det_Dg (i : Fin d) (x : K) : (idxChangeDg i x).det = x := by
-  rw [Matrix.det_diagonal, Finset.prod_update_of_mem (Finset.mem_univ i)]
-  simp
+  simp [Matrix.det_diagonal, Finset.prod_update_of_mem]
 
 theorem idxChange_Dg_mul (i : Fin d) (x y : K)
     : idxChangeDg i x * idxChangeDg i y = idxChangeDg i (x * y) := by
@@ -596,12 +584,10 @@ theorem indexChange_integral (v : HeightOneSpectrum R) (i : Fin d)
       push_cast at e2
       linarith
     have Pa' := ih a' ha'0 hc'
-    have Pϖa' : IdxChangeP v (idxChangeDg i (algebraMap R K ϖ * algebraMap R K a')) := by
-      rw [← idxChange_Dg_mul]
+    have Pta : IdxChangeP v (idxChangeDg i (algebraMap R K t * algebraMap R K a)) := by
+      rw [← map_mul, ha', map_mul, ← idxChange_Dg_mul]
       exact indexChange_mul v (by rw [idxChange_det_Dg]; exact hne ϖ hϖ0)
         (by rw [idxChange_det_Dg]; exact hne a' ha'0) (indexChange_uniformizer v i hcntϖ htp ht) Pa'
-    have Pta : IdxChangeP v (idxChangeDg i (algebraMap R K t * algebraMap R K a)) := by
-      rw [← map_mul, ha', map_mul]; exact Pϖa'
     exact indexChange_cancel v i (hne t ht0) (hne a ha) (indexChange_unit v i htp) Pta
 
 theorem indexChange_scalar (v : HeightOneSpectrum R) (i : Fin d) {x : K} (hx : x ≠ 0)
@@ -725,8 +711,7 @@ theorem indexChange_transvection (v : HeightOneSpectrum R) (t : Matrix.Transvect
   rw [Matrix.TransvectionStruct.toMatrix_mk]
   by_cases hc : c = 0
   · subst hc
-    rw [Matrix.transvection_zero]
-    exact indexChange_one v
+    simpa [Matrix.transvection_zero] using indexChange_one v
   rw [idxChange_transvection_conj hij hc]
   have hd1 : (idxChangeDg i c).det ≠ 0 := by rw [idxChange_det_Dg]; exact hc
   have hd2 : (Matrix.transvection i j (1 : K)).det ≠ 0 := by
@@ -742,9 +727,8 @@ theorem indexChange_of_det_ne_zero
   refine Matrix.diagonal_transvection_induction_of_det_ne_zero (IdxChangeP v) γ hγ ?_
     (indexChange_transvection v) (fun A B hA hB PA PB => indexChange_mul v hA hB PA PB)
   intro D hD
-  refine indexChange_diagonal v D fun k => ?_
   rw [Matrix.det_diagonal] at hD
-  exact Finset.prod_ne_zero_iff.mp hD k (Finset.mem_univ k)
+  exact indexChange_diagonal v D fun k => Finset.prod_ne_zero_iff.mp hD k (Finset.mem_univ k)
 
 end Main
 
@@ -764,9 +748,7 @@ theorem idxChange_hcompl_le_conj (w : HeightOneSpectrum (𝓞 K))
   change s ∈ w.asIdeal.map (cO K) at hmem
   rw [Ideal.mem_map_of_equiv] at hmem
   obtain ⟨x, hx, rfl⟩ := hmem
-  refine hs2 x ?_ hx
-  show (x : K) = star ((cO K x : 𝓞 K) : K)
-  simp [cO]
+  exact hs2 x (by simp [cO]) hx
 
 theorem idxChange_at
     {d : ℕ}

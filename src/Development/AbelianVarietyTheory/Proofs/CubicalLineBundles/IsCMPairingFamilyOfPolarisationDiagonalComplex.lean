@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.CmCurve
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.EqZeroOfSumEmbeddingMul
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsLinearOfIsMonHom
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermFormPullEqOfLbIsoPow
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LambdaBundleIsoOfWeilPairingCompatibleStatement
+public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LambdaBundleIsoOfWeilPairingCompatible
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.WeilEqIffHermFormEqComplexStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.SubsingletonPrimeSpectrum
 import Mathlib.Algebra.Order.Floor.Extended
@@ -327,8 +328,8 @@ theorem isFam_of_isHomFamily
         have hps := hpos (a : D.La) a.2 hne
         rw [Int.natCast_natAbs]
         rcases Int.units_eq_one_or ε with hε | hε <;> rw [hε] at hps ⊢ <;> norm_num at hps ⊢
-        · first | exact hps.le | exact abs_of_pos hps | linarith
-        · first | exact hps.le | exact abs_of_neg hps | linarith
+        · first | exact hps.le
+        · first | exact hps.le
     have hNC : (N : ℂ) ≠ 0 := by exact_mod_cast (show N ≠ 0 by omega)
     have habsC
         : (((D.EF (H.w0 • (a : D.La)) a).natAbs : ℕ) : ℂ)
@@ -366,8 +367,8 @@ theorem isFam_of_isHomFamily
       (GlobalTheory.T.weilEq_iff_hermForm_eq_complex hTh hLaws C.P C.P T.pol C.P uC uC uT uC HT HC
         χT χC hAHT hAHC (ψ a) (ψ b) (C.act.act (h a b)) (𝟙 C.P.A) (F a) (F b) G LinearMap.id
         (hFex a) (hFex b) hGex (fun z => by simp)).mpr ?_
-    · exact GlobalTheory.T.lambdaBundleIso_of_weilPairing_compatible hLaws ℂ C.P C.P T.pol C.P (ψ a)
-        (ψ b) (C.act.act (h a b)) (𝟙 C.P.A) (hmon a) (hmon b) (C.act.hom _) inferInstance hW
+    · exact _root_.GlobalTheory.CM.lamEq_of_weilEq hLaws ℂ C.P C.P T.pol C.P (ψ a) (ψ b)
+        (C.act.act (h a b)) (𝟙 C.P.A) (hmon a) (hmon b) (C.act.hom _) inferInstance hW
     intro z w
     obtain ⟨s, rfl⟩ := span z
     obtain ⟨t', rfl⟩ := span w

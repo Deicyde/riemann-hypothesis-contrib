@@ -234,7 +234,7 @@ theorem step_mp
   have gj : ∀ j, Good A c' (e + 1) T b sol ((ps W 0 ^ H * (s₁ * β j)) • W.φD T (bb j)) := by
     intro j
     have hbl : (letE a : LetA O n) • bb j = bb j :=
-      Formalism.MainNotions.UnusedSlot80.ArcF.letter_of_Nl W T a (hbb j).2
+      _root_.Formalism.MainNotions.LiftingTheory.frame_letE_fix W T a (hbb j).2
     have hbN : InFNc W T a 1 (bb j) := ⟨bb j, (hbb j).1, hbl, (one_smul _ _).symm⟩
     have hbP : InFP W T c' e 1 (abelian₂ W A a e • bb j) :=
       Formalism.MainNotions.UnusedSlot80.ArcC.arc_down W C.hs C.hR T A hA h5T (C.hmod T hT.1) C.hΔ

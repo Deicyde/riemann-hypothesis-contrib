@@ -139,10 +139,9 @@ theorem nrm_surj_adjoin
   intro F F' _ _ _ _ s hs n γ
   set M : Matrix (Fin n) (Fin n) F' := ((incl F F' n γ : GL (Fin n) F') : Matrix (Fin n) (Fin n) F') with hM
   set B := Algebra.adjoin F' {M} with hB
-  obtain ⟨hfix, hinj, -, hcomm4, hmul⟩ :=
-    GlobalTheory.T.galoisTwistedNormGL_basic_properties F F' s hs n
+  obtain ⟨hfix, hinj, -, hcomm4, hmul⟩ := _root_.GlobalTheory.Shin.NrmBasic.main F F' s hs n
   have hcard :=
-    GlobalTheory.T.card_twistedNorm_one_mul_card_fixed_units F F' s hs n B (adjoin_stable n s γ)
+    _root_.GlobalTheory.Shin.card_nrm_one_mul_card_fixed F F' s hs n B (adjoin_stable n s γ)
   have hstab
       : ∀ (t : F' ≃ₐ[F] F') (δ : GL (Fin n) F'),
         δ ∈ unitsIn B → galAct F F' n t δ ∈ unitsIn B := fun t δ h => by

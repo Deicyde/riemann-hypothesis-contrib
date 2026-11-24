@@ -268,7 +268,6 @@ theorem dsig_kfin
     show dsig (k := k) (r := r) σ Y s ∈ T
     induction hs using Submodule.span_induction with
     | mem y hy =>
-
       rw [(hL ⟨y, hy⟩ Y hY).1, ← b.sum_repr Y, map_sum]
       refine T.sum_mem fun j _ => ?_
       rw [map_smul]

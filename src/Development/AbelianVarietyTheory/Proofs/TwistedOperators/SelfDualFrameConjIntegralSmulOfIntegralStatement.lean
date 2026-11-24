@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.selfDualFrame_conj_integral_smul_of_integral
                   IsIntM (toEAf D a • γ.1) → IsIntM (toEAf D a • (γ⁻¹ : GL (Fin T.rank) (EAf D)).1)
                     → IsIntM (toEAf D (cA D a) • γ.1)
                       ∧ IsIntM (toEAf D (cA D a) • (γ⁻¹ : GL (Fin T.rank) (EAf D)).1) := by
-  first
-  | exact @GlobalTheory.ConjIntegral.conj_smul_isIntM
-  | exact GlobalTheory.ConjIntegral.conj_smul_isIntM
-  | (intros; apply GlobalTheory.ConjIntegral.conj_smul_isIntM <;> assumption)
+  first | exact @GlobalTheory.ConjIntegral.conj_smul_isIntM

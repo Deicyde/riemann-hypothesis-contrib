@@ -49,8 +49,6 @@ open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 abbrev borelA (E : Type) [Field E] [NumberField E] (n : ℕ) : MeasurableSpace (GA E n) := borel _

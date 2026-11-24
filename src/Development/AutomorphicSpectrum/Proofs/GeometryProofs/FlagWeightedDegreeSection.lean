@@ -3,14 +3,19 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.AlternatingMapSumSmulEqDetSmul
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CoordsAtSmul
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericFlagTrdegFormulaStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericTrdegEqDimensionStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsGenericFlag
+public import Mathlib.RingTheory.AlgebraicIndependent.Basic
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericFlagTrdegFormula
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCptGen
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.PushInvertible
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericTrdegEqDimension
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GramMatrixTwoFrames
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptAwayFromPrimesStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptAwayFromPrimes
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorFlag
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorGenericStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarisedStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PairSumFrameAtPointStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ContDiffUncentre
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PairSumFrameAtPoint
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorGeneric
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -284,14 +289,14 @@ theorem val_ne_zero_of_rank_zero
     : u ≠ 0 := by
   classical
   obtain ⟨-, ⟨x, hx⟩, hchar, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c O β Y S Ω K J y 𝔐 hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c O β Y S Ω K J y 𝔐 hβ
   have hA :=
-    GlobalTheory.T.generic_trdeg_eq_dimension E H D l Xo c O β Y 𝔐.Ω₀ 𝔐.ξ₀ Ω x 𝔐.fn hβ 𝔐.gen₀
-      (hx ▸ 𝔐.fn_over)
+    _root_.GlobalTheory.CompanionTheory.Ar.CptTrdeg.trdeg_eq_dim E H D l Xo c O β Y 𝔐.Ω₀ 𝔐.ξ₀ Ω x
+      𝔐.fn hβ 𝔐.gen₀ (hx ▸ 𝔐.fn_over)
   letI : Algebra 𝔐.Ω₀ Ω := 𝔐.fn.toAlgebra
   have hB :=
-    GlobalTheory.T.generic_flag_trdeg_formula 𝔐.Ω₀ Ω Fl.Li₀ 𝔐.Li Fl.j (CMType H ⊕ CMType H)
-      (labelRk D) Fl.V₀ Fl.b Fl.deg Fl.generic
+    _root_.GlobalTheory.CompanionTheory.Ar.FlagTrdeg.trdeg_of_isGenericFlag 𝔐.Ω₀ Ω Fl.Li₀ 𝔐.Li Fl.j
+      (CMType H ⊕ CMType H) (labelRk D) Fl.V₀ Fl.b Fl.deg Fl.generic
   haveI : CharZero 𝔐.Ω₀ := (RingHom.charZero_iff 𝔐.fn.injective).mpr hchar
   haveI : FaithfulSMul ℤ 𝔐.Ω₀ := (faithfulSMul_iff_algebraMap_injective ℤ 𝔐.Ω₀).mpr Int.cast_injective
   haveI : FaithfulSMul 𝔐.Ω₀ Ω := (faithfulSMul_iff_algebraMap_injective 𝔐.Ω₀ Ω).mpr 𝔐.fn.injective
@@ -339,12 +344,14 @@ theorem exists_gram
       𝔐.M.GramAt 𝔐.t.PP.L z b Γ ∧ Γ.PosDef := by
   have hβ : Function.Injective (algebraMap (𝓞 c.F) c.F) := RingOfIntegers.coe_injective
   obtain ⟨-, -, hchar, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
   have hgen : genPt 𝔐.ξ ⤳ centre z := 𝔐.all _
-  have hpol := GlobalTheory.T.interior_point_polarised E H D l Xo c Y S Ω K J y 𝔐 z hz
+  have hpol :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.polarisedAt_of_interior E H D l Xo c Y S Ω K
+      J y 𝔐 z hz
   obtain ⟨hV, -, -⟩ :=
-    GlobalTheory.T.hodge_cpt_away_from_primes E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ ⟨centre z, hgen⟩
-      fun r hr => GrNorm.not_inFibre 𝔐.tie.gen hgen hr
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeChar0.lattices_of_char_zero E H D l Xo c _ _ Y S Ω K
+      J y 𝔐 hβ ⟨centre z, hgen⟩ fun r hr => GrNorm.not_inFibre 𝔐.tie.gen hgen hr
   have hmem : ∀ k, b k ∈ 𝔐.Vgen s ⊔ 𝔐.Vgen s := fun k => by
     have h1 : b k ∈ 𝔐.V s ⟨centre z, hgen⟩ := by
       rw [hb.2]
@@ -374,7 +381,8 @@ theorem exists_gram
       rw [sup_idem, hb.2, ← hspan]
       exact ⟨x, hx, rfl⟩
   obtain ⟨Γ, h1, h2⟩ :=
-    GlobalTheory.T.pair_sum_frame_at_point E H D l Xo c Y S Ω K J y 𝔐 s s _ bb z hgen hpol hfr
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.GramEx.exists_gramAt_posDef E H D l Xo c Y S
+      Ω K J y 𝔐 s s _ bb z hgen hpol hfr
   exact ⟨Γ, h1, h2⟩
 
 theorem exists_flag_frame
@@ -421,9 +429,11 @@ theorem exists_doubled
         ∧ Real.log ‖Γ'.det‖ = Real.log ‖Γ.det‖ + labelRk D s * Real.log 4 := by
   have hβ : Function.Injective (algebraMap (𝓞 c.F) c.F) := RingOfIntegers.coe_injective
   obtain ⟨-, -, hchar, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
   have hgen : genPt 𝔐.ξ ⤳ centre z := 𝔐.all _
-  have hpol := GlobalTheory.T.interior_point_polarised E H D l Xo c Y S Ω K J y 𝔐 z hz
+  have hpol :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.polarisedAt_of_interior E H D l Xo c Y S Ω K
+      J y 𝔐 z hz
   have hu2 : IsUnit (2 : 𝔐.X.presheaf.stalk (centre z)) :=
     CxVal.isUnit (z := z) 2 fun h =>
       (two_ne_zero : (2 : ℂ) ≠ 0) ((map_ofNat (Scheme.stalkClosedPointTo z).hom 2).symm.trans h)
@@ -504,7 +514,7 @@ theorem norm_against_root_metrics
     hint hc₁ hfr cc u hcc hu
   have hβ : Function.Injective (algebraMap (𝓞 c.F) c.F) := RingOfIntegers.coe_injective
   obtain ⟨-, -, hchar, -⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.basic E H D l Xo c _ _ Y S Ω K J y 𝔐 hβ
   have hgen : genPt 𝔐.ξ ⤳ centre z := 𝔐.all _
   choose b Γ t hbf hbG hbP ht hbw hbn using fun s => exists_flag_frame Fl hint s
   let ν : ∀ s, Fin (labelRk D s) → ℝ := fun s k =>

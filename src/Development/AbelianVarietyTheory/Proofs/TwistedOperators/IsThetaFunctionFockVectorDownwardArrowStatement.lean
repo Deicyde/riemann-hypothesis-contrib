@@ -47,6 +47,7 @@ open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheor
 attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+
 theorem _root_.GlobalTheory.T.isThetaFunction_fock_vector_downward_arrow
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
         (ρ : RealMatch W) (t : T) (i j : ℕ),
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.isThetaFunction_fock_vector_downward_arrow
                 → ∀ Q : PolF D (G.pT (.mu t i j)).rank (G.pS (.mu t i j)).rank,
                   IsThetaFunO W.ψ (G.pS (.mu t i j)) (G.pT (.mu t i j))
                     (W.fock (.mu t i j) f Q) := by
-  first
-  | exact @GlobalTheory.DownFock.isThetaFunO_fock_down
-  | exact GlobalTheory.DownFock.isThetaFunO_fock_down
-  | (intros; apply GlobalTheory.DownFock.isThetaFunO_fock_down <;> assumption)
+  first | exact @GlobalTheory.DownFock.isThetaFunO_fock_down

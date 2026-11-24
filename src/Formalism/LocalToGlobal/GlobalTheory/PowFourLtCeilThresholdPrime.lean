@@ -208,8 +208,8 @@ theorem pa_Xpp_eq (s : Scale) (n : ℕ) (hn : (1 : ℝ) ≤ n) : s.X'' n = s.X' 
 theorem pa_Xp_le_Xpp (s : Scale) (n : ℕ) (hn : (1 : ℝ) ≤ n) : s.X' ≤ s.X'' n := by
   obtain ⟨hx, -, ha, hX, -⟩ := Lnk.sc_pos s
   rw [pa_Xpp_eq s n hn]
-  have h1 : 1 ≤ s.x * n := by nlinarith [s.one_lt_alt]
-  nlinarith
+  have h1 : 1 ≤ s.x * n := one_le_mul_of_one_le_of_one_le s.one_lt_alt.le hn
+  exact le_mul_of_one_le_right hX.le h1
 
 theorem pa_VV_empty (a b : G.HH D → ℤ) (p : ℕ) (h : ¬ G.Cand D L K p) : G.VV X K a b p = ∅ := by
   unfold G.VV
@@ -609,10 +609,7 @@ section AtRecordC
 
 variable {D : D7} {L : SizeData₂ D} (X : G.Inst D L) (K : G.Consts) (Cr C bo : ℝ)
 
-theorem pc_mem_Ps {p : ℕ} : p ∈ PsAt L ↔ p < bndP L ∧ p.Prime ∧ InertK D p := by
-  classical
-  unfold PsAt
-  rw [Finset.mem_filter, Finset.mem_range]
+alias pc_mem_Ps := _root_.Formalism.L2.GlobalTheoryTheory.Loss.pa_mem_PsAt
 
 theorem pc_X'_le (L : SizeData₂ D) : L.sc.X' ≤ L.sc.X'' D.R.n := by
   obtain ⟨hx, hb, ha, hX, hb'⟩ := Lnk.sc_pos L.sc
@@ -623,8 +620,8 @@ theorem pc_X'_le (L : SizeData₂ D) : L.sc.X' ≤ L.sc.X'' D.R.n := by
     have hn0 : (D.R.n : ℝ) ≠ 0 := by linarith
     field_simp
   rw [e]
-  have : 1 ≤ L.sc.x * D.R.n := by nlinarith
-  nlinarith
+  have : 1 ≤ L.sc.x * D.R.n := one_le_mul_of_one_le_of_one_le h1.le hn
+  exact le_mul_of_one_le_right hX.le this
 
 theorem pc_rho_nonneg (hK : K.Nonneg) (L : SizeData₂ D) : 0 ≤ G.rhoB D K L.sc := by
   obtain ⟨hx, hb, ha, hX, hb'⟩ := Lnk.sc_pos L.sc
@@ -635,8 +632,7 @@ theorem pc_rho_nonneg (hK : K.Nonneg) (L : SizeData₂ D) : 0 ≤ G.rhoB D K L.s
   have hb1 := Lnk.one_le_b L.sc
   have ha1 : 1 ≤ L.sc.a := by
     unfold Scale.a
-    have := L.sc.one_lt_alt
-    nlinarith
+    exact one_le_mul_of_one_le_of_one_le L.sc.one_lt_alt.le hb1
   have hlog : 0 ≤ Real.log L.sc.a := Real.log_nonneg ha1
   have hLa : 0 ≤ G.La K L.sc := by
     unfold G.La
@@ -710,9 +706,9 @@ theorem pc_VV_empty (p : ℕ) (h : NoGain X K Cr p) : G.VV X K (G.aL L) (G.bL L)
   · obtain ⟨hp0, i, hi, hab⟩ := h
     refine hband hp0 ⟨hp0, hpX, i, hi, ?_, ?_⟩
     · have := (abs_le.1 hab).1
-      nlinarith
+      linarith [mul_sub L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), sub_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
     · have := (abs_le.1 hab).2
-      nlinarith
+      linarith [mul_add L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), add_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
   · exact absurd hs (not_le.2 h.2)
   · have := pc_X'_le L
     linarith
@@ -742,7 +738,7 @@ theorem pc_cand
   have hX : 0 < L.sc.X' := (Lnk.sc_pos L.sc).2.2.2.1
   have hlt : (p : ℝ) < L.sc.X' * (1 + Cr * G.rhoB D K L.sc) := by
     have : 0 ≤ Cr * G.rhoB D K L.sc := mul_nonneg (by linarith) hρ
-    nlinarith
+    exact lt_of_lt_of_le hpX (le_mul_of_one_le_right hX.le (by linarith))
   have h1 : ¬((addOrderOf (G.hP D p) : ℝ) < L.sc.x ^ (L.sc.eps / 4)) := fun hh =>
     h (Or.inl ⟨hlt, hc0, Or.inl hh⟩)
   have h2 : ¬(L.sc.p0 D.R.k ≤ (p : ℝ)
@@ -752,8 +748,8 @@ theorem pc_cand
     refine ⟨hpp, hpX, hc0, not_lt.1 h1, fun hp0 hb => h2 ⟨hp0, ?_⟩⟩
     obtain ⟨-, -, d, hd, hb1, hb2⟩ := hb
     refine ⟨d, hd, abs_le.2 ⟨?_, ?_⟩⟩
-    · nlinarith
-    · nlinarith
+    · linarith [mul_sub L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), sub_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
+    · linarith [mul_add L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), add_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
   refine ⟨hc, ?_⟩
   by_contra hs
   exact h (Or.inl ⟨hlt, hc0, Or.inr (Or.inr ⟨hc, not_le.1 hs⟩)⟩)
@@ -929,10 +925,10 @@ theorem firstHyp_at
     · rw [tie.p₀]; exact Nat.ceil_le.2 hp0
     · rw [hXp, tie.ρ]
       have := (abs_le.1 hab).1
-      nlinarith
+      linarith [mul_sub L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), sub_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
     · rw [hXp, tie.ρ]
       have := (abs_le.1 hab).2
-      nlinarith
+      linarith [mul_add L.sc.X' (1 : ℝ) (G.rhoB D K L.sc), add_mul (1 : ℝ) (G.rhoB D K L.sc) L.sc.X']
   · exact absurd h h3
   · exact absurd h h2
   · exact absurd hI.symm h
@@ -1038,7 +1034,7 @@ theorem pd_one_le_a (s : Scale) : 1 ≤ s.a := by
   have h1 := Lnk.one_le_b s
   have h2 := s.one_lt_alt
   unfold Scale.a
-  nlinarith
+  exact one_le_mul_of_one_le_of_one_le h2.le h1
 
 theorem pd_wpp_pos (L : SizeData₂ D) : 0 < L.sc.w'' D.R.n := by
   obtain ⟨hx, -, -, -, hb'⟩ := Lnk.sc_pos L.sc
@@ -1046,16 +1042,14 @@ theorem pd_wpp_pos (L : SizeData₂ D) : 0 < L.sc.w'' D.R.n := by
   unfold Scale.w''
   exact div_pos hb' (mul_pos hx (by linarith))
 
-theorem pd_one_le_X' (s : Scale) : 1 ≤ s.X' := by
-  unfold Scale.X'
-  exact Real.one_le_exp (Real.rpow_nonneg (lt_trans one_pos s.one_lt_alt).le _)
+alias pd_one_le_X' := _root_.Formalism.MainNotions.J.one_le_Xp
 
 theorem pd_wpp_le_bx (L : SizeData₂ D) : L.sc.w'' D.R.n ≤ L.sc.b' / L.sc.x := by
   obtain ⟨hx, -, -, -, hb'⟩ := Lnk.sc_pos L.sc
   have hn := Lnk.one_le_n D.R
   unfold Scale.w''
   apply div_le_div_of_nonneg_left hb'.le hx
-  nlinarith
+  exact le_mul_of_one_le_right hx.le hn
 
 theorem pd_wpp_le_b (L : SizeData₂ D) : L.sc.w'' D.R.n ≤ L.sc.b := by
   obtain ⟨hx, hb, ha, hX, hb'⟩ := Lnk.sc_pos L.sc
@@ -1482,7 +1476,8 @@ theorem pow_four_lt_ceil_threshold_prime (sK : SizeK L) (h3 : 3 ≤ L.sc.x)
     linarith
   have hk1 : (1 : ℝ) ≤ (D.R.k : ℝ) := le_trans h4 hk
   unfold Scale.p0
-  have h5 : (D.R.k : ℝ) ≤ (D.R.k : ℝ) ^ 2 := by nlinarith
+  have h5 : (D.R.k : ℝ) ≤ (D.R.k : ℝ) ^ 2 := by
+    rw [sq]; exact le_mul_of_one_le_right (by linarith) hk1
   have h6 : (D.R.k : ℝ) ^ 2 * 2 ≤ (D.R.k : ℝ) ^ 2 * L.sc.x ^ Scale.A :=
     mul_le_mul_of_nonneg_left hA (by positivity)
   linarith
@@ -1512,7 +1507,12 @@ theorem pe_Sc_le
     have e1 : L.sc.x ^ (7 : ℝ) = L.sc.x ^ (2 : ℝ) * L.sc.x ^ (5 : ℝ) := by
       rw [← Real.rpow_add hx]; norm_num
     rw [e1, Real.rpow_two]
-    exact mul_le_mul_of_nonneg_right (by nlinarith) (Real.rpow_nonneg hx.le _)
+    have h4x2 : (4 : ℝ) ≤ L.sc.x ^ 2 := by
+      calc
+        (4 : ℝ)
+          ≤ 3 ^ 2 := by norm_num
+        _ ≤ L.sc.x ^ 2 := pow_le_pow_left₀ (by norm_num) h3 2
+    exact mul_le_mul_of_nonneg_right h4x2 (Real.rpow_nonneg hx.le _)
   have hexp
       : Real.exp (L.sc.x ^ (L.sc.eps / 4))
         = Real.exp (1 / 2 * L.sc.x ^ (L.sc.eps / 4)) * Real.exp (L.sc.x ^ (L.sc.eps / 4) / 2) := by
@@ -1534,7 +1534,7 @@ theorem pe_log_a (s : Scale) : 0 ≤ Real.log s.a := by
   apply Real.log_nonneg
   have := Lnk.one_le_b s
   unfold Scale.a
-  nlinarith [s.one_lt_alt]
+  exact one_le_mul_of_one_le_of_one_le s.one_lt_alt.le this
 
 theorem pe_rho_nonneg (K : G.Consts) (hK : K.Nonneg) : 0 ≤ G.rhoB D K L.sc := by
   have hx := scale_pos_alt L.sc
@@ -1562,7 +1562,7 @@ theorem pe_th
   · positivity
   · rw [one_div]
     apply inv_anti₀ hx
-    nlinarith
+    exact hA.trans (le_mul_of_one_le_left (hx.le.trans hA) hk)
 
 theorem scale_sq_le_rank_pow (sK : SizeK L)
     : L.sc.x ^ 2 ≤ (D.R.k : ℝ) ^ 2 * L.sc.x ^ (3 * Scale.A) := by
@@ -1570,8 +1570,9 @@ theorem scale_sq_le_rank_pow (sK : SizeK L)
   have h1 := pe_k_ge sK
   have h2 : (1 : ℝ) ≤ L.sc.x ^ (3 * Scale.A) := pe_one_le _ (by unfold Scale.A; norm_num)
   have h3 : (1 : ℝ) ≤ L.sc.x ^ 2 := one_le_pow₀ L.sc.one_lt_alt.le
-  have h4 : (D.R.k : ℝ) ≤ (D.R.k : ℝ) ^ 2 := by nlinarith
-  nlinarith
+  have h4 : (D.R.k : ℝ) ≤ (D.R.k : ℝ) ^ 2 := by
+    rw [sq]; exact le_mul_of_one_le_right (by linarith) (by linarith)
+  exact (h1.trans h4).trans (le_mul_of_one_le_right (by positivity) h2)
 
 theorem pe_d
     (sQD : SizeQD L) (hE : L.sc.x ^ (2 : ℝ) ≤ Real.exp (1 * L.sc.x ^ (L.sc.ez / 5 - L.sc.ez / 100)))
@@ -1601,8 +1602,11 @@ theorem pe_Y
       _ ≤ L.sc.x ^ (0 : ℝ) := Lnk.rpow_mono' _ (by norm_num)
       _ = 1 := Real.rpow_zero _
   constructor
-  · nlinarith
-  · nlinarith
+  · exact one_le_mul_of_one_le_of_one_le hX (by linarith)
+  · calc
+      L.sc.X' * (1 + Cr * G.rhoB D K L.sc)
+        ≤ L.sc.X' * 2 := mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+      _ = 2 * L.sc.X' := by ring
 
 theorem rank_count_scaled_bounds (sN : SizeN L) (sM : SizeM L) (sTT : SizeTT L) (h3 : 3 ≤ L.sc.x)
     : 0 ≤ (D.R.m : ℝ) * (D.host.TT.card : ℝ) * L.sc.x ^ (-12 : ℝ)
@@ -1924,11 +1928,7 @@ theorem two_not_inert (D : D7) : ¬ InertK D 2 := by
   have hcl : D.host.cls 2 = PrimeClass.ram2 := primeClass_two D.host.toHostRaw
   rintro (h | h) <;> rw [hcl] at h <;> cases h
 
-theorem mem_sAt {p : ℕ} : p ∈ sAt L K ↔ G.Cand D L K p := by
-  classical
-  unfold sAt
-  rw [Finset.mem_filter, Finset.mem_range]
-  exact ⟨fun h => h.2, fun h => ⟨Nat.lt_ceil.mpr h.2.1, h⟩⟩
+alias mem_sAt := _root_.Formalism.L2.GlobalTheoryTheory.Loss.pa_mem_sAt
 
 end AtRecord
 

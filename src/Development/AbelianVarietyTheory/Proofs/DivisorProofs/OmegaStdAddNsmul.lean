@@ -47,6 +47,7 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 import Development.AbelianVarietyTheory.Definitions.Divisors.SRelOneOneIff
 import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -59,12 +60,6 @@ open scoped CategoryTheory.Obj
 noncomputable section
 
 namespace GlobalTheory.SiegCover
-
-theorem unitOn_pow' {R : Type} [CommRing R] (u : Rˣ) (m : ℕ) : unitOn (u ^ m) = unitOn u ^ m := by
-  unfold unitOn; exact map_pow _ u m
-
-theorem unitOn_one' {R : Type} [CommRing R] : unitOn (1 : Rˣ) = 1 := by
-  unfold unitOn; exact map_one _
 
 theorem weilIs_congr_base
     {S : Scheme.{0}} {A : Over S} [GrpObj A]
@@ -100,8 +95,8 @@ theorem weilTransport
 theorem omegaStd_add_nsmul {h : ℕ} (N : ℕ) (a a' c₁ c₂ : Fin h ⊕ Fin h → ℤ)
     : omegaStd (a + N • c₁) (a' + N • c₂)
       = omegaStd a a' + N * (omegaStd c₁ a' + omegaStd a c₂ + N * omegaStd c₁ c₂) := by
-  simp only [omegaStd, Pi.add_apply, Pi.smul_apply, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply,
-    mul_add, Finset.mul_sum, ← Finset.sum_add_distrib]
+  simp only [omegaStd, Pi.add_apply, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply, mul_add,
+    Finset.mul_sum, ← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun i _ => by ring
 
 end GlobalTheory.SiegCover

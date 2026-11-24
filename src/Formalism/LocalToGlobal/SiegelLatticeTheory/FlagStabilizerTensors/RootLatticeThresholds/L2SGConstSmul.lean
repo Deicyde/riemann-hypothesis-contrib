@@ -96,9 +96,7 @@ theorem l2SG_const_smul
     : l2SG ν (fun m => s • f m) = (‖s‖₊ : ℝ≥0∞) ^ 2 * l2SG ν f := by
   unfold l2SG
   simp only [nnnorm_smul, ENNReal.coe_mul, mul_pow]
-  first
-  | exact lintegral_const_mul' _ _ (by simp)
-  | exact lintegral_const_mul' _ _ (ENNReal.pow_ne_top ENNReal.coe_ne_top)
+  first | exact lintegral_const_mul' _ _ (by simp)
 
 theorem goodSRest_of
     {C : Choice X θ} (hB : WuBessel C)

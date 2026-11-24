@@ -105,7 +105,3 @@ theorem estBlockOfSumForm_ok : EstBlockOfSumForm := by
     exact h.trans (mul_le_mul_of_nonneg_right hMv hX)
 
 end Formalism.FourierDecayAlt.P.BaseGramNonnegativity
-
-theorem Formalism.FourierDecayAlt.P.blockEstimateOfCosetSum
-    : Formalism.FourierDecayAlt.crystallineComparison.EstBlockOfSumForm :=
-  Formalism.FourierDecayAlt.P.BaseGramNonnegativity.estBlockOfSumForm_ok

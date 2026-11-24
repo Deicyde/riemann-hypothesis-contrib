@@ -111,7 +111,7 @@ theorem _root_.GlobalTheory.HL.SAN.mem_coord
       intro j
       by_cases h : j = i
       · subst h; simp [L.O.one_mem]
-      · simp [Pi.single_apply, h, L.O.zero_mem]
+      · simp [h, L.O.zero_mem]
     | zero =>
       intro j; exact L.O.zero_mem
     | add y z _ _ hy hz =>

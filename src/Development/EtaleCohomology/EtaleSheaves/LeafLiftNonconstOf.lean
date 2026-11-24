@@ -69,15 +69,7 @@ theorem appTop_eq
     (e)
     : g.appLE ⊤ ⊤ e = (Spec.map f).appTop := by
   subst hg
-  first
-  | exact Scheme.Hom.appLE_eq_app _
-  | (simp only [Scheme.Hom.appLE]; exact (CategoryTheory.Category.comp_id _).trans rfl)
-  | (simp only [Scheme.Hom.appLE]; erw [CategoryTheory.Functor.map_id, Category.comp_id]; rfl)
-  | (
-      simp only [Scheme.Hom.appLE, Scheme.Hom.appTop]
-      convert Category.comp_id _ using 2
-      exact (Subsingleton.elim _ _ : (homOfLE e).op = 𝟙 _) ▸ rfl
-    )
+  first | exact Scheme.Hom.appLE_eq_app _
 
 theorem stalk_inj
     {X : Scheme.{0}} [IsIntegral X]

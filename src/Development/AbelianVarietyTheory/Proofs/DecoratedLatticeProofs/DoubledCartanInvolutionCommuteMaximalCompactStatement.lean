@@ -72,7 +72,4 @@ theorem _root_.GlobalTheory.T.doubled_cartanInvolution_commute_maximalCompact
               = (Matrix.fromBlocks (sA τ) 0 0 (- sA τ)).submatrix finSumFinEquiv.symm
                   finSumFinEquiv.symm
                 * compAt θ τ (Formalism.L2.Theta.mt (dblSp A) k) := by
-  first
-  | exact @GlobalTheory.Core.Rk.IP.Cartan.cartan_dbl
-  | exact GlobalTheory.Core.Rk.IP.Cartan.cartan_dbl
-  | (intros; apply GlobalTheory.Core.Rk.IP.Cartan.cartan_dbl <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.IP.Cartan.cartan_dbl

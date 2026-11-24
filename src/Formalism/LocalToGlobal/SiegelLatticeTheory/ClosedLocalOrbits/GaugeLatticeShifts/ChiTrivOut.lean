@@ -52,7 +52,8 @@ open Formalism.L2.SG.TermOp.Vanish
 theorem nilradical_conj_level' : NilradicalConjLevel :=
   nilradical_conj_level_of_mem fun _ X u => unipotent_in_level X u
 
-theorem chiTrivialC_outright : ChiTrivialC := chiTrivialC_of_nconj nilradical_conj_level'
+theorem chiTrivialC_outright : ChiTrivialC :=
+  _root_.Formalism.L2.SG.NormCut.chiTrivialC_of_nilradicalConjLevel nilradical_conj_level'
 
 theorem lemmaVC_of_rest (hA : AvgCore) (h3 : RCocompactC) (h4 : NonRelCharC)
     : Formalism.L2.SG.Full.LemmaVC :=

@@ -66,10 +66,10 @@ def UP : Subgroup (GG p) where
     refine ⟨?_, ?_⟩
     · show IsLoUni ((x.1 * y.1 : GLp p) : MP p)
       rw [Units.val_mul]
-      exact ZsVolGrp.isLoUni_mul hx1 hy1
+      exact _root_.PI.TermAttrConst.UnitaryGroupMassFormula.isLoUni_mul hx1 hy1
     · show IsUpUni (((x.2 * y.2).unop : GLp p) : MP p)
       rw [MulOpposite.unop_mul, Units.val_mul]
-      exact ZsVolGrp.isUpUni_mul hy2 hx2
+      exact _root_.GlobalTheory.UpperUnipotentProductInertiaEigenvalues.isUpUni_mul hy2 hx2
   inv_mem' := by
     rintro x ⟨hx1, hx2⟩
     refine ⟨?_, ?_⟩

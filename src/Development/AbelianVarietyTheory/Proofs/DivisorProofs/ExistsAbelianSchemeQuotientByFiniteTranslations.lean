@@ -8,11 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Fla
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ForallGeometricallyIntegralOfSmoothOfGeometrical
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.QuotientIsAbelianSchemeOfQuotientScheme
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsGloballyGeneratedIffGeneratingSections
-import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FormallyUnramifiedOfCompOfEtaleOfSurjective
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsGaloisCoverOfIsQProjOver
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GaloisCoverDescentAndCartesianSquares
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsProperAndGeometricallyConnectedOfIsNilpotent
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.LocallyOfFinitePresentationOfCancelStatement
+public import Mathlib.AlgebraicGeometry.Morphisms.Finite
+public import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
+public import Mathlib.AlgebraicGeometry.Morphisms.Flat
+public import Mathlib.Combinatorics.Quiver.ReflQuiver
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.LocallyOfFinitePresentationOfCancel
+public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleLBOfRelAmpleOfIsAffine
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FormallyUnramifiedOfCompOfEtaleOfSurjective
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -56,43 +61,50 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
-public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleLBOfRelAmpleOfIsAffine
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
 
 noncomputable section
 namespace GlobalTheory.TranslQuotient
 
-theorem finiteSubsets_preimage {S : Scheme.{0}} (A : Over S) [GrpObj A] (L : LB A.left) (hL : L.IsLB)
-    (hamp : Out.RelAmple A L) (U : S.Opens) (hU : IsAffineOpen U) :
-    FiniteSubsetsInAffineOpens (A.hom ⁻¹ᵁ U) := by
+theorem finiteSubsets_preimage
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    (L : LB A.left) (hL : L.IsLB) (hamp : Out.RelAmple A L)
+    (U : S.Opens) (hU : IsAffineOpen U)
+    : FiniteSubsetsInAffineOpens (A.hom ⁻¹ᵁ U) := by
   have h := GlobalTheory.isAmpleLB_of_relAmple A hL hamp U hU
   exact ⟨fun s hs => by
     obtain ⟨n, -, t, h1, -, h2⟩ := h.exists_affine_finite_subset hs (U := ⊤) (Set.subset_univ _)
     exact ⟨_, h2, h1⟩⟩
 
-theorem transl_mul {S : Scheme.{0}} {A : Over S} [GrpObj A] (a c : 𝟙_ (Over S) ⟶ A) :
-    Hecke.transl (a * c) = Hecke.transl a ≫ Hecke.transl c := by
-  simp only [Hecke.transl, comp_mul, Category.id_comp, Category.comp_id]
+theorem transl_mul {S : Scheme.{0}} {A : Over S} [GrpObj A] (a c : 𝟙_ (Over S) ⟶ A)
+    : Hecke.transl (a * c) = Hecke.transl a ≫ Hecke.transl c := by
+  simp only [Hecke.transl, comp_mul, Category.comp_id]
   rw [← Category.assoc, toUnit_unique (_ ≫ toUnit A) (toUnit A)]
   exact (mul_assoc _ _ _).symm
 
-theorem transl_one {S : Scheme.{0}} {A : Over S} [GrpObj A] :
-    Hecke.transl (1 : 𝟙_ (Over S) ⟶ A) = 𝟙 A := by
+theorem transl_one {S : Scheme.{0}} {A : Over S} [GrpObj A]
+    : Hecke.transl (1 : 𝟙_ (Over S) ⟶ A) = 𝟙 A := by
   simp [Hecke.transl]
 
-theorem isAbelianScheme_of_finite_etale {S : Scheme.{0}} (A Q : Over S) [GrpObj A] [GrpObj Q]
-    (q : A ⟶ Q) (hA : IsAbelianScheme A) (hQ : IsCommMonObj Q) (hfin : IsFinite q.left)
-    (het : Etale q.left) (hsurj : Surjective q.left) : IsAbelianScheme Q := by
+theorem isAbelianScheme_of_finite_etale
+    {S : Scheme.{0}} (A Q : Over S) [GrpObj A] [GrpObj Q]
+    (q : A ⟶ Q)
+    (hA : IsAbelianScheme A) (hQ : IsCommMonObj Q) (hfin : IsFinite q.left) (het : Etale q.left)
+    (hsurj : Surjective q.left)
+    : IsAbelianScheme Q := by
   have := hA.smooth
   have := hA.proper
   have := hA.geomConnected
   have hw : q.left ≫ Q.hom = A.hom := Over.w q
-  have := GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A.hom
-    hA.smooth hA.geomConnected
+  have :=
+    GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A.hom
+      hA.smooth hA.geomConnected
   have : Flat (q.left ≫ Q.hom) := by rw [hw]; infer_instance
   have : UniversallyClosed (q.left ≫ Q.hom) := by rw [hw]; infer_instance
   have : IsSeparated (q.left ≫ Q.hom) := by rw [hw]; infer_instance
@@ -104,16 +116,22 @@ theorem isAbelianScheme_of_finite_etale {S : Scheme.{0}} (A Q : Over S) [GrpObj 
   have := GlobalTheory.NilProper.isSeparated_of_comp_surjective q.left Q.hom
   have := GlobalTheory.AbelianQuotient.geometricallyReduced_of_comp q.left Q.hom
   have : LocallyOfFinitePresentation Q.hom :=
-    GlobalTheory.T.locallyOfFinitePresentation_of_cancel q.left Q.hom hfin inferInstance inferInstance hsurj inferInstance
-  exact ⟨hQ, GlobalTheory.AbelianQuotient.smooth_of_grpObj_of_flat Q, ⟨⟩,
-    GlobalTheory.AbelianQuotient.geometricallyConnected_of_comp q.left Q.hom⟩
-
+    _root_.GlobalTheory.CompanionTheory.LfpDescent.descends q.left Q.hom hfin inferInstance
+      inferInstance hsurj inferInstance
+  exact ⟨
+    hQ,
+    GlobalTheory.AbelianQuotient.smooth_of_grpObj_of_flat Q,
+    ⟨⟩,
+    GlobalTheory.AbelianQuotient.geometricallyConnected_of_comp q.left Q.hom
+  ⟩
 
 open GlobalTheory.AbelianQuotient in
-theorem grp_descent : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonObj A] (q : A ⟶ Q),
-    Flat q.left → Surjective q.left → QuasiCompact q.left →
-    (∀ (W : Over S) (a b c d : W ⟶ A), a ≫ q = b ≫ q → c ≫ q = d ≫ q → (a * c) ≫ q = (b * d) ≫ q) →
-    ∃ _ : GrpObj Q, IsCommMonObj Q ∧ IsMonHom q := by
+theorem grp_descent
+    : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonObj A] (q : A ⟶ Q),
+      Flat q.left → Surjective q.left → QuasiCompact q.left
+        → (∀ (W : Over S) (a b c d : W ⟶ A),
+          a ≫ q = b ≫ q → c ≫ q = d ≫ q → (a * c) ≫ q = (b * d) ≫ q)
+        → ∃ _ : GrpObj Q, IsCommMonObj Q ∧ IsMonHom q := by
   intro S A Q _ _ q _ _ _ hq
   have hinv : ∀ {W : Over S} (a b : W ⟶ A), a ≫ q = b ≫ q → a⁻¹ ≫ q = b⁻¹ ≫ q := by
     intro W a b h
@@ -131,16 +149,18 @@ theorem grp_descent : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonO
   have := FlatQuotient.epi_of_flat_surjective q
   have := FlatQuotient.epi_tensorHom q q
   have := FlatQuotient.epi_tensorHom (q ⊗ₘ q) q
-  obtain ⟨m, hm⟩ := exists_desc (q ⊗ₘ q) (μ[A] ≫ q) (by
-    intro W a b h
-    have h1 : (a ≫ fst A A) ≫ q = (b ≫ fst A A) ≫ q := by simpa using h =≫ fst Q Q
-    have h2 : (a ≫ snd A A) ≫ q = (b ≫ snd A A) ≫ q := by simpa using h =≫ snd Q Q
-    rw [← Category.assoc, ← Category.assoc, hμ a, hμ b]
-    exact hq W _ _ _ _ h1 h2)
-  obtain ⟨n, hn⟩ := exists_desc q (GrpObj.inv ≫ q) (by
-    intro W a b h
-    rw [← Category.assoc, ← Category.assoc, ← Hom.inv_def, ← Hom.inv_def]
-    exact hinv a b h)
+  obtain ⟨m, hm⟩ :=
+    exists_desc (q ⊗ₘ q) (μ[A] ≫ q) (by
+      intro W a b h
+      have h1 : (a ≫ fst A A) ≫ q = (b ≫ fst A A) ≫ q := by simpa using h =≫ fst Q Q
+      have h2 : (a ≫ snd A A) ≫ q = (b ≫ snd A A) ≫ q := by simpa using h =≫ snd Q Q
+      rw [← Category.assoc, ← Category.assoc, hμ a, hμ b]
+      exact hq W _ _ _ _ h1 h2)
+  obtain ⟨n, hn⟩ :=
+    exists_desc q (GrpObj.inv ≫ q) (by
+      intro W a b h
+      rw [← Category.assoc, ← Category.assoc, ← Hom.inv_def, ← Hom.inv_def]
+      exact hinv a b h)
   have key : ∀ {W : Over S} (a b : W ⟶ A), lift (a ≫ q) (b ≫ q) ≫ m = (a * b) ≫ q := by
     intro W a b
     rw [← lift_map, Category.assoc, hm, Hom.mul_def, Category.assoc]
@@ -197,14 +217,17 @@ theorem grp_descent : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonO
   rw [← cancel_epi (q ⊗ₘ q), BraidedCategory.braiding_naturality_assoc, ← IsMonHom.mul_hom,
     IsCommMonObj.mul_comm_assoc]
 
-theorem comp_transl {S : Scheme.{0}} {A W : Over S} [GrpObj A] (x : W ⟶ A) (h : 𝟙_ (Over S) ⟶ A) :
-    x ≫ Hecke.transl h = x * (toUnit _ ≫ h) := by
-  rw [Hecke.transl, comp_mul, Category.comp_id, ← Category.assoc, toUnit_unique (x ≫ toUnit A) (toUnit _)]
+theorem comp_transl {S : Scheme.{0}} {A W : Over S} [GrpObj A] (x : W ⟶ A) (h : 𝟙_ (Over S) ⟶ A)
+    : x ≫ Hecke.transl h = x * (toUnit _ ≫ h) := by
+  rw [Hecke.transl, comp_mul, Category.comp_id, ← Category.assoc,
+    toUnit_unique (x ≫ toUnit A) (toUnit _)]
 
-theorem transl_compat : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonObj A]
-    (H : Subgroup (𝟙_ (Over S) ⟶ A)) (q : A ⟶ Q),
-    GlobalTheory.ZM.IsGaloisCover H (fun h => (GlobalTheory.UPel.HT.Hecke.transl h.1).left) q.left →
-    ∀ (W : Over S) (a b c d : W ⟶ A), a ≫ q = b ≫ q → c ≫ q = d ≫ q → (a * c) ≫ q = (b * d) ≫ q := by
+theorem transl_compat
+    : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMonObj A] (H : Subgroup (𝟙_ (Over S) ⟶ A))
+        (q : A ⟶ Q),
+      GlobalTheory.ZM.IsGaloisCover H (fun h => (GlobalTheory.UPel.HT.Hecke.transl h.1).left) q.left
+        → ∀ (W : Over S) (a b c d : W ⟶ A),
+          a ≫ q = b ≫ q → c ≫ q = d ≫ q → (a * c) ≫ q = (b * d) ≫ q := by
   intro S A Q _ _ H q hc W a b c d hab hcd
   have loc := (GlobalTheory.ZM.galoisCover_descent _ _ _ _ _ hc).2.1
   apply Over.OverMorphism.ext
@@ -217,13 +240,13 @@ theorem transl_compat : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMo
     rw [← comp_transl, Category.assoc]
     ext
     simp only [Over.comp_left, Over.homMk_left, jV]
-    rw [← W.left.homOfLE_ι (inf_le_left : V₁ ⊓ V₂ ≤ V₁), ]
+    rw [← W.left.homOfLE_ι (inf_le_left : V₁ ⊓ V₂ ≤ V₁)]
     simp only [Category.assoc, e₁]
   have f₂ : jV ≫ d = (jV ≫ c) * (toUnit _ ≫ k.1) := by
     rw [← comp_transl, Category.assoc]
     ext
     simp only [Over.comp_left, Over.homMk_left, jV]
-    rw [← W.left.homOfLE_ι (inf_le_right : V₁ ⊓ V₂ ≤ V₂), ]
+    rw [← W.left.homOfLE_ι (inf_le_right : V₁ ⊓ V₂ ≤ V₂)]
     simp only [Category.assoc, e₂]
   have hinv : Hecke.transl (h * k).1 ≫ q = q := Over.OverMorphism.ext (hc.inv (h * k))
   have key : jV ≫ (b * d) = jV ≫ (a * c) ≫ Hecke.transl (h * k).1 := by
@@ -233,24 +256,38 @@ theorem transl_compat : ∀ (S : Scheme.{0}) (A Q : Over S) [GrpObj A] [IsCommMo
     rw [← Category.assoc jV (b * d), key, Category.assoc, Category.assoc, hinv]
   simpa [jV] using congrArg CommaMorphism.left key'
 
-theorem exists_quotient : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (L : LB A.left) (H : Subgroup (𝟙_ (Over S) ⟶ A)), IsAbelianScheme A → L.IsLB → Out.RelAmple A L → Finite H → (∀ (κ : Type) [Field κ] [IsAlgClosed κ] (x : Sp κ ⟶ S) (h : 𝟙_ (Over S) ⟶ A), h ∈ H → toUnit (Over.mk x) ≫ h = 1 → h = 1) → ∃ (A' : Over S) (_ : GrpObj A') (_ : IsCommMonObj A') (ψ : A ⟶ A'), IsAbelianScheme A' ∧ IsMonHom ψ ∧ GlobalTheory.ZM.IsGaloisCover H (fun h => (GlobalTheory.UPel.HT.Hecke.transl h.1).left) ψ.left := by
+theorem exists_quotient
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (L : LB A.left)
+        (H : Subgroup (𝟙_ (Over S) ⟶ A)),
+      IsAbelianScheme A → L.IsLB → Out.RelAmple A L → Finite H
+        → (∀ (κ : Type) [Field κ] [IsAlgClosed κ] (x : Sp κ ⟶ S) (h : 𝟙_ (Over S) ⟶ A),
+          h ∈ H → toUnit (Over.mk x) ≫ h = 1 → h = 1)
+        → ∃ (A' : Over S) (_ : GrpObj A') (_ : IsCommMonObj A') (ψ : A ⟶ A'),
+          IsAbelianScheme A' ∧ IsMonHom ψ
+            ∧ GlobalTheory.ZM.IsGaloisCover H
+              (fun h => (GlobalTheory.UPel.HT.Hecke.transl h.1).left)
+              ψ.left := by
   intro S A _ _ L H hA hL hamp hH hfree
   let ρ : H → (A.left ⟶ A.left) := fun h => (Hecke.transl h.1).left
   have h1 : ρ 1 = 𝟙 _ := by
     show (Hecke.transl (1 : 𝟙_ (Over S) ⟶ A)).left = _
-    rw [transl_one]; rfl
+    rw [transl_one]
+    rfl
   have hm : ∀ a c, ρ (a * c) = ρ a ≫ ρ c := fun a c => by
     show (Hecke.transl (a.1 * c.1)).left = _
-    rw [transl_mul]; rfl
+    rw [transl_mul]
+    rfl
   have hS : ∀ a, ρ a ≫ A.hom = A.hom := fun a => Over.w _
   let τ := GlobalTheory.ZM.autOfRightAction ρ h1 hm
   have hτ : ∀ a, (τ a).asIso.hom ≫ A.hom = A.hom := fun a => hS a⁻¹
-  have : OrbitsInAffineOpens τ := OrbitsInAffineOpens.of_locally_on_base τ A.hom hτ fun s => by
-    obtain ⟨_, ⟨U, hU, rfl⟩, hsU, -⟩ :=
-      S.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ s) isOpen_univ
-    exact ⟨U, hsU, finiteSubsets_preimage A L hL hamp U hU⟩
-  have hfreeρ : ∀ (k : Type) [Field k] [IsAlgClosed k] (y : Spec (.of k) ⟶ A.left) (a : H),
-      y ≫ ρ a = y → a = 1 := by
+  have : OrbitsInAffineOpens τ :=
+    OrbitsInAffineOpens.of_locally_on_base τ A.hom hτ fun s => by
+      obtain ⟨_, ⟨U, hU, rfl⟩, hsU, -⟩ :=
+        S.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ s) isOpen_univ
+      exact ⟨U, hsU, finiteSubsets_preimage A L hL hamp U hU⟩
+  have hfreeρ
+      : ∀ (k : Type) [Field k] [IsAlgClosed k] (y : Spec (.of k) ⟶ A.left) (a : H),
+        y ≫ ρ a = y → a = 1 := by
     intro k _ _ y a hy
     let y' : Over.mk (y ≫ A.hom) ⟶ A := Over.homMk y rfl
     have e : y' ≫ Hecke.transl a.1 = y' := Over.OverMorphism.ext hy
@@ -262,11 +299,18 @@ theorem exists_quotient : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMo
     exact Subtype.ext (hfree k (y ≫ A.hom) a.1 a.2 h2)
   have hf : IsFreeAction τ := .of_isAlgClosed fun k _ _ y a h ↦ inv_eq_one.mp (hfreeρ k y a⁻¹ h)
   obtain ⟨Y, π, hQ⟩ := (GlobalTheory.exists_isAffineQuotient_iff τ).mpr ‹OrbitsInAffineOpens τ›
-  let ψ : A ⟶ Over.mk (hQ.desc A.hom hτ) :=
-    Over.homMk π (hQ.comp_desc A.hom hτ)
+  let ψ : A ⟶ Over.mk (hQ.desc A.hom hτ) := Over.homMk π (hQ.comp_desc A.hom hτ)
   have hc : GlobalTheory.ZM.IsGaloisCover H ρ ψ.left := by
-    refine ⟨hH, h1, hm, fun a ↦ ?_, hQ.isFinite_of_isFreeAction hf,
-      hQ.etale_of_isFreeAction hf, hQ.surjective, fun k _ _ y y' e ↦ ?_⟩
+    refine ⟨
+      hH,
+      h1,
+      hm,
+      fun a ↦ ?_,
+      hQ.isFinite_of_isFreeAction hf,
+      hQ.etale_of_isFreeAction hf,
+      hQ.surjective,
+      fun k _ _ y y' e ↦ ?_
+    ⟩
     · have := hQ.comp_eq a⁻¹
       rwa [GlobalTheory.ZM.autOfRightAction_hom, inv_inv] at this
     · obtain ⟨a, ha⟩ := (hQ.comp_eq_comp_iff y y').mp e
@@ -279,10 +323,17 @@ theorem exists_quotient : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMo
   have := hc.fin
   have := hc.etale
   have := hc.onto
-  obtain ⟨inst, hcomm, hhom⟩ := grp_descent S A _ ψ inferInstance hc.onto inferInstance
-    (transl_compat S A _ H ψ hc)
-  exact ⟨_, inst, hcomm, ψ, isAbelianScheme_of_finite_etale A _ ψ hA hcomm hc.fin hc.etale hc.onto,
-    hhom, hc⟩
+  obtain ⟨inst, hcomm, hhom⟩ :=
+    grp_descent S A _ ψ inferInstance hc.onto inferInstance (transl_compat S A _ H ψ hc)
+  exact ⟨
+    _,
+    inst,
+    hcomm,
+    ψ,
+    isAbelianScheme_of_finite_etale A _ ψ hA hcomm hc.fin hc.etale hc.onto,
+    hhom,
+    hc
+  ⟩
 
 end GlobalTheory.TranslQuotient
 

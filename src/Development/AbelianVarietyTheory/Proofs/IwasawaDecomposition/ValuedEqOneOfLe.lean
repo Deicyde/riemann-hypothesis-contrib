@@ -143,7 +143,7 @@ theorem continuous_finP {N : ℕ} (hN : 0 < N) (ψ : FI L →* ℂˣ) (hψ : ∀
         P ∉ T → Valued.v (N : P.adicCompletion L) = 1 :=
     ⟨(finite_nat (L := L) hN).toFinset, fun P hP => by simpa using hP⟩
   choose n hn using fun P : HeightOneSpectrum (𝓞 L) =>
-    GlobalTheory.Idele.exists_exp_neg_lt (GlobalTheory.AdLat.valued_natCast_ne_zero P hN)
+    WithZero.exists_exp_neg_natCast_lt (GlobalTheory.AdLat.valued_natCast_ne_zero P hN)
   have ho := (GlobalTheory.Mem.UnitOpen.unit_open_and_congr_open L).2 T (T.sup n)
   have h1 :=
     ho.mem_nhds (x := (1 : Ideles L)) ⟨

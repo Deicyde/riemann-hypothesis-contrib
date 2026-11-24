@@ -307,7 +307,7 @@ theorem exists_antisymm_eq_mul (p : LaurentRing n)
   | single μ c =>
     obtain ⟨q, hq⟩ := exists_alternant_eq_mul μ
     refine ⟨c • q, ?_⟩
-    have : (single μ c : LaurentRing n) = c • monomial μ := by simp [monomial, smul_single']
+    have : (single μ c : LaurentRing n) = c • monomial μ := by simp [monomial]
     rw [this, map_smul, ← alternant, hq, mul_smul_comm]
 
 theorem coeff_alternant_staircase : (alternant (staircase n)).coeff (staircase n) = 1 := by
@@ -376,7 +376,6 @@ theorem lamS_comp_symm (σ : Equiv.Perm (Fin n)) (S : Finset (Fin n))
   simp only [Function.comp_apply, lamS_apply, Finset.mem_map_equiv]
 
 theorem permAct_esymmL (r : ℕ) (σ : Equiv.Perm (Fin n)) : permAct σ (esymmL n r) = esymmL n r := by
-
   rw [esymmL, map_sum]
   simp only [permAct_monomial, lamS_comp_symm]
   refine Finset.sum_nbij'

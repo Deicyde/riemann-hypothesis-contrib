@@ -76,8 +76,7 @@ theorem exists_ltSeries_lift
     exact ⟨RelSeries.singleton _ ⟨Q, hQ⟩, rfl, hQc⟩
   | succ n ih =>
     intro p hp
-    obtain ⟨q', hq'len, hq'c⟩ :=
-      ih p.eraseLast (by first | (show p.length - 1 = n; omega) | simp [hp])
+    obtain ⟨q', hq'len, hq'c⟩ := ih p.eraseLast (by first | (show p.length - 1 = n; omega))
     have hlt : p.eraseLast.last < p.last := p.eraseLast_last_rel_last (by omega)
     obtain ⟨Q, hQle, hQ, hQc⟩ :=
       Ideal.exists_ideal_over_prime_of_isIntegral_of_isPrime p.last.asIdeal q'.last.asIdeal (by
@@ -137,10 +136,7 @@ theorem exists_gt_of_comap_int_eq_bot
     let f : MvPolynomial σ ℤ →+* A ⧸ p := (Ideal.Quotient.mk p).comp g
     have hf : Function.Surjective f := Ideal.Quotient.mk_surjective.comp hg
     have hint : (f.comp MvPolynomial.C).IsIntegral := by
-      first
-      | exact MvPolynomial.comp_C_integral_of_surjective_of_isJacobsonRing f hf
-      | exact Ideal.MvPolynomial.comp_C_integral_of_surjective_of_isJacobsonRing f hf
-      | exact MvPolynomial.comp_C_integral_of_surjective_of_isJacobson f hf
+      first | exact MvPolynomial.comp_C_integral_of_surjective_of_isJacobsonRing f hf
     have hinj : Function.Injective (f.comp MvPolynomial.C) := by
       rw [RingHom.injective_iff_ker_eq_bot, eq_bot_iff]
       intro x hx

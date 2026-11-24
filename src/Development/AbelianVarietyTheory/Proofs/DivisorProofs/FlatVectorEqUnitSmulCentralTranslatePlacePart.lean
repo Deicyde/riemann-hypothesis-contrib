@@ -84,7 +84,6 @@ open GlobalTheory.ConjTwist (BaseOf UnitOff)
 open GlobalTheory.FlatVecSum (princ)
 open scoped TensorProduct
 
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
 open GlobalTheory.BigOn.Exp.TupLe.Swap
@@ -286,7 +285,7 @@ theorem dil_part
           = ((Real.sqrt (Rr.card : ℝ) : ℝ) : ℂ) * ((Real.sqrt (Rr.card : ℝ) : ℝ) : ℂ) := by
       rw [← Complex.ofReal_mul, Real.mul_self_sqrt (Nat.cast_nonneg _), Complex.ofReal_natCast]
     rw [hs]
-    simp only [splitFacO, map_one, mul_one, Circle.coe_mul, Circle.coe_inv]
+    simp only [splitFacO, map_one, mul_one, Circle.coe_inv]
     by_cases h0 : ((Real.sqrt (Rr.card : ℝ) : ℝ) : ℂ) = 0
     · rw [h0]; simp
     · field_simp

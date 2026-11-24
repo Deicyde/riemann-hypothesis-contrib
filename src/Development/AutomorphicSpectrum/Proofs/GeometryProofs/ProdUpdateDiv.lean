@@ -143,7 +143,7 @@ theorem stepMinor_smul
     : stepMinor (b • A) i J = b ^ ((i : ℕ) + 1) * stepMinor A i J := by
   unfold stepMinor
   rw [Matrix.submatrix_smul]
-  simp [Matrix.det_smul]
+  simp
 
 theorem flagMat_eq
     {E : Type} [AddCommGroup E] [Module Ω E]

@@ -89,11 +89,7 @@ theorem secZ_eq_zero_of_genVal
   obtain ⟨a, ha⟩ : ∃ a, Ideal.Quotient.mk p.I a = g p u := Ideal.Quotient.mk_surjective _
   show g p u = 0
   rw [← ha, Ideal.Quotient.eq_zero_iff_mem]
-  have hJ : p.I.jacobson = p.I := by
-    first
-    | exact IsJacobsonRing.out' _ p.rad
-    | exact IsJacobsonRing.out inferInstance p.rad
-    | exact Ideal.IsJacobson.out' _ p.rad
+  have hJ : p.I.jacobson = p.I := by first | exact IsJacobsonRing.out' _ p.rad
   rw [← hJ, Ideal.jacobson, Submodule.mem_sInf]
   rintro m ⟨hIm, hm⟩
   letI : Field (MvPolynomial _ c.F ⧸ m) := Ideal.Quotient.field m

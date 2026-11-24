@@ -94,7 +94,4 @@ theorem _root_.GlobalTheory.T.exists_goodPlace_translateCombination_latticeIndic
               c • om' (κ k, 1)
                 (∑ k, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure (f k) (φ k)))
             ∈ Γ.M'.So B.ψ B.τ₁ := by
-  first
-  | exact @GlobalTheory.CombAtGood.exists_comb_translates_mem_So
-  | exact GlobalTheory.CombAtGood.exists_comb_translates_mem_So
-  | (intros; apply GlobalTheory.CombAtGood.exists_comb_translates_mem_So <;> assumption)
+  first | exact @GlobalTheory.CombAtGood.exists_comb_translates_mem_So

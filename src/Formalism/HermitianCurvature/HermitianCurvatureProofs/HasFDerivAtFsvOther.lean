@@ -73,7 +73,6 @@ theorem rdV_smulC (X : Matrix (Fin n) (Fin n) ℂ) : SmulC (E := E) (RdV X) := b
   funext g
   simp only [RdV, Pi.smul_apply]
   first
-  | exact deriv_const_smul' α
   | (
       by_cases h : DifferentiableAt ℝ (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) 0
       · exact deriv_const_smul α h
@@ -208,25 +207,15 @@ theorem hasFDerivAt_fsv_other (t : ℂ) (l : Fin m) (c : Fin m → ℂ)
       HasFDerivAt (fun c' : Fin m → ℂ => fsv t (c' l)) D c
         ∧ ∀ l' : Fin m, l' ≠ l → ∀ v : ℂ, D (Pi.single l' v) = 0 := by
   have hconj : Differentiable ℝ (fun z : ℂ => conj z) := Complex.conjCLE.differentiable
-  have hlin : Differentiable ℝ (fun z : ℂ => t * z - conj t * conj z) := by
-    first
-    | fun_prop
-    | (
-        apply Differentiable.sub
-        · exact (differentiable_id (𝕜 := ℝ) (E := ℂ)).const_mul t
-        · exact hconj.const_mul (conj t)
-      )
+  have hlin : Differentiable ℝ (fun z : ℂ => t * z - conj t * conj z) := by first | fun_prop
   have hg : DifferentiableAt ℝ (fun z : ℂ => fsv t z) (c l) := by
     unfold fsv
-    first
-    | exact ((Complex.differentiable_exp (𝕜 := ℝ)).comp hlin) (c l)
-    | exact (hlin (c l)).cexp
-    | fun_prop
+    first | exact ((Complex.differentiable_exp (𝕜 := ℝ)).comp hlin) (c l)
   refine ⟨(fderiv ℝ (fun z : ℂ => fsv t z) (c l)).comp (ContinuousLinearMap.proj l), ?_, ?_⟩
   · have h := hg.hasFDerivAt.comp c (hasFDerivAt_apply (𝕜 := ℝ) l c)
     exact h
   · intro l' hl' v
-    simp [Pi.single_apply, Ne.symm hl']
+    simp [Ne.symm hl']
 
 theorem wirt_fsv_smul_other
     (t : ℂ)
@@ -376,7 +365,7 @@ theorem Ts_mem
     (Y : ℂ) (hp : σ.p ∈ T) (hc : σ.c ∈ T) (hci : σ.ci ∈ T) (a b : Fin 2)
     : Ts σ Y a b ∈ T := by
   fin_cases a <;> fin_cases b <;> simp [Ts, Formalism.YangianSpanCharacter.T.Tm]
-    <;> first | exact T.add_mem (T.algebraMap_mem Y) hp | exact hc | exact hci | exact T.neg_mem hc
+    <;> first | exact T.add_mem (T.algebraMap_mem Y) hp | exact hc | exact hci
 
 end Cen
 

@@ -68,9 +68,8 @@ theorem stage3_alt
             ∧ ∃ tr, R.TrISem F tr ∧ GlobalTheory.Hk3.TrISepWith A3 tr := by
   intro P D G _ _ Pl0 I0 T0 A3 Ks _ _ _ R F hT hM hU hL hPos hK
   obtain ⟨_hGiven, hGS, hCD, hLI, _hTR, _hUI, _hUIW⟩ :=
-    _root_.GlobalTheory.T.lift_data_of_multiplicity_one P R F hT hM
-  obtain ⟨hOk, hGU, hGE, _hBlk, hA, hB⟩ :=
-    _root_.GlobalTheory.T.pgUnit_and_pgEquiv_of_multEq P R F hT hM
+    _root_.GlobalTheory.PrimBase.base_of_ties_alt P R F hT hM
+  obtain ⟨hOk, hGU, hGE, _hBlk, hA, hB⟩ := _root_.GlobalTheory.Stage1.stage1_alt P R F hT hM
   have hJ := (GlobalTheory.Hk3.inertJunk_iff A3).1 hT.junk
   have hLev : R.PLevW F :=
     GlobalTheory.LevW.levW_of_parts P.q2 P.q1 R F hLI hT.ok hT.char hT.ex hJ hGS hCD hM hGE hPos hK
@@ -94,6 +93,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 open scoped TensorProduct InnerProductSpace Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.PrimIn
+
 theorem _root_.GlobalTheory.T.pLevW_and_trISep_of_liftTest_pos
     : _root_.GlobalTheory.PrimIn.PublishedThetaConditionTheorems
       → ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T0 : Type}
@@ -104,8 +104,5 @@ theorem _root_.GlobalTheory.T.pLevW_and_trISep_of_liftTest_pos
           → (0 < R.kap ∧ ∀ i t p, 0 < R.lam3 i t p A3.A.v0)
           → R.PLevW F ∧ (R.toCx3 F).PartsW false ∧ R.PHecke F ∧ A3.fam3.TypesSep3
             ∧ ∃ tr, R.TrISem F tr ∧ GlobalTheory.Hk3.TrISepWith A3 tr := by
-  first
-  | exact @_root_.GlobalTheory.Stage3.stage3_alt
-  | exact _root_.GlobalTheory.Stage3.stage3_alt
-  | (intros; apply _root_.GlobalTheory.Stage3.stage3_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.Stage3.stage3_alt
 end

@@ -5,10 +5,13 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.HtatPar
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.IsPolLatticePlane
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyCoordIdeal
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyCoordIdealStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTateFreeIntegralModelsStatement
-import Development.WeilBound.CoreStatements.HodgeTatePoints.HcptgenRing
+public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LaurentCechNerveLevelSpecTensorPower
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.InstFintypeSumElim
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IntegralClosureHeightEqOneOfLiesOver
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTateFreeIntegralModels
 public import Development.WeilBound.CoreStatements.HodgeTatePoints.HtatPol
+import Development.WeilBound.CoreStatements.HodgeTatePoints.HcptgenRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -219,11 +222,12 @@ theorem chart_facts
     c' hc'
   haveI hch : CharZero Ω := GlobalTheory.CompanionTheory.Ar.Num.ConstClosure.charZero_of_isArithVar hV
   obtain ⟨-, -, -, -, -, -, hchart⟩ :=
-    GlobalTheory.T.hodge_tate_free_integral_models E H D l Xo c O₀ β Y S Ω K J y 𝔐 p hpS (zp Ω p)
-      (mem_range_zp Ω p)
+    _root_.GlobalTheory.CompanionTheory.Ar.HT.hcpt_generic_point E H D l Xo c O₀ β Y S Ω K J y 𝔐 p
+      hpS (zp Ω p) (mem_range_zp Ω p)
   obtain ⟨-, hic, hfr, -⟩ := hchart c' hc'
   obtain ⟨-, -, -, hconst, -⟩ :=
-    GlobalTheory.T.arith_variety_coord_ideal E H D l Xo c O₀ β Y S Ω K J y 𝔐 d hV A
+    _root_.GlobalTheory.CompanionTheory.Ar.Num.ConstClosure.const_closure E H D l Xo c O₀ β Y S Ω K
+      J y 𝔐 d hV A
   have eO := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := O) y c' hc'
   have eo := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := zp Ω p) y c' hc'
   have eZ := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := ℤ) y c' hc'
@@ -294,7 +298,7 @@ noncomputable def scalePt (P : HTPoint C O c κ N V Ω) (a : Oˣ) : HTPoint C O 
     adj := fun b x y => by simp [P.adj]
     lagr := fun x => by
       rw [P.lagr]
-      simp [ha]
+      simp
   }
 
 end Scale

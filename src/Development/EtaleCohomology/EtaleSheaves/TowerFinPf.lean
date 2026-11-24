@@ -168,13 +168,6 @@ theorem ker_zero (K : Cx R) (a : ℤ) (hK : ∀ i, i < a → IsZero (K.X i))
   change 𝟙 _ ≫ (kernel.ι (qK K a hK)).f a = 0 ≫ (kernel.ι (qK K a hK)).f a
   rw [h0, comp_zero, zero_comp]
 
-theorem inv_nat'
-    {C : Type*} [Category C]
-    {X₁ X₂ Y₁ Y₂ : C} (g₁ : X₁ ⟶ Y₁) (g₂ : X₂ ⟶ Y₂) [IsIso g₁] [IsIso g₂]
-    (t₂ : X₁ ⟶ X₂) (t₃ : Y₁ ⟶ Y₂) (h : g₁ ≫ t₃ = t₂ ≫ g₂)
-    : t₃ ≫ inv g₂ = inv g₁ ≫ t₂ :=
-  inv_nat g₁ g₂ t₂ t₃ h
-
 abbrev MainNotions (K : Cx R) (a : ℤ) (hK : ∀ i, i < a → IsZero (K.X i)) : ShortComplex (Cx R) :=
   ShortComplex.mk (kernel.ι (qK K a hK)) (qK K a hK) (kernel.condition _)
 
@@ -221,8 +214,8 @@ theorem hs (m : ℤ)
   unfold spl
   split_ifs with h
   · subst h
-    exact @inv_nat' _ _ _ _ _ _ _ _ (qK_iso K m hK) (qK_iso L m hL) _ _
-      (HomologicalComplex.congr_hom (phiS f m hK hL).comm₂₃ m).symm
+    exact @_root_.LateralTheory.E.TowerFinPf.inv_nat _ _ _ _ _ _ _ _ (qK_iso K m hK) (qK_iso L m hL)
+      _ _ (HomologicalComplex.congr_hom (phiS f m hK hL).comm₂₃ m).symm
   · simp only [ShortComplex.Splitting.ofIsIsoOfIsZero]
     erw [comp_zero, zero_comp]
 
@@ -232,8 +225,8 @@ theorem hr (m : ℤ)
   split_ifs with h
   · simp only [ShortComplex.Splitting.ofIsZeroOfIsIso]
     erw [comp_zero, zero_comp]
-  · exact @inv_nat' _ _ _ _ _ _ _ _ (ι_iso K a hK m h) (ι_iso L a hL m h) _ _
-      (HomologicalComplex.congr_hom (phiS f a hK hL).comm₁₂ m).symm
+  · exact @_root_.LateralTheory.E.TowerFinPf.inv_nat _ _ _ _ _ _ _ _ (ι_iso K a hK m h)
+      (ι_iso L a hL m h) _ _ (HomologicalComplex.congr_hom (phiS f a hK hL).comm₁₂ m).symm
 
 def triMap
     : CochainComplex.triangleOfDegreewiseSplit (MainNotions K a hK) (spl K a hK)

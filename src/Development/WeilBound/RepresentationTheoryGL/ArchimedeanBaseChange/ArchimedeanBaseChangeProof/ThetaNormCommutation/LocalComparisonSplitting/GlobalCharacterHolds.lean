@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 namespace PositivityTheory.Rg.BcB.G8
 
 theorem global_character_holds : G4 :=
-  global_character_of_finite_inputs Fin.kfOC_holds Fin.finLevel_holds Fin.finHalf_holds
+  global_character_of_finite_inputs _root_.GlobalTheory.CompanionTheory.IntegralPoints.kfOC
+    _root_.GlobalTheory.CompanionTheory.FinLevelTw.finLevel Fin.finHalf_holds
 
 end PositivityTheory.Rg.BcB.G8

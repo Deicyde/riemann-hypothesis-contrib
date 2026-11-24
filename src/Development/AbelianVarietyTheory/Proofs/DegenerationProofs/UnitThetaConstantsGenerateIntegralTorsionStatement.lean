@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.unitThetaConstants_generate_integralTorsion
     : Laws → Laws2 → UTorsSt
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.unitThetaConstants_generate_integralTorsion
         (∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1)
           → (0 < S.delta y₀
             ∧ AddSubgroup.closure {x | ‖y₀ ⟨S.th x, S.th_mem x⟩‖ = S.delta y₀} = l.yy.ker) := by
-  first
-  | exact @GlobalTheory.UnitTheta.closure_unit_theta
-  | exact GlobalTheory.UnitTheta.closure_unit_theta
-  | (intros; apply GlobalTheory.UnitTheta.closure_unit_theta <;> assumption)
+  first | exact @GlobalTheory.UnitTheta.closure_unit_theta

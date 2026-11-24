@@ -96,8 +96,7 @@ private theorem sign_cycleRange_symm_mul_decomposeFin_mul_finRotate
       = (-1) ^ (t + (l : ℕ)) * (Equiv.Perm.sign τ : ℤ) := by
   rw [Equiv.Perm.sign_mul, Units.val_mul, sign_cycleRange_symm_mul_decomposeFin_symm,
     sign_finRotate]
-  simp only [Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one, add_tsub_cancel_right,
-    add_tsub_cancel_left]
+  simp only [Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one, add_tsub_cancel_right]
   ring
 
 private theorem qminor_eq_sum_expand_first_column

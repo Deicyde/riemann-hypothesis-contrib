@@ -65,7 +65,7 @@ theorem UpperTheory.V.AlgebraTools.hkDedekind
     ext i
     have h := DFunLike.congr_fun huv (X i)
     simp only [φ, MonoidHom.comp_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-        AlgHom.toRingHom_eq_coe, RingHom.coe_coe, AlgHom.coe_toRingHom, rename_X]
+        AlgHom.toRingHom_eq_coe, RingHom.coe_coe, rename_X]
       at h
     have h2 := IsFractionRing.injective (MvPolynomial (Fin n) R) K h
     exact congrArg Fin.val (X_injective h2)

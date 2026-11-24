@@ -106,10 +106,10 @@ theorem comp_sq
       rw [IsIso.inv_comp_eq, ← Category.assoc, IsIso.eq_comp_inv]
       apply pullback.hom_ext
       · simp only [Category.assoc, pullbackComparison_comp_fst, pullback.lift_fst,
-          ← Functor.map_comp, pullback.lift_fst_assoc]
+          ← Functor.map_comp]
         rw [pullbackComparison_comp_fst_assoc, ← Functor.map_comp]
       · simp only [Category.assoc, pullbackComparison_comp_snd, pullback.lift_snd,
-          ← Functor.map_comp, pullback.lift_snd_assoc]
+          ← Functor.map_comp]
         rw [pullbackComparison_comp_snd_assoc, ← Functor.map_comp]
 
 end LateralTheory.E.MayerVietorisSequence

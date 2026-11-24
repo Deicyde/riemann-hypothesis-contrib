@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnipotentBlockColumnIndex
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFundamentalDomainMassOneCocompactLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SetIntegralFundamentalDomainEqMassMulAverageStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFundamentalDomainMassOneCocompactLattice
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SetIntegralFundamentalDomainEqMassMulAverage
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -63,15 +63,15 @@ theorem avg_add_of_per
   letI : MeasurableSpace G := borel G
   haveI : BorelSpace G := ⟨rfl⟩
   obtain ⟨μ, 𝓕, hμ, hF, h1⟩ :=
-    GlobalTheory.T.exists_fundamentalDomain_mass_one_cocompactLattice G Γ hΓ
+    _root_.GlobalTheory.CuspGeneric.exists_fundamentalDomain_mass_one G Γ hΓ
   have hs : Per Γ (fun x => Φ x + Φ' x) :=
     ⟨h.1.add h'.1, fun γ hγ x => by simp only [h.2 γ hγ x, h'.2 γ hγ x]⟩
   obtain ⟨-, -, i1, e1⟩ :=
-    GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average G Γ hΓ μ 𝓕 hμ hF Φ h
+    _root_.GlobalTheory.CuspGeneric.setIntegral_eq_mass_mul_avg G Γ hΓ μ 𝓕 hμ hF Φ h
   obtain ⟨-, -, i2, e2⟩ :=
-    GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average G Γ hΓ μ 𝓕 hμ hF Φ' h'
+    _root_.GlobalTheory.CuspGeneric.setIntegral_eq_mass_mul_avg G Γ hΓ μ 𝓕 hμ hF Φ' h'
   obtain ⟨-, -, -, e3⟩ :=
-    GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average G Γ hΓ μ 𝓕 hμ hF _ hs
+    _root_.GlobalTheory.CuspGeneric.setIntegral_eq_mass_mul_avg G Γ hΓ μ 𝓕 hμ hF _ hs
   rw [h1] at e1 e2 e3
   simp only [ENNReal.toReal_one, Complex.ofReal_one, one_mul] at e1 e2 e3
   rw [← e1, ← e2, ← e3]

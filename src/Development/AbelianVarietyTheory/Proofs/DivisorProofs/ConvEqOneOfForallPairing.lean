@@ -184,7 +184,7 @@ theorem natCard_eq_pow_finrank
       simp [← hc, mul_comm]
   rw [← Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective f hf).toEquiv, hker,
     Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective g hg).toEquiv]
-  simp [Nat.card_pi]
+  simp
 
 theorem bijective_of_mod
     [Module.Finite ℤ_[p] M] [Module.Free ℤ_[p] M] [Module.Finite ℤ_[p] N] [Module.Free ℤ_[p] N]

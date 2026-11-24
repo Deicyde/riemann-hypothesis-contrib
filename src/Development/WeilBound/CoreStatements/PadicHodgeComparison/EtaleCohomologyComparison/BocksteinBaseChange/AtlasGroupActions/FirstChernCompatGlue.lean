@@ -54,58 +54,84 @@ namespace CrystallineSemistableComparison
 
 namespace GlueB'
 
-variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (Amp : ∀ M : Model l K, E.LineData M.X → Prop)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (Amp : ∀ M : Model l K, E.LineData M.X → Prop)
 
-theorem f_act (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) (j : ℕ) (σ : K.fixingSubgroup) (x : ((dat Amp).H a).N j) :
-    bβ Amp hC a j (((dat Amp).H a).act j σ x) = ((dat Amp).A a).act j σ (bβ Amp hC a j x) := by
+theorem f_act
+    (hC : B.Compat l)
+    {M : Model l K} (a : (dat Amp).Ch M)
+    (j : ℕ)
+    (σ : K.fixingSubgroup) (x : ((dat Amp).H a).N j)
+    : bβ Amp hC a j (((dat Amp).H a).act j σ x) = ((dat Amp).A a).act j σ (bβ Amp hC a j x) := by
   let g := IntermediateField.fixingSubgroupEquiv K σ
   refine Subtype.ext (funext fun n => ?_)
   exact hC.gal (B.schFn M.p) (okToOC l K) g (galOC_okToOC g) false n j
     ((show (M.HS false j).lim from x).1 n)
 
-theorem f_act' (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) (j : ℕ) (σ : K.fixingSubgroup) (x : ((dat Amp).H' a).N j) :
-    bβ' Amp hC a j (((dat Amp).H' a).act j σ x) = ((dat Amp).A a).act j σ (bβ' Amp hC a j x) := by
+theorem f_act'
+    (hC : B.Compat l)
+    {M : Model l K} (a : (dat Amp).Ch M)
+    (j : ℕ)
+    (σ : K.fixingSubgroup) (x : ((dat Amp).H' a).N j)
+    : bβ' Amp hC a j (((dat Amp).H' a).act j σ x) = ((dat Amp).A a).act j σ (bβ' Amp hC a j x) := by
   let g := IntermediateField.fixingSubgroupEquiv K σ
   refine Subtype.ext (funext fun n => ?_)
   exact hC.gal (B.schFn M.p) (okToOC l K) g (galOC_okToOC g) true n j
     ((show (M.HS true j).lim from x).1 n)
 
-theorem f_phi' (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) (j : ℕ) (x : ((dat Amp).H' a).N j) :
-    bβ' Amp hC a j ((dat Amp).phi' a j x) = (dat Amp).phiA a j (bβ' Amp hC a j x) := by
+theorem f_phi'
+    (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) (j : ℕ) (x : ((dat Amp).H' a).N j)
+    : bβ' Amp hC a j ((dat Amp).phi' a j x) = (dat Amp).phiA a j (bβ' Amp hC a j x) := by
   refine Subtype.ext (funext fun n => ?_)
   exact hC.phi (B.schFn M.p) (okToOC l K) n j ((show (M.HS true j).lim from x).1 n)
 
-theorem f_nat (hC : B.Compat l) {M N : Model l K} {u : M.X ⟶ N.X} {hu : u ≫ N.p = M.p} {a : (dat Amp).Ch M}
-    {b : (dat Amp).Ch N} (m : (dat Amp).Mo u hu a b) (j : ℕ) (x : ((dat Amp).H b).N j) :
-    bβ Amp hC a j ((dat Amp).pullH m j x) = (dat Amp).pullA m j (bβ Amp hC b j x) := by
+theorem f_nat
+    (hC : B.Compat l)
+    {M N : Model l K} {u : M.X ⟶ N.X} {hu : u ≫ N.p = M.p} {a : (dat Amp).Ch M} {b : (dat Amp).Ch N}
+    (m : (dat Amp).Mo u hu a b)
+    (j : ℕ) (x : ((dat Amp).H b).N j)
+    : bβ Amp hC a j ((dat Amp).pullH m j x) = (dat Amp).pullA m j (bβ Amp hC b j x) := by
   refine Subtype.ext (funext fun n => ?_)
   exact hC.pull (okToOC l K) (B.schMap u hu) false n j ((show (N.HS false j).lim from x).1 n)
 
-theorem f_nat' (hC : B.Compat l) {M N : Model l K} {u : M.X ⟶ N.X} {hu : u ≫ N.p = M.p} {a : (dat Amp).Ch M}
-    {b : (dat Amp).Ch N} (m : (dat Amp).Mo u hu a b) (j : ℕ) (x : ((dat Amp).H' b).N j) :
-    bβ' Amp hC a j (datPull Amp m j x) = (dat Amp).pullA m j (bβ' Amp hC b j x) := by
+theorem f_nat'
+    (hC : B.Compat l)
+    {M N : Model l K} {u : M.X ⟶ N.X} {hu : u ≫ N.p = M.p} {a : (dat Amp).Ch M} {b : (dat Amp).Ch N}
+    (m : (dat Amp).Mo u hu a b)
+    (j : ℕ) (x : ((dat Amp).H' b).N j)
+    : bβ' Amp hC a j (datPull Amp m j x) = (dat Amp).pullA m j (bβ' Amp hC b j x) := by
   refine Subtype.ext (funext fun n => ?_)
   exact hC.pull (okToOC l K) (B.schMap u hu) true n j ((show (N.HS true j).lim from x).1 n)
 
-theorem f_cup (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) {i j : ℕ} (x : ((dat Amp).H a).N i)
-    (y : ((dat Amp).H a).N j) (z : ((dat Amp).H a).N (i + j)) (hz : ((dat Amp).H a).cup x y z) :
-    ((dat Amp).A a).cup (bβ Amp hC a i x) (bβ Amp hC a j y) (bβ Amp hC a (i + j) z) :=
-  GlueBL.lim_cup (fun j => βS hC (B.schFn M.p) (okToOC l K) false j)
-    (fun n _ _ x y => hC.cup (B.schFn M.p) (okToOC l K) false n rfl x y) x y z hz
+theorem f_cup
+    (hC : B.Compat l)
+    {M : Model l K} (a : (dat Amp).Ch M)
+    {i j : ℕ} (x : ((dat Amp).H a).N i) (y : ((dat Amp).H a).N j) (z : ((dat Amp).H a).N (i + j))
+    (hz : ((dat Amp).H a).cup x y z)
+    : ((dat Amp).A a).cup (bβ Amp hC a i x) (bβ Amp hC a j y) (bβ Amp hC a (i + j) z) :=
+  GlueBL.lim_cup
+    (fun j => βS hC (B.schFn M.p) (okToOC l K) false j)
+    (fun n _ _ x y => hC.cup (B.schFn M.p) (okToOC l K) false n rfl x y)
+    x y z hz
 
-theorem f_one (hC : B.Compat l) {M : Model l K} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 0) (hx : ((dat Amp).H a).one x) :
-    ((dat Amp).A a).one (bβ Amp hC a 0 x) := by
+theorem f_one
+    (hC : B.Compat l)
+    {M : Model l K} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 0) (hx : ((dat Amp).H a).one x)
+    : ((dat Amp).A a).one (bβ Amp hC a 0 x) := by
   intro n
   let F := B.schFn M.p
   let κ := okToOC l K
-  exact (congrArg (fun v : M.Hc false n 0 => B.β F κ false n 0 v) (hx n)).trans
-    (hC.one F κ false n)
+  exact (congrArg (fun v : M.Hc false n 0 => B.β F κ false n 0 v) (hx n)).trans (hC.one F κ false n)
 
-theorem first_chern_compat_glue (hC : B.Compat l) (h1 : B.FirstChernCompatible l) {M : Model l K} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 2)
-    (hx : (dat Amp).c1H a x) : (dat Amp).c1A a (bβ Amp hC a 2 x) :=
+theorem first_chern_compat_glue
+    (hC : B.Compat l) (h1 : B.FirstChernCompatible l)
+    {M : Model l K} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 2) (hx : (dat Amp).c1H a x)
+    : (dat Amp).c1A a (bβ Amp hC a 2 x) :=
   h1 M.p (okToOC l K) false a.1 _ hx
 
-def bmap (hMain : B.Main l) (hC : B.Compat l) (h1 : B.FirstChernCompatible l) : BMap Model.Sm (dat Amp) where
+def bmap (hMain : B.Main l) (hC : B.Compat l) (h1 : B.FirstChernCompatible l)
+    : BMap Model.Sm (dat Amp) where
   β a j := bβ Amp hC a j
   β' a j := bβ' Amp hC a j
   act a _ j σ x := f_act Amp hC a j σ x
@@ -119,7 +145,8 @@ def bmap (hMain : B.Main l) (hC : B.Compat l) (h1 : B.FirstChernCompatible l) : 
   phi' a _ j x := f_phi' Amp hC a j x
   surj' a hM j := f_surj' Amp hMain hC a hM j
 
-def bphi (hMain : B.Main l) (hC : B.Compat l) (h1 : B.FirstChernCompatible l) : BPhi (bmap Amp hMain hC h1) where
+def bphi (hMain : B.Main l) (hC : B.Compat l) (h1 : B.FirstChernCompatible l)
+    : BPhi (bmap Amp hMain hC h1) where
   pull m j := datPull Amp m j
   nat m _ _ j x := f_nat' Amp hC m j x
   inj a hM j := f_inj' Amp hMain hC a hM j

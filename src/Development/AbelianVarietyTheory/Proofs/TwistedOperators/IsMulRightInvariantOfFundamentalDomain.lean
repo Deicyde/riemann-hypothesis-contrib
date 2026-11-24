@@ -57,9 +57,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.UnitU
 
 variable {D : D7} {ρ : ℕ}

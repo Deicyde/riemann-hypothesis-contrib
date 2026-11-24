@@ -120,7 +120,6 @@ theorem trdeg_eq
     have hj' : y j ≠ 0 := hj
     set F := Subfield.closure (Set.range (algebraMap K Ω) ∪ {r | ∃ i j, r = y i / y j}) with hF
     have h1 : ∀ v, ev v / y j ∈ F := fun v => by
-
       rw [← b.sum_repr v, map_sum, Finset.sum_div]
       refine sum_mem fun i _ => ?_
       rw [map_smul, Algebra.smul_def, mul_div_assoc]

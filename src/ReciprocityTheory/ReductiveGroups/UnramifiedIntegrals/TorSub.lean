@@ -94,8 +94,6 @@ theorem slope_mem_sub
       (
         first
         | assumption
-        | exact K.zero_mem
-        | exact K.one_mem
         | apply K.div_mem
         | apply K.sub_mem
         | apply K.add_mem
@@ -103,19 +101,7 @@ theorem slope_mem_sub
         | apply K.pow_mem
         | apply K.neg_mem
       )
-  · repeat
-      (
-        first
-        | assumption
-        | exact K.zero_mem
-        | exact K.one_mem
-        | apply K.div_mem
-        | apply K.sub_mem
-        | apply K.add_mem
-        | apply K.mul_mem
-        | apply K.pow_mem
-        | apply K.neg_mem
-      )
+  · repeat (first | assumption | apply K.div_mem | apply K.sub_mem | apply K.neg_mem)
 
 theorem addX_mem_sub (hW : CoeffSub K W) {x₁ x₂ s : C} (hx₁ : x₁ ∈ K) (hx₂ : x₂ ∈ K) (hs : s ∈ K)
     : W.toAffine.addX x₁ x₂ s ∈ K := by
@@ -142,18 +128,7 @@ theorem addY_mem_sub
   have hN : W.toAffine.negAddY x₁ x₂ y₁ s ∈ K := by
     simp only [WeierstrassCurve.Affine.negAddY]
     repeat
-      (
-        first
-        | assumption
-        | exact K.zero_mem
-        | exact K.one_mem
-        | apply K.div_mem
-        | apply K.sub_mem
-        | apply K.add_mem
-        | apply K.mul_mem
-        | apply K.pow_mem
-        | apply K.neg_mem
-      )
+      (first | assumption | apply K.sub_mem | apply K.add_mem | apply K.mul_mem | apply K.neg_mem)
   simp only [WeierstrassCurve.Affine.addY]
   exact negY_mem_sub K W hW hX hN
 

@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsConstAlongSingleton
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTSubmatrixMul
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LeviDecompositionGradedIsotropicFlagStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.LocallyCompactUnipFlag
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LeviDecompositionGradedIsotropicFlag
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StdParEqFlag
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -152,7 +153,7 @@ theorem GlobalTheory.RatLevi.rat_unip_eq_levi_mul_unip
     by rw [inv_inv]; exact GlobalTheory.RatLevi.par_of_unip hs hdm hγT
   ⟩
   obtain ⟨u, huF, m, hmF, hpm, hr⟩ :=
-    (GlobalTheory.T.leviDecomposition_gradedIsotropicFlag F E σ h n J hJ s
+    (_root_.GlobalTheory.LeviFlag.levi_decomposition F E σ h n J hJ s
       (X.submatrix id (Fin.castLE hs)) (Y.submatrix id (Fin.castLE hs)) d
       (by rw [GlobalTheory.TieStd.cT_submatrix_mul, hW.xx]; ext; simp)
       (by rw [GlobalTheory.TieStd.cT_submatrix_mul, hW.yy]; ext; simp)

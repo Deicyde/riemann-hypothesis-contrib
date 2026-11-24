@@ -66,17 +66,6 @@ section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-theorem repr_map
-    {R S : Type} [CommRing R] [CommRing S] [Algebra F R] [Algebra F S]
-    (g : R →ₐ[F] S)
-    {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (y : R ⊗[F] E) (k : Fin d)
-    : (Algebra.TensorProduct.basis S b).repr (Algebra.TensorProduct.map g (AlgHom.id F E) y) k
-      = g ((Algebra.TensorProduct.basis R b).repr y k) := by
-  induction y with
-  | add x y hx hy => simp [map_add (f := _), hx, hy]
-  | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul]
-
 theorem repr_tmul_mul
     {R : Type} [CommRing R] [Algebra F R]
     {d : ℕ} (b : Module.Basis (Fin d) F E)
@@ -155,8 +144,7 @@ theorem ainf_ball_cpt (r : ℝ) : IsCompact {y : Ainf F | ∀ w, ‖y w‖ ≤ r
 theorem cont_norm_w (w : InfinitePlace F) : Continuous fun y : Ainf F => ‖y w‖ :=
   continuous_norm.comp (continuous_apply (A := fun w : InfinitePlace F => w.Completion) w)
 
-theorem cont_fstA : Continuous (fstA F) :=
-  (continuous_fst : Continuous (Prod.fst : Ainf F × Af F → Ainf F))
+alias cont_fstA := _root_.GlobalTheory.CompanionTheory.SW.Glue.continuous_fstA
 
 theorem cont_sndA : Continuous (sndA F) :=
   (continuous_snd : Continuous (Prod.snd : Ainf F × Af F → Af F))
@@ -242,13 +230,13 @@ theorem comp_v
     (k : Fin d)
     : (Algebra.TensorProduct.basis (Fv F v) b).repr (projV v (projFin X) a i) k
       = evalV F v (sndA F ((Algebra.TensorProduct.basis (AF F) b).repr (X a i) k)) := by
-  simp only [projV, projFin, repr_map]
+  simp only [projV, projFin, _root_.GlobalTheory.CompanionTheory.SW.Glue.repr_map]
 
 theorem size_eq (X : Fin n → Fin M → AF F ⊗[F] E)
     : sizeTup b (projInf X)
       = ∑ a, ∑ i, ∑ k, ∑ w : InfinitePlace F,
         ‖(fstA F ((Algebra.TensorProduct.basis (AF F) b).repr (X a i) k)) w‖ := by
-  simp only [sizeTup, sizeInf, projInf, repr_map]
+  simp only [sizeTup, sizeInf, projInf, _root_.GlobalTheory.CompanionTheory.SW.Glue.repr_map]
 
 theorem cont_size : Continuous fun X : Fin n → Fin M → AF F ⊗[F] E => sizeTup b (projInf X) := by
   simp only [size_eq]

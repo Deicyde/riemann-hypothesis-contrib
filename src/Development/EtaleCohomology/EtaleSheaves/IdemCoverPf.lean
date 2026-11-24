@@ -116,10 +116,9 @@ theorem integral : Algebra.IsIntegral C (D C) := by
     Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1),
     ?_
   ⟩
-  simp only [Polynomial.eval₂_mul, Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C,
-    map_one]
+  simp only [Polynomial.eval₂_mul, Polynomial.eval₂_sub, Polynomial.eval₂_X, map_one]
   funext p
-  simp only [Pi.mul_apply, Pi.sub_apply, Pi.one_apply, Pi.zero_apply]
+  simp only [Pi.mul_apply, Pi.sub_apply, Pi.zero_apply]
   unfold e
   split_ifs <;> simp
 

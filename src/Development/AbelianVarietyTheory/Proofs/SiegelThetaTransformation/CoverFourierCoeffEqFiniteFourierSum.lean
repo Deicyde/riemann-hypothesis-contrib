@@ -418,7 +418,7 @@ theorem exists_mult {M : ℕ} {Λ : Lt E n} (hΛ : Λ ∈ Vset E n M)
       induction hx using Submodule.span_induction with
       | mem x hx =>
         obtain ⟨i, rfl⟩ := hx
-        by_cases h : b = i <;> simp [Pi.single_apply, h, isIntegral_one, isIntegral_zero]
+        by_cases h : b = i <;> simp [h, isIntegral_one, isIntegral_zero]
       | zero => exact isIntegral_zero
       | add x y _ _ hx hy => exact hx.add hy
       | smul t x _ hx => exact t.2.mul hx
@@ -427,7 +427,7 @@ theorem exists_mult {M : ℕ} {Λ : Lt E n} (hΛ : Λ ∈ Vset E n M)
   · have := zsmul_mem (h2 (Pi.single b 1) (Submodule.subset_span ⟨b, rfl⟩)) a
     convert this using 1
     funext j
-    by_cases h : j = b <;> simp [Pi.single_apply, h]
+    by_cases h : j = b <;> simp [h]
 
 theorem int_of_nok
     {M N : ℕ} {Λ : Lt E n} (hΛ : Λ ∈ Vset E n M) (hN : NOK Λ N M)
@@ -438,7 +438,7 @@ theorem int_of_nok
     refine (hN.2.2 (Submodule.smul_mem_smul (Ideal.subset_span rfl) fun j _ => ?_)).1
     by_cases h : j = b
     · subst h; simpa using Submodule.one_le.1 le_rfl
-    · simp [Pi.single_apply, h]
+    · simp [h]
   have := (hΛ.2.1 v).1 hv _ h1
   rw [Base.herm_one,
       Finset.sum_eq_single b (fun j _ hj => by simp [Pi.single_apply, hj, cc]) (by simp)]
@@ -554,7 +554,6 @@ theorem zetaM_pow (d : DeltaDat Xo c n) (h : d.IsLev)
   congr 1
   rw [hk, Nat.mul_div_cancel_left _ hM, h.2.1, mul_comm l.M, _root_.mul_assoc,
     Nat.mul_div_cancel_left _ hp, mul_comm]
-
 
 theorem w_eq_sum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n) [Algebra c.F ℂ] [Algebra d.c₂.F ℂ], (∀ t : c.F, algebraMap d.c₂.F ℂ (d.eF t) = algebraMap c.F ℂ t) → d.IsLev → ∀ (ph : (Fin n → LaJ Xo c d) → c.F) (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ) (x₀ : Fin n → LaJ Xo c d), d.PhiPin ph ψ x₀ → ∀ (r : ℕ) (X : Data E r) (D : SW.Level X) (hn : r ≤ n), r = Dw.p + Dw.q → LevTie d (algebraMap c.F ℂ) ph D hn → ∀ L ∈ D.lats, ∀ (mk mk₂ δ : Dw.La →ₗ[𝓞 E] (Fin r → E)) (x0 : Fin n → Dw.La), IsMark l L mk → IsMark d.l₂ L mk₂ → MarkOver l d.l₂ L mk mk₂ → IsDual X l (algebraMap c.F ℂ (zetaM c)) L mk δ → IsBaseClassLevelAdapted d D hn x0 δ → ∃ t : ℂ, ‖t‖ = 1 ∧ ∀ Λ ∈ Vset E n d.l₂.M, ∀ N : ℕ, NOK Λ N d.l₂.M → ∀ Y : (Fin n → LevQ Dw d.l₂) → Matrix (Fin n) (Fin r) E, IsRoots d.l₂ L mk₂ N Y → ∀ q, algebraMap d.c₂.F ℂ (d.w x0 q) = t * ∑ᶠ cl : tens Λ ((Ideal.span {2} * conjI D.𝔪) • L) ⧸ (tens Λ ((Ideal.span {2} * conjI D.𝔪 * D.𝔪) • L)).addSubgroupOf _, datF D (Mfr l) hn (cl.out : Matrix (Fin n) (Fin r) E) * cexp (-(2 * Real.pi * I * ((∑ b, EF X ((cl.out : Matrix (Fin n) (Fin r) E) b) (Y q b) : ℚ) : ℂ))) := by
   intro E _ _ _ H Dw l Xo c n d _ _ halg hlev ph ψ x₀ hpin r X D hn hr hT L hL mk mk₂ δ x0 hmk hmk₂ hov hδ hx0

@@ -229,18 +229,13 @@ theorem exists_smul_mem
   rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i), mul_comm, mul_smul]
   exact L.smul_mem _ (hsu i)
 
-theorem vAdd_mul' (𝔓 : HeightOneSpectrum (𝓞 K)) {x y : K} (hx : x ≠ 0) (hy : y ≠ 0)
-    : vAdd 𝔓 (x * y) = vAdd 𝔓 x + vAdd 𝔓 y := by
-  unfold vAdd
-  rw [map_mul, WithZero.log_mul ((Valuation.ne_zero_iff _).2 hx) ((Valuation.ne_zero_iff _).2 hy)]
-  ring
-
 theorem vAdd_pow' (𝔓 : HeightOneSpectrum (𝓞 K)) {x : K} (hx : x ≠ 0) (k : ℕ)
     : vAdd 𝔓 (x ^ k) = k * vAdd 𝔓 x := by
   induction k with
   | zero => simp [vAdd]
   | succ k ih =>
-    rw [pow_succ, vAdd_mul' 𝔓 (pow_ne_zero _ hx) hx, ih]
+    rw [pow_succ,
+      _root_.Formalism.BasicNotions.Examples₂.PlacesToy.vAdd_mul 𝔓 (pow_ne_zero _ hx) hx, ih]
     push_cast
     ring
 
@@ -305,7 +300,9 @@ theorem lineDeg_frame
   have hv : ∀ 𝔓, (vAdd 𝔓 (Mx 𝔓).det : ℝ) = (vAdd 𝔓 (c • Mx 𝔓).det : ℝ) - m * (vAdd 𝔓 c : ℝ) := by
     intro 𝔓
     rw [Matrix.det_smul, Fintype.card_fin,
-      vAdd_mul' 𝔓 (pow_ne_zero _ hc0) (det_ne_zero_of_comb hu (hM 𝔓)), vAdd_pow' 𝔓 hc0]
+      _root_.Formalism.BasicNotions.Examples₂.PlacesToy.vAdd_mul 𝔓 (pow_ne_zero _ hc0)
+        (det_ne_zero_of_comb hu (hM 𝔓)),
+      vAdd_pow' 𝔓 hc0]
     push_cast
     ring
   have hfc := finite_vAdd hc0

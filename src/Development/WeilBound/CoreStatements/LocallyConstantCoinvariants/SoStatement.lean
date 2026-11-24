@@ -50,6 +50,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.Connected.Separation
 
 @[expose] public section
 
@@ -256,7 +257,7 @@ theorem mem_so
       by_cases h : w = v
       · subst h
         simp [s]
-      · simp [s, h, Function.update_of_ne h]
+      · simp [s, h]
     unfold GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure
     rw [key, finprod_mul_distrib hfs hfin, finprod_eq_single s v fun w hw => if_neg hw]
     simp only [s, if_true]

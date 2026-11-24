@@ -82,7 +82,7 @@ theorem thetaT_injective
     refine iSup_le fun σ => le_trans (hsub σ) ?_
     exact le_iSup₂_of_le (lam σ) (hlam0 σ) le_rfl
   have hind : iSupIndep (Module.End.eigenspace T) := by
-    first | exact Module.End.eigenspaces_iSupIndep T | exact Module.End.eigenspaces_independent T
+    first | exact Module.End.eigenspaces_iSupIndep T
   have hdis : Disjoint (Module.End.eigenspace T 0) ⊤ := (hind 0).mono_right htop
   have hker : LinearMap.ker T = ⊥ := by
     rw [← Module.End.eigenspace_zero]

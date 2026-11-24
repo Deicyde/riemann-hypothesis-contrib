@@ -50,17 +50,17 @@ open Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.MixModel MeasureTheo
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 public noncomputable abbrev source
-    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D T.rank ρ)) (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ)
-    : WO S₀ T → ℂ := fun w₀ =>
-  ∫ a in 𝓕, heisO ψ S T (a * d.pY)
+    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D)
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D T.rank ρ))
+    (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ) : WO S₀ T → ℂ :=
+  fun w₀ => ∫ a in 𝓕, heisO ψ S T (a * d.pY)
     (heisO ψ S T (x * d.pX) (heisO ψ S T (w₀ * d.p0) f)) 0 ∂μ
 
 public noncomputable abbrev target
-    {D : D7} {T T₀ : HSp D} {ρ : ℕ} (d : HypDec T T₀ ρ) (S : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D ρ S.rank)) (𝓕 : Set (Mx D ρ S.rank)) (f : WO S T → ℂ) (y : Mx D S.rank ρ)
-    : WO S T₀ → ℂ := fun w₀ =>
-  ∫ ξ in 𝓕, heisO ψ S T (d.jX * ξ)
+    {D : D7} {T T₀ : HSp D} {ρ : ℕ} (d : HypDec T T₀ ρ) (S : HSp D)
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D ρ S.rank))
+    (𝓕 : Set (Mx D ρ S.rank)) (f : WO S T → ℂ) (y : Mx D S.rank ρ) : WO S T₀ → ℂ :=
+  fun w₀ => ∫ ξ in 𝓕, heisO ψ S T (d.jX * ξ)
     (heisO ψ S T (d.jY * (incA D (-D.host.xi0⁻¹) • (adj y * gA S)))
       (heisO ψ S T (d.j0 * w₀) f)) 0 ∂μ
 
@@ -68,9 +68,7 @@ end I195MixedCoordinates_da3d54e6b295c596ea3330b3
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -81,11 +79,10 @@ namespace GlobalTheory.FlatShiftPf
 
 variable {D : D7}
 
-theorem psiE_mul_star {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) (a : AE D)
-    : psiE ψ a * star (psiE ψ a) = 1 := by
+theorem psiE_mul_star {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) (a : AE D) :
+    psiE ψ a * star (psiE ψ a) = 1 := by
   have h1 : ‖psiE ψ a‖ = 1 := hψ.1.2.1 _
-  rw [Complex.star_def, Complex.mul_conj', h1]
-  simp
+  rw [Complex.star_def, Complex.mul_conj', h1]; simp
 
 theorem measEmb_val (ρ : ℕ) : MeasurableEmbedding (fun u : UX D ρ => u.1.1) := by
   haveI : BorelSpace (UX D ρ) := ⟨rfl⟩
@@ -103,7 +100,7 @@ theorem flatAt_shift {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)
     flatAt ψ dV dW μS 𝓕S μT 𝓕T νU x y (heisO ψ V W (dV.extX W (x ⬝ N)) f) =
       psiE ψ (upSum N) • flatAt ψ dV dW μS 𝓕S μT 𝓕T νU x y f := by
   funext w
-  simp only [flatAt, flatFun, evalAt, Pi.smul_apply, smul_eq_mul, Check.mixS_heis_extX]
+  simp only [flatAt, flatFun, evalAt, Pi.smul_apply, smul_eq_mul]
   set c := psiE ψ (upSum N) with hcdef
   have hc : c * star c = 1 := psiE_mul_star hψ _
   set H : Mx D ρ ρ → ℂ := fun m => (_root_.I195MixedCoordinates_da3d54e6b295c596ea3330b3.target dW) V₀ ψ μT 𝓕T ((_root_.I195MixedCoordinates_da3d54e6b295c596ea3330b3.source dV) W ψ μS 𝓕S f (x ⬝ m)) y w with hH

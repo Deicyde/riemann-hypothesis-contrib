@@ -216,7 +216,6 @@ local macro "fbm" : tactic =>
       Matrix.cons_val_succ, cz_pt, cz_add _ B.G.const, cz_comp1 _ (B.A.const _), map_zero,
       Pi.zero_apply, implies_true, and_self, forall_const, true_and] at *))
 
-
 def mapFB : FB R' d O where
   G := mapG ψ B.G
   A := mapA ψ B.A

@@ -45,6 +45,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta Formalism.IndefR.Datum Matrix GlobalTheory.FinPl GlobalTheory.SplitWeil
   ValuativeRel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitPlaceData_distinct_places_commute
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (p p' : SplitPt D k) (n n' m m' : Type) [Fintype n]
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.splitPlaceData_distinct_places_commute
             (Ψ : Matrix n n' k → ℂ) (Ψ' : Matrix m m' k → ℂ),
           Vac ψ S T LS LT (· = p'.v) f₀ → Over ψ α β LS LT f₀ Ψ g → Over ψ α' β' LS LT g Ψ' h
             → ∃ g', Over ψ α' β' LS LT f₀ Ψ' g' ∧ Over ψ α β LS LT g' Ψ h := by
-  first
-  | exact @GlobalTheory.FinPl.overSwap
-  | exact GlobalTheory.FinPl.overSwap
-  | (intros; apply GlobalTheory.FinPl.overSwap <;> assumption)
+  first | exact @GlobalTheory.FinPl.overSwap

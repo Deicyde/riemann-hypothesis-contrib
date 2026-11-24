@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueFrameChangeByMatricesStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndCompStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeExistsUniqueOfSamePointStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueFrameChangeByMatrices
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndComp
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeExistsUniqueOfSamePoint
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LowerTriangularMul
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -58,19 +58,7 @@ section Tri
 
 variable {S : Type} [CommRing S] {n : ℕ}
 
-theorem lowerTri_mul
-    (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0) (hB : ∀ i j, i < j → B i j = 0)
-    : ∀ i j, i < j → (A * B) i j = 0 := by
-  first
-  | exact @_root_.GlobalTheory.LowerTriangularMul.main
-  | exact _root_.GlobalTheory.LowerTriangularMul.main
-  | (apply _root_.GlobalTheory.LowerTriangularMul.main <;> assumption)
-  | (intros; apply _root_.GlobalTheory.LowerTriangularMul.main <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.LowerTriangularMul.main <;> first | assumption | infer_instance
-    )
-  | (intros; exact _root_.GlobalTheory.LowerTriangularMul.main ..)
+alias lowerTri_mul := _root_.GlobalTheory.LowerTriangularMul.lowerTriangular_mul
 
 theorem lowerTri_mul_diag
     (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0) (hB : ∀ i j, i < j → B i j = 0)
@@ -140,7 +128,7 @@ theorem frBor_calculus
   intro E _ _ _ H Dw l Xo c S _ _ y y' y''
   refine ⟨frBor_iff_frChg y y', fun hx hu => ?_, fun t t' h h' => ?_, fun t h => ?_⟩
   · obtain ⟨g₀, a, -, -, -, hs⟩ :=
-      (GlobalTheory.T.frameChange_exists_unique_of_same_point E H Dw l Xo c S y y').1 hx
+      (_root_.GlobalTheory.Frames.frChg_exists_unique E H Dw l Xo c S y y').1 hx
     choose cf hd hz hc using hu
     refine ⟨
       fun k =>
@@ -158,24 +146,24 @@ theorem frBor_calculus
     · show (g' τ * g τ) i i = _
       rw [lowerTri_mul_diag _ _ (hz' τ) (hz τ), hd, hd', Pi.mul_apply, Units.val_mul]
     · rw [Pi.mul_apply, Units.val_mul]
-      exact (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c S y y' y'').2 g g' _ _
-        hc hc'
+      exact (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c S y y' y'').2 g g' _ _ hc
+        hc'
   · obtain ⟨g, hz, hd, hc⟩ := (frBor_iff_frChg y y' t).1 h
     have hdet : ∀ τ, IsUnit (g τ).det := fun τ =>
       lowerTri_isUnit_det _ (hz τ) fun i => by rw [hd]; exact Units.isUnit _
     have hinv : ∀ τ, (g τ)⁻¹ * g τ = 1 := fun τ => Matrix.nonsing_inv_mul _ (hdet τ)
     have hzi : ∀ τ i j, i < j → (g τ)⁻¹ i j = 0 := fun τ => lowerTri_inv _ (hz τ) (hdet τ)
     obtain ⟨z, hzc, -⟩ :=
-      GlobalTheory.T.existsUnique_frameChangeByMatrices E H Dw l Xo c S y'
+      _root_.GlobalTheory.Frames.existsUnique_frChg E H Dw l Xo c S y'
         (fun τ => (g τ)⁻¹)
         (t none)⁻¹
         fun τ => Matrix.isUnit_nonsing_inv_det _ (hdet τ)
     have h1 :=
-      (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c S y y' z).2 g _ _ _ hc hzc
+      (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c S y y' z).2 g _ _ _ hc hzc
     simp only [hinv, Units.inv_mul] at h1
-    have h0 := (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c S y y y).1
+    have h0 := (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c S y y y).1
     have hzy : z = y :=
-      (GlobalTheory.T.existsUnique_frameChangeByMatrices E H Dw l Xo c S y
+      (_root_.GlobalTheory.Frames.existsUnique_frChg E H Dw l Xo c S y
         (fun _ => 1)
         1
         (fun τ => by simp)).unique h1 h0

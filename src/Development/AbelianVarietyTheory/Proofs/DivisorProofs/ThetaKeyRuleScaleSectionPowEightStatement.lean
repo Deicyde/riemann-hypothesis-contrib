@@ -52,6 +52,7 @@ open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto
   GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.thetaKeyRule_scale_section_pow_eight
     : ∀ κ : Rule,
       Homog (fun _ => 1) κ
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.thetaKeyRule_scale_section_pow_eight
                     → ThJet ⟨x.P, x.g_pos, x.rig, x.rig_gen, th', h', x.v, x.basis⟩ hg m pt
                       (fun i => a * ϑ i)
                       (fun i j => a * J i j) := by
-  first
-  | exact @GlobalTheory.MBLow.ScaleJet.scale_key
-  | exact GlobalTheory.MBLow.ScaleJet.scale_key
-  | (intros; apply GlobalTheory.MBLow.ScaleJet.scale_key <;> assumption)
+  first | exact @GlobalTheory.MBLow.ScaleJet.scale_key

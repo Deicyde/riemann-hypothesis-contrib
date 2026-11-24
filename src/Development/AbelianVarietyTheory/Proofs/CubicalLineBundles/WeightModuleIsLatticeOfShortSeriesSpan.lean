@@ -4,7 +4,8 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaValues.GamAt
 public import Formalism.LocalToGlobal.ProjectiveLattices.XcLat
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.WeightedPrimeSumBound
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.LatOfLamSt
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.MeanLogSupNormLowerBoundOfCoreLawsStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.MeanLogSupNormLowerBoundOfCoreLaws
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.LatOfLam
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -42,7 +43,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.LatOfLam
 
 @[expose] public section
 
@@ -99,7 +99,7 @@ theorem latAt_record
               S.sK ≠ 0 → PullbackSections.SpanAt X ka → WeightAlgebra.H2 X S ka wL wF
                 → Formalism.MainNotions.Gaps.EtaleWeightGaps.LatAt (recB h) j ka := by
   intro D T h hG large₂ CA hA j ka P X S wL wF hs hsp hH
-  obtain ⟨C0, -, hC⟩ := GlobalTheory.T.meanLogSupNorm_lower_bound_of_coreLaws
+  obtain ⟨C0, -, hC⟩ := _root_.GlobalTheory.lamwAt_of_lawsCore
   apply full_of_short_span X S ka wL wF hs hsp hH
   exact PullbackSections.latOfLam D (recB h) P j X S ka wL wF large₂ C0 2
     (fun i => (D.host.g_prime i).pos)

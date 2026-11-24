@@ -62,7 +62,6 @@ theorem isDS_sigLam (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : 
     ⟨_, (sigLam_lowK hgap hP hv₀).1⟩,
     ?_
   ⟩
-  intro μ S hS
-  exact (sigLam_kType_bounds hgap hP hv₀ S hS).1
+  exact fun μ S hS => (sigLam_kType_bounds hgap hP hv₀ S hS).1
 
 end ReciprocityTheory.ChartRestriction.DS

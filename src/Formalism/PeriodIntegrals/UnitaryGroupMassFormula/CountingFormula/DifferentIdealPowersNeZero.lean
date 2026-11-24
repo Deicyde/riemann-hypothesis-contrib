@@ -126,8 +126,7 @@ theorem sStable_ddS (D : Formalism.BasicNotions.D7) : SStable (ddS D) := by
   rw [← hc, ← Ideal.map_map]
   exact Ideal.mem_map_of_mem _ hy
 
-theorem ddS_ne_zero' (D : Formalism.BasicNotions.D7) : ddS D ≠ 0 :=
-  PI.ScalarPairDr.W.ddS_ne_zero D
+theorem ddS_ne_zero' (D : Formalism.BasicNotions.D7) : ddS D ≠ 0 := PI.ScalarPairDr.W.ddS_ne_zero D
 
 theorem stable_differentIdealPowers (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1))
     : SStable (differentIdealPowers D i) := by

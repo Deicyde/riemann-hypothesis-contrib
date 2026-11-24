@@ -48,6 +48,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.finiteAnnihilator_open_subgroup_in_box
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.finiteAnnihilator_open_subgroup_in_box
                       a.map (infPart D) = 0 → d.extY T a ∈ U
                         → ψ (symplO S T (d.extX T x) (d.extY T a)) = 1)
                     → InBox K x := by
-  first
-  | exact @GlobalTheory.AnnihBox.annihilator_inBox
-  | exact GlobalTheory.AnnihBox.annihilator_inBox
-  | (intros; apply GlobalTheory.AnnihBox.annihilator_inBox <;> assumption)
+  first | exact @GlobalTheory.AnnihBox.annihilator_inBox

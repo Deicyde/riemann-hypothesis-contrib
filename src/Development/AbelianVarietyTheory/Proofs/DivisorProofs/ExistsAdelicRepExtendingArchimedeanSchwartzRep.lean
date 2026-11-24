@@ -104,7 +104,7 @@ theorem _root_.GlobalTheory.SliceExt.exists_rep_pure
       rw [show ι f = ((j f : LinearMap.range ι) : _) from rfl]
       exact Submodule.prodEquivOfIsCompl_symm_apply_left _ _ hC _
     simp only [A, LinearMap.comp_apply, LinearEquiv.coe_coe, this, LinearMap.prodMap_apply,
-      LinearEquiv.symm_apply_apply, map_zero, LinearMap.id_apply]
+      LinearEquiv.symm_apply_apply, map_zero]
     rw [Submodule.coe_prodEquivOfIsCompl']
     simp [j]
   let s := _root_.GlobalTheory.SliceExt.splitPts F κ

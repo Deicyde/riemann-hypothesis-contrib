@@ -111,7 +111,7 @@ theorem smooth_calculus
     unfold dRep
     congr 1
     funext t
-    simp [Function.comp_def, smul_smul]
+    simp [smul_smul]
   · have hw' : w ∈ GlobalTheory.SmVec.smSub J π := hw
     rw [GlobalTheory.SmVec.inner_dRep hG hπ hv' hw' hX', neg_neg]
   · have hw' : w ∈ GlobalTheory.SmVec.smSub J π := hw

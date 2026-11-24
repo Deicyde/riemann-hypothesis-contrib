@@ -140,12 +140,13 @@ theorem uu_ne : uu ≠ 0 := fun h => by have := uu_norm; rw [h] at this; simp at
 
 theorem th_stable {x : ℂ} (hx : x ∈ L7.lattice) : th * x ∈ L7.lattice := by
   rw [mem7] at hx ⊢
-  have := Formalism.L2.Th1.F.cmStable 1 1 2 7 one_pos (by norm_num) (by norm_num) 0 1 x hx
+  have := _root_.Formalism.L2.Th1.F.cm_stable 1 1 2 7 one_pos (by norm_num) (by norm_num) 0 1 x hx
   simpa using this
 
 theorem thbar_stable {x : ℂ} (hx : x ∈ L7.lattice) : conj th * x ∈ L7.lattice := by
   rw [mem7] at hx ⊢
-  have := Formalism.L2.Th1.F.cmStable 1 1 2 7 one_pos (by norm_num) (by norm_num) 1 (-1) x hx
+  have :=
+    _root_.Formalism.L2.Th1.F.cm_stable 1 1 2 7 one_pos (by norm_num) (by norm_num) 1 (-1) x hx
   have h2 : conj th = 1 - th := by rw [← th_rel.2.1]; ring
   rw [h2]
   simpa [sub_eq_add_neg] using this
@@ -249,7 +250,8 @@ theorem stdData_seven
       (alphaQ (Real.sqrt (7 : ℕ) / 2) (stdH L7 (Fin 4 × n))) (gU n) := by
   have h :=
     Formalism.L2.Th1.H.stdDataCm 1 1 2 7 one_pos (by norm_num) 1 one_ne_zero (by norm_num)
-      (by decide) (by norm_num) _ _ _ (gU n) (gU_isom n) (stdSelfDual L7 n)
+      (by decide) (by norm_num) _ _ _ (gU n) (gU_isom n)
+      (_root_.Formalism.L2.Th1.H.StdSelfDual_proof L7 n)
       (fun x hx => th_stable_std hx)
       (by rw [fourth_power_standard_lattice]; exact idxU₁ _)
       (by rw [fourth_power_standard_lattice]; exact idxU₂ _)

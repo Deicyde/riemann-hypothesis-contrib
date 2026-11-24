@@ -473,7 +473,7 @@ theorem _root_.GlobalTheory.exists_torus_coordinates
         · have h2 := hy' ⟨ComplexEmbedding.conjugate τ.1, ⟨b.1 - X.p0, by rw [hn τ]; omega⟩⟩
           rw [coord_conjugate_eq_neg_conj_pr, neg_eq_zero, map_eq_zero] at h2
           convert h2 using 3
-          first | (simp only [Fin.val_mk]; omega) | (ext; simp only [Fin.val_mk]; omega)
+          first | (simp only; omega)
       exact (mul_eq_zero.mp key).resolve_left (hc τ)
     show y τ = 0
     rw [_root_.ReciprocityTheory.ChartRestriction.G.I2.TorusAtDataPf.expand X τ (e τ) (he τ) (y τ)]
@@ -506,7 +506,7 @@ theorem _root_.GlobalTheory.exists_torus_coordinates
         _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC_smul_left]
       ring
     · simp only [_root_.GlobalTheory.TorusCoord.pr,
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC_smul_left, map_mul, map_neg,
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC_smul_left, map_mul,
         ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj, Complex.conj_ofReal]
       ring
   · intro y y'

@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFin
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteIdeleExistsLocalApprox
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HeckeCharEqProdLocalComponentsApproximating
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdempotentMulEqZeroOfOrthogonal
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralUnitRootNormOneAdeleStatement
+import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralUnitRootNormOneAdele
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLevelSubgroup
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -70,7 +71,7 @@ theorem finite_root_near
       x ∈ intHat F E ∧ y ∈ intHat F E ∧ x * y = 1 ∧ x = u * sg (FiniteAdeleRing (𝓞 F) F) c x
         ∧ ∃ p ∈ intHat F E, x = w + n * p := by
   obtain ⟨x₁, hx₁, ⟨y₁, hy₁, hxy₁⟩, hr₁⟩ :=
-    GlobalTheory.T.exists_integral_unit_root_norm_one_adele F E c h2 hc hP u huO hu
+    _root_.GlobalTheory.AdLat.exists_integral_unit_root F E c h2 hc hP u huO hu
   obtain ⟨e, f, hee, hef, hun⟩ :=
     exists_idem (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletionIntegers F) n
   obtain ⟨y₀, hy₀⟩ :=

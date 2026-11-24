@@ -2,7 +2,7 @@ module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LinearChangeEulerProductStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LinearChangeEulerProduct
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import GroundTheory.GlobalFields.LocalFieldAtPlace
 import GroundTheory.GlobalFields.TateThesis.AdeleMeasurable
@@ -164,7 +164,7 @@ theorem GlobalTheory.CompanionTheory.SW.map_inclR_prodFormula
   intro F E _ _ _ _ _ σ hCM t ht
   have hfin : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
   obtain ⟨cinf, c, hU, hinf, hv⟩ :=
-    T.addHaar_map_mulVec_eq_smul_at_all_places F (Fin (Module.finrank F E))
+    _root_.GlobalTheory.CompanionTheory.SW.ProdFormula.modulus_matrix F (Fin (Module.finrank F E))
       (Algebra.leftMulMatrix (Module.finBasis F E) t)
       (by
         rw [← Algebra.norm_eq_matrix_det]

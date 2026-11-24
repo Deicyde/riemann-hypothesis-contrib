@@ -274,7 +274,6 @@ theorem map_jac
     (f : Fin (D + 1) → A)
     : exteriorPowerMapOver B D (KaehlerDifferential.map R S A B) (jac R f)
       = jac S (fun i => algebraMap A B (f i)) := by
-
   rw [jac, jac, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, dWedge, exteriorPowerMapOver_ιMulti, ← algebraMap_smul B]

@@ -176,21 +176,6 @@ theorem tmA_sm_left
   · intro g hg hgJ
     exact hfF (x * g) hg (tmA_inUJ_mul hx hgJ)
 
-theorem tmA_sm_sum
-    {ι : Type*} (s : Finset ι) (F : ι → Matrix (Fin n) (Fin n) ℂ → ℂ)
-    (hF : ∀ i ∈ s, Formalism.REAL.SmoothOnG ε (F i))
-    : Formalism.REAL.SmoothOnG ε (fun x => ∑ i ∈ s, F i x) := by
-  first
-  | exact UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1} ..
-  | (apply UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1} <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1} <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1} <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1} <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qf26.tmA_sm_sum.{u_1}
-        <;> first | assumption | infer_instance
-    )
-
 theorem tmA_eab_sum
     {ι : Type*} (s : Finset ι) (F : ι → Matrix (Fin n) (Fin n) ℂ → ℂ)
     (hF : ∀ i ∈ s, Formalism.REAL.SmoothOnG ε (F i))
@@ -208,7 +193,7 @@ theorem tmA_eab_sum
       funext x; rw [Finset.sum_insert hi, one_mul]
     rw [e,
       Formalism.REAL.lie_derivative_add_smul a b 1 (hF i (Finset.mem_insert_self i s))
-        (tmA_sm_sum s F hs) hg,
+        (_root_.Formalism.REAL.smooth_on_group_sum s F hs) hg,
       ih hs, one_mul, Finset.sum_insert hi]
 
 end Calc

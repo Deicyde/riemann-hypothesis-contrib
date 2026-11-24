@@ -92,7 +92,6 @@ theorem _root_.GlobalTheory.BI.char_coset_sum_eq_zero
     (LinearMap.IsIdempotentElem.trace_eq_zero_iff hidem).1 (by rw [map_smul, hH, smul_zero])
   have hS0 : S = 0 := by simpa [hcard] using hP
   have hsum : ∑ u : H, LinearMap.trace ℂ _ (ρ (g * u)) = LinearMap.trace ℂ _ (ρ g * S) := by
-
     rw [Finset.mul_sum, map_sum]
     simp [map_mul]
   rw [hsum, hS0, mul_zero, map_zero]

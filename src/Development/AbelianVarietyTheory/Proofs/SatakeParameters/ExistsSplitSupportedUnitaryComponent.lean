@@ -159,7 +159,6 @@ theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by
     refine Finset.sum_eq_zero fun i _ => ?_
     have h1 : ∑ j, V.gram i j * v j = 0 := congr_fun h0 i
     have h2 : V.hT (V.frame i) (V.frame.equivFun.symm v) = ∑ j, V.gram i j * v j := by
-
       rw [Module.Basis.equivFun_symm_apply, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_smul, smul_eq_mul, mul_comm]

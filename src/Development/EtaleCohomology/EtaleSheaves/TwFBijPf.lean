@@ -96,7 +96,6 @@ theorem uniq
   have key := (Commute.all x y).geom_sum₂_mul n
   rw [hx, hy, sub_self] at key
   have hS : IsUnit (∑ i ∈ Finset.range n, x ^ i * y ^ (n - 1 - i)) := by
-
     rw [← residue_ne_zero_iff_isUnit, map_sum]
     have : ∀ i ∈ Finset.range n, residue C (x ^ i * y ^ (n - 1 - i)) = residue C x ^ (n - 1) := by
       intro i hi

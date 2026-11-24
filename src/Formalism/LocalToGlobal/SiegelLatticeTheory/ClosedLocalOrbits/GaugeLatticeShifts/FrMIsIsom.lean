@@ -190,8 +190,7 @@ theorem mem_NH
     · simp only [hy, UnitaryIsometries.hJ_sub_right, UnitaryIsometries.hJ_sum_right, Fw.ee,
         mul_zero, Finset.sum_const_zero, sub_zero, hMe]
     · simp only [hy, UnitaryIsometries.hJ_sub_right, UnitaryIsometries.hJ_sum_right, hpe, mul_ite,
-        mul_one, mul_zero, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true,
-        sub_self]
+        mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
     · have hze : ∀ b, hJ ε z (e b) = 0 := fun b => hJ_swap0 (Fw.ez b)
       simp only [hy, UnitaryIsometries.hJ_sub_right, UnitaryIsometries.hJ_sum_right, hze, mul_zero,
         Finset.sum_const_zero, sub_zero, hMz]

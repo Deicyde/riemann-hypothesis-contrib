@@ -83,7 +83,7 @@ theorem exists_congr_signVec
   have hc0 : ∀ i, c i ≠ 0 := by
     intro i
     have h1 : 0 < |hA.eigenvalues i| := abs_pos.2 (eigenvalues_ne_zero hA hd i)
-    simp [hc, Real.sqrt_eq_zero', not_le.2 h1, eigenvalues_ne_zero hA hd i]
+    simp [hc, eigenvalues_ne_zero hA hd i]
   set V := U * diagonal c with hV
   have hVdet : V.det ≠ 0 := by
     rw [hV, det_mul, det_diagonal]
@@ -159,7 +159,7 @@ theorem perm_congr {n : ℕ} (d : Fin n → ℂ) (e : Fin n ≃ Fin n)
         * (1 : Matrix (Fin n) (Fin n) ℂ).submatrix id e
       = diagonal (d ∘ e) := by
   ext i j
-  simp [Matrix.mul_apply, Matrix.one_apply, Matrix.diagonal_apply, Matrix.conjTranspose_apply]
+  simp [Matrix.mul_apply, Matrix.one_apply, Matrix.diagonal_apply]
   split_ifs with h <;> simp [h]
 
 theorem congr_of_sigPosH_eq

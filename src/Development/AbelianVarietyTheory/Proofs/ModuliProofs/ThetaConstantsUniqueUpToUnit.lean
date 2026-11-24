@@ -5,7 +5,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.SymmetricLiftOddOrderExistsUnique
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ThetaGrpActsLinearly
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConstantsRingBaseChangeStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConstantsRingBaseChange
+public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.SpanEqTopOfFunctionals
 import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.IsThetaPtOverOfSubsingleton
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -49,7 +50,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBPull
-public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.SpanEqTopOfFunctionals
 
 @[expose] public section
 
@@ -261,9 +261,9 @@ theorem hasTh_unique_unit
           → ∃ u : Rˣ, ∀ a, v' a = u * v a := fun h₁ h₂ o _ g N' J b S s t R _ x v v' H H' hv =>
   ThetaUniq.exists_unit_of_local hv fun q _ =>
     ThetaUniq.exists_unit_local h₁.globalFns t _
-      (T.hasThetaConstants_ring_baseChange h₂ o g N' J b S s t R _
+      (_root_.GlobalTheory.hasTh_baseChange h₂ o g N' J b S s t R _
         (algebraMap R (Localization.AtPrime q)) x v H)
-      (T.hasThetaConstants_ring_baseChange h₂ o g N' J b S s t R _
+      (_root_.GlobalTheory.hasTh_baseChange h₂ o g N' J b S s t R _
         (algebraMap R (Localization.AtPrime q)) x v' H')
 
 end GlobalTheory

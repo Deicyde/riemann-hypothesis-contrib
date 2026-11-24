@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.WeilParts
 open scoped TensorProduct Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.completedHomLattice_multiple_mem_open_level
     : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
         (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
@@ -78,7 +79,4 @@ theorem _root_.GlobalTheory.T.completedHomLattice_multiple_mem_open_level
                     fun _ => True),
                 N • actO S T g h u ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E))
                   (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True) := by
-  first
-  | exact @GlobalTheory.LatLevel.level_of_generators
-  | exact GlobalTheory.LatLevel.level_of_generators
-  | (intros; apply GlobalTheory.LatLevel.level_of_generators <;> assumption)
+  first | exact @GlobalTheory.LatLevel.level_of_generators

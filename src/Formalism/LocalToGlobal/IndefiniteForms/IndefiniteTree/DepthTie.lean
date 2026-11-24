@@ -249,10 +249,8 @@ theorem nuLevel
   intro w _ hw j
   refine ⟨(key w hw j).le, le_of_eq ?_⟩
   rw [key _ ?_ j]
-  · first | rw [Formalism.EigenvalueLevelCeiling.plc_conjPl] | rw [Formalism.L2.DIV.plc_conjPl]
-  · first
-    | (rw [Formalism.EigenvalueLevelCeiling.plc_conjPl]; exact hw)
-    | (rw [Formalism.L2.DIV.plc_conjPl]; exact hw)
+  · first | rw [Formalism.EigenvalueLevelCeiling.plc_conjPl]
+  · first | (rw [Formalism.EigenvalueLevelCeiling.plc_conjPl]; exact hw)
 
 theorem tieScale : TieScale S (nuT Xo c Dd ι) (nuWT Xo c Dd ι) (sWT Xo c Dd ι) := by
   unfold TieScale AtPair
@@ -287,10 +285,7 @@ omit [StarRing (𝓞 E)] in
 theorem bar_bar (a : 𝓞 E) : H.bar (H.bar a) = a := by
   apply NumberField.RingOfIntegers.ext
   rw [H.bar_eq, H.bar_eq]
-  first
-  | exact IsCMField.complexConj_apply_apply (a : E)
-  | exact IsCMField.complexConj_apply_apply E (a : E)
-  | simp
+  first | exact IsCMField.complexConj_apply_apply E (a : E)
 
 def Nsig (Q : DepPage) (DFL DFF : ℕ) : ℕ := Q.q ^ (Q.f * Q.r * Q.n') * Q.Z1 DFL DFF
 
@@ -301,7 +296,7 @@ theorem vw_nonneg_of_isIntegral
   by_cases h0 : x = 0
   · subst h0
     simp only [vw, FractionalIdeal.spanSingleton_zero]
-    first | simp [FractionalIdeal.count_zero] | simp [FractionalIdeal.count]
+    first | simp [FractionalIdeal.count_zero]
   · let r : 𝓞 K := ⟨x, hx⟩
     have hr : algebraMap (𝓞 K) K r = x := rfl
     have hr0 : r ≠ 0 := by
@@ -311,13 +306,10 @@ theorem vw_nonneg_of_isIntegral
     unfold vw
     rw [← hr, ← FractionalIdeal.coeIdeal_span_singleton]
     apply FractionalIdeal.count_coe_nonneg
-    try simpa using hr0
 
 omit [StarRing K] [StarRing (𝓞 E)] in
 theorem isIntegral_alg (a : 𝓞 E) : IsIntegral ℤ (algebraMap (𝓞 E) K a) := by
-  first
-  | exact IsIntegral.algebraMap (Algebra.IsIntegral.isIntegral a)
-  | exact IsIntegral.algebraMap (NumberField.RingOfIntegers.isIntegral a)
+  first | exact IsIntegral.algebraMap (Algebra.IsIntegral.isIntegral a)
 
 omit [StarRing K] [StarRing (𝓞 E)] in
 theorem sigAt_eq (Dw' : Datum H) (j : ℕ)
@@ -387,16 +379,6 @@ theorem vw_N (v : HeightOneSpectrum (𝓞 K)) (N : ℕ) (hN : N ≠ 0)
   push_cast
   rfl
 
-private theorem vw_mul_lemma (v : HeightOneSpectrum (𝓞 K)) (a b : K) (ha : a ≠ 0) (hb : b ≠ 0)
-    : vw v (a * b) = vw v a + vw v b := by
-  unfold vw
-  rw [← FractionalIdeal.spanSingleton_mul_spanSingleton]
-  have h1 : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) a ≠ 0 :=
-    FractionalIdeal.spanSingleton_eq_zero_iff.not.mpr ha
-  have h2 : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) b ≠ 0 :=
-    FractionalIdeal.spanSingleton_eq_zero_iff.not.mpr hb
-  first | exact FractionalIdeal.count_mul K v h1 h2 | exact FractionalIdeal.count_mul h1 h2
-
 theorem vw_sig
     (hsp : PiSplit (H := H) Dd)
     (hprime : Dd.Q.g1.Prime ∧ Dd.Q.g2.Prime ∧ Dd.Q.q1.Prime ∧ Dd.Q.dd.Prime)
@@ -407,7 +389,10 @@ theorem vw_sig
           * (ramw v : ℝ) := by
   have hn : nnKAt (H := H) (LL := K) Dd j ≠ 0 := nnK_ne_zero Dd hsp ⟨hprime.1, hprime.2.1⟩ j
   have hN : Nsig Dd.Q (DF Dw' (Dd.aL j)) (DF Dw' (Dd.aF j)) ≠ 0 := Nsig_ne_zero _ hprime _ _
-  rw [sigAt_eq, vw_mul_lemma v _ _ hn (Nat.cast_ne_zero.mpr hN), vw_N v _ hN]
+  rw [sigAt_eq,
+    _root_.Formalism.DivisionValues.ValuationRepresentative.vw_mul v _ _ hn
+      (Nat.cast_ne_zero.mpr hN),
+    vw_N v _ hN]
   rw [Int.cast_add, Int.cast_mul, Int.cast_natCast]
 
 theorem sigmaLevel

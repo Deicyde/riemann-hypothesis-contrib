@@ -63,6 +63,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
   GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.discreteSeriesTestData_of_noncompactGaps
     : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
       GlobalTheory.Count.GapGe X.B (100 * (D.R.r : ℝ) ^ 4)
@@ -76,7 +77,4 @@ theorem _root_.GlobalTheory.T.discreteSeriesTestData_of_noncompactGaps
             Integrable
               (Formalism.L2.SG.ProjRows.phLoc (ε := X.B.I.ε v) (X.B.σ v) (X.B.w v) (X.dv v))
               (Formalism.REAL.muG (X.B.I.ε v)) := by
-  first
-  | exact @GlobalTheory.Core.Mi.seeData_of_gap
-  | exact GlobalTheory.Core.Mi.seeData_of_gap
-  | (intros; apply GlobalTheory.Core.Mi.seeData_of_gap <;> assumption)
+  first | exact @GlobalTheory.Core.Mi.seeData_of_gap

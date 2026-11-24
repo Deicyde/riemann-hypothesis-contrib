@@ -93,7 +93,6 @@ theorem WeightedIndexBound.proof
   have hmink : (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E ≤ |o.volumeForm b| := by
     refine h₅ o b lam hlam0 fun z hz => ?_
     have hsum : ∑ i, (z i : ℝ) • b i = Φ ((∑ i, z i • e i : A) : E) := by
-
       rw [hcoe, map_sum]
       simp only [map_zsmul, b, Int.cast_smul_eq_zsmul]
     rw [hsum]

@@ -51,9 +51,6 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.BigOn.Exp
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

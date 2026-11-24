@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.exists_keyInvariant_after_dvr_extension
               (hg' : x'.P.g = x.P.g) (s' : Fin x'.P.g → RR x' n) (u : O'ˣ),
             Function.Injective j ∧ IsLocalHom j ∧ r'.comp j = r ∧ KeyVia x' x j φ' w'
               ∧ (∀ i, SecVia x' x φ' w' (s' i) (s (i.cast hg'))) ∧ KaVal x' n l l' al s' u := by
-  first
-  | exact @GlobalTheory.KaLift.exists_kaVal_extension
-  | exact GlobalTheory.KaLift.exists_kaVal_extension
-  | (intros; apply GlobalTheory.KaLift.exists_kaVal_extension <;> assumption)
+  first | exact @GlobalTheory.KaLift.exists_kaVal_extension

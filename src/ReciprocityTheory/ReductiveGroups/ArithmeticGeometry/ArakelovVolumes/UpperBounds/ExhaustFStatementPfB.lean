@@ -279,7 +279,7 @@ theorem psgn_dmin_gt
       simp only [Sum.elim_inl, Sum.elim_inr, gr, Fin.coe_castLE, Fin.val_mk] at h1
       omega
     · have h1 := congrArg Fin.val hst
-      simp only [Sum.elim_inl, Sum.elim_inr, gr, Fin.coe_castLE, Fin.val_mk] at h1
+      simp only [Sum.elim_inr, gr, Fin.val_mk] at h1
       exact congrArg Sum.inr (Fin.ext (by omega))
   have hli := hli0.comp _ hg
   have hS : (-(D - α * B)).PosDef := by

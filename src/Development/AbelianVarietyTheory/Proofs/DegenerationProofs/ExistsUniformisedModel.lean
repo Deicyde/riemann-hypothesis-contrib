@@ -84,10 +84,7 @@ theorem exists_finite_factor
     fun x hx => IntermediateField.subset_adjoin _ _ (Finset.mem_coe.2 (Finset.mem_union_right _ hx))
   ⟩
 
-theorem spMap_spMap
-    {R R₁ R₂ : Type} [CommRing R] [CommRing R₁] [CommRing R₂] (a : R →+* R₁) (b : R₁ →+* R₂)
-    : spMap b ≫ spMap a = spMap (b.comp a) := by
-  rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
+alias spMap_spMap := _root_.GlobalTheory.SplitReduction.spMap_comp
 
 theorem exists_polBaseChange (hB : PolBaseChangeSt) {S S' : Scheme.{0}} (f : S' ⟶ S) (P : PolAV S)
     : ∃ (P' : PolAV S') (φ : P'.A.left ⟶ P.A.left),

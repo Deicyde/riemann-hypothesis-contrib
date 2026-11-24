@@ -56,7 +56,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -64,13 +65,16 @@ namespace SectionSpanStep
 
 variable {K : Type} [Fintype K] {ι : K → Type} {Ω : Type} [Field Ω]
 
-theorem mul_mem {y : (Σ k, ι k) → Ω} {a : K → ℤ} {n j : ℕ} {s t : Ω} (hs : s ∈ chartLat y a n)
-    (ht : t ∈ chartLat y a j) : s * t ∈ chartLat y a (n + j) := by
+theorem mul_mem
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {n j : ℕ} {s t : Ω}
+    (hs : s ∈ chartLat y a n) (ht : t ∈ chartLat y a j)
+    : s * t ∈ chartLat y a (n + j) := by
   apply _root_.GroundTheory.Heights₂.Heights.HilbertSamuel.SpanStepHomog.mul_mem <;> assumption
 
-theorem prod_pow_mem {y : (Σ k, ι k) → Ω} {a : K → ℤ} {q : ℕ} {w : Fin q → Ω}
-    (hw : ∀ j, w j ∈ chartLat y a 1) (ν : Fin q → ℕ) (S : Finset (Fin q)) :
-    ∏ j ∈ S, w j ^ ν j ∈ chartLat y a (∑ j ∈ S, ν j) := by
+theorem prod_pow_mem
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {q : ℕ} {w : Fin q → Ω}
+    (hw : ∀ j, w j ∈ chartLat y a 1) (ν : Fin q → ℕ) (S : Finset (Fin q))
+    : ∏ j ∈ S, w j ^ ν j ∈ chartLat y a (∑ j ∈ S, ν j) := by
   have hpow : ∀ (j : Fin q) (e : ℕ), w j ^ e ∈ chartLat y a e := by
     intro j e
     induction e with
@@ -85,10 +89,9 @@ theorem prod_pow_mem {y : (Σ k, ι k) → Ω} {a : K → ℤ} {q : ℕ} {w : Fi
 
 end SectionSpanStep
 
-
 open SectionSpanStep in
-theorem SectionSpanStep.proof (hH : SpanStepHomog.Statement) (hS : SerreGraded.Statement) :
-    SectionSpanStep.Statement := by
+theorem SectionSpanStep.proof (hH : SpanStepHomog.Statement) (hS : SerreGraded.Statement)
+    : SectionSpanStep.Statement := by
   intro K _ ι _ Ω _ y a q w hy hw hgen
   obtain ⟨m, r, t, ht, hloc⟩ := hH K ι Ω y a q w hy hw hgen
   have hne : ∃ j, w j ≠ 0 := by

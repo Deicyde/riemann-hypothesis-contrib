@@ -190,7 +190,6 @@ end GlobalTheory.Reg.ChartCompat
 namespace GlobalTheory.Reg
 open ChartCompat
 
-
 attribute [local instance 1100] Subalgebra.algebra OreLocalization.instAlgebra in
 attribute [local instance 100] IntermediateField.instAlgebraSubtypeMem in
 theorem FChart.compat

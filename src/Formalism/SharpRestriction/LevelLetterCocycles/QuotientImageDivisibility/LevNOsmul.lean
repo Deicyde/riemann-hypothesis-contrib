@@ -78,11 +78,7 @@ theorem levN_osmul (c : ZMod n) (ζ : LL) (o : O) (x : ↥(W.N T))
   rw [this]
   change smulS _ _ = _
   have hC : (algebraMap O (PowerSeries LL) o) = PowerSeries.C (algebraMap O LL o) := by
-    first
-    | exact PowerSeries.algebraMap_apply' o
-    | exact PowerSeries.algebraMap_apply o
-    | simp [PowerSeries.algebraMap_apply']
-    | simp [PowerSeries.algebraMap_apply]
+    first | simp [PowerSeries.algebraMap_apply]
   rw [AlgHom.commutes, hC, smulS_C hm]
 
 theorem fam_exp

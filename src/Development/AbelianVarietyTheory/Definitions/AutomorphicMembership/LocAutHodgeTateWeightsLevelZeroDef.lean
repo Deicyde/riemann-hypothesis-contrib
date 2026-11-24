@@ -51,7 +51,6 @@ variable
   {R : Ranks} {H : Host R} {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
   {LL0 : IntermediateField ℚ what₂.LL}
 
-
 structure LocNd (L : NLay0 R H what₂ LL0) where
   Loc : Type
   l : Loc → ℕ
@@ -211,7 +210,6 @@ def LocNd.nd {L : NLay0 R H what₂ LL0} (X : LocNd L) : NData R H what₂ := {
   Zgood := fun _ => ∅
 }
 
-
 structure LocTw {L : NLay0 R H what₂ LL0} (X : LocNd L) where
   twOf : X.nd.Loc → L.ntw.Tw
   twSide : X.nd.Loc → Bool
@@ -253,7 +251,6 @@ def LocTw.ntw {L : NLay0 R H what₂ LL0} {X : LocNd L} (T : LocTw X) : NTw R H 
   psiL_l := T.psiL_l
   chi_tw := T.chi_tw
 }
-
 
 structure LocAut {L : NLay0 R H what₂ LL0} (X : LocNd L) where
   iotaQ : ∀ i, FractionRing (X.nd.O i) →+* Qbar (X.nd.l i)

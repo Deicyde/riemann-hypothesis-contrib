@@ -71,17 +71,17 @@ section Basis
 
 variable {R A : Type*} [CommRing R] [CommRing A] [Algebra R A] {n : ℕ}
 
-def polyTensorAlgEquiv (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] (n : ℕ) :
-    (MvPolynomial (Fin n) R ⊗[R] A) ≃ₐ[R] MvPolynomial (Fin n) A :=
+def polyTensorAlgEquiv (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] (n : ℕ)
+    : (MvPolynomial (Fin n) R ⊗[R] A) ≃ₐ[R] MvPolynomial (Fin n) A :=
   (Algebra.TensorProduct.comm R (MvPolynomial (Fin n) R) A).trans
     ((algebraTensorAlgEquiv R A).restrictScalars R)
 
-theorem polyTensorAlgEquiv_tmul (p : MvPolynomial (Fin n) R) (a : A) :
-    polyTensorAlgEquiv R A n (p ⊗ₜ a) = a • MvPolynomial.map (algebraMap R A) p := by
+theorem polyTensorAlgEquiv_tmul (p : MvPolynomial (Fin n) R) (a : A)
+    : polyTensorAlgEquiv R A n (p ⊗ₜ a) = a • MvPolynomial.map (algebraMap R A) p := by
   simp [polyTensorAlgEquiv]
 
-def polyTensorEquiv (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] (n : ℕ) :
-    (MvPolynomial (Fin n) R ⊗[R] A) ≃ₗ[MvPolynomial (Fin n) R] MvPolynomial (Fin n) A where
+def polyTensorEquiv (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] (n : ℕ)
+    : (MvPolynomial (Fin n) R ⊗[R] A) ≃ₗ[MvPolynomial (Fin n) R] MvPolynomial (Fin n) A where
   toFun := polyTensorAlgEquiv R A n
   invFun := (polyTensorAlgEquiv R A n).symm
   map_add' := map_add _
@@ -91,41 +91,42 @@ def polyTensorEquiv (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] (n : �
     induction t using TensorProduct.induction_on with
     | zero => simp
     | tmul p a =>
-      rw [smul_tmul', smul_eq_mul, polyTensorAlgEquiv_tmul, polyTensorAlgEquiv_tmul, RingHom.id_apply,
-        Algebra.smul_def q, MvPolynomial.algebraMap_def, map_mul, mul_smul_comm]
-    | add s t hs ht =>
-      rw [smul_add, map_add (f := _), map_add (f := _), hs, ht, smul_add]
+      rw [smul_tmul', smul_eq_mul, polyTensorAlgEquiv_tmul, polyTensorAlgEquiv_tmul,
+        RingHom.id_apply, Algebra.smul_def q, MvPolynomial.algebraMap_def, map_mul, mul_smul_comm]
+    | add s t hs ht => rw [smul_add, map_add (f := _), map_add (f := _), hs, ht, smul_add]
 
-def polyBasis {ι : Type*} (b : Module.Basis ι R A) (n : ℕ) :
-    Module.Basis ι (MvPolynomial (Fin n) R) (MvPolynomial (Fin n) A) :=
+def polyBasis {ι : Type*} (b : Module.Basis ι R A) (n : ℕ)
+    : Module.Basis ι (MvPolynomial (Fin n) R) (MvPolynomial (Fin n) A) :=
   (Algebra.TensorProduct.basis (MvPolynomial (Fin n) R) b).map (polyTensorEquiv R A n)
 
-theorem polyBasis_apply {ι : Type*} (b : Module.Basis ι R A) (n : ℕ) (i : ι) :
-    polyBasis b n i = C (b i) := by
+theorem polyBasis_apply {ι : Type*} (b : Module.Basis ι R A) (n : ℕ) (i : ι)
+    : polyBasis b n i = C (b i) := by
   simp [polyBasis, polyTensorEquiv, Algebra.TensorProduct.basis_apply, polyTensorAlgEquiv_tmul,
     smul_eq_C_mul]
 
 end Basis
 
-theorem normForm_eq_det {R A : Type*} [CommRing R] [CommRing A] [Algebra R A] {n : ℕ} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι R A) (x : Fin n → A) :
-    normForm A x = (∑ j, (X j : MvPolynomial (Fin n) R) • (Algebra.leftMulMatrix b (x j)).map C).det := by
+theorem normForm_eq_det
+    {R A : Type*} [CommRing R] [CommRing A] [Algebra R A]
+    {n : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R A) (x : Fin n → A)
+    : normForm A x
+      = (∑ j, (X j : MvPolynomial (Fin n) R) • (Algebra.leftMulMatrix b (x j)).map C).det := by
   apply GroundTheory.Heights₂.Heights.Vertical.normForm_eq_det <;> assumption
 
 section Embeddings
 
 variable {E L K : Type*} [Field E] [Field L] [Field K] [Algebra E L] [Algebra E K] {n : ℕ}
 
-def embForm (σ : L →ₐ[E] K) (x : Fin n → L) : MvPolynomial (Fin n) K :=
-  ∑ j, X j * C (σ (x j))
+def embForm (σ : L →ₐ[E] K) (x : Fin n → L) : MvPolynomial (Fin n) K := ∑ j, X j * C (σ (x j))
 
-theorem eval_embForm (σ : L →ₐ[E] K) (x : Fin n → L) (u : Fin n → K) :
-    eval u (embForm σ x) = ∑ j, u j * σ (x j) := by
+theorem eval_embForm (σ : L →ₐ[E] K) (x : Fin n → L) (u : Fin n → K)
+    : eval u (embForm σ x) = ∑ j, u j * σ (x j) := by
   simp [embForm]
 
-theorem normForm_map_eq_prod [FiniteDimensional E L] [Algebra.IsSeparable E L] [IsAlgClosed K]
-    (x : Fin n → L) :
-    (normForm (R := E) L x).map (algebraMap E K) = ∏ σ : L →ₐ[E] K, embForm σ x := by
+theorem normForm_map_eq_prod
+    [FiniteDimensional E L] [Algebra.IsSeparable E L] [IsAlgClosed K] (x : Fin n → L)
+    : (normForm (R := E) L x).map (algebraMap E K) = ∏ σ : L →ₐ[E] K, embForm σ x := by
   classical
   let pb := Field.powerBasisOfFiniteOfSeparable E L
   let b := pb.basis
@@ -137,10 +138,12 @@ theorem normForm_map_eq_prod [FiniteDimensional E L] [Algebra.IsSeparable E L] [
   have hP : P.det ≠ 0 := by
     have h := (map_ne_zero (algebraMap E K)).mpr (det_traceMatrix_ne_zero' pb)
     rw [RingHom.map_det, RingHom.mapMatrix_apply,
-      Algebra.traceMatrix_eq_embeddingsMatrixReindex_mul_trans E K b e, det_mul, det_transpose] at h
+        Algebra.traceMatrix_eq_embeddingsMatrixReindex_mul_trans E K b e, det_mul, det_transpose]
+      at h
     exact left_ne_zero_of_mul h
-  have hkey : ∀ (z : L) (k j : Fin pb.dim),
-      ∑ i, algebraMap E K (Algebra.leftMulMatrix b z i k) * P i j = P k j * e j z := by
+  have hkey
+      : ∀ (z : L) (k j : Fin pb.dim),
+        ∑ i, algebraMap E K (Algebra.leftMulMatrix b z i k) * P i j = P k j * e j z := by
     intro z k j
     have h1 : z * b k = ∑ i, Algebra.leftMulMatrix b z i k • b i := by
       simp only [Algebra.leftMulMatrix_eq_repr_mul]
@@ -160,16 +163,17 @@ theorem normForm_map_eq_prod [FiniteDimensional E L] [Algebra.IsSeparable E L] [
     rw [mul_diagonal, Matrix.mul_apply]
 
     simp only [hΛ, transpose_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.sum_apply,
-    Matrix.smul_apply, smul_eq_mul, map_sum, map_mul, map_X, map_C, D, embForm]
-    calc ∑ i, (∑ l, X l * C (algebraMap E K (Algebra.leftMulMatrix b (x l) i k))) * C (P i j)
-        = ∑ l, X l * C (∑ i, algebraMap E K (Algebra.leftMulMatrix b (x l) i k) * P i j) := by
-
-          simp only [Finset.sum_mul, map_sum, Finset.mul_sum, map_mul, mul_assoc]
-          exact Finset.sum_comm
+      Matrix.smul_apply, smul_eq_mul, map_sum, map_mul, map_X, map_C, D, embForm]
+    calc
+      ∑ i, (∑ l, X l * C (algebraMap E K (Algebra.leftMulMatrix b (x l) i k))) * C (P i j)
+          = ∑ l, X l * C (∑ i, algebraMap E K (Algebra.leftMulMatrix b (x l) i k) * P i j) := by
+        simp only [Finset.sum_mul, map_sum, Finset.mul_sum, map_mul, mul_assoc]
+        exact Finset.sum_comm
       _ = C (P k j) * ∑ l, X l * C (e j (x l)) := by
-          simp only [hkey, Finset.mul_sum, map_mul]
-          exact Finset.sum_congr rfl fun l _ => by ring
-  have hPC : (P.map C : Matrix (Fin pb.dim) (Fin pb.dim) (MvPolynomial (Fin n) K)).det = C P.det := by
+        simp only [hkey, Finset.mul_sum, map_mul]
+        exact Finset.sum_congr rfl fun l _ => by ring
+  have hPC
+      : (P.map C : Matrix (Fin pb.dim) (Fin pb.dim) (MvPolynomial (Fin n) K)).det = C P.det := by
     rw [RingHom.map_det, RingHom.mapMatrix_apply]
   have hdet := congrArg det hconj
   rw [det_mul, det_mul, det_transpose, det_diagonal, hPC] at hdet
@@ -184,14 +188,16 @@ section Degree
 
 variable {K : Type*} [Field K] {n : ℕ}
 
-theorem isUnit_of_totalDegree_eq_zero {p : MvPolynomial (Fin n) K} (hp : p ≠ 0)
-    (hd : p.totalDegree = 0) : IsUnit p := by
+theorem isUnit_of_totalDegree_eq_zero
+    {p : MvPolynomial (Fin n) K} (hp : p ≠ 0) (hd : p.totalDegree = 0)
+    : IsUnit p := by
   rw [totalDegree_eq_zero_iff_eq_C] at hd
   rw [hd] at hp ⊢
   exact (Ne.isUnit fun h => hp (by rw [h, C_0])).map C
 
-theorem irreducible_of_totalDegree_le_one {ℓ : MvPolynomial (Fin n) K} (h1 : ℓ.totalDegree ≤ 1)
-    (hc : ∀ r, ℓ ≠ C r) : Irreducible ℓ := by
+theorem irreducible_of_totalDegree_le_one
+    {ℓ : MvPolynomial (Fin n) K} (h1 : ℓ.totalDegree ≤ 1) (hc : ∀ r, ℓ ≠ C r)
+    : Irreducible ℓ := by
   have hne : ℓ ≠ 0 := by simpa using hc 0
   refine irreducible_iff.mpr ⟨fun hu => ?_, fun a b hab => ?_⟩
   · obtain ⟨r, -, hr⟩ := isUnit_iff_eq_C_of_isReduced.mp hu
@@ -210,23 +216,23 @@ end Degree
 
 section Forms
 
-variable {E L K : Type*} [Field E] [Field L] [Field K] [Algebra E L] [Algebra E K] {n : ℕ}
-  {x : Fin n → L} {t : Fin n → E}
+variable
+  {E L K : Type*} [Field E] [Field L] [Field K] [Algebra E L] [Algebra E K]
+  {n : ℕ} {x : Fin n → L} {t : Fin n → E}
 
 theorem totalDegree_embForm_le (σ : L →ₐ[E] K) (x : Fin n → L) : (embForm σ x).totalDegree ≤ 1 := by
   refine (totalDegree_finsetSum _ _).trans (Finset.sup_le fun j _ => ?_)
   refine (totalDegree_mul _ _).trans ?_
   simp [totalDegree_X, totalDegree_C]
 
-theorem eval_embForm_alt (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1) :
-    eval (fun j => algebraMap E K (t j)) (embForm σ x) = 1 := by
-
+theorem eval_embForm_alt (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1)
+    : eval (fun j => algebraMap E K (t j)) (embForm σ x) = 1 := by
   rw [eval_embForm, ← map_one σ, ← ht, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, AlgHom.commutes]
 
-theorem embForm_ne_C (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1) (r : K) :
-    embForm σ x ≠ C r := by
+theorem embForm_ne_C (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1) (r : K)
+    : embForm σ x ≠ C r := by
   intro h
   have h1 := congrArg (eval fun j => algebraMap E K (t j)) h
   rw [eval_embForm_alt σ ht, eval_C] at h1
@@ -236,16 +242,18 @@ theorem embForm_ne_C (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x 
     simpa using h0.symm
   exact one_ne_zero (h1.trans h0)
 
-theorem irreducible_embForm (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1) :
-    Irreducible (embForm σ x) :=
+theorem irreducible_embForm (σ : L →ₐ[E] K) (ht : ∑ j, algebraMap E L (t j) * x j = 1)
+    : Irreducible (embForm σ x) :=
   irreducible_of_totalDegree_le_one (totalDegree_embForm_le σ x) (embForm_ne_C σ ht)
 
-theorem eq_of_embForm_dvd (hgen : Algebra.adjoin E (Set.range x) = ⊤)
-    (ht : ∑ j, algebraMap E L (t j) * x j = 1) {σ τ : L →ₐ[E] K}
-    (h : embForm σ x ∣ embForm τ x) : σ = τ := by
+theorem eq_of_embForm_dvd
+    (hgen : Algebra.adjoin E (Set.range x) = ⊤) (ht : ∑ j, algebraMap E L (t j) * x j = 1)
+    {σ τ : L →ₐ[E] K} (h : embForm σ x ∣ embForm τ x)
+    : σ = τ := by
   obtain ⟨q, hq⟩ := h
-  have hu : IsUnit q := ((irreducible_embForm τ ht).isUnit_or_isUnit hq).resolve_left
-    (irreducible_embForm σ ht).not_isUnit
+  have hu : IsUnit q :=
+    ((irreducible_embForm τ ht).isUnit_or_isUnit hq).resolve_left
+      (irreducible_embForm σ ht).not_isUnit
   obtain ⟨r, -, rfl⟩ := isUnit_iff_eq_C_of_isReduced.mp hu
   have hr : r = 1 := by
     have := congrArg (eval fun j => algebraMap E K (t j)) hq
@@ -257,9 +265,11 @@ theorem eq_of_embForm_dvd (hgen : Algebra.adjoin E (Set.range x) = ⊤)
   have := congrArg (eval (Pi.single j 1)) hq
   simpa [eval_embForm, Pi.single_apply] using this.symm
 
-theorem prod_embForm_dvd [Fintype (L →ₐ[E] K)] (hgen : Algebra.adjoin E (Set.range x) = ⊤)
-    (ht : ∑ j, algebraMap E L (t j) * x j = 1) {p : MvPolynomial (Fin n) K}
-    (h : ∀ σ : L →ₐ[E] K, embForm σ x ∣ p) : ∏ σ : L →ₐ[E] K, embForm σ x ∣ p := by
+theorem prod_embForm_dvd
+    [Fintype (L →ₐ[E] K)]
+    (hgen : Algebra.adjoin E (Set.range x) = ⊤) (ht : ∑ j, algebraMap E L (t j) * x j = 1)
+    {p : MvPolynomial (Fin n) K} (h : ∀ σ : L →ₐ[E] K, embForm σ x ∣ p)
+    : ∏ σ : L →ₐ[E] K, embForm σ x ∣ p := by
   classical
   suffices ∀ s : Finset (L →ₐ[E] K), ∏ σ ∈ s, embForm σ x ∣ p from this Finset.univ
   intro s
@@ -276,25 +286,29 @@ theorem prod_embForm_dvd [Fintype (L →ₐ[E] K)] (hgen : Algebra.adjoin E (Set
     · obtain ⟨q', rfl⟩ := h1
       exact ⟨q', by rw [hq]; ring⟩
 
-theorem map_embForm (τ : K →ₐ[E] K) (σ : L →ₐ[E] K) :
-    (embForm σ x).map (τ : K →+* K) = embForm (τ.comp σ) x := by
+theorem map_embForm (τ : K →ₐ[E] K) (σ : L →ₐ[E] K)
+    : (embForm σ x).map (τ : K →+* K) = embForm (τ.comp σ) x := by
   simp [embForm]
 
-theorem map_map_algebraMap (τ : K →ₐ[E] K) (p : MvPolynomial (Fin n) E) :
-    (p.map (algebraMap E K)).map (τ : K →+* K) = p.map (algebraMap E K) := by
+theorem map_map_algebraMap (τ : K →ₐ[E] K) (p : MvPolynomial (Fin n) E)
+    : (p.map (algebraMap E K)).map (τ : K →+* K) = p.map (algebraMap E K) := by
   rw [MvPolynomial.map_map, AlgHom.comp_algebraMap]
 
-theorem exists_comp_eq [FiniteDimensional E L] [Algebra.IsSeparable E L] [IsAlgClosed K]
-    [Algebra.IsAlgebraic E K] (σ σ' : L →ₐ[E] K) : ∃ τ : K →ₐ[E] K, τ.comp σ = σ' := by
+theorem exists_comp_eq
+    [FiniteDimensional E L] [Algebra.IsSeparable E L] [IsAlgClosed K] [Algebra.IsAlgebraic E K]
+    (σ σ' : L →ₐ[E] K)
+    : ∃ τ : K →ₐ[E] K, τ.comp σ = σ' := by
   let pb := Field.powerBasisOfFiniteOfSeparable E L
   have hy : Polynomial.aeval (σ' pb.gen) (minpoly E (σ pb.gen)) = 0 := by
     rw [minpoly.algHom_eq σ σ.injective, Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
-  obtain ⟨τ, hτ⟩ := IntermediateField.exists_algHom_of_splits_of_aeval
-    (fun s => ⟨Algebra.IsIntegral.isIntegral (R := E) s, IsAlgClosed.splits _⟩) hy
+  obtain ⟨τ, hτ⟩ :=
+    IntermediateField.exists_algHom_of_splits_of_aeval
+      (fun s => ⟨Algebra.IsIntegral.isIntegral (R := E) s, IsAlgClosed.splits _⟩)
+      hy
   exact ⟨τ, pb.algHom_ext (by simpa using hτ)⟩
 
-theorem isUnit_of_map_isUnit {p : MvPolynomial (Fin n) E} (h : IsUnit (p.map (algebraMap E K))) :
-    IsUnit p := by
+theorem isUnit_of_map_isUnit {p : MvPolynomial (Fin n) E} (h : IsUnit (p.map (algebraMap E K)))
+    : IsUnit p := by
   obtain ⟨r, hr, hpr⟩ := isUnit_iff_eq_C_of_isReduced.mp h
   have hc : ∀ m, m ≠ 0 → p.coeff m = 0 := fun m hm => by
     have := congrArg (AddMonoidAlgebra.coeff · m) hpr
@@ -318,7 +332,6 @@ end Forms
 
 end NormFormIrreducible
 
-
 open NormFormIrreducible in
 theorem NormFormIrreducible.proof : NormFormIrreducible.Statement := by
   intro E L _ _ _ _ _ _ n x t hgen ht
@@ -329,28 +342,30 @@ theorem NormFormIrreducible.proof : NormFormIrreducible.Statement := by
   have hirr : ∀ σ : L →ₐ[E] K, Irreducible (embForm σ x) := fun σ => irreducible_embForm σ ht
   let σ₀ : L →ₐ[E] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine irreducible_iff.mpr ⟨fun hu => ?_, fun F G hFG => ?_⟩
   · have := hu.map (MvPolynomial.map (algebraMap E K))
     rw [hprod] at this
     exact (hirr σ₀).not_isUnit
       (isUnit_of_dvd_unit (Finset.dvd_prod_of_mem (fun σ => embForm σ x) (Finset.mem_univ σ₀)) this)
-  · have hbar : ∏ σ : L →ₐ[E] K, embForm σ x =
-        F.map (algebraMap E K) * G.map (algebraMap E K) := by
+  · have hbar : ∏ σ : L →ₐ[E] K, embForm σ x = F.map (algebraMap E K) * G.map (algebraMap E K) := by
       rw [← hprod, hFG, map_mul]
     have hN0 : ∏ σ : L →ₐ[E] K, embForm σ x ≠ 0 :=
       Finset.prod_ne_zero_iff.mpr fun σ _ => (hirr σ).ne_zero
-    have hstable : ∀ p : MvPolynomial (Fin n) E, (∃ σ : L →ₐ[E] K, embForm σ x ∣ p.map (algebraMap E K)) →
-        ∀ σ : L →ₐ[E] K, embForm σ x ∣ p.map (algebraMap E K) := by
+    have hstable
+        : ∀ p : MvPolynomial (Fin n) E,
+          (∃ σ : L →ₐ[E] K, embForm σ x ∣ p.map (algebraMap E K))
+            → ∀ σ : L →ₐ[E] K, embForm σ x ∣ p.map (algebraMap E K) := by
       rintro p ⟨σ, hσ⟩ σ'
       obtain ⟨τ, rfl⟩ := exists_comp_eq σ σ'
       have := map_dvd (MvPolynomial.map (τ : K →+* K)) hσ
       rwa [map_embForm, map_map_algebraMap] at this
-    have hunit : ∀ P Q : MvPolynomial (Fin n) E, (∀ σ : L →ₐ[E] K, embForm σ x ∣ P.map (algebraMap E K)) →
-        ∏ σ : L →ₐ[E] K, embForm σ x = P.map (algebraMap E K) * Q.map (algebraMap E K) →
-          IsUnit Q := by
+    have hunit
+        : ∀ P Q : MvPolynomial (Fin n) E,
+          (∀ σ : L →ₐ[E] K, embForm σ x ∣ P.map (algebraMap E K))
+            → ∏ σ : L →ₐ[E] K, embForm σ x = P.map (algebraMap E K) * Q.map (algebraMap E K)
+            → IsUnit Q := by
       intro P Q hP hPQ
       have hd := prod_embForm_dvd hgen ht hP
       rw [hPQ] at hd hN0
@@ -362,7 +377,8 @@ theorem NormFormIrreducible.proof : NormFormIrreducible.Statement := by
     · simp only [not_exists] at hF
       refine Or.inl (hunit G F (hstable G ⟨σ₀, ?_⟩) (by rw [hbar, mul_comm]))
       exact ((hirr σ₀).prime.dvd_or_dvd
-        (hbar ▸ Finset.dvd_prod_of_mem (fun σ => embForm σ x) (Finset.mem_univ σ₀))).resolve_left (hF σ₀)
+          (hbar ▸ Finset.dvd_prod_of_mem (fun σ => embForm σ x) (Finset.mem_univ σ₀))).resolve_left
+        (hF σ₀)
 
 end
 

@@ -58,27 +58,27 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.C
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.FlagStep
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.FlagStep
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagStep
 
-theorem exists_tensor_equiv_of_semilinear :
-    ∀ (Ω₀ Ω : Type) [Field Ω₀] [Field Ω] [Algebra Ω₀ Ω] (V V' : Type) [AddCommGroup V]
-    [Module Ω₀ V] [AddCommGroup V'] [Module Ω V'] (j : V →+ V'),
-    (∀ (a : Ω₀) e, j (a • e) = algebraMap Ω₀ Ω a • j e) →
-    (∀ (n : ℕ) (b : Fin n → V), LinearIndependent Ω₀ b → LinearIndependent Ω fun k => j (b k)) →
-    Submodule.span Ω (Set.range j) = ⊤ →
-    ∃ Φ : TensorProduct Ω₀ Ω V ≃ₗ[Ω] V', ∀ e, Φ (TensorProduct.mk Ω₀ Ω V 1 e) = j e := by
+theorem exists_tensor_equiv_of_semilinear
+    : ∀ (Ω₀ Ω : Type) [Field Ω₀] [Field Ω] [Algebra Ω₀ Ω] (V V' : Type) [AddCommGroup V]
+        [Module Ω₀ V] [AddCommGroup V'] [Module Ω V'] (j : V →+ V'),
+      (∀ (a : Ω₀) e, j (a • e) = algebraMap Ω₀ Ω a • j e)
+        → (∀ (n : ℕ) (b : Fin n → V), LinearIndependent Ω₀ b → LinearIndependent Ω fun k => j (b k))
+        → Submodule.span Ω (Set.range j) = ⊤
+        → ∃ Φ : TensorProduct Ω₀ Ω V ≃ₗ[Ω] V', ∀ e, Φ (TensorProduct.mk Ω₀ Ω V 1 e) = j e := by
   intro Ω₀ Ω _ _ _ V V' _ _ _ _ j hsemi hind hspan
   letI : Module Ω₀ V' := Module.compHom V' (algebraMap Ω₀ Ω)
   haveI : IsScalarTower Ω₀ Ω V' := ⟨fun a b x => by
     change (a • b) • x = algebraMap Ω₀ Ω a • (b • x)
     rw [Algebra.smul_def, mul_smul]⟩
-  let jl : V →ₗ[Ω₀] V' :=
-    { toFun := j
-      map_add' := j.map_add
-      map_smul' := fun a e => hsemi a e }
+  let jl : V →ₗ[Ω₀] V' := { toFun := j, map_add' := j.map_add, map_smul' := fun a e => hsemi a e }
   let L : TensorProduct Ω₀ Ω V →ₗ[Ω] V' := jl.liftBaseChange Ω
   have hL : ∀ e, L (TensorProduct.mk Ω₀ Ω V 1 e) = j e := by
     intro e

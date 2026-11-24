@@ -41,23 +41,29 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH NumberField IsDedekindDomain Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links
-open Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Lev Formalism.L2.Pj Formalism.L2.Host
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH NumberField
+  IsDedekindDomain Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR
+  Formalism.IndefR.Links
+open Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Lev Formalism.L2.Pj
+  Formalism.L2.Host
 
 namespace GlobalTheory.Mem.R3.Tr
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {B : Base} {C : Cols B} {a : Late B C} (b : Late B C) {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
+variable
+  {B : Base} {C : Cols B} {a : Late B C} (b : Late B C)
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 I0 T : Type}
 variable {Ks : Type} [Field Ks] [NumberField Ks] [iK : Algebra Ks a.D.what₂.LL]
 set_option linter.style.haveILetI false
 
 section Spaces
 
-
 variable (a) in
-def goodPartB : type_of% (@goodPart b.D) := @fun V S θ M J χ e => (by with_unfolding_all exact ((@goodPart a.D ((V)) ((S)) ((θ)) (((ds a M))) ((J)) ((χ)) ((e))) : _))
-
+def goodPartB : type_of% (@goodPart b.D) :=
+  @fun V S θ M J χ e => (by
+    with_unfolding_all exact ((@goodPart a.D ((V)) ((S)) ((θ)) (((ds a M))) ((J)) ((χ)) ((e))) : _))
 
 variable (a) in
 theorem goodPart_eq : @goodPart b.D = @goodPartB B C a b := by
@@ -66,10 +72,11 @@ theorem goodPart_eq : @goodPart b.D = @goodPartB B C a b := by
   rewrite [mult_eq a b]
   with_unfolding_all apply Eq.refl (@goodPartB B C a b V S θ M J χ e)
 
-
 variable (a) in
-def partFullB : type_of% (@partFull b.D) := @fun V S θ M J χ Sb c => (by with_unfolding_all exact ((@partFull a.D ((V)) ((S)) ((θ)) (((ds a M))) ((J)) ((χ)) ((Sb)) ((c))) : _))
-
+def partFullB : type_of% (@partFull b.D) :=
+  @fun V S θ M J χ Sb c => (by
+    with_unfolding_all
+      exact ((@partFull a.D ((V)) ((S)) ((θ)) (((ds a M))) ((J)) ((χ)) ((Sb)) ((c))) : _))
 
 variable (a) in
 theorem partFull_eq : @partFull b.D = @partFullB B C a b := by
@@ -82,29 +89,41 @@ end Spaces
 
 section General
 
-variable {D : D7} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {D : D7} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
-abbrev ccW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T) (j : ℕ) :
-    Submodule ℂ (SmT (R.MY j) →ₗ[ℂ] (GA D (Yc D j) → ℂ)) :=
+abbrev ccW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T) (j : ℕ)
+    : Submodule ℂ (SmT (R.MY j) →ₗ[ℂ] (GA D (Yc D j) → ℂ)) :=
   m R.θ (R.MY j) (levS _ (R.βY j) (R.datYt t j R.triv)) (levChi _ (R.βY j) (R.datYt t j R.triv))
 
-def pIoYW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T) (k : ℕ) (io : ccW (@m) R t (k + 1) →ₗ[ℂ] ccW (@m) R t k) : Prop :=
-  Lift.IsIo (R.νY t (k + 1)) (R.fdY t (k + 1)) (thetaKO (R.ωY t k)) (R.ptY t k) (R.ItY k) (ccW (@m) R t (k + 1)) (ccW (@m) R t k) io
+def pIoYW
+    (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T) (k : ℕ)
+    (io : ccW (@m) R t (k + 1) →ₗ[ℂ] ccW (@m) R t k)
+    : Prop :=
+  Lift.IsIo (R.νY t (k + 1)) (R.fdY t (k + 1)) (thetaKO (R.ωY t k)) (R.ptY t k) (R.ItY k)
+    (ccW (@m) R t (k + 1)) (ccW (@m) R t k) io
 
-def pIoXW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T)
-    (io : LinearMap.range (R.cX.toMap R.prX ∘ₗ (R.HX t).e) →ₗ[ℂ] ccW (@m) R t (D.R.m - 1)) : Prop :=
-  Lift.IsIo (R.νX t) (R.fdX t) (thetaKO (R.ωX t)) (R.ptX t) R.ItX (LinearMap.range (R.cX.toMap R.prX ∘ₗ (R.HX t).e))
-    (ccW (@m) R t (D.R.m - 1)) io
+def pIoXW
+    (m : type_of% (@MultT D)) (R : RealDat D A Ks) (t : T)
+    (io : LinearMap.range (R.cX.toMap R.prX ∘ₗ (R.HX t).e) →ₗ[ℂ] ccW (@m) R t (D.R.m - 1))
+    : Prop :=
+  Lift.IsIo (R.νX t) (R.fdX t) (thetaKO (R.ωX t)) (R.ptX t) R.ItX
+    (LinearMap.range (R.cX.toMap R.prX ∘ₗ (R.HX t).e)) (ccW (@m) R t (D.R.m - 1)) io
 
-def thDnW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (y : IoYT (@m) R) (x : IoXT (@m) R) (t : T) :
-    (R.HX t).H →ₗ[ℂ] (SmT (R.MY 0) →ₗ[ℂ] (GA D (Yc D 0) → ℂ)) :=
-  (ccW (@m) R t 0).subtype ∘ₗ Lift.thetaDn (ccW (@m) R t) (y t) (D.R.m - 1) ∘ₗ x t ∘ₗ
-    (R.cX.toMap R.prX ∘ₗ (R.HX t).e).rangeRestrict
+def thDnW (m : type_of% (@MultT D)) (R : RealDat D A Ks) (y : IoYT (@m) R) (x : IoXT (@m) R) (t : T)
+    : (R.HX t).H →ₗ[ℂ] (SmT (R.MY 0) →ₗ[ℂ] (GA D (Yc D 0) → ℂ)) :=
+  (ccW (@m) R t 0).subtype ∘ₗ Lift.thetaDn (ccW (@m) R t) (y t) (D.R.m - 1) ∘ₗ x t
+    ∘ₗ (R.cX.toMap R.prX ∘ₗ (R.HX t).e).rangeRestrict
 
-theorem io_congr (R : RealDat D A Ks) {m m' : type_of% (@MultT D)} (e : @m = @m') {β : Type}
-    (f : ∀ m : type_of% (@MultT D), IoYT (@m) R → IoXT (@m) R → β) (y : IoYT (@m) R) (x : IoXT (@m) R) :
-    f (@m) y x = f (@m') (castAlong (congrArg (fun m : type_of% (@MultT D) => IoYT (@m) R) e) y).1
-      (castAlong (congrArg (fun m : type_of% (@MultT D) => IoXT (@m) R) e) x).1 := by
+theorem io_congr
+    (R : RealDat D A Ks)
+    {m m' : type_of% (@MultT D)} (e : @m = @m')
+    {β : Type} (f : ∀ m : type_of% (@MultT D), IoYT (@m) R → IoXT (@m) R → β)
+    (y : IoYT (@m) R) (x : IoXT (@m) R)
+    : f (@m) y x
+      = f (@m') (castAlong (congrArg (fun m : type_of% (@MultT D) => IoYT (@m) R) e) y).1
+        (castAlong (congrArg (fun m : type_of% (@MultT D) => IoXT (@m) R) e) x).1 := by
   subst e
   exact (congrArg₂ (f (@m)) (castAlong_rfl y) (castAlong_rfl x)).symm
 
@@ -114,29 +133,63 @@ section Two
 
 variable {A : FamIn a.D.what₂.LL G Pl0 T a.D.R.m} (R : RealDat a.D A Ks) {F : Face a.D A}
 
-theorem eeat_eq : R.EEat = (@RealDat.EEat (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› (@alg B C a b Ks ‹Field Ks› iK) (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A R)) := by
+theorem eeat_eq
+    : R.EEat
+      = (@RealDat.EEat (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T
+        (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks››
+        (@alg B C a b Ks ‹Field Ks› iK)
+        (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A
+          R)) := by
   funext P
-  with_unfolding_all apply congrArg (fun m : type_of% (@goodPart a.D) =>
-    m R.θ (R.MY 0) (levS _ (R.βY 0) (R.dat0 P)) (levChi _ (R.βY 0) (R.dat0 P)) R.e0) (goodPart_eq b a)
+  with_unfolding_all
+    apply congrArg
+      (fun m : type_of% (@goodPart a.D) =>
+        m R.θ (R.MY 0) (levS _ (R.βY 0) (R.dat0 P)) (levChi _ (R.βY 0) (R.dat0 P)) R.e0)
+      (goodPart_eq b a)
 
-theorem wall_eq : R.Wall = (by with_unfolding_all exact ((letI := alg b iK; (real b R).Wall) :)) := by
+theorem wall_eq
+    : R.Wall = (by with_unfolding_all exact ((letI := alg b iK; (real b R).Wall) :)) := by
   funext i σ
-  with_unfolding_all apply congrArg (fun m : type_of% (@Mult.Mult a.D) =>
-    m R.θ (R.MW i σ) (levS _ (R.βW i) (R.datWp i R.triv)) (levChi _ (R.βW i) (R.datWp i R.triv))) (mult_eq b a)
+  with_unfolding_all
+    apply congrArg
+      (fun m : type_of% (@Mult.Mult a.D) =>
+        m R.θ (R.MW i σ) (levS _ (R.βW i) (R.datWp i R.triv))
+          (levChi _ (R.βW i) (R.datWp i R.triv)))
+      (mult_eq b a)
 
 theorem wat_eq : R.Wat = (by with_unfolding_all exact ((letI := alg b iK; (real b R).Wat) :)) := by
   funext i σ P
-  with_unfolding_all apply congrArg (fun m : type_of% (@goodPart a.D) =>
-    m R.θ (R.MW i σ) (levS _ (R.βW i) (R.datWp i P)) (levChi _ (R.βW i) (R.datWp i P)) (R.eWf i σ)) (goodPart_eq b a)
+  with_unfolding_all
+    apply congrArg
+      (fun m : type_of% (@goodPart a.D) =>
+        m R.θ (R.MW i σ) (levS _ (R.βW i) (R.datWp i P)) (levChi _ (R.βW i) (R.datWp i P))
+          (R.eWf i σ))
+      (goodPart_eq b a)
 
-theorem thDn_eq : R.thDn = (@RealDat.thDn (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› (@alg B C a b Ks ‹Field Ks› iK) (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A R)) :=
-  by with_unfolding_all apply io_congr R (multT_eq b a) (fun m y x => thDnW (@m) R y x) R.ioY R.ioX
+theorem thDn_eq
+    : R.thDn
+      = (@RealDat.thDn (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T
+        (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks››
+        (@alg B C a b Ks ‹Field Ks› iK)
+        (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A
+          R)) := by
+  with_unfolding_all apply io_congr R (multT_eq b a) (fun m y x => thDnW (@m) R y x) R.ioY R.ioX
 
-theorem pTh_eq : R.PTh = (@RealDat.PTh (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› (@alg B C a b Ks ‹Field Ks› iK) (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A R)) :=
-  by with_unfolding_all apply congrArg (fun (d : type_of% R.thDn) (t : T) (g : (R.HX t).H →ₗ[ℂ] R.HE.H) =>
-    ∀ x, R.HE.e (g x) = postOn (R.MY 0) R.e0 (PiTensorProduct.lift.symm (d t x))) (thDn_eq b R)
+theorem pTh_eq
+    : R.PTh
+      = (@RealDat.PTh (@Late.D B C b) G ‹Group G› ‹Fintype G› Pl0 T
+        (@famM B C a b G ‹Group G› ‹Fintype G› Pl0 T A) Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks››
+        (@alg B C a b Ks ‹Field Ks› iK)
+        (@real B C a b G ‹Group G› ‹Fintype G› Pl0 T Ks ‹Field Ks› ‹@NumberField Ks ‹Field Ks›› iK A
+          R)) := by
+  with_unfolding_all
+    apply congrArg
+      (fun (d : type_of% R.thDn) (t : T) (g : (R.HX t).H →ₗ[ℂ] R.HE.H) =>
+        ∀ x, R.HE.e (g x) = postOn (R.MY 0) R.e0 (PiTensorProduct.lift.symm (d t x)))
+      (thDn_eq b R)
 
-theorem pThF_eq : R.PThF = (by with_unfolding_all exact ((letI := alg b iK; (real b R).PThF) :)) := by
+theorem pThF_eq
+    : R.PThF = (by with_unfolding_all exact ((letI := alg b iK; (real b R).PThF) :)) := by
   funext i t th
   have e := congrArg (fun W : type_of% R.Wall => ∀ x, th x ∈ W i (sg0 a.D A)) (wall_eq b R)
   refine propext ?_
@@ -147,7 +200,6 @@ end Two
 section Two
 
 variable {A : FamIn a.D.what₂.LL G Pl0 T a.D.R.m} {R : RealDat a.D A Ks} {F : Face a.D A}
-
 
 omit [Field Ks] [NumberField Ks] iK in
 theorem levIs_tr {L : Links.LevCh a.D T} {μ0 : T} (h : L.Is μ0) : (levCh b L).Is μ0 := by
@@ -218,8 +270,6 @@ theorem isModels_tr (h : R.IsModels) : letI := alg b iK; (real b R).IsModels := 
   case BV => with_unfolding_all apply h.BV
   case order => with_unfolding_all apply h.order
 
-
-
 theorem isChainW_tr (h : R.IsChainW) : letI := alg b iK; (real b R).IsChainW := by
   letI := alg b iK
   constructor
@@ -252,16 +302,20 @@ theorem isChainW_tr (h : R.IsChainW) : letI := alg b iK; (real b R).IsChainW := 
     rw [itW_eq a b]
     with_unfolding_all apply h.ItX
   case ioY =>
-    with_unfolding_all apply cast (io_congr R (multT_eq b a)
-      (fun m y _ => ∀ t k, k + 1 < a.D.R.m → OrZero (pIoYW (@m) R t k) (y t k)) R.ioY R.ioX) h.ioY
+    with_unfolding_all
+      apply cast
+        (io_congr R (multT_eq b a)
+          (fun m y _ => ∀ t k, k + 1 < a.D.R.m → OrZero (pIoYW (@m) R t k) (y t k))
+          R.ioY R.ioX)
+        h.ioY
   case ioX =>
-    with_unfolding_all apply cast (io_congr R (multT_eq b a)
-      (fun m _ x => ∀ t, OrZero (pIoXW (@m) R t) (x t)) R.ioY R.ioX) h.ioX
+    with_unfolding_all
+      apply cast
+        (io_congr R (multT_eq b a) (fun m _ x => ∀ t, OrZero (pIoXW (@m) R t) (x t)) R.ioY R.ioX)
+        h.ioX
   case Th =>
     have e := congrArg (fun p : type_of% R.PTh => ∀ t, OrZero (p t) (R.Th t)) (pTh_eq b R)
     with_unfolding_all apply e.mp h.Th
-
-
 
 theorem isThPW_tr (h : R.IsThPW) : letI := alg b iK; (real b R).IsThPW := by
   letI := alg b iK
@@ -282,8 +336,6 @@ theorem isThPW_tr (h : R.IsThPW) : letI := alg b iK; (real b R).IsThPW := by
     with_unfolding_all apply e.mp h.thF
   case thG => with_unfolding_all apply h.thG
 
-
-
 theorem exAt_tr (h : R.ExAt) : letI := alg b iK; (real b R).ExAt := by
   letI := alg b iK
   constructor
@@ -295,15 +347,35 @@ theorem exAt_tr (h : R.ExAt) : letI := alg b iK; (real b R).ExAt := by
     unfold RealDat.ex_ItX RealDat.PItX
     rw [itW_eq a b]
     with_unfolding_all apply h.ItX
-  case ioY => with_unfolding_all apply cast (congrArg (fun m : type_of% (@MultT a.D) => ∀ t k, k + 1 < a.D.R.m → ∃ y, pIoYW (@m) R t k y) (multT_eq b a)) h.ioY
-  case ioX => with_unfolding_all apply cast (congrArg (fun m : type_of% (@MultT a.D) => ∀ t, ∃ y, pIoXW (@m) R t y) (multT_eq b a)) h.ioX
-  case Th => with_unfolding_all apply cast (congrArg (fun p : type_of% R.PTh => ∀ t, ∃ y, p t y) (pTh_eq b R)) h.Th
+  case ioY =>
+    with_unfolding_all
+      apply cast
+        (congrArg
+          (fun m : type_of% (@MultT a.D) => ∀ t k, k + 1 < a.D.R.m → ∃ y, pIoYW (@m) R t k y)
+          (multT_eq b a))
+        h.ioY
+  case ioX =>
+    with_unfolding_all
+      apply cast
+        (congrArg (fun m : type_of% (@MultT a.D) => ∀ t, ∃ y, pIoXW (@m) R t y) (multT_eq b a))
+        h.ioX
+  case Th =>
+    with_unfolding_all
+      apply cast (congrArg (fun p : type_of% R.PTh => ∀ t, ∃ y, p t y) (pTh_eq b R)) h.Th
   case ioP => with_unfolding_all apply h.ioP
-  case thF => with_unfolding_all apply cast (congrArg (fun p : type_of% R.PThF => ∀ i t, ∃ y, p i t y) (pThF_eq b R)) h.thF
+  case thF =>
+    with_unfolding_all
+      apply cast (congrArg (fun p : type_of% R.PThF => ∀ i t, ∃ y, p i t y) (pThF_eq b R)) h.thF
   case thG => with_unfolding_all apply h.thG
 
 theorem lLevelW_tr (h : R.LLevelW F) : letI := alg b iK; (real b R).LLevelW (face b F) := by
-  with_unfolding_all apply cast (congrArg (fun W : type_of% R.Wat => ∀ c i σ, R.WS F c i σ = (W i σ (R.levL F c σ)).comap (R.HW i σ).e) (wat_eq b R)) h
+  with_unfolding_all
+    apply cast
+      (congrArg
+        (fun W : type_of% R.Wat =>
+          ∀ c i σ, R.WS F c i σ = (W i σ (R.levL F c σ)).comap (R.HW i σ).e)
+        (wat_eq b R))
+      h
 
 end Two
 

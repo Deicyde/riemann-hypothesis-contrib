@@ -47,8 +47,10 @@ import Mathlib.Topology.Sheaves.Init
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 
 namespace PositivityTheory.SiegelWeilFormula.kfour
 
@@ -56,17 +58,21 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 
 variable {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n}
 
-theorem continuous_chr {ψ : AddChar (AF F) ℂ} (hψ : Continuous ψ) {b : GL (Fin n ⊕ Fin n) E}
-    (T : Matrix (Fin n) (Fin n) (AE F E)) :
-    Continuous fun β : nA σ Y b => ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T * β.1)))) := by
+theorem continuous_chr
+    {ψ : AddChar (AF F) ℂ} (hψ : Continuous ψ)
+    {b : GL (Fin n ⊕ Fin n) E}
+    (T : Matrix (Fin n) (Fin n) (AE F E))
+    : Continuous fun β : nA σ Y b =>
+      ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T * β.1)))) := by
   have htr : Continuous (Algebra.trace (AF F) (AE F E)) :=
     IsModuleTopology.continuous_of_linearMap (R := AF F) (Algebra.trace (AF F) (AE F E))
   exact hψ.comp ((htr.comp (continuous_const.matrix_mul continuous_subtype_val).matrix_trace).neg)
 
-private theorem trace_inclR_eq_algebraMap_trace (e : E) :
-    Algebra.trace (AF F) (AE F E) (inclR (AF F) e) = algebraMap F (AF F) (Algebra.trace F E e) := by
-  have h : Algebra.lmul (AF F) (AE F E) (inclR (AF F) e) =
-      (Algebra.lmul F E e).baseChange (AF F) := by
+private theorem trace_inclR_eq_algebraMap_trace (e : E)
+    : Algebra.trace (AF F) (AE F E) (inclR (AF F) e)
+      = algebraMap F (AF F) (Algebra.trace F E e) := by
+  have h
+      : Algebra.lmul (AF F) (AE F E) (inclR (AF F) e) = (Algebra.lmul F E e).baseChange (AF F) := by
     apply TensorProduct.AlgebraTensorModule.ext
     intro a x
     show (1 ⊗ₜ[F] e) * (a ⊗ₜ[F] x) = _
@@ -85,8 +91,8 @@ theorem lamBd : LamBd := by
   obtain ⟨K, hK, hKcov⟩ := nF_cocompact hσ hfr
   have hψ1 : ∀ c : F, d.B.ψ (algebraMap F (AF F) c) = 1 := good.std.2.1
   let χ : nA σ d.Y d.b → ℂ := fun β =>
-    d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (((T : nA σ d.Y d.b) :
-      Matrix (Fin d.n) (Fin d.n) (AE F E)) * β.1))))
+    d.B.ψ (-(Algebra.trace (AF F) (AE F E)
+      (Matrix.trace (((T : nA σ d.Y d.b) : Matrix (Fin d.n) (Fin d.n) (AE F E)) * β.1))))
   have hχadd : ∀ β γ, χ (β + γ) = χ β * χ γ := by
     intro β γ
     simp only [χ, AddSubgroup.coe_add, Matrix.mul_add, Matrix.trace_add, map_add (f := _), neg_add]
@@ -95,8 +101,9 @@ theorem lamBd : LamBd := by
     intro k β
     simp only [χ, AddSubgroup.coe_nsmul, Matrix.mul_smul, Matrix.trace_smul, map_nsmul, ← smul_neg]
     exact AddChar.map_nsmul_eq_pow _ _ _
-  have htr : ∀ X : Matrix (Fin d.n) (Fin d.n) E,
-      Matrix.trace (incM F X) = inclR (AF F) (Matrix.trace X) := by
+  have htr
+      : ∀ X : Matrix (Fin d.n) (Fin d.n) E,
+        Matrix.trace (incM F X) = inclR (AF F) (Matrix.trace X) := by
     intro X
 
     simp [incM, Matrix.trace, map_sum]
@@ -122,8 +129,9 @@ theorem lamBd : LamBd := by
     have := hχR (k • β)
     rw [hχns, norm_pow] at this
     linarith
-  have hper : ∀ f : G2 σ d.Y → ℂ, (∀ γ ∈ rat2 σ d.Y, ∀ g, f (γ * g) = f g) →
-      ∀ β, ∃ β' ∈ K, f (nb β * x) = f (nb β' * x) := by
+  have hper
+      : ∀ f : G2 σ d.Y → ℂ,
+        (∀ γ ∈ rat2 σ d.Y, ∀ g, f (γ * g) = f g) → ∀ β, ∃ β' ∈ K, f (nb β * x) = f (nb β' * x) := by
     intro f hf β
     obtain ⟨γ, hγ, hmem⟩ := hKcov β
     refine ⟨γ + β, hmem, ?_⟩
@@ -132,8 +140,10 @@ theorem lamBd : LamBd := by
     rw [h1]
     exact ENNReal.one_lt_top
   haveI : IsFiniteMeasure (lam.restrict 𝓖) := ⟨by rw [Measure.restrict_apply_univ]; exact hfin⟩
-  have hint : ∀ f : G2 σ d.Y → ℂ, Continuous f → (∀ γ ∈ rat2 σ d.Y, ∀ g, f (γ * g) = f g) →
-      Integrable (fun β => f (nb β * x) * χ β) (lam.restrict 𝓖) := by
+  have hint
+      : ∀ f : G2 σ d.Y → ℂ,
+        Continuous f → (∀ γ ∈ rat2 σ d.Y, ∀ g, f (γ * g) = f g)
+          → Integrable (fun β => f (nb β * x) * χ β) (lam.restrict 𝓖) := by
     intro f hf hfi
     have hc : Continuous fun β => f (nb β * x) := hf.comp (hnbc.mul continuous_const)
     obtain ⟨M, hM⟩ := hK.exists_bound_of_continuousOn hc.continuousOn
@@ -146,8 +156,9 @@ theorem lamBd : LamBd := by
   · intro a f f' hf hf' hfi hfi'
     show ∫ β in 𝓖, (a • f + f') (nb β * x) * χ β ∂lam =
       a * ∫ β in 𝓖, f (nb β * x) * χ β ∂lam + ∫ β in 𝓖, f' (nb β * x) * χ β ∂lam
-    have e : (fun β => (a • f + f') (nb β * x) * χ β) =
-        fun β => a * (f (nb β * x) * χ β) + f' (nb β * x) * χ β := by
+    have e
+        : (fun β => (a • f + f') (nb β * x) * χ β)
+          = fun β => a * (f (nb β * x) * χ β) + f' (nb β * x) * χ β := by
       funext β
       simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       ring
@@ -160,8 +171,9 @@ theorem lamBd : LamBd := by
       obtain ⟨β', hβ', he⟩ := hper f hfi β
       rw [norm_mul, he]
       exact (mul_le_of_le_one_right (norm_nonneg _) (hχ1 β)).trans (hM _ ⟨β', hβ', rfl⟩)
-    calc ‖∫ β in 𝓖, f (nb β * x) * χ β ∂lam‖ ≤ M * lam.real 𝓖 :=
-          norm_setIntegral_le_of_norm_le_const hfin hb
+    calc
+      ‖∫ β in 𝓖, f (nb β * x) * χ β ∂lam‖
+        ≤ M * lam.real 𝓖 := norm_setIntegral_le_of_norm_le_const hfin hb
       _ = M := by simp [Measure.real, h1]
 
 end PositivityTheory.SiegelWeilFormula.kfour

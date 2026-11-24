@@ -55,13 +55,13 @@ open NumberField
 
 namespace GlobalTheory.PlaceInt
 
-
 open NumberField in
-theorem _root_.GlobalTheory.PlaceInt.exists_ringOfIntegers_lift (E : Type) [Field E] [NumberField E]
-    (V : Type) [CommRing V]
-    [IsDomain V] [IsIntegrallyClosed V] (k : Type) [Field k] [Algebra V k] [IsFractionRing V k]
-    (ψ : E →+* k) :
-    ∃ σ : 𝓞 E →+* V, ∀ x : 𝓞 E, algebraMap V k (σ x) = ψ (x : E) := by
+theorem _root_.GlobalTheory.PlaceInt.exists_ringOfIntegers_lift
+    (E : Type) [Field E] [NumberField E]
+    (V : Type) [CommRing V] [IsDomain V] [IsIntegrallyClosed V]
+    (k : Type) [Field k] [Algebra V k] [IsFractionRing V k]
+    (ψ : E →+* k)
+    : ∃ σ : 𝓞 E →+* V, ∀ x : 𝓞 E, algebraMap V k (σ x) = ψ (x : E) := by
   have inj : Function.Injective (algebraMap V k) := IsFractionRing.injective V k
   have hint : ∀ x : 𝓞 E, ∃ y : V, algebraMap V k y = ψ (x : E) := by
     intro x
@@ -69,26 +69,33 @@ theorem _root_.GlobalTheory.PlaceInt.exists_ringOfIntegers_lift (E : Type) [Fiel
     have h2 : IsIntegral V (ψ (x : E)) := h1.tower_top
     exact IsIntegrallyClosed.isIntegral_iff.mp h2
   choose f hf using hint
-  refine ⟨{ toFun := f
-            map_one' := inj (by rw [hf, map_one]; simp)
-            map_mul' := fun x y => inj (by rw [map_mul, hf, hf, hf]; push_cast; rw [map_mul])
-            map_zero' := inj (by rw [hf, map_zero]; simp)
-            map_add' := fun x y => inj (by rw [map_add (f := _), hf, hf, hf]; push_cast; rw [map_add (f := _)]) },
-    hf⟩
-
+  refine ⟨
+    {
+      toFun := f
+      map_one' := inj (by rw [hf, map_one]; simp)
+      map_mul' := fun x y => inj (by rw [map_mul, hf, hf, hf]; push_cast; rw [map_mul])
+      map_zero' := inj (by rw [hf, map_zero]; simp)
+      map_add' := fun x y =>
+        inj (by rw [map_add (f := _), hf, hf, hf]; push_cast; rw [map_add (f := _)])
+    },
+    hf
+  ⟩
 
 open NumberField Polynomial IsLocalRing in
-theorem _root_.GlobalTheory.PlaceInt.placeIdem : _root_.ReciprocityTheory.ChartRestriction.G.PullbackSections.PlaceIdemSt := by
+theorem _root_.GlobalTheory.PlaceInt.placeIdem
+    : _root_.ReciprocityTheory.ChartRestriction.G.PullbackSections.PlaceIdemSt := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.PullbackSections.PlaceIdemSt
   intro E _ _ V _ _ _ _ k _ _ _ P hP hP0
   classical
   choose σ hσ using fun ψ : E →+* k => _root_.GlobalTheory.PlaceInt.exists_ringOfIntegers_lift E V k ψ
   have inj : Function.Injective (algebraMap V k) := IsFractionRing.injective V k
-  obtain ⟨Q, hQ, hQp⟩ : ∃ Q : (E →+* k) → Ideal (𝓞 E),
-      (∀ ψ x, x ∈ Q ψ ↔ σ ψ x ∈ maximalIdeal V) ∧ ∀ ψ, (Q ψ).IsPrime :=
+  obtain ⟨Q, hQ, hQp⟩
+      : ∃ Q : (E →+* k) → Ideal (𝓞 E),
+        (∀ ψ x, x ∈ Q ψ ↔ σ ψ x ∈ maximalIdeal V) ∧ ∀ ψ, (Q ψ).IsPrime :=
     ⟨fun ψ => (maximalIdeal V).comap (σ ψ), fun _ _ => Iff.rfl, fun _ => inferInstance⟩
-  have hcond : ∀ ψ : E →+* k, (∀ x : 𝓞 E, x ∈ P ↔
-      ψ (x : E) ∈ algebraMap V k '' (maximalIdeal V : Set V)) ↔ Q ψ = P := by
+  have hcond
+      : ∀ ψ : E →+* k,
+        (∀ x : 𝓞 E, x ∈ P ↔ ψ (x : E) ∈ algebraMap V k '' (maximalIdeal V : Set V)) ↔ Q ψ = P := by
     intro ψ
     have key : ∀ x : 𝓞 E, ψ (x : E) ∈ algebraMap V k '' (maximalIdeal V : Set V) ↔ x ∈ Q ψ := by
       intro x
@@ -172,11 +179,11 @@ theorem _root_.GlobalTheory.PlaceInt.placeIdem : _root_.ReciprocityTheory.ChartR
   obtain ⟨u, v, huv⟩ := hcop
   set g : V[X] := u * p0 with hg
   refine ⟨g.natDegree + 1, fun j => b ^ (j : ℕ), fun j => g.coeff j, fun ψ => ?_⟩
-  have hsum : ∑ j : Fin (g.natDegree + 1), algebraMap V k (g.coeff j) * ψ ((b ^ (j : ℕ) : 𝓞 E) : E)
-      = algebraMap V k (g.eval (σ ψ b)) := by
-
+  have hsum
+      : ∑ j : Fin (g.natDegree + 1), algebraMap V k (g.coeff j) * ψ ((b ^ (j : ℕ) : 𝓞 E) : E)
+        = algebraMap V k (g.eval (σ ψ b)) := by
     rw [eval_eq_sum_range' (Nat.lt_succ_self _), map_sum,
-    ← Fin.sum_univ_eq_sum_range (fun j => algebraMap V k (g.coeff j * σ ψ b ^ j))]
+      ← Fin.sum_univ_eq_sum_range (fun j => algebraMap V k (g.coeff j * σ ψ b ^ j))]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [← hσ]
     simp only [map_pow, map_mul]
@@ -188,8 +195,7 @@ theorem _root_.GlobalTheory.PlaceInt.placeIdem : _root_.ReciprocityTheory.ChartR
       exact Finset.prod_eq_zero (i := ψ) (by simp [h]) (by simp)
     have : g.eval (σ ψ b) = 1 := by
       have h2 : (u * p0 + v * p1).eval (σ ψ b) = 1 := by rw [huv, eval_one]
-      rw [eval_add, show (v * p1).eval (σ ψ b) = 0 by rw [eval_mul, hp1z, mul_zero],
-        add_zero] at h2
+      rw [eval_add, show (v * p1).eval (σ ψ b) = 0 by rw [eval_mul, hp1z, mul_zero], add_zero] at h2
       exact h2
     rw [this, map_one]
   · rw [if_neg (fun h' => h ((hcond ψ).mp h'))]

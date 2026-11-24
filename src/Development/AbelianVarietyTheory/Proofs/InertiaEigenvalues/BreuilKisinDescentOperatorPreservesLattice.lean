@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.ImagePolynomialAction
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinIntegralityComputationStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinIntegralityComputation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,7 +59,7 @@ theorem integral
         → GlobalTheory.IndefiniteRowSideFullHecke.ImagePolynomialAction.Integral D := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D hηH hl
   obtain ⟨-, hfil, hcomp⟩ :=
-    GlobalTheory.T.breuilKisin_integrality_computation O K l e a ι η H D hηH hl
+    _root_.GlobalTheory.IntegralityComp.integralityComputation O K l e a ι η H D hηH hl
   intro w hw
   obtain ⟨⟨y, hyM, rfl⟩, hinv⟩ := (D.desc.mem_Z).1 hw
   obtain ⟨p, hp, f, hf, hEq⟩ := hcomp y hyM

@@ -85,7 +85,4 @@ theorem _root_.GlobalTheory.T.exists_iso_of_sectionRing_equiv_alt
                           * Geo.Tor.gs (𝟙 X'.left) x _ (b.f j')
                         = Geo.Tor.gs Φ.hom.left x _ ((θ n hn b).f j)
                           * Geo.Tor.gs (𝟙 X'.left) x _ (a.f j')) := by
-  first
-  | exact @GlobalTheory.exists_iso_of_sectionRing_equiv
-  | exact GlobalTheory.exists_iso_of_sectionRing_equiv
-  | (intros; apply GlobalTheory.exists_iso_of_sectionRing_equiv <;> assumption)
+  first | exact @GlobalTheory.exists_iso_of_sectionRing_equiv

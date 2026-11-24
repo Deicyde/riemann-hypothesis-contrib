@@ -143,10 +143,10 @@ end Form
 theorem star_int {E : Type} [Field E] [NumberField E] [StarRing E] (q : 𝓞 E)
     : ∃ q' : 𝓞 E, algebraMap (𝓞 E) E q' = star (algebraMap (𝓞 E) E q) := by
   have h : IsIntegral ℤ (algebraMap (𝓞 E) E q) := by
-    first | exact NumberField.RingOfIntegers.isIntegral_coe q | exact q.2
+    first | exact NumberField.RingOfIntegers.isIntegral_coe q
   have h2 : IsIntegral ℤ (star (algebraMap (𝓞 E) E q)) := by
     have h3 := h.map (starRingEnd E).toIntAlgHom
-    first | exact h3 | simpa using h3
+    first | exact h3
   exact ⟨⟨_, h2⟩, rfl⟩
 
 private theorem exists_finite_residue_reps_mod_natCast
@@ -162,7 +162,6 @@ private theorem exists_finite_residue_reps_mod_natCast
     exact hN'
   haveI : Finite (𝓞 F ⧸ Ideal.span {(N : 𝓞 F)}) := by
     first
-      | exact @Finite.of_fintype _ (Ideal.fintypeQuotientOfFreeOfNeBot _ hI)
       | exact Ideal.finiteQuotientOfFreeOfNeBot _ hI
   refine ⟨
     Set.range (Function.surjInv (Ideal.Quotient.mk_surjective (I := Ideal.span {(N : 𝓞 F)}))),
@@ -211,11 +210,7 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
     simp only [Lat, Set.mem_setOf_eq] at hp
     obtain ⟨hJ, hdet, -, hspan, hint, hdual⟩ := hp
     have hinj : Function.Injective (algebraMap (𝓞 E) E) := by
-      first
-      | exact NumberField.RingOfIntegers.coe_injective
-      | exact IsFractionRing.injective (𝓞 E) E
-      | exact NoZeroSMulDivisors.algebraMap_injective (𝓞 E) E
-      | exact FaithfulSMul.algebraMap_injective (𝓞 E) E
+      first | exact NumberField.RingOfIntegers.coe_injective
     obtain ⟨I, hIdef⟩
         : ∃ I : Ideal (𝓞 E), ∀ g,
           g ∈ I ↔ ∃ y ∈ p.2, algebraMap (𝓞 E) E g = hform (starRingEnd E) p.1 x y := ⟨
@@ -284,14 +279,14 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
       (hform_swap' p.1 hJ y0 y0).symm
     obtain ⟨f, hf⟩ := (hCM.fixed _).mp hbstar
     have hβint : IsIntegral ℤ (algebraMap (𝓞 E) E β) := by
-      first | exact NumberField.RingOfIntegers.isIntegral_coe β | exact β.2
+      first | exact NumberField.RingOfIntegers.isIntegral_coe β
     have hfint : IsIntegral ℤ f := by
       rw [hβ, ← hf] at hβint
       exact (isIntegral_algHom_iff (algebraMap F E).toIntAlgHom (algebraMap F E).injective).mp hβint
     obtain ⟨r, hrT, g, hfg⟩ := hT k ⟨f, hfint⟩
     have hgint : IsIntegral ℤ (algebraMap F E (algebraMap (𝓞 F) F g)) := by
       have h1 : IsIntegral ℤ (algebraMap (𝓞 F) F g) := by
-        first | exact NumberField.RingOfIntegers.isIntegral_coe g | exact g.2
+        first | exact NumberField.RingOfIntegers.isIntegral_coe g
       exact h1.map (algebraMap F E).toIntAlgHom
     obtain ⟨sE, hsE⟩
         : ∃ sE : 𝓞 E, algebraMap (𝓞 E) E sE = -(algebraMap F E (algebraMap (𝓞 F) F g)) :=

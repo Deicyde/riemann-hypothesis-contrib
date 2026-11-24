@@ -489,9 +489,7 @@ theorem eventually_absFin_le_one (z : AF F ⊗[F] E)
       exact (absFin_add_le F v _ _).trans (max_le h.1 h.2)
   | tmul a x =>
     have hxa : IsAlgebraic ℤ x := by
-      first
-      | exact Algebra.IsAlgebraic.isAlgebraic x
-      | exact (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic x)
+      first | exact (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic x)
     obtain ⟨m, hm, hint⟩ := hxa.exists_integral_multiple
     have hmF : (m : F) ≠ 0 := Int.cast_ne_zero.2 hm
     have hxe : (m : F)⁻¹ • (m • x) = x := by

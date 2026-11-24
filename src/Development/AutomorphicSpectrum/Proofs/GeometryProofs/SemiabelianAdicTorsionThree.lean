@@ -6,12 +6,17 @@ public import Mathlib.Tactic.ENatToNat
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BtOrderEmbeddingOpenCover
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BtOrderValueEval
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.DualLatticePointUniversalStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.DualLatticePointUniversal
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueTangentDualNumber
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteBaseChangeStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RelOfTorsion
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SectionEqZeroOfValuesStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionOneStatement
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.DualOrder
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionOne
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteBaseChange
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUnitFormLocalizationEtaleNbhd
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SectionEqZeroOfValues
 import Development.WeilBound.CoreStatements.HodgeTatePoints.MhBase
 import Development.WeilBound.CoreStatements.HodgeTatePoints.TwhopfSec
 import Mathlib.Algebra.Order.Floor.Extended
@@ -294,7 +299,8 @@ theorem omega_open
                       ≫ (M.pt e).left
                   → valAt v ⊤ le_top s
                     = TrivSqZeroExt.inr (Ideal.Quotient.mk (Ideal.span {(N : R)}) (w e))) := by
-  obtain ⟨u, hu, hupin, huniv⟩ := GlobalTheory.T.dual_lattice_point_universal S G R x L M
+  obtain ⟨u, hu, hupin, huniv⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.BT.Tan.Univ.tangent_universal S G R x L M
   obtain ⟨θ, hsurj, hNθ, hlift⟩ := exists_theta_open Γ U ht hj hU u hu huniv
   have hθN : ∀ w', θ (N • w') = 0 := fun w' => by
     have := LinearMap.congr_fun hNθ w'
@@ -307,7 +313,7 @@ theorem omega_open
         LinearMap.range ((N : R) • (LinearMap.id : Module.Dual R L →ₗ[R] Module.Dual R L))
       have h0 : N • W.mkQ = 0 := by
         ext w'
-        simp only [LinearMap.smul_apply, LinearMap.zero_apply, LinearMap.comp_apply]
+        simp only [LinearMap.smul_apply, LinearMap.zero_apply]
         exact (map_nsmul W.mkQ N w').symm.trans
           ((Submodule.Quotient.mk_eq_zero W).2 ⟨w', by simp [Nat.cast_smul_eq_nsmul]⟩)
       obtain ⟨ψ, hψ, -⟩ := hlift _ W.mkQ h0
@@ -541,7 +547,9 @@ theorem der_unique
   constructor
   · rintro ⟨s', hs', hv'⟩
     have hss : s' = s := by
-      refine sub_eq_zero.mp (GlobalTheory.T.section_eq_zero_of_values R T Γ ⊤ (s' - s) ?_)
+      refine sub_eq_zero.mp
+        (_root_.GlobalTheory.CompanionTheory.Ar.BT.section_eq_zero_of_val_generic R T Γ ⊤ (s' - s)
+          ?_)
       intro t h
       rw [ValEmb.valAt_sub]
       exact sub_eq_zero.mpr ((hs' t).trans (hs t).symm)
@@ -715,9 +723,9 @@ theorem der_main
   haveI : IsIntegrallyClosed O := inferInstance
   haveI : Smooth G.hom := hG.smooth
   haveI : Finite (LevGrp La p n) := finite_levGrp' (Fact.out) n
-  haveI : Module.Projective O L := (GlobalTheory.T.lie_model_finite_base_change S G O y L M).2.1
+  haveI : Module.Projective O L := (_root_.GlobalTheory.CompanionTheory.Ar.LieProj.lie_finite_projective_baseChange S G O y L M).2.1
   obtain ⟨U, H, hfin, -⟩ :=
-    GlobalTheory.T.semiabelian_adic_torsion_one p C v O hv hp hO S G hG y La X
+    _root_.GlobalTheory.CompanionTheory.Ar.HT.tw_hopf_main p C v O hv hp hO S G hG y La X
   have hex
       : ∃ j : (X.Γ n).G.left ⟶ Spec (CommRingCat.of ((X.Γ n).btOrder ⊤)),
         (X.Γ n).IsEmb ((X.Γ n).btOrder ⊤) j := by
@@ -741,7 +749,8 @@ theorem der_main
             = PositivityTheory.HtPt.Mh.val (Γ.pt t).left s')
         : s = s' := by
       rw [← sub_eq_zero]
-      refine GlobalTheory.T.section_eq_zero_of_values O _ Γ ⊤ _ fun t ht => ?_
+      refine _root_.GlobalTheory.CompanionTheory.Ar.BT.section_eq_zero_of_val_generic O _ Γ ⊤ _
+        fun t ht => ?_
       rw [htop, map_sub, h, sub_self]
     have hhom_ext
         {B : Type} [CommRing B]

@@ -63,6 +63,7 @@ open GlobalTheory.SquareComm GlobalTheory.SquareAgree
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Classical
 open GlobalTheory.HeisOrbit
+
 theorem _root_.GlobalTheory.T.heisenberg_orbit_coefficient_smooth
     : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W),
@@ -79,7 +80,4 @@ theorem _root_.GlobalTheory.T.heisenberg_orbit_coefficient_smooth
                   (fun t : ℝ =>
                     GlobalTheory.HeisOrbit.archCo M.co (u * (mat (γ (Multiplicative.ofAdd t)))ᵀ))
                   (GlobalTheory.HeisOrbit.archCo M.co u') 0 := by
-  first
-  | exact @GlobalTheory.HeisOrbitSmooth.archCo_orbit_smooth
-  | exact GlobalTheory.HeisOrbitSmooth.archCo_orbit_smooth
-  | (intros; apply GlobalTheory.HeisOrbitSmooth.archCo_orbit_smooth <;> assumption)
+  first | exact @GlobalTheory.HeisOrbitSmooth.archCo_orbit_smooth

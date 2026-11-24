@@ -149,7 +149,6 @@ theorem exists_hom_range_stabiliser
     apply τ.injective
     rw [hCM.2.2.2, hCM.2.2.2, star_star]
   have hfix : σ (hE σ J (x 0) (x 0)) = hE σ J (x 0) (x 0) := by
-
     simp only [hE, Formalism.UG.hform, map_sum, map_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

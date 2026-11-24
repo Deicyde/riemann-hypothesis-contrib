@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.MixModel GlobalTheory.MixPer
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.flag_unipotent_bessel_character_laws
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsCharAF D.host.F ψ
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.flag_unipotent_bessel_character_laws
             ∧ (∀ g, g ∈ besGrp d o ↔ ∃ n ∈ flagN d, ∃ h, g = n * embA d o h)
             ∧ ∀ ι : A.V →ₗ[D.host.E] S.V,
               frameMat S A ι = d.i₀ * o.iA → ∀ h, EmbRel S A ι (embA d o h) h := by
-  first
-  | exact @GlobalTheory.MixPer.charLaws
-  | exact GlobalTheory.MixPer.charLaws
-  | (intros; apply GlobalTheory.MixPer.charLaws <;> assumption)
+  first | exact @GlobalTheory.MixPer.charLaws

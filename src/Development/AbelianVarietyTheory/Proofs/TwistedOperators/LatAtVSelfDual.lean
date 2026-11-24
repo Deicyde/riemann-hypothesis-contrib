@@ -131,7 +131,7 @@ theorem latAtV_selfDual
         have := G.V.L.smul_mem (⟨e, hei⟩ : 𝓞 E) (hS j)
         convert this using 1
         ext i
-        first | rfl | simp [Algebra.smul_def]
+        first | rfl
       have htat : At (evFin F v) t := fun u hu => by
         have := GlobalTheory.LatVac.symp_smul_smul σ (incM F G.V.J) (incM F G.W.J) (-1) u 1 z M
         rw [hz u hu, one_smul, mul_one, GlobalTheory.LatVacArith.symp_zero_left] at this

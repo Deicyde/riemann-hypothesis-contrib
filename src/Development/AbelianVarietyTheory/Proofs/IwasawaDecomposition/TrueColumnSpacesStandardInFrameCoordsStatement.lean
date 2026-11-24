@@ -43,6 +43,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
   GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.trueColumn_spaces_standard_in_frameCoords
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.trueColumn_spaces_standard_in_frameCoords
                     ∧ ∃ (eY : (I.chain l u a).Y i ≃ Formalism.L2.Forms.Fr (I.rec7 l Z) i hi),
                       I.IdY l Z u a i hi eY
                         ∧ ∀ τ z, (I.chain l u a).de i z τ = ((eY z).1 τ).det := by
-  first
-  | exact @GlobalTheory.Mem.Col2.TC.spaces_in_coordinates
-  | exact GlobalTheory.Mem.Col2.TC.spaces_in_coordinates
-  | (intros; apply GlobalTheory.Mem.Col2.TC.spaces_in_coordinates <;> assumption)
+  first | exact @GlobalTheory.Mem.Col2.TC.spaces_in_coordinates

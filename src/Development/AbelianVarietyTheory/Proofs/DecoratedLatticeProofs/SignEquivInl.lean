@@ -121,7 +121,7 @@ theorem Jpq_submatrix
   · have hne : signEquiv ε hp hq a ≠ signEquiv ε hp hq b := (signEquiv ε hp hq).injective.ne hab
     rw [if_neg hab]
     rcases h1 : signEquiv ε hp hq a with i | i <;> rcases h2 : signEquiv ε hp hq b with j | j
-      <;> rw [h1, h2] at hne <;> simp_all [Formalism.UG.Jpq, Matrix.one_apply]
+      <;> rw [h1, h2] at hne <;> simp_all [Formalism.UG.Jpq]
 
 end GlobalTheory.ChainOnto.RealData
 

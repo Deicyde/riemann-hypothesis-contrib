@@ -259,7 +259,7 @@ theorem gaussSumEighthPower : GaussEighth := by
     intro v
     rw [Fin.prod_univ_four]
     change b (v 0) (- v 1) * b (v 1) (v 0) * b (v 2) (- v 3) * b (v 3) (v 2) = 1
-    simp only [h.b_neg_left, h.b_neg_right, inv_inv]
+    simp only [h.b_neg_right]
     rw [h.symm (v 1) (v 0), h.symm (v 3) (v 2)]
     exact eq_one_of_eq_inv_mul_self_mul_inv_mul_self (h.b_ne (v 0) (v 1)) (h.b_ne (v 2) (v 3))
       (by ring)
@@ -267,7 +267,7 @@ theorem gaussSumEighthPower : GaussEighth := by
     intro v
     rw [Fin.prod_univ_four]
     change b (v 0) (- v 2) * b (v 1) (v 3) * b (v 2) (v 0) * b (v 3) (- v 1) = 1
-    simp only [h.b_neg_left, h.b_neg_right, inv_inv]
+    simp only [h.b_neg_right]
     rw [h.symm (v 2) (v 0), h.symm (v 3) (v 1)]
     exact eq_one_of_eq_inv_mul_self_mul_inv_mul_self (h.b_ne (v 0) (v 2)) (h.b_ne (v 1) (v 3))
       (by ring)
@@ -275,7 +275,7 @@ theorem gaussSumEighthPower : GaussEighth := by
     intro v
     rw [Fin.prod_univ_four]
     change b (v 0) (- v 3) * b (v 1) (- v 2) * b (v 2) (v 1) * b (v 3) (v 0) = 1
-    simp only [h.b_neg_left, h.b_neg_right, inv_inv]
+    simp only [h.b_neg_right]
     rw [h.symm (v 2) (v 1), h.symm (v 3) (v 0)]
     exact eq_one_of_eq_inv_mul_self_mul_inv_mul_self (h.b_ne (v 0) (v 3)) (h.b_ne (v 1) (v 2))
       (by ring)

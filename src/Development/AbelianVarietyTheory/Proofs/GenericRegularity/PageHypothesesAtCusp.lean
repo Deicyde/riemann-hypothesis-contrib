@@ -1,13 +1,17 @@
 module
 
+public import Development.AbelianVarietyTheory.Definitions.UpperBounds.PhRec
+public import Formalism.LocalToGlobal.ProjectiveLattices.CurveInstSt
+public import Formalism.LocalToGlobal.ProjectiveLattices.IntAtExtExtAll
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsGenFrGenFr
+public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.TranscendenceDegreeRatiosCuspFormsComponents
 public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.GrowthConstantBoundGcR
 public import Formalism.LocalToGlobal.ProjectiveLattices.CurveAsm
 public import Formalism.LocalToGlobal.ProjectiveLattices.IntegralExtensionOfRegR1
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsCuspFormNonzeroEveryComponentStatement
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LowerBoundConstAtLargeMultipleNumericalBoundsStatement
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsCuspFormNonzeroEveryComponent
+public import Formalism.LocalToGlobal.ProjectiveLattices.AxHLAM
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LowerBoundConstAtLargeMultipleNumericalBounds
 public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExpLeOfNegLogSqrtLe
-public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursionStatement
-import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -23,7 +27,6 @@ import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -43,8 +46,65 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+import Mathlib.Tactic.Basify
 import Mathlib.Tactic.ReduceModChar
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursion, Development.AbelianVarietyTheory.Proofs.GenericRegularity.PageHypothesesAtCusp
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursion =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursion", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.UpperBounds.PhRec\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveInstSt\npublic import Formalism.LocalToGlobal.ProjectiveLattices.IntAtExtExtAll\npublic import Formalism.LocalToGlobal.ProjectiveLattices.IsGenFrGenFr\npublic import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.TranscendenceDegreeRatiosCuspFormsComponents\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\n\n"}
+section -- clump:auto
+@[expose] public section
+
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.BigRec
+
+noncomputable section
+
+namespace GlobalTheory.BigRec
+
+section Inst
+
+variable {D : D7} {T : Top D}
+
+variable (h : LawsP T) {j : ℕ} (hj : InR D j)
+
+end Inst
+
+theorem bigAt_record
+    : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
+        (ka wL wF : WeightFamilies.Wt D j) (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (c : ℝ)
+        (large₂ : SizeData₂ D) (CK C1 A1 h0 : ℝ) (Tn nP nW : ℕ),
+      SetC large₂ (recPlus h j hj) CK C1 A1 ka wL wF Tn nP nW h0
+        → NoCommonZero (T.Q.Xo j) T.Q.c (fun i => (G.w i).1)
+        → (j < D.R.m
+          → 0 < G.iet ∧ (recPlus h j hj).NonZeroComp _ G.et
+            ∧ ∃ σ, GoodEmb T.Q.c σ ∧ PhRec h j σ G.w G.iet G.et c)
+        → 0 ≤ c → 2 * c * g0 D ≤ 1
+        → (j < D.R.m
+          → ∃ w1 : WeightFamilies.Wt D j,
+            IsDoubledWeightWithShift wL w1 nW
+              ∧ ∃ th : (recB h.toLawsCore).Cusp j w1, (recPlus h j hj).NonZeroComp w1 th)
+        → BigAt h j hj hG G := by
+  intro D T h j hj hG ka wL wF G c large₂ CK C1 A1 h0 Tn nP nW hS hN hE hc hcg _
+  exact ⟨
+    hN,
+    _root_.GlobalTheory.BigTrdeg.trdeg_ratios_record D T h j hj hG ka wL wF G c large₂ CK C1 A1 h0
+      Tn nP nW hS hN hE hc hcg
+  ⟩
+
+end GlobalTheory.BigRec
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursion =====
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.GenericRegularity.PageHypothesesAtCusp =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.GenericRegularity.PageHypothesesAtCusp", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.HeightFunctions.GrowthConstantBoundGcR\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveAsm\npublic import Formalism.LocalToGlobal.ProjectiveLattices.IntegralExtensionOfRegR1\npublic import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsCuspFormNonzeroEveryComponent\npublic import Formalism.LocalToGlobal.ProjectiveLattices.AxHLAM\npublic import Development.AbelianVarietyTheory.Proofs.HeightProofs.LowerBoundConstAtLargeMultipleNumericalBounds\npublic import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExpLeOfNegLogSqrtLe\npublic import Development.AbelianVarietyTheory.Definitions.UpperBounds.PhRec\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveInstSt\npublic import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.SetConstantsGoodEmbeddingRecursion\nimport Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.ReduceModChar\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
@@ -107,8 +167,8 @@ theorem curveHyp_of_run
                 g0 := by
   intro D T h j hj large₂ H C2 A2 CT ka wL wF Tn nP nW h0 S nus hG hP hC G hGen hEta
   obtain ⟨⟨g0, hg0, -⟩, hnz⟩ :=
-    GlobalTheory.T.exists_cuspForm_nonzero_everyComponent D T h j hj large₂ H C2 A2 CT ka wL wF Tn
-      nP nW h0 hG hP
+    _root_.GlobalTheory.RunJoin.exists_nonZeroComp_and_ne_zero D T h j hj large₂ H C2 A2 CT ka wL wF
+      Tn nP nW h0 hG hP
   obtain ⟨hT, hN, hlN, hZ, hLow⟩ := hGen
   have hZb : 0 ≤ Zb D large₂ := by
     have hs := hP.hyp.2.1
@@ -121,8 +181,8 @@ theorem curveHyp_of_run
     rw [hP.tie.1] at this
     linarith
   have hrow :=
-    (GlobalTheory.T.lowerBoundConst_at_large_multiple_numerical_bounds D _ _ j (recPJ h j hj) large₂
-      H C2 A2 CT ka wL wF Tn nP nW h0 1 G.N 1 hj hP one_pos hN one_pos hlN
+    (_root_.GlobalTheory.RunJoin.lamConst_lamR_rows D _ _ j (recPJ h j hj) large₂ H C2 A2 CT ka wL
+      wF Tn nP nW h0 1 G.N 1 hj hP one_pos hN one_pos hlN
       (by rw [Nat.cast_one, Real.log_one]; positivity)).2.2.2.2.2.2.2.2.1
   have hc0 : 0 ≤ cc D large₂ C2 A2 7 wL := by
     have h1 : 0 ≤ zBase large₂ := hZb
@@ -143,7 +203,7 @@ theorem curveHyp_of_run
     ⟨WeightFamilies.dimY D j + 4, w2, th2, weight_add_eq_smul_of_G2 hw2, (hnz w2 th2 hth2).1⟩,
     hg0
   ⟩
-  refine GlobalTheory.T.set_constants_good_embedding_recursion D T h j hj hG ka wL wF
+  refine _root_.GlobalTheory.BigRec.bigAt_record D T h j hj hG ka wL wF
     (gd2Xplus G (extAll h j hj) (intAtExt_extAll h j hj)) (cc D large₂ C2 A2 7 wL) large₂ H.CK H.C1
     H.A1 h0 Tn nP nW hP.hyp.2.1 hZ
     (fun hjm => ?_)
@@ -167,3 +227,7 @@ theorem curveHyp_of_run
     exact ⟨w1, hw1, th1, hth1⟩
 
 end GlobalTheory.RunJoin
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.GenericRegularity.PageHypothesesAtCusp =====

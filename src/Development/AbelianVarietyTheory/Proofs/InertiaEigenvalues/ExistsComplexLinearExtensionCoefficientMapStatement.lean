@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.exists_complexLinear_extension_coefficientMap
         (O : OMDat T.toCore R j Tp tup),
       ∃ c : VsV D j ℂ →ₗ[ℂ] (R.cV j).W,
         ExtC R j (inC O.c') O.c0' c := by
-  first
-  | exact @GlobalTheory.ExtCoeff.exists_extC
-  | exact GlobalTheory.ExtCoeff.exists_extC
-  | (intros; apply GlobalTheory.ExtCoeff.exists_extC <;> assumption)
+  first | exact @GlobalTheory.ExtCoeff.exists_extC

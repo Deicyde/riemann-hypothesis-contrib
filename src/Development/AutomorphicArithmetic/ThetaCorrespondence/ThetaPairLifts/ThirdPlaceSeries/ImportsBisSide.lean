@@ -49,8 +49,6 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
@@ -67,6 +65,7 @@ open MeasureTheory Formalism.BasicNotions.TH
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
   Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Lev
   Formalism.IndefR.Links Formalism.IndefR.RecTie
+
 theorem main_alt_alt
     : GlobalTheory.Published.HarishChandraFinite → GlobalTheory.Published.CuspRapidDecay
       → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
@@ -158,7 +157,6 @@ theorem main_alt_alt
       φ := φ
       φ_mem := hmem
       φ_inner := fun x y => by
-        beta_reduce
         rw [hT.mj j x y]
         change (∏ τ, ((Mult.dimK _ _ (kapAt (Wc D j) (sg0 D X.A) τ) : ℚ) : ℂ))
             * Mult.ipM (X.R.MW j (sg0 D X.A)) (ENNReal.ofReal (RealDat.nP X.F false)⁻¹ • X.R.νW j)

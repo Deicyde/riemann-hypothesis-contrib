@@ -82,7 +82,7 @@ theorem block_three_mul_apply_last
     · simp
     · simp
     · have : q ≠ a := fun h => hq (by rw [h])
-      simp [Matrix.one_apply, this.symm]
+      simp [this.symm]
   · intro h; exact absurd (Finset.mem_univ _) h
 
 theorem zh_row (a : Fin p)
@@ -238,8 +238,8 @@ theorem pb_head_support
       have hs : sP Bj x ∈ B.GV k (p + ρ) := by
         unfold sP
         rw [if_pos hx]
-        refine Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (LeftFubiniLemmas.rn_nset _).1
-          ?_
+        refine Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+          (_root_.Formalism.FourierDecayAlt.P.Ux3.rn_nset _).1 ?_
         rw [← Formalism.FourierDecayAlt.P.Dx2.Tower.lev_eq_embG]
         exact Formalism.FourierDecayAlt.P.Dx2.Tower.lev_GV p ρ _
           (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul

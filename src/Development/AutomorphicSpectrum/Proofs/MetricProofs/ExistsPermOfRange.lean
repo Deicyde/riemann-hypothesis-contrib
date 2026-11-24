@@ -296,7 +296,7 @@ theorem core
           by_cases hx : x = s
           · subst hx
             simp [Matrix.updateRow_apply]
-          · simp [Matrix.updateRow_apply, Function.update_apply, hx]
+          · simp [Matrix.updateRow_apply, hx]
         have hprod
             : ((h.submatrix id f) * (h.submatrix e f)⁻¹) r s
               = Ring.inverse (h.submatrix e f).det

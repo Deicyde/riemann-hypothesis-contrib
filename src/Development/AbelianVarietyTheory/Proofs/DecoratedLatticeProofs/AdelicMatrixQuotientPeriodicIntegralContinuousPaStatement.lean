@@ -47,6 +47,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.adelicMatrixQuotient_periodicIntegral_continuous_param
     : ∀ (D : D7) (m n : ℕ) (v : VolM D m n) (P : Type) [TopologicalSpace P] (K : Mx D m n → P → ℂ),
       Continuous (Function.uncurry K) → (∀ γ ∈ ratMx D m n, ∀ x p, K (γ + x) p = K x p)
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.adelicMatrixQuotient_periodicIntegral_continuous_p
           ∧ ∀ (e : Mx D m n ≃+ Mx D m n),
             Continuous e → Continuous e.symm → (∀ x, e x ∈ ratMx D m n ↔ x ∈ ratMx D m n)
               → ∀ p, ∫ x in v.𝓕, K (e x) p ∂v.μ = ∫ x in v.𝓕, K x p ∂v.μ := by
-  first
-  | exact @GlobalTheory.Unf.ParCont.parCont
-  | exact GlobalTheory.Unf.ParCont.parCont
-  | (intros; apply GlobalTheory.Unf.ParCont.parCont <;> assumption)
+  first | exact @GlobalTheory.Unf.ParCont.parCont

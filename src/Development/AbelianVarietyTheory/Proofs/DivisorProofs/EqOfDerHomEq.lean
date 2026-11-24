@@ -138,7 +138,7 @@ theorem exists_derHom
     map_smul' := fun r b ↦ by simp [Algebra.smul_def, TrivSqZeroExt.algebraMap_eq_inl']
     map_one_eq_zero' := by simp
     leibniz' := fun a b ↦ by
-      simp only [map_mul, TrivSqZeroExt.snd_mul, smul_eq_mul]
+      simp only [smul_eq_mul]
       simp [MulOpposite.smul_eq_mul_unop, hfst]
       ring
   }
@@ -171,7 +171,7 @@ theorem snd_val_derHom
     toFun := fun c ↦ TrivSqZeroExt.inl c.fst + TrivSqZeroExt.inr (δ c.snd)
     map_one' := by ext <;> simp
     map_zero' := by ext <;> simp
-    map_add' := fun a b ↦ by ext <;> simp <;> ring
+    map_add' := fun a b ↦ by ext <;> simp
     map_mul' := fun a b ↦ by
       ext
       · simp

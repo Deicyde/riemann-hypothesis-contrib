@@ -67,15 +67,6 @@ namespace GlobalTheory.InertDatumExist
 
 open scoped TensorProduct
 
-theorem isCMExt (E : Type) [Field E] [NumberField E] [IsCMField E]
-    : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt (maximalRealSubfield E) E
-      (IsCMField.complexConj E).toAlgHom := ⟨
-  inferInstance,
-  inferInstance,
-  Algebra.IsQuadraticExtension.finrank_eq_two _ _,
-  fun τ x => IsCMField.complexEmbedding_complexConj E τ x
-⟩
-
 theorem mem_tensInt_iff
     {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (v : HeightOneSpectrum (𝓞 F)) (x : E ⊗[F] v.adicCompletion F)
@@ -219,7 +210,9 @@ theorem exists_inertDatum
   obtain ⟨c, hc, -⟩ :=
     GlobalTheory.LFun.InertChart.existsUnique_isConjAt (IsCMField.complexConj D.host.E).toAlgHom hw
       hunder
-  obtain ⟨ϖ, hU⟩ := GlobalTheory.LFun.InertChart.exists_isUnramInv (isCMExt D.host.E) hw hc
+  obtain ⟨ϖ, hU⟩ :=
+    GlobalTheory.LFun.InertChart.exists_isUnramInv
+      (_root_.GlobalTheory.AdelicU.isCMExt_of_isCMField D.host.E) hw hc
   obtain ⟨k, hk, hke⟩ :=
     GlobalTheory.LFun.InertChart.exists_congr_antiJ (n := n) hU (B := 1) (one_mem _)
       (by simp [Formalism.UG.cT, Matrix.map_one])

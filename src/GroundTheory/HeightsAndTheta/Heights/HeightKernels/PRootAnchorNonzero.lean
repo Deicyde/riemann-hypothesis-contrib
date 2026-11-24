@@ -59,10 +59,11 @@ noncomputable section
 
 namespace RootAnchorNonzeroAlt
 
-theorem anchorMinor_eq_one {R : Type*} [CommRing R] (j m : ℕ) (Z : Matrix (Fin j) (Fin m) R) :
-    (colsOf (onePipe Z) (plAnchor j m)).det = 1 := by
-  have he : (plAnchor j m).1.orderEmbOfFin (plAnchor j m).2 =
-      Fin.castLEOrderEmb (Nat.le_add_right j m) := by
+theorem anchorMinor_eq_one {R : Type*} [CommRing R] (j m : ℕ) (Z : Matrix (Fin j) (Fin m) R)
+    : (colsOf (onePipe Z) (plAnchor j m)).det = 1 := by
+  have he
+      : (plAnchor j m).1.orderEmbOfFin (plAnchor j m).2
+        = Fin.castLEOrderEmb (Nat.le_add_right j m) := by
     symm
     apply Finset.orderEmbOfFin_unique'
     intro x
@@ -75,8 +76,10 @@ theorem anchorMinor_eq_one {R : Type*} [CommRing R] (j m : ℕ) (Z : Matrix (Fin
     rw [this, Fin.append_left]
   rw [this, Matrix.det_one]
 
-theorem rootCoord_isIntegral {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ} (hζ : IsRootMatrix ζ)
-    (p : Σ _ : Fin f, PlIdx j m) : IsIntegral ℤ (rootCoord ζ p) := by
+theorem rootCoord_isIntegral
+    {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ}
+    (hζ : IsRootMatrix ζ) (p : Σ _ : Fin f, PlIdx j m)
+    : IsIntegral ℤ (rootCoord ζ p) := by
   classical
   apply IsIntegral.det
   intro a b
@@ -95,27 +98,30 @@ def homForm {f j m : ℕ} (q : Polynomial ℤ) (τ : Fin f) (I : PlIdx j m) : MR
   ∑ k ∈ Finset.range (q.natDegree + 1),
     C (q.coeff k) * X ⟨τ, I⟩ ^ k * X ⟨τ, plAnchor j m⟩ ^ (q.natDegree - k)
 
-theorem homForm_mem {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ) (q : Polynomial ℤ) (τ : Fin f)
-    (I : PlIdx j m) (hq : Polynomial.aeval (rootCoord ζ ⟨τ, I⟩) q = 0) :
-    homForm q τ I ∈ rootPointIdeal ζ := by
+theorem homForm_mem
+    {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ)
+    (q : Polynomial ℤ) (τ : Fin f) (I : PlIdx j m)
+    (hq : Polynomial.aeval (rootCoord ζ ⟨τ, I⟩) q = 0)
+    : homForm q τ I ∈ rootPointIdeal ζ := by
   show mConeMap (rootCoord ζ) (homForm q τ I) = 0
   have hA : rootCoord ζ ⟨τ, plAnchor j m⟩ = 1 := anchorMinor_eq_one j m (ζ τ)
 
   simp only [homForm, mConeMap, map_sum, map_mul, map_pow, aeval_X, aeval_C, hA, map_one, one_mul]
   rw [Polynomial.aeval_eq_sum_range] at hq
-  calc _ = ∑ k ∈ Finset.range (q.natDegree + 1),
+  calc
+    _ = ∑ k ∈ Finset.range (q.natDegree + 1),
         C (q.coeff k • rootCoord ζ ⟨τ, I⟩ ^ k) * (X τ : MvPolynomial (Fin f) ℂ) ^ q.natDegree := by
-        refine Finset.sum_congr rfl fun k hk => ?_
-        have hk' : k ≤ q.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)
-        rw [← pow_mul_pow_sub (X τ : MvPolynomial (Fin f) ℂ) hk', zsmul_eq_mul, map_mul, map_pow,
-          eq_intCast, map_intCast, mul_pow]
-        ring
+      refine Finset.sum_congr rfl fun k hk => ?_
+      have hk' : k ≤ q.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)
+      rw [← pow_mul_pow_sub (X τ : MvPolynomial (Fin f) ℂ) hk', zsmul_eq_mul, map_mul, map_pow,
+        eq_intCast, map_intCast, mul_pow]
+      ring
     _ = 0 := by rw [← Finset.sum_mul, ← map_sum, hq, map_zero, zero_mul]
 
-theorem eval_homForm {f j m : ℕ} {q : Polynomial ℤ} (hq : q.Monic) {τ : Fin f} {I : PlIdx j m}
-    {z : (Σ _ : Fin f, PlIdx j m) → ℂ} (hz : z ⟨τ, plAnchor j m⟩ = 0) :
-    eval z (map (Int.castRingHom ℂ) (homForm q τ I)) = z ⟨τ, I⟩ ^ q.natDegree := by
-
+theorem eval_homForm
+    {f j m : ℕ} {q : Polynomial ℤ} (hq : q.Monic)
+    {τ : Fin f} {I : PlIdx j m} {z : (Σ _ : Fin f, PlIdx j m) → ℂ} (hz : z ⟨τ, plAnchor j m⟩ = 0)
+    : eval z (map (Int.castRingHom ℂ) (homForm q τ I)) = z ⟨τ, I⟩ ^ q.natDegree := by
   simp only [homForm, map_sum, map_mul, map_pow, map_C, map_X, eval_C, eval_X, hz]
   rw [Finset.sum_range_succ, Finset.sum_eq_zero]
   · simp [hq.coeff_natDegree]

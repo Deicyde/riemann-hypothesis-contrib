@@ -1,6 +1,6 @@
 module
 
-public import Mathlib
+import Mathlib
 public import Formalism.SharpRestriction.LevelLetterCocycles.LamPS
 public import Formalism.SharpRestriction.LevelLetterCocycles.LocalFormOfThreeInputs
 import Mathlib.Algebra.Order.Floor.Extended
@@ -207,11 +207,6 @@ theorem killR_of_steps
   haveI : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   haveI : NeZero (finrank ℚ_[l] ↥(K0 K)) := by
     first
-    | infer_instance
-    | exact ⟨Module.finrank_pos.ne'⟩
-    | exact ⟨(Formalism.MainNotions.N.Ln34.max_unramified_finrank_pos K).ne'⟩
-    | exact ⟨(Formalism.MainNotions.N.PreambleDegrees.finrank_maxUnramifiedSubfield_padicFinExt_pos K).ne'⟩
-    | (haveI := Formalism.MainNotions.WachCoordinates.Br.finiteDimensional_max_unramified K; exact ⟨Module.finrank_pos.ne'⟩)
     | (haveI := FiniteDimensional.left ℚ_[l] ↥(K0 K) ↥K.1; exact ⟨Module.finrank_pos.ne'⟩)
   refine ⟨
     sK l K,

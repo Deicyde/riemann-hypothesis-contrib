@@ -62,7 +62,7 @@ theorem SeqCx.exactAt_of_links
     exact ⟨by simpa using hl, hlen⟩
   by_cases h0 : ([] : List V) ∈ F
   · obtain ⟨b, hb, hcb', hcyc⟩ :=
-      T.exists_homologous_cycle_with_entries_in_of_exactAt_links V F S hF p
+      _root_.GlobalTheory.SeqCx.exists_sub_bd_mem_chains_linkIn_nil V F S hF p
         (fun τ hτ _ _ _ hl => h τ hτ hl)
         c hc hcb
     obtain ⟨b', hb', hbd⟩ := h [] h0 (by simp) (c - bd V b) (by simpa using hcb') hcyc
@@ -80,13 +80,3 @@ theorem SeqCx.exactAt_of_links
     exact ⟨0, Submodule.zero_mem _, by simp [hc0]⟩
 
 end GlobalTheory
-
-section
-open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.seqComplex_exactAt_of_all_links_exactAt
-    : ∀ (V : Type) (F : Set (List V)) (S : Set V),
-      SubClosed F
-        → ∀ (p : ℕ),
-          (∀ τ ∈ F, τ.length ≤ p → ExactAt (linkIn F S τ) (p - τ.length)) → ExactAt F p := by
-  first | exact @GlobalTheory.SeqCx.exactAt_of_links
-end

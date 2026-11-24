@@ -57,10 +57,6 @@ theorem lowerTriangular_mul
   · rw [hA i k hik, zero_mul]
   · rw [hB k j (lt_of_le_of_lt hki hij), mul_zero]
 
-theorem main
-    : ∀ {S : Type} [inst : CommRing S] {n : ℕ} (A B : Matrix (Fin n) (Fin n) S),
-      (∀ (i j : Fin n), i < j → A i j = (0 : S)) → (∀ (i j : Fin n), i < j → B i j = (0 : S))
-        → ∀ (i j : Fin n), i < j → (A * B) i j = (0 : S) := fun A B hA hB =>
-  lowerTriangular_mul A B hA hB
+alias main := _root_.GlobalTheory.LowerTriangularMul.lowerTriangular_mul
 
 end GlobalTheory.LowerTriangularMul

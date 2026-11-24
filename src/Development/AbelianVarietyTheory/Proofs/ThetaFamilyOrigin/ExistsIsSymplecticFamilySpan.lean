@@ -295,7 +295,7 @@ theorem exists_stdSymp_of_pairing
     exact congrArg _ (Subtype.ext (wr _ _ _))
   have βw : ∀ x y (n : ℤ), β x y = n ↔ w x.toMul y.toMul = ze ^ n := fun x y n => by
     simp only [β]
-    rw [AddEquiv.symm_apply_eq, hz.zmodEquivZPowers_apply_coe_int]
+    rw [AddEquiv.symm_apply_eq, hz.zmodEquivZPowers_apply_intCast]
     exact Subtype.ext_iff
   let B : LinearMap.BilinForm (ZMod (p ^ (j + 1))) (Additive T) :=
     LinearMap.mk₂ _ β βl

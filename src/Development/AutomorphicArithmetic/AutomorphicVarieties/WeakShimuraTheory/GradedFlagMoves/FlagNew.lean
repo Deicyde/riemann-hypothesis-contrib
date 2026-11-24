@@ -94,7 +94,7 @@ private theorem upOf
     · exact absurd e2 h0
     · exact e2
   intro i j hij
-  fin_cases i <;> fin_cases j <;> simp_all <;> omega
+  fin_cases i <;> fin_cases j <;> simp_all
 
 private theorem core
     {k : Type} [Field k]

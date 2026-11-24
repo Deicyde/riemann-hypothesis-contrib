@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilDatum_fixes_vacuum_nonSplitPlace_unramified
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.weilDatum_fixes_vacuum_nonSplitPlace_unramified
                 → ∀ v ε,
                   NonSplitAt D v ε → UnramAt ε χS → UnramAt ε χT
                     → FixesVacAt ψ S T ΛS ΛT om v ε := by
-  first
-  | exact @GlobalTheory.VacInert.fixesVacAt_of_unram
-  | exact GlobalTheory.VacInert.fixesVacAt_of_unram
-  | (intros; apply GlobalTheory.VacInert.fixesVacAt_of_unram <;> assumption)
+  first | exact @GlobalTheory.VacInert.fixesVacAt_of_unram

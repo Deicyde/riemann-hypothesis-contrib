@@ -84,12 +84,7 @@ theorem Bdd.mul {s t : ℕ → C} (hs : Bdd V s) (ht : Bdd V t) : Bdd V (fun n =
 theorem Bdd.sum {ι : Type} (S : Finset ι) {s : ι → ℕ → C} (h : ∀ i ∈ S, Bdd V (s i))
     : Bdd V (fun n => ∑ i ∈ S, s i n) := by
   first
-  | exact GlobalTheory.ScalarStatement.main ..
   | (apply GlobalTheory.ScalarStatement.main <;> assumption)
-  | (intros; apply GlobalTheory.ScalarStatement.main <;> assumption)
-  | (apply @GlobalTheory.ScalarStatement.main <;> assumption)
-  | (intros; apply @GlobalTheory.ScalarStatement.main <;> assumption)
-  | (apply @GlobalTheory.ScalarStatement.main <;> first | assumption | infer_instance)
   | exact @GlobalTheory.ScalarStatement.main C ‹_› V ι S s h
   | exact @GlobalTheory.ScalarStatement.main C ‹_› V ι S s
   | exact @GlobalTheory.ScalarStatement.main C ‹_› V ι S
@@ -134,12 +129,7 @@ theorem BddS.prod
     {ι : Type} (S : Finset ι) {f : ι → ℕ → MvPowerSeries σ C} (h : ∀ i ∈ S, BddS V (f i))
     : BddS V (fun n => ∏ i ∈ S, f i n) := by
   first
-  | exact UpperTheory.Reformulated.B.BoundedSums.prod ..
   | (apply UpperTheory.Reformulated.B.BoundedSums.prod <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.BoundedSums.prod <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.BoundedSums.prod <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.BoundedSums.prod <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.BoundedSums.prod <;> first | assumption | infer_instance)
   | exact @UpperTheory.Reformulated.B.BoundedSums.prod C ‹_› V σ ι S f h
   | exact @UpperTheory.Reformulated.B.BoundedSums.prod C ‹_› V σ ι S f
   | exact @UpperTheory.Reformulated.B.BoundedSums.prod C ‹_› V σ ι S

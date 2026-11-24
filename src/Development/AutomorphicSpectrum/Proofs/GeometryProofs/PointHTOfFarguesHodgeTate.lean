@@ -1,16 +1,24 @@
 module
 
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.IsPolLatticePlane
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionTwoStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionThreeStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.NonemptyLinearEquivOfPiFinPowFinite
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionTwo
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionThree
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.DualOrder
 public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.FarguesHodgeTate
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.CompleteIntegersPropertiesStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.PolarisedDivisibleGroupExistsStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFreeOverLocalRingStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionFiveStatement
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.NumberTheory.Padics.PadicIntegers
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.CompleteIntegersProperties
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.PolarisedDivisibleGroupExists
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFreeOverLocalRing
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionFive
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionFourStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionOneStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianAdicTorsionOne
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -70,7 +78,8 @@ theorem lie_free_finite
     (E : Type) [AddCommGroup E] [Module R E]
     (M : LieModel G x E)
     : Module.Free R E ∧ Module.Finite R E := by
-  obtain ⟨n, ⟨b⟩⟩ := GlobalTheory.T.lie_model_free_over_local_ring S G hG R x E M
+  obtain ⟨n, ⟨b⟩⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.LieFreeSmooth.lieModel_free_of_smooth S G hG R x E M
   exact ⟨Module.Free.of_basis b, Module.Finite.of_basis b⟩
 
 def ordTower
@@ -89,10 +98,13 @@ def ordTower
     (M : LieModel G y L)
     : OrdTower p O La L :=
   haveI : IsLocalRing O :=
-    (GlobalTheory.T.complete_integers_properties p C v O hv hp hO).2.1.toIsLocalRing
-  have h3 := GlobalTheory.T.semiabelian_adic_torsion_one p C v O hv hp hO S G hG y La X
-  have h4 := GlobalTheory.T.semiabelian_adic_torsion_two p C v O hv hp hO S G hG y La X
-  have h5 := GlobalTheory.T.semiabelian_adic_torsion_three p C v O hv hp hO S G hG y La X L M
+    (_root_.GlobalTheory.CompanionTheory.Ar.HT.padicComplete_integers_structure p C v O hv hp
+      hO).2.1.toIsLocalRing
+  have h3 := _root_.GlobalTheory.CompanionTheory.Ar.HT.tw_hopf_main p C v O hv hp hO S G hG y La X
+  have h4 :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HT.btOrder_restriction p C v O hv hp hO S G hG y La X
+  have h5 :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HT.TwDer.der_main p C v O hv hp hO S G hG y La X L M
   have h6 := (GlobalTheory.T.semiabelian_adic_torsion_four p C v O hv hp hO S G hG y La X L M).1
   {
     A := fun n => (X.Γ n).btOrder ⊤
@@ -117,7 +129,7 @@ theorem pointHT (hF : FarguesHodgeTate) : PointHT := by
     hmon hact hind hrank ζ hζ hζp hpair κ hκ
   haveI : Module.Free ℤ La := hu.free
   haveI : Module.Finite ℤ La := hu.finite
-  haveI : IsLocalRing O := (GlobalTheory.T.complete_integers_properties p C v O hv hp hO).2.1.toIsLocalRing
+  haveI : IsLocalRing O := (_root_.GlobalTheory.CompanionTheory.Ar.HT.padicComplete_integers_structure p C v O hv hp hO).2.1.toIsLocalRing
   obtain ⟨hLf, hLfin⟩ := lie_free_finite S G hG.smooth O y L M
   let T := ordTower p C v O hv hp hO S G hG y La X L M
   have hacts : ∀ a : 𝓞 E, T.Acts (DistribSMul.toAddMonoidHom La a) (ρL a) := by
@@ -126,10 +138,11 @@ theorem pointHT (hF : FarguesHodgeTate) : PointHT := by
     exact (GlobalTheory.T.semiabelian_adic_torsion_four p C v O hv hp hO S G hG y La X L M).2
       (act a) _ (ρL a) (hind a) (hact a) n f g hfg
   have hpe : T.PairingExtends EF ζ := fun n =>
-    GlobalTheory.T.exists_prodSpan_torsion_pairing_eq_zeta_pow p C v O hv hp hO S G hG y La X EF ζ
+    _root_.GlobalTheory.CompanionTheory.Ar.HT.pairingRegular_mem_prodSpan p C v O hv hp hO S G hG y
+      La X EF ζ
       (fun n => (hζ n).pow_eq_one)
       hpair n
-  exact GlobalTheory.T.polarised_divisible_group_exists hF p C v O hv hp hO E c hc La EF N u hu L T
-    ρL ζ κ hacts hrank hζ hζp hpe hκ
+  exact _root_.GlobalTheory.CompanionTheory.Ar.HT.TowerPoint.exists_HTPoint hF p C v O hv hp hO E c
+    hc La EF N u hu L T ρL ζ κ hacts hrank hζ hζp hpe hκ
 
 end GlobalTheory.CompanionTheory.Ar.HT.Fargues

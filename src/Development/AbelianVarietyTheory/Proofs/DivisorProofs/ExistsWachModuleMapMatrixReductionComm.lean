@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RankOfMulEqOne
 public import Formalism.LocalRingCardinality.SpanPowerMembership.NDLocE
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WachRingFactsUnramifiedLevelOneStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WachRingFactsUnramifiedLevelOne
 public import Formalism.PieriBlockIdeals.PieriColumnMinors.HeckeLFunctionIdealEulerProduct
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -119,12 +119,10 @@ theorem coeff_comm
     (hA : ∀ k, g (e k) = ∑ m, A m k • (b' m : M')) (j : Fin n') (k : Fin n)
     : ∑ m, p m k * A j m = ∑ m, σ (A m k) * p' j m := by
   have h1 : g (u (e k)) = ∑ j, (∑ m, p m k * A j m) • (b' j : M') := by
-
     rw [hp k, map_sum]
     simp only [hg, hA]
     exact sum_smul_sum (fun m => p m k) (fun m j => A j m) (fun j => (b' j : M'))
   have h2 : u' (g (e k)) = ∑ j, (∑ m, σ (A m k) * p' j m) • (b' j : M') := by
-
     rw [hA k, map_sum]
     simp only [hu', hp']
     exact sum_smul_sum (fun m => σ (A m k)) (fun m j => p' j m) (fun j => (b' j : M'))
@@ -371,7 +369,7 @@ theorem exists_mapMat_redHom
   intro l _ P H K LL hA T T' n n' γ b b' N N' u un g hT hT' hF hF' hχ hun
   have hl : l ≠ 2 := hA.2.1
   have := charP_residueField_of_irreducible LL
-  obtain ⟨hφ, -, hγ, -, hRF, -⟩ := GlobalTheory.T.wachRingFacts_unramified_levelOne H K LL hA
+  obtain ⟨hφ, -, hγ, -, hRF, -⟩ := _root_.GlobalTheory.WachPlace.ringFacts_of_caseA H K LL hA
   have RF
       : ∀ a : (↥(OL LL))⟦X⟧,
         (∀ δ ∈ (H.W K 1 LL hA.2.2).DelF, (H.W K 1 LL hA.2.2).γ₀ δ a = a)

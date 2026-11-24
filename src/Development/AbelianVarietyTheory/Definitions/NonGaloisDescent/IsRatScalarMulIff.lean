@@ -51,9 +51,6 @@ open Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.Co
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

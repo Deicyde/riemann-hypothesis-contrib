@@ -3,13 +3,13 @@ module
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GtBaseChangeSt
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.AuxiliaryInertOddPrime
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsModelBaseChangeOverringStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSabCancel
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsModelBaseChangeOverring
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GenericPartDenseProOpen
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsReducedIsNormalSchemeIsLocallyNoetherianOfSmoo
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelMapFiniteEtaleSurjective
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MapToUniversalObjectUnique
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.OpenImmersionCompStructureEqGeneric
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSabCancel
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -201,8 +201,8 @@ theorem dominates_of_map_to_base
 
   obtain ⟨ido, hid⟩ := ObjMaps.exists_sab_id Y.oF.t
   obtain ⟨C, a, hiso⟩ :=
-    GlobalTheory.T.exists_model_baseChange_overring E H _ c.F O _ Y.oF.t β O' β' b (ofModel Y) ido
-      hid hβ hβ' hb
+    _root_.GlobalTheory.Models.Cpt.exists_above_isIso_of_overring E H _ c.F O _ Y.oF.t β O' β' b
+      (ofModel Y) ido hid hβ hβ' hb
   obtain ⟨e, π, mu, _, e₁, e₂, hj, hm⟩
       : ∃ (e : C.X ⟶ pullback Y.s (spMap b)) (π : C.X ⟶ Y.X) (mu : SABMap C.t Y.t π),
         IsIso e ∧ e ≫ pullback.fst _ _ = π ∧ e ≫ pullback.snd _ _ = C.s ∧ C.j ≫ π = Y.j

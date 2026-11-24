@@ -76,7 +76,6 @@ theorem eigSp_ext
   have hP'apply : ∀ w, P' w = ∑ m, i (σ (c m)) • ρ' (a m) w := fun w => by
     simp [P', LinearMap.sum_apply]
   have hscal : ∑ m, i (σ (c m)) * i (σ (a m)) = ((NumberField.discr F : ℤ) : Ω') := by
-
     rw [← map_intCast (i.comp σ), ← hsum, map_sum]
     simp [map_mul]
   have hP'eig : ∀ w ∈ eigSp ρ' (i.comp σ), P' w = ((NumberField.discr F : ℤ) : Ω') • w := by

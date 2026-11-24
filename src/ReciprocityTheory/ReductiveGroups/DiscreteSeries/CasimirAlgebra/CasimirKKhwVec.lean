@@ -75,9 +75,7 @@ theorem pair_apply_hw
     : (E a b * E b a) v = ((hwTerm μ a b : ℝ) : ℂ) • v := by
   rcases lt_trichotomy a b with h | rfl | h
   · have hc := congrArg (fun f : Module.End ℂ M => f v) (hE a b b a)
-    simp only [if_pos rfl, if_true, ite_true, LinearMap.sub_apply, Module.End.mul_apply, hab h,
-        map_zero, sub_zero]
-      at hc
+    simp only [if_true, LinearMap.sub_apply, Module.End.mul_apply, hab h, map_zero, sub_zero] at hc
     rw [Module.End.mul_apply, hc, hd, hd]
     simp [hwTerm, h, h.ne, sub_smul]
   · rw [Module.End.mul_apply, hd, map_smul, hd, smul_smul]

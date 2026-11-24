@@ -55,8 +55,6 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.OffRange
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.Mem.Top.Bl

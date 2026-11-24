@@ -68,16 +68,7 @@ theorem dc_aeval_intertwine
     (ψ : Y →ₗ[ℂ] Z) (A : Module.End ℂ Y) (B : Module.End ℂ Z) (h : ∀ y, ψ (A y) = B (ψ y))
     (p : ℂ[X]) (y : Y)
     : ψ (aeval A p y) = aeval B p (ψ y) := by
-  first
-  | exact UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine ..
-  | (apply UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine
-        <;> first | assumption | infer_instance
-    )
+  first | (apply UpperTheory.Reformulated.B.Qj10.dc_aeval_intertwine <;> assumption)
 
 theorem dc_tensSub_fd
     {M : Type*} [AddCommGroup M] [Module ℂ M] {S : Submodule ℂ M} (hS : FiniteDimensional ℂ S)
@@ -449,7 +440,6 @@ theorem dc_eeF_Qsymm
       Q (eeF dual E f) g = Q f (eeF dual E g) := by
   intro f hf g hg
   have hΩ : Q (casimir (tensF dual E) f) g = Q f (casimir (tensF dual E) g) := by
-
     simp only [casimir, LinearMap.sum_apply, Module.End.mul_apply, map_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     rw [hadj a b _ (dc_tens_genSub_stable dual b a f hf) g hg,

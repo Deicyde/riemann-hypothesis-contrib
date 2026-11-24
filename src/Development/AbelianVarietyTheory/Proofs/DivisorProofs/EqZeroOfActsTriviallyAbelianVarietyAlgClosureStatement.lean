@@ -1,6 +1,6 @@
 module
 
-public import Mathlib
+public import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 public import Mathlib.NumberTheory.NumberField.Basic
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SABBaseChangeSt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqZeroOfActsTriviallyAbelianVarietyAlgClosure
@@ -54,6 +54,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.eq_zero_of_acts_trivially_abelianVariety_algClosure
     : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [IsSepClosed Ω] (A : Over (Sp K)) [GrpObj A]
         [IsCommMonObj A],
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.eq_zero_of_acts_trivially_abelianVariety_algClosur
                 [IsFractionRing O F] (α : OAct O A) (x : O),
               (OAct.pullback (spMap (algebraMap K (AlgebraicClosure Ω))) A α).act x = 1
                 → x = 0 := by
-  first
-  | exact @GlobalTheory.ActTrivialInj.eq_zero_of_act_pullback_eq_one
-  | exact GlobalTheory.ActTrivialInj.eq_zero_of_act_pullback_eq_one
-  | (intros; apply GlobalTheory.ActTrivialInj.eq_zero_of_act_pullback_eq_one <;> assumption)
+  first | exact @GlobalTheory.ActTrivialInj.eq_zero_of_act_pullback_eq_one

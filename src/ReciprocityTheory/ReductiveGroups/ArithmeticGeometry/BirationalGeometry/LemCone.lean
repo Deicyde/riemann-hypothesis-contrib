@@ -67,7 +67,6 @@ private theorem coeff_coneMap_eq_aeval_homogeneousComponent
     (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ)
     : (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
   classical
-
   conv_lhs => rw [f.as_sum, map_sum]
   rw [Polynomial.finsetSum_coeff]
   simp only [coneMap_monomial', Polynomial.coeff_C_mul_X_pow]
@@ -92,9 +91,7 @@ theorem mem_coordIdeal_of_isHomogeneous
     : f ∈ coordIdeal o x := by
   rw [coordIdeal, RingHom.mem_ker, coneMap_of_isHomogeneous o x hf, h, map_zero, zero_mul]
 
-theorem coeff_coneMap (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ)
-    : (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
-  exact coeff_coneMap_eq_aeval_homogeneousComponent o x f d
+alias coeff_coneMap := _root_.ReciprocityTheory.ChartRestriction.G.Geo.coeff_coneMap_eq_aeval_homogeneousComponent
 
 theorem coordIdeal_isHomogIdeal (x : ι → Ω) : IsHomogIdeal o (coordIdeal o x) := by
   intro f hf d

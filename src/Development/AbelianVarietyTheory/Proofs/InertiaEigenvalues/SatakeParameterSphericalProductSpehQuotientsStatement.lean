@@ -47,6 +47,7 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsUnitarisa
 open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL
   GlobalTheory.DefiniteBC GlobalTheory.BcSpeh
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.satakeParameter_spherical_product_spehQuotients
     : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (c n : ℕ)
         (a d : Fin c → ℕ) (h : ∑ i, d i * a i = n) (ρ : ∀ i, LocIrr w (a i))
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.satakeParameter_spherical_product_spehQuotients
               (∀ i, GlobalTheory.LFun.HasSatGL w (ρ i).ρ (S i))
                 ∧ ∑ i, ∑ k : Fin (d i), (S i).map (fun z => (z : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (((d i : ℂ) - 1) / 2 - (k : ℕ)))
                   = T.map (fun z => (z : ℂ)) := by
-  first
-  | exact @GlobalTheory.SatInd.satake_locProd_speh
-  | exact GlobalTheory.SatInd.satake_locProd_speh
-  | (intros; apply GlobalTheory.SatInd.satake_locProd_speh <;> assumption)
+  first | exact @GlobalTheory.SatInd.satake_locProd_speh

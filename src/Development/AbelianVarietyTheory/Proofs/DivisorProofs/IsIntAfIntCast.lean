@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqOne
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -127,10 +128,7 @@ theorem actOn_tmul
     (r : R) (c : C)
     : actOn rep R (r ⊗ₜ c) = r • (rep c).baseChange R := by
   rw [Algebra.smul_def]
-  first
-  | exact Algebra.TensorProduct.lift_tmul _ _ _ r c
-  | (erw [Algebra.TensorProduct.lift_tmul]; rfl)
-  | rfl
+  first | exact Algebra.TensorProduct.lift_tmul _ _ _ r c
 
 theorem EFA_actOn (L : Link D G) (X : AfP p ⊗[ℚ] G.C) (v w : AfP p ⊗[ℚ] VQ D)
     : EFA D (actOn L.rep (AfP p) X v) w

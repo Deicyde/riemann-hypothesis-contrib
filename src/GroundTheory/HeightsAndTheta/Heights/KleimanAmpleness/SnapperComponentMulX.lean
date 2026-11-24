@@ -53,6 +53,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.Assembly
 
 @[expose] public section
 
@@ -103,18 +104,6 @@ theorem snapper_colon_X
   rw [Submodule.mem_colon_span_singleton, smul_eq_mul] at hf ⊢
   rw [← snapper_component_mul_X]
   exact hJ _ hf _
-
-omit [Fintype K] [LinearOrder K] in
-theorem snapper_eval_shift (p : MvPolynomial K ℚ) (e m : K → ℤ)
-    : eval (fun k => ((m - e) k : ℚ)) p
-      = eval (fun k => (m k : ℚ)) (bind₁ (fun j => X j - C ((e j : ℤ) : ℚ)) p) := by
-  have hb
-      : ∀ (x : K → ℚ) (g : K → MvPolynomial K ℚ),
-        eval x (bind₁ g p) = eval (fun j => eval x (g j)) p := fun x g =>
-    eval₂Hom_bind₁ _ _ _ _
-  rw [hb]
-  refine congrArg (fun x => eval x p) (funext fun j => ?_)
-  simp
 
 theorem snapper_top
     (V : Ideal (MvPolynomial (Σ k, ι k) F)) (m : K → ℤ)
@@ -189,7 +178,8 @@ theorem EulerPoly.proof
       obtain ⟨p2, hp2⟩ := ih _ (hlt2 v hvJ) (hSup v)
       refine ⟨bind₁ (fun j => X j - C (((Pi.single v.1 1 : K → ℤ) j : ℤ) : ℚ)) p1 + p2, fun m => ?_⟩
       rw [hE F K ι J v hJ (hfin J hJ) (hfin _ (snapper_colon_X hJ v)) (hfin _ (hSup v)) m, hp1, hp2,
-        map_add (f := _), ← snapper_eval_shift]
+        map_add (f := _),
+        ← _root_.GroundTheory.Heights₂.Heights.FieldNumbers.HilbEventuallyPoly.eval_shift]
     · push Not at hA
       by_cases hB : ∃ k, ∀ i, (X ⟨k, i⟩ : MvPolynomial (Σ k, ι k) F) ∈ J
       · obtain ⟨k, hk⟩ := hB

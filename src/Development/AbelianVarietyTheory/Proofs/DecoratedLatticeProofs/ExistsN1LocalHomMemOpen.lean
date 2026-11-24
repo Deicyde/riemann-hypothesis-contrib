@@ -161,7 +161,7 @@ theorem locHom_autOf
     : (locHom ι e (autOf e g)).val = g.val.map ι := by
   rw [locHom_val]
   ext i j
-  simp [GlobalTheory.SymBridge.toLoc, autOf_apply, Matrix.mulVec_single_one]
+  simp [GlobalTheory.SymBridge.toLoc, autOf_apply]
 
 end GlobalTheory.VolBridge.NormOneIdeleAutomorphisms
 

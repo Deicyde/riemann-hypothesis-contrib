@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.memberDictionary_invariant_rational_level
     : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H)
         (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ)
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.memberDictionary_invariant_rational_level
                   ∧ (∀ g τ i, ‖dmin (C.M.X (dict g).1).Gm (dict g).2 τ i‖ = 1)
                   ∧ ∀ g k γ,
                     C.Mark g k γ → ∃ δ ∈ (C.M.X k).Γ, dict g = ⟨k, lact δ (C.fr (γ * g) k)⟩ := by
-  first
-  | exact @GlobalTheory.Member.dict_invariant
-  | exact GlobalTheory.Member.dict_invariant
-  | (intros; apply GlobalTheory.Member.dict_invariant <;> assumption)
+  first | exact @GlobalTheory.Member.dict_invariant

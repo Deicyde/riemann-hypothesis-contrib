@@ -309,28 +309,6 @@ private theorem ch_core_lemma
         fun h' => absurd h' hall
       ⟩
 
-theorem CH_of_lenCoker
-    {V : VF C} {d : ℕ} [NeZero d]
-    {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
-    (G : ∀ g, Cart V d (I g) (J g)) (n j j' : ℕ)
-    (big : Fin 2 → ZMod d → Prop) (big_compl : ∀ g a, big (1 - g) a ↔ ¬ big g a)
-    (h : Fin 2 → ℕ) (ht : ∀ g, Fin (h g) → I g → C) (ht_int : ∀ g i x, V.Ge 0 (ht g i x))
-    (hLen : ∀ g a,
-      big g a
-        → ∃ e : Fin (pT G g a) ≃ {x : I g // (G g).ty (Sum.inl x) = a},
-          ((Even d ∧ ∀ b : ZMod d, (big 0 b ↔ Even b.val))
-              → S4.lenCoker V.v (Matrix.of fun c i => ht g i (e c))
-                ≤ (((n : ℝ) * gam V.l + ((j : ℝ) + j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ))
-            ∧ ((∀ b, big g b)
-              → S4.lenCoker V.v (Matrix.of fun c i => ht g i (e c))
-                ≤ ((((j : ℝ) + j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ)))
-    (hGerm : ∀ g (i : Fin (h g)) (S : ∀ g, Sys (G g)) (t : ∀ g, I g → MvPowerSeries (I g) C),
-      (∀ g, (S g).IsT (t g))
-        → upG g (mvExp (∑ x : I g, ht g i x • (MvPowerSeries.X x : MvPowerSeries (I g) C)))
-          ∈ IntGerm V t)
-    : CHProp G n j j' big := by
-  exact ch_core_lemma G n j j' big big_compl h ht ht_int hLen hGerm
-
 def upB (l rp rm : ℕ) (w : ℝ) : ℝ := ((rp : ℝ) - rm) * w + (rm : ℝ) / ((l : ℝ) - 1)
 
 theorem gam_le {l : ℕ} (hl : 1 < l) : gam l ≤ 1 / ((l : ℝ) - 1) := by
@@ -386,7 +364,10 @@ theorem CH_of_UP
     : CHProp G n j j' big := by
   have hl1 : 1 < V.l := V.l_prime.one_lt
   obtain ⟨hb1, hb2⟩ := upB_le_bounds hl1 n j j'
-  refine CH_of_lenCoker G n j j' big big_compl h ht ht_int (fun g a hb => ?_) hGerm
+  refine _root_.Formalism.L2.FormalSeriesBounds.CharacteristicFromRanks.ch_core_lemma G n j j' big
+    big_compl h ht ht_int
+    (fun g a hb => ?_)
+    hGerm
   obtain ⟨e, h1, h2⟩ := hUP g a hb
   exact ⟨
     e,

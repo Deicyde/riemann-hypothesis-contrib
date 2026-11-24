@@ -59,29 +59,33 @@ import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.Ha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.ArtinInvCont
 
-theorem absoluteGaloisAbelianization_t2Space (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] :
-    T2Space (GlobalTheory.HeckeGal.Gab E Ω) := by
+theorem absoluteGaloisAbelianization_t2Space
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+    : T2Space (GlobalTheory.HeckeGal.Gab E Ω) := by
   unfold GlobalTheory.HeckeGal.Gab TopologicalAbelianization
   haveI : IsClosed (((commutator (G E Ω)).topologicalClosure : Subgroup (G E Ω)) : Set (G E Ω)) :=
     Subgroup.isClosed_topologicalClosure _
   infer_instance
 
-theorem continuous_localIdele' (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) :
-    Continuous (Neutral.B1.localIdele E v) := by
+theorem continuous_localIdele' (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
+    : Continuous (Neutral.B1.localIdele E v) := by
   apply GlobalTheory.CompanionTheory.InertOpen.continuous_localIdele' <;> assumption
 
-theorem isCompact_valOne (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) :
-    IsCompact {x : (w.adicCompletion E)ˣ | Valued.v (x : w.adicCompletion E) = 1} := by
+theorem isCompact_valOne (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
+    : IsCompact {x : (w.adicCompletion E)ˣ | Valued.v (x : w.adicCompletion E) = 1} := by
   rw [Units.isEmbedding_val₀.isInducing.isCompact_iff]
-  have e : (Units.val '' {x : (w.adicCompletion E)ˣ | Valued.v (x : w.adicCompletion E) = 1}) =
-      {y : w.adicCompletion E | Valued.v y = 1} := by
+  have e
+      : (Units.val '' {x : (w.adicCompletion E)ˣ | Valued.v (x : w.adicCompletion E) = 1})
+        = {y : w.adicCompletion E | Valued.v y = 1} := by
     ext y
     constructor
     · rintro ⟨x, hx, rfl⟩
@@ -93,10 +97,12 @@ theorem isCompact_valOne (E : Type) [Field E] [NumberField E] (w : HeightOneSpec
       exact ⟨Units.mk0 y h0, hy, rfl⟩
   rw [e]
   have hK : IsCompact (w.adicCompletionIntegers E : Set (w.adicCompletion E)) :=
-    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers E w)
+    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers
+      E w)
   refine hK.of_isClosed_subset ?_ ?_
   · have h1 : IsClosed {y : w.adicCompletion E | Valued.v y ≤ 1} := by
-      have : {y : w.adicCompletion E | Valued.v y ≤ 1} = (w.adicCompletionIntegers E : Set (w.adicCompletion E)) := by
+      have : {y : w.adicCompletion E | Valued.v y ≤ 1}
+          = (w.adicCompletionIntegers E : Set (w.adicCompletion E)) := by
         ext y
         exact (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).symm
       rw [this]
@@ -111,8 +117,10 @@ theorem isCompact_valOne (E : Type) [Field E] [NumberField E] (w : HeightOneSpec
       show Valued.v z < 1
       rw [this]
       exact Valuation.map_add_lt _ hz' hy
-    have e2 : {y : w.adicCompletion E | Valued.v y = 1} =
-        {y : w.adicCompletion E | Valued.v y ≤ 1} ∩ {y : w.adicCompletion E | Valued.v y < 1}ᶜ := by
+    have e2
+        : {y : w.adicCompletion E | Valued.v y = 1}
+          = {y : w.adicCompletion E | Valued.v y ≤ 1}
+            ∩ {y : w.adicCompletion E | Valued.v y < 1}ᶜ := by
       ext y
       simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_compl_iff, not_lt]
       exact ⟨fun h => ⟨h.le, h.ge⟩, fun h => le_antisymm h.1 h.2⟩
@@ -121,7 +129,14 @@ theorem isCompact_valOne (E : Type) [Field E] [NumberField E] (w : HeightOneSpec
   · intro y hy
     exact (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).2 (le_of_eq hy)
 
-theorem continuous_inv_on_ine : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (art : Neutral.B1.Ideles E →* GlobalTheory.HeckeGal.Gab E Ω) (a : Weil h →* (w.adicCompletion E)ˣ), GlobalTheory.HeckeGal.IsGlobalArtin art → (∀ σ, ord (w.adicCompletion E) (a σ) = -deg σ) → (∀ σ : Weil h, art (Neutral.B1.localIdele E w (a σ)) = GlobalTheory.HeckeGal.toAb E Ω σ) → Continuous fun σ : Ine (F := E) A => a (ineIncl h σ) := by
+theorem continuous_inv_on_ine
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+        (art : Neutral.B1.Ideles E →* GlobalTheory.HeckeGal.Gab E Ω)
+        (a : Weil h →* (w.adicCompletion E)ˣ),
+      GlobalTheory.HeckeGal.IsGlobalArtin art → (∀ σ, ord (w.adicCompletion E) (a σ) = - deg σ)
+        → (∀ σ : Weil h, art (Neutral.B1.localIdele E w (a σ)) = GlobalTheory.HeckeGal.toAb E Ω σ)
+        → Continuous fun σ : Ine (F := E) A => a (ineIncl h σ) := by
   intro E Ω _ _ _ _ _ A w h art a ha hord hart
   haveI := absoluteGaloisAbelianization_t2Space E Ω
   let K : Set (w.adicCompletion E)ˣ := {x | Valued.v (x : w.adicCompletion E) = 1}
@@ -130,7 +145,8 @@ theorem continuous_inv_on_ine : ∀ (E Ω : Type) [Field E] [NumberField E] [Fie
   have hf : Continuous f :=
     (ha.quot.continuous.comp (continuous_localIdele' E w)).comp continuous_subtype_val
   have hinj : Function.Injective f := fun x y hxy =>
-    Subtype.ext (GlobalTheory.ArtinLocalInj.artin_localIdele_injective GlobalTheory.Published.chevalleyUnits' E Ω art ha w hxy)
+    Subtype.ext (GlobalTheory.ArtinLocalInj.artin_localIdele_injective
+      GlobalTheory.Published.chevalleyUnits' E Ω art ha w hxy)
   have hemb := hf.isClosedEmbedding hinj
   have hmem : ∀ σ : Ine (F := E) A, a (ineIncl h σ) ∈ K := by
     intro σ
@@ -140,7 +156,8 @@ theorem continuous_inv_on_ine : ∀ (E Ω : Type) [Field E] [NumberField E] [Fie
     have ho := hord (ineIncl h σ)
     rw [hd, neg_zero, GlobalTheory.SmGL.SphCompletion.ord_completion, neg_eq_zero] at ho
     show Valued.v ((a (ineIncl h σ) : (w.adicCompletion E)ˣ) : w.adicCompletion E) = 1
-    rw [← WithZero.exp_log (by simp : Valued.v ((a (ineIncl h σ) : (w.adicCompletion E)ˣ) : w.adicCompletion E) ≠ 0),
+    rw [← WithZero.exp_log
+        (by simp : Valued.v ((a (ineIncl h σ) : (w.adicCompletion E)ˣ) : w.adicCompletion E) ≠ 0),
       ho, WithZero.exp_zero]
   let g : Ine (F := E) A → K := fun σ => ⟨a (ineIncl h σ), hmem σ⟩
   have hg : Continuous g := by

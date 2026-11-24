@@ -58,7 +58,6 @@ variable
   (Bw : LocBridge l E Ω Gw O)
   [IsDomain O]
 
-
 theorem eq_zero_of_phi (k : ℕ) (x : KOG O k) (hx : Br.phi Bw k x = 0) : x = 0 := by
   obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   have h1 : Br.vecS Bw k v ∈ stdG (Br.Ow Bw) (Br.LLw Bw) k := (Submodule.Quotient.mk_eq_zero _).1 hx

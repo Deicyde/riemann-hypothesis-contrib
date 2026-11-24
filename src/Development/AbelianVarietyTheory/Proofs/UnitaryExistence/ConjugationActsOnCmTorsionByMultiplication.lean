@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.PermutesRefl
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsCmEndomorphismCommConjugationStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsCmEndomorphismCommConjugation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -158,7 +158,7 @@ theorem main
                         → (∃ s' a, wC H s' * wC H s = 1 + n * wC H a)
                           ∧ ∀ m : ℕ, m ∣ n → C.ActsBy τ io m s := by
   intro E _ _ _ H C τ hτ io h n hn
-  obtain ⟨W, -, hW, hker, hon, hcomm⟩ := GlobalTheory.T.exists_cmEndomorphism_comm_conjugation E H C
+  obtain ⟨W, -, hW, hker, hon, hcomm⟩ := _root_.GlobalTheory.CurveEndo.exists_endo_comm E H C
   have hc := hcomm τ hτ io h
   have key :=
     corr (wC H (0, 1)) (wC H)

@@ -115,9 +115,8 @@ theorem subst_psIn
     MvPolynomial.algHom_ext fun q => by simp
   apply jet_hom_ext
   intro p
-  simp only [jetSubstP, jetRen, AlgHom.comp_apply, jetMap_mk, MvPolynomial.aeval_X, map_sub,
-    MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, psIn, MvPolynomial.constantCoeff_rename, hr,
-    MvPolynomial.rename_C]
+  simp only [jetSubstP, jetRen, AlgHom.comp_apply, jetMap_mk, MvPolynomial.aeval_X, map_sub, psIn,
+    MvPolynomial.constantCoeff_rename, hr, MvPolynomial.rename_C]
 
 end Pts
 
@@ -285,8 +284,8 @@ theorem exists_ad_one
         (fun m => hpe m _)
         (fun m U _ h => by
           simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, wl_pt, wl_pt', pe_pt,
-            pt_sub, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, pt_X, pt_act hch,
-            zpow_neg, Finset.prod_inv_distrib]
+            pt_sub, Matrix.cons_val_zero, Matrix.cons_val_one, pt_X, pt_act hch, zpow_neg,
+            Finset.prod_inv_distrib]
           simp only [inv_mul_cancel_right])
         (fun m y J hJ =>
           (val_mul hJ _ _ _).trans

@@ -47,6 +47,7 @@ import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsAd
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLatBasisZero
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
 import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -128,7 +129,7 @@ theorem _root_.GlobalTheory.det_ne_zero_of_im_hermForm_eq_int
   have hI := hall (Complex.I • w)
   have hre := hpos w hw0
   simp only [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm, smul_dotProduct,
-      smul_eq_mul, Complex.mul_im, Complex.I_re, Complex.I_im, zero_mul, one_mul, zero_add]
+      smul_eq_mul, Complex.mul_im, Complex.I_re, Complex.I_im, zero_mul, zero_add]
     at hI hre
   linarith
 

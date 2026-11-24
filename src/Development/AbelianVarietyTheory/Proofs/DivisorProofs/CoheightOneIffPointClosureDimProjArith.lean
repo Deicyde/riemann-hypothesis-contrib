@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAmbOfIsArithVar
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoheightAddPointClosureDimEqDimStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasPointClosureDimBasicProjArithAmbientStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoheightAddPointClosureDimEqDim
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasPointClosureDimBasicProjArithAmbient
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -71,8 +71,8 @@ theorem dimOne
                   → (topologicalKrullDim (clo z) = e
                     ∧ (Order.coheight w = 1 ↔ Order.coheight (cloι z w) = 2)) := by
   intro k _ Y _ q hq e hY
-  have hB := GlobalTheory.T.hasPointClosureDim_basic_projArithAmbient k Y q hq
-  have hC := GlobalTheory.T.coheight_add_pointClosureDim_eq_dim k Y q hq (e + 1) hY
+  have hB := _root_.GlobalTheory.MixHt.hasDim_basic k Y q hq
+  have hC := _root_.GlobalTheory.DimCoheight.coheight_add_eq k Y q hq (e + 1) hY
   have h1 : ∀ z : Y, Order.coheight z = 1 ↔ HasDim z e := by
     intro z
     obtain ⟨m, hm⟩ := hB.1
@@ -99,12 +99,12 @@ theorem dimOne
   have hdim : topologicalKrullDim (clo z) = e := (hB.2.2.2.2.2 (clo z) e).1 hgen
   refine ⟨hdim, ?_⟩
   have hq' : IsAmb (cloι z ≫ q) := hq.sub (cloι z)
-  have hB' := GlobalTheory.T.hasPointClosureDim_basic_projArithAmbient k (clo z) (cloι z ≫ q) hq'
+  have hB' := _root_.GlobalTheory.MixHt.hasDim_basic k (clo z) (cloι z ≫ q) hq'
   obtain ⟨m, hm⟩ := hB'.1
   obtain ⟨d, -, hd⟩ := hm w
   have hd' : HasDim (cloι z w) d := (hB.2.2.2.2.1 (clo z) (cloι z) w d).2 hd
   obtain ⟨n, hn, hnd⟩ :=
-    enat_add_natCast_eq_natCast_exists (GlobalTheory.T.coheight_add_pointClosureDim_eq_dim k (clo z)
+    enat_add_natCast_eq_natCast_exists (_root_.GlobalTheory.DimCoheight.coheight_add_eq k (clo z)
       (cloι z ≫ q) hq' e hdim w d hd)
   obtain ⟨n', hn', hnd'⟩ := enat_add_natCast_eq_natCast_exists (hC (cloι z w) d hd')
   have : n' = n + 1 := by omega

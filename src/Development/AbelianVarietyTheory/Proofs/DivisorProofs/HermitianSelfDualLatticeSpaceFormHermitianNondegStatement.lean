@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.hermitianSelfDualLatticeSpace_form_hermitian_nonde
               ∧ (GlobalTheory.WeilSchrodinger.sesq D X.Jᵀ).Nondegenerate
               ∧ Formalism.HermitianLatticesTheory.IsUnimodular
                 (GlobalTheory.WeilSchrodinger.sesq D X.Jᵀ) X.L := by
-  first
-  | exact @GlobalTheory.WeilSchrodingerHerm.main
-  | exact GlobalTheory.WeilSchrodingerHerm.main
-  | (intros; apply GlobalTheory.WeilSchrodingerHerm.main <;> assumption)
+  first | exact @GlobalTheory.WeilSchrodingerHerm.main

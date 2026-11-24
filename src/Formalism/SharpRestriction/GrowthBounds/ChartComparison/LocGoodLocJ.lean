@@ -99,7 +99,6 @@ theorem locJ_UJ (c : cmp) (γ : ((gatCh (gatJ Lv (i + 1)) em).lev c).Γ)
   reGL_mem_UJ (rankN D (i + 1) hi) _ (D.sp.X (i + 1)).gram _ (gramN_apply D (i + 1) hi) _
     (t.gamI c γ).2
 
-
 theorem locJ_actB (hB : FrRatJ t B) : (locJ hi t B).ActB := by
   refine LocAt.actB_of (locJ hi t B) (rankN D (i + 1) hi) B
     (fun c γ => (t.gamI c γ).1)

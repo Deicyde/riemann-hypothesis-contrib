@@ -51,6 +51,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.rational_unitary_group_structure
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T),
       (∃ e : {ga : GL (Fin T.rank) D.host.E // IsUn C.X ga} ≃ GQ T, ∀ ga, IsRatOf T ga.1 (e ga).1)
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.rational_unitary_group_structure
               I ≠ ⊥
                 → ∀ f ∈ GfC V, ∃ f₁ ∈ GfC V, ∃ f₂ ∈ GfC V,
                   f = f₁ * f₂ ∧ f₁ * f₂ = f₂ * f₁ ∧ TrivAt V I f₁ ∧ TrivOff V I f₂ := by
-  first
-  | exact @GlobalTheory.Ker.Grp.rational_points_and_parts
-  | exact GlobalTheory.Ker.Grp.rational_points_and_parts
-  | (intros; apply GlobalTheory.Ker.Grp.rational_points_and_parts <;> assumption)
+  first | exact @GlobalTheory.Ker.Grp.rational_points_and_parts

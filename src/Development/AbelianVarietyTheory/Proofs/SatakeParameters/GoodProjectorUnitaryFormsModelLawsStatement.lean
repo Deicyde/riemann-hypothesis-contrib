@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.goodProjector_unitaryFormsModel_laws
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.goodProjector_unitaryFormsModel_laws
           eH R i * eH R i = eH R i ∧ (∀ g, Commute (eH R i) (R.gW i (sg0 D A) g))
             ∧ (∀ x, eH R i x = x ↔ (R.HW i _).e x ∈ R.Wat i (sg0 D A) R.triv)
             ∧ ∀ t y, eH R i (R.thG i t y) = R.thG i t y := by
-  first
-  | exact @GlobalTheory.Hk3.eH_laws
-  | exact GlobalTheory.Hk3.eH_laws
-  | (intros; apply GlobalTheory.Hk3.eH_laws <;> assumption)
+  first | exact @GlobalTheory.Hk3.eH_laws

@@ -199,11 +199,6 @@ end Abstract
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem coe_toG {n : ℕ} {M : Mt p n} (h : IsUnit M) : ((toG M : Gn p n) : Mt p n) = M := by
-  unfold toG
-  rw [dite_eq_left h]
-  exact IsUnit.unit_spec _
-
 def stdP (L : List (Pc p)) : (n : ℕ) → Mt p n → Prop :=
   List.rec
     (motive := fun _ => (n : ℕ) → Mt p n → Prop)
@@ -239,8 +234,9 @@ theorem hcL_eq_ind (L : List (Pc p)) (hL : ∀ q ∈ L, IsClass q.2)
         : ∀ a ∈ Q, ∀ b ∈ Q, toG (tl q.1 (a * b).val) = toG (tl q.1 a.val) * toG (tl q.1 b.val) := by
       intro a ha b hb
       apply Units.ext
-      rw [Units.val_mul (toG _), coe_toG (hu _ ((hQ _).1 ha)).1, coe_toG (hu _ ((hQ _).1 hb)).1,
-        coe_toG (hu _ ((hQ _).1 (Q.mul_mem ha hb))).1]
+      rw [Units.val_mul (toG _), _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 ha)).1,
+        _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 hb)).1,
+        _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 (Q.mul_mem ha hb))).1]
       exact (hm _ _ ((hQ _).1 ha) ((hQ _).1 hb)).1
     have hbr
         : ∀ a ∈ Q, ∀ b ∈ Q,
@@ -248,8 +244,9 @@ theorem hcL_eq_ind (L : List (Pc p)) (hL : ∀ q ∈ L, IsClass q.2)
             = toG (br q.1 (degL L) a.val) * toG (br q.1 (degL L) b.val) := by
       intro a ha b hb
       apply Units.ext
-      rw [Units.val_mul (toG _), coe_toG (hu _ ((hQ _).1 ha)).2, coe_toG (hu _ ((hQ _).1 hb)).2,
-        coe_toG (hu _ ((hQ _).1 (Q.mul_mem ha hb))).2]
+      rw [Units.val_mul (toG _), _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 ha)).2,
+        _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 hb)).2,
+        _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 (Q.mul_mem ha hb))).2]
       exact (hm _ _ ((hQ _).1 ha) ((hQ _).1 hb)).2
     have hsurj : ∀ l : Gn p (degL L), ∃ g ∈ Q, toG (br q.1 (degL L) g.val) = l := by
       intro l
@@ -259,7 +256,7 @@ theorem hcL_eq_ind (L : List (Pc p)) (hL : ∀ q ∈ L, IsClass q.2)
       obtain ⟨g, hg⟩ := Finset.card_pos.1 hpos
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hg
       refine ⟨g, (hQ _).2 hg.1, Units.ext ?_⟩
-      rw [coe_toG (hu _ hg.1).2, hg.2.2]
+      rw [_root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ hg.1).2, hg.2.2]
     have hA
         : ∀ z ∈ Q, ∀ y ∈ Q, q.2 (toG (tl q.1 (y⁻¹ * z * y).val)) = q.2 (toG (tl q.1 z.val)) := by
       intro z hz y hy
@@ -295,9 +292,10 @@ theorem hcL_eq_ind (L : List (Pc p)) (hL : ∀ q ∈ L, IsClass q.2)
     · simp
     · rw [inv_one, one_mul, mul_one, hQ]
       refine and_congr_right fun hg => ?_
-      rw [coe_toG (hu _ hg).2]
+      rw [_root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ hg).2]
       rfl
-    · rw [inv_one, one_mul, mul_one, coe_toG (hu _ ((hQ _).1 hg.1)).2]
+    · rw [inv_one, one_mul, mul_one,
+        _root_.GlobalTheory.GLm.ParBasic.toG_val (hu _ ((hQ _).1 hg.1)).2]
       rfl
 
 theorem ind_eq_hcL
@@ -469,7 +467,7 @@ theorem cuspOn_toG
     : cuspOn θ (toG (h.submatrix (Fintype.equivFin ι).symm (Fintype.equivFin ι).symm))
       = cuspChar θ h := by
   unfold cuspOn
-  rw [coe_toG]
+  rw [_root_.GlobalTheory.GLm.ParBasic.toG_val]
   · simp
   · refine IsUnit.of_mul_eq_one (h'.submatrix (Fintype.equivFin ι).symm (Fintype.equivFin ι).symm)
       ?_

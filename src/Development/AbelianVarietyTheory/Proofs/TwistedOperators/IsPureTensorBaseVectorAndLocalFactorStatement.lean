@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.isPureTensor_base_vector_and_local_factor
           ∧ ∀ (q : Place D) (x : Place D → WO S T → ℂ),
             IsLocal ψ θ S T sS sT ΛS ΛT q (x q) → (∀ p, p ≠ q → x p = f₀)
               → IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x (x q) := by
-  first
-  | exact @GlobalTheory.LocalPure.isPure_base_and_local
-  | exact GlobalTheory.LocalPure.isPure_base_and_local
-  | (intros; apply GlobalTheory.LocalPure.isPure_base_and_local <;> assumption)
+  first | exact @GlobalTheory.LocalPure.isPure_base_and_local

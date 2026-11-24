@@ -63,6 +63,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.CoeffOneSubstOfConstantCoeffEqZero
+import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.LogarithmicSubstitution.NormHalfB2SubTwoTorsionLeOne
 
 @[expose] public section
 
@@ -94,7 +95,7 @@ theorem wpReg_change
         * PowerSeries.rescale ((C.u⁻¹ : Kˣ) : K) (Formalism.L2.Th1.A.wpReg W) := by
   rw [Formalism.L2.KerInert.Sigma.wpReg_eq, Formalism.L2.KerInert.Sigma.wpReg_eq, (g_change' W C).1,
     (g_change' W C).2]
-  exact (Formalism.L2.Th1.F.seriesScale K _ _ _).2.2.2.1
+  exact (_root_.Formalism.L2.Th1.F.series_scale K _ _ _).2.2.2.1
 
 private lemma prim_rescale (a : K) (ha : a ≠ 0) (f : K⟦X⟧) :
     Formalism.L2.Th1.B.prim (PowerSeries.rescale a f) =
@@ -106,15 +107,6 @@ private lemma prim_rescale (a : K) (ha : a ≠ 0) (f : K⟦X⟧) :
       PowerSeries.coeff_mk, Nat.succ_ne_zero, if_false, Nat.add_sub_cancel]
     rw [pow_succ]
     field_simp
-
-private lemma prim_C_mul' (c : K) (f : K⟦X⟧) :
-    Formalism.L2.Th1.B.prim (PowerSeries.C c * f) = PowerSeries.C c * Formalism.L2.Th1.B.prim f := by
-  ext n
-  rcases n with _ | m
-  · simp [Formalism.L2.Th1.B.prim]
-  · simp only [Formalism.L2.Th1.B.prim, PowerSeries.coeff_C_mul, PowerSeries.coeff_mk, Nat.succ_ne_zero,
-      if_false]
-    ring
 
 private lemma fExp_rescale (a : K) (f : K⟦X⟧) (hf : PowerSeries.constantCoeff f = 0) :
     Formalism.L2.Th1.B.fExp (PowerSeries.rescale a f) = PowerSeries.rescale a (Formalism.L2.Th1.B.fExp f) := by
@@ -147,8 +139,8 @@ theorem sgW_change (s2 : K)
             * PowerSeries.rescale ((C.u⁻¹ : Kˣ) : K) (Formalism.L2.Th1.A.wpReg W)))
         = PowerSeries.rescale ((C.u⁻¹ : Kˣ) : K)
           (Formalism.L2.Th1.B.prim (Formalism.L2.Th1.B.prim (Formalism.L2.Th1.A.wpReg W))) := by
-    rw [prim_C_mul', prim_rescale _ hl, ← mul_assoc, ← map_mul, prim_C_mul', prim_rescale _ hl,
-      ← mul_assoc, ← map_mul]
+    rw [_root_.Formalism.L2.Th1.F.Scale.prim_C_mul, prim_rescale _ hl, ← mul_assoc, ← map_mul,
+      _root_.Formalism.L2.Th1.F.Scale.prim_C_mul, prim_rescale _ hl, ← mul_assoc, ← map_mul]
     have h1 : ((C.u⁻¹ : Kˣ) : K) ^ 2 * ((C.u⁻¹ : Kˣ) : K)⁻¹ * ((C.u⁻¹ : Kˣ) : K)⁻¹ = 1 := by
       field_simp
     rw [h1, map_one, one_mul]
@@ -197,11 +189,6 @@ theorem subst_smul' {f a : K⟦X⟧} (ha : constantCoeff a = 0) (c : K)
   have h := HasSubst.of_constantCoeff_zero' ha
   rw [← PowerSeries.coe_substAlgHom h, map_smul]
 
-private lemma subst_fExp' {a f : K⟦X⟧} (ha : PowerSeries.constantCoeff a = 0)
-    (hf : PowerSeries.constantCoeff f = 0) :
-    PowerSeries.subst a (Formalism.L2.Th1.B.fExp f) = Formalism.L2.Th1.B.fExp (PowerSeries.subst a f) :=
-  (Formalism.L2.Th1.B.expLogSubst K Unit Unit (fun _ => a) (fun _ => ha)).1 f hf
-
 theorem exp_rel (s2 : K)
     : phi W C * Formalism.L2.Th1.B.fExp
         (-((Formalism.L2.Th1.B.phW (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)).subst (phi W C)))
@@ -215,8 +202,9 @@ theorem exp_rel (s2 : K)
   have hℓ0' : PowerSeries.constantCoeff (Formalism.L2.Th1.A.logSer (C • W)) = 0 :=
     Formalism.L2.Th1.A.ZSer.log_cc (W := C • W)
   have hℓ' := PowerSeries.HasSubst.of_constantCoeff_zero' hℓ0'
-  have hcs := Formalism.L2.Th1.B.curveSigma K W s2
-  have hcs' := Formalism.L2.Th1.B.curveSigma K (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)
+  have hcs := _root_.Formalism.L2.Th1.B.Crv.curve_sigma_function_holds K W s2
+  have hcs' :=
+    _root_.Formalism.L2.Th1.B.Crv.curve_sigma_function_holds K (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)
   have hnP0
       : PowerSeries.constantCoeff (- Formalism.L2.Th1.B.phW (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2))
         = 0 := by
@@ -234,7 +222,7 @@ theorem exp_rel (s2 : K)
           (X * Formalism.L2.Th1.B.fExp (- Formalism.L2.Th1.B.phW (C • W)
             (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2))) := by
     rw [← PowerSeries.coe_substAlgHom hφ, map_mul, PowerSeries.coe_substAlgHom hφ,
-      PowerSeries.subst_X hφ, subst_fExp' hφ0 hnP0, subst_neg' hφ0]
+      PowerSeries.subst_X hφ, _root_.Formalism.L2.Th1.B.Ph.psubst_fExp hφ0 hnP0, subst_neg' hφ0]
   have hsm
       : PowerSeries.C ((C.u : Kˣ) : K)
           * PowerSeries.rescale ((C.u⁻¹ : Kˣ) : K) (Formalism.L2.Th1.B.sgW W s2)
@@ -303,8 +291,9 @@ theorem cong_phi
   have hφ0 : PowerSeries.constantCoeff (phi W C) = 0 := by
     rw [Formalism.L2.KerInert.VC.phi_eq]; simp
   have hφ := PowerSeries.HasSubst.of_constantCoeff_zero' hφ0
-  have hcs := Formalism.L2.Th1.B.curveSigma K W s2
-  have hcs' := Formalism.L2.Th1.B.curveSigma K (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)
+  have hcs := _root_.Formalism.L2.Th1.B.Crv.curve_sigma_function_holds K W s2
+  have hcs' :=
+    _root_.Formalism.L2.Th1.B.Crv.curve_sigma_function_holds K (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)
   have key := exp_rel W C s2
   obtain ⟨A, hA⟩
       : ∃ A : K⟦X⟧,
@@ -387,9 +376,6 @@ open Formalism.L2.Th1.C Formalism.L2.Th1.C.Pts Formalism.L2.Th1.C.Calc
 
 variable {K : Type} [Field K] [CharZero K] {R' : Subring K}
 
-private lemma powerSeries_subst_X (f : K⟦X⟧) : PowerSeries.subst (X : K⟦X⟧) f = f := by
-  rw [← one_smul K (X : K⟦X⟧), ← PowerSeries.rescale_eq_subst, PowerSeries.rescale_one, RingHom.id_apply]
-
 private lemma intMv_coe_of_intPS {f : K⟦X⟧} (h : IntPS R' f) : IntMv R' (f : MvPowerSeries Unit K) := by
   intro n
   rw [Finsupp.unique_single n]
@@ -456,7 +442,7 @@ theorem phNormAt_varChange
             (mulBy (Formalism.L2.Th1.A.logSer W) (Formalism.L2.Th1.A.expSer W) c)
           : K⟦X⟧)
         : MvPowerSeries Unit K) :=
-    ⟨hmψ0, Formalism.L2.Th1.C.intSubst K R' _ hE Unit _ hψpt⟩
+    ⟨hmψ0, _root_.Formalism.L2.Th1.C.coeffsInSubst' K R' _ hE Unit _ hψpt⟩
   have hD := cong_phi W hW C hu hu' hr hs ht s2
   obtain ⟨D, hDdef⟩
       : ∃ D : K⟦X⟧,
@@ -473,7 +459,8 @@ theorem phNormAt_varChange
       : Formalism.L2.Th1.B.phW (C • W) (((C.u⁻¹ : Kˣ) : K) ^ 2 * s2)
         = PowerSeries.subst (Formalism.L2.Th1.A.compInv (phi W C))
           (Formalism.L2.Th1.B.phW W s2 + D) := by
-    rw [← e1, PowerSeries.subst_comp_subst_apply hφ hψ, spec.2.1, powerSeries_subst_X]
+    rw [← e1, PowerSeries.subst_comp_subst_apply hφ hψ, spec.2.1,
+      _root_.Formalism.L2.Th1.B.psubst_X]
   have hadd
       : ∀ (a f g : K⟦X⟧),
         PowerSeries.HasSubst a
@@ -521,9 +508,11 @@ theorem phNormOKInert_of : Formalism.L2.KerInert.PhNormOKInert := by
   have hcc : cc ≠ ⊥ := hcurve.1
   have hδ : δ ≠ 0 :=
     Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.brcc_delta_ne D cc hcurve δ hδ12
-  obtain ⟨⟨L, hL⟩, -⟩ := Formalism.L2.Th1.F2.lamOfLat D cc δ hcc hδ
+  obtain ⟨⟨L, hL⟩, -⟩ := _root_.Formalism.L2.Th1.F2.lambda_of_lattice_holds D cc δ hcc hδ
   have hLg : g.abelian₂ = L.lattice.toAddSubgroup := hLam.trans hL.symm
-  obtain ⟨hg2, hg3⟩ := Formalism.L2.KerInert.Sigma.invAlg' D cc δ hcurve hδ12 L hL
+  obtain ⟨hg2, hg3⟩ :=
+    _root_.Formalism.L2.KerInert.Sigma.ChartWirtingerDerivatives.weierstrass_invariants_algebraic D
+      cc δ hcurve hδ12 L hL
   have hs2 := Formalism.L2.KerInert.Sigma.secondEisensteinAlgebraic D cc δ hcurve hδ12 L hL
   set a2 : Qbar := ⟨L.g₂, hg2⟩ with ha2
   set a3 : Qbar := ⟨L.g₃, hg3⟩ with ha3
@@ -536,7 +525,7 @@ theorem phNormOKInert_of : Formalism.L2.KerInert.PhNormOKInert := by
     Formalism.L2.KerInert.Sigma.ChartWirtingerDerivatives.hasCMBy_curve D cc δ hcurve hδ12 L hL
   have hdisc :=
     Formalism.L2.KerInert.Sigma.ChartWirtingerDerivatives.disc_curve D cc δ hcurve hδ12 L hL
-  obtain ⟨ι, hι⟩ := Formalism.L2.KerInert.lamExt p g.lam
+  obtain ⟨ι, hι⟩ := _root_.Formalism.L2.KerInert.lattice_extension p g.lam
   have hιg2 : ι L.g₂ = g.lam a2 := hι a2
   have hιg3 : ι L.g₃ = g.lam a3 := hι a3
   have hιs : ι (Formalism.L2.Th1.F.s2 L) = g.lam s0 := hι s0
@@ -665,14 +654,14 @@ theorem phNormOKInert_of : Formalism.L2.KerInert.PhNormOKInert := by
   obtain ⟨m', n', hz1, hz2⟩ := hpair
   have hcτ
       : tauK D g.lam ((((m : 𝓞 D.host.K) + (n : 𝓞 D.host.K) * ωK : 𝓞 D.host.K) : D.host.K)) = ι z :=
-    (Formalism.L2.KerInert.lamCIota p g.lam ι hι).1 _
+    (_root_.Formalism.L2.KerInert.lattice_embedding p g.lam ι hι).1 _
       (Formalism.MainNotions.Ext.test_vector_mem_schwartz_bruhat D _)
   have hcbτ
       : tauKc D g.lam ((((m : 𝓞 D.host.K) + (n : 𝓞 D.host.K) * ωK : 𝓞 D.host.K) : D.host.K))
         = ι (starRingEnd ℂ z) := by
     unfold tauKc
     rw [← hzb]
-    exact (Formalism.L2.KerInert.lamCIota p g.lam ι hι).1 _
+    exact (_root_.Formalism.L2.KerInert.lattice_embedding p g.lam ι hι).1 _
       (Formalism.MainNotions.Ext.test_vector_mem_schwartz_bruhat D _)
   rw [hcτ, hcbτ]
   set k : ℕ := (D.host.d + 1) / 4 with hk
@@ -702,14 +691,14 @@ theorem phNormOKInert_of : Formalism.L2.KerInert.PhNormOKInert := by
         = PowerSeries.C (ε ^ 2)
           * PowerSeries.rescale ε (Formalism.L2.Th1.F.pOf (g.lam a2) (g.lam a3)) := by
     rw [Formalism.L2.KerInert.Sigma.wpReg_eq, c2, c3]
-    exact (Formalism.L2.Th1.F.seriesScale ℂ_[p] (g.lam a2) (g.lam a3) ε).2.2.2.1
+    exact (_root_.Formalism.L2.Th1.F.series_scale ℂ_[p] (g.lam a2) (g.lam a3) ε).2.2.2.1
   have hR
       : PowerSeries.rescale ε (sgSer g.lam g.abelian₂)
         = PowerSeries.C ε * Formalism.L2.Th1.B.sgW g.W (ε ^ 2 * ι (Formalism.L2.Th1.F.s2 L)) := by
     unfold Formalism.L2.Th1.B.sgW
     rw [hser, hwp, hιs]
-    exact ((Formalism.L2.Th1.F.sigmaScale ℂ_[p] (Formalism.L2.Th1.F.pOf (g.lam a2) (g.lam a3))
-      (g.lam s0) ε).2).symm
+    exact ((_root_.Formalism.L2.Th1.F.sigma_scale' ℂ_[p]
+      (Formalism.L2.Th1.F.pOf (g.lam a2) (g.lam a3)) (g.lam s0) ε).2).symm
   have hph : g.ph = Formalism.L2.Th1.B.phW g.W (ε ^ 2 * ι (Formalism.L2.Th1.F.s2 L)) :=
     Formalism.L2.KerInert.Dict.formal_phase_agree p g _ hOk hR
 
@@ -742,7 +731,5 @@ end Main
 end Formalism.L2.KerInert.PN
 
 namespace Formalism.L2.KerInert
-
-theorem phi_norm_inert_prime : PhNormOKInert := PN.phNormOKInert_of
 
 end Formalism.L2.KerInert

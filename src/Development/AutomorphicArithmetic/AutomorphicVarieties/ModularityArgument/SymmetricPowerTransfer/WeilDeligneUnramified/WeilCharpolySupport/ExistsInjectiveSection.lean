@@ -64,7 +64,6 @@ open UpperTheory.V.W (Plc Lp)
 open scoped Polynomial
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 namespace UpperTheory.V.Z.Sym.AboveWeight
 
 section

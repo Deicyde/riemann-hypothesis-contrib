@@ -51,9 +51,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open Formalism.IndefR.Links
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.SeriesTie.ActProof
 open Formalism.IndefR.Lev Formalism.L2.DIV Formalism.IndefR.Mult
 open scoped TensorProduct

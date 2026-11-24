@@ -107,7 +107,7 @@ theorem exists_frame
           ?_
         rw [prod_line, cPoint_y, hb, mul_comm g₀.b]
         apply Additive.ofMul.injective
-        simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
+        simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_pow]
         module)
       (LB.mulGen D.P.L _ _ _ _ (LB.mulGen D.P.L _ _ _ _ (LB.mulGen D.P.L _ _ _ _ ω₀ w) (g₀.s p.y))
         N)

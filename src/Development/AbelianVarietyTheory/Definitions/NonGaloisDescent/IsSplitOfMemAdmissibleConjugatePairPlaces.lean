@@ -57,9 +57,6 @@ open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab toAb IsGlobalArtin)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

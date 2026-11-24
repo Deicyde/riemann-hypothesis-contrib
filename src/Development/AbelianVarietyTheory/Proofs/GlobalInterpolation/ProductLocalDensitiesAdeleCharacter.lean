@@ -3,11 +3,11 @@ module
 public import Development.AbelianVarietyTheory.BlockTheory.GlobalSignature.LocalDualIndex
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsAdicCompleteAndCardQuotientAdicCompletionInteg
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SummableAbsNormInvSq
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DualLatticeDifferentIndexStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsEqStandardAdeleCharRationalDilateStatement
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DualLatticeDifferentIndex
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsEqStandardAdeleCharRationalDilate
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsUniqueIsStandardAdeleCharUnramifiedCMBaseStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FinprodLocalDifferentIdealNormEqDiscrStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HasProdQuadExtLocalEulerFactorInvInvStatement
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FinprodLocalDifferentIdealNormEqDiscr
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HasProdQuadExtLocalEulerFactorInvInv
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUniqueIsStdChar
 import Mathlib.Algebra.AffineMonoid.Basic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -263,14 +263,14 @@ theorem density_product
   intro F E _ _ _ _ _ _ σ hCM hst hU ψ hψ
   obtain ⟨ψ₀, h₀, -⟩ :=
     GlobalTheory.T.existsUnique_isStandardAdeleChar_unramifiedCM_base F E σ hCM hst hU
-  have hd := GlobalTheory.T.dual_lattice_different_index F E σ hCM hst hU ψ₀ h₀
+  have hd := _root_.GlobalTheory.StdDual.dualV_eq_inv_different_cm F E σ hCM hst hU ψ₀ h₀
   obtain ⟨hfin, hprod, -⟩ :=
-    GlobalTheory.T.finprod_localDifferentIdealNorm_eq_discr F E σ hCM hst hU
+    _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV F E σ hCM hst hU
   refine ⟨fun v => ?_, fun a ha hs M hM => ?_⟩
   · obtain ⟨a, ha, h⟩ :=
-      GlobalTheory.T.exists_eq_standardAdeleChar_rational_dilate F E σ hCM hst hU ψ₀ h₀ ψ hψ
+      _root_.GlobalTheory.AdelicCharDilate.exists_eq_std_dilate F E σ hCM hst hU ψ₀ h₀ ψ hψ
     exact (dual_scaled ha h v (hd v).1).1
-  obtain ⟨hL, hE⟩ := GlobalTheory.T.hasProd_quadExtLocalEulerFactorInv_inv F E σ hCM hst hU M hM
+  obtain ⟨hL, hE⟩ := _root_.GlobalTheory.EtaEulerProduct.hasProd_eulerInv_inv F E σ hCM hst hU M hM
   have hn : ∀ v, dualIndex F ψ v = normDifferentV F v * ‖algebraMap F (Fv F v) a‖⁻¹ := fun v =>
     (dual_scaled ha (eq_of_isScalingInf h₀ hψ ha hs) v (hd v).1).2
   have hfa := finite_norm_ne_one ha

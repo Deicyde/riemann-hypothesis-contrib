@@ -143,7 +143,7 @@ theorem symp_frame
         Algebra.trace (AF F) (AE F E) (t * ((ε : ℤ) : AE F E))
           = ((ε : ℤ) : AF F) * Algebra.trace (AF F) (AE F E) t := fun t => by
     rw [mul_comm, key]
-  simp only [Bf, neg_one_mul, map_neg, map_add (f := _), key, key2, key3]
+  simp only [Bf, neg_one_mul, map_neg, map_add (f := _), key2]
   ring
 
 end PositivityTheory.SiegelWeilFormula.Ldexa

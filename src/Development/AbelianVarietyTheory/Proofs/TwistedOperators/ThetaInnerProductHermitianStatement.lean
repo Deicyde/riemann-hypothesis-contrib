@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.theta_inner_product_hermitian
                 ipO μ 𝓕 (heisO ψ S T w f) (heisO ψ S T w g) = ipO μ 𝓕 f g
                   ∧ ipO μ 𝓕 (heisO ψ S T w f) g = ipO μ 𝓕 f (heisO ψ S T (-w) g))
               ∧ ∀ μ' 𝓕', IsCovolOne (ratL T S) μ' 𝓕' → ipO μ' 𝓕' f g = ipO μ 𝓕 f g := by
-  first
-  | exact @GlobalTheory.ThetaPairingLaws.ipO_laws
-  | exact GlobalTheory.ThetaPairingLaws.ipO_laws
-  | (intros; apply GlobalTheory.ThetaPairingLaws.ipO_laws <;> assumption)
+  first | exact @GlobalTheory.ThetaPairingLaws.ipO_laws

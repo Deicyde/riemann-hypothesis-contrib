@@ -38,15 +38,12 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV Formalism.IndefR
   Formalism.IndefR.Links
 set_option autoImplicit false
 noncomputable section
-
 
 namespace GlobalTheory.BigOn.Exp
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

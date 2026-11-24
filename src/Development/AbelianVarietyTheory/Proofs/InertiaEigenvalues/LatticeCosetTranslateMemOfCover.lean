@@ -189,7 +189,7 @@ theorem coset_translate_mem_of_cover
           rw [Finset.sum_eq_single i
             (fun b _ hb => by simp [Ne.symm hb])
             (fun h => absurd (Finset.mem_univ i) h)]
-          simp [Algebra.smul_def]
+          simp
           ring
         · simp [hk, Ne.symm hk]
       rw [Pi.add_apply, h1, h2, hu, Matrix.one_apply]

@@ -1,6 +1,6 @@
 module
 
-import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CoefBTensSubKStable
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CoefBTensSubKStable
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.HidaSetting
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CoefAInnerEqZero
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.StdGap
@@ -69,17 +69,19 @@ variable {n : ℕ}
 
 section admitted
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {lam : Fin n → ℝ} {V : Submodule ℂ M}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {lam : Fin n → ℝ} {V : Submodule ℂ M}
 
-theorem coefB_khw_le (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hgap : StdGap ε lam) (C : ℝ) :
-    ∃ k : ℕ, ∀ w ∈ genSub E V, ∀ μ : Fin n → ℝ, IsKHWVec ε E μ w → casValK ε μ ≤ C →
-      w ∈ layer ε E V k := by
+theorem coefB_khw_le
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hgap : StdGap ε lam) (C : ℝ)
+    : ∃ k : ℕ, ∀ w ∈ genSub E V, ∀ μ : Fin n → ℝ,
+      IsKHWVec ε E μ w → casValK ε μ ≤ C → w ∈ layer ε E V k := by
   obtain ⟨hmono, h, hh, hbig⟩ := hgap
   refine ⟨⌈(C - casValK ε (lowK ε lam)) / (2 * (h - n + 1))⌉₊, fun w hw μ hμ hμC => ?_⟩
-  obtain ⟨w₀, hw₀, -, m, ws, hsum, hws⟩ := k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
+  obtain ⟨w₀, hw₀, -, m, ws, hsum, hws⟩ :=
+    k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
   rw [hsum]
   refine Submodule.add_mem _ (layer_mono (Nat.zero_le _) (show w₀ ∈ layer ε E V 0 from hw₀))
     (Submodule.sum_mem _ fun j _ => ?_)
@@ -94,11 +96,11 @@ theorem coefB_khw_le (hE : IsGlRep E) (hU : IsInfUnitary ε E)
   have := hj.trans (Nat.le_ceil _)
   exact_mod_cast this
 
-theorem coefB_adm (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hgap : StdGap ε lam) (C : ℝ) :
-    ∃ k : ℕ, ∀ y ∈ genSub E V, ∀ θ : ℝ, θ ≤ C → casimirK ε E y = (θ : ℂ) • y →
-      y ∈ layer ε E V k := by
+theorem coefB_adm
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hgap : StdGap ε lam) (C : ℝ)
+    : ∃ k : ℕ, ∀ y ∈ genSub E V, ∀ θ : ℝ,
+      θ ≤ C → casimirK ε E y = (θ : ℂ) • y → y ∈ layer ε E V k := by
   obtain ⟨K, hK⟩ := coefB_khw_le hE hU hV hc hgap C
   refine ⟨K, fun y hy θ hθ hyθ => ?_⟩
   have hUk := isKUnitary_of_isInfUnitary hU
@@ -129,8 +131,10 @@ theorem coefB_adm (hE : IsGlRep E) (hU : IsInfUnitary ε E)
     exact (Submodule.starProjection_apply_mem T₀ y).2
   exfalso
   set S : Submodule ℂ M := T ⊓ T₀ᗮ
-  have hrS : r ∈ S := ⟨T.sub_mem hyT (Submodule.starProjection_apply_mem T₀ y).1,
-    Submodule.sub_starProjection_mem_orthogonal y⟩
+  have hrS : r ∈ S := ⟨
+    T.sub_mem hyT (Submodule.starProjection_apply_mem T₀ y).1,
+    Submodule.sub_starProjection_mem_orthogonal y
+  ⟩
   have hSd : FiniteDimensional ℂ S := Submodule.finiteDimensional_of_le inf_le_left
   have hSs : IsKStableSub ε E S := fun a b hab x hx =>
     ⟨hTs a b hab x hx.1, orthogonal_kStable hUk hT0s a b hab x hx.2⟩
@@ -146,7 +150,8 @@ theorem coefB_adm (hE : IsGlRep E) (hU : IsInfUnitary ε E)
   have h2 : (θ : ℂ) = ((nsq (μ + rhoC ε) - nsq (rhoC ε) : ℝ) : ℂ) := smul_left_injective ℂ hw0 h1
   have h3 : casValK ε μ = θ := by
     have := Complex.ofReal_injective h2
-    rw [this]; rfl
+    rw [this]
+    rfl
   have hwK := hK w (layer_le_genSub m hwT.1) μ hμ (h3 ▸ hθ)
   have hwT0 : w ∈ T₀ := ⟨hwS.1, hwK⟩
   have := Submodule.inner_right_of_mem_orthogonal hwT0 hwS.2
@@ -158,77 +163,65 @@ section Tr
 
 variable {D : Type*} [NormedAddCommGroup D] [InnerProductSpace ℂ D]
 
-def coefTr (A : Module.End ℂ (Fin n → D)) : Module.End ℂ (WithLp 2 (Fin n → D)) :=
-  (WithLp.linearEquiv 2 ℂ (Fin n → D)).symm.toLinearMap ∘ₗ A ∘ₗ
-    (WithLp.linearEquiv 2 ℂ (Fin n → D)).toLinearMap
-
-theorem coefTr_apply (A : Module.End ℂ (Fin n → D)) (u : WithLp 2 (Fin n → D)) :
-    coefTr A u = WithLp.toLp 2 (A (WithLp.ofLp u)) := rfl
-
-theorem coefTr_casimirK (ε : Fin n → Bool) (A : Fin n → Fin n → Module.End ℂ (Fin n → D)) :
-    casimirK ε (fun a b => coefTr (A a b)) = coefTr (casimirK ε A) := by
+theorem coefTr_casimirK (ε : Fin n → Bool) (A : Fin n → Fin n → Module.End ℂ (Fin n → D))
+    : casimirK ε (fun a b => coefTr (A a b)) = coefTr (casimirK ε A) := by
   refine LinearMap.ext fun u => ?_
-  simp only [casimirK, LinearMap.sum_apply, Module.End.mul_apply, coefTr_apply, WithLp.ofLp_toLp,
-    WithLp.toLp_sum]
+  simp only [casimirK, LinearMap.sum_apply, Module.End.mul_apply, coefTr_apply, WithLp.toLp_sum]
 
-theorem coefB_sum_ite_left (a : Fin n) (x : D) (v : Fin n → D) :
-    ∑ c, inner ℂ (if c = a then x else 0) (v c) = inner ℂ x (v a) := by
-  rw [Finset.sum_eq_single a (fun c _ hc => by rw [if_neg hc, inner_zero_left])
-    (fun h => absurd (Finset.mem_univ a) h), if_pos rfl]
+theorem coefB_sum_ite_left (a : Fin n) (x : D) (v : Fin n → D)
+    : ∑ c, inner ℂ (if c = a then x else 0) (v c) = inner ℂ x (v a) := by
+  rw [Finset.sum_eq_single a
+      (fun c _ hc => by rw [if_neg hc, inner_zero_left])
+      (fun h => absurd (Finset.mem_univ a) h),
+    if_pos rfl]
 
-theorem coefB_sum_ite_right (a : Fin n) (x : D) (v : Fin n → D) :
-    ∑ c, inner ℂ (v c) (if c = a then x else 0) = inner ℂ (v a) x := by
-  rw [Finset.sum_eq_single a (fun c _ hc => by rw [if_neg hc, inner_zero_right])
-    (fun h => absurd (Finset.mem_univ a) h), if_pos rfl]
-
-theorem coefB_isKUnitary (dual : Bool) {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ D}
-    (hU : IsKUnitary ε E) : IsKUnitary ε (fun a b => coefTr (tensF dual E a b)) := by
-  apply ReciprocityTheory.ChartRestriction.DS.coefB_isKUnitary <;> assumption
+theorem coefB_sum_ite_right (a : Fin n) (x : D) (v : Fin n → D)
+    : ∑ c, inner ℂ (v c) (if c = a then x else 0) = inner ℂ (v a) x := by
+  rw [Finset.sum_eq_single a
+      (fun c _ hc => by rw [if_neg hc, inner_zero_right])
+      (fun h => absurd (Finset.mem_univ a) h),
+    if_pos rfl]
 
 end Tr
 
 section Exist
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
   {E : Fin n → Fin n → Module.End ℂ D}
 
-theorem coefB_tensSub_kStable (dual : Bool) {S : Submodule ℂ D} (hS : IsKStableSub ε E S) :
-    IsKStableSub ε (tensF dual E) (tensSub S) := by
-  apply ReciprocityTheory.ChartRestriction.DS.coefB_tensSub_kStable <;> assumption
-
-theorem coefB_casimirK_mem {X : Type*} [AddCommGroup X] [Module ℂ X]
-    {A : Fin n → Fin n → Module.End ℂ X} {S : Submodule ℂ X} (hS : IsKStableSub ε A S) {x : X}
-    (hx : x ∈ S) : casimirK ε A x ∈ S := by
+theorem coefB_casimirK_mem
+    {X : Type*} [AddCommGroup X] [Module ℂ X]
+    {A : Fin n → Fin n → Module.End ℂ X} {S : Submodule ℂ X} (hS : IsKStableSub ε A S)
+    {x : X} (hx : x ∈ S)
+    : casimirK ε A x ∈ S := by
   unfold casimirK
   simp only [LinearMap.sum_apply, Module.End.mul_apply]
   refine Submodule.sum_mem _ fun a _ => Submodule.sum_mem _ fun b hb => ?_
   have hb' : ε b = ε a := (Finset.mem_filter.mp hb).2
   exact hS a b hb'.symm _ (hS b a hb' _ hx)
 
-theorem coefB_locFin (hE : IsGlRep E) {V : Submodule ℂ D} (hVf : FiniteDimensional ℂ V)
-    (hVk : IsKStableSub ε E V) : CoefLocFin (casimirK ε E) (genSub E V) := by
-  intro y hy
-  obtain ⟨m, hm⟩ := exists_layer_of_mem_genSub hE hVk hy
-  exact ⟨layer ε E V m, finiteDimensional_layer hVf m, layer_le_genSub m,
-    fun x hx => casimirK_mem_of_kStable (layer_kStable hE hVk m) hx, hm⟩
-
-theorem coefB_ι_casimirK (dual : Bool) {S' : Submodule ℂ D} {ι : D →ₗ[ℂ] (Fin n → D)}
-    (hS' : ∀ a b, ∀ v ∈ S', E a b v ∈ S')
-    (hι : ∀ a b, ∀ x ∈ S', ι (E a b x) = tensF dual E a b (ι x)) {y : D} (hy : y ∈ S') :
-    ι (casimirK ε E y) = casimirK ε (tensF dual E) (ι y) := by
+theorem coefB_ι_casimirK
+    (dual : Bool)
+    {S' : Submodule ℂ D} {ι : D →ₗ[ℂ] (Fin n → D)} (hS' : ∀ a b, ∀ v ∈ S', E a b v ∈ S')
+    (hι : ∀ a b, ∀ x ∈ S', ι (E a b x) = tensF dual E a b (ι x))
+    {y : D} (hy : y ∈ S')
+    : ι (casimirK ε E y) = casimirK ε (tensF dual E) (ι y) := by
   unfold casimirK
 
   simp only [LinearMap.sum_apply, Module.End.mul_apply, map_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [hι a b _ (hS' b a y hy), hι b a y hy]
 
-theorem coefB_toSum_exists (dual : Bool) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
-    {lam' : Fin n → ℝ} {V V' : Submodule ℂ D} (hVf : FiniteDimensional ℂ V)
-    (hVk : IsKStableSub ε E V) (hgap' : StdGap ε lam') (hV' : IsKIrrHW ε E (lowK ε lam') V')
-    (hc' : ∀ v ∈ V', casimir E v = (casVal lam' : ℂ) • v) {ι : D →ₗ[ℂ] (Fin n → D)}
-    (hι : IsGKEmb dual ε σ E (genSub E V) (genSub E V') ι) :
-    ∀ f ∈ tensSub (genSub E V), ∃ z ∈ genSub E V', ∀ y ∈ genSub E V',
+theorem coefB_toSum_exists
+    (dual : Bool)
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+    {lam' : Fin n → ℝ} {V V' : Submodule ℂ D}
+    (hVf : FiniteDimensional ℂ V) (hVk : IsKStableSub ε E V) (hgap' : StdGap ε lam')
+    (hV' : IsKIrrHW ε E (lowK ε lam') V') (hc' : ∀ v ∈ V', casimir E v = (casVal lam' : ℂ) • v)
+    {ι : D →ₗ[ℂ] (Fin n → D)} (hι : IsGKEmb dual ε σ E (genSub E V) (genSub E V') ι)
+    : ∀ f ∈ tensSub (genSub E V), ∃ z ∈ genSub E V', ∀ y ∈ genSub E V',
       inner ℂ z y = ∑ c, inner ℂ (f c) (ι y c) := by
   intro f hf
   have hE := hD.glRep
@@ -277,21 +270,24 @@ theorem coefB_toSum_exists (dual : Bool) (hσ : IsURepOn (UJset ε) σ) (hD : Is
   have hfL : WithLp.toLp 2 f ∈ L := Submodule.mem_pi.2 fun c _ => hk c
   have hTsym : ∀ x y, inner ℂ (casimirK ε E x) y = inner ℂ x (casimirK ε E y) :=
     casimirK_inner_symm hUk
-  obtain ⟨z, hzM, hz⟩ := coefA_toSum hTsym (coefB_locFin hE hV'.1 hV'.2.1) ℓ C
-    (finiteDimensional_layer hV'.1 K) (layer_le_genSub K) (fun y hy θ hθ hyθ => hK y hy θ hθ hyθ)
-    (fun y hy θ hθ hyθ => by
-      refine hC _ hfL (WithLp.toLp 2 (ι y)) θ hθ ?_
-      rw [hTYa, ← coefB_ι_casimirK dual (fun a b v hv => closure_E_mem_genSub a b hv) hι.2.2.1 hy,
-        hyθ, map_smul]
-      rfl)
+  obtain ⟨z, hzM, hz⟩ :=
+    coefA_toSum hTsym (coefB_locFin hE hV'.1 hV'.2.1) ℓ C (finiteDimensional_layer hV'.1 K)
+      (layer_le_genSub K)
+      (fun y hy θ hθ hyθ => hK y hy θ hθ hyθ)
+      (fun y hy θ hθ hyθ => by
+        refine hC _ hfL (WithLp.toLp 2 (ι y)) θ hθ ?_
+        rw [hTYa, ← coefB_ι_casimirK dual (fun a b v hv => closure_E_mem_genSub a b hv) hι.2.2.1 hy,
+          hyθ, map_smul]
+        rfl)
   exact ⟨z, hzM, fun y hy => by rw [hz y hy, hℓ]⟩
 
-theorem coefB_ofSum_exists (dual : Bool) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem coefB_ofSum_exists
+    (dual : Bool)
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     {lam' : Fin n → ℝ} {V V' : Submodule ℂ D} (hgap' : StdGap ε lam')
-    (hV' : IsKIrrHW ε E (lowK ε lam') V')
-    (hc' : ∀ v ∈ V', casimir E v = (casVal lam' : ℂ) • v) {ι : D →ₗ[ℂ] (Fin n → D)}
-    (hι : IsGKEmb dual ε σ E (genSub E V) (genSub E V') ι) :
-    ∀ z ∈ genSub E V', ∃ f ∈ tensSub (genSub E V), ∀ y ∈ genSub E V',
+    (hV' : IsKIrrHW ε E (lowK ε lam') V') (hc' : ∀ v ∈ V', casimir E v = (casVal lam' : ℂ) • v)
+    {ι : D →ₗ[ℂ] (Fin n → D)} (hι : IsGKEmb dual ε σ E (genSub E V) (genSub E V') ι)
+    : ∀ z ∈ genSub E V', ∃ f ∈ tensSub (genSub E V), ∀ y ∈ genSub E V',
       inner ℂ z y = ∑ c, inner ℂ (f c) (ι y c) := by
   intro z hz
   have hE := hD.glRep
@@ -316,8 +312,9 @@ theorem coefB_ofSum_exists (dual : Bool) (hσ : IsURepOn (UJset ε) σ) (hD : Is
     refine hι.2.1 y hy ?_
     have := congrArg WithLp.ofLp h0
     exact this
-  have hfin : ∀ θ : ℝ, ∃ Z : Submodule ℂ D, FiniteDimensional ℂ Z ∧
-      ∀ y ∈ genSub E V', casimirK ε E y = (θ : ℂ) • y → y ∈ Z := by
+  have hfin
+      : ∀ θ : ℝ, ∃ Z : Submodule ℂ D,
+        FiniteDimensional ℂ Z ∧ ∀ y ∈ genSub E V', casimirK ε E y = (θ : ℂ) • y → y ∈ Z := by
     intro θ
     obtain ⟨K, hK⟩ := coefB_adm hE hU hV' hc' hgap' θ
     exact ⟨layer ε E V' K, finiteDimensional_layer hV'.1 K, fun y hy hyθ => hK y hy θ le_rfl hyθ⟩

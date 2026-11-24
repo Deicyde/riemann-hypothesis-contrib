@@ -48,6 +48,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_thetaLabel_common_generic_fibre_pullback
     : ∀ {o₁ Ω₁ o₂ Ω₂ : Type} [CommRing o₁] [Field Ω₁] [Algebra o₁ Ω₁] [CommRing o₂] [Field Ω₂]
         [Algebra o₂ Ω₂] (S₁ : ThetaSys o₁ Ω₁) (S₂ : ThetaSys o₂ Ω₂) (ρ₁ : S₁.Real) (ρ₂ : S₂.Real)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.exists_thetaLabel_common_generic_fibre_pullback
         → ∃ lab : S₁.Gam →+ S₂.Gam,
           Same ρ₁ ε₁ ρ₂ ε₂ lab φ
             ∧ ∀ x : S₂.Gam, ∃ a, lab a = (S₂.r * S₂.N / (S₁.r * S₁.N)) • x := by
-  first
-  | exact @GlobalTheory.Poinc.DeepLab.exists_lab_same
-  | exact GlobalTheory.Poinc.DeepLab.exists_lab_same
-  | (intros; apply GlobalTheory.Poinc.DeepLab.exists_lab_same <;> assumption)
+  first | exact @GlobalTheory.Poinc.DeepLab.exists_lab_same

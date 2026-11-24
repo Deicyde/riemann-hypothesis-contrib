@@ -86,7 +86,6 @@ theorem flagV_pair_table
     unfold flagV sgnD
     split_ifs <;> first
       | omega
-      | exact d11
       | exact d1 _ _ (by dsimp only; omega)
       | exact d6 _ _ (by dsimp only; omega)
       | exact d16 _ _ (by dsimp only; omega)

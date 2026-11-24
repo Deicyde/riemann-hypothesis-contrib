@@ -73,13 +73,10 @@ def _root_.PositivityTheory.Rg.BcB.SpectralAccumulation.Tr.addTw
   | _, .leaf V z, α => .leaf V (z + α 0)
   | _, .node t₁ t₂, α => .node (t₁.addTw α) (t₂.addTw fun i => α (i + t₁.twists.length))
 
-abbrev Cint (E : Type) [Field E] [NumberField E] (n : ℕ) : Subgroup (GL (Fin n) (Af E)) :=
-  GroundTheory.Automorphic.AdelicGLn.integralFiniteGL E n
-
 theorem exists_decI {r s : ℕ} (x : GA E (r + s))
     : ∃ q
         : (BlockIx (r + s) r → Ad E) × (GA E r × GA E s) × Kinf E (r + s) × GL (Fin (r + s)) (Af E),
-      q.2.2.2 ∈ Cint E (r + s)
+      q.2.2.2 ∈ _root_.GlobalTheory.CompanionTheory.LimV.KO E (r + s)
         ∧ x = unip q.1 * lev (Ad E) r s q.2.1 * InducedTensorMap.cf (r + s) q.2.2.1 q.2.2.2 := by
   obtain ⟨b, hb, k, hy⟩ :=
     GlobalTheory.IwasawaAdelic.exists_upper_mul_unitary_inf E (r + s)
@@ -113,10 +110,10 @@ theorem exists_decI {r s : ℕ} (x : GA E (r + s))
     ga_ext ?_ ?_
   ⟩
   · simp only [InducedTensorMap.cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e1, pInf_infGL,
-      pInf_finGL, mul_one, one_mul]
+      pInf_finGL, mul_one]
     rw [hy, hbi]
   · simp only [InducedTensorMap.cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e2, pFin_infGL,
-      pFin_finGL, mul_one, one_mul]
+      pFin_finGL, one_mul]
     rw [hf]
 
 def mult : {N : ℕ} → Tr E N → (ℕ → ℂ) → GA E N → ℂ

@@ -172,7 +172,7 @@ theorem tors_alg
           = (Algebra.TensorProduct.includeRight
               : TensorProduct R T.A T.A →ₐ[R] TensorProduct R T.A (TensorProduct R T.A T.A)).comp
             iL := by
-      ext x; simp [hiL, hiR, Algebra.TensorProduct.one_def]
+      ext x; simp [hiL, hiR]
     rw [e1, e2, lift_comul T Δ hΔ, e5, e6, e3, e4, lift_comul T Δ hΔ, _root_.mul_assoc]
   · apply tors_ext T
     rw [lift_comul T Δ hΔ]

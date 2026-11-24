@@ -40,8 +40,6 @@ import Formalism.SharpRestriction.LevelLetterCocycles.EndomorphismIndexBound
 
 @[expose] public section
 
-
-
 section
 open Module
 noncomputable section

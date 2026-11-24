@@ -285,7 +285,7 @@ theorem isSelfDualE_latOf (g : UA D.sp.cm (Xp G).gram)
       calc
         0 = r * (∑ i, ∑ j, star (y i) * (Xp G).gram i j * v j) := by rw [hzy, mul_zero]
         _ = ∑ i, ∑ j, star (y i) * (Xp G).gram i j * (r * v j) := by
-          simp [Finset.mul_sum, mul_comm, mul_left_comm, mul_assoc]
+          simp [Finset.mul_sum, mul_comm, mul_assoc]
     obtain ⟨i, hi⟩ : ∃ i, v i ≠ 0 := by
       by_contra hn
       apply hv0

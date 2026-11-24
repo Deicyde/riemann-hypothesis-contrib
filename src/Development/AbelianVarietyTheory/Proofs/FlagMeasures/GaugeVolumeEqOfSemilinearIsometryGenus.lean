@@ -228,7 +228,7 @@ theorem pi_smul
     (c : ι → ℝ≥0)
     : Measure.pi (fun i => c i • μ i) = (∏ i, c i) • Measure.pi μ := by
   refine Measure.pi_eq fun s _ => ?_
-  simp only [Measure.coe_nnreal_smul_apply, Measure.pi_pi, Measure.nnreal_smul_coe_apply]
+  simp only [Measure.coe_nnreal_smul_apply, Measure.pi_pi]
   simp [Finset.prod_mul_distrib]
 
 theorem map_pi_smul

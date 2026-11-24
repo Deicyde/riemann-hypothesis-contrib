@@ -278,11 +278,13 @@ theorem chart_dim
     rfl
 
   have d₁ :=
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT ℂ (Fin m) V J (linForm t - 1)
-      hV.isPrime (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top t) hJmin
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+      ℂ (Fin m) V J (linForm t - 1) hV.isPrime
+      (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top t) hJmin
   have d₂ :=
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT ℂ (Fin m) V Q₀ (linForm u - 1)
-      hV.isPrime (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top u) hQ₀min
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+      ℂ (Fin m) V Q₀ (linForm u - 1) hV.isPrime
+      (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top u) hQ₀min
   rw [← d₂, hdimQ₀] at d₁
   exact eq_of_add_one_eq d₁
 

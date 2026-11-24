@@ -121,7 +121,7 @@ theorem term_linear
   · simp only [term, res, heisO_add_fun, Pi.add_apply]
     exact integral_add (key G hG) (key H hH)
   · simp only [term, res, heisO_smul_fun, Pi.smul_apply, smul_eq_mul]
-    first | exact integral_const_mul c _ | exact integral_mul_left c _
+    first | exact integral_const_mul c _
 
 end GlobalTheory.MixedTerm
 

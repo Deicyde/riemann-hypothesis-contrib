@@ -38,8 +38,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.TwistedPlacesOfCond
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.Fc.S0

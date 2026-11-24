@@ -39,8 +39,6 @@ import Formalism.LocalToGlobal.IndefiniteReal.CxPass
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped InnerProductSpace

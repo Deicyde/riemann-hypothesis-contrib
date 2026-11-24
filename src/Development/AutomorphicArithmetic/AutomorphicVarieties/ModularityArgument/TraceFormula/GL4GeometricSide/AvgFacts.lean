@@ -142,7 +142,7 @@ private theorem exists_in
   have e : ∀ y : S, L y = ⟪w, (y : V)⟫_ℂ := fun y => rfl
   rw [← e, ← this]
   refine integral_congr_ae (Filter.Eventually.of_forall fun κ => ?_)
-  simp [e, G, inner_smul_right]
+  simp [e, G]
 
 private theorem wk_unique {c : Un n → ℂ} {v p q : V} (hp : IsWk ν σ c v p) (hq : IsWk ν σ c v q)
     : p = q :=

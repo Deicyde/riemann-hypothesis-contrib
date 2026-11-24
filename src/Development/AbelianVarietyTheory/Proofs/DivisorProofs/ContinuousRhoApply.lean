@@ -123,7 +123,7 @@ theorem continuous_rho_prod : Continuous fun x : L2 l × (l ⊕ l → ℝ) => rh
   exact continuous_prod_of_dense_continuous_lipschitzWith
     (fun x : L2 l × (l ⊕ l → ℝ) => rho x.2 x.1)
     1 hd (by rintro _ ⟨f, rfl⟩; exact continuous_rho_schwartz f)
-    fun w => (rho w).lipschitz
+    fun w => (rho w).lipschitzWith
 
 theorem continuous_rho
     : ∀ (l : Type) [Fintype l] (v : L2 l), Continuous fun w : l ⊕ l → ℝ => rho w v := fun l _ v =>

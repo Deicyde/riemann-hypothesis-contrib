@@ -2,7 +2,8 @@ module
 
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.StrictJoinCandidates.IntertwiningCandidates.StrictJoin
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameReading.IwahoriPairLeMaximal
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegralPointsOpenCompactStatement
+public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.ThetaNormCommutation.LocalComparisonSplitting.GlobalCharacterOfInputs
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegralPointsOpenCompact
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.AdelicHeckeBlocks.PPositions
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -50,8 +51,6 @@ open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
 open PositivityTheory.Rg.BcB.G8
 open scoped Classical
 
-
-
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Rg.BcB.F.FX.Bo.LevelOpenness
@@ -94,8 +93,8 @@ theorem gSet_open'
     (a : ℕ) (ha : a ≤ n)
     : IsOpen (gSet Sec d a) := by
   have hSl' := hSl E a (n - a) Sec hS
-  obtain ⟨hKo1, -⟩ := GlobalTheory.T.finite_kernel_compact_open E a
-  obtain ⟨hKo2, -⟩ := GlobalTheory.T.finite_kernel_compact_open E (n - a)
+  obtain ⟨hKo1, -⟩ := _root_.GlobalTheory.CompanionTheory.IntegralPoints.kfOC E a
+  obtain ⟨hKo2, -⟩ := _root_.GlobalTheory.CompanionTheory.IntegralPoints.kfOC E (n - a)
   set U : Set (Hf E a (n - a)) := (((Kf E a).prod (Kf E (n - a)) : Subgroup (Hf E a (n - a))) : Set (Hf E a (n - a)))
     with hU
   have hUo : IsOpen U := by

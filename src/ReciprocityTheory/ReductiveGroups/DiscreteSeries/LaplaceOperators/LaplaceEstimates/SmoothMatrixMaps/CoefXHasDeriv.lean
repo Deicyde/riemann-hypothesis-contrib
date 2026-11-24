@@ -444,7 +444,7 @@ theorem tMapD_Eab
       rw [single_dotProduct, one_mul]
       by_cases h : c = a
       · subst h; simp [Matrix.mulVec, dotProduct, Matrix.single_apply]
-      · simp [Matrix.mulVec, dotProduct, Matrix.single_apply, h, Ne.symm h]
+      · simp [Matrix.mulVec, dotProduct, h, Ne.symm h]
     have e2
         : (if c = a then y b * coefX σ x₀ w (f a : H) g else 0)
           = (if c = a then y b else 0) * coefX σ x₀ w (f c : H) g := by

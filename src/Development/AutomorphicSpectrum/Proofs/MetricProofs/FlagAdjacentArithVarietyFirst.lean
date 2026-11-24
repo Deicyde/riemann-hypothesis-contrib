@@ -3,8 +3,9 @@ module
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BasePartFlagPt
 public import Mathlib.FieldTheory.RatFunc.AsPolynomial
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseVectorProperties
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentPluckerOrbitStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogPeriodStatementStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PullbackPullback
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentPluckerOrbit
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogPeriodStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -124,8 +125,8 @@ theorem main
               ∈ mcPts (mCoordIdeal (M.wCo (τ, a) k₀ ca cb RatFunc.X)) := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n BM d τ a b k₀ ca cb hb hab hk hca hcb hvar l b' hb' h t hh
   obtain ⟨h1, h2⟩ :=
-    GlobalTheory.T.flag_adjacent_plucker_orbit K ι Φ y Ψ N j M τ a b k₀ ca cb hb hab hk hca hcb
-      (BM.F l) (bvec BM l b') h t
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.fstPt_sndPt_wVec K ι Φ y Ψ N j M τ a b k₀ ca cb
+      hb hab hk hca hcb (BM.F l) (bvec BM l b') h t
   obtain ⟨g1, g2, g3, -⟩ :=
     GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.bvec_good K ι Φ y Ψ N j M n BM l b' hb'
   have hh'
@@ -145,9 +146,9 @@ theorem main
       : basePart M.blk (fstPt k₀ (wVec M (BM.F l) (bvec BM l b') h τ a k₀ ca cb t))
         = bvec BM l b' := by
     rw [h1, basePart_flagPt]
-  refine (GlobalTheory.T.log_period_statement K ι Φ y Ψ N j M d τ a b k₀ ca cb hb hab hk hca hcb
-    hvar (BM.F l) _ (BM.isFrame l) (by rw [hbase]; exact g1) (by rw [hbase]; exact g2)
-    (by rw [hbase]; exact g3)).2 ⟨h, t, ?_, ?_⟩
+  refine (_root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.Pts.main K ι Φ y Ψ N j M d τ a b k₀ ca cb hb
+    hab hk hca hcb hvar (BM.F l) _ (BM.isFrame l) (by rw [hbase]; exact g1)
+    (by rw [hbase]; exact g2) (by rw [hbase]; exact g3)).2 ⟨h, t, ?_, ?_⟩
   · rw [h1]
     exact isFlagOf_flagPt M (BM.F l) g3 hh
   · rw [h2]

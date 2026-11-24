@@ -63,7 +63,6 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0 FullRk SgJ
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 noncomputable section
 
 open GlobalTheory.IndefiniteRowSideFullHecke.CommutingRationalGroups GlobalTheory.ThetaProjEquiv
@@ -77,8 +76,7 @@ theorem reductionGroupAction_mul
     (f : G → W)
     : Bridge.g0Act ch q (Bridge.g0Act ch q' f) = Bridge.g0Act ch (q * q') f := by
   funext h
-  simp only [Bridge.g0Act, smul_smul, Subgroup.coe_mul, mul_assoc, map_mul, mul_inv, Units.val_mul,
-    mul_comm]
+  simp only [Bridge.g0Act, smul_smul, Subgroup.coe_mul, mul_assoc, map_mul, mul_inv, Units.val_mul]
 
 variable
   {D : D7} {G : Type} [Group G] [Fintype G]

@@ -82,7 +82,7 @@ theorem kappa_integral_of_calculation (hC : CalcC) : uniformGaussModelConditionR
       split_ifs <;> rfl
     rw [e, ← h]
     rfl
-  exact Formalism.L2.Th1.E.generalIntOf ℂ_[l] (unitBall ℂ_[l])
+  exact _root_.Formalism.L2.Th1.E.general_integrality ℂ_[l] (unitBall ℂ_[l])
     (fun _ => Iff.rfl)
     (lgF ℂ_[l] l) (expF ℂ_[l] l)
     (PowerSeries.map (MaximalUnramifiedExtension l).subtype (phFF l g2 g3 s2 ε)) hFr (BrC.Osub σ)
@@ -133,7 +133,7 @@ theorem HypShape_of (hC : CalcC) : HypShape := by
         · exact (hall _ (hf' e i).1 (hf' e i).2).1)
       (by rintro (e | e) <;> exact Formalism.L2.Th1.E.CompatibleChartOperations.isPt_X _)
   obtain ⟨h3, h4, h5⟩ :=
-    Formalism.L2.Th1.E.substExpInt ℂ_[l] n (Bool × ιr × Fin N0 × Fin N1)
+    _root_.Formalism.L2.Th1.E.subst_exp_integral ℂ_[l] n (Bool × ιr × Fin N0 × Fin N1)
       (Formalism.L2.Th1.E.hypCoord (lgF ℂ_[l] l) (expF ℂ_[l] l)
         (MaximalUnramifiedExtension l).subtype f f')
       (fun i => (hpt i).1)
@@ -161,14 +161,17 @@ theorem HypShape_of (hC : CalcC) : HypShape := by
     have hcob
         : cob (MvPowerSeries.map (MaximalUnramifiedExtension l).subtype F) (lgF ℂ_[l] l) = 0 := by
       rw [← Formalism.L2.Th1.E.Joints.map_lgF' (MaximalUnramifiedExtension l).subtype l,
-        ← Formalism.L2.Th1.E.mapCob _ _ _ _ _ hF.1, hF.2.2, map_zero]
-    rw [Formalism.L2.Th1.E.mapCob _ _ _ _ _ hF.1,
-      Formalism.L2.Th1.E.sumEBridge ℂ_[l] (lgF ℂ_[l] l) (expF ℂ_[l] l) (BrC.logPair hl2) _ hF0 hcob]
-    refine (Formalism.L2.Th1.E.congIffSimeq ℂ_[l] (unitBall ℂ_[l]) (fun _ => Iff.rfl) _ _ _).1 ?_
+        ← _root_.Formalism.L2.Th1.E.map_coboundary _ _ _ _ _ hF.1, hF.2.2, map_zero]
+    rw [_root_.Formalism.L2.Th1.E.map_coboundary _ _ _ _ _ hF.1,
+      _root_.Formalism.L2.Th1.E.sum_series_analytic ℂ_[l] (lgF ℂ_[l] l) (expF ℂ_[l] l)
+        (BrC.logPair hl2) _ hF0 hcob]
+    refine (_root_.Formalism.L2.Th1.E.congruence_iff_simeq ℂ_[l] (unitBall ℂ_[l])
+      (fun _ => Iff.rfl)
+      _ _ _).1 ?_
     rw [Formalism.L2.Th1.E.CompatibleChartOperations.subst_phSum _ fun i => (hpt i).1]
-    exact Formalism.L2.Th1.C.hyperbolicSum ℂ_[l] (unitBall ℂ_[l]) (lgF ℂ_[l] l) (expF ℂ_[l] l)
-      (PowerSeries.map (MaximalUnramifiedExtension l).subtype (phFF l g2 g3 s2 ε)) hFr (BrC.Osub σ)
-      ((MaximalUnramifiedExtension l).subtype.comp (BrC.Osub σ).subtype)
+    exact _root_.Formalism.L2.Th1.C.hyperbolic_sum_identity ℂ_[l] (unitBall ℂ_[l]) (lgF ℂ_[l] l)
+      (expF ℂ_[l] l) (PowerSeries.map (MaximalUnramifiedExtension l).subtype (phFF l g2 g3 s2 ε))
+      hFr (BrC.Osub σ) ((MaximalUnramifiedExtension l).subtype.comp (BrC.Osub σ).subtype)
       (fun α => (hall α.1 α.2.1 α.2.2).1)
       (fun z hz => hbin z.1 z.2.1 (congrArg Subtype.val hz))
       hF1

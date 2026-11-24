@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj GlobalTheory.EtaForm
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.fullLinearLevel_cover_baseChange_torsor
     : Laws
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.fullLinearLevel_cover_baseChange_torsor
                   ∧ ∀ ev', IsFullLev Xo k x0 ev' → ∃ g : LevGrp Dw k, ∀ q, ev' q = ev (g q))
             ∧ ∀ (K : Type) [Field K] [IsAlgClosed K] (x0 : Sp K ⟶ Xo.X), ∃ ev,
               IsFullLev Xo k x0 ev := by
-  first
-  | exact @GlobalTheory.fullLevel_cover_baseChange_torsor
-  | exact GlobalTheory.fullLevel_cover_baseChange_torsor
-  | (intros; apply GlobalTheory.fullLevel_cover_baseChange_torsor <;> assumption)
+  first | exact @GlobalTheory.fullLevel_cover_baseChange_torsor

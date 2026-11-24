@@ -2,8 +2,11 @@ module
 
 public import Development.WeilBound.CoreStatements.FlagImmersions.Transport
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSheetCover
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPointStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SectionBoundaryClosedAndCodenseStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPoint
+public import ReciprocityTheory.AnalyticForms.LeviForms.IsRegFamilyInhabitStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SectionBoundaryClosedAndCodense
 public import Development.WeilBound.CoreStatements.VolumeEquality.ChartMeetsForm
 public import Development.WeilBound.CoreStatements.VolumeEquality.HolNull
 public import Development.WeilBound.CoreStatements.VolumeEquality.Pieces
@@ -130,8 +133,8 @@ theorem ptsFam : PtsFam := by
       ⟨ht₀, Or.Re.R.mem_U w₀⟩,
       ?_
     ⟩
-    refine GlobalTheory.T.holomorphic_coords_of_generic_point _ _ Or.𝔐.ξ _ _ RM.y Or.𝔐.tie Or.𝔐.all
-      _ _
+    refine _root_.GlobalTheory.CompanionTheory.Ar.PeriodsHol.isHolTo_of_coordsAt_family _ _ Or.𝔐.ξ _
+      _ RM.y Or.𝔐.tie Or.𝔐.all _ _
       (fun t => Or.Re.R.lift w₀ (ψ ((Sys.A.chart k).symm t)))
       _ hB ?_ ?_
     · refine differentiableOn_pi.2 fun p t ht => ?_
@@ -169,8 +172,8 @@ theorem ptsFam : PtsFam := by
     obtain ⟨k, hk⟩ := Sys.A.cover (Or.Re.π w₁)
     have hopen := (Sys.A.chart k).isOpen_inter_preimage (hol k U 0).1
     have hd :=
-      (GlobalTheory.T.section_boundary_closed_and_codense _ _ Sys.A Sys.L Sys.s Sys.nb Sys.m Sys.W
-        Sys.sec Sys.snc).2
+      (_root_.GlobalTheory.CompanionTheory.Ar.Bdry.bdry_isClosed_dense_compl _ _ Sys.A Sys.L Sys.s
+        Sys.nb Sys.m Sys.W Sys.sec Sys.snc).2
     obtain ⟨x, ⟨hxs, -, hxU⟩, hxo⟩ :=
       hd.inter_open_nonempty _ hopen ⟨
         Or.Re.π w₁,

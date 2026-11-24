@@ -144,10 +144,7 @@ theorem vol : VolSt := by
     ENNReal.coe_ne_zero.2 (Measure.haarScalarFactor_pos_of_isHaarMeasure μ μ1).ne'
   have hμX : ∀ X, μ X = (Measure.haarScalarFactor μ μ1 : ℝ≥0∞) * μ1 X := fun X => by
     conv_lhs => rw [hscale]
-    first
-    | rw [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
-    | simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
-    | simp [Measure.smul_apply]
+    first | rw [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   have hac : μ1 ≪ μ := fun X hX => by
     rw [hμX] at hX
     exact (mul_eq_zero.1 hX).resolve_left hc0

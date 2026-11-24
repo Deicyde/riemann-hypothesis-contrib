@@ -56,7 +56,4 @@ theorem _root_.GlobalTheory.T.mem_doublingSiegelParabolic_iff_chart_mem_siegelUn
       IsSkew μ
         → ∀ κ : GA D (dblSp A) ≃* G D A.rank,
           IsChart A μ κ → ∀ g, g ∈ siegel A ↔ κ g ∈ P D A.rank := by
-  first
-  | exact @GlobalTheory.StdUnn.mem_siegel_iff_chart_mem_P
-  | exact GlobalTheory.StdUnn.mem_siegel_iff_chart_mem_P
-  | (intros; apply GlobalTheory.StdUnn.mem_siegel_iff_chart_mem_P <;> assumption)
+  first | exact @GlobalTheory.StdUnn.mem_siegel_iff_chart_mem_P

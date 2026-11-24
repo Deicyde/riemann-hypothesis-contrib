@@ -115,14 +115,14 @@ theorem isIntegralOp_conv_and_translate
       simp only [LinearMap.comp_apply] at this
       rw [this, ← integral_mul_left_eq_self (fun y => f' (x⁻¹ * y) * l (σ y v)) x]
       refine integral_congr_ae (.of_forall fun y => ?_)
-      simp [map_mul, Module.End.mul_apply]
+      simp [map_mul]
     rw [LinearMap.comp_apply, (hA (B v) l).2]
     simp_rw [hx, ← integral_const_mul, ← mul_assoc]
     rw [integral_integral_swap_of_hasCompactSupport hF hFc]
     simp_rw [integral_mul_const]
   · have hx : ∀ y, f' y * l (σ g (σ y v)) = (fun x => f' (g⁻¹ * x) * l (σ x v)) (g * y) := by
       intro y
-      simp [map_mul, Module.End.mul_apply]
+      simp [map_mul]
     have hc : Continuous fun x => f' (g⁻¹ * x) * l (σ x v) :=
       (hf'c.comp (continuous_const.mul continuous_id)).mul (horb l v)
     have hs : HasCompactSupport fun x => f' (g⁻¹ * x) * l (σ x v) :=

@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.PetIPSmulRight
 public import Development.AbelianVarietyTheory.Definitions.Foundations.RepL
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlashIntMatrixPosDetPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlashIntMatrixPosDetProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -95,7 +95,7 @@ theorem term_eq
     (τ : ℍ)
     : ch ε (((((γ : SL(2, ℤ)) : M2)) * β) 0 0) * slz k ((((γ : SL(2, ℤ)) : M2)) * β) f τ
       = ch ε (β 0 0) * slz k β f τ := by
-  obtain ⟨hc, -, hinv, -, -⟩ := GlobalTheory.T.slashIntMatrixPosDet_properties k f hk
+  obtain ⟨hc, -, hinv, -, -⟩ := _root_.GlobalTheory.EisM.slz_props k f hk
   set g : SL(2, ℤ) := (γ : SL(2, ℤ)) with hg
   have hgL : (L : ℤ) ∣ g 1 0 := by
     have := (Gamma0_mem).1 γ.2

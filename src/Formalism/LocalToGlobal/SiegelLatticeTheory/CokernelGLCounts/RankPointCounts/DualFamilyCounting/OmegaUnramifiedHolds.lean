@@ -66,10 +66,7 @@ theorem unramAt_of_cm
     rw [Ideal.card_inertia_eq_ramificationIdxIn (G := Gal(E/F)) (P.under (𝓞 F)) P,
       Ideal.ramificationIdxIn_eq_ramificationIdx (P.under (𝓞 F)) P Gal(E/F)]
   by_contra hne
-  have hG : Nat.card Gal(E/F) = 2 := by
-    first
-    | (rw [IsGalois.card_aut_eq_finrank]; exact hc.deg2)
-    | (rw [Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank]; exact hc.deg2)
+  have hG : Nat.card Gal(E/F) = 2 := by first | (rw [IsGalois.card_aut_eq_finrank]; exact hc.deg2)
   haveI : Fact (Nat.card Gal(E/F)).Prime := ⟨by rw [hG]; exact Nat.prime_two⟩
   have htop : P.inertia Gal(E/F) = ⊤ := by
     rcases Subgroup.eq_bot_or_eq_top_of_prime_card (P.inertia Gal(E/F)) with h | h

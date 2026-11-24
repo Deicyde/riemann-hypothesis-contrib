@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
   Formalism.L2.Pj Formalism.L2.PjFree GlobalTheory.EtaForm GlobalTheory.EtaAn GlobalTheory.ArcQ
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.theta_function_torus_l2_norm
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ)
         (ty : Fin g → (E →+* ℂ)) (Pm : D.La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ)
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.theta_function_torus_l2_norm
           ∧ ∀ z,
             Real.sqrt (T.ptN2 1 (fun v : Fin 1 → I2.Vsp T.dim => θ (ψ.symm (v 0))) (fun _ => ψ z))
               = ‖θ z‖ * Real.exp (-(Real.pi / 2) * (hermForm Hm z z).re) := by
-  first
-  | exact @GlobalTheory.EtaAn.ThetaTorus.theta_section_l2_torus
-  | exact GlobalTheory.EtaAn.ThetaTorus.theta_section_l2_torus
-  | (intros; apply GlobalTheory.EtaAn.ThetaTorus.theta_section_l2_torus <;> assumption)
+  first | exact @GlobalTheory.EtaAn.ThetaTorus.theta_section_l2_torus

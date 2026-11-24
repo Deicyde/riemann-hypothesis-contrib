@@ -158,9 +158,7 @@ theorem admissibleBase_maximalIdeal_completeDVR
   obtain ⟨d, hc, h0⟩ := hV
   exact ⟨inferInstance, inferInstance, inferInstance, hc⟩
 
-theorem epi_spMap {K L : Type} [Field K] [Field L] (i : K →+* L) : Epi (spMap i) :=
-  letI := i.toAlgebra
-  GlobalTheory.FixedPoint.epi_specAlg (K₀ := K) (K₁ := L)
+alias epi_spMap := _root_.GlobalTheory.ThetaDescent.epi_spMap
 
 theorem sp_comp
     {A B C : Type} [CommRing A] [CommRing B] [CommRing C]

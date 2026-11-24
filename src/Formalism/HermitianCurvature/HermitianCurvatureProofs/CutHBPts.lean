@@ -79,7 +79,7 @@ theorem zxH_det_ne {h : C.LPt} {j : ℕ} (hh : D.IsLocPt h j) (v : XH h)
   unfold zxH
   rw [Matrix.det_reindex_self, Matrix.det_mul]
   exact mul_ne_zero (LeftFubiniLemmas.lh_unit _ v).ne_zero
-    (Formalism.FourierDecayAlt.P.PBM.hMat_det_ne _ _ (ptDiag_ne hh))
+    (_root_.Formalism.FourierDecayAlt.P.Ux10.det_hMat_ne _ _ (ptDiag_ne hh))
 
 theorem cdOn_mat
     {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X]
@@ -281,7 +281,7 @@ theorem pts : Pts := by
       exact hΩ.1 ⟨l', by omega⟩ (by simp; omega)
   · rw [hx, gf_castM e]
     have hG :=
-      Formalism.FourierDecayAlt.P.level_function_slice P.k (j + 1) (P.r - (j + 1)) _ _ hz hz' 0 0
+      _root_.Formalism.FourierDecayAlt.P.Ux3.gfSlice P.k (j + 1) (P.r - (j + 1)) _ _ hz hz' 0 0
         (zfull Z τ) γ
     rw [LeftFubiniLemmas.rn_zero, inv_one, Matrix.one_mul, Matrix.mul_one] at hG
     rw [hG, hl1, hl2]
@@ -303,11 +303,11 @@ theorem leading_block_of_base_point
       : ∀ q : Fin (2 * (j + 1 + (r - (j + 1))) + k + 1),
         q.val = 2 * (j + (r - j)) + k - a.val
           → q = U.eB k (j + 1) (r - (j + 1)) (Sum.inr ⟨j - a.val, by omega⟩) := by
-    intro q hq; ext; rw [Ux3.block_index_last_val]; simp only [Fin.val_mk]; omega
+    intro q hq; ext; rw [Ux3.block_index_last_val]; simp only; omega
   rw [key (Fin.cast _ _) (by simp), LeftFubiniLemmas.embedding_map_apply_last_block,
     dite_eq_left (by simp only [Fin.val_cast]; omega), zfull_apply,
     dite_eq_left (by simp only [Fin.val_rev, Fin.val_cast, Fin.val_mk]; omega)]
-  congr 1 <;> ext <;> simp only [Fin.val_rev, Fin.val_cast, Fin.val_mk] <;> omega
+  congr 1 <;> ext <;> simp only [Fin.val_rev] <;> omega
 
 end head
 

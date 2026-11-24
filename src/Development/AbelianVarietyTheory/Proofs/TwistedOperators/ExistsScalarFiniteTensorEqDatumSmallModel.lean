@@ -370,9 +370,6 @@ def boxGraph
     {p | ∃ φ₁ φ₂, IsSBHalf ε (latA G t i j) φ₁ ∧ IsSBHalf ε (latB G i j) φ₂ ∧
       p = (boxS t e φ₁ φ₂, boxS t e (T₁ φ₁) (T₂ φ₂))}
 
-
-
-
 def graphMap
     (t : T)
     (e : Num G i j) (T₁ : (HomA G t i j → ℂ) →ₗ[ℂ] (HomA G t i j → ℂ))
@@ -565,11 +562,7 @@ theorem lagr_vac
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc}
 
-theorem splitIdem_conj {a : AE D} (h : IsSplitIdem D a) : IsSplitIdem D (cA D a) := by
-  obtain ⟨h1, h2, v, ε, h3, h4⟩ := h
-  refine ⟨by rw [← RingHom.map_mul, h1], ?_, v, ε, h3, ?_⟩
-  · rw [GlobalTheory.DualPairCheck.cA_cA, mul_comm, h2]
-  · rw [GlobalTheory.DualPairCheck.cA_cA, add_comm, h4]
+alias splitIdem_conj := _root_.GlobalTheory.SplitScalar.isSplitIdem_conj
 
 def halfPt {i j : ℕ} (t : T) (e : Num G i j) (ε : AE D) : AddSubgroup (PtS G i j) :=
   ((GlobalTheory.PlaceModel.half _ _ ε).prod (GlobalTheory.PlaceModel.half _ _ ε)).comap
@@ -742,7 +735,7 @@ theorem exists_scalar_datum
       · rw [if_neg fun h => hl h.2, zero_mul, mul_zero]
       · rw [if_neg fun h : _ ∧ IsHalf ε (mapB e u) => hl h.2, mul_zero, mul_zero]
   have hR :=
-    GlobalTheory.T.heisenbergStableRelation_of_vacua Γ.M' W.ψ hstd hG (locPl G t)
+    _root_.GlobalTheory.InductLagr.rel_of_vac Γ.M' W.ψ hstd hG (locPl G t)
       (fun w => w.under (𝓞 D.host.F))
       (Good.under_injOn hL G t) _
       (fun w => mixHalfS e (atPl w 1))

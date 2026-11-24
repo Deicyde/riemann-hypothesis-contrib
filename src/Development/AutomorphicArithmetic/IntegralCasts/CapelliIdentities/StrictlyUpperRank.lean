@@ -46,20 +46,19 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper.{u_1, u_2} :
-    {𝕜 : Type u_1} → [RCLike 𝕜] → {n : Type u_2} → [LinearOrder n] → Matrix n n 𝕜 → Prop :=
-  fun {𝕜} [RCLike 𝕜] {n} [LinearOrder n] X ↦
-    ∀ (i j : n), j ≤ i → X i j = 0
+noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper.{u_1, u_2}
+    : {𝕜 : Type u_1} → [RCLike 𝕜] → {n : Type u_2} → [LinearOrder n] → Matrix n n 𝕜 → Prop :=
+  fun {𝕜} [RCLike 𝕜] {n} [LinearOrder n] X ↦ ∀ (i j : n), j ≤ i → X i j = 0
 
-noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow.{u_2} :
-    {n : Type u_2} → [Fintype n] → [LinearOrder n] → n → ℕ :=
-  fun {n} [Fintype n] [LinearOrder n] i ↦
-    ({x : n | x < i} : Finset n).card
+noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow.{u_2}
+    : {n : Type u_2} → [Fintype n] → [LinearOrder n] → n → ℕ :=
+  fun {n} [Fintype n] [LinearOrder n] i ↦ ({x : n | x < i} : Finset n).card
 
-theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.{u_1, u_2} :
-    ∀ {𝕜 : Type u_1} [inst : RCLike 𝕜] {n : Type u_2} [inst_1 : Fintype n] [inst_2 : LinearOrder n] {X : Matrix n n 𝕜},
-      @UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper 𝕜 inst n inst_2 X →
-        ∀ (k : Nat) (i j : n),
+theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.{u_1, u_2}
+    : ∀ {𝕜 : Type u_1} [inst : RCLike 𝕜] {n : Type u_2} [inst_1 : Fintype n]
+        [inst_2 : LinearOrder n] {X : Matrix n n 𝕜},
+      @UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper 𝕜 inst n inst_2 X
+        → ∀ (k : Nat) (i j : n),
           @Ne 𝕜
               (@HPow.hPow (Matrix n n 𝕜) Nat (Matrix n n 𝕜)
                 (@instHPow (Matrix n n 𝕜) Nat
@@ -71,7 +70,8 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
                             (@Semifield.toDivisionSemiring 𝕜
                               (@Field.toSemifield 𝕜
                                 (@NormedField.toField 𝕜
-                                  (@DenselyNormedField.toNormedField 𝕜 (@RCLike.toDenselyNormedField 𝕜 inst))))))
+                                  (@DenselyNormedField.toNormedField 𝕜
+                                    (@RCLike.toDenselyNormedField 𝕜 inst))))))
                           inst_1 fun (a b : n) ↦ @LinearOrder.toDecidableEq n inst_2 a b)))))
                 X k i j)
               (@OfNat.ofNat 𝕜 (nat_lit 0)
@@ -82,9 +82,11 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
                         (@Semifield.toDivisionSemiring 𝕜
                           (@Field.toSemifield 𝕜
                             (@NormedField.toField 𝕜
-                              (@DenselyNormedField.toNormedField 𝕜 (@RCLike.toDenselyNormedField 𝕜 inst)))))))))) →
-            @LE.le Nat instLENat
-              (@HAdd.hAdd Nat Nat Nat (@instHAdd Nat instAddNat) (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 i) k)
+                              (@DenselyNormedField.toNormedField 𝕜
+                                (@RCLike.toDenselyNormedField 𝕜 inst))))))))))
+            → @LE.le Nat instLENat
+              (@HAdd.hAdd Nat Nat Nat (@instHAdd Nat instAddNat)
+                (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 i) k)
               (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 j) := by
   intro 𝕜 _ n _ _ X hX k
   induction k with
@@ -103,7 +105,9 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
     have hlj : l < j := by
       by_contra hle
       exact right_ne_zero_of_mul hl (hX l j (not_lt.mp hle))
-    have h2 : UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow l < UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow j := by
+    have h2
+        : UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow l
+          < UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow j := by
       unfold UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow
       apply Finset.card_lt_card
       refine ⟨fun x hx => ?_, fun hsub => ?_⟩

@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.AlgebraMapNeZeroOfMemHcompl
 
 @[expose] public section
 
@@ -54,12 +55,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemVR
 
-open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne nonZeroDivisors
+open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence
+  Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne nonZeroDivisors
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
-    hcompl (K := K) p ≤ p.primeCompl := by
+theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    : hcompl (K := K) p ≤ p.primeCompl := by
   have := hp.isPrime
   unfold hcompl
   rw [Submonoid.closure_le]
@@ -69,8 +71,9 @@ theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
 theorem one_mem_locR (p : Ideal (𝓞 K)) : (1 : K) ∈ locR (K := K) p :=
   ⟨1, (hcompl (K := K) p).one_mem, by rw [one_smul]; exact Submodule.mem_one.2 ⟨1, map_one _⟩⟩
 
-theorem mul_mem_locR {p : Ideal (𝓞 K)} {x y : K} (hx : x ∈ locR (K := K) p) (hy : y ∈ locR (K := K) p) :
-    x * y ∈ locR (K := K) p := by
+theorem mul_mem_locR
+    {p : Ideal (𝓞 K)} {x y : K} (hx : x ∈ locR (K := K) p) (hy : y ∈ locR (K := K) p)
+    : x * y ∈ locR (K := K) p := by
   obtain ⟨s, hs, hsx⟩ := hx
   obtain ⟨t, ht, hty⟩ := hy
   refine ⟨s * t, (hcompl (K := K) p).mul_mem hs ht, ?_⟩
@@ -80,14 +83,10 @@ theorem mul_mem_locR {p : Ideal (𝓞 K)} {x y : K} (hx : x ∈ locR (K := K) p)
   rw [map_mul, hr, hr', Algebra.smul_def, Algebra.smul_def, Algebra.smul_def, map_mul]
   ring
 
-theorem conjO_mem_hcompl {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ hcompl (K := K) p) :
-    conjO K s ∈ hcompl (K := K) p := by
-  apply Formalism.HermitianLattices.Ext.L3.SplitA.conjO_mem_hcompl <;> assumption
-
-theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p) :
-    star x ∈ locR (K := K) p := by
+theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p)
+    : star x ∈ locR (K := K) p := by
   obtain ⟨s, hs, hsx⟩ := hx
-  refine ⟨conjO K s, conjO_mem_hcompl hs, ?_⟩
+  refine ⟨conjO K s, _root_.Formalism.HermitianLattices.Ext.L3.WA.conjO_mem_hcompl hs, ?_⟩
   obtain ⟨r, hr⟩ := Submodule.mem_one.1 hsx
   refine Submodule.mem_one.2 ⟨conjO K r, ?_⟩
   rw [Algebra.smul_def] at hr ⊢
@@ -95,8 +94,8 @@ theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p) 
   have e2 : algebraMap (𝓞 K) K (conjO K s) = star (algebraMap (𝓞 K) K s) := rfl
   rw [e1, e2, hr, star_mul']
 
-theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x ∈ locR (K := K) p) :
-    x ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x ∈ locR (K := K) p)
+    : x ∈ (1 : Submodule (𝓞 K) K) := by
   let J : Ideal (𝓞 K) := (1 : Submodule (𝓞 K) K).comap (LinearMap.toSpanSingleton (𝓞 K) K x)
   have hJ : J = ⊤ := by
     by_contra hne
@@ -111,9 +110,12 @@ theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x 
   change LinearMap.toSpanSingleton (𝓞 K) K x 1 ∈ (1 : Submodule (𝓞 K) K) at h1
   rwa [LinearMap.toSpanSingleton_apply, one_smul] at h1
 
-theorem exists_local (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) {M : Submodule (𝓞 K) K}
-    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
-    ∃ z : K, star z * z = 1 ∧ ∀ y : K, y ∈ loc (K := K) p M ↔ ∃ r ∈ locR (K := K) p, y = r * z := by
+theorem exists_local
+    (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
+    {M : Submodule (𝓞 K) K} (hM : M ∈ genus h (1 : Submodule (𝓞 K) K))
+    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    : ∃ z : K,
+      star z * z = 1 ∧ ∀ y : K, y ∈ loc (K := K) p M ↔ ∃ r ∈ locR (K := K) p, y = r * z := by
   obtain ⟨g, hg, hgM⟩ := hM.2 p hp
   refine ⟨g 1, (mem_isom_iff h1 g).1 hg, fun y => ?_⟩
   have hgx : ∀ x, g x = x * g 1 := by
@@ -129,24 +131,34 @@ theorem exists_local (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) {M : 
     rw [← hgx, LinearEquiv.symm_apply_apply]
     exact hr
 
-theorem norm_unit (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) {M M' : Submodule (𝓞 K) K}
-    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) (hM' : M' ∈ genus h (1 : Submodule (𝓞 K) K)) {a : K}
-    (he : M = Submodule.span (𝓞 K) {a} * M') :
-    a * star a ∈ (1 : Submodule (𝓞 K) K) ∧ (a * star a)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
-  have key : ∀ p : Ideal (𝓞 K), p.IsMaximal →
-      a * star a ∈ locR (K := K) p ∧ (a * star a)⁻¹ ∈ locR (K := K) p := by
+theorem norm_unit
+    (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
+    {M M' : Submodule (𝓞 K) K}
+    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) (hM' : M' ∈ genus h (1 : Submodule (𝓞 K) K))
+    {a : K} (he : M = Submodule.span (𝓞 K) {a} * M')
+    : a * star a ∈ (1 : Submodule (𝓞 K) K) ∧ (a * star a)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
+  have key
+      : ∀ p : Ideal (𝓞 K),
+        p.IsMaximal → a * star a ∈ locR (K := K) p ∧ (a * star a)⁻¹ ∈ locR (K := K) p := by
     intro p hp
     obtain ⟨z, hz, hzM⟩ := exists_local h h1 hM hp
     obtain ⟨z', hz', hzM'⟩ := exists_local h h1 hM' hp
     have hl : loc (K := K) p M = Submodule.span (𝓞 K) {a} * loc (K := K) p M' := by
       rw [he, loc_mul hp]
-    have hzin : z ∈ loc (K := K) p M := (hzM z).2 ⟨1, one_mem_locR p, (one_mul z).symm⟩
+    have hzin : z ∈ loc (K := K) p M :=
+      (hzM z).2
+        ⟨1, _root_.Formalism.HermitianLattices.Ext.L3.SplitA.one_mem_locR p, (one_mul z).symm⟩
     rw [hl, Submodule.mem_span_singleton_mul] at hzin
     obtain ⟨m, hm, hmz⟩ := hzin
     obtain ⟨r, hr, rfl⟩ := (hzM' m).1 hm
     have haz : a * z' ∈ loc (K := K) p M := by
       rw [hl, Submodule.mem_span_singleton_mul]
-      exact ⟨z', (hzM' z').2 ⟨1, one_mem_locR p, (one_mul z').symm⟩, rfl⟩
+      exact ⟨
+        z',
+        (hzM' z').2
+          ⟨1, _root_.Formalism.HermitianLattices.Ext.L3.SplitA.one_mem_locR p, (one_mul z').symm⟩,
+        rfl
+      ⟩
     obtain ⟨r', hr', hr'e⟩ := (hzM _).1 haz
     have hz1 : z * star z = 1 := by rw [mul_comm]; exact hz
     have hz1' : z' * star z' = 1 := by rw [mul_comm]; exact hz'

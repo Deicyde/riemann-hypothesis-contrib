@@ -102,7 +102,6 @@ theorem norm_int
 
 theorem isUnitary_of_inf (χ : HChar E) (h : ∀ y, ‖((chiInf χ y : ℂˣ) : ℂ)‖ = 1) : χ.IsUnitary := by
   intro z
-  change ‖((χ.1 z : ℂˣ) : ℂ)‖ = 1
   obtain ⟨n, hn, -, h1⟩ :=
     Subgroup.exists_pow_mem_of_index_ne_zero
       (GlobalTheory.Mem.UnitIndex.finiteIndex_unitIdl_sup E).index_ne_zero z
@@ -147,7 +146,6 @@ theorem norm_chiInf (χ : HChar E) (h : ∀ z, star z = z → dchi χ z = 0) (y 
       at h3
     exact (mul_eq_zero.1 h3).resolve_left (by positivity)
   have h3 : ∀ z : Cinf E, (dchi χ z).re = 0 := fun z => by
-
     rw [← Finset.univ_sum_single z, map_sum, Complex.re_sum]
     refine Finset.sum_eq_zero fun w _ => ?_
     have e

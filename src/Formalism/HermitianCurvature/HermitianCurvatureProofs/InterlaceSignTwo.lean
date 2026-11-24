@@ -57,8 +57,8 @@ open Formalism.FourierDecayAlt.M Formalism.FourierDecayAlt Finset
 
 namespace Formalism.FourierDecayAlt.P.Mx3
 
-theorem rho_eq (P : Par) (π : Ty P) (i : ℕ) (h : 1 ≤ i ∧ i ≤ P.k - 1) :
-    rho P π i = P.lo i + (((π ⟨i - 1, by omega⟩ : Fin _) : ℕ) : ℝ) := by
+theorem rho_eq (P : Par) (π : Ty P) (i : ℕ) (h : 1 ≤ i ∧ i ≤ P.k - 1)
+    : rho P π i = P.lo i + (((π ⟨i - 1, by omega⟩ : Fin _) : ℕ) : ℝ) := by
   simp only [rho, dif_pos h]
 
 theorem tyInterlaces : TyInterlaces := by
@@ -76,8 +76,10 @@ theorem tyInterlaces : TyInterlaces := by
   have h0 : (0 : ℝ) ≤ (((π ⟨i - 1, by omega⟩ : Fin _) : ℕ) : ℝ) := Nat.cast_nonneg _
   have a1 : P.hi i ≤ P.u i - 1 / 2 := by unfold Par.hi; linarith [min_le_left (P.u i) (P.u' i)]
   have a2 : P.hi i ≤ P.u' i - 1 / 2 := by unfold Par.hi; linarith [min_le_right (P.u i) (P.u' i)]
-  have a3 : P.u (i + 1) + 1 / 2 ≤ P.lo i := by unfold Par.lo; linarith [le_max_left (P.u (i + 1)) (P.u' (i + 1))]
-  have a4 : P.u' (i + 1) + 1 / 2 ≤ P.lo i := by unfold Par.lo; linarith [le_max_right (P.u (i + 1)) (P.u' (i + 1))]
+  have a3 : P.u (i + 1) + 1 / 2 ≤ P.lo i := by
+    unfold Par.lo; linarith [le_max_left (P.u (i + 1)) (P.u' (i + 1))]
+  have a4 : P.u' (i + 1) + 1 / 2 ≤ P.lo i := by
+    unfold Par.lo; linarith [le_max_right (P.u (i + 1)) (P.u' (i + 1))]
   refine ⟨by linarith, by linarith, by linarith, by linarith⟩
 
 theorem rhoUp : RhoUp := by
@@ -88,8 +90,8 @@ theorem rhoUp : RhoUp := by
   simp only [e]
   split_ifs <;> push_cast <;> ring
 
-theorem mono (k : ℕ) (u u' ρ : ℕ → ℝ) (h : I.Interlaces k u u' ρ) :
-    ∀ d i, 1 ≤ i → i + d ≤ k → u (i + d) ≤ u i ∧ u' (i + d) ≤ u' i := by
+theorem mono (k : ℕ) (u u' ρ : ℕ → ℝ) (h : I.Interlaces k u u' ρ)
+    : ∀ d i, 1 ≤ i → i + d ≤ k → u (i + d) ≤ u i ∧ u' (i + d) ≤ u' i := by
   intro d
   induction d with
   | zero => intro i _ _; simp
@@ -101,10 +103,12 @@ theorem mono (k : ℕ) (u u' ρ : ℕ → ℝ) (h : I.Interlaces k u u' ρ) :
     rw [e]
     constructor <;> linarith [b.1, b.2.1, b.2.2.1, b.2.2.2]
 
-theorem val_congr (P : Par) (π : Ty P) (a b : Fin (P.k - 1)) (h : a = b) :
-    ((π a : Fin _) : ℕ) = ((π b : Fin _) : ℕ) := by subst h; rfl
+theorem val_congr (P : Par) (π : Ty P) (a b : Fin (P.k - 1)) (h : a = b)
+    : ((π a : Fin _) : ℕ) = ((π b : Fin _) : ℕ) := by
+  subst h; rfl
 
-theorem lo_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) : ∃ n : ℤ, P.lo i - P.u 1 - 1 / 2 = n := by
+theorem lo_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1))
+    : ∃ n : ℤ, P.lo i - P.u 1 - 1 / 2 = n := by
   have h := Finset.mem_Icc.1 hi
   obtain ⟨a, ha⟩ := hP.int_u (i + 1) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
   obtain ⟨b, hb⟩ := hP.int_u' (i + 1) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
@@ -113,7 +117,8 @@ theorem lo_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) : �
   · exact ⟨a, by rw [h]; linarith⟩
   · exact ⟨b, by rw [h]; linarith⟩
 
-theorem hi_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) : ∃ n : ℤ, P.hi i - P.u 1 + 1 / 2 = n := by
+theorem hi_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1))
+    : ∃ n : ℤ, P.hi i - P.u 1 + 1 / 2 = n := by
   have h := Finset.mem_Icc.1 hi
   obtain ⟨a, ha⟩ := hP.int_u i (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
   obtain ⟨b, hb⟩ := hP.int_u' i (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
@@ -125,9 +130,11 @@ theorem hi_int (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) : �
 theorem floor_of_int (x : ℝ) (h0 : 0 ≤ x) (z : ℤ) (hz : x = z) : ((⌊x⌋₊ : ℕ) : ℝ) = x := by
   have hz0 : 0 ≤ z := by have : (0 : ℝ) ≤ (z : ℝ) := hz ▸ h0; exact_mod_cast this
   obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hz0
-  rw [hz]; simp
+  rw [hz]
+  simp
 
-theorem wid_eq (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) : (P.wid i : ℝ) = P.hi i - P.lo i := by
+theorem wid_eq (P : Par) (hP : P.OK) (i : ℕ) (hi : i ∈ Icc 1 (P.k - 1))
+    : (P.wid i : ℝ) = P.hi i - P.lo i := by
   obtain ⟨a, ha⟩ := lo_int P hP i hi
   obtain ⟨b, hb⟩ := hi_int P hP i hi
   exact floor_of_int _ (by linarith [hP.gap i hi]) (b - a - 1) (by push_cast; linarith)
@@ -136,13 +143,16 @@ theorem tyComplete : TyComplete := by
   intro P hP
   constructor
   · intro ρ hI hint
-    have key : ∀ i ∈ Icc 1 (P.k - 1), 0 ≤ ρ i - P.lo i ∧ ρ i - P.lo i ≤ P.hi i - P.lo i ∧
-        ((⌊ρ i - P.lo i⌋₊ : ℕ) : ℝ) = ρ i - P.lo i := by
+    have key
+        : ∀ i ∈ Icc 1 (P.k - 1),
+          0 ≤ ρ i - P.lo i ∧ ρ i - P.lo i ≤ P.hi i - P.lo i
+            ∧ ((⌊ρ i - P.lo i⌋₊ : ℕ) : ℝ) = ρ i - P.lo i := by
       intro i hi
       have b := hI i hi
       have c1 : P.lo i ≤ ρ i := by
         unfold Par.lo
-        have : max (P.u (i + 1)) (P.u' (i + 1)) ≤ ρ i - 1 / 2 := max_le (by linarith [b.2.2.1]) (by linarith [b.2.2.2])
+        have : max (P.u (i + 1)) (P.u' (i + 1)) ≤ ρ i - 1 / 2 :=
+          max_le (by linarith [b.2.2.1]) (by linarith [b.2.2.2])
         linarith
       have c2 : ρ i ≤ P.hi i := by
         unfold Par.hi
@@ -150,7 +160,8 @@ theorem tyComplete : TyComplete := by
         linarith
       obtain ⟨a, ha⟩ := lo_int P hP i hi
       obtain ⟨n, hn⟩ := hint i hi
-      exact ⟨by linarith, by linarith, floor_of_int _ (by linarith) (n - a) (by push_cast; linarith)⟩
+      exact
+        ⟨by linarith, by linarith, floor_of_int _ (by linarith) (n - a) (by push_cast; linarith)⟩
     refine ⟨fun i => ⟨⌊ρ ((i : ℕ) + 1) - P.lo ((i : ℕ) + 1)⌋₊, ?_⟩, ?_⟩
     · have hi : (i : ℕ) + 1 ∈ Icc 1 (P.k - 1) := Finset.mem_Icc.2 ⟨by omega, by have := i.2; omega⟩
       exact Nat.lt_succ_of_le (Nat.floor_le_floor (key _ hi).2.1)
@@ -159,28 +170,35 @@ theorem tyComplete : TyComplete := by
       rw [rho_eq P _ i h]
       have e : i - 1 + 1 = i := by omega
       simp only [e]
-      rw [(key i hi).2.2]; ring
+      rw [(key i hi).2.2]
+      ring
   · intro π π' h
     funext i
     apply Fin.ext
     have hi : (i : ℕ) + 1 ∈ Icc 1 (P.k - 1) := Finset.mem_Icc.2 ⟨by omega, by have := i.2; omega⟩
     have h1 := h _ hi
     rw [rho_eq P π _ (Finset.mem_Icc.1 hi), rho_eq P π' _ (Finset.mem_Icc.1 hi)] at h1
-    have h2 : (((π ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) : ℝ) = (((π' ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) : ℝ) := by
+    have h2
+        : (((π ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) : ℝ)
+          = (((π' ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) : ℝ) := by
       linarith
-    have h3 : ((π ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) = ((π' ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) := by
+    have h3
+        : ((π ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ)
+          = ((π' ⟨(i : ℕ) + 1 - 1, by have := i.2; omega⟩ : Fin _) : ℕ) := by
       exact_mod_cast h2
     rw [val_congr P π _ i (Fin.ext (by simp)), val_congr P π' _ i (Fin.ext (by simp))] at h3
     exact h3
 
-theorem ord (k : ℕ) (u u' ρ : ℕ → ℝ) (hI : I.Interlaces k u u' ρ) (l : ℕ) (hl : l ∈ Icc 1 (k - 1)) :
-    (∀ i ∈ Icc 1 k, i ≤ l → u l ≤ u i ∧ u' l ≤ u' i) ∧ (∀ i ∈ Icc 1 k, l < i → u i ≤ u (l + 1) ∧ u' i ≤ u' (l + 1)) ∧
-    (∀ j ∈ Icc 1 (k - 1), j < l → u l + 1 / 2 ≤ ρ j ∧ u' l + 1 / 2 ≤ ρ j) ∧
-    (∀ j ∈ Icc 1 (k - 1), l < j → ρ j + 1 / 2 ≤ u (l + 1) ∧ ρ j + 1 / 2 ≤ u' (l + 1)) := by
+theorem ord (k : ℕ) (u u' ρ : ℕ → ℝ) (hI : I.Interlaces k u u' ρ) (l : ℕ) (hl : l ∈ Icc 1 (k - 1))
+    : (∀ i ∈ Icc 1 k, i ≤ l → u l ≤ u i ∧ u' l ≤ u' i)
+      ∧ (∀ i ∈ Icc 1 k, l < i → u i ≤ u (l + 1) ∧ u' i ≤ u' (l + 1))
+      ∧ (∀ j ∈ Icc 1 (k - 1), j < l → u l + 1 / 2 ≤ ρ j ∧ u' l + 1 / 2 ≤ ρ j)
+      ∧ (∀ j ∈ Icc 1 (k - 1), l < j → ρ j + 1 / 2 ≤ u (l + 1) ∧ ρ j + 1 / 2 ≤ u' (l + 1)) := by
   apply Formalism.FourierDecayAlt.P.Mx4.ord <;> assumption
 
-theorem nrm_pos (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π π' : Ty P) (hU : Up P l π π') :
-    0 < Nrm P l π := by
+theorem nrm_pos
+    (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π π' : Ty P) (hU : Up P l π π')
+    : 0 < Nrm P l π := by
   have hI := tyInterlaces P hP π
   have hI' := tyInterlaces P hP π'
   have hr := rhoUp P l π π' hU l hl
@@ -211,29 +229,34 @@ theorem nrm_pos (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π
     · have := o4 j hj1 (by omega)
       apply mul_pos_of_neg_of_neg <;> linarith [b.2.2.1, b.2.2.2, this.1, this.2]
 
-theorem nrm_down (P : Par) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π π' : Ty P) (hU : Up P l π π') :
-    NrmDown P l π' = Nrm P l π := by
+theorem nrm_down (P : Par) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π π' : Ty P) (hU : Up P l π π')
+    : NrmDown P l π' = Nrm P l π := by
   have hr := rhoUp P l π π' hU
   have hrl := hr l hl
   rw [if_pos rfl] at hrl
   unfold NrmDown Nrm
   rw [hrl]
-  have e1 : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π' j - (rho P π l + 1) + 1) =
-      ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l) := by
+  have e1
+      : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π' j - (rho P π l + 1) + 1)
+        = ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l) := by
     refine Finset.prod_congr rfl ?_
     intro j hj
-    rw [hr j (Finset.mem_of_mem_erase hj), if_neg (Finset.ne_of_mem_erase hj)]; ring
-  have e2 : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π' j - (rho P π l + 1)) =
-      ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1) := by
+    rw [hr j (Finset.mem_of_mem_erase hj), if_neg (Finset.ne_of_mem_erase hj)]
+    ring
+  have e2
+      : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π' j - (rho P π l + 1))
+        = ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1) := by
     refine Finset.prod_congr rfl ?_
     intro j hj
-    rw [hr j (Finset.mem_of_mem_erase hj), if_neg (Finset.ne_of_mem_erase hj)]; ring
+    rw [hr j (Finset.mem_of_mem_erase hj), if_neg (Finset.ne_of_mem_erase hj)]
+    ring
   rw [e1, e2]
   congr 3
   ring
 
-theorem top (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π π') :
-    rho P π l = P.hi l := by
+theorem top
+    (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π π')
+    : rho P π l = P.hi l := by
   have hl' := Finset.mem_Icc.1 hl
   have e : l - 1 + 1 = l := by omega
   by_contra hne
@@ -244,17 +267,17 @@ theorem top (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : T
     have h2 := (π ⟨l - 1, by omega⟩).2
     simp only [e] at h2
     have h3 : ((π ⟨l - 1, by omega⟩ : Fin _) : ℕ) = P.wid l := by omega
-    rw [rho_eq P π l hl', h3, wid_eq P hP l hl]; ring
+    rw [rho_eq P π l hl', h3, wid_eq P hP l hl]
+    ring
   refine ⟨fun i => if hi : (i : ℕ) + 1 = l then ⟨(π i : ℕ) + 1, ?_⟩ else π i, ?_⟩
   · have : i = ⟨l - 1, by omega⟩ := Fin.ext (by simp; omega)
-    rw [val_congr P π _ _ this, hi]; omega
+    rw [val_congr P π _ _ this, hi]
+    omega
   · intro i
-    by_cases hi : (i : ℕ) + 1 = l
-    · simp [hi]
-    · simp [hi]
+    by_cases hi : (i : ℕ) + 1 = l <;> simp [hi]
 
-theorem bot (P : Par) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π' π) :
-    rho P π l = P.lo l := by
+theorem bot (P : Par) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π' π)
+    : rho P π l = P.lo l := by
   have hl' := Finset.mem_Icc.1 hl
   by_contra hne
   apply h
@@ -262,14 +285,16 @@ theorem bot (P : Par) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬
     by_contra hge
     apply hne
     have h3 : ((π ⟨l - 1, by omega⟩ : Fin _) : ℕ) = 0 := by omega
-    rw [rho_eq P π l hl', h3]; simp
+    rw [rho_eq P π l hl', h3]
+    simp
   refine ⟨fun i => if hi : (i : ℕ) + 1 = l then ⟨(π i : ℕ) - 1, ?_⟩ else π i, ?_⟩
   · have := (π i).2; omega
   · intro i
     by_cases hi : (i : ℕ) + 1 = l
     · have : i = ⟨l - 1, by omega⟩ := Fin.ext (by simp; omega)
       have h5 := val_congr P π _ _ this
-      simp [hi]; omega
+      simp [hi]
+      omega
     · simp [hi]
 
 theorem nrmFacts : NrmFacts := by
@@ -279,39 +304,52 @@ theorem nrmFacts : NrmFacts := by
   · intro h
     have ht := top P hP l hl π h
     unfold Nrm I.qpoly
-    have : ∏ i ∈ Icc 1 P.k, ((-rho P π l - 1 + 1 / 2 + P.u i) * (-rho P π l - 1 + 1 / 2 + P.u' i)) = 0 := by
+    have : ∏ i ∈ Icc 1 P.k, ((-rho P π l - 1 + 1 / 2 + P.u i) * (-rho P π l - 1 + 1 / 2 + P.u' i))
+        = 0 := by
       apply Finset.prod_eq_zero (i := l) (Finset.mem_Icc.2 ⟨hl'.1, by omega⟩)
-      rw [ht]; unfold Par.hi
+      rw [ht]
+      unfold Par.hi
       rcases min_choice (P.u l) (P.u' l) with h | h <;> rw [h] <;> ring
-    rw [this]; simp
+    rw [this]
+    simp
   · intro h
     have ht := bot P l hl π h
     unfold NrmDown I.qpoly
     have : ∏ i ∈ Icc 1 P.k, ((-rho P π l + 1 / 2 + P.u i) * (-rho P π l + 1 / 2 + P.u' i)) = 0 := by
       apply Finset.prod_eq_zero (i := l + 1) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
-      rw [ht]; unfold Par.lo
+      rw [ht]
+      unfold Par.lo
       rcases max_choice (P.u (l + 1)) (P.u' (l + 1)) with h | h <;> rw [h] <;> ring
-    rw [this]; simp
+    rw [this]
+    simp
 
-theorem num_zero (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π π') :
-    I.qpoly P.k P.T P.T' P.u P.u' (-rho P π l - 1) = 0 := by
+theorem num_zero
+    (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) (h : ¬ ∃ π', Up P l π π')
+    : I.qpoly P.k P.T P.T' P.u P.u' (- rho P π l - 1) = 0 := by
   have hl' := Finset.mem_Icc.1 hl
   have ht := top P hP l hl π h
   unfold I.qpoly
-  have : ∏ i ∈ Icc 1 P.k, ((-rho P π l - 1 + 1 / 2 + P.u i) * (-rho P π l - 1 + 1 / 2 + P.u' i)) = 0 := by
+  have : ∏ i ∈ Icc 1 P.k, ((-rho P π l - 1 + 1 / 2 + P.u i) * (-rho P π l - 1 + 1 / 2 + P.u' i))
+      = 0 := by
     apply Finset.prod_eq_zero (i := l) (Finset.mem_Icc.2 ⟨hl'.1, by omega⟩)
-    rw [ht]; unfold Par.hi
+    rw [ht]
+    unfold Par.hi
     rcases min_choice (P.u l) (P.u' l) with h | h <;> rw [h] <;> ring
-  rw [this]; simp
+  rw [this]
+  simp
 
-theorem nrm_key (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P) :
-    Nrm P l π * ((∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l)) *
-      ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1)) = -I.qpoly P.k P.T P.T' P.u P.u' (-rho P π l - 1) := by
+theorem nrm_key (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π : Ty P)
+    : Nrm P l π
+        * ((∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l))
+          * ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1))
+      = - I.qpoly P.k P.T P.T' P.u P.u' (- rho P π l - 1) := by
   by_cases h : ∃ π', Up P l π π'
   · obtain ⟨π', hU⟩ := h
     have hp := nrm_pos P hP l hl π π' hU
-    have hD : ((∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l)) *
-      ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1)) ≠ 0 := by
+    have hD
+        : ((∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l))
+            * ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (rho P π j - rho P π l - 1))
+          ≠ 0 := by
       intro h0
       unfold Nrm at hp
       rw [h0, div_zero] at hp
@@ -320,12 +358,13 @@ theorem nrm_key (P : Par) (hP : P.OK) (l : ℕ) (hl : l ∈ Icc 1 (P.k - 1)) (π
     exact div_mul_cancel₀ _ hD
   · rw [(nrmFacts P hP l hl π).2.1 h, num_zero P hP l hl π h]; simp
 
-theorem rho_inj (P : Par) (hP : P.OK) (π : Ty P) (i j : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) (hj : j ∈ Icc 1 (P.k - 1))
-    (hij : i < j) : rho P π j < rho P π i := by
+theorem rho_inj
+    (P : Par) (hP : P.OK) (π : Ty P)
+    (i j : ℕ) (hi : i ∈ Icc 1 (P.k - 1)) (hj : j ∈ Icc 1 (P.k - 1)) (hij : i < j)
+    : rho P π j < rho P π i := by
   have hI := tyInterlaces P hP π
   have o := (ord P.k P.u P.u' (rho P π) hI i hi).2.2.2 j hj hij
-  have b := hI i hi
-  linarith [o.1, b.2.2.1]
+  linarith [o.1, (hI i hi).2.2.1]
 
 open Polynomial in
 theorem wExact : WExact := by
@@ -349,35 +388,46 @@ theorem wExact : WExact := by
       · exact absurd h2 (ne_of_gt (rho_inj P hP π i j hi hj h))
       · exact absurd h2 (ne_of_lt (rho_inj P hP π j i hj hi h))
     · intro l hl
-      have e : (X + C ((rho P π l : ℂ) + 1) : ℂ[X]) = X - C (-((rho P π l : ℂ) + 1)) := by rw [C_neg, sub_neg_eq_add]
+      have e : (X + C ((rho P π l : ℂ) + 1) : ℂ[X]) = X - C (-((rho P π l : ℂ) + 1)) := by
+        rw [C_neg, sub_neg_eq_add]
       rw [e, dvd_iff_isRoot, IsRoot.def]
       unfold wNum
       rw [eval_add, eval_finsetSum, Finset.sum_eq_single l]
       · have hk := nrm_key P hP l hl π
         have hk' := congrArg (fun x : ℝ => (x : ℂ)) hk
-        simp only [Complex.ofReal_mul, Complex.ofReal_prod, Complex.ofReal_sub, Complex.ofReal_neg, Complex.ofReal_one] at hk'
-        have hq : eval (-((rho P π l : ℂ) + 1)) (qP P) = ((I.qpoly P.k P.T P.T' P.u P.u' (-rho P π l - 1) : ℝ) : ℂ) := by
+        simp only [Complex.ofReal_mul, Complex.ofReal_prod, Complex.ofReal_sub, Complex.ofReal_neg,
+            Complex.ofReal_one]
+          at hk'
+        have hq
+            : eval (-((rho P π l : ℂ) + 1)) (qP P)
+              = ((I.qpoly P.k P.T P.T' P.u P.u' (- rho P π l - 1) : ℝ) : ℂ) := by
           unfold qP I.qpoly
           simp only [eval_mul, eval_C, eval_prod, eval_add, eval_X]
           push_cast
           congr 1
           refine Finset.prod_congr rfl ?_
-          intro i _; ring
+          intro i _
+          ring
         rw [hq]
         simp only [eval_mul, eval_C, eval_prod, eval_add, eval_X]
-        have e1 : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (-((rho P π l : ℂ) + 1) + (rho P π j : ℂ)) =
-            ∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l - 1) :=
+        have e1
+            : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (-((rho P π l : ℂ) + 1) + (rho P π j : ℂ))
+              = ∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l - 1) :=
           Finset.prod_congr rfl (fun j _ => by ring)
-        have e2 : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (-((rho P π l : ℂ) + 1) + ((rho P π j : ℂ) + 1)) =
-            ∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l) :=
+        have e2
+            : ∏ j ∈ (Icc 1 (P.k - 1)).erase l, (-((rho P π l : ℂ) + 1) + ((rho P π j : ℂ) + 1))
+              = ∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l) :=
           Finset.prod_congr rfl (fun j _ => by ring)
-        rw [e1, e2, mul_comm (∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l - 1)), hk']
+        rw [e1, e2, mul_comm (∏ j ∈ (Icc 1 (P.k - 1)).erase l, ((rho P π j : ℂ) - rho P π l - 1)),
+          hk']
         ring
       · intro m _ hml
         simp only [eval_mul, eval_C, eval_prod, eval_add, eval_X]
-        have : ∏ j ∈ (Icc 1 (P.k - 1)).erase m, (-((rho P π l : ℂ) + 1) + ((rho P π j : ℂ) + 1)) = 0 :=
+        have : ∏ j ∈ (Icc 1 (P.k - 1)).erase m, (-((rho P π l : ℂ) + 1) + ((rho P π j : ℂ) + 1))
+            = 0 :=
           Finset.prod_eq_zero (i := l) (Finset.mem_erase.2 ⟨fun h => hml h.symm, hl⟩) (by ring)
-        rw [this]; simp
+        rw [this]
+        simp
       · intro h; exact absurd hl h
   have hmod := (modByMonic_eq_zero_iff_dvd hmonic).2 hdvd
   have := modByMonic_add_div (wNum P π) (coordinatePolynomial P π)
@@ -386,9 +436,7 @@ theorem wExact : WExact := by
 
 theorem realPoints : RealPoints := by
   intro P π Y
-  constructor
-  · simp [xC, I.xpoly]
-  · simp [qC, I.qpoly]
+  exact ⟨by simp [xC, I.xpoly], by simp [qC, I.qpoly]⟩
 
 theorem interlaceSignTwo : InterlaceSignTwo := by
   intro k u u' ρ l Y h1 h2 hI hC e he
@@ -416,21 +464,31 @@ theorem interlaceSignTwo : InterlaceSignTwo := by
   have hsplit : Icc 1 (k - 1) = Icc 1 (l - 1) ∪ Icc l (k - 1) := by
     ext i; simp only [Finset.mem_Icc, Finset.mem_union]; omega
   have hdisj : Disjoint (Icc 1 (l - 1)) (Icc l (k - 1)) := by
-    rw [Finset.disjoint_left]; intro i a b
-    have := Finset.mem_Icc.1 a; have := Finset.mem_Icc.1 b; omega
+    rw [Finset.disjoint_left]
+    intro i a b
+    have := Finset.mem_Icc.1 a
+    have := Finset.mem_Icc.1 b
+    omega
   have hcard : (Icc l (k - 1)).card = k - l := by simp; omega
   unfold I.xpoly
   rw [hsplit, Finset.prod_union hdisj]
-  have hneg : ∏ i ∈ Icc l (k - 1), (Y + e + ρ i) = (-1) ^ (k - l) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i)) := by
+  have hneg
+      : ∏ i ∈ Icc l (k - 1), (Y + e + ρ i)
+        = (-1) ^ (k - l) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i)) := by
     rw [← hcard, ← Finset.prod_const, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl ?_
-    intro i _; ring
+    intro i _
+    ring
   rw [hneg]
   have p1 := Finset.prod_pos hlow
   have p2 := Finset.prod_pos hhigh
   have sq : ((-1 : ℝ) ^ (k - l)) * (-1) ^ (k - l) = 1 := by rw [← mul_pow]; simp
-  calc (0:ℝ) < (∏ i ∈ Icc 1 (l - 1), (Y + e + ρ i)) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i)) := mul_pos p1 p2
-    _ = ((-1 : ℝ) ^ (k - l) * (-1) ^ (k - l)) * ((∏ i ∈ Icc 1 (l - 1), (Y + e + ρ i)) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i))) := by rw [sq, one_mul]
+  calc
+    (0 : ℝ) < (∏ i ∈ Icc 1 (l - 1), (Y + e + ρ i)) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i)) :=
+      mul_pos p1 p2
+    _ = ((-1 : ℝ) ^ (k - l) * (-1) ^ (k - l))
+        * ((∏ i ∈ Icc 1 (l - 1), (Y + e + ρ i)) * ∏ i ∈ Icc l (k - 1), (-(Y + e + ρ i))) := by
+      rw [sq, one_mul]
     _ = _ := by ring
 
 end Formalism.FourierDecayAlt.P.Mx3
@@ -440,7 +498,6 @@ namespace Formalism.FourierDecayAlt.P
 theorem types_interlace : Formalism.FourierDecayAlt.M.TyInterlaces := Mx3.tyInterlaces
 theorem types_complete : Formalism.FourierDecayAlt.M.TyComplete := Mx3.tyComplete
 theorem rho_raise : Formalism.FourierDecayAlt.M.RhoUp := Mx3.rhoUp
-theorem nrmFacts_statement : Formalism.FourierDecayAlt.M.NrmFacts := Mx3.nrmFacts
 theorem realPoints_statement : Formalism.FourierDecayAlt.M.RealPoints := Mx3.realPoints
 theorem weight_exact : Formalism.FourierDecayAlt.M.WExact := Mx3.wExact
 theorem interlace_sign_two : Formalism.FourierDecayAlt.M.InterlaceSignTwo := Mx3.interlaceSignTwo

@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.uniformisedTest_dimensions_and_split_fibre
           ∧ SmoothOfRelativeDimension S.g u.G.hom ∧ 4 ≤ S.N
           ∧ ∃ E : SplitExt (Sp (IsLocalRing.ResidueField u.V)),
             E.IsGt ((Over.pullback (spMap (IsLocalRing.residue u.V))).obj u.G) := by
-  first
-  | exact @GlobalTheory.ZH.utest_dim_and_split
-  | exact GlobalTheory.ZH.utest_dim_and_split
-  | (intros; apply GlobalTheory.ZH.utest_dim_and_split <;> assumption)
+  first | exact @GlobalTheory.ZH.utest_dim_and_split

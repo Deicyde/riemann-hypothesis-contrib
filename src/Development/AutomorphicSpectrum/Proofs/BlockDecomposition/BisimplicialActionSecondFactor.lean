@@ -317,7 +317,6 @@ theorem act_const
             = cst 1 (0 : Fin 1) := fun i ↦ by
       ext j; simp [cst]
     have key : act F (cst 2 (0 : Fin 1)) (dn F 1 x) = act F (cst 1 (0 : Fin 1)) x := by
-
       simp only [dn, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, cof_eq]
       simp only [← act_comp, c]
       simp [Fin.sum_univ_succ]

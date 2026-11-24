@@ -66,22 +66,26 @@ private theorem ext_gHadamard : _root_.ReciprocityTheory.ChartRestriction.G.I2.E
   intro n M
   simpa [Real.norm_eq_abs, sq_abs] using _root_.GlobalTheory.Hadamard.norm_det_le_prod_col M
 
-private theorem ext_cauchyBinetMax' : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.CauchyBinetMax := by
+private theorem ext_cauchyBinetMax'
+    : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.CauchyBinetMax := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.CauchyBinetMax
   intro i N r M hM hr
-  obtain ⟨S, hS⟩ := _root_.GlobalTheory.exists_two_rpow_le_norm_minor M hM (r := r) (by simpa using hr)
+  obtain ⟨S, hS⟩ :=
+    _root_.GlobalTheory.exists_two_rpow_le_norm_minor M hM (r := r) (by simpa using hr)
   refine ⟨_root_.GlobalTheory.subsetEnum S, ?_, hS⟩
   unfold _root_.GlobalTheory.subsetEnum
   exact (Finset.orderEmbOfFin _ _).strictMono
 
-private theorem ext_detPerturbation : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbation := by
+private theorem ext_detPerturbation
+    : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbation := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbation
   intro 𝕜 _ i κ _ w σ₀ ε Δmax hΔ
   classical
   set f := (Matrix.detRowAlternating : (Fin i → 𝕜) [⋀^Fin i]→ₗ[𝕜] 𝕜).toMultilinearMap with hf
   have hD : ∀ cols : Fin i → Fin i → 𝕜, (Matrix.of fun a j => cols j a).det = f cols := by
     intro cols
-    rw [show (Matrix.of fun a j => cols j a) = (Matrix.of cols).transpose from rfl, Matrix.det_transpose]
+    rw [show (Matrix.of fun a j => cols j a) = (Matrix.of cols).transpose from rfl,
+      Matrix.det_transpose]
     rfl
   have hΔ0 : 0 ≤ Δmax := (norm_nonneg _).trans (hΔ σ₀)
   set coef : Fin i → Option κ → 𝕜 := fun j o => Option.elim o 1 (ε j) with hcoef
@@ -90,9 +94,9 @@ private theorem ext_detPerturbation : _root_.ReciprocityTheory.ChartRestriction.
     funext j
     rw [Fintype.sum_option]
     simp [hcoef, hpick]
-  have hexp : f (fun j => w (σ₀ j) + ∑ k, ε j k • w k)
-      = ∑ r : Fin i → Option κ, (∏ j, coef j (r j)) • f (fun j => w (pick j (r j))) := by
-
+  have hexp
+      : f (fun j => w (σ₀ j) + ∑ k, ε j k • w k)
+        = ∑ r : Fin i → Option κ, (∏ j, coef j (r j)) • f (fun j => w (pick j (r j))) := by
     rw [hcol, MultilinearMap.map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     exact f.map_smul_univ (fun j => coef j (r j)) (fun j => w (pick j (r j)))
@@ -100,8 +104,9 @@ private theorem ext_detPerturbation : _root_.ReciprocityTheory.ChartRestriction.
   have hterm0 : (∏ j, coef j (r0 j)) • f (fun j => w (pick j (r0 j))) = f (fun j => w (σ₀ j)) := by
     simp [hr0, hcoef, hpick]
   rw [hD, hD, hexp, ← Finset.add_sum_erase _ _ (Finset.mem_univ r0), hterm0, add_sub_cancel_left]
-  have hbound : ∀ r : Fin i → Option κ, ‖(∏ j, coef j (r j)) • f (fun j => w (pick j (r j)))‖
-      ≤ (∏ j, ‖coef j (r j)‖) * Δmax := by
+  have hbound
+      : ∀ r : Fin i → Option κ,
+        ‖(∏ j, coef j (r j)) • f (fun j => w (pick j (r j)))‖ ≤ (∏ j, ‖coef j (r j)‖) * Δmax := by
     intro r
     rw [norm_smul, norm_prod]
     refine mul_le_mul_of_nonneg_left ?_ (by positivity)
@@ -115,14 +120,16 @@ private theorem ext_detPerturbation : _root_.ReciprocityTheory.ChartRestriction.
     rw [Fintype.sum_option]
     simp [hcoef]
   have hone : ∏ j, ‖coef j (r0 j)‖ = 1 := by simp [hr0, hcoef]
-  calc ‖∑ r ∈ Finset.univ.erase r0, (∏ j, coef j (r j)) • f (fun j => w (pick j (r j)))‖
-      ≤ ∑ r ∈ Finset.univ.erase r0, (∏ j, ‖coef j (r j)‖) * Δmax :=
-        (norm_sum_le _ _).trans (Finset.sum_le_sum fun r _ => hbound r)
+  calc
+    ‖∑ r ∈ Finset.univ.erase r0, (∏ j, coef j (r j)) • f (fun j => w (pick j (r j)))‖
+        ≤ ∑ r ∈ Finset.univ.erase r0, (∏ j, ‖coef j (r j)‖) * Δmax :=
+      (norm_sum_le _ _).trans (Finset.sum_le_sum fun r _ => hbound r)
     _ = (∏ j, (1 + ∑ k, ‖ε j k‖) - 1) * Δmax := by
-        rw [← Finset.sum_mul, ← hsum, ← Finset.add_sum_erase _ _ (Finset.mem_univ r0), hone]
-        ring
+      rw [← Finset.sum_mul, ← hsum, ← Finset.add_sum_erase _ _ (Finset.mem_univ r0), hone]
+      ring
 
-private theorem ext_detPerturbNumeric : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbNumeric := by
+private theorem ext_detPerturbNumeric
+    : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbNumeric := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetPerturbNumeric
   intro ρ hρ
   have hρ1 : (1 : ℝ) ≤ ρ := by exact_mod_cast hρ
@@ -133,8 +140,9 @@ private theorem ext_detPerturbNumeric : _root_.ReciprocityTheory.ChartRestrictio
     rw [Real.rpow_neg_one] at hle
     have : (ρ : ℝ) * (ρ : ℝ)⁻¹ = 1 := mul_inv_cancel₀ hρ0.ne'
     nlinarith
-  have h1 : (1 + (ρ : ℝ) ^ (-3 / 2 : ℝ) / 10) ^ ρ
-      ≤ Real.exp ((ρ : ℝ) * ((ρ : ℝ) ^ (-3 / 2 : ℝ) / 10)) := by
+  have h1
+      : (1 + (ρ : ℝ) ^ (-3 / 2 : ℝ) / 10) ^ ρ
+        ≤ Real.exp ((ρ : ℝ) * ((ρ : ℝ) ^ (-3 / 2 : ℝ) / 10)) := by
     rw [Real.exp_nat_mul]
     exact pow_le_pow_left₀ (by positivity)
       (by linarith [Real.add_one_le_exp ((ρ : ℝ) ^ (-3 / 2 : ℝ) / 10)]) ρ
@@ -146,8 +154,8 @@ private theorem ext_detPerturbNumeric : _root_.ReciprocityTheory.ChartRestrictio
     nlinarith [this.2]
   linarith
 
-private theorem two_pow_add_pow_sub_two_pow_mul_le (c : ℕ) (ε : ℝ) (h0 : 0 ≤ ε) (h1 : ε ≤ 1) :
-    ∀ i : ℕ, ((2 : ℝ) ^ c + ε) ^ i - 2 ^ (c * i) ≤ i * ε * (2 ^ c + 1) ^ i := by
+private theorem two_pow_add_pow_sub_two_pow_mul_le (c : ℕ) (ε : ℝ) (h0 : 0 ≤ ε) (h1 : ε ≤ 1)
+    : ∀ i : ℕ, ((2 : ℝ) ^ c + ε) ^ i - 2 ^ (c * i) ≤ i * ε * (2 ^ c + 1) ^ i := by
   intro i
   induction i with
   | zero => simp
@@ -156,35 +164,46 @@ private theorem two_pow_add_pow_sub_two_pow_mul_le (c : ℕ) (ε : ℝ) (h0 : 0 
     have hB1 : (1 : ℝ) ≤ 2 ^ c + 1 := by linarith
     have hbB : (2 : ℝ) ^ (c * i) ≤ (2 ^ c + 1) ^ (i + 1) := by
       rw [pow_mul]
-      have hbase : ((2 : ℝ) ^ c) ^ i ≤ (2 ^ c + 1) ^ i :=
-        pow_le_pow_left₀ hb (by linarith) i
+      have hbase : ((2 : ℝ) ^ c) ^ i ≤ (2 ^ c + 1) ^ i := pow_le_pow_left₀ hb (by linarith) i
       exact hbase.trans (pow_le_pow_right₀ hB1 (Nat.le_succ i))
     have ha : 0 ≤ (2 : ℝ) ^ c + ε := by linarith
     have hpos : 0 ≤ (i : ℝ) * ε * (2 ^ c + 1) ^ i := by positivity
-    have e : ((2 : ℝ) ^ c + ε) ^ (i + 1) - 2 ^ (c * (i + 1))
-        = (2 ^ c + ε) * ((2 ^ c + ε) ^ i - 2 ^ (c * i)) + ε * 2 ^ (c * i) := by
+    have e
+        : ((2 : ℝ) ^ c + ε) ^ (i + 1) - 2 ^ (c * (i + 1))
+          = (2 ^ c + ε) * ((2 ^ c + ε) ^ i - 2 ^ (c * i)) + ε * 2 ^ (c * i) := by
       rw [mul_add_one, pow_add (2 : ℝ) (c * i) c, pow_succ ((2 : ℝ) ^ c + ε) i]
       ring
     rw [e]
     have k1 := mul_le_mul_of_nonneg_left ih ha
     have k2 := mul_le_mul_of_nonneg_right (show (2 : ℝ) ^ c + ε ≤ 2 ^ c + 1 by linarith) hpos
     have k3 := mul_le_mul_of_nonneg_left hbB h0
-    have k4 : ((i + 1 : ℕ) : ℝ) * ε * (2 ^ c + 1) ^ (i + 1)
-        = (2 ^ c + 1) * (i * ε * (2 ^ c + 1) ^ i) + ε * (2 ^ c + 1) ^ (i + 1) := by
+    have k4
+        : ((i + 1 : ℕ) : ℝ) * ε * (2 ^ c + 1) ^ (i + 1)
+          = (2 ^ c + 1) * (i * ε * (2 ^ c + 1) ^ i) + ε * (2 ^ c + 1) ^ (i + 1) := by
       rw [Nat.cast_succ, pow_succ ((2 : ℝ) ^ c + 1) i]
       ring
     rw [k4]
     exact add_le_add (k1.trans k2) k3
 
-private theorem ext_detProductRest : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetProductRest := by
+private theorem ext_detProductRest
+    : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetProductRest := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.DetProductRest
   intro i c ε h0 h1
   exact two_pow_add_pow_sub_two_pow_mul_le c ε h0 h1 i
 
-theorem _root_.GlobalTheory.ext_all_inputs : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.All := by
+theorem _root_.GlobalTheory.ext_all_inputs
+    : _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.All := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.I2.Ext.All
-  exact ⟨_root_.GlobalTheory.packingCount, _root_.GlobalTheory.gaussTail_of_card_le, ext_ballVolume, ext_gHadamard,
-    _root_.GlobalTheory.nearestPlane_rounding, ext_cauchyBinetMax', ext_detPerturbation,
-    ext_detPerturbNumeric, ext_detProductRest⟩
+  exact ⟨
+    _root_.GlobalTheory.packingCount,
+    _root_.GlobalTheory.gaussTail_of_card_le,
+    ext_ballVolume,
+    ext_gHadamard,
+    _root_.GlobalTheory.nearestPlane_rounding,
+    ext_cauchyBinetMax',
+    ext_detPerturbation,
+    ext_detPerturbNumeric,
+    ext_detProductRest
+  ⟩
 
 end GlobalTheory

@@ -237,7 +237,7 @@ theorem ev_dehomog
       : (evHom hy).comp (dehomog c)
         = eval₂Hom (Int.castRingHom ℂ) (fun q : (Σ k, Bk n k) => z q / z ⟨q.1, c q.1⟩) := by
     refine MvPolynomial.ringHom_ext (fun r => ?_) (fun q => ?_)
-    · simp only [RingHom.comp_apply, map_intCast, eval₂Hom_C]
+    · simp only [RingHom.comp_apply, eval₂Hom_C]
       have : (C r : Pol n) = (r : Pol n) := map_intCast C r
       rw [this, map_intCast, map_intCast]
       rfl

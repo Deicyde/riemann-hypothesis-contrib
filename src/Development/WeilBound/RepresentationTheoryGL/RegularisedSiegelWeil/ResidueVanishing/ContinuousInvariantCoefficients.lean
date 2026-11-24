@@ -72,7 +72,6 @@ open GlobalTheory.StdUnn PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace PositivityTheory.Rg.Rsw.Kplug
 
-
 theorem continuation_through_chart : ContinuationThroughChart := by
   intro D ψ A B χ omh hW ν 𝓨 hν θ hθ μ hμ κ hκ omS hT lam hlam a ha p hp f hf hK Φ hΦ U d E hU hR hs
     hd hhol hc hi he

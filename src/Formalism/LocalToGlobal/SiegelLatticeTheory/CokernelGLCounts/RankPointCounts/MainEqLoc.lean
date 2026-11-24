@@ -100,7 +100,6 @@ theorem localInputG_of_le
   · intro x hx
     rw [ha x hx]
     first
-    | rfl
     | (
         unfold Formalism.L2.SG.Pf.MainEqCut.weightedGenericAmplitudeSq
           Formalism.L2.SG.Pf.MainEqCut.ampGen

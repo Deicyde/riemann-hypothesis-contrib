@@ -65,7 +65,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 
-
 noncomputable section
 
 namespace GlobalTheory.SmGL.Relabel

@@ -48,11 +48,6 @@ import Mathlib.Topology.Sheaves.Init
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem mem_span_X
-    {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O) (hf : constantCoeff f = 0)
-    : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
-  _root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X f hf
-
 private theorem der_algebraMap
     {O A Q : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup Q] [Module O Q]
     (x : A →ₐ[O] O) (D : A →ₗ[O] Q) (hD : D ∈ PtDer x Q)
@@ -154,6 +149,7 @@ theorem UpperTheory.V.Alg.der_extend
       exact h1
     have h1 :=
       hspan (f - algebraMap O _ (constantCoeff f))
-        (mem_span_X _ (by simp [MvPowerSeries.algebraMap_apply]))
+        (_root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X _
+          (by simp [MvPowerSeries.algebraMap_apply]))
     rw [map_sub, AlgHom.commutes, map_sub, der_algebraMap _ D hD, sub_zero] at h1
     exact h1

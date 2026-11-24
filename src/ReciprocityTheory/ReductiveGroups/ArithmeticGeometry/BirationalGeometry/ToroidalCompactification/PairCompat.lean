@@ -59,11 +59,7 @@ theorem away_ext
     {B : Type} [CommRing B] [Algebra S B]
     (f g : Localization.Away u →ₐ[S] B)
     : f = g := by
-  first
-  | exact Subsingleton.elim f g
-  | exact (IsLocalization.algHom_subsingleton (Submonoid.powers u)).elim f g
-  | exact AlgHom.coe_ringHom_injective (IsLocalization.ringHom_ext (Submonoid.powers u)
-      (by ext x; simp))
+  first | exact (IsLocalization.algHom_subsingleton (Submonoid.powers u)).elim f g
 
 abbrev Rv {S : Type} [CommRing S] (a b c : S) : Type := Localization.Away (algebraMap S (Qv a b) c)
 

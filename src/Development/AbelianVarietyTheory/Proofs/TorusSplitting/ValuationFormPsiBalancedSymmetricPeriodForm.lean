@@ -79,7 +79,7 @@ theorem hasVal_coord
     congrArg
       (fun f => (CommRingCat.Hom.hom f) (DegPre.toOpen (R := V) ⊤ r))
       (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (algebraMap V (FractionRing V))))
-  simp only [CommRingCat.comp_apply, CommRingCat.hom_ofHom] at hnat
+  simp only at hnat
   have hid : (Scheme.ΓSpecIso (CommRingCat.of V)).hom.hom (DegPre.toOpen ⊤ r) = r := by
     simp only [DegPre.toOpen, RingHom.coe_comp, Function.comp_apply]
     have : (homOfLE (le_top : (⊤ : (Spec (CommRingCat.of V)).Opens) ≤ ⊤)).op = 𝟙 _ :=

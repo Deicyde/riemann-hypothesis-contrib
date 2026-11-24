@@ -2,10 +2,11 @@ module
 
 public import Formalism.LocalToGlobal.ProjectiveLattices.IsCombAt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueFrameChangeByMatricesStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndCompStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeCommBaseChangeStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeExistsUniqueOfSamePointStatement
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueFrameChangeByMatrices
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndComp
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeCommBaseChange
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeExistsUniqueOfSamePoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -43,7 +44,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
 
 @[expose] public section
 
@@ -63,12 +63,13 @@ theorem frPt_eq_of_frMap_injective
         Function.Injective φ → z'.x = z.x → FrMap φ z w → FrMap φ z' w → z = z' := by
   intro _ E _ _ _ H Dw l Xo c S _ _ T _ _ φ z z' w hφ hx hz hz'
   obtain ⟨g, a, -, hga⟩ :=
-    (GlobalTheory.T.frameChange_exists_unique_of_same_point E H Dw l Xo c S z z').1 hx
+    (_root_.GlobalTheory.Frames.frChg_exists_unique E H Dw l Xo c S z z').1 hx
   have h1 :=
-    (GlobalTheory.T.frameChange_comm_baseChange E H Dw l Xo c S T φ z z' w w g (a : S) hga hz).1 hz'
-  have h2 := (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c T w w w).1
+    (_root_.GlobalTheory.Frames.ChgBC.frChg_baseChange E H Dw l Xo c S T φ z z' w w g (a : S) hga
+      hz).1 hz'
+  have h2 := (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c T w w w).1
   obtain ⟨hg, ha⟩ :=
-    (GlobalTheory.T.frameChange_exists_unique_of_same_point E H Dw l Xo c T w w).2 _ _ _ _ h1 h2
+    (_root_.GlobalTheory.Frames.frChg_exists_unique E H Dw l Xo c T w w).2 _ _ _ _ h1 h2
   have ha1 : (a : S) = ((1 : Sˣ) : S) := hφ (by rw [ha]; simp)
   have hg1 : g = fun _ => 1 := by
     funext τ
@@ -83,8 +84,8 @@ theorem frPt_eq_of_frMap_injective
     · simp [Matrix.one_apply_ne e]
   rw [ha1, hg1] at hga
   have h3 : FrChg (fun _ => 1) ((1 : Sˣ) : S) z z :=
-    (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c S z z z).1
-  exact (GlobalTheory.T.existsUnique_frameChangeByMatrices E H Dw l Xo c S z
+    (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c S z z z).1
+  exact (_root_.GlobalTheory.Frames.existsUnique_frChg E H Dw l Xo c S z
     (fun _ => 1)
     1
     (fun _ => by simp)).unique h3 hga

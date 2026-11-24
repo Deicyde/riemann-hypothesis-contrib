@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.isotropicDualMiddleParts_symplectic_orthogonal
     : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
         (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E),
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.isotropicDualMiddleParts_symplectic_orthogonal
               ∧ (∀ a x, symplO V W (isoPart V W C a) (midPart V V' W B x) = 0)
               ∧ (∀ a x, symplO V W (isoPart V W C' a) (midPart V V' W B x) = 0)
               ∧ (∀ a b, symplO V W (isoPart V W C' a) (isoPart V W C' b) = 0) := by
-  first
-  | exact @GlobalTheory.TwistFormsOrth.orthogonal
-  | exact GlobalTheory.TwistFormsOrth.orthogonal
-  | (intros; apply GlobalTheory.TwistFormsOrth.orthogonal <;> assumption)
+  first | exact @GlobalTheory.TwistFormsOrth.orthogonal

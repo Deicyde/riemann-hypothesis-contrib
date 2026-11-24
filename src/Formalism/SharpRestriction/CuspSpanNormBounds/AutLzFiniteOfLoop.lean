@@ -125,15 +125,13 @@ theorem card_le_cntCl
     rw [← h2] at h3
     exact hinj i j h3.2
   unfold cntCl
-  first
-  | exact ENat.card_le_card_of_injective hg
-  | (rw [← ENat.card_coe_set_eq]; exact ENat.card_le_card_of_injective hg)
+  first | exact ENat.card_le_card_of_injective hg
 
 theorem one_mem_NLam (D : D7) (Λ : LatV D) {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
     : (LinearEquiv.refl D.host.E (hS D).V) ∈ NLam Λ F := by
   simp only [NLam, IsAutLam, Set.mem_setOf_eq]
   refine ⟨⟨?_, ?_⟩, fun j x _ => by simp, fun x _ => by simp⟩
-  · first | exact (Formalism.HermitianLatticesTheory.isom _).one_mem | exact fun _ _ => rfl
+  · first | exact (Formalism.HermitianLatticesTheory.isom _).one_mem
   · ext x
     simp [Formalism.HermitianLatticesTheory.gmap]
 

@@ -1,7 +1,8 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.TypeConditions.DistinctAbsIrredConstituents
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.AbsIrrDistinctConstituentsAfterExtensionStatement
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.SplitRep
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.AbsIrrDistinctConstituentsAfterExtension
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -53,7 +54,7 @@ theorem UpperTheory.GalS.jointCondition_of_constituentCondition_split
     (hS : GlobalTheory.SplitCoef.OSplitAt D i)
     : AbsIrreducibleDistinct D i r := by
   obtain ⟨K', hK', hA, _, hK⟩ := h
-  exact GlobalTheory.T.absIrr_distinct_constituents_after_extension D i r hS hr K'
+  exact _root_.GlobalTheory.absIrrDistinct_repK_of_oSplitAt_of_mapRep_distinct D i r hS hr K'
     (algebraMap (Kf D.nd i) K') (fun x => (hK x).2)
 end
 

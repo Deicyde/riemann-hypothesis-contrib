@@ -116,7 +116,6 @@ theorem locFree_dual
         obtain ⟨n, hn⟩ := exists_uniform_pow R R' hR' (f l) (hf l) _ key
         refine ⟨n, ?_⟩
         have h5 : β.flip (∑ q, a q • C q) (∑ q, a' q • b q) = ∑ q, a' q * a q := by
-
           rw [map_sum (β.flip (∑ q, a q • C q))]
           refine Finset.sum_congr rfl fun q _ => ?_
           rw [map_smul, LinearMap.flip_apply, hsum, smul_eq_mul]

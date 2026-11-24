@@ -192,7 +192,7 @@ theorem weight_of_torus
         by_cases hc : i = a
         · subst hc
           simp
-        · simp [Matrix.single_apply, hc, Ne.symm hc]
+        · simp [hc, Ne.symm hc]
       · rw [Matrix.diagonal_apply_ne _ hij, Matrix.smul_apply, Matrix.single_apply,
           if_neg (fun hh => hij (hh.1.symm.trans hh.2)), smul_zero]
     show NormedSpace.exp _ = _
@@ -266,7 +266,7 @@ theorem weight_shift
       : K c c (K a b v)
         = K a b (K c c v) + ((if c = a then K c b else 0) - (if b = c then K a c else 0)) v := by
     rw [← hg c c a b]
-    simp [Module.End.mul_apply]
+    simp
   rw [e, hv c, map_smul]
   by_cases h1 : c = a
   · subst h1

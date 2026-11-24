@@ -53,7 +53,6 @@ open GlobalTheory.ExportSeries GlobalTheory.ConjTwist GlobalTheory.SeriesTie.Sca
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 namespace GlobalTheory.MtLatConj

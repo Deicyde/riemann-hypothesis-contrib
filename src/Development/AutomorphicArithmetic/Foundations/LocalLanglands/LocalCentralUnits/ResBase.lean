@@ -87,7 +87,7 @@ private theorem base_cong
       < 1)
     : A.valuation (algebraMap E Ω (y : E) - algebraMap E' Ω (x : E') ^ ((g ^ n - 1) / (g - 1)))
       < 1 := by
-  have hTR := tameRecAll
+  have hTR := _root_.UpperTheory.localArtin_inertia_valuation_of_uniformizer_prime
   have hg1 : 1 < g := (Fact.out : g.Prime).one_lt
   have hdvd : (g - 1) ∣ (g ^ n - 1) := by simpa using Nat.sub_dvd_pow_sub_pow g 1 n
   set e := (g ^ n - 1) / (g - 1) with he

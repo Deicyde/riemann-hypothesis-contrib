@@ -145,7 +145,7 @@ theorem deg_set_bound {N : ℕ} {μ : Fin N → ℝ} (hμ : IsHCParam μ)
       Formalism.QuantumDeterminants.fdegRatio N (μ + epsI I) a h1.1.injective (deg_hc_diff h1)
         h2.1.injective
     have hb :=
-      (Formalism.HermitianLatticeCounting.Final.ExpansionTerms.degStepBound N (μ + epsI I) a
+      (_root_.Formalism.HermitianLatticeCounting.P.degree_increment_bound N (μ + epsI I) a
         h1.1.injective (deg_hc_diff h1)).1 h2.1.injective
     rw [← hr] at hb
     have hN : (0 : ℝ) < N := by

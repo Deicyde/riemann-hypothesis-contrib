@@ -143,7 +143,7 @@ theorem IsSD.exists_norm'
   obtain ⟨y, hy, -, -, hprim, a, ha, hyy⟩ := exists_primitive_norm' hS hM.toIsLatIn hξ hu hξu
   obtain ⟨w, hw, hn⟩ := hM.exists_not_dv hπ hy hprim
   have huf : star u = u := by
-    have e : starRingEnd K (h ξ ξ) = h ξ ξ := by first | exact hs ξ ξ | exact hs.eq ξ ξ
+    have e : starRingEnd K (h ξ ξ) = h ξ ξ := by first | exact hs.eq ξ ξ
     rw [hξu, starRingEnd_apply] at e
     exact e
   exact exists_norm_of_not_dv hS hπ hs hM.smul_mem hM.int hy hw ha hu huf hyy hn

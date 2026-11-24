@@ -107,8 +107,7 @@ def sgnV (r : ℕ) : Fin (r + 1) → ℂ := fun b => (-1 : ℂ) ^ (r - b.1)
 theorem zhatO_eq_mul (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
     : RealObj.ZhatO Z = Matrix.diagonal (fun _ => 1) * Z * Matrix.diagonal (sgnV r) := by
   ext a b
-  rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
-  simp only [RealObj.ZhatO, sgnV]
+  simp only [RealObj.ZhatO, sgnV, Matrix.mul_diagonal, Matrix.diagonal_mul]
   ring
 
 theorem zhatO_invol (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
@@ -119,8 +118,6 @@ theorem zhatO_invol (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
 
 theorem norm_prod_sgn {l : ℕ} (hl : l ≤ r + 1) : ‖∏ i : Fin l, sgnV r (Fin.castLE hl i)‖ = 1 := by
   rw [norm_prod]
-  apply Finset.prod_eq_one
-  intro i _
   simp [sgnV]
 
 theorem norm_dl_zhatO (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) {l : ℕ} (hl : l ≤ r + 1)
@@ -249,9 +246,7 @@ theorem pt_last
     rintro rfl
     simp at hsum
   obtain ⟨q, hq⟩ : ∃ q, p.getLast? = some q := ⟨p.getLast hne, List.getLast?_eq_some_getLast hne⟩
-  have hq1 : q.1 = 1 := by
-    rw [hq] at h1
-    simpa using h1
+  have hq1 : q.1 = 1 := by simpa [hq] using h1
   have hp' : p = p.dropLast ++ [q] := by
     rw [List.getLast?_eq_some_getLast hne, Option.some.injEq] at hq
     rw [← hq]
@@ -271,9 +266,8 @@ theorem pt_last
     conv_lhs => rw [hp']
     rw [signFlip_append, hs0, add_comm, signFlip_singleton_last, List.map_append]
     rfl
-  · rw [List.map_map]
-    have : Prod.snd ∘ Prod.swap = (Prod.fst : ℕ × D.host.E → ℕ) := rfl
-    rw [this, sign_list_fst, hs0]
+  · rw [List.map_map, show Prod.snd ∘ Prod.swap = (Prod.fst : ℕ × D.host.E → ℕ) from rfl,
+      sign_list_fst, hs0]
 
 end Sign
 
@@ -292,7 +286,7 @@ theorem zx_sc (u u' : D.what₂.Word) (sc : ℝ) (γ : X.B.I.Ginf) (v : Infinite
   simp only [ZX, Zhat, frm, famSc, Formalism.L2.SG.HidaSetting.hJ, Matrix.mul_diagonal,
     Matrix.diagonal_mul, cS]
   simp only [Complex.ofReal_one, one_pow, inv_one, one_smul, Matrix.mulVec_smul, star_smul,
-    smul_eq_mul, Complex.star_def, map_inv₀, map_pow, Complex.conj_ofReal]
+    Complex.star_def, map_inv₀, map_pow, Complex.conj_ofReal]
   simp only [smul_dotProduct, dotProduct_smul, smul_eq_mul]
   ring
 
@@ -335,11 +329,7 @@ theorem topTie_G
     | some q => rw [hq] at h1; simpa using h1
   obtain ⟨L, t, hw, hs, hlast⟩ := pt_last p w hp h1'
   let σ : D.host.E →+* ℂ := (X.B.I.φ (τ j)).comp X.ιE.symm.toRingHom
-  have hσ : S.emb j t = σ t := by
-    have := hemb j (X.ιE.symm t)
-    rw [RingEquiv.apply_symm_apply] at this
-    rw [this]
-    rfl
+  have hσ : S.emb j t = σ t := by simpa [σ] using hemb j (X.ιE.symm t)
   have hL
       : Formalism.FourierDecayAlt.D.ptLast (Formalism.FourierDecayAlt.C.loc (S.emb j) p)
         = (1, σ t) := by

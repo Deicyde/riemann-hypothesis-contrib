@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsFlatSecRankZero
+import Formalism.MeanHeightDescent.DivisionInequalityWithCovolume
 
 @[expose] public section
 
@@ -158,7 +159,7 @@ theorem deg_add_le_deg_of_ideal_smul_le
     rw [algebraMap_smul]
     exact hsub (Submodule.smul_mem_smul hr hx)
   have key :=
-    Formalism.ExtensionFiltration.twistLower K V (Fin n) W (Fin n') b X b' X'
+    _root_.Formalism.ExtensionFiltration.twist_lower_bound K V (Fin n) W (Fin n') b X b' X'
       (fun v => (hG v).1)
       (fun v => (hG' v).1)
       φ L L' (𝔞 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) hI hL hL' h0 hinj hsm hrk

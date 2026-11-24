@@ -54,7 +54,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 noncomputable section
 
@@ -62,10 +63,12 @@ namespace GlobalTheory.ArchGramFibre
 
 open Formalism.L2.SG.Sub PI.VolFromSW PI.AdicCompletionValuation PI.VolStabS
 
-theorem exists_real_coords (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M a : ℕ) :
-    ∃ (n m : ℕ) (eV : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin n → ℝ))
-      (eH : HermR (Ainf F) σ a ≃ₜ (Fin m → ℝ)),
+theorem exists_real_coords
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    (M a : ℕ)
+    : ∃ (n m : ℕ) (eV : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin n → ℝ))
+        (eH : HermR (Ainf F) σ a ≃ₜ (Fin m → ℝ)),
       (∀ x y, eV (x + y) = eV x + eV y) ∧ ∀ x y, eH (x + y) = eH x + eH y := by
   have : IsTotallyReal F := hCM.1
   obtain ⟨k, eK, hK⟩ := exists_coord_tens F E
@@ -89,21 +92,24 @@ theorem exists_real_coords (F E : Type) [Field F] [NumberField F] [Field E] [Num
         rw [mul_one_div_cancel this, map_one]
       ext i j
       simp only [Matrix.smul_apply, smul_eq_mul, nsmul_eq_mul, ← mul_assoc, hc1, one_mul]
-  obtain ⟨m, eH, hH⟩ := exists_coord_sub (X := Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) eM hM
-    (HermR (Ainf F) σ a) (isClosed_HermR (Ainf F) σ a) hdiv
+  obtain ⟨m, eH, hH⟩ :=
+    exists_coord_sub (X := Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) eM hM (HermR (Ainf F) σ a)
+      (isClosed_HermR (Ainf F) σ a) hdiv
   exact ⟨n, m, eV, eH, hV, hH⟩
 
-theorem gramB_surj_of_free (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M a : ℕ)
-    (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) :
-    ∀ X : Fin a → Fin M → Ainf F ⊗[F] E, LinearIndependent (Ainf F ⊗[F] E) X →
-      ∀ S : HermR (Ainf F) σ a, ∃ Y, gramB (Ainf F) σ J X Y = S := by
+theorem gramB_surj_of_free
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    (M a : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+    : ∀ X : Fin a → Fin M → Ainf F ⊗[F] E,
+      LinearIndependent (Ainf F ⊗[F] E) X
+        → ∀ S : HermR (Ainf F) σ a, ∃ Y, gramB (Ainf F) σ J X Y = S := by
   intro X hX S
   have := semisimpleTens_holds F E σ hCM
   have hσ : ∀ x, σ (σ x) = x := PI.VolStabS.sigma_invol σ hCM.2.2.2
   let s := sigR (Ainf F) σ
-  let Z : Fin a → Fin M → Ainf F ⊗[F] E :=
-    fun i => Matrix.vecMul (fun l => s (X i l)) (JR (F := F) (Ainf F) J)
+  let Z : Fin a → Fin M → Ainf F ⊗[F] E := fun i =>
+    Matrix.vecMul (fun l => s (X i l)) (JR (F := F) (Ainf F) J)
   have hZh : ∀ i y, hR (Ainf F) σ J (X i) y = ∑ k, Z i k * y k := by
     intro i y
     simp only [hR, Formalism.UG.hform, Z, Matrix.vecMul, dotProduct, Finset.sum_mul]
@@ -121,7 +127,8 @@ theorem gramB_surj_of_free (F E : Type) [Field F] [NumberField F] [Field E] [Num
       funext j
       have := congrFun hg j
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Z, Matrix.vecMul, dotProduct,
-        Finset.mul_sum, Pi.zero_apply] at this
+          Finset.mul_sum, Pi.zero_apply]
+        at this
       simp only [Matrix.vecMul, dotProduct, v, Finset.sum_mul, Pi.zero_apply]
       rw [Finset.sum_comm]
       rw [← this]
@@ -129,7 +136,8 @@ theorem gramB_surj_of_free (F E : Type) [Field F] [NumberField F] [Field E] [Num
     have hv : v = 0 := by
       have := congrArg (fun u => Matrix.vecMul u (JR (F := F) (Ainf F) J)⁻¹) hv0
       simp only [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hJu, Matrix.vecMul_one,
-        Matrix.zero_vecMul] at this
+          Matrix.zero_vecMul]
+        at this
       exact this
     have hX0 : ∑ i, s (g i) • X i = 0 := by
       funext l
@@ -141,14 +149,16 @@ theorem gramB_surj_of_free (F E : Type) [Field F] [NumberField F] [Field E] [Num
     have e2 := congrArg s this
     simp only [s, sigR_invol (Ainf F) σ hσ, map_zero] at e2
     exact e2
-  let half : Ainf F ⊗[F] E := algebraMap F (Ainf F ⊗[F] E) (1/2)
+  let half : Ainf F ⊗[F] E := algebraMap F (Ainf F ⊗[F] E) (1 / 2)
   have hh : half + half = 1 := by
-    simp only [half, ← map_add (f := _)]; norm_num
-    first | rfl | exact Algebra.TensorProduct.one_def.symm
+    simp only [half, ← map_add (f := _)]
+    norm_num
+    first | rfl
   have hsh : s half = half := (Algebra.TensorProduct.map (AlgHom.id F (Ainf F)) σ).commutes _
-  have hw : ∀ j, ∃ w : Fin M → Ainf F ⊗[F] E, ∀ i, ∑ k, Z i k * w k =
-      half * (S : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) i j :=
-    fun j => exists_dual_of_linIndep Z hZ _
+  have hw
+      : ∀ j, ∃ w : Fin M → Ainf F ⊗[F] E, ∀ i,
+        ∑ k, Z i k * w k = half * (S : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) i j := fun j =>
+    exists_dual_of_linIndep Z hZ _
   choose Y hY using hw
   refine ⟨Y, ?_⟩
   funext i j
@@ -160,33 +170,39 @@ theorem gramB_surj_of_free (F E : Type) [Field F] [NumberField F] [Field E] [Num
   show hR (Ainf F) σ J (X i) (Y j) + hR (Ainf F) σ J (Y i) (X j) = _
   rw [h1, h2, ← add_mul, hh, one_mul]
 
-theorem exists_submersion_coords (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M a : ℕ)
-    (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) :
-    ∃ (n m : ℕ) (eV : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin n → ℝ))
-      (eH : HermR (Ainf F) σ a ≃ₜ (Fin m → ℝ)) (f' : (Fin n → ℝ) → (Fin m → ℝ)),
-      (∀ x y, eV (x + y) = eV x + eV y) ∧ (∀ x y, eH (x + y) = eH x + eH y) ∧ ContDiff ℝ 1 f' ∧
-      (∀ X, ((eH.symm (f' (eV X)) : HermR (Ainf F) σ a) : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) =
-        gramR (Ainf F) σ J X) ∧
-      ∀ X, LinearIndependent (Ainf F ⊗[F] E) X → Function.Surjective (fderiv ℝ f' (eV X)) := by
+theorem exists_submersion_coords
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    (M a : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+    : ∃ (n m : ℕ) (eV : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin n → ℝ))
+        (eH : HermR (Ainf F) σ a ≃ₜ (Fin m → ℝ)) (f' : (Fin n → ℝ) → (Fin m → ℝ)),
+      (∀ x y, eV (x + y) = eV x + eV y) ∧ (∀ x y, eH (x + y) = eH x + eH y) ∧ ContDiff ℝ 1 f'
+        ∧ (∀ X,
+          ((eH.symm (f' (eV X)) : HermR (Ainf F) σ a) : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E))
+            = gramR (Ainf F) σ J X)
+        ∧ ∀ X, LinearIndependent (Ainf F ⊗[F] E) X → Function.Surjective (fderiv ℝ f' (eV X)) := by
   obtain ⟨n, m, eV, eH, hV, hH⟩ := exists_real_coords F E σ hCM M a
   have hσ : ∀ x, σ (σ x) = x := PI.VolStabS.sigma_invol σ hCM.2.2.2
   let Q : (Fin a → Fin M → Ainf F ⊗[F] E) → HermR (Ainf F) σ a := gramH (Ainf F) σ hσ J hJ.1
-  let β : (Fin a → Fin M → Ainf F ⊗[F] E) → (Fin a → Fin M → Ainf F ⊗[F] E) →
-      HermR (Ainf F) σ a := fun X Y => ⟨gramB (Ainf F) σ J X Y, gramB_mem (Ainf F) σ hσ J hJ.1 X Y⟩
-  have hβc : Continuous (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) ×
-      (Fin a → Fin M → Ainf F ⊗[F] E) => β p.1 p.2) := by
+  let β : (Fin a → Fin M → Ainf F ⊗[F] E) → (Fin a → Fin M → Ainf F ⊗[F] E) → HermR (Ainf F) σ a :=
+    fun X Y => ⟨gramB (Ainf F) σ J X Y, gramB_mem (Ainf F) σ hσ J hJ.1 X Y⟩
+  have hβc : Continuous
+      (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) × (Fin a → Fin M → Ainf F ⊗[F] E) => β p.1 p.2) := by
     exact (continuous_gramB (Ainf F) σ J).subtype_mk _
   have hβa : ∀ x y z, β (x + y) z = β x z + β y z := by
-    intro x y z; apply Subtype.ext; funext i j
+    intro x y z
+    apply Subtype.ext
+    funext i j
     show gramB (Ainf F) σ J (x + y) z i j = gramB (Ainf F) σ J x z i j + gramB (Ainf F) σ J y z i j
     simp only [gramB, Pi.add_apply, PI.VolStabS.hR_add_left, PI.VolStabS.hR_add_right]
     abel
   have hβs : ∀ x y, β x y = β y x := by
-    intro x y; apply Subtype.ext; funext i j
-    simp only [β, gramB]; exact add_comm _ _
-  have hQ : ∀ x, β x x = Q x + Q x := by
-    intro x; apply Subtype.ext; funext i j; rfl
+    intro x y
+    apply Subtype.ext
+    funext i j
+    simp only [β, gramB]
+    exact add_comm _ _
+  have hQ : ∀ x, β x x = Q x + Q x := by intro x; apply Subtype.ext; funext i j; rfl
   obtain ⟨hC, hD⟩ := quadCoord_holds _ _ n m eV eH Q β hV hH hβc hβa hβs hQ
   refine ⟨n, m, eV, eH, fun y => eH (Q (eV.symm y)), hV, hH, hC, fun X => ?_, fun X hX => ?_⟩
   · simp [Q, gramH]
@@ -197,23 +213,30 @@ theorem exists_submersion_coords (F E : Type) [Field F] [NumberField F] [Field E
     have : β X Y = eH.symm t := Subtype.ext hY
     rw [this, Homeomorph.apply_symm_apply]
 
-theorem gram_densities (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M a : ℕ)
-    (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+theorem gram_densities
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    (M a : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
     (μ : Measure (Fin a → Fin M → Ainf F ⊗[F] E)) (ν : Measure (HermR (Ainf F) σ a))
-    (hμ : μ.IsAddHaarMeasure) (hν : ν.IsAddHaarMeasure) :
-    DensAll μ (gramR (Ainf F) σ J) Subtype.val ν {X | LinearIndependent (Ainf F ⊗[F] E) X} := by
+    (hμ : μ.IsAddHaarMeasure) (hν : ν.IsAddHaarMeasure)
+    : DensAll μ (gramR (Ainf F) σ J) Subtype.val ν {X | LinearIndependent (Ainf F ⊗[F] E) X} := by
   obtain ⟨n, m, eV, eH, f', hV, hH, hC, hG, hS⟩ := exists_submersion_coords F E σ hCM M a J hJ
-  have : ContinuousAdd (Fin a → Fin M → Ainf F ⊗[F] E) := ⟨by
-    have e : (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) × (Fin a → Fin M → Ainf F ⊗[F] E) =>
-        p.1 + p.2) = fun p => eV.symm (eV p.1 + eV p.2) := by
-      funext p; rw [← hV, Homeomorph.symm_apply_apply]
-    rw [e]; fun_prop⟩
-  have : ContinuousAdd (HermR (Ainf F) σ a) := ⟨by
-    have e : (fun p : HermR (Ainf F) σ a × HermR (Ainf F) σ a => p.1 + p.2) =
-        fun p => eH.symm (eH p.1 + eH p.2) := by
-      funext p; rw [← hH, Homeomorph.symm_apply_apply]
-    rw [e]; fun_prop⟩
+  have : ContinuousAdd (Fin a → Fin M → Ainf F ⊗[F] E) :=
+    ⟨by
+      have e
+          : (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) × (Fin a → Fin M → Ainf F ⊗[F] E) => p.1 + p.2)
+            = fun p => eV.symm (eV p.1 + eV p.2) := by
+        funext p; rw [← hV, Homeomorph.symm_apply_apply]
+      rw [e]
+      fun_prop⟩
+  have : ContinuousAdd (HermR (Ainf F) σ a) :=
+    ⟨by
+      have e
+          : (fun p : HermR (Ainf F) σ a × HermR (Ainf F) σ a => p.1 + p.2)
+            = fun p => eH.symm (eH p.1 + eH p.2) := by
+        funext p; rw [← hH, Homeomorph.symm_apply_apply]
+      rw [e]
+      fun_prop⟩
   have hμ' : (μ.map eV).IsAddHaarMeasure :=
     Measure.isAddHaarMeasure_map μ (AddMonoidHom.mk' eV hV) eV.continuous eV.surjective
       (eV.map_cocompact).le
@@ -221,19 +244,23 @@ theorem gram_densities (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
     Measure.isAddHaarMeasure_map ν (AddMonoidHom.mk' eH hH) eH.continuous eH.surjective
       (eH.map_cocompact).le
   have hD := submDens_holds n m _ _ hμ' hν' f' hC
-  refine densAll_transport μ ν (gramR (Ainf F) σ J) Subtype.val _ eV eH f'
-    Subtype.val_injective (fun X => hG X) (densAll_mono hD ?_)
+  refine densAll_transport μ ν (gramR (Ainf F) σ J) Subtype.val _ eV eH f' Subtype.val_injective
+    (fun X => hG X)
+    (densAll_mono hD ?_)
   rintro y ⟨X, hX, rfl⟩
   exact hS X hX
 
-theorem exists_fibreFamily : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M a : ℕ) (J : Matrix (Fin M) (Fin M) E),
-    IsHermND σ J →
-    ∀ (μ : Measure (Fin a → Fin M → Ainf F ⊗[F] E)) (ν : Measure (HermR (Ainf F) σ a)),
-      μ.IsAddHaarMeasure → ν.IsAddHaarMeasure →
-      ∃ fib : HermR (Ainf F) σ a → Measure (Fin a → Fin M → Ainf F ⊗[F] E),
-        IsFibreFamily μ (gramR (Ainf F) σ J) Subtype.val
-          {X | LinearIndependent (Ainf F ⊗[F] E) X} ν Set.univ fib := by
+theorem exists_fibreFamily
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M a : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → ∀ (μ : Measure (Fin a → Fin M → Ainf F ⊗[F] E)) (ν : Measure (HermR (Ainf F) σ a)),
+              μ.IsAddHaarMeasure → ν.IsAddHaarMeasure
+                → ∃ fib : HermR (Ainf F) σ a → Measure (Fin a → Fin M → Ainf F ⊗[F] E),
+                  IsFibreFamily μ (gramR (Ainf F) σ J) Subtype.val
+                    {X | LinearIndependent (Ainf F ⊗[F] E) X} ν Set.univ fib := by
   intro F E _ _ _ _ _ σ hCM M a J hJ μ ν hμ hν
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   have hσ : ∀ x, σ (σ x) = x := PI.VolStabS.sigma_invol σ hCM.2.2.2

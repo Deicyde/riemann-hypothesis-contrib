@@ -44,8 +44,6 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Strict
 
 @[expose] public section
 
-
-
 section
 section
 noncomputable section

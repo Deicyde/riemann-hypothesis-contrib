@@ -272,7 +272,6 @@ theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2
     have :=
       hcl (uni b L) (by
         intro h
-        beta_reduce at h
         have h' : (((uni b L ∩ Q).card : ℕ) : ℤ) < d := by convert h
         rw [hcap, hr] at h'
         omega)

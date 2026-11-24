@@ -339,6 +339,4 @@ end Formalism.FourierDecayAlt.P.PBM
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem vector_vanishes_big_cell : PBJ.BigCellVan := PBM.bigCellVan
-
 end Formalism.FourierDecayAlt.P

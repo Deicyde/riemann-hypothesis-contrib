@@ -50,6 +50,7 @@ open scoped BigOperators
 open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
   GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
   ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+
 theorem _root_.GlobalTheory.T.gaugedCurveLogarithms_closed_under_tadicLimits
     : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)]
         (κ : Type) [Fintype κ] (X : RawChart C d I κ),
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.gaugedCurveLogarithms_closed_under_tadicLimits
               (∀ i, PowerSeries.coeff m ((a n).1 i) = PowerSeries.coeff m (b.1 i))
                 ∧ ∀ q, PowerSeries.coeff m ((a n).2 q) = PowerSeries.coeff m (b.2 q))
             → b ∈ Cv X V g := by
-  first
-  | exact @GlobalTheory.RowLaw.cv_closed_under_limits
-  | exact GlobalTheory.RowLaw.cv_closed_under_limits
-  | (intros; apply GlobalTheory.RowLaw.cv_closed_under_limits <;> assumption)
+  first | exact @GlobalTheory.RowLaw.cv_closed_under_limits

@@ -56,6 +56,7 @@ open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.Conju
   ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
   GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.globalArtin_localIdele_injective
     : ChevalleyUnits
       → ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.globalArtin_localIdele_injective
           → ∀ w : HeightOneSpectrum (𝓞 E),
             Function.Injective fun x : (w.adicCompletion E)ˣ =>
               art (Neutral.B1.localIdele E w x) := by
-  first
-  | exact @GlobalTheory.ArtinLocalInj.artin_localIdele_injective
-  | exact GlobalTheory.ArtinLocalInj.artin_localIdele_injective
-  | (intros; apply GlobalTheory.ArtinLocalInj.artin_localIdele_injective <;> assumption)
+  first | exact @GlobalTheory.ArtinLocalInj.artin_localIdele_injective

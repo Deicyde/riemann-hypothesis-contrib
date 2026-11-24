@@ -150,10 +150,10 @@ theorem exists_cm_solvDisj_dec_eq
   obtain ⟨v, hv⟩ :=
     (Formalism.MainNotions.V.Pf.ShaCmp.exists_over_iff (K := maximalRealSubfield E) A).mpr
       ⟨n, hn, hnv⟩
-  obtain ⟨T, hvT, hT⟩ := GlobalTheory.T.exists_cmField_lift_disjoint_of_real_solvable Ω E v N hNo
+  obtain ⟨T, hvT, hT⟩ := _root_.GlobalTheory.KLift.exists_cm_lift Ω E v N hNo
   obtain ⟨F₁, hfin, hab, hreal, hdecF, hsplit⟩ :=
-    GlobalTheory.T.exists_abelian_totallyReal_ext_prescribedCompletion Ω (maximalRealSubfield E) A v
-      hv (V.map (resHom (F := maximalRealSubfield E) (E := E) A)) (isOpen_map A hfix V hVo)
+    _root_.GlobalTheory.AbStep.exists_abelian_real_field Ω (maximalRealSubfield E) A v hv
+      (V.map (resHom (F := maximalRealSubfield E) (E := E) A)) (isOpen_map A hfix V hVo)
       (commutator_le_map A hfix V hVc) T hvT
   have hsolv : IsSolvable (F₁ ≃ₐ[maximalRealSubfield E] F₁) :=
     isSolvable_of_comm fun a b => hab.toIsMulCommutative.is_comm.comm a b

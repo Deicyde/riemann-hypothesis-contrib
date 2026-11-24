@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Semi
 open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
   GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.natural_pointwiseCochain_const_of_globalSections_base
     : ∀ (R : Type) [CommRing R] (X : Over (Sp R)) (K : Type) (W : K → X.left.Opens),
       ⨆ i, W i = ⊤ → Function.Surjective X.hom.appTop.hom

@@ -185,7 +185,7 @@ theorem sum_mem_DdR
   rw [h1, Finset.sum_eq_single i]
   · simp
   · intro j _ hij
-    simp [Finsupp.single_apply, hij]
+    simp [hij]
   · simp
 
 omit J in

@@ -159,8 +159,8 @@ theorem charpoly_of_decomp
         ext a b
         by_cases hab : a = b
         · subst hab
-          simp [Matrix.charmatrix_apply]
-        · simp [Matrix.charmatrix_apply, hab, Matrix.diagonal_apply_ne _ hab]
+          simp
+        · simp [hab]
       rw [Matrix.charpoly, hch, Matrix.det_diagonal]
 
   have hidx

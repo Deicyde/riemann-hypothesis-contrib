@@ -49,7 +49,7 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G
 
 def OrbitChartResidue.Statement : Prop :=
-  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (n : ι → ℕ) (A : HermLine n)
+  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (n : ι → ℕ) (A : Heights.HermLine n)
       (x : Cone n (AlgebraicClosure ℚ)) (s : MvPolynomial (Coord n) ℤ),
     BlockNonzero x → Geo.IsSectionOn (orbitIdeal x) A.toGeo s
       → ∀ V ∈ Geo.divSupp (orbitIdeal x) s, ∀ c : (k : ι) → Fin (n k + 1),

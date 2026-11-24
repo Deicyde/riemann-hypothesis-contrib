@@ -58,7 +58,7 @@ theorem _root_.GlobalTheory.PeriodConn.hermForm_conj_mul
     Matrix.vecMul_transpose]
   congr 2
   ext i
-  simp [Matrix.mulVec, dotProduct, star_sum, mul_comm]
+  simp [Matrix.mulVec, dotProduct, star_sum]
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 

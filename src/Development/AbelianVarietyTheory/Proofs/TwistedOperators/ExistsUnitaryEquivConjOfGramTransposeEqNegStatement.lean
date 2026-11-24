@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.exists_unitary_equiv_conj_of_gram_transpose_eq_neg
                 = (Formalism.L2.Theta.mt T' h).map (cA D))
             ∧ (∀ e h, SuppAt e T' h → SuppAt e S (φ' h))
             ∧ ∀ h, (Formalism.L2.Theta.mt S (φ' h)).det = (Formalism.L2.Theta.mt T' h⁻¹).det := by
-  first
-  | exact @GlobalTheory.GrpConj.exists_conj_equiv
-  | exact GlobalTheory.GrpConj.exists_conj_equiv
-  | (intros; apply GlobalTheory.GrpConj.exists_conj_equiv <;> assumption)
+  first | exact @GlobalTheory.GrpConj.exists_conj_equiv

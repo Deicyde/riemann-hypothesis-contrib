@@ -125,7 +125,7 @@ theorem rec_diag
   refine ⟨α, e0, ?_⟩
   rw [algNorm, L.nu_eq, e, WD.lpTw_mk]
   refine WD.sound ⟨.refl _ _, fun g v => funext fun i => ?_, fun v => rfl⟩
-  simp [mul_zpow, mul_comm, mul_left_comm, mul_assoc]
+  simp [mul_zpow, mul_comm, mul_left_comm]
 
 theorem frob_of
     {l : ℕ} [Fact l.Prime]

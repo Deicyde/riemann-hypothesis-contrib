@@ -42,6 +42,7 @@ import Mathlib.Topology.Sheaves.Init
 @[expose] public section
 
 open GlobalTheory.FinPl GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing Matrix
+
 theorem _root_.GlobalTheory.T.schwartzBruhat_tensor_indicator_character_facts
     : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
         (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'],

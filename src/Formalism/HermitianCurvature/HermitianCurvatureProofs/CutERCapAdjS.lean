@@ -131,8 +131,8 @@ theorem word_adj_scalar {μ : Measure (Mt k r)} (h : B.IsHaarOn (B.GV k r) μ)
       simp only [B.Rw, List.reverse_cons, List.foldr_append, List.foldr_cons, List.foldr_nil]
     have hra := tf_rw ha w
     have sk :=
-      Formalism.FourierDecayAlt.P.right_differential_skew k r 0 μ (haar0 h) X (B.Rw w a) b (lie0 hX)
-        (smooth0 hra.1) (smooth0 hb.1) (cpt0 hra.2) (cpt0 hb.2)
+      _root_.qnRdSkew k r 0 μ (haar0 h) X (B.Rw w a) b (lie0 hX) (smooth0 hra.1) (smooth0 hb.1)
+        (cpt0 hra.2) (cpt0 hb.2)
     rw [e1, sk, word_adj_scalar h w hw' ha (tf_rdV hb X), e2, List.length_cons, pow_succ]
     ring
 
@@ -170,7 +170,7 @@ theorem capacity_adjoint_scalar : CapAdjScalar := by
     exact hc.integrable_of_hasCompactSupport hs
 
   have hH :=
-    Formalism.FourierDecayAlt.P.hermitian_haar_invariance k r 0 0 0 μ (haar0 h)
+    _root_.qnHermHaar k r 0 0 0 μ (haar0 h)
       (fun _ _ => rfl)
       (fun _ _ => rfl)
       a b (smooth0 ha) (smooth0 hb) (cpt0 hac) (cpt0 hbc) Y 0 0

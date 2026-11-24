@@ -62,10 +62,7 @@ theorem valuation_eq_exp (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ)
 
 theorem toNNReal_exp {e : NNReal} (he : e ≠ 0) (n : ℤ)
     : WithZeroMulInt.toNNReal he (WithZero.exp n) = e ^ n := by
-  first
-  | (simp [WithZero.exp, WithZeroMulInt.toNNReal_pos_apply he]; done)
-  | (rw [WithZeroMulInt.toNNReal_pos_apply he WithZero.exp_ne_zero]; simp [WithZero.exp]; done)
-  | rfl
+  first | (simp [WithZero.exp]; done) | rfl
 
 theorem prod_norm_emb (x : L) : ∏ φ : L →+* ℂ, ‖φ x‖ = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
   calc
@@ -93,14 +90,6 @@ theorem finprod_norm_embedding
       | (
           show (FinitePlace.mk v) (k : L) = _
           rw [FinitePlace.mk_apply, FinitePlace.norm_embedding]
-        )
-      | (
-          rw [FinitePlace.equivHeightOneSpectrum_symm_apply, FinitePlace.mk_apply,
-            FinitePlace.norm_embedding]
-        )
-      | (
-          simp only [FinitePlace.equivHeightOneSpectrum, Equiv.coe_fn_symm_mk]
-          rw [← FinitePlace.mk_apply, FinitePlace.norm_embedding]
         )
     rw [e1, NumberField.HeightOneSpectrum.adicAbv_def, valuation_eq_exp, toNNReal_exp]
     push_cast

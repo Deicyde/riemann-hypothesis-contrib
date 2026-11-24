@@ -78,7 +78,4 @@ theorem _root_.GlobalTheory.T.central_uniformiser_acts_by_dilation_tame_kernel
                                           IsSBHalf eQ (lattice₂ R i) Ψ
                                             → ω (z, 1) (Tm Ψ)
                                               = κ • Tm (fun x => Ψ (dil i (ϖ : D.host.E)⁻¹ x)) := by
-  first
-  | exact @GlobalTheory.BaseCmp.dilKer_of_ne_zero
-  | exact GlobalTheory.BaseCmp.dilKer_of_ne_zero
-  | (intros; apply GlobalTheory.BaseCmp.dilKer_of_ne_zero <;> assumption)
+  first | exact @GlobalTheory.BaseCmp.dilKer_of_ne_zero

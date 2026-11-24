@@ -77,7 +77,4 @@ theorem _root_.GlobalTheory.T.weilRepresentationLocality_unitaryGroupV'
                 S φ ∈ GlobalTheory.WeilM.SB _
                   ∧ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Acts (evFin F v)
                     (om' (x, 1)) φ (S φ) := by
-  first
-  | exact @GlobalTheory.WeilLocality.locality
-  | exact GlobalTheory.WeilLocality.locality
-  | (intros; apply GlobalTheory.WeilLocality.locality <;> assumption)
+  first | exact @GlobalTheory.WeilLocality.locality

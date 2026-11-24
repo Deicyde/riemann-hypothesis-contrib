@@ -111,7 +111,7 @@ theorem absIrrSub_of_span_eq_top
     : AbsIrrSub σ ⊤ := by
   refine GlobalTheory.ResAbsIrrGood.absIrrSub_top_of_irred (algebraMap k (AlgebraicClosure k)) hr σ
     fun W hW => ?_
-  refine GlobalTheory.BurnsideIff.eq_bot_or_top_of_span_eq_top (mat σ) h W fun g x hx => ?_
+  refine _root_.GlobalTheory.InvariantBotOrTop.bot_or_top (mat σ) h W fun g x hx => ?_
   have e
       : (mat σ g).map (algebraMap k (AlgebraicClosure k))
         = ((mapRep (algebraMap k (AlgebraicClosure k)) σ g : GL (Fin r) (AlgebraicClosure k))

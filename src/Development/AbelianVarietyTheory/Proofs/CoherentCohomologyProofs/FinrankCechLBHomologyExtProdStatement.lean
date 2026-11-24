@@ -63,8 +63,4 @@ theorem _root_.GlobalTheory.T.finrank_cechLB_homology_extProd_alt
             → ∀ n,
               Module.finrank K ((cechLB (p₁ ≫ f) (tw (M.pull p₁) (M'.pull p₂) 1) D).homology n)
                 = ∑ x ∈ Finset.HasAntidiagonal.antidiagonal n, Module.finrank K ((cechLB f M U).homology x.1) * Module.finrank K ((cechLB f' M' W).homology x.2) :=
-  by
-    first
-    | exact @GlobalTheory.AbLaw.finrank_cechLB_homology_extProd
-    | exact GlobalTheory.AbLaw.finrank_cechLB_homology_extProd
-    | (intros; apply GlobalTheory.AbLaw.finrank_cechLB_homology_extProd <;> assumption)
+  by first | exact @GlobalTheory.AbLaw.finrank_cechLB_homology_extProd

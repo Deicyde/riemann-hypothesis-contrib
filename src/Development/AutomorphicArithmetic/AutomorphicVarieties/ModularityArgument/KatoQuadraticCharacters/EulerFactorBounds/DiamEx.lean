@@ -3,7 +3,12 @@ module
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.KatoQuadraticCharacters.EulerFactorBounds.KatoTwistedClassNormCompatibleCyclotomic
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GalBMemKummerInvariantSet
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HeckeLetterPreservesBasisSet
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ModularFunctionTowerIntegralityStatement
+import Development.AbelianVarietyTheory.Definitions.Foundations.Letter
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ModularFunctionTowerIntegrality
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -92,8 +97,7 @@ private theorem conj_mem
 theorem UpperTheory.V.Z.Kato.Nb.sBStab : UpperTheory.V.Z.Kato.Nb.SBStab := by
   intro Ω _ _ _ ε X l _ N w hN b hb
   obtain ⟨hA, hG⟩ :=
-    GlobalTheory.T.modular_function_tower_integrality ε X ε.injective
-      (X.j_hol.imp fun _ h => h.symm) l
+    _root_.GlobalTheory.KZ.kmap_A_stable ε X ε.injective (X.j_hol.imp fun _ h => h.symm) l
   have key
       : ∀ f : X.Fn l →ₗ[ℤ_[l]] X.Fn l,
         (∀ c ∈ X.BSet N l w, f c ∈ X.BSet N l w) → f b ∈ X.B N l w := by

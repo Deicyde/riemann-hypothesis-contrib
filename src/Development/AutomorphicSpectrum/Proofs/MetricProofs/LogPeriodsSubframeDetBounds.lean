@@ -2,7 +2,7 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.StarInvMulVecDotProductMulVecInvMulVec
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodMatrixLocalTrivializationStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodMatrixLocalTrivialization
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SubframeDetLogGrowth
 import GroundTheory.HeightsAndTheta.Heights.Regularisation.Assembly
 import GroundTheory.HeightsAndTheta.Heights.Regularisation.PHodgeDerivative
@@ -162,7 +162,8 @@ theorem logPeriods_subframe_det_bounds
                         ^ N
                       * ‖(F z * L.H z * (F z)ᴴ).det‖ := by
   intro n a g Λ _ L k F hF hrk
-  obtain ⟨Q, A, hAd, hA0, hAH⟩ := GlobalTheory.T.period_matrix_local_trivialization n a g Λ L
+  obtain ⟨Q, A, hAd, hA0, hAH⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Flat.exists_periodPolydisc_frame n a g Λ L
   obtain ⟨ρ₁, c, C, hρ₁, hρ₁1, hc, hb⟩ :=
     (ImTauBounds.cond RiemannExtensionSlices.proof PuncturedExpOrder.proof LogCoverDescent.proof) n
       a g Q

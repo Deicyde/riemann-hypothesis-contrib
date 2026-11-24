@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.sections_flat_baseChange_affineMilnorSquare_open
     : ∀ (S : Scheme.{0}) (A T T₁ T₂ T₀ : Over S) [Flat A.hom] (j₁ : T₁ ⟶ T) (j₂ : T₂ ⟶ T)
         (k₁ : T₀ ⟶ T₁) (k₂ : T₀ ⟶ T₂),
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.sections_flat_baseChange_affineMilnorSquare_open
                   (A ◁ k₁).left.appLE _ V h₁ a₁ = (A ◁ k₂).left.appLE _ V h₂ a₂
                     → ∃ a : Γ((A ⊗ T).left, W),
                       (A ◁ j₁).left.app W a = a₁ ∧ (A ◁ j₂).left.app W a = a₂ := by
-  first
-  | exact @GlobalTheory.DualOpen.sections_milnor
-  | exact GlobalTheory.DualOpen.sections_milnor
-  | (intros; apply GlobalTheory.DualOpen.sections_milnor <;> assumption)
+  first | exact @GlobalTheory.DualOpen.sections_milnor

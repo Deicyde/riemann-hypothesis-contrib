@@ -53,18 +53,21 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.RegDenom
 
-theorem exists_denom_of_injective {R K B S : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K]
-    [IsFractionRing R K] [CommRing B] [Finite S]
-    (ρ : R →+* B) (v : S → B →+* K) (hv : Function.Injective v)
-    (hρ : ∀ i r, v i (ρ r) = algebraMap R K r) (f : S → K) :
-    ∃ d : R, d ≠ 0 ∧ ∃ b : B, ∀ i, v i b = algebraMap R K d * f i := by
+theorem exists_denom_of_injective
+    {R K B S : Type}
+    [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K] [CommRing B] [Finite S]
+    (ρ : R →+* B) (v : S → B →+* K)
+    (hv : Function.Injective v) (hρ : ∀ i r, v i (ρ r) = algebraMap R K r)
+    (f : S → K)
+    : ∃ d : R, d ≠ 0 ∧ ∃ b : B, ∀ i, v i b = algebraMap R K d * f i := by
   classical
   cases nonempty_fintype S
   have inj : Function.Injective (algebraMap R K) := IsFractionRing.injective R K
@@ -81,18 +84,19 @@ theorem exists_denom_of_injective {R K B S : Type} [CommRing R] [IsDomain R] [Fi
     have hli : LinearIndependent K (fun i : S => (fun b => v i b : B → K)) :=
       (linearIndependent_monoidHom B K).comp _ hm
     have hc : ∀ i, φ (Pi.single i 1) = 0 := by
-      have h0 := Fintype.linearIndependent_iff.mp hli (fun i => φ (Pi.single i 1)) (by
-        funext b
-        have hb : φ (fun i => v i b) = 0 := hle (Submodule.subset_span ⟨b, rfl⟩)
-        have hx : (fun i => v i b) = ∑ i, (v i b) • (Pi.single i (1 : K) : S → K) := by
-          funext j
-          simp [Finset.sum_apply, Pi.single_apply]
+      have h0 :=
+        Fintype.linearIndependent_iff.mp hli (fun i => φ (Pi.single i 1)) (by
+          funext b
+          have hb : φ (fun i => v i b) = 0 := hle (Submodule.subset_span ⟨b, rfl⟩)
+          have hx : (fun i => v i b) = ∑ i, (v i b) • (Pi.single i (1 : K) : S → K) := by
+            funext j
+            simp [Finset.sum_apply, Pi.single_apply]
 
-        rw [hx, map_sum] at hb
-        simp only [map_smul, smul_eq_mul] at hb
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
-        rw [← hb]
-        exact Finset.sum_congr rfl fun i _ => mul_comm _ _)
+          rw [hx, map_sum] at hb
+          simp only [map_smul, smul_eq_mul] at hb
+          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+          rw [← hb]
+          exact Finset.sum_congr rfl fun i _ => mul_comm _ _)
       exact h0
     apply hφ
     ext i
@@ -104,7 +108,8 @@ theorem exists_denom_of_injective {R K B S : Type} [CommRing R] [IsDomain R] [Fi
     | mem x h =>
       obtain ⟨b, rfl⟩ := h
       exact ⟨1, one_ne_zero, b, fun i => by simp⟩
-    | zero => exact ⟨1, one_ne_zero, 0, fun i => by simp⟩
+    | zero =>
+      exact ⟨1, one_ne_zero, 0, fun i => by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨d, hd, b, hb⟩ := hx
       obtain ⟨e, he, c, hc⟩ := hy
@@ -123,15 +128,23 @@ theorem exists_denom_of_injective {R K B S : Type} [CommRing R] [IsDomain R] [Fi
 
 variable {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T]
 
-def valHom {B : Type} [CommRing B] {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ U) : Γ(X, U) →+* B :=
+def valHom
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U)
+    : Γ(X, U) →+* B :=
   (Scheme.ΓSpecIso (CommRingCat.of B)).hom.hom.comp (x.appLE U ⊤ h).hom
 
-theorem valHom_apply {B : Type} [CommRing B] {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ U) (s : Γ(X, U)) : valHom x U h s = valAt x U h s := rfl
+theorem valHom_apply
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) (s : Γ(X, U))
+    : valHom x U h s = valAt x U h s :=
+  rfl
 
-theorem eq_of_valHom_eq {B : Type} [CommRing B] {X : Scheme.{0}} {x y : Spec (CommRingCat.of B) ⟶ X} {U : X.Opens}
-    (hU : IsAffineOpen U) (hx : ⊤ ≤ x ⁻¹ᵁ U) (hy : ⊤ ≤ y ⁻¹ᵁ U) (e : valHom x U hx = valHom y U hy) : x = y := by
+theorem eq_of_valHom_eq
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} {x y : Spec (CommRingCat.of B) ⟶ X} {U : X.Opens}
+    (hU : IsAffineOpen U) (hx : ⊤ ≤ x ⁻¹ᵁ U) (hy : ⊤ ≤ y ⁻¹ᵁ U) (e : valHom x U hx = valHom y U hy)
+    : x = y := by
   have ha : x.appLE U ⊤ hx = y.appLE U ⊤ hy := by
     ext s
     have := DFunLike.congr_fun e s
@@ -145,17 +158,23 @@ theorem eq_of_valHom_eq {B : Type} [CommRing B] {X : Scheme.{0}} {x y : Spec (Co
     infer_instance
   exact (cancel_epi htop.fromSpec).mp h1.symm
 
-theorem le_preimage_top {X Y : Scheme.{0}} (p : X ⟶ Y) (U : X.Opens) : U ≤ p ⁻¹ᵁ ⊤ :=
-  fun _ _ => trivial
+theorem le_preimage_top {X Y : Scheme.{0}} (p : X ⟶ Y) (U : X.Opens) : U ≤ p ⁻¹ᵁ ⊤ := fun _ _ =>
+  trivial
 
 def structHom {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) (U : X.Opens) : R →+* Γ(X, U) :=
   (p.appLE ⊤ U (le_preimage_top p U)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom
 
-theorem valHom_structHom {B : Type} [CommRing B] {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R))
+theorem valHom_structHom
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R))
     (i : R →+* B) (x : Spec (CommRingCat.of B) ⟶ X) (hx : x ≫ p = Spec.map (CommRingCat.ofHom i))
-    (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) (r : R) : valHom x U h (structHom p U r) = i r := by
-  have e : (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ p.appLE ⊤ U (le_preimage_top p U) ≫ x.appLE U ⊤ h ≫
-      (Scheme.ΓSpecIso (CommRingCat.of B)).hom = CommRingCat.ofHom i := by
+    (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U)
+    (r : R)
+    : valHom x U h (structHom p U r) = i r := by
+  have e
+      : (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ p.appLE ⊤ U (le_preimage_top p U) ≫ x.appLE U ⊤ h
+          ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom
+        = CommRingCat.ofHom i := by
     have e1 : p.appLE ⊤ U (le_preimage_top p U) ≫ x.appLE U ⊤ h = (x ≫ p).appTop := by
       rw [Scheme.Hom.appLE_comp_appLE]
       simp only [Scheme.Hom.appLE, Scheme.Hom.comp_appTop, Scheme.Hom.appTop]
@@ -164,9 +183,11 @@ theorem valHom_structHom {B : Type} [CommRing B] {X : Scheme.{0}} (p : X ⟶ Spe
     rw [reassoc_of% e1, hx, Scheme.ΓSpecIso_naturality, Iso.inv_hom_id_assoc]
   exact congr($(e).hom r)
 
-theorem exists_denom_regularAt : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T]
-    (Γ : QFGroup R T) (f : T → FractionRing R) (g : Γ.G.left),
-    ∃ d : R, d ≠ 0 ∧ Γ.RegularAt (fun t => algebraMap R _ d * f t) g := by
+theorem exists_denom_regularAt
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (f : T → FractionRing R) (g : Γ.G.left),
+      ∃ d : R,
+        d ≠ 0 ∧ Γ.RegularAt (fun t => algebraMap R _ d * f t) g := by
   intro R _ _ T _ _ Γ f g
   obtain ⟨U, hU, hg, -⟩ := exists_isAffineOpen_mem_and_subset (x := g) (U := ⊤) trivial
   let S := {t : T // ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U}

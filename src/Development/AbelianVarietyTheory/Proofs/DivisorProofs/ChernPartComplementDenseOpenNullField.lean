@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsClosedImmersionGenericPoint
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VolumeComplexPointsProperClosedChartFieldStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.DetJacMatCoordsEqTransitionJacobianDet
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VolumeComplexPointsProperClosedChartField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -103,8 +104,8 @@ theorem chernPart_compl_null
     exact nonpos_iff_eq_zero.1 h
   refine glue_null _ _ hA fun c => ?_
   rw [hcX]
-  exact GlobalTheory.T.volume_complexPoints_properClosed_chart_field k X p σ D _
-    U.isOpen.isClosed_compl (by simpa using hU) c
+  exact _root_.GlobalTheory.ChernNull.chart_null_field k X p σ D _ U.isOpen.isClosed_compl
+    (by simpa using hU) c
 
 end GlobalTheory.ChernNullField
 

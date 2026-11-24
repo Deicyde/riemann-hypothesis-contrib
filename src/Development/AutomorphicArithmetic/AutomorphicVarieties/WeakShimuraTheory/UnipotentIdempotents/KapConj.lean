@@ -55,9 +55,7 @@ private theorem kapConj_alg
   apply Additive.ofMul.injective
   have h0' := congrArg Additive.ofMul h0
   have h2' := congrArg Additive.ofMul h2
-  simp only [ofMul_mul, ofMul_pow, ofMul_inv, ofMul_one, add_smul, one_smul, neg_smul, smul_add,
-      smul_neg]
-    at h0' h2' ⊢
+  simp only [ofMul_mul, ofMul_pow, ofMul_inv, ofMul_one, add_smul, smul_add, smul_neg] at h0' h2' ⊢
   have hk
       : Additive.ofMul k'
         = -(Additive.ofMul k
@@ -69,7 +67,7 @@ private theorem kapConj_alg
     rw [eq_neg_iff_add_eq_zero, add_comm]
     exact h2'
   rw [hk, hb]
-  simp only [smul_add, smul_neg, neg_add, neg_neg, two_smul]
+  simp only [smul_add, smul_neg, neg_add, two_smul]
   abel
 
 theorem UpperTheory.V.Ws.Lk.kapConj

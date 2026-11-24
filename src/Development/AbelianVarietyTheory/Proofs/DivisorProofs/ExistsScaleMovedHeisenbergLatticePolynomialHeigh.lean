@@ -187,7 +187,8 @@ theorem GlobalTheory.MovedLat.exists_scale
     (hKcf.union (hgf.union hhf)).subset
       ((Function.mulSupport_mul _ _).trans
         (Set.union_subset_union le_rfl (Function.mulSupport_mul _ _)))
-  obtain ⟨M, hM0, hMb, hMv⟩ := GlobalTheory.SmoothForms.denom_global H hH1 hHf
+  obtain ⟨M, hM0, hMb, hMv⟩ :=
+    _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator H hH1 hHf
   have hfin
       : ∀ x : AF F,
         (∀ v, ‖evFin F v x‖₊ ≤ H v)

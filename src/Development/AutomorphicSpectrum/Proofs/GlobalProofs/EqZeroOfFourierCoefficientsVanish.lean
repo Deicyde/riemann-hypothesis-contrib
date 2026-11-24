@@ -293,7 +293,4 @@ theorem eq_zero_of_coeffs_vanish
 
 end Gen
 
-theorem countable_numberField (F : Type) [Field F] [NumberField F] : Countable F :=
-  (Module.finBasis ℚ F).equivFun.injective.countable
-
 end GlobalTheory.CompanionTheory.FourierComplete

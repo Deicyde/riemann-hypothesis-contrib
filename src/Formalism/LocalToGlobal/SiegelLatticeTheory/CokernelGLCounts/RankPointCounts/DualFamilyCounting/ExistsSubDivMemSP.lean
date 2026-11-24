@@ -167,7 +167,6 @@ theorem exists_sub_div_mem_SP
 
 theorem star_jK (w : 𝓞 K) : ∃ w' : 𝓞 K, jK w' = star (jK w) := StandardSymmetricSums.star_int w
 
-theorem star_jK_ι (hF : IsFixF K F) (t : 𝓞 F) : star (jK (ι t)) = jK (ι t) :=
-  (hF _).2 ⟨(t : F), rfl⟩
+alias star_jK_ι := _root_.Formalism.HermitianLattices.Ext.L3.localizedQuotients.star_ι
 
 end Formalism.L2.SG.Pf.G2

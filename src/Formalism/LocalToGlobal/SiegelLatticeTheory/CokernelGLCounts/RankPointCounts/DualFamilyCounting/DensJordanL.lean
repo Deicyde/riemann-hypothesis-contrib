@@ -76,7 +76,7 @@ theorem jl_bc_smulO (o : 𝓞 D.host.E) (x : (VS D).V)
     : L.bc p (o • x) = (D.s.atP p).ιE (o : D.host.E) • L.bc p x := by
   rw [← L.bc_smul p]
   congr 1
-  first | rfl | exact (algebraMap_smul D.host.E o x).symm
+  first | exact (algebraMap_smul D.host.E o x).symm
 
 theorem jl_iE_mem (hA : Agree δ M p) (o : 𝓞 D.host.E)
     : (D.s.atP p).ιE (o : D.host.E) ∈ (M p).L.O := by

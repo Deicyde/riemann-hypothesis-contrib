@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsInvDer
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ConstThickeningFieldStructureStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsLieBasis
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ConstThickeningFieldStructure
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LeISupInfPreimage
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -113,7 +114,8 @@ theorem aux
             ∧ (∀ W f f', dd W (f * f') = f * dd W f' + f' * dd W f)
             ∧ (∀ W W' (f : Γ(Y, W)), W' ≤ W → dd W' (rsT f W') = rsT (dd W f) W')
             ∧ (∀ W a, dd W (constFn q W a) = 0) ∧ ∀ dd', P dd' → dd' = dd := by
-  obtain ⟨hO, -, hex⟩ := GlobalTheory.T.const_thickening_field_structure K Y Y' q π ρ j hp hρ hπ
+  obtain ⟨hO, -, hex⟩ :=
+    _root_.GlobalTheory.ConstThickening.structure_dualNumber K Y Y' q π ρ j hp hρ hπ
   have hTW : ∀ W : Y.Opens, ρ ⁻¹ᵁ W ≤ T ⁻¹ᵁ W := fun W => by
     have := hO (T ⁻¹ᵁ W)
     rw [← Scheme.Hom.comp_preimage j T, hT, Scheme.Hom.id_preimage] at this

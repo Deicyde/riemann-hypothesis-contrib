@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LayerProd
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointLatticeIntersectionSelfDualPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointMajorantFramesGiveMajorantsStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointLatticeIntersectionSelfDualProperties
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointMajorantFramesGiveMajorants
 public import Formalism.HarderNarasimhan.ShiftInvariance
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -164,8 +164,8 @@ theorem steps
             → 0 < least I x ∧ (stepLe I x t = ⊥ ↔ t < least I x)
               ∧ (stepLt I x t = ⊥ ↔ t ≤ least I x)) := by
   intro I x t ht
-  obtain ⟨-, hfg, hspan, -, -⟩ := GlobalTheory.T.autPointLatticeIntersection_selfDual_properties I x
-  obtain ⟨hTC, -, -, -, hw⟩ := GlobalTheory.T.autPointMajorantFrames_give_majorants I x
+  obtain ⟨-, hfg, hspan, -, -⟩ := _root_.GlobalTheory.PointLattice.lamX_selfDual I x
+  obtain ⟨hTC, -, -, -, hw⟩ := _root_.GlobalTheory.Count.FrameMajorant.frames_give_majorants I x
   have := hTC
   have hdet : ∀ w, IsUnit (frm I x w).det := fun w => (hw w).1
   set ρ := Formalism.HermitianLatticesTheory.realize (bas I) (frm I x) with hρ

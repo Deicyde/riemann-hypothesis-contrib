@@ -81,8 +81,7 @@ theorem decomp
     have e1 : (s : G) = y := huniq s ⟨s.2, hx.1.2⟩
     have e2 : (t : G) = y := huniq t ⟨t.2, hx.2.2⟩
     exact Subtype.ext (e1.trans e2.symm)
-  have hRae : ∀ᵐ x ∂μR, x ∈ R := by
-    first | exact ae_iff.2 hR | exact (mem_ae_iff.2 hR : R ∈ ae μR) | simpa [ae_iff] using hR
+  have hRae : ∀ᵐ x ∂μR, x ∈ R := by first | exact ae_iff.2 hR
   have hae : P =ᵐ[μR] ⋃ s : Γ0, (P ∩ (fun x => (s : G) * x) ⁻¹' Q) := by
     filter_upwards [hRae] with x hx
     constructor

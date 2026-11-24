@@ -90,10 +90,10 @@ theorem exists_succ
     : ∃ q : Fin n, Prec ρ κ a.val q.val ∧ dp n ρ κ a.val ≤ dp n ρ κ q.val + 1 := by
   by_cases h : a.val + 1 = ρ + κ
   · refine ⟨⟨ρ + κ + 1, by omega⟩, ?_, ?_⟩
-    all_goals (simp only [Prec, dp, Fin.val_mk] at *; split_ifs at * <;> omega)
+    all_goals (simp only [Prec, dp] at *; split_ifs at * <;> omega)
   · have : a.val + 1 < n := by unfold dp at ha; split_ifs at ha <;> omega
     refine ⟨⟨a.val + 1, this⟩, ?_, ?_⟩
-    all_goals (simp only [Prec, dp, Fin.val_mk] at *; split_ifs at * <;> omega)
+    all_goals (simp only [Prec, dp] at *; split_ifs at * <;> omega)
 
 theorem exists_pred
     {ρ κ : ℕ} (hn : n = 2 * ρ + κ + 1) (hρ : 1 ≤ ρ) (hκ : 2 ≤ κ) (a : Fin n) (ha : 1 ≤ ht ρ κ a.val)
@@ -101,13 +101,13 @@ theorem exists_pred
   have := a.2
   by_cases h : a.val = ρ + κ
   · refine ⟨⟨ρ - 1, by omega⟩, ?_, ?_⟩
-    all_goals (simp only [Prec, ht, Fin.val_mk] at *; split_ifs at * <;> omega)
+    all_goals (simp only [Prec, ht] at *; split_ifs at * <;> omega)
   by_cases h' : a.val = ρ + κ + 1
   · refine ⟨⟨ρ + κ - 1, by omega⟩, ?_, ?_⟩
-    all_goals (simp only [Prec, ht, Fin.val_mk] at *; split_ifs at * <;> omega)
+    all_goals (simp only [Prec, ht] at *; split_ifs at * <;> omega)
   · have : 1 ≤ a.val := by unfold ht at ha; split_ifs at ha <;> omega
     refine ⟨⟨a.val - 1, by omega⟩, ?_, ?_⟩
-    all_goals (simp only [Prec, ht, Fin.val_mk] at *; split_ifs at * <;> omega)
+    all_goals (simp only [Prec, ht] at *; split_ifs at * <;> omega)
 
 theorem allowed_of
     {ρ κ i a : ℕ} (hn : n = 2 * ρ + κ + 1) (hρ : 1 ≤ ρ) (hκ : 2 ≤ κ) (hi : i < n) (ha : a < n)
@@ -203,11 +203,11 @@ theorem mul_single_mul' (X Y : Matrix (Fin n) (Fin n) k) (p q i j : Fin n) (s : 
     by_cases hx : x = q
     · subst hx
       rw [if_pos rfl, Finset.sum_eq_single p]
-      · simp [Matrix.single_apply]
-      · intro y _ hy; simp [Matrix.single_apply, Ne.symm hy]
+      · simp
+      · intro y _ hy; simp [Ne.symm hy]
       · simp
     · rw [if_neg hx]
-      exact Finset.sum_eq_zero fun y _ => by simp [Matrix.single_apply, Ne.symm hx]
+      exact Finset.sum_eq_zero fun y _ => by simp [Ne.symm hx]
   rw [h1, Matrix.mul_apply, Finset.sum_eq_single q]
   · simp [mul_assoc]
   · intro y _ hy; simp [hy]

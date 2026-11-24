@@ -64,8 +64,7 @@ theorem lift_lift_V
       = D.castV h2 (liftVec k (j + 1) ρ v) := by
   funext i
   simp only [D.castV, liftVec, Fin.coe_cast]
-  split_ifs <;> (try simp only [Fin.ext_iff, Fin.val_mk, Fin.coe_cast] at *)
-    <;> first | rfl | omega | (congr 1 <;> ext <;> simp only [Fin.val_mk, Fin.coe_cast] <;> omega)
+  split_ifs <;> (try simp only at *) <;> first | rfl | omega
 
 theorem lift_lift_M
     (j ρ n r : ℕ) (hn : 1 + ρ = n) (h1 : j + n = r) (h2 : j + 1 + ρ = r) (y : B.Mat k ρ)
@@ -73,8 +72,7 @@ theorem lift_lift_M
   ext p q
   simp only [D.castM, Matrix.reindex_apply, Matrix.submatrix_apply, finCongr_symm, finCongr_apply,
     Fin.coe_cast, ιLev]
-  split_ifs <;> (try simp only [Fin.ext_iff, Fin.val_mk, Fin.coe_cast] at *)
-    <;> first | rfl | omega | (congr 1 <;> ext <;> simp only [Fin.val_mk, Fin.coe_cast] <;> omega)
+  split_ifs <;> (try simp only [Fin.ext_iff, Fin.coe_cast] at *) <;> first | rfl | omega
 
 theorem castV_inj
     {a b : ℕ} (h : a = b) {v w : Fin (2 * a + k + 1) → ℂ} (e : D.castV h v = D.castV h w)

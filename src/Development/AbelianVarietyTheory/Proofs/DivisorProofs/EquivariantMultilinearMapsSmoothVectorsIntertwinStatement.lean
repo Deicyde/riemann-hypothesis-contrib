@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped Classical
+
 theorem _root_.GlobalTheory.T.equivariantMultilinear_maps_smoothVectors_intertwines
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
       IsInfFam θ
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.equivariantMultilinear_maps_smoothVectors_intertwi
                 ∧ ∀ τ, ∀ X ∈ lieAt V τ,
                   dL2 θ V ρ (τ, X) (Φ fun τ => (v τ : M.H τ))
                     = Φ (Function.update (fun τ => (v τ : M.H τ)) τ (dRep (M.rep τ) X (v τ))) := by
-  first
-  | exact @GlobalTheory.SmoothMultilinear.smooth_map
-  | exact GlobalTheory.SmoothMultilinear.smooth_map
-  | (intros; apply GlobalTheory.SmoothMultilinear.smooth_map <;> assumption)
+  first | exact @GlobalTheory.SmoothMultilinear.smooth_map

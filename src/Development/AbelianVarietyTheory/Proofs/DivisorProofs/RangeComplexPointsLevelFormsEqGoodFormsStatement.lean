@@ -51,6 +51,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.range_complex_points_level_forms_eq_good_forms
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.range_complex_points_level_forms_eq_good_forms
             = Tw.sub (twAt D.what₂.embLL A3.A.v0)
               ((R.toRealDat.Wat i (sg0 D A3.A) (R.toRealDat.levL F.lv2 b (sg0 D A3.A))).comap
                 (R.HW i (sg0 D A3.A)).e) := by
-  first
-  | exact @GlobalTheory.LevelRange.range_w0C_eq
-  | exact GlobalTheory.LevelRange.range_w0C_eq
-  | (intros; apply GlobalTheory.LevelRange.range_w0C_eq <;> assumption)
+  first | exact @GlobalTheory.LevelRange.range_w0C_eq

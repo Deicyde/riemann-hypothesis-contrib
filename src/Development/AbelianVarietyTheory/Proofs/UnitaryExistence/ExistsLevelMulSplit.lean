@@ -249,7 +249,7 @@ theorem _root_.GlobalTheory.exists_level_mul_split
         : (Ideal.span {(pd : 𝓞 E), H.w0 - (r : 𝓞 E)}).map (H.bar : 𝓞 E →+* 𝓞 E)
           = Ideal.span {(pd : 𝓞 E), 1 - H.w0 - (r : 𝓞 E)} := by
       rw [Ideal.map_span, Set.image_pair]
-      simp [host_bar_w0_of_isCMField]
+      simp
     refine ⟨Ideal.span {(pd : 𝓞 E), H.w0 - (r : 𝓞 E)}, ?_, ?_, ?_⟩
     · refine span_eq_span_inter_subalgebra _ _
         (Set.insert_subset_iff.2 ⟨

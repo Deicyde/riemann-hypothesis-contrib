@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -50,6 +51,7 @@ open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
+
 theorem _root_.GlobalTheory.T.surjective_labelHom_lattice_mod_level_thetaMember
     : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (Z : Scheme.{0})
         (i : F.X ⟶ Z) (X₁ : Setup F W i) (z₁ : X₁.M.Z)
@@ -60,7 +62,4 @@ theorem _root_.GlobalTheory.T.surjective_labelHom_lattice_mod_level_thetaMember
       (∀ a, ∃ mu, 𝔪.YY a mu) ∧ (∀ mu, ∃ a, 𝔪.YY a mu)
         ∧ (∀ a mu mu', 𝔪.YY a mu → (𝔪.YY a mu' ↔ ∀ v, CongMod (X₁.S.r * X₁.S.N) (mu' v) (mu v)))
         ∧ (∀ a a' mu mu', 𝔪.YY a mu → 𝔪.YY a' mu' → 𝔪.YY (a + a') (mu + mu')) := by
-  first
-  | exact @GlobalTheory.Poinc.Sep.Labels.yy_hom
-  | exact GlobalTheory.Poinc.Sep.Labels.yy_hom
-  | (intros; apply GlobalTheory.Poinc.Sep.Labels.yy_hom <;> assumption)
+  first | exact @GlobalTheory.Poinc.Sep.Labels.yy_hom

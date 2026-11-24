@@ -2,8 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPeriodPairIdealCurveLattice
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.JetsTorsionTranslatesCmThetaProductStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KernelAtPrimeEqSumTorsionTranslatesStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.JetsTorsionTranslatesCmThetaProduct
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KernelAtPrimeEqSumTorsionTranslates
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OddThetaFunctionExistenceUniqueness
 import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.FamilyLogGammaSmallHolds
 import Mathlib.Algebra.Order.Floor.Extended
@@ -64,9 +64,8 @@ def Bd {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (B : ℝ) (x : ℂ) :
 section
 variable {p : ℕ} [Fact p.Prime] {lam : Qbar →+* ℂ_[p]}
 
-theorem lamC_coe (x : Qbar) : lamC lam (x : ℂ) = lam x := by simp [lamC, x.2]
-
-theorem Bd.coe {B : ℝ} {x : Qbar} (h : ‖lam x‖ ≤ B) : Bd lam B (x : ℂ) := ⟨x.2, by rwa [lamC_coe]⟩
+theorem Bd.coe {B : ℝ} {x : Qbar} (h : ‖lam x‖ ≤ B) : Bd lam B (x : ℂ) :=
+  ⟨x.2, by rwa [_root_.GlobalTheory.ProductJets.lamC_coe]⟩
 
 theorem Bd.mono {B B' : ℝ} {x : ℂ} (h : Bd lam B x) (hB : B ≤ B') : Bd lam B' x :=
   ⟨h.1, h.2.trans hB⟩
@@ -80,7 +79,7 @@ theorem Bd.add {B : ℝ} {x y : ℂ} (hx : Bd lam B x) (hy : Bd lam B y) : Bd la
   obtain ⟨hy, h2⟩ := hy
   lift x to Qbar using hx
   lift y to Qbar using hy
-  rw [lamC_coe] at h1 h2
+  rw [_root_.GlobalTheory.ProductJets.lamC_coe] at h1 h2
   have :=
     Bd.coe (lam := lam) (B := B) (x := x + y) (by
       rw [map_add (f := _)]
@@ -93,7 +92,7 @@ theorem Bd.mul {A B : ℝ} {x y : ℂ} (hx : Bd lam A x) (hy : Bd lam B y)
   obtain ⟨hy, h2⟩ := hy
   lift x to Qbar using hx
   lift y to Qbar using hy
-  rw [lamC_coe] at h1 h2
+  rw [_root_.GlobalTheory.ProductJets.lamC_coe] at h1 h2
   have :=
     Bd.coe (lam := lam) (B := A * B) (x := x * y) (by
       rw [map_mul, norm_mul]
@@ -297,7 +296,7 @@ theorem term_bound
                               + ((P.a * P.d : ℕ) : ℝ) * (padicValNat p Q : ℝ)) := by
   intro D hI S dl hL δ t0 Q hC ht hQ P p _ lam g g' k' hk hg hg' T
   obtain ⟨b, k, M, r, s, hb, hloc, hM, hMp, hs, hr, hF⟩ :=
-    GlobalTheory.T.kernelAtPrime_eq_sum_torsionTranslates D hI δ t0 Q hC ht hQ.1 P p lam g g' k' hk
+    _root_.GlobalTheory.NormSum.kernel_eq_sum_translates D hI δ t0 Q hC ht hQ.1 P p lam g g' k' hk
       hg hg'
   have hp : p.Prime := Fact.out
   have hp0 : (0 : ℝ) < p := by exact_mod_cast hp.pos
@@ -333,8 +332,8 @@ theorem term_bound
   rw [hQn] at h1
   refine (Bd.coe h1).mul ?_
   have :=
-    GlobalTheory.T.jets_torsion_translates_cm_theta_product D hI p lam ⊤ δ hC (by simp) t0 ht P.a
-      P.d _ b hb hloc (s i) (M * Q) (Nat.mul_pos hM hQ.1) (hs i) hsp _ y hy
+    _root_.GlobalTheory.ProductJets.jets_translate_product D hI p lam ⊤ δ hC (by simp) t0 ht P.a P.d
+      _ b hb hloc (s i) (M * Q) (Nat.mul_pos hM hQ.1) (hs i) hsp _ y hy
   rw [hN] at this
   exact this
 

@@ -45,6 +45,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.Published
+
 theorem _root_.GlobalTheory.T.weaklyAttachedGaloisRepresentation_baseChange_restrict
     : ∀ (E M Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field M] [NumberField M]
         [IsCMField M] [Algebra E M] [Field Ω] [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω]
@@ -53,7 +54,4 @@ theorem _root_.GlobalTheory.T.weaklyAttachedGaloisRepresentation_baseChange_rest
       IsLift π P
         → ∀ r : G E Ω →* GL (Fin a) (Qbar l),
           Weak π ι r → Weak P ι (r.comp (UpperTheory.V.Af.Bc.res E Ω M)) := by
-  first
-  | exact @GlobalTheory.GalCut.weak_comp_res
-  | exact GlobalTheory.GalCut.weak_comp_res
-  | (intros; apply GlobalTheory.GalCut.weak_comp_res <;> assumption)
+  first | exact @GlobalTheory.GalCut.weak_comp_res

@@ -212,13 +212,7 @@ theorem coeff_free
     have hz : ∀ q : Fin 3 × Fin dd, constantCoeff (rz (C := C) (dd := dd) 2 q.1 q.2) = 0 := by
       rintro ⟨k, i⟩
       induction k using Fin.cases <;> simp [rz, pt]
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_zero' hz
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun q => by
-        rw [hz q]; exact IsNilpotent.zero)
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_nilpotent (fun q => by
-        rw [hz q]; exact IsNilpotent.zero)
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz
   have hmon
       : ∀ d' : Fin 2 × Fin dd →₀ ℕ,
         (d'.prod fun s n => (X s : PS C 2 dd) ^ n) = MvPowerSeries.monomial d' (1 : C) := by

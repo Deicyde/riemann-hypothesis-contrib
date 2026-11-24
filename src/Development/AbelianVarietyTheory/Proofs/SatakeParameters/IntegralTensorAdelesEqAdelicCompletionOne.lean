@@ -61,7 +61,8 @@ theorem lamHat_eq_hat {D : D7} (V : HSp D)
         (GlobalTheory.Member.latC V : Set (Fin V.rank → D.host.E)) := by
   have : (GlobalTheory.Member.latC V : Set (Fin V.rank → D.host.E)) = L0c D V := by
     ext v
-    rw [SetLike.mem_coe, GlobalTheory.Member.mem_latC, Module.Basis.equivFun_symm_apply]
+    rw [SetLike.mem_coe, _root_.GlobalTheory.Member.mem_latC_iff_symm_mem,
+      Module.Basis.equivFun_symm_apply]
     rfl
   rw [this]
   rfl

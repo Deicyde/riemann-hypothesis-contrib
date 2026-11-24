@@ -44,7 +44,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
 open GlobalTheory.Mem.R3.Tr Formalism.BasicNotions.TH
 
-
 noncomputable section
 namespace GlobalTheory.Mem.GridMove
 open GlobalTheory.ChiGrid

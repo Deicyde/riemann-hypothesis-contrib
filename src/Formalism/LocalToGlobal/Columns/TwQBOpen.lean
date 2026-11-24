@@ -180,7 +180,7 @@ theorem qbDF_spec (P : Q)
         ∧ ∃ w ∈ ((qv F P.1).adicCompletionIntegers F),
           algebraMap (𝓞 F) ((qv F P.1).adicCompletion F) D
             = qbF hc hQ P (qbD hc Θ hQ hΘ P) * w := by
-  obtain ⟨b, hb⟩ := qsp_norm_mem hc (qbPi hc hQ P)
+  obtain ⟨b, hb⟩ := _root_.Formalism.L2.Col.rll_norm_mem hc (qbPi hc hQ P)
   have hbP : b ∈ (underPl F P.1).asIdeal := by
     show algebraMap (𝓞 F) (𝓞 E) b ∈ P.1.asIdeal
     rw [hb]
@@ -261,7 +261,7 @@ theorem qbOpen : QOpen (qbLoc hc Θ hQ hΘ) := by
     rw [map_sub, map_mul, map_natCast] at e2
     refine ⟨
       algebraMap (𝓞 F) _ t * w * f (z i),
-      Subring.mul_mem _ (Subring.mul_mem _ (glo_algMap_int _ t) hw)
+      Subring.mul_mem _ (Subring.mul_mem _ (_root_.Formalism.UG.P.levelaf_int_mem_v _ t) hw)
         ((((qbLoc hc Θ hQ hΘ).sp_int P (z i)).1 (qsp_locL_entry _ hz i)).1),
       ?_
     ⟩
@@ -311,7 +311,9 @@ theorem qbOpen : QOpen (qbLoc hc Θ hQ hΘ) := by
     refine ⟨
       w * (∏ P' ∈ Q.attach.erase P, algebraMap (𝓞 F) _ (qbDF hc Θ hQ hΘ P'))
         * f (prV (E := E) (qv F P.1) (sa i j : E ⊗[F] Formalism.L2.Herm.Af F)),
-      Subring.mul_mem _ (Subring.mul_mem _ hw (Subring.prod_mem _ fun P' _ => glo_algMap_int _ _))
+      Subring.mul_mem _
+        (Subring.mul_mem _ hw
+          (Subring.prod_mem _ fun P' _ => _root_.Formalism.UG.P.levelaf_int_mem_v _ _))
         ((((qbLoc hc Θ hQ hΘ).sp_int P _).1 (afsplit_prV_int (qv F P.1) _ (sa i j).2)).1),
       ?_
     ⟩

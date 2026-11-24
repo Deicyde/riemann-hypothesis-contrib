@@ -1,8 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharactersStatement
-import Mathlib.Algebra.AffineMonoid.UniqueSums
+public import Mathlib.RepresentationTheory.FinGroupCharZero
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -18,6 +17,8 @@ import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
 import Mathlib.RingTheory.Radical.NatInt
 import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
@@ -27,7 +28,7 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -41,8 +42,148 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Tactic.Linter.HaveILetI
 import Std.Tactic.BVDecide.Normalize.Prop
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharacters, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RootsMinpolyPhi
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharacters =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharacters", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\npublic import Mathlib.RepresentationTheory.FinGroupCharZero\nimport Mathlib.RingTheory.Coalgebra.IsFrobenius\nimport Mathlib.RingTheory.HopfAlgebra.Basic\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+section
+open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
+open scoped Classical
+
+noncomputable section
+
+namespace GlobalTheory.CompanionTheory.FieldAut
+
+section Rep
+
+variable {G : Type} [Group G]
+
+def galRep (σ : ℂ ≃+* ℂ) (V : FDRep ℂ G) : Representation ℂ G (Fin (Module.finrank ℂ V) → ℂ) :=
+  ((Matrix.toLinAlgEquiv' (R := ℂ) (n := Fin (Module.finrank ℂ V))).toMulEquiv.toMonoidHom).comp
+    (((σ : ℂ →+* ℂ).mapMatrix (m := Fin (Module.finrank ℂ V))).toMonoidHom.comp
+      (((LinearMap.toMatrixAlgEquiv (Module.finBasis ℂ V)).toMulEquiv.toMonoidHom).comp V.ρ))
+
+theorem trace_galRep (σ : ℂ ≃+* ℂ) (V : FDRep ℂ G) (x : G)
+    : LinearMap.trace ℂ _ (galRep σ V x) = σ (V.character x) := by
+  have h1
+      : galRep σ V x
+        = Matrix.toLin'
+          ((LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) (V.ρ x)).map σ) :=
+    rfl
+  have h2
+      : V.character x
+        = (LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) (V.ρ x)).trace :=
+    LinearMap.trace_eq_matrix_trace ℂ (Module.finBasis ℂ V) (V.ρ x)
+  rw [h1, Matrix.trace_toLin'_eq, h2]
+  simp [Matrix.trace]
+
+variable [Fintype G]
+
+theorem isIrr_comp (σ : ℂ ≃+* ℂ) {χ : G → ℂ} (h : IsIrr χ) : IsIrr (σ ∘ χ) := by
+  obtain ⟨V, hs, hV⟩ := h
+  have hW : ∀ x, (FDRep.of (galRep σ V)).character x = σ (V.character x) := fun x =>
+    trace_galRep σ V x
+  refine ⟨FDRep.of (galRep σ V), ?_, fun x => by rw [hW, hV]; rfl⟩
+  rw [FDRep.simple_iff_char_is_norm_one]
+  have h := congrArg σ ((FDRep.simple_iff_char_is_norm_one V).1 hs)
+
+  rw [map_natCast, map_sum] at h
+  rw [← h]
+  exact Finset.sum_congr rfl fun x _ => by rw [map_mul, hW, hW]
+
+theorem coeff_zOf (χ : G → ℂ) (y : G) : (zOf χ).coeff y = χ 1 / (Fintype.card G : ℂ) * χ y⁻¹ := by
+  simp only [zOf, MonoidAlgebra.coeff_sum, MonoidAlgebra.coeff_single, Finsupp.coe_finsetSum,
+    Finset.sum_apply, Finsupp.single_apply, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+theorem mapRange_zOf (σ : ℂ ≃+* ℂ) (χ : G → ℂ)
+    : (zOf χ).coeff.mapRange σ (map_zero σ) = (zOf (σ ∘ χ)).coeff := by
+  ext y
+  rw [Finsupp.mapRange_apply, coeff_zOf, coeff_zOf]
+  simp only [Function.comp, map_mul, map_div₀, map_natCast]
+
+theorem ip_comp (σ : ℂ ≃+* ℂ) (α β : G → ℂ) : ip (σ ∘ α) (σ ∘ β) = σ (ip α β) := by
+  simp only [ip, Function.comp, map_mul, map_sum, map_inv₀, map_natCast]
+
+end Rep
+
+variable {g : ℕ} [Fact g.Prime]
+
+theorem hc_comp (σ : ℂ ≃+* ℂ) (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ)
+    : hc a b (σ ∘ α) (σ ∘ β) n = σ ∘ hc a b α β n := by
+  funext x
+
+  simp only [hc, hcT, Function.comp, map_mul, map_sum, map_inv₀, map_natCast, apply_ite σ, map_zero]
+
+theorem degL_map (σ : ℂ ≃+* ℂ) (L : List (Pc g))
+    : degL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g)) = degL L := by
+  simp [degL, List.map_map, Function.comp_def]
+
+theorem hcL_map (σ : ℂ ≃+* ℂ) (L : List (Pc g))
+    : ∀ n, hcL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g)) n = σ ∘ hcL L n := by
+  induction L with
+  | nil =>
+    intro n
+    funext x
+    simp [hcL_nil]
+  | cons p L ih =>
+    intro n
+    show hc p.1 (degL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g))) (σ ∘ p.2)
+      (hcL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g)) (degL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g)))) n = _
+    rw [degL_map, ih, hc_comp, hcL_cons]
+
+theorem res_comp (σ : ℂ ≃+* ℂ) (a b : ℕ) {n : ℕ} (χ : Gn g n → ℂ) (h₁ : Gn g a) (h₂ : Gn g b)
+    : res a b (σ ∘ χ) h₁ h₂ = σ (res a b χ h₁ h₂) := by
+  simp only [res, Function.comp, map_mul, map_sum, map_inv₀, map_pow, map_natCast, apply_ite σ,
+    map_zero]
+
+theorem isCusp_comp (σ : ℂ ≃+* ℂ) {d : ℕ} {χ : Gn g d → ℂ} (h : IsCusp χ) : IsCusp (σ ∘ χ) :=
+  ⟨h.1, isIrr_comp σ h.2.1, fun a ha ha' => by rw [res_comp, h.2.2 a ha ha', map_zero]⟩
+
+end GlobalTheory.CompanionTheory.FieldAut
+
+theorem GlobalTheory.CompanionTheory.FieldAut.action
+    : ∀ (g : ℕ) [Fact g.Prime] (σ : ℂ ≃+* ℂ),
+      (∀ (G : Type) [Group G] [Fintype G] (χ : G → ℂ),
+          (IsIrr χ → IsIrr (σ ∘ χ)) ∧ (zOf χ).coeff.mapRange σ (map_zero σ) = (zOf (σ ∘ χ)).coeff
+            ∧ ∀ β, ip (σ ∘ χ) (σ ∘ β) = σ (ip χ β))
+        ∧ (∀ (L : List (Pc g)) (n : ℕ),
+          hcL (L.map fun p => (⟨p.1, σ ∘ p.2⟩ : Pc g)) n = σ ∘ hcL L n)
+        ∧ ∀ (d : ℕ) (χ : Gn g d → ℂ), IsCusp χ → IsCusp (σ ∘ χ) := by
+  intro g _ σ
+  exact ⟨
+    fun G _ _ χ => ⟨
+      GlobalTheory.CompanionTheory.FieldAut.isIrr_comp σ,
+      GlobalTheory.CompanionTheory.FieldAut.mapRange_zOf σ χ,
+      GlobalTheory.CompanionTheory.FieldAut.ip_comp σ χ
+    ⟩,
+    fun L n => GlobalTheory.CompanionTheory.FieldAut.hcL_map σ L n,
+    fun d χ h => GlobalTheory.CompanionTheory.FieldAut.isCusp_comp σ h
+  ⟩
+
+end
+end
+
+section
+open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
+open scoped Classical
+alias _root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters := _root_.GlobalTheory.CompanionTheory.FieldAut.action
+
+end
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharacters =====
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RootsMinpolyPhi =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RootsMinpolyPhi", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum\npublic import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ComplexFieldAutActsHarishChandraCharacters\nimport Mathlib.Algebra.AffineMonoid.UniqueSums\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.HaveILetI\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\n\n"}
+section -- clump:auto
 @[expose] public section
 
 open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
@@ -94,8 +235,8 @@ theorem teich_injective (L : LabelDatum g) : Function.Injective L.teich := by
     · exact absurd (by rw [h, hy, teich_zero]) (teich_ne_zero L hx)
     · exact L.teich_inj x y hx hy h
 
-theorem map_eq_pow {R : Type} [CommRing R] [IsDomain R] (s : R →* R) {x : R} (hx : IsOfFinOrder x) :
-    ∃ a : ℕ, s x = x ^ a := by
+theorem map_eq_pow {R : Type} [CommRing R] [IsDomain R] (s : R →* R) {x : R} (hx : IsOfFinOrder x)
+    : ∃ a : ℕ, s x = x ^ a := by
   haveI : NeZero (orderOf x) := ⟨hx.orderOf_pos.ne'⟩
   have h1 : s x ^ orderOf x = 1 := by rw [← map_pow, pow_orderOf_eq_one, map_one]
   obtain ⟨a, -, ha⟩ := (IsPrimitiveRoot.orderOf x).eq_pow_of_pow_eq_one h1
@@ -104,8 +245,8 @@ theorem map_eq_pow {R : Type} [CommRing R] [IsDomain R] (s : R →* R) {x : R} (
 def phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) : Fbar g :=
   Function.invFun L.teich (τ (L.teich x))
 
-theorem phi_pow (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
-    ∃ a : ℕ, phi L τ x = x ^ a ∧ τ (L.teich x) = L.teich (x ^ a) := by
+theorem phi_pow (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g)
+    : ∃ a : ℕ, phi L τ x = x ^ a ∧ τ (L.teich x) = L.teich (x ^ a) := by
   have h : ∃ a : ℕ, τ (L.teich x) = L.teich (x ^ a) := by
     by_cases hx : x = 0
     · exact ⟨1, by rw [hx, pow_one, teich_zero, map_zero]⟩
@@ -114,8 +255,8 @@ theorem phi_pow (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
   obtain ⟨a, ha⟩ := h
   exact ⟨a, by rw [phi, ha]; exact Function.leftInverse_invFun (teich_injective L) _, ha⟩
 
-theorem teich_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
-    L.teich (phi L τ x) = τ (L.teich x) := by
+theorem teich_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g)
+    : L.teich (phi L τ x) = τ (L.teich x) := by
   obtain ⟨a, h1, h2⟩ := phi_pow L τ x
   rw [h1, h2]
 
@@ -128,11 +269,12 @@ theorem phi_injective (L : LabelDatum g) (τ : ℂ ≃+* ℂ) : Function.Injecti
 theorem phi_zero (L : LabelDatum g) (τ : ℂ ≃+* ℂ) : phi L τ 0 = 0 :=
   teich_injective L (by rw [teich_phi, teich_zero, map_zero])
 
-theorem phi_pow' (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) (n : ℕ) : phi L τ (x ^ n) = phi L τ x ^ n :=
+theorem phi_pow' (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) (n : ℕ)
+    : phi L τ (x ^ n) = phi L τ x ^ n :=
   teich_injective L (by rw [teich_phi, map_pow, map_pow, map_pow, teich_phi])
 
-theorem phi_gal (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (s : Fbar g ≃ₐ[ZMod g] Fbar g) (x : Fbar g) :
-    phi L τ (s x) = s (phi L τ x) := by
+theorem phi_gal (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (s : Fbar g ≃ₐ[ZMod g] Fbar g) (x : Fbar g)
+    : phi L τ (s x) = s (phi L τ x) := by
   by_cases hx : x = 0
   · rw [hx, map_zero, phi_zero, map_zero]
   · obtain ⟨b, hb⟩ := map_eq_pow (s : Fbar g →* Fbar g) (finOrder hx)
@@ -140,14 +282,15 @@ theorem phi_gal (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (s : Fbar g ≃ₐ[ZMod 
     obtain ⟨a, ha, -⟩ := phi_pow L τ x
     rw [hb', phi_pow', ha, map_pow, hb', ← pow_mul, ← pow_mul, mul_comm]
 
-theorem mem_rootsBar {f : (ZMod g)[X]} (hf : f ≠ 0) {x : Fbar g} : x ∈ rootsBar f ↔ aeval x f = 0 := by
+theorem mem_rootsBar {f : (ZMod g)[X]} (hf : f ≠ 0) {x : Fbar g}
+    : x ∈ rootsBar f ↔ aeval x f = 0 := by
   have := mem_aroots (p := f) (S := Fbar g) (a := x)
   rw [aroots_def] at this
   rw [rootsBar, this]
   exact ⟨fun h => h.2, fun h => ⟨hf, h⟩⟩
 
-theorem mem_roots_minpoly {x y : Fbar g} :
-    y ∈ rootsBar (minpoly (ZMod g) x) ↔ ∃ s : Fbar g ≃ₐ[ZMod g] Fbar g, s x = y := by
+theorem mem_roots_minpoly {x y : Fbar g}
+    : y ∈ rootsBar (minpoly (ZMod g) x) ↔ ∃ s : Fbar g ≃ₐ[ZMod g] Fbar g, s x = y := by
   have hi : IsIntegral (ZMod g) x := Algebra.IsIntegral.isIntegral x
   rw [mem_rootsBar (minpoly.ne_zero hi)]
   constructor
@@ -160,8 +303,8 @@ theorem nodup_minpoly (x : Fbar g) : (rootsBar (minpoly (ZMod g) x)).Nodup := by
   haveI : NeZero g := ⟨(Fact.out : g.Prime).ne_zero⟩
   exact nodup_roots (PerfectField.separable_of_irreducible (minpoly.irreducible hi)).map
 
-theorem roots_minpoly_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
-    rootsBar (minpoly (ZMod g) (phi L τ x)) = (rootsBar (minpoly (ZMod g) x)).map (phi L τ) := by
+theorem roots_minpoly_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g)
+    : rootsBar (minpoly (ZMod g) (phi L τ x)) = (rootsBar (minpoly (ZMod g) x)).map (phi L τ) := by
   rw [Multiset.Nodup.ext (nodup_minpoly _) ((nodup_minpoly x).map (phi_injective L τ))]
   intro y
   rw [mem_roots_minpoly, Multiset.mem_map]
@@ -172,14 +315,16 @@ theorem roots_minpoly_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
     obtain ⟨s, rfl⟩ := mem_roots_minpoly.1 hz
     exact ⟨s, (phi_gal L τ s x).symm⟩
 
-theorem rootsBar_mul {f h : (ZMod g)[X]} (hf : f ≠ 0) (hh : h ≠ 0) :
-    rootsBar (f * h) = rootsBar f + rootsBar h := by
+theorem rootsBar_mul {f h : (ZMod g)[X]} (hf : f ≠ 0) (hh : h ≠ 0)
+    : rootsBar (f * h) = rootsBar f + rootsBar h := by
   rw [rootsBar, rootsBar, rootsBar, Polynomial.map_mul, roots_mul]
   exact mul_ne_zero (Polynomial.map_ne_zero hf) (Polynomial.map_ne_zero hh)
 
-theorem eq_of_rootsBar {f h : (ZMod g)[X]} (hf : f.Monic) (hh : h.Monic) (e : rootsBar f = rootsBar h) :
-    f = h := by
-  apply Polynomial.map_injective (algebraMap (ZMod g) (Fbar g)) (algebraMap (ZMod g) (Fbar g)).injective
+theorem eq_of_rootsBar
+    {f h : (ZMod g)[X]} (hf : f.Monic) (hh : h.Monic) (e : rootsBar f = rootsBar h)
+    : f = h := by
+  apply Polynomial.map_injective (algebraMap (ZMod g) (Fbar g))
+    (algebraMap (ZMod g) (Fbar g)).injective
   rw [(IsAlgClosed.splits (f.map _)).eq_prod_roots_of_monic (hf.map _),
     (IsAlgClosed.splits (h.map _)).eq_prod_roots_of_monic (hh.map _)]
   exact congrArg (fun m : Multiset (Fbar g) => (m.map fun a => X - C a).prod) e
@@ -187,36 +332,43 @@ theorem eq_of_rootsBar {f h : (ZMod g)[X]} (hf : f.Monic) (hh : h.Monic) (e : ro
 theorem card_rootsBar (f : (ZMod g)[X]) : (rootsBar f).card = f.natDegree := by
   rw [rootsBar, ← (IsAlgClosed.splits (f.map _)).natDegree_eq_card_roots, natDegree_map]
 
-theorem exists_minpoly {P : (ZMod g)[X]} (hm : P.Monic) (hP : Irreducible P) :
-    ∃ x : Fbar g, P = minpoly (ZMod g) x := by
+theorem exists_minpoly {P : (ZMod g)[X]} (hm : P.Monic) (hP : Irreducible P)
+    : ∃ x : Fbar g, P = minpoly (ZMod g) x := by
   obtain ⟨x, hx⟩ := IsAlgClosed.exists_aeval_eq_zero (Fbar g) P (degree_pos_of_irreducible hP).ne'
   exact ⟨x, minpoly.eq_of_irreducible_of_monic hP hx hm⟩
 
 def Rel (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (f f' : (ZMod g)[X]) : Prop :=
   f'.Monic ∧ rootsBar f' = (rootsBar f).map (phi L τ)
 
-theorem Rel.mul {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' h h' : (ZMod g)[X]} (hf : f ≠ 0) (hh : h ≠ 0)
-    (h1 : Rel L τ f f') (h2 : Rel L τ h h') : Rel L τ (f * h) (f' * h') :=
-  ⟨h1.1.mul h2.1, by
-    rw [rootsBar_mul h1.1.ne_zero h2.1.ne_zero, rootsBar_mul hf hh, h1.2, h2.2, Multiset.map_add (f := _)]⟩
+theorem Rel.mul
+    {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' h h' : (ZMod g)[X]}
+    (hf : f ≠ 0) (hh : h ≠ 0) (h1 : Rel L τ f f') (h2 : Rel L τ h h')
+    : Rel L τ (f * h) (f' * h') := ⟨
+  h1.1.mul h2.1,
+  by
+    rw [rootsBar_mul h1.1.ne_zero h2.1.ne_zero, rootsBar_mul hf hh, h1.2, h2.2,
+      Multiset.map_add (f := _)]
+⟩
 
-theorem Rel.unique {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' f'' : (ZMod g)[X]}
-    (h1 : Rel L τ f f') (h2 : Rel L τ f f'') : f' = f'' :=
+theorem Rel.unique
+    {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' f'' : (ZMod g)[X]}
+    (h1 : Rel L τ f f') (h2 : Rel L τ f f'')
+    : f' = f'' :=
   eq_of_rootsBar h1.1 h2.1 (h1.2.trans h2.2.symm)
 
-theorem Rel.symm {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' : (ZMod g)[X]} (hf : f.Monic)
-    (h1 : Rel L τ f f') : Rel L τ.symm f' f :=
+theorem Rel.symm
+    {L : LabelDatum g} {τ : ℂ ≃+* ℂ} {f f' : (ZMod g)[X]} (hf : f.Monic) (h1 : Rel L τ f f')
+    : Rel L τ.symm f' f :=
   ⟨hf, by rw [h1.2, Multiset.map_map]; simp [phi_symm]⟩
 
-theorem rel_minpoly (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g) :
-    Rel L τ (minpoly (ZMod g) x) (minpoly (ZMod g) (phi L τ x)) :=
+theorem rel_minpoly (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (x : Fbar g)
+    : Rel L τ (minpoly (ZMod g) x) (minpoly (ZMod g) (phi L τ x)) :=
   ⟨minpoly.monic (Algebra.IsIntegral.isIntegral _), roots_minpoly_phi L τ x⟩
 
-theorem rel_one (L : LabelDatum g) (τ : ℂ ≃+* ℂ) : Rel L τ 1 1 :=
-  ⟨monic_one, by simp [rootsBar]⟩
+theorem rel_one (L : LabelDatum g) (τ : ℂ ≃+* ℂ) : Rel L τ 1 1 := ⟨monic_one, by simp [rootsBar]⟩
 
-theorem exists_rel (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ) :
-    ∀ f : (ZMod g)[X], f.Monic → f.natDegree = n → ∃ f', Rel L τ f f' := by
+theorem exists_rel (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ)
+    : ∀ f : (ZMod g)[X], f.Monic → f.natDegree = n → ∃ f', Rel L τ f f' := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro f hf hn
@@ -233,20 +385,27 @@ theorem exists_rel (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ) :
       obtain ⟨x, rfl⟩ := exists_minpoly hPm hP
       exact ⟨_, (rel_minpoly L τ x).mul hPm.ne_zero hh.ne_zero hh'⟩
 
-theorem theta_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (d : ℕ) (x z : Fbar g) :
-    thetaOf L d (phi L τ x) z = τ (thetaOf L d x z) := by
+theorem theta_phi (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (d : ℕ) (x z : Fbar g)
+    : thetaOf L d (phi L τ x) z = τ (thetaOf L d x z) := by
   unfold thetaOf
   split_ifs with h
   · rw [teich_phi, map_pow]
   · rw [map_zero]
 
-theorem isCuspOf_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) {P : (ZMod g)[X]} {d : ℕ} {χ : Gn g d → ℂ}
-    (h : IsCuspOf L P χ) : ∃ P', Rel L τ P P' ∧ IsCuspOf L P' (τ ∘ χ) := by
+theorem isCuspOf_map
+    (L : LabelDatum g) (τ : ℂ ≃+* ℂ) {P : (ZMod g)[X]} {d : ℕ} {χ : Gn g d → ℂ} (h : IsCuspOf L P χ)
+    : ∃ P', Rel L τ P P' ∧ IsCuspOf L P' (τ ∘ χ) := by
   obtain ⟨⟨hm, hi, h0, hd⟩, hc, hv⟩ := h
   obtain ⟨x, rfl⟩ := exists_minpoly hm hi
   have hr := rel_minpoly L τ x
   have hint : IsIntegral (ZMod g) (phi L τ x) := Algebra.IsIntegral.isIntegral _
-  refine ⟨_, hr, ⟨hr.1, minpoly.irreducible hint, ?_, ?_⟩, (GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ).2.2 d χ hc, ?_⟩
+  refine ⟨
+    _,
+    hr,
+    ⟨hr.1, minpoly.irreducible hint, ?_, ?_⟩,
+    (_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ).2.2 d χ hc,
+    ?_
+  ⟩
   · intro h
     have h2 : (0 : Fbar g) ∈ rootsBar (minpoly (ZMod g) (phi L τ x)) := by
       rw [mem_rootsBar hr.1.ne_zero, ← coeff_zero_eq_aeval_zero', h, map_zero]
@@ -263,11 +422,14 @@ theorem isCuspOf_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) {P : (ZMod g)[X]} {
 
     simp only [theta_phi, map_mul, map_pow, map_neg, map_one, map_sum]
 
-theorem list_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (Q : List ((ZMod g)[X] × Pc g))
-    (hQ : ∀ p ∈ Q, IsCuspOf L p.1 p.2.2) :
-    ∃ Q' : List ((ZMod g)[X] × Pc g), (∀ p ∈ Q', IsCuspOf L p.1 p.2.2) ∧
-      Q'.map Prod.snd = (Q.map Prod.snd).map (fun p => (⟨p.1, τ ∘ p.2⟩ : Pc g)) ∧
-      (Q.map Prod.fst).prod.Monic ∧ Rel L τ (Q.map Prod.fst).prod (Q'.map Prod.fst).prod := by
+theorem list_map
+    (L : LabelDatum g)
+    (τ : ℂ ≃+* ℂ)
+    (Q : List ((ZMod g)[X] × Pc g)) (hQ : ∀ p ∈ Q, IsCuspOf L p.1 p.2.2)
+    : ∃ Q' : List ((ZMod g)[X] × Pc g),
+      (∀ p ∈ Q', IsCuspOf L p.1 p.2.2)
+        ∧ Q'.map Prod.snd = (Q.map Prod.snd).map (fun p => (⟨p.1, τ ∘ p.2⟩ : Pc g))
+        ∧ (Q.map Prod.fst).prod.Monic ∧ Rel L τ (Q.map Prod.fst).prod (Q'.map Prod.fst).prod := by
   induction Q with
   | nil => exact ⟨[], by simp, rfl, monic_one, rel_one L τ⟩
   | cons p Q ih =>
@@ -285,37 +447,54 @@ theorem list_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (Q : List ((ZMod g)[X] 
     · simp only [List.map_cons, List.prod_cons]
       exact hP1.mul hp.1.1.ne_zero h3.ne_zero h4
 
-theorem hasLabel_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) {n : ℕ} {χ : Gn g n → ℂ} {f f' : (ZMod g)[X]}
-    (hr : Rel L τ f f') (h : HasLabel L χ f) : HasLabel L (τ ∘ χ) f' := by
+theorem hasLabel_map
+    (L : LabelDatum g) (τ : ℂ ≃+* ℂ)
+    {n : ℕ} {χ : Gn g n → ℂ} {f f' : (ZMod g)[X]} (hr : Rel L τ f f') (h : HasLabel L χ f)
+    : HasLabel L (τ ∘ χ) f' := by
   obtain ⟨Q, hQ, hd, rfl, hip⟩ := h
   obtain ⟨Q', h1, h2, -, h4⟩ := list_map L τ Q hQ
   refine ⟨Q', h1, ?_, hr.unique h4, ?_⟩
   · rw [h2, ← hd, degL, degL, List.map_map]
     rfl
-  · rw [h2, (GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ).2.1, ((GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).2.2]
+  · rw [h2, (_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ).2.1,
+      ((_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).2.2]
     exact fun h => hip ((map_eq_zero τ).1 h)
 
-theorem eSerC_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ) {f f' : (ZMod g)[X]} (hf : f.Monic)
-    (hr : Rel L τ f f') :
-    (eSerC L n f).coeff.mapRange τ (map_zero τ) = (eSerC L n f').coeff := by
-  have hset : {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f'} =
-      (fun χ : Gn g n → ℂ => τ ∘ χ) '' {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f} := by
+theorem eSerC_map
+    (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ) {f f' : (ZMod g)[X]} (hf : f.Monic) (hr : Rel L τ f f')
+    : (eSerC L n f).coeff.mapRange τ (map_zero τ) = (eSerC L n f').coeff := by
+  have hset
+      : {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f'}
+        = (fun χ : Gn g n → ℂ => τ ∘ χ) '' {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f} := by
     ext χ
     constructor
     · rintro ⟨h1, h2⟩
-      refine ⟨τ.symm ∘ χ, ⟨((GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ.symm).1 _ χ).1 h1, hasLabel_map L τ.symm (hr.symm hf) h2⟩, ?_⟩
+      refine ⟨
+        τ.symm ∘ χ,
+        ⟨
+          ((_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ.symm).1 _
+            χ).1 h1,
+          hasLabel_map L τ.symm (hr.symm hf) h2
+        ⟩,
+        ?_
+      ⟩
       funext x
       simp
     · rintro ⟨χ, ⟨h1, h2⟩, rfl⟩
-      exact ⟨((GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).1 h1, hasLabel_map L τ hr h2⟩
+      exact ⟨
+        ((_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).1 h1,
+        hasLabel_map L τ hr h2
+      ⟩
   let E := MonoidAlgebra.mapAddEquiv (Gn g n) τ.toAddEquiv
-  have hE : ∀ a : MonoidAlgebra ℂ (Gn g n), (E a).coeff = a.coeff.mapRange τ (map_zero τ) := fun a => by
+  have hE
+      : ∀ a : MonoidAlgebra ℂ (Gn g n), (E a).coeff = a.coeff.mapRange τ (map_zero τ) := fun a => by
     ext x
     rw [MonoidAlgebra.coeff_mapAddEquiv, Finsupp.mapRange_apply]
     rfl
   have hz : ∀ χ : Gn g n → ℂ, E (zOf χ) = zOf (τ ∘ χ) := fun χ => by
     ext x
-    rw [hE, ((GlobalTheory.T.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).2.1]
+    rw [hE,
+      ((_root_.GlobalTheory.Adopt.complexFieldAut_acts_harishChandra_characters g τ).1 _ χ).2.1]
   rw [← hE, eSerC, eSerC, hset, finsum_mem_image (τ.injective.comp_left.injOn)]
   congr 1
   rw [E.map_finsum]
@@ -323,7 +502,14 @@ theorem eSerC_map (L : LabelDatum g) (τ : ℂ ≃+* ℂ) (n : ℕ) {f f' : (ZMo
   rw [E.map_finsum]
   exact finsum_congr fun _ => hz χ
 
-theorem eSer_galois : Green → ∀ D : Formalism.BasicNotions.D7, ESerTie D → ∀ (τ : ℂ ≃+* ℂ) (k : Fin 2) (f : (ZMod (D.host.g k))[X]), IsLabel D k f → (D.ntypes.eSer k f).coeff.mapRange τ (map_zero τ) = (D.ntypes.eSer k (labAct D τ k f)).coeff := by
+theorem eSer_galois
+    : Green
+      → ∀ D : Formalism.BasicNotions.D7,
+        ESerTie D
+          → ∀ (τ : ℂ ≃+* ℂ) (k : Fin 2) (f : (ZMod (D.host.g k))[X]),
+            IsLabel D k f
+              → (D.ntypes.eSer k f).coeff.mapRange τ (map_zero τ)
+                = (D.ntypes.eSer k (labAct D τ k f)).coeff := by
   intro _ D hD τ k f hf
   haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
   obtain ⟨L, hL, he⟩ := hD k
@@ -337,3 +523,7 @@ theorem eSer_galois : Green → ∀ D : Formalism.BasicNotions.D7, ESerTie D →
   exact h
 
 end GlobalTheory.GLq.GalSer
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RootsMinpolyPhi =====

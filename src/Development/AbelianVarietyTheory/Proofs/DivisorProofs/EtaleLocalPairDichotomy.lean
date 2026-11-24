@@ -113,7 +113,7 @@ theorem pair_dich
     exact this
   have hF : ψ (algebraMap A _ f) * ψ u = 1 - ψ e := by rw [← map_mul, hu, map_sub, map_one]
   have hψf : ψ (algebraMap A _ f) = φ (algebraMap A A' f) := by rw [AlgHom.commutes]; rfl
-  rw [GlobalTheory.T.etaleLocally_iff_affine_etale_point_cover]
+  rw [_root_.GlobalTheory.EtC.loc_iff_etale_affine_points]
   · intro t
     have key
         : ∀ G : Γ(T, ⊤),

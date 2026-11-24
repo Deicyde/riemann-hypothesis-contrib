@@ -121,7 +121,7 @@ theorem denseRange_fin : DenseRange (algebraMap F (Af F)) := by
   have hc : Continuous fun z : Af F => y - z := continuous_const.sub continuous_id
   have hV : (fun z : Af F => y - z) ⁻¹' U ∈ 𝓝 (0 : Af F) :=
     hc.continuousAt.preimage_mem_nhds (by simpa using hU)
-  obtain ⟨N, hN, hNU⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _ hV
+  obtain ⟨N, hN, hNU⟩ := _root_.GlobalTheory.LocalNormBound.main F _ hV
   obtain ⟨a, β, hβ, e⟩ := (GlobalTheory.AdLat.strong_approximation_mod_nat F N hN).1 y
   refine ⟨y - N • β, hNU β hβ, a, ?_⟩
   rw [e, add_sub_cancel_right]
@@ -160,8 +160,9 @@ theorem ker_mem_nhds {ψ : AddChar (AF F) ℂ} (hc : Continuous ψ) (hn : ∀ x,
     refine ((Circle.isOpen_centeredArc _).preimage hχ).mem_nhds ?_
     rw [Set.mem_preimage, h0, Circle.mem_centeredArc (by linarith [Real.pi_pos])]
     simp [Real.pi_pos]
-  obtain ⟨N, hN, hNV⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _ hV
-  refine Filter.mem_of_superset (GlobalTheory.AdLat.OpenLat.nsmul_integral_mem_nhds F N hN) ?_
+  obtain ⟨N, hN, hNV⟩ := _root_.GlobalTheory.LocalNormBound.main F _ hV
+  refine Filter.mem_of_superset
+    (_root_.GlobalTheory.IntegralNeighbourhoodZero.nsmul_integral_mem_nhds_zero F N hN) ?_
   rintro _ ⟨a, ha, rfl⟩
   have : χ (N • a) = 1 := by
     refine Circle.eq_one_of_forall_pow_mem_centeredArc_pi_div_two fun n _ => ?_
@@ -179,7 +180,7 @@ theorem ker_mem_nhds {ψ : AddChar (AF F) ℂ} (hc : Continuous ψ) (hn : ∀ x,
 
 theorem exists_nsmul_inf {ψ : AddChar (AF F) ℂ} (hψ : IsCharAF F ψ)
     : ∃ N : ℕ, 0 < N ∧ ∀ r : 𝓞 F, ψ (pairA F (algebraMap F _ ((N : F) * r)) 0) = 1 := by
-  obtain ⟨N, hN, h⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _ (ker_mem_nhds hψ.1 hψ.2.1)
+  obtain ⟨N, hN, h⟩ := _root_.GlobalTheory.LocalNormBound.main F _ (ker_mem_nhds hψ.1 hψ.2.1)
   refine ⟨N, hN, fun r => ?_⟩
   have h1 : ψ (pairA F 0 (N • algebraMap F (Af F) r)) = 1 :=
     h _ fun v => HeightOneSpectrum.coe_mem_adicCompletionIntegers v r
@@ -398,8 +399,7 @@ theorem exists_fin {ψ : AddChar (AF F) ℂ} (hψ : IsCharAF F ψ) (v : HeightOn
   push Not at h
   obtain ⟨a, ha⟩ := exists_trace hψ
   have ha0 := trace_mul_ne_zero hψ ha
-  obtain ⟨N, hN, hNU⟩ :=
-    GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _ (ker_mem_nhds hψ.1 hψ.2.1)
+  obtain ⟨N, hN, hNU⟩ := _root_.GlobalTheory.LocalNormBound.main F _ (ker_mem_nhds hψ.1 hψ.2.1)
   obtain ⟨t, ht0, htv, htw⟩ := exists_mem_only v
   have key
       : ∀ y : F,
@@ -440,13 +440,7 @@ theorem exists_fin {ψ : AddChar (AF F) ℂ} (hψ : IsCharAF F ψ) (v : HeightOn
     rw [mul_comm (n : ℂ), mul_right_inj' Complex.two_pi_I_ne_zero] at hn
     exact ⟨n, by exact_mod_cast hn⟩
   let D := FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F)
-  have h1 : (1 : FractionalIdeal (𝓞 F)⁰ F) ≠ 0 := by
-    first
-    | exact one_ne_zero
-    | exact FractionalIdeal.one_ne_zero
-    | simp
-    | (rw [← FractionalIdeal.coeIdeal_top]; exact FractionalIdeal.coeIdeal_ne_zero.2 top_ne_bot)
-    | (rw [← Ideal.one_eq_top, FractionalIdeal.coeIdeal_one]; simp)
+  have h1 : (1 : FractionalIdeal (𝓞 F)⁰ F) ≠ 0 := by first | exact one_ne_zero
   have hD : ∀ k : ℕ, a * N / (t : F) ^ k ∈ D := fun k => by
     rw [FractionalIdeal.mem_dual h1]
     intro x hx

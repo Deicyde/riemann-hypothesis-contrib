@@ -122,7 +122,7 @@ theorem ratGL_lastRow {γ : GL (Fin (m + 1)) E} (hγ : IsMir m γ) (l : Fin (m +
   rw [hγ (Fin.last m) l (Or.inl (by simp))]
   by_cases h : Fin.last m = l
   · simp [Matrix.one_apply, h]
-  · simp [Matrix.one_apply, h]
+  · simp [h]
 
 theorem continuous_fT
     {φ : GA E (m + 1) → ℂ} (hφ : Continuous φ)

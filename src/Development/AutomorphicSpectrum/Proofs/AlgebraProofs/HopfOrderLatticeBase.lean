@@ -132,7 +132,7 @@ theorem avg_mem
     dsimp only
     rw [Finset.sum_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl (fun a _ => ?_)
-    simp [Prod.smul_fst, Pi.smul_apply, smul_eq_mul, mul_assoc]
+    simp [Pi.smul_apply, smul_eq_mul]
   · rw [Prod.snd_sum]
     have hterm
         : ∀ a : Fˣ,
@@ -183,7 +183,7 @@ theorem eq_on_step
       subst hji
       simp
     · have hne : j ≠ i := fun e => by subst e; exact lt_irrefl _ hij
-      simp [hx j hij, Pi.single_apply, hne]
+      simp [hx j hij, hne]
   have e : H x = H (x i • Pi.single i 1) := by
     have := hinv (x i • Pi.single i 1) _ hk
     rwa [add_sub_cancel] at this

@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.weilOperator_integral_comm_of_bounded_finiteMeasure
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : Om S T),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.weilOperator_integral_comm_of_bounded_finiteMeasur
             → (∃ C : ℝ, ∀ a x, ‖F a x‖ ≤ C) → (Continuous fun q : Ω × WO S T => om p (F q.1) q.2)
             → (∃ C : ℝ, ∀ a x, ‖om p (F a) x‖ ≤ C) → IsThetaFunO ψ S T (fun x => ∫ a, F a x ∂m)
             → ∀ x, om p (fun y => ∫ a, F a y ∂m) x = ∫ a, om p (F a) x ∂m := by
-  first
-  | exact @GlobalTheory.CommIntBdd.om_integral_comm_bdd
-  | exact GlobalTheory.CommIntBdd.om_integral_comm_bdd
-  | (intros; apply GlobalTheory.CommIntBdd.om_integral_comm_bdd <;> assumption)
+  first | exact @GlobalTheory.CommIntBdd.om_integral_comm_bdd

@@ -64,7 +64,6 @@ theorem rep_H_apply (z w : m → ℂ)
     mul_assoc]
 
 theorem rep_H_conj (z w : m → ℂ) : conj (stdH L m z w) = stdH L m w z := by
-
   rw [rep_H_apply, rep_H_apply, map_mul, map_sum]
   congr 1
   · simp [Complex.conj_ofReal]
@@ -112,7 +111,7 @@ theorem rep_sat_ratN (hl : l.Prime) {v : m → ℂ} (hv : SatMem l Λ v) (r : �
   have e : (n * k) • (((r : ℂ) / k) • v) = r • (n • v) := by
     funext i
     simp only [Pi.smul_apply, nsmul_eq_mul, zsmul_eq_mul, smul_eq_mul, Nat.cast_mul, Pi.mul_apply,
-      Pi.natCast_apply, Pi.intCast_apply]
+      Pi.natCast_apply]
     field_simp
   rw [e]
   exact Λ.zsmul_mem hnv _

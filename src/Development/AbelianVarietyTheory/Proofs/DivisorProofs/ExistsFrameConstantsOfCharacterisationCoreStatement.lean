@@ -54,6 +54,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_frameConstants_of_characterisationCore
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_frameConstants_of_characterisationCore
               → ∃ cc,
                 CcIs R.θ (Vc D i) (Wc D i) (rank_Wc i) (T.U ((i : ℕ) + 1) O.s0) O.dict O.mu
                   (T.x₀ ((i : ℕ) + 1) O.s0) (R.ωP i A.μ0) (R.vacP i) cc := by
-  first
-  | exact @GlobalTheory.AdTh.CcExCore.exists_ccIs_core
-  | exact GlobalTheory.AdTh.CcExCore.exists_ccIs_core
-  | (intros; apply GlobalTheory.AdTh.CcExCore.exists_ccIs_core <;> assumption)
+  first | exact @GlobalTheory.AdTh.CcExCore.exists_ccIs_core

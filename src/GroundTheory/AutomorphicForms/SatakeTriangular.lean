@@ -333,7 +333,6 @@ theorem satakeTransform_mem_symmetric (h : SphericalHecke μ (F := F) (n := n))
       (h : HeckeAlgebra μ) (Cartan.diagPow F n ν) / (H ν : HeckeAlgebra μ) (Cartan.diagPow F n ν)
     set h' := h - ∑ ν ∈ Top, c ν • H ν
     have hsum : satakeTransform μ (∑ ν ∈ Top, c ν • H ν) ∈ symmetricLaurent (n := n) := by
-
       rw [map_sum]
       refine Subalgebra.sum_mem _ fun ν hν => ?_
       rw [map_smul, hHs ν hν]

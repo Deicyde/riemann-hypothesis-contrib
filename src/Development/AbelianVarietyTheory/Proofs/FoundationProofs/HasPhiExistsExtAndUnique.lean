@@ -87,7 +87,7 @@ theorem nonempty_sabMap_of_models
   have hp : IsProper t'.G.hom :=
     MorphismProperty.of_isPullback (P := @IsProper) m1'.cart.1 Xo.univ.proper
   obtain ⟨ψ, -⟩ :=
-    GlobalTheory.semiAbelian_model_determined_by_generic_fibre E H T.V inferInstance G' G t' hp m2'
+    _root_.GlobalTheory.ModelUniqueChecks.extV_holds E H T.V inferInstance G' G t' hp m2'
       (Category.id_comp (spMap (algebraMap T.V T.Fr)) ▸ n)
   exact ⟨ψ⟩
 

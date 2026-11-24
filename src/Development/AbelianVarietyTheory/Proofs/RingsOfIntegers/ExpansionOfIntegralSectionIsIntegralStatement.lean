@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.expansion_of_integral_section_is_integral
                       GeneratorPullback.SecScal D.toPre.P.L (DegPre.famφ D.toPre (FractionRing V) α)
                         (DegPre.famε k) (E.s α) (D.toPre.famφB α) (DegPre.famε k) (g α)
                         (DegPre.prB D.toPre (FractionRing V)).left 1 := by
-  first
-  | exact @GlobalTheory.ExpInt.main
-  | exact GlobalTheory.ExpInt.main
-  | (intros; apply GlobalTheory.ExpInt.main <;> assumption)
+  first | exact @GlobalTheory.ExpInt.main

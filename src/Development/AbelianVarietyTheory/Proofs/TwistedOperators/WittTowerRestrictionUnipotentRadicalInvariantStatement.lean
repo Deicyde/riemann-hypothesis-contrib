@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.wittTower_restriction_unipotentRadical_invariant
     : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
         (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.wittTower_restriction_unipotentRadical_invariant
                 → ∀ (n : NI V C) (f : WO V W → ℂ),
                   IsThetaFunO ψ V W f
                     → res V V' W C B μ 𝓨 (ω ((n : GA D V), 1) f) = res V V' W C B μ 𝓨 f := by
-  first
-  | exact @GlobalTheory.UnipRes.res_unip
-  | exact GlobalTheory.UnipRes.res_unip
-  | (intros; apply GlobalTheory.UnipRes.res_unip <;> assumption)
+  first | exact @GlobalTheory.UnipRes.res_unip

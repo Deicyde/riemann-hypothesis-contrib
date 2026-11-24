@@ -250,7 +250,7 @@ theorem hP_eq
   unfold hP
   rw [← hAi]
   simp only [Matrix.add_mul, Matrix.mul_add, Matrix.trace_add, Complex.add_re, Matrix.mul_assoc,
-    Matrix.mul_one, Matrix.one_mul, ha, hb, he, hc]
+    Matrix.mul_one, ha, hb, he, hc]
   ring
 
 theorem inv_push
@@ -260,8 +260,8 @@ theorem inv_push
   apply Matrix.inv_eq_right_inv
   have h1 := Matrix.mul_nonsing_inv _ h
   have h2 : Z * ((1 - Zᴴ * Z) * (1 - Zᴴ * Z)⁻¹) * Zᴴ = Z * Zᴴ := by rw [h1, Matrix.mul_one]
-  simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, Matrix.add_mul,
-      Matrix.mul_add, Matrix.mul_assoc]
+  simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, Matrix.mul_add,
+      Matrix.mul_assoc]
     at h2 ⊢
   rw [← h2]
   abel
@@ -305,8 +305,7 @@ theorem levi_eq
   rw [r1, r2, r3, r4, r5, r6]
   set s := trace (Ai * Zᴴ * U * Ai * Zᴴ * V)
   set l := trace (Ai * Vᴴ * Bi * U)
-  apply Complex.ext <;> simp [Complex.mul_re, Complex.mul_im, Complex.div_re, Complex.div_im]
-    <;> ring
+  apply Complex.ext <;> simp [Complex.mul_re, Complex.mul_im] <;> ring
 
 theorem det_blocks
     {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
@@ -395,7 +394,7 @@ theorem hess_sum
       : HasFDerivAt (fun x => c • ∑ i, fderiv ℝ (f i) x) (c • ∑ i, fderiv ℝ (fderiv ℝ (f i)) t) t :=
     (HasFDerivAt.fun_sum fun i _ => (h2 i).hasFDerivAt).const_smul c
   rw [h4.fderiv]
-  simp [ContinuousLinearMap.sum_apply]
+  simp
 
 theorem det_pos_of_posDef {m : Type} [Fintype m] [DecidableEq m] {A : Matrix m m ℂ} (h : A.PosDef)
     : 0 < A.det.re ∧ A.det = (A.det.re : ℂ) := by
@@ -424,7 +423,7 @@ theorem trace_single
       = X b1 b2 * Y a2 a1 := by
   rw [Matrix.conjTranspose_single, star_one]
   simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.single_apply]
-  simp [ite_and, Finset.sum_ite_eq, Finset.sum_ite_eq']
+  simp [ite_and, Finset.sum_ite_eq]
 
 theorem hess_ball
     (q : Ψ × Fin j × Fin j' ≃ Fin n) (t : Fin n → ℂ) (ht : t ∈ ballDom q) (u v : Fin n → ℂ)

@@ -200,11 +200,9 @@ theorem sDelta_of
           h4]
         ring
       have hl1 : linF (fun a => τ.1 (cf a)) (Data.emb τ.1 μ) = τ.1 (F μ) := by
-
         rw [linF_apply, hFc, map_sum]
         simp only [Data.emb, map_mul]
       have hl2 : linF (fun a => τ.1 (cf a)) (Data.emb τ.1 ξ) = 1 := by
-
         rw [linF_apply, show (1 : ℂ) = τ.1 (F ξ) by rw [hFξ, map_one], hFc, map_sum]
         simp only [Data.emb, map_mul]
       set co := X.Hf z1 τ (Data.emb τ.1 μ) (Data.emb τ.1 ξ) /

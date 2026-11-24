@@ -289,7 +289,7 @@ theorem schr_mem_and_thetaSum
     | smul c Φ _ h =>
       convert (schA F κ).smul_mem c h using 1
       funext x
-      simp [schr, mul_comm, mul_left_comm, mul_assoc]
+      simp [schr, mul_comm, mul_left_comm]
   · have h2 : ⅟(2 : AdeleRing (𝓞 F) F) = algebraMap F _ 2⁻¹ := by
       apply invOf_eq_right_inv
       rw [← map_ofNat (algebraMap F (AdeleRing (𝓞 F) F)) 2, ← map_mul, mul_inv_cancel₀ two_ne_zero,

@@ -62,7 +62,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem weight_variables_exist
     (l : ℕ) [Fact l.Prime]
     (F : W.GFrame l)

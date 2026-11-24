@@ -57,8 +57,6 @@ open UpperTheory.V.Z.J.D
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
-
 namespace UpperTheory.V.Z.J.D.AuxBlock5
 
 variable

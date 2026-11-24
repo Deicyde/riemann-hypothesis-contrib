@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.exists_latticeVacuum_finitePlaces_rationalDarboux
             → ∀ v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F),
               ∃ φ : (Fin n × Fin d → Fv F v) → ℂ,
                 M.IsVac B.ψ v φ := by
-  first
-  | exact @GlobalTheory.LatVac.exists_isVac
-  | exact GlobalTheory.LatVac.exists_isVac
-  | (intros; apply GlobalTheory.LatVac.exists_isVac <;> assumption)
+  first | exact @GlobalTheory.LatVac.exists_isVac

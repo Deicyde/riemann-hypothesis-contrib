@@ -151,10 +151,7 @@ theorem indep_char
     (χ : ι → ℂ → ℂ) (hχ : Function.Injective χ)
     (p : ι → Submodule ℂ V) (hp : ∀ i v, v ∈ p i ↔ ∀ w, C w v = χ i w • v)
     : iSupIndep p := by
-  first
-  | exact Bl.general_b_fact_second_ter_form.goal1 ..
-  | (apply Bl.general_b_fact_second_ter_form.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_second_ter_form.goal1 <;> assumption)
+  first | (apply Bl.general_b_fact_second_ter_form.goal1 <;> assumption)
 
 theorem hw_cpol
     {n : ℕ} {E : Fin n → Fin n → Module.End ℂ V} {m ν : Fin n → ℂ} {v : V}

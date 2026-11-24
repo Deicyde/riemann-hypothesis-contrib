@@ -51,6 +51,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.exists_separating_inertPassage_carried_by_forms
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -76,7 +77,4 @@ theorem _root_.GlobalTheory.T.exists_separating_inertPassage_carried_by_forms
                 (∃ k : A3.okI A3.A.μ0 × List ℕ, p.2 (k.1.1, k.2) ≠ p'.2 (k.1.1, k.2))
                   → ∃ k : A3.okI A3.A.μ0 × List ℕ,
                     tr j p.2 (k.1.1, k.2) ≠ tr j p'.2 (k.1.1, k.2) := by
-  first
-  | exact @GlobalTheory.exists_inert_passage_separating
-  | exact GlobalTheory.exists_inert_passage_separating
-  | (intros; apply GlobalTheory.exists_inert_passage_separating <;> assumption)
+  first | exact @GlobalTheory.exists_inert_passage_separating

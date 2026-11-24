@@ -54,7 +54,7 @@ private theorem comp_rel
   refine Eq.trans ?_ (h.trans ?_)
   · rfl
   · ext i j
-    by_cases hij : i = j <;> simp [hij, Matrix.one_apply, sim]
+    by_cases hij : i = j <;> simp [hij, sim]
 
 theorem UpperTheory.Gal.W2.Seed.pCongConj
     : UpperTheory.Gal.CertificateRingHomMap.LocComm → CongConj := by
@@ -81,7 +81,7 @@ theorem UpperTheory.Gal.W2.Seed.pCongConj
     rw [← hG]
     by_cases hik : i = k
     · subst hik; simp [Matrix.sub_apply]
-    · simp [Matrix.sub_apply, Matrix.one_apply, hik, Ne.symm hik]
+    · simp [Matrix.sub_apply, hik, Ne.symm hik]
   calc
     Valued.v (((comp (UpperTheory.Gal.CertificateRingHomMap.cj w) g).val - 1) i k)
         = Valued.v (conjLoc (GlobalTheory.SplitPts.conjE E) w

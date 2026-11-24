@@ -38,8 +38,6 @@ import Formalism.PieriBlockIdeals.MertensReciprocalElementary
 
 @[expose] public section
 
-
-
 section
 set_option autoImplicit false
 noncomputable section

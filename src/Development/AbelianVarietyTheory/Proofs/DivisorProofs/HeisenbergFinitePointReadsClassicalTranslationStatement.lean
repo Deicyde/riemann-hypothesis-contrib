@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.heisenbergFinitePoint_reads_classicalTranslation
             → ∀ z : Matrix (Fin d) (Fin a) D.host.E,
               Reads ψ θ hS hT cc δ r (U D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z) G)
                 (heisO ψ S T (finPt hS hT r z) f) := by
-  first
-  | exact @GlobalTheory.NormExact.heisO_finPt_reads
-  | exact GlobalTheory.NormExact.heisO_finPt_reads
-  | (intros; apply GlobalTheory.NormExact.heisO_finPt_reads <;> assumption)
+  first | exact @GlobalTheory.NormExact.heisO_finPt_reads

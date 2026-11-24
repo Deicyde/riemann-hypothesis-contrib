@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.PetIPSmulRight
 public import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EisensteinLatticeFunctionIsModularFormCoeffSeqStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.RepL
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EisensteinLatticeFunctionIsModularFormCoeffSeq
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -164,8 +165,8 @@ theorem GlobalTheory.eis_periodic_weights
   haveI : NeZero L₁ := ⟨hL₁.ne'⟩
   have hhat : hat (invF (N := L₁) a) = a := funext (hat_invF a ha)
   obtain ⟨c, hc, -⟩ :=
-    GlobalTheory.T.eisenstein_latticeFunction_isModularFormCoeffSeq j L₁ L₂ b χ₁ χ₂
-      (invF (N := L₁) a) hj hL₁ hL₂ (by rw [hhat]; exact ha0) hb
+    _root_.GlobalTheory.EisForm.eis_latF_mf j L₁ L₂ b χ₁ χ₂ (invF (N := L₁) a) hj hL₁ hL₂
+      (by rw [hhat]; exact ha0) hb
       (fun d hd => ⟨
         fun y =>
           invF_twist a ha d (χ₁ d)

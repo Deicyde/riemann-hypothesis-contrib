@@ -64,7 +64,7 @@ def splitRT (Kf : Type) [Field Kf] (r t : ℕ)
 
 private theorem sumSplitEquiv_apply_lemma (Kf : Type) [Field Kf] (r t : ℕ) (z : Fin (r + t) → Kf)
     : splitRT Kf r t z = (fun i => z (Fin.castAdd t i), fun j => z (Fin.natAdd r j)) := by
-  first | rfl | (refine Prod.ext (funext fun i => ?_) (funext fun j => ?_) <;> simp [splitRT])
+  first | rfl
 
 section Block
 
@@ -99,7 +99,6 @@ theorem blockHom_mulVec
       rw [LinearEquiv.apply_symm_apply]
       simp [Matrix.toLin'_apply]
     )
-  | (simp [LinearEquiv.conjRingEquiv_apply, LinearEquiv.conj_apply, Matrix.toLin'_apply]; done)
 
 private theorem blockHom_eq_reindex_lemma_2
     (A : Matrix (Fin a) (Fin a) k) (B : Matrix (Fin b) (Fin b) k)
@@ -112,12 +111,8 @@ private theorem blockHom_eq_reindex_lemma_2
   rw [blockHom_mulVec]
   simp only [sumSplitEquiv_apply_lemma]
   refine Prod.ext (funext fun i => ?_) (funext fun j => ?_)
-  · first
-    | (simp [Matrix.mulVec, dotProduct, Fin.sum_univ_add]; done)
-    | (simp [Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_add]; done)
-  · first
-    | (simp [Matrix.mulVec, dotProduct, Fin.sum_univ_add]; done)
-    | (simp [Matrix.mulVec, Matrix.dotProduct, Fin.sum_univ_add]; done)
+  · first | (simp [Matrix.mulVec, dotProduct, Fin.sum_univ_add]; done)
+  · first | (simp [Matrix.mulVec, dotProduct, Fin.sum_univ_add]; done)
 
 theorem blockHom_charpoly (A : Matrix (Fin a) (Fin a) k) (B : Matrix (Fin b) (Fin b) k)
     : (blockHom k a b (A, B)).charpoly = A.charpoly * B.charpoly := by

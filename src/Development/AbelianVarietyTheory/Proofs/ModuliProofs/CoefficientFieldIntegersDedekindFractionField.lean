@@ -98,7 +98,7 @@ private theorem isIntegral_one_add_rt0_div_two
   have hkC : (4 : ℂ) * k = H.d + 1 := by exact_mod_cast hk
   refine ⟨Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (k : ℤ), by monicity!, ?_⟩
   simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_X,
-    Polynomial.eval₂_C, Polynomial.eval₂_natCast, eq_intCast, Int.cast_natCast]
+    Polynomial.eval₂_natCast, eq_intCast, Int.cast_natCast]
   linear_combination (1 / 4 : ℂ) * H.sqrt_neg_disc_sq + (1 / 4 : ℂ) * hkC
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
@@ -142,25 +142,13 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
   NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem mem_valuationSubring_of_isIntegral_moduli
-    {K : Type} [Field K] (V : ValuationSubring K) {x : K} (hx : IsIntegral ℤ x)
-    : x ∈ V := by
-  have hV : IsIntegral V x := hx.tower_top
-  obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.mp hV
-  rw [← hy]
-  exact y.2
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField in
-open scoped CategoryTheory.Obj TensorProduct Pointwise in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
 private theorem isDedekindDomain_valuationSubring_of_not_isUnit_natCast
     {K : Type} [Field K] [NumberField K]
     (V : ValuationSubring K) (p : ℕ) (hp : p ≠ 0) (hpV : ¬ IsUnit (p : V))
     : IsDedekindDomain V := by
   let f : 𝓞 K →+* V :=
-    (algebraMap (𝓞 K) K).codRestrict V.toSubring
-      (fun x => mem_valuationSubring_of_isIntegral_moduli V (RingOfIntegers.isIntegral_coe x))
+    (algebraMap (𝓞 K) K).codRestrict V.toSubring (fun x =>
+      _root_.GlobalTheory.CoeffRings.mem_of_isIntegral V (RingOfIntegers.isIntegral_coe x))
   letI : Algebra (𝓞 K) V := f.toAlgebra
   have hcoe : ∀ x : 𝓞 K, ((algebraMap (𝓞 K) V x : V) : K) = algebraMap (𝓞 K) K x := fun _ => rfl
   let P : Ideal (𝓞 K) := (IsLocalRing.maximalIdeal V).comap (algebraMap (𝓞 K) V)
@@ -336,8 +324,10 @@ theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac
       intro x hx
       simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
       rcases hx with rfl | rfl | rfl
-      · exact ⟨⟨⟨_, hwF⟩, (memV _).mpr (mem_valuationSubring_of_isIntegral_moduli W hw)⟩, rfl⟩
+      · exact
+          ⟨⟨⟨_, hwF⟩, (memV _).mpr (_root_.GlobalTheory.CoeffRings.mem_of_isIntegral W hw)⟩, rfl⟩
       · exact ⟨⟨⟨_, hSF⟩, (memV _).mpr (natCast_inv_mem_of_coprime W hpW hS)⟩, rfl⟩
-      · exact ⟨⟨⟨_, hzF⟩, (memV _).mpr (mem_valuationSubring_of_isIntegral_moduli W hz)⟩, rfl⟩
+      · exact
+          ⟨⟨⟨_, hzF⟩, (memV _).mpr (_root_.GlobalTheory.CoeffRings.mem_of_isIntegral W hz)⟩, rfl⟩
 
 end GlobalTheory.CoeffRings

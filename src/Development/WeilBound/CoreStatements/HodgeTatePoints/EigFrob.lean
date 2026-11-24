@@ -3,9 +3,9 @@ module
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsSplitGaussChars
 public import Mathlib.RingTheory.Coalgebra.IsFrobenius
 public import Mathlib.RingTheory.HopfAlgebra.Basic
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualLatticeDegreeNegStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigenProjectorsSplitActionStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundlesStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualLatticeDegreeNeg
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigenProjectorsSplitAction
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundles
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -57,11 +57,16 @@ open GlobalTheory.CompanionTheory.Ar.Crv
 
 namespace PositivityTheory.HtPt.Ci
 
-theorem mem_eig {K O V : Type} [Field K] [AddCommGroup V] [Module K V] {ρ : O → V →ₗ[K] V} {χ : O → K} {x : V} :
-    x ∈ eig ρ χ ↔ ∀ a, ρ a x = χ a • x := by
+theorem mem_eig
+    {K O V : Type} [Field K] [AddCommGroup V] [Module K V] {ρ : O → V →ₗ[K] V} {χ : O → K} {x : V}
+    : x ∈ eig ρ χ ↔ ∀ a, ρ a x = χ a • x := by
   simp [eig, sub_eq_zero]
 
-theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (d : ℕ) (O : Type) (ρ : O → Matrix (Fin d) (Fin d) K) (χ : O → K), eig (fun a => Matrix.toLin' ((ρ a).map (· ^ p))) (fun a => χ a ^ p) = frobSub p (eig (fun a => Matrix.toLin' (ρ a)) χ) := by
+theorem eig_frob
+    : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (d : ℕ) (O : Type)
+        (ρ : O → Matrix (Fin d) (Fin d) K) (χ : O → K),
+      eig (fun a => Matrix.toLin' ((ρ a).map (· ^ p))) (fun a => χ a ^ p)
+        = frobSub p (eig (fun a => Matrix.toLin' (ρ a)) χ) := by
   intro K _ p _ _ d O ρ χ
   apply le_antisymm
   · classical
@@ -84,7 +89,8 @@ theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p]
       intro ι a r
       have h1 := congrFun (hy a) r
       simp only [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, Pi.smul_apply,
-        smul_eq_mul] at h1
+          smul_eq_mul]
+        at h1
       have h2 := congrArg (fun u => (β.repr u ι : K)) h1
       simp only [hsum, hrepr] at h2
       exact h2
@@ -109,8 +115,10 @@ theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p]
       rw [Finset.sum_apply]
       conv_lhs => rw [← β.linearCombination_repr (y j)]
       rw [Finsupp.linearCombination_apply,
-        Finsupp.sum_of_support_subset _ (Finset.subset_biUnion_of_mem
-          (fun j => (β.repr (y j)).support) (Finset.mem_univ j)) (fun i (a : K0) => a • β i) (fun i _ => zero_smul _ _)]
+        Finsupp.sum_of_support_subset _
+          (Finset.subset_biUnion_of_mem (fun j => (β.repr (y j)).support) (Finset.mem_univ j))
+          (fun i (a : K0) => a • β i)
+          (fun i _ => zero_smul _ _)]
       refine Finset.sum_congr rfl fun ι _ => ?_
       show (β.repr (y j) ι : K) * β ι = β ι * x ι j ^ p
       rw [hx ι j, mul_comm]
@@ -126,27 +134,40 @@ theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p]
     simp only [Matrix.toLin'_apply] at hxa ⊢
     funext r
     have h1 := congrFun hxa r
-    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, frobVec, Matrix.map_apply] at h1 ⊢
+    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, frobVec, Matrix.map_apply]
+      at h1 ⊢
     rw [← mul_pow, ← h1, sum_pow_char]
     simp only [mul_pow]
 
-theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I → AddSubgroup (Fin d → K)) (O k S : Type) [CommRing O] [Field k] [Algebra k K] [Fintype S] [DecidableEq S] (χ : S → (O →+* k)), IsSplit χ → (∀ i (c : k), C.v i (algebraMap k K c) ≤ 1) → ∀ ρ : O →+* Matrix (Fin d) (Fin d) K, IsBun C L → (∀ a, IsHom C L L (Matrix.toLin' (ρ a))) → ∀ s, subDeg C (dotDual C L) (eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a))) = - subDeg C L (eig (fun a => Matrix.toLin' (ρ a)) (fun a => algebraMap k K (χ s a))) := by
+theorem eig_dual
+    : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I → AddSubgroup (Fin d → K))
+        (O k S : Type) [CommRing O] [Field k] [Algebra k K] [Fintype S] [DecidableEq S]
+        (χ : S → (O →+* k)),
+      IsSplit χ → (∀ i (c : k), C.v i (algebraMap k K c) ≤ 1)
+        → ∀ ρ : O →+* Matrix (Fin d) (Fin d) K,
+          IsBun C L → (∀ a, IsHom C L L (Matrix.toLin' (ρ a)))
+            → ∀ s,
+              subDeg C (dotDual C L)
+                  (eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a)))
+                = - subDeg C L
+                  (eig (fun a => Matrix.toLin' (ρ a)) (fun a => algebraMap k K (χ s a))) := by
   intro K _ C d L O k S _ _ _ _ _ χ hχ hv ρ hL hρ s
   let ρL : O →+* Module.End K (Fin d → K) :=
-    (Matrix.toLinAlgEquiv'.toRingEquiv : Matrix (Fin d) (Fin d) K ≃+* Module.End K (Fin d → K)).toRingHom.comp ρ
+    (Matrix.toLinAlgEquiv'.toRingEquiv
+      : Matrix (Fin d) (Fin d) K ≃+* Module.End K (Fin d → K)).toRingHom.comp ρ
   obtain ⟨e, he_hom, he_mem, he_id, -, he_comb⟩ :=
-    GlobalTheory.T.eigen_projectors_split_action K C (Fin d → K) L O k S χ hχ hv ρL hL hρ
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.SplitProj.split_proj K C (Fin d → K) L O k S χ hχ hv
+      ρL hL hρ
   obtain ⟨m, c, b, hc, hes⟩ := he_comb s
   set W := eig (fun a => Matrix.toLin' (ρ a)) (fun a => algebraMap k K (χ s a)) with hW
   set W' := eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a)) with hW'
   set E : Matrix (Fin d) (Fin d) K := ∑ j, algebraMap k K (c j) • ρ (b j) with hE
   have hlin : Matrix.toLin' E = ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)) := by
-
     rw [hE, map_sum]
     simp only [map_smul]
-  have hlinT : Matrix.toLin' E.transpose =
-      ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)).transpose := by
-
+  have hlinT
+      : Matrix.toLin' E.transpose
+        = ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)).transpose := by
     rw [hE, Matrix.transpose_sum, map_sum]
     simp only [Matrix.transpose_smul, map_smul]
   have heE : ∀ x, e s x = E.mulVec x := by
@@ -162,7 +183,7 @@ theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I �
     rw [← Matrix.toLin'_apply, hlinT, LinearMap.sum_apply]
 
     simp only [LinearMap.smul_apply, Matrix.toLin'_apply, hy, smul_smul, ← map_mul,
-    ← Finset.sum_smul, ← map_sum]
+      ← Finset.sum_smul, ← map_sum]
     rw [hc s, if_pos rfl, map_one, one_smul]
   have hETW : ∀ z, E.transpose.mulVec z ∈ W' := by
     intro z
@@ -218,7 +239,9 @@ theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I �
   have hfr : Module.finrank K W = Module.finrank K (W' →ₗ[K] K) := by omega
   have hbij : Function.Bijective B :=
     ⟨hinj, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hfr).1 hinj⟩
-  obtain ⟨-, hdeg, -⟩ := GlobalTheory.T.dual_lattice_degree_neg K C W W' (sub C L W) B (GlobalTheory.T.sub_and_quotient_bundles K C _ L W hL).1 hbij
+  obtain ⟨-, hdeg, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegDual.deg_dual K C W W' (sub C L W) B
+      (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C _ L W hL).1 hbij
   have hident : dualLat C (sub C L W) B = sub C (dotDual C L) W' := by
     funext i
     ext y

@@ -4,7 +4,8 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThGerm
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsIsNab
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointsLiftToLevelCoverStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliSchemeLevelMapsHeckePointsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliSchemeLevelMapsHeckePoints
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
 import Mathlib.Algebra.Order.Floor.Extended
@@ -137,7 +138,7 @@ theorem exists_deltaDat_isLev
   intro E _ _ _ H Dw l Xo c hr n pd I l₂ Xo₂ c₂ hF hd hM hcop hMb hI
   have hL := GlobalTheory.firstFiveLaws.1
   obtain ⟨r, jK, m, -, -, he, heA, -, hrF⟩ :=
-    (GlobalTheory.T.moduliScheme_levelMaps_heckePoints'.2 E H Dw hr).1 l l₂ Xo Xo₂ hd
+    (_root_.GlobalTheory.moduliScheme_levelMaps_heckePoints.2 E H Dw hr).1 l l₂ Xo Xo₂ hd
   obtain ⟨rF, h₁, h₂, hfin, -, hsur, -⟩ := hrF c c₂ hF.symm
   obtain ⟨st, nab, hnab⟩ := GlobalTheory.CanonConn.exists_isNab hL E H Dw l₂ Xo₂ c₂
   let d : DeltaDat Xo c n := {

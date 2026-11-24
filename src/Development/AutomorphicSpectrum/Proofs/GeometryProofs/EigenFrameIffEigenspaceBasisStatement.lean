@@ -55,6 +55,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
+
 theorem _root_.GlobalTheory.T.eigen_frame_iff_eigenspace_basis
     : ∀ (S : Scheme.{0}) (R : Type) [CommRing R] (G : Over S) [GrpObj G] [IsCommMonObj G]
         (x : Sp R ⟶ S) (Em : Type) [AddCommGroup Em] [Module R Em] (M : LieModel G x Em) (Oe : Type)
@@ -63,10 +64,4 @@ theorem _root_.GlobalTheory.T.eigen_frame_iff_eigenspace_basis
       M.IsActOf act.act ρ
         → (IsEigFrame act x τ (fun i => M.pt (b i))
           ↔ (∀ i, b i ∈ eigSp ρ τ) ∧ ∀ e ∈ eigSp ρ τ, ∃! cf : Fin n → R, e = ∑ i, cf i • b i) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Flat.LieEigFrame.isEigFrame_pt_iff
-  | exact GlobalTheory.CompanionTheory.Ar.Flat.LieEigFrame.isEigFrame_pt_iff
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.Ar.Flat.LieEigFrame.isEigFrame_pt_iff <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.Ar.Flat.LieEigFrame.isEigFrame_pt_iff

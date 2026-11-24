@@ -70,6 +70,7 @@ theorem continuous_whit
         = fun g => ∫ X, F (uGL X * g) * (GroundTheory.Global.adelicChar E (-supSum 0 X) : ℂ) ∂μ :=
     rfl
   rw [e]
+
   refine continuous_of_dominated
     (bound := fun _ => C)
     (fun g => ?_)

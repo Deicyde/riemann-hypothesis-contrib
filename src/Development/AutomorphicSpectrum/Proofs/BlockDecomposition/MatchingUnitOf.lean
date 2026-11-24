@@ -211,8 +211,8 @@ theorem ct_lone {a b : ℕ} (h : a + b = n) {w : Pl E} (hU : UL n w = ⊤) (m : 
           = (intMat a b w : Set _).indicator 1 := by
       funext X
       by_cases hX : X ∈ intMat a b w
-      · simp [hm, hX, Set.indicator_of_mem (show X ∈ (intMat a b w : Set _) from hX)]
-      · simp [hX, Set.indicator_of_notMem (show X ∉ (intMat a b w : Set _) from hX)]
+      · simp [hm, hX]
+      · simp [hX]
     rw [e, GlobalTheory.CompanionTheory.FamClP.hint_ind, habs, if_pos hm, mul_one]
   · have e
         : (fun X : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) =>

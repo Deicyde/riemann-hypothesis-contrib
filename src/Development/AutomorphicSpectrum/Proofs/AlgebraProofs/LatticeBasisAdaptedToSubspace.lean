@@ -381,7 +381,6 @@ private theorem exists_lat_basis_compatible_quotient
     rw [Fintype.linearIndependent_iff]
     intro c hc j
     have hz : ∑ l, c l • b' (Fin.natAdd _ l) ∈ W := by
-
       rw [← hker, map_sum]
       simpa [famQ] using hc
     have hrep : b'.repr (∑ l, c l • b' (Fin.natAdd _ l)) (Fin.natAdd _ j) = c j := by

@@ -54,6 +54,7 @@ open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped InnerProductSpace
+
 theorem _root_.GlobalTheory.T.discrete_series_multiplicity
     : (∀ (D : D7) (V : HSp D) (μ : Measure (GA D V)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant],
         GlobalTheory.IndefiniteRowSideFullHecke.CuspidalNoRadicalFixed.CuspidalOperators V μ)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.discrete_series_multiplicity
         IsTestData V lam M T U μa μf μ fa ff
           → GlobalTheory.IndefiniteRowSideFullHecke.CuspidalNoRadicalFixed.IsCuspidalOp V μ
             (tensor D.sp.cm.sig V.gram fa ff) := by
-  first
-  | exact @GlobalTheory.TestFnCusp.isCuspidalOp_tensor
-  | exact GlobalTheory.TestFnCusp.isCuspidalOp_tensor
-  | (intros; apply GlobalTheory.TestFnCusp.isCuspidalOp_tensor <;> assumption)
+  first | exact @GlobalTheory.TestFnCusp.isCuspidalOp_tensor

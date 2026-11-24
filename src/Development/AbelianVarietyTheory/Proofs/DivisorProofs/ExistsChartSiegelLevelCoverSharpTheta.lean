@@ -2,12 +2,14 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSiegelObjectLoweredLevel
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsThetaCompact
-import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditional
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsPolAVHypSRetract
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsChartFiniteEtaleCoverGenericPointStatement
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.ArithBase
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsChartFiniteEtaleCoverGenericPoint
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLevelCoverMatrices
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSharpGen
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SharpPolarizationPullbackStableStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SharpPolarizationPullbackStable
+import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditional
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SmoothProjectiveStalkFactorial
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsE8IsSharpBasis
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsSharpAndPrim
@@ -49,6 +51,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -79,7 +82,7 @@ theorem chartL
               ∧ y ≫ sY = spMap (algebraMap (cycAway N) R)
               ∧ (∀ w, (spMap R.val.toRingHom ≫ y ≫ q) w = η)
               ∧ ((spMap R.val.toRingHom ≫ y ≫ q).stalkMap (genericPoint (Sp Ω))).hom.Finite :=
-  GlobalTheory.T.exists_chart_finite_etale_cover_generic_point
+  _root_.GlobalTheory.Poinc.Chart.exists_chart
 
 theorem pullL
     : ∀ (g n : ℕ) (o : Type) [CommRing o] (ζ : o) (F : SFam g n ζ) (W : Matrix (Fin 8) (Fin 8) ℤ)
@@ -87,7 +90,7 @@ theorem pullL
         (φ : P'.A.left ⟶ P.A.left),
       SharpOver F W P u → IsGrpPullback P'.A P.A f φ → LBIso P'.L (P.L.pull φ)
         → SharpOver F W P' (f ≫ u) :=
-  GlobalTheory.T.sharp_polarization_pullback_stable
+  _root_.GlobalTheory.Poinc.sharpOver_pullback
 
 theorem exists_isSharpBasis (h : ℕ) (W : Matrix (Fin 8) (Fin 8) ℤ) (hW : IsE8 W)
     : ∃ bas : (Fin (2 * (8 * h)) → ℤ) ≃ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)), IsSharpBasis W bas := by
@@ -176,8 +179,9 @@ theorem exists_sharpOver_cover
   haveI : Smooth F'.s := SmoothOfRelativeDimension.smooth (g * (g + 1) / 2) F'.s
   haveI : IsLocallyNoetherian F'.X := LocallyOfFiniteType.isLocallyNoetherian F'.s
   obtain ⟨t, ht, hp⟩ :=
-    GlobalTheory.exists_isSharp_and_prim L₁ L₂ Moduli.cube_of_isLB g (8 * g) W J a w w' bas hW hb hw
-      hw' hs k (cycAway (n * k)) b F'.X F'.s c (powBaseR_pow hn.ne' hk) hko hc hd
+    GlobalTheory.exists_isSharp_and_prim L₁ L₂ _root_.GlobalTheory.AbLaw.CubeAssembly.cube_gen g
+      (8 * g) W J a w w' bas hW hb hw hw' hs k (cycAway (n * k)) b F'.X F'.s c
+      (powBaseR_pow hn.ne' hk) hko hc hd
   refine ⟨b, t, hp, ?_⟩
   let cT : SiegPre g n (zetaAway n) (F'.s ≫ spMap κ) :=
     SiegLower.lower F'.univ (n := n) (d := k) rfl hnk κ hζ
@@ -248,7 +252,8 @@ theorem exists_chart
     (GlobalTheory.shape_prim_pull_and_descend _ _ _ _ b (fun _ => 0) 0 w w' _ _ _ _ y t' t ht).2.1
       hp'
   obtain ⟨ψ, hψ, hψL, -, -⟩ := ht
-  have hsh : SharpOver F W t.pol (y ≫ q) := pullL _ _ _ _ F W _ _ t'.pol t.pol q y ψ hsh' hψ hψL
+  have hsh : SharpOver F W t.pol (y ≫ q) :=
+    _root_.GlobalTheory.Poinc.sharpOver_pullback _ _ _ _ F W _ _ t'.pol t.pol q y ψ hsh' hψ hψL
   refine ⟨
     cycAway (n * (n.minFac ^ j) ^ 2),
     Ω,
@@ -273,7 +278,8 @@ theorem exists_chart
     ((IsFinite.SpecMap_iff _).1 hfin),
     hstalk
   ⟩
-  · have e := pullL _ _ _ _ F W _ _ t.pol P (y ≫ q) f φ hsh h1 h2
+  · have e :=
+      _root_.GlobalTheory.Poinc.sharpOver_pullback _ _ _ _ F W _ _ t.pol P (y ≫ q) f φ hsh h1 h2
     exact e
   · rw [Category.assoc, hqs, ← Category.assoc y, hys]
     simp only [spMap, ← Spec.map_comp]

@@ -59,10 +59,4 @@ theorem _root_.GlobalTheory.T.generic_sections_meet_transversally
         4 ≤ n → KeyVia x' x (algebraMap k K) φ w → IsBasis x b → (∀ j, SecVia x' x φ w (b' j) (b j))
           → AlgebraicIndependent k T → (∀ i, Coords x' b' (fun j => T (i, j)) (s i).f)
           → ∃ (d : ℕ) (z : Fin d → Pt x') (ch : Fin d → x'.P.L.ι), EtZ x' s z ch := by
-  first
-  | exact @GlobalTheory.KeyKa.GenericZeros.exists_etZ_of_algebraicIndependent
-  | exact GlobalTheory.KeyKa.GenericZeros.exists_etZ_of_algebraicIndependent
-  | (
-      intros
-      apply GlobalTheory.KeyKa.GenericZeros.exists_etZ_of_algebraicIndependent <;> assumption
-    )
+  first | exact @GlobalTheory.KeyKa.GenericZeros.exists_etZ_of_algebraicIndependent

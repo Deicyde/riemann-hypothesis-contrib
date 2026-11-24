@@ -205,7 +205,7 @@ theorem exists_basis_of_dense
         : ((ε • B'.map ι) *ᵥ y) i
           = ε * ι ((B' *ᵥ fun k => (N : E)⁻¹ * u k) i)
             + ∑ k, (ε * ι ((B' *ᵥ (Pi.single k (m : E) : Fin n → E)) i)) * z k := by
-      simp only [Matrix.mulVec_single, Matrix.mulVec, dotProduct_single]
+      simp only [Matrix.mulVec, dotProduct_single]
 
       simp only [dotProduct, map_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
@@ -237,9 +237,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
   GlobalTheory.MixModel GlobalTheory.IwaPlace
 open GlobalTheory.FinPlLoc
-
-
-
 
 namespace GlobalTheory.IwaPlace.FreeAt
 

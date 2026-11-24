@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.doubledBasisSkewColumnMatrix_gram_inverse
           ∧ (Tm A μ)⁻¹
             = (Matrix.fromRows (dblDec A).qX (μ⁻¹ • (dblDec A).qY)).submatrix finSumFinEquiv.symm
               id := by
-  first
-  | exact @GlobalTheory.StdUnn.Tm_gram_inv
-  | exact GlobalTheory.StdUnn.Tm_gram_inv
-  | (intros; apply GlobalTheory.StdUnn.Tm_gram_inv <;> assumption)
+  first | exact @GlobalTheory.StdUnn.Tm_gram_inv

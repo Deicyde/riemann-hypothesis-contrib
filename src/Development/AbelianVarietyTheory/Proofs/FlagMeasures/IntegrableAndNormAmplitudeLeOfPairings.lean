@@ -106,11 +106,7 @@ theorem rankOne_integral
             : ∀ j,
               AEMeasurable (fun x => ∑ i, ENNReal.ofReal (‖⟪e j, f x⟫_ℂ‖ * ‖⟪b i, g x⟫_ℂ‖)) ν := by
           intro j
-          first
-          | exact Finset.aemeasurable_fun_sum _ fun i _ => hterm j i
-          | exact Finset.aemeasurable_sum' _ fun i _ => hterm j i
-          | exact (Finset.aemeasurable_sum _ fun i _ => hterm j i).congr
-              (Filter.Eventually.of_forall fun x => by simp [Finset.sum_apply])
+          first | exact Finset.aemeasurable_fun_sum _ fun i _ => hterm j i
         rw [MeasureTheory.lintegral_finsetSum' _ fun j _ => hsum j]
         exact Finset.sum_congr rfl fun j _ =>
           MeasureTheory.lintegral_finsetSum' _ fun i _ => hterm j i

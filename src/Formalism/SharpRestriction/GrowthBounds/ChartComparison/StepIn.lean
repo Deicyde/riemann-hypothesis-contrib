@@ -63,7 +63,6 @@ variable
   (M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A P)
   {p : ℕ}
 
-
 structure StepIn (i : ℕ) (hi : i ≤ D.R.m) (G : GAtP p) where
   T : ℕ
   bad : Set (HeightOneSpectrum (𝓞 D.host.F))

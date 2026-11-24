@@ -50,6 +50,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
   PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.stronglyMeasurable_twisted_lattice_sum
     : ∀ {D : D7} {ρ p : ℕ} (ψ : AddChar (AF D.host.F) ℂ),
       IsCharAF D.host.F ψ
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.stronglyMeasurable_twisted_lattice_sum
                 ‖Φ (GlobalTheory.CompanionTheory.FJE.rt ξ + y)‖))
             → StronglyMeasurable (fun v : Mx D ρ p × Mx D ρ p =>
               GlobalTheory.CompanionTheory.FJE.dsum ψ b₀ Φ v.2 v.1) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.FJE.dsum_stronglyMeasurable
-  | exact GlobalTheory.CompanionTheory.FJE.dsum_stronglyMeasurable
-  | (intros; apply GlobalTheory.CompanionTheory.FJE.dsum_stronglyMeasurable <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.FJE.dsum_stronglyMeasurable

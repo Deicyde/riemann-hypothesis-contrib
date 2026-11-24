@@ -1,8 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRatioOfWeight
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardBoundedHomogeneousIntFormFamiliesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SectionsEqSumAevalBoundedIntCoeffAmpleStatement
+public import Mathlib.Algebra.Order.Archimedean.Real.Basic
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardBoundedHomogeneousIntFormFamilies
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SectionsEqSumAevalBoundedIntCoeffAmple
 import Mathlib.Algebra.AffineMonoid.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -70,8 +73,7 @@ theorem fg_finrank_le
     (hH : ∀ f ∈ H, ∃ T : Fin δ → MvPolynomial (Fin (D + 1)) ℤ,
       (∀ i, (T i).IsHomogeneous n) ∧ f = ∑ i, MvPolynomial.aeval x (T i) * w i)
     : H.FG ∧ Module.finrank ℤ H ≤ δ * (n + D).choose D := by
-  obtain ⟨-, -, -, hrk, hfin⟩ :=
-    GlobalTheory.T.card_bounded_homogeneous_int_form_families D n δ 0 le_rfl
+  obtain ⟨-, -, -, hrk, hfin⟩ := _root_.GlobalTheory.HSAmp.card_bounded_forms D n δ 0 le_rfl
   haveI := hfin
   haveI : Module.Free ℤ (MvPolynomial.homogeneousSubmodule (Fin (D + 1)) ℤ n) :=
     Module.free_of_finite_type_torsion_free'
@@ -121,7 +123,7 @@ theorem GlobalTheory.HSAmp.HSUpper.upper_bound
                                     * (q + c + D).choose D) := by
   intro k _ X _ p D hD P hA e x hx a b
   obtain ⟨c, w, C, hC, hrep⟩ :=
-    GlobalTheory.T.sections_eq_sum_aeval_boundedIntCoeff_ample k X p D hD P hA e x hx a b
+    _root_.GlobalTheory.HSRep.sections_eq_sum_aeval_bounded k X p D hD P hA e x hx a b
   refine ⟨c, C, hC, fun q => ?_⟩
   obtain ⟨hfg, hrk⟩ :=
     GlobalTheory.HSAmp.HSUpper.fg_finrank_le x w (q + c) (P.H (e * q + a) b) (fun f hf => by
@@ -131,8 +133,8 @@ theorem GlobalTheory.HSAmp.HSUpper.upper_bound
   set R' : ℝ := C * R / κ ^ (q + c)
   have hR' : 0 ≤ R' := div_nonneg (mul_nonneg hC.le hR) (pow_pos hκ _).le
   obtain ⟨hSfin, hScard, -⟩ :=
-    GlobalTheory.T.card_bounded_homogeneous_int_form_families D (q + c)
-      (Module.finrank (ratF x) X.functionField) R' hR'
+    _root_.GlobalTheory.HSAmp.card_bounded_forms D (q + c) (Module.finrank (ratF x) X.functionField)
+      R' hR'
   set S := {T : Fin (Module.finrank (ratF x) X.functionField) → MvPolynomial (Fin (D + 1)) ℤ |
     (∀ i, (T i).IsHomogeneous (q + c)) ∧ ∀ i α, |((AddMonoidAlgebra.coeff (T i) α : ℤ) : ℝ)| ≤ R'}
   have hsub

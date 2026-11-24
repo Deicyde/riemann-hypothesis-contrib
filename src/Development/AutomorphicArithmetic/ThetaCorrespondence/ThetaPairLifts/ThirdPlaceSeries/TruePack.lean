@@ -38,8 +38,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.MiS GlobalTheory.Mem

@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTh
   GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.semicharacter_sq_eq_one_on_halfA
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (δ : ℂ) (sc : ℝ),
       StdPair θ S T δ sc ψ
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.semicharacter_sq_eq_one_on_halfA
                     → ∀ x' ∈ halfAO SS (perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') c,
                       alV D.host.d sc (embH (tauE D) δ x') * alV D.host.d sc (embH (tauE D) δ x')
                         = 1 := by
-  first
-  | exact @GlobalTheory.AdForm.HalfASign.alV_mul_self_halfA
-  | exact GlobalTheory.AdForm.HalfASign.alV_mul_self_halfA
-  | (intros; apply GlobalTheory.AdForm.HalfASign.alV_mul_self_halfA <;> assumption)
+  first | exact @GlobalTheory.AdForm.HalfASign.alV_mul_self_halfA

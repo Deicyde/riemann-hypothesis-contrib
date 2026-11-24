@@ -179,7 +179,7 @@ theorem exists_unit
   have h2 : LinearIndependent BdR fun i => (v i : BdR ⊗[Qp] LL) := by
     rw [linearIndependent_iff_finset_linearIndependent]
     intro s
-    refine GlobalTheory.RegularRing.linearIndepOn_of_invariant
+    refine _root_.GlobalTheory.LinearIndependentFixed.linearIndepOn_of_fixed
       (fun g b => PD.actdR g b)
       (fun g => (tw PD χ g).toAddMonoidHom)
       (tw_smul PD χ) ?_ _

@@ -86,7 +86,6 @@ theorem theta_inj
       (fun ξ hξ => by
         obtain ⟨i, hi⟩ := Function.ne_iff.1 hξ
         refine ⟨Pi.single i (algebraMap F (AF F) (ξ i)⁻¹ * a₀), ?_⟩
-        beta_reduce
         rwa [dotProduct_single, ← mul_assoc, ← map_mul, mul_inv_cancel₀ hi, map_one, one_mul])
       (by
         convert summable_norm_of_mem_schA F (GlobalTheory.SchwartzTranslate.schA_translate F x hφ) using 1)

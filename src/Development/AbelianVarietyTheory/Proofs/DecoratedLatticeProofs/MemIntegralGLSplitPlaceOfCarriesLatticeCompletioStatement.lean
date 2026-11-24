@@ -49,6 +49,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw GlobalTheory.FinPl GlobalTheory.Fam ValuativeRel IsLocalRing
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_integralGL_split_place_of_carries_latticeCompletion
     : ∀ {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : SplitPt D k) (S : HSp D) {Y : Type} [Fintype Y]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.mem_integralGL_split_place_of_carries_latticeCompl
           Moves S g N N P
             → ∀ x : GL Y k,
               (mt S g).map q.pr = F.β * x.val * F.γ → x ∈ GlobalTheory.SplitWeil.KO k Y := by
-  first
-  | exact @GlobalTheory.SplitInt.mem_KO_of_moves
-  | exact GlobalTheory.SplitInt.mem_KO_of_moves
-  | (intros; apply GlobalTheory.SplitInt.mem_KO_of_moves <;> assumption)
+  first | exact @GlobalTheory.SplitInt.mem_KO_of_moves

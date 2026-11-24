@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition GlobalTheory.MixedTerm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mixedModelTerm_linear_thetaFunctions
     : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C C' : Matrix (Fin V.rank) (Fin r) D.host.E)
         (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E) (ψ : AddChar (AF D.host.F) ℂ),
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.mixedModelTerm_linear_thetaFunctions
                 ∧ ∀ (c : ℂ) (G : WO V W → ℂ),
                   IsThetaFunO ψ V W G
                     → term ψ V V' W C C' B μ 𝓨 (c • G) y = c * term ψ V V' W C C' B μ 𝓨 G y := by
-  first
-  | exact @GlobalTheory.MixedTerm.term_linear
-  | exact GlobalTheory.MixedTerm.term_linear
-  | (intros; apply GlobalTheory.MixedTerm.term_linear <;> assumption)
+  first | exact @GlobalTheory.MixedTerm.term_linear

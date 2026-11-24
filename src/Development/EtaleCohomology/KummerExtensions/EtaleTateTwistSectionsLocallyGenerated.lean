@@ -45,4 +45,4 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 theorem LateralTheory.Ext.etale_tate_twist_sections_locally_generated
     : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyGenerated :=
-  GlobalTheory.T.tateTwist_sections_locally_generated
+  _root_.GlobalTheory.EtC.twist_sections

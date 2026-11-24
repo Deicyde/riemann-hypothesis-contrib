@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.SumExpSt
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
   Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn

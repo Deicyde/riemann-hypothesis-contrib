@@ -128,11 +128,7 @@ theorem ptm_copy
     (m : ℕ) (i : Fin n)
     : ptm C P m ≫ homAt y.x (jetCopy C.d m i) = ptm C ![P i] m := by
   have hs : MvPowerSeries.HasSubst (fun p : Fin n × Fin C.d => P p.1 p.2) := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hP p.1 p.2)
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_zero (fun p => hP p.1 p.2)
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun q => by
-        rw [(fun p => hP p.1 p.2) q]; exact IsNilpotent.zero)
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hP p.1 p.2)
   unfold ptm
   rw [GermD.homAt_comp, ExpGF.jetCopy_eq_PS,
     ExpGF.jetSubstPS_comp m

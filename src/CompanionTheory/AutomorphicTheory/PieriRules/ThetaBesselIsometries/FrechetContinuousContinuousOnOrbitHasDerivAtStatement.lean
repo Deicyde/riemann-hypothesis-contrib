@@ -51,6 +51,7 @@ namespace Gp91
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.Gp91.GlobalTheory.T.frechetContinuous_continuousOn_orbit_hasDerivAt
     : PI.KFinSmooth
       → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r),
@@ -66,7 +67,4 @@ theorem _root_.Gp91.GlobalTheory.T.frechetContinuous_continuousOn_orbit_hasDeriv
                       → HasDerivAt
                         (fun t : ℝ => Bm (R.σ (NormedSpace.exp ((t : ℂ) • X)) v))
                         (Bm (PI.UpqRep.dsig (k := k) (r := r) R.σ X v)) 0 := by
-  first
-  | exact @GlobalTheory.cwCont_continuousOn_hasDerivAt
-  | exact GlobalTheory.cwCont_continuousOn_hasDerivAt
-  | (intros; apply GlobalTheory.cwCont_continuousOn_hasDerivAt <;> assumption)
+  first | exact @GlobalTheory.cwCont_continuousOn_hasDerivAt

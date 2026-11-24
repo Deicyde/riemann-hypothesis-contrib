@@ -60,7 +60,7 @@ theorem prodFinLen
   intro F _ _ _ _ ι _ _ α _ _ m _ _ e X _ _ σ hs hi
   have hirr : (piTensor σ).IsIrreducible :=
     GlobalTheory.ProdFiniteLength.piTensor_isIrreducible_of_schur σ hi fun a φ hφ =>
-      GlobalTheory.SchurAdm.schur_admissible (GL (m a) F) (KO F (m a))
+      _root_.GlobalTheory.SchurAdmissibility.schur_admissible (GL (m a) F) (KO F (m a))
         GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO (X a) (σ a) (hi a)
         (GlobalTheory.CompanionTheory.SmGLBridge.irreducibleAdmissible F (m a) (X a) (σ a) (hs a)
           (hi a))

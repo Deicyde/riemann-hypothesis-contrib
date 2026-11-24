@@ -2,15 +2,17 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsUnitIffUnitAt
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsSubMemEigW
-import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ProjectiveLinePlaceTrivialOnConstants
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FormalIsomorphismTransportStatement
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.GermComp1ZeroPointLeft
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FormalIsomorphismTransport
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseConstantsRegularStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CharpolySplitsOfEmbeddingsStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreCurveGermPowersStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeGermEigenStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeSpanIndependentStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LinearIndependentEigProj
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeSpanIndependent
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionHiddenSecondStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValuationBoundedFrameStatement
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ProjectiveLinePlaceTrivialOnConstants
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -75,7 +77,9 @@ theorem toH_rhoH
     (p : Cpt ξ)
     (a : 𝓞 E) (y : (Fin d → X.presheaf.stalk p.1) × (Fin d → X.presheaf.stalk p.1))
     : toH S p (rhoH (S.g p).B a y) = 𝓗.ρH a (toH S p y) := by
-  have h1 := (GlobalTheory.T.formal_isomorphism_transport _ _ _ _ _ _ _ _ (S.iso p)).2.2.2.2.1 a
+  have h1 :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.Conj.Iso.rho_pairing _ _ _ _ _ _ _ _
+      (S.iso p)).2.2.2.2.1 a
   have h2 := hg.1 a (transH (S.φ p) (S.ψ p) (S.lam p) (vmap (genMap ξ p) y))
   have h3 := LinearMap.congr_fun h1 (vmap (genMap ξ p) y)
   simp only [LinearMap.comp_apply] at h3
@@ -99,7 +103,6 @@ theorem eigProj_toH_eq_zero
   refine eigW_induction (P := fun w => HT.eigProj 𝓗.ρH σ (toH S p w) = 0) hw ?_ ?_ ?_
   · intro a y
     have hc : HT.eigProj 𝓗.ρH σ (𝓗.ρH a (toH S p y)) = 𝓗.ρH a (HT.eigProj 𝓗.ρH σ (toH S p y)) := by
-
       simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm]
@@ -244,8 +247,8 @@ theorem germ_degZero
   choose hFB φ' ψ' lam' he hφ hψ hlam using hFi
   choose xs A hxs hfr hpr using GlobalTheory.T.hodge_lattice_germ_eigen E H X t Ω ξ d r M S ρ 𝓗 σ u hξ hgive hσ hu hsp
   have hdet := fun q =>
-    (GlobalTheory.T.hodge_lattice_span_independent X Ω ξ E (Fin d → Ω) M.lat ρ H.bar r 𝓗 σ u hσ hu
-      hsp).2.2 q (A q) (hfr q)
+    (_root_.GlobalTheory.CompanionTheory.Ar.Flat.HodgeLat.quot_det_bundle X Ω ξ E (Fin d → Ω) M.lat
+      ρ H.bar r 𝓗 σ u hσ hu hsp).2.2 q (A q) (hfr q)
   choose Mt hAM hMt using fun i => exists_trans S hgive σ (qi i) q0 (FibreCurve.generic_centre_specializes Γ i) (τ q0) (hτ q0)
     (he i) (hxs q0) hu (hpr (qi i)) (hpr q0)
   let χ : 𝓞 E →+* Γ.κ := v0.comp (τ q0)

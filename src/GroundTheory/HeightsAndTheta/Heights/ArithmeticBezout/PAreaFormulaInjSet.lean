@@ -76,11 +76,15 @@ theorem AreaFormulaInjSet.proof (h : AreaFormulaLocal.Statement) : AreaFormulaIn
       LinearMap.normDet_eq_zero_iff_ker_ne_bot.2 fun hk0 => hni (LinearMap.ker_eq_bot.1 hk0)
     simp [hJdef, SheetImageAreaSet.areaJacobian_eq_normDet, h0]
   have hCnull : μH[(k : ℝ)] (f '' C) = 0 := by
-    let e : (Fin k → ℝ) ≃L[ℝ] E := (finBasisOfFinrankEq ℝ E hk).equivFun.symm.toContinuousLinearEquiv
+    let e : (Fin k → ℝ) ≃L[ℝ] E :=
+      (finBasisOfFinrankEq ℝ E hk).equivFun.symm.toContinuousLinearEquiv
     have himg : f '' C = (f ∘ e) '' (e ⁻¹' C) := by
       rw [image_comp, image_preimage_eq _ e.surjective]
-    have key := IndefiniteRowSideFullHecke.ComplexSets.hausdorffMeasure_image_eq_zero_of_not_injective (f := f ∘ e)
-      (s := e ⁻¹' C) (f' := fun x => (fderiv ℝ f (e x)).comp (e : (Fin k → ℝ) →L[ℝ] E)) ?_ ?_
+    have key :=
+      IndefiniteRowSideFullHecke.ComplexSets.hausdorffMeasure_image_eq_zero_of_not_injective
+        (f := f ∘ e) (s := e ⁻¹' C)
+        (f' := fun x => (fderiv ℝ f (e x)).comp (e : (Fin k → ℝ) →L[ℝ] E))
+        ?_ ?_
     · rw [himg]
       simpa using key
     · intro x hx
@@ -95,7 +99,7 @@ theorem AreaFormulaInjSet.proof (h : AreaFormulaLocal.Statement) : AreaFormulaIn
   have hRm : MeasurableSet R := hA.diff hCm
   set G : Set (Set E) := {V | IsOpen V ∧ V ⊆ U ∧ ∀ B ⊆ V, MeasurableSet B →
     μH[(k : ℝ)] (f '' B) = ∫⁻ x in B, J x ∂(μH[(k : ℝ)])} with hGdef
-  have hRG : R ⊆ ⋃₀ G := by
+  have hRG : R ⊆ ⋃₀G := by
     intro x hx
     have hxinj : Function.Injective (fderiv ℝ f x) := by
       by_contra hn
@@ -103,9 +107,13 @@ theorem AreaFormulaInjSet.proof (h : AreaFormulaLocal.Statement) : AreaFormulaIn
     obtain ⟨V, hVo, hxV, hVU, hV⟩ := h E F k hk U f x hU hf (hAU hx.1) hxinj
     exact ⟨V, ⟨hVo, hVU, hV⟩, hxV⟩
   obtain ⟨T, hTc, hTG, hTU⟩ := TopologicalSpace.isOpen_sUnion_countable G fun V hV => hV.1
-  have hG0 : (∅ : Set E) ∈ G := ⟨isOpen_empty, empty_subset _, fun B hB _ => by
-    rw [subset_empty_iff.1 hB]
-    simp⟩
+  have hG0 : (∅ : Set E) ∈ G := ⟨
+    isOpen_empty,
+    empty_subset _,
+    fun B hB _ => by
+      rw [subset_empty_iff.1 hB]
+      simp
+  ⟩
   obtain ⟨V, hVeq⟩ := (hTc.insert ∅).exists_eq_range (insert_nonempty _ _)
   have hVG : ∀ n, V n ∈ G := by
     intro n
@@ -118,7 +126,7 @@ theorem AreaFormulaInjSet.proof (h : AreaFormulaLocal.Statement) : AreaFormulaIn
     · exact hTG hT
   have hRV : R ⊆ ⋃ n, V n := by
     intro x hx
-    have hx' : x ∈ ⋃₀ T := by
+    have hx' : x ∈ ⋃₀T := by
       rw [hTU]
       exact hRG hx
     obtain ⟨W, hWT, hxW⟩ := hx'
@@ -147,23 +155,26 @@ theorem AreaFormulaInjSet.proof (h : AreaFormulaLocal.Statement) : AreaFormulaIn
       obtain rfl := hinj (hBA n hc) (hBA m ha) hca
       exact disjoint_left.1 (hBd hmn) ha hc
     · intro n
-      exact (hBm n).image_of_continuousOn_injOn
-        (hf.continuousOn.mono ((hBV n).trans (hVG n).2.1)) (hinj.mono (hBA n))
+      exact (hBm n).image_of_continuousOn_injOn (hf.continuousOn.mono ((hBV n).trans (hVG n).2.1))
+        (hinj.mono (hBA n))
 
   have hAC : A = R ∪ C := (sdiff_union_of_subset inter_subset_left).symm
   have himgA : μH[(k : ℝ)] (f '' A) = μH[(k : ℝ)] (f '' R) := by
     apply le_antisymm
-    · calc μH[(k : ℝ)] (f '' A) = μH[(k : ℝ)] (f '' R ∪ f '' C) := by
-            rw [← image_union, ← hAC]
+    · calc
+        μH[(k : ℝ)] (f '' A)
+          = μH[(k : ℝ)] (f '' R ∪ f '' C) := by rw [← image_union, ← hAC]
         _ ≤ μH[(k : ℝ)] (f '' R) + μH[(k : ℝ)] (f '' C) := measure_union_le _ _
         _ = μH[(k : ℝ)] (f '' R) := by rw [hCnull, add_zero]
     · exact measure_mono (image_mono sdiff_subset)
   have hintA : ∫⁻ x in A, J x ∂(μH[(k : ℝ)]) = ∫⁻ x in R, J x ∂(μH[(k : ℝ)]) := by
-    calc ∫⁻ x in A, J x ∂(μH[(k : ℝ)]) = ∫⁻ x in R ∪ C, J x ∂(μH[(k : ℝ)]) := by rw [← hAC]
+    calc
+      ∫⁻ x in A, J x ∂(μH[(k : ℝ)])
+        = ∫⁻ x in R ∪ C, J x ∂(μH[(k : ℝ)]) := by rw [← hAC]
       _ = ∫⁻ x in R, J x ∂(μH[(k : ℝ)]) + ∫⁻ x in C, J x ∂(μH[(k : ℝ)]) :=
-          lintegral_union hCm disjoint_sdiff_left
+        lintegral_union hCm disjoint_sdiff_left
       _ = ∫⁻ x in R, J x ∂(μH[(k : ℝ)]) := by
-          rw [setLIntegral_congr_fun hCm hJC, lintegral_zero, add_zero]
+        rw [setLIntegral_congr_fun hCm hJC, lintegral_zero, add_zero]
   rw [himgA, hR, hintA]
 
 end GroundTheory.Heights₂.Heights

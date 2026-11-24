@@ -40,8 +40,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.BasicNotions.TH
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -54,7 +52,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.HeightCounting.Up GlobalTheory.HeightCounting.RatSide
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
-
 
 namespace GlobalTheory.HeightCounting.ThetaSt
 section Gen

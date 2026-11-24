@@ -68,7 +68,7 @@ theorem _root_.GlobalTheory.minorHarm_pderiv_comm
     apply MvPolynomial.derivation_ext
     intro n
     rw [Derivation.commutator_apply, MvPolynomial.pderiv_X, MvPolynomial.pderiv_X]
-    by_cases hj : j = n <;> by_cases hi : i = n <;> simp [Pi.single_apply, hj, hi]
+    by_cases hj : j = n <;> by_cases hi : i = n <;> simp [hj, hi]
   have := DFunLike.congr_fun h p
   rw [Derivation.commutator_apply] at this
   simpa [sub_eq_zero] using this

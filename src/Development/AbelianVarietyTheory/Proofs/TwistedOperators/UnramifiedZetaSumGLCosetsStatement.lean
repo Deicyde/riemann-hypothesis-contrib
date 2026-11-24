@@ -56,6 +56,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unramified_zeta_sum_GL_cosets
     : GlobalTheory.Published.UnramifiedDoublingGL
       → ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (r t : ℕ),
@@ -77,7 +78,4 @@ theorem _root_.GlobalTheory.T.unramified_zeta_sum_GL_cosets
                         (eulerFac (B.map (z * ·)) (npow w (-((1 + (t : ℂ)) / 2)))
                           * eulerFac (B.map fun β => (z * β)⁻¹) (npow w (-((1 + (t : ℂ)) / 2)))
                           * (∏ i ∈ Finset.Ioc t (r + t), (1 - ((qV E w : ℂ) ^ i)⁻¹)) * ℓ x) := by
-  first
-  | exact @GlobalTheory.ZetaGL.zeta_sum_GL
-  | exact GlobalTheory.ZetaGL.zeta_sum_GL
-  | (intros; apply GlobalTheory.ZetaGL.zeta_sum_GL <;> assumption)
+  first | exact @GlobalTheory.ZetaGL.zeta_sum_GL

@@ -42,6 +42,8 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabPull
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.NonemptyIsLimitBaseChange
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
 
 @[expose] public section
 
@@ -52,17 +54,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open MonoidalCategory CartesianMonoidalCategory MonObj
 
 namespace GlobalTheory.TransLift
-
-theorem spMap_comp''
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (α : A →+* B) (β : B →+* C)
-    : spMap β ≫ spMap α = spMap (β.comp α) := by
-  rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
-
-theorem dualMap_comp''
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (α : A →+* B) (β : B →+* C)
-    : (dualMap β).comp (dualMap α) = dualMap (β.comp α) := by
-  refine RingHom.ext fun x => ?_
-  ext <;> simp [dualMap]
 
 theorem lift_isTranslate
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X X' : Scheme.{0})
@@ -83,7 +74,7 @@ theorem lift_isTranslate
   have hsq : m.φ ≫ t.G.hom = t'.G.hom ≫ j := m.cart.1.w
   have hg : (g₀' ≫ m.φ) ≫ t.G.hom = spMap (φS.comp ψ) ≫ x := by
     rw [Category.assoc, hsq, ← Category.assoc, hg₀', Category.assoc, hx, ← Category.assoc,
-      spMap_comp'']
+      _root_.GlobalTheory.spMap_comp_ring]
   obtain ⟨g', v', h₁, h₂, h₃⟩ := hw'
   have ht : IsTranslate t (φS.comp ψ) (g₀' ≫ m.φ) u (w' ≫ m.φ) := by
     let T : Over X' := tEpsG (g₀' ≫ t'.G.hom)
@@ -96,7 +87,8 @@ theorem lift_isTranslate
     · show 𝟙 _ ≫ g'.left ≫ m.φ = _
       rw [Category.id_comp, h₁, Category.assoc]
     · show 𝟙 _ ≫ v'.left ≫ m.φ = _
-      rw [Category.id_comp, h₂, Category.assoc, huu, ← Category.assoc, spMap_comp'', dualMap_comp'']
+      rw [Category.id_comp, h₂, Category.assoc, huu, ← Category.assoc,
+        _root_.GlobalTheory.spMap_comp_ring, _root_.GlobalTheory.Frames.Glue.dual_comp]
     · rw [← MonObj.comp_mul, ← map_mul]
       show 𝟙 _ ≫ (g' * v').left ≫ m.φ = _
       rw [Category.id_comp, h₃]

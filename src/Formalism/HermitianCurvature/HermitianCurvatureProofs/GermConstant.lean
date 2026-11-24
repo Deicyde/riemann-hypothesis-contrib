@@ -46,6 +46,9 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.ComponentFamilySettingOfSettingBis
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SizeAtNonneg
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SupremumAIsMajorant
 
 @[expose] public section
 
@@ -113,18 +116,9 @@ variable
   [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
   [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
 
-theorem sizeAt_nonneg (S : C.HidaSetting E Wp Wq) (v : Fin S.f) (a : List C.Letter)
-    : 0 ≤ S.sizeAt v a := by
-  unfold C.HidaSetting.sizeAt
-  exact List.prod_nonneg fun x hx => by
-    obtain ⟨y, -, rfl⟩ := List.mem_map.1 hx
-    exact abs_nonneg _
-
-theorem rd_pos' : 0 < S6.rd E := GermRealisation.rd_pos E
-
 theorem gamLev_nonneg (S : C.HidaSetting E Wp Wq) (i : ℕ)
     : 0 ≤ D.GamLev S.G.k S.G.r (D.kapG (S.g : ℝ) (S6.rd E)) (D.deG (S.g : ℝ) (S6.rd E)) i := by
-  have hrd := (rd_pos' (E := E)).le
+  have hrd := (_root_.Formalism.FourierDecayAlt.P.Jx5.rd_pos' (E := E)).le
   unfold D.GamLev
   refine Finset.prod_nonneg fun l _ => div_nonneg (zpow_nonneg ?_ _) ?_
   · unfold D.kapG; positivity
@@ -152,7 +146,7 @@ theorem gNSetC_main
           (by rw [← hP.2]; exact FormNormSumIdentities.ptSize_toStd S.G.r (S.g : ℝ) 1 P))
         (KB.slv (p v).T (F v ε) i hi a (D.toStd S.G.r (S.g : ℝ) 1 Q)
           (by rw [← hQ.2]; exact FormNormSumIdentities.ptSize_toStd S.G.r (S.g : ℝ) 1 Q)) := by
-  have hsz : 0 ≤ S.sizeAt v a := sizeAt_nonneg S v a
+  have hsz : 0 ≤ S.sizeAt v a := _root_.Formalism.FourierDecayAlt.P.PBA.sizeAt_nonneg S v a
   have hΓ := gamLev_nonneg S i
   have e1
       : KB.gN (PBL.setC S p F) v ε i a P Q
@@ -247,12 +241,6 @@ theorem sqrt_zpow_two_mul (y : ℝ) (hy : 0 ≤ y) (a b : ℤ) : √(y ^ (2 * a 
   rw [show 2 * a * b = (a * b) * 2 by ring, zpow_mul, zpow_two,
     Real.sqrt_mul_self (zpow_nonneg hy _)]
 
-theorem bSt_pos_loc (κ : ℝ) (hκ : 0 < κ) (p : C.LPt) : 0 < D.bSt κ p := by
-  unfold D.bSt
-  refine List.prod_pos fun x hx => ?_
-  obtain ⟨a, _, rfl⟩ := List.mem_map.1 hx
-  exact Finset.prod_pos fun m _ => zpow_pos (div_pos (zpow_pos hκ _) Real.pi_pos) _
-
 theorem weight_product_nonneg (k r : ℕ) (fr : ℕ → ℕ → ℝ) (hfr : ∀ b s, 0 ≤ fr b s)
     : ∀ (b : ℕ) (P : C.LPt), 0 ≤ C.nAux k r 0 fr b P
   | _, [] => by simp [C.nAux]
@@ -295,7 +283,8 @@ theorem lambdaValue_append_two
           / (betaZ (D.kapG (S.g : ℝ) (S6.rd E)) ((m + 1 : ℕ) : ℤ)
             * betaZ (D.kapG (S.g : ℝ) (S6.rd E)) ((1 : ℕ) : ℤ))) := by
   have hfr : ∀ b s, 0 ≤ S.fr b s := fun b s => by
-    unfold C.HidaSetting.fr; exact Real.rpow_nonneg (rd_pos' (E := E)).le _
+    unfold C.HidaSetting.fr
+    exact Real.rpow_nonneg (_root_.Formalism.FourierDecayAlt.P.Jx5.rd_pos' (E := E)).le _
   unfold lamP C.nLoc
   have hsz : D.ptSize (h ++ [(m + 1, t), (1, c)]) = b0 + m + 2 := by
     simp [D.ptSize, List.map_append, List.sum_append] at hh ⊢; omega
@@ -327,7 +316,8 @@ theorem lambdaMap_one_eq_zero
               * (C.Mlev S.G.k S.G.r (1 + b0 + (m + 2) - 1) + ((m + 2 : ℕ) : ℤ) - 3))
           / betaZ (D.kapG (S.g : ℝ) (S6.rd E)) ((m + 2 : ℕ) : ℤ)) := by
   have hfr : ∀ b s, 0 ≤ S.fr b s := fun b s => by
-    unfold C.HidaSetting.fr; exact Real.rpow_nonneg (rd_pos' (E := E)).le _
+    unfold C.HidaSetting.fr
+    exact Real.rpow_nonneg (_root_.Formalism.FourierDecayAlt.P.Jx5.rd_pos' (E := E)).le _
   unfold lamP C.nLoc
   have hsz : D.ptSize (h ++ [(m + 2, z)]) = b0 + m + 2 := by
     simp [D.ptSize, List.map_append, List.sum_append] at hh ⊢; omega
@@ -365,7 +355,7 @@ theorem germConst : GermConst := by
   have n5 : U.Mlev S.G.k ρ - 2 = S.G.k + 2 * ρ + 1 := by simp only [U.Mlev]; omega
   have hκ : D.kapG (S.g : ℝ) (S6.rd E) = ((S.g : ℝ) / (2 * Real.pi) * S6.rd E)⁻¹ := by
     unfold D.kapG; field_simp
-  have hrd : 0 < S6.rd E := rd_pos' (E := E)
+  have hrd : 0 < S6.rd E := _root_.Formalism.FourierDecayAlt.P.Jx5.rd_pos' (E := E)
   have hκ0 : D.kapG (S.g : ℝ) (S6.rd E) ≠ 0 := by rw [hκ]; positivity
   rw [show ((m + 2 : ℕ) : ℤ) = ((m + 1 : ℕ) : ℤ) + 1 by push_cast; ring, betaZ_succ' _ hκ0 (m + 1)]
   simp only [n1, n2, n3, n4, n5, Nat.cast_one, betaZ_one, mul_one, C.HidaSetting.fr]
@@ -394,7 +384,8 @@ theorem germConst : GermConst := by
   have hHf0 : 0 ≤ Hf := by
     rw [hHf]
     refine div_nonneg (Real.sqrt_nonneg _)
-      (mul_nonneg (bSt_pos_loc _ (by rw [hκ]; positivity) h).le (Real.sqrt_nonneg _))
+      (mul_nonneg (_root_.Formalism.FourierDecayAlt.P.PBD.bSt_pos' _ (by rw [hκ]; positivity) h).le
+        (Real.sqrt_nonneg _))
   unfold kapB
   have c1 : (((m + 1) * (m + 4) / 2 : ℕ) : ℝ) = ((m : ℝ) + 1) * ((m : ℝ) + 4) / 2 := by
     have : 2 ∣ (m + 1) * (m + 4) := by
@@ -443,11 +434,3 @@ end loc2
 end
 
 end Formalism.FourierDecayAlt.P.FormNormSumIdentities
-
-theorem Formalism.FourierDecayAlt.P.germ_null_set_compact
-    : Formalism.FourierDecayAlt.P.FormNormSumIdentities.GNSetC :=
-  Formalism.FourierDecayAlt.P.FormNormSumIdentities.gNSetC
-
-theorem Formalism.FourierDecayAlt.P.germ_constant
-    : Formalism.FourierDecayAlt.P.FormNormSumIdentities.GermConst :=
-  Formalism.FourierDecayAlt.P.FormNormSumIdentities.germConst

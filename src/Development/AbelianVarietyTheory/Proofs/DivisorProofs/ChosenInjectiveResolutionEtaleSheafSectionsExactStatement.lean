@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.chosenInjectiveResolutionEtaleSheaf_sections_exactness
     : ∀ (R : Type) [CommRing R] (F : Shv R) (U : Scheme.{0}),
       (∀ z : Sec ((res R F).X 0) U,
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.chosenInjectiveResolutionEtaleSheaf_sections_exact
                 → Loc U fun V g =>
                   ∃ y : Sec ((res R F).X m) V, Sec.map ((res R F).d m n) y = Sec.res g z)
         ∧ ∀ n : ℤ, n < 0 → Subsingleton (Sec ((res R F).X n) U) := by
-  first
-  | (exact @GlobalTheory.EtC.resSec)
-  | (exact GlobalTheory.EtC.resSec)
-  | (intros; apply GlobalTheory.EtC.resSec <;> assumption)
+  first | (exact @GlobalTheory.EtC.resSec)

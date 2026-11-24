@@ -4,13 +4,25 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IntegralClosureHeightEqOneOfLiesOver
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsChartOfLineBundle
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenLatticeConstantRankStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTateWeilPullbackStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeVectorBundlePullbackStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompatStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.NormalCptIffNormalSchemeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimitiveRootHodgeCptStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtNoetherianModelNoetherianStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenLatticeConstantRank
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GenWeil
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsGenOfIsVBOne
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.MemEigSpOfMemHtDual
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTateWeilPullback
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EtaleLocalizationAtPrimeTensorOfLowHeight
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeVectorBundlePullback
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompat
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.NormalCptIffNormalScheme
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimitiveRootHodgeCpt
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import Mathlib.AlgebraicGeometry.Noetherian
+public import Mathlib.AlgebraicGeometry.Properties
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtNoetherianModelNoetherian
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -56,8 +68,11 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -65,10 +80,13 @@ namespace GlobalTheory.CompanionTheory.Ar.HFlag
 
 section Lemmas
 
-variable {Ω Ω' : Type} [Field Ω] [Field Ω'] {V V' : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup V'] [Module Ω' V']
+variable
+  {Ω Ω' : Type} [Field Ω] [Field Ω']
+  {V V' : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup V'] [Module Ω' V']
 
-theorem exists_forms_eq {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearIndependent Ω b) (l : Fin n) :
-    ∃ u : V, ∀ k, b k u = if k = l then 1 else 0 := by
+theorem exists_forms_eq
+    {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearIndependent Ω b) (l : Fin n)
+    : ∃ u : V, ∀ k, b k u = if k = l then 1 else 0 := by
   classical
   have hs : Function.Surjective (LinearMap.pi b : V →ₗ[Ω] (Fin n → Ω)) := by
     rw [← LinearMap.dualMap_injective_iff, injective_iff_map_eq_zero]
@@ -76,7 +94,9 @@ theorem exists_forms_eq {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearI
     have hc : ∑ k, φ (Pi.single k 1) • b k = 0 := by
       ext u
       have h1 := LinearMap.congr_fun hφ u
-      have h2 : (LinearMap.pi b : V →ₗ[Ω] (Fin n → Ω)) u = ∑ k, b k u • (Pi.single k 1 : Fin n → Ω) := by
+      have h2
+          : (LinearMap.pi b : V →ₗ[Ω] (Fin n → Ω)) u
+            = ∑ k, b k u • (Pi.single k 1 : Fin n → Ω) := by
         ext m
         simp [Finset.sum_apply, Pi.single_apply]
 
@@ -94,9 +114,11 @@ theorem exists_forms_eq {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearI
   have := congrFun hu k
   simpa [Pi.single_apply] using this
 
-theorem li_of_adjoint {i : Ω →+* Ω'} (j : V →+ V') (jd : Module.Dual Ω V →+ Module.Dual Ω' V')
-    (h : ∀ w v, jd w (j v) = i (w v)) {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearIndependent Ω b) :
-    LinearIndependent Ω' fun k => jd (b k) := by
+theorem li_of_adjoint
+    {i : Ω →+* Ω'}
+    (j : V →+ V') (jd : Module.Dual Ω V →+ Module.Dual Ω' V') (h : ∀ w v, jd w (j v) = i (w v))
+    {n : ℕ} {b : Fin n → Module.Dual Ω V} (hb : LinearIndependent Ω b)
+    : LinearIndependent Ω' fun k => jd (b k) := by
   classical
   refine Fintype.linearIndependent_iff.2 fun c hc l => ?_
   obtain ⟨u, hu⟩ := exists_forms_eq hb l
@@ -105,19 +127,26 @@ theorem li_of_adjoint {i : Ω →+* Ω'} (j : V →+ V') (jd : Module.Dual Ω V 
 
 end Lemmas
 
-theorem isVBOn_mono {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type}
-    [AddCommGroup E] [Module Ω E] {L : Lat ξ E} {T T' : Set (Cpt ξ)} (hT : T' ⊆ T) {r : ℕ} {V : Submodule Ω E}
-    (h : L.IsVBOn T r V) : L.IsVBOn T' r V := by
+theorem isVBOn_mono
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+    {L : Lat ξ E} {T T' : Set (Cpt ξ)} (hT : T' ⊆ T)
+    {r : ℕ} {V : Submodule Ω E} (h : L.IsVBOn T r V)
+    : L.IsVBOn T' r V := by
   intro p hp
   obtain ⟨U, hU, b, hb, hfr⟩ := h p (hT hp)
   exact ⟨U, hU, b, hb, fun q hq => hfr q (hT hq)⟩
 
-theorem exists_adjoint {Ω Ω' : Type} [Field Ω] [Field Ω'] {V V' : Type} [AddCommGroup V] [Module Ω V]
-    [FiniteDimensional Ω V] [AddCommGroup V'] [Module Ω' V'] {i : Ω →+* Ω'} {j : V →+ V'} (hj : IsExtOver i j)
-    (hs : Submodule.span Ω' (Set.range j) = ⊤) :
-    Module.finrank Ω' V' = Module.finrank Ω V ∧ ∃ jd : Module.Dual Ω V →+ Module.Dual Ω' V',
-      (∀ w v, jd w (j v) = i (w v)) ∧ (∀ (a : Ω) w, jd (a • w) = i a • jd w) ∧
-        Submodule.span Ω' (jd '' ((⊤ : Submodule Ω (Module.Dual Ω V)) : Set (Module.Dual Ω V))) = ⊤ := by
+theorem exists_adjoint
+    {Ω Ω' : Type} [Field Ω] [Field Ω']
+    {V V' : Type}
+    [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V] [AddCommGroup V'] [Module Ω' V']
+    {i : Ω →+* Ω'} {j : V →+ V'} (hj : IsExtOver i j) (hs : Submodule.span Ω' (Set.range j) = ⊤)
+    : Module.finrank Ω' V' = Module.finrank Ω V
+      ∧ ∃ jd : Module.Dual Ω V →+ Module.Dual Ω' V',
+        (∀ w v, jd w (j v) = i (w v)) ∧ (∀ (a : Ω) w, jd (a • w) = i a • jd w)
+          ∧ Submodule.span Ω' (jd '' ((⊤ : Submodule Ω (Module.Dual Ω V)) : Set (Module.Dual Ω V)))
+            = ⊤ := by
   classical
   let v := Module.finBasis Ω V
   have hexp : ∀ u, j u = ∑ k, i (v.repr u k) • j (v k) := fun u => by
@@ -136,15 +165,17 @@ theorem exists_adjoint {Ω Ω' : Type} [Field Ω] [Field Ω'] {V V' : Type} [Add
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
   let v' := Module.Basis.mk hli hsp
   have hv' : ∀ k, v' k = j (v k) := fun k => by simp [v']
-  let jd : Module.Dual Ω V →+ Module.Dual Ω' V' := AddMonoidHom.mk' (fun w => v'.constr Ω' fun k => i (w (v k)))
-    (fun a b => by
-      rw [← map_add (f := _)]
-      congr 1
-      funext k
-      simp)
+  let jd : Module.Dual Ω V →+ Module.Dual Ω' V' :=
+    AddMonoidHom.mk'
+      (fun w => v'.constr Ω' fun k => i (w (v k)))
+      (fun a b => by
+        rw [← map_add (f := _)]
+        congr 1
+        funext k
+        simp)
   have hjd : ∀ w k, jd w (v' k) = i (w (v k)) := fun w k => by
     show (v'.constr Ω' fun k => i (w (v k))) (v' k) = _
-    simp [Module.Basis.constr_basis]
+    simp
   have hadj : ∀ w u, jd w (j u) = i (w u) := fun w u => by
     rw [hexp u]
     conv_rhs => rw [← v.sum_repr u]
@@ -159,15 +190,32 @@ theorem exists_adjoint {Ω Ω' : Type} [Field Ω] [Field Ω'] {V V' : Type} [Add
     simp
   · rw [eq_top_iff]
     rintro w' -
-    have hc : ∀ k, jd (v.coord k) = v'.coord k := fun k => v'.ext fun l => by
-      rw [hjd]
-      simp [Finsupp.single_apply, Module.Basis.coord_apply, eq_comm]
+    have hc : ∀ k, jd (v.coord k) = v'.coord k := fun k =>
+      v'.ext fun l => by
+        rw [hjd]
+        simp [Finsupp.single_apply, Module.Basis.coord_apply, eq_comm]
     rw [← v'.sum_dual_apply_smul_coord w']
-    exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨v.coord k, trivial, hc k⟩)
+    exact Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨v.coord k, trivial, hc k⟩)
 
-theorem omP_ext : Out.WeilSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω Ω' : Type) [Field Ω] [CharZero Ω] [Field Ω'] [CharZero Ω'] (i : Ω →+* Ω') (K K' : Type) [Fintype K] [Fintype K'] (J : K → Type) (J' : K' → Type) [∀ k, Fintype (J k)] [∀ k, Fintype (J' k)] (y : (Σ k, J k) → Ω) (y' : (Σ k, J' k) → Ω') (A : HodgeCpt Y S y) (A' : HodgeCpt Y S y') (g : A'.X ⟶ A.X) (m : SABMap A'.t A.t g) (j₁ : A.Li →+ A'.Li) (y₀ : Sp Ω ⟶ Xo.XF c) (p : ℕ), p ∈ S → GlobalTheory.CompanionTheory.Ar.Dominates A'.ξ A.ξ g i → A'.f = g ≫ A.f → A'.R = A.R → IsExtOver i j₁ → (∀ v, (A'.M.pt (j₁ v)).left ≫ m.φ = spMap (dualMap i) ≫ (A.M.pt v).left) → A.ξ ≫ A.f = y₀ ≫ Y.j → (∃ ζ : Ω, IsPrimitiveRoot ζ (p ^ A.R p)) → (HT.omP A p).IsVBOn {q | InFibre A.ξ p q} (Module.finrank Ω A.Li) ⊤ → (HT.omP A' p).IsVBOn {q | InFibre A'.ξ p q} (Module.finrank Ω' A'.Li) ⊤ := by
-  intro hW E _ _ _ H D l Xo c Y S Ω Ω' _ _ _ _ i K K' _ _ J J' _ _ y y' A A' g m j₁ y₀ p hp hd hf hR hext hpt hy hζ h
+theorem omP_ext
+    : Out.WeilSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+          (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l)
+          (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω Ω' : Type) [Field Ω]
+          [CharZero Ω] [Field Ω'] [CharZero Ω'] (i : Ω →+* Ω') (K K' : Type) [Fintype K]
+          [Fintype K'] (J : K → Type) (J' : K' → Type) [∀ k, Fintype (J k)] [∀ k, Fintype (J' k)]
+          (y : (Σ k, J k) → Ω) (y' : (Σ k, J' k) → Ω') (A : HodgeCpt Y S y) (A' : HodgeCpt Y S y')
+          (g : A'.X ⟶ A.X) (m : SABMap A'.t A.t g) (j₁ : A.Li →+ A'.Li) (y₀ : Sp Ω ⟶ Xo.XF c)
+          (p : ℕ),
+        p ∈ S → GlobalTheory.CompanionTheory.Ar.Dominates A'.ξ A.ξ g i → A'.f = g ≫ A.f → A'.R = A.R
+          → IsExtOver i j₁
+          → (∀ v, (A'.M.pt (j₁ v)).left ≫ m.φ = spMap (dualMap i) ≫ (A.M.pt v).left)
+          → A.ξ ≫ A.f = y₀ ≫ Y.j → (∃ ζ : Ω, IsPrimitiveRoot ζ (p ^ A.R p))
+          → (HT.omP A p).IsVBOn {q | InFibre A.ξ p q} (Module.finrank Ω A.Li) ⊤
+          → (HT.omP A' p).IsVBOn {q | InFibre A'.ξ p q} (Module.finrank Ω' A'.Li) ⊤ := by
+  intro hW E _ _ _ H D l Xo c Y S Ω Ω' _ _ _ _ i K K' _ _ J J' _ _ y y' A A' g m j₁ y₀ p hp hd hf hR
+    hext hpt hy hζ h
   classical
   have hn : p ^ A.R p ≠ 0 := pow_ne_zero _ (A.S_prime p hp).ne_zero
   obtain ⟨ζ, hζ⟩ := hζ
@@ -180,23 +228,40 @@ theorem omP_ext : Out.WeilSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   have hy' : A'.ξ ≫ A'.f = (spMap i ≫ y₀) ≫ Y.j := by
     have hd' : A'.ξ ≫ g = spMap i ≫ A.ξ := hd
     rw [hf, ← Category.assoc, hd', Category.assoc, hy, Category.assoc]
-  obtain ⟨-, e, -, -, -, -, he, -⟩ := GlobalTheory.T.primitive_root_hodge_cpt hW E H D l Xo c Y S Ω K J y A y₀ p ζ hp hy hζ'
-  obtain ⟨-, e', -, -, -, -, he', -⟩ := GlobalTheory.T.primitive_root_hodge_cpt hW E H D l Xo c Y S Ω' K' J' y' A' (spMap i ≫ y₀) p ζ₁ hp hy'
-    (by rw [hR]; exact hζ₁)
-  have := ((GlobalTheory.T.regAt_noetherian_model_noetherian _ Ω A.ξ ℤ _ _ A.tie).2 A.all).1
-  have := ((GlobalTheory.T.regAt_noetherian_model_noetherian _ Ω' A'.ξ ℤ _ _ A'.tie).2 A'.all).1
+  obtain ⟨-, e, -, -, -, -, he, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HF.generic_torsion hW E H D l Xo c Y S Ω K J y A y₀ p ζ
+      hp hy hζ'
+  obtain ⟨-, e', -, -, -, -, he', -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HF.generic_torsion hW E H D l Xo c Y S Ω' K' J' y' A'
+      (spMap i ≫ y₀) p ζ₁ hp hy' (by rw [hR]; exact hζ₁)
+  have :=
+    ((_root_.GlobalTheory.CompanionTheory.Ar.CoordNoeth.noetherian_of_coordTie _ Ω A.ξ ℤ _ _
+      A.tie).2 A.all).1
+  have :=
+    ((_root_.GlobalTheory.CompanionTheory.Ar.CoordNoeth.noetherian_of_coordTie _ Ω' A'.ξ ℤ _ _
+      A'.tie).2 A'.all).1
   rw [hR] at he'
   have hfd : FiniteDimensional Ω A.Li :=
-    (GlobalTheory.T.eigen_lattice_constant_rank E H D l Xo c Y A.X Ω A.ξ A.f y₀ A.t A.m A.Li A.M A.ρ A.cst hy A.cst_over A.act).1
-  obtain ⟨-, hspan, -⟩ := GlobalTheory.T.lie_lattice_dominant_compat A.X A'.X Ω Ω' A.ξ A'.ξ g i A.t.G A'.t.G m.φ A.Li A'.Li A.M A'.M j₁
-    A.tie.gen A'.tie.gen hd m.cart A.t.semi.smooth hpt
+    (_root_.GlobalTheory.CompanionTheory.Ar.EigRank.eig_finrank_label E H D l Xo c Y A.X Ω A.ξ A.f
+      y₀ A.t A.m A.Li A.M A.ρ A.cst hy A.cst_over A.act).1
+  obtain ⟨-, hspan, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.LiePull.main A.X A'.X Ω Ω' A.ξ A'.ξ g i A.t.G A'.t.G m.φ
+      A.Li A'.Li A.M A'.M j₁ A.tie.gen A'.tie.gen hd m.cart A.t.semi.smooth hpt
   obtain ⟨hrk, jd, hadj, hsm, hjs⟩ := exists_adjoint hext hspan
-  have key := (GlobalTheory.T.hodge_tate_weil_pullback A.X Ω A.ξ A.tie.gen ((GlobalTheory.T.normal_cpt_iff_normal_scheme _ Ω A.ξ A.tie.gen A.all).2.2 A.normal) A.t.G A.t.semi
-    A.t.PP.L _ (Nat.one_le_iff_ne_zero.2 hn) (A.tors p hp) e he A.Li A.M A'.X Ω' A'.ξ A'.tie.gen
-    ((GlobalTheory.T.normal_cpt_iff_normal_scheme _ Ω' A'.ξ A'.tie.gen A'.all).2.2 A'.normal) g i hd A'.t.G m.φ m.cart A'.t.PP.L e' he' A'.Li
-    A'.M j₁ jd hpt hadj).1
-  have h2 := GlobalTheory.T.lattice_vector_bundle_pullback A.X Ω A.ξ (Module.Dual Ω A.Li) A'.X Ω' A'.ξ g i (Module.Dual Ω' A'.Li) jd (HT.omP A p)
-    {q | InFibre A.ξ p q} _ ⊤ hd hsm (fun _ _ hb => li_of_adjoint j₁ jd hadj hb) h
+  have key :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.HtPull.main A.X Ω A.ξ A.tie.gen
+      ((_root_.GlobalTheory.CompanionTheory.Ar.XR.component_whole_isIntegral_and_normal _ Ω A.ξ
+        A.tie.gen A.all).2.2 A.normal)
+      A.t.G A.t.semi A.t.PP.L _ (Nat.one_le_iff_ne_zero.2 hn) (A.tors p hp) e he A.Li A.M A'.X Ω'
+      A'.ξ A'.tie.gen
+      ((_root_.GlobalTheory.CompanionTheory.Ar.XR.component_whole_isIntegral_and_normal _ Ω' A'.ξ
+        A'.tie.gen A'.all).2.2 A'.normal)
+      g i hd A'.t.G m.φ m.cart A'.t.PP.L e' he' A'.Li A'.M j₁ jd hpt hadj).1
+  have h2 :=
+    _root_.GlobalTheory.CompanionTheory.Ar.LatPull.isVBOn_pull A.X Ω A.ξ (Module.Dual Ω A.Li) A'.X
+      Ω' A'.ξ g i (Module.Dual Ω' A'.Li) jd (HT.omP A p) {q | InFibre A.ξ p q} _ ⊤ hd hsm
+      (fun _ _ hb => li_of_adjoint j₁ jd hadj hb)
+      h
   rw [← key, hjs, ← hrk, ← hR] at h2
   refine isVBOn_mono (fun q hq => ?_) h2
   refine ⟨LatModel.dominates_spec hd q, fun hu => hq ?_⟩

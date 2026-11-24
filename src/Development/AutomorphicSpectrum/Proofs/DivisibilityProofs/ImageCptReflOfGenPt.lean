@@ -1,8 +1,11 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.RootOnFund
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericPointFieldIsoStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.HodgeComponentFactorPointStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCptGen
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericPointFieldIso
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.HodgeComponentFactorPoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -123,11 +126,13 @@ theorem imageCpt_refl_of_genPt
         (A : HodgeCpt Y S y) (A' : HodgeCpt Y S y'),
       Mono (spMap β) → genPt A.ξ₀ = genPt A'.ξ₀ → IsImageCpt (Iso.refl Xo.X) A A' := by
   intro E _ _ _ H D l Xo c O _ β Y S Ω Ω' _ _ K K' _ _ J J' y y' A A' hβ hgen
-  obtain ⟨x, hx⟩ := GlobalTheory.T.hodge_component_factor_point E H D l Xo c O β Y S Ω K J y A hβ
+  obtain ⟨x, hx⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.GenOpen.gen_open E H D l Xo c O β Y S Ω K J y A hβ
   obtain ⟨x', hx'⟩ :=
-    GlobalTheory.T.hodge_component_factor_point E H D l Xo c O β Y S Ω' K' J' y' A' hβ
+    _root_.GlobalTheory.CompanionTheory.Ar.GenOpen.gen_open E H D l Xo c O β Y S Ω' K' J' y' A' hβ
   obtain ⟨ψ, hψ⟩ :=
-    GlobalTheory.T.generic_point_field_iso Y.X A.Ω₀ A'.Ω₀ A.ξ₀ A'.ξ₀ A.gen₀ A'.gen₀ hgen
+    _root_.GlobalTheory.CompanionTheory.Ar.GenIso.exists_iso_of_genPt_eq Y.X A.Ω₀ A'.Ω₀ A.ξ₀ A'.ξ₀
+      A.gen₀ A'.gen₀ hgen
   haveI : Mono Y.j := by
     haveI := hβ
     haveI := Y.jQ_open

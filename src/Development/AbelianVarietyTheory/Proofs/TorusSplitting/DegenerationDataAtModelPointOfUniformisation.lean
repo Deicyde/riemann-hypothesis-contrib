@@ -47,6 +47,7 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.Cha
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.UnifAt
 import Development.AbelianVarietyTheory.Definitions.ThetaValues.IsNullVal
 import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.AbelianAt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -171,8 +172,7 @@ theorem datAt_of_uniformisation
   have hprop : IsProper I.t'.G.hom :=
     MorphismProperty.of_isPullback (P := @IsProper) I.m1.cart.1 Xo.univ.proper
   obtain ⟨ψ, -⟩ :=
-    GlobalTheory.semiAbelian_model_determined_by_generic_fibre E H T.V inferInstance G tP I.t' hprop
-      I.m2 mK
+    _root_.GlobalTheory.ModelUniqueChecks.extV_holds E H T.V inferInstance G tP I.t' hprop I.m2 mK
   obtain ⟨n, -⟩ := sabComp pullCubComp E H _ _ _ Y.t tP G yt (𝟙 _) mP' ψ
   let n' : SABMap G Y.t yt := PullbackSections.sabMapCast n (Category.id_comp yt)
   obtain ⟨n2, -⟩ := sabComp pullCubComp E H _ _ _ Y.t G G' yt (spMap φ) n' mG

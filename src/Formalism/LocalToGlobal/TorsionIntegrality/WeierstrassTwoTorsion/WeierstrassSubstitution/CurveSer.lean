@@ -163,25 +163,25 @@ theorem fw_eq
 
 theorem fw_coeff_one : coeff 1 (fw W) = -W.a₁ := by
   rw [fw_eq W]
-  simp [coeff_X_pow_mul', coeff_X, coeff_X_pow, coeff_one, coeff_C_mul]
+  simp [coeff_X_pow_mul', coeff_X_pow, coeff_one, coeff_C_mul]
 
 theorem fw_coeff_two : coeff 2 (fw W) = -W.a₂ := by
   rw [fw_eq W]
-  simp [coeff_X_pow_mul', coeff_X, coeff_X_pow, coeff_one, coeff_C_mul]
+  simp [coeff_X_pow_mul', coeff_X_pow, coeff_one, coeff_C_mul]
 
 theorem om_coeff_one : coeff 1 (om W) = W.a₁ := by
   have h := congrArg (coeff 1) (fw_mul_om W)
   simp [coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_range_succ, fw_cc W,
       om_cc W, fw_coeff_one W, coeff_one]
     at h
-  first | linear_combination h | linear_combination -h
+  first | linear_combination h
 
 theorem om_coeff_two : coeff 2 (om W) = W.a₁ ^ 2 + W.a₂ := by
   have h := congrArg (coeff 2) (fw_mul_om W)
   simp [coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_range_succ, fw_cc W,
       om_cc W, fw_coeff_one W, fw_coeff_two W, om_coeff_one W, coeff_one]
     at h
-  first | linear_combination h | linear_combination -h
+  first | linear_combination h
 
 theorem iDen_cc : constantCoeff (iDen W) = -1 := by
   unfold iDen

@@ -67,12 +67,12 @@ theorem sum_pi_single
   have hpt : ∀ t : ι → α, (if P (t v) then ∏ i, w i (t i) else 0) = ∏ i, h i (t i) := by
     intro t
     by_cases hp : P (t v)
-    · rw [if_pos hp]
+    · rw [ite_eq_left hp]
       refine Finset.prod_congr rfl fun i _ => ?_
       by_cases hi : i = v
       · subst hi; simp [hh, hp]
       · simp [hh, hi]
-    · rw [if_neg hp]
+    · rw [ite_eq_right hp]
       symm
       exact Finset.prod_eq_zero (Finset.mem_univ v) (by simp [hh, hp])
   rw [Finset.sum_congr rfl fun t _ => hpt t, ← Finset.prod_univ_sum,
@@ -83,7 +83,7 @@ theorem sum_pi_single
     refine Finset.prod_le_one₀ (fun i _ => Finset.sum_nonneg fun a _ => ?_) fun i hi => ?_
     · simp only [hh]; split_ifs <;> first | exact hw0 _ _ | exact le_rfl
     · have hne : i ≠ v := Finset.ne_of_mem_erase hi
-      simp only [hh, if_neg hne]
+      simp only [hh, ite_eq_right hne]
       exact hw1 i
   rw [hv]
   calc

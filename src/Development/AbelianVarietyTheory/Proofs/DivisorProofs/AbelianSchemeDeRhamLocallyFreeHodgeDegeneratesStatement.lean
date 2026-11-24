@@ -48,9 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
     : GlobalTheory.Published.AbelianHodgeDeRham := by
-  first
-  | exact @GlobalTheory.AbCoh.abelianHodgeDeRham
-  | exact GlobalTheory.AbCoh.abelianHodgeDeRham
-  | (intros; apply GlobalTheory.AbCoh.abelianHodgeDeRham <;> assumption)
+  first | exact @GlobalTheory.AbCoh.abelianHodgeDeRham

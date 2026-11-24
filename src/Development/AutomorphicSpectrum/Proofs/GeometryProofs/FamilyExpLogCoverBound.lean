@@ -3,10 +3,11 @@ module
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 public import Development.AbelianVarietyTheory.Definitions.Uniformization.PointEqOfSubsingleton
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExponentialFamilyPeriods
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodHolomorphicContinuationStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodLatticeDiscreteFreeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodSetClosedStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorsionSectionEqOfConnectedStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodHolomorphicContinuation
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodLatticeDiscreteFree
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodSetClosed
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorsionSectionEqOfConnected
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -133,7 +134,7 @@ theorem period_of_tendsto
     : p ∈ e.per b₀ := by
   by_cases hfreq : ∃ᶠ m in atTop, bs m = b₀
   · obtain ⟨Γ₀, hΓ, hdisc, -, -⟩ :=
-      GlobalTheory.T.period_lattice_discrete_free R G g n M B ψ e b₀ hb₀
+      _root_.GlobalTheory.CompanionTheory.Ar.Flat.FamExp.per_discrete R G g n M B ψ e b₀ hb₀
     have hcl : IsClosed (Γ₀ : Set (Fin g → ℂ)) := by
       haveI := hdisc
       exact (Γ₀.toAddSubgroup).isClosed_of_discreteTopology
@@ -180,7 +181,9 @@ theorem period_of_tendsto
         ⟨Nat.find h.2, Nat.find_spec h.2, dif_pos h⟩
       rw [hsk, ← hk]
       exact hper k
-    have := GlobalTheory.T.period_set_closed R G g n M B ψ e hsep hhol b₀ hb₀ s hcont hfr
+    have :=
+      _root_.GlobalTheory.CompanionTheory.Ar.Flat.mem_per_of_frequently R G g n M B ψ e hsep hhol b₀
+        hb₀ s hcont hfr
     rwa [hs₀] at this
 
 end Exp
@@ -223,7 +226,7 @@ theorem limit_core
           ∧ Tendsto (fun m => P m (y m)) atTop (𝓝 p) := by
     intro p hp
     obtain ⟨ε, s, hε, hsub, hsd, hs₀, hsper⟩ :=
-      GlobalTheory.T.period_holomorphic_continuation R t.G g n M B ψ e hhol.1 b₀ hb₀ p hp
+      _root_.GlobalTheory.CompanionTheory.Ar.Flat.per_spreads R t.G g n M B ψ e hhol.1 b₀ hb₀ p hp
     have hy : ∀ m, ∃ y : Λ, bs m ∈ ball b₀ ε → P m y = s (bs m) := by
       intro m
       by_cases hm : bs m ∈ ball b₀ ε
@@ -310,7 +313,8 @@ theorem limit_core
       Units.ext (by simp [unitOn])
     ⟩
     have hconst :=
-      GlobalTheory.T.torsion_section_eq_of_connected (Sp R) t.G t.PP t.cub n N (ball b₀ (min ε ε'))
+      _root_.GlobalTheory.CompanionTheory.Ar.Flat.cubWeil_const_of_isHolTo_family (Sp R) t.G t.PP
+        t.cub n N (ball b₀ (min ε ε'))
         (fun b => spMap (ψ b))
         X X' ζ₁ b₀ hN isOpen_ball (convex_ball _ _).isPreconnected hb₀' hX hX' htors hu
     have hbm : ∀ᶠ m in atTop, bs m ∈ ball b₀ (min ε ε') := hbs (ball_mem_nhds b₀ hδ)

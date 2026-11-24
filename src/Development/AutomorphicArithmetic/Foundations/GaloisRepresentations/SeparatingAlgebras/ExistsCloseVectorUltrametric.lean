@@ -78,7 +78,7 @@ private theorem exists_close_vector_ultrametric
       · intro j
         by_cases hj : j = i
         · subst hj; simp
-        · simp [Pi.single_apply, hj]
+        · simp [hj]
       · intro c hc
         have hc0 : c = 0 := by simpa using hc
         simp [hc0]

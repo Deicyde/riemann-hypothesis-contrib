@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
   GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.vertical_factor_smooth_hermitian_metric
     : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (II : IntersectionSystem)
         (Ψ : Type) [Fintype Ψ] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W : Ψ → Type)
@@ -64,6 +65,4 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.vertical_factor_smooth_hermiti
             ∃ G : (Fin (Fintype.card Ψ * D.j * (D.N - D.j)) → ℂ) → ℂ,
               AnalyticAt ℂ G t
                 ∧ ∀ᶠ t' in 𝓝 t, Real.log (D.vertFactor p ((D.chart a).γ t')) = (G t').re := by
-  first
-  | exact @LevelTowerAlt.vertical_factor_smooth_line
-  | exact LevelTowerAlt.vertical_factor_smooth_line
+  first | exact @LevelTowerAlt.vertical_factor_smooth_line

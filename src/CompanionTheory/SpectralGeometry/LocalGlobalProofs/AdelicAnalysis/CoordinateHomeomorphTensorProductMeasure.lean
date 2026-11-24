@@ -1,9 +1,10 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasureStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OneVectorCcOfSiegelWeil
+import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -134,9 +135,9 @@ def splitH (R K : Type) [TopologicalSpace R] [TopologicalSpace K] (n : ℕ)
       | succ i =>
         exact (continuous_apply i).comp (continuous_fst.comp (continuous_snd.comp continuous_snd))
     · rcases hx : (pairEquiv n).symm p with j | q
-      · simp only [hx, Sum.elim_inl]
+      · simp only [Sum.elim_inl]
         exact (continuous_apply j).comp (continuous_fst.comp continuous_snd)
-      · simp only [hx, Sum.elim_inr]
+      · simp only [Sum.elim_inr]
         exact (continuous_apply q).comp (continuous_snd.comp (continuous_snd.comp continuous_snd))
 
 theorem shuffle_mp
@@ -320,14 +321,14 @@ theorem herm_split
                     = coordHerm R σ b lam (n + 1) := by
   intro F E _ _ _ _ _ σ hσ R _ _ _ _ _ _ _ _ _ d b lam hlam n
   obtain ⟨hKring, hKlc, hKsc, hKt2, hsig, htr, -, -, -, -⟩ :=
-    GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ R
   haveI := hKring
   haveI := hKlc
   haveI := hKsc
   haveI := hKt2
   haveI := hlam
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
-  haveI hκ := (GlobalTheory.T.coordinate_haar_measure F E σ hσ R d b lam hlam).1
+  haveI hκ := (_root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ R d b lam hlam).1
   haveI hHerm : ∀ m, BorelSpace (HermR R σ m) := fun _ => ⟨rfl⟩
   let C := fun m => chartH (F := F) (E := E) (σ := σ) R hσ htr hsig m
   haveI hsc : ∀ m, SecondCountableTopology (HermR R σ m) := fun m => (C m).secondCountableTopology

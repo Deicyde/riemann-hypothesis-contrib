@@ -4,9 +4,13 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FromNAdd
 public import Development.WeilBound.CoreStatements.TorusUniformisation.ChowMahlerFamilies.FunctionFamilyIdempotent
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.StepOrderRes
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsLatFlagPair
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HopfOrderRetractRestrictionStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LemmaBTHoldsStatement
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsTight
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HopfOrderRetractRestriction
 public import Development.WeilBound.CoreStatements.TorusUniformisation.ChowMahlerFamilies.IsIntegrallyClosedOfDenom
+public import ReciprocityTheory.DualLattices.ExistsSmulMemOfMemSpan
+import Development.AutomorphicSpectrum.Statements.GeometryStatements.NonemptyEquivOfCardHom
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LemmaBTHolds
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -53,7 +57,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
-public import ReciprocityTheory.DualLattices.ExistsSmulMemOfMemSpan
 import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.CompactGapsGE
 
 @[expose] public section
@@ -270,8 +273,9 @@ theorem bt_mul
     : ∀ f ∈ P.Γ₁.btOrder ⊤, (fun t => f (mulT _ p a t)) ∈ P.Γ₁.btOrder ⊤ := by
   haveI := 𝔐.t.act.hom a
   haveI := frac_epi (CR O y c')
-  refine (GlobalTheory.T.LemmaBT_holds (CR O y c') (TorsT E (D.p + D.q) p) P.Γ₁ _ 𝔐.t.G P.x p P.i₁
-    P.tors₁ 𝔐.t.semi.smooth).2.2.2.1 (𝔐.t.act.act a) (mulT _ p a) ?_
+  refine (_root_.GlobalTheory.CompanionTheory.Ar.BT.lemmaBT_holds (CR O y c')
+      (TorsT E (D.p + D.q) p) P.Γ₁ _ 𝔐.t.G P.x p P.i₁ P.tors₁ 𝔐.t.semi.smooth).2.2.2.1
+    (𝔐.t.act.act a) (mulT _ p a) ?_
   intro t
   obtain ⟨x, rfl⟩ := qmk_surj _ p t
   rw [← cancel_epi (spMap (fracToField (CR O y c'))), ← P.pts₁, mulT_qmk, G.t₁.lin, Over.comp_left,
@@ -303,8 +307,8 @@ theorem ord_hopf
   exists_hopf (RC := RC) ((algebraMap Ω C).comp (algebraMap (CR O y c') Ω))
     ((algebraMap Ω C).injective.comp Subtype.val_injective)
     (fun r => ⟨⟨_, hR r r.2⟩, rfl⟩)
-    (GlobalTheory.T.LemmaBT_holds (CR O y c') (TorsT E (D.p + D.q) p) P.Γ₁ _ 𝔐.t.G P.x p P.i₁
-      P.tors₁ 𝔐.t.semi.smooth).1
+    (_root_.GlobalTheory.CompanionTheory.Ar.BT.lemmaBT_holds (CR O y c') (TorsT E (D.p + D.q) p)
+      P.Γ₁ _ 𝔐.t.G P.x p P.i₁ P.tors₁ 𝔐.t.semi.smooth).1
 
 theorem ord_ret
     [IsNoetherianRing (CR O y c')] [IsIntegrallyClosed (CR O y c')] [IsFractionRing (CR O y c') Ω]
@@ -446,8 +450,8 @@ theorem PositivityTheory.Xgn.test_order_sections
   have hret := ord_ret P RC hsec
   rw [← hAA] at hret
   obtain ⟨⟨AW, hAW⟩, -⟩ :=
-    GlobalTheory.T.hopf_order_retract_restriction p C v RC hvI hvp _ AA _ (TestPt.toNAdd sc)
-      (TestPt.fromNAdd pq)
+    _root_.GlobalTheory.CompanionTheory.Ar.GR.ret_hopf_factor p C v RC hvI hvp _ AA _
+      (TestPt.toNAdd sc) (TestPt.fromNAdd pq)
       (fun z => funext fun k => hsec.1 (z k))
       hret
   rw [hAA] at hAW

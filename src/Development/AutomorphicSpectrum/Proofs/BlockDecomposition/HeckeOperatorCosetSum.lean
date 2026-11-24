@@ -1,8 +1,10 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.LocalBaseChange.StrictDominanceCasselman.IsStrictlyDominant
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactFixedVectorProjectionStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FixedVectorZeroOfDualStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactFixedVectorProjection
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FixedVectorZeroOfDual
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -62,7 +64,7 @@ theorem hecke_eq_average
                       ((T v : fixed π J) : V) = ((r : ℂ)⁻¹) • ∑ i, π (x i * g) (v : V) := by
   intro k _ _ _ _ N J hJ V _ _ π hπ g T hT r x hr hx hy v
   obtain ⟨E, hE1, -, hE3, -, hE5⟩ :=
-    GlobalTheory.T.compact_fixed_vector_projection (GL (Fin N) k) J hJ V π hπ
+    _root_.GlobalTheory.CompanionTheory.CompactAvg.exists_average (GL (Fin N) k) J hJ V π hπ
   have hv : ∀ j ∈ J, π j (v : V) = v := fun j hj => by
     have := v.2 ⟨j, hj⟩
     simpa using this
@@ -78,12 +80,14 @@ theorem hecke_eq_average
   have hw : ((T v : fixed π J) : V) - E (π g (v : V)) ∈ fixed π J :=
     Submodule.sub_mem _ (T v).2 (hE1 _)
   have h0 :=
-    GlobalTheory.T.fixed_vector_zero_of_dual (GL (Fin N) k) J hJ V π hπ _ hw (by
-      intro l hl
-      have h1 : l (E (π g (v : V))) = l (π g (v : V)) := by
-        have := hE3 l hl
-        exact LinearMap.congr_fun this _
-      rw [map_sub, h1, hT v l hl, sub_self])
+    _root_.GlobalTheory.CompanionTheory.CompactAvg.invariant_forms_separate_fixed (GL (Fin N) k) J
+      hJ V π hπ _ hw
+      (by
+        intro l hl
+        have h1 : l (E (π g (v : V))) = l (π g (v : V)) := by
+          have := hE3 l hl
+          exact LinearMap.congr_fun this _
+        rw [map_sub, h1, hT v l hl, sub_self])
   exact sub_eq_zero.mp h0
 
 end GlobalTheory.CompanionTheory.HeckeAvg

@@ -53,6 +53,7 @@ open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLoca
   Formalism.MainNotions.DIV.Cons
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.degenerationData_coords_ne_zero_lattices_isomorphic
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.degenerationData_coords_ne_zero_lattices_isomorphi
               → ∀ A A' : DatAt Y P,
                 (∀ χ r, PsiCoord A.U.D.toPre χ r → ((A.f r : intO ↥C.S) : ↥C.S) ≠ 0)
                   ∧ ∃ e : A.Ylat ≃ₗ[𝓞 E] A'.Ylat, ∀ a b, A'.beta (e a) (e b) = A.beta a b := by
-  first
-  | exact @GlobalTheory.DatUniq.coord_ne_zero_and_exists_equiv
-  | exact GlobalTheory.DatUniq.coord_ne_zero_and_exists_equiv
-  | (intros; apply GlobalTheory.DatUniq.coord_ne_zero_and_exists_equiv <;> assumption)
+  first | exact @GlobalTheory.DatUniq.coord_ne_zero_and_exists_equiv

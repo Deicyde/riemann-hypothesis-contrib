@@ -46,6 +46,7 @@ import Development.AutomorphicArithmetic.IntegralCasts.IsOpenStabOfMemNhds
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.CuspRep GlobalTheory.CuspGeneric
+
 theorem _root_.GlobalTheory.T.whittakerCoefficient_rationalMirabolic_mul
     : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (ψ : AddChar (Ad E) ℂ),
       StdPsi ψ
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.whittakerCoefficient_rationalMirabolic_mul
                       (fun t =>
                         ∑ s : UnipotentBlockColumnIndex a (m + 1) (m + 1), ξ s * γ.val s.1.1 t.1.1)
                       f g := by
-  first
-  | exact @GlobalTheory.CuspGeneric.coefF_ratGL_mul
-  | exact GlobalTheory.CuspGeneric.coefF_ratGL_mul
-  | (intros; apply GlobalTheory.CuspGeneric.coefF_ratGL_mul <;> assumption)
+  first | exact @GlobalTheory.CuspGeneric.coefF_ratGL_mul

@@ -50,9 +50,6 @@ section Gen
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Rows Formalism.MainNotions NumberField
   IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.TwInputs.Move
 
-
-
-
 structure Cp
     (D : D7)
     {R : Ranks} {H : Host R} {r : Rows.Data R} [NumberField r.LL] [StarRing r.LL]
@@ -565,9 +562,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 open GlobalTheory.Mem.Top.TwChar (plUnder incl embLL_incl mem_plUnder plUnder_surjective)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
-
-
 
 theorem exists_fixedEquiv {B B' : Base} (h : Enl B B')
     : ∃ e : ↥B'.LL0 ≃+* ↥B.LL0, ∀ x : ↥B'.LL0, incl h (e x : B.LL) = (x : B'.LL) := by

@@ -63,8 +63,7 @@ theorem hc_isChar
         → ∀ (α : GL (Fin a) F → ℂ) (β : GL (Fin b) F → ℂ),
           IsChar ℂ ℂ α → IsChar ℂ ℂ β → IsChar ℂ ℂ (hc a b α β n) := by
   intro F _ _ a b n hn α β hα hβ
-  obtain ⟨H, π, hH, -, hπ, -, -⟩ :=
-    GlobalTheory.T.exists_blockParabolic_subgroup_levi_projection F a b n hn
+  obtain ⟨H, π, hH, -, hπ, -, -⟩ := _root_.GlobalTheory.Shin.BlockPar.block_par F a b n hn
   haveI : Finite (GL (Fin n) F) := inferInstance
   have h1 : IsChar ℂ ℂ (fun p : H => α (π p).1) := by
     obtain ⟨m, ρ, hρ⟩ := hα

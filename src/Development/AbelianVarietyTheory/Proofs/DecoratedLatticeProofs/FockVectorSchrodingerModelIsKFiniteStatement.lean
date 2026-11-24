@@ -71,7 +71,4 @@ theorem _root_.GlobalTheory.T.fockVector_schrodingerModel_isKFinite
                                     → FiniteDimensional ℂ
                                       (Submodule.span ℂ
                                         {Ψ : schwartzA θ V.rank n | ∃ k ∈ K D n, Ψ = ω k Φ}) := by
-  first
-  | exact @GlobalTheory.StdUnn.KFin.fock_kfinite
-  | exact GlobalTheory.StdUnn.KFin.fock_kfinite
-  | (intros; apply GlobalTheory.StdUnn.KFin.fock_kfinite <;> assumption)
+  first | exact @GlobalTheory.StdUnn.KFin.fock_kfinite

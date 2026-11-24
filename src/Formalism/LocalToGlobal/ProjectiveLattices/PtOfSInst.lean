@@ -41,8 +41,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace Formalism.L2.Pj

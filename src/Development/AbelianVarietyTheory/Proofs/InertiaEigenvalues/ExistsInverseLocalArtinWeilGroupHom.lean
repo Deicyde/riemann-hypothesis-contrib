@@ -115,7 +115,7 @@ theorem exists_invLocalArtin
       rw [huf, ← map_zpow, ← map_mul]
       congr 1
       conv_rhs => rw [hτ]
-      simp [Subgroup.coe_mul, Subgroup.coe_zpow]
+      simp [Subgroup.coe_mul]
   choose g hgo hgf using hex
   let a : Weil h →* (w.adicCompletion E)ˣ := {
     toFun := g

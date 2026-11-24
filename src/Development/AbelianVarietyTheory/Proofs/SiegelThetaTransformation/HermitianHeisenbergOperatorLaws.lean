@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.FirstCoordinateAdmissible
 public import Mathlib.Data.Matrix.ColumnRowPartitioned
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianWeilActionUnitaryGroupTestFunctionsStatement
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianWeilActionUnitaryGroupTestFunctions
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ThHEqThSDictionary
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.UnitaryActHalfSpace
 import Mathlib.Algebra.Order.Floor.Extended
@@ -387,9 +387,8 @@ theorem GlobalTheory.SW.heisH_laws
                         (Matrix.fromCols d b * γ⁻¹).toCols₂ (weil Ψ γ φ) := by
   intro E _ _ _ Ψ hΨ n N hn d b φ hφ
   refine ⟨isSB_heisH d b hφ, fun Z _ z z' => thH_heisH hΨ d b φ Z z z', fun γ hγ => ?_⟩
-  obtain ⟨h1, h2, -⟩ :=
-    GlobalTheory.T.hermitianWeilAction_unitaryGroup_testFunctions E Ψ hΨ n N hn γ hγ φ hφ
+  obtain ⟨h1, h2, -⟩ := _root_.GlobalTheory.SW.weil_action E Ψ hΨ n N hn γ hγ φ hφ
   have h3 := transH_heisH hΨ hγ (fromCols d b * γ⁻¹).toCols₁ (fromCols d b * γ⁻¹).toCols₂ h2
   rw [← (cols_eq hγ d b).1, ← (cols_eq hγ d b).2] at h3
-  exact ((GlobalTheory.T.hermitianWeilAction_unitaryGroup_testFunctions E Ψ hΨ n N hn γ hγ _
-    (isSB_heisH d b hφ)).2.2.1 _ (isSB_heisH _ _ h1) h3).symm
+  exact ((_root_.GlobalTheory.SW.weil_action E Ψ hΨ n N hn γ hγ _ (isSB_heisH d b hφ)).2.2.1 _
+    (isSB_heisH _ _ h1) h3).symm

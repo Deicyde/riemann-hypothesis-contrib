@@ -53,6 +53,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.UnitaryWeigh
 import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsAddEquivOfSurjectiveOfKerIff
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapGeSubKapBase
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.NonemptyIsLimitBaseChange
 
 @[expose] public section
 
@@ -91,12 +93,6 @@ theorem valR_spMap_comp
   rw [valR_eq_evAt x U h, valR_eq_evAt _ U (GlobalTheory.TanDeriv.comp_top_le φ x U h)]
   exact GlobalTheory.TanDeriv.evAt_comp φ x U h _ f
 
-theorem spMap_comp_spMap
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ : A →+* B) (ψ : B →+* C)
-    : spMap ψ ≫ spMap φ = spMap (ψ.comp φ) := by
-  simp only [spMap, ← Spec.map_comp]
-  rfl
-
 variable {X0 : Scheme.{0}} {S : Type} [CommRing S] {x0 : Sp S ⟶ X0} {G : Over X0} [GrpObj G]
 
 theorem top_le_of_fst
@@ -117,7 +113,9 @@ theorem fst_comp_of_smT_zero
     : spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ z.left = g₀ := by
   have h1 : (smT x0 0 z).left = spMap (epsMul 0) ≫ z.left := rfl
   have h2 := congrArg (fun φ => spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ φ) (hz ▸ h1)
-  rw [hg, ← Category.assoc, ← Category.assoc, spMap_comp_spMap, spMap_comp_spMap] at h2
+  rw [hg, ← Category.assoc, ← Category.assoc, _root_.GlobalTheory.spMap_comp_ring,
+      _root_.GlobalTheory.spMap_comp_ring]
+    at h2
   have e1
       : (TrivSqZeroExt.fstHom S S S).toRingHom.comp (algebraMap S (DualNumber S))
         = RingHom.id S := by
@@ -137,7 +135,7 @@ theorem smT_const
     : smT x0 a g' = g' := by
   apply Over.OverMorphism.ext
   have h1 : (smT x0 a g').left = spMap (epsMul a) ≫ g'.left := rfl
-  rw [h1, hg, ← Category.assoc, spMap_comp_spMap]
+  rw [h1, hg, ← Category.assoc, _root_.GlobalTheory.spMap_comp_ring]
   congr 2
   exact RingHom.ext fun x => by simp [epsMul]
 

@@ -51,12 +51,13 @@ theorem chain_sum_coordVec {n : ℕ} (w : V n) : w = ∑ b, w b • coordVec b :
   ext i
   simp [coordVec, Pi.single_apply]
 
-theorem del_dbar_comp_holo_pull : ∀ (m n : ℕ) (τ : V m → V n) (c : V n → ℂ) (v : V m),
-    DifferentiableAt ℂ τ v → DifferentiableAt ℝ c (τ v) →
-    (∑ a, del (fun x => c (τ x)) v (coordVec a) • dz a : Alt m)
-      = pull (fderiv ℂ τ v) (∑ a, del c (τ v) (coordVec a) • dz a) ∧
-    (∑ a, dbar (fun x => c (τ x)) v (coordVec a) • dzb a : Alt m)
-      = pull (fderiv ℂ τ v) (∑ a, dbar c (τ v) (coordVec a) • dzb a) := by
+theorem del_dbar_comp_holo_pull
+    : ∀ (m n : ℕ) (τ : V m → V n) (c : V n → ℂ) (v : V m),
+      DifferentiableAt ℂ τ v → DifferentiableAt ℝ c (τ v)
+        → (∑ a, del (fun x => c (τ x)) v (coordVec a) • dz a : Alt m)
+            = pull (fderiv ℂ τ v) (∑ a, del c (τ v) (coordVec a) • dz a)
+          ∧ (∑ a, dbar (fun x => c (τ x)) v (coordVec a) • dzb a : Alt m)
+            = pull (fderiv ℂ τ v) (∑ a, dbar c (τ v) (coordVec a) • dzb a) := by
   intro m n τ c v hτ hc
   constructor
 

@@ -89,7 +89,8 @@ theorem flat_85_bound
   unfold RootTower.Proportional at hP
   unfold I9 at hI9
   obtain ⟨τ⟩ := ‹Nonempty Ψ›
-  obtain ⟨⟨Q, hQ, hdeg⟩, -⟩ := testForms_sh_tot Ψ N T.j τ T.j_pos T.j_lt
+  obtain ⟨⟨Q, hQ, hdeg⟩, -⟩ :=
+    _root_.RootFieldNumerics.exists_degree_one_class Ψ N T.j τ T.j_pos T.j_lt
   obtain ⟨h, hPP, hbd⟩ := hF
   have hN : 1 ≤ N := le_trans T.j_pos T.j_lt.le
   have hQ' : Q.IsHomogeneous (dimFl Ψ N + 1 - 1) := by simpa using hQ
@@ -109,7 +110,7 @@ theorem flat_85_bound
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [hPP B₀ (by omega) c τ Q hQ, hdeg, mul_one]
   rw [hL, hhh, hrest] at hid
-  simp only [hSh, hTot, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true] at hid
+  simp only [hSh, hTot, Finset.sum_ite_eq', Finset.mem_univ, if_true] at hid
   have hvol : 0 < T.volT := Finset.sum_pos (fun c _ => hP.1 c) Finset.univ_nonempty
   have hv0 : T.volT ≠ 0 := hvol.ne'
   have key : (T.j : ℝ) * A₀ + N * b₀ = -(∑ c, h B₀ c τ * T.vol c) / T.volT := by

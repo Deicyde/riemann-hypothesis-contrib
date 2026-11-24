@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.siegelWeilSection_degeneratePrincipalSeries_law
                       = (χB⁻¹ (aP A p) : Circle)
                         * npow (absA D (aP A p)) (sZero A B + (A.rank : ℂ) / 2)
                         * swSec A B omh ν 𝓕 φ g := by
-  first
-  | exact @GlobalTheory.Core.Rk.SWLaw.swSec_law
-  | exact GlobalTheory.Core.Rk.SWLaw.swSec_law
-  | (intros; apply GlobalTheory.Core.Rk.SWLaw.swSec_law <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.SWLaw.swSec_law

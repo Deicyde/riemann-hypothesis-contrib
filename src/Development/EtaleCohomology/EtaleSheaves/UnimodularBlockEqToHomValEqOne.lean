@@ -240,14 +240,12 @@ def glNat (N : ℕ) : pglCat N ⟶ glCat N := {
 
 theorem ofCatMap_comp {C D F : CommRingCat.{0} ⥤ Cat.{0, 0}} (α : C ⟶ D) (β : D ⟶ F)
     : ofCatMap (α ≫ β) = ofCatMap α ≫ ofCatMap β := by
-  first
-  | rfl
+  first | rfl
 
 theorem liftCat_fst
     {E : Spc} {C D : CommRingCat.{0} ⥤ Cat.{0, 0}} (V : E ⟶ ofCat C) (W : E ⟶ ofCat D)
     : liftCat V W ≫ ofCatMap (fstNat C D) = V := by
-  first
-  | rfl
+  first | rfl
 
 theorem e_rho (a b : ℕ) : rho a b ≫ glNat a = pr1 a b ≫ fstNat _ _ := by
   ext A
@@ -304,8 +302,7 @@ theorem jmF
     unimodularBlock_eqToHom_val_eq_one, unimodularBlock_eqToHom_val_eq_one]
   simp only [one_mul, mul_one]
   have k1 := congrArg (fun q => q.1) (CategoryTheory.Functor.congr_hom h1 f)
-  first
-  | (rw [Um_eqToHom_comp, Um_comp_eqToHom] at k1)
+  first | (rw [Um_eqToHom_comp, Um_comp_eqToHom] at k1)
   have ku : (F.map f).1.2 = (G.map f).1.2 := by
     have := congrArg Prod.snd k1
     exact this
@@ -410,8 +407,7 @@ theorem LeafHalf1_of : LeafHalf1 := by
       simp only [singleObj_eqToHom_eq_monoid_one] at this
       have t : blockGL a b _ (Ve.map f) (We.map f) = (1 * (F.map f).1.1) * 1 := this
       rw [blockDiagonal_apply₂]
-      first
-      | exact t.trans (by simp only [mul_one, one_mul])
+      first | exact t.trans (by simp only [mul_one, one_mul])
     have hfirst
         : ∀ i, Ideal.span (Set.range fun k : Fin a => (F.obj i).1 (Fin.castAdd b k)) = ⊤ := by
       intro i
@@ -442,8 +438,7 @@ theorem LeafHalf1_of : LeafHalf1 := by
         : ((liftCat V W).app (op (SimplexCategory.mk n))).app (op X) e
           = ((ofCatMap (pr1 a b)).app (op (SimplexCategory.mk n))).app (op X)
             (show Sx (ofCat (cat1 a b)) n X from G) := by
-      first
-      | rfl
+      first | rfl
     obtain ⟨y, hy1, hy2⟩ :=
       pb_exists (liftCat V W) (ofCatMap (pr1 a b)) e (show Sx (ofCat (cat1 a b)) n X from G) hG
     refine ⟨y, pb_ext ?_ ?_⟩

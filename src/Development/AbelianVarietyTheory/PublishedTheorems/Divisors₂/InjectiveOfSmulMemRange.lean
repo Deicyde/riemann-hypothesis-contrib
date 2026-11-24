@@ -166,7 +166,6 @@ theorem injective_of_smul_mem_range
   let P : Matrix _ _ A := Matrix.of fun i j => b.repr (φ (b j)) i
   have key : ∀ m i, b.repr (φ m) i = (P.mulVec fun j => σ (b.repr m j)) i := fun m i => by
     have h1 : φ m = ∑ j, σ (b.repr m j) • φ (b j) := by
-
       conv_lhs => rw [← b.sum_repr m, map_sum]
       simp only [map_smulₛₗ]
     rw [h1]

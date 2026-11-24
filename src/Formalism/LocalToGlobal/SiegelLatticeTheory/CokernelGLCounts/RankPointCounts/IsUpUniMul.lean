@@ -81,15 +81,7 @@ theorem isLoUni_mul {l l' : Matrix (Fin n) (Fin n) R} (h : IsLoUni l) (h' : IsLo
 theorem isUpUni_mul {l l' : Matrix (Fin n) (Fin n) R} (h : IsUpUni l) (h' : IsUpUni l')
     : IsUpUni (l * l') := by
   first
-  | exact GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul ..
   | (apply GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul <;> assumption)
-  | (intros; apply GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul <;> assumption)
-  | (apply @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul <;> assumption)
-  | (intros; apply @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul <;> assumption)
-  | (
-      apply @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul
-        <;> first | assumption | infer_instance
-    )
   | exact @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul R ‹_› n l l' h h'
   | exact @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul R ‹_› n l l' h
   | exact @GlobalTheory.UpperUnipotentProductFlagMeasures.upUni_mul R ‹_› n l l'
@@ -167,7 +159,15 @@ def stZ (Z L : Formalism.L2.SG.PairVal.MatR D) (hL : IsUnit L.det)
     · simp [zhatOM_zhatOM]
   mul_mem' := by
     rintro x y ⟨x', hx, hxl, bx, hbx, hxZ, hxp⟩ ⟨y', hy, hyl, by', hby, hyZ, hyp⟩
-    refine ⟨x' * y', ?_, ?_, by' * bx, isUpUni_mul hby hbx, ?_, fun p => ?_⟩
+    refine ⟨
+      x' * y',
+      ?_,
+      ?_,
+      by' * bx,
+      _root_.GlobalTheory.UpperUnipotentProductInertiaEigenvalues.isUpUni_mul hby hbx,
+      ?_,
+      fun p => ?_
+    ⟩
     · rw [Units.val_mul, hx, hy, Units.val_mul]
       calc
         L⁻¹ * (x' : Formalism.L2.SG.PairVal.MatR D) * L
@@ -177,7 +177,7 @@ def stZ (Z L : Formalism.L2.SG.PairVal.MatR D) (hL : IsUnit L.det)
           simp only [Matrix.mul_assoc]
         _ = _ := by rw [Matrix.mul_nonsing_inv L hL, Matrix.mul_one]; simp only [Matrix.mul_assoc]
     · rw [Units.val_mul]
-      exact isLoUni_mul hxl hyl
+      exact _root_.PI.TermAttrConst.UnitaryGroupMassFormula.isLoUni_mul hxl hyl
     · rw [Units.val_mul]
       calc
         (x' : Formalism.L2.SG.PairVal.MatR D) * (y' : Formalism.L2.SG.PairVal.MatR D) * ZhatOM Z

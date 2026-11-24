@@ -305,8 +305,8 @@ theorem _root_.GlobalTheory.DivisionVolume.margin_iff
               (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) 0
               (_root_.GlobalTheory.DivisionVolume.unitVec e) :=
         rfl
-      rw [hR, _root_.GlobalTheory.LeviZero.leviZero r X _ _ hx0,
-          _root_.GlobalTheory.LeviZero.leviZero r X _ _ hx0]
+      rw [hR, _root_.GlobalTheory.LeviZero.levi_phla_zero r X _ _ hx0,
+          _root_.GlobalTheory.LeviZero.levi_phla_zero r X _ _ hx0]
         at h
       simp only [sum_mul_norm_unitVec_sq_eq] at h
       exact h

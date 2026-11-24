@@ -89,7 +89,7 @@ theorem pair_int
   have hy1 : ∀ x ∈ X, (VS D).hT x y0 = 0 := fun x hx => horth x hx
   have hxx : (VS D).hT x2 x1 = 0 := hiso x1 hx1' x2 hx2'
   have hsym : starRingEnd D.host.E ((VS D).hT x1 y0) = (VS D).hT y0 x1 := by
-    first | exact (VS D).herm x1 y0 | exact (VS D).herm.eq x1 y0
+    first | exact (VS D).herm.eq x1 y0
   have hy2 : (VS D).hT y0 x1 = 0 := by rw [← hsym, hy1 x1 hx1', map_zero]
   have ea1 : a1 = l • y0 - x1 := by rw [← e1]; abel
   have ea2 : a2 = m • y0 - x2 := by rw [← e2]; abel

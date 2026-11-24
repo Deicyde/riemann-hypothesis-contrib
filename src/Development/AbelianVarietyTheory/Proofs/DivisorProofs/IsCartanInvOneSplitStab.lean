@@ -59,15 +59,6 @@ namespace GlobalTheory.AdTh
 
 noncomputable section
 
-theorem mt_mul_splitStab {D : D7} (V : HSp D) (g h : GA D V)
-    : Formalism.L2.Theta.mt V (g * h) = Formalism.L2.Theta.mt V g * Formalism.L2.Theta.mt V h := by
-  unfold Formalism.L2.Theta.mt
-  rw [map_mul, Units.val_mul]
-
-theorem mt_one_splitStab {D : D7} (V : HSp D) : Formalism.L2.Theta.mt V 1 = 1 := by
-  unfold Formalism.L2.Theta.mt
-  rw [map_one, Units.val_one]
-
 theorem idem_unit_splitStab {R : Type} [CommRing R] {e d d' : R} (he : e * e = e) (h : d' * d = 1)
     : (e * d + (1 - e)) * (e * d' + (1 - e)) = 1 := by
   linear_combination (e * e) * h + (2 - d - d') * he
@@ -81,11 +72,6 @@ theorem isCartanInv_one_splitStab (k : ℕ) : IsCartanInv (1 : Matrix (Fin k) (F
   refine ⟨by simp, by simp, ?_⟩
   rw [Matrix.mul_one]
   exact Matrix.PosDef.one
-
-theorem heisO_zero_splitStab {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (V W : HSp D) (f : WO V W → ℂ)
-    : heisO ψ V W 0 f = f := by
-  funext w
-  simp [heisO, symplOH, symplO, hO]
 
 theorem om_vacuum_split_stab
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (V W : HSp D)
@@ -125,16 +111,17 @@ theorem om_vacuum_split_stab
     exact isCartanInv_one_splitStab _
   have hs1 : SuppAt e V 1 := by
     intro i j
-    rw [mt_one_splitStab, sub_self, Matrix.zero_apply, mul_zero]
+    rw [_root_.GlobalTheory.WeilVacMove.mt_one, sub_self, Matrix.zero_apply, mul_zero]
   have hx : IsDetAt e V 1 1 := by
     unfold IsDetAt
-    rw [mt_one_splitStab, Matrix.det_one, Units.val_one]
+    rw [_root_.GlobalTheory.WeilVacMove.mt_one, Matrix.det_one, Units.val_one]
     ring
   have hact : ∀ u, actO V W 1 k (actO V W 1 k⁻¹ u) = u := by
     intro u
     unfold actO
-    rw [inv_one, mt_one_splitStab, Matrix.mul_one, Matrix.mul_one, ← Matrix.mul_assoc,
-      ← mt_mul_splitStab, mul_inv_cancel, mt_one_splitStab, Matrix.one_mul]
+    rw [inv_one, _root_.GlobalTheory.WeilVacMove.mt_one, Matrix.mul_one, Matrix.mul_one,
+      ← Matrix.mul_assoc, ← _root_.GlobalTheory.WeilVacMove.mt_mul, mul_inv_cancel,
+      _root_.GlobalTheory.WeilVacMove.mt_one, Matrix.one_mul]
   have key :=
     GlobalTheory.SplitScalar.om_vacuum_eq_splitFac_smul_sum D ψ θ V W χV χW om hP.weil hP.inf
       hP.sigV hP.sigW
@@ -164,7 +151,7 @@ theorem om_vacuum_split_stab
       f hf
   have hr : IsDetRoot W k y := isDetAt_root he W k hk y hy
   rw [key, hmu.2 k y hr]
-  simp [heisO_zero_splitStab, splitFacO]
+  simp [_root_.GlobalTheory.SplitScalar.heisO_zero, splitFacO]
 
 end
 

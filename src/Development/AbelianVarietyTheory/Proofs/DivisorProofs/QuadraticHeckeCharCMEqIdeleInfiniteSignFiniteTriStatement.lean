@@ -45,6 +45,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.quadraticHeckeCharCM_eq_ideleInfiniteSign_finiteTrivial
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (b : Neutral.B1.Ideles (maximalRealSubfield E)),
@@ -53,7 +54,4 @@ theorem _root_.GlobalTheory.T.quadraticHeckeCharCM_eq_ideleInfiniteSign_finiteTr
           = GlobalTheory.ConsEta.infSign E
             (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap
               (maximalRealSubfield E) E b) := by
-  first
-  | exact @GlobalTheory.EtaInfSign.quadChar_eq_infSign
-  | exact GlobalTheory.EtaInfSign.quadChar_eq_infSign
-  | (intros; apply GlobalTheory.EtaInfSign.quadChar_eq_infSign <;> assumption)
+  first | exact @GlobalTheory.EtaInfSign.quadChar_eq_infSign

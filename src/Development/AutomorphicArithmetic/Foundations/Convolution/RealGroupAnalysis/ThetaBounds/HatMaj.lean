@@ -228,7 +228,6 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.hatMaj
     rw [show nu F (infGL E 2 y) = 1 from hy, cD_one_left] at h
     exact (LinearMap.congr_fun h φ).symm
   have hΨ : W.Om k (W.L (infGL E 2 y) φ) = ∑ i, c i • W.L (infGL E 2 y) (e i) := by
-
     rw [hcomm, hk', map_sum]
     exact Finset.sum_congr rfl fun i _ => map_smul _ _ _
   have hsplit
@@ -243,11 +242,7 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.hatMaj
     fin_cases i <;> simp
   have hη : ‖((W.η.1 a : ℂˣ) : ℂ)‖ = 1 := by
     have h0 := W.η_sq a
-    have h : ((W.η.1 a : ℂˣ) : ℂ) ^ 2 = 1 := by
-      first
-      | exact h0
-      | (rw [← Units.val_pow_eq_pow_val, h0]; rfl)
-      | simpa using congrArg Units.val h0
+    have h : ((W.η.1 a : ℂˣ) : ℂ) ^ 2 = 1 := by first | (rw [← Units.val_pow_eq_pow_val, h0]; rfl)
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).1 (by rw [← norm_pow, h, norm_one])
   set v' : V4 F := ![0, ((a⁻¹ : (A F)ˣ) : A F) * x, a * u, a * t] with hv'
   have hm

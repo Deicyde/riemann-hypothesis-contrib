@@ -327,7 +327,7 @@ theorem gbBil_single (y : Fin D → ℂ) (i : Fin D) (a : ℂ)
     : gbBil D y (Pi.single i a) = (y i).re * a.re + (y i).im * a.im := by
   rw [gbBil_apply, Finset.sum_eq_single i]
   · simp
-  · intro k _ hk; simp [Pi.single_apply, hk]
+  · intro k _ hk; simp [hk]
   · simp
 
 theorem gb_I_single (i : Fin D)
@@ -335,7 +335,7 @@ theorem gb_I_single (i : Fin D)
   ext k
   by_cases h : k = i
   · subst h; simp
-  · simp [h, Pi.single_apply]
+  · simp [h]
 
 theorem gb_conj_mul (u v : ℂ)
     : starRingEnd ℂ u * v
@@ -392,7 +392,7 @@ theorem det_cxHessian_gbPot (y : Fin D → ℂ)
     ring
   rw [hdot, hs, Fintype.card_fin]
   push_cast
-  simp only [inv_pow, one_div_pow, one_div]
+  simp only [inv_pow, one_div]
   field_simp
   ring
 

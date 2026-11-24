@@ -162,7 +162,7 @@ private theorem up_zero
   ext i j
   have e := ent X i j
   fin_cases i <;> fin_cases j <;> simp [sgn, Fin.rev, h0, h1, h2, h3, h4, h5] at e ⊢
-    <;> first | exact hu _ _ (by decide) | exact e | exact neg_eq_zero.mp e.symm | skip
+    <;> first | exact hu _ _ (by decide) | exact e
 
 private theorem bor1 : Module.finrank k (bor (1 : M4 k)) = 6 := by
   let f : bor (1 : M4 k) →ₗ[k] (Fin 6 → k) := {
@@ -220,7 +220,7 @@ private theorem tor2 : Module.finrank k (tor k) = 2 := by
     ext i j
     have e := ent X.1 i j
     fin_cases i <;> fin_cases j <;> simp [sgn, Fin.rev, h0, h1] at e ⊢
-      <;> first | exact hd (by decide) | exact e | exact neg_eq_zero.mp e.symm
+      <;> first | exact hd (by decide) | exact e
   have hsurj : Function.Surjective f := by
     intro v
     refine ⟨

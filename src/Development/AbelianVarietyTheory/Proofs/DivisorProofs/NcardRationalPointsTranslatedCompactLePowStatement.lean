@@ -52,6 +52,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.ncard_rationalPoints_translatedCompact_le_pow
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
       IsInfFam θ
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.ncard_rationalPoints_translatedCompact_le_pow
               {γ : GA D V | γ ∈ GQ V ∧ ∃ o ∈ Ω, γ * y = x * u * o}.Finite
                 ∧ (({γ : GA D V | γ ∈ GQ V ∧ ∃ o ∈ Ω, γ * y = x * u * o}.ncard : ℕ) : ℝ)
                   ≤ C * normInf θ V u ^ N := by
-  first
-  | exact @GlobalTheory.RatCount.ncard_rational_le
-  | exact GlobalTheory.RatCount.ncard_rational_le
-  | (intros; apply GlobalTheory.RatCount.ncard_rational_le <;> assumption)
+  first | exact @GlobalTheory.RatCount.ncard_rational_le

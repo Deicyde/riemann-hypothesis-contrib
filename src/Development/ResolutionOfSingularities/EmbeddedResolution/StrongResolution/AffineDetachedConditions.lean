@@ -64,10 +64,6 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-theorem range_base_subschemeι {X : Scheme.{u}} (I : X.IdealSheafData)
-    : Set.range ⇑I.subschemeι.base = ((I.support : TopologicalSpace.Closeds ↥X) : Set ↥X) := by
-  rw [Scheme.IdealSheafData.range_subschemeι]
-
 private theorem mem_of_mem_support_vanishingIdeal
     {W : Scheme.{u}} (Z : TopologicalSpace.Closeds ↥W) (x : ↥W)
     (hx : x ∈ (Scheme.IdealSheafData.vanishingIdeal Z).support)
@@ -89,7 +85,8 @@ private theorem exists_iso_subscheme_vanishingIdeal_of_closure_range
       e.hom ≫ f = (Scheme.IdealSheafData.vanishingIdeal K).subschemeι := by
   have hrange
       : Set.range ⇑(Scheme.IdealSheafData.vanishingIdeal K).subschemeι.base = (K : Set ↥W) := by
-    rw [range_base_subschemeι, Scheme.IdealSheafData.coe_support_vanishingIdeal]
+    rw [AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι,
+      Scheme.IdealSheafData.coe_support_vanishingIdeal]
   have hle'
       : Scheme.Hom.ker f ≤ Scheme.Hom.ker (Scheme.IdealSheafData.vanishingIdeal K).subschemeι := by
     rw [Scheme.IdealSheafData.ker_subschemeι]
@@ -248,7 +245,7 @@ private theorem mem_support_strictTransform
     : x ∈ (Blowup.strictTransform π Z J).support := by
   have := hqc
   have hxr : x ∈ Set.range ⇑(J.comap π).subschemeι.base := by
-    rw [range_base_subschemeι]
+    rw [AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι]
     exact (mem_support_comap π J x).mpr h1
   obtain ⟨y, hy⟩ := hxr
   have h3 : ⇑(J.comap π).subschemeι.base y ∉ (Z.comap π).support := by
@@ -332,7 +329,7 @@ private theorem mem_range_strictTransformι_iff
         = (((S.strictTransformIdeal j).support : TopologicalSpace.Closeds ↥(S.ambientLevel j))
           : Set ↥(S.ambientLevel j)) := by
     rw [S.strictTransformι_eq_subschemeι j]
-    exact range_base_subschemeι _
+    exact AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι _
   constructor
   · intro hx
     have h2 : x ∈ Set.range ⇑(S.strictTransformι j).base := hx
@@ -447,12 +444,12 @@ private theorem detachedClopenInCenter_of_isNoetherian_of_support
         = (((S.strictTransformIdeal i).support : TopologicalSpace.Closeds ↥(S.ambientLevel i))
           : Set ↥(S.ambientLevel i)) := by
     rw [S.strictTransformι_eq_subschemeι i]
-    exact range_base_subschemeι _
+    exact AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι _
   have hrangeC
       : Set.range ⇑((S.ambientCenter i).subschemeι).base
         = (((S.ambientCenter i).support : TopologicalSpace.Closeds ↥(S.ambientLevel i))
           : Set ↥(S.ambientLevel i)) :=
-    range_base_subschemeι _
+    AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι _
   have hdom
       : ∀ x : ↥(S.ambientCenter i).subscheme,
         IsDomain (((S.ambientCenter i).subscheme).presheaf.stalk x) := fun x =>
@@ -613,7 +610,7 @@ private theorem detachedClopenInCenter_of_isNoetherian_of_support
         : Set.range ⇑(S.discardedι i).base
           = (((S.discardedIdeal i).support : TopologicalSpace.Closeds ↥(S.strictTransform i))
             : Set ↥(S.strictTransform i)) :=
-      range_base_subschemeι _
+      AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι _
     rw [h1, S.discardedIdeal_eq_vanishingIdeal i, Scheme.IdealSheafData.coe_support_vanishingIdeal,
       S.coe_discardedLocusClosure i]
   have hrf
@@ -645,7 +642,7 @@ private theorem detachedClopenInCenter_ofAffine
         0).base) := by
     rw [(AffineSpacePrincipalizationData.ofAffine A hemb hsnc hsm k Y
         pY).strictTransformι_eq_subschemeι 0,
-      range_base_subschemeι]
+      AlgebraicGeometry.Scheme.IdealSheafData.range_subschemeι]
     exact (((AffineSpacePrincipalizationData.ofAffine A hemb hsnc hsm k Y pY).strictTransformIdeal
       0).support).2
   have heq

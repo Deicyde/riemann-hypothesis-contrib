@@ -327,7 +327,6 @@ variable (Y : Ch D u)
 end Indep
 
 theorem emb_mem_Fi (i : ℕ) (x : Vl X i) : X.fm.emb i x ∈ X.fm.Fi i := by
-
   rw [← (X.fm.emb_basis i).2, ← (X.fm.lat i).b.sum_repr x, map_sum]
   refine Submodule.sum_mem _ fun a _ => ?_
   rw [LinearMap.map_smulₛₗ]

@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_uniformizationEndomorphism_of_linear
               E.aG = ιG.act a ∧ E.aA = ιA.act a ∧ E.aB = ιD.onB.act a ∧ (∀ χ, E.h χ = star a • χ)
                 ∧ ∀ (F : Type) [Field F] [Algebra (FractionRing R) F] (g g' : GtPtF D.toPre F),
                   E.Act g g' ↔ GtAct ιD a g g' := by
-  first
-  | exact @GlobalTheory.UT.OLinEnd.main
-  | exact GlobalTheory.UT.OLinEnd.main
-  | (intros; apply GlobalTheory.UT.OLinEnd.main <;> assumption)
+  first | exact @GlobalTheory.UT.OLinEnd.main

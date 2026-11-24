@@ -173,7 +173,7 @@ theorem _root_.GlobalTheory.PDivGroup.exists_mulP_eq_of_transl_eq
   show ψ.ofConv (G.mulP n e) = ψ.ofConv a
   rw [← _root_.GlobalTheory.CartierDual.map_apply]
   have h5 := congrArg (fun x => x.ofConv (_root_.GlobalTheory.CartierDual.map (G.mulP n) ψ)) he
-  simp only [ofConv_toConv] at h5
+  simp only at h5
   rw [← hL ψ]
   exact h5
 

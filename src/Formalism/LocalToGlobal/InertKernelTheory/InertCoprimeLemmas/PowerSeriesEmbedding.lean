@@ -80,7 +80,4 @@ theorem power_series_embedding : PSerIota := by
     = ι (Formalism.MainNotions.TaylorLogMetric.taylor D G α)
   exact (lattice_embedding p lam ι h).1 _ (hG α)
 
-theorem lamExt : LamExt := lattice_extension
-theorem lamCIota : LamCIota := lattice_embedding
-
 end Formalism.L2.KerInert

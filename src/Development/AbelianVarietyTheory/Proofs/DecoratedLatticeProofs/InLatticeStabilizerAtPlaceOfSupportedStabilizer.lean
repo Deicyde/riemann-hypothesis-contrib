@@ -91,28 +91,6 @@ theorem compFin_e_ne {v w : Pl D} (h : w ≠ v)
   rw [evalV_sv_ne h]
   exact TensorProduct.zero_tmul _ _
 
-theorem infPart_pair (x : Af D.host.F) (c : D.host.E)
-    : infPart D (pairA D.host.F 0 x ⊗ₜ[D.host.F] c) = 0 :=
-  TensorProduct.zero_tmul _ _
-
-theorem finPart_pair (x : Af D.host.F) (c : D.host.E)
-    : finPart D (pairA D.host.F 0 x ⊗ₜ[D.host.F] c) = x ⊗ₜ[D.host.F] c :=
-  rfl
-
-theorem exists_fin_lift (b : Af D.host.F ⊗[D.host.F] D.host.E)
-    : ∃ a : AE D, infPart D a = 0 ∧ finPart D a = b := by
-  induction b using TensorProduct.induction_on with
-  | zero => exact ⟨0, (infPart D).map_zero, (finPart D).map_zero⟩
-  | tmul x c => exact ⟨pairA D.host.F 0 x ⊗ₜ c, infPart_pair x c, finPart_pair x c⟩
-  | add x y hx hy =>
-    obtain ⟨a, ha1, ha2⟩ := hx
-    obtain ⟨b, hb1, hb2⟩ := hy
-    exact ⟨
-      a + b,
-      by rw [(infPart D).map_add, ha1, hb1, add_zero],
-      by rw [(finPart D).map_add, ha2, hb2]
-    ⟩
-
 end GlobalTheory.KStabBridge
 
 namespace GlobalTheory.KStabBridge
@@ -173,11 +151,12 @@ theorem exists_lift_latV
     refine ⟨
       fun i => pairA D.host.F 0 (singleV D.host.F v 1 * a) ⊗ₜ[D.host.F] (1 * x i),
       AddSubgroup.subset_closure ⟨_, intAf_mul (sv_int v) ha, fun w hw => ?_, 1, rfl, x, hx, rfl⟩,
-      fun i => infPart_pair _ _,
+      fun i => _root_.GlobalTheory.LatVac.infPart_pair _ _,
       fun i => ?_
     ⟩
     · rw [map_mul, evalV_sv_ne hw, zero_mul]
-    · rw [finPart_pair, one_mul, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+    · rw [_root_.GlobalTheory.LatVac.finPart_pair, one_mul, Algebra.TensorProduct.tmul_mul_tmul,
+        one_mul]
   | zero =>
     refine ⟨0, zero_mem (latV S L (· = v)), fun i => (infPart D).map_zero, fun i => ?_⟩
     show finPart D 0 = (singleV D.host.F v 1 ⊗ₜ[D.host.F] (1 : D.host.E)) * 0
@@ -313,7 +292,8 @@ theorem mem_latHat_iff_lift
     obtain ⟨y', hy', h1', h2'⟩ := exists_lift_latV S L v hzL
     have : y' = y :=
       funext fun i =>
-        GlobalTheory.VacStabFixed.parts_ext (by rw [h1', h1]) (by rw [h2', h2]; exact congrFun hz i)
+        _root_.GlobalTheory.SplitScalar.adele_ext (by rw [h1', h1])
+          (by rw [h2', h2]; exact congrFun hz i)
     rwa [← this]
   · intro hy
     have := fin_mem_latHat S L _ hy
@@ -364,7 +344,7 @@ theorem inStabAt_of_inK
     (fun i j => by rw [← hfin]; exact e_mul_of_supp v _ fun w hw => hcomp w hw i j)
     ?_
   intro z hz
-  choose lift hl1 hl2 using exists_fin_lift (D := D)
+  choose lift hl1 hl2 using _root_.GlobalTheory.VacInert.exists_lift (D := D)
   let y : Fin S.rank → AE D := fun i => lift (z i)
   have hsupp : ∀ i, y i ∈ idAt D (· = v) := fun i =>
     Ideal.mem_inf.2 ⟨

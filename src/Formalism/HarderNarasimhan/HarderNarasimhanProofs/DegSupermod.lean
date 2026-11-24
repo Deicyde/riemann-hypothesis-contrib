@@ -68,9 +68,7 @@ theorem degSupermod_zl_mono {A B : Submodule R V} (h : A ≤ B) : zl ρ A ≤ zl
 
 theorem degSupermod_zl_sup (A B : Submodule R V) : zl ρ (A ⊔ B) = zl ρ A ⊔ zl ρ B := by
   simp only [zl, Submodule.sup_toAddSubgroup, AddSubgroup.map_sup]
-  first
-  | exact SupHomClass.map_sup AddSubgroup.toIntSubmodule _ _
-  | (ext y; simp [Submodule.mem_sup, AddSubgroup.mem_sup])
+  first | exact SupHomClass.map_sup AddSubgroup.toIntSubmodule _ _
 
 theorem degSupermod_zl_inf
     {L A B : Submodule R V} (hinj : Set.InjOn ρ (L : Set V)) (hA : A ≤ L) (hB : B ≤ L)

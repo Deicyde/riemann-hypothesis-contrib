@@ -94,12 +94,7 @@ theorem aeval_mem_stable_submodule
     (T : Module.End LL M) (W : Submodule LL M) (hW : ∀ x ∈ W, T x ∈ W) (p : LL[X])
     : ∀ x ∈ W, aeval T p x ∈ W := by
   first
-  | exact Bl.general_b_fact_upper_form.goal1 ..
   | (apply Bl.general_b_fact_upper_form.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_upper_form.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_upper_form.goal1 <;> assumption)
-  | (intros; apply @Bl.general_b_fact_upper_form.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_upper_form.goal1 <;> first | assumption | infer_instance)
   | exact @Bl.general_b_fact_upper_form.goal1 LL M ‹_› ‹_› ‹_› T W hW p x ‹_›
   | exact @Bl.general_b_fact_upper_form.goal1 LL M ‹_› ‹_› ‹_› T W hW p x
   | exact @Bl.general_b_fact_upper_form.goal1 LL M ‹_› ‹_› ‹_› T W hW p
@@ -116,12 +111,7 @@ theorem aeval_apply_eigenvector_alt
     (T : Module.End LL M) (a : LL) (y : M) (hy : T y = a • y) (p : LL[X])
     : aeval T p y = p.eval a • y := by
   first
-  | exact Bl.general_b_fact_upper_variant.goal1 ..
   | (apply Bl.general_b_fact_upper_variant.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_upper_variant.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_upper_variant.goal1 <;> assumption)
-  | (intros; apply @Bl.general_b_fact_upper_variant.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_upper_variant.goal1 <;> first | assumption | infer_instance)
   | exact @Bl.general_b_fact_upper_variant.goal1 LL M ‹_› ‹_› ‹_› T a y hy p
   | exact @Bl.general_b_fact_upper_variant.goal1 LL M ‹_› ‹_› ‹_› T a y hy
   | exact @Bl.general_b_fact_upper_variant.goal1 LL M ‹_› ‹_› ‹_› T a y

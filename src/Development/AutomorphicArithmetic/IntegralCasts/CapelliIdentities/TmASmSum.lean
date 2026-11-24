@@ -53,21 +53,22 @@ open scoped ContDiff Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-noncomputable def Jm : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ :=
-  fun {_} ε ↦ Matrix.diagonal fun a ↦ if ε a then 1 else -1
+noncomputable def Jm : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ := fun {_} ε ↦
+  Matrix.diagonal fun a ↦ if ε a then 1 else -1
 
-noncomputable def inUJ : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ → Prop :=
-  fun {_} ε g ↦ gᴴ * Jm ε * g = Jm ε
+noncomputable def inUJ : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ → Prop := fun {_} ε g ↦
+  gᴴ * Jm ε * g = Jm ε
 
-noncomputable def SmoothOnG :
-    {n : ℕ} → (Fin n → Bool) → (Matrix (Fin n) (Fin n) ℂ → ℂ) → Prop :=
-  fun {n} ε f ↦
-    ∀ g₀ : Matrix (Fin n) (Fin n) ℂ, inUJ ε g₀ →
-      ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → ℂ),
+noncomputable def SmoothOnG
+    : {n : ℕ} → (Fin n → Bool) → (Matrix (Fin n) (Fin n) ℂ → ℂ) → Prop := fun {n} ε f ↦
+  ∀ g₀ : Matrix (Fin n) (Fin n) ℂ,
+    inUJ ε g₀
+      → ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → ℂ),
         IsOpen U ∧ g₀ ∈ U ∧ ContDiffOn ℝ ∞ F U ∧ ∀ g ∈ U, inUJ ε g → f g = F g
 
-theorem tmA_sm_sum.{u_1} :
-    ∀ {n : ℕ} {ε : Fin n → Bool} {ι : Type u_1} (s : Finset ι) (F : ι → Matrix (Fin n) (Fin n) ℂ → ℂ),
+theorem tmA_sm_sum.{u_1}
+    : ∀ {n : ℕ} {ε : Fin n → Bool} {ι : Type u_1} (s : Finset ι)
+        (F : ι → Matrix (Fin n) (Fin n) ℂ → ℂ),
       (∀ i ∈ s, SmoothOnG ε (F i)) → SmoothOnG ε (fun x ↦ ∑ i ∈ s, F i x) := by
   intro n ε ι s F h g₀ hg
   classical

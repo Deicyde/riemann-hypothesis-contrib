@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.shortThetaValue_under_levelMove
     : Laws → ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.shortThetaValue_under_levelMove
                           → ShortValAt Xo c nab
                             (fun q => w (fun b => σq.symm (q b)))
                             Λ β N P y v := by
-  first
-  | exact @GlobalTheory.ShortValMove.shortValAt_move
-  | exact GlobalTheory.ShortValMove.shortValAt_move
-  | (intros; apply GlobalTheory.ShortValMove.shortValAt_move <;> assumption)
+  first | exact @GlobalTheory.ShortValMove.shortValAt_move

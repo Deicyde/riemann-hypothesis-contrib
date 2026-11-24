@@ -108,9 +108,7 @@ theorem exists_hasDerivAt
           = ((∫ s in (0 : ℝ)..(u + δ), M s) - ∫ s in (0 : ℝ)..u, M s) * ↑(hA.unit⁻¹) := fun u => by
     rw [← mul_integral M hc hadd u δ, mul_assoc, hAA, mul_one]
   have hP : HasDerivAt (fun u => ∫ s in (0 : ℝ)..(u + δ), M s) (M (t + δ)) t := by
-    first
-    | exact (hasDerivAt_primitive M hc (t + δ)).comp_add_const t δ
-    | exact HasDerivAt.comp_add_const t δ (hasDerivAt_primitive M hc (t + δ))
+    first | exact (hasDerivAt_primitive M hc (t + δ)).comp_add_const t δ
   have hF := (hP.sub (hasDerivAt_primitive M hc t)).mul_const (↑(hA.unit⁻¹) : 𝔸)
   have hF' := hF.congr_of_eventuallyEq (Eventually.of_forall hM)
   refine hF'.congr_deriv ?_

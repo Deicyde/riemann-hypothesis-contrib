@@ -231,7 +231,7 @@ theorem be_add_left
       sb_X]
     at h1
   · exact h1
-  all_goals first | exact hs0 | exact hex0 | exact hinv
+  all_goals first | exact hs0
 
 include hSub hex0 hinv hB in
 theorem be_add_right

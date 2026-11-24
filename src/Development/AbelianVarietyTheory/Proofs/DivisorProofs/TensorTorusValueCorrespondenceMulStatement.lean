@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.tensorTorusValueCorrespondence_mul
       TensFacts W φ e wv
         → ∀ (v' u' : N'.Gt) (vs us : Fin r → N.Gt),
           GtRelV W φ e wv v' vs → GtRelV W φ e wv u' us → GtRelV W φ e wv (v' * u') (vs * us) := by
-  first
-  | exact @GlobalTheory.Mum.TensTor.gtRelV_mul
-  | exact GlobalTheory.Mum.TensTor.gtRelV_mul
-  | (intros; apply GlobalTheory.Mum.TensTor.gtRelV_mul <;> assumption)
+  first | exact @GlobalTheory.Mum.TensTor.gtRelV_mul

@@ -60,19 +60,12 @@ namespace Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates.JL
 
 open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting
 
-theorem jm_mul_jm {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.Jm ε * Formalism.REAL.Jm ε = 1 := by
-  unfold Formalism.REAL.Jm
-  rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-  congr 1
-  funext i
-  split_ifs <;> norm_num
-
 theorem ujOf_left
     {n : ℕ} {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : Formalism.REAL.inUJ ε g)
     : Formalism.REAL.Jm ε * gᴴ * Formalism.REAL.Jm ε * g = 1 := by
   have h : gᴴ * Formalism.REAL.Jm ε * g = Formalism.REAL.Jm ε := hg
   rw [Matrix.mul_assoc (Formalism.REAL.Jm ε * gᴴ), Matrix.mul_assoc (Formalism.REAL.Jm ε),
-    ← Matrix.mul_assoc gᴴ, h, jm_mul_jm]
+    ← Matrix.mul_assoc gᴴ, h, _root_.Formalism.REAL.Jm_mul_self]
 
 def ujOf {n : ℕ} {ε : Fin n → Bool} (g : Matrix (Fin n) (Fin n) ℂ) (hg : Formalism.REAL.inUJ ε g)
     : Formalism.REAL.UJ ε := ⟨
@@ -189,7 +182,7 @@ theorem psiP_mul_B
 
 theorem jacExGoodN_of_hpkEx_of_pFrame_of_haarCorr
     (hH : HpkEx) (hP : PFrame) (hHC : HaarCorr) (hZB : ZBig) (hBM : BigMem) (hW : CoordW)
-    (hSec : SecWb)
+    (hSec : _root_.Formalism.QuantumDeterminants.SectionExists)
     : JacExGoodN := by
   intro r k ε e z z' T T' sc hF hG hsc
   obtain ⟨P, hPJ, hPdet, hPe, zH, zH', hzH, hzH', hPz, hPz', hTz, hTz'⟩ :=

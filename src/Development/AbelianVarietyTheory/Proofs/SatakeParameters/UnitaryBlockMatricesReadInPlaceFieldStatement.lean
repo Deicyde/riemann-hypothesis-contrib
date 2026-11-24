@@ -47,6 +47,7 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
   Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
   Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitaryBlockMatrices_read_in_placeField
     : ∀ {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7)
         (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau) (Kc : Type) [Field Kc]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.unitaryBlockMatrices_read_in_placeField
                 ∧ Formalism.L2.G.Pend.tw X Kc v s (ρ v (M : Matrix (Fin n) (Fin n) D.host.E).det)
                   = ι (embT D (pos ⟨v, s⟩) (M : Matrix (Fin n) (Fin n) D.host.E).det)
                     ^ (if IsOddPos s then (-1 : ℤ) else 1) := by
-  first
-  | exact @GlobalTheory.TwV.DelA.blkC_atR_read
-  | exact GlobalTheory.TwV.DelA.blkC_atR_read
-  | (intros; apply GlobalTheory.TwV.DelA.blkC_atR_read <;> assumption)
+  first | exact @GlobalTheory.TwV.DelA.blkC_atR_read

@@ -564,9 +564,6 @@ theorem hs_of_add (q : Place F) {α β γ : Fˣ} (h : (α : F) + β = γ)
     <;> rcases Int.units_eq_one_or (hs q (-1) γ) with hE | hE <;> rw [hA, hB, hC, hD] at h1
     <;> rw [hD, hE] at e3 <;> rw [hA, hB, hC, hE] <;> revert h1 e3 <;> decide
 
-theorem hs_sq_right (q : Place F) (a b c : Fˣ) : hs q a (b * c ^ 2) = hs q a b := by
-  rw [hs_mul_right, hs_eq_one_iff.mpr (mem_nrm_of_sqr (sq_mem_sqr q c) a), mul_one]
-
 theorem Lone.exists_left {p : Place F} (hp : Lone p) {b : Fˣ} (hb : b ∉ sqr p)
     : ∃ c : Fˣ, c ∉ nrm p b ∧ ∀ q, q ≠ p → c ∈ nrm q b := by
   obtain ⟨a, d, had, hq⟩ := hp
@@ -613,7 +610,8 @@ theorem Lone.exists_left {p : Place F} (hp : Lone p) {b : Fˣ} (hb : b ∉ sqr p
       rw [ha, hx, hy]
       field_simp
       ring
-    rw [hbW, hs_sq_right, hs_mul_right, hs_comm q d a, hs_comm q d (Units.mk0 _ hN1),
+    rw [hbW, _root_.GlobalTheory.HilbertRecip.hs_mul_sq_right, hs_mul_right, hs_comm q d a,
+      hs_comm q d (Units.mk0 _ hN1),
       hs_eq_one_iff.2 (mem_nrm_of_eq q (a := Units.mk0 _ hN1) (δ := d) (x := x₁) (y := y₁)
         (by simp)),
       mul_one]
@@ -638,10 +636,11 @@ theorem Lone.exists_left {p : Place F} (hp : Lone p) {b : Fˣ} (hb : b ∉ sqr p
         (-(x₁ ^ 2 - d * y₁ ^ 2) * (1 + (x₀ ^ 2 - d * y₀ ^ 2) * (x₀ ^ 2 - d * y₀ ^ 2)⁻¹)) * hinv
     refine ⟨Units.mk0 _ hN0 * a, fun q => ?_⟩
     have e1 : hs q (Units.mk0 _ hN0) (b * Units.mk0 _ hN1) = hs q a b * hs q a d := by
-      rw [hs_of_add q E1, E2, hs_comm, hs_sq_right, hs_mul_right]
+      rw [hs_of_add q E1, E2, hs_comm, _root_.GlobalTheory.HilbertRecip.hs_mul_sq_right,
+        hs_mul_right]
     have e2 : hs q (Units.mk0 _ hN0) (Units.mk0 _ hN1) = 1 := by
-      rw [E3, hs_sq_right, hs_mul_right, hs_comm q _ (- Units.mk0 _ hN0),
-        hs_eq_one_iff.2 (neg_mem_nrm q (Units.mk0 _ hN0)), mul_one]
+      rw [E3, _root_.GlobalTheory.HilbertRecip.hs_mul_sq_right, hs_mul_right,
+        hs_comm q _ (- Units.mk0 _ hN0), hs_eq_one_iff.2 (neg_mem_nrm q (Units.mk0 _ hN0)), mul_one]
       exact hs_eq_one_iff.2 (mem_nrm_of_eq q (a := Units.mk0 _ hN0) (δ := d) (x := x₀) (y := y₀)
         (by simp))
     rw [hs_mul_right, e2, mul_one] at e1
@@ -1218,8 +1217,6 @@ private lemma ringEquivRealOfIsReal_algebraMap {K : Type} [Field K] [NumberField
     InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe]
   first
   | rfl
-  | simp
-  | rw [← WithAbs.equiv_symm_apply, RingEquiv.apply_symm_apply]
 
 end GlobalTheory.HilbertRecip
 

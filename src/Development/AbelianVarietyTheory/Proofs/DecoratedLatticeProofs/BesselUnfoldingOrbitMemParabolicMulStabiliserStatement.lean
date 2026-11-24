@@ -50,6 +50,7 @@ open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastKer lastPair)
 open GlobalTheory.FinPl
+
 theorem _root_.GlobalTheory.T.besselUnfolding_orbit_mem_parabolic_mul_stabiliser
     : ∀ (D : D7) (σ : ℕ) (B : BesLev D σ) (L : Lat B.V) (L₀ : Lat B.V₀) (v : Pl D),
       MonoAt B.d L L₀ v
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.besselUnfolding_orbit_mem_parabolic_mul_stabiliser
                         ∧ ∃ κ',
                           InK B.V L (· = v) κ'
                             ∧ n * B.d.emb0 (B.o.emb (a, 1) * κ₀) * κ = r * κ' := by
-  first
-  | exact @GlobalTheory.FinPl.OrbitCoset.orbit_coset
-  | exact GlobalTheory.FinPl.OrbitCoset.orbit_coset
-  | (intros; apply GlobalTheory.FinPl.OrbitCoset.orbit_coset <;> assumption)
+  first | exact @GlobalTheory.FinPl.OrbitCoset.orbit_coset

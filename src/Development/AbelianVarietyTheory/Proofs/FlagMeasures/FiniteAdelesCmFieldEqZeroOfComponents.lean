@@ -60,7 +60,7 @@ theorem equivFinsuppOfBasisLeft_lTensor
       = f (TensorProduct.equivFinsuppOfBasisLeft b x i) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
-  | tmul m n => simp [TensorProduct.equivFinsuppOfBasisLeft_apply_tmul_apply]
+  | tmul m n => simp
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
 
 theorem AL_eq_zero_of_compAt

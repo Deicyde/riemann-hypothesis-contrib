@@ -5,8 +5,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapFromSp
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapStalkMap
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelBaseChangeMapStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFreeOverLocalRingStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelBaseChangeMap
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFreeOverLocalRing
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelPullbackCorrespondence
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -82,7 +84,8 @@ theorem bc
     : LinearIndependent R' b' ∧ Submodule.span R' (Set.range b') = ⊤ := by
   subst hy
   letI := f.toAlgebra
-  obtain ⟨j, hj, -, hsp⟩ := GlobalTheory.T.lie_model_base_change_map S G R R' x E E' M M'
+  obtain ⟨j, hj, -, hsp⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.lieModel_baseChange S G R R' x E E' M M'
   have e : (fun k => j (b k)) = b' :=
     funext fun k => M'.inj (Over.OverMorphism.ext ((hj _).trans (hb k).symm))
   have := hsp hs n b
@@ -287,7 +290,8 @@ theorem core
     : ∃ (n : ℕ) (b : Fin n → V) (c : Fin n → A'),
       (∀ k, ∃ v, Ext g x M (b k) v) ∧ e' = ∑ k, g' (c k) • j (b k) := by
   obtain ⟨n, ⟨b⟩⟩ :=
-    GlobalTheory.T.lie_model_free_over_local_ring X G hs A x (ExtE hx M) (extModel hg hx M)
+    _root_.GlobalTheory.CompanionTheory.Ar.LieFreeSmooth.lieModel_free_of_smooth X G hs A x
+      (ExtE hx M) (extModel hg hx M)
   have up
       : ∀ k, ∃ u : epsAt x' ⟶ G',
         Ext g' x' M' (j (val (b k))) u
@@ -359,7 +363,8 @@ theorem main
         LinearIndependent Ω' (fun k => j (B k))
           ∧ Submodule.span Ω' (Set.range fun k => j (B k)) = ⊤ := fun m B =>
     bc hs i ξ (ξ' ≫ f) (Eq.symm hd) M (LieMove.pushModel hG M') B (fun k => j (B k)) (fun k => hj _)
-  obtain ⟨m, ⟨b₁⟩⟩ := GlobalTheory.T.lie_model_free_over_local_ring X G hs Ω ξ V M
+  obtain ⟨m, ⟨b₁⟩⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.LieFreeSmooth.lieModel_free_of_smooth X G hs Ω ξ V M
   refine ⟨⟨semilin hG hj, fun n b hb => indep_of_bases b₁ j (fun m B => (hbc m B).1) b hb⟩, ?_, ?_⟩
   · refine top_le_iff.1 ((hbc m b₁).2.symm.le.trans (Submodule.span_mono ?_))
     rintro _ ⟨k, rfl⟩

@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.CdScaleTieIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsArchAdeleTensorEquivComplexCmTypeStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsArchAdeleTensorEquivComplexCmType
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ImportsRest
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UpqLocallyCompactGroup
 import Mathlib.Algebra.Order.Floor.Extended
@@ -234,7 +234,7 @@ theorem real_points
                 : Matrix (Fin M) (Fin M) (Ainf F ⊗[F] E)).map (θ i) := by
   intro F E _ _ _ _ _ σ M J I _ τ θ P Q A hcm hfam hθ hsig hA
   obtain ⟨e, he, hc, hc', hs⟩ :=
-    GlobalTheory.T.exists_archAdeleTensor_equiv_complex_cmType F E σ I τ θ hcm hfam hθ
+    _root_.GlobalTheory.Mem.VolInfIso.exists_infAdele_equiv F E σ I τ θ hcm hfam hθ
   choose B hAB hBA using fun i =>
     (GlobalTheory.Mem.SignatureFactor.exists_factor M (P i) (Q i) _ (hsig i)).2.2 (A i) (hA i)
   refine exists_equiv he hc hc' (sigR (Ainf F) σ)

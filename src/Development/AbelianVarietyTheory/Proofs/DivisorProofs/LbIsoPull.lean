@@ -47,6 +47,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
 import ReciprocityTheory.AnalyticForms.RegularLocalRings.JacChartA
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -64,17 +65,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 noncomputable section
 
 namespace GlobalTheory.Poinc.Special
-
-theorem spc {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) := by
-  rw [← Spec.map_comp]; rfl
-
-theorem lbIso_pull'
-    {X Y Z : Scheme.{0}} {L : LB X} {M : LB Y} {a : Y ⟶ X} (h : LBIso M (L.pull a)) (j : Z ⟶ Y)
-    {a' : Z ⟶ X} (e : a' = j ≫ a)
-    : LBIso (M.pull j) (L.pull a') :=
-  LBIso.chartPull (Geo.Tor.chartPullPull M j j rfl)
-    (Geo.Tor.chartPullSame L _ (fun _ => a) _ j fun _ => e) h
 
 theorem main
     : ∀ (R₁ R₂ O K F₁ F₂ M Γ : Type) [CommRing R₁] [CommRing R₂] [CommRing O] [Field K] [Field F₁]
@@ -111,8 +101,10 @@ theorem main
   let P₀ : PolAV (Sp K) := GlobalTheory.StrictPull.polPull P (spMap v)
   let β : P₀.A.left ⟶ P.A.left := pullback.fst P.A.hom (spMap v)
   have hβ : IsGrpPullback P₀.A P.A (spMap v) β := isGrpPullback_pullback P.A (spMap v)
-  have eq₁ : spMap (algebraMap F₁ K) ≫ spMap k₁ = spMap v ≫ spMap f₁ := by rw [spc, spc, hk₁]
-  have eq₂ : spMap (algebraMap F₂ K) ≫ spMap k₂ = spMap v ≫ spMap f₂ := by rw [spc, spc, hk₂]
+  have eq₁ : spMap (algebraMap F₁ K) ≫ spMap k₁ = spMap v ≫ spMap f₁ := by
+    rw [_root_.GlobalTheory.spMap_comp_ring, _root_.GlobalTheory.spMap_comp_ring, hk₁]
+  have eq₂ : spMap (algebraMap F₂ K) ≫ spMap k₂ = spMap v ≫ spMap f₂ := by
+    rw [_root_.GlobalTheory.spMap_comp_ring, _root_.GlobalTheory.spMap_comp_ring, hk₂]
   have c₁ := hβ.comp hb₁
   have c₂ := hβ.comp hb₂
   have w₁ : (β ≫ b₁) ≫ P₁.A.hom = (P₀.A.hom ≫ spMap (algebraMap F₁ K)) ≫ spMap k₁ := by
@@ -131,10 +123,12 @@ theorem main
   refine ⟨P₀, a₁, a₂, ga₁, ga₂, ?_, ?_, fun x => ?_, fun E w w₂' hw hw₂ h => ?_⟩
   · rw [hP₀L]
     exact LBIso.trans (pull_isLB P.isLB _) (pull_isLB P₁.isLB _) (pull_isLB A₁.isLB _)
-      (lbIso_pull' hPL₁ β rfl) (lbIso_pull' hL₁ a₁ ha₁.symm).symm
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hPL₁ β rfl)
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hL₁ a₁ ha₁.symm).symm
   · rw [hP₀L]
     exact LBIso.trans (pull_isLB P.isLB _) (pull_isLB P₂.isLB _) (pull_isLB A₂.isLB _)
-      (lbIso_pull' hPL₂ β rfl) (lbIso_pull' hL₂ a₂ ha₂.symm).symm
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hPL₂ β rfl)
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hL₂ a₂ ha₂.symm).symm
   · obtain ⟨wO, hs, h₁, h₂⟩ := ht x
     have sq : (spMap v ≫ wO) ≫ P.A.hom = 𝟙 _ ≫ spMap v := by
       rw [Category.assoc, hs, Category.comp_id, Category.id_comp]
@@ -145,13 +139,15 @@ theorem main
             = pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ β ≫ b₁ :=
           congrArg (fun z => pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ z) ha₁
         _ = (pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ β) ≫ b₁ := (Category.assoc _ _ _).symm
-        _ = _ := by rw [hl, Category.assoc, h₁, ← Category.assoc, spc]
+        _ = _ := by
+          rw [hl, Category.assoc, h₁, ← Category.assoc, _root_.GlobalTheory.spMap_comp_ring]
     · calc
         pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ a₂ ≫ φ₂
             = pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ β ≫ b₂ :=
           congrArg (fun z => pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ z) ha₂
         _ = (pullback.lift (spMap v ≫ wO) (𝟙 _) sq ≫ β) ≫ b₂ := (Category.assoc _ _ _).symm
-        _ = _ := by rw [hl, Category.assoc, h₂, ← Category.assoc, spc]
+        _ = _ := by
+          rw [hl, Category.assoc, h₂, ← Category.assoc, _root_.GlobalTheory.spMap_comp_ring]
   · obtain ⟨e, he₁, he₂⟩ := he E
     have sqe : (β ≫ e.left) ≫ P.A.hom = P₀.A.hom ≫ spMap v := by
       rw [Category.assoc, Over.w e]; exact pullback.condition

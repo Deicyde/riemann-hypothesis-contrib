@@ -240,6 +240,6 @@ theorem mem_glueFil_iff
     rw [eval_eq]
     congr 2
     funext j
-    simp [sndC_apply]
+    simp
 
 end GlobalTheory.HTGlueLie

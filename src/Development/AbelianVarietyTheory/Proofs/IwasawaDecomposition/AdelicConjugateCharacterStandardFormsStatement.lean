@@ -61,7 +61,4 @@ theorem _root_.GlobalTheory.T.adelic_conjugate_character_standard_forms
                         (Formalism.L2.Forms.mulLat γ.1 (clsCrd (I.rec7 l Z) u i hi c'))
                       = Formalism.HermitianLatticesTheory.localization₂ q.asIdeal
                         (clsCrd (I.rec7 l Z) u i hi c) := by
-  first
-  | exact @GlobalTheory.Mem.Col2.SameOff.use₆
-  | exact GlobalTheory.Mem.Col2.SameOff.use₆
-  | (intros; apply GlobalTheory.Mem.Col2.SameOff.use₆ <;> assumption)
+  first | exact @GlobalTheory.Mem.Col2.SameOff.use₆

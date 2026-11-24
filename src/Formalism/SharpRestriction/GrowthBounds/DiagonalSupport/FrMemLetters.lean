@@ -68,7 +68,7 @@ theorem llPos_lt (j : ℤ) (l l' : ℕ) (hll : l < l') (hl' : l' < (Fr.LLset j).
         ((Fr.LLset j).sort (· ≤ ·)).getD k 0
           = ((Fr.LLset j).sort (· ≤ ·))[k]'(by rw [hlen]; exact hk) := by
     intro k hk
-    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem, hlen, hk]
+    simp [List.getD_eq_getElem?_getD, hlen, hk]
   rw [e l (by omega), e l' hl']
   exact hs (a := ⟨l, by rw [hlen]; omega⟩) (b := ⟨l', by rw [hlen]; exact hl'⟩) hll
 
@@ -86,14 +86,14 @@ private theorem llPos_mem_LLset' (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card
   have e
       : ((Fr.LLset j).sort (· ≤ ·)).getD l 0
         = ((Fr.LLset j).sort (· ≤ ·))[l]'(by rw [hlen]; exact hl) := by
-    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem, hlen, hl]
+    simp [List.getD_eq_getElem?_getD, hlen, hl]
   rw [e, ← Finset.mem_sort (· ≤ ·)]
   exact List.getElem_mem _
 
 theorem posU_lt
     (hV : Fr.Valid L₁ N₁) (j : ℤ) (a b : ℕ) (hab : a < b) (hb : b < (Fr.LLset j).card + r)
     : posU Fr (Fr.LLset j).card j a < posU Fr (Fr.LLset j).card j b := by
-  have hm := fr_le_fr_of_le_of_valid hV j
+  have hm := _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_entries_monotone hV j
   unfold posU
   split_ifs with ha hb hb
   · exact llPos_lt j a b hab hb
@@ -136,7 +136,8 @@ theorem w_lt_posU
     (j : ℤ) (i u : ℕ) (hi : i < r) (hu : u < (Fr.LLset j).card + r)
     : Fr.fr (j - 1) i < posU Fr (Fr.LLset j).card j u := by
   have hfi : Fr.fr (j - 1) i ≤ Fr.fr (j - 1) (r - 1) :=
-    fr_le_fr_of_le_of_valid hV (j - 1) i (r - 1) (by omega) (by omega)
+    _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_entries_monotone hV (j - 1) i
+      (r - 1) (by omega) (by omega)
   have hgap : Fr.fr (j - 1) (r - 1) < Fr.fr j 0 := by
     have h1 := hV.2.2.2.1 (j - 1)
     rwa [sub_add_cancel] at h1
@@ -146,12 +147,15 @@ theorem w_lt_posU
     simp only [Frames.LLset, Finset.mem_filter, Finset.mem_Ioo] at h1
     exact lt_of_le_of_lt hfi h1.1.1
   · exact lt_of_le_of_lt hfi
-      (lt_of_lt_of_le hgap (fr_le_fr_of_le_of_valid hV j 0 _ (Nat.zero_le _) (by omega)))
+      (lt_of_lt_of_le hgap
+        (_root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_entries_monotone hV j 0 _
+          (Nat.zero_le _) (by omega)))
 
 theorem fr_mem_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (i : ℕ) (hi : i < r)
     : Fr.fr j i ∈ Fr.letters j := by
-  have hm0 := fr_le_fr_of_le_of_valid hV (j - 1)
-  have hm := fr_le_fr_of_le_of_valid hV j
+  have hm0 :=
+    _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_entries_monotone hV (j - 1)
+  have hm := _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_entries_monotone hV j
   have hgap : Fr.fr (j - 1) (r - 1) < Fr.fr j 0 := by
     have h1 := hV.2.2.2.1 (j - 1)
     rwa [sub_add_cancel] at h1

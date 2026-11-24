@@ -108,7 +108,6 @@ variable
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure NewReal (R : RealDat D A Ks) (V : NewLev D N) (X : NewFam A N) where
   BR
     : ∀ n,

@@ -56,9 +56,6 @@ open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTh
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.UnitaryMove
 
 section Generic
@@ -127,11 +124,7 @@ end Generic
 
 variable {D : D7}
 
-theorem cA_cA (z : AE D) : cA D (cA D z) = z := by
-  induction z using TensorProduct.induction_on with
-  | zero => rw [RingHom.map_zero, RingHom.map_zero]
-  | tmul a x => exact congrArg (fun y : D.host.E => a ⊗ₜ[D.host.F] y) (star_star x)
-  | add a b ha hb => rw [RingHom.map_add (f := _), RingHom.map_add (f := _), ha, hb]
+alias cA_cA := _root_.Formalism.L2.Theta.cA_cA
 
 theorem exists_blockUnit
     : ∀ {D : D7} (V : HSp D),

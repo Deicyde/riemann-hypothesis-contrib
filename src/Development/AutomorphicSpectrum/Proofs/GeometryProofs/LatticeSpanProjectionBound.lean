@@ -142,7 +142,6 @@ theorem two_frames
       intro a
       obtain ⟨ψ, hψ⟩ := exists_dual_ext hext hs (π₀ a)
       have hψv : ψ (κ • b j) = c a := by
-
         rw [← hc, map_sum, Finset.sum_eq_single a]
         · rw [map_smul, hψ, hπ, if_pos rfl, map_one, smul_eq_mul, mul_one]
         · intro x _ hx

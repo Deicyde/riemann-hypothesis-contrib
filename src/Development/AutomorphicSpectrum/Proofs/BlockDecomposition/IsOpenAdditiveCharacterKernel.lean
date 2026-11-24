@@ -52,8 +52,8 @@ open Matrix Filter Topology ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.LocalFieldChar
 
-theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
-    (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re) : z = 1 := by
+theorem circle_eq_one_of_forall_re_pow_pos (z : Circle) (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re)
+    : z = 1 := by
   have hsq : ∀ w : Circle, (w : ℂ).re ^ 2 + (w : ℂ).im ^ 2 = 1 := by
     intro w
     have := Circle.normSq_coe w
@@ -73,8 +73,7 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
   have hstep : ∀ j, a (j + 1) = 2 * a j ^ 2 - 1 := by
     intro j
     have h2 := hsq (z ^ (2 ^ j))
-    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by
-      rw [pow_succ, pow_mul, sq]
+    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by rw [pow_succ, pow_mul, sq]
     simp only [ha]
     rw [hp, Circle.coe_mul, Complex.mul_re]
     nlinarith
@@ -99,9 +98,10 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
   have hpos : 0 < a j := h _
   linarith
 
-theorem isOpen_addChar_ker : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle), Continuous ψ →
-    IsOpen {x : k | ψ x = 1} := by
+theorem isOpen_addChar_ker
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle),
+      Continuous ψ → IsOpen {x : k | ψ x = 1} := by
   apply GlobalTheory.CompanionTheory.BZFun.isOpen_addChar_eq_one <;> assumption
 
 end GlobalTheory.CompanionTheory.LocalFieldChar

@@ -167,7 +167,6 @@ theorem eq_zero_of_sum_mono
     have := Finset.Nat.mem_antidiagonalTuple.mp (adtEnum_mem D N i)
     simpa using this
   have hpa : aeval y p = 0 := by
-
     rw [hp, map_sum, ← h]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [aeval_monomial, Finsupp.prod_fintype _ _ (by simp)]

@@ -61,12 +61,6 @@ section Lin
 
 variable {m : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem Jm_sq (ε : Fin m → Bool) : Jm ε * Jm ε = 1 := by
-  rw [Jm, diagonal_mul_diagonal, ← diagonal_one]
-  congr 1
-  funext a
-  split_ifs <;> norm_num
-
 theorem formT_mat
     (ε : Fin m → Bool) (A : Matrix (Fin m) (Fin m) ℂ) (hA : A * Jm ε * Aᴴ = Jm ε) (y x : Fin m → H)
     : formT ε (fun c => ∑ d, A d c • y d) (fun c => ∑ d, A d c • x d) = formT ε y x := by
@@ -194,11 +188,10 @@ theorem act_coe
     (U : URep k r) {g : Mx k r} (hg : g ∈ GG k r) (x : M (vr k r true, U)) (c : Fin (2 * r + k + 1))
     : (CompanionTheory.Zuck.act (vr k r true, U) g x c : U.R.H) = ∑ d, g⁻¹ d c • U.R.σ g (x d) := by
   simp only [CompanionTheory.Zuck.act, CompanionTheory.Zuck.mAct, CompanionTheory.Zuck.dOp, vr,
-    if_true, ite_true, BranchingSupport.dualM, CompanionTheory.Zuck.URep.sig, dif_pos hg,
+    if_true, BranchingSupport.dualM, CompanionTheory.Zuck.URep.sig, dif_pos hg,
     LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.compLeft_apply, LinearMap.sum_apply,
     LinearMap.smul_apply, LinearMap.proj_apply, Function.comp_apply, transpose_apply,
-    Submodule.coe_sum, Submodule.coe_smul, LinearMap.restrict_coe_apply,
-    ContinuousLinearMap.coe_coe]
+    Submodule.coe_sum, Submodule.coe_smul]
   rfl
 
 theorem act_one_coe (U : URep k r) {g : Mx k r} (hg : g ∈ GG k r) (x : M (one U))
@@ -207,7 +200,7 @@ theorem act_one_coe (U : URep k r) {g : Mx k r} (hg : g ∈ GG k r) (x : M (one 
     CompanionTheory.Zuck.one, CompanionTheory.Zuck.triv, CompanionTheory.Zuck.URep.sig, dif_pos hg,
     LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.compLeft_apply, LinearMap.sum_apply,
     LinearMap.smul_apply, LinearMap.proj_apply, Function.comp_apply, Submodule.coe_sum,
-    Submodule.coe_smul, LinearMap.restrict_coe_apply, ContinuousLinearMap.coe_coe]
+    Submodule.coe_smul]
   simp only [Fintype.univ_unit, Finset.sum_singleton, Matrix.one_apply_eq, one_smul]
   rfl
 
@@ -299,7 +292,7 @@ theorem invForm
     (i : M (one T) →ₗ[ℂ] M (vr k r true, U)) (i' : M (one T') →ₗ[ℂ] M (vr k r true, U))
     (hi : IsHom (one T) (vr k r true, U) i) (hi' : IsHom (one T') (vr k r true, U) i')
     : IsInvForm T.R T'.R fun x y => formT ε (dn U P (i' (ext1 T' y))) (dn U P (i (ext1 T x))) := by
-  have hJ : (Jm ε)⁻¹ = Jm ε := Matrix.inv_eq_left_inv (Jm_sq ε)
+  have hJ : (Jm ε)⁻¹ = Jm ε := Matrix.inv_eq_left_inv (_root_.Formalism.REAL.Jm_mul_self ε)
   have hdet : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).mp hP.1.1
   unfold BranchingSupport.IsInvForm
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩

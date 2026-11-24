@@ -168,14 +168,6 @@ theorem exists_frame
     ext a <;> simp [ReciprocityTheory.ChartRestriction.G.Chart.dualMapR]
   rw [this]
 
-theorem fromSpec_ringHom_ext
-    {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen W)
-    {R : Type} [CommRing R]
-    {a a' : Γ(X, W) →+* R} (h : spMap a ≫ hW.fromSpec = spMap a' ≫ hW.fromSpec)
-    : a = a' := by
-  have h1 := Spec.map_injective ((cancel_mono hW.fromSpec).1 h)
-  exact congrArg CommRingCat.Hom.hom h1
-
 theorem spec_dual_comp
     {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R''] (φ : R →+* R') (φ' : R' →+* R'')
     : Spec.map (CommRingCat.ofHom (dualMap φ')) ≫ Spec.map (CommRingCat.ofHom (dualMap φ))
@@ -268,12 +260,12 @@ theorem exists_affine_frame
   have hθp : Spec.map (CommRingCat.ofHom θp) ≫ hW.fromSpec = X.fromSpecStalk _ :=
     germ_fromSpec hW hp
   have e1 : (genMap ξ q).comp θ = (genMap ξ ⟨_, h⟩).comp θp :=
-    fromSpec_ringHom_ext hW (by
+    _root_.GlobalTheory.CompanionTheory.Ar.TanMul.ring_inj hW (by
       change Spec.map (CommRingCat.ofHom _) ≫ _ = Spec.map (CommRingCat.ofHom _) ≫ _
       rw [← spec_comp, ← spec_comp, Category.assoc, Category.assoc, hθ, hθp, spec_genMap,
         spec_genMap])
   have e2 : ψ = (Scheme.stalkClosedPointTo (spMap ψ ≫ hW.fromSpec)).hom.comp θp :=
-    fromSpec_ringHom_ext hW (by
+    _root_.GlobalTheory.CompanionTheory.Ar.TanMul.ring_inj hW (by
       change _ = Spec.map (CommRingCat.ofHom _) ≫ _
       rw [← spec_comp, Category.assoc, hθp]
       exact (spec_centre _).symm)

@@ -188,12 +188,7 @@ theorem norm_Tc_le
 omit hI in
 theorem diff_Hf (a : Vsp X.dim) : Differentiable ℂ (fun v : Vsp X.dim => Hf v a) := by
   unfold Hf
-  first
-  | fun_prop
-  | exact Differentiable.fun_sum fun i _ =>
-      (EuclideanSpace.proj i : Vsp X.dim →L[ℂ] ℂ).differentiable.mul_const _
-  | exact Differentiable.sum fun i _ =>
-      (EuclideanSpace.proj i : Vsp X.dim →L[ℂ] ℂ).differentiable.mul_const _
+  first | fun_prop
 
 omit hI in
 theorem differentiable_zeroModeLift_of (hβd : Differentiable ℂ β)

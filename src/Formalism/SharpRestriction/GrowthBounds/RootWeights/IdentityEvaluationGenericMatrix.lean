@@ -65,8 +65,7 @@ private theorem mapRingHom_laurent_C' {A B : Type*} [CommRing A] [CommRing B] (f
 private theorem mapRingHom_laurent_T {A B : Type*} [CommRing A] [CommRing B] (f : A →+* B) (k : ℤ)
     : AddMonoidAlgebra.mapRingHom ℤ f (LaurentPolynomial.T k : LaurentPolynomial A)
       = LaurentPolynomial.T k := by
-  first
-  | (simp [LaurentPolynomial.T, -LaurentPolynomial.single_eq_C_mul_T]; done)
+  first | (simp [LaurentPolynomial.T, -LaurentPolynomial.single_eq_C_mul_T]; done)
 
 theorem mul_Psi_support
     {σ A R' : Type*} [CommRing A] [CommRing R']
@@ -109,8 +108,7 @@ def mul_ev (R : Type*) [CommRing R] (n : ℕ) : GLCoord R n →+* R :=
 
 theorem mul_ev_alg (R : Type*) [CommRing R] (n : ℕ) (a : MvPolynomial (Fin n × Fin n) R)
     : mul_ev R n (algebraMap _ (GLCoord R n) a) = identityEvaluation R n a := by
-  first
-  | simp [mul_ev]
+  first | simp [mul_ev]
 
 theorem mul_ev_inv (R : Type*) [CommRing R] (n : ℕ)
     : mul_ev R n (IsLocalization.Away.invSelf (S := GLCoord R n) (genMat R n).det) = 1 := by
@@ -145,7 +143,7 @@ theorem mul_ph_gLinv (R : Type*) [CommRing R] (n : ℕ) : (mul_ph R n).mapMatrix
   have hab := congrFun (congrFun hadj a) b
   simp only [RingHom.mapMatrix_apply, Matrix.map_apply] at hab
   simp only [gLinv, RingHom.mapMatrix_apply, Matrix.map_apply, mul_ph_C, map_mul, mul_ev_inv,
-    mul_ev_alg, one_mul, hab, Matrix.one_apply]
+    mul_ev_alg, hab, Matrix.one_apply]
   split_ifs <;> simp
 
 theorem mul_ph_twist (R : Type*) [CommRing R] (n : ℕ) (j : Fin n) (k : ℤ)

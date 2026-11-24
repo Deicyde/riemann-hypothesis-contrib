@@ -2,8 +2,9 @@ module
 
 public import CompanionTheory.RealGroups.GeneralUnitaryRepresentations.ArchimedeanJacquetSegments.Complementary
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.UnipotentDerivatives.DerUnipLeUnipB
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicTwistedKernelDerivativeZeroStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RestrictionMirabolicTwistedKernelStatement
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.ColMatMulGlEmbMat
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicTwistedKernelDerivativeZero
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RestrictionMirabolicTwistedKernel
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwistedJacquetPhiMinusEquiv
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -131,7 +132,7 @@ theorem ker_Q (ψ : AddChar k Circle) {n : ℕ}
   | 0, τ => by
     show LinearMap.ker (twKer τ.ρ (MirUin k n) 1).mkQ = _
     rw [Submodule.ker_mkQ]
-    exact GlobalTheory.T.mirabolic_twisted_kernel_derivative_zero k ψ n τ.V τ.ρ
+    exact _root_.GlobalTheory.CompanionTheory.BZMir.twKer_MirUin_eq_derUnipM k ψ n τ.V τ.ρ
   | j + 1, τ => by
     have hnm : n ≤ n + j := Nat.le_add_right n j
     have H :=
@@ -529,7 +530,7 @@ theorem derEquiv
   have hA : LinearMap.ker A = LinearMap.ker B := by
     have e1 : LinearMap.ker A = twKer π (derUnip k (n + j + 1) n) (derChar k ψ (n + j + 1) n) :=
       (ker_Q ψ j (resM k π)).trans
-        (GlobalTheory.T.restriction_mirabolic_twisted_kernel k ψ (n + j) n V π)
+        (_root_.GlobalTheory.CompanionTheory.BZMirDer.twKer_resM_derUnipM k ψ (n + j) n V π)
     rw [e1, ker_Q']
   let L :=
     ((LinearMap.quotKerEquivOfSurjective A hAs).symm.trans (Submodule.quotEquivOfEq _ _ hA)).trans

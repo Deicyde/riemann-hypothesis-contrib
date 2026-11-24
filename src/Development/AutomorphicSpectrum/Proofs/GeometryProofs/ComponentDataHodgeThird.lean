@@ -1,8 +1,9 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsPeriodAtRestrict
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarisedStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PairSumFrameAtPointStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ContDiffUncentre
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PairSumFrameAtPoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -80,7 +81,9 @@ theorem gramAt_posDef_of_isFrameAt_blocks
       exact x.2
     obtain ⟨w, hw⟩ := hx
     exact ⟨w, Subtype.ext hw⟩
-  have hpol := GlobalTheory.T.interior_point_polarised E H D l Xo c Y S₀ Ω K J Dc.y Or.𝔐 z hi
+  have hpol :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.polarisedAt_of_interior E H D l Xo c Y S₀ Ω K
+      J Dc.y Or.𝔐 z hi
   have hframe : (Lat.comap
       (fun p => Or.𝔐.V (Or.bg τ) p ⊔ Or.𝔐.V (Or.sm τ) p)
       (Or.𝔐.Vgen (Or.bg τ)
@@ -107,8 +110,8 @@ theorem gramAt_posDef_of_isFrameAt_blocks
       subst this
       exact hw'
   obtain ⟨G, h1, h2⟩ :=
-    GlobalTheory.T.pair_sum_frame_at_point E H D l Xo c Y S₀ Ω K J Dc.y Or.𝔐 (Or.bg τ) (Or.sm τ)
-      Dc.N
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeMetric.GramEx.exists_gramAt_posDef E H D l Xo c Y S₀
+      Ω K J Dc.y Or.𝔐 (Or.bg τ) (Or.sm τ) Dc.N
       (fun k => φ (b k))
       z h hpol hframe
   exact ⟨G, h1, h2⟩

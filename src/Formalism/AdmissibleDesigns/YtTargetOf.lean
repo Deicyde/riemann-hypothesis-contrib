@@ -69,12 +69,6 @@ variable
 
 theorem nzsd_R' : NoZeroSMulDivisors (D.nd.O i) Dd.R' := by
   first
-  | exact inferInstance
-  | (
-      haveI : NoZeroSMulDivisors (D.nd.O i) (FractionRing (D.nd.O i)) :=
-         NoZeroSMulDivisors.of_algebraMap_injective (IsFractionRing.injective _ _)
-      exact inferInstance
-    )
   | exact ⟨fun {c x} h => by
       by_cases hc : c = 0
       · exact Or.inl hc
@@ -95,7 +89,6 @@ theorem heS
         ↥(TruncatedSeriesCountingIdentities.CoefExt.self i w hw).LL.1 (selfO i hw a)
       = eS i hw (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)) a) := by
   first
-  | rfl
   | (
       have e1 : ∀ y, eS i hw y = Formalism.MainNotions.N.Br.toLLK (D.nbr i w hw) y := fun _ => rfl
       rw [e1, Formalism.MainNotions.N.Br.toLLK, IsFractionRing.lift_algebraMap]
@@ -110,7 +103,7 @@ theorem fd_yt
     : FiniteDimensional ↥(TruncatedSeriesCountingIdentities.CoefExt.self i w hw).LL.1
       (TrV (eS i hw) (MK (O := D.nd.O i) (YtM i Dd))) := by
   obtain ⟨m, xs, φ, hφ, -⟩ := hemb
-  first | exact FiniteDimensional.of_injective φ hφ | exact Module.Finite.of_injective φ hφ
+  first | exact FiniteDimensional.of_injective φ hφ
 
 private theorem continuous_of_injective_linearMap_comp
     {K V W G : Type*} [Field K] [TopologicalSpace K]
@@ -126,7 +119,6 @@ private theorem continuous_of_injective_linearMap_comp
   haveI : ContinuousSMul K V := by
     first
     | exact inferInstance
-    | exact IsModuleTopology.toContinuousSMul K V
   obtain ⟨ψ, hψ⟩ := LinearMap.exists_leftInverse_of_injective φ (LinearMap.ker_eq_bot.mpr hφ)
   have hψc : Continuous ψ := IsModuleTopology.continuous_of_linearMap ψ
   have e1 : f = fun g => ψ (φ (f g)) := funext fun g => (LinearMap.congr_fun hψ (f g)).symm
@@ -146,7 +138,7 @@ theorem cont_yt
     ?_
     (fun g => (heq g v).symm)
   refine continuous_pi fun a => ?_
-  first | exact (hc' (xs a)).matrix_mulVec continuous_const | fun_prop
+  first | exact (hc' (xs a)).matrix_mulVec continuous_const
 
 def ytY
     (hfin : Module.Finite (D.nd.O i) Dd.R')
@@ -170,10 +162,6 @@ theorem msW_eq
           hw))⁻¹ := by
   ext g a b
   first
-  | exact ((TruncatedSeriesCountingIdentities.CoefExt.self i w hw).inc.comp
-      ((algebraMap ↥(OL (TruncatedSeriesCountingIdentities.CoefExt.self i w hw).LL)
-          ↥(TruncatedSeriesCountingIdentities.CoefExt.self i w hw).LL.1).comp
-        (selfO i hw).toRingHom)).map_mul _ _
   | (
       simp only [MsW, TruncatedSeriesCountingIdentities.locC,
         TruncatedSeriesCountingIdentities.chi1C, rTwO, twistM, mapM, Formalism.MainNotions.N.Br.loc,
@@ -205,7 +193,7 @@ theorem ytPsi_rec
       Cd := by
   haveI := hfin
   haveI := nzsd_R' i Dd
-  first | apply ytG_psi | (unfold ytY; apply ytG_psi)
+  first | apply ytG_psi
 
 theorem jump_pi
     (hF : TruncatedSeriesCountingIdentities.FontaineAtPlacesOverL i)

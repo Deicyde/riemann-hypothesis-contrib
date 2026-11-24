@@ -3,7 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsOneComb
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsWeilSourceActionAndSmooth
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.OneDblIffSum
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PositionOneOfSymmetricDoubleIntegralFiniteStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ToOneSucc
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PositionOneOfSymmetricDoubleIntegralFinite
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RootExchangeUnipotentHaarIntegralPointsEqOneStatement
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsSelfDualOfHasConductor
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RelIndexMulMatrixVolumeOpenSubgroupIntegralGL
@@ -259,8 +261,8 @@ theorem comb_eq_sum_cells
       rw [e]
       simpa only [inv_mul_cancel_right] using hz a ha
     have h1 :=
-      GlobalTheory.T.positionOne_of_symmetricDoubleIntegral_finite k n₀ n₁ n₂ c ρ hcρ ψ hψ hne ν hsd
-        μ₁ μ₂ ho₁ ho₂ m₁ G₁ m₂ G₂ A τ hτ T hT F ρ₀ hρ₀ (ρ₀ α P₁) P₂ (e₀.mapDomain (· * α⁻¹)) hsrc
+      _root_.GlobalTheory.PosOne.oneDbl_of_symDbl k n₀ n₁ n₂ c ρ hcρ ψ hψ hne ν hsd μ₁ μ₂ ho₁ ho₂ m₁
+        G₁ m₂ G₂ A τ hτ T hT F ρ₀ hρ₀ (ρ₀ α P₁) P₂ (e₀.mapDomain (· * α⁻¹)) hsrc
         (fun g => z (g * α))
         hsym
     rw [hcomb, hρ₀] at h1

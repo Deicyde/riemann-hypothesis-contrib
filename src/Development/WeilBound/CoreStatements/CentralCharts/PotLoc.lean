@@ -2,8 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EmbedsGeneric
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPointStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SectionBoundaryClosedAndCodenseStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPoint
+public import ReciprocityTheory.AnalyticForms.LeviForms.IsRegFamilyInhabitStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SectionBoundaryClosedAndCodense
 public import Development.WeilBound.CoreStatements.FlagImmersions.ContAtOfHoloOn
 public import Development.WeilBound.CoreStatements.FlagImmersions.CoordsOrbit
 public import Development.WeilBound.CoreStatements.FlagImmersions.IsHolToOfLocal
@@ -135,8 +137,8 @@ theorem potLoc
     have hco : ∀ t ∈ B, CoordsAt Gr.𝔐.ξ Gr.y (z t) (γ t) := fun t ht =>
       coords_orbit (hpt t ht.1).2.1 (horb t ht)
     have hz : IsHolTo B z :=
-      GlobalTheory.T.holomorphic_coords_of_generic_point _ _ Gr.𝔐.ξ _ _ Gr.y Gr.𝔐.tie Gr.𝔐.all _ B γ
-        z hB
+      _root_.GlobalTheory.CompanionTheory.Ar.PeriodsHol.isHolTo_of_coordsAt_family _ _ Gr.𝔐.ξ _ _
+        Gr.y Gr.𝔐.tie Gr.𝔐.all _ B γ z hB
         (differentiableOn_pi.2 fun q t ht => (hγ t ht q).differentiableAt.differentiableWithinAt)
         hco
     have hop : ∀ t ∈ V, An.Re.π (w t) ∈ An.Sys.open' := fun t ht => by
@@ -213,8 +215,8 @@ theorem ptsFam
       ⟨ht₀, An.Re.R.mem_U w₀⟩,
       ?_
     ⟩
-    refine GlobalTheory.T.holomorphic_coords_of_generic_point _ _ Gr.𝔐.ξ _ _ Gr.y Gr.𝔐.tie Gr.𝔐.all
-      _ _
+    refine _root_.GlobalTheory.CompanionTheory.Ar.PeriodsHol.isHolTo_of_coordsAt_family _ _ Gr.𝔐.ξ _
+      _ Gr.y Gr.𝔐.tie Gr.𝔐.all _ _
       (fun t => An.Re.R.lift w₀ (ψ ((An.Sys.A.chart k).symm t)))
       _ hB ?_ ?_
     · refine differentiableOn_pi.2 fun p t ht => ?_
@@ -252,8 +254,8 @@ theorem ptsFam
     obtain ⟨k, hk⟩ := An.Sys.A.cover (An.Re.π w₁)
     have hopen := (An.Sys.A.chart k).isOpen_inter_preimage (hol k U 0).1
     have hd :=
-      (GlobalTheory.T.section_boundary_closed_and_codense _ _ An.Sys.A An.Sys.L An.Sys.s An.Sys.nb
-        An.Sys.m An.Sys.W An.Sys.sec An.Sys.snc).2
+      (_root_.GlobalTheory.CompanionTheory.Ar.Bdry.bdry_isClosed_dense_compl _ _ An.Sys.A An.Sys.L
+        An.Sys.s An.Sys.nb An.Sys.m An.Sys.W An.Sys.sec An.Sys.snc).2
     obtain ⟨x, ⟨hxs, -, hxU⟩, hxo⟩ :=
       hd.inter_open_nonempty _ hopen ⟨
         An.Re.π w₁,

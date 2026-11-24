@@ -53,6 +53,7 @@ open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLoca
   Formalism.MainNotions.DIV.Cons
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_degeneration_data_algebraic_point_model
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_degeneration_data_algebraic_point_model
                 (∃ _ : IsDiscreteValuationRing A.R, Finite (ResidueField A.R))
                   ∧ Function.Injective A.f
                   ∧ ∃ φ : T.V →+* A.R, A.f.comp φ = g ∧ A.ι = spMap φ ≫ ιT ∧ φ.Finite := by
-  first
-  | exact @GlobalTheory.DatAtPoint.exists_datAt
-  | exact GlobalTheory.DatAtPoint.exists_datAt
-  | (intros; apply GlobalTheory.DatAtPoint.exists_datAt <;> assumption)
+  first | exact @GlobalTheory.DatAtPoint.exists_datAt

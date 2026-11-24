@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.doubledPairSchrodingerFunction_continuous_integrab
             → ∀ f,
               IsThetaFunO ψ (dblSp A) B f
                 → Continuous (sch ψ A B ν 𝓨 f) ∧ Integrable (sch ψ A B ν 𝓨 f) ν := by
-  first
-  | exact @GlobalTheory.Core.Rk.SchInt.sch_continuous_integrable
-  | exact GlobalTheory.Core.Rk.SchInt.sch_continuous_integrable
-  | (intros; apply GlobalTheory.Core.Rk.SchInt.sch_continuous_integrable <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.SchInt.sch_continuous_integrable

@@ -156,7 +156,6 @@ def lv : Levels Fl :=
     (fun i hi => (Z.Fo i hi).Ch)
     (fun i hi β => (Z.S i hi).chart β)
 
-
 def loc (i : ℕ) (hi : i + 1 ≤ D.R.m) : LocIn X0 u w hg (Z.lv Fl ht) i (Z.Fo i hi).Ch :=
   haveI := Z.chFin
   haveI : ∀ β, Fintype ((Z.S i hi).chart β).comp := fun β => @Fintype.ofFinite _ ((Z.S i hi).fin β)

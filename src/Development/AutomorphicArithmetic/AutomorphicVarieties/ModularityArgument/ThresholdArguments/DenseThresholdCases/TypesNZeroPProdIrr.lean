@@ -39,9 +39,6 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.NonzeroTypes.Pro
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open ValuativeRel Matrix

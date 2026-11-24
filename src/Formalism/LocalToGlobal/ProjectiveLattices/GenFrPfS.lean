@@ -47,8 +47,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace Formalism.L2.Pj
@@ -112,10 +110,10 @@ theorem gfp_gen_of
           = 𝟙 _ := by
       apply CartesianMonoidalCategory.hom_ext
       · ext
-        simp only [Over.comp_left, Over.homMk_left, Over.id_left, Category.assoc, Category.id_comp]
+        simp only [Over.comp_left, Over.homMk_left, Category.assoc, Category.id_comp]
         rw [hkπ, hπ]
       · ext
-        simp only [Over.comp_left, Over.homMk_left, Over.id_left, Category.assoc, Category.id_comp]
+        simp only [Over.comp_left, Over.homMk_left, Category.assoc, Category.id_comp]
         rw [hkφ, hF]
     exact congrArg (fun f => Over.Hom.left f) e1
   have hscal

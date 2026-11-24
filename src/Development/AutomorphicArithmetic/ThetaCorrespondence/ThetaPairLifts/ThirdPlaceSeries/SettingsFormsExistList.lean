@@ -37,8 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up
@@ -47,7 +45,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
 
 variable (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (cDep : ℝ)
 def extensionWithList
@@ -74,13 +71,12 @@ def ModuliPointsExistList' : Prop :=
           ∧ (ListSt cDep x → ListSt cDep x')
 def FinitenessListStatement : Prop :=
   AllSt fun K _ _ _ w P x =>
-    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt)
-        (Γ : GeoP),
+    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt),
       ListSt cDep x
         → ∃ (Z : w.Lt)
             (v : Lv3
               (_root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension
-                (_root_.GlobalTheory.HeightCounting.Up.extensionWithList hL cDep) S Γ).s
+                (_root_.GlobalTheory.HeightCounting.Up.extensionWithList hL cDep) S).s
               K w Z),
           v.Wt = P.Wt ∧ Kept l.c.ch v.nch
 end GlobalTheory.HeightCounting.Up

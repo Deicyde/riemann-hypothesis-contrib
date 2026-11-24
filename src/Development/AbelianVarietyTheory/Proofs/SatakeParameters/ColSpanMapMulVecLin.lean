@@ -52,14 +52,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TwV
 
-theorem colSpan_map_mulVecLin
-    {R K : Type} [CommRing R] [Field K] [Algebra R K] {k : ℕ} (A g : Matrix (Fin k) (Fin k) K)
-    : (Formalism.MainNotions.G.colSpan R g).map (A.mulVecLin.restrictScalars R)
-      = Formalism.MainNotions.G.colSpan R (A * g) := by
-  unfold Formalism.MainNotions.G.colSpan
-  rw [Submodule.map_span, ← Set.range_comp]
-  congr 2
-
 theorem locSp_reindex
     : ∀ {E : Type} [Field E] [NumberField E] (σ : E →+* E) (W K : Type) [CommRing W] [Field K]
         [Algebra W K] (ρ : E →+* K) {n N : ℕ} (h : n = N) (J : Matrix (Fin N) (Fin N) E)
@@ -79,7 +71,7 @@ theorem locSp_reindex
   intro E _ _ σ W K _ _ _ ρ n N h J B g Λ Λ' hΛ hs
   subst h
   obtain rfl := eq_of_heq hΛ
-  rw [colSpan_map_mulVecLin, hs]
+  rw [_root_.Formalism.MainNotions.G.LatticeSystems.je_colSpan_mul, hs]
   rfl
 
 end GlobalTheory.TwV

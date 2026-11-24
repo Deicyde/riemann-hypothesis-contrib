@@ -118,7 +118,7 @@ theorem nonempty_conj_embedding
     e.orthonormal.comp _ (Fin.castLE_injective h)
   let f : EE →ₛₗ[starRingEnd ℂ] EuclideanSpace ℂ (Fin D) := {
     toFun := fun x => ∑ i, (inner ℂ x (b i)) • e (Fin.castLE h i)
-    map_add' := by intro x y; simp [inner_add_left, add_smul, Finset.sum_add_distrib]
+    map_add' := by intro x y; simp [add_smul, Finset.sum_add_distrib]
     map_smul' := by intro c x; simp [Finset.smul_sum, smul_smul, mul_comm]
   }
   refine ⟨⟨f, fun x => ?_⟩⟩

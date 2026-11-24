@@ -3,10 +3,12 @@ module
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTransportF
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwoMulInvOf
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicRapidDecayOfMemAdelicSchwartzSpace
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaTransformEqOrientedThetaFunctionCMStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsThetaFunctionThetaTransformRationalCoordsCMStatement
-import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CtxExists
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumF
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaTransformEqOrientedThetaFunctionCM
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsThetaFunctionThetaTransformRationalCoordsCM
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.EqOfThetaHeisenbergTranslates
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CtxExists
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.RapidDecayAdelicIntegrablePeriodisationContinuou
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -79,7 +81,7 @@ theorem exists_transport
       hΘ (by rw [hr, map_mul, Module.End.mul_apply, Module.End.mul_apply, hr, hr])
   refine ⟨⟨⟨fun g => A.conj ((r g).prodMap LinearMap.id), ?_⟩, fun g h => ?_⟩, fun g x => ?_⟩
   · ext v
-    simp [r1, LinearEquiv.conj_apply_apply, Module.End.one_eq_id]
+    simp [r1, Module.End.one_eq_id]
   · ext v
     simp [rm, LinearEquiv.conj_apply_apply]
   · have h : A.conj ((r g).prodMap LinearMap.id) (x : V) = r g x := by
@@ -404,8 +406,8 @@ theorem exists_isTransportF
     constructor
     · intro hf
       obtain ⟨Φ, hΦ, h⟩ :=
-        GlobalTheory.T.exists_thetaTransform_eq_orientedThetaFunction_CM F E σ B hB nS nT JS JT hS
-          hT ξ₀ hξ0 hσξ hω.std _ (numCoordF co τ) he hr f hf
+        _root_.GlobalTheory.ThetaOntoF.exists_thV_eqF F E σ B hB nS nT JS JT hS hT ξ₀ hξ0 hσξ hω.std
+          _ (numCoordF co τ) he hr f hf
       refine ⟨_, comp_mem_schA τ.symm hΦ, ?_⟩
       rw [thetaTr_eqF co τ, ← h]
       congr 2
@@ -413,8 +415,8 @@ theorem exists_isTransportF
       simp [Function.comp_def]
     · rintro ⟨Φ, hΦ, rfl⟩
       rw [thetaTr_eqF co τ]
-      exact GlobalTheory.T.isThetaFunction_thetaTransform_rational_coords_CM F E σ B hB nS nT JS JT
-        hS hT ξ₀ hξ0 hσξ hω.std _ (numCoordF co τ) he hr _ (comp_mem_schA τ hΦ)
+      exact _root_.GlobalTheory.ThetaTransformF.isThetaFunOF_thV F E σ B hB nS nT JS JT hS hT ξ₀ hξ0
+        hσξ hω.std _ (numCoordF co τ) he hr _ (comp_mem_schA τ hΦ)
   obtain ⟨om, hom⟩ :=
     exists_transport' _ _ _ hadd (thetaTr_smulF co) hinj hon (ω.comp (pairHomF hS hξ0 hA hB'))
       fun p f hf => hω.om_pres _ f hf

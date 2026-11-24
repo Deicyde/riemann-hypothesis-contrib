@@ -127,7 +127,7 @@ theorem word_fun
     by_cases h : τ = p.1
     · subst h; simp [GlobalTheory.BackForm.lettersAt]
     · have h' : ¬ p.1 = τ := fun e => h e.symm
-      simp [GlobalTheory.BackForm.lettersAt, Function.update_of_ne h, List.filter_cons, h']
+      simp [GlobalTheory.BackForm.lettersAt, Function.update_of_ne h, h']
 
 end GlobalTheory.ConjRowCont
 

@@ -109,10 +109,7 @@ theorem bL_last {n m : ℕ} (e es : Fin n) (v : Fin m → Fin n)
   simp only [Function.comp_apply, Fin.succAbove_last]
   cases i using Fin.cases with
   | zero => simp [PI.bE]
-  | succ j =>
-    first
-    | simp [PI.bE, PI.bS, ← Fin.succ_castSucc]
-    | simp [PI.bE, PI.bS, Fin.cons_snoc_eq_snoc_cons]
+  | succ j => first | simp [PI.bE, PI.bS, ← Fin.succ_castSucc]
 
 private theorem mul_intCast_mul_eq_intCast_mul_mul {A : Type*} [Ring A] (s x : A) (z : ℤ)
     : s * ((z : A) * x) = (z : A) * (s * x) := by
@@ -153,7 +150,7 @@ theorem borderFull_of (hFC : ExpFirstCol) (hS : BorderS) (hM : BFMid) : BorderFu
       rw [← mul_assoc, ← mul_assoc, tm_comm_E E hE u e es (v x) hne (hve x)]
   rw [hFC A n (m + 1) E (PI.bE e (PI.bS v es)) (PI.bE e (PI.bS v es)) u, Fin.sum_univ_succ,
     Fin.sum_univ_castSucc]
-  first | simp only [hmid] | rw [Finset.sum_congr rfl (fun w _ => hmid w)]
+  first | simp only [hmid]
   rw [Fin.succAbove_zero, hs, h0v, hL, hLv, hgen]
   simp only [Fin.val_zero, pow_zero, Int.cast_one, one_mul, Fin.val_succ, Fin.val_last]
   rw [hS A n m E e es v hE hv (u - 1), hu, mul_sub (Formalism.REAL.Tm E u e e), hT2,

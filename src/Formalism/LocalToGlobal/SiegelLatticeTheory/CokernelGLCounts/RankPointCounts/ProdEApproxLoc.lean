@@ -84,9 +84,7 @@ theorem mem_latS {c : L.Fp} {x : L.Ep} : x ∈ latS L c ↔ ∃ y ∈ L.O, x = a
 
 theorem alg_mem_O {s : L.Fp} (hs : s ∈ 𝒪[L.Fp]) : algebraMap L.Fp L.Ep s ∈ L.O := by
   refine (L.O_def _).mpr ?_
-  first
-  | exact isIntegral_algebraMap (x := (⟨s, hs⟩ : 𝒪[L.Fp]))
-  | exact (IsScalarTower.algebraMap_apply (𝒪[L.Fp]) L.Fp L.Ep ⟨s, hs⟩) ▸ isIntegral_algebraMap
+  first | exact isIntegral_algebraMap (x := (⟨s, hs⟩ : 𝒪[L.Fp]))
 
 theorem latS_mul {c c' : L.Fp} {x y : L.Ep} (hx : x ∈ latS L c) (hy : y ∈ latS L c')
     : x * y ∈ latS L (c * c') := by

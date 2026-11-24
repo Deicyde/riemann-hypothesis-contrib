@@ -3,10 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicSchwartzSpaceTranslateMemOfMem
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchActionReadingsCompatible
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExistStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExist
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFiniteWeightComplementaryArchimedeanSchwar
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsSchwartzArchimedeanSliceAdelicSchwartz
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeisenbergCommutingOperatorBlindToArchimedeanFibStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeisenbergCommutingOperatorIndependentOfArchimedeanFiber
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -219,7 +220,7 @@ theorem exists_op_of_UAt
     field_simp
     ring
   have h0 :=
-    GlobalTheory.T.heisenbergCommuting_operator_independent_of_archimedeanFibres ψ T0 hψ hkeep
+    _root_.GlobalTheory.FinFibre.fibre_zero ψ T0 hψ hkeep
       (fun u hu p q Φ hΦ => hcomm u hu p q Φ hΦ)
       (Φ₁ - Φ₂) (sub_mem hr.2 hm₂) y hfz
   rw [map_sub, Pi.sub_apply, sub_eq_zero] at h0
@@ -315,7 +316,7 @@ theorem pol_stable_compact
     intro u _
     simp [mat]
   obtain ⟨A, hA⟩ := exists_op_of_UAt hψ hw (1, k) h1 hk.1
-  obtain ⟨D, hD⟩ := GlobalTheory.T.archHeisenbergDerivatives_exist F E σ _ _ _ ψ _ _ M.co hψ
+  obtain ⟨D, hD⟩ := _root_.GlobalTheory.HeisDer.derEx F E σ _ _ _ ψ _ _ M.co hψ
   have hL := actsLaws F (Fin n × Fin d)
   have hSD : ∀ u, At (evI F) u → ∀ φ, SD (M.heisLine ψ u) φ (D u φ) := fun u hu φ => (hD u hu φ).1
   have hAD

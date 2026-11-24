@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.TransvectionPeriodicity
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.HermitianTraceFormVanishing
 
 @[expose] public section
 
@@ -50,15 +51,6 @@ open NumberField ReciprocityTheory.ChartRestriction.G.FD
 open scoped Matrix
 
 namespace GlobalTheory.TransvLevel
-
-theorem herm_smul_left
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {r : ℕ} (G : Matrix (Fin r) (Fin r) E)
-    (c : E) (x y : Fin r → E)
-    : herm G (c • x) y = c * herm G x y := by
-  simp only [herm, Finset.mul_sum, Pi.smul_apply, smul_eq_mul]
-  refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => ?_
-  ring
 
 theorem transv_mem
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : DataX E r) (m : ℕ),
@@ -92,7 +84,8 @@ theorem transv_mem
           = (X.g : E)
             • ((b * ((m : E) * X.κ0) * herm X.Gm ((X.NA : E) • x) v) • ((X.NC : E) • v)) := by
     intro x
-    rw [smul_smul, smul_smul, hαdef, herm_smul_left]
+    rw [smul_smul, smul_smul, hαdef,
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.HermitianTraceFormVanishing.herm_smul_left]
     congr 1
     push_cast
     ring

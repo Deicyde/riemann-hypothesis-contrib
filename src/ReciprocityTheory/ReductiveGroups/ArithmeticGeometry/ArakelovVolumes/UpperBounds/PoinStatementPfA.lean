@@ -70,7 +70,7 @@ theorem rmulDom
     : rmul x b ∈ X.dom :=
   OrthogonalFrameDomain.rmul_mem_dom X hx hb
 
-theorem isOpenDom (X : Data E r) : IsOpen X.dom := FourierCoefficientDomain.isOpen_dom X
+alias isOpenDom := _root_.ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientDomain.isOpen_dom
 
 theorem lact_mul' {Ψ : Finset (E →+* ℂ)} (γ γ' : GL (Fin r) E) (x : Frame Ψ r)
     : lact (γ * γ') x = lact γ (lact γ' x) := by
@@ -153,16 +153,6 @@ namespace ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf
 
 open Metric
 
-theorem fderiv_bound_ball
-    {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℂ Y]
-    {g : Y → ℂ} {y : Y} {R M : ℝ}
-    (hR : 0 < R) (hg : DifferentiableOn ℂ g (ball y (2 * R))) (hM : ∀ v ∈ ball y (2 * R), ‖g v‖ ≤ M)
-    : ‖fderiv ℂ g y‖ ≤ M / R := by
-  first
-  | exact Bl.general_b_fact_version.goal1 ..
-  | (apply Bl.general_b_fact_version.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_version.goal1 <;> assumption)
-
 theorem differentiableOn_tsum_loc
     {ι Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℂ Y]
     {U : Set Y} (hU : IsOpen U)
@@ -190,7 +180,7 @@ theorem differentiableOn_tsum_loc
   have hder : ∀ i, ∀ y ∈ ball y0 R, HasFDerivAt (f i) (fderiv ℂ (f i) y) y := fun i y hy =>
     ((hf i y (hin y hy)).differentiableAt (hU.mem_nhds (hin y hy))).hasFDerivAt
   have hbd : ∀ i, ∀ y ∈ ball y0 R, ‖fderiv ℂ (f i) y‖ ≤ u i / R := fun i y hy =>
-    fderiv_bound_ball hR0 ((hf i).mono ((hsub y hy).trans hδ'))
+    _root_.Bl.general_b_fact_version.goal1 hR0 ((hf i).mono ((hsub y hy).trans hδ'))
       (fun v hv => hub i v (hε' (hsub y hy hv)))
   have hs :=
     hasFDerivAt_tsum_of_isPreconnected (hu.div_const R) isOpen_ball

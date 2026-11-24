@@ -54,6 +54,7 @@ import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.HasTeich
 import Formalism.LocalToGlobal.ProjectiveLattices.SubConstMemOrig
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import Formalism.LocalToGlobal.CharacterGerms.CharacteristicFromRanks
 
 @[expose] public section
 
@@ -295,18 +296,6 @@ open scoped BigOperators in
 open NumberField in
 open Finsupp in
 variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] in
-private lemma mvExp_zero_eq_one' {α : Type} : _root_.Formalism.IncomingBounds.mvExp (0 : MvPowerSeries α C) = 1 := by
-  ext m
-  show (∑ k ∈ Finset.range (m.degree + 1),
-    MvPowerSeries.coeff m ((0 : MvPowerSeries α C) ^ k) / (k.factorial : C)) =
-      MvPowerSeries.coeff m 1
-  rw [Finset.sum_range_succ']
-  simp
-
-open scoped BigOperators in
-open NumberField in
-open Finsupp in
-variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] in
 private lemma rowCopy_eq_rename_rowEmb {N : ℕ} (ρ : Fin N) (g : MvPowerSeries (_root_.Formalism.L2.FormalSeriesBounds.WV I) C) :
     _root_.Formalism.L2.FormalSeriesBounds.rowCopy ρ g = MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb ρ) g := by
   unfold _root_.Formalism.L2.FormalSeriesBounds.rowCopy
@@ -415,7 +404,8 @@ theorem _root_.GlobalTheory.JetProd.jetProd : _root_.Formalism.L2.FormalSeriesBo
         unfold _root_.Formalism.L2.FormalSeriesBounds.kindAll; rw [dite_eq_right hn]
       rw [hZ1, hK]
       show MvPowerSeries.rename _ (1 * _root_.Formalism.IncomingBounds.mvExp 0) = 1
-      rw [mvExp_zero_eq_one', mul_one, map_one]
+      rw [_root_.Formalism.L2.FormalSeriesBounds.CharacteristicFromRanks.mvExp_zero, mul_one,
+        map_one]
     · intro s
       rw [hZ, _root_.Formalism.L2.FormalSeriesBounds.kindAll_pl hpl]
   simp only [valOf_eq_jetAt0_prod_rename_rowSer]

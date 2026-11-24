@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.product_of_sections_expands_to_convolution
     : LL
       → AllUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.product_of_sections_expands_to_convolution
                           SumF I F
                             (fun χ => coef s g w χ * coef s' g w' (α - χ))
                             (coef s'' g w'' α) := by
-  first
-  | exact @GlobalTheory.UT.ProdConv.main
-  | exact GlobalTheory.UT.ProdConv.main
-  | (intros; apply GlobalTheory.UT.ProdConv.main <;> assumption)
+  first | exact @GlobalTheory.UT.ProdConv.main

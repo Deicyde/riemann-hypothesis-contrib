@@ -230,14 +230,9 @@ section Transl
 
 variable {K : Type} [Field K] {A : Over (Sp K)} [GrpObj A]
 
-theorem dualMap_comp_algebraMap {B B' : Type} [CommRing B] [CommRing B'] (φ : B →+* B')
-    : (dualMap φ).comp (algebraMap B (DualNumber B)) = (algebraMap B' (DualNumber B')).comp φ := by
-  ext b <;> simp [dualMap, TrivSqZeroExt.algebraMap_eq_inl']
+alias dualMap_comp_algebraMap := _root_.Formalism.L2.Pj.dualMap_alg
 
-theorem dualMap_comp_dualMap
-    {B B' B'' : Type} [CommRing B] [CommRing B'] [CommRing B''] (φ : B →+* B') (ψ : B' →+* B'')
-    : (dualMap ψ).comp (dualMap φ) = dualMap (ψ.comp φ) := by
-  ext c <;> simp [dualMap]
+alias dualMap_comp_dualMap := _root_.GlobalTheory.Frames.Glue.dual_comp
 
 theorem exists_isTransl
     {B : Type} [CommRing B]
@@ -295,12 +290,7 @@ theorem IsTransl.map
       dualMap_comp_algebraMap]
   · change spMap (dualMap ρ) ≫ v'.left = _
     rw [hv', ← Category.assoc, ← Cris.spMap_comp, dualMap_comp_dualMap]
-  · have e : g ≫ x' * g ≫ v' = g ≫ (x' * v') := by
-      first
-      | exact (comp_mul g x' v').symm
-      | exact (Hom.comp_mul g x' v').symm
-      | exact (MonObj.comp_mul g x' v').symm
-      | simp
+  · have e : g ≫ x' * g ≫ v' = g ≫ (x' * v') := by first | exact (comp_mul g x' v').symm
     rw [e]
     rfl
 
@@ -314,7 +304,7 @@ theorem IsTransl.red
       : spMap (TrivSqZeroExt.fstHom B B B).toRingHom ≫ spMap ((algebraMap B (DualNumber B)).comp φ)
         = spMap φ := by
     rw [← Cris.spMap_comp]
-    congr 1 <;> (ext b; simp [TrivSqZeroExt.algebraMap_eq_inl'])
+    congr 1
   let g : Over.mk (spMap φ) ⟶ Over.mk (spMap ((algebraMap B (DualNumber B)).comp φ)) :=
     Over.homMk _ eg
   have e1 : g ≫ v' = 1 := by
@@ -328,22 +318,12 @@ theorem IsTransl.red
       exact RingHom.ext fun c ↦ by simp [dualMap]
     rw [e3, Cris.spMap_comp, Category.assoc, hv]
     congr 1
-    all_goals
-      first
-      | exact (Over.toUnit_left _).symm
-      | exact (Over.w (toUnit (Over.mk (spMap φ)))).symm.trans (Category.comp_id _)
-      | (have h1 := Over.w (toUnit (Over.mk (spMap φ))); simpa using h1.symm)
-  have e : g ≫ x' * g ≫ v' = g ≫ (x' * v') := by
-    first
-    | exact (comp_mul g x' v').symm
-    | exact (Hom.comp_mul g x' v').symm
-    | exact (MonObj.comp_mul g x' v').symm
-    | simp
+  have e : g ≫ x' * g ≫ v' = g ≫ (x' * v') := by first | exact (comp_mul g x' v').symm
   have e4
       : (TrivSqZeroExt.fstHom B B B).toRingHom.comp (algebraMap B (DualNumber B))
         = RingHom.id B := by
     ext b
-    simp [TrivSqZeroExt.algebraMap_eq_inl']
+    simp
   calc
     spMap (TrivSqZeroExt.fstHom B B B).toRingHom ≫ (x' * v').left
       = (g ≫ (x' * v')).left := rfl
@@ -417,12 +397,7 @@ theorem Pt.In.tr {P : GPt A} {U : A.left.Opens} (h : P.In U) {v : epsR K ⟶ A} 
           ≫ spMap (TrivSqZeroExt.fstHom P.B P.B P.B).toRingHom).base y
         = y := by
     rw [← Cris.spMap_comp]
-    first
-    | exact key y
-    | (simp only [spMap]; exact key y)
-    | (simp only [spMap, Scheme.Spec_map_base]; exact key y)
-    | (simp [spMap]; exact key y)
-    | (simp only [spMap]; done)
+    first | exact key y
   have h1
       : (spMap (TrivSqZeroExt.fstHom P.B P.B P.B).toRingHom ≫ P.trx v).base
           ((spMap (algebraMap P.B (DualNumber P.B))).base y)
@@ -476,7 +451,7 @@ theorem fibMor (h : IsGrpPullback A A' (DeRham.epsRed K) i)
     : GrpMor (dp0 (DualNumber K)) (𝟙 _) A' (dp0 K) (𝟙 _) A (TrivSqZeroExt.fstHom K K K).toRingHom
       (DeRham.epsRed K) i :=
   GrpMor.of_isGrpPullback (isDPMorphism_of_eq_bot _ rfl _ _)
-    (by rw [Category.comp_id, Category.id_comp] <;> rfl) h
+    (by rw [Category.comp_id, Category.id_comp]) h
 
 omit [GrpObj A] in
 @[reducible]

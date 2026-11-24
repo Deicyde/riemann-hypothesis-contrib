@@ -44,8 +44,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -60,6 +58,7 @@ open GlobalTheory.StepData GlobalTheory.SplitWeil
 open ValuativeRel
 noncomputable section
 namespace GlobalTheory.PenLev
+
 theorem tuple_free_level_moves_alt
     : ∀ {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws}
         {Z : TC.Later B (I.cols l)} {L : SizeData₂ (I.rec7 l Z)} {hT : GatTies (I.rec7 l Z)}
@@ -82,7 +81,7 @@ theorem tuple_free_level_moves_alt
     rw [_root_.GlobalTheory.PenBridge.eq_s_succ_of_succ_eq_m J hj i]
     exact ⟨y⟩
   let α : J.Ch j := fun i => (hch i).some
-  rw [← _root_.GlobalTheory.T.true_geometry_tuple_free_relation_alt W hW u a ha hTr j hj t J hJ α,
+  rw [← _root_.GlobalTheory.PenLev.relaxed_level_eq_tuple_free_alt W hW u a ha hTr j hj t J hJ α,
       _root_.GlobalTheory.PenLev.mem_relax_iff']
     at hg
   obtain ⟨-, -, hK⟩ := hg

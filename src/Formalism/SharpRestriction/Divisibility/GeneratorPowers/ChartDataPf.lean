@@ -85,7 +85,6 @@ theorem mk_psTrunc
       = Ideal.Quotient.mk _
         (psTrunc m f - MvPolynomial.C (MvPolynomial.constantCoeff (psTrunc m f))) := by
   have h0 : MvPolynomial.constantCoeff (psTrunc m f) = 0 := by
-
     simp only [psTrunc, map_sum, MvPolynomial.constantCoeff_monomial]
     refine Finset.sum_eq_zero fun x _ => ?_
     split_ifs with hx

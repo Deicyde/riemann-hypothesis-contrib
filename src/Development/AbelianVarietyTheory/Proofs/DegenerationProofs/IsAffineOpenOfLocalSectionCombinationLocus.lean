@@ -62,7 +62,6 @@ def secComb {X : Scheme.{0}} {H : LB X} {J : Type} [Fintype J] (a : J → Γ(X, 
     : H.Sec where
   f l := ∑ k, resG X le_top (a k) * (s k).f l
   compat i j := by
-
     rw [map_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     have e

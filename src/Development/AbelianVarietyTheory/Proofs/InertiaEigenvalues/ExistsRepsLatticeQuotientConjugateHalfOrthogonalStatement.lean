@@ -57,6 +57,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
 open GlobalTheory.DownLift.GenFinite
 open GlobalTheory.DownLift.SplitCoef
+
 theorem _root_.GlobalTheory.T.exists_reps_latticeQuotient_conjugateHalf_orthogonal
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
       IsStdChar D ψ (-1)
@@ -78,7 +79,4 @@ theorem _root_.GlobalTheory.T.exists_reps_latticeQuotient_conjugateHalf_orthogon
                                 → ∀ y ∈ Y, ψ (symplO S T x y) = 1)
                               ∧ ((¬ ∃ u ∈ latH S T ΛS ΛT, IsHalf a u ∧ x = k • u)
                                 → ∑ y ∈ Y, ψ (symplO S T x y) = 0) := by
-  first
-  | exact @GlobalTheory.DownLift.GenQuot.reps_orth
-  | exact GlobalTheory.DownLift.GenQuot.reps_orth
-  | (intros; apply GlobalTheory.DownLift.GenQuot.reps_orth <;> assumption)
+  first | exact @GlobalTheory.DownLift.GenQuot.reps_orth

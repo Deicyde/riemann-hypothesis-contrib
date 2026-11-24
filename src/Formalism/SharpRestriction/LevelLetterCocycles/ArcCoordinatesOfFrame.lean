@@ -636,9 +636,7 @@ theorem Nl_le_N (T : LocLat G Qp LL O) (c : ZMod n) {x : W.DD T} (hx : x ∈ W.N
   simp only [LinearMap.smul_apply, LinearMap.id_apply]
   exact (W.N T).smul_mem _ hz
 
-theorem map_smulA {T₁ T₂ : LocLat G Qp LL O} (F : LatHom T₁.L T₂.L) (a : LetA O n) (x : W.DD T₁)
-    : W.map F (a • x) = a • W.map F x :=
-  ((W.map F).restrictScalars (LetA O n)).map_smul a x
+alias map_smulA := _root_.Formalism.MainNotions.LiftingTheory.wmap_map_smul
 
 theorem map_smulO {T₁ T₂ : LocLat G Qp LL O} (F : LatHom T₁.L T₂.L) (c : O) (x : W.DD T₁)
     : W.map F (c • x) = c • W.map F x := by
@@ -666,7 +664,6 @@ theorem arcL_at [NeZero n] (hΔ : IsUnit ((W.DelF.card : ℕ) : O))
   have hlp : Formalism.MainNotions.LiftingTheory.lp W rr • x₂ = (((PD.p : ℕ) : O) ^ rr) • x₂ := by
     rw [← algebraMap_smul (LetA O n) (((PD.p : ℕ) : O) ^ rr) x₂, map_pow, map_natCast]; rfl
   have hmap1 : W.map F x₁ = (((PD.p : ℕ) : O) ^ rr) • x₂ := by
-
     rw [hx₁, map_smulO, map_sum]
     have h1 : ∀ δ ∈ W.DelF, W.map F (W.γD T₁ δ x₁') = (((PD.p : ℕ) : O) ^ rr) • x₂ := by
       intro δ hδ

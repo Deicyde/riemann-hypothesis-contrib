@@ -205,8 +205,7 @@ theorem exists_highest_coordinate_functional
     show e.symm (P w) = 0
     rw [h2, map_zero]
   · intro x
-    have h8 : ∀ s : KK O, ((e s : Submodule.span (KK O) {v}) : V) = s • v := fun s => by
-      first | rfl | simp [e, LinearEquiv.toSpanNonzeroSingleton_apply]
+    have h8 : ∀ s : KK O, ((e s : Submodule.span (KK O) {v}) : V) = s • v := fun s => by first | rfl
     have h3 : (e.symm (P x)) • v = (P x : V) := by rw [← h8, LinearEquiv.apply_symm_apply]
     show x - (e.symm (P x)) • v ∈ otherWts E lam
     rw [h3]

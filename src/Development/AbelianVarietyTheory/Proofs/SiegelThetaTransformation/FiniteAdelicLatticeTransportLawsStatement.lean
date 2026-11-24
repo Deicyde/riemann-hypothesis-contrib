@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.finiteAdelicLatticeTransport_laws
     : ∀ (D : D7) (k : ℕ) (L : Lt D.host.E k),
       (L.FG ∧ Submodule.span D.host.E (L : Set (Fin k → D.host.E)) = ⊤)
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.finiteAdelicLatticeTransport_laws
                           → IsMov m (𝔞 • L) (𝔞 • L') ∧ IsMov m (idq 𝔞 𝔟 L) (idq 𝔞 𝔟 L')
                             ∧ (idq 𝔞 𝔟 L).FG
                             ∧ Submodule.span D.host.E (idq 𝔞 𝔟 L : Set (Fin k → D.host.E)) = ⊤ := by
-  first
-  | exact @GlobalTheory.Ker.isMov_laws
-  | exact GlobalTheory.Ker.isMov_laws
-  | (intros; apply GlobalTheory.Ker.isMov_laws <;> assumption)
+  first | exact @GlobalTheory.Ker.isMov_laws

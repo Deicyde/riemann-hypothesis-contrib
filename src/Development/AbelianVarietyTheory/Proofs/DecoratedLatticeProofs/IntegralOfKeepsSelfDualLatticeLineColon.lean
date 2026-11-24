@@ -54,9 +54,6 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter (compFin ExtUnr
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.ColonInt
 
 theorem mem_int_of_pow

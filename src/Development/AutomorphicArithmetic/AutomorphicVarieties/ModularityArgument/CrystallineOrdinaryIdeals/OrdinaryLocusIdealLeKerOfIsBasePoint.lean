@@ -2,11 +2,11 @@ module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsInertiaInfiniteCyclotomic
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.ConjStable
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.SaturatedOrdinaryIdealCutsOutCrystallineLocusStatement
-import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.CrLift
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.SaturatedOrdinaryIdealCutsOutCrystallineLocus
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsTypeAndIsLocallyCrystallineRz
-import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.PtCont
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.SmoothCompl
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.CrLift
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.PtCont
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.UnivEx
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.UnramifiedLiftDeformation
 import Mathlib.Algebra.Order.Floor.Extended
@@ -176,7 +176,7 @@ theorem GlobalTheory.OrdLoc.saturatedOrdinaryIdeal_smooth_at_residualRep
                 ∧ (∃ y, x y ≠ 0 ∧ ∀ a ∈ P, y * a ∈ D.IY U) ∧ P = D.It U ∧ D.primesAt0 U = {P}
                 ∧ ringKrullDim (U.R ⧸ P) = (n + 1 : ℕ) := by
   intro hL l _ O _ _ _ _ _ _ _ D U E _ _ _ _ _ _ _ _ x hx
-  obtain ⟨hPC, hCP⟩ := GlobalTheory.T.saturatedOrdinaryIdeal_cuts_out_crystalline_locus hL D U
+  obtain ⟨hPC, hCP⟩ := _root_.GlobalTheory.OrdLoc.ideal_cuts_crystalline_locus hL D U
   refine ⟨GlobalTheory.OrdLoc.SmoothPushforward.le_ker D U E x hx _ hCP, ?_⟩
   obtain ⟨n, P, φ, hφ, hIP, hy, hQ, hP, hdim⟩ :=
     GlobalTheory.OrdLoc.SmoothPushforward.smooth D U E x hx _ hPC hCP hL

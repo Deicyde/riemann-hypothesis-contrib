@@ -42,8 +42,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting.Blocks
@@ -78,7 +76,6 @@ theorem local_parameter_twist_abs_pow
           UpperTheory.One.M.opn _ (_root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h)
         obtain ⟨_, _, _, H⟩ := hOpn
       )
-    | obtain ⟨_, _, _, -, H⟩ := _root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h
     refine (_root_.GlobalTheory.CuspRep.ParLaws.local_parameter_eq_reciprocity_of_is_local_component
       hL (hσ.twist ν) h).trans ?_
     rw [show _root_.GlobalTheory.CuspRep.ParLawsT.locParT hL (Quotient.mk _ π) h = _ from

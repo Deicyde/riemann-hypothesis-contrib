@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.InvariantProjectionRangeTrivial
 
 @[expose] public section
 
@@ -125,23 +126,6 @@ theorem equivariant_lifts_monoid
     obtain ⟨u2, hu2, h2⟩ := ihy
     exact ⟨u1 * u2, mul_mem hu1 hu2, fun z => (h1 (u2 z)).trans (congrArg x (h2 z))⟩
 
-private theorem exists_Umon_intertwined_of_isEquivariantMap
-    (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T)
-    {u : Module.End K V} (hu : u ∈ Umon E)
-    : ∃ u' ∈ Umon E', ∀ y, T (u y) = u' (T y) := by
-  have hu' : u ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => E ab.1 ab.2) := hu
-  clear hu
-  induction hu' using Submonoid.closure_induction with
-  | mem x hx =>
-    obtain ⟨⟨a, b⟩, rfl⟩ := hx
-    exact ⟨E' a b, Submonoid.subset_closure ⟨(a, b), rfl⟩, fun y => hT a b y⟩
-  | one =>
-    exact ⟨1, one_mem _, fun y => rfl⟩
-  | mul x y _ _ ihx ihy =>
-    obtain ⟨u1, hu1, h1⟩ := ihx
-    obtain ⟨u2, hu2, h2⟩ := ihy
-    exact ⟨u1 * u2, mul_mem hu1 hu2, fun z => (h1 (y z)).trans (congrArg u1 (h2 z))⟩
-
 theorem equivariant_map_cyclicSubmodule
     (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T) (v : V)
     : (cyclicSubmodule E v).map T = cyclicSubmodule E' (T v) := by
@@ -151,7 +135,8 @@ theorem equivariant_map_cyclicSubmodule
   ext x
   constructor
   · rintro ⟨w, ⟨u, hu, rfl⟩, rfl⟩
-    obtain ⟨u', hu', h⟩ := exists_Umon_intertwined_of_isEquivariantMap E E' T hT hu
+    obtain ⟨u', hu', h⟩ :=
+      _root_.Formalism.MainNotions.G.GLWeightTheory.equivariant_intertwines_monoid E E' T hT hu
     exact ⟨u', hu', h v⟩
   · rintro ⟨u', hu', rfl⟩
     obtain ⟨u, hu, h⟩ := equivariant_lifts_monoid E E' T hT hu'
@@ -262,7 +247,6 @@ theorem equivariant_injective_of_cyclic
         H y = t • y → H (EG a b y) = (t + (((a : ℕ) : K) - ((b : ℕ) : K))) • EG a b y := by
     intro a b y t hy
     have e1 : ∑ c : Fin n, ((c : ℕ) : K) • EG a b (EG c c y) = EG a b (H y) := by
-
       rw [hHapp, map_sum]
       simp only [map_smul]
     have e2

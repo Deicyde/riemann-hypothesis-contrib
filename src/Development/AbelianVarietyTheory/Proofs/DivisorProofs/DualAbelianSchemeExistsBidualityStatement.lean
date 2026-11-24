@@ -48,9 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.dualAbelianScheme_exists_biduality
     : GlobalTheory.Published.DualAbelianScheme := by
-  first
-  | exact @GlobalTheory.dualAbelianScheme
-  | exact GlobalTheory.dualAbelianScheme
-  | (intros; apply GlobalTheory.dualAbelianScheme <;> assumption)
+  first | exact @GlobalTheory.dualAbelianScheme

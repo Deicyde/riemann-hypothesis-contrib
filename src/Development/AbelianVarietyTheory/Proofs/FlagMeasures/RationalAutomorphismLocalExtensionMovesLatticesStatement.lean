@@ -46,6 +46,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
   Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
   GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.rationalAutomorphism_local_extension_moves_lattices
     : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
       ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.rationalAutomorphism_local_extension_moves_lattice
                   LocOver Λ y
                     → ∃ y',
                       LocOver (Formalism.HermitianLatticesTheory.gmap h Λ) y' ∧ RMoves h y y' := by
-  first
-  | exact @GlobalTheory.RatLocMove.rat_ext_moves
-  | exact GlobalTheory.RatLocMove.rat_ext_moves
-  | (intros; apply GlobalTheory.RatLocMove.rat_ext_moves <;> assumption)
+  first | exact @GlobalTheory.RatLocMove.rat_ext_moves

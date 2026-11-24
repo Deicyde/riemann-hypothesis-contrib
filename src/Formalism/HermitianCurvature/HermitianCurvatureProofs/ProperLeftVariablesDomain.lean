@@ -101,7 +101,7 @@ theorem jfSliceIntN
           = {x | x ∈ B.GV k (p + ρ) ∧ U.DjU k p ρ x ≠ 0} := by
       ext x
       show _ ∧ _ ↔ _ ∧ _
-      rw [Formalism.FourierDecayAlt.P.hat_z_minimum_degree k p ρ B0.z B0.z' x]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux3.zhDmin k p ρ B0.z B0.z' x]
     have hHc' : ContinuousOn H {x | x ∈ B.GV k (p + ρ) ∧ U.DjU k p ρ x ≠ 0} := hset ▸ hHc
     have h :=
       (Formalism.FourierDecayAlt.P.slice_integral_jacobian_factor hp σ d hd Bj B0 hz'.symm hπ'' hW'
@@ -143,14 +143,14 @@ theorem pt_eq
     : D.castM e0
         (U.mMap k j (r - j) Z (D.castM h1 (U.mMap k 1 (r - (j + 1)) (Matrix.of fun _ _ => τ) γ)))
       = LevelPointCoordinates.x0 k r j hj Z τ γ := by
-  rw [mMap_castM, Formalism.FourierDecayAlt.P.PBH.asm_castM_castM]
+  rw [mMap_castM, _root_.Formalism.FourierDecayAlt.P.Dx2.SplitF.castM_castM]
   unfold LevelPointCoordinates.x0 LevelPointCoordinates.zfull
   have hM
       : D.castM (Formalism.FourierDecayAlt.P.PBH.hs' k j (r - (j + 1)))
           (U.mMap k j (1 + (r - (j + 1))) Z (U.mMap k 1 (r - (j + 1)) (Matrix.of fun _ _ => τ) γ))
         = U.mMap k (j + 1) (r - (j + 1)) (U.blk2 Z 0 0 (Matrix.of fun _ _ => τ)) γ :=
     Formalism.FourierDecayAlt.P.PBH.M2 (k := k) (ρ := r - (j + 1)) Z hZ τ hτ γ
-  rw [← hM, Formalism.FourierDecayAlt.P.PBH.asm_castM_castM]
+  rw [← hM, _root_.Formalism.FourierDecayAlt.P.Dx2.SplitF.castM_castM]
 
 end pt
 

@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsRegularFnIffOfIsAffineOpen
 
 @[expose] public section
 
@@ -47,12 +48,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 
 namespace GlobalTheory.DlogCocycle
-
-theorem resG_resG {X : Scheme.{0}} {U V T : X.Opens} (h : V ≤ U) (h' : T ≤ V) (f : Γ(X, U))
-    : resG X h' (resG X h f) = resG X (h'.trans h) f := by
-  simp only [resG]
-  rw [← CommRingCat.comp_apply, ← Functor.map_comp]
-  rfl
 
 theorem res_val {X : Scheme.{0}} {U V : X.Opens} (h : V ≤ U) (u : Γ(X, U)ˣ)
     : (res h u).val = resG X h u.val :=
@@ -63,7 +58,8 @@ theorem resG_dlog
     {P A T : Z.Opens} (hA : A ≤ W₀) (hTA : T ≤ A) (hAP : A ≤ P) (u : Γ(Z, P)ˣ)
     : resG Z hTA (d A (resG Z hAP u.val) * resG Z hAP u⁻¹.val)
       = d T (resG Z (hTA.trans hAP) u.val) * resG Z (hTA.trans hAP) u⁻¹.val := by
-  rw [map_mul, ← hd.2.2 A T hTA hA, resG_resG, resG_resG]
+  rw [map_mul, ← hd.2.2 A T hTA hA, _root_.GlobalTheory.Cartier.resG_resG,
+    _root_.GlobalTheory.Cartier.resG_resG]
 
 theorem dlog_cocycle
     : ∀ (Z : Scheme.{0}) (L : LB Z),
@@ -95,7 +91,7 @@ theorem dlog_cocycle
     resG_dlog hd ((inf_le_left : W i' ⊓ W i'' ≤ W i').trans (hW i')),
     resG_dlog hd ((inf_le_left : W i ⊓ W i'' ≤ W i).trans (hW i))]
   have e := congrArg (fun u => resG Z hT u.val) (hL.cocycle (j i) (j i') (j i''))
-  simp only [Units.val_mul, map_mul, res_val, resG_resG] at e
+  simp only [Units.val_mul, map_mul, res_val, _root_.GlobalTheory.Cartier.resG_resG] at e
   have inv
       : ∀ {P : Z.Opens} (h : W i ⊓ W i' ⊓ W i'' ≤ P) (u : Γ(Z, P)ˣ),
         resG Z h u.val * resG Z h u⁻¹.val = 1 := fun h u => by

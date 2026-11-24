@@ -184,16 +184,7 @@ theorem semisimple_decomposition_of
     rfl
   have hdiag : ∀ d : Fin D.R.t → KK D.nd i, (Matrix.diagonal d).charpoly = ∏ c, (X - C (d c)) := by
     intro d
-    first
-    | exact Matrix.charpoly_diagonal d
-    | (
-        unfold Matrix.charpoly
-        rw [show Matrix.charmatrix (Matrix.diagonal d)
-            = Matrix.diagonal fun c => X - C (d c) from by
-          ext a b
-          by_cases h : a = b <;> simp [Matrix.charmatrix_apply, Matrix.diagonal_apply, h]]
-        exact Matrix.det_diagonal
-      )
+    first | exact Matrix.charpoly_diagonal d
   obtain ⟨Pm, hPm⟩ :=
     hBN (KK D.nd i) (D.R.r + D.R.t) (mapRep (toK D.nd i) (r π)) (rhoChiK D i (ρ π)) hSS1 hSS (by
       intro g

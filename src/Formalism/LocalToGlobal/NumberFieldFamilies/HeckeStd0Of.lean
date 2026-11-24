@@ -50,8 +50,6 @@ namespace Formalism.L2.Fam.NPC.LatticeFinitenessFree
 
 open Formalism.L2.Fam.NPC
 
-
-
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (B : LocBase0 H what₂)
 
 def latJ (j : ℕ) (w : what₂.places.Pl) : Set (what₂.MtL (what₂.muTw w) j) :=

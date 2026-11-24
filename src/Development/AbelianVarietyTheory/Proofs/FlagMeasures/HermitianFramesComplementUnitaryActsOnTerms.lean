@@ -1,11 +1,11 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MoveLatticeIsTermSameDatumWithWitnesses
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BasisOfIsCompl
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemPerpSpan
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SelfDualLatticeUnipotentTranslateStandardStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermInvariantsIndependentOfWitnessesStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SelfDualLatticeUnipotentTranslateStandard
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermInvariantsIndependentOfWitnesses
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MoveLatticeIsTermSameDatumWithWitnesses
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -70,8 +70,8 @@ theorem mem_smul (h : S.GLV) (Λ : Submodule L.O S.V) (x : S.V) : x ∈ h • Λ
   · intro hx
     exact ⟨_, hx, h.apply_symm_apply x⟩
 
-theorem isSD_smul {h : S.GLV} (hh : h ∈ isomG L S.Hm) {Λ : Submodule L.O S.V} (hΛ : IsSD L S.Hm Λ) :
-    IsSD L S.Hm (h • Λ) := by
+theorem isSD_smul {h : S.GLV} (hh : h ∈ isomG L S.Hm) {Λ : Submodule L.O S.V} (hΛ : IsSD L S.Hm Λ)
+    : IsSD L S.Hm (h • Λ) := by
   apply GlobalTheory.HL.MoveWit.isSD_smul <;> assumption
 
 theorem spanTo_mono (g : Fin (r + 1) → S.V) : S.spanTo g r ≤ S.spanTo g (r + 1) :=
@@ -80,9 +80,10 @@ theorem spanTo_mono (g : Fin (r + 1) → S.V) : S.spanTo g r ≤ S.spanTo g (r +
 theorem mem_spanTo (g : Fin (r + 1) → S.V) (b : Fin (r + 1)) : g b ∈ S.spanTo g (r + 1) :=
   Submodule.subset_span ⟨b, b.2, rfl⟩
 
-theorem spanTo_le_perp {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
-    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es')) :
-    S.spanTo g (r + 1) ≤ perp L S.Hm (S.spanTo g r) := by
+theorem spanTo_le_perp
+    {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
+    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es'))
+    : S.spanTo g (r + 1) ≤ perp L S.Hm (S.spanTo g r) := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨i, -, rfl⟩
   rw [Frames.spanTo, image_lt, SetLike.mem_coe, mem_perp_span]
@@ -90,14 +91,20 @@ theorem spanTo_le_perp {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
   · intro j; simp [S.gram, Fin.castSucc_ne_last]
   · intro j; simp [S.gram', Fin.castSucc_ne_last]
 
-theorem nof_mem {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
-    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es')) {n : S.GLV} (hn : n ∈ S.Nof g)
-    {x : S.V} (hx : x ∈ S.spanTo g (r + 1)) : n x ∈ S.spanTo g (r + 1) := by
+theorem nof_mem
+    {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
+    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es'))
+    {n : S.GLV} (hn : n ∈ S.Nof g)
+    {x : S.V} (hx : x ∈ S.spanTo g (r + 1))
+    : n x ∈ S.spanTo g (r + 1) := by
   have := spanTo_mono S g (hn.2.2 x (spanTo_le_perp S hg hx))
   simpa using Submodule.add_mem _ this hx
 
-theorem perp_map {h : S.GLV} (hh : h ∈ isomG L S.Hm) {Y : Submodule E S.V} (hY : ∀ y ∈ Y, h y = y)
-    {x : S.V} (hx : x ∈ perp L S.Hm Y) : h x ∈ perp L S.Hm Y := fun y hy => by
+theorem perp_map
+    {h : S.GLV} (hh : h ∈ isomG L S.Hm)
+    {Y : Submodule E S.V} (hY : ∀ y ∈ Y, h y = y)
+    {x : S.V} (hx : x ∈ perp L S.Hm Y)
+    : h x ∈ perp L S.Hm Y := fun y hy => by
   rw [← hY y hy, hh x y]; exact hx y hy
 
 theorem inv_fix {h : S.GLV} {x : S.V} (hx : h x = x) : h⁻¹ x = x := by
@@ -106,10 +113,13 @@ theorem inv_fix {h : S.GLV} {x : S.V} (hx : h x = x) : h⁻¹ x = x := by
 
 variable [IsNonarchimedeanLocalField F] [CharZero F]
 
-theorem inner_iff {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
-    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es')) {A : Submodule L.O S.V}
-    (hA : S.IsInner g gs A) {n : S.GLV} (hn : n ∈ S.Nof g) (x : S.V) :
-    x ∈ A ↔ ∃ y ∈ n • S.stdLat g gs A, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r := by
+theorem inner_iff
+    {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
+    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es'))
+    {A : Submodule L.O S.V} (hA : S.IsInner g gs A)
+    {n : S.GLV} (hn : n ∈ S.Nof g)
+    (x : S.V)
+    : x ∈ A ↔ ∃ y ∈ n • S.stdLat g gs A, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r := by
   rw [(stdLat_spec L r k S g gs hg A hA).2.2 x]
   have hi := (S.Nof g).inv_mem hn
   constructor
@@ -120,76 +130,105 @@ theorem inner_iff {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
     refine ⟨n⁻¹ y, (mem_smul S n _ y).1 hy, (hi.2.1 y).2 h1, ?_⟩
     simpa using Submodule.add_mem _ (hi.2.2 y h1) h2
 
-theorem side {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
-    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es')) {A : Submodule L.O S.V}
-    (hA : S.IsInner g gs A) {n : S.GLV} (hn : n ∈ S.Nof g) {h : S.GLV} (hh : h ∈ isomG L S.Hm)
-    (hfix : ∀ x ∈ S.spanTo g (r + 1), h x = x) :
-    S.IsInner g gs (h • A) ∧ ∃ m ∈ S.Nof g, (∀ b, m (g b) = n (g b)) ∧
-      h • n • S.stdLat g gs A = m • S.stdLat g gs (h • A) := by
+theorem side
+    {g : Fin (r + 1) → S.V} {gs : Fin r → S.V}
+    (hg : (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es'))
+    {A : Submodule L.O S.V} (hA : S.IsInner g gs A)
+    {n : S.GLV} (hn : n ∈ S.Nof g)
+    {h : S.GLV} (hh : h ∈ isomG L S.Hm) (hfix : ∀ x ∈ S.spanTo g (r + 1), h x = x)
+    : S.IsInner g gs (h • A)
+      ∧ ∃ m ∈ S.Nof g,
+        (∀ b, m (g b) = n (g b)) ∧ h • n • S.stdLat g gs A = m • S.stdLat g gs (h • A) := by
   have hs := stdLat_spec L r k S g gs hg A hA
   have hi := (S.Nof g).inv_mem hn
   have hhi := (isomG L S.Hm).inv_mem hh
   have hfi : ∀ x ∈ S.spanTo g (r + 1), h⁻¹ x = x := fun x hx => inv_fix S (hfix x hx)
-  have hsp : n • Submodule.span L.O (g '' {i | (i : ℕ) < r + 1}) =
-      Submodule.span L.O (Set.range fun b => n (g b)) := by
-    have hs : {i : Fin (r + 1) | (i : ℕ) < r + 1} = Set.univ := by
-      ext i; simpa using i.2
+  have hsp
+      : n • Submodule.span L.O (g '' {i | (i : ℕ) < r + 1})
+        = Submodule.span L.O (Set.range fun b => n (g b)) := by
+    have hs : {i : Fin (r + 1) | (i : ℕ) < r + 1} = Set.univ := by ext i; simpa using i.2
     rw [Submodule.smul_span, hs, Set.image_univ, Set.smul_set_range]
     rfl
-  obtain ⟨B, hB, m, hm, hmn, hL⟩ := GlobalTheory.T.selfDual_lattice_unipotent_translate_standard L r k S g gs hg (h • n • S.stdLat g gs A)
-    (isSD_smul S hh (isSD_smul S hn.1.1 hs.1)) n hn (fun x => by
-      rw [← hsp, mem_smul S n, ← hs.2.1 _ le_rfl, mem_smul, mem_smul]
-      constructor
-      · rintro ⟨h1, h2⟩
-        rw [hfi x h2] at h1
-        exact ⟨h1, nof_mem S hg hi h2⟩
-      · rintro ⟨h1, h2⟩
-        have h3 := nof_mem S hg hn h2
-        have h4 : n (n⁻¹ x) = x := n.apply_symm_apply x
-        rw [h4] at h3
-        exact ⟨by rwa [hfi x h3], h3⟩)
+  obtain ⟨B, hB, m, hm, hmn, hL⟩ :=
+    _root_.GlobalTheory.HL.FrameLift.lift L r k S g gs hg (h • n • S.stdLat g gs A)
+      (isSD_smul S hh (isSD_smul S hn.1.1 hs.1)) n hn
+      (fun x => by
+        rw [← hsp, mem_smul S n, ← hs.2.1 _ le_rfl, mem_smul, mem_smul]
+        constructor
+        · rintro ⟨h1, h2⟩
+          rw [hfi x h2] at h1
+          exact ⟨h1, nof_mem S hg hi h2⟩
+        · rintro ⟨h1, h2⟩
+          have h3 := nof_mem S hg hn h2
+          have h4 : n (n⁻¹ x) = x := n.apply_symm_apply x
+          rw [h4] at h3
+          exact ⟨by rwa [hfi x h3], h3⟩)
   have hBA : B = h • A := by
     ext x
     rw [inner_iff S hg hB hm, ← hL, mem_smul, inner_iff S hg hA hn]
     constructor
     · rintro ⟨y, hy, h1, h2⟩
-      refine ⟨h⁻¹ y, (mem_smul S h _ y).1 hy,
-        perp_map S hhi (fun y hy => hfi y (spanTo_mono S g hy)) h1, ?_⟩
-      rw [← map_sub, hfi _ (spanTo_mono S g h2)]; exact h2
+      refine ⟨
+        h⁻¹ y,
+        (mem_smul S h _ y).1 hy,
+        perp_map S hhi (fun y hy => hfi y (spanTo_mono S g hy)) h1,
+        ?_
+      ⟩
+      rw [← map_sub, hfi _ (spanTo_mono S g h2)]
+      exact h2
     · rintro ⟨y, hy, h1, h2⟩
-      refine ⟨h y, Submodule.smul_mem_pointwise_smul y h _ hy,
-        perp_map S hh (fun y hy => hfix y (spanTo_mono S g hy)) h1, ?_⟩
+      refine ⟨
+        h y,
+        Submodule.smul_mem_pointwise_smul y h _ hy,
+        perp_map S hh (fun y hy => hfix y (spanTo_mono S g hy)) h1,
+        ?_
+      ⟩
       have h4 : h (h⁻¹ x) = x := h.apply_symm_apply x
       have h5 := hfix _ (spanTo_mono S g h2)
       rw [map_sub, h4] at h5
-      rw [h5]; exact h2
+      rw [h5]
+      exact h2
   subst hBA
   exact ⟨hB, m, hm, hmn, hL⟩
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem hermitianFrames_complementUnitary_fixes_ME {h : S.GLV} (hh : h ∈ S.H0) : ∀ x ∈ S.ME, h x = x := fun x hx =>
+theorem hermitianFrames_complementUnitary_fixes_ME {h : S.GLV} (hh : h ∈ S.H0)
+    : ∀ x ∈ S.ME, h x = x := fun x hx =>
   sub_eq_zero.1 ((Submodule.mem_bot E).1 (hh.2.2 x hx))
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem graph_mem {h : S.GLV} (hh : h ∈ S.H0) {Λ : Submodule L.O S.V} {p : S.V × S.V}
-    (hp : p ∈ S.graphOf Λ) : h • p ∈ S.graphOf (h • Λ) := by
+theorem graph_mem
+    {h : S.GLV} (hh : h ∈ S.H0) {Λ : Submodule L.O S.V} {p : S.V × S.V} (hp : p ∈ S.graphOf Λ)
+    : h • p ∈ S.graphOf (h • Λ) := by
   have hX : ∀ x ∈ S.X, h x = x := fun x hx =>
     hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_left (spanTo_mono S _ hx))
   have hX' : ∀ x ∈ S.X', h x = x := fun x hx =>
     hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_right (spanTo_mono S _ hx))
   obtain ⟨y', hy', y, hy, h1, h2, h3, h4, z, hz, h5⟩ := hp
-  refine ⟨h y', Submodule.smul_mem_pointwise_smul y' h _ hy', h y,
-    Submodule.smul_mem_pointwise_smul y h _ hy, perp_map S hh.1 hX' h1, perp_map S hh.1 hX h2, ?_, ?_,
-    h z, Submodule.smul_mem_pointwise_smul z h _ hz, ?_⟩
+  refine ⟨
+    h y',
+    Submodule.smul_mem_pointwise_smul y' h _ hy',
+    h y,
+    Submodule.smul_mem_pointwise_smul y h _ hy,
+    perp_map S hh.1 hX' h1,
+    perp_map S hh.1 hX h2,
+    ?_,
+    ?_,
+    h z,
+    Submodule.smul_mem_pointwise_smul z h _ hz,
+    ?_
+  ⟩
   · change h y' - h p.1 ∈ _
-    rw [← map_sub, hX' _ h3]; exact h3
+    rw [← map_sub, hX' _ h3]
+    exact h3
   · change h y - h p.2 ∈ _
-    rw [← map_sub, hX _ h4]; exact h4
+    rw [← map_sub, hX _ h4]
+    exact h4
   · rw [← map_sub, h5, map_smul]
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem graph_smul {h : S.GLV} (hh : h ∈ S.H0) (Λ : Submodule L.O S.V) :
-    h • S.graphOf Λ = S.graphOf (h • Λ) := by
+theorem graph_smul {h : S.GLV} (hh : h ∈ S.H0) (Λ : Submodule L.O S.V)
+    : h • S.graphOf Λ = S.graphOf (h • Λ) := by
   ext p
   rw [Set.mem_smul_set_iff_inv_smul_mem]
   constructor
@@ -216,20 +255,40 @@ theorem comm {h s : S.GLV} (hh : h ∈ S.H0) (hs : s ∈ S.St) : s * h = h * s :
   have hv : v ∈ S.ME ⊔ S.W0 := by rw [hco.sup_eq_top]; trivial
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hv
   change s (h (a + b)) = h (s (a + b))
-  rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hermitianFrames_complementUnitary_fixes_ME S hh a ha, hermitianFrames_complementUnitary_fixes_ME S hh _ (hM a ha), hW b hb,
+  rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _),
+    hermitianFrames_complementUnitary_fixes_ME S hh a ha,
+    hermitianFrames_complementUnitary_fixes_ME S hh _ (hM a ha), hW b hb,
     hW _ (perp_map S hh.1 (hermitianFrames_complementUnitary_fixes_ME S hh) hb)]
 
-theorem termW {d : S.Datum} {Λ : Submodule L.O S.V} {n n' : S.GLV} (H : S.IsTermW d Λ n n')
-    {h : S.GLV} (hh : h ∈ S.H0) :
-    ∃ m m', S.IsTermW (h • d) (h • Λ) m m' ∧ (∀ b, m (S.f b) = n (S.f b)) ∧
-      ∀ b, m' (S.f' b) = n' (S.f' b) := by
+theorem termW
+    {d : S.Datum} {Λ : Submodule L.O S.V} {n n' : S.GLV} (H : S.IsTermW d Λ n n')
+    {h : S.GLV} (hh : h ∈ S.H0)
+    : ∃ m m',
+      S.IsTermW (h • d) (h • Λ) m m' ∧ (∀ b, m (S.f b) = n (S.f b))
+        ∧ ∀ b, m' (S.f' b) = n' (S.f' b) := by
   obtain ⟨hA, hA', hn, hn', h1, h2, h3, h4⟩ := H
-  obtain ⟨hB, m, hm, hmn, hL⟩ := side S (Or.inl ⟨rfl, rfl⟩) hA hn hh.1
-    fun x hx => hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_left hx)
-  obtain ⟨hB', m', hm', hmn', hL'⟩ := side S (Or.inr ⟨rfl, rfl⟩) hA' hn' hh.1
-    fun x hx => hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_right hx)
-  refine ⟨m, m', ⟨hB, hB', hm, hm', by rw [← h1] at hL; exact hL, by rw [← h2] at hL'; exact hL',
-    fun b => ?_, ?_⟩, hmn, hmn'⟩
+  obtain ⟨hB, m, hm, hmn, hL⟩ :=
+    side S (Or.inl ⟨rfl, rfl⟩) hA hn hh.1 fun x hx =>
+      hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_left hx)
+  obtain ⟨hB', m', hm', hmn', hL'⟩ :=
+    side S (Or.inr ⟨rfl, rfl⟩) hA' hn' hh.1 fun x hx =>
+      hermitianFrames_complementUnitary_fixes_ME S hh x (Submodule.mem_sup_right hx)
+  refine ⟨
+    m,
+    m',
+    ⟨
+      hB,
+      hB',
+      hm,
+      hm',
+      by rw [← h1] at hL; exact hL,
+      by rw [← h2] at hL'; exact hL',
+      fun b => ?_,
+      ?_
+    ⟩,
+    hmn,
+    hmn'
+  ⟩
   · obtain ⟨z, hz, h5⟩ := h3 b
     refine ⟨h z, Submodule.smul_mem_pointwise_smul z h _ hz, ?_⟩
     rw [hmn, hmn', ← map_smul, ← h5, hermitianFrames_complementUnitary_fixes_ME S hh]
@@ -238,11 +297,19 @@ theorem termW {d : S.Datum} {Λ : Submodule L.O S.V} {n n' : S.GLV} (H : S.IsTer
       (Submodule.mem_sup_left (nof_mem S (Or.inl ⟨rfl, rfl⟩) hn (mem_spanTo S _ b)))
   · rw [← graph_smul S hh, ← h4]; rfl
 
-theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → ∀ h ∈ S.H0, S.IsTerm (h • d) (h • Λ) ∧ S.om (h • d) (h • Λ) = S.om d Λ ∧ S.mu (h • Λ) = S.mu Λ ∧ S.M (h • d) (h • Λ) = S.M d Λ ∧ S.sat (h • Λ) = S.sat Λ ∧ S.Fr (h • d) (h • Λ) = S.Fr d Λ := by
+theorem main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V),
+        S.IsTerm d Λ
+          → ∀ h ∈ S.H0,
+            S.IsTerm (h • d) (h • Λ) ∧ S.om (h • d) (h • Λ) = S.om d Λ ∧ S.mu (h • Λ) = S.mu Λ
+              ∧ S.M (h • d) (h • Λ) = S.M d Λ ∧ S.sat (h • Λ) = S.sat Λ
+              ∧ S.Fr (h • d) (h • Λ) = S.Fr d Λ := by
   intro F _ _ _ _ _ E _ _ _ L r k S d Λ ⟨⟨n, n'⟩, H⟩ h hh
   obtain ⟨m, m', H', hm, hm'⟩ := termW S H hh
-  obtain ⟨a1, a2, a3, -⟩ := GlobalTheory.T.term_invariants_independent_of_witnesses L r k S _ _ _ _ H
-  obtain ⟨b1, b2, b3, -⟩ := GlobalTheory.T.term_invariants_independent_of_witnesses L r k S _ _ _ _ H'
+  obtain ⟨a1, a2, a3, -⟩ := _root_.GlobalTheory.HL.WitIndep.witness_independence L r k S _ _ _ _ H
+  obtain ⟨b1, b2, b3, -⟩ := _root_.GlobalTheory.HL.WitIndep.witness_independence L r k S _ _ _ _ H'
   refine ⟨⟨(m, m'), H'⟩, ?_, ?_, ?_, ?_, ?_⟩
   · rw [a1, b1]
     simp only [Frames.psi, Frames.psi', Frames.psiOf, Frames.coef, hm, hm']

@@ -146,13 +146,11 @@ theorem hT_fvec (F : FlagG S r T) (i j : Fin (r + 1))
     | last => simp [FlagG.fvec, TF, F.z_norm]
     | cast j =>
       have h1 : S.hT F.z (F.e j) = 0 := by
-        first
-        | rw [← S.herm (F.e j) F.z, F.z_orth j, map_zero]
-        | rw [← S.herm.eq (F.e j) F.z, F.z_orth j, map_zero]
+        first | rw [← S.herm.eq (F.e j) F.z, F.z_orth j, map_zero]
       simp [FlagG.fvec, TF, h1, Matrix.diagonal_apply_ne _ (hne j).symm]
   | cast i =>
     induction j using Fin.lastCases with
-    | last => simp [FlagG.fvec, TF, F.z_orth i, Matrix.diagonal_apply_ne _ (hne i)]
+    | last => simp [FlagG.fvec, TF, F.z_orth i]
     | cast j =>
       simp only [FlagG.fvec, Fin.snoc_castSucc, F.e_iso i j, TF, Matrix.diagonal_apply]
       split_ifs <;> simp_all
@@ -181,14 +179,14 @@ theorem gramBlocks : GramBlocks := by
   · simp [gramFF, pairVec, brS, Zhat]
   · simp only [gramFF, pairVec, brS, Zhat, Matrix.fromBlocks_apply₂₁, Matrix.conjTranspose_apply,
       Sum.elim_inl, Sum.elim_inr]
-    first | exact (S.herm _ _).symm | exact (S.herm.eq _ _).symm
+    first | exact (S.herm.eq _ _).symm
   · simp [gramFF, pairVec, brS, hT_fvec]
 
 theorem gramDetFlag : GramDetFlag := by
   intro E _ _ _ S r T T' F F'
   rw [gramBlocks E S r T T' F F']
   have h :=
-    Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramDetGen E r (Zhat F F')ᴴ
+    _root_.Formalism.HermitianLatticeCounting.P.gram_determinant_general E r (Zhat F F')ᴴ
       (Zhat F F') T T'
   unfold TF
   rw [h, Matrix.det_conjTranspose, ← Matrix.conjTranspose_submatrix, Matrix.det_conjTranspose,
@@ -208,7 +206,7 @@ theorem gramIndep : GramIndep := by
     rw [this, Matrix.det_transpose]
     exact hdet
   have h :=
-    Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramNondeg E S.V
+    _root_.Formalism.HermitianLatticeCounting.P.gram_matrix_nondegenerate E S.V
       (Fin (r + 1) ⊕ Fin (r + 1)) (starRingEnd E) S.hT.flip (pairVec F F') hB
   refine ⟨h.1, ?_⟩
   have hl : LinearIndependent E (Sum.elim F.fvec F'.fvec) := h.1

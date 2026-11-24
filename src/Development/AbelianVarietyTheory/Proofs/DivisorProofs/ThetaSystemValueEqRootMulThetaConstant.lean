@@ -215,7 +215,7 @@ private theorem exists_injective_stalk_hom_gs_eq
     : ∃ (y : (baseOver (Sp S.R)).left) (φ : S.R →+* (baseOver (Sp S.R)).left.presheaf.stalk y),
       Function.Injective φ ∧ ∀ a : S.R, gs (𝟙 _) y ⊤ (fn a) = φ a := by
   have hI : IsIntegral (baseOver (Sp S.R)).left := by
-    first | infer_instance | (show IsIntegral (Spec (CommRingCat.of S.R)); infer_instance)
+    first | (show IsIntegral (Spec (CommRingCat.of S.R)); infer_instance)
   refine ⟨
     genericPoint _,
     (((baseOver (Sp S.R)).left.presheaf.germ ⊤ (genericPoint _) trivial).hom).comp

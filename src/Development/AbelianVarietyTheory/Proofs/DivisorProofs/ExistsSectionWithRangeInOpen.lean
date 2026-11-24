@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -98,7 +99,7 @@ theorem exists_lift_mem_open
             = x₀ := by
         rw [← Spec.map_comp_assoc, hg', hχ₀]
       have h2 := congrArg (fun h => h (closedPoint (ResidueField R'))) h1
-      simp only [Scheme.Hom.comp_apply] at h2
+      simp only at h2
       rw [hy] at h2
       refine Eq.trans ?_ h2
       exact congrArg (Spec.map (CommRingCat.ofHom g.toRingHom) ≫ U.left.fromSpecStalk y)

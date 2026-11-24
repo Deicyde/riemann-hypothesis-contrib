@@ -66,8 +66,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace GlobalTheory.GenRatio
@@ -79,14 +77,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.Frames
 open GlobalTheory.Reg.ChartInhab GlobalTheory.Reg.LiftUnique
 open scoped LaurentSeries
-
-theorem cstMul {V : Type} [CommRing V] {Z : Scheme.{0}} (q : Z ⟶ Sp V) (z : Z) (a b : V)
-    : Geo.Tor.cst q z (a * b) = Geo.Tor.cst q z a * Geo.Tor.cst q z b := by
-  rw [Geo.Tor.cst, map_mul, gs_mul q z ⊤ trivial]; rfl
-
-theorem cstOne {V : Type} [CommRing V] {Z : Scheme.{0}} (q : Z ⟶ Sp V) (z : Z)
-    : Geo.Tor.cst q z 1 = 1 := by
-  rw [Geo.Tor.cst, gs_eq q z ⊤ trivial, map_one, map_one, map_one]
 
 theorem gs_of_isoMaps
     {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X' ⟶ X} {w : LB.Iso L' (L.pull F)}
@@ -173,8 +163,8 @@ theorem Cut.pull
     h Z (g ≫ pm) f p j k j₀ (by rw [Category.assoc, h₁]; exact e₁)
       (by rw [e₂, Category.assoc, reassoc_of% h₂]) m₁ m₂ m₃
   rw [e, ← h₃ _ hle, gs_appLE pm _ _ hle g p mg, gs_mul (g ≫ pm) p _ (hle mg),
-    gs_scal' x b _ (g ≫ pm) p (hle mg), cstMul, _root_.mul_assoc, Category.assoc, h₂,
-    ← Category.assoc, cst_comp]
+    gs_scal' x b _ (g ≫ pm) p (hle mg), _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_mul,
+    _root_.mul_assoc, Category.assoc, h₂, ← Category.assoc, cst_comp]
 
 theorem Cut.chg
     {T : Type} [CommRing T]
@@ -193,7 +183,8 @@ theorem Cut.chg
   have e := h Z g f p j k j₀ e₁ e₂ m₁ m₂ m₃
   have hle := FramedBaseChange.chart_le (𝟙 _) h₁ (fun _ => j₀)
   rw [e, ← h₃ _ hle, gs_appLE (𝟙 _) _ _ hle g p mg, Category.comp_id, gs_mul g p _ mg,
-    gs_scal' x' b _ g p mg, cstMul, _root_.mul_assoc]
+    gs_scal' x' b _ g p mg, _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_mul,
+    _root_.mul_assoc]
 
 theorem exists_lift'
     {T : Type} [CommRing T]
@@ -379,7 +370,8 @@ theorem exists_cut
   rw [gs_appLE m2.φ _ _ (le j) (g ≫ h) p c₂, T2 Z _ p j k k' b₁.2 b₂ hk'] at u₂
   rw [Category.assoc, h0g, Category.comp_id, T1 Z _ p j₀ k k' b₃ b₂ hk'] at u₁
   have eg : ((g ≫ h) ≫ n.φ) ≫ Y.m.φ = (g ≫ h) ≫ m2.φ := by rw [e2, Category.assoc]
-  rw [eg, u₁, u₂, cstOne, Units.val_mul, Units.val_mul]
+  rw [eg, u₁, u₂, _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_one, Units.val_mul,
+    Units.val_mul]
   ring
 
 theorem exists_cut_gen
@@ -392,12 +384,14 @@ theorem exists_cut_gen
   obtain ⟨S, hS⟩ := exists_cut h₀ h₁ hs hx hV
   obtain ⟨a, ha, hu⟩ := hg S
   have one : ∀ i, scal x 1 i * S.f i = S.f i := fun i =>
-    fn_ext fun p hp => by rw [gs_mul _ p _ hp, gs_scal' x 1 _ (𝟙 _) p hp, cstOne, _root_.one_mul]
+    fn_ext fun p hp => by
+      rw [gs_mul _ p _ hp, gs_scal' x 1 _ (𝟙 _) p hp,
+        _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_one, _root_.one_mul]
   refine ⟨a, ?_, fun a' h' => hu a' fun i => (one i).symm.trans (hS.eq hx hV h' i)⟩
   intro Z g f p j k j₀ e₁ e₂ m₁ m₂ m₃
   have mg := (mem_chart e₁ p j₀).2 m₃
-  rw [hS Z g f p j k j₀ e₁ e₂ m₁ m₂ m₃, cstOne, _root_.one_mul, ha (fun _ => j₀), gs_mul g p _ mg,
-    gs_scal' x a _ g p mg]
+  rw [hS Z g f p j k j₀ e₁ e₂ m₁ m₂ m₃, _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_one,
+    _root_.one_mul, ha (fun _ => j₀), gs_mul g p _ mg, gs_scal' x a _ g p mg]
 
 theorem pullsToMul_gs
     {A : Type} [CommRing A]
@@ -710,7 +704,8 @@ theorem secBC_of_frMap
     : SecBC φ.toRingHom 1 y.x y'.x y.s y'.s := by
   obtain ⟨-, -, pm, h₁, h₂, h₃⟩ := h
   refine ⟨pm, h₁, h₂, fun i hi => Eq.trans (congrArg _ (fn_ext fun p hp => ?_)) (h₃ i hi)⟩
-  rw [gs_mul _ p _ hp, gs_scal' y.x 1 _ (𝟙 _) p hp, cstOne, _root_.one_mul]
+  rw [gs_mul _ p _ hp, gs_scal' y.x 1 _ (𝟙 _) p hp,
+    _root_.ReciprocityTheory.ChartRestriction.G.H1.cst_one, _root_.one_mul]
 
 theorem exists_ratio
     (hB : Out.SecBaseChangeSt) (h₀ : RigIso Y.m0.toSABMap w₀) (h₁ : RigIso Y.m w₁)

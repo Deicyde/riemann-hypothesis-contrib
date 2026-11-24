@@ -65,7 +65,7 @@ private theorem conj_mat
     (r : G →* GG (m := 3) (R := R)) (g : G) (hg : (r g).right = 1)
     : (conjBy h⁻¹ r g).mat
       = ((h⁻¹ : GL (Fin 3) R) : Matrix _ _ R) * (r g).mat * (h : Matrix (Fin 3) (Fin 3) R) := by
-  simp [conjBy, GG.mat, MulAut.conj_apply, hg]
+  simp [conjBy, GG.mat, hg]
 
 private def Kl (I : Ideal R) (N : Matrix (Fin 3) (Fin 3) R) : Prop := ∀ a b, ∀ x ∈ I, x * N a b = 0
 

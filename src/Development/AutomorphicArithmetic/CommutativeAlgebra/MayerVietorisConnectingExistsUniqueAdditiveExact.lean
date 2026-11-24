@@ -1,8 +1,13 @@
 module
 
 public import Development.AutomorphicArithmetic.CupPullbacks.ConstCompSingle
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCochainShortExactOfInjectiveTermsStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
+public import Mathlib.Algebra.Homology.HomotopyCategory.KInjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafProperties
+public import Development.AbelianVarietyTheory.Definitions.Divisors.GalMapMul
+public import Mathlib.RingTheory.WittVector.IsPoly
+public import Mathlib.Tactic.ReduceModChar
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCochainShortExactOfInjectiveTerms
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSpaceChainsMayerVietorisShortExactStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMayerVietorisConnectingExactStatement
 import Mathlib.Algebra.Order.Floor.Extended
@@ -323,7 +328,7 @@ private theorem mvx_of_se
   have hl : biprod.lift p (-q) = p ≫ biprod.inl - q ≫ biprod.inr := by apply biprod.hom_ext <;> simp
   have hd : biprod.desc i j = biprod.fst ≫ i + biprod.snd ≫ j := by apply biprod.hom_ext' <;> simp
   refine ⟨comm, fun n γ => ?_, fun n α β h => ?_, fun n c h1 h2 => ?_⟩
-  · obtain ⟨b, hb⟩ := (GlobalTheory.T.etaleCochain_shortExact_of_injective_terms R I hI _ hS n).1 γ
+  · obtain ⟨b, hb⟩ := (_root_.GlobalTheory.EtC.cochain_shortExact_of_injective R I hI _ hS n).1 γ
     have hb' : pb (biprod.lift p (-q)) b = γ := hb
     refine ⟨pb biprod.inl b, pb biprod.inr b, ?_⟩
     rw [← pb_comp, ← pb_comp, ← pb_hsub, ← hl, hb']
@@ -334,12 +339,12 @@ private theorem mvx_of_se
     have hf : pb (biprod.lift p (-q)) (pb biprod.fst α + pb biprod.snd β) = 0 := by
       rw [hl, pb_hsub, pb_comp, pb_comp, hb1, hb2, h, sub_self]
     obtain ⟨c, hc⟩ :=
-      (GlobalTheory.T.etaleCochain_shortExact_of_injective_terms R I hI _ hS n).2.1 _ hf
+      (_root_.GlobalTheory.EtC.cochain_shortExact_of_injective R I hI _ hS n).2.1 _ hf
     have hc' : pb (biprod.desc i j) c = pb biprod.fst α + pb biprod.snd β := hc
     refine ⟨c, ?_, ?_⟩
     · rw [← biprod.inl_desc i j, pb_comp, hc', hb1]
     · rw [← biprod.inr_desc i j, pb_comp, hc', hb2]
-  · refine (GlobalTheory.T.etaleCochain_shortExact_of_injective_terms R I hI _ hS n).2.2 c ?_
+  · refine (_root_.GlobalTheory.EtC.cochain_shortExact_of_injective R I hI _ hS n).2.2 c ?_
     change pb (biprod.desc i j) c = 0
     rw [hd, pb_hadd, pb_comp, pb_comp, h1, h2, pb_zero, pb_zero, add_zero]
 
@@ -349,7 +354,7 @@ private theorem mvx
       ((chains R).map f) ((chains R).map g) := by
   obtain ⟨w, hS⟩ := GlobalTheory.T.etaleSpaceChains_mayerVietoris_shortExact R f g h
   exact mvx_of_se (by rw [← Functor.map_comp, ← Functor.map_comp, pullback.condition]) w hS
-    (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties R F).2.1
+    (_root_.GlobalTheory.EtC.ResBasic.res_basic R F).2.1
 
 end UpperTheory.MVd
 
@@ -382,7 +387,7 @@ theorem UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact
   refine ⟨?_, ?_⟩
   · intro U V E f g h
     have X := mvx R F f g h
-    obtain ⟨d, hd, -⟩ := GlobalTheory.T.exists_mayerVietoris_connecting_exact R F
+    obtain ⟨d, hd, -⟩ := _root_.GlobalTheory.EtC.mayerVietoris R F
     exact ⟨
       fun c => Rel.exists X c,
       fun c x x' => Rel.unique X,

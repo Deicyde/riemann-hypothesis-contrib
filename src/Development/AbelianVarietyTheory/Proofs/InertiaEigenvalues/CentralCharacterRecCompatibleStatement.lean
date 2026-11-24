@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.Conju
   ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
   GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.central_character_rec_compatible
     : LanglandsExhaustionGL → ZelevinskyPolynomialRing → GeometricLemma
       → BernsteinZelevinskyFiniteness
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.central_character_rec_compatible
           → ∀ (x : IrrGL (k := w.adicCompletion E)) s,
             HasSupport x.rep s
               → ∀ σ, (rc x).charPol σ = (s.map fun y => (rc y).charPol σ).prod := by
-  first
-  | exact @GlobalTheory.LocLanglands.charPol_eq_prod_support
-  | exact GlobalTheory.LocLanglands.charPol_eq_prod_support
-  | (intros; apply GlobalTheory.LocLanglands.charPol_eq_prod_support <;> assumption)
+  first | exact @GlobalTheory.LocLanglands.charPol_eq_prod_support

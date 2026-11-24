@@ -3,12 +3,14 @@ module
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.MemSEOfFin
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCongruenceKernelIdeleCharacterTrivialAtInf
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.EtaDef
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmExtensionConjugationInvolutiveFixedFieldStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsEtaCmType
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmExtensionConjugationInvolutiveFixedField
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHalfAbstract
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegerOfAlgebraMapMemAdelesFiniteMultipleStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntFOneMul
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegerOfAlgebraMapMemAdelesFiniteMultiple
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitaryHeckeCharacterExtendingBaseCharacte
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankSmulMemAdelesFiniteMultipleOfTensorCongruStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankSmulMemAdelesFiniteMultipleOfTensorCongru
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsOpenIntegralTensorAdeleMultiples
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemNormGroupIffEverywhereNorm
 import Mathlib.Algebra.Order.Floor.Extended
@@ -98,8 +100,7 @@ theorem eta_fin
         algebraMap (AF F) (AF F ⊗[F] E) t ∈ SE F E
           → ∀ v : HeightOneSpectrum (𝓞 F), 2 * t.2 v ∈ v.adicCompletionIntegers F := by
     intro t ht v
-    have :=
-      GlobalTheory.T.finrank_smul_mem_adelesFiniteMultiple_of_tensorCongruence F E 1 t (CE_one ht)
+    have := _root_.GlobalTheory.HeckeExtend.TraceCE.finrank_smul_mem_intF F E 1 t (CE_one ht)
     rw [hB.cm.2.2.1] at this
     obtain ⟨c, hc, e⟩ := this
     have e2 : evalV F v (2 • t.2) = evalV F v (1 • c) := congrArg (evalV F v) e
@@ -128,7 +129,7 @@ theorem fixed_of_mem
     {x w : (AF F ⊗[F] E)ˣ} (hx : x ∈ UI σ) (hw : w ∈ WE F E (M * N))
     (k : Eˣ) (a : (AF F)ˣ) (h : Units.map (incAF F E).toMonoidHom k * idFF F E a * w = x)
     : σ k = (k : E) := by
-  obtain ⟨hσσ, hfix⟩ := GlobalTheory.T.cmExtension_conjugation_involutive_fixedField F E σ hcm
+  obtain ⟨hσσ, hfix⟩ := _root_.GlobalTheory.CMConjInvol.cm_conj_invol_fixed F E σ hcm
   let cU : (AF F ⊗[F] E)ˣ →* (AF F ⊗[F] E)ˣ := Units.map (cA σ).toMonoidHom
   have hcW : cU w ∈ WE F E (M * N) := by
     refine ⟨?_, ?_⟩
@@ -178,11 +179,9 @@ theorem fixed_of_mem
   have hyS : algebraMap (AF F) (AF F ⊗[F] E) (algebraMap F (AF F) y) ∈ SE F E := by
     rw [← incAF_algebraMap, hy, map_mul, map_sub σ, map_one, map_sub, map_sub, map_one]
     exact SE_mul (sub_mem hζS one_mem_SE) (sub_mem hζS' one_mem_SE)
-  have hy2 :=
-    GlobalTheory.T.finrank_smul_mem_adelesFiniteMultiple_of_tensorCongruence F E 1 _ (CE_one hyS)
+  have hy2 := _root_.GlobalTheory.HeckeExtend.TraceCE.finrank_smul_mem_intF F E 1 _ (CE_one hyS)
   rw [hcm.2.2.1, ← map_nsmul] at hy2
-  obtain ⟨r, hr⟩ :=
-    GlobalTheory.T.exists_integer_of_algebraMap_mem_adelesFiniteMultiple F _ 1 one_pos hy2
+  obtain ⟨r, hr⟩ := _root_.GlobalTheory.HeckeExtend.exists_int_of_mem_intF F _ 1 one_pos hy2
   have hy0 : 2 • y = 0 := by
     refine hN (2 • y) ?_ (fun φ => ?_) (2 * (M • phi τ s) * (phi τ (incAF F E (σ ζ)) - 1)) ?_ ?_
     · rw [hr, Nat.cast_one, one_mul]
@@ -236,8 +235,7 @@ theorem key
   obtain ⟨y, hy, w, hw, hyw⟩ := Subgroup.mem_sup.1 hV
   obtain ⟨_, ⟨k, rfl⟩, _, ⟨a, rfl⟩, rfl⟩ := Subgroup.mem_sup.1 hy
   have hk := fixed_of_mem hB.cm B.τ₁ hNk hx hw k a hyw
-  obtain ⟨f, hf⟩ :=
-    (GlobalTheory.T.cmExtension_conjugation_involutive_fixedField F E σ hB.cm).2 k hk
+  obtain ⟨f, hf⟩ := (_root_.GlobalTheory.CMConjInvol.cm_conj_invol_fixed F E σ hB.cm).2 k hk
   have hf0 : f ≠ 0 := by
     rintro rfl
     rw [map_zero] at hf

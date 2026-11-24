@@ -55,7 +55,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 theorem UpperTheory.isoSum_of_injective_equivariant_family
     : ∀ (H M N : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup M]
         [Module ℂ M] [AddCommGroup N] [Module ℂ N] (ρ : Representation ℂ H M)

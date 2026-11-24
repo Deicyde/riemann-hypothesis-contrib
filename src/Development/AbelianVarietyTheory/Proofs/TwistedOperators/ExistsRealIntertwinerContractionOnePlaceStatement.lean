@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_realIntertwiner_contraction_one_place
               ⟪u, A φ y⟫_ℂ
                 = ellT M (Function.update w τ u)
                   (inclT M (It φ (PiTensorProduct.tprod ℂ (Function.update v τ y)))) := by
-  first
-  | exact @GlobalTheory.Chain.RealLine.Semi.exists_semiW
-  | exact GlobalTheory.Chain.RealLine.Semi.exists_semiW
-  | (intros; apply GlobalTheory.Chain.RealLine.Semi.exists_semiW <;> assumption)
+  first | exact @GlobalTheory.Chain.RealLine.Semi.exists_semiW

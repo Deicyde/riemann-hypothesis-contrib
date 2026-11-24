@@ -53,18 +53,26 @@ public import Mathlib.Topology.Algebra.OpenSubgroup
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
 open scoped Pointwise ENNReal
 
 namespace GlobalTheory.VolRatio
 
-theorem relIndex_mul_measure_sub {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
+theorem relIndex_mul_measure_sub
+    {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
     (H L : Subgroup G) (hHL : H ≤ L) [(H.subgroupOf L).FiniteIndex]
-    (hH : MeasurableSet (H : Set G)) (μ : Measure G) [μ.IsMulLeftInvariant] :
-    (H.relIndex L : ENNReal) * μ H = μ L := by
+    (hH : MeasurableSet (H : Set G))
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    : (H.relIndex L : ENNReal) * μ H = μ L := by
   apply GlobalTheory.IndexVolume.relIndex_mul_measure_subgroup <;> assumption
 
-theorem vol_ratio : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G) [μ.IsHaarMeasure] (A B : Subgroup G), IsOpen ((A ⊓ B : Subgroup G) : Set G) → IsCompact (A : Set G) → IsCompact (B : Set G) → (μ (A : Set G)).toReal / (μ (B : Set G)).toReal = (B.relIndex A : ℝ) / (A.relIndex B : ℝ) := by
+theorem vol_ratio
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+        [BorelSpace G] (μ : MeasureTheory.Measure G) [μ.IsHaarMeasure] (A B : Subgroup G),
+      IsOpen ((A ⊓ B : Subgroup G) : Set G) → IsCompact (A : Set G) → IsCompact (B : Set G)
+        → (μ (A : Set G)).toReal / (μ (B : Set G)).toReal
+          = (B.relIndex A : ℝ) / (A.relIndex B : ℝ) := by
   intro G _ _ _ _ _ μ _ A B hC hA hB
   have hCA : A ⊓ B ≤ A := inf_le_left
   have hCB : A ⊓ B ≤ B := inf_le_right

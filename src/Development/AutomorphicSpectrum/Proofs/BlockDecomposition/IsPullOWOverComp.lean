@@ -86,7 +86,7 @@ theorem restrict_pull1_bijective_of_basis
   have hs := _root_.GlobalTheory.sep_of_factoring_cover (OAff s') G H hcov
   have hg := _root_.GlobalTheory.CatCoh.Desc.glue_comma_of_basis (OAff s') G H hcov hdir
   have hv :=
-    _root_.GlobalTheory.CatCoh.Desc.Basis.oneCocycle_vanishing_comma_of_basis (OAff s') G H hcov
+    _root_.GlobalTheory.CatCoh.Desc.Basis.oneCocycle_coboundary_comma_localBasis (OAff s') G H hcov
       hdir
   exact ⟨
     _root_.GlobalTheory.CatCoh.CoefMap.restrict_pull1_injective_of_sep_glue _ _ hs hg,

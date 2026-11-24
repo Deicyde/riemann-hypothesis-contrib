@@ -106,7 +106,7 @@ theorem exists_grCube_twistedSections_hom_secCube_bijective
             ∀ I,
               Function.Bijective (φ.app I).hom := by
   intro R _ Y f H m s M hH hM hva hx
-  have hloc := GlobalTheory.T.twistedSections_localise_to_charts R Y f H m s M hH hM hva hx
+  have hloc := _root_.GlobalTheory.AbLaw.twisted_sections_localise R Y f H m s M hH hM hva hx
   refine GlobalTheory.exists_grCube_hom_bijective (Fin (m + 1)) R (GrSum (hx ⊤))
     (GrSum.grading (hx ⊤))
     (fun t => secCube f (tw M H t) fun i => nonzeroLocus (s i))

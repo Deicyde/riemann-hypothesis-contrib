@@ -2,8 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LocalAtPlaces
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRedF
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FiniteVerticalRecursionStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LogIntegralCongrSmulStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FiniteVerticalRecursion
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Objects
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsIntersectionFamily
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LogIntegralCongrSmul
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Cartier
 import GroundTheory.HeightsAndTheta.Heights.HeightComparison.IsMultiHomogIdealIff
 import Mathlib.Algebra.Order.Floor.Extended
@@ -151,9 +153,11 @@ theorem change_line
       hI.2.2 P D L (A'.tensor B) (T.g ()) bg hP hL hAB' dG
         ((GroundTheory.Heights₂.Heights.Bridge.isMultiHomog_iff _ _).1 hg) hgP
     obtain ⟨fin1, s1⟩ :=
-      GlobalTheory.T.finite_vertical_recursion K ι P D hP I bf (T.f ()) hf hfP L (A.tensor B)
+      _root_.GlobalTheory.CompanionTheory.Ar.Num.RecSplit.recR_split K ι P D hP I bf (T.f ()) hf hfP
+        L (A.tensor B)
     obtain ⟨fin2, s2⟩ :=
-      GlobalTheory.T.finite_vertical_recursion K ι P D hP I bg (T.g ()) hg hgP L (A'.tensor B)
+      _root_.GlobalTheory.CompanionTheory.Ar.Num.RecSplit.recR_split K ι P D hP I bg (T.g ()) hg hgP
+        L (A'.tensor B)
     have hor
         : (∑ᶠ W, (divCycle P (T.f ()) W : ℝ) * Set.indicator {W | IsHorizontal W} (fun W => I W D L) W)
           = ∑ᶠ W, (divCycle P (T.g ()) W : ℝ) * Set.indicator {W | IsHorizontal W} (fun W => I W D L) W :=
@@ -164,7 +168,8 @@ theorem change_line
         · have : W ∉ {W | IsHorizontal W} := hW
           simp [Set.indicator_of_notMem this]
     have ar : arInt P (T.f ()) (A.tensor B) L = arInt P (T.g ()) (A'.tensor B) L := by
-      refine (GlobalTheory.T.log_integral_congr_smul K ι P D _).1 _ _ fun z hz => ?_
+      refine (_root_.GlobalTheory.CompanionTheory.Ar.Num.ptsIntegral_congr_and_homog K ι P D _).1 _
+        _ fun z hz => ?_
       have h1 := hnorm z hz
       have pA := A.pos z hz.1
       have pA' := A'.pos z hz.1

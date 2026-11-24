@@ -70,8 +70,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.DVR
 open GlobalTheory.UT
 
-
-
 namespace GlobalTheory.UT
 
 open GlobalTheory.EndData in
@@ -92,7 +90,7 @@ theorem exists_degenerationEndomorphism_of_admissibleBase
   obtain ⟨h, hh⟩ :=
     T.uniformisation_endomorphism_character_map_constant hL R I hR D A G U.toUnifPre aG hG
   choose t ht hi using hh
-  choose v hv vv using fun χ e => T.exists_gen_of_torusEnd_compat R I D.toPre e G (U.gt e) ((Over.pullback (thick R I e)).map aG) aB h (t e)
+  choose v hv vv using fun χ e => _root_.GlobalTheory.gtCoord_end_ratio_descends R I D.toPre e G (U.gt e) ((Over.pullback (thick R I e)).map aG) aB h (t e)
     inferInstance (ht e) (hi e) (hq e) χ
   have down
       : ∀ χ e (Z : Scheme.{0}) (r : Z ⟶ (thickObj R I e G).left) (z : Z) (J),

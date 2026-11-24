@@ -197,8 +197,7 @@ theorem fderiv_snd_comp
       = (fderiv ℝ v q.1.2).comp (ContinuousLinearMap.snd ℝ _ _) := by
   have hq : q.1.2 ∈ Ann P := q.2.2
   have hd : DifferentiableAt ℝ v q.1.2 :=
-    (hv.differentiableOn (by first | simp | exact_mod_cast le_top)).differentiableAt
-      ((ann_open P).mem_nhds hq)
+    (hv.differentiableOn (by first | simp)).differentiableAt ((ann_open P).mem_nhds hq)
   rw [show (fun x : E P.r => v x.2) = v ∘ Prod.snd from rfl,
     fderiv_comp q.1 hd differentiableAt_snd, fderiv_snd]
 
@@ -222,7 +221,7 @@ theorem wirt_fnZ_zb
     (fnZ_ev_eq P hv q).fderiv_eq.trans (fderiv_snd_comp P hv q)
   unfold MA.wirt
   rw [h1]
-  simp [MA.dirE, M.vzb, NF.dZb] <;> ring
+  simp [MA.dirE, M.vzb, NF.dZb]
 
 private theorem star_mul_self_eq_one_of_norm_eq_one {z : ℂ} (h : ‖z‖ = 1) : star z * z = 1 := by
   calc
@@ -237,11 +236,10 @@ theorem dZ_conj_unit
     : NF.dZ (fun w => star (u w)) ζ = - (star (u ζ)) ^ 2 * NF.dZ u ζ
       ∧ NF.dZb (fun w => star (u w)) ζ = - (star (u ζ)) ^ 2 * NF.dZb u ζ := by
   have hd : DifferentiableAt ℝ u ζ :=
-    (hu.differentiableOn (by first | simp | exact_mod_cast le_top)).differentiableAt
-      ((ann_open P).mem_nhds hζ)
+    (hu.differentiableOn (by first | simp)).differentiableAt ((ann_open P).mem_nhds hζ)
   have hstar : ∀ h : ℂ, fderiv ℝ (fun w => star (u w)) ζ h = star (fderiv ℝ u ζ h) := by
     intro h
-    first | (rw [fderiv_star]; rfl) | (rw [(hd.hasFDerivAt.star).fderiv]; rfl)
+    first | (rw [fderiv_star]; rfl)
   have hconst : (fun w => u w * star (u w)) =ᶠ[nhds ζ] fun _ => (1 : ℂ) := by
     filter_upwards [(ann_open P).mem_nhds hζ] with w hw
     rw [mul_comm]
@@ -274,7 +272,7 @@ theorem mul_conjCoordinate_apply (f : SmQ P.r P.TT) (q : Qp P.r P.TT)
       = star q.1.2 * (f : Qp P.r P.TT → ℂ) q := by
   show MA.coordE M.vzb q.1 * (f : Qp P.r P.TT → ℂ) q = star q.1.2 * (f : Qp P.r P.TT → ℂ) q
   congr 1
-  first | (simp [MA.coordE, MA.zE, M.vzb]; done) | (simp [MA.coordE, MA.zE, M.vzb]; rfl)
+  first | (simp [MA.coordE, MA.zE, M.vzb]; done)
 
 theorem algebraMap_comp_ofPadicInt_apply (f : SmQ P.r P.TT) (q : Qp P.r P.TT)
     : ((show SmQ P.r P.TT from ((MA.DQ P).zP).1 f) : Qp P.r P.TT → ℂ) q
@@ -290,10 +288,7 @@ theorem ggiP_apply (f : SmQ P.r P.TT) (q : Qp P.r P.TT)
       (fun ζ : ℂ => ((Complex.normSq ζ : ℂ) - (P.TT : ℂ))⁻¹)
       (Ann P) := by
     have hs : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ : ℂ => star ζ) := by
-      first
-      | exact contDiff_id.star
-      | exact Complex.conjCLE.contDiff
-      | simpa using (Complex.conjCLE.contDiff (n := ((⊤ : ℕ∞) : WithTop ℕ∞)))
+      first | exact Complex.conjCLE.contDiff
     have h
         : (fun ζ : ℂ => ((Complex.normSq ζ : ℂ) - (P.TT : ℂ))⁻¹)
           = fun ζ : ℂ => (ζ * star ζ - (P.TT : ℂ))⁻¹ := by

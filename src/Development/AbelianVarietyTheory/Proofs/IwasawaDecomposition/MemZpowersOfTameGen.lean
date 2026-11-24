@@ -50,29 +50,34 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.TameGenPowers
 open scoped Pointwise
 
-theorem wild_mem_Ine {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+theorem wild_mem_Ine
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
     {A : ValuationSubring Ω} {σ : Formalism.ConjugateSelfDual.G E Ω}
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) : σ ∈ Ine (F := E) A := by
+    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    : σ ∈ Ine (F := E) A := by
   apply GlobalTheory.TameEig.wild_mem_Ine <;> assumption
 
-theorem finite_roots (K : Type) [Field K] (m : ℕ) (hm : m ≠ 0) :
-    {u : Kˣ | u ^ m = 1}.Finite := by
+theorem finite_roots (K : Type) [Field K] (m : ℕ) (hm : m ≠ 0) : {u : Kˣ | u ^ m = 1}.Finite := by
   haveI : NeZero m := ⟨hm⟩
   have : Finite (rootsOfUnity m K) := inferInstance
   have h := Set.toFinite ((rootsOfUnity m K : Subgroup Kˣ) : Set Kˣ)
   exact h.subset fun u hu => (mem_rootsOfUnity m u).2 hu
 
-theorem eq_one_of_wild_prime (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω)
-    (hA : IsPlaceOver A v) (K : Type) [Field K] [TopologicalSpace K] [T2Space K]
-    (r : Formalism.ConjugateSelfDual.G E Ω →* Kˣ) (hr : Continuous r) (l : ℕ) (hl : l.Prime)
-    (hlv : ((l : ℕ) : 𝓞 E) ∉ v.asIdeal) (σ : Formalism.ConjugateSelfDual.G E Ω)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) (hσl : r σ ^ l = 1) : r σ = 1 := by
+theorem eq_one_of_wild_prime
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (hA : IsPlaceOver A v)
+    (K : Type) [Field K] [TopologicalSpace K] [T2Space K]
+    (r : Formalism.ConjugateSelfDual.G E Ω →* Kˣ) (hr : Continuous r)
+    (l : ℕ) (hl : l.Prime) (hlv : ((l : ℕ) : 𝓞 E) ∉ v.asIdeal)
+    (σ : Formalism.ConjugateSelfDual.G E Ω)
+    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) (hσl : r σ ^ l = 1)
+    : r σ = 1 := by
   have hvl : ¬ A.valuation (l : Ω) < 1 := by
     intro h
     apply hlv
@@ -81,10 +86,8 @@ theorem eq_one_of_wild_prime (E Ω : Type) [Field E] [NumberField E] [Field Ω] 
   have hvl1 : A.valuation (l : Ω) = 1 :=
     le_antisymm ((A.valuation_le_one_iff _).mpr (natCast_mem A l)) (not_lt.mp hvl)
   have hfin : ({u : Kˣ | u ^ l = 1} \ {1}).Finite := (finite_roots K l hl.ne_zero).diff
-  have hop : IsOpen (r ⁻¹' ({u : Kˣ | u ^ l = 1} \ {1})ᶜ) :=
-    hfin.isClosed.isOpen_compl.preimage hr
-  obtain ⟨L, hL, hsub⟩ := (krullTopology_mem_nhds_one_iff E Ω _).mp
-    (hop.mem_nhds (by simp))
+  have hop : IsOpen (r ⁻¹' ({u : Kˣ | u ^ l = 1} \ {1})ᶜ) := hfin.isClosed.isOpen_compl.preimage hr
+  obtain ⟨L, hL, hsub⟩ := (krullTopology_mem_nhds_one_iff E Ω _).mp (hop.mem_nhds (by simp))
   have : IsGalois E Ω := IsAlgClosure.isGalois E Ω
   have hidx : L.fixingSubgroup.index ≠ 0 := by
     rw [← IntermediateField.finrank_eq_fixingSubgroup_index]
@@ -109,12 +112,25 @@ theorem eq_one_of_wild_prime (E Ω : Type) [Field E] [NumberField E] [Field Ω] 
   have := (pow_gcd_eq_one (a := r σ) (m := l) (n := n)).mpr ⟨hσl, h1⟩
   rwa [hc, pow_one] at this
 
-theorem mem_zpowers_of_tameGen : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω), IsPlaceOver A v → ∀ (γ : Formalism.ConjugateSelfDual.G E Ω), TameGenAt A γ → ∀ (K : Type) [Field K] [TopologicalSpace K] [T2Space K] (r : Formalism.ConjugateSelfDual.G E Ω →* Kˣ), Continuous r → ∀ m : ℕ, ((m : ℕ) : 𝓞 E) ∉ v.asIdeal → (∀ σ ∈ Ine (F := E) A, r σ ^ m = 1) → ∀ σ ∈ Ine (F := E) A, r σ ∈ Subgroup.zpowers (r γ) := by
+theorem mem_zpowers_of_tameGen
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω),
+      IsPlaceOver A v
+        → ∀ (γ : Formalism.ConjugateSelfDual.G E Ω),
+          TameGenAt A γ
+            → ∀ (K : Type) [Field K] [TopologicalSpace K] [T2Space K]
+                (r : Formalism.ConjugateSelfDual.G E Ω →* Kˣ),
+              Continuous r
+                → ∀ m : ℕ,
+                  ((m : ℕ) : 𝓞 E) ∉ v.asIdeal → (∀ σ ∈ Ine (F := E) A, r σ ^ m = 1)
+                    → ∀ σ ∈ Ine (F := E) A, r σ ∈ Subgroup.zpowers (r γ) := by
   intro E Ω _ _ _ _ _ v A hA γ hγ K _ _ _ r hr m hm hI σ hσ
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (by simp)
-  have hw : ∀ τ : Formalism.ConjugateSelfDual.G E Ω, (∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1) → r τ = 1 := by
+  have hw
+      : ∀ τ : Formalism.ConjugateSelfDual.G E Ω,
+        (∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1) → r τ = 1 := by
     intro τ hτ
     by_contra hne
     have hd : orderOf (r τ) ∣ m := orderOf_dvd_of_pow_eq_one (hI τ (wild_mem_Ine hτ))
@@ -147,8 +163,10 @@ theorem mem_zpowers_of_tameGen : ∀ (E Ω : Type) [Field E] [NumberField E] [Fi
     rintro u ⟨z, rfl⟩
     show (r γ ^ z) ^ m = 1
     rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hI γ hγ.1, one_zpow]
-  have hc : IsClosed (((Subgroup.zpowers (r γ)).comap r : Subgroup (Formalism.ConjugateSelfDual.G E Ω)) :
-      Set (Formalism.ConjugateSelfDual.G E Ω)) := hfin.isClosed.preimage hr
+  have hc : IsClosed
+      (((Subgroup.zpowers (r γ)).comap r : Subgroup (Formalism.ConjugateSelfDual.G E Ω))
+        : Set (Formalism.ConjugateSelfDual.G E Ω)) :=
+    hfin.isClosed.preimage hr
   refine closure_minimal (SetLike.coe_subset_coe.2 ((Subgroup.closure_le _).2 ?_)) hc (hγ.2 hσ)
   rintro τ (rfl | hτ)
   · exact Subgroup.mem_zpowers _

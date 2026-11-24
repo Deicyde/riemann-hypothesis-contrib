@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_isotropic_group_lattice_class_representatives
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (n : ℕ)
         (Λ : GenLat E n) (N : ℕ),
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_isotropic_group_lattice_class_representativ
                       (∀ i j, (cm i j : E) = (N : E) * mu i j)
                         → ∀ i, Dw.ModN (N ^ 2) (∑ j, cm i j • a j))
                 → ∃ i, ∀ b, Dw.ModN (N ^ 2) (a b - zz i b) := by
-  first
-  | exact @GlobalTheory.ZCount.exists_class_representatives
-  | exact GlobalTheory.ZCount.exists_class_representatives
-  | (intros; apply GlobalTheory.ZCount.exists_class_representatives <;> assumption)
+  first | exact @GlobalTheory.ZCount.exists_class_representatives

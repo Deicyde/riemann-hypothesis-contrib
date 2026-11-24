@@ -64,14 +64,7 @@ def OrthSplit : Prop :=
           ∧ Submodule.span ℤ_[p] {x} ⊔ L' = L
           ∧ (∀ (c : ℤ_[p]) (y : MvPolynomial σ ℚ_[p]), y ∈ L' → c • x + y = 0 → c = 0)
 
-theorem freeLat_proved : FreeLat := by
-  first
-  | exact Bl.FreeLattices.goal1 ..
-  | (apply Bl.FreeLattices.goal1 <;> assumption)
-  | (intros; apply Bl.FreeLattices.goal1 <;> assumption)
-  | (apply @Bl.FreeLattices.goal1 <;> assumption)
-  | (intros; apply @Bl.FreeLattices.goal1 <;> assumption)
-  | (apply @Bl.FreeLattices.goal1 <;> first | assumption | infer_instance)
+theorem freeLat_proved : FreeLat := by first | (apply Bl.FreeLattices.goal1 <;> assumption)
 
 theorem orthBasisLat_of (hF : FreeLat) (hS : OrthSplit) : OrthBasisLat := by
   intro p _ σ B L W hp hW hLW hfg hsm hadd hsy

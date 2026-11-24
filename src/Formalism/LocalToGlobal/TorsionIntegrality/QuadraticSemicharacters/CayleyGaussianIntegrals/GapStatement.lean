@@ -107,8 +107,8 @@ theorem semi_nsmul
   | zero =>
     have h1 := hα.2 0 Λ.zero_mem 0 Λ.zero_mem
     have h2 := semi_sq hα Λ.zero_mem
-    simp only [add_zero, altE, map_zero, LinearMap.zero_apply, Complex.zero_im, Complex.ofReal_zero,
-        mul_zero, Complex.exp_zero, mul_one]
+    simp only [add_zero, altE, map_zero, Complex.zero_im, Complex.ofReal_zero, mul_zero,
+        Complex.exp_zero, mul_one]
       at h1
     rw [zero_nsmul]
     calc

@@ -2,7 +2,8 @@ module
 
 public import CompanionTheory.AutomorphicTheory.ProductFormulaTheory.GrothendieckRingPolynomial.ProdList
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NonemptyEquivProdIrrZero
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductIrreducibleAppendEquivStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NonemptyEquivMultiProdOne
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductIrreducibleAppendEquiv
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -49,8 +50,6 @@ noncomputable section
 
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
   GlobalTheory.JHMult
-
-
 
 namespace CompanionTheory.Groth
 
@@ -127,7 +126,7 @@ theorem prodIrr_append_one
         = mulR (sg x₀) (cl0 (prodIrr y hy)) := by
   have hx1 : ∑ _ : Fin 1, x₀.1 = x₀.1 := by simp
   obtain ⟨F⟩ :=
-    GlobalTheory.T.product_irreducible_append_equiv k 1 h x₀.1 (∑ a, (y a).1)
+    _root_.GlobalTheory.CompanionTheory.ProdStage.prod₂_prodIrr_append k 1 h x₀.1 (∑ a, (y a).1)
       (fun _ : Fin 1 => x₀)
       y hx1 hy happ
   have H1 := prodIrr_one x₀ hx1

@@ -66,10 +66,14 @@ noncomputable section
 
 namespace PairConeAlg
 
-theorem eval_generic {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ]
-    [Algebra Ω Φ] {N : ℕ} (e u : Module.Basis (Fin N) Ω E) (t : Fin N → Φ) (ψ : Module.Dual Ω E) :
-    ∑ i, t i * algebraMap Ω Φ (ψ (e i)) =
-      ∑ q, (∑ i, t i * algebraMap Ω Φ (u.repr (e i) q)) * algebraMap Ω Φ (ψ (u q)) := by
+theorem eval_generic
+    {Ω : Type*} [Field Ω]
+    {E : Type*} [AddCommGroup E] [Module Ω E]
+    {Φ : Type*} [Field Φ] [Algebra Ω Φ]
+    {N : ℕ} (e u : Module.Basis (Fin N) Ω E) (t : Fin N → Φ)
+    (ψ : Module.Dual Ω E)
+    : ∑ i, t i * algebraMap Ω Φ (ψ (e i))
+      = ∑ q, (∑ i, t i * algebraMap Ω Φ (u.repr (e i) q)) * algebraMap Ω Φ (ψ (u q)) := by
   simp_rw [Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -82,13 +86,15 @@ theorem eval_generic {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Modul
   rw [h, map_sum, Finset.mul_sum]
   simp only [map_mul, mul_assoc]
 
-theorem expand {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ]
-    [Algebra Ω Φ] {N : ℕ} {σ : Type*} (e u : Module.Basis (Fin N) Ω E) (t : Fin N → Φ)
-    (ψ : Module.Dual Ω E) (Y Z : Ω) (o : σ) :
-    ∑ q, C (algebraMap Ω Φ (ψ (u q) / Z)) *
-        (C (algebraMap Ω Φ Y * ∑ i, t i * algebraMap Ω Φ (u.repr (e i) q)) * (X o : MvPolynomial σ Φ)) =
-      C (algebraMap Ω Φ (Y / Z) * ∑ i, t i * algebraMap Ω Φ (ψ (e i))) * X o := by
-
+theorem expand
+    {Ω : Type*} [Field Ω]
+    {E : Type*} [AddCommGroup E] [Module Ω E]
+    {Φ : Type*} [Field Φ] [Algebra Ω Φ]
+    {N : ℕ} {σ : Type*} (e u : Module.Basis (Fin N) Ω E) (t : Fin N → Φ)
+    (ψ : Module.Dual Ω E) (Y Z : Ω) (o : σ)
+    : ∑ q, C (algebraMap Ω Φ (ψ (u q) / Z)) *
+          (C (algebraMap Ω Φ Y * ∑ i, t i * algebraMap Ω Φ (u.repr (e i) q)) * (X o : MvPolynomial σ Φ))
+      = C (algebraMap Ω Φ (Y / Z) * ∑ i, t i * algebraMap Ω Φ (ψ (e i))) * X o := by
   rw [eval_generic e u t ψ, Finset.mul_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [← mul_assoc, ← map_mul]
@@ -96,10 +102,13 @@ theorem expand {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E
   simp only [map_div₀]
   ring
 
-theorem isAlgebraic_of_mulVec {R L : Type*} [CommRing R] [IsDomain R] [CommRing L] [IsDomain L]
-    [Algebra R L] {n : Type*} [Fintype n] [DecidableEq n] (G : Matrix n n L) (w : n → L)
-    (hG : ∀ i j, IsAlgebraic R (G i j)) (hGw : ∀ i, IsAlgebraic R ((G.mulVec w) i)) (hdet : G.det ≠ 0)
-    (q : n) : IsAlgebraic R (w q) := by
+theorem isAlgebraic_of_mulVec
+    {R L : Type*} [CommRing R] [IsDomain R] [CommRing L] [IsDomain L] [Algebra R L]
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (G : Matrix n n L) (w : n → L)
+    (hG : ∀ i j, IsAlgebraic R (G i j)) (hGw : ∀ i, IsAlgebraic R ((G.mulVec w) i))
+    (hdet : G.det ≠ 0) (q : n)
+    : IsAlgebraic R (w q) := by
   let AC := Subalgebra.algebraicClosure R L
   let GA : Matrix n n AC := fun i j => ⟨G i j, hG i j⟩
   let f : AC →+* L := AC.val.toRingHom
@@ -120,12 +129,11 @@ theorem isAlgebraic_of_mulVec {R L : Type*} [CommRing R] [IsDomain R] [CommRing 
 
 end PairConeAlg
 
-
 open PairConeAlg GenericProjClosureDim in
 theorem PairConeAlg.proof : PairConeAlg.Statement := by
-  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N hN E _ _ B B' hB M M' a₀ a₀' φ φ' hφ hφ' Φ _ _ _ _ e t ht
+  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N hN E _ _ B B' hB M M' a₀ a₀' φ φ' hφ hφ' Φ _ _ _ _ e t
+    ht
   classical
-
   have hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0 := fun k => by
     obtain ⟨j, hj⟩ := hV.multiProj.relevant k
     refine ⟨j, fun h0 => hj ?_⟩
@@ -141,18 +149,20 @@ theorem PairConeAlg.proof : PairConeAlg.Statement := by
     have : Finite κ := Finite.of_injective a ha
     haveI := Fintype.ofFinite κ
     have hcard : Fintype.card κ = N := by
-      rw [← finrank_span_eq_card hind, hsp, TwistedDualGensSpan.proof O Ω K ι y N E B a₀ M φ hφ c hyc,
-        finrank_top, Subspace.dual_finrank_eq, Module.finrank_eq_card_basis e, Fintype.card_fin]
+      rw [← finrank_span_eq_card hind, hsp,
+        TwistedDualGensSpan.proof O Ω K ι y N E B a₀ M φ hφ c hyc, finrank_top,
+        Subspace.dual_finrank_eq, Module.finrank_eq_card_basis e, Fintype.card_fin]
     let σ := Fintype.equivFinOfCardEq hcard
     exact ⟨a ∘ σ.symm, hind.comp σ.symm σ.symm.injective⟩
-  obtain ⟨m', hm'⟩ := exists_ne_zero_of_span hN e hli φ'
-    (TwistedDualGensSpan.proof O Ω K ι y N E B' a₀' M' φ' hφ' c hyc)
+  obtain ⟨m', hm'⟩ :=
+    exists_ne_zero_of_span hN e hli φ'
+      (TwistedDualGensSpan.proof O Ω K ι y N E B' a₀' M' φ' hφ' c hyc)
 
   have hϖ0 : algebraMap O Ω ϖ ≠ 0 := by
     intro h0
     have hmem : ϖ ∈ (pointIdeal O y).comap (C : O →+* MRing ι O) := by
-      rw [Ideal.mem_comap, pointIdeal, RingHom.mem_ker, pointConeMap, aeval_C, MvPolynomial.algebraMap_apply, h0,
-        map_zero]
+      rw [Ideal.mem_comap, pointIdeal, RingHom.mem_ker, pointConeMap, aeval_C,
+        MvPolynomial.algebraMap_apply, h0, map_zero]
     rw [hV.noTorsion] at hmem
     exact hϖ.ne_zero (Ideal.mem_bot.1 hmem)
 
@@ -162,12 +172,20 @@ theorem PairConeAlg.proof : PairConeAlg.Statement := by
     by_contra! h
     simp [h] at hsum
   have hsec : ∀ q, ∃ n : ℕ, f l0 ^ n • b l0 q ∈ B.lat c := fun q =>
-    (hiff l0 (b l0 q)).2 ⟨Pi.single q 1, fun q' => ⟨0, by
-      by_cases h : q' = q
-      · subst h; simp
-      · simp [h]⟩, by simp [Pi.single_apply]⟩
+    (hiff l0 (b l0 q)).2 ⟨
+      Pi.single q 1,
+      fun q' => ⟨
+        0,
+        by
+          by_cases h : q' = q
+          · subst h; simp
+          · simp [h]
+      ⟩,
+      by simp [Pi.single_apply]
+    ⟩
   choose n hn using hsec
-  let u := (Module.Basis.mk (hbli l0) (hbsp l0).ge).isUnitSMul (fun q => (pow_ne_zero (n q) hl0).isUnit)
+  let u :=
+    (Module.Basis.mk (hbli l0) (hbsp l0).ge).isUnitSMul (fun q => (pow_ne_zero (n q) hl0).isUnit)
   have hu : ∀ q, u q ∈ B.lat c := fun q => by
     rw [Module.Basis.isUnitSMul_apply, Module.Basis.mk_apply]
     exact hn q
@@ -187,48 +205,53 @@ theorem PairConeAlg.proof : PairConeAlg.Statement := by
       simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, Gm] at hq
       rw [LinearMap.zero_apply, LinearMap.sum_apply]
       simp only [LinearMap.smul_apply, smul_eq_mul]
-      calc ∑ i, r i * φ (l i) (u q) = Y * ∑ i, r i * (φ (l i) (u q) / Y) := by
-            rw [Finset.mul_sum]
-            exact Finset.sum_congr rfl fun i _ => by field_simp
+      calc
+        ∑ i, r i * φ (l i) (u q) = Y * ∑ i, r i * (φ (l i) (u q) / Y) := by
+          rw [Finset.mul_sum]
+          exact Finset.sum_congr rfl fun i _ => by field_simp
         _ = 0 := by rw [hq, mul_zero]
     exact funext (Fintype.linearIndependent_iff.1 hl r hzero)
 
-  have key : ∀ A1 : Subalgebra O (MvPolynomial (Option (Option K)) Φ),
-      (∀ q : Σ k, ι k, C (algebraMap Ω Φ (y q)) * X (some (some q.1)) ∈ A1) →
-      (∀ i, C (pairProjCoord y e φ φ' t ⟨some none, l i⟩) * X (some none) ∈ A1) →
-      C (pairProjCoord y e φ φ' t ⟨none, m'⟩) * X none ∈ A1 →
-      ∀ p : Σ o, bundleIdx (bundleIdx ι M) M' o,
-        IsAlgebraic A1 (C (pairProjCoord y e φ φ' t p) * X p.1) := by
+  have key
+      : ∀ A1 : Subalgebra O (MvPolynomial (Option (Option K)) Φ),
+        (∀ q : Σ k, ι k, C (algebraMap Ω Φ (y q)) * X (some (some q.1)) ∈ A1)
+          → (∀ i, C (pairProjCoord y e φ φ' t ⟨some none, l i⟩) * X (some none) ∈ A1)
+          → C (pairProjCoord y e φ φ' t ⟨none, m'⟩) * X none ∈ A1
+          → ∀ p : Σ o, bundleIdx (bundleIdx ι M) M' o,
+            IsAlgebraic A1 (C (pairProjCoord y e φ φ' t p) * X p.1) := by
     intro A1 h1 h2 h3
     let AC := Subalgebra.algebraicClosure A1 (MvPolynomial (Option (Option K)) Φ)
     have hA : ∀ x ∈ A1, x ∈ AC := fun x hx => isAlgebraic_algebraMap (⟨x, hx⟩ : A1)
     let ψ : Ω →+* MvPolynomial (Option (Option K)) Φ := (C : Φ →+* _).comp (algebraMap Ω Φ)
     have hψ : ∀ a, ψ a = C (algebraMap Ω Φ a) := fun _ => rfl
 
-    let G : Subalgebra O Ω :=
-      { carrier := {a | ψ a ∈ AC}
-        mul_mem' := fun {a b} ha hb => by
-          show ψ (a * b) ∈ AC
-          rw [map_mul]
-          exact AC.mul_mem ha hb
-        add_mem' := fun {a b} ha hb => by
-          show ψ (a + b) ∈ AC
-          rw [map_add (f := _)]
-          exact AC.add_mem ha hb
-        algebraMap_mem' := fun r => by
-          show ψ (algebraMap O Ω r) ∈ AC
-          have : ψ (algebraMap O Ω r) = algebraMap O (MvPolynomial (Option (Option K)) Φ) r := by
-            rw [hψ, ← IsScalarTower.algebraMap_apply, MvPolynomial.algebraMap_apply]
-          rw [this]
-          exact hA _ (A1.algebraMap_mem r) }
+    let G : Subalgebra O Ω := {
+      carrier := {a | ψ a ∈ AC}
+      mul_mem' := fun {a b} ha hb => by
+        show ψ (a * b) ∈ AC
+        rw [map_mul]
+        exact AC.mul_mem ha hb
+      add_mem' := fun {a b} ha hb => by
+        show ψ (a + b) ∈ AC
+        rw [map_add (f := _)]
+        exact AC.add_mem ha hb
+      algebraMap_mem' := fun r => by
+        show ψ (algebraMap O Ω r) ∈ AC
+        have : ψ (algebraMap O Ω r) = algebraMap O (MvPolynomial (Option (Option K)) Φ) r := by
+          rw [hψ, ← IsScalarTower.algebraMap_apply, MvPolynomial.algebraMap_apply]
+        rw [this]
+        exact hA _ (A1.algebraMap_mem r)
+    }
     have hratio : ∀ k j, ψ (y ⟨k, j⟩ / y ⟨k, c k⟩) ∈ AC := by
       intro k j
-      have h0 : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) ∈
-          nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) :=
-        mem_nonZeroDivisors_of_ne_zero (mul_ne_zero (by rw [← hψ]; exact (map_ne_zero ψ).2 (hc k)) (X_ne_zero _))
+      have h0
+          : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k))
+            ∈ nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) :=
+        mem_nonZeroDivisors_of_ne_zero (mul_ne_zero (by rw [← hψ]; exact (map_ne_zero ψ).2 (hc k))
+          (X_ne_zero _))
       refine IsAlgebraic.of_mul h0 (hA _ (h1 ⟨k, c k⟩)) ?_
-      have : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) * ψ (y ⟨k, j⟩ / y ⟨k, c k⟩) =
-          C (algebraMap Ω Φ (y ⟨k, j⟩)) * X (some (some k)) := by
+      have : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) * ψ (y ⟨k, j⟩ / y ⟨k, c k⟩)
+          = C (algebraMap Ω Φ (y ⟨k, j⟩)) * X (some (some k)) := by
         rw [hψ, mul_right_comm, ← map_mul, ← map_mul, mul_div_cancel₀ _ (hc k)]
       rw [this]
       exact hA _ (h1 ⟨k, j⟩)
@@ -262,8 +285,10 @@ theorem PairConeAlg.proof : PairConeAlg.Statement := by
 
     let w : Fin N → MvPolynomial (Option (Option K)) Φ := fun q =>
       C (algebraMap Ω Φ Y * ∑ i, t i * algebraMap Ω Φ (u.repr (e i) q)) * X (some none)
-    have hx : ∀ lφ, C (pairProjCoord y e φ φ' t ⟨some none, lφ⟩) * X (some none) =
-        ∑ q, ψ (φ lφ (u q) / Y) * w q := by
+    have hx
+        : ∀ lφ,
+          C (pairProjCoord y e φ φ' t ⟨some none, lφ⟩) * X (some none)
+            = ∑ q, ψ (φ lφ (u q) / Y) * w q := by
       intro lφ
       have := expand e u t (φ lφ) Y Y (some none : Option (Option K))
       rw [div_self hY, map_one, one_mul] at this
@@ -278,33 +303,42 @@ theorem PairConeAlg.proof : PairConeAlg.Statement := by
         rw [← RingHom.map_det]
         exact (map_ne_zero ψ).2 hdet
     rintro ⟨(_ | _ | k), j⟩
-    ·
-      let P : Fin M' → MvPolynomial (Option (Option K)) Φ := fun l' => ∑ q, ψ (φ' l' (u q) / Y') * w q
-      have hP : ∀ l', P l' = C (algebraMap Ω Φ (Y / Y') * pairProjCoord y e φ φ' t ⟨none, l'⟩) * X (some none) :=
+    · let P : Fin M' → MvPolynomial (Option (Option K)) Φ := fun l' =>
+        ∑ q, ψ (φ' l' (u q) / Y') * w q
+      have hP
+          : ∀ l',
+            P l'
+              = C (algebraMap Ω Φ (Y / Y') * pairProjCoord y e φ φ' t ⟨none, l'⟩) * X (some none) :=
         fun l' => expand e u t (φ' l') Y Y' (some none : Option (Option K))
-      have hPA : ∀ l', P l' ∈ AC := fun l' => Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg' l' q) (hw q)
+      have hPA : ∀ l', P l' ∈ AC := fun l' =>
+        Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg' l' q) (hw q)
       have hP0 : P m' ∈ nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) := by
         rw [hP]
         refine mem_nonZeroDivisors_of_ne_zero (mul_ne_zero ?_ (X_ne_zero _))
         rw [Ne, C_eq_zero]
         exact mul_ne_zero ((map_ne_zero _).2 (div_ne_zero hY hY')) hm'
       refine IsAlgebraic.of_mul hP0 (hPA m') ?_
-      have : P m' * (C (pairProjCoord y e φ φ' t ⟨none, j⟩) * X none) =
-          P j * (C (pairProjCoord y e φ φ' t ⟨none, m'⟩) * X none) := by
+      have : P m' * (C (pairProjCoord y e φ φ' t ⟨none, j⟩) * X none)
+          = P j * (C (pairProjCoord y e φ φ' t ⟨none, m'⟩) * X none) := by
         rw [hP m', hP j]
         simp only [map_mul]
         ring
       rw [this]
       exact AC.mul_mem (hPA j) (hA _ h3)
-    ·
-      show C (pairProjCoord y e φ φ' t ⟨some none, j⟩) * X (some none) ∈ AC
+    · show C (pairProjCoord y e φ φ' t ⟨some none, j⟩) * X (some none) ∈ AC
       rw [hx]
       exact Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg j q) (hw q)
-    ·
-      exact hA _ (h1 ⟨k, j⟩)
-  exact ⟨l, m', hl, hm', key _ (fun q => Algebra.subset_adjoin (Or.inl ⟨q, rfl⟩))
-    (fun i => Algebra.subset_adjoin (Or.inr ⟨Sum.inl i, rfl⟩))
-    (Algebra.subset_adjoin (Or.inr ⟨Sum.inr (), rfl⟩))⟩
+    · exact hA _ (h1 ⟨k, j⟩)
+  exact ⟨
+    l,
+    m',
+    hl,
+    hm',
+    key _
+      (fun q => Algebra.subset_adjoin (Or.inl ⟨q, rfl⟩))
+      (fun i => Algebra.subset_adjoin (Or.inr ⟨Sum.inl i, rfl⟩))
+      (Algebra.subset_adjoin (Or.inr ⟨Sum.inr (), rfl⟩))
+  ⟩
 
 end
 

@@ -4,12 +4,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CongModRefl
 public import Formalism.LocalToGlobal.ProjectiveLattices.IsLevMove
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditionalStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ActLevOfLiftsOfEqOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevMoveCommLevelMapOfTrivialModStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelStructureChangeFramedGeometricPointUniqueStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevMoveCommLevelMapOfTrivialMod
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelStructureChangeFramedGeometricPointUnique
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LiesOverFramedOfSquareLevelMoves
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelMapFibreSimplyTransitive
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelMapsClosed
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointMoveCalculusStatement
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsLevMoveOfFrOver
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelMapFibreSimplyTransitive
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointMoveCalculus
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -44,7 +46,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsLevMoveOfFrOver
 
 @[expose] public section
 
@@ -126,8 +127,8 @@ theorem fibre_torsor
   refine ⟨
     ⟨fun h' => ?_, fun ⟨γ, hγ, hr⟩ => ?_⟩,
     fun γ γ' h₁ h₂ =>
-      GlobalTheory.T.levelStructureChange_framedGeometricPoint_unique E H Dw d.l₂ d.Xo₂ d.c₂ hpq hA
-        lift hlift k y₂ y₂' γ γ' h₁ h₂
+      _root_.GlobalTheory.LevelFree.move_unique E H Dw d.l₂ d.Xo₂ d.c₂ hpq hA lift hlift k y₂ y₂' γ
+        γ' h₁ h₂
   ⟩
   · obtain ⟨g, ρ, ν, hg, -, hmv, hfr⟩ :=
       GlobalTheory.exists_levMove_of_frOver hLaws E H Dw l Xo c 0 d hN hd hM hE d.r d.m hE k hk y y₂
@@ -159,9 +160,9 @@ theorem fibre_torsor
       exact hmv.2.2 a
   · obtain ⟨ρ₂, ν₂, hi, hmv, hfr⟩ := hr
     obtain ⟨e₁, e₂⟩ :=
-      GlobalTheory.T.levMove_comp_r_eq_of_trivial_mod E H Dw l Xo c 0 d hpq hlev hA hbase ρ₂ ν₂
-        (lift γ) LinearMap.id hi hmv hγ
-    obtain ⟨⟨ι, hι, hone⟩, -, -⟩ := GlobalTheory.T.framedPointMove_calculus E H Dw l Xo c
+      _root_.GlobalTheory.levMove_comm_levelMap_of_trivial_mod E H Dw l Xo c 0 d hpq hlev hA hbase
+        ρ₂ ν₂ (lift γ) LinearMap.id hi hmv hγ
+    obtain ⟨⟨ι, hι, hone⟩, -, -⟩ := _root_.GlobalTheory.MoveCalc.frMove_calculus E H Dw l Xo c
     exact GlobalTheory.frOver_of_square_of_frMove E H Dw l Xo c 0 d (𝟙 _) ι ρ₂ ν₂ d.r d.m
       (by rw [e₁, Category.comp_id]) (by rw [e₂, hι, Category.comp_id]) k y y y₂ y₂' hy (hone k y)
       hfr

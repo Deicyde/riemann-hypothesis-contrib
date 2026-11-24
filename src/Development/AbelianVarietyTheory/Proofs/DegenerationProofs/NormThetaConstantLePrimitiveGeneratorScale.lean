@@ -139,9 +139,8 @@ theorem norm_theta_le
   obtain ⟨c', hc'⟩ := hex (htf a).2.1 th'
   have hval : y₀ ⟨S.th a, S.th_mem a⟩ = c * c' := huniq th _ _ (hth a) (hmul th' th c c' hc hc')
   obtain ⟨w₁, hw₁, hv₁, hsum⟩ :=
-    GlobalTheory.T.section_value_at_torsionPoint_eq_sum_terms hLL h₁ h₂ h₃ h₄ u.V u.complete ϖ hϖ
-      u.D Q hQ (PadicAlgCl p) v hv u.A u.G u.semi u.U w₀ rig hW (S.r * S.N) hn q (x a) hqx (e a)
-      (htf a)
+    _root_.GlobalTheory.UT.TorsionValue.value_at_torsion hLL h₁ h₂ h₃ h₄ u.V u.complete ϖ hϖ u.D Q
+      hQ (PadicAlgCl p) v hv u.A u.G u.semi u.U w₀ rig hW (S.r * S.N) hn q (x a) hqx (e a) (htf a)
   obtain ⟨-, -, -, -, hqk, -, hterm⟩ :=
     GlobalTheory.UT.CoefVal.main hLL h₁ h₂ h₃ h₄ u.V u.complete ϖ hϖ u.D Q hQ (PadicAlgCl p) v hv
       q.g

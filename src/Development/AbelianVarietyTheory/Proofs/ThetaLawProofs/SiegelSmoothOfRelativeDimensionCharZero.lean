@@ -88,7 +88,7 @@ theorem card_torsion_of_level
       obtain ⟨a, rfl⟩ := hsurj g hg
       exact ⟨fun i => (a i : ZMod k), Subtype.ext ((key _ _).2 fun i => by simp)⟩
   rw [← Nat.card_eq_of_bijective F hF]
-  simp [Nat.card_pi]
+  simp
 
 noncomputable def pointsEquiv
     {S S' : Scheme.{0}} {G' : Over S'} [GrpObj G']

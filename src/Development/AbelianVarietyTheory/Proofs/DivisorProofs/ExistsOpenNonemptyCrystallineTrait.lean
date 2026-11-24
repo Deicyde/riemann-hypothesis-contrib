@@ -91,8 +91,7 @@ theorem exists_lift_genericFibre
   have hinj := injective_of_charZero ψ.hom
   let ψ' : F →+* K := IsFractionRing.lift hinj
   have hc : ψ'.comp b = ψ.hom := RingHom.ext fun a => IsFractionRing.lift_algebraMap hinj a
-  have e : x ≫ z = spMap ψ' ≫ spMap b := by
-    rw [GlobalTheory.Poinc.GCTrait.spMap_comp'', hc, ← hψ]; rfl
+  have e : x ≫ z = spMap ψ' ≫ spMap b := by rw [_root_.GlobalTheory.spMap_comp_ring, hc, ← hψ]; rfl
   exact ⟨pullback.lift x (spMap ψ') e, pullback.lift_fst _ _ _⟩
 
 theorem exists_finite_point_rat
@@ -135,7 +134,7 @@ theorem exists_finite_point_rat
     | mul a b _ _ ha hb => rw [map_mul]; exact K.mul_mem ha hb
   let φK : Γ(X, U) →+* K := φ.hom.codRestrict K hmem
   refine ⟨K, hK, spMap φK ≫ hU.fromSpec, ?_⟩
-  rw [← Category.assoc, GlobalTheory.Poinc.GCTrait.spMap_comp'',
+  rw [← Category.assoc, _root_.GlobalTheory.spMap_comp_ring,
     ← IsOpenImmersion.lift_fac hU.fromSpec y hr, ← hφ]
   rfl
 
@@ -239,7 +238,7 @@ theorem exists_uCTrait_of_open
       show algebraMap K (PadicAlgCl p) (e (e.symm k)) = _
       rw [AlgEquiv.apply_symm_apply]
     have key : spMap ι ≫ spMap fK ≫ spMap es = spMap (algebraMap K (PadicAlgCl p)) := by
-      rw [GlobalTheory.Poinc.GCTrait.spMap_comp'', GlobalTheory.Poinc.GCTrait.spMap_comp'',
+      rw [_root_.GlobalTheory.spMap_comp_ring, _root_.GlobalTheory.spMap_comp_ring,
         ← RingHom.comp_assoc, hι, hκ]
     refine ⟨⟨y, rfl, T, ι, hint, ?_⟩, rfl⟩
     calc

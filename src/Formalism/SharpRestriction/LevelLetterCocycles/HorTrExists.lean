@@ -119,7 +119,7 @@ theorem horTr_mem
       ⟨∑ m, y r m • b m, (W.N T).sum_mem fun m _ => (W.N T).smul_of_tower_mem _ ((hb.1 m).1.1), ?_⟩
     simp only [LinearMap.smul_apply, LinearMap.id_apply, Finset.smul_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
-    rw [smul_comm, Formalism.MainNotions.UnusedSlot80.ArcF.letter_of_Nl W T c' (hb.1 m).2]
+    rw [smul_comm, _root_.Formalism.MainNotions.LiftingTheory.frame_letE_fix W T c' (hb.1 m).2]
 
 theorem yM_gen
     (hTr : Formalism.MainNotions.LiftingTheory.coreTr W)

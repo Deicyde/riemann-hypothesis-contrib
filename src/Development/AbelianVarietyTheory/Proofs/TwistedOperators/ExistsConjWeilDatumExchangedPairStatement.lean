@@ -46,6 +46,7 @@ open MeasureTheory Matrix GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.PairLift
+
 theorem _root_.GlobalTheory.T.exists_conj_weilDatum_exchangedPair
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (ω : WRep S T),
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.exists_conj_weilDatum_exchangedPair
           IsWeilDatumO ψ T S χT χS ω'
             ∧ ∀ (g : GA D S) (h : GA D T) (f : WO S T → ℂ),
               ω' (h, g) (dag S T f) = dag S T (ω (g, h) f) := by
-  first
-  | exact @GlobalTheory.WeilConj.exists_conj_weilDatum
-  | exact GlobalTheory.WeilConj.exists_conj_weilDatum
-  | (intros; apply GlobalTheory.WeilConj.exists_conj_weilDatum <;> assumption)
+  first | exact @GlobalTheory.WeilConj.exists_conj_weilDatum

@@ -136,7 +136,7 @@ theorem fiber_card_mul_stabCard
             = t⁻¹ * (t * k) := by group
           _ = _ := by rw [e]; group
       have : ((φ ⟨⟨γ⁻¹, Γ.inv_mem hγ⟩, hmem⟩ * k)⁻¹ * k' : K) = (w⁻¹ : G) := by
-        simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_mk]
+        simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv]
         rw [e']
         group
       rw [this]
@@ -149,7 +149,7 @@ theorem fiber_card_mul_stabCard
       show ((φ γ * k : K) : K ⧸ W.subgroupOf K) = ((φ γ₀ * k : K) : K ⧸ W.subgroupOf K) ↔ _
       rw [eq_comm, QuotientGroup.eq, Subgroup.mem_subgroupOf]
       have : (((φ γ₀ * k)⁻¹ * (φ γ * k) : K) : G) = (t * k)⁻¹ * ((γ₀.1 : G)⁻¹ * γ.1) * (t * k) := by
-        simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_mk]; group
+        simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv]; group
       rw [this]
     refine ⟨{
       toFun := fun γ =>

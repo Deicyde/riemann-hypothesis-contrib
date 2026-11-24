@@ -88,9 +88,7 @@ theorem exp_entry_contDiff (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
     | succ m ih =>
       have h' : ContDiff ℝ m (deriv f) := by rw [hder]; exact ih.mul contDiff_const
       have h1 : ContDiff ℝ ((m : WithTop ℕ∞) + 1) f := by
-        first
-        | exact contDiff_succ_iff_deriv.2 ⟨hdiff, by simp, h'⟩
-        | exact contDiff_succ_iff_deriv.2 ⟨hdiff, h'⟩
+        first | exact contDiff_succ_iff_deriv.2 ⟨hdiff, by simp, h'⟩
       exact h1.of_le (by norm_num)
   have hcf : ContDiff ℝ ∞ f := contDiff_infty.2 hcd
   let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℂ := {

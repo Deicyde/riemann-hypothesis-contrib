@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaVacuum_heckeIdentity_splitPlace
     : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)) (P : Pl D.host.E),
@@ -86,7 +87,4 @@ theorem _root_.GlobalTheory.T.thetaVacuum_heckeIdentity_splitPlace
                                 ^ j
                           else
                             0)) := by
-  first
-  | exact @GlobalTheory.Hk3.SplitMatch.match_split
-  | exact GlobalTheory.Hk3.SplitMatch.match_split
-  | (intros; apply GlobalTheory.Hk3.SplitMatch.match_split <;> assumption)
+  first | exact @GlobalTheory.Hk3.SplitMatch.match_split

@@ -61,10 +61,4 @@ theorem exists_isConjAt_of_embedding
     simp only [ComplexEmbedding.conjugate_coe_eq]
     rw [hσ a]
 
-theorem isConjAt_exists_main
-    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
-      (∃ σ : K →+* ℂ, ∀ x : K, σ (star x) = starRingEnd ℂ (σ x))
-        → ∃ v0 : InfinitePlace K, IsConjAt v0 := fun K _ _ _ h =>
-  exists_isConjAt_of_embedding K h
-
 end GlobalTheory

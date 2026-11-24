@@ -148,11 +148,10 @@ theorem unimod_of_unimod_adjoin
   ext a
   have h1 := LocalizedFibreSets.comb_mem_dualAt_iff hs S p L' 0 a
   rw [hU, S.comb_mem_loc_adjoin_iff, zero_mul] at h1
-  constructor
-  · intro ha
-    exact (h1.mpr ⟨Submodule.zero_mem _, ha⟩).2
-  · intro ha
-    exact (h1.mp ⟨Submodule.zero_mem _, ha⟩).2
+  exact ⟨
+    fun ha => (h1.mpr ⟨Submodule.zero_mem _, ha⟩).2,
+    fun ha => (h1.mp ⟨Submodule.zero_mem _, ha⟩).2
+  ⟩
 
 theorem isIntegralLat_cut
     (S : VecSplit h h')
@@ -400,8 +399,7 @@ theorem exists_of_fibLoc_ne_zero
 theorem fibLoc_locF
     (S : VecSplit h h') (L : Submodule (𝓞 K) V) (𝔭 : Ideal (𝓞 F)) (T : Submodule (𝓞 K) V')
     : fibLoc S L 𝔭 (locF 𝔭 T) = fibLoc S L 𝔭 T := by
-  unfold fibLoc
-  rw [LocF.locF_idem]
+  simp only [fibLoc, LocF.locF_idem]
 
 theorem fibLoc_congr
     (S : VecSplit h h') (L : Submodule (𝓞 K) V)

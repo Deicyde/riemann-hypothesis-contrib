@@ -89,15 +89,14 @@ theorem isHaarOn_smul'
   unfold Formalism.MainNotions.S.IsHaarOn at h ⊢
   obtain ⟨hs, hne, hnull, hinv⟩ := h
   refine ⟨?_, ?_, ?_, ?_⟩
-  · first | infer_instance | (rw [← ENNReal.coe_toNNReal h1, ← ENNReal.smul_def]; infer_instance)
+  · first | (rw [← ENNReal.coe_toNNReal h1, ← ENNReal.smul_def]; infer_instance)
   · first
-    | exact smul_ne_zero h0 hne
     | (
         intro hz
         apply hne
         have hu := congrArg (fun ν : Measure (Mt k r) => ν Set.univ) hz
         simp [h0] at hu
-        first | exact hu | exact Measure.measure_univ_eq_zero.mp hu
+        first | exact hu
       )
   · rw [Measure.smul_apply, hnull, smul_zero]
   · intro s hs'

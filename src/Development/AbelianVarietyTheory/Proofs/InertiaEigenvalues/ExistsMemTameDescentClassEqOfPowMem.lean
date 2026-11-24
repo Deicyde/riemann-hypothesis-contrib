@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsAlgebraMapEqRoot
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinDescentMonodromyImageValuationStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrimePowDivisibilityOfDescentDatumStatement
+public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.ImagePolynomialAction
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinDescentMonodromyImageValuation
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrimePowDivisibilityOfDescentDatum
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -41,7 +42,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.ImagePolynomialAction
 
 @[expose] public section
 
@@ -105,7 +105,7 @@ theorem exists_mem_Y'_Lc_cls_eq
             → ∃ y ∈ D.Y', D.Lc (D.cls y) = (l : K) ^ (c + η + (N + 1) * η) • D.Lc w := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D U N hJ hU hN hηH hl h10 c w hw hc
   obtain ⟨-, hVal, hInt⟩ :=
-    GlobalTheory.T.breuilKisinDescent_monodromy_image_valuation O K l e a ι η H D U N hJ hU hN hηH
+    _root_.GlobalTheory.LcImage.image_valuation_integralImage O K l e a ι η H D U N hJ hU hN hηH
   obtain ⟨-, hR0, hv, hcard, hcard'⟩ := hVal hl
 
   obtain ⟨z, hz, hRz⟩ :=
@@ -122,8 +122,7 @@ theorem exists_mem_Y'_Lc_cls_eq
     rw [← ht]
     ring
 
-  obtain ⟨z'', hz'', hv''⟩ :=
-    (GlobalTheory.T.prime_pow_divisibility_of_descentDatum O K l e a ι η H D).1 _ hx1
+  obtain ⟨z'', hz'', hv''⟩ := (_root_.GlobalTheory.divisible_of_BKDat O K l e a ι η H D).1 _ hx1
 
   have hz3 : z'' ∈ (D.desc.Y η).map (D.cls.restrictScalars O) := by rw [Descent.map_Y]; exact hz''
   obtain ⟨y'', hy'', rfl⟩ := hz3

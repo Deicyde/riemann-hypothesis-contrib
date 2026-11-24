@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LatticeDualPairingCyclotomic
 
 @[expose] public section
 
@@ -48,19 +49,6 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
   Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.RedLocConst
-
-theorem mem_span_smul_top'
-    {G : Type} [Group G]
-    {LL : Type} [Field LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V} (L : Lattice (O := O) ρ)
-    (a : O) (x : ↥L.T)
-    : x ∈ (Ideal.span {a} • ⊤ : Submodule O ↥L.T) ↔ ∃ y : ↥L.T, x = a • y := by
-  rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists]
-  constructor
-  · rintro ⟨y, -, rfl⟩; exact ⟨y, rfl⟩
-  · rintro ⟨y, rfl⟩; exact ⟨y, Submodule.mem_top, rfl⟩
 
 theorem redT_mem_Z1Q
     : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (LL : Type) [Field LL]
@@ -91,7 +79,7 @@ theorem redT_mem_Z1Q
         x ∈ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)
           ↔ (x : A.V) ∈ (fun v : A.V => c • v) '' (LA.T : Set A.V) := by
     intro x
-    rw [mem_span_smul_top']
+    rw [_root_.GlobalTheory.TateOrth.mem_span_smul_top]
     constructor
     · rintro ⟨y, rfl⟩
       refine ⟨y, y.2, ?_⟩

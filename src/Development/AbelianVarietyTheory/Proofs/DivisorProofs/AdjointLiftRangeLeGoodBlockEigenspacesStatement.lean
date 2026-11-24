@@ -52,6 +52,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.adjointLift_range_le_goodBlock_eigenspaces
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.adjointLift_range_le_goodBlock_eigenspaces
         GlobalTheory.Chain.LiftInteg D → A3.fam3.Ok3 s → R.WeakCharacterisation F → R.toRealDat.ExAt
           → R.PGEquiv F
           → (R.toCx3 F).zs.InBlock := by
-  first
-  | exact @GlobalTheory.Hk3.inBlock_of_cuspRapidDecay
-  | exact GlobalTheory.Hk3.inBlock_of_cuspRapidDecay
-  | (intros; apply GlobalTheory.Hk3.inBlock_of_cuspRapidDecay <;> assumption)
+  first | exact @GlobalTheory.Hk3.inBlock_of_cuspRapidDecay

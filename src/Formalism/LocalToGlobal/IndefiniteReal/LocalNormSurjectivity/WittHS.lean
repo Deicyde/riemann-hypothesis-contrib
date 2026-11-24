@@ -125,9 +125,7 @@ theorem newton_bound (h2 : vv (2 : L) = 1) (hu : vv (u - 1) < 1) (k : ℕ)
       rw [Valuation.map_mul, Valuation.map_pow, hx1, one_pow, mul_one,
         show (4 : L) = 2 * 2 by norm_num, Valuation.map_mul, h2, one_mul]
     have hlt : vv (u - 1) ^ (k + 1) < 1 := by
-      first
-      | exact pow_lt_one₀ zero_le' hu (Nat.succ_ne_zero k)
-      | exact pow_lt_one' hu (Nat.succ_ne_zero k)
+      first | exact pow_lt_one₀ zero_le' hu (Nat.succ_ne_zero k)
     constructor
     · have he
           : newtonSq u (k + 1) - 1 = (newtonSq u (k + 1) - newtonSq u k) + (newtonSq u k - 1) := by
@@ -138,13 +136,11 @@ theorem newton_bound (h2 : vv (2 : L) = 1) (hu : vv (u - 1) < 1) (k : ℕ)
       exact lt_of_le_of_lt ih2 hlt
     · rw [hsq, Valuation.map_div, Valuation.map_pow, h4, div_one]
       calc
-        vv (newtonSq u k * newtonSq u k - u) ^ 2 ≤ (vv (u - 1) ^ (k + 1)) ^ 2 := by
-          first | exact pow_le_pow_left' ih2 2 | exact pow_le_pow_left₀ zero_le' ih2 2
+        vv (newtonSq u k * newtonSq u k - u) ^ 2
+          ≤ (vv (u - 1) ^ (k + 1)) ^ 2 := by first | exact pow_le_pow_left' ih2 2
         _ = vv (u - 1) ^ ((k + 1) * 2) := by rw [← pow_mul]
         _ ≤ vv (u - 1) ^ (k + 1 + 1) := by
-          first
-          | exact pow_le_pow_right_of_le_one' hu.le (by omega)
-          | exact pow_le_pow_right_of_le_one₀ zero_le' hu.le (by omega)
+          first | exact pow_le_pow_right_of_le_one' hu.le (by omega)
 
 end HS
 
@@ -158,9 +154,7 @@ variable (u : L)
 
 theorem pow_anti {γ : WithZero (Multiplicative ℤ)} (hγ : γ ≤ 1) {a b : ℕ} (hab : a ≤ b)
     : γ ^ b ≤ γ ^ a := by
-  first
-  | exact pow_le_pow_right_of_le_one' hγ hab
-  | exact pow_le_pow_right_of_le_one₀ zero_le' hγ hab
+  first | exact pow_le_pow_right_of_le_one' hγ hab
 
 theorem newton_cauchy_bound (h2 : vv (2 : L) = 1) (hu : vv (u - 1) < 1) (n m : ℕ) (hnm : n ≤ m)
     : vv (newtonSq u m - newtonSq u n) ≤ vv (u - 1) ^ (n + 1) := by

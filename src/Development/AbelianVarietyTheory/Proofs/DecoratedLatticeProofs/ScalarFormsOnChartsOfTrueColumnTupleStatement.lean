@@ -50,6 +50,7 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.KJInf Formalism.L2.Ker
 open GlobalTheory.SeeSaw GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.scalarForms_on_charts_of_trueColumnTuple
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.scalarForms_on_charts_of_trueColumnTuple
                                 (infM θ _ (rankN (I.rec7 l Z) i hi) k) ⟨y.1, y.2⟩ ⟨y'.1, y'.2⟩
                               → A.rd θ i hi β φ y (γ * (A.h i β c * k) * κ.1)
                                 = (A.chi i β κ : ℂ) * φ c.1 y' := by
-  first
-  | exact @GlobalTheory.AdForm.rd_charts
-  | exact GlobalTheory.AdForm.rd_charts
-  | (intros; apply GlobalTheory.AdForm.rd_charts <;> assumption)
+  first | exact @GlobalTheory.AdForm.rd_charts

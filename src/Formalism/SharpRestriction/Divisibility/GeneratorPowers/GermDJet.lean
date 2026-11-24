@@ -75,7 +75,7 @@ theorem jet_hom_ext
   Ideal.Quotient.algHom_ext R (MvPolynomial.algHom_ext fun i => h i)
 
 private theorem deg_sum_lemma {κ : Type} (e : κ →₀ ℕ) : e.degree = ∑ i ∈ e.support, e i := by
-  first | rfl | simp [Finsupp.degree] | exact Finsupp.degree_apply e
+  first | rfl
 
 theorem monomial_mem_orig_pow (e : ι →₀ ℕ) (c : R) : monomial e c ∈ orig R ι ^ e.degree := by
   classical
@@ -223,7 +223,7 @@ theorem sL_trunc (m : ℕ) (g : Fin d → MvPowerSeries (Fin 1 × Fin d) R)
   rw [Ideal.Quotient.eq]
   fin_cases k
   · simp
-  · simp only [power_series_in_fin_one, Matrix.cons_val_one, Matrix.head_cons]
+  · simp only [power_series_in_fin_one]
     change psTrunc (m + 1) (g j) - C (MvPolynomial.constantCoeff (psTrunc (m + 1) (g j)))
         - (psTrunc m (g j) - C (MvPolynomial.constantCoeff (psTrunc m (g j))))
       ∈ _

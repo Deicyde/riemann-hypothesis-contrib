@@ -103,7 +103,6 @@ theorem UpperTheory.V.Alg.homog_span
     obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hf
     choose G hG using fun i => W.surj (a i)
     have h1 : f - ∑ i, G i * e i ∈ RingHom.ker W.π := by
-
       rw [RingHom.mem_ker, map_sub, ← ha, map_sum]
       simp [hG, heg]
     have h2 := W.homog _ h1 j

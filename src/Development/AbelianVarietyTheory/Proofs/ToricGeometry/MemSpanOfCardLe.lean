@@ -78,7 +78,6 @@ def secComb
     : L.Sec where
   f j := ∑ i, constFn p _ (a i) * (s i).f j
   compat j k := by
-
     rw [map_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, map_mul, res_constFn, res_constFn, (s i).compat j k]

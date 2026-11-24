@@ -49,7 +49,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 namespace UpperTheory.Gal.projectedFormsSystemPart
 
 open UpperTheory.V.Z.Ord UpperTheory.Zero.LLC

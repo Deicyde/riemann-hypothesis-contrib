@@ -176,7 +176,7 @@ theorem fixed_fd_of_conjT
     | smul a x _ hx =>
       have : (fun g => star ((a • x) g)) = star a • (fun g => star (x g)) := by
         funext g
-        simp [mul_comm]
+        simp
       rw [this]
       exact S2.smul_mem _ hx
   let c : S1 →ₗ[ℝ] S2 := {
@@ -217,7 +217,7 @@ theorem form_of_conjT
     have e : c (y + a • z) = c y + (starRingEnd ℂ a) • c z := by
       apply Subtype.ext
       funext g
-      simp [hc, mul_comm]
+      simp [hc]
     simp only
     rw [e, hlin, map_add (f := _), map_mul, Complex.conj_conj]
   · intro x y

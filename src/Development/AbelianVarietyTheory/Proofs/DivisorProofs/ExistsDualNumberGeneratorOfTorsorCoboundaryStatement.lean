@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB)
 open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
   GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_dualNumberGenerator_of_torsorCoboundary
     : ∀ (R : Type) [CommRing R] (A B : Over (Sp R)) [GrpObj A] [GrpObj B] (P : LB (A ⊗ B).left),
       P.IsLB
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.exists_dualNumberGenerator_of_torsorCoboundary
                 → ∀ s,
                   IsPtGen P (AbDual.inl A B) s
                     → ∀ k : Fn0 A, IsCob (chartsA P) (tanCoc P j v) k → ∃ T, IsEpsGen P v T := by
-  first
-  | exact @GlobalTheory.PtExt.exists_isEpsGen_of_isCob
-  | exact GlobalTheory.PtExt.exists_isEpsGen_of_isCob
-  | (intros; apply GlobalTheory.PtExt.exists_isEpsGen_of_isCob <;> assumption)
+  first | exact @GlobalTheory.PtExt.exists_isEpsGen_of_isCob

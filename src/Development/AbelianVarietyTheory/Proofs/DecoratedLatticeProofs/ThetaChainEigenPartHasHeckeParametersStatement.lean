@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaChain_eigenPart_has_heckeParameters
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ D : D7,
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.thetaChain_eigenPart_has_heckeParameters
                 ∧ ∀ w B,
                   PiLocalization₂.val u w ≠ 0 → ParFun c s (PiLocalization₂.val u w) B
                     → IsPar u B := by
-  first
-  | exact @GlobalTheory.ChainOnto.partPar
-  | exact GlobalTheory.ChainOnto.partPar
-  | (intros; apply GlobalTheory.ChainOnto.partPar <;> assumption)
+  first | exact @GlobalTheory.ChainOnto.partPar

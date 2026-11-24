@@ -81,27 +81,7 @@ namespace Formalism.MainNotions.G
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem sc_x_pos (s : Scale) : 0 < s.x := lt_trans one_pos s.one_lt_alt
-
-theorem sc_one_le_b (s : Scale) : 1 ≤ s.b := by
-  unfold Scale.b Scale.L
-  exact Real.one_le_exp (Real.rpow_nonneg (sc_x_pos s).le _)
-
-theorem sc_one_lt_a (s : Scale) : 1 < s.a := by
-  unfold Scale.a
-  nlinarith [s.one_lt_alt, sc_one_le_b s]
-
-theorem sc_b'_nonneg (s : Scale) : 0 ≤ s.b' := by
-  unfold Scale.b' Scale.X'
-  exact div_nonneg (le_trans zero_le_one (sc_one_lt_a s).le) (Real.exp_pos _).le
-
-theorem sc_w''_nonneg (s : Scale) (n : ℕ) : 0 ≤ s.w'' n := by
-  unfold Scale.w''
-  exact div_nonneg (sc_b'_nonneg s) (mul_nonneg (sc_x_pos s).le (Nat.cast_nonneg n))
-
-theorem sc_delta1_pos (s : Scale) : 0 < s.delta1 := by
-  unfold Scale.delta1
-  exact Real.rpow_pos_of_pos (sc_x_pos s) _
+alias sc_x_pos := _root_.Formalism.BasicNotions.Scale.x_pos
 
 theorem rG_eq (s : Scale) : rG s = Formalism.MainNotions.rG s.eps := rfl
 
@@ -159,12 +139,12 @@ theorem lo_le_loG
   have hCC' : C ≤ C' := by linarith
   have hC'1 : 1 ≤ C' := by linarith
   have hC'0 : 0 ≤ C' := by linarith
-  have ha := sc_one_lt_a L.sc
+  have ha := _root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a L.sc
   have hlg : 0 ≤ Real.logb p (2 * L.sc.a) := Real.logb_nonneg hp1 (by linarith)
   have hlx : 0 ≤ Real.log L.sc.x := Real.log_nonneg L.sc.one_lt_alt.le
-  have hb' := sc_b'_nonneg L.sc
-  have hw := sc_w''_nonneg L.sc D.R.n
-  have hd := sc_delta1_pos L.sc
+  have hb' := _root_.Formalism.MainNotions.G.TopChoiceBounds.scale_b'_nonneg₂ L.sc
+  have hw := _root_.Formalism.MainNotions.G.TopChoiceBounds.w''_nonneg₂ L.sc D.R.n
+  have hd := _root_.Formalism.MainNotions.J.delta1_pos L.sc
   have hSc := L.Sc_pos
   have hη := L.etaSz_pos
   have hk : (0 : ℝ) ≤ (D.R.k : ℝ) := Nat.cast_nonneg _
@@ -185,7 +165,7 @@ theorem lo_le_loG
     have h3 := mul_nonneg habs hk
     have h4 := mul_nonneg habs hSc.le
     rw [hC']
-    nlinarith
+    linarith
 
   have hpr
       : (if IsResidueClassZero D p then
@@ -214,7 +194,7 @@ theorem lo_le_loG
       · rw [if_pos h0, if_pos h0, ← rG_eq]
         have h1 : 0 ≤ (rG L.sc : ℝ) * L.sc.b' * Real.log L.sc.x :=
           mul_nonneg (mul_nonneg (Nat.cast_nonneg _) hb') hlx
-        nlinarith [mul_nonneg (sub_nonneg.2 hCC') h1]
+        linarith [mul_nonneg (sub_nonneg.2 hCC') h1]
       · rw [if_neg h0, if_neg h0]
         by_cases h1 : (p : ℝ) < L.sc.X'
         · rw [if_pos h1, if_pos h1]
@@ -233,7 +213,7 @@ theorem lo_le_loG
                   + (D.R.t : ℝ) * Real.log L.sc.x / L.sc.delta1 := by
             ring
           rw [e4, e5]
-          nlinarith [mul_nonneg (sub_nonneg.2 hCC') e2, mul_nonneg (sub_nonneg.2 hC'1) e1,
+          linarith [mul_nonneg (sub_nonneg.2 hCC') e2, mul_nonneg (sub_nonneg.2 hC'1) e1,
             mul_nonneg (sub_nonneg.2 hC'1) hη.le, mul_nonneg hC'0 hSc.le, mul_nonneg hC'0 e3]
         · rw [if_neg h1, if_neg h1]
     · rw [if_neg hc, if_neg hc]
@@ -287,14 +267,15 @@ theorem lo_le_loG
 theorem fl_le_flG (L : SizeData₂ D) (C : ℝ) (p : ℕ) (hp : p.Prime)
     : fl D L.sc C p ≤ flG L (4 * |C| + 1) p := by
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
-  have hlg : 0 ≤ Real.logb p L.sc.a := Real.logb_nonneg hp1 (sc_one_lt_a L.sc).le
+  have hlg : 0 ≤ Real.logb p L.sc.a :=
+    Real.logb_nonneg hp1 (_root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a L.sc).le
   have hCC' : C ≤ 4 * |C| + 1 := by linarith [abs_nonneg C, le_abs_self C]
   have hf : (0 : ℝ) ≤ (D.R.f : ℝ) := Nat.cast_nonneg _
   unfold fl flG Nm
   have e1 : 0 ≤ (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) ^ 2 * Real.logb p L.sc.a :=
     mul_nonneg (mul_nonneg hf (by positivity)) hlg
   have e2 : 0 ≤ (D.R.f : ℝ) * Real.logb p L.sc.a ^ 2 := mul_nonneg hf (by positivity)
-  nlinarith [mul_nonneg (sub_nonneg.2 hCC') e1, mul_nonneg (sub_nonneg.2 hCC') e2]
+  linarith [mul_nonneg (sub_nonneg.2 hCC') e1, mul_nonneg (sub_nonneg.2 hCC') e2]
 
 theorem aL_top (L : SizeData₂ D) (t : D.host.TT) : aL L (t : HH D) = L.aT t := by
   unfold aL
@@ -360,7 +341,7 @@ theorem vUnit_pos {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) : 0 < vUnit G := by
 
 theorem X'_le_X'' (s : Scale) (n : ℕ) (hn : 1 ≤ n) : s.X' ≤ s.X'' n := by
   have hx := sc_x_pos s
-  have ha : 0 < s.a := lt_trans one_pos (sc_one_lt_a s)
+  have ha : 0 < s.a := lt_trans one_pos (_root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a s)
   have hX : 0 < s.X' := by unfold Scale.X'; exact Real.exp_pos _
   have hn' : (1 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
   have h : s.X'' n = s.X' * (s.x * n) := by
@@ -369,12 +350,6 @@ theorem X'_le_X'' (s : Scale) (n : ℕ) (hn : 1 ≤ n) : s.X' ≤ s.X'' n := by
   rw [h]
   have : 1 ≤ s.x * n := by nlinarith [s.one_lt_alt]
   nlinarith
-
-theorem cand_of_VV_ne (X : Inst D L) (K : Consts) (a b : HH D → ℤ) (p : ℕ) (h : VV X K a b p ≠ ∅)
-    : Cand D L K p := by
-  unfold VV at h
-  by_contra hc
-  exact h (if_neg (fun hh => hc hh.1))
 
 def ServedGIdx (X : Inst D L) (K : Consts) : Prop :=
   ∀ (u : D.what₂.Word) (p : ℕ),
@@ -393,7 +368,8 @@ theorem servedGIdx_of
     (hLv : LevelPrimesNotClassZero D)
     : ServedGIdx X K := by
   intro u p hV hpT
-  obtain ⟨hp, _, hc0, hord, _⟩ := cand_of_VV_ne X K _ _ _ hV
+  obtain ⟨hp, _, hc0, hord, _⟩ :=
+    _root_.Formalism.MainNotions.G.TopChoiceBounds.bt_cand X K _ _ _ hV
   refine ⟨
     hp,
     ?_,
@@ -412,82 +388,7 @@ theorem servedGIdx_of
     exact hj (D.host.split_small p hp hne2 hp4)
   · exact fun h => hpT ((Nat.prime_dvd_prime_iff_eq hp (D.mem u).A.T_prime).1 h)
 
-theorem Nm_le_Sc (P : ParameterChoice' D L)
-    : (5 : ℝ) ≤ (D.R.k : ℝ) ∧ (D.R.N D.R.m : ℝ) ≤ L.Sc ∧ 100 ≤ L.Sc := by
-  have hm : (2 : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast D.R.two_le_m
-  have hk : (5 : ℝ) ≤ (D.R.k : ℝ) := by
-    have := D.R.m_add_three_le_k
-    have h2 := D.R.two_le_m
-    exact_mod_cast (by omega : 5 ≤ D.R.k)
-  have hNk : (D.R.k : ℝ) ≤ (D.R.N D.R.m : ℝ) := by
-    have : D.R.k ≤ D.R.N D.R.m := by unfold Ranks.N; omega
-    exact_mod_cast this
-  have h := P.Del_ge.2.2.2
-  have hm10 : (1 : ℝ) ≤ (D.R.m : ℝ) ^ 10 := one_le_pow₀ (by linarith)
-  have hN0 : (0 : ℝ) ≤ (D.R.N D.R.m : ℝ) := Nat.cast_nonneg _
-  have hND : (D.R.N D.R.m : ℝ) ≤ (D.s.Del : ℝ) := by
-    have := mul_le_mul_of_nonneg_left hm10 hN0
-    linarith
-  have hD : (5 : ℝ) ≤ (D.s.Del : ℝ) := by linarith
-  have hkD : 5 * (D.s.Del : ℝ) ≤ (D.R.k : ℝ) * (D.s.Del : ℝ) :=
-    mul_le_mul_of_nonneg_right hk (by linarith)
-  refine ⟨hk, ?_, ?_⟩ <;> rw [L.Sc_eq] <;> nlinarith
-
-theorem kaJ_le (P : ParameterChoice' D L) (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
-    : kaJ D j ≤ L.Sc := by
-  obtain ⟨hk, hN, _⟩ := Nm_le_Sc P
-  have hj2 : (j : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast (Finset.mem_Icc.1 hj).2
-  have hNe : (D.R.N D.R.m : ℝ) = (D.R.k : ℝ) + (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by
-    unfold Ranks.N; push_cast; ring
-  have ht : (0 : ℝ) ≤ (D.R.t : ℝ) + 1 := by positivity
-  have h1 := mul_le_mul_of_nonneg_right hj2 ht
-  unfold kaJ
-  nlinarith
-
-theorem w''_le (s : Scale) (n : ℕ) (hn : 1 ≤ n) : s.w'' n ≤ s.b' / s.x ∧ s.b' / s.x ≤ s.b' := by
-  have hx := sc_x_pos s
-  have hn' : (1 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
-  have hb := sc_b'_nonneg s
-  constructor
-  · unfold Scale.w''
-    apply div_le_div_of_nonneg_left hb hx
-    nlinarith
-  · exact div_le_self hb s.one_lt_alt.le
-
-theorem two_b'_le_a (s : Scale) : 2 * s.b' ≤ s.a := by
-  have hX : 2 ≤ s.X' := by
-    unfold Scale.X'
-    have h1 : 1 ≤ s.x ^ (s.eps / 3) :=
-      Real.one_le_rpow s.one_lt_alt.le (by have := s.eps_pos; positivity)
-    have := Real.add_one_le_exp (s.x ^ (s.eps / 3))
-    linarith
-  have hb := sc_b'_nonneg s
-  have h : s.b' * s.X' = s.a := by
-    unfold Scale.b'
-    exact div_mul_cancel₀ _ (by linarith)
-  nlinarith
-
-theorem fill_nonneg (X : Inst D L) (j : ℕ) (z : Bool × HH D) : 0 ≤ fill X (bL L) j z := by
-  have hb := sc_b'_nonneg L.sc
-  have hx := sc_x_pos L.sc
-  unfold fill
-  by_cases ht : z.1 = false ∧ z.2 ∈ D.host.TT
-  · rw [if_pos ht]
-    have h1 := (X.off_top j z ht).1
-    have h2 : L.sc.b' ≤ (bL L z.2 : ℝ) := by
-      unfold bL
-      rw [dite_eq_left ht.2]
-      exact L.bT_ge _
-    have h3 : 0 ≤ L.sc.b' / L.sc.x := div_nonneg hb hx.le
-    linarith
-  · rw [if_neg ht]
-    by_cases hth : IsThickPl D z
-    · have := (X.off_thick j z hth).1
-      have := sc_one_le_b L.sc
-      linarith
-    · have := (X.off_thin j z ⟨ht, hth⟩).1
-      have := sc_w''_nonneg L.sc D.R.n
-      linarith
+alias w''_le := _root_.Formalism.MainNotions.G.TopChoiceBounds.w''_le₂
 
 theorem ceil_bound (S B R : ℝ) (hSB : S ≤ B) (h : (B = 0 ∧ R = 0) ∨ B + 1 ≤ R)
     : ((⌈S⌉ : ℤ) : ℝ) ≤ R := by
@@ -508,17 +409,18 @@ theorem svBound_of (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterCho
     : SvBound X K := by
   classical
   intro p t0 ht0
-  obtain ⟨hp, hpX, -⟩ := cand_of_VV_ne X K _ _ _ (Finset.ne_empty_of_mem ht0)
+  obtain ⟨hp, hpX, -⟩ :=
+    _root_.Formalism.MainNotions.G.TopChoiceBounds.bt_cand X K _ _ _ (Finset.ne_empty_of_mem ht0)
   obtain ⟨_, _, _, _, _, _, _, _, _, _, _, hdl1, hdl2, hPr1, _⟩ := hK
-  obtain ⟨hk, hN, hSc⟩ := Nm_le_Sc P
+  obtain ⟨hk, hN, hSc⟩ := _root_.Formalism.MainNotions.G.TopChoiceBounds.bl_Nm_le_Sc P
   have hn : 1 ≤ D.R.n := D.R.n_pos'
   obtain ⟨hw1, hw2⟩ := w''_le L.sc D.R.n hn
   have hkS := P.kS_le
-  have hab := two_b'_le_a L.sc
+  have hab := _root_.Formalism.MainNotions.G.TopChoiceBounds.two_b'_le_a₂ L.sc
   have hx := sc_x_pos L.sc
-  have ha := sc_one_lt_a L.sc
-  have hb' := sc_b'_nonneg L.sc
-  have hw0 := sc_w''_nonneg L.sc D.R.n
+  have ha := _root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a L.sc
+  have hb' := _root_.Formalism.MainNotions.G.TopChoiceBounds.scale_b'_nonneg₂ L.sc
+  have hw0 := _root_.Formalism.MainNotions.G.TopChoiceBounds.w''_nonneg₂ L.sc D.R.n
   have hη := L.etaSz_pos
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
   have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
@@ -563,8 +465,8 @@ theorem svBound_of (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterCho
     · apply le_min
       · exact div_nonneg (hal s (Finset.mem_filter.1 hs).1).1 (by positivity)
       · unfold capU fillG cG
-        have := fill_nonneg X j (partner D p s e)
-        have := kaJ_le P j hj
+        have := _root_.Formalism.MainNotions.G.TopChoiceBounds.fill_nonneg₂ X j (partner D p s e)
+        have := _root_.Formalism.MainNotions.G.TopChoiceBounds.kappa_le_Sc P j hj
         linarith
     · exact le_rfl
   have hbase : 0 ≤ L.sc.w'' D.R.n + L.etaSz + cG L + Nm D := by linarith
@@ -580,7 +482,7 @@ theorem svBound_of (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterCho
           unfold fill
           rw [if_pos ⟨rfl, hs'⟩]
         have h2 := (X.off_top j (false, s) ⟨rfl, hs'⟩).1
-        have h3 := kaJ_le P j hj
+        have h3 := _root_.Formalism.MainNotions.G.TopChoiceBounds.kappa_le_Sc P j hj
         unfold fillG
         rw [h1]
         linarith
@@ -596,7 +498,7 @@ theorem svBound_of (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterCho
     have h1 : (p : ℝ) / ((p : ℝ) ^ 2 - 1) ≤ 4 / 3 * (1 / p) := by
       rw [div_le_iff₀ hd]
       field_simp
-      nlinarith
+      linarith
     have h2 := mul_le_mul_of_nonneg_right h1 (by linarith : (0 : ℝ) ≤ L.sc.a)
     calc
       (p : ℝ) / ((p : ℝ) ^ 2 - 1) * L.sc.a
@@ -627,7 +529,7 @@ theorem svBound_of (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterCho
     have h5 := mul_le_mul_of_nonneg_left hgam.2 hNv
     have h6 : 0 ≤ (Nv X p t0 : ℝ) * q := mul_nonneg hNv (by linarith)
     apply max_le (by linarith)
-    nlinarith
+    linarith
   have htot
       : ∑ j ∈ SizeData₂.lifts D,
           max 0 (gU X K (aL L) (bL L) p j t0 - Pr X K (bL L) p j t0 - max (g0 X K (aL L) (bL L) p j t0) 0)
@@ -697,13 +599,7 @@ theorem cmp_inj
   ext a
   simpa using h a
 
-theorem descent
-    (hφ : ∀ x : K, w.valuation K x ≤ 1 ↔ φ x ∈ Set.range (algebraMap O Kf))
-    (hs : ∀ a x, cmp (a • x) = φ a • cmp x) (hli : LinearIndependent Kf (fun a => cmp (b a)))
-    (Lat : Submodule A V) (hfg : Lat.FG)
-    (v : V) (hv : cmp v ∈ Submodule.span O (cmp '' (Lat : Set V)))
-    : ∃ s : A, s ∉ w.asIdeal ∧ s • v ∈ Lat := by
-  exact Bl.general_b_fact_upper_bis.goal1 w b φ cmp hφ hs hli Lat hfg v hv
+alias descent := _root_.Bl.general_b_fact_upper_bis.goal1
 
 end Descent
 
@@ -906,7 +802,7 @@ theorem linkG_at_core
           have h1 : aL L s = L.aT ⟨s, hs⟩ := by unfold aL; rw [dite_eq_left hs]
           obtain ⟨_, h2⟩ := L.aT_win ⟨s, hs⟩
           have h3 : L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2)) ≤ L.sc.a := by
-            have ha := sc_one_lt_a L.sc
+            have ha := _root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a L.sc
             have hk : (1 : ℝ) ≤ (D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2) := by
               have hk1 : (1 : ℝ) ≤ (D.R.k : ℝ) := by
                 have := D.R.m_add_three_le_k
@@ -921,7 +817,8 @@ theorem linkG_at_core
           intro s hs
           have h1 : bL L s = L.bT ⟨s, hs⟩ := by unfold bL; rw [dite_eq_left hs]
           rw [h1]
-          exact le_trans (sc_b'_nonneg L.sc) (L.bT_ge ⟨s, hs⟩)
+          exact le_trans (_root_.Formalism.MainNotions.G.TopChoiceBounds.scale_b'_nonneg₂ L.sc)
+            (L.bT_ge ⟨s, hs⟩)
         have hPG := (h0 (aL L) (bL L) haw hbw _ hp hin' j hj t.1 t.2).1
         simp only [Function.Embedding.coe_subtype]
         linarith
@@ -946,8 +843,10 @@ theorem linkG_at_of
     (fun w => (hlat w).2)
     (fun u w hg hV =>
       (hlat w).1
-        (hsupp w (le_trans (cand_of_VV_ne X K _ _ _ hV).2.1.le (X'_le_X'' L.sc D.R.n D.R.n_pos'))) u
-        hg)
+        (hsupp w
+          (le_trans (_root_.Formalism.MainNotions.G.TopChoiceBounds.bt_cand X K _ _ _ hV).2.1.le
+            (X'_le_X'' L.sc D.R.n D.R.n_pos')))
+        u hg)
     hsupp hTied hNu h1 h2 h0 hG1 hServed hSv hIncl
 
 def Ev {eps : ℝ} (Fm : FamP eps) (P : ∀ x, Fm.Ix x → Prop) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i, P x i
@@ -1015,7 +914,7 @@ theorem eventually_sizes_admitted {eps : ℝ} (Fm : FamP eps)
   obtain ⟨w⟩ := exists_place (Fm.D x i)
   obtain ⟨_, _, _, _, _, _, hLa⟩ := Fm.fills x hx1 i w
   have P := Fm.params x hx1 i
-  obtain ⟨hk, hN, hSc⟩ := Nm_le_Sc P
+  obtain ⟨hk, hN, hSc⟩ := _root_.Formalism.MainNotions.G.TopChoiceBounds.bl_Nm_le_Sc P
   have hkS := P.kS_le
   have hkSc : 5 * (Fm.L x i).Sc ≤ ((Fm.D x i).R.k : ℝ) * (Fm.L x i).Sc :=
     mul_le_mul_of_nonneg_right hk (by linarith)
@@ -1062,10 +961,10 @@ theorem family_second_bound_of_theorem
   refine ⟨x0, fun x hx i => ?_⟩
   obtain ⟨hp, hx1⟩ := h x hx i
   have P := Fm.params x hx1 i
-  obtain ⟨hk, _, hSc⟩ := Nm_le_Sc P
+  obtain ⟨hk, _, hSc⟩ := _root_.Formalism.MainNotions.G.TopChoiceBounds.bl_Nm_le_Sc P
   obtain ⟨hw1, hw2⟩ := w''_le (Fm.L x i).sc (Fm.D x i).R.n (Fm.D x i).R.n_pos'
   have hkS := P.kS_le
-  have hab := two_b'_le_a (Fm.L x i).sc
+  have hab := _root_.Formalism.MainNotions.G.TopChoiceBounds.two_b'_le_a₂ (Fm.L x i).sc
   have hkSc : 5 * (Fm.L x i).Sc ≤ ((Fm.D x i).R.k : ℝ) * (Fm.L x i).Sc :=
     mul_le_mul_of_nonneg_right hk (by linarith)
   exact Joints.type_two_hypothesis_of_counts _ _ _ C hC0 hCk hCt hCL hCD hCs hCk'
@@ -1451,7 +1350,7 @@ theorem first_theorem_tools_admitted (h70 : ExtremalProjectorTools) (h : Loc8All
       ColumnFamilies.Top.b9 D,
       ColumnFamilies.Top.b10 D,
       ColumnFamilies.Top.b11 D,
-      ColumnFamilies.Top.b19 D
+      _root_.Formalism.MainNotions.G.ColumnFamilies.admissible_lattice_biduality D
     ⟩,
     ⟨h.tCartanDomain, h.tCartanOnto⟩,
     ⟨h.lWitt, h.tFlatTop, h.tFlatHH⟩,
@@ -1646,14 +1545,14 @@ theorem sizes_bound_of_log_estimates
   have hinv : 0 < 1 / K.La := by positivity
   have hA : 2 * K.La * Ce ^ 2 * l ^ 3 ≤ xd := by
     have : 0 ≤ (38 * Ce + 1 / K.La) * l ^ 3 := by positivity
-    nlinarith
+    linarith
   have hB : 38 * Ce * l ^ 3 ≤ xd := by
     have : 0 ≤ (2 * K.La * Ce ^ 2 + 1 / K.La) * l ^ 3 := by positivity
-    nlinarith
+    linarith
   have hC : 1 / K.La ≤ xd := by
     have h1 : 0 ≤ (2 * K.La * Ce ^ 2 + 38 * Ce) * l ^ 3 := by positivity
     have h2 : 1 / K.La ≤ 1 / K.La * l ^ 3 := le_mul_of_one_le_right hinv.le hl3
-    nlinarith
+    linarith
   have hloga : Real.log L.sc.a = l + xe := by
     unfold Scale.a Scale.b Scale.L
     rw [Real.log_mul hx0.ne' (Real.exp_pos _).ne', Real.log_exp]
@@ -1752,7 +1651,7 @@ theorem family_sizes_bound {eps : ℝ} (Fm : FamP eps) (hLa : 0 < Fm.GK.La) : Ad
   have hx3 : (3 : ℝ) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
   have hxx := Fm.L_x x i hx1
   have hee := Fm.L_eps x i
-  have hd0 : 0 < (Fm.L x i).sc.delta1 := sc_delta1_pos _
+  have hd0 : 0 < (Fm.L x i).sc.delta1 := _root_.Formalism.MainNotions.J.delta1_pos _
   have hd1 : (Fm.L x i).sc.delta1 ≤ 1 := by
     unfold Scale.delta1
     apply Real.rpow_le_one_of_one_le_of_nonpos (Fm.L x i).sc.one_lt_alt.le
@@ -1883,7 +1782,8 @@ theorem windows_of
 
 theorem La_nonneg {K : Consts} (h : 0 ≤ K.La) (s : Scale) : 0 ≤ La K s := by
   unfold La
-  exact mul_nonneg (mul_nonneg h (by positivity)) (Real.log_nonneg (sc_one_lt_a s).le)
+  exact mul_nonneg (mul_nonneg h (by positivity))
+    (Real.log_nonneg (_root_.Formalism.MainNotions.G.TopChoiceBounds.bt_a s).le)
 
 def NumCmpF {eps : ℝ} (Fm : FamP eps) : Prop :=
   Ev Fm fun x i =>
@@ -2042,7 +1942,7 @@ theorem cb_closed (𝒞 : FamClass)
     have hx3 : (3 : ℝ) ≤ x := le_trans (le_max_right _ _) hx
     have hxx := Fm.L_x x i hxx1
     have hee := Fm.L_eps x i
-    have hd0 : 0 < (Fm.L x i).sc.delta1 := sc_delta1_pos _
+    have hd0 : 0 < (Fm.L x i).sc.delta1 := _root_.Formalism.MainNotions.J.delta1_pos _
     have hd1 : (Fm.L x i).sc.delta1 ≤ 1 := by
       unfold Scale.delta1
       apply Real.rpow_le_one_of_one_le_of_nonpos (Fm.L x i).sc.one_lt_alt.le

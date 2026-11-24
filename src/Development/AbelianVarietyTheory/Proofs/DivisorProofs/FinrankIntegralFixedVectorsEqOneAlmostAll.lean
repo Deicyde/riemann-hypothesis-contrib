@@ -179,8 +179,8 @@ theorem finrank_fixed_KL_eq_one
   obtain ⟨θ, h1, h2, h3⟩ := exists_gelfand_anti E hU n w
   obtain ⟨hKo, hKc⟩ := GlobalTheory.BCT.LocCompU.isOpen_isCompact_KL hU n w
   have :=
-    GlobalTheory.fixed_eq_span_of_gelfandPair (UL n w) (KL n w) hKo hKc θ h1 h2 h3 (σ w).V (σ w).ρ
-      (σ w).irred (hadm w) x hx hx0
+    _root_.GlobalTheory.GroupAverageProjection.main (UL n w) (KL n w) hKo hKc θ h1 h2 h3 (σ w).V
+      (σ w).ρ (σ w).irred (hadm w) x hx hx0
   rw [this, finrank_span_singleton hx0]
 
 end GlobalTheory.BCT.SphLine

@@ -38,14 +38,19 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.adSurj :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (R : RingBr L) (n : ℕ) (g : UA L n), ∃ x : ∀ v : Pl (Lp L), Matrix (Fin n) (Fin n) (Lsq (Kv v) (cv v R.Δ)), (∀ v, star (x v) * x v = 1) ∧ (∀ᶠ v in Filter.cofinite, ∀ i j, IsIntegral (Ov v) (x v i j)) ∧ ∀ w, mL w g = (x (un w)).map (R.ρ _ w rfl) := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.adSurj
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (R : RingBr L) (n : ℕ) (g : UA L n),
+      ∃ x : ∀ v : Pl (Lp L), Matrix (Fin n) (Fin n) (Lsq (Kv v) (cv v R.Δ)),
+        (∀ v, star (x v) * x v = 1) ∧ (∀ᶠ v in Filter.cofinite, ∀ i j, IsIntegral (Ov v) (x v i j))
+          ∧ ∀ w, mL w g = (x (un w)).map (R.ρ _ w rfl) := by
   intro L _ _ _ R n g
   classical
   let G : Matrix (Fin n) (Fin n) (Ad L) := (g.1 : Matrix (Fin n) (Fin n) (Ad L))
@@ -69,8 +74,10 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.adSurj :
     intro w h
 
     rw [map_sub, Matrix.mul_apply, map_sum]
-    have e1 : ∀ k, R.ρ v w h ((star (Matrix.of (x v))) i k * (Matrix.of (x v)) k j) =
-        pLoc L w (cjF (L := L) (A k i) * A k j) := by
+    have e1
+        : ∀ k,
+          R.ρ v w h ((star (Matrix.of (x v))) i k * (Matrix.of (x v)) k j)
+            = pLoc L w (cjF (L := L) (A k i) * A k j) := by
       intro k
       rw [map_mul, map_mul, Matrix.star_apply, Matrix.of_apply, Matrix.of_apply,
         R.ρ_star v _ _ (hx v k i) w h, hx v k j w h]
@@ -83,8 +90,8 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.adSurj :
       intro i j
       exact (A i j).2
     have hall : {w : Plc L | ∃ i j, pLoc L w (A i j) ∉ w.adicCompletionIntegers L}.Finite := by
-      have : {w : Plc L | ∃ i j, pLoc L w (A i j) ∉ w.adicCompletionIntegers L} =
-          ⋃ i, ⋃ j, {w : Plc L | pLoc L w (A i j) ∉ w.adicCompletionIntegers L} := by
+      have : {w : Plc L | ∃ i j, pLoc L w (A i j) ∉ w.adicCompletionIntegers L}
+          = ⋃ i, ⋃ j, {w : Plc L | pLoc L w (A i j) ∉ w.adicCompletionIntegers L} := by
         ext w; simp
       rw [this]
       exact Set.finite_iUnion fun i => Set.finite_iUnion fun j => hfin i j
@@ -94,7 +101,8 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.adSurj :
     intro v hv
     simp only [Set.mem_setOf_eq, not_forall] at hv
     obtain ⟨i, j, hij⟩ := hv
-    have : ¬ ∀ w h, R.ρ v w h (x v i j) ∈ w.adicCompletionIntegers L := fun h => hij ((R.ρ_int v _).2 h)
+    have : ¬ ∀ w h, R.ρ v w h (x v i j) ∈ w.adicCompletionIntegers L := fun h =>
+      hij ((R.ρ_int v _).2 h)
     simp only [not_forall] at this
     obtain ⟨w, h, hw⟩ := this
     exact ⟨w, ⟨i, j, by rwa [hx v i j w h] at hw⟩, h⟩

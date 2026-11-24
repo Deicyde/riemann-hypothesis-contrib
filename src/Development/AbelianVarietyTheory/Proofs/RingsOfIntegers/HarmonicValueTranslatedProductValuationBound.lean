@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -170,9 +171,9 @@ theorem term_bound
     GlobalTheory.T.reachedSection_regular_on_integralModel E H Dw l Xo c hstar T io y C hC
       (n' ^ 2 * A) (hh b) (hReach b)
   choose f hf using fun b =>
-    (GlobalTheory.T.regular_section_integral_germ_unique_scale E H Dw l Xo c hstar T io y C hC.1 (n' ^ 2 * A) (hh b)).1 (hReg b)
+    (_root_.GlobalTheory.RegularGerm.regular_germ E H Dw l Xo c hstar T io y C hC.1 (n' ^ 2 * A) (hh b)).1 (hReg b)
   obtain ⟨B, hB, h49⟩ :=
-    GlobalTheory.T.integralChart_formalBiextension_gauge_bound E H Dw l Xo c hstar T io y C
+    _root_.GlobalTheory.PlaceInt.integralBiext_gauge_eig_bound E H Dw l Xo c hstar T io y C
   have h48 :=
     GlobalTheory.T.harmonicValue_integralPoint_eq_value_on_biextensionCopies E H Dw l Xo c hstar T
       io y C nab hnab B hB (n' ^ 2 * A) n hh f hf w P hP

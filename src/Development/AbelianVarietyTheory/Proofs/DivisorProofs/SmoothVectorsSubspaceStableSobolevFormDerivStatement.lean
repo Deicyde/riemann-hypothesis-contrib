@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.smoothVectors_subspace_stable_sobolevForm_deriv
     : ∀ (n : ℕ) (Hm : Mt n) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         [CompleteSpace H] (σ : Mt n → (H →L[ℂ] H)),
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.smoothVectors_subspace_stable_sobolevForm_deriv
                       HasDerivAt
                         (fun t : ℝ => ℓ (σ (NormedSpace.exp (t • X)) v))
                         (ℓ (dRep σ X v)) 0 := by
-  first
-  | exact @GlobalTheory.UnitarySmVec.smoothVec_basic
-  | exact GlobalTheory.UnitarySmVec.smoothVec_basic
-  | (intros; apply GlobalTheory.UnitarySmVec.smoothVec_basic <;> assumption)
+  first | exact @GlobalTheory.UnitarySmVec.smoothVec_basic

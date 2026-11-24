@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField UpperTheory.V.Af
 theorem UpperTheory.V.Af.solvable_descent_of_printed_hida

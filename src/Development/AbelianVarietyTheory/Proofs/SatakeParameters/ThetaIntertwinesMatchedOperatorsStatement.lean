@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.theta_intertwines_matched_operators
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.theta_intertwines_matched_operators
                           ∧ ∀ c, ∀ w ∈ Wcc R SF i c,
                             hV P cV (LinearMap.adjoint (R.thG i t) w)
                               = evC (Wc D i) P (c P) cW • LinearMap.adjoint (R.thG i t) w := by
-  first
-  | exact @GlobalTheory.SysW.matched_operators_theta_intertwine
-  | exact GlobalTheory.SysW.matched_operators_theta_intertwine
-  | (intros; apply GlobalTheory.SysW.matched_operators_theta_intertwine <;> assumption)
+  first | exact @GlobalTheory.SysW.matched_operators_theta_intertwine

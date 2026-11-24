@@ -83,25 +83,6 @@ theorem isAdmissible_congr
   subst hE
   exact h
 
-theorem ofMarkedSequence_boundary_eq_of_le
-    {k : Type u} [Field k]
-    {X : Scheme.{u}} {p : X ⟶ Spec (CommRingCat.of k)} {I : X.IdealSheafData} {m : ℕ}
-    {E : List X.IdealSheafData} (s : MarkedSequenceOfBlowups p I m E)
-    (i : ℕ) (hi : i ≤ s.length)
-    : (MarkedBlowupSequenceData.ofMarkedSequence s).toBlowupSequenceData.boundaryFrom E i
-      = s.boundary i := by
-  revert hi
-  induction i with
-  | zero =>
-    intro _
-    rw [BlowupSequenceData.boundary_zero]
-    exact s.boundary_zero.symm
-  | succ i ih =>
-    intro hi
-    have hlt : i < s.length := hi
-    rw [BlowupSequenceData.boundary_succ, ih (Nat.le_of_lt hlt)]
-    exact (s.boundary_succ i hlt).symm
-
 end
 
 section
@@ -427,8 +408,8 @@ private theorem continuationByNonMonomialPart_boundary_length
     : (continuationByNonMonomialPart hG hspec hT hdim s hcont).boundary
         (continuationByNonMonomialPart hG hspec hT hdim s hcont).length
       = (A (nonMonomialTriple T s)).boundary (A (nonMonomialTriple T s)).length :=
-  ofMarkedSequence_boundary_eq_of_le (A (nonMonomialTriple T s)) (A (nonMonomialTriple T s)).length
-    le_rfl
+  _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.ofMarkedSequence_boundary
+    (A (nonMonomialTriple T s)) (A (nonMonomialTriple T s)).length le_rfl
 
 private theorem continuationByNonMonomialPart_ideal_length
     (hG : PrincipalizationGeometryHypotheses.{u})
@@ -704,11 +685,12 @@ private theorem hasCenter_continuationByNonMonomialPart
           (tripleAtLength_dim_le hG hT s (lastNonMonomialPart T s)
             (maxOrderNonMonomial T s))).boundary i := by
     rw [MarkedBlowupSequenceData.toMarkedSequence_boundary]
-    exact ofMarkedSequence_boundary_eq_of_le
-      (principalizationSeqAtEnd T (principalizationOfDimLe T A) s (lastNonMonomialPart T s)
-        (maxOrderNonMonomial T s)
-        (tripleAtLength_dim_le hG hT s (lastNonMonomialPart T s) (maxOrderNonMonomial T s)))
-      i (le_of_lt hi)
+    exact
+      _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.ofMarkedSequence_boundary
+        (principalizationSeqAtEnd T (principalizationOfDimLe T A) s (lastNonMonomialPart T s)
+          (maxOrderNonMonomial T s)
+          (tripleAtLength_dim_le hG hT s (lastNonMonomialPart T s) (maxOrderNonMonomial T s)))
+        i (le_of_lt hi)
   have hloc
       : (continuationByNonMonomialPart hG hspec hT hdim s
           hcont).toMarkedSequenceOfBlowups.boundaryLocus i

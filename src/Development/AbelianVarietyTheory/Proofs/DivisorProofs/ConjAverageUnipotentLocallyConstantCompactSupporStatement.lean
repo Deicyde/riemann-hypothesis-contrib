@@ -43,6 +43,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.conjAverage_unipotent_locallyConstant_compactSupport
     : ∀ (E : Type) [Field E] [NumberField E] (n a b : ℕ) (h : a + b = n) (w : Pl E)
         (f : GLw n w → ℂ),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.conjAverage_unipotent_locallyConstant_compactSuppo
                     = GlobalTheory.LeviDesc.cavg (GlobalTheory.LFun.KGL w (n := n)) f (blk h w m x))
             ∧ HasCompactSupport (fun X =>
               GlobalTheory.LeviDesc.cavg (GlobalTheory.LFun.KGL w (n := n)) f (blk h w m X)) := by
-  first
-  | exact @GlobalTheory.LeviDesc.UnipMean.cavg_blk_locConst_compactSupport
-  | exact GlobalTheory.LeviDesc.UnipMean.cavg_blk_locConst_compactSupport
-  | (intros; apply GlobalTheory.LeviDesc.UnipMean.cavg_blk_locConst_compactSupport <;> assumption)
+  first | exact @GlobalTheory.LeviDesc.UnipMean.cavg_blk_locConst_compactSupport

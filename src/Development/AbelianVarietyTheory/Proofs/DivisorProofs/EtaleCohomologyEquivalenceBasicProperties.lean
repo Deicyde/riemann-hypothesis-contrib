@@ -96,7 +96,7 @@ theorem eqv_basic
       rw [hc] at this
       exact (Function.Bijective.of_comp_iff _ (hg n)).mp this
   · intro E E' f hq n
-    exact GlobalTheory.T.quasiIso_hypercohomology_bijective R ((chains R).map f) F n
+    exact _root_.GlobalTheory.EtC.quasiIso_hypercohomology_bijective' R ((chains R).map f) F n
   · intro E E' f hf
     constructor
     · intro h n hn

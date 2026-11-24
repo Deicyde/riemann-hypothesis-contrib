@@ -61,7 +61,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 noncomputable section
 
 namespace GlobalTheory.LevTransl
@@ -466,7 +465,7 @@ theorem om_fock
     : ω (g, 1) (B.F.fock f P) = B.F.fock (ω (g, 1) f) P :=
   (GlobalTheory.OrientedHeis.om_pureTensorO D _ _ S T _ _ ω hω hB.frame.vac.2.inf _ _ _ _ _ _ _ _ g
     1
-    (fun τ => by rw [GlobalTheory.FiniteFock.compAt_mt_of_finite _ τ hg] <;> simp)
+    (fun τ => by rw [GlobalTheory.FiniteFock.compAt_mt_of_finite _ τ hg])
     (fun τ => by rw [GlobalTheory.FiniteFock.compAt_mt_of_finite _ τ (one_mem _)] <;> simp)
     (fun τ => by rw [GlobalTheory.FiniteFock.compAt_mt_of_finite _ τ hg] <;> simp)
     (fun τ => by rw [GlobalTheory.FiniteFock.compAt_mt_of_finite _ τ (one_mem _)] <;> simp)

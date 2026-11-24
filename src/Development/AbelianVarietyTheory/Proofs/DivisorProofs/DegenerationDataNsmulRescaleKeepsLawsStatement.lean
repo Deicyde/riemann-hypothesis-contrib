@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UC
   GlobalTheory.UCanon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.degenerationDataNsmulRescale_keeps_laws
     : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (O : Type) [CommRing O] [StarRing O]
         [Module O D.X] (oa : D.OAct O) (w0 : O) (n : ℕ),
@@ -56,7 +58,4 @@ theorem _root_.GlobalTheory.T.degenerationDataNsmulRescale_keeps_laws
           (mulDeg D n).PsiEven ∧ (mulDeg D n).TauBimult ∧ (∀ y, PsiUnitOn (mulDeg D n) y Set.univ)
             ∧ ∃ oa' : (mulDeg D n).OAct O,
               oa'.onB = oa.onB ∧ TraceFormTwistIso (mulDeg D n) oa' w0 := by
-  first
-  | exact @GlobalTheory.UCanon.MulDeg.mulDeg_laws
-  | exact GlobalTheory.UCanon.MulDeg.mulDeg_laws
-  | (intros; apply GlobalTheory.UCanon.MulDeg.mulDeg_laws <;> assumption)
+  first | exact @GlobalTheory.UCanon.MulDeg.mulDeg_laws

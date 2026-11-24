@@ -200,7 +200,7 @@ theorem IsFr.stab
   have hct : c t * c t' = 1 := by rw [← map_mul, ht, map_one]
   have e4 : ∀ j, P (Sum.inr 1) (Sum.inl j) = 0 := fun j => by
     have := congrFun (congrFun hP (Sum.inl j)) (Sum.inr 0)
-    simp [Matrix.mul_apply, e3, gr, one_apply, Fintype.sum_sum_type, apply_ite c] at this
+    simp [Matrix.mul_apply, e3, gr, Fintype.sum_sum_type] at this
     calc
       _ = P (Sum.inr 1) (Sum.inl j) * c t * c t' := by rw [mul_assoc, hct, mul_one]
       _ = 0 := by rw [this, zero_mul]
@@ -212,7 +212,7 @@ theorem IsFr.stab
   · rw [mulVec_mulVec, (cols_of_mul e2).1, add_mulVec, mulVec_mulVec]
     congr 1
     ext i
-    simp [mulVec, dotProduct, Matrix.mul_apply, toBlocks₂₁, e4, Finset.sum_mul, Finset.mul_sum,
-      mul_comm, mul_left_comm]
+    simp [mulVec, dotProduct, Matrix.mul_apply, toBlocks₂₁, e4, Finset.mul_sum, mul_comm,
+      mul_left_comm]
 
 end PositivityTheory.ThKG.Tow.Levi

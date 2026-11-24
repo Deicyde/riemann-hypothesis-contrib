@@ -72,7 +72,7 @@ theorem hOF_dC
   simp only [← finSumFinEquiv.sum_comp, Matrix.of_apply, Equiv.symm_apply_apply,
     GlobalTheory.LagrThetaInv.dblG_apply]
   simp only [Fintype.sum_sum_type]
-  simp [dbl, Finset.sum_add_distrib, Finset.sum_neg_distrib]
+  simp [dbl, Finset.sum_neg_distrib]
 
 theorem symplOHF_dC
     (σ : E →ₐ[F] E)

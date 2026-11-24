@@ -69,7 +69,7 @@ theorem exists_eq_div_adjoin
     show b ∈ (genMap ξ _).range
     refine RingHom.mem_range.mpr ⟨s, ?_⟩
     simp only [genMap, TopCat.Presheaf.stalkSpecializes_refl]
-    first | exact hs | (rw [Category.id_comp]; exact hs) | simpa using hs
+    first | exact hs
   have hgU : genPt ξ ∈ U := (hUc (genPt ξ)).mpr ⟨specializes_refl _, And.intro hc fun _ => hreg0 _⟩
   let φ : Γ(X, U) →+* Ω := (X.presheaf.germ U (genPt ξ) hgU ≫ Scheme.stalkClosedPointTo ξ).hom
   have key : ∀ r : Γ(X, U), φ r ∈ Algebra.adjoin ℤ (Set.range fun j => x j / x c) := by
@@ -81,10 +81,7 @@ theorem exists_eq_div_adjoin
     have e0
         : X.presheaf.germ U p.1 hpU ≫ X.presheaf.stalkSpecializes p.2
           = X.presheaf.germ U (genPt ξ) hgU := by
-      first
-      | simp
-      | exact TopCat.Presheaf.germ_stalkSpecializes X.presheaf hpU p.2
-      | exact TopCat.Presheaf.germ_stalkSpecializes hpU p.2
+      first | simp
     show (X.presheaf.stalkSpecializes p.2 ≫ Scheme.stalkClosedPointTo ξ).hom
         ((X.presheaf.germ U p.1 hpU).hom r) = φ r
     rw [← RingHom.comp_apply, ← CommRingCat.hom_comp]
@@ -92,7 +89,6 @@ theorem exists_eq_div_adjoin
     | exact congrArg
         (fun (m : Γ(X, U) ⟶ CommRingCat.of Ω) => CommRingCat.Hom.hom m r)
         ((reassoc_of% e0) (Scheme.stalkClosedPointTo ξ))
-    | (simp only [reassoc_of% e0]; rfl)
   have gres
       : ∀ {W W' : X.Opens} (hle : W ≤ W') (hw : genPt ξ ∈ W) (z : Γ(X, W')),
         (X.presheaf.germ W (genPt ξ) hw).hom ((X.presheaf.map (homOfLE hle).op).hom z)
@@ -101,7 +97,7 @@ theorem exists_eq_div_adjoin
     have e
         : X.presheaf.map (homOfLE hle).op ≫ X.presheaf.germ W (genPt ξ) hw
           = X.presheaf.germ W' (genPt ξ) (hle hw) := by
-      first | simp | exact TopCat.Presheaf.germ_res _ _ _ _
+      first | simp
     exact congrArg (fun m => m.hom z) e
   obtain ⟨s0, hs0⟩ : ∃ s0 : X.presheaf.stalk (genPt ξ), (Scheme.stalkClosedPointTo ξ).hom s0 = a :=
     hT.gen.bij.2 a
@@ -125,7 +121,7 @@ theorem exists_eq_div_adjoin
   let ψ : X.presheaf.stalk (genPt ξ) →+* Ω := (Scheme.stalkClosedPointTo ξ).hom
   have hφ : ∀ r, φ r = ψ ((X.presheaf.germ U (genPt ξ) hgU).hom r) := by
     intro r
-    first | rfl | simp [φ, ψ]
+    first | rfl
   have hs0' : ψ ((X.presheaf.germ V (genPt ξ) hV).hom f) = a := hs0
   have h3 : φ y = φ t ^ n * a := by rw [hφ, hφ, h2, map_mul, map_pow, hs0']
   have hunit : IsUnit ((X.presheaf.germ U (genPt ξ) hgU).hom t) :=

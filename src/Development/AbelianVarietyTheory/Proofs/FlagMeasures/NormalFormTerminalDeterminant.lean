@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.NormalFormDualOrthogonalLast
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFlagPairLatticeSumDiscriminantEqNormMinorStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePairNormalFormGeometrySummaryStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFlagPairLatticeSumDiscriminantEqNormMinor
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePairNormalFormGeometrySummary
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeDiscriminantOrderNeZeroUnimodula
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LeOfLatMod
 import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovol
@@ -429,10 +429,10 @@ theorem main
             → N.bI Λ ≠ 0 ∧ bOne N.F' N.F Λ N.j = N.bI Λ
               ∧ delBar N.F N.F' Λ * (N.bI Λ : ℝ) ^ 2 = N.Del ∧ 1 ≤ delBar N.F N.F' Λ := by
   intro K V _ _ _ _ _ _ _ _ H hK r N g Λ hg hT
-  have G := GlobalTheory.T.hermFramePairNormalForm_geometry_summary K V H hK r N
+  have G := _root_.GlobalTheory.DegCnt.NF.geometry K V H hK r N
   have hD :=
-    (GlobalTheory.T.hermFlagPairLatticeSumDiscriminant_eq_norm_minor K V H hK r N g Λ hg hT N.j
-      le_rfl G.2.2.2.2.2.2.2.2.2.2.1).1
+    (_root_.GlobalTheory.DegCnt.FlagDisc.main K V H hK r N g Λ hg hT N.j le_rfl
+      G.2.2.2.2.2.2.2.2.2.2.1).1
   obtain ⟨hS, -, -, hrad, -⟩ := G.1
   obtain ⟨⟨hU, hF, hF'⟩, -⟩ := hT
   have hΛ : Submodule.IsFullLattice K Λ := by

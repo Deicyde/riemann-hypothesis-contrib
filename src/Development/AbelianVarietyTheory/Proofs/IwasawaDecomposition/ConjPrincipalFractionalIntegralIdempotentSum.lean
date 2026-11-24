@@ -54,8 +54,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.IdemIntegral
 
 theorem toEAf_mem_of_finPart {D : D7} {w : AE D} (hw : finPart D w ∈ intAE D)

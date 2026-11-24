@@ -93,7 +93,7 @@ theorem resL_X_mul (v u : σ) (huv : u ≠ v) (e : ℕ) (g : MvPolynomial σ ℚ
   change (initPart v e (X u * g)).coeff m = (X u * initPart v e g).coeff m
   rw [coeff_initPart, MvPolynomial.coeff_X_mul', MvPolynomial.coeff_X_mul']
   by_cases hu : u ∈ m.support
-  · have hmv : (m - Finsupp.single u 1 : σ →₀ ℕ) v = m v := by simp [Finsupp.single_apply, huv]
+  · have hmv : (m - Finsupp.single u 1 : σ →₀ ℕ) v = m v := by simp [huv]
     simp only [hu, if_true, coeff_initPart, hmv]
   · simp only [hu, if_false]
     split_ifs <;> rfl
@@ -114,7 +114,7 @@ theorem resL_pderiv (v u : σ) (huv : u ≠ v) (e : ℕ) (g : MvPolynomial σ �
   induction g using MvPolynomial.induction_on' with
   | monomial m a =>
     rw [hr, hr, MvPolynomial.pderiv_monomial, hi, hi]
-    have hmv : (m - Finsupp.single u 1 : σ →₀ ℕ) v = m v := by simp [Finsupp.single_apply, huv]
+    have hmv : (m - Finsupp.single u 1 : σ →₀ ℕ) v = m v := by simp [huv]
     rw [hmv]
     split_ifs <;> simp [MvPolynomial.pderiv_monomial]
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
@@ -126,7 +126,6 @@ theorem resL_glAct
     (x : MvPolynomial (Fin N × Fin r) ℚ_[p])
     : resL p v e (glAct p LL j c d x) = glAct p LL j c d (resL p v e x) := by
   classical
-
   rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < j
@@ -241,7 +240,6 @@ private theorem pderiv_last_glAct_comm
     : pderiv (Fin.last K, c) (glAct p LL K a b x)
       = glAct p LL K a b (pderiv (Fin.last K, c) x) := by
   classical
-
   rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < K
@@ -273,7 +271,7 @@ theorem pderiv_glAct
   · subst hac
     simp only [Pi.single_eq_same, mul_one, if_true]
     ring
-  · simp [Pi.single_apply, hac, add_assoc]
+  · simp [hac]
 
 private theorem yCond_le_restrictSupport_wt_le
     {N : ℕ} [NeZero r] (LL : Letters N) (j : ℕ) (Mt : WithTop ℤ)
@@ -466,7 +464,6 @@ private theorem pderiv_last_eulL_eq (c : Fin r) (g : MvPolynomial (Fin (K + 1) �
         (fun d : Fin r => (Fin.last K, d))
         (pderiv (Fin.last K, c) g) := by
   classical
-
   rw [Formalism.GM.ProjS.eulL_apply, Formalism.GM.ProjS.eulL_apply, map_sum]
   simp only [Derivation.leibniz, MvPolynomial.pderiv_X, smul_eq_mul, Finset.sum_add_distrib]
   refine (add_comm _ _).trans ?_
@@ -475,7 +472,7 @@ private theorem pderiv_last_eulL_eq (c : Fin r) (g : MvPolynomial (Fin (K + 1) �
     · simp
     · intro d _ hd
       have hne : ((Fin.last K, d) : Fin (K + 1) × Fin r) ≠ (Fin.last K, c) := by simp [hd]
-      simp [Pi.single_apply, hne]
+      simp [hne]
     · intro h
       exact absurd (Finset.mem_univ c) h
   · refine Finset.sum_congr rfl fun d _ => ?_

@@ -59,7 +59,6 @@ variable
 def sgTG : D.what₂.Tau → DomWeight (D.R.N D.R.m - 1) := fun τ =>
   shW (M.sg τ) ((D.R.m * (D.R.t + 1) / 2 : ℕ) : ℤ)
 
-
 structure ClassesAtPrimes (bad : Set (HeightOneSpectrum (𝓞 D.host.F))) where
   lev : StepLevel D.host.F D.host.E (sigD D) (gramP D) 1 D.R.f bad
   y : M.clsP → UPts (sigD D) (gramP D) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)

@@ -4,7 +4,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.ArcDictExpZeroSection
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsCoprimeTwoSubRtTwoAddRt
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.NonemptyFiniteRootsOfBimul
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusExtensionComplexPointsEqCharactersStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HasArcDataIff
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ConstOfNormPeriodic
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusExtensionComplexPointsEqCharacters
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RosVal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -49,7 +52,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RosVal
 
 @[expose] public section
 
@@ -74,8 +76,6 @@ theorem ex_eq_iff (z w : Fin g → ℂ) : u.ex z = u.ex w ↔ z - w ∈ u.Λ := 
   have e : u.ex z = u.ex (z - w) * u.ex w := by rw [← u.ex_add, sub_add_cancel]
   rw [e]
   exact mul_eq_right
-
-theorem ex_zero' : u.ex 0 = 1 := (u.ker 0).2 u.Λ.zero_mem
 
 theorem lin_ext {F G : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)} (h : ∀ z, u.ex (F z) = u.ex (G z))
     : F = G := by
@@ -127,7 +127,7 @@ theorem exists_lift_points
     exact (mul_eq_left (a := c 0) (b := c 0)).1 this.symm
   let S : Submodule O (X × (Fin g → ℂ)) := {
     carrier := {p | u.ex p.2 = c p.1}
-    zero_mem' := (ex_zero' u).trans c0.symm
+    zero_mem' := (_root_.GlobalTheory.CubeValues.ex_zero u).trans c0.symm
     add_mem' := fun {p q} hp hq => by
       change u.ex (p.2 + q.2) = c (p.1 + q.1)
       rw [u.ex_add, hadd, hp, hq]
@@ -202,7 +202,7 @@ theorem isLift_tau (hc : ∀ x, u.ex (ct x) = D.c x) (a b : D.X)
   · exact jFK_comp_xK hc _
   · exact jFK_comp_xK hc _
   · change _ ≫ _ ≫ _ = (u.ex 0).left
-    rw [← Category.assoc, jFK_comp_toUnit, ex_zero', Hom.one_def]
+    rw [← Category.assoc, jFK_comp_toUnit, _root_.GlobalTheory.CubeValues.ex_zero, Hom.one_def]
     simp [eSec]
 
 variable {Hm : Matrix (Fin g) (Fin g) ℂ} {χ : u.Λ → ℂ}
@@ -333,7 +333,7 @@ theorem nonempty_gtAn
       symm
       (fun x => (bal x).2)
   choose ex0 hex0 using fun v : (a.D₀.X →+ ℂ) × (Fin a.D₀.P.g → ℂ) =>
-    ((GlobalTheory.T.torusExtension_complexPoints_eq_characters a.D₀ _ u Hm χ ct hAH hrig hc v.2).1 v.1).exists
+    ((_root_.GlobalTheory.TorusExtChar.points_eq_characters a.D₀ _ u Hm χ ct hAH hrig hc v.2).1 v.1).exists
   let A : AnArc (𝓞 E) := {
     gB := a.D₀.P.g
     abelian₂ := u.Λ

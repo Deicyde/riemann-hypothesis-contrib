@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.sphericalOperators_forms_on_rank_space_normal
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -68,11 +69,4 @@ theorem _root_.GlobalTheory.T.sphericalOperators_forms_on_rank_space_normal
                     → (∀ P d,
                       Good R A.μ0 P → IsLab (Wc D i) P d → h P (Finsupp.single d 1) x = c P d • x)
                     → x ∈ Wcc R SF i c := by
-  first
-  | exact @GlobalTheory.SphOpsModel.sphericalOperators_forms_on_rank_space_normal_alt
-  | exact GlobalTheory.SphOpsModel.sphericalOperators_forms_on_rank_space_normal_alt
-  | (
-      intros
-      apply GlobalTheory.SphOpsModel.sphericalOperators_forms_on_rank_space_normal_alt
-        <;> assumption
-    )
+  first | exact @GlobalTheory.SphOpsModel.sphericalOperators_forms_on_rank_space_normal_alt

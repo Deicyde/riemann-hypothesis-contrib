@@ -180,7 +180,6 @@ theorem exists_E
       rw [hw]
       ring
     have e2 : ∑ j, vy j * σ (vx j) = b₀ * σ (X i₀) := by
-
       rw [hXi, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hvyA, map_mul]
@@ -211,7 +210,6 @@ theorem exists_E
         ((((A⁻¹).1)ᵀ.map σ) *ᵥ vy) k
           = ∑ l, σ ((A⁻¹).1 l k) * vy l := rfl
         _ = b₀ * σ (∑ l, A.1 i₀ l * (A⁻¹).1 l k) := by
-
           rw [map_sum, Finset.mul_sum]
           refine Finset.sum_congr rfl fun l _ => ?_
           rw [hvyA, map_mul]

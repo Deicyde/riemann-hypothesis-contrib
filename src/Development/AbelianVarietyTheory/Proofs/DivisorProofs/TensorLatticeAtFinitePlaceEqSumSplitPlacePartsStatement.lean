@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.Genus
   GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.tensorLatticeAtFinitePlace_eq_sum_splitPlace_parts
     : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         {σ : E →ₐ[F] E} {n d : ℕ},
@@ -53,7 +54,4 @@ theorem _root_.GlobalTheory.T.tensorLatticeAtFinitePlace_eq_sum_splitPlace_parts
         → ∀ (X : Spc F E n) (W : Spc F E d) (v : Pl (F := F)) (t : E →ₐ[F] Fv F v),
           ∀ γ ∈ latAtV X W v, ∃ γ₁ ∈ latAtV X W v, ∃ γ₂ ∈ latAtV X W v,
             γ = γ₁ + γ₂ ∧ γ₁.map (piW (t.comp σ)) = 0 ∧ γ₂.map (piW t) = 0 := by
-  first
-  | exact @GlobalTheory.LatSplit.latAtV_decomp
-  | exact GlobalTheory.LatSplit.latAtV_decomp
-  | (intros; apply GlobalTheory.LatSplit.latAtV_decomp <;> assumption)
+  first | exact @GlobalTheory.LatSplit.latAtV_decomp

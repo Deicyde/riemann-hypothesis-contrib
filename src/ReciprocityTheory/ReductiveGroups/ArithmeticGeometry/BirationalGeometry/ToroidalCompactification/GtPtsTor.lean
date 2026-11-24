@@ -60,10 +60,7 @@ theorem charUnit_appTop {Z : Scheme.{0}} (τ : Z ⟶ (splitTorus S X).left) (χ 
         ((Scheme.ΓSpecIso (torusRing ZU X)).inv.hom (AddMonoidAlgebra.single χ 1)) := by
   rw [charUnit_val, Scheme.Hom.comp_appTop, CommRingCat.comp_apply]
   congr 2
-  first
-  | (rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]; simp only [Scheme.Hom.preimage_top])
-  | (simp [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE, Scheme.Hom.preimage_top])
-  | (ext1; simp [Scheme.Hom.appLE, Scheme.Hom.appTop])
+  first | (rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]; simp only [Scheme.Hom.preimage_top])
 
 theorem ringHom_ext_ZU
     {A : Type} [CommRing A]

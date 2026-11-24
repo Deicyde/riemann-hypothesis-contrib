@@ -53,11 +53,14 @@ namespace Formalism.WachCohomologyFacts.PLenBound
 
 variable {O : Type} [CommRing O]
 
-theorem length_le_of_span {P : Type} [AddCommGroup P] [Module O P] {ι : Type} [Fintype ι]
-    (v : ι → P) (a : O) (hspan : Submodule.span O (Set.range v) = ⊤) (hv : ∀ i, a • v i = 0) :
-    Module.length O P ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_le_of_span
+    {P : Type} [AddCommGroup P] [Module O P]
+    {ι : Type} [Fintype ι]
+    (v : ι → P) (a : O) (hspan : Submodule.span O (Set.range v) = ⊤) (hv : ∀ i, a • v i = 0)
+    : Module.length O P ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   classical
-  have hker : ∀ i, Ideal.span {a} ≤ LinearMap.ker (LinearMap.toSpanSingleton O P (v i)) := fun i => by
+  have hker
+      : ∀ i, Ideal.span {a} ≤ LinearMap.ker (LinearMap.toSpanSingleton O P (v i)) := fun i => by
     refine Ideal.span_le.2 (Set.singleton_subset_iff.2 ?_)
     show LinearMap.toSpanSingleton O P (v i) a = 0
     rw [LinearMap.toSpanSingleton_apply]
@@ -80,13 +83,15 @@ theorem length_le_of_span {P : Type} [AddCommGroup P] [Module O P] {ι : Type} [
     rw [← LinearMap.range_eq_top, eq_top_iff, ← hspan, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     exact ⟨_, hg i⟩
-  calc Module.length O P ≤ Module.length O (ι → O ⧸ Ideal.span {a}) :=
-        Module.length_le_of_surjective g hsurj
+  calc
+    Module.length O P
+      ≤ Module.length O (ι → O ⧸ Ideal.span {a}) := Module.length_le_of_surjective g hsurj
     _ = (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
-        rw [Module.length_pi, ENat.card_eq_coe_fintype_card]
+      rw [Module.length_pi, ENat.card_eq_coe_fintype_card]
 
-theorem length_quot_pow_le (a : O) (e : ℕ) :
-    Module.length O (O ⧸ Ideal.span {a ^ e}) ≤ (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_quot_pow_le (a : O) (e : ℕ)
+    : Module.length O (O ⧸ Ideal.span {a ^ e})
+      ≤ (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   apply GlobalTheory.length_quotient_span_pow_le <;> assumption
 
 end PLenBound
@@ -98,8 +103,9 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
   have hsZ : ∀ x ∈ s, x ∈ Z := fun x hx => hZ ▸ Submodule.mem_sup_left (Submodule.subset_span hx)
   let v : s → ↥Z ⧸ I.comap Z.subtype := fun x => Submodule.Quotient.mk ⟨x.1, hsZ x.1 x.2⟩
   have hspan : Submodule.span O (Set.range v) = ⊤ := by
-    have hle' : Submodule.span O (s : Set M) ⊔ Bc ≤
-        ((Submodule.span O (Set.range v)).comap (I.comap Z.subtype).mkQ).map Z.subtype := by
+    have hle'
+        : Submodule.span O (s : Set M) ⊔ Bc
+          ≤ ((Submodule.span O (Set.range v)).comap (I.comap Z.subtype).mkQ).map Z.subtype := by
       rw [sup_le_iff, Submodule.span_le]
       constructor
       · intro x hx
@@ -109,7 +115,8 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
         have hbZ : b ∈ Z := hZ ▸ Submodule.mem_sup_right hb
         refine ⟨⟨b, hbZ⟩, ?_, rfl⟩
         show Submodule.Quotient.mk _ ∈ Submodule.span O (Set.range v)
-        rw [(Submodule.Quotient.mk_eq_zero _).2 (show (⟨b, hbZ⟩ : Z) ∈ I.comap Z.subtype from hBI hb)]
+        rw [(Submodule.Quotient.mk_eq_zero _).2
+          (show (⟨b, hbZ⟩ : Z) ∈ I.comap Z.subtype from hBI hb)]
         exact Submodule.zero_mem _
     have hle := hZ.symm.le.trans hle'
     rw [eq_top_iff]
@@ -130,7 +137,8 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
   have hcard : (Fintype.card s : ℕ∞) ≤ g := by
     rw [Fintype.card_coe]
     exact_mod_cast hs
-  calc Module.length O (↥Z ⧸ I.comap Z.subtype)
+  calc
+    Module.length O (↥Z ⧸ I.comap Z.subtype)
       ≤ (Fintype.card s : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O) ^ e}) := h1
     _ ≤ (g : ℕ∞) * ((e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})) := mul_le_mul' hcard h2
     _ = (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)}) := by rw [mul_assoc]

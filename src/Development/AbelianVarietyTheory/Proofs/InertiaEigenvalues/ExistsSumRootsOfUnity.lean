@@ -56,7 +56,9 @@ import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.ExpImage
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+  GlobalTheory.ExpImage
 
 noncomputable section
 
@@ -75,21 +77,25 @@ theorem fg_rootRing {m : ℕ} (hm : 0 < m) : (rootRing l m).toSubmodule.FG := by
   refine fg_adjoin_of_finite hfin ?_
   intro x hx
   refine IsIntegral.of_pow hm ?_
-  rw [show x ^ m = 1 from hx]; exact isIntegral_one
+  rw [show x ^ m = 1 from hx]
+  exact isIntegral_one
 
-theorem exists_mem_rootRing {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h1 : ‖x‖ ≤ 1) :
-    ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ x ∈ rootRing l m := by
+theorem exists_mem_rootRing {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h1 : ‖x‖ ≤ 1)
+    : ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ x ∈ rootRing l m := by
   apply GlobalTheory.TiltInvariants.mem_rootRing <;> assumption
 
-theorem norm_pow_sub_pow_le {m : ℕ} (hm : 0 < m) {k : ℕ} (hk : k ≠ 0) {a b : Om l}
-    (ha : a ∈ rootRing l m) (hb : b ∈ rootRing l m) (h : ‖a - b‖ ≤ (l : ℝ)⁻¹) :
-    ‖a ^ (l ^ k) - b ^ (l ^ k)‖ ≤ (l : ℝ)⁻¹ * ‖a - b‖ := by
+theorem norm_pow_sub_pow_le
+    {m : ℕ} (hm : 0 < m)
+    {k : ℕ} (hk : k ≠ 0)
+    {a b : Om l} (ha : a ∈ rootRing l m) (hb : b ∈ rootRing l m) (h : ‖a - b‖ ≤ (l : ℝ)⁻¹)
+    : ‖a ^ (l ^ k) - b ^ (l ^ k)‖ ≤ (l : ℝ)⁻¹ * ‖a - b‖ := by
   have hp : l.Prime := Fact.out
   have hd := sub_mem ha hb
   obtain ⟨r, hr⟩ := exists_add_pow_prime_pow_eq hp (⟨b, hb⟩ : rootRing l m) ⟨a - b, hd⟩ k
   have hr' := congrArg Subtype.val hr
   simp only [MulMemClass.coe_mul, AddMemClass.coe_add, SubmonoidClass.coe_pow,
-    SubringClass.coe_natCast, add_sub_cancel] at hr'
+      SubringClass.coe_natCast, add_sub_cancel]
+    at hr'
   have e : a ^ (l ^ k) - b ^ (l ^ k) = (a - b) ^ (l ^ k) + l * (a - b) * (b * r) := by
     rw [hr']; ring
   rw [e]
@@ -99,25 +105,30 @@ theorem norm_pow_sub_pow_le {m : ℕ} (hm : 0 < m) {k : ℕ} (hk : k ≠ 0) {a b
     have h1 := norm_le_one hm hd
     have h2 : ‖a - b‖ ^ j ≤ 1 := pow_le_one₀ (norm_nonneg _) h1
     rw [hj, norm_pow, pow_add, sq]
-    calc _ ≤ 1 * ((l : ℝ)⁻¹ * ‖a - b‖) := by gcongr
+    calc
+      _ ≤ 1 * ((l : ℝ)⁻¹ * ‖a - b‖) := by gcongr
       _ = _ := one_mul _
   · rw [norm_mul, norm_mul, norm_l]
     have h1 := norm_le_one hm (mul_mem hb r.2)
-    calc _ ≤ (l : ℝ)⁻¹ * ‖a - b‖ * 1 := by gcongr
+    calc
+      _ ≤ (l : ℝ)⁻¹ * ‖a - b‖ * 1 := by gcongr
       _ = _ := mul_one _
 
 def part (F : IntermediateField ℚ_[l] (Om l)) (m : ℕ) : Submodule ℤ_[l] (Om l) :=
   (rootRing l m).toSubmodule ⊓ F.toSubalgebra.toSubmodule.restrictScalars ℤ_[l]
 
-theorem mem_part {F : IntermediateField ℚ_[l] (Om l)} {m : ℕ} {x : Om l} :
-    x ∈ part F m ↔ x ∈ rootRing l m ∧ x ∈ F := Iff.rfl
+theorem mem_part {F : IntermediateField ℚ_[l] (Om l)} {m : ℕ} {x : Om l}
+    : x ∈ part F m ↔ x ∈ rootRing l m ∧ x ∈ F :=
+  Iff.rfl
 
 theorem fg_part (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < m) : (part F m).FG :=
   (fg_rootRing hm).of_le inf_le_left
 
-theorem exists_teich (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m)
-    {x : Om l} (hx : x ∈ part F m) :
-    ∃ w ∈ part F m, w ^ (l ^ m.totient) = w ∧ ‖x - w‖ < 1 := by
+theorem exists_teich
+    (F : IntermediateField ℚ_[l] (Om l))
+    {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m)
+    {x : Om l} (hx : x ∈ part F m)
+    : ∃ w ∈ part F m, w ^ (l ^ m.totient) = w ∧ ‖x - w‖ < 1 := by
   have hp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   have hli : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ hl1
@@ -131,11 +142,13 @@ theorem exists_teich (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < 
     obtain ⟨z, hz, ez⟩ := pow_sub_mem hl hy
     rw [ez, add_sub_cancel_left, norm_mul, norm_l]
     have h1 := norm_le_one hm hz
-    calc _ ≤ (l : ℝ)⁻¹ * 1 := by gcongr
+    calc
+      _ ≤ (l : ℝ)⁻¹ * 1 := by gcongr
       _ = _ := mul_one _
-  obtain ⟨w, ⟨hw, hwx⟩, hmin⟩ := hc.exists_isMinOn
-    (f := fun y : Om l => ‖y ^ (l ^ m.totient) - y‖)
-    ⟨x, hx, Metric.mem_closedBall_self (by positivity)⟩ (by fun_prop)
+  obtain ⟨w, ⟨hw, hwx⟩, hmin⟩ :=
+    hc.exists_isMinOn
+      (f := fun y : Om l => ‖y ^ (l ^ m.totient) - y‖)
+      ⟨x, hx, Metric.mem_closedBall_self (by positivity)⟩ (by fun_prop)
   rw [Metric.mem_closedBall, dist_eq_norm] at hwx
   have hw' := mem_part.mp hw
   refine ⟨w, hw, ?_, by rw [norm_sub_rev]; exact hwx.trans_lt hli⟩
@@ -144,17 +157,20 @@ theorem exists_teich (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < 
     rw [Metric.mem_closedBall, dist_eq_norm,
       show w ^ (l ^ m.totient) - x = (w ^ (l ^ m.totient) - w) + (w - x) by ring]
     exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hstep w hw'.1) hwx)
-  have h1 : ‖w ^ (l ^ m.totient) - w‖ ≤ ‖(w ^ (l ^ m.totient)) ^ (l ^ m.totient) - w ^ (l ^ m.totient)‖ :=
+  have h1
+      : ‖w ^ (l ^ m.totient) - w‖
+        ≤ ‖(w ^ (l ^ m.totient)) ^ (l ^ m.totient) - w ^ (l ^ m.totient)‖ :=
     hmin hmem
-  have h2 := norm_pow_sub_pow_le hm (Nat.totient_pos.mpr hm).ne' (pow_mem hw'.1 (l ^ m.totient))
-    hw'.1 (hstep w hw'.1)
+  have h2 :=
+    norm_pow_sub_pow_le hm (Nat.totient_pos.mpr hm).ne' (pow_mem hw'.1 (l ^ m.totient)) hw'.1
+      (hstep w hw'.1)
   have h3 := norm_nonneg (w ^ (l ^ m.totient) - w)
   have h4 : ‖w ^ (l ^ m.totient) - w‖ = 0 := by nlinarith
   exact sub_eq_zero.mp (norm_eq_zero.mp h4)
 
-theorem part_le_span (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) :
-    part F m ≤ Submodule.span ℤ_[l]
-      {w : Om l | w ∈ F ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ w ^ m = 1} := by
+theorem part_le_span (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m)
+    : part F m
+      ≤ Submodule.span ℤ_[l] {w : Om l | w ∈ F ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ w ^ m = 1} := by
   have hp : l.Prime := Fact.out
   have hl0 : (l : Om l) ≠ 0 := Nat.cast_ne_zero.mpr hp.ne_zero
   refine Submodule.le_of_le_smul_of_le_jacobson_bot (I := IsLocalRing.maximalIdeal ℤ_[l])
@@ -167,8 +183,7 @@ theorem part_le_span (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < 
     have : z = (x - w) / l := by rw [ez]; field_simp
     rw [this]
     exact div_mem hd.2 (natCast_mem F l)
-  have e : x = w + (l : ℤ_[l]) • z := by
-    rw [Algebra.smul_def, map_natCast, ← ez]; ring
+  have e : x = w + (l : ℤ_[l]) • z := by rw [Algebra.smul_def, map_natCast, ← ez]; ring
   rw [e]
   refine Submodule.add_mem_sup ?_ (Submodule.smul_mem_smul ?_ (mem_part.mpr ⟨hz, hzF⟩))
   · by_cases h0 : w = 0
@@ -185,10 +200,17 @@ theorem part_le_span (F : IntermediateField ℚ_[l] (Om l)) {m : ℕ} (hm : 0 < 
   · rw [PadicInt.maximalIdeal_eq_span_p]
     exact Ideal.mem_span_singleton_self _
 
-theorem exists_sum_rootsOfUnity : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (c : Om l), c ∈ K0 K → ‖c‖ ≤ 1 → ∃ (n : ℕ) (z : Fin n → ℤ_[l]) (ω : Fin n → Om l), (∀ i, ω i ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ ω i ^ m = 1) ∧ c = ∑ i, algebraMap ℚ_[l] (Om l) (z i : ℚ_[l]) * ω i := by
+theorem exists_sum_rootsOfUnity
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (c : Om l),
+      c ∈ K0 K → ‖c‖ ≤ 1
+        → ∃ (n : ℕ) (z : Fin n → ℤ_[l]) (ω : Fin n → Om l),
+          (∀ i, ω i ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ ω i ^ m = 1)
+            ∧ c = ∑ i, algebraMap ℚ_[l] (Om l) (z i : ℚ_[l]) * ω i := by
   intro l _ K c hc h1
-  obtain ⟨m, hm, hl, h⟩ := exists_mem_rootRing (x := c) (show c ∈ K.1 ⊓ MaximalUnramifiedExtension l from hc).2 h1
-  obtain ⟨n, z, g, e⟩ := Submodule.mem_span_set'.mp (part_le_span (K0 K) hm hl (mem_part.mpr ⟨h, hc⟩))
+  obtain ⟨m, hm, hl, h⟩ :=
+    exists_mem_rootRing (x := c) (show c ∈ K.1 ⊓ MaximalUnramifiedExtension l from hc).2 h1
+  obtain ⟨n, z, g, e⟩ :=
+    Submodule.mem_span_set'.mp (part_le_span (K0 K) hm hl (mem_part.mpr ⟨h, hc⟩))
   refine ⟨n, z, fun i => g i, fun i => (g i).2, ?_⟩
   rw [← e]
   refine Finset.sum_congr rfl fun i _ => ?_

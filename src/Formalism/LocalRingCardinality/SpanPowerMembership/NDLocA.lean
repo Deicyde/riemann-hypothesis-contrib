@@ -58,12 +58,13 @@ noncomputable section
 
 namespace Formalism.BasicNotions.Examples₂.LB
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Pointwise
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Pointwise
 
 variable (l : ℕ) [hl : Fact l.Prime]
 
-theorem denseRange_emb {Ω : Type} [Field Ω] [IsAlgClosed Ω] (j : Ω →+* PadicAlgCl l) :
-    DenseRange j := by
+theorem denseRange_emb {Ω : Type} [Field Ω] [IsAlgClosed Ω] (j : Ω →+* PadicAlgCl l)
+    : DenseRange j := by
   apply GlobalTheory.denseRange_of_isAlgClosed_padicAlgCl <;> assumption
 
 def ball : ValuationSubring (PadicAlgCl l) :=
@@ -71,10 +72,7 @@ def ball : ValuationSubring (PadicAlgCl l) :=
 
 theorem mem_ball (x : PadicAlgCl l) : x ∈ ball l ↔ ‖x‖ ≤ 1 := by
   rw [ball, Valuation.mem_valuationSubring_iff]
-  first
-    | exact Iff.rfl
-    | (rw [← NNReal.coe_le_coe]; rfl)
-    | simp
+  first | exact Iff.rfl
 
 variable {l} {Ω : Type} [Field Ω]
 
@@ -83,8 +81,9 @@ def placeJ (j : Ω →+* PadicAlgCl l) : ValuationSubring Ω := (ball l).comap j
 theorem mem_placeJ (j : Ω →+* PadicAlgCl l) (x : Ω) : x ∈ placeJ j ↔ ‖j x‖ ≤ 1 := by
   rw [placeJ, ValuationSubring.mem_comap, mem_ball]
 
-theorem val_lt_one_iff {A : ValuationSubring Ω} {j : Ω →+* PadicAlgCl l}
-    (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1) (y : Ω) : A.valuation y < 1 ↔ ‖j y‖ < 1 := by
+theorem val_lt_one_iff
+    {A : ValuationSubring Ω} {j : Ω →+* PadicAlgCl l} (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1) (y : Ω)
+    : A.valuation y < 1 ↔ ‖j y‖ < 1 := by
   by_cases hy : y = 0
   · simp [hy]
   · have hjy : j y ≠ 0 := (map_ne_zero j).2 hy
@@ -92,16 +91,12 @@ theorem val_lt_one_iff {A : ValuationSubring Ω} {j : Ω →+* PadicAlgCl l}
     have e1 := (Valuation.one_lt_val_iff A.valuation (inv_ne_zero hy)).symm
     rw [inv_inv] at e1
     rw [e1, ← not_le, ValuationSubring.valuation_le_one_iff, hj, map_inv₀, norm_inv, not_le]
-    first
-      | exact one_lt_inv₀ hpos
-      | (rw [one_lt_inv_iff₀]; simp [hpos])
+    first | exact one_lt_inv₀ hpos
 
 variable (l) in
 theorem prime_l : Prime ((l : ℕ) : 𝓞 ℚ) := by
-  have h : Prime ((l : ℕ) : ℤ) := Nat.prime_iff_prime_int.mp hl.out
   rw [← MulEquiv.prime_iff Rat.ringOfIntegersEquiv.toMulEquiv]
-  simpa using h
-
+  simpa using (Nat.prime_iff_prime_int.mp hl.out)
 
 variable (l) in
 def vQ (l : ℕ) [Fact l.Prime] : HeightOneSpectrum (𝓞 ℚ) where
@@ -118,8 +113,8 @@ theorem val_intCast_le_one (A : ValuationSubring Ω) (n : ℤ) : A.valuation (n 
   rw [ValuationSubring.valuation_le_one_iff]
   exact intCast_mem A n
 
-theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ) :
-    A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
+theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ)
+    : A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
   constructor
   · intro h
     by_contra hnd
@@ -144,27 +139,24 @@ theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l :
     rw [map_mul]
     exact (mul_le_of_le_one_right' (val_intCast_le_one A m)).trans_lt hA
 
-theorem isPlaceOver_vQ [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) :
-    IsPlaceOver (F := ℚ) A (vQ l) := by
+theorem isPlaceOver_vQ [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   unfold IsPlaceOver
   intro x
-  obtain ⟨n, rfl⟩ : ∃ n : ℤ, ((n : 𝓞 ℚ)) = x :=
-    ⟨Rat.ringOfIntegersEquiv x, by
-      rw [← eq_intCast Rat.ringOfIntegersEquiv.symm, RingEquiv.symm_apply_apply]⟩
+  obtain ⟨n, rfl⟩ : ∃ n : ℤ, ((n : 𝓞 ℚ)) = x := ⟨
+    Rat.ringOfIntegersEquiv x,
+    by rw [← eq_intCast Rat.ringOfIntegersEquiv.symm, RingEquiv.symm_apply_apply]
+  ⟩
   rw [intCast_mem_vQ, ← val_intCast_lt_one_iff A hA n]
-  first
-    | simp
-    | (push_cast; rfl)
-    | norm_cast
+  first | simp
 
-theorem exists_emb [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω)
-    (hA : A.valuation ((l : ℕ) : Ω) < 1) :
-    ∃ j : Ω →+* PadicAlgCl l, ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1 := by
+theorem exists_emb
+    [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : ∃ j : Ω →+* PadicAlgCl l, ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1 := by
   have : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
   let j0 : Ω →ₐ[ℚ] PadicAlgCl l := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have h0 : (placeJ (j0 : Ω →+* PadicAlgCl l)).valuation ((l : ℕ) : Ω) < 1 := by
     rw [val_lt_one_iff (mem_placeJ _), map_natCast]
@@ -172,7 +164,8 @@ theorem exists_emb [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring 
       rw [← PadicAlgCl.norm_extends, map_natCast]
     rw [h1]
     exact Padic.norm_p_lt_one
-  obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ _ h0) (isPlaceOver_vQ A hA)
+  obtain ⟨σ, hσ⟩ :=
+    exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ _ h0) (isPlaceOver_vQ A hA)
   refine ⟨(j0 : Ω →+* PadicAlgCl l).comp ((σ⁻¹ : G ℚ Ω) : Ω →+* Ω), fun x => ?_⟩
   rw [← hσ, ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, mem_placeJ]
   rfl

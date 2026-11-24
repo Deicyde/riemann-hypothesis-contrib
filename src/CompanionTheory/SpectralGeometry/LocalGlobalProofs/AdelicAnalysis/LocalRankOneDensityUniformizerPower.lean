@@ -1,12 +1,13 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRingStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasureStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramFiberMeasuresSupportStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramFiberMeasuresSupport
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FinprodLocalDifferentIdealNormEqDiscr
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HaarModulusProductFormulaTotallyReal
+import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -135,7 +136,7 @@ theorem scale_fv
     (k : ℕ) (hk : ‖x‖ = ((Ideal.absNorm v.asIdeal : ℝ))⁻¹ ^ k)
     : lam.map (fun y => x * y) = ((Ideal.absNorm v.asIdeal : ℝ≥0) ^ k) • lam := by
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
-  obtain ⟨i1, i2, i3, i4, -⟩ := GlobalTheory.T.completion_is_local_ring F v
+  obtain ⟨i1, i2, i3, i4, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
   have hu : IsUnit x := hx.isUnit
   have hc
       : ((distribHaarChar (Fv F v) hu.unit : ℝ≥0) : ℝ) = ((Ideal.absNorm v.asIdeal : ℝ))⁻¹ ^ k := by
@@ -191,7 +192,8 @@ theorem coordK_map
     (t : R) (ht : t ≠ 0)
     (c : ℝ≥0) (h : lam.map (fun y => t * y) = c • lam)
     : (coordK R b lam).map (fun y => algebraMap R (R ⊗[F] E) t * y) = (c ^ d) • coordK R b lam := by
-  obtain ⟨hr, -, -, -, -, -, hh, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
+  obtain ⟨hr, -, -, -, -, -, hh, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ R
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
   have hb := hh d b
   have hemb : MeasurableEmbedding (fun (y : R ⊗[F] E) (k : Fin d) =>
@@ -256,9 +258,10 @@ theorem coordHerm_map
       (τ S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i j
         = algebraMap R (R ⊗[F] E) t * (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i j)
     : (coordHerm R σ b lam 1).map τ = c • coordHerm R σ b lam 1 := by
-  obtain ⟨i1, i2, i3, i4, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
+  obtain ⟨i1, i2, i3, i4, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ R
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
-  obtain ⟨hK, -, hH⟩ := GlobalTheory.T.coordinate_haar_measure F E σ hσ R d b lam ‹_›
+  obtain ⟨hK, -, hH⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ R d b lam ‹_›
   haveI := hK
   haveI := hH 1
   set φ : HermR R σ 1 → (Fin 1 → R) × ({p : Fin 1 × Fin 1 // p.1 < p.2} → R ⊗[F] E) :=
@@ -329,13 +332,15 @@ theorem dilation
                               = (Ideal.absNorm v.asIdeal : ℝ≥0∞) ^ (e * (2 * M - 2))
                                 * m (hermScal (Fv F v) σ ((a : Fv F v) ^ 2 * s)) A := by
   intro F E _ _ _ _ _ σ hσ M J hJ d b v lam hlam m hm hM a e ha h1 h2 s A hA
-  have hloc := GlobalTheory.T.completion_is_local_ring F v
+  have hloc := _root_.GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
   obtain ⟨i1, i2, i3, i4, -⟩ := id hloc
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   haveI : lam.IsAddHaarMeasure := hlam.1
-  obtain ⟨j1, j2, j3, j4, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ (Fv F v)
+  obtain ⟨j1, j2, j3, j4, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Fv F v)
   haveI : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
-  obtain ⟨hK, hW, hH⟩ := GlobalTheory.T.coordinate_haar_measure F E σ hσ (Fv F v) d b lam ‹_›
+  obtain ⟨hK, hW, hH⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ (Fv F v) d b lam ‹_›
   haveI := hK
   have hd : d = 2 := by rw [← hσ.2.2.1, Module.finrank_eq_card_basis b, Fintype.card_fin]
   subst hd
@@ -400,7 +405,7 @@ theorem dilation
     exact measurable_pi_iff.2 fun p =>
       measurable_pi_iff.2 fun i => hfm.comp ((measurable_pi_apply i).comp (measurable_pi_apply p))
   have key :=
-    GlobalTheory.T.gram_fiber_measures_rmul_equivariant F E σ hσ M J hJ (Fv F v) hloc 1
+    _root_.GlobalTheory.CompanionTheory.SW.FibScale.fib_rmul F E σ hσ M J hJ (Fv F v) hloc 1
       (coordW (Fv F v) b lam 1 M) (coordHerm (Fv F v) σ b lam 1) m (hW 1 M) (hH 1) hm g hg τ hτ _ _
       (by rw [hrm]; exact hk2) hc (hermScal (Fv F v) σ s)
   have hτs : τ (hermScal (Fv F v) σ s) = hermScal (Fv F v) σ ((a : Fv F v) ^ 2 * s) := by

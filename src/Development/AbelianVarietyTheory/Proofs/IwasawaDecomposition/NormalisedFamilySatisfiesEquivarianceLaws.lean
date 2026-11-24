@@ -4,14 +4,15 @@ public import Formalism.LocalToGlobal.KernelLattices.LateralTheory
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsLatticeOfAdelicPoint
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InducedTypeThetaGenusOnePermutes
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OddnessConditionHolds
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLine
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DetIdNormOneMul
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MovedVacuumMemThetaFunctionsAndMoves
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DetIdLatGmap
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsMovesOfSelfDual
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsThetaVectorFamilyOfCurveDatumStatement
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsThetaVectorFamilyOfCurveDatum
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsWeilOThZeroTriv
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SpanRangeEmb4EqTop
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLine
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -124,7 +125,7 @@ theorem eqP
   letI := D.host.cmStar
   have hC : Crv D cc δ := ⟨hc, hδ⟩
   obtain ⟨χ', e, hχ', hv, q1, q2, q3⟩ :=
-    GlobalTheory.T.exists_thetaVectorFamily_of_curveDatum D cc δ hC
+    _root_.GlobalTheory.TrueTheta.exists_family_of_curve D cc δ hC
   have key
       : ∀ N N',
         Even N → Even N'

@@ -81,13 +81,6 @@ section Fr
 
 variable {n' r : ℕ} [NeZero n']
 
-theorem fr_mono' {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
-    : ∀ i, i < r → F.fr j 0 ≤ F.fr j i := by
-  intro i hi
-  induction i with
-  | zero => exact le_rfl
-  | succ i ih => exact le_trans (ih (by omega)) (le_of_lt (hV.2.2.1 j i hi))
-
 theorem fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
     : ∀ k i, i < k → k < r → F.fr j i < F.fr j k := by
   intro k i hik hk
@@ -107,7 +100,9 @@ theorem seg_of {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (hr 
     omega
   have hstep : ∀ j : ℤ, F.fr j (r - 1) < F.fr (j + 1) (r - 1) := by
     intro j
-    exact lt_of_lt_of_le (hV.2.2.2.1 j) (fr_mono' hV (j + 1) (r - 1) (by omega))
+    exact lt_of_lt_of_le (hV.2.2.2.1 j)
+      (_root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_first_entry_le hV (j + 1)
+        (r - 1) (by omega))
   have hmono : StrictMono (fun j : ℤ => F.fr j (r - 1)) := strictMono_int_of_lt_succ hstep
   have hup : ∀ m : ℕ, F.fr 0 (r - 1) + m ≤ F.fr ((m : ℤ) * F.J) (r - 1) := by
     intro m
@@ -170,7 +165,9 @@ theorem arow_near
       · intro z hz
         simp only [Finset.mem_image, Finset.mem_range] at hz
         obtain ⟨i, hi, rfl⟩ := hz
-        have h0 := fr_mono' hV (j - 1) i hi
+        have h0 :=
+          _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_first_entry_le hV (j - 1) i
+            hi
         have h1 : F.fr (j - 1) i ≤ F.fr (j - 1) (r - 1) := by
           rcases Nat.lt_or_ge i (r - 1) with h | h
           · exact le_of_lt (fr_lt hV (j - 1) (r - 1) i h (by omega))
@@ -207,7 +204,9 @@ theorem twist_of
   unfold Qj zF
   apply Nat.pow_le_pow_right (by omega)
   have h1 := hF.2.2.1 (j + 1)
-  have h2 := fr_mono' hF.2.1 j (r - 1) (by omega)
+  have h2 :=
+    _root_.Formalism.MainNotions.G.WittFrameLocaliserOrders.frame_first_entry_le hF.2.1 j (r - 1)
+      (by omega)
   simp only [add_sub_cancel_right] at h1
   omega
 

@@ -46,6 +46,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.SharpRestriction.Divisibility.KudlaSiegelWeil
 
 @[expose] public section
 
@@ -100,10 +101,6 @@ theorem mul_smul_eq_span_absNorm
       rw [Int.cast_neg, Ideal.span_singleton_neg, Int.cast_natCast]
   exact pow_left_injective hpos key
 
-theorem hostConj_quadraticGenerator_eq_neg (D : Formalism.BasicNotions.D7)
-    : D.host.conj (D.host.sqd) = -D.host.sqd :=
-  D.host.conj_sqd
-
 theorem conj_mul_cE_absNorm (D : Formalism.BasicNotions.D7) (cc : Ideal (𝓞 D.host.K))
     : (∀ α ∈ GlobalTheory.VacRead.cE D cc, ∀ β ∈ GlobalTheory.VacRead.cE D cc, ∃ o : 𝓞 D.host.E,
         D.host.conj α * β = (Ideal.absNorm cc : D.host.E) * (o : D.host.E))
@@ -119,7 +116,9 @@ theorem conj_mul_cE_absNorm (D : Formalism.BasicNotions.D7) (cc : Ideal (𝓞 D.
       intro h1
       have hs : D.host.sqd ∈ D.host.K := IntermediateField.mem_adjoin_simple_self ℚ _
       have h2 := hτ ⟨_, hs⟩
-      rw [h1, AlgEquiv.one_apply, hostConj_quadraticGenerator_eq_neg] at h2
+      rw [h1, AlgEquiv.one_apply,
+          _root_.Formalism.MainNotions.KudlaSiegelWeil.InertConditionsOfHost.conj_b]
+        at h2
       have h3 : D.host.sqd = 0 := by
         have : (2 : D.host.E) * D.host.sqd = 0 := by simp only at h2; linear_combination h2
         simpa using this

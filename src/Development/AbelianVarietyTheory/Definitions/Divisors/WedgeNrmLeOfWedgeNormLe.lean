@@ -52,7 +52,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 namespace GlobalTheory.CompHS

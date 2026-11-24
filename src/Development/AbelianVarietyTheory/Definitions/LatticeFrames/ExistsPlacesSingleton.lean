@@ -81,14 +81,15 @@ theorem isCartanInv_one {A : HSp D} (hA : A.SigOK) (hp : A.IsPosDef) (τ : D.wha
     IP.Model.exists_cartan (hA (tauE D τ)).choose
       (J := Formalism.UG.Jpq (A.sig (tauE D τ)).1 (A.sig (tauE D τ)).2)
       (by rw [jpq_eq_one hp, Matrix.mul_one]) (by rw [jpq_eq_one hp, Matrix.conjTranspose_one])
-      (IP.Model.gramAt_unit A τ) (hc τ)
+      (_root_.GlobalTheory.SmoothAutCheck.gramAt_unit A τ) (hc τ)
   have h2 : gramAt D A τ * s = gramAt D A τ := by
     conv_lhs => rw [← hc τ, Matrix.mul_assoc, hs']
     rw [← hc τ, jpq_eq_one hp]
     simp
   have h3 : s = 1 := by
     have := congrArg ((gramAt D A τ)⁻¹ * ·) h2
-    simpa only [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ (IP.Model.gramAt_unit A τ),
+    simpa only [← Matrix.mul_assoc,
+        Matrix.nonsing_inv_mul _ (_root_.GlobalTheory.SmoothAutCheck.gramAt_unit A τ),
         Matrix.one_mul]
       using this
   exact h3 ▸ hs

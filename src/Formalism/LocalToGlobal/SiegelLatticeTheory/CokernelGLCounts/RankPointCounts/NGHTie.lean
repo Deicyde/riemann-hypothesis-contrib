@@ -143,8 +143,7 @@ theorem hpt_eq [StarRing E] (r : ℕ) (γ : PN.Pts E r) (rd g : ℝ) (hg : 0 < g
       : ((rd ^ (2 * r * (r + 1)))⁻¹) ^ f
           * ∏ a : Fin γ.1.length, ((rd ^ (2 * (endIdx γ a * (2 * r + 1 - endIdx γ a))))⁻¹) ^ f
         = ((rd ^ (2 * f))⁻¹) ^ nDelta r γ := by
-    simp only [← inv_pow, ← pow_mul, Finset.prod_inv_distrib, Finset.prod_pow_eq_pow_sum, ← mul_inv,
-      ← pow_add]
+    simp only [← inv_pow, ← pow_mul, Finset.prod_pow_eq_pow_sum, ← mul_inv, ← pow_add]
     congr 2
     unfold nDelta
     have e
@@ -187,22 +186,22 @@ theorem hTie_of (hP : HTPlace) (hD : HTDelta) (hT : HTTheta) : Formalism.L2.SG.F
       : (Function.mulSupport fun p : PlF D =>
           ((zOf Y).M p).modK (algebraMap _ _ (LocNG.theta ((zOf Y).M p))))
         ⊆ ↑S := fun p hp => by
-    simp [hS, Set.Finite.mem_toFinset, hp]
+    simp [hS, hp]
   have hsB
       : (Function.mulSupport fun p : PlF D => ((zOf Y).M p).modK (algebraMap _ _ ((zOf Y).δ p)))
         ⊆ ↑S := fun p hp => by
-    simp [hS, Set.Finite.mem_toFinset, hp]
+    simp [hS, hp]
   have hsC
       : (Function.mulSupport fun p : PlF D =>
           ((zOf Y).M p).modK ((D.s.atP p).ιE (GPt ((Tu D u : ℕ) * (Tu D u' : ℕ)) γ)))
         ⊆ ↑S := fun p hp => by
-    simp [hS, Set.Finite.mem_toFinset, hp]
+    simp [hS, hp]
   have hsD
       : ∀ a,
         (Function.mulSupport fun p : PlF D => ((zOf Y).M p).modK ((D.s.atP p).ιE (endMin γ a)))
           ⊆ ↑S := fun a p hp => by
     simp only [hS, Finset.coe_union, Finset.coe_biUnion, Finset.coe_univ, Set.mem_union,
-      Set.mem_iUnion, Set.Finite.coe_toFinset, Set.mem_univ, true_and]
+      Set.mem_iUnion, Set.Finite.coe_toFinset, Set.mem_univ]
     exact Or.inr ⟨a, trivial, hp⟩
   have hnn : ∀ p (x : (D.s.atP p).Ep), 0 ≤ ((zOf Y).M p).modK x := fun p x => ENNReal.toReal_nonneg
 

@@ -141,7 +141,6 @@ theorem rank_link_of_model
 
 end Local
 
-
 theorem rank_link_holds : Formalism.MainNotions.N.Ln34.SecondPropositionOfRank := by
   intro D HW hM hR l _ hl K LL hG π' E hp T h' hh hC hJ c
   haveI := Formalism.MainNotions.N.Ln34.GenPf.isDVR (D.loc l) LL

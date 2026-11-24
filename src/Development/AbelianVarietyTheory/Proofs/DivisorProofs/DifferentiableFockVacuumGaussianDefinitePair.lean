@@ -84,7 +84,7 @@ def dSq {m n : ℕ} (Z : D.what₂.Tau → Fin m → Fin n → ℂ)
 
 theorem dSq_apply {m n : ℕ} (Z V : D.what₂.Tau → Fin m → Fin n → ℂ)
     : dSq Z V = ∑ τ, ∑ a, ∑ b, 2 * (V τ a b * starRingEnd ℂ (Z τ a b)).re := by
-  simp [dSq, ContinuousLinearMap.sum_apply, entryR_apply, Complex.inner, two_mul]
+  simp [dSq, entryR_apply, Complex.inner, two_mul]
   refine Finset.sum_congr rfl fun _ _ =>
     Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
@@ -267,12 +267,10 @@ theorem differentiable_gZ_of_frames
             z
           = Complex.I • z := fun z => by
     funext τ i k
-    simp [jO_apply, cplxO, Matrix.mul_apply, Matrix.one_apply, Pi.mul_apply, Pi.one_apply]
+    simp [jO_apply, cplxO]
     first
     | exact congrFun (congrFun (Matrix.one_mul (M := (z τ : Matrix (Fin T.rank) (Fin S.rank) ℂ))) i)
         k
-    | (erw [Matrix.mul_apply]; simp [Matrix.one_apply])
-    | (rw [Matrix.one_mul])
   set F : RW T S → ℂ := fun z => f (iotaW σ T S z) with hF
   set Φ := frL (fun τ => GlobalTheory.FockPos.frAt frS τ) (fun τ => GlobalTheory.FockPos.frAt frT τ) with hΦ
   intro Z

@@ -1,10 +1,13 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothHermCombLine
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ComplexPointLiftsToMulticoneStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DehomogenizedEvalEqRatioStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RestrictedFormNonzeroOnGenericPointStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ZeroLocusRegularFunctionNullStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsPullHermPullLine
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ComplexPointLiftsToMulticone
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DehomogenizedEvalEqRatio
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RestrictedFormNonzeroOnGenericPoint
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsEqnIffGeneratesAtInv
+public import Development.AbelianVarietyTheory.Definitions.Divisors.DetJacMatCoordsEqTransitionJacobianDet
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ZeroLocusRegularFunctionNull
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -79,7 +82,8 @@ theorem ev_dehomog_eq_zero_iff
   have hne : ∏ k, z ⟨k, c k⟩ ^ a k ≠ 0 :=
     Finset.prod_ne_zero_iff.2 fun k _ =>
       pow_ne_zero _ ((hz k (c k)).1.1 (CxPts.ptsIn_mono (mchart_le c k) hw))
-  rw [CxPts.ev_app i rfl, GlobalTheory.T.dehomogenized_eval_eq_ratio m n c f a hf _ z hz hw,
+  rw [CxPts.ev_app i rfl,
+    _root_.GlobalTheory.CompanionTheory.MixZ.ev_dehomog_of_isUnder m n c f a hf _ z hz hw,
     div_eq_zero_iff]
   exact ⟨fun h => h.resolve_right hne, Or.inl⟩
 
@@ -101,7 +105,8 @@ theorem zeroLocus_eq_iUnion
         (CxPts.mem_ptsIn.2 (Set.mem_iInter.2 fun k => mem_ptChart _ k))
     exact ⟨_, hc, (ev_dehomog_eq_zero_iff _ hf y hc hz).2 h0⟩
   · rintro ⟨c, hc, h0⟩
-    obtain ⟨z, -, hz⟩ := GlobalTheory.T.complex_point_lifts_to_multicone m n X i y
+    obtain ⟨z, -, hz⟩ :=
+      _root_.GlobalTheory.CompanionTheory.MPDict.exists_mem_mcPts_isUnder m n X i y
     exact ⟨z, hz, (ev_dehomog_eq_zero_iff c hf y hc hz).1 h0⟩
 
 theorem measurableSet_ev_eq_zero {Y : Scheme.{0}} (q : Y ⟶ Sp ℤ) (W : Y.Opens) (g : Γ(Y, W))
@@ -140,8 +145,10 @@ theorem zeroLocus_measurable_null
   rw [Set.preimage_iUnion, Set.inter_iUnion]
   refine measure_iUnion_null fun c => ?_
   by_cases hg : genericPoint X ∈ i ⁻¹ᵁ mchart c
-  · exact GlobalTheory.T.zero_locus_regular_function_null X (i ≫ mpStr ℤ m n) σ₀ D ch _ hg _
-      (GlobalTheory.T.restricted_form_nonzero_on_generic_point m n X i c hg f a hf hI)
+  · exact _root_.GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf X (i ≫ mpStr ℤ m n) σ₀
+      D ch _ hg _
+      (_root_.GlobalTheory.CompanionTheory.MixZ.FnForm.fnAt_ne_zero_of_notMem_ptIdeal m n X i c hg f
+        a hf hI)
   · have e
         : ch.e.target
             ∩ ch.e.symm

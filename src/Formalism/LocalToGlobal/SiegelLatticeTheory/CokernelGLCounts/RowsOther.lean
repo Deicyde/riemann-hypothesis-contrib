@@ -154,7 +154,7 @@ theorem pairAbs_le_ampSum
     by_cases hp : p ∈ Q
     · simp only [Set.indicator_of_mem hp]
       exact norm_inner_le_norm _ _
-    · simp [Set.indicator_apply, hp]
+    · simp [hp]
   have hnn : ∀ p, 0 ≤ Q.indicator (fun p : τ × τ => ‖inner ℂ (X.vec p.1) (X.vec p.2)‖) p := fun p =>
     Set.indicator_nonneg (fun _ _ => norm_nonneg _) p
   exact Summable.tsum_le_tsum hle (hs.of_nonneg_of_le hnn hle) hs

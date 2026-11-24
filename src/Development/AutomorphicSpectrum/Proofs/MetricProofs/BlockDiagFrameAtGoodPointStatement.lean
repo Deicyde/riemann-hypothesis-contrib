@@ -1,7 +1,8 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsBlkCover
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPointsStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsValueAtOfTorus
 import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PCoordConeArithVar
 import Mathlib.Algebra.Order.Floor.Extended
@@ -108,7 +109,7 @@ theorem _root_.GlobalTheory.T.block_diag_frame_at_good_point
     rw [hI]
     exact hG
   have hz₀ : z₀ ∈ mcPts (mCoordIdeal y) :=
-    ((GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M).2.2 F hF z₀ hb₀ hG₀
+    ((_root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K ι Φ y Ψ N j M).2.2 F hF z₀ hb₀ hG₀
       hflag.1).mpr ⟨H, hflag⟩
   have ho' : SameOrbit w z₀ := ⟨
     fun k => (c k)⁻¹,

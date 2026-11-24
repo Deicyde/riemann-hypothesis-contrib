@@ -59,18 +59,23 @@ namespace GlobalTheory.KZ.PolAct
 variable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
 
 def homF (A : Submodule R M) (w : ℕ) : Submodule R ((Fin 2 → R) → M) where
-  carrier := {b | ∃ c : Fin (w + 1) → M, (∀ i, c i ∈ A) ∧
-    ∀ u, b u = ∑ i : Fin (w + 1), (u 0 ^ (i : ℕ) * u 1 ^ (w - (i : ℕ))) • c i}
+  carrier :=
+    {b | ∃ c : Fin (w + 1) → M, (∀ i, c i ∈ A) ∧
+      ∀ u, b u = ∑ i : Fin (w + 1), (u 0 ^ (i : ℕ) * u 1 ^ (w - (i : ℕ))) • c i}
   zero_mem' := ⟨0, fun _ => A.zero_mem, fun u => by simp⟩
   add_mem' := by
     rintro a b ⟨c, hc, ha⟩ ⟨d, hd, hb⟩
-    exact ⟨c + d, fun i => A.add_mem (hc i) (hd i), fun u => by
-      simp [ha, hb, Finset.sum_add_distrib]⟩
+    exact
+      ⟨c + d, fun i => A.add_mem (hc i) (hd i), fun u => by simp [ha, hb, Finset.sum_add_distrib]⟩
   smul_mem' := by
     rintro r b ⟨c, hc, hb⟩
-    exact ⟨r • c, fun i => A.smul_mem r (hc i), fun u => by
-      simp only [Pi.smul_apply, hb, Finset.smul_sum]
-      exact Finset.sum_congr rfl fun i _ => smul_comm _ _ _⟩
+    exact ⟨
+      r • c,
+      fun i => A.smul_mem r (hc i),
+      fun u => by
+        simp only [Pi.smul_apply, hb, Finset.smul_sum]
+        exact Finset.sum_congr rfl fun i _ => smul_comm _ _ _
+    ⟩
 
 open scoped MatrixGroups TensorProduct in
 open Matrix in
@@ -156,19 +161,22 @@ private lemma linear_form_pow_smul_mem_homF_add {A : Submodule R M} {n : ℕ}
     exact (smul_smul (α * u 0 + β * u 1)
       ((α * u 0 + β * u 1) ^ k) (b u)).symm
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] in
-theorem _root_.GlobalTheory.KZ.PolAct.subst_mem {A : Submodule R M} {w : ℕ} (φ : M →ₗ[R] M)
-    (hφ : ∀ a ∈ A, φ a ∈ A)
-    (m : Matrix (Fin 2) (Fin 2) R) {b : (Fin 2 → R) → M}
-    (hb : b ∈ _root_.GlobalTheory.KZ.PolAct.homF A w) :
-    (fun u => φ (b (m *ᵥ u))) ∈ _root_.GlobalTheory.KZ.PolAct.homF A w := by
+theorem _root_.GlobalTheory.KZ.PolAct.subst_mem
+    {A : Submodule R M} {w : ℕ}
+    (φ : M →ₗ[R] M) (hφ : ∀ a ∈ A, φ a ∈ A)
+    (m : Matrix (Fin 2) (Fin 2) R)
+    {b : (Fin 2 → R) → M} (hb : b ∈ _root_.GlobalTheory.KZ.PolAct.homF A w)
+    : (fun u => φ (b (m *ᵥ u))) ∈ _root_.GlobalTheory.KZ.PolAct.homF A w := by
   obtain ⟨c, hc, hbu⟩ := hb
-  have hterm : ∀ i : Fin (w + 1), (fun u : Fin 2 → R =>
-      ((m 0 0 * u 0 + m 0 1 * u 1) ^ (i : ℕ) * (m 1 0 * u 0 + m 1 1 * u 1) ^ (w - (i : ℕ))) •
-        φ (c i)) ∈ _root_.GlobalTheory.KZ.PolAct.homF A w := by
+  have hterm
+      : ∀ i : Fin (w + 1),
+        (fun u : Fin 2 → R =>
+            ((m 0 0 * u 0 + m 0 1 * u 1) ^ (i : ℕ) * (m 1 0 * u 0 + m 1 1 * u 1) ^ (w - (i : ℕ)))
+              • φ (c i))
+          ∈ _root_.GlobalTheory.KZ.PolAct.homF A w := by
     intro i
     have h0 := const_mem_homF_zero (hφ _ (hc i))
     have h1 := linear_form_pow_smul_mem_homF_add h0 (m 1 0) (m 1 1) (w - i)
@@ -180,25 +188,24 @@ theorem _root_.GlobalTheory.KZ.PolAct.subst_mem {A : Submodule R M} {w : ℕ} (�
     convert h2 using 1
     funext u
     rw [mul_smul]
-  have hsum := Submodule.sum_mem (_root_.GlobalTheory.KZ.PolAct.homF A w)
-    (t := Finset.univ) (fun i _ => hterm i)
+  have hsum :=
+    Submodule.sum_mem (_root_.GlobalTheory.KZ.PolAct.homF A w) (t := Finset.univ)
+      (fun i _ => hterm i)
   convert hsum using 1
   funext u
 
-  simp [hbu, map_sum, map_smul, Matrix.mulVec, dotProduct, Fin.sum_univ_two, Finset.sum_apply]
-
+  simp [hbu, map_sum, map_smul, Finset.sum_apply]
 
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] in
-theorem _root_.GlobalTheory.KZ.PolAct.act_mem_pol {Ω : Type} [Field Ω] [Algebra ℚ Ω]
-    {ε : Ω →+* ℂ} (X : _root_.GlobalTheory.KZ.Tower Ω ε) (l w : ℕ) [Fact l.Prime]
+theorem _root_.GlobalTheory.KZ.PolAct.act_mem_pol
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (X : _root_.GlobalTheory.KZ.Tower Ω ε)
+    (l w : ℕ) [Fact l.Prime]
     (m : Matrix (Fin 2) (Fin 2) ℤ)
-    (h : ∀ a ∈ X.A l, X.kmap l
-      (X.sl (_root_.GlobalTheory.KZ.toGQ m)).toRingEquiv a ∈ X.A l) :
-    ∀ b ∈ X.Pol l w,
-      X.act l m b ∈
-        X.Pol l w := by
+    (h : ∀ a ∈ X.A l, X.kmap l (X.sl (_root_.GlobalTheory.KZ.toGQ m)).toRingEquiv a ∈ X.A l)
+    : ∀ b ∈ X.Pol l w, X.act l m b ∈ X.Pol l w := by
   intro b hb
   exact _root_.GlobalTheory.KZ.PolAct.subst_mem (A := X.A l) (w := w) _ h _ hb
 

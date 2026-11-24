@@ -168,7 +168,8 @@ theorem cns_kfin
   refine ⟨S, hSf, ⟨y, hk, hx.symm⟩, ?_⟩
   intro g hg v hv
   obtain ⟨u, hu, huv⟩ := hv
-  have hgU : g ∈ UJset ε := cf_kset_sub hg
+  have hgU : g ∈ UJset ε :=
+    _root_.ReciprocityTheory.ChartRestriction.DS.UnitaryGroupOfForm.K_mem_UJ hg
   obtain ⟨w, hw, hwe⟩ := hS0K g hg u hu
   refine ⟨w, hw, ?_⟩
   show (w : L2 ε) = ((sigLam ε Ψ v₀ g v : Hlam ε Ψ v₀) : L2 ε)
@@ -358,8 +359,8 @@ theorem cns_shift_inj
   have heval : shiftF dual μ s s = shiftF dual μ s' s := congrFun h s
   delta shiftF at heval
   cases dual
-  · simp [Pi.single_apply, hne] at heval
-  · simp [Pi.single_apply, hne] at heval
+  · simp [hne] at heval
+  · simp [hne] at heval
 
 theorem cns_coefV
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
@@ -438,7 +439,11 @@ theorem cns_kfin_map
   obtain ⟨S, hSf, hxS, hSK⟩ := hx
   refine ⟨S.map U.toLinearIsometry.toLinearMap, Module.Finite.map _ _, ⟨x, hxS, rfl⟩, ?_⟩
   rintro g hg _ ⟨v, hv, rfl⟩
-  exact ⟨σ₁ g v, hSK g hg v hv, hU g (cf_kset_sub hg) v⟩
+  exact ⟨
+    σ₁ g v,
+    hSK g hg v hv,
+    hU g (_root_.ReciprocityTheory.ChartRestriction.DS.UnitaryGroupOfForm.K_mem_UJ hg) v
+  ⟩
 
 theorem cns_symm_intertw
     {H₁ H₂ : Type*} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [NormedAddCommGroup H₂]

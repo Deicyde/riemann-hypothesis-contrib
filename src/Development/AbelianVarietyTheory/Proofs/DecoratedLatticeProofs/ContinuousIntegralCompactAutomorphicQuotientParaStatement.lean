@@ -47,6 +47,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.continuous_integral_compactAutomorphicQuotient_param
     : ∀ (D : D7) (V : HSp D),
       CoCpt V
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.continuous_integral_compactAutomorphicQuotient_par
             → (∀ p, IntegrableOn (fun g => K g p) v.𝓕 v.μ)
               ∧ (Continuous fun p => ∫ g in v.𝓕, K g p ∂v.μ)
               ∧ ∀ p₀, ∃ C : ℝ, ∀ᶠ p in nhds p₀, ∀ g, ‖K g p‖ ≤ C := by
-  first
-  | exact @GlobalTheory.CocompactParam.continuous_integral_param
-  | exact GlobalTheory.CocompactParam.continuous_integral_param
-  | (intros; apply GlobalTheory.CocompactParam.continuous_integral_param <;> assumption)
+  first | exact @GlobalTheory.CocompactParam.continuous_integral_param

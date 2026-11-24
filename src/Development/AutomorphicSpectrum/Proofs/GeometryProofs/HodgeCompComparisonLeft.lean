@@ -3,8 +3,11 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapFromSpecStalk
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompat
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompatStatement
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelPullbackCorrespondence
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -64,23 +67,6 @@ section Move
 
 variable {S : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R']
 
-theorem tan_up
-    {G : Over S} [GrpObj G]
-    (φ : R →+* R') (x : Sp R ⟶ S) (x' : Sp R' ⟶ S) (h : Spec.map (CommRingCat.ofHom φ) ≫ x = x')
-    (v : epsAt x ⟶ G) (hv : IsTanAt G x v)
-    : IsTanAt G x' (LieCarrier.epsHom φ x x' h ≫ v) := by
-  let u : Over.mk x' ⟶ Over.mk x := Over.homMk (Spec.map (CommRingCat.ofHom φ)) h
-  have e
-      : (LieEx.zsec x' : _ ⟶ LieEx.ob x' R') ≫ LieCarrier.epsHom φ x x' h = u ≫ LieEx.zsec x := by
-    apply Over.OverMorphism.ext
-    show Spec.map _ ≫ Spec.map _ = Spec.map _ ≫ Spec.map _
-    rw [← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp]
-    congr 2
-    refine RingHom.ext fun a => ?_
-    simp [dualMap]
-  refine (LieEx.isTanAt_iff x' G _).2 ?_
-  rw [← Category.assoc, e, Category.assoc, (LieEx.isTanAt_iff x G _).1 hv, MonObj.comp_one]
-
 variable
   {X X' : Scheme.{0}} {Ω Ω' : Type} [Field Ω] [Field Ω']
   {ξ : Sp Ω ⟶ X} {ξ' : Sp Ω' ⟶ X'} {f : X' ⟶ X} {i : Ω →+* Ω'} {G : Over X} {G' : Over X'}
@@ -96,7 +82,7 @@ theorem exists_hom
   have hx : Spec.map (CommRingCat.ofHom i) ≫ ξ = ξ' ≫ f := hd.symm
   let P := LieMove.pushModel hG M'
   have ex : ∀ e, ∃ e', P.pt e' = LieCarrier.epsHom i ξ (ξ' ≫ f) hx ≫ M.pt e := fun e =>
-    P.onto _ (tan_up i ξ (ξ' ≫ f) hx _ (M.tan e))
+    P.onto _ (_root_.GlobalTheory.CompanionTheory.Ar.LiePull.tan_pull i ξ (ξ' ≫ f) hx _ (M.tan e))
   choose j hj using ex
   refine ⟨AddMonoidHom.mk' j fun a b => P.inj ?_, fun e => congrArg (fun z => z.left) (hj e)⟩
   rw [P.add, hj, hj, hj, M.add, MonObj.comp_mul]
@@ -140,8 +126,8 @@ theorem main
   obtain ⟨m, hm⟩ := cancel hf A.m B.m
   obtain ⟨j, hj⟩ := exists_hom hd m.cart A.M B.M
   obtain ⟨hx, -, hl⟩ :=
-    GlobalTheory.T.lie_lattice_dominant_compat A.X B.X Ω₁ Ω A.ξ B.ξ h i A.t.G B.t.G m.φ A.Li B.Li
-      A.M B.M j A.tie.gen B.tie.gen hd m.cart A.t.semi.smooth hj
+    _root_.GlobalTheory.CompanionTheory.Ar.LiePull.main A.X B.X Ω₁ Ω A.ξ B.ξ h i A.t.G B.t.G m.φ
+      A.Li B.Li A.M B.M j A.tie.gen B.tie.gen hd m.cart A.t.semi.smooth hj
   refine ⟨j, hx, fun e => ?_, fun a e => ?_, hl⟩
   · rw [hm, ← Category.assoc, hj, Category.assoc]
   · exact map_diff m.cart (m.act a) hj (A.act a) (B.act a) e

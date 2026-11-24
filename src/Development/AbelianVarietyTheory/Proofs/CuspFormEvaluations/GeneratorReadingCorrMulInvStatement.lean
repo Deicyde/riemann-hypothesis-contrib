@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
   Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.generatorReading_corr_mul_inv
     : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (L : RigLB A) (x0 : Sp ℂ ⟶ S)
         (g : ℕ) (Φ : AnFr A L x0 g),
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.generatorReading_corr_mul_inv
             ∧ Φ.GenRd (Sum.elim φ φ') (Sum.elim ε ε') (LB.mulGen L.L φ ε φ' ε' t t') q
               (Sum.elim p p') (v * v')
             ∧ Φ.GenRd φ (fun k => - ε k) (LB.invGen L.L φ ε t) q p v⁻¹ := by
-  first
-  | exact @GlobalTheory.AnValGenCorr.genRd_corr_mul_inv
-  | exact GlobalTheory.AnValGenCorr.genRd_corr_mul_inv
-  | (intros; apply GlobalTheory.AnValGenCorr.genRd_corr_mul_inv <;> assumption)
+  first | exact @GlobalTheory.AnValGenCorr.genRd_corr_mul_inv

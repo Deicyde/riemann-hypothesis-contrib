@@ -123,7 +123,7 @@ theorem sec_pi_bijective
     : Function.Bijective (fun (y : Sec F (Spec (CommRingCat.of (S → B)))) (s : S) =>
       Sec.res (Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : S => B) s))) y) := by
   obtain ⟨hc⟩ := GlobalTheory.EtC.spec_pi_cofan_isColimit S (fun _ => B) (S → B) (RingEquiv.refl _)
-  exact GlobalTheory.T.etaleModuleSheaf_sections_coprod_bijective R F _ S _ _ hc
+  exact _root_.GlobalTheory.EtC.sec_coprod R F _ S _ _ hc
 
 theorem res_eval_pullQ
     (R : Type) [CommRing R]
@@ -158,8 +158,8 @@ theorem GlobalTheory.EtC.sec_locallyConstant
                     = ψ x := by
   intro R _ F hF X _ _ B _
   have hfin :=
-    ((GlobalTheory.T.preservesFilteredColimits_moduleCat_iff_forget_iff_elements (ULift.{1} R)
-        (onRings F)).2.mp hF)
+    ((_root_.GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements
+        (ULift.{1} R) (onRings F)).2.mp hF)
       _ (stage X B) (lcCocone X B) (lcCoconeIsColimit X B)
   have hrep
       : ∀ t : Sec F (Spec (CommRingCat.of (LocallyConstant X B))),

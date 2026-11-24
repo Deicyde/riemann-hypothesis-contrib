@@ -75,16 +75,16 @@ private lemma mulVec_column_of_orthogonal_idempotents {R J C : Type} [CommRing R
   · subst hdc; rfl
   · rfl
 
-
 open Module in
-theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (J C : Type) [Fintype J] [DecidableEq J] [Fintype C]
-      [DecidableEq C] (e : C → Matrix J J O),
-      (∀ c c', e c * e c' = if c = c' then e c else 0) → ∑ c, e c = 1 →
-      ∃ (κ : J → C) (col : J → J),
-        IsUnit (Matrix.det (Matrix.of fun i j => e (κ i) j (col i))) ∧
-        ∀ c, Submodule.span O (Set.range fun i => fun j => e c j i) =
-          Submodule.span O {v | ∃ i, κ i = c ∧ v = fun j => e c j (col i)} := by
+theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (J C : Type) [Fintype J] [DecidableEq J] [Fintype C]
+        [DecidableEq C] (e : C → Matrix J J O),
+      (∀ c c', e c * e c' = if c = c' then e c else 0) → ∑ c, e c = 1
+        → ∃ (κ : J → C) (col : J → J),
+          IsUnit (Matrix.det (Matrix.of fun i j => e (κ i) j (col i)))
+            ∧ ∀ c,
+              Submodule.span O (Set.range fun i => fun j => e c j i)
+                = Submodule.span O {v | ∃ i, κ i = c ∧ v = fun j => e c j (col i)} := by
   intro O _ _ J C _ _ _ _ e he hsum
   classical
   let f : Matrix J J O →+* Matrix J J (IsLocalRing.ResidueField O) :=
@@ -106,9 +106,10 @@ theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
     have h1 := congrArg (Matrix.mulVecLin (E d)) hg
 
     simp only [map_sum, map_smul, map_zero, Matrix.mulVecLin_apply, W, w,
-    mulVec_column_of_orthogonal_idempotents E hE, Fintype.sum_sigma, smul_ite, smul_zero] at h1
+        mulVec_column_of_orthogonal_idempotents E hE, Fintype.sum_sigma, smul_ite, smul_zero]
+      at h1
     rw [Finset.sum_eq_single d (fun c _ hc => by simp [Ne.symm hc]) (by simp)] at h1
-    simp only [if_pos rfl] at h1
+    simp only at h1
     exact Fintype.linearIndependent_iff.mp (hli d) (fun t => g ⟨d, t⟩) h1 t
   have hWsp : ⊤ ≤ Submodule.span (IsLocalRing.ResidueField O) (Set.range W) := by
     rw [← (Pi.basisFun (IsLocalRing.ResidueField O) J).span_eq, Submodule.span_le]
@@ -132,8 +133,8 @@ theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
   let σ : J ≃ (Σ c, T c) := Fintype.equivOfCardEq hcard
   let M : Matrix J J O := Matrix.of fun i j => e (σ i).1 j (a (σ i).1 (σ i).2)
   have hdet : IsUnit M.det := by
-    rw [← isUnit_map_iff (IsLocalRing.residue O), RingHom.map_det,
-      ← Matrix.isUnit_iff_isUnit_det, ← Matrix.linearIndependent_rows_iff_isUnit]
+    rw [← isUnit_map_iff (IsLocalRing.residue O), RingHom.map_det, ← Matrix.isUnit_iff_isUnit_det,
+      ← Matrix.linearIndependent_rows_iff_isUnit]
     exact hWli.comp σ σ.injective
   refine ⟨fun i => (σ i).1, fun i => a (σ i).1 (σ i).2, hdet, fun c => le_antisymm ?_ ?_⟩
   · rw [Submodule.span_le]
@@ -143,9 +144,12 @@ theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
       simpa using mulVec_column_of_orthogonal_idempotents e he c c s
     have h3 : (fun j => e c j s) = Matrix.vecMul (Matrix.vecMul (fun j => e c j s) M⁻¹) M := by
       rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hdet, Matrix.vecMul_one]
-    have h4 : (fun j => e c j s) =
-        ∑ i, (Matrix.vecMul (fun j => e c j s) M⁻¹) i • (e c).mulVec (M i) := by
-      calc (fun j => e c j s) = (e c).mulVec (fun j => e c j s) := hfix.symm
+    have h4
+        : (fun j => e c j s)
+          = ∑ i, (Matrix.vecMul (fun j => e c j s) M⁻¹) i • (e c).mulVec (M i) := by
+      calc
+        (fun j => e c j s)
+          = (e c).mulVec (fun j => e c j s) := hfix.symm
         _ = (e c).mulVec (Matrix.vecMul (Matrix.vecMul (fun j => e c j s) M⁻¹) M) := by rw [← h3]
         _ = _ := by
           rw [Matrix.vecMul_eq_sum]

@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralElementsUnitFactorizationStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralElementsUnitFactorization
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -264,7 +264,7 @@ theorem exists_lattice_basis
             ∧ ∀ w : Fin d → WCb l,
               (∀ i, w i ∈ bk.OE) → (∀ i, (l : WCb l) ∣ (Y' *ᵥ w) i) → ∀ i, (l : WCb l) ∣ w i := by
   intro l _ K bk d Y1 hY
-  obtain ⟨h1, -, -, h4, -⟩ := GlobalTheory.T.integral_elements_unit_factorization l K bk
+  obtain ⟨h1, -, -, h4, -⟩ := _root_.GlobalTheory.OEDvr.main l K bk
   have hirr : Irreducible (l : WCb l) := WittVector.irreducible l
   have : PerfectRing (Cb l) l := by
     refine PerfectRing.ofSurjective _ l fun x => ?_
@@ -273,7 +273,7 @@ theorem exists_lattice_basis
     obtain ⟨b', rfl⟩ := surjective_frobenius (OCb l) l b
     exact ⟨
       algebraMap (OCb l) (Cb l) a' / algebraMap (OCb l) (Cb l) b',
-      by simp [frobenius_def, div_pow, map_pow]
+      by simp [frobenius_def, map_pow]
     ⟩
   obtain ⟨c, u, hu⟩ := WittVector.exists_eq_pow_p_mul' Y1.det hY
   have := pid_of_fact bk.OE hirr (natCast_mem _ l) h4

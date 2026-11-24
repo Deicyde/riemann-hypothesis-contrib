@@ -61,8 +61,7 @@ theorem tensorProductBasis_repr_map_firstFactor
   induction x using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp [map_add (f := _), hx, hy]
-  | tmul a m =>
-    simp [Algebra.TensorProduct.basis_repr_tmul, Algebra.TensorProduct.map_tmul, Algebra.smul_def]
+  | tmul a m => simp [Algebra.TensorProduct.basis_repr_tmul, Algebra.TensorProduct.map_tmul]
 
 theorem CMAdele_eq_zero_of_infinite_and_finite_components_zero
     (D : D7) (a : AE D) (h0 : infPart D a = 0) (hw : ∀ w : Pl D, compAt D w a = 0)

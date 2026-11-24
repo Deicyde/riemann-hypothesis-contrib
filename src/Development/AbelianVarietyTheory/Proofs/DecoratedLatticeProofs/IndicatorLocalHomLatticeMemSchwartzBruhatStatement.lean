@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.indicator_localHomLattice_mem_schwartzBruhat
               {x | (ofSplit P.q).up P.FS P.FT x ∈ latO S T (M : Set _) (M' : Set _) (· = P.q.v)}
               (fun _ => (1 : ℂ))
             ∈ SB (Matrix P.Y P.Y' P.k) := by
-  first
-  | exact @GlobalTheory.LatIndSB.indicator_latO_mem_SB
-  | exact GlobalTheory.LatIndSB.indicator_latO_mem_SB
-  | (intros; apply GlobalTheory.LatIndSB.indicator_latO_mem_SB <;> assumption)
+  first | exact @GlobalTheory.LatIndSB.indicator_latO_mem_SB

@@ -53,17 +53,20 @@ open scoped TensorProduct
 
 namespace GlobalTheory.SplitResidueCard
 
-theorem absNorm_eq_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
-    {w : Ideal (𝓞 E)} (hwp : w.IsPrime) (hw : ((p : ℕ) : 𝓞 E) ∈ w) :
-    Ideal.absNorm w = p := by
-  apply GlobalTheory.LevDesc.absNorm_eq_of_split <;> assumption
-
-theorem card_quotient_of_ncard {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+theorem absNorm_eq_of_ncard
+    {E : Type} [Field E] [NumberField E]
     {p : ℕ} (hp : p.Prime)
     (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal) :
-    Nat.card (𝓞 F ⧸ v.asIdeal) = p := by
+    {w : Ideal (𝓞 E)} (hwp : w.IsPrime) (hw : ((p : ℕ) : 𝓞 E) ∈ w)
+    : Ideal.absNorm w = p := by
+  apply GlobalTheory.LevDesc.absNorm_eq_of_split <;> assumption
+
+theorem card_quotient_of_ncard
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {p : ℕ} (hp : p.Prime)
+    (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
+    (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal)
+    : Nat.card (𝓞 F ⧸ v.asIdeal) = p := by
   have := v.isPrime
   have := v.isMaximal
   obtain ⟨w, hwm, hwo⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) v.asIdeal
@@ -80,7 +83,9 @@ theorem card_quotient_of_ncard {F E : Type} [Field F] [NumberField F] [Field E] 
   have := (Nat.card_eq_one_iff_unique.1 h1).1
   exact not_subsingleton (𝓞 F ⧸ v.asIdeal) this
 
-theorem card_kv : ∀ (D : D7) (i : Fin 2) (v : HeightOneSpectrum (𝓞 D.host.F)), (D.host.g i : 𝓞 D.host.F) ∈ v.asIdeal → Nat.card (kv D.host.F v) = D.host.g i := by
+theorem card_kv
+    : ∀ (D : D7) (i : Fin 2) (v : HeightOneSpectrum (𝓞 D.host.F)),
+      (D.host.g i : 𝓞 D.host.F) ∈ v.asIdeal → Nat.card (kv D.host.F v) = D.host.g i := by
   intro D i v hv
   rw [← card_quotient_of_ncard (D.host.g_prime i) (D.nd.g_split i) v hv]
   have h := Formalism.UG.P.tjcosets_card_residue v

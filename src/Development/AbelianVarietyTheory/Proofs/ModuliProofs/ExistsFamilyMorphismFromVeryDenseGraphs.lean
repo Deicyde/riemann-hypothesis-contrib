@@ -3,16 +3,16 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHomogeneousInf
 public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReducedAlgebraOfSmoothOfIsNoetherianRing
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsAwaySurjective
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFlatProjectiveThroughPointsGoodFibresStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsoOfProjectiveCoordinateRepresentation
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFlatProjectiveThroughPointsGoodFibres
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSchemeMapOfProjectiveCoordinates
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjProperRelAmpleOfProjectiveCoordinateRep
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MemIdealOfOfDense
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ProjRepGraphSegreCoordinatesFibreStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SecCoordBcScaleUnique
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SegreCoordinates
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ProjRepGraphSegreCoordinatesFibre
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SmoothOfRelativeDimensionAndGeometricallyConnect
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SpMapCompRingHomComp
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsoOfProjectiveCoordinateRepresentation
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjProperRelAmpleOfProjectiveCoordinateRep
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SecCoordBcScaleUnique
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SegreCoordinates
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -71,11 +71,7 @@ set_option backward.isDefEq.respectTransparency false
 noncomputable section
 namespace GlobalTheory.ZM.GraphMor
 
-theorem spMap_comp_hom
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  simp only [spMap, ← Spec.map_comp]
-  rfl
+alias spMap_comp_hom := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem exists_chart_two
     {Y X₁ X₂ : Scheme.{0}} {σ₁ σ₂ : Type} {M₁ : LB X₁} {M₂ : LB X₂} (h₁ : M₁.IsLB) (h₂ : M₂.IsLB)
@@ -219,7 +215,7 @@ theorem exists_hom_of_graphs
           G K x f → f = pullback.fst _ _ ≫ F.left := by
   intro R σ₁ σ₂ Hh _ _ _ _ _ _ Z₁ Z₂ I₁ I₂ M₁ M₂ th₁ th₂ p₁ p₂ Q d G h₁ h₂ hp₁ hp₂ hsm hG hP
   obtain ⟨Γ', M, th, hΓ, -, hflat, hlfp, hfib⟩ :=
-    GlobalTheory.T.exists_flat_projective_through_points_goodFibres R (σ₁ × σ₂) Hh
+    _root_.GlobalTheory.ZM.FlatFamily.exists_flat_projRep_vanIdeal R (σ₁ × σ₂) Hh
       (fun h i => p₁ h i.1 * p₂ h i.2)
       Q d
       (fun K _ x I =>
@@ -245,7 +241,7 @@ theorem exists_hom_of_graphs
                   → SecCoord M th (y ≫ φ) (fun i => v₁ i.1 * v₂ i.2) := by
     intro K _ x f hf
     obtain ⟨N, ty, hN, hc⟩ :=
-      GlobalTheory.T.projRep_graph_segre_coordinates_fibre R K σ₁ σ₂ x I₁ I₂ Z₁ Z₂ M₁ M₂ th₁ th₂ _
+      _root_.GlobalTheory.ZM.GraphSegre.projRep_graph R K σ₁ σ₂ x I₁ I₂ Z₁ Z₂ M₁ M₂ th₁ th₂ _
         (pullback.snd _ _) (pullback.fst _ _) f h₁ h₂ (IsPullback.of_hasPullback _ _)
         (hG K x f hf).1
     obtain ⟨φ, hφ, -, hφc⟩ := hfib K x _ _ _ N ty ⟨f, hf, rfl⟩ hN

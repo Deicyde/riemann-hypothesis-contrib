@@ -49,7 +49,3 @@ open NumberField IsDedekindDomain ReciprocityTheory.Aut Formalism.AUTREP Formali
 attribute [local instance]
   GlobalTheory.TypeRec.factG Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField
-
-theorem GlobalTheory.GLp.reduction_GL_surjective
-    : ∀ (g : ℕ) [Fact g.Prime] (n : ℕ), Function.Surjective (GlobalTheory.GLp.red g n) :=
-  fun g _ n => GlobalTheory.GLp.red_surjective g n

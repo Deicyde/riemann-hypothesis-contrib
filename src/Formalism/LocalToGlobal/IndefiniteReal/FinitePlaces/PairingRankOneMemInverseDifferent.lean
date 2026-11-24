@@ -61,8 +61,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-
-
 namespace Formalism.IndefR.Fin
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -175,7 +173,6 @@ theorem conj_inv_eq : D.host.conj⁻¹ = D.host.conj := by
   exact AlgEquiv.ext fun y => Formalism.MainNotions.UnusedSlot33.HK.conj_conj D.host y
 
 theorem conj_inv_smul (x : 𝓞 D.host.E) : D.host.conj⁻¹ • x = D.host.conj • x := by rw [conj_inv_eq]
-
 
 theorem star_mem_AAbar {c : D.host.E} (hc : c ∈ D.host.AA) : star c ∈ D.host.AAbar := by
   have hJ

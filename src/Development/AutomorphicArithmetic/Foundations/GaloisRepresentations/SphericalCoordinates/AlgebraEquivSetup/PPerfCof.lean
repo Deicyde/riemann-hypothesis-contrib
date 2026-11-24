@@ -109,7 +109,7 @@ theorem UpperTheory.Gal.W2.Seed.pPerfCof : PerfCof := by
       rcases eq_or_ne j i with h | h
       · subst h
         simp
-      · simp [Finsupp.single_apply, h]
+      · simp [h]
     intro z
     exact LinearMap.congr_fun hlin z
   have hdual

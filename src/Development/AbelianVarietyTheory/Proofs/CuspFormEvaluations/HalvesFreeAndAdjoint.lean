@@ -243,11 +243,6 @@ theorem ef_swap (x y : Dw.La) : Dw.EF y x = - Dw.EF x y := by
   simp only [map_add (f := _), LinearMap.add_apply, Dw.alt] at h
   linarith
 
-theorem qRep_mk {K : Submodule (𝓞 E) Dw.La} (q : Dw.La ⧸ K)
-    : Submodule.Quotient.mk (qRep q) = q := by
-  unfold qRep
-  exact Classical.choose_spec (Submodule.Quotient.mk_surjective _ q)
-
 private theorem host_bar_bar' (a : 𝓞 E) : H.bar (H.bar a) = a := by
   apply RingOfIntegers.ext
   rw [H.bar_eq, H.bar_eq]
@@ -347,7 +342,8 @@ theorem exists_adjoint_halves
       : ∀ a b : Dw.La,
         B (Submodule.Quotient.mk a) (Submodule.Quotient.mk b)
           = ((Dw.EF a (cHalf H I • b) : ℤ) : ZMod N) := fun a b =>
-    key _ _ _ _ (qRep_mk _) (qRep_mk _)
+    key _ _ _ _ (_root_.GlobalTheory.DatumInverseCharacter.qRep_spec _)
+      (_root_.GlobalTheory.DatumInverseCharacter.qRep_spec _)
   have hadd : ∀ p q q', B p (q + q') = B p q + B p q' := by
     intro p q q'
     obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ p
@@ -400,12 +396,12 @@ theorem exists_adjoint_halves
       : ∀ u v : Dw.La,
         B (kst (Submodule.Quotient.mk u)) (Submodule.Quotient.mk v)
           = ((Dw.EF (qRep (kst (Submodule.Quotient.mk u))) (cHalf H I • v) : ℤ) : ZMod N) :=
-    fun u v => key _ _ _ _ rfl (qRep_mk _)
+    fun u v => key _ _ _ _ rfl (_root_.GlobalTheory.DatumInverseCharacter.qRep_spec _)
   have e2
       : ∀ u v : Dw.La,
         B (Submodule.Quotient.mk u) (k (Submodule.Quotient.mk v))
           = ((Dw.EF u (cHalf H I • qRep (k (Submodule.Quotient.mk v))) : ℤ) : ZMod N) := fun u v =>
-    key _ _ _ _ (qRep_mk _) rfl
+    key _ _ _ _ (_root_.GlobalTheory.DatumInverseCharacter.qRep_spec _) rfl
   constructor
   · intro h p q
     obtain ⟨u, rfl⟩ := Submodule.Quotient.mk_surjective _ p

@@ -51,6 +51,7 @@ open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
+
 theorem _root_.GlobalTheory.T.finitePart_mem_level_of_thetaDatum_ne_zero
     : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
         (βS : GL (Fin S.rank) (Lev.EAf D)) (βT : GL (Fin T.rank) (Lev.EAf D))
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.finitePart_mem_level_of_thetaDatum_ne_zero
                     (actO S T g 1 x)
                   ≠ 0
                 → Lev.finE S g ∈ Formalism.L2.DIV.lev D.sp.cm S.gram βS L := by
-  first
-  | exact @GlobalTheory.SuppLevO.finE_mem_lev
-  | exact GlobalTheory.SuppLevO.finE_mem_lev
-  | (intros; apply GlobalTheory.SuppLevO.finE_mem_lev <;> assumption)
+  first | exact @GlobalTheory.SuppLevO.finE_mem_lev

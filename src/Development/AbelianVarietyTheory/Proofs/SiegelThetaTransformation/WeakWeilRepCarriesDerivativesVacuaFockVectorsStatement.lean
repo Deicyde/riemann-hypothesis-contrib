@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weakWeilRep_carries_derivatives_vacua_fockVectors
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ),
       IsWeak C.ψ S T om
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.weakWeilRep_carries_derivatives_vacua_fockVectors
                           (C.sB (C.mvB g B))
                           (fun τ => compAt C.θ τ (mt S h))
                           (C.mvB g B) (om (h, g) f) Q := by
-  first
-  | exact @GlobalTheory.Ker.WeakMove.om_move
-  | exact GlobalTheory.Ker.WeakMove.om_move
-  | (intros; apply GlobalTheory.Ker.WeakMove.om_move <;> assumption)
+  first | exact @GlobalTheory.Ker.WeakMove.om_move

@@ -57,9 +57,6 @@ namespace PositivityTheory.Rg.Sw.Glob.RhoH
 
 variable {D : D7} {n : ℕ}
 
-
-
-
 theorem eval_aeval_subst
     {σ τ' : Type} (x : τ' → ℂ) (f : σ → MvPolynomial τ' ℂ) (p : MvPolynomial σ ℂ)
     : MvPolynomial.eval x (MvPolynomial.aeval f p)

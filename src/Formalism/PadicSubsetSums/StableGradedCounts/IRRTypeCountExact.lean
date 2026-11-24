@@ -78,9 +78,7 @@ theorem type_count_exact : TypeCountExact := by
       intro h
       have ha := h a (by simp)
       obtain ⟨h1, h2, h3, h4⟩ := ih (fun q hq => h q (by simp [hq]))
-      have hna : normalize a = a := by
-        first
-        | exact ha.1.normalize_eq_self
+      have hna : normalize a = a := by first | exact ha.1.normalize_eq_self
       rw [Multiset.prod_cons]
       refine ⟨ha.1.mul h1, ?_, ?_, ?_⟩
       · rw [normalizedFactors_mul ha.2.1.ne_zero h1.ne_zero, normalizedFactors_irreducible ha.2.1,
@@ -100,19 +98,13 @@ theorem type_count_exact : TypeCountExact := by
           → ∀ q ∈ normalizedFactors (monicOf c),
             q.Monic ∧ Irreducible q ∧ q.coeff 0 ≠ 0 ∧ 1 ≤ q.natDegree ∧ q.natDegree ≤ N := by
     intro c hc q hq
-    have hirr : Irreducible q := by
-      first
-      | exact irreducible_of_normalized_factor q hq
+    have hirr : Irreducible q := by first | exact irreducible_of_normalized_factor q hq
     have hq0 : q ≠ 0 := hirr.ne_zero
-    have hnq : normalize q = q := by
-      first
-      | exact normalize_normalized_factor q hq
+    have hnq : normalize q = q := by first | exact normalize_normalized_factor q hq
     have hmon : q.Monic := by
       have h := Polynomial.monic_normalize hq0
       rwa [hnq] at h
-    have hdvd : q ∣ monicOf c := by
-      first
-      | exact dvd_of_mem_normalizedFactors hq
+    have hdvd : q ∣ monicOf c := by first | exact dvd_of_mem_normalizedFactors hq
     have hp0 : monicOf c ≠ 0 := (monicOf_monic c).ne_zero
     refine ⟨hmon, hirr, ?_, ?_, ?_⟩
     · intro h0
@@ -136,8 +128,7 @@ theorem type_count_exact : TypeCountExact := by
     have hp0 : monicOf c ≠ 0 := (monicOf_monic c).ne_zero
     have hm := (L1 _ (fun q hq => ⟨(F c hc q hq).1, (F c hc q hq).2.1, (F c hc q hq).2.2.1⟩)).1
     apply Polynomial.eq_of_monic_of_associated hm (monicOf_monic c)
-    first
-    | exact prod_normalizedFactors hp0
+    first | exact prod_normalizedFactors hp0
   set Irr : ℕ → Finset K[X] := fun d => ((Finset.univ : Finset (Fin d → K)).filter
     (fun c => Irreducible (monicOf c) ∧ (monicOf c).coeff 0 ≠ 0)).image monicOf with hIrrdef
   have hIrr

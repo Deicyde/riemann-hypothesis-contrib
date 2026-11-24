@@ -105,7 +105,9 @@ theorem rho_representation_holds : CompanionTheory.RgDs.K.RhoRep := by
     funext x'
 
     simp only [rhoA, map_sum, map_smul, Finset.smul_sum, smul_smul]
-    refine Eq.trans ?_ (Finset.sum_comm (s := (Finset.univ : Finset (Fin x'.1 → Fin n × Fin n))) (t := (Finset.univ : Finset (Fin x'.1 → Fin n × Fin n)))).symm
+    refine Eq.trans ?_
+      (Finset.sum_comm (s := (Finset.univ : Finset (Fin x'.1 → Fin n × Fin n)))
+        (t := (Finset.univ : Finset (Fin x'.1 → Fin n × Fin n)))).symm
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [← Finset.sum_smul, rr_op_mul]
     congr 1
@@ -125,8 +127,7 @@ theorem rho_representation_holds : CompanionTheory.RgDs.K.RhoRep := by
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [smul_comm]
   · intro a
-    have hK : Continuous fun k : KG ε => toMK k :=
-      (continuous_toM ε).comp continuous_subtype_val
+    have hK : Continuous fun k : KG ε => toMK k := (continuous_toM ε).comp continuous_subtype_val
     have hKi : Continuous fun k : KG ε => (toMK k)⁻¹ := by
       simp only [rr_toMK_inv]
       exact hK.comp continuous_inv

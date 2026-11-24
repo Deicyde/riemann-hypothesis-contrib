@@ -90,14 +90,14 @@ theorem sigZeroDecay_real
   have hlog : Real.log G ≤ Real.log N + s := by
     have h1 := Real.log_le_log hG hGle
     rwa [Real.log_mul hN.ne' (Real.exp_pos s).ne', Real.log_exp] at h1
-  have hcs : c * (s / c) = s := by first | (field_simp; done) | (field_simp; ring)
+  have hcs : c * (s / c) = s := by first | (field_simp; done)
   have hmin : s - 1 ≤ c * min (s ^ 2) (s / c) := by
     rcases min_cases (s ^ 2) (s / c) with ⟨h1, _⟩ | ⟨h1, _⟩
     · rw [h1]
       nlinarith [mul_le_mul_of_nonneg_right hc (sq_nonneg s), sq_nonneg (s - 1)]
     · rw [h1, hcs]
       linarith
-  have hh8 : h / 8 = c * (h / (8 * c)) := by first | (field_simp; done) | (field_simp; ring)
+  have hh8 : h / 8 = c * (h / (8 * c)) := by first | (field_simp; done)
   rw [Real.rpow_def_of_pos hN, Real.rpow_def_of_pos hG, ← Real.exp_add, ← Real.exp_add,
     Real.exp_le_exp, hh8]
   nlinarith [mul_le_mul_of_nonneg_left hmin ha.le, mul_le_mul_of_nonneg_left hlog ha.le]

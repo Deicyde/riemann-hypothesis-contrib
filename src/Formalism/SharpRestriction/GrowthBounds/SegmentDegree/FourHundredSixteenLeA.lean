@@ -51,7 +51,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf.TE
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace Formalism.MainNotions.SelectionLemmas.Pf.T
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace Formalism.MainNotions.SelectionLemmas.Pf.T
 
 section Num61
 
@@ -63,8 +64,10 @@ theorem six_le_Ns (hX : X.Hyp p K) : 6 ≤ X.Ns := by
   have hg : X.F.fr 0 (r - 1) < X.F.fr 1 0 := by
     have h0 := hV.2.2.2.1 0
     simpa using h0
-  have hle : ∀ j : ℤ, ∀ i, i < r → X.F.fr j 0 ≤ X.F.fr j i := fun j i hi => fr_le hV j 0 i (Nat.zero_le _) hi
-  have hleT : ∀ j : ℤ, ∀ i, i < r → X.F.fr j i ≤ X.F.fr j (r - 1) := fun j i hi => fr_le hV j i (r - 1) (by omega) (by omega)
+  have hle : ∀ j : ℤ, ∀ i, i < r → X.F.fr j 0 ≤ X.F.fr j i := fun j i hi =>
+    fr_le hV j 0 i (Nat.zero_le _) hi
+  have hleT : ∀ j : ℤ, ∀ i, i < r → X.F.fr j i ≤ X.F.fr j (r - 1) := fun j i hi =>
+    fr_le hV j i (r - 1) (by omega) (by omega)
   have hinj : ∀ j : ℤ, Set.InjOn (fun i => X.F.fr j i) (Finset.range r) := by
     intro j a ha b hb hab
     simp only [Finset.coe_range, Set.mem_Iio] at ha hb
@@ -80,8 +83,10 @@ theorem six_le_Ns (hX : X.Hyp p K) : 6 ≤ X.Ns := by
   have hCc : ((Finset.range r).image (fun i => X.F.fr 1 i)).card = r := by
     rw [Finset.card_image_of_injOn (hinj 1), Finset.card_range]
   have hBc : r ≤ (X.F.LLset 1).card := (hV.2.2.2.2.2.2.1 1).1
-  have hsub : (Finset.range r).image (fun i => X.F.fr 0 i) ∪ X.F.LLset 1 ∪
-      (Finset.range r).image (fun i => X.F.fr 1 i) ⊆ X.F.letters 1 := by
+  have hsub
+      : (Finset.range r).image (fun i => X.F.fr 0 i) ∪ X.F.LLset 1
+          ∪ (Finset.range r).image (fun i => X.F.fr 1 i)
+        ⊆ X.F.letters 1 := by
     intro x hx
     simp only [Finset.mem_union, Finset.mem_image, Finset.mem_range] at hx
     simp only [Frames.letters, sub_self, Finset.mem_filter, Finset.mem_Icc]
@@ -139,21 +144,21 @@ theorem a_big (hX : X.Hyp p K) : 416 * (X.Ns : ℝ) ≤ X.a := by
     have h1 : (0 : ℝ) ≤ X.E₀ := Nat.cast_nonneg _
     have h2 : (0 : ℝ) ≤ X.mStar := Nat.cast_nonneg _
     linarith
-  calc 416 * (X.Ns : ℝ) = 32 * 13 * 1 * 1 ^ 2 * X.Ns * 1 ^ 2 * 1 := by ring
+  calc
+    416 * (X.Ns : ℝ)
+      = 32 * 13 * 1 * 1 ^ 2 * X.Ns * 1 ^ 2 * 1 := by ring
     _ ≤ 32 * p * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * X.Q ^ 2 * ((X.E₀ : ℝ) + X.mStar + 1) := by
       gcongr
     _ ≤ X.a := hX.P3
 
 theorem four_hundred_sixteen_le_a (hX : X.Hyp p K) : 416 ≤ X.a := by
-  have h1 := a_big hX
   have h2 : (6 : ℝ) ≤ X.Ns := by exact_mod_cast six_le_Ns hX
-  linarith
+  linarith [a_big hX]
 
 theorem log_a_ge (hX : X.Hyp p K) : 1 ≤ Real.log X.a := by
   have h := four_hundred_sixteen_le_a hX
   rw [Real.le_log_iff_exp_le (by linarith)]
-  have h2 := Real.exp_one_lt_d9
-  linarith
+  linarith [Real.exp_one_lt_d9]
 
 theorem k_big (hX : X.Hyp p K) (hk : 1088 ≤ X.Ck) : 1088 * (X.Ns : ℝ) ^ 2 ≤ ((r + K : ℕ) : ℝ) := by
   have hl := log_a_ge hX
@@ -163,11 +168,13 @@ theorem k_big (hX : X.Hyp p K) (hk : 1088 ≤ X.Ck) : 1088 * (X.Ns : ℝ) ^ 2 �
   have h1 : 0 ≤ X.Ck * (X.Ns : ℝ) ^ 2 := mul_nonneg hC hN
   nlinarith [mul_le_mul_of_nonneg_left hl h1, mul_le_mul_of_nonneg_right hk hN]
 
-theorem c_bounds (hX : X.Hyp p K) (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.deg t : ℝ) ≤ (X.a' p K t : ℝ))
-    (j y : ℤ) (hy : y ∈ X.F.letters j) :
-    (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) ≤
-        (X.a' p K (posOf n' y) : ℝ) ∧
-      (9 / 10 : ℝ) * X.a ≤ (X.a' p K (posOf n' y) : ℝ) ∧ (X.a' p K (posOf n' y) : ℝ) ≤ 2 * X.a := by
+theorem c_bounds
+    (hX : X.Hyp p K) (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.deg t : ℝ) ≤ (X.a' p K t : ℝ))
+    (j y : ℤ) (hy : y ∈ X.F.letters j)
+    : (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)
+        ≤ (X.a' p K (posOf n' y) : ℝ)
+      ∧ (9 / 10 : ℝ) * X.a ≤ (X.a' p K (posOf n' y) : ℝ)
+      ∧ (X.a' p K (posOf n' y) : ℝ) ≤ 2 * X.a := by
   have hV := hX.valid
   have hr2 := hX.r2
   have hp1 : (1 : ℝ) ≤ p := by have := hX.p13; exact_mod_cast (by omega : 1 ≤ p)
@@ -222,10 +229,14 @@ theorem c_bounds (hX : X.Hyp p K) (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.d
     have h2 : (p : ℝ) ^ D0 ≤ X.Q ^ 2 * ((X.E₀ : ℝ) + X.mStar + 1) := by
       nlinarith [mul_le_mul_of_nonneg_left hE (sq_nonneg X.Q)]
     have h3 := mul_le_mul_of_nonneg_right (mul_le_mul h1 h2 (by positivity) (by linarith)) hYk
-    calc Dn = 8 * (p : ℝ) ^ D0 * (X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns) := by rw [hDnd, hkdef]; ring
-      _ ≤ 32 * p * (X.Q ^ 2 * ((X.E₀ : ℝ) + X.mStar + 1)) * (X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns) := h3
-      _ = 32 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * X.Q ^ 2 *
-          ((X.E₀ : ℝ) + X.mStar + 1) := by ring
+    calc
+      Dn
+        = 8 * (p : ℝ) ^ D0 * (X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns) := by rw [hDnd, hkdef]; ring
+      _ ≤ 32 * p * (X.Q ^ 2 * ((X.E₀ : ℝ) + X.mStar + 1)) * (X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns) :=
+        h3
+      _ = 32 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * X.Q ^ 2
+          * ((X.E₀ : ℝ) + X.mStar + 1) := by
+        ring
       _ ≤ X.a := hX.P3
   have hfl1 : ⌊X.a / Dn⌋₊ ≠ 0 := by
     have h1 : 1 ≤ ⌊X.a / Dn⌋₊ := Nat.le_floor (by rw [Nat.cast_one, le_div_iff₀ hDn]; linarith)
@@ -233,7 +244,9 @@ theorem c_bounds (hX : X.Hyp p K) (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.d
   have hRjdef : X.Rj p K j = Nat.log p ⌊X.a / Dn⌋₊ := rfl
   have hRj : (p : ℝ) ^ (X.Rj p K j) ≤ X.a / Dn := by
     have h1 : p ^ (X.Rj p K j) ≤ ⌊X.a / Dn⌋₊ := by rw [hRjdef]; exact Nat.pow_log_le_self p hfl1
-    calc (p : ℝ) ^ (X.Rj p K j) = ((p ^ X.Rj p K j : ℕ) : ℝ) := by push_cast; ring
+    calc
+      (p : ℝ) ^ (X.Rj p K j)
+        = ((p ^ X.Rj p K j : ℕ) : ℝ) := by push_cast; ring
       _ ≤ (⌊X.a / Dn⌋₊ : ℝ) := by exact_mod_cast h1
       _ ≤ X.a / Dn := Nat.floor_le (div_nonneg (by linarith) hDn.le)
   have hpd : (p : ℝ) ^ (X.F.dist j y) ≤ (p : ℝ) ^ D0 := pow_le_pow_right₀ hp1 hdist
@@ -241,35 +254,43 @@ theorem c_bounds (hX : X.Hyp p K) (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.d
     rw [hkdef]
     have := hYk
     nlinarith
-  have e : (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) ≤
-      (9 / 10) * X.a := by
+  have e
+      : (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ)
+          * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)
+        ≤ (9 / 10) * X.a := by
     rw [pow_add]
-    calc (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ X.F.dist j y * (p : ℝ) ^ X.Rj p K j)
-        ≤ (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D0 * (X.a / Dn)) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul hpd hRj (by positivity) (by positivity)) hA
+    calc
+      (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ)
+            * ((p : ℝ) ^ X.F.dist j y * (p : ℝ) ^ X.Rj p K j)
+          ≤ (36 / 5 : ℝ) * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D0 * (X.a / Dn)) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul hpd hRj (by positivity) (by positivity)) hA
       _ = (9 / 10) * X.a := by
-          have hk0 : Dat.k (r := r) K ≠ 0 := by rw [hkdef]; linarith
-          have hY0 : X.Y ≠ 0 := by linarith
-          have hN0 : (X.Ns : ℝ) ≠ 0 := by linarith
-          have hpD : (p : ℝ) ^ D0 ≠ 0 := pow_ne_zero _ (by linarith)
-          rw [hDnd]
-          field_simp
-          ring
+        have hk0 : Dat.k (r := r) K ≠ 0 := by rw [hkdef]; linarith
+        have hY0 : X.Y ≠ 0 := by linarith
+        have hN0 : (X.Ns : ℝ) ≠ 0 := by linarith
+        have hpD : (p : ℝ) ^ D0 ≠ 0 := pow_ne_zero _ (by linarith)
+        rw [hDnd]
+        field_simp
+        ring
   linarith [hdeg.1, h41y]
 
-theorem Bdeg_bounds (hX : X.Hyp p K) (hk : 1088 ≤ X.Ck)
+theorem Bdeg_bounds
+    (hX : X.Hyp p K) (hk : 1088 ≤ X.Ck)
     (h41 : ∀ t ∈ X.F.TT, (9 / 10 : ℝ) * (X.deg t : ℝ) ≤ (X.a' p K t : ℝ))
-    (j : ℤ) (b : ℤ → ℕ) (hA : X.AdmLL p K j b) (x : ℤ) (hx : x ∈ X.F.letters j) (hlt : x < X.F.fr j 0) :
-    (X.a' p K (posOf n' x) : ℝ) / (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) - 2 * Dat.k (r := r) K * (X.Ns : ℝ) ≤
-        (X.Bdeg p K j (X.restr j b) x : ℝ) ∧
-      (X.Bdeg p K j (X.restr j b) x : ℝ) ≤
-        (X.a' p K (posOf n' x) : ℝ) / (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) := by
+    (j : ℤ) (b : ℤ → ℕ) (hA : X.AdmLL p K j b)
+    (x : ℤ) (hx : x ∈ X.F.letters j) (hlt : x < X.F.fr j 0)
+    : (X.a' p K (posOf n' x) : ℝ) / (p : ℝ) ^ (X.F.dist j x + X.Rj p K j)
+          - 2 * Dat.k (r := r) K * (X.Ns : ℝ)
+        ≤ (X.Bdeg p K j (X.restr j b) x : ℝ)
+      ∧ (X.Bdeg p K j (X.restr j b) x : ℝ)
+        ≤ (X.a' p K (posOf n' x) : ℝ) / (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) := by
   have hV := hX.valid
   have hr2 := hX.r2
   have hNs : (6 : ℝ) ≤ X.Ns := by exact_mod_cast six_le_Ns hX
   have hkdef : Dat.k (r := r) K = ((r + K : ℕ) : ℝ) := rfl
   have hpp : 0 < p ^ (X.F.dist j x + X.Rj p K j) := pow_pos hX.prime.pos _
-  have hPc : ((p ^ (X.F.dist j x + X.Rj p K j) : ℕ) : ℝ) = (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) := by
+  have hPc
+      : ((p ^ (X.F.dist j x + X.Rj p K j) : ℕ) : ℝ) = (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) := by
     push_cast
     ring
   have hP0 : (0 : ℝ) < (p : ℝ) ^ (X.F.dist j x + X.Rj p K j) := by rw [← hPc]; exact_mod_cast hpp
@@ -285,12 +306,15 @@ theorem Bdeg_bounds (hX : X.Hyp p K) (hk : 1088 ≤ X.Ck)
       have hlt := Nat.mod_lt A hpp
       have hppR : (0 : ℝ) < (pp : ℝ) := by exact_mod_cast hpp
       rw [div_lt_iff₀ hppR]
-      have e1 : (A : ℝ) = (pp : ℝ) * ((A / pp : ℕ) : ℝ) + ((A % pp : ℕ) : ℝ) := by exact_mod_cast hmod.symm
+      have e1 : (A : ℝ) = (pp : ℝ) * ((A / pp : ℕ) : ℝ) + ((A % pp : ℕ) : ℝ) := by
+        exact_mod_cast hmod.symm
       have e2 : ((A % pp : ℕ) : ℝ) < (pp : ℝ) := by exact_mod_cast hlt
       nlinarith
     rw [← hPc]
     set z : ℤ := ((A / pp : ℕ) : ℤ) - ((r + K + r + 1 : ℕ) : ℤ) - (((r + K) * X.Ns + 1 : ℕ) : ℤ) with hz
-    have hzR : (z : ℝ) = ((A / pp : ℕ) : ℝ) - ((r + K + r + 1 : ℕ) : ℝ) - (((r + K) * X.Ns + 1 : ℕ) : ℝ) := by
+    have hzR
+        : (z : ℝ)
+          = ((A / pp : ℕ) : ℝ) - ((r + K + r + 1 : ℕ) : ℝ) - (((r + K) * X.Ns + 1 : ℕ) : ℝ) := by
       simp only [hz, Int.cast_sub, Int.cast_natCast]
     have hc1 : ((r + K + r + 1 : ℕ) : ℝ) = 2 * (r : ℝ) + K + 1 := by push_cast; ring
     have hc2 : (((r + K) * X.Ns + 1 : ℕ) : ℝ) = ((r : ℝ) + K) * X.Ns + 1 := by push_cast; ring

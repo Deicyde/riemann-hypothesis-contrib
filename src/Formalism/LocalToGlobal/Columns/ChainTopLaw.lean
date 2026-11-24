@@ -55,6 +55,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.MemGoodPrimesOfNoExceptional
 
 @[expose] public section
 
@@ -97,10 +98,6 @@ private theorem intAt_zero_columns : IntAt P (0 : E) :=
 
 private theorem intAt_one_columns : IntAt P (1 : E) :=
   ⟨1, 1, fun h => P.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h), by simp⟩
-
-private theorem intAt_neg_columns {a : E} (ha : IntAt P a) : IntAt P (-a) := by
-  obtain ⟨r, s, hs, h⟩ := ha
-  exact ⟨-r, s, hs, by rw [mul_neg, h, map_neg]⟩
 
 theorem ctl_red_symm
     {N : ℕ} {κ : Sp E N ≃ₗ[E] Sp E N} (hκ : κ ∈ GLint E N P)
@@ -304,7 +301,7 @@ theorem columns_ctl_fact {n : ℕ} (x : Sp E (n + 0))
   rw [Submodule.mem_comap, ciMem_stdAt, ciMem_stdAt]
   refine forall_congr' fun l => ?_
   have hl : l.1 < n := l.2
-  simp [LocE.scE, hl]
+  simp [LocE.scE]
 
 theorem ctl_stab0 {n : ℕ} {κ : Sp E n ≃ₗ[E] Sp E n} (hκ : κ ∈ GLint E n P)
     : κ ∈ stabL E (n + 0) (LocE.lamY P q n 0 (fun i => i + 1)) := by
@@ -597,11 +594,6 @@ private theorem exists_intAt_eq_q_mul_of_redP_eq_zero
   · rw [eq_comm, mul_div_assoc', div_eq_iff (mul_ne_zero hsE hs'E)]
     linear_combination hcE - (algebraMap (𝓞 E) E s') * h
 
-private theorem eN_eq_pi_single {N l : ℕ} (hl : l < N)
-    : (Loc.eN E N l : Sp E N) = Pi.single (⟨l, hl⟩ : Fin N) 1 := by
-  funext m
-  simp [Loc.eN, Pi.single_apply, Fin.ext_iff]
-
 theorem ctl_tgt
     (hq : ((q : ℕ) : 𝓞 E) ∈ P.asIdeal) (hu : ((q : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
     {N' k₀ r t m rS : ℕ} (hN' : N' = r + m * t) (hrN : r ≤ N' + 1) (hr' : r ≤ N') (hr : k₀ + rS < r)
@@ -650,12 +642,13 @@ theorem ctl_tgt
   · intro p l hp hl
     have hp1 : p < N' + 1 := by omega
     have hl1 : l < N' + 1 := by omega
-    rw [eN_eq_pi_single hl1, eN_eq_pi_single hl]
+    rw [_root_.Formalism.L2.Col.basisVec_eq_single hl1,
+      _root_.Formalism.L2.Col.basisVec_eq_single hl]
     unfold Loc.atN
     rw [dite_eq_left hp1, dite_eq_left hp]
     obtain ⟨ia, ra⟩ := hEκ ⟨p, hp1⟩ ⟨l, hl1⟩
     obtain ⟨ib, rb⟩ := hEγ ⟨p, hp⟩ ⟨l, hl⟩
-    have hsub := intAt_add_columns ia (intAt_neg_columns ib)
+    have hsub := intAt_add_columns ia (_root_.Formalism.L2.Ker.intAt_neg_kernel_local_factors ib)
     rw [← sub_eq_add_neg] at hsub
     have hred0
         : redP P
@@ -676,7 +669,7 @@ theorem ctl_tgt
     exact ⟨d, hd, by rw [← hdeq]; ring⟩
   · intro p hp
     have hp1 : p < N' + 1 := by omega
-    rw [eN_eq_pi_single (by omega : N' < N' + 1)]
+    rw [_root_.Formalism.L2.Col.basisVec_eq_single (by omega : N' < N' + 1)]
     unfold Loc.atN
     rw [dite_eq_left hp1]
     obtain ⟨ia, ra⟩ := hEκ ⟨p, hp1⟩ ⟨N', by omega⟩
@@ -905,7 +898,7 @@ theorem ctl_det_red
     one_mem' := intAt_one_columns
     add_mem' := fun ha hb => intAt_add_columns ha hb
     zero_mem' := intAt_zero_columns
-    neg_mem' := fun ha => intAt_neg_columns ha
+    neg_mem' := fun ha => _root_.Formalism.L2.Ker.intAt_neg_kernel_local_factors ha
   }
   let f : S →+* 𝓞 E ⧸ P.asIdeal := {
     toFun := fun a => redP P a.1

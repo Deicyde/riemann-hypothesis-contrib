@@ -50,6 +50,7 @@ open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doublin
   PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_self_dual_siegel_weil_measures
     : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ),
       IsCharAF D.host.F ψ
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.exists_self_dual_siegel_weil_measures
                     ∧ ∀ (φ : Mx D V.rank r → ℂ) (β : HermE D r),
                       W ψ V μ lam φ β
                         = coefN D.sp.cm.sig V.gram ψ dx db (fun X => φ (tupOf X)) β.1 := by
-  first
-  | exact @GlobalTheory.CompanionTheory.SiegelND.whit_eq_coefN
-  | exact GlobalTheory.CompanionTheory.SiegelND.whit_eq_coefN
-  | (intros; apply GlobalTheory.CompanionTheory.SiegelND.whit_eq_coefN <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.SiegelND.whit_eq_coefN

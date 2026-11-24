@@ -3,7 +3,7 @@ module
 public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.AbByPOfComm
 public import Mathlib.Basic.Complex.Basic
 public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.IsCharacterOverSubfieldRestrictClassFunctionOne
-public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.VirtualCharacterIrreducibleExpansionNormSqStatement
+public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.VirtualCharacterIrreducibleExpansionNormSq
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -115,7 +115,7 @@ theorem irr_of_norm_one
         → (IsIrrChar ℂ ℂ φ ∨ IsIrrChar ℂ ℂ (-φ))
           ∧ (IsChar ℂ ℂ φ → IsIrrChar ℂ ℂ φ ∧ ∃ n : ℕ, 0 < n ∧ φ 1 = n) := by
   intro G _ _ φ hφ hnorm
-  obtain ⟨c, hirr, hsum, hsq⟩ := GlobalTheory.T.virtualCharacter_irreducible_expansion_normSq G φ hφ
+  obtain ⟨c, hirr, hsum, hsq⟩ := _root_.GlobalTheory.BI.virt_expand G φ hφ
   have hG : (Nat.card G : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
   have h1 : (c.sum fun _ m => (m : ℂ) ^ 2) = 1 :=
     mul_right_cancel₀ hG ((hsq.symm.trans hnorm).trans (one_mul _).symm)

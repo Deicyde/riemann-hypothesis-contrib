@@ -132,8 +132,8 @@ theorem exists_rat_Tm_mulVec_eq
   let w : Fin (A.rank + A.rank) → AE D := fun k =>
     Sum.elim (rat A.gram *ᵥ x) 0 (finSumFinEquiv.symm k)
   have hw : w ∈ upperHalf D A.rank := by
-    simp only [upperHalf, LinearMap.mem_ker, funext_iff, LinearMap.funLeft_apply,
-      Function.comp_apply, Pi.zero_apply, w, Equiv.symm_apply_apply, Sum.elim_inr, implies_true]
+    simp only [upperHalf, LinearMap.mem_ker, funext_iff, LinearMap.funLeft_apply, Pi.zero_apply, w,
+      Equiv.symm_apply_apply, Sum.elim_inr, implies_true]
   have hv' : ∀ a, v (finSumFinEquiv (Sum.inl a)) = v (finSumFinEquiv (Sum.inr a)) := by
     simpa only [diagSub, LinearMap.mem_eqLocus, funext_iff, LinearMap.funLeft_apply,
         Function.comp_apply]

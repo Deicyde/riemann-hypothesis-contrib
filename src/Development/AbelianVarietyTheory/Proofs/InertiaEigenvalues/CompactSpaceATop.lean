@@ -49,8 +49,6 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
   TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
 
-
-
 namespace GlobalTheory.WeakClosed
 
 theorem compactSpace_oTop

@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FullToGlIsSelfAdjoint
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjTransposeVecMulVecSelf
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsMulStarEqOfNormOneUnramifiedQuadraticStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.FourierMatch
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsMulStarEqOfNormOneUnramifiedQuadratic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -143,8 +144,7 @@ theorem uNormal
     have := congrArg (fun p => p.2.2) hX
     simp only [inv, Hn.toGl, Inv.map] at this
     exact (algebraMap F E).injective this
-  obtain ⟨ν, hν⟩ :=
-    GlobalTheory.T.exists_mul_star_eq_of_norm_one_unramifiedQuadratic F E (a.2.1 0) ha
+  obtain ⟨ν, hν⟩ := _root_.GlobalTheory.NormUnits.norm_onto_units F E (a.2.1 0) ha
   have ha0 : algebraMap F E (a.2.1 0) ≠ 0 := by
     rw [map_ne_zero]
     intro h

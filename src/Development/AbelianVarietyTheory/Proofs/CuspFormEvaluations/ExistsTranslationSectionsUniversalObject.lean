@@ -167,8 +167,7 @@ theorem exists_isVtOver_and_existsUnique_isUUOver
                   → ∃! F, IsUUOver Xo.univ.t.G Xo.univ.t.PP N s x₁ x₂ F := by
   intro hLaws E _ _ _ H Dw l Xo N hN T s
   have hL : Xo.univ.t.PP.L.IsLB := Xo.univ.t.PP.isLB
-  obtain ⟨α₀, hg₀, hn₀, hu₀, hT⟩ :=
-    GlobalTheory.T.universal_normalised_mulByNat_pullback_iso hLaws E H Dw l Xo N
+  obtain ⟨α₀, hg₀, hn₀, hu₀, hT⟩ := _root_.GlobalTheory.moduli_univ_normMul hLaws E H Dw l Xo N
   obtain ⟨α, hgα, hcα⟩ := hT T
   obtain ⟨s₁, hs₁⟩
       : ∃ s₁,

@@ -227,8 +227,7 @@ theorem smulRight_smul_smul
   rw [ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.smul_apply,
     ContinuousLinearMap.smulRight_apply, smul_smul, smul_smul]
   congr 1
-  have h1 : (innerSL ℂ (a • u)) x = star a * (innerSL ℂ u) x := by
-    simp [inner_smul_left, Complex.star_def]
+  have h1 : (innerSL ℂ (a • u)) x = star a * (innerSL ℂ u) x := by simp
   rw [h1]
   ring
 

@@ -1,7 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwistedTraceFormulaStable
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormOneMulCompactOfTwistedNormCompactStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TwConj
+public import Mathlib.Analysis.Normed.Field.Basic
+public import Mathlib.Topology.Instances.Matrix
+public import Mathlib.Topology.MetricSpace.ProperSpace
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormOneMulCompactOfTwistedNormCompact
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmField
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistedCentralizerIsNormOneTorus
 import GroundTheory.GlobalFields.LocalAtPlace
@@ -102,7 +106,7 @@ theorem main
     set C' : Set (GLw n w) := (fun c : GLw n w => y * c⁻¹) '' C
     have hC' : IsCompact C' := hC.image (by fun_prop)
     obtain ⟨D, hD, hDp⟩ :=
-      GlobalTheory.T.exists_normOne_mul_compact_of_twistedNorm_compact K hnorm n y.val hReg C' hC'
+      _root_.GlobalTheory.Tw.NormOneCore.exists_normOne_mul_compact K hnorm n y.val hReg C' hC'
     refine ⟨D, hD, fun z hz hzC => ?_⟩
     have hzv : z.val * GlobalTheory.Tw.nrm y.val = GlobalTheory.Tw.nrm y.val * z.val := by
       rw [← hN, ← Units.val_mul, hz, Units.val_mul]

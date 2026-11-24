@@ -54,8 +54,10 @@ import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsAbelianSchem
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -64,8 +66,9 @@ namespace GlobalTheory.ConnSpread
 
 open GlobalTheory.AbLaw GlobalTheory.AbLaw.Seesaw ReciprocityTheory.ChartRestriction.G.Out
 
-theorem preconnectedSpace_of_functions (Y : Scheme.{0})
-    (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤) : PreconnectedSpace Y := by
+theorem preconnectedSpace_of_functions
+    (Y : Scheme.{0}) (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤)
+    : PreconnectedSpace Y := by
   apply _root_.GlobalTheory.AlgGroup.preconnectedSpace_of_functions <;> assumption
 
 variable {X X' : Scheme.{0}}
@@ -76,19 +79,24 @@ def fnSec (π : X' ⟶ X) (s : Γ(X', ⊤)) : LB.Sec ((Inh.trivLB X).pull π) wh
     rw [Inh.linComb_triv_g, Units.val_one, _root_.one_mul]
     exact (rs_rs _ _ s).trans (rs_rs _ _ s).symm
 
-theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) :=
-  ⟨⟨fun _ => 1⟩, fun i j => by
+theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) := ⟨
+  ⟨fun _ => 1⟩,
+  fun i j => by
     erw [Inh.linComb_triv_g, _root_.one_mul]
-    exact (map_one _).trans (map_one _).symm⟩
+    exact (map_one _).trans (map_one _).symm
+⟩
 
-theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
-    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X)) {g : R →+* F} {π : X' ⟶ X}
-    {f' : X' ⟶ Spec (CommRingCat.of F)} (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
-    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v) :
-    PreconnectedSpace X' := by
+theorem preconnectedSpace_of_line
+    {R F : Type} [CommRing R] [Field F]
+    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X))
+    {g : R →+* F} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of F)}
+    (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
+    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v)
+    : PreconnectedSpace X' := by
   obtain ⟨E, hE⟩ := P.sec F g X' π f' h
-  have key : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
-      rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s = AbLaw.cst f' _ c * loc P π f' v i := fun s => by
+  have key
+      : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
+        rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s = AbLaw.cst f' _ c * loc P π f' v i := fun s => by
     obtain ⟨w, hw⟩ := E.surjective (fnSec π s)
     obtain ⟨c, hc⟩ := hv w.1 w.2
     refine ⟨c, fun i => ?_⟩
@@ -113,15 +121,23 @@ theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
     rw [hc]
     exact mem_of_isUnit (((IsUnit.mk0 c h0).map _).mul (hu i)) hi
 
-theorem exists_geometricallyConnected_away_of_fibre : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (K : Type) [Field K] (x : R →+* K), IsProjOver s → Smooth s → GeometricallyConnected (pullback.snd s (spMap x)) → ∃ f : R, x f ≠ 0 ∧ GeometricallyConnected (pullback.snd s (spMap (algebraMap R (Localization.Away f)))) := by
+theorem exists_geometricallyConnected_away_of_fibre
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (K : Type)
+        [Field K] (x : R →+* K),
+      IsProjOver s → Smooth s → GeometricallyConnected (pullback.snd s (spMap x))
+        → ∃ f : R,
+          x f ≠ 0 ∧ GeometricallyConnected (pullback.snd s
+            (spMap (algebraMap R (Localization.Away f)))) := by
   intro R _ _ Z s K _ x hp hs hc
   have hp' : IsProjBy s := (GlobalTheory.ProjSpace.isProjBy_iff_isProjOver s).2 hp
   obtain ⟨P⟩ := nonempty_perf_of_smooth_isProjBy R Z s hs hp' _ (Inh.trivLB_isLB _)
   have hpr : IsProper s := isProper_of_isProjBy R Z s hp'
   have h₀ : IsPullback (pullback.fst s (spMap x)) (pullback.snd s (spMap x)) s
-      (Spec.map (CommRingCat.ofHom x)) := IsPullback.of_hasPullback _ _
-  have hbij := bijective_appTop_of_smooth_of_isProper_of_geometricallyConnected K _
-    (pullback.snd s (spMap x)) inferInstance inferInstance hc
+      (Spec.map (CommRingCat.ofHom x)) :=
+    IsPullback.of_hasPullback _ _
+  have hbij :=
+    bijective_appTop_of_smooth_of_isProper_of_geometricallyConnected K _ (pullback.snd s (spMap x))
+      inferInstance inferInstance hc
   obtain ⟨v, -, hu, hline⟩ := loc_of_triv P h₀ (Inh.trivLB_isLB _) (triv_pull _)
   obtain ⟨x₀, -⟩ := (pullback.snd s (spMap x)).surjective (⊥ : PrimeSpectrum K)
   have hv0 : v ≠ 0 := by
@@ -140,8 +156,9 @@ theorem exists_geometricallyConnected_away_of_fibre : ∀ (R : Type) [CommRing R
     change x a ∈ (pullback.snd s (spMap x) x₀).asIdeal
     rw [h0]
     exact zero_mem _
-  obtain ⟨_, ⟨ε, rfl⟩, hε, hεs⟩ := PrimeSpectrum.isTopologicalBasis_basic_opens.exists_subset_of_mem_open
-    (show p ∈ (Set.range s : Set (PrimeSpectrum R)) from ⟨_, rfl⟩) s.isOpenMap.isOpen_range
+  obtain ⟨_, ⟨ε, rfl⟩, hε, hεs⟩ :=
+    PrimeSpectrum.isTopologicalBasis_basic_opens.exists_subset_of_mem_open
+      (show p ∈ (Set.range s : Set (PrimeSpectrum R)) from ⟨_, rfl⟩) s.isOpenMap.isOpen_range
   refine ⟨δ * ε, by rw [map_mul]; exact mul_ne_zero hδ (hpx ε hε), ?_⟩
   refine ⟨geometrically_iff_of_commRing.2 fun F _ _ Y fst snd h => ?_⟩
   let g : R →+* F := (algebraMap (Localization.Away (δ * ε)) F).comp (algebraMap R _)
@@ -149,8 +166,8 @@ theorem exists_geometricallyConnected_away_of_fibre : ∀ (R : Type) [CommRing R
     rw [← map_mul]
     exact (IsLocalization.Away.algebraMap_isUnit (S := Localization.Away (δ * ε)) (δ * ε)).map
       (algebraMap (Localization.Away (δ * ε)) F)
-  have h' : IsPullback (fst ≫ pullback.fst s (spMap (algebraMap R (Localization.Away (δ * ε))))) snd s
-      (Spec.map (CommRingCat.ofHom g)) := by
+  have h' : IsPullback (fst ≫ pullback.fst s (spMap (algebraMap R (Localization.Away (δ * ε))))) snd
+      s (Spec.map (CommRingCat.ofHom g)) := by
     have := h.paste_horiz (IsPullback.of_hasPullback s _)
     rwa [← Spec.map_comp] at this
   have hmem : Spec.map (CommRingCat.ofHom g) (⊥ : PrimeSpectrum F) ∈ Set.range s :=

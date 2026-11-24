@@ -166,17 +166,14 @@ theorem loc_of_eq
     fun x hx hxG => by rw [he x hx.2 hxG, hfe x hx.1 hxG]
   ⟩
 
-theorem hermitian_part_one_mem_lie (Z : Mat k r) : inLie k r (hpart1 (Hpk k r) Z) :=
-  Formalism.FourierDecayAlt.P.Qx2.hpart1_lie Z
-
-theorem hermitian_part_two_mem_lie (Z : Mat k r) : inLie k r (hpart2 (Hpk k r) Z) :=
-  Formalism.FourierDecayAlt.P.Qx2.hpart2_lie Z
-
 theorem eabH_loc (a b : Fin (2 * r + k + 1)) {f : Mat k r → E} {g : Mat k r} (h : Loc (⊤ : ℕ∞) f g)
     : Loc (⊤ : ℕ∞) (EabH (Hpk k r) a b f) g := by
   have h' : Loc ((⊤ : ℕ∞) + 1) f g := by rwa [top_add]
-  exact loc_add (loc_RdV (hermitian_part_one_mem_lie _) h')
-    (loc_RdV (hermitian_part_two_mem_lie _) h') Complex.I
+  exact loc_add
+    (loc_RdV (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.hermitian_part_mem_lie _) h')
+    (loc_RdV (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.antihermitian_part_mem_lie _)
+      h')
+    Complex.I
 
 theorem eabH_add
     (a b : Fin (2 * r + k + 1))
@@ -186,9 +183,9 @@ theorem eabH_add
       = EabH (Hpk k r) a b f₁ g + c • EabH (Hpk k r) a b f₂ g := by
   unfold EabH
   rw [Formalism.FourierDecayAlt.P.LieDecompositionLocal.rdV_fun_add h₁ h₂ hg
-      (hermitian_part_one_mem_lie _) c,
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.hermitian_part_mem_lie _) c,
     Formalism.FourierDecayAlt.P.LieDecompositionLocal.rdV_fun_add h₁ h₂ hg
-      (hermitian_part_two_mem_lie _) c]
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.antihermitian_part_mem_lie _) c]
   module
 
 theorem eabH_congr
@@ -198,8 +195,10 @@ theorem eabH_congr
     (he : ∀ x ∈ V, x ∈ GV k r → f₁ x = f₂ x)
     : EabH (Hpk k r) a b f₁ g = EabH (Hpk k r) a b f₂ g := by
   unfold EabH
-  rw [rdV_congr hV hg hgG (hermitian_part_one_mem_lie _) he,
-    rdV_congr hV hg hgG (hermitian_part_two_mem_lie _) he]
+  rw [rdV_congr hV hg hgG
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.hermitian_part_mem_lie _) he,
+    rdV_congr hV hg hgG
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.antihermitian_part_mem_lie _) he]
 
 theorem eabH_zero (a b : Fin (2 * r + k + 1)) (g : Mat k r)
     : EabH (Hpk k r) a b (fun _ : Mat k r => (0 : E)) g = 0 := by

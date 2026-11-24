@@ -62,7 +62,4 @@ theorem _root_.GlobalTheory.T.cmAdeleIdempotentOfPlace_properties
             → ∀ τ : D.what₂.Tau,
               θ τ (infPart D (idem D (.inr τ))) = 1
                 ∧ ∀ τ' : D.what₂.Tau, τ' ≠ τ → θ τ (infPart D (idem D (.inr τ'))) = 0 := by
-  first
-  | exact @GlobalTheory.PlaceTensor.idem_spec
-  | exact GlobalTheory.PlaceTensor.idem_spec
-  | (intros; apply GlobalTheory.PlaceTensor.idem_spec <;> assumption)
+  first | exact @GlobalTheory.PlaceTensor.idem_spec

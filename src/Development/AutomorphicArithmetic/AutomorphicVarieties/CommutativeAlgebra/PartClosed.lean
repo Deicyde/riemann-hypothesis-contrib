@@ -123,11 +123,6 @@ private theorem homog_span_pow
   rw [hT']
   exact homog_of_span wt T hT
 
-private theorem mem_span_X
-    {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O) (hf : constantCoeff f = 0)
-    : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
-  _root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X f hf
-
 theorem UpperTheory.V.Alg.part_closed
     : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
         [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
@@ -159,7 +154,8 @@ theorem UpperTheory.V.Alg.part_closed
     refine le_antisymm hle fun r hr => ?_
     obtain ⟨f, rfl⟩ := W.surj r
     have h1 : f - algebraMap O _ (constantCoeff f) ∈ Ideal.span S := by
-      refine Ideal.span_mono Set.subset_union_left (mem_span_X _ ?_)
+      refine Ideal.span_mono Set.subset_union_left
+        (_root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X _ ?_)
       simp [MvPowerSeries.algebraMap_apply]
     have h2 : constantCoeff f ∈ maximalIdeal O := fun hu =>
       hr ((MvPowerSeries.isUnit_iff_constantCoeff.2 hu).map W.π)

@@ -64,12 +64,13 @@ open scoped ComplexOrder
 
 namespace GlobalTheory.Mem
 
-theorem tsum_eq_exp_tsum_neg_log_of_primes {α ι : Type*} [CommMonoidWithZero α] [IsCancelMulZero α]
+theorem tsum_eq_exp_tsum_neg_log_of_primes
+    {α ι : Type*} [CommMonoidWithZero α] [IsCancelMulZero α]
     (p : ι → α) (hp : ∀ i, Prime (p i)) (hdvd : ∀ i j, p i ∣ p j → i = j)
-    (f : α → ℂ) (hmul : ∀ a b, f (a * b) = f a * f b) (h1 : f 1 = 1)
-    (hex : ∀ a, a ≠ 1 → f a ≠ 0 → ∃ i, p i ∣ a) (hsum : Summable fun a => ‖f a‖)
-    (hne : ∀ i, 1 - f (p i) ≠ 0) :
-    ∑' a, f a = exp (∑' i, -log (1 - f (p i))) := by
+    (f : α → ℂ)
+    (hmul : ∀ a b, f (a * b) = f a * f b) (h1 : f 1 = 1) (hex : ∀ a, a ≠ 1 → f a ≠ 0 → ∃ i, p i ∣ a)
+    (hsum : Summable fun a => ‖f a‖) (hne : ∀ i, 1 - f (p i) ≠ 0)
+    : ∑' a, f a = exp (∑' i, -log (1 - f (p i))) := by
   classical
   set g : Finset ι → α → ℂ := fun S a => if ∀ i ∈ S, ¬ p i ∣ a then f a else 0 with hg
   have hgle : ∀ S a, ‖g S a‖ ≤ ‖f a‖ := by
@@ -112,9 +113,11 @@ theorem tsum_eq_exp_tsum_neg_log_of_primes {α ι : Type*} [CommMonoidWithZero �
       simp only [e1]
       rw [(hgs S).tsum_sub hs2, e2]
       ring
-  have lim1 : Tendsto (fun S : Finset ι => ∑' a, g S a) atTop
-      (𝓝 (∑' a : α, if a = 1 then (1 : ℂ) else 0)) := by
-    refine tendsto_tsum_of_dominated_convergence hsum (fun a => ?_)
+  have lim1 : Tendsto
+      (fun S : Finset ι => ∑' a, g S a)
+      atTop (𝓝 (∑' a : α, if a = 1 then (1 : ℂ) else 0)) := by
+    refine tendsto_tsum_of_dominated_convergence hsum
+      (fun a => ?_)
       (Eventually.of_forall fun S a => hgle S a)
     by_cases ha : a = 1
     · subst ha
@@ -136,32 +139,38 @@ theorem tsum_eq_exp_tsum_neg_log_of_primes {α ι : Type*} [CommMonoidWithZero �
   have pinj : Function.Injective p := fun i j h => hdvd i j (h ▸ dvd_rfl)
   have hl : Summable fun i => log (1 - f (p i)) :=
     Summable.clog_one_sub (hsum.of_norm.comp_injective pinj)
-  have lim2 : Tendsto (fun S : Finset ι => ∏ i ∈ S, (1 - f (p i))) atTop
-      (𝓝 (exp (∑' i, log (1 - f (p i))))) := Complex.hasProd_of_hasSum_log hne hl.hasSum
+  have lim2 : Tendsto
+      (fun S : Finset ι => ∏ i ∈ S, (1 - f (p i)))
+      atTop (𝓝 (exp (∑' i, log (1 - f (p i))))) :=
+    Complex.hasProd_of_hasSum_log hne hl.hasSum
   have lim3 := lim2.mul_const (∑' a, f a)
   simp only [key] at lim3
   have := tendsto_nhds_unique lim3 lim1
   rw [tsum_neg, exp_neg]
   exact eq_inv_of_mul_eq_one_right this
 
-theorem lseriesSummable_card_absNorm (K : Type) [Field K] [NumberField K] {s : ℂ} (hs : 1 < s.re) :
-    LSeriesSummable (fun n => ((Nat.card {I : Ideal (𝓞 K) // Ideal.absNorm I = n} : ℝ) : ℂ)) s := by
+theorem lseriesSummable_card_absNorm (K : Type) [Field K] [NumberField K] {s : ℂ} (hs : 1 < s.re)
+    : LSeriesSummable
+      (fun n => ((Nat.card {I : Ideal (𝓞 K) // Ideal.absNorm I = n} : ℝ) : ℂ))
+      s := by
   apply GlobalTheory.FlagBase.SiegelUnfold.lseriesSummable_idealCount <;> assumption
 
-instance finite_absNorm_fiber (K : Type) [Field K] [NumberField K] (n : ℕ) :
-    Finite {I : Ideal (𝓞 K) // Ideal.absNorm I = n} :=
+instance finite_absNorm_fiber (K : Type) [Field K] [NumberField K] (n : ℕ)
+    : Finite {I : Ideal (𝓞 K) // Ideal.absNorm I = n} :=
   (Ideal.finite_setOfPred_absNorm_eq n).to_subtype
 
-theorem summable_norm_absNorm_cpow (K : Type) [Field K] [NumberField K] {s : ℂ} (hs : 1 < s.re) :
-    Summable fun I : Ideal (𝓞 K) => ‖((Ideal.absNorm I : ℕ) : ℂ) ^ (-s)‖ := by
+theorem summable_norm_absNorm_cpow (K : Type) [Field K] [NumberField K] {s : ℂ} (hs : 1 < s.re)
+    : Summable fun I : Ideal (𝓞 K) => ‖((Ideal.absNorm I : ℕ) : ℂ) ^ (-s)‖ := by
   have hs0 : s ≠ 0 := by rintro rfl; norm_num at hs
   rw [← (Equiv.sigmaFiberEquiv (fun I : Ideal (𝓞 K) => Ideal.absNorm I)).summable_iff,
     summable_sigma_of_nonneg (fun _ => by exact norm_nonneg _)]
   refine ⟨fun n => Summable.of_finite, ?_⟩
   refine (lseriesSummable_card_absNorm K hs).norm.congr fun n => ?_
   have : ∀ I : {I : Ideal (𝓞 K) // Ideal.absNorm I = n},
-      ((fun I : Ideal (𝓞 K) => ‖((Ideal.absNorm I : ℕ) : ℂ) ^ (-s)‖) ∘
-        (Equiv.sigmaFiberEquiv (fun I : Ideal (𝓞 K) => Ideal.absNorm I))) ⟨n, I⟩ = ‖(n : ℂ) ^ (-s)‖ := by
+      ((fun I : Ideal (𝓞 K) => ‖((Ideal.absNorm I : ℕ) : ℂ) ^ (-s)‖)
+            ∘ (Equiv.sigmaFiberEquiv (fun I : Ideal (𝓞 K) => Ideal.absNorm I)))
+          ⟨n, I⟩
+        = ‖(n : ℂ) ^ (-s)‖ := by
     rintro ⟨I, rfl⟩; rfl
   rw [tsum_congr this, tsum_const]
   rcases eq_or_ne n 0 with rfl | hn

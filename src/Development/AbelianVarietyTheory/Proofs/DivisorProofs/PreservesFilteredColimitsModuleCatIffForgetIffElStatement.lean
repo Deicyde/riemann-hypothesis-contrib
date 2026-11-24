@@ -53,6 +53,7 @@ import Mathlib.Topology.Sheaves.Presheaf
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   TensorProduct GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.preservesFilteredColimits_moduleCat_iff_forget_iff_elements
     : ∀ (Λ : Type 1) [Ring Λ] (N : CommRingCat.{0} ⥤ ModuleCat.{1} Λ),
       (PreservesFilteredColimitsOfSize.{0, 0} N
@@ -65,11 +66,4 @@ theorem _root_.GlobalTheory.T.preservesFilteredColimits_moduleCat_iff_forget_iff
                 ∧ ∀ j (y : N.obj (D.obj j)),
                   (N.map (c.ι.app j)).hom y = 0
                     → ∃ (k : J) (f : j ⟶ k), (N.map (D.map f)).hom y = 0) := by
-  first
-  | (exact @GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements)
-  | (exact GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements)
-  | (
-      intros
-      apply GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements
-        <;> assumption
-    )
+  first | (exact @GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements)

@@ -322,7 +322,7 @@ theorem exists_sub_mem_isotypicKernel (u : U)
             ≤ (Submodule.span ℂ (Set.range fun h => ρ h u)).comap (ρ g) := by
         refine Submodule.span_le.2 ?_
         rintro _ ⟨h, rfl⟩
-        exact Submodule.subset_span ⟨g * h, by simp [map_mul, Module.End.mul_apply]⟩
+        exact Submodule.subset_span ⟨g * h, by simp [map_mul]⟩
       exact hle hx
   ⟩
   have huW0 : u ∈ W0.toSubmodule := Submodule.subset_span ⟨1, by simp⟩
@@ -404,7 +404,6 @@ theorem exists_sub_mem_isotypicKernel (u : U)
   have hGu' : ∀ i, Gs i u' = Gs i u := by
     intro i
     have h2 : Γ0 (∑ k, s k (Gs k u)) = Γ u := by
-
       rw [map_sum]
       have h3 : ∀ k, Γ0 (s k (Gs k u)) = Pi.single k (Gs k u) := fun k => by
         rw [← Representation.IntertwiningMap.comp_apply, hs]

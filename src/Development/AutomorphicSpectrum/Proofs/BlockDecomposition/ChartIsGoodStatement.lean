@@ -45,12 +45,10 @@ import Mathlib.Tactic.NormNum.RealSqrt
 set_option backward.isDefEq.respectTransparency false
 open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
   CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+
 theorem _root_.GlobalTheory.T.chart_is_good
     : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} {γ : DividedPowers I} {p : ℕ}
         {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {V : X.Opens} {d : ℕ}
         (c : Chart γ p q κ V d),
       c.Good := by
-  first
-  | exact @GlobalTheory.CompanionTheory.ChartMaps.good
-  | exact GlobalTheory.CompanionTheory.ChartMaps.good
-  | (intros; apply GlobalTheory.CompanionTheory.ChartMaps.good <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.ChartMaps.good

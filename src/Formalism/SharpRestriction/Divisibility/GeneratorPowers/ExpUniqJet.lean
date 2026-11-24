@@ -96,7 +96,7 @@ theorem mem_pow_of_trunc_eq_zero
     have e
         : (jetTrunc : Jet R κ (m + 1) →ₐ[R] Jet R κ m) (Ideal.Quotient.mk _ P)
           = Ideal.Quotient.mk _ P := by
-      first | rfl | simp [jetTrunc]
+      first | rfl
     rw [e, Ideal.Quotient.eq_zero_iff_mem] at h
     exact h
   rw [Ij_eq_map, ← Ideal.map_pow]

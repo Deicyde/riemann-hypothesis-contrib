@@ -97,7 +97,6 @@ theorem stX_ok (a : I.ι) : (I.stX a).Ok := by
     haveI : Finite (autO p.1.1.deco.1.N) := by
       first
       | exact autO_finite (posStar_of_ok hX) p.1.1.deco.full_lattice
-      | exact autO_finite (posStar_of_ok hX) p.1.1.deco.full_lattice.toIsLattice
     exact Finite.of_injective _ (stabAut_inj y Unit (fun _ => Λ) (fun _ => Θ) (fun _ => True) b p)
   · intro _ g
     let M : Matrix (Fin (B.R.N B.R.m - 1)) (Fin (B.R.N B.R.m - 1)) B.fields.E := ↑(toGLm _ _ g.1.1)
@@ -112,7 +111,7 @@ theorem stX_ok (a : I.ι) : (I.stX a).Ok := by
       x ∈ p.1.1.deco.1.Lsh
     rw [toGLm_mulVec, Deco.Lsh_act _ g.1.2, mem_gmap, LinearEquiv.symm_apply_apply]
   · intro _ p
-    first | exact p.1.1.deco.2.Lsh_full_lattice | exact p.1.1.deco.2.Lsh_full_lattice.toIsLattice
+    first | exact p.1.1.deco.2.Lsh_full_lattice
   · intro b g p h h₁
     exact stepY_eq_one y Unit
       (fun _ => Λ)
@@ -166,7 +165,6 @@ theorem perIn_ok (h : I.Ok) (u : B.Word) (a : I.ι) : (I.perIn u a).Ok := {
   H_idx _ := (inferInstance : (⊤ : Subgroup _).FiniteIndex)
   H_rat _ g := ⟨g, Subgroup.mem_top _, rfl⟩
 }
-
 
 theorem perIn_over (h : I.Ok) (u : B.Word) (a : I.ι) : (I.perIn u a).Over (I.atIn u a) := {
   norm_tz := by

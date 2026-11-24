@@ -216,7 +216,7 @@ theorem fnOf_tr
         (fun τ => M τ * atInf (embT D) (g : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E) τ)
         P y := by
   unfold fnOf frameTranslate
-  simp only [LinearMap.coe_mk, AddHom.coe_mk, Subtype.coe_mk, Matrix.mul_assoc]
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, Matrix.mul_assoc]
 
 theorem valSc_tr
     (T : Forms0 D u) (w : D.what₂.places.Pl) (c : (D.mem u).C.cls 0) (h : (D.mem u).C.Y 0 → ℂ)

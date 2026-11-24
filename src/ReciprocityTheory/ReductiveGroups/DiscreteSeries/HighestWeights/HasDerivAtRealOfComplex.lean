@@ -80,9 +80,8 @@ theorem inK_iff' (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ)
   · rintro ⟨hG, hC⟩
     refine ⟨?_, hC⟩
     have h1 : Xᴴ * Jm ε = -(X * Jm ε) := by rw [hC]; exact eq_neg_of_add_eq_zero_left hG
-    have h2 := congrArg (· * Jm ε) h1
-    simp only [Matrix.mul_assoc, Jm_mul_self, Matrix.mul_one, Matrix.neg_mul] at h2
-    exact h2
+    simpa only [Matrix.mul_assoc, Jm_mul_self, Matrix.mul_one, Matrix.neg_mul] using
+      congrArg (· * Jm ε) h1
   · rintro ⟨hH, hC⟩
     refine ⟨?_, hC⟩
     unfold inG
@@ -192,8 +191,7 @@ theorem KType.conj_dτ
         = fun y : ℝ => NormedSpace.exp ((y : ℂ) • C) :=
     funext key
   simp only [hf] at h1
-  have := h1.unique h2
-  simpa using this
+  simpa using h1.unique h2
 
 section MatDeriv
 
@@ -253,8 +251,7 @@ theorem KType.dτ_bracket
         T.dτ (NormedSpace.exp ((s : ℂ) • X) * Y * NormedSpace.exp ((s : ℂ) • (-X))))
       (Filter.Eventually.of_forall fun s => (key s).symm)
   have := h1'.unique h2
-  rw [← this]
-  simp [sub_eq_add_neg]
+  simpa [sub_eq_add_neg] using this
 
 theorem single_mul_Jm {ε : Fin n → Bool} {a b : Fin n} (h : ε a = ε b) (c : ℂ)
     : Matrix.single a b c * Jm ε = Jm ε * Matrix.single a b c := by

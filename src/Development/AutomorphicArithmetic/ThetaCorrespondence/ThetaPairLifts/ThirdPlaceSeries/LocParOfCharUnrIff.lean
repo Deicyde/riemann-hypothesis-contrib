@@ -49,8 +49,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.RankOneComp
@@ -75,7 +73,6 @@ theorem locParT_ofChar_unr_iff_unrAt
         UpperTheory.One.M.opn _ (_root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h)
       obtain ⟨a, ha, ε, H⟩ := hOpn
     )
-  | obtain ⟨a, ha, ε, -, H⟩ := _root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h
   rw [_root_.GlobalTheory.CuspRep.ParLaws.local_parameter_of_hecke_character_eq_reciprocity, H.one,
     Test.unr_lpOfChar_iff ha (ParLaws.isSmoothChar_loc χ w)]
   refine forall_congr' fun x => imp_congr_left ?_
@@ -111,7 +108,6 @@ theorem frobEig_locParT_ofChar_of_unrAt
         UpperTheory.One.M.opn _ (_root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h)
       obtain ⟨a, ha, ε, H⟩ := hOpn
     )
-  | obtain ⟨a, ha, ε, -, H⟩ := _root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h
   have e2
       : _root_.GlobalTheory.CuspRep.ParLawsT.locParT hL (CG.ofChar χ) h
         = WD.mk (WDRep.diag h fun _ : Fin 1 => (χ.val w)⁻¹) := by

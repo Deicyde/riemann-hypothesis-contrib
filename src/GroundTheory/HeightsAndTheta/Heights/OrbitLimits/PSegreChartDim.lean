@@ -138,7 +138,8 @@ theorem ringKrullDim_le_of_mem_minimalPrimes_sup_span
         (show (s.card : WithBot ℕ∞) ≤ (s.card : WithBot ℕ∞) + 1 by
           exact_mod_cast Nat.le_succ s.card))
     · have h2 :=
-        ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT F τ W' W a hW'p haW' hmin
+        _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+          F τ W' W a hW'p haW' hmin
       rw [← h2] at h1
       calc
         ringKrullDim (MvPolynomial τ F ⧸ V)

@@ -75,7 +75,6 @@ private theorem glRel_op {X : Fin n → Fin n → A} (h : Formalism.REAL.GlRel X
 
 private theorem qdet_op {X : Fin n → Fin n → A} (h : Formalism.REAL.GlRel X) (y : ℂ)
     : qdet (fun i j => op (X j i)) y = op (qdet X y) := by
-
   have hP
       : ∀ (arg : Fin n → ℂ) (σ τ : Equiv.Perm (Fin n)),
         orderedTermProduct (fun i j => op (X j i)) arg σ τ

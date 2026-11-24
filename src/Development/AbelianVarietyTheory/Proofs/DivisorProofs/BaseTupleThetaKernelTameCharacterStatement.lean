@@ -51,6 +51,7 @@ open GlobalTheory.FormTies GlobalTheory.OnTies GlobalTheory.TraceClassRank
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.OnCmp GlobalTheory.BigOn GlobalTheory.RealIndexBound
+
 theorem _root_.GlobalTheory.T.baseTuple_thetaKernel_tameCharacter
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.baseTuple_thetaKernel_tameCharacter
                 → ∃ χ ξR,
                   KerDat R i (R.C.delAt (Formalism.EigenvalueLevelCeiling.plc v)) χ ξR
                     (placesOver R (R.mu v) (ownAt D v)) ω φ := by
-  first
-  | exact @GlobalTheory.OnBaseKer.kerDat_of_isBaseKernel
-  | exact GlobalTheory.OnBaseKer.kerDat_of_isBaseKernel
-  | (intros; apply GlobalTheory.OnBaseKer.kerDat_of_isBaseKernel <;> assumption)
+  first | exact @GlobalTheory.OnBaseKer.kerDat_of_isBaseKernel

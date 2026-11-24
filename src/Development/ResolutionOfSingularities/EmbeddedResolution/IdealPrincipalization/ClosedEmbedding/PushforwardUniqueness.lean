@@ -61,12 +61,15 @@ structure SequenceOfBlowupsPushforward
   square
     : ∀ (i : ℕ) (hi : i < B.length),
       σ (i + 1) hi ≫ B.transitionMapSucc i = BS.transitionMapSucc i ≫ σ i hi.le
-  center : ∀ (i : ℕ) (hi : i < B.length), B.center i = imageIdealSheaf (σ i hi.le) (BS.center i)
+  center
+    : ∀ (i : ℕ) (hi : i < B.length),
+      B.center i = _root_.FunctorialResolution.Blowup.schemeImageIdeal (σ i hi.le) (BS.center i)
 
 private theorem comap_imageIdealSheaf_of_isIso
     {A B : Scheme.{u}} (f : A ⟶ B) [IsIso f] (J : A.IdealSheafData)
-    : (imageIdealSheaf f J).comap f = J := by
-  rw [show imageIdealSheaf f J = J.map f from map_eq_imageIdealSheaf ..]
+    : (_root_.FunctorialResolution.Blowup.schemeImageIdeal f J).comap f = J := by
+  rw [show _root_.FunctorialResolution.Blowup.schemeImageIdeal f J = J.map f from
+    map_eq_imageIdealSheaf ..]
   exact Blowup.comap_map_of_isClosedImmersion f J
 
 private theorem exists_iso_succ_comp_blowupMorphism
@@ -206,7 +209,8 @@ theorem isomorphic
           have hBcen : (B'.center n).comap (d'.σ n hnB'.le) = BS.center n := by
             have := d'.isClosedImmersion n hnB'.le
             rw [d'.center n hnB',
-              show imageIdealSheaf (d'.σ n hnB'.le) (BS.center n)
+              show _root_.FunctorialResolution.Blowup.schemeImageIdeal (d'.σ n hnB'.le)
+                    (BS.center n)
                   = (BS.center n).map (d'.σ n hnB'.le) from
                 map_eq_imageIdealSheaf ..,
               Blowup.comap_map_of_isClosedImmersion]

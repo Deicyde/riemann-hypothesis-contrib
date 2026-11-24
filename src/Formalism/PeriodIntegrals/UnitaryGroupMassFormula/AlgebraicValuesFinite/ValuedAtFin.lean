@@ -60,15 +60,7 @@ theorem valued_atFin (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ)
   unfold ordF
   rw [neg_neg, WithZero.exp_log ((Valuation.ne_zero_iff _).2 k.ne_zero)]
   simp only [atFin, Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe]
-  first
-  | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (k : L)
-  | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation v (k : L)
-  | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := L) v (k : L)
-  | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (K := L) v (k : L)
-  | exact Valued.extension_extends _
-  | rfl
-  | simp [HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
-  | simp [HeightOneSpectrum.valuedAdicCompletion_eq_valuation]
+  first | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (k : L)
 
 theorem locVal : LocVal L := by
   intro χ v k hχ

@@ -4,12 +4,12 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHo
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.SectionsHaveFiniteDimension
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianVarietyCutOutBoundedDegreeTorsionStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HilbertFunctionEndomorphismGraphOfTorsionActionStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianVarietyCutOutBoundedDegreeTorsion
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HilbertFunctionEndomorphismGraphOfTorsionAction
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MemSubringOfLocalInverse
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PrincipalPolarisationVolumeFormSymmetricAmpleStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsHaveFiniteDimensionInvarianceIsomorphism
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaSectionsVeryAmplePeriodicStatement
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PrincipalPolarisationVolumeFormSymmetricAmple
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsHaveFiniteDimensionInvarianceIsomorphism
 import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.ExistsBasisOfIsField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -90,7 +90,7 @@ theorem vol_inv
   rw [hi]
   have hs : cls P.L P.isLB = pull (GrpObj.inv : P.A ⟶ P.A).left (cls P.L P.isLB) :=
     (cls_eq_iff P.isLB (pull_isLB P.isLB _)).2
-      (GlobalTheory.T.principalPolarisation_volume_form_symmetric_ample H1 H2 K P).2.2.1
+      (_root_.GlobalTheory.principal_polarisation_numerics H1 H2 K P).2.2.1
   have hB : (graphLB P.L (GrpObj.inv : P.A ⟶ P.A).left N).IsLB := LB.isLB_linComb P.isLB _ _
   have hc := cls_graphLB P.isLB _ N hB
   rw [← hs] at hc
@@ -131,7 +131,7 @@ theorem exists_vol
     exact vol_inv H1 H2 K t.pol N hN
   | some i =>
     obtain ⟨δ, hδ, H⟩ :=
-      GlobalTheory.T.hilbertFunction_endomorphismGraph_of_torsionAction H1 H2 g N κ l m
+      _root_.GlobalTheory.hilbert_graph_of_torsion H1 H2 g N κ l m
         ((Mat i).map (Int.cast : ℤ → ZMod (l ^ m))) hN hl hlt
     refine ⟨δ, hδ.trans (Nat.pow_le_pow_left (Nat.mul_le_mul_left _ (by omega)) _), ?_⟩
     intro K _ _ β t f hS hf hT
@@ -194,7 +194,7 @@ theorem cutBy_graphIdeal
   have hn2 : 2 ≤ n := hn.two_le
   haveI : NeZero ((n ^ 2) ^ 2) := ⟨by positivity⟩
   obtain ⟨d, k₀, Hc⟩ :=
-    GlobalTheory.T.abelianVariety_cut_out_bounded_degree_torsion H1 H2 g ((n ^ 2) ^ 2 * (2 + κ))
+    _root_.GlobalTheory.cutBy_idealOf_torsion H1 H2 g ((n ^ 2) ^ 2 * (2 + κ))
       (Ix g ((n ^ 2) ^ 2) × Ix g ((n ^ 2) ^ 2))
   refine ⟨2 + k₀ + ((n ^ 2) ^ 2 * (1 + κ)) ^ (2 * g), fun j hj o _ b i => ?_⟩
   have hjn : j < n ^ j := Nat.lt_pow_self hn2

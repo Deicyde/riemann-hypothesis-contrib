@@ -3,8 +3,12 @@ module
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
 public import Mathlib.AlgebraicGeometry.Geometrically.Integral
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.IsIntegralOfSmoothFieldOfConnectedSpace
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsRigidifiedCubicalSymmetricExtensionNormalBStatement
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LineBundleIsoExtendOfNormalBaseStatement
+public import Mathlib.AlgebraicGeometry.Geometrically.Connected
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubicalPullBaseChangeSt
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsRigidifiedCubicalSymmetricExtensionNormalB
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LineBundleIsoExtendOfNormalBase
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -124,8 +128,8 @@ theorem pic_ext
   obtain ⟨A, hA, rfl⟩ := cls_surj α
   obtain ⟨B, hB, rfl⟩ := cls_surj β
   exact (cls_eq_iff hA hB).2
-    ((GlobalTheory.T.lineBundleIso_extend_of_normal_base S hS U H HU j p e jH pU hp hg he hj A B hA
-        hB ((cls_eq_iff (pull_isLB hA _) (pull_isLB hB _)).1 h₁)).1
+    ((_root_.GlobalTheory.lbIso_extend_of_normal S hS U H HU j p e jH pU hp hg he hj A B hA hB
+        ((cls_eq_iff (pull_isLB hA _) (pull_isLB hB _)).1 h₁)).1
       ((cls_eq_iff (pull_isLB hA _) (pull_isLB hB _)).1 h₂))
 
 theorem exists_sab_extension
@@ -145,8 +149,8 @@ theorem exists_sab_extension
   have := semi.smooth
   have := semi.geomConnected
   obtain ⟨PP, cub, m, rfl, hme, hlin, hsym⟩ :=
-    GlobalTheory.T.exists_rigidified_cubical_symmetric_extension_normalBase S hS U j G t₀.G a h
-      t₀.PP t₀.cub M hM hMa
+    _root_.GlobalTheory.NormalCubeExt.exists_cubical_extension S hS U j G t₀.G a h t₀.PP t₀.cub M hM
+      hMa
   have hc₀ : cls t₀.PP.L t₀.PP.isLB = pull m.F (cls PP.L PP.isLB) := by
     obtain ⟨w, hw, -⟩ := hlin
     exact (cls_eq_iff t₀.PP.isLB (pull_isLB PP.isLB _)).2 ⟨w, hw⟩

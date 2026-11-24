@@ -65,7 +65,7 @@ theorem cj_apply (z : ℂ) : cj z = starRingEnd ℂ z := rfl
 
 theorem map_cj_map_cj (Λ : AddSubgroup ℂ) : (Λ.map cj).map cj = Λ := by
   rw [AddSubgroup.map_map]
-  have : cj.comp cj = AddMonoidHom.id ℂ := by ext z; simp [cj_apply]
+  have : cj.comp cj = AddMonoidHom.id ℂ := by ext z; simp
   rw [this, AddSubgroup.map_id]
 
 theorem eisG_map_cj (Λ : AddSubgroup ℂ) (k : ℕ) : eisG (Λ.map cj) k = starRingEnd ℂ (eisG Λ k) := by
@@ -76,7 +76,7 @@ theorem eisG_map_cj (Λ : AddSubgroup ℂ) (k : ℕ) : eisG (Λ.map cj) k = star
       starRingEnd ℂ w.1,
       by
         obtain ⟨v, hv, hv'⟩ := AddSubgroup.mem_map.1 w.2.1
-        have : starRingEnd ℂ w.1 = v := by rw [← hv']; simp [cj_apply]
+        have : starRingEnd ℂ w.1 = v := by rw [← hv']; simp
         rw [this]
         exact hv,
       by simpa using w.2.2
@@ -88,7 +88,7 @@ theorem eisG_map_cj (Λ : AddSubgroup ℂ) (k : ℕ) : eisG (Λ.map cj) k = star
   congr 1
   ext w
   show (1 : ℂ) / (starRingEnd ℂ (w : ℂ)) ^ (2 * k) = starRingEnd ℂ (1 / (w : ℂ) ^ (2 * k))
-  simp [map_div₀, map_pow]
+  simp [map_pow]
 
 theorem eisenstein_g_two_map_conj (Λ : AddSubgroup ℂ) : g2 (Λ.map cj) = starRingEnd ℂ (g2 Λ) := by
   unfold g2; rw [eisG_map_cj, map_mul, map_ofNat]

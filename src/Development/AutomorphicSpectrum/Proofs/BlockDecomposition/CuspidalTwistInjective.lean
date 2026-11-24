@@ -84,7 +84,7 @@ theorem eq_smul_of_eigenvector
       have hv' : π z v = c • v := by simpa [sub_eq_zero] using hv
       have h1 : π z (π g v) = π g (π z v) := by
         rw [← Module.End.mul_apply, ← map_mul, hz, map_mul, Module.End.mul_apply]
-      simp [sub_eq_zero, h1, hv']
+      simp [h1, hv']
   }
   have hE : E ≠ ⊥ := fun h =>
     hw (by

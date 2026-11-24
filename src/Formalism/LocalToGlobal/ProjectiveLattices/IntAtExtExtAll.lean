@@ -70,8 +70,7 @@ theorem extAll_vAt_inc
     intro m
     show (AddMonoidAlgebra.single (deg w) _).coeff m = _
     rw [AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
-  have h0 : y.1 0 = ⊤ := by
-    first | exact (isVal_valSet la y.1 y.2).zero | simpa using (isVal_valSet la y.1 y.2).zero
+  have h0 : y.1 0 = ⊤ := by first | exact (isVal_valSet la y.1 y.2).zero
   show vG y.1 ((recPJ h j hj).inc w F) = y.1 F.1
   unfold vG
   simp only [hinc]

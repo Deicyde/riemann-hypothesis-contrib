@@ -1,22 +1,17 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBound
 public import Formalism.PairingDivisors.StatementH
 public import Mathlib.Analysis.SpecialFunctions.Log.PosLog
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DerivationDenominatorsAndHostFieldSizesStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBoundMeansPosLogAreaNormalisedThetaStatement
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrt
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralJAndAlgebraicDataStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DerivationDenominatorsAndHostFieldSizes
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBoundMeansPosLogAreaNormalisedTheta
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MeanInfPosLogLe
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SumCoeffMonomial
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryDoubleCosetClassesFiniteCardLe
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryRationalConjIntersectionCardDvdInvariant
-import Mathlib.Algebra.AffineMonoid.UniqueSums
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
@@ -30,8 +25,6 @@ import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -51,19 +44,75 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrt
+import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralJAndAlgebraicData
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryDoubleCosetClassesFiniteCardLe
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.ReduceModChar
 import Std.Tactic.BVDecide.Normalize.Prop
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement, Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeUnitNormSqNonneg
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBound\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
+open scoped BigOperators
+
+theorem _root_.GlobalTheory.T.thetaPair_coordinates_conjugate_bound
+    : ∀ (D : D7),
+      Inp D
+        → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (t0 : ℂ) (Q : ℕ),
+          Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0
+            → ∀ (P : Pair D cc δ t0 Q),
+              0 < Q
+                → ∀ (B : ℝ),
+                  1 ≤ B → (∀ τ, (P.n τ : ℝ) ≤ 2 * B)
+                    → ∀ (ρ : Qbar →ₐ[ℚ] ℂ) t0',
+                      GL3Theta.IsTwoTorsionPointUnkilled D (lamConj Qbar ρ (lamOf D cc δ)) t0'
+                        → ∀ h T,
+                          P.coord h T ∈ Qbar
+                            ∧ ‖cj Qbar ρ (P.coord h T)‖ ^ 2
+                              ≤ (Nat.card (Cls D P.a (intG D P.a)) : ℝ) ^ 2 * (Q : ℝ) ^ (P.a * P.d)
+                                * (((P.a.factorial : ℝ) ^ (∑ τ, P.n τ)) ^ 2
+                                  * (3
+                                    * (2 * ((fF D * P.a * P.d : ℕ) : ℝ) * D.host.rdE + 1)
+                                      ^ (fF D * P.a * P.d)
+                                    * nrm1Sq (lamConj Qbar ρ (lamOf D cc δ))
+                                        (GL3Theta.th0 (lamConj Qbar ρ (lamOf D cc δ)) t0')
+                                      ^ (fF D * P.a * P.d)
+                                    * (2 * Real.exp 1 * Real.pi * B
+                                        / area (lamConj Qbar ρ (lamOf D cc δ)))
+                                      ^ (P.a * ∑ τ, P.n τ))) := by
+  first | exact @GlobalTheory.NormSum.CoordConj.coord_conj_le
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement =====
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeUnitNormSqNonneg =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeUnitNormSqNonneg", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm\npublic import Formalism.PairingDivisors.StatementH\npublic import Mathlib.Analysis.SpecialFunctions.Log.PosLog\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DerivationDenominatorsAndHostFieldSizes\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBoundMeansPosLogAreaNormalisedTheta\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MeanInfPosLogLe\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SumCoeffMonomial\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaPairCoordinatesConjugateBoundStatement\npublic import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryRationalConjIntersectionCardDvdInvariant\nimport Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrt\nimport Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3\nimport Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralJAndAlgebraicData\nimport Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryDoubleCosetClassesFiniteCardLe\nimport Mathlib.Algebra.AffineMonoid.UniqueSums\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Algebra.Order.Star.Real\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\n\n"}
+section -- clump:auto
+@[expose] public section
+
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.ArchNorm
 
-theorem exists_galois (S : Set ℂ) (hS : S.Finite) (h : ∀ x ∈ S, x ∈ Qbar) :
-    ∃ M : IntermediateField ℚ ℂ, FiniteDimensional ℚ M ∧ IsGalois ℚ M ∧ ∀ x ∈ S, x ∈ M := by
+theorem exists_galois (S : Set ℂ) (hS : S.Finite) (h : ∀ x ∈ S, x ∈ Qbar)
+    : ∃ M : IntermediateField ℚ ℂ, FiniteDimensional ℚ M ∧ IsGalois ℚ M ∧ ∀ x ∈ S, x ∈ M := by
   have hint : ∀ x ∈ hS.toFinset, IsIntegral ℚ x := fun x hx =>
     (mem_algebraicClosure_iff.1 (h x (hS.mem_toFinset.1 hx))).isIntegral
   let p : Polynomial ℚ := ∏ x ∈ hS.toFinset, minpoly ℚ x
@@ -79,15 +128,16 @@ theorem exists_galois (S : Set ℂ) (hS : S.Finite) (h : ∀ x ∈ S, x ∈ Qbar
   rw [map_prod]
   exact Finset.prod_eq_zero (hS.mem_toFinset.2 hx) (minpoly.aeval ℚ x)
 
-theorem exists_extension (M : IntermediateField ℚ ℂ) [FiniteDimensional ℚ M] (ρ : M →ₐ[ℚ] ℂ) :
-    ∃ ρ' : Qbar →ₐ[ℚ] ℂ, ∀ x ∈ M, ρ' (TaylorLogMetric.liftM Qbar x) = ρ (TaylorLogMetric.liftM M x) := by
+theorem exists_extension (M : IntermediateField ℚ ℂ) [FiniteDimensional ℚ M] (ρ : M →ₐ[ℚ] ℂ)
+    : ∃ ρ' : Qbar →ₐ[ℚ] ℂ, ∀ x ∈ M,
+      ρ' (TaylorLogMetric.liftM Qbar x) = ρ (TaylorLogMetric.liftM M x) := by
   have hle : M ≤ Qbar := le_algebraicClosure ℚ ℂ M
   let : Algebra M Qbar := (IntermediateField.inclusion hle).toRingHom.toAlgebra
   have : IsScalarTower ℚ M Qbar := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
   have : Algebra.IsAlgebraic ℚ Qbar := algebraicClosure.isAlgebraic ℚ ℂ
   have : Algebra.IsAlgebraic M Qbar := Algebra.IsAlgebraic.tower_top (K := ℚ) M
-  obtain ⟨φ, hφ⟩ := IsAlgClosed.surjective_domRestrict_of_isAlgebraic (K := ℚ) (L := M) (M := ℂ)
-    (E := Qbar) ρ
+  obtain ⟨φ, hφ⟩ :=
+    IsAlgClosed.surjective_domRestrict_of_isAlgebraic (K := ℚ) (L := M) (M := ℂ) (E := Qbar) ρ
   refine ⟨φ, fun x hx => ?_⟩
   rw [← hφ]
   unfold TaylorLogMetric.liftM
@@ -99,46 +149,51 @@ theorem lattice_unitNormSq_nonneg (Λ : AddSubgroup ℂ) (g : ℂ → ℂ) : 0 �
   simp only [MeasureTheory.average_eq, smul_eq_mul]
   exact mul_nonneg (by positivity) (MeasureTheory.integral_nonneg fun z => by positivity)
 
-theorem area_nonneg (Λ : AddSubgroup ℂ) : 0 ≤ area Λ :=
-  Real.sInf_nonneg fun _ h => h.1.le
+theorem area_nonneg (Λ : AddSubgroup ℂ) : 0 ≤ area Λ := Real.sInf_nonneg fun _ h => h.1.le
 
 theorem le_exp_posLog (y : ℝ) : y ≤ Real.exp (Real.posLog y) := by
   rcases le_or_gt y 0 with h | h
   · exact h.trans (Real.exp_pos _).le
-  · calc y = Real.exp (Real.log y) := (Real.exp_log h).symm
+  · calc
+      y = Real.exp (Real.log y) := (Real.exp_log h).symm
       _ ≤ _ := Real.exp_le_exp.2 (le_max_right _ _)
 
-theorem posLog_le_of_le_exp {y E : ℝ} (hy : 0 ≤ y) (hE : 0 ≤ E) (h : y ≤ Real.exp E) :
-    Real.posLog y ≤ E := by
+theorem posLog_le_of_le_exp {y E : ℝ} (hy : 0 ≤ y) (hE : 0 ≤ E) (h : y ≤ Real.exp E)
+    : Real.posLog y ≤ E := by
   refine (Real.posLog_le_posLog (by linarith) h).trans ?_
   rw [Real.posLog_apply, Real.log_exp]
   exact max_le hE le_rfl
 
-theorem pow_le_exp {y t k : ℝ} {n : ℕ} (hy : 0 ≤ y) (ht : 0 ≤ t) (h : y ≤ Real.exp t) (hn : (n : ℝ) ≤ k) :
-    y ^ n ≤ Real.exp (k * t) := by
-  calc y ^ n ≤ Real.exp t ^ n := pow_le_pow_left₀ hy h n
+theorem pow_le_exp
+    {y t k : ℝ} {n : ℕ} (hy : 0 ≤ y) (ht : 0 ≤ t) (h : y ≤ Real.exp t) (hn : (n : ℝ) ≤ k)
+    : y ^ n ≤ Real.exp (k * t) := by
+  calc
+    y ^ n
+      ≤ Real.exp t ^ n := pow_le_pow_left₀ hy h n
     _ = Real.exp (n * t) := (Real.exp_natCast_mul n t).symm
     _ ≤ _ := Real.exp_le_exp.2 (mul_le_mul_of_nonneg_right hn ht)
 
-theorem mul_le_exp {x y s t : ℝ} (hy : 0 ≤ y) (hx : x ≤ Real.exp s) (h : y ≤ Real.exp t) :
-    x * y ≤ Real.exp (s + t) := by
+theorem mul_le_exp {x y s t : ℝ} (hy : 0 ≤ y) (hx : x ≤ Real.exp s) (h : y ≤ Real.exp t)
+    : x * y ≤ Real.exp (s + t) := by
   rw [Real.exp_add]
   exact mul_le_mul hx h hy (Real.exp_pos _).le
 
 theorem le_exp_self (y : ℝ) : y ≤ Real.exp y := by linarith [Real.add_one_le_exp y]
 
-theorem cls_le_exp (f k : ℕ) (n r l L : ℝ) (hf : 1 ≤ f) (hk : (k : ℝ) ≤ 2 * n) (hr : 0 ≤ r)
-    (hl : 0 ≤ l) (hL : 0 ≤ L) (h1 : (f : ℝ) * (2 * n) ≤ Real.exp l) (h2 : r ≤ Real.exp L) :
-    (12 * (f : ℝ) ^ 2 * (k : ℝ) ^ 4 * r ^ 2) ^ (6 * f * k ^ 2) ≤
-      Real.exp (24 * f * n ^ 2 * (12 + 4 * l + 2 * L)) := by
+theorem cls_le_exp
+    (f k : ℕ) (n r l L : ℝ) (hf : 1 ≤ f) (hk : (k : ℝ) ≤ 2 * n) (hr : 0 ≤ r) (hl : 0 ≤ l)
+    (hL : 0 ≤ L) (h1 : (f : ℝ) * (2 * n) ≤ Real.exp l) (h2 : r ≤ Real.exp L)
+    : (12 * (f : ℝ) ^ 2 * (k : ℝ) ^ 4 * r ^ 2) ^ (6 * f * k ^ 2)
+      ≤ Real.exp (24 * f * n ^ 2 * (12 + 4 * l + 2 * L)) := by
   have hf' : (1 : ℝ) ≤ f := by exact_mod_cast hf
   have hk0 : (0 : ℝ) ≤ k := Nat.cast_nonneg k
   refine pow_le_exp (by positivity) (by positivity) ?_ ?_
   · have e1 : (f : ℝ) ^ 2 * (k : ℝ) ^ 4 ≤ Real.exp (4 * l) := by
-      refine le_trans ?_ (pow_le_exp (y := (f : ℝ) * (2 * n)) (n := 4) (by nlinarith) hl h1 (by norm_num))
+      refine le_trans ?_
+        (pow_le_exp (y := (f : ℝ) * (2 * n)) (n := 4) (by nlinarith) hl h1 (by norm_num))
       rw [mul_pow]
-      exact mul_le_mul (pow_le_pow_right₀ hf' (by norm_num)) (pow_le_pow_left₀ hk0 hk 4) (by positivity)
-        (by positivity)
+      exact mul_le_mul (pow_le_pow_right₀ hf' (by norm_num)) (pow_le_pow_left₀ hk0 hk 4)
+        (by positivity) (by positivity)
     have e2 : r ^ 2 ≤ Real.exp (2 * L) := pow_le_exp hr hL h2 (by norm_num)
     rw [mul_assoc (12 : ℝ)]
     exact mul_le_exp (by positivity) (mul_le_exp (by positivity) (le_exp_self 12) e1) e2
@@ -146,20 +201,23 @@ theorem cls_le_exp (f k : ℕ) (n r l L : ℝ) (hf : 1 ≤ f) (hk : (k : ℝ) �
     have := pow_le_pow_left₀ hk0 hk 2
     nlinarith
 
-
-
-theorem sizes (f N a d s Q ch cT ca cd : ℕ) (B L r ν A : ℝ) (hf : 1 ≤ f) (hN : 1 ≤ N) (had : a ≤ d)
-    (hd : d ≤ 2 * N) (hs : (s : ℝ) ≤ 2 * f * B) (hQ : 0 < Q) (hB : 1 ≤ B) (hL : 1 ≤ L) (hr : 1 ≤ r)
-    (hrL : Real.log r ≤ L) (hν : 0 ≤ ν) (hA : 0 ≤ A) (hch : ch ≤ cd * Q ^ (d ^ 2 + 4))
-    (hcT : cT ≤ 2 ^ (d * s))
+theorem sizes
+    (f N a d s Q ch cT ca cd : ℕ) (B L r ν A : ℝ)
+    (hf : 1 ≤ f) (hN : 1 ≤ N) (had : a ≤ d) (hd : d ≤ 2 * N) (hs : (s : ℝ) ≤ 2 * f * B) (hQ : 0 < Q)
+    (hB : 1 ≤ B) (hL : 1 ≤ L) (hr : 1 ≤ r) (hrL : Real.log r ≤ L) (hν : 0 ≤ ν) (hA : 0 ≤ A)
+    (hch : ch ≤ cd * Q ^ (d ^ 2 + 4)) (hcT : cT ≤ 2 ^ (d * s))
     (hcd : (cd : ℝ) ≤ (12 * (f : ℝ) ^ 2 * (d : ℝ) ^ 4 * r ^ 2) ^ (6 * f * d ^ 2))
-    (hca : (ca : ℝ) ≤ (12 * (f : ℝ) ^ 2 * (a : ℝ) ^ 4 * r ^ 2) ^ (6 * f * a ^ 2)) :
-    (ch : ℝ) * cT * ((ca : ℝ) ^ 2 * (Q : ℝ) ^ (a * d) * (((a.factorial : ℝ) ^ s) ^ 2 *
-      (3 * (2 * ((f * a * d : ℕ) : ℝ) * r + 1) ^ (f * a * d) * ν ^ (f * a * d) *
-        (2 * Real.exp 1 * Real.pi * B / A) ^ (a * s)))) ≤
-    Real.exp (1100 * f * (2 * (N : ℝ)) * B * (L + Real.log (B * (2 * (N : ℝ)))) +
-      1100 * f * (N : ℝ) ^ 2 * (L + Real.log ((f : ℝ) * (2 * (N : ℝ)) * B)) + 1100 * (N : ℝ) ^ 2 * Real.log Q +
-      (4 * f * (N : ℝ) ^ 2 * Real.posLog ν + 4 * f * N * B * Real.posLog A⁻¹)) := by
+    (hca : (ca : ℝ) ≤ (12 * (f : ℝ) ^ 2 * (a : ℝ) ^ 4 * r ^ 2) ^ (6 * f * a ^ 2))
+    : (ch : ℝ) * cT
+        * ((ca : ℝ) ^ 2 * (Q : ℝ) ^ (a * d)
+          * (((a.factorial : ℝ) ^ s) ^ 2
+            * (3 * (2 * ((f * a * d : ℕ) : ℝ) * r + 1) ^ (f * a * d) * ν ^ (f * a * d)
+              * (2 * Real.exp 1 * Real.pi * B / A) ^ (a * s))))
+      ≤ Real.exp
+        (1100 * f * (2 * (N : ℝ)) * B * (L + Real.log (B * (2 * (N : ℝ))))
+          + 1100 * f * (N : ℝ) ^ 2 * (L + Real.log ((f : ℝ) * (2 * (N : ℝ)) * B))
+          + 1100 * (N : ℝ) ^ 2 * Real.log Q
+          + (4 * f * (N : ℝ) ^ 2 * Real.posLog ν + 4 * f * N * B * Real.posLog A⁻¹)) := by
   have hf' : (1 : ℝ) ≤ f := by exact_mod_cast hf
   have hn : (1 : ℝ) ≤ N := by exact_mod_cast hN
   have hd' : (d : ℝ) ≤ 2 * N := by exact_mod_cast hd
@@ -196,7 +254,8 @@ theorem sizes (f N a d s Q ch cT ca cd : ℕ) (B L r ν A : ℝ) (hf : 1 ≤ f) 
   have e3 : (ch : ℝ) ≤ Real.exp (24 * f * n ^ 2 * (12 + 4 * l + 2 * L) + 8 * n ^ 2 * q) := by
     have : (ch : ℝ) ≤ cd * (Q : ℝ) ^ (d ^ 2 + 4) := by exact_mod_cast hch
     refine this.trans (mul_le_exp (by positivity) e1 (pow_le_exp (by positivity) hq0 hq1 ?_))
-    push_cast; nlinarith
+    push_cast
+    nlinarith
   have e4 : (cT : ℝ) ≤ Real.exp (4 * f * n * B * 2) := by
     have : (cT : ℝ) ≤ (2 : ℝ) ^ (d * s) := by exact_mod_cast hcT
     refine this.trans (pow_le_exp (by positivity) (by positivity) (le_exp_self 2) ?_)
@@ -208,37 +267,48 @@ theorem sizes (f N a d s Q ch cT ca cd : ℕ) (B L r ν A : ℝ) (hf : 1 ≤ f) 
   have e6 : (Q : ℝ) ^ (a * d) ≤ Real.exp (4 * n ^ 2 * q) :=
     pow_le_exp (by positivity) hq0 hq1 (by push_cast; exact had')
   have e7 : ((a.factorial : ℝ) ^ s) ^ 2 ≤ Real.exp (2 * (2 * f * B * (2 * n * m))) := by
-    refine pow_le_exp (by positivity) (by positivity) (pow_le_exp (by positivity) (by positivity) ?_ hs)
-      (by norm_num)
+    refine pow_le_exp (by positivity) (by positivity)
+      (pow_le_exp (by positivity) (by positivity) ?_ hs) (by norm_num)
     have : (a.factorial : ℝ) ≤ (a : ℝ) ^ a := by exact_mod_cast Nat.factorial_le_pow a
     exact this.trans (pow_le_exp ha0 hm0 (by nlinarith) ha')
-  have e8 : (2 * ((f * a * d : ℕ) : ℝ) * r + 1) ^ (f * a * d) ≤
-      Real.exp (4 * f * n ^ 2 * (3 + (2 * l + L))) := by
+  have e8
+      : (2 * ((f * a * d : ℕ) : ℝ) * r + 1) ^ (f * a * d)
+        ≤ Real.exp (4 * f * n ^ 2 * (3 + (2 * l + L))) := by
     refine pow_le_exp (by positivity) (by positivity) ?_ hG
-    have h1 : ((f : ℝ) * (2 * n)) ^ 2 ≤ Real.exp (2 * l) := pow_le_exp (by positivity) hl0 hfl (by norm_num)
+    have h1 : ((f : ℝ) * (2 * n)) ^ 2 ≤ Real.exp (2 * l) :=
+      pow_le_exp (by positivity) hl0 hfl (by norm_num)
     have h2 : ((f * a * d : ℕ) : ℝ) ≤ Real.exp (2 * l) := by
       refine hG.trans (le_trans ?_ h1)
-      have : 0 ≤ f * n ^ 2 * (f - 1) := by have : 0 ≤ (f : ℝ) - 1 := by linarith
-                                           positivity
+      have : 0 ≤ f * n ^ 2 * (f - 1) := by
+        have : 0 ≤ (f : ℝ) - 1 := by linarith
+        positivity
       nlinarith
     have h3 := mul_le_exp (by linarith) h2 hr1
     have h4 : 1 ≤ Real.exp (2 * l + L) := Real.one_le_exp (by linarith)
     have h5 := mul_le_exp (Real.exp_pos _).le (le_exp_self 3) (le_refl (Real.exp (2 * l + L)))
     linarith
   have e9 : ν ^ (f * a * d) ≤ Real.exp (4 * f * n ^ 2 * v) := pow_le_exp hν hv0 hv1 hG
-  have e10 : (2 * Real.exp 1 * Real.pi * B / A) ^ (a * s) ≤ Real.exp (4 * f * n * B * (2 + 1 + 4 + m + u)) := by
+  have e10
+      : (2 * Real.exp 1 * Real.pi * B / A) ^ (a * s)
+        ≤ Real.exp (4 * f * n * B * (2 + 1 + 4 + m + u)) := by
     refine pow_le_exp (by positivity) (by positivity) ?_ ?_
     · rw [div_eq_mul_inv]
-      refine mul_le_exp (by positivity) (mul_le_exp (by positivity) (mul_le_exp (by positivity)
-        (mul_le_exp (by positivity) (le_exp_self 2) le_rfl) (Real.pi_le_four.trans (le_exp_self 4))) ?_) hu1
+      refine mul_le_exp (by positivity)
+        (mul_le_exp (by positivity)
+          (mul_le_exp (by positivity) (mul_le_exp (by positivity) (le_exp_self 2) le_rfl)
+            (Real.pi_le_four.trans (le_exp_self 4)))
+          ?_)
+        hu1
       nlinarith
     · push_cast
       have := mul_le_mul ha' hs hs0 (by positivity)
       linarith
   refine (mul_le_exp (by positivity) (mul_le_exp (by positivity) e3 e4)
     (mul_le_exp (by positivity) (mul_le_exp (by positivity) e5 e6)
-      (mul_le_exp (by positivity) e7 (mul_le_exp (by positivity) (mul_le_exp (by positivity)
-        (mul_le_exp (by positivity) (le_exp_self 3) e8) e9) e10)))).trans (Real.exp_le_exp.2 ?_)
+      (mul_le_exp (by positivity) e7
+        (mul_le_exp (by positivity)
+          (mul_le_exp (by positivity) (mul_le_exp (by positivity) (le_exp_self 3) e8) e9)
+          e10)))).trans (Real.exp_le_exp.2 ?_)
   have hn2 : 1 ≤ n ^ 2 := by nlinarith
   have t2 : 1 ≤ (f : ℝ) * n ^ 2 := by nlinarith
   have t1 : 0 ≤ (f : ℝ) * n * B := by positivity
@@ -249,8 +319,9 @@ theorem sizes (f N a d s Q ch cT ca cd : ℕ) (B L r ν A : ℝ) (hf : 1 ≤ f) 
   have p5 := mul_nonneg (zero_le_one.trans hn2) hq0
   linarith
 
-theorem mul_mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (a : 𝓞 D.host.K) {w : ℂ}
-    (hw : w ∈ lamOf D cc δ) : w * D.host.φ₀ ((a : D.host.K) : D.host.E) ∈ lamOf D cc δ := by
+theorem mul_mem_lamOf
+    (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (a : 𝓞 D.host.K) {w : ℂ} (hw : w ∈ lamOf D cc δ)
+    : w * D.host.φ₀ ((a : D.host.K) : D.host.E) ∈ lamOf D cc δ := by
   unfold lamOf at hw
   induction hw using AddSubgroup.closure_induction with
   | mem x hx =>
@@ -262,25 +333,43 @@ theorem mul_mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (a : 𝓞
   | add x y _ _ hx hy => rw [add_mul]; exact add_mem hx hy
   | neg x _ hx => rw [neg_mul]; exact neg_mem hx
 
-theorem sum_prod_le {α β : Type} [Fintype α] [Fintype β] (g : α × β → ℝ) (X : ℝ) (h : ∀ p, g p ≤ X) :
-    ∑ p, g p ≤ (Nat.card α : ℝ) * (Fintype.card β : ℝ) * X := by
+theorem sum_prod_le {α β : Type} [Fintype α] [Fintype β] (g : α × β → ℝ) (X : ℝ) (h : ∀ p, g p ≤ X)
+    : ∑ p, g p ≤ (Nat.card α : ℝ) * (Fintype.card β : ℝ) * X := by
   refine (Finset.sum_le_card_nsmul _ _ X fun p _ => h p).trans (le_of_eq ?_)
   rw [Finset.card_univ, Fintype.card_prod, nsmul_eq_mul, Nat.cast_mul, Nat.card_eq_fintype_card]
 
-
-
-theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (t0 : ℂ) (Q : ℕ), Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0 → 0 < Q → ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (σ : K →+* ℂ) (N : ℕ) (B L : ℝ) (P : Pair D cc δ t0 Q) (x : K), 1 ≤ N → 1 ≤ B → 1 ≤ L → Real.log D.host.rdE ≤ L → |logDerivativeAtOne D| ≤ L → P.Small N B → σ x = (P.norm : ℂ) → Formalism.PairingDivisionLocalBalance.meanInf K (fun v => Real.posLog ‖v.embedding x‖) ≤ C * fF D * (2 * (N : ℝ)) * B * (L + Real.log (B * (2 * (N : ℝ)))) + C * fF D * (N : ℝ) ^ 2 * (L + Real.log ((fF D : ℝ) * (2 * (N : ℝ)) * B)) + C * (N : ℝ) ^ 2 * Real.log Q := by
-  obtain ⟨C₀, hC₀, hmean⟩ := GlobalTheory.T.exists_bound_means_posLog_area_normalisedTheta
+theorem norm_meanInf_posLog_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (D : D7),
+          Inp D
+            → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (t0 : ℂ) (Q : ℕ),
+              Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0 → 0 < Q
+                → ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+                    (σ : K →+* ℂ) (N : ℕ) (B L : ℝ) (P : Pair D cc δ t0 Q) (x : K),
+                  1 ≤ N → 1 ≤ B → 1 ≤ L → Real.log D.host.rdE ≤ L → |logDerivativeAtOne D| ≤ L
+                    → P.Small N B → σ x = (P.norm : ℂ)
+                    → Formalism.PairingDivisionLocalBalance.meanInf K
+                        (fun v => Real.posLog ‖v.embedding x‖)
+                      ≤ C * fF D * (2 * (N : ℝ)) * B * (L + Real.log (B * (2 * (N : ℝ))))
+                        + C * fF D * (N : ℝ) ^ 2 * (L + Real.log ((fF D : ℝ) * (2 * (N : ℝ)) * B))
+                        + C * (N : ℝ) ^ 2 * Real.log Q := by
+  obtain ⟨C₀, hC₀, hmean⟩ := _root_.GlobalTheory.PositiveMeans.means_le
   refine ⟨1100 + 4 * C₀, by positivity, ?_⟩
   intro D hI cc δ t0 Q hc ht hQ K _ _ _ σ N B L P x hN hB hL hrL hdL hsm hx
-  obtain ⟨-, -, hr, hf, hcard, -⟩ := GlobalTheory.T.derivationDenominators_and_hostField_sizes D hI.g1
-  obtain ⟨hdata, htor⟩ := (GlobalTheory.T.admJ_and_torsion_data_algebraic D hI.g1).2 cc δ hc
+  obtain ⟨-, -, hr, hf, hcard, -⟩ := _root_.GlobalTheory.NormSum.letters_and_sizes D hI.g1
+  obtain ⟨hdata, htor⟩ :=
+    (_root_.GlobalTheory.CurveAlgebraic.integral_j_and_algebraic_data D hI.g1).2 cc δ hc
   obtain ⟨-, hcd, hJ⟩ := GlobalTheory.NormSum.cls_finite_card_le D P.d
   obtain ⟨hfin, hch⟩ := hJ P.J P.J_le P.idx_ne
   have hca := (GlobalTheory.NormSum.cls_finite_card_le D P.a).2.1
-  have hcT := (GlobalTheory.MinorBound.minor_bound D P.a P.d P.n (fun _ => 0) 0 1 B one_pos hB le_rfl hsm.2
-    (differentiable_const _) (fun z => by simp)).1
-  have hcoord := GlobalTheory.T.thetaPair_coordinates_conjugate_bound D hI cc δ t0 Q hc ht P hQ B hB hsm.2
+  have hcT :=
+    (GlobalTheory.MinorBound.minor_bound D P.a P.d P.n
+      (fun _ => 0)
+      0 1 B one_pos hB le_rfl hsm.2 (differentiable_const _)
+      (fun z => by simp)).1
+  have hcoord :=
+    GlobalTheory.T.thetaPair_coordinates_conjugate_bound D hI cc δ t0 Q hc ht P hQ B hB hsm.2
   let _ : Fintype (Cls D P.d P.J) := Fintype.ofFinite _
   have hwp : wpF (lamOf D cc δ) t0 ∈ Qbar := by
     refine (htor t0 ⟨2, two_pos, by exact_mod_cast ht.1⟩ fun h0 => ?_).1
@@ -292,20 +381,21 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
     obtain ⟨t', ht'⟩ := (hI.t0Ex cc δ hc).2 Qbar Qbar.val hdata.2.1 hdata.2.2
     exact (hcoord Qbar.val t' ht' h T).1
   let b := Module.finBasis ℚ K
-  obtain ⟨M, hM1, hM2, hM⟩ := exists_galois
-    (Set.range (fun i => σ (b i)) ∪
-      Set.range (fun p : Cls D P.d P.J × Tup D P.a P.d P.n => P.coord p.1.out p.2) ∪
-      {g2 (lamOf D cc δ), g3 (lamOf D cc δ), wpF (lamOf D cc δ) t0})
-    (((Set.finite_range _).union (Set.finite_range _)).union (Set.toFinite _)) (by
-      rintro y ((⟨i, rfl⟩ | ⟨p, rfl⟩) | rfl | rfl | rfl)
-      · exact mem_algebraicClosure_iff.2
-          ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) (b i)).algHom σ.toRatAlgHom)
-      · exact hz _ _
-      · exact hdata.2.1
-      · exact hdata.2.2
-      · exact hwp)
+  obtain ⟨M, hM1, hM2, hM⟩ :=
+    exists_galois
+      (Set.range (fun i => σ (b i))
+        ∪ Set.range (fun p : Cls D P.d P.J × Tup D P.a P.d P.n => P.coord p.1.out p.2)
+        ∪ {g2 (lamOf D cc δ), g3 (lamOf D cc δ), wpF (lamOf D cc δ) t0})
+      (((Set.finite_range _).union (Set.finite_range _)).union (Set.toFinite _))
+      (by
+        rintro y ((⟨i, rfl⟩ | ⟨p, rfl⟩) | rfl | rfl | rfl)
+        · exact mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) (b i)).algHom
+            σ.toRatAlgHom)
+        · exact hz _ _
+        · exact hdata.2.1
+        · exact hdata.2.2
+        · exact hwp)
   have hσ : ∀ y, σ y ∈ M := fun y => by
-
     rw [← b.sum_repr y, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_rat_smul]
@@ -313,13 +403,16 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
   have h2 : g2 (lamOf D cc δ) ∈ M := hM _ (Or.inr (by simp))
   have h3 : g3 (lamOf D cc δ) ∈ M := hM _ (Or.inr (by simp))
   have h4 : wpF (lamOf D cc δ) t0 ∈ M := hM _ (Or.inr (by simp))
-  have hzM : ∀ p : Cls D P.d P.J × Tup D P.a P.d P.n, P.coord p.1.out p.2 ∈ M :=
-    fun p => hM _ (Or.inl (Or.inr ⟨p, rfl⟩))
+  have hzM : ∀ p : Cls D P.d P.J × Tup D P.a P.d P.n, P.coord p.1.out p.2 ∈ M := fun p =>
+    hM _ (Or.inl (Or.inr ⟨p, rfl⟩))
   choose t htt using fun ρ : M →ₐ[ℚ] ℂ => (hI.t0Ex cc δ hc).2 M ρ h2 h3
   obtain ⟨hu, hv⟩ := hmean D hI cc δ t0 hc ht L hL hrL hdL M h2 h3 h4 t htt
   refine (GlobalTheory.ArchMean.meanInf_posLog_le K σ x M (Cls D P.d P.J × Tup D P.a P.d P.n)
-    (fun p => ((gam D P.J p.1.out : ℚ))⁻¹) (fun p => ⟨P.coord p.1.out p.2, hzM p⟩) hσ
-    (fun p => by positivity) ?_).trans ?_
+    (fun p => ((gam D P.J p.1.out : ℚ))⁻¹)
+    (fun p => ⟨P.coord p.1.out p.2, hzM p⟩)
+    hσ
+    (fun p => by positivity)
+    ?_).trans ?_
   · rw [hx, Pair.norm, finsum_eq_sum_of_fintype, Fintype.sum_prod_type]
     push_cast
     refine Finset.sum_congr rfl fun h _ => ?_
@@ -331,7 +424,8 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
   have hs : ((∑ τ, P.n τ : ℕ) : ℝ) ≤ 2 * fF D * B := by
     push_cast
     refine (Finset.sum_le_card_nsmul _ _ _ fun τ _ => hsm.2 τ).trans (le_of_eq ?_)
-    rw [Finset.card_univ, hcard, nsmul_eq_mul]; ring
+    rw [Finset.card_univ, hcard, nsmul_eq_mul]
+    ring
   have hf' : (1 : ℝ) ≤ fF D := by exact_mod_cast hf
   have hn : (1 : ℝ) ≤ N := by exact_mod_cast hN
   have hm0 : 0 ≤ Real.log (B * (2 * (N : ℝ))) := Real.log_nonneg (by nlinarith)
@@ -341,12 +435,16 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
   set E₀ : ℝ := 1100 * fF D * (2 * (N : ℝ)) * B * (L + Real.log (B * (2 * (N : ℝ)))) +
       1100 * fF D * (N : ℝ) ^ 2 * (L + Real.log ((fF D : ℝ) * (2 * (N : ℝ)) * B)) +
       1100 * (N : ℝ) ^ 2 * Real.log Q with hE₀
-  have key : ∀ ρ : M →ₐ[ℚ] ℂ,
-      Real.posLog (∑ p : Cls D P.d P.J × Tup D P.a P.d P.n,
-        ((((gam D P.J p.1.out : ℚ))⁻¹ : ℚ) : ℝ) * ‖ρ ⟨P.coord p.1.out p.2, hzM p⟩‖ ^ 2) ≤
-      E₀ + (4 * fF D * (N : ℝ) ^ 2 * Real.posLog (nrm1Sq (lamConj M ρ (lamOf D cc δ))
-        (GL3Theta.th0 (lamConj M ρ (lamOf D cc δ)) (t ρ))) +
-        4 * fF D * N * B * Real.posLog (area (lamConj M ρ (lamOf D cc δ)))⁻¹) := by
+  have key
+      : ∀ ρ : M →ₐ[ℚ] ℂ,
+        Real.posLog
+            (∑ p : Cls D P.d P.J × Tup D P.a P.d P.n,
+              ((((gam D P.J p.1.out : ℚ))⁻¹ : ℚ) : ℝ) * ‖ρ ⟨P.coord p.1.out p.2, hzM p⟩‖ ^ 2)
+          ≤ E₀
+            + (4 * fF D * (N : ℝ) ^ 2
+                * Real.posLog (nrm1Sq (lamConj M ρ (lamOf D cc δ))
+                  (GL3Theta.th0 (lamConj M ρ (lamOf D cc δ)) (t ρ)))
+              + 4 * fF D * N * B * Real.posLog (area (lamConj M ρ (lamOf D cc δ)))⁻¹) := by
     intro ρ
     obtain ⟨ρ', hρ⟩ := exists_extension M ρ
     have hl : lamConj Qbar ρ' (lamOf D cc δ) = lamConj M ρ (lamOf D cc δ) := by
@@ -354,13 +452,18 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
       rw [hρ _ h2, hρ _ h3]
     have hb := hcoord ρ' (t ρ) (hl ▸ htt ρ)
     rw [hl] at hb
-    have h5 : 0 ≤ Real.posLog (nrm1Sq (lamConj M ρ (lamOf D cc δ))
-        (GL3Theta.th0 (lamConj M ρ (lamOf D cc δ)) (t ρ))) := Real.posLog_nonneg
+    have h5
+        : 0
+          ≤ Real.posLog (nrm1Sq (lamConj M ρ (lamOf D cc δ))
+            (GL3Theta.th0 (lamConj M ρ (lamOf D cc δ)) (t ρ))) :=
+      Real.posLog_nonneg
     have h6 : 0 ≤ Real.posLog (area (lamConj M ρ (lamOf D cc δ)))⁻¹ := Real.posLog_nonneg
-    refine posLog_le_of_le_exp (by positivity) (by positivity) (le_trans ?_
-      (sizes (fF D) N P.a P.d (∑ τ, P.n τ) Q (Nat.card (Cls D P.d P.J)) (Fintype.card (Tup D P.a P.d P.n))
-        _ _ B L D.host.rdE _ _ hf hN P.a_le hsm.1 hs hQ hB hL hr hrL (lattice_unitNormSq_nonneg _ _) (area_nonneg _)
-        (hch.trans (Nat.mul_le_mul_left _ P.idx_le)) hcT hcd hca))
+    refine posLog_le_of_le_exp (by positivity) (by positivity)
+      (le_trans ?_
+        (sizes (fF D) N P.a P.d (∑ τ, P.n τ) Q (Nat.card (Cls D P.d P.J))
+          (Fintype.card (Tup D P.a P.d P.n)) _ _ B L D.host.rdE _ _ hf hN P.a_le hsm.1 hs hQ hB hL
+          hr hrL (lattice_unitNormSq_nonneg _ _) (area_nonneg _)
+          (hch.trans (Nat.mul_le_mul_left _ P.idx_le)) hcT hcd hca))
     refine sum_prod_le _ _ fun p => ?_
     · refine le_trans ?_ (hb p.1.out p.2).2
       have hg := (GlobalTheory.StabOrder.gam_ne_zero_dvd_invariant D P.d P.J P.J_le p.1.out).1
@@ -377,9 +480,9 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
   clear_value E₀
   have hM0 : (0 : ℝ) < Module.finrank ℚ M := by exact_mod_cast Module.finrank_pos
   refine (div_le_div_of_nonneg_right (Finset.sum_le_sum fun ρ _ => key ρ) hM0.le).trans ?_
-  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, Finset.sum_const,
-    Finset.card_univ, AlgHom.card, nsmul_eq_mul, add_div, add_div, mul_div_cancel_left₀ _ hM0.ne',
-    mul_div_assoc, mul_div_assoc]
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
+    Finset.sum_const, Finset.card_univ, AlgHom.card, nsmul_eq_mul, add_div, add_div,
+    mul_div_cancel_left₀ _ hM0.ne', mul_div_assoc, mul_div_assoc]
   have p1 := mul_le_mul_of_nonneg_left hu (show (0 : ℝ) ≤ 4 * fF D * N * B by positivity)
   have p2 := mul_le_mul_of_nonneg_left hv (show (0 : ℝ) ≤ 4 * fF D * (N : ℝ) ^ 2 by positivity)
   have p3 : 0 ≤ C₀ * fF D * N * B * L := by positivity
@@ -390,3 +493,6 @@ theorem norm_meanInf_posLog_le : ∃ C : ℝ, 0 < C ∧ ∀ (D : D7), Inp D → 
   linarith
 
 end GlobalTheory.ArchNorm
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeUnitNormSqNonneg =====

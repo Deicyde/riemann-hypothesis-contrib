@@ -58,12 +58,7 @@ variable
 theorem tvOf_tv {x : Sp S ⟶ Xo.X} (n : TanM x Xo.univ.t.G)
     : tvOf (isTanAtG_of (t := Xo.univ.t) (x0 := x) (tv n) (tv_mem n)) = n := by
   apply tanM_ext
-  first
-  | rfl
-  | exact Over.OverMorphism.ext rfl
-  | (ext; rfl)
-  | (ext1; simp [tvOf, tv, mkT])
-  | simp [tvOf, tv, mkT]
+  first | rfl
 
 theorem eig_coords
     (y : FrPt Xo c S) (τ : E →+* ℂ)

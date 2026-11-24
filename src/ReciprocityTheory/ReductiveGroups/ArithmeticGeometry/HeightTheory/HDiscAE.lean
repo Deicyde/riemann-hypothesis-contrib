@@ -103,8 +103,7 @@ private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
       refine ⟨y, nonZeroDivisors.ne_zero hy, MvPolynomial.C x, ?_⟩
       rw [hC, ← MvPolynomial.C_mul]
       congr 1
-      first
-      | (field_simp; done)
+      first | (field_simp; done)
     next p q hp hq =>
       obtain ⟨s1, hs1, p1, hp1⟩ := hp
       obtain ⟨s2, hs2, q1, hq1⟩ := hq
@@ -168,8 +167,7 @@ private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
     rw [e1, e2]
     have h1 := hCne sq hsq
     have h2 := hCne sp hsp
-    first
-    | (field_simp; done)
+    first | (field_simp; done)
   · intro x y hxy
     exact ⟨1, by rw [hinj hxy]⟩
 

@@ -363,10 +363,7 @@ theorem gs_comp
   have e := congrArg (fun φ => φ.hom ((F.app U).hom f)) (Scheme.Hom.germ_stalkMap r (F ⁻¹ᵁ U) z h)
   simp only [CommRingCat.comp_apply] at e
   rw [e]
-  first
-  | rfl
-  | (rw [Scheme.Hom.comp_app, CommRingCat.comp_apply]; rfl)
-  | (simp only [Scheme.Hom.comp_app, CommRingCat.comp_apply]; rfl)
+  first | rfl
 
 variable
   {E : Type} [Field E] [NumberField E] [IsCMField E]

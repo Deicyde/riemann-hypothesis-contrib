@@ -96,8 +96,8 @@ private theorem map_mem_splitSeq_iff_of_pairing_preserved
     {a b : ℕ} (f : (Fin a → R) × (Fin a → R) → (Fin b → R) × (Fin b → R))
     (hf : ∀ x y, (f y).2 ⬝ᵥ (f x).1 = y.2 ⬝ᵥ x.1) (l : List ((Fin a → R) × (Fin a → R)))
     : List.map f l ∈ splitSeq R b ↔ l ∈ splitSeq R a := by
-  rw [(GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R b).2.2.1,
-    (GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R a).2.2.1, List.pairwise_map]
+  rw [(_root_.GlobalTheory.SeqCx.split_uni_closed R b).2.2.1,
+    (_root_.GlobalTheory.SeqCx.split_uni_closed R a).2.2.1, List.pairwise_map]
   simp only [List.mem_map, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂, hf]
 
 open LinkSplit in
@@ -110,7 +110,7 @@ theorem exactAt_link_splitSeq
   intro R _ s hs N m p ρ hρ hlen hsm hex
   have hmN : m ≤ N := by omega
   obtain ⟨g, hg⟩ :=
-    GlobalTheory.T.exists_GL_splitSeq_standard_of_stableRangeLe R s hs N ρ hρ (by omega)
+    _root_.GlobalTheory.splitSeq_to_standard R s hs N ρ hρ (by omega)
       (fun j => (⟨m + (j : ℕ), by omega⟩ : Fin N))
       (by intro a b h; ext; simp only [Fin.mk.injEq] at h; omega)
   let T : (Fin N → R) × (Fin N → R) → (Fin N → R) × (Fin N → R) := fun x =>
@@ -143,7 +143,7 @@ theorem exactAt_link_splitSeq
   have hTiinj : Function.Injective Ti := fun x y h => by rw [← hTTi x, ← hTTi y, h]
   have hmemT := map_mem_splitSeq_iff_of_pairing_preserved T hTdot
   have hmemP := map_mem_splitSeq_iff_of_pairing_preserved P hPdot
-  have hchar := (GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R N).2.2.1
+  have hchar := (_root_.GlobalTheory.SeqCx.split_uni_closed R N).2.2.1
   have hρT
       : ∀ j : Fin ρ.length,
         T (ρ.get j)
@@ -215,14 +215,3 @@ theorem exactAt_link_splitSeq
   exact hex
 
 end GlobalTheory.SeqCx
-
-section
-open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.exactAt_linkIn_splitSeq_of_exactAt_splitSeq
-    : ∀ (R : Type) [CommRing R] (s : ℕ),
-      StableRangeLe R s
-        → ∀ (N m p : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))),
-          ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (splitSeq R m) p
-            → ExactAt (linkIn (splitSeq R N) Set.univ ρ) p := by
-  first | exact @GlobalTheory.SeqCx.exactAt_link_splitSeq
-end

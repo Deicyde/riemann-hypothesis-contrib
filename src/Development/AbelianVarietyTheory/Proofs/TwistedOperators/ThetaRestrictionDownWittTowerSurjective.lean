@@ -238,7 +238,7 @@ theorem surj_core
     exact hcv
   have hint : ∫ y in 𝓨, fH (isoPart H W dH.e y) ∂μ = c := by
     rw [← hcv]
-    simp only [res, GlobalTheory.TowerRestrict.midPart_zero, add_zero]
+    simp only [res, _root_.GlobalTheory.TowerResNonzero.midPart_zero', add_zero]
   refine ⟨
     fun w =>
       f' (sandwich (rat 1) (rat d.i₀) w) * (c⁻¹ • fH) (sandwich (rat 1) (rat (embMat d dH)) w),

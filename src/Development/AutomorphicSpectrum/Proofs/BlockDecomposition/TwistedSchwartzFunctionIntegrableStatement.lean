@@ -83,10 +83,4 @@ theorem _root_.GlobalTheory.T.twisted_schwartz_function_integrable
                               (Matrix.trace
                                 ((b : Matrix (Fin n) (Fin n) (AF F ⊗[F] E)) * gramR (AF F) σ J X))))
                         dx := by
-  first
-  | exact @GlobalTheory.CompanionTheory.SiegelND.Integ.Phase.integrable_mul_phase
-  | exact GlobalTheory.CompanionTheory.SiegelND.Integ.Phase.integrable_mul_phase
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.SiegelND.Integ.Phase.integrable_mul_phase <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.SiegelND.Integ.Phase.integrable_mul_phase

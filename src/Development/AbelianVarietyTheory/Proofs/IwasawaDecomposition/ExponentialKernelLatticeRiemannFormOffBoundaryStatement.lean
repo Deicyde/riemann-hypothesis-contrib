@@ -38,6 +38,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
   GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exponentialKernel_lattice_riemannForm_off_boundary
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
@@ -66,7 +68,4 @@ theorem _root_.GlobalTheory.T.exponentialKernel_lattice_riemannForm_off_boundary
                   = Complex.exp (-(2 * Real.pi * Complex.I) * ((hermForm Hm v w).im : ℂ) / k)
                 → GlobalTheory.UU.CubWeil Z.t.cub k (ex ((k : ℂ)⁻¹ • v)) (ex ((k : ℂ)⁻¹ • w))
                   (unitOn ζ) := by
-  first
-  | exact @GlobalTheory.ShFam.Hor.LogCh.kernel_lattice_of_inner
-  | exact GlobalTheory.ShFam.Hor.LogCh.kernel_lattice_of_inner
-  | (intros; apply GlobalTheory.ShFam.Hor.LogCh.kernel_lattice_of_inner <;> assumption)
+  first | exact @GlobalTheory.ShFam.Hor.LogCh.kernel_lattice_of_inner

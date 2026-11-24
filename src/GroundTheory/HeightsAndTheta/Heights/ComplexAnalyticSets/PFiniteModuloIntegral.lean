@@ -54,16 +54,16 @@ open Topology Filter Polynomial
 
 noncomputable section
 
-def germCompRingHom {σ τ : Type} [Fintype σ] [Fintype τ] (x : σ → ℂ) (L : (σ → ℂ) →L[ℂ] (τ → ℂ)) :
-    Germ (𝓝 (L x)) ℂ →+* Germ (𝓝 x) ℂ where
+def germCompRingHom {σ τ : Type} [Fintype σ] [Fintype τ] (x : σ → ℂ) (L : (σ → ℂ) →L[ℂ] (τ → ℂ))
+    : Germ (𝓝 (L x)) ℂ →+* Germ (𝓝 x) ℂ where
   toFun s := s.compTendsto L (L.continuous.tendsto x)
   map_one' := rfl
   map_mul' s t := Germ.inductionOn₂ s t fun _ _ => rfl
   map_zero' := rfl
   map_add' s t := Germ.inductionOn₂ s t fun _ _ => rfl
 
-def holGermsPullback {σ τ : Type} [Fintype σ] [Fintype τ] (x : σ → ℂ) (L : (σ → ℂ) →L[ℂ] (τ → ℂ)) :
-    holGerms (L x) →+* holGerms x :=
+def holGermsPullback {σ τ : Type} [Fintype σ] [Fintype τ] (x : σ → ℂ) (L : (σ → ℂ) →L[ℂ] (τ → ℂ))
+    : holGerms (L x) →+* holGerms x :=
   ((germCompRingHom x L).comp (holGerms (L x)).subtype).codRestrict (holGerms x) fun s => by
     obtain ⟨b, hb, hbs⟩ := s.2
     refine ⟨b ∘ L, hb.comp (L.analyticAt x), ?_⟩
@@ -79,8 +79,9 @@ theorem FiniteModuloIntegral.proof : FiniteModuloIntegral.Statement := by
   set I : Ideal (holGerms x) :=
     Ideal.span (Set.range fun i => (⟨f i, f i, hf i, rfl⟩ : holGerms x)) with hIdef
   let _ : Algebra (holGerms (L x)) (holGerms x ⧸ I) := ((Ideal.Quotient.mk I).comp φ).toAlgebra
-  have hsmul : ∀ (s : holGerms (L x)) (q : holGerms x),
-      s • Ideal.Quotient.mk I q = Ideal.Quotient.mk I (φ s * q) := by
+  have hsmul
+      : ∀ (s : holGerms (L x)) (q : holGerms x),
+        s • Ideal.Quotient.mk I q = Ideal.Quotient.mk I (φ s * q) := by
     intro s q
     rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra]
     simp
@@ -91,24 +92,26 @@ theorem FiniteModuloIntegral.proof : FiniteModuloIntegral.Statement := by
     rintro q -
     obtain ⟨⟨_, u, hu, rfl⟩, rfl⟩ := Ideal.Quotient.mk_surjective q
     obtain ⟨b, h, hb, hh, hev⟩ := hrep u hu
-    have hq : Ideal.Quotient.mk I ⟨u, u, hu, rfl⟩ = ∑ m, (⟨b m, b m, hb m, rfl⟩ : holGerms (L x)) •
-        Ideal.Quotient.mk I ⟨e m, e m, he m, rfl⟩ := by
-
+    have hq
+        : Ideal.Quotient.mk I ⟨u, u, hu, rfl⟩
+          = ∑ m, (⟨b m, b m, hb m, rfl⟩ : holGerms (L x)) •
+            Ideal.Quotient.mk I ⟨e m, e m, he m, rfl⟩ := by
       simp only [hsmul, ← map_sum]
       rw [Ideal.Quotient.eq]
       have hmem : ∑ i, (⟨h i, h i, hh i, rfl⟩ : holGerms x) * ⟨f i, f i, hf i, rfl⟩ ∈ I :=
         Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
       convert hmem using 1
       apply Subring.subtype_injective
-      have e1 : (holGerms x).subtype ((⟨u, u, hu, rfl⟩ : holGerms x) -
-          ∑ m, φ ⟨b m, b m, hb m, rfl⟩ * ⟨e m, e m, he m, rfl⟩) =
-          Germ.coeRingHom (𝓝 x) (u - ∑ m, (b m ∘ L) * e m) := by
-
+      have e1
+          : (holGerms x).subtype
+              ((⟨u, u, hu, rfl⟩ : holGerms x)
+                - ∑ m, φ ⟨b m, b m, hb m, rfl⟩ * ⟨e m, e m, he m, rfl⟩)
+            = Germ.coeRingHom (𝓝 x) (u - ∑ m, (b m ∘ L) * e m) := by
         simp only [map_sub, map_sum, map_mul]
         rfl
-      have e2 : (holGerms x).subtype (∑ i, (⟨h i, h i, hh i, rfl⟩ : holGerms x) * ⟨f i, f i, hf i, rfl⟩) =
-          Germ.coeRingHom (𝓝 x) (∑ i, h i * f i) := by
-
+      have e2
+          : (holGerms x).subtype (∑ i, (⟨h i, h i, hh i, rfl⟩ : holGerms x) * ⟨f i, f i, hf i, rfl⟩)
+            = Germ.coeRingHom (𝓝 x) (∑ i, h i * f i) := by
         simp only [map_sum, map_mul]
         rfl
       rw [e1, e2]
@@ -124,7 +127,8 @@ theorem FiniteModuloIntegral.proof : FiniteModuloIntegral.Statement := by
   obtain ⟨p, hpm, hp⟩ :=
     Algebra.IsIntegral.isIntegral (R := holGerms (L x)) (Ideal.Quotient.mk I ⟨g, g, hg, rfl⟩)
   rw [RingHom.algebraMap_toAlgebra, ← Polynomial.hom_eval₂, Ideal.Quotient.eq_zero_iff_mem,
-    hpm.as_sum] at hp
+      hpm.as_sum]
+    at hp
   simp only [eval₂_add, eval₂_X_pow, eval₂_finsetSum, eval₂_mul, eval₂_C] at hp
   obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.1 hp
   choose a ha hae using fun j : ℕ => (p.coeff j).2
@@ -136,8 +140,10 @@ theorem FiniteModuloIntegral.proof : FiniteModuloIntegral.Statement := by
     show germCompRingHom x L (p.coeff j).1 = _
     rw [← hae j]
     rfl
-  have hgerm : Germ.coeRingHom (𝓝 x) (∑ i, h i * f i) = Germ.coeRingHom (𝓝 x)
-      (g ^ p.natDegree + ∑ j ∈ Finset.range p.natDegree, (a j ∘ L) * g ^ j) := by
+  have hgerm
+      : Germ.coeRingHom (𝓝 x) (∑ i, h i * f i)
+        = Germ.coeRingHom (𝓝 x)
+          (g ^ p.natDegree + ∑ j ∈ Finset.range p.natDegree, (a j ∘ L) * g ^ j) := by
     have := congrArg (holGerms x).subtype hc
 
     simp only [map_add (f := _), map_sum, map_mul, map_pow, hcI, hφI] at this ⊢

@@ -615,11 +615,7 @@ theorem pf_norm (x : D.host.E)
   rw [h, sq]
   rfl
 
-theorem pf_rd_pos : 0 < D.host.rdE := by
-  unfold Host.rdE
-  have h : (NumberField.discr D.host.E : ℝ) ≠ 0 := by
-    exact_mod_cast NumberField.discr_ne_zero D.host.E
-  positivity
+alias pf_rd_pos := _root_.Formalism.MainNotions.S.rdE_pos
 
 theorem PFHost_of_discr (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2)
     : PFHost D := by
@@ -839,7 +835,7 @@ end Sizes
 section Close
 
 def k2C0 (C : ℝ) : ℝ :=
-  if h : 1 ≤ C then (Formalism.HermitianLatticeCounting.Final.S6.finalSum C h).choose else 0
+  if h : 1 ≤ C then (_root_.Formalism.HermitianLatticeCounting.P.final_sum_bound C h).choose else 0
 
 def k2A (D : D7) (large₂ : SizeData₂ D) (C : ℝ) (j : ℕ) : ℝ :=
   Real.exp (C * (D.R.m : ℝ) ^ 6 * D.R.f * large₂.sc.L) * (C / D.R.k) ^ (j * (D.R.k - 1 - j) * D.R.f)
@@ -854,8 +850,8 @@ theorem final_bound_closes
     (hk : k2C0 C * (D.R.m : ℝ) ^ 6 * large₂.sc.L ≤ (D.R.k : ℝ) * Real.log D.R.k)
     : 2 * d * k2B D large₂ C ≤ d * Real.exp (-((D.R.k : ℝ) * D.R.f * Real.log D.R.k)) := by
   have h :=
-    (Formalism.HermitianLatticeCounting.Final.S6.finalSum C hC).choose_spec.2 D.R.k D.R.rS D.R.f
-      large₂.sc.b d (two_le_scale_b D large₂) (one_le_degree_f D) hd
+    (_root_.Formalism.HermitianLatticeCounting.P.final_sum_bound C hC).choose_spec.2 D.R.k D.R.rS
+      D.R.f large₂.sc.b d (two_le_scale_b D large₂) (one_le_degree_f D) hd
   rw [two_rank_add_two_eq_m D, log_scale_eq_L D large₂] at h
   unfold k2C0 at hk
   rw [dite_eq_left hC] at hk
@@ -1650,8 +1646,8 @@ theorem ng_gram_base (P : FPair H r)
         · exact P.B.h_iso b a (Or.inl (fun h => hab (by rw [ha, h])))
         · exact P.B.h_iso b a (Or.inr ha)
   rw [hG,
-    Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramDetGen E r
-      (Zh.transpose.map c) Zh]
+    _root_.Formalism.HermitianLatticeCounting.P.gram_determinant_general E r (Zh.transpose.map c)
+      Zh]
   have d1 : (Zh.transpose.map c).det = M.L.cj Zh.det := by
     rw [← hcx, RingHom.map_det, ← Matrix.det_transpose]
     rfl

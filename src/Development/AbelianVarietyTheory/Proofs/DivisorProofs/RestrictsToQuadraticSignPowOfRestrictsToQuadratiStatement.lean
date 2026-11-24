@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.restrictsToQuadraticSignPow_of_restrictsToQuadrati
           GlobalTheory.LFun.ResEta F E χ n
             → GlobalTheory.WeilM.ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ
               n := by
-  first
-  | exact @GlobalTheory.LFun.resEtaPow_of_resEta
-  | exact GlobalTheory.LFun.resEtaPow_of_resEta
-  | (intros; apply GlobalTheory.LFun.resEtaPow_of_resEta <;> assumption)
+  first | exact @GlobalTheory.LFun.resEtaPow_of_resEta

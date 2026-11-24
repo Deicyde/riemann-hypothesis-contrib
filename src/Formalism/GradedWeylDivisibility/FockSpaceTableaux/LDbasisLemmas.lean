@@ -52,9 +52,11 @@ namespace Formalism.GradedWeylDivisibility
 
 open scoped MonomialOrder
 
-theorem ldbasis_linearIndependent {σ R ι : Type*} [CommRing R] (o : MonomialOrder σ)
-    (v : ι → MvPolynomial σ R) (hinj : Function.Injective fun i => o.degree (v i))
-    (hlc : ∀ i, o.leadingCoeff (v i) = 1) : LinearIndependent R v := by
+theorem ldbasis_linearIndependent
+    {σ R ι : Type*} [CommRing R]
+    (o : MonomialOrder σ) (v : ι → MvPolynomial σ R)
+    (hinj : Function.Injective fun i => o.degree (v i)) (hlc : ∀ i, o.leadingCoeff (v i) = 1)
+    : LinearIndependent R v := by
   classical
   rw [linearIndependent_iff']
   intro s g hsum i hi
@@ -64,7 +66,8 @@ theorem ldbasis_linearIndependent {σ R ι : Type*} [CommRing R] (o : MonomialOr
     (s.filter fun j => g j ≠ 0).exists_max_image (fun j => o.toSyn (o.degree (v j))) htne
   have hcoeff := congrArg (AddMonoidAlgebra.coeff · (o.degree (v j))) hsum
   rw [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, MvPolynomial.coeff_sum,
-    Finset.sum_eq_single j] at hcoeff
+      Finset.sum_eq_single j]
+    at hcoeff
   · rw [AddMonoidAlgebra.coeff_smul_apply, smul_eq_mul] at hcoeff
     have hone : (v j).coeff (o.degree (v j)) = 1 := hlc j
     rw [hone, mul_one] at hcoeff
@@ -81,12 +84,14 @@ theorem ldbasis_linearIndependent {σ R ι : Type*} [CommRing R] (o : MonomialOr
   · intro hj'
     exact absurd (Finset.mem_filter.mp hj).1 hj'
 
-theorem ldbasis_sum_single_perm {r s : ℕ} (I : Fin s → Fin r) (σ : Equiv.Perm (Fin s)) :
-    (∑ q : Fin s, (Pi.single (I (σ q)) 1 : Fin r → ℕ)) = ∑ p : Fin s, Pi.single (I p) 1 := by
+theorem ldbasis_sum_single_perm {r s : ℕ} (I : Fin s → Fin r) (σ : Equiv.Perm (Fin s))
+    : (∑ q : Fin s, (Pi.single (I (σ q)) 1 : Fin r → ℕ)) = ∑ p : Fin s, Pi.single (I p) 1 := by
   exact Equiv.sum_comp σ (fun p => (Pi.single (I p) 1 : Fin r → ℕ))
 
-theorem ldbasis_initMinor_rowHom (R : Type*) [CommRing R] {r n s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n) :
-    IsWeightedHomogeneous (rowW r n) (initMinor R (n := n) I hs) (∑ p : Fin s, Pi.single (I p) 1) := by
+theorem ldbasis_initMinor_rowHom
+    (R : Type*) [CommRing R] {r n s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n)
+    : IsWeightedHomogeneous (rowW r n) (initMinor R (n := n) I hs)
+      (∑ p : Fin s, Pi.single (I p) 1) := by
   unfold initMinor
   rw [Matrix.det_apply]
   apply IsWeightedHomogeneous.sum
@@ -104,16 +109,18 @@ theorem ldbasis_initMinor_rowHom (R : Type*) [CommRing R] {r n s : ℕ} (I : Fin
     ∏ i, (X (I (σ i), Fin.castLE hs i) : MvPolynomial (Fin r × Fin n) R)) d = 0
   rw [Units.smul_def, AddMonoidAlgebra.coeff_smul_apply, h0, smul_zero]
 
-theorem ldbasis_bidet_rowHom (R : Type*) [CommRing R] {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n)
-    (I : ∀ k, Fin (sz k) → Fin r) :
-    IsWeightedHomogeneous (rowW r n) (bideterminant R sz hsz I)
+theorem ldbasis_bidet_rowHom
+    (R : Type*) [CommRing R]
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r)
+    : IsWeightedHomogeneous (rowW r n) (bideterminant R sz hsz I)
       (∑ k : Fin K, ∑ p : Fin (sz k), Pi.single (I k p) 1) := by
   unfold bideterminant
   exact IsWeightedHomogeneous.prod _ _ _ (fun k _ => ldbasis_initMinor_rowHom R (I k) (hsz k))
 
-theorem ldbasis_rowWt_bidetExp {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n)
-    (I : ∀ k, Fin (sz k) → Fin r) :
-    rowWt (bidetExp sz hsz I) = ∑ k : Fin K, ∑ p : Fin (sz k), (Pi.single (I k p) 1 : Fin r → ℕ) := by
+theorem ldbasis_rowWt_bidetExp
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r)
+    : rowWt (bidetExp sz hsz I)
+      = ∑ k : Fin K, ∑ p : Fin (sz k), (Pi.single (I k p) 1 : Fin r → ℕ) := by
   classical
   funext a
   simp only [rowWt, rowDeg, bidetExp, Finsupp.finsetSum_apply, Finset.sum_apply,

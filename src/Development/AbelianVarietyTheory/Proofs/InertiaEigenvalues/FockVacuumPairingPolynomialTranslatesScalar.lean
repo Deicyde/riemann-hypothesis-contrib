@@ -127,13 +127,7 @@ theorem pT_heisO
       GlobalTheory.Hk3.FiniteHeis.heisO_dRho ψ hθ hw]
     rfl
 
-theorem thetaIP_eq_ipO (μ : Measure (WO S T)) (𝓕 : Set (WO S T)) (f g : WO S T → ℂ)
-    : thetaIP μ 𝓕 f g = GlobalTheory.Ker.ipO μ 𝓕 g f := by
-  unfold thetaIP GlobalTheory.Ker.ipO
-  congr 1
-  funext w
-  rw [mul_comm]
-  rfl
+alias thetaIP_eq_ipO := _root_.GlobalTheory.VacSchurFin.thetaIP_eq_ipO
 
 theorem thetaInner_heisenberg
     (hψ : IsStdChar D ψ (-1))

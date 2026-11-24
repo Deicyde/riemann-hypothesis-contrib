@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.mem_selfDualLattice_of_mem_all_latticeCompletions
                   pairA D.host.F 0 (GlobalTheory.FinPl.LatMem.indP D.host.F (· = v)) ⊗ₜ[D.host.F] z i)
                 ∈ latV S L (· = v))
             → z ∈ L) := by
-  first
-  | exact @GlobalTheory.FinPl.LocGlob.mem_of_mem_latV_all
-  | exact GlobalTheory.FinPl.LocGlob.mem_of_mem_latV_all
-  | (intros; apply GlobalTheory.FinPl.LocGlob.mem_of_mem_latV_all <;> assumption)
+  first | exact @GlobalTheory.FinPl.LocGlob.mem_of_mem_latV_all

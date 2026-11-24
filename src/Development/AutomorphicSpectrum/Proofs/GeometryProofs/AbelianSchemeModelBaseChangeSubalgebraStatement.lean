@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
+
 theorem _root_.GlobalTheory.T.abelianScheme_model_baseChange_subalgebra
     : ∀ (k V : Type) [CommRing k] [CommRing V] [Algebra k V] (A : Over (Sp V)) [GrpObj A]
         (A₀ : Over (Sp k)) [GrpObj A₀] (φ : A.left ⟶ A₀.left),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.abelianScheme_model_baseChange_subalgebra
               ∧ IsGrpPullback A (Over.mk (pullback.snd A₀.hom (spMap (algebraMap k R))))
                 (spMap R.val.toRingHom) φ₁
               ∧ φ₁ ≫ pullback.fst _ _ = φ := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Approx.model_passes_to_subalgebra
-  | exact GlobalTheory.CompanionTheory.Ar.Approx.model_passes_to_subalgebra
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.Approx.model_passes_to_subalgebra <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.Approx.model_passes_to_subalgebra

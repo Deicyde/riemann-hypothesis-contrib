@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.integral_ramifiedChar_det_singularMatrixCoset_eq_z
           x.det = 0
             → ∫ g in {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)}, (ν (gdet g) : ℂ) * apow (gdet g) z ∂μ
               = 0 := by
-  first
-  | exact @GlobalTheory.CosetVanish.integral_coset_singular_eq_zero
-  | exact GlobalTheory.CosetVanish.integral_coset_singular_eq_zero
-  | (intros; apply GlobalTheory.CosetVanish.integral_coset_singular_eq_zero <;> assumption)
+  first | exact @GlobalTheory.CosetVanish.integral_coset_singular_eq_zero

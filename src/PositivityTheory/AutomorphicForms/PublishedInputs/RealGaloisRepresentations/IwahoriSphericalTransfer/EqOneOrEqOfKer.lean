@@ -2,11 +2,12 @@ module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ConjOnInterQuadraticKernelsOfTraceEq
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ConjOnInterQuadraticKernelsOfTraceEqStatement
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsExtensionRepIndexTwoOfTraceInvariant
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsExtensionRepIndexTwoOfTraceInvariantStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsRepPatchTwistStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FiniteQuadraticCharactersInAdjointStatement
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsRepPatchTwist
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FiniteQuadraticCharactersInAdjoint
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntertwinerZeroOfCharacterTwist
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntertwinerZeroOfQuadraticTwists
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -47,8 +48,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Algebra.Group.Units
 import Mathlib.Topology.Sheaves.Init
-public import PositivityTheory.AutomorphicForms.PublishedInputs.RealGaloisRepresentations.IwahoriSphericalTransfer.IntertwinerZeroOfCharacterTwist
-public import PositivityTheory.AutomorphicForms.PublishedInputs.RealGaloisRepresentations.IwahoriSphericalTransfer.IntertwinerZeroOfQuadraticTwists
 import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
@@ -112,7 +111,7 @@ private theorem exists_ne_zero_smul_mem_of_mem_span'
             → ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace
               = ((ρj g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace := by
   obtain ⟨P, hP⟩ :=
-    GlobalTheory.T.conj_on_inter_quadraticKernels_of_trace_eq Γ k n ρ₀ ρj η₀ η h0 hj htr
+    _root_.GlobalTheory.QuadKernelConj.conj_on_ker_inf_ker Γ k n ρ₀ ρj η₀ η h0 hj htr
   have hs : ∃ s, η₀ s = 1 ∧ η s = -1 := by
     by_contra hc
     push_neg at hc
@@ -122,9 +121,9 @@ private theorem exists_ne_zero_smul_mem_of_mem_span'
     · exact hne1 h
     · exact hne2 h
   obtain ⟨s, hs0, hs1⟩ := hs
-  have hY := GlobalTheory.T.intertwiner_zero_of_character_twist Γ k n ρ₀ η₀ η hB1 hB2
+  have hY := _root_.GlobalTheory.commute_on_ker_of_commute_on_ker_inter Γ k n ρ₀ η₀ η hB1 hB2
   obtain ⟨ρ, hρ0, hρ1⟩ :=
-    GlobalTheory.T.exists_rep_agreeing_on_kernels Γ k n ρ₀ ρj η₀ η P s hs0 hs1 hP
+    _root_.GlobalTheory.exists_rep_patch_twist Γ k n ρ₀ ρj η₀ η P s hs0 hs1 hP
       (fun Y hYc => hY Y hYc s hs0)
   refine ⟨ρ, hρ0, ?_, ?_⟩
   · apply GlobalTheory.IndexTwoExt.isSSRep_of_ker η₀ t ht
@@ -160,8 +159,7 @@ theorem main
     have hext
         : ∀ i, ∃ ρ : Γ →* GL (Fin n) k,
           Continuous ρ ∧ IsSSRep ρ ∧ ∀ h : (η i).ker, ρ h = r i h := fun i =>
-      GlobalTheory.T.exists_extension_rep_index_two_of_trace_invariant Γ k n (η i) (hopen i) (r i)
-        (hr i).1 (hr i).2 (hconj i)
+      _root_.GlobalTheory.IndexTwoExt.main Γ k n (η i) (hopen i) (r i) (hr i).1 (hr i).2 (hconj i)
     choose ρe hρc hρs hρr using hext
     obtain ⟨i₀, hi₀⟩ : ∃ i, η i ≠ 1 := by
       by_contra hc
@@ -180,7 +178,7 @@ theorem main
       ⟨_, rfl⟩
     have hB : B.Finite := by
       rw [hBdef]
-      exact GlobalTheory.T.finite_quadratic_characters_in_adjoint' Γ k n (ρe i₀)
+      exact _root_.GlobalTheory.finite_quadratic_characters_in_adjoint Γ k n (ρe i₀)
     have notB
         : ∀ χ : Γ →* ℤˣ,
           χ ∉ B
@@ -258,8 +256,8 @@ theorem main
         (fun g g0 g1 => htrc i₀ j g g0 g1)
         hj.1.2.2.1 hj.1.2.2.2 (notB _ hj.1.1) (notB _ hj.1.2.1)
     have hall :=
-      GlobalTheory.T.intertwiner_zero_of_quadratic_twists Γ k n (ρe i₀) ρ₁ ρj (η i₀) (η j₁) (η j)
-        hρ1a hρja hρ1s hρjs
+      _root_.GlobalTheory.trace_eq_of_agree_on_index_two_of_no_twisted_intertwiner Γ k n (ρe i₀) ρ₁
+        ρj (η i₀) (η j₁) (η j) hρ1a hρja hρ1s hρjs
         (by
           intro c hc
           apply notB

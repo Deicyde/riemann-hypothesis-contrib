@@ -53,17 +53,23 @@ namespace PositivityTheory.LocalTateOrthogonality.Gcoh
 theorem gcRep : SgcRep := by
   intro G _ _ _ R _ M _ _ _ _ rho hrho
   letI : Module (ULift.{0} ℤ) M := Module.compHom M (ULift.ringEquiv : ULift.{0} ℤ ≃+* ℤ).toRingHom
-  let σ : Representation (ULift.{0} ℤ) G M :=
-    { toFun := fun g =>
-        { toFun := rho g
-          map_add' := map_add _
-          map_smul' := fun c m => map_zsmul (rho g) c.down m }
-      map_one' := LinearMap.ext fun m => by
+  let σ : Representation (ULift.{0} ℤ) G M := {
+    toFun := fun g => {
+      toFun := rho g
+      map_add' := map_add _
+      map_smul' := fun c m => map_zsmul (rho g) c.down m
+    }
+    map_one' :=
+      LinearMap.ext fun m => by
         change rho 1 m = m
-        rw [map_one]; rfl
-      map_mul' := fun g h => LinearMap.ext fun m => by
+        rw [map_one]
+        rfl
+    map_mul' := fun g h =>
+      LinearMap.ext fun m => by
         change rho (g * h) m = rho g (rho h m)
-        rw [map_mul]; rfl }
+        rw [map_mul]
+        rfl
+  }
   refine ⟨Rep.of σ, ⟨fun a => ?_⟩, AddEquiv.refl M, fun g m => rfl⟩
   have hc : Continuous fun g : G => rho g (a : M) :=
     hrho.comp (continuous_id.prodMk continuous_const)
@@ -73,32 +79,29 @@ attribute [local instance 2000] Rep.hV2
 
 section
 
-variable {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {M : Type} [AddCommGroup M] [TopologicalSpace M] [DiscreteTopology M]
   (A : Rep.{0} k G) (e : M ≃+ A.V)
 
 omit [IsTopologicalGroup G] in
-theorem lc_of_cont {X : Type} [TopologicalSpace X] {f : X → M} (hf : Continuous f) :
-    IsLocallyConstant fun s => e (f s) :=
+theorem lc_of_cont {X : Type} [TopologicalSpace X] {f : X → M} (hf : Continuous f)
+    : IsLocallyConstant fun s => e (f s) :=
   ((IsLocallyConstant.iff_continuous f).2 hf).comp e
 
 omit [IsTopologicalGroup G] in
-theorem cont_of_lc {X : Type} [TopologicalSpace X] {f : X → A.V} (hf : IsLocallyConstant f) :
-    Continuous fun s => e.symm (f s) :=
+theorem cont_of_lc {X : Type} [TopologicalSpace X] {f : X → A.V} (hf : IsLocallyConstant f)
+    : Continuous fun s => e.symm (f s) :=
   (hf.comp e.symm).continuous
 
 end
 
-theorem gcn : Sgcn := by
-  apply CompanionTheory.LocalTateOrthogonality.Gcoh.gcn <;> assumption
+theorem gcn : Sgcn := by apply CompanionTheory.LocalTateOrthogonality.Gcoh.gcn <;> assumption
 
-theorem gc0 : Sgc0 := by
-  apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc0 <;> assumption
+theorem gc0 : Sgc0 := by apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc0 <;> assumption
 
-theorem gc1 : Sgc1 := by
-  apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc1 <;> assumption
+theorem gc1 : Sgc1 := by apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc1 <;> assumption
 
-theorem gc2 : Sgc2 := by
-  apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc2 <;> assumption
+theorem gc2 : Sgc2 := by apply CompanionTheory.LocalTateOrthogonality.Gcoh.gc2 <;> assumption
 
 end PositivityTheory.LocalTateOrthogonality.Gcoh

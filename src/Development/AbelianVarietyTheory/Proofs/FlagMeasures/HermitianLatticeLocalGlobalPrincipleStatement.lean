@@ -46,6 +46,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
   Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
   GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.hermitianLattice_local_global_principle
     : ∀ (D : D7) (Z : LocDat D),
       (∀ Λ₁ Λ₂ : LV D,
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.hermitianLattice_local_global_principle
               (∀ p, (Lp p).FG ∧ Submodule.span (D.s.atP p).Ep (Lp p : Set (Vp D p)) = ⊤)
                 → {p | Lp p ≠ lattice₂ D Z.M p Λ₀}.Finite
                 → ∃ Λ : LV D, Submodule.IsLattice D.host.E Λ ∧ ∀ p, lattice₂ D Z.M p Λ = Lp p := by
-  first
-  | exact @GlobalTheory.Unfold.LatLoc.lattices_local_global
-  | exact GlobalTheory.Unfold.LatLoc.lattices_local_global
-  | (intros; apply GlobalTheory.Unfold.LatLoc.lattices_local_global <;> assumption)
+  first | exact @GlobalTheory.Unfold.LatLoc.lattices_local_global

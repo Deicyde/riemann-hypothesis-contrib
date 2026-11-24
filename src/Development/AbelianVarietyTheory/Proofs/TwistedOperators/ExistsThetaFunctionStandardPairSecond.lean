@@ -60,8 +60,6 @@ open GlobalTheory.Grid GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle
 
 noncomputable section
 
-
-
 namespace GlobalTheory.CompanionTheory.StdSndTheta
 
 variable {D : D7}

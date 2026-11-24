@@ -50,8 +50,6 @@ noncomputable section
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
   GlobalTheory.JHMult GlobalTheory.ProdReorder
 
-
-
 namespace CompanionTheory.Groth
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
@@ -173,8 +171,8 @@ theorem one : One k := by
   have D
       : Nonempty ((ind₂ (stdSum (Nat.zero_add x.1)) (extTensor (multiProd e τ) (IrrGL.rep x))).Equiv
         (IrrGL.rep x)) :=
-    GlobalTheory.T.parabolicInductionTwoBlocks_empty_product_left k x.1 0 (Nat.zero_add x.1) _
-      (IrrGL.rep x) x.2.rep.smooth
+    _root_.GlobalTheory.ProdReorder.ind₂_unit_left k x.1 0 (Nat.zero_add x.1) _ (IrrGL.rep x)
+      x.2.rep.smooth
       (fun _ => 0)
       (fun _ => ℂ)
       τ e

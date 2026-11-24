@@ -63,9 +63,7 @@ def wZb (f : ℂ → ℂ) (ζ : ℂ) : ℂ := (1 / 2 : ℂ) * (fderiv ℝ f ζ 1
 def Hh (TT : ℝ) : Set ℂ := {w | TT < Complex.normSq (Complex.exp w)}
 
 theorem normSq_exp (w : ℂ) : Complex.normSq (Complex.exp w) = Real.exp w.re ^ 2 := by
-  first
-  | rw [Complex.normSq_eq_norm_sq, Complex.norm_exp]
-  | simp [Complex.normSq_eq_norm_sq, Complex.norm_exp]
+  first | rw [Complex.normSq_eq_norm_sq, Complex.norm_exp]
 
 theorem isOpen_Hh (TT : ℝ) : IsOpen (Hh TT) :=
   isOpen_lt continuous_const (Complex.continuous_normSq.comp Complex.continuous_exp)

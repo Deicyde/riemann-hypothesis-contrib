@@ -66,7 +66,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 theorem UpperTheory.V.Hi.levelUR2HeckeMap
     : ∀ (A M M' ι ι' : Type) [CommRing A] [AddCommGroup M] [Module A M] [AddCommGroup M']
         [Module A M'] (Y : Submodule A M) (Y' : Submodule A M') (op : ι → Module.End A M)

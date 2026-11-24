@@ -140,7 +140,7 @@ theorem exists_finite_residues_pi {κ : Type} [Fintype κ] (n : ℕ) (hn : 0 < n
   choose r hr u hu hru using fun i => h (t i) (ht i)
   refine ⟨fun i => r i, ⟨fun i => ⟨r i, hr i⟩, rfl⟩, u, hu, ?_⟩
   funext i
-  simp only [Pi.add_apply, Pi.smul_apply, nsmul_eq_mul]
+  simp only [Pi.add_apply, nsmul_eq_mul]
   exact hru i
 
 theorem exists_pair_of_annihilator
@@ -183,7 +183,7 @@ theorem exists_pair_of_annihilator
     intro i t ht j
     by_cases h : j = i
     · subst h; simpa using ht
-    · simp [Pi.single_apply, h, O.zero_mem]
+    · simp [h, O.zero_mem]
 
   have hcη : ∀ i, c * η i ∈ O := by
     intro i

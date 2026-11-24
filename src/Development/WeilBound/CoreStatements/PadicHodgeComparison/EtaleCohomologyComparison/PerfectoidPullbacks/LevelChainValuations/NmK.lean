@@ -46,8 +46,6 @@ set_option autoImplicit false
 
 noncomputable section
 
-
-
 open CategoryTheory AlgebraicGeometry Limits GlobalTheory.LogCris DividedPowers
 
 namespace CrystallineSemistableComparison.Pb.Kap

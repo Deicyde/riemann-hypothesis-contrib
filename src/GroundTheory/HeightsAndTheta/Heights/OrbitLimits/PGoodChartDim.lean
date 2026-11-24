@@ -102,9 +102,7 @@ theorem projChartSet_eq
   · rintro ⟨⟨z, hz, rfl⟩, h1⟩
     exact ⟨z, hz, (hl z).symm.trans h1, rfl⟩
 
-theorem linForm_single' {m : ℕ} (a : Fin m) : linForm (Pi.single a (1 : ℂ)) = X a := by
-  classical
-  simp [linForm, Pi.single_apply]
+alias linForm_single' := _root_.GroundTheory.Heights₂.Heights.linForm_single
 
 omit [∀ k, Fintype (ι k)] in
 theorem segreChartSet_eq (P : Ideal (MRing ι)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (a : Fin m)
@@ -124,8 +122,7 @@ theorem linForm_sub_one_not_mem
   intro h
   have h0 := hV _ h 0
   rw [homogeneousComponent_zero] at h0
-  have hc : AddMonoidAlgebra.coeff (linForm t - 1) 0 = -1 := by
-    simp [linForm, coeff_sum, coeff_C_mul, coeff_X]
+  have hc : AddMonoidAlgebra.coeff (linForm t - 1) 0 = -1 := by simp [linForm, coeff_C_mul, coeff_X]
   rw [hc] at h0
   exact hne (Ideal.eq_top_of_isUnit_mem _ h0 (by simp))
 
@@ -225,11 +222,13 @@ theorem GoodChartDim.proof
     rfl
 
   have d₁ :=
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT ℂ (Fin m) V J (linForm t - 1)
-      hV.isPrime (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top t) hJmin
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+      ℂ (Fin m) V J (linForm t - 1) hV.isPrime
+      (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top t) hJmin
   have d₂ :=
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT ℂ (Fin m) V Q₀ (linForm u - 1)
-      hV.isPrime (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top u) hQ₀min
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+      ℂ (Fin m) V Q₀ (linForm u - 1) hV.isPrime
+      (linForm_sub_one_not_mem hV.isHomog hV.isPrime.ne_top u) hQ₀min
   rw [← d₂, hdimQ₀] at d₁
   exact eq_of_add_one_eq d₁
 

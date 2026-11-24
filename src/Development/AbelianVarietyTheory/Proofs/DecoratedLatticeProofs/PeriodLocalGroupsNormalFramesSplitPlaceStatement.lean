@@ -56,6 +56,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.periodLocalGroups_normalFrames_splitPlace
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k) (n : Type) [Fintype n]

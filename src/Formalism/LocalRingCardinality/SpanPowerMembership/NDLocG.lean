@@ -73,11 +73,7 @@ theorem phi_mem (φ : F →+* PadicAlgCl l) (x : F) : φ x ∈ Kphi φ := by
   refine sum_mem (fun i _ => ?_)
   rw [map_rat_smul, Rat.smul_def]
   refine mul_mem ?_ (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
-  first
-  | exact SubfieldClass.ratCast_mem _ _
-  | exact ratCast_mem _ _
-  | exact (Kphi φ).toSubfield.ratCast_mem _
-  | simp
+  first | exact SubfieldClass.ratCast_mem _ _
 
 theorem exists_embAt (w : HeightOneSpectrum (𝓞 F)) (hw : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
     : ∃ φ : F →+* PadicAlgCl l, ∀ x : 𝓞 F, x ∈ w.asIdeal ↔ ‖φ (x : F)‖ < 1 := by

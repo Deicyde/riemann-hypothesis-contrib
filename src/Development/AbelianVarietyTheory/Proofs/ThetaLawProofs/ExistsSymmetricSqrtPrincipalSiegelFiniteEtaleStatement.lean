@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.KeyPow GlobalTheory.KeyFam GlobalTheory.ZM GlobalTheory.AbLaw
+
 theorem _root_.GlobalTheory.T.exists_symmetric_sqrt_principal_siegel_finite_etale
     : Out.Laws
       → ∀ (h k : ℕ) (o : Type) [CommRing o] (ζ : o) (R : Type) [CommRing R] [Algebra ℚ R]
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_symmetric_sqrt_principal_siegel_finite_etal
               (φ : P.A.left ⟶ c.A.left),
             (Module.Finite R R₁ ∧ Algebra.Etale R R₁ ∧ Module.FaithfullyFlat R R₁)
               ∧ SqOf P c (spMap (algebraMap R R₁) ≫ f) φ ∧ TorsConst P.A 2 := by
-  first
-  | exact @GlobalTheory.SiegelSqrt.exists_sqrt
-  | exact GlobalTheory.SiegelSqrt.exists_sqrt
-  | (intros; apply GlobalTheory.SiegelSqrt.exists_sqrt <;> assumption)
+  first | exact @GlobalTheory.SiegelSqrt.exists_sqrt

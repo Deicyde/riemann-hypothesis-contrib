@@ -115,9 +115,7 @@ theorem smooth_away_core
   let ψ : B →ₐ[O] C' :=
     IsLocalization.liftAlgHom (M := Submonoid.powers a) (S := B) (f := ψA) hunit1
   have hψ : ∀ x : A, ψ (algebraMap A B x) = ψA x := fun x => by
-    first
-    | exact IsLocalization.lift_eq (M := Submonoid.powers a) (S := B) _ x
-    | simp [ψ, IsLocalization.liftAlgHom]
+    first | exact IsLocalization.lift_eq (M := Submonoid.powers a) (S := B) _ x
   let xB : σ → B := fun i => algebraMap A B (Ideal.Quotient.mk I (MvPolynomial.X i))
   have hxB : ∏ i ∈ T, xB i = algebraMap O B ϖ := by
     have e
@@ -156,9 +154,7 @@ theorem smooth_away_core
   let χ : C' →ₐ[O] B :=
     IsLocalization.liftAlgHom (M := Submonoid.powers h) (S := C') (f := χC) hunit2
   have hχ : ∀ x : C, χ (algebraMap C C' x) = χC x := fun x => by
-    first
-    | exact IsLocalization.lift_eq (M := Submonoid.powers h) (S := C') _ x
-    | simp [χ, IsLocalization.liftAlgHom]
+    first | exact IsLocalization.lift_eq (M := Submonoid.powers h) (S := C') _ x
   have hχu : χ (algebraMap C C' h) * χ u = 1 := by rw [← map_mul, hu, map_one]
   rw [hχ, hχh] at hχu
   have h1 : χ.comp ψ = AlgHom.id O B := by

@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.QuadraticCharNegOne
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormCmPrimeInertPrimeSignStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IdxEqRelIndex
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormCmPrimeInertPrimeSign
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -175,7 +176,7 @@ theorem norm_neg
         → (∏ τ, embT D τ (t : D.host.E)).re < 0 := by
   intro D t P B ht0 ht hP hc hB
   obtain ⟨-, p, f, hp, -, hp2, -, hf, hN, hpd⟩ :=
-    (GlobalTheory.T.absNorm_cmPrime_inertPrime_sign D P hP).2.1 hc
+    (_root_.GlobalTheory.InertResidue.norm_prime D P hP).2.1 hc
   rw [prod_embT]
   generalize D.host = H at *
   haveI : Fact H.d.Prime := ⟨H.hyp.2.1⟩

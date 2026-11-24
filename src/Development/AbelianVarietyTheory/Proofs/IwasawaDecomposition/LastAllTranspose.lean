@@ -54,7 +54,6 @@ attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Ho
 
 noncomputable section
 
-
 namespace GlobalTheory.Mem.Col2.LowerTie
 
 section Gen

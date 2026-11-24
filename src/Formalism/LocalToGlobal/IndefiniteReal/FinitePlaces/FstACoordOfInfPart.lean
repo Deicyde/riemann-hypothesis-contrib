@@ -153,7 +153,6 @@ theorem fstA_coord_of_infPart
     conv_lhs => rw [← (Algebra.TensorProduct.basis (AF D.host.F) b).sum_repr z]
     simp only [Algebra.TensorProduct.basis_apply, c]
   have hinf : infPart D z = ∑ i, fstA D.host.F (c i) • bI i := by
-
     rw [hz', map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one, Algebra.TensorProduct.basis_apply,

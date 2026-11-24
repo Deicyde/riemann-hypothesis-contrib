@@ -295,7 +295,7 @@ theorem one_mem_level_subgroup : (1 : X.B.I.Gf) ∈ X.K2 := by
   have h1 : X.B.I.fmat 1 = 1 := by simp [AutInst.fmat]
   simp only [HidaSetting.K2, K2set, K2cong, InMod, Set.mem_setOf_eq, h1, sub_self,
     Matrix.zero_mulVec, Submodule.zero_mem, implies_true, and_true]
-  first | simp [AutInst.Kset] | exact (Formalism.UG.stabGL X.B.I.Lf).one_mem
+  first | simp [AutInst.Kset]
 
 def frameOrthogonalLattice : Set (VA X.B.I) :=
   {y | y ∈ X.B.I.Lf ∧ ∀ a, hA X.B.I (incl X.B.I (X.eR a)) y = 0 ∧ hA X.B.I (incl X.B.I (X.fR a)) y = 0 ∧

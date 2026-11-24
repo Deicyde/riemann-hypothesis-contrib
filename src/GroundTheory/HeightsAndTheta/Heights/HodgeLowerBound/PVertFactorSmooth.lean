@@ -68,12 +68,13 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem aeval_eq_eval_map (z : (Σ k, ι k) → ℂ) (g : MRing ι) :
-    aeval z g = eval z (map (Int.castRingHom ℂ) g) := by
+theorem aeval_eq_eval_map (z : (Σ k, ι k) → ℂ) (g : MRing ι)
+    : aeval z g = eval z (map (Int.castRingHom ℂ) g) := by
   rw [eval_map, aeval_def, algebraMap_int_eq]
 
-theorem contDiff_evalMap (t : MRing ι) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z : (Σ k, ι k) → ℂ => eval z (map (Int.castRingHom ℂ) t)) := by
+theorem contDiff_evalMap (t : MRing ι)
+    : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+      (fun z : (Σ k, ι k) → ℂ => eval z (map (Int.castRingHom ℂ) t)) := by
   induction t using MvPolynomial.induction_on with
   | C a => simpa using contDiff_const
   | add p q hp hq => simpa using hp.add hq
@@ -91,40 +92,43 @@ theorem mdeg_apply (d : (Σ k, ι k) →₀ ℕ) (k : K) : mdeg d k = ∑ i, d �
     simp [hk']
   · simp
 
-theorem isMultiHomog_iff (g : MRing ι) (d : K →₀ ℕ) :
-    IsMultiHomog g ⇑d ↔ ∀ e ∈ g.support, mdeg e = d :=
-  ⟨fun h e he => Finsupp.ext fun k => by rw [mdeg_apply]; exact h e he k,
-    fun h e he k => by rw [← mdeg_apply, h e he]⟩
+theorem isMultiHomog_iff (g : MRing ι) (d : K →₀ ℕ)
+    : IsMultiHomog g ⇑d ↔ ∀ e ∈ g.support, mdeg e = d := ⟨
+  fun h e he => Finsupp.ext fun k => by rw [mdeg_apply]; exact h e he k,
+  fun h e he k => by rw [← mdeg_apply, h e he]
+⟩
 
 section Cone
 
 variable {Ω : Type} [Field Ω]
 
-theorem mConeMap_monomial (y : (Σ k, ι k) → Ω) (e : (Σ k, ι k) →₀ ℕ) (a : ℤ) :
-    mConeMap y (monomial e a) = monomial (mdeg e) ((a : Ω) * e.prod fun p n => y p ^ n) := by
+theorem mConeMap_monomial (y : (Σ k, ι k) → Ω) (e : (Σ k, ι k) →₀ ℕ) (a : ℤ)
+    : mConeMap y (monomial e a) = monomial (mdeg e) ((a : Ω) * e.prod fun p n => y p ^ n) := by
   classical
   have hX : (e.prod fun p n => (X p.1 : MvPolynomial K Ω) ^ n) = monomial (mdeg e) 1 := by
     have h := rename_monomial (R := Ω) (Sigma.fst : (Σ k, ι k) → K) e 1
     rw [monomial_eq, C_1, one_mul, map_finsuppProd] at h
     simpa [rename_X, mdeg] using h
   simp only [mConeMap, aeval_monomial, mul_pow, Finsupp.prod_mul, ← map_pow, ← map_finsuppProd, hX]
-  rw [show ((algebraMap ℤ (MvPolynomial K Ω)) a) = C (a : Ω) by simp, ← mul_assoc, ← map_mul, C_mul_monomial,
-    mul_one]
+  rw [show ((algebraMap ℤ (MvPolynomial K Ω)) a) = C (a : Ω) by simp, ← mul_assoc, ← map_mul,
+    C_mul_monomial, mul_one]
 
-theorem mConeMap_eq_sum (y : (Σ k, ι k) → Ω) (u : MRing ι) :
-    mConeMap y u = ∑ e ∈ u.support, monomial (mdeg e) (((AddMonoidAlgebra.coeff u e : ℤ) : Ω) * e.prod fun p n => y p ^ n) := by
-  conv_lhs => rw [u.as_sum]
+theorem mConeMap_eq_sum (y : (Σ k, ι k) → Ω) (u : MRing ι)
+    : mConeMap y u
+      = ∑ e ∈ u.support, monomial (mdeg e) (((AddMonoidAlgebra.coeff u e : ℤ) : Ω) * e.prod fun p n => y p ^ n) :=
+  by
+    conv_lhs => rw [u.as_sum]
 
-  rw [map_sum]
-  simp only [mConeMap_monomial]
-
+    rw [map_sum]
+    simp only [mConeMap_monomial]
 
 open Classical in
 def comp (u : MRing ι) (m : K →₀ ℕ) : MRing ι :=
   ∑ e ∈ u.support.filter (fun e => mdeg e = m), monomial e (AddMonoidAlgebra.coeff u e)
 
-theorem coeff_comp (u : MRing ι) (m : K →₀ ℕ) (e : (Σ k, ι k) →₀ ℕ) :
-    AddMonoidAlgebra.coeff (comp u m) e = if mdeg e = m then AddMonoidAlgebra.coeff u e else 0 := by
+theorem coeff_comp (u : MRing ι) (m : K →₀ ℕ) (e : (Σ k, ι k) →₀ ℕ)
+    : AddMonoidAlgebra.coeff (comp u m) e
+      = if mdeg e = m then AddMonoidAlgebra.coeff u e else 0 := by
   classical
   rw [comp, coeff_sum]
   simp only [coeff_monomial]
@@ -139,16 +143,15 @@ theorem isMultiHomog_comp (u : MRing ι) (m : K →₀ ℕ) : IsMultiHomog (comp
   by_contra h
   exact he (by simp [h])
 
-theorem aeval_comp (y : (Σ k, ι k) → Ω) (u : MRing ι) (m : K →₀ ℕ) :
-    aeval y (comp u m) = AddMonoidAlgebra.coeff (mConeMap y u) m := by
+theorem aeval_comp (y : (Σ k, ι k) → Ω) (u : MRing ι) (m : K →₀ ℕ)
+    : aeval y (comp u m) = AddMonoidAlgebra.coeff (mConeMap y u) m := by
   classical
-
   rw [mConeMap_eq_sum, coeff_sum, comp, map_sum]
   simp only [coeff_monomial, aeval_monomial, algebraMap_int_eq, eq_intCast]
   rw [← Finset.sum_filter]
 
-theorem mConeMap_of_homog (y : (Σ k, ι k) → Ω) {g : MRing ι} {d : K →₀ ℕ} (hg : IsMultiHomog g ⇑d) :
-    mConeMap y g = monomial d (aeval y g) := by
+theorem mConeMap_of_homog (y : (Σ k, ι k) → Ω) {g : MRing ι} {d : K →₀ ℕ} (hg : IsMultiHomog g ⇑d)
+    : mConeMap y g = monomial d (aeval y g) := by
   classical
   rw [isMultiHomog_iff] at hg
   rw [mConeMap_eq_sum]
@@ -159,7 +162,8 @@ theorem mConeMap_of_homog (y : (Σ k, ι k) → Ω) {g : MRing ι} {d : K →₀
 
 end Cone
 
-theorem isMultiHomog_X_pow [DecidableEq K] (q : Σ k, ι k) (n : ℕ) : IsMultiHomog (X q ^ n : MRing ι) (Pi.single q.1 n) := by
+theorem isMultiHomog_X_pow [DecidableEq K] (q : Σ k, ι k) (n : ℕ)
+    : IsMultiHomog (X q ^ n : MRing ι) (Pi.single q.1 n) := by
   classical
   intro m hm k
   rw [support_X_pow, Finset.mem_singleton] at hm
@@ -174,11 +178,12 @@ theorem isMultiHomog_X_pow [DecidableEq K] (q : Σ k, ι k) (n : ℕ) : IsMultiH
     · simp
   · simp [Ne.symm hk]
 
-theorem isMultiHomog_prod_X_pow (c : (k : K) → ι k) (e : K → ℕ) :
-    IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ e k) e := by
+theorem isMultiHomog_prod_X_pow (c : (k : K) → ι k) (e : K → ℕ)
+    : IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ e k) e := by
   classical
-  have h : ∀ s : Finset K, IsMultiHomog (∏ k ∈ s, (X ⟨k, c k⟩ : MRing ι) ^ e k)
-      (∑ k ∈ s, Pi.single k (e k)) := by
+  have h
+      : ∀ s : Finset K,
+        IsMultiHomog (∏ k ∈ s, (X ⟨k, c k⟩ : MRing ι) ^ e k) (∑ k ∈ s, Pi.single k (e k)) := by
     intro s
     induction s using Finset.induction_on with
     | empty => simpa using isMultiHomog_one (ι := ι)
@@ -187,10 +192,10 @@ theorem isMultiHomog_prod_X_pow (c : (k : K) → ι k) (e : K → ℕ) :
       exact isMultiHomog_mul (isMultiHomog_X_pow _ _) ih
   simpa [Finset.univ_sum_single] using h Finset.univ
 
-theorem eval_torusSmul {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (c : K → ℂ)
-    (z : (Σ k, ι k) → ℂ) :
-    eval (torusSmul c z) (map (Int.castRingHom ℂ) g) =
-      (∏ k, c k ^ d k) * eval z (map (Int.castRingHom ℂ) g) := by
+theorem eval_torusSmul
+    {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (c : K → ℂ) (z : (Σ k, ι k) → ℂ)
+    : eval (torusSmul c z) (map (Int.castRingHom ℂ) g)
+      = (∏ k, c k ^ d k) * eval z (map (Int.castRingHom ℂ) g) := by
   classical
   rw [eval_eq', eval_eq', Finset.mul_sum,
     support_map_of_injective _ (Int.castRingHom ℂ).injective_int]
@@ -204,13 +209,17 @@ theorem eval_torusSmul {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (c
   simp only [torusSmul, mul_pow, Finset.prod_mul_distrib, hc]
   ring
 
-theorem torusSmul_mem_mcPts {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) {z : (Σ k, ι k) → ℂ}
-    (hz : z ∈ mcPts P) {c : K → ℂ} (hc : ∀ k, c k ≠ 0) : torusSmul c z ∈ mcPts P := by
+theorem torusSmul_mem_mcPts
+    {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
+    {c : K → ℂ} (hc : ∀ k, c k ≠ 0)
+    : torusSmul c z ∈ mcPts P := by
   obtain ⟨S, hS, hPS⟩ := hP
   refine ⟨fun k => ?_, fun g hg => ?_⟩
   · obtain ⟨i, hi⟩ := hz.1 k
     exact ⟨i, mul_ne_zero (hc k) hi⟩
-  · have hle : Ideal.span S ≤ RingHom.ker ((eval (torusSmul c z)).comp (map (Int.castRingHom ℂ))) := by
+  · have hle
+        : Ideal.span S ≤ RingHom.ker ((eval (torusSmul c z)).comp (map (Int.castRingHom ℂ))) := by
       rw [Ideal.span_le]
       intro s hs
       obtain ⟨a, ha⟩ := hS s hs
@@ -222,15 +231,19 @@ theorem torusSmul_mem_mcPts {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) {z
 
 section Component
 
-variable {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+variable
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
   {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
 
-theorem exists_forms (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ D.S)
-    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y)) :
-    ∃ (dG dH : K → ℕ) (G H : MRing ι), IsMultiHomog G dG ∧ IsMultiHomog H dH ∧
-      (fun k => (dG k : ℤ) - dH k) = D.vdeg p ∧
-      aeval D.y G * aeval D.y (D.vden p) = aeval D.y (D.vnum p) * aeval D.y H ∧
-      eval z (map (Int.castRingHom ℂ) H) ≠ 0 := by
+theorem exists_forms
+    (D : ComponentData II Ψ K ι Ω E)
+    {p : ℕ} (hp : p ∈ D.S)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y))
+    : ∃ (dG dH : K → ℕ) (G H : MRing ι),
+      IsMultiHomog G dG ∧ IsMultiHomog H dH ∧ (fun k => (dG k : ℤ) - dH k) = D.vdeg p
+        ∧ aeval D.y G * aeval D.y (D.vden p) = aeval D.y (D.vnum p) * aeval D.y H
+        ∧ eval z (map (Int.castRingHom ℂ) H) ≠ 0 := by
   classical
   have hV := D.vertical p hp
   obtain ⟨bf, bg, hf, hg, hb⟩ := hV.degrees
@@ -265,19 +278,31 @@ theorem exists_forms (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ D
   have key : AddMonoidAlgebra.coeff (mConeMap D.y (u * D.vnum p - v * D.vden p)) (m + bf') = 0 := by
     have h0 : mConeMap D.y (u * D.vnum p - v * D.vden p) = 0 := huv
     simp [h0]
-  rw [map_sub, map_mul, map_mul, mConeMap_of_homog _ hf', mConeMap_of_homog _ hg', MvPolynomial.coeff_sub,
-    coeff_mul_monomial, coeff_mul_monomial'] at key
-  have hfy : aeval D.y (D.vnum p) ≠ 0 := fun h => hV.num_not_mem (mem_mCoordIdeal_of_aeval_eq_zero _ hf h)
+  rw [map_sub, map_mul, map_mul, mConeMap_of_homog _ hf', mConeMap_of_homog _ hg',
+      MvPolynomial.coeff_sub, coeff_mul_monomial, coeff_mul_monomial']
+    at key
+  have hfy : aeval D.y (D.vnum p) ≠ 0 := fun h =>
+    hV.num_not_mem (mem_mCoordIdeal_of_aeval_eq_zero _ hf h)
   have hHz : eval z (map (Int.castRingHom ℂ) (comp u m)) ≠ 0 := by
     rwa [← aeval_eq_eval_map, aeval_comp]
   split_ifs at key with hle
-  · refine ⟨⇑(m + bf' - bg'), ⇑m, comp v (m + bf' - bg'), comp u m, isMultiHomog_comp _ _,
-      isMultiHomog_comp _ _, ?_, ?_, hHz⟩
+  · refine ⟨
+      ⇑(m + bf' - bg'),
+      ⇑m,
+      comp v (m + bf' - bg'),
+      comp u m,
+      isMultiHomog_comp _ _,
+      isMultiHomog_comp _ _,
+      ?_,
+      ?_,
+      hHz
+    ⟩
     · funext k
       rw [← hb]
       have := hle k
       simp only [bf', bg', Finsupp.coe_tsub, Finsupp.coe_add, Pi.sub_apply, Pi.add_apply,
-        Finsupp.coe_equivFunOnFinite_symm] at this ⊢
+          Finsupp.coe_equivFunOnFinite_symm]
+        at this ⊢
       omega
     · rw [aeval_comp, aeval_comp]
       linear_combination -key
@@ -286,14 +311,19 @@ theorem exists_forms (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ D
     have h0 : aeval D.y (comp u m) = 0 := by
       rw [aeval_comp]
       exact (mul_eq_zero.1 key).resolve_right hfy
-    exact hHz (eval_eq_zero_of_mem_mcPts hz (mem_mCoordIdeal_of_aeval_eq_zero _ (isMultiHomog_comp u m) h0))
+    exact hHz (eval_eq_zero_of_mem_mcPts hz
+      (mem_mCoordIdeal_of_aeval_eq_zero _ (isMultiHomog_comp u m) h0))
 
-theorem vertFactor_eq (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ D.S) {w : (Σ k, ι k) → ℂ}
-    (hw : w ∈ mcPts (mCoordIdeal D.y)) {dG dH : K → ℕ} {G H : MRing ι} (hG : IsMultiHomog G dG)
-    (hH : IsMultiHomog H dH) (hdeg : (fun k => (dG k : ℤ) - dH k) = D.vdeg p)
+theorem vertFactor_eq
+    (D : ComponentData II Ψ K ι Ω E)
+    {p : ℕ} (hp : p ∈ D.S)
+    {w : (Σ k, ι k) → ℂ} (hw : w ∈ mcPts (mCoordIdeal D.y))
+    {dG dH : K → ℕ} {G H : MRing ι} (hG : IsMultiHomog G dG) (hH : IsMultiHomog H dH)
+    (hdeg : (fun k => (dG k : ℤ) - dH k) = D.vdeg p)
     (hrel : aeval D.y G * aeval D.y (D.vden p) = aeval D.y (D.vnum p) * aeval D.y H)
-    (hHw : eval w (map (Int.castRingHom ℂ) H) ≠ 0) :
-    D.vertFactor p w = ‖eval w (map (Int.castRingHom ℂ) G) / eval w (map (Int.castRingHom ℂ) H)‖ := by
+    (hHw : eval w (map (Int.castRingHom ℂ) H) ≠ 0)
+    : D.vertFactor p w
+      = ‖eval w (map (Int.castRingHom ℂ) G) / eval w (map (Int.castRingHom ℂ) H)‖ := by
   classical
   have hc : ∃ c : (k : K) → ι k, ∀ k, w ⟨k, c k⟩ ≠ 0 :=
     ⟨fun k => (hw.1 k).choose, fun k => (hw.1 k).choose_spec⟩
@@ -309,7 +339,8 @@ theorem vertFactor_eq (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ 
     apply hwc k
     have hX := isMultiHomog_X_pow (ι := ι) ⟨k, c k⟩ 1
     rw [pow_one] at hX
-    have := eval_eq_zero_of_mem_mcPts hw (mem_mCoordIdeal_of_aeval_eq_zero D.y hX (by simpa using h))
+    have :=
+      eval_eq_zero_of_mem_mcPts hw (mem_mCoordIdeal_of_aeval_eq_zero D.y hX (by simpa using h))
     simpa using this
   have hHy : aeval D.y H ≠ 0 := fun h =>
     hHw (eval_eq_zero_of_mem_mcPts hw (mem_mCoordIdeal_of_aeval_eq_zero D.y hH h))
@@ -323,7 +354,9 @@ theorem vertFactor_eq (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ 
     rw [← zpow_natCast, ← zpow_natCast, Pi.neg_apply, ← zpow_add₀ (hyc k)]
     congr 1
     omega
-  have hZ : eval w (map (Int.castRingHom ℂ) Mn) * zMono w c b = eval w (map (Int.castRingHom ℂ) Mp) := by
+  have hZ
+      : eval w (map (Int.castRingHom ℂ) Mn) * zMono w c b
+        = eval w (map (Int.castRingHom ℂ) Mp) := by
     simp only [hMn, hMp, zMono, map_prod, map_pow, map_X, eval_X, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
     rw [← zpow_natCast, ← zpow_natCast, ← zpow_add₀ (hwc k)]
@@ -334,8 +367,17 @@ theorem vertFactor_eq (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ 
     exact Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hwc k)
   have hval : IsValueAt D.y (aeval D.y (D.vnum p) / aeval D.y (D.vden p) * chartMono D.y c (-b)) w
       (eval w (map (Int.castRingHom ℂ) (G * Mn)) / eval w (map (Int.castRingHom ℂ) (H * Mp))) := by
-    refine ⟨dG + fun k => (-b k).toNat, G * Mn, H * Mp, isMultiHomog_mul hG (isMultiHomog_prod_X_pow c _),
-      ?_, ?_, ?_, ?_, rfl⟩
+    refine ⟨
+      dG + fun k => (- b k).toNat,
+      G * Mn,
+      H * Mp,
+      isMultiHomog_mul hG (isMultiHomog_prod_X_pow c _),
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      rfl
+    ⟩
     · have h := isMultiHomog_mul hH (isMultiHomog_prod_X_pow c fun k => (b k).toNat)
       convert h using 1
       funext k
@@ -352,12 +394,12 @@ theorem vertFactor_eq (D : ComponentData II Ψ K ι Ω E) {p : ℕ} (hp : p ∈ 
       exact mul_ne_zero hHw hMpw
   rw [valAt_eq hw hval, ← norm_mul]
   congr 1
-  rw [map_mul, map_mul, map_mul, map_mul, div_mul_eq_mul_div, mul_assoc, hZ, mul_div_mul_right _ _ hMpw]
+  rw [map_mul, map_mul, map_mul, map_mul, div_mul_eq_mul_div, mul_assoc, hZ,
+    mul_div_mul_right _ _ hMpw]
 
 end Component
 
 end VertFactorSmooth
-
 
 open VertFactorSmooth in
 theorem VertFactorSmooth.proof (hPos : VertFactorPos.Statement) : VertFactorSmooth.Statement := by
@@ -367,7 +409,8 @@ theorem VertFactorSmooth.proof (hPos : VertFactorPos.Statement) : VertFactorSmoo
     have hcz := torusSmul_mem_mcPts D.arith.2.1.2.1 hz hc
     have hprod : ∀ d : K → ℕ, ∏ k, c k ^ d k ≠ 0 := fun d =>
       Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hc k)
-    rw [vertFactor_eq D hp hcz hG hH hdeg hrel (by rw [eval_torusSmul hH]; exact mul_ne_zero (hprod _) hHz),
+    rw [vertFactor_eq D hp hcz hG hH hdeg hrel
+        (by rw [eval_torusSmul hH]; exact mul_ne_zero (hprod _) hHz),
       vertFactor_eq D hp hz hG hH hdeg hrel hHz, eval_torusSmul hG, eval_torusSmul hH, ← hdeg,
       mul_div_mul_comm, norm_mul, norm_div, norm_prod, norm_prod, ← Finset.prod_div_distrib]
     congr 1
@@ -382,13 +425,20 @@ theorem VertFactorSmooth.proof (hPos : VertFactorPos.Statement) : VertFactorSmoo
       exact lt_irrefl _ hpos
     have hcG := contDiff_evalMap G
     have hcH := contDiff_evalMap H
-    refine ⟨{w | eval w (map (Int.castRingHom ℂ) H) ≠ 0 ∧ eval w (map (Int.castRingHom ℂ) G) ≠ 0}, ?_,
-      fun w => ‖eval w (map (Int.castRingHom ℂ) G) / eval w (map (Int.castRingHom ℂ) H)‖, ?_, ?_⟩
+    refine ⟨
+      {w | eval w (map (Int.castRingHom ℂ) H) ≠ 0 ∧ eval w (map (Int.castRingHom ℂ) G) ≠ 0},
+      ?_,
+      fun w => ‖eval w (map (Int.castRingHom ℂ) G) / eval w (map (Int.castRingHom ℂ) H)‖,
+      ?_,
+      ?_
+    ⟩
     · refine IsOpen.mem_nhds ?_ ⟨hHz, hGz⟩
-      exact (isOpen_ne_fun hcH.continuous continuous_const).inter (isOpen_ne_fun hcG.continuous continuous_const)
+      exact (isOpen_ne_fun hcH.continuous continuous_const).inter
+        (isOpen_ne_fun hcG.continuous continuous_const)
     · intro w hw
       have hd : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
-          (fun w => eval w (map (Int.castRingHom ℂ) G) * (eval w (map (Int.castRingHom ℂ) H))⁻¹) w :=
+          (fun w => eval w (map (Int.castRingHom ℂ) G) * (eval w (map (Int.castRingHom ℂ) H))⁻¹)
+          w :=
         hcG.contDiffAt.mul (hcH.contDiffAt.inv hw.1)
       simp only [← div_eq_mul_inv] at hd
       exact (hd.norm ℝ (div_ne_zero hw.2 hw.1)).contDiffWithinAt

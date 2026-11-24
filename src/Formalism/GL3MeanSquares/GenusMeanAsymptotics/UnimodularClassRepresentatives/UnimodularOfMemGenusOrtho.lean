@@ -60,10 +60,9 @@ theorem loc_gmap (g : V ≃ₗ[K] V) (p : Ideal (𝓞 K)) (L : Submodule (𝓞 K
   have hsm : ∀ (s : 𝓞 K) (v : V), g (s • v) = s • g v := fun s v => by
     rw [← algebraMap_smul K s v, ← algebraMap_smul K s (g v), map_smul]
   unfold Formalism.HermitianLatticesTheory.loc Formalism.HermitianLatticesTheory.gmap
-    Formalism.HermitianLatticesTheory.locS
   ext x
-  simp only [Submodule.mem_map, Submodule.mem_mk, AddSubmonoid.mem_mk, AddSubsemigroup.mem_mk,
-    Set.mem_setOf_eq, LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
+  simp only [Formalism.HermitianLatticesTheory.mem_locS, Submodule.mem_map,
+    LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
   constructor
   · rintro ⟨s, hs, y, hy, hyx⟩
     refine ⟨g.symm x, ⟨s, hs, ?_⟩, by simp⟩

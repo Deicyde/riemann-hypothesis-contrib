@@ -57,9 +57,6 @@ open GlobalTheory.RegSch (ikS projS Lvl)
 
 namespace PositivityTheory.Rg.Rsw.L.LFixTh
 
-
-
-
 open PositivityTheory.Rg.Rsw.L
 
 variable {D : D7} {n : ℕ}

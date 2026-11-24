@@ -56,8 +56,11 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open IsLocalRing
 
-theorem regVert_eq_of_le_height_one {A : Type*} [CommRing A] [IsDomain A] {Q P : Ideal A} [Q.IsPrime]
-    [P.IsPrime] (hQ : Q ≠ ⊥) (hQP : Q ≤ P) (hP : P.height = 1) : Q = P := by
+theorem regVert_eq_of_le_height_one
+    {A : Type*} [CommRing A] [IsDomain A]
+    {Q P : Ideal A} [Q.IsPrime] [P.IsPrime]
+    (hQ : Q ≠ ⊥) (hQP : Q ≤ P) (hP : P.height = 1)
+    : Q = P := by
   by_contra hne
   have hlt : Q < P := lt_of_le_of_ne hQP hne
   have hbot : (⊥ : Ideal A) < Q := bot_lt_iff_ne_bot.mpr hQ
@@ -66,42 +69,42 @@ theorem regVert_eq_of_le_height_one {A : Type*} [CommRing A] [IsDomain A] {Q P :
   haveI : Q.FiniteHeight := ⟨Or.inr hQfin⟩
   haveI : (⊥ : Ideal A).FiniteHeight := ⟨Or.inr (by simp)⟩
   have h1 : (⊥ : Ideal A).height + 1 ≤ Q.height := by
-    first
-    | exact ENat.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hbot)
-    | exact Order.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hbot)
+    first | exact Order.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hbot)
   have h2 : Q.height + 1 ≤ P.height := by
-    first
-    | exact ENat.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hlt)
-    | exact Order.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hlt)
+    first | exact Order.add_one_le_of_lt (Ideal.height_strict_mono_of_isPrime hlt)
   rw [hP] at h2
   have h3 : (2 : ℕ∞) ≤ 1 := by
-    calc (2 : ℕ∞) = 0 + 1 + 1 := by norm_num
+    calc
+      (2 : ℕ∞)
+        = 0 + 1 + 1 := by norm_num
       _ ≤ (⊥ : Ideal A).height + 1 + 1 := by gcongr; simp
       _ ≤ Q.height + 1 := by gcongr
       _ ≤ 1 := h2
   exact absurd h3 (by norm_num)
 
-theorem regVert_valuationRing {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [IsIntegrallyClosed A] (P : Ideal A) [P.IsPrime] (hP : P.height = 1) :
-    ValuationRing (Localization.AtPrime P) := by
+theorem regVert_valuationRing
+    {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    (P : Ideal A) [P.IsPrime]
+    (hP : P.height = 1)
+    : ValuationRing (Localization.AtPrime P) := by
   have hPne : P ≠ ⊥ := by
     rintro rfl
-    have h0 : (⊥ : Ideal A).height = 0 := by
-      first
-      | exact Ideal.height_bot
+    have h0 : (⊥ : Ideal A).height = 0 := by first | exact Ideal.height_bot
     rw [h0] at hP
     exact zero_ne_one hP
   haveI : IsNoetherianRing (Localization.AtPrime P) :=
     IsLocalization.isNoetherianRing P.primeCompl _ inferInstance
   have hinj : Function.Injective (algebraMap A (Localization.AtPrime P)) :=
     IsLocalization.injective _ P.primeCompl_le_nonZeroDivisors
-  have hmax : Ideal.map (algebraMap A (Localization.AtPrime P)) P =
-      IsLocalRing.maximalIdeal (Localization.AtPrime P) :=
+  have hmax
+      : Ideal.map (algebraMap A (Localization.AtPrime P)) P
+        = IsLocalRing.maximalIdeal (Localization.AtPrime P) :=
     Localization.AtPrime.map_eq_maximalIdeal
-  have hcm : Ideal.comap (algebraMap A (Localization.AtPrime P))
-      (IsLocalRing.maximalIdeal (Localization.AtPrime P)) = P := by
-    first
-    | exact Localization.AtPrime.under_maximalIdeal
+  have hcm
+      : Ideal.comap (algebraMap A (Localization.AtPrime P))
+          (IsLocalRing.maximalIdeal (Localization.AtPrime P))
+        = P := by
+    first | exact Localization.AtPrime.under_maximalIdeal
   have hmne : IsLocalRing.maximalIdeal (Localization.AtPrime P) ≠ ⊥ := by
     rw [← hmax]
     intro h
@@ -130,15 +133,29 @@ theorem regVert_valuationRing {A : Type*} [CommRing A] [IsDomain A] [IsNoetheria
     have heq := regVert_eq_of_le_height_one hcne hc hP
     rw [← IsLocalization.map_under P.primeCompl (Localization.AtPrime P) Q', heq, hmax]
   first
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 3).mpr (And.intro hic huniq)
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 4).mpr (And.intro hic huniq)
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 2).mpr (And.intro hic huniq)
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 5).mpr (And.intro hic huniq)
-  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _ (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 4).mpr (And.intro hic huniq))
-  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _ (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 5).mpr (And.intro hic huniq))
-  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _ (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 3).mpr (And.intro hic huniq))
-  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _ (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 6).mpr (And.intro hic huniq))
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 2 3).mpr (And.intro hic huniq)
-  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 2 4).mpr (And.intro hic huniq)
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 3).mpr
+      (And.intro hic huniq)
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 4).mpr
+      (And.intro hic huniq)
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 2).mpr
+      (And.intro hic huniq)
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 5).mpr
+      (And.intro hic huniq)
+  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _
+      (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 4).mpr
+        (And.intro hic huniq))
+  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _
+      (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 5).mpr
+        (And.intro hic huniq))
+  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _
+      (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 3).mpr
+        (And.intro hic huniq))
+  | exact @ValuationRing.of_isDiscreteValuationRing _ _ _
+      (((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 1 6).mpr
+        (And.intro hic huniq))
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 2 3).mpr
+      (And.intro hic huniq)
+  | exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime P) hnf).out 2 4).mpr
+      (And.intro hic huniq)
 
 end ReciprocityTheory.ChartRestriction.G.T0

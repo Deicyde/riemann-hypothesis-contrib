@@ -3,15 +3,22 @@ module
 public import Development.AbelianVarietyTheory.Definitions.RegularCharts.BaseNorm
 public import Formalism.LocalToGlobal.ProjectiveLattices.IntegrableOnIntegrand
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.LawsFieldsSeparately
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasseNormTheoremQuadraticExtensionStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CmModuliConsequenceOfAbelianSchemeLawsStatement
+public import Development.AbelianVarietyTheory.PublishedTheorems.Landherr₂.ExistsNormTensor
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasseNormTheoremQuadraticExtension
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CmModuliConsequenceOfAbelianSchemeLaws
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ArithmeticGroupCuspCentreLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFlagDomainModelsOfFamilyUniformisationStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFramedPointsAllNormalisationsFamilyUnifStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FamilyUniformisationIsComplexUniformisationStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FlagDomainModelsExponentsLevelMStatement
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRingStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RelabelEmbeddingsGoodBijectiveConjCompatStatement
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.NormConst
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFlagDomainModelsOfFamilyUniformisation
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFramedPointsAllNormalisationsFamilyUnif
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FamilyUniformisationIsComplexUniformisation
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FlagDomainModelsExponentsLevelM
+public import Formalism.LocalToGlobal.ProjectiveLattices.UnFree
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RelabelEmbeddingsGoodBijectiveConjCompat
+import Formalism.LocalToGlobal.ProjectiveLattices.AllTest
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -49,7 +56,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.NormConst
 
 @[expose] public section
 
@@ -96,8 +102,8 @@ theorem exists_unf_hasPrinc
                   (U.un k x))
               ∧ ∀ ρ, FJ.LatZ U.X ρ ∧ (l.A = 1 → FJ.ExpoMatch U.X 1 ρ l.M) := by
   intro E _ _ _ H Dw l Xo c σ r ξ₀ Gm φ hpq hσ hξ hneg hφ
-  have hN : N1c := GlobalTheory.T.cmModuli_consequence_of_abelianSchemeLaws
-  have hH := GlobalTheory.T.hasse_norm_theorem_quadratic_extension
+  have hN : N1c := _root_.GlobalTheory.closing_of_abelianSchemeLaws
+  have hH := _root_.GlobalTheory.QNorm.hasseNormSt
   have hB : Out.SecBaseChangeSt := GlobalTheory.lawsFieldsSeparately.2.1
   have hT : Out.SecTwistSt :=
     GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
@@ -107,24 +113,20 @@ theorem exists_unf_hasPrinc
   obtain ⟨F⟩ :=
     hN E H Dw l Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) _
       (fun j => relab c σ (e j).1)
-      hpq hσ
-      ((GlobalTheory.T.relabelEmbeddings_good_bijective_conj_compat E H l c σ hσ).2.2.2 Dw _ e)
+      hpq hσ ((_root_.GlobalTheory.Relab.relab_good E H l c σ hσ).2.2.2 Dw _ e)
   obtain ⟨M, hM, hX, hG⟩ :=
-    GlobalTheory.T.exists_flagDomainModels_of_familyUniformisation hH E H Dw l Xo _ _ _ F r ξ₀ Gm φ
-      hξ hneg hφ
+    _root_.GlobalTheory.ModelsExist.exists_modelsOf hH E H Dw l Xo _ _ _ F r ξ₀ Gm φ hξ hneg hφ
   obtain ⟨un, hun⟩ :=
-    GlobalTheory.T.exists_framedPoints_all_normalisations_familyUnif hB hT E H Dw l Xo c σ _ e F r M
-      hσ hM hX
+    _root_.GlobalTheory.FrameUnif.exists_framesOK hB hT E H Dw l Xo c σ _ e F r M hσ hM hX
   have hred : IsReduced (CAt σ) := inferInstanceAs (IsReduced ℂ)
   refine ⟨
     unfOf e F M un,
-    GlobalTheory.T.familyUniformisation_isComplexUniformisation hB E H Dw l Xo c σ _ e F r M un hσ
-      hM hX hun,
+    _root_.GlobalTheory.FrameUnif.isUnf_built hB E H Dw l Xo c σ _ e F r M un hσ hM hX hun,
     fun k γ hγ h => ?_,
     ⟨⟨0, F.n_pos⟩⟩,
     hM.chi,
     hG,
-    fun k x => GlobalTheory.T.framedPoint_reduced_from_testRing hB E H Dw l Xo c (CAt σ) _,
+    fun k x => _root_.GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw l Xo c (CAt σ) _,
     fun ρ => ⟨GlobalTheory.T.arithmeticGroup_cuspCentre_lattice E r ρ _ _, fun hA => ?_⟩
   ⟩
   · exact (hM.gam k γ).2 ⟨
@@ -132,6 +134,6 @@ theorem exists_unf_hasPrinc
       fun a _ => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_left _ _) h a,
       fun a => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_right _ _) h a
     ⟩
-  · exact GlobalTheory.T.flagDomainModels_exponents_levelM E H Dw l Xo _ _ _ F r M ρ hM hA
+  · exact _root_.GlobalTheory.ExpoModels.expoMatch_models E H Dw l Xo _ _ _ F r M ρ hM hA
 
 end GlobalTheory.FrameUnif

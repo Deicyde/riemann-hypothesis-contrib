@@ -87,11 +87,7 @@ theorem thetaU_one
 theorem TensStd_of (hZ : ShapeToZ) (hT : TransIntC) : TensStd := by
   intro a₀ b₀ c₀ dK ha hdK lam hlam hok n _ _ h Λ hsd hst θ hθ p _ hp ι hW g₁ ε hiso hnd hrel hε
     htens t N hN hpN ht
-  have hω : (cmL a₀ b₀ dK ha hdK lam hlam).ω₁ = lam * a₀ := by
-    first
-    | rfl
-    | simp [cmL, Formalism.L2.Th1.F.scalePair, Formalism.L2.Th1.F.cmPair]
-    | (simp [cmL, Formalism.L2.Th1.F.scalePair, Formalism.L2.Th1.F.cmPair]; ring)
+  have hω : (cmL a₀ b₀ dK ha hdK lam hlam).ω₁ = lam * a₀ := by first | rfl
   have hmem : lam * (a₀ : ℂ) ∈ (cmL a₀ b₀ dK ha hdK lam hlam).lattice :=
     hω ▸ PeriodPair.ω₁_mem_lattice _
   have hnot : lam * (a₀ : ℂ) / 2 ∉ (cmL a₀ b₀ dK ha hdK lam hlam).lattice :=

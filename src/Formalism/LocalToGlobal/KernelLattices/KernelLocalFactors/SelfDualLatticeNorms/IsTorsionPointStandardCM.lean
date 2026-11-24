@@ -60,7 +60,7 @@ variable {L L' : PeriodPair} {ω₀ ω₀' : ℂ}
 theorem thetaNull_congr_lattice
     (h : L.lattice = L'.lattice) (hω : (ω₀ - ω₀') / 2 ∈ L'.lattice) (hn : ω₀' / 2 ∉ L'.lattice)
     : Formalism.L2.Th1.F.th0 L (ω₀ / 2) = Formalism.L2.Th1.F.th0 L' (ω₀' / 2) := by
-  obtain ⟨-, -, -, hA, -, hs, -⟩ := Formalism.L2.Th1.F.latticeOnly L L' h
+  obtain ⟨-, -, -, hA, -, hs, -⟩ := _root_.Formalism.L2.Th1.F.lattice_only L L' h
   have e1 : Formalism.L2.Th1.F.th0 L (ω₀ / 2) = Formalism.L2.Th1.F.th0 L' (ω₀ / 2) := by
     funext z
     simp only [Formalism.L2.Th1.F.th0, Formalism.L2.Th1.F.opU, Formalism.L2.Th1.F.herm, hA, hs]
@@ -74,12 +74,12 @@ theorem thetaNull_congr_lattice
 theorem stdH_congr (h : L.lattice = L'.lattice) (n : Type) [Fintype n] [DecidableEq n]
     : Formalism.L2.Th1.H.stdH L n = Formalism.L2.Th1.H.stdH L' n := by
   unfold Formalism.L2.Th1.H.stdH
-  rw [(Formalism.L2.Th1.F.latticeOnly L L' h).2.2.2.1]
+  rw [(_root_.Formalism.L2.Th1.F.lattice_only L L' h).2.2.2.1]
 
 theorem hOne_congr (h : L.lattice = L'.lattice) (n : Type) [Fintype n] [DecidableEq n]
     : hOne L n = hOne L' n := by
   unfold hOne
-  rw [(Formalism.L2.Th1.F.latticeOnly L L' h).2.2.2.1]
+  rw [(_root_.Formalism.L2.Th1.F.lattice_only L L' h).2.2.2.1]
 
 theorem thM_congr
     (h : L.lattice = L'.lattice) (hω : (ω₀ - ω₀') / 2 ∈ L'.lattice) (hn : ω₀' / 2 ∉ L'.lattice)

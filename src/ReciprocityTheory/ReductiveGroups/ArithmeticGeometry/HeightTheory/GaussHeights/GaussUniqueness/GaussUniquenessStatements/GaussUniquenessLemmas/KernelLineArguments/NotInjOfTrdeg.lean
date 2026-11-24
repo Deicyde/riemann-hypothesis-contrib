@@ -60,9 +60,7 @@ theorem not_inj_of_trdeg
   intro hinj
   have hai : AlgebraicIndependent F (imgR (D := D) j0 ρ) := hinj
   have h1 := hai.cardinalMk_le_trdeg
-  first
-  | rw [← Algebra.trdeg_add_eq F (IntermediateField.adjoin F S)] at h1
-  | rw [← trdeg_add_eq F (IntermediateField.adjoin F S)] at h1
+  first | rw [← trdeg_add_eq F (IntermediateField.adjoin F S)] at h1
   rw [htr, MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id] at h1
   have hT : Fintype.card (TVar D N) = (D + 1) * (N + 1) := by simp [TVar]
   have hS : Fintype.card (SVar D N) = 1 + (D + 1) * N := by simp [SVar]

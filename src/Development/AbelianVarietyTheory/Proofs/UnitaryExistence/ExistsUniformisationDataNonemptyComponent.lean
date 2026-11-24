@@ -52,7 +52,9 @@ import Std.Tactic.BVDecide.Normalize.Prop
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj
 
 namespace GlobalTheory
 
@@ -62,13 +64,12 @@ open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem herm_std (x y : Fin r → E) :
-    herm (1 : Matrix (Fin r) (Fin r) E) x y = ∑ a, x a * cc (y a) := by
+theorem herm_std (x y : Fin r → E)
+    : herm (1 : Matrix (Fin r) (Fin r) E) x y = ∑ a, x a * cc (y a) := by
   simp [herm, Matrix.one_apply]
 
-theorem emb_herm_self (φ : E →+* ℂ) (x : Fin r → E) :
-    φ (herm (1 : Matrix (Fin r) (Fin r) E) x x) = ((∑ a, ‖φ (x a)‖ ^ 2 : ℝ) : ℂ) := by
-
+theorem emb_herm_self (φ : E →+* ℂ) (x : Fin r → E)
+    : φ (herm (1 : Matrix (Fin r) (Fin r) E) x x) = ((∑ a, ‖φ (x a)‖ ^ 2 : ℝ) : ℂ) := by
   rw [herm_std, map_sum, Complex.ofReal_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_mul, emb_cc, Complex.mul_conj, Complex.normSq_eq_norm_sq]
@@ -92,15 +93,17 @@ theorem single_mem_stdLat (b : Fin r) : (Pi.single b 1 : Fin r → E) ∈ stdLat
   · subst h; simpa using isIntegral_one
   · simpa [h] using isIntegral_zero
 
-theorem stab_finite :
-    {γ : GL (Fin r) E | IsUStab (1 : Matrix (Fin r) (Fin r) E) (stdLat E r) γ}.Finite := by
+theorem stab_finite
+    : {γ : GL (Fin r) E | IsUStab (1 : Matrix (Fin r) (Fin r) E) (stdLat E r) γ}.Finite := by
   have hfin := NumberField.Embeddings.finite_of_norm_le (K := E) (A := ℂ) 1
   have hpi := Set.Finite.pi' (fun _ : Fin r => Set.Finite.pi' (fun _ : Fin r => hfin))
   refine Set.Finite.of_finite_image (hpi.subset ?_) ?_
     (f := fun γ : GL (Fin r) E => fun a b => (γ : Matrix (Fin r) (Fin r) E) a b)
   · rintro _ ⟨γ, ⟨hh, hl⟩, rfl⟩ a b
-    have hv : ∀ i, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) (Pi.single b 1) i =
-        (γ : Matrix (Fin r) (Fin r) E) i b := by
+    have hv
+        : ∀ i,
+          Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) (Pi.single b 1) i
+            = (γ : Matrix (Fin r) (Fin r) E) i b := by
       intro i; simp
     refine ⟨?_, fun φ => ?_⟩
     · have := (mem_stdLat _).1 ((hl _).1 (single_mem_stdLat b)) a
@@ -117,16 +120,18 @@ theorem stab_finite :
       simp only [hv] at h2
       have h4 : ‖φ ((γ : Matrix (Fin r) (Fin r) E) a b)‖ ^ 2 ≤ 1 := by
         rw [← h2]
-        exact Finset.single_le_sum (f := fun i => ‖φ ((γ : Matrix (Fin r) (Fin r) E) i b)‖ ^ 2)
-          (fun i _ => sq_nonneg _) (Finset.mem_univ a)
+        exact Finset.single_le_sum
+          (f := fun i => ‖φ ((γ : Matrix (Fin r) (Fin r) E) i b)‖ ^ 2)
+          (fun i _ => sq_nonneg _)
+          (Finset.mem_univ a)
       nlinarith [norm_nonneg (φ ((γ : Matrix (Fin r) (Fin r) E) a b))]
   · intro γ _ δ _ h
     apply Units.ext
     ext a b
     exact congrFun (congrFun h a) b
 
-theorem eq_zero_of_herm_self {x : Fin r → E}
-    (h : herm (1 : Matrix (Fin r) (Fin r) E) x x = 0) : x = 0 := by
+theorem eq_zero_of_herm_self {x : Fin r → E} (h : herm (1 : Matrix (Fin r) (Fin r) E) x x = 0)
+    : x = 0 := by
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h1 := emb_herm_self φ x
   rw [h, map_zero] at h1
@@ -136,12 +141,12 @@ theorem eq_zero_of_herm_self {x : Fin r → E}
   have h4 : φ (x a) = 0 := by simpa using h3
   exact (map_eq_zero_iff φ φ.injective).1 h4
 
-theorem nonempty_data (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) :
-    Nonempty (FD.Data E r) := by
+theorem nonempty_data (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+    : Nonempty (FD.Data E r) := by
   classical
   let X : FD.Data E 1 := inhab
-  exact ⟨
-  { Ψ := X.Ψ
+  exact ⟨{
+    Ψ := X.Ψ
     cmType := X.cmType
     Gm := 1
     Gm_herm := by
@@ -184,8 +189,10 @@ theorem nonempty_data (E : Type) [Field E] [NumberField E] [IsCMField E] (r : �
       rw [Subgroup.mem_bot] at hγ
       subst hγ
       simp [IsUStab]
-    Γ_index := ⟨(stab_finite (E := E) (r := r)).toFinset, fun γ hγ =>
-      ⟨γ, (Set.Finite.mem_toFinset _).2 hγ, by simp⟩⟩
+    Γ_index := ⟨
+      (stab_finite (E := E) (r := r)).toFinset,
+      fun γ hγ => ⟨γ, (Set.Finite.mem_toFinset _).2 hγ, by simp⟩
+    ⟩
     Γ_free := fun γ hγ _ _ _ _ _ => Subgroup.mem_bot.mp hγ
     χ := fun _ _ => 1
     χ_mul := by intros; simp
@@ -204,15 +211,22 @@ theorem nonempty_data (E : Type) [Field E] [NumberField E] [IsCMField E] (r : �
       have hξ := eq_zero_of_herm_self hiso
       refine ⟨1, Subgroup.one_mem _, ?_⟩
       ext a b
-      simp [transvMat, hξ, Matrix.one_apply] }⟩
+      simp [transvMat, hξ, Matrix.one_apply]
+  }⟩
 
 end DefiniteData
 
-theorem exists_unf_nonempty_comp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), 1 ≤ Dw.p + Dw.q → ∀ σ : c.F →+* ℂ, ∃ U : Formalism.L2.PjFree.Unf Xo c σ (Dw.p + Dw.q), Nonempty U.Comp := by
+theorem exists_unf_nonempty_comp
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      1 ≤ Dw.p + Dw.q
+        → ∀ σ : c.F →+* ℂ, ∃ U : Formalism.L2.PjFree.Unf Xo c σ (Dw.p + Dw.q), Nonempty U.Comp := by
   intro E _ _ _ H Dw l Xo c h σ
   obtain ⟨X⟩ := DefiniteData.nonempty_data E (Dw.p + Dw.q)
-  obtain ⟨y⟩ := GlobalTheory.nonempty_frPt_complex GlobalTheory.closing_of_abelianSchemeLaws
-    GlobalTheory.firstFiveLaws.2.1.secTwist E H Dw l Xo c h σ
+  obtain ⟨y⟩ :=
+    GlobalTheory.nonempty_frPt_complex GlobalTheory.closing_of_abelianSchemeLaws
+      GlobalTheory.firstFiveLaws.2.1.secTwist E H Dw l Xo c h σ
   exact ⟨{ Comp := Unit, X := fun _ => X, un := fun _ _ => y }, ⟨()⟩⟩
 
 end GlobalTheory

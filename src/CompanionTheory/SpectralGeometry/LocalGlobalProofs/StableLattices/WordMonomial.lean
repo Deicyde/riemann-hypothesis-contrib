@@ -192,7 +192,7 @@ theorem cover : Koszul → Verma → Cover := by
     · intro a b c d
       apply TensorProduct.ext'
       intro v f
-      simp [Module.End.mul_apply]
+      simp
   let cc : P →ₗ[ℂ] ℂ := (MvPolynomial.lcoeff ℂ (0 : NC ε →₀ ℕ))
   have hcc : ∀ f : P, cc f = constantCoeff f := fun f => rfl
   refine ⟨

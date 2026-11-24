@@ -1,6 +1,8 @@
 module
 
-public import GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator
+public import Formalism.RealPlaceAnalysis.StatementE
+public import Mathlib.Analysis.Calculus.FDeriv.Defs
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -19,8 +21,6 @@ import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.WittVector.IsPoly
-import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -40,11 +40,80 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.FormalDegreeBessel.StatementWR
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreCut
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGaugeCut
+import Formalism.HermitianCurvature.StatementI
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
-import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator, GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub
+
+-- ===== clump member: GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator =====
+-- clump-header: {"m": "GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator", "h": "module\n\npublic import Formalism.RealPlaceAnalysis.StatementE\npublic import Mathlib.Analysis.Calculus.FDeriv.Defs\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\nimport Formalism.FormalDegreeBessel.StatementWR\nimport Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreCut\nimport Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGaugeCut\nimport Formalism.HermitianCurvature.StatementI\npublic import Mathlib.LinearAlgebra.FiniteDimensional.Defs\n\n"}
+section -- clump:auto
+@[expose] public section
+
+set_option maxSynthPendingDepth 1
+
+open Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.P.CutMP.Gauge Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
+
+namespace GroundTheory.BlockD.FourierDecayAlt.GaugeExists
+
+noncomputable section
+
+def dZv {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (φ : ℂ → V) (ζ : ℂ) : V :=
+  (1 / 2 : ℂ) • (fderiv ℝ φ ζ 1 - Complex.I • fderiv ℝ φ ζ Complex.I)
+
+section ops
+
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+
+end ops
+
+section sub
+
+variable
+  {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+
+end sub
+
+section frame
+
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+
+end frame
+
+def QdetSub : Prop :=
+  ∀ (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ) (Eo : Fin n → Fin n → A),
+    1 ≤ n
+      → ∃ C : ℕ → A, ∀ u : ℂ,
+        qdet Eo u
+          = algebraMap ℂ A (u ^ n)
+            + algebraMap ℂ A (u ^ (n - 1))
+              * (∑ i, Eo i i - algebraMap ℂ A (((n : ℂ) * ((n : ℂ) - 1)) / 2))
+            + ∑ j ∈ Finset.range (n - 1), algebraMap ℂ A (u ^ j) * C j
+
+end
+
+end GroundTheory.BlockD.FourierDecayAlt.GaugeExists
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator =====
+
+-- ===== clump member: GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub =====
+-- clump-header: {"m": "GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub", "h": "module\n\npublic import GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.RotationOfDiagonalGenerator\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\n\n"}
+section -- clump:auto
 @[expose] public section
 
 set_option maxSynthPendingDepth 1
@@ -71,8 +140,8 @@ def evU (u : ℂ) : A[X] →+* A :=
 
 theorem evU_apply (u : ℂ) (p : A[X]) : evU u p = eval₂ (RingHom.id A) (algebraMap ℂ A u) p := rfl
 
-theorem evU_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (k : ℕ) (a b : Fin n) :
-    evU u (tmPoly E k a b) = Tm E (u - (k : ℂ)) a b := by
+theorem evU_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (k : ℕ) (a b : Fin n)
+    : evU u (tmPoly E k a b) = Tm E (u - (k : ℂ)) a b := by
   unfold tmPoly Tm
   split_ifs <;> simp [evU_apply, map_sub]
 
@@ -89,23 +158,23 @@ theorem evU_qdetPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) : evU u (qd
     funext k
     simp [Function.comp, evU_tmPoly]
 
-theorem natDegree_tmPoly_le {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a b : Fin n) :
-    (tmPoly E k a b).natDegree ≤ if a = b then 1 else 0 := by
+theorem natDegree_tmPoly_le {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a b : Fin n)
+    : (tmPoly E k a b).natDegree ≤ if a = b then 1 else 0 := by
   unfold tmPoly
   split_ifs with h
   · refine (natDegree_add_le _ _).trans ?_
     refine max_le ((natDegree_sub_le _ _).trans (max_le natDegree_X_le ?_)) ?_ <;> simp
   · simp
 
-theorem natDegree_prod_le {n : ℕ} (E : Fin n → Fin n → A) (σ : Equiv.Perm (Fin n)) :
-    (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree ≤
-      ∑ k : Fin n, if σ k = k then 1 else 0 := by
+theorem natDegree_prod_le {n : ℕ} (E : Fin n → Fin n → A) (σ : Equiv.Perm (Fin n))
+    : (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree
+      ≤ ∑ k : Fin n, if σ k = k then 1 else 0 := by
   refine (natDegree_list_prod_le _).trans ?_
   rw [List.map_ofFn, List.sum_ofFn]
   exact Finset.sum_le_sum fun k _ => natDegree_tmPoly_le E k (σ k) k
 
-theorem fixed_add_support {n : ℕ} (σ : Equiv.Perm (Fin n)) :
-    (∑ k : Fin n, if σ k = k then 1 else 0) + σ.support.card = n := by
+theorem fixed_add_support {n : ℕ} (σ : Equiv.Perm (Fin n))
+    : (∑ k : Fin n, if σ k = k then 1 else 0) + σ.support.card = n := by
   have h : σ.support.card = ∑ k : Fin n, if σ k = k then 0 else 1 := by
     rw [Finset.sum_ite, Finset.sum_const_zero, zero_add, Finset.sum_const, smul_eq_mul, mul_one]
     congr 1
@@ -113,19 +182,18 @@ theorem fixed_add_support {n : ℕ} (σ : Equiv.Perm (Fin n)) :
   simp only [apply_ite₂]
   simp
 
-theorem natDegree_prod_ne_one {n : ℕ} (E : Fin n → Fin n → A) {σ : Equiv.Perm (Fin n)} (hσ : σ ≠ 1) :
-    (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree + 2 ≤ n := by
+theorem natDegree_prod_ne_one {n : ℕ} (E : Fin n → Fin n → A) {σ : Equiv.Perm (Fin n)} (hσ : σ ≠ 1)
+    : (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree + 2 ≤ n := by
   have h1 := natDegree_prod_le E σ
   have h2 := fixed_add_support σ
   have h3 := Equiv.Perm.two_le_card_support_of_ne_one hσ
   omega
 
-
 omit [Algebra ℂ A] in
-theorem prod_linear (m : ℕ) (c : Fin m → A) :
-    (List.ofFn fun k : Fin m => X + C (c k)).prod.natDegree ≤ m ∧
-      (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff m = 1 ∧
-      ∀ j, j + 1 = m → (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff j = ∑ k, c k := by
+theorem prod_linear (m : ℕ) (c : Fin m → A)
+    : (List.ofFn fun k : Fin m => X + C (c k)).prod.natDegree ≤ m
+      ∧ (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff m = 1
+      ∧ ∀ j, j + 1 = m → (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff j = ∑ k, c k := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -149,8 +217,8 @@ theorem prod_linear (m : ℕ) (c : Fin m → A) :
       | zero => simp [P]
       | succ i => rw [coeff_mul_X, h3 i rfl]
 
-theorem tmPoly_diag {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a : Fin n) :
-    tmPoly E k a a = X + C (E a a - algebraMap ℂ A (k : ℂ)) := by
+theorem tmPoly_diag {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a : Fin n)
+    : tmPoly E k a a = X + C (E a a - algebraMap ℂ A (k : ℂ)) := by
   unfold tmPoly
   simp only [if_true, map_sub]
   abel
@@ -172,10 +240,12 @@ theorem natDegree_qdetPoly_le {n : ℕ} (E : Fin n → Fin n → A) : (qdetPoly 
   have := fixed_add_support σ
   omega
 
-theorem coeff_qdetPoly_top {n : ℕ} (E : Fin n → Fin n → A) (j : ℕ) (hj : n ≤ j + 1) :
-    (qdetPoly E).coeff j = (List.ofFn fun k : Fin n => X + C (E k k - algebraMap ℂ A ((k : ℕ) : ℂ))).prod.coeff j := by
+theorem coeff_qdetPoly_top {n : ℕ} (E : Fin n → Fin n → A) (j : ℕ) (hj : n ≤ j + 1)
+    : (qdetPoly E).coeff j
+      = (List.ofFn fun k : Fin n => X + C (E k k - algebraMap ℂ A ((k : ℕ) : ℂ))).prod.coeff j := by
   unfold qdetPoly
-  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (1 : Equiv.Perm (Fin n))), coeff_add, finsetSum_coeff]
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (1 : Equiv.Perm (Fin n))), coeff_add,
+    finsetSum_coeff]
   rw [Finset.sum_eq_zero]
   · simp [tmPoly_diag]
   · intro σ hσ
@@ -189,10 +259,11 @@ theorem quantum_determinant_leading_terms : QdetSub := by
   intro A _ _ n Eo hn
   obtain ⟨-, htop, hsub⟩ := prod_linear n fun k => Eo k k - algebraMap ℂ A ((k : ℕ) : ℂ)
   have hN : (qdetPoly Eo).coeff n = 1 := by rw [coeff_qdetPoly_top Eo n (by omega), htop]
-  have hN1 : (qdetPoly Eo).coeff (n - 1) = ∑ i, Eo i i - algebraMap ℂ A (((n : ℂ) * ((n : ℂ) - 1)) / 2) := by
-
+  have hN1
+      : (qdetPoly Eo).coeff (n - 1)
+        = ∑ i, Eo i i - algebraMap ℂ A (((n : ℂ) * ((n : ℂ) - 1)) / 2) := by
     rw [coeff_qdetPoly_top Eo (n - 1) (by omega), hsub (n - 1) (by omega), Finset.sum_sub_distrib,
-    ← map_sum, sum_fin_cast]
+      ← map_sum, sum_fin_cast]
   refine ⟨fun j => (qdetPoly Eo).coeff j, fun u => ?_⟩
   have hdeg : (qdetPoly Eo).natDegree < n - 1 + 1 + 1 := by
     have := natDegree_qdetPoly_le Eo
@@ -207,3 +278,6 @@ theorem quantum_determinant_leading_terms : QdetSub := by
 end
 
 end GroundTheory.BlockD.FourierDecayAlt.GaugeExists
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub =====

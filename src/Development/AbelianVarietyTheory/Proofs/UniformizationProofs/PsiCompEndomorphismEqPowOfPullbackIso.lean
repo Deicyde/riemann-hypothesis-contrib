@@ -224,7 +224,7 @@ theorem kappa_add
     rw [MonObj.mul_comp, Category.id_comp, cPoint_nsmul, hc', mul_comm (𝟙 D.P.A) (cP D D.P.A y),
       mul_comm (𝟙 D.P.A) (cP D D.P.A y ^ ν)]
     apply Additive.ofMul.injective
-    simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
+    simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_pow]
     module
   · have C : IsCub (th D (T := 𝟙_ (Over (Spec (CommRingCat.of R)))) w I) := isCub_cubV D.cub hI
     obtain ⟨k₁, k₂⟩ := key (1 : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ D.P.A) w I hI
@@ -530,8 +530,8 @@ theorem exists_pull_val
       (lift_snd _ _) _ _ α hα t
   obtain ⟨s', ht', -⟩ := (hB ν hν w₀ hw₀.1).1 t'
   have H :=
-    (T.expansion_pullback_section_endomorphism hL R I hI D A G hG U F E hE ν 1 le_rfl hν ⟨β, hβ⟩).2
-      w₀ ρ hw₀ _ _ (lift_snd _ _) (lift_fst _ _) rfl α hα hαn t t' s s' ht ht' htt κ hκ
+    (_root_.GlobalTheory.UT.PullExp.main hL R I hI D A G hG U F E hE ν 1 le_rfl hν ⟨β, hβ⟩).2 w₀ ρ
+      hw₀ _ _ (lift_snd _ _) (lift_fst _ _) rfl α hα hαn t t' s s' ht ht' htt κ hκ
   refine ⟨s', fun χ b z J hJ => ?_⟩
   obtain ⟨g, rfl⟩ := (gt_onto_divisible_kernel hL R I hI D F).1 b
   obtain ⟨g', hg', -⟩ := (T.uniformizationEndomorphism_calculus hL R I hI D A G hG U F E E E).1 g

@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.keyData_descend_countable_subrings
             → ∃ (R₀ : Subring R) (_ : IsLocalRing R₀) (_ : IsPrincipalIdealRing R₀) (x₀ : KeyIn R₀),
               Countable R₀ ∧ s ⊆ R₀ ∧ IsLocalHom R₀.subtype ∧ KeyPB x x₀ R₀.subtype)
         ∧ KeyDesc := by
-  first
-  | exact @GlobalTheory.KeyCountableDescent.keyIn_descends_countable
-  | exact GlobalTheory.KeyCountableDescent.keyIn_descends_countable
-  | (intros; apply GlobalTheory.KeyCountableDescent.keyIn_descends_countable <;> assumption)
+  first | exact @GlobalTheory.KeyCountableDescent.keyIn_descends_countable

@@ -342,8 +342,8 @@ theorem cwCont_continuousOn_hasDerivAt
                         (Bm (PI.UpqRep.dsig (k := k) (r := r) R.σ X v)) 0 := by
   intro hK k r ε mu R hR V _ _ Bm ha hs hB v hv
   have hD : DerFacts R := fun X hX => ⟨
-    (GlobalTheory.T.derivedAction_discreteSeries_properties hK k r ε mu R hR X hX).1,
-    (GlobalTheory.T.derivedAction_discreteSeries_properties hK k r ε mu R hR X hX).2.2.2.2
+    (_root_.Gp91.GlobalTheory.DerivedAction.derived_action hK k r ε mu R hR X hX).1,
+    (_root_.Gp91.GlobalTheory.DerivedAction.derived_action hK k r ε mu R hR X hX).2.2.2.2
   ⟩
   have hsm := PI.UnitaryGroupMassFormula.CapelliEig.smooth_right_action k r ε mu R.H R.σ hR.2 v hv
   have h0 : (0 : R.H) ∈ R.sm := R.smSub.zero_mem

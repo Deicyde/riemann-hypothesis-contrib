@@ -57,8 +57,6 @@ open scoped InnerProductSpace ENNReal
 
 noncomputable section
 
-
-
 namespace Formalism.FourierDecayAlt.P
 
 namespace UnipotentHaarMeasurability

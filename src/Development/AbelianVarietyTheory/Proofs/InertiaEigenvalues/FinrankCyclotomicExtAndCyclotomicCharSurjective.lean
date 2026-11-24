@@ -3,8 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
 public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharacterPadicBasicProperties
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormEqZpowOfMemMaxUnramifiedSubfieldStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormPrimitiveRootPrimePowSubOnePadicComplexStatement
+public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormEqZpowOfMemMaxUnramifiedSubfield
+public import Mathlib.NumberTheory.Padics.Complex
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormPrimitiveRootPrimePowSubOnePadicComplex
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -79,7 +82,7 @@ theorem aeval_ne_zero_of_norm_eq
       have := mem_support_iff.1 hi
       exact fun h => this (Subtype.ext h)
     obtain ⟨n, hn⟩ :=
-      GlobalTheory.T.norm_eq_zpow_of_mem_maxUnramifiedSubfield l K _ (p.coeff i).2 h0
+      _root_.GlobalTheory.UnramValue.norm_of_mem_unramified_subfield l K _ (p.coeff i).2 h0
     refine ⟨n, ?_⟩
     change ‖((p.coeff i : ↥(K0 K)) : Om l) * π ^ i‖ = _
     rw [norm_mul, norm_pow, hn, hπ, ← Real.rpow_natCast, ← Real.rpow_mul hl0.le,
@@ -133,7 +136,7 @@ theorem minpoly_unramifiedSubfield_eq_cyclotomic
     exact hζ.isRoot_cyclotomic hpos
   have hnorm : ‖ζ - 1‖ = (l : ℝ) ^ (-(1 : ℝ) / ((Nat.totient (l ^ j) : ℕ) : ℝ)) := by
     have h1 :=
-      GlobalTheory.T.norm_primitiveRoot_primePow_sub_one_padicComplex l j hj (ζ : PadicComplex l)
+      _root_.GlobalTheory.Cyc.norm_primitiveRoot_sub_one l j hj (ζ : PadicComplex l)
         (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
     rw [Nat.totient_prime_pow hlp hj]
     push_cast [Nat.cast_sub hlp.one_le]
@@ -153,11 +156,7 @@ theorem minpoly_unramifiedSubfield_eq_cyclotomic
   · rw [taylor_apply, aeval_comp]
     simp
 
-theorem exists_primitiveRoot_Om (j : ℕ) : ∃ ζ : Om l, IsPrimitiveRoot ζ (l ^ j) := by
-  have hlp : l.Prime := Fact.out
-  haveI : NeZero (l ^ j) := ⟨(pow_pos hlp.pos j).ne'⟩
-  haveI : CharZero (Om l) := algebraRat.charZero _
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot (Om l) (l ^ j)
+alias exists_primitiveRoot_Om := _root_.GlobalTheory.Cyc.exists_primRoot_pow
 
 theorem Ks_eq_restrictScalars (K : FinExt l) (j : ℕ) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ j))
     : Ks K j = ((↥(K0 K))⟮ζ⟯).restrictScalars ℚ_[l] := by

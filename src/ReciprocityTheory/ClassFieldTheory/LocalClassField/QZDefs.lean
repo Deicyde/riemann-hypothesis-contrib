@@ -53,15 +53,17 @@ noncomputable section
 def trivRep (G : Type) [Group G] [TopologicalSpace G] (A : Type) [AddCommGroup A] : TRep ℤ G :=
   letI : TopologicalSpace A := ⊥
   haveI : DiscreteTopology A := ⟨rfl⟩
-  { V := A
-    rho := 1
-    cont := continuous_snd }
+  { V := A, rho := 1, cont := continuous_snd }
 
-scoped instance (G : Type) [Group G] [TopologicalSpace G] (A : Type) [AddCommGroup A] :
-    DiscreteTopology (trivRep G A).V := ⟨rfl⟩
+scoped instance (G : Type) [Group G] [TopologicalSpace G] (A : Type) [AddCommGroup A]
+    : DiscreteTopology (trivRep G A).V :=
+  ⟨rfl⟩
 
-def trivMap (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {A B : Type} [AddCommGroup A]
-    [AddCommGroup B] (f : A →+ B) : Pair (trivRep G A) (trivRep G B) :=
+def trivMap
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {A B : Type} [AddCommGroup A] [AddCommGroup B]
+    (f : A →+ B)
+    : Pair (trivRep G A) (trivRep G B) :=
   Pair.ofMap (M := trivRep G A) (M' := trivRep G B) f.toIntLinearMap continuous_of_discreteTopology
     fun _ _ => rfl
 

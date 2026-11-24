@@ -41,9 +41,6 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.NonzeroTypes.Cus
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel

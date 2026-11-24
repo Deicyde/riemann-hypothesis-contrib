@@ -189,7 +189,7 @@ theorem reindex_mem_KO
   ⟩
   ext i j
   rw [h]
-  simp [Matrix.reindexAlgEquiv_apply, Matrix.reindex_apply]
+  simp [Matrix.reindex_apply]
 
 theorem mem_KO_iff_reindex
     {m ι : Type} [Fintype m] [DecidableEq m] [Fintype ι] [DecidableEq ι]

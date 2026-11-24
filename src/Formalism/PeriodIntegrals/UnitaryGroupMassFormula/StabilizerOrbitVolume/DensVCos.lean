@@ -71,14 +71,8 @@ theorem HasDens.add
   obtain ⟨hi1, hc1, he1⟩ := h₁
   obtain ⟨hi2, hc2, he2⟩ := h₂
   refine ⟨hi1.add hi2, hc1.add hc2, fun S hS => ?_⟩
-  have hg1 : IntegrableOn g₁ S ν := by
-    first
-    | exact hc1.continuousOn.integrableOn_compact hS
-    | exact ContinuousOn.integrableOn_compact hS hc1.continuousOn
-  have hg2 : IntegrableOn g₂ S ν := by
-    first
-    | exact hc2.continuousOn.integrableOn_compact hS
-    | exact ContinuousOn.integrableOn_compact hS hc2.continuousOn
+  have hg1 : IntegrableOn g₁ S ν := by first | exact hc1.continuousOn.integrableOn_compact hS
+  have hg2 : IntegrableOn g₂ S ν := by first | exact hc2.continuousOn.integrableOn_compact hS
   rw [integral_add hi1.integrableOn hi2.integrableOn, integral_add hg1 hg2, he1 S hS, he2 S hS]
 
 theorem hasDens_sum [IsFiniteMeasureOnCompacts ν] {κ : Type} (φ : κ → V → ℝ) (g : κ → X → ℝ)
@@ -136,10 +130,7 @@ theorem integrable_cos
   have hK := isCompact_cos Λ hΛc y
   have hO : IsOpen {z : V | z - y ∈ Λ} := hΛo.preimage (continuous_sub_right y)
   have hI : IntegrableOn (fun _ : V => (1 : ℝ)) {z : V | z - y ∈ Λ} μ := by
-    first
-    | exact ContinuousOn.integrableOn_compact hK continuousOn_const
-    | exact integrableOn_const hK.measure_lt_top.ne
-    | exact integrableOn_const.2 (Or.inr hK.measure_lt_top)
+    first | exact integrableOn_const hK.measure_lt_top.ne
   exact hI.integrable_indicator hO.measurableSet
 
 theorem densLC_of_cosB

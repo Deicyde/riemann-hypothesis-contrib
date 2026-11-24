@@ -93,7 +93,7 @@ theorem enorm_smulRight
 
 theorem mt_cont
     : Continuous (fun y : Formalism.QuantumDeterminants.Mt k r => (Matrix.of y : Mx k r)) := by
-  first | exact continuous_id | fun_prop | continuity
+  first | exact continuous_id
 
 theorem inner_bound
     (hNI : NormInv)

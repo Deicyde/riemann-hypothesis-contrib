@@ -250,12 +250,7 @@ theorem veryAmpleBy_pw_of_generic
     refine (GlobalTheory.CechPic.cls_eq_iff (GlobalTheory.isLB_lbPow hN 2)
       (GlobalTheory.AbLaw.isLB_pw hN 2)).1 ?_
     rw [GlobalTheory.CechPic.cls_lbPow hN, GlobalTheory.AmpleStabFinite.cls_pw hN]
-    first
-    | rfl
-    | exact (natCast_zsmul _ 2).symm
-    | exact natCast_zsmul _ 2
-    | simp only [two_smul, two_nsmul]
-    | (simp; done)
+    first | rfl
   choose v hv using fun i => GlobalTheory.exists_sec_nonzeroLocus_eq_of_lbIso (GlobalTheory.isLB_lbPow hN 2)
     (GlobalTheory.AbLaw.isLB_pw hN _) hiso (u i)
   have hcov : ⨆ i, Out.nonzeroLocus (v i) = ⊤ := by

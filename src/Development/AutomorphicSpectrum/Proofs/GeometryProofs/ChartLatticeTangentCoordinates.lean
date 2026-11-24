@@ -3,7 +3,7 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsRigTransport
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductMapIffStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductMapIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -159,8 +159,9 @@ theorem gramAt_of_isRiem
     w,
     hval,
     fun p q =>
-      (GlobalTheory.T.hodge_inner_product_map_iff E H X t (Sp C.R) C.t h m (spMap (C.ψ z)) (v p)
-        (v q) (w p) (w q) _ (e p) (e q)).1 (hodgeInnerProduct_iff_hodgeForm.2 (hF q p))
+      (_root_.GlobalTheory.CompanionTheory.Ar.hodgeInnerProduct_tripleMap_iff E H X t (Sp C.R) C.t h
+          m (spMap (C.ψ z)) (v p) (v q) (w p) (w q) _ (e p) (e q)).1
+        (hodgeInnerProduct_iff_hodgeForm.2 (hF q p))
   ⟩
 
 end GlobalTheory.CompanionTheory.Ar.RiemGram

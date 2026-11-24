@@ -191,7 +191,7 @@ theorem second_expansion_identity : ExpansionDualColumn := by
       rw [dite_eq_left a.isLt, dite_eq_left (by omega)]
       congr 2
       apply Fin.ext
-      simp only [Fin.val_mk]
+      simp only
       omega
   have hP := third_peeling_identity A k r z' E hG (i0 + s') hm' ⟨i0, by omega⟩ ell
   have hLa

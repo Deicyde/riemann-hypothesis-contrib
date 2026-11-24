@@ -330,7 +330,7 @@ theorem thetaPar_partner
     unfold GapGt lamA'
     have hl : (block t).length = t := by simp [block]
     refine (GlobalTheory.Chain.ItPairCompare.cross_iff (l₁ := al ++ block t ++ de) (l₂ := ga ++ be)
-      (by simp [hl] <;> omega) (by simp <;> omega)
+      (by simp [hl] <;> omega) (by simp)
       (fun z =>
         (((al.length + be.length + ga.length + de.length + t : ℕ) : ℝ) ^ 3) < |(z : ℝ)|)).2 ?_
     intro x hx y hy hs

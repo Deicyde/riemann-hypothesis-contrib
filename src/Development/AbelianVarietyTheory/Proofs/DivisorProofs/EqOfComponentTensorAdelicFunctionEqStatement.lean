@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.eq_of_componentTensorAdelicFunction_eq
             → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₁ r
               = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₂ r)
         → φ₁ = φ₂ := by
-  first
-  | exact @GlobalTheory.TensUniq.eq_of_tens_eq
-  | exact GlobalTheory.TensUniq.eq_of_tens_eq
-  | (intros; apply GlobalTheory.TensUniq.eq_of_tens_eq <;> assumption)
+  first | exact @GlobalTheory.TensUniq.eq_of_tens_eq

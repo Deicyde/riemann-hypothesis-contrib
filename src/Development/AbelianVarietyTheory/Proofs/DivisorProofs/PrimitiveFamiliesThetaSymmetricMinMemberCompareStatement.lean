@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -51,6 +52,7 @@ open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory
   GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.primitive_families_thetaSymmetric_min_member_compare
     : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsIntegrallyClosed V] [Field K]
         (io : FractionRing V →+* K) (N N' k : ℕ) (J : Type) (c : Fin N → K) (c' : Fin N' → K)
@@ -65,7 +67,4 @@ theorem _root_.GlobalTheory.T.primitive_families_thetaSymmetric_min_member_compa
               ∧ ∃ b,
                 th b ≠ 0
                   ∧ e j₀ / th b ^ N.factorial ∈ Set.range (algebraMap V (FractionRing V)) := by
-  first
-  | exact @GlobalTheory.UMin.prim_symTup_cmp
-  | exact GlobalTheory.UMin.prim_symTup_cmp
-  | (intros; apply GlobalTheory.UMin.prim_symTup_cmp <;> assumption)
+  first | exact @GlobalTheory.UMin.prim_symTup_cmp

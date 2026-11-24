@@ -115,7 +115,7 @@ theorem repr_prod
     refine Finset.sum_congr (by simp) fun p _ => ?_
     simp only [hc, MvPolynomial.smul_eq_C_mul, Finset.prod_mul_distrib, map_prod]
   rw [hT']
-  first | rw [Module.Basis.repr_sum_self] | simp [map_sum, Finsupp.single_apply, hc]
+  first | rw [Module.Basis.repr_sum_self]
 
 end Ten
 
@@ -138,7 +138,7 @@ theorem beta_dualB
   unfold dualB
   rw [Module.Basis.map_apply, LinearEquiv.apply_symm_apply]
   ext x
-  simp [Module.Basis.dualBasis_apply]
+  simp
 
 theorem dualB_repr
     {V : Type} [AddCommGroup V] [Module Kf V]

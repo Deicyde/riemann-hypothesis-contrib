@@ -96,7 +96,6 @@ theorem norm_le_card
   have hM : ∀ y, ‖l (ρ y x)‖ ≤ M := fun y => le_ciSup hb y
   have hM0 : 0 < M := (norm_pos_iff.2 h1).trans_le (hM 1)
   have key : ∀ y, ‖a‖ * ‖l (ρ y x)‖ ≤ S.card * M := fun y => by
-
     rw [← norm_mul, ← smul_eq_mul, ← map_smul, ← map_smul, ← h, map_sum, map_sum]
     refine (norm_sum_le _ _).trans ?_
     rw [← nsmul_eq_mul]

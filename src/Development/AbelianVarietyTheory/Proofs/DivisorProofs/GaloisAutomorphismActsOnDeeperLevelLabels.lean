@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.OneArc
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -79,14 +80,6 @@ theorem exists_mulEquiv_points
   ⟩
   exact ⟨MulEquiv.ofBijective (MonoidHom.mk' m hmul) ⟨hinj, hsurj⟩, hm⟩
 
-theorem epi_spMap_of_field {K L : Type} [Field K] [Field L] (f : K →+* L) : Epi (spMap f) := by
-  have f₁ : Flat (spMap f) := by
-    rw [HasRingHomProperty.Spec_iff (P := @Flat)]
-    exact RingHom.Flat.of_isField (Field.toIsField K) f
-  have f₂ : Surjective (spMap f) :=
-    ⟨fun y => ⟨(default : PrimeSpectrum L), Subsingleton.elim (α := PrimeSpectrum K) _ _⟩⟩
-  exact Flat.epi_of_flat_of_surjective _
-
 theorem eq_id_of_frac
     {A K : Type} [CommRing A] [Field K]
     (φ : A →+* K) (h : ∀ x, ∃ a b, x = φ a / φ b)
@@ -116,7 +109,7 @@ theorem exists_generic_labels
   let j : Over.mk (spMap S.R.val.toRingHom) ⟶ baseOver (Sp S.R) :=
     Over.homMk (spMap S.R.val.toRingHom) (by simp)
   let k : Sp (AlgebraicClosure Ω) ⟶ Sp Ω := spMap (algebraMap Ω (AlgebraicClosure Ω))
-  have : Epi k := epi_spMap_of_field _
+  have : Epi k := _root_.GlobalTheory.ThetaDescent.epi_spMap _
   let k' : Over.mk (k ≫ spMap S.R.val.toRingHom) ⟶ Over.mk (spMap S.R.val.toRingHom) :=
     Over.homMk k rfl
   let w : S.Gam → (Over.mk (𝟙 (Sp Ω)) ⟶ G) := fun x => e.symm (j ≫ ρ.pt x)
@@ -171,7 +164,7 @@ theorem exists_label_action
           w ≫ b = spMap S.R.val.toRingHom ≫ (ρ.pt x).left → w ≫ t = spMap σ ≫ w → a x = x := by
   obtain ⟨p, hp, hadd, hinj, htor, hsurj⟩ := exists_generic_labels ρ hb
   obtain ⟨e, he⟩ := exists_mulEquiv_points ht (𝟙 _) (spMap σ) (Category.id_comp _)
-  have : Epi (spMap σ) := epi_spMap_of_field _
+  have : Epi (spMap σ) := _root_.GlobalTheory.ThetaDescent.epi_spMap _
   let s : Over.mk (spMap σ) ⟶ Over.mk (𝟙 (Sp Ω)) := Over.homMk (spMap σ) (Category.comp_id _)
   let τ : (Over.mk (𝟙 (Sp Ω)) ⟶ G) →* (Over.mk (𝟙 (Sp Ω)) ⟶ G) := e.symm.toMonoidHom.comp (preHom s)
   have hτ : ∀ z, (τ z).left ≫ t = spMap σ ≫ z.left := fun z =>

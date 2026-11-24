@@ -97,7 +97,7 @@ theorem isSelfDualMod_loc
   · intro x hx
     exact (hu' x).mpr hx
   · intro x
-    obtain ⟨n, hn, hnx⟩ := Formalism.HermitianLatticesTheory.traceReal_mult L hL x
+    obtain ⟨n, hn, hnx⟩ := _root_.Bl.general_b_fact_second'''''.goal1 L hL x
     refine ⟨(n : K), by exact_mod_cast hn, ?_⟩
     rw [Int.cast_smul_eq_zsmul]
     exact Formalism.HermitianLatticesTheory.locBasic_le_locS _ L hnx

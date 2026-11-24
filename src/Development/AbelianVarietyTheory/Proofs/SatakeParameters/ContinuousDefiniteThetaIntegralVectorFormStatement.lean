@@ -57,6 +57,7 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 open scoped TensorProduct ComplexOrder
 open MeasureTheory Formalism.IndefR.Datum Formalism.L2.Theta Formalism.BasicNotions.TH
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+
 theorem _root_.GlobalTheory.T.continuous_definiteThetaIntegral_vectorForm
     : ∀ {D : D7}
         (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF D.host.F) ℂ)
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.continuous_definiteThetaIntegral_vectorForm
                 → ∀ u : GA D V → X,
                   Continuous u → (∀ γ ∈ GQ V, ∀ h, u (γ * h) = u h)
                     → Continuous (fun g => ∫ h in 𝓕, thetaKO om h g (L (u h)) ∂ν) := by
-  first
-  | exact @GlobalTheory.ThetaIntegralCont.continuous_theta_integral_vector
-  | exact GlobalTheory.ThetaIntegralCont.continuous_theta_integral_vector
-  | (intros; apply GlobalTheory.ThetaIntegralCont.continuous_theta_integral_vector <;> assumption)
+  first | exact @GlobalTheory.ThetaIntegralCont.continuous_theta_integral_vector

@@ -112,11 +112,9 @@ theorem lin_tf_fix_iff
   have key
       : ∀ v : Fin I.n → I.E ⊗[I.F] Af I.F,
         (I.fmat x).map (swapE I) *ᵥ (fun i => swapE I (v i))
-          = fun i => swapE I ((I.fmat x *ᵥ v) i) := by
-    intro v
-    funext i
-    exact (RingHom.map_mulVec (swapE I : I.E ⊗[I.F] Af I.F →+* Af I.F ⊗[I.F] I.E) (I.fmat x) v
-      i).symm
+          = fun i => swapE I ((I.fmat x *ᵥ v) i) := fun v =>
+    (funext fun i =>
+      (RingHom.map_mulVec (swapE I : I.E ⊗[I.F] Af I.F →+* Af I.F ⊗[I.F] I.E) (I.fmat x) v i).symm)
   rw [key]
   constructor
   · intro h
@@ -246,8 +244,7 @@ theorem fin_mat (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (γ :
           : GL (Fin I.n) (Af I.F ⊗[I.F] I.E))
         : Matrix (Fin I.n) (Fin I.n) _)
       = (I.fmat γ.2).map (swapE I) := by
-  have hB := (toHA_isBridge I hb γ).2
-  rw [hB]
+  rw [(toHA_isBridge I hb γ).2]
   ext i j
   simp only [ofHAFin, Matrix.map_apply]
   rw [← Bridge_tens_eq]

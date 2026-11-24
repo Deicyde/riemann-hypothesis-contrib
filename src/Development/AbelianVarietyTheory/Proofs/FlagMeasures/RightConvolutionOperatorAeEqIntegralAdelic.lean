@@ -1,9 +1,10 @@
 module
 
 public import Formalism.SharpRestriction.CuspSpanNormBounds.GlobAut
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitaryHaarBiInvariantStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitaryHaarBiInvariant
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RightRegularRepUnitaryStronglyContinuous
+public import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FiniteAdelicUnitaryCongruenceTopology
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RightRegularRepUnitaryStronglyContinuousStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -15,7 +16,6 @@ import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -148,8 +148,8 @@ theorem rconv_eq_integral
   by
     intro B φ T hT y
     obtain ⟨hT2, hL, hS, -⟩ := GlobalTheory.CongTop.adelic_topology B.I
-    obtain ⟨hl, -⟩ := GlobalTheory.T.adelicUnitaryHaar_bi_invariant B.I B.μf
-    obtain ⟨-, -, hn, -, hext⟩ := GlobalTheory.T.rightRegularRep_unitary_stronglyContinuous B
+    obtain ⟨hl, -⟩ := _root_.GlobalTheory.AdelicUnimod.adelic_unimodular B.I B.μf
+    obtain ⟨-, -, hn, -, hext⟩ := _root_.GlobalTheory.RightRegFund.rightReg_unitary_continuous B
     have : BorelSpace B.I.GA := inferInstance
     have : (B.I.muA B.μf).IsMulLeftInvariant := ⟨hl⟩
     have : SigmaFinite (B.I.muA B.μf) := by unfold AutInst.muA; infer_instance

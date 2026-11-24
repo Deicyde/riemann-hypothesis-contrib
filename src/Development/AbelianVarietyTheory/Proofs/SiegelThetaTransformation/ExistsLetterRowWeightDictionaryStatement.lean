@@ -53,6 +53,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.exists_letterRowWeightDictionary
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
         (l : Geo.Tor.Level H) (c : Coeff l) (σ : c.F →+* ℂ) (r g n : ℕ) (X : Data E r)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_letterRowWeightDictionary
         → ∃ Dc : Dic Dw c σ X g Dw.p n a,
           Dc.e = e
             ∧ (LastPos Dw a → 0 < Dw.p → ∃ τ, ∃ i : Fin Dw.p, i.val + 1 = Dw.p ∧ 1 ≤ Dc.k τ i) := by
-  first
-  | exact @GlobalTheory.Dict.exists_dic
-  | exact GlobalTheory.Dict.exists_dic
-  | (intros; apply GlobalTheory.Dict.exists_dic <;> assumption)
+  first | exact @GlobalTheory.Dict.exists_dic

@@ -163,9 +163,7 @@ theorem exists_finset_adjoin_laurent_preimage
   | single x r =>
     have := N.smul_mem r (gen x)
     convert this using 1
-    first
-    | exact (Finsupp.smul_single_one x r).symm
-    | (unfold ModuleCat.freeMk; erw [Finsupp.smul_single_one])
+    first | (unfold ModuleCat.freeMk; erw [Finsupp.smul_single_one])
 
 theorem leafFreeCokSurj : LeafFreeCokSurj := by
   intro R _ A' B' A B i' i a b w h2

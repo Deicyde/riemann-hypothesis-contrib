@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BhattScholzeIntegral
 public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BhattScholzeCoefficientsOfPadicIntLatticesStatement
+public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BhattScholzeCrystallineLattices
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BhattScholzeCoefficientsOfPadicIntLattices
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsHwFonCmpTies
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -53,8 +54,7 @@ theorem exists_hw_fon_cmp_of_integral
         Nonempty (CmpOf D.loc D.locA HW F) := by
   intro hI D
   obtain ⟨H, F, hC, -⟩ :=
-    exists_hw_fon_cmp_ties (GlobalTheory.T.bhattScholze_coefficients_of_padicInt_lattices hI) D.loc
-      D.locA D.locT
+    exists_hw_fon_cmp_ties (_root_.GlobalTheory.bhattScholze_coeff hI) D.loc D.locA D.locT
   exact ⟨H, F, hC⟩
 
 end GlobalTheory.HWL

@@ -65,10 +65,10 @@ theorem sN_of : SN := by
     rw [Matrix.sum_apply, Finset.sum_eq_single r]
     · by_cases h : r = s
       · subst h
-        simp [Matrix.single_apply]
-      · simp [Matrix.single_apply, Matrix.one_apply, h]
+        simp
+      · simp [h]
     · intro k _ hk
-      simp [Matrix.single_apply, hk]
+      simp [hk]
     · simp
   have hEE
       : ∀ i j j' k,
@@ -90,7 +90,6 @@ theorem sN_of : SN := by
         rw [hEE k i0 i0 i0, if_pos rfl, hEE k i0 i0 k, if_pos rfl]
       rw [e1, h0, mul_zero, zero_mul]
     have h1 : ψ 1 = 0 := by
-
       rw [← hsum1 (R := F), map_sum]
       exact Finset.sum_eq_zero fun k _ => hk k
     rw [map_one] at h1

@@ -2,7 +2,7 @@ module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebras.IsTheta
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SplitPlaceUnitaryLocalPointsEquivGL
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SplitPlaceUnitaryLocalPointsEquivGLStatement
+public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BaseChangeDefiniteUnitary
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -47,7 +47,6 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-
 
 private theorem w_under
     {l : ℕ} [Fact l.Prime]
@@ -122,7 +121,7 @@ theorem UpperTheory.V.Hi.secU
                   ∧ (∀ g, cmp n w ((sec n s w g : Ub n s) : Ga l L n) = g)
                   ∧ ∀ g, sec n s w g ∈ locA n s w) := by
   intro l _ L Ω _ _ _ _ _ _ s n _ w hw
-  obtain ⟨e, he⟩ := GlobalTheory.T.splitPlace_unitaryLocalPoints_equiv_GL L n w hw
+  obtain ⟨e, he⟩ := _root_.GlobalTheory.locU_equiv_GL L n w hw
   have hs : ∀ y, cLoc w (e.symm y : UA L n) = y := fun y => by rw [← he, e.apply_symm_apply]
   refine ⟨
     ⟨

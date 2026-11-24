@@ -158,7 +158,6 @@ def boxSecGenF (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) (jN : K → (Fin j 
     : Γ(Y', LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN) :=
   ∏ i, rs (box_le_of_comp L pr φ' (φ i) (p i) i (hφ i) jN) (((p i).app _).hom ((σ i).f (fun a => jN a i)))
 
-
 include hφ in
 lemma boxGen_g_res (jN jN' : K → (Fin j → L.ι)) {V : Y'.Opens}
     (h : V ≤ LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN ⊓ LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN') :
@@ -182,7 +181,6 @@ lemma boxGen_g_res (jN jN' : K → (Fin j → L.ι)) {V : Y'.Opens}
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [hφ i a]
 
-
 lemma g_pull_gen {Z : Scheme.{0}} (h : Z ⟶ Y) (ψ : K → (Y ⟶ X)) (a b : K → L.ι) {W : Z.Opens}
     (hW : W ≤ h ⁻¹ᵁ (LB.wchart L ψ a ⊓ LB.wchart L ψ b)) :
     res hW (pullU h _ ((LB.LinComb L ψ ε).g a b)) = ∏ c, tr L W (h ≫ ψ c) (a c) (b c) ^ ε c := by
@@ -195,7 +193,6 @@ lemma g_pull_gen {Z : Scheme.{0}} (h : Z ⟶ Y) (ψ : K → (Y ⟶ X)) (a b : K 
     rw [tr_eq_tu, tu, dite_eq_left hle]
   erw [e]
   exact tr_pull L h hW hle
-
 
 lemma boxSecGenF_compat (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) (jN jN' : K → (Fin j → L.ι)) :
     rs (inf_le_left : LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN ⊓

@@ -49,6 +49,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTh
   GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.movedWeilVacuum_eq_vacuum_of_movedLattices
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (a b : ℕ)
         (hS : S.rank = a) (hT : T.rank = b) (δ : ℂ) (sc : ℝ),
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.movedWeilVacuum_eq_vacuum_of_movedLattices
                         ∈ Formalism.L2.Th1.H.Th (HV sc) (alV D.host.d sc)
                           (LamC (tauE D) δ (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N')
                       ∧ xiN θ S T hS hT δ sc (om (g, h) f) ≠ 0 := by
-  first
-  | exact @GlobalTheory.MovedVac.vac_moved
-  | exact GlobalTheory.MovedVac.vac_moved
-  | (intros; apply GlobalTheory.MovedVac.vac_moved <;> assumption)
+  first | exact @GlobalTheory.MovedVac.vac_moved

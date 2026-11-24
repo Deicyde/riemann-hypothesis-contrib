@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_iso_uniformisations_of_iso_degeneration_data
     : Laws → Laws2
       → ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (I : Ideal R),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_iso_uniformisations_of_iso_degeneration_dat
                   IsMonHom ψ.hom ∧ IsMonHom bc.hom
                     ∧ bc.hom.left ≫ pullback.fst G.hom (specOf (RingHom.id R)) = ψ.hom.left
                     ∧ IsPullUnif (RingHom.id R) hD bc U U' := by
-  first
-  | exact @GlobalTheory.exists_iso_isPullUnif_of_isPullDeg
-  | exact GlobalTheory.exists_iso_isPullUnif_of_isPullDeg
-  | (intros; apply GlobalTheory.exists_iso_isPullUnif_of_isPullDeg <;> assumption)
+  first | exact @GlobalTheory.exists_iso_isPullUnif_of_isPullDeg

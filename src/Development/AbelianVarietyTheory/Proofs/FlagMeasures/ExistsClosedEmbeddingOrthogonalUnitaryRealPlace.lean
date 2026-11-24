@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GaugeUnfold
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsDualOfAnisotropicOrthogonal
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryOrthogonalEmbeddingStabilizerStatement
+public import Formalism.SatakeDualWeyl.Statement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryOrthogonalEmbeddingStabilizer
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -70,7 +71,7 @@ theorem realUJ_eq {n : ℕ} (ε : Fin n → Bool)
   have hc : ∀ M : Matrix (Fin n) (Fin n) ℂ, Formalism.UG.cT (starRingEnd ℂ) M = Mᴴ := by
     intro M
     ext i j
-    simp [Formalism.UG.cT, Matrix.conjTranspose_apply, Complex.star_def]
+    simp [Formalism.UG.cT, Matrix.conjTranspose_apply]
   ext g
   change Formalism.UG.cT (starRingEnd ℂ) (g : Matrix (Fin n) (Fin n) ℂ) * Formalism.REAL.Jm ε * g
       = Formalism.REAL.Jm ε
@@ -105,15 +106,15 @@ theorem exists_closedEmbedding_unitary_orthogonal
       : ∀ {p q : ℕ} (M : Matrix (Fin p) (Fin q) ℂ), Formalism.UG.cT (starRingEnd ℂ) M = Mᴴ := by
     intro p q M
     ext i k
-    simp [Formalism.UG.cT, Matrix.conjTranspose_apply, Complex.star_def]
+    simp [Formalism.UG.cT, Matrix.conjTranspose_apply]
   have hstar : (fun i => starRingEnd ℂ (x₀ i)) = star x₀ := by
     funext i
-    simp [Complex.star_def]
+    simp
   obtain ⟨j, hjmat, hjrange⟩ :=
-    GlobalTheory.T.exists_unitary_orthogonal_embedding_stabilizer ℂ (starRingEnd ℂ) n m
-      (Formalism.REAL.Jm ε) (Formalism.REAL.Jm ε') x₀ u B A'
-      (by rw [hstar]; exact isUnit_iff_ne_zero.mpr hβ) (by rw [hstar]; exact hx)
-      (by rw [hcT]; exact hBJx) (by rw [hcT]; exact hB) hA'B hA'x huB hux hres
+    _root_.GlobalTheory.StabRing.exists_emb ℂ (starRingEnd ℂ) n m (Formalism.REAL.Jm ε)
+      (Formalism.REAL.Jm ε') x₀ u B A' (by rw [hstar]; exact isUnit_iff_ne_zero.mpr hβ)
+      (by rw [hstar]; exact hx) (by rw [hcT]; exact hBJx) (by rw [hcT]; exact hB) hA'B hA'x huB hux
+      hres
   obtain ⟨jj, hjj, hrange⟩
       : ∃ jj : Formalism.REAL.UJ ε' →* Formalism.REAL.UJ ε,
         (∀ g,

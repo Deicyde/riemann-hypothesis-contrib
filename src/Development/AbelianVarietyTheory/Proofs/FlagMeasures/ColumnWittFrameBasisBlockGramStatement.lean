@@ -45,6 +45,7 @@ open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
   Formalism.L2.SG.ColDict GlobalTheory.St
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.columnWittFrame_basis_blockGram
     : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V),
       WittX X u wt
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.columnWittFrame_basis_blockGram
             ∧ (Q.map (starRingEnd X.B.I.E))ᵀ * X.B.I.J * Q
               = Matrix.fromBlocks ((Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)).map X.ιE.symm) 0 0
                 G' := by
-  first
-  | exact @GlobalTheory.St.qFrame_basis_gram
-  | exact GlobalTheory.St.qFrame_basis_gram
-  | (intros; apply GlobalTheory.St.qFrame_basis_gram <;> assumption)
+  first | exact @GlobalTheory.St.qFrame_basis_gram

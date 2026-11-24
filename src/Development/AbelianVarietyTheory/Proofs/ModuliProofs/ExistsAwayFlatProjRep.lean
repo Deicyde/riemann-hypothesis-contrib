@@ -1,10 +1,13 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.DenseOfDenseP
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsAwayProjectiveFormsThroughPointsStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsoOfProjectiveCoordinateRepresentationStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsProjCoordRepresentationHomogeneousIdealFlaStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ProjectiveRepresentationPullbackCoordinatesStatement
+public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsGaloisCover
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsAwayProjectiveFormsThroughPoints
+public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHomogeneousInf
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsoOfProjectiveCoordinateRepresentation
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsProjCoordRepresentationHomogeneousIdealFla
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ProjectiveRepresentationPullbackCoordinates
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleIdentityIso
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -45,7 +48,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleIdentityIso
 
 @[expose] public section
 
@@ -129,20 +131,20 @@ theorem exists_away_flat_projRep
                           SecCoord M' th' y w ↔ SecCoord M th (y ≫ φ) w := by
   intro R σ Hh _ _ _ _ _ p Q d P hP hcutP q₀ hq₀
   obtain ⟨f, hf, hproj, hmap⟩ :=
-    GlobalTheory.T.exists_away_projective_forms_through_points R σ Hh p Q d P hP hcutP q₀ hq₀
+    _root_.GlobalTheory.ZM.FormsFamily.exists_away_projective_vanIdeal R σ Hh p Q d P hP hcutP q₀
+      hq₀
   obtain ⟨Z, s, M, th, -, hrep, -, hflat⟩ :=
-    GlobalTheory.T.exists_projCoordRepresentation_homogeneousIdeal_flat (Localization.Away f) σ
+    _root_.GlobalTheory.ProjFlat.exists_projRep_flat (Localization.Away f) σ
       (vanIdeal d (fun h i => loc f (p h i))) d (homogeneousComponent_mem_vanIdeal d _)
   refine
     ⟨f, hf, Over.mk s, M, th, hrep, hflat fun e he => by have := hproj e he; infer_instance, ?_⟩
   intro K _ x I X s' M' th' hI hcut hrep'
   have hpb := IsPullback.of_hasPullback s (spMap x)
   obtain ⟨th₁, hrep₁, hc₁⟩ :=
-    GlobalTheory.T.projective_representation_pullback_coordinates _ K σ x _ Z _ s _ _ M th hrep hpb
+    _root_.GlobalTheory.ZM.RepBC.projRep_baseChange _ K σ x _ Z _ s _ _ M th hrep hpb
   rw [hmap K x] at hrep₁
   obtain ⟨e, he, hiso, hc⟩ :=
-    GlobalTheory.T.exists_iso_of_projectiveCoordinateRepresentation K σ I _ X _ s' _ M' _ th' th₁
-      hrep' hrep₁
+    _root_.GlobalTheory.RepUniq.exists_iso_of_projRep K σ I _ X _ s' _ M' _ th' th₁ hrep' hrep₁
       fun T _ β v hv => ⟨
         eval₂_eq_zero_of_forms_le (homogeneousComponent_mem_vanIdeal d _)
           (fun e he F hF h => ((hcut e he).2 F hF).2 h)

@@ -44,7 +44,8 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Polynomial
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Polynomial
 open scoped TensorProduct Pointwise
 
 namespace GlobalTheory.CM
@@ -53,8 +54,8 @@ section General
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem baseChange_neg_form (D : Datum H) (x y : ℝ ⊗[ℤ] D.La) :
-    (-D.EF).baseChange ℝ x y = -D.EF.baseChange ℝ x y := by
+theorem baseChange_neg_form (D : Datum H) (x y : ℝ ⊗[ℤ] D.La)
+    : (-D.EF).baseChange ℝ x y = - D.EF.baseChange ℝ x y := by
   induction x with
   | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb]; ring
   | tmul r a =>
@@ -81,11 +82,11 @@ def oppDatum (D : Datum H) : Datum H where
     refine ⟨-J, fun x => by simp [h1], fun x y => ?_, fun x hx => ?_, fun a A t hA ht => ?_⟩
     · simp [baseChange_neg_form, h2]
     · simpa [baseChange_neg_form] using h3 x hx
-    · obtain ⟨e1, e2, e3⟩ := h4 a A (starRingEnd ℂ t) hA (by
-
-        rw [ht, map_sum]
-        refine Finset.sum_congr rfl fun τ _ => ?_
-        simp [add_comm])
+    · obtain ⟨e1, e2, e3⟩ :=
+        h4 a A (starRingEnd ℂ t) hA (by
+          rw [ht, map_sum]
+          refine Finset.sum_congr rfl fun τ _ => ?_
+          simp [add_comm])
       refine ⟨by rw [LinearMap.neg_comp, LinearMap.comp_neg, e1], by simpa using e2, ?_⟩
       rw [LinearMap.neg_comp, map_neg, e3]
       simp

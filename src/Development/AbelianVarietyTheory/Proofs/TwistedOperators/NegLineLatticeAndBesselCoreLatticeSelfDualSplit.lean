@@ -48,6 +48,7 @@ import Mathlib.Tactic.ReduceModChar
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsRealFam
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RealLineOfPeriodsOnLine
+import Formalism.LocalToGlobal.GlobalTheory.GL3.PLinkThIndep
 
 @[expose] public section
 
@@ -104,7 +105,7 @@ theorem isSelfDualC_latPi
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Finset.sum_eq_single a]
     · simp
-    · intro b _ hb; simp [Matrix.neg_apply, Matrix.one_apply, Ne.symm hb]
+    · intro b _ hb; simp [Matrix.neg_apply, Ne.symm hb]
     · simp
   have hIeq : I = J⁻¹ := eq_inv_of_mul_eq_one_left hII
   obtain ⟨a0, ha0, ha00⟩ : ∃ a ∈ I, a ≠ 0 := by
@@ -148,7 +149,7 @@ theorem conjFI_AAbar (D : D7) : GlobalTheory.SeeSaw.conjFI D D.host.AAbar = D.ho
   rw [← GlobalTheory.SeeSaw.conjFI_AA]
   ext x
   rw [GlobalTheory.SeeSaw.mem_conjFI, GlobalTheory.SeeSaw.mem_conjFI,
-    GlobalTheory.SeeSaw.conj_conj_host]
+    _root_.Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.CU.conj_conj]
 
 theorem lineId_ne_zero (D : D7) (j : ℕ) : lineId D j ≠ 0 := by
   have hA := GlobalTheory.FinPl.LocGen.AA_ne_zero D

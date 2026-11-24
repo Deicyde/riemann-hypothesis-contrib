@@ -241,7 +241,7 @@ theorem word_pds
           by_cases h : i = ⟨j, by omega⟩
           · subst h
             simp [hr ⟨j, by omega⟩ (le_refl j) hjk]
-          · simp [h, Pi.single_apply, Function.update_apply]
+          · simp [h]
         have h1
             : pds L' (orb ρ Z u j) (Function.update r ⟨j, by omega⟩ t)
               = pds L' (fun r' => orb ρ Z u j (Function.update r' ⟨j, by omega⟩ t)) r := by
@@ -283,7 +283,7 @@ lemma word_eval (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : ∀ Y ∈ l, Y ∈
       intro h'
       rw [h'] at h
       simp at h
-    simp [Pi.single_apply, this]
+    simp [this]
   have := hL v hv _ hr
   rw [List.drop_zero] at this
   rw [← this, orb_last]

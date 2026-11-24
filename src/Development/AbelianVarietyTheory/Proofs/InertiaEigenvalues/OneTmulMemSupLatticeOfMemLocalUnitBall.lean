@@ -3,8 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValCCuspOfSmul
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralCuspFormsFullLattice
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsCdvrReadingInCpOfFiniteResidue
+public import Formalism.LocalToGlobal.IndefiniteReal.GramCEqTranspose
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsSmulMemSupLattice
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteAndIntegral
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SupLatticeLocalisationOfUnitBall
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -49,8 +50,6 @@ open scoped TensorProduct
 set_option autoImplicit false
 noncomputable section
 
-
-
 namespace GlobalTheory.GeoTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -94,9 +93,9 @@ theorem one_tmul_mem_Bsup_of_mem_locBall
     : (show NX.Fm S i ((j : ℕ) + 1) b from (1 : NX.KB S i b) ⊗ₜ[S.Ks] f)
       ∈ NX.Bsup S i ((j : ℕ) + 1) b := by
   obtain ⟨s, hs, hsM⟩ :=
-    GlobalTheory.supLattice_localisation_of_unitBall D.what₂.LL T0.Q.c.F _ _ _ (Rl.FW j)
-      (GlobalTheory.GoodLat.Obj.mkFull_of_tie fw j).2 (placeC YS iC b) (fw.e j (cuspOf YS fw j f))
-      (nrm_le_one_of_mem_locBall YS fw iC b j hf)
+    _root_.GlobalTheory.DenominatorExistenceTwistedOperators.exists_smul_mem_supLattice D.what₂.LL
+      T0.Q.c.F _ _ _ (Rl.FW j) (GlobalTheory.GoodLat.Obj.mkFull_of_tie fw j).2 (placeC YS iC b)
+      (fw.e j (cuspOf YS fw j f)) (nrm_le_one_of_mem_locBall YS fw iC b j hf)
   rw [e_cuspOf] at hsM
   set c : S.Ks := (YS.fi j).eK.symm (s : T0.Q.c.F) with hcdef
   have hc

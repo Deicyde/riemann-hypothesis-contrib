@@ -50,6 +50,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.MainNotions.S NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
   Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.intertwinersAndLifts_exist_at_choices
     : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules
       → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.intertwinersAndLifts_exist_at_choices
           [Algebra Ks D.what₂.LL] (R : RealDat D A Ks),
         R.toLevCh.Is A.μ0 → R.IsFam → R.IsModels → R.grp_record → HostHyp D → R.IsChainW → R.IsThPW
           → R.ExAt := by
-  first
-  | exact @GlobalTheory.ExAtAssembly.exAt_holds
-  | exact GlobalTheory.ExAtAssembly.exAt_holds
-  | (intros; apply GlobalTheory.ExAtAssembly.exAt_holds <;> assumption)
+  first | exact @GlobalTheory.ExAtAssembly.exAt_holds

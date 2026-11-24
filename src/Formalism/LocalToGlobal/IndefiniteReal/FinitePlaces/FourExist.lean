@@ -495,7 +495,7 @@ theorem coef_ne_zero
               + hex.choose • v := by
         rw [hv', ← hz]
         push_cast
-        first | exact (add_neg_cancel_left _ _).symm | simp | abel
+        first | exact (add_neg_cancel_left _ _).symm
       rw [h2]
       exact hI _ ((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out).2 v hv
     have hshift_sum

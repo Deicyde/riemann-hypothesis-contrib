@@ -71,7 +71,7 @@ theorem _root_.GlobalTheory.GaugeEx.isOpenUnits_of_basis
     rw [← hR.continuousAt_iff]
     have h : (Ring.inverse ∘ Units.val : Rˣ → R) = fun v => ↑v⁻¹ := by
       funext v
-      simp [Ring.inverse_unit]
+      simp
     rw [h]
     exact Units.continuous_coe_inv.continuousAt
   obtain ⟨g, hg⟩

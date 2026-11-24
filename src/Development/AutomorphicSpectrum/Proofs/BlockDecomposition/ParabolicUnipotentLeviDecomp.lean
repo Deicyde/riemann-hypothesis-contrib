@@ -151,8 +151,7 @@ theorem main
     induction a using Fin.lastCases with
     | last =>
       rw [hh]
-      induction b using Fin.lastCases
-        <;> simp [glEmbMat, colMat, eLast, Fin.castSucc_ne_last, Pi.single_apply]
+      induction b using Fin.lastCases <;> simp [glEmbMat, colMat, eLast, Fin.castSucc_ne_last]
     | cast a =>
       induction b using Fin.lastCases <;> simp [glEmbMat, colMat, blockMat, Fin.castSucc_ne_last, M]
   refine hd.trans ?_

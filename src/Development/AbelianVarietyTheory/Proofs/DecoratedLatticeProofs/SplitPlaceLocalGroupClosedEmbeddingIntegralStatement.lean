@@ -56,6 +56,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitPlace_local_group_closedEmbedding_integral
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k) (V : HSp D) (Y : Type)
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.splitPlace_local_group_closedEmbedding_integral
                 (∀ i, y i ∈ 𝒪[k])
                   ↔ (fun i => q.sec ((F.β *ᵥ y) i)) ∈ GlobalTheory.FinPl.latV V L (· = q.v))
               → ∀ g, g ∈ KO k Y ↔ GlobalTheory.FinPl.InK V L (· = q.v) (gl g) := by
-  first
-  | exact @GlobalTheory.LocGl.local_group
-  | exact GlobalTheory.LocGl.local_group
-  | (intros; apply GlobalTheory.LocGl.local_group <;> assumption)
+  first | exact @GlobalTheory.LocGl.local_group

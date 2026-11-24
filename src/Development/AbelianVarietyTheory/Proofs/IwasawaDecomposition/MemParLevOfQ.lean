@@ -49,8 +49,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
   GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 
-
-
 noncomputable section
 
 namespace GlobalTheory.Mem.R3.LiftBrg.ActQ

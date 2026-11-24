@@ -102,7 +102,7 @@ theorem coef_of_mem
     obtain ⟨j, hj, rfl⟩ := hx
     refine ⟨Pi.single j 1, fun i hi => ?_, ?_⟩
     · have hij : i ≠ j := fun e => hi (e ▸ hj)
-      simp [Pi.single_apply, hij]
+      simp [hij]
     · simp [Pi.single_apply]
   | zero =>
     exact ⟨0, fun _ _ => rfl, by simp⟩
@@ -138,7 +138,6 @@ theorem hC_self_im (v : Fin r → ℂ) : (hermC τ G v v).im = 0 := by
     | (simp only [cc]; exact (NumberField.IsCMField.complexEmbedding_complexConj τ (G a b)).symm)
     | (simp [cc])
   have hc : conj (hermC τ G v v) = hermC τ G v v := by
-
     simp only [hermC, map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
@@ -168,8 +167,6 @@ theorem gs_exists
     intro a b
     rw [← hG a b]
     first
-    | exact (NumberField.IsCMField.complexEmbedding_complexConj τ (G a b)).symm
-    | exact (IsCMField.complexEmbedding_complexConj τ (G a b)).symm
     | (simp only [cc]; exact (NumberField.IsCMField.complexEmbedding_complexConj τ (G a b)).symm)
     | (simp [cc])
   have csym : ∀ u w, conj (hermC τ G u w) = hermC τ G w u := by
@@ -298,7 +295,7 @@ theorem gs_exists
           rintro j ⟨hj1, _⟩
           exact lt_of_le_of_lt hj1 ham
         have hnot : c₀ ∉ {j : Fin n | (j : ℕ) < m} := by simp [hc₀]
-        first | exact hind.not_mem_span_image hnot hin | exact hind.notMem_span_image hnot hin
+        first | exact hind.notMem_span_image hnot hin
 
       have hsign : 0 < (ε c₀ * hermC τ G v v).re := by
         obtain ⟨w, hw, hvw⟩ := coef_of_mem Y S₀ hvS

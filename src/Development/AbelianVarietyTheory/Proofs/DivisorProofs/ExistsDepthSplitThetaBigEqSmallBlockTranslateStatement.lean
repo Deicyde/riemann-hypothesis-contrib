@@ -89,7 +89,4 @@ theorem _root_.GlobalTheory.T.exists_depth_splitThetaBig_eq_small_blockTranslate
                           (g₀.val * Z
                             * (c₀ * diagGL (fun col => if col ∈ P then ϖ ^ m else (ϖ ^ m)⁻¹)).val))
                       = smallP μ₀ σ ν (ν * β) Ψ := by
-  first
-  | exact @GlobalTheory.PureMatch.exists_depth_bigP_eq_smallP
-  | exact GlobalTheory.PureMatch.exists_depth_bigP_eq_smallP
-  | (intros; apply GlobalTheory.PureMatch.exists_depth_bigP_eq_smallP <;> assumption)
+  first | exact @GlobalTheory.PureMatch.exists_depth_bigP_eq_smallP

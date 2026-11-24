@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsAlgebraIsotropicFlagSelfAdjointLeviStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNilpotentAlgebraIsotropicFlagUnipotentRadiStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsRiemannianHaarUnitaryJSubgroupOfAlgebraStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsAlgebraIsotropicFlagSelfAdjointLevi
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNilpotentAlgebraIsotropicFlagUnipotentRadi
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsRiemannianHaarUnitaryJSubgroupOfAlgebra
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactHaarRightInvariantInst
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -107,12 +107,12 @@ theorem gaugeSubEx
   intro n ε a j W _ hW
   refine ⟨?_, ?_, gaugeSubEx_haarK n ε⟩
   · obtain ⟨A, E, h1, h2, h3, h4⟩ :=
-      GlobalTheory.T.exists_nilpotentAlgebra_isotropicFlagUnipotentRadical n ε a j W hW
+      _root_.GlobalTheory.RadicalAlg.exists_algebra_flagN n ε a j W hW
     rw [h4]
-    exact GlobalTheory.T.exists_riemannianHaar_unitaryJSubgroupOfAlgebra n ε A _ E h1 h2 h3
+    exact _root_.GlobalTheory.GaugeSubExists.exists_isGaugeSub n ε A _ E h1 h2 h3
   · obtain ⟨A, E, h1, h2, h3, h4⟩ :=
-      GlobalTheory.T.exists_algebra_isotropicFlagSelfAdjointLevi n ε a j W hW
+      _root_.GlobalTheory.LeviAlgebra.exists_levi_algebra n ε a j W hW
     rw [h4]
-    exact GlobalTheory.T.exists_riemannianHaar_unitaryJSubgroupOfAlgebra n ε A _ E h1 h2 h3
+    exact _root_.GlobalTheory.GaugeSubExists.exists_isGaugeSub n ε A _ E h1 h2 h3
 
 end GlobalTheory.FlagMeas

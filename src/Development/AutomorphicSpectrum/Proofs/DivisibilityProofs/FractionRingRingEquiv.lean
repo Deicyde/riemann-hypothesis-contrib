@@ -1,7 +1,8 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LaurentCechNerveLevelSpecTensorPower
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IntersectionNumberFieldEquivStatement
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.BundleObjects
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IntersectionNumberFieldEquiv
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -98,7 +99,7 @@ theorem genNum_zp_eq_rat
   unfold genNum
   refine Finset.sum_congr rfl fun μ _ => ?_
   rw [genFib_extTo_zp,
-    GlobalTheory.T.intersection_number_field_equiv K ι ℚ (FractionRing (ZP p))
+    _root_.GlobalTheory.CompanionTheory.Ar.Num.intNumL_map_ringEquiv K ι ℚ (FractionRing (ZP p))
       (ratEquivFractionZP p)]
 
 end GlobalTheory.CompanionTheory.Ar.Num

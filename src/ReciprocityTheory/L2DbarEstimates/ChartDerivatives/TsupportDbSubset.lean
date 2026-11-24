@@ -305,7 +305,7 @@ theorem d_add
     exact (wd_wdb_add_and_mul n j
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)
       (differentiableAt_comp_chart_symm_of_mem_target n z g hg _ he _ ht)).1
-  · simp [d, db, h]
+  · simp [d, h]
 
 theorem db_add
     {M : Type*} [TopologicalSpace M]
@@ -320,7 +320,7 @@ theorem db_add
     exact (wd_wdb_add_and_mul n j
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)
       (differentiableAt_comp_chart_symm_of_mem_target n z g hg _ he _ ht)).2.1
-  · simp [d, db, h]
+  · simp [db, h]
 
 theorem d_const_mul
     {M : Type*} [TopologicalSpace M]
@@ -334,7 +334,7 @@ theorem d_const_mul
     rw [d_eq_wd_comp_chosen_chart_symm n z j _ x h, d_eq_wd_comp_chosen_chart_symm n z j f x h]
     exact (wd_wdb_const_mul n j c
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)).1
-  · simp [d, db, h]
+  · simp [d, h]
 
 theorem db_const_mul
     {M : Type*} [TopologicalSpace M]
@@ -348,7 +348,7 @@ theorem db_const_mul
     rw [db_eq_wdb_comp_chosen_chart_symm n z j _ x h, db_eq_wdb_comp_chosen_chart_symm n z j f x h]
     exact (wd_wdb_const_mul n j c
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)).2
-  · simp [d, db, h]
+  · simp [db, h]
 
 theorem d_mul
     {M : Type*} [TopologicalSpace M]
@@ -365,7 +365,7 @@ theorem d_mul
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)
       (differentiableAt_comp_chart_symm_of_mem_target n z g hg _ he _ ht)).2.2.1.trans ?_
     rw [hx' f, hx' g]
-  · simp [d, db, h]
+  · simp [d, h]
 
 theorem db_mul
     {M : Type*} [TopologicalSpace M]
@@ -382,7 +382,7 @@ theorem db_mul
       (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)
       (differentiableAt_comp_chart_symm_of_mem_target n z g hg _ he _ ht)).2.2.2.trans ?_
     rw [hx' f, hx' g]
-  · simp [d, db, h]
+  · simp [db, h]
 
 theorem d_const {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (c : ℂ) (j : Fin n) (x : M)
     : d n z j (fun _ => c) x = 0 := by
@@ -430,7 +430,7 @@ theorem d_cexp
       (wd_wdb_cexp n j (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)).1.trans
         ?_
     rw [hx' f]
-  · simp [d, db, h]
+  · simp [d, h]
 
 theorem db_cexp
     {M : Type*} [TopologicalSpace M]
@@ -446,7 +446,7 @@ theorem db_cexp
       (wd_wdb_cexp n j (differentiableAt_comp_chart_symm_of_mem_target n z f hf _ he _ ht)).2.trans
         ?_
     rw [hx' f]
-  · simp [d, db, h]
+  · simp [db, h]
 
 theorem db_comp_real
     {M : Type*} [TopologicalSpace M]
@@ -466,7 +466,7 @@ theorem db_comp_real
       exact h1.congr_of_eventuallyEq (Filter.Eventually.of_forall fun w => by simp)
     refine (wd_wdb_ofReal_comp_real_chain n j k (hk.differentiable (by simp)) _ _ hP).2.trans ?_
     simp [hsx, Function.comp_def]
-  · simp [d, db, h]
+  · simp [db, h]
 
 theorem tsupport_d_subset
     {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (j : Fin n) (f : M → ℂ)

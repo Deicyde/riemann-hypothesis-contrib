@@ -81,7 +81,7 @@ theorem vrow_poly (Y : Gl r k) (i : ℕ)
     · funext l
       rw [vrow_succ_cast]
       simp [vrow, Pi.single_apply, Fin.castSucc_ne_last, Matrix.vecMul, dotProduct,
-        Matrix.one_apply_ne' (Fin.castSucc_ne_last _), Matrix.one_apply]
+        Matrix.one_apply]
   | succ i ih =>
     obtain ⟨p, h1, h2, h3⟩ := ih
     refine ⟨p * Polynomial.X + Polynomial.C (vrow Y (i + 1) (Fin.last r)), ?_, fun N hN => ?_, ?_⟩
@@ -93,7 +93,7 @@ theorem vrow_poly (Y : Gl r k) (i : ℕ)
     · funext l
       rw [vrow_succ_cast, h3]
       simp [map_add (f := _), Polynomial.aeval_X, Polynomial.aeval_C, Matrix.vecMul_add,
-        Matrix.vecMul_vecMul, Algebra.algebraMap_eq_smul_one, Matrix.vecMul_smul, mul_comm]
+        Matrix.vecMul_vecMul, Algebra.algebraMap_eq_smul_one, Matrix.vecMul_smul]
 
 theorem lastDet_eq (Y : Gl r k) : lastDet Y = (-1) ^ r * (Cm Y).det := by
   classical
@@ -118,8 +118,7 @@ theorem lastDet_eq (Y : Gl r k) : lastDet Y = (-1) ^ r * (Cm Y).det := by
               (Pi.single (Fin.last r) (1 : k) ᵥ* (full Y ^ (i : ℕ))) j)
             0 (Fin.castSucc j)
           = 0 := by
-    intro j
-    simp [Pi.single_apply, Fin.castSucc_ne_last, Matrix.one_apply_ne' (Fin.castSucc_ne_last _)]
+    intro j; simp [Matrix.one_apply_ne' (Fin.castSucc_ne_last _)]
   simp only [hz, mul_zero, zero_mul, Finset.sum_const_zero, zero_add]
   rw [show (Matrix.of fun (i j : Fin (r + 1)) =>
           (Pi.single (Fin.last r) (1 : k) ᵥ* (full Y ^ (i : ℕ))) j)
@@ -145,7 +144,7 @@ theorem Cm_act (g : GL (Fin r) k) (Y : Gl r k)
         = 1 from
       Units.inv_mul g,
     Matrix.vecMul_one]
-  simp [Matrix.vecMul, dotProduct, Cm]
+  simp [Matrix.vecMul, dotProduct]
 
 end GlobalTheory.JR.TransferFactor
 

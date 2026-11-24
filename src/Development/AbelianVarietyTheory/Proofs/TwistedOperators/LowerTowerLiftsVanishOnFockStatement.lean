@@ -46,9 +46,7 @@ open MeasureTheory Matrix GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.PairLift
+
 theorem _root_.GlobalTheory.T.lowerTowerLifts_vanish_on_fock
     : ∀ (D : D7) (X : ProvA), Inputs D X → LowFock D X := by
-  first
-  | exact @GlobalTheory.LowerMembersRule.lowFock
-  | exact GlobalTheory.LowerMembersRule.lowFock
-  | (intros; apply GlobalTheory.LowerMembersRule.lowFock <;> assumption)
+  first | exact @GlobalTheory.LowerMembersRule.lowFock

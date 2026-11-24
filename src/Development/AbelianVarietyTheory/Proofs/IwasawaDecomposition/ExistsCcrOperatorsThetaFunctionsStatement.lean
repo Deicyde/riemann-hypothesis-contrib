@@ -53,6 +53,7 @@ open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace
 open scoped TensorProduct ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped Classical
+
 theorem _root_.GlobalTheory.T.exists_ccr_operators_thetaFunctions
     : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → ℂ) →+ AE D),
       GlobalTheory.FockCompare.Chart θ σ
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_ccr_operators_thetaFunctions
                   → ((∑ k, ∑ l, X k l • (x k * d l)) f).1
                     = (nOp (GlobalTheory.RealWeil.rhoV hψ σ S T) (GlobalTheory.RealWeil.HM S T) X
                       F).1 := by
-  first
-  | exact @GlobalTheory.Mem.Lift.exists_isCCR_theta
-  | exact GlobalTheory.Mem.Lift.exists_isCCR_theta
-  | (intros; apply GlobalTheory.Mem.Lift.exists_isCCR_theta <;> assumption)
+  first | exact @GlobalTheory.Mem.Lift.exists_isCCR_theta

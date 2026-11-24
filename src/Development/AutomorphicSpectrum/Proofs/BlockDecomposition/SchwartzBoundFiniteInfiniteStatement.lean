@@ -53,6 +53,7 @@ open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doublin
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.SiegelFormula
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.schwartz_bound_finite_infinite
     : ∀ (D : D7) (θ : InfFam D),
       IsInfFam θ
@@ -66,12 +67,4 @@ theorem _root_.GlobalTheory.T.schwartz_bound_finite_infinite
                   ∧ ∀ x,
                     ‖Φ x‖ₑ
                       ≤ ∑ i, ‖f i (fun τ i' j => compAt θ τ x i' j) * g i (fun i' j => finPart D (x i' j))‖ₑ :=
-  by
-    first
-    | exact @GlobalTheory.CompanionTheory.WeilTheta.schwartzA_continuous_and_dominated
-    | exact GlobalTheory.CompanionTheory.WeilTheta.schwartzA_continuous_and_dominated
-    | (
-        intros
-        apply GlobalTheory.CompanionTheory.WeilTheta.schwartzA_continuous_and_dominated
-          <;> assumption
-      )
+  by first | exact @GlobalTheory.CompanionTheory.WeilTheta.schwartzA_continuous_and_dominated

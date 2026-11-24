@@ -51,9 +51,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.Host
   GlobalTheory.Mem.Col2 GlobalTheory.HeightCounting GlobalTheory.SeriesTie
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 section General
 
 variable

@@ -190,10 +190,7 @@ def quadBasis (h2 : Module.finrank F E = 2) {θ : E} (hli : LinearIndependent F 
 theorem quadBasis_coe
     (h2 : Module.finrank F E = 2) {θ : E} (hli : LinearIndependent F ![(1 : E), θ])
     : ⇑(quadBasis h2 hli) = ![(1 : E), θ] := by
-  first
-  | exact coe_basisOfLinearIndependentOfCardEqFinrank hli _
-  | (unfold quadBasis; exact coe_basisOfLinearIndependentOfCardEqFinrank hli _)
-  | simp [quadBasis]
+  first | exact coe_basisOfLinearIndependentOfCardEqFinrank hli _
 
 end Field
 
@@ -209,14 +206,10 @@ def quadBasisR : Module.Basis (Fin 2) R (R ⊗[F] E) :=
   Algebra.TensorProduct.basis R (quadBasis h2 hli)
 
 theorem quadBasisR_zero : quadBasisR h2 hli R 0 = (1 : R) ⊗ₜ[F] (1 : E) := by
-  first
-  | (unfold quadBasisR; rw [Algebra.TensorProduct.basis_apply, quadBasis_coe]; rfl)
-  | simp [quadBasisR, quadBasis_coe]
+  first | (unfold quadBasisR; rw [Algebra.TensorProduct.basis_apply, quadBasis_coe]; rfl)
 
 theorem quadBasisR_one : quadBasisR h2 hli R 1 = (1 : R) ⊗ₜ[F] θ := by
-  first
-  | (unfold quadBasisR; rw [Algebra.TensorProduct.basis_apply, quadBasis_coe]; rfl)
-  | simp [quadBasisR, quadBasis_coe]
+  first | (unfold quadBasisR; rw [Algebra.TensorProduct.basis_apply, quadBasis_coe]; rfl)
 
 theorem quad_coord_eq (a b : R)
     : ⇑((quadBasisR h2 hli R).repr (a ⊗ₜ[F] (1 : E) + b ⊗ₜ[F] θ)) = ![a, b] := by
@@ -248,8 +241,6 @@ theorem quad_decomp (z : R ⊗[F] E)
 private lemma sigR_tmul_adelic_unitary_orbits (x : R) (y : E) : sigR R σ (x ⊗ₜ[F] y) = x ⊗ₜ[F] σ y := by
   first
   | rfl
-  | simp [sigR]
-  | (unfold sigR; simp)
 
 theorem quad_sig (hσθ : σ θ = -θ) (a b : R)
     : sigR R σ (a ⊗ₜ[F] (1 : E) + b ⊗ₜ[F] θ) = a ⊗ₜ[F] (1 : E) + (-b) ⊗ₜ[F] θ := by

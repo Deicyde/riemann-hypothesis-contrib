@@ -66,7 +66,7 @@ private theorem map_jw_eq_self_of_involution
   · ext i j; simp
   · ext i j; simp [Matrix.one_apply]
   · ext i j
-    by_cases h : i = j <;> simp [Matrix.one_apply, Matrix.smul_apply, h, hse]
+    by_cases h : i = j <;> simp [Matrix.smul_apply, h, hse]
   · ext i j; simp
 
 theorem frame_inv_pf

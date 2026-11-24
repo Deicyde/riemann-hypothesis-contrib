@@ -265,7 +265,6 @@ theorem integral_class_eq_zero
 
 end MainStatements.WeightKernel.PArchZero
 
-
 open MainStatements.WeightKernel.PArchZero in
 theorem MainStatements.WeightKernel.archZero
     : BumpOn → Weight → Vanish → FDRight → ArchGroup → ArchUnimod

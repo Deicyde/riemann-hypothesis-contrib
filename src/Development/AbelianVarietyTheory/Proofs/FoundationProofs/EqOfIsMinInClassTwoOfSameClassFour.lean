@@ -68,23 +68,26 @@ variable {X : Type*} [AddCommGroup X] {Q : QuadraticMap ℤ X ℝ}
 theorem eq_polar_div_two (Q : QuadraticMap ℤ X ℝ) (x : X) : Q x = polar Q x x / 2 := by
   rw [polar_self, two_smul]; ring
 
-theorem map_add_zsmul (Q : QuadraticMap ℤ X ℝ) (a m : X) (n : ℤ) :
-    Q (a + n • m) = Q a + n * polar Q a m + n ^ 2 * Q m := by
+theorem map_add_zsmul (Q : QuadraticMap ℤ X ℝ) (a m : X) (n : ℤ)
+    : Q (a + n • m) = Q a + n * polar Q a m + n ^ 2 * Q m := by
   rw [QuadraticMap.map_add Q, polar_smul_right, QuadraticMap.map_smul]
   simp only [zsmul_eq_mul]
   push_cast
   ring
 
-theorem eq_zero_of_zsmul_eq_zero (hQ : Q.PosDef) {n : ℤ} (hn : n ≠ 0) {x : X} (h : n • x = 0) :
-    x = 0 := by
+theorem eq_zero_of_zsmul_eq_zero (hQ : Q.PosDef) {n : ℤ} (hn : n ≠ 0) {x : X} (h : n • x = 0)
+    : x = 0 := by
   have h1 : Q (n • x) = 0 := by rw [h, map_zero]
   rw [QuadraticMap.map_smul, zsmul_eq_mul] at h1
   have h2 : ((n * n : ℤ) : ℝ) ≠ 0 := by exact_mod_cast mul_ne_zero hn hn
   exact hQ.anisotropic x ((mul_eq_zero.mp h1).resolve_left h2)
 
-theorem lt_add_zsmul_of_le_add (hQ : Q.PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ) {a m : X} {n : ℤ}
-    (hn : 2 ≤ n) (h : t * Q a + ν a ≤ t * Q (a + m) + ν (a + m)) (hm : m ≠ 0) :
-    t * Q a + ν a < t * Q (a + n • m) + ν (a + n • m) := by
+theorem lt_add_zsmul_of_le_add
+    (hQ : Q.PosDef)
+    {t : ℝ} (ht : 0 < t)
+    (ν : X →+ ℝ)
+    {a m : X} {n : ℤ} (hn : 2 ≤ n) (h : t * Q a + ν a ≤ t * Q (a + m) + ν (a + m)) (hm : m ≠ 0)
+    : t * Q a + ν a < t * Q (a + n • m) + ν (a + n • m) := by
   have h1 := map_add_zsmul Q a m 1
   rw [one_smul] at h1
   rw [h1, map_add (f := _)] at h
@@ -96,31 +99,50 @@ theorem lt_add_zsmul_of_le_add (hQ : Q.PosDef) {t : ℝ} (ht : 0 < t) (ν : X �
   have h4 : 0 < (n : ℝ) * (n - 1) * (t * Q m) := mul_pos (mul_pos (by linarith) (by linarith)) hp
   nlinarith
 
-theorem affine_lt_of_min_class (hQ : Q.PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ) {N n : ℤ}
-    (hn : 2 ≤ n) {a : X} (ha : ∀ w, t * Q a + ν a ≤ t * Q (a + N • w) + ν (a + N • w)) {w : X}
-    (hw : (n * N) • w ≠ 0) :
-    t * Q a + ν a < t * Q (a + (n * N) • w) + ν (a + (n * N) • w) := by
+theorem affine_lt_of_min_class
+    (hQ : Q.PosDef)
+    {t : ℝ} (ht : 0 < t)
+    (ν : X →+ ℝ)
+    {N n : ℤ} (hn : 2 ≤ n)
+    {a : X} (ha : ∀ w, t * Q a + ν a ≤ t * Q (a + N • w) + ν (a + N • w))
+    {w : X} (hw : (n * N) • w ≠ 0)
+    : t * Q a + ν a < t * Q (a + (n * N) • w) + ν (a + (n * N) • w) := by
   rw [mul_smul] at hw ⊢
   exact lt_add_zsmul_of_le_add hQ ht ν hn (ha w) fun h => hw (by rw [h, smul_zero])
 
-theorem lt_of_min_class (hQ : Q.PosDef) {N n : ℤ} (hn : 2 ≤ n) {a : X}
-    (ha : ∀ w, Q a ≤ Q (a + N • w)) {w : X} (hw : (n * N) • w ≠ 0) :
-    Q a < Q (a + (n * N) • w) := by
+theorem lt_of_min_class
+    (hQ : Q.PosDef)
+    {N n : ℤ} (hn : 2 ≤ n)
+    {a : X} (ha : ∀ w, Q a ≤ Q (a + N • w))
+    {w : X} (hw : (n * N) • w ≠ 0)
+    : Q a < Q (a + (n * N) • w) := by
   simpa using affine_lt_of_min_class hQ one_pos 0 hn (by simpa using ha) hw
 
-theorem lt_of_min_class_of_ne_zero (hQ : Q.PosDef) {N n : ℤ} (hN : N ≠ 0) (hn : 2 ≤ n) {a : X}
-    (ha : ∀ w, Q a ≤ Q (a + N • w)) {w : X} (hw : w ≠ 0) : Q a < Q (a + (n * N) • w) :=
-  lt_of_min_class hQ hn ha fun h =>
-    hw (eq_zero_of_zsmul_eq_zero hQ (mul_ne_zero (by omega) hN) h)
+theorem lt_of_min_class_of_ne_zero
+    (hQ : Q.PosDef)
+    {N n : ℤ} (hN : N ≠ 0) (hn : 2 ≤ n)
+    {a : X} (ha : ∀ w, Q a ≤ Q (a + N • w))
+    {w : X} (hw : w ≠ 0)
+    : Q a < Q (a + (n * N) • w) :=
+  lt_of_min_class hQ hn ha fun h => hw (eq_zero_of_zsmul_eq_zero hQ (mul_ne_zero (by omega) hN) h)
 
-theorem affine_lt_of_global_min (hQ : Q.PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ) {N : ℤ}
-    (hN : 2 ≤ N) {a : X} (ha : ∀ x, t * Q a + ν a ≤ t * Q x + ν x) {w : X} (hw : w ≠ 0) :
-    t * Q a + ν a < t * Q (a + N • w) + ν (a + N • w) :=
+theorem affine_lt_of_global_min
+    (hQ : Q.PosDef)
+    {t : ℝ} (ht : 0 < t)
+    (ν : X →+ ℝ)
+    {N : ℤ} (hN : 2 ≤ N)
+    {a : X} (ha : ∀ x, t * Q a + ν a ≤ t * Q x + ν x)
+    {w : X} (hw : w ≠ 0)
+    : t * Q a + ν a < t * Q (a + N • w) + ν (a + N • w) :=
   lt_add_zsmul_of_le_add hQ ht ν hN (ha _) hw
 
-theorem lt_of_global_min (hQ : Q.PosDef) (ν : X →+ ℝ) {N : ℤ} (hN : 2 ≤ N) {a : X}
-    (ha : ∀ x, Q a / N + ν a ≤ Q x / N + ν x) {w : X} (hw : w ≠ 0) :
-    Q a / N + ν a < Q (a + N • w) / N + ν (a + N • w) := by
+theorem lt_of_global_min
+    (hQ : Q.PosDef)
+    (ν : X →+ ℝ)
+    {N : ℤ} (hN : 2 ≤ N)
+    {a : X} (ha : ∀ x, Q a / N + ν a ≤ Q x / N + ν x)
+    {w : X} (hw : w ≠ 0)
+    : Q a / N + ν a < Q (a + N • w) / N + ν (a + N • w) := by
   have hN' : (0 : ℝ) < N := by exact_mod_cast (by omega : (0 : ℤ) < N)
   simp only [div_eq_inv_mul] at ha ⊢
   exact affine_lt_of_global_min hQ (inv_pos.mpr hN') ν hN ha hw
@@ -131,71 +153,82 @@ section Gram
 
 variable {X : Type*} [AddCommGroup X] {ι : Type*}
 
-def gram {R : Type*} [CommRing R] [Module R X] [Module R ℝ] (Q : QuadraticMap R X ℝ) (e : ι → X) :
-    Matrix ι ι ℝ :=
+def gram {R : Type*} [CommRing R] [Module R X] [Module R ℝ] (Q : QuadraticMap R X ℝ) (e : ι → X)
+    : Matrix ι ι ℝ :=
   Matrix.of fun i j => polar Q (e i) (e j)
 
-@[simp] theorem gram_apply {R : Type*} [CommRing R] [Module R X] [Module R ℝ]
-    (Q : QuadraticMap R X ℝ) (e : ι → X) (i j : ι) : gram Q e i j = polar Q (e i) (e j) := rfl
+@[simp]
+theorem gram_apply
+    {R : Type*} [CommRing R] [Module R X] [Module R ℝ]
+    (Q : QuadraticMap R X ℝ) (e : ι → X) (i j : ι)
+    : gram Q e i j = polar Q (e i) (e j) :=
+  rfl
 
-theorem gram_isHermitian {R : Type*} [CommRing R] [Module R X] [Module R ℝ]
-    (Q : QuadraticMap R X ℝ) (e : ι → X) : (gram Q e).IsHermitian := by
+theorem gram_isHermitian
+    {R : Type*} [CommRing R] [Module R X] [Module R ℝ] (Q : QuadraticMap R X ℝ) (e : ι → X)
+    : (gram Q e).IsHermitian := by
   ext i j
   simp [polar_comm Q (e j)]
 
-theorem polar_sum_smul {R : Type*} [CommRing R] [Module R X] [Algebra R ℝ] [Fintype ι]
-    (Q : QuadraticMap R X ℝ) (e : ι → X) (x y : ι → R) :
-    polar Q (∑ i, x i • e i) (∑ i, y i • e i) =
-      (fun i => algebraMap R ℝ (x i)) ⬝ᵥ (gram Q e *ᵥ fun i => algebraMap R ℝ (y i)) := by
+theorem polar_sum_smul
+    {R : Type*} [CommRing R] [Module R X] [Algebra R ℝ] [Fintype ι]
+    (Q : QuadraticMap R X ℝ) (e : ι → X) (x y : ι → R)
+    : polar Q (∑ i, x i • e i) (∑ i, y i • e i)
+      = (fun i => algebraMap R ℝ (x i)) ⬝ᵥ (gram Q e *ᵥ fun i => algebraMap R ℝ (y i)) := by
   rw [← polarBilin_apply_apply, LinearMap.map_sum₂]
 
   simp only [map_sum, map_smul, LinearMap.smul_apply, polarBilin_apply_apply, dotProduct, mulVec,
-  gram_apply, Algebra.smul_def, Finset.mul_sum]
+    gram_apply, Algebra.smul_def, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
 def realExtension (Q : QuadraticMap ℤ X ℝ) : QuadraticForm ℝ (ℝ ⊗[ℤ] X) :=
   (1 / 2 : ℝ) • LinearMap.BilinMap.toQuadraticMap (LinearMap.liftBaseChangeEquiv ℝ
-    ((LinearMap.liftBaseChangeEquiv ℝ (R := ℤ) (M := X) (N := ℝ)).toLinearMap.restrictScalars ℤ ∘ₗ
-      Q.polarBilin))
+    ((LinearMap.liftBaseChangeEquiv ℝ (R := ℤ) (M := X) (N := ℝ)).toLinearMap.restrictScalars ℤ
+      ∘ₗ Q.polarBilin))
 
-@[simp] theorem realExtension_one_tmul (Q : QuadraticMap ℤ X ℝ) (x : X) :
-    realExtension Q (1 ⊗ₜ x) = Q x := by
+@[simp]
+theorem realExtension_one_tmul (Q : QuadraticMap ℤ X ℝ) (x : X)
+    : realExtension Q (1 ⊗ₜ x) = Q x := by
   rw [eq_polar_div_two Q]
   simp [realExtension]
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 
-theorem gram_eq_of_comp {Q : QuadraticMap ℤ X ℝ} {P : QuadraticForm ℝ V} (φ : X →+ V)
-    (h : ∀ x, P (φ x) = Q x) (e : ι → X) : gram Q e = gram P (fun i => φ (e i)) := by
+theorem gram_eq_of_comp
+    {Q : QuadraticMap ℤ X ℝ} {P : QuadraticForm ℝ V}
+    (φ : X →+ V) (h : ∀ x, P (φ x) = Q x)
+    (e : ι → X)
+    : gram Q e = gram P (fun i => φ (e i)) := by
   ext i j
   simp only [gram_apply, polar, ← map_add φ, h]
 
-theorem dotProduct_gram_mulVec [Fintype ι] (P : QuadraticForm ℝ V) (v : ι → V) (x : ι → ℝ) :
-    x ⬝ᵥ (gram P v *ᵥ x) = 2 * P (∑ i, x i • v i) := by
+theorem dotProduct_gram_mulVec [Fintype ι] (P : QuadraticForm ℝ V) (v : ι → V) (x : ι → ℝ)
+    : x ⬝ᵥ (gram P v *ᵥ x) = 2 * P (∑ i, x i • v i) := by
   have := polar_sum_smul P v x x
   rw [polar_self, two_smul] at this
   simp only [Algebra.algebraMap_self, RingHom.id_apply] at this
   rw [← this, two_mul]
 
-theorem gram_posDef_of_linearIndependent [Finite ι] {P : QuadraticForm ℝ V} (hP : P.PosDef)
-    {v : ι → V} (hv : LinearIndependent ℝ v) : (gram P v).PosDef := by
+theorem gram_posDef_of_linearIndependent
+    [Finite ι] {P : QuadraticForm ℝ V} (hP : P.PosDef) {v : ι → V} (hv : LinearIndependent ℝ v)
+    : (gram P v).PosDef := by
   have := Fintype.ofFinite ι
   refine posDef_iff_dotProduct_mulVec.mpr ⟨gram_isHermitian P v, fun x hx => ?_⟩
   rw [star_trivial, dotProduct_gram_mulVec]
   refine mul_pos two_pos (hP _ fun h => hx ?_)
   exact funext (Fintype.linearIndependent_iff.mp hv x h)
 
-theorem gram_posDef_iff [Finite ι] (P : QuadraticForm ℝ V) (v : Module.Basis ι ℝ V) :
-    (gram P v).PosDef ↔ P.PosDef := by
+theorem gram_posDef_iff [Finite ι] (P : QuadraticForm ℝ V) (v : Module.Basis ι ℝ V)
+    : (gram P v).PosDef ↔ P.PosDef := by
   have := Fintype.ofFinite ι
   refine ⟨fun h y hy => ?_, fun h => gram_posDef_of_linearIndependent h v.linearIndependent⟩
   have h1 := h.dotProduct_mulVec_pos (x := v.equivFun y) (by simpa using hy)
   rw [star_trivial, dotProduct_gram_mulVec, v.sum_equivFun] at h1
   linarith
 
-theorem realExtension_posDef_iff [Finite ι] (Q : QuadraticMap ℤ X ℝ) (e : Module.Basis ι ℤ X) :
-    (realExtension Q).PosDef ↔ (gram Q e).PosDef := by
+theorem realExtension_posDef_iff [Finite ι] (Q : QuadraticMap ℤ X ℝ) (e : Module.Basis ι ℤ X)
+    : (realExtension Q).PosDef ↔ (gram Q e).PosDef := by
   rw [← gram_posDef_iff _ (Algebra.TensorProduct.basis ℝ e),
     gram_eq_of_comp (TensorProduct.mk ℤ ℝ X 1).toAddMonoidHom (realExtension_one_tmul Q) e]
   have : ⇑(Algebra.TensorProduct.basis ℝ e) = fun i => (1 : ℝ) ⊗ₜ[ℤ] e i :=
@@ -203,8 +236,8 @@ theorem realExtension_posDef_iff [Finite ι] (Q : QuadraticMap ℤ X ℝ) (e : M
   rw [this]
   rfl
 
-theorem two_mul_eq_dotProduct [Fintype ι] (Q : QuadraticMap ℤ X ℝ) (e : Module.Basis ι ℤ X) (a : X) :
-    2 * Q a = (fun i => (e.repr a i : ℝ)) ⬝ᵥ (gram Q e *ᵥ fun i => (e.repr a i : ℝ)) := by
+theorem two_mul_eq_dotProduct [Fintype ι] (Q : QuadraticMap ℤ X ℝ) (e : Module.Basis ι ℤ X) (a : X)
+    : 2 * Q a = (fun i => (e.repr a i : ℝ)) ⬝ᵥ (gram Q e *ᵥ fun i => (e.repr a i : ℝ)) := by
   have := polar_sum_smul Q e (e.repr a) (e.repr a)
   rw [e.sum_repr, polar_self, two_smul] at this
   rw [two_mul, this]
@@ -216,8 +249,9 @@ section Rational
 
 variable {X : Type*} [AddCommGroup X] {ι : Type*} {Q : QuadraticMap ℤ X ℝ}
 
-theorem dotProduct_gram_pos_of_rat [Fintype ι] (hQ : Q.PosDef) (e : Module.Basis ι ℤ X) {x : ι → ℚ}
-    (hx : x ≠ 0) : 0 < (fun i => (x i : ℝ)) ⬝ᵥ (gram Q e *ᵥ fun i => (x i : ℝ)) := by
+theorem dotProduct_gram_pos_of_rat
+    [Fintype ι] (hQ : Q.PosDef) (e : Module.Basis ι ℤ X) {x : ι → ℚ} (hx : x ≠ 0)
+    : 0 < (fun i => (x i : ℝ)) ⬝ᵥ (gram Q e *ᵥ fun i => (x i : ℝ)) := by
   obtain ⟨⟨D, hD⟩, h⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors ℤ) x
   choose y hy using h
   have hD0 : D ≠ 0 := nonZeroDivisors.ne_zero hD
@@ -236,12 +270,13 @@ theorem dotProduct_gram_pos_of_rat [Fintype ι] (hQ : Q.PosDef) (e : Module.Basi
     rw [h1] at this
     simpa [hD0] using this.symm
   have h2 := two_mul_eq_dotProduct Q e (e.equivFun.symm y)
-  rw [hyx, mulVec_smul, dotProduct_smul, smul_dotProduct, smul_eq_mul, smul_eq_mul, ← mul_assoc] at h2
+  rw [hyx, mulVec_smul, dotProduct_smul, smul_dotProduct, smul_eq_mul, smul_eq_mul, ← mul_assoc]
+    at h2
   have h3 := hQ _ hy0
   exact (pos_iff_pos_of_mul_pos (h2 ▸ mul_pos two_pos h3)).mp (mul_self_pos.mpr hD')
 
-theorem gram_posSemidef [Finite ι] (hQ : Q.PosDef) (e : Module.Basis ι ℤ X) :
-    (gram Q e).PosSemidef := by
+theorem gram_posSemidef [Finite ι] (hQ : Q.PosDef) (e : Module.Basis ι ℤ X)
+    : (gram Q e).PosSemidef := by
   have := Fintype.ofFinite ι
   refine posSemidef_iff_dotProduct_mulVec.mpr ⟨gram_isHermitian Q e, fun x => ?_⟩
   rw [star_trivial]
@@ -255,8 +290,9 @@ theorem gram_posSemidef [Finite ι] (hQ : Q.PosDef) (e : Module.Basis ι ℤ X) 
       rw [this, zero_dotProduct]
     · exact (dotProduct_gram_pos_of_rat hQ e hy).le
 
-theorem realExtension_posDef_of_rat [Module.Free ℤ X] [Module.Finite ℤ X] (hQ : Q.PosDef)
-    (hr : ∀ x y, ∃ q : ℚ, polar Q x y = q) : (realExtension Q).PosDef := by
+theorem realExtension_posDef_of_rat
+    [Module.Free ℤ X] [Module.Finite ℤ X] (hQ : Q.PosDef) (hr : ∀ x y, ∃ q : ℚ, polar Q x y = q)
+    : (realExtension Q).PosDef := by
   classical
   let e := Module.Free.chooseBasis ℤ X
   choose M hM using fun i j => hr (e i) (e j)
@@ -280,20 +316,22 @@ theorem realExtension_posDef_of_rat [Module.Free ℤ X] [Module.Finite ℤ X] (h
 def ofIntBilin (β : LinearMap.BilinForm ℤ X) : QuadraticMap ℤ X ℝ :=
   (1 / 2 : ℝ) • (Int.castAddHom ℝ).toIntLinearMap.compQuadraticMap β.toQuadraticMap
 
-@[simp] theorem ofIntBilin_apply (β : LinearMap.BilinForm ℤ X) (x : X) :
-    ofIntBilin β x = (β x x : ℝ) / 2 := by
+@[simp]
+theorem ofIntBilin_apply (β : LinearMap.BilinForm ℤ X) (x : X)
+    : ofIntBilin β x = (β x x : ℝ) / 2 := by
   simp [ofIntBilin]
   ring
 
-theorem polar_ofIntBilin {β : LinearMap.BilinForm ℤ X} (hβ : ∀ x y, β x y = β y x) (x y : X) :
-    polar (ofIntBilin β) x y = β x y := by
+theorem polar_ofIntBilin {β : LinearMap.BilinForm ℤ X} (hβ : ∀ x y, β x y = β y x) (x y : X)
+    : polar (ofIntBilin β) x y = β x y := by
   simp only [polar, ofIntBilin_apply, map_add (f := _), LinearMap.add_apply, hβ y x]
   push_cast
   ring
 
-theorem realExtension_ofIntBilin_posDef [Module.Free ℤ X] [Module.Finite ℤ X]
-    {β : LinearMap.BilinForm ℤ X} (hβ : ∀ x y, β x y = β y x) (hpos : ∀ x, x ≠ 0 → 0 < β x x) :
-    (realExtension (ofIntBilin β)).PosDef :=
+theorem realExtension_ofIntBilin_posDef
+    [Module.Free ℤ X] [Module.Finite ℤ X]
+    {β : LinearMap.BilinForm ℤ X} (hβ : ∀ x y, β x y = β y x) (hpos : ∀ x, x ≠ 0 → 0 < β x x)
+    : (realExtension (ofIntBilin β)).PosDef :=
   realExtension_posDef_of_rat
     (fun x hx => by
       rw [ofIntBilin_apply]
@@ -304,13 +342,12 @@ end Rational
 
 section Exists
 
-variable {X : Type*} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-  {Q : QuadraticMap ℤ X ℝ}
-
+variable {X : Type*} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] {Q : QuadraticMap ℤ X ℝ}
 
 omit [Module.Free ℤ X] [Module.Finite ℤ X] in
-theorem exists_mul_sum_sq_le {ι : Type*} [Fintype ι] (hQ : (realExtension Q).PosDef)
-    (e : Module.Basis ι ℤ X) : ∃ c > 0, ∀ a, c * ∑ i, (e.repr a i : ℝ) ^ 2 ≤ Q a := by
+theorem exists_mul_sum_sq_le
+    {ι : Type*} [Fintype ι] (hQ : (realExtension Q).PosDef) (e : Module.Basis ι ℤ X)
+    : ∃ c > 0, ∀ a, c * ∑ i, (e.repr a i : ℝ) ^ 2 ≤ Q a := by
   obtain ⟨c, hc, h⟩ := posDef_exists_mul_dotProduct_le ((realExtension_posDef_iff Q e).mp hQ)
   refine ⟨c / 2, by positivity, fun a => ?_⟩
   have := h fun i => (e.repr a i : ℝ)
@@ -318,8 +355,9 @@ theorem exists_mul_sum_sq_le {ι : Type*} [Fintype ι] (hQ : (realExtension Q).P
   simp only [dotProduct, ← pow_two] at this
   linarith
 
-theorem finite_affine_sublevel (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ)
-    (r : ℝ) : {x | t * Q x + ν x ≤ r}.Finite := by
+theorem finite_affine_sublevel
+    (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ) (r : ℝ)
+    : {x | t * Q x + ν x ≤ r}.Finite := by
   let e := Module.Free.chooseBasis ℤ X
   obtain ⟨c, hc, h⟩ := exists_mul_sum_sq_le hQ e
   have hs : 0 < t * c := mul_pos ht hc
@@ -330,15 +368,16 @@ theorem finite_affine_sublevel (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0
     e.equivFun.injective.injOn (Set.Finite.pi fun _ => Set.finite_Icc _ _)
   intro a ha i _
   have hν : ν a = ∑ i, (e.repr a i : ℝ) * ν (e i) := by
-
     conv_lhs => rw [← e.sum_repr a, map_sum]
     simp only [map_zsmul, zsmul_eq_mul]
-  have h1 : s / 2 * ∑ i, (e.repr a i : ℝ) ^ 2 ≤
-      s * ∑ i, (e.repr a i : ℝ) ^ 2 + ν a + ∑ i, ν (e i) ^ 2 / (2 * s) := by
+  have h1
+      : s / 2 * ∑ i, (e.repr a i : ℝ) ^ 2
+        ≤ s * ∑ i, (e.repr a i : ℝ) ^ 2 + ν a + ∑ i, ν (e i) ^ 2 / (2 * s) := by
     rw [hν, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_le_sum fun j _ => ?_
     have : s * (e.repr a j : ℝ) ^ 2 + (e.repr a j : ℝ) * ν (e j) + ν (e j) ^ 2 / (2 * s)
-        - s / 2 * (e.repr a j : ℝ) ^ 2 = (s * e.repr a j + ν (e j)) ^ 2 / (2 * s) := by
+          - s / 2 * (e.repr a j : ℝ) ^ 2
+        = (s * e.repr a j + ν (e j)) ^ 2 / (2 * s) := by
       field_simp
       ring
     have h0 : 0 ≤ (s * e.repr a j + ν (e j)) ^ 2 / (2 * s) := by positivity
@@ -347,7 +386,9 @@ theorem finite_affine_sublevel (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0
     rw [hsdef, mul_assoc]
     exact mul_le_mul_of_nonneg_left (h a) ht.le
   have h3 : (e.repr a i : ℝ) ^ 2 ≤ ∑ i, (e.repr a i : ℝ) ^ 2 :=
-    Finset.single_le_sum (f := fun i => (e.repr a i : ℝ) ^ 2) (fun _ _ => sq_nonneg _)
+    Finset.single_le_sum
+      (f := fun i => (e.repr a i : ℝ) ^ 2)
+      (fun _ _ => sq_nonneg _)
       (Finset.mem_univ i)
   have ha' : t * Q a + ν a ≤ r := ha
   have h4 : (e.repr a i : ℝ) ^ 2 < K := by
@@ -360,17 +401,19 @@ theorem finite_affine_sublevel (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0
 theorem finite_sublevel (hQ : (realExtension Q).PosDef) (r : ℝ) : {x | Q x ≤ r}.Finite := by
   simpa using finite_affine_sublevel hQ one_pos 0 r
 
-theorem tendsto_affine_cofinite (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t)
-    (ν : X →+ ℝ) : Tendsto (fun x => t * Q x + ν x) cofinite atTop :=
-  tendsto_atTop.mpr fun r => (finite_affine_sublevel hQ ht ν r).subset fun x hx =>
-    le_of_not_ge (show ¬ r ≤ t * Q x + ν x from hx)
+theorem tendsto_affine_cofinite (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ)
+    : Tendsto (fun x => t * Q x + ν x) cofinite atTop :=
+  tendsto_atTop.mpr fun r =>
+    (finite_affine_sublevel hQ ht ν r).subset fun x hx =>
+      le_of_not_ge (show ¬ r ≤ t * Q x + ν x from hx)
 
-theorem exists_affine_min_on (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ)
-    {S : Set X} (hS : S.Nonempty) : ∃ a ∈ S, ∀ x ∈ S, t * Q a + ν a ≤ t * Q x + ν x :=
+theorem exists_affine_min_on
+    (hQ : (realExtension Q).PosDef) {t : ℝ} (ht : 0 < t) (ν : X →+ ℝ) {S : Set X} (hS : S.Nonempty)
+    : ∃ a ∈ S, ∀ x ∈ S, t * Q a + ν a ≤ t * Q x + ν x :=
   (tendsto_affine_cofinite hQ ht ν).exists_within_forall_le hS
 
-theorem exists_global_min (hQ : (realExtension Q).PosDef) (ν : X →+ ℝ) {N : ℝ} (hN : 0 < N) :
-    ∃ a, ∀ x, Q a / N + ν a ≤ Q x / N + ν x := by
+theorem exists_global_min (hQ : (realExtension Q).PosDef) (ν : X →+ ℝ) {N : ℝ} (hN : 0 < N)
+    : ∃ a, ∀ x, Q a / N + ν a ≤ Q x / N + ν x := by
   simpa [div_eq_inv_mul] using exists_affine_min_on hQ (inv_pos.mpr hN) ν Set.univ_nonempty
 
 end Exists
@@ -382,29 +425,39 @@ open ReciprocityTheory.ReducedBases (toReal SameClass IsMinInClass IsUniqueMinIn
 variable {d : ℕ} {A : Matrix (Fin d) (Fin d) ℝ}
 
 def ofMatrix (A : Matrix (Fin d) (Fin d) ℝ) : QuadraticMap ℤ (Fin d → ℤ) ℝ :=
-  (1 / 2 : ℝ) • LinearMap.BilinMap.toQuadraticMap (LinearMap.mk₂ ℤ (ReciprocityTheory.ReducedBases.polar A)
-    (fun x y z => by simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, add_mul, Finset.sum_add_distrib])
-    (fun n x y => by
-      simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, Finset.mul_sum, mul_assoc])
-    (fun x y z => by
-      simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, mul_add, Finset.sum_add_distrib])
-    (fun n x y => by
-      simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, Finset.mul_sum, mul_left_comm]))
+  (1 / 2 : ℝ)
+    • LinearMap.BilinMap.toQuadraticMap (LinearMap.mk₂ ℤ (ReciprocityTheory.ReducedBases.polar A)
+      (fun x y z => by
+        simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, add_mul,
+          Finset.sum_add_distrib])
+      (fun n x y => by
+        simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, Finset.mul_sum, mul_assoc])
+      (fun x y z => by
+        simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, mul_add,
+          Finset.sum_add_distrib])
+      (fun n x y => by
+        simp [ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, Finset.mul_sum,
+          mul_left_comm]))
 
-@[simp] theorem ofMatrix_apply (A : Matrix (Fin d) (Fin d) ℝ) (x : Fin d → ℤ) :
-    ofMatrix A x = ReciprocityTheory.ReducedBases.Q A x := by
-  change (1 / 2 : ℝ) * ReciprocityTheory.ReducedBases.polar A x x = ReciprocityTheory.ReducedBases.polar A x x / 2
+@[simp]
+theorem ofMatrix_apply (A : Matrix (Fin d) (Fin d) ℝ) (x : Fin d → ℤ)
+    : ofMatrix A x = ReciprocityTheory.ReducedBases.Q A x := by
+  change (1 / 2 : ℝ) * ReciprocityTheory.ReducedBases.polar A x x
+    = ReciprocityTheory.ReducedBases.polar A x x / 2
   ring
 
-theorem polar_ofMatrix (hA : A.IsHermitian) (x y : Fin d → ℤ) :
-    polar (ofMatrix A) x y = ReciprocityTheory.ReducedBases.polar A x y := by
-  have hs : ReciprocityTheory.ReducedBases.polar A y x = ReciprocityTheory.ReducedBases.polar A x y := by
+theorem polar_ofMatrix (hA : A.IsHermitian) (x y : Fin d → ℤ)
+    : polar (ofMatrix A) x y = ReciprocityTheory.ReducedBases.polar A x y := by
+  have hs
+      : ReciprocityTheory.ReducedBases.polar A y x
+        = ReciprocityTheory.ReducedBases.polar A x y := by
     have hT : Aᵀ = A := by simpa using hA.eq
-    rw [ReciprocityTheory.ReducedBases.polar, ReciprocityTheory.ReducedBases.polar, dotProduct_mulVec, ← mulVec_transpose, hT,
-      dotProduct_comm]
+    rw [ReciprocityTheory.ReducedBases.polar, ReciprocityTheory.ReducedBases.polar,
+      dotProduct_mulVec, ← mulVec_transpose, hT, dotProduct_comm]
   have ha : toReal (x + y) = toReal x + toReal y := by funext i; simp [toReal]
   simp only [polar, ofMatrix_apply, ReciprocityTheory.ReducedBases.Q]
-  simp only [ReciprocityTheory.ReducedBases.polar, ha, mulVec_add, dotProduct_add, add_dotProduct] at hs ⊢
+  simp only [ReciprocityTheory.ReducedBases.polar, ha, mulVec_add, dotProduct_add, add_dotProduct]
+    at hs ⊢
   linarith
 
 theorem gram_ofMatrix (hA : A.IsHermitian) : gram (ofMatrix A) (Pi.basisFun ℤ (Fin d)) = A := by

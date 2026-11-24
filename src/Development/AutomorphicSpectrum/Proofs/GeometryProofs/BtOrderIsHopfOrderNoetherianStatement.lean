@@ -48,6 +48,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
   TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
+
 theorem _root_.GlobalTheory.T.btOrder_isHopfOrder_noetherian
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R] (T : Type)
         [CommGroup T] [Finite T] (Γ : QFGroup R T),

@@ -187,11 +187,11 @@ theorem _root_.GlobalTheory.JetsPure.main
         symm
         refine Finset.sum_nbij' (fun α => α ∘ e p) (fun β => β ∘ (e p).symm) ?_ ?_ ?_ ?_ ?_
         · intro α hα
-          simp only [Finset.mem_coe, Finset.Nat.mem_antidiagonalTuple] at hα ⊢
+          simp only [Finset.Nat.mem_antidiagonalTuple] at hα ⊢
           rw [← hα]
           exact Equiv.sum_comp (e p) α
         · intro β hβ
-          simp only [Finset.mem_coe, Finset.Nat.mem_antidiagonalTuple] at hβ ⊢
+          simp only [Finset.Nat.mem_antidiagonalTuple] at hβ ⊢
           rw [← hβ]
           exact Equiv.sum_comp (e p).symm β
         · intro α _

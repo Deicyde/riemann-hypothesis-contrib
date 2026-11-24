@@ -85,7 +85,7 @@ theorem side0Pos_of
         (Formalism.FourierDecayAlt.P.PBH.mcOm P.k (P.r - (D.ptSize h + 1))
           (p.T.bs (D.ptSize h + 1)).z (p.T.bs (D.ptSize h + 1)).z' (p.T.bs (D.ptSize h + 1)).z_mem
           (p.T.bs (D.ptSize h + 1)).z'_mem τ hτ γ hγ hΩ)
-    rw [Formalism.FourierDecayAlt.P.PBH.asm_castM_castM,
+    rw [_root_.Formalism.FourierDecayAlt.P.Dx2.SplitF.castM_castM,
         Formalism.FourierDecayAlt.P.PBH.asm_castV_castV,
         Formalism.FourierDecayAlt.P.PBH.asm_castV_castV]
       at h2

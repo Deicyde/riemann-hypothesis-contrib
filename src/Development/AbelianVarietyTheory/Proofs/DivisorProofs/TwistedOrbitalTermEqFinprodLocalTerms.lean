@@ -145,7 +145,7 @@ theorem twTerm_eq_finprod
           (cptPart (twCent (θv v) (pf v δ))) := by
     rw [inf_relIndex_of_le_left_term (cptPart_le_self_term _), hHg, hCg]
     simp only [hloc]
-    exact GlobalTheory.T.relIndex_restrictedProduct_componentwise_eq_prod pf K hX
+    exact _root_.GlobalTheory.RelIdxRestr.relIndex_iInf_comap pf K hX
       (fun v => cptPart (twCent (θv v) (pf v δ)))
       (fun v => (K v).map (MulAut.conj (pf v x)).toMonoidHom)
       (fun v => by rw [← hloc]; exact (hwt v (pf v x)).2)

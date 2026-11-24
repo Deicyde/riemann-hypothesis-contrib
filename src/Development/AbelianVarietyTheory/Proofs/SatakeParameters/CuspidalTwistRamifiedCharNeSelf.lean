@@ -309,7 +309,6 @@ theorem no_eigvec
     intro o φ hφ g
     by_cases ho : ∀ k, o ≠ .fin k
     · rw [← op_comm_fin p o ho, hPcomm o ho]
-      change p.op o (P (p.finPart g φ)) = 0
       rw [hφ g, map_zero]
     · push_neg at ho
       obtain ⟨k, rfl⟩ := ho

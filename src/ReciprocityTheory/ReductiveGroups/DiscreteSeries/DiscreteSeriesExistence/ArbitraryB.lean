@@ -46,6 +46,8 @@ import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.ArbitraryA
 public import Mathlib.Analysis.Calculus.BumpFunction.Basic
 public import Mathlib.Analysis.Calculus.ContDiff.Convolution
+import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeCSchur
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.FormulaFA
 
 @[expose] public section
 
@@ -131,7 +133,8 @@ theorem arb_locInt (hσ : IsURepOn (UJset ε) σ) (w : H)
   intro x
   refine ⟨Metric.closedBall x 1, Metric.closedBall_mem_nhds x one_pos, ?_⟩
   rw [hemb.integrableOn_map_iff]
-  exact (arb_orbit_cont hσ w).continuousOn.integrableOn_compact
+  exact (_root_.ReciprocityTheory.ChartRestriction.DS.continuous_orbitA hσ
+      w).continuousOn.integrableOn_compact
     ((Formalism.REAL.isClosedEmbeddingMatrix n ε).1.isCompact_preimage (isCompact_closedBall x 1))
 
 theorem arb_param_integral
@@ -199,7 +202,7 @@ theorem opConv_smooth
     ?_
   ⟩
   · intro g hg hgU
-    obtain ⟨γ, rfl⟩ := arb_exists_umat (ε := ε) hgU
+    obtain ⟨γ, rfl⟩ := _root_.ReciprocityTheory.ChartRestriction.DS.ffa_UJ_lift (ε := ε) hgU
     beta_reduce
     rw [opConv_translate hσ w hα.continuous hαc γ,
       (Formalism.REAL.isClosedEmbeddingMatrix n ε).1.integral_map]
@@ -265,7 +268,7 @@ theorem exists_good_moll (hσ : IsURepOn (UJset ε) σ) (S : Submodule ℂ H) [F
       _ ≤ (1 / 2) * ‖(⟨w, hw⟩ : S)‖ := mul_le_mul_of_nonneg_right h2.le (norm_nonneg _)
       _ = ‖w‖ / 2 := by rw [show ‖(⟨w, hw⟩ : S)‖ = ‖w‖ from rfl]; ring
   have hbc : Continuous (fun y : Formalism.REAL.UJ ε => arbB δ (Formalism.MainNotions.S.umat y)) :=
-    (contDiff_arbB δ).continuous.comp arb_umat_cont
+    (contDiff_arbB δ).continuous.comp _root_.Formalism.MainNotions.BridgeCSchur.continuous_umat
   have hbs : HasCompactSupport (fun y : Formalism.REAL.UJ ε =>
       arbB δ (Formalism.MainNotions.S.umat y)) :=
     (hasCompactSupport_arbB hδ).comp_isClosedEmbedding
@@ -305,7 +308,8 @@ theorem exists_good_moll (hσ : IsURepOn (UJset ε) σ) (S : Submodule ℂ H) [F
         (fun y : Formalism.REAL.UJ ε =>
           (arbB δ (Formalism.MainNotions.S.umat y) / c) • σ (Formalism.MainNotions.S.umat y) w)
         (Formalism.REAL.muG ε) :=
-      (hφc.smul (arb_orbit_cont hσ w)).integrable_of_hasCompactSupport hφs.smul_right
+      (hφc.smul (_root_.ReciprocityTheory.ChartRestriction.DS.continuous_orbitA hσ
+        w)).integrable_of_hasCompactSupport hφs.smul_right
     have hi3 : Integrable
         (fun y : Formalism.REAL.UJ ε => (arbB δ (Formalism.MainNotions.S.umat y) / c) • w)
         (Formalism.REAL.muG ε) :=

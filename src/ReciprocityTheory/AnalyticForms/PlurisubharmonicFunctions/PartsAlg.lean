@@ -230,7 +230,7 @@ theorem re_mdisc_cons_vecMulVec_nonneg
       ≤ (mdisc
         (Fin.cons (vecMulVec a (star a)) B
           : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
-  refine (mdisc_nonneg_of_posSemidef _ fun k => ?_).2
+  refine (_root_.ReciprocityTheory.AnForm.A.mixedDiscriminant_nonneg_of_gram _ fun k => ?_).2
   refine Fin.cases ?_ (fun i => ?_) k
   · simpa using posSemidef_vecMulVec_self_star a
   · simpa using hB i

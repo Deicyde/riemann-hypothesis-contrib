@@ -175,7 +175,6 @@ theorem polForm_exists
   have hz'
       : IsChern (dp0 K) (A.hom ≫ 𝟙 _) (Xo.univ.t.PP.L.pull π) (∑ k, cup _ (a' k).1 (b' k).1) := by
     have : z = ∑ k, cup _ (a k) (b k) := by
-
       rw [← e.apply_symm_apply z, ← hab, map_sum]
       exact Finset.sum_congr rfl fun k _ ↦ he _ _
     exact this ▸ hz

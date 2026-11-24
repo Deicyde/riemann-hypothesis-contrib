@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.besselPeriod_linear_and_translationCombination
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.besselPeriod_linear_and_translationCombination
                 IsContAut B.V f
                   → IsContAut B.V (trc e f)
                     ∧ B.per ψ φ (trc e f) = ∑ g ∈ e.support, e g * B.per ψ φ (rTrans g f) := by
-  first
-  | exact @GlobalTheory.SeeSaw.per_linear_trc
-  | exact GlobalTheory.SeeSaw.per_linear_trc
-  | (intros; apply GlobalTheory.SeeSaw.per_linear_trc <;> assumption)
+  first | exact @GlobalTheory.SeeSaw.per_linear_trc

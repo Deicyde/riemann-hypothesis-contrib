@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.thetaTransform_rational_translate_quasiInvariant
                     GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ Φ (ratW T S γ + w)
                       = ψ (-(Formalism.IndefR.Datum.symplOH S T (ratW T S γ) w))
                         * GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ Φ w := by
-  first
-  | exact @GlobalTheory.ThetaQuasiRat.thetaTr_ratW_add
-  | exact GlobalTheory.ThetaQuasiRat.thetaTr_ratW_add
-  | (intros; apply GlobalTheory.ThetaQuasiRat.thetaTr_ratW_add <;> assumption)
+  first | exact @GlobalTheory.ThetaQuasiRat.thetaTr_ratW_add

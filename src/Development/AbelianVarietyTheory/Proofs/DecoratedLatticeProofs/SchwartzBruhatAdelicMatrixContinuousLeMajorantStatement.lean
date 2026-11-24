@@ -71,7 +71,4 @@ theorem _root_.GlobalTheory.T.schwartzBruhatAdelicMatrix_continuous_le_majorant
             → Continuous φ
               ∧ ∃ K : Set (Mx D m n),
                 IsCompact K ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ x, ‖φ x‖ ≤ C * GlobalTheory.Unf.maj θ K N x := by
-  first
-  | exact @GlobalTheory.SchwartzMaj.continuous_and_le_maj
-  | exact GlobalTheory.SchwartzMaj.continuous_and_le_maj
-  | (intros; apply GlobalTheory.SchwartzMaj.continuous_and_le_maj <;> assumption)
+  first | exact @GlobalTheory.SchwartzMaj.continuous_and_le_maj

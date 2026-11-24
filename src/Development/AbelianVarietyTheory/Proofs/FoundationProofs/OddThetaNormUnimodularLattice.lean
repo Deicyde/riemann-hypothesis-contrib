@@ -331,7 +331,7 @@ theorem odd_theta_norm_canonical : nrm1Sq Λ (canTheta a τ) = (Real.sqrt (2 * �
   have e3
       : ((fun i => (p (.inl i) : ℂ)) + (!![(τ : ℂ)]).mulVec fun i => (p (.inr i) : ℂ))
         = ![(p (.inl 0) : ℂ) + p (.inr 0) * τ] := by
-    ext i; fin_cases i; simp [Matrix.mulVec, dotProduct, mul_comm]
+    ext i; fin_cases i; simp [dotProduct, mul_comm]
   simp only [e, e2, e3, canTheta, mul_div_cancel_left₀ _ ha, oddTheta,
     LatticeAreaBound.area_eq ha h]
   rw [norm_mul, Complex.norm_exp, mul_pow, ← Real.exp_nat_mul, mul_right_comm, ← Real.exp_add,
@@ -370,7 +370,7 @@ theorem odd_theta_norm_sigma_star
   refine ⟨?_, fun t _ => ?_⟩
   · rw [LatticeAreaBound.discr_eq L _ hL, ← latticeCurve_Δ, latticeCurve_Δ_eq_discriminant ha h']
       at hd
-    have hπ' : ‖(2 * π : ℂ)‖ = 2 * π := by simp [hπ.le]
+    have hπ' : ‖(2 * π : ℂ)‖ = 2 * π := by simp
     have e := congrArg norm hd
     rw [norm_mul, norm_pow, norm_div, hπ', norm_one, div_pow, div_mul_eq_mul_div,
         div_eq_one_iff_eq (by positivity)]

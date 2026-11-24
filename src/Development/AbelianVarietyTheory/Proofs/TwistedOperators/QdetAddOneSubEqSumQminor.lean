@@ -159,7 +159,7 @@ theorem qdet_add_one_sub
         funext j
         by_cases hj : Fin.castSucc j < k
         · rw [if_pos hj, Fin.succAbove_of_castSucc_lt k j hj]
-          simp [Fin.coe_castSucc]
+          simp
         · rw [if_neg hj, Fin.succAbove_of_le_castSucc k j (not_lt.mp hj)]
           simp only [id, Fin.val_succ]
           congr 1

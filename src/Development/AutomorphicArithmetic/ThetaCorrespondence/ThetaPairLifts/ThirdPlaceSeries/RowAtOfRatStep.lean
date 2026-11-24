@@ -37,8 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 set_option autoImplicit false
 noncomputable section
@@ -50,7 +48,6 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
   GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-
 
 namespace GlobalTheory.BigOn.Exp
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

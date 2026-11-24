@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StarDepthToFunNonneg
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.VorFunEvalEqFineMean
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CentreDepthLeStarDepthOfCellStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CentreDepthLeStarDepthOfCell
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RealConeCoveredByStarAtPoint
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StarDepthLeOnCentreCell
 import Mathlib.Algebra.Order.Floor.Extended
@@ -94,7 +94,7 @@ theorem starDepth_on_cell
       · have := hI β₀ hin
         nlinarith
       · have hl :=
-          GlobalTheory.T.centreDepth_le_starDepth_of_cell O bar ψ w X m γ (toReal β₀) β₀ 1 hγ
+          _root_.GlobalTheory.PolFan.depth_le_starDepth O bar ψ w X m γ (toReal β₀) β₀ 1 hγ
             (by obtain ⟨c, hc0, e⟩ := hin; exact ⟨c, hc0, e⟩) hβ₀ hβ₀p hw hin hne huniq zero_le_one
             (by rw [one_smul, sub_self]; exact ⟨0, fun _ => le_rfl, by simp⟩)
         rwa [evalR_toReal] at hl

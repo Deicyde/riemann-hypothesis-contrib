@@ -164,7 +164,7 @@ theorem perFr_mem
     conv_lhs => rw [← mul_nonsing_inv_cancel_left (mat x ⟨_, h'⟩) (mat x' ⟨_, h'⟩) hd]
     generalize (mat x ⟨_, h'⟩)⁻¹ * mat x' ⟨_, h'⟩ = n
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hermC,
-      ReciprocityTheory.ChartRestriction.G.FD.col, mul_apply, Finset.sum_mul, Finset.mul_sum]
+      ReciprocityTheory.ChartRestriction.G.FD.col, Finset.mul_sum]
     rw [Finset.sum_comm (s := Finset.univ) (f := fun b c => ∑ d, n b _ * _)]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [Finset.sum_comm]

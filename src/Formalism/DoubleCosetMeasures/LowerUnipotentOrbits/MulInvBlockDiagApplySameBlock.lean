@@ -50,8 +50,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
 noncomputable section
 
 open Matrix
@@ -255,11 +253,11 @@ theorem conj_apply
 
 theorem low_zero {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) {i j : Fin n} (h : i < j)
     : x i j = 0 := by
-  first | exact hx.1 h | exact hx.1 (show OrderDual.toDual j < OrderDual.toDual i from h)
+  first | exact hx.1 h
 
 theorem up_zero {n : ℕ} {y : Matrix (Fin n) (Fin n) K} (hy : IsUpUni y) {i j : Fin n} (h : j < i)
     : y i j = 0 := by
-  first | exact hy.1 h | (unfold IsUpUni at hy; done)
+  first | exact hy.1 h
 
 theorem mul_inv_one_low {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) : x * x⁻¹ = 1 := by
   have hd : IsUnit x.det := by
@@ -426,9 +424,7 @@ theorem phase_main : PhaseWellDef := by
         congr 1
         refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun a => ?_
         refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun c => ?_
-        first
-        | simp only [Function.Involutive.coe_toPerm, revF_revF]
-        | simp [Function.Involutive.toPerm, revF_revF]
+        first | simp [Function.Involutive.toPerm, revF_revF]
       _ = - ∑ a : Fin s.sum, ∑ c : Fin s.sum, if (a : ℕ) = c + 1 then x a c else 0 := by
         congr 1
         refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => ?_
@@ -438,6 +434,6 @@ theorem phase_main : PhaseWellDef := by
 
 end Phase
 
-theorem phaseWellDef : Formalism.DoubleCosetMeasures.PhaseWellDef := Phase.phase_main
+alias phaseWellDef := _root_.Formalism.DoubleCosetMeasures.P.Phase.phase_main
 
 end Formalism.DoubleCosetMeasures.P

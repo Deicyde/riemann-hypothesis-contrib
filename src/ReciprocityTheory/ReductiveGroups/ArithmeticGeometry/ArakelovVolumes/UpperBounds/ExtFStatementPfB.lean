@@ -66,10 +66,7 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data 
 theorem cont_dmin (τ : X.Ψ) (i : Fin (r + 1))
     : Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
   unfold dmin lminor gram hermC col mat
-  first
-  | fun_prop
-  | (apply Continuous.matrix_det; apply Continuous.matrix_submatrix; fun_prop)
-  | continuity
+  first | fun_prop
 
 theorem nfac_contOn (la : Wt X.Ψ r) : ContinuousOn (X.nfac la) X.dom := by
   have hd : ∀ (τ : X.Ψ) (i : Fin (r + 1)), Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i :=
@@ -102,7 +99,6 @@ private lemma dom_isOpen : IsOpen X.dom := by
     intro τ
     first
       | exact Continuous.matrix_det (continuous_apply τ)
-      | (unfold mat; fun_prop)
   show IsOpen {x : Frame X.Ψ r | ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
     ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re}
   simp only [Set.setOf_forall, Set.setOf_and]
@@ -117,7 +113,6 @@ private lemma continuous_cpt' : Continuous (cpt X x0) := by
     · simp only [nmat, dif_pos h]
       first
         | exact (EuclideanSpace.proj (𝕜 := ℂ) _).continuous
-        | fun_prop
     · by_cases h' : a = b
       · simp only [nmat, dif_neg h, if_pos h']
         exact continuous_const
@@ -153,7 +148,7 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
     apply continuousOn_finsetProd
     intro i _
     apply ContinuousOn.zpow₀
-    · have hent : Continuous fun y : Frame X.Ψ r => y τ i i := by first | fun_prop | continuity
+    · have hent : Continuous fun y : Frame X.Ψ r => y τ i i := by first | fun_prop
       exact hent.comp_continuousOn hbc
     · intro x hx
       left
@@ -163,7 +158,7 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
     by_cases h : x ∈ cell D
     · rw [Set.piecewise_eq_of_mem _ _ _ h]
       exact if_pos h
-    · first | rw [Set.piecewise_eq_of_notMem _ _ _ h] | rw [Set.piecewise_eq_of_not_mem _ _ _ h]
+    · first | rw [Set.piecewise_eq_of_notMem _ _ _ h]
       exact if_neg h
   have hPm : Measurable (P0 D la F) := by
     rw [hP]
@@ -178,9 +173,7 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
   have hp : ∀ x, X.pnorm la (P0 D la F) x = ‖P0 D la F x‖ * X.nfac la x := fun x => rfl
   unfold Gf
   simp only [hp]
-  first
-  | exact ((hPm.norm.mul hnf).pow_const 2).ennreal_ofReal
-  | exact ENNReal.measurable_ofReal.comp ((hPm.norm.mul hnf).pow_const 2)
+  first | exact ((hPm.norm.mul hnf).pow_const 2).ennreal_ofReal
 
 theorem Gf_inv {x b : Frame X.Ψ r} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ r)
     : Gf D la F (rmul x b) = Gf D la F x := by

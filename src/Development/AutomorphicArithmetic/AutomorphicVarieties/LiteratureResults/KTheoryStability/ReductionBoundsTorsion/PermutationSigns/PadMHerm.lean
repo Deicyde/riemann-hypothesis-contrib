@@ -123,7 +123,7 @@ def eL (n M : ℕ) : HS L M :=
       ext i j
       by_cases h : (i : ℕ) < n ∧ (j : ℕ) < n
       · have h' : (j : ℕ) < n ∧ (i : ℕ) < n := ⟨h.2, h.1⟩
-        simp [padMat, h, h']
+        simp [padMat, h]
       · have h' : ¬((j : ℕ) < n ∧ (i : ℕ) < n) := fun h' => h ⟨h'.2, h'.1⟩
         by_cases e : i = j
         · subst e; simp [padMat]
@@ -140,7 +140,7 @@ theorem blk_herm {d n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitia
   congr 1
   by_cases e : x.1 = y.1
   · simp [Matrix.one_apply, e]
-  · simp [Matrix.one_apply, e, Ne.symm e]
+  · simp [e, Ne.symm e]
 
 def blkL (d n : ℕ) : HS L n →L[ℝ] HS L (d * n) :=
   LinearMap.toContinuousLinearMap {

@@ -58,9 +58,7 @@ open GlobalTheory.SplitHecke
 
 variable {D : D7} {S T : HSp D}
 
-theorem act_add (g : GA D S) (h : GA D T) (x y : WO S T)
-    : actO S T g h (x + y) = actO S T g h x + actO S T g h y :=
-  map_add (actAdd S T g h) x y
+alias act_add := _root_.GlobalTheory.WeilVacMove.actO_add
 
 theorem act_nsmul (g : GA D S) (h : GA D T) (k : ℕ) (x : WO S T)
     : actO S T g h (k • x) = k • actO S T g h x :=
@@ -102,11 +100,7 @@ theorem halfInd_act
   · rw [if_pos ht, if_pos (this.2 ht)]
   · rw [if_neg ht, if_neg (fun hh => ht (this.1 hh))]
 
-theorem heisO_smul' (ψ : AddChar (AF D.host.F) ℂ) (w : WO S T) (c : ℂ) (f : WO S T → ℂ)
-    : heisO ψ S T w (c • f) = c • heisO ψ S T w f := by
-  funext t
-  simp only [heisO, Pi.smul_apply, smul_eq_mul]
-  ring
+alias heisO_smul' := _root_.GlobalTheory.LatVac.heisO_smul
 
 theorem om_theta_eq_smul
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)

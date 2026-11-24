@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -49,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.integralChart_formalBiextension_gauge_bound
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)],
@@ -73,7 +75,4 @@ theorem _root_.GlobalTheory.T.integralChart_formalBiextension_gauge_bound
                                          (fun ℓ : LtN Dw n => ℓ.2.2)
                                          (fun ℓ => C.ch.uvec ⟨ℓ.1, ℓ.2.1⟩)
                                          P)) := by
-  first
-  | exact @GlobalTheory.PlaceInt.integralBiext_gauge_eig_bound
-  | exact GlobalTheory.PlaceInt.integralBiext_gauge_eig_bound
-  | (intros; apply GlobalTheory.PlaceInt.integralBiext_gauge_eig_bound <;> assumption)
+  first | exact @GlobalTheory.PlaceInt.integralBiext_gauge_eig_bound

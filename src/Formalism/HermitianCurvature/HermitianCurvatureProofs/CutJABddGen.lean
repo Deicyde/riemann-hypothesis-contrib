@@ -85,7 +85,7 @@ theorem order_zero_operator_apply (J : B.Mat S.G.k S.G.r → (Wq (S.pl v) →L[�
   funext g
   simp only [B.opApply, orderZeroDifferentialOperator, List.map_cons, List.map_nil, List.sum_cons,
     List.sum_nil, add_zero]
-  first | rfl | simp [B.Rw]
+  first | rfl
 
 theorem order_zero_operator_adjoint (J : B.Mat S.G.k S.G.r → (Wq (S.pl v) →L[ℂ] Wp (S.pl v)))
     : B.opAdj (orderZeroDifferentialOperator S v c ca hadj) J = fun g => ca g (J g) := by
@@ -93,11 +93,10 @@ theorem order_zero_operator_adjoint (J : B.Mat S.G.k S.G.r → (Wq (S.pl v) →L
   first
   | (simp [B.opAdj, orderZeroDifferentialOperator]; done)
   | (simp [B.opAdj, orderZeroDifferentialOperator]; rfl)
-  | rfl
 
 theorem order_zero_operator_order
     : B.opOrder (orderZeroDifferentialOperator S v c ca hadj) = 0 := by
-  first | rfl | simp [B.opOrder, orderZeroDifferentialOperator]
+  first | rfl
 
 end gen
 

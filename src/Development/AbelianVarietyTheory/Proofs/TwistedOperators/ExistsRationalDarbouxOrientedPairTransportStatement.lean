@@ -51,6 +51,7 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
+
 theorem _root_.GlobalTheory.T.exists_rational_darboux_orientedPair_transport
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
       IsInfFam θ
@@ -106,7 +107,4 @@ theorem _root_.GlobalTheory.T.exists_rational_darboux_orientedPair_transport
                               IsDatum M ψ cS Φ f
                                 ↔ Φ ∈ GlobalTheory.WeilM.schA D.host.F (Fin S.rank × Fin d)
                                   ∧ GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ Φ = f := by
-  first
-  | exact @GlobalTheory.SquareAgree.exists_darboux_transport
-  | exact GlobalTheory.SquareAgree.exists_darboux_transport
-  | (intros; apply GlobalTheory.SquareAgree.exists_darboux_transport <;> assumption)
+  first | exact @GlobalTheory.SquareAgree.exists_darboux_transport

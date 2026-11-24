@@ -43,6 +43,7 @@ import Mathlib.Tactic.ReduceModChar
 import Development.AbelianVarietyTheory.Definitions.Divisors.CommGroupMulMulEqMulInvMulMulMul
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsoOverOfIsOpenImmersion
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsBaseFrame
+import Mathlib.Algebra.Azumaya.Basic
 
 @[expose] public section
 
@@ -108,21 +109,6 @@ theorem valR_resG
     _ = GlobalTheory.FlagMod.ev z U (GlobalTheory.FlagMod.le_preimage_mono e h) a :=
       GlobalTheory.FlagMod.ev_res z e h _ a
     _ = valR z U a := (valR_eq_ev z U _ a).symm
-
-theorem isAffineHom_of_field {K : Type} [Field K] {X : Scheme.{0}} (x0 : Sp K ⟶ X)
-    : IsAffineHom x0 := by
-  refine ⟨fun U _ => ?_⟩
-  by_cases h : (default : PrimeSpectrum K) ∈ x0 ⁻¹ᵁ U
-  · have e : x0 ⁻¹ᵁ U = ⊤ :=
-      eq_top_iff.2 fun p _ => by rwa [Subsingleton.elim (α := PrimeSpectrum K) p default]
-    rw [e]
-    exact isAffineOpen_top _
-  · have e : x0 ⁻¹ᵁ U = ⊥ :=
-      eq_bot_iff.2 fun p hp => by
-        rw [Subsingleton.elim (α := PrimeSpectrum K) p default] at hp
-        exact (h hp).elim
-    rw [e]
-    exact isAffineOpen_bot _
 
 theorem IsChartPt.of_le
     {K : Type} [Field K]

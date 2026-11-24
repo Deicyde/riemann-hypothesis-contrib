@@ -48,6 +48,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.thetaSetup_dividingLabel_persists_deeperLevel
     : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (Z : Scheme.{0})
         (i : F.X ⟶ Z) (X₁ : Setup F W i),
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.thetaSetup_dividingLabel_persists_deeperLevel
             → ∀ (D : Deep X₁ ε₁), ∀ (z₁ : X₁.M.Z) (x₀ : X₁.S.Gam),
               x₀ ∈ X₁.S.supI X₁.M z₁
                 → ∀ (z' : D.X.M.Z), D.q z' = z₁ → D.X.M.Div D.X.S.th (D.lab x₀) z' := by
-  first
-  | exact @GlobalTheory.Poinc.DivDeep.main
-  | exact GlobalTheory.Poinc.DivDeep.main
-  | (intros; apply GlobalTheory.Poinc.DivDeep.main <;> assumption)
+  first | exact @GlobalTheory.Poinc.DivDeep.main

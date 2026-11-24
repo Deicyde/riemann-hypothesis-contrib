@@ -53,10 +53,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.RamifiedCoefficientChains.S9.DLev
 
-open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc IsLocalRing
+open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  IsLocalRing
 
-private theorem isPrecomplete_of_module_finite {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (I : Ideal R) [hR : IsPrecomplete I R] [Module.Finite R M] : IsPrecomplete I M := by
+private theorem isPrecomplete_of_module_finite
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    (I : Ideal R) [hR : IsPrecomplete I R] [Module.Finite R M]
+    : IsPrecomplete I M := by
   classical
   obtain ⟨n, s, hs⟩ := Module.Finite.exists_fin (R := R) (M := M)
   refine ⟨fun g hg => ?_⟩
@@ -68,27 +71,31 @@ private theorem isPrecomplete_of_module_finite {R M : Type*} [CommRing R] [AddCo
     rwa [neg_sub] at h2
   choose A hA hAs using fun k =>
     (Submodule.mem_ideal_smul_span_iff_exists_sum (I ^ k) s (g (k + 1) - g k)).1 (hd k)
-  have hc : ∀ i : Fin n, ∀ {a b : ℕ}, a ≤ b →
-      (∑ k ∈ Finset.range a, A k i) ≡ (∑ k ∈ Finset.range b, A k i) [SMOD (I ^ a • ⊤ : Submodule R R)] := by
-    intro i a b hab
-    rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, ← Finset.sum_range_add_sum_Ico _ hab,
-      sub_add_cancel_left]
-    refine neg_mem (sum_mem fun k hk => ?_)
-    exact Ideal.pow_le_pow_right (Finset.mem_Ico.1 hk).1 (hA k i)
+  have hc
+      : ∀ i : Fin n, ∀ {a b : ℕ},
+        a ≤ b
+          → (∑ k ∈ Finset.range a, A k i) ≡ (∑ k ∈ Finset.range b, A k i) [SMOD (I ^ a • ⊤ : Submodule R R)] :=
+    by
+      intro i a b hab
+      rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, ← Finset.sum_range_add_sum_Ico _ hab,
+        sub_add_cancel_left]
+      refine neg_mem (sum_mem fun k hk => ?_)
+      exact Ideal.pow_le_pow_right (Finset.mem_Ico.1 hk).1 (hA k i)
   choose C hC using fun i : Fin n => hR.prec' _ (hc i)
   refine ⟨g 0 + ∑ i, C i • s i, fun K => ?_⟩
   rw [SModEq.sub_mem]
   have hgK : g K = g 0 + ∑ i, (∑ k ∈ Finset.range K, A k i) • s i := by
     have h1 : ∑ k ∈ Finset.range K, (g (k + 1) - g k) = g K - g 0 := Finset.sum_range_sub g K
-    have h2 : ∑ k ∈ Finset.range K, (g (k + 1) - g k) =
-        ∑ i, (∑ k ∈ Finset.range K, A k i) • s i := by
+    have h2
+        : ∑ k ∈ Finset.range K, (g (k + 1) - g k) = ∑ i, (∑ k ∈ Finset.range K, A k i) • s i := by
       simp only [← hAs, Finsupp.sum_fintype, zero_smul, implies_true, Finset.sum_smul]
       exact Finset.sum_comm
     rw [← h2, h1]
     abel
   rw [hgK]
-  have hsplit : g 0 + ∑ i, (∑ k ∈ Finset.range K, A k i) • s i - (g 0 + ∑ i, C i • s i) =
-      ∑ i, ((∑ k ∈ Finset.range K, A k i) - C i) • s i := by
+  have hsplit
+      : g 0 + ∑ i, (∑ k ∈ Finset.range K, A k i) • s i - (g 0 + ∑ i, C i • s i)
+        = ∑ i, ((∑ k ∈ Finset.range K, A k i) - C i) • s i := by
     simp only [sub_smul, Finset.sum_sub_distrib]
     abel
   rw [hsplit]
@@ -96,25 +103,28 @@ private theorem isPrecomplete_of_module_finite {R M : Type*} [CommRing R] [AddCo
   have h := SModEq.sub_mem.1 (hC i K)
   rwa [Ideal.smul_eq_mul, Ideal.mul_top] at h
 
-
-
-theorem complete_max {l : ℕ} [Fact l.Prime] (LL : FinExt l) :
-    IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) := by
+theorem complete_max {l : ℕ} [Fact l.Prime] (LL : FinExt l)
+    : IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) := by
   apply Formalism.MainNotions.N.Ln17.isAdicComplete_integers_local <;> assumption
 
-theorem lemmaDN0_L (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F)
-    (h1 : Formalism.MainNotions.RamifiedCoefficientChains.adm1 D HW F Cm) (h11 : Formalism.MainNotions.RamifiedCoefficientChains.adm11 D) :
-    ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (hg : Good K 1 LL)
-      [NeZero (Module.finrank ℚ_[l] ↥(K0 K))], Formalism.MainNotions.N.Pv.LocalLengthBound.LemmaDN0 ((HW l).W K 1 LL hg) := by
+theorem lemmaDN0_L
+    (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F)
+    (h1 : Formalism.MainNotions.RamifiedCoefficientChains.adm1 D HW F Cm)
+    (h11 : Formalism.MainNotions.RamifiedCoefficientChains.adm11 D)
+    : ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (hg : Good K 1 LL)
+        [NeZero (Module.finrank ℚ_[l] ↥(K0 K))],
+      Formalism.MainNotions.N.Pv.LocalLengthBound.LemmaDN0 ((HW l).W K 1 LL hg) := by
   intro l _ K LL hg _
   have hT := h1 l K 1 LL hg
   obtain ⟨hE, hC, hQ⟩ := h11 l K LL
   have := complete_max LL
-  have h9D : Formalism.MainNotions.DeltaInvariantLattices.P9 D HW F := fun l' _ K' s' LL' h' => (h1 l' K' s' LL' h').2.2.2.2.2.2.2.2.1
+  have h9D : Formalism.MainNotions.DeltaInvariantLattices.P9 D HW F := fun l' _ K' s' LL' h' =>
+    (h1 l' K' s' LL' h').2.2.2.2.2.2.2.2.1
   have hpt := Formalism.MainNotions.UnusedSlot80.points_exist_of_ring_condition D HW F h9D
   have hp : ((D.loc l).PD K).p = l := (D.loc l).PD_p K
-  refine Formalism.MainNotions.RamifiedCoefficientChains.S9.NinQ.lemmaDN0_of_admits _ hE hC hQ (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hg) hT.2.2.2.1
-    hT.2.2.2.2.1 hT.2.2.2.2.2.2.2.2.1 ?_ ?_
+  refine Formalism.MainNotions.RamifiedCoefficientChains.S9.NinQ.lemmaDN0_of_admits _ hE hC hQ
+    (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hg) hT.2.2.2.1 hT.2.2.2.2.1
+    hT.2.2.2.2.2.2.2.2.1 ?_ ?_
   · intro hA hl11 c ζ hζ
     have hK : K.1 ≤ MaximalUnramifiedExtension l := by
       intro x hx

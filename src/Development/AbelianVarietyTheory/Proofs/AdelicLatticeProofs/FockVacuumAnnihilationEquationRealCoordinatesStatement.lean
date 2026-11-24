@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.FockCompare GlobalTheory.VacUnique
+
 theorem _root_.GlobalTheory.T.fockVacuum_annihilation_equation_real_coordinates
     : ∀ (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →+ AE D),
       Chart θ σ
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.fockVacuum_annihilation_equation_real_coordinates
                             - Real.pi * Complex.I * (omO S T w (jO S T sS sT z) : ℂ)
                               * f (iotaW σ T S w))
                       = 0 := by
-  first
-  | exact @GlobalTheory.VacUnique.Ann.vacuum_annihilation
-  | exact GlobalTheory.VacUnique.Ann.vacuum_annihilation
-  | (intros; apply GlobalTheory.VacUnique.Ann.vacuum_annihilation <;> assumption)
+  first | exact @GlobalTheory.VacUnique.Ann.vacuum_annihilation

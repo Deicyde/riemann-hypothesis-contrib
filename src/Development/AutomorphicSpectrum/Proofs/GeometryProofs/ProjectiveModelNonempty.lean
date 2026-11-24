@@ -1,7 +1,9 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsProperIntegralModelStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import Mathlib.AlgebraicGeometry.Morphisms.Proper
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsProperIntegralModel
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,7 +67,7 @@ theorem nonempty_pModel_of_chart
     · exact ⟨0, zero_mem _, 1, one_mem _, one_ne_zero, by simp [hv0]⟩
     · exact ⟨u, hu, v, hv, hv0, rfl⟩
   obtain ⟨X, ξ, s, tie, all, -, -, hover⟩ :=
-    GlobalTheory.T.exists_proper_integral_model Ω o κ x c hc h'
+    _root_.GlobalTheory.CompanionTheory.Ar.exists_cl_scheme Ω o κ x c hc h'
   exact ⟨{ X := X, ξ := ξ, s := s, hover := hover, all := all, tie := tie }⟩
 
 end GlobalTheory.CompanionTheory.Ar

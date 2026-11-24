@@ -46,6 +46,7 @@ import Mathlib.Topology.Sheaves.Init
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.GlobalTheory.T.discreteSeries_unitary_smooth_basic
     : PI.KFinSmooth
       → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.discreteSeries_unitary_smooth_basic
             ∧ (∀ g ∈ GG k r, ∀ v ∈ R.TK, R.σ g v ∈ R.TK) ∧ (∀ v, R.KFin v → v ∈ R.TK)
             ∧ (∃ w, ‖w‖ = 1 ∧ R.KFin w ∧ PI.UpqRep.IsLowUnitH k r ε mu R.σ w)
             ∧ (∀ v, ContinuousOn (fun g => R.σ g v) (GG k r)) := by
-  first
-  | exact @GlobalTheory.rep_basic_of_isDS
-  | exact GlobalTheory.rep_basic_of_isDS
-  | (intros; apply GlobalTheory.rep_basic_of_isDS <;> assumption)
+  first | exact @GlobalTheory.rep_basic_of_isDS

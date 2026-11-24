@@ -102,13 +102,7 @@ theorem gap_kap_le (τ : Psi H) {k : ℕ} (h : k + 1 < Dw.p + Dw.q)
   split_ifs <;> omega
 
 theorem div_le_sub_mul_div (g : ℤ) {n : ℤ} (hn : 0 < n) : g / n ≤ g - (n - 1) * (g / n) := by
-  have h₁ : n * (g / n) ≤ g := by
-    first
-    | exact Int.mul_ediv_self_le hn.ne'
-    | exact Int.mul_ediv_le hn g
-    | (have := Int.emod_def g n; have := Int.emod_nonneg g hn.ne'; linarith)
-    | (have := Int.ediv_mul_le g hn.ne'; linarith)
-    | (have := Int.emod_add_mul_ediv g n; have := Int.emod_nonneg g hn.ne'; linarith)
+  have h₁ : n * (g / n) ≤ g := by first | exact Int.mul_ediv_self_le hn.ne'
   linarith
 
 theorem gaps_of_wtBig

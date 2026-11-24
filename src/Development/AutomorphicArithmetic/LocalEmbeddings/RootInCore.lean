@@ -4,17 +4,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovo
 public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CongModRefl
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ActLevAndActBC
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.RuleBaseChangeSectionValuesSemilinearStatement
+public import Development.AbelianVarietyTheory.Definitions.ThetaValues.LeCovCoeff
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.RuleBaseChangeSectionValuesSemilinear
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BaseLevelCharacterEqProdSuperdiagonalSum
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DeepLevelCoverPrincipalLevelLawsGalois
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EquivAtRecordOfEquivRow
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTypeFrameCoverLevelMapsReductionsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibreConstantIffCoveringGroupInvariantStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelCoverCuspFormPullbackInjectiveDescentStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+public import Formalism.LocalToGlobal.IndefiniteReal.ThPinsR
+public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+public import Formalism.SharpRestriction.Divisibility.LiftErrorLocal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTypeFrameCoverLevelMapsReductions
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ValuesAlgIffValuesUnitOfNe
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThClassPins
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibreConstantIffCoveringGroupInvariant
+public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
+public import Development.AbelianVarietyTheory.Definitions.Foundations.IsProbabilityMeasureMuPart
+public import Formalism.SharpRestriction.CuspSpanNormBounds.BesselShellMomentBounds
+public import Mathlib.Algebra.AffineMonoid.Basic
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelCoverCuspFormPullbackInjectiveDescent
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrincipalLevelLiftModuliLawsOfCore
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullActLev
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SectionPullbackExistsUnique
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLevelAtEachIndex
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SectionPullbackExistsUnique
 import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ActLevFullLevelGroupFramedPoints
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeEmbeddingLiftDatumHermitianSpace
 import Mathlib.Algebra.Order.Floor.Extended
@@ -50,8 +61,6 @@ import Mathlib.Tactic.NormNum.NatSqrt
 import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifOfSpaceEq
-public import Development.AbelianVarietyTheory.Definitions.ThetaValues.LeCovCoeff
 
 @[expose] public section
 
@@ -117,8 +126,8 @@ theorem pull_data
     simp only [Ranks.sigW]
     omega
   obtain ⟨π, p1, p2, -, -, p5, -⟩ :=
-    GlobalTheory.T.levelCover_cuspForm_pullback_injective_descent D j _ _ _ _ _ Y.c' Y.hle _ _ Y.d _
-      _ hL hL₂ hG.lev.1 hgal a n hD hD.2
+    _root_.GlobalTheory.LevRingDesc.levRing_descent D j _ _ _ _ _ Y.c' Y.hle _ _ Y.d _ _ hL hL₂
+      hG.lev.1 hgal a n hD hD.2
   have hC : ∀ {f}, f ∈ cuspW (T.Q.Xo j) T.Q.c (T.U j) (wtZ a n) ↔ f ∈ T.cuspA j a n := fun {f} => by
     rw [cuspW_wtZ]
   have s₁ : ∀ {f}, f ∈ cuspW (T.Q.Xo j) T.Q.c (T.U j) (wtZ a n) → f ∈ sec (T.Q.Xo j) T.Q.c a n :=
@@ -153,8 +162,7 @@ theorem pull_data
         (transl Y.d.Xo₂ Y.d.c₂ γ).toLinearMap (π' v) = π' ⟨_, hv⟩ := by
     intro γ v hv'
     have hv :=
-      ((GlobalTheory.T.ruleBaseChange_section_values_semilinear _ _ _ _ _ _ _ Y.hle).1 a n _
-        (s₁ v.2)).1
+      ((_root_.GlobalTheory.FieldBC.rulBC_sec_val_linear _ _ _ _ _ _ _ Y.hle).1 a n _ (s₁ v.2)).1
     have h1 :=
       GlobalTheory.LevPullEquiv.pull_actLev D j _ _ _ _ _ Y.d hpq.2 hG.lev.1 hG.lev.2
         (GlobalTheory.ClsVal.Cmp.overBase_of_ne hpq.1 hL.levA Y.d) G _ lev liftLa hact' hact₂ (θ γ)
@@ -164,8 +172,7 @@ theorem pull_data
       (geo h1 (p1 ⟨_, hv'⟩) ?_)
     refine GlobalTheory.CoverSec.eq_of_geometric
       (GlobalTheory.LevelEquivCompare.actLev_mem_sec hact' _ hv).1
-      ((GlobalTheory.T.ruleBaseChange_section_values_semilinear _ _ _ _ _ _ _ Y.hle).1 a n _
-        (s₁ hv')).1.1
+      ((_root_.GlobalTheory.FieldBC.rulBC_sec_val_linear _ _ _ _ _ _ _ Y.hle).1 a n _ (s₁ hv')).1.1
       fun k _ _ _ y => ?_
     letI := resAlg Y.hle k
     exact (hbc a n (θ γ) 1 _ _ _ hv
@@ -176,8 +183,8 @@ theorem pull_data
   refine
     ⟨π, fun m b hb => p2 m b hb, fun γ v => ⟨hC.2 (hkeep _ _ (hC.1 v.2)), hc γ v _⟩, fun g hg => ?_⟩
   have h1 : GlobalTheory.LevPull.FibConst Y.d g := by
-    refine (GlobalTheory.T.fibreConstant_iff_coveringGroup_invariant D j _ _ _ _ _ Y.d hpq.2
-      hG.lev.1 hG.lev.2 (Or.inl ⟨hpq.1, hL.levA⟩) liftLa
+    refine (_root_.GlobalTheory.LevInv.fibConst_iff_invariant D j _ _ _ _ _ Y.d hpq.2 hG.lev.1
+      hG.lev.2 (Or.inl ⟨hpq.1, hL.levA⟩) liftLa
       (fun γ => LinearMap.ext (liftLa_spec γ))
       a n g (s₂ g.2)).2 fun γ hγ => hg γ hγ
   exact (p5 g).2 h1
@@ -283,7 +290,7 @@ theorem frame_data (p : PtAt ex Csz) (i : Fin D.R.m) (Y : Cov p i) {e : ℕ} {o 
     (GlobalTheory.Member.exists_iotaOK D p.T.Q hJ.pins _ hj).2.1
   have hle : Y.d.l₂.Mb ≤ p.T.Q.l.Mb := hY.lev.1.2.2.2.1.le.trans Ideal.mul_le_left
   obtain ⟨fr, ε, iso, h1, h2⟩ :=
-    GlobalTheory.T.exists_typeFrame_cover_levelMaps_reductions D _ _ _ _ _ p.R.toRealDat i
+    _root_.GlobalTheory.TypeFrameCover.typeFrame_cover D _ _ _ _ _ p.R.toRealDat i
       (p.charW.base.lev.βW i) _ (dat p i) _ Y.d.l₂ _
       (GlobalTheory.LevelAction.latEmb_iotaW p.T hJ i) hr hA hM hl₂ hle hMb _ (p.pins i).2.lift.lev
   obtain ⟨t, ψ, t1, t2, t3, t4⟩ :=

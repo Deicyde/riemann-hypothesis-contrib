@@ -107,7 +107,7 @@ theorem compact_bound {Ω : Set (AF F)} (hΩ : IsCompact Ω)
     exact mul_le_one₀ (ha v) (norm_nonneg _) (IsUltrametricDist.norm_natCast_le_one _ _)
   have cov : Ω ⊆ ⋃ c, O c := fun a _ => by
     obtain ⟨d, d0, -, hd⟩ :=
-      GlobalTheory.SmoothForms.denom_global
+      _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator
         (fun v => max 1 ‖evFin F v a‖₊)
         (fun _ => le_max_left _ _)
         ((Filter.eventually_cofinite.1 a.2.2).subset fun v hv h =>
@@ -140,7 +140,7 @@ theorem scale_core
   have hQ : ∏ᶠ v, ‖evFin F v ν‖₊ ≤ 1 := finprod_induction (· ≤ 1) le_rfl (fun _ _ => mul_le_one') h2
   have n0 : ∀ v, 0 < ‖evFin F v ν‖₊ := fun v => nnnorm_pos.2 (ν.isUnit.map _).ne_zero
   obtain ⟨m, m0, hm, hv⟩ :=
-    GlobalTheory.SmoothForms.denom_global
+    _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator
       (fun v => ‖evFin F v ν‖₊⁻¹)
       (fun v => (one_le_inv₀ (n0 v)).2 (h2 v))
       (by rwa [Function.mulSupport_fun_inv])

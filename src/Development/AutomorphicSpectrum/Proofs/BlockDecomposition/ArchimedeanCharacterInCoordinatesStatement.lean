@@ -87,10 +87,4 @@ theorem _root_.GlobalTheory.T.archimedean_character_in_coordinates
                           (tupC Θ X)
                         : ℝ)
                       : ℂ)) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.PhaseCoord.psiInf_phase
-  | exact GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.PhaseCoord.psiInf_phase
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.PhaseCoord.psiInf_phase <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.PhaseCoord.psiInf_phase

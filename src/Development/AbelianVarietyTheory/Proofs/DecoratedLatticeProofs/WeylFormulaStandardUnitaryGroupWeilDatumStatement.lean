@@ -72,8 +72,4 @@ theorem _root_.GlobalTheory.T.weyl_formula_standardUnitaryGroup_weilDatum
                                     → ∀ Φ x,
                                       (omS g Φ).1 x
                                         = ∫ y, Φ.1 y * shift ψ lam (trA (Matrix.trace (GlobalTheory.StdUnn.inner B x y))) ∂ν :=
-  by
-    first
-    | exact @GlobalTheory.StdUnn.WeylStd.main
-    | exact GlobalTheory.StdUnn.WeylStd.main
-    | (intros; apply GlobalTheory.StdUnn.WeylStd.main <;> assumption)
+  by first | exact @GlobalTheory.StdUnn.WeylStd.main

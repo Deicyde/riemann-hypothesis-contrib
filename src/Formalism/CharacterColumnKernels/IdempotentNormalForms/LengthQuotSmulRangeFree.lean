@@ -76,22 +76,24 @@ lemma quot_mono {M : Type*} [AddCommGroup M] [Module O M] {A B : Submodule O M} 
     Module.length O (M ⧸ B) ≤ Module.length O (M ⧸ A) := by
   exact Module.length_le_of_surjective (Submodule.factor h) (Submodule.factor_surjective h)
 
-private theorem length_quot_span_pow_irreducible {ϖ : O} (hϖ : Irreducible ϖ) (k : ℕ) :
-    Module.length O (O ⧸ Ideal.span {ϖ ^ k}) = k := by
+private theorem length_quot_span_pow_irreducible {ϖ : O} (hϖ : Irreducible ϖ) (k : ℕ)
+    : Module.length O (O ⧸ Ideal.span {ϖ ^ k}) = k := by
   induction k with
   | zero => simp
   | succ k ih =>
     have hle : Ideal.span {ϖ ^ (k + 1)} ≤ Ideal.span {ϖ ^ k} := by
       rw [Ideal.span_singleton_le_span_singleton]
       exact pow_dvd_pow ϖ (Nat.le_add_right k 1)
-    have hcomap : Ideal.span {ϖ} ≤
-        Submodule.comap (LinearMap.mulLeft O (ϖ ^ k)) (Ideal.span {ϖ ^ (k + 1)}) := by
+    have hcomap
+        : Ideal.span {ϖ}
+          ≤ Submodule.comap (LinearMap.mulLeft O (ϖ ^ k)) (Ideal.span {ϖ ^ (k + 1)}) := by
       intro a ha
       rw [Submodule.mem_comap, LinearMap.mulLeft_apply]
       obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.mp ha
       exact Ideal.mem_span_singleton'.mpr ⟨b, by ring⟩
-    let f := Submodule.mapQ (Ideal.span {ϖ}) (Ideal.span {ϖ ^ (k + 1)})
-      (LinearMap.mulLeft O (ϖ ^ k)) hcomap
+    let f :=
+      Submodule.mapQ (Ideal.span {ϖ}) (Ideal.span {ϖ ^ (k + 1)}) (LinearMap.mulLeft O (ϖ ^ k))
+        hcomap
     let g := Submodule.factor hle
     have hf : Function.Injective f := by
       rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -127,14 +129,12 @@ private theorem length_quot_span_pow_irreducible {ϖ : O} (hϖ : Irreducible ϖ)
     have hlen := Module.length_eq_add_of_exact f g hf hg hex
     have h1 : Module.length O (O ⧸ Ideal.span {ϖ}) = 1 := by
       rw [Module.length_eq_one_iff, isSimpleModule_iff_isCoatom]
-      first
-        | exact (PrincipalIdealRing.isMaximal_of_irreducible hϖ).out
+      first | exact (PrincipalIdealRing.isMaximal_of_irreducible hϖ).out
     rw [hlen, h1, ih]
-    first
-      | (push_cast; ring)
+    first | (push_cast; ring)
 
-private theorem length_quot_smulRange_eq_addVal (l : O) :
-    Module.length O (O ⧸ smulRange O l) = addVal O l := by
+private theorem length_quot_smulRange_eq_addVal (l : O)
+    : Module.length O (O ⧸ smulRange O l) = addVal O l := by
   have hspan : smulRange O l = Ideal.span {l} := by
     ext x
     rw [mem_smulRange, Ideal.mem_span_singleton']
@@ -145,8 +145,7 @@ private theorem length_quot_smulRange_eq_addVal (l : O) :
       exact ⟨y, by rw [smul_eq_mul, mul_comm]⟩
   rw [hspan]
   have hirr : ∃ ϖ : O, Irreducible ϖ := by
-    first
-      | exact IsDiscreteValuationRing.exists_irreducible O
+    first | exact IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨ϖ, hϖ⟩ := hirr
   by_cases hl : l = 0
   · subst hl
@@ -164,8 +163,8 @@ private theorem length_quot_smulRange_eq_addVal (l : O) :
     have h' : m + 1 ≤ m := by exact_mod_cast h
     omega
   · obtain ⟨k, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hl hϖ
-    rw [Ideal.span_singleton_mul_left_unit u.isUnit, length_quot_span_pow_irreducible hϖ k, addVal_mul,
-      addVal_pow, addVal_uniformizer hϖ, IsDiscreteValuationRing.addVal_eq_zero_of_unit]
+    rw [Ideal.span_singleton_mul_left_unit u.isUnit, length_quot_span_pow_irreducible hϖ k,
+      addVal_mul, addVal_pow, addVal_uniformizer hϖ, IsDiscreteValuationRing.addVal_eq_zero_of_unit]
     simp
 
 lemma length_quot_smulRange_pi (n : ℕ) (l : O) :
@@ -206,7 +205,6 @@ lemma length_quot_smulRange_free (Q : Type*) [AddCommGroup Q] [Module O Q] [Modu
   haveI : Module.Free O Q := by
     first
       | exact Module.free_of_finite_type_torsion_free'
-      | infer_instance
   let e : Q ≃ₗ[O] (Fin (finrank O Q) → O) := (Module.finBasis O Q).equivFun
   have hmap : (smulRange Q l).map (e : Q →ₗ[O] (Fin (finrank O Q) → O)) =
       smulRange (Fin (finrank O Q) → O) l := by
@@ -222,10 +220,9 @@ lemma length_quot_smulRange_free (Q : Type*) [AddCommGroup Q] [Module O Q] [Modu
   rw [← length_quot_smulRange_pi (finrank O Q) l]
   first
     | exact e'.length_eq
-    | exact le_antisymm (Module.length_le_of_injective e'.toLinearMap e'.injective)
-        (Module.length_le_of_injective e'.symm.toLinearMap e'.symm.injective)
 
-variable {V : Type*} [AddCommGroup V] [Module (FractionRing O) V] [Module O V]
+variable
+  {V : Type*} [AddCommGroup V] [Module (FractionRing O) V] [Module O V]
   [IsScalarTower O (FractionRing O) V] [FiniteDimensional (FractionRing O) V]
 
 lemma isTorsionFree_quot (U : Submodule (FractionRing O) V) : IsTorsionFree O (V ⧸ U) := by
@@ -374,8 +371,9 @@ lemma split {M P : Type*} [AddCommGroup M] [Module O M] [AddCommGroup P] [Module
 def img (E : Set (Module.End (FractionRing O) V)) (N : Submodule O V) : Submodule O V :=
   Submodule.span O {v | ∃ f ∈ E, ∃ n ∈ N, f n = v}
 
-def Dsub (E : Set (Module.End (FractionRing O) V)) (N : Submodule O V)
-    (U : Submodule (FractionRing O) V) : Submodule O N :=
+def Dsub
+    (E : Set (Module.End (FractionRing O) V)) (N : Submodule O V) (U : Submodule (FractionRing O) V)
+    : Submodule O N :=
   (img E N ⊔ (U.restrictScalars O ⊓ N)).comap N.subtype
 
 lemma img_le {E : Set (Module.End (FractionRing O) V)} {N : Submodule O V}
@@ -392,14 +390,18 @@ lemma img_mono {E : Set (Module.End (FractionRing O) V)} {N N' : Submodule O V} 
   rintro v ⟨f, hf, n, hn, rfl⟩
   exact ⟨f, hf, n, h hn, rfl⟩
 
-theorem core {X : Type*} (E : Set (Module.End (FractionRing O) V))
-    (W : X → Submodule (FractionRing O) V) (w : X → ℕ∞) (S : Finset X) :
-    (∀ f ∈ E, ∀ x ∈ S, W x ≤ (W x).comap f) →
-    (∀ x ∈ S, ∃ f ∈ E, ∃ l : O, (∀ v ∈ W x, f v = l • v) ∧ addVal O l ≤ w x) →
-    ∀ U : Submodule (FractionRing O) V, (∀ f ∈ E, U ≤ U.comap f) →
-    ∀ N : Submodule O V, N.FG → (∀ f ∈ E, ∀ n ∈ N, f n ∈ N) →
-    N ≤ ((⨆ x ∈ S, W x) ⊔ U).restrictScalars O →
-    Module.length O (N ⧸ Dsub E N U) ≤ ∑ x ∈ S, (finrank (FractionRing O) (W x) : ℕ∞) * w x := by
+theorem core
+    {X : Type*}
+    (E : Set (Module.End (FractionRing O) V)) (W : X → Submodule (FractionRing O) V) (w : X → ℕ∞)
+    (S : Finset X)
+    : (∀ f ∈ E, ∀ x ∈ S, W x ≤ (W x).comap f)
+      → (∀ x ∈ S, ∃ f ∈ E, ∃ l : O, (∀ v ∈ W x, f v = l • v) ∧ addVal O l ≤ w x)
+      → ∀ U : Submodule (FractionRing O) V,
+        (∀ f ∈ E, U ≤ U.comap f)
+          → ∀ N : Submodule O V,
+            N.FG → (∀ f ∈ E, ∀ n ∈ N, f n ∈ N) → N ≤ ((⨆ x ∈ S, W x) ⊔ U).restrictScalars O
+              → Module.length O (N ⧸ Dsub E N U)
+                ≤ ∑ x ∈ S, (finrank (FractionRing O) (W x) : ℕ∞) * w x := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -413,8 +415,7 @@ theorem core {X : Type*} (E : Set (Module.End (FractionRing O) V))
       show n ∈ img E N ⊔ (U.restrictScalars O ⊓ N)
       exact Submodule.mem_sup_right (Submodule.mem_inf.mpr ⟨hnU, hn⟩)
     rw [htop, Finset.sum_empty]
-    first
-      | simp
+    first | simp
   | @insert x S hxS ih =>
     intro h1 h2 U hU N hN hNE hNS
     obtain ⟨f, hfE, l, hfl, hlw⟩ := h2 x (Finset.mem_insert_self x S)
@@ -451,12 +452,16 @@ theorem core {X : Type*} (E : Set (Module.End (FractionRing O) V))
       have hn2 : n ∈ U₁ := hN'U hn
       have hg2 : g n ∈ U₁ := hEU₁ g hg hn2
       exact hN'ge (Submodule.mem_inf.mpr ⟨hNE g hg n hn1, hg2⟩)
-    have hN'S : N' ≤ ((⨆ y ∈ S, W y) ⊔ U).restrictScalars O := by
-      rw [← hU₁]; exact hN'U
-    have hih := ih (fun g hg y hy => h1 g hg y (Finset.mem_insert_of_mem hy))
-      (fun y hy => h2 y (Finset.mem_insert_of_mem hy)) U hU N' hN'fg hN'E hN'S
-    obtain ⟨B₀, hB₀⟩ : ∃ B₀ : Submodule O N,
-        B₀ = smulRange N l ⊔ LinearMap.ker ((U₁.mkQ.restrictScalars O) ∘ₗ N.subtype) := ⟨_, rfl⟩
+    have hN'S : N' ≤ ((⨆ y ∈ S, W y) ⊔ U).restrictScalars O := by rw [← hU₁]; exact hN'U
+    have hih :=
+      ih
+        (fun g hg y hy => h1 g hg y (Finset.mem_insert_of_mem hy))
+        (fun y hy => h2 y (Finset.mem_insert_of_mem hy))
+        U hU N' hN'fg hN'E hN'S
+    obtain ⟨B₀, hB₀⟩
+        : ∃ B₀ : Submodule O N,
+          B₀ = smulRange N l ⊔ LinearMap.ker ((U₁.mkQ.restrictScalars O) ∘ₗ N.subtype) :=
+      ⟨_, rfl⟩
     have hstep := step1 N hN (W x) U₁ hNWU l
     rw [← hB₀] at hstep
     have hiB : ∀ p : N', Submodule.inclusion hN'N p ∈ Dsub E N U ⊔ B₀ := by
@@ -508,19 +513,18 @@ theorem core {X : Type*} (E : Set (Module.End (FractionRing O) V))
           rwa [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at h0
         have hmN' : (m : V) ∈ N' := hN'ge (Submodule.mem_inf.mpr ⟨m.2, hmU⟩)
         exact Submodule.mem_sup_right ⟨⟨(m : V), hmN'⟩, Subtype.ext rfl⟩
-    have hsplit := split (Dsub E N U) (Dsub E N U ⊔ B₀) le_sup_left (Submodule.inclusion hN'N)
-      (Dsub E N' U) hiB hC hB
+    have hsplit :=
+      split (Dsub E N U) (Dsub E N U ⊔ B₀) le_sup_left (Submodule.inclusion hN'N) (Dsub E N' U) hiB
+        hC hB
     have hq := quot_mono (M := N) (le_sup_right : B₀ ≤ Dsub E N U ⊔ B₀)
     rw [Finset.sum_insert hxS]
-    calc Module.length O (N ⧸ Dsub E N U)
+    calc
+      Module.length O (N ⧸ Dsub E N U)
         ≤ Module.length O (N ⧸ (Dsub E N U ⊔ B₀)) + Module.length O (N' ⧸ Dsub E N' U) := hsplit
-      _ ≤ (finrank (FractionRing O) (W x) : ℕ∞) * addVal O l +
-            ∑ y ∈ S, (finrank (FractionRing O) (W y) : ℕ∞) * w y :=
-          add_le_add (hq.trans hstep) hih
-      _ ≤ _ := by
-          first
-            | (gcongr; exact hlw)
-            | gcongr
+      _ ≤ (finrank (FractionRing O) (W x) : ℕ∞) * addVal O l
+          + ∑ y ∈ S, (finrank (FractionRing O) (W y) : ℕ∞) * w y :=
+        add_le_add (hq.trans hstep) hih
+      _ ≤ _ := by first | (gcongr; exact hlw) | gcongr
 
 section Eig
 
@@ -597,22 +601,27 @@ lemma vcc_attain (Z : Set X) (x : X) :
   unfold vcc
   rw [iInf_subtype]
 
-theorem congMod_le (hsum : (⨆ x, Vx T act x) = ⊤) (L : Submodule O V) (hL : L.FG)
+theorem congMod_le
+    (hsum : (⨆ x, Vx T act x) = ⊤)
+    (L : Submodule O V) (hL : L.FG)
     (S : Finset X) (E : Set (Module.End (FractionRing O) V)) (w : X → ℕ∞)
-    (hcomm : ∀ g ∈ E, ∀ f : T, g * act f = act f * g)
-    (hEL : ∀ g ∈ E, ∀ v ∈ L, g v ∈ L) (hES : ∀ g ∈ E, ∀ v ∈ L, g v ∈ VS T act (S : Set X))
-    (hmin : ∀ x ∈ S, ∃ g ∈ E, ∃ l : O, (∀ v ∈ Vx T act x, g v = l • v) ∧ addVal O l ≤ w x) :
-    Module.length O (CongMod T act L (S : Set X)) ≤
-      ∑ x ∈ S, (finrank (FractionRing O) (Vx T act x) : ℕ∞) * w x := by
-  have hcore := core E (Vx T act) w S
-    (fun f hf x _ => vx_pres f (hcomm f hf) x) hmin (VS T act ((S : Set X)ᶜ))
-    (fun f hf => VS_pres f (fun y => vx_pres f (hcomm f hf) y) _) L hL hEL
-    (by
-      intro v _
-      have hv : v ∈ VS T act (S : Set X) ⊔ VS T act ((S : Set X)ᶜ) := by
-        rw [VS_sup_compl hsum (S : Set X)]
-        exact Submodule.mem_top
-      exact hv)
+    (hcomm : ∀ g ∈ E, ∀ f : T, g * act f = act f * g) (hEL : ∀ g ∈ E, ∀ v ∈ L, g v ∈ L)
+    (hES : ∀ g ∈ E, ∀ v ∈ L, g v ∈ VS T act (S : Set X))
+    (hmin : ∀ x ∈ S, ∃ g ∈ E, ∃ l : O, (∀ v ∈ Vx T act x, g v = l • v) ∧ addVal O l ≤ w x)
+    : Module.length O (CongMod T act L (S : Set X))
+      ≤ ∑ x ∈ S, (finrank (FractionRing O) (Vx T act x) : ℕ∞) * w x := by
+  have hcore :=
+    core E (Vx T act) w S
+      (fun f hf x _ => vx_pres f (hcomm f hf) x)
+      hmin (VS T act ((S : Set X)ᶜ))
+      (fun f hf => VS_pres f (fun y => vx_pres f (hcomm f hf) y) _)
+      L hL hEL
+      (by
+        intro v _
+        have hv : v ∈ VS T act (S : Set X) ⊔ VS T act ((S : Set X)ᶜ) := by
+          rw [VS_sup_compl hsum (S : Set X)]
+          exact Submodule.mem_top
+        exact hv)
   refine le_trans (quot_mono ?_) hcore
   unfold Dsub
   refine Submodule.comap_mono (sup_le_sup_right ?_ _)
@@ -639,12 +648,14 @@ theorem congBoundGood : StatCongBoundGood := by
     by_cases hyg : y ∈ Zg
     · rw [hZgA y hyg v hv]
       exact Submodule.smul_mem _ _
-        ((le_iSup₂_of_le y (Finset.mem_coe.mpr hyg) le_rfl :
-          Vx T act y ≤ ⨆ x ∈ (Zg : Set X), Vx T act x) hv)
+        ((le_iSup₂_of_le y (Finset.mem_coe.mpr hyg) le_rfl
+            : Vx T act y ≤ ⨆ x ∈ (Zg : Set X), Vx T act x)
+          hv)
     · rw [hZ0 y (Finset.mem_coe.mp hy) hyg v hv]
       exact Submodule.zero_mem _
   refine congMod_le hsum L hL Zg ((fun c : T => a * act c) '' (ccIdeal T (Z : Set X) : Set T))
-    (fun x => vcc T (Z : Set X) x + addVal O (A : O)) ?_ ?_ ?_ ?_
+    (fun x => vcc T (Z : Set X) x + addVal O (A : O))
+    ?_ ?_ ?_ ?_
   · rintro g ⟨c, -, rfl⟩ f
     show a * act c * act f = act f * (a * act c)
     rw [mul_assoc, cc_comm c f, ← mul_assoc, hacomm f, mul_assoc]
@@ -657,9 +668,8 @@ theorem congBoundGood : StatCongBoundGood := by
     refine ⟨a * act c, ⟨c, hc, rfl⟩, (A : O) * (c : X → O) x, fun v hv => ?_, ?_⟩
     · show a (act c v) = _
       rw [(mem_Vx.mp hv) c, ← algebraMap_smul (FractionRing O) ((c : X → O) x) v, map_smul,
-        hZgA x hx v hv, smul_smul,
-        ← algebraMap_smul (FractionRing O) ((A : O) * (c : X → O) x) v, map_mul, map_intCast,
-        mul_comm]
+        hZgA x hx v hv, smul_smul, ← algebraMap_smul (FractionRing O) ((A : O) * (c : X → O) x) v,
+        map_mul, map_intCast, mul_comm]
     · exact le_of_eq (by rw [addVal_mul, hcx, add_comm])
 
 end Formalism.NG

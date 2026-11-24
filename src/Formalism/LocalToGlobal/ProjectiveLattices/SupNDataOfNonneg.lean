@@ -66,13 +66,7 @@ theorem htI2et_of_pt
     (d : Data K ι Ω WT A) (hpt : ∀ sg, Real.log (d.supN sg (d.n1 • d.wde) d.et) / d.i ≤ d.Pet)
     : d.HeightIntegralEstimateTrivialPlace := by
   unfold Data.HeightIntegralEstimateTrivialPlace meanK
-  have hN : (0 : ℝ) < (Fintype.card (K →+* ℂ) : ℝ) := by
-    first
-    | exact_mod_cast Fintype.card_pos
-    | (
-        haveI : Nonempty (K →+* ℂ) := ⟨(IsAlgClosed.lift : K →ₐ[ℚ] ℂ).toRingHom⟩
-        exact_mod_cast Fintype.card_pos
-      )
+  have hN : (0 : ℝ) < (Fintype.card (K →+* ℂ) : ℝ) := by first | exact_mod_cast Fintype.card_pos
   rw [div_right_comm, Finset.sum_div, div_le_iff₀ hN]
   calc
     ∑ sg, (fun sg => Real.log (d.supN sg (d.n1 • d.wde) d.et)) sg / (d.i : ℝ)
@@ -156,7 +150,7 @@ theorem supN_dataOf_nonneg
   intro p
   unfold dataOf nrmC
   dsimp only
-  first | positivity | exact (rfl : (0 : ℕ) = 0)
+  first | positivity
 
 theorem htI2be_of
     (h : GenFrEx Xo c)

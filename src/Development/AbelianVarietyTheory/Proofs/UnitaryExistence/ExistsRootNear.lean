@@ -3,7 +3,7 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 public import Mathlib.NumberTheory.NumberField.AdeleRing
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsAdeleRingTensorEquivInfiniteProdFinite
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralUnitRootNormOneAdeleStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralUnitRootNormOneAdele
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsOpenNsmulAdelicCompletionOfVectorSet
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -265,7 +265,7 @@ theorem finite_root
     rw [hu1]
     exact add_mem (one_mem _) (mul_mem (mul_mem (ofNat_mem _ 2) (natCast_mem _ n)) hz)
   obtain ⟨x₁, hx₁, ⟨y₁, hy₁, hxy₁⟩, hr₁⟩ :=
-    GlobalTheory.T.exists_integral_unit_root_norm_one_adele F E c h2 hc hP u huO hu
+    _root_.GlobalTheory.AdLat.exists_integral_unit_root F E c h2 hc hP u huO hu
   obtain ⟨e, f, hee, hef, hun⟩ :=
     exists_idem (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletionIntegers F) n
   obtain ⟨y₀, hy₀⟩ :=

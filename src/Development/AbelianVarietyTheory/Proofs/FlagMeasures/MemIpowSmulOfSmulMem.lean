@@ -58,12 +58,15 @@ section Gen
 variable {K V ι : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
 
 def gen (H : HermSpace K V) (J : Finset ι) (e ρ : ι → V) (c : ι → ι → K) : V →ₗ[K] V :=
-  LinearMap.id + ∑ b ∈ J, ((H.B.flip (e b)).smulRight (ρ b) - (H.B.flip (ρ b)).smulRight (e b) +
-    ∑ a ∈ J, (c a b • H.B.flip (e b)).smulRight (e a))
+  LinearMap.id
+    + ∑ b ∈ J, ((H.B.flip (e b)).smulRight (ρ b) - (H.B.flip (ρ b)).smulRight (e b) +
+      ∑ a ∈ J, (c a b • H.B.flip (e b)).smulRight (e a))
 
-theorem gen_apply (H : HermSpace K V) (J : Finset ι) (e ρ : ι → V) (c : ι → ι → K) (v : V) :
-    gen H J e ρ c v = v + ∑ b ∈ J, (H.B v (e b) • ρ b - H.B v (ρ b) • e b +
-      ∑ a ∈ J, (c a b * H.B v (e b)) • e a) := by
+theorem gen_apply (H : HermSpace K V) (J : Finset ι) (e ρ : ι → V) (c : ι → ι → K) (v : V)
+    : gen H J e ρ c v
+      = v
+        + ∑ b ∈ J, (H.B v (e b) • ρ b - H.B v (ρ b) • e b +
+          ∑ a ∈ J, (c a b * H.B v (e b)) • e a) := by
   simp [gen, LinearMap.sum_apply, mul_smul]
 
 end Gen
@@ -71,27 +74,26 @@ end Gen
 section Ideal
 variable {K : Type} [Field K] [NumberField K]
 
-theorem ipow_mul_mem {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m n : ℤ} {x y : K} (hx : x ∈ ipow 𝔡 m)
-    (hy : y ∈ ipow 𝔡 n) : x * y ∈ ipow 𝔡 (m + n) := by
-  have h0 : ((𝔡 : FractionalIdeal (𝓞 K)⁰ K)) ≠ 0 := by
-    simpa using h𝔡
+theorem ipow_mul_mem
+    {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m n : ℤ} {x y : K} (hx : x ∈ ipow 𝔡 m) (hy : y ∈ ipow 𝔡 n)
+    : x * y ∈ ipow 𝔡 (m + n) := by
+  have h0 : ((𝔡 : FractionalIdeal (𝓞 K)⁰ K)) ≠ 0 := by simpa using h𝔡
   unfold ipow at *
   rw [zpow_add₀ h0, FractionalIdeal.coe_mul]
   exact Submodule.mul_mem_mul hx hy
 
-theorem one_mem_ipow_mul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) (m : ℤ) :
-    (1 : K) ∈ ipow 𝔡 m * ipow 𝔡 (-m) := by
-  have h0 : ((𝔡 : FractionalIdeal (𝓞 K)⁰ K)) ≠ 0 := by
-    simpa using h𝔡
+theorem one_mem_ipow_mul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) (m : ℤ)
+    : (1 : K) ∈ ipow 𝔡 m * ipow 𝔡 (-m) := by
+  have h0 : ((𝔡 : FractionalIdeal (𝓞 K)⁰ K)) ≠ 0 := by simpa using h𝔡
   unfold ipow
   rw [← FractionalIdeal.coe_mul, ← zpow_add₀ h0, add_neg_cancel, zpow_zero, FractionalIdeal.coe_one]
   exact Submodule.one_le.mp le_rfl
 
-theorem ipow_zero (𝔡 : Ideal (𝓞 K)) : ipow 𝔡 0 = 1 := by
-  simp [ipow]
+theorem ipow_zero (𝔡 : Ideal (𝓞 K)) : ipow 𝔡 0 = 1 := by simp [ipow]
 
-theorem mem_ipow_of_mul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m n : ℤ} {x : K}
-    (h : ∀ t ∈ ipow 𝔡 (-m), t * x ∈ ipow 𝔡 n) : x ∈ ipow 𝔡 (m + n) := by
+theorem mem_ipow_of_mul
+    {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m n : ℤ} {x : K} (h : ∀ t ∈ ipow 𝔡 (-m), t * x ∈ ipow 𝔡 n)
+    : x ∈ ipow 𝔡 (m + n) := by
   have key : ∀ y ∈ ipow 𝔡 m * ipow 𝔡 (-m), y * x ∈ ipow 𝔡 (m + n) := by
     intro y hy
     refine Submodule.mul_induction_on hy ?_ ?_
@@ -106,15 +108,18 @@ theorem mem_ipow_of_mul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m n : �
 end Ideal
 
 section Smul
-variable {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type}
+  [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem smul_mem_of_mem_ipow_smul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m : ℤ} {M : Submodule (𝓞 K) V} {v : V}
-    (hv : v ∈ ipow 𝔡 m • M) {t : K} (ht : t ∈ ipow 𝔡 (-m)) : t • v ∈ M := by
+theorem smul_mem_of_mem_ipow_smul
+    {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥)
+    {m : ℤ} {M : Submodule (𝓞 K) V} {v : V} (hv : v ∈ ipow 𝔡 m • M)
+    {t : K} (ht : t ∈ ipow 𝔡 (-m))
+    : t • v ∈ M := by
   refine Submodule.smul_induction_on hv ?_ ?_
   · intro a ha n hn
-    have h1 : t * a ∈ ipow 𝔡 0 := by
-      simpa [add_comm] using ipow_mul_mem h𝔡 ht ha
+    have h1 : t * a ∈ ipow 𝔡 0 := by simpa [add_comm] using ipow_mul_mem h𝔡 ht ha
     rw [ipow_zero] at h1
     obtain ⟨o, ho⟩ := Submodule.mem_one.mp h1
     rw [smul_smul, ← ho, algebraMap_smul]
@@ -123,8 +128,10 @@ theorem smul_mem_of_mem_ipow_smul {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥)
     rw [smul_add]
     exact M.add_mem hx hy
 
-theorem mem_ipow_smul_of_smul_mem {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) {m : ℤ} {M : Submodule (𝓞 K) V} {v : V}
-    (h : ∀ t ∈ ipow 𝔡 (-m), t • v ∈ M) : v ∈ ipow 𝔡 m • M := by
+theorem mem_ipow_smul_of_smul_mem
+    {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥)
+    {m : ℤ} {M : Submodule (𝓞 K) V} {v : V} (h : ∀ t ∈ ipow 𝔡 (-m), t • v ∈ M)
+    : v ∈ ipow 𝔡 m • M := by
   have key : ∀ y ∈ ipow 𝔡 m * ipow 𝔡 (-m), y • v ∈ ipow 𝔡 m • M := by
     intro y hy
     refine Submodule.mul_induction_on hy ?_ ?_
@@ -146,8 +153,8 @@ theorem star_integral (y : 𝓞 K) : ∃ y' : 𝓞 K, (y' : K) = star (y : K) :=
     exact (RingOfIntegers.isIntegral_coe y).map ((starRingEnd K).toIntAlgHom)
   exact ⟨⟨star (y : K), h⟩, rfl⟩
 
-theorem star_pow_mem {𝔡 : Ideal (𝓞 K)} (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : K) = star (x : K)) (k : ℕ) :
-    ∀ x ∈ 𝔡 ^ k, ∃ y ∈ 𝔡 ^ k, (y : K) = star (x : K) := by
+theorem star_pow_mem {𝔡 : Ideal (𝓞 K)} (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : K) = star (x : K)) (k : ℕ)
+    : ∀ x ∈ 𝔡 ^ k, ∃ y ∈ 𝔡 ^ k, (y : K) = star (x : K) := by
   induction k with
   | zero =>
     intro x _
@@ -166,16 +173,18 @@ theorem star_pow_mem {𝔡 : Ideal (𝓞 K)} (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈
     · rintro a b ⟨a', ha', ea⟩ ⟨b', hb', eb⟩
       exact ⟨a' + b', Submodule.add_mem _ ha' hb', by simp [ea, eb]⟩
 
-theorem star_mem_one {x : K} (hx : x ∈ (1 : FractionalIdeal (𝓞 K)⁰ K)) :
-    star x ∈ (1 : FractionalIdeal (𝓞 K)⁰ K) := by
+theorem star_mem_one {x : K} (hx : x ∈ (1 : FractionalIdeal (𝓞 K)⁰ K))
+    : star x ∈ (1 : FractionalIdeal (𝓞 K)⁰ K) := by
   rw [FractionalIdeal.mem_one_iff] at *
   obtain ⟨y, rfl⟩ := hx
   obtain ⟨y', hy'⟩ := star_integral y
   exact ⟨y', hy'⟩
 
-theorem star_mem_ipow {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥)
-    (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : K) = star (x : K)) (n : ℤ) {x : K} (hx : x ∈ ipow 𝔡 n) :
-    star x ∈ ipow 𝔡 n := by
+theorem star_mem_ipow
+    {𝔡 : Ideal (𝓞 K)} (h𝔡 : 𝔡 ≠ ⊥) (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : K) = star (x : K))
+    (n : ℤ)
+    {x : K} (hx : x ∈ ipow 𝔡 n)
+    : star x ∈ ipow 𝔡 n := by
   apply GlobalTheory.DegCnt.PosJ.star_mem_ipow <;> assumption
 
 end Star

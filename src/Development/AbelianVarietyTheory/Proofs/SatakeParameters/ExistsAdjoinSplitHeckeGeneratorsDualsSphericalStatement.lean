@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_adjoin_splitHeckeGenerators_duals_spherical
     : ∀ {D : D7} (V : HSp D) (P : Pl D.host.E),
       conjPl P ≠ P
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.exists_adjoin_splitHeckeGenerators_duals_spherical
                 {x : Module.End ℂ M | ∃ k, k ≤ V.rank ∧ (x = opOf π P (Finsupp.single (splitLab V.rank k) 1) ∨ x = opOf π P (Finsupp.single (dualLab (splitLab V.rank k)) 1))},
             ∀ u : M,
               (∀ k ∈ hyp V P, π k u = u) → a u = opOf π P (Finsupp.single d 1) u := by
-  first
-  | exact @GlobalTheory.SplitGen.gen_split
-  | exact GlobalTheory.SplitGen.gen_split
-  | (intros; apply GlobalTheory.SplitGen.gen_split <;> assumption)
+  first | exact @GlobalTheory.SplitGen.gen_split

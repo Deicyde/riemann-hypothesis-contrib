@@ -55,6 +55,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.fockCoefficientMap_extremal_eq_phase_smul_letters
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : Formalism.L2.DIV.FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D)
@@ -83,7 +84,4 @@ theorem _root_.GlobalTheory.T.fockCoefficientMap_extremal_eq_phase_smul_letters
                               (fun _ => 1)
                               (onb (R.MW i (sg0 D A))) (R.vP i t)
                               (MvPolynomial.rename lt (MvPolynomial.map (inC O.c') (O.io v))) := by
-  first
-  | exact @GlobalTheory.AdTh.PhaseMapCore.io_eq_phase_smul_core
-  | exact GlobalTheory.AdTh.PhaseMapCore.io_eq_phase_smul_core
-  | (intros; apply GlobalTheory.AdTh.PhaseMapCore.io_eq_phase_smul_core <;> assumption)
+  first | exact @GlobalTheory.AdTh.PhaseMapCore.io_eq_phase_smul_core

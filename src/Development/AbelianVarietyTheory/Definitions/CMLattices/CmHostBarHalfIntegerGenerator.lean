@@ -41,8 +41,10 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -57,8 +59,11 @@ variable {D : Datum H} {ε : ℤˣ} {h : D.La → D.La → OK H}
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem hasType_neg {ρ : 𝓞 K} (hρ : ρ ^ 2 = -(H.d : 𝓞 K)) {G : Over (Sp (𝓞 K))} [GrpObj G] {act : OAct (𝓞 E) G}
-    {p q : ℕ} (h : HasType H act ρ p q) : HasType H act (-ρ) q p := by
+theorem hasType_neg
+    {ρ : 𝓞 K} (hρ : ρ ^ 2 = -(H.d : 𝓞 K))
+    {G : Over (Sp (𝓞 K))} [GrpObj G]
+    {act : OAct (𝓞 E) G} {p q : ℕ} (h : HasType H act ρ p q)
+    : HasType H act (-ρ) q p := by
   intro k _ _ β hβ τ
   obtain ⟨h1, h2⟩ := h k β hβ τ
   have e1 : τ H.rt ^ 2 = -(H.d : k) := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
@@ -79,7 +84,7 @@ theorem hasType_neg {ρ : 𝓞 K} (hρ : ρ ^ 2 = -(H.d : 𝓞 K)) {G : Over (Sp
   have hβρ : β ρ ≠ 0 := by
     intro h0
     exact hρ0 (hβ (h0.trans (map_zero β).symm))
-  have hne : β ρ ≠ -β ρ := by
+  have hne : β ρ ≠ - β ρ := by
     intro h0
     have e : (2 : k) * β ρ = 0 := by linear_combination h0
     rcases mul_eq_zero.mp e with e' | e'

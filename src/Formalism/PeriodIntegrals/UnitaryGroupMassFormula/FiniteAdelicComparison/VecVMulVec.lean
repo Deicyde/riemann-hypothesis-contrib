@@ -64,7 +64,7 @@ theorem psiV_tauF
     rw [tauF_tmul]
     simp only [psiV, prF, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sndA,
       AlgHom.toRingHom_eq_coe, RingHom.coe_coe, AlgHom.comp_apply, AlgEquiv.coe_toAlgHom,
-      AlgHom.coe_coe, Algebra.TensorProduct.comm_tmul, Algebra.TensorProduct.map_tmul]
+      Algebra.TensorProduct.comm_tmul, Algebra.TensorProduct.map_tmul]
     rfl
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 

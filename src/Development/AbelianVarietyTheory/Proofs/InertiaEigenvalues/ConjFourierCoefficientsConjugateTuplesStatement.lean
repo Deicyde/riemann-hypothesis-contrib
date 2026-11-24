@@ -51,6 +51,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.conj_fourierCoefficients_conjugate_tuples
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.conj_fourierCoefficients_conjugate_tuples
                             → M.c'.F),
                       (u : ℂ) = ((R.xi (tup b) s : Circle) : ℂ) ∧ (∀ k, HEq (w' k) (M.w b (e k)))
                         ∧ ∀ k q, ta (M.w a k q) = u * w' k q := by
-  first
-  | exact @GlobalTheory.ConjDatum.conj_coeff
-  | exact GlobalTheory.ConjDatum.conj_coeff
-  | (intros; apply GlobalTheory.ConjDatum.conj_coeff <;> assumption)
+  first | exact @GlobalTheory.ConjDatum.conj_coeff

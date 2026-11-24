@@ -122,7 +122,7 @@ theorem blk_val {j : ℕ} (x : UnipotentBlockColumnIndex k j j → Ad E) (i c : 
   rw [posM, Matrix.sum_apply]
   split_ifs with h
   · rw [Finset.sum_eq_single (⟨(i, c), h.1, h.2.ge, h.2.le⟩ : UnipotentBlockColumnIndex k j j)]
-    · first | exact Matrix.single_apply_same _ _ _ | simp [Matrix.single_apply]
+    · first | exact Matrix.single_apply_same _ _ _
     · intro t _ ht
       apply Matrix.single_apply_of_ne
       rintro ⟨h1, h2⟩
@@ -142,7 +142,7 @@ theorem blk_mul_val
   rw [Units.val_mul, Matrix.mul_apply]
   simp only [blk_val, add_mul, Finset.sum_add_distrib]
   congr 1
-  · first | rw [← Matrix.mul_apply, Matrix.one_mul] | simp [Matrix.one_apply]
+  · first | rw [← Matrix.mul_apply, Matrix.one_mul]
   · rw [Finset.sum_eq_single ⟨j, hj⟩]
     · by_cases h : (i : ℕ) < j
       · rw [dite_eq_left (show (i : ℕ) < j ∧ ((⟨j, hj⟩ : Fin k) : ℕ) = j from ⟨h, rfl⟩),
@@ -267,7 +267,7 @@ theorem UU_col {j : ℕ} (hj : j < k) (u : GA E k) (hu : UU j u)
       · have hne : i ≠ ⟨j, hj⟩ := fun e => by subst e; exact lt_irrefl j h
         rw [dite_eq_left h, h2 ⟨j, hj⟩, mul_one, Matrix.one_apply_ne hne]
         show u.val i ⟨j, hj⟩ + -u.val i ⟨j, hj⟩ = 0
-        first | exact add_neg_cancel _ | simp
+        first | exact add_neg_cancel _
       · rw [dite_eq_right h, zero_mul, add_zero]
         rcases Nat.lt_or_ge j (i : ℕ) with hij | hij
         · have hne : i ≠ ⟨j, hj⟩ := fun e => by subst e; exact lt_irrefl j hij
@@ -281,7 +281,7 @@ theorem UU_split {j : ℕ} (hj : j < k) (u : GA E k) (hu : UU j u)
       UU (j + 1) u' ∧ u = blkU y * u' :=
   ⟨colU u j, blkU (- colU u j) * u, UU_col hj u hu, by rw [← mul_assoc, bU_mul_neg, one_mul]⟩
 
-theorem nuD_zero : nuD E k 0 = Measure.dirac 1 := by first | rfl | simp only [nuD]
+theorem nuD_zero : nuD E k 0 = Measure.dirac 1 := by first | rfl
 
 theorem nuD_succ (d : ℕ)
     : nuD E k (d + 1)
@@ -290,7 +290,7 @@ theorem nuD_succ (d : ℕ)
           blkU p.1 * p.2)
         ((vecMeasure E (UnipotentBlockColumnIndex k (k - (d + 1)) (k - (d + 1)))).prod
           (nuD E k d)) := by
-  first | rfl | simp only [nuD]
+  first | rfl
 
 theorem sf_nuD : ∀ d, SFinite (nuD E k d)
   | 0 => by rw [nuD_zero]; infer_instance
@@ -428,8 +428,7 @@ theorem props_succ
           iinv (fun n => F (n * blkU (-x))) (hF.comp (meas_rmul _))
         _ = ∫⁻ n, F (blkU (-x) * (blkU x * n * blkU (-x))) ∂nuD E k d :=
           lintegral_congr fun n =>
-            congrArg F (by
-              first | rw [← mul_assoc, ← mul_assoc, bU_neg_mul, one_mul] | (rw [← bU_inv]; group))
+            congrArg F (by first | rw [← mul_assoc, ← mul_assoc, bU_neg_mul, one_mul])
         _ = ∫⁻ n, F (blkU (-x) * n) ∂nuD E k d :=
           iconj x (fun n => F (blkU (-x) * n)) (hF.comp (meas_lmul _))
     have hH : Measurable fun u : GA E k => ∫⁻ n, F (u * n) ∂nuD E k d :=

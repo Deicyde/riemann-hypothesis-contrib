@@ -48,6 +48,7 @@ open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRes
 open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
+
 theorem _root_.GlobalTheory.T.normalisedFramedPoint_triangularFrame_weightRule
     : Out.SecTwistSt
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.normalisedFramedPoint_triangularFrame_weightRule
               FrBor t (un k x) (un k ⟨_, h⟩)
                 ∧ ∀ a n,
                   Dom a n → toC (wchar (ex Dw a n) t) = bchar (laU (unfOf e F M un) a n k) b := by
-  first
-  | exact @GlobalTheory.NormUnBor.normUn_bor
-  | exact GlobalTheory.NormUnBor.normUn_bor
-  | (intros; apply GlobalTheory.NormUnBor.normUn_bor <;> assumption)
+  first | exact @GlobalTheory.NormUnBor.normUn_bor

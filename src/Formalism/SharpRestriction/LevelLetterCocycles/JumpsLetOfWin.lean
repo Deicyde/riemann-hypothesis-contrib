@@ -264,12 +264,6 @@ theorem prod_q_eq
     rw [map_mul, mul_pow]
     rfl
 
-private theorem letE_mul_self_level_letter_cocycles (c : ZMod n)
-    : (letE c : LetA O n) * letE c = letE c := by
-  funext k
-  simp only [letE, Pi.mul_apply, Pi.single_apply]
-  split_ifs <;> simp
-
 theorem prodPs_mem
     (hs : W.s = 1)
     (hR : Formalism.MainNotions.DeltaInvariantLattices.wachRingRelations W 1 (PD.p - 1) W.π₀
@@ -291,7 +285,7 @@ theorem prodPs_mem
   have hxc : (letE c : LetA O n) • x = x := by
     obtain ⟨y, _, hy⟩ := Submodule.mem_map.1 hxl
     rw [← hy, LinearMap.smul_apply, LinearMap.id_apply, smul_smul,
-      letE_mul_self_level_letter_cocycles]
+      _root_.Formalism.MainNotions.WachCoordinates.Br.letE_mul_self]
   have hch := chain W hs T h5 c Gb j hM x hxN hxc j le_rfl
   obtain ⟨u, hu, hueq⟩ := prod_q_eq W hR j Gb
   rw [hueq, mul_smul] at hch

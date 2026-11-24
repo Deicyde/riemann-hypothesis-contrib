@@ -66,20 +66,14 @@ theorem fdegOf_eq
   have h1
       : ∀ g : UJ ε, coefOn σ w w g * star (coefOn σ w w g) = ((‖coefOn σ w w g‖ ^ 2 : ℝ) : ℂ) := by
     intro g
-    first
-    | (rw [RCLike.star_def, RCLike.mul_conj]; push_cast; rfl)
-    | (rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]; push_cast; rfl)
-    | (rw [Complex.star_def, Complex.mul_conj']; push_cast; rfl)
+    first | (rw [RCLike.star_def, RCLike.mul_conj]; push_cast; rfl)
   simp_rw [h1] at heq
   rw [integral_complex_ofReal, inner_self_eq_norm_sq_to_K] at heq
   have key : ∫ g, ‖coefOn σ w w g‖ ^ 2 ∂μ = ‖w‖ ^ 4 / d := by
     have h2 : ((‖w‖ : ℂ) ^ 2 * (‖w‖ : ℂ) ^ 2 / (d : ℂ)) = ((‖w‖ ^ 4 / d : ℝ) : ℂ) := by
       push_cast
       ring
-    first
-    | exact_mod_cast heq.trans h2
-    | (apply Complex.ofReal_injective; rw [heq]; push_cast; ring)
-    | (apply Complex.ofReal_injective; rw [heq, ← h2])
+    first | exact_mod_cast heq.trans h2
   rw [key]
   field_simp
 

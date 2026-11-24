@@ -121,8 +121,8 @@ theorem eI_conjTranspose (I : Finset (Fin n)) : (eI I : Matrix (Fin n) (Fin n) �
 theorem weyl_idem {R : Type} [CommRing R] (e : Matrix (Fin n) (Fin n) R) (he : e * e = e)
     : blk4 1 e 0 1 * blk4 1 0 (-e) 1 * blk4 1 e 0 1 = blk4 (1 - e) e (-e) (1 - e) := by
   rw [submatrix_fromBlocks_mul, submatrix_fromBlocks_mul]
-  simp only [Matrix.mul_one, Matrix.one_mul, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
-    Matrix.mul_neg, Matrix.neg_mul, Matrix.add_mul, he]
+  simp only [Matrix.mul_one, Matrix.one_mul, Matrix.mul_zero, add_zero, zero_add, Matrix.mul_neg,
+    Matrix.neg_mul, Matrix.add_mul, he]
   congr 1 <;> abel
 
 theorem unip_unitary
@@ -142,7 +142,7 @@ theorem unipBar_unitary
   rw [cT_blk4, Formalism.UG.cT_one, cT_zero', hc, submatrix_fromBlocks_mul,
     submatrix_fromBlocks_mul]
   simp only [Matrix.mul_one, Matrix.one_mul, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
-    Matrix.mul_neg, Matrix.neg_mul]
+    Matrix.mul_neg]
   congr 1 <;> simp
 
 theorem JR_Jst (D : D7) (n : ℕ) : JR (F := D.host.F) (AF D.host.F) (Jst D n) = blk4 0 1 (-1) 0 := by
@@ -210,8 +210,7 @@ theorem exists_I (hL : LocRedField) (k : G D n) (τ : D.what₂.Tau)
     exact this
   have hJJ : (blk4 (0 : Matrix (Fin n) (Fin n) ℂ) 1 (-1) 0) * blk4 0 1 (-1) 0 = -1 := by
     rw [submatrix_fromBlocks_mul]
-    simp only [Matrix.mul_one, Matrix.one_mul, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
-      Matrix.mul_neg, Matrix.neg_mul, neg_neg]
+    simp only [Matrix.mul_one, Matrix.mul_zero, add_zero, zero_add, Matrix.mul_neg]
     rw [← block_matrix_one, ← blk4_neg, neg_zero]
   have hinv : ((-(blk4 0 1 (-1) 0)) * Mᴴ * blk4 0 1 (-1) 0) * M = 1 := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc Mᴴ, hu, Matrix.neg_mul, hJJ, neg_neg]
@@ -229,7 +228,6 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open GenInfH PlaceFactsH
 open Formalism.IndefR.Eqv (psiT glueA splitInv psiT_glueA finPart_glueA ae_ext' mat_ext)
-
 
 theorem kInInf_of (hU : UnitD) (hL : LocRedField) : KInInf := by
   intro D n k hk hfin

@@ -224,6 +224,3 @@ theorem roomOffGrid : RoomOffGrid := by
         exact two_lt_of_four_lt (hfar y hy b hb)
 
 end Formalism.FourierDecayAlt.P.PBD
-
-theorem Formalism.FourierDecayAlt.P.room_off_grid : Formalism.FourierDecayAlt.P.PBD.RoomOffGrid :=
-  Formalism.FourierDecayAlt.P.PBD.roomOffGrid

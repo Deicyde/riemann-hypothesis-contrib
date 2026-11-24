@@ -129,7 +129,7 @@ theorem decomp {n : ℕ} (g : Mir k n)
     refine Fin.lastCases ?_ (fun j => ?_) j
     · simp [GlobalTheory.BZMir.glEmbMat, GlobalTheory.BZMir.colMat, GlobalTheory.BZMir.eLast]
     · simp [GlobalTheory.BZMir.glEmbMat, GlobalTheory.BZMir.colMat, GlobalTheory.BZMir.eLast,
-        Pi.single_apply, Fin.castSucc_ne_last]
+        Fin.castSucc_ne_last]
   · refine Fin.lastCases ?_ (fun j => ?_) j
     · simp [GlobalTheory.BZMir.glEmbMat, GlobalTheory.BZMir.colMat,
         GlobalTheory.CompanionTheory.MirLevi.colv]
@@ -179,7 +179,7 @@ theorem restr_injective : Function.Injective (restr ρ) := by
           (x : GlobalTheory.CompanionTheory.MirLevi.LH k n) (g : GlobalTheory.BZMir.Mir k n),
         F.1.1.1 ((x : GlobalTheory.BZMir.Mir k n) * g) = ρ x (F.1.1.1 g) := by
     intro F x g
-    first | exact F.1.1.2 x g | exact F.1.2 x g | exact F.2 x g | simpa using F.1.1.2 x g
+    first | exact F.1.1.2 x g
   have hv
       : ∀ v,
         f.1.1.1 (GlobalTheory.CompanionTheory.MirLevi.uv n v)
@@ -195,9 +195,7 @@ theorem restr_injective : Function.Injective (restr ρ) := by
             : GlobalTheory.BZMir.Mir k n) :=
       rfl
     rw [GlobalTheory.CompanionTheory.MirLevi.decomp g, e, key f, key f', hv]
-  first
-  | exact Subtype.ext (Subtype.ext (Subtype.ext (funext hall)))
-  | exact Subtype.ext (Subtype.ext (Subtype.ext (by ext g; exact hall g)))
+  first | exact Subtype.ext (Subtype.ext (Subtype.ext (funext hall)))
 
 theorem restr_uv (a : Fin n → k) (f : cIndSpace (LH k n) ρ) (v : Fin n → k)
     : restr ρ (cInd (LH k n) ρ (uv n a) f) v = restr ρ f (v + a) := by
@@ -211,7 +209,7 @@ theorem restr_levi (m : GL (Fin n) k) (f : cIndSpace (LH k n) ρ) (v : Fin n →
       : ∀ (x : GlobalTheory.CompanionTheory.MirLevi.LH k n) (g : GlobalTheory.BZMir.Mir k n),
         f.1.1.1 ((x : GlobalTheory.BZMir.Mir k n) * g) = ρ x (f.1.1.1 g) := by
     intro x g
-    first | exact f.1.1.2 x g | exact f.1.2 x g | exact f.2 x g | simpa using f.1.1.2 x g
+    first | exact f.1.1.2 x g
   have e
       : GlobalTheory.BZMir.levi k n m
         = ((GlobalTheory.CompanionTheory.MirLevi.lv k n m

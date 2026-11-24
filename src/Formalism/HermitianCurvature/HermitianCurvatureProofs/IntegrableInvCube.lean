@@ -175,7 +175,7 @@ theorem gsup_one
         / R ^ (2 * S.f)
       ≤ B ^ S.f * S.base.vol b 1)
     : ∃ P, 0 ≤ P ∧ P ≤ B ^ S.f * S.base.vol b 1 ∧ GSup S ε b 1 P := by
-  obtain ⟨i1, i2, hcov, -⟩ := pbc_lstdFacts S.f R hR
+  obtain ⟨i1, i2, hcov, -⟩ := _root_.Formalism.FourierDecayAlt.P.PBC.Lat.lstdFacts S.f R hR
   have := i1
   have := i2
   have hg' : (0 : ℝ) < S.g := by exact_mod_cast hg

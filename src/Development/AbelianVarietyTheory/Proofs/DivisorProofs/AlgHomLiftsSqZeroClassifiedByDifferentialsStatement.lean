@@ -49,6 +49,7 @@ open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
   GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.algHom_lifts_sqZero_classified_by_differentials
     : ∀ (R R₀ B B₀ B' : Type) [CommRing R] [CommRing R₀] [CommRing B] [Algebra R B] [CommRing B₀]
         [Algebra R₀ B₀] [CommRing B'] [Algebra R B'] (I : Ideal R),
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.algHom_lifts_sqZero_classified_by_differentials
                     ∧ ∀ θ : Ω[B₀⁄R₀] →+ B',
                       (∀ b w, θ (p b • w) = α b * θ w) → (∀ w, θ w ∈ I.map (algebraMap R B'))
                         → ∃ β : B →ₐ[R] B', IsTheta I p α β θ := by
-  first
-  | exact @GlobalTheory.LiftSys.theta_classify
-  | exact GlobalTheory.LiftSys.theta_classify
-  | (intros; apply GlobalTheory.LiftSys.theta_classify <;> assumption)
+  first | exact @GlobalTheory.LiftSys.theta_classify

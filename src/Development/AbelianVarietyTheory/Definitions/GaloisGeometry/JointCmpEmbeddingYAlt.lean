@@ -99,7 +99,6 @@ variable
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure JIn (t : KerEntTied ex) (u : D.what₂.Word) (μ : D.what₂.Tup) where
   Gd : GroupCompatibilityAll D hT ex.cmp
   Hh : Formalism.L2.Herm.SymmetricHermitianColumns D

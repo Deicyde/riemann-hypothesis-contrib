@@ -450,7 +450,7 @@ theorem level_eq_of_pow_eq_of_hasTh
       exact Finset.prod_congr rfl fun i _ => by
         rw [map_pow, map_pow, (over_iff hφ _ hτ _ _).1 (hz i)])
   unfold TObj.HasTh at H H'
-  simp only [hid] at H H'
+  simp only at H H'
   have Hz : Out.IsThetaPtOver t'.pol (n ^ j)
       (fun a : Ix g ((n ^ j) ^ 2) => Out.linComb z fun i => (a i).val)
       _ :=

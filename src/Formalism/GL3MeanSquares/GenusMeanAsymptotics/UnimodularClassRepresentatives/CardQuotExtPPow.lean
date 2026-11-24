@@ -105,9 +105,7 @@ theorem finite_quot {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) :
   have h0 : extP K 𝔭 ^ k ≠ ⊥ := by
     rw [← Ideal.zero_eq_bot]
     exact pow_ne_zero _ (by rw [Ideal.zero_eq_bot]; exact map_ne_bot_of_isMaximal h𝔭)
-  first
-  | exact Ideal.finiteQuotientOfFreeOfNeBot _ h0
-  | exact (Ideal.absNorm_ne_zero_iff _).mp (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact h0)
+  first | exact Ideal.finiteQuotientOfFreeOfNeBot _ h0
 
 def piQ (K : Type) {F : Type} [Field K] [Field F] [Algebra F K] (𝔭 : Ideal (𝓞 F)) (k : ℕ)
     : (𝓞 K ⧸ extP K 𝔭 ^ (k + 1)) →+* (𝓞 K ⧸ extP K 𝔭 ^ k) :=
@@ -147,16 +145,7 @@ theorem card_ker_piQ
       : Nat.card (𝓞 K ⧸ extP K 𝔭 ^ (k + 1))
         = Nat.card (RingHom.ker (piQ K 𝔭 k))
           * Nat.card ((𝓞 K ⧸ extP K 𝔭 ^ (k + 1)) ⧸ RingHom.ker (piQ K 𝔭 k)) := by
-    first
-    | exact Submodule.card_eq_card_quotient_mul_card _
-    | (rw [mul_comm]; exact Submodule.card_eq_card_quotient_mul_card _)
-    | (
-        rw [mul_comm]
-        exact AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (RingHom.ker (piQ K 𝔭
-          k)).toAddSubgroup
-      )
-    | exact AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (RingHom.ker (piQ K 𝔭
-        k)).toAddSubgroup
+    first | exact Submodule.card_eq_card_quotient_mul_card _
   rw [hC, hA, hB] at hmul
   have hN : 0 < Ideal.absNorm 𝔭 ^ (2 * k) :=
     pow_pos (Nat.pos_of_ne_zero (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact ne_bot h𝔭)) _

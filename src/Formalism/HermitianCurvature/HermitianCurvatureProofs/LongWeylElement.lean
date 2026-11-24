@@ -75,7 +75,6 @@ theorem conjM_cont {k r : ℕ} (a : Mat k r) : Continuous (conjM a : Mt k r → 
       show Continuous fun x : Mt k r => (a * Matrix.of x * a⁻¹ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
       exact (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
     )
-  | (unfold conjM; fun_prop)
 
 def mid (k r' : ℕ) (p : Fin (2 * (1 + r') + k + 1)) : Prop := 1 ≤ p.val ∧ p.val < 2 * r' + k + 1 + 1
 
@@ -123,14 +122,12 @@ theorem lev_n (k r' : ℕ) (g : Mat k r') (p q : Fin (2 * (1 + r') + k + 1)) (hp
 
 theorem lev_one (k r' : ℕ) : ιLev k 1 r' 1 = 1 := by
   ext p q
-  simp only [ιLev, Matrix.one_apply, Fin.ext_iff, Fin.val_mk]
+  simp only [ιLev, Matrix.one_apply, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem lev_mul (k r' : ℕ) (g h : Mat k r')
     : ιLev k 1 r' (g * h) = ιLev k 1 r' g * ιLev k 1 r' h := by
-  first
-  | exact Formalism.FourierDecayAlt.P.B2x2.lev_mul k r' g h
-  | exact (Formalism.FourierDecayAlt.P.B2x5.lev_mul k r' g h).symm
+  first | exact Formalism.FourierDecayAlt.P.B2x2.lev_mul k r' g h
 
 def blk (k r' : ℕ) (x : Mt k (1 + r')) : Mt k r' := fun s t => x (levPos k 1 r' s) (levPos k 1 r' t)
 
@@ -138,10 +135,7 @@ theorem levM_cont (k r' : ℕ) : Continuous (levM k r') := by
   refine continuous_pi fun p => continuous_pi fun q => ?_
   show Continuous fun x : Mt k r' => ιLev k 1 r' (Matrix.of x) p q
   simp only [ιLev]
-  split_ifs <;> first
-    | exact continuous_const
-    | fun_prop
-    | exact (continuous_apply _).comp (continuous_apply _)
+  split_ifs <;> first | exact continuous_const | fun_prop
 
 end PartL
 
@@ -160,7 +154,7 @@ private lemma w0_apply_eq_ite_first_index (c : ℂ) (i m : Fin (2 * (1 + r') + k
       else if i.val = 2 * (1 + r') + k then (if m = iZ k r' then c else 0) else (if m = i then 1 else 0) := by
   have hi := i.isLt
   have hm := m.isLt
-  simp only [w0, iL, iZ, Fin.ext_iff, Fin.val_mk]
+  simp only [w0, iL, iZ, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 lemma weylMatrix_mul_apply (c : ℂ) (A : Mat k (1 + r')) (i j : Fin (2 * (1 + r') + k + 1)) :
@@ -175,7 +169,7 @@ private lemma w0_apply_eq_ite_col (c : ℂ) (m j : Fin (2 * (1 + r') + k + 1)) :
       else if j.val = 2 * (1 + r') + k then (if m = iZ k r' then (star c)⁻¹ else 0) else (if m = j then 1 else 0) := by
   have hj := j.isLt
   have hm := m.isLt
-  simp only [w0, iL, iZ, Fin.ext_iff, Fin.val_mk]
+  simp only [w0, iL, iZ, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 lemma mul_long_weyl_element_apply (c : ℂ) (A : Mat k (1 + r')) (i j : Fin (2 * (1 + r') + k + 1)) :
@@ -217,29 +211,15 @@ theorem t_w0comm : WeylElementCommutesLevelOne := by
   have hj := j.isLt
   by_cases hj0 : j.val = 0 ∨ j.val = 2 * (1 + r') + k
   · rw [lev_out_col g i j hj0]
-    simp only [iL, iZ, Fin.ext_iff, Fin.val_mk]
-    split_ifs <;> first
-      | rfl
-      | (exfalso; omega)
-      | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done)
-      | (simp; done)
-      | (simp_all; done)
+    simp only [iL, iZ, Fin.ext_iff]
+    split_ifs
+      <;> first | rfl | (exfalso; omega) | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done)
   · by_cases hi0 : i.val = 0 ∨ i.val = 2 * (1 + r') + k
     · rw [lev_out_row g i j hi0]
-      simp only [iL, iZ, Fin.ext_iff, Fin.val_mk]
-      split_ifs <;> first
-        | rfl
-        | (exfalso; omega)
-        | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done)
-        | (simp; done)
-        | (simp_all; done)
-    · simp only [iL, iZ, Fin.ext_iff, Fin.val_mk]
-      split_ifs <;> first
-        | rfl
-        | (exfalso; omega)
-        | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done)
-        | (simp; done)
-        | (simp_all; done)
+      simp only [iL, iZ, Fin.ext_iff]
+      split_ifs <;> first | rfl | (exfalso; omega) | (simp only [mul_zero]; done)
+    · simp only [iL, iZ, Fin.ext_iff]
+      split_ifs <;> first | rfl | (exfalso; omega)
 
 private lemma matrix_apply_congr_of_eq {n m : ℕ} (μ : Matrix (Fin n) (Fin m) ℂ) {a b c d : ℕ} {ha : a < n} {hb : b < m}
     {hc : c < n} {hd : d < m} (h1 : a = c) (h2 : b = d) : μ ⟨a, ha⟩ ⟨b, hb⟩ = μ ⟨c, hc⟩ ⟨d, hd⟩ := by
@@ -255,7 +235,7 @@ theorem t_bigcellrec : BigCellRec := by
   have hj := j.isLt
   by_cases h0 : i.val = 0
   · rw [if_pos h0, lev_out_row _ (iL k r') j (Or.inr rfl)]
-    simp only [bigCell, esI, iL, a0, Fin.ext_iff, Fin.val_mk, h0]
+    simp only [bigCell, esI, iL, a0, Fin.ext_iff, h0]
     split_ifs <;> first
       | rfl
       | (exfalso; omega)
@@ -264,7 +244,7 @@ theorem t_bigcellrec : BigCellRec := by
       | (
           simp only [mul_one]
           congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-            <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
+            <;> first | omega | (ext; simp only; omega)
         )
       | (
           congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
@@ -272,7 +252,7 @@ theorem t_bigcellrec : BigCellRec := by
         )
   · by_cases hL : i.val = 2 * (1 + r') + k
     · rw [if_neg h0, if_pos hL, lev_out_row _ (iZ k r') j (Or.inl rfl)]
-      simp only [bigCell, esI, iZ, a0, Fin.ext_iff, Fin.val_mk, hL]
+      simp only [bigCell, esI, iZ, a0, Fin.ext_iff, hL]
       split_ifs <;> first
         | rfl
         | (exfalso; omega)
@@ -295,7 +275,7 @@ theorem t_bigcellrec : BigCellRec := by
         by_cases hA : j.val < 1 + r'
         · have hA' : j.val - 1 < r' := by omega
           simp only [hA, hA', dite_true]
-          simp only [Fin.ext_iff, Fin.val_mk]
+          simp only [Fin.ext_iff]
           split_ifs <;> first
             | rfl
             | (exfalso; omega)
@@ -306,10 +286,7 @@ theorem t_bigcellrec : BigCellRec := by
                 congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
                   <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
               )
-            | (
-                congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                  <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
-              )
+            | (congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *) <;> first | omega)
         · have hA' : ¬(j.val - 1 < r') := by omega
           by_cases hB : j.val ≤ 1 + r' + k
           · have hB' : j.val - 1 ≤ r' + k := by omega
@@ -320,16 +297,11 @@ theorem t_bigcellrec : BigCellRec := by
               | (simp only [mul_one, mul_zero]; done)
               | (exact matrix_apply_congr_of_eq _ (by omega) (by omega))
               | (
-                  simp only [mul_one]
-                  congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                    <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
-                )
-              | (
                   congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
                     <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
                 )
           · have hB' : ¬(j.val - 1 ≤ r' + k) := by omega
-            simp only [hA, hA', hB, hB', dite_true, dite_false]
+            simp only [hA, hA', hB, hB', dite_false]
             split_ifs <;> first
               | rfl
               | (exfalso; omega)
@@ -342,20 +314,13 @@ theorem t_bigcellrec : BigCellRec := by
                 )
               | (
                   congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                    <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
+                    <;> first | omega | (ext; simp only [Fin.coe_natAdd]; omega)
                 )
       · rw [lev_mn k r' _ i j hmi hmj]
-        simp only [bigCell, esI, Fin.ext_iff, Fin.val_mk]
+        simp only [bigCell, esI, Fin.ext_iff]
         split_ifs <;> first
           | rfl
           | (exfalso; omega)
-          | (simp only [mul_one, mul_zero]; done)
-          | (exact matrix_apply_congr_of_eq _ (by omega) (by omega))
-          | (
-              simp only [mul_one]
-              congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
-            )
           | (
               congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
                 <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
@@ -372,7 +337,7 @@ variable {k r' : ℕ}
 
 lemma not_mid_iff (p : Fin (2 * (1 + r') + k + 1)) : ¬ mid k r' p ↔ p = iZ k r' ∨ p = iL k r' := by
   have hp := p.isLt
-  simp only [mid, iZ, iL, Fin.ext_iff, Fin.val_mk]
+  simp only [mid, iZ, iL, Fin.ext_iff]
   constructor <;> intro h <;> omega
 
 lemma lev_col_n (g : Mat k r') (p q : Fin (2 * (1 + r') + k + 1)) (hq : ¬ mid k r' q) :
@@ -385,7 +350,7 @@ lemma lev_col_n (g : Mat k r') (p q : Fin (2 * (1 + r') + k + 1)) (hq : ¬ mid k
 
 lemma lev_conjT (g : Mat k r') : (ιLev k 1 r' g)ᴴ = ιLev k 1 r' gᴴ := by
   ext p q
-  simp only [Matrix.conjTranspose_apply, ιLev, Fin.ext_iff, Fin.val_mk]
+  simp only [Matrix.conjTranspose_apply, ιLev, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega) | (simp; done)
 
 lemma lev_inj {g h : Mat k r'} (e : ιLev k 1 r' g = ιLev k 1 r' h) : g = h := by
@@ -401,12 +366,12 @@ lemma Hpk_eq (k r' : ℕ) : Hpk k (1 + r') = w0 k r' 1 * ιLev k 1 r' (Hpk k r')
   have hj := j.isLt
   by_cases h0 : i.val = 0
   · rw [if_pos h0, lev_out_row (Hpk k r') (iL k r') j (Or.inr rfl)]
-    simp only [Hpk, iL, Fin.ext_iff, Fin.val_mk, h0]
-    split_ifs <;> first | rfl | (exfalso; omega) | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done) | (simp; done) | (simp_all; done)
+    simp only [Hpk, iL, Fin.ext_iff, h0]
+    split_ifs <;> first | rfl | (exfalso; omega)
   · by_cases hL : i.val = 2 * (1 + r') + k
     · rw [if_neg h0, if_pos hL, lev_out_row (Hpk k r') (iZ k r') j (Or.inl rfl)]
-      simp only [Hpk, iZ, Fin.ext_iff, Fin.val_mk, hL]
-      split_ifs <;> first | rfl | (exfalso; omega) | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done) | (simp; done) | (simp_all; done)
+      simp only [Hpk, iZ, Fin.ext_iff, hL]
+      split_ifs <;> first | rfl | (exfalso; omega)
     · rw [if_neg h0, if_neg hL]
       have hmi : mid k r' i := by
         show 1 ≤ i.val ∧ i.val < 2 * r' + k + 1 + 1
@@ -418,7 +383,7 @@ lemma Hpk_eq (k r' : ℕ) : Hpk k (1 + r') = w0 k r' 1 * ιLev k 1 r' (Hpk k r')
       · rw [lev_col_n (Hpk k r') i j hmj, if_neg (fun h => by subst h; exact hmj hmi)]
         have hj' : ¬ (1 ≤ j.val ∧ j.val < 2 * r' + k + 1 + 1) := hmj
         simp only [Hpk, Fin.ext_iff]
-        split_ifs <;> first | rfl | (exfalso; omega) | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done) | (simp; done) | (simp_all; done)
+        split_ifs <;> first | rfl | (exfalso; omega)
 
 lemma long_weyl_element_sq_one (k r' : ℕ) : w0 k r' 1 * w0 k r' 1 = 1 := by
   ext i j
@@ -426,8 +391,8 @@ lemma long_weyl_element_sq_one (k r' : ℕ) : w0 k r' 1 * w0 k r' 1 = 1 := by
   simp only [w0_apply_eq_ite_first_index]
   have hi := i.isLt
   have hj := j.isLt
-  simp only [iL, iZ, Matrix.one_apply, Fin.ext_iff, Fin.val_mk, star_one, inv_one, one_mul, true_and, and_true]
-  split_ifs <;> first | rfl | (exfalso; omega) | (simp only [mul_one, one_mul, mul_zero, zero_mul]; done) | (simp; done) | (simp_all; done)
+  simp only [iL, iZ, Matrix.one_apply, Fin.ext_iff, Fin.val_mk, star_one, inv_one, one_mul]
+  split_ifs <;> first | rfl | (exfalso; omega)
 
 lemma lev_UH (g : Mat k r') : ιLev k 1 r' g ∈ GV k (1 + r') ↔ g ∈ GV k r' := by
   show (ιLev k 1 r' g)ᴴ * Hpk k (1 + r') * ιLev k 1 r' g = Hpk k (1 + r') ↔ gᴴ * Hpk k r' * g = Hpk k r'
@@ -446,9 +411,6 @@ lemma lev_UH (g : Mat k r') : ιLev k 1 r' g ∈ GV k (1 + r') ↔ g ∈ GV k r'
 lemma col_eq {m : ℕ} (g : Matrix (Fin m) (Fin m) ℂ) (j p : Fin m) : (g *ᵥ bvec j) p = g p j := by
   first
     | (simp [bvec, Matrix.mulVec_single]; done)
-    | (simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]; done)
-    | simp only [bvec, Matrix.mulVec, dotProduct, Pi.single_apply, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 lemma fix_iff {m : ℕ} (g : Matrix (Fin m) (Fin m) ℂ) (j : Fin m) :
     g *ᵥ bvec j = bvec j ↔ ∀ p, g p j = if p = j then 1 else 0 := by
@@ -533,13 +495,9 @@ theorem uWbRec : Formalism.FourierDecayAlt.B2.UWbRec := by
       rw [hGe, Matrix.mul_apply] at h1
       first
       | (
-          simp only [Hpk_Z, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.sum_ite_eq,
-              Finset.mem_univ, ite_true]
+          simp only [Hpk_Z, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
+              ite_true]
             at h1
-          exact h1.symm
-        )
-      | (
-          simp [Hpk_Z] at h1
           exact h1.symm
         )
     have rZ : ∀ q, g (iZ k r') q = if q = iZ k r' then 1 else 0 := by
@@ -548,13 +506,9 @@ theorem uWbRec : Formalism.FourierDecayAlt.B2.UWbRec := by
       rw [hGe, Matrix.mul_apply] at h1
       first
       | (
-          simp only [Hpk_L, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.sum_ite_eq,
-              Finset.mem_univ, ite_true]
+          simp only [Hpk_L, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
+              ite_true]
             at h1
-          exact h1.symm
-        )
-      | (
-          simp [Hpk_L] at h1
           exact h1.symm
         )
     have hg : g = ιLev k 1 r' (Matrix.of (blk k r' g)) := by
@@ -638,14 +592,14 @@ lemma bc_mid_col (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) �
       else 0 := by
   have h1 := hj.1
   have h2 := hj.2
-  simp only [bigCell, dif_neg (show ¬ j.val < r by omega), dif_pos h2] <;> rfl
+  simp only [bigCell, dif_neg (show ¬ j.val < r by omega), dif_pos h2]
 
 lemma bc_mid_row_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
     (hi : midW k r i) (hj : ¬ midW k r j) : bigCell k r c μ i j = 0 := by
   have h1 := hi.1
   have h2 := hi.2
   have hj' : ¬ (r ≤ j.val ∧ j.val ≤ r + k) := hj
-  simp only [bigCell, esI, Fin.ext_iff, Fin.val_mk]
+  simp only [bigCell, esI, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 lemma bc_out_col (c : Fin r → ℂ) (μ ν : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
@@ -660,7 +614,7 @@ lemma bc_one_mid (c : Fin r → ℂ) (i j : Fin (2 * r + k + 1)) (hi : midW k r 
   have h2 := hi.2
   have h3 := hj.1
   have h4 := hj.2
-  simp only [bigCell, Matrix.one_apply, Fin.ext_iff, Fin.val_mk]
+  simp only [bigCell, Matrix.one_apply, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem t_bigcellfactor : BigCellFactor := by
@@ -781,21 +735,16 @@ theorem splitE_mp (r' : ℕ) : MeasurePreserving (splitE r') volume volume := by
         (MeasureTheory.volume_measurePreserving_piCongrLeft
           (fun _ => ℂ)
           (finCongr (Nat.add_comm r' 1))))
-  | exact (MeasureTheory.volume_preserving_piFinSuccAbove (fun _ => ℂ) 0).comp
-      ((MeasureTheory.volume_measurePreserving_piCongrLeft
-        (fun _ => ℂ)
-        (finCongr (Nat.add_comm r' 1))).symm _)
 
 theorem splitE_eq (r' : ℕ) : (splitE r' : (Fin (1 + r') → ℂ) → ℂ × (Fin r' → ℂ)) = splitC r' := by
   funext c
   refine Prod.ext ?_ ?_
   · show c _ = c (a0 r')
     congr 1
-    all_goals (ext; simp [a0])
   · funext a
     show c _ = c (Fin.natAdd 1 a)
     congr 1
-    all_goals (ext; simp [Fin.succAbove_zero, Fin.coe_natAdd, add_comm])
+    all_goals (ext; simp [add_comm])
 
 theorem lint_split (r' : ℕ) (G : ℂ × (Fin r' → ℂ) → ℝ≥0∞)
     : ∫⁻ c : Fin (1 + r') → ℂ, G (splitC r' c) = ∫⁻ p : ℂ × (Fin r' → ℂ), G p := by
@@ -826,31 +775,19 @@ variable {k r r' : ℕ}
 
 theorem sf {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) : SigmaFinite μ := by
   haveI : IsFiniteMeasureOnCompacts μ := ⟨fun K hK => h.finite_compact K hK⟩
-  first
-  | infer_instance
-  | exact sigmaFinite_of_locallyFinite
-  | exact MeasureTheory.sigmaFinite_of_locallyFinite
+  first | infer_instance
 
 theorem haar_ae {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ)
     : ∀ᵐ g ∂μ, (Matrix.of g : Mat k r) ∈ U := by
-  first
-  | exact ae_iff.2 h.2.1
-  | exact ae_iff.2 h.2.2.1
-  | exact ae_iff.2 h.2.2.2
-  | exact ae_iff.2 h.2.2.2.1
-  | exact ae_iff.2 h.2.2.2.2
-  | exact ae_iff.2 h.2.2.2.2.1
-  | exact ae_iff.2 h.1
-  | exact ae_iff.2 (by simpa using h.2.1)
-  | exact ae_iff.2 (by simpa using h.2.2.1)
+  first | exact ae_iff.2 h.1
 
 def adjF (x : Mt k r) : Mt k r := (Matrix.of x : Mat k r).adjugate
 def detF (x : Mt k r) : ℂ := (Matrix.of x : Mat k r).det
 
 theorem detF_cont : Continuous (detF (k := k) (r := r)) := by
-  first | exact Continuous.matrix_det continuous_id | (unfold detF; fun_prop)
+  first | exact Continuous.matrix_det continuous_id
 theorem adjF_cont : Continuous (adjF (k := k) (r := r)) := by
-  first | exact Continuous.matrix_adjugate continuous_id | (unfold adjF; fun_prop)
+  first | exact Continuous.matrix_adjugate continuous_id
 
 theorem invM_smul : (invM : Mt k r → Mt k r) = fun x => (detF x)⁻¹ • adjF x := by
   funext x
@@ -859,18 +796,10 @@ theorem invM_smul : (invM : Mt k r → Mt k r) = fun x => (detF x)⁻¹ • adjF
       show ((Matrix.of x : Mat k r)⁻¹ : Mat k r) = ((Matrix.of x : Mat k r).det)⁻¹ • (Matrix.of x : Mat k r).adjugate
       rw [Matrix.inv_def, Ring.inverse_eq_inv']
     )
-  | (
-      simp only [invM, detF, adjF]
-      rw [Matrix.inv_def, Ring.inverse_eq_inv']
-      rfl
-    )
 
 theorem invM_meas : Measurable (invM : Mt k r → Mt k r) := by
   rw [invM_smul]
-  first
-  | exact (detF_cont.measurable.inv).smul adjF_cont.measurable
-  | exact (measurable_inv.comp detF_cont.measurable).smul adjF_cont.measurable
-  | fun_prop
+  first | exact (detF_cont.measurable.inv).smul adjF_cont.measurable
 
 theorem mulM_cont : Continuous (mulM : Mt k r × Mt k r → Mt k r) := by
   first
@@ -878,14 +807,13 @@ theorem mulM_cont : Continuous (mulM : Mt k r × Mt k r → Mt k r) := by
       show Continuous fun p : Mt k r × Mt k r => (Matrix.of p.1 * Matrix.of p.2 : Mat k r)
       exact continuous_fst.matrix_mul continuous_snd
     )
-  | (unfold mulM; fun_prop)
 
 theorem mulM_meas : Measurable (mulM : Mt k r × Mt k r → Mt k r) := by exact mulM_cont.measurable
 
 theorem mm_meas
     {α : Type*} [MeasurableSpace α] {A B : α → Mt k r} (hA : Measurable A) (hB : Measurable B)
     : Measurable (fun t => mulM (A t, B t)) := by
-  first | exact mulM_meas.comp (hA.prodMk hB) | exact mulM_meas.comp (hA.prod_mk hB)
+  first | exact mulM_meas.comp (hA.prodMk hB)
 
 theorem levM_meas : Measurable (levM k r') := by exact (levM_cont k r').measurable
 
@@ -893,25 +821,20 @@ lemma continuous_herm {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) :
     Continuous fun p : (ι → ℂ) × (ι → ℂ) => herm H p.1 p.2 := by
   first
     | (unfold herm; fun_prop)
-    | exact (continuous_snd.star).matrix_dotProduct (continuous_const.matrix_mulVec continuous_fst)
-    | (simp only [herm, dotProduct, Matrix.mulVec]; fun_prop)
 
 lemma continuous_lift (k r' : ℕ) : Continuous (liftVec k 1 r') := by
   refine continuous_pi fun p => ?_
   show Continuous fun v : Fin (2 * r' + k + 1) → ℂ => liftVec k 1 r' v p
   simp only [liftVec]
-  split_ifs <;> first | exact continuous_const | exact continuous_apply _ | fun_prop
+  split_ifs <;> first | exact continuous_const | exact continuous_apply _
 
 lemma continuous_hb (k r' : ℕ) : Continuous fun x : HPar k r' => hb k r' x.1 x.2 := by
   have h1 : Continuous fun x : HPar k r' => herm (Hpk k r') x.1 x.1 := by
     first
       | exact (continuous_herm (Hpk k r')).comp (continuous_fst.prodMk continuous_fst)
-      | exact (continuous_herm (Hpk k r')).comp (continuous_fst.prod_mk continuous_fst)
   unfold hb
   first
     | fun_prop
-    | exact (Complex.continuous_ofReal.comp ((Complex.continuous_re.comp h1).neg.div_const 2)).add
-        ((Complex.continuous_ofReal.comp continuous_snd).mul continuous_const)
 
 lemma continuous_heis0 (k r' : ℕ) : Continuous (heis0 k r') := by
   have hv : Continuous fun x : HPar k r' => liftVec k 1 r' x.1 := (continuous_lift k r').comp continuous_fst
@@ -920,7 +843,6 @@ lemma continuous_heis0 (k r' : ℕ) : Continuous (heis0 k r') := by
     intro j
     first
       | exact (continuous_herm _).comp (continuous_const.prodMk hv)
-      | exact (continuous_herm _).comp (continuous_const.prod_mk hv)
   refine continuous_pi fun p => continuous_pi fun q => ?_
   simp only [heis0, heisG, Matrix.sub_apply, Matrix.add_apply, Matrix.vecMulVec_apply, Matrix.one_apply, Pi.add_apply,
     Pi.smul_apply, smul_eq_mul]
@@ -946,7 +868,6 @@ theorem bcF_meas : Measurable (bcF k r) := by
     | exact continuous_star.measurable.inv
     | exact measurable_id
     | fun_prop
-    | measurability
 
 def w0F (k r' : ℕ) (c : ℂ) : Mt k (1 + r') := w0 k r' c
 
@@ -960,8 +881,6 @@ theorem long_weyl_element_measurable : Measurable (w0F k r') := by
     | exact (continuous_star.measurable.comp (measurable_pi_apply _)).inv
     | exact continuous_star.measurable.inv
     | exact measurable_id
-    | fun_prop
-    | measurability
 
 theorem cell_meas
     {α : Type*} [MeasurableSpace α]
@@ -1014,7 +933,6 @@ def thetaF (k r' : ℕ) (p : HPar k r' × Mt k r') : Mt k (1 + r') :=
 theorem thetaF_meas : Measurable (thetaF k r') := by
   first
   | exact mulM_meas.comp ((levM_meas.comp measurable_snd).prodMk (heisF_meas.comp measurable_fst))
-  | exact mulM_meas.comp ((levM_meas.comp measurable_snd).prod_mk (heisF_meas.comp measurable_fst))
 
 theorem μHeis_eq (k r' : ℕ) : μHeis k r' = (volume : Measure (HPar k r')).map (heisF k r') := rfl
 
@@ -1182,20 +1100,9 @@ theorem lint_smul3
         lintegral_smul_measure, smul_eq_mul, ENNReal.coe_mul]
       ring
     )
-  | (
-      simp [Measure.prod_smul_left, Measure.prod_smul_right, lintegral_smul_measure, smul_smul,
-        ENNReal.smul_def]
-      ring
-    )
-  | simp [Measure.prod_smul_left, Measure.prod_smul_right, lintegral_smul_measure, smul_smul,
-      ENNReal.smul_def, mul_comm, mul_assoc, mul_left_comm]
 
 theorem cW_meas (k r : ℕ) : Measurable fun c : Fin r → ℂ => ENNReal.ofReal (cWeight k r c) := by
-  first
-  | (unfold cWeight; fun_prop)
-  | exact ENNReal.measurable_ofReal.comp (Finset.measurable_prod _ fun a _ =>
-      ((measurable_pi_apply a).norm).pow_const _)
-  | (unfold cWeight; measurability)
+  first | (unfold cWeight; fun_prop)
 
 theorem iter_step
     (hO : OneStepInt) (HU : HaarUnique) (hL : LevHaar) (hCN : ClosedN) (hCb : ClosedWb)
@@ -1362,7 +1269,7 @@ theorem bc_zero (k : ℕ) (c : Fin 0 → ℂ) : bigCell k 0 c 1 = 1 := by
   ext i j
   have hi := i.isLt
   have hj := j.isLt
-  simp only [bigCell, Matrix.one_apply, Fin.ext_iff, Fin.val_mk]
+  simp only [bigCell, Matrix.one_apply, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem iter_base (HU : HaarUnique) (hCb : ClosedWb) (hNB : NBase) (k : ℕ) : IterAt k 0 := by

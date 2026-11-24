@@ -157,7 +157,6 @@ theorem fib_iff_fibAt
     {π : Q.Mx k r → (Wp →L[ℂ] Wp)} {π' : Q.Mx k r → (Wq →L[ℂ] Wq)} {ζ : ℂ} {X : Wq →L[ℂ] Wp}
     : X ∈ NF.Fib k r z z' μsec π π' ζ ↔ X ∈ FibAt k r z z' π π' (NF.muZ k r μsec ζ) := by
   first
-  | exact Iff.rfl
   | (
       simp only [NF.Fib, FibAt, Set.mem_setOf_eq, NF.Stab, Prod.forall]
       constructor
@@ -195,8 +194,7 @@ variable
   {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by
-  first | rfl | (simp [B.hsVec]; done) | (unfold B.hsVec; rw [← WithLp.toLp_smul]; rfl)
+theorem hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by first | rfl
 
 theorem hsVec_ne_zero {A : Wq →L[ℂ] Wp} (hA : A ≠ 0) : B.hsVec A ≠ 0 := by
   intro h

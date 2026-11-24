@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.Genus
   MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
+
 theorem _root_.GlobalTheory.T.thetaTransform_rationalTranslate_quasiInvariant_cm
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E) (B : Base F E),
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.thetaTransform_rationalTranslate_quasiInvariant_cm
                           GlobalTheory.WeilSchrodinger.thetaTr F co B.ψ Φ (ratWF γ + w)
                             = B.ψ (-(symplOHF σ JS JT ξ₀ (ratWF γ) w))
                               * GlobalTheory.WeilSchrodinger.thetaTr F co B.ψ Φ w := by
-  first
-  | exact @GlobalTheory.ThetaQuasiRatF.thetaTr_ratWF_add
-  | exact GlobalTheory.ThetaQuasiRatF.thetaTr_ratWF_add
-  | (intros; apply GlobalTheory.ThetaQuasiRatF.thetaTr_ratWF_add <;> assumption)
+  first | exact @GlobalTheory.ThetaQuasiRatF.thetaTr_ratWF_add

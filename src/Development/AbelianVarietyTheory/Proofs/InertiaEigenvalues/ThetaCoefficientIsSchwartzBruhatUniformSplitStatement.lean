@@ -53,6 +53,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
 open GlobalTheory.DownLift.GenFinite
 open GlobalTheory.DownLift.SplitCoef
+
 theorem _root_.GlobalTheory.T.thetaCoefficient_isSchwartzBruhat_uniform_split
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
       IsStdChar D ψ (-1)
@@ -77,7 +78,4 @@ theorem _root_.GlobalTheory.T.thetaCoefficient_isSchwartzBruhat_uniform_split
                             IsHalf a x
                               → (∀ ℓ, InvForm ψ S T a ℓ → ℓ (heisO ψ S T x f) = 0)
                                 ∨ ∃ x₁ ∈ X, heisO ψ S T x f = heisO ψ S T x₁ f := by
-  first
-  | exact @GlobalTheory.DownLift.SplitCoef.coef_isSBHalf_uniform
-  | exact GlobalTheory.DownLift.SplitCoef.coef_isSBHalf_uniform
-  | (intros; apply GlobalTheory.DownLift.SplitCoef.coef_isSBHalf_uniform <;> assumption)
+  first | exact @GlobalTheory.DownLift.SplitCoef.coef_isSBHalf_uniform

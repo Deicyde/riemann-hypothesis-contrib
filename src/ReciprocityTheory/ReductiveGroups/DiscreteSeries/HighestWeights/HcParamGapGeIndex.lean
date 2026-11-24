@@ -103,8 +103,7 @@ theorem lowK_card_gt (ε : Fin n → Bool) (a : Fin n)
         (s.filter (fun b => ε b ≠ ε a)).card + (s.filter (fun b => ¬(ε b ≠ ε a))).card
           = s.card := by
     intro s
-    first
-    | exact Finset.card_filter_add_card_filter_not _
+    first | exact Finset.card_filter_add_card_filter_not _
   rw [← Fin.card_Ioi a, ← key (Finset.Ioi a)]
   congr 1 <;> congr 1 <;> ext b <;> simp
 
@@ -116,8 +115,7 @@ theorem lowK_card_lt (ε : Fin n → Bool) (a : Fin n)
         (s.filter (fun b => ε b ≠ ε a)).card + (s.filter (fun b => ¬(ε b ≠ ε a))).card
           = s.card := by
     intro s
-    first
-    | exact Finset.card_filter_add_card_filter_not _
+    first | exact Finset.card_filter_add_card_filter_not _
   rw [← Fin.card_Iio a, ← key (Finset.Iio a)]
   congr 1 <;> congr 1 <;> ext b <;> simp
 

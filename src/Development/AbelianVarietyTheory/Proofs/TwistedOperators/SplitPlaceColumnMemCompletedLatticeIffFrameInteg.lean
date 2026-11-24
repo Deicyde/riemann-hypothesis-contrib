@@ -50,9 +50,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.SplitFrameColumn
 
 theorem intAE_mul

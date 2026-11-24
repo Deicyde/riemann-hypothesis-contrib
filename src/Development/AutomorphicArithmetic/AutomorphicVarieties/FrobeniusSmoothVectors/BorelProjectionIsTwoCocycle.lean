@@ -81,8 +81,7 @@ theorem UpperTheory.V.Fr.borelProjection_isTwoCocycle
     rw [hx, hx, hx]
     apply SemidirectProduct.ext
     · simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
-        SemidirectProduct.inv_left, SemidirectProduct.inv_right, SemidirectProduct.left_inl,
-        GG.ofGL]
+        SemidirectProduct.inv_left, SemidirectProduct.left_inl, GG.ofGL]
       rw [← MulAut.mul_apply, ← map_mul, map_mul F.del a b, mul_inv_cancel, map_one,
         MulAut.one_apply]
     · simp only [SemidirectProduct.mul_right, SemidirectProduct.inv_right,

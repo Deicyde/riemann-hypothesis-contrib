@@ -142,8 +142,7 @@ theorem mn_label_le
 def Ctx.Ds (s : Fin n') : PP := X.sb (Dtop p n' O X.Fr X.hH.2.2.1 X.g (s.val : ℤ))
 
 theorem mn_Ds_IT (s : Fin n') : bc_IT X.Fr (X.Ds s) := by
-  have hr : 1 ≤ r := by have := X.hH.2.1; omega
-  exact bc_IT_Dtop X.S.w X.Fr X.hV X.hH.2.2.2.2 hr X.hH.2.2.1 X.hg _
+  exact bc_IT_Dtop X.S.w X.Fr X.hV X.hH.2.2.2.2 (by have := X.hH.2.1; omega) X.hH.2.2.1 X.hg _
 
 theorem leading_depth_one_mem_closure
     (D : Formalism.BasicNotions.D7) (v : TV n' (r + K)) (hN : IsNormal r v) (hs : v.1 ∈ X.Fr.TT)
@@ -160,11 +159,7 @@ theorem leading_depth_one_mem_closure
   have hsum
       : C (algebraMap O (KK O) X.S.w) * MvPolynomial.X (s, b) * X.Ds s
         = ∑ i, ka0 i * MvPolynomial.map (algebraMap O (KK O)) (H i) := by
-    have e1
-        : C (algebraMap O (KK O) X.S.w) * MvPolynomial.X (s, b) * X.Ds s
-          = C (algebraMap O (KK O) X.S.w) * (MvPolynomial.X (s, b) * X.Ds s) := by
-      ring
-    rw [e1]
+    rw [mul_assoc]
     unfold Ctx.Ds Ctx.sb
     rw [heq, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -187,12 +182,10 @@ theorem leading_depth_one_mem_closure
 
 theorem mn_DkQ_eq : X.DkQ = ∏ s ∈ X.Fr.TT, X.Ds s ^ ((r + K) * X.Q) := by
   unfold Ctx.DkQ DtopProd Ctx.Ds
-  rw [map_prod]
-  simp only [map_pow]
+  simp only [map_prod, map_pow]
 
 theorem mn_DkQ_IT : bc_IT X.Fr X.DkQ := by
-  rw [mn_DkQ_eq]
-  exact bc_IT_prod _ _ fun s _ => bc_IT_pow (mn_Ds_IT X s) _
+  simpa [mn_DkQ_eq] using bc_IT_prod _ _ fun s _ => bc_IT_pow (mn_Ds_IT X s) _
 
 def mn_ns (r : ℕ) {n' k : ℕ} (mon : TV n' k →₀ ℕ) (s : Fin n') : ℕ :=
   ∑ v ∈ (mon.support.filter (fun v => IsNormal r v)).filter (fun v => v.1 = s), mon v

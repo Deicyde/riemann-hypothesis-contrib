@@ -90,11 +90,8 @@ theorem large_mul_mem
   convert this using 1
   simp only [map_mul, map_pow, map_natCast, mul_assoc]
 
-theorem exists_pow_lt {ε : ℝ} (hε : 0 < ε) : ∃ k : ℕ, (l : ℝ) ^ (-(k : ℤ)) < ε :=
-  PadicInt.exists_pow_neg_lt l hε
-
 theorem exists_mul_le_one (c : ℚ_[l]) : ∃ k : ℕ, ‖(l : ℚ_[l]) ^ k * c‖ ≤ 1 := by
-  obtain ⟨k, hk⟩ := exists_pow_lt (l := l) (ε := (‖c‖ + 1)⁻¹) (by positivity)
+  obtain ⟨k, hk⟩ := PadicInt.exists_pow_neg_lt (p := l) (ε := (‖c‖ + 1)⁻¹) (by positivity)
   refine ⟨k, ?_⟩
   rw [norm_mul, Padic.norm_p_pow]
   calc
@@ -214,7 +211,7 @@ theorem continuous_of_latCont
     push Not at h
     exact tD_pow_not_mem AI T N (by exact_mod_cast mem_FilB_of_forall_Lat l P AI T (N + 1) _ h)
   refine continuous_iff_continuousAt.2 fun x₀ => Metric.tendsto_nhds.2 fun ε hε => ?_
-  obtain ⟨k, hk⟩ := exists_pow_lt (l := l) hε
+  obtain ⟨k, hk⟩ := PadicInt.exists_pow_neg_lt (p := l) hε
   filter_upwards [H N le_rfl (k + n) x₀] with x hx
   rw [dist_eq_norm]
   by_contra hlt

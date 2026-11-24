@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.weightSpace_values_integralTorsion_bound_shortestVector
     : Laws → Laws2 → UTorsSt
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.weightSpace_values_integralTorsion_bound_shortestV
               → ∀ h ∈ l.yy.ker, ∀ i,
                 ‖∑ j, y₀ (algebraMap o S.R (S.proj _ (l.wt α) j i)) * y₀ ⟨S.ev h j, S.ev_mem h j⟩‖
                   ≤ S.delta y₀ * Real.exp (-(l.q α / S.N))) := by
-  first
-  | exact @GlobalTheory.ZH.WeightBound.main
-  | exact GlobalTheory.ZH.WeightBound.main
-  | (intros; apply GlobalTheory.ZH.WeightBound.main <;> assumption)
+  first | exact @GlobalTheory.ZH.WeightBound.main

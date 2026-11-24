@@ -3,8 +3,8 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ZarhinBundleKernelFirstCoordEquations
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsJoinModelDominatesStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueDominatingMapStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtChartLocalizationStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueDominatingMap
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtChartLocalization
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -147,7 +147,12 @@ theorem mem_ctrSet_self
     {x : κ → Ω} (M : PModel o x) (p : Cpt M.ξ)
     : p ∈ ctrSet o x (RingHom.id Ω) M.ξ := by
   obtain ⟨c, hc⟩ := M.tie.cover p
-  exact ⟨c, hc.1, fun a ha => (GlobalTheory.T.regAt_chart_localization o Ω κ x M c p hc).1 a ha⟩
+  exact ⟨
+    c,
+    hc.1,
+    fun a ha =>
+      (_root_.GlobalTheory.CompanionTheory.Ar.chart_regAt_localisation o Ω κ x M c p hc).1 a ha
+  ⟩
 
 theorem mem_ctrSet_join
     {o : Type} [CommRing o]
@@ -173,7 +178,7 @@ theorem mem_ctrSet_join
     rw [e]
     exact mul_mem (hc.2 j) (hl.2 m)
   | algebraMap r =>
-    exact (GlobalTheory.T.regAt_chart_localization o Ω κ x M c p hc).1 _
+    exact (_root_.GlobalTheory.CompanionTheory.Ar.chart_regAt_localisation o Ω κ x M c p hc).1 _
       (Subalgebra.algebraMap_mem _ r)
   | add y z _ _ hy hz => exact add_mem hy hz
   | mul y z _ _ hy hz => exact mul_mem hy hz
@@ -191,15 +196,15 @@ theorem coordTie_join_of_charts
       (fun _ => rfl)
       hl (eq_top_iff.2 fun a _ => Subfield.subset_closure (Or.inl ⟨a, rfl⟩))
   obtain ⟨g, hg, -⟩ :=
-    GlobalTheory.T.existsUnique_dominating_map o Ω (κ × κ') _ M' o Ω κ x M (RingHom.id Ω)
-      (fun p => mem_ctrSet_join M p (hw p))
+    _root_.GlobalTheory.CompanionTheory.Ar.ChMorph.existsUnique_dominates o Ω (κ × κ') _ M' o Ω κ x
+      M (RingHom.id Ω) (fun p => mem_ctrSet_join M p (hw p))
   rw [dominates_id_iff] at hf hg
   have u1 :=
-    GlobalTheory.T.existsUnique_dominating_map o Ω κ x M o Ω κ x M (RingHom.id Ω)
-      (mem_ctrSet_self M)
+    _root_.GlobalTheory.CompanionTheory.Ar.ChMorph.existsUnique_dominates o Ω κ x M o Ω κ x M
+      (RingHom.id Ω) (mem_ctrSet_self M)
   have u2 :=
-    GlobalTheory.T.existsUnique_dominating_map o Ω (κ × κ') _ M' o Ω (κ × κ') _ M' (RingHom.id Ω)
-      (mem_ctrSet_self M')
+    _root_.GlobalTheory.CompanionTheory.Ar.ChMorph.existsUnique_dominates o Ω (κ × κ') _ M' o Ω
+      (κ × κ') _ M' (RingHom.id Ω) (mem_ctrSet_self M')
   have e1 : g ≫ f = 𝟙 _ :=
     u1.unique (dominates_id_iff.2 (by rw [← Category.assoc, hg, hf]))
       (dominates_id_iff.2 (Category.comp_id _))

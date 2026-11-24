@@ -43,8 +43,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
 
 @[expose] public section
 
-
-
 section
 open scoped InnerProductSpace TensorProduct
 open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
@@ -102,7 +100,7 @@ theorem botHyp_match_alt
           fun a b h => h ▸ Iff.rfl)
         _ _ (e _)
     · exact (congrArg (seeChiS W.S.X) (e _)).symm.trans (h2 hk)
-  have hK := Formalism.L2.SG.Closed.level_subgroup_is_group W.S.X
+  have hK := _root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary W.S.X
   refine ⟨W.Q.charW.base.models, W.Q.charW.base.models.inf, W.Q.stdChar, ?_, ?_, ?_⟩
   · intro z hz hzc
     have hz' := Subgroup.mem_center_iff.1 hzc

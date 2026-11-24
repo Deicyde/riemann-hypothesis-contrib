@@ -115,7 +115,7 @@ theorem coordsAt_blkV
         : h (GlobalTheory.CompanionTheory.Ar.genPt ξ)
           = GlobalTheory.CompanionTheory.Ar.genPt ξ₀ := by
       have hh := congrArg (fun f => f (IsLocalRing.closedPoint Ω)) hdom
-      simp only [Scheme.Hom.comp_apply] at hh
+      simp only at hh
       exact hh.trans (congrArg ξ₀ (hpt _ _))
     have e2
         : h (GlobalTheory.CompanionTheory.Ar.centre z)

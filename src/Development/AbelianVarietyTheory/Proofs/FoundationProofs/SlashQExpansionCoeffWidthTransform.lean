@@ -76,7 +76,7 @@ theorem slash_periodic_comp
   intro w
   by_cases hw : 0 < w.im
   · have hw' : 0 < (w + M).im := by simp [hw]
-    simp only [Function.comp_apply, ofComplex_apply_of_im_pos hw', ofComplex_apply_of_im_pos hw]
+    simp only [Function.comp_apply, ofComplex_apply_of_im_pos hw]
     convert key ⟨w, hw⟩ using 2
     ext
     simp [ofComplex_apply_of_im_pos hw', add_comm]

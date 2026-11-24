@@ -48,6 +48,7 @@ attribute [local instance]
 open GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top
   GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3
   GlobalTheory.Mem.R3.Rw GlobalTheory.Mem.R3.Tr
+
 theorem _root_.GlobalTheory.T.typeRepresentativesParts_otherLaterStages
     : ∀ (B : Base) (C : Cols B) (a b : Late B C) (G : Type) [Group G] [Fintype G] (Pl0 T : Type)
         (Ks : Type) [Field Ks] [NumberField Ks] [iK : Algebra Ks a.D.what₂.LL]
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.typeRepresentativesParts_otherLaterStages
               (@Hd.prtW b.D G _ _ Pl0 T (famM b A) Ks _ _ (alg b iK) (real b R) y' (face b F)
                 ((by exact i)) ((by exact π)))
               (y.prtW F i π) := by
-  first
-  | exact @GlobalTheory.Mem.R3.Tr.reps_parts_tr
-  | exact GlobalTheory.Mem.R3.Tr.reps_parts_tr
-  | (intros; apply GlobalTheory.Mem.R3.Tr.reps_parts_tr <;> assumption)
+  first | exact @GlobalTheory.Mem.R3.Tr.reps_parts_tr

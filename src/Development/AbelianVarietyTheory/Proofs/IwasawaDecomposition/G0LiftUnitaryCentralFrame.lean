@@ -104,7 +104,7 @@ theorem isCompOf_one_of_not_mem
     split_ifs <;> simp
   intro a c
   rw [e]
-  by_cases hac : a = c <;> simp [Matrix.one_apply, hac]
+  by_cases hac : a = c <;> simp [hac]
 
 theorem isBlockDiagonal_reduction_of_blockLift_splitPlace
     (s : SplitPlace L)

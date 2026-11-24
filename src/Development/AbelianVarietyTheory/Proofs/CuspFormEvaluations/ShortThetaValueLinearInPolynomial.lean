@@ -167,7 +167,7 @@ theorem shortThetaValue_linear
                       → v = ∑ i, algebraMap c.F S (cf i) * u i := by
   intro hC E _ _ _ H Dw l Xo c _ nab hnab n Λ N hU hT hL a w β m cf Q hQ S _ _ y v u hv hu
   classical
-  have : Finite (LevQ Dw l) := GlobalTheory.ShortValue.finite_levelQuotient Dw l
+  have : Finite (LevQ Dw l) := _root_.GlobalTheory.finite_levQ Dw l
   have hEU := fun i =>
     GlobalTheory.shortThetaValue_existsUnique_natural GlobalTheory.abelianSchemeLaws_all.1 hC E H Dw
       l Xo c nab hnab n Λ N hU hT hL a (Q i) (hQ i) w β

@@ -2,9 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PlacesToAdeles
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FlatMapsSatisfyFlatLawsFinitePlacesStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticeVacuumIffPlacewiseStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticeVacuumIffPlacewise
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemHomLatticeCompletionIffSupportedMaps
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualImageAdelicPointWittCoreStatement
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualImageAdelicPointWittCore
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -158,17 +159,17 @@ theorem GlobalTheory.FinPl.movedVac
   intro D ψ σ J B s LV LV₀ LW LW₀ v hA _ f hf γ _
   have hflat : IsFlatFB s (· = v) (flatFB s) :=
     (GlobalTheory.T.flatMapsSatisfyFlatLaws_finitePlaces D ψ (· = v)).2 σ J B s
-  obtain ⟨M, hM, hMv⟩ := (GlobalTheory.T.selfDual_image_adelicPoint_wittCore D B.V₀ LW₀ hA.sdW₀).1 γ
+  obtain ⟨M, hM, hMv⟩ := (_root_.GlobalTheory.FinPl.GlobImage.glob D B.V₀ LW₀ hA.sdW₀).1 γ
   obtain ⟨L', hL', hL'v⟩ :=
-    (GlobalTheory.T.selfDual_image_adelicPoint_wittCore D B.V LW hA.sdW).1 (B.d.emb0 γ)
+    (_root_.GlobalTheory.FinPl.GlobImage.glob D B.V LW hA.sdW).1 (B.d.emb0 γ)
   have hmono : MonoAt B.d L' M v :=
-    (GlobalTheory.T.selfDual_image_adelicPoint_wittCore D B.V LW hA.sdW).2 B.V₀ σ B.d LW₀ M L' γ v
-      hA.monoW (hMv _) (hL'v _)
+    (_root_.GlobalTheory.FinPl.GlobImage.glob D B.V LW hA.sdW).2 B.V₀ σ B.d LW₀ M L' γ v hA.monoW
+      (hMv _) (hL'v _)
   have h1 : Moves J.W 1 LV LV (· = v) := fun y _ => by
     rw [show mt J.W 1 = 1 by simp [Formalism.L2.Theta.mt], Matrix.one_mulVec]
   have hf' : Vac ψ J.W B.V LV L' (· = v) (s.om (1, B.d.emb0 γ) f) :=
-    ((GlobalTheory.T.latticeVacuum_iff_placewise D ψ J.W B.V s.χV s.χW s.om s.weil LV LW hA.sdV
-      hA.sdW (· = v)
+    ((_root_.GlobalTheory.VacLoc.vac_loc D ψ J.W B.V s.χV s.χW s.om s.weil LV LW hA.sdV hA.sdW
+      (· = v)
       (fun w hw => hw ▸ hA.tame)
       f).2.2 hf 1 (B.d.emb0 γ) LV L' hA.sdV hL' h1 (hL'v _))
   refine ⟨M, hM, hMv _, hflat.Heisenberg₂.theta _ hf'.1, fun u hu => ?_, fun e he u hu hh => ?_⟩

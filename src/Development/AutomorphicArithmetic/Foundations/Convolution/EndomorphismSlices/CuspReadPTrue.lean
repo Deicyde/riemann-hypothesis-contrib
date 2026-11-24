@@ -53,8 +53,6 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
 
-
-
 namespace UpperTheory.Zero.ConvolutionTheory.EB
 
 attribute [local instance] borelG borelF borelA borelH

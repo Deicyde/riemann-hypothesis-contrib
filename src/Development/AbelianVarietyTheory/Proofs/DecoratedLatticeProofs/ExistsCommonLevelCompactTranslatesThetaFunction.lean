@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.CovolOneIntegralAdd
 
 @[expose] public section
 
@@ -56,22 +57,14 @@ open GlobalTheory.Core.Rk.IP
 
 namespace GlobalTheory.Core.Rk.Level
 
-theorem mt_mul' {D : D7} (V : HSp D) (g h : GA D V)
-    : Formalism.L2.Theta.mt V (g * h) = Formalism.L2.Theta.mt V g * Formalism.L2.Theta.mt V h := by
-  unfold Formalism.L2.Theta.mt; rw [map_mul]; rfl
-
-theorem mt_one' {D : D7} (V : HSp D) : Formalism.L2.Theta.mt V 1 = 1 := by
-  unfold Formalism.L2.Theta.mt; rw [map_one]; rfl
-
-theorem continuous_mt' {D : D7} (V : HSp D) : Continuous (Formalism.L2.Theta.mt V) :=
-  Units.continuous_val.comp continuous_subtype_val
-
 theorem actO_mul_mt {D : D7} (S T : HSp D) (k : GA D S) (u : WO S T)
     : actO S T k 1
         (HMul.hMul (u : Matrix (Fin T.rank) (Fin S.rank) (AE D)) (Formalism.L2.Theta.mt S k))
       = u := by
   unfold actO
-  rw [mt_one', Matrix.one_mul, Matrix.mul_assoc, ← mt_mul', mul_inv_cancel, mt_one', Matrix.mul_one]
+  rw [_root_.GlobalTheory.BesselCompare.mt_one, Matrix.one_mul, Matrix.mul_assoc,
+    ← _root_.GlobalTheory.BesselCompare.mt_mul, mul_inv_cancel,
+    _root_.GlobalTheory.BesselCompare.mt_one, Matrix.mul_one]
 
 theorem exists_common_level
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
@@ -109,7 +102,7 @@ theorem exists_common_level
     have hc : Continuous fun p : WO S T × GA D S =>
         (HMul.hMul (p.1 : Matrix (Fin T.rank) (Fin S.rank) (AE D)) (Formalism.L2.Theta.mt S p.2)
           : WO S T) :=
-      continuous_fst.matrix_mul ((continuous_mt' S).comp continuous_snd)
+      continuous_fst.matrix_mul ((_root_.GlobalTheory.MixModel.continuous_mt S).comp continuous_snd)
     refine (hU₀.preimage hc).mem_nhds ?_
     show (HMul.hMul (0 : Matrix (Fin T.rank) (Fin S.rank) (AE D)) (Formalism.L2.Theta.mt S k) : WO S T) ∈ U₀
     rw [Matrix.zero_mul]

@@ -63,7 +63,7 @@ def vol {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) : IdE D :
 theorem mulVec_col {N : ℕ} (A U : Matrix (Fin N) (Fin N) D.host.E) (j : Fin N)
     : A *ᵥ (fun i => U i j) = fun i => (A * U) i j := by
   funext i
-  first | rfl | simp [Matrix.mulVec, Matrix.mul_apply, dotProduct]
+  first | rfl
 
 theorem detId_mul_vol_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
     : detId D L L' * vol D L ≤ vol D L' := by
@@ -261,7 +261,7 @@ theorem spanPow
     have hsI : s ∈ (I : Submodule R K) := by
       rw [hIS]
       exact Submodule.subset_span hs
-    first | exact Submodule.pow_mem_pow hsI k | exact Submodule.pow_mem_pow _ hsI k
+    first | exact Submodule.pow_mem_pow _ hsI k
   let J : FractionalIdeal R⁰ K := ⟨_, FractionalIdeal.isFractional_of_le hJle⟩
   have hJ : (J : Submodule R K) = Submodule.span R ((fun s => s ^ k) '' S) := rfl
   rw [← hJ, ← FractionalIdeal.coe_pow, FractionalIdeal.coe_le_coe]
@@ -305,8 +305,7 @@ theorem spanPow
           rw [FractionalIdeal.spanSingleton_le_iff_mem, ← FractionalIdeal.mem_coe]
           exact Submodule.subset_span ⟨s, hs, rfl⟩
         exact le_trans ((FractionalIdeal.coeIdeal_le_coeIdeal K).1 h2) hcP
-      have haP : a ≤ P := by
-        first | exact Ideal.IsPrime.le_of_pow_le hak | exact hPmax.isPrime.le_of_pow_le hak
+      have haP : a ≤ P := by first | exact Ideal.IsPrime.le_of_pow_le hak
       calc
         FractionalIdeal.spanSingleton R⁰ s = FractionalIdeal.spanSingleton R⁰ s * I⁻¹ * I := by
           rw [mul_assoc, inv_mul_cancel₀ hI, mul_one]

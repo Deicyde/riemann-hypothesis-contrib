@@ -96,31 +96,9 @@ theorem corr_of_val_field
     (corr_of_val hL fun y J hJ => ?_)
   exact (val_pull hJ _ _ _).trans ((h y J hJ).trans (val_pull hJ _ _ _).symm)
 
-theorem prod_O
-    (D : DegPre R)
-    {T : Over (Spec (CommRingCat.of R))} (b : T ⟶ D.P.A)
-    (χ : D.X)
-    {U : Type} [CommGroup U]
-    (h : (T.left ⟶ D.P.A.left) → U)
-    : ∏ i, h (D.Oφ b χ i) ^ Oε i
-      = h (cP D _ χ * b).left * (h (cP D _ χ).left)⁻¹ * (h b.left)⁻¹ * h (1 : T ⟶ D.P.A).left := by
-  rw [Fin.prod_univ_four, mul_comm (cP D _ χ) b]
-  show h (b * cP D _ χ).left ^ (1 : ℤ) * h (cP D _ χ).left ^ (-1 : ℤ) * h b.left ^ (-1 : ℤ) *
-    h (1 : T ⟶ D.P.A).left ^ (1 : ℤ) = _
-  simp only [zpow_neg, zpow_one]
+alias prod_O := _root_.GlobalTheory.UT.OLinEnd.prod_Oφ
 
-theorem prod_Oinv
-    (D : DegPre R)
-    {T : Over (Spec (CommRingCat.of R))} (b : T ⟶ D.P.A)
-    (χ : D.X)
-    {U : Type} [CommGroup U]
-    (h : (T.left ⟶ D.P.A.left) → U)
-    : ∏ i, h (D.Oφ b χ i) ^ Oinvε i
-      = (h (cP D _ χ * b).left)⁻¹ * h (cP D _ χ).left * h b.left * (h (1 : T ⟶ D.P.A).left)⁻¹ := by
-  rw [Fin.prod_univ_four, mul_comm (cP D _ χ) b]
-  show h (b * cP D _ χ).left ^ (-1 : ℤ) * h (cP D _ χ).left ^ (1 : ℤ) * h b.left ^ (1 : ℤ) *
-    h (1 : T ⟶ D.P.A).left ^ (-1 : ℤ) = _
-  simp only [zpow_neg, zpow_one]
+alias prod_Oinv := _root_.GlobalTheory.UT.OLinEnd.prod_Oφ_inv
 
 theorem val_eq_rosati
     (hG : GlobalFnsSt)

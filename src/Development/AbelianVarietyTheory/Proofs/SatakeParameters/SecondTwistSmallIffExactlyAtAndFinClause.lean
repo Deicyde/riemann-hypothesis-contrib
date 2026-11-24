@@ -171,7 +171,6 @@ theorem linearIndepOn_of_invariant
     have key : ∀ i ∈ s, ∀ g, a g (c i) = c i := by
       intro i hi g
       have h1 : ∑ i ∈ s, a g (c i) • v i = v x := by
-
         rw [← hv g x, ← hc, map_sum]
         exact Finset.sum_congr rfl fun j _ => by rw [hσ, hv]
       have h2 :=

@@ -3,9 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHomogeneousInf
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFamilyMorphismFromVeryDenseGraphsStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GraphInversionEndomorphismCutBoundedDegreeStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjProperRelAmpleOfProjectiveCoordinateRepStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFamilyMorphismFromVeryDenseGraphs
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GraphInversionEndomorphismCutBoundedDegree
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjProperRelAmpleOfProjectiveCoordinateRep
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SecCoordBcScaleUnique
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -261,13 +261,11 @@ theorem exists_endomorphisms
                       → ∀ i : Option J,
                         φ ≫ (F i).left = (i.elim (𝟙 t'.A)⁻¹ t'.act : t'.A ⟶ t'.A).left ≫ φ) := by
   intro hL hL2 g J _ Mat κ n hn hodd
-  obtain ⟨j₀, hj₀⟩ :=
-    GlobalTheory.T.graph_inversion_endomorphism_cut_bounded_degree hL hL2 g J Mat κ n hn hodd
+  obtain ⟨j₀, hj₀⟩ := _root_.GlobalTheory.GraphCut.cutBy_graphIdeal hL hL2 g J Mat κ n hn hodd
   refine ⟨j₀, fun j hj o _ b R _ _ _ β v Z I M th sc p hvd hPF hfib => ?_⟩
   haveI : NeZero ((n ^ j) ^ 2) := ⟨pow_ne_zero _ (pow_ne_zero _ hn.ne_zero)⟩
   obtain ⟨hrep, hsm, -, hp⟩ := hPF
-  have hprop :=
-    (GlobalTheory.T.isProj_proper_relAmple_of_projectiveCoordinateRep R _ I Z M th hrep).2.1
+  have hprop := (_root_.GlobalTheory.ZM.projRep_projective_ample R _ I Z M th hrep).2.1
   have hsm' : Smooth Z.hom := SmoothOfRelativeDimension.smooth g _
   have key
       : ∀ i : Option J, ∃ F : Z ⟶ Z,
@@ -286,8 +284,8 @@ theorem exists_endomorphisms
             → f = pullback.fst _ _ ≫ F.left := by
     intro i
     obtain ⟨Q, d, hQ⟩ := hj₀ j hj o b i
-    refine GlobalTheory.T.exists_family_morphism_from_veryDense_graphs R _ _ (Ix g ((n ^ j) ^ 2)) Z
-      Z I I M M th th p
+    refine _root_.GlobalTheory.ZM.GraphMor.exists_hom_of_graphs R _ _ (Ix g ((n ^ j) ^ 2)) Z Z I I M
+      M th th p
       (fun h => p (labMap _ Mat i h))
       Q d _ hrep hrep hprop hprop hsm' ?_ ?_
     · rintro K _ x f ⟨_, t', φ, hφ, ht, ⟨σ, hE, hσ⟩, hl, rfl⟩

@@ -50,6 +50,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.test_data_haar_factorization
     : ∀ (D : D7) (V : HSp D) (lam : D.what₂.Tau → Fin V.rank → ℤ) (S : D.what₂.Tau → SPar)
         (M : DSModel V S) (T : TypeDataG V) (U : AuxiliaryPlaceHermitianSpace V)
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.test_data_haar_factorization
                       GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.HasTrace ν σ
                           (finFn V ff) c
                         → HasTrace (repOp π μ (tensor D.sp.cm.sig V.gram fa ff)) c := by
-  first
-  | exact @GlobalTheory.AutMult.hasTrace_repOp_of_isCopyFinDS
-  | exact GlobalTheory.AutMult.hasTrace_repOp_of_isCopyFinDS
-  | (intros; apply GlobalTheory.AutMult.hasTrace_repOp_of_isCopyFinDS <;> assumption)
+  first | exact @GlobalTheory.AutMult.hasTrace_repOp_of_isCopyFinDS

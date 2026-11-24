@@ -66,7 +66,7 @@ theorem gen_eq
   have e
       : ((freeP R).map φ).app (op Y) (ModuleCat.freeMk (ULift.up y))
         = ModuleCat.freeMk (ULift.up (φ.app _ y)) := by
-    first | rfl | exact ModuleCat.free_map_apply (R := ULift R) _ _
+    first | exact ModuleCat.free_map_apply (R := ULift R) _ _
   have h3 :=
     congrArg
       (fun w => w (ModuleCat.freeMk (ULift.up y)))
@@ -93,7 +93,7 @@ theorem loc_eq
     erw [ConcreteCategory.comp_apply, ConcreteCategory.comp_apply] at n1
     rw [← n1]
     congr 1
-    first | rfl | exact ModuleCat.free_map_apply (R := ULift R) _ _
+    first | exact ModuleCat.free_map_apply (R := ULift R) _ _
   have hE :=
     Presheaf.IsSheaf.hom_ext G.2 ⟨S, hS⟩
       (ModuleCat.ofHom (LinearMap.toSpanSingleton (ULift R) _

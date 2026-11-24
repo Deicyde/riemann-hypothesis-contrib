@@ -109,10 +109,25 @@ theorem StdHyp.to0
     {u u' : Fin k → ℝ} {T T' ka b : ℝ} (h : StdHyp Ch Cg k r ε lam u u' T T' ka b)
     : StdHyp0 Ch Cg k r ε lam u u' T T' ka b := by
   obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, h17⟩ := h
-  refine ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, fun e => ?_⟩
-  rcases h17 with h | h
-  · exact h.2
-  · exact absurd e h.1
+  exact ⟨
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    h7,
+    h8,
+    h9,
+    h10,
+    h11,
+    h12,
+    h13,
+    h14,
+    h15,
+    h16,
+    fun e => Or.elim h17 (fun h => h.2) (fun h => absurd e h.1)
+  ⟩
 
 def LocOk
     (D : D7)

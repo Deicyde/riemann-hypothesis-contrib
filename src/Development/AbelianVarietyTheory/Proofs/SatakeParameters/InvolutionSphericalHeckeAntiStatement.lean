@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.NTheta Formalism.IndefR.Mult
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.involution_spherical_hecke_anti
     : ∀ {D : D7} (V : HSp D) (P : HeightOneSpectrum (𝓞 D.host.E)) (e : Formalism.L2.Theta.AE D),
       IsIdemAt e P
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.involution_spherical_hecke_anti
                         ϖ' ∈ P.asIdeal → ϖ' ∉ P.asIdeal ^ 2 → IsHeckeElt V e (ϖ' : D.host.E) k α'
                           → ∃ a ∈ locPart V (KsphC V ∅) e, ∃ b ∈ locPart V (KsphC V ∅) e,
                             α' = a * α * b := by
-  first
-  | exact @GlobalTheory.SplitPlace.split_local
-  | exact GlobalTheory.SplitPlace.split_local
-  | (intros; apply GlobalTheory.SplitPlace.split_local <;> assumption)
+  first | exact @GlobalTheory.SplitPlace.split_local

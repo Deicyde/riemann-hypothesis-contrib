@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FirstMinimumPrincipalTorusAtOrthonormalFrame
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.MatRmulUnipMulHeadProj
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.SummableNormSiegelThetaSeriesTerms
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ThetaCharacteristicsIffTestFunctionThetaSeriesStatement
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ThetaCharacteristicsIffTestFunctionThetaSeries
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.WeilActionPreservesThetaAndInnerProduct
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -185,8 +185,8 @@ theorem theta_holomorphic_weight
                 ∧ ∀ x ∈ X.dom, AnalyticOnNhd ℂ (thA X bas idx φ x) Set.univ := by
   intro E _ _ _ r X g q0 hr bas idx n hs hn c c' φ hφ P hP
   obtain ⟨m, a, b, t, ht⟩ :=
-    (GlobalTheory.T.thetaCharacteristics_iff_testFunction_thetaSeries E r X g q0 hr bas idx n hs
-      hn).2 φ hφ
+    (_root_.GlobalTheory.SW.CharLink.harmonicTheta_eq_sum_thetaCharacteristic E r X g q0 hr bas idx
+      n hs hn).2 φ hφ
   have hH := Harm.isHarmonic_of_mem_rowHighest hP
   refine ⟨?_, ?_, ?_, ?_⟩
   · have hd : DifferentiableOn ℂ

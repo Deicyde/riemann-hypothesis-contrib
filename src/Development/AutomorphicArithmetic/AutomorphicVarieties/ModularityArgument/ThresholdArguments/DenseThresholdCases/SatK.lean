@@ -39,9 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 theorem UpperTheory.V.Af.satake_k_of_printed_results
     : _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.SatK := by

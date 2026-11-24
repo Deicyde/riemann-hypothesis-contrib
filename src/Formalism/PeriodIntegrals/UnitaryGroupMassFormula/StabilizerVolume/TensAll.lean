@@ -60,8 +60,9 @@ namespace PI.VolStabS
 namespace TensAllW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation
-  PI.VolFromSW PositiveNearLattice Matrix
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation PI.VolFromSW
+  PositiveNearLattice Matrix
 
 def LIP (R : Type) [CommRing R] : Prop :=
   ∀ (m n : Type) [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n] (W : Matrix m n R),
@@ -80,8 +81,9 @@ theorem lip_field (K : Type) [Field K] : LIP K := by
   have h2 := congrArg LinearMap.toMatrix' h1
   rwa [LinearMap.toMatrix'_toLin', LinearMap.toMatrix'_id] at h2
 
-theorem lip_pi {ι : Type} [Fintype ι] [DecidableEq ι] (K : ι → Type) [∀ i, CommRing (K i)]
-    (h : ∀ i, LIP (K i)) : LIP (∀ i, K i) := by
+theorem lip_pi
+    {ι : Type} [Fintype ι] [DecidableEq ι] (K : ι → Type) [∀ i, CommRing (K i)] (h : ∀ i, LIP (K i))
+    : LIP (∀ i, K i) := by
   intro m n _ _ _ _ W hW
   have hv : ∀ v, ∃ P : Matrix n m (K v), P * W.map (fun x => x v) = 1 := by
     intro v
@@ -110,9 +112,12 @@ theorem lip_pi {ι : Type} [Fintype ι] [DecidableEq ι] (K : ι → Type) [∀ 
   rw [this]
   by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
 
-theorem inj_of_isUnit {R : Type} [CommRing R] {m n : Type} [Fintype m] [Fintype n]
-    [DecidableEq n] (W : Matrix m n R) (P : Matrix n m R) (hP : IsUnit (P * W).det)
-    (c : n → R) (hc : W *ᵥ c = 0) : c = 0 := by
+theorem inj_of_isUnit
+    {R : Type} [CommRing R]
+    {m n : Type} [Fintype m] [Fintype n] [DecidableEq n]
+    (W : Matrix m n R) (P : Matrix n m R) (hP : IsUnit (P * W).det)
+    (c : n → R) (hc : W *ᵥ c = 0)
+    : c = 0 := by
   have h1 : (P * W) *ᵥ c = 0 := by rw [← Matrix.mulVec_mulVec, hc, Matrix.mulVec_zero]
   obtain ⟨u, hu⟩ := (Matrix.isUnit_iff_isUnit_det _).2 hP
   have h2 : ((u⁻¹ : (Matrix n n R)ˣ) : Matrix n n R) *ᵥ ((P * W) *ᵥ c) = c := by
@@ -121,23 +126,25 @@ theorem inj_of_isUnit {R : Type} [CommRing R] {m n : Type} [Fintype m] [Fintype 
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] {d : ℕ} (b : Module.Basis (Fin d) F E)
 
-def wMat (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) :
-    Matrix (Fin M × Fin d) (Fin a × Fin d) R :=
-  fun p q => crd b R (((1 : R) ⊗ₜ[F] b q.2) * X q.1 p.1) p.2
+def wMat (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E)
+    : Matrix (Fin M × Fin d) (Fin a × Fin d) R := fun p q =>
+  crd b R (((1 : R) ⊗ₜ[F] b q.2) * X q.1 p.1) p.2
 
-theorem wMat_mulVec (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) (j : Fin M) (l : Fin d) :
-    (wMat b R X *ᵥ c) (j, l) =
-      crd b R (∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j) l := by
-
+theorem wMat_mulVec
+    (R : Type) [CommRing R] [Algebra F R]
+    {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) (j : Fin M)
+    (l : Fin d)
+    : (wMat b R X *ᵥ c) (j, l)
+      = crd b R (∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j) l := by
   simp only [Matrix.mulVec, dotProduct, wMat, crd, Fintype.sum_prod_type, Finset.sum_mul,
-  smul_mul_assoc, map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply,
-  Finsupp.smul_apply, smul_eq_mul]
+    smul_mul_assoc, map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-theorem wMat_mulVec_eq_zero (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) :
-    wMat b R X *ᵥ c = 0 ↔ ∀ j, ∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j = 0 := by
+theorem wMat_mulVec_eq_zero
+    (R : Type) [CommRing R] [Algebra F R]
+    {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R)
+    : wMat b R X *ᵥ c = 0 ↔ ∀ j, ∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j = 0 := by
   constructor
   · intro h j
     apply (Algebra.TensorProduct.basis R b).repr.injective
@@ -150,28 +157,29 @@ theorem wMat_mulVec_eq_zero (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
     rw [wMat_mulVec, h p.1]
     simp [crd]
 
-theorem linIndep_iff (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) :
-    LinearIndependent (R ⊗[F] E) X ↔ ∀ c, wMat b R X *ᵥ c = 0 → c = 0 := by
+theorem linIndep_iff (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E)
+    : LinearIndependent (R ⊗[F] E) X ↔ ∀ c, wMat b R X *ᵥ c = 0 → c = 0 := by
   apply PI.AprimeInfW.linIndep_iff <;> assumption
 
 section Top
 
-variable [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-  [IsTopologicalRing R]
+variable
+  [FiniteDimensional F E]
+  (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
 
-theorem continuous_wMat {a M : ℕ} :
-    Continuous (fun X : Fin a → Fin M → R ⊗[F] E => wMat b R X) := by
+theorem continuous_wMat {a M : ℕ}
+    : Continuous (fun X : Fin a → Fin M → R ⊗[F] E => wMat b R X) := by
   refine continuous_pi fun p => continuous_pi fun q => ?_
   exact (continuous_crd b R p.2).comp
     (continuous_const.mul ((continuous_apply p.1).comp (continuous_apply q.1)))
 
 include b in
-theorem isOpen_linIndep (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R) {a M : ℕ} :
-    IsOpen {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} := by
-  have e : {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} =
-      ⋃ P : Matrix (Fin a × Fin d) (Fin M × Fin d) R,
-        (fun X => (P * wMat b R X).det) ⁻¹' {r | IsUnit r} := by
+theorem isOpen_linIndep (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R) {a M : ℕ}
+    : IsOpen {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} := by
+  have e
+      : {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X}
+        = ⋃ P : Matrix (Fin a × Fin d) (Fin M × Fin d) R,
+            (fun X => (P * wMat b R X).det) ⁻¹' {r | IsUnit r} := by
     ext X
     simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_preimage]
     rw [linIndep_iff b]
@@ -190,17 +198,27 @@ end Top
 end TensAllW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation
-  PI.VolFromSW TensAllW
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation PI.VolFromSW
+  TensAllW
 
-theorem tensFacts_of {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (a : ℕ) (R : Type) [CommRing R] [Algebra F R]
-    [TopologicalSpace R] [IsTopologicalRing R] [LocallyCompactSpace R] [T2Space R]
-    [SecondCountableTopology R] (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R) :
-    TensFacts F E σ M J a R :=
-  ⟨inferInstance, inferInstance, inferInstance, isClosed_HermR R σ a, continuous_gramR R σ J,
-    gramR_mem R σ hσ J hJ, isOpen_linIndep (Module.finBasis F E) R hU hL⟩
+theorem tensFacts_of
+    {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j)
+    (a : ℕ)
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+    [LocallyCompactSpace R] [T2Space R] [SecondCountableTopology R]
+    (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R)
+    : TensFacts F E σ M J a R := ⟨
+  inferInstance,
+  inferInstance,
+  inferInstance,
+  isClosed_HermR R σ a,
+  continuous_gramR R σ J,
+  gramR_mem R σ hσ J hJ,
+  isOpen_linIndep (Module.finBasis F E) R hU hL
+⟩
 
 theorem lip_ainf (F : Type) [Field F] [NumberField F] : LIP (InfiniteAdeleRing F) := by
   classical

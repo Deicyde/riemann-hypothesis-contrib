@@ -102,7 +102,7 @@ theorem finUnit_pow (χ : HChar L) (hχ : χ.IsUnitary)
       continuous_id
       (fun _ => rfl)
       (intFin L)
-      (fun W hW => GlobalTheory.AdLat.OpenLat.exists_nsmul_adele L W hW)
+      (fun W hW => _root_.GlobalTheory.LocalNormBound.main L W hW)
       finite_quot ψ hψ
   refine ⟨m, hm, fun u h1 h2 => ?_⟩
   have := h u ⟨funext h1, fun v => (h2 v).le, fun v => ((unitIdl L).inv_mem h2 v).le⟩

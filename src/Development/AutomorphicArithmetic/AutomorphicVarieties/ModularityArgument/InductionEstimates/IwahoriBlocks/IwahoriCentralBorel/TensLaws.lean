@@ -42,14 +42,20 @@ public import Lean.Meta.ExprDefEq
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-private theorem coef_mem {A B ι : Type} (X : Submodule ℂ (A → ℂ)) (s : Finset ι) (φ : ι → A → ℂ) (ψ : ι → B → ℂ)
-    (hψ : LinearIndependent ℂ ψ) (h : ∀ b, (fun a => ∑ i ∈ s, φ i a * ψ i b) ∈ X) : ∀ i ∈ s, φ i ∈ X := by
+private theorem coef_mem
+    {A B ι : Type} (X : Submodule ℂ (A → ℂ)) (s : Finset ι) (φ : ι → A → ℂ) (ψ : ι → B → ℂ)
+    (hψ : LinearIndependent ℂ ψ) (h : ∀ b, (fun a => ∑ i ∈ s, φ i a * ψ i b) ∈ X)
+    : ∀ i ∈ s, φ i ∈ X := by
   intro i hi
   by_contra hn
   obtain ⟨f, hf, hX⟩ := Submodule.exists_le_ker_of_notMem hn
@@ -64,37 +70,43 @@ private theorem coef_mem {A B ι : Type} (X : Submodule ℂ (A → ℂ)) (s : Fi
     simpa [Finset.sum_apply, mul_comm] using h1
   exact hf (linearIndependent_iff'.1 hψ s _ h0 i hi)
 
-private noncomputable def prodMap {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) :
-    X₁ ⊗[ℂ] X₂ →ₗ[ℂ] (A × B → ℂ) :=
-  TensorProduct.lift (LinearMap.mk₂ ℂ (fun φ ψ x => φ.1 x.1 * ψ.1 x.2)
-    (fun _ _ _ => by funext x; simp [add_mul]) (fun _ _ _ => by funext x; simp [mul_assoc])
-    (fun _ _ _ => by funext x; simp [mul_add]) (fun _ _ _ => by funext x; simp [mul_left_comm]))
+private noncomputable def prodMap {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ))
+    : X₁ ⊗[ℂ] X₂ →ₗ[ℂ] (A × B → ℂ) :=
+  TensorProduct.lift (LinearMap.mk₂ ℂ
+    (fun φ ψ x => φ.1 x.1 * ψ.1 x.2)
+    (fun _ _ _ => by funext x; simp [add_mul])
+    (fun _ _ _ => by funext x; simp [mul_assoc])
+    (fun _ _ _ => by funext x; simp [mul_add])
+    (fun _ _ _ => by funext x; simp [mul_left_comm]))
 
-private theorem prodMap_tmul {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (φ : X₁) (ψ : X₂) :
-    prodMap X₁ X₂ (φ ⊗ₜ ψ) = fun x => φ.1 x.1 * ψ.1 x.2 := by
+private theorem prodMap_tmul
+    {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (φ : X₁) (ψ : X₂)
+    : prodMap X₁ X₂ (φ ⊗ₜ ψ) = fun x => φ.1 x.1 * ψ.1 x.2 := by
   simp only [prodMap, TensorProduct.lift.tmul, LinearMap.mk₂_apply]
 
-private theorem prodMap_inj {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) :
-    Function.Injective (prodMap X₁ X₂) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem prodMap_inj {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ))
+    : Function.Injective (prodMap X₁ X₂) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro t ht
   let β := Module.Basis.ofVectorSpace ℂ X₂
   obtain ⟨c, rfl⟩ := TensorProduct.eq_repr_basis_right β t
   have hβ : LinearIndependent ℂ (fun i => (β i).1) :=
     β.linearIndependent.map' X₂.subtype (Submodule.ker_subtype _)
-  have hc := coef_mem (⊥ : Submodule ℂ (A → ℂ)) c.support (fun i => (c i).1) (fun i => (β i).1) hβ (by
-    intro b
-    rw [Submodule.mem_bot]
-    funext a
-    have := congrFun ht (a, b)
+  have hc :=
+    coef_mem (⊥ : Submodule ℂ (A → ℂ)) c.support (fun i => (c i).1) (fun i => (β i).1) hβ (by
+      intro b
+      rw [Submodule.mem_bot]
+      funext a
+      have := congrFun ht (a, b)
 
-    simpa [Finsupp.sum, map_sum, prodMap_tmul, Finset.sum_apply] using this)
+      simpa [Finsupp.sum, map_sum, prodMap_tmul, Finset.sum_apply] using this)
   refine Finset.sum_eq_zero fun i hi => ?_
   have : c i = 0 := Subtype.ext ((Submodule.mem_bot ℂ).1 (hc i hi))
   simp [this]
 
-private theorem prodMap_range {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) :
-    LinearMap.range (prodMap X₁ X₂) = tensFn X₁ X₂ := by
+private theorem prodMap_range {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ))
+    : LinearMap.range (prodMap X₁ X₂) = tensFn X₁ X₂ := by
   apply le_antisymm
   · rintro _ ⟨t, rfl⟩
     induction t using TensorProduct.induction_on with
@@ -105,12 +117,22 @@ private theorem prodMap_range {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X
     rintro _ ⟨φ, hφ, ψ, hψ, rfl⟩
     exact ⟨⟨φ, hφ⟩ ⊗ₜ ⟨ψ, hψ⟩, prodMap_tmul X₁ X₂ _ _⟩
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.tensLaws :
-    ∀ {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)), (∃ e : X₁ ⊗[ℂ] X₂ ≃ₗ[ℂ] tensFn X₁ X₂, ∀ φ ψ x, (e (φ ⊗ₜ ψ)).1 x = φ.1 x.1 * ψ.1 x.2) ∧
-      ∀ (F : A × B → ℂ) (d : ℕ) (φ : Fin d → A → ℂ) (ψ : Fin d → B → ℂ), (∀ x, F x = ∑ i, φ i x.1 * ψ i x.2) →
-        (∀ b, (fun a => F (a, b)) ∈ X₁) → (∀ a, (fun b => F (a, b)) ∈ X₂) → F ∈ tensFn X₁ X₂ := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.tensLaws
+    : ∀ {A B : Type} (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)),
+      (∃ e : X₁ ⊗[ℂ] X₂ ≃ₗ[ℂ] tensFn X₁ X₂, ∀ φ ψ x, (e (φ ⊗ₜ ψ)).1 x = φ.1 x.1 * ψ.1 x.2)
+        ∧ ∀ (F : A × B → ℂ) (d : ℕ) (φ : Fin d → A → ℂ) (ψ : Fin d → B → ℂ),
+          (∀ x, F x = ∑ i, φ i x.1 * ψ i x.2) → (∀ b, (fun a => F (a, b)) ∈ X₁)
+            → (∀ a, (fun b => F (a, b)) ∈ X₂)
+            → F ∈ tensFn X₁ X₂ := by
   intro A B X₁ X₂
-  refine ⟨⟨(LinearEquiv.ofInjective _ (prodMap_inj X₁ X₂)).trans (LinearEquiv.ofEq _ _ (prodMap_range X₁ X₂)), ?_⟩, ?_⟩
+  refine ⟨
+    ⟨
+      (LinearEquiv.ofInjective _ (prodMap_inj X₁ X₂)).trans
+        (LinearEquiv.ofEq _ _ (prodMap_range X₁ X₂)),
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · intro φ ψ x
     exact congrFun (prodMap_tmul X₁ X₂ φ ψ) x
   · intro F d φ ψ hF h₁ h₂
@@ -134,13 +156,14 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.tensLaws
       have := congrFun (congrArg Subtype.val (β.sum_repr ⟨_, hW a⟩)) b
       rw [Submodule.coe_sum, Finset.sum_apply] at this
       exact this.symm
-    have hc := coef_mem X₁ Finset.univ (fun i a => β.repr ⟨_, hW a⟩ i) (fun i => (β i).1) hβ (by
-      intro b
-      have : (fun a => ∑ i, β.repr ⟨_, hW a⟩ i * (β i).1 b) = fun a => F (a, b) := by
-        funext a
-        exact (hrep a b).symm
-      rw [this]
-      exact h₁ b)
+    have hc :=
+      coef_mem X₁ Finset.univ (fun i a => β.repr ⟨_, hW a⟩ i) (fun i => (β i).1) hβ (by
+        intro b
+        have : (fun a => ∑ i, β.repr ⟨_, hW a⟩ i * (β i).1 b) = fun a => F (a, b) := by
+          funext a
+          exact (hrep a b).symm
+        rw [this]
+        exact h₁ b)
     have : F = ∑ i, fun x : A × B => β.repr ⟨_, hW x.1⟩ i * (β i).1 x.2 := by
       funext x
       rw [Finset.sum_apply]

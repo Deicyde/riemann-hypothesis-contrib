@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.CoeEqAlgebraMapZeroEquiv
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -59,8 +60,7 @@ private theorem evI_mulVec
     : P (aeval f q x) = aeval H q *ᵥ P x := by
   induction q using Polynomial.induction_on generalizing x with
   | C a =>
-    simp [Polynomial.aeval_C, Module.algebraMap_end_apply, Algebra.algebraMap_eq_smul_one,
-      Matrix.smul_mulVec]
+    simp
     ext j
     simp
   | add p r hp hr =>
@@ -78,10 +78,10 @@ private theorem evI_diag
   induction q using Polynomial.induction_on with
   | C a =>
     rw [Polynomial.aeval_C]
-    simp only [Polynomial.aeval_C, algebraMap_int_eq, eq_intCast, map_intCast]
+    simp only [eq_intCast, map_intCast]
     rw [Matrix.diagonal_intCast, Int.cast_comm]
   | add p r hp hr =>
-    simp only [map_add (f := _), add_mul, hp, hr, ← Matrix.diagonal_add, mul_add, Pi.add_def]
+    simp only [map_add (f := _), add_mul, hp, hr, ← Matrix.diagonal_add, mul_add]
   | monomial n a ih =>
     rw [pow_succ, ← _root_.mul_assoc, map_mul (aeval H) (C a * X ^ n) X, aeval_X, _root_.mul_assoc,
       h, ← _root_.mul_assoc, ih, _root_.mul_assoc, Matrix.diagonal_mul_diagonal]

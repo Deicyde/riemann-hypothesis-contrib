@@ -48,9 +48,6 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Module Module.End
 
 namespace Formalism.L2.Fam.NPC
 
-
-
-
 section Gen
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (B : LocBase0 H what₂)
@@ -103,7 +100,7 @@ theorem prMtC_span (hC : PartCompl B) (hL : MtLoc B hC) (i : LocT B)
           '' (projOf B hC i '' Set.range (B.iV (jOf B i) (wOf B i))) := by
     ext z
     simp [prMtC]
-  have h3 : LinearMap.range (projOf B hC i) = ⊤ := Submodule.linearProjOfIsCompl_range (hC i)
+  have h3 : LinearMap.range (projOf B hC i) = ⊤ := Submodule.range_projectionOnto (hC i)
   rw [h2, Submodule.span_image, Submodule.span_image, h1, Submodule.map_top, h3, Submodule.map_top,
     LinearMap.range_eq_top.2 (mtEquiv B hC hL i).symm.surjective]
 

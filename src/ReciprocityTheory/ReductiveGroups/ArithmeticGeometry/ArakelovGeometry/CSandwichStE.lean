@@ -79,7 +79,6 @@ theorem sum_secFun_eq'
         ((mem_homogeneousSubmodule _ _).mpr hg)
     exact (mem_homogeneousSubmodule _ _).mp this
   have hx : aeval x h = 0 := by
-
     rw [hh_def, map_sub, map_sum, ← hc, sub_eq_zero]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_zsmul, zsmul_eq_mul, hbf j, aeval_map_intQ]

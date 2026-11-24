@@ -76,7 +76,7 @@ theorem twist_left_inverse
     by_cases h : a = b
     · subst h
       simp
-    · simp [Finsupp.single_apply, h, Ne.symm h]
+    · simp [h]
   choose w hw using hw
   have hwR : ∀ a, ∀ e ∈ L p, w a e ∈ regAt ξ p := by
     intro a e he

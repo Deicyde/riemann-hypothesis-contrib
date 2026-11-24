@@ -376,9 +376,8 @@ theorem isAutFunSm_average
   have hR : ∀ ψ ∈ 𝒟, ∀ τ' X, X ∈ lieAt V τ' → Rder θ V τ' X ψ ∈ 𝒟 := fun _ h _ _ hX =>
     GlobalTheory.CuspLie.isAutFunSm_Rder hθ hX h
   have FAM := fun ψ (h : IsAutFunSm θ V ψ) =>
-    GlobalTheory.T.compactAverage_smoothFamily_closedUnderDerivatives D θ hθ V K μ
-      (famSpan θ V τ κ 𝒟) (famSpan_cont hθ hκ hU h𝒟) (famSpan_sm hθ hU h𝒟)
-      (famSpan_Rder hθ hκ hU h𝒟 hR)
+    _root_.GlobalTheory.AvgFam.avg_closed D θ hθ V K μ (famSpan θ V τ κ 𝒟)
+      (famSpan_cont hθ hκ hU h𝒟) (famSpan_sm hθ hU h𝒟) (famSpan_Rder hθ hκ hU h𝒟 hR)
       (fun k x => e k * ψ (x * atTau θ V τ (κ k)))
       (Submodule.subset_span ⟨e, he, ψ, h, rfl⟩)
   have F0 := FAM φ hφ
@@ -452,9 +451,8 @@ theorem isAutFunSm_average
     have hF0 : (fun k x => e k * φ (x * atTau θ V τ (κ k))) ∈ famSpan θ V τ κ (growN θ V N) :=
       Submodule.subset_span ⟨e, he, φ, ⟨hφ, hN⟩, rfl⟩
     have FN :=
-      GlobalTheory.T.compactAverage_smoothFamily_closedUnderDerivatives D θ hθ V K μ
-        (famSpan θ V τ κ (growN θ V N)) (famSpan_cont hθ hκ hU h𝒟N) (famSpan_sm hθ hU h𝒟N)
-        (famSpan_Rder hθ hκ hU h𝒟N hRN) _ hF0
+      _root_.GlobalTheory.AvgFam.avg_closed D θ hθ V K μ (famSpan θ V τ κ (growN θ V N))
+        (famSpan_cont hθ hκ hU h𝒟N) (famSpan_sm hθ hU h𝒟N) (famSpan_Rder hθ hκ hU h𝒟N hRN) _ hF0
     refine ⟨N, fun l hl x => ?_⟩
     rw [FN.2.2.1 l hl]
     obtain ⟨C, hC⟩ := famSpan_growth hθ hκ hU N _ (famSpan_words hθ hκ hU h𝒟N hRN hF0 l hl) x

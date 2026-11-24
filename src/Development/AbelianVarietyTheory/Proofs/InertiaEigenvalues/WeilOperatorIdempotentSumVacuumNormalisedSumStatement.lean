@@ -53,6 +53,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.weilOperator_idempotentSum_vacuum_normalised_sum
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),

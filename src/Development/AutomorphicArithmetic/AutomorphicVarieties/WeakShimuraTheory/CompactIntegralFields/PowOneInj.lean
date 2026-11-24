@@ -103,7 +103,7 @@ private theorem up (h : T.Le T')
   have hm := hj _ (resQ_mem T.F g)
   refine ⟨IntermediateField.fixingSubgroupEquiv T'.F ⟨_, hm⟩, ?_⟩
   ext x
-  simp [resLe, IntermediateField.fixingSubgroupEquiv, map_pow]
+  simp [resLe, IntermediateField.fixingSubgroupEquiv]
 
 private theorem rb_resLe (h : T.Le T') (w : ℤ × ℤ) (g : G T'.F Ω)
     : T'.rb w g = T.rb w (resLe h.le g) := by

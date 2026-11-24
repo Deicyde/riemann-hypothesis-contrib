@@ -46,9 +46,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr

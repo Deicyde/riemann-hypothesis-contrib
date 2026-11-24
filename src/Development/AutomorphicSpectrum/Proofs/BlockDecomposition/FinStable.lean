@@ -138,11 +138,9 @@ theorem exists_iw (x : GA E (r + s))
     hc,
     ga_ext ?_ ?_
   ⟩
-  · simp only [cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e1, pInf_infGL, pInf_finGL, mul_one,
-      one_mul]
+  · simp only [cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e1, pInf_infGL, pInf_finGL, mul_one]
     rw [hy, hbi]
-  · simp only [cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e2, pFin_infGL, pFin_finGL, mul_one,
-      one_mul]
+  · simp only [cf, map_mul, IwaAd.map_unip, IwaAd.map_lev, e2, pFin_infGL, pFin_finGL, one_mul]
     rw [hf]
 
 def leviOf (x : GA E (r + s)) : GA E r × GA E s := (exists_iw x).choose_spec.choose

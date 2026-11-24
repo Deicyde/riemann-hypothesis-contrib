@@ -49,8 +49,6 @@ open Formalism.IndefR.Links
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.Lev Formalism.L2.DIV Formalism.IndefR.Mult
 
-
-
 noncomputable section
 
 namespace GlobalTheory.SplitOffS0

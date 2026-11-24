@@ -128,9 +128,9 @@ private theorem charPerm_single {α ι : Type} [Fintype ι] (a b : ι → α)
     | cons y s ih =>
       by_cases hxy : y = x
       · subst hxy
-        simp [Multiset.count_cons, ih]
+        simp [ih]
         try ring
-      · simp [Multiset.count_cons, ih, Finsupp.single_apply, hxy, Ne.symm hxy]
+      · simp [ih, Ne.symm hxy]
   have hsum
       : ∀ c : ι → α,
         (∑ i, Finsupp.single (c i) (1 : ℤ))

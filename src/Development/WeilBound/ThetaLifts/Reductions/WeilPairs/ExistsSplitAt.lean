@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Foundations.OfInfProjInfMulOfFinProjFin
 
 @[expose] public section
 
@@ -100,11 +101,9 @@ theorem cA_fj (σ : E →ₐ[F] E) (α : Af F) : cAF σ (fj E α) = fj E α := b
   rw [cA_tmul, map_one]
   rfl
 
-theorem afext {a b : Af F} (h : ∀ v, evalV F v a = evalV F v b) : a = b := Subtype.ext (funext h)
-
 theorem singleV_mul (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v) (α : Af F)
     : α * singleV F v y = singleV F v (evalV F v α * y) :=
-  afext fun w => by
+  _root_.GlobalTheory.AdelicU.af_ext fun w => by
     by_cases hw : w = v
     · subst hw; simp only [map_mul, evalV_singleV_same]
     · simp only [map_mul, evalV_singleV_ne _ v _ hw, mul_zero]
@@ -114,7 +113,7 @@ abbrev pl (v : HeightOneSpectrum (𝓞 F)) : AEF F E := fj E (singleV F v 1)
 
 theorem pl_mul_pl {v v' : HeightOneSpectrum (𝓞 F)} (h : v ≠ v') : pl E v * pl E v' = 0 := by
   have : singleV F v 1 * singleV F v' 1 = 0 :=
-    afext fun w => by
+    _root_.GlobalTheory.AdelicU.af_ext fun w => by
       rw [map_mul, map_zero]
       by_cases hw : w = v
       · subst hw; rw [evalV_singleV_ne _ v' _ h, mul_zero]
@@ -125,7 +124,7 @@ theorem idem_eq_sum
     (e : Af F) (he : e * e = e)
     (S : Finset (HeightOneSpectrum (𝓞 F))) (hS : ∀ v, v ∈ S ↔ evalV F v e ≠ 0)
     : e = ∑ v ∈ S, singleV F v 1 := by
-  refine afext fun w => ?_
+  refine _root_.GlobalTheory.AdelicU.af_ext fun w => ?_
 
   rw [map_sum]
   by_cases hw : w ∈ S

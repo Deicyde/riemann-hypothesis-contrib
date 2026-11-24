@@ -68,7 +68,7 @@ theorem uwRQe_gen
   obtain rfl : φ' = fun k => g ≫ φ k := funext hφ
   refine ⟨LB.pullGen L φ ε t g, LB.isGen_pullGen (φ := φ) (ε := ε) (c := t) (hc := ht) (h := g), ?_⟩
   intro Z r z J hg
-  first | exact val_pull hg t g r | exact val_pull t g r
+  first | exact val_pull hg t g r
 
 section QkExt
 
@@ -84,12 +84,10 @@ theorem uwRQe_e
     : CommRingCat.ofHom (algebraMap (FractionRing R) F) ≫ CommRingCat.ofHom f
       = CommRingCat.ofHom (algebraMap (FractionRing R) F') := by
   ext x
-  first | exact hf x | simpa using hf x
+  first | exact hf x
 
 theorem uwRQe_rho_jFK : spMap f ≫ Out.jFK (R := R) F = Out.jFK (R := R) F' := by
-  first
-  | rw [← Spec.map_comp, uwRQe_e f hf]
-  | (simp only [spMap, Out.jFK]; rw [← Spec.map_comp, uwRQe_e f hf])
+  first | rw [← Spec.map_comp, uwRQe_e f hf]
 
 def uwRQe_rho : Out.TF (R := R) F' ⟶ Out.TF (R := R) F :=
   Over.homMk (spMap f) (by
@@ -97,20 +95,10 @@ def uwRQe_rho : Out.TF (R := R) F' ⟶ Out.TF (R := R) F :=
     rw [← Category.assoc, uwRQe_rho_jFK f hf])
 
 theorem uwRQe_cF (χ : D.X) : Out.DegPre.cF D F' χ = uwRQe_rho f hf ≫ Out.DegPre.cF D F χ := by
-  first
-  | simp [Out.DegPre.cF]
-  | (
-      show toUnit _ ≫ D.c χ = uwRQe_rho f hf ≫ toUnit _ ≫ D.c χ
-      rw [← Category.assoc, CartesianMonoidalCategory.comp_toUnit]
-    )
+  first | simp [Out.DegPre.cF]
 
 theorem uwRQe_zeroF : Out.DegPre.zeroF D F' = uwRQe_rho f hf ≫ Out.DegPre.zeroF D F := by
-  first
-  | simp [Out.DegPre.zeroF]
-  | (
-      show toUnit _ ≫ η[D.P.A] = uwRQe_rho f hf ≫ toUnit _ ≫ η[D.P.A]
-      rw [← Category.assoc, CartesianMonoidalCategory.comp_toUnit]
-    )
+  first | simp [Out.DegPre.zeroF]
 
 theorem uwRQe_padd (x y : Out.TF (R := R) F ⟶ D.P.A)
     : padd D.P.A (uwRQe_rho f hf ≫ x) (uwRQe_rho f hf ≫ y) = uwRQe_rho f hf ≫ padd D.P.A x y := by
@@ -158,9 +146,6 @@ theorem uwRQe_cub
   simp only [Out.DegPre.cubAt]
   rw [e]
   first
-  | exact (val_pull D.cub.t _ r).trans
-      ((congrArg (fun q => val D.cub.t q z J) (Category.assoc r (spMap f) _).symm).trans
-        (val_pull D.cub.t _ (r ≫ spMap f)).symm)
   | exact (val_pull hJ D.cub.t _ r).trans
       ((congrArg (fun q => val D.cub.t q z J) (Category.assoc r (spMap f) _).symm).trans
         (val_pull hJ D.cub.t _ (r ≫ spMap f)).symm)
@@ -224,9 +209,6 @@ theorem uwRQe_isIota {y : D.X} {g : Out.GtPtF D F} (h : g.IsIota y)
     rw [h1, uwRQe_cF D f hf y]
   · rw [uwRQe_val D f hf g χ _ p J hJ, val_corr hJ (h2 χ)]
     first
-    | exact (val_pull _ _ _).trans
-        ((congrArg (fun q => val (D.io y χ) q p J) (by
-          rw [Category.assoc, uwRQe_rho_jFK f hf])).trans (val_pull _ _ _).symm)
     | exact (val_pull hJ _ _ _).trans
         ((congrArg (fun q => val (D.io y χ) q p J) (by
           rw [Category.assoc, uwRQe_rho_jFK f hf])).trans (val_pull hJ _ _ _).symm)
@@ -260,6 +242,6 @@ theorem qkExtExists : QkExtExistsSt := by
   dsimp only
   refine ⟨rfl, rfl, fun χ => corr_of_val D.P.isLB fun q J hJ => ?_⟩
   rw [uwRQe_val D f hf p.g χ _ q J hJ]
-  first | exact (val_pull _ _ _).symm | exact (val_pull hJ _ _ _).symm
+  first | exact (val_pull hJ _ _ _).symm
 
 end ReciprocityTheory.ChartRestriction.G.Geo.Tor

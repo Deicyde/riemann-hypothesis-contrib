@@ -84,8 +84,8 @@ theorem unitary_diag_one_mem_dbl
     ⟩,
     rfl
   ⟩
-  · rw [Matrix.fromBlocks_multiply]; simp [h1, Matrix.fromBlocks_one]
-  · rw [Matrix.fromBlocks_multiply]; simp [h2, Matrix.fromBlocks_one]
+  · rw [Matrix.fromBlocks_multiply]; simp [Matrix.fromBlocks_one]
+  · rw [Matrix.fromBlocks_multiply]; simp [Matrix.fromBlocks_one]
   · show (Matrix.fromBlocks ((g : GL β E) : Matrix β β E) 0 0 1)ᵀ * dbl J *
         (Matrix.fromBlocks ((g : GL β E) : Matrix β β E) 0 0 1).map c = dbl J
     rw [dbl, Matrix.fromBlocks_transpose, Matrix.fromBlocks_map, hm0, hm1,

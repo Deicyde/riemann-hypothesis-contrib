@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.innerProduct_translated_vacua_eq_gaussianKernel
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
       IsCovolOne (ratL T S) μ 𝓕
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.innerProduct_translated_vacua_eq_gaussianKernel
                       * conj (gaussR C.X C.bas C.idx x₂ (C.zOf x₂ w₂))
                       * kZero C.X C.idx x₁ x₂ (C.zOf x₁ w₁)
                         (fun k i => conj (C.zOf x₂ w₂ k i))) := by
-  first
-  | exact @GlobalTheory.Ker.GaussKer.ipO_rho_Th
-  | exact GlobalTheory.Ker.GaussKer.ipO_rho_Th
-  | (intros; apply GlobalTheory.Ker.GaussKer.ipO_rho_Th <;> assumption)
+  first | exact @GlobalTheory.Ker.GaussKer.ipO_rho_Th

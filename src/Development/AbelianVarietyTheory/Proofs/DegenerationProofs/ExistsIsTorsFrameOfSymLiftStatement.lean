@@ -52,6 +52,7 @@ open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ThetaReal
+
 theorem _root_.GlobalTheory.T.exists_isTorsFrame_of_symLift'
     : Laws
       → ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (P : PolAV S)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_isTorsFrame_of_symLift'
                           (fun _ => x.left)
                           (fun _ => 1)),
                         IsTorsFrame P rig n x τ := by
-  first
-  | exact @GlobalTheory.exists_isTorsFrame_of_symLift
-  | exact GlobalTheory.exists_isTorsFrame_of_symLift
-  | (intros; apply GlobalTheory.exists_isTorsFrame_of_symLift <;> assumption)
+  first | exact @GlobalTheory.exists_isTorsFrame_of_symLift

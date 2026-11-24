@@ -370,7 +370,6 @@ theorem om_eq_smul_sum_iso
   obtain ⟨v₀, ⟨hv₀, hv₀Λ⟩, hv₀u⟩ := hRu 0 h0 (isHalf_zero e)
   have hv₀' : v₀ ∈ Λ := by rwa [zero_sub, neg_mem_iff] at hv₀Λ
   have hsum : ℓ (∑ u ∈ R, heisO ψ S T u f) = ℓ f := by
-
     rw [map_sum, Finset.sum_eq_single_of_mem v₀ hv₀, hf1 v₀ hv₀' (hR _ hv₀).2]
     intro u hu hne
     have huΛ : u ∉ Λ := fun huΛ => hne (hv₀u u ⟨hu, by rwa [zero_sub, neg_mem_iff]⟩)

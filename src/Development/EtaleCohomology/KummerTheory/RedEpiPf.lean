@@ -116,7 +116,6 @@ theorem RedEpi_of
           (Sec.res (F := tw (l ^ a) i) k (Sec.res (F := tw (l ^ a) i) g y)))
         ?_
       rintro W' k' ⟨e, he⟩
-      beta_reduce
       refine ⟨e • genZ i (ζ.map k'.appTop.hom), ?_⟩
       have hr : (ζ'.map k'.appTop.hom).1 = (ζ.map k'.appTop.hom).1 ^ (l ^ c / l ^ a) := by
         show k'.appTop.hom ζ'.1 = (k'.appTop.hom ζ.1) ^ _

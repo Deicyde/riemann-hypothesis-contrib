@@ -45,7 +45,6 @@ import Mathlib.Tactic.ReduceModChar
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 namespace GlobalTheory.OneMapAll

@@ -45,6 +45,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.self_dual_lattice_pairing_dual
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
         (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
@@ -81,7 +82,4 @@ theorem _root_.GlobalTheory.T.self_dual_lattice_pairing_dual
                             (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
                           f'
                         → heisO ψ S T u f' = ε • f' := by
-  first
-  | exact @GlobalTheory.LatVac.latO_selfDual_approx_sign
-  | exact GlobalTheory.LatVac.latO_selfDual_approx_sign
-  | (intros; apply GlobalTheory.LatVac.latO_selfDual_approx_sign <;> assumption)
+  first | exact @GlobalTheory.LatVac.latO_selfDual_approx_sign

@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.AdmissibleParameterJoins.SumLogPrimeFactorsLe
 
 @[expose] public section
 
@@ -112,7 +113,8 @@ theorem sum_le_etaSum_num
     exact Finset.mem_filter.2 (hTw y hy)
   · intro w _ _
     rw [hg]
-    exact mul_nonneg (mul_nonneg (zero_le_logWeight w) (Nat.cast_nonneg _))
+    exact mul_nonneg
+      (mul_nonneg (_root_.Formalism.MainNotions.J.logWeight_nonneg w) (Nat.cast_nonneg _))
       (by exact_mod_cast D.what₂.etaJ_nonneg _ w)
 
 theorem inEta_num

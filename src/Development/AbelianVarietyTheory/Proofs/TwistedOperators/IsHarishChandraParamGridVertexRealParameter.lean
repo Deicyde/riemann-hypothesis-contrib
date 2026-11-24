@@ -98,7 +98,7 @@ theorem even_rkV_iff (D : D7) (i j : ℕ) : Even (rkV D i j) ↔ Odd (i + j) := 
   have e : rkV D i j = 2 * (u + j * c + i * (u + 3)) + (1 + j + i) := by
     unfold rkV sLen; rw [hr, hc]; ring
   rw [e, Nat.even_add, Nat.odd_add]
-  simp only [even_two, Even.mul_right, true_iff, Nat.even_add, Nat.odd_add]
+  simp only [even_two, Even.mul_right, true_iff, Nat.even_add]
   simp only [Nat.odd_iff, Nat.even_iff]
   omega
 

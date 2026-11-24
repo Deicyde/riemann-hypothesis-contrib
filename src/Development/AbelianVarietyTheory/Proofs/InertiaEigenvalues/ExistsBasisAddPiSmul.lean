@@ -142,7 +142,7 @@ theorem _root_.GlobalTheory.WachTie.exists_invariant_basis
           = 1
             + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n)
               • LinearMap.toMatrix b b g := by
-      simp [f, map_add (f := _), LinearMap.toMatrix_id]
+      simp [f, map_add (f := _)]
     rw [hM, Pi.isUnit_iff]
     intro i
     rw [PowerSeries.isUnit_iff_constantCoeff]

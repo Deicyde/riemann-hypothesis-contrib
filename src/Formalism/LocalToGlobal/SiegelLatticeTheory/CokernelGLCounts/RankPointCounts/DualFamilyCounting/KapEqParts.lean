@@ -303,7 +303,8 @@ theorem inj_at
   have hdrec : ∀ a, d a = ∑ c, Δ c a • eV X v c := by
     intro a
     apply hJ_test (X.B.I.ε v) (fam X u v) (fam_span X u v)
-    rintro (b | b | j | ⟨⟩) <;> simp only [fam, Sum.elim_inl, Sum.elim_inr, hJsumr]
+    rintro (b | b | j | ⟨⟩)
+      <;> simp only [fam, Sum.elim_inl, Sum.elim_inr, _root_.Formalism.L2.SG.Pf.hJ_sum_right']
     · rw [hde a b]
       simp [fr_ee]
     · rw [← hΔ b a]
@@ -327,7 +328,7 @@ theorem inj_at
       refine Finset.sum_congr rfl fun c _ => ?_
       rw [Matrix.conjTranspose_apply, hαm]
     have t2 : hJ (X.B.I.ε v) (uMat (s v) *ᵥ fV X v b) (d a) = (αmᴴ * Δ) b a := by
-      rw [hdrec a, hJsumr, Matrix.mul_apply]
+      rw [hdrec a, _root_.Formalism.L2.SG.Pf.hJ_sum_right', Matrix.mul_apply]
       refine Finset.sum_congr rfl fun c _ => ?_
       rw [Matrix.conjTranspose_apply, hαm, hJswap (X.B.I.ε v) (eV X v c) (uMat (s v) *ᵥ fV X v b),
         mul_comm]

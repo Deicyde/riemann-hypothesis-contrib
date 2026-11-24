@@ -84,7 +84,7 @@ theorem phRat_of_serOf
                 → (O i).PhRat (κ i) (v₀ i (sg0 D A)) cc 1 := by
   intro D G _ _ Pl0 T0 A T _ R F κ v₀ hG hP' t O i hpins cc hser hex hequiv
   obtain ⟨hcc, hph, hs⟩ := hser
-  obtain ⟨τ⟩ : Nonempty D.what₂.Tau := ⟨D.eTau.symm ⟨1, by simp [Formalism.FrobeniusOrbits.Psi]⟩⟩
+  obtain ⟨τ⟩ : Nonempty D.what₂.Tau := ⟨D.eTau.symm ⟨1, by simp⟩⟩
   have hn : (κ i).n = (Vc D i).rank :=
     (t.kap i τ).2.2.trans (D.sp.V_rank _ (Nat.le_add_left _ _) i.2).symm
   refine GlobalTheory.PhaseRationalDegenerate.of_before_projector (O i) (κ i) _ cc hequiv hG.chiW

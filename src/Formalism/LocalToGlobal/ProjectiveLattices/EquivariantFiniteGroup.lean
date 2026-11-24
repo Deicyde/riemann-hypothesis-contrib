@@ -242,7 +242,7 @@ theorem pnorm_eq_of_unit
     (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (x : Frame X.Ψ r)
     (h : ∀ τ i, ‖dmin X.Gm x τ i‖ = 1)
     : X.pnorm la P x = ‖P x‖ := by
-  simp [Data.pnorm, norm_div, h]
+  simp [Data.pnorm, h]
 
 theorem L2Norm_le_sup_norm
     {X : Comp → Data E r}

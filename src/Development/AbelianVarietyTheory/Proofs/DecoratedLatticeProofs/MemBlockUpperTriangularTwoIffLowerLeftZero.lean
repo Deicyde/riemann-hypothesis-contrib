@@ -150,7 +150,7 @@ noncomputable def blockTriangularEquiv (r s : ℕ)
     by
       rw [mem_blockUpperTriangularTwo_iff_lowerLeft_zero]
       ext i j
-      simp [toSum, Matrix.toBlocks₂₁, val_mk']
+      simp [toSum, Matrix.toBlocks₂₁]
   ⟩
   left_inv g := by
     apply Subtype.ext
@@ -167,13 +167,13 @@ noncomputable def blockTriangularEquiv (r s : ℕ)
     refine Prod.ext (Units.ext ?_) (Prod.ext (Units.ext ?_) ?_)
     · show (toSum _).toBlocks₁₁ = _
       ext i j
-      simp [toSum, Matrix.toBlocks₁₁, val_mk']
+      simp [toSum, Matrix.toBlocks₁₁]
     · show (toSum _).toBlocks₂₂ = _
       ext i j
-      simp [toSum, Matrix.toBlocks₂₂, val_mk']
+      simp [toSum, Matrix.toBlocks₂₂]
     · show (toSum _).toBlocks₁₂ = _
       ext i j
-      simp [toSum, Matrix.toBlocks₁₂, val_mk']
+      simp [toSum, Matrix.toBlocks₁₂]
 
 theorem natCard_blockUpperTriangularTwo_finiteField (κ : Type) [Field κ] [Finite κ] (r s : ℕ)
     : Nat.card (Formalism.L2.DIV.blockTri (κ := κ) (Formalism.L2.DIV.blk2 (n := r + s) r))

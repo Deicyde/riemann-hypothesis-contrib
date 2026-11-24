@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_harmonicCoefficientMap_at_weights
     : ∀ (D : D7) (Q : Formalism.L2.Pj.Par D),
       Q.Pins
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.exists_harmonicCoefficientMap_at_weights
                   : VsV D i c'.F →ₗ[c'.F] MvPolynomial (LtN (Q.Dw ((i : ℕ) + 1)) (Vc D i).rank) c'.F)
                   (hw : VsV D i c'.F),
                 IoLFRec c' (fun τ => embF c' (tauE D τ)) (lamV D i) (wtA (κ i)) io hw := by
-  first
-  | exact @GlobalTheory.CoefMapRecord.exists_io_record
-  | exact GlobalTheory.CoefMapRecord.exists_io_record
-  | (intros; apply GlobalTheory.CoefMapRecord.exists_io_record <;> assumption)
+  first | exact @GlobalTheory.CoefMapRecord.exists_io_record

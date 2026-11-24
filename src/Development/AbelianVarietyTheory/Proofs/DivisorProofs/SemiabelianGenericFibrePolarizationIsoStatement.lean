@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU GlobalTheory.LN
+
 theorem _root_.GlobalTheory.T.semiabelian_generic_fibre_polarization_iso
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
       GlobalTheory.LN.admitted R (IsLocalRing.maximalIdeal R)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.semiabelian_generic_fibre_polarization_iso
                 → ∃ (D : DegData R (IsLocalRing.maximalIdeal R))
                     (U : Unif (IsLocalRing.maximalIdeal R) D A G),
                   U.LG = P.L ∧ U.gen = gen := by
-  first
-  | exact @GlobalTheory.SectionUnif.exists_unif_of_ne_zero
-  | exact GlobalTheory.SectionUnif.exists_unif_of_ne_zero
-  | (intros; apply GlobalTheory.SectionUnif.exists_unif_of_ne_zero <;> assumption)
+  first | exact @GlobalTheory.SectionUnif.exists_unif_of_ne_zero

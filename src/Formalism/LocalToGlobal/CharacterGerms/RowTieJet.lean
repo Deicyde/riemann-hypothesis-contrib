@@ -297,7 +297,7 @@ private theorem coeff_embDomain_rename_character_germs
   · intro y hy hne
     exfalso
     apply hne
-    simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq,
+    simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff,
         Finsupp.embDomain_eq_mapDomain]
       at hy
     exact Finsupp.mapDomain_injective e.injective hy
@@ -307,8 +307,7 @@ private theorem coeff_rename_eq_zero_of_ne_embDomain
     : MvPowerSeries.coeff x (MvPowerSeries.rename e F) = 0 := by
   rw [MvPowerSeries.coeff_rename]
   refine Finset.sum_eq_zero fun y hy => ?_
-  simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
-    at hy
+  simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff] at hy
   exact absurd (by rw [Finsupp.embDomain_eq_mapDomain]; exact hy) (hx y)
 
 theorem rtj_jet_rename (e : σ ↪ τ) (P : MvPolynomial σ K) (F : MvPowerSeries σ K)
@@ -323,7 +322,7 @@ theorem rtj_jet_rename (e : σ ↪ τ) (P : MvPolynomial σ K) (F : MvPowerSerie
     · intro y hy hne
       exfalso
       apply hne
-      simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq,
+      simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff,
           Finsupp.embDomain_eq_mapDomain]
         at hy
       exact Finsupp.mapDomain_injective e.injective hy
@@ -352,8 +351,7 @@ theorem rtj_serIn_rename (e : σ ↪ τ) (F : MvPowerSeries σ K)
   intro μ hμ
   rw [MvPowerSeries.coeff_rename] at hμ
   obtain ⟨y, hy, -⟩ := Finset.exists_ne_zero_of_sum_ne_zero hμ
-  simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
-    at hy
+  simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff] at hy
   subst hy
   intro i hi
   obtain ⟨j, -, rfl⟩ := Finset.mem_image.mp (Finsupp.mapDomain_support hi)

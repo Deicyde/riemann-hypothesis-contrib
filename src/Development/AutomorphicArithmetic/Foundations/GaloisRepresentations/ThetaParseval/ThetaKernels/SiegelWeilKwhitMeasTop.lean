@@ -46,8 +46,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix
@@ -82,7 +80,7 @@ theorem meas_herm_top'_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ)
     inferInstanceAs (LocallyCompactSpace (Fin d.n → Fin d.n → AF F ⊗[F] E))
   haveI : SecondCountableTopology (Matrix (Fin d.n) (Fin d.n) (AF F ⊗[F] E)) :=
     inferInstanceAs (SecondCountableTopology (Fin d.n → Fin d.n → AF F ⊗[F] E))
-  haveI : Countable E := meas_countableE
+  haveI : Countable E := _root_.Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableE
   haveI : Countable (Matrix (Fin d.n) (Fin d.n) E) := inferInstanceAs (Countable (Fin d.n → Fin d.n → E))
   refine ⟨
     inferInstance,
@@ -122,7 +120,7 @@ theorem meas_mx_top'_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ)
   haveI := hSC'
   haveI := hT2'
   haveI : BorelSpace (AE F E) := ⟨rfl⟩
-  haveI : Countable E := meas_countableE
+  haveI : Countable E := _root_.Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableE
   haveI : Countable (Matrix (Fin d.m) (Fin d.n) E) := inferInstanceAs (Countable (Fin d.m → Fin d.n → E))
   refine ⟨
     inferInstance,

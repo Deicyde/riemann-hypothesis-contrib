@@ -105,7 +105,7 @@ theorem zOf_ker
       tensorBasis_repr_zOf, tensorBasis_repr_zOf, tensorBasis_repr_zOf, smul_eq_mul]
     have hck := congrArg (fun t : v.adicCompletionIntegers F => (t : Fv F v)) (hc (0, k))
     push_cast at hck
-    first | rw [hck] | (congr 1; exact hck) | simpa using congrArg _ hck
+    first | rw [hck]
   · rintro ⟨y, hy, hyeq⟩ ⟨i, k⟩
     obtain rfl : i = 0 := Subsingleton.elim _ _
     have hk := congrArg (fun x => (Algebra.TensorProduct.basis (Fv F v) b).repr x k) hyeq

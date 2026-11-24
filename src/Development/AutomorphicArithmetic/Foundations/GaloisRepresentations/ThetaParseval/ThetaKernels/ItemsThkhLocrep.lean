@@ -47,8 +47,6 @@ import Development.WeilBound.CoreStatements.CompactAveragingSplitting.Eigenvecto
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace PositivityTheory.ThKH.Locrep

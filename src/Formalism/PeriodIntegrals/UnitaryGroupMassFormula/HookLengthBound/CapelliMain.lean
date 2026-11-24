@@ -77,9 +77,9 @@ theorem Pn_succ
         - ∑ j : Fin k, if w j.succ = g 0 then
             Pn x d (Function.update (fun i => w i.succ) j (w 0)) (fun i => g i.succ) else 0 := by
   have h := E_Pn x d hxx hdx (fun i => w i.succ) (fun i => g i.succ) (w 0) (g 0)
-  have hw : (Fin.cons (w 0) (fun i => w i.succ) : Fin (k + 1) → I) = w := Fin.cons_self_tail w
-  have hg : (Fin.cons (g 0) (fun i => g i.succ) : Fin (k + 1) → I) = g := Fin.cons_self_tail g
-  rw [hw, hg] at h
+  rw [show (Fin.cons (w 0) (fun i => w i.succ) : Fin (k + 1) → I) = w from Fin.cons_self_tail w,
+      show (Fin.cons (g 0) (fun i => g i.succ) : Fin (k + 1) → I) = g from Fin.cons_self_tail g]
+    at h
   rw [h]
   abel
 
@@ -221,7 +221,6 @@ theorem capelli_absolute_value : CapAbsMain := by
         rw [← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun σ _ => ?_
         rw [← smul_add, D_succ x d hxx hdx, add_assoc]
-      _ = 0 + 0 := congrArg₂ (· + ·) h1 h2
-      _ = 0 := add_zero 0
+      _ = 0 := by rw [h1, h2, add_zero]
 
 end PI.HookSteps.Cap

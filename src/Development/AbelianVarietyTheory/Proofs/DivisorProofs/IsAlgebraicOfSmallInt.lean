@@ -62,8 +62,6 @@ open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.SerRefCore
 
 variable {D : D7}
@@ -258,7 +256,7 @@ theorem algComb_of_ratScalar
         : coefFn (embLL0 D) (ρ.B i j b).w.lam (G : Pol ↥D.LL0 D.what₂.Tau (Vc D j).rank)
           ∈ (harm (Wc D j).rank (ρ.B i j b).w (ρ.B i j b).F.BS).map
             (harmFn (Wc D j).rank (ρ.B i j b).w (ρ.B i j b).F.BS) := by
-      rw [GlobalTheory.T.fockHarmonicValueSpace_map_eq_dualWeylModuleFunctions D _ _ _ _ hB.wt hm]
+      rw [_root_.GlobalTheory.ExportSeries.Onto.map_harm_eq D _ _ _ _ hB.wt hm]
       exact Submodule.subset_span
         ⟨GlobalTheory.CoefModel.mapVV (embLL0 D) _ G, (Scale.coefFn_map _ _ _).symm⟩
     exact h3

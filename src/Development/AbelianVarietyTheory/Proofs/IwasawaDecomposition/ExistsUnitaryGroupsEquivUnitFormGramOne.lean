@@ -51,6 +51,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
   GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
+
 noncomputable section
 
 namespace GlobalTheory.Mem.R3.LiftBrg.StdGroups
@@ -60,13 +61,13 @@ theorem castGL_bc
     : castGL h (Formalism.UG.bc f x) = Formalism.UG.bc f (castGL h x) := by
   subst h
   ext i j
-  simp [castGL, Formalism.UG.bc, Matrix.reindexAlgEquiv_apply]
+  simp [castGL, Formalism.UG.bc]
 
 theorem castGL_symm_castGL' {A : Type} [CommRing A] {m n : ℕ} (h : m = n) (x : GL (Fin m) A)
     : castGL h.symm (castGL h x) = x := by
   subst h
   ext i j
-  simp [castGL, Matrix.reindexAlgEquiv_apply]
+  simp [castGL]
 
 theorem castGL_mem_UJ_one
     {A : Type} [CommRing A]
@@ -77,7 +78,7 @@ theorem castGL_mem_UJ_one
   subst h
   have e : castGL (rfl : m = m) x = x := by
     ext i j
-    simp [castGL, Matrix.reindexAlgEquiv_apply]
+    simp [castGL]
   rwa [e]
 
 theorem bc_injective
@@ -180,10 +181,8 @@ def psiQ (X : Stages) (i : Fin X.toD7.R.m) (hg : (Vc X.toD7 i).gram = 1)
           : HR (AF X.toD7.host.F) X.toD7.sp.cm.sig (Vc X.toD7 i).gram)),
       Subgroup.mem_subgroupOf.2 ⟨_, hm, rfl⟩
     ⟩
-  map_one' :=
-    Subtype.ext (Subtype.ext (by first | rfl | (simp only [map_one]; rfl) | (simp <;> rfl)))
-  map_mul' a b :=
-    Subtype.ext (Subtype.ext (by first | rfl | (simp only [map_mul]; rfl) | (simp <;> rfl)))
+  map_one' := Subtype.ext (Subtype.ext (by first | (simp only; rfl) | (simp <;> rfl)))
+  map_mul' a b := Subtype.ext (Subtype.ext (by first | (simp only; rfl) | (simp <;> rfl)))
 
 theorem psiQ_mat
     (X : Stages) (i : Fin X.toD7.R.m)

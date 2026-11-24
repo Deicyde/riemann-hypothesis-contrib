@@ -1,8 +1,8 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicHaarMeasureScalingStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopologyStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicHaarMeasureScaling
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopology
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -159,7 +159,7 @@ theorem measurePreserving_transvection
     · subst hk
       simp [transvection, add_mulVec, single_mulVec, hij.symm]
     · simp [transvection, add_mulVec, single_mulVec, hk, hij.symm]
-  simp only [Function.comp_apply, hup]
+  simp only [hup]
   exact lintegral_add_right_eq_self
     (fun xᵢ ↦ Set.indicator (Set.univ.pi s) 1 (Function.update x i xᵢ))
     (c * x j)
@@ -200,8 +200,9 @@ theorem pi_scale
                     = lf ((fun x => (a : A F) * x) '' Oh F) ^ Fintype.card ι
                       * (Measure.pi fun _ : ι => lf) s := by
   intro F _ _ _ _ lf hH h1 ι _ _
-  obtain ⟨hlc, hsc, ht2, hOc, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
-  obtain ⟨hF, -, hU⟩ := GlobalTheory.T.adelic_haar_measure_scaling F lf hH h1
+  obtain ⟨hlc, hsc, ht2, hOc, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
+  obtain ⟨hF, -, hU⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.Scale.lf_scale F lf hH h1
   haveI := hlc
   haveI := hsc
   haveI := ht2

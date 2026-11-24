@@ -161,7 +161,7 @@ theorem relAmple_of_geometricFibres
   let g := algebraMap Γ(S, V) p.asIdeal.ResidueField
   let i := algebraMap p.asIdeal.ResidueField (AlgebraicClosure p.asIdeal.ResidueField)
   obtain ⟨r, hr, hA⟩ :=
-    GlobalTheory.T.relAmple_near_fibre_flat_projective Γ(S, V) (Over.mk (pullback.snd P.A.hom t))
+    _root_.GlobalTheory.AmpleNear.relAmple_near_fibre Γ(S, V) (Over.mk (pullback.snd P.A.hom t))
       (M.pull (pullback.fst P.A.hom t)) (inferInstanceAs (Flat (pullback.snd P.A.hom t)))
       (AmpleBaseChange.isProjBy_smooth_isProper_geometricallyIntegral S P.A P.L P.isAb P.isLB
         P.ample _ t _ _ _ hB).1

@@ -84,9 +84,11 @@ lemma urepHom_mem_unitary {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H
 theorem uRepHom : URepHomStatement := by
   intro n ε H _ _ _ σ hσ
   have hmem : ∀ k : KG ε, toMK k ∈ Kset ε := fun k => k.2
-  refine ⟨{ toFun := fun k => ⟨σ (toMK k), urepHom_mem_unitary hσ k⟩
-            map_one' := ?_
-            map_mul' := ?_ }, ?_, fun k => rfl⟩
+  refine ⟨
+    { toFun := fun k => ⟨σ (toMK k), urepHom_mem_unitary hσ k⟩, map_one' := ?_, map_mul' := ?_ },
+    ?_,
+    fun k => rfl
+  ⟩
   · apply Subtype.ext
     show σ (toMK (1 : KG ε)) = 1
     rw [urepHom_toMK_one, hσ.1.1]
@@ -95,8 +97,7 @@ theorem uRepHom : URepHomStatement := by
     show σ (toMK (k * k')) = σ (toMK k) * σ (toMK k')
     rw [urepHom_toMK_mul]
     exact hσ.1.2 _ (hmem k) _ (hmem k')
-  · have hc : Continuous (fun k : KG ε => toMK k) := by
-      fun_prop
+  · have hc : Continuous (fun k : KG ε => toMK k) := by fun_prop
     have hop : Continuous (fun k : KG ε => σ (toMK k)) := by
       refine continuous_clm_apply.2 fun v => ?_
       exact (hσ.2.2 v).comp_continuous hc hmem

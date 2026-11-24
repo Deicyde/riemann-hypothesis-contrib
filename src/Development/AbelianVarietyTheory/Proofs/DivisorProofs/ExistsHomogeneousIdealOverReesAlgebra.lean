@@ -110,7 +110,7 @@ theorem piece_C_mul (e : ℕ) (r : reesAlgebra I) (F : MvPolynomial σ (reesAlge
       = ∑ p ∈ Finset.HasAntidiagonal.antidiagonal e, C ((r : Polynomial R).coeff p.1) * piece I p.2 F :=
   by
     ext m
-    simp [coeff_sum, coeff_C_mul, Polynomial.coeff_mul]
+    simp [coeff_C_mul, Polynomial.coeff_mul]
 
 theorem piece_isHomogeneous
     (e : ℕ) {d : ℕ} {F : MvPolynomial σ (reesAlgebra I)} (hF : F.IsHomogeneous d)

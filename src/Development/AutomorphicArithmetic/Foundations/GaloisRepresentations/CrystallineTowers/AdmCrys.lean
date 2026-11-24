@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFinExt
 
 @[expose] public section
 
@@ -148,7 +149,7 @@ private theorem isCrys_of_mats
   have hB' : B'.map P.ιB = B := Matrix.ext fun i j => hc i j
   have hinj
       : Function.Injective (fun X : Matrix (Fin d) (Fin d) P.R.B => X.map P.ιB) := fun X Y h =>
-    Matrix.ext fun i j => GlobalTheory.PMon.iota_injective P (congrFun (congrFun h i) j)
+    Matrix.ext fun i j => _root_.GlobalTheory.MemLoc.FitsEx.iota_inj P (congrFun (congrFun h i) j)
   have hmapmul : ∀ X Y : Matrix (Fin d) (Fin d) P.R.B, (X * Y).map P.ιB = X.map P.ιB * Y.map P.ιB :=
     fun X Y => Matrix.map_mul (f := (P.ιB : P.R.B →+* P.R.BdR))
   have h1 : A' * B' = 1 :=

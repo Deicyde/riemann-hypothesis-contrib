@@ -55,9 +55,6 @@ open Formalism.IndefR.Links (PolF)
 open Formalism.L2.NTheta (IsIdemAt)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.ExportSeries
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

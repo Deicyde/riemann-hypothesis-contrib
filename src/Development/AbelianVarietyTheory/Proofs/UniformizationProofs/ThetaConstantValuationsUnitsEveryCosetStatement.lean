@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.theta_constant_valuations_units_every_coset
     : LL → TwistBCSpanStatement → TWM.VRatioGtStatement → TWStatement → UUStatement
       → AllUV fun {V} _ _ _ {ϖ} hϖ {D} Q {F} _ _ {v} hv {A} {G} _ _ U =>
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.theta_constant_valuations_units_every_coset
                                 p'.y = 0 ∧ QkToAkU U.toUnifPre F (m ^ 2) p' x'
                                   ∧ (x' ^ m * (x ^ m)⁻¹) ^ n = 1 ∧ ThC A ρ m th x' t c
                                   ∧ v c = 0 := by
-  first
-  | exact @GlobalTheory.UT.ThetaConstVal.main
-  | exact GlobalTheory.UT.ThetaConstVal.main
-  | (intros; apply GlobalTheory.UT.ThetaConstVal.main <;> assumption)
+  first | exact @GlobalTheory.UT.ThetaConstVal.main

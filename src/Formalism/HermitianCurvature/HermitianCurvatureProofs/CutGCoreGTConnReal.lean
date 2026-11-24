@@ -402,7 +402,6 @@ theorem dZb_cont {F : ℂ → ℂ} (hF : ContDiff ℝ 1 F) : Continuous (NF.dZb 
   exact continuous_const.mul ((c.clm_apply continuous_const).add
     (continuous_const.mul (c.clm_apply continuous_const)))
 
-
 theorem gauge_reality_holds : GTCReal := by
   intro Wp Wq _ _ _ _ _ _ P Bs X d hH e he hk A Bf hAB hC ρ ζ0 hζ0
   classical
@@ -654,6 +653,6 @@ end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.SSReal
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
-theorem gauge_reality_holds : GTCReal := SSReal.gauge_reality_holds
+alias gauge_reality_holds := _root_.Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.SSReal.gauge_reality_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC

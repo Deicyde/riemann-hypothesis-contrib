@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -47,6 +48,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
   GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.refine_polarised_monomial_periods_monomial_data
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (Q : Data R) (m : ℕ) (t : Fin m → R)
         (δ : Fin m → LinearMap.BilinForm ℤ Q.X),
@@ -58,7 +60,4 @@ theorem _root_.GlobalTheory.T.refine_polarised_monomial_periods_monomial_data
             ∧ Refines Q ρ D.toPre e
             ∧ IsMonomial D.toPre r fun i =>
               (2 : ℤ) • pull e.toIntLinearEquiv.toLinearMap (δ i) := by
-  first
-  | exact @GlobalTheory.PolDeg.refine_monomial_of_polarised
-  | exact GlobalTheory.PolDeg.refine_monomial_of_polarised
-  | (intros; apply GlobalTheory.PolDeg.refine_monomial_of_polarised <;> assumption)
+  first | exact @GlobalTheory.PolDeg.refine_monomial_of_polarised

@@ -105,12 +105,6 @@ theorem hT_Hp_UUE
   rw [hT_swap v h, Formalism.L2.SG.NGCut.CorankRelation.hT_eq_zero_of_mem_Hp Λ F F' hh hv,
     star_zero]
 
-theorem hT_UUE_Hp
-    (Λ : Submodule (NumberField.RingOfIntegers E) S.V) (F : LFlag S r T) (F' : LFlag S r T')
-    {h v : S.V} (hh : h ∈ Hp Λ F F') (hv : v ∈ UUE Λ F F')
-    : S.hT v h = 0 :=
-  Formalism.L2.SG.NGCut.CorankRelation.hT_eq_zero_of_mem_Hp Λ F F' hh hv
-
 theorem hT_X_yv (F : FlagG S r T) (F' : FlagG S r T') {x : S.V} (hx : x ∈ F.X)
     : S.hT x (yv F F') = 0 := by
   have hker : F.X ≤ LinearMap.ker (S.hT (yv F F')) := by
@@ -181,9 +175,11 @@ theorem line_pair
     refine Formalism.L2.SG.NGCut.NormalVectorPairings.line Fl.fl hT (Hp Λ Fl F1) ?_ ?_ ?_ ?_ ?_ hb1
       ?_ ?_
     · intro x hx h hh
-      exact hT_UUE_Hp Λ Fl F1 hh (X_le_UUE Λ hΛ Fl F1 hL hL1 hx)
+      exact _root_.Formalism.L2.SG.NGCut.CorankRelation.hT_eq_zero_of_mem_Hp Λ Fl F1 hh
+        (X_le_UUE Λ hΛ Fl F1 hL hL1 hx)
     · intro h hh
-      exact hT_UUE_Hp Λ Fl F1 hh (z_mem_UUE Λ hΛ.toIsLattice Fl F1 hL hL1)
+      exact _root_.Formalism.L2.SG.NGCut.CorankRelation.hT_eq_zero_of_mem_Hp Λ Fl F1 hh
+        (z_mem_UUE Λ hΛ.toIsLattice Fl F1 hL hL1)
     · intro x hx hxH
       exact Formalism.L2.SG.NGCut.CorankRelation.Xsp_Hp_eq_zero Λ hΛ Fl F1 hL hL1 hG1 hx hxH
     · omega

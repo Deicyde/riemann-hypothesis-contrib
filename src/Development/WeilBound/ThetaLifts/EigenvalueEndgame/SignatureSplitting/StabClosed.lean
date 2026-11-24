@@ -63,14 +63,6 @@ variable
   {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {d d₁ : ℕ} {W : Spc F E d} {W₁ : Spc F E d₁} {H : Plane E d d₁}
 
-theorem inc_inj : Function.Injective (inclR (F := F) (E := E) (AF F)) := by
-  have : Nontrivial (AF F) :=
-    inferInstanceAs (Nontrivial (InfiniteAdeleRing F × FiniteAdeleRing (𝓞 F) F))
-  have : Nontrivial (AE F E) :=
-    Algebra.TensorProduct.nontrivial_of_algebraMap_injective_of_flat_left F _ _
-      (algebraMap F E).injective
-  exact RingHom.injective _
-
 theorem rat_iff {J : Matrix (Fin d) (Fin d) E} (g : UA σ J)
     : g ∈ ratU σ J ↔ ∃ A, mat g = incM F A := by
   refine ⟨fun ⟨A, h⟩ => ⟨A.1, (congrArg Units.val h).symm⟩, fun ⟨A, h⟩ => ?_⟩
@@ -79,7 +71,8 @@ theorem rat_iff {J : Matrix (Fin d) (Fin d) E} (g : UA σ J)
     rw [Matrix.det_mul, h, incM, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero,
         zero_mul, Matrix.det_one]
       at this
-    exact zero_ne_one (inc_inj (F := F) (E := E) (by rw [map_zero, map_one, this]))
+    exact zero_ne_one (_root_.PositivityTheory.ThKF.inclR_inj (F := F) (E := E)
+      (by rw [map_zero, map_one, this]))
   exact ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero A h1, Units.ext h.symm⟩
 
 theorem cont_hom
@@ -121,7 +114,7 @@ theorem conj_unipU
         obtain ⟨u', a, b⟩ := h2 u hu
         have b' := inv_vec b
         rw [inv_inv] at b'
-        refine inc_inj (F := F) ?_
+        refine _root_.PositivityTheory.ThKF.inclR_inj (F := F) ?_
         rw [← fa_inc, ← e, ← b', fa_mat, fa_inc, hz u' a]
     rw [e]
     conv => enter [2, 2]; rw [← inv_vec e]

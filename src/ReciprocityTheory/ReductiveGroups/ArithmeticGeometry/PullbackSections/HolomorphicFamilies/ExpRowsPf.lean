@@ -87,10 +87,7 @@ theorem dual_top_le
     : ⊤ ≤ W := by
   intro x _
   have hs : (x : PrimeSpectrum (DualNumber ℂ)) ⤳ IsLocalRing.closedPoint (DualNumber ℂ) := by
-    first
-    | exact IsLocalRing.specializes_closedPoint _
-    | exact (PrimeSpectrum.le_iff_specializes _ _).1
-        (IsLocalRing.le_maximalIdeal (x : PrimeSpectrum (DualNumber ℂ)).2.ne_top)
+    first | exact IsLocalRing.specializes_closedPoint _
   exact hs.mem_open W.isOpen hW
 
 theorem fst_appLE
@@ -112,7 +109,7 @@ theorem fst_appLE
   have key := specMap_comp_appLE (CommRingCat.ofHom (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom) v U h0 h
   rw [← hh he h0 hU]
   have key2 := congrArg (fun φ => φ.hom f) key
-  first | exact key2.symm | simpa using key2.symm
+  first | exact key2.symm
 
 theorem tangent_open_preimage_zero
     {e : (Fin g → ℂ) → (Sp ℂ ⟶ Y)} {w : Fin g → ℂ} {v : Sp (DualNumber ℂ) ⟶ Y}
@@ -125,7 +122,7 @@ theorem tangent_open_preimage_zero
     h (show (spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom).base x
         ∈ (⊤ : (Sp (DualNumber ℂ)).Opens) from
       trivial)
-  first | exact hx | (simp only [Scheme.Hom.mem_preimage, Scheme.comp_base_apply] at hx ⊢; exact hx)
+  first | exact hx
 
 theorem isDerivAt0_unique
     {e : (Fin g → ℂ) → (Sp ℂ ⟶ Y)} {w : Fin g → ℂ} {v v' : Sp (DualNumber ℂ) ⟶ Y}
@@ -160,10 +157,7 @@ theorem isDerivAt0_comp_hom
   simp only [← valAt'_comp]
   rw [← key]
   have hc : (v ≫ φ).appLE U ⊤ h = φ.app U ≫ v.appLE (φ ⁻¹ᵁ U) ⊤ h' := by
-    first
-    | exact Scheme.comp_appLE v φ U ⊤ h
-    | exact Scheme.Hom.comp_appLE v φ U ⊤ h
-    | simp [Scheme.Hom.appLE]
+    first | exact Scheme.Hom.comp_appLE v φ U ⊤ h
   rw [hc]
   rfl
 
@@ -189,9 +183,7 @@ theorem isDerivAt0_smul
           : (spMap (epsMul cc)).base (IsLocalRing.closedPoint (DualNumber ℂ))
             = IsLocalRing.closedPoint (DualNumber ℂ) :=
         IsLocalRing.comap_closedPoint (epsMul cc)
-      first
-      | (rw [← hc]; exact hx)
-      | (simp only [Scheme.Hom.mem_preimage, Scheme.comp_base_apply] at hx ⊢; rwa [hc] at hx)
+      first | (rw [← hc]; exact hx)
     have hq : ⊤ ≤ v ⁻¹ᵁ U := dual_top_le _ hp
     have key :=
       congrArg (fun φ => φ.hom f) (specMap_comp_appLE (CommRingCat.ofHom (epsMul cc)) v U h hq)
@@ -200,7 +192,7 @@ theorem isDerivAt0_smul
     rw [map_smul, ← hd]
     show TrivSqZeroExt.snd (((spMap (epsMul cc) ≫ v).appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of (DualNumber ℂ))).hom).hom f) = _
     rw [key]
-    first | simp [epsMul] | rfl
+    first | simp [epsMul]
 
 theorem isDerivAt0_comp_lin
     {e : (Fin g → ℂ) → (Sp ℂ ⟶ Y)} (hol : IsHolFam e)
@@ -247,7 +239,7 @@ theorem derivAt_over
     : v ≫ Xo.univ.t.G.hom = spMap (algebraMap ℂ (DualNumber ℂ)) ≫ F.u i P := by
   obtain ⟨v0, hv0, -⟩ := (F.ex_diff i P hP).1 w
   rw [isDerivAt0_unique hv hv0, Over.w v0]
-  first | rfl | simp [epsPt]
+  first | rfl
 
 end Tan
 

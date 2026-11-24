@@ -51,6 +51,7 @@ open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doublin
   PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.schwartz_function_schwartz_bruhat
     : ∀ (D : D7) (θ : InfFam D),
       IsInfFam θ
@@ -58,11 +59,4 @@ theorem _root_.GlobalTheory.T.schwartz_function_schwartz_bruhat
           φ ∈ schwartzA θ m r
             → GlobalTheory.Published.SiegelOneVector.IsSchwartzBruhat (F := D.host.F)
               (E := D.host.E) (fun X : Fin r → Fin m → AE D => φ (tupOf X)) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.SiegelND.isSchwartzBruhat_tupOf_of_mem_schwartzA
-  | exact GlobalTheory.CompanionTheory.SiegelND.isSchwartzBruhat_tupOf_of_mem_schwartzA
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.SiegelND.isSchwartzBruhat_tupOf_of_mem_schwartzA
-        <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.SiegelND.isSchwartzBruhat_tupOf_of_mem_schwartzA

@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_framedPoint_baseChange_algHom
     : Laws
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_framedPoint_baseChange_algHom
           [CommRing T] [Algebra c.F T] (ψ : S →ₐ[c.F] T) (y : FrPt Xo c S),
         ∃ z : FrPt Xo c T,
           FrMap ψ y z := by
-  first
-  | exact @GlobalTheory.FramedBaseChange.exists_frMap
-  | exact GlobalTheory.FramedBaseChange.exists_frMap
-  | (intros; apply GlobalTheory.FramedBaseChange.exists_frMap <;> assumption)
+  first | exact @GlobalTheory.FramedBaseChange.exists_frMap

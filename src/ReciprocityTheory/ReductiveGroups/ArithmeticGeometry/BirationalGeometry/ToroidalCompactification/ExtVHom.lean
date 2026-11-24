@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Splits
 
 @[expose] public section
 
@@ -112,13 +113,6 @@ theorem gm_div_pull_g
   rw [Category.id_comp]
   exact gm_res_mul_inv_res f y _ _ h1 _ _
 
-private theorem pullU_res_eq_res_preimage_mono
-    {A B : Scheme.{0}} (g : A ⟶ B) {U V : B.Opens} (h : V ≤ U) (u : Γ(B, U)ˣ)
-    : pullU g V (res h u) = res (g.preimage_mono h) (pullU g U u) := by
-  apply Units.ext
-  have := congrArg (fun φ => φ.hom u.val) (g.naturality (homOfLE h).op)
-  simpa [pullU, res] using this
-
 private theorem res_res_eq_res_trans'
     {Z : Scheme.{0}} {U V W : Z.Opens} (h₁ : V ≤ U) (h₂ : W ≤ V) (a : Γ(Z, U)ˣ)
     : res h₂ (res h₁ a) = res (h₂.trans h₁) a := by
@@ -154,8 +148,9 @@ private theorem res_pullU_res_mul_inv_res
     (a : Γ(X, U₁)ˣ) (b : Γ(X, U₂)ˣ)
     : res h0 (pullU f W (res h₁ a * (res h₂ b)⁻¹))
       = res k₁ (pullU f U₁ a) * (res k₂ (pullU f U₂ b))⁻¹ := by
-  rw [map_mul, map_inv, pullU_res_eq_res_preimage_mono, pullU_res_eq_res_preimage_mono, map_mul,
-    map_inv, res_res_eq_res_trans', res_res_eq_res_trans']
+  rw [map_mul, map_inv, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.pullU_res₂,
+    _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.pullU_res₂, map_mul, map_inv,
+    res_res_eq_res_trans', res_res_eq_res_trans']
 
 theorem divPullGen_isGen
     {L M : LB X}
@@ -187,7 +182,7 @@ theorem divPullGen_isGen
     _ * res _ (res _ (b.s _) * (res _ (a.s _))⁻¹)
   rw [hG, map_mul, map_inv, map_mul, map_inv, res_res_eq_res_trans', res_res_eq_res_trans',
     res_res_eq_res_trans', res_res_eq_res_trans', hb', ha']
-  first | (simp only [mul_inv_rev]; ac_rfl) | (simp [mul_comm, mul_assoc, mul_left_comm]; done)
+  first | (simp only [mul_inv_rev]; ac_rfl)
 
 end DivPull
 
@@ -329,7 +324,7 @@ private theorem pullU_pullU_eq_pullU_comp
     {X Y Z : Scheme.{0}} (b : Z ⟶ Y) (a : Y ⟶ X) (W : X.Opens) (u : Γ(X, W)ˣ)
     : pullU b (a ⁻¹ᵁ W) (pullU a W u) = pullU (b ≫ a) W u := by
   apply Units.ext
-  first | (simp [pullU]; done) | (simp [pullU]; rfl) | rfl
+  first | (simp [pullU]; done) | (simp [pullU]; rfl)
 
 private theorem res_pullU_eq_of_eq
     {P Z : Scheme.{0}} (C C' : P ⟶ Z) (h : C = C') (W : Z.Opens) (u : Γ(Z, W)ˣ)
@@ -357,18 +352,20 @@ theorem rigPullOf_isGen
         ≤ e ⁻¹ᵁ ((L.pull (eSec G)).U (fun _ => i ⟨⟩ ⟨⟩) ⊓ (L.pull (eSec G)).U (fun _ => j ⟨⟩ ⟨⟩)) :=
     le_inf (inf_le_left.trans (rigPull_le F e he L i)) (inf_le_right.trans (rigPull_le F e he L j))
   have hr' := congrArg (fun x => res hV (pullU e _ x)) (hr (fun _ => i ⟨⟩ ⟨⟩) (fun _ => j ⟨⟩ ⟨⟩))
-  simp only [map_mul, pullU_res_eq_res_preimage_mono, res_res_eq_res_trans'] at hr'
+  simp only [map_mul, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.pullU_res₂,
+      res_res_eq_res_trans']
+    at hr'
   have hG
       : res hV (pullU e _ ((L.pull (eSec G)).g (fun _ => i ⟨⟩ ⟨⟩) (fun _ => j ⟨⟩ ⟨⟩)))
         = ((L.pull F).pull (eSec G')).g i j := by
     rw [pull_g_eq_res_pullU_g (P := L) (eSec G) _ _
         (pull_U_inf_le_preimage_inf (P := L) (eSec G) _ _),
-      pullU_res_eq_res_preimage_mono, res_res_eq_res_trans',
+      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.pullU_res₂, res_res_eq_res_trans',
       pull_g_eq_res_pullU_g (P := L.pull F) (eSec G') i j
         (pull_U_inf_le_preimage_inf (P := L.pull F) (eSec G') i j),
       pull_g_eq_res_pullU_g (P := L) F (i ⟨⟩) (j ⟨⟩)
         (pull_U_inf_le_preimage_inf (P := L) F (i ⟨⟩) (j ⟨⟩)),
-      pullU_res_eq_res_preimage_mono, res_res_eq_res_trans']
+      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.pullU_res₂, res_res_eq_res_trans']
     exact res_pullU_pullU_eq_of_comp_eq e (eSec G) (eSec G') F he.symm _ _ _ _
   rw [hG] at hr'
   first
@@ -383,10 +380,6 @@ theorem rigPullOf_isGen
                 ≤ ((L.pull F).pull (eSec G')).U j)]
         at hr'
       exact hr'
-    )
-  | (
-      refine (res_res_eq_res_trans' _ _ _).trans (hr'.trans ?_)
-      exact congrArg (fun x => _ * x) (res_res_eq_res_trans' _ _ _).symm
     )
 
 end RigPull
@@ -424,7 +417,7 @@ theorem gm_rigPullOf
     (hz : g z ∈ ((L.pull F).pull (eSec G')).U j)
     : gm g z _ ((rigPullOf F e he L r).s j) = gm (g ≫ e) z _ (r.s (fun _ => j ⟨⟩ ⟨⟩)) := by
   refine (gm_res g z _ hz _).trans (gm_pull g e z _ ?_ _)
-  first | exact rigPull_le F e he L j hz | exact (rigPull_le F e he L j) hz
+  first | exact rigPull_le F e he L j hz
 
 end GermsRig
 

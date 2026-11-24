@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.EqOrEqN
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsPosNatMemFractionalIdeal
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsRankOneCuspLatticeDataOfPrincipal
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.IsIntegralLevelMulKappa
+public import Development.AbelianVarietyTheory.Definitions.RegularCharts.BaseNorm
+public import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrincipalLevelArithmeticGroupsContainCongruence
 import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.TraceFormIntegralPerfectOfIsUnf
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrincipalLevelArithmeticGroupsContainCongruenceStatement
 import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.FactPrincipalDatum
 import Formalism.LocalToGlobal.ProjectiveLattices.HostInt
 import Mathlib.Algebra.Order.Floor.Extended
@@ -133,8 +135,7 @@ theorem exists_dataX_transv
                               (γ : Matrix (Fin D.R.r) (Fin D.R.r) D.host.E).map τ.1
                                 = Xx.flowMat v τ ((M : ℂ) * τ.1 b) := by
   intro D j H Dw l Xo c U dict h σ hσ k
-  have hP :=
-    GlobalTheory.T.principalLevel_arithmeticGroups_contain_congruence D j H Dw l Xo c U dict h σ hσ
+  have hP := _root_.GlobalTheory.LevGeo.hasPrinc_laws D j H Dw l Xo c U dict h σ hσ
   have hN : 0 < Ideal.absNorm D.host.ccK :=
     Nat.pos_of_ne_zero fun h0 => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
   have hd : 0 < D.host.d := by have := D.host.qd_big.2; omega

@@ -53,6 +53,7 @@ open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 open GlobalTheory.LN
+
 theorem _root_.GlobalTheory.T.exists_degData_psi_of_section_nonzero_fibres
     : Laws → Laws2 → Ega
       → ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (I : Ideal R),
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.exists_degData_psi_of_section_nonzero_fibres
                           (hD : IsPullDeg φ (withPsi D psi h) D'.toPre),
                         Dd.toPre = withPsi D psi h ∧ hD.e.hom.left ≫ pullback.fst _ _ = C.β
                           ∧ HEq hD.w C.v ∧ hD.xe = C.xe := by
-  first
-  | exact @GlobalTheory.PsiRing.exists_degData_of_thetaNZ
-  | exact GlobalTheory.PsiRing.exists_degData_of_thetaNZ
-  | (intros; apply GlobalTheory.PsiRing.exists_degData_of_thetaNZ <;> assumption)
+  first | exact @GlobalTheory.PsiRing.exists_degData_of_thetaNZ

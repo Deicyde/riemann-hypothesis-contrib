@@ -50,8 +50,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 
 namespace Formalism.IndefR.Mi
 
-
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {A T : HSp D} {ι : A.V →ₗ[D.host.E] T.V}

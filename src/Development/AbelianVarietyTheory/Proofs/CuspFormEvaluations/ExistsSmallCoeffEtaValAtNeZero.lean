@@ -65,34 +65,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.EtaForm
 
-private theorem frMap_id_self
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {S : Type}
-    [CommRing S] [Algebra c.F S]
-    (y : FrPt Xo c S)
-    : FrMap (AlgHom.id c.F S) y y := by
-  have eid : spMap (AlgHom.id c.F S).toRingHom = 𝟙 (Sp S) := Spec.map_id _
-  have did : spMap (dualMap (AlgHom.id c.F S).toRingHom) = 𝟙 _ := by
-    have : dualMap (AlgHom.id c.F S).toRingHom = RingHom.id _ :=
-      RingHom.ext fun x => by ext <;> simp [dualMap]
-    rw [this]
-    exact Spec.map_id _
-  refine ⟨
-    by rw [eid, Category.id_comp],
-    fun τ i => by rw [did, Category.id_comp],
-    𝟙 _,
-    by simp,
-    by rw [eid]; simp,
-    ?_
-  ⟩
-  intro i h
-  have e : Scheme.Hom.appLE (𝟙 (Gx y.x)) ((PPx y.x).U i) ((PPx y.x).U i) h = 𝟙 _ := by
-    rw [Scheme.Hom.appLE, Scheme.Hom.id_app]
-    refine (Category.id_comp _).trans ?_
-    rw [← (Gx y.x).presheaf.map_id]
-    rfl
-  rw [e, CommRingCat.hom_id, RingHom.id_apply]
-
 theorem exists_small_coeff_etaValAt_ne_zero
     : Laws
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -144,7 +116,7 @@ theorem exists_small_coeff_etaValAt_ne_zero
       ev k,
       w k,
       RingHom.FaithfullyFlat.of_bijective Function.bijective_id,
-      frMap_id_self (y k),
+      _root_.GlobalTheory.FramedBaseChange.refl (y k),
       hev k,
       hw k,
       rfl

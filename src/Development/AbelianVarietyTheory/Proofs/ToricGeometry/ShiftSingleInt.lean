@@ -74,7 +74,7 @@ theorem shift_single_int
       rw [add_assoc, ← Pi.single_add]
       congr 2
       push_cast
-      first | rfl | ring | abel | simp
+      first | abel
     rw [← ih x, this, h]
 
 theorem main

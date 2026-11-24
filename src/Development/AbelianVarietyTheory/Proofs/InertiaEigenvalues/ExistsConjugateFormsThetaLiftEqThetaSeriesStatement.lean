@@ -51,6 +51,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.exists_conjugateForms_thetaLift_eq_thetaSeries
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.exists_conjugateForms_thetaLift_eq_thetaSeries
                               R.thF i t y (fun ρ => u ρ) g = ser R i t (R.vP i t) u h (c x) g
                                 ∧ R.thF i t' y' (fun ρ => u ρ) g
                                   = ser R i t' (R.vP i t') u h (c x') g := by
-  first
-  | exact @GlobalTheory.ConjTwist.exists_conjForm_thF_eq_ser
-  | exact GlobalTheory.ConjTwist.exists_conjForm_thF_eq_ser
-  | (intros; apply GlobalTheory.ConjTwist.exists_conjForm_thF_eq_ser <;> assumption)
+  first | exact @GlobalTheory.ConjTwist.exists_conjForm_thF_eq_ser

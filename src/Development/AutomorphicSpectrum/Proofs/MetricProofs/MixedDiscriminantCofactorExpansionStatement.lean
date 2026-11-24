@@ -52,6 +52,7 @@ open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
   ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
   GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
+
 theorem _root_.GlobalTheory.T.mixed_discriminant_cofactor_expansion
     : ∀ (d : ℕ),
       (∀ (f : Fin (d + 1) → ℂ) (Bm : Fin (d + 1) → Matrix (Fin d) (Fin d) ℂ),

@@ -54,6 +54,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_adelicLift_eq_geometric_classSum_all_tuples
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.exists_adelicLift_eq_geometric_classSum_all_tuples
                 CcIs R.θ (Vc D i) (Wc D i) (rank_Wc i) (T.U ((i : ℕ) + 1) O.s0) O.dict O.mu
                     (T.x₀ ((i : ℕ) + 1) O.s0) (R.ωP i A.μ0) (R.vacP i) cc
                   → ∃ u : ℂ, ‖u‖ = 1 ∧ SerOf O (κ i) (v₀ i (sg0 D A)) (u • cc) 1 := by
-  first
-  | exact @GlobalTheory.AdTh.SerCore.exists_serOf_core
-  | exact GlobalTheory.AdTh.SerCore.exists_serOf_core
-  | (intros; apply GlobalTheory.AdTh.SerCore.exists_serOf_core <;> assumption)
+  first | exact @GlobalTheory.AdTh.SerCore.exists_serOf_core

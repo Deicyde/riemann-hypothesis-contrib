@@ -141,7 +141,7 @@ theorem ComponentOfIncIdeal.proof
   have hS : ringKrullDim (MvPolynomial (Fin e × Fin n) F) = ((e * n : ℕ) : WithBot ℕ∞) := by
     rw [MvPolynomial.ringKrullDim_of_isNoetherianRing,
       ringKrullDim_eq_zero_of_isField (Field.toIsField F)]
-    simp [Nat.card_eq_fintype_card]
+    simp
   have hsum :=
     GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := F) (incIdeal W e)
   rw [hdimInc, hS] at hsum

@@ -58,7 +58,6 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 
-
 noncomputable section
 
 namespace GlobalTheory.CovTop.FlatSz

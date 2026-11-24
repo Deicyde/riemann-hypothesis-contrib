@@ -2,11 +2,12 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.DensConst
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GeometricallyConnectedOfIsIsoRestrict
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPullbackSectionZerosNormMultiplicitiesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogNormSectionIntegrableMixedChernProjectiveStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MixedChernFormSignedPartMeasureComplOpenGenericPStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MixedChernMeasureFiniteIntegrableProjectiveStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReducedClosureOfPointPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.JGenSpecializes
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPullbackSectionZerosNormMultiplicities
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogNormSectionIntegrableMixedChernProjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MixedChernMeasureFiniteIntegrableProjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReducedClosureOfPointProperties
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MixedChernFormSignedPartMeasureComplOpenGenericP
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -78,7 +79,7 @@ theorem cycle_facts
                 ∧ ∀ (M : MLine p σ) (s : M.B.Sec),
                   z ∈ nonzeroLocus s → CycIntg L (M.logSec s) z := by
   intro hP F _ X p σ hp e L z hdim
-  obtain ⟨hint, hgen, hdimeq, -⟩ := GlobalTheory.T.reducedClosureOfPoint_properties X z
+  obtain ⟨hint, hgen, hdimeq, -⟩ := _root_.GlobalTheory.ClosFacts.clos_facts X z
   haveI := hint
   have hp' : IsProjOver (closι z ≫ p) := by
     obtain ⟨N, φ, hφ, rfl⟩ := hp
@@ -88,8 +89,8 @@ theorem cycle_facts
     exact LocallyOfFiniteType.isLocallyNoetherian (ι ≫ PSpace.str F N)
   have hd : topologicalKrullDim (clos z) = ((e : ℕ) : WithBot ℕ∞) := hdimeq.trans hdim
   have H1 :=
-    GlobalTheory.T.mixedChernMeasure_finite_integrable_projective hP F (clos z) (closι z ≫ p) σ e
-      hp' hd (fun i => (L i).pull (closι z) rfl)
+    _root_.GlobalTheory.MixFin.finite_and_intg hP F (clos z) (closι z ≫ p) σ e hp' hd
+      (fun i => (L i).pull (closι z) rfl)
   have hpre
       : ∀ U : X.Opens,
         ptMap (closι z) rfl σ ⁻¹' ptsIn p σ U = ptsIn (closι z ≫ p) σ (closι z ⁻¹ᵁ U) := by
@@ -104,20 +105,18 @@ theorem cycle_facts
       rw [hgen]
       exact hU
     rw [hpre U]
-    exact GlobalTheory.T.mixedChernFormSignedPartMeasure_compl_open_genericPoint_eq_zero F (clos z)
-      (closι z ≫ p) σ σ.injective hp' e _ ε _ hgU
+    exact _root_.GlobalTheory.MixNull.part_compl_null F (clos z) (closι z ≫ p) σ σ.injective hp' e _
+      ε _ hgU
   · intro M s hs
     obtain ⟨s', hnz, hnsq, -⟩ :=
-      GlobalTheory.T.exists_pullback_section_zeros_norm_multiplicities F X (clos z) p (closι z ≫ p)
-        σ (closι z) rfl M s
+      _root_.GlobalTheory.Mix.exists_secPull_props F X (clos z) p (closι z ≫ p) σ (closι z) rfl M s
     have hgs : genericPoint (clos z) ∈ nonzeroLocus s' := by
       rw [hnz]
       show closι z (genericPoint (clos z)) ∈ nonzeroLocus s
       rw [hgen]
       exact hs
     have H :=
-      GlobalTheory.T.log_norm_section_integrable_mixedChern_projective hP F (clos z) (closι z ≫ p) σ
-        e hp' hd
+      _root_.GlobalTheory.Mix.logSec_intg_proj hP F (clos z) (closι z ≫ p) σ e hp' hd
         (fun i => (L i).pull (closι z) rfl)
         (M.pull (closι z) rfl) s' hgs
     have he : (M.pull (closι z) rfl).logSec s' = fun y => M.logSec s (ptMap (closι z) rfl σ y) := by

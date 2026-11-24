@@ -48,6 +48,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.HermitianOrthogonalExtensionData
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelfDualCLatFrame
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilRepresentationVacuumCosetVectorsGrid
 
 @[expose] public section
 
@@ -136,9 +137,8 @@ theorem exists_le_hom (hS : Submodule.IsLattice D.host.E ΛS) (hT : Submodule.Is
     convert ΛT.smul_mem c ht using 1
     funext i
     change (((A * B * B * C) • genMap S T a s t) *ᵥ y) i = (c : D.host.E) * t i
-    simp only [Matrix.smul_apply, Matrix.mulVec, dotProduct, genMap, Matrix.of_apply, Pi.smul_apply,
-      smul_eq_mul, hc', nsmul_eq_mul, Nat.cast_mul, star_mul', star_natCast, Finset.sum_mul,
-      Finset.mul_sum]
+    simp only [Matrix.smul_apply, Matrix.mulVec, dotProduct, genMap, Matrix.of_apply, hc',
+      nsmul_eq_mul, Nat.cast_mul, star_mul', star_natCast, Finset.sum_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
   | zero => simp
   | add x y _ _ hx hy => rw [nsmul_add]; exact add_mem hx hy
@@ -258,11 +258,6 @@ theorem model_spec {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) (�
       _ = (Bᴴ * Aᴴ) * Formalism.REAL.Jm (M.ε τ) * (A * B) := by simp only [Matrix.mul_assoc]
       _ = _ := by rw [e1, e3, Matrix.one_mul, Matrix.mul_one]
 
-theorem sigOK_negSp {V : HSp D} (h : V.SigOK) : (negSp V).SigOK := fun τ => by
-  have e : (negSp V).gram.map τ = -(V.gram.map τ) := Matrix.ext fun i j => map_neg τ _
-  rw [e]
-  exact GlobalTheory.Grid.hasSignature_neg (h τ)
-
 def IsMaj (V : HSp D) (s B : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ) : Prop :=
   ∀ τ,
     IsCartanInv (gramAt D V τ) (s τ)
@@ -335,8 +330,8 @@ theorem exists_weil
     · exact ⟨0, 0, fun h => absurd h hi⟩
     obtain ⟨f, c, h⟩ :=
       exists_vac_cos hψ hθ (S := G.pS (.chi i 0)) (T := G.pT (.chi i 0))
-        (sS := G.cartS s (.chi i 0)) (sT := G.onT s (.chi i 0)) (sigOK_negSp (hV (i + 1) hi).1)
-        (hV i hi.le).1
+        (sS := G.cartS s (.chi i 0)) (sT := G.onT s (.chi i 0))
+        (_root_.GlobalTheory.GridWeil.sigOK_neg (hV (i + 1) hi).1) (hV i hi.le).1
         (fun τ => isCartanInv_neg (hs (.grid (i + 1) 0) ⟨hi, Nat.zero_le _⟩ τ).1)
         (fun τ => (hs (.grid i 0) ⟨hi.le, Nat.zero_le _⟩ τ).1)
         (ΛS := G.latS (.chi i 0)) (ΛT := G.latT (.chi i 0)) (isSelfDualC_neg (hV (i + 1) hi).2)

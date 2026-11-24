@@ -72,14 +72,11 @@ theorem last_eq
   have h2 : (adjugate Z * Z) *ᵥ v = adjugate Z *ᵥ Pi.single (Fin.last r) x := by
     rw [← mulVec_mulVec, h]
   rw [adjugate_mul] at h2
-  first | rw [smul_mulVec, one_mulVec] at h2 | rw [Matrix.smul_mulVec_assoc, one_mulVec] at h2
+  first | rw [smul_mulVec, one_mulVec] at h2
   have h3 := congrFun h2 (Fin.last r)
   rw [Pi.smul_apply, smul_eq_mul, mulVec_single] at h3
   rw [h3]
-  first
-  | (simp only [Pi.smul_apply, op_smul_eq_mul, col_apply]; rw [adj_last])
-  | (simp [adj_last]; done)
-  | (simp [adj_last, mul_comm])
+  first | (simp only [Pi.smul_apply, op_smul_eq_mul, col_apply]; rw [adj_last])
 
 theorem vec_zero
     {r : ℕ} (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (v : Fin (r + 1) → E) (h : Z *ᵥ v = 0)

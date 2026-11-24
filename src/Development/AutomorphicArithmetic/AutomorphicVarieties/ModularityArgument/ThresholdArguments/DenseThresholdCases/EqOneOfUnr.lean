@@ -51,9 +51,6 @@ import Mathlib.Tactic.Polynomial.Basic
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
@@ -81,7 +78,7 @@ private theorem full_chars
           : List (Segment k))
         : Multiset (Segment k))
       ρ := by
-  obtain ⟨hρ, hq⟩ := (UpperTheory.Gal.LocD.ofSupport_holds k n V ρ ξ hξ).1 hs
+  obtain ⟨hρ, hq⟩ := (_root_.UpperTheory.Gal.LocD.ofSupport k n V ρ ξ hξ).1 hs
   let y : Fin n → IrrGL (k := k) := fun i => IrrGL.ofChar (ξ i) (hξ i)
   have hy : ∀ i, (y i).IsCusp := fun i => IrrGL.isCusp_ofChar _ _
   have hd : ∑ i, (y i).1 = n := by simp [y, IrrGL.ofChar]

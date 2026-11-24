@@ -93,6 +93,6 @@ theorem invariant_projection_extremal_formula
 
 theorem root_multiple_apply_first {n : ℕ} (a b : Fin n) (hab : a ≠ b) (k : ℕ)
     : ((k : ℤ) • rootW a b) a = k := by
-  simp [rootW, Pi.single_apply, hab]
+  simp [rootW, hab]
 
 end Formalism.MainNotions.G.GLWeightTheory

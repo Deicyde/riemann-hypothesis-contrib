@@ -2,8 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ProjectiveNotIsUnit
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsProjectiveAlgebraisationFormalCompleteLoca
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BaseChangeQuotientClosedImmersionIdealSheafStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TowerSquaresStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.BaseIdealIdeal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BaseChangeQuotientClosedImmersionIdealSheaf
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ThickTransComp
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TowerSquares
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -122,9 +124,9 @@ theorem ev_surjective
       · funext j
         exact C.ρ_pull e i j
     have hk :=
-      (GlobalTheory.T.baseChange_quotient_closedImmersion_idealSheaf R (I ^ (e + 1))
-          (Y (e + 1)).left (Y e).left ((Y (e + 1)).hom ≫ thick R I (e + 1)) (β e) (Y e).hom
-          ((GlobalTheory.T.isPullback_thick_tower_squares R I Y β hβ).1 e)).2.2 (C.D (e + 1) i)
+      (_root_.GlobalTheory.FormalAlg.baseChange_quotient R (I ^ (e + 1)) (Y (e + 1)).left (Y e).left
+          ((Y (e + 1)).hom ≫ thick R I (e + 1)) (β e) (Y e).hom
+          ((_root_.GlobalTheory.FormalAlg.towerSquares R I Y β hβ).1 e)).2.2 (C.D (e + 1) i)
         (C.aff (e + 1) i)
     obtain ⟨hr, hker⟩ := appLE_of_eq (β e) (C.D (e + 1) i) (C.D e i) (C.pre e i) (C.pre e i).ge hk.1
     rw [hk.2] at hker

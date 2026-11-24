@@ -216,7 +216,6 @@ theorem value_base
       apply Real.one_le_exp
       have := hM ⟨z, hzc, rfl⟩
       linarith
-    beta_reduce
     rw [hcut, hnsq, hPF z (hsub hz), ← ENNReal.ofReal_mul (Real.exp_pos _).le,
       norm_sub_rev (1 : ℂ) (F z)]
     apply ENNReal.ofReal_le_ofReal

@@ -58,34 +58,42 @@ noncomputable section
 namespace MassDataLevelSSteps.LatTop
 
 open scoped TensorProduct
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures MeasureTheory NumberField IsDedekindDomain
-  Topology PI.AdicCompletionValuation
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures MeasureTheory NumberField IsDedekindDomain Topology
+  PI.AdicCompletionValuation
 
 section Key
 
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
 
-theorem exists_int_smul_mem (L : Submodule (𝓞 E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (x : Fin n → E) :
-    ∃ N : ℤ, N ≠ 0 ∧ N • x ∈ L := by
+theorem exists_int_smul_mem
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    (x : Fin n → E)
+    : ∃ N : ℤ, N ≠ 0 ∧ N • x ∈ L := by
   apply Formalism.L2.SG.Pf.NcVal.OmVSt.OmX.exists_int_smul_mem <;> assumption
 
 end Key
 
 section Lat
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  [FiniteDimensional F E] (v : HeightOneSpectrum (𝓞 F)) {n : ℕ}
+variable
+  {F E : Type}
+  [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [FiniteDimensional F E]
+  (v : HeightOneSpectrum (𝓞 F))
+  {n : ℕ}
 
 def ratAdd : (Fin n → E) →+ (Fin n → Fv F v ⊗[F] E) :=
   AddMonoidHom.compLeft (inclR (F := F) (Fv F v) : E →+* Fv F v ⊗[F] E).toAddMonoidHom (Fin n)
 
-theorem smul_mem_latLoc (Λ : Set (Fin n → E)) {c : Fv F v} (hc : c ∈ v.adicCompletionIntegers F)
-    {y : Fin n → Fv F v ⊗[F] E} (hy : y ∈ latLoc (E := E) v Λ) : c • y ∈ latLoc (E := E) v Λ :=
+theorem smul_mem_latLoc
+    (Λ : Set (Fin n → E))
+    {c : Fv F v} (hc : c ∈ v.adicCompletionIntegers F)
+    {y : Fin n → Fv F v ⊗[F] E} (hy : y ∈ latLoc (E := E) v Λ)
+    : c • y ∈ latLoc (E := E) v Λ :=
   (latLoc (E := E) v Λ).smul_mem (⟨c, hc⟩ : v.adicCompletionIntegers F) hy
 
-theorem isCompact_latLoc (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG) :
-    IsCompact (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) := by
+theorem isCompact_latLoc (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG)
+    : IsCompact (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) := by
   classical
   have : CompactSpace (v.adicCompletionIntegers F) :=
     isCompact_iff_compactSpace.mp (isCompact_adicCompletionIntegers F v)
@@ -93,19 +101,24 @@ theorem isCompact_latLoc (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG) :
   have : Module.Finite ℤ L := Module.Finite.trans (𝓞 E) L
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := ℤ) (M := L)
   let g : s → (Fin n → Fv F v ⊗[F] E) := fun i => ratV (F := F) (Fv F v) ((i.1 : L) : Fin n → E)
-  let f : (s → v.adicCompletionIntegers F) → (Fin n → Fv F v ⊗[F] E) :=
-    fun c => ∑ i, ((c i : v.adicCompletionIntegers F) : Fv F v) • g i
+  let f : (s → v.adicCompletionIntegers F) → (Fin n → Fv F v ⊗[F] E) := fun c =>
+    ∑ i, ((c i : v.adicCompletionIntegers F) : Fv F v) • g i
   have hf : Continuous f := by
     refine continuous_finsetSum _ fun i _ => ?_
     have hi : Continuous fun c : (s → v.adicCompletionIntegers F) =>
-        ((c i : v.adicCompletionIntegers F) : Fv F v) := (continuous_apply i).subtype_val
+        ((c i : v.adicCompletionIntegers F) : Fv F v) :=
+      (continuous_apply i).subtype_val
     exact hi.smul (continuous_const : Continuous fun _ : (s → v.adicCompletionIntegers F) => g i)
-  have hle : latLoc (E := E) v (L : Set (Fin n → E)) ≤
-      Submodule.span (v.adicCompletionIntegers F) (Set.range g) := by
+  have hle
+      : latLoc (E := E) v (L : Set (Fin n → E))
+        ≤ Submodule.span (v.adicCompletionIntegers F) (Set.range g) := by
     apply Submodule.span_le.mpr
     rintro _ ⟨l, hl, rfl⟩
-    have key : ∀ x : L, x ∈ Submodule.span ℤ (s : Set L) →
-        ratAdd v (x : Fin n → E) ∈ Submodule.span (v.adicCompletionIntegers F) (Set.range g) := by
+    have key
+        : ∀ x : L,
+          x ∈ Submodule.span ℤ (s : Set L)
+            → ratAdd v (x : Fin n → E)
+              ∈ Submodule.span (v.adicCompletionIntegers F) (Set.range g) := by
       intro x hx
       induction hx using Submodule.span_induction with
       | mem x hx => exact Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
@@ -121,7 +134,8 @@ theorem isCompact_latLoc (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG) :
         rw [Submodule.coe_smul_of_tower, map_zsmul]
         exact zsmul_mem hx k
     exact key ⟨l, hl⟩ (hs ▸ Submodule.mem_top)
-  have e : (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) = Set.range f := by
+  have e
+      : (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) = Set.range f := by
     ext y
     constructor
     · intro hy
@@ -133,8 +147,8 @@ theorem isCompact_latLoc (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG) :
   rw [e]
   exact isCompact_range hf
 
-theorem one_tmul_intCast_mul (N : ℤ) (e : E) :
-    (1 : Fv F v) ⊗ₜ[F] ((N : E) * e) = (N : Fv F v) ⊗ₜ[F] e := by
+theorem one_tmul_intCast_mul (N : ℤ) (e : E)
+    : (1 : Fv F v) ⊗ₜ[F] ((N : E) * e) = (N : Fv F v) ⊗ₜ[F] e := by
   induction N using Int.induction_on with
   | zero => simp
   | succ k ih =>
@@ -144,9 +158,9 @@ theorem one_tmul_intCast_mul (N : ℤ) (e : E) :
     push_cast at ih ⊢
     rw [sub_mul, one_mul, TensorProduct.tmul_sub, ih, TensorProduct.sub_tmul]
 
-theorem ratV_zsmul_single (N : ℤ) (j : Fin n) (e : E) :
-    ratV (F := F) (Fv F v) (N • (Pi.single j e : Fin n → E)) =
-      (N : Fv F v) • (Pi.single j ((1 : Fv F v) ⊗ₜ[F] e) : Fin n → Fv F v ⊗[F] E) := by
+theorem ratV_zsmul_single (N : ℤ) (j : Fin n) (e : E)
+    : ratV (F := F) (Fv F v) (N • (Pi.single j e : Fin n → E))
+      = (N : Fv F v) • (Pi.single j ((1 : Fv F v) ⊗ₜ[F] e) : Fin n → Fv F v ⊗[F] E) := by
   classical
   funext i
   by_cases h : i = j

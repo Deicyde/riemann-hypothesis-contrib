@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.ResidualConstruction
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffDetGenericSumMemHeckeAlgebraStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffDetGenericSumMemHeckeAlgebra
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DetOneAddSmulBlkMem
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemSpanRingCornerIdealModuleIff
 import Mathlib.Algebra.Order.Floor.Extended
@@ -61,7 +61,7 @@ theorem blockDet_mem
   intro Γ X O _ _ n T rep hc g Θ hΘ
   exact GlobalTheory.BlockDet.main T n (ringR T rep)
     (fun m a ha d =>
-      GlobalTheory.T.coeff_det_generic_sum_mem_heckeAlgebra T rep hc m a
+      _root_.GlobalTheory.SpanRing.coeff_det_generic_sum_mem_of_inRing T rep hc m a
         (fun k => (mem_ringR T rep _).1 (ha k))
         d)
     g Θ

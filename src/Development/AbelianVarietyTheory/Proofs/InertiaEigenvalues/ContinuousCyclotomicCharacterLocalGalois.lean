@@ -120,9 +120,7 @@ theorem cyc_char_continuous
   have e : (fun g : G => ((ε g : Oˣ) : O)) = (fun g : GK p K => ((ε' g : Oˣ) : O)) ∘ i := by
     funext g
     simp only [Function.comp_apply, hε', carry, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom]
-    first
-    | rw [ContinuousMulEquiv.symm_apply_apply]
-    | exact congrArg (fun x => ((ε x : Oˣ) : O)) (i.toMulEquiv.symm_apply_apply g).symm
+    first | exact congrArg (fun x => ((ε x : Oˣ) : O)) (i.toMulEquiv.symm_apply_apply g).symm
   rw [e]
   exact hcont'.comp i.continuous
 

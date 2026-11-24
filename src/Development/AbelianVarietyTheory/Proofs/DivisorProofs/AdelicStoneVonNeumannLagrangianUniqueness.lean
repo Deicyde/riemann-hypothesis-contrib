@@ -1,11 +1,12 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealisedOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterInvariantAdelicFormEqMulEvalZeroStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSymplecticBlockGeneratorsLagrangianNormalFStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsRealisedOnAdelicSchwartzLeviInverseTransposeStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsRealisedOnAdelicSchwartzWeylFourierStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowerUnipotentRealisedOnAdelicSchwartzStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterInvariantAdelicFormEqMulEvalZero
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSymplecticBlockGeneratorsLagrangianNormalF
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsRealisedOnAdelicSchwartzLeviInverseTranspose
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsRealisedOnAdelicSchwartzWeylFourier
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowerUnipotentRealisedOnAdelicSchwartz
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaTransformRationalTranslateQuasiInvariant
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresentationPreservesSchwartz
 import Mathlib.Algebra.Order.Floor.Extended
@@ -118,9 +119,9 @@ theorem realised_of_mem_closure
   induction hg using Submonoid.closure_induction with
   | mem g hg =>
     rcases hg with (⟨A, hA, rfl⟩ | ⟨C, hC, rfl⟩) | rfl
-    · exact GlobalTheory.T.isRealisedOnAdelicSchwartz_levi_inverseTranspose F ψ κ A hA
-    · exact GlobalTheory.T.lowerUnipotent_realisedOnAdelicSchwartz F ψ hψ κ C hC
-    · exact GlobalTheory.T.isRealisedOnAdelicSchwartz_weyl_fourier F ψ hψ κ
+    · exact _root_.GlobalTheory.AdelicSvNLevi.realised_levi F ψ κ A hA
+    · exact _root_.GlobalTheory.AdelicSvNQuad.realised_unip F ψ hψ κ C hC
+    · exact _root_.GlobalTheory.AdelicSvN.Weyl.realised_weyl F ψ hψ κ
   | one => exact realised_one ψ
   | mul g h _ _ hg hh => exact hg.mul hh
 
@@ -172,7 +173,7 @@ theorem main
   intro F _ _ ψ hψ κ _ L hL hdim l₁ hl₁ l₂ hl₂ hi₁ hi₂ ⟨φ₀, hφ₀, hne⟩
   classical
   obtain ⟨g, hg, hgL⟩ :=
-    GlobalTheory.T.exists_symplecticBlockGenerators_lagrangian_normal_form F κ L hL hdim
+    _root_.GlobalTheory.AdelicSvN.LagrangianNormalForm.exists_mem_closure F κ L hL hdim
   obtain ⟨S, hS, hSs, hSa, hSi⟩ := realised_of_mem_closure ψ hψ hg
   have key
       : ∀ l ∈ (adeleClass F).adm κ,
@@ -188,12 +189,11 @@ theorem main
     intro l hl hi
     obtain ⟨l', hl', e⟩ := hSa l hl
     obtain ⟨c, hc⟩ :=
-      GlobalTheory.T.character_invariant_adelic_form_eq_mul_eval_zero F ψ hψ κ l' hl'
-        (fun y φ hφ => by
-          have hm : (fun x => ψ (x ⬝ᵥ y) * φ x) = schr ψ (0, y) φ := by funext x; simp [schr]
-          rw [hm, e _ (GlobalTheory.HeisSchA.schr_mem_schA ψ hψ _ φ hφ), e φ hφ, hSi _ φ hφ,
-            act_zero_eq_sum]
-          exact inv_sum ψ hψ L hL l hi Finset.univ y _ (fun j => hgL _) _ (hS φ hφ))
+      _root_.GlobalTheory.CharInvForm.main F ψ hψ κ l' hl' (fun y φ hφ => by
+        have hm : (fun x => ψ (x ⬝ᵥ y) * φ x) = schr ψ (0, y) φ := by funext x; simp [schr]
+        rw [hm, e _ (GlobalTheory.HeisSchA.schr_mem_schA ψ hψ _ φ hφ), e φ hφ, hSi _ φ hφ,
+          act_zero_eq_sum]
+        exact inv_sum ψ hψ L hL l hi Finset.univ y _ (fun j => hgL _) _ (hS φ hφ))
     exact ⟨c, fun φ hφ => (e φ hφ).symm.trans (hc φ hφ)⟩
   obtain ⟨c₁, h₁⟩ := key l₁ hl₁ hi₁
   obtain ⟨c₂, h₂⟩ := key l₂ hl₂ hi₂

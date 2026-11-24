@@ -2,9 +2,9 @@ module
 
 public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NotFullBot
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CrystallineFrobeniusBijOnLettersDirectSumStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CrystallineFrobeniusBijOnLettersDirectSum
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnramifiedSubfieldLeCyclotomicExt
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeExpansionsStdBelowLevelStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeExpansionsStdBelowLevel
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLevelExpansionAtRootOfUnity
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -246,7 +246,7 @@ theorem expansions_low_and_pullback
   have hstd
       : ∀ (i : Let K) (ζ : ↥LL.1),
         ζ ^ (l ^ (s - 1)) = 1 → Std (Di (HW l) h T i) (latSpan (ex C h T i ζ)) :=
-    GlobalTheory.T.wachLattice_expansions_std_below_level D HW F Cm l K s LL h T hT
+    _root_.GlobalTheory.NL.LatLow.lat_low D HW F Cm l K s LL h T hT
   refine ⟨fun i ζ hζ hX => ?_, fun i ζ τ hτ => ?_⟩
   · have hm : ζ ^ (l ^ hζ.choose) = 1 := by
       have := hζ.choose_spec
@@ -278,8 +278,7 @@ theorem expansions_low_and_pullback
       (W.levN T i ζ) (ex C h T i ζ) (ex C h T (i - 1) (ζ ^ l)) _ _ _ _ (hl.2.2.2.1 hprim).1
       ((C.C K s LL h).tie.levN_eq T i ζ) ((C.C K s LL h).tie.levB_mem T i ζ)
       (hstd (i - 1) (ζ ^ l) (pow_pow_pred h.1 hprim)) hφ
-      ((GlobalTheory.T.crystallineFrobenius_bijOn_letters_directSum D HW l K s LL h T hT).1
-        i).surjOn
+      ((_root_.GlobalTheory.NL.PhiD.phi_letters D HW l K s LL h T hT).1 i).surjOn
       (fun x => W.N_φ T x x.2)
 
 end GlobalTheory.NL.LowLevel

@@ -60,10 +60,7 @@ theorem ex_periodic (a : (W.F.Di (W.ik k)).La) (z : Fin W.g → ℂ)
     : W.F.ex (W.ik k) W.Pm (z + W.Pm a) = W.F.ex (W.ik k) W.Pm z := by
   rw [W.F.ex_add _ _ W.per, (W.F.ex_ker _ _ W.per _).mpr ⟨a, rfl⟩, _root_.mul_one]
 
-theorem primeSpectrum_eq (p q : PrimeSpectrum ℂ) : p = q := by
-  first
-  | exact Subsingleton.elim p q
-  | exact PrimeSpectrum.ext ((Ideal.eq_bot_of_prime _).trans (Ideal.eq_bot_of_prime _).symm)
+theorem primeSpectrum_eq (p q : PrimeSpectrum ℂ) : p = q := by first | exact Subsingleton.elim p q
 
 theorem exists_chart_pt {X : Scheme.{0}} (L : LB X) (hL : L.IsLB) (y : Sp ℂ ⟶ X)
     : ∃ j, ⊤ ≤ y ⁻¹ᵁ L.U j := by

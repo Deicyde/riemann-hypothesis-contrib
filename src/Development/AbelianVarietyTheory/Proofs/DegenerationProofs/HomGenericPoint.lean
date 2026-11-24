@@ -49,7 +49,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
@@ -57,9 +58,11 @@ attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlge
 noncomputable section
 namespace GlobalTheory.ZH.InFibChart
 
-theorem eval_scale {K J : Type} [CommRing K] (c : K) (x : J → K) {F : MvPolynomial J K} {d : ℕ}
-    (hF : F.IsHomogeneous d) :
-    MvPolynomial.eval (fun j => c * x j) F = c ^ d * MvPolynomial.eval x F := by
+theorem eval_scale
+    {K J : Type} [CommRing K]
+    (c : K) (x : J → K)
+    {F : MvPolynomial J K} {d : ℕ} (hF : F.IsHomogeneous d)
+    : MvPolynomial.eval (fun j => c * x j) F = c ^ d * MvPolynomial.eval x F := by
   rw [MvPolynomial.eval_eq, MvPolynomial.eval_eq, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hd : ∑ i ∈ m.support, m i = d := by
@@ -68,13 +71,22 @@ theorem eval_scale {K J : Type} [CommRing K] (c : K) (x : J → K) {F : MvPolyno
   simp only [mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hd]
   ring
 
-theorem exists_subst {K J : Type} [CommRing K] [Fintype J] (g : Matrix J J K) {F : MvPolynomial J K} {d : ℕ}
-    (hF : F.IsHomogeneous d) :
-    ∃ F' : MvPolynomial J K, F'.IsHomogeneous d ∧
-      ∀ v, MvPolynomial.eval v F' = MvPolynomial.eval (g.mulVec v) F := by
-  refine ⟨MvPolynomial.aeval (fun i => ∑ j, MvPolynomial.C (g i j) * MvPolynomial.X j) F, ?_, fun v => ?_⟩
-  · have := hF.aeval (n := 1) (fun i => ∑ j, MvPolynomial.C (g i j) * (MvPolynomial.X j : MvPolynomial J K))
-      (fun i => MvPolynomial.IsHomogeneous.sum _ _ _ fun j _ => MvPolynomial.isHomogeneous_C_mul_X _ _)
+theorem exists_subst
+    {K J : Type} [CommRing K] [Fintype J]
+    (g : Matrix J J K)
+    {F : MvPolynomial J K} {d : ℕ} (hF : F.IsHomogeneous d)
+    : ∃ F' : MvPolynomial J K,
+      F'.IsHomogeneous d ∧ ∀ v, MvPolynomial.eval v F' = MvPolynomial.eval (g.mulVec v) F := by
+  refine ⟨
+    MvPolynomial.aeval (fun i => ∑ j, MvPolynomial.C (g i j) * MvPolynomial.X j) F,
+    ?_,
+    fun v => ?_
+  ⟩
+  · have :=
+      hF.aeval (n := 1)
+        (fun i => ∑ j, MvPolynomial.C (g i j) * (MvPolynomial.X j : MvPolynomial J K))
+        (fun i =>
+          MvPolynomial.IsHomogeneous.sum _ _ _ fun j _ => MvPolynomial.isHomogeneous_C_mul_X _ _)
     simpa using this
   · clear hF
     induction F using MvPolynomial.induction_on with
@@ -84,16 +96,20 @@ theorem exists_subst {K J : Type} [CommRing K] [Fintype J] (g : Matrix J J K) {F
       rw [map_mul, map_mul, map_mul, hp]
       simp [Matrix.mulVec, dotProduct]
 
-variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {S : ThetaSys o Ω} {ρ : S.Real} {M : RatModel o Ω}
-  {U₀ : M.Z.Opens} {EE : M.Lat S.J} (Q : Clos ρ M U₀ EE)
+variable
+  {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+  {S : ThetaSys o Ω} {ρ : S.Real} {M : RatModel o Ω} {U₀ : M.Z.Opens} {EE : M.Lat S.J}
+  (Q : Clos ρ M U₀ EE)
 
-theorem hom_genericPoint (hU : (U₀ : Set M.Z).Nonempty) :
-    Q.P.hom (genericPoint Q.P.left) = genericPoint M.Z := by
-  have hg : genericPoint M.Z ∈ U₀ := (genericPoint_specializes hU.some).mem_open U₀.isOpen hU.some_mem
+theorem hom_genericPoint (hU : (U₀ : Set M.Z).Nonempty)
+    : Q.P.hom (genericPoint Q.P.left) = genericPoint M.Z := by
+  have hg : genericPoint M.Z ∈ U₀ :=
+    (genericPoint_specializes hU.some).mem_open U₀.isOpen hU.some_mem
   have hw : η[ρ.P.A].left ≫ ρ.P.A.hom = 𝟙 _ := Over.w η[ρ.P.A]
   let s : U₀.toScheme ⟶ pullback ρ.P.A.hom Q.u₀ :=
     pullback.lift (Q.u₀ ≫ η[ρ.P.A].left) (𝟙 _) (by
-      rw [Category.assoc, Category.id_comp]; exact (congrArg (Q.u₀ ≫ ·) hw).trans (Category.comp_id _))
+      rw [Category.assoc, Category.id_comp]
+      exact (congrArg (Q.u₀ ≫ ·) hw).trans (Category.comp_id _))
   have hs : (s ≫ Q.a₀) ≫ Q.P.hom = U₀.ι := by
     rw [Category.assoc, Q.cart.w, pullback.lift_snd_assoc, Category.id_comp]
   have h1 : Q.P.hom ((s ≫ Q.a₀) ⟨_, hg⟩) = genericPoint M.Z :=
@@ -102,9 +118,10 @@ theorem hom_genericPoint (hU : (U₀ : Set M.Z).Nonempty) :
   rw [h1] at h2
   exact (h2.antisymm (genericPoint_specializes _)).eq
 
-theorem exists_change (l l' : Q.Λ) {z : M.Z} (hl : z ∈ Q.W l) (hl' : z ∈ Q.W l') :
-    ∃ g : Matrix S.J S.J (M.O z), Q.B l' = g.map (↑) * Q.B l ∧
-      (Q.c l).map (valF M.pt (Q.W l)) = (Q.c l').map (valF M.pt (Q.W l')) * g.map (↑) := by
+theorem exists_change (l l' : Q.Λ) {z : M.Z} (hl : z ∈ Q.W l) (hl' : z ∈ Q.W l')
+    : ∃ g : Matrix S.J S.J (M.O z),
+      Q.B l' = g.map (↑) * Q.B l
+        ∧ (Q.c l).map (valF M.pt (Q.W l)) = (Q.c l').map (valF M.pt (Q.W l')) * g.map (↑) := by
   have h : ∀ i, ∃ a : S.J → M.O z, ∑ j, a j • Q.B l j = Q.B l' i := fun i => by
     refine (Submodule.mem_span_range_iff_exists_fun (M.O z) (v := fun j k => Q.B l j k)).1 ?_
     refine (Q.basis l z hl).le ((Q.basis l' z hl').ge ?_)
@@ -118,20 +135,26 @@ theorem exists_change (l l' : Q.Λ) {z : M.Z} (hl : z ∈ Q.W l) (hl' : z ∈ Q.
   have h1 := mul_eq_one_comm.1 (Q.c_inv l)
   have h2 := Q.c_inv l'
   rw [e] at h2
-  calc _ = ((Q.c l').map (valF M.pt (Q.W l')) * ((Matrix.of a).map (↑) * Q.B l)) *
-        (Q.c l).map (valF M.pt (Q.W l)) := by rw [h2, Matrix.one_mul]
+  calc
+    _ = ((Q.c l').map (valF M.pt (Q.W l')) * ((Matrix.of a).map (↑) * Q.B l))
+        * (Q.c l).map (valF M.pt (Q.W l)) := by
+      rw [h2, Matrix.one_mul]
     _ = _ := by rw [Matrix.mul_assoc, Matrix.mul_assoc, h1, Matrix.mul_one]
 
-theorem crd_change_loc (l l' : Q.Λ) {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R]
-    (y : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (y' : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W l').toScheme) (t : Sp R ⟶ M.Z)
+theorem crd_change_loc
+    (l l' : Q.Λ)
+    {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R]
+    (y : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (y' : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W l').toScheme)
+    (t : Sp R ⟶ M.Z)
     (hy : y' ≫ (Q.P.hom ⁻¹ᵁ Q.W l').ι = y ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι)
-    (ht : y ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom = t) (q : Sp R) (hq : t q = genericPoint M.Z)
+    (ht : y ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom = t)
+    (q : Sp R) (hq : t q = genericPoint M.Z)
     {z : M.Z} (hz : t (IsLocalRing.closedPoint R) ⤳ z) (hl : z ∈ Q.W l) (hl' : z ∈ Q.W l')
     (g : Matrix S.J S.J (M.O z))
     (hg : (Q.c l).map (valF M.pt (Q.W l)) = (Q.c l').map (valF M.pt (Q.W l')) * g.map (↑))
     {w w' : S.J → R} (hw : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l).ι) (Q.σ l) y w)
-    (hw' : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l').ι) (Q.σ l') y' w') :
-    ∃ u : Rˣ, ∀ j, w' j = (u : R) * (g.map (RatModel.valLoc t z hz)).mulVec w j := by
+    (hw' : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l').ι) (Q.σ l') y' w')
+    : ∃ u : Rˣ, ∀ j, w' j = (u : R) * (g.map (RatModel.valLoc t z hz)).mulVec w j := by
   have ht' : y' ≫ (Q.P.hom ⁻¹ᵁ Q.W l').ι ≫ Q.P.hom = t := by
     rw [← Category.assoc, hy, Category.assoc, ht]
   have h1 := Q.rel l R y w hw
@@ -160,7 +183,8 @@ theorem crd_change_loc (l l' : Q.Λ) {R : Type} [CommRing R] [IsDomain R] [IsLoc
     rw [e3, ← RingHom.map_det]
     intro h0
     have hpt : ⊤ ≤ M.pt ⁻¹ᵁ Q.W l' := M.top_le_preimage_pt (Q.ne l')
-    have e4 : (Q.c l').map (valF M.pt (Q.W l')) = (CrdCalc.valHom M.pt _ hpt).mapMatrix (Q.c l') := by
+    have e4
+        : (Q.c l').map (valF M.pt (Q.W l')) = (CrdCalc.valHom M.pt _ hpt).mapMatrix (Q.c l') := by
       ext i j
       exact CrdCalc.valR_eq M.pt _ hpt _
     have h5 : IsUnit (valR M.pt (Q.W l') (Q.c l').det) := by
@@ -170,14 +194,17 @@ theorem crd_change_loc (l l' : Q.Λ) {R : Type} [CommRing R] [IsDomain R] [IsLoc
       rw [← M.pt_apply (IsLocalRing.closedPoint Ω)]
       exact (CrdCalc.isUnit_valR_iff M.pt _ hpt _).1 h5 (Set.mem_univ _)
     have h7 : (t.appLE (Q.W l') ⊤ hW).hom (Q.c l').det = 0 :=
-      (Scheme.ΓSpecIso (CommRingCat.of R)).commRingCatIsoToRingEquiv.injective (h0.trans (map_zero _).symm)
+      (Scheme.ΓSpecIso (CommRingCat.of R)).commRingCatIsoToRingEquiv.injective
+        (h0.trans (map_zero _).symm)
     have b := Scheme.basicOpen_appLE t ⊤ (Q.W l') hW (Q.c l').det
     have h8 : q ∈ (Sp R).basicOpen ((t.appLE (Q.W l') ⊤ hW).hom (Q.c l').det) :=
       b.ge ⟨trivial, show t q ∈ _ from hq ▸ h6⟩
     rw [h7, Scheme.basicOpen_zero] at h8
     exact h8
-  have h9 : ((Q.c l').map (valR t (Q.W l'))).mulVec
-      (w' - (u : R) • (g.map (RatModel.valLoc t z hz)).mulVec w) = 0 := by
+  have h9
+      : ((Q.c l').map (valR t (Q.W l'))).mulVec
+          (w' - (u : R) • (g.map (RatModel.valLoc t z hz)).mulVec w)
+        = 0 := by
     rw [Matrix.mulVec_sub, Matrix.mulVec_smul, Matrix.mulVec_mulVec, sub_eq_zero]
     funext j
     rw [hu j, e1, e2, hC, Matrix.map_mul]
@@ -187,16 +214,20 @@ theorem crd_change_loc (l l' : Q.Λ) {R : Type} [CommRing R] [IsDomain R] [IsLoc
   rw [h10]
   rfl
 
-theorem crd_change (hU : (U₀ : Set M.Z).Nonempty) (l l' : Q.Λ) {K : Type} [Field K]
-    (x : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (x' : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l').toScheme) (t : Sp K ⟶ M.Z)
+theorem crd_change
+    (hU : (U₀ : Set M.Z).Nonempty)
+    (l l' : Q.Λ)
+    {K : Type} [Field K]
+    (x : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (x' : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l').toScheme)
+    (t : Sp K ⟶ M.Z)
     (hx : x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l').ι = x ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι)
     (ht : x ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom = t)
     {z : M.Z} (hz : t (IsLocalRing.closedPoint K) = z) (hl : z ∈ Q.W l) (hl' : z ∈ Q.W l')
     (g : Matrix S.J S.J (M.O z))
     (hg : (Q.c l).map (valF M.pt (Q.W l)) = (Q.c l').map (valF M.pt (Q.W l')) * g.map (↑))
     {w w' : S.J → K} (hw : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l).ι) (Q.σ l) x w)
-    (hw' : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l').ι) (Q.σ l') x' w') :
-    ∃ u : K, w' = fun j => u * (g.map fun a => M.val t a).mulVec w j := by
+    (hw' : Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l').ι) (Q.σ l') x' w')
+    : ∃ u : K, w' = fun j => u * (g.map fun a => M.val t a).mulVec w j := by
   obtain ⟨X, hX⟩ : ∃ X : Sp K ⟶ Q.P.left, X = x ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι := ⟨_, rfl⟩
   have hXt : X ≫ Q.P.hom = t := by rw [hX, Category.assoc, ht]
   let p : Q.P.left := X (IsLocalRing.closedPoint K)
@@ -208,12 +239,16 @@ theorem crd_change (hU : (U₀ : Set M.Z).Nonempty) (l l' : Q.Λ) {K : Type} [Fi
   let φ : R →+* K := (Scheme.stalkClosedPointTo (R := .of K) X).hom
   have hφ : spMap φ ≫ Y = X := Scheme.Spec_stalkClosedPointTo_fromSpecStalk (R := .of K) X
   have hr : Set.range Y = {ξ | ξ ⤳ p} := Scheme.range_fromSpecStalk
-  have hlift : ∀ k : Q.Λ, z ∈ Q.W k → ∃ y : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W k).toScheme,
-      y ≫ (Q.P.hom ⁻¹ᵁ Q.W k).ι = Y := fun k hk =>
-    ⟨IsOpenImmersion.lift _ Y (by
-      rw [Scheme.Opens.range_ι, hr]
-      exact fun ξ hξ => Specializes.mem_open hξ (Q.P.hom ⁻¹ᵁ Q.W k).isOpen (show Q.P.hom p ∈ Q.W k from hp ▸ hk)),
-      IsOpenImmersion.lift_fac _ _ _⟩
+  have hlift
+      : ∀ k : Q.Λ,
+        z ∈ Q.W k → ∃ y : Sp R ⟶ (Q.P.hom ⁻¹ᵁ Q.W k).toScheme, y ≫ (Q.P.hom ⁻¹ᵁ Q.W k).ι = Y :=
+    fun k hk => ⟨
+      IsOpenImmersion.lift _ Y (by
+        rw [Scheme.Opens.range_ι, hr]
+        exact fun ξ hξ =>
+          Specializes.mem_open hξ (Q.P.hom ⁻¹ᵁ Q.W k).isOpen (show Q.P.hom p ∈ Q.W k from hp ▸ hk)),
+      IsOpenImmersion.lift_fac _ _ _
+    ⟩
   obtain ⟨y, hy⟩ := hlift l hl
   obtain ⟨y', hy'⟩ := hlift l' hl'
   have hxy : spMap φ ≫ y = x := by
@@ -228,8 +263,9 @@ theorem crd_change (hU : (U₀ : Set M.Z).Nonempty) (l l' : Q.Λ) {K : Type} [Fi
     exact specializes_of_eq ((Scheme.Hom.comp_apply _ _ _).trans ((congrArg Q.P.hom this).trans hp))
   obtain ⟨v, hv⟩ := CrdCalc.crd_exists (LB.isLB_pull Q.isLB _) (Q.σ l) y
   obtain ⟨v', hv'⟩ := CrdCalc.crd_exists (LB.isLB_pull Q.isLB _) (Q.σ l') y'
-  obtain ⟨u, hu⟩ := crd_change_loc Q l l' y y' (Y ≫ Q.P.hom) (hy'.trans hy.symm)
-    (by rw [← Category.assoc, hy]) q hq' hc hl hl' g hg hv hv'
+  obtain ⟨u, hu⟩ :=
+    crd_change_loc Q l l' y y' (Y ≫ Q.P.hom) (hy'.trans hy.symm) (by rw [← Category.assoc, hy]) q
+      hq' hc hl hl' g hg hv hv'
   have k1 := CrdCalc.crd_map φ hv
   have k2 := CrdCalc.crd_map φ hv'
   rw [hxy] at k1
@@ -241,20 +277,28 @@ theorem crd_change (hU : (U₀ : Set M.Z).Nonempty) (l l' : Q.Λ) {K : Type} [Fi
     rw [← RatModel.val_spMap_comp, ← Category.assoc, hφ, hXt]
   rw [hb j]
 
-  simp only [hu j, map_mul, Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply, hval, ha, Finset.mul_sum]
+  simp only [hu j, map_mul, Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply, hval, ha,
+    Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem tors_change (hB : BaseFacts S M U₀ EE) (l l' : Q.Λ) {K : Type} [Field K] (t : Sp K ⟶ M.Z)
-    {z : M.Z} (hz : t (IsLocalRing.closedPoint K) = z) (hl : z ∈ Q.W l)
-    (g : Matrix S.J S.J (M.O z)) (hg : Q.B l' = g.map (↑) * Q.B l) {v : S.J → K} (hv : v ∈ Q.Tors t l) :
-    (g.map fun a => M.val t a).mulVec v ∈ Q.Tors t l' := by
+theorem tors_change
+    (hB : BaseFacts S M U₀ EE)
+    (l l' : Q.Λ)
+    {K : Type} [Field K]
+    (t : Sp K ⟶ M.Z)
+    {z : M.Z} (hz : t (IsLocalRing.closedPoint K) = z) (hl : z ∈ Q.W l) (g : Matrix S.J S.J (M.O z))
+    (hg : Q.B l' = g.map (↑) * Q.B l)
+    {v : S.J → K} (hv : v ∈ Q.Tors t l)
+    : (g.map fun a => M.val t a).mulVec v ∈ Q.Tors t l' := by
   obtain ⟨z', ⟨w, hw⟩, x₀, hx₀, h, hh, rfl⟩ := hv
   have hzz : z' = z := by rw [← hw, ← hz, Subsingleton.elim w (IsLocalRing.closedPoint K)]
   subst hzz
   refine ⟨z', ⟨w, hw⟩, x₀, hx₀, h, hh, funext fun i => ?_⟩
   have hr : Set.range t = {z'} := hw ▸ RatModel.range_eq_singleton t w
-  let a : S.J → M.O z' := fun j => ⟨(Q.B l j ⬝ᵥ S.ev h) / S.th x₀,
-    (hB.sec z' x₀ hx₀ h hh).1 _ ((Q.basis l z' hl).ge (Submodule.subset_span ⟨j, rfl⟩))⟩
+  let a : S.J → M.O z' := fun j => ⟨
+    (Q.B l j ⬝ᵥ S.ev h) / S.th x₀,
+    (hB.sec z' x₀ hx₀ h hh).1 _ ((Q.basis l z' hl).ge (Submodule.subset_span ⟨j, rfl⟩))
+  ⟩
   have e : (Q.B l' i ⬝ᵥ S.ev h) / S.th x₀ = ((∑ j, g i j * a j : M.O z') : Ω) := by
     have e1 : Q.B l' i ⬝ᵥ S.ev h = (Q.B l').mulVec (S.ev h) i := rfl
     rw [e1, hg, ← Matrix.mulVec_mulVec]
@@ -264,11 +308,24 @@ theorem tors_change (hB : BaseFacts S M U₀ EE) (l l' : Q.Λ) {K : Type} [Field
   simp only [map_mul, RatModel.valHom_apply]
   rfl
 
-theorem inFib_of_chart : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (ρ : S.Real) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J), BaseFacts S M U₀ EE → ∀ (Q : Clos ρ M U₀ EE) (K : Type) [Field K] (l : Q.Λ) (x' : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (w : S.J → K), Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l).ι) (Q.σ l) x' w → (∀ (d : ℕ) (Pf : MvPolynomial S.J K), d ≤ S.N ^ S.g * S.g.factorial → Pf.IsHomogeneous d → (∀ v ∈ Q.Tors (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom) l, MvPolynomial.eval v Pf = 0) → MvPolynomial.eval w Pf = 0) → Q.InFib (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι) := by
+theorem inFib_of_chart
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
+        (ρ : S.Real) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J),
+      BaseFacts S M U₀ EE
+        → ∀ (Q : Clos ρ M U₀ EE) (K : Type) [Field K] (l : Q.Λ)
+            (x' : Sp K ⟶ (Q.P.hom ⁻¹ᵁ Q.W l).toScheme) (w : S.J → K),
+          Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W l).ι) (Q.σ l) x' w
+            → (∀ (d : ℕ) (Pf : MvPolynomial S.J K),
+              d ≤ S.N ^ S.g * S.g.factorial → Pf.IsHomogeneous d
+                → (∀ v ∈ Q.Tors (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom) l,
+                  MvPolynomial.eval v Pf = 0)
+                → MvPolynomial.eval w Pf = 0)
+            → Q.InFib (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι) := by
   intro o Ω _ _ _ _ S ρ M U₀ EE hB Q K _ l x w hw H l' x' w' hx hw' d Pf hd hPf hT
   rw [Category.assoc] at hT
   obtain ⟨t, ht⟩ : ∃ t, x ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom = t := ⟨_, rfl⟩
-  have ht' : x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l').ι ≫ Q.P.hom = t := by rw [← Category.assoc, hx, Category.assoc, ht]
+  have ht' : x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l').ι ≫ Q.P.hom = t := by
+    rw [← Category.assoc, hx, Category.assoc, ht]
   rw [ht] at hT H
   have hl : t (IsLocalRing.closedPoint K) ∈ Q.W l := by
     rw [← ht]
@@ -279,9 +336,10 @@ theorem inFib_of_chart : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω
   obtain ⟨g, hg, hc⟩ := exists_change Q l l' hl hl'
   obtain ⟨u, rfl⟩ := crd_change Q hB.ov.ne l l' x x' t hx ht rfl hl hl' g hc hw hw'
   obtain ⟨F, hF, hev⟩ := exists_subst (g.map fun a => M.val t a) hPf
-  have h0 := H d F hd hF fun v hv => by
-    rw [hev]
-    exact hT _ (tors_change Q hB l l' t rfl hl g hg hv)
+  have h0 :=
+    H d F hd hF fun v hv => by
+      rw [hev]
+      exact hT _ (tors_change Q hB l l' t rfl hl g hg hv)
   rw [eval_scale u _ hPf, ← hev, h0, mul_zero]
 
 end GlobalTheory.ZH.InFibChart

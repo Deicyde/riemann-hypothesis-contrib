@@ -56,8 +56,6 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK HkIdx)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 noncomputable section
 
 namespace GlobalTheory.HeightCounting.FirstFacts

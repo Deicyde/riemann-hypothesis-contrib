@@ -50,14 +50,15 @@ open Polynomial Formalism.CyclotomicNorms
 
 variable (g : ℕ) [hg : Fact g.Prime]
 
-theorem N_pos {d : ℕ} (hd : 0 < d) : 0 < g ^ d - 1 := Nat.sub_pos_of_lt (Nat.one_lt_pow hd.ne' hg.out.one_lt)
-
+theorem N_pos {d : ℕ} (hd : 0 < d) : 0 < g ^ d - 1 :=
+  Nat.sub_pos_of_lt (Nat.one_lt_pow hd.ne' hg.out.one_lt)
 
 open Formalism.MainNotions.ArithmeticCylinders
 variable {g}
 
-theorem thetaOf_gen_pow (L : LabelDatum g) {d : ℕ} (hd : 0 < d) {x : Fbar g} (hx : x ^ (g ^ d - 1) = 1) (n : ℕ) :
-    thetaOf L d x (L.gen d ^ n) = L.teich x ^ n := by
+theorem thetaOf_gen_pow
+    (L : LabelDatum g) {d : ℕ} (hd : 0 < d) {x : Fbar g} (hx : x ^ (g ^ d - 1) = 1) (n : ℕ)
+    : thetaOf L d x (L.gen d ^ n) = L.teich x ^ n := by
   apply GlobalTheory.GLq.LabelModel.thetaOf_pow <;> assumption
 
 theorem toG_coe {n : ℕ} (x : Gn g n) : toG (x : Mt g n) = x := by
@@ -72,8 +73,7 @@ theorem hc_full {n : ℕ} (α : Gn g n → ℂ) (hα : IsClass α) : hc n 0 α (
   funext x
 
   have hpar : ∀ M : Mt g n, InPar n M := fun M i j _ hi => absurd i.isLt (not_lt.mpr hi)
-  have hα' : ∀ y : Gn g n, α (y⁻¹ * x * y) = α x := fun y => by
-    simpa using hα x y⁻¹
+  have hα' : ∀ y : Gn g n, α (y⁻¹ * x * y) = α x := fun y => by simpa using hα x y⁻¹
   have hcard : (Fintype.card (Gn g n) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   simp only [hc, hcT, hpar, if_true, mul_one, tl_self, toG_coe, hα', Finset.sum_const,
     Finset.filter_true, Finset.card_univ, nsmul_eq_mul]

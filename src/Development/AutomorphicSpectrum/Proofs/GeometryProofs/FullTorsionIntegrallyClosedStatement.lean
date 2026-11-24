@@ -47,6 +47,7 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
   NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
   ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+
 theorem _root_.GlobalTheory.T.full_torsion_integrally_closed
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
         (B : Type) [CommRing B] (b : Base l B) (X : Scheme.{0}) (Ω : Type) [Field Ω] [CharZero Ω]
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.full_torsion_integrally_closed
         → IsNoetherianRing (X.presheaf.stalk q.1)
         → M.IsHTFormAt n q 0 ∧ (0 < D.p + D.q → ∃ ζ : Ω, IsPrimitiveRoot ζ n)
           ∧ M.htOm t.PP.L n q = M.htLat n q := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.OmLink.htOm_eq_htLat
-  | exact GlobalTheory.CompanionTheory.Ar.OmLink.htOm_eq_htLat
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.OmLink.htOm_eq_htLat <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.OmLink.htOm_eq_htLat

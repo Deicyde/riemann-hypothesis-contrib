@@ -48,6 +48,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
   GlobalTheory.Mem.R3
+
 theorem _root_.GlobalTheory.T.rowFiniteTypes_isotypicParts_span_orthogonal
     : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (θ : InfFam D) (M : DSModel V S)
         (P : principalLevelFrame.RowPsi V D.R.r) (hF : D.host.F = maximalRealSubfield D.host.E)
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.rowFiniteTypes_isotypicParts_span_orthogonal
               → ∀ x ∈ principalLevelFrame.isotL θ P M (levS V β L) (levChi V β L) e π,
                 ∀ y ∈ principalLevelFrame.isotL θ P M (levS V β L) (levChi V β L) e π',
                   ipM M μ 𝓕 x y = 0 := by
-  first
-  | exact @GlobalTheory.FinTypesRows.isotL_span_orth
-  | exact GlobalTheory.FinTypesRows.isotL_span_orth
-  | (intros; apply GlobalTheory.FinTypesRows.isotL_span_orth <;> assumption)
+  first | exact @GlobalTheory.FinTypesRows.isotL_span_orth

@@ -48,6 +48,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
   GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
+
 theorem _root_.GlobalTheory.T.exists_unitaryGroups_equiv_unitForm_gram_one
     : ∀ (X : Stages) (i : Fin X.toD7.R.m),
       (Vc X.toD7 i).gram = 1
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.exists_unitaryGroups_equiv_unitForm_gram_one
             ∧ (∀ γ,
               Bridge.IsRatMat (Vc X.toD7 i) (eΓ γ)
                 (LiftBrg.castGL (LiftBrg.rkEq X i) (γ : GL (Fin X.B.R.nV) X.toD7.host.E))) := by
-  first
-  | exact @GlobalTheory.Mem.R3.LiftBrg.StdGroups.stdGroups_equiv
-  | exact GlobalTheory.Mem.R3.LiftBrg.StdGroups.stdGroups_equiv
-  | (intros; apply GlobalTheory.Mem.R3.LiftBrg.StdGroups.stdGroups_equiv <;> assumption)
+  first | exact @GlobalTheory.Mem.R3.LiftBrg.StdGroups.stdGroups_equiv

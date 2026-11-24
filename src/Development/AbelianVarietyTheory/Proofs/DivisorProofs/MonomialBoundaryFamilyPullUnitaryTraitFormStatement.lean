@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -47,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.monomialBoundaryFamily_pull_unitaryTrait_form
     : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
         {l : Geo.Tor.Level H} (Xo : Moduli Dw l) (c : Coeff l) (φ : InvFun (𝓞 E)) (R : Type)
@@ -70,7 +72,4 @@ theorem _root_.GlobalTheory.T.monomialBoundaryFamily_pull_unitaryTrait_form
                                   IsMonomial P.D.toPre ![ϖ] ![be]
                                     ∧ φ.evalZ be
                                       = ∑ i, (w i : ℝ) * φ.evalZ ((l.M' : ℤ) • C.δ i) := by
-  first
-  | exact @GlobalTheory.UChart.pull_trait
-  | exact GlobalTheory.UChart.pull_trait
-  | (intros; apply GlobalTheory.UChart.pull_trait <;> assumption)
+  first | exact @GlobalTheory.UChart.pull_trait

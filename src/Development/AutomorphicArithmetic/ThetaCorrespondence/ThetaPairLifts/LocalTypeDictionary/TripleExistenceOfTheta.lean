@@ -57,8 +57,9 @@ theorem triEx_holds_alt
       → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → LNe
       → TriEx := by
   intro hH hP hK hM hL
-  obtain ⟨CF1, H1⟩ := _root_.GlobalTheory.T.bottom_theta_norm_eq_prod_local_factors hH hP hK hM hL
-  obtain ⟨CF2, H2⟩ := _root_.GlobalTheory.T.first_occurrence_theta_lift_ne_zero hP hK hM hL
+  obtain ⟨CF1, H1⟩ :=
+    _root_.GlobalTheory.BottomFactor.bottom_theta_norm_factorization hH hP hK hM hL
+  obtain ⟨CF2, H2⟩ := _root_.GlobalTheory.NonVanBottom.bottom_theta_lift_ne_zero hP hK hM hL
   refine ⟨max CF1 CF2, fun ε CF hCF => ?_⟩
   obtain ⟨C1, x1, G1⟩ := H1 ε CF (le_trans (le_max_left _ _) hCF)
   obtain ⟨C2, x2, G2⟩ := H2 ε CF (le_trans (le_max_right _ _) hCF)
@@ -101,13 +102,11 @@ end
 
 section
 open GlobalTheory.SqTop
+
 theorem _root_.GlobalTheory.T.triEx_of_howe_duality_real
     : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs
       → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
       → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → LNe
       → TriEx := by
-  first
-  | exact @_root_.GlobalTheory.SqTop.triEx_holds_alt
-  | exact _root_.GlobalTheory.SqTop.triEx_holds_alt
-  | (intros; apply _root_.GlobalTheory.SqTop.triEx_holds_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.SqTop.triEx_holds_alt
 end

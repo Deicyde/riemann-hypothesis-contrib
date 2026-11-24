@@ -60,13 +60,6 @@ open GlobalTheory.IndefiniteRowSideFullHecke.RigidPullbackIdentification
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem res_res {X : Scheme.{0}} {U V W : X.Opens} (h₁ : V ≤ U) (h₂ : W ≤ V) (s : Γ(X, U)ˣ)
-    : res h₂ (res h₁ s) = res (h₂.trans h₁) s := by
-  ext
-  simp only [res, Units.coe_map, MonoidHom.coe_coe]
-  rw [← CommRingCat.comp_apply, ← Functor.map_comp]
-  rfl
-
 theorem res_self {X : Scheme.{0}} {U : X.Opens} (h : U ≤ U) (s : Γ(X, U)ˣ) : res h s = s := by
   ext
   simp only [res, Units.coe_map, MonoidHom.coe_coe]
@@ -78,7 +71,9 @@ theorem res_eq_iff {X : Scheme.{0}} {U V : X.Opens} (h : V ≤ U) (h' : U ≤ V)
     : res h s = res h t ↔ s = t := ⟨
   fun e => by
     have := congrArg (res h') e
-    rwa [res_res, res_res, res_self, res_self] at this,
+    rwa [_root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res',
+        _root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res', res_self, res_self]
+      at this,
   fun e => e ▸ rfl
 ⟩
 
@@ -164,8 +159,10 @@ theorem rig_iff
         (Fintype.prod_unique fun _ : PUnit =>
           res h₁ (pullU (eSec G') _ (w.s (fun _ => j, j'))) ^ (1 : ℤ))
         ?_)
-    · exact (res_res _ _ _).trans ((res_res _ _ _).trans (res_res _ _ _)).symm
-    · exact (res_res _ _ _).symm
+    · exact (_root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res' _ _ _).trans
+        ((_root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res' _ _ _).trans
+          (_root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res' _ _ _)).symm
+    · exact (_root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res' _ _ _).symm
   exact ⟨
     fun h j j' => (key j j').1 (h (fun _ _ => j, fun _ => j')),
     fun h p => (key (p.1 PUnit.unit PUnit.unit) (p.2 PUnit.unit)).2 (h _ _)

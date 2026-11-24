@@ -82,7 +82,7 @@ theorem reduce_on
       by_cases hj : j = a
       · subst hj
         simp [ha, Nat.mod_add_div']
-      · simp [hj, Pi.single_eq_of_ne hj]
+      · simp [hj]
     rw [hfun, GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.GoodBdd.periodic_mul hv]
 
 theorem bddW_of_periodic

@@ -157,8 +157,8 @@ theorem UpperTheory.Gal.Int.Geo.twPhi : UpperTheory.Gal.Int.Geo.TwPhi := by
     Units.continuous_val.comp ck
   rw [← e3] at q3
   have key :=
-    GlobalTheory.T.fontaineParameter_twist_potentiallySemistable l P AI hT ι E Ω A w h O Bw hj dd _
-      _ hcs hck (pst_of_crys hT c2) (pst_of_crys hT c1) q3
+    _root_.GlobalTheory.TwistParamAbove.wdAt_twist l P AI hT ι E Ω A w h O Bw hj dd _ _ hcs hck
+      (pst_of_crys hT c2) (pst_of_crys hT c1) q3
   rw [e3] at key
   rw [key]
   have hx :=

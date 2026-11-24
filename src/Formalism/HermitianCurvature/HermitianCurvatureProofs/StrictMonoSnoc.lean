@@ -89,7 +89,7 @@ theorem det_row_lin
     by_cases h : a = i
     · subst h
       simp
-    · simp [h, Matrix.updateRow_ne h]
+    · simp [h]
   calc
     (Matrix.of X).det
       = ((Matrix.of X).updateRow i (∑ w ∈ Finset.univ, η w • v w)).det := congrArg Matrix.det h1
@@ -177,7 +177,7 @@ theorem herm_bvec_sum
       split_ifs with h
       · have hw := w.isLt
         rw [Fin.ext_iff] at h
-        simp only [Fin.val_mk] at h
+        simp only at h
         exact absurd ⟨by omega, by omega⟩ hp
       · exact mul_zero _
 

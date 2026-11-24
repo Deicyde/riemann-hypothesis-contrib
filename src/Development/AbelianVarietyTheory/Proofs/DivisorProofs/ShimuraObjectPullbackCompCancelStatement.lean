@@ -45,6 +45,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsMonoFamNontri
 import Development.AbelianVarietyTheory.Definitions.Divisors.HasRigidCoords
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalModelStructureMap
 import ReciprocityTheory.AnalyticForms.RegularLocalRings.JacChartA
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -57,6 +58,7 @@ open GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan Gl
   GlobalTheory.UCanon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.shimuraObject_pullback_comp_cancel
     : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H}
         {l : Geo.Tor.Level H},
@@ -70,7 +72,4 @@ theorem _root_.GlobalTheory.T.shimuraObject_pullback_comp_cancel
               k.toSABMap.φ = n.toSABMap.φ ≫ m.toSABMap.φ)
             ∧ ∀ k : ObjMap o'' o (g ≫ f), ∃ n : ObjMap o'' o' g,
               k.toSABMap.φ = n.toSABMap.φ ≫ m.toSABMap.φ) := by
-  first
-  | exact @GlobalTheory.UCanon.obj_pull_comp_cancel
-  | exact GlobalTheory.UCanon.obj_pull_comp_cancel
-  | (intros; apply GlobalTheory.UCanon.obj_pull_comp_cancel <;> assumption)
+  first | exact @GlobalTheory.UCanon.obj_pull_comp_cancel

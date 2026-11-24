@@ -47,6 +47,7 @@ import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
   Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
+
 theorem _root_.GlobalTheory.T.fontaine_inequality_dcris_finite_concrete_rings
     : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
       LocTied l P AI

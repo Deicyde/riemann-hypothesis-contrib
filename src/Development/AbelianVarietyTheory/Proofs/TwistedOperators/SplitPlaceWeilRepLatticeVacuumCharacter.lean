@@ -170,8 +170,7 @@ theorem om_latVac_split
     simpa using hw
   have hnorm : ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖ = r := by
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr]
-    have hs1 : ‖(splitFacO χS χT x y : ℂ)‖ = 1 := by
-      first | exact Circle.norm_coe _ | exact Circle.abs_coe _ | simp
+    have hs1 : ‖(splitFacO χS χT x y : ℂ)‖ = 1 := by first | exact Circle.norm_coe _
     rw [hs1, mul_one]
   have hr1 : r = 1 := by
     have hc : ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖₊ ^ 2 = 1 := by

@@ -266,7 +266,7 @@ theorem restBlockSubst_isMultiHomogeneous
       rw [Finset.sum_eq_single b]
       · simp
       · intro c _ hc
-        simp [Pi.single_apply, Ne.symm hc]
+        simp [Ne.symm hc]
       · simp
   intro s hs b
   have hb := congrFun (hW (MvPolynomial.mem_support_iff.mp hs)) b
@@ -277,7 +277,7 @@ theorem restBlockSubst_isMultiHomogeneous
     Fintype.sum_prod_type, Finset.sum_eq_single b]
   · simp
   · intro c _ hc
-    simp [Pi.single_apply, Ne.symm hc]
+    simp [Ne.symm hc]
   · simp
 
 theorem blockSphere_logMean_bound

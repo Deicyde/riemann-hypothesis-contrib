@@ -77,7 +77,6 @@ theorem ReadsG.period_eq
     : Pm.period w G = Pm.period w G' := by
   choose v hv using hw
   have e : w = ∑ c, eW.symm (Pi.single c (j (v c))) := by
-
     rw [← map_sum, LinearEquiv.eq_symm_apply]
     simp only [hv]
     exact (Finset.univ_sum_single _).symm

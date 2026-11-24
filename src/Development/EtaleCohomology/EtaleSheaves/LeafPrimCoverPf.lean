@@ -132,6 +132,4 @@ theorem leafPrimCover_pf : LateralTheory.E.LeafOneSpecPf.LeafPrimCover := by
         (Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom))
       ζ⟩
 
-theorem LeafPrimCover_of : LateralTheory.E.LeafOneSpecPf.LeafPrimCover := leafPrimCover_pf
-
 end LateralTheory.E.LeafPrimCoverPf

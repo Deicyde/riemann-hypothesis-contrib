@@ -248,7 +248,7 @@ theorem lattice_main
     rw [← Algebra.discr_localizationLocalization R (nonZeroDivisors R) (L c) (a c), ← gram_mul]
     congr 1
     ext i j
-    simp only [Matrix.of_apply, a', Module.Basis.localizationLocalization_apply]
+    simp only [Matrix.of_apply, Module.Basis.localizationLocalization_apply]
     rfl
   have hd0 : ∀ c, Algebra.discr R (a c) ≠ 0 := by
     intro c h

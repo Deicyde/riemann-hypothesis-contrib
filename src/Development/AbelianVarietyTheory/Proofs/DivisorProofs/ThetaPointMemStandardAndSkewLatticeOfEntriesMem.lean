@@ -109,14 +109,7 @@ theorem pt_mem_of_entries_mem
               / ((D.host.conj • 𝔪 : Ideal (𝓞 D.host.E))
                 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := by
         rw [FractionalIdeal.le_div_iff_mul_le hne]
-        first
-        | exact mul_le_of_le_one_right' FractionalIdeal.coeIdeal_le_one
-        | exact mul_le_of_le_one_right (zero_le _) FractionalIdeal.coeIdeal_le_one
-        | exact (mul_le_mul_left FractionalIdeal.coeIdeal_le_one _).trans_eq (mul_one _)
-        | exact (FractionalIdeal.mul_le_mul_left FractionalIdeal.coeIdeal_le_one _).trans_eq
-            (mul_one _)
-        | exact (mul_le_mul_of_nonneg_left FractionalIdeal.coeIdeal_le_one (zero_le _)).trans_eq
-            (mul_one _)
+        first | exact mul_le_of_le_one_right' FractionalIdeal.coeIdeal_le_one
       exact (FractionalIdeal.coe_le_coe.2 hle) (hent x hx i)
 
 end GlobalTheory.FunObj.SqNum

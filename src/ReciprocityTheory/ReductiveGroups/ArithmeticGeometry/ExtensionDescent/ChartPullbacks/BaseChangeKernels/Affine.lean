@@ -117,12 +117,12 @@ theorem bijective_liftNC_of_isPushout
       : ∀ (x : X) (r : R),
         e (AddMonoidAlgebra.single x r) = qa.hom r * φ (Multiplicative.ofAdd x) := by
     intro x r
-    simp [e, AddMonoidAlgebra.liftNC_single]
+    simp [e]
   have hF
       : ∀ (x : X) (r : R'),
         F (AddMonoidAlgebra.single x r) = qa'.hom r * φ' (Multiplicative.ofAdd x) := by
     intro x r
-    simp [F, AddMonoidAlgebra.liftNC_single]
+    simp [F]
   have hM
       : ∀ (x : X) (r : R),
         Mp (AddMonoidAlgebra.single x r) = AddMonoidAlgebra.single x (ba.hom r) := by

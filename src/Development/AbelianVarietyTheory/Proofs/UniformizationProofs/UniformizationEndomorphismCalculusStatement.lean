@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.uniformizationEndomorphism_calculus
             ∧ (E''.aG = E.aG ≫ E'.aG
               → E''.aB = E.aB ≫ E'.aB ∧ E''.h = E.h.comp E'.h
                 ∧ ∀ g g₁ g₂ : GtPtF D.toPre F, E.Act g g₁ → E'.Act g₁ g₂ → E''.Act g g₂) := by
-  first
-  | exact @GlobalTheory.EndCalc.end_calculus
-  | exact GlobalTheory.EndCalc.end_calculus
-  | (intros; apply GlobalTheory.EndCalc.end_calculus <;> assumption)
+  first | exact @GlobalTheory.EndCalc.end_calculus

@@ -86,7 +86,7 @@ theorem tm_conj
     · simp [hab]
     · simp [hab, Ne.symm hab]
   simp only [Tm, Econj, smul_add, Finset.sum_add_distrib, Fintype.sum_prod_type, smul_ite,
-    smul_zero, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
   rw [← Finset.sum_smul, hQP]
   split_ifs <;> simp
 

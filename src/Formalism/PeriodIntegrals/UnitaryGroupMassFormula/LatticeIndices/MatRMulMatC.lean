@@ -159,11 +159,7 @@ theorem adapt_of_eps
     · exact hT.resolve_left h0
   have hlt : Valued.v ((gOf p : ℕ) : FpX X p) < 1 := by
     have h2 : ((gOf p : ℕ) : FpX X p) = (((gOf p : ℕ) : X.B.I.F) : FpX X p) := by
-      first
-      | exact (map_natCast (algebraMap X.B.I.F (FpX X p)) _).symm
-      | exact (map_natCast (IsDedekindDomain.HeightOneSpectrum.coeRingHom p.1) _).symm
-      | (norm_cast; done)
-      | (simp; done)
+      first | exact (map_natCast (algebraMap X.B.I.F (FpX X p)) _).symm
     rw [h2, IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
       ← map_natCast (algebraMap (𝓞 X.B.I.F) X.B.I.F),
       IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem]

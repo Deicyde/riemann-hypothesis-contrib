@@ -85,7 +85,7 @@ theorem peirce_block_decomposition
       _ = E * x * E + F * x * F + E * x * F + F * x * E := by noncomm_ring
       _ = _ := by rw [hx, add_zero]
   · intro x
-    simp only [mul_add, add_mul, mul_assoc, hE', hF', hEF', hFE', hE, hF, add_zero, zero_add]
+    simp only [mul_add, mul_assoc, hE', hF', hEF', hFE', hE, hF, add_zero, zero_add]
 
 theorem blk_mul_of_triangular
     : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (e : Matrix ι ι ℚ) (R : Type) [CommRing R]

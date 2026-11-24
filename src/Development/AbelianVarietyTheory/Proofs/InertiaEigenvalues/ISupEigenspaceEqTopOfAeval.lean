@@ -71,7 +71,7 @@ theorem aeval_restrict_coe
   | add p q hp hq => simp [hp, hq]
   | monomial n c =>
     simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply,
-      Module.End.pow_restrict, LinearMap.restrict_apply, Submodule.coe_smul]
+      Submodule.coe_smul]
     rw [Module.End.pow_restrict n hW]
     rfl
 

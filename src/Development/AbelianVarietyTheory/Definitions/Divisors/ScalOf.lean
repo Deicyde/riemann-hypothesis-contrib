@@ -69,7 +69,6 @@ variable
   {R : RealDat D A J.Q.c.F} {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
   {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec}
 
-
 def reFw (fw : FWTie J R κ v₀) (F : Face D A) : FWTie J (charOf R F) κ v₀ := { fw with }
 
 def reOM {i : Fin D.R.m} (O : OMDat J.toCore R i Unit (fun _ => A.μ0)) (F : Face D A)

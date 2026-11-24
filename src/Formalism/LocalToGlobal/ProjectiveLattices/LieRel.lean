@@ -46,8 +46,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace Formalism.L2.Pj.LieRel
@@ -113,8 +111,7 @@ theorem tan_eq_cvV {w : epsOver V V ⟶ G} (h : IsTan w)
   let y : sp (R₀ := V) (DualNumber V) ⟶ G := Over.homMk w.left ((Over.w w).trans epsOver_hom)
   have hy : ReciprocityTheory.ChartRestriction.G.Chart.IsTan y := Over.OverMorphism.ext h
   refine ⟨tcoord hx y hy, ?_⟩
-  have e : y = tvec (x := xc) (tcoord hx y hy) := by
-    first | exact tcoord_spec hx y hy | exact tcoord_spec y hy
+  have e : y = tvec (x := xc) (tcoord hx y hy) := by first | exact tcoord_spec hx y hy
   rw [← e]
   exact Over.OverMorphism.ext (by rw [cvV_left]; rfl)
 
@@ -168,9 +165,7 @@ theorem comb_iff {m : ℕ} (b : Fin m → Fin n → V) (r : Fin m → V) (e : Fi
                 ≫ tvec (x := xc) (b i)) :=
       funext fun i => Over.OverMorphism.ext (by rw [hu1, cvV_left, cvV_left] <;> rfl)
     rw [hu', hprod] at hw
-    first
-    | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj hx (cvV_inj hw)
-    | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj (cvV_inj hw)
+    first | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj hx (cvV_inj hw)
   · intro he
     refine ⟨
       fun i =>
@@ -213,7 +208,7 @@ theorem fst_alg
   rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
   have hid
       : (TrivSqZeroExt.fstHom K K K).toRingHom.comp (algebraMap K (DualNumber K)) = RingHom.id K :=
-    RingHom.ext fun a => by simp [TrivSqZeroExt.algebraMap_eq_inl]
+    RingHom.ext fun a => by simp
   rw [hid, CommRingCat.ofHom_id, Spec.map_id]
 
 def iotaX : epsAt x ⟶ Over.mk ((viaT (𝟙 (Sp K)) (sp (R₀ := K) (DualNumber K))).hom ≫ x) :=

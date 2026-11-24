@@ -41,11 +41,16 @@ import Mathlib.Topology.Sheaves.Init
 @[expose] public section
 
 open Formalism.BasicNotions Classical NumberField GlobalTheory.LvT
-open Formalism.MainNotions.product_first_zeroth_parts (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
+open Formalism.MainNotions.product_first_zeroth_parts
+  (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
 
 namespace GlobalTheory.LvT
 
-theorem isExt_KT : ∀ (D : D7) (u : D.what₂.Word) (X : Ch D u) (i : ℕ) (M : PtModel X i) (M' : PtModel X (i + 1)) (K : KerPt M M') (φ : Fn X i) (Φ : M.Pt → M.Val), K.TgtEq → M.IsExt φ Φ → M'.IsExt (KT X i φ) (fun p' => ∑ c, X.C.wt i c • K.k (M.rep c) p' (Φ (M.rep c))) := by
+theorem isExt_KT
+    : ∀ (D : D7) (u : D.what₂.Word) (X : Ch D u) (i : ℕ) (M : PtModel X i) (M' : PtModel X (i + 1))
+        (K : KerPt M M') (φ : Fn X i) (Φ : M.Pt → M.Val),
+      K.TgtEq → M.IsExt φ Φ
+        → M'.IsExt (KT X i φ) (fun p' => ∑ c, X.C.wt i c • K.k (M.rep c) p' (Φ (M.rep c))) := by
   intro D u X i M M' K φ Φ hK hΦ
   refine ⟨fun c' => ?_, fun g' p' => ?_⟩
   · show Formalism.ThetaLiftIndependence.kerOpM (X.C.wt i) (X.C.Kmap i) φ c' = _

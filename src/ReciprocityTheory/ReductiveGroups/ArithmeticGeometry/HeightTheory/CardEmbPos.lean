@@ -92,7 +92,7 @@ theorem meanK_le (F G H : (K →+* ℂ) → ℝ) (C r : ℝ) (hle : ∀ sg, F sg
             + r * ((∑ sg, H sg) / (Fintype.card (K →+* ℂ) : ℝ)))
           * (Fintype.card (K →+* ℂ) : ℝ)
         = (∑ sg, G sg) + Fintype.card (K →+* ℂ) * C + r * ∑ sg, H sg := by
-    field_simp <;> ring
+    field_simp
   linarith
 
 theorem sg_part

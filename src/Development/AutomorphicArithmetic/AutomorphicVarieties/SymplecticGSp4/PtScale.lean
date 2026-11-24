@@ -62,7 +62,7 @@ private theorem pts_wv {K : Type} [CommRing K] (t : Multiplicative (ℤ × ℤ) 
         = Multiplicative.ofAdd ((1, 0) : ℤ × ℤ) ^ a
           * Multiplicative.ofAdd ((0, 1) : ℤ × ℤ) ^ b := by
     apply Multiplicative.toAdd.injective
-    simp [toAdd_zpow, toAdd_mul, Prod.ext_iff]
+    simp [toAdd_zpow, toAdd_mul]
   rw [h, map_mul, map_zpow, map_zpow]
   rfl
 
@@ -85,7 +85,7 @@ private theorem pts_abs
     have hle : Submodule.map W.A.val.toLinearMap (W.gr 0) ≤ W.part 0 := by
       rintro _ ⟨a, ha, rfl⟩
       exact ha
-    first | exact isNoetherian_submodule.mp hP _ hle | exact isNoetherian_submodule'.mp hP _ hle
+    first | exact isNoetherian_submodule.mp hP _ hle
   obtain ⟨t, Ξ, hΞ, -⟩ := points_finite O (ℤ × ℤ) S W hz K ξ (hG.map _)
   refine ⟨(t (Multiplicative.ofAdd (1, 0)), t (Multiplicative.ofAdd (0, 1))), Ξ, ?_⟩
   intro w x hx

@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.FrobeniusEigenvaluesTwist
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.FrobeniusSignCompatibility
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.GaloisRepIrreducibilityCriterion
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.SchurTwistHolds
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.BcDefs
+public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.SchurTwistHolds
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.TIsoOfFrob
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -43,9 +44,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
   ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.HeckeGal
@@ -56,6 +54,6 @@ theorem UpperTheory.V.Af.Bc.noTwist_of_prints (hP : _root_.UpperTheory.V.Af.Hypo
   UpperTheory.baseChange_noSelfTwist_of_frobenius_sign_irreducible
     (_root_.UpperTheory.V.Af.iso_of_frobenius_of_printed_results hP)
     UpperTheory.frobenius_eigenvalues_twist UpperTheory.exists_quadratic_sign_character
-    UpperTheory.frobenius_sign_compatibility UpperTheory.schur_twist_holds
+    UpperTheory.frobenius_sign_compatibility _root_.UpperTheory.Reformulated.B.H13.schur_twist_holds
     UpperTheory.galoisRep_irreducibility_criterion
 end

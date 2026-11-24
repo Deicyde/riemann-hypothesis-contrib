@@ -42,9 +42,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
   ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep

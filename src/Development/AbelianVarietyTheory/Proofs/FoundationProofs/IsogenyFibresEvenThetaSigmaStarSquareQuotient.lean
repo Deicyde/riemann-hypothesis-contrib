@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DifferentiableSqTh
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvenThetaEqProdSigmaStarSquareQuotientStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvenThetaTwoTorsionBasicPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvenThetaEqProdSigmaStarSquareQuotient
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvenThetaTwoTorsionBasicProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -148,9 +148,9 @@ theorem isogeny_fibres
       linear_combination (-2 * x) * hN'
   ⟩
   obtain ⟨hd, h0, hev, -, hz, hU⟩ :=
-    GlobalTheory.T.th0_zero_even_sq_zeros_and_periodicity Λ h t₀ ht₀ h2
+    _root_.GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties Λ h t₀ ht₀ h2
   obtain ⟨Q, hQ, hQe⟩ :=
-    GlobalTheory.T.evenTheta_eq_prod_sigmaStarSquareQuotient Λ h k
+    _root_.GlobalTheory.EvenTheta.exists_eq_prod_sqTh Λ h k
       (fun z => GL3Theta.th0 Λ t₀ (β * z))
       (hd.comp (by fun_prop))
       (fun z => by rw [mul_neg, hev])
@@ -165,7 +165,7 @@ theorem isogeny_fibres
           rw [thetaTranslationOperator_apply, trFac_mul hN] at this
           simpa only [mul_add] using this))
   obtain ⟨Q', hQ', hQe'⟩ :=
-    GlobalTheory.T.evenTheta_eq_prod_sigmaStarSquareQuotient Λ h (2 * k)
+    _root_.GlobalTheory.EvenTheta.exists_eq_prod_sqTh Λ h (2 * k)
       (fun z => sqTh Λ (β * t₀) (β * z))
       ((h.differentiable_sqTh _).comp (by fun_prop))
       (fun z => by rw [mul_neg, sqTh_neg])

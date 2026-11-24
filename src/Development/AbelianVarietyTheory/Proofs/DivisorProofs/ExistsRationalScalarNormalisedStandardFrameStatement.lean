@@ -44,6 +44,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Fo
   Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT GlobalTheory.SeriesTie
   GlobalTheory.BigOn.Exp
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_rationalScalar_normalised_standardFrame
     : GlobalTheory.Published.GlobalArtinReciprocity → GlobalTheory.Published.RayClassFieldSt
       → GlobalTheory.SerStd.SeriesRatS
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_rationalScalar_normalised_standardFrame
         RealPin Rl cG ρ → RatHyp T Rl F κ v₀ O i j hV
           → T.toCore.cuspA ((j : ℕ) + 1) (wtA (κ j)) (κ j).n ≠ ⊥
           → ∃ ν, IsNorm Rl v₀ (ρ.B i j b) ν ∧ IsRatScalar T Rl κ v₀ hV (ρ.B i j b) ν := by
-  first
-  | exact @GlobalTheory.SeriesTie.NormRatStd.exists_isNorm_isRatScalar_std
-  | exact GlobalTheory.SeriesTie.NormRatStd.exists_isNorm_isRatScalar_std
-  | (intros; apply GlobalTheory.SeriesTie.NormRatStd.exists_isNorm_isRatScalar_std <;> assumption)
+  first | exact @GlobalTheory.SeriesTie.NormRatStd.exists_isNorm_isRatScalar_std

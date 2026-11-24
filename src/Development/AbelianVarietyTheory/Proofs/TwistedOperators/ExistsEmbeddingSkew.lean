@@ -70,7 +70,7 @@ theorem exists_toLp_ext {G : Type} [MeasurableSpace G] (ν : Measure G)
   let S : Submodule ℂ (G → ℂ) := {
     carrier := {φ | MemLp φ 2 ν}
     add_mem' := fun ha hb => ha.add hb
-    zero_mem' := by first | exact MemLp.zero | exact MemLp.zero' | exact zero_memLp | simp
+    zero_mem' := by first | exact MemLp.zero
     smul_mem' := fun c _ h => h.const_smul c
   }
   let f : S →ₗ[ℂ] Lp ℂ 2 ν := {
@@ -92,7 +92,7 @@ theorem inner_eq
   refine integral_congr_ae ?_
   filter_upwards [h, h'] with g hg hg'
   rw [hg, hg']
-  first | (rw [RCLike.inner_apply]; try ring) | simp [mul_comm]
+  first | (rw [RCLike.inner_apply]; try ring)
 
 variable {D : D7} {θ : InfFam D} {V : HSp D}
 
@@ -116,7 +116,7 @@ theorem conj_mul
   refine ⟨(Complex.continuous_conj.comp c).mul c', max B 0 * max B' 0, fun g => ?_⟩
   calc
     ‖(starRingEnd ℂ) (φ g) * φ' g‖
-      = ‖φ g‖ * ‖φ' g‖ := by simp [norm_mul]
+      = ‖φ g‖ * ‖φ' g‖ := by simp
     _ ≤ max B 0 * max B' 0 :=
       mul_le_mul ((hB g).trans (le_max_left _ _)) ((hB' g).trans (le_max_left _ _)) (norm_nonneg _)
         (le_max_right _ _)
@@ -164,7 +164,6 @@ theorem exists_embedding_skew
     haveI : SMulInvariantMeasure (GQ V) (GA D V) μ := by
       first
         | exact inferInstance
-        | exact ⟨fun γ s _ => measure_preimage_mul μ (γ : GA D V) s⟩
     open Pointwise in
     have hinv : ∀ γ : GQ V, γ • {g | φ g ≠ 0} = {g | φ g ≠ 0} := by
       intro γ

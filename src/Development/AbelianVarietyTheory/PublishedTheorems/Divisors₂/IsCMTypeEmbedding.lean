@@ -79,10 +79,6 @@ theorem hasInf_inv
   rw [Formalism.L2.Host.HChar.inf_inv, Units.val_inv_eq_inv_val, h k, ← Finset.prod_inv_distrib]
   simp only [zpow_neg]
 
-theorem isUnitary_inv {χ : HChar E} (h : IsUnitary χ) : IsUnitary χ⁻¹ := fun x => by
-  show ‖(((χ.1 x)⁻¹ : ℂˣ) : ℂ)‖ = 1
-  rw [Units.val_inv_eq_inv_val, norm_inv, h x, inv_one]
-
 theorem zero_iff
     (h : HeckeFunctionalEquationAbs)
     [_root_.NumberField.IsTotallyComplex E]
@@ -103,14 +99,6 @@ theorem zero_iff
       pow_ne_zero _ (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot)
   rw [hs s, mul_eq_zero, mul_eq_zero, Complex.cpow_eq_zero_iff]
   tauto
-
-end
-
-section
-open Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
-  GlobalTheory.DefU.NonTriv
-
-variable (E : Type) [Field E] [NumberField E] [IsCMField E]
 
 end
 

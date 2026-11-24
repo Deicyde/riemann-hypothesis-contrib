@@ -38,8 +38,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
@@ -54,6 +52,7 @@ variable
 variable {ex : Extra D L hT Gi Gl Kc Y cX}
 namespace PtAt
 variable {Csz : ℝ}
+
 def ofReal_alt
     (P : IndefiniteRowSideFullHecke ex)
     (Del h0 : ℕ) (hDel : D.s.Del = (Del : ℚ)) (hh0 : L.etaSz = (D.R.m : ℝ) * (h0 : ℝ))

@@ -48,6 +48,7 @@ open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
+
 theorem _root_.GlobalTheory.T.schur_finiteHeisenberg_fockVacuumThetaFunctions
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D),
       IsStdChar D ψ (-1) → IsInfFam θ
@@ -86,7 +87,4 @@ theorem _root_.GlobalTheory.T.schur_finiteHeisenberg_fockVacuumThetaFunctions
                         → (∀ τ, IsFockVacAt (heisO ψ S T) θ τ (cplxO (sS τ) (sT τ)) f)
                         → (∀ τ, IsFockVacAt (heisO ψ S T) θ τ (cplxO (sS τ) (sT τ)) g)
                         → Φ f g = c * thetaIP μ 𝓕 f g := by
-  first
-  | exact @GlobalTheory.VacSchurFin.vacSchur
-  | exact GlobalTheory.VacSchurFin.vacSchur
-  | (intros; apply GlobalTheory.VacSchurFin.vacSchur <;> assumption)
+  first | exact @GlobalTheory.VacSchurFin.vacSchur

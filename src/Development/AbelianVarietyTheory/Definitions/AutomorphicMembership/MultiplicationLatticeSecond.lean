@@ -44,8 +44,6 @@ import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.AbelianAt
 
 @[expose] public section
 
-
-
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField TopologicalSpace

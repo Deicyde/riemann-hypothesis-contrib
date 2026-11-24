@@ -61,8 +61,8 @@ section Character
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ)
 
-theorem exp_mem_range_of_isAlgClosed (x : ℚ) :
-    Complex.exp (2 * Real.pi * Complex.I * (x : ℂ)) ∈ Set.range ε := by
+theorem exp_mem_range_of_isAlgClosed (x : ℚ)
+    : Complex.exp (2 * Real.pi * Complex.I * (x : ℂ)) ∈ Set.range ε := by
   have hMΩ : ((x.den : ℕ) : Ω) ≠ 0 := by
     intro h
     have := congrArg ε h
@@ -75,9 +75,11 @@ theorem exp_mem_range_of_isAlgClosed (x : ℚ) :
   have hw : Complex.exp (2 * Real.pi * Complex.I * (x : ℂ)) ^ x.den = 1 := by
     rw [← Complex.exp_nat_mul]
     have hx : (x : ℂ) * (x.den : ℂ) = (x.num : ℂ) := by exact_mod_cast Rat.mul_den_eq_num x
-    have : (x.den : ℂ) * (2 * Real.pi * Complex.I * (x : ℂ)) = (x.num : ℂ) * (2 * Real.pi * Complex.I) := by
+    have : (x.den : ℂ) * (2 * Real.pi * Complex.I * (x : ℂ))
+        = (x.num : ℂ) * (2 * Real.pi * Complex.I) := by
       rw [← hx]; ring
-    rw [this]; exact Complex.exp_int_mul_two_pi_mul_I _
+    rw [this]
+    exact Complex.exp_int_mul_two_pi_mul_I _
   obtain ⟨i, -, hi⟩ := hζ'.eq_pow_of_pow_eq_one hw
   exact ⟨ζ ^ i, by rw [map_pow]; exact hi⟩
 
@@ -87,11 +89,14 @@ theorem eOm_spec (x : ℚ) : ε (eOm ε x) = Complex.exp (2 * Real.pi * Complex.
 theorem eOm_add (x y : ℚ) : eOm ε (x + y) = eOm ε x * eOm ε y := by
   apply ε.injective
   rw [map_mul, eOm_spec, eOm_spec, eOm_spec, ← Complex.exp_add]
-  congr 1; push_cast; ring
+  congr 1
+  push_cast
+  ring
 
 theorem eOm_zero : eOm ε 0 = 1 := by
   apply ε.injective
-  rw [eOm_spec, map_one]; simp
+  rw [eOm_spec, map_one]
+  simp
 
 end Character
 
@@ -99,10 +104,10 @@ section Coeff
 
 variable {R : Type*} [CommRing R]
 
-theorem cm_coeff (c : ℚ → R) (φ : HahnSeries ℚ R) (r : ℚ) : (cm c φ).coeff r = c r * φ.coeff r := rfl
+alias cm_coeff := _root_.GlobalTheory.CyclotomicQExpansion.Api.coeff_cm
 
-theorem cm_mul (c : ℚ → R) (hc : ∀ r s, c (r + s) = c r * c s) (φ ψ : HahnSeries ℚ R) :
-    cm c (φ * ψ) = cm c φ * cm c ψ := by
+theorem cm_mul (c : ℚ → R) (hc : ∀ r s, c (r + s) = c r * c s) (φ ψ : HahnSeries ℚ R)
+    : cm c (φ * ψ) = cm c φ * cm c ψ := by
   apply GlobalTheory.UlCusp.cm_mul_of_char <;> assumption
 
 theorem cm_one (c : ℚ → R) (hc : c 0 = 1) : cm c (1 : HahnSeries ℚ R) = 1 := by
@@ -112,7 +117,8 @@ theorem cm_one (c : ℚ → R) (hc : c 0 = 1) : cm c (1 : HahnSeries ℚ R) = 1 
   · subst h; rw [hc, mul_one]
   · rw [mul_zero]
 
-theorem scale_mul {a : ℚ} (ha : 0 < a) (φ ψ : HahnSeries ℚ R) : scale a (φ * ψ) = scale a φ * scale a ψ := by
+theorem scale_mul {a : ℚ} (ha : 0 < a) (φ ψ : HahnSeries ℚ R)
+    : scale a (φ * ψ) = scale a φ * scale a ψ := by
   simp only [scale, dif_pos ha]
   exact HahnSeries.embDomain_mul _ (fun x y => by simp [mul_add]) φ ψ
 
@@ -122,9 +128,11 @@ theorem scale_one {a : ℚ} (ha : 0 < a) : scale a (1 : HahnSeries ℚ R) = 1 :=
 
 end Coeff
 
-theorem sub_mul_and_one : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (a b d : ℚ), 0 < a / d →
-    ∀ φ ψ : HahnSeries ℚ Ω,
-  sub ε a b d (φ * ψ) = sub ε a b d φ * sub ε a b d ψ ∧ sub ε a b d 1 = 1 := by
+theorem sub_mul_and_one
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (a b d : ℚ),
+      0 < a / d
+        → ∀ φ ψ : HahnSeries ℚ Ω,
+          sub ε a b d (φ * ψ) = sub ε a b d φ * sub ε a b d ψ ∧ sub ε a b d 1 = 1 := by
   intro Ω _ _ _ ε a b d h φ ψ
   have hc : ∀ r s : ℚ, eOm ε ((r + s) * b / d) = eOm ε (r * b / d) * eOm ε (s * b / d) := by
     intro r s; rw [← eOm_add]; congr 1; ring

@@ -126,7 +126,7 @@ theorem FrameAtV_holds : FrameAtV := by
     Formalism.L2.SG.PoincareInHH.Cut.hJ_crd (X := X) v p q
   have hs : ∀ p q : (VS D).V, (VS D).hT q p = starRingEnd D.host.E ((VS D).hT p q) := by
     intro p q
-    first | exact ((VS D).herm.eq p q).symm | exact ((VS D).herm p q).symm
+    first | exact ((VS D).herm.eq p q).symm
   simp only [HidaSetting.eR, HidaSetting.fR, HidaSetting.zR, hc]
   refine ⟨
     fun a b => by rw [X.ee a b, map_zero],

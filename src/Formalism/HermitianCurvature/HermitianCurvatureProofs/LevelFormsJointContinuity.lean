@@ -665,7 +665,3 @@ theorem level_forms_joint_continuity : GermFibreKernels.KerContB := by
 end final
 
 end Formalism.FourierDecayAlt.P.LastBlockContinuity
-
-theorem Formalism.FourierDecayAlt.P.kernel_continuity_built
-    : Formalism.FourierDecayAlt.P.GermFibreKernels.KerContB :=
-  Formalism.FourierDecayAlt.P.LastBlockContinuity.level_forms_joint_continuity

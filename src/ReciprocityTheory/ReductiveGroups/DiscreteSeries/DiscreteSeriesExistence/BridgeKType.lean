@@ -58,8 +58,10 @@ namespace ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+  {E : Fin n → Fin n → Module.End ℂ D}
 
 private lemma exp_smul_mem_Kset_of_skew_of_commute_Jm (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X)
     (hJ : X * Jm ε = Jm ε * X) (t : ℝ) : NormedSpace.exp ((t : ℂ) • X) ∈ Kset ε := by
@@ -119,8 +121,6 @@ private lemma exp_smul_diagonal_I (φ : Fin n → ℝ) (t : ℝ) :
   congr 1
   funext b
   first
-  | (rw [Pi.exp_apply, ← Complex.exp_eq_exp_ℂ])
-  | (simp only [Pi.exp_apply]; exact (congrFun Complex.exp_eq_exp_ℂ _).symm)
   | simp [Complex.exp_eq_exp_ℂ]
 
 private lemma diagonal_I_conjTranspose_eq_neg (φ : Fin n → ℝ) :
@@ -217,7 +217,7 @@ private lemma actM_diagonal_I_single {M : Type*} [AddCommGroup M] [Module ℂ M]
   rw [actM_diagonal, Finset.sum_eq_single a]
   · simp
   · intro b _ hb
-    simp [Pi.single_apply, hb]
+    simp [hb]
   · intro h
     exact absurd (Finset.mem_univ a) h
 
@@ -298,17 +298,17 @@ private lemma actM_symmetric_I_unit {M : Type*} [AddCommGroup M] [Module ℂ M]
       Complex.I • E' a b x + Complex.I • E' b a x := by
   simp [actM, add_smul, Finset.sum_add_distrib, ite_and, ite_smul]
 
-theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) {Λ : Fin n → ℝ}
-    {V : Submodule ℂ D} (hV : IsKIrrHW ε E Λ V)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
-    (hwt : ∀ (μ : Fin n → ℝ) (x : D), x ∈ V → x ≠ 0 → (∀ a, E a a x = ((μ a : ℝ) : ℂ) • x) →
-      Formalism.MainNotions.S.CDom ε μ Λ) :
-    Formalism.MainNotions.S.IsKTypeOf ε σ Λ (V.map D.subtype) := by
+theorem isKTypeOf_of_isKIrrHW
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+    {Λ : Fin n → ℝ} {V : Submodule ℂ D}
+    (hV : IsKIrrHW ε E Λ V) (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    (hwt : ∀ (μ : Fin n → ℝ) (x : D),
+      x ∈ V → x ≠ 0 → (∀ a, E a a x = ((μ a : ℝ) : ℂ) • x) → Formalism.MainNotions.S.CDom ε μ Λ)
+    : Formalism.MainNotions.S.IsKTypeOf ε σ Λ (V.map D.subtype) := by
   unfold Formalism.MainNotions.S.IsKTypeOf
   have hW : FiniteDimensional ℂ (V.map D.subtype) := by
     haveI := hV.1
-    first
-    | exact Module.Finite.map V D.subtype
+    first | exact Module.Finite.map V D.subtype
   refine ⟨hW, ?_, ?_, ?_, ?_⟩
   · intro g hg v hv
     obtain ⟨x, hxV, hxv⟩ := Submodule.mem_map.mp hv
@@ -317,22 +317,29 @@ theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn �
     exact Submodule.mem_map_of_mem hyV
   · intro S' hle hS'
     haveI : FiniteDimensional ℂ S' := Submodule.finiteDimensional_of_le hle
-    have hmem : ∀ X : Matrix (Fin n) (Fin n) ℂ, Xᴴ = -X → X * Jm ε = Jm ε * X →
-        ∀ v : D, (v : H) ∈ S' → ((actM E X v : D) : H) ∈ S' := by
+    have hmem
+        : ∀ X : Matrix (Fin n) (Fin n) ℂ,
+          Xᴴ = -X → X * Jm ε = Jm ε * X → ∀ v : D, (v : H) ∈ S' → ((actM E X v : D) : H) ∈ S' := by
       intro X hX hJ v hv
-      exact deriv_mem_submodule_of_forall_mem (hD.deriv X (inG_of_skewHermitian_of_commute_Jm X hX hJ) v)
+      exact deriv_mem_submodule_of_forall_mem
+        (hD.deriv X (inG_of_skewHermitian_of_commute_Jm X hX hJ) v)
         (fun t => hS' _ (exp_smul_mem_Kset_of_skew_of_commute_Jm X hX hJ t) _ hv)
     have hTs : IsKStableSub ε E (V ⊓ S'.comap D.subtype) := by
       intro a b hab v hv
       have hv' := Submodule.mem_inf.mp hv
       have hv2 : (v : H) ∈ S' := Submodule.mem_comap.mp hv'.2
       refine Submodule.mem_inf.mpr ⟨hV.2.1 a b hab v hv'.1, ?_⟩
-      have h1 := hmem _ (antisymmetric_unit_conjTranspose_eq_neg a b) (antisymmetric_unit_commute_Jm_of_same_sign hab) v hv2
-      have h2 := hmem _ (symmetric_I_unit_conjTranspose_eq_neg a b) (symmetric_I_unit_commute_Jm_of_same_sign hab) v hv2
+      have h1 :=
+        hmem _ (antisymmetric_unit_conjTranspose_eq_neg a b)
+          (antisymmetric_unit_commute_Jm_of_same_sign hab) v hv2
+      have h2 :=
+        hmem _ (symmetric_I_unit_conjTranspose_eq_neg a b)
+          (symmetric_I_unit_commute_Jm_of_same_sign hab) v hv2
       rw [actM_antisymmetric_unit] at h1
       rw [actM_symmetric_I_unit] at h2
-      have key : (2 : ℂ) • E a b v = (E a b v - E b a v) +
-          (-Complex.I) • (Complex.I • E a b v + Complex.I • E b a v) := by
+      have key
+          : (2 : ℂ) • E a b v
+            = (E a b v - E b a v) + (-Complex.I) • (Complex.I • E a b v + Complex.I • E b a v) := by
         rw [smul_add (-Complex.I), smul_smul, smul_smul, neg_mul, Complex.I_mul_I, neg_neg,
           one_smul, one_smul, two_smul]
         abel
@@ -341,8 +348,7 @@ theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn �
         exact S'.add_mem h1 (S'.smul_mem _ h2)
       rw [Submodule.coe_smul] at h3
       refine Submodule.mem_comap.mpr ?_
-      first
-      | exact (S'.smul_mem_iff two_ne_zero).mp h3
+      first | exact (S'.smul_mem_iff two_ne_zero).mp h3
     rcases hV.2.2.1 (V ⊓ S'.comap D.subtype) inf_le_left hTs with h | h
     · left
       rw [Submodule.eq_bot_iff]
@@ -362,8 +368,9 @@ theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn �
   · obtain ⟨w, hwV, hw0, hwHW⟩ := hV.2.2.2
     refine ⟨(w : H), Submodule.mem_map_of_mem hwV, fun h => hw0 (Submodule.coe_eq_zero.mp h), ?_⟩
     intro θ hθ
-    have hact : actM E (Matrix.diagonal (fun b => (θ b : ℂ) * Complex.I)) w =
-        (((∑ a, Λ a * θ a : ℝ) : ℂ) * Complex.I) • w := by
+    have hact
+        : actM E (Matrix.diagonal (fun b => (θ b : ℂ) * Complex.I)) w
+          = (((∑ a, Λ a * θ a : ℝ) : ℂ) * Complex.I) • w := by
       rw [actM_diagonal]
       simp only [hwHW.1, smul_smul]
       rw [← Finset.sum_smul]
@@ -371,8 +378,10 @@ theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn �
       push_cast
       rw [Finset.sum_mul]
       exact Finset.sum_congr rfl fun a _ => by ring
-    have h := sigma_exp_smul_eq_exp_smul_of_actM_eigen hσ hD (Matrix.diagonal (fun b => (θ b : ℂ) * Complex.I)) (diagonal_I_conjTranspose_eq_neg θ)
-      (diagonal_commute_Jm _) (((∑ a, Λ a * θ a : ℝ) : ℂ) * Complex.I) w hact 1
+    have h :=
+      sigma_exp_smul_eq_exp_smul_of_actM_eigen hσ hD
+        (Matrix.diagonal (fun b => (θ b : ℂ) * Complex.I)) (diagonal_I_conjTranspose_eq_neg θ)
+        (diagonal_commute_Jm _) (((∑ a, Λ a * θ a : ℝ) : ℂ) * Complex.I) w hact 1
     rw [exp_smul_diagonal_I] at h
     simpa using h
   · intro μ v hv hv0 hwt'
@@ -381,22 +390,31 @@ theorem isKTypeOf_of_isKIrrHW (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn �
     subst hxv
     refine hwt μ x hxV (fun h => hv0 (by rw [h]; rfl)) (fun a => ?_)
     have hX := diagonal_I_conjTranspose_eq_neg (Pi.single a (1 : ℝ))
-    have hJ := diagonal_commute_Jm (ε := ε) (fun b => (((Pi.single a (1 : ℝ) : Fin n → ℝ) b : ℝ) : ℂ) * Complex.I)
+    have hJ :=
+      diagonal_commute_Jm (ε := ε)
+        (fun b => (((Pi.single a (1 : ℝ) : Fin n → ℝ) b : ℝ) : ℂ) * Complex.I)
     have h1 := hD.deriv _ (inG_of_skewHermitian_of_commute_Jm _ hX hJ) x
-    have hfeq : (fun s : ℝ => σ (NormedSpace.exp ((s : ℂ) •
-        Matrix.diagonal (fun b => (((Pi.single a (1 : ℝ) : Fin n → ℝ) b : ℝ) : ℂ) * Complex.I))) (x : H)) =
-        fun s : ℝ => Complex.exp (((μ a * s : ℝ) : ℂ) * Complex.I) • (x : H) := by
+    have hfeq
+        : (fun s : ℝ =>
+            σ
+              (NormedSpace.exp
+                ((s : ℂ) • Matrix.diagonal (fun b =>
+                  (((Pi.single a (1 : ℝ) : Fin n → ℝ) b : ℝ) : ℂ) * Complex.I)))
+              (x : H))
+          = fun s : ℝ => Complex.exp (((μ a * s : ℝ) : ℂ) * Complex.I) • (x : H) := by
       funext s
       have hK := exp_smul_mem_Kset_of_skew_of_commute_Jm _ hX hJ s
       rw [exp_smul_diagonal_I (Pi.single a (1 : ℝ)) s] at hK ⊢
       rw [hwt' _ hK]
       simp [Pi.single_apply]
     rw [hfeq] at h1
-    have h3 : HasDerivAt (fun s : ℝ => (((μ a * s : ℝ) : ℂ) * Complex.I))
+    have h3 : HasDerivAt
+        (fun s : ℝ => (((μ a * s : ℝ) : ℂ) * Complex.I))
         ((μ a : ℂ) * Complex.I) 0 := by
       have := (((hasDerivAt_id (0 : ℝ)).const_mul (μ a)).ofReal_comp).mul_const Complex.I
       simpa using this
-    have h2 : HasDerivAt (fun s : ℝ => Complex.exp (((μ a * s : ℝ) : ℂ) * Complex.I) • (x : H))
+    have h2 : HasDerivAt
+        (fun s : ℝ => Complex.exp (((μ a * s : ℝ) : ℂ) * Complex.I) • (x : H))
         (((μ a : ℂ) * Complex.I) • (x : H)) 0 := by
       have := h3.cexp.smul_const (x : H)
       simpa using this

@@ -67,7 +67,7 @@ theorem sep_of_cover
         = pullback.map (U.f i) (U.f j) (U.f i ≫ f) (U.f j ≫ f) (𝟙 _) (𝟙 _) f (by simp)
           (by simp) := by
     apply pullback.hom_ext <;> simp only [Scheme.Cover.pullbackHom, Category.assoc, limit.lift_π,
-      PullbackCone.mk_π_app, pullback.lift_fst, pullback.lift_snd, Category.comp_id]
+      PullbackCone.mk_π_app, Category.comp_id]
     · exact pullbackDiagonalMapIdIso_inv_snd_fst (U.f i) (U.f j) f
     · exact pullbackDiagonalMapIdIso_inv_snd_snd (U.f i) (U.f j) f
   rw [e]

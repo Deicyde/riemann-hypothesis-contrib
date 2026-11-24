@@ -232,7 +232,7 @@ theorem hQ_w
     Matrix.map_one _ (map_zero _) (map_one _)]
   congr 1
   ext i j
-  by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
+  by_cases hij : i = j <;> simp [hij]
 
 theorem map_cA_smul {p q : Type} (a : AF F) (A : Matrix p q (AE F E))
     : (a • A).map (cA σ) = a • A.map (cA σ) := by

@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaKernel_testFunction_map_linear_injective_equivariant
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ x ∈ C.X.dom, ∀ φ : TF S.rank C.g,
       SW.IsSB φ
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.thetaKernel_testFunction_map_linear_injective_equi
             IsRatOf T ga γ
               → ∀ w,
                 C.Th (lact ga x) (wG C.X C.bas C.idx ga φ) w = C.Th x φ (actO S T 1 γ⁻¹ w) := by
-  first
-  | exact @GlobalTheory.Ker.Ctx.th_laws
-  | exact GlobalTheory.Ker.Ctx.th_laws
-  | (intros; apply GlobalTheory.Ker.Ctx.th_laws <;> assumption)
+  first | exact @GlobalTheory.Ker.Ctx.th_laws

@@ -97,11 +97,7 @@ theorem map_haar
   have hmm : Measure.map m ν = Measure.map α ν := rfl
   set c := Measure.addHaarScalarFactor (Measure.map α ν) μN with hcdef
   have hc : 0 < c := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _
-  have heq : Measure.map α ν = c • μN := by
-    first
-    | exact Measure.isAddHaarMeasure_eq_smul _ _
-    | exact Measure.isAddLeftInvariant_eq_smul _ _
-    | exact Measure.isAddLeftInvariant_eq_smul_of_regular _ _
+  have heq : Measure.map α ν = c • μN := by first | exact Measure.isAddLeftInvariant_eq_smul _ _
   have heq' : Measure.map α ν = (c : ENNReal) • μN := by
     rw [heq]
     rfl

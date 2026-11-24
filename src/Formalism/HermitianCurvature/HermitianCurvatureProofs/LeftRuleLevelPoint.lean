@@ -80,7 +80,7 @@ theorem single_mul_hpk_eI (p : Fin (2 * r + k + 1)) (c : Fin r) (x : ℂ)
   · rw [hpk_row_eI]
     by_cases hi : i = p <;> by_cases hl : l = esI k r c
       <;> simp [Matrix.single_apply, hi, hl, eq_comm]
-  · intro m _ hm; simp [Matrix.single_apply, Ne.symm hm]
+  · intro m _ hm; simp [Ne.symm hm]
   · simp
 
 theorem hpart1_single (hj : j + 1 ≤ r) (b : Fin j)
@@ -189,7 +189,7 @@ theorem single_mul_hpk_esI (p : Fin (2 * r + k + 1)) (c : Fin r) (x : ℂ)
   · rw [hpk_row_esI]
     by_cases hi : i = p <;> by_cases hl : l = eI k r c
       <;> simp [Matrix.single_apply, hi, hl, eq_comm]
-  · intro m _ hm; simp [Matrix.single_apply, Ne.symm hm]
+  · intro m _ hm; simp [Ne.symm hm]
   · simp
 
 theorem hM_lie (hj : j + 1 ≤ r) (x y : Fin (j + 1)) (s : ℂ)

@@ -100,7 +100,7 @@ theorem front_face_low (i : ℕ) (hi : i ≤ a)
   apply hom_ext'
   intro j
   have hj := j.isLt
-  simp only [comp_apply', fc_apply, idc_apply, backc_apply]
+  simp only [comp_apply', fc_apply, idc_apply]
   rcases lt_or_ge (j : ℕ) i with h | h
   · rw [faceFun_lt (by omega), faceFun_lt h]; omega
   · rw [faceFun_ge (by omega), faceFun_ge h]; omega
@@ -119,7 +119,7 @@ theorem front_face_high (i : ℕ) (hi : a < i)
   apply hom_ext'
   intro j
   have hj := j.isLt
-  simp only [comp_apply', fc_apply, idc_apply, backc_apply]
+  simp only [comp_apply', fc_apply, idc_apply]
   rw [faceFun_lt (by omega)]
   omega
 
@@ -129,7 +129,7 @@ theorem back_face_high (j : ℕ) (hj : j ≤ b)
   apply hom_ext'
   intro k
   have hk := k.isLt
-  simp only [comp_apply', fc_apply, idc_apply, backc_apply]
+  simp only [comp_apply', fc_apply, backc_apply]
   rcases lt_or_ge (k : ℕ) (j + 1) with h | h
   · rw [faceFun_lt (by omega), faceFun_lt h]; omega
   · rw [faceFun_ge (by omega), faceFun_ge h]; omega
@@ -139,7 +139,7 @@ theorem front_face_cancel
   apply hom_ext'
   intro j
   have hj := j.isLt
-  simp only [comp_apply', fc_apply, idc_apply, backc_apply]
+  simp only [comp_apply', fc_apply, idc_apply]
   rw [faceFun_lt (by omega)]
   omega
 

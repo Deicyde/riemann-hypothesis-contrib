@@ -80,7 +80,6 @@ theorem homogeneousComponent_mul_mem_span
     {g : Poly S N} {e : ℕ} (hg : g.IsHomogeneous e) (r : Poly S N) (d : ℕ)
     : homogeneousComponent d (r * g) ∈ Ideal.span {g} := by
   classical
-
   rw [← sum_homogeneousComponent r, Finset.sum_mul, map_sum]
   refine Ideal.sum_mem _ fun m _ => ?_
   rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).mpr

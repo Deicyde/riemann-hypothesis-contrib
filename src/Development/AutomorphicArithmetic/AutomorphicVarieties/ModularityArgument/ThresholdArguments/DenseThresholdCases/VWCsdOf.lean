@@ -41,9 +41,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Admis
 
 @[expose] public section
 
-
-
-
 section
 open UpperTheory.GalN.V
 open NumberField Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal

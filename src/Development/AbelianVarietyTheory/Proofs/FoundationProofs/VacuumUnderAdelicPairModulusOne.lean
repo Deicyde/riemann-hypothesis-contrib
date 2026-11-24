@@ -1,14 +1,15 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteAdeleStrongApproxModAdelicIdealStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaLatticePointMemThetaLatticeOfAdelicStatement
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteAdeleStrongApproxModAdelicIdeal
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaLatticePointMemThetaLatticeOfAdelic
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsHalfIdem
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRationalPointOfMemMovedThetaLattice
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLine
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryHeckeCharacterValues
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsLatticeOfAdelicPoint
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRationalPointOfMemMovedThetaLatticeStatement
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RationalPointsIntegralPointsMembership
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLineStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryHeckeCharacterValuesStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -91,20 +92,14 @@ theorem wd_wd (D : D7) (T : Tor D) {N N' : ℕ} (a b : VC D N N')
   field_simp at this
   linear_combination (wdPh D T a * wdPh D T b * F (z + (a + b))) * this
 
-theorem wd_zero (D : D7) (T : Tor D) {a d : ℕ} (G : VC D a d → ℂ) : Wd D T 0 G = G := by
-  funext z
-  simp [Wd, wdPh, ee, qH, U, Hf]
+alias wd_zero := _root_.GlobalTheory.NormSum.wd_zero
 
 theorem pt_zero (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) {a d : ℕ}
     : pt D (tor0 D cc δ) δ (0 : Matrix (Fin d) (Fin a) D.host.E) = 0 := by
   funext τ i j
   simp [pt, embV, tor0]
 
-theorem pt_add
-    (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) {a d : ℕ} (z w : Matrix (Fin d) (Fin a) D.host.E)
-    : pt D (tor0 D cc δ) δ (z + w) = pt D (tor0 D cc δ) δ z + pt D (tor0 D cc δ) δ w := by
-  funext τ i j
-  simp [pt, embV, tor0, mul_add]
+alias pt_add := _root_.GlobalTheory.NormSum.MovedLattice.pt_add
 
 theorem iop_zero (D : D7) (T : Tor D) {N N' : ℕ} (A B : AddSubgroup (VC D N N'))
     : Iop D T A B 0 = 0 := by
@@ -180,7 +175,7 @@ theorem MI_bound
     ∑ l, ∑ k, ((n : AE D) * P i k * ((n' : AE D) * Q l j)) * y k l,
     sum_mem fun l _ =>
       sum_mem fun k _ =>
-        (GlobalTheory.T.cmFiniteAdele_strong_approx_mod_adelicIdeal D cc hc).2.2 _
+        (_root_.GlobalTheory.AdelicApprox.approx_mod_ideal D cc hc).2.2 _
           (mul_mem (hP _ _) (hQ _ _)) _ (hy _ _),
     ?_
   ⟩
@@ -191,7 +186,7 @@ theorem MI_bound
 
 theorem MI_approx (hc : cc ≠ ⊥) (M : Matrix (Fin a) (Fin b) (AE D)) (m : ℕ) (hm : 0 < m)
     : ∃ z : Matrix (Fin a) (Fin b) D.host.E, MI D cc m (z.map (inc D) - M) := by
-  choose e t ht h using fun i j => (GlobalTheory.T.cmFiniteAdele_strong_approx_mod_adelicIdeal D cc hc).1 (M i j) m hm
+  choose e t ht h using fun i j => (_root_.GlobalTheory.AdelicApprox.approx_mod_ideal D cc hc).1 (M i j) m hm
   exact ⟨Matrix.of e, fun i j => ⟨t i j, ht i j, h i j⟩⟩
 
 end
@@ -237,7 +232,7 @@ theorem wd_fix
     {F : VC D N N' → ℂ} (hF : F ∈ ThSp D (tor0 D cc δ) A)
     {x : VC D N N'} (hx : x ∈ A)
     : Wd D (tor0 D cc δ) x F = F := by
-  rw [(GlobalTheory.T.theta_space_selfDual_pair_at_most_line D h1 cc δ hc N N' A hA).2.1 x hx]
+  rw [(_root_.GlobalTheory.ThetaLine.theta_line D h1 cc δ hc N N' A hA).2.1 x hx]
   exact funext (hF.2 x hx)
 
 theorem vac_TT
@@ -271,8 +266,7 @@ theorem exists_scalar
     intro h0
     rw [h0, iop_zero] at hinv
     exact W.nz hinv.symm
-  obtain ⟨hline, hW, -⟩ :=
-    GlobalTheory.T.theta_space_selfDual_pair_at_most_line D hI.g1 cc δ hc N N' _ k1
+  obtain ⟨hline, hW, -⟩ := _root_.GlobalTheory.ThetaLine.theta_line D hI.g1 cc δ hc N N' _ k1
   suffices hG : W.Om g g' e0 ∈ ThSp D (tor0 D cc δ) (La D (tor0 D cc δ) L₁ L₁') from
     hline _ hG _ hF hF0
   refine ⟨(W.maps g g' e0 hT).1, fun x hx => ?_⟩
@@ -295,14 +289,13 @@ theorem exists_scalar
       exact (smul_eq_zero.1 this).resolve_left (sub_ne_zero.2 hne)
     rw [hφ, h3, one_smul]
   obtain ⟨z', rfl, hz'⟩ :=
-    GlobalTheory.T.exists_rationalPoint_of_mem_movedThetaLattice D hI.g1 cc δ hcc N N' g g' L₁ L₁' h
-      h' x hx
+    _root_.GlobalTheory.NormSum.exists_pt_of_mem_La_moved D hI.g1 cc δ hcc N N' g g' L₁ L₁' h h' x
+      hx
   have hlatb :=
-    GlobalTheory.T.cmThetaLatticePoint_mem_thetaLattice_of_adelic D hI.g1 cc δ hcc N N' g g' L₁ L₁'
-      h h'
+    _root_.GlobalTheory.NormSum.pt_mem_La_of_adelic D hI.g1 cc δ hcc N N' g g' L₁ L₁' h h'
   have hlat0 :=
-    GlobalTheory.T.cmThetaLatticePoint_mem_thetaLattice_of_adelic D hI.g1 cc δ hcc N N' 1 1 _ _
-      (moves_one D N) (moves_one D N')
+    _root_.GlobalTheory.NormSum.pt_mem_La_of_adelic D hI.g1 cc δ hcc N N' 1 1 _ _ (moves_one D N)
+      (moves_one D N')
   simp only [OneMemClass.coe_one, inv_one, Units.val_one, Matrix.one_mul, Matrix.mul_one] at hlat0
   simp only [← MI_one] at hz' hlatb hlat0
   obtain ⟨m0, hm0, hl0⟩ := W.lift g g' 0 e0 hT
@@ -441,8 +434,8 @@ theorem GlobalTheory.NormSum.vacuum_under_adelic_pair
         <;> (rw [← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul]; congr 1; push_cast; ring)
     rw [h4]
     exact algebraicModulusOneAll_mul
-      (algebraicModulusOneAll_zpow (GlobalTheory.T.unitaryHeckeCharacter_values D N W.chV x').1 _)
-      (algebraicModulusOneAll_zpow (GlobalTheory.T.unitaryHeckeCharacter_values D N' W.chV' x).1 _)
+      (algebraicModulusOneAll_zpow (_root_.GlobalTheory.HeckeVal.hecke_values D N W.chV x').1 _)
+      (algebraicModulusOneAll_zpow (_root_.GlobalTheory.HeckeVal.hecke_values D N' W.chV' x).1 _)
   refine ⟨c, hmod, hce, fun p _ lam k' hk' ht ht' => ?_⟩
   have hm1 : Moves D (k' : GL (Fin N') (AE D)) (stdL D N') := by
     simpa using moves_mul_int hk' (moves_one D N')
@@ -454,10 +447,10 @@ theorem GlobalTheory.NormSum.vacuum_under_adelic_pair
       (hI.odd4 cc δ hc N N' hev e0 he W.nz W 1 k' _ _ a (moves_one D N) hm1 hae).1 z z' x x' hz hz'
         hx hx'
     obtain ⟨m, hm, hxm⟩ :=
-      (GlobalTheory.T.unitaryHeckeCharacter_values D N' W.chV' x).2.1 (hxi (det_int D _
+      (_root_.GlobalTheory.HeckeVal.hecke_values D N' W.chV' x).2.1 (hxi (det_int D _
         (((mem_ratG_intG D N).2.1 1).1 (one_mem _))))
     obtain ⟨m', hm', hxm'⟩ :=
-      (GlobalTheory.T.unitaryHeckeCharacter_values D N W.chV x').2.1 (hxi' (det_int D _
+      (_root_.GlobalTheory.HeckeVal.hecke_values D N W.chV x').2.1 (hxi' (det_int D _
         (((mem_ratG_intG D N').2.1 k').1 hk')))
     refine ⟨2 * (2 * (m * m')), by positivity, ?_⟩
     have hs : sg ^ 2 = 1 := by rcases hsg with rfl | rfl <;> norm_num

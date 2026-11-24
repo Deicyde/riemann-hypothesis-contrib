@@ -1,11 +1,12 @@
 module
 
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.ThetaBijections.SymplecticFormCoordinates
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterInvariantAdelicFormEqMulEvalZeroStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterInvariantAdelicFormEqMulEvalZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAdelicSchwartzThetaDistributionSumNeZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SymplecticChangeOfGoodModelsIntertwines
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresentationPreservesSchwartz
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.ThetaBijections.IsOpAdm
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresentationPreservesSchwartz
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -144,14 +145,13 @@ theorem core (d : SD σ)
     rfl
   have hadm := isOp_adm h d.l hD.adm
   obtain ⟨C, hC⟩ :=
-    GlobalTheory.T.character_invariant_adelic_form_eq_mul_eval_zero F d.B.ψ hψ d.κ (d.l ∘ₗ e) hadm
-      (fun y φ hφ => by
-        obtain ⟨w, hw⟩ := hsurj (0, y)
-        obtain ⟨Z, rfl⟩ := coordinates_fst_eq_zero d τ w (by rw [hw])
-        have e1 : (fun x => d.B.ψ (x ⬝ᵥ y) * φ x) = schr d.B.ψ (c0 d τ (Z * (dg d)ᵀ)) φ := by
-          rw [hw]; funext x; simp [schr]
-        rw [LinearMap.comp_apply, LinearMap.comp_apply, e1, hheis _ φ hφ]
-        exact hD.kill Z _ (h.maps φ hφ))
+    _root_.GlobalTheory.CharInvForm.main F d.B.ψ hψ d.κ (d.l ∘ₗ e) hadm (fun y φ hφ => by
+      obtain ⟨w, hw⟩ := hsurj (0, y)
+      obtain ⟨Z, rfl⟩ := coordinates_fst_eq_zero d τ w (by rw [hw])
+      have e1 : (fun x => d.B.ψ (x ⬝ᵥ y) * φ x) = schr d.B.ψ (c0 d τ (Z * (dg d)ᵀ)) φ := by
+        rw [hw]; funext x; simp [schr]
+      rw [LinearMap.comp_apply, LinearMap.comp_apply, e1, hheis _ φ hφ]
+      exact hD.kill Z _ (h.maps φ hφ))
   have hT : ∀ Ψ ∈ schA F d.κ, ∀ X, d.T (e Ψ) X = C * Ψ (fun k => d.crd X (τ k)) := fun Ψ hΨ X => by
     have h1 := hC _ (GlobalTheory.HeisSchA.schr_mem_schA d.B.ψ hψ (c0 d τ (X * (yy d)ᵀ)) Ψ hΨ)
     rw [LinearMap.comp_apply, hheis _ Ψ hΨ, coordinates_frame] at h1

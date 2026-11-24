@@ -49,36 +49,41 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal Polynomial IntermediateField
+open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal Polynomial
+  IntermediateField
 
 namespace GlobalTheory.LadicDenom
 
-theorem norm_natCast_padicComplex (l : ℕ) [Fact l.Prime] (n : ℕ) : ‖(n : ℂ_[l])‖ = ‖(n : ℚ_[l])‖ := by
+theorem norm_natCast_padicComplex (l : ℕ) [Fact l.Prime] (n : ℕ)
+    : ‖(n : ℂ_[l])‖ = ‖(n : ℚ_[l])‖ := by
   have h : (n : ℂ_[l]) = algebraMap ℚ_[l] ℂ_[l] (n : ℚ_[l]) := by simp
   rw [h, norm_algebraMap']
 
-theorem norm_ratCast_padicComplex (l : ℕ) [Fact l.Prime] (q : ℚ) : ‖(q : ℂ_[l])‖ = ‖(q : ℚ_[l])‖ := by
+theorem norm_ratCast_padicComplex (l : ℕ) [Fact l.Prime] (q : ℚ)
+    : ‖(q : ℂ_[l])‖ = ‖(q : ℚ_[l])‖ := by
   have h : (q : ℂ_[l]) = algebraMap ℚ_[l] ℂ_[l] (q : ℚ_[l]) := by simp
   rw [h, norm_algebraMap']
 
 theorem norm_prime_padicComplex (l : ℕ) [Fact l.Prime] : ‖(l : ℂ_[l])‖ = (l : ℝ)⁻¹ := by
   rw [norm_natCast_padicComplex, Padic.norm_p]
 
-theorem norm_le_one_of_isIntegral {C : Type} [NormedField C] [IsUltrametricDist C] {x : C} (hx : IsIntegral ℤ x) :
-    ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral
+    {C : Type} [NormedField C] [IsUltrametricDist C] {x : C} (hx : IsIntegral ℤ x)
+    : ‖x‖ ≤ 1 := by
   have h : x ∈ (NormedField.valuation (K := C)).integer :=
     (Valuation.integer.integers (NormedField.valuation (K := C))).mem_of_integral hx.tower_top
   rw [Valuation.mem_integer_iff, NormedField.valuation_apply] at h
   exact_mod_cast h
 
-theorem not_dvd_den_of_norm_le_one (l : ℕ) [hl : Fact l.Prime] (q : ℚ) (h : ‖(q : ℚ_[l])‖ ≤ 1) : ¬ l ∣ q.den := by
+theorem not_dvd_den_of_norm_le_one (l : ℕ) [hl : Fact l.Prime] (q : ℚ) (h : ‖(q : ℚ_[l])‖ ≤ 1)
+    : ¬ l ∣ q.den := by
   apply GlobalTheory.LocalData.not_dvd_den <;> assumption
 
-
-
-theorem norm_root_le_one (l : ℕ) [Fact l.Prime] (α : algebraicClosure ℚ ℂ)
-    (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1) (β : ℂ_[l]) (hβ : β ∈ (minpoly ℚ α).aroots ℂ_[l]) :
-    ‖β‖ ≤ 1 := by
+theorem norm_root_le_one
+    (l : ℕ) [Fact l.Prime]
+    (α : algebraicClosure ℚ ℂ) (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1)
+    (β : ℂ_[l]) (hβ : β ∈ (minpoly ℚ α).aroots ℂ_[l])
+    : ‖β‖ ≤ 1 := by
   haveI : Algebra.IsAlgebraic ℚ (algebraicClosure ℚ ℂ) := algebraicClosure.isAlgebraic ℚ ℂ
   have hα : IsIntegral ℚ α := (Algebra.IsAlgebraic.isAlgebraic α).isIntegral
   let φ := (algHomAdjoinIntegralEquiv ℚ hα).symm ⟨β, hβ⟩
@@ -86,8 +91,7 @@ theorem norm_root_le_one (l : ℕ) [Fact l.Prime] (α : algebraicClosure ℚ ℂ
   haveI : Algebra.IsAlgebraic ℚ⟮α⟯ (algebraicClosure ℚ ℂ) := Algebra.IsAlgebraic.tower_top (K := ℚ) _
   let ψ : algebraicClosure ℚ ℂ →ₐ[ℚ⟮α⟯] ℂ_[l] := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have e : ψ α = β := by
     have h1 := ψ.commutes (AdjoinSimple.gen ℚ α)
@@ -97,9 +101,11 @@ theorem norm_root_le_one (l : ℕ) [Fact l.Prime] (α : algebraicClosure ℚ ℂ
   rw [← e]
   exact h ψ.toRingHom
 
-theorem coeff_norm_le_one (l : ℕ) [Fact l.Prime] (α : algebraicClosure ℚ ℂ)
-    (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1) (i : ℕ) :
-    ‖(((minpoly ℚ α).coeff i : ℚ) : ℂ_[l])‖ ≤ 1 := by
+theorem coeff_norm_le_one
+    (l : ℕ) [Fact l.Prime]
+    (α : algebraicClosure ℚ ℂ) (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1)
+    (i : ℕ)
+    : ‖(((minpoly ℚ α).coeff i : ℚ) : ℂ_[l])‖ ≤ 1 := by
   haveI : Algebra.IsAlgebraic ℚ (algebraicClosure ℚ ℂ) := algebraicClosure.isAlgebraic ℚ ℂ
   have hα : IsIntegral ℚ α := (Algebra.IsAlgebraic.isAlgebraic α).isIntegral
   set P := (minpoly ℚ α).map (algebraMap ℚ ℂ_[l]) with hP
@@ -110,30 +116,34 @@ theorem coeff_norm_le_one (l : ℕ) [Fact l.Prime] (α : algebraicClosure ℚ �
     exact_mod_cast Iff.rfl
   have hmon : P.Monic := (minpoly.monic hα).map _
   have hroots : ∀ β ∈ P.roots, β ∈ S := fun β hβ => (memS β).2 (norm_root_le_one l α h β hβ)
-  have hc : (((minpoly ℚ α).coeff i : ℚ) : ℂ_[l]) = P.coeff i := by
-    rw [hP, coeff_map, eq_ratCast]
+  have hc : (((minpoly ℚ α).coeff i : ℚ) : ℂ_[l]) = P.coeff i := by rw [hP, coeff_map, eq_ratCast]
   rw [hc, ← memS]
   by_cases hi : i ≤ P.natDegree
-  · rw [coeff_eq_esymm_roots_of_card IsAlgClosed.card_roots_eq_natDegree hi, hmon.leadingCoeff, one_mul]
+  · rw [coeff_eq_esymm_roots_of_card IsAlgClosed.card_roots_eq_natDegree hi, hmon.leadingCoeff,
+      one_mul]
     refine S.mul_mem (S.pow_mem (S.neg_mem S.one_mem) _) ?_
     unfold Multiset.esymm
     refine S.multiset_sum_mem _ fun z hz => ?_
     obtain ⟨t, ht, rfl⟩ := Multiset.mem_map.1 hz
-    exact S.multiset_prod_mem _ fun w hw => hroots w (Multiset.mem_of_le (Multiset.mem_powersetCard.1 ht).1 hw)
+    exact S.multiset_prod_mem _ fun w hw =>
+      hroots w (Multiset.mem_of_le (Multiset.mem_powersetCard.1 ht).1 hw)
   · rw [coeff_eq_zero_of_natDegree_lt (not_le.1 hi)]
     exact S.zero_mem
 
-theorem intAt_of_forall_norm_le_one (l : ℕ) [hl : Fact l.Prime] (α : algebraicClosure ℚ ℂ)
-    (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1) : IntAt l (α : ℂ) := by
+theorem intAt_of_forall_norm_le_one
+    (l : ℕ) [hl : Fact l.Prime]
+    (α : algebraicClosure ℚ ℂ) (h : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], ‖lam α‖ ≤ 1)
+    : IntAt l (α : ℂ) := by
   haveI : Algebra.IsAlgebraic ℚ (algebraicClosure ℚ ℂ) := algebraicClosure.isAlgebraic ℚ ℂ
   have hα : IsIntegral ℚ α := (Algebra.IsAlgebraic.isAlgebraic α).isIntegral
   set p := minpoly ℚ α with hp
   have hmon : p.Monic := minpoly.monic hα
   have hden : ∀ i, ¬ l ∣ (p.coeff i).den := fun i =>
-    not_dvd_den_of_norm_le_one l _ (by rw [← norm_ratCast_padicComplex]; exact coeff_norm_le_one l α h i)
+    not_dvd_den_of_norm_le_one l _
+      (by rw [← norm_ratCast_padicComplex]; exact coeff_norm_le_one l α h i)
   set D : ℕ := ∏ i ∈ Finset.range p.natDegree, (p.coeff i).den with hD
-  have hDc : D.Coprime l := Nat.Coprime.prod_left fun i _ =>
-    ((Nat.Prime.coprime_iff_not_dvd hl.out).2 (hden i)).symm
+  have hDc : D.Coprime l :=
+    Nat.Coprime.prod_left fun i _ => ((Nat.Prime.coprime_iff_not_dvd hl.out).2 (hden i)).symm
   refine ⟨D, hDc, ?_⟩
   set q := p.scaleRoots (D : ℚ) with hq
   have hql : q ∈ lifts (Int.castRingHom ℚ) := by
@@ -154,8 +164,7 @@ theorem intAt_of_forall_norm_le_one (l : ℕ) [hl : Fact l.Prime] (α : algebrai
       rw [hn, hmon.coeff_natDegree, Nat.sub_self, pow_zero, mul_one, map_one]
     · refine ⟨0, ?_⟩
       rw [coeff_eq_zero_of_natDegree_lt hn, zero_mul, map_zero]
-  have hqm : q.Monic := by
-    rw [Monic, hq, leadingCoeff_scaleRoots]; exact hmon
+  have hqm : q.Monic := by rw [Monic, hq, leadingCoeff_scaleRoots]; exact hmon
   obtain ⟨Q, hQ, -, hQm⟩ := lifts_and_natDegree_eq_and_monic hql hqm
   have hroot : aeval ((D : algebraicClosure ℚ ℂ) * α) q = 0 := by
     have := scaleRoots_aeval_eq_zero (r := (D : ℚ)) (minpoly.aeval ℚ α)
@@ -167,8 +176,9 @@ theorem intAt_of_forall_norm_le_one (l : ℕ) [hl : Fact l.Prime] (α : algebrai
   have := map_isIntegral_int (algebraicClosure ℚ ℂ).val.toRingHom hint
   simpa using this
 
-theorem valGe_iff_forall_sz (l : ℕ) [hl : Fact l.Prime] (r : ℝ) (x : ℂ) :
-    GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.ValGe_vp l r x ↔ ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], Sz l lam r x := by
+theorem valGe_iff_forall_sz (l : ℕ) [hl : Fact l.Prime] (r : ℝ) (x : ℂ)
+    : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.ValGe_vp l r x
+      ↔ ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l], Sz l lam r x := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   haveI : Algebra.IsAlgebraic ℚ (algebraicClosure ℚ ℂ) := algebraicClosure.isAlgebraic ℚ ℂ
@@ -187,7 +197,9 @@ theorem valGe_iff_forall_sz (l : ℕ) [hl : Fact l.Prime] (r : ℝ) (x : ℂ) :
       have h3 : x = ((N : ℂ) * ((l : ℂ) ^ ⌈r⌉ * x ^ 1)) * ((N : ℂ) * (l : ℂ) ^ ⌈r⌉)⁻¹ := by
         rw [pow_one, ← mul_assoc, mul_right_comm, mul_inv_cancel₀ h2, one_mul]
       rw [h3]
-      exact mul_mem h1 (inv_mem (mul_mem (IntermediateField.natCast_mem _ _) (zpow_mem (IntermediateField.natCast_mem _ _) _)))
+      exact mul_mem h1
+        (inv_mem (mul_mem (IntermediateField.natCast_mem _ _)
+          (zpow_mem (IntermediateField.natCast_mem _ _) _)))
     refine ⟨hmem, ?_⟩
     set t := ‖lam ⟨x, hmem⟩‖ with ht
     have key : ∀ (m : ℤ) (n : ℕ), 0 < n → r ≤ (m : ℝ) / n → t ^ n ≤ (l : ℝ) ^ m := by
@@ -195,14 +207,19 @@ theorem valGe_iff_forall_sz (l : ℕ) [hl : Fact l.Prime] (r : ℝ) (x : ℂ) :
       obtain ⟨N, hN, hi⟩ := hv m n hn hmn
       set β : algebraicClosure ℚ ℂ := (N : algebraicClosure ℚ ℂ) * ((l : algebraicClosure ℚ ℂ) ^ m * ⟨x, hmem⟩ ^ n)
       have hiβ : IsIntegral ℤ β := by
-        refine (isIntegral_algHom_iff ((algebraicClosure ℚ ℂ).val.restrictScalars ℤ) Subtype.val_injective).1 ?_
-        have e : ((algebraicClosure ℚ ℂ).val.restrictScalars ℤ) β = (N : ℂ) * ((l : ℂ) ^ m * x ^ n) :=
+        refine (isIntegral_algHom_iff ((algebraicClosure ℚ ℂ).val.restrictScalars ℤ)
+          Subtype.val_injective).1 ?_
+        have e
+            : ((algebraicClosure ℚ ℂ).val.restrictScalars ℤ) β = (N : ℂ) * ((l : ℂ) ^ m * x ^ n) :=
           Complex.ext rfl rfl
-        rw [e]; exact hi
+        rw [e]
+        exact hi
       have h1 := norm_le_one_of_isIntegral (map_isIntegral_int lam hiβ)
       simp only [β, map_mul, map_pow, map_zpow₀, map_natCast, norm_mul, norm_pow, norm_zpow] at h1
-      rw [norm_natCast_padicComplex, Padic.norm_natCast_eq_one_iff.2 hN.symm, norm_prime_padicComplex, one_mul,
-        inv_zpow', zpow_neg, inv_mul_le_iff₀ (zpow_pos hl0 m), mul_one] at h1
+      rw [norm_natCast_padicComplex, Padic.norm_natCast_eq_one_iff.2 hN.symm,
+          norm_prime_padicComplex, one_mul, inv_zpow', zpow_neg, inv_mul_le_iff₀ (zpow_pos hl0 m),
+          mul_one]
+        at h1
       exact h1
     by_contra hgt
     rw [not_le] at hgt
@@ -220,25 +237,31 @@ theorem valGe_iff_forall_sz (l : ℕ) [hl : Fact l.Prime] (r : ℝ) (x : ℂ) :
     rw [h5] at h4
     exact absurd hk (not_le.2 h4)
   · intro h
-    let lam₀ : algebraicClosure ℚ ℂ →+* ℂ_[l] := (IsAlgClosed.lift : algebraicClosure ℚ ℂ →ₐ[ℚ] ℂ_[l]).toRingHom
+    let lam₀ : algebraicClosure ℚ ℂ →+* ℂ_[l] :=
+      (IsAlgClosed.lift : algebraicClosure ℚ ℂ →ₐ[ℚ] ℂ_[l]).toRingHom
     obtain ⟨hmem, -⟩ := h lam₀
     intro m n hn hmn
     have hmn' : r * n ≤ m := by rwa [le_div_iff₀ (Nat.cast_pos.2 hn)] at hmn
-    have hb : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l],
-        ‖lam ((l : algebraicClosure ℚ ℂ) ^ m * ⟨x, hmem⟩ ^ n)‖ ≤ 1 := by
+    have hb
+        : ∀ lam : algebraicClosure ℚ ℂ →+* ℂ_[l],
+          ‖lam ((l : algebraicClosure ℚ ℂ) ^ m * ⟨x, hmem⟩ ^ n)‖ ≤ 1 := by
       intro lam
       obtain ⟨h', hle⟩ := h lam
-      rw [map_mul, map_zpow₀, map_pow, map_natCast, norm_mul, norm_zpow, norm_pow, norm_prime_padicComplex,
-        inv_zpow', zpow_neg]
+      rw [map_mul, map_zpow₀, map_pow, map_natCast, norm_mul, norm_zpow, norm_pow,
+        norm_prime_padicComplex, inv_zpow', zpow_neg]
       have h2 : ‖lam ⟨x, hmem⟩‖ ^ n ≤ (l : ℝ) ^ m := by
-        calc ‖lam ⟨x, hmem⟩‖ ^ n ≤ ((l : ℝ) ^ r) ^ n := pow_le_pow_left₀ (norm_nonneg _) hle n
+        calc
+          ‖lam ⟨x, hmem⟩‖ ^ n
+            ≤ ((l : ℝ) ^ r) ^ n := pow_le_pow_left₀ (norm_nonneg _) hle n
           _ = (l : ℝ) ^ (r * n) := by rw [← Real.rpow_natCast, ← Real.rpow_mul hl0.le]
           _ ≤ (l : ℝ) ^ (m : ℝ) := Real.rpow_le_rpow_of_exponent_le hl1.le hmn'
           _ = (l : ℝ) ^ m := Real.rpow_intCast _ _
       rw [inv_mul_le_iff₀ (zpow_pos hl0 m), mul_one]
       exact h2
     have := intAt_of_forall_norm_le_one l _ hb
-    have e : (((l : algebraicClosure ℚ ℂ) ^ m * ⟨x, hmem⟩ ^ n : algebraicClosure ℚ ℂ) : ℂ) = (l : ℂ) ^ m * x ^ n :=
+    have e
+        : (((l : algebraicClosure ℚ ℂ) ^ m * ⟨x, hmem⟩ ^ n : algebraicClosure ℚ ℂ) : ℂ)
+          = (l : ℂ) ^ m * x ^ n :=
       Complex.ext rfl rfl
     rwa [e] at this
 

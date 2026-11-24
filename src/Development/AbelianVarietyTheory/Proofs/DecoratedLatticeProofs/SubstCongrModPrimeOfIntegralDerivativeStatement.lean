@@ -47,6 +47,7 @@ import Mathlib.Topology.Sheaves.Init
 @[expose] public section
 
 open PowerSeries GlobalTheory.Honda
+
 theorem _root_.GlobalTheory.T.subst_congr_mod_prime_of_integral_derivative
     : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K] (l : ℕ),
       l.Prime → ‖(l : K)‖ < 1

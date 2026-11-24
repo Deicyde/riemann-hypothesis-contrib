@@ -49,7 +49,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.IsKSValueOneOfRetra
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
@@ -93,7 +92,7 @@ theorem tan_iff (hπ : IsGrpPullback A Xo.univ.t.G x π) (w : epsR K ⟶ A)
       rw [Category.assoc, hw, a, ← Geo.Tor.spMap_comp]
       have : (TrivSqZeroExt.fstHom K K K).toRingHom.comp (algebraMap K (DualNumber K))
           = RingHom.id K := by
-        ext r; simp [TrivSqZeroExt.algebraMap_eq_inl]
+        ext r; simp
       rw [this]
       exact Spec.map_id _
   · intro h

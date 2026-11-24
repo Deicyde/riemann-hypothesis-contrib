@@ -135,7 +135,7 @@ theorem integrable_pairing
     have hmono : (mixedDisc A).re ≤ (mixedDisc B).re :=
       ReciprocityTheory.AnForm.A.mdisc_re_mono A B hApsd hAB
     have hnn : 0 ≤ (mixedDisc A).re :=
-      (ReciprocityTheory.AnForm.A.mdisc_nonneg_of_posSemidef A hApsd).2
+      (_root_.ReciprocityTheory.AnForm.A.mixedDiscriminant_nonneg_of_gram A hApsd).2
     have hB : mixedDisc B = ((C' : ℝ) : ℂ) ^ e * HN.det := by
       have h := ReciprocityTheory.AnForm.A.mdisc_const (((C' : ℝ) : ℂ) • HN)
       rw [det_smul, Fintype.card_fin] at h

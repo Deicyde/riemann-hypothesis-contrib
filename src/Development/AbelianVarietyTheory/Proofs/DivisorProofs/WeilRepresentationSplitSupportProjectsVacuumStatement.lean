@@ -50,6 +50,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta Formalism.IndefR.Datum
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilRepresentation_split_support_projects_vacuum
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (V W : HSp D)
         (χV χW : (AE D)ˣ →* Circle) (om : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)),
@@ -96,7 +97,4 @@ theorem _root_.GlobalTheory.T.weilRepresentation_split_support_projects_vacuum
                                             : ℂ))
                                         • projA X bas (H.w0 : D.host.E) (tens Λ₁ L) φ)
                                       x := by
-  first
-  | exact @GlobalTheory.AdTh.SplitClass.om_reads_projA
-  | exact GlobalTheory.AdTh.SplitClass.om_reads_projA
-  | (intros; apply GlobalTheory.AdTh.SplitClass.om_reads_projA <;> assumption)
+  first | exact @GlobalTheory.AdTh.SplitClass.om_reads_projA

@@ -3,20 +3,22 @@ module
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsRtensOp
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaEqB
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsGridFr
-import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ComplexEmbeddingHermitianQuadrupleSum
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchActionReadingsCompatibleStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExistStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartanEigenOrthonormalFrameExistsStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchActionReadingsCompatible
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExist
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartanEigenOrthonormalFrameExists
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNegConjMemberHermitianLatticeSpaceData
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockToSchrodingerMapExistsOfArchHeisenbergDerivaStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockToSchrodingerMapExistsOfArchHeisenbergDeriva
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockVacuaTripleProportionalToNonzero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OrientedHermitianFormQuadSumEqTrace
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzFockVacuumLineUniqueOfHeisenbergDerivatiStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaPureTensorO
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DarbouxModelAlgebraicVectorsLeAdelicSchwartzStatement
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SeesawFramesWeilEquivalence
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SignedUnitaryGroupCompat
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaTransformDarbouxModelLinearInjectiveStatement
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.UnitCharTriangle
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ComplexEmbeddingHermitianQuadrupleSum
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzFockVacuumLineUniqueOfHeisenbergDerivati
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.WeilModelProjectionFactorisationStatement
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -55,7 +57,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.UnitCharTriangle
 import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsMatchOver
 import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.TwistPlacesOffPrimeQZero
 import Development.AbelianVarietyTheory.Statements.HeckeThetaIntegrals.FormulaAt
@@ -120,7 +121,7 @@ theorem adjM_coord (S B : HSp D) (y : Matrix (Fin S.rank) (Fin B.rank) (AE D))
       = GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.mulG B (y.map (cA D)) := by
   have e0 : ((incM S.gram).map (cA D))ᵀ = incM S.gram := by
     ext a b
-    exact congrArg (incA D) (GlobalTheory.TripleSpace.star_gram S b a)
+    exact congrArg (incA D) (_root_.GlobalTheory.DualPairCheck.gram_star S b a)
   have e1 : (S.gram⁻¹).map (incA D) * incM S.gram = 1 := by
     show (S.gram⁻¹).map (incA D) * S.gram.map (incA D) = 1
     rw [← Matrix.map_mul,
@@ -202,8 +203,8 @@ theorem gauss_small
     {f₀} (hf₀ : f₀ ≠ 0) (hG₀ : Γ.M'.IsGauss B.ψ B.emb f₀)
     (g) (hg : Γ.M'.IsGauss B.ψ B.emb g)
     : ∃ c : ℂ, g = c • f₀ := by
-  choose A hA hAθ using fun w => GlobalTheory.T.cartanEigen_orthonormalFrame_exists _ _ _ _ _ (hgeo.hV'.sig w) (hgeo.hV'.cartan w)
-  choose C hC hCθ using fun w => GlobalTheory.T.cartanEigen_orthonormalFrame_exists _ _ _ _ _ (hgeo.hW.sig w) (hgeo.hW.cartan w)
+  choose A hA hAθ using fun w => _root_.GlobalTheory.RealLift.frameEx_holds _ _ _ _ _ (hgeo.hV'.sig w) (hgeo.hV'.cartan w)
+  choose C hC hCθ using fun w => _root_.GlobalTheory.RealLift.frameEx_holds _ _ _ _ _ (hgeo.hW.sig w) (hgeo.hW.cartan w)
   have fr : GlobalTheory.RealLift.Framed B.emb
       (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM F Γ.V'.J)
       (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM F Γ.W.J) 1 Complex.I A C := ⟨
@@ -212,9 +213,8 @@ theorem gauss_small
     fun w => by rw [GlobalTheory.GaussLine.incM_map_piInf']; exact hC w
   ⟩
   obtain ⟨Φ, hΦ⟩ :=
-    GlobalTheory.T.fockToSchrodingerMapExists_of_archHeisenbergDerivatives
-      GlobalTheory.T.archHeisenbergDerivatives_exist F E σ _ _ _ _ _ _ _ B.ψ B.emb _ _ Γ.M'.co 1
-      Complex.I A C hb.cm hb.std fr
+    _root_.GlobalTheory.FockMapEx.fockEx_of_derEx _root_.GlobalTheory.HeisDer.derEx F E σ _ _ _ _ _
+      _ _ B.ψ B.emb _ _ Γ.M'.co 1 Complex.I A C hb.cm hb.std fr
   have toD
       : ∀ u
           (f f₁ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
@@ -227,7 +227,7 @@ theorem gauss_small
           → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ActsD
             (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (Γ.M'.heisLine B.ψ u) f
             f₁ := fun u f f₁ h =>
-    (GlobalTheory.T.archActionReadings_compatible F (Fin a' × Fin (a + a')) f f₁ f₁).1 _
+    (_root_.GlobalTheory.RealLift.actsLaws F (Fin a' × Fin (a + a')) f f₁ f₁).1 _
       (fun t => by
         funext x
         simp [GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model.heisLine,
@@ -237,9 +237,8 @@ theorem gauss_small
       : ∀ f,
         Γ.M'.IsGauss B.ψ B.emb f → ∃ z : ℂ, f = z • Φ (PiTensorProduct.tprod ℂ fun _ => 1) := by
     rintro f ⟨ε, hε⟩
-    refine GlobalTheory.T.schwartzFockVacuumLineUnique_of_heisenberg_derivatives
-      GlobalTheory.T.archHeisenbergDerivatives_exist F E σ _ _ _ _ _ _ _ B.ψ B.emb _ _ Γ.M'.co 1
-      Complex.I A C Φ hb.cm hb.std fr hΦ f ε
+    refine _root_.GlobalTheory.VacLn.vacLine_of_derEx _root_.GlobalTheory.HeisDer.derEx F E σ _ _ _
+      _ _ _ _ B.ψ B.emb _ _ Γ.M'.co 1 Complex.I A C Φ hb.cm hb.std fr hΦ f ε
       (fun u u' hu hu' c hc hc' f1 f1' hf hf' =>
         hε u u' hu hu' (fun w => ?_) f1 f1' (toD _ _ _ hf) (toD _ _ _ hf'))
     have h2 := congrArg Matrix.transpose (hCθ w)

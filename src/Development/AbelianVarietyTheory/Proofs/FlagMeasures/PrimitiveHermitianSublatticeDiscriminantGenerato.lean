@@ -2,9 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen
 public import Formalism.HermitianLattices.StatementMass
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeDiscriminantOrderNeZeroUnimodulaStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LatticeQuotientGensAndIntermediateCountStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitianStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeDiscriminantOrderNeZeroUnimodula
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LatticeQuotientGensAndIntermediateCount
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitian
 import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -217,10 +217,9 @@ theorem main
                   ∧ dual (hRes h U) (latIn U L)
                     = (latIn U L) ⊔ Submodule.span (𝓞 K) (t : Set _)) := by
   intro K V _ _ _ _ _ _ _ _ h hK hs hp L U e hL ⟨t, hte, ht⟩
-  obtain ⟨hc, hsU, hpU, -⟩ :=
-    (GlobalTheory.T.witt_extension_totally_definite_hermitian K V h hK hs hp).2 U
+  obtain ⟨hc, hsU, hpU, -⟩ := (_root_.GlobalTheory.Mass.Witt.witt_definite K V h hK hs hp).2 U
   obtain ⟨-, hsW, hpW, -⟩ :=
-    (GlobalTheory.T.witt_extension_totally_definite_hermitian K V h hK hs hp).2 (perp h U)
+    (_root_.GlobalTheory.Mass.Witt.witt_definite K V h hK hs hp).2 (perp h U)
   set W := perp h U with hW
   have horth : ∀ (u : U) (w : W), h (u : V) (w : V) = 0 := fun u w => by
     have := w.2
@@ -244,12 +243,8 @@ theorem main
         conv_rhs => rw [← hpq x, map_add (f := _), LinearMap.add_apply, horth, zero_add])
       L hL
   have hLd : L ≤ dual h L := by rw [ht]; exact le_sup_left
-  have nL :=
-    (GlobalTheory.T.hermitianLatticeDiscriminantOrder_ne_zero_unimodular K V h hK hs (nondeg h hp) L
-      hL).1
-  have nU :=
-    (GlobalTheory.T.hermitianLatticeDiscriminantOrder_ne_zero_unimodular K U _ hK hsU (nondeg _ hpU)
-      _ iU).1
+  have nL := (_root_.GlobalTheory.Mass.DiscOrder.main K V h hK hs (nondeg h hp) L hL).1
+  have nU := (_root_.GlobalTheory.Mass.DiscOrder.main K U _ hK hsU (nondeg _ hpU) _ iU).1
   have mU := idx_mul _ _ _ (latIn_le U p hp1 L) (Submodule.map_mono hLd)
   have mW := idx_mul _ _ _ (latIn_le W q hq1 L) (Submodule.map_mono hLd)
   have sw := idx_swap U W p q hpq L
@@ -261,7 +256,7 @@ theorem main
     exact Nat.mul_le_mul (Nat.le_of_dvd (Nat.pos_of_ne_zero nU) dvU)
       (Nat.le_of_dvd (Nat.pos_of_ne_zero nL) (idx_map_dvd W q L _))
   · obtain ⟨s, hs1, hs2⟩ :=
-      (GlobalTheory.T.lattice_quotient_gens_and_intermediate_count K W _ _ (latIn_le W q hq1 L)
+      (_root_.GlobalTheory.Mass.LatticeGens.gens_and_count K W _ _ (latIn_le W q hq1 L)
         (ne_zero_of_dvd_ne_zero nU dvU)).1 (hL.1.fg.map _)
     obtain ⟨s', h1, h2⟩ := gens_swap U W p q hp1 hpq L s hs2
     refine ⟨

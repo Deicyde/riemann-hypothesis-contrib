@@ -128,7 +128,8 @@ theorem u_mem_AΔ
     (hEΔ : Eπ ∈ W.AΔ) (hnz : ∀ a : LetA O n, a * Eπ = 0 → a = 0) (hu : W.γA W.gam Eπ = u * Eπ)
     : u ∈ W.AΔ := by
   intro δ hδ
-  have h1 : W.γA δ (u * Eπ) = u * Eπ := by rw [← hu, γA_comm, hEΔ δ hδ]
+  have h1 : W.γA δ (u * Eπ) = u * Eπ := by
+    rw [← hu, _root_.Formalism.MainNotions.LiftingTheory.gammaA_comm, hEΔ δ hδ]
   rw [map_mul, hEΔ δ hδ] at h1
   exact sub_eq_zero.1 (hnz _ (by rw [sub_mul, h1, sub_self]))
 

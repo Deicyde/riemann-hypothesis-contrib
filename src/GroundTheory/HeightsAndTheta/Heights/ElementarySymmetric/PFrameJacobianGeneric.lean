@@ -65,8 +65,8 @@ noncomputable section
 open MvPolynomial
 open scoped Matrix
 
-theorem frame_matrix_det_ne_zero {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n))) :
-    (Matrix.of fun j l : Fin n => b j l).det ≠ 0 := by
+theorem frame_matrix_det_ne_zero {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n)))
+    : (Matrix.of fun j l : Fin n => b j l).det ≠ 0 := by
   intro h
   obtain ⟨v, hv, hvM⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr h
   apply hv
@@ -78,8 +78,9 @@ theorem frame_matrix_det_ne_zero {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (Eu
   funext j
   exact hli j
 
-theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
-    (hC : ConormalGenerationGeneric.Statement) : FrameJacobianGeneric.Statement := by
+theorem FrameJacobianGeneric.proof
+    (hR : JacobianRankGeneric.Statement) (hC : ConormalGenerationGeneric.Statement)
+    : FrameJacobianGeneric.Statement := by
   classical
   intro n d J hJ hd b
   have := hJ
@@ -92,12 +93,14 @@ theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
     rw [IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
   have hdn : d ≤ n := by
     have h1 := ringKrullDim_quotient_le J
-    rw [hd, MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, zero_add,
-      Nat.card_eq_fintype_card, Fintype.card_fin] at h1
+    rw [hd, MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
+        zero_add, Nat.card_eq_fintype_card, Fintype.card_fin]
+      at h1
     exact_mod_cast h1
   obtain ⟨t, G, hG⟩ := Submodule.fg_iff_exists_fin_generating_family.mp (IsNoetherian.noetherian J)
   set r := Fintype.card (Fin n) - d with hr
-  obtain ⟨a, c, hac⟩ := IndefiniteRowSideFullHecke.Inter.exists_jacobian_minor_not_mem_charZero J G hG d hd
+  obtain ⟨a, c, hac⟩ :=
+    IndefiniteRowSideFullHecke.Inter.exists_jacobian_minor_not_mem_charZero J G hG d hd
   have hrn : r = n - d := by rw [hr, Fintype.card_fin]
   have hGJ : ∀ i, G i ∈ J := fun i => hG ▸ Ideal.subset_span ⟨i, rfl⟩
   let V : Matrix (Fin r) (Fin n) K := Matrix.of fun i l => π (pderiv l (G (a i)))
@@ -114,8 +117,9 @@ theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
     rw [this, ← RingHom.map_det]
     exact fun h => hac ((hπ _).mp h)
   have hN : N.det ≠ 0 := by
-    have : N = π.mapMatrix ((C : ℂ →+* MvPolynomial (Fin n) ℂ).mapMatrix
-        (Matrix.of fun j l : Fin n => b j l)ᵀ) := by
+    have : N
+        = π.mapMatrix
+          ((C : ℂ →+* MvPolynomial (Fin n) ℂ).mapMatrix (Matrix.of fun j l : Fin n => b j l)ᵀ) := by
       ext l j
       rfl
     rw [this, ← RingHom.map_det, ← RingHom.map_det, Matrix.det_transpose]
@@ -147,8 +151,7 @@ theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
   have hmem : ∀ j, j ∈ Set.range col ↔ j ∉ I₀ := by
     intro j
     simp [I₀]
-  let e : Fin r ≃ {j // j ∉ I₀} :=
-    (Equiv.ofInjective col hinj).trans (Equiv.subtypeEquivRight hmem)
+  let e : Fin r ≃ {j // j ∉ I₀} := (Equiv.ofInjective col hinj).trans (Equiv.subtypeEquivRight hmem)
   have he : ∀ i, (e i : Fin n) = col i := fun i => rfl
   let f : {j // j ∉ I₀} → MvPolynomial (Fin n) ℂ := fun k => G (a (e.symm k))
   have hli : LinearIndependent K (fun i => genericGradient J (G (a i))) := by
@@ -158,10 +161,11 @@ theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
       rw [Matrix.vecMul_eq_sum]
       exact hx
     simpa using congrFun (hVinj x this)
-  have hspan : Submodule.span K (Set.range (genericGradient J ∘ f)) =
-      Submodule.span K (genericGradient J '' (J : Set _)) := by
-    have hrange : Set.range (genericGradient J ∘ f) =
-        Set.range (fun i => genericGradient J (G (a i))) := by
+  have hspan
+      : Submodule.span K (Set.range (genericGradient J ∘ f))
+        = Submodule.span K (genericGradient J '' (J : Set _)) := by
+    have hrange
+        : Set.range (genericGradient J ∘ f) = Set.range (fun i => genericGradient J (G (a i))) := by
       ext v
       constructor
       · rintro ⟨k, rfl⟩
@@ -177,8 +181,8 @@ theorem FrameJacobianGeneric.proof (hR : JacobianRankGeneric.Statement)
       exact (hR n d J hd).trans (by simp)
   obtain ⟨s, hsJ, hs⟩ := hC n J {j // j ∉ I₀} f (fun k => hGJ _) hspan
   refine ⟨I₀, f, s, ?_, fun k => hGJ _, hsJ, ?_, hs⟩
-  · rw [Finset.card_compl, Finset.card_image_of_injective _ hinj, Finset.card_univ, Fintype.card_fin,
-      Fintype.card_fin]
+  · rw [Finset.card_compl, Finset.card_image_of_injective _ hinj, Finset.card_univ,
+      Fintype.card_fin, Fintype.card_fin]
     omega
   · intro hdet
     rw [← hπ, frameJacobianDet, RingHom.map_det, ← Matrix.det_submatrix_equiv_self e] at hdet

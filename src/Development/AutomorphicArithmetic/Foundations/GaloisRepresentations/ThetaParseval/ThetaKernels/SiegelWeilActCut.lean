@@ -47,8 +47,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder

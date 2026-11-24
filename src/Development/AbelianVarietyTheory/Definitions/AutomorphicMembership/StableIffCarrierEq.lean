@@ -175,7 +175,6 @@ def liftForm
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure Read (R : RealDat D A3.A Ks) (F : Face D A3.A) (X0 : BaseLevelRowSide D) : Type 1 where
   tup : T → D.what₂.Tup
   tupT : D.what₂.Tup → T

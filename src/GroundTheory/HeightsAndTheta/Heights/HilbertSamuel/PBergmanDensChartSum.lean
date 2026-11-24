@@ -104,7 +104,7 @@ theorem hessC_weight_trans
     T.map_source hy |> fun h => by rw [trans_target_eq] at h; exact h.1
   have hψ : ContDiffAt ℝ 2 (W.φ k ∘ (A.chart k).symm) (T y) :=
     ((weight_contDiffOn W k).contDiffAt ((A.chart k).open_target.mem_nhds hTy)).of_le
-      (by first | exact_mod_cast (le_top : (2 : ℕ∞) ≤ ⊤) | simp | exact WithTop.coe_le_coe.2 le_top)
+      (by first | simp)
   have hTc : ContDiffAt ℝ 2 T y := (hTan.contDiffAt (n := 2)).restrict_scalars ℝ
   have hφ : ContDiffAt ℝ 2 ((W.φ k ∘ (A.chart k).symm) ∘ T) y := hψ.comp y hTc
   set g : (Fin D → ℂ) → ℂ := fun w => L.g j k ((A.chart j).symm w) ^ 2 with hg
@@ -322,11 +322,8 @@ theorem densIn_continuousAt
   have hnhds : (A.chart j).target ∈ 𝓝 (A.chart j x) := (A.chart j).open_target.mem_nhds hy
   have hH : ContinuousAt (hessC (W.φ j ∘ (A.chart j).symm)) (A.chart j x) :=
     (hessC_continuousOn _ _ (A.chart j).open_target
-      ((weight_contDiffOn W j).of_le (by
-        first
-        | exact_mod_cast (le_top : (2 : ℕ∞) ≤ ⊤)
-        | simp
-        | exact WithTop.coe_le_coe.2 le_top))).continuousAt hnhds
+      ((weight_contDiffOn W j).of_le
+        (by first | simp | exact WithTop.coe_le_coe.2 le_top))).continuousAt hnhds
   have hdet : Continuous fun M : Matrix (Fin D) (Fin D) ℂ =>
       (D.factorial : ℝ) * ((((1 / Real.pi : ℝ) : ℂ) • M).det).re := by
     fun_prop
@@ -440,7 +437,6 @@ theorem integral_chart_term
   have hfac : (D.factorial : ℝ) ≠ 0 := by exact_mod_cast (Nat.factorial_pos D).ne'
   simp only [bergmanDens_symm W dV j hy, smul_eq_mul, ENNReal.toReal_ofReal hpos.le]
   field_simp
-  try ring
 
 end BergmanDensChartSum
 

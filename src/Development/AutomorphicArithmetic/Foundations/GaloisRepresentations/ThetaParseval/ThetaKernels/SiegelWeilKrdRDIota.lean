@@ -47,8 +47,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct Matrix
@@ -203,7 +201,7 @@ theorem hQ_w_k
     Matrix.map_one _ (map_zero _) (map_one _)]
   congr 1
   ext i j
-  by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
+  by_cases hij : i = j <;> simp [hij]
 theorem fin_MxI_k (w : InfinitePlace F) (ζ : ℂ) (y : GR d.n)
     : finOne F • _root_.PositivityTheory.SiegelWeilFormula.Krd.MxI_k d w ζ y = finOne F • 1 := by
   rw [_root_.PositivityTheory.SiegelWeilFormula.Krd.MxI_k, fin_mul, fin_mul,

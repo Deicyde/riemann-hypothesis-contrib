@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IMemSiegel
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.RationalSchwartzBruhatAlgebraIntegralLinearStatement
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.RationalSchwartzBruhatAlgebraIntegralLinear
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -131,8 +131,7 @@ theorem heisS_laws
   intro κ ι _ _ _ a b φ hφ
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · exact isSB_mul_char a b _
-      ((GlobalTheory.T.rationalSchwartzBruhat_algebra_integral_linear ℚ κ ι φ φ hφ hφ).2.2.2.2.2.2.2
-        b).1
+      ((_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι φ φ hφ hφ).2.2.2.2.2.2.2 b).1
   · intro τ hτ ζ
     unfold thS
     rw [← tsum_mul_left, ← (Equiv.addRight b).tsum_eq]
@@ -170,11 +169,9 @@ theorem heisS_laws
     simp [heisS, dotProduct]
   · intro ψ hψ
     have h1 : IsSB (fun x : Matrix κ ι ℚ => conj (ψ x)) :=
-      (GlobalTheory.T.rationalSchwartzBruhat_algebra_integral_linear ℚ κ ι ψ ψ hψ hψ).2.2.2.1
-    have h2 := (GlobalTheory.T.rationalSchwartzBruhat_algebra_integral_linear ℚ κ ι φ _ hφ h1).2.2.1
-    have h3 :=
-      ((GlobalTheory.T.rationalSchwartzBruhat_algebra_integral_linear ℚ κ ι _ _ h2 h2).2.2.2.2.2.2.2
-        b).2
+      (_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι ψ ψ hψ hψ).2.2.2.1
+    have h2 := (_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι φ _ hφ h1).2.2.1
+    have h3 := ((_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι _ _ h2 h2).2.2.2.2.2.2.2 b).2
     unfold ip
     refine Eq.trans ?_ h3
     congr 1

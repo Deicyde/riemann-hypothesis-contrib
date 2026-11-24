@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.cocyclePullback_iff_preimage_affineHom
     : ∀ (R R' : Type) [CommRing R] [CommRing R'] (X X' : Scheme.{0}) (s : X ⟶ Sp R)
         (s' : X' ⟶ Sp R') (σ : R →+* R') (φ : X' ⟶ X) (h : φ ≫ s = s' ≫ spMap σ) [IsAffineHom φ],
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.cocyclePullback_iff_preimage_affineHom
                 ∧ GlobalTheory.CatCoh.H2.mk _ c = (preRes φ s').pull2 z)
         ∧ (∀ y, (preRes φ s').pull1 (pullHO1 h y) = (preCoef h).pull1 y)
         ∧ ∀ y, (preRes φ s').pull2 (pullHO2 h y) = (preCoef h).pull2 y := by
-  first
-  | exact @GlobalTheory.AbCoh.red_iff_pre
-  | exact GlobalTheory.AbCoh.red_iff_pre
-  | (intros; apply GlobalTheory.AbCoh.red_iff_pre <;> assumption)
+  first | exact @GlobalTheory.AbCoh.red_iff_pre

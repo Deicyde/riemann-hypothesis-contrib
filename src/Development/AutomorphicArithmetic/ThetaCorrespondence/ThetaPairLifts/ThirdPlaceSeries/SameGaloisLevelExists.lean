@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up
@@ -52,6 +50,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option genInjectivity false
 set_option genSizeOfSpec false
+
 variable
   {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {K : Ctx} {B : Base}
   {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
@@ -125,12 +124,11 @@ def EtaStatement' : Prop :=
                   → ∀ v' : D'.what₂.places.Pl, HEq v' v → D'.what₂.etaJ j v' = P.q.eta j v
 def FinitenessStatement : Prop :=
   AllSt fun K _ _ _ w P x =>
-    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt)
-        (Γ : GeoP),
+    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt),
       ∃ (Z : w.Lt)
           (v : Lv3
             (_root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension
-              (_root_.GlobalTheory.HeightCounting.Up.extensionWithLaw hL) S Γ).s
+              (_root_.GlobalTheory.HeightCounting.Up.extensionWithLaw hL) S).s
             K w Z),
         v.Wt = P.Wt ∧ Kept l.c.ch v.nch
 end GlobalTheory.HeightCounting.Up

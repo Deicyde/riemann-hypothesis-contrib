@@ -680,7 +680,7 @@ theorem rootSum : RootSum := by
         Multiset.map (fun x => x ^ f i) (Multiset.map σ B)
           = Multiset.map σ (Multiset.map (fun x => x ^ f i) B) := by
     intro i σ B
-    simp [Multiset.map_map, Function.comp_def, map_pow]
+    simp [Multiset.map_map, map_pow]
   have hfib
       : ∀ i (s : (D i).S),
         Finite {B : Multiset ℂ // Multiset.map (fun x => x ^ f i) B = (D i).β s}
@@ -734,8 +734,8 @@ theorem rootSum : RootSum := by
     let mE : Multiset ℂ ≃ Multiset ℂ := ⟨
       Multiset.map σ,
       Multiset.map σ.symm,
-      fun B => by simp [Multiset.map_map, Function.comp_def],
-      fun B => by simp [Multiset.map_map, Function.comp_def]
+      fun B => by simp [Multiset.map_map],
+      fun B => by simp [Multiset.map_map]
     ⟩
     refine ⟨
       Equiv.sigmaCongrRight fun i =>

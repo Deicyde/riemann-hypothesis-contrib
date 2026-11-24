@@ -63,8 +63,8 @@ variable {K : Type*} [Field K] [CharZero K]
 abbrev eS {τ : Type*} (f : MvPowerSeries τ K) : MvPowerSeries τ K :=
   PowerSeries.subst f (PowerSeries.exp K)
 
-theorem fin_two_vector_eq_matrixVecCons (e : Fin 2 →₀ ℕ) (k j : ℕ) :
-    e = Finsupp.single 0 k + Finsupp.single 1 j ↔ e 0 = k ∧ e 1 = j := by
+theorem fin_two_vector_eq_matrixVecCons (e : Fin 2 →₀ ℕ) (k j : ℕ)
+    : e = Finsupp.single 0 k + Finsupp.single 1 j ↔ e 0 = k ∧ e 1 = j := by
   constructor
   · rintro rfl
     simp
@@ -72,16 +72,19 @@ theorem fin_two_vector_eq_matrixVecCons (e : Fin 2 →₀ ℕ) (k j : ℕ) :
     ext i
     fin_cases i <;> simp [h0, h1]
 
-theorem coeff_X_add_X_pow (n : ℕ) (e : Fin 2 →₀ ℕ) :
-    coeff e ((X 0 + X 1 : MvPowerSeries (Fin 2) K) ^ n) =
-      if e 0 + e 1 = n then (n.choose (e 0) : K) else 0 := by
-
+theorem coeff_X_add_X_pow (n : ℕ) (e : Fin 2 →₀ ℕ)
+    : coeff e ((X 0 + X 1 : MvPowerSeries (Fin 2) K) ^ n)
+      = if e 0 + e 1 = n then (n.choose (e 0) : K) else 0 := by
   rw [add_pow, map_sum]
-  have hterm : ∀ m ∈ Finset.range (n + 1), coeff e ((X 0 : MvPowerSeries (Fin 2) K) ^ m * X 1 ^ (n - m) *
-      (n.choose m : MvPowerSeries (Fin 2) K)) = if e 0 = m ∧ e 1 = n - m then (n.choose m : K) else 0 := by
+  have hterm
+      : ∀ m ∈ Finset.range (n + 1),
+        coeff e
+            ((X 0 : MvPowerSeries (Fin 2) K) ^ m * X 1 ^ (n - m)
+              * (n.choose m : MvPowerSeries (Fin 2) K))
+          = if e 0 = m ∧ e 1 = n - m then (n.choose m : K) else 0 := by
     intro m _
-    rw [mul_comm, ← nsmul_eq_mul, map_nsmul, X_pow_eq, X_pow_eq, monomial_mul_monomial, coeff_monomial,
-      mul_one, nsmul_eq_mul]
+    rw [mul_comm, ← nsmul_eq_mul, map_nsmul, X_pow_eq, X_pow_eq, monomial_mul_monomial,
+      coeff_monomial, mul_one, nsmul_eq_mul]
     simp only [fin_two_vector_eq_matrixVecCons]
     split_ifs <;> simp
   rw [Finset.sum_congr rfl hterm]
@@ -131,8 +134,9 @@ private lemma coeff_eS_X (i : Fin 2) (e : Fin 2 →₀ ℕ) :
 
 theorem eS_X_add_X : eS (X 0 + X 1 : MvPowerSeries (Fin 2) K) = eS (X 0) * eS (X 1) := by
   ext e
-  have hL : coeff e (eS (X 0 + X 1 : MvPowerSeries (Fin 2) K)) =
-      ((e 0 + e 1).factorial : K)⁻¹ * ((e 0 + e 1).choose (e 0) : K) := by
+  have hL
+      : coeff e (eS (X 0 + X 1 : MvPowerSeries (Fin 2) K))
+        = ((e 0 + e 1).factorial : K)⁻¹ * ((e 0 + e 1).choose (e 0) : K) := by
     rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero (by simp))]
     rw [finsum_eq_single _ (e 0 + e 1)]
     · rw [coeff_exp_K, coeff_X_add_X_pow, if_pos rfl, smul_eq_mul]
@@ -144,8 +148,10 @@ theorem eS_X_add_X : eS (X 0 + X 1 : MvPowerSeries (Fin 2) K) = eS (X 0) * eS (X
     simp only [Finsupp.single_eq_same]
     have h1 := Nat.choose_mul_factorial_mul_factorial (Nat.le_add_right (e 0) (e 1))
     rw [Nat.add_sub_cancel_left] at h1
-    have h2 : ((e 0 + e 1).choose (e 0) : K) * (e 0).factorial * (e 1).factorial =
-        (e 0 + e 1).factorial := by exact_mod_cast h1
+    have h2
+        : ((e 0 + e 1).choose (e 0) : K) * (e 0).factorial * (e 1).factorial
+          = (e 0 + e 1).factorial := by
+      exact_mod_cast h1
     have f0 : ((e 0).factorial : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
     have f1 : ((e 1).factorial : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
     have hC : ((e 0 + e 1).choose (e 0) : K) ≠ 0 :=
@@ -169,40 +175,48 @@ theorem eS_X_add_X : eS (X 0 + X 1 : MvPowerSeries (Fin 2) K) = eS (X 0) * eS (X
       · rw [if_neg h2, mul_zero]
     · rw [if_neg h1, zero_mul]
   · intro h
-    exact absurd (Finset.HasAntidiagonal.mem_antidiagonal.mpr ((fin_two_vector_eq_matrixVecCons e (e 0) (e 1)).mpr ⟨rfl, rfl⟩).symm) h
+    exact absurd
+      (Finset.HasAntidiagonal.mem_antidiagonal.mpr
+        ((fin_two_vector_eq_matrixVecCons e (e 0) (e 1)).mpr ⟨rfl, rfl⟩).symm)
+      h
 
 variable {τ υ : Type*}
 
-theorem subst_psubst {b : τ → MvPowerSeries υ K} (hb : HasSubst b) {a : MvPowerSeries τ K}
-    (ha : PowerSeries.HasSubst a) (φ : PowerSeries K) :
-    subst b (PowerSeries.subst a φ) = PowerSeries.subst (subst b a) φ := by
+theorem subst_psubst
+    {b : τ → MvPowerSeries υ K} (hb : HasSubst b)
+    {a : MvPowerSeries τ K} (ha : PowerSeries.HasSubst a)
+    (φ : PowerSeries K)
+    : subst b (PowerSeries.subst a φ) = PowerSeries.subst (subst b a) φ := by
   rw [PowerSeries.subst_def, PowerSeries.subst_def,
     MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.const ha) hb]
 
-theorem eS_add (f g : MvPowerSeries τ K) (hf : constantCoeff f = 0) (hg : constantCoeff g = 0) :
-    eS (f + g) = eS f * eS g := by
+theorem eS_add (f g : MvPowerSeries τ K) (hf : constantCoeff f = 0) (hg : constantCoeff g = 0)
+    : eS (f + g) = eS f * eS g := by
   let b : Fin 2 → MvPowerSeries τ K := ![f, g]
-  have hb : HasSubst b := hasSubst_of_constantCoeff_zero fun i => by
-    fin_cases i <;> simp [b, hf, hg]
+  have hb : HasSubst b :=
+    hasSubst_of_constantCoeff_zero fun i => by fin_cases i <;> simp [b, hf, hg]
   have h1 : subst b (eS (X 0 + X 1 : MvPowerSeries (Fin 2) K)) = eS (f + g) := by
-    rw [subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)), subst_add hb, subst_X hb,
-      subst_X hb]
+    rw [subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)), subst_add hb,
+      subst_X hb, subst_X hb]
     rfl
   have h2 : subst b (eS (X 0 : MvPowerSeries (Fin 2) K) * eS (X 1)) = eS f * eS g := by
     rw [subst_mul hb, subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
-      subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)), subst_X hb, subst_X hb]
+      subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)), subst_X hb,
+      subst_X hb]
     rfl
   rw [← h1, eS_X_add_X, h2]
 
 theorem eS_zero : eS (0 : MvPowerSeries τ K) = 1 := by
   ext e
-  rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)), finsum_eq_single _ 0]
-  · simp [coeff_exp_K]
+  rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
+    finsum_eq_single _ 0]
+  · simp
   · intro d hd
     simp [zero_pow hd]
 
-theorem eS_sum {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries τ K)
-    (hf : ∀ i ∈ s, constantCoeff (f i) = 0) : eS (∑ i ∈ s, f i) = ∏ i ∈ s, eS (f i) := by
+theorem eS_sum
+    {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries τ K) (hf : ∀ i ∈ s, constantCoeff (f i) = 0)
+    : eS (∑ i ∈ s, f i) = ∏ i ∈ s, eS (f i) := by
   classical
   revert hf
   induction s using Finset.induction_on with
@@ -219,8 +233,9 @@ theorem eS_sum {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries τ K)
     rw [map_sum]
     exact Finset.sum_eq_zero fun i hi => hf i (Finset.mem_insert_of_mem hi)
 
-theorem subst_eS {b : τ → MvPowerSeries υ K} (hb : HasSubst b) (f : MvPowerSeries τ K)
-    (hf : constantCoeff f = 0) : subst b (eS f) = eS (subst b f) := by
+theorem subst_eS
+    {b : τ → MvPowerSeries υ K} (hb : HasSubst b) (f : MvPowerSeries τ K) (hf : constantCoeff f = 0)
+    : subst b (eS f) = eS (subst b f) := by
   exact subst_psubst hb (PowerSeries.HasSubst.of_constantCoeff_zero hf) _
 
 end PI.OrbShared.ExpSum

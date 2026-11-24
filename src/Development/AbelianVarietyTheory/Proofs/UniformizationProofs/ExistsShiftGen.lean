@@ -164,7 +164,7 @@ theorem exists_shift_gen
           h (1 : TF (R := R) F ⟶ D.P.A).left ^ (n : ℤ) * h (g.b * cP D _ z).left ^ (-(n : ℤ))
         rw [mul_comm g.b]
         apply Additive.ofMul.injective
-        simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
+        simp only [ofMul_mul, ofMul_zpow]
         module)
       (LB.mulGen D.P.L _ _ _ _
         (LB.mulGen D.P.L _ _ _ _ w

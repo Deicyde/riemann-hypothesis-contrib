@@ -50,6 +50,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
   GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.inertDoubleCosetOperator_eq_inertHeckeOperator
     : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
         (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L))
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.inertDoubleCosetOperator_eq_inertHeckeOperator
                 ∧ ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (φ : GAf L n → W),
                   (∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ φ = φ)
                     → ∑ γ ∈ R, NG.rt L n γ φ = heckeFunI L n (Umax L n) Dv ha φ := by
-  first
-  | exact @GlobalTheory.InertDCOp.dcOp_eq_heckeFunI
-  | exact GlobalTheory.InertDCOp.dcOp_eq_heckeFunI
-  | (intros; apply GlobalTheory.InertDCOp.dcOp_eq_heckeFunI <;> assumption)
+  first | exact @GlobalTheory.InertDCOp.dcOp_eq_heckeFunI

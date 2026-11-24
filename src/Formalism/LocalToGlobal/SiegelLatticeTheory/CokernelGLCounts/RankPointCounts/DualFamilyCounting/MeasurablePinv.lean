@@ -234,7 +234,7 @@ theorem Pmap_mp : MeasurePreserving (Pmap X) volume volume := by
     measurePreserving_fst
   have h2 := volume_preserving_arrowCongr' e (MeasurableEquiv.refl ℝ) (MeasurePreserving.id volume)
   convert h2.comp h1 using 1
-  all_goals first | rfl | (funext x; rfl)
+  all_goals first | rfl
 
 theorem measurable_Pinv : Measurable (Pinv X) := by
   unfold Pinv
@@ -339,10 +339,7 @@ theorem realIdealBlock (𝔞 : (FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)
       ENNReal.ofReal_mul (by exact_mod_cast FractionalIdeal.absNorm_nonneg _),
       ← ENNReal.ofReal_coe_nnreal]
     congr 2
-    first
-    | simp [Int.norm_eq_abs]
-    | simp [Real.coe_sqrt, Int.norm_eq_abs]
-    | (rw [NNReal.coe_sqrt]; simp [Int.norm_eq_abs])
+    first | simp [Int.norm_eq_abs]
   refine ⟨
     ⟨
       Pinv X ⁻¹' ZSpan.fundamentalDomain b,

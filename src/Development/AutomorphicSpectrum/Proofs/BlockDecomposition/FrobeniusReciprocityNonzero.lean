@@ -77,7 +77,7 @@ theorem mk_parab (e : (Σ a, m a) ≃ n) (τ : Representation ℂ (GL n k) V) (p
     intro y
     rw [jac_mk, smul_smul, Units.mul_inv, one_smul]
   have e1 : τ (p : GL n k) w = τ (leviEmb k e (leviProj k e p)) (τ u w) := by
-    first | (rw [hp, map_mul]; rfl) | rw [hp, map_mul]
+    first | (rw [hp, map_mul]; rfl)
   rw [e1, hL, hL, key]
 
 def frobFun
@@ -127,7 +127,7 @@ theorem frobFun_translate
     (v : V) (h x : GL n k)
     : frobFun e f v (x * h) = frobFun e f (τ h v) x := by
   show f (Submodule.Quotient.mk (τ (x * h) v)) = f (Submodule.Quotient.mk (τ x (τ h v)))
-  first | (rw [map_mul]; rfl) | rw [map_mul]
+  first | (rw [map_mul]; rfl)
 
 theorem frobFun_smooth
     (e : (Σ a, m a) ≃ n)
@@ -157,8 +157,7 @@ theorem frobFun_smooth
     ?_
   ⟩
   · intro g hg
-    have h1 : R (g0 * (g0⁻¹ * g)) F = R g0 (R (g0⁻¹ * g) F) := by
-      first | (rw [map_mul]; rfl) | rw [map_mul]
+    have h1 : R (g0 * (g0⁻¹ * g)) F = R g0 (R (g0⁻¹ * g) F) := by first | (rw [map_mul]; rfl)
     rw [mul_inv_cancel_left] at h1
     show R g F = F
     rw [h1, hstab _ hg]
@@ -194,7 +193,7 @@ theorem frobInv_one
     (v : V)
     : (frobInv e hτ f v).1.1 1 = f (Submodule.Quotient.mk v) := by
   show f (Submodule.Quotient.mk (τ 1 v)) = f (Submodule.Quotient.mk v)
-  first | (rw [map_one]; rfl) | rw [map_one]
+  first | (rw [map_one]; rfl)
 
 theorem exists_frobInv_ne_zero
     (e : (Σ a, m a) ≃ n)

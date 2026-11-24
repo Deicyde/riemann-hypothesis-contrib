@@ -96,15 +96,15 @@ theorem _root_.Formalism.FourierDecayAlt.P.rule_of_eq : LevelPointCoordinates.Ru
       : ell k r z' (hpart1 (Hpk k r) Z) - star (ell k r z' (hpart1 (Hpk k r) Z))
         = Λ (hpart1 (Hpk k r) Z) := by
     rw [← dEll_eq_ell _ _ hr]
-    exact (Formalism.FourierDecayAlt.P.dpsi_is_derivation k r z' _ hr hz
-      (Formalism.FourierDecayAlt.P.PBG.hermitian_part_one_mem_lie Z)
+    exact (_root_.Formalism.FourierDecayAlt.P.SignAntidiagonal.dpsi_is_derivation k r z' _ hr hz
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.hermitian_part_mem_lie Z)
       (pat_inNp (Formalism.FourierDecayAlt.Q.QRR.pat_hpart1 hl))).symm
   have hΛ2
       : ell k r z' (hpart2 (Hpk k r) Z) - star (ell k r z' (hpart2 (Hpk k r) Z))
         = Λ (hpart2 (Hpk k r) Z) := by
     rw [← dEll_eq_ell _ _ hr]
-    exact (Formalism.FourierDecayAlt.P.dpsi_is_derivation k r z' _ hr hz
-      (Formalism.FourierDecayAlt.P.PBG.hermitian_part_two_mem_lie Z)
+    exact (_root_.Formalism.FourierDecayAlt.P.SignAntidiagonal.dpsi_is_derivation k r z' _ hr hz
+      (_root_.Formalism.FourierDecayAlt.P.LieDecompositionLocal.antihermitian_part_mem_lie Z)
       (pat_inNp (Formalism.FourierDecayAlt.Q.QRR.pat_hpart2 hl))).symm
   have hsum : hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z = Z := by
     unfold hpart1 hpart2

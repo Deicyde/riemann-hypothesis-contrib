@@ -51,15 +51,19 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 section FrobPiNGeom
 
 variable {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
 
-theorem frobpin_iter_mem (I : Ideal A) (f : M →+ M)
+theorem frobpin_iter_mem
+    (I : Ideal A) (f : M →+ M)
     (hf : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule A M), f y ∈ (I ^ (k + 1) • ⊤ : Submodule A M))
-    (j : ℕ) : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule A M),
+    (j : ℕ)
+    : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule A M),
       (⇑f)^[j] y ∈ (I ^ (k + j) • ⊤ : Submodule A M) := by
   induction j with
   | zero =>
@@ -71,13 +75,17 @@ theorem frobpin_iter_mem (I : Ideal A) (f : M →+ M)
     have h1 := hf (k + j) _ (ih k y hy)
     rwa [show k + (j + 1) = k + j + 1 by ring]
 
-theorem frobpin_mono (I : Ideal A) {m k : ℕ} (h : m ≤ k) {y : M}
-    (hy : y ∈ (I ^ k • ⊤ : Submodule A M)) : y ∈ (I ^ m • ⊤ : Submodule A M) :=
+theorem frobpin_mono
+    (I : Ideal A) {m k : ℕ} (h : m ≤ k) {y : M} (hy : y ∈ (I ^ k • ⊤ : Submodule A M))
+    : y ∈ (I ^ m • ⊤ : Submodule A M) :=
   Submodule.smul_mono_left (Ideal.pow_le_pow_right h) hy
 
-theorem frobpin_geom (I : Ideal A) [IsAdicComplete I M] (f : M →+ M)
+theorem frobpin_geom
+    (I : Ideal A) [IsAdicComplete I M]
+    (f : M →+ M)
     (hf : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule A M), f y ∈ (I ^ (k + 1) • ⊤ : Submodule A M))
-    (b : M) : ∃! y : M, f y - y = b := by
+    (b : M)
+    : ∃! y : M, f y - y = b := by
   have hit := frobpin_iter_mem I f hf
   have htop : ∀ y : M, y ∈ (I ^ 0 • ⊤ : Submodule A M) := by
     intro y
@@ -94,7 +102,6 @@ theorem frobpin_geom (I : Ideal A) [IsAdicComplete I M] (f : M →+ M)
   have hS : ∀ k, f (S k) - S k = (⇑f)^[k] b - b := by
     intro k
     have e1 : f (S k) = ∑ i ∈ Finset.range k, (⇑f)^[i + 1] b := by
-
       simp only [S, map_sum]
       exact Finset.sum_congr rfl (fun i _ => (Function.iterate_succ_apply' _ _ _).symm)
     rw [e1]
@@ -130,7 +137,9 @@ theorem frobpin_geom (I : Ideal A) [IsAdicComplete I M] (f : M →+ M)
   have h0 : f (y - -L) = y - -L := by
     refine sub_eq_zero.1 ?_
     rw [map_sub]
-    calc f y - f (-L) - (y - -L) = (f y - y) - (f (-L) - -L) := by abel
+    calc
+      f y - f (-L) - (y - -L)
+        = (f y - y) - (f (-L) - -L) := by abel
       _ = 0 := by rw [hy, hex, sub_self]
   exact sub_eq_zero.1 (hfix _ h0)
 
@@ -138,45 +147,38 @@ end FrobPiNGeom
 
 section FrobPiNLocal
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+  (T : LocLat G Qp LL O)
 
-theorem frobpin_φD_smul (a : LetA O n) (x : W.DD T) :
-    W.φD T (a • x) = W.φA a • W.φD T x := by
-  have := W.φD_smul T (algebraMap (LetA O n) W.EE a) x
-  rw [algebraMap_smul, W.φE_ext, algebraMap_smul] at this
-  exact this
-
-theorem frobpin_γD_smul (g : W.Gam) (a : LetA O n) (x : W.DD T) :
-    W.γD T g (a • x) = W.γA g a • W.γD T g x := by
-  have := W.γD_smul T g (algebraMap (LetA O n) W.EE a) x
-  rw [algebraMap_smul, W.γE_ext, algebraMap_smul] at this
-  exact this
-
-theorem frobpin_φA_pow (I : Ideal (LetA O n)) (hφI : ∀ a ∈ I, W.φA a ∈ I) (k : ℕ) :
-    ∀ a ∈ I ^ k, W.φA a ∈ I ^ k := by
+theorem frobpin_φA_pow (I : Ideal (LetA O n)) (hφI : ∀ a ∈ I, W.φA a ∈ I) (k : ℕ)
+    : ∀ a ∈ I ^ k, W.φA a ∈ I ^ k := by
   intro a ha
   have h1 : I ≤ Ideal.comap W.φA I := fun x hx => hφI x hx
   exact Ideal.le_comap_pow W.φA k (Ideal.pow_right_mono h1 k ha)
 
-theorem frobpin_local (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T))
-    (hφI : ∀ a ∈ I, W.φA a ∈ I) (π' Ep : LetA O n) (u : (LetA O n)ˣ) (s' h' M : ℕ)
-    (hφπ : W.φA π' = (u : LetA O n) * π' * Ep ^ s') (hEI : Ep ∈ I) (hsM : h' + 1 ≤ s' * M)
-    (hN : ∀ y ∈ W.N T, Ep ^ h' • W.φD T y ∈ W.N T)
-    (hπΔ : ∀ δ ∈ W.DelF, W.γA δ π' = π')
-    (hunit : IsUnit (algebraMap (LetA O n) W.EE π')) : FrobPiN W T π' M := by
+theorem frobpin_local
+    (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T)) (hφI : ∀ a ∈ I, W.φA a ∈ I)
+    (π' Ep : LetA O n) (u : (LetA O n)ˣ) (s' h' M : ℕ)
+    (hφπ : W.φA π' = (u : LetA O n) * π' * Ep ^ s')
+    (hEI : Ep ∈ I) (hsM : h' + 1 ≤ s' * M) (hN : ∀ y ∈ W.N T, Ep ^ h' • W.φD T y ∈ W.N T)
+    (hπΔ : ∀ δ ∈ W.DelF, W.γA δ π' = π') (hunit : IsUnit (algebraMap (LetA O n) W.EE π'))
+    : FrobPiN W T π' M := by
   classical
   have := hI
   obtain ⟨c, hcdef⟩ : ∃ c : LetA O n, c = (u : LetA O n) ^ M * Ep ^ (s' * M) := ⟨_, rfl⟩
   have hφx : ∀ y : W.DD T, W.φD T (π' ^ M • y) = π' ^ M • (c • W.φD T y) := by
     intro y
-    rw [frobpin_φD_smul, map_pow, hφπ, smul_smul, hcdef, mul_pow, mul_pow, ← pow_mul]
+    rw [_root_.Formalism.MainNotions.LiftingTheory.wmap_φD_smul, map_pow, hφπ, smul_smul, hcdef,
+      mul_pow, mul_pow, ← pow_mul]
     congr 1
     ring
   obtain ⟨r, hr⟩ : ∃ r, s' * M = r + 1 + h' := ⟨s' * M - (h' + 1), by omega⟩
@@ -189,20 +191,24 @@ theorem frobpin_local (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T))
     rw [e]
     exact Submodule.smul_mem_smul hEI ((W.N T).smul_mem _ (hN z hz))
   have hcN : ∀ z ∈ W.N T, c • W.φD T z ∈ W.N T := fun z hz => Submodule.smul_le_right (hcI z hz)
-  have hlev : ∀ k : ℕ, ∀ y ∈ (I ^ k • W.N T : Submodule (LetA O n) (W.DD T)),
-      c • W.φD T y ∈ (I ^ (k + 1) • W.N T : Submodule (LetA O n) (W.DD T)) := by
+  have hlev
+      : ∀ k : ℕ, ∀ y ∈ (I ^ k • W.N T : Submodule (LetA O n) (W.DD T)),
+        c • W.φD T y ∈ (I ^ (k + 1) • W.N T : Submodule (LetA O n) (W.DD T)) := by
     intro k y hy
     refine Submodule.smul_induction_on hy (fun a ha z hz => ?_) (fun x y hx hy => ?_)
-    · rw [frobpin_φD_smul, smul_comm c (W.φA a), pow_succ, Submodule.mul_smul]
+    · rw [_root_.Formalism.MainNotions.LiftingTheory.wmap_φD_smul, smul_comm c (W.φA a), pow_succ,
+        Submodule.mul_smul]
       exact Submodule.smul_mem_smul (frobpin_φA_pow W I hφI k a ha) (hcI z hz)
     · rw [map_add (f := _), smul_add]
       exact Submodule.add_mem _ hx hy
-  let f : ↥(W.N T) →+ ↥(W.N T) :=
-    { toFun := fun y => ⟨c • W.φD T y, hcN y y.2⟩
-      map_zero' := by ext; simp
-      map_add' := fun x y => by ext; simp [map_add (f := _), smul_add] }
-  have hf : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule (LetA O n) ↥(W.N T)),
-      f y ∈ (I ^ (k + 1) • ⊤ : Submodule (LetA O n) ↥(W.N T)) := by
+  let f : ↥(W.N T) →+ ↥(W.N T) := {
+    toFun := fun y => ⟨c • W.φD T y, hcN y y.2⟩
+    map_zero' := by ext; simp
+    map_add' := fun x y => by ext; simp [map_add (f := _), smul_add]
+  }
+  have hf
+      : ∀ k : ℕ, ∀ y ∈ (I ^ k • ⊤ : Submodule (LetA O n) ↥(W.N T)),
+        f y ∈ (I ^ (k + 1) • ⊤ : Submodule (LetA O n) ↥(W.N T)) := by
     intro k y hy
     rw [Submodule.mem_smul_top_iff] at hy ⊢
     exact hlev k y hy
@@ -223,8 +229,11 @@ theorem frobpin_local (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T))
     intro z hz h
     rw [hφx] at h
     exact huniq0 z hz (hcancel _ _ h)
-  have huniq2 : ∀ x₁ x₂ : W.DD T, (∃ z ∈ W.N T, π' ^ M • z = x₁) →
-      (∃ z ∈ W.N T, π' ^ M • z = x₂) → W.φD T x₁ - x₁ = W.φD T x₂ - x₂ → x₁ = x₂ := by
+  have huniq2
+      : ∀ x₁ x₂ : W.DD T,
+        (∃ z ∈ W.N T, π' ^ M • z = x₁) → (∃ z ∈ W.N T, π' ^ M • z = x₂)
+          → W.φD T x₁ - x₁ = W.φD T x₂ - x₂
+          → x₁ = x₂ := by
     rintro _ _ ⟨z₁, hz₁, rfl⟩ ⟨z₂, hz₂, rfl⟩ h
     rw [sub_eq_sub_iff_sub_eq_sub, ← map_sub, ← smul_sub] at h
     have := huniq (z₁ - z₂) (Submodule.sub_mem _ hz₁ hz₂) h
@@ -240,34 +249,45 @@ theorem frobpin_local (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T))
     have hyv : c • W.φD T (y : W.DD T) - (y : W.DD T) = yb := congrArg Subtype.val hy
     have hsol : W.φD T (π' ^ M • (y : W.DD T)) - π' ^ M • (y : W.DD T) = π' ^ M • yb := by
       rw [hφx, ← smul_sub, hyv]
-    refine ⟨π' ^ M • (y : W.DD T), ⟨(mem_PiNS W T π' M _).2 ⟨⟨y, y.2, rfl⟩, fun δ hδ => ?_⟩, hsol⟩, ?_⟩
+    refine
+      ⟨π' ^ M • (y : W.DD T), ⟨(mem_PiNS W T π' M _).2 ⟨⟨y, y.2, rfl⟩, fun δ hδ => ?_⟩, hsol⟩, ?_⟩
     · exact huniq2 _ _
-        ⟨W.γD T δ y, W.N_Γ T δ y y.2, by rw [frobpin_γD_smul, map_pow, hπΔ δ hδ]⟩ ⟨y, y.2, rfl⟩
-        (by rw [W.φγ_comm, ← map_sub, hsol, hbΔ δ hδ])
+        ⟨
+          W.γD T δ y,
+          W.N_Γ T δ y y.2,
+          by rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, map_pow, hπΔ δ hδ]
+        ⟩
+        ⟨y, y.2, rfl⟩ (by rw [W.φγ_comm, ← map_sub, hsol, hbΔ δ hδ])
     · rintro x' ⟨hx', hx'sol⟩
       exact huniq2 _ _ ((mem_PiNS W T π' M x').1 hx').1 ⟨y, y.2, rfl⟩ (by rw [hx'sol, hsol])
 
 end FrobPiNLocal
 
-theorem frobenius_uniformiser_wach {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀]
-    [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+theorem frobenius_uniformiser_wach
+    {G : Type} [Group G] [TopologicalSpace G]
+    {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+    [IsScalarTower Qp K₀ K]
     {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
     [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
     [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
-    (I : Ideal (LetA O n)) (hI : IsAdicComplete I ↥(W.N T))
-    (hQI : W.Q ∈ I) (hφI : ∀ a ∈ I, W.φA a ∈ I) (hs1 : W.s = 1)
-    (hNl : W.N T = ⨆ i, W.Nl T i) (h' : ℕ)
-    (hp5 : ∀ i, ∀ x ∈ W.Nl T (i - 1), W.Q ^ h' • W.φD T x ∈ W.N T)
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+    [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O) (I : Ideal (LetA O n))
+    (hI : IsAdicComplete I ↥(W.N T)) (hQI : W.Q ∈ I) (hφI : ∀ a ∈ I, W.φA a ∈ I)
+    (hs1 : W.s = 1) (hNl : W.N T = ⨆ i, W.Nl T i)
+    (h' : ℕ) (hp5 : ∀ i, ∀ x ∈ W.Nl T (i - 1), W.Q ^ h' • W.φD T x ∈ W.N T)
     (e s' M : ℕ) (π' : LetA O n) (E : ZMod n → Polynomial O)
-    (hp9 : Formalism.MainNotions.DeltaInvariantLattices.wachRingRelations W e s' π' E) (hsM : h' + 1 ≤ s' * M) : FrobPiN W T π' M := by
+    (hp9 : Formalism.MainNotions.DeltaInvariantLattices.wachRingRelations W e s' π' E)
+    (hsM : h' + 1 ≤ s' * M)
+    : FrobPiN W T π' M := by
   obtain ⟨hπΔ, -, ⟨w, hw⟩, -, ⟨w₁, hw₁⟩, ⟨u, hu⟩, -, -⟩ := hp9
   have hQq : W.Q = W.q := by
     rw [LocWach.Q, hs1, Nat.sub_self, pow_zero]
     rfl
-  have hE : Formalism.MainNotions.DeltaInvariantLattices.Eat E π' = ((w₁⁻¹ : (LetA O n)ˣ) : LetA O n) * W.Q := by
+  have hE
+      : Formalism.MainNotions.DeltaInvariantLattices.Eat E π'
+        = ((w₁⁻¹ : (LetA O n)ˣ) : LetA O n) * W.Q := by
     rw [hQq, hw₁, ← mul_assoc, Units.inv_mul, one_mul]
   have hEI : Formalism.MainNotions.DeltaInvariantLattices.Eat E π' ∈ I := by
     rw [hE]
@@ -275,8 +295,10 @@ theorem frobenius_uniformiser_wach {G : Type} [Group G] [TopologicalSpace G] {Qp
   have hQN : ∀ y ∈ W.N T, W.Q ^ h' • W.φD T y ∈ W.N T := by
     intro y hy
     rw [hNl] at hy
-    refine Submodule.iSup_induction (fun i => W.Nl T i)
-      (motive := fun y => W.Q ^ h' • W.φD T y ∈ W.N T) hy ?_ ?_ ?_
+    refine Submodule.iSup_induction
+      (fun i => W.Nl T i)
+      (motive := fun y => W.Q ^ h' • W.φD T y ∈ W.N T)
+      hy ?_ ?_ ?_
     · intro i x hx
       exact hp5 (i + 1) x (by rwa [add_sub_cancel_right])
     · rw [map_zero, smul_zero]
@@ -284,7 +306,9 @@ theorem frobenius_uniformiser_wach {G : Type} [Group G] [TopologicalSpace G] {Qp
     · intro x y hx hy
       rw [map_add (f := _), smul_add]
       exact Submodule.add_mem _ hx hy
-  have hN : ∀ y ∈ W.N T, Formalism.MainNotions.DeltaInvariantLattices.Eat E π' ^ h' • W.φD T y ∈ W.N T := by
+  have hN
+      : ∀ y ∈ W.N T,
+        Formalism.MainNotions.DeltaInvariantLattices.Eat E π' ^ h' • W.φD T y ∈ W.N T := by
     intro y hy
     rw [hE, mul_pow, mul_smul]
     exact (W.N T).smul_mem _ (hQN y hy)
@@ -292,28 +316,32 @@ theorem frobenius_uniformiser_wach {G : Type} [Group G] [TopologicalSpace G] {Qp
   have hunit : IsUnit (algebraMap (LetA O n) W.EE π') := by
     rw [hw, map_mul, map_pow]
     exact (w.isUnit.map _).mul (W.EE_π.pow _)
-  exact frobpin_local W T I hI hφI π' (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') u s' h' M hu hEI hsM hN hπΔ' hunit
+  exact frobpin_local W T I hI hφI π' (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') u s'
+    h' M hu hEI hsM hN hπΔ' hunit
 
-theorem max_unramified_finrank_pos {l : ℕ} [Fact l.Prime] (K : FinExt l) : 0 < finrank ℚ_[l] ↥(K0 K) := by
+theorem max_unramified_finrank_pos {l : ℕ} [Fact l.Prime] (K : FinExt l)
+    : 0 < finrank ℚ_[l] ↥(K0 K) := by
   have := K.2
-  have : FiniteDimensional ℚ_[l] ↥(K0 K) := FiniteDimensional.of_injective
+  have : FiniteDimensional ℚ_[l] ↥(K0 K) :=
+    FiniteDimensional.of_injective
       (IntermediateField.inclusion (inf_le_left : K0 K ≤ K.1)).toLinearMap
       (IntermediateField.inclusion (inf_le_left : K0 K ≤ K.1)).injective
   exact finrank_pos
 
-theorem frobpin_finrank_sup {l : ℕ} [Fact l.Prime] (F : IntermediateField ℚ_[l] (Om l)) (y : Om l)
-    (hint : IsIntegral F y) :
-    finrank ℚ_[l] ↥(F ⊔ IntermediateField.adjoin ℚ_[l] {y}) = finrank ℚ_[l] ↥F * (minpoly F y).natDegree := by
+theorem frobpin_finrank_sup
+    {l : ℕ} [Fact l.Prime] (F : IntermediateField ℚ_[l] (Om l)) (y : Om l) (hint : IsIntegral F y)
+    : finrank ℚ_[l] ↥(F ⊔ IntermediateField.adjoin ℚ_[l] {y})
+      = finrank ℚ_[l] ↥F * (minpoly F y).natDegree := by
   rw [← IntermediateField.restrictScalars_adjoin_eq_sup, ← IntermediateField.adjoin.finrank hint]
   set_option synthInstance.maxHeartbeats 200000 in
-    exact (Module.finrank_mul_finrank ℚ_[l] ↥F ↥(IntermediateField.adjoin F {y})).symm
+  exact (Module.finrank_mul_finrank ℚ_[l] ↥F ↥(IntermediateField.adjoin F {y})).symm
 
-theorem frobpin_sK_pos {l : ℕ} [Fact l.Prime] (hl : l ≠ 2) (K LL : FinExt l) (hG : Good K 1 LL) :
-    1 ≤ sK l K := by
+theorem frobpin_sK_pos {l : ℕ} [Fact l.Prime] (hl : l ≠ 2) (K LL : FinExt l) (hG : Good K 1 LL)
+    : 1 ≤ sK l K := by
   apply Formalism.MainNotions.N.Ln34.ramification_quotient_pos <;> assumption
 
-theorem frobpin_sM {l : ℕ} [Fact l.Prime] (K : FinExt l) (h' : ℕ) (hh' : 1 ≤ h')
-    (hs : 1 ≤ sK l K) : h' + 1 ≤ sK l K * MK l K h' := by
+theorem frobpin_sM {l : ℕ} [Fact l.Prime] (K : FinExt l) (h' : ℕ) (hh' : 1 ≤ h') (hs : 1 ≤ sK l K)
+    : h' + 1 ≤ sK l K * MK l K h' := by
   have hsR : (0 : ℝ) < (sK l K : ℝ) := by exact_mod_cast hs
   have hc : (4 * h' : ℝ) / (sK l K : ℝ) ≤ (MK l K h' : ℝ) := Nat.le_ceil _
   rw [div_le_iff₀ hsR] at hc
@@ -326,10 +354,12 @@ theorem frobpin_sM {l : ℕ} [Fact l.Prime] (K : FinExt l) (h' : ℕ) (hh' : 1 �
 theorem frobPiNCondition : FrobPiNStep := by
   intro D HW F Cm CA CB CK hA l _ hl K LL hG π' E hp9 T h' hh' hc hj
   have hT1 := hA.1 l K 1 LL hG
-  have hfree : Formalism.MainNotions.DeltaInvariantLattices.wachFree ((HW l).W K 1 LL hG) T := hT1.1 T hc
+  have hfree : Formalism.MainNotions.DeltaInvariantLattices.wachFree ((HW l).W K 1 LL hG) T :=
+    hT1.1 T hc
   have := Formalism.MainNotions.LiftingTheory.liftb_neZero ((HW l).W K 1 LL hG)
   have := Formalism.MainNotions.LiftingTheory.hstr_ps_D D HW F l K LL
-  obtain ⟨I, hQI, hφI, hI⟩ := Formalism.MainNotions.LiftingTheory.hstr_CompleteB ((HW l).W K 1 LL hG) T hfree
+  obtain ⟨I, hQI, hφI, hI⟩ :=
+    Formalism.MainNotions.LiftingTheory.hstr_CompleteB ((HW l).W K 1 LL hG) T hfree
   exact frobenius_uniformiser_wach _ T I hI hQI hφI ((HW l).W_s K 1 LL hG) hfree.1 h'
     (hT1.2.2.2.2.1 T (fun _ => h') (fun _ => h') hc (fun τ _ _ => hj τ)).1 _ _ _ π' E hp9
     (frobpin_sM K h' hh' (frobpin_sK_pos hl K LL hG))

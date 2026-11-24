@@ -1,11 +1,13 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountableStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicTupleProjectionsStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRingStatement
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountable
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicTupleProjections
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteProductMultipliable
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
+public import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -19,7 +21,6 @@ import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -187,15 +188,15 @@ theorem GlobalTheory.CompanionTheory.SW.EulerInt.euler_int
   intro F E _ _ _ _ _ σ hCM d b n M I minf m hEu hminf hm Φ Φinf Φf Φv hc hcs hpure hprod
   classical
   obtain ⟨hpi, hpf, hpv, hlat, hint, hae, -, -, -⟩ :=
-    GlobalTheory.T.adelic_tuple_projections F E σ hCM d b n M
-  obtain ⟨⟨lcA, scA, t2A⟩, -⟩ := GlobalTheory.T.adeles_locally_compact_second_countable F
+    _root_.GlobalTheory.CompanionTheory.SW.MeasProj.proj_props F E σ hCM d b n M
+  obtain ⟨⟨lcA, scA, t2A⟩, -⟩ := _root_.GlobalTheory.CompanionTheory.AdeleTop.adele_top F
   haveI := lcA
   haveI := scA
   haveI := t2A
   haveI : T2Space (Ainf F) := GlobalTheory.CompanionTheory.SW.EulerInt.infinite_adeles_t2Space F
   haveI : SecondCountableTopology (Ainf F) := GlobalTheory.CompanionTheory.SW.EulerInt.sc_ainf F scA
-  have KA := GlobalTheory.T.tensor_locally_compact_ring F E σ hCM (AF F)
-  have KI := GlobalTheory.T.tensor_locally_compact_ring F E σ hCM (Ainf F)
+  have KA := _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (AF F)
+  have KI := _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Ainf F)
   haveI : SecondCountableTopology (Ainf F ⊗[F] E) := KI.2.2.1
   haveI : BorelSpace (Fin n → Fin M → AF F ⊗[F] E) := KA.2.2.2.2.2.2.2.1 n M
   haveI : BorelSpace (Fin n → Fin M → Ainf F ⊗[F] E) := KI.2.2.2.2.2.2.2.1 n M
@@ -203,12 +204,12 @@ theorem GlobalTheory.CompanionTheory.SW.EulerInt.euler_int
       : ∀ v : HeightOneSpectrum (𝓞 F),
         SecondCountableTopology (Fv F v ⊗[F] E) ∧ BorelSpace (Fin n → Fin M → Fv F v ⊗[F] E) := by
     intro v
-    obtain ⟨h1, h2, h3, h4, -⟩ := GlobalTheory.T.completion_is_local_ring F v
+    obtain ⟨h1, h2, h3, h4, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
     haveI := h1
     haveI := h2
     haveI := h3
     haveI := h4
-    have K := GlobalTheory.T.tensor_locally_compact_ring F E σ hCM (Fv F v)
+    have K := _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Fv F v)
     exact ⟨K.2.2.1, K.2.2.2.2.2.2.2.1 n M⟩
   haveI : ∀ v : HeightOneSpectrum (𝓞 F), SecondCountableTopology (Fv F v ⊗[F] E) := fun v => (KVb v).1
   haveI : ∀ v : HeightOneSpectrum (𝓞 F), BorelSpace (Fin n → Fin M → Fv F v ⊗[F] E) := fun v => (KVb v).2

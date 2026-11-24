@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwoMulInvOf
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegrandPeriodic
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FiniteAdeleVectorAnnihilatorsCompactOpenBasisStatement
+public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZero
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FiniteAdeleVectorAnnihilatorsCompactOpenBasis
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -115,7 +116,7 @@ theorem invV_level_support
     rw [← invV_heisV_fst, hf (u, 0) hu hi h0]
   · refine ⟨
       _,
-      (GlobalTheory.T.finiteAdeleVector_annihilators_compact_open_basis F N ψ lam ν (half F N) hc).1
+      (_root_.GlobalTheory.SWQ.finite_annihilators F N ψ lam ν (half F N) hc).1
         (U.comap (finEmbSnd F N)) (hU.preimage (continuous_finEmbSnd F N)),
       fun x hx v hv => ?_
     ⟩

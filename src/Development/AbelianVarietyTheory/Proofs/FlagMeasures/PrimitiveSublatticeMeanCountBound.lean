@@ -1,17 +1,16 @@
 module
 
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen
+public import Mathlib.Topology.Algebra.InfiniteSum.Basic
 public import Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary₂.MaxMass
 public import Mathlib.Analysis.SpecialFunctions.Log.Base
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FewOrbitsSubspacesHermitianLatticeDiscriminantStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianGenusMassEqOrbitStabilizerMassStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassIntegralLatticesDiscriminantOrderLeStatement
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassEqWeightedSumFibres
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassSubspaceCyclicDiscriminantLeStatement
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumMonoSubadditiveStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSliceStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumTransportEquivariantStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticesMoveWithIsometriesStatement
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitianStatement
+public import Formalism.HermitianLattices.StatementMass
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FewOrbitsSubspacesHermitianLatticeDiscriminant
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianGenusMassEqOrbitStabilizerMass
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassIntegralLatticesDiscriminantOrderLe
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassSubspaceCyclicDiscriminantLe
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumTransportEquivariant
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticesMoveWithIsometries
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -30,13 +29,7 @@ import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.Order.CompletePartialOrder
-import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.RegularLocalRing.Defs
-import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -44,7 +37,7 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -58,7 +51,109 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassEqWeightedSumFibres
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumMonoSubadditive
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitian
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Linter.HaveILetI
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSlice, Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticeMeanCountBound
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSlice =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSlice", "h": "module\n\npublic import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\npublic import Mathlib.Topology.Algebra.InfiniteSum.Basic\n\n"}
+section -- clump:auto
+@[expose] public section
+
+open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory
+open scoped ENNReal Classical
+
+namespace GlobalTheory.Mass.Slice
+
+theorem exists_smul_eq_out (G : Type) {α : Type} [Group G] [MulAction G α] (x : α)
+    : ∃ g : G, g • x = Quotient.out (Quotient.mk (MulAction.orbitRel G α) x) := by
+  have h : (MulAction.orbitRel G α) (Quotient.out (Quotient.mk (MulAction.orbitRel G α) x)) x :=
+    Quotient.exact (Quotient.out_eq _)
+  exact MulAction.mem_orbit_iff.mp (MulAction.orbitRel_apply.mp h)
+
+theorem card_stabilizer_smul (G : Type) {α : Type} [Group G] [MulAction G α] (g : G) (x : α)
+    : ENat.card (MulAction.stabilizer G (g • x)) = ENat.card (MulAction.stabilizer G x) := by
+  have h : (MulAction.orbitRel G α) (g • x) x :=
+    MulAction.orbitRel_apply.mpr (MulAction.mem_orbit x g)
+  exact ENat.card_congr (MulAction.stabilizerEquivStabilizerOfOrbitRel h).toEquiv
+
+theorem card_stabilizer_subgroup
+    {G α : Type} [Group G] [MulAction G α] (H : Subgroup G) (x : α) (h : ∀ g : G, g • x = x → g ∈ H)
+    : ENat.card (MulAction.stabilizer H x) = ENat.card (MulAction.stabilizer G x) :=
+  ENat.card_congr {
+    toFun := fun a => ⟨(a.1 : G), a.2⟩
+    invFun := fun a => ⟨⟨a.1, h a.1 a.2⟩, a.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
+
+theorem orbSum_restrict
+    : ∀ (G α : Type) [Group G] [MulAction G α] (H : Subgroup G) (X X₀ : Set α) (N : α → ℝ≥0∞),
+      X₀ ⊆ X → Stable G X → Stable H X₀ → (∀ (g : G) x, N (g • x) = N x)
+        → (∀ x ∈ X, ∃ g : G, g • x ∈ X₀) → (∀ (g : G), ∀ x ∈ X₀, g • x ∈ X₀ → g ∈ H)
+        → orbSum H X₀ N = orbSum G X N := by
+  intro G α _ _ H X X₀ N hsub hX hX₀ hN hmeet hret
+  let f
+      : {q : MulAction.orbitRel.Quotient H α // Quotient.out q ∈ X₀}
+        → {q : MulAction.orbitRel.Quotient G α // Quotient.out q ∈ X} := fun q => ⟨
+    Quotient.mk (MulAction.orbitRel G α) (Quotient.out q.1),
+    by
+      obtain ⟨g, hg⟩ := exists_smul_eq_out G (Quotient.out q.1)
+      rw [← hg]
+      exact hX g _ (hsub q.2)
+  ⟩
+  have hinj : Function.Injective f := by
+    intro a b hab
+    have h1 : (MulAction.orbitRel G α) (Quotient.out a.1) (Quotient.out b.1) :=
+      Quotient.exact (congrArg Subtype.val hab)
+    obtain ⟨g, hg⟩ := MulAction.mem_orbit_iff.mp (MulAction.orbitRel_apply.mp h1)
+    have hgH : g ∈ H := hret g _ b.2 (hg ▸ a.2)
+    have h2 : (MulAction.orbitRel H α) (Quotient.out a.1) (Quotient.out b.1) :=
+      MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr ⟨⟨g, hgH⟩, hg⟩)
+    apply Subtype.ext
+    rw [← Quotient.out_eq a.1, ← Quotient.out_eq b.1]
+    exact Quotient.sound h2
+  have hsurj : Function.Surjective f := by
+    intro b
+    obtain ⟨g, hg⟩ := hmeet _ b.2
+    obtain ⟨k, hk⟩ := exists_smul_eq_out H (g • Quotient.out b.1)
+    refine ⟨⟨Quotient.mk (MulAction.orbitRel H α) (g • Quotient.out b.1), ?_⟩, ?_⟩
+    · rw [← hk]; exact hX₀ k _ hg
+    · apply Subtype.ext
+      show Quotient.mk (MulAction.orbitRel G α)
+        (Quotient.out (Quotient.mk (MulAction.orbitRel H α) (g • Quotient.out b.1))) = b.1
+      rw [← hk]
+      conv_rhs => rw [← Quotient.out_eq b.1]
+      apply Quotient.sound
+      refine MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr ⟨(k : G) * g, ?_⟩)
+      rw [mul_smul]
+      rfl
+  unfold orbSum
+  rw [← (Equiv.ofBijective f ⟨hinj, hsurj⟩).tsum_eq]
+  refine tsum_congr fun q => ?_
+  obtain ⟨g, hg⟩ := exists_smul_eq_out G (Quotient.out q.1)
+  have e : Quotient.out ((Equiv.ofBijective f ⟨hinj, hsurj⟩) q).1 = g • Quotient.out q.1 := hg.symm
+  rw [e, hN, card_stabilizer_smul,
+    card_stabilizer_subgroup H _ (fun a ha => hret a _ q.2 (by rw [ha]; exact q.2))]
+
+end GlobalTheory.Mass.Slice
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSlice =====
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticeMeanCountBound =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticeMeanCountBound", "h": "module\n\npublic import Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary₂.MaxMass\npublic import Mathlib.Analysis.SpecialFunctions.Log.Base\npublic import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen\npublic import Formalism.HermitianLattices.StatementMass\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FewOrbitsSubspacesHermitianLatticeDiscriminant\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianGenusMassEqOrbitStabilizerMass\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassIntegralLatticesDiscriminantOrderLe\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassSubspaceCyclicDiscriminantLe\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumRestrictSlice\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumTransportEquivariant\npublic import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticesMoveWithIsometries\nimport Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassEqWeightedSumFibres\nimport Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumMonoSubadditive\nimport Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitian\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.Order.CompletePartialOrder\nimport Mathlib.RingTheory.Henselian\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.RegularLocalRing.Defs\nimport Mathlib.RingTheory.SimpleRing.Principal\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.HaveILetI\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
 @[expose] public section
 
 open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory
@@ -84,8 +179,7 @@ theorem orbSum_encard_le
       hfin
   have h2 : orbSum G Y (fun a => (((P a).encard : ℕ∞) : ℝ≥0∞)) ≤ orbMass G X := by
     rw [h1]
-    refine (GlobalTheory.T.orbitWeightedStabilizerSum_mono_subadditive G A).1 Y Y _ _ subset_rfl
-      fun a ha => ?_
+    refine (_root_.GlobalTheory.Mass.OrbMono.main G A).1 Y Y _ _ subset_rfl fun a ha => ?_
     have : (P a).encard ≤ (X ∩ Prod.fst ⁻¹' {a}).encard :=
       Set.encard_le_encard_of_injOn
         (f := fun b => (a, b))
@@ -94,7 +188,7 @@ theorem orbSum_encard_le
     exact_mod_cast this
   refine h2.trans ?_
   have h3 :=
-    (GlobalTheory.T.orbitWeightedStabilizerSum_mono_subadditive G (A × B)).2.2.1 B s X
+    (_root_.GlobalTheory.Mass.OrbMono.main G (A × B)).2.2.1 B s X
       (fun b₀ => {p | p ∈ X ∧ ∃ g : G, g • b₀ = p.2})
       (fun _ => 1)
       (by
@@ -110,7 +204,7 @@ theorem orbSum_encard_le
     rw [e]
     exact g.2
   have h4 :=
-    GlobalTheory.T.orbitWeightedStabilizerSum_restrict_slice G (A × B) (MulAction.stabilizer G b₀)
+    _root_.GlobalTheory.Mass.Slice.orbSum_restrict G (A × B) (MulAction.stabilizer G b₀)
       {p | p ∈ X ∧ ∃ g : G, g • b₀ = p.2} {p | p ∈ X ∧ p.2 = b₀}
       (fun _ => 1)
       (fun p hp => ⟨hp.1, 1, by rw [one_smul, hp.2]⟩)
@@ -132,7 +226,7 @@ theorem orbSum_encard_le
         rw [e] at e'
         exact e')
   rw [← h4]
-  exact GlobalTheory.T.orbitWeightedStabilizerSum_transport_equivariant (MulAction.stabilizer G b₀)
+  exact _root_.GlobalTheory.Mass.OrbTransport.main (MulAction.stabilizer G b₀)
     (MulAction.stabilizer G b₀) (A × B) A (MulEquiv.refl _) Prod.fst {p | p ∈ X ∧ p.2 = b₀}
     {a | a ∈ Y ∧ b₀ ∈ P a}
     (fun _ => 1)
@@ -262,7 +356,7 @@ theorem main
   intro hM K V _ _ _ _ _ _ _ _ h hK hs hp hLand j s hj hs1 hjs V₁ _ _ _ _ _ h₁ I₁ hs₁ hI₁ V₂ _ _ _ _
     _ h₂ I₂ hs₂ hI₂ n N₀ hn hN 𝒢 hst h𝒢
   obtain ⟨S, hcard, hdim, hcov⟩ :=
-    GlobalTheory.T.few_orbits_subspaces_hermitian_lattice_discriminant K V h hK hs hp hLand j n hn
+    _root_.GlobalTheory.Mass.FewOrbits.main K V h hK hs hp hLand j n hn
   have hnd : h.Nondegenerate := by
     obtain ⟨τ⟩ : Nonempty (K →+* ℂ) := inferInstance
     refine ⟨fun x hx => ?_, fun x hx => ?_⟩
@@ -279,12 +373,11 @@ theorem main
   have h1 :=
     orbSum_encard_le (isom h) (Submodule (𝓞 K) V) (Submodule K V) 𝒢
       (fun L => primSp h L j n)
-      (fun g L U =>
-        (GlobalTheory.T.primitive_sublattices_move_with_isometries K V h hK hs hnd g L U j n).1)
+      (fun g L U => (_root_.GlobalTheory.Mass.PrimMove.main K V h hK hs hnd g L U j n).1)
       hst
       (fun L hL =>
-        (GlobalTheory.T.hermitianGenusMass_eq_orbitStabilizerMass K V h hK hs hp L
-          (h𝒢 L hL).1.1).2.2.2.1 L (h𝒢 L hL).1.1)
+        (_root_.GlobalTheory.Mass.GenusOrb.main K V h hK hs hp L (h𝒢 L hL).1.1).2.2.2.1 L
+          (h𝒢 L hL).1.1)
       S
       (fun L hL U hU => hcov U hU.1 ⟨latIn U L, isIntLat_latIn h (h𝒢 L hL).1 U, hU.2⟩)
   refine h1.trans ?_
@@ -302,15 +395,14 @@ theorem main
           ≤ ENNReal.ofReal C := by
     intro U hU
     have dU := hdim U hU
-    obtain ⟨hc, sU, pU, -⟩ :=
-      (GlobalTheory.T.witt_extension_totally_definite_hermitian K V h hK hs hp).2 U
+    obtain ⟨hc, sU, pU, -⟩ := (_root_.GlobalTheory.Mass.Witt.witt_definite K V h hK hs hp).2 U
     obtain ⟨-, sW, pW, -⟩ :=
-      (GlobalTheory.T.witt_extension_totally_definite_hermitian K V h hK hs hp).2 (perp h U)
+      (_root_.GlobalTheory.Mass.Witt.witt_definite K V h hK hs hp).2 (perp h U)
     have dW : Module.finrank K (perp h U) = s := by
       have := Submodule.finrank_add_eq_of_isCompl hc
       omega
     have a1 :=
-      (GlobalTheory.T.orbitWeightedStabilizerSum_mono_subadditive (MulAction.stabilizer (isom h) U)
+      (_root_.GlobalTheory.Mass.OrbMono.main (MulAction.stabilizer (isom h) U)
           (Submodule (𝓞 K) V)).1 {L | L ∈ 𝒢 ∧ U ∈ primSp h L j n}
         {L : Submodule (𝓞 K) V | IsIntLat h L ∧ discN h L = N₀ ∧ (∃ t : Finset V, t.card ≤ 1 ∧
           dual h L = L ⊔ Submodule.span (𝓞 K) (t : Set _)) ∧ discN (hRes h U) (latIn U L) = n}
@@ -318,11 +410,11 @@ theorem main
         (fun _ => 1)
         (fun L hL => ⟨(h𝒢 L hL.1).1, (h𝒢 L hL.1).2.1, (h𝒢 L hL.1).2.2, hL.2.2⟩)
         (fun _ _ => le_rfl)
-    refine a1.trans ((GlobalTheory.T.orbitStabilizerMass_subspace_cyclicDiscriminant_le K V h hK hs
-      hp U n N₀).trans ?_)
+    refine a1.trans
+      ((_root_.GlobalTheory.Mass.FixedSub.orbMass_stabilizer_le K V h hK hs hp U n N₀).trans ?_)
     have a2 :=
-      GlobalTheory.T.mass_integralLattices_discriminantOrder_le hM K U (hRes h U) hK sU pU (dU ▸ hj)
-        V₁ h₁ hs₁ I₁ (dU ▸ hI₁) n hn
+      _root_.GlobalTheory.Mass.SpaceMass.main hM K U (hRes h U) hK sU pU (dU ▸ hj) V₁ h₁ hs₁ I₁
+        (dU ▸ hI₁) n hn
     rw [dU] at a2
     have a3
         : ∑ n' ∈ Finset.Icc 1 (n * N₀), orbMass (isom (hRes h (perp h U)))
@@ -332,8 +424,8 @@ theorem main
         fun n' hn' => ?_).trans (le_of_eq ?_)
       · obtain ⟨b1, b2⟩ := Finset.mem_Icc.1 hn'
         have a :=
-          GlobalTheory.T.mass_integralLattices_discriminantOrder_le hM K (perp h U)
-            (hRes h (perp h U)) hK sW pW (dW ▸ hs1) V₂ h₂ hs₂ I₂ (dW ▸ hI₂) n' b1
+          _root_.GlobalTheory.Mass.SpaceMass.main hM K (perp h U) (hRes h (perp h U)) hK sW pW
+            (dW ▸ hs1) V₂ h₂ hs₂ I₂ (dW ▸ hI₂) n' b1
         rw [dW] at a
         refine a.trans (ENNReal.ofReal_le_ofReal ?_)
         have b3 : (n' : ℝ) ≤ X := by rw [hX]; exact_mod_cast b2
@@ -361,3 +453,6 @@ theorem main
     _ = _ := by ring
 
 end GlobalTheory.Mass.PrimMean
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.FlagMeasures.PrimitiveSublatticeMeanCountBound =====

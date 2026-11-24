@@ -441,7 +441,6 @@ theorem val_toU {z : ℂ} (h : z ≠ 0) : ((toU z : ℂˣ) : ℂ) = z := by
   unfold toU; rw [dite_eq_right h]; rfl
 
 open Polynomial in
-
 def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂ h) where
   iotaQ i := i.elim
   iotaQC i := i.elim

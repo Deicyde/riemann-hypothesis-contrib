@@ -101,7 +101,6 @@ theorem sum_lterm (hq : ∀ w, (0 : ℝ) < q w) (σ : ℝ) (p : W × ℕ)
     ring
   simp only [e1]
   have e2 : ∑ i, ∑ j, s i * conj (s j) * z = (∑ i, s i) * conj (∑ j, s j) * z := by
-
     rw [map_sum, Finset.sum_mul_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Finset.sum_mul]

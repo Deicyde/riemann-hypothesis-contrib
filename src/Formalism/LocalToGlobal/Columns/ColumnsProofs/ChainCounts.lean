@@ -282,7 +282,6 @@ theorem cong_of_redM
     rw [key]
     exact h3
   have hTx : T x ∈ LocE.sclLat P (qOf P) N e := by
-
     rw [← sum_basV P N e x, map_sum]
     refine Submodule.sum_mem _ fun l _ => ?_
     rw [map_smul]
@@ -408,13 +407,7 @@ open Classical
 
 variable {X : Fields} {Pr : Primes X}
 
-theorem mem_of_mem_divs
-    {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} {P : HeightOneSpectrum A} (h : P ∈ divs a)
-    : a ∈ P.asIdeal := by
-  unfold divs at h
-  split_ifs at h with hf
-  · simpa using hf.mem_toFinset.1 h
-  · exact absurd h (Finset.notMem_empty _)
+alias mem_of_mem_divs := _root_.Formalism.L2.Col.decoFin_mem_of_mem_divs
 
 end Unram
 

@@ -61,8 +61,6 @@ namespace GlobalTheory.HalfAdjInt
 
 open Formalism.IndefR.Fin.LevelGroupLemmas.Lat Matrix
 
-
-
 theorem cA_smul_genE
     {D : D7} {S T : HSp D} (e : AE D) (c : EAf D) (τ : Fin T.rank → EAf D) (σ : Fin S.rank → EAf D)
     : cA D e • genE (S := S) (T := T) c τ σ = genE (sR D (toEAf D e) * c) τ σ := by

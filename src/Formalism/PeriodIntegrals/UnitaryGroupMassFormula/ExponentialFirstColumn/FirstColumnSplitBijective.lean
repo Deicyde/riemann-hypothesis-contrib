@@ -60,12 +60,12 @@ def cyc0 (m : ℕ) (j : Fin (m + 1)) : Equiv.Perm (Fin (m + 1)) := (Fin.cycleRan
 
 theorem cycle_perm_zero (m : ℕ) (j : Fin (m + 1)) : cyc0 m j 0 = j := by
   unfold cyc0
-  first | exact Fin.cycleRange_symm_zero j | rw [Equiv.symm_apply_eq, Fin.cycleRange_self]
+  first | exact Fin.cycleRange_symm_zero j
 
 theorem cycle_perm_succ (m : ℕ) (j : Fin (m + 1)) (k : Fin m)
     : cyc0 m j k.succ = j.succAbove k := by
   unfold cyc0
-  first | exact Fin.cycleRange_symm_succ j k | rw [Equiv.symm_apply_eq, Fin.cycleRange_succAbove]
+  first | exact Fin.cycleRange_symm_succ j k
 
 theorem sign_cycle_perm (m : ℕ) (j : Fin (m + 1))
     : Equiv.Perm.sign (cyc0 m j) = (-1) ^ (j : ℕ) := by
@@ -84,9 +84,7 @@ theorem extByZero_succ {m : ℕ} (τ : Equiv.Perm (Fin m)) (k : Fin m)
 theorem sign_extend_perm {m : ℕ} (τ : Equiv.Perm (Fin m))
     : Equiv.Perm.sign (ext0 τ) = Equiv.Perm.sign τ := by
   unfold ext0
-  first
-  | exact (Equiv.Perm.sign_symm_trans_trans _ _).trans (Equiv.optionCongr_sign τ)
-  | exact (Equiv.Perm.sign_permCongr _ _).trans (Equiv.optionCongr_sign τ)
+  first | exact (Equiv.Perm.sign_symm_trans_trans _ _).trans (Equiv.optionCongr_sign τ)
 
 def phi0 (m : ℕ) (p : Fin (m + 1) × Equiv.Perm (Fin m)) : Equiv.Perm (Fin (m + 1)) :=
   cyc0 m p.1 * ext0 p.2
@@ -134,9 +132,9 @@ theorem expFirst
     ring
   simp only [hs, List.ofFn_succ, List.prod_cons, h0, hk, hu, Function.comp_apply, Fin.val_zero,
     Nat.cast_zero, sub_zero]
-  simp only [← zsmul_eq_mul, smul_mul_assoc, mul_smul_comm, smul_smul]
+  simp only [← zsmul_eq_mul, mul_smul_comm, smul_smul]
   congr 1
-  first | (push_cast; ring) | push_cast | simp
+  first | (push_cast; ring)
 
 theorem expLast
     {A : Type*} [Ring A] [Algebra ℂ A]
@@ -150,7 +148,6 @@ theorem expLast
     have hr : ∀ k : Fin m, finRotate (m + 1) k.castSucc = k.succ := by
       intro k
       first
-      | exact finRotate_castSucc k
       | exact Fin.ext (by
           rw [coe_finRotate_of_ne_last (Fin.castSucc_lt_last k).ne, Fin.coe_castSucc, Fin.val_succ])
     have hbij : Function.Bijective (fun p : Fin (m + 1) × Equiv.Perm (Fin m) =>
@@ -168,7 +165,7 @@ theorem expLast
       have h1 : Equiv.Perm.sign (phi0 m (j, τ)) = (-1) ^ (j : ℕ) * Equiv.Perm.sign τ := by
         simp only [phi0, Equiv.Perm.sign_mul, sign_cycle_perm, sign_extend_perm]
       rw [Equiv.Perm.sign_mul, h1, sign_finRotate]
-      all_goals first | rfl | exact rfl | simp [mul_comm, mul_left_comm, mul_assoc]
+      all_goals first | rfl
     have hl : (phi0 m (j, τ) * finRotate (m + 1)) (Fin.last m) = j := by
       simp only [Equiv.Perm.mul_apply, finRotate_last, phi0, matrixExtendByZero_zero,
         cycle_perm_zero]
@@ -179,7 +176,7 @@ theorem expLast
       List.prod_nil, mul_one, hl, hk, Function.comp_apply, Fin.val_last, Fin.coe_castSucc]
     simp only [← zsmul_eq_mul, smul_mul_assoc, mul_smul_comm, smul_smul]
     congr 1
-    first | (push_cast; ring) | push_cast | simp
+    first | (push_cast; ring)
 
 theorem expFirstCol : PI.ExpFirstCol := fun _ _ _ _ _ E a b u => expFirst E a b u
 

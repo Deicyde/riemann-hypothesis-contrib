@@ -98,11 +98,7 @@ theorem hint_mpTail (D n : ℕ) (hn : 0 < n)
         = Prod.snd
           ∘ ⇑(MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0) := by
     funext z i
-    first
-    | rfl
-    | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; done)
-    | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; rfl)
-    | exact congrArg z (by simp)
+    first | rfl
   rw [e]
   exact h
 

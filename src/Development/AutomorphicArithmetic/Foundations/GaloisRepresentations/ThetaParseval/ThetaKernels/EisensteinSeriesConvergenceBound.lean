@@ -42,8 +42,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 open scoped TensorProduct NNReal Matrix
 open NumberField IsDedekindDomain MeasureTheory Filter Topology
@@ -51,6 +49,7 @@ open NumberField IsDedekindDomain MeasureTheory Filter Topology
 open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
   GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
+
 theorem _root_.GlobalTheory.T.eisenstein_series_convergence_bound
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E) (B : Base F E) (n : ℕ) (Y : Spc F E n) (r s : ℕ),
@@ -62,8 +61,5 @@ theorem _root_.GlobalTheory.T.eisenstein_series_convergence_bound
                 → ∃ (C : ℝ) (N : ℕ), ∀ x : G2 σ Y,
                   Summable (fun q : Cos σ Y => a ((Quotient.out q).1 * x) ^ σ')
                     ∧ ∑' q : Cos σ Y, a ((Quotient.out q).1 * x) ^ σ' ≤ C * (ht2 x : ℝ) ^ N := by
-  first
-  | exact @_root_.GlobalTheory.CompanionTheory.GodementH.godement_sum_k
-  | exact _root_.GlobalTheory.CompanionTheory.GodementH.godement_sum_k
-  | (intros; apply _root_.GlobalTheory.CompanionTheory.GodementH.godement_sum_k <;> assumption)
+  first | exact @_root_.GlobalTheory.CompanionTheory.GodementH.godement_sum_k
 end

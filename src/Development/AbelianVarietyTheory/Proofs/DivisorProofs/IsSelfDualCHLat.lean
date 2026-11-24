@@ -60,9 +60,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.MovedLat
 
 open GlobalTheory.AdelicLatMove GlobalTheory.AdLat Formalism.IndefR

@@ -50,6 +50,7 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.KJInf Formalism.L2.Ker
 open GlobalTheory.SeeSaw GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.chartLevels_reps_represent_unitaryDoubleCosets
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.chartLevels_reps_represent_unitaryDoubleCosets
                 IsReps ((I.rec7 l Z).sp.X i) (A.U i β) (A.h i β)
                   ∧ (Continuous fun κ => ((A.chi i β κ : ℂˣ) : ℂ))
                   ∧ ∀ c, stabOrd (A.U i β) (A.h i β c) = Nat.card ((I.chain l u a).stab i c.1) := by
-  first
-  | exact @GlobalTheory.ChartReps.twDat_reps
-  | exact GlobalTheory.ChartReps.twDat_reps
-  | (intros; apply GlobalTheory.ChartReps.twDat_reps <;> assumption)
+  first | exact @GlobalTheory.ChartReps.twDat_reps

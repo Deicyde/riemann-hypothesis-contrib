@@ -59,23 +59,22 @@ noncomputable section
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ι → ℕ}
 
-
 omit [Fintype ι] [DecidableEq ι] in
-theorem val_chartEval_eq_aeval_div (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1))
-    (f : MvPolynomial (Coord n) ℤ) :
-    (((chartEval x c f : chartRing x c) : ratioField x) : AlgebraicClosure ℚ) =
-      aeval (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1)) f := by
+theorem val_chartEval_eq_aeval_div
+    (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1)) (f : MvPolynomial (Coord n) ℤ)
+    : (((chartEval x c f : chartRing x c) : ratioField x) : AlgebraicClosure ℚ)
+      = aeval (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1)) f := by
   induction f using MvPolynomial.induction_on with
   | C a => simp
-  | add p q hp hq => simp only [map_add (f := _), Subalgebra.coe_add, IntermediateField.coe_add, hp, hq]
+  | add p q hp hq =>
+    simp only [map_add (f := _), Subalgebra.coe_add, IntermediateField.coe_add, hp, hq]
   | mul_X p v hp =>
     simp only [map_mul, Subalgebra.coe_mul, IntermediateField.coe_mul, hp]
     simp [chartEval, chartRatio]
 
-
 omit [Fintype ι] [DecidableEq ι] in
-theorem chartEval_surjective (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1)) :
-    Function.Surjective (chartEval x c) := by
+theorem chartEval_surjective (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1))
+    : Function.Surjective (chartEval x c) := by
   rintro ⟨a, ha⟩
   rw [chartRing, Algebra.adjoin_range_eq_range_aeval] at ha
   obtain ⟨f, rfl⟩ := ha
@@ -84,11 +83,11 @@ theorem chartEval_surjective (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) �
     MvPolynomial.algHom_ext fun p ↦ by simp [chartEval]
   exact AlgHom.congr_fun h f
 
-
 omit [Fintype ι] [DecidableEq ι] in
-theorem mem_ker_chartEval_iff (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1))
-    (f : MvPolynomial (Coord n) ℤ) :
-    f ∈ RingHom.ker (chartEval x c) ↔ aeval (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1)) f = 0 := by
+theorem mem_ker_chartEval_iff
+    (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1)) (f : MvPolynomial (Coord n) ℤ)
+    : f ∈ RingHom.ker (chartEval x c)
+      ↔ aeval (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1)) f = 0 := by
   rw [RingHom.mem_ker, ← val_chartEval_eq_aeval_div]
   constructor
   · intro h
@@ -97,17 +96,20 @@ theorem mem_ker_chartEval_iff (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) 
   · intro h
     exact Subtype.ext (Subtype.ext h)
 
-theorem aeval_blockScale_of_isWeightedHomogeneous {Ω : Type*} [Field Ω] [Algebra ℤ Ω] (t : ι → Ω) (w : Coord n → Ω)
-    {g : MvPolynomial (Coord n) ℤ} {m : ι → ℕ} (hg : IsWeightedHomogeneous (coordDeg n) g m) :
-    aeval (fun p ↦ t p.1 * w p) g = (∏ k, t k ^ m k) * aeval w g := by
+theorem aeval_blockScale_of_isWeightedHomogeneous
+    {Ω : Type*} [Field Ω] [Algebra ℤ Ω]
+    (t : ι → Ω) (w : Coord n → Ω)
+    {g : MvPolynomial (Coord n) ℤ} {m : ι → ℕ} (hg : IsWeightedHomogeneous (coordDeg n) g m)
+    : aeval (fun p ↦ t p.1 * w p) g = (∏ k, t k ^ m k) * aeval w g := by
   have h : algebraMap ℤ Ω = Int.castRingHom Ω := Subsingleton.elim _ _
   rw [aeval_def, aeval_def, h]
   exact eval₂_scale_of_isWeightedHomogeneous t w hg
 
-theorem ker_chartEval (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1))
-    (hc : ∀ k, x k (c k) ≠ 0) :
-    RingHom.ker (chartEval x c) = orbitIdeal x ⊔
-      Ideal.span (Set.range fun k ↦ (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) - 1) := by
+theorem ker_chartEval
+    (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin (n k + 1)) (hc : ∀ k, x k (c k) ≠ 0)
+    : RingHom.ker (chartEval x c)
+      = orbitIdeal x
+        ⊔ Ideal.span (Set.range fun k ↦ (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) - 1) := by
   set J := Ideal.span (Set.range fun k ↦ (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) - 1) with hJ
   set z : Coord n → AlgebraicClosure ℚ := fun p ↦ x p.1 p.2 / x p.1 (c p.1) with hz
   apply le_antisymm
@@ -136,8 +138,9 @@ theorem ker_chartEval (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin 
       have hhom : IsWeightedHomogeneous (coordDeg n) F N := by
         have : F ∈ weightedHomogeneousSubmodule ℤ (coordDeg n) N := by
           refine Submodule.sum_mem _ fun m hm ↦ ?_
-          have h2 := (weightedHomogeneousComponent_isWeightedHomogeneous m f).mul
-            (isWeightedHomogeneous_chartMonomial c (N - m))
+          have h2 :=
+            (weightedHomogeneousComponent_isWeightedHomogeneous m f).mul
+              (isWeightedHomogeneous_chartMonomial c (N - m))
           rwa [add_tsub_cancel_of_le (hle m hm)] at h2
         exact this
       rw [orbitIdeal, mem_mCoordIdeal_iff_of_isWeightedHomogeneous _ hhom]
@@ -145,15 +148,22 @@ theorem ker_chartEval (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin 
         funext p
         simp only [hz, flatCone]
         rw [mul_div_cancel₀ _ (hc p.1)]
-      have hterm : ∀ m ∈ compDegs f,
-          aeval (flatCone x) (weightedHomogeneousComponent (coordDeg n) m f * chartMonomial c (N - m)) =
-            (∏ k, x k (c k) ^ N k) * aeval z (weightedHomogeneousComponent (coordDeg n) m f) := by
+      have hterm
+          : ∀ m ∈ compDegs f,
+            aeval (flatCone x)
+                (weightedHomogeneousComponent (coordDeg n) m f * chartMonomial c (N - m))
+              = (∏ k, x k (c k) ^ N k)
+                * aeval z (weightedHomogeneousComponent (coordDeg n) m f) := by
         intro m hm
-        have hs := aeval_blockScale_of_isWeightedHomogeneous (fun k ↦ x k (c k)) z
-          (weightedHomogeneousComponent_isWeightedHomogeneous m f)
-        have hmon : aeval (flatCone x) (chartMonomial c (N - m)) = ∏ k, x k (c k) ^ (N k - m k) := by
+        have hs :=
+          aeval_blockScale_of_isWeightedHomogeneous
+            (fun k ↦ x k (c k))
+            z (weightedHomogeneousComponent_isWeightedHomogeneous m f)
+        have hmon
+            : aeval (flatCone x) (chartMonomial c (N - m)) = ∏ k, x k (c k) ^ (N k - m k) := by
           simp [chartMonomial, map_prod, flatCone]
-        have hpow : ∏ k, x k (c k) ^ N k = (∏ k, x k (c k) ^ m k) * ∏ k, x k (c k) ^ (N k - m k) := by
+        have hpow
+            : ∏ k, x k (c k) ^ N k = (∏ k, x k (c k) ^ m k) * ∏ k, x k (c k) ^ (N k - m k) := by
           rw [← Finset.prod_mul_distrib]
           refine Finset.prod_congr rfl fun k _ ↦ ?_
           rw [← pow_add, Nat.add_sub_cancel' (hle m hm k)]
@@ -175,10 +185,13 @@ theorem ker_chartEval (x : Cone n (AlgebraicClosure ℚ)) (c : (k : ι) → Fin 
 
       rw [← sum_compDegs f, map_sum]
       refine Finset.sum_eq_zero fun m _ ↦ ?_
-      have hs := aeval_blockScale_of_isWeightedHomogeneous (fun k ↦ (x k (c k))⁻¹) (flatCone x)
-        (weightedHomogeneousComponent_isWeightedHomogeneous m f)
-      have hz' : (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1)) =
-          fun p ↦ (x p.1 (c p.1))⁻¹ * flatCone x p := by
+      have hs :=
+        aeval_blockScale_of_isWeightedHomogeneous
+          (fun k ↦ (x k (c k))⁻¹)
+          (flatCone x) (weightedHomogeneousComponent_isWeightedHomogeneous m f)
+      have hz'
+          : (fun p : Coord n ↦ x p.1 p.2 / x p.1 (c p.1))
+            = fun p ↦ (x p.1 (c p.1))⁻¹ * flatCone x p := by
         funext p
         rw [div_eq_inv_mul]
         rfl
@@ -197,8 +210,9 @@ theorem OrbitChartQuot.proof : OrbitChartQuot.Statement := by
   let g : MvPolynomial (Coord n) ℤ →+* chartRing x c ⧸ chartPoint x c V :=
     (Ideal.Quotient.mk _).comp (chartEval x c : MvPolynomial (Coord n) ℤ →+* chartRing x c)
   have hg : Function.Surjective g := Ideal.Quotient.mk_surjective.comp hsurj
-  have hker : RingHom.ker g =
-      V ⊔ Ideal.span (Set.range fun k ↦ (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) - 1) := by
+  have hker
+      : RingHom.ker g
+        = V ⊔ Ideal.span (Set.range fun k ↦ (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) - 1) := by
     ext f
     rw [RingHom.mem_ker]
     change Ideal.Quotient.mk _ (chartEval x c f) = 0 ↔ _

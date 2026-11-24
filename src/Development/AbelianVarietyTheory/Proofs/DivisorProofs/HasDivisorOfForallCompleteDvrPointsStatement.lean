@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
 import Development.AbelianVarietyTheory.Definitions.Divisors.SymTupOne
 import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -54,6 +55,7 @@ open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory
   GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.hasDivisor_of_forall_complete_dvr_points
     : ∀ (k Ω : Type) [CommRing k] [IsNoetherianRing k] [Field Ω] [CharZero Ω] [Algebra k Ω]
         (M : RatModel k Ω) (J J' : Type) [Fintype J] (th : J → Ω) (e : J' → Ω) (D : ℕ),
@@ -69,7 +71,4 @@ theorem _root_.GlobalTheory.T.hasDivisor_of_forall_complete_dvr_points
                         th b ≠ 0
                           ∧ emb (e j₀ / th b ^ D) ∈ Set.range (algebraMap V (FractionRing V)))
         → M.HasDiv th := by
-  first
-  | exact @GlobalTheory.ValCmp.hasDiv_of_forall_cDvr
-  | exact GlobalTheory.ValCmp.hasDiv_of_forall_cDvr
-  | (intros; apply GlobalTheory.ValCmp.hasDiv_of_forall_cDvr <;> assumption)
+  first | exact @GlobalTheory.ValCmp.hasDiv_of_forall_cDvr

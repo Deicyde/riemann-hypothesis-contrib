@@ -140,7 +140,7 @@ theorem continuous_levi (m : ℕ) : Continuous (levi k m) := by
     intro i j
     induction i using Fin.lastCases <;> induction j using Fin.lastCases
       <;> simp [GlobalTheory.BZMir.glEmbHom, GlobalTheory.BZMir.glEmbMat]
-      <;> first | exact continuous_const | exact continuous_id.matrix_elem _ _ | fun_prop
+      <;> first | exact continuous_const | exact continuous_id.matrix_elem _ _
   have hGL : Continuous (GlobalTheory.BZMir.glEmb k m) := Continuous.units_map _ hmat
   exact continuous_induced_rng.2 hGL
 

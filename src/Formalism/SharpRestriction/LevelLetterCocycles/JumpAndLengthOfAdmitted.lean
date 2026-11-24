@@ -292,16 +292,6 @@ theorem subquot_of_quot
         simp only [LinearMap.comp_apply]
         rw [hq g u hu, hfg]
     )
-  | (
-      refine ⟨m, xs, U, fun u => f (q u), hU, ?_, ?_⟩
-      · intro v'
-        obtain ⟨v, rfl⟩ := hf v'
-        obtain ⟨u, hu, rfl⟩ := hs v
-        exact ⟨u, hu, rfl⟩
-      · intro g u hu
-        show f (q _) = ρ' g (f (q u))
-        rw [hq g u hu, hfg]
-    )
 
 theorem rowAt_of_lift
     {ι : Type} {k k2 : ℕ} (Ms : ι → G → Matrix (Fin k) (Fin k) LL)
@@ -558,7 +548,7 @@ variable
 
 theorem locDeg_conj {u : HeightOneSpectrum (𝓞 H.E)} (huw : IsConjPl H u w)
     : locDeg H.E w = locDeg H.E u := by
-  first | exact ef_conj _ u w huw | (unfold locDeg; exact ef_conj _ u w huw)
+  first | exact ef_conj _ u w huw
 
 end AtPlace
 
@@ -635,7 +625,7 @@ theorem sum_lenW_split
     unfold Formalism.MainNotions.TruncatedSeriesCountingIdentities.lenW
     rw [dite_eq_left hu]
     unfold Br.lenCol
-    first | exact lenCol_le e' _ _ _ _ _ (vdel_nonneg i) (hJ u hu) | exact (0 : Nat)
+    first | exact lenCol_le e' _ _ _ _ _ (vdel_nonneg i) (hJ u hu)
   have hrow
       : ∀ v ∈ dc.row,
         Formalism.MainNotions.TruncatedSeriesCountingIdentities.lenW i ρ π dc
@@ -664,7 +654,6 @@ theorem sum_lenW_split
           + 2 * D.nd.vdel i + Br.h0W i u ρ π)
       (rowNum e' c0) (backPl i dc) hback hinj hcol hrow hnn)
     (le_of_eq (Finset.sum_congr rfl (fun u _ => ?_)))
-  beta_reduce
   unfold rowNum
   ring
 
@@ -810,7 +799,7 @@ variable
 
 theorem locC_self {k : ℕ} (M : GE D.nd →* Matrix (Fin k) (Fin k) (D.nd.O i))
     : locC (CoefExt.self i w hw) M = Br.loc D.nbr i w hw M := by
-  first | rfl | (ext g a b; rfl) | (unfold locC; rfl) | (unfold locC CoefExt.self; exact (0 : Nat))
+  first | rfl
 
 variable (C : CoefExt D i w hw)
 

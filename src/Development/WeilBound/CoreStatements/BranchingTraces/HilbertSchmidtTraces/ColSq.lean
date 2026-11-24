@@ -101,11 +101,11 @@ theorem _root_.PositivityTheory.UnitaryDecomposition.X4.emb
       fun h => ?_
     ⟩
     · ext a b
-      simp only [Jm, Matrix.mul_apply, mul_diagonal]
+      simp only [Jm, Matrix.mul_apply]
       rw [← e.sum_comp]
       by_cases hab : a = b
       · subst hab; simp [incl, hF.2]
-      · simp [incl, hab, Ne.symm hab]
+      · simp [incl, hab]
     · funext a
       simp [Jm, incl, zi]
     · simp [Jm, zi, h1]
@@ -126,7 +126,7 @@ theorem _root_.PositivityTheory.UnitaryDecomposition.X4.emb
       rw [key]
       rcases a with a | a <;> rcases b with b | b
         <;> simp [GlobalTheory.CompanionTheory.PairingAnalysis.emb, incl, Matrix.mul_apply,
-          vecMulVec_apply, zi, Pi.single_apply]
+          vecMulVec_apply, zi]
   · simp [GlobalTheory.CompanionTheory.UnitaryFramesMetricPeriods.nsq, colSq]
   · exact ⟨
       hU.1.1,

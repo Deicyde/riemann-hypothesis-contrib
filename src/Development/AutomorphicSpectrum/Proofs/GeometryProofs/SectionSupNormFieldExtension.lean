@@ -4,7 +4,8 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsTheta
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ValCalc
 public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimageOfValAtNeZero
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PolarizedDataFieldExtensionStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PolarizedDataFieldExtension
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniformBaseChange.PullGt
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -46,7 +47,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.OneArc
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaCore
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBLocal
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniformBaseChange.PullGt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.HolJetA
 
 @[expose] public section
@@ -490,7 +490,8 @@ theorem exists_section
       e.base).mp r
   obtain ⟨s', hs'⟩ := exists_sec gw D.t.PP.isLB D'.t.PP.isLB n s
   have hs := fun (x : Sp ℂ ⟶ D'.t.G.left) j k => hs' ℂ x pt₀ j k
-  have hg : D'.g = D.g := ((GlobalTheory.T.polarized_data_field_extension E H L D L').2 D' e).1
+  have hg : D'.g = D.g :=
+    ((_root_.GlobalTheory.CompanionTheory.Ar.Sl.ext_baseChange E H L D L').2 D' e).1
   refine ⟨
     s',
     fun M hM σ' a' θ hθ v => ?_,

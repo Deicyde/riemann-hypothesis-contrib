@@ -49,6 +49,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw GlobalTheory.FinPl
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaAt_seesawProductDatum_eq_vacuumCombinations
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.thetaAt_seesawProductDatum_eq_vacuumCombinations
                           → Vac ψ S T N N'
                             (fun _ => True)
                             ((List.finRange n).foldr (fun i g => comb ψ S T (L i).o g) f₀) := by
-  first
-  | exact @GlobalTheory.VecProd.thetaAt_prodDat
-  | exact GlobalTheory.VecProd.thetaAt_prodDat
-  | (intros; apply GlobalTheory.VecProd.thetaAt_prodDat <;> assumption)
+  first | exact @GlobalTheory.VecProd.thetaAt_prodDat

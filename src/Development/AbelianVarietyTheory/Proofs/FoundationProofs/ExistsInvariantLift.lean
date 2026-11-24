@@ -49,6 +49,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsRootOfIsAlgClosed
+import Development.AbelianVarietyTheory.Definitions.Foundations.OpLDOneSubMemTriv
 
 @[expose] public section
 
@@ -346,11 +347,6 @@ theorem exists_uniform_level
   ⟩
   exact (Finset.dvd_prod_of_mem L (hfin.mem_toFinset.2 ⟨γ, rfl⟩)).mul_left _
 
-theorem toGQ_coe_eq (γ : SL(2, ℤ)) : toGQ (γ : Matrix (Fin 2) (Fin 2) ℤ) = ofSL γ := by
-  have h : (0 : ℤ) < (γ : Matrix (Fin 2) (Fin 2) ℤ).det := by simp
-  ext i j
-  simp [toGQ, h, ofSL]
-
 theorem cls_eq_of_mem_Gam
     : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (N l w n : ℕ)
         [Fact l.Prime] (b : X.Fn l),
@@ -392,7 +388,7 @@ theorem cls_eq_of_mem_Gam
       rw [map_smul, map_smul, smul_smul]
       apply hsm
       simp only [map_mul, map_pow, u0, u1, map_intCast, Matrix.cons_val_zero, Matrix.cons_val_one,
-        map_one, map_zero, one_pow, one_mul]
+        map_zero, one_pow, one_mul]
       rcases Nat.eq_zero_or_pos (w - (i : ℕ)) with h | h
       · have : (i : ℕ) = w := by have := i.2; omega
         rw [this]
@@ -408,7 +404,7 @@ theorem cls_eq_of_mem_Gam
       exact ⟨by rw [map_smul, hx.1], by simp only [Pi.smul_apply, map_smul, hx.2, smul_comm a]⟩
   have e1 : X.kmap l (X.sl (ofSL γ)).toRingEquiv (b u) = b ![1, 0] := by
     have := congrFun key.1 ![1, 0]
-    rw [← toGQ_coe_eq]
+    rw [← _root_.GlobalTheory.KZ.Betti.toGQ_sl]
     exact this
   rw [← hf, ← e1]
   refine (GlobalTheory.KZ.H3.cls_props Ω ε X l n).2.2.2.2.2.1 _ _ _ ?_

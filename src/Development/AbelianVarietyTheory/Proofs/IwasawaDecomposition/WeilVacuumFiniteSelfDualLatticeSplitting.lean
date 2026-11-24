@@ -234,21 +234,6 @@ end Generic
 
 variable {D : D7}
 
-theorem exists_placeIdem (v : HeightOneSpectrum (𝓞 D.host.F)) : ∃ ε, IsPlaceIdem D v ε := by
-  classical
-  exact ⟨
-    _,
-    singleV D.host.F v 1,
-    rfl,
-    Pi.single_eq_same
-      (M := fun w : HeightOneSpectrum (𝓞 D.host.F) => w.adicCompletion D.host.F)
-      v 1,
-    fun w hw =>
-      Pi.single_eq_of_ne
-        (M := fun w : HeightOneSpectrum (𝓞 D.host.F) => w.adicCompletion D.host.F)
-        hw 1
-  ⟩
-
 theorem placeIdem_idem
     {v : HeightOneSpectrum (𝓞 D.host.F)} {ε : AF D.host.F} (h : IsPlaceIdem D v ε)
     : ε * ε = ε := by
@@ -492,7 +477,7 @@ private theorem selfDual_full
       refine ⟨b + c, ?_⟩
       change (b : D.host.E) + c = _
       rw [hb, hc]
-      simp [f, map_add, add_mul, Finset.sum_add_distrib, mul_add]
+      simp [f, add_mul, Finset.sum_add_distrib, mul_add]
     smul_mem' := by
       rintro c x ⟨b, hb⟩
       refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
@@ -565,7 +550,7 @@ theorem om_vacuum_finite
   have hh := stab_of_isMov T hβT hk' mk'
   have hth := hf.2.theta
   have hvac := hf.2.lat
-  choose ε hε using exists_placeIdem (D := D)
+  choose ε hε using _root_.GlobalTheory.IdemSupport.exists_placeIdem (D := D)
   obtain ⟨κ, a0, a1, a2, a3⟩ := exists_trunc hε S βS
   obtain ⟨μ, b0, b1, b2, b3⟩ := exists_trunc hε T βT
   have hloc

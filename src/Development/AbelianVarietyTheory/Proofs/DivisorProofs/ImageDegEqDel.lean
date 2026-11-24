@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
 public import Development.AbelianVarietyTheory.Definitions.Divisors.WellChosen
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeImageBirationalLinearSystemEqSelfIntStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeImageBirationalLinearSystemEqSelfInt
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LeOfRingKrullDimConeIdeal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -70,7 +70,7 @@ theorem imageDeg_eq_del
           → (CompHt.imageDeg ev T.D : ℤ) = T.del := by
   intro hQ F _ _ T V Ω _ _ _ _ _ _ Nm W ev hG hB hP
   obtain ⟨-, hdeg, hdim⟩ :=
-    GlobalTheory.T.degree_image_birational_linearSystem_eq_selfInt hQ F T.toLinSys hG.alg.variety
+    _root_.GlobalTheory.ImageDegree.degree_image_eq_topSelf hQ F T.toLinSys hG.alg.variety
       hG.alg.bpf hB
   obtain ⟨f, hf, -⟩ :=
     hQ.chowInt F T.N T.D T.imageIdeal T.toLinSys.isHomogeneous_imageIdeal

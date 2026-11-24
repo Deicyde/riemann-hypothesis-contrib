@@ -121,7 +121,7 @@ theorem _root_.GlobalTheory.ThetaAH.hermForm_pullback
       = (h *ᵥ z) ⬝ᵥ B *ᵥ star (h *ᵥ w) := by
   have hs : h.map (starRingEnd ℂ) *ᵥ star w = star (h *ᵥ w) := by
     funext i
-    simp [Matrix.mulVec, dotProduct, star_sum, mul_comm]
+    simp [Matrix.mulVec, dotProduct, star_sum]
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm
   rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hs, Matrix.dotProduct_mulVec,
     Matrix.vecMul_transpose]

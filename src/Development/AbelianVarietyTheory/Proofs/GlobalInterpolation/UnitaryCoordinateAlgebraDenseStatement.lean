@@ -43,6 +43,7 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Unitar
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+
 theorem _root_.GlobalTheory.T.unitary_coordinate_algebra_dense
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ),
       (∀ p
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.unitary_coordinate_algebra_dense
                   ∧ b i ∈ Algebra.adjoin ℂ
                     {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j})
               ∧ ∀ x k, p (x * k) = ∑ i, a i x * b i k := by
-  first
-  | exact @GlobalTheory.PolyRealU.poly_infU
-  | exact GlobalTheory.PolyRealU.poly_infU
-  | (intros; apply GlobalTheory.PolyRealU.poly_infU <;> assumption)
+  first | exact @GlobalTheory.PolyRealU.poly_infU

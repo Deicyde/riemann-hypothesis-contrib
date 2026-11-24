@@ -2,8 +2,8 @@ module
 
 public import Formalism.SharpRestriction.Divisibility.SchurIrreducible
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockDualPairSwapSymmetryStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MinFirstStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockDualPairSwapSymmetry
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MinFirst
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -124,7 +124,7 @@ theorem GlobalTheory.FockAlg.min_second
                     (genSub (fockAct1 p q r s)
                       {Q | Q ∈ jointHarm p q r s ∧ OfType (fockAct2 p q r s) μ' Q}) := by
   intro p q r s M1 M2 f hirr hadm hf hf0 μ' hμ hmin
-  obtain ⟨s1, s2, s3⟩ := GlobalTheory.T.fock_dualPair_swap_symmetry r s p q
+  obtain ⟨s1, s2, s3⟩ := _root_.GlobalTheory.FockSwap.swap_symmetry r s p q
   set e := swapPol r s p q with he
   have h1 : ∀ Z v, e (fockAct1 r s p q Z v) = fockAct2 p q r s Z (e v) := s1
   have h2 : ∀ Z v, e (fockAct2 r s p q Z v) = fockAct1 p q r s Z (e v) := s2
@@ -157,8 +157,7 @@ theorem GlobalTheory.FockAlg.min_second
     rw [hg, e.apply_symm_apply, LinearMap.zero_apply] at this
     exact c.map_eq_zero_iff.mp this
   obtain ⟨⟨μ, P, hP, hP1, hP2, hP0⟩, hB⟩ :=
-    GlobalTheory.T.exists_jointHarm_highestWeight_and_map_mem_genSub r s p q M2 M1 g hirr hadm hgI
-      hg0 μ' hμ hmin
+    _root_.GlobalTheory.FockAlg.min_first r s p q M2 M1 g hirr hadm hgI hg0 μ' hμ hmin
   refine ⟨⟨μ, e P, hJ P hP, isHW_equiv e _ _ h2 _ _ hP2, isHW_equiv e _ _ h1 _ _ hP1, ?_⟩, ?_⟩
   · intro h
     apply hP0

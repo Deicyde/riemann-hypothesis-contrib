@@ -65,9 +65,3 @@ theorem _root_.GlobalTheory.T.exists_transposeGram_coordinate_homeomorph_symplec
           ∧ ∀ x, (L x).map (finPart D) = 0 ↔ x.map (finPart D) = 0 := by
   first
   | exact @GlobalTheory.Twist.exists_transposeGram_coordinate_homeomorph_symplectic.coordsLin_spec
-  | exact GlobalTheory.Twist.exists_transposeGram_coordinate_homeomorph_symplectic.coordsLin_spec
-  | (
-      intros
-      apply GlobalTheory.Twist.exists_transposeGram_coordinate_homeomorph_symplectic.coordsLin_spec
-        <;> assumption
-    )

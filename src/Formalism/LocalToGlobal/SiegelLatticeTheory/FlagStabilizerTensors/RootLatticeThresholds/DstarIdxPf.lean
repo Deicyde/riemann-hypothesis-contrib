@@ -75,13 +75,13 @@ variable
 
 theorem lIdx_ne (p : TypX X) : lIdx X hb p ≠ 0 := by
   obtain ⟨K, hKe, -, -, -, hfin⟩ :=
-    LocIdx_main X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+    LocIdx_main X hb (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)
       (Formalism.L2.SG.Closed.level_subgroup_properties X) p
   have hcl : KvS X p = K := by rw [KvS, ← hKe, Subgroup.closure_eq]
-  rw [lIdx, LocIdx_KppvS X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X) p, hcl]
+  rw [lIdx, LocIdx_KppvS X hb (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X) p, hcl]
   exact hfin
 
-theorem g_pos : 1 ≤ X.B.g := Nat.one_le_iff_ne_zero.mpr (Formalism.L2.SG.Pf.modulus_g_ne_zero X)
+alias g_pos := _root_.Formalism.L2.SG.PoincareInHH.Cut.one_le_g
 
 theorem isOpen_Kg : IsOpen (X.B.I.Kg X.B.g) := X.B.I.topf_open X.B.g (g_pos X)
 
@@ -93,7 +93,7 @@ theorem one_mem_Kg : (1 : X.B.I.Gf) ∈ X.B.I.Kg X.B.g := ⟨
 
 theorem isOpen_levelSubgroup'
     : IsOpen
-      ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+      ((levelSubgroupOfCharacter X (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)
           : Subgroup X.B.I.Gf)
         : Set X.B.I.Gf) := by
   refine Subgroup.isOpen_of_mem_nhds _ (g := 1) ?_
@@ -102,29 +102,30 @@ theorem isOpen_levelSubgroup'
   exact ((Formalism.L2.SG.Closed.level_subgroup_properties X).1 x hx).1
 
 theorem relIdx_eq
-    : ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex
-        (KsetSub X.B.I))
+    : ((levelSubgroupOfCharacter X
+        (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)).relIndex (KsetSub X.B.I))
       = ∏ p : TypX X, lIdx X hb p := by
-  rw [← PI.MassDataKppVolLemmas.IP_gIdx X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X)]
+  rw [← PI.MassDataKppVolLemmas.IP_gIdx X hb
+    (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)]
   exact PI.MassDataKppVolLemmas.IP_idxProd X hb PI.MassDataKppVolLemmas.single_component_surjective
-    (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+    (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)
     (Formalism.L2.SG.Closed.level_subgroup_properties X)
 
 theorem muK_eq : X.B.μf X.B.I.Kset = ((∏ p : TypX X, lIdx X hb p : ℕ) : ℝ≥0∞) * X.B.μf X.K2 := by
   have hle
-      : levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+      : levelSubgroupOfCharacter X (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)
         ≤ KsetSub X.B.I := fun x hx =>
     (Formalism.L2.SG.Closed.level_subgroup_properties X).2.1 x hx
   have hi
-      : (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex
-          (KsetSub X.B.I)
+      : (levelSubgroupOfCharacter X
+          (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X)).relIndex (KsetSub X.B.I)
         ≠ 0 := by
     rw [relIdx_eq X hb]
     exact Finset.prod_ne_zero_iff.2 fun p _ => lIdx_ne X hb p
   have :=
     Glob_measure_eq_relIndex_mul X.B.μf (KsetSub X.B.I)
-      (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)) hle
-      (isOpen_levelSubgroup' X) hi
+      (levelSubgroupOfCharacter X (_root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X))
+      hle (isOpen_levelSubgroup' X) hi
   rw [relIdx_eq X hb] at this
   exact this
 
@@ -201,7 +202,7 @@ theorem ggC_eq (R : Formalism.BasicNotions.Ranks) (g : ℕ)
       : Nat.card (Formalism.FourierDecayAlt.S3.Idx R.rS R.k) = Nat.card (Fin (R.k + R.m - 1)) := by
     obtain ⟨t, ht⟩ := R.m_even
     have h2 := R.two_le_m
-    simp only [Formalism.FourierDecayAlt.S3.Idx, Formalism.FourierDecayAlt.S3.Mid, Nat.card_sum,
+    simp only [Formalism.FourierDecayAlt.S3.Idx, Formalism.FourierDecayAlt.S3.Mid,
       Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin, Fintype.card_unit,
       Formalism.BasicNotions.Ranks.rS]
     omega

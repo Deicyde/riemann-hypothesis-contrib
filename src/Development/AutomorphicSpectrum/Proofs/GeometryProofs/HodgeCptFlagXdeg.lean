@@ -3,8 +3,11 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.Metric
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorFlagStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductConjugateStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocalRingPointsExistsUniqueStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductConjugate
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocalRingPointsExistsUnique
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -72,13 +75,6 @@ section Val
 
 variable {R : Type} [CommRing R] [IsLocalRing R] {z : Spec (CommRingCat.of R) ⟶ X}
 
-theorem valAt_unique (hg : IsCptGen ξ) {a : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a r')
-    : r = r' := by
-  obtain ⟨h1, s, hs, rfl⟩ := h
-  obtain ⟨h2, s', hs', rfl⟩ := h'
-  have : s = s' := hg.inj ⟨centre z, h1⟩ (hs.trans hs'.symm)
-  rw [this]
-
 theorem valAt_mul {a b : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z b r')
     : ValAt ξ z (a * b) (r * r') := by
   obtain ⟨h1, s, rfl, rfl⟩ := h
@@ -104,16 +100,6 @@ section Cx
 
 variable {z : Spec (CommRingCat.of ℂ) ⟶ X}
 
-theorem valAt_inv {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) : ValAt ξ z a⁻¹ r⁻¹ := by
-  obtain ⟨h1, s, rfl, rfl⟩ := h
-  have hu : IsUnit s := (Scheme.isLocalHom_stalkClosedPointTo' z).map_nonunit s (IsUnit.mk0 _ hr)
-  obtain ⟨s', hs'⟩ := hu.exists_right_inv
-  have e1 : genMap ξ ⟨centre z, h1⟩ s * genMap ξ ⟨centre z, h1⟩ s' = 1 :=
-    (map_mul (genMap ξ ⟨centre z, h1⟩) s s').symm.trans (by rw [hs', map_one])
-  have e2 : (Scheme.stalkClosedPointTo z).hom s * (Scheme.stalkClosedPointTo z).hom s' = 1 :=
-    (map_mul (Scheme.stalkClosedPointTo z).hom s s').symm.trans ((congrArg _ hs').trans (map_one _))
-  exact ⟨h1, s', (eq_inv_of_mul_eq_one_right e1), (eq_inv_of_mul_eq_one_right e2)⟩
-
 theorem valAt_zpow
     {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) (hz : genPt ξ ⤳ centre z) (n : ℤ)
     : ValAt ξ z (a ^ n) (r ^ n) := by
@@ -124,7 +110,9 @@ theorem valAt_zpow
     | succ m ih => simpa [pow_succ] using valAt_mul ih hb
   cases n with
   | ofNat m => simpa using hn h m
-  | negSucc m => simpa [zpow_negSucc] using valAt_inv (hn h (m + 1)) (pow_ne_zero _ hr)
+  | negSucc m =>
+    simpa [zpow_negSucc] using
+      _root_.GlobalTheory.CompanionTheory.Ar.CxVal.inv (hn h (m + 1)) (pow_ne_zero _ hr)
 
 theorem exists_valAt_of_unit
     {a : Ω} (h : genPt ξ ⤳ centre z) (ha : unitAt ξ ⟨centre z, h⟩ a) (hg : IsCptGen ξ)
@@ -136,7 +124,8 @@ theorem exists_valAt_of_unit
   rintro rfl
   have := valAt_mul hr hr'
   rw [mul_inv_cancel₀ h0, zero_mul] at this
-  exact zero_ne_one (valAt_unique hg this (valAt_one h))
+  exact zero_ne_one (_root_.GlobalTheory.CompanionTheory.Ar.TiePoints.valAt_unique hg this
+    (valAt_one h))
 
 abbrev cj (z : Spec (CommRingCat.of ℂ) ⟶ X) : Spec (CommRingCat.of ℂ) ⟶ X :=
   spMap (starRingEnd ℂ) ≫ z
@@ -284,7 +273,8 @@ theorem isGrNorm_conj
       fun i => cjTan (v i),
       fun i => lieVal_conj M (hv i),
       fun p q =>
-        GlobalTheory.T.hodge_inner_product_conjugate E H X T z (v p) (v q) _ _ _ rfl rfl (hΓ p q)
+        _root_.GlobalTheory.CompanionTheory.Ar.HodgeConj.hodgeInnerProduct_conj_abelianScheme E H X
+          T z (v p) (v q) _ _ _ rfl rfl (hΓ p q)
     ⟩,
     (show Γ.transpose = Γ.map (starRingEnd ℂ) from Matrix.ext fun i j => (hpd.1.apply j i).symm)
       ▸ hpd.transpose,
@@ -517,8 +507,10 @@ theorem exists_metric
     Finset.prod_ne_zero_iff.2 fun k _ => zpow_ne_zero _ (hy k)
   refine ⟨u₁ ^ rootSgn D r * u₀⁻¹ * m⁻¹, ?_, ?_⟩
   · have :=
-      valAt_mul (valAt_mul (valAt_zpow hv₁ hu₁ hall (rootSgn D r)) (valAt_inv hv₀ hu₀))
-        (valAt_inv hvm hm)
+      valAt_mul
+        (valAt_mul (valAt_zpow hv₁ hu₁ hall (rootSgn D r))
+          (_root_.GlobalTheory.CompanionTheory.Ar.CxVal.inv hv₀ hu₀))
+        (_root_.GlobalTheory.CompanionTheory.Ar.CxVal.inv hvm hm)
     convert this using 1
     rw [smul_eq_mul, div_zpow (t) t₀]
     have := zpow_ne_zero (rootSgn D r) ht₀
@@ -547,7 +539,7 @@ theorem Good.smul
     {κ : K → ℂ} (hκ : ∀ k, κ k ≠ 0)
     : Good Fl r a e₀ z (fun p => κ p.1 * w p) ((∏ k, ‖κ k‖ ^ a k) * h) := by
   obtain ⟨hw, hi, hp, hn⟩ := hG
-  obtain ⟨-, -, t3⟩ := GlobalTheory.T.local_ring_points_existsUnique 𝔐.X Ω 𝔐.ξ K J y 𝔐.tie ℂ
+  obtain ⟨-, -, t3⟩ := _root_.GlobalTheory.CompanionTheory.Ar.tie_points 𝔐.X Ω 𝔐.ξ K J y 𝔐.tie ℂ
   refine ⟨
     ((t3 z w (𝔐.all _) hw).2 _).2 ⟨fun k => Units.mk0 (κ k) (hκ k), rfl⟩,
     hi,
@@ -587,7 +579,7 @@ theorem exists_hodgeLine
       : ∀ z z' w h h',
         Good Fl r (xdeg r) (e r) z w h → Good Fl r (xdeg r) (e r) z' w h' → h = h' := by
     intro z z' w h h' hG hG'
-    obtain ⟨t1, -, t3⟩ := GlobalTheory.T.local_ring_points_existsUnique 𝔐.X Ω 𝔐.ξ K J y 𝔐.tie ℂ
+    obtain ⟨t1, -, t3⟩ := _root_.GlobalTheory.CompanionTheory.Ar.tie_points 𝔐.X Ω 𝔐.ξ K J y 𝔐.tie ℂ
     have hzz : z' = z :=
       (t1 w hG.1.1 (t3 z w (𝔐.all _) hG.1).1).unique ⟨𝔐.all _, hG'.1⟩ ⟨𝔐.all _, hG.1⟩
     subst hzz
@@ -596,7 +588,8 @@ theorem exists_hodgeLine
     have hn₀ : ∀ k, w ⟨k, c₀ k⟩ ≠ 0 := fun k => (hc₀ k).ne_zero
     obtain ⟨u, hv, he⟩ := hG.2.2.2 t ν hgr c₀ hn₀
     obtain ⟨u', hv', he'⟩ := hG'.2.2.2 t ν hgr c₀ hn₀
-    have huu : u = u' := valAt_unique 𝔐.tie.gen hv hv'
+    have huu : u = u' :=
+      _root_.GlobalTheory.CompanionTheory.Ar.TiePoints.valAt_unique 𝔐.tie.gen hv hv'
     rw [huu, ← he'] at he
     exact mul_left_cancel₀ (zpow_pos hν _).ne' he
   have hneg
@@ -642,7 +635,7 @@ theorem exists_hodgeLine
       rw [metricF_eq hu hG, metricF_eq hu hG.conj]
     · rw [metricF_of_not hx, metricF_of_not (hneg w hx)]
       unfold refNorm
-      simp [Complex.norm_conj]
+      simp
 
 end Main
 

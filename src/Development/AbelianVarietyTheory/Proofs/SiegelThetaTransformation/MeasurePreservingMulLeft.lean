@@ -122,7 +122,7 @@ theorem _root_.GlobalTheory.SW.Slab.exists_bound_upper
       intro j hj hjk
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, not_lt] at hj
       exact hzero j (lt_of_le_of_ne hj (Ne.symm hjk))
-    have hfk : ‖f k‖ = ‖b k k‖ * ‖b k c‖ := by simp [f, norm_mul, hd]
+    have hfk : ‖f k‖ = ‖b k k‖ * ‖b k c‖ := by simp [f, hd]
     have hsum : ‖∑ j ∈ Finset.univ.filter (· < k), f j‖ ≤ r * C ^ 2 := by
       calc
         ‖∑ j ∈ Finset.univ.filter (· < k), f j‖
@@ -313,12 +313,6 @@ private theorem sign_re_pos_and_norm_bounds_of_near_sign
 
 open Matrix Complex NumberField MeasureTheory in
 open scoped ComplexConjugate ComplexOrder Real Classical in
-private theorem lminor_last_eq_det {r : ℕ} (G : Matrix (Fin r) (Fin r) ℂ)
-    : _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor G (Fin.last r) = G.det := by
-  unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor; rfl
-
-open Matrix Complex NumberField MeasureTheory in
-open scoped ComplexConjugate ComplexOrder Real Classical in
 private theorem mem_Bor_iff_det_ne_zero_and_lower_eq_zero
     {E : Type} [Field E]
     {Ψ : Finset (E →+* ℂ)} {r : ℕ} {b : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame Ψ r}
@@ -432,7 +426,7 @@ theorem _root_.GlobalTheory.SW.thin_slab : ∀ (E : Type) [Field E] [NumberField
     have hdg := _root_.GlobalTheory.SW.Slab.det_gram X τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x τ)
     have hzero : _root_.ReciprocityTheory.ChartRestriction.G.FD.dmin X.Gm x τ (Fin.last r) = 0 := by
       show _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ.1 X.Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x τ)) (Fin.last r) = 0
-      rw [lminor_last_eq_det, hdg, h0]
+      rw [_root_.ReciprocityTheory.ChartRestriction.G.FD.lminor_last, hdg, h0]
       simp
     rw [hzero] at hlast
     simp at hlast

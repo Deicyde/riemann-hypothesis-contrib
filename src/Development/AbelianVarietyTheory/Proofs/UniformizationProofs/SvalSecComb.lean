@@ -57,7 +57,6 @@ def secComb {X : Scheme.{0}} {L : LB X} {n : ℕ} (b : Fin n → Γ(X, ⊤)) (t 
     : LB.Sec L where
   f := fun j => ∑ i, resTop _ (b i) * (t i).f j
   compat := fun i j => by
-
     simp only [map_sum, map_mul, (t _).compat, DVR.SecOps.resTop_res, Finset.mul_sum]
     exact Finset.sum_congr rfl fun l _ => mul_left_comm _ _ _
 

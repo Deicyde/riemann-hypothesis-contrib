@@ -2,84 +2,31 @@ module
 
 public import Mathlib.LinearAlgebra.Trace
 public import Mathlib.RepresentationTheory.Basic
-import Mathlib.Algebra.Order.Floor.Extended
-import Mathlib.Algebra.Order.Floor.Semifield
-import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
-import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Combinatorics.Enumerative.DyckWord
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
-import Mathlib.Data.NNRat.Floor
-import Mathlib.Data.Nat.Choose.Multinomial
-import Mathlib.Geometry.Euclidean.Volume.Basic
-import Mathlib.NumberTheory.Chebyshev
-import Mathlib.NumberTheory.Height.NumberField
-import Mathlib.NumberTheory.Height.Projectivization
-import Mathlib.NumberTheory.LucasLehmer
-import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Coalgebra.IsFrobenius
-import Mathlib.RingTheory.Henselian
-import Mathlib.RingTheory.HopfAlgebra.Basic
-import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.RegularLocalRing.Defs
-import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.RingTheory.WittVector.IsPoly
-import Mathlib.Tactic.Echelon.Zsqrtd
-import Mathlib.Tactic.Inclusion.Extension.Core.Core
-import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Lemma
-import Mathlib.Tactic.Linter.Style
-import Mathlib.Tactic.NormNum.Irrational
-import Mathlib.Tactic.NormNum.IsCoprime
-import Mathlib.Tactic.NormNum.IsSquare
-import Mathlib.Tactic.NormNum.LegendreSymbol
-import Mathlib.Tactic.NormNum.ModEq
-import Mathlib.Tactic.NormNum.NatFib
-import Mathlib.Tactic.NormNum.NatLog
-import Mathlib.Tactic.NormNum.NatSqrt
-import Mathlib.Tactic.NormNum.Ordinal
-import Mathlib.Tactic.NormNum.Parity
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Module NumberField
+open Module
 
 namespace Bl.RankOneOrbitForms
 
-variable {K : Type} [Field K] {G : Type} [Group G] {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
+variable
+  {K : Type} [Field K]
+  {G : Type} [Group G]
+  {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
 
 private lemma rank_one_form (f : T →ₗ[K] T) (h1 : finrank K (LinearMap.range f) = 1) :
     ∃ (φ : T →ₗ[K] K) (v : T), v ≠ 0 ∧ φ ≠ 0 ∧ f = φ.smulRight v := by
-  obtain ⟨v, hv, hw⟩ := finrank_eq_one_iff'.mp h1
-  choose a ha using fun x => hw ⟨f x, LinearMap.mem_range_self f x⟩
-  have hv' : (v : T) ≠ 0 := fun h => hv (Subtype.ext h)
-  have hav : ∀ x, a x • (v : T) = f x := fun x => congrArg Subtype.val (ha x)
-  have inj := smul_left_injective K hv'
-  let φ : T →ₗ[K] K :=
-    { toFun := a
-      map_add' := fun x y => inj (by simp only [add_smul, hav, map_add (f := _)])
-      map_smul' := fun c x => inj (by
-        simp only [smul_eq_mul, mul_smul, hav, map_smul, RingHom.id_apply]) }
-  refine ⟨φ, v, hv', ?_, ?_⟩
-  · intro h0
-    obtain ⟨y, hy⟩ := LinearMap.mem_range.mp v.2
-    apply hv'
-    rw [← hy, ← hav y]
-    have : a y = 0 := LinearMap.congr_fun h0 y
-    rw [this, zero_smul]
-  · ext x
-    simp only [LinearMap.smulRight_apply]
-    exact (hav x).symm
+  let e : LinearMap.range f ≃ₗ[K] K := LinearEquiv.ofFinrankEq _ _ (by simpa using h1)
+  let φ := e.toLinearMap.comp f.rangeRestrict
+  let v := e.symm (1 : K)
+  have hv : v ≠ 0 := by
+    simpa only [v, map_zero] using e.symm.injective.ne (one_ne_zero : (1 : K) ≠ 0)
+  have hφ : Function.Surjective φ := e.surjective.comp f.surjective_rangeRestrict
+  refine ⟨φ, v, fun h => hv (Subtype.ext h), LinearMap.ne_zero_of_surjective hφ, ?_⟩
+  ext x
+  change f x = ((e (f.rangeRestrict x) • e.symm 1 : LinearMap.range f) : T)
+  rw [← e.symm.map_smul, smul_eq_mul, mul_one, e.symm_apply_apply]
+  rfl
 
 private lemma span_orbit (τ : Representation K G T)
     (hirr : ∀ W : Submodule K T, (∀ g : G, ∀ w ∈ W, τ g w ∈ W) → W = ⊥ ∨ W = ⊤)
@@ -105,26 +52,13 @@ private lemma span_orbit (τ : Representation K G T)
 private lemma orbit_ker (τ : Representation K G T)
     (hirr : ∀ W : Submodule K T, (∀ g : G, ∀ w ∈ W, τ g w ∈ W) → W = ⊥ ∨ W = ⊤)
     (φ : T →ₗ[K] K) (hφ : φ ≠ 0) (x : T) (hx : ∀ g, φ (τ g x) = 0) : x = 0 := by
-  let W : Submodule K T := ⨅ g : G, LinearMap.ker (φ ∘ₗ τ g)
-  have memW : ∀ y, y ∈ W ↔ ∀ g, φ (τ g y) = 0 := by
-    intro y
-    simp [W, Submodule.mem_iInf]
-  have hinvar : ∀ g : G, ∀ w ∈ W, τ g w ∈ W := by
-    intro g w hw
-    rw [memW] at hw ⊢
-    intro h
-    have := hw (h * g)
-    rwa [map_mul, Module.End.mul_apply] at this
-  rcases hirr W hinvar with h | h
-  · have : x ∈ W := (memW x).2 hx
-    rw [h, Submodule.mem_bot] at this
-    exact this
-  · exfalso
-    apply hφ
-    ext y
-    have hy : y ∈ W := h ▸ Submodule.mem_top
-    have := (memW y).1 hy 1
-    simpa using this
+  by_contra hx0
+  have hle : Submodule.span K (Set.range fun g => τ g x) ≤ LinearMap.ker φ := by
+    rw [Submodule.span_le]
+    rintro _ ⟨g, rfl⟩
+    exact hx g
+  rw [span_orbit τ hirr x hx0] at hle
+  exact hφ (LinearMap.ker_eq_top.mp (top_le_iff.mp hle))
 
 private lemma select {ι M : Type} [AddCommGroup M] [Module K M] [FiniteDimensional K M]
     (f : ι → M) (r : ℕ) (hr : finrank K (Submodule.span K (Set.range f)) = r) :
@@ -137,20 +71,19 @@ private lemma select {ι M : Type} [AddCommGroup M] [Module K M] [FiniteDimensio
   let e : Fin r ≃ κ := (Fintype.equivFinOfCardEq hc).symm
   exact ⟨a ∘ e, hli.comp e e.injective⟩
 
-theorem goal1 (τ : Representation K G T)
+theorem goal1
+    (τ : Representation K G T)
     (hirr : ∀ W : Submodule K T, (∀ g : G, ∀ w ∈ W, τ g w ∈ W) → W = ⊥ ∨ W = ⊤)
-    (ε₀ ε : T →ₗ[K] T) (h1 : finrank K (LinearMap.range ε₀) = 1) :
-    ∃ (γ δ : Fin (finrank K (LinearMap.range ε)) → G)
-      (c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K),
-      c.det ≠ 0 ∧
-      (∀ i j, c i j = LinearMap.trace K T (ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j))) ∧
-      (∀ i j, ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j) ∘ₗ ε₀ = c i j • ε₀) ∧
-      ∑ j, ∑ i, c⁻¹ j i • (ε ∘ₗ τ (γ j) ∘ₗ ε₀ ∘ₗ τ (δ i) ∘ₗ ε) = ε := by
+    (ε₀ ε : T →ₗ[K] T) (h1 : finrank K (LinearMap.range ε₀) = 1)
+    : ∃ (γ δ : Fin (finrank K (LinearMap.range ε)) → G)
+        (c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K),
+      c.det ≠ 0 ∧ (∀ i j, c i j = LinearMap.trace K T (ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)))
+        ∧ (∀ i j, ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j) ∘ₗ ε₀ = c i j • ε₀)
+        ∧ ∑ j, ∑ i, c⁻¹ j i • (ε ∘ₗ τ (γ j) ∘ₗ ε₀ ∘ₗ τ (δ i) ∘ₗ ε) = ε := by
   obtain ⟨φ, v, hv, hφ, rfl⟩ := rank_one_form ε₀ h1
   have hspanT := span_orbit τ hirr v hv
   have hspanR : Submodule.span K (Set.range fun g => ε (τ g v)) = LinearMap.range ε := by
-    have : (Set.range fun g => ε (τ g v)) = ε '' (Set.range fun g => τ g v) := by
-      ext y; simp
+    have : (Set.range fun g => ε (τ g v)) = ε '' (Set.range fun g => τ g v) := by ext y; simp
     rw [this, ← Submodule.map_span, hspanT, Submodule.map_top]
   obtain ⟨γ, hγ⟩ := select (fun g => ε (τ g v)) (finrank K (LinearMap.range ε)) (by rw [hspanR])
   have hle : Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) ≤ LinearMap.range ε := by
@@ -185,8 +118,8 @@ theorem goal1 (τ : Representation K G T)
     exact Finset.sum_eq_zero fun j _ => by
       have : ℓ (fun k => if j = k then 1 else 0) = 0 := hz j
       rw [this, smul_zero]
-  obtain ⟨δ, hδ⟩ := select w (finrank K (LinearMap.range ε))
-    (by rw [hw, finrank_top, Module.finrank_fin_fun])
+  obtain ⟨δ, hδ⟩ :=
+    select w (finrank K (LinearMap.range ε)) (by rw [hw, finrank_top, Module.finrank_fin_fun])
   let c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K :=
     Matrix.of fun i j => φ (τ (δ i) (ε (τ (γ j) v)))
   have hc : IsUnit c := Matrix.linearIndependent_rows_iff_isUnit.mp hδ
@@ -194,15 +127,16 @@ theorem goal1 (τ : Representation K G T)
   refine ⟨γ, δ, c, hcd.ne_zero, ?_, ?_, ?_⟩
   · intro i j
     rw [show (φ.smulRight v) ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)
-        = (φ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)).smulRight v from LinearMap.ext fun _ => rfl,
+          = (φ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)).smulRight v from
+        LinearMap.ext fun _ => rfl,
       LinearMap.trace_smulRight]
     rfl
   · intro i j
     ext x
     simp [c, smul_smul, mul_comm]
   · ext x
-    have hx : ε x ∈ Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) :=
-      by rw [hueq]; exact LinearMap.mem_range_self ε x
+    have hx : ε x ∈ Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) := by
+      rw [hueq]; exact LinearMap.mem_range_self ε x
     obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun K).mp hx
     simp only [Function.comp_apply] at ha
     have hcoef : ∀ i, φ (τ (δ i) (ε x)) = ∑ k, c i k * a k := by
@@ -212,8 +146,11 @@ theorem goal1 (τ : Representation K G T)
       simp [c, map_sum, map_smul, mul_comm]
     have hinv : ∀ j, ∑ i, c⁻¹ j i * ∑ k, c i k * a k = a j := by
       intro j
-      have := congrFun (show Matrix.mulVec c⁻¹ (Matrix.mulVec c a) = a by
-        rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul c hcd, Matrix.one_mulVec]) j
+      have :=
+        congrFun
+          (show Matrix.mulVec c⁻¹ (Matrix.mulVec c a) = a by
+            rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul c hcd, Matrix.one_mulVec])
+          j
       simpa [Matrix.mulVec, dotProduct] using this
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply,
       LinearMap.smulRight_apply, map_smul, hcoef]

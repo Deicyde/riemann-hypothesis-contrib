@@ -3,7 +3,10 @@ module
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.NoCommonZeroSt
 public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsThetaGeneratorReadingNeZeroAtFrameStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.UnitaryDatumNumbersForSupBoundsStatement
+public import Development.AbelianVarietyTheory.Definitions.ThetaValues.GamAt
+public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.UnitaryDatumNumbersForSupBounds
 public import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -54,7 +57,7 @@ theorem noCommonZero_of_chartIndep
   intro hC D T h j hj w hn _hlast hM _hα σ hσ k x hx
 
   obtain ⟨-, -, -, -, hr1, hxi, hDF, -, hc, -⟩ :=
-    GlobalTheory.T.unitaryDatumNumbers_for_supBounds D T h j hj w
+    _root_.GlobalTheory.SupDict.record_dictionary D T h j hj w
 
   obtain ⟨st, hnab⟩ := h.nabPin j hj
 

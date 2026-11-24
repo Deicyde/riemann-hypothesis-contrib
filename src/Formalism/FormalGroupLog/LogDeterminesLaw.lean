@@ -70,10 +70,8 @@ private lemma mvPowerSeries_subst_powerSeries_subst_eq_subst_subst {R : Type*} [
     MvPowerSeries.subst a (PowerSeries.subst b p) = PowerSeries.subst (MvPowerSeries.subst a b) p :=
   MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.const hb) ha p
 
-theorem homComp : HomComp := by
-  apply Formalism.G.homComp_statement <;> assumption
-theorem logIffHomGa : LogIffHomGa := by
-  apply Formalism.G.log_iff_hom_additive <;> assumption
-theorem substInjective : SubstInjective := substInjective_statement
+theorem homComp : HomComp := by apply Formalism.G.homComp_statement <;> assumption
+theorem logIffHomGa : LogIffHomGa := by apply Formalism.G.log_iff_hom_additive <;> assumption
+alias substInjective := _root_.Formalism.G.substInjective_statement
 
 end Formalism.G

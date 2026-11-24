@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.abelianScheme_cubical_bundle_exists_and_maps
                   IsGrpPullback B' B f β → (∃ r : LB.Gen (M'.L.L.pull (eSec B')), r.IsGen)
                     → LBIso M'.L.L (M.L.L.pull β)
                     → IsCPPullback M' M f β) := by
-  first
-  | exact @GlobalTheory.AbPackage.abelian_cp
-  | exact GlobalTheory.AbPackage.abelian_cp
-  | (intros; apply GlobalTheory.AbPackage.abelian_cp <;> assumption)
+  first | exact @GlobalTheory.AbPackage.abelian_cp

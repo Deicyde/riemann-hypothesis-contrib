@@ -4,7 +4,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.PolBaseChangeOfRelAmpleLocal
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsProjectiveModel
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsBasicOpenKTrivOfFibreStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.NonzeroLocus
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsBasicOpenKTrivOfFibre
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PolPull
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaGroupKernelTrivialOfOpenCover
 import Mathlib.Algebra.Order.Floor.Extended
@@ -67,17 +69,6 @@ open GlobalTheory.Models GlobalTheory.ZM
 
 namespace GlobalTheory.KTrivGlob
 
-private theorem mul_left_congr_of_base_eq
-    {S T : Scheme.{0}} {G : Over S} [GrpObj G]
-    {a b : T ⟶ S} (hab : a = b) (u v : Over.mk a ⟶ G) (u' v' : Over.mk b ⟶ G)
-    (hu : u.left = u'.left) (hv : v.left = v'.left)
-    : (u * v).left = (u' * v').left := by
-  subst hab
-  have h1 : u = u' := Over.OverMorphism.ext hu
-  have h2 : v = v' := Over.OverMorphism.ext hv
-  subst h1 h2
-  rfl
-
 private theorem exists_isGrpPullback_factor
     {S S₁ S₂ : Scheme.{0}} {G : Over S} {G₁ : Over S₁} {G₂ : Over S₂}
     [GrpObj G] [GrpObj G₁] [GrpObj G₂]
@@ -106,40 +97,13 @@ private theorem exists_isGrpPullback_factor
           (Over.homMk (y₀.left ≫ φ₁) ey) rfl rfl
       have B := hm₂ T x y (Over.homMk (x.left ≫ φ₂) fx) (Over.homMk (y.left ≫ φ₂) fy) rfl rfl
       have C :=
-        mul_left_congr_of_base_eq (Category.assoc T.hom g f₁) (Over.homMk (x₀.left ≫ φ₁) ex)
-          (Over.homMk (y₀.left ≫ φ₁) ey) (Over.homMk (x.left ≫ φ₂) fx) (Over.homMk (y.left ≫ φ₂) fy)
-          (by simp [hx, hp₁.lift_fst]) (by simp [hy, hp₁.lift_fst])
+        _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.mul_left_congr
+          (Category.assoc T.hom g f₁) (Over.homMk (x₀.left ≫ φ₁) ex) (Over.homMk (y₀.left ≫ φ₁) ey)
+          (Over.homMk (x.left ≫ φ₂) fx) (Over.homMk (y.left ≫ φ₂) fy) (by simp [hx, hp₁.lift_fst])
+          (by simp [hy, hp₁.lift_fst])
       rw [← A, C, B, Category.assoc, hp₁.lift_fst]
     · rw [Over.w (x₀ * y₀), Category.assoc, hp₁.lift_snd, ← Category.assoc, Over.w (x * y)]
       rfl
-
-private theorem isGrpPullback_comp'
-    {S S₁ S₂ : Scheme.{0}} {G : Over S} {G₁ : Over S₁} {G₂ : Over S₂}
-    [GrpObj G] [GrpObj G₁] [GrpObj G₂]
-    {f : S₁ ⟶ S} {g : S₂ ⟶ S₁} {φ : G₁.left ⟶ G.left} {ψ : G₂.left ⟶ G₁.left}
-    (h₂ : IsGrpPullback G₂ G₁ g ψ) (h₁ : IsGrpPullback G₁ G f φ)
-    : IsGrpPullback G₂ G (g ≫ f) (ψ ≫ φ) := by
-  obtain ⟨hp₁, hm₁⟩ := h₁
-  obtain ⟨hp₂, hm₂⟩ := h₂
-  refine ⟨hp₂.paste_horiz hp₁, ?_⟩
-  intro T x y x₀ y₀ hx hy
-  have ex : (x.left ≫ ψ) ≫ G₁.hom = T.hom ≫ g := by
-    rw [Category.assoc, hp₂.w, ← Category.assoc, Over.w x]
-  have ey : (y.left ≫ ψ) ≫ G₁.hom = T.hom ≫ g := by
-    rw [Category.assoc, hp₂.w, ← Category.assoc, Over.w y]
-  have ex' : ((x.left ≫ ψ) ≫ φ) ≫ G.hom = (T.hom ≫ g) ≫ f := by
-    rw [Category.assoc, hp₁.w, ← Category.assoc, ex]
-  have ey' : ((y.left ≫ ψ) ≫ φ) ≫ G.hom = (T.hom ≫ g) ≫ f := by
-    rw [Category.assoc, hp₁.w, ← Category.assoc, ey]
-  have A := hm₂ T x y (Over.homMk (x.left ≫ ψ) ex) (Over.homMk (y.left ≫ ψ) ey) rfl rfl
-  have B :=
-    hm₁ (Over.mk (T.hom ≫ g)) (Over.homMk (x.left ≫ ψ) ex) (Over.homMk (y.left ≫ ψ) ey)
-      (Over.homMk ((x.left ≫ ψ) ≫ φ) ex') (Over.homMk ((y.left ≫ ψ) ≫ φ) ey') rfl rfl
-  have C :=
-    mul_left_congr_of_base_eq (Category.assoc T.hom g f).symm x₀ y₀
-      (Over.homMk ((x.left ≫ ψ) ≫ φ) ex') (Over.homMk ((y.left ≫ ψ) ≫ φ) ey') (by simp [hx])
-      (by simp [hy])
-  rw [C, B, A, Category.assoc]
 
 theorem kTriv_transfer
     {S S₁ S₂ : Scheme.{0}} {G : Over S} {G₁ : Over S₁} {G₂ : Over S₂}
@@ -189,7 +153,7 @@ private theorem exists_open_kTriv_restrict_of_kTriv_fibre
     rw [hx, hm]
   have h₂ :=
     IsGrpPullback.congr
-      (isGrpPullback_comp'
+      (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsGrpPullback.comp
         (isGrpPullback_pullback ((Over.pullback hV.fromSpec).obj G) (spMap (Spec.preimage m).hom))
         hAp)
       hpt rfl
@@ -197,8 +161,9 @@ private theorem exists_open_kTriv_restrict_of_kTriv_fibre
     kTriv_transfer hL hL' (pull_isLB hLA _) h h₂ e
       (LBIso.symm (GlobalTheory.GenSpread.lbIso_pull_pull hL _ rfl)) hK
   obtain ⟨r, hr, hsp⟩ :=
-    GlobalTheory.T.exists_basicOpen_kTriv_of_fibre Γ(S, V) ((Over.pullback hV.fromSpec).obj G)
-      (L.pull (pullback.fst G.hom hV.fromSpec)) (S'.residueField q) (Spec.preimage m).hom
+    _root_.GlobalTheory.KTrivSpread.exists_kTriv_of_isUnit Γ(S, V)
+      ((Over.pullback hV.fromSpec).obj G) (L.pull (pullback.fst G.hom hV.fromSpec))
+      (S'.residueField q) (Spec.preimage m).hom
       ((Over.pullback (spMap (Spec.preimage m).hom)).obj ((Over.pullback hV.fromSpec).obj G))
       (pullback.fst ((Over.pullback hV.fromSpec).obj G).hom (spMap (Spec.preimage m).hom)) hAb hLA
       (hAamp hA)
@@ -233,7 +198,7 @@ private theorem exists_open_kTriv_restrict_of_kTriv_fibre
       (isGrpPullback_pullback ((Over.pullback hV.fromSpec).obj G)
         (spMap (S.presheaf.map (homOfLE (S.basicOpen_le r)).op).hom))
   have h₁' :=
-    isGrpPullback_comp'
+    _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsGrpPullback.comp
       (isGrpPullback_pullback ((Over.pullback hV.fromSpec).obj G)
         (spMap (S.presheaf.map (homOfLE (S.basicOpen_le r)).op).hom))
       hAp
@@ -250,16 +215,7 @@ private theorem exists_open_kTriv_restrict_of_kTriv_fibre
     (LBIso.symm (GlobalTheory.GenSpread.lbIso_pull_pull hL _ rfl))
     (PolBaseChange.lbIso_refl (pull_isLB hL _)) hK'
 
-theorem exists_open
-    {S S' : Scheme.{0}} [IsLocallyNoetherian S]
-    {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} {L : LB G.left} {L' : LB G'.left}
-    (hL : L.IsLB) (hL' : L'.IsLB)
-    (hG : IsAbelianScheme G) (hA : Out.RelAmple G L) (h : IsGrpPullback G' G f φ)
-    (e : LBIso L' (L.pull φ)) (hK : Out.KTriv G' L') (q : S')
-    : ∃ U : S.Opens,
-      f q ∈ U ∧ Out.KTriv ((Over.pullback U.ι).obj G) (L.pull (pullback.fst G.hom U.ι)) :=
-  exists_open_kTriv_restrict_of_kTriv_fibre hL hL' hG hA h e hK q
+alias exists_open := _root_.GlobalTheory.KTrivGlob.exists_open_kTriv_restrict_of_kTriv_fibre
 
 theorem kTriv_of_forall_point
     : Out.Laws

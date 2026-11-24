@@ -58,8 +58,8 @@ namespace GlobalTheory.CompanionTheory.HalfModCompact
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem exists_nabs_le_of_isCompact {C : Set k} (hC : IsCompact C) :
-    ∃ B : ℝ, ∀ u : kˣ, (u : k) ∈ C → nabs k u ≤ B := by
+theorem exists_nabs_le_of_isCompact {C : Set k} (hC : IsCompact C)
+    : ∃ B : ℝ, ∀ u : kˣ, (u : k) ∈ C → nabs k u ≤ B := by
   apply GlobalTheory.ZetaConvergence.exists_nabs_le <;> assumption
 
 theorem nabs_pow_eq (y : kˣ) (n : ℕ) : nabs k (y ^ n) = nabs k y ^ n := by
@@ -70,8 +70,9 @@ theorem nabs_inv_eq (y : kˣ) : nabs k y⁻¹ = (nabs k y)⁻¹ := by
   unfold nabs
   rw [map_inv, NNReal.coe_inv]
 
-theorem nabs_eq_one_of_pow_le (y : kˣ) (B : ℝ) (h₁ : ∀ n : ℕ, nabs k (y ^ n) ≤ B)
-    (h₂ : ∀ n : ℕ, nabs k (y⁻¹ ^ n) ≤ B) : nabs k y = 1 := by
+theorem nabs_eq_one_of_pow_le
+    (y : kˣ) (B : ℝ) (h₁ : ∀ n : ℕ, nabs k (y ^ n) ≤ B) (h₂ : ∀ n : ℕ, nabs k (y⁻¹ ^ n) ≤ B)
+    : nabs k y = 1 := by
   have hpos : 0 < nabs k y := (nabs_properties k).2.1 y
   rcases lt_trichotomy (nabs k y) 1 with hlt | heq | hgt
   · exfalso
@@ -91,34 +92,36 @@ def blockDet {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (a : Fin h) (
   Matrix.det (Matrix.of fun i j : Fin (d a) =>
     (g : Matrix (Fin N) (Fin N) k) (stdBlocks d hd ⟨a, i⟩) (stdBlocks d hd ⟨a, j⟩))
 
-theorem continuous_blockDet {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (a : Fin h) :
-    Continuous (blockDet (k := k) d hd a) := by
+theorem continuous_blockDet {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (a : Fin h)
+    : Continuous (blockDet (k := k) d hd a) := by
   unfold blockDet
-  first
-    | fun_prop
-    | exact Continuous.matrix_det (continuous_pi fun i => continuous_pi fun j =>
-        (Units.continuous_val.matrix_elem _ _))
+  first | fun_prop
 
-theorem blockDet_leviEmb {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (a : Fin h)
-    (x : Levi k (Bl d)) :
-    blockDet d hd a (leviEmb k (stdBlocks d hd) x) =
-      ((Matrix.GeneralLinearGroup.det (x a) : kˣ) : k) := by
+theorem blockDet_leviEmb
+    {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (a : Fin h) (x : Levi k (Bl d))
+    : blockDet d hd a (leviEmb k (stdBlocks d hd) x)
+      = ((Matrix.GeneralLinearGroup.det (x a) : kˣ) : k) := by
   unfold blockDet
-  have hm : (Matrix.of fun i j : Fin (d a) =>
-      ((leviEmb k (stdBlocks d hd) x : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
-        (stdBlocks d hd ⟨a, i⟩) (stdBlocks d hd ⟨a, j⟩)) =
-      ((x a : GL (Bl d a) k) : Matrix (Bl d a) (Bl d a) k) := by
+  have hm
+      : (Matrix.of fun i j : Fin (d a) =>
+          ((leviEmb k (stdBlocks d hd) x : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+            (stdBlocks d hd ⟨a, i⟩) (stdBlocks d hd ⟨a, j⟩))
+        = ((x a : GL (Bl d a) k) : Matrix (Bl d a) (Bl d a) k) := by
     ext i j
     simp [leviEmb, Matrix.blockDiagonal'_apply_eq]
   rw [hm, Matrix.GeneralLinearGroup.val_det_apply]
 
-theorem nabs_det_eq_one_of_mem_KM {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N)
+theorem nabs_det_eq_one_of_mem_KM
+    {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N)
     {J : Subgroup (GL (Fin N) k)} (hJ : IsCompact (J : Set (GL (Fin N) k)))
-    {x : Levi k (Bl d)} (hx : x ∈ KM k N J d hd) (a : Fin h) :
-    nabs k (Matrix.GeneralLinearGroup.det (x a)) = 1 := by
-  have hmem : ∀ z ∈ KM k N J d hd, blockDet d hd a (leviEmb k (stdBlocks d hd) z) ∈
-      blockDet (k := k) d hd a '' (J : Set (GL (Fin N) k)) :=
-    fun z hz => ⟨_, hz, rfl⟩
+    {x : Levi k (Bl d)} (hx : x ∈ KM k N J d hd)
+    (a : Fin h)
+    : nabs k (Matrix.GeneralLinearGroup.det (x a)) = 1 := by
+  have hmem
+      : ∀ z ∈ KM k N J d hd,
+        blockDet d hd a (leviEmb k (stdBlocks d hd) z)
+          ∈ blockDet (k := k) d hd a '' (J : Set (GL (Fin N) k)) := fun z hz =>
+    ⟨_, hz, rfl⟩
   obtain ⟨B, hB⟩ := exists_nabs_le_of_isCompact (hJ.image (continuous_blockDet d hd a))
   apply nabs_eq_one_of_pow_le _ B
   · intro n
@@ -134,9 +137,9 @@ theorem nabs_det_eq_one_of_mem_KM {N h : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d
     rw [blockDet_leviEmb, e, map_pow, map_inv] at h1
     exact h1
 
-theorem deltaHalf_eq_one_of_mem_KM :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      (N h : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (J : Subgroup (GL (Fin N) k)),
+theorem deltaHalf_eq_one_of_mem_KM
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N h : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (J : Subgroup (GL (Fin N) k)),
       IsCompact (J : Set (GL (Fin N) k)) → ∀ x ∈ KM k N J d hd, deltaHalf k (Bl d) x = 1 := by
   intro k _ _ _ _ N h d hd J hJ x hx
   unfold deltaHalf

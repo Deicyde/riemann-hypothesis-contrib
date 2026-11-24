@@ -100,7 +100,6 @@ theorem coeff_mem_span
       have h0 : W.mkQ (p u) = 0 :=
         (Submodule.Quotient.mk_eq_zero W).2 (Submodule.subset_span ⟨u, rfl⟩)
       have h1 : f (W.mkQ (p u)) = ∑ j ∈ Finset.range (d + 1), u ^ j * f (W.mkQ (a j)) := by
-
         rw [hp u, map_sum, map_sum]
         refine Finset.sum_congr rfl fun j _ => ?_
         rw [map_smul, map_smul, smul_eq_mul]
@@ -159,9 +158,7 @@ private theorem isUnit_det_map_of_det_ne_zero
   rw [isUnit_iff_ne_zero, hd]
   exact (map_ne_zero τ).2 hM
 
-theorem conjTranspose_map (h : IsCMExt F E σ) (hJ : IsHermND σ J) (τ : E →+* ℂ)
-    : (J.map τ)ᴴ = J.map τ :=
-  conjTranspose_map_eq_of_isHermND h hJ τ
+alias conjTranspose_map := _root_.GlobalTheory.LeviHC.conjTranspose_map_eq_of_isHermND
 
 omit [NumberField F] [NumberField E] in
 theorem isUnit_det_map (hJ : IsHermND σ J) (τ : E →+* ℂ) : IsUnit (J.map τ).det :=

@@ -57,21 +57,22 @@ namespace Formalism.HermitianLattices.Ext.L3.BallB
 
 section Gram
 
-variable {K V ι : Type*} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι]
-  [DecidableEq ι]
+variable
+  {K V ι : Type*} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
-theorem gram_det_eq (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis ι K V) (u w : ι → V) :
-    (Matrix.of fun i j => h (u i) (w j)).det =
-      star (b.det u) * (Matrix.of fun i j => h (b i) (b j)).det * b.det w := by
-  have hm : (Matrix.of fun i j => h (u i) (w j)) =
-      (b.toMatrix u).conjTranspose * (Matrix.of fun i j => h (b i) (b j)) * b.toMatrix w := by
+theorem gram_det_eq (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis ι K V) (u w : ι → V)
+    : (Matrix.of fun i j => h (u i) (w j)).det
+      = star (b.det u) * (Matrix.of fun i j => h (b i) (b j)).det * b.det w := by
+  have hm
+      : (Matrix.of fun i j => h (u i) (w j))
+        = (b.toMatrix u).conjTranspose * (Matrix.of fun i j => h (b i) (b j)) * b.toMatrix w := by
     ext i j
     rw [Matrix.of_apply]
     conv_lhs => rw [← b.sum_repr (u i), ← b.sum_repr (w j)]
 
     simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, Matrix.mul_apply,
-    Matrix.conjTranspose_apply, Basis.toMatrix_apply, Matrix.of_apply, smul_eq_mul,
-    Finset.sum_mul, Finset.mul_sum, starRingEnd_apply, RingHom.id_apply]
+      Matrix.conjTranspose_apply, Basis.toMatrix_apply, Matrix.of_apply, smul_eq_mul,
+      Finset.sum_mul, Finset.mul_sum, starRingEnd_apply, RingHom.id_apply]
     refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
     ring
   rw [hm, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, Basis.det_apply,
@@ -85,23 +86,32 @@ variable {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarT
 def gdet (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis (Fin (finrank K V)) K V) : K :=
   (Matrix.of fun i j => h (b i) (b j)).det
 
-theorem mem_discrIdeal {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (b : Basis (Fin (finrank K V)) K V) {x : Fin (finrank K V) → V} (hx : ∀ i, x i ∈ L) {z : 𝓞 K}
-    (hz : algebraMap (𝓞 K) K z = star (b.det x) * gdet h b * b.det x) : z ∈ discrIdeal h L :=
+theorem mem_discrIdeal
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (b : Basis (Fin (finrank K V)) K V)
+    {x : Fin (finrank K V) → V} (hx : ∀ i, x i ∈ L)
+    {z : 𝓞 K} (hz : algebraMap (𝓞 K) K z = star (b.det x) * gdet h b * b.det x)
+    : z ∈ discrIdeal h L :=
   Ideal.subset_span ⟨x, hx, by rw [hz, gram_det_eq h b]; rfl⟩
 
-theorem discrIdeal_le {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (b : Basis (Fin (finrank K V)) K V) {I : Ideal (𝓞 K)}
-    (hI : ∀ x : Fin (finrank K V) → V, (∀ i, x i ∈ L) → ∀ z : 𝓞 K,
-      algebraMap (𝓞 K) K z = star (b.det x) * gdet h b * b.det x → z ∈ I) : discrIdeal h L ≤ I := by
+theorem discrIdeal_le
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (b : Basis (Fin (finrank K V)) K V)
+    {I : Ideal (𝓞 K)}
+    (hI : ∀ x : Fin (finrank K V) → V,
+      (∀ i, x i ∈ L)
+        → ∀ z : 𝓞 K, algebraMap (𝓞 K) K z = star (b.det x) * gdet h b * b.det x → z ∈ I)
+    : discrIdeal h L ≤ I := by
   refine Ideal.span_le.2 ?_
   rintro z ⟨x, hx, hz⟩
   exact hI x hx z (by rw [hz, gram_det_eq h b]; rfl)
 
-theorem exists_mixed {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (b : Basis (Fin (finrank K V)) K V)
-    {u w : Fin (finrank K V) → V} (hu : ∀ i, u i ∈ L) (hw : ∀ i, w i ∈ L) :
-    ∃ z : 𝓞 K, algebraMap (𝓞 K) K z = star (b.det u) * gdet h b * b.det w := by
+theorem exists_mixed
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (b : Basis (Fin (finrank K V)) K V)
+    {u w : Fin (finrank K V) → V} (hu : ∀ i, u i ∈ L) (hw : ∀ i, w i ∈ L)
+    : ∃ z : 𝓞 K, algebraMap (𝓞 K) K z = star (b.det u) * gdet h b * b.det w := by
   choose g hg using fun i j => Submodule.mem_one.mp (hLi (u i) (hu i) (w j) (hw j))
   refine ⟨(Matrix.of g).det, ?_⟩
   rw [RingHom.map_det, gdet, ← gram_det_eq h b]
@@ -109,28 +119,35 @@ theorem exists_mixed {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) 
   ext i j
   exact hg i j
 
-theorem update_mem {L : Submodule (𝓞 K) V} {n : ℕ} {x : Fin n → V} {i : Fin n}
-    (hx : ∀ k, k ≠ i → x k ∈ L) {y : V} (hy : y ∈ L) : ∀ k, Function.update x i y k ∈ L := by
+theorem update_mem
+    {L : Submodule (𝓞 K) V} {n : ℕ} {x : Fin n → V} {i : Fin n} (hx : ∀ k, k ≠ i → x k ∈ L)
+    {y : V} (hy : y ∈ L)
+    : ∀ k, Function.update x i y k ∈ L := by
   intro k
   by_cases hk : k = i
   · subst hk; rwa [Function.update_self]
   · rw [Function.update_of_ne hk]; exact hx k hk
 
-theorem algebraMap_conjO (x : 𝓞 K) :
-    algebraMap (𝓞 K) K (conjO K x) = star (algebraMap (𝓞 K) K x) := rfl
+theorem algebraMap_conjO (x : 𝓞 K) : algebraMap (𝓞 K) K (conjO K x) = star (algebraMap (𝓞 K) K x) :=
+  rfl
 
-theorem mem_of_unram (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {I : Ideal (𝓞 K)} {z : 𝓞 K}
-    (hz : ∀ θ : 𝓞 K, (θ - conjO K θ) * z ∈ I) : z ∈ I := by
+theorem mem_of_unram
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    {I : Ideal (𝓞 K)} {z : 𝓞 K} (hz : ∀ θ : 𝓞 K, (θ - conjO K θ) * z ∈ I)
+    : z ∈ I := by
   by_contra hn
-  let J : Ideal (𝓞 K) :=
-    { carrier := {c | c * z ∈ I}
-      add_mem' := fun {a c} ha hc => by
-        change (a + c) * z ∈ I
-        rw [add_mul]; exact I.add_mem ha hc
-      zero_mem' := by change (0 : 𝓞 K) * z ∈ I; rw [zero_mul]; exact I.zero_mem
-      smul_mem' := fun c a ha => by
-        change (c • a) * z ∈ I
-        rw [smul_eq_mul, mul_assoc]; exact I.mul_mem_left c ha }
+  let J : Ideal (𝓞 K) := {
+    carrier := {c | c * z ∈ I}
+    add_mem' := fun {a c} ha hc => by
+      change (a + c) * z ∈ I
+      rw [add_mul]
+      exact I.add_mem ha hc
+    zero_mem' := by change (0 : 𝓞 K) * z ∈ I; rw [zero_mul]; exact I.zero_mem
+    smul_mem' := fun c a ha => by
+      change (c • a) * z ∈ I
+      rw [smul_eq_mul, mul_assoc]
+      exact I.mul_mem_left c ha
+  }
   have hJ : J ≠ ⊤ := by
     intro hJ
     have h1 : (1 : 𝓞 K) ∈ J := hJ ▸ Submodule.mem_top
@@ -141,12 +158,17 @@ theorem mem_of_unram (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {I : I
   obtain ⟨θ, hθ⟩ := exists_sub_conjO_notMem hK hP
   exact hθ (hJP (hz θ))
 
-theorem mixed_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (b : Basis (Fin (finrank K V)) K V)
-    {x : Fin (finrank K V) → V} {i : Fin (finrank K V)} (hx : ∀ k, k ≠ i → x k ∈ L) {y y' : V}
-    (hy : y ∈ L) (hy' : y' ∈ L) {z : 𝓞 K}
-    (hz : algebraMap (𝓞 K) K z = star (b.det (Function.update x i y)) * gdet h b *
-      b.det (Function.update x i y')) : z ∈ discrIdeal h L := by
+theorem mixed_mem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (b : Basis (Fin (finrank K V)) K V)
+    {x : Fin (finrank K V) → V} {i : Fin (finrank K V)} (hx : ∀ k, k ≠ i → x k ∈ L)
+    {y y' : V} (hy : y ∈ L) (hy' : y' ∈ L)
+    {z : 𝓞 K}
+    (hz : algebraMap (𝓞 K) K z
+      = star (b.det (Function.update x i y)) * gdet h b * b.det (Function.update x i y'))
+    : z ∈ discrIdeal h L := by
   have hu := update_mem hx hy
   have hu' := update_mem hx hy'
   obtain ⟨z11, h11⟩ := exists_mixed hLi b hu hu
@@ -156,17 +178,21 @@ theorem mixed_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {h : V �
   have m22 := mem_discrIdeal b hu' h22
   have key : ∀ θ : 𝓞 K, θ * z + conjO K θ * z21 ∈ discrIdeal h L := by
     intro θ
-    have hd : b.det (Function.update x i (y + θ • y')) =
-        b.det (Function.update x i y) + algebraMap (𝓞 K) K θ * b.det (Function.update x i y') := by
+    have hd
+        : b.det (Function.update x i (y + θ • y'))
+          = b.det (Function.update x i y)
+            + algebraMap (𝓞 K) K θ * b.det (Function.update x i y') := by
       rw [← algebraMap_smul K θ y', AlternatingMap.map_update_add, AlternatingMap.map_update_smul,
         smul_eq_mul]
     have hw : z11 + conjO K θ * θ * z22 + θ * z + conjO K θ * z21 ∈ discrIdeal h L := by
       refine mem_discrIdeal b (update_mem hx (L.add_mem hy (L.smul_mem θ hy'))) ?_
       rw [hd]
-      simp only [map_add (f := _), map_mul, h11, h22, h21, hz, algebraMap_conjO, star_add, star_mul']
+      simp only [map_add (f := _), map_mul, h11, h22, h21, hz, algebraMap_conjO, star_add,
+        star_mul']
       ring
-    have he : θ * z + conjO K θ * z21 =
-        (z11 + conjO K θ * θ * z22 + θ * z + conjO K θ * z21) - z11 - conjO K θ * θ * z22 := by
+    have he
+        : θ * z + conjO K θ * z21
+          = (z11 + conjO K θ * θ * z22 + θ * z + conjO K θ * z21) - z11 - conjO K θ * θ * z22 := by
       ring
     rw [he]
     exact Ideal.sub_mem _ (Ideal.sub_mem _ hw m11) (Ideal.mul_mem_left _ _ m22)
@@ -177,11 +203,10 @@ theorem mixed_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {h : V �
   rw [he]
   exact Ideal.sub_mem _ (key θ) (Ideal.mul_mem_left _ _ h1)
 
-
 omit [StarRing K] in
-theorem exists_prim {J : Type*} [Finite J] (a : J → K) {j₀ : J} (ha : a j₀ ≠ 0) {P : Ideal (𝓞 K)}
-    (hP : P ≠ ⊤) :
-    ∃ (t : K) (c : J → 𝓞 K), (∀ j, algebraMap (𝓞 K) K (c j) = t * a j) ∧ ∃ j, c j ∉ P := by
+theorem exists_prim
+    {J : Type*} [Finite J] (a : J → K) {j₀ : J} (ha : a j₀ ≠ 0) {P : Ideal (𝓞 K)} (hP : P ≠ ⊤)
+    : ∃ (t : K) (c : J → 𝓞 K), (∀ j, algebraMap (𝓞 K) K (c j) = t * a j) ∧ ∃ j, c j ∉ P := by
   obtain ⟨N, hN⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 K)) a
   choose e he using hN
   have hN0 : algebraMap (𝓞 K) K (N : 𝓞 K) ≠ 0 := by
@@ -195,8 +220,7 @@ theorem exists_prim {J : Type*} [Finite J] (a : J → K) {j₀ : J} (ha : a j₀
     have := he' j₀
     rw [h0, map_zero] at this
     exact (mul_ne_zero hN0 ha) this.symm
-  have hβK : algebraMap (𝓞 K) K (e j₀) ≠ 0 := by
-    rwa [Ne, FaithfulSMul.algebraMap_eq_zero_iff]
+  have hβK : algebraMap (𝓞 K) K (e j₀) ≠ 0 := by rwa [Ne, FaithfulSMul.algebraMap_eq_zero_iff]
   obtain ⟨C, hC⟩ : Ideal.span (Set.range e) ∣ Ideal.span {e j₀} :=
     Ideal.dvd_iff_le.2 (Ideal.span_le.2 (by
       rintro _ rfl
@@ -224,12 +248,18 @@ theorem exists_prim {J : Type*} [Finite J] (a : J → K) {j₀ : J} (ha : a j₀
     rw [hC, mul_comm γ]
     exact Ideal.mul_mem_mul (Ideal.subset_span ⟨j, rfl⟩) hγ
   choose c hc using fun j => Ideal.mem_span_singleton'.1 (hmem j)
-  refine ⟨algebraMap (𝓞 K) K γ * algebraMap (𝓞 K) K (N : 𝓞 K) / algebraMap (𝓞 K) K (e j₀), c,
-    fun j => ?_, j₁, fun hcP => hj₁ ?_⟩
+  refine ⟨
+    algebraMap (𝓞 K) K γ * algebraMap (𝓞 K) K (N : 𝓞 K) / algebraMap (𝓞 K) K (e j₀),
+    c,
+    fun j => ?_,
+    j₁,
+    fun hcP => hj₁ ?_
+  ⟩
   · have := congrArg (algebraMap (𝓞 K) K) (hc j)
     rw [map_mul, map_mul, he' j] at this
     field_simp
-    rw [this]; ring
+    rw [this]
+    ring
   · rw [← hc j₁]
     exact Ideal.mul_mem_mul hcP (Ideal.mem_span_singleton_self _)
 

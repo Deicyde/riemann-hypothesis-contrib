@@ -81,8 +81,7 @@ local notation "𝒮" => tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E)
 local notation "ιA" => inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
 
 theorem incl_int (b : 𝓞 E) : ιA (algebraMap (𝓞 E) E b) ∈ 𝒮 := by
-  have := Formalism.UG.P.levelaf_tmul_mem (F := F) (E := E) b (one_mem (intAd F))
-  exact this
+  exact Formalism.UG.P.levelaf_tmul_mem (F := F) (E := E) b (one_mem (intAd F))
 
 def globLat (g : GL n 𝒜) (Λ : Submodule (𝓞 E) (n → E)) : Submodule (𝓞 E) (n → E) where
   carrier :=

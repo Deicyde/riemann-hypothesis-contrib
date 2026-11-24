@@ -158,7 +158,6 @@ theorem ker_baseChange
       apply hν
       rw [map_zero, ← hΘα, hQ, map_mul, hP, mul_zero]
     have hJ : α Q ∈ (RingHom.ker ψ).map (map a) := by
-
       rw [Q.as_sum, map_sum]
       refine Ideal.sum_mem _ fun v _ => ?_
       rw [monomial_eq, map_mul, hαC]

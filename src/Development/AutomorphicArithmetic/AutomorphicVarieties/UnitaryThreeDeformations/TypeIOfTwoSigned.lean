@@ -371,7 +371,7 @@ private theorem conjBy_inv_mat_of_eta_eq_one
         * (h : Matrix (Fin 3) (Fin 3) A) := by
   have hr1 : (r g).right = 1 := by rw [hm g, hg]
   show ((((GG.ofGL h⁻¹) * r g * (GG.ofGL h⁻¹)⁻¹).left : GL (Fin 3) A) : Matrix (Fin 3) (Fin 3) A) = _
-  simp [SemidirectProduct.mul_left, hr1, sgnAct_one, GG.mat]
+  simp [SemidirectProduct.mul_left, hr1, GG.mat]
 
 private theorem loc_rel
     [IsDomain A]

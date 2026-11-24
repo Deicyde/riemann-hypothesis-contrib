@@ -58,11 +58,11 @@ namespace ReciprocityTheory.AnForm.R
 
 open MvPolynomial
 
-theorem gs_exists_rows_det_ne_zero {K : Type*} [Field K] {t r : ℕ} (M : Matrix (Fin t) (Fin r) K)
-    (hM : ∀ c : Fin r → K, M.mulVec c = 0 → c = 0) :
-    ∃ a : Fin r → Fin t, (M.submatrix a id).det ≠ 0 := by
+theorem gs_exists_rows_det_ne_zero
+    {K : Type*} [Field K]
+    {t r : ℕ} (M : Matrix (Fin t) (Fin r) K) (hM : ∀ c : Fin r → K, M.mulVec c = 0 → c = 0)
+    : ∃ a : Fin r → Fin t, (M.submatrix a id).det ≠ 0 := by
   classical
-
   have hspan : Submodule.span K (Set.range fun i => M i) = ⊤ := by
     by_contra hne
     obtain ⟨f, hf0, hf⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
@@ -93,10 +93,9 @@ theorem gs_exists_rows_det_ne_zero {K : Type*} [Field K] {t r : ℕ} (M : Matrix
     simpa using h.symm
   let e : Fin r ≃ κ := (Fintype.equivFinOfCardEq hcard).symm
   refine ⟨a ∘ e, ?_⟩
-  have hli2 : LinearIndependent K (Matrix.row (M.submatrix (a ∘ e) id)) :=
-    hli.comp e e.injective
-  rw [Matrix.linearIndependent_rows_iff_isUnit, Matrix.isUnit_iff_isUnit_det,
-    isUnit_iff_ne_zero] at hli2
+  have hli2 : LinearIndependent K (Matrix.row (M.submatrix (a ∘ e) id)) := hli.comp e e.injective
+  rw [Matrix.linearIndependent_rows_iff_isUnit, Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero]
+    at hli2
   exact hli2
 
 end ReciprocityTheory.AnForm.R

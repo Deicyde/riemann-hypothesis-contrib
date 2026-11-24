@@ -252,8 +252,7 @@ theorem prodIrr_swap_adj
   obtain ⟨u, hu⟩ := hu0
   have hq' : ∑ t, (![y j, y i] t).1 = q := by
     rw [← hq]
-    simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
-      <;> omega
+    simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one] <;> omega
   have h₁ : ∑ a, (Fin.append P (Fin.append ![y i, y j] S) a).1 = r + (q + u) := by
     rw [Fin.sum_univ_add, Fin.sum_univ_add]
     simp only [Fin.append_left, Fin.append_right, hr, hq, hu]

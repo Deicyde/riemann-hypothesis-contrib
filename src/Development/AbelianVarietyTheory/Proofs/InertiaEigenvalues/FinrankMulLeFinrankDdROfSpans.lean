@@ -157,7 +157,6 @@ theorem finrank_mul_le_finrank_DdR_of_spans
     intro y _
     obtain ⟨m, b, d, hd, hy⟩ := hs (e.symm y)
     have hy' : y = ∑ i, b i • e (d i) := by
-
       rw [← e.apply_symm_apply y, hy, map_sum]
       simp only [he]
     rw [hy']

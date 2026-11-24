@@ -101,7 +101,7 @@ variable {F E : Type} [Field F] [CommRing E] [Algebra F E]
 theorem sigR_inclE (σ : E →ₐ[F] E) (R : Type) [CommRing R] [Algebra F R] (e : E)
     : PI.UnitaryApproxDefs.sigR σ R (PI.UnitaryApproxDefs.inclE (F := F) R e)
       = PI.UnitaryApproxDefs.inclE (F := F) R (σ e) := by
-  first | rfl | simp [PI.UnitaryApproxDefs.sigR, PI.UnitaryApproxDefs.inclE]
+  first | rfl
 
 end Tensor
 

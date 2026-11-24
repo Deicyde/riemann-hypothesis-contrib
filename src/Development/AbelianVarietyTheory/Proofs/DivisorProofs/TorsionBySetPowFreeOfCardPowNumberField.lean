@@ -150,10 +150,7 @@ theorem exists_span_torsionBySet_maximal
   rw [← this]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← hu i]
-  first
-  | (rw [Submodule.torsionBySet.mk_smul]; rfl)
-  | (rw [Module.IsTorsionBySet.mk_smul]; rfl)
-  | rfl
+  first | (rw [Submodule.torsionBySet.mk_smul]; rfl)
 
 theorem torsionBySet_pow_free_of_natCard
     : ∀ (F : Type) [Field F] [NumberField F] (M : Type) [AddCommGroup M] [Module (𝓞 F) M]

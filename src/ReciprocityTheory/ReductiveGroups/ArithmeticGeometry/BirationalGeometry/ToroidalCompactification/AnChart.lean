@@ -81,7 +81,7 @@ theorem hasFDerivAt_eval {I : Type} [Fintype I] [DecidableEq I] (p : MvPolynomia
         (ContinuousLinearMap.ext fun v => ?_)).congr_of_eventuallyEq
       (Filter.Eventually.of_forall fun y => by simp)
     simp [pderiv_X, Pi.single_apply, mul_add, Finset.sum_add_distrib, Finset.mul_sum, mul_comm,
-      mul_left_comm, apply_ite, add_comm]
+      mul_left_comm, apply_ite]
 
 theorem anChart_alg
     {k A : Type} [Field k] [CommRing A] [Algebra k A]

@@ -70,10 +70,7 @@ open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.AnyAppellHumbert
 
-theorem hermForm_swap {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (h : Hm.IsHermitian) (z w : Fin g → ℂ)
-    : hermForm Hm w z = star (hermForm Hm z w) := by
-  unfold hermForm
-  rw [← Matrix.star_dotProduct_star, Matrix.star_mulVec, star_star, h.eq, Matrix.dotProduct_mulVec]
+alias hermForm_swap := _root_.GlobalTheory.AppellHumbertTrivial.hermForm_swap
 
 theorem semicharacter_add
     {A : Over (Sp ℂ)} [GrpObj A]

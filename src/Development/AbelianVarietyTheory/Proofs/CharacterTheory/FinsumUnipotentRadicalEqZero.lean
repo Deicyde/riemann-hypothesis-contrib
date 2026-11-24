@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.InvariantSubspaceMobiusInverseRecEqOfFinrankLt
-public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.ExistsStandardUnipotentRadicalBijOnNilradicalStatement
+public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.ExistsStandardUnipotentRadicalBijOnNilradical
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -60,7 +60,7 @@ theorem IsPrimitive.finsum_unipotentRadical_eq_zero
         φ (Matrix.toLin' (u : Matrix (Fin d) (Fin d) F))
       = 0 := by
   obtain ⟨A, H, hA, hH, hbij⟩ :=
-    GlobalTheory.T.exists_standardUnipotentRadical_bijOn_nilradical F d a had.le
+    _root_.GlobalTheory.CuspGL.UnipNilRad.exists_unip_bijOn_nilRad F d a had.le
   have hbot : A ≠ ⊥ := by
     rintro rfl
     rw [finrank_bot] at hA

@@ -55,8 +55,6 @@ open GlobalTheory.Mem.R3.LiftBrg
 
 noncomputable section
 
-
-
 namespace GlobalTheory.Mem.R3.LiftBrg.FrameEquiv
 
 theorem castGL_castGL_symm {R : Type} [CommRing R] {m n : ℕ} (h : m = n) (x : GL (Fin n) R)

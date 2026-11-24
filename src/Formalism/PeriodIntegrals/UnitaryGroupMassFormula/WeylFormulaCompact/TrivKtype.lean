@@ -49,8 +49,8 @@ noncomputable section
 
 namespace PI.WeylForKInhab
 
-theorem diag_mem {N : ℕ} (ε : Fin N → Bool) (θ : Fin N → ℝ) :
-    Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Kset ε := by
+theorem diag_mem {N : ℕ} (ε : Fin N → Bool) (θ : Fin N → ℝ)
+    : Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Kset ε := by
   apply GlobalTheory.DiscreteSeriesTest.torus_mem <;> assumption
 
 end PI.WeylForKInhab

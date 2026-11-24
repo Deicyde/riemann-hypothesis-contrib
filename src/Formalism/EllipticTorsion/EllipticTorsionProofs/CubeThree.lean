@@ -433,7 +433,6 @@ namespace Formalism.ELL
 
 open CubeThreeAlt WeierstrassChordSeries
 
-
 theorem chordDeterminantFactor_holds : CubeThree.{u} := by
   intro K _ W w F hw hF0 hch
   have hU := wSeriesSubstUnique_holds.{u}

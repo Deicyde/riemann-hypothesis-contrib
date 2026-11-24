@@ -62,7 +62,6 @@ theorem continuous_cA : Continuous (cA D) := IsModuleTopology.continuous_of_line
 theorem continuous_trace : Continuous (Algebra.trace (AF D.host.F) (AE D)) :=
   IsModuleTopology.continuous_of_linearMap (Algebra.trace (AF D.host.F) (AE D))
 
-
 theorem continuous_hO : Continuous fun p : WO S T × WO S T => hO S T p.1 p.2 := by
   have hc := continuous_cA (D := D)
   unfold hO

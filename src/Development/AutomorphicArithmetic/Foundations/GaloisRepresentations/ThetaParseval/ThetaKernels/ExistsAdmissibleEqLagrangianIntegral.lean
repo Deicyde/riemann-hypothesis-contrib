@@ -50,8 +50,6 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramHspOf
 
 @[expose] public section
 
-
-
 section
 open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes

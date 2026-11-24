@@ -82,7 +82,7 @@ private theorem kos_Z_mono_of_le
     : (kos act M r).Z m ≤ (kos act M' r).Z m := by
   intro c hc
   simp only [GlobalTheory.PD.Cx.Z, kos, acx, Submodule.mem_inf, Submodule.mem_pi, Set.mem_univ,
-      forall_const, true_implies, LinearMap.mem_ker]
+      forall_const, LinearMap.mem_ker]
     at hc ⊢
   refine ⟨fun s => ?_, hc.2⟩
   have hs := hc.1 s

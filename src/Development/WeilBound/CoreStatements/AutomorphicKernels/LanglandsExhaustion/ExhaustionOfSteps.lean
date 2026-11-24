@@ -51,15 +51,22 @@ import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.Zelevin
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc
 
 namespace PositivityTheory.Exh
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem move_left (hM : MidP k) (hR : RefineP k) (hS : SwapP k) (hJ : JuxtP k) (hL : LinkP k) (x ρ : IrrGL (k := k)) :
-    ∀ (A : List (IrrGL (k := k))), (∀ a ∈ A, a.IsCusp ∧ ρ ≠ a.nu 1) → ∀ (Δ : Segment k) (b : IrrGL (k := k)) (B : List (IrrGL (k := k))), Δ.first = ρ →
-      IsLSeg Δ b.rep → EmbL x (A ++ [b] ++ B) → ∃ (Γ : Segment k) (c y : IrrGL (k := k)), Γ.first = ρ ∧ IsLSeg Γ c.rep ∧ EmbL x [c, y] := by
+theorem move_left
+    (hM : MidP k) (hR : RefineP k) (hS : SwapP k) (hJ : JuxtP k) (hL : LinkP k)
+    (x ρ : IrrGL (k := k))
+    : ∀ (A : List (IrrGL (k := k))),
+      (∀ a ∈ A, a.IsCusp ∧ ρ ≠ a.nu 1)
+        → ∀ (Δ : Segment k) (b : IrrGL (k := k)) (B : List (IrrGL (k := k))),
+          Δ.first = ρ → IsLSeg Δ b.rep → EmbL x (A ++ [b] ++ B)
+            → ∃ (Γ : Segment k) (c y : IrrGL (k := k)),
+              Γ.first = ρ ∧ IsLSeg Γ c.rep ∧ EmbL x [c, y] := by
   intro A
   induction A using List.reverseRecOn with
   | nil =>
@@ -89,9 +96,11 @@ theorem move_left (hM : MidP k) (hR : RefineP k) (hS : SwapP k) (hJ : JuxtP k) (
       exact ih hA' Δ b ([a] ++ B) hΔ hb (by simpa using h3)
 
 theorem exhaustion_of_steps
-    (H : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k],
-      MidP k ∧ RefineP k ∧ SwapP k ∧ CuspEmbP k ∧ SuppP k ∧ JuxtP k ∧ LinkP k ∧ MinP k ∧ PeelGoodP k) :
-    GlobalTheory.Published.LanglandsExhaustionGL := by
+    (H : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [CharZero k],
+      MidP k ∧ RefineP k ∧ SwapP k ∧ CuspEmbP k ∧ SuppP k ∧ JuxtP k ∧ LinkP k ∧ MinP k
+        ∧ PeelGoodP k)
+    : GlobalTheory.Published.LanglandsExhaustionGL := by
   apply CompanionTheory.Exh.exhaustion_of_steps <;> assumption
 
 end PositivityTheory.Exh

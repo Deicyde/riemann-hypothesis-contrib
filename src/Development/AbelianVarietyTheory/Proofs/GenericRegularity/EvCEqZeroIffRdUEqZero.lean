@@ -3,9 +3,10 @@ module
 public import Formalism.LocalToGlobal.ProjectiveLattices.PetersonNormSubspace
 public import Development.AbelianVarietyTheory.Definitions.RegularCharts.ModelAt
 public import Formalism.LocalToGlobal.ProjectiveLattices.IsGenFrGenFr
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.EvaluationLawsGenericFramesAtlasHoldStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsGenericComponentPointsOffMeagreStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIdempotentWeightZeroSectionOfComponentStatement
+public import Development.AbelianVarietyTheory.Definitions.RegularCharts.Reframe
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.EvaluationLawsGenericFramesAtlasHold
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsGenericComponentPointsOffMeagre
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIdempotentWeightZeroSectionOfComponent
 import Development.AbelianVarietyTheory.Proofs.GenericRegularity.SectionEqZeroOfGenericFramedPointValues
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -119,10 +120,10 @@ theorem GlobalTheory.evC_eq_zero_iff_rdU_eq_zero
               Dom u n
                 → ∀ f ∈ sec Xo c u n, evC h Z f = 0 ↔ ∀ x ∈ (U.X k).dom, rdU U f k x = 0) := by
   intro E _ _ _ H Dw l Xo c σ r U hσ hU h k Z x₀ ⟨φ, y', t, hm, hb⟩ u n hd f hf
-  obtain ⟨hL, -, -, hA⟩ := GlobalTheory.T.evaluation_laws_generic_frames_atlas_hold E H Dw l Xo c
+  obtain ⟨hL, -, -, hA⟩ := _root_.GlobalTheory.Reg.evLaws_genFr_atlas E H Dw l Xo c
   refine ⟨fun h0 => ?_, fun h0 => (rdU_eq_zero_iff hL U h k Z x₀ φ y' t hm hb hf).1 (h0 _ x₀.2)⟩
   obtain ⟨Z', S, hS, hg⟩ :=
-    GlobalTheory.T.exists_genericComponentPoints_off_meagre E H Dw l Xo c σ r U hσ hU h k
+    _root_.GlobalTheory.GenericFrames.exists_comp_generic_off_meagre E H Dw l Xo c σ r U hσ hU h k
   have hO : IsOpen (U.X k).dom := FourierCoefficientDomain.isOpen_dom _
   have key
       : ∀ (a : (E →+* ℂ) × ℕ → ℕ) (m : ℕ),
@@ -135,7 +136,7 @@ theorem GlobalTheory.evC_eq_zero_iff_rdU_eq_zero
   have hZ : Z' = Z := by
     by_contra hne
     obtain ⟨χ, hχ, -, h1, hz⟩ :=
-      GlobalTheory.T.exists_idempotent_weightZero_section_of_component E H Dw l Xo c hL h (hA h) Z
+      _root_.GlobalTheory.Reg.exists_idem_section E H Dw l Xo c hL h (hA h) Z
     have hD : Dom (E := E) 0 0 := ⟨fun τ _ _ _ => le_rfl, Even.zero⟩
     have := (rdU_eq_zero_iff hL U h k Z x₀ φ y' t hm hb hχ).1 (key 0 0 hD χ hχ (hz Z' hne) _ x₀.2)
     rw [h1] at this

@@ -141,7 +141,6 @@ private theorem desc
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
   set x := ∑ p ∈ S, p.1 ⊗ₜ[ℚ_[l]] p.2 with hxd
   have hix : LinearMap.rTensor (Loc.Bcr l) i (LinearMap.rTensor (Loc.Bcr l) f x) = x := by
-
     rw [hxd, map_sum, map_sum]
     refine Finset.sum_congr rfl fun p hp => ?_
     rw [LinearMap.rTensor_tmul, LinearMap.rTensor_tmul]
@@ -491,9 +490,9 @@ theorem UpperTheory.V.U3.bloch_kato_nonpositive_weight
             : (D.ΨQ g : PadicAlgCl l)
               = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ e * ψQ g := by
           simp [Dat.ΨQ, Dat.Ψ, Chr.Psi, chiO, ψQ]
-        simp only [MonoidHom.mul_apply, MonoidHom.zpow_apply, MonoidHom.pow_apply,
-          MonoidHom.inv_apply, Units.val_mul, _root_.zpow_neg, zpow_natCast,
-          Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, pow_mul]
+        simp only [MonoidHom.mul_apply, MonoidHom.pow_apply, MonoidHom.inv_apply, Units.val_mul,
+          _root_.zpow_neg, zpow_natCast, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val,
+          pow_mul]
         have h2 := (D.ΨQ g).ne_zero
         have h3 := (θ g).ne_zero
         field_simp

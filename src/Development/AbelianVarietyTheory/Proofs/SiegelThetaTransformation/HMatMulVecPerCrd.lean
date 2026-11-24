@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsSystem
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.DifferentiableOnDetHMat
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HeisenbergOperatorRationalPointLawsStatement
+public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IMemSiegel
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HeisenbergOperatorRationalPointLaws
 import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExistsIntMulIntegral
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -50,17 +51,19 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open scoped ComplexConjugate ComplexOrder Real Classical
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (omegaStd)
 
 namespace GlobalTheory.SW
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r g : ℕ} (X : Data E r)
-  (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r g : ℕ} (X : Data E r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
 
-theorem vecQ_add (m m' : Fin g ⊕ Fin g → ℚ) :
-    vecQ X bas (m + m') = vecQ X bas m + vecQ X bas m' := by
+theorem vecQ_add (m m' : Fin g ⊕ Fin g → ℚ)
+    : vecQ X bas (m + m') = vecQ X bas m + vecQ X bas m' := by
   simp only [vecQ, Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
 theorem vecQ_smul (q : ℚ) (m : Fin g ⊕ Fin g → ℚ) : vecQ X bas (q • m) = q • vecQ X bas m := by
@@ -68,10 +71,9 @@ theorem vecQ_smul (q : ℚ) (m : Fin g ⊕ Fin g → ℚ) : vecQ X bas (q • m)
 
 theorem vecQ_zero : vecQ X bas 0 = 0 := by simp [vecQ]
 
-theorem vecQ_intCast (m : Fin g ⊕ Fin g → ℤ) :
-    vecQ X bas (fun j => (m j : ℚ)) = (bas m : Fin r → E) := by
-  have hm : m = ∑ j, m j • Pi.single j (1 : ℤ) := by
-    funext j; simp [Pi.single_apply]
+theorem vecQ_intCast (m : Fin g ⊕ Fin g → ℤ)
+    : vecQ X bas (fun j => (m j : ℚ)) = (bas m : Fin r → E) := by
+  have hm : m = ∑ j, m j • Pi.single j (1 : ℤ) := by funext j; simp [Pi.single_apply]
 
   conv_rhs => rw [hm, map_sum, AddSubmonoidClass.coe_finsetSum]
   simp only [vecQ, map_zsmul, AddSubgroupClass.coe_zsmul, Int.cast_smul_eq_zsmul]
@@ -90,24 +92,26 @@ theorem vecQ_crd (v : Fin r → E) : vecQ X bas (crd X bas v) = v :=
 noncomputable def EFBil : (Fin r → E) →ₗ[ℚ] (Fin r → E) →ₗ[ℚ] ℚ :=
   LinearMap.mk₂ ℚ (EF X)
     (fun u u' v => by
-      simp only [EF_def, ← map_add (f := _), herm, Pi.add_apply, add_mul, Finset.sum_add_distrib, mul_add])
+      simp only [EF_def, ← map_add (f := _), herm, Pi.add_apply, add_mul, Finset.sum_add_distrib,
+        mul_add])
     (fun q u v => by
       simp only [EF_def, ← map_smul, herm, Pi.smul_apply, smul_mul_assoc, ← Finset.smul_sum,
         mul_smul_comm])
     (fun u v v' => by
       simp only [EF_def, herm, cc, Pi.add_apply, map_add (f := _), Finset.sum_add_distrib, mul_add])
     (fun q u v => by
-      simp only [EF_def, herm, cc, Pi.smul_apply, map_rat_smul, ← Finset.smul_sum,
-        mul_smul_comm])
+      simp only [EF_def, herm, cc, Pi.smul_apply, map_rat_smul, ← Finset.smul_sum, mul_smul_comm])
 
 variable {X bas}
 
-theorem EF_vecQ (hs : IsSympl X bas) (m m' : Fin g ⊕ Fin g → ℚ) :
-    EF X (vecQ X bas m) (vecQ X bas m') =
-      -∑ i, (m (Sum.inl i) * m' (Sum.inr i) - m (Sum.inr i) * m' (Sum.inl i)) := by
+theorem EF_vecQ (hs : IsSympl X bas) (m m' : Fin g ⊕ Fin g → ℚ)
+    : EF X (vecQ X bas m) (vecQ X bas m')
+      = - ∑ i, (m (Sum.inl i) * m' (Sum.inr i) - m (Sum.inr i) * m' (Sum.inl i)) := by
   change EFBil X _ _ = _
-  have h (j k) : EFBil X (bas (Pi.single j 1)) (bas (Pi.single k 1)) =
-      -(omegaStd (Pi.single j 1) (Pi.single k 1) : ℤ) := hs _ _
+  have h (j k)
+      : EFBil X (bas (Pi.single j 1)) (bas (Pi.single k 1))
+        = -(omegaStd (Pi.single j 1) (Pi.single k 1) : ℤ) :=
+    hs _ _
 
   simp only [vecQ, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, h]
   simp [Fintype.sum_sum_type, omegaStd, Pi.single_apply, Finset.sum_sub_distrib, mul_comm]
@@ -124,43 +128,47 @@ theorem vecQ_injective (hs : IsSympl X bas) : Function.Injective (vecQ X bas) :=
 theorem crd_vecQ (hs : IsSympl X bas) (m : Fin g ⊕ Fin g → ℚ) : crd X bas (vecQ X bas m) = m :=
   Function.leftInverse_invFun (vecQ_injective hs) m
 
-theorem crd_add (hs : IsSympl X bas) (u v : Fin r → E) :
-    crd X bas (u + v) = crd X bas u + crd X bas v :=
+theorem crd_add (hs : IsSympl X bas) (u v : Fin r → E)
+    : crd X bas (u + v) = crd X bas u + crd X bas v :=
   vecQ_injective hs (by rw [vecQ_add, vecQ_crd, vecQ_crd, vecQ_crd])
 
-theorem crd_smul (hs : IsSympl X bas) (q : ℚ) (v : Fin r → E) :
-    crd X bas (q • v) = q • crd X bas v :=
+theorem crd_smul (hs : IsSympl X bas) (q : ℚ) (v : Fin r → E)
+    : crd X bas (q • v) = q • crd X bas v :=
   vecQ_injective hs (by rw [vecQ_smul, vecQ_crd, vecQ_crd])
 
 theorem crd_zero (hs : IsSympl X bas) : crd X bas 0 = 0 :=
   vecQ_injective hs (by rw [vecQ_crd, vecQ_zero])
 
-theorem EF_crd (hs : IsSympl X bas) (u v : Fin r → E) :
-    EF X u v = -∑ i, (crd X bas u (Sum.inl i) * crd X bas v (Sum.inr i) -
-      crd X bas u (Sum.inr i) * crd X bas v (Sum.inl i)) := by
+theorem EF_crd (hs : IsSympl X bas) (u v : Fin r → E)
+    : EF X u v
+      = - ∑ i, (crd X bas u (Sum.inl i) * crd X bas v (Sum.inr i) -
+        crd X bas u (Sum.inr i) * crd X bas v (Sum.inl i)) := by
   rw [← EF_vecQ hs, vecQ_crd, vecQ_crd]
 
-theorem hMat_mulVec_per_crd (hs : IsSympl X bas) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
-    (v : Fin r → E) :
-    hMat X bas idx x *ᵥ (per X x v ∘ idx) = qv (fun i => crd X bas v (Sum.inl i)) +
-      tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i) := by
-  have h : per X x v ∘ idx =
-      perMat X bas idx Sum.inl x *ᵥ qv (fun i => crd X bas v (Sum.inl i)) +
-      perMat X bas idx Sum.inr x *ᵥ qv fun i => crd X bas v (Sum.inr i) := by
+theorem hMat_mulVec_per_crd (hs : IsSympl X bas) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (v : Fin r → E)
+    : hMat X bas idx x *ᵥ (per X x v ∘ idx)
+      = qv (fun i => crd X bas v (Sum.inl i))
+        + tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i) := by
+  have h
+      : per X x v ∘ idx
+        = perMat X bas idx Sum.inl x *ᵥ qv (fun i => crd X bas v (Sum.inl i))
+          + perMat X bas idx Sum.inr x *ᵥ qv fun i => crd X bas v (Sum.inr i) := by
     funext i
     conv_lhs => rw [← vecQ_crd X bas v, vecQ, per_sum]
     simp only [per_ratSmul, Fintype.sum_sum_type]
     simp [mulVec, dotProduct, mul_comm, qv, Rat.smul_def]
   rw [h, mulVec_add, mulVec_mulVec, mulVec_mulVec, tauMat, hMat_mul_perMat idx hs hx, one_mulVec]
 
-theorem heis_exponent {ι : Type} [Fintype ι] [DecidableEq ι] (τ W : Matrix ι ι ℂ)
-    (hτ : τ.IsSymm) (hW : W.IsSymm) (hY : W * τ.map (fun z => (z.im : ℂ)) = 1) (a b : ι → ℚ)
-    (u : ι → ℂ) :
-    π / 2 * (u ⬝ᵥ W *ᵥ u) + π * I * (qv b ⬝ᵥ τ *ᵥ qv b + 2 * (qv b ⬝ᵥ u) + qv a ⬝ᵥ qv b) =
-      -(π * ((u + (1 / 2 : ℂ) • (qv a + τ *ᵥ qv b)) ⬝ᵥ W *ᵥ star (qv a + τ *ᵥ qv b))) +
-        π / 2 * ((u + (qv a + τ *ᵥ qv b)) ⬝ᵥ W *ᵥ (u + (qv a + τ *ᵥ qv b))) := by
-  have h1 : star (qv a + τ *ᵥ qv b) =
-      (qv a + τ *ᵥ qv b) - (2 * I) • (τ.map (fun z => (z.im : ℂ)) *ᵥ qv b) := by
+theorem heis_exponent
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (τ W : Matrix ι ι ℂ) (hτ : τ.IsSymm) (hW : W.IsSymm) (hY : W * τ.map (fun z => (z.im : ℂ)) = 1)
+    (a b : ι → ℚ) (u : ι → ℂ)
+    : π / 2 * (u ⬝ᵥ W *ᵥ u) + π * I * (qv b ⬝ᵥ τ *ᵥ qv b + 2 * (qv b ⬝ᵥ u) + qv a ⬝ᵥ qv b)
+      = -(π * ((u + (1 / 2 : ℂ) • (qv a + τ *ᵥ qv b)) ⬝ᵥ W *ᵥ star (qv a + τ *ᵥ qv b)))
+        + π / 2 * ((u + (qv a + τ *ᵥ qv b)) ⬝ᵥ W *ᵥ (u + (qv a + τ *ᵥ qv b))) := by
+  have h1
+      : star (qv a + τ *ᵥ qv b)
+        = (qv a + τ *ᵥ qv b) - (2 * I) • (τ.map (fun z => (z.im : ℂ)) *ᵥ qv b) := by
     funext i
     simp only [Pi.star_apply, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, mulVec, dotProduct, qv,
       star_add, star_sum, star_mul', RCLike.star_def, map_ratCast, map_apply, smul_eq_mul,
@@ -180,15 +188,34 @@ theorem heis_exponent {ι : Type} [Fintype ι] [DecidableEq ι] (τ W : Matrix �
     dotProduct_smul, smul_eq_mul, h3, dotProduct_comm u (qv b), dotProduct_comm w (qv b), h2]
   ring
 
-theorem heisG_laws : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → (∀ v, vecQ X bas (crd X bas v) = v) ∧ (∀ u v, crd X bas (u + v) = crd X bas u + crd X bas v) ∧ (∀ u v, EF X u v = -∑ i, (crd X bas u (Sum.inl i) * crd X bas v (Sum.inr i) - crd X bas u (Sum.inr i) * crd X bas v (Sum.inl i))) ∧ ∀ (y : Matrix (Fin n) (Fin r) E) (φ : TF n g), IsSB φ → IsSB (heisG X bas y φ) ∧ heisG X bas 0 φ = φ ∧ (∀ y', heisG X bas y (heisG X bas y' φ) = cexp (-(π * I * ((∑ k, EF X (y k) (y' k) : ℚ) : ℂ))) • heisG X bas (y + y') φ) ∧ (∀ ψ, IsSB ψ → ip (heisG X bas y φ) (heisG X bas y ψ) = ip φ ψ) ∧ ∀ x ∈ X.dom, ∀ z : Fin n → Fin g → ℂ, thA X bas idx (heisG X bas y φ) x z = cexp (-(π * ∑ k, (hMat X bas idx x *ᵥ (z k + (1 / 2 : ℂ) • (per X x (y k) ∘ idx))) ⬝ᵥ imInv X bas idx x *ᵥ star (hMat X bas idx x *ᵥ (per X x (y k) ∘ idx)))) * thA X bas idx φ x (fun k => z k + per X x (y k) ∘ idx) := by
+theorem heisG_laws
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ)
+        (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ),
+      IsSympl X bas → Even n
+        → (∀ v, vecQ X bas (crd X bas v) = v)
+          ∧ (∀ u v, crd X bas (u + v) = crd X bas u + crd X bas v)
+          ∧ (∀ u v,
+            EF X u v
+              = - ∑ i, (crd X bas u (Sum.inl i) * crd X bas v (Sum.inr i) - crd X bas u (Sum.inr i) * crd X bas v (Sum.inl i)))
+          ∧ ∀ (y : Matrix (Fin n) (Fin r) E) (φ : TF n g),
+            IsSB φ
+              → IsSB (heisG X bas y φ) ∧ heisG X bas 0 φ = φ
+                ∧ (∀ y',
+                  heisG X bas y (heisG X bas y' φ)
+                    = cexp (-(π * I * ((∑ k, EF X (y k) (y' k) : ℚ) : ℂ))) • heisG X bas (y + y') φ)
+                ∧ (∀ ψ, IsSB ψ → ip (heisG X bas y φ) (heisG X bas y ψ) = ip φ ψ)
+                ∧ ∀ x ∈ X.dom, ∀ z : Fin n → Fin g → ℂ,
+                  thA X bas idx (heisG X bas y φ) x z
+                    = cexp (-(π
+                        * ∑ k, (hMat X bas idx x *ᵥ (z k + (1 / 2 : ℂ) • (per X x (y k) ∘ idx))) ⬝ᵥ imInv X bas idx x *ᵥ star (hMat X bas idx x *ᵥ (per X x (y k) ∘ idx))))
+                      * thA X bas idx φ x (fun k => z k + per X x (y k) ∘ idx) := by
   intro E _ _ _ r X g bas idx n hs _
   refine ⟨vecQ_crd X bas, crd_add hs, EF_crd hs, fun y φ hφ => ?_⟩
-  obtain ⟨h1, h2, h3, h4, h5⟩ := GlobalTheory.T.heisenbergOperatorRationalPoint_laws _ _
-    (Matrix.of fun k i => crd X bas (y k) (Sum.inl i))
-    (Matrix.of fun k i => crd X bas (y k) (Sum.inr i)) φ hφ
+  obtain ⟨h1, h2, h3, h4, h5⟩ :=
+    _root_.GlobalTheory.SW.heisS_laws _ _ (Matrix.of fun k i => crd X bas (y k) (Sum.inl i))
+      (Matrix.of fun k i => crd X bas (y k) (Sum.inr i)) φ hφ
   refine ⟨h1, ?_, fun y' => ?_, h5, fun x hx z => ?_⟩
-  · simp only [heisG, Matrix.zero_apply, crd_zero hs, show ∀ k, (0 : Matrix (Fin n) (Fin r) E) k = 0
-      from fun _ => rfl]
+  · simp only [heisG, crd_zero hs, show ∀ k, (0 : Matrix (Fin n) (Fin r) E) k = 0 from fun _ => rfl]
     exact h4
   · rw [heisG, heisG, h3, heisG]
     congr 2
@@ -201,24 +228,34 @@ theorem heisG_laws : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r :
       exact (congrFun (crd_add hs (y k) (y' k)) _).symm
     · ext k i
       exact (congrFun (crd_add hs (y k) (y' k)) _).symm
-  · have hz (w v) : hMat X bas idx x *ᵥ (w + per X x v ∘ idx) = hMat X bas idx x *ᵥ w +
-        (qv (fun i => crd X bas v (Sum.inl i)) +
-          tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i)) := by
+  · have hz (w v)
+        : hMat X bas idx x *ᵥ (w + per X x v ∘ idx)
+          = hMat X bas idx x *ᵥ w
+            + (qv (fun i => crd X bas v (Sum.inl i))
+              + tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i)) := by
       rw [mulVec_add, hMat_mulVec_per_crd idx hs hx]
-    have hz' (w v) : hMat X bas idx x *ᵥ (w + (1 / 2 : ℂ) • (per X x v ∘ idx)) =
-        hMat X bas idx x *ᵥ w + (1 / 2 : ℂ) • (qv (fun i => crd X bas v (Sum.inl i)) +
-          tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i)) := by
+    have hz' (w v)
+        : hMat X bas idx x *ᵥ (w + (1 / 2 : ℂ) • (per X x v ∘ idx))
+          = hMat X bas idx x *ᵥ w
+            + (1 / 2 : ℂ)
+              • (qv (fun i => crd X bas v (Sum.inl i))
+                + tauMat X bas idx x *ᵥ qv fun i => crd X bas v (Sum.inr i)) := by
       rw [mulVec_add, mulVec_smul, hMat_mulVec_per_crd idx hs hx]
     rw [thA, thA, heisG, h2 _ ⟨tauMat_isSymm idx hs hx, tauMat_im_posDef idx hs hx⟩]
     change Fin n → Fin r → E at y
     simp only [hz, hz', hMat_mulVec_per_crd idx hs hx]
-    have he := Finset.sum_congr (s₁ := Finset.univ) rfl fun (k : Fin n) _ =>
-      heis_exponent _ _ (tauMat_isSymm idx hs hx) (imInv_isSymm idx hs hx) (imInv_mul_im idx hs hx)
-        (fun i => crd X bas (y k) (Sum.inl i)) (fun i => crd X bas (y k) (Sum.inr i))
-        (hMat X bas idx x *ᵥ z k)
+    have he :=
+      Finset.sum_congr (s₁ := Finset.univ) rfl fun (k : Fin n) _ =>
+        heis_exponent _ _ (tauMat_isSymm idx hs hx) (imInv_isSymm idx hs hx)
+          (imInv_mul_im idx hs hx)
+          (fun i => crd X bas (y k) (Sum.inl i))
+          (fun i => crd X bas (y k) (Sum.inr i))
+          (hMat X bas idx x *ᵥ z k)
     rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, Finset.sum_add_distrib,
-      Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib, Finset.sum_add_distrib (f := fun k => -_),
-      Finset.sum_neg_distrib, ← Finset.mul_sum, ← Finset.mul_sum] at he
+        Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib,
+        Finset.sum_add_distrib (f := fun k => -_), Finset.sum_neg_distrib, ← Finset.mul_sum,
+        ← Finset.mul_sum]
+      at he
     have he' := congrArg cexp he
     rw [Complex.exp_add, Complex.exp_add] at he'
     simp only [← add_assoc (hMat X bas idx x *ᵥ z _)] at he' ⊢

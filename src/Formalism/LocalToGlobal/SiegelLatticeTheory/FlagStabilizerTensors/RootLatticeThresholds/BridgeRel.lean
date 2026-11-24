@@ -140,7 +140,7 @@ theorem psiR_Q
   apply Complex.ext
     <;> simp [Complex.mul_re, Complex.mul_im, Formalism.QuantumDeterminants.cStd, Complex.div_re,
       Complex.div_im]
-    <;> field_simp <;> ring
+    <;> field_simp
 
 theorem psiR_conj
     {H Hi g : Matrix (Fin n) (Fin n) ℂ}

@@ -80,7 +80,4 @@ theorem _root_.GlobalTheory.T.exists_ne_zero_primitiveFrameDatum_renumber
           ∧ ∀ (ϖ : kˣ) (n : ℕ) (Λ : Submodule 𝒪[k] (C → k)) (Ψ : Matrix A' C k → ℂ)
               (X : Matrix A C k),
             phiA μ σ' ν ϖ n Λ Ψ X = u * phiA μ σ ν ϖ n Λ Ψ X := by
-  first
-  | exact @GlobalTheory.ColumnRenumber.phiA_renumber
-  | exact GlobalTheory.ColumnRenumber.phiA_renumber
-  | (intros; apply GlobalTheory.ColumnRenumber.phiA_renumber <;> assumption)
+  first | exact @GlobalTheory.ColumnRenumber.phiA_renumber

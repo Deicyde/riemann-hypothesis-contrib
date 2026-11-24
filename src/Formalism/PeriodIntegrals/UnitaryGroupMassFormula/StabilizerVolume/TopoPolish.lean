@@ -54,8 +54,9 @@ namespace PI.VolStabS.TopoPolish
 
 open Topology TopologicalSpace Set
 
-theorem polish_of_lcsc (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y]
-    [SecondCountableTopology Y] : PolishSpace Y := by
+theorem polish_of_lcsc
+    (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y] [SecondCountableTopology Y]
+    : PolishSpace Y := by
   apply PI.AprimeInfA.polish_of_lcsc <;> assumption
 
 end PI.VolStabS.TopoPolish

@@ -178,7 +178,6 @@ theorem frame_fin
     congr 1
     simp
   | cast i =>
-
     rw [hfe, hnLe, map_sum, Fin.sum_univ_castSucc, hfz, (hB _ _).1 (Fin.castSucc_lt_last i)]
     simp only [map_smul, hnHe, hfe]
     simp

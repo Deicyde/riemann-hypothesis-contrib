@@ -118,10 +118,7 @@ theorem _root_.GlobalTheory.Mass.GenusOrb.main
   have htr : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x) :=
     _root_.GlobalTheory.Mass.GenusOrb.trace_pos_of_PD h hp
   have hmass := by
-    first
-    | exact _root_.Formalism.HermitianLatticesTheory.final_massBasic K V h hsymm htr L hL
-    | exact _root_.Formalism.HermitianLatticesTheory.final_massBasic K V h hsymm htr L
-        hL.toIsLattice
+    first | exact _root_.Formalism.HermitianLatticesTheory.final_massBasic K V h hsymm htr L hL
   obtain ⟨hmass_ex, hmass_eq, hmass_pos⟩ := hmass
   have hgen
       : ∀ g ∈ _root_.Formalism.HermitianLatticesTheory.isom h,

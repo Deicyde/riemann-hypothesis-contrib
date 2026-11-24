@@ -383,8 +383,8 @@ theorem ChartSectionNotMem.proof : ChartSectionNotMem.Statement := by
   obtain ⟨W, hW, hWθ⟩ :=
     Ideal.exists_minimalPrimes_le (sup_le hQθ ((Ideal.span_singleton_le_iff_mem _).2 hsθ))
   have hpit :=
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.dimPIT ℂ (Σ k, ι k) Q W _ hQ.1.1
-      (hsQ Q hQ) hW
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensionPrincipalIdeal.dimPIT'
+      ℂ (Σ k, ι k) Q W _ hQ.1.1 (hsQ Q hQ) hW
   rw [hdim Q hQ] at hpit
   have hle
       : ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ RingHom.ker (coneMap (K := K) 𝔮))

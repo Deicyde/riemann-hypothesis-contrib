@@ -114,8 +114,8 @@ theorem le_lintegral_bump
   rw [← lintegral_indicator_one hKm]
   refine lintegral_mono fun v => ?_
   by_cases hv : v ∈ K
-  · simp [Set.indicator_apply, hv, h1 v hv]
-  · simp [Set.indicator_apply, hv]
+  · simp [hv, h1 v hv]
+  · simp [hv]
 
 theorem lintegral_bump_le
     (m : Measure V)
@@ -129,7 +129,7 @@ theorem lintegral_bump_le
   · have hz : φ v = 0 := by
       by_contra hne
       exact hv (hs (subset_tsupport φ hne))
-    simp [Set.indicator_apply, hv, hz]
+    simp [hv, hz]
 
 variable [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
 

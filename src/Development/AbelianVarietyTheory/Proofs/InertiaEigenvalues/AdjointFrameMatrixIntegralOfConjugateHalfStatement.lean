@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.adjointFrameMatrix_integral_of_conjugate_half
             → ∀ u : WO S T,
               u ∈ latO S T ΛS ΛT (fun _ => True) → IsHalf (cA D e) u
                 → IsIntM (frMapAdj S T βS βT u) := by
-  first
-  | exact @GlobalTheory.HalfAdjInt.frMapAdj_int_of_half
-  | exact GlobalTheory.HalfAdjInt.frMapAdj_int_of_half
-  | (intros; apply GlobalTheory.HalfAdjInt.frMapAdj_int_of_half <;> assumption)
+  first | exact @GlobalTheory.HalfAdjInt.frMapAdj_int_of_half

@@ -61,14 +61,17 @@ open CategoryTheory Polynomial GlobalTheory.NormalDescent
 
 namespace GlobalTheory.CharpolyDvd
 
-theorem matrix_charpoly_dvd_pow {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (M : Matrix ι ι K) (G : K[X]) (hG : aeval M G = 0) :
-    M.charpoly ∣ G ^ Fintype.card ι := by
+theorem matrix_charpoly_dvd_pow
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (M : Matrix ι ι K) (G : K[X]) (hG : aeval M G = 0)
+    : M.charpoly ∣ G ^ Fintype.card ι := by
   apply GlobalTheory.CharpolyPowIrred.charpoly_dvd_pow_of_aeval <;> assumption
 
-theorem charpoly_dvd_pow_finrank {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (f : Module.End K V) (G : K[X]) (hG : aeval f G = 0) :
-    f.charpoly ∣ G ^ Module.finrank K V := by
+theorem charpoly_dvd_pow_finrank
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (f : Module.End K V) (G : K[X]) (hG : aeval f G = 0)
+    : f.charpoly ∣ G ^ Module.finrank K V := by
   classical
   let b := Module.finBasis K V
   have hM : aeval (LinearMap.toMatrix b b f) G = 0 := by
@@ -82,8 +85,6 @@ theorem charpoly_dvd_pow_finrank {K V : Type} [Field K] [AddCommGroup V] [Module
   have := matrix_charpoly_dvd_pow _ G hM
   rwa [LinearMap.charpoly_toMatrix, Fintype.card_fin] at this
 
-theorem main : ∀ {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (f : Module.End K V) (G : K[X]), aeval f G = 0 → f.charpoly ∣ G ^ Module.finrank K V :=
-  fun f G hG => charpoly_dvd_pow_finrank f G hG
+alias main := _root_.GlobalTheory.CharpolyDvd.charpoly_dvd_pow_finrank
 
 end GlobalTheory.CharpolyDvd

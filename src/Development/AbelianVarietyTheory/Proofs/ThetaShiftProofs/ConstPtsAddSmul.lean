@@ -2,7 +2,8 @@ module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IdealPart
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.AnalyticDictionaryExpAdditiveSurjectiveLinearStatement
+public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.ArcDictExpZeroSection
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.AnalyticDictionaryExpAdditiveSurjectiveLinear
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.PmapsOfGenRelR
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -68,7 +69,7 @@ theorem constPts_add_smul
           ∧ ∀ (e : 𝓞 E) v, Ξ.x (Λ.A.actV e v) = Ξ.x v ≫ W.t.act.act e := by
   intro hL hL2 E _ _ _ H _ D l Xo c O _ β Y _ _ b a χ W Λ Ξ
   obtain ⟨hadd, -, hact⟩ :=
-    GlobalTheory.T.analyticDictionaryExp_additive_surjective_linear hL hL2 E H D l c O β b a Λ
+    _root_.GlobalTheory.ArcPts.ex0_additive_surjective_equivariant hL hL2 E H D l c O β b a Λ
   have hG := hL.globalFns
   obtain ⟨gp, hw, -, ho, -, -⟩ := W.spec
   have hw' := (isGen_iff _).1 hw

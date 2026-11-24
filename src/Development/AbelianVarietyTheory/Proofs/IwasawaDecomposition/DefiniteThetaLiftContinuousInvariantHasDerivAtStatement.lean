@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
 open scoped TensorProduct InnerProductSpace ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DefLift
+
 theorem _root_.GlobalTheory.T.definiteThetaLift_continuous_invariant_hasDerivAt
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.definiteThetaLift_continuous_invariant_hasDerivAt
                                 HasDerivAt
                                   (fun t : ℝ => lift om ν 𝓕 (fun h => L (F h)) (g * oneP θ T τ Y t))
                                   (lift om ν 𝓕 (fun h => L' (F h)) g) 0 := by
-  first
-  | exact @GlobalTheory.DefLiftDer.lift_continuous_invariant_hasDerivAt
-  | exact GlobalTheory.DefLiftDer.lift_continuous_invariant_hasDerivAt
-  | (intros; apply GlobalTheory.DefLiftDer.lift_continuous_invariant_hasDerivAt <;> assumption)
+  first | exact @GlobalTheory.DefLiftDer.lift_continuous_invariant_hasDerivAt

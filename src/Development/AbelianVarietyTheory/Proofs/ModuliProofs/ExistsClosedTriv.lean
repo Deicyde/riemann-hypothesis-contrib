@@ -83,8 +83,7 @@ theorem exists_closed_triv
         (IsPullback.of_horiz_isIso ⟨by simp⟩)
     exact ⟨_, h₁, m, s, h₂⟩
   obtain ⟨H, j, hj, hH⟩ :=
-    GlobalTheory.T.exists_closedSubscheme_locallyTrivial_product_lineBundle hL.globalFns K T P.A
-      P.isAb hproj N hN
+    _root_.GlobalTheory.TrivSubscheme.exists_closed_locTriv hL.globalFns K T P.A P.isAb hproj N hN
   refine ⟨H.left, j.left, hj, fun T' h => ⟨?_, ?_⟩⟩
   · rintro ⟨t, ht⟩
     obtain ⟨y, hy⟩ :=

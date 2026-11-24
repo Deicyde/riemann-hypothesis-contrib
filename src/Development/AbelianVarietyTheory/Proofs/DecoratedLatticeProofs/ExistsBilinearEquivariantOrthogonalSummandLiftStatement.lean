@@ -49,6 +49,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter (compFin ExtUnr
 open scoped TensorProduct Pointwise
 open GlobalTheory.FinPl GlobalTheory.FinPl.SrcGl
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_bilinear_equivariant_orthogonalSummandLift
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (p : SplitPt D k) (n n' : Type) [Fintype n] [DecidableEq n]
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.exists_bilinear_equivariant_orthogonalSummandLift
                                     (fun x => Φ (x * (GlobalTheory.FinPl.SrcGl.blk g).val))
                                   = ((lS (Matrix.GeneralLinearGroup.det g) : ℂˣ) : ℂ)⁻¹
                                     • θ v Φ := by
-  first
-  | exact @GlobalTheory.FinPl.SrcTheta.exists_theta
-  | exact GlobalTheory.FinPl.SrcTheta.exists_theta
-  | (intros; apply GlobalTheory.FinPl.SrcTheta.exists_theta <;> assumption)
+  first | exact @GlobalTheory.FinPl.SrcTheta.exists_theta

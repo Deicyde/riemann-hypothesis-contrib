@@ -169,9 +169,7 @@ theorem ext_of_injective
 
 variable {R : Type} [CommRing R]
 
-theorem sp_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) :=
-  (Spec.map_comp _ _).symm
+alias sp_comp := _root_.GlobalTheory.TanMod.spMap_comp'
 
 theorem dual_base (i : R →+* k)
     : spMap (dualMapR i) ≫ spMap (algebraMap R (DualNumber R))
@@ -473,7 +471,6 @@ theorem actsBy_of_detCond
   classical
   obtain ⟨_, hs⟩ := DetCompare.exists_splitting (E := E) (k := k)
   have key : ∀ z : TanMod.TanSp t G, TanMod.TanSp.act t a H.w0 z = c • z := fun z => by
-
     rw [← EigenSplit.sum_proj hs (TanMod.TanSp.act t a) z, map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun τ _ => ?_
     have hz := EigenSplit.proj_mem hs (TanMod.TanSp.act t a) τ z

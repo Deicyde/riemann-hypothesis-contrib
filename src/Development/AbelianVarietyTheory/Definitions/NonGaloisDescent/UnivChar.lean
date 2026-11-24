@@ -60,9 +60,6 @@ open Formalism.L2.Host (embLL0 CharFrame)
 open GlobalTheory.TwSys GlobalTheory.TwAll GlobalTheory.SupLaw GlobalTheory.LiftLeaf
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.TwInputs
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

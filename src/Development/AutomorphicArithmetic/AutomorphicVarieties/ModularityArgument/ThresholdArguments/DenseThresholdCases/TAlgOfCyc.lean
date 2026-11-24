@@ -52,9 +52,6 @@ import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
   ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.GalOfCusp Filter Topology
@@ -227,10 +224,11 @@ private theorem nhd_loc (V : Set (Ideles E)) (hV : V ∈ 𝓝 (1 : Ideles E))
   have h2 : (fun b => MulOpposite.op (f b)) ⁻¹' T2 ∈ 𝓝 0 :=
     (MulOpposite.continuous_op.comp hf).continuousAt.preimage_mem_nhds
       (by rw [Function.comp_apply, hf0]; exact hT2)
-  obtain ⟨N, hN, hNW⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele E _ (Filter.inter_mem h1 h2)
+  obtain ⟨N, hN, hNW⟩ := _root_.GlobalTheory.LocalNormBound.main E _ (Filter.inter_mem h1 h2)
   let P : Set (FiniteAdeleRing (𝓞 E) E) :=
     {c | ∃ a : FiniteAdeleRing (𝓞 E) E, (∀ v, a v ∈ v.adicCompletionIntegers E) ∧ c = N • a}
-  have hP : P ∈ 𝓝 0 := GlobalTheory.AdLat.OpenLat.nsmul_integral_mem_nhds E N hN
+  have hP : P ∈ 𝓝 0 :=
+    _root_.GlobalTheory.IntegralNeighbourhoodZero.nsmul_integral_mem_nhds_zero E N hN
   have key
       : ∀ (u : Ideles E),
         (u : AdeleRing (𝓞 E) E).2 - 1 ∈ P

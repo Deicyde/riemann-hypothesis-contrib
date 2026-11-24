@@ -49,6 +49,7 @@ open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
   GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.hodge_cohomology_iso_presented_crystal
     : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
         (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (X₀ : Scheme.{0}) (s₀ : X₀ ⟶ Sp R₀),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.hodge_cohomology_iso_presented_crystal
                   (c : FirstDeRham s),
                 e (toHO1 s (cmp1 s c)) = S.r hI (m.pull1 c))
               ∧ ∀ c : HO1 s, IsPullO h.w c (S.redO.pull1 (e c)) := by
-  first
-  | exact @GlobalTheory.LiftSys.cohomology_presents
-  | exact GlobalTheory.LiftSys.cohomology_presents
-  | (intros; apply GlobalTheory.LiftSys.cohomology_presents <;> assumption)
+  first | exact @GlobalTheory.LiftSys.cohomology_presents

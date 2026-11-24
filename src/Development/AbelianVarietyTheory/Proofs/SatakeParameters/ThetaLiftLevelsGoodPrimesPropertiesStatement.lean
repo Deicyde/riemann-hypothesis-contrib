@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.theta_lift_levels_good_primes_properties
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.theta_lift_levels_good_primes_properties
             → ∀ t, ∀ P ∈ A.ok t,
               Good R t (R.pl P) ∧ conjPl (R.pl P) ≠ R.pl P
                 ∧ A.q P = Ideal.absNorm (R.pl P).asIdeal) := by
-  first
-  | exact @GlobalTheory.GoodPrimes.good_primes
-  | exact GlobalTheory.GoodPrimes.good_primes
-  | (intros; apply GlobalTheory.GoodPrimes.good_primes <;> assumption)
+  first | exact @GlobalTheory.GoodPrimes.good_primes

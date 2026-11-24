@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 open ReciprocityTheory.ChartRestriction.G.TB (dLin transF IsInvPair dAct)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ChartCmp
+
 theorem _root_.GlobalTheory.T.harmonicValueCopies_gauge_independent
     : ∀ (R : Type) [CommRing R] (d : ℕ) (O : Type) [CommRing O] [StarRing O] [Module.Free ℤ O]
         [Module.Finite ℤ O] [IsReduced O] (k : Type) [Field k] [Algebra ℚ k] [Algebra R k]
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.harmonicValueCopies_gauge_independent
                           (fun ℓ : Letter T r n => ℓ.2.2)
                           (fun ℓ : Letter T r n => u ⟨ℓ.1, ℓ.2.1⟩)
                           P := by
-  first
-  | exact @GlobalTheory.nabValN_harmonic_gauge_independent
-  | exact GlobalTheory.nabValN_harmonic_gauge_independent
-  | (intros; apply GlobalTheory.nabValN_harmonic_gauge_independent <;> assumption)
+  first | exact @GlobalTheory.nabValN_harmonic_gauge_independent

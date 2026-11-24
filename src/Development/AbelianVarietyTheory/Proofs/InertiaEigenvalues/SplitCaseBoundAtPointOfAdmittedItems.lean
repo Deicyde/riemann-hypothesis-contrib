@@ -3,7 +3,7 @@ module
 public import Formalism.SharpRestriction.LevelLetterCocycles.EmbeddingTypes
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsUniqueHcharOfFiniteOrder
 public import Formalism.GaloisCohomology.LocalTateDualityK
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SelmerLengthBoundAtPointStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SelmerLengthBoundAtPoint
 public import Formalism.AdmissibleDesigns.AdmG5OfAdm51AdmG5
 public import Formalism.SharpRestriction.LevelLetterCocycles.JumpAndLengthOfAdmitted
 import Mathlib.Algebra.Order.Floor.Extended
@@ -99,7 +99,7 @@ theorem splitCase_bound_at_point_of_admitted_items
   have g2 : TruncatedSeriesCountingIdentities.admG2 i r ρ π := hG2 hL.2.2.2.1 hL.2.2.2.2 hπ
   refine ⟨hJ, hRow, fun hs hsha _ => ?_⟩
   have hthm :=
-    GlobalTheory.T.globalLatticeIndexTheorem_of_lengthBoundAtPlaces hAR hTD hEC D i r ρ π dc
+    _root_.GlobalTheory.SelmerBoundAtPoint.main hAR hTD hEC D i r ρ π dc
       (EmbeddingTypes.lenRowSplit i dc e' c0)
       (fun _ => e')
       cB g1 g2 g3 g4 g5 g5x g6 hBK.1 hBK.2 ct dcm font fin tie a51 unr

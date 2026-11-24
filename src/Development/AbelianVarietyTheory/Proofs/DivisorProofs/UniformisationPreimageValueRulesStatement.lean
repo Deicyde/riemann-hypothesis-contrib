@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham
   GlobalTheory.CechDR GlobalTheory.CechPer
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.uniformisation_preimage_value_rules
     : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g),
       (∀ U, IsOpen (pre u.ex U)) ∧ (∀ U b, DifferentiableOn ℂ (val u.ex U b) (pre u.ex U))
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.uniformisation_preimage_value_rules
         ∧ (∀ U, ∀ z ∈ pre u.ex U, ∃ e : Sec (str A) U →ₐ[ℂ] ℂ, ∀ b, val u.ex U b z = e b)
         ∧ (∀ U b z, z ∈ pre u.ex (A.left.basicOpen b) ↔ val u.ex U b z ≠ 0)
         ∧ ∀ z, z ∈ pre u.ex ⊤ := by
-  first
-  | exact @GlobalTheory.CechPer.pre_val_rules
-  | exact GlobalTheory.CechPer.pre_val_rules
-  | (intros; apply GlobalTheory.CechPer.pre_val_rules <;> assumption)
+  first | exact @GlobalTheory.CechPer.pre_val_rules

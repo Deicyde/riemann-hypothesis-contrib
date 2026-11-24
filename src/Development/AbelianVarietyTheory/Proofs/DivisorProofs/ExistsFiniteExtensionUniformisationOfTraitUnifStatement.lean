@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -46,6 +47,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
+
 theorem _root_.GlobalTheory.T.exists_finiteExtension_uniformisation_of_trait_unif
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
       Base R
@@ -68,7 +70,4 @@ theorem _root_.GlobalTheory.T.exists_finiteExtension_uniformisation_of_trait_uni
                             (U₁ : Unif (maximalIdeal R') D₁ A₁ G₁),
                           FinExt ρ ∧ Nonempty (IsPullDeg ρ D.toPre D₁.toPre)
                             ∧ IsGrpPullback G₁ G (spMap ρ) β₁ ∧ LBIso U₁.LG.L (P.L.L.pull β₁) := by
-  first
-  | exact @GlobalTheory.Mum.Ident.exists_finExt_unif
-  | exact GlobalTheory.Mum.Ident.exists_finExt_unif
-  | (intros; apply GlobalTheory.Mum.Ident.exists_finExt_unif <;> assumption)
+  first | exact @GlobalTheory.Mum.Ident.exists_finExt_unif

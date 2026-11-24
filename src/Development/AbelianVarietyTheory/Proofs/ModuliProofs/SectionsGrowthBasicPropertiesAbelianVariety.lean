@@ -3,8 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.SectionsHaveFiniteDimension
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.CubeTheoremAndSectionsFiniteGrowthAbelianVariety
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.EventuallySectionAndRelAmplePowDivStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsHaveFiniteDimensionInvarianceIsomorphismStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.EventuallySectionAndRelAmplePowDiv
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsHaveFiniteDimensionInvarianceIsomorphism
 import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.IsIntegralOfIsAbelianSchemeField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -153,9 +154,7 @@ theorem res_cst (p : X ⟶ Sp K) {U V : X.Opens} (h : V ≤ U) (a : K)
       (Scheme.Hom.appLE_map p (U := ⊤) (V := U) le_top (homOfLE h).op)
   exact this
 
-theorem res_res {U V W : X.Opens} (h : V ≤ U) (h' : W ≤ V) (a : Γ(X, U))
-    : resG X h' (resG X h a) = resG X (h'.trans h) a := by
-  rw [← RingHom.comp_apply, ← CommRingCat.hom_comp, ← Functor.map_comp]; rfl
+alias res_res := _root_.GlobalTheory.Cartier.resG_resG
 
 theorem exists_h0Is
     (p : X ⟶ Sp K) (M : LB X)
@@ -283,8 +282,8 @@ theorem sectionsDim_congr_of_cechPicardClass_eq
     {A B : LB X} (hA : A.IsLB) (hB : B.IsLB) (h : cls A hA = cls B hB)
     {r : ℕ} (hr : SectionsHaveFiniteDimension p A r)
     : SectionsHaveFiniteDimension p B r :=
-  ((GlobalTheory.T.sectionsHaveFiniteDimension_invariance_isomorphisms K X p A hA).2.1 B hB
-    ((cls_eq_iff hA hB).1 h)).1 r hr
+  ((_root_.GlobalTheory.SecDim.lbPow_mul_and_pull_and_sectionsFiniteDim_iso_invariant K X p A
+    hA).2.1 B hB ((cls_eq_iff hA hB).1 h)).1 r hr
 
 theorem h0_le
     [IsIntegral X]
@@ -298,7 +297,7 @@ theorem h0_le
   rw [cls_tens hA hN, e]
   abel
 
-theorem isLB_pow {L : LB X} (hL : L.IsLB) (n : ℕ) : (lbPow L n).IsLB := LB.isLB_linComb hL _ _
+alias isLB_pow := _root_.GlobalTheory.isLB_lbPow
 
 theorem cls_pow_pow {L : LB X} (hL : L.IsLB) (a e : ℕ)
     : cls _ (isLB_pow (isLB_pow hL a) e) = cls _ (isLB_pow hL (a * e)) := by
@@ -344,7 +343,7 @@ theorem vol_basic
           → ∀ r r',
             SectionsHaveFiniteDimension P.A.hom N r → SectionsHaveFiniteDimension P.A.hom N r'
               → r = r' := fun N hN =>
-    (GlobalTheory.T.sectionsHaveFiniteDimension_invariance_isomorphisms K _ _ N hN).1
+    (_root_.GlobalTheory.SecDim.lbPow_mul_and_pull_and_sectionsFiniteDim_iso_invariant K _ _ N hN).1
   refine ⟨fin M hM, ?_, ?_, ?_, ?_, ?_⟩
   · rintro δ δ' ⟨h, hh, ht⟩ ⟨h', hh', ht'⟩
     obtain rfl : h = h' := funext fun e => uniq _ (isLB_pow hM e) _ _ (hh e) (hh' e)
@@ -377,8 +376,8 @@ theorem vol_basic
         uniq _ (isLB_pow hM (a * e)) _ _
           (sectionsDim_congr_of_cechPicardClass_eq _ _ _ (cls_pow_pow hM a e) (hh' e)) (hh _)
     obtain ⟨c, hc⟩ :=
-      eventually_atTop.1 (GlobalTheory.T.eventually_section_and_relAmple_pow_div K P M (lbPow M 0)
-        hM (isLB_pow hM 0) hamp)
+      eventually_atTop.1 (_root_.GlobalTheory.AmpleDominates.eventually_sec_and_relAmple K P M
+        (lbPow M 0) hM (isLB_pow hM 0) hamp)
     refine ⟨h, hh, tendsto_of_multiples h a g c ha δ (fun e e' he => ?_) ht⟩
     obtain ⟨t, rfl⟩ := Nat.exists_eq_add_of_le (show e ≤ e' by omega)
     refine h0_le _ (isLB_pow hM e) (isLB_pow hM (e + t))

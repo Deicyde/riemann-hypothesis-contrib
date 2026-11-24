@@ -60,14 +60,13 @@ open Module
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-def IsStable (T : Set (End ℂ M)) (p : Submodule ℂ M) : Prop :=
-  ∀ t ∈ T, ∀ x ∈ p, t x ∈ p
+def IsStable (T : Set (End ℂ M)) (p : Submodule ℂ M) : Prop := ∀ t ∈ T, ∀ x ∈ p, t x ∈ p
 
 def IsSimpleUnder (T : Set (End ℂ M)) : Prop :=
   Nontrivial M ∧ ∀ p : Submodule ℂ M, IsStable T p → p = ⊥ ∨ p = ⊤
 
-theorem IsStable.adjoin {T : Set (End ℂ M)} {p : Submodule ℂ M} (h : IsStable T p) :
-    ∀ a ∈ Algebra.adjoin ℂ T, ∀ x ∈ p, a x ∈ p := by
+theorem IsStable.adjoin {T : Set (End ℂ M)} {p : Submodule ℂ M} (h : IsStable T p)
+    : ∀ a ∈ Algebra.adjoin ℂ T, ∀ x ∈ p, a x ∈ p := by
   intro a ha
   induction ha using Algebra.adjoin_induction with
   | mem t ht => exact h t ht
@@ -84,8 +83,8 @@ theorem IsStable.adjoin {T : Set (End ℂ M)} {p : Submodule ℂ M} (h : IsStabl
     rw [Module.End.mul_apply]
     exact ha _ (hb x hx)
 
-theorem commute_of_mem_adjoin {T : Set (End ℂ M)} {a : End ℂ M} (ha : ∀ t ∈ T, Commute a t) :
-    ∀ b ∈ Algebra.adjoin ℂ T, Commute a b := by
+theorem commute_of_mem_adjoin {T : Set (End ℂ M)} {a : End ℂ M} (ha : ∀ t ∈ T, Commute a t)
+    : ∀ b ∈ Algebra.adjoin ℂ T, Commute a b := by
   intro b hb
   induction hb using Algebra.adjoin_induction with
   | mem t ht => exact ha t ht
@@ -93,9 +92,9 @@ theorem commute_of_mem_adjoin {T : Set (End ℂ M)} {a : End ℂ M} (ha : ∀ t 
   | add b c _ _ hb hc => exact hb.add_right hc
   | mul b c _ _ hb hc => exact hb.mul_right hc
 
-theorem IsStable.mono {T₁ T₂ : Set (End ℂ M)} {p : Submodule ℂ M} (h : IsStable T₂ p)
-    (hT : T₁ ⊆ T₂) : IsStable T₁ p :=
-  fun t ht => h t (hT ht)
+theorem IsStable.mono {T₁ T₂ : Set (End ℂ M)} {p : Submodule ℂ M} (h : IsStable T₂ p) (hT : T₁ ⊆ T₂)
+    : IsStable T₁ p := fun t ht =>
+  h t (hT ht)
 
 variable [FiniteDimensional ℂ M]
 
@@ -124,10 +123,7 @@ theorem adjoin_eq_top {T : Set (End ℂ M)} (h : IsSimpleUnder T) : Algebra.adjo
     intro f x
     obtain ⟨c, rfl⟩ := hb.2 f
     simp [Algebra.algebraMap_eq_smul_one]
-  let ψ : End (End A M) M :=
-    { toFun := φ
-      map_add' := φ.map_add
-      map_smul' := fun f x => hφ f x }
+  let ψ : End (End A M) M := { toFun := φ, map_add' := φ.map_add, map_smul' := fun f x => hφ f x }
   obtain ⟨a, ha⟩ := hsurj ψ
   have : (a : End ℂ M) = φ := by
     ext x
@@ -136,14 +132,16 @@ theorem adjoin_eq_top {T : Set (End ℂ M)} (h : IsSimpleUnder T) : Algebra.adjo
   rw [← this]
   exact a.2
 
-
 omit [FiniteDimensional ℂ M] in
-theorem eq_zero_of_forall_mem {T₁ T₂ : Set (End ℂ M)} (h : IsSimpleUnder (T₁ ∪ T₂))
-    (hc : ∀ a ∈ T₁, ∀ b ∈ T₂, Commute a b) {N : Submodule ℂ M} (hN : N ≠ ⊥) (hNs : IsStable T₁ N)
-    {a : End ℂ M} (ha : ∀ b ∈ T₂, Commute a b) (h0 : ∀ x ∈ N, a x = 0) : a = 0 := by
+theorem eq_zero_of_forall_mem
+    {T₁ T₂ : Set (End ℂ M)} (h : IsSimpleUnder (T₁ ∪ T₂)) (hc : ∀ a ∈ T₁, ∀ b ∈ T₂, Commute a b)
+    {N : Submodule ℂ M} (hN : N ≠ ⊥) (hNs : IsStable T₁ N)
+    {a : End ℂ M} (ha : ∀ b ∈ T₂, Commute a b) (h0 : ∀ x ∈ N, a x = 0)
+    : a = 0 := by
   set B := Algebra.adjoin ℂ T₂
   set P : Submodule ℂ M := ⨆ b : B, N.map (b : End ℂ M)
-  have hmap : ∀ b : B, N.map (b : End ℂ M) ≤ P := fun b => le_iSup (fun b : B => N.map (b : End ℂ M)) b
+  have hmap : ∀ b : B, N.map (b : End ℂ M) ≤ P := fun b =>
+    le_iSup (fun b : B => N.map (b : End ℂ M)) b
   have hst : IsStable (T₁ ∪ T₂) P := by
     intro t ht x hx
     have hle : P ≤ P.comap t := by
@@ -181,36 +179,47 @@ theorem eq_zero_of_forall_mem {T₁ T₂ : Set (End ℂ M)} (h : IsSimpleUnder (
 def restrictSet (T : Set (End ℂ M)) (N : Submodule ℂ M) (hN : IsStable T N) : Set (End ℂ N) :=
   Set.range fun t : T => (t : End ℂ M).restrict (hN t t.2)
 
-
 omit [FiniteDimensional ℂ M] in
-theorem exists_of_mem_adjoin_restrictSet {T : Set (End ℂ M)} {N : Submodule ℂ M}
-    (hN : IsStable T N) {b : End ℂ N} (hb : b ∈ Algebra.adjoin ℂ (restrictSet T N hN)) :
-    ∃ a ∈ Algebra.adjoin ℂ T, ∀ x : N, (b x : M) = a x := by
-  let S : Subalgebra ℂ (End ℂ N) :=
-    { carrier := {b | ∃ a ∈ Algebra.adjoin ℂ T, ∀ x : N, (b x : M) = a x}
-      mul_mem' := by
-        rintro b₁ b₂ ⟨a₁, ha₁, h₁⟩ ⟨a₂, ha₂, h₂⟩
-        exact ⟨a₁ * a₂, Subalgebra.mul_mem _ ha₁ ha₂, fun x => by
-          rw [Module.End.mul_apply, h₁, Module.End.mul_apply, h₂]⟩
-      add_mem' := by
-        rintro b₁ b₂ ⟨a₁, ha₁, h₁⟩ ⟨a₂, ha₂, h₂⟩
-        exact ⟨a₁ + a₂, Subalgebra.add_mem _ ha₁ ha₂, fun x => by
-          rw [LinearMap.add_apply, Submodule.coe_add, h₁, h₂, LinearMap.add_apply]⟩
-      algebraMap_mem' := fun c => ⟨algebraMap ℂ (End ℂ M) c, Subalgebra.algebraMap_mem _ c,
-        fun x => by simp [Algebra.algebraMap_eq_smul_one]⟩ }
+theorem exists_of_mem_adjoin_restrictSet
+    {T : Set (End ℂ M)} {N : Submodule ℂ M} (hN : IsStable T N)
+    {b : End ℂ N} (hb : b ∈ Algebra.adjoin ℂ (restrictSet T N hN))
+    : ∃ a ∈ Algebra.adjoin ℂ T, ∀ x : N, (b x : M) = a x := by
+  let S : Subalgebra ℂ (End ℂ N) := {
+    carrier := {b | ∃ a ∈ Algebra.adjoin ℂ T, ∀ x : N, (b x : M) = a x}
+    mul_mem' := by
+      rintro b₁ b₂ ⟨a₁, ha₁, h₁⟩ ⟨a₂, ha₂, h₂⟩
+      exact ⟨
+        a₁ * a₂,
+        Subalgebra.mul_mem _ ha₁ ha₂,
+        fun x => by rw [Module.End.mul_apply, h₁, Module.End.mul_apply, h₂]
+      ⟩
+    add_mem' := by
+      rintro b₁ b₂ ⟨a₁, ha₁, h₁⟩ ⟨a₂, ha₂, h₂⟩
+      exact ⟨
+        a₁ + a₂,
+        Subalgebra.add_mem _ ha₁ ha₂,
+        fun x => by rw [LinearMap.add_apply, Submodule.coe_add, h₁, h₂, LinearMap.add_apply]
+      ⟩
+    algebraMap_mem' := fun c => ⟨
+      algebraMap ℂ (End ℂ M) c,
+      Subalgebra.algebraMap_mem _ c,
+      fun x => by simp [Algebra.algebraMap_eq_smul_one]
+    ⟩
+  }
   have : Algebra.adjoin ℂ (restrictSet T N hN) ≤ S := by
     refine Algebra.adjoin_le ?_
     rintro _ ⟨t, rfl⟩
     exact ⟨t, Algebra.subset_adjoin t.2, fun x => rfl⟩
   exact this hb
 
-theorem exists_simple_stable (T : Set (End ℂ M)) [Nontrivial M] :
-    ∃ (N : Submodule ℂ M) (hN : IsStable T N), N ≠ ⊥ ∧ IsSimpleUnder (restrictSet T N hN) := by
+theorem exists_simple_stable (T : Set (End ℂ M)) [Nontrivial M]
+    : ∃ (N : Submodule ℂ M) (hN : IsStable T N), N ≠ ⊥ ∧ IsSimpleUnder (restrictSet T N hN) := by
   classical
   have hex : ∃ d, ∃ N : Submodule ℂ M, N ≠ ⊥ ∧ IsStable T N ∧ Module.finrank ℂ N = d :=
     ⟨_, ⊤, top_ne_bot, fun _ _ _ _ => trivial, rfl⟩
   obtain ⟨N, hN0, hNs, hNd⟩ := Nat.find_spec hex
-  have hmin : ∀ N' : Submodule ℂ M, N' ≠ ⊥ → IsStable T N' → Module.finrank ℂ N ≤ Module.finrank ℂ N' :=
+  have hmin
+      : ∀ N' : Submodule ℂ M, N' ≠ ⊥ → IsStable T N' → Module.finrank ℂ N ≤ Module.finrank ℂ N' :=
     fun N' h1 h2 => hNd ▸ Nat.find_min' hex ⟨N', h1, h2, rfl⟩
   refine ⟨N, hNs, hN0, ?_, ?_⟩
   · exact Submodule.nontrivial_iff_ne_bot.2 hN0

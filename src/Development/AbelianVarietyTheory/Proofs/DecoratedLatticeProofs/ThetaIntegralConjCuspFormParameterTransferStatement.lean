@@ -52,6 +52,7 @@ open GlobalTheory.SphTheta (IsStd CayleyRule intMat liftPar)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke IsCommensurated Tj SatU ordL Ov)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaIntegral_conjCuspForm_parameterTransfer
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ D : D7,
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.thetaIntegral_conjCuspForm_parameterTransfer
                                     ((rightReg ℂ (GA D T) ℂ).comp (embV T v))
                                     (fun x => ∫ g in 𝓕, thetaKO om g x f * conj (y g) ∂ν)
                                     (stepPar χS χT t (fun _ => B) w) := by
-  first
-  | exact @GlobalTheory.ChainOnto.thetaIntegral_param
-  | exact GlobalTheory.ChainOnto.thetaIntegral_param
-  | (intros; apply GlobalTheory.ChainOnto.thetaIntegral_param <;> assumption)
+  first | exact @GlobalTheory.ChainOnto.thetaIntegral_param

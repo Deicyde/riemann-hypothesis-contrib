@@ -67,9 +67,6 @@ open GlobalTheory.DownLift.SplitCoef
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.DownLift.GenQuot
 
 open GlobalTheory.PlaceModel

@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.bounded_automorphic_has_representative
     : ∀ (D : D7) (V : HSp D),
       ∀ (μ : Measure (GA D V)) (𝓕 : Set (GA D V))
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.bounded_automorphic_has_representative
               Repr V μ 𝓕 F ψ → Repr V μ 𝓕 F' ψ'
                 → IntegrableOn (fun x => star (ψ x) * ψ' x) 𝓕 μ
                   ∧ ⟪F, F'⟫_ℂ = ∫ x in 𝓕, star (ψ x) * ψ' x ∂μ := by
-  first
-  | exact @GlobalTheory.HolDict.RepresentativeL2.repr_properties
-  | exact GlobalTheory.HolDict.RepresentativeL2.repr_properties
-  | (intros; apply GlobalTheory.HolDict.RepresentativeL2.repr_properties <;> assumption)
+  first | exact @GlobalTheory.HolDict.RepresentativeL2.repr_properties

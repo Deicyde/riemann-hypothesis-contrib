@@ -84,12 +84,10 @@ theorem eq_xz
   obtain ⟨w, rfl⟩ : ∃ w, n = u + w := ⟨n - u, (add_tsub_cancel_of_le hle).symm⟩
   have hadd : ∀ a b : Fin 2 × Fin d →₀ ℕ, (a + b).degree = a.degree + b.degree := by
     intro a b
-    first
-    | exact map_add _ a b
+    first | exact map_add _ a b
   have hsg : ∀ x : Fin 2 × Fin d, (single x 1).degree = 1 := by
     intro x
-    first
-    | exact Finsupp.degree_single x 1
+    first | exact Finsupp.degree_single x 1
   have hdu : u.degree = 2 := by rw [hu, hadd, hsg, hsg]
   rw [hadd, hdu] at hd
   have hw : w.degree = 0 := by omega
@@ -142,7 +140,7 @@ theorem coeff_subst_xz
     simp only [true_and] at e0 e1
     have n01 : ((1 : Fin 2) = 0) = False := by simp
     have n10 : ((0 : Fin 2) = 1) = False := by simp
-    simp only [n01, n10, false_and, and_false, if_false, add_zero, zero_add] at e0 e1
+    simp only [n01, n10, false_and, if_false, add_zero, zero_add] at e0 e1
     split_ifs at e0 e1 <;> simp_all
   have hprod
       : ∀ D : Fin 2 × Fin d →₀ ℕ,
@@ -215,12 +213,10 @@ theorem degree_xz (j i : Fin d)
     : (single ((0 : Fin 2), j) 1 + single ((1 : Fin 2), i) 1).degree = 2 := by
   have hadd : ∀ a b : Fin 2 × Fin d →₀ ℕ, (a + b).degree = a.degree + b.degree := by
     intro a b
-    first
-    | exact map_add _ a b
+    first | exact map_add _ a b
   have hsg : ∀ x : Fin 2 × Fin d, (single x 1).degree = 1 := by
     intro x
-    first
-    | exact Finsupp.degree_single x 1
+    first | exact Finsupp.degree_single x 1
   rw [hadd, hsg, hsg]
 
 theorem coeff_xz_mul_X (φ : PS k 1 d) (j i m : Fin d)
@@ -240,7 +236,7 @@ theorem coeff_xz_mul_X (φ : PS k 1 d) (j i m : Fin d)
     rw [coeff_embDomain_rename]
   · rw [if_neg hm]
     apply coeff_mul_X_eq_zero
-    simp [single_apply, Ne.symm hm]
+    simp [Ne.symm hm]
 
 theorem coeff_xz_X_mul (ψ : PS k 1 d) (j i l : Fin d)
     : coeff (single ((0 : Fin 2), j) 1 + single ((1 : Fin 2), i) 1)
@@ -260,7 +256,7 @@ theorem coeff_xz_X_mul (ψ : PS k 1 d) (j i l : Fin d)
     rw [coeff_embDomain_rename]
   · rw [if_neg hl]
     apply coeff_mul_X_eq_zero
-    simp [single_apply, Ne.symm hl]
+    simp [Ne.symm hl]
 
 theorem const_actK (B : FB R d O) (a : O) (l : Fin d) : constantCoeff (B.actK k a l) = 0 := by
   simp only [FB.actK]
@@ -314,8 +310,7 @@ theorem coeff_ad_side2 (B : FB R d O) (h : PS k 2 d) (hc : B.IsCanonGauge k h) (
                 ((1, m) : Fin 2 × Fin d).2
               = rename (eZ d) (B.actK k (star a) m) := fun m =>
         eval_second_point_rename _
-      simp only [e0, e1, coeff_xz_X_mul, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-        if_true]
+      simp only [e0, e1, coeff_xz_X_mul, mul_ite, mul_zero]
       rw [Finset.sum_comm]
       simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
       rfl

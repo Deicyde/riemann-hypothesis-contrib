@@ -146,8 +146,7 @@ theorem isUnimod_blk {m : ℕ} {P : Matrix (Fin m) (Fin m) L} (hP : IsUnimod P)
       : ∀ {A : Matrix (Fin m) (Fin m) L},
         (∀ i j, A i j ∈ Formalism.UG.intL L) → ∀ i j, blk (1 : L) A i j ∈ Formalism.UG.intL L := by
     intro A hA i j
-    refine Fin.cases ?_ (fun i => ?_) i <;> refine Fin.cases ?_ (fun j => ?_) j
-      <;> simp [blk, Subring.one_mem, Subring.zero_mem, hA]
+    refine Fin.cases ?_ (fun i => ?_) i <;> refine Fin.cases ?_ (fun j => ?_) j <;> simp [blk, hA]
   exact ⟨hint hP1, blk 1 P', hint hP', by rw [blk_mul, hPP, one_mul, blk_one]⟩
 
 def IsDiagF {m n : ℕ} (z : Matrix (Fin m) (Fin n) L) : Prop :=
@@ -385,7 +384,7 @@ theorem GlobalTheory.Hk3.smith_int_approx
     · rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
       congr 1
       funext i
-      simp only [s, t, Pi.one_apply]
+      simp only [s, t]
       split_ifs with ha
       · rw [div_mul_div_comm, mul_comm (ϖ⁻¹ ^ a i), div_self (mul_ne_zero (hdne i ha) (hpw _))]
       · exact one_mul 1

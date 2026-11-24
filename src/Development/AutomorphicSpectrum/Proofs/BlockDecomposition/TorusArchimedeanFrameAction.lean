@@ -70,7 +70,7 @@ theorem mul_frameLine
     by_cases h : i = a
     · subst h
       simp [Matrix.diagonal_mul, Matrix.single_apply]
-    · simp [Matrix.diagonal_mul, Matrix.single_apply, h]
+    · simp [Matrix.diagonal_mul, h]
   rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hA, Matrix.mul_assoc P, e, Matrix.mul_smul,
     Matrix.smul_mul]
 
@@ -85,7 +85,7 @@ theorem map_frameLine
   by_cases h : a = i ∧ b = i
   · obtain ⟨rfl, rfl⟩ := h
     simp
-  · simp [Matrix.single_apply, show ¬(i = a ∧ i = b) from fun q => h ⟨q.1.symm, q.2.symm⟩]
+  · simp [show ¬(i = a ∧ i = b) from fun q => h ⟨q.1.symm, q.2.symm⟩]
 
 theorem torus_mul_frameIdem
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]

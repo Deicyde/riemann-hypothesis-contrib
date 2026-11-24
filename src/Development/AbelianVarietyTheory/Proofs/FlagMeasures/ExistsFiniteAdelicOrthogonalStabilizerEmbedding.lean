@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsFinEmb
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsDualOfAnisotropicOrthogonal
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryOrthogonalEmbeddingStabilizerStatement
+public import Formalism.SatakeDualWeyl.Statement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryOrthogonalEmbeddingStabilizer
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -89,8 +90,8 @@ theorem exists_stab_emb_baseChange
     ext i j
     simp [vecMulVec_apply, Matrix.mul_apply]
   obtain ⟨j, hj, hr⟩ :=
-    GlobalTheory.T.exists_unitary_orthogonal_embedding_stabilizer R σ n m (J.map φ) (J'.map φ)
-      (φ ∘ x) (φ ∘ u) (A.map φ) (A'.map φ)
+    _root_.GlobalTheory.StabRing.exists_emb R σ n m (J.map φ) (J'.map φ) (φ ∘ x) (φ ∘ u) (A.map φ)
+      (A'.map φ)
       (by
         change IsUnit ((fun i => σ (φ (x i))) ⬝ᵥ _)
         rw [hsx, mv, ← RingHom.map_dotProduct]
@@ -107,7 +108,7 @@ theorem exists_stab_emb_baseChange
     simp
   · rw [hj, Matrix.add_mul, Matrix.mul_assoc, k1, Matrix.mul_one, Matrix.vecMulVec_mul, k3]
     ext a b
-    simp [vecMulVec_apply]
+    simp
 
 theorem exists_finEmb
     : ∀ (I : AutInst) (D : Sib I) (s : Bool) (x : Fin I.n → I.E)

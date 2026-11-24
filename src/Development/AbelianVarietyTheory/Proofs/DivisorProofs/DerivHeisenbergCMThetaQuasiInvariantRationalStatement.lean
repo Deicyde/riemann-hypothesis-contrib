@@ -45,6 +45,7 @@ open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped ContDiff
+
 theorem _root_.GlobalTheory.T.deriv_heisenbergCM_theta_quasiInvariant_rational
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E) (B : Base F E),
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.deriv_heisenbergCM_theta_quasiInvariant_rational
                                 (fun t : ℝ =>
                                   Formalism.IndefR.DatumF.heisOF σ JS JT ξ₀ B.ψ (L t) f (w))
                                 0 := by
-  first
-  | exact @GlobalTheory.ThetaDerivQuasi.deriv_heis_quasi
-  | exact GlobalTheory.ThetaDerivQuasi.deriv_heis_quasi
-  | (intros; apply GlobalTheory.ThetaDerivQuasi.deriv_heis_quasi <;> assumption)
+  first | exact @GlobalTheory.ThetaDerivQuasi.deriv_heis_quasi

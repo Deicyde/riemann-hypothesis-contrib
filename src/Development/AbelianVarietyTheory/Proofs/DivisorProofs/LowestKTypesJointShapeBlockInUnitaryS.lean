@@ -1,7 +1,7 @@
 module
 
 public import Formalism.LocalRingCardinality.DataTheta
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockUnitaryStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockUnitary
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -156,7 +156,7 @@ theorem types_mirror
                   ≤ 0)) := by
   intro t al be ga de h
   obtain ⟨k1, -, k3, k4, k5⟩ :=
-    GlobalTheory.T.lowest_kTypes_jointShape_block_unitary t ga de al be (hypA_swap h)
+    _root_.GlobalTheory.LowestTypes.lowest_types t ga de al be (hypA_swap h)
   have e1 : lamA al be ga de = fun b => lamA ga de al be b.swap := ofBlocks_swap _ _
   have e2 : lamM' t al be ga de = fun b => lamA' t ga de al be b.swap := ofBlocks_swap _ _
   rw [e1, e2]

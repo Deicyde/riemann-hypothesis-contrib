@@ -45,6 +45,7 @@ import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsRootOfIsAl
 
 open GlobalTheory.KZ GlobalTheory.CyclotomicQExpansion GlobalTheory.Glue
 open scoped MatrixGroups
+
 theorem _root_.GlobalTheory.T.theta_basis_linear_combination
     : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
         (A : ValuationSubring Ω) (N l : ℕ) [Fact l.Prime] (n w : ℕ) (b b' : X.Fn l),

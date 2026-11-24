@@ -84,9 +84,6 @@ theorem int_mul {x y : Af D.host.F ⊗[D.host.F] D.host.E} (hx : x ∈ intAE D) 
   · intro x y _ _ h; rw [neg_mul]; exact neg_mem h
   · intro x y _ _ h; rw [mul_neg]; exact neg_mem h
 
-theorem incA_int (x : 𝓞 D.host.E) : finPart D (incA D (x : D.host.E)) ∈ intAE D :=
-  AddSubgroup.subset_closure ⟨1, fun _ => one_mem _, x, rfl⟩
-
 theorem idemAt_mul_int
     {e : AE D} {P : HeightOneSpectrum (𝓞 D.host.E)} (he : Formalism.L2.NTheta.IsIdemAt e P)
     {y : D.host.E} (hv : P.valuation D.host.E y ≤ 1)
@@ -101,7 +98,7 @@ theorem idemAt_mul_int
   have hq : y = (a : D.host.E) * ((b : 𝓞 D.host.E) : D.host.E)⁻¹ := by
     rw [eq_mul_inv_iff_mul_eq₀ hb1]
     exact hab
-  have h := int_mul (incA_int (D := D) a) hi
+  have h := int_mul (_root_.GlobalTheory.SplitIndex.finPart_incA_mem (D := D) a) hi
   rw [← RingHom.map_mul, mul_left_comm, ← map_mul (incA D), ← hq] at h
   exact h
 
@@ -195,7 +192,8 @@ theorem GlobalTheory.DilScalar.scalar_dil_facts
         - cA D (incA D ((ϖ : D.host.E)⁻¹)) + 2) * hec
       + e * hXP + cA D e * hYZ
 
-  have hPint : finPart D (incA D (ϖ : D.host.E)) ∈ intAE D := incA_int ϖ
+  have hPint : finPart D (incA D (ϖ : D.host.E)) ∈ intAE D :=
+    _root_.GlobalTheory.SplitIndex.finPart_incA_mem ϖ
   have hPmem : ∀ u ∈ latAll S T ΛS ΛT, incA D (ϖ : D.host.E) • u ∈ latAll S T ΛS ΛT :=
     GlobalTheory.LatticeStable.smul_mem_latO D S T _ _ _ _ hPint
 

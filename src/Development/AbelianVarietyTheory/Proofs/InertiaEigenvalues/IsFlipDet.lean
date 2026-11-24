@@ -66,7 +66,6 @@ open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 noncomputable section
 
 namespace GlobalTheory.LevelSeries

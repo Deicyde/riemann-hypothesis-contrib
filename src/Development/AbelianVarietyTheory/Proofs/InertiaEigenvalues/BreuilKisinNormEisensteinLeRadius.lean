@@ -88,7 +88,6 @@ theorem norm_E_le_radius
       rw [← Polynomial.coeToPowerSeries.ringHom_apply, map_sum]
       simp
     have hmem : algebraMap A (PreDisc l (s X) bk.ρ₀) (s bk.E) ∈ ball l (s X) bk.ρ₀ (l : ℝ)⁻¹ := by
-
       rw [hE, map_add (f := _), map_add (f := _), map_sum, map_sum]
       refine add_mem ?_ (Submodule.sum_mem _ fun i hi => ?_)
       · refine Submodule.subset_span ⟨0, bk.Ep.natDegree, 0, ?_, ?_⟩

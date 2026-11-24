@@ -206,7 +206,7 @@ theorem deltaHalf_thetaL {h : ℕ} (d : Fin h → ℕ) (g : Levi k (fun a => Fin
   simp only [hg]
   rw [← Equiv.prod_comp Fin.revPerm]
   refine Finset.prod_congr rfl fun a _ => ?_
-  simp only [Fin.revPerm_apply, Fin.rev_rev, modExp_rev, Int.cast_neg, neg_div, absPow_neg, map_inv,
+  simp only [Fin.revPerm_apply, modExp_rev, Int.cast_neg, neg_div, absPow_neg, map_inv,
     MonoidHom.inv_apply, inv_inv]
   exact congrArg
     (fun b =>

@@ -60,25 +60,30 @@ namespace GroundTheory.Heights₂.Heights
 open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsArithVar IsGoodProj mcPts segre segre_rel)
 open ComplexSets MvPolynomial Matrix
 
-theorem homogeneousComponent_mem_leadIdeal {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
-    {f : MvPolynomial (Fin n) ℂ} (hf : f ∈ J) {r : ℕ} (hr : f.totalDegree ≤ r) :
-    homogeneousComponent r f ∈ leadIdeal J := by
+theorem homogeneousComponent_mem_leadIdeal
+    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {f : MvPolynomial (Fin n) ℂ} (hf : f ∈ J)
+    {r : ℕ} (hr : f.totalDegree ≤ r)
+    : homogeneousComponent r f ∈ leadIdeal J := by
   rcases hr.eq_or_lt with h | h
   · rw [← h]
     exact Ideal.subset_span ⟨f, hf, rfl⟩
   · rw [homogeneousComponent_eq_zero (n := r) (φ := f) h]
     exact zero_mem _
 
-theorem eval_linPoly_eq_mulVec {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (r : Fin d) (x : Fin n → ℂ) :
-    eval x (linPoly A r) = (A *ᵥ x) r := by
+theorem eval_linPoly_eq_mulVec {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (r : Fin d) (x : Fin n → ℂ)
+    : eval x (linPoly A r) = (A *ᵥ x) r := by
   simp [linPoly, Matrix.mulVec, dotProduct]
 
-theorem SegreChartProjFinite.pow_mem {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+theorem SegreChartProjFinite.pow_mem
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
     {P : Ideal (MRing ι)} {e m : ℕ} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ) (hΨ0 : ∀ w, Ψ w 0 = w i)
-    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : J ∈ segreChartComponents P σ i) (a : Fin m) :
-    ∃ r : ℕ, (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
+    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : J ∈ segreChartComponents P σ i)
+    (a : Fin m)
+    : ∃ r : ℕ,
+      (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
   classical
   obtain ⟨r, hr, G, hG, hrel⟩ := segre_rel hP.2.1.2.1 Ψ hΨ (σ a)
   set A := chartProjMatrix σ Ψ with hA
@@ -97,7 +102,7 @@ theorem SegreChartProjFinite.pow_mem {K : Type} [Fintype K] {ι : K → Type} [�
     change eval (fun a => segre z (σ a)) f = 0
 
     simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename, hw,
-    eval_linPoly_eq_mulVec, hA, chartProjMatrix_mulVec]
+      eval_linPoly_eq_mulVec, hA, chartProjMatrix_mulVec]
     rw [h]
     simp [Equiv.apply_symm_apply, mul_comm]
   have hdeg : f.totalDegree ≤ r := by
@@ -114,15 +119,18 @@ theorem SegreChartProjFinite.pow_mem {K : Type} [Fintype K] {ι : K → Type} [�
       if_pos rfl]
   have h0 : homogeneousComponent r (Gx 0) = 0 :=
     homogeneousComponent_eq_zero (n := r) (φ := Gx 0) (by have := hGx 0; omega)
-  have hcomp : homogeneousComponent r f =
-      X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
-
+  have hcomp
+      : homogeneousComponent r f
+        = X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
     simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
-    homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
-  have hmem : homogeneousComponent r f + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j ∈
-      leadIdeal J ⊔ linIdeal A :=
+      homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
+  have hmem
+      : homogeneousComponent r f
+          + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j
+        ∈ leadIdeal J ⊔ linIdeal A :=
     add_mem (Ideal.mem_sup_left (homogeneousComponent_mem_leadIdeal hfJ hdeg))
-      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
+      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ =>
+        Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
   rw [hcomp, sub_add_cancel] at hmem
   exact ⟨r, hmem⟩
 
@@ -133,9 +141,13 @@ theorem SegreChartProjFinite.proof : SegreChartProjFinite.Statement := by
       refine Ideal.span_le.2 (Set.range_subset_iff.2 fun a => ?_)
       obtain ⟨r, hr⟩ := SegreChartProjFinite.pow_mem hP hΨ hΨ0 hJ a
       exact ⟨r, hr⟩
-    obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
+    obtain ⟨N, hN⟩ :=
+      Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
     exact ConeAvoidsFinite.proof m e N J _ hN
-  exact ⟨FiniteProjHomInjective.proof m e J _ (mem_segreChartComponents.1 hJ).1.1
-    (SegreChartDim.proof K ι P e m σ i hP J hJ) hfin, hfin⟩
+  exact ⟨
+    FiniteProjHomInjective.proof m e J _ (mem_segreChartComponents.1 hJ).1.1
+      (SegreChartDim.proof K ι P e m σ i hP J hJ) hfin,
+    hfin
+  ⟩
 
 end GroundTheory.Heights₂.Heights

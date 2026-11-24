@@ -4,7 +4,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatVecU
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSubquotSmIndCongr
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasSatakeGLOfIsSatVecGL
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsSubquotientOfSameSphericalHeckeEigenvaluesStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsSubquotientOfSameSphericalHeckeEigenvalues
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFixedIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -73,7 +73,7 @@ theorem hasSatake_of_isSatVecGL
   obtain ⟨y, hy, hy0, ht⟩ :=
     exists_fixed_of_fun _ _ ho (Final.GLintComm E w n) hφ0 ((isSphericalGL_iff α φ).1 hφ)
   have hq : IsSubquot π (psGL (w.adicCompletion E) α) :=
-    GlobalTheory.T.isSubquotient_of_same_spherical_hecke_eigenvalues _ _ _ π _ _ hc
+    _root_.GlobalTheory.LGrp.Zonal.isSubquot_of_hecke_eigenvalues _ _ _ π _ _ hc
       (Final.GLintComm E w n) hπ (LeviDatum.nInd_isSmooth _ _) x hx.2.1 hx.1 y hy hy0
       fun f hf => by
         obtain ⟨c, e1, e2⟩ := exists_eigenvalue_GL hx (isSatVecGL_of_isSpherical hφ hφ0) f hf

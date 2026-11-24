@@ -3,7 +3,9 @@ module
 public import Mathlib.Data.Matrix.ColumnRowPartitioned
 public import Mathlib.LinearAlgebra.Matrix.Rank
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannFormPeriodDeterminantBoundStatement
+public import Mathlib.Analysis.Complex.Order
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannFormPeriodDeterminantBound
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -118,7 +120,8 @@ theorem eq_zero_of_vecMul_eq_zero
   have hFt : Fᵀ.rank = q := by rw [Matrix.rank_transpose, hF]
   have hk : LinearMap.ker Fᵀ.mulVecLin = ⊥ := by
     have h0 := LinearMap.finrank_range_add_finrank_ker Fᵀ.mulVecLin
-    have h1 : Module.finrank ℂ (LinearMap.range Fᵀ.mulVecLin) = q := (Matrix.finrank_range_mulVecLin Fᵀ).trans hFt
+    have h1 : Module.finrank ℂ (LinearMap.range Fᵀ.mulVecLin) = q :=
+      (Matrix.finrank_range_mulVecLin Fᵀ).trans hFt
     rw [h1] at h0
     simp only [Module.finrank_fintype_fun_eq_card, Fintype.card_fin] at h0
     exact Submodule.finrank_eq_zero.mp (by omega)
@@ -240,7 +243,7 @@ theorem reindexed
     simpa [Matrix.mul_apply] using this
   have hdet : (S.submatrix e e).det ≠ 0 := by rwa [Matrix.det_submatrix_equiv_self]
   obtain ⟨t₁, t₂, t₃, -⟩ :=
-    GlobalTheory.T.riemann_form_period_determinant p q (A.submatrix id e) (B.submatrix id e)
+    _root_.GlobalTheory.CompanionTheory.Ar.Flat.fcNorm p q (A.submatrix id e) (B.submatrix id e)
       (S.submatrix e e) H₁ H₂ h₁ h₂ hdet hrel'
   have hG : ((S.submatrix e e)ᵀ)⁻¹ * (B.submatrix id e)ᵀ = ((Sᵀ)⁻¹ * Bᵀ).submatrix e id := by
     rw [Matrix.transpose_submatrix, Matrix.transpose_submatrix, Matrix.inv_submatrix_equiv,

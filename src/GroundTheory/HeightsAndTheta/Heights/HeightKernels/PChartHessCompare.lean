@@ -147,7 +147,6 @@ theorem cxHessian_affine_form
           : ℝ)
         : ℂ) := by
   have hD : ∑ i, star (x i) • L (Pi.single i 1) = L (star x) := by
-
     simp_rw [← L.map_smul, ← map_sum]
     congr 1
     funext k

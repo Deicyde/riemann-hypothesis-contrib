@@ -1,8 +1,8 @@
 module
 
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.Splits
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NewtonPolygonSlopeExistenceStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PolynomialRootsOfClosedQuotientStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NewtonPolygonSlopeExistence
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PolynomialRootsOfClosedQuotient
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -94,7 +94,8 @@ theorem step_comp
         → Aic (S := S ⧸ Ideal.span {ϖ ^ 2})
         → Step ϖ := by
   intro S _ ϖ hj hnz hD hA Q n hQ hd hn
-  have hRoots : Roots ϖ := GlobalTheory.T.polynomial_roots_of_closed_quotient ϖ hj hnz hD hA
+  have hRoots : Roots ϖ :=
+    _root_.GlobalTheory.CompanionTheory.RootsUpToUnits.roots_of_dich ϖ hj hnz hD hA
   have hq0 : Q.coeff 0 = Q.eval 0 := Polynomial.coeff_zero_eq_eval_zero Q
   have hspan : ϖ ^ (n + 1) ∈ Ideal.span {Q.coeff 0, ϖ ^ (n + 1)} := Ideal.subset_span (by simp)
   rcases hD (Q.coeff 0) (ϖ ^ (n + 1)) ⟨n + 1, hspan⟩ with hdiv | hdiv
@@ -108,7 +109,7 @@ theorem step_comp
       have h0 : ϖ ^ (n + 1) * x = 0 := by rw [he]; linear_combination e * hx
       exact (mem_nonZeroDivisors_iff_right.mp hpow) x (by rw [mul_comm]; exact h0)
     obtain ⟨c, hc1, i0, hi1, hi2, hi3⟩ :=
-      GlobalTheory.T.newton_polygon_slope_existence ϖ hD hRoots
+      _root_.GlobalTheory.CompanionTheory.NewtonSlope.first_slope ϖ hD hRoots
         (fun i => Q.coeff i)
         Q.natDegree (n + 1) hd hQ.coeff_natDegree hdiv
     have hs

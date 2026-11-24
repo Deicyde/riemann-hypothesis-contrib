@@ -66,7 +66,4 @@ theorem _root_.GlobalTheory.T.fockVacuum_real_restriction_gaussian_entire
                     → f w
                       = GlobalTheory.FockPos.gaussO θ frS frT w
                         * Φ (GlobalTheory.FockPos.zCo θ frS frT w) := by
-  first
-  | exact @GlobalTheory.FockPos.vacuum_real_entire
-  | exact GlobalTheory.FockPos.vacuum_real_entire
-  | (intros; apply GlobalTheory.FockPos.vacuum_real_entire <;> assumption)
+  first | exact @GlobalTheory.FockPos.vacuum_real_entire

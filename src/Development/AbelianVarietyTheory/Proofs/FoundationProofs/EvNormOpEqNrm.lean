@@ -99,7 +99,6 @@ theorem ev_normOp_eq_nrm
     refine Fintype.linearIndependent_iff.2 fun g hg i => ?_
     choose d hd using fun i => Ideal.Quotient.mk_surjective (g i)
     have hx : ev R p (m + 1) (∑ j, phi (R := R) p hp.out.pos (d j) * (1 + X) ^ (j : ℕ)) = 0 := by
-
       rw [← hg, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hsm, ← hd j]

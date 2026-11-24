@@ -53,6 +53,7 @@ open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.R
   UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
+-- The trace of any endomorphism on the zero submodule vanishes.
 private theorem trOn_bot' {V : Type} [AddCommGroup V] [Module ℂ V] (L : V →ₗ[ℂ] V)
     : trOn (⊥ : Submodule ℂ V) L = 0 := by
   unfold trOn
@@ -65,7 +66,7 @@ private theorem trOn_bot' {V : Type} [AddCommGroup V] [Module ℂ V] (L : V →�
 private theorem cf_sum {n : ℕ} (s : Finset (Wt n)) (g : Wt n → ℂ) (μ : Wt n)
     : cf (∑ x ∈ s, g x • ex x) μ = if μ ∈ s then g μ else 0 := by
   classical
-  simp [cf, ex, AddMonoidAlgebra.coeff, Finsupp.finsetSum_apply, Finsupp.single_apply]
+  simp [cf, ex, Finsupp.finsetSum_apply, Finsupp.single_apply]
 
 theorem UpperTheory.RealTr.chEx
     : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]

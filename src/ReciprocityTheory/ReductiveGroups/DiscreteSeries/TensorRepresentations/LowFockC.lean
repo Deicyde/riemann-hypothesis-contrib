@@ -71,7 +71,7 @@ theorem lf_rhoHol_sub_rhoN (ε : Fin n → Bool) (c : Fin n)
         else
           -((univ.filter fun i => ε i = true ∧ c < i).card : ℝ) := by
   rw [cfa_rho_coord]
-  cases hc : ε c <;> simp [hc, Finset.sum_boole]
+  cases hc : ε c <;> simp [Finset.sum_boole]
 
 theorem lowerWedge_weight (ε : Fin n → Bool) (c : Fin n)
     : sgE ε cpFock cmFock c c (fockBasis n (lowerWedgeAlt ε).1)

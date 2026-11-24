@@ -37,9 +37,6 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenerators.Co
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal

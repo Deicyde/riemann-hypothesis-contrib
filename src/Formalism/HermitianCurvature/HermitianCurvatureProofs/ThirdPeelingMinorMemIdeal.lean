@@ -108,8 +108,7 @@ theorem dpsi_last_basis_shift
   have c4 : r + k < 2 * r + k - a ∧ r + k < 2 * r + k - b := by omega
   have c5 : (2 * r + k - b = 2 * r + k - a + 1) ↔ (b + 1 = a) := by omega
   have c6 : ¬(2 * r + k - a ≤ r + k) := by omega
-  simp only [dpsiP, ps_val, c1, c2, c3, c4, c5, c6, if_false, if_true, and_self, and_false,
-    false_and, and_true]
+  simp only [dpsiP, ps_val, c1, c2, c4, c5, c6, if_false, if_true, and_self, and_false, and_true]
 
 theorem third_peeling_minor_mem_ideal
     {A : Type} [Ring A] [Algebra ℂ A]

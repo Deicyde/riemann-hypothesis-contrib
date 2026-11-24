@@ -54,9 +54,11 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem exists_smul_mem_of_finrank_eq {E : Type*} [AddCommGroup E] (S N : Submodule ℤ E) [Module.Finite ℤ S]
-    (hNS : N ≤ S) (hrk : finrank ℤ S = finrank ℤ N) :
-    ∀ x ∈ S, ∃ a : ℤ, a ≠ 0 ∧ a • x ∈ N := by
+theorem exists_smul_mem_of_finrank_eq
+    {E : Type*} [AddCommGroup E]
+    (S N : Submodule ℤ E) [Module.Finite ℤ S]
+    (hNS : N ≤ S) (hrk : finrank ℤ S = finrank ℤ N)
+    : ∀ x ∈ S, ∃ a : ℤ, a ≠ 0 ∧ a • x ∈ N := by
   intro x hx
   set P : Submodule ℤ S := N.comap S.subtype with hP
   have hPr : finrank ℤ P = finrank ℤ N :=
@@ -68,9 +70,12 @@ theorem exists_smul_mem_of_finrank_eq {E : Type*} [AddCommGroup E] (S N : Submod
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at hax
   exact hax
 
-theorem satR_mem_zl {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] (ρ : V →+ E) (N : Submodule R V) (y : E) :
-    y ∈ zl ρ N ↔ ∃ x ∈ N, ρ x = y := Iff.rfl
+theorem satR_mem_zl
+    {R V E : Type*}
+    [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (ρ : V →+ E) (N : Submodule R V) (y : E)
+    : y ∈ zl ρ N ↔ ∃ x ∈ N, ρ x = y :=
+  Iff.rfl
 
 theorem real_saturation_property : SatR := by
   intro R V E _ _ _ _ _ _ ρ L N hL hNL
@@ -82,15 +87,16 @@ theorem real_saturation_property : SatR := by
     exact (satR_mem_zl ρ L _).2 ⟨x, hNL hx, rfl⟩
   obtain ⟨-, hNS, hrk⟩ := Formalism.F.saturProps E (zl ρ L) (zl ρ N) hdisc hNL'
   set S := Formalism.F.satur (zl ρ L) (zl ρ N) with hSdef
-  have : DiscreteTopology S :=
-    Formalism.F.discreteTopology_of_le (L := zl ρ L) inf_le_left
+  have : DiscreteTopology S := Formalism.F.discreteTopology_of_le (L := zl ρ L) inf_le_left
   have htor := exists_smul_mem_of_finrank_eq S (zl ρ N) hNS hrk
   have hspan : ∀ y : E, y ∈ S ↔ y ∈ zl ρ L ∧ y ∈ span ℝ ((zl ρ N : Submodule ℤ E) : Set E) :=
     fun y => Submodule.mem_inf
-  refine ⟨{ carrier := {x | x ∈ L ∧ ρ x ∈ S}
-            add_mem' := ?_
-            zero_mem' := ?_
-            smul_mem' := ?_ }, ?_, ?_, ?_⟩
+  refine ⟨
+    { carrier := {x | x ∈ L ∧ ρ x ∈ S}, add_mem' := ?_, zero_mem' := ?_, smul_mem' := ?_ },
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rintro x y ⟨hxL, hxS⟩ ⟨hyL, hyS⟩
     refine ⟨L.add_mem hxL hyL, ?_⟩
     rw [map_add (f := _)]

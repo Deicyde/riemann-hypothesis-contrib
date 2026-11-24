@@ -41,8 +41,6 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemLevSph
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -54,6 +52,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.See
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.TopVol GlobalTheory.FinPl
+
 theorem _root_.GlobalTheory.T.injective_q_v_of_reads
     : ∀ {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws}
         {Z : TC.Later B (I.cols l)} {L : SizeData₂ (I.rec7 l Z)} {hT : GatTies (I.rec7 l Z)}
@@ -66,8 +65,5 @@ theorem _root_.GlobalTheory.T.injective_q_v_of_reads
           a.Is → a.True
             → ∀ (t : W.P.T) (J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t),
               J.Reads → Function.Injective fun i => (J.G i).q.v := by
-  first
-  | exact @_root_.GlobalTheory.TopVol.TwistPlaces.places_injective_alt
-  | exact _root_.GlobalTheory.TopVol.TwistPlaces.places_injective_alt
-  | (intros; apply _root_.GlobalTheory.TopVol.TwistPlaces.places_injective_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.TopVol.TwistPlaces.places_injective_alt
 end

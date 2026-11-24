@@ -130,8 +130,8 @@ lemma lseries_summable {σ : ℝ} (hσ : 1 < σ) :
   · norm_num
   · simpa using hσ
 
-theorem summable_absNorm_rpow {σ : ℝ} (hσ : 1 < σ) :
-    Summable (fun w : HeightOneSpectrum (𝓞 K) => ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (-σ)) := by
+theorem summable_absNorm_rpow {σ : ℝ} (hσ : 1 < σ)
+    : Summable (fun w : HeightOneSpectrum (𝓞 K) => ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (-σ)) := by
   apply PositivityTheory.Lord.summable_primes_rpow <;> assumption
 
 end Sum
@@ -156,13 +156,12 @@ open Formalism.MainNotions.SchurIrreducible MeasureTheory
 section Tail
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-
-
 end Tail
 
 section Main
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E]
-  [Algebra F E] {A B : Formalism.BasicNotions.HSpace E} (O : RFObj F E A B)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {A B : Formalism.BasicNotions.HSpace E} (O : RFObj F E A B)
 
 end Main
 end Formalism.MainNotions.DIV.Proofs.QuadraticNormBounds

@@ -136,7 +136,7 @@ theorem ptm_σL
 
 theorem gm_top {Y Z : Scheme.{0}} (r : Z ⟶ Y) (z : Z) (v : Γ(Y, ⊤)ˣ)
     : gm r z ⊤ v = gm (𝟙 Z) z ⊤ (Units.map r.appTop.hom.toMonoidHom v) := by
-  first | rfl | (simp only [gm, pullU]; rfl) | (ext; simp [gm, pullU]; rfl)
+  first | (simp only [gm, pullU]; rfl) | (ext; simp [gm, pullU]; rfl)
 
 theorem gm_homAt
     {A B : Type} [CommRing A] [Algebra S A] [CommRing B] [Algebra S B]

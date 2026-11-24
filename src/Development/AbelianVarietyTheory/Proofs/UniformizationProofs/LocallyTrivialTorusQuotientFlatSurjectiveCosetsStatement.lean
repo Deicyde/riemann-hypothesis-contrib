@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.locallyTrivial_torusQuotient_flat_surjective_coset
         → Mono i ∧ Flat q.left ∧ Surjective q.left ∧ (Smooth G.hom → Smooth B.hom)
           ∧ ∀ (Z : Over S) (g g' : Z ⟶ G),
             g ≫ q = g' ≫ q ↔ ∃ t : Z ⟶ splitTorus S X, g' = (t ≫ i) * g) := by
-  first
-  | exact @GlobalTheory.LocTriv.main
-  | exact GlobalTheory.LocTriv.main
-  | (intros; apply GlobalTheory.LocTriv.main <;> assumption)
+  first | exact @GlobalTheory.LocTriv.main

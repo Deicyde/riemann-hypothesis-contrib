@@ -50,6 +50,7 @@ open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRes
   Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory MonObj MonoidalCategory
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.torsion_dualNumber_point_eq_constant_charZero
     : ∀ (K : Type) [Field K] [CharZero K] (A : Over (Sp K)) [GrpObj A]
         (f : Sp (DualNumber K) ⟶ Sp K),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.torsion_dualNumber_point_eq_constant_charZero
             → u.left
               = spMap (algebraMap K (DualNumber K)) ≫ spMap (TrivSqZeroExt.fstHom K K K).toRingHom
                 ≫ u.left := by
-  first
-  | exact @GlobalTheory.TorsConst.torsion_eq_const
-  | exact GlobalTheory.TorsConst.torsion_eq_const
-  | (intros; apply GlobalTheory.TorsConst.torsion_eq_const <;> assumption)
+  first | exact @GlobalTheory.TorsConst.torsion_eq_const

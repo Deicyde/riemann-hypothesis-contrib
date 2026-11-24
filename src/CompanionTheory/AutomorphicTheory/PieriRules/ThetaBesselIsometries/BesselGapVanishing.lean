@@ -2,11 +2,15 @@ module
 
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.IsDSOfIsDG
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.SumNonneg
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.BesselGrowthStabilizerUnipotentStatement
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselNeZeroOfCyclicOrbit
-import Formalism.HermitianCurvature.HermitianCurvatureProofs.ContinuousMulMt
+public import Formalism.HermitianCurvature.BesselNonvanishingReduction
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.GrowthUnitaryGroupRpowNegIntegrable
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.UhMeasurableSet
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PolynomialProperness.ZhatNormLinearBound
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.HaarCompactGrowth.GrowthSphericalBound
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ReproducingFormulaReduction
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SigmaContOn
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselNeZeroOfCyclicOrbit
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.ContinuousMulMt
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HighestWeightUniqueness.HpkMulMulHpkApply
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -274,6 +278,6 @@ theorem be_conv
                 Integrable (beInt z Formalism.QuantumDeterminants.cStd π R.σ w v) (μW.prod μN))
               ∧ PI.BesselMapUniq.IsCWCont (k := k) (r := r) R.σ
                 (fun w => be z Formalism.QuantumDeterminants.cStd π R.σ μW μN w v) :=
-  be_conv_of_growth GlobalTheory.T.besselGrowth_stabilizer_unipotent
+  be_conv_of_growth _root_.Formalism.FourierDecayAlt.P.growth_spherical_bound
 
 end GlobalTheory.BesselConv

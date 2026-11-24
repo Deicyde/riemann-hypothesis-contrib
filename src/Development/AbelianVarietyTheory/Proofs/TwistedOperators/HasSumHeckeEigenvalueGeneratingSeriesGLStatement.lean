@@ -60,6 +60,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.hasSum_heckeEigenvalue_generatingSeries_GL
     : GlobalTheory.Published.UnramifiedDoublingGL
       → ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (r : ℕ) (V : Type)
@@ -83,8 +84,4 @@ theorem _root_.GlobalTheory.T.hasSum_heckeEigenvalue_generatingSeries_GL
                                 (eulerFac B ((qV E w : ℂ) ^ (((r : ℂ) - 1) / 2) * X)
                                   * eulerFac (B.map (·⁻¹)) ((qV E w : ℂ) ^ (((r : ℂ) - 1) / 2) * X)
                                   * ∏ i ∈ Finset.range r, (1 - (qV E w : ℂ) ^ i * (X : ℂ) ^ 2)) :=
-  by
-    first
-    | exact @GlobalTheory.FinZeta.GLSeries.hasSum_hecke_eigenvalues
-    | exact GlobalTheory.FinZeta.GLSeries.hasSum_hecke_eigenvalues
-    | (intros; apply GlobalTheory.FinZeta.GLSeries.hasSum_hecke_eigenvalues <;> assumption)
+  by first | exact @GlobalTheory.FinZeta.GLSeries.hasSum_hecke_eigenvalues

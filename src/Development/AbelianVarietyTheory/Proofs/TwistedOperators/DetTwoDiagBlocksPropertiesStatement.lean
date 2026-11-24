@@ -61,6 +61,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.det_twoDiagBlocks_properties
     : ∀ (κ : Type) [CommRing κ] (n r t : ℕ) (hr : r ≤ n) (g : GL (Fin n) κ),
       (g ∈ blockTri (blk2 r)
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.det_twoDiagBlocks_properties
         ∧ (n = r
           → Matrix.GeneralLinearGroup.det (upperLeftBlock hr g)
             = Matrix.GeneralLinearGroup.det g) := by
-  first
-  | exact @GlobalTheory.VecInv.TwoBlockDet.det_blocks
-  | exact GlobalTheory.VecInv.TwoBlockDet.det_blocks
-  | (intros; apply GlobalTheory.VecInv.TwoBlockDet.det_blocks <;> assumption)
+  first | exact @GlobalTheory.VecInv.TwoBlockDet.det_blocks

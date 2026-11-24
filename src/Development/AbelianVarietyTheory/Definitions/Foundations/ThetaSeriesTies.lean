@@ -467,7 +467,7 @@ theorem sub_orthProj_mem_perpOf
       : ∀ u y : Fin n → K,
         Formalism.DivisionValues.hform Hm u y = star u ⬝ᵥ Hm.mulVec y := fun u y => by
     simp [Formalism.DivisionValues.hform, Matrix.toLinearMapₛₗ₂'_apply, dotProduct, Matrix.mulVec,
-      Finset.mul_sum, starRingEnd_apply, mul_assoc, mul_comm, mul_left_comm]
+      Finset.mul_sum, starRingEnd_apply, mul_assoc, mul_comm]
   rw [h1, Matrix.mulVecLin_apply, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
     Matrix.mulVec_mulVec, h0, dotProduct_zero]
 

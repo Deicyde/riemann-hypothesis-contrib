@@ -4,7 +4,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Cubic
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.CubicalExtendsAndExtendGen
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ForallGeometricallyIntegralOfSmoothOfGeometrical
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUniqueRigidifiedGeneratorExtendNormalStatement
+public import Mathlib.AlgebraicGeometry.Geometrically.Integral
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUniqueRigidifiedGeneratorExtendNormal
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GeometricallyIntegralIffGeometricallyConnectedOf
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ExistsCubicalSymmetricExtension
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ExistsRigidifiedIso
@@ -337,7 +341,7 @@ theorem exists_extension
   obtain ⟨t, ht, hv⟩ := key _ hφ
   obtain ⟨ρ, hρ, vρ⟩ := exists_gen hL f₁ (LB.oneGen L) (LB.isGen_oneGen L)
   obtain ⟨c, ⟨hc₁, hc₂⟩, -⟩ :=
-    GlobalTheory.T.existsUnique_rigidified_generator_extend_normal S hS U H HU X j p e jH pU eU hs
+    _root_.GlobalTheory.GenExtendNormal.existsUnique_gen_extend S hS U H HU X j p e jH pU eU hs
       (forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ _ hs hc) he hp heU L hL
       K φ ε t ρ ht hρ
       (corr_of_val hL fun y J hJ => by

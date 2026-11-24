@@ -166,7 +166,6 @@ theorem isExp_mvExp [CharZero C] {σ : Type} [Fintype σ] (y : σ → C)
   · intro w
     ext m
     have hL : pderiv w (∑ x, y x • (X x : MvPowerSeries σ C)) = MvPowerSeries.C (y w) := by
-
       rw [map_sum, Finset.sum_eq_single w]
       · simp [smul_eq_C_mul]
       · intro b _ hb; simp [pderiv_X_of_ne hb]

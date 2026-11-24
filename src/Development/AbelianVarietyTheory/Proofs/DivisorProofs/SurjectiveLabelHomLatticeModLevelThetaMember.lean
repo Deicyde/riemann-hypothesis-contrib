@@ -42,6 +42,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -59,13 +60,6 @@ open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
 noncomputable section
 
 namespace GlobalTheory.Poinc.Sep.Labels
-
-theorem comp_pow_overScheme_grpObj
-    {S : Scheme.{0}} {A T T' : Over S} [GrpObj A] (ρ : T' ⟶ T) (x : T ⟶ A) (n : ℕ)
-    : ρ ≫ x ^ n = (ρ ≫ x) ^ n := by
-  induction n with
-  | zero => simp only [pow_zero, MonObj.comp_one]
-  | succ n ih => rw [pow_succ, MonObj.comp_mul, ih, pow_succ]
 
 open GlobalTheory.TorusExt in
 attribute [local instance] gtGroup in
@@ -118,7 +112,9 @@ theorem yy_hom
                 𝔪.yK))
               ⟶ baseOver (Sp X₁.S.R))
           ≫ X₁.ρ.pt a)
-        (by rw [← comp_pow_overScheme_grpObj, (X₁.ρ.fr_tors a).1, MonObj.comp_one])
+        (by
+          rw [← _root_.GlobalTheory.SemiAbTorsion.comp_pow_points, (X₁.ρ.fr_tors a).1,
+            MonObj.comp_one])
     have h1 := hc a rfl
     have h2 :=
       hc b (by

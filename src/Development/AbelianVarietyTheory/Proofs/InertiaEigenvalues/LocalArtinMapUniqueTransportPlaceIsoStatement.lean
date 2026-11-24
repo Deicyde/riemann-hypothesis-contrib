@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.Conju
   ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
   GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.localArtinMap_unique_transport_placeIso
     : GlobalArtinReciprocity → ChevalleyUnits
       → ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.localArtinMap_unique_transport_placeIso
           → ∀ (a : Weil h →* (w.adicCompletion E)ˣ) (a' : Weil h' →* (w'.adicCompletion E')ˣ),
             IsLocalArtin h a → IsLocalArtin h' a'
               → ∀ σ σ', WeilRel φ σ σ' → a' σ' = Units.map i.toRingHom.toMonoidHom (a σ) := by
-  first
-  | exact @GlobalTheory.LocLanglands.isLocalArtin_transport
-  | exact GlobalTheory.LocLanglands.isLocalArtin_transport
-  | (intros; apply GlobalTheory.LocLanglands.isLocalArtin_transport <;> assumption)
+  first | exact @GlobalTheory.LocLanglands.isLocalArtin_transport

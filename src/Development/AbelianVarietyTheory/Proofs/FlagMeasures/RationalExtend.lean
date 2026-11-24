@@ -61,29 +61,31 @@ namespace GlobalTheory.HL.RatExt
 section General
 variable {E R : Type} [Field E] [CommRing R] (ι : E →+* R)
 
-theorem single_comp {n : ℕ} (i : Fin n) :
-    (fun j => ι ((Pi.single i 1 : Fin n → E) j)) = (Pi.single i 1 : Fin n → R) := by
+theorem single_comp {n : ℕ} (i : Fin n)
+    : (fun j => ι ((Pi.single i 1 : Fin n → E) j)) = (Pi.single i 1 : Fin n → R) := by
   funext j
   by_cases h : j = i
   · subst h; simp
   · simp [h]
 
-theorem span_range {n : ℕ} :
-    Submodule.span R (Set.range fun (x : Fin n → E) (i : Fin n) => ι (x i)) = ⊤ := by
+theorem span_range {n : ℕ}
+    : Submodule.span R (Set.range fun (x : Fin n → E) (i : Fin n) => ι (x i)) = ⊤ := by
   rw [eq_top_iff, ← (Pi.basisFun R (Fin n)).span_eq]
   apply Submodule.span_mono
   rintro _ ⟨i, rfl⟩
   exact ⟨Pi.single i 1, by simpa using single_comp ι i⟩
 
-theorem lin_ext {n : ℕ} {M : Type} [AddCommGroup M] [Module R M] (a b : (Fin n → R) →ₗ[R] M)
-    (h : ∀ x : Fin n → E, a (fun i => ι (x i)) = b (fun i => ι (x i))) : a = b :=
+theorem lin_ext
+    {n : ℕ} {M : Type} [AddCommGroup M] [Module R M]
+    (a b : (Fin n → R) →ₗ[R] M) (h : ∀ x : Fin n → E, a (fun i => ι (x i)) = b (fun i => ι (x i)))
+    : a = b :=
   LinearMap.ext_on_range (span_range ι) h
 
 open ValuativeRel NumberField IsDedekindDomain in
 open scoped Pointwise ENNReal Classical in
 variable {E R : Type} [Field E] [CommRing R] (ι : E →+* R) in
-theorem _root_.GlobalTheory.HL.RatExt.exists_equiv {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) :
-    ∃ g' : (Fin n → R) ≃ₗ[R] (Fin n → R), ∀ x, g' (fun i => ι (x i)) = fun i => ι (g x i) := by
+theorem _root_.GlobalTheory.HL.RatExt.exists_equiv {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E))
+    : ∃ g' : (Fin n → R) ≃ₗ[R] (Fin n → R), ∀ x, g' (fun i => ι (x i)) = fun i => ι (g x i) := by
   set M := LinearMap.toMatrix' (g : (Fin n → E) →ₗ[E] (Fin n → E))
   set N := LinearMap.toMatrix' (g.symm : (Fin n → E) →ₗ[E] (Fin n → E))
   have hMN : M * N = 1 := by
@@ -108,24 +110,39 @@ end General
 
 open ValuativeRel NumberField IsDedekindDomain in
 open scoped Pointwise ENNReal Classical in
-private theorem exists_dual_family_of_linearIndependent {E : Type} [Field E] {n m : ℕ} {v : Fin m → Fin n → E}
-    (hv : LinearIndependent E v) :
-    ∃ φ : Fin m → (Fin n → E) →ₗ[E] E, ∀ a b, φ b (v a) = if a = b then 1 else 0 := by
+private theorem exists_dual_family_of_linearIndependent
+    {E : Type} [Field E] {n m : ℕ} {v : Fin m → Fin n → E} (hv : LinearIndependent E v)
+    : ∃ φ : Fin m → (Fin n → E) →ₗ[E] E, ∀ a b, φ b (v a) = if a = b then 1 else 0 := by
   choose φ hφ using fun b =>
     LinearMap.exists_extend ((Module.Basis.span hv).coord b)
   refine ⟨φ, fun a b => ?_⟩
   have h := LinearMap.congr_fun (hφ b) ⟨v a, Submodule.subset_span (Set.mem_range_self a)⟩
   simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype] at h
   rw [h]
-  have hb : (⟨v a, Submodule.subset_span (Set.mem_range_self a)⟩ : Submodule.span E (Set.range v))
-      = Module.Basis.span hv a := by
+  have hb
+      : (⟨v a, Submodule.subset_span (Set.mem_range_self a)⟩ : Submodule.span E (Set.range v))
+        = Module.Basis.span hv a := by
     ext; simp [Module.Basis.span_apply]
   rw [hb, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply]
 
-
 open ValuativeRel NumberField IsDedekindDomain in
 open scoped Pointwise ENNReal Classical in
-theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : _root_.GlobalTheory.HL.Places F E sig), ∀ (n : ℕ) (p : HeightOneSpectrum (𝓞 F)), Function.Injective (A.bc (n := n) p) ∧ Submodule.span (A.loc p).Ep (Set.range (A.bc (n := n) p)) = ⊤ ∧ (∀ g : (Fin n → E) ≃ₗ[E] (Fin n → E), ∃! g', A.Ext p g g') ∧ (∀ (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) g' (Λ : Submodule (𝓞 E) (Fin n → E)), A.Ext p g g' → A.lat p (Λ.map ((g : (Fin n → E) →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E))) = g' • A.lat p Λ) ∧ (∀ (Hm : Matrix (Fin n) (Fin n) E) (x y : Fin n → E), _root_.GlobalTheory.HL.hf (A.L p) (Hm.map (A.loc p).ιE) (A.bc p x) (A.bc p y) = (A.loc p).ιE (∑ i, ∑ j, x i * Hm i j * sig (y j))) ∧ ∀ (m : ℕ) (v : Fin m → Fin n → E), LinearIndependent E v ↔ LinearIndependent (A.loc p).Ep fun a => A.bc p (v a) := by
+theorem _root_.GlobalTheory.HL.RatExt.rational_extend
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : _root_.GlobalTheory.HL.Places F E sig),
+      ∀ (n : ℕ) (p : HeightOneSpectrum (𝓞 F)),
+        Function.Injective (A.bc (n := n) p)
+          ∧ Submodule.span (A.loc p).Ep (Set.range (A.bc (n := n) p)) = ⊤
+          ∧ (∀ g : (Fin n → E) ≃ₗ[E] (Fin n → E), ∃! g', A.Ext p g g')
+          ∧ (∀ (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) g' (Λ : Submodule (𝓞 E) (Fin n → E)),
+            A.Ext p g g'
+              → A.lat p (Λ.map ((g : (Fin n → E) →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E)))
+                = g' • A.lat p Λ)
+          ∧ (∀ (Hm : Matrix (Fin n) (Fin n) E) (x y : Fin n → E),
+            _root_.GlobalTheory.HL.hf (A.L p) (Hm.map (A.loc p).ιE) (A.bc p x) (A.bc p y)
+              = (A.loc p).ιE (∑ i, ∑ j, x i * Hm i j * sig (y j)))
+          ∧ ∀ (m : ℕ) (v : Fin m → Fin n → E),
+            LinearIndependent E v ↔ LinearIndependent (A.loc p).Ep fun a => A.bc p (v a) := by
   intro F E _ _ _ _ _ sig A n p
   have hbc : ∀ x : Fin n → E, A.bc p x = fun i => (A.loc p).ιE (x i) := fun _ => rfl
   haveI : Nontrivial (A.loc p).Ep := by
@@ -170,8 +187,11 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
       obtain ⟨φ, hφ⟩ := exists_dual_family_of_linearIndependent hv
       rw [Fintype.linearIndependent_iff]
       intro c hc b
-      have key : ∀ a, ∑ j, (A.loc p).ιE (v a j) *
-          (A.loc p).ιE (φ b (fun k => if j = k then 1 else 0)) = if a = b then 1 else 0 := by
+      have key
+          : ∀ a,
+            ∑ j, (A.loc p).ιE (v a j) *
+                (A.loc p).ιE (φ b (fun k => if j = k then 1 else 0))
+              = if a = b then 1 else 0 := by
         intro a
         have h := congrArg (A.loc p).ιE (LinearMap.pi_apply_eq_sum_univ (φ b) (v a))
         rw [hφ] at h
@@ -179,9 +199,12 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
         simp only [map_sum, smul_eq_mul, map_mul] at h
         rw [← h]
         split_ifs <;> simp
-      calc c b = ∑ a, c a * (if a = b then 1 else 0) := by simp
+      calc
+        c b
+          = ∑ a, c a * (if a = b then 1 else 0) := by simp
         _ = ∑ a, c a * ∑ j, (A.loc p).ιE (v a j) *
-              (A.loc p).ιE (φ b (fun k => if j = k then 1 else 0)) := by simp only [key]
+              (A.loc p).ιE (φ b (fun k => if j = k then 1 else 0)) := by
+          simp only [key]
         _ = ∑ j, (∑ a, c a • A.bc p (v a)) j *
               (A.loc p).ιE (φ b (fun k => if j = k then 1 else 0)) := by
           simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hbc, Finset.mul_sum,
@@ -191,13 +214,14 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
     · intro hv
       rw [Fintype.linearIndependent_iff] at hv ⊢
       intro c hc a
-      have h := hv (fun a => (A.loc p).ιE (c a)) (by
-        funext j
-        have hj := congrFun hc j
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hbc] at hj ⊢
+      have h :=
+        hv (fun a => (A.loc p).ιE (c a)) (by
+          funext j
+          have hj := congrFun hc j
+          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hbc] at hj ⊢
 
-        rw [← map_zero (A.loc p).ιE, ← hj, map_sum]
-        simp [map_mul])
+          rw [← map_zero (A.loc p).ιE, ← hj, map_sum]
+          simp [map_mul])
       exact (map_eq_zero_iff _ (A.loc p).ιE.injective).mp (h a)
 
 end GlobalTheory.HL.RatExt

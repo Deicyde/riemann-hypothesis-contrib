@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafPropertiesStatement
+public import Mathlib.Algebra.Homology.HomotopyCategory.KInjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafProperties
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSpaceChainsMayerVietorisShortExactStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HypercohomologyLongExactFirstOfInjectiveStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HypercohomologyPullbackBiprodInlInrBijective
@@ -54,16 +55,7 @@ open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComp
 noncomputable section
 namespace GlobalTheory.EtC.MayerVietoris
 
-theorem cpull_add
-    {R : Type} [CommRing R]
-    {K L : Cx R} (f g : K ⟶ L)
-    (I : Cx R) (n : ℤ) (x : CohomologyClass L I n)
-    : cpull (f + g) I n x = cpull f I n x + cpull g I n x := by
-  obtain ⟨x, rfl⟩ := x.mk_surjective
-  rw [cpre_mk, cpre_mk, cpre_mk, ← CohomologyClass.mk_add]
-  congr 1
-  apply Cocycle.ext
-  simp [zcomp, Cochain.ofHom_add, Cochain.add_comp]
+alias cpull_add := _root_.GlobalTheory.EtC.BiprodCls.cpull_add
 
 theorem cpull_neg
     {R : Type} [CommRing R] {K L : Cx R} (f : K ⟶ L) (I : Cx R) (n : ℤ) (x : CohomologyClass L I n)
@@ -74,20 +66,14 @@ theorem cpull_neg
   apply Cocycle.ext
   simp [zcomp, Cochain.ofHom_neg, Cochain.neg_comp]
 
-theorem cpull_comp
-    {R : Type} [CommRing R]
-    {K L M : Cx R} (f : K ⟶ L) (g : L ⟶ M)
-    (I : Cx R) (n : ℤ) (x : CohomologyClass M I n)
-    : cpull (f ≫ g) I n x = cpull f I n (cpull g I n x) :=
-  (GlobalTheory.EtC.ZcFun.main R).2.1 f g I n x
-
 theorem cpull_lift
     {R : Type} [CommRing R]
     {K L M : Cx R} (a : M ⟶ K) (b : M ⟶ L)
     (I : Cx R) (n : ℤ) (y : CohomologyClass (K ⊞ L) I n)
     : cpull (biprod.lift a b) I n y
       = cpull a I n (cpull biprod.inl I n y) + cpull b I n (cpull biprod.inr I n y) := by
-  rw [biprod.lift_eq, cpull_add, cpull_comp, cpull_comp]
+  rw [biprod.lift_eq, cpull_add, _root_.GlobalTheory.EtC.ZcFun.cpull_comp,
+    _root_.GlobalTheory.EtC.ZcFun.cpull_comp]
 
 def mvS (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E) : ShortComplex (Cx R) :=
   ShortComplex.mk
@@ -101,7 +87,7 @@ def mvS (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E) : Shor
 
 theorem mvS_exact (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E) (h : Cover2 R f g)
     : (mvS R f g).ShortExact := by
-  obtain ⟨w, hw⟩ := GlobalTheory.T.etaleSpaceChains_mayerVietoris_shortExact R f g h
+  obtain ⟨w, hw⟩ := _root_.GlobalTheory.EtC.mv_shortExact R f g h
   exact hw
 
 def mvMap
@@ -138,7 +124,7 @@ theorem GlobalTheory.EtC.mayerVietoris
   intro R _ F
   obtain ⟨D, hex, hnat⟩ :=
     GlobalTheory.T.hypercohomology_longExact_first_of_injective R (res R F)
-      (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties R F).2.1
+      (_root_.GlobalTheory.EtC.ResBasic.res_basic R F).2.1
   refine ⟨
     fun f g h n =>
       D (GlobalTheory.EtC.MayerVietoris.mvS R f g)
@@ -161,12 +147,12 @@ theorem GlobalTheory.EtC.mayerVietoris
               = pull R g F m x := by
       intro m x
       constructor
-      · refine (GlobalTheory.EtC.MayerVietoris.cpull_comp (K := (chains R).obj U)
+      · refine (_root_.GlobalTheory.EtC.ZcFun.cpull_comp (K := (chains R).obj U)
           (L := (chains R).obj U ⊞ (chains R).obj V) biprod.inl
           (biprod.desc ((chains R).map f) ((chains R).map g)) _ m x).symm.trans ?_
         rw [biprod.inl_desc]
         rfl
-      · refine (GlobalTheory.EtC.MayerVietoris.cpull_comp (K := (chains R).obj V)
+      · refine (_root_.GlobalTheory.EtC.ZcFun.cpull_comp (K := (chains R).obj V)
           (L := (chains R).obj U ⊞ (chains R).obj V) biprod.inr
           (biprod.desc ((chains R).map f) ((chains R).map g)) _ m x).symm.trans ?_
         rw [biprod.inr_desc]

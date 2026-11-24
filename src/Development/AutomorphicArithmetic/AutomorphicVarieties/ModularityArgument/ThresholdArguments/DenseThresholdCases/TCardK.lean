@@ -39,9 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 private theorem klev_three (K : Type) [Field K] [NumberField K] (n M : ℕ)
     : UpperTheory.V.Af.KLev K n (3 * M) ≤ UpperTheory.V.Af.KLev K n M := by

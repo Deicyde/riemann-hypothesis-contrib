@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_perfect_free_finite_complex
     : ∀ (A : Type) [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
         (B : Over (Spec (CommRingCat.of A))) [GrpObj B] [IsCommMonObj B],
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.exists_perfect_free_finite_complex
                           (g < i ∨ ¬ Triv (F.pull π))
                             → (((ModuleCat.extendScalars φ).mapHomologicalComplex _).obj C).ExactAt
                               i := by
-  first
-  | exact @GlobalTheory.AbLaw.exists_free_complex_of_primitive
-  | exact GlobalTheory.AbLaw.exists_free_complex_of_primitive
-  | (intros; apply GlobalTheory.AbLaw.exists_free_complex_of_primitive <;> assumption)
+  first | exact @GlobalTheory.AbLaw.exists_free_complex_of_primitive

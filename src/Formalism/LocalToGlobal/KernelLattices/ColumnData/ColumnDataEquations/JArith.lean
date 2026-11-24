@@ -169,8 +169,9 @@ theorem gaussRow_of (hS : B.StdOK) (hL : B.LatAll) (hNeg : NegOneNorm D) : Gauss
     unfold TaylorLogMetric.al TaylorLogMetric.Hf
     simp
   have hU₁ :=
-    c.unitaryData₁ 0 (unitaryData hL hN (by decide) γ 1 Ae hA) (formV_herm' _ _ _ _)
-      (formV_pos (area_pos' B) _ _ _) (phiL_isom _ _ _ _ _ _ _) hA₁ hal0 (al_phi _ _ _ _ _ _)
+    c.unitaryData₁ 0 (unitaryData hL hN (by decide) γ 1 Ae hA)
+      (_root_.Formalism.L2.Ker.Cd.formV_herm _ _ _ _) (formV_pos (area_pos' B) _ _ _)
+      (phiL_isom _ _ _ _ _ _ _) hA₁ hal0 (al_phi _ _ _ _ _ _)
   have hcard : 0 < S.card := by
     obtain ⟨x, hx, -⟩ := hS₁.2.2 0 (AddSubgroup.zero_mem _)
     exact Finset.card_pos.mpr ⟨x, hx⟩

@@ -82,7 +82,4 @@ theorem _root_.GlobalTheory.T.zetaIntegral_leftTranslate_primitiveFrames
               (X0 k σ * (invT h).val)
             * (ν (gdet g₀) : ℂ) * apow (gdet g₀) ((Fintype.card C : ℂ) / 2)
           = fFun μ σ ν Ψ (X0 k σ * (invT h).val) := by
-  first
-  | exact @GlobalTheory.LeftTranslateZeta.bigF_phiA_left
-  | exact GlobalTheory.LeftTranslateZeta.bigF_phiA_left
-  | (intros; apply GlobalTheory.LeftTranslateZeta.bigF_phiA_left <;> assumption)
+  first | exact @GlobalTheory.LeftTranslateZeta.bigF_phiA_left

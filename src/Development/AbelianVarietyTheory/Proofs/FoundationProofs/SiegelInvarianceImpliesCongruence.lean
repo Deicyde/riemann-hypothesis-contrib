@@ -1,6 +1,5 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitJPolynomialBoundedDenominators
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SmoothedSiegelUnitQExpansionCoeffsIntegral
 public import Development.AbelianVarietyTheory.Definitions.Foundations.Imports
 public import Development.AbelianVarietyTheory.Definitions.Foundations.SgC
@@ -10,8 +9,11 @@ public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.RegularLocalRing.Defs
 public import Mathlib.RingTheory.SimpleRing.Principal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasQExpansionOfLevelCoeffAndFunctionUnique
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitInTowerSlActionRowVectorStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitQExpansionCoefficientsStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitInTowerSlActionRowVector
+public import Development.AbelianVarietyTheory.Definitions.Divisors.HasQIff
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitQExpansionCoefficients
+public import Mathlib.RingTheory.RootsOfUnity.Complex
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUnitJPolynomialBoundedDenominators
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SmoothedSiegelUnitIndexAddIntVector
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -60,7 +62,6 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Presheaf
 import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 import Development.AbelianVarietyTheory.Definitions.Foundations.Integral
-public import Mathlib.RingTheory.RootsOfUnity.Complex
 
 @[expose] public section
 
@@ -73,9 +74,13 @@ namespace GlobalTheory.SiegSep
 
 open GlobalTheory.Sieg GlobalTheory.QFam GlobalTheory.SiegQ
 
-theorem hasQ_expo (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c ![(a : ℚ) / M, (b : ℚ) / M]) :
-    ∃ A : ℕ → ℂ, HasQ M (fun τ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * ee (-((expo c M a : ℂ) / M) * (τ : ℂ))) A ∧
-      A 0 ≠ 0 := by
+theorem hasQ_expo
+    (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c ![(a : ℚ) / M, (b : ℚ) / M])
+    : ∃ A : ℕ → ℂ,
+      HasQ M
+          (fun τ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * ee (-((expo c M a : ℂ) / M) * (τ : ℂ)))
+          A
+        ∧ A 0 ≠ 0 := by
   have hc : 0 < c := by have := hadm.1; omega
   have hM0 : (M : ℂ) ≠ 0 := by exact_mod_cast hM.ne'
   set ζ : ℂ := ee (1 / (M : ℂ)) with hζ
@@ -97,26 +102,28 @@ theorem hasQ_expo (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c !
       simp only [Matrix.cons_val_one, Matrix.cons_val_zero, Int.cast_natCast]
       field_simp
       linear_combination -this
-  have hK : Good (IntermediateField.adjoin ℚ {ζ}).toSubfield.toSubring (unitPart c M a (ζ ^ b)) := by
+  have hK
+      : Good (IntermediateField.adjoin ℚ {ζ}).toSubfield.toSubring (unitPart c M a (ζ ^ b)) := by
     set K := IntermediateField.adjoin ℚ {ζ}
     have m1 : ζ ^ b ∈ K := pow_mem (IntermediateField.mem_adjoin_simple_self ℚ ζ) b
     have m2 : (1 - (ζ ^ b) ^ c)⁻¹ ∈ K := inv_mem (sub_mem (one_mem K) (pow_mem m1 c))
     exact good_unitPart hc hM ha hv m1 (inv_mem m1 : _ ∈ K)
-      (fun _ => (mul_mem (pow_mem (sub_mem (one_mem K) m1) _) m2 : _ ∈ K)) fun _ h => ⟨hne h, m2⟩
+      (fun _ => (mul_mem (pow_mem (sub_mem (one_mem K) m1) _) m2 : _ ∈ K))
+      fun _ h => ⟨hne h, m2⟩
   refine ⟨tc (unitPart c M a (ζ ^ b)), ?_, ?_⟩
-  · have e : (fun τ : ℍ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ *
-        ee (-((expo c M a : ℂ) / M) * (τ : ℂ))) = fun τ => unitPart c M a (ζ ^ b) (qv M τ) := by
+  · have e
+        : (fun τ : ℍ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * ee (-((expo c M a : ℂ) / M) * (τ : ℂ)))
+          = fun τ => unitPart c M a (ζ ^ b) (qv M τ) := by
       funext τ
       have hz0 : qv M τ ≠ 0 := Complex.exp_ne_zero _
-      have e1 : ee τ = qv M τ ^ M := by
-        rw [ee, qv, ← Complex.exp_nat_mul]; congr 1; field_simp
+      have e1 : ee τ = qv M τ ^ M := by rw [ee, qv, ← Complex.exp_nat_mul]; congr 1; field_simp
       have e2 : ee (pt ![(a : ℚ) / M, (b : ℚ) / M] τ) = qv M τ ^ a * ζ ^ b := by
         rw [hζ, ee, ee, qv, ← Complex.exp_nat_mul, ← Complex.exp_nat_mul, ← Complex.exp_add]
         congr 1
         simp only [pt, Matrix.cons_val_one, Matrix.cons_val_zero]
         push_cast
         ring
-      have e3 : ee (-((expo c M a : ℂ) / M) * (τ : ℂ)) = qv M τ ^ (-expo c M a) := by
+      have e3 : ee (-((expo c M a : ℂ) / M) * (τ : ℂ)) = qv M τ ^ (- expo c M a) := by
         rw [ee, qv, ← Complex.exp_int_mul]
         congr 1
         push_cast
@@ -129,30 +136,36 @@ theorem hasQ_expo (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c !
   · rw [tc_zero]
     exact unitPart_zero_ne hc hM ha (pow_ne_zero _ hζ0) hne
 
-theorem ee_add (x y : ℂ) : ee (x + y) = ee x * ee y := by
-  rw [ee, ee, ee, ← Complex.exp_add]; ring_nf
-
-theorem hasQ_shift {M : ℕ} {f : ℍ → ℂ} {α : ℕ → ℂ} (h : HasQ M f α) (d : ℕ) :
-    HasQ M (fun τ => f τ * ee (((d : ℂ) / M) * (τ : ℂ))) (fun n => if d ≤ n then α (n - d) else 0) := by
+theorem hasQ_shift {M : ℕ} {f : ℍ → ℂ} {α : ℕ → ℂ} (h : HasQ M f α) (d : ℕ)
+    : HasQ M
+      (fun τ => f τ * ee (((d : ℂ) / M) * (τ : ℂ)))
+      (fun n => if d ≤ n then α (n - d) else 0) := by
   apply GlobalTheory.FracBd.shift_hasQ <;> assumption
 
-theorem exp_siegel_ord {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε)
-    (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c ![(a : ℚ) / M, (b : ℚ) / M]) :
-    (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff ((expo c M a : ℚ) / M) ≠ 0 ∧
-    ∀ r : ℚ, (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r ≠ 0 → (expo c M a : ℚ) / M ≤ r := by
-  obtain ⟨k, A, hA, hco, hz⟩ := GlobalTheory.T.siegel_unit_q_expansion_coefficients Ω ε T c M a b hM ha hadm
+theorem exp_siegel_ord
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (ε : Ω →+* ℂ) (T : Tower Ω ε)
+    (c M a b : ℕ) (hM : 0 < M) (ha : a < M) (hadm : admitted c ![(a : ℚ) / M, (b : ℚ) / M])
+    : (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff ((expo c M a : ℚ) / M) ≠ 0
+      ∧ ∀ r : ℚ,
+        (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r ≠ 0
+          → (expo c M a : ℚ) / M ≤ r := by
+  obtain ⟨k, A, hA, hco, hz⟩ := _root_.GlobalTheory.KExp.siegel_exp Ω ε T c M a b hM ha hadm
   obtain ⟨B, hB, hB0⟩ := hasQ_expo c M a b hM ha hadm
   set e := expo c M a with he
   set f := sg c ![(a : ℚ) / M, (b : ℚ) / M] with hf
-  have shift : ∀ (u v : ℤ) (d : ℕ), (d : ℤ) = u - v →
-      (fun τ : ℍ => f τ * ee (-((u : ℂ) / M) * (τ : ℂ)) * ee (((d : ℂ) / M) * (τ : ℂ))) =
-        fun τ => f τ * ee (-((v : ℂ) / M) * (τ : ℂ)) := by
+  have shift
+      : ∀ (u v : ℤ) (d : ℕ),
+        (d : ℤ) = u - v
+          → (fun τ : ℍ => f τ * ee (-((u : ℂ) / M) * (τ : ℂ)) * ee (((d : ℂ) / M) * (τ : ℂ)))
+            = fun τ => f τ * ee (-((v : ℂ) / M) * (τ : ℂ)) := by
     intro u v d hd
     funext τ
-    rw [mul_assoc, ← ee_add]
+    rw [mul_assoc, ← _root_.GlobalTheory.Sieg.Model.ee_add]
     congr 2
     have hd' : (d : ℂ) = (u : ℂ) - v := by exact_mod_cast hd
-    rw [hd']; ring
+    rw [hd']
+    ring
   have hke : k ≤ e := by
     by_contra hlt
     push_neg at hlt
@@ -189,8 +202,7 @@ theorem exp_siegel_ord {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ
     by_cases hex : ∃ n : ℕ, r = ((k : ℚ) + n) / M
     · obtain ⟨n, rfl⟩ := hex
       rw [hco n] at hr
-      have hnd : d ≤ n := by
-        by_contra hnd; exact hr (hAn n (by omega))
+      have hnd : d ≤ n := by by_contra hnd; exact hr (hAn n (by omega))
       rw [hed] at hlt
       have : ((k : ℚ) + n) < (k : ℚ) + d := (div_lt_div_iff_of_pos_right hMq).1 hlt
       have : (n : ℚ) < d := by linarith
@@ -198,48 +210,60 @@ theorem exp_siegel_ord {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ
     · push_neg at hex
       exact hr (hz r hex)
 
-theorem sum_sub (M K : ℕ) : ∀ n : ℕ, n * M ≤ K →
-    2 * ((∑ m ∈ Finset.range n, (K - (m + 1) * M) : ℕ) : ℤ) = 2 * n * K - M * n * (n + 1) := by
+theorem sum_sub (M K : ℕ)
+    : ∀ n : ℕ,
+      n * M ≤ K
+        → 2 * ((∑ m ∈ Finset.range n, (K - (m + 1) * M) : ℕ) : ℤ)
+          = 2 * n * K - M * n * (n + 1) := by
   intro n
   induction n with
   | zero => intro _; simp
   | succ n ih =>
     intro h
-    rw [Finset.sum_range_succ, Nat.cast_add, mul_add, ih (le_trans (Nat.mul_le_mul_right _ (Nat.le_succ n)) h),
-      Nat.cast_sub h]
-    push_cast; ring
+    rw [Finset.sum_range_succ, Nat.cast_add, mul_add,
+      ih (le_trans (Nat.mul_le_mul_right _ (Nat.le_succ n)) h), Nat.cast_sub h]
+    push_cast
+    ring
 
-theorem expo_two (t M a : ℕ) (hM : 0 < M) (ha : a < M) :
-    2 * expo (1 + t * M) M a =
-      2 * ((M * (((1 + t * M) ^ 2 - 1) / 12) : ℕ) : ℤ) + t * (2 + t * M) * (a * a - M * a) := by
+theorem expo_two (t M a : ℕ) (hM : 0 < M) (ha : a < M)
+    : 2 * expo (1 + t * M) M a
+      = 2 * ((M * (((1 + t * M) ^ 2 - 1) / 12) : ℕ) : ℤ) + t * (2 + t * M) * (a * a - M * a) := by
   have hdiv : (1 + t * M) * a / M = t * a := by
-    rw [show (1 + t * M) * a = a + M * (t * a) by ring, Nat.add_mul_div_left _ _ hM, Nat.div_eq_of_lt ha, zero_add]
+    rw [show (1 + t * M) * a = a + M * (t * a) by ring, Nat.add_mul_div_left _ _ hM,
+      Nat.div_eq_of_lt ha, zero_add]
   have hkk : 2 * kk (1 + t * M) = ((1 + t * M : ℕ) : ℤ) - ((1 + t * M : ℕ) : ℤ) ^ 2 := by
     unfold kk
     apply Int.mul_ediv_cancel'
-    have : ((1 + t * M : ℕ) : ℤ) - ((1 + t * M : ℕ) : ℤ) ^ 2 =
-        -((((1 + t * M : ℕ) : ℤ) - 1) * ((((1 + t * M : ℕ) : ℤ) - 1) + 1)) := by ring
+    have : ((1 + t * M : ℕ) : ℤ) - ((1 + t * M : ℕ) : ℤ) ^ 2
+        = -((((1 + t * M : ℕ) : ℤ) - 1) * ((((1 + t * M : ℕ) : ℤ) - 1) + 1)) := by
+      ring
     rw [this]
     exact (Int.even_mul_succ_self _).neg.two_dvd
-  have hS := sum_sub M ((1 + t * M) * a) (t * a)
-    (by rw [show (1 + t * M) * a = a + M * (t * a) by ring]; nlinarith)
+  have hS :=
+    sum_sub M ((1 + t * M) * a) (t * a)
+      (by rw [show (1 + t * M) * a = a + M * (t * a) by ring]; nlinarith)
   unfold expo
   rw [hdiv]
   push_cast at hS hkk ⊢
   linear_combination (a : ℤ) * hkk + hS
 
-theorem expo_inj (c M a a' : ℕ) (hc : 1 < c) (hcM : c ≡ 1 [MOD M]) (ha : a < M) (ha' : a' < M)
-    (h : expo c M a = expo c M a') : a = a' ∨ a + a' = M := by
+theorem expo_inj
+    (c M a a' : ℕ)
+    (hc : 1 < c) (hcM : c ≡ 1 [MOD M]) (ha : a < M) (ha' : a' < M) (h : expo c M a = expo c M a')
+    : a = a' ∨ a + a' = M := by
   have hM : 0 < M := by omega
   obtain ⟨t, ht⟩ : M ∣ c - 1 := (Nat.modEq_iff_dvd' (by omega)).1 hcM.symm
   have hc' : c = 1 + t * M := by
     have := Nat.eq_add_of_sub_eq (by omega) ht
-    rw [this]; ring
+    rw [this]
+    ring
   subst hc'
   have e1 := expo_two t M a hM ha
   have e2 := expo_two t M a' hM ha'
   rw [h] at e1
-  have key : (t : ℤ) * (2 + t * M) * ((a : ℤ) * a - M * a) = t * (2 + t * M) * ((a' : ℤ) * a' - M * a') := by
+  have key
+      : (t : ℤ) * (2 + t * M) * ((a : ℤ) * a - M * a)
+        = t * (2 + t * M) * ((a' : ℤ) * a' - M * a') := by
     linarith
   have tpos : 0 < t := by
     rcases Nat.eq_zero_or_pos t with h0 | h0
@@ -252,8 +276,10 @@ theorem expo_inj (c M a a' : ℕ) (hc : 1 < c) (hcM : c ≡ 1 [MOD M]) (ha : a <
   · left; omega
   · right; omega
 
-theorem isAdmissibleSmoothingFactor_of_int_index {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) {a b : ℤ}
-    (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) : admitted c ![(a : ℚ) / M, (b : ℚ) / M] := by
+theorem isAdmissibleSmoothingFactor_of_int_index
+    {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    : admitted c ![(a : ℚ) / M, (b : ℚ) / M] := by
   refine ⟨hc, h6, ?_⟩
   have hcop : Nat.Coprime M c := by
     have := Nat.ModEq.gcd_eq hcM
@@ -269,15 +295,20 @@ theorem isAdmissibleSmoothingFactor_of_int_index {c M : ℕ} (hM : 0 < M) (hc : 
   rintro ⟨h1, h2⟩
   exact hab ⟨key a (by simpa using h1), key b (by simpa using h2)⟩
 
-theorem siegel_add_int {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (T : Tower Ω ε) {c : ℕ} {x : Fin 2 → ℚ}
-    (hx : admitted c x) (n : Fin 2 → ℤ) : siegel T c (fun i => x i + n i) = siegel T c x := by
-  have e : sgC c (fun i => x i + n i) = sgC c x := funext fun z => GlobalTheory.Sieg.Per.sg_add_int c x n _ hx
+theorem siegel_add_int
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (T : Tower Ω ε)
+    {c : ℕ} {x : Fin 2 → ℚ} (hx : admitted c x)
+    (n : Fin 2 → ℤ)
+    : siegel T c (fun i => x i + n i) = siegel T c x := by
+  have e : sgC c (fun i => x i + n i) = sgC c x :=
+    funext fun z => GlobalTheory.Sieg.Per.sg_add_int c x n _ hx
   unfold siegel
   rw [e]
 
-theorem norm_facts {M : ℕ} (hM : 0 < M) {a b : ℤ} (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) :
-    (((a % M).toNat : ℕ) : ℤ) = a % M ∧ (((b % M).toNat : ℕ) : ℤ) = b % M ∧ (a % M).toNat < M ∧
-    ¬ ((M : ℤ) ∣ (((a % M).toNat : ℕ) : ℤ) ∧ (M : ℤ) ∣ (((b % M).toNat : ℕ) : ℤ)) := by
+theorem norm_facts {M : ℕ} (hM : 0 < M) {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    : (((a % M).toNat : ℕ) : ℤ) = a % M ∧ (((b % M).toNat : ℕ) : ℤ) = b % M ∧ (a % M).toNat < M
+      ∧ ¬((M : ℤ) ∣ (((a % M).toNat : ℕ) : ℤ) ∧ (M : ℤ) ∣ (((b % M).toNat : ℕ) : ℤ)) := by
   have hM0 : (M : ℤ) ≠ 0 := by exact_mod_cast hM.ne'
   have hMpos : (0 : ℤ) < M := by exact_mod_cast hM
   have ta : (((a % M).toNat : ℕ) : ℤ) = a % M := Int.toNat_of_nonneg (Int.emod_nonneg a hM0)
@@ -292,18 +323,23 @@ theorem norm_facts {M : ℕ} (hM : 0 < M) {a b : ℤ} (hab : ¬ ((M : ℤ) ∣ a
     · rw [← Int.emod_add_mul_ediv a M]; exact dvd_add h1 (dvd_mul_right _ _)
     · rw [← Int.emod_add_mul_ediv b M]; exact dvd_add h2 (dvd_mul_right _ _)
 
-theorem isAdmissibleSmoothingFactor_of_emod_index {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) {a b : ℤ}
-    (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) :
-    admitted c ![(((a % M).toNat : ℕ) : ℚ) / M, (((b % M).toNat : ℕ) : ℚ) / M] := by
+theorem isAdmissibleSmoothingFactor_of_emod_index
+    {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    : admitted c ![(((a % M).toNat : ℕ) : ℚ) / M, (((b % M).toNat : ℕ) : ℚ) / M] := by
   have := isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM (norm_facts hM hab).2.2.2
   simpa only [Int.cast_natCast] using this
 
-theorem siegel_norm {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (T : Tower Ω ε) {c M : ℕ} (hM : 0 < M)
-    (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) {a b : ℤ} (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) :
-    siegel T c ![(a : ℚ) / M, (b : ℚ) / M] =
-      siegel T c ![(((a % M).toNat : ℕ) : ℚ) / M, (((b % M).toNat : ℕ) : ℚ) / M] := by
+theorem siegel_norm
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (T : Tower Ω ε)
+    {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    : siegel T c ![(a : ℚ) / M, (b : ℚ) / M]
+      = siegel T c ![(((a % M).toNat : ℕ) : ℚ) / M, (((b % M).toNat : ℕ) : ℚ) / M] := by
   obtain ⟨ta, tb, -, -⟩ := norm_facts hM hab
-  rw [← siegel_add_int T (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab) ![a / M, b / M]]
+  rw [← siegel_add_int T (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab)
+    ![a / M, b / M]]
   congr 1
   have hMq : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
   have qa : ((((a % M).toNat : ℕ)) : ℚ) = ((a % M : ℤ) : ℚ) := by
@@ -317,20 +353,26 @@ theorem siegel_norm {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} 
   funext i
   fin_cases i
   · simp only [Fin.zero_eta, Matrix.cons_val_zero]
-    rw [qa, ha]; field_simp
+    rw [qa, ha]
+    field_simp
   · simp only [Fin.mk_one, Matrix.cons_val_one, Matrix.cons_val_zero]
-    rw [qb, hb]; field_simp
+    rw [qb, hb]
+    field_simp
 
-theorem siegel_eq_imp {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε)
-    {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) {a b a' b' : ℤ}
-    (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) (hab' : ¬ ((M : ℤ) ∣ a' ∧ (M : ℤ) ∣ b'))
-    (h : siegel T c ![(a : ℚ) / M, (b : ℚ) / M] = siegel T c ![(a' : ℚ) / M, (b' : ℚ) / M]) :
-    a % M = a' % M ∨ a % M + a' % M = M := by
+theorem siegel_eq_imp
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (ε : Ω →+* ℂ) (T : Tower Ω ε)
+    {c M : ℕ} (hM : 0 < M) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    {a b a' b' : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) (hab' : ¬((M : ℤ) ∣ a' ∧ (M : ℤ) ∣ b'))
+    (h : siegel T c ![(a : ℚ) / M, (b : ℚ) / M] = siegel T c ![(a' : ℚ) / M, (b' : ℚ) / M])
+    : a % M = a' % M ∨ a % M + a' % M = M := by
   rw [siegel_norm T hM hc h6 hcM hab, siegel_norm T hM hc h6 hcM hab'] at h
   obtain ⟨ta, -, ha, -⟩ := norm_facts hM hab
   obtain ⟨ta', -, ha', -⟩ := norm_facts hM hab'
-  have o1 := exp_siegel_ord ε T c M _ _ hM ha (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab)
-  have o2 := exp_siegel_ord ε T c M _ _ hM ha' (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab')
+  have o1 :=
+    exp_siegel_ord ε T c M _ _ hM ha (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab)
+  have o2 :=
+    exp_siegel_ord ε T c M _ _ hM ha' (isAdmissibleSmoothingFactor_of_emod_index hM hc h6 hcM hab')
   rw [h] at o1
   have e1 := o1.2 _ o2.1
   have e2 := o2.2 _ o1.1
@@ -343,46 +385,76 @@ theorem siegel_eq_imp {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ 
   · left; rw [← ta, ← ta', h5]
   · right; rw [← ta, ← ta']; exact_mod_cast h5
 
-theorem act_int (M : ℕ) (a b : ℤ) (γ : SL(2, ℤ)) :
-    act ![(a : ℚ) / M, (b : ℚ) / M] γ =
-      ![((a * en γ 0 0 + b * en γ 1 0 : ℤ) : ℚ) / M, ((a * en γ 0 1 + b * en γ 1 1 : ℤ) : ℚ) / M] := by
-  funext i
-  fin_cases i <;> simp [act, en, Fin.sum_univ_two] <;> ring
+theorem act_int (M : ℕ) (a b : ℤ) (γ : SL(2, ℤ))
+    : act ![(a : ℚ) / M, (b : ℚ) / M] γ
+      = ![((a * en γ 0 0 + b * en γ 1 0 : ℤ) : ℚ) / M, ((a * en γ 0 1 + b * en γ 1 1 : ℤ) : ℚ) / M] :=
+  by
+    funext i
+    fin_cases i <;> simp [act, en, Fin.sum_univ_two] <;> ring
 
-theorem prim_act {M : ℕ} {a b : ℤ} (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) (δ : SL(2, ℤ)) :
-    ¬ ((M : ℤ) ∣ (a * en δ 0 0 + b * en δ 1 0) ∧ (M : ℤ) ∣ (a * en δ 0 1 + b * en δ 1 1)) := by
+theorem prim_act {M : ℕ} {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) (δ : SL(2, ℤ))
+    : ¬((M : ℤ) ∣ (a * en δ 0 0 + b * en δ 1 0) ∧ (M : ℤ) ∣ (a * en δ 0 1 + b * en δ 1 1)) := by
   rintro ⟨h1, h2⟩
   have hd : en δ 0 0 * en δ 1 1 - en δ 0 1 * en δ 1 0 = 1 := by
     have := δ.det_coe; rw [Matrix.det_fin_two] at this; simpa [en] using this
   apply hab
   constructor
-  · have e : a = (a * en δ 0 0 + b * en δ 1 0) * en δ 1 1 - (a * en δ 0 1 + b * en δ 1 1) * en δ 1 0 := by
+  · have e
+        : a
+          = (a * en δ 0 0 + b * en δ 1 0) * en δ 1 1
+            - (a * en δ 0 1 + b * en δ 1 1) * en δ 1 0 := by
       linear_combination (-a) * hd
-    rw [e]; exact dvd_sub (dvd_mul_of_dvd_left h1 _) (dvd_mul_of_dvd_left h2 _)
-  · have e : b = (a * en δ 0 1 + b * en δ 1 1) * en δ 0 0 - (a * en δ 0 0 + b * en δ 1 0) * en δ 0 1 := by
+    rw [e]
+    exact dvd_sub (dvd_mul_of_dvd_left h1 _) (dvd_mul_of_dvd_left h2 _)
+  · have e
+        : b
+          = (a * en δ 0 1 + b * en δ 1 1) * en δ 0 0
+            - (a * en δ 0 0 + b * en δ 1 0) * en δ 0 1 := by
       linear_combination (-b) * hd
-    rw [e]; exact dvd_sub (dvd_mul_of_dvd_left h2 _) (dvd_mul_of_dvd_left h1 _)
+    rw [e]
+    exact dvd_sub (dvd_mul_of_dvd_left h2 _) (dvd_mul_of_dvd_left h1 _)
 
-theorem fix_siegel_pm_one : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : GlobalTheory.KZ.Tower Ω ε), ∀ (M c : ℕ) (γ : SL(2, ℤ)), 0 < M → 1 < c → Nat.Coprime c 6 → c ≡ 1 [MOD M] → (∀ a b : ℤ, ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b) → X.sl (ofSL γ) (siegel X c ![(a : ℚ) / M, (b : ℚ) / M]) = siegel X c ![(a : ℚ) / M, (b : ℚ) / M]) → γ ∈ CongruenceSubgroup.Gamma M ∨ -γ ∈ CongruenceSubgroup.Gamma M := by
+theorem fix_siegel_pm_one
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : GlobalTheory.KZ.Tower Ω ε),
+      ∀ (M c : ℕ) (γ : SL(2, ℤ)),
+        0 < M → 1 < c → Nat.Coprime c 6 → c ≡ 1 [MOD M]
+          → (∀ a b : ℤ,
+            ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)
+              → X.sl (ofSL γ) (siegel X c ![(a : ℚ) / M, (b : ℚ) / M])
+                = siegel X c ![(a : ℚ) / M, (b : ℚ) / M])
+          → γ ∈ CongruenceSubgroup.Gamma M ∨ -γ ∈ CongruenceSubgroup.Gamma M := by
   intro Ω _ _ _ ε X M c γ hM hc h6 hcM H
   rcases Nat.lt_or_ge M 2 with hM1 | hM2
   · left
     obtain rfl : M = 1 := by omega
-    rw [CongruenceSubgroup.Gamma_one_top]; trivial
-  have hfix : ∀ a b : ℤ, ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b) →
-      siegel X c ![((a * en γ 0 0 + b * en γ 1 0 : ℤ) : ℚ) / M, ((a * en γ 0 1 + b * en γ 1 1 : ℤ) : ℚ) / M] =
-      siegel X c ![(a : ℚ) / M, (b : ℚ) / M] := fun a b hab => by
-    rw [← act_int, ← GlobalTheory.T.siegelUnitInTower_sl_action_rowVector Ω ε X c _ γ (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM hab)]; exact H a b hab
-  have hM1' : ¬ ((M : ℤ) ∣ 1) := by
-    intro h; have := Int.le_of_dvd one_pos h; omega
-  have p01 : ¬ ((M : ℤ) ∣ 0 ∧ (M : ℤ) ∣ 1) := fun h => hM1' h.2
-  have p10 : ¬ ((M : ℤ) ∣ 1 ∧ (M : ℤ) ∣ 0) := fun h => hM1' h.1
+    rw [CongruenceSubgroup.Gamma_one_top]
+    trivial
+  have hfix
+      : ∀ a b : ℤ,
+        ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)
+          → siegel X c
+              ![((a * en γ 0 0 + b * en γ 1 0 : ℤ) : ℚ) / M, ((a * en γ 0 1 + b * en γ 1 1 : ℤ) : ℚ) / M]
+            = siegel X c ![(a : ℚ) / M, (b : ℚ) / M] := fun a b hab => by
+    rw [← act_int,
+      ← _root_.GlobalTheory.KZ.SiegelSL.sl_siegel Ω ε X c _ γ
+        (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM hab)]
+    exact H a b hab
+  have hM1' : ¬((M : ℤ) ∣ 1) := by intro h; have := Int.le_of_dvd one_pos h; omega
+  have p01 : ¬((M : ℤ) ∣ 0 ∧ (M : ℤ) ∣ 1) := fun h => hM1' h.2
+  have p10 : ¬((M : ℤ) ∣ 1 ∧ (M : ℤ) ∣ 0) := fun h => hM1' h.1
   have hr := siegel_eq_imp ε X hM hc h6 hcM (prim_act p01 γ) p01 (hfix 0 1 p01)
   have hp := siegel_eq_imp ε X hM hc h6 hcM (prim_act p10 γ) p10 (hfix 1 0 p10)
   have hS := congrArg (X.sl (ofSL ModularGroup.S)) (hfix 1 0 p10)
-  rw [GlobalTheory.T.siegelUnitInTower_sl_action_rowVector Ω ε X c _ _ (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM (prim_act p10 γ)),
-    GlobalTheory.T.siegelUnitInTower_sl_action_rowVector Ω ε X c _ _ (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM p10), act_int, act_int] at hS
-  have hq := siegel_eq_imp ε X hM hc h6 hcM (prim_act (prim_act p10 γ) ModularGroup.S) (prim_act p10 ModularGroup.S) hS
+  rw [_root_.GlobalTheory.KZ.SiegelSL.sl_siegel Ω ε X c _ _
+        (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM (prim_act p10 γ)),
+      _root_.GlobalTheory.KZ.SiegelSL.sl_siegel Ω ε X c _ _
+        (isAdmissibleSmoothingFactor_of_int_index hM hc h6 hcM p10),
+      act_int, act_int]
+    at hS
+  have hq :=
+    siegel_eq_imp ε X hM hc h6 hcM (prim_act (prim_act p10 γ) ModularGroup.S)
+      (prim_act p10 ModularGroup.S) hS
   have hd : en γ 0 0 * en γ 1 1 - en γ 0 1 * en γ 1 0 = 1 := by
     have := γ.det_coe; rw [Matrix.det_fin_two] at this; simpa [en] using this
   simp [en, ModularGroup.S] at hr hp hq
@@ -418,7 +490,8 @@ theorem fix_siegel_pm_one : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgCl
     rw [e00] at hdZ
     have e11 : ((γ 1 1 : ℤ) : ZMod M) = -1 := by linear_combination -hdZ
     rw [CongruenceSubgroup.Gamma_mem]
-    simp only [Matrix.SpecialLinearGroup.coe_neg, Matrix.neg_apply, Int.cast_neg, e00, e11, z01, z10]
+    simp only [Matrix.SpecialLinearGroup.coe_neg, Matrix.neg_apply, Int.cast_neg, e00, e11, z01,
+      z10]
     norm_num
 
 end GlobalTheory.SiegSep

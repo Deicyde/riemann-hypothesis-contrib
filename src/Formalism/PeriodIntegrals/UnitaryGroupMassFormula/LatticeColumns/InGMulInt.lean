@@ -173,7 +173,7 @@ theorem span_coord
         hy1 (Sum.inl b) (not_isW_inl b)
       rw [he]
       have h0 : (Pi.single (Sum.inl b) (1 : FpX X p) : Idx D.R.rS D.R.k → FpX X p) (wI j) = 0 := by
-        simp [Pi.single_apply, wI]
+        simp [wI]
       rw [h0, add_zero]
       obtain ⟨y, hy⟩ := crd_gLam X p θ Q hLB _ (kloc_gLam X p _ hAK _ hd) (wI j)
       exact ⟨y, hy⟩
@@ -185,7 +185,7 @@ theorem span_coord
       rw [show A *ᵥ PI.FinKW.vecV X.B.I p.1 (X.bw j') = _ from rfl, hc]
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
       have h0 : (Pi.single (wI j') (1 : FpX X p) : Idx D.R.rS D.R.k → FpX X p) (wI j) = 0 := by
-        simp [Pi.single_apply, wI, hne.symm]
+        simp [wI, hne.symm]
       rw [h0, zero_sub]
       exact ⟨- c (wI j), by push_cast; ring⟩
   induction ha using Submodule.span_induction with

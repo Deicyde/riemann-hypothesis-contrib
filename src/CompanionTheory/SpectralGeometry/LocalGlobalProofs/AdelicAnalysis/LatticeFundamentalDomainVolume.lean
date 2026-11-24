@@ -197,7 +197,7 @@ theorem integral_char_eq_zero
     obtain ⟨z, hz⟩ := sum_places_int hF ρ hρ (r * s)
     have hrs : ((r * s : 𝓞 F) : F) = (N : F) * β * (s : F) := by
       rw [← hr]
-      first | rfl | simp
+      first | rfl
     have h1 : f (fun w => ρ w ((N : F) * (s : F))) = 1 := by
       have : (∑ w, ρ w β * ρ w ((N : F) * (s : F))) = (z : ℝ) := by
         rw [← hz]

@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.adelicUnitaryLattice_selfDual_traceForm
     : ∀ (D : D7) (V : HSp D),
       ∀ (g : GA D V) (J : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.adelicUnitaryLattice_selfDual_traceForm
               (∀ y ∈ latG V g, ∃ n : ℤ,
                   Algebra.trace ℚ D.host.E (-(-D.host.xi0) * herm (- V.gramᵀ) v y) = n)
                 ↔ v ∈ latG V g := by
-  first
-  | exact @GlobalTheory.Member.latG_selfDual
-  | exact GlobalTheory.Member.latG_selfDual
-  | (intros; apply GlobalTheory.Member.latG_selfDual <;> assumption)
+  first | exact @GlobalTheory.Member.latG_selfDual

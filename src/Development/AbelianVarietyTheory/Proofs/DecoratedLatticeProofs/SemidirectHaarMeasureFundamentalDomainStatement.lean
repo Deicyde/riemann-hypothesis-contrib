@@ -47,6 +47,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.semidirect_haar_measure_fundamental_domain
     : ∀ (D : D7) (S H : HSp D) (N : Subgroup (GA D S)) (s : GA D H →* GA D S),
       Continuous s → IsClosed (N : Set (GA D S)) → (∀ n ∈ N, ∀ h, s h * n * (s h)⁻¹ ∈ N)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.semidirect_haar_measure_fundamental_domain
                       ∧ (AbsConv vH.μ vH.𝓕 ν 𝓝 (fun h n => f (n.1 * s h))
                         → ∫ r in 𝓡, f (r : GA D S) ∂(semiMeas N s vH.μ ν)
                           = ∫ h in vH.𝓕, ∫ n in 𝓝, f (n.1 * s h) ∂ν ∂vH.μ) := by
-  first
-  | exact @GlobalTheory.Unf.semiFd_iterated
-  | exact GlobalTheory.Unf.semiFd_iterated
-  | (intros; apply GlobalTheory.Unf.semiFd_iterated <;> assumption)
+  first | exact @GlobalTheory.Unf.semiFd_iterated

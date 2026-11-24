@@ -156,7 +156,6 @@ theorem hasChernIntegral_of_eq_mul
     · have := congrArg (fun μ : Measure (CxPts X.str σ) => μ (ptsIn X.str σ O)) hm
       simpa only [Measure.smul_apply, smul_eq_mul, Measure.restrict_apply_self] using this
     · have e1 := hRt y hyS a hy _ (E.nonempty (under y)).choose_spec
-      beta_reduce
       rw [e1, hx, ENNReal.ofReal_mul hc]
   rcases le_or_gt 0 t with ht | ht
   · refine ⟨fun ε => ?_, ?_⟩

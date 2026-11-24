@@ -38,6 +38,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
+
 theorem _root_.GlobalTheory.T.isThetaPoint_of_algebraic_series_one_trait
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
       Base R
@@ -67,7 +69,4 @@ theorem _root_.GlobalTheory.T.isThetaPoint_of_algebraic_series_one_trait
                           → ∃ s : Cˣ, ∀ i, em (v i) = s * N.tx (n ^ j) (q i))
                   → IsThetaPt A (n ^ j) (lab ((n ^ j) ^ 2))
                     (fun p => GlobalTheory.Ex.fnOf (v p)) := by
-  first
-  | exact @GlobalTheory.Mum.OneTraitTheta.isThetaPt_of_series
-  | exact GlobalTheory.Mum.OneTraitTheta.isThetaPt_of_series
-  | (intros; apply GlobalTheory.Mum.OneTraitTheta.isThetaPt_of_series <;> assumption)
+  first | exact @GlobalTheory.Mum.OneTraitTheta.isThetaPt_of_series

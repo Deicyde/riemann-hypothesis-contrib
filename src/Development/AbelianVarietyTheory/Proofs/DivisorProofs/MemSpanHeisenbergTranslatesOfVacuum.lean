@@ -58,18 +58,19 @@ open scoped ComplexOrder
 
 namespace GlobalTheory.HeisVacuum
 
-theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M] [Module ℂ M]
-    (β : X → X → ℂ) (ρ : X → M →ₗ[ℂ] M) (Λ : AddSubgroup X) (e : M)
+theorem mem_span_translates_vacuum
+    (X M : Type) [AddCommGroup X] [AddCommGroup M] [Module ℂ M]
+    (β : X → X → ℂ)
+    (ρ : X → M →ₗ[ℂ] M) (Λ : AddSubgroup X)
+    (e : M)
     (hl : ∀ x y z, β (x + y) z = β x z * β y z) (hr : ∀ x y z, β x (y + z) = β x y * β x z)
-    (hd : ∀ x, β x x = 1) (h0 : ∀ v, ρ 0 v = v)
-    (hρ : ∀ x y v, ρ x (ρ y v) = β x y • ρ (x + y) v)
-    (hΛ : ∀ x, x ∈ Λ ↔ ∀ a ∈ Λ, β x a ^ 2 = 1)
-    (hdiv : ∀ N : ℕ, 0 < N → ∀ x : X, ∃ y : X, N • y = x)
+    (hd : ∀ x, β x x = 1) (h0 : ∀ v, ρ 0 v = v) (hρ : ∀ x y v, ρ x (ρ y v) = β x y • ρ (x + y) v)
+    (hΛ : ∀ x, x ∈ Λ ↔ ∀ a ∈ Λ, β x a ^ 2 = 1) (hdiv : ∀ N : ℕ, 0 < N → ∀ x : X, ∃ y : X, N • y = x)
     (hfin : ∀ N : ℕ, 0 < N → ∃ R : Set X, R.Finite ∧ ∀ t ∈ Λ, ∃ r ∈ R, ∃ u ∈ Λ, t = r + N • u)
     (he : e ≠ 0) (hε : ∀ u ∈ Λ, ∃ ε : ℂ, ρ u e = ε • e) (h2 : ∀ u ∈ Λ, ρ (2 • u) e = e)
     (hvac : ∀ v : M, (∀ u ∈ Λ, ∀ ε : ℂ, ρ u e = ε • e → ρ u v = ε • v) → ∃ c : ℂ, v = c • e)
-    (v : M) (hv : ∃ N : ℕ, 0 < N ∧ ∀ u ∈ Λ, ρ (N • u) v = v) :
-    v ∈ Submodule.span ℂ (Set.range fun x => ρ x e) := by
+    (v : M) (hv : ∃ N : ℕ, 0 < N ∧ ∀ u ∈ Λ, ρ (N • u) v = v)
+    : v ∈ Submodule.span ℂ (Set.range fun x => ρ x e) := by
   classical
   obtain ⟨N, hN, hv⟩ := hv
   have hsym : ∀ x y, β x y * β y x = 1 := by
@@ -118,7 +119,8 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
   have hεmul : ∀ u ∈ Λ, ∀ u' ∈ Λ, ε u * ε u' = β u u' * ε (u + u') := by
     intro u hu u' hu'
     have := hρ u u' e
-    rw [hε u' hu', map_smul, hε u hu, hε _ (Λ.add_mem hu hu'), smul_smul, smul_smul, mul_comm] at this
+    rw [hε u' hu', map_smul, hε u hu, hε _ (Λ.add_mem hu hu'), smul_smul, smul_smul, mul_comm]
+      at this
     exact smul_left_injective ℂ he this
   let A : Λ → M → M := fun u w => (ε u)⁻¹ • ρ u w
   have hA : ∀ (u u' : Λ) w, A u (A u' w) = A (u + u') w := by
@@ -151,9 +153,11 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
     obtain ⟨R, hR, hR'⟩ := hfin K hKpos
     have : Finite {x : Λ // (x : X) ∈ R} := by
       have : Finite R := hR
-      exact Finite.of_injective (fun x : {x : Λ // (x : X) ∈ R} => (⟨x.1, x.2⟩ : R))
+      exact Finite.of_injective
+        (fun x : {x : Λ // (x : X) ∈ R} => (⟨x.1, x.2⟩ : R))
         (fun a b h => Subtype.ext (Subtype.ext (congrArg (fun z : R => (z : X)) h)))
-    refine Finite.of_surjective (fun x : {x : Λ // (x : X) ∈ R} => (QuotientAddGroup.mk x.1 : Λ ⧸ H)) ?_
+    refine
+      Finite.of_surjective (fun x : {x : Λ // (x : X) ∈ R} => (QuotientAddGroup.mk x.1 : Λ ⧸ H)) ?_
     intro q
     obtain ⟨t, rfl⟩ := QuotientAddGroup.mk_surjective q
     obtain ⟨r, hr, u, hu, htu⟩ := hR' t t.2
@@ -165,19 +169,18 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
     refine QuotientAddGroup.eq.2 ⟨⟨u, hu⟩, Subtype.ext ?_⟩
     simp [htu]
   have := Fintype.ofFinite (Λ ⧸ H)
-  have hwell : ∀ w, (∀ u ∈ Λ, ρ (K • u) w = w) → ∀ x y : Λ,
-      (QuotientAddGroup.mk x : Λ ⧸ H) = QuotientAddGroup.mk y → A x w = A y w := by
+  have hwell
+      : ∀ w,
+        (∀ u ∈ Λ, ρ (K • u) w = w)
+          → ∀ x y : Λ, (QuotientAddGroup.mk x : Λ ⧸ H) = QuotientAddGroup.mk y → A x w = A y w := by
     intro w hw x y hxy
     obtain ⟨u, hu⟩ := QuotientAddGroup.eq.1 hxy
-    have h1 : y = x + K • u := by
-      have : K • u = -x + y := hu
-      rw [this]; abel
+    have h1 : y = x + K • u := by rw [show K • u = -x + y from hu]; abel
     have h3 : A (K • u) w = w := by
       simp only [A, AddSubgroup.coe_nsmul, hεK u u.2, hw u u.2, inv_one, one_smul]
     rw [h1, ← hA, h3]
   have hAsum : ∀ (u : Λ) (f : Λ ⧸ H → M), A u (∑ q, f q) = ∑ q, A u (f q) := by
     intro u f
-
     simp only [A, map_sum, Finset.smul_sum]
   have hP : ∀ w, (∀ u ∈ Λ, ρ (K • u) w = w) → ∃ c : ℂ, (∑ q : Λ ⧸ H, A q.out w) = c • e := by
     intro w hw
@@ -189,8 +192,7 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
       refine Fintype.sum_equiv (Equiv.addLeft (QuotientAddGroup.mk ⟨u, hu⟩ : Λ ⧸ H)) _ _ ?_
       intro q
       rw [hA]
-      apply hwell w hw
-      simp
+      exact hwell w hw _ _ (by simp)
     conv_rhs => rw [← h1]
     simp only [A, smul_smul, mul_inv_cancel₀ (hεne u hu), one_smul]
   let Tg : AddSubgroup X := Λ.comap (nsmulAddMonoidHom K : X →+ X)
@@ -198,21 +200,22 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
   let S := Submodule.span ℂ (Set.range fun x => ρ x e)
   have hmem : ∀ t ∈ Tg, (∑ q : Λ ⧸ H, β t (q.out : Λ) ^ 2 • A q.out v) ∈ S := by
     intro t ht
-    obtain ⟨c, hc⟩ := hP (ρ (-t) v) (by
-      intro u hu
-      rw [hcomm, hvK u hu, hp1, ← hp2, (hΛ u).1 hu _ ((hTg _).1 (Tg.neg_mem ht)), one_smul])
+    obtain ⟨c, hc⟩ :=
+      hP (ρ (-t) v) (by
+        intro u hu
+        rw [hcomm, hvK u hu, hp1, ← hp2, (hΛ u).1 hu _ ((hTg _).1 (Tg.neg_mem ht)), one_smul])
     have h1 := congrArg (ρ t) hc
-
     rw [map_sum, map_smul] at h1
     have h3 : c • ρ t e ∈ S := S.smul_mem c (Submodule.subset_span ⟨t, rfl⟩)
     rw [← h1] at h3
     convert h3 using 2 with q
     simp only [A, map_smul]
     rw [hcomm t, hinv, smul_comm]
-  let χ : Λ ⧸ H → (Multiplicative Tg →* ℂ) := fun q =>
-    { toFun := fun t => β (t.toAdd : Tg) (q.out : Λ) ^ 2
-      map_one' := by simp [hz1]
-      map_mul' := by intro a b; simp [hl, mul_pow] }
+  let χ : Λ ⧸ H → (Multiplicative Tg →* ℂ) := fun q => {
+    toFun := fun t => β (t.toAdd : Tg) (q.out : Λ) ^ 2
+    map_one' := by simp [hz1]
+    map_mul' := by intro a b; simp [hl, mul_pow]
+  }
   have hχ : Function.Injective χ := by
     intro q q' h
     have h1 : ∀ t ∈ Tg, β t (q.out : Λ) ^ 2 = β t (q'.out : Λ) ^ 2 := fun t ht =>
@@ -225,8 +228,7 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
       have h3 := h1 t ha
       have h4 : ((q'.out : Λ) : X) = (q.out : Λ) + K • y := by rw [hy]; abel
       rw [h4, hr, mul_pow, hp2, ← hp1 K] at h3
-      have h5 : β (K • t) y ^ 2 = 1 :=
-        (mul_eq_left₀ (pow_ne_zero 2 (hne _ _))).1 h3.symm
+      have h5 : β (K • t) y ^ 2 = 1 := (mul_eq_left₀ (pow_ne_zero 2 (hne _ _))).1 h3.symm
       have h6 := congrArg (· ^ 2) (hsym y (K • t))
       simpa [mul_pow, h5] using h6
     rw [← QuotientAddGroup.out_eq' q, ← QuotientAddGroup.out_eq' q']
@@ -235,18 +237,17 @@ theorem mem_span_translates_vacuum (X M : Type) [AddCommGroup X] [AddCommGroup M
     (linearIndependent_monoidHom (Multiplicative Tg) ℂ).comp χ hχ
   rw [← Submodule.Quotient.mk_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro φ
-  have h1 := Fintype.linearIndependent_iff.1 hli (fun q => φ (S.mkQ (A q.out v))) (by
-    funext t
-    have h3 := (Submodule.Quotient.mk_eq_zero S).2 (hmem _ (t.toAdd).2)
-    have h4 := congrArg φ h3
-
-    rw [← Submodule.mkQ_apply, map_sum, map_sum, map_zero] at h4
-    simp only [map_smul, smul_eq_mul] at h4
-    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
-    rw [← h4]
-    exact Finset.sum_congr rfl fun q _ => mul_comm _ _) 0
-  have h3 : A (0 : Λ ⧸ H).out v = v := by
-    rw [hwell v hvK _ 0 (by simp), hA0]
+  have h1 :=
+    Fintype.linearIndependent_iff.1 hli
+      (fun q => φ (S.mkQ (A q.out v)))
+      (by
+        funext t
+        have h4 := congrArg φ ((Submodule.Quotient.mk_eq_zero S).2 (hmem _ (t.toAdd).2))
+        rw [← Submodule.mkQ_apply, map_sum, map_sum, map_zero] at h4
+        simp only [map_smul, smul_eq_mul, Finset.sum_apply, Pi.smul_apply, Pi.zero_apply] at h4 ⊢
+        exact (Finset.sum_congr rfl fun q _ => mul_comm _ _).trans h4)
+      0
+  have h3 : A (0 : Λ ⧸ H).out v = v := by rw [hwell v hvK _ 0 (by simp), hA0]
   simpa [h3] using h1
 
 end GlobalTheory.HeisVacuum

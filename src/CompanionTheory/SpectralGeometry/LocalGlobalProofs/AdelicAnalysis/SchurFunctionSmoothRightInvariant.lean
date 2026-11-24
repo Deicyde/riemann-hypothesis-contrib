@@ -1,11 +1,11 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicHaarMeasureScalingStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopologyStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LatticeFundamentalDomainVolumeStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacterStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ThetaFunctionGrowthBoundStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicHaarMeasureScaling
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LatticeFundamentalDomainVolume
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacter
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ThetaFunctionGrowthBound
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopology
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TopoAF
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -214,7 +214,7 @@ theorem cosets_of_multiples
                   → q = q' := by
   intro F _ _ N hN H hH
   obtain ⟨-, -, -, -, hOopen, hdense, hOint, -, -, hWopen⟩ :=
-    GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
+    _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
   have hO0 : (0 : A F) ∈ Oh F := fun v => zero_mem _
   have hOsub : ∀ x y : A F, x ∈ Oh F → y ∈ Oh F → x - y ∈ Oh F := fun x y hx hy v =>
     sub_mem (hx v) (hy v)
@@ -265,8 +265,9 @@ theorem mass_multiples
             → (lf {x : A F | ∃ z ∈ Oh F, x = (N : A F) * z}).toReal * (N : ℝ) ^ Module.finrank ℚ F
               = 1 := by
   intro F _ _ _ _ lf hlf h1 N hN
-  obtain ⟨-, -, -, -, hOopen, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
-  obtain ⟨h2, -⟩ := GlobalTheory.T.adelic_haar_measure_scaling F lf hlf h1
+  obtain ⟨-, -, -, -, hOopen, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
+  obtain ⟨h2, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.Scale.lf_scale F lf hlf h1
   have hN0 : (N : F) ≠ 0 := Nat.cast_ne_zero.2 hN.ne'
   have h3 := h2 (N : F) hN0 (Oh F) hOopen.measurableSet
   have h4
@@ -366,15 +367,15 @@ theorem fourier_coeff_eis
     obtain ⟨hTR, -, -, -, hρ, -, -⟩ := id hQ
     have hcount : Countable F := (Module.finBasis ℚ F).equivFun.toEquiv.injective.countable
     obtain ⟨-, hLcount, hLmem, hLD⟩ :=
-      GlobalTheory.T.lattice_fundamental_domain_volume F hTR ρ hρ N hN
+      _root_.GlobalTheory.CompanionTheory.SW.FD.main F hTR ρ hρ N hN
     obtain ⟨hvol, horth⟩ := hLD D hD
     obtain ⟨-, -, -, -, hOopen, -, hOint, -, -, hWopen⟩ :=
-      GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
-    obtain ⟨-, hψ'⟩ := GlobalTheory.T.standard_adelic_character F
+      _root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F
+    obtain ⟨-, hψ'⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.StdChar.main F
     obtain ⟨hψ1, hψO, -⟩ := hψ' ψ hψ
     obtain ⟨C, hC⟩ :=
-      GlobalTheory.T.summable_norm_eiTerm_and_wt_mul_tsum_le F lf hlf h1 ψ hψ ι M B ρ P hQ hM φ hφ 1
-        one_pos
+      _root_.GlobalTheory.CompanionTheory.SW.Core.EiBound.ei_bound F lf hlf h1 ψ hψ ι M B ρ P hQ hM
+        φ hφ 1 one_pos
     haveI := hLcount
     haveI : lf.IsAddHaarMeasure := hlf
 

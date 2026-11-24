@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtCoord
 public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsRegularFnIffOfIsAffineOpen
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsEtaleCoordinatesOnOpenBaseChangePreimageStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsEtaleCoordinatesOnOpenBaseChangePreimage
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,8 +65,8 @@ theorem sncChart_baseChange
           C'.U = π ⁻¹ᵁ C.U := by
   intro R R' _ _ φ X X' f f' π d s L σ C hP
   obtain ⟨hA, hE⟩ :=
-    GlobalTheory.T.isEtaleCoordinatesOnOpen_baseChange_preimage R R' φ X X' f f' π C.U d C.t hP
-      C.affine C.etale
+    _root_.GlobalTheory.LogPair.isEtCoord_baseChange R R' φ X X' f f' π C.U d C.t hP C.affine
+      C.etale
   refine ⟨
     {
       U := π ⁻¹ᵁ C.U

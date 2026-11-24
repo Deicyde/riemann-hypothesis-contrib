@@ -115,7 +115,7 @@ theorem isTransp_iff
     (Qi : Matrix (Fin (2 * r + k + 1)) (Fin X.B.I.n) ℂ)
     : Formalism.L2.SG.RealObj.IsTransp X v g k r Q Qi
       ↔ IsTranspC X v (-(Complex.I * (g : ℂ)) / (2 * (Real.pi : ℂ))) k r Q Qi := by
-  first | exact Iff.rfl | (unfold Formalism.L2.SG.RealObj.IsTransp IsTranspC; exact Iff.rfl)
+  first | exact Iff.rfl
 
 def frS (D : D7) : ℂ := ((D.host.ka / (2 * Real.pi) : ℝ) : ℂ)
 

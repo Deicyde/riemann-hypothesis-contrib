@@ -72,7 +72,4 @@ theorem _root_.GlobalTheory.T.adelicHeisenberg_acts_by_local_schrodinger
             (GlobalTheory.AdelicU.evFin F v) (co.rho ψ γ) φ
             (GlobalTheory.WeilM.schr (GlobalTheory.LatVac.psiAt ψ v)
               (GlobalTheory.LatVac.locCo co v γ) φ) := by
-  first
-  | exact @GlobalTheory.VacBridge.rho_acts_locCo
-  | exact GlobalTheory.VacBridge.rho_acts_locCo
-  | (intros; apply GlobalTheory.VacBridge.rho_acts_locCo <;> assumption)
+  first | exact @GlobalTheory.VacBridge.rho_acts_locCo

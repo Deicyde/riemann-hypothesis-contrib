@@ -53,8 +53,8 @@ namespace PI.GGConvScalarW
 
 open Formalism.L2.SG.GGMirabolic Finset
 
-theorem gam_conj {F : Type} [Field F] [Fintype F] {k : ℕ} (ψ₀ : AddChar F ℂ) (g x : GL (Fin k) F) :
-    gam ψ₀ (g * x * g⁻¹) = gam ψ₀ x := by
+theorem gam_conj {F : Type} [Field F] [Fintype F] {k : ℕ} (ψ₀ : AddChar F ℂ) (g x : GL (Fin k) F)
+    : gam ψ₀ (g * x * g⁻¹) = gam ψ₀ x := by
   unfold gam
   congr 1
   rw [← Equiv.sum_comp (Equiv.mulRight g) (fun y => psiNat ψ₀ (y * x * y⁻¹))]
@@ -68,8 +68,8 @@ theorem representation_commutes_gamma : RepGamComm := by
   apply LinearMap.ext
   intro v
 
-  simp only [repGam, LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply,
-  map_sum, map_smul]
+  simp only [repGam, LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum,
+    map_smul]
   have hm : ∀ a b : GL (Fin k) F, π a (π b v) = π (a * b) v := fun a b => by
     rw [map_mul, Module.End.mul_apply]
   simp only [hm]
@@ -81,9 +81,11 @@ theorem representation_commutes_gamma : RepGamComm := by
   congr 2
   group
 
-theorem representation_conjugation_apply {F : Type} [Field F] [Fintype F] {k : ℕ} {V : Type} [AddCommGroup V]
-    [Module ℂ V] (π : Representation ℂ (GL (Fin k) F) V) (y x : GL (Fin k) F) (v : V) :
-    π y⁻¹ (π (y * x * y⁻¹) (π y v)) = π x v := by
+theorem representation_conjugation_apply
+    {F : Type} [Field F] [Fintype F]
+    {k : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin k) F) V) (y x : GL (Fin k) F) (v : V)
+    : π y⁻¹ (π (y * x * y⁻¹) (π y v)) = π x v := by
   rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
   congr 2
   group
@@ -92,12 +94,14 @@ theorem representation_conjugate_gamma : RepGamConj := by
   intro F _ _ k ψ₀ V _ _ π
   apply LinearMap.ext
   intro v
-  have hR : ∀ y : GL (Fin k) F, ((π y⁻¹) ∘ₗ projQ ψ₀ π ∘ₗ π y) v =
-      ∑ z, ((cardU F k : ℂ)⁻¹ * psiNat ψ₀ (y * z * y⁻¹)) • π z v := by
+  have hR
+      : ∀ y : GL (Fin k) F,
+        ((π y⁻¹) ∘ₗ projQ ψ₀ π ∘ₗ π y) v
+          = ∑ z, ((cardU F k : ℂ)⁻¹ * psiNat ψ₀ (y * z * y⁻¹)) • π z v := by
     intro y
 
-    simp only [projQ, LinearMap.comp_apply, LinearMap.smul_apply, LinearMap.sum_apply,
-    map_smul, map_sum]
+    simp only [projQ, LinearMap.comp_apply, LinearMap.smul_apply, LinearMap.sum_apply, map_smul,
+      map_sum]
     rw [← Equiv.sum_comp (MulAut.conj y).toEquiv, Finset.smul_sum]
     refine Finset.sum_congr rfl fun z _ => ?_
     simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply]
@@ -112,8 +116,9 @@ theorem trace_representation_gamma : TraceRepGam := by
 
   rw [representation_conjugate_gamma F k ψ₀ V π, map_sum]
 
-  have h : ∀ y : GL (Fin k) F,
-      LinearMap.trace ℂ V ((π y⁻¹) ∘ₗ projQ ψ₀ π ∘ₗ π y) = LinearMap.trace ℂ V (projQ ψ₀ π) := by
+  have h
+      : ∀ y : GL (Fin k) F,
+        LinearMap.trace ℂ V ((π y⁻¹) ∘ₗ projQ ψ₀ π ∘ₗ π y) = LinearMap.trace ℂ V (projQ ψ₀ π) := by
     intro y
     show LinearMap.trace ℂ V (π y⁻¹ * (projQ ψ₀ π * π y)) = _
     rw [LinearMap.trace_mul_comm, mul_assoc, ← map_mul, mul_inv_cancel, map_one, mul_one]

@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.fockVacua_localFactors_stable_heisenberg_away
                         → ∀ z,
                           IsLocal ψ θ S T sS sT ΛS ΛT p
                             (Formalism.IndefR.Datum.dRho (heisO ψ S T) θ τ z f) := by
-  first
-  | exact @GlobalTheory.PlaceStable.heis_stable
-  | exact GlobalTheory.PlaceStable.heis_stable
-  | (intros; apply GlobalTheory.PlaceStable.heis_stable <;> assumption)
+  first | exact @GlobalTheory.PlaceStable.heis_stable

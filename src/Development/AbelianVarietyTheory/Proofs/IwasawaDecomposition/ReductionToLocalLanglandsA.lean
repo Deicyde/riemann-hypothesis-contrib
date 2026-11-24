@@ -48,9 +48,6 @@ namespace GlobalTheory.HeightCounting.Up
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 def nOfLay
     {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
     (x : St P) (L : Lay0 (Dof x)) (hZ : L.ZOk) (hE : L.EtaOk)

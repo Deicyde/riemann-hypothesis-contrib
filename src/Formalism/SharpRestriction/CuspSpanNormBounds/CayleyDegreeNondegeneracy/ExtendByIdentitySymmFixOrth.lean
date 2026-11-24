@@ -71,7 +71,6 @@ theorem finrank_orth_add_finrank (U : Submodule E S.V)
     rw [Fintype.linearIndependent_iff]
     intro c hc a
     have h1 : S.hT (∑ a, star (c a) • (b a : S.V)) = 0 := by
-
       rw [map_sum, ← hc]
       refine Finset.sum_congr rfl (fun a _ => ?_)
       rw [map_smulₛₗ, starRingEnd_apply, star_star]

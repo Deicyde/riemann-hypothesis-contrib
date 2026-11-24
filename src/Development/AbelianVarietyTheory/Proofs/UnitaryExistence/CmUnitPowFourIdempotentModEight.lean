@@ -301,7 +301,7 @@ theorem det_interp_datum
       rw [show IsCMField.complexConj E (H.rt : E) = H.rt from h] at h2
       have h3 : (σ H.rt).im = 0 := Complex.conj_eq_iff_im.mp h2.symm
       have h4 := congrArg (fun x => (σ x).re) h1
-      simp only [map_pow, map_neg, map_natCast, sq, map_mul, Complex.mul_re, h3, Complex.neg_re,
+      simp only [map_neg, map_natCast, sq, map_mul, Complex.mul_re, h3, Complex.neg_re,
           Complex.natCast_re]
         at h4
       nlinarith [mul_self_nonneg (σ H.rt).re]
@@ -361,7 +361,6 @@ theorem det_interp_datum
       · rintro ⟨y, hy⟩
         refine ⟨gam.symm y, ?_⟩
         apply Matrix.mulVec_injective_of_isUnit γ.isUnit
-        change _ *ᵥ _ = _ *ᵥ _
         rw [hγ, LinearEquiv.apply_symm_apply, hy]
   have hdet1 :=
     CongruenceDet.det_eq_one E _ M Gm (LinearMap.range φ) γ hdet hfg hspan hM hU (by

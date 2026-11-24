@@ -418,9 +418,7 @@ theorem shortNe0_of_t4Span
   intro g hg
   have hsp : Submodule.span c.F (shortGen Xo c nab bad nV a n (dδ n)) = ⊥ :=
     (Submodule.span_eq_bot).2 hno
-  have := h a n hd hl hn hg
-  rw [hsp] at this
-  exact this
+  simpa [hsp] using h a n hd hl hn hg
 
 def CMP
     {n : ℕ} (d : DeltaDat Xo c n) (σ0 : d.c₂.F →+* ℂ)

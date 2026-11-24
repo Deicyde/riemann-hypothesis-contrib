@@ -47,8 +47,6 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.E Posit
 open PositivityTheory.RgTw (Mat G)
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 attribute [local instance] borelG borelF borelH

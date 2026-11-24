@@ -91,8 +91,7 @@ theorem coord_fst
   calc
     _ = βᵀ * (Gᵀ * (b * b') * G'ᵀ) * xᵀ.submatrix id e * (c'ᵀ * cᵀ) * (γ.submatrix e e)ᵀ := by
       simp only [Matrix.mul_assoc]
-    _ = _ := by
-      rw [hb, Matrix.mul_one, h2, h1]; simp only [Matrix.mul_assoc, Matrix.mul_one, Matrix.one_mul]
+    _ = _ := by rw [hb, Matrix.mul_one, h2, h1]; simp only [Matrix.mul_assoc, Matrix.mul_one]
 
 theorem coord_snd
     (e : k ≃ d) (y : Matrix a d K)

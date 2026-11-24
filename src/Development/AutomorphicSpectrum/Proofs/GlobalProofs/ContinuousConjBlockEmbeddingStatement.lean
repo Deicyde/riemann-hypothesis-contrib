@@ -65,10 +65,4 @@ theorem _root_.GlobalTheory.T.orthogonal_subspace_unitary_embedding
                 → (∀ h, s h ∈ uPart D.sp.cm.sig V.gram X Y T)
                   ∧ (∀ g ∈ uPart D.sp.cm.sig V.gram X Y T, ∃ h, s h = g)
                   ∧ ∀ h ∈ GfC V', s h ∈ GfC V := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.UEmb.range_embHom
-  | exact GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.UEmb.range_embHom
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.UEmb.range_embHom <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.UEmb.range_embHom

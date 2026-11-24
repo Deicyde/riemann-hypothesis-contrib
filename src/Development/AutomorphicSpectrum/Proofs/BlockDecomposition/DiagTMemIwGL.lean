@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmFieldStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwistedTraceFormulaStable
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmField
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsDiagUnit
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IwahoriAndMaximalCompactCriteria
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormOneUnitHilbertNinetyStatement
@@ -123,7 +124,7 @@ theorem main
                                   = b * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) u
                                     * b⁻¹ := by
   intro E _ _ _ hU w hw n b hb ϖ hϖ l hl hyp γ hγ
-  obtain ⟨-, hcc, hcv, -⟩ := GlobalTheory.T.placeConjugation_properties_cmField E hU w
+  obtain ⟨-, hcc, hcv, -⟩ := _root_.GlobalTheory.ConjAtPlace.main E hU w
   obtain ⟨hW1, hW2, -, -⟩ :=
     GlobalTheory.CompanionTheory.UnitaryWitt.unitary_hyperbolic_basis E hU w hw n b hb
   obtain ⟨hanti, hrev⟩ := GlobalTheory.CompanionTheory.Wexp.wexp_strictAnti_rev n l hl
@@ -167,7 +168,7 @@ theorem main
     simp only [Units.val_mul]
     rw [UnitaryCorrection.ordL_mul_of_ne (Units.ne_zero _) (Units.ne_zero _), ordL_zpow, hϖ.1,
       UnitaryCorrection.ordL_congr (b := (1 : w.adicCompletion E)) (by rw [hv, hτ1, map_one]),
-      UnitaryCorrection.ordL_one]
+      _root_.Formalism.UG.P.fSatake_ord_one]
     simp
   have hm0e := (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n m0).1.1 hm0
   have hδe : m0 * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) u * m0⁻¹ = δ := by

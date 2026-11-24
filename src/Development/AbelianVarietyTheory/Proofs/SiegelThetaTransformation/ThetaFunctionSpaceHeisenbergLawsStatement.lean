@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaFunction_space_heisenberg_laws
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T),
       C.IsTh 0
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.thetaFunction_space_heisenberg_laws
               ∧ ∃ N : ℕ,
                 0 < N
                   ∧ ∀ u ∈ hatA S T (tens (stdL D.host.E S.rank) C.X.Λ), C.rho (N • u) f = f := by
-  first
-  | exact @GlobalTheory.ThetaSpace.theta_space_laws
-  | exact GlobalTheory.ThetaSpace.theta_space_laws
-  | (intros; apply GlobalTheory.ThetaSpace.theta_space_laws <;> assumption)
+  first | exact @GlobalTheory.ThetaSpace.theta_space_laws

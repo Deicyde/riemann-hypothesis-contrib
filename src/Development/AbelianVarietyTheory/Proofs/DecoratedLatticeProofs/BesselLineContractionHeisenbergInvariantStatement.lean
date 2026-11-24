@@ -49,6 +49,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx
   GlobalTheory.LocMod
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.besselLineContraction_heisenberg_invariant
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.besselLineContraction_heisenberg_invariant
               GlobalTheory.Unf.contr l S vL (heisO ψ B.V₀ S ((B.o.resS S).symm (0, l.κ S x)) Ξ₁)
                   (heisO ψ S B'.V₀ ((B'.o.resT S).symm (0, x)) Ξ₂)
                 = GlobalTheory.Unf.contr l S vL Ξ₁ Ξ₂ := by
-  first
-  | exact @GlobalTheory.Unf.ContrHeis.contr_heisO
-  | exact GlobalTheory.Unf.ContrHeis.contr_heisO
-  | (intros; apply GlobalTheory.Unf.ContrHeis.contr_heisO <;> assumption)
+  first | exact @GlobalTheory.Unf.ContrHeis.contr_heisO

@@ -47,9 +47,7 @@ namespace Formalism.MainNotions.BridgeLemma₂
 open Formalism.HermitianLatticeCounting
 
 theorem rows_rpow_pow {b : ℝ} (hb : 0 < b) (x : ℝ) (n : ℕ) : (b ^ x) ^ n = b ^ (x * n) := by
-  first
-  | exact (Real.rpow_mul_natCast hb.le x n).symm
-  | (rw [← Real.rpow_natCast, ← Real.rpow_mul hb.le])
+  first | exact (Real.rpow_mul_natCast hb.le x n).symm
 
 theorem rows_num_Q {f r : ℕ} {b pe E1 cr δ : ℝ} (hb : 2 ≤ b) (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1)
     : (1 + δ) * (((b ^ pe) ^ E1) ^ 2 * ((b ^ pe) ^ cr) ^ 2)
@@ -76,7 +74,6 @@ theorem rows_num_Q {f r : ℕ} {b pe E1 cr δ : ℝ} (hb : 2 ≤ b) (hδ0 : 0 �
   have hA : (41 : ℝ) ^ f * (b ^ pe) ^ 3 ≤ b ^ (6 * (f : ℝ) + 3 * pe) := by
     rw [Real.rpow_add hb0, e0]
     gcongr
-    all_goals first | exact h41 | positivity
   have e1 : ((b ^ pe) ^ E1) ^ 2 = b ^ (2 * pe * E1) := by
     rw [hrp, rows_rpow_pow hb0]
     congr 1 <;> push_cast <;> ring
@@ -97,7 +94,6 @@ theorem rows_num_Q {f r : ℕ} {b pe E1 cr δ : ℝ} (hb : 2 ≤ b) (hδ0 : 0 �
         ≤ b ^ (1 : ℝ) * (((b ^ pe) ^ E1) ^ 2 * ((b ^ pe) ^ cr) ^ 2)
           * ((b ^ (6 * (f : ℝ) + 3 * pe)) ^ ((r + 1) ^ 2)) ^ 2 := by
       gcongr
-      all_goals first | exact h1δ | exact hA | positivity
     _ = b ^ (1 : ℝ) * (b ^ (2 * pe * E1) * b ^ (2 * pe * cr))
         * b ^ (12 * (f : ℝ) * ((r : ℝ) + 1) ^ 2 + 6 * pe * ((r : ℝ) + 1) ^ 2) := by
       rw [e1, e2, e3]
@@ -126,9 +122,7 @@ theorem rows_num_nd
           ^ (C * ((s : ℝ) + m) * (m : ℝ) ^ 2) := by
     unfold Formalism.HermitianLatticeCounting.LatticeSumBounds.bigH
     rw [← Real.rpow_mul hb0.le]
-    first
-    | exact Real.rpow_le_rpow_of_exponent_le hb1 hexp
-    | exact (Real.rpow_le_rpow_left_iff (by linarith)).2 hexp
+    first | exact Real.rpow_le_rpow_of_exponent_le hb1 hexp
   have hB := (rows_num_Q (f := f) (r := r) (pe := pe) (E1 := E1) (cr := cr) hb hδ0 hδ).trans hH
   have hep : 1 ≤ Real.exp 1 * Real.pi := by
     have h1 : (1 : ℝ) ≤ Real.exp 1 := by linarith [Real.add_one_le_exp (1 : ℝ)]
@@ -137,7 +131,7 @@ theorem rows_num_nd
   have hkv : 0 ≤ (k : ℝ) * v := by positivity
   have hq : (k : ℝ) * v / (Real.exp 1 * Real.pi) ≤ (k : ℝ) * v * C := by
     have hd : (k : ℝ) * v / (Real.exp 1 * Real.pi) ≤ (k : ℝ) * v := by
-      first | exact div_le_self hkv hep | (rw [div_le_iff₀ (by positivity)]; nlinarith)
+      first | exact div_le_self hkv hep
     nlinarith
   have hK
       : ((k : ℝ) * v / (Real.exp 1 * Real.pi)) ^ (k * f)
@@ -155,7 +149,6 @@ theorem rows_num_nd
         * Formalism.HermitianLatticeCounting.LatticeSumBounds.bigH C m f b
           ^ (C * ((s : ℝ) + m) * (m : ℝ) ^ 2) := by
       gcongr
-      all_goals first | assumption | positivity
     _ = Formalism.HermitianLatticeCounting.LatticeSumBounds.ndRow C k m f s b g v Γ Xi * rD := by
       unfold Formalism.HermitianLatticeCounting.LatticeSumBounds.ndRow
       ring

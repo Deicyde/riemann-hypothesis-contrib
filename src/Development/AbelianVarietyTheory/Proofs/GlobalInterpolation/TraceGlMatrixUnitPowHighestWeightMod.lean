@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.GoodTopBot
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.GlMatrixUnitPowCommutatorAndTraceCentralStatement
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CommPowEntry
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -127,7 +127,7 @@ theorem pow_entry_stable
     by_cases h : a = b
     · subst h
       simpa [Matrix.one_apply] using hf
-    · simp [Matrix.one_apply, h]
+    · simp [h]
   | succ k ih =>
     intro a b f hf
     rw [pow_succ', Matrix.mul_apply, LinearMap.sum_apply]
@@ -144,13 +144,12 @@ theorem hw_pow_entries
   | zero =>
     constructor
     · intro i j hij
-      simp [Matrix.one_apply, hij.ne]
+      simp [hij.ne]
     · intro i
-      simp [hwRowSum_zero, Matrix.one_apply]
+      simp [hwRowSum_zero]
   | succ k ih =>
     obtain ⟨ih1, ih2⟩ := ih
-    have hcomm :=
-      (GlobalTheory.T.glMatrixUnit_pow_commutator_and_trace_central (Module.End R V) N E hE k).1
+    have hcomm := (_root_.GlobalTheory.CommutatorPowerEntry.main (Module.End R V) N E hE k).1
     have hst := pow_entry_stable E M hM k
     have key
         : ∀ i j l,

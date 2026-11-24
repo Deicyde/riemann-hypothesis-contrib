@@ -2,7 +2,7 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUniqueLeftBasisCoordsAdicCompletion
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComponentDataIntersectionBoundStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComponentDataIntersectionBound
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -75,6 +75,6 @@ theorem phMu_eq_log_small_blocks_abelian
                               = Real.log (‖valAt Dc.y d.u w‖ * ∏ k, ‖w ⟨k, d.c k⟩‖ ^ Hd.aMu k)
                                 + (∑ τ, Real.log (Γ τ).det.re) / 2) := by
   intro hG E _ _ _ _
-  exact GlobalTheory.T.component_data_intersection_bound hG E
+  exact _root_.GlobalTheory.CompanionTheory.Ar.Cusp.PhMuFree.phMu_small hG E
 
 end GlobalTheory.CompanionTheory.Ar.Cusp

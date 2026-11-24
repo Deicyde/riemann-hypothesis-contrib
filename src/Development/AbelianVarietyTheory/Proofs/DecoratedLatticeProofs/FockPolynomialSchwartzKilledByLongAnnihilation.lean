@@ -88,7 +88,7 @@ theorem hasDerivAt_eval_line
       intro j
       by_cases hj : j = k
       · subst hj; simp
-      · simp [Pi.single_apply, Ne.symm hj, hj]
+      · simp [Ne.symm hj, hj]
     rw [Finset.sum_add_distrib, Finset.sum_mul]
     conv_rhs => rw [add_comm]
     congr 1

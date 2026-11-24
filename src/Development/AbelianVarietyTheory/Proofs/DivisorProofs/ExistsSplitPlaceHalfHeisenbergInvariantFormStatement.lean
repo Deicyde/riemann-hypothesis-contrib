@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_split_place_half_heisenberg_invariant_form
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.exists_split_place_half_heisenberg_invariant_form
                   (∀ i j, cA D e * u i j = u i j)
                     → ∀ f, IsThetaFunO ψ S T f → ℓ (heisO ψ S T u f) = ℓ f)
                 ∧ ∃ f, IsThetaFunO ψ S T f ∧ ℓ f ≠ 0 := by
-  first
-  | exact @GlobalTheory.HalfCoinv.exists_invariant_form
-  | exact GlobalTheory.HalfCoinv.exists_invariant_form
-  | (intros; apply GlobalTheory.HalfCoinv.exists_invariant_form <;> assumption)
+  first | exact @GlobalTheory.HalfCoinv.exists_invariant_form

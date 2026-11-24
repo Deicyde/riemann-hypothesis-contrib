@@ -67,17 +67,18 @@ section
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
 
-theorem cast_rank_eq_moduleRank (N : Submodule ℤ E) [DiscreteTopology N] :
-    ((rk N : ℕ) : Cardinal) = Module.rank ℤ N := by
+theorem cast_rank_eq_moduleRank (N : Submodule ℤ E) [DiscreteTopology N]
+    : ((rk N : ℕ) : Cardinal) = Module.rank ℤ N := by
   unfold rk
   exact Module.finrank_eq_rank ℤ N
 
-private theorem discreteTopology_of_le_discrete (L A : Submodule ℤ E) [DiscreteTopology L] (h : A ≤ L) :
-    DiscreteTopology A :=
+private theorem discreteTopology_of_le_discrete
+    (L A : Submodule ℤ E) [DiscreteTopology L] (h : A ≤ L)
+    : DiscreteTopology A :=
   DiscreteTopology.of_subset (s := (L : Set E)) ‹_› h
 
-theorem rk_sup_add_rk_inf (L A B : Submodule ℤ E) [DiscreteTopology L] (hA : A ≤ L)
-    (hB : B ≤ L) : rk (A ⊔ B) + rk (A ⊓ B) = rk A + rk B := by
+theorem rk_sup_add_rk_inf (L A B : Submodule ℤ E) [DiscreteTopology L] (hA : A ≤ L) (hB : B ≤ L)
+    : rk (A ⊔ B) + rk (A ⊓ B) = rk A + rk B := by
   haveI : DiscreteTopology A := discreteTopology_of_le_discrete L A hA
   haveI : DiscreteTopology B := discreteTopology_of_le_discrete L B hB
   haveI : DiscreteTopology ↥(A ⊔ B) := discreteTopology_of_le_discrete L _ (sup_le hA hB)
@@ -85,13 +86,15 @@ theorem rk_sup_add_rk_inf (L A B : Submodule ℤ E) [DiscreteTopology L] (hA : A
   have h := Submodule.rank_sup_add_rank_inf_eq A B
   apply Nat.cast_injective (R := Cardinal)
   push_cast
-  rw [cast_rank_eq_moduleRank, cast_rank_eq_moduleRank,
-    cast_rank_eq_moduleRank, cast_rank_eq_moduleRank]
+  rw [cast_rank_eq_moduleRank, cast_rank_eq_moduleRank, cast_rank_eq_moduleRank,
+    cast_rank_eq_moduleRank]
   exact h
 
-theorem mem_span_inf_of_mem_span (L A B : Submodule ℤ E) [DiscreteTopology L] (hA : A ≤ L)
-    (hB : B ≤ L) {b : E} (hbB : b ∈ B) (hbA : b ∈ span ℝ (A : Set E)) :
-    b ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E) := by
+theorem mem_span_inf_of_mem_span
+    (L A B : Submodule ℤ E) [DiscreteTopology L]
+    (hA : A ≤ L) (hB : B ≤ L)
+    {b : E} (hbB : b ∈ B) (hbA : b ∈ span ℝ (A : Set E))
+    : b ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E) := by
   classical
   obtain ⟨-, hAAs, hrk⟩ := saturProps E L A ‹_› hA
   haveI : DiscreteTopology (satur L A) := discreteTopology_of_le_discrete L _ inf_le_left
@@ -107,22 +110,20 @@ theorem mem_span_inf_of_mem_span (L A B : Submodule ℤ E) [DiscreteTopology L] 
     card_nsmul_eq_zero'
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at h0
   have hA' : Nat.card (satur L A ⧸ N) • b ∈ A := by simpa [N] using h0
-  have hC : Nat.card (satur L A ⧸ N) • b ∈ A ⊓ B :=
-    Submodule.mem_inf.2 ⟨hA', B.nsmul_mem hbB _⟩
+  have hC : Nat.card (satur L A ⧸ N) • b ∈ A ⊓ B := Submodule.mem_inf.2 ⟨hA', B.nsmul_mem hbB _⟩
   have hb : b = ((Nat.card (satur L A ⧸ N) : ℕ) : ℝ)⁻¹ • (Nat.card (satur L A ⧸ N) • b) := by
     rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul, inv_mul_cancel₀ (by exact_mod_cast hn.ne'), one_smul]
   rw [hb]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hC)
 
-theorem covol_eq_relIndex_mul_covol (N N' : Submodule ℤ E) [DiscreteTopology N'] (hle : N ≤ N')
-    (hrk : rk N = rk N') :
-    covol N = (N.toAddSubgroup.relIndex N'.toAddSubgroup : ℝ) * covol N' := by
+theorem covol_eq_relIndex_mul_covol
+    (N N' : Submodule ℤ E) [DiscreteTopology N'] (hle : N ≤ N') (hrk : rk N = rk N')
+    : covol N = (N.toAddSubgroup.relIndex N'.toAddSubgroup : ℝ) * covol N' := by
   classical
   haveI : DiscreteTopology N := DiscreteTopology.of_subset (s := (N' : Set E)) ‹_› hle
   let K : Submodule ℤ N' := N.comap N'.subtype
   let eK : K ≃ₗ[ℤ] N := Submodule.comapSubtypeEquivOfLe hle
-  have hK : Module.finrank ℤ K = Module.finrank ℤ N' := by
-    rw [eK.finrank_eq]; exact hrk
+  have hK : Module.finrank ℤ K = Module.finrank ℤ N' := by rw [eK.finrank_eq]; exact hrk
   let b : Basis (Fin (Module.finrank ℤ N')) ℤ N' := Module.finBasis ℤ N'
   let bK : Basis (Fin (Module.finrank ℤ N')) ℤ K := Module.finBasisOfFinrankEq ℤ K hK
   let A : Matrix (Fin (Module.finrank ℤ N')) (Fin (Module.finrank ℤ N')) ℤ :=
@@ -145,8 +146,8 @@ theorem covol_eq_relIndex_mul_covol (N N' : Submodule ℤ E) [DiscreteTopology N
     simp [Ar, v, Int.cast_smul_eq_zsmul]
   have hgram : Matrix.gram ℝ w = Ar.transpose * (Matrix.gram ℝ v * Ar) := by
     ext i j
-    simp only [Matrix.gram_apply, hw, Matrix.mul_apply, Matrix.transpose_apply,
-      inner_sum, sum_inner, real_inner_smul_left, real_inner_smul_right, Finset.mul_sum]
+    simp only [Matrix.gram_apply, hw, Matrix.mul_apply, Matrix.transpose_apply, inner_sum,
+      sum_inner, real_inner_smul_left, real_inner_smul_right, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have hA : Ar.det = (A.det : ℝ) := by
@@ -166,35 +167,43 @@ theorem covol_eq_relIndex_mul_covol (N N' : Submodule ℤ E) [DiscreteTopology N
   simp [Nat.cast_natAbs, Int.cast_abs]
   exact Or.inl rfl
 
-theorem orthogonal_starProjection_comp_of_le {U W : Submodule ℝ E} (hUW : U ≤ W) (x : E) :
-    Wᗮ.starProjection (Uᗮ.starProjection x) = Wᗮ.starProjection x := by
+theorem orthogonal_starProjection_comp_of_le {U W : Submodule ℝ E} (hUW : U ≤ W) (x : E)
+    : Wᗮ.starProjection (Uᗮ.starProjection x) = Wᗮ.starProjection x := by
   have h1 := U.starProjection_add_starProjection_orthogonal x
   have h2 : Wᗮ.starProjection (U.starProjection x) = 0 := by
     rw [Submodule.starProjection_apply_eq_zero_iff, Submodule.orthogonal_orthogonal]
     exact hUW (U.starProjection_apply_mem x)
-  calc Wᗮ.starProjection (Uᗮ.starProjection x)
-      = Wᗮ.starProjection (U.starProjection x) + Wᗮ.starProjection (Uᗮ.starProjection x) := by
-        rw [h2, zero_add]
+  calc
+    Wᗮ.starProjection (Uᗮ.starProjection x)
+        = Wᗮ.starProjection (U.starProjection x) + Wᗮ.starProjection (Uᗮ.starProjection x) := by
+      rw [h2, zero_add]
     _ = Wᗮ.starProjection x := by rw [← map_add (f := _), h1]
 
-theorem mem_of_orthogonal_starProjection_eq_zero {W : Submodule ℝ E} {x : E}
-    (h : Wᗮ.starProjection x = 0) : x ∈ W := by
+theorem mem_of_orthogonal_starProjection_eq_zero
+    {W : Submodule ℝ E} {x : E} (h : Wᗮ.starProjection x = 0)
+    : x ∈ W := by
   rw [Submodule.starProjection_apply_eq_zero_iff, Submodule.orthogonal_orthogonal] at h
   exact h
 
-theorem covol_le_of_contraction (Q1 Q2 : Submodule ℤ E) [DiscreteTopology Q1]
-    [DiscreteTopology Q2] (φ : Q1 ≃ₗ[ℤ] Q2) (f : E →L[ℝ] E)
-    (hf : ∀ x : Q1, ((φ x : Q2) : E) = f x) (hn : ∀ v, ‖f v‖ ≤ ‖v‖) : covol Q2 ≤ covol Q1 := by
+theorem covol_le_of_contraction
+    (Q1 Q2 : Submodule ℤ E) [DiscreteTopology Q1] [DiscreteTopology Q2]
+    (φ : Q1 ≃ₗ[ℤ] Q2) (f : E →L[ℝ] E)
+    (hf : ∀ x : Q1, ((φ x : Q2) : E) = f x) (hn : ∀ v, ‖f v‖ ≤ ‖v‖)
+    : covol Q2 ≤ covol Q1 := by
   let v := Module.finBasis ℤ Q1
   let w := v.map φ
   rw [covol_eq_gram E Q1 _ v, covol_eq_gram E Q2 _ w]
   apply Real.sqrt_le_sqrt
-  have h := gram_det_le E E _ (fun i => (v i : E)) (fun i => (w i : E)) 1 (fun c => by
-    have : ∑ i, c i • ((w i : Q2) : E) = f (∑ i, c i • ((v i : Q1) : E)) := by
-
-      simp only [w, Basis.map_apply, hf, map_sum, map_smul]
-    rw [this, one_mul]
-    exact hn _)
+  have h :=
+    gram_det_le E E _
+      (fun i => (v i : E))
+      (fun i => (w i : E))
+      1
+      (fun c => by
+        have : ∑ i, c i • ((w i : Q2) : E) = f (∑ i, c i • ((v i : Q1) : E)) := by
+          simp only [w, Basis.map_apply, hf, map_sum, map_smul]
+        rw [this, one_mul]
+        exact hn _)
   simpa using h
 
 end
@@ -229,8 +238,8 @@ theorem degree_supermodular_integral : DegSupermodZ := by
 
   have hAs_span : ∀ x ∈ satur (A ⊔ B) A, x ∈ span ℝ (A : Set E) := fun x hx =>
     (Submodule.mem_inf.1 hx).2
-  have hBs_span : ∀ x ∈ satur B (A ⊓ B), x ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E) :=
-    fun x hx => (Submodule.mem_inf.1 hx).2
+  have hBs_span : ∀ x ∈ satur B (A ⊓ B), x ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E) := fun x hx =>
+    (Submodule.mem_inf.1 hx).2
   have hBsAs : satur B (A ⊓ B) ≤ satur (A ⊔ B) A := by
     intro x hx
     refine Submodule.mem_inf.2 ⟨(le_sup_right : B ≤ A ⊔ B) (Submodule.mem_inf.1 hx).1, ?_⟩
@@ -243,51 +252,63 @@ theorem degree_supermodular_integral : DegSupermodZ := by
     have := covol_pos A
     rw [hcA, h0] at this
     simp at this
-  have hiC : (A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup =
-      A.toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup := by
+  have hiC
+      : (A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup
+        = A.toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup := by
     unfold AddSubgroup.relIndex
     congr 1
     ext x
     simp only [AddSubgroup.mem_addSubgroupOf, Submodule.mem_toAddSubgroup]
     have hxB : (x : E) ∈ B := (Submodule.mem_inf.1 x.2).1
     exact ⟨fun h => (Submodule.mem_inf.1 h).1, fun h => Submodule.mem_inf.2 ⟨h, hxB⟩⟩
-  have hle : (A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup ≤
-      A.toAddSubgroup.relIndex (satur (A ⊔ B) A).toAddSubgroup := by
+  have hle
+      : (A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup
+        ≤ A.toAddSubgroup.relIndex (satur (A ⊔ B) A).toAddSubgroup := by
     rw [hiC]
     exact AddSubgroup.relIndex_le_of_le_right hBsAs hiA
   have hii : covol (satur (A ⊔ B) A) * covol (A ⊓ B) ≤ covol A * covol (satur B (A ⊓ B)) := by
     rw [hcA, hcC]
     have h1 := covol_pos (satur (A ⊔ B) A)
     have h2 := covol_pos (satur B (A ⊓ B))
-    have h3 : ((A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup : ℝ) ≤
-        (A.toAddSubgroup.relIndex (satur (A ⊔ B) A).toAddSubgroup : ℝ) := by exact_mod_cast hle
+    have h3
+        : ((A ⊓ B).toAddSubgroup.relIndex (satur B (A ⊓ B)).toAddSubgroup : ℝ)
+          ≤ (A.toAddSubgroup.relIndex (satur (A ⊔ B) A).toAddSubgroup : ℝ) := by
+      exact_mod_cast hle
     have h4 := mul_le_mul_of_nonneg_right h3 (mul_pos h1 h2).le
     nlinarith [h4]
 
-  have hspan : span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E) ≤
-      span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E) := span_mono hBsAs
-  have hPW0 : ∀ y ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E),
-      (span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E))ᗮ.starProjection y = 0 := by
+  have hspan
+      : span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E)
+        ≤ span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E) :=
+    span_mono hBsAs
+  have hPW0
+      : ∀ y ∈ span ℝ ((A ⊓ B : Submodule ℤ E) : Set E),
+        (span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E))ᗮ.starProjection y = 0 := by
     intro y hy
     rw [Submodule.starProjection_apply_eq_zero_iff, Submodule.orthogonal_orthogonal]
     exact span_mono hCBs hy
-  have hPU0 : ∀ y ∈ A, (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection y = 0 := by
+  have hPU0
+      : ∀ y ∈ A, (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection y = 0 := by
     intro y hy
     rw [Submodule.starProjection_apply_eq_zero_iff, Submodule.orthogonal_orthogonal]
     exact subset_span (hAAs hy)
-  have hmaps : ∀ x ∈ quot B (satur B (A ⊓ B)),
-      (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection x ∈
-        quot (A ⊔ B) (satur (A ⊔ B) A) := by
+  have hmaps
+      : ∀ x ∈ quot B (satur B (A ⊓ B)),
+        (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection x
+          ∈ quot (A ⊔ B) (satur (A ⊔ B) A) := by
     intro x hx
     obtain ⟨b, hb, rfl⟩ := Submodule.mem_map.1 hx
     refine Submodule.mem_map.2 ⟨b, (le_sup_right : B ≤ A ⊔ B) hb, ?_⟩
     simp only [LinearMap.coe_restrictScalars, ContinuousLinearMap.coe_coe]
     exact (orthogonal_starProjection_comp_of_le hspan b).symm
   let g : quot B (satur B (A ⊓ B)) →ₗ[ℤ] quot (A ⊔ B) (satur (A ⊔ B) A) :=
-    (((span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection : E →L[ℝ] E).toLinearMap.restrictScalars ℤ).restrict
-      hmaps
-  have hg : ∀ x, ((g x : quot (A ⊔ B) (satur (A ⊔ B) A)) : E) =
-      (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection x := fun x => rfl
+    (((span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection
+      : E →L[ℝ] E).toLinearMap.restrictScalars ℤ).restrict hmaps
+  have hg
+      : ∀ x,
+        ((g x : quot (A ⊔ B) (satur (A ⊔ B) A)) : E)
+          = (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection x := fun x =>
+    rfl
   have hinj : Function.Injective g := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx
@@ -297,8 +318,7 @@ theorem degree_supermodular_integral : DegSupermodZ := by
     simp only [LinearMap.coe_restrictScalars, ContinuousLinearMap.coe_coe] at hbx
     rw [← hbx, orthogonal_starProjection_comp_of_le hspan] at hx0
     have hbU := mem_of_orthogonal_starProjection_eq_zero hx0
-    have hbA : b ∈ span ℝ (A : Set E) :=
-      span_le.2 (fun y hy => hAs_span y hy) hbU
+    have hbA : b ∈ span ℝ (A : Set E) := span_le.2 (fun y hy => hAs_span y hy) hbU
     have hbC := mem_span_inf_of_mem_span L A B hA hB hb hbA
     apply Subtype.ext
     rw [← hbx, hPW0 b hbC]
@@ -307,28 +327,30 @@ theorem degree_supermodular_integral : DegSupermodZ := by
     rintro ⟨y, hy⟩
     obtain ⟨s, hs, rfl⟩ := Submodule.mem_map.1 hy
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hs
-    have hpb : (span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E))ᗮ.starProjection b ∈
-        quot B (satur B (A ⊓ B)) := Submodule.mem_map.2 ⟨b, hb, rfl⟩
+    have hpb
+        : (span ℝ ((satur B (A ⊓ B) : Submodule ℤ E) : Set E))ᗮ.starProjection b
+          ∈ quot B (satur B (A ⊓ B)) :=
+      Submodule.mem_map.2 ⟨b, hb, rfl⟩
     refine ⟨⟨_, hpb⟩, Subtype.ext ?_⟩
     rw [hg]
-    simp only [LinearMap.coe_restrictScalars, ContinuousLinearMap.coe_coe, map_add (f := _), hPU0 a ha,
-      zero_add]
+    simp only [LinearMap.coe_restrictScalars, ContinuousLinearMap.coe_coe, map_add (f := _),
+      hPU0 a ha, zero_add]
     exact orthogonal_starProjection_comp_of_le hspan b
   let φ := LinearEquiv.ofBijective g ⟨hinj, hsurj⟩
   have hcov : covol (quot (A ⊔ B) (satur (A ⊔ B) A)) ≤ covol (quot B (satur B (A ⊓ B))) := by
     refine covol_le_of_contraction _ _ φ
-      ((span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection) (fun x => hg x) ?_
+      ((span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.starProjection)
+      (fun x => hg x)
+      ?_
     intro v
-    first
-      | exact Submodule.norm_starProjection_apply_le _ v
-      | exact (span ℝ ((satur (A ⊔ B) A : Submodule ℤ E) : Set E))ᗮ.norm_starProjection_apply_le v
-      | exact ContinuousLinearMap.le_of_opNorm_le _ (Submodule.starProjection_norm_le _) v
-      | simpa using ContinuousLinearMap.le_of_opNorm_le _ (Submodule.starProjection_norm_le _) v
-  have k1 : Real.log (covol (quot (A ⊔ B) (satur (A ⊔ B) A))) ≤
-      Real.log (covol (quot B (satur B (A ⊓ B)))) :=
+    first | exact Submodule.norm_starProjection_apply_le _ v
+  have k1
+      : Real.log (covol (quot (A ⊔ B) (satur (A ⊔ B) A)))
+        ≤ Real.log (covol (quot B (satur B (A ⊓ B)))) :=
     Real.log_le_log (covol_pos _) hcov
-  have k2 : Real.log (covol (satur (A ⊔ B) A)) + Real.log (covol (A ⊓ B)) ≤
-      Real.log (covol A) + Real.log (covol (satur B (A ⊓ B))) := by
+  have k2
+      : Real.log (covol (satur (A ⊔ B) A)) + Real.log (covol (A ⊓ B))
+        ≤ Real.log (covol A) + Real.log (covol (satur B (A ⊓ B))) := by
     rw [← Real.log_mul (covol_pos _).ne' (covol_pos _).ne',
       ← Real.log_mul (covol_pos _).ne' (covol_pos _).ne']
     exact Real.log_le_log (mul_pos (covol_pos _) (covol_pos _)) hii

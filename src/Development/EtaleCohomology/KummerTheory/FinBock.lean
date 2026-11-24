@@ -37,7 +37,7 @@ public import Development.EtaleCohomology.TateTwists.EtaleSheafShortComplexExact
 public import Development.EtaleCohomology.TateTwists.EtaleSingleSheafHomotopicMapsEqualHolds
 public import Development.EtaleCohomology.TateTwists.Imports
 import Development.EtaleCohomology.TateTwists.PpEvBasicPf
-import Development.EtaleCohomology.TateTwists.PpEvDeltaPf
+import Development.EtaleCohomology.TateTwists.EtaleChainCochainEvalDifferentialFormulaHolds
 import Development.EtaleCohomology.TateTwists.PpEvMkPf
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -141,7 +141,6 @@ theorem etale_bockstein_reduction_kernel_eq_image : LateralTheory.KummerTheory.B
     | exact etale_torsion_cohomology_twist_section
     | exact etale_torsion_cohomology_primary_part_basic
     | exact etale_torsion_cohomology_localization_basic
-    | exact etale_torsion_cohomology_mono_epi_of_exact
 theorem etale_sheaf_short_complex_exact_iff_locally_lifts
     : LateralTheory.EtaleFoundations.EtaleSheafShortComplexExactIffLocallyLifts := by
   apply LateralTheory.EtaleFoundations.etale_sheaf_short_complex_exact_iff_local_lifts_holds
@@ -188,7 +187,7 @@ theorem etale_cohomology_evaluation_mk : LateralTheory.EtaleFoundations.pp_ev_mk
   apply LateralTheory.EtaleFoundations.pp_ev_mk_of
 theorem etale_cohomology_evaluation_connecting_hom
     : LateralTheory.EtaleFoundations.pp_ev_delta := by
-  apply LateralTheory.EtaleFoundations.pp_ev_delta_of
+  apply _root_.LateralTheory.EtaleFoundations.etale_chain_cochain_eval_differential_formula_holds
 theorem etale_torsion_cohomology_operation_spec
     : LateralTheory.EtaleFoundations.EtaleCochainSemilinearMapOnClasses := by
   apply LateralTheory.EtaleFoundations.etale_semilinear_cohomology_operation_exists_of_evaluation
@@ -236,17 +235,6 @@ theorem etale_bockstein_sequence_adic_finiteness : LateralTheory.KummerTheory.Bo
     | exact etale_bockstein_connecting_map_unique_up_to_sign
     | exact etale_bockstein_reduction_postcomposition_compat
     | exact etale_torsion_cohomology_primary_part_basic
-    | exact etale_torsion_cohomology_primary_localization
-    | exact etale_torsion_cohomology_twist_section
-    | exact etale_torsion_cohomology_mono_epi_of_exact
-    | exact etale_sheaf_short_complex_exact_iff_locally_lifts
-    | exact etale_torsion_cohomology_localization_basic
-    | exact etale_torsion_cohomology_residue_basic
-    | exact etale_torsion_cohomology_extension_hom_exists
-    | exact etale_torsion_cohomology_operation_spec
-    | exact etale_torsion_cohomology_operation_comp
-    | exact etale_prime_power_twist_reduction_map_exists
-    | exact etale_prime_power_twist_restriction_exists
 theorem intersectionNumber_baseChange : LateralTheory.KummerTheory.Bock :=
   etale_bockstein_sequence_adic_finiteness
 end LateralTheory.Fin.Bock

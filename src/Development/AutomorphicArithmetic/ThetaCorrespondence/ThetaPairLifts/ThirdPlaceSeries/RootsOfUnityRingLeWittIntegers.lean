@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting
@@ -55,6 +53,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option genInjectivity false
 set_option genSizeOfSpec false
+
 structure HeightCountingBaseData
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists)
     (D : D7) (cf : CharFrame D) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r)

@@ -89,9 +89,7 @@ theorem plConjEq (D : D7) : PlConjEq D := by
     RingOfIntegers.ext (by rw [hc, hc, star_star])
   ext x
   show x ∈ (D.plEq (D.what₂.places.conj w)).asIdeal ↔ x ∈ (D.plEq w).asIdeal.map (cO D.what₂.LL)
-  first
-  | rw [Ideal.mem_map_of_equiv]
-  | rw [Ideal.mem_map_iff_of_surjective _ (cO D.what₂.LL).surjective]
+  first | rw [Ideal.mem_map_of_equiv]
   have hiff
       : (∃ y ∈ (D.plEq w).asIdeal, cO D.what₂.LL y = x) ↔ cO D.what₂.LL x ∈ (D.plEq w).asIdeal := by
     constructor
@@ -111,14 +109,6 @@ end PlConj
 section Cut
 
 open TensorProduct Formalism.BasicNotions.Rows
-
-section CutTensor
-
-variable
-  {O R W : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup W] [Module O W] [Module R W]
-  [IsScalarTower O R W]
-
-end CutTensor
 
 section OForm
 
@@ -141,26 +131,5 @@ theorem restRowsFiniteGroupCard_pos (D : Formalism.BasicNotions.D7)
 end CutRec
 
 end Cut
-
-section Fam
-
-variable
-  (D : Formalism.BasicNotions.D7)
-  {G : Type} [Group G] [Fintype G]
-  {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
-
-theorem ranks_r_sym (D : Formalism.BasicNotions.D7) : D.R.r = D.R.k + 2 * D.R.rS + 1 := by
-  have h1 := D.R.two_le_m
-  obtain ⟨j, hj⟩ := D.R.m_even
-  unfold Formalism.BasicNotions.Ranks.r Formalism.BasicNotions.Ranks.rS
-  omega
-
-end Fam
-
-section Inhabit
-
-variable {K : Type} [Field K] [NumberField K] [StarRing K]
-
-end Inhabit
 
 end Formalism.L2.DIV

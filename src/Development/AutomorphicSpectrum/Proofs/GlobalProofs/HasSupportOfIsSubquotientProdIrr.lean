@@ -87,9 +87,9 @@ theorem hasSupport_of_isSubquotient_prodIrr
       (multiProd e fun a => multiProd (e' a) fun b => (u a b).rep) :=
     GlobalTheory.CuspSupportExist.L_ind k _ _ _ e _ _ _ _
       (isSmooth_piTensor fun a => isSmooth_parInd _ _)
-      (GlobalTheory.CuspSupportExist.L_pit _ _ _ _ _ _ he')
+      (_root_.GlobalTheory.piTensor_isSubquotient_of_forall _ _ _ _ _ _ he')
   obtain ⟨E, hE⟩ :=
-    GlobalTheory.CuspSupportExist.L_stage k c N
+    _root_.GlobalTheory.SmGL.Stages.isSubquotient_multiProd_multiProd k c N
       (fun a => (y a).1)
       e T
       (fun a b => (u a b).1)

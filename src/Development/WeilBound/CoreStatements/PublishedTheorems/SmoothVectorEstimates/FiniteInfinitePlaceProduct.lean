@@ -153,7 +153,6 @@ theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 
       GroundTheory.Global.denseRange_units_prod_pi S (Finset.univ : Finset (InfinitePlace L))
     intro p
     refine hd.induction_on p (isClosed_eq hc continuous_const) (fun k => ?_)
-    beta_reduce
     have e1
         : (∏ v : S, ν.loc v.1 (Units.map ↑(algebraMap L (v.1.adicCompletion L)) k))
           = ∏ v ∈ S, ν.locK v k :=

@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.fockPolynomialVector_laws
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ B,
       C.IsB B
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.fockPolynomialVector_laws
                 ∧ (∀ f', C.IsTh f' → C.fvec B (f + f') Q = C.fvec B f Q + C.fvec B f' Q)
                 ∧ (∀ a : ℂ, C.fvec B (a • f) Q = a • C.fvec B f Q)
                 ∧ ∀ u, IsFinPt u → C.fvec B (C.rho u f) Q = C.rho u (C.fvec B f Q) := by
-  first
-  | exact @GlobalTheory.Ker.FockAlg.fock_vec_laws
-  | exact GlobalTheory.Ker.FockAlg.fock_vec_laws
-  | (intros; apply GlobalTheory.Ker.FockAlg.fock_vec_laws <;> assumption)
+  first | exact @GlobalTheory.Ker.FockAlg.fock_vec_laws

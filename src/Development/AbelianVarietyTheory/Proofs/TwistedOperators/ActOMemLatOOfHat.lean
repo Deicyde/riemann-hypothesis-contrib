@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.InvolutionSphericalHeckeAnti
 
 @[expose] public section
 
@@ -112,19 +113,11 @@ theorem actO_eq_self_of_half
   rw [Matrix.smul_mul, ← Matrix.mul_smul, GlobalTheory.SplitScalar.off_smul_mt_inv hg,
     Matrix.mul_smul, Matrix.mul_one, hx' _ ha]
 
-theorem suppAt_inv' {a : AE D} {V : HSp D} {g : GA D V} (hg : SuppAt a V g) : SuppAt a V g⁻¹ := by
-  have h := GlobalTheory.SplitScalar.off_smul_mt_inv hg
-  rw [← sub_eq_zero, ← smul_sub, sub_smul, one_smul, sub_eq_zero] at h
-  exact fun i j => (congrFun (congrFun h i) j).symm
-
 end GlobalTheory.StdHalfLat
 
 namespace GlobalTheory.StdHalfLat
 
 open Matrix
-
-
-
 
 variable {D : D7}
 
@@ -181,22 +174,17 @@ theorem mem_latO_iff_of_half
     rwa [actO_eq_self_of_half ha hb hg hh hx] at this
   · intro hm
     have := actO_mem_latO_of_hat g⁻¹ h⁻¹ hS' hT' hm
-    rwa [actO_eq_self_of_half ha hb (suppAt_inv' hg) (suppAt_inv' hh) hx] at this
+    rwa [actO_eq_self_of_half ha hb (_root_.GlobalTheory.SplitPlace.suppAt_inv hg)
+        (_root_.GlobalTheory.SplitPlace.suppAt_inv hh) hx]
+      at this
 
-theorem half_nsmul {m n : ℕ} {e : AE D} {x : Mx D m n} (hx : IsHalf e x) (k : ℕ)
-    : IsHalf e (k • x) := fun i j => by
-  have h := hx i j
-  simp only [Matrix.smul_apply, nsmul_eq_mul]
-  linear_combination (k : AE D) * h
+alias half_nsmul := _root_.GlobalTheory.SplitScalar.isHalf_nsmul
 
 end GlobalTheory.StdHalfLat
 
 namespace GlobalTheory.StdHalfLat
 
 open Matrix
-
-
-
 
 theorem hat_moves
     {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {U : Set T} (N : Std G U)
@@ -239,9 +227,6 @@ end GlobalTheory.StdHalfLat
 namespace GlobalTheory.LastVertexMove
 
 open GlobalTheory.StdHalfLat
-
-
-
 
 theorem isSBHalf_stdLat
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}

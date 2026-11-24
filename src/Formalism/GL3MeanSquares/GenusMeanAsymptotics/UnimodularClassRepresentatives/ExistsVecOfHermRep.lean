@@ -88,7 +88,7 @@ def vecSplitPerp (h : V →ₗ⋆[K] V →ₗ[K] K) {x₀ : V} (hx : h x₀ x₀
 
 private theorem star_sesq_eq_swap_of_isSymm {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (a b : V)
     : star (h a b) = h b a := by
-  first | exact hs a b | exact hs.eq a b
+  first | exact hs.eq a b
 
 theorem VecSplit.finrank_add_one
     {h : V →ₗ⋆[K] V →ₗ[K] K} {h' : V' →ₗ⋆[K] V' →ₗ[K] K} (S : VecSplit h h')
@@ -131,7 +131,7 @@ theorem VecSplit.isSymm
     intro a b
     rw [← S.isom, ← S.isom]
     exact star_sesq_eq_swap_of_isSymm hs _ _
-  first | exact H | exact ⟨H⟩
+  first | exact ⟨H⟩
 
 theorem exists_vec_of_hermRep
     (hH : HermRepUnram) (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
@@ -159,8 +159,8 @@ theorem exists_vec_of_hermRep
       (fun φ => hd _ hy0 φ)
       hpos
   refine ⟨star s • x + star t • y'.1, ?_⟩
-  simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, map_smul,
-    smul_eq_mul, hxy, hyx, starRingEnd_apply, star_star]
+  simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
+    hxy, hyx, starRingEnd_apply, star_star]
   linear_combination hst
 
 theorem VecSplit.le_dual_of_mem

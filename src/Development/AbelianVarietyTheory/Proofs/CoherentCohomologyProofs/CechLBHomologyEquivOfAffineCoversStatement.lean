@@ -56,7 +56,4 @@ theorem _root_.GlobalTheory.T.nonempty_cechLB_homology_equiv_of_affine_covers
       M.IsLB → IsSeparated f → (∀ i, IsAffineOpen (D i)) → ⨆ i, D i = ⊤ → (∀ i, IsAffineOpen (D' i))
         → ⨆ i, D' i = ⊤
         → ∀ n, Nonempty ((cechLB f M D).homology n ≃ₗ[R] (cechLB f M D').homology n) := by
-  first
-  | exact @GlobalTheory.AbLaw.cechLB_homology_equiv_of_affine_covers
-  | exact GlobalTheory.AbLaw.cechLB_homology_equiv_of_affine_covers
-  | (intros; apply GlobalTheory.AbLaw.cechLB_homology_equiv_of_affine_covers <;> assumption)
+  first | exact @GlobalTheory.AbLaw.cechLB_homology_equiv_of_affine_covers

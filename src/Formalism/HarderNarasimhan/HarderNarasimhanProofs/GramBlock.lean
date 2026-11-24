@@ -60,9 +60,10 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem gramBlock_norm_sum_sq {P F : Type*} [Fintype P] [NormedAddCommGroup F]
-    [InnerProductSpace ℝ F] (y : P → F) (h : ∀ v w, v ≠ w → inner ℝ (y v) (y w) = 0) :
-    ‖∑ v, y v‖ ^ 2 = ∑ v, ‖y v‖ ^ 2 := by
+theorem gramBlock_norm_sum_sq
+    {P F : Type*} [Fintype P] [NormedAddCommGroup F] [InnerProductSpace ℝ F]
+    (y : P → F) (h : ∀ v w, v ≠ w → inner ℝ (y v) (y w) = 0)
+    : ‖∑ v, y v‖ ^ 2 = ∑ v, ‖y v‖ ^ 2 := by
   classical
   rw [← real_inner_self_eq_norm_sq]
   simp_rw [sum_inner, inner_sum]
@@ -70,20 +71,22 @@ theorem gramBlock_norm_sum_sq {P F : Type*} [Fintype P] [NormedAddCommGroup F]
   rw [Finset.sum_eq_single v (fun w _ hw => h v w (Ne.symm hw)) (by simp),
     real_inner_self_eq_norm_sq]
 
-theorem gramBlock_gram_comb {ι E F : Type*} [Fintype ι] [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F]
-    (g : E →ₗ[ℝ] F) (f : ι → E) (M : Matrix ι ι ℝ) :
-    Matrix.gram ℝ (fun j => g (∑ i, M i j • f i)) = M.transpose * Matrix.gram ℝ (fun i => g (f i)) * M := by
+theorem gramBlock_gram_comb
+    {ι E F : Type*} [Fintype ι] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℝ F]
+    (g : E →ₗ[ℝ] F) (f : ι → E) (M : Matrix ι ι ℝ)
+    : Matrix.gram ℝ (fun j => g (∑ i, M i j • f i))
+      = M.transpose * Matrix.gram ℝ (fun i => g (f i)) * M := by
   ext j l
 
   simp only [Matrix.gram_apply, Matrix.mul_apply, Matrix.transpose_apply, map_sum, map_smul,
-  sum_inner, inner_sum, real_inner_smul_left, real_inner_smul_right, Finset.sum_mul]
+    sum_inner, inner_sum, real_inner_smul_left, real_inner_smul_right, Finset.sum_mul]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-private theorem det_gram_le_one_of_norm_sum_sq_le {κ F : Type*} [Fintype κ] [DecidableEq κ]
-    [NormedAddCommGroup F] [InnerProductSpace ℝ F] (w : κ → F)
-    (hw : ∀ x : κ → ℝ, ‖∑ a, x a • w a‖ ^ 2 ≤ ∑ a, x a ^ 2) :
-    (Matrix.gram ℝ w).det ≤ 1 := by
+private theorem det_gram_le_one_of_norm_sum_sq_le
+    {κ F : Type*} [Fintype κ] [DecidableEq κ] [NormedAddCommGroup F] [InnerProductSpace ℝ F]
+    (w : κ → F) (hw : ∀ x : κ → ℝ, ‖∑ a, x a • w a‖ ^ 2 ≤ ∑ a, x a ^ 2)
+    : (Matrix.gram ℝ w).det ≤ 1 := by
   have hP := Matrix.posSemidef_gram ℝ w
   rw [hP.isHermitian.det_eq_prod_eigenvalues]
   apply Finset.prod_le_one₀
@@ -104,8 +107,8 @@ theorem gram_block_determinant : GramBlock := by
   intro P E E' ι _ _ _ _ _ _ _ _ _ _ Ev Ev' T c W u hEv hEv' hc hT hW hu hspan
   classical
   let k : P → ℕ := fun v => Module.finrank ℝ (W ⊓ Ev v : Submodule ℝ E)
-  let B : ∀ v, OrthonormalBasis (Fin (k v)) ℝ (W ⊓ Ev v : Submodule ℝ E) :=
-    fun v => stdOrthonormalBasis ℝ _
+  let B : ∀ v, OrthonormalBasis (Fin (k v)) ℝ (W ⊓ Ev v : Submodule ℝ E) := fun v =>
+    stdOrthonormalBasis ℝ _
   let f : (Σ v, Fin (k v)) → E := fun a => (B a.1 a.2 : E)
   have hfW : ∀ a, f a ∈ W ⊓ Ev a.1 := fun a => (B a.1 a.2).2
   have hfon : Orthonormal ℝ f := by
@@ -130,8 +133,11 @@ theorem gram_block_determinant : GramBlock := by
     · conv_lhs => rw [hW]
       refine iSup_le fun v => ?_
       intro x hx
-      have key : ((∑ i, inner ℝ (B v i) (⟨x, hx⟩ : (W ⊓ Ev v : Submodule ℝ E)) • B v i :
-          (W ⊓ Ev v : Submodule ℝ E)) : E) = x := by
+      have key
+          : ((∑ i, inner ℝ (B v i) (⟨x, hx⟩ : (W ⊓ Ev v : Submodule ℝ E)) • B v i
+                : (W ⊓ Ev v : Submodule ℝ E))
+              : E)
+            = x := by
         rw [(B v).sum_repr']
       rw [← key, Submodule.coe_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
@@ -167,15 +173,17 @@ theorem gram_block_determinant : GramBlock := by
     simp only [huM]
     rw [h1, hG1, Matrix.mul_one, Matrix.det_mul, Matrix.det_transpose]
     ring
-  have hGT : (Matrix.gram ℝ (fun i => T (u i))).det =
-      M.det ^ 2 * (Matrix.gram ℝ (fun i => T (f' i))).det := by
+  have hGT
+      : (Matrix.gram ℝ (fun i => T (u i))).det
+        = M.det ^ 2 * (Matrix.gram ℝ (fun i => T (f' i))).det := by
     simp only [huM]
     rw [gramBlock_gram_comb T f' M, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose]
     ring
-  have hreidx : (Matrix.gram ℝ (fun i => T (f' i))).det =
-      (Matrix.gram ℝ (fun a => T (f a))).det := by
-    have h1 : Matrix.gram ℝ (fun i => T (f' i)) =
-        (Matrix.gram ℝ (fun a => T (f a))).submatrix e.symm e.symm := by
+  have hreidx
+      : (Matrix.gram ℝ (fun i => T (f' i))).det = (Matrix.gram ℝ (fun a => T (f a))).det := by
+    have h1
+        : Matrix.gram ℝ (fun i => T (f' i))
+          = (Matrix.gram ℝ (fun a => T (f a))).submatrix e.symm e.symm := by
       ext i j
       rfl
     rw [h1, Matrix.det_submatrix_equiv_self]
@@ -184,8 +192,9 @@ theorem gram_block_determinant : GramBlock := by
     have h1 := hT a.1 (f a) (hfW a).2
     rw [hfon.1 a, mul_one] at h1
     exact h1
-  have hprod : ∏ v, c v ^ (2 * Module.finrank ℝ (W ⊓ Ev v : Submodule ℝ E)) =
-      ∏ a : (Σ v, Fin (k v)), c a.1 ^ 2 := by
+  have hprod
+      : ∏ v, c v ^ (2 * Module.finrank ℝ (W ⊓ Ev v : Submodule ℝ E))
+        = ∏ a : (Σ v, Fin (k v)), c a.1 ^ 2 := by
     rw [Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun v _ => ?_
     simp [Finset.prod_const, ← pow_mul, k]
@@ -196,13 +205,16 @@ theorem gram_block_determinant : GramBlock := by
         have h1 := (hTf a).2
         rw [ha0] at h1
         exact norm_le_zero_iff.1 h1
-      rw [Matrix.det_eq_zero_of_row_eq_zero a (fun j => by rw [Matrix.gram_apply, hz, inner_zero_left])]
+      rw [Matrix.det_eq_zero_of_row_eq_zero a
+        (fun j => by rw [Matrix.gram_apply, hz, inner_zero_left])]
       exact Finset.prod_nonneg fun _ _ => sq_nonneg _
     · push_neg at h0
       have hpos : ∀ a : (Σ v, Fin (k v)), 0 < c a.1 := fun a => lt_of_le_of_ne (hc a.1) (h0 a).symm
       let w : (Σ v, Fin (k v)) → E' := fun a => (c a.1)⁻¹ • T (f a)
-      have hgram : Matrix.gram ℝ (fun a => T (f a)) =
-          Matrix.diagonal (fun a => c a.1) * Matrix.gram ℝ w * Matrix.diagonal (fun a => c a.1) := by
+      have hgram
+          : Matrix.gram ℝ (fun a => T (f a))
+            = Matrix.diagonal (fun a => c a.1) * Matrix.gram ℝ w
+              * Matrix.diagonal (fun a => c a.1) := by
         ext a b
         simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.gram_apply, w,
           real_inner_smul_left, real_inner_smul_right]
@@ -226,27 +238,30 @@ theorem gram_block_determinant : GramBlock := by
           · have hv := (hT v _ (hzE v)).2
             simp only [y]
             rw [norm_smul, Real.norm_eq_abs, abs_inv, abs_of_pos h]
-            calc (c v)⁻¹ * ‖T (z v)‖ ≤ (c v)⁻¹ * (c v * ‖z v‖) := by gcongr
+            calc
+              (c v)⁻¹ * ‖T (z v)‖
+                ≤ (c v)⁻¹ * (c v * ‖z v‖) := by gcongr
               _ = ‖z v‖ := by field_simp
-        have hzsum : ∑ v, z v = ∑ a, x a • f a := by
-          rw [Fintype.sum_sigma]
+        have hzsum : ∑ v, z v = ∑ a, x a • f a := by rw [Fintype.sum_sigma]
         rw [hsum, gramBlock_norm_sum_sq y (fun v w hvw => hEv' v w hvw _ (hyE v) _ (hyE w))]
-        calc ∑ v, ‖y v‖ ^ 2 ≤ ∑ v, ‖z v‖ ^ 2 :=
-              Finset.sum_le_sum fun v _ => pow_le_pow_left₀ (norm_nonneg _) (hyz v) 2
+        calc
+          ∑ v, ‖y v‖ ^ 2 ≤ ∑ v, ‖z v‖ ^ 2 :=
+            Finset.sum_le_sum fun v _ => pow_le_pow_left₀ (norm_nonneg _) (hyz v) 2
           _ = ‖∑ v, z v‖ ^ 2 :=
-              (gramBlock_norm_sum_sq z (fun v w hvw => hEv v w hvw _ (hzE v) _ (hzE w))).symm
+            (gramBlock_norm_sum_sq z (fun v w hvw => hEv v w hvw _ (hzE v) _ (hzE w))).symm
           _ = ∑ a, x a ^ 2 := by
-              rw [hzsum, ← real_inner_self_eq_norm_sq, hfon.inner_sum x x Finset.univ]
-              simp [sq]
+            rw [hzsum, ← real_inner_self_eq_norm_sq, hfon.inner_sum x x Finset.univ]
+            simp [sq]
       have hle : (Matrix.gram ℝ w).det ≤ 1 := det_gram_le_one_of_norm_sum_sq_le w hnorm
       have hP0 : 0 ≤ ∏ a : (Σ v, Fin (k v)), c a.1 := Finset.prod_nonneg fun a _ => (hpos a).le
       rw [hgram, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal]
-      calc (∏ a : (Σ v, Fin (k v)), c a.1) * (Matrix.gram ℝ w).det * ∏ a : (Σ v, Fin (k v)), c a.1
-          ≤ (∏ a : (Σ v, Fin (k v)), c a.1) * 1 * ∏ a : (Σ v, Fin (k v)), c a.1 :=
-            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hle hP0) hP0
+      calc
+        (∏ a : (Σ v, Fin (k v)), c a.1) * (Matrix.gram ℝ w).det * ∏ a : (Σ v, Fin (k v)), c a.1
+            ≤ (∏ a : (Σ v, Fin (k v)), c a.1) * 1 * ∏ a : (Σ v, Fin (k v)), c a.1 :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hle hP0) hP0
         _ = ∏ a : (Σ v, Fin (k v)), c a.1 ^ 2 := by
-            rw [mul_one, ← Finset.prod_mul_distrib]
-            simp [sq]
+          rw [mul_one, ← Finset.prod_mul_distrib]
+          simp [sq]
   refine ⟨?_, fun hiso => ?_⟩
   · rw [hGT, hGu, hreidx, hprod, mul_comm]
     exact mul_le_mul_of_nonneg_right hA (sq_nonneg _)

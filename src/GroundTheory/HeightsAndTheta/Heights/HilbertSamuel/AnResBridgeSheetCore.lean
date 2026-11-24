@@ -19,8 +19,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel.AnResBridge
 open ReciprocityTheory.ChartRestriction.G.Geo
 open MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M Topology Filter
 
-private theorem prod_norm_update_zpow {K : Type} [Fintype K] [DecidableEq K] (k0 : K) (v : ℂ) (a : K → ℤ) :
-    ∏ k, ‖Function.update (fun _ => (1 : ℂ)) k0 v k‖ ^ a k = ‖v‖ ^ a k0 := by
+private theorem prod_norm_update_zpow
+    {K : Type} [Fintype K] [DecidableEq K] (k0 : K) (v : ℂ) (a : K → ℤ)
+    : ∏ k, ‖Function.update (fun _ => (1 : ℂ)) k0 v k‖ ^ a k = ‖v‖ ^ a k0 := by
   rw [Finset.prod_eq_single k0]
   · simp
   · intro k _ hk
@@ -28,19 +29,24 @@ private theorem prod_norm_update_zpow {K : Type} [Fintype K] [DecidableEq K] (k0
   · intro h
     exact absurd (Finset.mem_univ k0) h
 
-private theorem maDensity_eq_maDens {D : ℕ} (φ : Fin D → (Fin D → ℂ) → ℝ)
-    (z : Fin D → ℂ) : maDensity φ z = ReciprocityTheory.AnForm.maDens φ z := rfl
+private theorem maDensity_eq_maDens {D : ℕ} (φ : Fin D → (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : maDensity φ z = ReciprocityTheory.AnForm.maDens φ z :=
+  rfl
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
   {P J : Ideal (MRing ι)} {e : ℕ}
   (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
 
-theorem exists_sheet_of_resolution (L : Fin e → HermLine ι) (A : HermLine ι) (s : MRing ι)
+theorem exists_sheet_of_resolution
+    (L : Fin e → HermLine ι) (A : HermLine ι) (s : MRing ι)
     (hP : IsArithVar P (e + 1)) (hL : ∀ j, IsSmoothHerm (L j)) (hs : IsSectionOn P A s)
-    (x : R.X) (hx : x ∉ brBad R Ψ) :
-    ∃ γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ, IsSheet P Ψ (brQ R Ψ x) (brW R Ψ x) γ ∧
-      logNorm A s (γ (brQ R Ψ x)) * maDensity (fun j y' => pot L j (γ y')) (brQ R Ψ x) =
-        logNorm A s (R.lift x x) * pushDens R.A (fun j => potOf R (L j)) (brQ R Ψ) x := by
+    (x : R.X) (hx : x ∉ brBad R Ψ)
+    : ∃ γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ,
+      IsSheet P Ψ (brQ R Ψ x) (brW R Ψ x) γ
+        ∧ logNorm A s (γ (brQ R Ψ x)) * maDensity (fun j y' => pot L j (γ y')) (brQ R Ψ x)
+          = logNorm A s (R.lift x x) * pushDens R.A (fun j => potOf R (L j)) (brQ R Ψ) x := by
   classical
   obtain ⟨k0⟩ := hP.1
   have hPh : IsMultiHomogIdeal P := hP.2.1.2.1
@@ -108,8 +114,9 @@ theorem exists_sheet_of_resolution (L : Fin e → HermLine ι) (A : HermLine ι)
     simp only [hψ0, hγ₀u]
     rfl
   · rw [← hy0]
-    have hU : ∀ᶠ y' in 𝓝 (Q u),
-        F.symm y' ∈ (R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x :=
+    have hU
+        : ∀ᶠ y' in 𝓝 (Q u),
+          F.symm y' ∈ (R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x :=
       hσa.continuousAt.preimage_mem_nhds (by
         rw [hσu]; exact ((R.A.chart j).isOpen_inter_preimage_symm (R.isOpen_U x)).mem_nhds huU)
     filter_upwards [hγa.eventually_analyticAt, hU, F.open_target.mem_nhds hyt,
@@ -133,10 +140,11 @@ theorem exists_sheet_of_resolution (L : Fin e → HermLine ι) (A : HermLine ι)
       rw [logNorm_bsmul A ha hsa (hc_ne _ hψ0u), hγ₀u]
     rw [hlog]
     congr 1
-    have hblk : ∀ k, ∃ i, γ₀ (Q u) ⟨k, i⟩ ≠ 0 := by
-      rw [hγ₀u]; exact (R.mem x x (R.mem_U x)).1
-    have hH : ∀ i, cxHessian (fun y' => pot L i (γ y')) (Q u) =
-        cxHessian (fun y' => pot L i (γ₀ y')) (Q u) := by
+    have hblk : ∀ k, ∃ i, γ₀ (Q u) ⟨k, i⟩ ≠ 0 := by rw [hγ₀u]; exact (R.mem x x (R.mem_U x)).1
+    have hH
+        : ∀ i,
+          cxHessian (fun y' => pot L i (γ y')) (Q u)
+            = cxHessian (fun y' => pot L i (γ₀ y')) (Q u) := by
       intro i
       set G : (Fin e → ℂ) → ℂ :=
         fun y' => ((-((L i).a k0 : ℝ) : ℝ) : ℂ) * Complex.log (ψ0 y' / ψ0 (Q u)) with hG
@@ -146,48 +154,58 @@ theorem exists_sheet_of_resolution (L : Fin e → HermLine ι) (A : HermLine ι)
         show ψ0 (Q u) / ψ0 (Q u) ∈ Complex.slitPlane
         rw [div_self hψ0u]
         exact Complex.one_mem_slitPlane
-      have heq : (fun y' => pot L i (γ y')) =ᶠ[𝓝 (Q u)]
-          fun y' => pot L i (γ₀ y') + (G y').re + C := by
+      have heq
+          : (fun y' => pot L i (γ y')) =ᶠ[𝓝 (Q u)]
+            fun y' => pot L i (γ₀ y') + (G y').re + C := by
         filter_upwards [hψ0a.continuousAt.eventually_ne hψ0u,
           hγ₀a.continuousAt.eventually (isOpen_blockNonzero.mem_nhds hblk)] with y' h0 hb
         have hpos : 0 < (L i).h (γ₀ y') := (L i).pos _ hb
         have hn0 : ‖(ψ0 y')⁻¹‖ ^ (L i).a k0 ≠ 0 :=
           zpow_ne_zero _ (norm_ne_zero_iff.mpr (inv_ne_zero h0))
         simp only [pot, hγdef]
-        rw [show bsmul (c y') (γ₀ y') = fun p => c y' p.1 * γ₀ y' p from rfl, (L i).smul _ _ (hc_ne y' h0), prod_norm_update_zpow, Real.log_mul hn0 hpos.ne',
-          hG, hC, Complex.re_ofReal_mul, Complex.log_re, norm_div,
+        rw [show bsmul (c y') (γ₀ y') = fun p => c y' p.1 * γ₀ y' p from rfl,
+          (L i).smul _ _ (hc_ne y' h0), prod_norm_update_zpow, Real.log_mul hn0 hpos.ne', hG, hC,
+          Complex.re_ofReal_mul, Complex.log_re, norm_div,
           Real.log_div (norm_ne_zero_iff.mpr h0) (norm_ne_zero_iff.mpr hψ0u), Real.log_zpow,
           norm_inv, Real.log_inv]
         ring
-      rw [cxHessian_congr heq, cxHessian_add_re (φ := fun y' => pot L i (γ₀ y')) C
-        (pot_contDiffAt (hL i) hγ₀a hblk) hGa]
-    have hmd : maDensity (fun i y' => pot L i (γ y')) (Q u) =
-        maDensity (fun i y' => pot L i (γ₀ y')) (Q u) := by
+      rw [cxHessian_congr heq,
+        cxHessian_add_re (φ := fun y' => pot L i (γ₀ y')) C (pot_contDiffAt (hL i) hγ₀a hblk) hGa]
+    have hmd
+        : maDensity (fun i y' => pot L i (γ y')) (Q u)
+          = maDensity (fun i y' => pot L i (γ₀ y')) (Q u) := by
       simp only [maDensity, hH]
     rw [hmd, maDensity_eq_maDens]
-    have hcd : ∀ i, ContDiffAt ℝ 2 (fun v => pot L i (R.lift x ((R.A.chart j).symm v)))
-        (F.symm (Q u)) := by
+    have hcd
+        : ∀ i,
+          ContDiffAt ℝ 2 (fun v => pot L i (R.lift x ((R.A.chart j).symm v))) (F.symm (Q u)) := by
       intro i
       rw [hσu]
       exact pot_contDiffAt (hL i) (analyticAt_lift_chart R x j huU)
         (by rw [hsu]; exact (R.mem x x (R.mem_U x)).1)
-    have hcomp : ReciprocityTheory.AnForm.maDens (fun i y' => pot L i (γ₀ y')) (Q u) =
-        ReciprocityTheory.AnForm.maDens (fun i v => pot L i (R.lift x ((R.A.chart j).symm v)))
-          (F.symm (Q u)) * Complex.normSq (ReciprocityTheory.AnForm.A.jacC F.symm (Q u)).det :=
-      ReciprocityTheory.AnForm.A.maDens_comp (fun i v => pot L i (R.lift x ((R.A.chart j).symm v)))
+    have hcomp
+        : ReciprocityTheory.AnForm.maDens (fun i y' => pot L i (γ₀ y')) (Q u)
+          = ReciprocityTheory.AnForm.maDens
+              (fun i v => pot L i (R.lift x ((R.A.chart j).symm v)))
+              (F.symm (Q u))
+            * Complex.normSq (ReciprocityTheory.AnForm.A.jacC F.symm (Q u)).det :=
+      ReciprocityTheory.AnForm.A.maDens_comp
+        (fun i v => pot L i (R.lift x ((R.A.chart j).symm v)))
         F.symm (Q u) hσa hcd
-    have hdetinv : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) :
-        (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
+    have hdetinv
+        : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+          = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
       have := ContinuousLinearEquiv.det_coe_symm Ce
       rw [hCe'] at this
       exact this
-    have hloc : ReciprocityTheory.AnForm.maDens (fun i v => pot L i (R.lift x ((R.A.chart j).symm v))) u =
-        locDens R.A (fun i => potOf R (L i)) j u := by
+    have hloc
+        : ReciprocityTheory.AnForm.maDens (fun i v => pot L i (R.lift x ((R.A.chart j).symm v))) u
+          = locDens R.A (fun i => potOf R (L i)) j u := by
       unfold locDens
       rw [hsu]
       rfl
-    rw [hcomp, hσu, ReciprocityTheory.AnForm.A.det_jacC, hσd.fderiv, hdetinv, hloc, Complex.normSq_inv,
-      Complex.normSq_eq_norm_sq]
+    rw [hcomp, hσu, ReciprocityTheory.AnForm.A.det_jacC, hσd.fderiv, hdetinv, hloc,
+      Complex.normSq_inv, Complex.normSq_eq_norm_sq]
     unfold pushDens
     rw [div_eq_mul_inv]
 

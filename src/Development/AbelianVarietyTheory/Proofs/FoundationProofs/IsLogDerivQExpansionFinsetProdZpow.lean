@@ -5,7 +5,7 @@ public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
 public import Mathlib.RingTheory.Flat.TorsionFree
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.RegularLocalRing.Defs
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLogDerivQExpansionModPrimePowCalculusStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLogDerivQExpansionModPrimePowCalculus
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,7 +65,7 @@ theorem isDl_finset_prod_zpow
   intro Ω _ _ _ ε X hj l _ A hl n s ι I f φ m h
   classical
   have C := fun (a b : X.K) (u v : HahnSeries ℚ Ω) =>
-    GlobalTheory.T.isLogDerivQExpansionModPrimePow_calculus ε X hj l A hl n s a b u v
+    _root_.GlobalTheory.Glue.isDl_calc ε X hj l A hl n s a b u v
   have one : IsDl X A l n s (1 : X.K) 0 := by
     have := (C 1 1 0 0).2.2.2.1 1 one_ne_zero
     simpa using this

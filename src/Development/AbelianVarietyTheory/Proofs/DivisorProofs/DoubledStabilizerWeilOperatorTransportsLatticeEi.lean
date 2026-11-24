@@ -121,7 +121,7 @@ theorem cols_mem
       | inl j =>
         simp only [A₁, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Matrix.fromCols_apply_inl,
           Matrix.transpose_apply, Matrix.smul_apply, incM, Matrix.map_apply, Matrix.vecMulVec_apply,
-          Sum.elim_inl, Pi.smul_apply, map_mul, Algebra.smul_def, Pi.mul_apply, Pi.algebraMap_apply]
+          Sum.elim_inl, map_mul, Algebra.smul_def, Pi.mul_apply, Pi.algebraMap_apply]
         ring
       | inr j => simp [A₁, Matrix.vecMulVec_apply]
     show A₁ _ ∈ S
@@ -143,7 +143,7 @@ theorem cols_mem
       | inr j =>
         simp only [A₂, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Matrix.fromCols_apply_inr,
           Matrix.transpose_apply, Matrix.smul_apply, incM, Matrix.map_apply, Matrix.vecMulVec_apply,
-          Sum.elim_inr, Pi.smul_apply, map_mul, Algebra.smul_def, Pi.mul_apply, Pi.algebraMap_apply]
+          Sum.elim_inr, map_mul, Algebra.smul_def, Pi.mul_apply, Pi.algebraMap_apply]
         ring
     show A₂ _ ∈ S
     rw [e]

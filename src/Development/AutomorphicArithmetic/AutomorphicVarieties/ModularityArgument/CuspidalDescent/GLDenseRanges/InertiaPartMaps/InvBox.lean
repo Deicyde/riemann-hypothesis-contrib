@@ -43,8 +43,6 @@ noncomputable section
 open UpperTheory.V.Hi UpperTheory.V.Z.J.D
 open scoped TensorProduct
 
-
-
 namespace UpperTheory.V.Z.Desc.V0
 
 section Lin
@@ -162,8 +160,7 @@ private theorem mem_box_inr_eigenspace_iff_lTensor_opE_sub_eq_zero
         = LinearMap.lTensor W (opE κ a - (N : Module.End ℂ W')) := by
     apply TensorProduct.ext'
     intro w v
-    simp [opE_box_comp_inr_tmul, TensorProduct.tmul_sub, Module.End.natCast_apply,
-      TensorProduct.tmul_smul]
+    simp [opE_box_comp_inr_tmul, TensorProduct.tmul_smul]
   unfold ePart
   rw [LinearMap.mem_ker, e]
 
@@ -176,7 +173,6 @@ private theorem mem_invT_iff_sum_smul_inl_eq_and_inr_fixed
       ↔ (∀ (k : K₁) (i : Fin m), ∑ j, (τ₀ k : Matrix (Fin m) (Fin m) ℂ) i j • ρ (↑k, 1) (F j) = F i)
         ∧ ∀ k ∈ K₂, ∀ i, ρ (1, k) (F i) = F i :=
   Iff.rfl
-
 
 theorem invBox : InvBox := by
   intro G H W W' _ _ _ _ _ _ ρ κ m K₁ K₂ τ₀ a N

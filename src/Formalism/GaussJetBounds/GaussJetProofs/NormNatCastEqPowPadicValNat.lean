@@ -62,15 +62,7 @@ variable {K : Type u} [NormedField K] [IsUltrametricDist K]
 theorem norm_natCast_eq_one_of_not_dvd {l m : ℕ} (hl : l.Prime) (hlt : ‖(l : K)‖ < 1) (hm : ¬ l ∣ m)
     : ‖(m : K)‖ = 1 := by
   first
-  | exact GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd ..
   | (apply GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd <;> assumption)
-  | (intros; apply GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd <;> assumption)
-  | (apply @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd <;> assumption)
-  | (intros; apply @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd <;> assumption)
-  | (
-      apply @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd
-        <;> first | assumption | infer_instance
-    )
   | exact @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd K ‹_› ‹_› l m hl hlt hm
   | exact @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd K ‹_› ‹_› l m hl hlt
   | exact @GlobalTheory.NatCastUnitNorm.norm_natCast_eq_one_of_not_dvd K ‹_› ‹_› l m hl

@@ -124,11 +124,9 @@ theorem glue_ratios
   choose! p hp q hq h1 h2 using hK'
   refine ⟨K, ∑ Z ∈ S, p Z, sum_mem hp, ∑ Z ∈ S, q Z, sum_mem hq, fun Z hZ => ?_⟩
   have ep : e Z (∑ Z ∈ S, p Z) = e Z (p Z) := by
-
     rw [map_sum]
     exact Finset.sum_eq_single_of_mem Z hZ fun b hb hne => (h2 b hb Z hne.symm).1
   have eq : e Z (∑ Z ∈ S, q Z) = e Z (q Z) := by
-
     rw [map_sum]
     exact Finset.sum_eq_single_of_mem Z hZ fun b hb hne => (h2 b hb Z hne.symm).2
   rw [ep, eq]

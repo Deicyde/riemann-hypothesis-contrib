@@ -44,8 +44,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
 
-
-
 section
 open CategoryTheory AlgebraicGeometry NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
@@ -59,6 +57,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
+
 theorem _root_.GlobalTheory.T.size_bounds_for_family_alt
     : _root_.GlobalTheory.CovTop.SizeCondition
       → _root_.GlobalTheory.CovTop.CoversCondition fun Fm x _ ι p i Y PP _ =>
@@ -93,8 +92,5 @@ theorem _root_.GlobalTheory.T.size_bounds_for_family_alt
           ∧ ∀ j ≤ lenT p i PP,
             ∑ τ, ∑ k, |((⟨uW p i, cZero (Fm.D x ι) ((i : ℕ) + 1), (Fm.D x ι).R.k - 2, lenT p i PP⟩ : WtPar (dat p i)).wt j τ k : ℝ)|
               ≤ zBase (Fm.L x ι) ^ 2 * kap p i := by
-  first
-  | exact @_root_.GlobalTheory.CovTop.CovSz.size_rows_alt
-  | exact _root_.GlobalTheory.CovTop.CovSz.size_rows_alt
-  | (intros; apply _root_.GlobalTheory.CovTop.CovSz.size_rows_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.CovTop.CovSz.size_rows_alt
 end

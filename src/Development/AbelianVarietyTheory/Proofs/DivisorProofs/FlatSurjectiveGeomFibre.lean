@@ -57,6 +57,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsAutomorphismPermutationMaxOrderMembers
 
 @[expose] public section
 
@@ -68,12 +69,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.IsogenyQuasiInverse
-
-theorem isIntegral_left {K : Type} [Field K] (A : Over (Sp K)) [GrpObj A] (hA : IsAbelianScheme A)
-    : IsIntegral A.left := by
-  have := hA.smooth
-  have := hA.geomConnected
-  exact isIntegral_of_smooth_of_geometricallyConnected A.hom
 
 theorem nonempty_left {K : Type} [Field K] (A : Over (Sp K)) [GrpObj A] : Nonempty A.left :=
   ⟨η[A].left (IsLocalRing.closedPoint K)⟩
@@ -155,8 +150,8 @@ theorem flat_surjective_of_field
     (hBg : SmoothOfRelativeDimension g B.hom)
     (f : A ⟶ B) [IsMonHom f] [LocallyQuasiFinite f.left]
     : Flat f.left ∧ Surjective f.left := by
-  have := isIntegral_left A hA
-  have := isIntegral_left B hB
+  have := _root_.GlobalTheory.SS.isIntegral_of_abelian A hA
+  have := _root_.GlobalTheory.SS.isIntegral_of_abelian B hB
   have := hA.proper
   have := hB.proper
   have := hA.smooth

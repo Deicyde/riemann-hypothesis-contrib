@@ -55,9 +55,6 @@ open GlobalTheory.SignedHC GlobalTheory.ChiGrid Formalism.L2.DIV Formalism.L2.Ke
   GlobalTheory.FunObj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.LatMulAd

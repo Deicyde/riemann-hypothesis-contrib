@@ -57,7 +57,4 @@ theorem _root_.GlobalTheory.T.adelicUnitaryComponentAtPlace_laws
         ∧ ∀ (S T : HSp D) (p : Place D) (g : GA D S) (h : GA D T) (w : WO S T),
           actO S T (gAt S p g) (gAt T p h) w = idem D p • actO S T g h w + (1 - idem D p) • w
             ∧ wAt p (actO S T g h w) = actO S T (gAt S p g) (gAt T p h) (wAt p w) := by
-  first
-  | exact @GlobalTheory.PlaceComponent.gAt_laws
-  | exact GlobalTheory.PlaceComponent.gAt_laws
-  | (intros; apply GlobalTheory.PlaceComponent.gAt_laws <;> assumption)
+  first | exact @GlobalTheory.PlaceComponent.gAt_laws

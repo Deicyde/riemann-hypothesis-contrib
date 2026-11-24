@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.abelian_map_lie_model_field_point
               IsCombAt y.x v cf w
                 → ∃ hw : w ≫ Xo.univ.t.G.hom = spMap (algebraMap F (DualNumber F)) ≫ y.x,
                   (MC.pt (∑ j, cf j • e j)).left ≫ m.φ = FinRd.Roots.LieBasis.tanW Y y w hw := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Roots.LieBasis.comb_val
-  | exact GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Roots.LieBasis.comb_val
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Roots.LieBasis.comb_val <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Roots.LieBasis.comb_val

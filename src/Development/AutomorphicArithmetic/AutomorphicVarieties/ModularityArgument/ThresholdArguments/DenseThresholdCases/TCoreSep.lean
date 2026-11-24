@@ -42,9 +42,6 @@ import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
@@ -68,7 +65,6 @@ private theorem coreSep_coord
     map_smul' := fun r f => hsmul _ f.2 r
   }
   have h1 : s g = ∑ j ∈ (b.repr g).support, φ (b.repr g j) • sp (b j) := by
-
     conv_lhs => rw [← b.linearCombination_repr g, Finsupp.linearCombination_apply, Finsupp.sum, map_sum]
     exact Finset.sum_congr rfl fun j _ => s.map_smulₛₗ _ _
   by_cases hi : i ∈ (b.repr g).support

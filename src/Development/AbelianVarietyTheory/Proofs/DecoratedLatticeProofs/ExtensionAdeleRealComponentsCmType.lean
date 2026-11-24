@@ -79,7 +79,7 @@ theorem eq_zero_of_map_eq_zero
     intro i y k
     induction y using TensorProduct.induction_on with
     | zero => simp
-    | tmul a e => simp [Algebra.smul_def, mul_comm]
+    | tmul a e => simp
     | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
   apply (Algebra.TensorProduct.basis A b).repr.injective
   ext k

@@ -135,7 +135,7 @@ theorem ramified_discriminant_condition_holds : FRamDCore := by
     rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     congr 2
     simp only [Formalism.BasicNotions.Ranks.n, Formalism.HC.Frame.A]
-    first | exact Fintype.card_fin _ | simp [Formalism.HC.Idx] | exact ZMod.card _
+    first | exact Fintype.card_fin _
   have h1 := mul_le_mul_of_nonneg_left (hsumle.trans hcard.le) hk1
   have h2 := mul_nonneg hk1 hsum0
   unfold NumDatum.FRamD

@@ -111,7 +111,7 @@ theorem flipM_antiCols (d : ℕ) : flipM (F := F) (E := E) d * antiCols d = diag
   simp [flipM, antiCols, diagCols, Matrix.fromBlocks_mul_fromRows]
 
 theorem flipM_map (σ : E →ₐ[F] E) (d : ℕ) : (flipM (F := F) (E := E) d).map (cA σ) = flipM d := by
-  ext (i | i) (j | j) <;> simp [flipM, Matrix.one_apply] <;> split_ifs <;> simp
+  ext (i | i) (j | j) <;> simp [flipM, Matrix.one_apply] <;> split_ifs
 
 section Idem2
 
@@ -230,7 +230,7 @@ theorem idem_smul_mem_latAt
 theorem flipAt_mulVec_inl (v : Pl (F := F)) {d : ℕ} (z : Fin d ⊕ Fin d → AE F E) (i : Fin d)
     : (flipAt v d *ᵥ z) (Sum.inl i) = z (Sum.inl i) := by
   simp [flipAt, flipM, Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.one_apply, add_mul,
-    Finset.sum_add_distrib, ite_mul, smul_mul_assoc, neg_mul, Finset.sum_neg_distrib]
+    Finset.sum_add_distrib, ite_mul]
   rw [← add_smul, sub_add_cancel, one_smul]
 
 theorem flipAt_mulVec_inr (v : Pl (F := F)) {d : ℕ} (z : Fin d ⊕ Fin d → AE F E) (i : Fin d)
@@ -238,7 +238,7 @@ theorem flipAt_mulVec_inr (v : Pl (F := F)) {d : ℕ} (z : Fin d ⊕ Fin d → A
       = z (Sum.inr i) - (GlobalTheory.LatVac.liftV v 1 : AF F) • z (Sum.inr i)
         - (GlobalTheory.LatVac.liftV v 1 : AF F) • z (Sum.inr i) := by
   simp [flipAt, flipM, Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.one_apply, add_mul,
-    Finset.sum_add_distrib, ite_mul, smul_mul_assoc, neg_mul, Finset.sum_neg_distrib]
+    Finset.sum_add_distrib, ite_mul, neg_mul, Finset.sum_neg_distrib]
   rw [sub_smul, one_smul]
   abel
 

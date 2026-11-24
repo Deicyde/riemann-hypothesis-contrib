@@ -83,7 +83,7 @@ theorem framepf_Δ_cancel
 
 theorem framepf_γA_Δ (g : W.Gam) {a : LetA O n} (ha : a ∈ W.AΔ) : W.γA g a ∈ W.AΔ := by
   intro δ hδ
-  rw [gradNPf_γA_comm, ha δ hδ]
+  rw [_root_.Formalism.MainNotions.LiftingTheory.gammaA_comm, ha δ hδ]
 
 theorem framepf_γA_inv (g : W.Gam) (a : LetA O n) : W.γA g (W.γA g⁻¹ a) = a := by
   funext i
@@ -92,7 +92,7 @@ theorem framepf_γA_inv (g : W.Gam) (a : LetA O n) : W.γA g (W.γA g⁻¹ a) = 
 
 theorem framepf_γA_q (g : W.Gam) : ∃ t : LetA O n, W.γA g W.q = W.q * t := by
   have hπ : ∀ g : W.Gam, ∃ a : LetA O n, W.γA g letπ = letπ * a := fun g => by
-    obtain ⟨t, ht⟩ := Formalism.MainNotions.LiftingTheory.wmap_γAX W g 0
+    obtain ⟨t, ht⟩ := _root_.Formalism.MainNotions.LiftingTheory.liftb_gammaXk W g 0
     exact ⟨_, ht⟩
   have hc : ∀ x y : LetA O n, letπ * x = letπ * y → x = y := fun x y h => by
     apply W.EE_inj
@@ -209,7 +209,8 @@ theorem framepf_PcS_smul {a : LetA O n} (ha : a ∈ W.AΔ) {p : W.DD T} (hp : p 
     ⟩,
     (mem_letS W T c _).2 ?_
   ⟩
-  · rw [gradNPf_γD_smul, ha δ hδ, (mem_DelS W T p).1 h2 δ hδ]
+  · rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ha δ hδ,
+      (mem_DelS W T p).1 h2 δ hδ]
   · rw [smul_comm, (mem_letS W T c p).1 h3]
 
 theorem framepf_JP_smul {a : LetA O n} (ha : a ∈ W.AΔ) {y : W.DD T} (hy : y ∈ JP W T π' Eπ h' M c)
@@ -256,8 +257,8 @@ theorem framepf_γLA_toLA {x : LA W T π' c} (hx : x ∈ LinearMap.range (toLA W
     refine ⟨(⟨W.γA W.gamK b, framepf_γA_Δ _ b.2⟩ : ↥W.AΔ) ⊗ₜ s, ?_⟩
     show algebraMap (LetA O n) W.EE ((letE c : LetA O n) * W.γA W.gamK b) ⊗ₜ[O] (s : LcQ W T π' c) =
       W.γE W.gamK (algebraMap (LetA O n) W.EE ((letE c : LetA O n) * b)) ⊗ₜ[O] (s : LcQ W T π' c)
-    rw [W.γE_ext, ← Formalism.MainNotions.LiftingTheory.wmap_γA_letE W W.gamK c, ← map_mul,
-      Formalism.MainNotions.LiftingTheory.wmap_γA_letE]
+    rw [W.γE_ext, ← _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent W W.gamK c,
+      ← map_mul, _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent]
     rfl
   | add x y hx hy => simp only [map_add (f := _)] at ⊢; exact Submodule.add_mem _ hx hy
 
@@ -272,9 +273,13 @@ theorem framepf_γD_PcS (g : W.Gam) {p : W.DD T} (hp : p ∈ PcS W T c) : W.γD 
     obtain ⟨_, ⟨z, hz, rfl⟩, rfl⟩ := hx
     rw [← W.φγ_comm]
     exact Submodule.subset_span ⟨_, ⟨W.γD T g z, W.N_Γ T g z hz, (γD_letE W T g _ z).symm⟩, rfl⟩
-  | zero => rw [map_zero]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy => rw [map_add (f := _)]; exact Submodule.add_mem _ hx hy
-  | smul s x _ hx => rw [gradNPf_γD_smul]; exact Submodule.smul_mem _ _ hx
+  | zero =>
+    rw [map_zero]; exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [map_add (f := _)]; exact Submodule.add_mem _ hx hy
+  | smul s x _ hx =>
+    rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear]
+    exact Submodule.smul_mem _ _ hx
 
 variable
   {f t t' : LetA O n} (hfΔ : f ∈ W.AΔ) (hf : W.γA W.gamK π' = π' * f) (htΔ : t ∈ W.AΔ)
@@ -297,7 +302,8 @@ theorem framepf_γ_JP {y : W.DD T} (hy : y ∈ JP W T π' Eπ h' M c)
     ?_
   ⟩
   show (π' ^ M * Eπ ^ (3 * h')) • _ = W.γD T W.gamK ((π' ^ M * Eπ ^ (3 * h')) • p)
-  rw [gradNPf_γD_smul, framepf_γ_JJ π' Eπ h' M hf ht, mul_smul (π' ^ M * Eπ ^ (3 * h'))]
+  rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, framepf_γ_JJ π' Eπ h' M hf ht,
+    mul_smul (π' ^ M * Eπ ^ (3 * h'))]
   rfl
 
 include hfΔ hf htΔ ht in
@@ -357,15 +363,16 @@ theorem framepf_Ψα_γ
       · show _ ∈ DelS W T
         rw [mem_DelS]
         intro δ hδ
-        rw [gradNPf_γD_smul, ← W.φγ_comm, hdΔ.2 δ hδ, map_mul, map_mul, huΔ δ hδ, haΔ δ hδ,
-          Formalism.MainNotions.LiftingTheory.wmap_γA_letE]
+        rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ← W.φγ_comm, hdΔ.2 δ hδ,
+          map_mul, map_mul, huΔ δ hδ, haΔ δ hδ,
+          _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent]
       · show _ ∈ letS W T c
         rw [mem_letS, smul_smul, ← mul_assoc, ← mul_assoc,
-          Formalism.MainNotions.LiftingTheory.wmap_letE_idem]
+          _root_.Formalism.MainNotions.LiftingTheory.letter_idempotent_sq]
       · rw [e, e', hΨ, hΨ, W.γD_smul, ← smul_sub, ← W.φγ_comm, ← map_sub, ← hde,
           Formalism.MainNotions.LiftingTheory.wmap_φD_smul, map_pow, hφ, W.γE_ext, algebraMap_smul,
           smul_smul, smul_smul, show letγ (W.γ₀ W.gamK) = W.γA W.gamK from rfl, map_mul,
-          Formalism.MainNotions.LiftingTheory.wmap_γA_letE]
+          _root_.Formalism.MainNotions.LiftingTheory.gammaA_letter_idempotent]
         congr 1
         ring
     | add x y hx hy =>
@@ -380,7 +387,8 @@ theorem framepf_Ψα_γ
   show (π' ^ M * Eπ ^ (3 * h')) • (t' ^ h' • p) = _
   rw [← sub_eq_zero]
   apply gradNPf_tf W T (Eπ ^ h') (by rw [map_pow]; exact huE.pow _)
-  rw [hz, framepf_γLA_smulLA, framepf_Ψ_smulLA, framepf_Ψ_smulLA, gradNPf_γD_smul, ← smul_sub]
+  rw [hz, framepf_γLA_smulLA, framepf_Ψ_smulLA, framepf_Ψ_smulLA,
+      _root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ← smul_sub]
     at hpe
   have hΛ : Eπ ^ h' = t' ^ h' * W.γA W.gamK (Eπ ^ h') := by rw [map_pow, ← mul_pow, mul_comm, ← ht']
   have h2

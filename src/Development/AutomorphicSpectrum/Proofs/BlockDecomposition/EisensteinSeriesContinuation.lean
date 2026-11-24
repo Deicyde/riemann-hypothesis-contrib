@@ -1,10 +1,12 @@
 module
 
 public import Development.WeilBound.ThetaLifts.LatticeBasics.HypothesesE
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EisensteinSeriesConvergentStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FlatSectionGrowthBoundStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightContinuousPosStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompactStandardMaximalStatement
+public import Development.WeilBound.ThetaLifts.LatticeBasics.UnfoldC
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EisensteinSeriesConvergent
+public import Development.WeilBound.ThetaLifts.LatticeBasics.Hypotheses2
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FlatSectionGrowthBound
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightContinuousPos
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompactStandardMaximal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -81,12 +83,16 @@ theorem eis_half_plane
                   (∀ s : ℂ, t < s.re → ∀ x, HasSum (eisTerm (flat a f s₁ s) x) (Ê s x))
                     ∧ ∀ x, DifferentiableOn ℂ (Ê · x) {s | t < s.re} := by
   intro F E _ _ _ _ _ σ B n Y r s' hB hn hY b K a hb hK hH χ s₁ f hf
-  have hKc := GlobalTheory.T.isCompact_standard_maximal F E σ B n Y r s' hB hn hY b K a hb hK hH
+  have hKc :=
+    _root_.GlobalTheory.CompanionTheory.StdK.isCompact_K F E σ B n Y r s' hB hn hY b K a hb hK hH
   obtain ⟨-, hpos⟩ :=
-    GlobalTheory.T.height_function_continuous_pos' F E σ B n Y r s' hB hn hY b K a hb hK hH
-  obtain ⟨C₀, hC₀⟩ := GlobalTheory.T.flat_section_growth_bound K a hKc hH hpos χ s₁ f hf
+    _root_.GlobalTheory.CompanionTheory.Iwasawa.height_continuous_pos F E σ B n Y r s' hB hn hY b K
+      a hb hK hH
+  obtain ⟨C₀, hC₀⟩ :=
+    _root_.GlobalTheory.CompanionTheory.EisTerm.flat_norm_le_height_rpow K a hKc hH hpos χ s₁ f hf
   obtain ⟨σ₀, hσ₀⟩ :=
-    GlobalTheory.T.eisenstein_series_convergent F E σ B n Y r s' hB hn hY b K a hb hK hH
+    _root_.GlobalTheory.CompanionTheory.GodementH.godement_sum F E σ B n Y r s' hB hn hY b K a hb hK
+      hH
   have hC : ∀ s x, ‖flat a f s₁ s x‖ ≤ max C₀ 0 * a x ^ (s.re + (n : ℝ) / 2) := fun s x =>
     (hC₀ s x).trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.rpow_nonneg (hpos x).le _))
   have hsum
@@ -98,9 +104,7 @@ theorem eis_half_plane
   · intro s hs x
     apply Summable.hasSum
     have hg := (hsum (s.re + (n : ℝ) / 2) (by linarith) x).mul_left (max C₀ 0)
-    first
-    | exact Summable.of_norm_bounded _ hg (fun q => hC s _)
-    | exact Summable.of_norm_bounded hg (fun q => hC s _)
+    first | exact Summable.of_norm_bounded hg (fun q => hC s _)
   · intro x s₀ hs₀
     have hs₀' : σ₀ - (n : ℝ) / 2 < s₀.re := hs₀
     set c := (σ₀ - (n : ℝ) / 2 + s₀.re) / 2 with hc

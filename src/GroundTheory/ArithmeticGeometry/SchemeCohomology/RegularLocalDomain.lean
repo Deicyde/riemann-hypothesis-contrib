@@ -61,10 +61,10 @@ universe u
 
 variable {R : Type u} [CommRing R]
 
-theorem spanFinrank_maximalIdeal_quotient_add_one_le [IsLocalRing R] [IsNoetherianRing R]
-    {x : R} (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2)
-    [IsLocalRing (R ⧸ span {x})] :
-    (maximalIdeal (R ⧸ span {x})).spanFinrank + 1 ≤ (maximalIdeal R).spanFinrank := by
+theorem spanFinrank_maximalIdeal_quotient_add_one_le
+    [IsLocalRing R] [IsNoetherianRing R]
+    {x : R} (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2) [IsLocalRing (R ⧸ span {x})]
+    : (maximalIdeal (R ⧸ span {x})).spanFinrank + 1 ≤ (maximalIdeal R).spanFinrank := by
   classical
   set m := maximalIdeal R with hm
   let x' : m := ⟨x, hx⟩
@@ -87,14 +87,18 @@ theorem spanFinrank_maximalIdeal_quotient_add_one_le [IsLocalRing R] [IsNoetheri
   let s : Set m := insert x' (Set.range t)
   have hspan : Submodule.span (ResidueField R) (m.toCotangent '' s) = ⊤ := by
     set S := Submodule.span (ResidueField R) (m.toCotangent '' s)
-    have hLS : L ≤ S := Submodule.span_le.mpr (by
-      rintro _ rfl
-      exact Submodule.subset_span ⟨x', Set.mem_insert _ _, rfl⟩)
+    have hLS : L ≤ S :=
+      Submodule.span_le.mpr (by
+        rintro _ rfl
+        exact Submodule.subset_span ⟨x', Set.mem_insert _ _, rfl⟩)
     have hmap : S.map L.mkQ = ⊤ := by
       rw [eq_top_iff, ← bW.span_eq, Submodule.span_le]
       rintro _ ⟨i, rfl⟩
-      exact ⟨m.toCotangent (t i), Submodule.subset_span ⟨t i, Set.mem_insert_of_mem _ ⟨i, rfl⟩, rfl⟩,
-        ht i⟩
+      exact ⟨
+        m.toCotangent (t i),
+        Submodule.subset_span ⟨t i, Set.mem_insert_of_mem _ ⟨i, rfl⟩, rfl⟩,
+        ht i
+      ⟩
     rw [Submodule.map_mkQ_eq_top] at hmap
     rwa [sup_eq_right.mpr hLS] at hmap
   have hspanR : Submodule.span R s = ⊤ := CotangentSpace.span_image_eq_top_iff.mp hspan
@@ -102,21 +106,25 @@ theorem spanFinrank_maximalIdeal_quotient_add_one_le [IsLocalRing R] [IsNoetheri
     have := Submodule.map_span m.subtype s
     rw [hspanR, Submodule.map_subtype_top] at this
     exact this
-  have hmax : maximalIdeal (R ⧸ span {x}) =
-      Ideal.span (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))) := by
+  have hmax
+      : maximalIdeal (R ⧸ span {x})
+        = Ideal.span (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))) := by
     rw [← map_maximalIdeal_of_surjective _ Ideal.Quotient.mk_surjective, ← hm,
       congrArg (Ideal.map (Ideal.Quotient.mk (span {x}))) hmspan, Ideal.map_span]
-    have : (Ideal.Quotient.mk (span {x})) '' (Subtype.val '' s) =
-        insert 0 (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))) := by
+    have : (Ideal.Quotient.mk (span {x})) '' (Subtype.val '' s)
+        = insert 0 (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))) := by
       simp only [s, Set.image_insert_eq, ← Set.range_comp]
       congr 1
       exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self x)
     rw [this, Ideal.span_insert_zero]
   have hle : (maximalIdeal (R ⧸ span {x})).spanFinrank ≤ q := by
     rw [hmax]
-    have hfin : (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))) =
-        ((Finset.univ.image (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R)) :
-          Finset (R ⧸ span {x})) : Set (R ⧸ span {x})) := by simp
+    have hfin
+        : (Set.range (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R)))
+          = ((Finset.univ.image (fun i ↦ Ideal.Quotient.mk (span {x}) (t i : R))
+              : Finset (R ⧸ span {x}))
+            : Set (R ⧸ span {x})) := by
+      simp
     refine (Submodule.spanFinrank_span_le_ncard_of_finite (Set.finite_range _)).trans ?_
     rw [hfin, Set.ncard_coe_finset]
     exact (Finset.card_image_le).trans (by simp)
@@ -138,9 +146,10 @@ private lemma exists_nat_of_le_add_one {d : WithBot ℕ∞} {n b : ℕ} (h2 : (n
       exact ENat.natCast_ne_top b h4
     | coe k => exact ⟨k, rfl⟩
 
-theorem isRegularLocalRing_quotient [IsRegularLocalRing R] {x : R} (hx : x ∈ maximalIdeal R)
-    (hx2 : x ∉ maximalIdeal R ^ 2) [IsLocalRing (R ⧸ span {x})] :
-    IsRegularLocalRing (R ⧸ span {x}) ∧ ringKrullDim (R ⧸ span {x}) + 1 = ringKrullDim R := by
+theorem isRegularLocalRing_quotient
+    [IsRegularLocalRing R]
+    {x : R} (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2) [IsLocalRing (R ⧸ span {x})]
+    : IsRegularLocalRing (R ⧸ span {x}) ∧ ringKrullDim (R ⧸ span {x}) + 1 = ringKrullDim R := by
   have h1 := spanFinrank_maximalIdeal_quotient_add_one_le hx hx2
   have hR : ringKrullDim R = ((maximalIdeal R).spanFinrank : WithBot ℕ∞) :=
     ((isRegularLocalRing_iff R).mp inferInstance).symm

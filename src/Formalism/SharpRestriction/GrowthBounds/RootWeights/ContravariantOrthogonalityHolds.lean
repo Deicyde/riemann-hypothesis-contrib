@@ -70,15 +70,7 @@ theorem isotypic_stable_operator
     (E : GLOps n K V) (mu : Fin n → ℤ) (a b : Fin n) {x : V} (hx : x ∈ isoSub E mu)
     : E a b x ∈ isoSub E mu := by
   first
-  | exact UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator ..
   | (apply UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator n K V ‹_› ‹_› ‹_› E mu a b x hx
   | exact @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator n K V ‹_› ‹_› ‹_› E mu a b x
   | exact @UpperTheory.Reformulated.B.Qh28.isotypic_stable_operator n K V ‹_› ‹_› ‹_› E mu a b
@@ -98,15 +90,7 @@ theorem hwv_lowering_span_lower
     {x : V} (hx : x ∈ hwvLoweringSpan E mu)
     : E a b x ∈ hwvLoweringSpan E mu := by
   first
-  | exact UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower ..
   | (apply UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower n K V ‹_› ‹_› ‹_› E mu a b hab x
       hx
   | exact @UpperTheory.Reformulated.B.Qk30.hwv_lowering_span_lower n K V ‹_› ‹_› ‹_› E mu a b hab x

@@ -57,9 +57,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-theorem gB_ne_zero : X.B.g ≠ 0 := by
-  rw [X.g_eq]; exact Nat.mul_ne_zero (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero
-
 theorem hfe : ∀ a b : Fin D.R.rS, a ≠ b → ZMod' X.B.I X.B.g (hA X.B.I (X.f0 a) (X.e0 b)) := by
   intro a b hab
   rw [hA_symm]
@@ -98,7 +95,8 @@ theorem chiN_mul
     (hcy : Formalism.L2.SG.NormCut.NCong X y)
     : chiN X (x * y) = chiN X x * chiN X y := by
   unfold chiN
-  refine psi_mul_of_Z X.B.I X.B.g X.psiEf_add X.psiEf_int (gB_ne_zero X) ?_
+  refine psi_mul_of_Z X.B.I X.B.g X.psiEf_add X.psiEf_int
+    (_root_.Formalism.L2.SG.Pf.modulus_g_ne_zero X) ?_
   have hf0 : ∀ a, X.f0 a ∈ X.B.I.Lf := fun a => (X.vectorsInLattice.1 a).2
   rw [← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
   refine Z_sum X.B.I X.B.g _ _ fun a _ => ?_
@@ -107,7 +105,8 @@ theorem chiN_mul
 
 theorem chiN_one : chiN X 1 = 1 := by
   unfold chiN
-  refine psi_Z X.B.I X.B.g X.psiEf_add X.psiEf_int (gB_ne_zero X) ?_
+  refine psi_Z X.B.I X.B.g X.psiEf_add X.psiEf_int (_root_.Formalism.L2.SG.Pf.modulus_g_ne_zero X)
+    ?_
   simp only [show X.B.I.fmat 1 = 1 from rfl, Matrix.one_mulVec]
   exact Z_sum X.B.I X.B.g _ _ fun a _ => nxt_Z X.B.I X.B.g X.e0 X.f0 X.z0 (hfe X) (hfz X) a
 
@@ -132,7 +131,8 @@ theorem chiN_colDiff
     : chiN X (((h : X.B.I.Gf) * X.xu w)⁻¹ * ((h' : X.B.I.Gf) * X.xu w)) = 1 := by
   have s := colStab X w h h' hk
   unfold chiN
-  refine psi_Z X.B.I X.B.g X.psiEf_add X.psiEf_int (Formalism.L2.SG.Pf.ChiNMul.gB_ne_zero X) ?_
+  refine psi_Z X.B.I X.B.g X.psiEf_add X.psiEf_int (_root_.Formalism.L2.SG.Pf.modulus_g_ne_zero X)
+    ?_
   refine Z_sum X.B.I X.B.g _ _ fun a _ => ?_
   have hf0 : X.f0 a ∈ X.B.I.Lf := (X.vectorsInLattice.1 a).2
   have hd

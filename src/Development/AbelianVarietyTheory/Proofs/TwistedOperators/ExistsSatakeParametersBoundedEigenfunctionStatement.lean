@@ -54,6 +54,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_satake_parameters_bounded_eigenfunction
     : ∀ (D : D7) (V : HSp D) (J : Set (GA D V)) (χ : GA D V → ℂ)
         (Sb : Finset (HeightOneSpectrum (𝓞 D.host.F))),
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_satake_parameters_bounded_eigenfunction
                   IsParamFunV V Sb f B
                     ∧ Bounded (above D.host.E (Sb : Set (HeightOneSpectrum (𝓞 D.host.F)))) B V.rank
                       (((V.rank : ℝ) - 1) / 2) := by
-  first
-  | exact @GlobalTheory.FinZeta.ParamBound.exists_param_bounded
-  | exact GlobalTheory.FinZeta.ParamBound.exists_param_bounded
-  | (intros; apply GlobalTheory.FinZeta.ParamBound.exists_param_bounded <;> assumption)
+  first | exact @GlobalTheory.FinZeta.ParamBound.exists_param_bounded

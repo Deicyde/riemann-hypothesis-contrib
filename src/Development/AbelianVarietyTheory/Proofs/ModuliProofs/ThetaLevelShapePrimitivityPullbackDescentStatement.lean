@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
+
 theorem _root_.GlobalTheory.T.thetaLevel_shape_primitivity_pullback_descent
     : ∀ (o : Type) [CommRing o] (g k : ℕ) (J : Type) (b : TBase o k) Mat κ (w w' : J)
         (S S' : Scheme.{0}) (s : S ⟶ Sp o) (s' : S' ⟶ Sp o) (f : S' ⟶ S) (t : TObj g k J b s)
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.thetaLevel_shape_primitivity_pullback_descent
             IsAffine S' → Nonempty S'
               → (t'.Shape Mat κ → t.Shape Mat κ)
                 ∧ (IsIntegral S' → t'.Prim w w' → t.Prim w w') := by
-  first
-  | exact @GlobalTheory.shape_prim_pull_and_descend
-  | exact GlobalTheory.shape_prim_pull_and_descend
-  | (intros; apply GlobalTheory.shape_prim_pull_and_descend <;> assumption)
+  first | exact @GlobalTheory.shape_prim_pull_and_descend

@@ -1,7 +1,8 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.CrystallineLiftingBounds
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsJumpVIffOfExactCrystallineLatticesStatement
+public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsJumpVIffOfExactCrystallineLattices
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -52,10 +53,10 @@ theorem jumps_exact_adm
   intro D HW F
   exact ⟨
     fun l _ K LL =>
-      GlobalTheory.T.isJumpV_iff_of_exact_crystalline_lattices l (D.loc l) (D.locA l) (D.locT l) K
+      _root_.GlobalTheory.Per.SESJumps.isJumpV_iff_of_isSESLat l (D.loc l) (D.locA l) (D.locT l) K
         LL,
     fun l _ K LL =>
-      GlobalTheory.T.isJumpV_iff_of_exact_crystalline_lattices l (D.loc l) (D.locA l) (D.locT l) K
+      _root_.GlobalTheory.Per.SESJumps.isJumpV_iff_of_isSESLat l (D.loc l) (D.locA l) (D.locT l) K
         LL
   ⟩
 

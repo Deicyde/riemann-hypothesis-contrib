@@ -61,11 +61,6 @@ open scoped ComplexConjugate InnerProductSpace
 
 noncomputable section
 
-theorem norm_psi_one (b w : ℂ) : ‖G.psi b w‖ = 1 := by
-  unfold G.psi
-  rw [mul_comm]
-  exact Complex.norm_exp_ofReal_mul_I _
-
 theorem isCompact_roots (n : ℕ) (hn : 0 < n) (K : Set ℂ) (hK : IsCompact K)
     : IsCompact {z : ℂ | z ^ n ∈ K} := by
   obtain ⟨R, hR⟩ := hK.isBounded.exists_norm_le
@@ -246,8 +241,9 @@ theorem germ_core
         show z ^ (m + 2) ∈ K
         rw [(Formalism.FourierDecayAlt.P.mem_rootSet_iff_pow_eq hs).1 hz]
         exact hD
-      rw [norm_smul, norm_mul, Complex.norm_conj, norm_psi_one, mul_one, Complex.norm_real,
-        Real.norm_eq_abs, abs_of_nonneg (by positivity)]
+      rw [norm_smul, norm_mul, Complex.norm_conj,
+        _root_.Formalism.FourierDecayAlt.P.StationaryPhaseModel.F_norm_psi, mul_one,
+        Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
       have := hM1 z hzK
       rw [Real.norm_eq_abs] at this
       exact le_trans (le_trans (le_abs_self _) this) (le_max_left _ _)

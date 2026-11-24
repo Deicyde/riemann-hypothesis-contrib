@@ -3,7 +3,8 @@ module
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CuspidalGaloisUnramified
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.HeckeGaloisCriteria.RhoBar
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DepthZeroOfHyp
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsHeckeGaloisQOfIsHeckeGaloisStatement
+public import Formalism.SharpRestriction.LevelLetterCocycles.SumRepresentations
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsHeckeGaloisQOfIsHeckeGalois
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.TypeConditions.CompatR
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.TypeConditions.ConstituentConditionAtDistinguishedPrime
 import Mathlib.Algebra.Order.Floor.Extended
@@ -46,8 +47,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
   Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
@@ -87,7 +86,7 @@ theorem de_rham_points_weight_jumps_alt
   exact ⟨
     fun i r hr =>
       (Parts.crys_unram_of_lgc D h0 h1 (Parts.lgc D h0 h2 h5) i r fun x =>
-        GlobalTheory.T.isHeckeGaloisQ_of_isHeckeGalois' D i x (r x) (hr x)).1,
+        _root_.GlobalTheory.NRows.isHeckeGaloisQ_of_isHeckeGalois D i x (r x) (hr x)).1,
     fun i r hr _ w hw x => all i r hr x w hw,
     fun i r hr => Parts.constituentCondition_of_hodgeJumps D h0 i r hr (all i r hr)
   ⟩

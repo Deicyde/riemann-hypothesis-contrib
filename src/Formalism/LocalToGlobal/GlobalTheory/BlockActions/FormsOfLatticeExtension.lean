@@ -960,7 +960,6 @@ def ExtLevL (Tf : FormsTiedSym D u Ch chOf) : Prop :=
           (((Tf.cls D.R.m le_rfl (Or.inr rfl)).lev.chi ⟨G, hG⟩ : ℂˣ) : ℂ)
             = ((Tf.clsP.lev.chi κ : ℂˣ) : ℂ)
 
-
 theorem extLevK_of (Tf : FormsTiedSym D u Ch chOf) (hL : ExtLevL Tf) : ExtLevK Tf := by
   intro κ
   obtain ⟨g, hg, hu⟩ :=

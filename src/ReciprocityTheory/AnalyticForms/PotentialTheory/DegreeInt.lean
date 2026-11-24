@@ -188,7 +188,7 @@ theorem exists_sheet_partition
       rw [← hTU] at hx'
       exact hx'
   · intro m
-    first | exact disjointed_subset _ m | exact disjointed_le _ m | exact disjointed_subset m
+    first | exact disjointed_subset _ m
   · intro m
     exact ⟨hV0o _, hk0 _, hW0 _, hdis0 _, hpre0 _, hsh0 _⟩
 

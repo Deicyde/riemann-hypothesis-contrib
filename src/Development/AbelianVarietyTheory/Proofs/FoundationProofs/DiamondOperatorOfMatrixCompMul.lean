@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.PetEqRelIndexMulPetProd
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DiamondOperatorOfMatrixCongrStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DiamondOperatorOfMatrixCongr
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -72,8 +72,7 @@ theorem dia_mul
         → ∀ f : ModularForm (GlobalTheory.Hk.lev N l) k,
           GlobalTheory.Hk.dia k τ (GlobalTheory.Hk.dia k σ ⇑f) = GlobalTheory.Hk.dia k ρ ⇑f := by
   intro N l k d e σ τ ρ hN hσ hτ hρ f
-  have h :=
-    GlobalTheory.T.diamondOperatorOfMatrix_congr N l k (d * e) (σ * τ) ρ hN (isDia_mul hσ hτ) hρ f
+  have h := _root_.GlobalTheory.Hk.dia_congr N l k (d * e) (σ * τ) ρ hN (isDia_mul hσ hτ) hρ f
   rw [← h]
   simp only [dia]
   rw [SlashAction.slash_mul]

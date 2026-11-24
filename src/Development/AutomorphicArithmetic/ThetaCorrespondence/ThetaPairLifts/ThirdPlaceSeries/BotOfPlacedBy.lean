@@ -43,8 +43,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -97,6 +95,7 @@ theorem pg_isTypePlaces_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex)
     h18,
     h19
   ⟩
+
 theorem stZero_is_com_zero_of_pkHyp
     (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (hP : _root_.GlobalTheory.Fam.PackageHypotheses W)
     (hm : 0 < D.R.m)
@@ -115,6 +114,7 @@ theorem stZero_is_com_zero_of_pkHyp
     h.haar,
     h.fund
   ⟩
+
 theorem bot_stZero_of_gRead
     (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (hP : _root_.GlobalTheory.Fam.PackageHypotheses W)
     (hm : 0 < D.R.m)
@@ -148,6 +148,7 @@ theorem bot_stZero_of_gRead
   · intro g x hx
     have h := (hR.lev g.1).2 g.2 (fun i => x (pl i)) (fun i => hx (pl i))
     exact h.trans (Equiv.prod_comp pl (fun PP => (G PP).S.P.lam (x PP)))
+
 theorem bot_of_placedBy_alt
     : ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
         {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}

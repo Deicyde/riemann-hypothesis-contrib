@@ -49,6 +49,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Fo
   NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.conjugate_maximalCompact_mem_parahoricLevel
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -78,7 +79,4 @@ theorem _root_.GlobalTheory.T.conjugate_maximalCompact_mem_parahoricLevel
               kap X h t k ∈ GfC (Yc D 0)
                 ∧ finE (Yc D 0) (kap X h t k)
                   ∈ Formalism.L2.DIV.parLev D.sp.cm (Yc D 0).gram (R.βY 0) (R.dat0 R.triv) := by
-  first
-  | exact @GlobalTheory.KapLevel.kap_mem_parLev
-  | exact GlobalTheory.KapLevel.kap_mem_parLev
-  | (intros; apply GlobalTheory.KapLevel.kap_mem_parLev <;> assumption)
+  first | exact @GlobalTheory.KapLevel.kap_mem_parLev

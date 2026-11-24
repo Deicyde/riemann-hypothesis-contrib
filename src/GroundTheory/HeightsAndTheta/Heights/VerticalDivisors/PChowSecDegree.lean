@@ -64,7 +64,8 @@ noncomputable section
 theorem isHomogeneous_specRest
     {R S : Type*} [CommRing R] [CommRing S]
     (φ : R →+* S)
-    {n e d : ℕ} {g : MvPolynomial (Fin (e + 1) × Fin n) R} (hg : IsMultiHomog d g) (y : Par e n → S)
+    {n e d : ℕ} {g : MvPolynomial (Fin (e + 1) × Fin n) R}
+    (hg : Heights.IsMultiHomog d g) (y : Par e n → S)
     : (specRest φ g y).IsHomogeneous d := by
   classical
   rw [specRest, g.as_sum, eval₂_sum]

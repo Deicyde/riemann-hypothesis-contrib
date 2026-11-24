@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.RingTheory.PicardGroup
 
 @[expose] public section
 
@@ -166,7 +167,7 @@ theorem finiteDimensional_fixed
   obtain ⟨φ, hφ, h0⟩ := exists_ne_zero π
   have : FiniteDimensional ℂ (X φ) := (π.isAut.aut φ hφ).kfin
   have : FiniteDimensional ℂ (C φ) := LinearMap.finiteDimensional_range _
-  obtain ⟨S, hS⟩ := GlobalTheory.T.definiteUnitary_classSet_finite E n K hK
+  obtain ⟨S, hS⟩ := _root_.GlobalTheory.DefU.ClassFin.classSet_finite E n K hK
   let L : fixed (π.rep.comp (finU (E := E) (n := n)).subtype) K →ₗ[ℂ] (S → C φ) :=
     LinearMap.pi fun s =>
       LinearMap.codRestrict (C φ)
@@ -208,7 +209,7 @@ theorem finiteDimensional_hom (π : AutSub E n)
   have : FiniteDimensional ℂ (X φ) := (π.isAut.aut φ hφ).kfin
   have : FiniteDimensional ℂ (C φ) := LinearMap.finiteDimensional_range _
   obtain ⟨S, hS⟩ :=
-    GlobalTheory.T.definiteUnitary_classSet_finite E n (stab φ) (π.isAut.aut φ hφ).level
+    _root_.GlobalTheory.DefU.ClassFin.classSet_finite E n (stab φ) (π.isAut.aut φ hφ).level
   let φV : π.V := ⟨φ, hφ⟩
   have hXV : X φ ≤ π.V := Submodule.span_le.2 (by rintro _ ⟨k, rfl⟩; exact π.isAut.stable _ φ hφ)
   have hmem

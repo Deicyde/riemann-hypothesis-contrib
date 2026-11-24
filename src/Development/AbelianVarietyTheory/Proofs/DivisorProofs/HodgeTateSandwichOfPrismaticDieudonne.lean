@@ -57,27 +57,32 @@ open WittVector Ideal Matrix CategoryTheory Function
 
 namespace GlobalTheory.DieudonneSandwich
 
-open GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+open GlobalTheory.PDivGroup GlobalTheory.Sandwich
+  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
 
 section Linear
 
-theorem equivFun_semilinear {R S X Y n m : Type*} [CommRing R] [CommRing S] [AddCommGroup X]
-    [Module R X] [AddCommGroup Y] [Module S Y] [Fintype n] [Fintype m] {σ : R →+* S}
-    (f : X →ₛₗ[σ] Y) (bx : Module.Basis n R X) (bz : Module.Basis m S Y) (x : X) :
-    bz.equivFun (f x) = (Matrix.of fun i j => bz.repr (f (bx j)) i) *ᵥ (σ ∘ bx.equivFun x) := by
+theorem equivFun_semilinear
+    {R S X Y n m : Type*} [CommRing R] [CommRing S] [AddCommGroup X] [Module R X] [AddCommGroup Y]
+    [Module S Y] [Fintype n] [Fintype m]
+    {σ : R →+* S} (f : X →ₛₗ[σ] Y)
+    (bx : Module.Basis n R X) (bz : Module.Basis m S Y) (x : X)
+    : bz.equivFun (f x) = (Matrix.of fun i j => bz.repr (f (bx j)) i) *ᵥ (σ ∘ bx.equivFun x) := by
   have h1 : f x = ∑ j, σ (bx.repr x j) • f (bx j) := by
-
     conv_lhs => rw [← bx.sum_repr x, map_sum]
     simp only [map_smulₛₗ]
   funext i
   rw [h1]
   simp [Matrix.mulVec, dotProduct, mul_comm]
 
-theorem exists_basis_reduction {A O M D n : Type*} [CommRing A] [CommRing O] [AddCommGroup M]
-    [Module A M] [AddCommGroup D] [Module O D] [Fintype n] {θ : A →+* O} (hθ : Surjective θ)
-    {ξ : A} (hξ : θ ξ = 0) (r : M →ₛₗ[θ] D) (hr : Surjective r)
-    (hk : ∀ m, r m = 0 → ∃ n, m = ξ • n) (b : Module.Basis n A M) :
-    ∃ c : Module.Basis n O D, ∀ m, c.equivFun (r m) = θ ∘ b.equivFun m := by
+theorem exists_basis_reduction
+    {A O M D n : Type*} [CommRing A] [CommRing O] [AddCommGroup M] [Module A M] [AddCommGroup D]
+    [Module O D] [Fintype n]
+    {θ : A →+* O} (hθ : Surjective θ)
+    {ξ : A} (hξ : θ ξ = 0)
+    (r : M →ₛₗ[θ] D) (hr : Surjective r) (hk : ∀ m, r m = 0 → ∃ n, m = ξ • n)
+    (b : Module.Basis n A M)
+    : ∃ c : Module.Basis n O D, ∀ m, c.equivFun (r m) = θ ∘ b.equivFun m := by
   classical
   have li : LinearIndependent O fun i => r (b i) := by
     rw [Fintype.linearIndependent_iff]
@@ -103,57 +108,73 @@ theorem exists_basis_reduction {A O M D n : Type*} [CommRing A] [CommRing O] [Ad
     simp only [eq_comm]
   rw [this, Matrix.one_mulVec]
 
-theorem exists_unit_of_generator {O X : Type*} [CommRing O] [AddCommGroup X] [Module O X]
-    (e : O ≃ₗ[O] X) (x : X) (hx : ∀ y, ∃ c : O, y = c • x) : ∃ u : Oˣ, x = (u : O) • e 1 := by
+theorem exists_unit_of_generator
+    {O X : Type*} [CommRing O] [AddCommGroup X] [Module O X]
+    (e : O ≃ₗ[O] X)
+    (x : X) (hx : ∀ y, ∃ c : O, y = c • x)
+    : ∃ u : Oˣ, x = (u : O) • e 1 := by
   obtain ⟨a, rfl⟩ := e.surjective x
   obtain ⟨c, hc⟩ := hx (e 1)
   rw [← map_smul, e.injective.eq_iff, smul_eq_mul] at hc
   refine ⟨(IsUnit.of_mul_eq_one_right c hc.symm).unit, ?_⟩
   rw [IsUnit.unit_spec, ← map_smul, smul_eq_mul, mul_one]
 
-theorem reduction_generates {A O M D : Type*} [CommRing A] [CommRing O] [AddCommGroup M]
-    [Module A M] [AddCommGroup D] [Module O D] {θ : A →+* O} (r : M →ₛₗ[θ] D)
-    (e : M ≃ₗ[A] A) (m : M) : r m = θ (e m) • r (e.symm 1) := by
+theorem reduction_generates
+    {A O M D : Type*}
+    [CommRing A] [CommRing O] [AddCommGroup M] [Module A M] [AddCommGroup D] [Module O D]
+    {θ : A →+* O} (r : M →ₛₗ[θ] D)
+    (e : M ≃ₗ[A] A) (m : M)
+    : r m = θ (e m) • r (e.symm 1) := by
   rw [← map_smulₛₗ]
   congr 1
   exact e.injective (by simp)
 
 end Linear
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
-theorem form_map_smul (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive]
-    {G G' : PDivGroup p O} (l : M.obj G' →ₗ[Ainf p O] Ainf p O) (m : M.obj G) (a : ℤ_[p])
-    (f : G ⟶ G') : l (M.map (a • f) m) = ofPadic p O a * l (M.map f m) := by
+theorem form_map_smul
+    (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive]
+    {G G' : PDivGroup p O} (l : M.obj G' →ₗ[Ainf p O] Ainf p O) (m : M.obj G)
+    (a : ℤ_[p]) (f : G ⟶ G')
+    : l (M.map (a • f) m) = ofPadic p O a * l (M.map f m) := by
   haveI : IsAdicComplete (span {(p : Ainf p O)}) (Ainf p O) := WittVector.isAdicCompleteIdealSpanP
   let T : (G ⟶ G') →+ Ainf p O :=
-    AddMonoidHom.mk' (fun f => l (M.map f m)) fun f g => by
-      rw [M.map_add (f := _), ← map_add (f := _)]; rfl
+    AddMonoidHom.mk'
+      (fun f => l (M.map f m))
+      fun f g => by rw [M.map_add (f := _), ← map_add (f := _)]; rfl
   exact Dieudonne.map_padic_smul (ofPadic p O) T a f
 
-def tateToM (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive] {G : PDivGroup p O}
-    {h : ℕ} (b : Module.Basis (Fin h) (Ainf p O) (M.obj G)) (m₀ : M.obj (const p O)) :
-    G.Tate →ₛₗ[ofPadic p O] M.obj G where
+def tateToM
+    (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive]
+    {G : PDivGroup p O} {h : ℕ} (b : Module.Basis (Fin h) (Ainf p O) (M.obj G))
+    (m₀ : M.obj (const p O))
+    : G.Tate →ₛₗ[ofPadic p O] M.obj G where
   toFun t := M.map (constHom G t) m₀
   map_add' s t := by rw [map_add (f := _), M.map_add (f := _)]; rfl
-  map_smul' a t := b.ext_elem fun i => by
-    rw [map_smul, map_smul]
-    exact form_map_smul M (b.coord i) m₀ a _
+  map_smul' a t :=
+    b.ext_elem fun i => by
+      rw [map_smul, map_smul]
+      exact form_map_smul M (b.coord i) m₀ a _
 
-def endMap (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive] (G : PDivGroup p O) :
-    End G →+* Module.End (Ainf p O) (M.obj G) where
+def endMap (M : PDivGroup p O ⥤ ModuleCat.{0} (Ainf p O)) [M.Additive] (G : PDivGroup p O)
+    : End G →+* Module.End (Ainf p O) (M.obj G) where
   toFun f := (M.map f.asHom).hom
   map_one' := congrArg ModuleCat.Hom.hom (M.map_id G)
   map_mul' f g := congrArg ModuleCat.Hom.hom (M.map_comp g.asHom f.asHom)
   map_zero' := congrArg ModuleCat.Hom.hom (M.map_zero G G)
   map_add' f g := congrArg ModuleCat.Hom.hom (M.map_add (f := f.asHom) (g := g.asHom))
 
-theorem exists_dual_basis [IsDomain O] {ε : PreTilt O p} (hε : IsPrimitiveSystem ε)
-    {G : PDivGroup p O} (hG : Bijective (pairing G O).flip) {h : ℕ}
-    (e : G.Tate ≃ₗ[ℤ_[p]] (Fin h → ℤ_[p])) :
-    ∃ χ : Fin h → G.dual.Tate, (∀ i t, pairing G O t (χ i) = e t i • epsTate hε) ∧
-      ∀ χ', χ' = ∑ i, epsPairing hε G (e.symm (Pi.single i 1)) χ' • χ i := by
+theorem exists_dual_basis
+    [IsDomain O]
+    {ε : PreTilt O p} (hε : IsPrimitiveSystem ε)
+    {G : PDivGroup p O} (hG : Bijective (pairing G O).flip)
+    {h : ℕ} (e : G.Tate ≃ₗ[ℤ_[p]] (Fin h → ℤ_[p]))
+    : ∃ χ : Fin h → G.dual.Tate,
+      (∀ i t, pairing G O t (χ i) = e t i • epsTate hε)
+        ∧ ∀ χ', χ' = ∑ i, epsPairing hε G (e.symm (Pi.single i 1)) χ' • χ i := by
   choose χ hχ using fun i : Fin h => hG.2
     (LinearMap.toSpanSingleton ℤ_[p] _ (epsTate hε) ∘ₗ LinearMap.proj i ∘ₗ e.toLinearMap)
   have h1 : ∀ i t, pairing G O t (χ i) = e t i • epsTate hε := fun i t =>
@@ -173,26 +194,32 @@ theorem exists_dual_basis [IsDomain O] {ε : PreTilt O p} (hε : IsPrimitiveSyst
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, map_smul, h1, LinearMap.smul_apply, ← epsPairing_smul hε, smul_comm]
 
-theorem exists_equiv_constDlogT :
-    ∃ e : O ≃ₗ[O] (const p O).dual.omega, e 1 = constDlogT p O := by
+theorem exists_equiv_constDlogT : ∃ e : O ≃ₗ[O] (const p O).dual.omega, e 1 = constDlogT p O := by
   have hb : Bijective (omegaMap _ (PDivGroup.mu p O) (PDivGroup.mu p O).bidual.inv) :=
-    bijective_iff_has_inverse.2 ⟨omegaMap _ _ (PDivGroup.mu p O).bidual.hom,
+    bijective_iff_has_inverse.2 ⟨
+      omegaMap _ _ (PDivGroup.mu p O).bidual.hom,
       fun x => by rw [← LinearMap.comp_apply, ← omegaMap_comp, Iso.hom_inv_id, omegaMap_id]; rfl,
-      fun x => by rw [← LinearMap.comp_apply, ← omegaMap_comp, Iso.inv_hom_id, omegaMap_id]; rfl⟩
+      fun x => by rw [← LinearMap.comp_apply, ← omegaMap_comp, Iso.inv_hom_id, omegaMap_id]; rfl
+    ⟩
   refine ⟨muOmegaEquiv p O ≪≫ₗ LinearEquiv.ofBijective _ hb, ?_⟩
   exact congrArg (omegaMap _ (PDivGroup.mu p O) (PDivGroup.mu p O).bidual.inv) (one_smul O _)
 
-theorem exists_equiv_muLieGen :
-    ∃ e : O ≃ₗ[O] (PDivGroup.mu p O).Lie, e 1 = muLieGen p O :=
-  ⟨(LinearMap.ringLmapEquivSelf O O O).symm ≪≫ₗ (muOmegaEquiv p O).symm.dualMap,
-    LinearMap.ext fun w => by simp [muLieGen]⟩
+theorem exists_equiv_muLieGen : ∃ e : O ≃ₗ[O] (PDivGroup.mu p O).Lie, e 1 = muLieGen p O := ⟨
+  (LinearMap.ringLmapEquivSelf O O O).symm ≪≫ₗ (muOmegaEquiv p O).symm.dualMap,
+  LinearMap.ext fun w => by simp [muLieGen]
+⟩
 
-theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-    {v : Valuation C NNReal} [Algebra O C] (hv : v.Integers O) [IsDomain O] {ε : PreTilt O p}
-    (hε : IsPrimitiveSystem ε) (hcov : CovariantDieudonneAt ε) : HodgeTateSandwichAt hε := by
+theorem sandwichAt_of_covariant
+    {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+    {v : Valuation C NNReal} [Algebra O C]
+    (hv : v.Integers O)
+    [IsDomain O]
+    {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (hcov : CovariantDieudonneAt ε)
+    : HodgeTateSandwichAt hε := by
   classical
   have hε1 : IsPrimitiveRoot (root ε).untilt p := by simpa [zeta] using hε 1
-  obtain ⟨hdom, -, hker, hsurj, hnu, -, -⟩ := GlobalTheory.AinfXi.ainf_local_xi_order p C v O hv ε hε1
+  obtain ⟨hdom, -, hker, hsurj, hnu, -, -⟩ :=
+    GlobalTheory.AinfXi.ainf_local_xi_order p C v O hv ε hε1
   have hxi : fontaineTheta O p (xi ε) = 0 := by
     rw [← RingHom.mem_ker, hker]; exact Ideal.mem_span_singleton_self _
   haveI : IsIntegrallyClosedIn O C := isIntegrallyClosedIn_iff.2
@@ -233,9 +260,9 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     (equivFun_semilinear Φ tb b t).symm
   let Gm : Matrix (Fin G.height) (Fin G.height) (Ainf p O) :=
     Matrix.of fun i k => ofPadic p O ↑u⁻¹ * e₁ (M.map (charHom G (χ i)) (b k))
-  have hG : ∀ m i, (Gm *ᵥ b.equivFun m) i =
-      ofPadic p O ↑u⁻¹ * e₁ (M.map (charHom G (χ i)) m) := fun m i => by
-
+  have hG
+      : ∀ m i,
+        (Gm *ᵥ b.equivFun m) i = ofPadic p O ↑u⁻¹ * e₁ (M.map (charHom G (χ i)) m) := fun m i => by
     conv_rhs => rw [← b.sum_repr m, map_sum, map_sum, Finset.mul_sum]
     simp only [Gm, Matrix.mulVec, dotProduct, Matrix.of_apply, map_smul, smul_eq_mul,
       Module.Basis.equivFun_apply]
@@ -254,45 +281,52 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     LinearMap.toMatrix_mulVec_repr b b _ m
   have hGF : ∀ t i, (Gm *ᵥ b.equivFun (Φ t)) i = ofPadic p O (e t i) * Sandwich.mu ε := by
     intro t i
-    have h1 : M.map (charHom G (χ i)) (Φ t) =
-        M.map (e t i • epsHom (zeta ε) hε.zeta_zero (zeta_succ_pow ε)) (e₀.symm 1) := by
+    have h1
+        : M.map (charHom G (χ i)) (Φ t)
+          = M.map (e t i • epsHom (zeta ε) hε.zeta_zero (zeta_succ_pow ε)) (e₀.symm 1) := by
       rw [hΦ, ← ModuleCat.comp_apply, ← M.map_comp, constHom_comp_charHom, hχ, map_smul]
       rfl
-    have h2 := form_map_smul M e₁.toLinearMap (e₀.symm 1) (e t i)
-      (epsHom (zeta ε) hε.zeta_zero (zeta_succ_pow ε))
+    have h2 :=
+      form_map_smul M e₁.toLinearMap (e₀.symm 1) (e t i)
+        (epsHom (zeta ε) hε.zeta_zero (zeta_succ_pow ε))
     have h3 : ofPadic p O ↑u⁻¹ * ofPadic p O u = 1 := by rw [← map_mul, Units.inv_mul, map_one]
     rw [LinearEquiv.coe_coe, hu (zeta ε) _ _ (fun _ => rfl), LinearEquiv.apply_symm_apply] at h2
     rw [hG, h1, h2]
     linear_combination (ofPadic p O (e t i) * Sandwich.mu ε) * h3
-  let D : Datum ε G.height Λ :=
-    { F := F, G := Gm, Ψ := Ψ
-      Ψ' := Matrix.of fun i k => phiInv p O (b.repr (n (b k)) i)
-      ρT := ρT, ρM := ρM
-      G_mul_F := by
-        ext1 i j
-        refine (hGF (tb j) i).trans ?_
-        by_cases hij : i = j
-        · simp [e, hij]
-        · simp [e, hij, Finsupp.single_apply, Ne.symm hij]
-      F_eq := by
-        ext1 i j
-        refine Eq.trans ?_ (congrFun (hΨ (Φ (tb j))) i).symm
-        have h0 : ψ _ (e₀.symm 1) = e₀.symm 1 := e₀.injective (by rw [he₀]; simp)
-        rw [hΦ, ← nψ, h0]
-        rfl
-      Ψ_mul := by
-        ext1 i j
-        refine (congrFun (hΨ (n (b j))) i).trans ?_
-        rw [hn]
-        simp [Matrix.one_apply, Finsupp.single_apply, eq_comm]
-      F_act := fun a => by
-        ext1 i j
-        refine Eq.trans ?_ (congrFun (hρM a (Φ (tb j))) i).symm
-        rw [hΦ, ← ModuleCat.comp_apply, ← M.map_comp, ← constHom_tateMap, ← hΦ, ← hF, ← hρT]
-        simp [e, Matrix.mul_apply, Matrix.mulVec, dotProduct, Finsupp.single_apply] }
-  have red : ∀ (X : Matrix (Fin G.height) (Fin G.height) (Ainf p O)) (y : Fin G.height → Ainf p O),
-      Matrix.toLin' (X.map (fontaineTheta O p)) (fontaineTheta O p ∘ y) =
-        fontaineTheta O p ∘ (X *ᵥ y) := fun X y =>
+  let D : Datum ε G.height Λ := {
+    F := F
+    G := Gm
+    Ψ := Ψ
+    Ψ' := Matrix.of fun i k => phiInv p O (b.repr (n (b k)) i)
+    ρT := ρT
+    ρM := ρM
+    G_mul_F := by
+      ext1 i j
+      refine (hGF (tb j) i).trans ?_
+      by_cases hij : i = j
+      · simp [e, hij]
+      · simp [e, hij, Ne.symm hij]
+    F_eq := by
+      ext1 i j
+      refine Eq.trans ?_ (congrFun (hΨ (Φ (tb j))) i).symm
+      have h0 : ψ _ (e₀.symm 1) = e₀.symm 1 := e₀.injective (by rw [he₀]; simp)
+      rw [hΦ, ← nψ, h0]
+      rfl
+    Ψ_mul := by
+      ext1 i j
+      refine (congrFun (hΨ (n (b j))) i).trans ?_
+      rw [hn]
+      simp [Matrix.one_apply, Finsupp.single_apply, eq_comm]
+    F_act := fun a => by
+      ext1 i j
+      refine Eq.trans ?_ (congrFun (hρM a (Φ (tb j))) i).symm
+      rw [hΦ, ← ModuleCat.comp_apply, ← M.map_comp, ← constHom_tateMap, ← hΦ, ← hF, ← hρT]
+      simp [e, Matrix.mul_apply, Matrix.mulVec, dotProduct, Finsupp.single_apply]
+  }
+  have red
+      : ∀ (X : Matrix (Fin G.height) (Fin G.height) (Ainf p O)) (y : Fin G.height → Ainf p O),
+        Matrix.toLin' (X.map (fontaineTheta O p)) (fontaineTheta O p ∘ y)
+          = fontaineTheta O p ∘ (X *ᵥ y) := fun X y =>
     funext fun i => (RingHom.map_mulVec _ X y i).symm
   have hal : ∀ t, D.al (toO e t) = (u₁ : O) • c.equivFun (ι G (hodgeTate G t)) := fun t => by
     refine (red F (ofPadic p O ∘ e t)).trans ?_
@@ -301,8 +335,9 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     obtain ⟨m, rfl⟩ := (hr G).1 y
     rw [nr, hc, hc, ← hρM]
     exact red _ _
-  have hbb : ∀ y i, D.bb (c.equivFun y) i =
-      padicToO p O ↑u⁻¹ * ↑u₂⁻¹ * π G y (dlog G (χ i)) := fun y i => by
+  have hbb
+      : ∀ y i,
+        D.bb (c.equivFun y) i = padicToO p O ↑u⁻¹ * ↑u₂⁻¹ * π G y (dlog G (χ i)) := fun y i => by
     obtain ⟨m, rfl⟩ := (hr G).1 y
     have h1 := nπ _ _ (charHom G (χ i)) (r G m)
     rw [nr, reduction_generates _ e₁, map_smul, hu₂, lieMap_charHom] at h1
@@ -319,19 +354,20 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     have hr' : ∀ x, π G (c.equivFun.symm (D.al x)) = 0 := fun x => by
       have hx : x = ∑ j, x j • toO e (tb j) := by
         funext i
-        simp [toO, e, Finset.sum_apply, Finsupp.single_apply, apply_ite (padicToO p O)]
+        simp [toO, e, Finset.sum_apply, apply_ite (padicToO p O)]
 
       rw [hx, map_sum, map_sum, map_sum]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [map_smul, hal, map_smul, map_smul, map_smul, map_smul, LinearEquiv.symm_apply_apply,
         (hex G).2.1.apply_apply_eq_zero, smul_zero, smul_zero]
-    obtain ⟨x, hx⟩ := (GlobalTheory.Sandwich.HodgeTateBound.bound p C v O hv ε hε1 Λ _ D).2.2.2.1 _ hy
+    obtain ⟨x, hx⟩ :=
+      (GlobalTheory.Sandwich.HodgeTateBound.bound p C v O hv ε hε1 Λ _ D).2.2.2.1 _ hy
     have h1 := hr' x
     rw [hx, map_smul, LinearEquiv.symm_apply_apply, map_smul] at h1
-    exact LinearMap.ext fun w =>
-      (mul_eq_zero.1 (LinearMap.congr_fun h1 w)).resolve_left hnu
-  let fil₀ : G.dual.omega →ₗ[O] D.Fil := (c.equivFun.toLinearMap ∘ₗ ι G).codRestrict _ fun w =>
-    (hFil _).2 ((hex G).2.1.apply_apply_eq_zero w)
+    exact LinearMap.ext fun w => (mul_eq_zero.1 (LinearMap.congr_fun h1 w)).resolve_left hnu
+  let fil₀ : G.dual.omega →ₗ[O] D.Fil :=
+    (c.equivFun.toLinearMap ∘ₗ ι G).codRestrict _ fun w =>
+      (hFil _).2 ((hex G).2.1.apply_apply_eq_zero w)
   have hfil : Bijective fil₀ := by
     refine ⟨fun w w' h => (hex G).1 (c.equivFun.injective (congrArg Subtype.val h)), fun x => ?_⟩
     obtain ⟨x, hx⟩ := x
@@ -343,12 +379,22 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     obtain ⟨y, rfl⟩ := c.equivFun.surjective x
     rw [hFil, LinearMap.mem_ker, LinearMap.comp_apply, LinearEquiv.coe_coe,
       LinearEquiv.symm_apply_apply]
-  let lie := Submodule.quotEquivOfEq _ _ hk ≪≫ₗ LinearMap.quotKerEquivOfSurjective
-    (π G ∘ₗ c.equivFun.symm.toLinearMap) ((hex G).2.2.comp c.equivFun.symm.surjective)
+  let lie :=
+    Submodule.quotEquivOfEq _ _ hk ≪≫ₗ LinearMap.quotKerEquivOfSurjective
+      (π G ∘ₗ c.equivFun.symm.toLinearMap) ((hex G).2.2.comp c.equivFun.symm.surjective)
   have hlie : ∀ y, lie (D.Fil.mkQ (c.equivFun y)) = π G y := fun y =>
     congrArg (π G) (c.equivFun.symm_apply_apply y)
-  refine ⟨D, e, LinearEquiv.ofBijective fil₀ hfil, lie, fun a t => (hρT a t).symm,
-    fun a w => ?_, fun a m => ?_, fun t => ?_, fun x χ' => ?_⟩
+  refine ⟨
+    D,
+    e,
+    LinearEquiv.ofBijective fil₀ hfil,
+    lie,
+    fun a t => (hρT a t).symm,
+    fun a w => ?_,
+    fun a m => ?_,
+    fun t => ?_,
+    fun x χ' => ?_
+  ⟩
   · exact (congrArg c.equivFun (nι _ _ (ρ a).asHom w).symm).trans (hact a _).symm
   · obtain ⟨y, rfl⟩ := c.equivFun.surjective m
     rw [hact, hlie, hlie]
@@ -367,13 +413,14 @@ theorem sandwichAt_of_covariant {C : Type} [Field C] [IsAlgClosed C] [CharZero C
     simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_coe]
     ring
 
-theorem hodgeTateSandwich_of_prismaticDieudonne₂ : GlobalTheory.Published.PrismaticDieudonneHodge →
-    ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-      (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
-      [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O → ∀ [IsDomain O] (ε : PreTilt O p)
-      (hε : IsPrimitiveSystem ε), HodgeTateSandwichAt hε :=
-  fun h p _ C _ _ _ v O _ _ _ _ hv _ ε hε =>
-    sandwichAt_of_covariant hv hε
-      (h.covariant p C v O hv ε (by simpa [zeta] using hε 1))
+theorem hodgeTateSandwich_of_prismaticDieudonne₂
+    : GlobalTheory.Published.PrismaticDieudonneHodge
+      → ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+          (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+          [IsAdicComplete (Ideal.span {(p : O)}) O],
+        v.Integers O
+          → ∀ [IsDomain O] (ε : PreTilt O p) (hε : IsPrimitiveSystem ε),
+            HodgeTateSandwichAt hε := fun h p _ C _ _ _ v O _ _ _ _ hv _ ε hε =>
+  sandwichAt_of_covariant hv hε (h.covariant p C v O hv ε (by simpa [zeta] using hε 1))
 
 end GlobalTheory.DieudonneSandwich

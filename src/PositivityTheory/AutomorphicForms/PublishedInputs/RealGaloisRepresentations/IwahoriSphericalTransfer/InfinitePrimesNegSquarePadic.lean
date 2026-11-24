@@ -68,9 +68,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
   UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.infinite_primes_neg_square_padic
     : ∀ (q : ℕ) [Fact q.Prime], {p : ℕ | p.Prime ∧ IsSquare (-(p : ℚ_[q]))}.Infinite := by
-  first
-  | exact @GlobalTheory.RealGal.PrimesNegSquare.infinite_primes_neg_isSquare
-  | exact GlobalTheory.RealGal.PrimesNegSquare.infinite_primes_neg_isSquare
-  | (intros; apply GlobalTheory.RealGal.PrimesNegSquare.infinite_primes_neg_isSquare <;> assumption)
+  first | exact @GlobalTheory.RealGal.PrimesNegSquare.infinite_primes_neg_isSquare

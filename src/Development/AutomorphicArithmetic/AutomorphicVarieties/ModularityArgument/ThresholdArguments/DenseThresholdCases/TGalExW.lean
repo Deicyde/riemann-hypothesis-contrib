@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 theorem UpperTheory.V.Z.Sym.W.galois_exists_w_statement
     : _root_.UpperTheory.V.Z.Sym.W.GalExWAlt := by

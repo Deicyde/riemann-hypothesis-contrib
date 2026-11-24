@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.exists_torus_char_of_label_orthogonal_dividing
                     (x : TFK (R := V) (FractionRing V) ⟶ 𝔪.A.A),
                   p.y = 0 ∧ p.g = g₀ ∧ QkToAkU 𝔪.U.toUnifPre (FractionRing V) (X₁.S.r * X₁.S.N) p x
                     ∧ x.left ≫ 𝔪.φ = spMap 𝔪.yK ≫ (X₁.ρ.pt τ).left) := by
-  first
-  | exact @GlobalTheory.GSep.TorPt.exists_torus_char
-  | exact GlobalTheory.GSep.TorPt.exists_torus_char
-  | (intros; apply GlobalTheory.GSep.TorPt.exists_torus_char <;> assumption)
+  first | exact @GlobalTheory.GSep.TorPt.exists_torus_char

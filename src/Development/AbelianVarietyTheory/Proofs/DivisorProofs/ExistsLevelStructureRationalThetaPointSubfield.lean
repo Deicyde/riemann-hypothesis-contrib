@@ -46,6 +46,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -58,33 +59,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.ThetaDescentLevel
-
-theorem isThetaPt_reindex
-    {S : Scheme.{0}} {P : PolAV S} {k : ℕ} {T : Over S} {I I' : Type} {x : I → (T ⟶ P.A)}
-    {v : I → Γ(T.left, ⊤)} (H : IsThetaPt P k x v) (f : I' → I)
-    : IsThetaPt P k (fun i => x (f i)) fun i => v (f i) := by
-  refine ⟨H.1, H.2.1, fun p => ?_⟩
-  obtain ⟨V, hV, th, s1, α, τ, U, s2, w, u, a1, a2, a3, a4, a5, a6, a7, a8⟩ := H.2.2 p
-  exact ⟨
-    V,
-    hV,
-    th,
-    s1,
-    α,
-    τ,
-    fun i => U (f i),
-    fun i => s2 (f i),
-    fun i => w (f i),
-    u,
-    a1,
-    a2,
-    a3,
-    a4,
-    fun i => a5 _,
-    fun i => a6 _,
-    fun i => a7 _,
-    fun i => a8 _
-  ⟩
 
 theorem exists_level
     : ∀ (F Ω : Type) [Field F] [IsAlgClosed F] [CharZero F] [Field Ω] [IsAlgClosed Ω] (em : F →+* Ω)
@@ -121,7 +95,7 @@ theorem exists_level
     hlev (unitOn (Units.map em.toMonoidHom ζ)) (hζ'.map_of_injective (Units.map_injective inj))
   choose i hi using fun a => hx _ (ThetaPtDet.levelPoint_pow lev rfl a)
   refine ⟨ζ, lev, fun a => v (i a), hζ, ?_⟩
-  have h := isThetaPt_reindex hv i
+  have h := _root_.GlobalTheory.Ex.AllLevels.isThetaPt_comp hv i
   rwa [show (fun a => x (i a)) = GlobalTheory.levelPoint lev rfl from funext hi] at h
 
 end GlobalTheory.ThetaDescentLevel

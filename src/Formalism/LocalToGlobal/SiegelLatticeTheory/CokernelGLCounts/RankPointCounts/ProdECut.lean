@@ -81,10 +81,10 @@ def StP (p : PlF D) : Subgroup (GLp p × (GLp p)ᵐᵒᵖ) where
     refine ⟨?_, ?_, ?_⟩
     · show IsLoUni ((x.1 * y.1 : GLp p) : MP p)
       rw [Units.val_mul]
-      exact ZsVolGrp.isLoUni_mul hx1 hy1
+      exact _root_.PI.TermAttrConst.UnitaryGroupMassFormula.isLoUni_mul hx1 hy1
     · show IsUpUni (((x.2 * y.2).unop : GLp p) : MP p)
       rw [MulOpposite.unop_mul, Units.val_mul]
-      exact ZsVolGrp.isUpUni_mul hy2 hx2
+      exact _root_.GlobalTheory.UpperUnipotentProductInertiaEigenvalues.isUpUni_mul hy2 hx2
     · show ((x.1 * y.1 : GLp p) : MP p) * _ * (((x.2 * y.2).unop : GLp p) : MP p) = _
       rw [MulOpposite.unop_mul, Units.val_mul, Units.val_mul]
       calc
@@ -323,11 +323,11 @@ def lU (β : Formalism.L2.SG.PairVal.GLR D) : GLp p := ⟨
   lOf δ M p (β⁻¹ : Formalism.L2.SG.PairVal.GLR D) (VolPinAsm.bOf w β⁻¹),
   by
     rw [← lOf_mul δ M hA, ← Units.val_mul, ← bOf_mul]
-    simp only [mul_inv_cancel, inv_mul_cancel, Units.val_one, bOf_one]
+    simp only [mul_inv_cancel, Units.val_one, bOf_one]
     exact lOf_one δ M hA,
   by
     rw [← lOf_mul δ M hA, ← Units.val_mul, ← bOf_mul]
-    simp only [mul_inv_cancel, inv_mul_cancel, Units.val_one, bOf_one]
+    simp only [inv_mul_cancel, Units.val_one, bOf_one]
     exact lOf_one δ M hA
 ⟩
 
@@ -336,11 +336,11 @@ def ρU (β : Formalism.L2.SG.PairVal.GLR D) : GLp p := ⟨
   ρOf δ M p (β⁻¹ : Formalism.L2.SG.PairVal.GLR D) (VolPinAsm.bOf w β⁻¹),
   by
     rw [← ρOf_mul δ M hA, ← Units.val_mul, ← bOf_mul]
-    simp only [mul_inv_cancel, inv_mul_cancel, Units.val_one, bOf_one]
+    simp only [inv_mul_cancel, Units.val_one, bOf_one]
     exact ρOf_one δ M hA,
   by
     rw [← ρOf_mul δ M hA, ← Units.val_mul, ← bOf_mul]
-    simp only [mul_inv_cancel, inv_mul_cancel, Units.val_one, bOf_one]
+    simp only [mul_inv_cancel, Units.val_one, bOf_one]
     exact ρOf_one δ M hA
 ⟩
 

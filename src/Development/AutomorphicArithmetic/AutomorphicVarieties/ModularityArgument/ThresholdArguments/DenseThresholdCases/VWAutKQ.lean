@@ -40,9 +40,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Admis
 
 @[expose] public section
 
-
-
-
 section
 open UpperTheory.GalN.V
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual

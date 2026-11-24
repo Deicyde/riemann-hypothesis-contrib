@@ -55,6 +55,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.CreationOperators.DifferentialCommutesWeightOperator
+import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.KsetSubset
 
 @[expose] public section
 
@@ -76,12 +77,13 @@ theorem hMultAlg : MultAlg :=
 
 theorem hKModExists : KModExists :=
   GlobalTheory.CompanionTheory.KModExists.kModExists DSIC.hSmMod
-    CompanionTheory.D.gk.admitted.kFin_mem_smoothVecs DSIC.hKFinStab DSIC.hStabLink DSIC.hHWofType
-    DSIC.hTypeOfHW
+    CompanionTheory.D.gk.admitted.kFin_mem_smoothVecs _root_.UpperTheory.Reformulated.B.Gc1.kFinStab
+    DSIC.hStabLink DSIC.hHWofType DSIC.hTypeOfHW
 
 theorem hOrthCyc : OrthCyc := GlobalTheory.CompanionTheory.LowKType.orthCyc
 
 theorem low_K_type_multiplicity_one_unconditional : LowKMultOneP :=
-  lowKMultOneP_of hMultAlg hKModExists cyclic_vectors_dense hOrthCyc
+  lowKMultOneP_of hMultAlg hKModExists cyclic_vectors_dense
+    _root_.GlobalTheory.CompanionTheory.LowKType.orthCyc
 
 end CompanionTheory.D.LK

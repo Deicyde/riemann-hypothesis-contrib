@@ -62,6 +62,8 @@ import Formalism.LocalToGlobal.IndefiniteReal.IndefiniteWeightData
 import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
 import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GapAtLeast
 import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HermitianStepLevelOfChartFormsLevel
+import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapLoc
 
 @[expose] public section
 
@@ -84,12 +86,6 @@ theorem sigR_tmul (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (e : E) 
     : Formalism.UG.sigR σ (v.adicCompletion F) (e ⊗ₜ[F] y) = σ e ⊗ₜ[F] y := by
   simp [Formalism.UG.sigR, Algebra.TensorProduct.map_tmul]
 
-theorem sigR_inclE (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (e : E)
-    : Formalism.UG.sigR σ (v.adicCompletion F) (Formalism.UG.inclE (F := F) (v.adicCompletion F) e)
-      = Formalism.UG.inclE (F := F) (v.adicCompletion F) (σ e) := by
-  show Formalism.UG.sigR σ (v.adicCompletion F) (e ⊗ₜ[F] 1) = σ e ⊗ₜ[F] 1
-  exact sigR_tmul σ v e 1
-
 theorem sigR_sigR
     (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
     (v : HeightOneSpectrum (𝓞 F)) (a : E ⊗[F] v.adicCompletion F)
@@ -99,34 +95,6 @@ theorem sigR_sigR
   | zero => simp
   | tmul e y => rw [sigR_tmul, sigR_tmul, hσ]
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb]
-
-theorem sigR_mem_intV
-    (σ : E →ₐ[F] E)
-    (v : HeightOneSpectrum (𝓞 F))
-    {a : E ⊗[F] v.adicCompletion F} (ha : a ∈ Formalism.BasicNotions.intV E v)
-    : Formalism.UG.sigR σ (v.adicCompletion F) a ∈ Formalism.BasicNotions.intV E v := by
-  have h
-      : Formalism.BasicNotions.intV E v
-        ≤ (Formalism.BasicNotions.intV E v).comap (Formalism.UG.sigR σ (v.adicCompletion F)) := by
-    show Subring.closure _ ≤ _
-    rw [Subring.closure_le]
-    rintro _ (⟨⟨e, he⟩, rfl⟩ | ⟨⟨y, hy⟩, rfl⟩)
-    · show Formalism.UG.sigR σ (v.adicCompletion F) (e ⊗ₜ[F] 1) ∈ Formalism.BasicNotions.intV E v
-      rw [sigR_tmul]
-      apply Subring.subset_closure
-      left
-      exact ⟨⟨σ e, GlobalTheory.uLocDual_intOE_map (σ : E →+* E) he⟩, rfl⟩
-    · show Formalism.UG.sigR σ (v.adicCompletion F) (1 ⊗ₜ[F] y) ∈ Formalism.BasicNotions.intV E v
-      rw [sigR_tmul, map_one]
-      apply Subring.subset_closure
-      right
-      exact ⟨⟨y, hy⟩, rfl⟩
-  exact h ha
-
-theorem inclE_int (v : HeightOneSpectrum (𝓞 F)) (r : 𝓞 E)
-    : Formalism.UG.inclE (F := F) (v.adicCompletion F) (r : E) ∈ Formalism.BasicNotions.intV E v :=
-  Formalism.UG.P.easyc_inclE_mem (F := F) (v.adicCompletion F)
-    (v.adicCompletionIntegers F).toSubring _ ⟨r, rfl⟩
 
 theorem one_int (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (a b : Fin n)
     : (1 : Matrix (Fin n) (Fin n) (E ⊗[F] v.adicCompletion F)) a b
@@ -170,7 +138,7 @@ theorem mulVec_mem_dLat
         rw [← mul_assoc, mul_comm (Formalism.UG.inclE (F := F) (v.adicCompletion F) (p : E)), hPinv,
           one_mul]
       rw [e]
-      exact mul_mem (inclE_int v p) h2
+      exact mul_mem (_root_.Formalism.MainNotions.Gaps.LG.fm_incl_mem v p) h2
     · exact h1 j hj
   refine (key _).2 ⟨fun i _ => ?_, ?_⟩
   · show ∑ j, N i j * y j ∈ Formalism.BasicNotions.intV E v
@@ -263,7 +231,7 @@ theorem mem_Uloc
               : Matrix (Fin n) (Fin n) (E ⊗[F] v.adicCompletion F))
             a b
           ∈ Formalism.BasicNotions.intV E v := by
-    intro a b; rw [hMient]; exact sigR_mem_intV σ v (hint b a)
+    intro a b; rw [hMient]; exact _root_.GlobalTheory.sigR_mem_intV_adic σ v (hint b a)
   choose c hc hcl using hlast
   have hmat
       : ((x⁻¹ : GL (Fin n) (E ⊗[F] v.adicCompletion F))
@@ -319,7 +287,9 @@ theorem mem_Uloc
     by
       intro i
       have h := congrArg (Formalism.UG.sigR σ (v.adicCompletion F)) (hMilast i)
-      rw [map_sub, map_mul, hMient, sigR_sigR σ hσ v, sigR_inclE, ← hq, hs1] at h
+      rw [map_sub, map_mul, hMient, sigR_sigR σ hσ v, _root_.GlobalTheory.sigR_inclE_adic, ← hq,
+          hs1]
+        at h
       exact h
 
   have h1 : x ∈ Formalism.UG.levelVL σ (1 : Matrix (Fin n) (Fin n) E) v S.Lb := by
@@ -350,7 +320,9 @@ theorem mem_Uloc
       by_cases hj : j = Formalism.L2.Col.lastIdx n
       · rw [hj, Matrix.sub_apply, hcol i,
           mul_comm (Formalism.UG.inclE (F := F) (v.adicCompletion F) (q : E)), mul_assoc]
-        exact mul_mem (sigR_mem_intV σ v (neg_mem (sum_mem fun k _ => mul_mem (hc k) (hMiint k i))))
+        exact mul_mem
+          (_root_.GlobalTheory.sigR_mem_intV_adic σ v
+            (neg_mem (sum_mem fun k _ => mul_mem (hc k) (hMiint k i))))
           hy2
       · exact mul_mem (sub_mem (hint i j) (one_int v i j)) (hy1 j hj)
     · show Formalism.UG.inclE (F := F) (v.adicCompletion F) ((p : E)⁻¹) *
@@ -394,9 +366,10 @@ theorem mem_Uloc
         rw [e]
         exact mul_mem
           (add_mem
-            (mul_mem (inclE_int v a)
-              (sigR_mem_intV σ v (neg_mem (sum_mem fun k _ => mul_mem (hc k) (hMiint k _)))))
-            (mul_mem (inclE_int v b) (hc _)))
+            (mul_mem (_root_.Formalism.MainNotions.Gaps.LG.fm_incl_mem v a)
+              (_root_.GlobalTheory.sigR_mem_intV_adic σ v
+                (neg_mem (sum_mem fun k _ => mul_mem (hc k) (hMiint k _)))))
+            (mul_mem (_root_.Formalism.MainNotions.Gaps.LG.fm_incl_mem v b) (hc _)))
           hy2
       · rw [Matrix.sub_apply, hcl j, ← mul_assoc, ← mul_assoc, hPinv, one_mul]
         exact mul_mem (hc j) (hy1 j hj)

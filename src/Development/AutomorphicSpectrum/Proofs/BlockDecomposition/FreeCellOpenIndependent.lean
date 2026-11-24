@@ -2,9 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FreeCell
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitsOpenEmbeddingLocalTensor
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LinearlyIndependentFramesOpenStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LinearlyIndependentFramesOpen
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -152,7 +153,6 @@ theorem yPart_linearIndependent
   have htail : tailH w = 0 := funext hwr
   have hx0 : ∀ y, hR R σ (hypOne J) (X 0) y = hLin R σ (hypOne J) (X 0) y := fun _ => rfl
   have hzero : hR R σ (hypOne J) (X 0) w = 0 := by
-
     rw [hx0, hw, map_sub, map_sum, map_smul]
     have h1 : ∀ j : Fin n, hLin R σ (hypOne J) (X 0) (g j • X j.succ) = 0 := fun j => by
       rw [map_smul, ← hx0]
@@ -372,7 +372,7 @@ theorem freeCell_props
   haveI := iSC
   haveI := iT2
   obtain ⟨kTR, kLC, kSC, kT2, ksig, -, -, -, -, -⟩ :=
-    GlobalTheory.T.tensor_locally_compact_ring F E σ hCM R
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM R
   haveI := kTR
   haveI := kLC
   haveI := kSC
@@ -380,7 +380,8 @@ theorem freeCell_props
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
   have hU := GlobalTheory.CompanionTheory.SW.KUnits.units_val_isOpenEmbedding F E σ hCM R hR
   refine ⟨
-    isOpen_freeCell hU (GlobalTheory.T.linearly_independent_frames_open F E σ hCM R hR n M),
+    isOpen_freeCell hU
+      (_root_.GlobalTheory.CompanionTheory.WeilSiegel.FreeOpen.isOpen_free F E σ hCM R hR n M),
     fun X hX => linearIndependent_of_yPart X hX.1 hX.2,
     fun X hX hg hu => ⟨hu, yPart_linearIndependent R σ J X hX hg hu⟩,
     fun x a s Y hu hY => ?_,

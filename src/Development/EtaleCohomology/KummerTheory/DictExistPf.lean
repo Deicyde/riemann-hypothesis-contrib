@@ -76,7 +76,7 @@ theorem phi_gen (a : Sec (I.X n) X) (U : Scheme.{0}) (x : U ⟶ X)
     congrArg
       (fun t => (t.app (op U)).hom (ModuleCat.freeMk (ULift.up x)))
       (toSheafify_sheafifyLift Scheme.etaleTopology (eta a) (I.X n).property)
-  simp only [NatTrans.comp_app, ModuleCat.hom_comp, LinearMap.comp_apply] at key
+  simp only [NatTrans.comp_app, ModuleCat.hom_comp] at key
   exact key.trans (eta_app a U x)
 
 def coch (a : Sec (I.X n) X) : Cochain ((chains R).obj (sch.obj X)) I n :=
@@ -144,5 +144,4 @@ end LateralTheory.KummerTheory.DE
 
 namespace LateralTheory.KummerTheory
 
-theorem DictExist_of : DictExist := DE.dictExist
 end LateralTheory.KummerTheory

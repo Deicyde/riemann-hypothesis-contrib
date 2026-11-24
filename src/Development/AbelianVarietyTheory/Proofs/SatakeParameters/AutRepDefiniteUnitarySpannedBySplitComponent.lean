@@ -81,7 +81,7 @@ theorem exists_locU_mul_comm
     (w : HeightOneSpectrum (𝓞 E)) (hw : IsSplitAt w)
     (g : UA E a)
     : ∃ x ∈ locU a w, ∃ y : UA E a, g = x * y ∧ ∀ z ∈ locU a w, y * z = z * y := by
-  have hb := (GlobalTheory.T.definiteUnitaryLocalComponent_splitPlace_homeomorph E a w hw).1
+  have hb := (_root_.GlobalTheory.Cong.cLoc_locU_bijective_open_continuous E a w hw).1
   obtain ⟨x, hx⟩ := hb.2 (cLoc w g)
   have hx' : cLoc w (x : UA E a) = cLoc w g := hx
   refine ⟨x, x.2, (x : UA E a)⁻¹ * g, by group, fun z hz => ?_⟩

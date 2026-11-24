@@ -121,7 +121,7 @@ theorem fromSpecStalk_appLE
   have e
       : (homOfLE (le_top : X.fromSpecStalk p ⁻¹ᵁ U ≤ ⊤)).op ≫ (homOfLE h).op
         = 𝟙 (Opposite.op (⊤ : (Spec (X.presheaf.stalk p)).Opens)) := by
-    first | exact Subsingleton.elim _ _ | rfl
+    first | exact Subsingleton.elim _ _
   rw [e]
   exact (congrArg
     (fun t => X.presheaf.germ U p hp ≫ (Scheme.ΓSpecIso (X.presheaf.stalk p)).inv ≫ t)

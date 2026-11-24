@@ -404,8 +404,7 @@ theorem exists_io_poly
     rw [map_smul, map_smul, LinearMap.smul_apply, hio, smul_smul, smul_smul, hψ0, hmv _ hbK, factK]
     have : (fun τ => ((((k₀ * κ) τ).map star)⁻¹)ᵀ) = k₀ * κ := funext fun τ => invT_conj (hκ' τ).1
     have hm :=
-      (GlobalTheory.T.fockPolynomialAction_one_mul_adjoint D W.rank V.rank M.ε x₁ x₂ x₃).2.1 k₀ κ 1
-        1
+      (_root_.GlobalTheory.JointHarm.fact_one_mul_adj D W.rank V.rank M.ε x₁ x₂ x₃).2.1 k₀ κ 1 1
         (fun τ => mem_KC_of_K (hk₀ τ))
         (fun τ => mem_KC_of_K (hκ τ))
         (fun _ => isUnit_one)
@@ -577,7 +576,7 @@ theorem fact_mul_cancel
     (hk' : ∀ τ, k' τ ∈ Formalism.REAL.Kset (ε τ)) (h : k * k' = 1)
     (P : PolF D m n)
     : fact ε x₁ x₂ x₃ k 1 (fact ε x₁ x₂ x₃ k' 1 P) = P := by
-  have H := GlobalTheory.T.fockPolynomialAction_one_mul_adjoint D m n ε x₁ x₂ x₃
+  have H := _root_.GlobalTheory.JointHarm.fact_one_mul_adj D m n ε x₁ x₂ x₃
   have hm :=
     H.2.1 k k' 1 1
       (fun τ => mem_KC_of_K (hk τ))

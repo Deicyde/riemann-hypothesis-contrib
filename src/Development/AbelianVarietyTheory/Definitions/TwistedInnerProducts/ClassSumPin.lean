@@ -53,7 +53,6 @@ variable
   {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
   {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
 
-
 def ClassSumPin (p : PtAt ex Csz) : Prop :=
   ∀ (w : D.what₂.places.Pl) (i : Fin D.R.m) (h1 : 1 ≤ (i : ℕ) + 1) (h2 : (i : ℕ) + 1 ≤ D.R.m)
       (t : p.P.T) (ht : p.P.I.tup t = D.what₂.muTw w),

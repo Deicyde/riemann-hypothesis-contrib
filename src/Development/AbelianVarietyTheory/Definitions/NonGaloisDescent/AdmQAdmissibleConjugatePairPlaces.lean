@@ -58,9 +58,6 @@ open GlobalTheory.UnivChar (IsUnivChar withUnivChar)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

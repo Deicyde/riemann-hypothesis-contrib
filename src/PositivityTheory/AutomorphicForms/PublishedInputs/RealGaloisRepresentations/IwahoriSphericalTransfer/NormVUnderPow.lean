@@ -80,14 +80,7 @@ theorem under_under
   rw [Ideal.comap_comap]
   congr 1
   ext x
-  first
-  | exact (IsScalarTower.algebraMap_eq (𝓞 F) (𝓞 K) (𝓞 M)).symm ▸ rfl
-  | (
-      apply RingOfIntegers.coe_injective
-      simp only [RingHom.comp_apply, RingOfIntegers.algebraMap_coe]
-      exact (IsScalarTower.algebraMap_apply F K M (x : F)).symm
-    )
-  | (apply RingOfIntegers.ext; simp [IsScalarTower.algebraMap_apply F K M])
+  first | exact (IsScalarTower.algebraMap_eq (𝓞 F) (𝓞 K) (𝓞 M)).symm ▸ rfl
 
 end GlobalTheory.AttResTower
 
@@ -116,4 +109,4 @@ theorem GlobalTheory.AttResTower.attRes_comp_res
   rw [Multiset.map_map] at h3
   rw [hff]
   convert h3 using 2
-  simp [Function.comp_def, pow_mul]
+  simp [pow_mul]

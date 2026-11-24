@@ -132,7 +132,6 @@ theorem pair_int
   have hu : u ∈ OEv (E := E) v :=
     sum_mem fun p _ => sum_mem fun q _ => b_mul_mem v (hS p q) (hT q p)
   have hfix : sigR (Fv F v) σ u = u := by
-
     rw [hudef, map_sum]
 
     simp only [map_sum, map_mul]

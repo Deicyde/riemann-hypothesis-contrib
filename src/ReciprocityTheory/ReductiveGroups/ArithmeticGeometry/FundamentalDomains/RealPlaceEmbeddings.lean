@@ -62,8 +62,8 @@ instance free_int : Module.Free ℤ X.Λ := inferInstance
 
 noncomputable def zb : Basis (Fin (finrank ℤ X.Λ)) ℤ X.Λ := Module.finBasis ℤ X.Λ
 
-theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ) :
-    α • l ∈ span ℚ (X.Λ : Set (Fin r → E)) := by
+theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ)
+    : α • l ∈ span ℚ (X.Λ : Set (Fin r → E)) := by
   have hα : α = ∑ k, (integralBasis E).repr α k • integralBasis E k :=
     ((integralBasis E).sum_repr α).symm
   rw [hα, Finset.sum_smul]
@@ -73,8 +73,8 @@ theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ) :
   rw [integralBasis_apply]
   exact X.Λ.smul_of_tower_mem (RingOfIntegers.basis E k) hl
 
-theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
-    span ℚ (Set.range fun i => (g i : Fin r → E)) = ⊤ := by
+theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
+    : span ℚ (Set.range fun i => (g i : Fin r → E)) = ⊤ := by
   set S := span ℚ (Set.range fun i => (g i : Fin r → E)) with hS
   have hΛ : ∀ l ∈ X.Λ, l ∈ S := by
     intro l hl
@@ -106,8 +106,8 @@ theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
   | add y z _ _ hy hz => exact S.add_mem hy hz
   | smul α y _ hy => exact hE α y hy
 
-theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
-    LinearIndependent ℚ fun i => (g i : Fin r → E) := by
+theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
+    : LinearIndependent ℚ fun i => (g i : Fin r → E) := by
   have hZ : LinearIndependent ℤ fun i => (g i : Fin r → E) :=
     g.linearIndependent.map' (X.Λ.toAddSubgroup.subtype.toIntLinearMap)
       (LinearMap.ker_eq_bot.mpr Subtype.val_injective)
@@ -116,12 +116,12 @@ theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
 noncomputable def qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) : Basis ι ℚ (Fin r → E) :=
   Basis.mk (linIndQ X g) (spanQ_eq_top X g).ge
 
-theorem qb_apply {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) (i : ι) : qb X g i = (g i : Fin r → E) := by
+theorem qb_apply {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) (i : ι)
+    : qb X g i = (g i : Fin r → E) := by
   unfold qb
   exact Basis.mk_apply _ _ _
 
-theorem card_qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
-    Fintype.card ι = r * finrank ℚ E := by
+theorem card_qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) : Fintype.card ι = r * finrank ℚ E := by
   rw [← Module.finrank_eq_card_basis (qb X g), Module.finrank_pi_fintype]
   simp
 
@@ -180,8 +180,10 @@ theorem Tm_injective : Function.Injective (Tm X) := by
     · exact ⟨⟨_, h⟩, Subtype.ext (InfinitePlace.mk_embedding w.1)⟩
     · have h2 : ComplexEmbedding.conjugate w.1.embedding ∈ X.Ψ :=
         (X.cmType _).mpr (by rw [TraceIntegralBasis.conj_conj]; exact h)
-      exact ⟨⟨_, h2⟩, Subtype.ext ((InfinitePlace.mk_conjugate_eq _).trans
-        (InfinitePlace.mk_embedding w.1))⟩
+      exact ⟨
+        ⟨_, h2⟩,
+        Subtype.ext ((InfinitePlace.mk_conjugate_eq _).trans (InfinitePlace.mk_embedding w.1))
+      ⟩
   have h3 := congrFun hz τ
   simp only [Tm, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply] at h3
   subst hτ
@@ -224,8 +226,8 @@ noncomputable def Ja (a : Fin r) : (X.Ψ → ℂ) →ₗ[ℝ] (X.Ψ → Fin r �
     simp only [Pi.smul_apply, RingHom.id_apply]
     split_ifs <;> simp
 
-theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
-    span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) = ⊤ := by
+theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
+    : span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) = ⊤ := by
   set S := span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) with hS
   have h1 : ∀ v : Fin r → E, X.embV v ∈ S := by
     intro v
@@ -234,7 +236,7 @@ theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
       funext τ a
 
       simp only [Data.embV, Data.emb, qb_apply, Finset.sum_apply, Pi.smul_apply, Rat.smul_def,
-      map_sum, map_mul, map_ratCast, Complex.real_smul, Complex.ofReal_ratCast]
+        map_sum, map_mul, map_ratCast, Complex.real_smul, Complex.ofReal_ratCast]
     rw [hv]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (subset_span ⟨i, rfl⟩)
   rw [eq_top_iff]
@@ -257,8 +259,8 @@ theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
   rw [h3]
   exact h1 _
 
-theorem linIndR {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
-    LinearIndependent ℝ fun i => X.embV (g i : Fin r → E) := by
+theorem linIndR {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
+    : LinearIndependent ℝ fun i => X.embV (g i : Fin r → E) := by
   refine linearIndependent_of_top_le_span_of_card_eq_finrank (span_embV X g).ge ?_
   rw [card_qb X g, Module.finrank_pi_fintype]
   simp only [Module.finrank_pi_fintype, Complex.finrank_real_complex, Finset.sum_const,

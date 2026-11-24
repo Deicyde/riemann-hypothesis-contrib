@@ -259,7 +259,6 @@ theorem descent_core
       refine ⟨c, fun k hk => ?_, ?_⟩
       · rw [hc k hk]; exact ha k hk
       · have h6 : ι (y - ∑ k ∈ s, c k • z k) = 0 := by
-
           rw [map_sub, map_sum, hy, sub_eq_zero]
           refine Finset.sum_congr rfl fun k hk => ?_
           rw [hιs, hc k hk]

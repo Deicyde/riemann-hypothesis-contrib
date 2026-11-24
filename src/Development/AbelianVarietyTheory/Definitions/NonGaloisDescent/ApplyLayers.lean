@@ -145,7 +145,6 @@ variable
 
 def ioOf : WIo (serOf W hs hp hL) RA RW inclR φR gR πA := { E with ioE_φ := hI.1, ioE_γ := hI.2 }
 
-
 def etOf : WEt (ioOf E hs hp hL hI) := { W, E with }
 
 def clOf : WCl (etOf E hs hp hL hI) := { W, E with }
@@ -243,7 +242,6 @@ abbrev IoL := ioOf (F.E K s LL h).tie (H.W_s K s LL h) (p_prime P K) hL.lev hL.i
 
 theorem ioW : IoW (Γ := GamL H h) (R := SerL H F h hL) (IoL H F h hL) :=
   (F.E K s LL h).inertia_action_on_roots
-
 
 abbrev EtL := etOf (F.E K s LL h).tie (H.W_s K s LL h) (p_prime P K) hL.lev hL.io
 
@@ -348,8 +346,9 @@ theorem levLaws : LevLaws (H.W K s LL h) := by
   · have h0 : (H.W K s LL h).φ₀ X = (1 + X) ^ l - 1 := by
       rw [(H.W K s LL h).φ₀_X, (H.W K s LL h).q₀_def, P.PD_p]
     exact (GlobalTheory.Cyc.act_unique l ↥(OL LL) hl0 hlu ((H.W K s LL h).γ₀ g) (H.W K s LL h).φ₀
-      (c g) h0 ((H.W K s LL h).γ₀_comm _) ((H.W K s LL h).γ₀_X _).1
-      (((H.W K s LL h).γ₀_X _).2.trans (hc g).symm)).2.trans (GlobalTheory.Cyc.act_eq_gam _ _ _)
+        (c g) h0 ((H.W K s LL h).γ₀_comm _) ((H.W K s LL h).γ₀_X _).1
+        (((H.W K s LL h).γ₀_X _).2.trans (hc g).symm)).2.trans
+      (_root_.GlobalTheory.Cyc.Series.act_eq _ _ _)
   · convert evLaw_integers P LL using 1
     exact Algebra.algebra_ext _ _ fun r => PowerSeries.algebraMap_apply
 

@@ -70,10 +70,7 @@ theorem val_pow_lt_one {ϖ : kˣ} (hϖ : IsUnif ϖ) {c : ℕ} (hc : 1 ≤ c)
     : valuation k (ϖ : k) ^ c < 1 := by
   have h1 : valuation k (ϖ : k) < 1 := by
     rw [hϖ]
-    first
-    | exact ValuativeRel.uniformizer_lt_one k
-    | exact ValuativeRel.uniformizer_lt_one
-    | exact ValuativeRel.uniformizer_lt_one (R := k)
+    first | exact ValuativeRel.uniformizer_lt_one
   exact pow_lt_one₀ zero_le h1 (by omega)
 
 theorem val_rep_unit {ϖ : kˣ} (hϖ : IsUnif ϖ) {c : ℕ} (hc : 1 ≤ c) (y : (Res k c)ˣ)
@@ -600,7 +597,7 @@ theorem gauss_ne_zero
   have hmin : ∃ u ∈ unitCong (unifAt v ^ (condExp ν - 1)), ν u ≠ 1 := by
     have hnot : condExp ν - 1 ∉ {c | CondLE (unifAt v) c ν} := by
       have hlt : condExp ν - 1 < condExp ν := by omega
-      first | exact Nat.not_mem_of_lt_sInf hlt | exact Nat.notMem_of_lt_sInf hlt
+      first | exact Nat.notMem_of_lt_sInf hlt
     by_contra hall
     push Not at hall
     exact hnot (fun u hu => hall u hu)
@@ -627,7 +624,7 @@ theorem gauss_ne_zero
   have heq : gauss ψ ν = gS (psiLoc ψ v) ν hϖ hc1 1 := by
     delta GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.gauss gS
     refine Finset.sum_congr ?_ (fun y _ => ?_)
-    · first | rfl | congr 1 | exact Subsingleton.elim _ _
+    · first | rfl
     · split_ifs with h
       · exact absurd h (rep_ne_zero hϖ hc1 y)
       · rw [one_mul]

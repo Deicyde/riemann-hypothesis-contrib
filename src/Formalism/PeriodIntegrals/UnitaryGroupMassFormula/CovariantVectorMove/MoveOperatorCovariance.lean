@@ -341,7 +341,7 @@ theorem Nc_last
       : Fc E η a b w m (j.cycleRange.symm * Equiv.Perm.decomposeFin.symm (0, σ) * finRotate (m + 1))
           (Fin.last m)
         = η (a j) := by
-    simp [Fc, finRotate_last, Equiv.Perm.decomposeFin_symm_apply_zero, Fin.cycleRange_symm_zero]
+    simp [Fc, Equiv.Perm.decomposeFin_symm_apply_zero, Fin.cycleRange_symm_zero]
   have h1
       : (fun i : Fin m =>
           Fc E η a b w m

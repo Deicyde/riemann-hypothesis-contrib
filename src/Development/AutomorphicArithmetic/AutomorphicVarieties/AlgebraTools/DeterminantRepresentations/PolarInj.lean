@@ -89,7 +89,6 @@ theorem UpperTheory.V.AlgebraTools.Det.polarInj
     y.coeff.support.sum fun g => MonoidAlgebra.single g (MvPolynomial.X g)
   let ev : MvPolynomial F.G₀ R →ₐ[R] B := MvPolynomial.aeval fun g => y.coeff g
   have hev : MonoidAlgebra.mapRingHom F.G₀ (ev : MvPolynomial F.G₀ R →+* B) u = y := by
-
     simp only [u, map_sum, MonoidAlgebra.mapRingHom_single]
     simp only [ev, AlgHom.coe_toRingHom, MvPolynomial.aeval_X]
     exact y.sum_single
@@ -97,7 +96,7 @@ theorem UpperTheory.V.AlgebraTools.Det.polarInj
       : (ev : MvPolynomial F.G₀ R →+* B).comp (algebraMap O (MvPolynomial F.G₀ R))
         = algebraMap O B := by
     ext o
-    simp [ev, MvPolynomial.algebraMap_eq, IsScalarTower.algebraMap_apply O R B]
+    simp [ev, IsScalarTower.algebraMap_apply O R B]
   have key : D.D _ (F.star O _ n u) = D.D _ u := by
     rw [← sub_eq_zero]
     ext m

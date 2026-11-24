@@ -54,7 +54,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 namespace GlobalTheory.IntegralFrameAllCompare

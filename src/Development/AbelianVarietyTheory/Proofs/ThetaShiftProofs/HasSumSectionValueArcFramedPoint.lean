@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.MemPunctu
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.RegularLocalRing.Defs
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ChartCoordinatesHasSumStatement
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.EqZeroOfForallExistsLsumETwoPi
+public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsFramedPointChangedByLetters
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ChartCoordinatesHasSum
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FrameChangeComposeInvertBaseChangeTriangular
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FrameChangeExistsUniqueInvertible
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FrameMatrixHasSumStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FramedPointEvalNaturalWeightScaling
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.HasSumThetaGeneratorChartRatioStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsOpenChartFramedPointTestRingStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.HasSumThetaGeneratorChartRatio
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsOpenChartFramedPointTestRing
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.EqZeroOfForallExistsLsumETwoPi
 import Formalism.LocalToGlobal.ProjectiveLattices.FrameCharts
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -251,7 +254,7 @@ theorem hasSum_evR_arc
     congr 2
     exact RingHom.ext fun x => (hK (β x)).symm
   obtain ⟨p, j, y₀, hch, hmem⟩ :=
-    GlobalTheory.T.exists_openChart_framedPoint_testRing hL1.secBaseChange E H Dw l Xo c
+    _root_.GlobalTheory.Frames.exists_openChart_testRing hL1.secBaseChange E H Dw l Xo c
       (pt (IsLocalRing.closedPoint ℂ⸨X⸩))
   haveI := hch.1
   obtain ⟨φ, hφ⟩ := exists_algHom_of_mem_range j hch.2.2 pt hpt3 hmem
@@ -260,14 +263,14 @@ theorem hasSum_evR_arc
     (frChg_exists_unique_units E H Dw l Xo c _ (fun _ => 1) 1 y₁).2.2.2 y
       (by rw [hy₁.1, ← hch.2.1, ← Category.assoc, hφ, hpt2])
   obtain ⟨T₁, h₁⟩ :=
-    GlobalTheory.T.holArc_chart_coordinates_hasSum E H Dw l Xo c σ O β Y a χ W g ty Fu Ha p j φ hK
-      hχ hβ hch.1 hch.2.2 (by rw [← Category.assoc, hφ, hpt1])
+    _root_.GlobalTheory.ArcPoint.chart_coordinates_hasSum E H Dw l Xo c σ O β Y a χ W g ty Fu Ha p j
+      φ hK hχ hβ hch.1 hch.2.2 (by rw [← Category.assoc, hφ, hpt1])
   obtain ⟨T₂, h₂⟩ :=
-    GlobalTheory.T.frame_matrix_hasSum_alt hL1 hL2 E H Dw l Xo c σ O β Y a χ W g ty Fu Ha y e th z p
-      j y₀ φ y₁ G s hK hχ hβ hy hz hch hy₁ hGs
+    _root_.GlobalTheory.ArcLie.frame_matrix_hasSum hL1 hL2 E H Dw l Xo c σ O β Y a χ W g ty Fu Ha y
+      e th z p j y₀ φ y₁ G s hK hχ hβ hy hz hch hy₁ hGs
   obtain ⟨T₃, h₃⟩ :=
-    GlobalTheory.T.hasSum_thetaGenerator_chart_ratio hL1 hL2 E H Dw l Xo c σ O β Y a χ W g ty Fu Ha
-      y e th Θ p j y₀ φ y₁ G s hK hχ hβ hP hth hy hch hy₁ hGs
+    _root_.GlobalTheory.ArcQ.hasSum_generator_ratio hL1 hL2 E H Dw l Xo c σ O β Y a χ W g ty Fu Ha y
+      e th Θ p j y₀ φ y₁ G s hK hχ hβ hP hth hy hch hy₁ hGs
   have key
       : ∀ w : ℂ,
         max T₁ (max T₂ T₃) < w.im

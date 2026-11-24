@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_coeffExt_rationalForms_values_field
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_coeffExt_rationalForms_values_field
                       gramR c0R c0L
                     ∧ CoefficientBaseChange R i jL σ' (c0L i) c0')
                 ∧ ∀ t (Cl : Type) [Fintype Cl] (h : Cl → GA D (Vc D i)), PlaceEx R i t h c0' := by
-  first
-  | exact @GlobalTheory.Mem.PlaceVal.exists_coef_placeEx
-  | exact GlobalTheory.Mem.PlaceVal.exists_coef_placeEx
-  | (intros; apply GlobalTheory.Mem.PlaceVal.exists_coef_placeEx <;> assumption)
+  first | exact @GlobalTheory.Mem.PlaceVal.exists_coef_placeEx

@@ -95,7 +95,6 @@ theorem trivPar_euler
   congr 2
   · simp
   · congr 1
-    push_cast
     ring
 
 end GlobalTheory.RallisEuler

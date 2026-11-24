@@ -57,9 +57,12 @@ open Filter Topology
 
 namespace GlobalTheory.ZeroFreePrincipal
 
-theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ),
-    s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0 →
-    s.re < 1 - c / Real.log (q * (|s.im| + 2)) := by
+theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ),
+          s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0
+            → s.re < 1 - c / Real.log (q * (|s.im| + 2)) := by
   obtain ⟨c₁, hc₁, hζ⟩ := Formalism.ZF.zeroFreeRegion
   refine ⟨min c₁ (1 / 2), by positivity, fun q _ s hs hL => ?_⟩
   have hq : (1 : ℝ) ≤ q := Nat.one_le_cast.2 (Nat.pos_of_ne_zero (NeZero.ne q))
@@ -70,8 +73,9 @@ theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧
     Real.log_le_log (by positivity) (by nlinarith)
   have hcL : min c₁ (1 / 2) / Real.log (q * (|s.im| + 2)) < 1 := by
     rw [div_lt_one (by linarith)]; linarith [min_le_right c₁ (1 / 2)]
-  have he : LFunction (1 : DirichletCharacter ℂ q) s =
-      (∏ p ∈ q.primeFactors, (1 - (p : ℂ) ^ (-s))) * riemannZeta s :=
+  have he
+      : LFunction (1 : DirichletCharacter ℂ q) s
+        = (∏ p ∈ q.primeFactors, (1 - (p : ℂ) ^ (-s))) * riemannZeta s :=
     LFunctionTrivChar_eq_mul_riemannZeta hs
   rw [he] at hL
   rcases mul_eq_zero.1 hL with hp | hz
@@ -79,11 +83,12 @@ theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧
     have hpp : p.Prime := Nat.prime_of_mem_primeFactors hpq
     have hnorm := congrArg norm (sub_eq_zero.1 hp0).symm
     rw [norm_natCast_cpow_of_pos hpp.pos, norm_one, neg_re,
-      Real.rpow_def_of_pos (by exact_mod_cast hpp.pos), Real.exp_eq_one_iff] at hnorm
+        Real.rpow_def_of_pos (by exact_mod_cast hpp.pos), Real.exp_eq_one_iff]
+      at hnorm
     have hlogp : 0 < Real.log p := Real.log_pos (by exact_mod_cast hpp.one_lt)
-    have hre : s.re = 0 := by
-      rcases mul_eq_zero.1 hnorm with h | h <;> linarith
-    rw [hre]; linarith
+    have hre : s.re = 0 := by rcases mul_eq_zero.1 hnorm with h | h <;> linarith
+    rw [hre]
+    linarith
   · have hre : s.re < 1 - c₁ / Real.log (|s.im| + 2) := by
       by_contra h; exact hζ s hs (not_lt.1 h) hz
     have : min c₁ (1 / 2) / Real.log (q * (|s.im| + 2)) ≤ c₁ / Real.log (|s.im| + 2) :=

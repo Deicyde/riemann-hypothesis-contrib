@@ -111,7 +111,7 @@ theorem tprod_update_mulSingle
   funext a
   by_cases h : a = j
   · subst h; simp
-  · simp [h, Pi.mulSingle_eq_of_ne h]
+  · simp [h]
 
 theorem cl_eq_of_piTensor_equiv
     : ∀ (β : Type) [Fintype β] (Γ : β → Type) [∀ j, Group (Γ j)] [∀ j, TopologicalSpace (Γ j)]

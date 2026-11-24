@@ -48,6 +48,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
 open scoped ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weil_finitePoint_preserves_fockVacuum
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
         (χS χT : (AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.weil_finitePoint_preserves_fockVacuum
             → ∀ x ∈ GfC S, ∀ y ∈ GfC T,
               IsThetaFunO ψ S T (om (x, y) f)
                 ∧ ∀ τ, IsFockVacAt (heisO ψ S T) θ τ (cplxO (sS τ) (sT τ)) (om (x, y) f) := by
-  first
-  | exact @GlobalTheory.FockRealMove.om_fin_fockVac
-  | exact GlobalTheory.FockRealMove.om_fin_fockVac
-  | (intros; apply GlobalTheory.FockRealMove.om_fin_fockVac <;> assumption)
+  first | exact @GlobalTheory.FockRealMove.om_fin_fockVac

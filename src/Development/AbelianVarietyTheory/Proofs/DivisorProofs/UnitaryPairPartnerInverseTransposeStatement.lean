@@ -62,7 +62,4 @@ theorem _root_.GlobalTheory.T.unitaryPair_partner_inverse_transpose
               (incM D.host.F JB)),
           ∃ (g : GA D S) (h : GA D T),
             mt T h = a.1.1 ∧ mt S g = (b⁻¹).1.1ᵀ := by
-  first
-  | exact @GlobalTheory.WeilPairPartner.pair_partner
-  | exact GlobalTheory.WeilPairPartner.pair_partner
-  | (intros; apply GlobalTheory.WeilPairPartner.pair_partner <;> assumption)
+  first | exact @GlobalTheory.WeilPairPartner.pair_partner

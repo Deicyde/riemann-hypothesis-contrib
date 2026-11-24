@@ -1,11 +1,15 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSheetCover
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComplexPointsIffCentresStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CuspCorrespondenceBoundStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreLatticeLinearEquivStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComplexPointsIffCentres
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUniqueLeftBasisCoordsAdicCompletion
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CuspCorrespondenceBound
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreLatticeLinearEquiv
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CuspWeightInvariantUnderIsometry
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsUnitIffUnitAt
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CuspWeightInvariantUnderIsometryStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -110,7 +114,8 @@ theorem isCMFam_of_labVal
     {z : Spec (CommRingCat.of ℂ) ⟶ Or.𝔐.X} {σ : CMType H → (𝓞 E →+* ℂ)} (hL : Or.𝔐.LabVal z Or.sm σ)
     : IsCMFam σ := by
   obtain ⟨σ₀, h0, -, -, -, -, hcm⟩ :=
-    GlobalTheory.T.cusp_correspondence_bound E H D l (Xo l) c Y S₀ Ω K J Dc.y Or.𝔐 ℂ z
+    _root_.GlobalTheory.CompanionTheory.Ar.Cusp.LabPt.exists_labVal E H D l (Xo l) c Y S₀ Ω K J Dc.y
+      Or.𝔐 ℂ z
   have hs : ∀ τ, σ τ = σ₀ (Or.sm τ) := fun τ =>
     RingHom.ext fun a => valAt_eq Or.𝔐.tie.gen (Or.𝔐.all _) (hL τ a) (h0 (Or.sm τ) a)
   obtain ⟨h1, h2, -⟩ := hcm (RingHom.id ℂ)
@@ -136,10 +141,11 @@ theorem eq_cuspW_of_fibre
     funext fun τ => RingHom.ext fun a => valAt_eq Or.𝔐.tie.gen (Or.𝔐.all _) (hL' τ a) (hL τ a)
   subst hσ
   obtain ⟨φ, h1, h2, h3, -⟩ :=
-    GlobalTheory.T.fibre_lattice_linear_equiv E H Or.𝔐.X Or.𝔐.t z g' g Λ' Λ R' R Empty _ _ _ hF' hF
+    _root_.GlobalTheory.CompanionTheory.Ar.Cusp.FibreUnique.exists_linearEquiv_of_fibreLatVec E H
+      Or.𝔐.X Or.𝔐.t z g' g Λ' Λ R' R Empty _ _ _ hF' hF
   rw [he]
-  exact (GlobalTheory.T.cusp_weight_invariant_under_isometry E g' Λ' (CMType H) R' σ' g Λ R φ
-    (isCMFam_of_labVal Or hL) h1 h2 h3).1.symm
+  exact (_root_.GlobalTheory.CompanionTheory.Relay.cusp_weight_invariant_under_isometry E g' Λ'
+    (CMType H) R' σ' g Λ R φ (isCMFam_of_labVal Or hL) h1 h2 h3).1.symm
 
 theorem cuspWeight_torus_and_sheets
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsAbelianGalois ℚ E] (H : Host E)
@@ -155,7 +161,8 @@ theorem cuspWeight_torus_and_sheets
   intro E _ _ _ _ H D Xo l c Y II K _ J _ Ω _ _ W _ _ Dc Hd S₀ Or Q U hU
   refine ⟨fun w hw w' hw' => ?_, fun m t ht => ?_⟩
   · obtain ⟨z, -, hz⟩ :=
-      (GlobalTheory.T.complex_points_iff_centres Or.𝔐.X Ω Or.𝔐.ξ K J Dc.y Or.𝔐.tie w).1 hw.1
+      (_root_.GlobalTheory.CompanionTheory.Ar.mem_mcPts_iff_exists_coordsAt Or.𝔐.X Ω Or.𝔐.ξ K J Dc.y
+        Or.𝔐.tie w).1 hw.1
     have hI : Or.𝔐.Interior z := by
       by_contra hn
       exact hw.2 ((Or.bd z w hz).2 hn)

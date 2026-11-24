@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.LocalOperatorBlocks.ContinuousWeightFactorUnitary
 
 @[expose] public section
 
@@ -68,18 +69,6 @@ theorem toBlocks₁₂_mul (M N : M2 n)
   simp [Matrix.toBlocks₁₁, Matrix.toBlocks₁₂, Matrix.toBlocks₂₂, Matrix.mul_apply,
     Fintype.sum_sum_type]
 
-theorem toBlocks₂₁_mul (M N : M2 n)
-    : (M * N).toBlocks₂₁ = M.toBlocks₂₁ * N.toBlocks₁₁ + M.toBlocks₂₂ * N.toBlocks₂₁ := by
-  ext i j
-  simp [Matrix.toBlocks₁₁, Matrix.toBlocks₂₂, Matrix.toBlocks₂₁, Matrix.mul_apply,
-    Fintype.sum_sum_type]
-
-theorem toBlocks₂₂_mul (M N : M2 n)
-    : (M * N).toBlocks₂₂ = M.toBlocks₂₁ * N.toBlocks₁₂ + M.toBlocks₂₂ * N.toBlocks₂₂ := by
-  ext i j
-  simp [Matrix.toBlocks₁₂, Matrix.toBlocks₂₂, Matrix.toBlocks₂₁, Matrix.mul_apply,
-    Fintype.sum_sum_type]
-
 theorem mob_mul
     (M N : M2 n) (Z : Matrix (Fin n) (Fin n) ℂ) (hV : IsUnit (N.toBlocks₂₁ * Z + N.toBlocks₂₂).det)
     : mob (M * N) Z = mob M (mob N Z) := by
@@ -88,7 +77,9 @@ theorem mob_mul
   have h1 : (M * N).toBlocks₁₁ * Z + (M * N).toBlocks₁₂ = M.toBlocks₁₁ * W + M.toBlocks₁₂ * V := by
     rw [toBlocks₁₁_mul, toBlocks₁₂_mul, hVdef, hWdef]; noncomm_ring
   have h2 : (M * N).toBlocks₂₁ * Z + (M * N).toBlocks₂₂ = M.toBlocks₂₁ * W + M.toBlocks₂₂ * V := by
-    rw [toBlocks₂₁_mul, toBlocks₂₂_mul, hVdef, hWdef]; noncomm_ring
+    rw [_root_.PositivityTheory.SiegelWeilFormula.KLI.lower_left_block_mul,
+      _root_.PositivityTheory.SiegelWeilFormula.KLI.lower_right_block_mul, hVdef, hWdef]
+    noncomm_ring
   clear_value V W
   have hVV : V * V⁻¹ = 1 := Matrix.mul_nonsing_inv V hV
   have hVV' : V⁻¹ * V = 1 := Matrix.nonsing_inv_mul V hV
@@ -142,7 +133,7 @@ theorem mob_K
   rw [← hM'] at hc
   simp only [JJ, Matrix.fromBlocks_multiply] at hc
   simp only [Matrix.zero_mul, Matrix.one_mul, zero_add, add_zero, Matrix.mul_zero, Matrix.mul_one,
-      Matrix.mul_neg, Matrix.neg_mul, neg_zero]
+      Matrix.mul_neg, Matrix.neg_mul]
     at hc
   obtain ⟨e1, e2, -, -⟩ := Matrix.fromBlocks_inj.mp hc
   set σ : ℂ := ((sg : ℤ) : ℂ)
@@ -150,7 +141,7 @@ theorem mob_K
   set X := M.toBlocks₂₁ * Z0 sg + M.toBlocks₂₂ with hX
   have hnum : M.toBlocks₁₁ * Z0 sg + M.toBlocks₁₂ = (Complex.I * σ) • X := by
     rw [hX, e1, e2]
-    simp only [Z0, Matrix.mul_smul, Matrix.mul_one, smul_add, Matrix.neg_mul, smul_neg, smul_smul]
+    simp only [Z0, Matrix.mul_smul, Matrix.mul_one, smul_add, smul_neg, smul_smul]
     rw [show Complex.I * σ * (Complex.I * σ) = -1 by
       rw [mul_mul_mul_comm, Complex.I_mul_I, hσ]; ring]
     simp [neg_smul]

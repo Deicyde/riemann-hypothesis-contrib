@@ -10,7 +10,8 @@ import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IdelicCharacterP
 import Development.AbelianVarietyTheory.Proofs.GenericRegularity.MemRangeOfIsAlgebraicRatFun
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsSecCharVal
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.PowClassNumberIntegral
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliSchemeLevelMapsHeckePointsStatement
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliSchemeLevelMapsHeckePoints
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsDeltaDatumHigherLevel
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeEmbeddingLiftDatumHermitianSpace
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsMemberDictionaryContextGoodEmbedding
@@ -213,7 +214,8 @@ theorem exists_covers_rep
         ∀ c'' : Coeff (l₂ t),
           c₀.F ≤ c''.F → FnAlgClosed (Xo := Xo₂) (c := c'') := fun t => by
     obtain ⟨Xo₂⟩ :=
-      GlobalTheory.T.moduliScheme_levelMaps_heckePoints'.1 _ _ (T.Q.Dw ((i : ℕ) + 1)) (l₂ t) hpos
+      _root_.GlobalTheory.moduliScheme_levelMaps_heckePoints.1 _ _ (T.Q.Dw ((i : ℕ) + 1)) (l₂ t)
+        hpos
     obtain ⟨c₀, -⟩ := exists_coeff_ge (l₂ t) ⊥
     obtain ⟨c₁, -, h⟩ := (GlobalTheory.GeomIrr.compNe_and_exists_fnAlgClosed _ _ _ _ Xo₂ c₀ hpos).2
     exact ⟨Xo₂, c₁, h⟩

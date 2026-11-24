@@ -345,7 +345,6 @@ theorem exists_compact_support
     intro hb0
     apply h0
     rw [hdef]
-    change GlobalTheory.JSW.whit φ (g * infGL E (m + 1) (secInv y)) * _ * _ * _ * _ = 0
     rw [hW', hb0, mul_zero]
     ring
   obtain ⟨u', hu', hc'⟩ := hbC p hpS hbp

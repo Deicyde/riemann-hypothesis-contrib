@@ -190,14 +190,14 @@ theorem selfDualFor_sum
       · rintro _ ⟨x, hx, rfl⟩
         rw [mem_sumLat]
         refine ⟨by simpa [extL, extR] using hx, ?_⟩
-        have : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL, extR]
+        have : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL]
         simp only [LinearMap.coe_restrictScalars] at this ⊢
         rw [this]
         exact ΛB.zero_mem
       · rintro _ ⟨x, hx, rfl⟩
         rw [mem_sumLat]
         refine ⟨?_, by simpa [extL, extR] using hx⟩
-        have : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extL, extR]
+        have : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extR]
         simp only [LinearMap.coe_restrictScalars] at this ⊢
         rw [this]
         exact ΛA.zero_mem
@@ -219,28 +219,28 @@ theorem selfDualFor_sum
         have hm : extL (D := D) ι κ x ∈ sumLat ΛA ΛB := by
           rw [mem_sumLat]
           refine ⟨by simpa [extL, extR] using hx, ?_⟩
-          have : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL, extR]
+          have : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL]
           rw [this]
           exact ΛB.zero_mem
         obtain ⟨b, hb⟩ := h _ hm
         refine ⟨b, ?_⟩
         rw [hb, form_sum]
-        have e1 : (extL (D := D) ι κ x) ∘ Sum.inl = x := by ext i; simp [extL, extR]
-        have e2 : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL, extR]
+        have e1 : (extL (D := D) ι κ x) ∘ Sum.inl = x := by ext i; simp [extL]
+        have e2 : (extL (D := D) ι κ x) ∘ Sum.inr = 0 := by ext i; simp [extL]
         rw [e1, e2]
         simp
       · intro x hx
         have hm : extR (D := D) ι κ x ∈ sumLat ΛA ΛB := by
           rw [mem_sumLat]
           refine ⟨?_, by simpa [extL, extR] using hx⟩
-          have : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extL, extR]
+          have : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extR]
           rw [this]
           exact ΛA.zero_mem
         obtain ⟨b, hb⟩ := h _ hm
         refine ⟨b, ?_⟩
         rw [hb, form_sum]
-        have e1 : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extL, extR]
-        have e2 : (extR (D := D) ι κ x) ∘ Sum.inr = x := by ext i; simp [extL, extR]
+        have e1 : (extR (D := D) ι κ x) ∘ Sum.inl = 0 := by ext i; simp [extR]
+        have e2 : (extR (D := D) ι κ x) ∘ Sum.inr = x := by ext i; simp [extR]
         rw [e1, e2]
         simp
 

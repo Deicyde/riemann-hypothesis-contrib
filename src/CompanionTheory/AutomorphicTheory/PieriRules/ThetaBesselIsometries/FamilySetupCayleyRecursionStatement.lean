@@ -51,6 +51,7 @@ namespace Gp91
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.Gp91.GlobalTheory.T.family_setup_cayley_recursion
     : HypsG
       → ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]

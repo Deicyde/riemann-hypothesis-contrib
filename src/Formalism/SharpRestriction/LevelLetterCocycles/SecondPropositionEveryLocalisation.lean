@@ -255,7 +255,6 @@ theorem len_ker_le
       simpa [L, relMap, bigRect, Fintype.sum_prod_type, Finset.sum_apply] using hk
     rw [LinearMap.mem_ker] at hL
     have hs : ∑ j, actQ (F (θ j)) (φ v j) = κ (L θ) := by
-
       simp only [L, LinearMap.coe_mk, AddHom.coe_mk, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       exact hact _ _
@@ -267,7 +266,7 @@ theorem len_ker_le
     apply Subtype.ext
     apply hφinj
     exact congrArg Subtype.val hvw
-  first | exact Module.length_le_of_injective ψ hψ | exact Module.length_le_of_injective hψ
+  first | exact Module.length_le_of_injective ψ hψ
 
 end Ker
 
@@ -458,8 +457,7 @@ theorem pi_one_eq
     : Submodule.pi Set.univ (fun _ : δ => (1 : Submodule O (FractionRing O)))
       = LinearMap.range (LinearMap.compLeft (Algebra.linearMap O (FractionRing O)) δ) := by
   ext v
-  simp only [Submodule.mem_pi, Set.mem_univ, true_implies, forall_const, Submodule.mem_one,
-    LinearMap.mem_range]
+  simp only [Submodule.mem_pi, Set.mem_univ, forall_const, Submodule.mem_one, LinearMap.mem_range]
   constructor
   · intro h
     choose w hw using h
@@ -620,9 +618,7 @@ theorem inSpan_of_fintype
   classical
   let e := Fintype.equivFin ι
   refine ⟨Fintype.card ι, fun k => f (e.symm k), fun k => γ (e.symm k), fun k => hf _, ?_⟩
-  first
-  | exact (Equiv.sum_comp e.symm (fun k => fun x' => f k x' • rep x' (γ k))).symm
-  | exact Equiv.sum_comp e.symm (fun k => fun x' => f k x' • rep x' (γ k))
+  first | exact (Equiv.sum_comp e.symm (fun k => fun x' => f k x' • rep x' (γ k))).symm
 
 def spanAlg {X' : Type} (T' : Subalgebra (N.O i) (X' → N.O i)) (rep : X' → (GE N →* MatN N i))
     : Subalgebra (N.O i) (X' → MatN N i) where
@@ -1097,7 +1093,7 @@ theorem charpolyRev_map
   rw [← Polynomial.coe_mapRingHom, RingHom.map_det]
   congr 1
   ext i j
-  by_cases hij : i = j <;> simp [hij, Matrix.one_apply]
+  by_cases hij : i = j <;> simp [hij]
 
 theorem inSpan_tSpan
     (Kf : Type) [CommRing Kf] [Algebra (N.O i) Kf] {a : X' → MatN N i} (ha : InSpan N i T' rep a)

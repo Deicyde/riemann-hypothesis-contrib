@@ -48,6 +48,7 @@ open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie Glo
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
+
 theorem _root_.GlobalTheory.T.tameKernel_vector_unit_mul_dilated_flat
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.tameKernel_vector_unit_mul_dilated_flat
                                     → φ
                                       = Tm (fun x =>
                                         Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x)) := by
-  first
-  | exact @GlobalTheory.BaseCmp.liftKer_of_ne
-  | exact GlobalTheory.BaseCmp.liftKer_of_ne
-  | (intros; apply GlobalTheory.BaseCmp.liftKer_of_ne <;> assumption)
+  first | exact @GlobalTheory.BaseCmp.liftKer_of_ne

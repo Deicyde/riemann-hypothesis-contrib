@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulRealAdEqZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ActsRhoOfAtInf
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsAdmissibleFiniteFactorArchimedeanSchwartzStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsAdmissibleFiniteFactorArchimedeanSchwartz
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -208,7 +209,7 @@ theorem schr_equiv
     exact ((hl.comp continuous_fst).prodMk (hl.comp continuous_snd)).comp
       (he.comp (continuous_const.matrix_mul hm))
   · obtain ⟨r₀, hr₀, hinj⟩ :=
-      GlobalTheory.T.exists_admissible_finiteFactor_archimedeanSchwartz (F := F) (Fin n × Fin d)
+      _root_.GlobalTheory.ArchUniq.exists_admissible_finite_factor (F := F) (Fin n × Fin d)
     have hrr := (hr₀ 0).1
     by_cases hz : ∀ x, r₀ x = 0
     · have h0 : ∀ g : SInf F (Fin n × Fin d), g = 0 := fun g =>

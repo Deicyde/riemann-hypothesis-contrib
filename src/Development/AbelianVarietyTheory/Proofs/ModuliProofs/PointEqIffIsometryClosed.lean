@@ -4,7 +4,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsMonHomOfMapLattice
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSabCancel
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LambdaBundleIsoOfPrimeToPWeilPairingsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LambdaBundleIsoOfPrimeToPWeilPairings
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliRepOfBase
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianSchemeDimRigidifiedSym
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjPull
@@ -106,7 +107,7 @@ theorem point_eq_iff_isometry_closed
                     ∧ (∀ a, ∃ x, gam (t a) = t' a + l.A • x)
                     ∧ ∀ a, P' (gam a) = h (P a)) := fun hT hL =>
   point_eq_iff_isometry hT hL (GlobalTheory.exists_isMonHom_of_map_lattice hT hL)
-    (GlobalTheory.T.lambdaBundleIso_of_primeToP_weilPairings hL) GlobalTheory.obj_pull
+    (_root_.GlobalTheory.lam_iso_of_weil_pairings hL) GlobalTheory.obj_pull
     GlobalTheory.ObjMaps.id_comp_cancel GlobalTheory.obj_isAbelianScheme_dim_rigidified_sym
     (GlobalTheory.moduli_rep_of_base GlobalTheory.ObjMaps.id_comp_cancel)
 

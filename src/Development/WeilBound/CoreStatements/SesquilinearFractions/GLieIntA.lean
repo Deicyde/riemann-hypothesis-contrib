@@ -106,11 +106,7 @@ theorem toAt_tan {A : Over (Sp R)} [GrpObj A] (v : epsR R ⟶ A) (hv : IsTangent
   rw [toAt_left]
   unfold IsTangent at hv
   rw [hv]
-  first
-  | (rw [Hom.one_def]; simp)
-  | simp [Hom.one_def]
-  | (rw [Hom.one_def, Over.comp_left]; congr 1; simp)
-  | rfl
+  first | (rw [Hom.one_def]; simp)
 
 end PositivityTheory.Xgf.isogeny_decomposition_product
 

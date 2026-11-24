@@ -45,30 +45,44 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 open scoped Pointwise
 
-theorem UpperTheory.V.LDataCardLeFinrank.shaInfl :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (S : Finset (HeightOneSpectrum (𝓞 F))) (A : S → ValuationSubring Ω), (∀ v, IsPlaceOver (A v) v.1) → ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [T2Space M] (ρ : Representation R (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M), ContAction ρ →
-      (Sha1 ρ (locFam S A) (continuous_locFam S A)).map (resH1 ρ (toGS Ω _) (continuous_toGS Ω _)) = ShaAbs (ρ.comp (toGS Ω _)) (S : Set (HeightOneSpectrum (𝓞 F))) := by
+theorem UpperTheory.V.LDataCardLeFinrank.shaInfl
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (S : Finset (HeightOneSpectrum (𝓞 F))) (A : S → ValuationSubring Ω),
+      (∀ v, IsPlaceOver (A v) v.1)
+        → ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M] [TopologicalSpace M]
+            [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [T2Space M]
+            (ρ : Representation R (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M),
+          ContAction ρ
+            → (Sha1 ρ (locFam S A) (continuous_locFam S A)).map
+                (resH1 ρ (toGS Ω _) (continuous_toGS Ω _))
+              = ShaAbs (ρ.comp (toGS Ω _)) (S : Set (HeightOneSpectrum (𝓞 F))) := by
   intro F Ω _ _ _ _ _ S A hA R _ M _ _ _ _ _ _ ρ hρ
-  have ine_le_NS {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+  have ine_le_NS
+      {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
       {S : Set (HeightOneSpectrum (𝓞 F))} {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
-      {A : ValuationSubring Ω} (hA : IsPlaceOver A v) {τ : G F Ω} (hτ : τ ∈ Ine (F := F) A) :
-      τ ∈ NS Ω S := by
+      {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+      {τ : G F Ω} (hτ : τ ∈ Ine (F := F) A)
+      : τ ∈ NS Ω S := by
     apply Subgroup.le_topologicalClosure
     apply Subgroup.subset_normalClosure
     simp only [Set.mem_iUnion]
     exact ⟨v, hv, A, hA, hτ⟩
 
-  have vanishAll {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-      {S : Set (HeightOneSpectrum (𝓞 F))} {R : Type} [CommRing R] {M : Type}
-      [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
-      [ContinuousConstSMul R M] [T2Space M] (rhoS : Representation R (GS Ω S) M)
+  have vanishAll
+      {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+      {S : Set (HeightOneSpectrum (𝓞 F))} {R : Type} [CommRing R]
+      {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+      [ContinuousConstSMul R M] [T2Space M]
+      (rhoS : Representation R (GS Ω S) M)
       {f : G F Ω → M} (hf : f ∈ Z1 (rhoS.comp (toGS Ω S) : Representation R (G F Ω) M))
-      (hv0 : ∀ v ∉ S, ∀ A : ValuationSubring Ω, IsPlaceOver A v →
-        ∃ m, ∀ g ∈ Ine (F := F) A, f g = rhoS (toGS Ω S g) m - m) (n : G F Ω)
-      (hn : n ∈ NS Ω S) : f n = 0 := by
+      (hv0 : ∀ v ∉ S, ∀ A : ValuationSubring Ω,
+        IsPlaceOver A v → ∃ m, ∀ g ∈ Ine (F := F) A, f g = rhoS (toGS Ω S g) m - m)
+      (n : G F Ω) (hn : n ∈ NS Ω S)
+      : f n = 0 := by
     have htriv : ∀ n ∈ NS Ω S, ∀ x, rhoS (toGS Ω S n) x = x := by
       intro n hn x
       have : toGS Ω S n = 1 := (QuotientGroup.eq_one_iff n).2 hn
@@ -78,14 +92,19 @@ theorem UpperTheory.V.LDataCardLeFinrank.shaInfl :
       have := hf.2 1 1
       rw [one_mul, map_one] at this
       exact left_eq_add.1 this
-    let N : Subgroup (G F Ω) :=
-      { carrier := {n | n ∈ NS Ω S ∧ f n = 0}
-        one_mem' := ⟨one_mem _, h1⟩
-        mul_mem' := fun {a b} ha hb => ⟨mul_mem ha.1 hb.1, by rw [hf.2, ha.2, hb.2, map_zero, add_zero]⟩
-        inv_mem' := fun {a} ha => ⟨inv_mem ha.1, by
+    let N : Subgroup (G F Ω) := {
+      carrier := {n | n ∈ NS Ω S ∧ f n = 0}
+      one_mem' := ⟨one_mem _, h1⟩
+      mul_mem' := fun {a b} ha hb =>
+        ⟨mul_mem ha.1 hb.1, by rw [hf.2, ha.2, hb.2, map_zero, add_zero]⟩
+      inv_mem' := fun {a} ha => ⟨
+        inv_mem ha.1,
+        by
           have := hf.2 a⁻¹ a
           rw [inv_mul_cancel, h1, ha.2, map_zero, add_zero] at this
-          exact this.symm⟩ }
+          exact this.symm
+      ⟩
+    }
     haveI hN : N.Normal := ⟨fun a ha g => by
       have hc := (normal_NS (Ω := Ω) S).conj_mem a ha.1 g
       refine ⟨hc, ?_⟩
@@ -104,8 +123,10 @@ theorem UpperTheory.V.LDataCardLeFinrank.shaInfl :
 
   have infUnram := @UpperTheory.V.LDataCardLeFinrank.infUnram
   have hI := (infUnram F Ω (S : Set (HeightOneSpectrum (𝓞 F))) R M ρ hρ).2
-  have key : ∀ z : Z1 ρ, (Submodule.Quotient.mk z : H1 ρ) ∈ Sha1 ρ (locFam S A) (continuous_locFam S A) ↔
-      ∀ v : S, ∃ m, ∀ g ∈ Dec (F := F) (A v), z.1 (toGS Ω _ g) = ρ (toGS Ω _ g) m - m := by
+  have key
+      : ∀ z : Z1 ρ,
+        (Submodule.Quotient.mk z : H1 ρ) ∈ Sha1 ρ (locFam S A) (continuous_locFam S A)
+          ↔ ∀ v : S, ∃ m, ∀ g ∈ Dec (F := F) (A v), z.1 (toGS Ω _ g) = ρ (toGS Ω _ g) m - m := by
     intro z
     refine (Submodule.mem_iInf _).trans (forall_congr' fun v => ?_)
     exact ((Submodule.Quotient.mk_eq_zero _).trans (mem_coboundaries1 _ _)).trans
@@ -122,7 +143,9 @@ theorem UpperTheory.V.LDataCardLeFinrank.shaInfl :
     let w := restrictCocycles1 ρ (toGS Ω _) (continuous_toGS Ω _) z
     refine ⟨ρ (toGS Ω _ g) m - w.1 g, fun σ => ?_⟩
     have h1 : (σ : G F Ω) ∈ Dec (F := F) (g • A ⟨v, hv⟩) := by rw [hg]; exact σ.2
-    have h2 := GlobalTheory.Cut.ShaBound.coc_conj _ _ w.2.2 g _ m (hm _ (GlobalTheory.Cut.ShaBound.conj_mem_Dec h1))
+    have h2 :=
+      GlobalTheory.Cut.ShaBound.coc_conj _ _ w.2.2 g _ m
+        (hm _ (GlobalTheory.Cut.ShaBound.conj_mem_Dec h1))
     have h3 : g * (g⁻¹ * σ * g) * g⁻¹ = σ := by group
     rw [h3] at h2
     exact h2
@@ -131,4 +154,6 @@ theorem UpperTheory.V.LDataCardLeFinrank.shaInfl :
     obtain ⟨y, rfl⟩ := (hI x).2 h2
     refine ⟨y, ?_, rfl⟩
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-    exact (key z).2 fun v => ((mk_mem_ShaAbs _ _ (restrictCocycles1 ρ (toGS Ω _) (continuous_toGS Ω _) z)).1 hx).1 v.1 v.2 _ (hA v)
+    exact (key z).2 fun v =>
+      ((mk_mem_ShaAbs _ _ (restrictCocycles1 ρ (toGS Ω _) (continuous_toGS Ω _) z)).1 hx).1 v.1 v.2
+        _ (hA v)

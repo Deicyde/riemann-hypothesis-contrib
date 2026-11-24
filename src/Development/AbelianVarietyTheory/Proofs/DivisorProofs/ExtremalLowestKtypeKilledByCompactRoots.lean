@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CartanInvolutionConjTransposeMul
 
 @[expose] public section
 
@@ -82,22 +83,6 @@ private theorem dRepC_zero_right (Z : Mt n) : dRepC (Formalism.REAL.Jm ε) σ Z 
 
 private theorem dRepC_zero_left (v : H) : dRepC (Formalism.REAL.Jm ε) σ 0 v = 0 := by
   simp [dRepC, conjH, dRep]
-
-private theorem diagonal_exp_mem_Kset (φ : Fin n → ℝ)
-    : Matrix.diagonal (fun b => Complex.exp ((φ b : ℂ) * Complex.I)) ∈ Formalism.REAL.Kset ε := by
-  refine ⟨?_, ?_⟩
-  · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
-      Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1
-    funext b
-    rw [Pi.star_apply, Complex.star_def, ← Complex.exp_conj, ← Complex.exp_add, map_mul,
-      Complex.conj_ofReal, Complex.conj_I]
-    simp
-  · unfold Formalism.REAL.Jm
-    rw [Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
-    congr 1
-    funext b
-    ring
 
 theorem isWtOn_proj
     (hσ : IsURepOn (UJset ε) σ)
@@ -282,11 +267,6 @@ theorem conjH_single {a c : Fin n} (h : ε a = ε c)
   rw [Jm_inv, single_ct_lemma, Matrix.mul_assoc, (commute_single h.symm).eq, ← Matrix.mul_assoc,
     Formalism.REAL.Jm_mul_self, Matrix.one_mul]
 
-private theorem star_one_div_two : star (1 / 2 : ℂ) = 1 / 2 := by simp
-
-private theorem star_one_div_two_mul_I : star (1 / (2 * Complex.I)) = -(1 / (2 * Complex.I)) := by
-  rw [Complex.star_def, map_div₀, map_one, map_mul, Complex.conj_I, map_ofNat, mul_neg, div_neg]
-
 theorem inner_dRepC
     {S : Submodule ℂ H} (hS : IsKStableOn ε σ S)
     {w v : H} (hw : ∀ x ∈ S, ⟪w, x⟫_ℂ = 0) (hv : v ∈ S)
@@ -300,15 +280,15 @@ theorem inner_dRepC
       : ((1 / 2 : ℂ) • (Matrix.single a c (1 : ℂ) + - Matrix.single c a 1))ᴴ
         = -((1 / 2 : ℂ) • (Matrix.single a c (1 : ℂ) + - Matrix.single c a 1)) := by
     rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.conjTranspose_neg,
-      single_ct_lemma, single_ct_lemma, star_one_div_two, ← smul_neg]
+      single_ct_lemma, single_ct_lemma, _root_.Formalism.REAL.star_one_half, ← smul_neg]
     congr 1
     abel
   have k2
       : ((1 / (2 * Complex.I)) • (Matrix.single a c (1 : ℂ) - - Matrix.single c a 1))ᴴ
         = -((1 / (2 * Complex.I)) • (Matrix.single a c (1 : ℂ) - - Matrix.single c a 1)) := by
     rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_sub, Matrix.conjTranspose_neg,
-      single_ct_lemma, single_ct_lemma, star_one_div_two_mul_I, neg_smul, sub_neg_eq_add,
-      sub_neg_eq_add, add_comm]
+      single_ct_lemma, single_ct_lemma, _root_.Formalism.REAL.star_one_div_two_I, neg_smul,
+      sub_neg_eq_add, sub_neg_eq_add, add_comm]
   have c1 : Commute ((1 / 2 : ℂ) • (Matrix.single a c (1 : ℂ) + - Matrix.single c a 1))
       (Formalism.REAL.Jm ε) :=
     (hc.add_left hc'.neg_left).smul_left _
@@ -357,7 +337,7 @@ theorem dRepC_diag
       · subst hij
         rw [Matrix.diagonal_apply_eq]
         by_cases hia : i = a
-        · subst hia; simp [Matrix.single, Complex.real_smul] <;> ring
+        · subst hia; simp [Matrix.single, Complex.real_smul]
         · simp [Matrix.single, hia, Ne.symm hia]
       · rw [Matrix.diagonal_apply_ne _ hij]
         simp only [Matrix.smul_apply, Matrix.single, Matrix.of_apply]
@@ -387,8 +367,7 @@ theorem dRepC_diag
   congr 1
   first
   | (
-      simp only [mul_zero, neg_zero, Complex.ofReal_zero, zero_mul, Complex.exp_zero, one_mul,
-        mul_one, Complex.ofReal_neg, Complex.ofReal_mul, Complex.ofReal_one]
+      simp only [mul_one, Complex.ofReal_neg]
       linear_combination (-(μ a : ℂ)) * Complex.I_mul_I
     )
   | simp [Complex.ext_iff]
@@ -545,7 +524,7 @@ theorem extremal_killed
     have hmulDP := hσ.1.2 _ (mem_UJset_of_mem_Kset_divisor hθ) P hPU
     have hmulP :=
       hσ.1.2 P hPU (Q * Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) * P)
-        (by rw [hD']; exact mem_UJset_of_mem_Kset_divisor (diagonal_exp_mem_Kset _))
+        (by rw [hD']; exact mem_UJset_of_mem_Kset_divisor (_root_.Formalism.IndefR.FWT.diag_mem _))
     have hPD
         : P * (Q * Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) * P)
           = Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) * P := by
@@ -560,7 +539,7 @@ theorem extremal_killed
       _ = σ P (σ (Q * Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) * P) x) := by
         rw [← hPD, hmulP]; rfl
       _ = Complex.exp (((∑ b, ν (s.symm b) * θ b : ℝ) : ℂ) * Complex.I) • σ P x := by
-        rw [hD', hx (fun b => θ (s b)) (diagonal_exp_mem_Kset _), map_smul, hsumP]
+        rw [hD', hx (fun b => θ (s b)) (_root_.Formalism.IndefR.FWT.diag_mem _), map_smul, hsumP]
   have h0 : SmoothVec (lieH (Formalism.REAL.Jm ε)) σ (0 : H) := fun k Xs _ => by
     simp only [map_zero]; exact contDiff_const
   obtain ⟨-, -, hequiv, -⟩ :=

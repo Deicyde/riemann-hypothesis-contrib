@@ -85,10 +85,7 @@ private lemma plOf_colIdx (l : K.Col i dc) : K.plOf i dc (K.colIdx i dc l) = l.1
 theorem col_over (l : K.Col i dc)
     : K.plOf i dc (K.colIdx i dc l) ∈ placesOver D.host.E (D.nd.l i) := by
   rw [plOf_colIdx]
-  first
-  | exact (dc.cover l.1).mp (Or.inr l.2)
-  | exact ((dc.cover l.1).mp (Or.inr l.2)).1
-  | (have h := (dc.cover l.1).mp (Or.inr l.2); done)
+  first | exact (dc.cover l.1).mp (Or.inr l.2)
 
 theorem col_hp (l : K.Col i dc)
     : (K.Aw i dc (K.colIdx i dc l)).valuation ((D.nd.l i : ℕ) : D.nd.Om) < 1 := by

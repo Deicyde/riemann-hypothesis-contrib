@@ -173,7 +173,7 @@ theorem exists_irrRep_wd
     GlobalTheory.ProdFiniteLength.piTensor_isIrreducible_of_schur _
       (fun a => (w.get a).2.rep.irr)
       fun a φ hφ =>
-        GlobalTheory.SchurAdm.schur_admissible _ (KO k (Fin (w.get a).1))
+        _root_.GlobalTheory.SchurAdmissibility.schur_admissible _ (KO k (Fin (w.get a).1))
           GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO _ _
           (w.get a).2.rep.irr (hA k _ _ _ (w.get a).2.rep.smooth (w.get a).2.rep.irr) φ hφ
   have hT1 : IsSubquotient π (⊤ : Subrepresentation π).toRepresentation :=

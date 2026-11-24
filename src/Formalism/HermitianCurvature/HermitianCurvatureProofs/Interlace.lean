@@ -198,12 +198,3 @@ theorem interlaceRatio : InterlaceRatio := by
     rwa [mul_comm (|Y + 1/2 + u' l|), mul_comm (∏ i ∈ Icc 1 k, (Y + 1/2 + u' i))] at this
 
 end Formalism.FourierDecayAlt.P.Interlace
-
-theorem Formalism.FourierDecayAlt.P.interlacing_sign : Formalism.FourierDecayAlt.I.InterlaceSign :=
-  Formalism.FourierDecayAlt.P.Interlace.interlaceSign
-theorem Formalism.FourierDecayAlt.P.q_positive_interlacing
-    : Formalism.FourierDecayAlt.I.QPositive :=
-  Formalism.FourierDecayAlt.P.Interlace.qPositive
-theorem Formalism.FourierDecayAlt.P.interlacing_ratio
-    : Formalism.FourierDecayAlt.I.InterlaceRatio :=
-  Formalism.FourierDecayAlt.P.Interlace.interlaceRatio

@@ -65,8 +65,6 @@ open GlobalTheory.SplitHecke GlobalTheory.SplitHomLattice Formalism.L2.NTheta
 
 variable {D : D7}
 
-theorem cA_cA' (z : AE D) : cA D (cA D z) = z := GlobalTheory.SplitDualLat.cA_cA z
-
 theorem cA_algebraMap (y : AF D.host.F)
     : cA D (algebraMap (AF D.host.F) (AE D) y) = algebraMap (AF D.host.F) (AE D) y := by
   change y ⊗ₜ[D.host.F] star (1 : D.host.E) = y ⊗ₜ[D.host.F] (1 : D.host.E)
@@ -77,20 +75,24 @@ theorem chart_conj
     : Chart (cA D e) v (π.comp (cA D)) := by
   refine ⟨fun x => ?_, fun a => ?_, fun y => ?_, fun a => ?_⟩
   · obtain ⟨z, rfl⟩ := hπ.1 x
-    exact ⟨cA D z, by simp only [RingHom.comp_apply, cA_cA']⟩
+    exact ⟨cA D z, by simp only [RingHom.comp_apply, _root_.Formalism.L2.Theta.cA_cA]⟩
   · rw [RingHom.comp_apply, hπ.2.1]
     constructor
     · intro h
       have := congrArg (cA D) h
-      rwa [RingHom.map_mul, cA_cA', RingHom.map_zero] at this
+      rwa [RingHom.map_mul, _root_.Formalism.L2.Theta.cA_cA, RingHom.map_zero] at this
     · intro h
-      rw [← cA_cA' e, ← RingHom.map_mul, h, RingHom.map_zero]
+      rw [← _root_.Formalism.L2.Theta.cA_cA e, ← RingHom.map_mul, h, RingHom.map_zero]
   · rw [RingHom.comp_apply, cA_algebraMap, hπ.2.2.1]
   · rw [RingHom.comp_apply, ← hπ.2.2.2]
     have h1 : finPart D (cA D e * a) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (e * cA D a)) := by
-      rw [← GlobalTheory.SplitDualLat.finPart_cA]; congr 1; rw [map_mul, cA_cA']
+      rw [← GlobalTheory.SplitDualLat.finPart_cA]
+      congr 1
+      rw [map_mul, _root_.Formalism.L2.Theta.cA_cA]
     have h2 : finPart D (e * cA D a) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (cA D e * a)) := by
-      rw [← GlobalTheory.SplitDualLat.finPart_cA]; congr 1; rw [map_mul, cA_cA']
+      rw [← GlobalTheory.SplitDualLat.finPart_cA]
+      congr 1
+      rw [map_mul, _root_.Formalism.L2.Theta.cA_cA]
     constructor
     · intro h; rw [h2]; exact GlobalTheory.SplitDualLat.sigR_mem_intAE h
     · intro h; rw [h1]; exact GlobalTheory.SplitDualLat.sigR_mem_intAE h
@@ -132,7 +134,7 @@ theorem conj_rk
     : π (cA D (rk S T a (fun k => finPart D (e * s k)) (fun k => finPart D (cA D e * t k)) p q))
       = π (cA D (incA D a)) * π (cA D (t p)) * ∑ k, π (s k) * π (cA D (incA D (S.gram k q))) := by
   have h := pi_rk (isSplitIdem_conj he) (chart_conj hπ) S T a s t p q
-  simp only [RingHom.comp_apply, cA_cA'] at h
+  simp only [RingHom.comp_apply, _root_.Formalism.L2.Theta.cA_cA] at h
   exact h
 
 theorem frame_cancel
@@ -259,7 +261,7 @@ theorem conj_half_onto
       e he (t' l)).2 fun j => ?_
     have h1 : (fun k => rdA φ (cA D (t' l k))) = (fun m => Y l m) ᵥ* Z := by
       funext k
-      rw [ht', cA_cA', hσ]
+      rw [ht', _root_.Formalism.L2.Theta.cA_cA, hσ]
     rw [← hGt, ← hBT, h1, Matrix.vecMul_vecMul, hZ1, Matrix.vecMul_one]
     exact hYint l j
   obtain ⟨U, hU⟩
@@ -275,7 +277,8 @@ theorem conj_half_onto
           rdA φ (cA D ((cA D e • U) p q)) = c * ∑ l, (Y * Z) l p * ∑ k, BS.1 k l * Gs q k := by
       intro p q
       have h0 : (cA D e • U) p q = cA D e * U p q := rfl
-      rw [h0, map_mul (cA D), cA_cA', map_mul (rdA φ), he.2.2, one_mul, hU, map_cA_sum_apply]
+      rw [h0, map_mul (cA D), _root_.Formalism.L2.Theta.cA_cA, map_mul (rdA φ), he.2.2, one_mul, hU,
+        map_cA_sum_apply]
       refine Eq.trans (Finset.sum_congr rfl fun l _ => ?_) (Finset.mul_sum _ _ _).symm
       rw [conj_rk hsi hπ S T a (s' l) (t' l) p q]
       have hYZ : ((fun m => Y l m) ᵥ* Z) p = (Y * Z) l p := rfl
@@ -283,8 +286,8 @@ theorem conj_half_onto
         intro k
         rw [hs', hσ, GlobalTheory.SplitDualLat.cA_incA, hQ, GlobalTheory.LatVac.gram_star, hGs,
           Matrix.map_apply]
-      rw [GlobalTheory.SplitDualLat.cA_incA, hQ, ← hcdef, ht', cA_cA', hσ, hYZ,
-        Finset.sum_congr rfl fun k _ => hk k, mul_assoc]
+      rw [GlobalTheory.SplitDualLat.cA_incA, hQ, ← hcdef, ht', _root_.Formalism.L2.Theta.cA_cA, hσ,
+        hYZ, Finset.sum_congr rfl fun k _ => hk k, mul_assoc]
     have hT'
         : (((cA D e • U : WO S T) : Matrix (Fin T.rank) (Fin S.rank) (AE D)).map fun x =>
             rdA φ (cA D x))ᵀ

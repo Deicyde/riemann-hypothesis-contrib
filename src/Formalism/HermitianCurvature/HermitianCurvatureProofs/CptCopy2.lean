@@ -161,7 +161,8 @@ theorem _root_.Formalism.FourierDecayAlt.P.CutBPEq.thmBpAt_eq_limEvTCpt
   have hNorm :=
     hN P Wp Wq Wqp Wqm up up' um um' p pp pm f Ap Am ApPt AmPt b n₀ p₀ hzp hzp' hzm hzm' hAms
   have hReg :=
-    Formalism.FourierDecayAlt.P.regularity_at_place p f b C₃ (2 * p₀ + n₀) (by linarith) hexp
+    _root_.Formalism.FourierDecayAlt.P.TBBx4.regularity_at_place_of_expansion p f b C₃ (2 * p₀ + n₀)
+      (by linarith) hexp
   have hPp :=
     hPt Wp Wqp (shP P up up') pp (fpmSh pp f Ap p₀) Λ A₁ χ nnp Yp K N hΛ hK hKN hχ hnnp hDDp
       (ckOn_fpmSh pp p₀ hf hAp) hdp hth1 hth2 hth3 hWGp hLGp hI5p hDp hBdp

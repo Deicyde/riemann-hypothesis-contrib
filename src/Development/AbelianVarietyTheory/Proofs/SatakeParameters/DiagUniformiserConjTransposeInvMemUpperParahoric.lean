@@ -181,7 +181,7 @@ theorem facts_of_mem
     have e2
         : ((Matrix.GeneralLinearGroup.map c.toRingHom a).val - 1) q p
           = c (a.val q p - if q = p then 1 else 0) := by
-      by_cases h : q = p <;> simp [Matrix.one_apply, h]
+      by_cases h : q = p <;> simp [h]
     rw [e2, hc] at this
     exact this
 

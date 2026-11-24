@@ -76,8 +76,7 @@ theorem exists_coord_pi
     ?_
   ⟩
   intro x y
-  simp only [Homeomorph.trans_apply, Homeomorph.piCongrRight_apply,
-    ContinuousLinearEquiv.coe_toHomeomorph]
+  simp only [Homeomorph.trans_apply, ContinuousLinearEquiv.coe_toHomeomorph]
   rw [← map_add (f := _)]
   congr 1
   funext i

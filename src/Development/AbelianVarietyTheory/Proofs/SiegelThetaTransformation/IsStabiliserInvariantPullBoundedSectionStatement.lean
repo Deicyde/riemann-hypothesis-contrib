@@ -53,6 +53,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.isStabiliserInvariant_pull_bounded_section
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X' X : Data E r)
         (h : SameSp X' X) (ga : GL (Fin r) E) (la' : Wt X'.Ψ r) (la : Wt X.Ψ r)
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.isStabiliserInvariant_pull_bounded_section
                     ∧ ∀ b ∈ Bor X'.Ψ r,
                       Q (lact ga (castFr h.psi (rmul x b)))
                         = bchar la' b * Q (lact ga (castFr h.psi x)) := by
-  first
-  | exact @GlobalTheory.Dict.isStabForm_pull
-  | exact GlobalTheory.Dict.isStabForm_pull
-  | (intros; apply GlobalTheory.Dict.isStabForm_pull <;> assumption)
+  first | exact @GlobalTheory.Dict.isStabForm_pull

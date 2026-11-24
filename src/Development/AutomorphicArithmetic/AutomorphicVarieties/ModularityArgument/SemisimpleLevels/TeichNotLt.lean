@@ -94,7 +94,7 @@ theorem UpperTheory.V.Lev.teichDvd
     · rw [Nat.one_mod_eq_one.mpr (by omega), pow_one]
   have hbar := hD.om_bar σ
   simp only [Raw.bar, hom, chiO, MonoidHom.comp_apply, hcyc] at hbar
-  simp [Units.coe_map] at hbar
+  simp at hbar
   have hch :=
     (Ws.Gys.coefFacts c (ResidueField c.O) (residue c.O)
       (fun x hx => (IsLocalRing.residue_eq_zero_iff x).mpr hx)).1

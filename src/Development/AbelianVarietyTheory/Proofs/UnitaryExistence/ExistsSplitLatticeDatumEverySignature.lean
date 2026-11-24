@@ -4,7 +4,7 @@ public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.P
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsDatumSumAndAllSignatures
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsConjDatum
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.HermitianDatumDirectPower
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.HermitianLatticeSignatureSplitOfDefiniteStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.HermitianLatticeSignatureSplitOfDefinite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -151,8 +151,8 @@ theorem exists_splitLat_of_signature
   · change p * D.q + q * D.p = q
     simp [hp, hq]
   · refine SplitSum.splitLat_sum
-      (GlobalTheory.T.hermitianLatticeSignatureSplit_of_definite E H _ (Or.inr ?_))
-      (GlobalTheory.T.hermitianLatticeSignatureSplit_of_definite E H _ (Or.inl ?_))
+      (_root_.GlobalTheory.CompRat.splitLat_of_definite E H _ (Or.inr ?_))
+      (_root_.GlobalTheory.CompRat.splitLat_of_definite E H _ (Or.inl ?_))
     · change p * D.q = 0
       simp [hq]
     · change q * D.q = 0

@@ -204,7 +204,6 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
     intro x hx hx0
     obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hx
     have hxz : ∑ i, c i • b i = ψ (∑ i, (c i : ℚ) • β i) := by
-
       rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [LinearMap.map_smul, Int.cast_smul_eq_zsmul, coe_basisOfLinearIndependentOfCardEqFinrank]
@@ -233,7 +232,7 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
     refine InnerProductSpace.ext_inner_right_basis b fun j => ?_
 
     rw [hm, coe_basisOfLinearIndependentOfCardEqFinrank, hpair, hω, Finset.sum_mul, map_sum]
-    simp [smul_mul_assoc, hαβ]
+    simp [hαβ]
   refine ⟨ω, ?_, ?_⟩
   · have h := hyli.restrict_scalars' ℚ
     rw [show y = fun k => φ (ω k) from funext hy] at h

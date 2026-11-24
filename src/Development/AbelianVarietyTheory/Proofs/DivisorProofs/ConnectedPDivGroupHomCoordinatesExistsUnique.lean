@@ -2,10 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboundarySmul
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EqZeroOfCobOneEqZero
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConnectedChartEvalSquareVariablesSwapConstantStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CounitCotangentClassPowerSeriesEvalAtNilpotentStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FunctionsEqSeriesInChartStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NilpotentEvalCommutesSubstAndAlgebraMapStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConnectedChartEvalSquareVariablesSwapConstant
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CounitCotangentClassPowerSeriesEvalAtNilpotent
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FunctionsEqSeriesInChart
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NilpotentEvalCommutesSubstAndAlgebraMap
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowerSeriesEvalAtNilpotentXEqCoordinate
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -66,7 +66,7 @@ theorem isMapOf_existsUnique_and
                   (∀ g, c.ev n (subst φ g) = f.app n (c'.ev n g))
                     ∧ ∀ s, c.ev₂ n (pull2 φ s) = pullbackTwo (f.app n) (c'.ev₂ n s) := by
   intro p k _ d e G H c c' f
-  have hone := (GlobalTheory.T.functions_eq_series_in_chart p k d G c).2.2
+  have hone := (_root_.GlobalTheory.Katz.Chart.functions_are_series p k d G c).2.2
   have hcomp : ∀ j n, G.res n (f.app (n + 1) (c'.x (n + 1) j)) = f.app n (c'.x n j) := fun j n => by
     rw [res_app, c'.res]
   refine ⟨?_, ?_⟩
@@ -77,15 +77,13 @@ theorem isMapOf_existsUnique_and
   intro φ hφ
   have hconst : ∀ j, constantCoeff (φ j) = 0 := fun j => by
     have h1 :=
-      (GlobalTheory.T.counit_cotangentClass_powerSeriesEvalAtNilpotent k d (G.A 0) (c.x 0) (c.nil 0)
-        (c.aug 0) (φ j)).1
+      (_root_.GlobalTheory.Katz.counit_dUnit_evA k d (G.A 0) (c.x 0) (c.nil 0) (c.aug 0) (φ j)).1
     change Coalgebra.counit (R := k) (c.ev 0 (φ j)) = _ at h1
     rw [← h1, hφ 0 j, CoalgHomClass.counit_comp_apply, c'.aug]
   refine ⟨hconst, fun n => ⟨fun g => ?_, fun s => ?_⟩⟩
   · have hy : ∀ j, IsNilpotent (f.app n (c'.x n j)) := fun j => (c'.nil n j).map (f.app n)
     have h1 :=
-      (GlobalTheory.T.nilpotent_eval_commutes_subst_and_algebraMap k (Fin e) (G.A n)).1 (Fin d)
-        (c.ev n)
+      (_root_.GlobalTheory.evA_subst_and_map k (Fin e) (G.A n)).1 (Fin d) (c.ev n)
         (fun t => by
           change IsNilpotent (evA k (c.x n) (c.nil n) (X t))
           rw [evA_X]
@@ -94,14 +92,14 @@ theorem isMapOf_existsUnique_and
         (fun j => hφ n j)
         g
     rw [h1]
-    exact ((GlobalTheory.T.nilpotent_eval_commutes_subst_and_algebraMap k (Fin e) (H.A n)).2 (G.A n)
+    exact ((_root_.GlobalTheory.evA_subst_and_map k (Fin e) (H.A n)).2 (G.A n)
       (f.app n : H.A n →ₐ[k] G.A n) (c'.x n) (c'.nil n) _ hy
       (fun _ => rfl)
       g).symm
   · let F : H.A n ⊗[k] H.A n →ₐ[k] G.A n ⊗[k] G.A n :=
       Algebra.TensorProduct.map (f.app n : H.A n →ₐ[k] G.A n) (f.app n : H.A n →ₐ[k] G.A n)
     have hy : ∀ i, IsNilpotent (F (c'.x₂ n i)) := fun i => (c'.nil₂ n i).map F
-    have hev := GlobalTheory.T.connectedChart_evalSquare_variables_swap_constant p k d G c n
+    have hev := _root_.GlobalTheory.EvSquare.main p k d G c n
     have ha
         : ∀ i,
           constantCoeff
@@ -121,8 +119,8 @@ theorem isMapOf_existsUnique_and
         change Coalgebra.counit (R := k) (c.ev n (φ j)) = 0
         rw [hφ n j, CoalgHomClass.counit_comp_apply, c'.aug]
     have h1 :=
-      (GlobalTheory.T.nilpotent_eval_commutes_subst_and_algebraMap k (Fin e ⊕ Fin e)
-          (G.A n ⊗[k] G.A n)).1 (Fin d ⊕ Fin d) (c.ev₂ n)
+      (_root_.GlobalTheory.evA_subst_and_map k (Fin e ⊕ Fin e) (G.A n ⊗[k] G.A n)).1 (Fin d ⊕ Fin d)
+        (c.ev₂ n)
         (fun t => by
           change IsNilpotent (evA k (c.x₂ n) (c.nil₂ n) (X t))
           rw [evA_X]
@@ -144,8 +142,10 @@ theorem isMapOf_existsUnique_and
             rfl)
         s
     have h2 :=
-      (GlobalTheory.T.nilpotent_eval_commutes_subst_and_algebraMap k (Fin e ⊕ Fin e)
-        (H.A n ⊗[k] H.A n)).2 (G.A n ⊗[k] G.A n) F (c'.x₂ n) (c'.nil₂ n) _ hy (fun _ => rfl) s
+      (_root_.GlobalTheory.evA_subst_and_map k (Fin e ⊕ Fin e) (H.A n ⊗[k] H.A n)).2
+        (G.A n ⊗[k] G.A n) F (c'.x₂ n) (c'.nil₂ n) _ hy
+        (fun _ => rfl)
+        s
     have h3 : pullbackTwo (f.app n) (c'.ev₂ n s) = F (c'.ev₂ n s) := by
       induction (c'.ev₂ n s) with
       | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]

@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SmallFam
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHermPairSectionsChangeOfIsometricCombinatiStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHermitianRepresentativeIntegerCombinationStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.CharZeroFunctionField
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHermPairSectionsChangeOfIsometricCombinati
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHermitianRepresentativeIntegerCombination
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -67,10 +68,8 @@ theorem ampleHS_pair
                       (α / (D + 1).factorial
                         + (((D : ℝ) + 1) * gdeg M D / (D + 1).factorial) * t)) := by
   intro hHS k _ X _ p D hX P a b a' b' M α hM hamp hsemi hself
-  obtain ⟨N, hN⟩ := GlobalTheory.T.exists_hermitianRepresentative_integerCombination k X p P a' b'
-  obtain ⟨Q, hQL, hQA, hQB⟩ :=
-    GlobalTheory.T.exists_hermPairSections_change_of_isometric_combinations k X p P a b a' b' M N hM
-      hN
+  obtain ⟨N, hN⟩ := _root_.GlobalTheory.VolBr.Pair.exists_rep k X p P a' b'
+  obtain ⟨Q, hQL, hQA, hQB⟩ := _root_.GlobalTheory.HSNef.change_pair k X p P a b a' b' M N hM hN
   have hamp' : IsAmpleLB Q.L.B := by rw [hQL]; exact hamp
   have hsemi' : Q.L.SemiPos D := by rw [hQL]; exact hsemi
   have hself' : Q.L.IsSelfInter α := by rw [hQL]; exact hself

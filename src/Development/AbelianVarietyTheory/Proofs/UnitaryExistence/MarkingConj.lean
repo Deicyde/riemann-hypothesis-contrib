@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.PermutesRefl
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsometryOfConjugateSplitPointStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsometryOfConjugateSplitPoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -78,7 +78,7 @@ theorem marking_conj
                                       F.t i' v = Φ (wE H s • a + H.bar (wE H s) • b) + l.M • e := by
   intro E _ _ _ H D l Xo σ g ty F h1 h2 h3 h4 τ hτ C io hio i P hP i' P' hP' hs hu s hact
   obtain ⟨Φ, hΦ1, hΦ2, hΦ3, hΦ4⟩ :=
-    GlobalTheory.T.exists_isometry_of_conjugate_split_point E H D l Xo σ g ty F h1 h2 h3 h4 τ hτ C
+    _root_.GlobalTheory.CompRat.exists_isometry_of_conj_split E H D l Xo σ g ty F h1 h2 h3 h4 τ hτ C
       io hio i P hP i' P' hP' hs hu
   refine ⟨Φ, hΦ1, hΦ2, hΦ3, fun v hv a ha b hb hab => ?_⟩
   have hM : 0 < l.M := lt_of_lt_of_le (by norm_num) l.three_le

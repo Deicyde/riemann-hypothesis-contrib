@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.doubling_zeta_value_at_eisenstein_holomorphic_poin
                       GlobalTheory.Eis.EisValueAt V Φ s₀ E₀
                         → GlobalTheory.Eis.DblConv V μ m E₀ f₁ f₂ ∧ GlobalTheory.Eis.ZetaHolValueAt
                           V μ m Φ f₁ f₂ s₀ (GlobalTheory.Eis.dblInt V μ m E₀ f₁ f₂) := by
-  first
-  | exact @GlobalTheory.Eis.zetaHolValueAt_of_eisValueAt
-  | exact GlobalTheory.Eis.zetaHolValueAt_of_eisValueAt
-  | (intros; apply GlobalTheory.Eis.zetaHolValueAt_of_eisValueAt <;> assumption)
+  first | exact @GlobalTheory.Eis.zetaHolValueAt_of_eisValueAt

@@ -2,8 +2,8 @@ module
 
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteAdeleStrongApproxModAdelicIdeal
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaLatticePointMemThetaLatticeOfAdelicStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRationalPointOfMemMovedThetaLatticeStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaLatticePointMemThetaLatticeOfAdelic
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRationalPointOfMemMovedThetaLattice
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -112,8 +112,7 @@ theorem om_wd_moved
                     W.Om h h' (Wd D (tor0 D cc δ) x F) = Wd D (tor0 D cc δ) x' (W.Om h h' F) := by
   intro D hD cc δ hcc N N' e0 W h k h' k' L₁ L₂ L₁' L₂' h1 h1' h2 h2' x hx F hF
   obtain ⟨z, rfl, hz⟩ :=
-    GlobalTheory.T.exists_rationalPoint_of_mem_movedThetaLattice D hD cc δ hcc N N' k k' L₁ L₁' h1
-      h1' x hx
+    _root_.GlobalTheory.NormSum.exists_pt_of_mem_La_moved D hD cc δ hcc N N' k k' L₁ L₁' h1 h1' x hx
   obtain ⟨m, hm, hl⟩ := W.lift h h' z F hF
   obtain ⟨hA, hO, hI⟩ := GlobalTheory.AdelicApprox.approx_mod_ideal D cc hcc
   obtain ⟨z', hc, hz'⟩ :=
@@ -135,8 +134,8 @@ theorem om_wd_moved
       m hm
   exact ⟨
     _,
-    GlobalTheory.T.cmThetaLatticePoint_mem_thetaLattice_of_adelic D hD cc δ hcc N N' (h * k)
-      (h' * k') L₂ L₂' h2 h2' z' hz',
+    _root_.GlobalTheory.NormSum.pt_mem_La_of_adelic D hD cc δ hcc N N' (h * k) (h' * k') L₂ L₂' h2
+      h2' z' hz',
     hl z' hc
   ⟩
 

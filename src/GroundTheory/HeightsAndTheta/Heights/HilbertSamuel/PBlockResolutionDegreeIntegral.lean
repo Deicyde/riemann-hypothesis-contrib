@@ -63,21 +63,6 @@ set_option linter.unusedSectionVars false
 
 namespace BlockResolutionDegreeIntegral
 
-theorem hessC_congr {n : ℕ} {φ ψ : (Fin n → ℂ) → ℝ} {z : Fin n → ℂ} (h : φ =ᶠ[𝓝 z] ψ)
-    : ReciprocityTheory.AnForm.hessC φ z = ReciprocityTheory.AnForm.hessC ψ z := by
-  unfold ReciprocityTheory.AnForm.hessC
-  rw [(h.fderiv (𝕜 := ℝ)).fderiv_eq]
-
-theorem maDens_congr
-    {n : ℕ} {φ ψ : Fin n → (Fin n → ℂ) → ℝ} {z : Fin n → ℂ} (h : ∀ i, φ i =ᶠ[𝓝 z] ψ i)
-    : ReciprocityTheory.AnForm.maDens φ z = ReciprocityTheory.AnForm.maDens ψ z := by
-  have hH
-      : (fun k => ReciprocityTheory.AnForm.hessC (φ k) z)
-        = fun k => ReciprocityTheory.AnForm.hessC (ψ k) z :=
-    funext fun k => hessC_congr (h k)
-  unfold ReciprocityTheory.AnForm.maDens
-  rw [hH]
-
 theorem mInt_congr_of_locDens
     {e : ℕ} {X : Type*} [TopologicalSpace X]
     (A : FinHolAtlas e X)
@@ -143,7 +128,7 @@ theorem mInt_blockInterpPot_eq
         g := by
   refine mInt_congr_of_locDens _ (fun j y hy => ?_) g
   unfold locDens
-  refine maDens_congr fun _ => ?_
+  refine _root_.ReciprocityTheory.ChartRestriction.G.Geo.maDens_congr fun _ => ?_
   have hmem
       : (d.R.A.chart j).target ∩ (d.R.A.chart j).symm ⁻¹' d.R.U ((d.R.A.chart j).symm y) ∈ 𝓝 y :=
     ((d.R.A.chart j).isOpen_inter_preimage_symm (d.R.isOpen_U _)).mem_nhds ⟨hy, d.R.mem_U _⟩

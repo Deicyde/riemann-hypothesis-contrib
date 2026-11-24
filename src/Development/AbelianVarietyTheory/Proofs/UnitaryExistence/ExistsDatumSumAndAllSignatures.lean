@@ -71,7 +71,7 @@ theorem blockEnd_apply
     [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
     (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W) (x : U)
     : e (blockEnd e f g x) = (f (e x).1, g (e x).2) := by
-  simp [blockEnd, Prod.map]
+  simp [blockEnd]
 
 theorem blockEnd_comp
     {U V W : Type}
@@ -141,7 +141,7 @@ theorem sumForm_baseChange
     induction y using TensorProduct.induction_on with
     | zero => simp
     | add a b ha hb => simp only [map_add (f := _), Prod.fst_add, Prod.snd_add, ha, hb]; ring
-    | tmul s v => simp [sumForm_apply, add_smul, add_mul]
+    | tmul s v => simp [sumForm_apply, add_smul]
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 

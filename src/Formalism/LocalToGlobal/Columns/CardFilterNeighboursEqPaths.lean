@@ -65,11 +65,7 @@ theorem double_sum_eq_of_filter_card
     · simp only [Finset.sum_const]
     · intro e f
       simp only [Finset.mem_filter]
-      constructor
-      · rintro ⟨he, hf⟩
-        exact ⟨⟨he, hf⟩, hU e he hf⟩
-      · rintro ⟨⟨he, hf⟩, -⟩
-        exact ⟨he, hf⟩
+      exact ⟨fun h => ⟨h, hU e h.1 h.2⟩, And.left⟩
   set U := A.biUnion B ∪ A'.biUnion B'
   rw [key A B U (fun e he => (Finset.subset_biUnion_of_mem B he).trans Finset.subset_union_left),
     key A' B' U (fun e he => (Finset.subset_biUnion_of_mem B' he).trans Finset.subset_union_right)]

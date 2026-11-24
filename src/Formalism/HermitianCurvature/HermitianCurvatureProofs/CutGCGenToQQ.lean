@@ -203,15 +203,7 @@ theorem intw_sum
     (h : ∀ i ∈ s, Intw P Bs e (A i) (A' i))
     : Intw P Bs e (∑ i ∈ s, A i) (∑ i ∈ s, A' i) := by
   first
-  | exact UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum ..
   | (apply UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum Wp Wq ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› P
       Bs e hsm ι s A A' h
   | exact @UpperTheory.Reformulated.B.IntertwinerStructure.intw_sum Wp Wq ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› P

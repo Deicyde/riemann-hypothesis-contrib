@@ -174,7 +174,7 @@ theorem norm_perp_le
   have k4 := key (-Complex.I) (by simp [Complex.star_def])
   simp only [Complex.star_def, map_one, map_neg, Complex.conj_I, one_mul, neg_mul, neg_neg,
       Complex.add_re, Complex.neg_re, Complex.mul_re, Complex.I_re, Complex.I_im, Complex.conj_re,
-      Complex.conj_im, zero_mul, one_mul, sub_zero, zero_sub, mul_neg, neg_zero]
+      Complex.conj_im, zero_mul, one_mul, zero_sub, mul_neg]
     at k1 k2 k3 k4
   have hre : |X.re| ≤ ((herm H u u).re + (herm H v v).re) / 2 := by
     rw [abs_le]; constructor <;> linarith
@@ -274,11 +274,11 @@ theorem hpk_outer
     : (Hpk k r *ᵥ y) ⟨2 * r + k - i.val, by omega⟩ = y i := by
   simp only [Matrix.mulVec, dotProduct]
   rw [Finset.sum_eq_single i]
-  · simp only [Hpk, Fin.val_mk]
+  · simp only [Hpk]
     split_ifs <;> first | (exfalso; omega) | simp
   · intro j _ hj
     have hj' : j.val ≠ i.val := fun h => hj (Fin.ext h)
-    simp only [Hpk, Fin.val_mk, Fin.ext_iff]
+    simp only [Hpk, Fin.ext_iff]
     split_ifs <;> first | (exfalso; omega) | simp
   · simp
 
@@ -320,7 +320,7 @@ theorem glev_wb
   have hout
       : (⟨2 * r + k - i.val, by omega⟩ : Fin (2 * r + k + 1)).val < r
         ∨ r + k < (⟨2 * r + k - i.val, by omega⟩ : Fin (2 * r + k + 1)).val := by
-    simp only [Fin.val_mk]; omega
+    simp only; omega
   rw [← hp, ← gn_herm_bvec_right, ← glev_fix hg _ hout, hb_UH _ hg.1, gn_herm_bvec_right, hp',
     hv i hi]
 
@@ -329,7 +329,7 @@ theorem bvec_wb (q : Fin (2 * r + k + 1)) (hq : r ≤ q.val ∧ q.val ≤ r + k)
   have hne : i ≠ q := by
     rintro rfl
     omega
-  simp [bvec, Pi.single_apply, hne]
+  simp [bvec, hne]
 
 theorem entry_eq (g : Mx k r) (p q : Fin (2 * r + k + 1)) : g p q = (g *ᵥ bvec q) p := by
   simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
@@ -400,7 +400,7 @@ theorem norm_entry_le
   · rw [glev_fix hg q hq]
     by_cases hpq : p = q
     · subst hpq; simp [bvec]; linarith
-    · simp [bvec, Pi.single_apply, hpq]; linarith
+    · simp [bvec, hpq]; linarith
   have hq' : r ≤ q.val ∧ q.val ≤ r + k := by omega
   by_cases hp : p.val < r ∨ r + k < p.val
   · rw [glev_wb hg (bvec_wb q hq') p hp, norm_zero]; linarith

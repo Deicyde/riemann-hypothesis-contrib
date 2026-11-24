@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ChainParSucc
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HeckeVecMemFixed
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnitarySatakeTransformEqOfBaseChangeSatakeParameStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.LineOppositeParabolicUnitaryLeviSectionEq
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnitarySatakeTransformEqOfBaseChangeSatakeParame
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUniqueIsConjAt
 import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.FSatakeA
 import Formalism.SatakeDualWeyl.KpqSubgroupCompact
@@ -141,8 +142,8 @@ theorem paramVec_add
         h1.2.1,
         fun t ht => by
           rw [h1.2.2 t ht,
-            GlobalTheory.T.unitarySatakeTransform_eq_of_baseChangeSatakeParameter_eq
-              (w.adicCompletion E) ϖ c' (qV F v) n hU α' α (hB'.symm.trans hB) t ht]
+            _root_.GlobalTheory.SatBc.satU_eq_of_bcParam_eq (w.adicCompletion E) ϖ c' (qV F v) n hU
+              α' α (hB'.symm.trans hB) t ht]
       ⟩
       exact Or.inr ⟨hw, c', ϖ, e, α, hU, he, satU_add hU hx h2 h0, hB⟩
 

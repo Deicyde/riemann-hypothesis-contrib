@@ -50,6 +50,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.heisenberg_sup_sobolev_seminorm_theta_laws
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.heisenberg_sup_sobolev_seminorm_theta_laws
                   IsThetaFunO ψ S T f → IsThetaFunO ψ S T g
                     → supSob ψ θ k (f + g) ≤ supSob ψ θ k f + supSob ψ θ k g
                       ∧ supSob ψ θ k (c • f) = ‖c‖ₑ * supSob ψ θ k f := by
-  first
-  | exact @GlobalTheory.Unf.SupFin.supSob_laws
-  | exact GlobalTheory.Unf.SupFin.supSob_laws
-  | (intros; apply GlobalTheory.Unf.SupFin.supSob_laws <;> assumption)
+  first | exact @GlobalTheory.Unf.SupFin.supSob_laws

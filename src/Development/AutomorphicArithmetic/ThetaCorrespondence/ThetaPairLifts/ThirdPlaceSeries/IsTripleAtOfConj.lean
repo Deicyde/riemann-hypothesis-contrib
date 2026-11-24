@@ -42,8 +42,6 @@ import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.HCFFromRecipA
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.Triple

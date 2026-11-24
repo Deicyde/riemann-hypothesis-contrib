@@ -241,6 +241,6 @@ theorem baseExp_end
         (if Q then f else 0) y = if Q then f y else 0 := by
     intro Q _ f y
     split_ifs <;> rfl
-  simp [baseExp, Finsupp.finsetSum_apply, Finsupp.single_apply, topOdd_ne_end, hite]
+  simp [baseExp, topOdd_ne_end, hite]
 
 end Formalism.MainNotions.ColumnSystems.Pf

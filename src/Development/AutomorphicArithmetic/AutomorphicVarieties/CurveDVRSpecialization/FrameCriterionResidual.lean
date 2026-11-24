@@ -97,16 +97,10 @@ theorem UpperTheory.frame_criterion_residual : UpperTheory.V.Pr.CrResid := by
       apply hu2
       rw [h1, one_zpow]
     rcases hn with rfl | rfl <;> fin_cases i <;> fin_cases j <;> simp [Fr.w] at key ⊢
-    all_goals
-      first
-      | exact hg key
-      | exact hu1 key
-      | exact hu2 key
-      | exact hu1 (inv_eq_one.mp key)
-      | exact hg (inv_eq_one.mp (by simpa [zpow_neg] using key))
+    all_goals first | exact hg key | exact hu1 key
   have hw : ∀ i : Fin n, Fr.w n (Fin.rev i) = - Fr.w n i := by
     intro i
-    rcases hn with rfl | rfl <;> fin_cases i <;> simp [Fr.w] <;> decide
+    rcases hn with rfl | rfl <;> fin_cases i <;> simp [Fr.w]
   have hΨc : ∀ g, F.Ψ (π (G.conj g) : F.Γ) = F.Ψ (π g : F.Γ) := by
     intro g
     rw [hc]
@@ -166,7 +160,7 @@ theorem UpperTheory.frame_criterion_residual : UpperTheory.V.Pr.CrResid := by
           G.star O B n (MonoidAlgebra.single g b)
             = MonoidAlgebra.single (G.conj g)⁻¹ (b * ((G.eps O B g ^ (1 - (n : ℤ)) : Bˣ) : B)) := by
       intro g b
-      simp [W.GFrame.star, W.GFrame.starOp, MonoidAlgebra.lift_single, MonoidAlgebra.smul_single']
+      simp [W.GFrame.star, W.GFrame.starOp, MonoidAlgebra.lift_single]
     have hrev
         : ∀ i z,
           MonoidAlgebra.lift B B G.G₀ (f i) (G.star O B n z)

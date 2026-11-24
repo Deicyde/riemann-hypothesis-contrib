@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   Formalism.L2.JoinChr Formalism.L2.Host
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_finitePlaceIdempotent_baseChangeAdeles
     : ∀ (D : D7) (ι : (Af D.host.F ⊗[D.host.F] D.host.E) ≃+* FiniteAdeleRing (𝓞 D.host.E) D.host.E),
       (∀ x : D.host.E,
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_finitePlaceIdempotent_baseChangeAdeles
         → (∀ P : HeightOneSpectrum (𝓞 D.host.E), ∃ e : AE D,
           IsPlIdem D e P ∧ infPart D e = 0 ∧ ι (finPart D e) P = 1
             ∧ ∀ P' : HeightOneSpectrum (𝓞 D.host.E), P' ≠ P → ι (finPart D e) P' = 0) := by
-  first
-  | exact @GlobalTheory.PlaceIdem.exists_isPlIdem
-  | exact GlobalTheory.PlaceIdem.exists_isPlIdem
-  | (intros; apply GlobalTheory.PlaceIdem.exists_isPlIdem <;> assumption)
+  first | exact @GlobalTheory.PlaceIdem.exists_isPlIdem

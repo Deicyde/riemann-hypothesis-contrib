@@ -3,8 +3,10 @@ module
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
 public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRingStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChangeStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRing
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChange
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -169,7 +171,7 @@ theorem exists_lieFunctional
           M.ValAt z e (MR.pt x) → ValAt ξ z (f e) u → g x = u := by
   intro X G _ _ _ Ω _ ξ Li _ _ M R _ _ z h ER _ _ MR f hξ hf
   obtain ⟨ev, hev, hlin, -⟩ :=
-    GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ Li M R z h ER MR hξ inferInstance
+    _root_.GlobalTheory.CompanionTheory.Ar.lieLat_val X G Ω ξ Li M R z h ER MR hξ inferInstance
   let ψ : X.presheaf.stalk (centre z) →+* R := (Scheme.stalkClosedPointTo z).hom
   letI : Algebra (X.presheaf.stalk (centre z)) R := ψ.toAlgebra
   letI : Module (X.presheaf.stalk (centre z)) ER := Module.compHom ER ψ
@@ -187,9 +189,9 @@ theorem exists_lieFunctional
       hlin ⟨genMap ξ ⟨centre z, h⟩ s, s, rfl⟩ (ψ s) ⟨e.val, e.mem⟩ ⟨h, s, rfl, rfl⟩
   }
   have hbc : IsBaseChange R j := by
-    refine GlobalTheory.T.lie_model_isBaseChange X G (X.presheaf.stalk (centre z)) R
-      (X.fromSpecStalk (centre z)) (Stalk M ⟨centre z, h⟩) ER (stalkLie hξ M ⟨centre z, h⟩)
-      (castLie (spec_centre z).symm MR) j fun e => ?_
+    refine _root_.GlobalTheory.CompanionTheory.Ar.lieModel_isBaseChange X G
+      (X.presheaf.stalk (centre z)) R (X.fromSpecStalk (centre z)) (Stalk M ⟨centre z, h⟩) ER
+      (stalkLie hξ M ⟨centre z, h⟩) (castLie (spec_centre z).symm MR) j fun e => ?_
     obtain ⟨h', v, hv, hw⟩ := (hev e.val (ev ⟨e.val, e.mem⟩)).2 ⟨e.mem, rfl⟩
     have hvv : v = e.tan := hv.unique (hξ.inj _) e.tan_spec
     subst hvv

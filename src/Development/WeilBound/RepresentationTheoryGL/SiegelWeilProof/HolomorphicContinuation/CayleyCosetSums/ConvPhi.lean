@@ -108,9 +108,8 @@ theorem conv_phi
     simp only [phi, h1, h2]
     ring
   have hone : F0 m 0 e (1 : GR n) = 1 := by
-    have h1 : toBlocks₂₁ (1 : M2 n) = 0 := by ext i j; simp [Matrix.toBlocks₂₁, Matrix.one_apply]
-    have h2 : toBlocks₂₂ (1 : M2 n) = 1 := by
-      ext i j; simp [Matrix.toBlocks₂₁, Matrix.toBlocks₂₂, Matrix.one_apply]
+    have h1 : toBlocks₂₁ (1 : M2 n) = 0 := by ext i j; simp [Matrix.toBlocks₂₁]
+    have h2 : toBlocks₂₂ (1 : M2 n) = 1 := by ext i j; simp [Matrix.toBlocks₂₂, Matrix.one_apply]
     simp [F0, mR, f0, u1, u2, h1, h2]
   have hF : F0 m 0 e k * F0 m 0 e k⁻¹ = 1 := by
     rw [← ((mult n m 0 e).1 k k⁻¹ (inv_mem hk)).1, mul_inv_cancel, hone]

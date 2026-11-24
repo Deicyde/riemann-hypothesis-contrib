@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.universal_symLift_exists_unique_global
     : Laws
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.universal_symLift_exists_unique_global
                   SymLift Xo.univ.t.G Xo.univ.t.PP.L ((N : ℤ) ^ 2) (N ^ 2) x U
                     → SymLift Xo.univ.t.G Xo.univ.t.PP.L ((N : ℤ) ^ 2) (N ^ 2) x U'
                     → LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ U.φ U'.φ := by
-  first
-  | exact @GlobalTheory.moduli_univ_symLift_global
-  | exact GlobalTheory.moduli_univ_symLift_global
-  | (intros; apply GlobalTheory.moduli_univ_symLift_global <;> assumption)
+  first | exact @GlobalTheory.moduli_univ_symLift_global

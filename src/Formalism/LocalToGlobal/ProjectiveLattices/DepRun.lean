@@ -70,10 +70,7 @@ theorem satDir_of
     by_cases hjm : j = m
     · subst hjm; simp
     · simp [hjm, Ne.symm hjm]
-  have hwA : (Matrix.of w) * (Matrix.of A) = 1 := by
-    first
-    | exact mul_eq_one_comm.mp hAw
-    | exact (Matrix.mul_eq_one_comm_of_equiv (Equiv.refl _)).mp hAw
+  have hwA : (Matrix.of w) * (Matrix.of A) = 1 := by first | exact mul_eq_one_comm.mp hAw
   refine ⟨fun i j => A j (emb i), fun i i' => ?_⟩
   letI := io.toAlgebra
   have e1

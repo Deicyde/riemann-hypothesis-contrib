@@ -167,10 +167,11 @@ theorem class_cubeLB
     : cl (cubeLB A ![x, y] L)
       = m (x * y).left * (m x.left)⁻¹ * (m y.left)⁻¹ * m (1 : T ⟶ A).left := by
   have e :=
-    congrArg (FreeGroup.lift m |> Abelianization.lift)
-      (prod_square_id x y (fun q => Abelianization.of (FreeGroup.of q)))
+    congrArg (FreeGroup.lift m |> Group.Abelianization.lift)
+      (prod_square_id x y (fun q => Group.Abelianization.of (FreeGroup.of q)))
   have hm (q : T.left ⟶ A.left)
-      : (Abelianization.lift (FreeGroup.lift m)) (Abelianization.of (FreeGroup.of q)) = m q := by
+      : (Group.Abelianization.lift (FreeGroup.lift m)) (Group.Abelianization.of (FreeGroup.of q))
+        = m q := by
     exact (Group.Abelianization.lift_apply_of _ _).trans FreeGroup.lift_apply_of
   simp only [diff₂, map_prod, map_zpow, map_mul, map_inv, hm] at e
   exact (h _ _ _).trans e

@@ -115,8 +115,7 @@ private theorem th_actOn_tmul_eq_evM_mulVec
   rw [ha, Th_tmul, evM_tmul, hβ]
   simp only [Th_tmul]
   rw [RingHom.map_mulVec]
-  simp [Matrix.mulVec, dotProduct, Finset.smul_sum, Finset.mul_sum, mul_comm, mul_left_comm,
-    mul_assoc]
+  simp [Matrix.mulVec, dotProduct, Finset.smul_sum, mul_left_comm, mul_assoc]
 
 theorem Th_act
     {K : Type} (f : K → (E →+* ℂ))

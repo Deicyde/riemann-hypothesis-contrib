@@ -107,7 +107,7 @@ theorem exists_compact_cover
       refine ⟨r • a, ?_⟩
       simp only [L, Prod.smul_fst, Prod.smul_snd, hsm, Matrix.mulVec_smul]
       ext i
-      simp [mul_add]
+      simp
   refine ⟨L '' (Set.Icc 0 1), isCompact_Icc.image hc, fun z => ?_⟩
   obtain ⟨⟨a, b⟩, rfl⟩ := hs z
   refine ⟨

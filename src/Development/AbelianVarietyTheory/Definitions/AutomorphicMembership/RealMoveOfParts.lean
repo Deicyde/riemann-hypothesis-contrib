@@ -52,7 +52,6 @@ open Formalism.L2 (NExpTied)
 open Formalism.L2.Host (embLL0 CharFrame)
 open scoped TensorProduct
 
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HeightCounting.SerMove
@@ -168,8 +167,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
   GlobalTheory.HeightCounting.Up GlobalTheory.TwistChoice
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
-
 
 namespace GlobalTheory.HeightCounting.SerMove
 

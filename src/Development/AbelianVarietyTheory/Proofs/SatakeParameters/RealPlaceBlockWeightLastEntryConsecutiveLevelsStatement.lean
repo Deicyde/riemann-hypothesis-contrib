@@ -47,6 +47,7 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
   Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
   Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.realPlaceBlockWeightLastEntry_consecutive_levels
     : ∀ {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7)
         (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau) (j : ℕ) (τ : D.what₂.Tau),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.realPlaceBlockWeightLastEntry_consecutive_levels
               wT X D pos j τ - cT1 X D pos j τ
             else
               - wT X D pos j τ) := by
-  first
-  | exact @GlobalTheory.TwV.DelA.eT_last_pair
-  | exact GlobalTheory.TwV.DelA.eT_last_pair
-  | (intros; apply GlobalTheory.TwV.DelA.eT_last_pair <;> assumption)
+  first | exact @GlobalTheory.TwV.DelA.eT_last_pair

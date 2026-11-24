@@ -49,13 +49,15 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenericallyFiniteFi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH
 
-theorem finite_notMem_coheight_le_one {X : Scheme.{0}} [IsIntegral X] [IsNoetherian X] (U : X.Opens)
-    (hU : (U : Set X).Nonempty) : {ξ : X | ξ ∉ U ∧ Order.coheight ξ ≤ 1}.Finite := by
+theorem finite_notMem_coheight_le_one
+    {X : Scheme.{0}} [IsIntegral X] [IsNoetherian X] (U : X.Opens) (hU : (U : Set X).Nonempty)
+    : {ξ : X | ξ ∉ U ∧ Order.coheight ξ ≤ 1}.Finite := by
   apply _root_.GlobalTheory.PushFinite.finite_notMem_coheight_le_one <;> assumption
 
 namespace RatModel
@@ -73,16 +75,16 @@ theorem isNoetherianRing_O [IsNoetherianRing o] (z : M.Z) : IsNoetherianRing (M.
   have := M.isNoetherian
   isNoetherianRing_of_ringEquiv _ (M.stalkEquiv z)
 
-theorem coheight_le_one_of_valuationRing [IsNoetherianRing o] {ξ : M.Z} (h : ValuationRing (M.O ξ)) :
-    Order.coheight ξ ≤ 1 := by
+theorem coheight_le_one_of_valuationRing [IsNoetherianRing o] {ξ : M.Z} (h : ValuationRing (M.O ξ))
+    : Order.coheight ξ ≤ 1 := by
   have := M.isNoetherianRing_O ξ
   have : IsPrincipalIdealRing (M.O ξ) := IsPrincipalIdealRing.of_isNoetherianRing_of_isBezout
   have h1 : ringKrullDim (M.O ξ) ≤ 1 := Ring.krullDimLE_iff.1 inferInstance
   rw [← ringKrullDim_eq_of_ringEquiv (M.stalkEquiv ξ), ringKrullDim_stalk_eq_coheight] at h1
   exact_mod_cast h1
 
-theorem exists_specializes_isLocalization (z : M.Z) (q : Ideal (M.O z)) [q.IsPrime] :
-    ∃ (ξ : M.Z) (h : ξ ⤳ z),
+theorem exists_specializes_isLocalization (z : M.Z) (q : Ideal (M.O z)) [q.IsPrime]
+    : ∃ (ξ : M.Z) (h : ξ ⤳ z),
       letI := (Subalgebra.inclusion (O_le_of_specializes h)).toRingHom.toAlgebra
       IsLocalization.AtPrime (M.O ξ) q := by
   obtain ⟨V, hV, hz, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := z) trivial
@@ -90,16 +92,18 @@ theorem exists_specializes_isLocalization (z : M.Z) (q : Ideal (M.O z)) [q.IsPri
     (M.stalkEquiv x).toRingHom.comp (M.Z.presheaf.germ V x hx).hom
   have hψ : ∀ {x : M.Z} (hx : x ∈ V) (f : Γ(M.Z, V)), ψ hx f = ⟨valF M.pt V f, valF_mem_O hx f⟩ :=
     fun hx f => stalkEquiv_germ hx f
-  have hloc : ∀ (p : PrimeSpectrum Γ(M.Z, V)) (hp : hV.fromSpec p ∈ V),
-      @IsLocalization.AtPrime _ _ (M.O (hV.fromSpec p)) _ (ψ hp).toAlgebra p.asIdeal _ := fun p hp => by
+  have hloc
+      : ∀ (p : PrimeSpectrum Γ(M.Z, V)) (hp : hV.fromSpec p ∈ V),
+        @IsLocalization.AtPrime _ _ (M.O (hV.fromSpec p)) _ (ψ hp).toAlgebra p.asIdeal
+          _ := fun p hp => by
     let : Algebra Γ(M.Z, V) (M.Z.presheaf.stalk (hV.fromSpec p)) :=
       TopCat.Presheaf.algebra_section_stalk M.Z.presheaf (U := V) ⟨_, hp⟩
     let := (ψ hp).toAlgebra
     have : IsLocalization p.asIdeal.primeCompl (M.Z.presheaf.stalk (hV.fromSpec p)) :=
       hV.isLocalization_stalk' p hp
     exact IsLocalization.isLocalization_of_algEquiv p.asIdeal.primeCompl
-      ({ M.stalkEquiv _ with commutes' := fun _ => rfl } :
-        M.Z.presheaf.stalk (hV.fromSpec p) ≃ₐ[Γ(M.Z, V)] M.O (hV.fromSpec p))
+      ({ M.stalkEquiv _ with commutes' := fun _ => rfl }
+        : M.Z.presheaf.stalk (hV.fromSpec p) ≃ₐ[Γ(M.Z, V)] M.O (hV.fromSpec p))
   have hmem : ∀ p : PrimeSpectrum Γ(M.Z, V), hV.fromSpec p ∈ V := fun p => by
     rw [← SetLike.mem_coe, ← hV.range_fromSpec]
     exact ⟨_, rfl⟩
@@ -118,11 +122,14 @@ theorem exists_specializes_isLocalization (z : M.Z) (q : Ideal (M.O z)) [q.IsPri
   let := (ψ (hmem p)).toAlgebra
   have h₁ := hloc p (hmem p)
   have : IsScalarTower Γ(M.Z, V) (M.O (hV.fromSpec p₀)) (M.O (hV.fromSpec p)) :=
-    IsScalarTower.of_algebraMap_eq fun a => (hψ (hmem p) a).trans
-      (congrArg (Subalgebra.inclusion (O_le_of_specializes hs)) (hψ hz a)).symm
-  have h₂ := IsLocalization.isLocalization_of_submonoid_le (M.O (hV.fromSpec p₀)) (M.O (hV.fromSpec p))
-    p₀.asIdeal.primeCompl p.asIdeal.primeCompl (fun a ha h => ha (hle h))
-  refine IsLocalization.of_le_of_exists_dvd (p.asIdeal.primeCompl.map (algebraMap _ (M.O (hV.fromSpec p₀)))) _
+    IsScalarTower.of_algebraMap_eq fun a =>
+      (hψ (hmem p) a).trans
+        (congrArg (Subalgebra.inclusion (O_le_of_specializes hs)) (hψ hz a)).symm
+  have h₂ :=
+    IsLocalization.isLocalization_of_submonoid_le (M.O (hV.fromSpec p₀)) (M.O (hV.fromSpec p))
+      p₀.asIdeal.primeCompl p.asIdeal.primeCompl (fun a ha h => ha (hle h))
+  refine IsLocalization.of_le_of_exists_dvd
+    (p.asIdeal.primeCompl.map (algebraMap _ (M.O (hV.fromSpec p₀)))) _
     (by rintro _ ⟨a, ha, rfl⟩; exact ha) fun n hn => ?_
   obtain ⟨⟨a, s⟩, e⟩ := IsLocalization.surj p₀.asIdeal.primeCompl n
   refine ⟨_, ⟨a, fun ha => ?_, rfl⟩, _, e.symm⟩
@@ -130,8 +137,11 @@ theorem exists_specializes_isLocalization (z : M.Z) (q : Ideal (M.O z)) [q.IsPri
   rw [← e] at ha'
   exact hn ((Ideal.mul_unit_mem_iff_mem q (IsLocalization.map_units _ s)).1 ha')
 
-theorem mem_O_of_forall_valuationRing [IsNoetherianRing o] (hn : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z)
-    (z : M.Z) (φ : Ω) (h : ∀ ξ : M.Z, ξ ⤳ z → ValuationRing (M.O ξ) → φ ∈ M.O ξ) : φ ∈ M.O z := by
+theorem mem_O_of_forall_valuationRing
+    [IsNoetherianRing o]
+    (hn : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z)
+    (z : M.Z) (φ : Ω) (h : ∀ ξ : M.Z, ξ ⤳ z → ValuationRing (M.O ξ) → φ ∈ M.O ξ)
+    : φ ∈ M.O z := by
   have := M.isNoetherianRing_O z
   have := isIntegrallyClosed_O hn z
   obtain ⟨y, rfl⟩ : φ ∈ (algebraMap (M.O z) Ω).range := by
@@ -146,15 +156,22 @@ theorem mem_O_of_forall_valuationRing [IsNoetherianRing o] (hn : ReciprocityTheo
 
 end RatModel
 
-theorem normalModel_height_le_one :
-    ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) [IsNoetherianRing o],
-      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z → ∀ (z : M.Z),
-      (∀ φ : Ω, (∀ ξ : M.Z, ξ ⤳ z → ValuationRing (M.O ξ) → φ ∈ M.O ξ) → φ ∈ M.O z) ∧
-      IsNoetherianRing (M.O z) ∧
-      ∀ U : M.Z.Opens, (U : Set M.Z).Nonempty → {ξ : M.Z | ξ ∉ U ∧ ValuationRing (M.O ξ)}.Finite := by
+theorem normalModel_height_le_one
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) [IsNoetherianRing o],
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z
+        → ∀ (z : M.Z),
+          (∀ φ : Ω, (∀ ξ : M.Z, ξ ⤳ z → ValuationRing (M.O ξ) → φ ∈ M.O ξ) → φ ∈ M.O z)
+            ∧ IsNoetherianRing (M.O z)
+            ∧ ∀ U : M.Z.Opens,
+              (U : Set M.Z).Nonempty → {ξ : M.Z | ξ ∉ U ∧ ValuationRing (M.O ξ)}.Finite := by
   intro o Ω _ _ _ M _ hn z
   have := M.isNoetherian
-  exact ⟨M.mem_O_of_forall_valuationRing hn z, M.isNoetherianRing_O z, fun U hU =>
-    (finite_notMem_coheight_le_one U hU).subset fun _ h => ⟨h.1, M.coheight_le_one_of_valuationRing h.2⟩⟩
+  exact ⟨
+    M.mem_O_of_forall_valuationRing hn z,
+    M.isNoetherianRing_O z,
+    fun U hU =>
+      (finite_notMem_coheight_le_one U hU).subset fun _ h =>
+        ⟨h.1, M.coheight_le_one_of_valuationRing h.2⟩
+  ⟩
 
 end GlobalTheory.ZH

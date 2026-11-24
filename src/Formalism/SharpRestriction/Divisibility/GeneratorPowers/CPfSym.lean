@@ -74,12 +74,7 @@ private theorem const_subst_lemma
     (a : σ → MvPowerSeries τ k) (ha : ∀ s, constantCoeff (a s) = 0)
     (g : MvPowerSeries σ k)
     : constantCoeff (subst a g) = constantCoeff g := by
-  have hA : HasSubst a := by
-    first
-    | exact hasSubst_of_constantCoeff_zero ha
-    | exact HasSubst.of_constantCoeff_zero' ha
-    | exact hasSubst_of_constantCoeff_nilpotent fun s => by rw [ha s]; exact IsNilpotent.zero
-    | exact HasSubst.of_constantCoeff_nilpotent fun s => by rw [ha s]; exact IsNilpotent.zero
+  have hA : HasSubst a := by first | exact hasSubst_of_constantCoeff_zero ha
   rw [constantCoeff_subst hA, finsum_eq_single _ (0 : σ →₀ ℕ)]
   · simp
   · intro e he

@@ -45,7 +45,6 @@ import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CoefChangeTyping
 
 @[expose] public section
 
-
 set_option linter.unusedSectionVars false
 
 noncomputable section

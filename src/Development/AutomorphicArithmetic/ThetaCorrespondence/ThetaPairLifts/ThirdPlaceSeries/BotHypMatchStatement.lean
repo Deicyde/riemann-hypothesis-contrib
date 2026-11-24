@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
 
 @[expose] public section
 
-
-
 section
 open scoped InnerProductSpace TensorProduct
 open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
@@ -54,6 +52,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
   GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MiTop
+
 theorem _root_.GlobalTheory.T.bottom_hypothesis_matching_central_alt
     : ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
         {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}
@@ -72,8 +71,5 @@ theorem _root_.GlobalTheory.T.bottom_hypothesis_matching_central_alt
             W.Q.Rl.HE.e e ∈ W.Q.Rl.toRealDat.EEat (W.Q.Rl.toRealDat.levR W.Q.F.lv2 true)
               → _root_.GlobalTheory.MiTop.rowFormOfVector W e
                 ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W := by
-  first
-  | exact @_root_.GlobalTheory.MiTop.botHyp_match_alt
-  | exact _root_.GlobalTheory.MiTop.botHyp_match_alt
-  | (intros; apply _root_.GlobalTheory.MiTop.botHyp_match_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.MiTop.botHyp_match_alt
 end

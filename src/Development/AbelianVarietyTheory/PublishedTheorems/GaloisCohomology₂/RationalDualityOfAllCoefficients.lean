@@ -69,6 +69,11 @@ variable
   [IsScalarTower ℚ_[l] K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower ℚ_[l] K₀ BdR]
   (PD : PeriodData G ℚ_[l] K₀ K B BdR)
 
+/--
+The Bloch--Kato dimension formula for the finite cohomology subgroup `H¹_f(K, V)` of a de Rham
+representation `V`: `dim H¹_f(K, V) = dim H⁰(K, V) + dim(D_dR(V) / Fil⁰ D_dR(V))`.
+See [Bloch and Kato, *L-functions and Tamagawa numbers of motives* (Corollary 3.8.4)][blochKato1990].
+-/
 def DimFormula : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] [TopologicalSpace V]
       [IsModuleTopology ℚ_[l] V] [ContinuousAdd V] [ContinuousConstSMul ℚ_[l] V]
@@ -80,6 +85,11 @@ def DimFormula : Prop :=
             + ((finrank ℚ_[l] ↥(DdR PD ρ) : ℤ)
               - finrank ℚ_[l] ↥(DdR PD ρ ⊓ FilV PD (LL := ℚ_[l]) (V := V) 0))
 
+/--
+Local orthogonality of the Bloch--Kato subspaces `H¹_f(K, V)` and `H¹_f(K, V*(1))` under the
+local Tate cup-product pairing for de Rham representations `V`.
+See [Bloch and Kato, *L-functions and Tamagawa numbers of motives* (Proposition 3.8)][blochKato1990].
+-/
 def RationalDuality : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] [TopologicalSpace V]
       [IsModuleTopology ℚ_[l] V] [ContinuousAdd V] [ContinuousConstSMul ℚ_[l] V] (V' : Type)
@@ -94,6 +104,11 @@ def RationalDuality : Prop :=
         ∧ (∀ b ∈ continuousCocycles ρ',
           (b ∈ finiteCocycles PD ρ' ↔ ∀ a ∈ finiteCocycles PD ρ, CobL PD (cupL ρ' P a b)))
 
+/--
+Integral lattice form of Bloch--Kato local orthogonality under the local Tate pairing for
+`ℤ_l`-lattices `L`, `L'` in dual de Rham representations `V`, `V*(1)`.
+See [Bloch and Kato, *L-functions and Tamagawa numbers of motives* (Proposition 3.8)][blochKato1990].
+-/
 def IntegralDuality : Prop :=
   ∀ L1 : Lattice (O := ℤ_[l]) (charRep (cycLL PD ℚ_[l])),
     L1.T = LinearMap.range (Algebra.linearMap ℤ_[l] ℚ_[l])
@@ -115,6 +130,11 @@ def IntegralDuality : Prop :=
 
 end BlochKato
 
+/--
+Combined local Bloch--Kato statements (`DimFormula`, `RationalDuality`, and `IntegralDuality`)
+for all finite extensions `K / ℚ_l`.
+See [Bloch and Kato, *L-functions and Tamagawa numbers of motives* (Proposition 3.8, Corollary 3.8.4)][blochKato1990].
+-/
 def BlochKatoLocal : Prop :=
   ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
     LocTied l P AI

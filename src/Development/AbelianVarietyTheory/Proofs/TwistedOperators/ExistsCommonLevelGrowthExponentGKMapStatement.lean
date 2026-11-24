@@ -46,6 +46,7 @@ open Classical Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
   Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_common_level_growth_exponent_gKMap
     : GlobalTheory.Published.HarishChandraModules
       → ∀ (D : D7) (θ : InfFam D),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_common_level_growth_exponent_gKMap
                   ∧ ∀ u,
                     (∀ k ∈ U, k ∈ GfC V → ∀ g, T₀ u (g * k) = T₀ u g)
                       ∧ ∀ d, GlobalTheory.Size.growthSob θ V d N (T₀ u) ≠ ⊤ := by
-  first
-  | exact @GlobalTheory.GKUnif.exists_level_exponent
-  | exact GlobalTheory.GKUnif.exists_level_exponent
-  | (intros; apply GlobalTheory.GKUnif.exists_level_exponent <;> assumption)
+  first | exact @GlobalTheory.GKUnif.exists_level_exponent

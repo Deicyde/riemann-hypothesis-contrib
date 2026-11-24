@@ -151,11 +151,7 @@ theorem AAbar_ne : D.host.AAbar ≠ 0 := by
   rw [h] at hfp
   simp at hfp
 
-theorem xi_ne : D.host.xi0 ≠ 0 := by
-  intro h
-  have hfp := Formalism.IndefR.Fin.factPrincipalDatum D.R D.host
-  rw [h] at hfp
-  simp at hfp
+alias xi_ne := _root_.GlobalTheory.ChiGrid.cmHost_imaginaryGenerator_ne_zero
 
 theorem intTr_iff_mem_dual (z : D.host.E)
     : IntTr z

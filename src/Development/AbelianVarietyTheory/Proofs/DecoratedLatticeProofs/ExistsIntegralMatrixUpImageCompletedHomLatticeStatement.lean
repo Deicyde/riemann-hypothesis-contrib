@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx
   GlobalTheory.SeeSaw GlobalTheory.LocMod
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_integral_matrix_up_image_completed_hom_lattice
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k),
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.exists_integral_matrix_up_image_completed_hom_latt
                   (· = q.v)
                 → IsHalf q.e u
                 → ∃ x : Matrix Y Y' k, (∀ r s, x r s ∈ 𝒪[k]) ∧ u = (ofSplit q).up FS FT x := by
-  first
-  | exact @GlobalTheory.HalfIntUp.exists_int_up
-  | exact GlobalTheory.HalfIntUp.exists_int_up
-  | (intros; apply GlobalTheory.HalfIntUp.exists_int_up <;> assumption)
+  first | exact @GlobalTheory.HalfIntUp.exists_int_up

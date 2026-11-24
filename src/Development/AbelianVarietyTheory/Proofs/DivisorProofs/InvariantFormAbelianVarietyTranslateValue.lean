@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Formalism.LocalToGlobal.ProjectiveLattices.SpMapAlgHomId
 
 @[expose] public section
 
@@ -93,9 +94,6 @@ theorem ev_sec_sub_ev_tan_eq_val
   sec_sub_id_eq_val (SqExt.ofModule K P.B P.B) P.w (P.trx v) (P.tr v).w ((P.isTransl_trx v).red hv)
     f
 
-theorem dualMap_id (B : Type) [CommRing B] : dualMap (RingHom.id B) = RingHom.id (DualNumber B) :=
-  RingHom.ext fun c ↦ by ext <;> simp [dualMap]
-
 @[reducible]
 def Pt.origin (A : Over (Sp K)) [GrpObj A] : GPt A where
   B := K
@@ -117,7 +115,7 @@ theorem isTransl_origin (v : epsR K ⟶ A) : IsTransl (algebraMap K K) η[A].lef
   ⟩
   rw [_root_.one_mul]
   change spMap (dualMap (RingHom.id K)) ≫ v.left = v.left
-  rw [dualMap_id, Cris.spMap_id, Category.id_comp]
+  rw [_root_.Formalism.L2.Pj.dualMap_id, Cris.spMap_id, Category.id_comp]
 
 theorem origin_trx (v : epsR K ⟶ A) : (Pt.origin A).trx v = v.left :=
   ((Pt.origin A).isTransl_trx v).unique (isTransl_origin v)
@@ -144,8 +142,7 @@ theorem isNat_tanFn (v : epsR K ⟶ A) (ω : Form (A.hom ≫ 𝟙 (Sp K))) : IsN
 theorem tanFn_eq (hA : IsAbelianScheme A) (v : epsR K ⟶ A) (ω : Form (A.hom ≫ 𝟙 (Sp K))) (P : GPt A)
     : tanFn v ω.1 P = algebraMap K P.B (tanVal v ω) := by
   obtain ⟨g, hg⟩ :=
-    GlobalTheory.T.exists_section_of_natural_on_algebraPoints_of_cover K A.left (A.hom ≫ 𝟙 (Sp K))
-      Unit
+    _root_.GlobalTheory.CechKS.exists_sec_of_isNat K A.left (A.hom ≫ 𝟙 (Sp K)) Unit
       (fun _ ↦ ⊤)
       ⊤
       (fun _ ↦ le_rfl)

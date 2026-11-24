@@ -57,6 +57,7 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (IsUnitarisable IsIrrSmooth bcParam)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilMatrixCoefficient_vacua_unramifiedPlace
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.weilMatrixCoefficient_vacua_unramifiedPlace
                     ∧ ∀ (a : Gv T v) (f₁ f₂ : WO S T → ℂ),
                       VacFin ψ S T v f₁ → VacFin ψ S T v f₂
                         → l2 μ 𝓕 (om (1, embV T v a) f₁) f₂ = φ a * l2 μ 𝓕 f₁ f₂ := by
-  first
-  | exact @GlobalTheory.VacCoef.vac_coef
-  | exact GlobalTheory.VacCoef.vac_coef
-  | (intros; apply GlobalTheory.VacCoef.vac_coef <;> assumption)
+  first | exact @GlobalTheory.VacCoef.vac_coef

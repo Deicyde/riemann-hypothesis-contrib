@@ -2,9 +2,11 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.GlobalCore
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MatKOSmulOne
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharUnramifiedAwayFromEllStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteQuotientCocycleSpanRhoCharLeCocyclesStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WildInertiaKilledByAdditiveLocallyConstantStatement
+public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
+public import Formalism.SharpRestriction.LevelLetterCocycles.QuotientHomNonvanishingBound
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharUnramifiedAwayFromEll
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteQuotientCocycleSpanRhoCharLeCocycles
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WildInertiaKilledByAdditiveLocallyConstant
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuationApplyOfWild
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -160,9 +162,8 @@ theorem main
   intro D i r ρ π Xs S hr hS hπ v hv hq c
   have hl := D.nd.SQ_l i v hv
   have hchi
-      : ∀ γ ∈ Ine (F := D.host.E) (D.nd.plOm.1 v),
-        chiU D.nd i ((c : ℕ) + 1) γ = chiU D.nd i 1 γ := fun γ hγ =>
-    (GlobalTheory.T.cyclotomicChar_unramified_away_from_ell D i v hl γ hγ).2 _ (by omega) c.2
+      : ∀ γ ∈ Ine (F := D.host.E) (D.nd.plOm.1 v), chiU D.nd i ((c : ℕ) + 1) γ = chiU D.nd i 1 γ :=
+    fun γ hγ => (_root_.GlobalTheory.CycUnram.main D i v hl γ hγ).2 _ (by omega) c.2
   have hγ0 := D.nd.locNd_chebotarevPlace_mem i v
   have htor : ∀ f ∈ cocChi i r S Xs c, (D.nd.zeta i v - 1) • f (D.nd.gam0 i v) = 0 := by
     intro f hf
@@ -174,8 +175,7 @@ theorem main
       : ∀ f ∈ cocChi i r S Xs c,
         f (D.nd.gam0 i v) = 0 → ∀ σ ∈ Ine (F := D.host.E) (D.nd.plOm.1 v), f σ = 0 := by
     intro f hf h0
-    obtain ⟨hc, hz⟩ :=
-      (GlobalTheory.T.finiteQuotientCocycleSpan_rho_char_le_cocycles D i r ρ π Xs S hr hS hπ).2 c hf
+    obtain ⟨hc, hz⟩ := (_root_.GlobalTheory.Cut.Coc.main D i r ρ π Xs S hr hS hπ).2 c hf
     have : DiscreteTopology (KOG (D.nd.O i) 1) := ⟨rfl⟩
     have hlc : IsLocallyConstant f := (IsLocallyConstant.iff_continuous f).2 hc
     have hadd
@@ -189,7 +189,7 @@ theorem main
         rw [hchi a ha, mul_inv_cancel, Units.val_one]
       rw [hz, Check.WKG_eq_matKO, e, Check.matKO_smul_one, one_smul]
     exact eq_zero_of_tameGen (D.nd.restN_tameGenerator_generates i v hv) f hlc hadd
-      (GlobalTheory.T.wildInertia_killed_by_additive_locallyConstant D i v hl f hlc hadd) h0
+      (_root_.GlobalTheory.WildAdditive.main D i v hl f hlc hadd) h0
   refine le_trans ?_ (length_torsionBy_le (D.nd.zeta i v - 1))
   refine Module.length_le_of_injective
     (LinearMap.restrict

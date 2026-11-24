@@ -85,7 +85,7 @@ theorem sbHalf_halfInd {S T : HSp D} (e : AE D) (Λ : AddSubgroup (WO S T))
         exact ⟨fun h => by simpa using Λ.sub_mem h hu, fun h => Λ.add_mem h hu⟩
       have hH : IsHalf e (t + 1 • u) ↔ IsHalf e t := by
         unfold IsHalf at hh ⊢
-        simp only [one_smul, Matrix.add_apply, Pi.add_apply, mul_add, hh, add_left_inj]
+        simp only [one_smul, Matrix.add_apply, mul_add, hh, add_left_inj]
       simp only [hΛ, hH]
     · intro t ht
       rw [one_smul]
@@ -161,7 +161,7 @@ theorem latO_le_all
   rintro w ⟨α, hα, h1, h2⟩
   refine ⟨α, hα, ?_, h2⟩
   intro v
-  first | exact fun h => absurd trivial h | simp | simp_all | aesop
+  first | exact fun h => absurd trivial h
 
 theorem fix_inert
     {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}

@@ -1,8 +1,10 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapFromSpecStalk
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRing
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRingStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -216,9 +218,9 @@ theorem lieLat_fibAt_iff
   intro X G _ _ Ω _ ξ E _ _ M R _ _ z C _ _ EC _ _ _ _ MC hξ hG h h' w
   obtain ⟨ER, _, _, ⟨MR⟩⟩ := lieModel_exists X G R z
   obtain ⟨ev, hev, -, hspan⟩ :=
-    GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ E M R z h ER MR hξ hG
+    _root_.GlobalTheory.CompanionTheory.Ar.lieLat_val X G Ω ξ E M R z h ER MR hξ hG
   obtain ⟨evC, hevC, -, -⟩ :=
-    GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ E M C _ h' EC MC hξ hG
+    _root_.GlobalTheory.CompanionTheory.Ar.lieLat_val X G Ω ξ E M C _ h' EC MC hξ hG
   have hj : ∀ u : ER, ∃ w, MC.pt w = LieCarrier.epsHom (algebraMap R C) z _ rfl ≫ MR.pt u :=
     fun u => MC.onto _ (LieFib.isTanAt_epsHom _ _ _ _ _ (MR.tan u))
   choose j hj using hj

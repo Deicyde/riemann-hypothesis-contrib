@@ -50,8 +50,7 @@ import Mathlib.Tactic.ReduceModChar
 open TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.annExt_of :
-    DinvExt → AnnExt := by
+theorem UpperTheory.Gal.crystallineComparison.annExt_of : DinvExt → AnnExt := by
   intro h F G B _ _ _ _ σ ψ L _ _ V _ _ ρ
   have hD := h F G B σ L V ρ
   have hinj : Function.Injective ((Dinv σ ρ).subtype.baseChange L) := by
@@ -59,15 +58,18 @@ theorem UpperTheory.Gal.crystallineComparison.annExt_of :
     exact Module.Flat.lTensor_preserves_injective_linearMap _ (Dinv σ ρ).injective_subtype
   refine ⟨fun e hadm => ?_, fun q n T hA x hx => ?_⟩
   · unfold admitted at hadm ⊢
-    rw [← LinearEquiv.finrank_map_eq (AlgebraTensorModule.assoc F F L L V B), hD, Module.finrank_baseChange]
+    rw [← LinearEquiv.finrank_map_eq (AlgebraTensorModule.assoc F F L L V B), hD,
+      Module.finrank_baseChange]
     rw [← hadm]
     change Module.finrank L (LinearMap.range ((Dinv σ ρ).subtype.baseChange L)) = _
     rw [LinearMap.finrank_range_of_inj hinj, Module.finrank_baseChange]
   · unfold AnnD at hA
     dsimp only
-    have comm : ∀ (f : V →ₗ[F] V) (g : B →ₗ[F] B) (y : (L ⊗[F] V) ⊗[F] B),
-        AlgebraTensorModule.assoc F F L L V B (AlgebraTensorModule.map (f.baseChange L) g y) =
-          (AlgebraTensorModule.map f g).lTensor L (AlgebraTensorModule.assoc F F L L V B y) := by
+    have comm
+        : ∀ (f : V →ₗ[F] V) (g : B →ₗ[F] B) (y : (L ⊗[F] V) ⊗[F] B),
+          AlgebraTensorModule.assoc F F L L V B (AlgebraTensorModule.map (f.baseChange L) g y)
+            = (AlgebraTensorModule.map f g).lTensor L
+              (AlgebraTensorModule.assoc F F L L V B y) := by
       intro f g y
       induction y using TensorProduct.induction_on with
       | zero => simp
@@ -92,8 +94,11 @@ theorem UpperTheory.Gal.crystallineComparison.annExt_of :
     | tmul a w =>
       simp only [Submodule.coe_toBaseChange_tmul, LinearMap.lTensor_tmul]
       have := hA w w.2
-      calc _ = TensorProduct.mk F L (V ⊗[F] B) a (∑ j ∈ Finset.range (n + 1), ((-1) ^ j * (q : ℤ) ^ j.choose 2) • (AlgebraTensorModule.map (T j) (ψ ^ (n - j))) w) := by
-
-            simp only [map_sum, map_zsmul, TensorProduct.mk_apply]
+      calc
+        _ = TensorProduct.mk F L (V ⊗[F] B) a
+            (∑ j ∈ Finset.range (n + 1), ((-1) ^ j * (q : ℤ) ^ j.choose 2) • (AlgebraTensorModule.map (T j) (ψ ^ (n - j))) w) :=
+          by simp only [map_sum, map_zsmul, TensorProduct.mk_apply]
         _ = 0 := by rw [this, map_zero]
-    | add z₁ z₂ h₁ h₂ => simp only [map_add (f := _), Submodule.coe_add, Finset.sum_add_distrib, smul_add, h₁, h₂, add_zero]
+    | add z₁ z₂ h₁ h₂ =>
+      simp only [map_add (f := _), Submodule.coe_add, Finset.sum_add_distrib, smul_add, h₁, h₂,
+        add_zero]

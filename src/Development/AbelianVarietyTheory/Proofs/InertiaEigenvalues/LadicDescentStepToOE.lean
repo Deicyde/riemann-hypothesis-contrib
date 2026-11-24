@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinOEStabilityPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TiltInvariantMemReductionOfFrobeniusEquationStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinOEStabilityProperties
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TiltInvariantMemReductionOfFrobeniusEquation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -57,12 +57,7 @@ namespace GlobalTheory.BSP.DescentStep
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem perfectRing_Cb : PerfectRing (Cb l) l := by
-  refine PerfectRing.ofSurjective _ _ fun x => ?_
-  obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := OCb l) x
-  obtain ⟨a, rfl⟩ := (bijective_frobenius (OCb l) l).2 a
-  obtain ⟨b, rfl⟩ := (bijective_frobenius (OCb l) l).2 b
-  exact ⟨algebraMap _ _ a / algebraMap _ _ b, by simp [frobenius_def]⟩
+alias perfectRing_Cb := _root_.GlobalTheory.OEStable.perfect_Cb
 
 theorem constantCoeff_frobW (w : WCb l)
     : WittVector.constantCoeff (p := l) (R := Cb l) (frobW l w)
@@ -93,13 +88,12 @@ theorem GlobalTheory.BSP.BK.descent_step
             ∧ ∀ g : ↥(GK K), bk.FixFlat g → ∀ j, galW l (g : GQ l) (x' j) = x' j := by
   intro l _ K bk κ _ x b c hc hb hx hg
   haveI : PerfectRing (Cb l) l := perfectRing_Cb
-  obtain ⟨sat, -, hφ, hfix, -⟩ := GlobalTheory.T.breuilKisin_OE_stability_properties l K bk
+  obtain ⟨sat, -, hφ, hfix, -⟩ := _root_.GlobalTheory.OEStable.main l K bk
   set cc := WittVector.constantCoeff (p := l) (R := Cb l) with hcc
   have hmemc : ∀ w ∈ bk.OE, cc w ∈ bk.OE.map cc := fun w hw => Subring.mem_map.2 ⟨w, hw, rfl⟩
   have key : ∀ j, cc (x j) ∈ bk.OE.map cc := by
-    refine GlobalTheory.T.tilt_invariant_mem_reduction_of_frobenius_equation l K bk κ
-      (fun j => cc (x j))
-      ?_ ?_
+    refine
+      _root_.GlobalTheory.BSP.TwoCopy.mem_reduction_of_invariant l K bk κ (fun j => cc (x j)) ?_ ?_
     · intro g hgf j
       have h1 := congrArg cc (hg g hgf j)
       rw [constantCoeff_galW] at h1

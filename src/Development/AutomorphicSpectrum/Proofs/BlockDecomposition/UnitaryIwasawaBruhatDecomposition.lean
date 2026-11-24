@@ -243,7 +243,7 @@ theorem exists_eich
     · subst hk
       by_cases hi' : i = p.rev
       · subst hi'; simp [hz]
-      · simp [hi', hi]
+      · simp [hi']
     · simp [hk, hi, Ne.symm hk]
 
 theorem eich_row_pivot (σ : L →+* L) (p : Fin n) (z : Fin n → L) (j : Fin n)
@@ -423,7 +423,7 @@ theorem mono_end (g : GU σ n) (h : ∀ a, ∃ c, IsoAt (mat g) a c)
           simp only [if_true, one_mul, hrev k, Fin.rev_injective.eq_iff, hinj.eq_iff]
           by_cases hik : i = k
           · simp [hik]
-          · simp [hik, Ne.symm hik]
+          · simp [hik]
         · intro j _ hj; simp [hj]
         · simp)
       (by

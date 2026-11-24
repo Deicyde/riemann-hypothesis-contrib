@@ -60,27 +60,34 @@ open MvPolynomial Finset
 noncomputable section
 
 def flagIntegralReal (f N : ℕ) : MvPolynomial (Fin f × Fin N) ℝ →ₗ[ℝ] ℝ where
-  toFun G := ∑ α ∈ (blockVandermonde f N).support,
-    AddMonoidAlgebra.coeff G α * ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ) * α.prod (fun _ e => (e.factorial : ℝ))
+  toFun G :=
+    ∑ α ∈ (blockVandermonde f N).support,
+      AddMonoidAlgebra.coeff G α * ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ) * α.prod (fun _ e => (e.factorial : ℝ))
   map_add' G H := by simp only [MvPolynomial.coeff_add, add_mul, sum_add_distrib]
-  map_smul' c G := by simp only [MvPolynomial.coeff_smul, smul_eq_mul, RingHom.id_apply, mul_sum, mul_assoc]
+  map_smul' c G := by
+    simp only [MvPolynomial.coeff_smul, smul_eq_mul, RingHom.id_apply, mul_sum, mul_assoc]
 
-theorem flagIntegralReal_map (f N : ℕ) (Φ : RootRing f N) :
-    flagIntegralReal f N (map (algebraMap ℚ ℝ) Φ) = (flagIntegral f N Φ : ℝ) := by
+theorem flagIntegralReal_map (f N : ℕ) (Φ : RootRing f N)
+    : flagIntegralReal f N (map (algebraMap ℚ ℝ) Φ) = (flagIntegral f N Φ : ℝ) := by
   simp [flagIntegralReal, flagIntegral, coeff_map, Finsupp.prod]
 
 namespace FlagEq
 
-theorem flagIntegralReal_eq {f N : ℕ} (G : MvPolynomial (Fin f × Fin N) ℝ) :
-    flagIntegralReal f N G =
-      stairConst f N * ∑ w, ((permSign f N w : ℤ) : ℝ) * AddMonoidAlgebra.coeff G (stairExp f N w) := by
+theorem flagIntegralReal_eq {f N : ℕ} (G : MvPolynomial (Fin f × Fin N) ℝ)
+    : flagIntegralReal f N G
+      = stairConst f N
+        * ∑ w, ((permSign f N w : ℤ) : ℝ) * AddMonoidAlgebra.coeff G (stairExp f N w) := by
   classical
-  have hsub : (blockVandermonde f N).support ⊆
-      (blockVandermonde f N).support ∪ univ.image (stairExp f N) := subset_union_left
+  have hsub
+      : (blockVandermonde f N).support
+        ⊆ (blockVandermonde f N).support ∪ univ.image (stairExp f N) :=
+    subset_union_left
   show ∑ α ∈ _, _ = _
   rw [sum_subset hsub (fun α _ hα => by rw [notMem_support_iff.mp hα]; simp)]
-  have hc : ∀ α : Fin f × Fin N →₀ ℕ, ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ) =
-      ∑ w, ((permSign f N w : ℤ) : ℝ) * if stairExp f N w = α then 1 else 0 := by
+  have hc
+      : ∀ α : Fin f × Fin N →₀ ℕ,
+        ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ)
+          = ∑ w, ((permSign f N w : ℤ) : ℝ) * if stairExp f N w = α then 1 else 0 := by
     intro α
     rw [coeff_blockVandermonde, Rat.cast_sum]
     refine sum_congr rfl fun w _ => ?_
@@ -93,41 +100,49 @@ theorem flagIntegralReal_eq {f N : ℕ} (G : MvPolynomial (Fin f × Fin N) ℝ) 
     prod_factorial_stairExp]
   ring
 
-theorem ddConst_apply (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) :
-    IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G =
-      AddMonoidAlgebra.coeff (∑ w : Fin f → Equiv.Perm (Fin (j + k)),
-        ((permSign f (j + k) w : ℤ) : ℝ) • rename (Equiv.prodCongrRight w) G) (rho f (j + k)) := by
-  simp [IndefiniteRowSideFullHecke.RestTerms.ddConst, IndefiniteRowSideFullHecke.RestTerms.blockAntisym, permSign, rho,
+theorem ddConst_apply (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G
+      = AddMonoidAlgebra.coeff
+        (∑ w : Fin f → Equiv.Perm (Fin (j + k)),
+          ((permSign f (j + k) w : ℤ) : ℝ) • rename (Equiv.prodCongrRight w) G)
+        (rho f (j + k)) := by
+  simp [IndefiniteRowSideFullHecke.RestTerms.ddConst,
+    IndefiniteRowSideFullHecke.RestTerms.blockAntisym, permSign, rho,
     IndefiniteRowSideFullHecke.RestTerms.rhoMon, coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul]
 
-theorem ddConst_eq (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) :
-    IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G =
-      ∑ w, ((permSign f (j + k) w : ℤ) : ℝ) * AddMonoidAlgebra.coeff G (stairExp f (j + k) w) := by
-  rw [ddConst_apply, coeff_rho_antisym]
+theorem ddConst_eq (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G
+      = ∑ w, ((permSign f (j + k) w : ℤ) : ℝ) * AddMonoidAlgebra.coeff G (stairExp f (j + k) w) :=
+  by rw [ddConst_apply, coeff_rho_antisym]
 
-theorem rename_psumAt (f j k m : ℕ) (τ : Fin f) (w : Fin f → Equiv.Perm (Fin (j + k))) :
-    rename (Equiv.prodCongrRight w) (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ) =
-      IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ := by
+theorem rename_psumAt (f j k m : ℕ) (τ : Fin f) (w : Fin f → Equiv.Perm (Fin (j + k)))
+    : rename (Equiv.prodCongrRight w) (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ)
+      = IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ := by
+  simp only [IndefiniteRowSideFullHecke.RestTerms.psumAt, map_sum, map_pow, rename_X,
+    Equiv.prodCongrRight_apply]
+  exact Equiv.sum_comp (w τ)
+    (fun i => (X (τ, i) : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) ^ m)
 
-  simp only [IndefiniteRowSideFullHecke.RestTerms.psumAt, map_sum, map_pow, rename_X, Equiv.prodCongrRight_apply]
-  exact Equiv.sum_comp (w τ) (fun i => (X (τ, i) : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) ^ m)
-
-def antisym (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) : IndefiniteRowSideFullHecke.RestTerms.Roots f j k :=
+def antisym (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : IndefiniteRowSideFullHecke.RestTerms.Roots f j k :=
   ∑ w : Fin f → Equiv.Perm (Fin (j + k)),
     ((permSign f (j + k) w : ℤ) : ℝ) • rename (Equiv.prodCongrRight w) G
 
-theorem antisym_psumAt_mul (f j k m : ℕ) (τ : Fin f) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) :
-    antisym f j k (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * G) =
-      IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * antisym f j k G := by
+theorem antisym_psumAt_mul
+    (f j k m : ℕ) (τ : Fin f) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : antisym f j k (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * G)
+      = IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * antisym f j k G := by
   simp only [antisym, map_mul, rename_psumAt, mul_sum, mul_smul_comm]
 
-theorem rename_antisym (f j k : ℕ) (u : Fin f → Equiv.Perm (Fin (j + k)))
-    (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) :
-    rename (Equiv.prodCongrRight u) (antisym f j k G) =
-      ((permSign f (j + k) u : ℤ) : ℝ) • antisym f j k G := by
-  have hcomp : ∀ w : Fin f → Equiv.Perm (Fin (j + k)),
-      rename (Equiv.prodCongrRight u) (rename (Equiv.prodCongrRight w) G) =
-        rename (Equiv.prodCongrRight (u * w)) G := by
+theorem rename_antisym
+    (f j k : ℕ)
+    (u : Fin f → Equiv.Perm (Fin (j + k))) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : rename (Equiv.prodCongrRight u) (antisym f j k G)
+      = ((permSign f (j + k) u : ℤ) : ℝ) • antisym f j k G := by
+  have hcomp
+      : ∀ w : Fin f → Equiv.Perm (Fin (j + k)),
+        rename (Equiv.prodCongrRight u) (rename (Equiv.prodCongrRight w) G)
+          = rename (Equiv.prodCongrRight (u * w)) G := by
     intro w
     rw [rename_rename]
     congr 1
@@ -140,11 +155,12 @@ theorem rename_antisym (f j k : ℕ) (u : Fin f → Equiv.Perm (Fin (j + k)))
   push_cast
   rw [← mul_assoc, hs, one_mul]
 
-theorem coeff_eq_zero_of_swap {f N : ℕ} (A : MvPolynomial (Fin f × Fin N) ℝ)
+theorem coeff_eq_zero_of_swap
+    {f N : ℕ} (A : MvPolynomial (Fin f × Fin N) ℝ)
     (hA : ∀ u : Fin f → Equiv.Perm (Fin N),
       rename (Equiv.prodCongrRight u) A = ((permSign f N u : ℤ) : ℝ) • A)
-    (β : Fin f × Fin N →₀ ℕ) (τ : Fin f) (i i' : Fin N) (hii : i ≠ i')
-    (hβ : β (τ, i) = β (τ, i')) : AddMonoidAlgebra.coeff A β = 0 := by
+    (β : Fin f × Fin N →₀ ℕ) (τ : Fin f) (i i' : Fin N) (hii : i ≠ i') (hβ : β (τ, i) = β (τ, i'))
+    : AddMonoidAlgebra.coeff A β = 0 := by
   classical
   let u : Fin f → Equiv.Perm (Fin N) := Pi.mulSingle τ (Equiv.swap i i')
   have hu1 : u τ = Equiv.swap i i' := Pi.mulSingle_eq_same _ _
@@ -170,10 +186,14 @@ theorem coeff_eq_zero_of_swap {f N : ℕ} (A : MvPolynomial (Fin f × Fin N) ℝ
   push_cast at h
   linarith
 
-theorem ddConst_psumAt_mul (f j k m : ℕ) (τ : Fin f) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
-    (hm : 1 ≤ m) : IndefiniteRowSideFullHecke.RestTerms.ddConst f j k (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * G) = 0 := by
+theorem ddConst_psumAt_mul
+    (f j k m : ℕ) (τ : Fin f) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) (hm : 1 ≤ m)
+    : IndefiniteRowSideFullHecke.RestTerms.ddConst f j k
+        (IndefiniteRowSideFullHecke.RestTerms.psumAt f j k m τ * G)
+      = 0 := by
   classical
-  rw [ddConst_apply, ← antisym, antisym_psumAt_mul, IndefiniteRowSideFullHecke.RestTerms.psumAt, sum_mul, coeff_sum]
+  rw [ddConst_apply, ← antisym, antisym_psumAt_mul, IndefiniteRowSideFullHecke.RestTerms.psumAt,
+    sum_mul, coeff_sum]
   refine sum_eq_zero fun i _ => ?_
   rw [X_pow_eq_monomial, coeff_monomial_mul']
   split_ifs with h
@@ -182,15 +202,17 @@ theorem ddConst_psumAt_mul (f j k m : ℕ) (τ : Fin f) (G : IndefiniteRowSideFu
     have hi : (i : ℕ) + m < j + k := by have := i.isLt; omega
     have hii : i ≠ ⟨(i : ℕ) + m, hi⟩ := by
       intro h'; have := congrArg Fin.val h'; simp at this; omega
-    rw [coeff_eq_zero_of_swap _ (fun u => rename_antisym f j k u G) _ τ i ⟨(i : ℕ) + m, hi⟩ hii, mul_zero]
+    rw [coeff_eq_zero_of_swap _ (fun u => rename_antisym f j k u G) _ τ i ⟨(i : ℕ) + m, hi⟩ hii,
+      mul_zero]
     rw [Finsupp.tsub_apply, Finsupp.tsub_apply, Finsupp.single_eq_same,
       Finsupp.single_eq_of_ne (by intro h'; simp at h'; exact hii h'.symm)]
     simp only [rho, Finsupp.coe_equivFunOnFinite_symm]
     omega
   · rfl
 
-theorem ddConst_monomial_rho (f j k : ℕ) :
-    IndefiniteRowSideFullHecke.RestTerms.ddConst f j k (monomial (rho f (j + k)) (1 : ℝ)) = 1 := by
+theorem ddConst_monomial_rho (f j k : ℕ)
+    : IndefiniteRowSideFullHecke.RestTerms.ddConst f j k (monomial (rho f (j + k)) (1 : ℝ))
+      = 1 := by
   rw [ddConst_eq, Fintype.sum_eq_single 1]
   · simp [stairExp_one, permSign_one]
   · intro w hw
@@ -198,10 +220,11 @@ theorem ddConst_monomial_rho (f j k : ℕ) :
 
 end FlagEq
 
-
 open FlagEq in
-theorem flagIntegralReal_eq_mul_ddConst (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k) :
-    flagIntegralReal f (j + k) G = stairConst f (j + k) * IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G := by
+theorem flagIntegralReal_eq_mul_ddConst
+    (f j k : ℕ) (G : IndefiniteRowSideFullHecke.RestTerms.Roots f j k)
+    : flagIntegralReal f (j + k) G
+      = stairConst f (j + k) * IndefiniteRowSideFullHecke.RestTerms.ddConst f j k G := by
   rw [flagIntegralReal_eq, ddConst_eq]
 
 end

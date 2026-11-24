@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaDiagInt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DoubledDarbouxCoordsCompat
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicStoneVonNeumannLagrangianUniquenessStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicStoneVonNeumannLagrangianUniqueness
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -176,8 +177,7 @@ theorem eq_mul_diagInt
     rw [e]
     exact h _ _ φ hφ
   obtain ⟨c, hc⟩ :=
-    GlobalTheory.T.adelicStoneVonNeumann_lagrangian_uniqueness F ψ hψ (κ ⊕ κ)
-      (LinearMap.range (diagL F κ))
+    _root_.GlobalTheory.AdelicSvN.main F ψ hψ (κ ⊕ κ) (LinearMap.range (diagL F κ))
       (by
         rintro _ ⟨p, rfl⟩ _ ⟨q, rfl⟩
         simp [diagL, dotProduct, Fintype.sum_sum_type])

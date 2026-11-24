@@ -47,28 +47,11 @@ import Mathlib.Tactic.TypeStar
 
 set_option maxSynthPendingDepth 1
 
+-- Use `sheafIsAbelian`, the instance Mathlib's `Sheaf.H` API is stated for, instead of the
+-- definitionally equal `TopCat.Sheaf.instAbelian`: the kernel is slow to identify the two.
+attribute [-instance] TopCat.Sheaf.instAbelian
+
 namespace GroundTheory.Arith.SchemeCoh
-
-section
-
-open AlgebraicGeometry CategoryTheory TopologicalSpace
-
-universe c236Ext c236Scheme
-
-private noncomputable def H.linearMapV436 {X : Scheme.{c236Scheme}}
-    [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
-    (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
-  toFun := Sheaf.H.map.{c236Ext} (modulesAbMap φ) n
-  map_add' := map_add _
-  map_smul' a x := by
-    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x) =
-      a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
-    rw [H.smul_def, H.smul_def, ← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply,
-      ← modulesAbMap_comp, ← modulesAbMap_comp, smulHom_comp]
-
-end
 
 open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits
 
@@ -86,8 +69,11 @@ private lemma mem_range_of_comm {R M M' N N' : Type*} [CommRing R]
   obtain ⟨x, rfl⟩ := hy
   exact ⟨f x, comm x⟩
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] (F : X.Modules) (q : ℕ)
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  (F : X.Modules) (q : ℕ)
 
 lemma formalτ_mem_formalQ (n : ℕ) (y : Sheaf.H.{u} (modulesAb (idealPow I F (n + 2))) (q + 1))
     (hy : y ∈ formalQ I F q (n + 1)) :
@@ -98,8 +84,10 @@ lemma formalτ_mem_formalQ (n : ℕ) (y : Sheaf.H.{u} (modulesAb (idealPow I F (
 def formalτQ (n : ℕ) : formalQ I F q (n + 1) →ₗ[A] formalQ I F q n :=
   (H.linearMap A (idealPowSucc I F (n + 1)) (q + 1)).restrict (formalτ_mem_formalQ I F q n)
 
-abbrev formalτP : ∀ n, (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q (n + 1)) →ₗ[A]
-    (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q n) :=
+abbrev formalτP
+    : ∀ n,
+      (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q (n + 1)) →ₗ[A]
+        (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q n) :=
   quotTower (formalK I F q) (formalK_antitone I F q)
 
 lemma formalι_comm (n : ℕ) :
@@ -134,15 +122,18 @@ private lemma mem_range_of_towerLimit {R : Type u} [CommRing R]
 
 variable {I F q}
 
-theorem mem_range_formalβ_of_mem_towerLimit {c : ℕ}
-    (hQ : ∀ n, towerComp (E := fun m => formalQ I F q m) (formalτQ I F q) n c = 0)
-    {x : ∀ n, Sheaf.H.{u} (modulesAb (quotPow I F n)) q} (hx : x ∈ towerLimit (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q) (formalτE I F q))
-    (n : ℕ) : x n ∈ LinearMap.range (formalβ I F q n) := by
+theorem mem_range_formalβ_of_mem_towerLimit
+    {c : ℕ} (hQ : ∀ n, towerComp (E := fun m => formalQ I F q m) (formalτQ I F q) n c = 0)
+    {x : ∀ n, Sheaf.H.{u} (modulesAb (quotPow I F n)) q}
+    (hx : x ∈ towerLimit (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q) (formalτE I F q))
+    (n : ℕ)
+    : x n ∈ LinearMap.range (formalβ I F q n) := by
   have hβ : (formalβ I F q n).range = (formalπ I F q n).ker :=
     (Submodule.range_liftQ (formalK I F q n) (formalβ I F q n) (ker_formalβ I F q n).ge).symm.trans
       (range_formalι I F q n)
   exact mem_range_of_towerLimit
-    (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q) (Q := fun m => formalQ I F q m)
+    (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q)
+    (Q := fun m => formalQ I F q m)
     (n := n) (c := c) (x := x) (formalτE I F q) (formalτQ I F q) (formalπ I F q)
     (formalπ_comm I F q) (hQ n) hx (formalβ I F q n) hβ
 

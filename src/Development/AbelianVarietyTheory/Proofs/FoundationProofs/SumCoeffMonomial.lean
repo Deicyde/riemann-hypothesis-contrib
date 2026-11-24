@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MonomialDerivCauchyBoundGaussianGrowthStatement
+public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.IsDiscriminantTwelfthRootOfIdealLattice
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MonomialDerivCauchyBoundGaussianGrowth
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -192,7 +193,7 @@ theorem minor_bound
       rw [hs, one_mul]
       apply Real.le_sqrt_of_sq_le
       have :=
-        GlobalTheory.T.monomialDeriv_cauchy_bound_gaussianGrowth D a d G S A B hA hB hS hG hbd
+        _root_.GlobalTheory.GaussCauchy.monomial_deriv_bound D a d G S A B hA hB hS hG hbd
           (expo D T p) (fun k => le_trans (by exact_mod_cast expo_le D T p k) (hn k.1))
       rwa [expo_sum] at this
     have hcard
@@ -200,7 +201,6 @@ theorem minor_bound
           = (a.factorial : ℝ) ^ (∑ τ, n τ) := by
       simp [Fintype.card_pi, Fintype.card_perm, Finset.prod_pow_eq_pow_sum]
     have hle : ‖L (minorPol D T)‖ ≤ (a.factorial : ℝ) ^ (∑ τ, n τ) * Real.sqrt M := by
-
       rw [minorPol_eq, map_sum]
       refine (norm_sum_le _ _).trans ?_
       refine (Finset.sum_le_sum fun p _ => hterm p).trans ?_

@@ -43,9 +43,6 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.FinIso
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N

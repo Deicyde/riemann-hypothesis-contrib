@@ -165,7 +165,7 @@ theorem coeff_kill (j : Fin n) (f : PS k n d) (m : Fin n × Fin d →₀ ℕ)
       have hp : (e.prod fun s i => a s ^ i) = 0 := by
         refine Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hb) ?_
         show ((Function.update gen j 0 j : Q k d n) : Pt k n d) b ^ e (j, b) = 0
-        first | rw [Function.update_self] | rw [Function.update_same]
+        first | rw [Function.update_self]
         exact zero_pow hb
       rw [hp, map_zero, if_neg]
       rintro ⟨rfl, h⟩

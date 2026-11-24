@@ -100,7 +100,7 @@ theorem isIntV_tmat_inv
   have hadj : ∀ i j, (tmat γ).adjugate i j ∈ S := by
     intro i j
     rw [hM, ← RingHom.map_adjugate]
-    first | exact (M'.adjugate i j).2 | simp
+    first | exact (M'.adjugate i j).2
   have hdet_inv : v ((tmat γ).det⁻¹) = 0 := by
     have h1 : v ((tmat γ).det⁻¹ * (tmat γ).det) = 0 := by
       rw [inv_mul_cancel₀ (tmat_det_ne_zero hdet), AddValuation.map_one]
@@ -172,7 +172,7 @@ theorem vecMul_tmat_support
       · simp [hx', hb']
       · have hb2 : ty b' = τ := not_not.mp hb'
         have h1 : tangent (γ b') c = 0 := ht b' c (by rw [hb2]; exact hc)
-        simp [hx', hb', tmat, h1]
+        simp [hx', tmat, h1]
   have h3 := congrFun (eq_zero_of_vecMul_tmat hdet hz) b
   simpa [hx', hb] using h3
 

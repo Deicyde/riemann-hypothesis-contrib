@@ -59,12 +59,12 @@ namespace GlobalTheory
 def unitBallSubring (A : Type) [NormedField A] [IsUltrametricDist A] : Subring A :=
   GlobalTheory.ClosedBallValuationSubring.closedBallSubring A
 
-theorem den_eq_one_of_padicNorm_le_one (c : ℚ)
-    (h : ∀ q : ℕ, q.Prime → padicNorm q c ≤ 1) : c.den = 1 := by
+theorem den_eq_one_of_padicNorm_le_one (c : ℚ) (h : ∀ q : ℕ, q.Prime → padicNorm q c ≤ 1)
+    : c.den = 1 := by
   apply PI.ProdFormulaE.Frac.den_eq_one_of_forall_padicNorm_le_one <;> assumption
 
-theorem isIntegral_of_forall_padicAlgCl_norm_le_one :
-    ∀ (M : Type) [Field M] [NumberField M] (a : M),
+theorem isIntegral_of_forall_padicAlgCl_norm_le_one
+    : ∀ (M : Type) [Field M] [NumberField M] (a : M),
       (∀ (q : ℕ) [Fact q.Prime] (τ : M →+* PadicAlgCl q), ‖τ a‖ ≤ 1) → IsIntegral ℤ a := by
   intro M _ _ a h
   set f := minpoly ℚ a with hf
@@ -81,7 +81,8 @@ theorem isIntegral_of_forall_padicAlgCl_norm_le_one :
         rw [Polynomial.mem_rootSet]
         obtain ⟨hne, hr⟩ := (mem_roots'.mp hb)
         refine ⟨fun h0 => hne (by rw [hg, h0, Polynomial.map_zero]), ?_⟩
-        rw [← eval_map_algebraMap]; exact hr
+        rw [← eval_map_algebraMap]
+        exact hr
       rw [← NumberField.Embeddings.range_eval_eq_rootSet_minpoly] at hb'
       obtain ⟨τ, rfl⟩ := hb'
       exact h q τ
@@ -97,10 +98,9 @@ theorem isIntegral_of_forall_padicAlgCl_norm_le_one :
         refine S.multiset_prod_mem _ fun y hy => hroots y ?_
         exact Multiset.mem_of_le (Multiset.mem_powersetCard.mp hs).1 hy
       · rw [coeff_eq_zero_of_natDegree_lt (by omega)]; exact S.zero_mem
-    have h1 : ‖algebraMap ℚ (PadicAlgCl q) (f.coeff n)‖ ≤ 1 := by
-      rw [← coeff_map]; exact hgc
-    have e : algebraMap ℚ (PadicAlgCl q) (f.coeff n) =
-        ((f.coeff n : ℚ_[q]) : PadicAlgCl q) := by simp
+    have h1 : ‖algebraMap ℚ (PadicAlgCl q) (f.coeff n)‖ ≤ 1 := by rw [← coeff_map]; exact hgc
+    have e : algebraMap ℚ (PadicAlgCl q) (f.coeff n) = ((f.coeff n : ℚ_[q]) : PadicAlgCl q) := by
+      simp
     rw [e, PadicAlgCl.norm_extends, Padic.eq_padicNorm] at h1
     exact_mod_cast h1
   have hlift : f ∈ Polynomial.lifts (Int.castRingHom ℚ) := by

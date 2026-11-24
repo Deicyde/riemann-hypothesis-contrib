@@ -57,6 +57,7 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+
 theorem _root_.GlobalTheory.T.exists_lieDerivative_polynomialFock_seesaw
     : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         {σ : E →ₐ[F] E} {a a' : ℕ} (B : Base F E) (G : Geo σ a a') (X : Chars F E)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_lieDerivative_polynomialFock_seesaw
             ∀ f ∈ G.M.Pol B.ψ B.emb,
               δ f ∈ G.M.Pol B.ψ B.emb
                 ∧ ActsD (evI F) (fun t => om (1, γ (Multiplicative.ofAdd t))) f (δ f) := by
-  first
-  | exact @GlobalTheory.OscLie.exists_lie_deriv_pol
-  | exact GlobalTheory.OscLie.exists_lie_deriv_pol
-  | (intros; apply GlobalTheory.OscLie.exists_lie_deriv_pol <;> assumption)
+  first | exact @GlobalTheory.OscLie.exists_lie_deriv_pol

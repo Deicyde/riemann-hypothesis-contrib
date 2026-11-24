@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilOperator_lattice_stabiliser_fixes_vacuum_nonsplit
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
         (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.weilOperator_lattice_stabiliser_fixes_vacuum_nonsp
                         (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
                       f
                     → om (g, h) f = f := by
-  first
-  | exact @GlobalTheory.VecInvInert.om_fixes_vacuum
-  | exact GlobalTheory.VecInvInert.om_fixes_vacuum
-  | (intros; apply GlobalTheory.VecInvInert.om_fixes_vacuum <;> assumption)
+  first | exact @GlobalTheory.VecInvInert.om_fixes_vacuum

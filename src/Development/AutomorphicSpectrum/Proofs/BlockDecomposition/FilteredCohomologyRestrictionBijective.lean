@@ -89,7 +89,7 @@ theorem pull_bij_of_adj
   have hR := CrystallineSemistableComparison.P.adj F' L m.G a n
   have hα : Function.Bijective ((CH.Mor.ofNatTrans α).pull n) := by
     have h1 :=
-      CrystallineSemistableComparison.P.coef_upTo α 1
+      _root_.GlobalTheory.CompanionTheory.CoefUpTo.coef_upTo α 1
         (fun T =>
           (CrystallineSemistableComparison.P.upTo_alg (α.app T).hom LinearMap.id 1 1).2.2.2.2.2 (hb
             T))

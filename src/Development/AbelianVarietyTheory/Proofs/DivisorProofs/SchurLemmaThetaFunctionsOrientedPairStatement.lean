@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.schurLemma_thetaFunctions_orientedPair
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.schurLemma_thetaFunctions_orientedPair
               μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL T S) 𝓕 μ
                 → ∀ f, IsThetaFunO ψ S T f → ∫⁻ w in 𝓕, ‖M f w‖ₑ ^ 2 ∂μ = ∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ)
             → ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ f, IsThetaFunO ψ S T f → M f = c • f := by
-  first
-  | exact @GlobalTheory.ThetaSchur.schur
-  | exact GlobalTheory.ThetaSchur.schur
-  | (intros; apply GlobalTheory.ThetaSchur.schur <;> assumption)
+  first | exact @GlobalTheory.ThetaSchur.schur

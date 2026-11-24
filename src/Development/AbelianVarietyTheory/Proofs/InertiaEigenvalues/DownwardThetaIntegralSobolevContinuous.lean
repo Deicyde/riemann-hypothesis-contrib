@@ -81,7 +81,7 @@ theorem integrableOn_extV
   have hp : (Vc D i).IsPosDef := hm.vpos i
   have hpd : ∀ τ, (gramAt D (Vc D i) τ).PosDef := fun τ =>
     GlobalTheory.RepsObj.gramAt_posDef hp (D.sp.V_sig ((i : ℕ) + 1)) τ
-  have hc := GlobalTheory.definite_unitary_cocompact (Vc D i) hpd
+  have hc := _root_.GlobalTheory.DefiniteQuotient.exists_compact (Vc D i) hpd
   have hK := hc.choose_spec.1
   have hKc := hc.choose_spec.2
   have hx := (hm.HV i t).2.1.le (LinearMap.mem_range_self _ y)
@@ -151,7 +151,7 @@ theorem downInt_sobolev_cont
   have hp : (Vc D i).IsPosDef := hm.vpos i
   have hpd : ∀ τ, (gramAt D (Vc D i) τ).PosDef := fun τ =>
     GlobalTheory.RepsObj.gramAt_posDef hp (D.sp.V_sig ((i : ℕ) + 1)) τ
-  obtain ⟨K, hK, hKc⟩ := GlobalTheory.definite_unitary_cocompact (Vc D i) hpd
+  obtain ⟨K, hK, hKc⟩ := _root_.GlobalTheory.DefiniteQuotient.exists_compact (Vc D i) hpd
   obtain ⟨HK, hHK⟩ := hK.exists_bound_of_continuousOn (continuous_height (Vc D i)).continuousOn
   have hHK0 : 0 ≤ HK := by
     obtain ⟨γ, -, c, hc, -⟩ := hKc 1

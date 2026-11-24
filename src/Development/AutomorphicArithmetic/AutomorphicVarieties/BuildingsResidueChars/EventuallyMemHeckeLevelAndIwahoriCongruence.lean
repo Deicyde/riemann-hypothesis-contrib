@@ -50,7 +50,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem cmp_of
     {l : ℕ} [Fact l.Prime]
     {L : Type} [Field L] [NumberField L] [IsCMField L]

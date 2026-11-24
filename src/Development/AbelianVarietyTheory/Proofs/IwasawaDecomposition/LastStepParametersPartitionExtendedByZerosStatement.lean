@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum GlobalTheory.Chain GlobalTheory.CompactHowe Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.lastStep_parameters_partition_extended_by_zeros
     : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N : ℕ) (lam : Fin n → ℝ) (ε : Fin n → Bool)
         (lam' : Fin N → ℝ) (ε' : Fin N → Bool),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.lastStep_parameters_partition_extended_by_zeros
                   ∧ ∀ b,
                     Formalism.QuantumDeterminants.lowK (allPos N) lam' b
                       = -(x₁ : ℝ) - ν (Fin.rev b) := by
-  first
-  | exact @GlobalTheory.LastStepParam.lastStep_param
-  | exact GlobalTheory.LastStepParam.lastStep_param
-  | (intros; apply GlobalTheory.LastStepParam.lastStep_param <;> assumption)
+  first | exact @GlobalTheory.LastStepParam.lastStep_param

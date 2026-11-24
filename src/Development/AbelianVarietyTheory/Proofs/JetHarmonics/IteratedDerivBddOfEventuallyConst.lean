@@ -200,7 +200,7 @@ private theorem inCC_real_smul_comp_Gf_of_inCC
           _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.wL,
           _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.wR, List.map_append, List.map_map,
           List.sum_append, List.sum_map_add, Function.comp_def, List.map_const', List.sum_replicate,
-          smul_eq_mul, List.length_map]
+          smul_eq_mul]
         omega
       calc
         _ ≤ K

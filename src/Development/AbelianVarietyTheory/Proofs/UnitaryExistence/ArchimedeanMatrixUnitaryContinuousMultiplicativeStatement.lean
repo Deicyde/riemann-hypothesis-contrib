@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.archimedeanMatrix_unitary_continuous_multiplicative
     : ∀ (D : D7) (V : HSp D), ∀ (θ : (D.host.E →+* ℂ) → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
       (∀ τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ (θ τ))
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.archimedeanMatrix_unitary_continuous_multiplicativ
                   → (u τ)ᵀ * (- V.gramᵀ).map τ * (u τ).map (starRingEnd ℂ) = (- V.gramᵀ).map τ)
               → ∃ a ∈ GinfC V, ∀ τ,
                 τ D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD → archM V (θ τ) a = u τ := by
-  first
-  | exact @GlobalTheory.Member.Arch.archM_spec
-  | exact GlobalTheory.Member.Arch.archM_spec
-  | (intros; apply GlobalTheory.Member.Arch.archM_spec <;> assumption)
+  first | exact @GlobalTheory.Member.Arch.archM_spec

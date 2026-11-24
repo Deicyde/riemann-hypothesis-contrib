@@ -51,7 +51,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 theorem UpperTheory.V.Hi.deformationRing_to_heckeAlgebra_surjective
     : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
         [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c),

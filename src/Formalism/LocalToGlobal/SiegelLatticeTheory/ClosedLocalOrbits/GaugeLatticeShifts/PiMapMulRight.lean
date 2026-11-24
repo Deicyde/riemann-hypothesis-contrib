@@ -111,7 +111,7 @@ theorem pi_map_mul_left
   have hpre
       : (fun x : ∀ i, G i => g * x) ⁻¹' Set.univ.pi s
         = Set.univ.pi fun i => (fun y => g i * y) ⁻¹' s i := by
-    ext x; simp [Set.mem_univ_pi]
+    ext x; simp
   rw [hpre, Measure.pi_pi]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [← Measure.map_apply (measurable_const_mul (g i)) (hs i), h i]
@@ -128,7 +128,7 @@ theorem pi_map_mul_right
   have hpre
       : (fun x : ∀ i, G i => x * g) ⁻¹' Set.univ.pi s
         = Set.univ.pi fun i => (fun y => y * g i) ⁻¹' s i := by
-    ext x; simp [Set.mem_univ_pi]
+    ext x; simp
   rw [hpre, Measure.pi_pi]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [← Measure.map_apply (measurable_mul_const (g i)) (hs i), h i]

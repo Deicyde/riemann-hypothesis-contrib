@@ -121,7 +121,7 @@ theorem toL_tS_mul : toL (tS W xP) * (xL W - HahnSeries.C xP) = 1 := by
       ring
     _ = 1 := by rw [toL_X_mul, toL_tDen_mul_inv, one_pow, one_mul]
 
-theorem coeff_two_tS : coeff 2 (tS W xP) = 1 := by simp [tS, PowerSeries.coeff_X_pow_mul', inv_cc]
+theorem coeff_two_tS : coeff 2 (tS W xP) = 1 := by simp [tS, PowerSeries.coeff_X_pow_mul']
 
 theorem toL_nS
     : toL (nS W xP yP)
@@ -139,8 +139,7 @@ theorem toL_yPlus
     : toL (yPlus W xP yP)
       = -(toL (yS W - C yP * X ^ 3) * toL (nS W xP yP) * toL (invOfUnit (tDen W xP) 1) ^ 3)
         - HahnSeries.C yP - HahnSeries.C W.a₁ * toL (xPlus W xP yP) - HahnSeries.C W.a₃ := by
-  simp only [yPlus, map_add (f := _), map_sub, map_neg, map_mul, map_pow,
-    HahnSeries.ofPowerSeries_C]
+  simp only [yPlus, map_sub, map_neg, map_mul, map_pow, HahnSeries.ofPowerSeries_C]
 
 theorem inv_subst (hI : ISerSpec.{u})
     : (invOfUnit (tDen W xP) 1).subst (iSer W) = iDen W ^ 2 * invOfUnit (tDen W xP) 1 := by
@@ -267,9 +266,9 @@ theorem map_xPlus : PowerSeries.map φ (xPlus W xP yP) = xPlus (W.map φ) (φ xP
     Plus.map_nS W xP yP φ, Plus.map_inv W xP φ]
 
 theorem map_yPlus : PowerSeries.map φ (yPlus W xP yP) = yPlus (W.map φ) (φ xP) (φ yP) := by
-  simp only [yPlus, yS, map_add (f := _), map_sub, map_neg, map_mul, map_pow, PowerSeries.map_C,
-    PowerSeries.map_X, CurveSer.map_xS, Plus.map_nS W xP yP φ, Plus.map_inv W xP φ,
-    Plus.map_xPlus W xP yP φ, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
+  simp only [yPlus, yS, map_sub, map_neg, map_mul, map_pow, PowerSeries.map_C, PowerSeries.map_X,
+    CurveSer.map_xS, Plus.map_nS W xP yP φ, Plus.map_inv W xP φ, Plus.map_xPlus W xP yP φ,
+    WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
 
 end Map
 

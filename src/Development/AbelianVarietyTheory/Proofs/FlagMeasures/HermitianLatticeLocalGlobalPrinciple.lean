@@ -2,8 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocClosed
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PlacesOf
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniqueGlobalLatticeOfLocalLatticesStatement
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NumberFieldLatticeDeterminedByLocalLatticesStatement
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GFrames
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniqueGlobalLatticeOfLocalLattices
+import Mathlib.Algebra.Module.Lattice.Full
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NumberFieldLatticeDeterminedByLocalLattices
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -100,8 +102,8 @@ theorem std_finite (Z : LocDat D) (Λ : LV D) (h : Submodule.IsFullLattice D.hos
       rw [Submodule.span_image, h.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
       exact (cE D).surjective
     have :=
-      (GlobalTheory.T.numberField_lattice_determined_by_local_lattices (GlobalTheory.HL.placesOf Z)
-        (nV D) (cL Λ) hc).2.2
+      (_root_.GlobalTheory.HL.PlacesRec.lattice_local (GlobalTheory.HL.placesOf Z) (nV D) (cL Λ)
+        hc).2.2
     simp only [localLattice_eq]
     exact this
 
@@ -131,18 +133,17 @@ theorem lattices_local_global
       rw [Submodule.span_image, h.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
       exact (cE D).surjective
     have r₁ :=
-      (GlobalTheory.T.numberField_lattice_determined_by_local_lattices (GlobalTheory.HL.placesOf Z)
-        (nV D) (cL Λ₁) (hc Λ₁ h₁)).1
+      (_root_.GlobalTheory.HL.PlacesRec.lattice_local (GlobalTheory.HL.placesOf Z) (nV D) (cL Λ₁)
+        (hc Λ₁ h₁)).1
     have r₂ :=
-      (GlobalTheory.T.numberField_lattice_determined_by_local_lattices (GlobalTheory.HL.placesOf Z)
-        (nV D) (cL Λ₂) (hc Λ₂ h₂)).1
+      (_root_.GlobalTheory.HL.PlacesRec.lattice_local (GlobalTheory.HL.placesOf Z) (nV D) (cL Λ₂)
+        (hc Λ₂ h₂)).1
     ext x
     rw [r₁, r₂]
     refine forall_congr' fun p => ?_
     rw [← localLattice_eq, ← localLattice_eq, h p]
   · obtain ⟨Γ, ⟨hΓ, hΓp⟩, -⟩ :=
-      GlobalTheory.T.exists_unique_global_lattice_of_local_lattices (GlobalTheory.HL.placesOf Z)
-        (nV D) Lp
+      _root_.GlobalTheory.HL.Glue.glue (GlobalTheory.HL.placesOf Z) (nV D) Lp
         (fun p => hL p)
         (((std_finite Z Λ₀ h₀).union hfin).subset fun p hp => by
           by_contra hc

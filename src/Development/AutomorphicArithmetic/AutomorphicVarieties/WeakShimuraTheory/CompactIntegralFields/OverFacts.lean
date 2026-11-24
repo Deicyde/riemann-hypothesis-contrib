@@ -135,7 +135,7 @@ private theorem eq_of_isLow_of_isUp_adj_mul_of_isUnit_det
         m12, m13, m23, n01, n02, n03, n12, n13, n23, m0, m1, m2, m3, d0, d1, d2, d3]
     · fin_cases i <;> fin_cases j <;> simp (config := { decide := true }) at hij ⊢
         <;> simp [Matrix.mul_apply, Fin.sum_univ_four, adj, sgn, Fin.rev, m01, m02, m03, m12, m13,
-          m23, n01, n02, n03, n12, n13, n23, m0, m1, m2, m3, d0, d1, d2, d3]
+          m23, n01, n02, n03, n12, n13, n23, m1, m2, m3, d1, d2, d3]
   calc
     n = (m * adj m) * n := by rw [hmr, Matrix.one_mul]
     _ = m * (adj m * n) := Matrix.mul_assoc _ _ _
@@ -285,10 +285,9 @@ private theorem first_column_and_entry_two_one_of_isUp_adj_mul
   constructor
   · intro i
     fin_cases i <;> simp [Matrix.mul_apply, Fin.sum_univ_four, n01, n02, n03, n12, n13, n23, x10,
-      x20, x30, x21, x31, x32, d0]
+      x20, x30, d0]
   · intro h01 h21 h11
-    simp [Matrix.mul_apply, Fin.sum_univ_four, n01, n02, n03, n12, n13, n23, x10, x20, x30, x21,
-        x31, x32, d0]
+    simp [Matrix.mul_apply, Fin.sum_univ_four, n01, n02, n03, n12, n13, n23, x21, x31, d0]
       at h01 h21 h11
     rw [h01] at h21 h11
     simp [hd 1] at h21 h11
@@ -304,7 +303,7 @@ private theorem entry_pow_mul_sub_eq_and_diag_pow
     : r (x ^ m) i j * (r x i i - r x j j) = r x i j * (r x i i ^ m - r x j j ^ m)
       ∧ r (x ^ m) i i = r x i i ^ m ∧ r (x ^ m) j j = r x j j ^ m := by
   induction m with
-  | zero => simp [Matrix.one_apply, hij]
+  | zero => simp [hij]
   | succ m ih =>
     obtain ⟨h1, h2, h3⟩ := ih
     rw [pow_succ, hc, hdi, hdj, h2, h3]
@@ -425,7 +424,6 @@ private theorem mul_inv_mul_mul_inv_eq {Γ : Type} [CommGroup Γ] (a b c : Γ)
   rw [mul_comm c, ← mul_assoc, mul_assoc a, mul_comm b⁻¹ a⁻¹, ← mul_assoc, mul_inv_cancel, one_mul,
     mul_comm]
 
-
 open UpperTheory.V.Ws.OvF in
 theorem UpperTheory.V.Ws.overFacts
     : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
@@ -533,7 +531,7 @@ theorem UpperTheory.V.Ws.overFacts
     have q21 := hSt g 2 1 (by decide) (by decide)
     have q23 := hSt g 2 3 (by decide) (by decide)
     simp only [Matrix.mul_apply, Fin.sum_univ_four, n00, m00, r01, r02, r03, r21, r23, q01, q02,
-        q03, q21, q23, mul_zero, zero_mul, add_zero, zero_add, mul_one]
+        q03, q21, q23, zero_mul, add_zero, mul_one]
       at e1 e2
     have d00 : t.r g 0 0 = s.r g 0 0 := by rw [hds, hdt]
     have d22 : t.r g 2 2 = s.r g 2 2 := by rw [hds, hdt]
@@ -564,7 +562,7 @@ theorem UpperTheory.V.Ws.overFacts
     have q12 := hSt g 1 2 (by decide) (by decide)
     have q13 := hSt g 1 3 (by decide) (by decide)
     simp only [Matrix.mul_apply, Fin.sum_univ_four, n00, m00, r01, r02, r03, r12, r13, q01, q02,
-        q03, q12, q13, mul_zero, zero_mul, add_zero, zero_add, mul_one]
+        q03, q12, q13, zero_mul, add_zero, mul_one]
       at e1 e2
     have d00 : t.r g 0 0 = s.r g 0 0 := by rw [hds, hdt]
     have d11 : t.r g 1 1 = s.r g 1 1 := by rw [hds, hdt]

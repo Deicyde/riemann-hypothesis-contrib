@@ -4,12 +4,12 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHo
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Clauses
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AdditionGraphThetaObjectCutOutBoundedDegreeStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFamilyMorphismFromVeryDenseGraphsStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AdditionGraphThetaObjectCutOutBoundedDegree
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFamilyMorphismFromVeryDenseGraphs
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSegreCoordinates
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjProperRelAmpleOfProjectiveCoordinateRep
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SecCoordBcScaleUnique
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionCoordinatesPullIsoNonzeroLocusStatement
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionCoordinatesPullIsoNonzeroLocus
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -206,7 +206,7 @@ theorem graph_transport
   have s₁ := hsq.1
   have s₂ := hsq.2
   obtain ⟨t₂, ht₂⟩ :=
-    (GlobalTheory.T.sectionCoordinates_pull_iso_nonzeroLocus _ M₂ _ th₂ hM₂).1 _
+    (_root_.GlobalTheory.ZM.CoordMove.secCoord_pull_iso_locus _ M₂ _ th₂ hM₂).1 _
       (q.left ≫ e ≫ pullback.fst _ _)
   refine ⟨_, t₂, pull_isLB hM₂ _, fun T _ y v₁ v₂ k₁ k₂ => ?_, ?_⟩
   · rw [ht₂]
@@ -268,8 +268,7 @@ theorem exists_add
                       → ∀ φ₂ : (t'.A ⊗ t'.A).left ⟶ (Z ⊗ Z).left,
                         IsSquare φ φ₂ → φ₂ ≫ m.left = (μ[t'.A]).left ≫ φ) := by
   intro L1 L2 g J _ Mat κ n hn ho
-  obtain ⟨j₀, hj₀⟩ :=
-    GlobalTheory.T.additionGraph_thetaObject_cutOut_bounded_degree L1 L2 g J Mat κ n hn ho
+  obtain ⟨j₀, hj₀⟩ := _root_.GlobalTheory.cutBy_graph_addition L1 L2 g J Mat κ n hn ho
   refine ⟨j₀, fun j hj o _ b R _ _ _ β v Z I M th sc p hVD ⟨hP, hS, _, hp⟩ hfib => ?_⟩
   obtain ⟨Q, d, hQ⟩ := hj₀ j hj o b
   have : NeZero ((n ^ j) ^ 2) := ⟨pow_ne_zero _ (pow_ne_zero _ hn.ne_zero)⟩
@@ -326,7 +325,7 @@ theorem exists_add
     · exact IsPullback.isoPullback_hom_fst _
     · exact Iso.hom_inv_id_assoc _ _
   obtain ⟨F, hF⟩ :=
-    GlobalTheory.T.exists_family_morphism_from_veryDense_graphs R _ _
+    _root_.GlobalTheory.ZM.GraphMor.exists_hom_of_graphs R _ _
       (Ix g ((n ^ j) ^ 2) × Ix g ((n ^ j) ^ 2)) (Z ⊗ Z) Z I₂ I M₂ M th₂ th
       (fun h i => p h.1 i.1 * p h.2 i.2)
       (fun h => p (h.1 + h.2))

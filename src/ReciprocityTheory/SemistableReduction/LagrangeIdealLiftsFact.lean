@@ -85,13 +85,6 @@ theorem isMultiHomogeneous_map_ring
   unfold IsMultiHomogeneous at hf ⊢
   first
   | exact fun d hd => hf d (by rwa [MvPolynomial.support_map_of_injective _ φ.injective] at hd)
-  | exact fun b => (hf b).map φ
-  | simpa [MvPolynomial.support_map_of_injective _ φ.injective] using hf
-  | (
-      intro d hd
-      simp only [MvPolynomial.mem_support_iff, MvPolynomial.coeff_map, ne_eq, map_eq_zero] at hd
-      exact hf d (by simpa using hd)
-    )
 
 theorem sphere_mean_mul_multihomogeneous
     (hInt : SphereLogIntegrableStatement)

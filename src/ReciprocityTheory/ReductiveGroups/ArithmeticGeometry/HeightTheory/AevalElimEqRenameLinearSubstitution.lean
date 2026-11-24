@@ -184,7 +184,7 @@ theorem eq_zero_of_xhom_zero
           = MvPolynomial.map (algebraMap K (Ω c)) q := by
     intro q
     induction q using MvPolynomial.induction_on with
-    | C a => simp [MvPolynomial.algebraMap_eq]
+    | C a => simp
     | add p q hp hq => simp only [map_add (f := _), hp, hq]
     | mul_X p v hp => simp [map_mul, hp]
   have e

@@ -58,13 +58,7 @@ namespace GlobalTheory.CompanionTheory.MPDict.IsomT
 
 variable {X : Scheme.{0}}
 
-theorem res_twice {U V W : X.Opens} (h₁ : V ≤ U) (h₂ : W ≤ V) (u : Γ(X, U)ˣ)
-    : res h₂ (res h₁ u) = res (h₂.trans h₁) u := by
-  apply Units.ext
-  show (X.presheaf.map (homOfLE h₂).op).hom ((X.presheaf.map (homOfLE h₁).op).hom (u : Γ(X, U))) =
-    (X.presheaf.map (homOfLE (h₂.trans h₁)).op).hom (u : Γ(X, U))
-  rw [← RingHom.comp_apply, ← CommRingCat.hom_comp, ← Functor.map_comp]
-  rfl
+alias res_twice := _root_.ReciprocityTheory.ChartRestriction.G.DVR.res_res'
 
 theorem units_ext_cover
     {ι : Type} (V : ι → X.Opens) (hc : ⨆ i, V i = ⊤)

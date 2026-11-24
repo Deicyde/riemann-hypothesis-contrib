@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.formalGroupLaw_jacobian_extension_changeCoeff
     : ∀ (R S : Type) [CommRing R] [CommRing S] (β : R →+* S),
       (∀ (d : ℕ) (F : FGLaw R d), ∃ F' : FGLaw S d, F'.F = F.mapF β)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.formalGroupLaw_jacobian_extension_changeCoeff
             → ExtSer (F.mapF β) (FB.mapF β)
               (fun j => MvPowerSeries.map β (J j))
               (fun j => MvPowerSeries.map β (Q j)) := by
-  first
-  | exact @GlobalTheory.ChF.changeCoeff_law_lin_extSer
-  | exact GlobalTheory.ChF.changeCoeff_law_lin_extSer
-  | (intros; apply GlobalTheory.ChF.changeCoeff_law_lin_extSer <;> assumption)
+  first | exact @GlobalTheory.ChF.changeCoeff_law_lin_extSer

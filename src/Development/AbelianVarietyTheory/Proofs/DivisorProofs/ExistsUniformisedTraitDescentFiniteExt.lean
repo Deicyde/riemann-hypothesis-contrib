@@ -4,24 +4,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UniTrait
 public import Development.AbelianVarietyTheory.Definitions.Degenerations.RigGen
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaLevelObjectDescendsFgSubfield
-import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
-import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsDescOfPoints
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsPrimitiveRootUnitOnIff
-import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LineBundleSymmetryHypothesisBaseChange
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCommonPullbackFractionFieldFiniteLocalExt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDegenerationDataPullbackInjectiveLocalHom
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasSemiAbelianUniformisationOfFiniteExtTrans
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPullDegUniqueAndComp
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EtaleCompletionOfDimOneNormal
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianSchemeDescentSmoothDimensionStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFinsetIsProjOverDescendsStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLineBundleDescentToSubfieldStatement
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsDescOfPoints
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LineBundleSymmetryHypothesisBaseChange
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasSemiAbelianUniformisationOfFiniteExtTrans
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianSchemeDescentSmoothDimension
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFinsetIsProjOverDescends
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLineBundleDescentToSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GrpObjDescendsToLargeSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsMonHomIffOfIsGrpPullback
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LineBundleTrivialIsoDescendField
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MorphismsDescendToLargeSubfieldStatement
+import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MorphismsDescendToLargeSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RelAmpleOfFieldExtensionBaseChange
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RigidifiedSymmetricKernelTrivialDescendFieldExtStatement
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.NonzeroLocus
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RigidifiedSymmetricKernelTrivialDescendFieldExt
 import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
 import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.QkToAkBaseChange
 import Mathlib.Algebra.Order.Floor.Extended
@@ -65,6 +70,7 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ExistsRosatiGen
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.GeneratorPullback.PullAlong
 import Std.Tactic.BVDecide.Normalize.Prop
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -81,11 +87,6 @@ open GlobalTheory.Mum
 namespace GlobalTheory.Mum.ClosureDescent
 
 open GlobalTheory.ThetaDescent
-
-theorem spMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f :=
-  Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)
 
 def Fib
     {K K' : Type} [CommRing K] [CommRing K']
@@ -110,7 +111,8 @@ theorem Fib.comp
     : Fib A'' A h (b ≫ a) := by
   subst e
   exact ⟨
-    (hb.1.comp ha.1).congr (spMap_comp' f g).symm rfl,
+    (hb.1.comp ha.1).congr (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp f g).symm
+      rfl,
     LBIso.trans A''.isLB (pull_isLB A'.isLB _) (pull_isLB A.isLB _) hb.2
       (GlobalTheory.ArcDataDescent.lbIso_pull ha.2 b rfl)
   ⟩
@@ -123,12 +125,14 @@ theorem Fib.cancel
     : ∃ b, b ≫ a = c ∧ Fib A'' A' g b := by
   subst e
   have w : c ≫ A.A.hom = (A''.A.hom ≫ spMap g) ≫ spMap f := by
-    rw [hc.1.1.w, spMap_comp', Category.assoc]
+    rw [hc.1.1.w, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, Category.assoc]
   have e₁ := ha.1.1.lift_fst _ _ w
   refine ⟨
     ha.1.1.lift _ _ w,
     e₁,
-    IsGrpPullback.cancel ha.1 (hc.1.congr (spMap_comp' f g) e₁.symm) (ha.1.1.lift_snd _ _ w),
+    IsGrpPullback.cancel ha.1
+      (hc.1.congr (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp f g) e₁.symm)
+      (ha.1.1.lift_snd _ _ w),
     ?_
   ⟩
   exact LBIso.trans A''.isLB (pull_isLB A.isLB _) (pull_isLB A'.isLB _) hc.2
@@ -153,7 +157,7 @@ theorem exists_fib_gen
   classical
   let act : Bool → (t.A ⟶ t.A) := fun j => cond j w wd
   obtain ⟨s₀, H₀⟩ :=
-    GlobalTheory.T.exists_finset_isProjOver_descends_to_subfield K (gen β ∅) t.A.left t.A.hom
+    _root_.GlobalTheory.exists_finset_isProjOver_descends K (gen β ∅) t.A.left t.A.hom
       (GlobalTheory.ProjSpace.isProjOver_of_relAmple t.ample)
   obtain ⟨X₀, p₀, φ, hp₀, sq⟩ :=
     H₀ (gen β s₀) (gen_mono β (Finset.empty_subset _)) (subset_gen β le_rfl)
@@ -166,10 +170,10 @@ theorem exists_fib_gen
   obtain ⟨s₁, H₁⟩ :=
     GlobalTheory.grpObj_descends_to_large_subfield K (gen β s₀) (Over.mk p₀) t.A φ sq
   obtain ⟨s₂, H₂⟩ :=
-    GlobalTheory.T.exists_lineBundle_descent_to_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ t.L
+    _root_.GlobalTheory.LBDescent.exists_lb_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ t.L
       t.isLB sq
   obtain ⟨s₃, H₃⟩ :=
-    GlobalTheory.T.exists_descent_of_morphisms_to_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ X₀
+    _root_.GlobalTheory.morphisms_descend_to_large_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ X₀
       p₀ Bool
       (fun j => (act j).left ≫ φ)
       sq
@@ -198,10 +202,11 @@ theorem exists_fib_gen
     · rw [Category.assoc, hψ₁, Category.assoc, e₁, (hf₁ j).1]
     · rw [Category.assoc, hψ₂, ← Category.assoc, Over.w, Category.assoc, Over.w, hψ₂]
   obtain ⟨hab, hdim⟩ :=
-    GlobalTheory.T.abelian_scheme_descent_smooth_dimension _ K (gen β s).subtype A₁ t.A ψ hG t.isAb
+    _root_.GlobalTheory.FieldDescentAb.isAbelianScheme_and_relDim_descend _ K (gen β s).subtype A₁
+      t.A ψ hG t.isAb
   obtain ⟨hr, hs, hk⟩ :=
-    GlobalTheory.T.rigidified_symmetric_kernelTrivial_descend_fieldExt _ K (gen β s).subtype A₁ t.A
-      ψ L₁ t.L hab hG hL₁ t.isLB hL
+    _root_.GlobalTheory.PolDescent.rigidified_sym_kTriv_descend _ K (gen β s).subtype A₁ t.A ψ L₁
+      t.L hab hG hL₁ t.isLB hL
   have hamp :=
     GlobalTheory.AmpleDescent.relAmple_of_fieldExtension _ K (gen β s).subtype A₁ t.A ψ L₁ t.L hab
       hG hL₁ t.isLB hL t.ample
@@ -233,7 +238,7 @@ theorem exists_map_desc
   have := P₁.isAb.proper
   have := P₂.isAb.smooth
   obtain ⟨s, H⟩ :=
-    GlobalTheory.T.exists_descent_of_morphisms_to_subfield Ω M₀ P₁.A.left B.A.left P₁.A.hom B.A.hom
+    _root_.GlobalTheory.morphisms_descend_to_large_subfield Ω M₀ P₁.A.left B.A.left P₁.A.hom B.A.hom
       b₁ P₂.A.left P₂.A.hom PUnit
       (fun _ => b₂)
       h₁.1.1
@@ -312,7 +317,9 @@ theorem exists_unif_fib
       Fib A' A ga a := by
   obtain ⟨hL, -, -, h4, h5⟩ := GlobalTheory.firstFiveLaws
   have sq : spMap ga ≫ jK R = jK R' ≫ spMap g :=
-    (spMap_comp' _ _).symm.trans ((congrArg spMap hga).trans (spMap_comp' _ _))
+    (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp _ _).symm.trans
+      ((congrArg spMap hga).trans
+        (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp _ _))
   obtain ⟨A', gA, pA, dA, mA, tA⟩ := hL.polBaseChange _ _ (spMap ga) A
   have gpA : IsGrpPullback A'.A A.A (spMap ga) gA := ⟨
     pA,

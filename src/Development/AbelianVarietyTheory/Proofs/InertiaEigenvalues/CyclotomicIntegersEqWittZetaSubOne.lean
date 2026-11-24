@@ -117,7 +117,7 @@ theorem norm_coeff_le
     apply Finset.sum_subset supp_subset_range_natDegree_succ
     intro i _ hi
     rw [notMem_support_iff.1 hi, zero_smul]
-  have h6 := IsUltrametricDist.nnnorm_sum_eq_sup_of_pairwise_ne hpw
+  have h6 := IsUltrametricDist.nnNorm_sum_eq_sup_of_pairwise_ne hpw
   rw [hs] at h6
   have h7 := Finset.le_sup (f := fun i => ‖p.coeff i • π ^ i‖₊) hj
   rw [← h6] at h7
@@ -166,7 +166,7 @@ theorem exists_poly
       ← GlobalTheory.Cyc.minpoly_unramifiedSubfield_eq_cyclotomic K s hs ζ hζ]
     exact natDegree_modByMonic_lt _ (minpoly.monic hint) (minpoly.ne_one _ _)
   · rw [taylor_apply, aeval_comp]
-    simp only [map_add (f := _), aeval_X, aeval_C, map_one, sub_add_cancel]
+    simp only [map_add (f := _), aeval_X, map_one, sub_add_cancel]
     exact aeval_modByMonic_eq_self_of_root (minpoly.aeval _ _)
 
 theorem main

@@ -131,14 +131,7 @@ theorem eigA
   have hge := natDegree_minpoly_le_tmul ℂ g hxi
   have hΘx : Θ x = G.psi v g := by
     rw [hx]
-    first
-    | (erw [Algebra.TensorProduct.lift_tmul, map_one, one_mul]; rfl)
-    | (
-        show (Algebra.ofId ℂ (Matrix (Fin G.n) (Fin G.n) ℂ)) 1 * ψF g = G.psi v g
-        rw [map_one, one_mul]
-        rfl
-      )
-    | simp [Θ, ψF]
+    first | (erw [Algebra.TensorProduct.lift_tmul, map_one, one_mul]; rfl)
   have hmin : minpoly ℂ (G.psi v g) = minpoly ℂ x := by rw [← hΘx]; exact minpoly.algHom_eq Θ hinj x
   have hgi : IsIntegral G.F g := IsIntegral.of_finite G.F g
   have hdvd : minpoly ℂ (G.psi v g) ∣ (minpoly G.F g).map (algebraMap G.F ℂ) := by
@@ -218,7 +211,7 @@ theorem normSq_of_eigenvector
         apply hw
         apply mul_right_cancel₀ hμ0
         rw [hμ2]
-        first | exact h2 | (rw [mul_comm]; exact h2)
+        first | exact h2
       apply normSq_eq_of_form Γ A _ hΓ' x w hx
       intro h
       have hneg :=

@@ -51,10 +51,8 @@ open GlobalTheory.Mem.Top.TwChar (plUnder RootIso FrobPick)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 set_option genInjectivity false
 set_option genSizeOfSpec false
-
 
 def SatU {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} (P : Pre2 K w)
     : Prop :=

@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.doubledTheta_eq_sum_schrodingerFunction_periodisat
                       (fun ξ : Matrix (Fin B.rank) (Fin A.rank) D.host.E =>
                         sch ψ A B ν 𝓨 f (x + rat ξ))
                       (f ((dblDec A).extX B x)) := by
-  first
-  | exact @GlobalTheory.Core.Rk.SchPeriod.theta_eq_sum_sch
-  | exact GlobalTheory.Core.Rk.SchPeriod.theta_eq_sum_sch
-  | (intros; apply GlobalTheory.Core.Rk.SchPeriod.theta_eq_sum_sch <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.SchPeriod.theta_eq_sum_sch

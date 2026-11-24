@@ -45,10 +45,12 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory TopologicalSpace Limits NumberField
-  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg GlobalTheory.FlagEmb
-  GlobalTheory.ProjSpace GlobalTheory.FlagMod GlobalTheory.FlagMod.FieldFlag
+-- `Proj` is `LowRank.Proj` here. With `AlgebraicGeometry.Proj` open too, every use is slow.
+open AlgebraicGeometry hiding Proj
+open CategoryTheory TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.Reg GlobalTheory.FlagEmb GlobalTheory.ProjSpace GlobalTheory.FlagMod
+  GlobalTheory.FlagMod.FieldFlag
 open GlobalTheory.FlagMod.LowRank (ECh Proj str)
 
 noncomputable section
@@ -326,9 +328,7 @@ theorem lies_of_local
         : ∀ s : S,
           Localization.awayMapₐ ψ (f q) (algebraMap S (Localization.Away (f q)) s)
             = algebraMap S' (Localization.Away (ψ (f q))) (ψ s) := fun s => by
-      first
-      | exact IsLocalization.map_eq _ _
-      | simp [IsLocalization.Away.mapₐ, IsLocalization.Away.map, IsLocalization.map_eq]
+      first | simp [IsLocalization.Away.mapₐ, IsLocalization.Away.map, IsLocalization.map_eq]
     have e3
         : (Localization.awayMapₐ ψ (f q)).comp
             (IsScalarTower.toAlgHom c.F S (Localization.Away (f q)))

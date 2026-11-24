@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.FockCompare GlobalTheory.VacUnique
+
 theorem _root_.GlobalTheory.T.scaled_finite_matrix_mem_lattice
     : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
         (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),

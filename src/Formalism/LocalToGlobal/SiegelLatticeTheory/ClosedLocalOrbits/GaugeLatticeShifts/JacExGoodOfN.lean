@@ -140,12 +140,6 @@ def CoordW : Prop :=
               = ENNReal.ofReal κ
                 * ∫⁻ c in GoodLoc (r := r) T T', ENNReal.ofReal (wtLoc k T T' c) * F c ∂(dcLoc (r := r))
 
-def SecWb : Prop :=
-  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ),
-    1 ≤ k → Formalism.QuantumDeterminants.inWb k r z → Formalism.QuantumDeterminants.inWb k r z'
-      → 0 < Formalism.QuantumDeterminants.Tz k r z → 0 < Formalism.QuantumDeterminants.Tz k r z'
-      → ∃ μsec, Formalism.QuantumDeterminants.IsSection k r z z' μsec
-
 def JacExGoodN : Prop :=
   ∀ (r k : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (e : Fin r → Fin (2 * r + k + 1) → ℂ)
       (z z' : Fin (2 * r + k + 1) → ℂ) (T T' sc : ℝ),

@@ -53,47 +53,53 @@ noncomputable section
 
 namespace MassDataLevelSSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField
-  IsDedekindDomain Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
 open scoped TensorProduct
 
 section Alg
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (R : Type) [CommRing R] [Algebra F R]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
-theorem hermForm_add_right_bis (x y z : Fin n → R ⊗[F] E) :
-    hR R σ J x (y + z) = hR R σ J x y + hR R σ J x z := by
+theorem hermForm_add_right_bis (x y z : Fin n → R ⊗[F] E)
+    : hR R σ J x (y + z) = hR R σ J x y + hR R σ J x z := by
   simp only [hR, Formalism.UG.hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem hermForm_sub_right (x y z : Fin n → R ⊗[F] E) :
-    hR R σ J x (y - z) = hR R σ J x y - hR R σ J x z := by
+theorem hermForm_sub_right (x y z : Fin n → R ⊗[F] E)
+    : hR R σ J x (y - z) = hR R σ J x y - hR R σ J x z := by
   simp only [hR, Formalism.UG.hform, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-theorem hermForm_smul_right_alt (c : R ⊗[F] E) (x y : Fin n → R ⊗[F] E) :
-    hR R σ J x (c • y) = c * hR R σ J x y := by
+theorem hermForm_smul_right_alt (c : R ⊗[F] E) (x y : Fin n → R ⊗[F] E)
+    : hR R σ J x (c • y) = c * hR R σ J x y := by
   simp only [hR, Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hermForm_sum_right_alt {ι : Type} (s : Finset ι) (d : ι → R ⊗[F] E) (v : ι → Fin n → R ⊗[F] E)
-    (x : Fin n → R ⊗[F] E) : hR R σ J x (∑ i ∈ s, d i • v i) = ∑ i ∈ s, d i * hR R σ J x (v i) := by
+theorem hermForm_sum_right_alt
+    {ι : Type} (s : Finset ι) (d : ι → R ⊗[F] E) (v : ι → Fin n → R ⊗[F] E) (x : Fin n → R ⊗[F] E)
+    : hR R σ J x (∑ i ∈ s, d i • v i) = ∑ i ∈ s, d i * hR R σ J x (v i) := by
   classical
   induction s using Finset.induction_on
-  · simp only [Finset.sum_empty, hR, Formalism.UG.hform, Pi.zero_apply, mul_zero, Finset.sum_const_zero]
+  · simp only [Finset.sum_empty, hR, Formalism.UG.hform, Pi.zero_apply, mul_zero,
+      Finset.sum_const_zero]
   · rename_i a s ha ih
-    rw [Finset.sum_insert ha, Finset.sum_insert ha, hermForm_add_right_bis, hermForm_smul_right_alt, ih]
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, hermForm_add_right_bis, hermForm_smul_right_alt,
+      ih]
 
-theorem conjTensor_incl (a : E) : sigR R σ (inclR R a) = inclR R (σ a) := by
-  simp [sigR, inclR]
+theorem conjTensor_incl (a : E) : sigR R σ (inclR R a) = inclR R (σ a) := by simp [sigR, inclR]
 
-theorem hermForm_rational_vectors (x y : Fin n → E) :
-    hR R σ J (ratV (F := F) R x) (ratV (F := F) R y) = inclR R (hE σ J x y) := by
-
+theorem hermForm_rational_vectors (x y : Fin n → E)
+    : hR R σ J (ratV (F := F) R x) (ratV (F := F) R y) = inclR R (hE σ J x y) := by
   simp [hR, hE, Formalism.UG.hform, ratV, JR, conjTensor_incl, map_sum, map_mul]
 
-theorem mem_tensor_span_iff {r : ℕ} (Y : Fin r → Fin n → E) (y : Fin n → R ⊗[F] E)
-    (hy : y ∈ spanR (F := F) R Y Set.univ) : ∃ d : Fin r → R ⊗[F] E, y = ∑ i, d i • ratV (F := F) R (Y i) := by
+theorem mem_tensor_span_iff
+    {r : ℕ} (Y : Fin r → Fin n → E) (y : Fin n → R ⊗[F] E) (hy : y ∈ spanR (F := F) R Y Set.univ)
+    : ∃ d : Fin r → R ⊗[F] E, y = ∑ i, d i • ratV (F := F) R (Y i) := by
   simp only [spanR, Set.image_univ] at hy
   rw [Submodule.mem_span_range_iff_exists_fun] at hy
   obtain ⟨d, hd⟩ := hy
@@ -121,12 +127,14 @@ def WbSub {r : ℕ} (P : Frame E n r) : Submodule (R ⊗[F] E) (Fin n → R ⊗[
 
 variable {R σ J}
 
-theorem witt_decomposition_unique {r : ℕ} (P : Frame E n r) (hee : ∀ a b, hE σ J (P.e a) (P.e b) = 0)
+theorem witt_decomposition_unique
+    {r : ℕ} (P : Frame E n r) (hee : ∀ a b, hE σ J (P.e a) (P.e b) = 0)
     (hef : ∀ a b, hE σ J (P.e a) (P.f b) = if a = b then 1 else 0)
     (hfe : ∀ a b, hE σ J (P.f a) (P.e b) = if a = b then 1 else 0)
     {x a w b c : Fin n → R ⊗[F] E} (hx : x ∈ spanR (F := F) R P.e Set.univ)
     (ha : a ∈ spanR (F := F) R P.e Set.univ) (hc : c ∈ spanR (F := F) R P.f Set.univ)
-    (hw : WbR R σ J P w) (hb : WbR R σ J P b) (h : x + w = a + b + c) : w = b := by
+    (hw : WbR R σ J P w) (hb : WbR R σ J P b) (h : x + w = a + b + c)
+    : w = b := by
   classical
   have hax : a - x ∈ spanR (F := F) R P.e Set.univ := Submodule.sub_mem _ ha hx
   obtain ⟨g, hg⟩ := mem_tensor_span_iff (R := R) P.e (a - x) hax
@@ -173,8 +181,7 @@ theorem witt_decomposition_unique {r : ℕ} (P : Frame E n r) (hee : ∀ a b, hE
   have hax0 : a - x = 0 := by
     rw [hg]
     exact Finset.sum_eq_zero fun i _ => by rw [hg0 i, zero_smul]
-  have hwb0 : w - b = 0 := by
-    rw [hwb, hax0, hc0, add_zero]
+  have hwb0 : w - b = 0 := by rw [hwb, hax0, hc0, add_zero]
   exact sub_eq_zero.mp hwb0
 
 end Alg

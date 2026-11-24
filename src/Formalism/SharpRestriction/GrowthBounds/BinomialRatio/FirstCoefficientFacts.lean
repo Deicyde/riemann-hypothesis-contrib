@@ -105,11 +105,10 @@ theorem four_fac
     have a : (1 - e1) * (1 - e2) ≤ 1 := by nlinarith
     have b : 0 ≤ (1 - e1) * (1 - e2) := mul_nonneg (by linarith) (by linarith)
     nlinarith
-  have hPlow : 1 - e1 - e2 - x ≤ (1 - e1) * (1 - e2) * (1 - x) := by
-    nlinarith [mul_nonneg (mul_nonneg h1 h2) (sub_nonneg.2 hx'), mul_nonneg h1 hx, mul_nonneg h2 hx]
-  have hw' : (1 - e1) * (1 - e2) * (1 - x) * (1 - z) ≤ (1 - e1) * (1 - e2) * (1 - x) * w :=
-    mul_le_mul_of_nonneg_left hw hP0
-  nlinarith [mul_nonneg (sub_nonneg.2 hP1) hz]
+  nlinarith [mul_le_mul_of_nonneg_left hw hP0,
+    mul_nonneg (mul_nonneg h1 h2) (sub_nonneg.2 hx'),
+    mul_nonneg h1 hx, mul_nonneg h2 hx,
+    mul_nonneg (sub_nonneg.2 hP1) hz]
 
 theorem symDim_toNat (m : ℕ) (A : ℤ) (hA : 0 ≤ A) : symDim (m + 1) A = sd m A.toNat := by
   unfold symDim sd
@@ -197,7 +196,7 @@ theorem seg_num
     have h2 : S * (m + 5) * a = k * Q * (m + 5) := by rw [← hSa]; ring
     linarith [mul_nonneg hkQ.le (sub_nonneg.2 hNk)]
   have hkr : k * ((2 * a / (k * Y) + E0 + Q) / a) = 2 * (1 / Y) + k * E0 / a + S := by
-    rw [hS]; field_simp; try ring
+    rw [hS]; field_simp
   have hmr : mN * ((2 * a / (k * Y) + E0 + Q) / a) ≤ k * ((2 * a / (k * Y) + E0 + Q) / a) :=
     mul_le_mul_of_nonneg_right hmNk hr0
   have hSm : 0 ≤ S * m := mul_nonneg hS0 hm

@@ -78,14 +78,7 @@ theorem smulO_mem
 theorem map_smulO
     (W : LocWach PD LL O v n) {T T' : LocLat G Qp LL O} (f : LatHom T.L T'.L) (c : O) (x : W.DD T)
     : W.map f (c • x) = c • W.map f x := by
-  first
-  | exact (W.map f).map_smul_of_tower c x
-  | exact LinearMap.map_smul_of_tower (W.map f) c x
-  | (
-      rw [← algebraMap_smul (LetA O n) c x, ← algebraMap_smul (LetA O n) c (W.map f x)]
-      exact (W.map f).map_smul _ x
-    )
-  | simp
+  first | exact (W.map f).map_smul_of_tower c x
 
 theorem pull_cocycle
     (W : LocWach PD LL O v n)

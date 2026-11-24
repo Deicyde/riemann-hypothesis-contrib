@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsHolFormConst
+import Development.AbelianVarietyTheory.Proofs.ToricGeometry.ReFormPosOfThetaNeZero
 
 @[expose] public section
 
@@ -54,7 +55,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -62,21 +64,15 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorusRM
 
-theorem ahFactor_im_int_chart {X : Scheme.{0}} (L : LB X) (hL : L.IsLB) (y : Sp ℂ ⟶ X) :
-    ∃ j, ⊤ ≤ y ⁻¹ᵁ L.U j := by
+theorem ahFactor_im_int_chart {X : Scheme.{0}} (L : LB X) (hL : L.IsLB) (y : Sp ℂ ⟶ X)
+    : ∃ j, ⊤ ≤ y ⁻¹ᵁ L.U j := by
   apply _root_.GlobalTheory.LamPullFrame.exists_chart_pt' <;> assumption
 
-theorem ahFactor_herm_swap {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian)
-    (v w : Fin g → ℂ) : w ⬝ᵥ Hm.mulVec (star v) = star (v ⬝ᵥ Hm.mulVec (star w)) := by
-  simp only [dotProduct, Matrix.mulVec, star_sum, star_mul', star_star, Finset.mul_sum, Pi.star_apply]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-  rw [← hH.apply a b, star_star]
-  ring
-
-theorem ahFactor_im_int : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A] (L : LB A.left) (u : HolUnif A L g)
-    (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ), L.IsLB → IsFactorAH u Hm χ →
-    ∀ l ∈ u.Λ, ∀ l' ∈ u.Λ, ∃ n : ℤ, (l ⬝ᵥ Hm.mulVec (star l')).im = n := by
+theorem ahFactor_im_int
+    : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A] (L : LB A.left) (u : HolUnif A L g)
+        (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ),
+      L.IsLB → IsFactorAH u Hm χ
+        → ∀ l ∈ u.Λ, ∀ l' ∈ u.Λ, ∃ n : ℤ, (l ⬝ᵥ Hm.mulVec (star l')).im = n := by
   intro g A _ L u Hm χ hL hF l hl l' hl'
   obtain ⟨hH, hχ, hfac⟩ := hF
   obtain ⟨i, hi⟩ := ahFactor_im_int_chart L hL (u.ex 0).left
@@ -90,7 +86,7 @@ theorem ahFactor_im_int : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A] (L : LB A
   have hne := u.fr_ne i (l + l') (hc _ (add_mem hl hl'))
   have hχ1 : χ ⟨l, hl⟩ ≠ 0 := fun h => by simpa [h] using hχ ⟨l, hl⟩
   have hχ2 : χ ⟨l', hl'⟩ ≠ 0 := fun h => by simpa [h] using hχ ⟨l', hl'⟩
-  have hsw := ahFactor_herm_swap hH l l'
+  have hsw := _root_.GlobalTheory.ThetaPositivity.form_conj hH l l'
   simp only [zero_add, zero_dotProduct, mul_zero] at e1 e3
   rw [e2] at e1
   rw [e4, add_comm l' l] at e3
@@ -102,14 +98,18 @@ theorem ahFactor_im_int : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A] (L : LB A
   set Hs := l' ⬝ᵥ Hm.mulVec (star l)
   set c1 := χ ⟨l, hl⟩
   set c2 := χ ⟨l', hl'⟩
-  have key2 : (c1 * c2 * F) * Complex.exp (Real.pi / 2 * H0 + (Real.pi * H + Real.pi / 2 * H')) =
-      (c1 * c2 * F) * Complex.exp (Real.pi / 2 * H' + (Real.pi * Hs + Real.pi / 2 * H0)) := by
+  have key2
+      : (c1 * c2 * F) * Complex.exp (Real.pi / 2 * H0 + (Real.pi * H + Real.pi / 2 * H'))
+        = (c1 * c2 * F) * Complex.exp (Real.pi / 2 * H' + (Real.pi * Hs + Real.pi / 2 * H0)) := by
     simp only [Complex.exp_add] at key ⊢
     linear_combination key
   have hnz : c1 * c2 * F ≠ 0 := mul_ne_zero (mul_ne_zero hχ1 hχ2) hne
   have key3 := mul_left_cancel₀ hnz key2
-  have key4 : Complex.exp ((Real.pi / 2 * H0 + (Real.pi * H + Real.pi / 2 * H')) -
-      (Real.pi / 2 * H' + (Real.pi * Hs + Real.pi / 2 * H0))) = 1 := by
+  have key4
+      : Complex.exp
+          ((Real.pi / 2 * H0 + (Real.pi * H + Real.pi / 2 * H'))
+            - (Real.pi / 2 * H' + (Real.pi * Hs + Real.pi / 2 * H0)))
+        = 1 := by
     rw [Complex.exp_sub, key3, div_self (Complex.exp_ne_zero _)]
   obtain ⟨n, hn⟩ := Complex.exp_eq_one_iff.mp key4
   refine ⟨n, ?_⟩

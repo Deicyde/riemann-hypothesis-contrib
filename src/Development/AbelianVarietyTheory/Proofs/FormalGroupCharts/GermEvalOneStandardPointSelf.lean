@@ -378,13 +378,7 @@ theorem ev_pt (f : PS R N d)
   unfold ev
   exact congrFun MvPowerSeries.subst_self f
 
-theorem germEval_oneStandardPoint_self (f : PS R 1 d)
-    : ev (n := 1) ![ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ.pt R d 0] f = f := by
-  refine Eq.trans ?_ (ev_pt f)
-  congr 1
-  funext j
-  fin_cases j
-  rfl
+alias germEval_oneStandardPoint_self := _root_.ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gt_ev_pt_self
 
 theorem eval_standard_points_two (f : PS R 2 d)
     : ev (n := 2)

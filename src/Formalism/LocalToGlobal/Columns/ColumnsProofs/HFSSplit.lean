@@ -70,7 +70,7 @@ theorem hfs_exists_poly [FiniteDimensional K V] (op : I → Module.End K V)
     : ∃ p, HeckePolyFor op p := by
   classical
   obtain ⟨b, hbsub, hbsp, hbli⟩ := exists_linearIndependent K (Set.range op)
-  have hbfin : b.Finite := by first | exact hbli.setFinite | exact @Set.toFinite _ b hbli.finite
+  have hbfin : b.Finite := by first | exact hbli.setFinite
   obtain ⟨s, -, hs⟩ :=
     Finset.subset_set_image_iff.1 (show (↑hbfin.toFinset : Set (Module.End K V)) ⊆ op '' Set.univ by
       rw [Set.image_univ, Set.Finite.coe_toFinset]; exact hbsub)

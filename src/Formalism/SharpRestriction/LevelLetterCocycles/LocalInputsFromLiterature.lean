@@ -157,17 +157,6 @@ theorem exps (x : ℤ) (H : ℕ) (h1 : -(H : ℤ) ≤ x) (h2 : x ≤ H)
       ∧ H = (H - (-x).toNat) + (-x).toNat := by
   omega
 
-theorem φpow_mem_AΔ {a : LetA O n} (ha : a ∈ W.AΔ) (s : ℕ) : (W.φA ^ s) a ∈ W.AΔ := by
-  induction s with
-  | zero => simpa using ha
-  | succ s ih =>
-    rw [pow_succ', AlgHom.mul_apply]
-    intro δ hδ
-    rw [← W.φA_γA δ, ih δ hδ]
-
-theorem ps_mem (hπ : W.π₀ ∈ W.AΔ) (s : ℕ) : ps W s ∈ W.AΔ :=
-  φpow_mem_AΔ W (W.AΔ.add_mem hπ (Subalgebra.natCast_mem _ _)) s
-
 theorem π₀_nzd
     (hw : ∃ w : (LetA O n)ˣ, W.π₀ = (w : LetA O n) * letπ ^ (PD.p - 1))
     {x : LetA O n} (h : W.π₀ * x = 0)
@@ -185,12 +174,6 @@ theorem π₀_nzd
   have hc := congrArg (PowerSeries.coeff (j + (PD.p - 1))) hi
   rw [PowerSeries.coeff_X_pow_mul] at hc
   simpa using hc
-
-theorem letE_idem (a : ZMod n) : (letE a : LetA O n) * letE a = letE a := by
-  funext i
-  by_cases h : i = a
-  · subst h; simp [letE]
-  · simp [letE, Pi.single_apply, h]
 
 end Core
 
@@ -210,7 +193,9 @@ variable (W : LocWach PD LL O v n)
 
 theorem cop_ps
     [IsDomain O] [NeZero n] (hR : ToolsR.RingP W) (hπ : W.π₀ ∈ W.AΔ) (s t : ℕ) (hst : s ≠ t)
-    : Cop ((PD.p : ℕ) : ↥W.AΔ) (⟨ps W s, ps_mem W hπ s⟩ : ↥W.AΔ) ⟨ps W t, ps_mem W hπ t⟩ := by
+    : Cop ((PD.p : ℕ) : ↥W.AΔ)
+      (⟨ps W s, _root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ s⟩ : ↥W.AΔ)
+      ⟨ps W t, _root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ t⟩ := by
   obtain ⟨κ, x, hx, y, hy, h⟩ := KF.psCoprime_of W hR s t hst
   refine ⟨κ, ⟨x, hx⟩, ⟨y, hy⟩, Subtype.ext ?_⟩
   simpa [lA] using h
@@ -218,21 +203,22 @@ theorem cop_ps
 theorem cop_π₀_ps
     (hT : Formalism.MainNotions.WachCoordinates.ToolsAlg W)
     (hw : ∃ w : (LetA O n)ˣ, W.π₀ = (w : LetA O n) * letπ ^ (PD.p - 1)) (hπ : W.π₀ ∈ W.AΔ) (s : ℕ)
-    : Cop ((PD.p : ℕ) : ↥W.AΔ) (⟨W.π₀, hπ⟩ : ↥W.AΔ) ⟨ps W s, ps_mem W hπ s⟩ := by
+    : Cop ((PD.p : ℕ) : ↥W.AΔ) (⟨W.π₀, hπ⟩ : ↥W.AΔ)
+      ⟨ps W s, _root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ s⟩ := by
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 (hT.2.2.1 s)
   have hc' : c * W.π₀ = ps W s - ((PD.p : ℕ) : LetA O n) := hc
   have hcΔ : c ∈ W.AΔ := by
     intro δ hδ
     have hm : ps W s - ((PD.p : ℕ) : LetA O n) ∈ W.AΔ :=
-      W.AΔ.sub_mem (ps_mem W hπ s) (Subalgebra.natCast_mem _ _)
+      W.AΔ.sub_mem (_root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ s)
+        (Subalgebra.natCast_mem _ _)
     have h1 : W.γA δ (c * W.π₀) = c * W.π₀ := by rw [hc']; exact hm δ hδ
     rw [map_mul, hπ δ hδ] at h1
     have h2 : W.π₀ * (W.γA δ c - c) = 0 := by
       rw [mul_sub, mul_comm _ (W.γA δ c), h1, mul_comm]; ring
     exact sub_eq_zero.1 (π₀_nzd W hw h2)
   refine ⟨1, ⟨-c, W.AΔ.neg_mem hcΔ⟩, 1, Subtype.ext ?_⟩
-  simp only [pow_one, Subalgebra.coe_add, Subalgebra.coe_mul, Subalgebra.coe_neg,
-    Subalgebra.coe_one, one_mul]
+  simp only [pow_one, Subalgebra.coe_add, Subalgebra.coe_mul, one_mul]
   push_cast
   rw [neg_mul, hc']
   ring
@@ -297,7 +283,9 @@ theorem local_inputs_from_literature
   have e2 : ps W s ^ H * ps W s ^ H = ps W s ^ N * ps W s ^ (H + H - N) := by
     rw [← pow_add, ← pow_add, ← h2H]
   refine ⟨κ, letE a * u1 + P' ^ 2 * letE a * W.π₀ * u2 * ps W s ^ (H + H - N), ?_, ?_⟩
-  · have hP'Δ : P' ∈ W.AΔ := Subalgebra.prod_mem _ fun t _ => Subalgebra.pow_mem _ (ps_mem W hπ t) _
+  · have hP'Δ : P' ∈ W.AΔ :=
+      Subalgebra.prod_mem _ fun t _ =>
+        Subalgebra.pow_mem _ (_root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ t) _
     exact W.AΔ.add_mem (W.AΔ.mul_mem (Formalism.MainNotions.UnusedSlot80.SatPW.letE_mem_AΔ W a) hu1)
       (W.AΔ.mul_mem
         (W.AΔ.mul_mem
@@ -306,7 +294,7 @@ theorem local_inputs_from_literature
               (Formalism.MainNotions.UnusedSlot80.SatPW.letE_mem_AΔ W a))
             hπ)
           hu2)
-        (W.AΔ.pow_mem (ps_mem W hπ s) _))
+        (W.AΔ.pow_mem (_root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ s) _))
   · rw [key', hΛ]
     linear_combination (-(letE a * u1)) * e1 + (P' ^ 2 * letE a * W.π₀ * u2) * e2
 
@@ -342,7 +330,8 @@ theorem loc_π₀
         simp only [map_add (f := _), map_mul]
   have key' := W.EE_inj key
   have hLΔ : abelian₂ W A a e ∈ W.AΔ :=
-    Subalgebra.prod_mem _ fun t _ => Subalgebra.pow_mem _ (ps_mem W hπ t) _
+    Subalgebra.prod_mem _ fun t _ =>
+      Subalgebra.pow_mem _ (_root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ t) _
   refine ⟨κ, letE a * u1 + abelian₂ W A a e * letE a * abelian₂ W A a e * u2, ?_, ?_⟩
   · exact W.AΔ.add_mem (W.AΔ.mul_mem (Formalism.MainNotions.UnusedSlot80.SatPW.letE_mem_AΔ W a) hu1)
       (W.AΔ.mul_mem
@@ -388,7 +377,7 @@ theorem ratCore_of
   let fac : Option ℕ → ↥W.AΔ := fun o =>
     match o with
     | none => (⟨W.π₀, hπ⟩ : ↥W.AΔ) ^ E₀
-    | some s => (⟨ps W s, ps_mem W hπ s⟩ : ↥W.AΔ) ^ N s
+    | some s => (⟨ps W s, _root_.Formalism.MainNotions.UnusedSlot80.KL.ps_mem W hπ s⟩ : ↥W.AΔ) ^ N s
   have hnone : none ∉ (Finset.range e).image some := by simp
   have hc
       : ∀ i ∈ insert none ((Finset.range e).image some),
@@ -452,7 +441,8 @@ theorem ratCore_of
     rw [← pow_add, hNdef]
     simp only
     rw [← (exps (E s) (A.Hs a e s) (hE s hs').1 (hE s hs').2).2.1]
-  have hle : letE a * (g * γ') = g * γ' := by rw [← hU, ← mul_assoc, letE_idem]
+  have hle : letE a * (g * γ') = g * γ' := by
+    rw [← hU, ← mul_assoc, _root_.Formalism.MainNotions.LiftingTheory.letter_idempotent_sq]
   apply hD'u.mul_left_cancel
   rw [← mul_assoc, ← map_mul, ← hΛ, hf', mul_one, hU, ← map_mul, ← hle, hgdef, hgN]
   congr 1

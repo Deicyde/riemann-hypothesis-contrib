@@ -2,7 +2,8 @@ module
 
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.WeightsConj
 public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.GelfandKazhdanDual
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CuspContragredientIsCMConjTwistOfPairedInvTranspStatement
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.DualIsConjByOne
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CuspContragredientIsCMConjTwistOfPairedInvTransp
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -40,8 +41,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open NumberField GlobalTheory.CuspRep GlobalTheory.ContraPair
 namespace UpperTheory.GalS
@@ -51,7 +50,7 @@ theorem cusp_of_pair_alt
   intro E Ω _ _ _ _ _ _ l _ ι a ha π χ hr hpol
   exact hP E Ω l ι a ha π χ hr ⟨
     hpol.sign,
-    GlobalTheory.T.cuspContragredientIsCMConjTwist_of_paired_invTranspose E a π
+    _root_.GlobalTheory.ConjDualPair.dualIsConjBy_of_paired_invT E a π
       (GlobalTheory.GalOfCusp.compNorm E χ) (hGK E a _) hpol.dual
   ⟩
 theorem carU_of_finite_gl_recT

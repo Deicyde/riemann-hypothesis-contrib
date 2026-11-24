@@ -187,7 +187,7 @@ theorem exists_cmLat
     -(s j.isLeft : 𝓞 E) * ⟨FD.herm X.Gm (lam (σ j)) (lam (σ j)), X.L'_int _ (hL _) _ (hL _)⟩
   have hhh
       : ∀ j, (hh j : E) = -(s j.isLeft : E) * FD.herm X.Gm (lam (σ j)) (lam (σ j)) := fun j => by
-    simp only [hh, map_mul, map_neg, map_intCast]
+    simp only [hh]
     rfl
   have hsq : ∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 ∨ τ (H.rt : E) = -H.rt0 := fun τ => by
     refine sq_eq_sq_iff_eq_or_eq_neg.1 ?_

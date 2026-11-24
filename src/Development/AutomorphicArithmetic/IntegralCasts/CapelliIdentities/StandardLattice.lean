@@ -49,36 +49,34 @@ public import Mathlib.RingTheory.Localization.Submodule
 
 namespace UpperTheory.Reformulated.B.StandardLattice
 
-noncomputable def pZ : ℕ → Ideal ℤ :=
-  fun l => Ideal.span {↑l}
+noncomputable def pZ : ℕ → Ideal ℤ := fun l => Ideal.span {↑l}
 
-theorem aux2 : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)],
-  (pZ l).IsPrime := by
+theorem aux2 : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)], (pZ l).IsPrime := by
   intro l hl
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl.out
   exact (Ideal.span_singleton_prime hp.ne_zero).mpr hp
 
-@[reducible] noncomputable def Ml : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K] → Submonoid (NumberField.RingOfIntegers K) :=
-  fun l [Fact (Nat.Prime l)] K [Field K] => by
-    letI := aux2 l
-    exact Algebra.algebraMapSubmonoid (NumberField.RingOfIntegers K)
-      (pZ l).primeCompl
+@[reducible]
+noncomputable def Ml
+    : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K]
+      → Submonoid (NumberField.RingOfIntegers K) := fun l [Fact (Nat.Prime l)] K [Field K] => by
+  letI := aux2 l
+  exact Algebra.algebraMapSubmonoid (NumberField.RingOfIntegers K) (pZ l).primeCompl
 
-@[reducible] noncomputable def Rl : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] → (K : Type) → [Field K] → Type :=
+@[reducible]
+noncomputable def Rl : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [Field K] → Type :=
   fun l [Fact (Nat.Prime l)] K [Field K] => Localization (Ml l K)
 
-theorem aux5 : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type)
-  [inst : Field K],
-  IsLocalization (Ml l K)
-    (Localization (Ml l K)) := by
+theorem aux5
+    : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type) [inst : Field K],
+      IsLocalization (Ml l K) (Localization (Ml l K)) := by
   intro l hl K inst
   exact Localization.isLocalization
 
-theorem aux6 : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type)
-  [inst : Field K] [NumberField K] (y : ↥(Ml l K)),
-  IsUnit ((Algebra.algebraMap (NumberField.RingOfIntegers K) K) ↑y) := by
+theorem aux6
+    : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type) [inst : Field K] [NumberField K]
+        (y : ↥(Ml l K)),
+      IsUnit ((Algebra.algebraMap (NumberField.RingOfIntegers K) K) ↑y) := by
   intro l hl K inst _ y
   obtain ⟨y, n, hn, rfl⟩ := y
   have hn0 : n ≠ 0 := by
@@ -87,57 +85,51 @@ theorem aux6 : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type)
   refine isUnit_iff_ne_zero.mpr ?_
   simpa using hn0
 
-noncomputable def rlToK : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] →
-    (K : Type) → [inst : Field K] → [NumberField K] → Rl l K →+* K :=
-  fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] =>
-    IsLocalization.lift (aux6 l K)
+noncomputable def rlToK
+    : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K] → [NumberField K]
+      → Rl l K →+* K := fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] =>
+  IsLocalization.lift (aux6 l K)
 
-@[reducible] noncomputable def rlAlgebra : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] →
-    (K : Type) → [inst : Field K] → [NumberField K] → Algebra (Rl l K) K :=
-  fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] =>
-    (rlToK l K).toAlgebra
+@[reducible]
+noncomputable def rlAlgebra
+    : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K] → [NumberField K]
+      → Algebra (Rl l K) K := fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] =>
+  (rlToK l K).toAlgebra
 
 attribute [local instance] rlAlgebra
 
-@[reducible] noncomputable def rlModule : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] →
-    (K : Type) →
-      [inst : Field K] →
-        [NumberField K] →
-          (V : Type) →
-            [inst_2 : AddCommGroup V] → [Module K V] → Module (Rl l K) V :=
+@[reducible]
+noncomputable def rlModule
+    : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K] → [NumberField K]
+      → (V : Type) → [inst_2 : AddCommGroup V] → [Module K V]
+      → Module (Rl l K) V :=
   fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] V [AddCommGroup V] [Module K V] =>
     Module.compHom V (Algebra.algebraMap (Rl l K) K)
 
 attribute [local instance] rlModule
 
-noncomputable def atL : (l : ℕ) →
-  [hl : Fact (Nat.Prime l)] →
-    (K : Type) →
-      [inst : Field K] →
-        [inst_1 : NumberField K] →
-          {V : Type} →
-            [inst_2 : AddCommGroup V] →
-              [inst_3 : Module K V] →
-                [inst_4 : Module (NumberField.RingOfIntegers K) V] →
-                  Submodule (NumberField.RingOfIntegers K) V →
-                    Submodule (Rl l K) V :=
+noncomputable def atL
+    : (l : ℕ) → [hl : Fact (Nat.Prime l)] → (K : Type) → [inst : Field K] → [inst_1 : NumberField K]
+      → {V : Type} → [inst_2 : AddCommGroup V] → [inst_3 : Module K V]
+      → [inst_4 : Module (NumberField.RingOfIntegers K) V]
+      → Submodule (NumberField.RingOfIntegers K) V
+      → Submodule (Rl l K) V :=
   fun l [Fact (Nat.Prime l)] K [Field K] [NumberField K] {V} [AddCommGroup V] [Module K V]
       [Module (NumberField.RingOfIntegers K) V] L =>
     Submodule.span (Rl l K) (↑L : Set V)
 
-theorem mem_atL_iff : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type)
-  [inst : Field K] [inst_1 : NumberField K] {V : Type} [inst_2 : AddCommGroup V] [inst_3 : Module K V]
-  [inst_4 : Module (NumberField.RingOfIntegers K) V] [IsScalarTower (NumberField.RingOfIntegers K) K V]
-  {L : Submodule (NumberField.RingOfIntegers K) V} {x : V},
-  x ∈ atL l K L ↔
-    ∃ s ∈ Ml l K, s • x ∈ L := by
+theorem mem_atL_iff
+    : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type) [inst : Field K] [inst_1 : NumberField K]
+        {V : Type} [inst_2 : AddCommGroup V] [inst_3 : Module K V]
+        [inst_4 : Module (NumberField.RingOfIntegers K) V]
+        [IsScalarTower (NumberField.RingOfIntegers K) K V]
+        {L : Submodule (NumberField.RingOfIntegers K) V} {x : V},
+      x ∈ atL l K L ↔ ∃ s ∈ Ml l K, s • x ∈ L := by
   intro l hl K inst inst_1 V inst_2 inst_3 inst_4 tower L x
   letI := rlModule l K V
-  have hact : ∀ (r : NumberField.RingOfIntegers K) (v : V),
-      (algebraMap (NumberField.RingOfIntegers K) (Rl l K) r) • v = r • v := by
+  have hact
+      : ∀ (r : NumberField.RingOfIntegers K) (v : V),
+        (algebraMap (NumberField.RingOfIntegers K) (Rl l K) r) • v = r • v := by
     intro r v
     change rlToK l K (algebraMap _ _ r) • v = r • v
     unfold rlToK
@@ -154,8 +146,7 @@ theorem mem_atL_iff : ∀ (l : ℕ) [hl : Fact (Nat.Prime l)] (K : Type)
   · rintro ⟨s, hs, hx⟩
     refine ⟨s • x, hx, ⟨s, hs⟩, ?_⟩
     rw [← hact, smul_smul]
-    have := IsLocalization.mk'_spec (Rl l K) (1 : NumberField.RingOfIntegers K)
-      (⟨s, hs⟩ : Ml l K)
+    have := IsLocalization.mk'_spec (Rl l K) (1 : NumberField.RingOfIntegers K) (⟨s, hs⟩ : Ml l K)
     rw [this, map_one, one_smul]
 
 end UpperTheory.Reformulated.B.StandardLattice

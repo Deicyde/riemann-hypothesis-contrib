@@ -44,6 +44,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   GlobalTheory.UnitaryClasses
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.gramKernelSign_nonsplit_baseChange_eq
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
       Unr E
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.gramKernelSign_nonsplit_baseChange_eq
                 = (-1) ^ ordL (algebraMap E (w.adicCompletion E)
                   (gramOn (IsCMField.complexConj E).toRingEquiv.toRingHom H
                     (LinearMap.ker (Matrix.toLin' A))).det) := by
-  first
-  | exact @GlobalTheory.UnitaryClasses.BaseChangeSign.main
-  | exact GlobalTheory.UnitaryClasses.BaseChangeSign.main
-  | (intros; apply GlobalTheory.UnitaryClasses.BaseChangeSign.main <;> assumption)
+  first | exact @GlobalTheory.UnitaryClasses.BaseChangeSign.main

@@ -227,8 +227,7 @@ theorem tmC_blk
       intro p
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_
-      by_cases h : p.1 i = p.1 (σ i)
-        <;> simp [hE, reindex_apply, kroneckerMap_apply, Matrix.one_apply, h]
+      by_cases h : p.1 i = p.1 (σ i) <;> simp [hE, reindex_apply, kroneckerMap_apply, h]
     simp only [hA]
     rw [Fintype.sum_prod_type]
     dsimp only

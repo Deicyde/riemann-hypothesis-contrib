@@ -58,7 +58,7 @@ theorem span_scaled
         = (s • (LinearMap.id : B.Cusp j wL →ₗ[𝓞 B.KO] B.Cusp j wL)) ∘ w0 := by
     funext k
     simp only [Function.comp_apply, LinearMap.smul_apply, LinearMap.id_apply]
-    first | rfl | exact algebraMap_smul B.KO s (w0 k) | simp
+    first | exact algebraMap_smul B.KO s (w0 k)
   rw [hfun, Set.range_comp, ← Submodule.map_span, h]
   rfl
 

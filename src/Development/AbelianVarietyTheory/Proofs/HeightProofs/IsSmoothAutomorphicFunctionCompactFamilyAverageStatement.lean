@@ -45,6 +45,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta MeasureTheory Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.isSmoothAutomorphicFunction_compactFamily_average
     : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
       IsInfFam (D := D) θ
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.isSmoothAutomorphicFunction_compactFamily_average
                 → ∀ φ : GA D V → ℂ,
                   IsAutFunSm θ V φ
                     → IsAutFunSm θ V (fun x => ∫ k, e k * φ (x * atTau θ V τ (κ k)) ∂μ) := by
-  first
-  | exact @GlobalTheory.RealAverage.isAutFunSm_average
-  | exact GlobalTheory.RealAverage.isAutFunSm_average
-  | (intros; apply GlobalTheory.RealAverage.isAutFunSm_average <;> assumption)
+  first | exact @GlobalTheory.RealAverage.isAutFunSm_average

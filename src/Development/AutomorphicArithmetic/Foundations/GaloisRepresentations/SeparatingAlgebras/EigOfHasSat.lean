@@ -161,7 +161,6 @@ theorem UpperTheory.Gal.Gen.locOp_pf
     simp only [one_mul, map_one, one_apply_eq_self] at h2
     have h3 := hT.2 (fun g => l (σ.ρ g v)) hf
     have h4 : l (opOf σ.ρ h v) = (m : ℂ) * ∑ g ∈ T, (H : HeckeAlgebra μ) g * l (σ.ρ g v) := by
-
       rw [opOf, Finsupp.sum_of_support_subset h hsupp _ (by simp), map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun g hg => ?_
       rw [map_smul, hval g hg, smul_eq_mul, mul_assoc]

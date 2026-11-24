@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.smooth_vector_automorphic_derivatives
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
       IsInfFam θ
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.smooth_vector_automorphic_derivatives
                             → Continuous (l.foldr (fun p f => Rder θ V p.1 p.2 f) ψ)
                               ∧ Repr V μ 𝓕 (l.foldr (dL2 θ V ρ) F)
                                 (l.foldr (fun p f => Rder θ V p.1 p.2 f) ψ) := by
-  first
-  | exact @GlobalTheory.SmoothRep.exists_smooth_repr
-  | exact GlobalTheory.SmoothRep.exists_smooth_repr
-  | (intros; apply GlobalTheory.SmoothRep.exists_smooth_repr <;> assumption)
+  first | exact @GlobalTheory.SmoothRep.exists_smooth_repr

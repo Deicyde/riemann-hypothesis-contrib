@@ -5,12 +5,20 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
 public import Formalism.LocalToGlobal.ProjectiveLattices.RecPJThAllNeBot
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.CardLatticeQuotientHalfLevelStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsReducedIntegralBasisHarmonicPolynomialsStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.LogSupNormThetaGeneratorLeStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.SupBoundsLeGeneratorConstantMulSizeStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ThetaRulesLinearAndLevelCongruenceStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.CardLatticeQuotientHalfLevel
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThProps
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsReducedIntegralBasisHarmonicPolynomials
+public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
+public import Formalism.LocalToGlobal.ProjectiveLattices.XcLat
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.LogSupNormThetaGeneratorLe
+public import Formalism.SharpRestriction.Divisibility.WeightAlgebra
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.SupBoundsLeGeneratorConstantMulSize
+public import Formalism.LocalToGlobal.ProjectiveLattices.RulInst
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ThetaRulesLinearAndLevelCongruence
 public import Formalism.SharpRestriction.GlobalSchurBounds.ThickPlacesCorollaryOfAnyTranslate
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.WeightFloorInequalities
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.IntegralValueOfChartValues
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -48,8 +56,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.WeightFloorInequalities
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.IntegralValueOfChartValues
 
 @[expose] public section
 
@@ -113,7 +119,7 @@ theorem exists_family
   refine ⟨g, hg, ?_⟩
   rintro f ⟨x, P, hP, hf⟩
   obtain ⟨hlin, hmod⟩ :=
-    GlobalTheory.T.theta_rules_linear_and_level_congruence hci E H Dw l Xo c nab hn a n
+    _root_.GlobalTheory.ThetaRule.isThRule_linear_and_congr hci E H Dw l Xo c nab hn a n
   set q : Fin n → LevQ Dw l := fun k => Submodule.Quotient.mk (x k) with hq
   have hrep : ∀ k, x k - levRep (q k) ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La) := by
     intro k
@@ -142,9 +148,7 @@ theorem exists_family
 theorem log_rdE (D : D7)
     : Real.log (ReciprocityTheory.ChartRestriction.G.FD.rdE D.host.E) = lrd D := by
   have hf : (Module.finrank ℚ D.host.E : ℝ) = 2 * D.R.f := by
-    first
-    | exact_mod_cast Formalism.MainNotions.Gaps.LevGap.finrank_hostE_eq D.host
-    | exact_mod_cast Formalism.MainNotions.StandardLattice.finrank_host D
+    first | exact_mod_cast Formalism.MainNotions.StandardLattice.finrank_host D
   have hd : (NumberField.discr D.host.E : ℝ) ≠ 0 := by
     exact_mod_cast NumberField.discr_ne_zero D.host.E
   unfold lrd ReciprocityTheory.ChartRestriction.G.FD.rdE ReciprocityTheory.ChartRestriction.G.FD.dE
@@ -179,12 +183,9 @@ theorem theta_family
                             + 2)
                 (recB h.toLawsCore) (recPJ h j hj) := by
   intro hci D T h hG large₂ j hj w hpg hL hr hlast
-  beta_reduce
 
   have hfin : Module.finrank ℚ D.host.E = 2 * D.R.f := by
-    first
-    | exact Formalism.MainNotions.Gaps.LevGap.finrank_hostE_eq D.host
-    | exact Formalism.MainNotions.StandardLattice.finrank_host D
+    first | exact Formalism.MainNotions.StandardLattice.finrank_host D
   have hfd : ReciprocityTheory.ChartRestriction.G.FD.fdeg D.host.E = D.R.f := by
     unfold ReciprocityTheory.ChartRestriction.G.FD.fdeg
     omega
@@ -220,8 +221,8 @@ theorem theta_family
     refine le_trans (Real.log_le_log (by positivity) ?_) hlDF
     linarith
   obtain ⟨R, b, hb, hgen, hR, hl1⟩ :=
-    GlobalTheory.T.exists_reduced_integral_basis_harmonicPolynomials D.host.E T.Q.H (T.Q.Dw j) T.Q.l
-      T.Q.c w.n (by rw [hpq]; exact hr) (wtA w) large₂.sc.L hL hrd hfd' hDF' hln
+    _root_.GlobalTheory.HarmBasis.exists_reduced_basis_harmA D.host.E T.Q.H (T.Q.Dw j) T.Q.l T.Q.c
+      w.n (by rw [hpq]; exact hr) (wtA w) large₂.sc.L hL hrd hfd' hDF' hln
 
   obtain ⟨g, hgr, hgcl⟩ :=
     exists_family hci (T.Q.Xo j) T.Q.c (T.nab j) hn (htot j hj) (wtA w) w.n b hb hgen
@@ -239,7 +240,7 @@ theorem theta_family
     rw [Submodule.mem_inf, Submodule.mem_iInf]
     exact ⟨hcusp j hj (wtA w) w.n (dom_wtA w) hLP (g p) (hth p), fun hn' => absurd hj hn'⟩
   have : Finite (LevQ (T.Q.Dw j) T.Q.l) :=
-    (GlobalTheory.T.card_lattice_quotient_half_level D.host.E T.Q.H (T.Q.Dw j) T.Q.l).1
+    (_root_.GlobalTheory.card_levQ D.host.E T.Q.H (T.Q.Dw j) T.Q.l).1
   let e := Finite.equivFin ((Fin w.n → LevQ (T.Q.Dw j) T.Q.l) × Fin R)
   let w0 : Fin (Nat.card ((Fin w.n → LevQ (T.Q.Dw j) T.Q.l) × Fin R)) → ↥(cutR T.C j w) := fun k =>
     ⟨g (e.symm k), hcut (e.symm k)⟩
@@ -252,8 +253,7 @@ theorem theta_family
         (fun f hf => by rw [h2]; exact hgcl f ((hmem f).1 hf))
     exact hsp
   · rw [Nat.card_prod, Nat.card_fun, Nat.card_fin, Nat.card_fin,
-      (GlobalTheory.T.card_lattice_quotient_half_level D.host.E T.Q.H (T.Q.Dw j) T.Q.l).2, hM, hfd,
-      hpq, ← pow_mul]
+      (_root_.GlobalTheory.card_levQ D.host.E T.Q.H (T.Q.Dw j) T.Q.l).2, hM, hfd, hpq, ← pow_mul]
     rw [hfd, hpq] at hR
     refine Nat.mul_le_mul le_rfl
       (le_trans hR (Nat.mul_le_mul le_rfl (Nat.pow_le_pow_left (by omega) _)))
@@ -289,12 +289,11 @@ theorem theta_family
         positivity
       linarith
     have key :=
-      GlobalTheory.T.log_supNorm_thetaGenerator_le hci D T h hG large₂ j hj w hpg hL hr hLP
+      _root_.GlobalTheory.RunIn.log_sup_theta_generator_le hci D T h hG large₂ j hj w hpg hL hr hLP
         (fun i => levRep ((e.symm k).1 i))
         (b (e.symm k).2) (hb _) (g (e.symm k)) (hgr _) σ _ hℓ hexp
     have h30 :=
-      (GlobalTheory.T.supBounds_le_generatorConstant_mul_size D (recB h.toLawsCore) large₂ j w 0 hL
-        hnpos).1
+      (_root_.GlobalTheory.RunIn.sup_bounds_le_Gc D (recB h.toLawsCore) large₂ j w 0 hL hnpos).1
     show Real.log (T.Ns j w σ (g (e.symm k))) ≤ 400 * Zb D large₂ * w.size + 3 * (D.R.f : ℝ) * D.R.r * w.n * large₂.sc.L +
       5 * Real.log (Module.finrank ℚ T.Q.c.F) + Real.log |((NumberField.discr T.Q.c.F : ℤ) : ℝ)| / Module.finrank ℚ T.Q.c.F + 2
     nlinarith [key, h30, hAm, hfrnL, hlg, hld]

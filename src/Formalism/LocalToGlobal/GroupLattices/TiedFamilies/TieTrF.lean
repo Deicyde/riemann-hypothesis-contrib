@@ -79,7 +79,6 @@ def lvSet
   P with
 }
 
-
 def forms0Set {u : D.what₂.Word} (T : Forms0 D u) : Forms0 (setGat D g' hd') u where
   atT := atTTSet D g' hd' T.atT
   cls0 := clsSet D g' hd' T.cls0

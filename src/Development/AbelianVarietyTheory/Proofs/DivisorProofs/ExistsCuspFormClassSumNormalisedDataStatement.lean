@@ -55,6 +55,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_cuspForm_classSum_normalisedData
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.exists_cuspForm_classSum_normalisedData
                       (Vc D i).rank,
                   IsThClsD (T.Q.Xo ((i : ℕ) + 1)) O.c' (O.dδ t) (O.w t) (O.La t) (O.Nc t) (O.gam t)
                     (O.vol t) (O.ep t) O.io x f := by
-  first
-  | exact @GlobalTheory.ClassSumRule.exists_cusp_isThClsD_core
-  | exact GlobalTheory.ClassSumRule.exists_cusp_isThClsD_core
-  | (intros; apply GlobalTheory.ClassSumRule.exists_cusp_isThClsD_core <;> assumption)
+  first | exact @GlobalTheory.ClassSumRule.exists_cusp_isThClsD_core

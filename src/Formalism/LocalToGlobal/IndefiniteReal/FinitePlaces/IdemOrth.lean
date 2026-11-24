@@ -51,8 +51,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-
-
 namespace Formalism.IndefR.Fin
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -137,19 +135,6 @@ theorem not_two_primes
   rw [Ideal.eq_top_iff_one, ← hab]
   simp only [eq_intCast, Int.cast_natCast]
   exact add_mem (I.mul_mem_left _ hpI) (I.mul_mem_left _ hqI)
-
-theorem nat_mem_of_conj
-    {P Q : HeightOneSpectrum (𝓞 D.host.E)} (h : Lev.IsConjPl (D := D) P Q)
-    {n : ℕ} (hn : (n : 𝓞 D.host.E) ∈ P.asIdeal)
-    : (n : 𝓞 D.host.E) ∈ Q.asIdeal := by
-  obtain ⟨c, hc, hce⟩ := h _ hn
-  have : c = (n : 𝓞 D.host.E) := by
-    apply FaithfulSMul.algebraMap_injective (𝓞 D.host.E) D.host.E
-    show (c : D.host.E) = ((n : 𝓞 D.host.E) : D.host.E)
-    rw [hce]
-    push_cast
-    exact star_natCast n
-  rwa [← this]
 
 theorem char_mem
     {P : HeightOneSpectrum (𝓞 D.host.E)} {q : ℕ}

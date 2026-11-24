@@ -95,10 +95,7 @@ theorem hpk_mulVec_liftVec (v : Fin (2 * r' + k + 1) → ℂ)
     simp only [Matrix.mulVec, dotProduct]
     rw [sum_lev]
     · refine Finset.sum_eq_zero fun j _ => ?_
-      have hj := j.isLt
-      have hjin : i ≤ (levPos k i r' j).val ∧ (levPos k i r' j).val < 2 * r' + k + 1 + i := by
-        rw [lev_val]; omega
-      rw [hpk_out_in p (levPos k i r' j) hp hjin, zero_mul]
+      rw [hpk_out_in p (levPos k i r' j) hp (lev_in j), zero_mul]
     · intro q hq
       rw [liftVec_out _ _ hq, mul_zero]
 
@@ -126,10 +123,7 @@ theorem bvec_lev (q : Fin (2 * r' + k + 1)) : bvec (levPos k i r' q) = liftVec k
     simp only [bvec, Pi.single_apply]
     rw [if_neg]
     rintro rfl
-    apply hp
-    rw [lev_val]
-    have := q.isLt
-    omega
+    exact hp (lev_in q)
 
 theorem fvec_lift (z : Fin (2 * r' + k + 1) → ℂ)
     : fvec k (i + r') (liftVec k i r' z) ⟨i, by omega⟩ = liftVec k i r' (fvec k r' z 0) := by
@@ -140,10 +134,10 @@ theorem fvec_lift (z : Fin (2 * r' + k + 1) → ℂ)
     apply Fin.ext
     simp [eI, lev_val]
   · exfalso
-    simp only [Fin.val_zero, Fin.val_mk] at h1 h2
+    simp only [Fin.val_zero] at h1 h2
     omega
   · exfalso
-    simp only [Fin.val_zero, Fin.val_mk] at h1 h2
+    simp only [Fin.val_zero] at h1 h2
     omega
   · rfl
 
@@ -181,8 +175,7 @@ theorem chatL_lev
   simp only [chatL]
   rw [ha, hb]
   refine Finset.sum_congr rfl fun j₁ _ => Finset.sum_congr rfl fun j₂ _ => ?_
-  rw [Function.comp_assoc, Function.comp_assoc, qminorOp_lev]
-  all_goals try exact hL
+  rw [Function.comp_assoc, Function.comp_assoc, qminorOp_lev hL]
 
 theorem second_capelli_minor_level
     {t : ℕ} (pos : Fin t → Fin (2 * r' + k + 1))
@@ -204,8 +197,7 @@ theorem second_capelli_minor_level
     Finset.sum_congr rfl fun j₂ _ =>
       Finset.sum_congr rfl fun j₃ _ => Finset.sum_congr rfl fun j₄ _ => ?_
   split_ifs
-  · rw [Function.comp_assoc, Function.comp_assoc, qminorOp_lev]
-    all_goals try exact hL
+  · rw [Function.comp_assoc, Function.comp_assoc, qminorOp_lev hL]
   · rfl
 
 omit hL in
@@ -213,8 +205,7 @@ theorem pos_comp
     {t : ℕ} (pos₁ : Fin t → Fin (2 * (i + r') + k + 1)) (pos₂ : Fin t → Fin (2 * r' + k + 1))
     (hpos : ∀ j, pos₁ j = levPos k i r' (pos₂ (Fin.cast rfl j)))
     : pos₁ = levPos k i r' ∘ pos₂ := by
-  funext j
-  exact hpos j
+  exact funext fun j => hpos j
 
 theorem capL_cast
     {t₁ t₂ : ℕ} (h : t₁ = t₂) (pos₁ : Fin t₁ → Fin (2 * (i + r') + k + 1))
@@ -248,8 +239,7 @@ theorem chatL_cast
         (fun y => F (ιLev k i r' y))
         x := by
   subst h
-  have hp : pos₁ = levPos k i r' ∘ pos₂ := pos_comp pos₁ pos₂ hpos
-  subst hp
+  rw [pos_comp pos₁ pos₂ hpos]
   exact chatL_lev hL pos₂ u a β a' β' F x (funext fun j => ha j) (funext fun j => hb j)
 
 theorem second_capelli_minor_cast
@@ -270,15 +260,14 @@ theorem second_capelli_minor_cast
         (fun y => F (ιLev k i r' y))
         x := by
   subst h
-  have hp : pos₁ = levPos k i r' ∘ pos₂ := pos_comp pos₁ pos₂ hpos
-  subst hp
+  rw [pos_comp pos₁ pos₂ hpos]
   exact second_capelli_minor_level hL pos₂ u a a₁ β β₁ a' a₁' β' β₁' F x (funext fun j => ha j)
     (funext fun j => ha₁ j) (funext fun j => hb j) (funext fun j => hb₁ j)
 
 end Ops
 
 theorem mdim_lev (k i r' : ℕ) : mdim k (i + r') ⟨i, by omega⟩ = mdim k r' 0 := by
-  simp only [mdim, Fin.val_zero, Fin.val_mk]
+  simp only [mdim, Fin.val_zero]
   omega
 
 theorem posL_lev (k i r' : ℕ) (j : Fin (mdim k (i + r') ⟨i, by omega⟩))

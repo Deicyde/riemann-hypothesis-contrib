@@ -63,7 +63,7 @@ private theorem sxPdMap_lemma_2
   simp only [IsGSp] at h ⊢
   rw [adj_map_ringHom, ← Matrix.map_mul, h]
   ext i j
-  by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
+  by_cases hij : i = j <;> simp [hij]
 
 theorem UpperTheory.V.Ws.sxPdMap
     : ∀ {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {R R' : Type} [CommRing R] [CommRing R']

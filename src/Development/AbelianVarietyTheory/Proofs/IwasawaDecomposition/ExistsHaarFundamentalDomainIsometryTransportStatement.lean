@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_haar_fundamentalDomain_isometryTransport
     : ∀ (D : D7) (V V' : HSp D) (I : GlobalTheory.Mem.Isom.IsoMat V V') (S : HSp D)
         (μ : Measure (WO S V')) (𝓕 : Set (WO S V')),
@@ -53,7 +54,4 @@ theorem _root_.GlobalTheory.T.exists_haar_fundamentalDomain_isometryTransport
         → ∃ (ν : Measure (WO S V)) (𝓖 : Set (WO S V)),
           ν.IsAddHaarMeasure ∧ IsAddFundamentalDomain (ratL V S) 𝓖 ν
             ∧ ∀ u : WO S V → ENNReal, ∫⁻ w in 𝓕, u ((I.phi S).symm w) ∂μ = ∫⁻ w in 𝓖, u w ∂ν := by
-  first
-  | exact @GlobalTheory.Mem.Isom.haar_fd_phi
-  | exact GlobalTheory.Mem.Isom.haar_fd_phi
-  | (intros; apply GlobalTheory.Mem.Isom.haar_fd_phi <;> assumption)
+  first | exact @GlobalTheory.Mem.Isom.haar_fd_phi

@@ -62,9 +62,7 @@ theorem val_pi_lt_one (h : LF O ϖ nrm q) : ValuativeRel.valuation F ϖ < 1 := b
   exact (h.lt_one ϖ).2 ⟨1, O.one_mem, (mul_one ϖ).symm⟩
 
 theorem val_pi_pos (h : LF O ϖ nrm q) : 0 < ValuativeRel.valuation F ϖ := by
-  first
-  | exact (Valuation.pos_iff _).2 h.ne
-  | exact zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 h.ne)
+  first | exact (Valuation.pos_iff _).2 h.ne
 
 theorem mem_iff_val_le (h : LF O ϖ nrm q) (x : F) : x ∈ O ↔ ValuativeRel.valuation F x ≤ 1 := by
   rw [h.O_eq]
@@ -86,10 +84,7 @@ theorem one_lt_q (h : LF O ϖ nrm q) : 1 < q := by
 
 private theorem isUnit_iff_valuation_eq_one' (y : 𝒪[F])
     : IsUnit y ↔ ValuativeRel.valuation F (y : F) = 1 := by
-  first
-  | exact (Valuation.integer.integers _).isUnit_iff_valuation_eq_one
-  | simpa using
-      (Valuation.integer.integers (ValuativeRel.valuation F)).isUnit_iff_valuation_eq_one (x := y)
+  first | exact (Valuation.integer.integers _).isUnit_iff_valuation_eq_one
 
 theorem irreducible_pi (h : LF O ϖ nrm q)
     : Irreducible (⟨ϖ, (Valuation.mem_integer_iff _ _).2 (val_pi_lt_one h).le⟩ : 𝒪[F]) := by
@@ -155,8 +150,7 @@ theorem nrm_eq_zpow
   have h1 : nrm (x * ϖ ^ (-e)) = 1 := h.nrm_unit _ (val_mul_zpow h he)
   have hdecomp : x = x * ϖ ^ (-e) * ϖ ^ e := by
     rw [mul_assoc, ← zpow_add₀ h.ne, neg_add_cancel, _root_.zpow_zero, mul_one]
-  have hz : nrm (ϖ ^ e) = nrm ϖ ^ e := by
-    first | exact map_zpow₀ nrm ϖ e | exact map_zpow₀ nrm.toMonoidWithZeroHom ϖ e
+  have hz : nrm (ϖ ^ e) = nrm ϖ ^ e := by first | exact map_zpow₀ nrm ϖ e
   conv_lhs => rw [hdecomp]
   rw [map_mul, h1, one_mul, hz, h.nrm_pi, _root_.inv_zpow']
 

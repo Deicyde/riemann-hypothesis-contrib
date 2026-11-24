@@ -59,13 +59,15 @@ open scoped MonoidAlgebra
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
 open scoped MonoidAlgebra in
-private theorem subalgebra_end_eq_whole_of_isSimpleModule {V : Type} [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] (A : Subalgebra ℂ (Module.End ℂ V)) [IsSimpleModule A V] :
-    A = ⊤ := by
+private theorem subalgebra_end_eq_whole_of_isSimpleModule
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (A : Subalgebra ℂ (Module.End ℂ V)) [IsSimpleModule A V]
+    : A = ⊤ := by
   classical
   have schur : ∀ f : V →ₗ[A] V, ∃ c : ℂ, ∀ y, f y = c • y := by
     intro f
-    obtain ⟨c, hc⟩ := (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 f
+    obtain ⟨c, hc⟩ :=
+      (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 f
     exact ⟨c, fun y => by rw [← hc]; rfl⟩
   let b := Module.finBasis ℂ V
   let ι := Fin (Module.finrank ℂ V)
@@ -80,7 +82,8 @@ private theorem subalgebra_end_eq_whole_of_isSimpleModule {V : Type} [AddCommGro
     intro T x
     have hsingle : ∀ (i j : ι) (y : V), P (Pi.single j (T y)) i = T (P (Pi.single j y) i) := by
       intro i j y
-      obtain ⟨c, hc⟩ := schur ((LinearMap.proj i).comp (P.comp (LinearMap.single A (fun _ : ι => V) j)))
+      obtain ⟨c, hc⟩ :=
+        schur ((LinearMap.proj i).comp (P.comp (LinearMap.single A (fun _ : ι => V) j)))
       have h1 := hc (T y)
       have h2 := hc y
       simp only [LinearMap.comp_apply, LinearMap.proj_apply, LinearMap.single_apply] at h1 h2
@@ -107,19 +110,21 @@ private theorem subalgebra_end_eq_whole_of_isSimpleModule {V : Type} [AddCommGro
   rw [hT]
   exact a.2
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
 open scoped MonoidAlgebra in
-theorem _root_.GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible :
-    ∀ (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) [FiniteDimensional ℂ V], ρ.IsIrreducible → Submodule.span ℂ (Set.range ρ) = ⊤ := by
+theorem _root_.GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible
+    : ∀ (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+        [FiniteDimensional ℂ V],
+      ρ.IsIrreducible → Submodule.span ℂ (Set.range ρ) = ⊤ := by
   intro G _ V _ _ ρ _ h
   let A : Subalgebra ℂ (Module.End ℂ V) := Algebra.adjoin ℂ (Set.range ρ)
   have hρA : ∀ g, ρ g ∈ A := fun g => Algebra.subset_adjoin ⟨g, rfl⟩
   have hspan : Subalgebra.toSubmodule A = Submodule.span ℂ (Set.range ρ) := by
     rw [Algebra.adjoin_eq_span]
     congr 1
-    have : Set.range ρ = ((MonoidHom.mrange ρ : Submonoid (Module.End ℂ V)) : Set (Module.End ℂ V)) :=
+    have : Set.range ρ
+        = ((MonoidHom.mrange ρ : Submonoid (Module.End ℂ V)) : Set (Module.End ℂ V)) :=
       (MonoidHom.coe_mrange ρ).symm
     rw [this, Submonoid.closure_eq]
   let φ : Submodule A V → Subrepresentation ρ := fun M =>

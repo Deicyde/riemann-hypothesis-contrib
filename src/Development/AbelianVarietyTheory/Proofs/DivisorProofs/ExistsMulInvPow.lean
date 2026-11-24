@@ -50,9 +50,6 @@ open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberFie
   GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop
   GlobalTheory.RefSum
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.CombTw

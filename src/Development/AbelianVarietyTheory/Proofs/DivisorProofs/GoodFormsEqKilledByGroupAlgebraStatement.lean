@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR For
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CuspMult
+
 theorem _root_.GlobalTheory.T.goodForms_eq_killed_by_groupAlgebra
     : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
         (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (M : DSModel V S)
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.goodForms_eq_killed_by_groupAlgebra
         → goodPart θ M (levS V β (withP L P)) (levChi V β (withP L P)) (gaL V β L eG c)
             ⊓ hPart M (levG V β (flag1L L)) ok pl q Sg
           = allMaps θ M ⊓ killed (finRep M) (eqSet V β L eG c P ok pl q Sg) := by
-  first
-  | exact @GlobalTheory.CuspMult.EqCut.good_hecke_eq_killed
-  | exact GlobalTheory.CuspMult.EqCut.good_hecke_eq_killed
-  | (intros; apply GlobalTheory.CuspMult.EqCut.good_hecke_eq_killed <;> assumption)
+  first | exact @GlobalTheory.CuspMult.EqCut.good_hecke_eq_killed

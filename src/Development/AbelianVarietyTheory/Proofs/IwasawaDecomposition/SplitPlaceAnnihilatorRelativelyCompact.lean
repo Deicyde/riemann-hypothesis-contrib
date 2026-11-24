@@ -48,7 +48,10 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BesselDatumA
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.BesselData GlobalTheory.RootExch
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.BesselData GlobalTheory.RootExch
 open scoped TensorProduct RestrictedProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -56,31 +59,46 @@ namespace GlobalTheory.SplitAnnihilator
 
 open GlobalTheory.IdemModTwo
 
-
 open Classical in
-theorem continuous_singleV (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    Continuous (singleV F v) := by
+theorem continuous_singleV (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : Continuous (singleV F v) := by
   apply _root_.GlobalTheory.FinPl.SplitPoint.continuous_single_at <;> assumption
 
-theorem trace_split {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {e : AE D} (he : SplitAt D v e)
-    (x y : Fv D.host.F v) :
-    Algebra.trace (AF D.host.F) (AE D) (fj D (singleV D.host.F v x) * e * (fj D (singleV D.host.F v y) * e)) =
-      pairA D.host.F 0 (singleV D.host.F v (x * y)) := by
-  have h1 : fj D (singleV D.host.F v x) * e * (fj D (singleV D.host.F v y) * e) =
-      fj D (singleV D.host.F v (x * y)) * e := by
+theorem trace_split
+    {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {e : AE D}
+    (he : SplitAt D v e) (x y : Fv D.host.F v)
+    : Algebra.trace (AF D.host.F) (AE D)
+        (fj D (singleV D.host.F v x) * e * (fj D (singleV D.host.F v y) * e))
+      = pairA D.host.F 0 (singleV D.host.F v (x * y)) := by
+  have h1
+      : fj D (singleV D.host.F v x) * e * (fj D (singleV D.host.F v y) * e)
+        = fj D (singleV D.host.F v (x * y)) * e := by
     rw [mul_mul_mul_comm, he.1, ← map_mul, singleV_mul, GlobalTheory.SplitIdem.evalV_singleV_same]
   have h2 := GlobalTheory.FockCompare.SymplVal.trace_AE D (fj D (singleV D.host.F v (x * y)) * e)
-  rw [map_mul (cA D), cA_fj, ← mul_add, he.2.2, ← map_mul (fj D), singleV_mul, GlobalTheory.SplitIdem.evalV_singleV_same, mul_one] at h2
+  rw [map_mul (cA D), cA_fj, ← mul_add, he.2.2, ← map_mul (fj D), singleV_mul,
+      GlobalTheory.SplitIdem.evalV_singleV_same, mul_one]
+    at h2
   rw [h1]
   exact tmul_one_inj (F := D.host.F) (E := D.host.E) h2
 
-theorem annihilator_subset_compact : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), (∀ v, ∃ y, psiV D.host.F ψ v y ≠ 1) → ∀ ε : AE D, IsSplitIdem D ε → ∀ V ∈ nhds (0 : AE D), ∃ C : Set (AE D), IsCompact C ∧ ∀ a, ε * a = a → (∀ s ∈ V, ε * s = s → ψ (Algebra.trace (AF D.host.F) (AE D) (a * s)) = 1) → a ∈ C := by
+theorem annihilator_subset_compact
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      (∀ v, ∃ y, psiV D.host.F ψ v y ≠ 1)
+        → ∀ ε : AE D,
+          IsSplitIdem D ε
+            → ∀ V ∈ nhds (0 : AE D), ∃ C : Set (AE D),
+              IsCompact C
+                ∧ ∀ a,
+                  ε * a = a
+                    → (∀ s ∈ V, ε * s = s → ψ (Algebra.trace (AF D.host.F) (AE D) (a * s)) = 1)
+                    → a ∈ C := by
   intro D ψ hψ e hε V hV
   obtain ⟨v, he⟩ := (isSplitIdem_iff e).1 hε
   obtain ⟨y, hy⟩ := hψ v
   have : IsModuleTopology (AF D.host.F) (AE D) := ⟨rfl⟩
   have : IsTopologicalRing (AE D) := IsModuleTopology.isTopologicalRing (AF D.host.F) (AE D)
-  have : ProperSpace (Fv D.host.F v) := GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion D.host.F v
+  have : ProperSpace (Fv D.host.F v) :=
+    GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion D.host.F v
   let j : Fv D.host.F v → AE D := fun x => fj D (singleV D.host.F v x) * e
   have hj : Continuous j := by
     have h1 : Continuous (algebraMap (AF D.host.F) (AE D)) :=
@@ -94,7 +112,8 @@ theorem annihilator_subset_compact : ∀ (D : D7) (ψ : AddChar (AF D.host.F) �
     simp only [j, h0, map_zero, zero_mul]
   have hV' : j ⁻¹' V ∈ nhds (0 : Fv D.host.F v) := hj.continuousAt.preimage_mem_nhds (by rwa [hj0])
   obtain ⟨r, hr, hball⟩ := Metric.mem_nhds_iff.1 hV'
-  refine ⟨j '' Metric.closedBall 0 (‖y‖ / r), (isCompact_closedBall _ _).image hj, fun a ha hs => ?_⟩
+  refine
+    ⟨j '' Metric.closedBall 0 (‖y‖ / r), (isCompact_closedBall _ _).image hj, fun a ha hs => ?_⟩
   obtain ⟨x, hx⟩ := he.exists_scalar a
   rw [ha] at hx
   refine ⟨x, ?_, hx.symm⟩
@@ -106,9 +125,10 @@ theorem annihilator_subset_compact : ∀ (D : D7) (ψ : AddChar (AF D.host.F) �
     rw [mem_ball_zero_iff, norm_div, div_lt_iff₀ hxpos]
     rw [div_lt_iff₀ hr] at hn
     linarith
-  have h := hs (j (y / x)) (hball hmem) (by
-    show e * (_ * e) = _ * e
-    rw [mul_left_comm, he.1])
+  have h :=
+    hs (j (y / x)) (hball hmem) (by
+      show e * (_ * e) = _ * e
+      rw [mul_left_comm, he.1])
   rw [hx] at h
   change ψ (Algebra.trace _ _ (_ * (_ * e))) = 1 at h
   rw [trace_split he, mul_div_cancel₀ _ hx0] at h

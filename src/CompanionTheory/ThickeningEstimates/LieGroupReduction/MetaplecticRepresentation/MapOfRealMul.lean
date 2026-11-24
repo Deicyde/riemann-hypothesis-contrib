@@ -133,9 +133,9 @@ theorem sec_apply_zero (s : Mat l) (hA : IsUnit (bl Sum.inl Sum.inl s)) (f : Sch
     : sec s f 0
       = (((√ |s.toBlocks₁₁.det|)⁻¹ : ℝ) : ℂ) * fou l
         (ph (-(Ring.inverse (bl Sum.inl Sum.inl s) * bl Sum.inl Sum.inr s)) (fouInv l f)) 0 := by
-  simp only [sec, big, ContinuousLinearMap.mul_apply, ContinuousLinearMap.smul_apply,
-    SchwartzMap.smul_apply, ph_apply, dil_apply hA.ringInverse, map_zero, inner_zero_left, mul_zero,
-    ofReal_zero, zero_mul, Complex.exp_zero, one_mul, smul_eq_mul]
+  simp only [sec, big, ContinuousLinearMap.mul_apply, ContinuousLinearMap.smul_apply, ph_apply,
+    dil_apply hA.ringInverse, map_zero, inner_zero_left, mul_zero, ofReal_zero, zero_mul,
+    Complex.exp_zero, one_mul, smul_eq_mul]
 
 end C
 

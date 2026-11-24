@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitChart_uniformiser_and_residueCard
     : ∀ {D : D7} (e : AE D) (P : HeightOneSpectrum (𝓞 D.host.E))
         (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.splitChart_uniformiser_and_residueCard
             → (∃ p : Ov D v,
                 algebraMap (Ov D v) (Fv D.host.F v) p = π (incA D (ϖ : D.host.E)) ∧ Irreducible p)
               ∧ Nat.card (IsLocalRing.ResidueField (Ov D v)) = Ideal.absNorm P.asIdeal := by
-  first
-  | exact @GlobalTheory.SplitUnif.unif_chart
-  | exact GlobalTheory.SplitUnif.unif_chart
-  | (intros; apply GlobalTheory.SplitUnif.unif_chart <;> assumption)
+  first | exact @GlobalTheory.SplitUnif.unif_chart

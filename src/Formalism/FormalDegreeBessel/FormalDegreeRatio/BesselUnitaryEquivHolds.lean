@@ -59,15 +59,12 @@ variable {k r : ℕ}
 theorem continuous_lmulM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     : Continuous (lmulM (k := k) (r := r) a) := by
   unfold lmulM
-  first | fun_prop | exact continuous_const.matrix_mul continuous_id | continuity
+  first | fun_prop
 
 theorem continuous_conjM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     : Continuous (conjM (k := k) (r := r) a) := by
   unfold conjM
-  first
-  | fun_prop
-  | exact (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
-  | continuity
+  first | fun_prop
 
 def lmulE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsUnit a.det)
     : Mt k r ≃ᵐ Mt k r where

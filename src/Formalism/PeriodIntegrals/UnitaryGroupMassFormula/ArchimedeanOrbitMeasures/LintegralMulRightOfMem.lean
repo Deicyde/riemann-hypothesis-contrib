@@ -107,12 +107,7 @@ theorem map_mul_right_eq (μ : Measure G) [μ.IsHaarMeasure] (g : G)
 theorem measurable_modChar : Measurable (fun g : G => (Measure.modularCharacterFun g : ℝ≥0∞)) := by
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : G)
   set μ : Measure G := Measure.haar
-  have hpos : μ K ≠ 0 := by
-    first
-    | exact (Measure.measure_pos_of_mem_nhds μ hK1).ne'
-    | exact (MeasureTheory.measure_pos_of_mem_nhds μ hK1).ne'
-    | exact ((isOpen_interior.measure_pos μ ⟨1, mem_interior_iff_mem_nhds.2 hK1⟩).trans_le
-        (measure_mono interior_subset)).ne'
+  have hpos : μ K ≠ 0 := by first | exact (Measure.measure_pos_of_mem_nhds μ hK1).ne'
   have hfin : μ K ≠ ∞ := hK.measure_lt_top.ne
   have key
       : (fun g : G => (Measure.modularCharacterFun g : ℝ≥0∞))
@@ -136,8 +131,6 @@ theorem modChar_eq_one
   haveI : MeasurableMul H := by
     first
     | infer_instance
-    | exact ⟨fun c => ((measurable_const_mul (c : G)).comp measurable_subtype_coe).subtype_mk,
-        fun c => ((measurable_mul_const (c : G)).comp measurable_subtype_coe).subtype_mk⟩
   obtain ⟨D, hD⟩ : ∃ D : H → ℝ, ∀ h, D h = (Measure.modularCharacterFun (h : G) : ℝ) :=
     ⟨_, fun _ => rfl⟩
   have hDm : Measurable D := by
@@ -242,8 +235,6 @@ theorem avg_mul_mem
   haveI : MeasurableMul H := by
     first
     | infer_instance
-    | exact ⟨fun c => ((measurable_const_mul (c : G)).comp measurable_subtype_coe).subtype_mk,
-        fun c => ((measurable_mul_const (c : G)).comp measurable_subtype_coe).subtype_mk⟩
   have e := lintegral_mul_left_eq_self (μ := ν) (fun h : H => f (g * (h : G))) k
   simpa [mul_assoc] using e
 
@@ -330,12 +321,7 @@ theorem unfold_stab
   have hπ : MeasurableEmbedding (fun q : G ⧸ MulAction.stabilizer G x0 => q.out • x0) :=
     (orb_cont x0 hc).measurableEmbedding (orb_inj x0)
   have hmk : Measurable (QuotientGroup.mk : G → G ⧸ MulAction.stabilizer G x0) := by
-    first
-    | exact measurable_quotient_mk''
-    | exact measurable_quotient_mk'
-    | exact (QuotientGroup.continuous_mk).measurable
-    | exact continuous_quot_mk.measurable
-    | fun_prop
+    first | exact measurable_quotient_mk''
   have hmap
       : μ.map (fun g => g • x0)
         = (μ.map (QuotientGroup.mk : G → G ⧸ MulAction.stabilizer G x0)).map

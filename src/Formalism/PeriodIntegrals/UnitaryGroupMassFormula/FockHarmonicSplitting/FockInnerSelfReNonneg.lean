@@ -298,7 +298,6 @@ lemma fockInner_hc_left {n : ℕ} (P Q : MvPolynomial σ ℂ) (hQ : Q ∈ FockH1
   · rfl
   · exact absurd (by
       first
-      | exact hdeg
       | (rw [Finsupp.degree_eq_weight_one]; exact hdeg)) hc
 
 lemma fockInner_hc_right {n : ℕ} (P Q : MvPolynomial σ ℂ) (hP : P ∈ FockH1Action.homog σ n) :
@@ -312,7 +311,6 @@ lemma fockInner_hc_right {n : ℕ} (P Q : MvPolynomial σ ℂ) (hP : P ∈ FockH
   · rfl
   · exact absurd (by
       first
-      | exact hdeg
       | (rw [Finsupp.degree_eq_weight_one]; exact hdeg)) hc
 
 end PI.FHS

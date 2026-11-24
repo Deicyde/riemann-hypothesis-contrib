@@ -3,18 +3,20 @@ module
 public import Formalism.DoubleCosetMeasures.StatementZ
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSBArgs
 public import Development.AbelianVarietyTheory.Definitions.Divisors.InvVolConjLevelOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFinsetCosetRepsBoundedHalfPointsStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFinsetCosetRepsBoundedHalfPoints
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIdempotentSumAuxiliaryPlaces
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteUnfSupportOfNeOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorDependsBelowAndSmallTranslationInvariaStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorSupportBoundedByUniformizerPowStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorVanishesUnlessLastRowBoundedStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorDependsBelowAndSmallTranslationInvaria
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorSupportBoundedByUniformizerPow
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorVanishesUnlessLastRowBounded
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasCompactSupportFlatIntegrand
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IndicatorSmallCosetHalfIsSchwartzBruhatStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IndicatorSmallCosetHalfIsSchwartzBruhat
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemGlLatCongOfSmul
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemMatLatSmulBlockLat
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnderMemAndPlaceAboveEqOfMem
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ValuationLeOneOfMem
+import Mathlib
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnderMemAndPlaceAboveEqOfMem
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNonarchimedeanLocalField
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NsmulProjectionXColumnsMemSelfDualLattice
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ParahoricLevelLiftsExist
@@ -75,6 +77,8 @@ open GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTh
 attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+
+attribute [local instance high] GlobalTheory.SplitWeil.matrixMeasurableSpace
 
 section Flip
 
@@ -158,7 +162,7 @@ theorem isNatDatum_sliceB
       · by_cases hb' : b = .theta i j
         · subst hb'
           ext r s
-          simp [Function.update_of_ne hne, Matrix.toCols₁]
+          simp [Matrix.toCols₁]
         · simp [Function.update_of_ne hb, Function.update_of_ne hb']
     have hZ' := FourierDepth.mem_matLat_smul_stdLat.1 hZ₀
     refine (congrArg T key).trans (hT.2.2 _ _ fun b => ?_)
@@ -225,7 +229,7 @@ theorem isTensor_flipTensor
           by_cases hb2 : b = .ex i j
           · subst hb2; simp
           · by_cases hb1 : b = .theta i j
-            · subst hb1; simp [Function.update_of_ne hne]
+            · subst hb1; simp
             · simp only [Function.update_of_ne hb2, Function.update_of_ne hb1]
               exact hxy b (mo b hb hb1 hb2)
     have e2 : G.joinA i j x = G.joinA i j y := by simp only [Grid.joinA, hxy _ m1, hxy _ m2]
@@ -260,13 +264,13 @@ theorem isTensor_flipTensor
           by_cases hb : b = .ex i j
           · subst hb; simp
           · by_cases hb' : b = .theta i j
-            · subst hb'; simp [Function.update_of_ne hne]
+            · subst hb'; simp
             · simp [Function.update_of_ne hb, Function.update_of_ne hb']
         refine (congrArg T key).trans (hT.2.2 _ _ fun b => ?_)
         by_cases hb : b = .ex i j
         · subst hb; simp
         · by_cases hb' : b = .theta i j
-          · subst hb'; simp [Function.update_of_ne hne]
+          · subst hb'; simp
           · simpa [Function.update_of_ne hb, Function.update_of_ne hb'] using hz b
     have e2 : G.joinA i j (x + z) = G.joinA i j x + G.joinA i j z := by
       ext r (s | s) <;> simp [Grid.joinA]
@@ -344,10 +348,7 @@ theorem val_pow_anti {ϖ : kˣ} (hϖ : IsUnif ϖ) {a b : ℕ} (h : a ≤ b)
   rw [Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, map_pow, map_pow]
   exact pow_le_pow_of_le_one zero_le' h1 h
 
-theorem val_inv_pow_mono {ϖ : kˣ} (hϖ : IsUnif ϖ) {a b : ℕ} (h : a ≤ b)
-    : valuation k (((ϖ ^ a)⁻¹ : kˣ) : k) ≤ valuation k (((ϖ ^ b)⁻¹ : kˣ) : k) := by
-  rw [Units.val_inv_eq_inv_val, Units.val_inv_eq_inv_val, map_inv₀, map_inv₀]
-  exact inv_anti₀ (zero_lt_iff.2 (by simp)) (val_pow_anti hϖ h)
+alias val_inv_pow_mono := _root_.GlobalTheory.FunObj.FlatSupp.val_inv_pow_mono
 
 theorem IsSBArgs.mono
     {G : Grid k} {ϖ : kˣ} (hϖ : IsUnif ϖ)
@@ -375,12 +376,11 @@ theorem exists_isSBArgs_flat
     (hT : G.IsTensor ϖ e (oppositePath G.m) T)
     : ∃ n, IsSBArgs G ϖ n (flatTensor hs ψ ν (moved G keep g T)) := by
   obtain ⟨hdep, n₁, hper⟩ :=
-    GlobalTheory.T.flatTensor_depends_below_and_small_translation_invariant G hs ψ ν ϖ e T keep g hϖ
-      hψ hT
+    _root_.GlobalTheory.FunObj.FlatDep.flatTensor_dep_and_per G hs ψ ν ϖ e T keep g hϖ hψ hT
   obtain ⟨n₂, hsupp⟩ :=
-    GlobalTheory.T.flatTensor_support_bounded_by_uniformizer_pow G hs ψ ν ϖ e T keep g hϖ hT
+    _root_.GlobalTheory.FunObj.FlatSupp.flatTensor_support G hs ψ ν ϖ e T keep g hϖ hT
   obtain ⟨n₃, hlast⟩ :=
-    GlobalTheory.T.flatTensor_vanishes_unless_lastRow_bounded G hs ψ ν ϖ e T keep g hm hϖ hψ hT
+    _root_.GlobalTheory.FunObj.FlatLast.flatTensor_lastRow_bounded G hs ψ ν ϖ e T keep g hm hϖ hψ hT
   refine ⟨
     max n₁ (max n₂ n₃),
     hdep,
@@ -565,12 +565,7 @@ theorem exists_idemSum_locPl' {μ₀ : T} (hL : L.Is μ₀) (G : GridData L sc) 
     fun w hw w' hw' h => Good.under_injOn hL G t hw hw' h
   rcases Good.locPl_cases hw with ⟨a, b⟩ | ⟨-, -, b⟩
   · exact b ▸ G.pl.w_split _ a
-  · first
-    | exact GlobalTheory.ParahoricLift.exists_isIdemAt fun h => (hL.Q_pl t w b).2 w b h
-    | exact GlobalTheory.ParahoricLift.exists_isIdemAt fun h =>
-        (hL.Q_pl t w b).2 w b ((GlobalTheory.IdemSupport.isConjPl_iff _ _).2 h)
-    | exact GlobalTheory.ParahoricLift.exists_isIdemAt fun h =>
-        (hL.Q_pl t w b).2 w b ((GlobalTheory.IdemSupport.isConjPl_iff _ _).1 h)
+  · first | exact GlobalTheory.ParahoricLift.exists_isIdemAt fun h => (hL.Q_pl t w b).2 w b h
 
 variable (G) in
 def finDatOf
@@ -598,19 +593,14 @@ theorem isSmall_zero : IsSmall P β' β n (0 : Mx D b a) := fun w _ r s => by
   rw [h]
   simp
 
-theorem IsSmall.add {x y : Mx D b a} (h : IsSmall P β' β n x) (h' : IsSmall P β' β n y)
-    : IsSmall P β' β n (x + y) := fun w hw r s => by
-  rw [frAt_add, Matrix.add_apply]
-  exact Valuation.map_add_le _ (h w hw r s) (h' w hw r s)
+alias IsSmall.add := _root_.GlobalTheory.FunObj.CosSB.isSmall_add
 
 theorem IsSmall.neg {x : Mx D b a} (h : IsSmall P β' β n x)
     : IsSmall P β' β n (-x) := fun w hw r s => by
   rw [frAt_neg, Matrix.neg_apply, Valuation.map_neg]
   exact h w hw r s
 
-theorem IsSmall.sub {x y : Mx D b a} (h : IsSmall P β' β n x) (h' : IsSmall P β' β n y)
-    : IsSmall P β' β n (x - y) := by
-  rw [sub_eq_add_neg]; exact h.add h'.neg
+alias IsSmall.sub := _root_.GlobalTheory.FunObj.CosSB.isSmall_sub
 
 theorem cosLoc_self {e : AE D} {r : Mx D b a} (hr : IsHalf e r) : cosLoc P e β' β n r r = 1 := by
   rw [cosLoc, if_pos ⟨hr, by rw [sub_self]; exact isSmall_zero⟩]
@@ -711,7 +701,7 @@ theorem isSBHalf_cosLoc_top
       (latO (G.pS (.top t j)) (G.pT (.top t j)) (G.latS (.top t j) : Set _)
         (G.latT (.top t j) : Set _) fun _ => True)
       (cosLoc (locPl G t) e (S.βp (j + 1)) (S.βp j) N r) :=
-  GlobalTheory.T.indicator_smallCoset_half_isSchwartzBruhat (G.V (.top j)) (G.V (.top (j + 1)))
+  _root_.GlobalTheory.FunObj.CosSB.isSBHalf_cosLoc (G.V (.top j)) (G.V (.top (j + 1)))
     (G.Λ (.top j)) (G.Λ (.top (j + 1))) (S.βp j) (S.βp (j + 1)) (locPl G t) e N r
     (by first | exact isFullLattice_top G j.2.le | exact (isFullLattice_top G j.2.le).toIsLattice)
     (by first | exact isFullLattice_top G j.2 | exact (isFullLattice_top G j.2).toIsLattice)
@@ -733,9 +723,9 @@ theorem isSBHalf_cosLoc_chi
     rcases i with ⟨_ | i, hi⟩
     · exact isFullLattice_grid_zero hL G
     · exact isFullLattice_grid_succ G hi.le
-  exact GlobalTheory.T.indicator_smallCoset_half_isSchwartzBruhat (G.pS (.chi i D.R.m))
-    (G.pT (.chi i D.R.m)) (G.Λ (.grid (i + 1) D.R.m)) (G.Λ (.grid i D.R.m)) (S.B.β (i + 1) D.R.m)
-    (S.B.β i D.R.m) (locPl G t) e N r
+  exact _root_.GlobalTheory.FunObj.CosSB.isSBHalf_cosLoc (G.pS (.chi i D.R.m)) (G.pT (.chi i D.R.m))
+    (G.Λ (.grid (i + 1) D.R.m)) (G.Λ (.grid i D.R.m)) (S.B.β (i + 1) D.R.m) (S.B.β i D.R.m)
+    (locPl G t) e N r
     (by
       first
       | exact isFullLattice_grid_succ G i.2
@@ -775,9 +765,9 @@ theorem GridChoice.exists_isCosExpansion
   set N := Finset.univ.sup n with hN
   have hF : ∀ w : locPl G t, IsSBArgs (locGrid G t w.1) (unifAt w.1) N (S.term t Φ β w).datum :=
     fun w => (hn w).mono (isUnif_unifAt w.1) (Finset.le_sup (f := n) (Finset.mem_univ w))
-  choose R hR1 hR2 hR3 using fun j : Fin D.R.m => GlobalTheory.T.exists_finset_cosetReps_bounded_half_points (S.βp (j + 1)) (S.βp j) (locPl G t) e N he
+  choose R hR1 hR2 hR3 using fun j : Fin D.R.m => _root_.GlobalTheory.FunObj.exists_finset_cosetReps (S.βp (j + 1)) (S.βp j) (locPl G t) e N he
   choose R' hR1' hR2' hR3' using fun i : Fin D.R.m =>
-    GlobalTheory.T.exists_finset_cosetReps_bounded_half_points (S.B.β i D.R.m) (S.B.β (i + 1) D.R.m) (locPl G t) e N he
+    _root_.GlobalTheory.FunObj.exists_finset_cosetReps (S.B.β i D.R.m) (S.B.β (i + 1) D.R.m) (locPl G t) e N he
   let Ix := (∀ j : Fin D.R.m, R j) × (∀ i : Fin D.R.m, R' i)
   let rX : Ix → ∀ j : Fin D.R.m, WO (G.V (.top j)) (G.V (.top (j + 1))) := fun κ j => (κ.1 j).1
   let rY : Ix → ∀ i : Fin D.R.m, WO (G.pS (.chi i D.R.m : Pair T)) (G.pT (.chi i D.R.m : Pair T)) :=

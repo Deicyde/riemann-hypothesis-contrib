@@ -74,11 +74,7 @@ theorem map_derivative (φ : R →+* S) (f : R⟦X⟧)
 
 theorem map_subst' (φ : R →+* S) {s : R⟦X⟧} (hs : HasSubst s) (f : R⟦X⟧)
     : PowerSeries.map φ (f.subst s) = (PowerSeries.map φ f).subst (PowerSeries.map φ s) := by
-  first
-  | exact PowerSeries.map_subst hs φ f
-  | exact PowerSeries.map_subst hs f
-  | exact PowerSeries.map_subst φ hs f
-  | exact (PowerSeries.subst_map hs φ f).symm
+  first | exact PowerSeries.map_subst hs f
 
 variable (W : WeierstrassCurve R)
 
@@ -107,8 +103,6 @@ theorem iterate_derivative_subst
     rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih]
     first
     | exact chainZ_of integration_spec composition_inverse_spec invariant_differential_units K W _
-    | exact chainZ_of integration_spec.{u} composition_inverse_spec.{u}
-        invariant_differential_units.{u} K W _
 
 end More
 
@@ -139,9 +133,7 @@ theorem jet_integral : JetZ.{u} := by
     first
     | exact (expSpec_of integration_spec composition_inverse_spec invariant_differential_units K
         W).1
-    | exact (formal_exponential_spec K W).1
-  have hs : HasSubst (expSer W) := by
-    first | exact HasSubst.of_constantCoeff_zero' hE0 | exact HasSubst.of_constantCoeff_zero hE0
+  have hs : HasSubst (expSer W) := by first | exact HasSubst.of_constantCoeff_zero' hE0
   rw [factorial_mul_coeff_eq_coeff_zero_iterate_derivative, More.iterate_derivative_subst,
     PowerSeries.coeff_zero_eq_constantCoeff_apply, constantCoeff_powerSeries_subst_eq_zero hs hE0]
 
@@ -193,9 +185,7 @@ theorem jet_mem' : JetMem.{u} := by
     first
     | exact (expSpec_of integration_spec composition_inverse_spec invariant_differential_units K
         W).1
-    | exact (formal_exponential_spec K W).1
-  have hs : HasSubst (expSer W) := by
-    first | exact HasSubst.of_constantCoeff_zero' hE0 | exact HasSubst.of_constantCoeff_zero hE0
+  have hs : HasSubst (expSer W) := by first | exact HasSubst.of_constantCoeff_zero' hE0
   have hX : ∀ m, coeff m (X : K⟦X⟧) ∈ S := fun m => by
     rw [PowerSeries.coeff_X]
     split_ifs

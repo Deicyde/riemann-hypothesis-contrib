@@ -146,8 +146,7 @@ theorem LawsT.rat
   have e3 :=
     ((hTB F E σ B _ _ X₁ W₁ M₀ χX χW om₀ _ _ _ _ hp₀).1 _ (hs _ hΨ)).2.1 g₁ (hr hδ) 1 (one_mem _) 1
       1
-  simp only [h.one, h.w1, map_one, NNReal.coe_one, Real.one_rpow, Complex.ofReal_one, mul_one,
-      Circle.coe_one, one_pow]
+  simp only [h.one, h.w1, map_one, NNReal.coe_one, Real.one_rpow, Complex.ofReal_one, mul_one]
     at e2 e3
   unfold thv
   rw [e1, h.uni m hm _ (pair_pres hp _ hΨ), e2, e3]

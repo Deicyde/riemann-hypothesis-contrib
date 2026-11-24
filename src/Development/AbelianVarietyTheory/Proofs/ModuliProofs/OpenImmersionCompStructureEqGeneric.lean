@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbProj
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.PullCub
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabComp
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.OneArc
 
 @[expose] public section
 
@@ -62,12 +63,7 @@ theorem Cpt.openImmersion_comp_structure_eq_generic
     : C.j ≫ C.s = c ≫ spMap β := by
   rw [Cpt.j, Category.assoc, pullback.condition, ← Category.assoc, C.jQ_over]
 
-private theorem spMap_comp_moduli_spaces
-    {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (g : A →+* B) (g' : B →+* D)
-    : spMap (g'.comp g) = spMap g' ≫ spMap g := by
-  unfold spMap
-  rw [← Spec.map_comp]
-  rfl
+private alias spMap_comp_moduli_spaces := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem Cpt.Above.exists_lift
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (U : Scheme.{0})

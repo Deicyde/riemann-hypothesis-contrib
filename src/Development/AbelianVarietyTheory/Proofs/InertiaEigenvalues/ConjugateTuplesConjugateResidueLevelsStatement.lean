@@ -50,6 +50,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.conjugate_tuples_conjugate_residue_levels
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.conjugate_tuples_conjugate_residue_levels
                     ∧ ∀ k (hk : k ∈ levJ R i t) (hk' : k ∈ levJ R i t'),
                       (((levEnv (Vc D i) (R.βV i) (R.datVt i t')).χ ⟨k, hk'⟩ : ℂˣ) : ℂ)
                         = τ (((levEnv (Vc D i) (R.βV i) (R.datVt i t)).χ ⟨k, hk⟩ : ℂˣ) : ℂ) := by
-  first
-  | exact @GlobalTheory.ConjRes.conj_res
-  | exact GlobalTheory.ConjRes.conj_res
-  | (intros; apply GlobalTheory.ConjRes.conj_res <;> assumption)
+  first | exact @GlobalTheory.ConjRes.conj_res

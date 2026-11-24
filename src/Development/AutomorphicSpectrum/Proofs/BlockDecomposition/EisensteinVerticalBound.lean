@@ -1,10 +1,12 @@
 module
 
 public import Development.WeilBound.ThetaLifts.LatticeBasics.HypothesesE
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EisensteinSeriesConvergentStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FlatSectionGrowthBoundStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightContinuousPosStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompactStandardMaximalStatement
+public import Development.WeilBound.ThetaLifts.LatticeBasics.UnfoldC
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EisensteinSeriesConvergent
+public import Development.WeilBound.ThetaLifts.LatticeBasics.Hypotheses2
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FlatSectionGrowthBound
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightContinuousPos
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompactStandardMaximal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -145,11 +147,15 @@ theorem eis_half_plane
   intro F E _ _ _ _ _ σ B n Y r s hB hn hY b K a hb hK ha χ s₁ f hf
   haveI := GlobalTheory.Doubling.isTopologicalRing_tens (F := F) (E := E) (R := AF F)
   obtain ⟨ac, a0⟩ :=
-    GlobalTheory.T.height_function_continuous_pos' F E σ B n Y r s hB hn hY b K a hb hK ha
-  have kc := GlobalTheory.T.isCompact_standard_maximal F E σ B n Y r s hB hn hY b K a hb hK ha
-  obtain ⟨C, hC⟩ := GlobalTheory.T.flat_section_growth_bound K a kc ha a0 χ s₁ f hf
+    _root_.GlobalTheory.CompanionTheory.Iwasawa.height_continuous_pos F E σ B n Y r s hB hn hY b K a
+      hb hK ha
+  have kc :=
+    _root_.GlobalTheory.CompanionTheory.StdK.isCompact_K F E σ B n Y r s hB hn hY b K a hb hK ha
+  obtain ⟨C, hC⟩ :=
+    _root_.GlobalTheory.CompanionTheory.EisTerm.flat_norm_le_height_rpow K a kc ha a0 χ s₁ f hf
   obtain ⟨σ₀, hG⟩ :=
-    GlobalTheory.T.eisenstein_series_convergent F E σ B n Y r s hB hn hY b K a hb hK ha
+    _root_.GlobalTheory.CompanionTheory.GodementH.godement_sum F E σ B n Y r s hB hn hY b K a hb hK
+      ha
   obtain ⟨W, hW, h1W, hWa⟩ := exists_nhd_one kc ac ha a0
   refine ⟨σ₀ - n / 2, fun t Ê ht hE => ?_⟩
   have tb

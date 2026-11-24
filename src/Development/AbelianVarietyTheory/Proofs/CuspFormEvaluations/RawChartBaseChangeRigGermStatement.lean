@@ -47,6 +47,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.rawChart_baseChange_rig_germ_alt
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (S S' : Type) [CommRing S] [CommRing S'] (ψ : S →+* S')
@@ -82,7 +83,4 @@ theorem _root_.GlobalTheory.T.rawChart_baseChange_rig_germ_alt
                       → RIsGerm (spMap ψ ≫ x0) d x'
                         (fun a i => MvPowerSeries.map ψ (act a i))
                         e' wP k Fs' (MvPowerSeries.map ψ f) := by
-  first
-  | exact @GlobalTheory.rawChart_baseChange_rig_germ
-  | exact GlobalTheory.rawChart_baseChange_rig_germ
-  | (intros; apply GlobalTheory.rawChart_baseChange_rig_germ <;> assumption)
+  first | exact @GlobalTheory.rawChart_baseChange_rig_germ

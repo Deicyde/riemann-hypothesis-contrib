@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_nilChart_reads_of_isChartJ
     : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
         [IsCommMonObj G],
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_nilChart_reads_of_isChartJ
                 ∧ ∀ (OE : Type) [CommRing OE] (io : Out.RingAct G OE)
                     (act : Geo.Tor.Germ.OAct OE F),
                   ChartActs G x io act → ∀ a, Reads X X (io.act a) (act.act a) := by
-  first
-  | exact @GlobalTheory.ChF.nilChart_of_isChartJ
-  | exact GlobalTheory.ChF.nilChart_of_isChartJ
-  | (intros; apply GlobalTheory.ChF.nilChart_of_isChartJ <;> assumption)
+  first | exact @GlobalTheory.ChF.nilChart_of_isChartJ

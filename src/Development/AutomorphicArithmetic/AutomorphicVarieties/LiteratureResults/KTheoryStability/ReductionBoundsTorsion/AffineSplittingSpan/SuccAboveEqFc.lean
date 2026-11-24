@@ -57,8 +57,8 @@ variable {Y : Type}
 def fc {n : ℕ} (i : ℕ) (l : Fin n) : Fin (n + 1) :=
   ⟨if (l : ℕ) < i then (l : ℕ) else (l : ℕ) + 1, by split_ifs <;> omega⟩
 
-theorem fc_val {n : ℕ} (i : ℕ) (l : Fin n) :
-    ((fc i l : Fin (n + 1)) : ℕ) = if (l : ℕ) < i then (l : ℕ) else (l : ℕ) + 1 :=
+theorem fc_val {n : ℕ} (i : ℕ) (l : Fin n)
+    : ((fc i l : Fin (n + 1)) : ℕ) = if (l : ℕ) < i then (l : ℕ) else (l : ℕ) + 1 :=
   rfl
 
 theorem succAbove_eq_fc {n : ℕ} (i : Fin (n + 1)) (l : Fin n) : i.succAbove l = fc i l := by
@@ -70,18 +70,12 @@ theorem succAbove_eq_fc {n : ℕ} (i : Fin (n + 1)) (l : Fin n) : i.succAbove l 
   · rw [if_neg (by omega), Fin.succAbove_of_le_castSucc _ _ (by simpa [Fin.le_def] using h)]
     rfl
 
-theorem dc_eq {m : ℕ} (F : (Fin (m + 1) → Y) → ℝ) (y : Fin (m + 2) → Y) :
-    dc F y = ∑ i : Fin (m + 2), (-1 : ℝ) ^ (i : ℕ) * F (fun l => y (fc i l)) := by
+theorem dc_eq {m : ℕ} (F : (Fin (m + 1) → Y) → ℝ) (y : Fin (m + 2) → Y)
+    : dc F y = ∑ i : Fin (m + 2), (-1 : ℝ) ^ (i : ℕ) * F (fun l => y (fc i l)) := by
   simp only [dc, succAbove_eq_fc]
 
-theorem dc_smul {m : ℕ} (r : ℝ) (F : (Fin (m + 1) → Y) → ℝ) : dc (r • F) = r • dc F := by
-  funext y; simp [dc, Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => by ring
-
-theorem dc_sub {m : ℕ} (F G : (Fin (m + 1) → Y) → ℝ) : dc (F - G) = dc F - dc G := by
-  funext y; simp [dc, mul_sub, Finset.sum_sub_distrib]
-
-private theorem fc_fc_eq_fc_fc_pred_of_lt {n : ℕ} (i j : ℕ) (hji : j < i) (l : Fin n) :
-    (fc i (fc j l) : Fin (n + 2)) = fc j (fc (i - 1) l) := by
+private theorem fc_fc_eq_fc_fc_pred_of_lt {n : ℕ} (i j : ℕ) (hji : j < i) (l : Fin n)
+    : (fc i (fc j l) : Fin (n + 2)) = fc j (fc (i - 1) l) := by
   apply Fin.ext
   simp only [fc_val]
   split_ifs <;> omega

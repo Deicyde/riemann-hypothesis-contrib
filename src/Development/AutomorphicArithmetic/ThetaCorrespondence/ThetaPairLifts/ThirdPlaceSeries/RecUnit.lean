@@ -44,8 +44,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
@@ -59,9 +57,7 @@ variable
 theorem _root_.UpperTheory.Zero.LLC.IsRecT.recSupp
     {rc : IrrGL (k := w.adicCompletion E) → WD h} (H : _root_.UpperTheory.Zero.LLC.IsRecT h rc)
     : RecSupp fun _ (π : Irr (w.adicCompletion E) _) => rc (cls (toIrrRep π)) := by
-  first
-  | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨a, ha, ε, H⟩ := hOpn)
-  | obtain ⟨a, ha, ε, -, H⟩ := H
+  first | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨a, ha, ε, H⟩ := hOpn)
   intro n s π d σ hs g
   have h1 := (hasSupport_of_isCuspSupport hs).of_equiv (equivRep (toIrrRep π))
   have h2 := H.supp (cls (toIrrRep π)) _ h1 g
@@ -70,9 +66,7 @@ theorem _root_.UpperTheory.Zero.LLC.IsRecT.recSupp
 theorem _root_.UpperTheory.Zero.LLC.IsRecT.recUnit
     {rc : IrrGL (k := w.adicCompletion E) → WD h} (H : _root_.UpperTheory.Zero.LLC.IsRecT h rc)
     : RecUnit fun _ (π : Irr (w.adicCompletion E) _) => rc (cls (toIrrRep π)) := by
-  first
-  | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨a, ha, ε, H⟩ := hOpn)
-  | obtain ⟨a, ha, ε, -, H⟩ := H
+  first | (have hOpn := UpperTheory.One.M.opn _ (H); obtain ⟨a, ha, ε, H⟩ := hOpn)
   intro χ c hu hc g α hα
   obtain ⟨hχ, e⟩ := cls_eq_ofChar χ c hc
   simp only [e, H.one, eig_lpOfChar, Multiset.mem_singleton] at hα

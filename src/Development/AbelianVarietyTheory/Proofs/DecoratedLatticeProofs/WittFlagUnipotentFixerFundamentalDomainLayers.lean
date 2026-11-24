@@ -48,9 +48,7 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -62,54 +60,39 @@ section Abstract
 
 open scoped Pointwise
 
-variable
-  {A B U X G : Type} [AddCommGroup A] [MeasurableSpace A] [MeasurableAdd₂ A] [AddGroup B]
-  [MeasurableSpace B] [MeasurableSpace U] [MeasurableSpace X] [Group G] [MulAction G X]
+variable {A B U X G : Type} [AddCommGroup A] [MeasurableSpace A] [MeasurableAdd₂ A] [AddGroup B] [MeasurableSpace B]
+  [MeasurableSpace U] [MeasurableSpace X] [Group G] [MulAction G X]
   {mA : Measure A} {mB : Measure B} {ν : Measure U} [SFinite mA] [SFinite mB] [SFinite ν]
 
 theorem null_middle {N : Set B} (hN : mB N = 0) : (mA.prod (mB.prod ν)) {p | p.2.1 ∈ N} = 0 := by
-  have h : {p : A × (B × U) | p.2.1 ∈ N} = Set.univ ×ˢ (N ×ˢ Set.univ) := by ext p; simp
+  have h : {p : A × (B × U) | p.2.1 ∈ N} = Set.univ ×ˢ (N ×ˢ Set.univ) := by
+    ext p; simp
   rw [h, Measure.prod_prod, Measure.prod_prod, hN]
   simp
 
-theorem null_shear
-    [mA.IsAddLeftInvariant] {φ : B → A} (hφ : Measurable φ) {N : Set A} (hN : mA N = 0)
-    : (mA.prod (mB.prod ν)) {p | p.1 + φ p.2.1 ∈ N} = 0 := by
+theorem null_shear [mA.IsAddLeftInvariant] {φ : B → A} (hφ : Measurable φ) {N : Set A} (hN : mA N = 0) :
+    (mA.prod (mB.prod ν)) {p | p.1 + φ p.2.1 ∈ N} = 0 := by
   have hM : MeasurableSet (toMeasurable mA N) := measurableSet_toMeasurable _ _
   have hM0 : mA (toMeasurable mA N) = 0 := by rw [measure_toMeasurable, hN]
   have hs : MeasurableSet {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N} :=
     (measurable_fst.add (hφ.comp (measurable_fst.comp measurable_snd))) hM
-  refine measure_mono_null (t := {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N})
-    (fun p hp => subset_toMeasurable mA N hp)
-    ?_
+  refine measure_mono_null (t := {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N}) (fun p hp => subset_toMeasurable mA N hp) ?_
   rw [Measure.prod_apply_symm hs]
-  have h0
-      : ∀ y : B × U,
-        mA ((fun x => (x, y)) ⁻¹' {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N})
-          = 0 := fun y => by
-    have h1
-        : (fun x : A => (x, y)) ⁻¹' {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N}
-          = (fun x => φ y.1 + x) ⁻¹' toMeasurable mA N := by
+  have h0 : ∀ y : B × U, mA ((fun x => (x, y)) ⁻¹' {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N}) = 0 := fun y => by
+    have h1 : (fun x : A => (x, y)) ⁻¹' {p : A × (B × U) | p.1 + φ p.2.1 ∈ toMeasurable mA N} =
+        (fun x => φ y.1 + x) ⁻¹' toMeasurable mA N := by
       ext x; simp [add_comm]
     rw [h1, measure_preimage_add, hM0]
   exact (lintegral_congr h0).trans lintegral_zero
 
-theorem isFundamentalDomain_layers
-    [mA.IsAddLeftInvariant]
-    (ΓA : AddSubgroup A)
-    (ΓB : AddSubgroup B) [Countable ΓB]
-    (κ : B → B → A) (hκ : ∀ b', Measurable (κ b'))
-    (e : A × (B × U) ≃ᵐ X)
+theorem isFundamentalDomain_layers [mA.IsAddLeftInvariant] (ΓA : AddSubgroup A) (ΓB : AddSubgroup B) [Countable ΓB]
+    (κ : B → B → A) (hκ : ∀ b', Measurable (κ b')) (e : A × (B × U) ≃ᵐ X)
     (hfree : ∀ (g g' : G) (x : X), g • x = g' • x → g = g')
-    (hG : ∀ g : G, ∃ (c' : ΓA) (b' : ΓB), ∀ p,
-      g • e p = e (c'.1 + p.1 + κ b'.1 p.2.1, b'.1 + p.2.1, p.2.2))
-    (hG' : ∀ (c' : ΓA) (b' : ΓB), ∃ g : G, ∀ p,
-      g • e p = e (c'.1 + p.1 + κ b'.1 p.2.1, b'.1 + p.2.1, p.2.2))
-    {𝓒 : Set A} {𝓕 : Set B}
-    (hC : IsAddFundamentalDomain ΓA 𝓒 mA) (hF : IsAddFundamentalDomain ΓB 𝓕 mB)
-    : IsFundamentalDomain G (e '' (𝓒 ×ˢ (𝓕 ×ˢ Set.univ))) ((mA.prod (mB.prod ν)).map e) := by
-  have hmem
-      : ∀ q, e q ∈ e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U))) ↔ q ∈ 𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U)) :=
+    (hG : ∀ g : G, ∃ (c' : ΓA) (b' : ΓB), ∀ p, g • e p = e (c'.1 + p.1 + κ b'.1 p.2.1, b'.1 + p.2.1, p.2.2))
+    (hG' : ∀ (c' : ΓA) (b' : ΓB), ∃ g : G, ∀ p, g • e p = e (c'.1 + p.1 + κ b'.1 p.2.1, b'.1 + p.2.1, p.2.2))
+    {𝓒 : Set A} {𝓕 : Set B} (hC : IsAddFundamentalDomain ΓA 𝓒 mA) (hF : IsAddFundamentalDomain ΓB 𝓕 mB) :
+    IsFundamentalDomain G (e '' (𝓒 ×ˢ (𝓕 ×ˢ Set.univ))) ((mA.prod (mB.prod ν)).map e) := by
+  have hmem : ∀ q, e q ∈ e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U))) ↔ q ∈ 𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U)) :=
     fun q => e.injective.mem_set_image
   have hmp := (e.measurable.measurePreserving (mA.prod (mB.prod ν))).symm e
   refine ⟨?_, ?_, ?_⟩
@@ -139,13 +122,8 @@ theorem isFundamentalDomain_layers
     obtain ⟨c₂, b₂, h₂⟩ := hG g₂⁻¹
     change (mA.prod (mB.prod ν)).map e (g₁ • (e '' _) ∩ g₂ • (e '' _)) = 0
     rw [e.map_apply]
-    have hin
-        : ∀ p,
-          p ∈ e
-              ⁻¹' (g₁ • (e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U))))
-                ∩ g₂ • (e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U)))))
-            → (c₁.1 + p.1 + κ b₁.1 p.2.1 ∈ 𝓒 ∧ b₁.1 + p.2.1 ∈ 𝓕)
-              ∧ (c₂.1 + p.1 + κ b₂.1 p.2.1 ∈ 𝓒 ∧ b₂.1 + p.2.1 ∈ 𝓕) := by
+    have hin : ∀ p, p ∈ e ⁻¹' (g₁ • (e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U)))) ∩ g₂ • (e '' (𝓒 ×ˢ (𝓕 ×ˢ (Set.univ : Set U))))) →
+        (c₁.1 + p.1 + κ b₁.1 p.2.1 ∈ 𝓒 ∧ b₁.1 + p.2.1 ∈ 𝓕) ∧ (c₂.1 + p.1 + κ b₂.1 p.2.1 ∈ 𝓒 ∧ b₂.1 + p.2.1 ∈ 𝓕) := by
       rintro p ⟨hp1, hp2⟩
       rw [Set.mem_smul_set_iff_inv_smul_mem, h₁, hmem] at hp1
       rw [Set.mem_smul_set_iff_inv_smul_mem, h₂, hmem] at hp2
@@ -178,15 +156,13 @@ section Concrete
 
 variable {D : D7}
 
-theorem rat_coords
-    {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ)
-    {b : Mx D ρ S₀.rank} {c : skewA D ρ} (h : d.nB b * d.nC c ∈ GQ S)
-    : b ∈ ratMx D ρ S₀.rank ∧ c.1 ∈ ratMx D ρ ρ := by
+theorem rat_coords {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) {b : Mx D ρ S₀.rank} {c : skewA D ρ}
+    (h : d.nB b * d.nC c ∈ GQ S) : b ∈ ratMx D ρ S₀.rank ∧ c.1 ∈ ratMx D ρ ρ := by
   have hm := (mem_GQ_iff S _).1 h
   have hb : b ∈ ratMx D ρ S₀.rank := by
     have e1 : d.pX ⬝ (mt S (d.nB b * d.nC c) ⬝ d.j0) = b := by
-      rw [mt_mul, Matrix.mul_assoc, d.nC_j0, d.nB_j0, Matrix.mul_add, d.pX_j0, ← Matrix.mul_assoc,
-        d.pX_jX, Matrix.one_mul, zero_add]
+      rw [mt_mul, Matrix.mul_assoc, d.nC_j0, d.nB_j0, Matrix.mul_add, d.pX_j0, ← Matrix.mul_assoc, d.pX_jX,
+        Matrix.one_mul, zero_add]
     rw [← e1]
     exact ratMx_mul (rat_mem _) (ratMx_mul hm (rat_mem _))
   refine ⟨hb, ?_⟩
@@ -199,36 +175,24 @@ theorem rat_coords
   rw [← e2]
   exact ratMx_mul (rat_mem _) (ratMx_mul hm2 (rat_mem _))
 
-theorem act_coords
-    {S S₀ : HSp D} {ρ : ℕ}
-    (d : HypDec S S₀ ρ) (c' c : skewA D ρ) (b' b : Mx D ρ S₀.rank) (u : GL (Fin ρ) (AE D))
-    : d.nC c' * d.nB b' * (d.nC c * (d.nB b * d.levi u))
-      = d.nC (c' + c + cComm S₀ b' b) * (d.nB (b' + b) * d.levi u) := by
+theorem act_coords {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (c' c : skewA D ρ) (b' b : Mx D ρ S₀.rank)
+    (u : GL (Fin ρ) (AE D)) :
+    d.nC c' * d.nB b' * (d.nC c * (d.nB b * d.levi u)) =
+      d.nC (c' + c + cComm S₀ b' b) * (d.nB (b' + b) * d.levi u) := by
   have h1 : d.nB b' * d.nC c = d.nC c * d.nB b' := (d.nC_mul_nB b' c).symm
   have h2 : d.nB (b' + b) * d.nC (cComm S₀ b' b) = d.nC (cComm S₀ b' b) * d.nB (b' + b) :=
     (d.nC_mul_nB _ _).symm
-  calc
-    d.nC c' * d.nB b' * (d.nC c * (d.nB b * d.levi u))
+  calc d.nC c' * d.nB b' * (d.nC c * (d.nB b * d.levi u))
       = d.nC c' * (d.nB b' * d.nC c) * d.nB b * d.levi u := by simp only [mul_assoc]
     _ = d.nC c' * d.nC c * (d.nB b' * d.nB b) * d.levi u := by rw [h1]; simp only [mul_assoc]
     _ = d.nC c' * d.nC c * d.nC (cComm S₀ b' b) * d.nB (b' + b) * d.levi u := by
-      rw [d.nB_mul_nB, h2]; simp only [mul_assoc]
+        rw [d.nB_mul_nB, h2]; simp only [mul_assoc]
     _ = d.nC (c' + c + cComm S₀ b' b) * (d.nB (b' + b) * d.levi u) := by
-      rw [d.nC_add, d.nC_add]; simp only [mul_assoc]
+        rw [d.nC_add, d.nC_add]; simp only [mul_assoc]
 
 end Concrete
 
-theorem fundDomain_layers
-    : ∀ (D : D7) (V V₀ : HSp D) (ρ : ℕ) (d : HypDec V V₀ ρ)
-        (e : skewA D ρ × (Mx D ρ V₀.rank × UX D ρ) ≃ᵐ flagN d),
-      (∀ p, (e p : GA D V) = d.nC p.1 * (d.nB p.2.1 * d.levi p.2.2.1))
-        → ∀ (lC : Measure (skewA D ρ)) (𝓒 : Set (skewA D ρ)),
-          lC.IsAddHaarMeasure → SFinite lC
-            → IsAddFundamentalDomain ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) 𝓒 lC
-            → ∀ (vb : VolM D ρ V₀.rank) (ν : Measure (UX D ρ)),
-              SFinite vb.μ → SFinite ν
-                → IsFundamentalDomain ((GQ V ⊓ radX d).subgroupOf (flagN d))
-                  (e '' (𝓒 ×ˢ (vb.𝓕 ×ˢ Set.univ))) ((lC.prod (vb.μ.prod ν)).map e) := by
+theorem fundDomain_layers : ∀ (D : D7) (V V₀ : HSp D) (ρ : ℕ) (d : HypDec V V₀ ρ) (e : skewA D ρ × (Mx D ρ V₀.rank × UX D ρ) ≃ᵐ flagN d), (∀ p, (e p : GA D V) = d.nC p.1 * (d.nB p.2.1 * d.levi p.2.2.1)) → ∀ (lC : Measure (skewA D ρ)) (𝓒 : Set (skewA D ρ)), lC.IsAddHaarMeasure → SFinite lC → IsAddFundamentalDomain ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) 𝓒 lC → ∀ (vb : VolM D ρ V₀.rank) (ν : Measure (UX D ρ)), SFinite vb.μ → SFinite ν → IsFundamentalDomain ((GQ V ⊓ radX d).subgroupOf (flagN d)) (e '' (𝓒 ×ˢ (vb.𝓕 ×ˢ Set.univ))) ((lC.prod (vb.μ.prod ν)).map e) := by
   intro D V V₀ ρ d e he lC 𝓒 _ _ hC vb ν _ _
   haveI : IsTopologicalAddGroup (Mx D ρ ρ) := (lattice_Mx D ρ ρ).1
   haveI : SecondCountableTopology (Mx D ρ ρ) := (lattice_Mx D ρ ρ).2.2.1
@@ -248,26 +212,19 @@ theorem fundDomain_layers
     intro b'
     have := (lattice_Mx D ρ ρ).1
     have : ContinuousSub (Mx D ρ ρ) := IsTopologicalAddGroup.to_continuousSub
-    have hp : Continuous (plus V₀ : Mx D ρ V₀.rank → _) :=
-      continuous_const.matrix_mul continuous_adj
+    have hp : Continuous (plus V₀ : Mx D ρ V₀.rank → _) := continuous_const.matrix_mul continuous_adj
     have h1 : Continuous fun b : Mx D ρ V₀.rank => half D • (b ⬝ plus V₀ b' - b' ⬝ plus V₀ b) :=
-      ((continuous_id.matrix_mul continuous_const).sub (continuous_const.matrix_mul hp)).const_smul
-        (half D)
+      ((continuous_id.matrix_mul continuous_const).sub (continuous_const.matrix_mul hp)).const_smul (half D)
     exact (h1.subtype_mk _).measurable
-  have key
-      : ∀ (c' : skewA D ρ) (b' : Mx D ρ V₀.rank) (p : skewA D ρ × (Mx D ρ V₀.rank × UX D ρ)),
-        d.nC c' * d.nB b' * (e p : GA D V)
-          = (e (c' + p.1 + cComm V₀ b' p.2.1, b' + p.2.1, p.2.2) : GA D V) := by
+  have key : ∀ (c' : skewA D ρ) (b' : Mx D ρ V₀.rank) (p : skewA D ρ × (Mx D ρ V₀.rank × UX D ρ)),
+      d.nC c' * d.nB b' * (e p : GA D V) = (e (c' + p.1 + cComm V₀ b' p.2.1, b' + p.2.1, p.2.2) : GA D V) := by
     intro c' b' p
     rw [he p, he (c' + p.1 + cComm V₀ b' p.2.1, b' + p.2.1, p.2.2)]
     exact act_coords d c' p.1 b' p.2.1 p.2.2.1
-  have hsm
-      : ∀ (g : ↥((GQ V ⊓ radX d).subgroupOf (flagN d))) (x : flagN d),
-        ((g • x : flagN d) : GA D V) = ((g : flagN d) : GA D V) * (x : GA D V) := fun _ _ =>
-    rfl
-  refine isFundamentalDomain_layers (mA := lC) (mB := vb.μ) (ν := ν)
-    ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) (ratMx D ρ V₀.rank) (cComm V₀) hκ e ?_ ?_ ?_ hC
-    vb.covol.2.1
+  have hsm : ∀ (g : ↥((GQ V ⊓ radX d).subgroupOf (flagN d))) (x : flagN d),
+      ((g • x : flagN d) : GA D V) = ((g : flagN d) : GA D V) * (x : GA D V) := fun _ _ => rfl
+  refine isFundamentalDomain_layers (mA := lC) (mB := vb.μ) (ν := ν) ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) (ratMx D ρ V₀.rank) (cComm V₀) hκ e
+    ?_ ?_ ?_ hC vb.covol.2.1
   · intro g g' x h
     rw [Subgroup.smul_def, Subgroup.smul_def] at h
     exact Subtype.ext (mul_right_cancel h)

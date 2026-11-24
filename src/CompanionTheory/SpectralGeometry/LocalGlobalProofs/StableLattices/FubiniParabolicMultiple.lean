@@ -5,14 +5,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Parabolic
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FlagFacts
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HaarExistence
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ParabolicSubgroupEquality
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGaugeMeasuresIsotropicFlagParabolic
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviConjHaarModulus
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaIntegrationFormulaUpToConstant
 import Development.AbelianVarietyTheory.Definitions.Foundations.MeasurePreservingRmulQuotMeas
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGaugeMeasuresIsotropicFlagParabolicStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviConjHaarModulusStatement
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagUnipotentRadicalClosedSubgroupKeeps
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaDecompositionUnitaryIsotropicFlag
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaIntegrationFormulaUpToConstant
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaIntegrationFormulaUpToConstantStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -145,8 +145,8 @@ theorem fub2 : Fub2 := by
   have hj : ∀ i : Fin 1, 1 ≤ (fun _ : Fin 1 => rk A) i := fun _ =>
     (GlobalTheory.CompanionTheory.GradFlag.flagFacts n ε A hA).1
   obtain ⟨⟨μN, sN, hN⟩, ⟨μM, sM, hM⟩, μK, hK0, hK1, hKi⟩ :=
-    GlobalTheory.T.exists_gauge_measures_isotropicFlag_parabolic n ε 1 _ (W A) hj hW
-  have hmod := GlobalTheory.T.isotropicFlag_levi_conj_haar_modulus n ε 1 _ (W A) hj hW μN hN
+    _root_.GlobalTheory.FlagMeas.gaugeSubEx n ε 1 _ (W A) hj hW
+  have hmod := _root_.GlobalTheory.FlagModulus.modulus n ε 1 _ (W A) hj hW μN hN
   refine ⟨μN, μM, inferInstance, inferInstance, hM.1, ?_, ?_, ?_⟩
   · intro a ha hc
     have e : μM.map (· * a) = μM.map (a * ·) :=
@@ -155,8 +155,8 @@ theorem fub2 : Fub2 := by
     rw [e]
     exact hM.2.1 a ha
   · obtain ⟨κ, k0, k1, hκ⟩ :=
-      GlobalTheory.T.iwasawa_integration_formula_up_to_constant n ε _ _ rfl rfl 1 _ hj (W A) hW μN
-        μM μK hN hM hK0 hK1 hKi
+      _root_.GlobalTheory.IwasawaShape.iwasawa_shape n ε _ _ rfl rfl 1 _ hj (W A) hW μN μM μK hN hM
+        hK0 hK1 hKi
     refine ⟨κ, k0, k1, fun F hF hinv => ?_⟩
     rw [hκ F hF]
     congr 1

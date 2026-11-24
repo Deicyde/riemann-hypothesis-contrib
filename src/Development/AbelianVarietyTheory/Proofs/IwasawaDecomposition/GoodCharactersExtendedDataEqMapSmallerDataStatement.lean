@@ -57,6 +57,7 @@ open GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top
   GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3
   GlobalTheory.Mem.R3.Rw GlobalTheory.Mem.R3.Tr
 open scoped Matrix
+
 theorem _root_.GlobalTheory.T.goodCharacters_extendedData_eq_map_smallerData
     : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules
       → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach

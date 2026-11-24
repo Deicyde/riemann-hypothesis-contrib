@@ -128,11 +128,6 @@ section Generic
 
 variable {X : Fields} {Pr : Primes X} {m : ℕ}
 
-theorem g_mem_of_vG (hPr : Pr.Ok) {i : Fin 2} {w : HeightOneSpectrum (𝓞 X.E)} (hw : w ∈ Pr.vG i)
-    : ((Pr.g i : ℕ) : 𝓞 X.E) ∈ w.asIdeal := by
-  rw [← hPr.vG_norm i w hw]
-  exact Ideal.absNorm_mem _
-
 theorem mem_vG_of_g_mem
     (hPr : Pr.Ok)
     {i : Fin 2} {w : HeightOneSpectrum (𝓞 X.E)}
@@ -154,7 +149,8 @@ theorem mem_vG_of_g_mem
   obtain ⟨a, b, hab⟩ := hc
   refine w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 ?_)
   rw [← hab]
-  exact add_mem (Ideal.mul_mem_left _ _ (g_mem_of_vG hPr hj)) (Ideal.mul_mem_left _ _ h)
+  exact add_mem (Ideal.mul_mem_left _ _ (_root_.Formalism.L2.Col.Primes.Ok.g_mem hPr hj))
+    (Ideal.mul_mem_left _ _ h)
 
 theorem mem_vGs {i : Fin 2} {w : HeightOneSpectrum (𝓞 X.E)} (hw : w ∈ Pr.vG i) : w ∈ Pr.vGs := by
   classical

@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 public import Development.AbelianVarietyTheory.Definitions.Foundations.OpLDOneSubMemTriv
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsCuspFunctionalValueModPrimePowDiamondIndependeStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsCuspFunctionalValueModPrimePowDiamondIndepende
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlMulToRingEquiv
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -98,5 +98,5 @@ theorem GlobalTheory.KZ.isThB_act_sgD_diam_iff
     rw [Matrix.SpecialLinearGroup.coe_mul, GlobalTheory.KZ.Tower.diam,
       GlobalTheory.KZ.Tower.act_act Ω ε X l _ _ (hpos _) (hpos _) b]
   rw [e]
-  exact GlobalTheory.T.isCuspFunctionalValueModPrimePow_diamond_independent Ω ε X A N l n w (d * a)
-    b hb _ (GlobalTheory.KZ.isDiam_mul hsa hsd) φ
+  exact _root_.GlobalTheory.KZ.isThB_act_isDiam_iff Ω ε X A N l n w (d * a) b hb _
+    (GlobalTheory.KZ.isDiam_mul hsa hsd) φ

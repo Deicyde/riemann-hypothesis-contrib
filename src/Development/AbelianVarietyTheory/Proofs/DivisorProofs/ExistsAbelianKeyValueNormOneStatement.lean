@@ -52,6 +52,7 @@ open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto
   GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_abelianKeyValue_norm_one
     : ∀ κ : Rule,
       Rule4 κ
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_abelianKeyValue_norm_one
               ν.IntN
                 → ∀ vB : Fin D.P.g → (epsR V ⟶ D.P.A),
                   IsLieBasis vB → ∃ k : C, BKey κ ν vB k ∧ ‖k‖ = 1 := by
-  first
-  | exact @GlobalTheory.MBLow.AbKey.exists_bKey
-  | exact GlobalTheory.MBLow.AbKey.exists_bKey
-  | (intros; apply GlobalTheory.MBLow.AbKey.exists_bKey <;> assumption)
+  first | exact @GlobalTheory.MBLow.AbKey.exists_bKey

@@ -128,22 +128,22 @@ theorem conv_of (hC : R.WeakCharacterisation F) (H : HkDat3 A3)
   ⟨⟨hC.base.fam.Sb, hC.base.fam.pl_onto, hC.inert.onto⟩, hC.tup.mu_used, hC.base.grp.levels, rfl⟩
 
 theorem kFormR_of (hM : R.toRealDat.IsModels) : (R.toCx3 F).KFormR := by
-  first | exact RealDat.kFormR_of (R := R.toRealDat) (F := F.lv2) hM | exact RealDat.kFormR_of hM
+  first | exact RealDat.kFormR_of (R := R.toRealDat) (F := F.lv2) hM
 
 theorem kFormL_of (hM : R.toRealDat.IsModels) : (R.toCx3 F).KFormL := by
-  first | exact RealDat.kFormL_of (R := R.toRealDat) (F := F.lv2) hM | exact RealDat.kFormL_of hM
+  first | exact RealDat.kFormL_of (R := R.toRealDat) (F := F.lv2) hM
 
 theorem jIsoR_of (hM : R.toRealDat.IsModels) : (R.toCx3 F).JIsoR F.cv := by
-  first | exact RealDat.jIsoR_of (R := R.toRealDat) (F := F.lv2) hM | exact RealDat.jIsoR_of hM
+  first | exact RealDat.jIsoR_of (R := R.toRealDat) (F := F.lv2) hM
 
 theorem jIsoL_of (hM : R.toRealDat.IsModels) : (R.toCx3 F).JIsoL F.cv := by
-  first | exact RealDat.jIsoL_of (R := R.toRealDat) (F := F.lv2) hM | exact RealDat.jIsoL_of hM
+  first | exact RealDat.jIsoL_of (R := R.toRealDat) (F := F.lv2) hM
 
 theorem kForm_of (h : R.toRealDat.LUnif) (b : Bool) : (R.toCx3 F).KForm b :=
   RealDat.kForm (F := F.lv2) h b
 
 theorem ewNorm (b : Bool) : (R.toCx3 F).EWnorm b := by
-  first | exact RealDat.ewNorm (R := R.toRealDat) (F := F.lv2) b | exact RealDat.ewNorm b
+  first | exact RealDat.ewNorm (R := R.toRealDat) (F := F.lv2) b
 
 theorem height_change_of_D0 (h : R.IsTup) : (R.toCx3 F).H0 := by
   refine ⟨h.mu_conj, fun w => ⟨h.mu_ne w, fun hne => ?_⟩⟩
@@ -214,14 +214,12 @@ private theorem smul_tw_map_adjoint_apply_of_unit_modulus
   rw [phase_cancel hc]
   exact tw_map_adjoint_apply_of_eigen f l e he
 
-
 theorem thmAop_of (hph : R.phase) (h : R.PThmA) (b : Bool) : (R.toCx3 F).ThmAop b := by
   intro j t p w hw
   have hw1 : Tw.out (s := twAt D.what₂.embLL A3.A.v0) w ∈ R.Wp3 j p := (Submodule.mem_inf.mp hw).1
   have hc : starRingEnd ℂ (R.phs j) * R.phs j = 1 := by rw [Complex.conj_mul', (hph j).1]; simp
   refine smul_tw_map_adjoint_apply_of_unit_modulus hc (R.thG j t) (R.lam3 j t p A3.A.v0) w ?_
   exact h j t p _ hw1
-
 
 theorem thmBop_of (h : R.PThmB) (b : Bool) : (R.toCx3 F).ThmBop b := by
   intro t p e he

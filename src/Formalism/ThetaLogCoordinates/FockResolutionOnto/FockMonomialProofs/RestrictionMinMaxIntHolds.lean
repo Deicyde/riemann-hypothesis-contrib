@@ -342,7 +342,7 @@ private theorem glAct_md_lemma_5
     by_cases h : i'' = i'
     · subst h
       simp [Finsupp.single_apply]
-    · simp [Finsupp.single_apply, Ne.symm h, h]
+    · simp [h]
   have hmono
       : ∀ (a b : Fin r) (n : Fin N × Fin r →₀ ℕ) (t : ℚ_[p]) (i' : Fin N),
         (MultiDeg LL n ↔ B)
@@ -401,13 +401,11 @@ theorem eproj_pol
       ∑ m ∈ x.support, if MultiDeg LL m then monomial m (AddMonoidAlgebra.coeff x m) else 0
     map_add' := fun x y => by
       ext n
-      beta_reduce
       rw [MvPolynomial.coeff_add, coeff_filt_lemma (fun m => MultiDeg LL m) _,
         coeff_filt_lemma (fun m => MultiDeg LL m) _, coeff_filt_lemma (fun m => MultiDeg LL m) _]
       split_ifs <;> simp
     map_smul' := fun t x => by
       ext n
-      beta_reduce
       rw [MvPolynomial.coeff_smul, coeff_filt_lemma (fun m => MultiDeg LL m) _,
         coeff_filt_lemma (fun m => MultiDeg LL m) _]
       split_ifs <;> simp

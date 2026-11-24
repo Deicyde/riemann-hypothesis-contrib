@@ -50,6 +50,7 @@ open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace
 open scoped TensorProduct ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped Classical
+
 theorem _root_.GlobalTheory.T.hasDerivAt_weilRep_realOneParam_adelicPoint
     : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → ℂ) →+ AE D),
       GlobalTheory.FockCompare.Chart θ σ
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.hasDerivAt_weilRep_realOneParam_adelicPoint
                                 + lam • F).1
                               w)
                             0 := by
-  first
-  | exact @GlobalTheory.Mem.LiftGen.hasDerivAt_om
-  | exact GlobalTheory.Mem.LiftGen.hasDerivAt_om
-  | (intros; apply GlobalTheory.Mem.LiftGen.hasDerivAt_om <;> assumption)
+  first | exact @GlobalTheory.Mem.LiftGen.hasDerivAt_om

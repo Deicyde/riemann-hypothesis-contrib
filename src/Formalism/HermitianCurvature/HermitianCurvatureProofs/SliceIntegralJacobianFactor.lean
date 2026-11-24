@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BlockTwoDiagonalZeroSize
 
 @[expose] public section
 
@@ -66,12 +67,6 @@ variable
   [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 def psiH {p : ℕ} (σ : Equiv.Perm (Fin p)) (v : U.LW σ → ℂ) : ℂ := G.psi U.betaU (U.subS (lhOf σ v))
-
-theorem volume_empty_blocks_real (p : ℕ)
-    : (volume : Measure ((Fin 0 → Fin p → ℂ) × (Fin p → Fin 0 → ℂ))).real Set.univ = 1 := by
-  rw [Measure.volume_eq_prod, measureReal_def, ← Set.univ_prod_univ, Measure.prod_prod]
-  rw [volume_pi, volume_pi, Measure.pi_univ, Measure.pi_univ]
-  simp [volume_pi, Measure.pi_univ]
 
 def regroup (σ : Equiv.Perm (Fin p))
     : XL k p ρ σ ≃ᵐ PBQ.XP k p ρ × ((Fin 0 → Fin p → ℂ) × (Fin p → Fin 0 → ℂ)) × (U.LW σ → ℂ) :=
@@ -187,13 +182,14 @@ theorem jfSliceInt
     have hR1 := hint2.integral_prod_right
     simp only [hin] at hR1
     have hR2 := hR1.integral_prod_right
-    simp only [integral_const, volume_empty_blocks_real, one_smul] at hR2
+    simp only [integral_const, _root_.Formalism.FourierDecayAlt.P.PBJ.Frz.vol_univ_zero, one_smul]
+      at hR2
     refine ⟨hR2, ?_⟩
     rw [hJ2, integral_prod_symm _ hint2]
     simp only [hin]
     rw [integral_fun_snd (fun v : U.LW σ → ℂ =>
         psiH σ v • PBQ.pbF Bj B0 rfl H (U.mMap k p ρ (lhOf σ v * U.hMat σ d) g)),
-      volume_empty_blocks_real, one_smul]
+      _root_.Formalism.FourierDecayAlt.P.PBJ.Frz.vol_univ_zero, one_smul]
 
 end fubini
 

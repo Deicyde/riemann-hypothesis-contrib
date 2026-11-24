@@ -99,7 +99,7 @@ theorem actO_add (S T : HSp D) (h : GA D T) (Y Y' : WO S T)
 theorem actO_inv (S T : HSp D) (h : GA D T) (y : WO S T) : actO S T 1 h (actO S T 1 h⁻¹ y) = y := by
   have h1 : Formalism.L2.Theta.mt T h * Formalism.L2.Theta.mt T h⁻¹ = 1 := by
     unfold Formalism.L2.Theta.mt
-    first | rw [← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one] | simp
+    first | rw [← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one]
   unfold actO
   simp [← Matrix.mul_assoc, h1]
 

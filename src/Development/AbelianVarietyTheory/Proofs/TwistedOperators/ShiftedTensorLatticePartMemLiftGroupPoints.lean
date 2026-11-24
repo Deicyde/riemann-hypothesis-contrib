@@ -63,9 +63,6 @@ open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.LiftLevel

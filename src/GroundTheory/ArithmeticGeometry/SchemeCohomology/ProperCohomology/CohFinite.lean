@@ -52,43 +52,22 @@ set_option maxSynthPendingDepth 3
 
 namespace GroundTheory.Arith.SchemeCoh
 
-section
-
-open AlgebraicGeometry CategoryTheory TopologicalSpace
-
-universe c236Ext c236Scheme
-
-private noncomputable def H.linearMapV436 {X : Scheme.{c236Scheme}}
-    [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
-    (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
-  toFun := Sheaf.H.map.{c236Ext} (modulesAbMap φ) n
-  map_add' := map_add _
-  map_smul' a x := by
-    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x) =
-      a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
-    rw [H.smul_def, H.smul_def, ← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply,
-      ← modulesAbMap_comp, ← modulesAbMap_comp, smulHom_comp]
-
-end
-
 open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits Abelian
 
 universe w' u
 
 noncomputable section
 
-variable {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+variable
+  {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
 
-def FiniteH (F : X.Modules) : Prop :=
-  ∀ p : ℕ, Module.Finite A (Sheaf.H.{w'} (modulesAb F) p)
+def FiniteH (F : X.Modules) : Prop := ∀ p : ℕ, Module.Finite A (Sheaf.H.{w'} (modulesAb F) p)
 
 variable {A}
 
-theorem FiniteH.of_iso {F G : X.Modules} (e : F ≅ G) (hF : FiniteH.{w'} A F) :
-    FiniteH.{w'} A G := fun p =>
+theorem FiniteH.of_iso {F G : X.Modules} (e : F ≅ G) (hF : FiniteH.{w'} A F)
+    : FiniteH.{w'} A G := fun p =>
   have := hF p
   Module.Finite.equiv (H.linearEquivOfIso.{w'} A e p)
 
@@ -102,26 +81,32 @@ lemma H.map_zero_injective {C : Type*} [Category C] {J : GrothendieckTopology C}
   rw [Sheaf.H.map_apply, Sheaf.H.map_apply, Ext.mk₀_comp_mk₀, Ext.mk₀_comp_mk₀] at hxy
   rw [(cancel_mono f).1 ((Ext.mk₀_bijective _ _).1 hxy)]
 
-private theorem finite_of_injective_linear {R M N : Type*} [CommRing R] [IsNoetherianRing R]
-    [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N] [Module.Finite R N]
-    (f : M →ₗ[R] N) (hf : Function.Injective f) : Module.Finite R M :=
+private theorem finite_of_injective_linear
+    {R M N : Type*} [CommRing R] [IsNoetherianRing R] [AddCommGroup M] [AddCommGroup N] [Module R M]
+    [Module R N] [Module.Finite R N]
+    (f : M →ₗ[R] N) (hf : Function.Injective f)
+    : Module.Finite R M :=
   Module.Finite.of_injective (σ' := RingHom.id R) f hf
 
 variable [IsNoetherianRing A]
 
-theorem FiniteH.of_shortExact₂ {S : ShortComplex X.Modules} (hS : S.ShortExact)
-    (h₁ : FiniteH.{w'} A S.X₁) (h₃ : FiniteH.{w'} A S.X₃) : FiniteH.{w'} A S.X₂ := fun p =>
+theorem FiniteH.of_shortExact₂
+    {S : ShortComplex X.Modules}
+    (hS : S.ShortExact) (h₁ : FiniteH.{w'} A S.X₁) (h₃ : FiniteH.{w'} A S.X₃)
+    : FiniteH.{w'} A S.X₂ := fun p =>
   have := h₁ p
   have := h₃ p
-  let f := H.linearMapV436.{w'} A S.f p
-  let g := H.linearMapV436.{w'} A S.g p
+  let f := H.linearMap.{w'} A S.f p
+  let g := H.linearMap.{w'} A S.g p
   finite_of_exact_noetherian f g (H.exact₂.{w'} (shortExact_abSC hS) (n := p))
 
-theorem FiniteH.of_shortExact₁ {S : ShortComplex X.Modules} (hS : S.ShortExact)
-    (h₂ : FiniteH.{w'} A S.X₂) (h₃ : FiniteH.{w'} A S.X₃) : FiniteH.{w'} A S.X₁ := by
+theorem FiniteH.of_shortExact₁
+    {S : ShortComplex X.Modules}
+    (hS : S.ShortExact) (h₂ : FiniteH.{w'} A S.X₂) (h₃ : FiniteH.{w'} A S.X₃)
+    : FiniteH.{w'} A S.X₁ := by
   intro p
   have hS' := shortExact_abSC hS
-  let f := H.linearMapV436.{w'} A S.f
+  let f := H.linearMap.{w'} A S.f
   cases p with
   | zero =>
     have := h₂ 0

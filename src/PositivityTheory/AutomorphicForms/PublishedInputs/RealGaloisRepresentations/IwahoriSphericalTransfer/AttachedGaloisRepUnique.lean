@@ -50,6 +50,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
   UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.attached_galois_rep_unique
     : ∀ (F Ω : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field Ω] [Algebra F Ω]
         [IsAlgClosure F Ω] (K : Type) [Field K] [NumberField K] [Algebra F K] [Algebra K Ω]
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.attached_galois_rep_unique
         (π : TR.CuspSub F a) (r r' : G K Ω →* GL (Fin a) (Qbar l)),
       Continuous r → Continuous r' → IsSSRep r → IsSSRep r' → AttRes π ι K r → AttRes π ι K r'
         → RepIso r r' := by
-  first
-  | exact @GlobalTheory.AttUniq.attRes_repIso
-  | exact GlobalTheory.AttUniq.attRes_repIso
-  | (intros; apply GlobalTheory.AttUniq.attRes_repIso <;> assumption)
+  first | exact @GlobalTheory.AttUniq.attRes_repIso

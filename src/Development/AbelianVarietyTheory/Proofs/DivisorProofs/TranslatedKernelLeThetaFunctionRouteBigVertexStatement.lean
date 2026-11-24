@@ -52,6 +52,7 @@ open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheor
 attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+
 theorem _root_.GlobalTheory.T.translatedKernel_le_thetaFunction_routeBigVertex
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T}
         (hL : L.Is μ₀) (W : G.Weil) (B : Frames G) (ρ : RealMatch W) (t : T) (i j : Fin D.R.m)
@@ -80,8 +81,4 @@ theorem _root_.GlobalTheory.T.translatedKernel_le_thetaFunction_routeBigVertex
             ‖translates z (kerSmall W Θ' g g₁) u‖
               ≤ C₀
                 * ‖GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.theta om' Φ (a u) (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blkU _ _ e h.JWW (g, g₁))‖ :=
-  by
-    first
-    | exact @GlobalTheory.ZConvIdent.translates_kerSmall_le_theta
-    | exact GlobalTheory.ZConvIdent.translates_kerSmall_le_theta
-    | (intros; apply GlobalTheory.ZConvIdent.translates_kerSmall_le_theta <;> assumption)
+  by first | exact @GlobalTheory.ZConvIdent.translates_kerSmall_le_theta

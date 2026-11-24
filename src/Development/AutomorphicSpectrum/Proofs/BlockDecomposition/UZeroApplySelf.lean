@@ -336,7 +336,6 @@ theorem lincomb_eq (l : I p d →₀ D)
   rfl
 
 theorem φ_sum (l : I p d →₀ D) : φ t (∑ i ∈ l.support, single i.1 (l i)) = l := by
-
   rw [map_sum]
   conv_rhs => rw [← Finsupp.sum_single l]
   refine Finset.sum_congr rfl fun i _ => ?_

@@ -95,7 +95,7 @@ variable
 
 theorem intLow_one : Formalism.MainNotions.S.TieN.IntLow Mp (1 : Matrix (Fin n) (Fin n) E) := ⟨
   fun a => by simp,
-  fun a b h => by simp [Matrix.one_apply, h.ne],
+  fun a b h => by simp [h.ne],
   fun a b => by
     rw [Matrix.one_apply]
     split_ifs
@@ -105,7 +105,7 @@ theorem intLow_one : Formalism.MainNotions.S.TieN.IntLow Mp (1 : Matrix (Fin n) 
 
 theorem intUp_one : Formalism.MainNotions.S.TieN.IntUp Mp (1 : Matrix (Fin n) (Fin n) E) := ⟨
   fun a => by simp,
-  fun a b h => by simp [Matrix.one_apply, h.ne'],
+  fun a b h => by simp [h.ne'],
   fun a b => by
     rw [Matrix.one_apply]
     split_ifs
@@ -113,32 +113,7 @@ theorem intUp_one : Formalism.MainNotions.S.TieN.IntUp Mp (1 : Matrix (Fin n) (F
     · exact zero_mem _
 ⟩
 
-theorem intLow_mul
-    {l l' : Matrix (Fin n) (Fin n) E}
-    (h : Formalism.MainNotions.S.TieN.IntLow Mp l) (h' : Formalism.MainNotions.S.TieN.IntLow Mp l')
-    : Formalism.MainNotions.S.TieN.IntLow Mp (l * l') := by
-  first
-  | exact GlobalTheory.LowerIntegralMul.intLow_mul ..
-  | (apply GlobalTheory.LowerIntegralMul.intLow_mul <;> assumption)
-  | (intros; apply GlobalTheory.LowerIntegralMul.intLow_mul <;> assumption)
-  | (apply @GlobalTheory.LowerIntegralMul.intLow_mul <;> assumption)
-  | (intros; apply @GlobalTheory.LowerIntegralMul.intLow_mul <;> assumption)
-  | (apply @GlobalTheory.LowerIntegralMul.intLow_mul <;> first | assumption | infer_instance)
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp n l l' h h'
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp n l l' h
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp n l l'
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp n l
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp n
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› Mp
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_› ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E ‹_›
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F E
-  | exact @GlobalTheory.LowerIntegralMul.intLow_mul F
+alias intLow_mul := _root_.GlobalTheory.LowerIntegralMul.intLow_mul
 
 theorem intUp_mul
     {l l' : Matrix (Fin n) (Fin n) E}

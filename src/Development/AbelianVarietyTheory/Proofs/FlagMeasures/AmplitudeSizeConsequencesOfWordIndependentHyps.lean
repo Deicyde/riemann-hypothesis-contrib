@@ -44,7 +44,8 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.BasicNotions Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp.SizesProof
@@ -52,8 +53,10 @@ namespace GlobalTheory.Amp.SizesProof
 theorem vand_pos {n : ℕ} {x : Fin n → ℝ} (h : StrictAnti x) : 0 < Formalism.MainNotions.S.vand x :=
   Finset.prod_pos fun _ _ => Finset.prod_pos fun _ hb => sub_pos.2 (h (Finset.mem_filter.1 hb).2)
 
-theorem sizes_of_hyp : ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 : ℝ), D.host.rdE ≤ large₂.sc.b →
-    HypZ D large₂ C' Cl Cg cb Cu cT CT C0 → Sizes D large₂ Cl Cg CT := by
+theorem sizes_of_hyp
+    : ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 : ℝ),
+      D.host.rdE ≤ large₂.sc.b → HypZ D large₂ C' Cl Cg cb Cu cT CT C0
+        → Sizes D large₂ Cl Cg CT := by
   apply GlobalTheory.Amp.RangeModel.sizes_of <;> assumption
 
 end GlobalTheory.Amp.SizesProof

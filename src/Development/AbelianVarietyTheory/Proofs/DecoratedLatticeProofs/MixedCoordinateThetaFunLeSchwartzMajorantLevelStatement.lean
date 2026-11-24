@@ -48,6 +48,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.mixedCoordinate_thetaFun_le_schwartz_majorant_level
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.mixedCoordinate_thetaFun_le_schwartz_majorant_leve
                     ∧ ∀ N : ℕ, ∃ C : ℝ≥0, ∀ f ∈ GlobalTheory.Size.thetaLevel ψ S T U, ∀ x w,
                       ‖d.mixS T ψ v.μ v.𝓕 f x w‖ₑ
                         ≤ C * supSob ψ θ N f * ENNReal.ofReal (maj θ K N x) := by
-  first
-  | exact @GlobalTheory.Unf.mixS_le_maj
-  | exact GlobalTheory.Unf.mixS_le_maj
-  | (intros; apply GlobalTheory.Unf.mixS_le_maj <;> assumption)
+  first | exact @GlobalTheory.Unf.mixS_le_maj

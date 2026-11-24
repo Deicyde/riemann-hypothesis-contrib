@@ -65,14 +65,7 @@ private theorem hasSubst_of_constantCoeff_eq_zero_gram_substitution_integral
     {κ ι : Type*} [Finite ι]
     {a : ι → MvPowerSeries κ ℂ_[p]} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0)
     : MvPowerSeries.HasSubst a := by
-  first
-  | exact MvPowerSeries.hasSubst_of_constantCoeff_zero ha
-  | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun i => by
-      rw [ha i]; exact IsNilpotent.zero)
-  | exact ⟨
-      fun i => by rw [ha i]; exact IsNilpotent.zero,
-      by rw [Filter.cofinite_eq_bot]; exact Filter.tendsto_bot
-    ⟩
+  first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero ha
 
 theorem subst_psubst
     {s : τ → MvPowerSeries σ ℂ_[p]} (hs : MvPowerSeries.HasSubst s)
@@ -224,7 +217,7 @@ theorem subst_be
 end Exact
 
 theorem cc_X {σ : Type*} (i : σ) : MvPowerSeries.constantCoeff (Xv (p := p) i) = 0 := by
-  first | exact MvPowerSeries.constantCoeff_X i | simp
+  first | exact MvPowerSeries.constantCoeff_X i
 
 theorem hasSubst_good
     {σ τ : Type*} [Finite τ] {s : τ → MvPowerSeries σ ℂ_[p]} (hs : ∀ i, Good (s i))

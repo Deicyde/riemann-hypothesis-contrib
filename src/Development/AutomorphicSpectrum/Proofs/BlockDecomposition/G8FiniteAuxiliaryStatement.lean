@@ -73,7 +73,7 @@ theorem map_thetaGL
     apply Units.ext
     ext i j
     have e : (GeneralLinearGroup.map f x)⁻¹ = GeneralLinearGroup.map f x⁻¹ := (map_inv _ x).symm
-    simp only [invT, MonoidHom.coe_mk, OneHom.coe_mk, e]
+    simp only [invT]
     rfl
   have h2
       : GeneralLinearGroup.map f (GeneralLinearGroup.map c g)

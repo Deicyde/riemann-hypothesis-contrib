@@ -97,7 +97,7 @@ theorem stalk_fromSpecStalk_equiv
       Iso.inv_hom_id, CommRingCat.id_apply]
     at h2
   rw [← h2]
-  simp only [← CommRingCat.comp_apply, Category.assoc, TopCat.Presheaf.germ_res]
+  simp only [← CommRingCat.comp_apply, Category.assoc]
   erw [TopCat.Presheaf.germ_res]
 
 end GlobalTheory.LocalRingGeneralisation

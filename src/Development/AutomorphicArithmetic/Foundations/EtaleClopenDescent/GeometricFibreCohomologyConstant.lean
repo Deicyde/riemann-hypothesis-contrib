@@ -447,6 +447,3 @@ theorem leaf : LeafSpec := by
 end UpperTheory.Cb.BimoduleProjections
 
 end
-
-theorem UpperTheory.Cb.geometric_fibre_cohomology_constant : LateralTheory.E.E4.LeafSpec :=
-  UpperTheory.Cb.BimoduleProjections.leaf

@@ -50,6 +50,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
 open GlobalTheory.DownLift.GenFinite
+
 theorem _root_.GlobalTheory.T.integrableOn_downwardThetaLift_integrand
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T : Type)
         (A : FamIn D.what₂.LL G Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.integrableOn_downwardThetaLift_integrand
             → IntegrableOn
               (fun h => thetaKO (R.ωP i t) h g f * l (R.extV i t y h))
               (R.fdV i t) (R.νV i t) := by
-  first
-  | exact @GlobalTheory.DownLift.GenFinite.integrableOn_downIntegrand
-  | exact GlobalTheory.DownLift.GenFinite.integrableOn_downIntegrand
-  | (intros; apply GlobalTheory.DownLift.GenFinite.integrableOn_downIntegrand <;> assumption)
+  first | exact @GlobalTheory.DownLift.GenFinite.integrableOn_downIntegrand

@@ -81,7 +81,7 @@ theorem ev_eq_hom
     {m n : ℕ}
     (a : Fin m → Pt S n d) (ha : ∀ j i, MvPowerSeries.constantCoeff (a j i) = 0) (f : PS S m d)
     : ev a f = MvPowerSeries.substAlgHom (hasSubst_pts a ha) f := by
-  first | rfl | (rw [MvPowerSeries.coe_substAlgHom]; rfl) | simp [ev, MvPowerSeries.coe_substAlgHom]
+  first | (rw [MvPowerSeries.coe_substAlgHom]; rfl)
 
 theorem ev_at
     {m n : ℕ}
@@ -205,7 +205,7 @@ theorem twist_mul_second_argument (G : FGLaw S d) (cc : Fin d → Fin d → S)
         = ev (![pt S d 0, pt S d 1] : Fin 2 → Pt S 3 d) (bilL G cc)
           + ev (![pt S d 0, pt S d 2] : Fin 2 → Pt S 3 d) (bilL G cc) := by
     rw [ev_bilL G cc _ ha, ev_bilL G cc _ hb, ev_bilL G cc _ hc]
-    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← Finset.sum_add_distrib]
@@ -262,7 +262,7 @@ theorem mk_X_psJet {n : ℕ} (m : ℕ) (q : Fin n × Fin d)
         by_cases h : i = q
         · subst h
           simp
-        · simp [h, Finsupp.single_apply, Ne.symm h]
+        · simp [h]
       · rw [Finsupp.sum_single_index rfl]
         show 1 ≤ m
         omega
@@ -299,9 +299,7 @@ theorem mk_psIn_psJet {n n' : ℕ} (m : ℕ) (σ : Fin n → Fin n') (f : PS S n
     (fun i => pt S d (σ i))
     ha hφ hmk f]
   unfold jetSubstP jetMap liftJet psJet psIn
-  simp only [MvPolynomial.constantCoeff_X, map_zero, sub_zero, Ideal.Quotient.liftₐ_apply,
-    Ideal.Quotient.lift_mk, AlgHom.coe_toRingHom, AlgHom.coe_comp, Function.comp_apply,
-    Ideal.Quotient.mkₐ_eq_mk]
+  simp only [MvPolynomial.constantCoeff_X, map_zero, sub_zero, Ideal.Quotient.liftₐ_apply]
   have hr
       : (aeval fun i : Fin n × Fin d => (X (σ i.1, i.2) : MvPolynomial (Fin n' × Fin d) S))
         = rename (fun p : Fin n × Fin d => (σ p.1, p.2)) :=
@@ -548,7 +546,7 @@ theorem twist_bal
       (fun l => ev (n := 2) ![pt S d 1] (LogPf.logOf B.G l))
   simp only [Matrix.of_apply] at key
   rw [ev_expP _ h0, ev_expP _ h1, ev_bilL _ _ _ h0, ev_bilL _ _ _ h1]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, ev_act_pt]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, ev_act_pt]
   rw [key]
 
 theorem twist_bal_jet

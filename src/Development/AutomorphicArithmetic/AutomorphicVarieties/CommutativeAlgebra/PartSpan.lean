@@ -49,10 +49,16 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.part_span :
-    ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R) (S : Set (W.σ →₀ ℕ)) (j : X), (∀ n ∈ S, Finsupp.weight W.wt n = j) →
-      ∃ μ : Finset (W.σ →₀ ℕ), (μ : Set _) ⊆ S ∧ ∀ f : MvPowerSeries W.σ O, (∀ n, n ∉ S → coeff n f = 0) →
-        ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, (∀ m, b m ∈ wtPart O W.wt 0) ∧ f = ∑ m ∈ μ, b m * monomial m 1 := by
+theorem UpperTheory.V.Alg.part_span
+    : ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X]
+        [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R) (S : Set (W.σ →₀ ℕ)) (j : X),
+      (∀ n ∈ S, Finsupp.weight W.wt n = j)
+        → ∃ μ : Finset (W.σ →₀ ℕ),
+          (μ : Set _) ⊆ S
+            ∧ ∀ f : MvPowerSeries W.σ O,
+              (∀ n, n ∉ S → coeff n f = 0)
+                → ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O,
+                  (∀ m, b m ∈ wtPart O W.wt 0) ∧ f = ∑ m ∈ μ, b m * monomial m 1 := by
   intro O R _ _ _ X _ _ _ W S j hS
   classical
   haveI := W.fin
@@ -67,8 +73,9 @@ theorem UpperTheory.V.Alg.part_span :
   · rw [Set.Finite.coe_toFinset]
     exact fun m hm => hm.1
   · intro f hf
-    obtain ⟨b, hb⟩ : ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, ∀ m k,
-        coeff k (b m) = if k + m ∈ S ∧ c (k + m) = m then coeff (k + m) f else 0 :=
+    obtain ⟨b, hb⟩
+        : ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, ∀ m k,
+          coeff k (b m) = if k + m ∈ S ∧ c (k + m) = m then coeff (k + m) f else 0 :=
       ⟨fun m k => if k + m ∈ S ∧ c (k + m) = m then coeff (k + m) f else 0, fun _ _ => rfl⟩
     refine ⟨b, ?_, ?_⟩
     · intro m k hk
@@ -81,8 +88,10 @@ theorem UpperTheory.V.Alg.part_span :
       simpa using hkm
     · ext n
 
-      rw [map_sum, Finset.sum_congr rfl
-      (g := fun m => if c n = m then (if n ∈ S then coeff n f else 0) else 0), Finset.sum_ite_eq]
+      rw [map_sum,
+        Finset.sum_congr rfl
+          (g := fun m => if c n = m then (if n ∈ S then coeff n f else 0) else 0),
+        Finset.sum_ite_eq]
       · by_cases hn : n ∈ S
         · rw [if_pos ((Set.Finite.mem_toFinset hMfin).2 (hcM n hn)), if_pos hn]
         · rw [hf n hn]

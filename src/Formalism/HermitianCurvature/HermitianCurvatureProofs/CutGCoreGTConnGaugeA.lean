@@ -61,8 +61,7 @@ variable
   {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by
-  first | rfl | (simp [B.hsVec]; done) | (unfold B.hsVec; rw [← WithLp.toLp_smul]; rfl)
+theorem hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by first | rfl
 
 theorem star_mul_self_of_norm {z : ℂ} (h : ‖z‖ = 1) : star z * z = 1 := by
   calc
@@ -161,10 +160,7 @@ theorem rawR_phase
 theorem conj_smooth {v : ℂ → ℂ} {s : Set ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v s)
     : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ => star (v ζ)) s := by
   have hs : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ : ℂ => star ζ) := by
-    first
-    | exact contDiff_id.star
-    | exact Complex.conjCLE.contDiff
-    | simpa using (Complex.conjCLE.contDiff (n := ((⊤ : ℕ∞) : WithTop ℕ∞)))
+    first | exact Complex.conjCLE.contDiff
   exact hs.comp_contDiffOn hv
 
 theorem trR_phase
@@ -195,7 +191,7 @@ theorem actA_diag
   refine (Fintype.sum_eq_single ρ (fun b hb => ?_)).trans ?_
   · have h0 :=
       congrArg (fun m : (MA.DQ P).Pr => m.1 (g b)) (Matrix.diagonal_apply_ne x (Ne.symm hb))
-    exact h0.trans (by first | rfl | simp)
+    exact h0.trans (by first | rfl)
   · exact congrArg (fun m : (MA.DQ P).Pr => m.1 (g ρ)) (Matrix.diagonal_apply_eq x ρ)
 
 theorem algebraMap_fst_apply (P : M.Par) (c : ℂ) (f : MA.SmQ P.r P.TT)
@@ -207,7 +203,7 @@ theorem actA_kap (P : M.Par) (f : M.Ty P → ℂ) (g : M.Ty P → MA.SmQ P.r P.T
   have hk
       : (MA.kap P (MA.DQ P) f : MA.A P (MA.DQ P))
         = Matrix.diagonal (fun π => algebraMap ℂ (MA.DQ P).Pr (f π)) := by
-    first | rfl | (ext i j; simp [MA.kap, Matrix.diagonal_apply])
+    first | rfl
   rw [hk, actA_diag, algebraMap_fst_apply]
 
 theorem actA_nabA (P : M.Par) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P)

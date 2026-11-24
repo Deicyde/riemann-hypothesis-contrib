@@ -165,7 +165,7 @@ theorem _root_.GlobalTheory.SpreadSep.exists_isClosed_preimage_diff
           : Set (D.obj m))ᶜ := by
     ext y
     simp only [Functor.map_comp, Set.mem_preimage, Set.mem_diff, SetLike.mem_coe, Set.mem_compl_iff,
-      Scheme.Hom.preimage_sup, TopologicalSpace.Opens.coe_sup, Set.mem_union, Scheme.Hom.comp_apply]
+      TopologicalSpace.Opens.coe_sup, Set.mem_union, Scheme.Hom.comp_apply]
     have h1 := ht y
     have h2 := hle y
     tauto

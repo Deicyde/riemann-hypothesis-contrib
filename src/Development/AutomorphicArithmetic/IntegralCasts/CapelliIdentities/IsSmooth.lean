@@ -141,7 +141,6 @@ theorem UpperTheory.Reformulated.B.DYka2.main
   refine ⟨∑ q : L ⧸ H, ψ q, ?_, ?_⟩
   · intro h0
     have e : f (∑ q : L ⧸ H, ψ q) = (Fintype.card (L ⧸ H) : ℂ) • f u := by
-
       rw [map_sum]
       simp only [hfψ]
       rw [Finset.sum_const, Finset.card_univ, Nat.cast_smul_eq_nsmul]

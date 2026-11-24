@@ -46,6 +46,7 @@ open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.Char
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
   GlobalTheory.CompanionTheory.Ar.Plug
 attribute [-instance] GlobalTheory.CompHt.fintypePsi
+
 theorem _root_.GlobalTheory.T.tower_weight_of_zero
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.tower_weight_of_zero
           GlobalTheory.CovHt.bndB u g = Top.bigB0 (reW u) g
             ∧ (1 ≤ Dw.q → Dw.q < Dw.p → GlobalTheory.CovHt.WtGap u g
               → Top.WeightHyp Dw.p (reW u) g) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Plug.integer_weights_vocab
-  | exact GlobalTheory.CompanionTheory.Ar.Plug.integer_weights_vocab
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.Plug.integer_weights_vocab <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.Plug.integer_weights_vocab

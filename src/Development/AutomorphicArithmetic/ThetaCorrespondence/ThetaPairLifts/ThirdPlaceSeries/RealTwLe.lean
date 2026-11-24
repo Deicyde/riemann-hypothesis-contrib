@@ -46,8 +46,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 set_option autoImplicit false
 noncomputable section
@@ -65,7 +63,6 @@ open GlobalTheory.FlatVecSum (princ)
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
-
 
 namespace GlobalTheory.BigOn.Exp.TupLe
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

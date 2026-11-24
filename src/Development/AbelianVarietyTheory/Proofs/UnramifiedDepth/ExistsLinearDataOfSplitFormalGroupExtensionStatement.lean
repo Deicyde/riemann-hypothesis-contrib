@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_linearData_of_split_formalGroup_extension
     : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
         (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.exists_linearData_of_split_formalGroup_extension
                     (H : HodgeTateDatum p g v O (ℤ_[p] ⊗[ℤ] OE) (sigE p OE) cp)
                     (B : Matrix (Fin g) (Fin d) O) (m : ℕ) (u : Fin m → PS O 1 d),
                   (∀ k, IsCh F.F (u k)) ∧ LinDat H (lin J) B ρG N (fun k => dl (u k)) := by
-  first
-  | exact @GlobalTheory.ChF.exists_linDat_of_extSer
-  | exact GlobalTheory.ChF.exists_linDat_of_extSer
-  | (intros; apply GlobalTheory.ChF.exists_linDat_of_extSer <;> assumption)
+  first | exact @GlobalTheory.ChF.exists_linDat_of_extSer

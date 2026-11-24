@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition GlobalTheory.MixedTerm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mixedModelHeisenbergPhase_eq_cexp_realPoints
     : ∀ (D : D7) (V W : HSp D) (r : ℕ) (C C' : Matrix (Fin V.rank) (Fin r) D.host.E),
       adj D C * V.gram * C' = 1
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.mixedModelHeisenbergPhase_eq_cexp_realPoints
                           * ((∑ τ, 2 * (Matrix.trace ((pairQ W y).map (tauE D τ) * compAt θ τ κ)).re
                               : ℝ)
                             : ℂ)) := by
-  first
-  | exact @GlobalTheory.PhaseReal.phase_eq
-  | exact GlobalTheory.PhaseReal.phase_eq
-  | (intros; apply GlobalTheory.PhaseReal.phase_eq <;> assumption)
+  first | exact @GlobalTheory.PhaseReal.phase_eq

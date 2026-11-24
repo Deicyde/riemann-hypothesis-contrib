@@ -67,7 +67,7 @@ private theorem chi_diag {n : ℕ} {k G : Type} [CommRing k] [Group G] (χ : Fin
   rw [← Matrix.det_diagonal]
   congr 1
   ext i j : 2
-  by_cases h : i = j <;> simp [GDet.repAlg, diagRep, Matrix.one_apply, Matrix.diagonal_apply, h]
+  by_cases h : i = j <;> simp [GDet.repAlg, diagRep, h]
 
 theorem UpperTheory.V.Pa.Core.chiRes
     : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (O : Type) [CommRing O] [IsLocalRing O]

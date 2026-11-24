@@ -104,7 +104,7 @@ end AddBlockData
 
 namespace HermLine
 
-def pow (A : HermLine n) (m : ℕ) : HermLine n where
+def pow (A : Heights.HermLine n) (m : ℕ) : Heights.HermLine n where
   deg := m • A.deg
   metric z := A.metric z ^ m
   metric_pos z hz := pow_pos (A.metric_pos z hz) m
@@ -115,7 +115,7 @@ def pow (A : HermLine n) (m : ℕ) : HermLine n where
     rw [Pi.smul_apply, nsmul_eq_mul, mul_comm, zpow_mul, zpow_natCast]
   metric_smooth := A.metric_smooth.pow m
 
-def inv (A : HermLine n) : HermLine n where
+def inv (A : Heights.HermLine n) : Heights.HermLine n where
   deg := -A.deg
   metric z := (A.metric z)⁻¹
   metric_pos z hz := inv_pos.mpr (A.metric_pos z hz)

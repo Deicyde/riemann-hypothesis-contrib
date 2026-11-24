@@ -188,9 +188,7 @@ theorem continuous_tprod
         ((o τ).coord (i τ)).continuous_of_finiteDimensional.comp (continuous_apply τ)).mul
       continuous_const
 
-theorem one_mem_UH {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ)
-    : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ Formalism.QuantumDeterminants.UH G := by
-  simp [Formalism.QuantumDeterminants.UH]
+alias one_mem_UH := _root_.GlobalTheory.PointAtPlaceHom.one_mem_UH
 
 theorem hasDerivAt_pol
     {σ Z : Type} [Finite σ]

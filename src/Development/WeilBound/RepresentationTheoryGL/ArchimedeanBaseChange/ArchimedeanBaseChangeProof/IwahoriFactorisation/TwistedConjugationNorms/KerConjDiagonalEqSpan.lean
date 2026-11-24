@@ -1,8 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramDetChangeOfBasesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmFieldStatement
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramDetChangeOfBases
+public import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwistedTraceFormulaStable
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjugationPropertiesCmField
+public import Mathlib.LinearAlgebra.Matrix.Permutation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -12,7 +15,6 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.LinearAlgebra.Matrix.Permutation
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -46,6 +48,8 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Std.Tactic.BVDecide.Normalize.Prop
+import Mathlib.RingTheory.PicardGroup
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CongruenceFiniteIndex
 
 @[expose] public section
 
@@ -63,58 +67,70 @@ section Lin
 
 variable {K : Type} [Field K] {n : ℕ}
 
-theorem conj_pow (P : GL (Fin n) K) (D : Matrix (Fin n) (Fin n) K) (k : ℕ) :
-    ((P : Matrix (Fin n) (Fin n) K) * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) ^ k =
-      (P : Matrix (Fin n) (Fin n) K) * D ^ k * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
-  have hPP : ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K) = 1 := by
+theorem conj_pow (P : GL (Fin n) K) (D : Matrix (Fin n) (Fin n) K) (k : ℕ)
+    : ((P : Matrix (Fin n) (Fin n) K) * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) ^ k
+      = (P : Matrix (Fin n) (Fin n) K) * D ^ k
+        * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+  have hPP
+      : ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K) = 1 := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
   induction k with
-  | zero =>
-    rw [pow_zero, pow_zero, Matrix.mul_one, ← Units.val_mul, mul_inv_cancel, Units.val_one]
+  | zero => rw [pow_zero, pow_zero, Matrix.mul_one, ← Units.val_mul, mul_inv_cancel, Units.val_one]
   | succ k ih =>
     rw [pow_succ, ih, pow_succ]
-    calc (P : Matrix (Fin n) (Fin n) K) * D ^ k * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *
-          ((P : Matrix (Fin n) (Fin n) K) * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
-        = (P : Matrix (Fin n) (Fin n) K) * D ^ k *
-            (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K)) * D *
-            ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by simp only [Matrix.mul_assoc]
+    calc
+      (P : Matrix (Fin n) (Fin n) K) * D ^ k * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+            * ((P : Matrix (Fin n) (Fin n) K) * D
+              * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
+          = (P : Matrix (Fin n) (Fin n) K) * D ^ k
+            * (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K))
+            * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by rw [hPP, Matrix.mul_one]; simp only [Matrix.mul_assoc]
 
-theorem aeval_conj (P : GL (Fin n) K) (D : Matrix (Fin n) (Fin n) K) (Q : K[X]) :
-    aeval ((P : Matrix (Fin n) (Fin n) K) * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) Q =
-      (P : Matrix (Fin n) (Fin n) K) * aeval D Q * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+theorem aeval_conj (P : GL (Fin n) K) (D : Matrix (Fin n) (Fin n) K) (Q : K[X])
+    : aeval ((P : Matrix (Fin n) (Fin n) K) * D * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
+        Q
+      = (P : Matrix (Fin n) (Fin n) K) * aeval D Q
+        * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
   induction Q using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, Matrix.mul_add, Matrix.add_mul]
   | monomial k a =>
     rw [aeval_monomial, aeval_monomial, conj_pow]
-    have hc : algebraMap K (Matrix (Fin n) (Fin n) K) a * (P : Matrix (Fin n) (Fin n) K) =
-        (P : Matrix (Fin n) (Fin n) K) * algebraMap K (Matrix (Fin n) (Fin n) K) a := Algebra.commutes a _
-    calc algebraMap K (Matrix (Fin n) (Fin n) K) a *
-          ((P : Matrix (Fin n) (Fin n) K) * D ^ k * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
-        = (algebraMap K (Matrix (Fin n) (Fin n) K) a * (P : Matrix (Fin n) (Fin n) K)) * D ^ k *
-            ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by simp only [Matrix.mul_assoc]
-      _ = (P : Matrix (Fin n) (Fin n) K) * (algebraMap K (Matrix (Fin n) (Fin n) K) a * D ^ k) *
-            ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by rw [hc]; simp only [Matrix.mul_assoc]
+    have hc
+        : algebraMap K (Matrix (Fin n) (Fin n) K) a * (P : Matrix (Fin n) (Fin n) K)
+          = (P : Matrix (Fin n) (Fin n) K) * algebraMap K (Matrix (Fin n) (Fin n) K) a :=
+      Algebra.commutes a _
+    calc
+      algebraMap K (Matrix (Fin n) (Fin n) K) a
+            * ((P : Matrix (Fin n) (Fin n) K) * D ^ k
+              * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
+          = (algebraMap K (Matrix (Fin n) (Fin n) K) a * (P : Matrix (Fin n) (Fin n) K)) * D ^ k
+            * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+        simp only [Matrix.mul_assoc]
+      _ = (P : Matrix (Fin n) (Fin n) K) * (algebraMap K (Matrix (Fin n) (Fin n) K) a * D ^ k)
+          * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+        rw [hc]; simp only [Matrix.mul_assoc]
 
-theorem aeval_diagonal' (u : Fin n → K) (Q : K[X]) :
-    aeval (Matrix.diagonal u) Q = Matrix.diagonal fun i => Q.eval (u i) := by
-  have h := Polynomial.aeval_algHom_apply (Matrix.diagonalAlgHom K : (Fin n → K) →ₐ[K] Matrix (Fin n) (Fin n) K) u Q
+theorem aeval_diagonal' (u : Fin n → K) (Q : K[X])
+    : aeval (Matrix.diagonal u) Q = Matrix.diagonal fun i => Q.eval (u i) := by
+  have h :=
+    Polynomial.aeval_algHom_apply
+      (Matrix.diagonalAlgHom K : (Fin n → K) →ₐ[K] Matrix (Fin n) (Fin n) K) u Q
   rw [Matrix.diagonalAlgHom_apply] at h
   rw [h, Matrix.diagonalAlgHom_apply, aeval_pi_apply]
   congr 1
 
-theorem mulVec_inv_mulVec (P : GL (Fin n) K) (x : Fin n → K) :
-    (P : Matrix (Fin n) (Fin n) K) *ᵥ (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *ᵥ x) = x := by
-  rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
-
-theorem inv_mulVec_mulVec (P : GL (Fin n) K) (x : Fin n → K) :
-    ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *ᵥ ((P : Matrix (Fin n) (Fin n) K) *ᵥ x) = x := by
+theorem inv_mulVec_mulVec (P : GL (Fin n) K) (x : Fin n → K)
+    : ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *ᵥ ((P : Matrix (Fin n) (Fin n) K) *ᵥ x)
+      = x := by
   rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
 
-theorem mem_ker_conj_diagonal (P : GL (Fin n) K) (d : Fin n → K) (x : Fin n → K) :
-    x ∈ LinearMap.ker (Matrix.toLin' ((P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d *
-        ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))) ↔
-      ∀ i, d i * ((((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) *ᵥ x) i = 0 := by
+theorem mem_ker_conj_diagonal (P : GL (Fin n) K) (d : Fin n → K) (x : Fin n → K)
+    : x ∈ LinearMap.ker (Matrix.toLin'
+        ((P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d
+          * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)))
+      ↔ ∀ i, d i * ((((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) *ᵥ x) i = 0 := by
   rw [LinearMap.mem_ker, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
   constructor
   · intro h i
@@ -129,11 +145,13 @@ theorem mem_ker_conj_diagonal (P : GL (Fin n) K) (d : Fin n → K) (x : Fin n �
       exact h i
     rw [this, Matrix.mulVec_zero]
 
-theorem ker_conj_diagonal_eq_span (P : GL (Fin n) K) (d : Fin n → K) (S : Finset (Fin n))
-    (hd : ∀ i, d i = 0 ↔ i ∈ S) :
-    LinearMap.ker (Matrix.toLin' ((P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d *
-        ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))) =
-      Submodule.span K (Set.range fun i : S => fun k => (P : Matrix (Fin n) (Fin n) K) k i.1) := by
+theorem ker_conj_diagonal_eq_span
+    (P : GL (Fin n) K) (d : Fin n → K) (S : Finset (Fin n)) (hd : ∀ i, d i = 0 ↔ i ∈ S)
+    : LinearMap.ker (Matrix.toLin'
+        ((P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d
+          * ((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)))
+      = Submodule.span K
+        (Set.range fun i : S => fun k => (P : Matrix (Fin n) (Fin n) K) k i.1) := by
   apply le_antisymm
   · intro x hx
     rw [mem_ker_conj_diagonal] at hx
@@ -142,9 +160,11 @@ theorem ker_conj_diagonal_eq_span (P : GL (Fin n) K) (d : Fin n → K) (S : Fins
       rcases mul_eq_zero.1 (hx j) with h | h
       · exact absurd ((hd j).1 h) hj
       · exact h
-    have hx' : x = ∑ j ∈ S, ((((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) *ᵥ x) j •
-        (fun k => (P : Matrix (Fin n) (Fin n) K) k j) := by
-      conv_lhs => rw [← mulVec_inv_mulVec P x]
+    have hx'
+        : x
+          = ∑ j ∈ S, ((((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) *ᵥ x) j •
+            (fun k => (P : Matrix (Fin n) (Fin n) K) k j) := by
+      conv_lhs => rw [← _root_.GlobalTheory.CongruenceIndex.mulVec_inv_mulVec P x]
       funext k
       rw [Finset.sum_apply]
       simp only [Pi.smul_apply, smul_eq_mul]
@@ -154,13 +174,18 @@ theorem ker_conj_diagonal_eq_span (P : GL (Fin n) K) (d : Fin n → K) (S : Fins
       · intro j _ hj
         rw [hy0 j hj, mul_zero]
     rw [hx']
-    exact Submodule.sum_mem _ fun j hj => Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨j, hj⟩, rfl⟩)
+    exact Submodule.sum_mem _ fun j hj =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨j, hj⟩, rfl⟩)
   · rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     rw [SetLike.mem_coe, mem_ker_conj_diagonal]
     intro j
-    have e : (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *ᵥ fun k => (P : Matrix (Fin n) (Fin n) K) k i.1) j =
-        (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K)) j i.1 := by
+    have e
+        : (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+              *ᵥ fun k => (P : Matrix (Fin n) (Fin n) K) k i.1)
+            j
+          = (((P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (P : Matrix (Fin n) (Fin n) K)) j
+            i.1 := by
       rw [Matrix.mul_apply]; rfl
     rw [e, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_apply]
     by_cases hj : j = i.1
@@ -168,8 +193,8 @@ theorem ker_conj_diagonal_eq_span (P : GL (Fin n) K) (d : Fin n → K) (S : Fins
       rw [(hd _).2 i.2, zero_mul]
     · rw [if_neg hj, mul_zero]
 
-theorem exists_eigvec (γ : Matrix (Fin n) (Fin n) K) (t : K) (ht : γ.charpoly.eval t = 0) :
-    ∃ x : Fin n → K, x ≠ 0 ∧ γ *ᵥ x = t • x := by
+theorem exists_eigvec (γ : Matrix (Fin n) (Fin n) K) (t : K) (ht : γ.charpoly.eval t = 0)
+    : ∃ x : Fin n → K, x ≠ 0 ∧ γ *ᵥ x = t • x := by
   rw [Matrix.eval_charpoly] at ht
   obtain ⟨x, hx, hx0⟩ := Matrix.exists_mulVec_eq_zero_iff.2 ht
   refine ⟨x, hx, ?_⟩
@@ -178,9 +203,11 @@ theorem exists_eigvec (γ : Matrix (Fin n) (Fin n) K) (t : K) (ht : γ.charpoly.
   funext i
   simp [Matrix.scalar_apply, Matrix.mulVec_diagonal]
 
-theorem exists_diagonalize (γ : Matrix (Fin n) (Fin n) K) (u : Fin n → K) (hu : Function.Injective u)
-    (hr : ∀ i, γ.charpoly.eval (u i) = 0) :
-    ∃ P : GL (Fin n) K, γ * (P : Matrix (Fin n) (Fin n) K) = (P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal u := by
+theorem exists_diagonalize
+    (γ : Matrix (Fin n) (Fin n) K) (u : Fin n → K)
+    (hu : Function.Injective u) (hr : ∀ i, γ.charpoly.eval (u i) = 0)
+    : ∃ P : GL (Fin n) K,
+      γ * (P : Matrix (Fin n) (Fin n) K) = (P : Matrix (Fin n) (Fin n) K) * Matrix.diagonal u := by
   choose x hx0 hx using fun i => exists_eigvec γ (u i) (hr i)
   have hli : LinearIndependent K x := by
     refine Module.End.eigenvectors_linearIndependent' (Matrix.toLin' γ) u hu x fun i => ?_
@@ -205,15 +232,17 @@ def revOn (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S) : Equiv.Perm 
   left_inv i := Subtype.ext (Fin.rev_rev _)
   right_inv i := Subtype.ext (Fin.rev_rev _)
 
-theorem det_submatrix_rev (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fin.rev i → A i j = 0)
-    (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S) :
-    (A.submatrix (fun i : S => i.1) (fun i : S => i.1)).det =
-      ((Equiv.Perm.sign (revOn S hS) : ℤ) : K) * ∏ j : S, A (Fin.rev j.1) j.1 := by
-  have e : A.submatrix (fun i : S => i.1) (fun i : S => i.1) =
-      (revOn S hS).permMatrix K * Matrix.diagonal fun j : S => A (Fin.rev j.1) j.1 := by
+theorem det_submatrix_rev
+    (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fin.rev i → A i j = 0)
+    (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S)
+    : (A.submatrix (fun i : S => i.1) (fun i : S => i.1)).det
+      = ((Equiv.Perm.sign (revOn S hS) : ℤ) : K) * ∏ j : S, A (Fin.rev j.1) j.1 := by
+  have e
+      : A.submatrix (fun i : S => i.1) (fun i : S => i.1)
+        = (revOn S hS).permMatrix K * Matrix.diagonal fun j : S => A (Fin.rev j.1) j.1 := by
     refine Matrix.ext fun i j => ?_
-    simp only [Matrix.mul_diagonal, Matrix.submatrix_apply, Equiv.Perm.permMatrix, PEquiv.toMatrix_apply,
-      Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq]
+    simp only [Matrix.mul_diagonal, Matrix.submatrix_apply, Equiv.Perm.permMatrix,
+      PEquiv.toMatrix_apply, Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq]
     by_cases h : (revOn S hS) i = j
     · rw [if_pos h, one_mul]
       subst h
@@ -225,9 +254,13 @@ theorem det_submatrix_rev (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fi
       exact Subtype.ext (by rw [hj]; rfl)
   rw [e, Matrix.det_mul, Matrix.det_permutation, Matrix.det_diagonal]
 
-theorem det_rev (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fin.rev i → A i j = 0) :
-    A.det = ((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n)) : ℤ) : K) * ∏ j, A (Fin.rev j) j := by
-  have e : A = (Fin.revPerm : Equiv.Perm (Fin n)).permMatrix K * Matrix.diagonal fun j => A (Fin.rev j) j := by
+theorem det_rev (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fin.rev i → A i j = 0)
+    : A.det
+      = ((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n)) : ℤ) : K) * ∏ j, A (Fin.rev j) j := by
+  have e
+      : A
+        = (Fin.revPerm : Equiv.Perm (Fin n)).permMatrix K
+          * Matrix.diagonal fun j => A (Fin.rev j) j := by
     refine Matrix.ext fun i j => ?_
     simp only [Matrix.mul_diagonal, Equiv.Perm.permMatrix, PEquiv.toMatrix_apply,
       Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq, Fin.revPerm_apply]
@@ -240,9 +273,11 @@ theorem det_rev (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, j ≠ Fin.rev i �
   conv_lhs => rw [e]
   rw [Matrix.det_mul, Matrix.det_permutation, Matrix.det_diagonal]
 
-theorem sum_rev_parity (f : Fin n → ℤ) (hf : ∀ j, f (Fin.rev j) = f j) (S : Finset (Fin n))
-    (hS : ∀ i ∈ S, Fin.rev i ∈ S) :
-    (((∑ j ∈ S, f j : ℤ)) : ZMod 2) = (((∑ j ∈ S.filter (fun j => Fin.rev j = j), f j : ℤ)) : ZMod 2) := by
+theorem sum_rev_parity
+    (f : Fin n → ℤ) (hf : ∀ j, f (Fin.rev j) = f j)
+    (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S)
+    : (((∑ j ∈ S, f j : ℤ)) : ZMod 2)
+      = (((∑ j ∈ S.filter (fun j => Fin.rev j = j), f j : ℤ)) : ZMod 2) := by
   rw [← Finset.sum_filter_add_sum_filter_not S (fun j => Fin.rev j = j), Int.cast_add]
   have h0 : (((∑ j ∈ S.filter (fun j => ¬ Fin.rev j = j), f j : ℤ)) : ZMod 2) = 0 := by
     rw [Int.cast_sum]
@@ -271,43 +306,16 @@ section Ord
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem ordL_eq_of_v {x y : L} (h : Valued.v x = Valued.v y) : ordL x = ordL y := by
-  unfold ordL
-  by_cases hx : Valued.v x = 0
-  · have hy : Valued.v y = 0 := by rw [← h]; exact hx
-    rw [dite_eq_left hx, dite_eq_left hy]
-  · have hy : Valued.v y ≠ 0 := by rw [← h]; exact hx
-    rw [dite_eq_right hx, dite_eq_right hy]
-    have e : WithZero.unzero hx = WithZero.unzero hy := by
-      apply WithZero.coe_injective
-      rw [WithZero.coe_unzero, WithZero.coe_unzero, h]
-    rw [e]
-
-theorem ordL_mul' {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) : ordL (x * y) = ordL x + ordL y := by
-  have h0 : Valued.v x ≠ 0 := by simpa using hx
-  have h0' : Valued.v y ≠ 0 := by simpa using hy
-  have h1 : Valued.v (x * y) ≠ 0 := by rw [map_mul]; exact mul_ne_zero h0 h0'
-  unfold ordL
-  rw [dite_eq_right h1, dite_eq_right h0, dite_eq_right h0']
-  have e : WithZero.unzero h1 = WithZero.unzero h0 * WithZero.unzero h0' := by
-    apply WithZero.coe_injective
-    rw [WithZero.coe_mul, WithZero.coe_unzero, WithZero.coe_unzero, WithZero.coe_unzero, map_mul]
-  rw [e, toAdd_mul]
-  ring
-
-theorem ordL_one' : ordL (1 : L) = 0 := by
-  have h := ordL_mul' (one_ne_zero : (1 : L) ≠ 0) (one_ne_zero : (1 : L) ≠ 0)
-  rw [one_mul] at h
-  omega
+alias ordL_mul' := _root_.Formalism.UG.P.fSatake_ord_mul
 
 theorem ordL_zero' : ordL (0 : L) = 0 := by
   unfold ordL
   simp
 
-theorem ordL_prod' {ι : Type} (T : Finset ι) (g : ι → L) (hg : ∀ j ∈ T, g j ≠ 0) :
-    ordL (∏ j ∈ T, g j) = ∑ j ∈ T, ordL (g j) := by
+theorem ordL_prod' {ι : Type} (T : Finset ι) (g : ι → L) (hg : ∀ j ∈ T, g j ≠ 0)
+    : ordL (∏ j ∈ T, g j) = ∑ j ∈ T, ordL (g j) := by
   induction T using Finset.induction_on with
-  | empty => simp [ordL_one']
+  | empty => simp [_root_.Formalism.UG.P.fSatake_ord_one]
   | @insert a T ha ih =>
     rw [Finset.prod_insert ha, Finset.sum_insert ha,
       ordL_mul' (hg a (Finset.mem_insert_self a T))
@@ -317,19 +325,20 @@ theorem ordL_prod' {ι : Type} (T : Finset ι) (g : ι → L) (hg : ∀ j ∈ T,
 theorem ordL_sign_mul (s : ℤˣ) (x : L) : ordL (((s : ℤ) : L) * x) = ordL x := by
   rcases Int.units_eq_one_or s with h | h <;> subst h
   · simp
-  · apply ordL_eq_of_v
+  · apply _root_.Formalism.UG.P.fSatake_ord_of_v
     simp
 
 end Ord
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
-
-theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) (hγ : γ ∈ UL n w)
-    (v : Fin n → ℤ) (hv : Function.Injective v) (hrev : ∀ i j, v j = -v i → j = Fin.rev i)
-    (hV : HasVals γ.val.charpoly v) (Q : (w.adicCompletion E)[X]) : kapSign n w Q γ = 1 := by
-  obtain ⟨-, hinv, hcj, -⟩ := GlobalTheory.T.placeConjugation_properties_cmField E hU w
+theorem kapSign_eq_one_of_vals
+    (hU : Unr E)
+    (w : Pl E) (n : ℕ) (γ : GLw n w) (hγ : γ ∈ UL n w) (v : Fin n → ℤ) (hv : Function.Injective v)
+    (hrev : ∀ i j, v j = - v i → j = Fin.rev i) (hV : HasVals γ.val.charpoly v)
+    (Q : (w.adicCompletion E)[X])
+    : kapSign n w Q γ = 1 := by
+  obtain ⟨-, hinv, hcj, -⟩ := _root_.GlobalTheory.ConjAtPlace.main E hU w
   unfold kapSign
   split_ifs with hs
   · rfl
@@ -338,8 +347,11 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
     have h := hγ
     unfold UL at h
     rw [if_neg hs] at h
-    have h2 : cT (cj w) (γ : Matrix (Fin n) (Fin n) (w.adicCompletion E)) * 1 *
-        (γ : Matrix (Fin n) (Fin n) (w.adicCompletion E)) = 1 := h
+    have h2
+        : cT (cj w) (γ : Matrix (Fin n) (Fin n) (w.adicCompletion E)) * 1
+            * (γ : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+          = 1 :=
+      h
     rw [Matrix.mul_one] at h2
     exact h2
   obtain ⟨u, hu_prod, hu⟩ := hV
@@ -349,11 +361,15 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
     rw [hu_prod, eval_prod]
     exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp)
   obtain ⟨P, hP⟩ := exists_diagonalize γ.val u huinj hroot
-  have hγP : γ.val = (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) * Matrix.diagonal u *
-      ((P⁻¹ : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) := by
-    calc γ.val = γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) *
-          ((P⁻¹ : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) := by
-            rw [Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.mul_one]
+  have hγP
+      : γ.val
+        = (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) * Matrix.diagonal u
+          * ((P⁻¹ : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) := by
+    calc
+      γ.val
+          = γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+            * ((P⁻¹ : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) := by
+        rw [Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.mul_one]
       _ = _ := by rw [hP]
 
   set H : Matrix (Fin n) (Fin n) (w.adicCompletion E) :=
@@ -361,32 +377,41 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
     with hHdef
   have hPdet : (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det ≠ 0 :=
     ((Matrix.isUnit_iff_isUnit_det _).1 P.isUnit).ne_zero
-  have hHdet : H.det = cj w (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det *
-      (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det := by
+  have hHdet
+      : H.det
+        = cj w (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det
+          * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det := by
     rw [hHdef, Matrix.det_mul, Matrix.det_transpose,
-      show ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w)).det =
-        cj w (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det by rw [RingHom.map_det]; rfl]
+      show ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w)).det
+          = cj w (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det by
+        rw [RingHom.map_det]; rfl]
   have hH0 : H.det ≠ 0 := by
     rw [hHdet]
     exact mul_ne_zero ((map_ne_zero (cj w)).2 hPdet) hPdet
   have hherm : ∀ i j, cj w (H j i) = H i j := by
     intro i j
 
-    simp only [hHdef, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, hinv]
+    simp only [hHdef, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul,
+      hinv]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
   have hun : ∀ i j, cj w (u i) * H i j * u j = H i j := by
-    have e1 : (((γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))).map (cj w))ᵀ *
-        (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)))) = H := by
+    have e1
+        : (((γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))).map (cj w))ᵀ
+            * (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))))
+          = H := by
       rw [Matrix.map_mul, Matrix.transpose_mul]
-      calc ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w))ᵀ * (γ.val.map (cj w))ᵀ *
-            (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)))
-          = ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w))ᵀ *
-            (((γ.val.map (cj w))ᵀ * γ.val) * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))) := by
-              simp only [Matrix.mul_assoc]
+      calc
+        ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w))ᵀ * (γ.val.map (cj w))ᵀ
+              * (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)))
+            = ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map (cj w))ᵀ
+              * (((γ.val.map (cj w))ᵀ * γ.val)
+                * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))) := by
+          simp only [Matrix.mul_assoc]
         _ = H := by rw [hUn, Matrix.one_mul]
-    have e2 : (((γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))).map (cj w))ᵀ *
-        (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)))) =
-        Matrix.diagonal (fun i => cj w (u i)) * H * Matrix.diagonal u := by
+    have e2
+        : (((γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))).map (cj w))ᵀ
+            * (γ.val * (P : Matrix (Fin n) (Fin n) (w.adicCompletion E))))
+          = Matrix.diagonal (fun i => cj w (u i)) * H * Matrix.diagonal u := by
       rw [hP, Matrix.map_mul, Matrix.transpose_mul, Matrix.diagonal_map (map_zero (cj w)),
         Matrix.diagonal_transpose, hHdef]
       simp only [Matrix.mul_assoc]
@@ -399,13 +424,17 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
     have h1 : cj w (u i) * u j = 1 := by
       have h2 : (cj w (u i) * u j) * H i j = 1 * H i j := by
         rw [one_mul]
-        calc (cj w (u i) * u j) * H i j = cj w (u i) * H i j * u j := by ring
+        calc
+          (cj w (u i) * u j) * H i j
+            = cj w (u i) * H i j * u j := by ring
           _ = H i j := hun i j
       exact mul_right_cancel₀ hne h2
     apply hj
     apply hrev
     have h2 := ordL_mul' ((map_ne_zero (cj w)).2 (hu i).1) (hu j).1
-    rw [h1, ordL_one', ordL_eq_of_v (hcj (u i)), (hu i).2, (hu j).2] at h2
+    rw [h1, _root_.Formalism.UG.P.fSatake_ord_one,
+        _root_.Formalism.UG.P.fSatake_ord_of_v (hcj (u i)), (hu i).2, (hu j).2]
+      at h2
     omega
 
   have hg0 : ∀ j, H (Fin.rev j) j ≠ 0 := by
@@ -420,24 +449,28 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
     intro j
     simp only [hfdef, Fin.rev_rev]
     rw [← hherm]
-    exact ordL_eq_of_v (hcj _)
-  have hordS : ∀ (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S),
-      ordL (H.submatrix (fun i : S => i.1) (fun i : S => i.1)).det = ∑ j ∈ S, f j := by
+    exact _root_.Formalism.UG.P.fSatake_ord_of_v (hcj _)
+  have hordS
+      : ∀ (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S),
+        ordL (H.submatrix (fun i : S => i.1) (fun i : S => i.1)).det = ∑ j ∈ S, f j := by
     intro S hS
-    rw [det_submatrix_rev H hsupp S hS, ordL_sign_mul,
-      ordL_prod' _ _ (fun j _ => hg0 j.1)]
+    rw [det_submatrix_rev H hsupp S hS, ordL_sign_mul, ordL_prod' _ _ (fun j _ => hg0 j.1)]
     exact Finset.sum_coe_sort S (fun j => f j)
   have htot : Even (∑ j ∈ (Finset.univ : Finset (Fin n)), f j) := by
     have e : ordL H.det = ∑ j, f j := by
       rw [det_rev H hsupp, ordL_sign_mul, ordL_prod' _ _ (fun j _ => hg0 j)]
-    rw [hHdet, ordL_mul' ((map_ne_zero (cj w)).2 hPdet) hPdet, ordL_eq_of_v (hcj _)] at e
+    rw [hHdet, ordL_mul' ((map_ne_zero (cj w)).2 hPdet) hPdet,
+        _root_.Formalism.UG.P.fSatake_ord_of_v (hcj _)]
+      at e
     exact ⟨ordL (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)).det, by rw [← e]⟩
   have hevenS : ∀ (S : Finset (Fin n)) (hS : ∀ i ∈ S, Fin.rev i ∈ S), Even (∑ j ∈ S, f j) := by
     intro S hS
     rw [← ZMod.intCast_eq_zero_iff_even, sum_rev_parity f hf S hS]
     by_cases hm : ∃ m ∈ S, Fin.rev m = m
     · obtain ⟨m, hmS, hm⟩ := hm
-      have e : S.filter (fun j => Fin.rev j = j) = (Finset.univ : Finset (Fin n)).filter (fun j => Fin.rev j = j) := by
+      have e
+          : S.filter (fun j => Fin.rev j = j)
+            = (Finset.univ : Finset (Fin n)).filter (fun j => Fin.rev j = j) := by
         ext j
         simp only [Finset.mem_filter, Finset.mem_univ, true_and]
         constructor
@@ -454,41 +487,60 @@ theorem kapSign_eq_one_of_vals (hU : Unr E) (w : Pl E) (n : ℕ) (γ : GLw n w) 
 
   set S : Finset (Fin n) := Finset.univ.filter fun i => Q.eval (u i) = 0 with hSdef
   set V₁ := LinearMap.ker (Matrix.toLin' (aeval γ.val Q)) with hV
-  have hVspan : V₁ = Submodule.span (w.adicCompletion E)
-      (Set.range fun i : S => fun k => (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1) := by
+  have hVspan
+      : V₁
+        = Submodule.span (w.adicCompletion E)
+          (Set.range fun i : S => fun k =>
+            (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1) := by
     rw [hV, hγP, aeval_conj, aeval_diagonal']
     exact ker_conj_diagonal_eq_span P _ S fun i => by simp [hSdef]
   have hli : LinearIndependent (w.adicCompletion E)
       (fun i : S => fun k => (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1) := by
-    have h := (Matrix.linearIndependent_cols_iff_isUnit.2 P.isUnit).comp (fun i : S => i.1) Subtype.val_injective
+    have h :=
+      (Matrix.linearIndependent_cols_iff_isUnit.2 P.isUnit).comp
+        (fun i : S => i.1)
+        Subtype.val_injective
     exact h
   set B := Module.finBasis (w.adicCompletion E) V₁
-  have hBli : LinearIndependent (w.adicCompletion E) (fun i => ((B i : V₁) : Fin n → w.adicCompletion E)) :=
+  have hBli : LinearIndependent (w.adicCompletion E)
+      (fun i => ((B i : V₁) : Fin n → w.adicCompletion E)) :=
     B.linearIndependent.map' V₁.subtype (Submodule.ker_subtype V₁)
-  have hBspan : Submodule.span (w.adicCompletion E)
-      (Set.range fun i => ((B i : V₁) : Fin n → w.adicCompletion E)) = V₁ := by
-    have e : (Set.range fun i => ((B i : V₁) : Fin n → w.adicCompletion E)) = V₁.subtype '' Set.range B := by
+  have hBspan
+      : Submodule.span (w.adicCompletion E)
+          (Set.range fun i => ((B i : V₁) : Fin n → w.adicCompletion E))
+        = V₁ := by
+    have e
+        : (Set.range fun i => ((B i : V₁) : Fin n → w.adicCompletion E))
+          = V₁.subtype '' Set.range B := by
       ext x; simp
     rw [e, Submodule.span_image, B.span_eq, Submodule.map_top, Submodule.range_subtype]
-  obtain ⟨d, hd0, hdet⟩ := GlobalTheory.T.gram_det_change_of_basis' (cj w) V₁
-    (fun i : S => fun k => (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1)
-    (fun i => ((B i : V₁) : Fin n → w.adicCompletion E)) hli hVspan.symm hBli hBspan
-  have hG : (Matrix.of fun i j : S => ∑ k, cj w ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1) *
-      (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k j.1) = H.submatrix (fun i : S => i.1) (fun i : S => i.1) := by
+  obtain ⟨d, hd0, hdet⟩ :=
+    _root_.GlobalTheory.gram_det_change_of_bases (cj w) V₁
+      (fun i : S => fun k => (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1)
+      (fun i => ((B i : V₁) : Fin n → w.adicCompletion E))
+      hli hVspan.symm hBli hBspan
+  have hG
+      : (Matrix.of fun i j : S =>
+          ∑ k, cj w ((P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k i.1) *
+            (P : Matrix (Fin n) (Fin n) (w.adicCompletion E)) k j.1)
+        = H.submatrix (fun i : S => i.1) (fun i : S => i.1) := by
     ext i j
     rfl
-  have key : (Matrix.of fun i j => ∑ k, cj w ((B i).1 k) * (B j).1 k).det =
-      cj w d * d * (H.submatrix (fun i : S => i.1) (fun i : S => i.1)).det := by
+  have key
+      : (Matrix.of fun i j => ∑ k, cj w ((B i).1 k) * (B j).1 k).det
+        = cj w d * d * (H.submatrix (fun i : S => i.1) (fun i : S => i.1)).det := by
     rw [← hG]
     exact hdet
   rw [key]
   by_cases hS : ∀ i ∈ S, Fin.rev i ∈ S
   · have hne : (H.submatrix (fun i : S => i.1) (fun i : S => i.1)).det ≠ 0 := by
       rw [det_submatrix_rev H hsupp S hS]
-      exact mul_ne_zero (by rcases Int.units_eq_one_or (Equiv.Perm.sign (revOn S hS)) with h | h <;> simp [h])
+      exact mul_ne_zero
+        (by rcases Int.units_eq_one_or (Equiv.Perm.sign (revOn S hS)) with h | h <;> simp [h])
         (Finset.prod_ne_zero_iff.2 fun j _ => hg0 j.1)
     rw [ordL_mul' (mul_ne_zero ((map_ne_zero (cj w)).2 hd0) hd0) hne,
-      ordL_mul' ((map_ne_zero (cj w)).2 hd0) hd0, ordL_eq_of_v (hcj d), hordS S hS]
+      ordL_mul' ((map_ne_zero (cj w)).2 hd0) hd0, _root_.Formalism.UG.P.fSatake_ord_of_v (hcj d),
+      hordS S hS]
     obtain ⟨r, hr⟩ := hevenS S hS
     exact Even.neg_one_zpow ⟨ordL d + r, by rw [hr]; ring⟩
   · push_neg at hS

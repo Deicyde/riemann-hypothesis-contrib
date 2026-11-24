@@ -99,7 +99,6 @@ theorem under_injOn
         (fun h => absurd (Finset.mem_coe.1 hPP) h),
       (hd PP (Finset.mem_coe.1 hPP)).2.1]
   have e2 : Φ (cA D (∑ Q ∈ P, es Q)) PP = 1 := by
-
     rw [map_sum, ev_sum, Finset.sum_eq_single PP' ?_ (fun h => absurd (Finset.mem_coe.1 hPP') h)]
     · have := (delta_conj hΦ (hd PP' (Finset.mem_coe.1 hPP'))).2.1
       rwa [← hc] at this

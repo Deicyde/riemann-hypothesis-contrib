@@ -71,7 +71,7 @@ theorem csAsm_hform_smul_right
     (J : Matrix n n E) (c : E) (y x : n → E)
     : hform σ J y (c • x) = c * hform σ J y x := by
   unfold Formalism.UG.hform
-  simp [Matrix.mulVec_smul, dotProduct_smul, Finset.mul_sum, smul_eq_mul, mul_left_comm]
+  simp [Finset.mul_sum, smul_eq_mul, mul_left_comm]
 
 theorem csAsm_gmap_mul
     {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
@@ -81,7 +81,7 @@ theorem csAsm_gmap_mul
       = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
   unfold Formalism.HermitianLatticesTheory.gmap
   rw [← Submodule.map_comp]
-  first | rfl | (congr 1; ext x; simp [LinearEquiv.mul_apply])
+  first | rfl
 
 theorem csAsm_gmap_one
     {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
@@ -117,7 +117,7 @@ theorem classSetFiniteL_of
   have hcF : ((c : 𝓞 F) : F) ≠ 0 := by
     intro h
     apply hc0
-    first | exact_mod_cast h | exact RingOfIntegers.ext h
+    first | exact_mod_cast h
   have hcE0 : cE ≠ 0 := by
     rw [hcE]
     exact (map_ne_zero _).mpr hcF

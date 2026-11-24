@@ -51,9 +51,11 @@ noncomputable section
 namespace GlobalTheory.ThetaRuleCheck
 open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField MvPolynomial
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem inPsi_conjugate_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
+theorem inPsi_conjugate_iff (τ : E →+* ℂ)
+    : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
   apply GlobalTheory.InertLabelling.inPsi_conj_iff <;> assumption
 
 end GlobalTheory.ThetaRuleCheck

@@ -91,7 +91,6 @@ def secComb {Y : Scheme.{0}} {L : LB Y} {n : ℕ} (a : Fin n → Γ(Y, ⊤)) (s 
     : LB.Sec L where
   f := fun j => ∑ i, resTop _ (a i) * (s i).f j
   compat := fun j j' => by
-
     rw [map_sum, map_sum, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => (SecOps.secScale (a i) (s i)).compat j j'
 

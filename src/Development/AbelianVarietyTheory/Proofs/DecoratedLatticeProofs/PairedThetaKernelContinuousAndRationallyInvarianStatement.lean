@@ -47,6 +47,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.pairedThetaKernel_continuous_and_rationally_invariant
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (σ : ℕ) (J : JacLev D (σ + 1)) (B : BesLev D σ)
         (s : StepFB ψ J B) (vL : VolM D B.L.rank J.W₀.rank) (Y : GA D J.W₀ → WO J.W₀ B.L → ℂ)
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.pairedThetaKernel_continuous_and_rationally_invari
         → Continuous (Function.uncurry (pairKer s vL Y Ξ))
           ∧ (∀ γ ∈ GQ J.W₀, ∀ h₀ h₁, pairKer s vL Y Ξ (γ * h₀) h₁ = pairKer s vL Y Ξ h₀ h₁)
           ∧ ∀ γ ∈ GQ B.A, ∀ h₀ h₁, pairKer s vL Y Ξ h₀ (γ * h₁) = pairKer s vL Y Ξ h₀ h₁ := by
-  first
-  | exact @GlobalTheory.PairKer.pairKer_law
-  | exact GlobalTheory.PairKer.pairKer_law
-  | (intros; apply GlobalTheory.PairKer.pairKer_law <;> assumption)
+  first | exact @GlobalTheory.PairKer.pairKer_law

@@ -116,8 +116,7 @@ theorem coef_coordR (i : Fin (wittIndex V)) (x : V.V)
   change hR R hc.sig V.gram _ _ = inclR R (V.hT _ _)
   rw [IndefiniteRowSideFullHecke.AdelicUnitaryGroups.hT_coord]
   simp [hR, Formalism.UG.hform, coordR, JR, inclR,
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR, CMData.sig,
-    TensorProduct.tmul_sum, starRingEnd_apply]
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR, CMData.sig, starRingEnd_apply]
 
 theorem coef_eq_zero
     (i : Fin (wittIndex V))

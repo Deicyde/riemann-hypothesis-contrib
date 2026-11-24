@@ -53,19 +53,18 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-def imageIdealSheaf {S X : Scheme.{u}} (σ : S ⟶ X) (I : S.IdealSheafData) : X.IdealSheafData :=
-  (I.subschemeι ≫ σ).ker
-
 theorem map_eq_imageIdealSheaf {S X : Scheme.{u}} (f : S ⟶ X) (I : S.IdealSheafData)
-    : I.map f = imageIdealSheaf f I :=
+    : I.map f = _root_.FunctorialResolution.Blowup.schemeImageIdeal f I :=
   rfl
 
 theorem imageIdealSheaf_comp {W A B : Scheme.{u}} (g : W ⟶ A) (w : A ⟶ B) (I : W.IdealSheafData)
-    : imageIdealSheaf (g ≫ w) I = imageIdealSheaf w (imageIdealSheaf g I) := by
+    : _root_.FunctorialResolution.Blowup.schemeImageIdeal (g ≫ w) I
+      = _root_.FunctorialResolution.Blowup.schemeImageIdeal w
+        (_root_.FunctorialResolution.Blowup.schemeImageIdeal g I) := by
   simp only [← map_eq_imageIdealSheaf, Scheme.IdealSheafData.map_comp]
 
 theorem imageIdealSheaf_eq_ker {S X : Scheme.{u}} (σ : S ⟶ X) (I : S.IdealSheafData)
-    : imageIdealSheaf σ I = (I.subschemeι ≫ σ).ker :=
+    : _root_.FunctorialResolution.Blowup.schemeImageIdeal σ I = (I.subschemeι ≫ σ).ker :=
   rfl
 
 def SequenceOfBlowups.Isomorphic {X : Scheme.{u}} (B B' : SequenceOfBlowups X) : Prop :=
@@ -90,7 +89,9 @@ def IsPushforwardBlowupSeq
         ∧ (σ 0 (Nat.zero_le _) ≫ B.isoZero.hom = BS.isoZero.hom ≫ j)
         ∧ (∀ i : ℕ, ∀ hi : i < BS.length,
           σ (i + 1) hi ≫ B.transitionMapSucc i = BS.transitionMapSucc i ≫ σ i hi.le)
-        ∧ (∀ i : ℕ, ∀ hi : i < BS.length, B.center i = imageIdealSheaf (σ i hi.le) (BS.center i))
+        ∧ (∀ i : ℕ, ∀ hi : i < BS.length,
+          B.center i
+            = _root_.FunctorialResolution.Blowup.schemeImageIdeal (σ i hi.le) (BS.center i))
         ∧ (∀ i : ℕ, ∀ hi : i < BS.length,
           (σ (i + 1) hi).ker
             = Blowup.strictTransform (B.transitionMapSucc i) (B.center i) (σ i hi.le).ker)

@@ -294,8 +294,7 @@ theorem shift_vw_alg (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K)
       = FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ (algebraMap (𝓞 K) K x)) :=
   rfl
 
-theorem shift_coe_ne_zero {x : 𝓞 K} (hx : x ≠ 0) : (x : K) ≠ 0 := by
-  first | simpa using hx | exact_mod_cast hx
+theorem shift_coe_ne_zero {x : 𝓞 K} (hx : x ≠ 0) : (x : K) ≠ 0 := by first | simpa using hx
 
 theorem shift_decomp (w : HeightOneSpectrum (𝓞 K))
     : ∃ ϖ : 𝓞 K,
@@ -586,7 +585,7 @@ theorem shift_smulLat_lattice
     simp [smulLat]
   rw [hset, ← Submodule.map_span, hN.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
   intro v
-  exact ⟨a⁻¹ • v, by simp [smul_smul, mul_inv_cancel₀ ha, inv_mul_cancel₀ ha]⟩
+  exact ⟨a⁻¹ • v, by simp [smul_smul, inv_mul_cancel₀ ha]⟩
 
 theorem shift_idealSmul_lattice
     (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)

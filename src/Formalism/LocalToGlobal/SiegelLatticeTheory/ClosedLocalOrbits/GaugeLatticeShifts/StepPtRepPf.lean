@@ -57,10 +57,6 @@ namespace Formalism.L2.SG.RealObj.InfCut
 
 open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting
 
-def StepPtRepDiag : Prop :=
-  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (sc : ℝ),
-    0 < sc → ∀ (i0 : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k), PtRepExists X u u' sc i0 i0
-
 namespace PtRepPf
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -71,7 +67,7 @@ theorem hJ_crd (v : InfinitePlace X.B.I.F) (x y : (VS D).V)
     : hJ (X.B.I.ε v) (rv X.B.I v (X.crd x)) (rv X.B.I v (X.crd y))
       = X.B.I.φ v (X.ιE.symm ((VS D).hT x y)) := by
   rw [← Formalism.L2.SG.PoincareInHH.Cut.hform_crd (X := X) x y]
-  first | rw [RingEquiv.symm_apply_apply] | simp only [RingEquiv.symm_apply_apply] | simp
+  first | rw [RingEquiv.symm_apply_apply]
   exact PI.ScPiFrameW.hJ_rv X.B.I v (X.crd x) (X.crd y)
 
 def frU (u : D.what₂.Word) (v : InfinitePlace X.B.I.F) : Fr (X.B.I.ε v) D.R.rS D.R.k where
@@ -119,7 +115,7 @@ theorem famSc_one {n r : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) 
 end PtRepPf
 
 open PtRepPf in
-theorem real_point_representative_diagonal : StepPtRepDiag := by
+theorem real_point_representative_diagonal : _root_.Formalism.L2.SG.RealObj.InfCut.StepPtRep := by
   intro D X u u' sc hsc i0 w hw
   have hloc := fun v =>
     locMain (frU X u v) (frU X u' v) rfl (i0 v) (ZhatO (ptC X v w)) (hw v) sc hsc
@@ -173,7 +169,7 @@ theorem real_point_representative_diagonal : StepPtRepDiag := by
         · simp [ha, Ne.symm ha]
       · by_cases hb : b = i0 v
         · subst hb; simp [hab]
-        · simp [hab, hb, Ne.symm hb]
+        · simp [hab, Ne.symm hb]
     rw [hm1, hm2]
     exact hD v
 

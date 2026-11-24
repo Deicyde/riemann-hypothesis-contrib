@@ -317,8 +317,7 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts
       HenselianRing.is_henselian (I := maximalIdeal K.O) f hfm 0
         (by simpa [hf] using Ideal.mul_mem_right _ _ hN)
         (by
-          have hd : (derivative f).eval 0 = (t + σ t) * i2 := by
-            rw [hf]; simp; first | done | rfl | ring
+          have hd : (derivative f).eval 0 = (t + σ t) * i2 := by rw [hf]; simp
           rw [hd]
           exact (ha1.mul hi2u).map _)
     rw [sub_zero] at hX0

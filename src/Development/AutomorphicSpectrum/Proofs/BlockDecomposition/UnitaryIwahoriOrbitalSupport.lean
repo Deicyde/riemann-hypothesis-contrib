@@ -52,15 +52,6 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.DiagCoset
 
-theorem v_eq_of_ne
-    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {x : L} (hx : x ≠ 0)
-    : Valued.v x
-      = ((Multiplicative.ofAdd (- ordL x) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
-  have h0 : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
-  unfold ordL
-  rw [dite_eq_right h0]
-  simp
-
 theorem diagT_mem_iwGL
     {E : Type} [Field E] [NumberField E] [IsCMField E]
     (w : Pl E) (n : ℕ)
@@ -115,7 +106,7 @@ theorem fU_diag
   have hvϖ
       : Valued.v (ϖ : w.adicCompletion E)
         = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
-    rw [v_eq_of_ne ϖ.ne_zero, hϖ.1]
+    rw [_root_.Formalism.UG.P.fSatake_v_eq ϖ.ne_zero, hϖ.1]
   have hvpow
       : ∀ d : ℤ,
         Valued.v (((ϖ ^ d : (w.adicCompletion E)ˣ)) : w.adicCompletion E)
@@ -130,7 +121,7 @@ theorem fU_diag
           = (u i : w.adicCompletion E)
             * (((ϖ ^ wexp n l i : (w.adicCompletion E)ˣ)) : w.adicCompletion E)⁻¹ := by
       simp [hτdef]
-    rw [e, map_mul, map_inv₀, hvpow, v_eq_of_ne (u i).ne_zero, hu i]
+    rw [e, map_mul, map_inv₀, hvpow, _root_.Formalism.UG.P.fSatake_v_eq (u i).ne_zero, hu i]
     exact mul_inv_cancel₀ WithZero.coe_ne_zero
   have hfac
       : GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) u

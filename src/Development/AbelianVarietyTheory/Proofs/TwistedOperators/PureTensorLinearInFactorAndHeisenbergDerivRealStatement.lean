@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.pureTensor_linear_in_factor_and_heisenbergDeriv_re
               → x' (.inr τ) = Formalism.IndefR.Datum.dRho (heisO ψ S T) θ τ z (x (.inr τ))
               → IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x'
                 (Formalism.IndefR.Datum.dRho (heisO ψ S T) θ τ z f) := by
-  first
-  | exact @GlobalTheory.PureLinear.isPure_linear_and_dRho
-  | exact GlobalTheory.PureLinear.isPure_linear_and_dRho
-  | (intros; apply GlobalTheory.PureLinear.isPure_linear_and_dRho <;> assumption)
+  first | exact @GlobalTheory.PureLinear.isPure_linear_and_dRho

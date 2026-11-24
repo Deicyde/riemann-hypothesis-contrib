@@ -435,7 +435,6 @@ private theorem pf_GRLip_lemma_7
   refine Finset.sum_congr rfl (fun j _ => ?_)
   exact pf_GRLip_lemma_5 _ _ z
 
-
 theorem pf_GRLip : GRLip := by
   intro hB hR hT
   unfold Basic at hB

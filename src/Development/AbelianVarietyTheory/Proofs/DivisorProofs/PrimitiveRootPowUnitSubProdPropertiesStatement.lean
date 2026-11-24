@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.primitiveRoot_pow_unit_sub_prod_properties
     : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A],
       (∀ ζ : Prim q A, ζ.1 ^ q = 1)
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.primitiveRoot_pow_unit_sub_prod_properties
         ∧ (∀ (ζ ξ : Prim q A),
           ∏ a ∈ (Finset.range q).filter (fun a => Nat.Coprime a q), (ξ.1 - ζ.1 ^ a) = 0)
         ∧ ∀ (r : ℕ), r ∣ q → ∀ ζ : Prim q A, ∃ ξ : Prim r A, ξ.1 = ζ.1 ^ (q / r) := by
-  first
-  | (exact @GlobalTheory.EtC.PrimBasic.prim_basic)
-  | (exact GlobalTheory.EtC.PrimBasic.prim_basic)
-  | (intros; apply GlobalTheory.EtC.PrimBasic.prim_basic <;> assumption)
+  first | (exact @GlobalTheory.EtC.PrimBasic.prim_basic)

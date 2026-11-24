@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.NTheta Formalism.IndefR.Mult
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.supported_subgroup_split_commute_primeIdempotents
     : ∀ {D : D7} (V : HSp D),
       (∀ f : Formalism.L2.Theta.AE D,
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.supported_subgroup_split_commute_primeIdempotents
                   → f * f' = 0 ∨ (f' = f ∧ (P' = P ∨ Formalism.IndefR.Lev.IsConjPl P P')))
         ∧ ∀ (P : HeightOneSpectrum (𝓞 D.host.E)) P' e,
           IsIdemAt e P → Formalism.IndefR.Lev.IsConjPl P P' → IsIdemAt (cA D e) P' := by
-  first
-  | exact @GlobalTheory.IdemSupport.supported_group_and_prime_idempotents
-  | exact GlobalTheory.IdemSupport.supported_group_and_prime_idempotents
-  | (intros; apply GlobalTheory.IdemSupport.supported_group_and_prime_idempotents <;> assumption)
+  first | exact @GlobalTheory.IdemSupport.supported_group_and_prime_idempotents

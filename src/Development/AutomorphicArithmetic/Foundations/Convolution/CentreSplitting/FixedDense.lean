@@ -41,24 +41,28 @@ import Mathlib.Topology.Sheaves.Init
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-theorem UpperTheory.ConvolutionTheory.Dp.fixedDense :
-    UpperTheory.ConvolutionTheory.Dp.FixedDense := by
+theorem UpperTheory.ConvolutionTheory.Dp.fixedDense
+    : UpperTheory.ConvolutionTheory.Dp.FixedDense := by
   intro G H X _ _ _ _ _ _ _ ρ τ J U hU hρ hτ hJ hd v hv
   refine Metric.mem_closure_iff.2 fun ε hε => ?_
   obtain ⟨x, hx⟩ := hd.exists_dist_lt v hε
   have hfin : ((fun g => τ g x) '' (U : Set G)).Finite := by
-    obtain ⟨t, -, ht⟩ := hU.elim_nhds_subcover (fun g => {h | τ h x = τ g x}) fun g _ => by
-      have h1 : IsOpen ((fun h => g⁻¹ * h) ⁻¹' {g | τ g x = x}) := (hτ x).preimage (by fun_prop)
-      refine Filter.mem_of_superset (h1.mem_nhds (by simp)) fun h hh => ?_
-      have h2 : τ (g⁻¹ * h) x = x := hh
-      show τ h x = τ g x
-      conv_rhs => rw [← h2]
-      rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left]
+    obtain ⟨t, -, ht⟩ :=
+      hU.elim_nhds_subcover
+        (fun g => {h | τ h x = τ g x})
+        fun g _ => by
+          have h1 : IsOpen ((fun h => g⁻¹ * h) ⁻¹' {g | τ g x = x}) := (hτ x).preimage (by fun_prop)
+          refine Filter.mem_of_superset (h1.mem_nhds (by simp)) fun h hh => ?_
+          have h2 : τ (g⁻¹ * h) x = x := hh
+          show τ h x = τ g x
+          conv_rhs => rw [← h2]
+          rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left]
     refine (t.finite_toSet.image fun g => τ g x).subset ?_
     rintro _ ⟨g, hg, rfl⟩
     obtain ⟨i, hi, h⟩ := Set.mem_iUnion₂.1 (ht hg)
@@ -76,13 +80,15 @@ theorem UpperTheory.ConvolutionTheory.Dp.fixedDense :
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [map_smul, map_sum]
     congr 1
-    refine Finset.sum_nbij' (τ u) (τ u⁻¹) (hst u hu) (hst _ (U.inv_mem hu)) (fun y _ => ?_) (fun y _ => ?_) fun _ _ => rfl
+    refine Finset.sum_nbij' (τ u) (τ u⁻¹) (hst u hu) (hst _ (U.inv_mem hu))
+      (fun y _ => ?_)
+      (fun y _ => ?_)
+      fun _ _ => rfl
     · rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one]; rfl
     · rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one]; rfl
   · have e : v - J ((S.card : ℂ)⁻¹ • ∑ y ∈ S, y) = (S.card : ℂ)⁻¹ • ∑ y ∈ S, (v - J y) := by
-
-      rw [map_smul, map_sum, Finset.sum_sub_distrib, smul_sub, Finset.sum_const, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
-      inv_mul_cancel₀ hc', one_smul]
+      rw [map_smul, map_sum, Finset.sum_sub_distrib, smul_sub, Finset.sum_const,
+        ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hc', one_smul]
     have h1 : ∀ y ∈ S, ‖v - J y‖ = dist v (J x) := fun y hy => by
       obtain ⟨g, hg, rfl⟩ := (hm y).1 hy
       rw [hJ, dist_eq_norm, ← hρ g (v - J x), map_sub, hv g hg]

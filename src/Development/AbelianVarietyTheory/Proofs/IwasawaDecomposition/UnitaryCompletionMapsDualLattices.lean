@@ -51,7 +51,9 @@ import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MemLocLatOver
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix GlobalTheory.LevelHecke
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix
+  GlobalTheory.LevelHecke
 open scoped TensorProduct
 
 noncomputable section
@@ -60,20 +62,22 @@ namespace GlobalTheory.DualCompletion
 
 open Formalism.L2.G.RelativeIndexFlags
 
-theorem hform_mulVec_left {A : Type} [CommRing A] {n : ℕ} (τ : A →+* A) (J B : Matrix (Fin n) (Fin n) A)
-    (t x : Fin n → A) : hform τ J (B *ᵥ t) x = ∑ a, τ (t a) * ((cT τ B * J) *ᵥ x) a := by
-
-  simp only [hform, cT, Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply,
-  map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+theorem hform_mulVec_left
+    {A : Type} [CommRing A] {n : ℕ} (τ : A →+* A) (J B : Matrix (Fin n) (Fin n) A) (t x : Fin n → A)
+    : hform τ J (B *ᵥ t) x = ∑ a, τ (t a) * ((cT τ B * J) *ᵥ x) a := by
+  simp only [hform, cT, Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.transpose_apply,
+    Matrix.map_apply, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun i _ => by ring
 
-theorem hform_col {A : Type} [CommRing A] {n : ℕ} (τ : A →+* A) (J B : Matrix (Fin n) (Fin n) A)
-    (a : Fin n) (c : A) (x : Fin n → A) :
-    hform τ J (B *ᵥ Pi.single a c) x = τ c * ((cT τ B * J) *ᵥ x) a := by
+theorem hform_col
+    {A : Type} [CommRing A]
+    {n : ℕ}
+    (τ : A →+* A) (J B : Matrix (Fin n) (Fin n) A) (a : Fin n) (c : A) (x : Fin n → A)
+    : hform τ J (B *ᵥ Pi.single a c) x = τ c * ((cT τ B * J) *ᵥ x) a := by
   rw [hform_mulVec_left, Finset.sum_eq_single a]
   · rw [Pi.single_eq_same]
   · intro b _ hb; rw [Pi.single_eq_of_ne hb, map_zero, zero_mul]
@@ -81,14 +85,16 @@ theorem hform_col {A : Type} [CommRing A] {n : ℕ} (τ : A →+* A) (J B : Matr
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem mem_dualL (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E)
-    (Λ : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E) :
-    y ∈ dualL σ J Λ ↔ y ∈ dualSet σ J Λ := by
+theorem mem_dualL
+    (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E)
+    : y ∈ dualL σ J Λ ↔ y ∈ dualSet σ J Λ := by
   apply _root_.GlobalTheory.OverLat.mem_span_dualSet <;> assumption
 
-theorem exists_common_den {p : ℕ} (hp : p.Prime) (M : Submodule (𝓞 E) (Fin n → E)) (hM : M.FG) (B : GL (Fin n) E)
-    (hB : IsLocBasis p (M : Set (Fin n → E)) B) :
-    ∃ s : ℕ, ¬ p ∣ s ∧ ∀ m ∈ M, ∀ a, (s : E) * ((B⁻¹).1 *ᵥ m) a ∈ (algebraMap (𝓞 E) E).range := by
+theorem exists_common_den
+    {p : ℕ} (hp : p.Prime)
+    (M : Submodule (𝓞 E) (Fin n → E)) (hM : M.FG)
+    (B : GL (Fin n) E) (hB : IsLocBasis p (M : Set (Fin n → E)) B)
+    : ∃ s : ℕ, ¬ p ∣ s ∧ ∀ m ∈ M, ∀ a, (s : E) * ((B⁻¹).1 *ᵥ m) a ∈ (algebraMap (𝓞 E) E).range := by
   classical
   have h1 : ¬ p ∣ 1 := fun h => hp.ne_one (Nat.dvd_one.1 h)
   obtain ⟨S, rfl⟩ := hM
@@ -100,19 +106,25 @@ theorem exists_common_den {p : ℕ} (hp : p.Prime) (M : Submodule (𝓞 E) (Fin 
   · induction hm using Submodule.span_induction with
     | mem y hy =>
       intro a
-      rw [← Finset.mul_prod_erase Finset.univ s (Finset.mem_univ ⟨y, hy⟩), mul_comm (s _), Nat.cast_mul, mul_assoc]
+      rw [← Finset.mul_prod_erase Finset.univ s (Finset.mem_univ ⟨y, hy⟩), mul_comm (s _),
+        Nat.cast_mul, mul_assoc]
       exact mul_mem (natCast_mem _ _) (H ⟨y, hy⟩ a)
-    | zero => intro a; simp
-    | add y z _ _ hy hz => intro a; rw [Matrix.mulVec_add, Pi.add_apply, mul_add]; exact add_mem (hy a) (hz a)
+    | zero =>
+      intro a; simp
+    | add y z _ _ hy hz =>
+      intro a; rw [Matrix.mulVec_add, Pi.add_apply, mul_add]; exact add_mem (hy a) (hz a)
     | smul c y _ hy =>
       intro a
       rw [Matrix.mulVec_smul, Pi.smul_apply, Algebra.smul_def, mul_left_comm]
       exact mul_mem ⟨c, rfl⟩ (hy a)
 
-theorem isLocBasis_dual (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) {p : ℕ} (hp : p.Prime)
-    (M : Submodule (𝓞 E) (Fin n → E)) (hM : M.FG) (B : GL (Fin n) E)
-    (hB : IsLocBasis p (M : Set (Fin n → E)) B) (C : GL (Fin n) E) (hC : C.1 = cT (σ : E →+* E) B.1 * J) :
-    IsLocBasis p (dualL (σ : E →+* E) J M : Set (Fin n → E)) C⁻¹ := by
+theorem isLocBasis_dual
+    (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E)
+    {p : ℕ} (hp : p.Prime)
+    (M : Submodule (𝓞 E) (Fin n → E)) (hM : M.FG)
+    (B : GL (Fin n) E) (hB : IsLocBasis p (M : Set (Fin n → E)) B)
+    (C : GL (Fin n) E) (hC : C.1 = cT (σ : E →+* E) B.1 * J)
+    : IsLocBasis p (dualL (σ : E →+* E) J M : Set (Fin n → E)) C⁻¹ := by
   classical
   have h1 : ¬ p ∣ 1 := fun h => hp.ne_one (Nat.dvd_one.1 h)
   intro x
@@ -128,10 +140,11 @@ theorem isLocBasis_dual (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) {p :
         exact ht a ha
       · exact hs hd
     · have h := hx _ (H a)
-      rw [Formalism.UG.P.csDual_hform_smul_left, hform_col, map_one, one_mul, map_natCast, Matrix.mulVec_smul,
-        Pi.smul_apply, smul_eq_mul] at h
-      rw [← Finset.mul_prod_erase Finset.univ t (Finset.mem_univ a), mul_comm (t a), Nat.cast_mul, Nat.cast_mul,
-        mul_assoc, mul_assoc]
+      rw [Formalism.UG.P.csDual_hform_smul_left, hform_col, map_one, one_mul, map_natCast,
+          Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul]
+        at h
+      rw [← Finset.mul_prod_erase Finset.univ t (Finset.mem_univ a), mul_comm (t a), Nat.cast_mul,
+        Nat.cast_mul, mul_assoc, mul_assoc]
       exact mul_mem (natCast_mem _ _) h
   · rintro ⟨s, hs, hx⟩
     obtain ⟨t, ht, H⟩ := exists_common_den hp M hM B hB
@@ -149,12 +162,16 @@ theorem isLocBasis_dual (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) {p :
     show σ _ * _ = _
     ring
 
-theorem mem_latS_dualL (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) (hJ : IsUnit J.det)
-    (v : HeightOneSpectrum (𝓞 F)) (M : Submodule (𝓞 E) (Fin n → E)) (hM : Submodule.IsFullLattice E M)
-    (w : Fin n → E ⊗[F] v.adicCompletion F) :
-    w ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J M) ↔
-      ∀ u ∈ latS (F := F) (v.adicCompletion F) (intV E v) M,
-        hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) u w ∈ intV E v := by
+theorem mem_latS_dualL
+    (σ : E →ₐ[F] E)
+    (J : Matrix (Fin n) (Fin n) E) (hJ : IsUnit J.det)
+    (v : HeightOneSpectrum (𝓞 F))
+    (M : Submodule (𝓞 E) (Fin n → E)) (hM : Submodule.IsFullLattice E M)
+    (w : Fin n → E ⊗[F] v.adicCompletion F)
+    : w ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J M)
+      ↔ ∀ u ∈ latS (F := F) (v.adicCompletion F) (intV E v) M,
+        hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) u w
+          ∈ intV E v := by
   classical
   haveI := v.isMaximal
   obtain ⟨p, -, -, hv, hp, -⟩ := Ideal.exists_prime_and_absNorm_eq_pow v.asIdeal
@@ -168,10 +185,12 @@ theorem mem_latS_dualL (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) (hJ :
   let C : GL (Fin n) E := Matrix.GeneralLinearGroup.mk'' _ hu
   have hC : C.1 = cT (σ : E →+* E) B.1 * J := rfl
   have hD := isLocBasis_dual σ J hp M hM.fg B hB C hC
-  rw [latS_of_locBasis v hp hv _ _ hD, latS_of_locBasis v hp hv _ _ hB, mem_latS_latB, map_inv, inv_inv]
-  have hC' : (bc (inclE (F := F) (v.adicCompletion F)) C).1 =
-      cT (sigR σ (v.adicCompletion F)) (bc (inclE (F := F) (v.adicCompletion F)) B).1 *
-        J.map (inclE (F := F) (v.adicCompletion F)) := by
+  rw [latS_of_locBasis v hp hv _ _ hD, latS_of_locBasis v hp hv _ _ hB, mem_latS_latB, map_inv,
+    inv_inv]
+  have hC'
+      : (bc (inclE (F := F) (v.adicCompletion F)) C).1
+        = cT (sigR σ (v.adicCompletion F)) (bc (inclE (F := F) (v.adicCompletion F)) B).1
+          * J.map (inclE (F := F) (v.adicCompletion F)) := by
     show C.1.map (inclE (F := F) (v.adicCompletion F)) =
       cT (sigR σ (v.adicCompletion F)) (B.1.map (inclE (F := F) (v.adicCompletion F))) * _
     rw [hC, Matrix.map_mul]
@@ -186,32 +205,48 @@ theorem mem_latS_dualL (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) (hJ :
     rw [e, hform_mulVec_left]
     exact sum_mem fun a _ => mul_mem (sigR_mem v σ (hu a)) (h a)
   · intro h a
-    have h1 := h (B'.1 *ᵥ Pi.single a 1) (by
-      rw [mem_latS_latB]
-      intro b
-      rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
-      by_cases hb : b = a
-      · subst hb; rw [Pi.single_eq_same]; exact one_mem _
-      · rw [Pi.single_eq_of_ne hb]; exact zero_mem _)
+    have h1 :=
+      h (B'.1 *ᵥ Pi.single a 1) (by
+        rw [mem_latS_latB]
+        intro b
+        rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
+        by_cases hb : b = a
+        · subst hb; rw [Pi.single_eq_same]; exact one_mem _
+        · rw [Pi.single_eq_of_ne hb]; exact zero_mem _)
     rwa [hform_col, map_one, one_mul] at h1
 
-theorem dual_move (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ)
-    (J : Matrix (Fin n) (Fin n) E) (v : HeightOneSpectrum (𝓞 F)) (L Lb : Submodule (𝓞 E) (Fin n → E))
-    (y : GL (Fin n) (E ⊗[F] v.adicCompletion F)) (hJ : IsUnit J.det) (hL : Submodule.IsFullLattice E L)
-    (hLb : Submodule.IsFullLattice E Lb) (hy : y ∈ UPts σ J (v.adicCompletion F))
-    (hyl : ∀ x, x ∈ latS (F := F) (v.adicCompletion F) (intV E v) L ↔
-      (y⁻¹).1 *ᵥ x ∈ latS (F := F) (v.adicCompletion F) (intV E v) Lb) :
-    ∀ x, x ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J L) ↔
-      (y⁻¹).1 *ᵥ x ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J Lb) := by
-  have hyU : cT (sigR σ (v.adicCompletion F)) y.1 * J.map (inclE (F := F) (v.adicCompletion F)) * y.1 =
-      J.map (inclE (F := F) (v.adicCompletion F)) := hy
-  have key : ∀ z x : Fin n → E ⊗[F] v.adicCompletion F,
-      hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) z ((y⁻¹).1 *ᵥ x) =
-      hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) (y.1 *ᵥ z) x := by
+theorem dual_move
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (n : ℕ) (J : Matrix (Fin n) (Fin n) E)
+    (v : HeightOneSpectrum (𝓞 F))
+    (L Lb : Submodule (𝓞 E) (Fin n → E)) (y : GL (Fin n) (E ⊗[F] v.adicCompletion F))
+    (hJ : IsUnit J.det) (hL : Submodule.IsFullLattice E L) (hLb : Submodule.IsFullLattice E Lb)
+    (hy : y ∈ UPts σ J (v.adicCompletion F))
+    (hyl : ∀ x,
+      x ∈ latS (F := F) (v.adicCompletion F) (intV E v) L
+        ↔ (y⁻¹).1 *ᵥ x ∈ latS (F := F) (v.adicCompletion F) (intV E v) Lb)
+    : ∀ x,
+      x ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J L)
+        ↔ (y⁻¹).1 *ᵥ x
+          ∈ latS (F := F) (v.adicCompletion F) (intV E v) (dualL (σ : E →+* E) J Lb) := by
+  have hyU
+      : cT (sigR σ (v.adicCompletion F)) y.1 * J.map (inclE (F := F) (v.adicCompletion F)) * y.1
+        = J.map (inclE (F := F) (v.adicCompletion F)) :=
+    hy
+  have key
+      : ∀ z x : Fin n → E ⊗[F] v.adicCompletion F,
+        hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) z
+            ((y⁻¹).1 *ᵥ x)
+          = hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
+            (y.1 *ᵥ z) x := by
     intro z x
-    have e := Formalism.UG.P.hform_mulVec (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
-      y.1 z ((y⁻¹).1 *ᵥ x)
-    rw [hyU, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec] at e
+    have e :=
+      Formalism.UG.P.hform_mulVec (sigR σ (v.adicCompletion F))
+        (J.map (inclE (F := F) (v.adicCompletion F))) y.1 z ((y⁻¹).1 *ᵥ x)
+    rw [hyU, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mulVec]
+      at e
     exact e.symm
   intro x
   rw [mem_latS_dualL σ J hJ v L hL, mem_latS_dualL σ J hJ v Lb hLb]
@@ -221,7 +256,9 @@ theorem dual_move (F E : Type) [Field F] [NumberField F] [Field E] [NumberField 
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
     exact hz
   · have h1 := H _ ((hyl z).1 hz)
-    rw [key, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec] at h1
+    rw [key, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mulVec]
+      at h1
     exact h1
 
 end GlobalTheory.DualCompletion

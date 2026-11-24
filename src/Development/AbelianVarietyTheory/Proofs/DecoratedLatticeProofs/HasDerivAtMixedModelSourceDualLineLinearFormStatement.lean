@@ -64,6 +64,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.hasDerivAt_mixedModelSource_dualLine_linearForm
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -83,7 +84,4 @@ theorem _root_.GlobalTheory.T.hasDerivAt_mixedModelSource_dualLine_linearForm
                           (fun p => deriv (fun t : ℝ => heisO ψ S T (d.extY T (L t)) f p) 0)
                           x w)
                         0 := by
-  first
-  | exact @GlobalTheory.Unf.hasDerivAt_mixS_extY
-  | exact GlobalTheory.Unf.hasDerivAt_mixS_extY
-  | (intros; apply GlobalTheory.Unf.hasDerivAt_mixS_extY <;> assumption)
+  first | exact @GlobalTheory.Unf.hasDerivAt_mixS_extY

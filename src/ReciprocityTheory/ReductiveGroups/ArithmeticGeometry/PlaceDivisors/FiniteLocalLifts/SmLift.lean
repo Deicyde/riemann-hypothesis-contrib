@@ -63,12 +63,7 @@ theorem exists_lift_nil
   obtain ⟨n, f, hf, hfg⟩
       : ∃ (n : ℕ) (f : MvPolynomial (Fin n) R →ₐ[R] A),
         Function.Surjective f ∧ (RingHom.ker f.toRingHom).FG := by
-    first
-    | exact Algebra.FinitePresentation.out
-    | (
-        obtain ⟨n, f, hf, hfg⟩ := Algebra.FinitePresentation.out (R := R) (A := A)
-        exact ⟨n, f, hf, hfg⟩
-      )
+    first | exact Algebra.FinitePresentation.out
   choose w hw using fun i : Fin n => hsurj (φ (f (MvPolynomial.X i)))
   let Φ : MvPolynomial (Fin n) R →ₐ[R] W := MvPolynomial.aeval w
   have hΦ : ρ.comp Φ = φ.comp f := by
@@ -113,7 +108,7 @@ theorem exists_lift_nil
         : (Ideal.quotientKerAlgEquivOfSurjective hf).symm (f p)
           = Ideal.Quotient.mk (RingHom.ker f) p := by
       rw [AlgEquiv.symm_apply_eq]
-      first | rfl | simp
+      first | rfl
     show (Ideal.Quotient.liftₐ (RingHom.ker f) ((Ideal.Quotient.mkₐ R J).comp Φ) hcond)
       ((Ideal.quotientKerAlgEquivOfSurjective hf).symm (f p)) = _
     rw [e0]

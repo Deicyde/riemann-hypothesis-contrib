@@ -3,13 +3,18 @@ module
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.Mfac
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LagrInt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReindexDblIncM
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousTransportWeilDatumCmExtensionStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAdmittedEqDiagonalLagrangianThetaIntegralStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTransportF
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousTransportWeilDatumCmExtension
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAdmittedEqDiagonalLagrangianThetaIntegral
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHalfAbstract
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRationalDarbouxHermitianTensorAdeles
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaTransformEqOrientedThetaFunctionCMStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilTransportAdelicSchwartzCmExtension
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardTraceAddCharIsStandardCharOfAdmissibleCM
+public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZero
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwoMulInvOf
+import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+import Formalism.LocalToGlobal.IndefiniteReal.DatumF
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaTransformEqOrientedThetaFunctionCM
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilTransportAdelicSchwartzCmExtension
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -47,7 +52,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZero
 
 @[expose] public section
 
@@ -143,8 +147,8 @@ theorem exists_coord
     obtain ⟨y, z, h⟩ := hrat x
     exact ⟨y ∘ τ.symm, z ∘ τ.symm, by rw [GlobalTheory.TransportF.numCoordF_apply]; erw [h]; rfl⟩
   obtain ⟨Φ, hΦ, h⟩ :=
-    GlobalTheory.T.exists_thetaTransform_eq_orientedThetaFunction_CM F E σ B hB nS nT JS JT hS hT ξ₀
-      hξ hσ (GlobalTheory.StdCharWeilDatum.isStdCharF_of_isGood F E σ B hB) _
+    _root_.GlobalTheory.ThetaOntoF.exists_thV_eqF F E σ B hB nS nT JS JT hS hT ξ₀ hξ hσ
+      (GlobalTheory.StdCharWeilDatum.isStdCharF_of_isGood F E σ B hB) _
       (GlobalTheory.TransportF.numCoordF (σ := σ) co τ) he hr f hf
   refine ⟨_, GlobalTheory.TransportF.comp_mem_schA τ.symm hΦ, ?_⟩
   rw [GlobalTheory.TransportF.thetaTr_eqF (σ := σ) co τ, ← h]
@@ -187,11 +191,11 @@ theorem cont
     GlobalTheory.TransportF.exists_isTransportF F E σ B hB _ _ JS _ hS hT' ξ₀ hξ hσ χS 1 hω.hecS
       hω.hecT hω.resS hω.resT ωd hω _ _ _ rfl eB _ co hrat
   have hc :=
-    GlobalTheory.T.continuous_transport_weil_datum_cm_extension F E σ B hB _ _ JS _ hS hT' ξ₀ hξ hσ
-      χS 1 hω.hecS hω.hecT hω.resS hω.resT ωd hω _ _ _ rfl eB _ co hrat om hom
+    _root_.GlobalTheory.WeilContF.continuous_transportF F E σ B hB _ _ JS _ hS hT' ξ₀ hξ hσ χS 1
+      hω.hecS hω.hecT hω.resS hω.resT ωd hω _ _ _ rfl eB _ co hrat om hom
   obtain ⟨l, hl, hl'⟩ :=
-    GlobalTheory.T.exists_admitted_eq_diagonalLagrangian_thetaIntegral F E σ B hB nS nT JT _ _ _ co
-      hrat ν 𝓕 hν h𝓕
+    _root_.GlobalTheory.LagrThetaAdm.exists_admitted_eq_diagonalLagrangian_thetaIntegral_alt F E σ B
+      hB nS nT JT _ _ _ co hrat ν 𝓕 hν h𝓕
   let a
       : GAF σ (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT)
         → UG (cA σ) (incM F (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT)ᵀ) := fun h =>

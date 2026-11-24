@@ -70,8 +70,4 @@ theorem _root_.GlobalTheory.T.schwartzBruhatHalf_span_modulated_translates
                 IsSBHalf a (latO S T ΛS ΛT fun _ => True) Φ
                   → Φ ∈ Submodule.span ℂ
                     {Ψ : WO S T → ℂ | ∃ x y : WO S T, IsHalf a x ∧ IsHalf (cA D a) y ∧ Ψ = fun t => ψ (symplO S T t y) * halfInd a (latO S T ΛS ΛT fun _ => True) (t + x)} :=
-  by
-    first
-    | exact @GlobalTheory.PlaceTensor.halfWaves_span
-    | exact GlobalTheory.PlaceTensor.halfWaves_span
-    | (intros; apply GlobalTheory.PlaceTensor.halfWaves_span <;> assumption)
+  by first | exact @GlobalTheory.PlaceTensor.halfWaves_span

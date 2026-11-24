@@ -51,6 +51,7 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
+
 theorem _root_.GlobalTheory.T.exists_adelicUnitary_prod_localPoints_mul_latticeStabilizer
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E) (B : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E)
@@ -93,7 +94,4 @@ theorem _root_.GlobalTheory.T.exists_adelicUnitary_prod_localPoints_mul_latticeS
                         ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.latAtV G.V' G.W w
                       ↔ γ ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.latAtV G.V' G.W
                         w) := by
-  first
-  | exact @GlobalTheory.FinDecomp.exists_prod_local_mul_latStab
-  | exact GlobalTheory.FinDecomp.exists_prod_local_mul_latStab
-  | (intros; apply GlobalTheory.FinDecomp.exists_prod_local_mul_latStab <;> assumption)
+  first | exact @GlobalTheory.FinDecomp.exists_prod_local_mul_latStab

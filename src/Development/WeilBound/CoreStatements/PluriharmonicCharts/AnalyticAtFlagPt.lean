@@ -2,16 +2,17 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BasePartFlagPt
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsBaseChart
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseChartHolomorphicCompositionStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseVectorPropertiesStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockLUFactorizationStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsFlagPointInOrbitStatement
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagPointTriangularChangeOrbitStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseChartHolomorphicComposition
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseVectorProperties
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockLUFactorization
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsFlagPointInOrbit
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagPointTriangularChangeOrbit
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameLUMinorValue
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameMinorValueFormulaStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.TwoPointFibreChartFirst
 public import Development.WeilBound.CoreStatements.PluriharmonicCharts.ExistsHoloOnOfGerm
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameMinorValueFormula
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -103,7 +104,7 @@ theorem bvec_holo
         (∀ b ∈ BM.O l, RegAt M.x (mCoordIdeal (FC.bvec BM l b)) s)
           → A.HoloOn W fun x => valAt M.x s (FC.bvec BM l (pr x)) := by
   have key := fun k =>
-    GlobalTheory.T.base_chart_holomorphic_composition K ι Φ y Ψ N j M n BM l e
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.bvec_val_analytic K ι Φ y Ψ N j M n BM l e
       ((A.chart k).target ∩ (A.chart k).symm ⁻¹' W) (pr ∘ (A.chart k).symm)
       ((A.chart k).isOpen_inter_preimage_symm hW)
       (hp.1.comp_continuousOn ((A.chart k).continuousOn_symm.mono Set.inter_subset_left))
@@ -163,10 +164,10 @@ theorem exists_holo_flags
                 (FC.flagPt M (BM.F l) (FC.bvec BM l (pr x)) fun τ => h₀ τ * L τ x) := by
   have hj := M.j_le
   have hF := BM.isFrame l
-  have hg := GlobalTheory.T.base_vector_properties K ι Φ y Ψ N j M n BM l
+  have hg := _root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.bvec_good K ι Φ y Ψ N j M n BM l
   have hex := fun x (hx : x ∈ W) =>
-    GlobalTheory.T.exists_flag_point_in_orbit K ι Φ y Ψ N j M n BM l (pr x) (hl x hx) (z x)
-      (hm x hx) (hb x hx)
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.exists_flagPt_of_orbit K ι Φ y Ψ N j M n BM l
+      (pr x) (hl x hx) (z x) (hm x hx) (hb x hx)
   obtain ⟨h₀, hh₀, ho₀⟩ := hex x₀ hx₀
   let tw : Fin N → K → Ψ → Finset (Fin N) → X → ℂ := fun i k τ J x =>
     twMinor M (BM.F l) (FC.bvec BM l (pr x)) i k (h₀ τ)⁻¹ (z x) J
@@ -195,8 +196,8 @@ theorem exists_holo_flags
     exact ⟨
       α,
       hα,
-      GlobalTheory.T.frame_minor_value_formula K ι Φ y Ψ N j M (BM.F l) _ t.1.1 t.1.2 _ _ _ α _ hF
-        (hg _ (hl x hx)).1 (hg _ (hl x hx)).2.1 t.2 (hb' _) hzk
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.WMan.TwRead.main K ι Φ y Ψ N j M (BM.F l) _ t.1.1
+        t.1.2 _ _ _ α _ hF (hg _ (hl x hx)).1 (hg _ (hl x hx)).2.1 t.2 (hb' _) hzk
     ⟩
   refine ⟨
     {x | x ∈ W ∧ ∀ t, den t x ≠ 0},
@@ -232,7 +233,7 @@ theorem exists_holo_flags
           IsBlockDiag j L ∧ IsLowerUni L ∧ IsBlockDiag j U ∧ U.BlockTriangular id ∧ (∀ c, U c c ≠ 0)
             ∧ (h₀ τ)⁻¹ * h' τ = L * U := by
       intro τ
-      refine GlobalTheory.T.block_LU_factorization N j _ hj
+      refine _root_.GlobalTheory.CompanionTheory.Ar.PB.WMan.LU.exists_lower_upper N j _ hj
         (((hh₀ τ).1.inv (hh₀ τ).2.isUnit).mul (hh' τ).1) ?_ fun i hi => ?_
       · rw [Matrix.det_mul]
         exact mul_ne_zero (Matrix.isUnit_nonsing_inv_det _ (hh₀ τ).2.isUnit).ne_zero (hh' τ).2
@@ -262,7 +263,7 @@ theorem exists_holo_flags
         rw [Matrix.mul_assoc, ← hLU, Matrix.mul_nonsing_inv_cancel_left _ _ (hh₀ τ).2.isUnit]
     refine orbit_trans ho ?_
     rw [e2]
-    refine GlobalTheory.T.flag_point_triangular_change_orbit K ι Φ y Ψ N j M _ _
+    refine _root_.GlobalTheory.CompanionTheory.Ar.PB.WSq.FC.sameOrbit_flagPt_mul K ι Φ y Ψ N j M _ _
       (fun τ => h₀ τ * L τ)
       U
       fun τ => ⟨hUb τ, hUt τ, ?_⟩

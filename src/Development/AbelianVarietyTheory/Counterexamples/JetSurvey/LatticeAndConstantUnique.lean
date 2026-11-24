@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Formalism.LocalToGlobal.ProjectiveLattices.HostRank
 
 @[expose] public section
 
@@ -96,7 +97,7 @@ theorem le_of_span_le
 
 theorem AA_ne_zero (D : D7) : D.host.AA ≠ 0 := by
   intro h
-  have h1 := GlobalTheory.LatticeData.absNorm_ccK_mem D
+  have h1 := _root_.Formalism.L2.Pj.normK_mem_AA D
   rw [h, FractionalIdeal.mem_zero_iff] at h1
   exact D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 (by exact_mod_cast h1))
 
@@ -117,7 +118,7 @@ theorem holds_by_value
       NC := Ideal.absNorm D.host.ccK
       NA_pos :=
         Nat.pos_of_ne_zero fun e =>
-          GlobalTheory.LatticeData.halfDifferent_ne_bot D (Ideal.absNorm_eq_zero_iff.1 e)
+          _root_.Formalism.L2.Pj.b_ne_bot D (Ideal.absNorm_eq_zero_iff.1 e)
       NC_pos := Nat.pos_of_ne_zero fun e => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 e)
       NA_sub := fun x hx => ?_
       NC_sub := fun x hx => ?_
@@ -138,6 +139,6 @@ theorem holds_by_value
     | add v w _ _ hv hw => rw [smul_add]; exact add_mem hv hw
     | smul c v _ hv => rw [smul_comm]; exact Xx.L'.smul_mem c hv
   · rw [h3]
-    exact Submodule.subset_span ⟨_, GlobalTheory.LatticeData.absNorm_ccK_mem D, x, hx, rfl⟩
+    exact Submodule.subset_span ⟨_, _root_.Formalism.L2.Pj.normK_mem_AA D, x, hx, rfl⟩
 
 end GlobalTheory.ModelLatticeCheck

@@ -191,7 +191,7 @@ theorem UnipotentHorizontal.proof
   ext w i
   simp only [Pi.neg_apply, Pi.sub_apply]
   rw [hprod, hgW, mulVec_add, huY, mulVec_add, mulVec_smul, hs, (hδw w).1, hdW w, add_smul]
-  simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.neg_apply]
+  simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
   ring
 
 end

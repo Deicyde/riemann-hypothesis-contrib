@@ -39,18 +39,13 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import PositivityTheory.AutomorphicForms.PublishedInputs.CyclicBaseChange.PSSmo
 
 @[expose] public section
 
 open NumberField IsDedekindDomain Filter
 open GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual UpperTheory.V.Published
   UpperTheory.CBC
-
-private theorem not_both
-    (F : Type) [Field F] [NumberField F] (h : IsTotallyReal F) (h' : IsTotallyComplex F)
-    : False := by
-  obtain ⟨v⟩ : Nonempty (InfinitePlace F) := inferInstance
-  exact (InfinitePlace.not_isReal_iff_isComplex.2 (h'.isComplex v)) (h.isReal v)
 
 theorem UpperTheory.ConvolutionTheory.Sph.liftUnr : UpperTheory.ConvolutionTheory.Sph.LiftUnr := by
   intro K M _ _ _ _ _ _ _ _ hp a ha π hη
@@ -59,7 +54,7 @@ theorem UpperTheory.ConvolutionTheory.Sph.liftUnr : UpperTheory.ConvolutionTheor
   · exact (hη η hη' (Quotient.sound e)).elim
   rcases P with @⟨_, P⟩ | @⟨hR, P⟩
   swap
-  · exact (not_both M hR inferInstance).elim
+  · exact (_root_.UpperTheory.CBC.SmoothnessOfSatakeParameters.not_both M hR inferInstance).elim
   refine ⟨P, hW, fun w f B hu hf hB => ?_, fun τ => ?_, hS⟩
   · have hall
         : ∀ w' : HeightOneSpectrum (𝓞 M),

@@ -45,8 +45,6 @@ import Mathlib.Topology.Sheaves.Init
 
 open IsLocalRing
 
-
-
 namespace GlobalTheory
 
 noncomputable def tensorIntegralClosureInclusion

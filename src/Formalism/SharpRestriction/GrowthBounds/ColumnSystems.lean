@@ -421,8 +421,8 @@ theorem HI_iff {C0 CYb Cde Ck CD Cb : ℝ} {X : Loc}
         h26,
         h27
       ⟩,
-      fun s hs => ⟨(h9 s hs).1, by linarith [(h9 s hs).2]⟩,
-      fun s hs => ⟨(h18 s hs).1, by linarith [(h18 s hs).2]⟩
+      by simpa using h9,
+      by simpa using h18
     ⟩
   · rintro ⟨
       ⟨
@@ -464,7 +464,7 @@ theorem HI_iff {C0 CYb Cde Ck CD Cb : ℝ} {X : Loc}
       g6,
       g7,
       g8,
-      fun s hs => ⟨(g9 s hs).1, by linarith [(g9 s hs).2]⟩,
+      by simpa using g9,
       g10,
       g11,
       g12,
@@ -473,7 +473,7 @@ theorem HI_iff {C0 CYb Cde Ck CD Cb : ℝ} {X : Loc}
       g15,
       g16,
       g17,
-      fun s hs => ⟨(g18 s hs).1, by linarith [(g18 s hs).2]⟩,
+      by simpa using g18,
       g19,
       g20,
       g21,
@@ -522,8 +522,7 @@ theorem WindowHypotheses.cleaning_budget_nonneg
       g27
     ⟩ :=
     h
-  unfold Loc.J0
-  exact g23.trans g24
+  simpa [Loc.J0] using g23.trans g24
 
 theorem HIext.of_le
     {C0 CYb Cde Ck CD Cb xa xb : ℝ} {X : Loc} (h : WindowHypotheses C0 CYb Cde Ck CD Cb X)
@@ -661,12 +660,11 @@ theorem RootMultiplicityTwo.toExtendedDigitRankBound
     (h : RootMultiplicityTwo D C0 CYb Cde Ck CD Cb CE1 CE2 Cc)
     : ExtendedDigitRankBound D C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
   intro X _ W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ jO w hS hE hC j rz ry hD
-  obtain ⟨⟨g1, -, -, -, -, -, -, -, g10, -⟩, -⟩ := id hE
   have hM : 0 ≤ X.b' / (X.k * X.Q * X.Y) := by
-    apply div_nonneg g10.le
-    apply mul_nonneg (mul_nonneg ?_ ?_) (by linarith)
-    · unfold Loc.k; positivity
-    · unfold Loc.Q; positivity
+    obtain ⟨⟨g1, -, -, -, -, -, -, -, g10, -⟩, -⟩ := hE
+    exact div_nonneg g10.le
+      (mul_nonneg (mul_nonneg (by unfold Loc.k; positivity) (by unfold Loc.Q; positivity))
+        (by linarith))
   exact (h X W Qq O Kf ι σ jO w hS hE hC j 0 le_rfl hM rz ry hD).2
 
 def ExtendedAllConclusions

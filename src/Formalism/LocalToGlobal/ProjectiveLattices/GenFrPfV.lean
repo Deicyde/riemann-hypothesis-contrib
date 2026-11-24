@@ -217,9 +217,7 @@ theorem gfp_exists
       rw [a1, a2]
   refine ⟨ReciprocityTheory.ChartRestriction.G.Chart.tcoord hx y hy, ?_⟩
   have e : y = tvec (x := xc) (ReciprocityTheory.ChartRestriction.G.Chart.tcoord hx y hy) := by
-    first
-    | exact ReciprocityTheory.ChartRestriction.G.Chart.tcoord_spec hx y hy
-    | exact ReciprocityTheory.ChartRestriction.G.Chart.tcoord_spec y hy
+    first | exact ReciprocityTheory.ChartRestriction.G.Chart.tcoord_spec hx y hy
   show w = (tvec (x := xc) (ReciprocityTheory.ChartRestriction.G.Chart.tcoord hx y hy)).left ≫ pullback.fst Xo.univ.t.G.hom x
   rw [← e]
   exact (pullback.lift_fst _ _ _).symm
@@ -237,9 +235,7 @@ theorem gfp_inj (hx : IsUnivChart _ n xc) {c₁ c₂ : Fin n → L} (h : gfpVec 
     h
   have ht : tvec (x := xc) c₁ = tvec (x := xc) c₂ :=
     Over.OverMorphism.ext (pullback.hom_ext h' (by rw [hw, hw]))
-  first
-  | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj hx ht
-  | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj ht
+  first | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_inj hx ht
 
 theorem gfp_eig_iff [Algebra c.F L] (hx : IsUnivChart _ n xc) (τ : E →+* ℂ) (cc : Fin n → L)
     : IsEigAt c τ (gfpVec x xc cc)

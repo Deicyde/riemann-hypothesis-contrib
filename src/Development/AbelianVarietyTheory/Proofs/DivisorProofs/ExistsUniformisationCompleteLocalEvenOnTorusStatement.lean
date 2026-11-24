@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -46,6 +47,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
+
 theorem _root_.GlobalTheory.T.exists_uniformisation_completeLocal_evenOnTorus
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
       Base R
@@ -56,7 +58,4 @@ theorem _root_.GlobalTheory.T.exists_uniformisation_completeLocal_evenOnTorus
                 → LBIso (A.L.pull gen.hom.left) (P.L.L.pull (pullback.fst G.hom (jK R)))
                 → ∃ (D : DegData R (maximalIdeal R)) (U : Unif (maximalIdeal R) D A G),
                   U.LG = P.L ∧ U.gen = gen := by
-  first
-  | exact @GlobalTheory.Mum.exists_unif_even
-  | exact GlobalTheory.Mum.exists_unif_even
-  | (intros; apply GlobalTheory.Mum.exists_unif_even <;> assumption)
+  first | exact @GlobalTheory.Mum.exists_unif_even

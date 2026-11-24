@@ -4,7 +4,8 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Has
 public import Development.AutomorphicSpectrum.Statements.MetricStatements.AgreementIffGuarded
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LowerBoundOfBaseSetting
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FunctionalProductLinearFormsStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.MonomialLinesPermutationStatement
+public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Birational
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.MonomialLinesPermutation
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FormPolyIsHomogeneousAndEval
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHFlProdLinear
 import Mathlib.Algebra.Order.Floor.Extended
@@ -102,7 +103,7 @@ theorem hhFl_linRoot_pow
               (fun k => GroundTheory.Heights₂.Heights.LowerBoundFree.xLine Ψ N (w k)) := by
     intro w
     obtain ⟨hdeg, σ, -, hI⟩ :=
-      GlobalTheory.T.monomial_lines_permutation II hII.1 _ _
+      _root_.GlobalTheory.CompanionTheory.Ar.Top.monoLines_monomial_word II hII.1 _ _
         (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1) _
         (GroundTheory.Heights₂.Heights.LowerBoundFree.xLine Ψ N) w hP
         (fun j =>

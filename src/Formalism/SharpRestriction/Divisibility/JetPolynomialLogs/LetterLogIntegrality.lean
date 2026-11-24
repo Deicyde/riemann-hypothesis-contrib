@@ -121,11 +121,9 @@ theorem lw_twist (l d : ℕ) [Fact l.Prime] [NeZero d] (ζ : ℂ_[l]) (s : ZMod 
     : ζ ^ lw l s = product_zeroth_first_parts.twist l d ζ s := by
   unfold lw product_zeroth_first_parts.twist
   by_cases h : Even s.val
-  · have h' : s.val % 2 = 0 := Nat.even_iff.mp h
-    rw [if_pos h', if_pos h, one_mul]
+  · rw [if_pos (Nat.even_iff.mp h), if_pos h, one_mul]
     exact_mod_cast zpow_natCast ζ (l ^ s.val)
-  · have h' : ¬ s.val % 2 = 0 := fun e => h (Nat.even_iff.mpr e)
-    rw [if_neg h', if_neg h, neg_one_mul, zpow_neg]
+  · rw [if_neg (by simpa [Nat.even_iff] using h), if_neg h, neg_one_mul, zpow_neg]
     congr 1
 
 theorem torus_invariant_of_teichmuller
@@ -367,8 +365,7 @@ theorem letterLog_cc (l d : ℕ) [Fact l.Prime] [NeZero d] (x : V2 d)
     : MvPowerSeries.constantCoeff (letterLog (K := ℂ_[l]) l x) = 0 := by
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
   change (letterLog (K := ℂ_[l]) l x) 0 = 0
-  unfold letterLog
-  simp
+  simp [letterLog]
   intro h
   exact absurd h.symm (Finsupp.single_ne_zero.mpr one_ne_zero)
 
@@ -376,8 +373,7 @@ theorem jetLogG_cc (l d : ℕ) [Fact l.Prime] [NeZero d] (v : ZMod d × Fin 2)
     : MvPowerSeries.constantCoeff (Formalism.BasicNotions.jetLogG l d (β := Fin 2) v) = 0 := by
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
   change (Formalism.BasicNotions.jetLogG l d (β := Fin 2) v) 0 = 0
-  unfold Formalism.BasicNotions.jetLogG
-  simp [Formalism.BasicNotions.JetTdeg]
+  simp [Formalism.BasicNotions.jetLogG, Formalism.BasicNotions.JetTdeg]
   intro h
   exact absurd h.symm (Finsupp.single_ne_zero.mpr one_ne_zero)
 
@@ -475,8 +471,7 @@ theorem constant_coeff_zero_of_vanishing
     : MvPowerSeries.constantCoeff be = 0 := by
   by_contra hne
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply] at hne
-  have := (h 0 hne).1
-  simp [product_zeroth_first_parts.bideg] at this
+  simpa [product_zeroth_first_parts.bideg] using (h 0 hne).1
 
 theorem integrality_of_letter_log
     (l : ℕ) [Fact l.Prime]

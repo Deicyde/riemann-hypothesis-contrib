@@ -60,9 +60,12 @@ open GlobalTheory.CompanionTheory.Ar.Num
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 
-theorem locFree_map_equiv (R : Subalgebra o Ω) {E E' : Type} [AddCommGroup E] [Module Ω E]
-    [AddCommGroup E'] [Module Ω E'] (e : E ≃ₗ[Ω] E') {r : ℕ} {L : AddSubgroup E}
-    (h : LocFree R r L) : LocFree R r (L.map e.toLinearMap.toAddMonoidHom) := by
+theorem locFree_map_equiv
+    (R : Subalgebra o Ω)
+    {E E' : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E'] [Module Ω E']
+    (e : E ≃ₗ[Ω] E')
+    {r : ℕ} {L : AddSubgroup E} (h : LocFree R r L)
+    : LocFree R r (L.map e.toLinearMap.toAddMonoidHom) := by
   obtain ⟨hst, k, f, c, hf, hc, hs, hl⟩ := h
   refine ⟨?_, k, f, c, hf, hc, hs, fun l => ?_⟩
   · rintro a ha _ ⟨x, hx, rfl⟩
@@ -73,8 +76,8 @@ theorem locFree_map_equiv (R : Subalgebra o Ω) {E E' : Type} [AddCommGroup E] [
         rw [← Set.range_comp]; rfl
       rw [this, ← Submodule.map_span, hsp, Submodule.map_top, LinearMap.range_eq_top]
       exact e.surjective
-    · have key : ∀ n : ℕ, f l ^ n • v ∈ L.map e.toLinearMap.toAddMonoidHom ↔
-          f l ^ n • e.symm v ∈ L := by
+    · have key
+          : ∀ n : ℕ, f l ^ n • v ∈ L.map e.toLinearMap.toAddMonoidHom ↔ f l ^ n • e.symm v ∈ L := by
         intro n
         constructor
         · rintro ⟨x, hx, hxe⟩
@@ -99,15 +102,18 @@ theorem locFree_map_equiv (R : Subalgebra o Ω) {E E' : Type} [AddCommGroup E] [
 
         simp [map_sum]
 
-theorem mem_stdLat (R : Subalgebra o Ω) {ι : Type} {v : ι → Ω} :
-    v ∈ stdLat R ι ↔ ∀ j, v j ∈ R := by
+theorem mem_stdLat (R : Subalgebra o Ω) {ι : Type} {v : ι → Ω} : v ∈ stdLat R ι ↔ ∀ j, v j ∈ R := by
   simp [stdLat, AddSubgroup.mem_pi]
 
 theorem locFree_stdLat (R : Subalgebra o Ω) (m : ℕ) : LocFree R m (stdLat R (Fin m)) := by
   apply PositivityTheory.Xgn.LocallyFreeLatticeSpans.locFree_std <;> assumption
 
-theorem locFree_divLat (R : Subalgebra o Ω) {E : Type} [AddCommGroup E] [Module Ω E] {c : Ω}
-    (hc : c ≠ 0) {r : ℕ} {L : AddSubgroup E} (h : LocFree R r L) : LocFree R r (divLat c L) := by
+theorem locFree_divLat
+    (R : Subalgebra o Ω)
+    {E : Type} [AddCommGroup E] [Module Ω E]
+    {c : Ω} (hc : c ≠ 0)
+    {r : ℕ} {L : AddSubgroup E} (h : LocFree R r L)
+    : LocFree R r (divLat c L) := by
   have := locFree_map_equiv R (LinearEquiv.smulOfNeZero Ω E c⁻¹ (inv_ne_zero hc)) h
   convert this using 1
   ext v
@@ -118,13 +124,18 @@ theorem locFree_divLat (R : Subalgebra o Ω) {E : Type} [AddCommGroup E] [Module
     show c • (c⁻¹ • x) ∈ L
     simpa [smul_smul, hc] using hx
 
-theorem locFree_map_mkQ_iff (R : Subalgebra o Ω) {E E₂ : Type} [AddCommGroup E] [Module Ω E]
-    [AddCommGroup E₂] [Module Ω E₂] (q : E →ₗ[Ω] E₂) (hq : Function.Surjective q) {r : ℕ}
-    (L : AddSubgroup E) :
-    LocFree R r (L.map (LinearMap.ker q).mkQ.toAddMonoidHom) ↔ LocFree R r (L.map q.toAddMonoidHom) := by
+theorem locFree_map_mkQ_iff
+    (R : Subalgebra o Ω)
+    {E E₂ : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E₂] [Module Ω E₂]
+    (q : E →ₗ[Ω] E₂) (hq : Function.Surjective q)
+    {r : ℕ}
+    (L : AddSubgroup E)
+    : LocFree R r (L.map (LinearMap.ker q).mkQ.toAddMonoidHom)
+      ↔ LocFree R r (L.map q.toAddMonoidHom) := by
   let e := q.quotKerEquivOfSurjective hq
-  have h1 : (L.map (LinearMap.ker q).mkQ.toAddMonoidHom).map e.toLinearMap.toAddMonoidHom =
-      L.map q.toAddMonoidHom := by
+  have h1
+      : (L.map (LinearMap.ker q).mkQ.toAddMonoidHom).map e.toLinearMap.toAddMonoidHom
+        = L.map q.toAddMonoidHom := by
     rw [AddSubgroup.map_map]
     congr 1
   constructor
@@ -132,28 +143,32 @@ theorem locFree_map_mkQ_iff (R : Subalgebra o Ω) {E E₂ : Type} [AddCommGroup 
     rw [← h1]
     exact locFree_map_equiv R e h
   · intro h
-    have h2 : (L.map q.toAddMonoidHom).map e.symm.toLinearMap.toAddMonoidHom =
-        L.map (LinearMap.ker q).mkQ.toAddMonoidHom := by
+    have h2
+        : (L.map q.toAddMonoidHom).map e.symm.toLinearMap.toAddMonoidHom
+          = L.map (LinearMap.ker q).mkQ.toAddMonoidHom := by
       rw [← h1, AddSubgroup.map_map]
       ext v
       simp
     rw [← h2]
     exact locFree_map_equiv R e.symm h
 
-theorem isBaseChange_bcMap (Ω C : Type) [Field Ω] [Field C] [Algebra Ω C] (ι : Type) [Finite ι] :
-    IsBaseChange C (bcMap Ω C ι) := by
+theorem isBaseChange_bcMap (Ω C : Type) [Field Ω] [Field C] [Algebra Ω C] (ι : Type) [Finite ι]
+    : IsBaseChange C (bcMap Ω C ι) := by
   have := Fintype.ofFinite ι
-  have h := IsBaseChange.pi (S := C) (fun _ : ι => Algebra.linearMap Ω C)
-    (fun _ => IsBaseChange.linearMap Ω C)
+  have h :=
+    IsBaseChange.pi (S := C)
+      (fun _ : ι => Algebra.linearMap Ω C)
+      (fun _ => IsBaseChange.linearMap Ω C)
   exact h
 
-theorem span_bcMap_annSub (Ω C : Type) [Field Ω] [Field C] [Algebra Ω C] (n i : ℕ) :
-    Submodule.span C (bcMap Ω C (Fin n) '' (annSub Ω n i : Set (Fin n → Ω))) = annSub C n i := by
+theorem span_bcMap_annSub (Ω C : Type) [Field Ω] [Field C] [Algebra Ω C] (n i : ℕ)
+    : Submodule.span C (bcMap Ω C (Fin n) '' (annSub Ω n i : Set (Fin n → Ω))) = annSub C n i := by
   classical
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨v, hv, rfl⟩
-    simp only [annSub, SetLike.mem_coe, Submodule.mem_pi, Set.mem_setOf_eq, Submodule.mem_bot] at hv ⊢
+    simp only [annSub, SetLike.mem_coe, Submodule.mem_pi, Set.mem_setOf_eq, Submodule.mem_bot]
+      at hv ⊢
     intro j hj
     simp [bcMap, hv j hj]
   · intro v hv
@@ -168,22 +183,29 @@ theorem span_bcMap_annSub (Ω C : Type) [Field Ω] [Field C] [Algebra Ω C] (n i
       · intro j _ hjk
         by_cases hj : (j : ℕ) < i
         · simp [hj, bcMap]
-        · simp [hj, bcMap, Pi.single_apply, hjk.symm]
+        · simp [hj, bcMap, hjk.symm]
       · simp
     rw [this]
-    refine Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, ?_, rfl⟩)
+    refine Submodule.sum_mem _ fun j _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, ?_, rfl⟩)
     simp only [annSub, SetLike.mem_coe, Submodule.mem_pi, Set.mem_setOf_eq, Submodule.mem_bot]
     intro k hk
     by_cases hj : (j : ℕ) < i
     · simp [hj]
     · have : k ≠ j := by rintro rfl; exact hj hk
-      simp [hj, Pi.single_apply, this]
+      simp [hj, this]
 
-theorem spanOver_swap {C V Z Vc Zc : Type} [Field C] [Algebra o C] (RC : Subalgebra o C)
-    [AddCommGroup V] [AddCommGroup Z] [AddCommGroup Vc] [AddCommGroup Zc]
-    [Module C Vc] [Module C Zc] (b : V → Vc) (b' : Z → Zc) (Γ : AddSubgroup (Z × V)) :
-    spanOver RC (Prod.map b b' '' (Γ.map (AddEquiv.prodComm (M := Z) (N := V)).toAddMonoidHom : AddSubgroup (V × Z))) =
-      (spanOver RC (Prod.map b' b '' Γ)).map (AddEquiv.prodComm (M := Zc) (N := Vc)).toAddMonoidHom := by
+theorem spanOver_swap
+    {C V Z Vc Zc : Type} [Field C] [Algebra o C]
+    (RC : Subalgebra o C)
+    [AddCommGroup V] [AddCommGroup Z] [AddCommGroup Vc] [AddCommGroup Zc] [Module C Vc]
+    [Module C Zc]
+    (b : V → Vc) (b' : Z → Zc) (Γ : AddSubgroup (Z × V))
+    : spanOver RC
+        (Prod.map b b'
+          '' (Γ.map (AddEquiv.prodComm (M := Z) (N := V)).toAddMonoidHom : AddSubgroup (V × Z)))
+      = (spanOver RC (Prod.map b' b '' Γ)).map
+        (AddEquiv.prodComm (M := Zc) (N := Vc)).toAddMonoidHom := by
   unfold spanOver
   rw [AddMonoidHom.map_closure]
   congr 1

@@ -188,7 +188,6 @@ theorem exists_field_BIs
         have e' : c' = (bad : 𝓞 D.host.E) :=
           RingOfIntegers.ext (by
             rw [e]
-            change star ((bad : 𝓞 D.host.E) : D.host.E) = ((bad : 𝓞 D.host.E) : D.host.E)
             rw [show ((bad : 𝓞 D.host.E) : D.host.E) = (bad : D.host.E) from
                 map_natCast (algebraMap (𝓞 D.host.E) D.host.E) bad,
               star_natCast])

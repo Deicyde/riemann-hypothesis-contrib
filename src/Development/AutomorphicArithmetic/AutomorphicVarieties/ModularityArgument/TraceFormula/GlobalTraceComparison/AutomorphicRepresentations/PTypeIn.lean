@@ -49,8 +49,11 @@ import Mathlib.Tactic.ReduceModChar
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.Zero.ConvolutionTheory.EB
@@ -63,12 +66,15 @@ attribute [local instance] PositivityTheory.Rg.BcB.E.borelH borelG borelF borelA
 
 section SlopeTestRemainingChoices
 
-private def rtRep {X Γ : Type} [Group X] [Group Γ] (τ : Γ →* X) (F : Submodule ℂ (X → ℂ))
-    (h : ∀ γ, ∀ a ∈ F, (fun x => a (x * τ γ)) ∈ F) : Representation ℂ Γ F where
-  toFun γ :=
-    { toFun := fun a => ⟨fun x => a.1 (x * τ γ), h γ a.1 a.2⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+private def rtRep
+    {X Γ : Type} [Group X] [Group Γ]
+    (τ : Γ →* X) (F : Submodule ℂ (X → ℂ)) (h : ∀ γ, ∀ a ∈ F, (fun x => a (x * τ γ)) ∈ F)
+    : Representation ℂ Γ F where
+  toFun γ := {
+    toFun := fun a => ⟨fun x => a.1 (x * τ γ), h γ a.1 a.2⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   map_one' := by
     ext a x
     simp
@@ -161,8 +167,10 @@ theorem typeIn_pf : PiAdm → DetZero → EvalBasis → CvIn → FormEx → Orth
   haveI := hYfd
   haveI := hW
   have hdet : ∀ γ, logAbs (tau K γ).val.det = 0 := fun γ => by
-    rw [tau_apply, DiscreteGroups.T1.G.Dcy.logAbs_det_mul', (hDet E n).2 K hKc _ γ.1.2, (hDet E n).1 γ.2, add_zero]
-  have hst : ∀ γ, ∀ a ∈ Fm, (fun x => a (x * tau K γ)) ∈ Fm := fun γ a ha => (hBi _ (hdet γ) ⟨a, ha⟩).1
+    rw [tau_apply, DiscreteGroups.T1.G.Dcy.logAbs_det_mul', (hDet E n).2 K hKc _ γ.1.2,
+      (hDet E n).1 γ.2, add_zero]
+  have hst : ∀ γ, ∀ a ∈ Fm, (fun x => a (x * tau K γ)) ∈ Fm := fun γ a ha =>
+    (hBi _ (hdet γ) ⟨a, ha⟩).1
   let R := rtRep (tau K) Fm hst
   have hR : ∀ γ (a : Fm) x, (R γ a).1 x = a.1 (x * tau K γ) := fun _ _ _ => rfl
   let W' : Submodule ℂ ((K × Kinf E n) → ℂ) := W.map (LinearMap.funLeft ℂ ℂ Prod.snd)
@@ -171,8 +179,8 @@ theorem typeIn_pf : PiAdm → DetZero → EvalBasis → CvIn → FormEx → Orth
   have hSl : ∀ ψ ∈ π.V, Slab D ψ.1 := fun ψ h => (hCv E n hn D π hfix ψ h).1
   have hVm : ∀ ψ ∈ π.V, ∀ a : Fm, ψ.1 = a.1 → a ∈ V := fun ψ h a e => ⟨ψ, h, e⟩
 
-  obtain ⟨d, p, w, hw, hs⟩ := hEv (Kinf E n) (Kinf E n → ℂ) (fun x => LinearMap.proj x)
-    (fun v hv => funext hv) W hW
+  obtain ⟨d, p, w, hw, hs⟩ :=
+    hEv (Kinf E n) (Kinf E n → ℂ) (fun x => LinearMap.proj x) (fun v hv => funext hv) W hW
   let z : Fm := ⟨f, (hF f).2 hS⟩
   let zb : Fin d → Fm := fun b => R (1, p b) z
   have hexp : ∀ γ, R γ z = ∑ b, w b γ.2 • zb b := by
@@ -185,90 +193,94 @@ theorem typeIn_pf : PiAdm → DetZero → EvalBasis → CvIn → FormEx → Orth
     simp only [LinearMap.proj_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at e2
     change f (x * tau K γ) = _
     rw [e1, e2]
-    simp only [AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    simp only [AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
+      smul_eq_mul]
     refine Finset.sum_congr rfl fun b _ => ?_
     have e3 : (zb b).1 x = f (x * kI E n (p b)) := by
       change f (x * tau K (1, p b)) = _
       simp [tau_apply]
     rw [e3, mul_comm]
-  obtain ⟨y, hyV, hyY, horth⟩ := hAbs (K × Kinf E n) Fm R B W' V Y z hBs hBp
-    (fun γ a b => (hBi _ (hdet γ) a).2 _ b _ (fun _ => rfl) fun _ => rfl)
-    (by
-      rintro h ⟨v, hv, rfl⟩ γ
-      refine ⟨_, hWR v hv γ.2, funext fun x => ?_⟩
-      simp [LinearMap.funLeft_apply])
-    (by
-      rintro γ v ⟨ψ, hψ, e⟩
-      obtain ⟨ψ', h', e'⟩ := trans_mem π ψ hψ γ.1.1 γ.2
-      refine hVm ψ' h' _ (e'.trans (funext fun x => ?_))
-      have e2 : ψ.1 = v.1 := e
-      rw [hR, ← tau_apply, e2])
-    (by
-      rintro v ⟨ψ, hψ, e⟩
-      obtain ⟨U, hU, hUm⟩ := orbit_fin π K hKc ψ hψ
-      haveI := hU
-      refine fd_span Fm _ U fun γ => ?_
-      have := hUm γ.1.1 γ.1.2 γ.2
-      convert this using 1
-      funext x
-      have e2 : ψ.1 = v.1 := e
-      rw [hR, tau_apply, e2])
-    (by
-      haveI : FiniteDimensional ℂ (Y0.map (Sm E n).subtype) := Module.Finite.map _ _
-      exact fd_sub Fm Y (Y0.map (Sm E n).subtype) fun x hx => hx)
-    (by
-      rintro v ⟨ψ, hψ, e⟩ hl
-      have key : ∀ g, ∃ h ∈ W, ∀ γ, h γ.2 = ψ.1 (g * tau K γ) := by
-        intro g
-        obtain ⟨h, hh, e'⟩ := hl ((LinearMap.proj g).comp Fm.subtype)
-        refine ⟨h, hh, fun γ => ?_⟩
-        have := congrFun e' γ
-        simp only [LinearMap.funLeft_apply] at this
-        rw [this]
-        change v.1 (g * tau K γ) = _
+  obtain ⟨y, hyV, hyY, horth⟩ :=
+    hAbs (K × Kinf E n) Fm R B W' V Y z hBs hBp
+      (fun γ a b => (hBi _ (hdet γ) a).2 _ b _ (fun _ => rfl) fun _ => rfl)
+      (by
+        rintro h ⟨v, hv, rfl⟩ γ
+        refine ⟨_, hWR v hv γ.2, funext fun x => ?_⟩
+        simp [LinearMap.funLeft_apply])
+      (by
+        rintro γ v ⟨ψ, hψ, e⟩
+        obtain ⟨ψ', h', e'⟩ := trans_mem π ψ hψ γ.1.1 γ.2
+        refine hVm ψ' h' _ (e'.trans (funext fun x => ?_))
         have e2 : ψ.1 = v.1 := e
-        rw [e2]
-      have hTy : TypeB K W ψ := by
-        refine ⟨fun u hu g => ?_, fun g => ?_⟩
-        · obtain ⟨h, -, hh⟩ := key g
-          have a1 := hh (⟨u, hu⟩, 1)
-          have a2 := hh 1
-          simp only [tau_apply, map_one, mul_one] at a1 a2
-          exact a1.symm.trans a2
-        · obtain ⟨h, hm, hh⟩ := key g
-          convert hm using 1
-          funext κ
-          have a1 := hh (1, κ)
-          simp only [tau_apply] at a1
-          have a2 : ψ.1 (g * kI E n κ) = h κ := by simpa using a1.symm
-          exact a2
-      exact ⟨ψ, hY ψ hψ hTy, e⟩)
-    (by
-      have hle : Submodule.span ℂ (Set.range fun γ => R γ z) ≤ Submodule.span ℂ (Set.range zb) :=
-        Submodule.span_le.2 (by
-          rintro _ ⟨γ, rfl⟩
-          simp only [hexp γ]
-          exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩))
-      haveI : FiniteDimensional ℂ (Submodule.span ℂ (Set.range zb)) :=
-        FiniteDimensional.span_of_finite ℂ (Set.finite_range zb)
-      exact Submodule.finiteDimensional_of_le hle)
-    (by
-      intro l
-      have e : (fun γ => l (R γ z)) = ∑ b, l (zb b) • LinearMap.funLeft ℂ ℂ Prod.snd (w b) := by
-        funext γ
+        rw [hR, ← tau_apply, e2])
+      (by
+        rintro v ⟨ψ, hψ, e⟩
+        obtain ⟨U, hU, hUm⟩ := orbit_fin π K hKc ψ hψ
+        haveI := hU
+        refine fd_span Fm _ U fun γ => ?_
+        have := hUm γ.1.1 γ.1.2 γ.2
+        convert this using 1
+        funext x
+        have e2 : ψ.1 = v.1 := e
+        rw [hR, tau_apply, e2])
+      (by
+        haveI : FiniteDimensional ℂ (Y0.map (Sm E n).subtype) := Module.Finite.map _ _
+        exact fd_sub Fm Y (Y0.map (Sm E n).subtype) fun x hx => hx)
+      (by
+        rintro v ⟨ψ, hψ, e⟩ hl
+        have key : ∀ g, ∃ h ∈ W, ∀ γ, h γ.2 = ψ.1 (g * tau K γ) := by
+          intro g
+          obtain ⟨h, hh, e'⟩ := hl ((LinearMap.proj g).comp Fm.subtype)
+          refine ⟨h, hh, fun γ => ?_⟩
+          have := congrFun e' γ
+          simp only [LinearMap.funLeft_apply] at this
+          rw [this]
+          change v.1 (g * tau K γ) = _
+          have e2 : ψ.1 = v.1 := e
+          rw [e2]
+        have hTy : TypeB K W ψ := by
+          refine ⟨fun u hu g => ?_, fun g => ?_⟩
+          · obtain ⟨h, -, hh⟩ := key g
+            have a1 := hh (⟨u, hu⟩, 1)
+            have a2 := hh 1
+            simp only [tau_apply, map_one, mul_one] at a1 a2
+            exact a1.symm.trans a2
+          · obtain ⟨h, hm, hh⟩ := key g
+            convert hm using 1
+            funext κ
+            have a1 := hh (1, κ)
+            simp only [tau_apply] at a1
+            have a2 : ψ.1 (g * kI E n κ) = h κ := by simpa using a1.symm
+            exact a2
+        exact ⟨ψ, hY ψ hψ hTy, e⟩)
+      (by
+        have hle : Submodule.span ℂ (Set.range fun γ => R γ z) ≤ Submodule.span ℂ (Set.range zb) :=
+          Submodule.span_le.2 (by
+            rintro _ ⟨γ, rfl⟩
+            simp only [hexp γ]
+            exact Submodule.sum_mem _ fun b _ =>
+              Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩))
+        haveI : FiniteDimensional ℂ (Submodule.span ℂ (Set.range zb)) :=
+          FiniteDimensional.span_of_finite ℂ (Set.finite_range zb)
+        exact Submodule.finiteDimensional_of_le hle)
+      (by
+        intro l
+        have e : (fun γ => l (R γ z)) = ∑ b, l (zb b) • LinearMap.funLeft ℂ ℂ Prod.snd (w b) := by
+          funext γ
 
-        simp only [hexp γ, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-        LinearMap.funLeft_apply]
-        exact Finset.sum_congr rfl fun b _ => mul_comm _ _
-      rw [e]
-      exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ ⟨w b, hw b, rfl⟩)
+          simp only [hexp γ, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+            LinearMap.funLeft_apply]
+          exact Finset.sum_congr rfl fun b _ => mul_comm _ _
+        rw [e]
+        exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ ⟨w b, hw b, rfl⟩)
   obtain ⟨ψ₀, hψ₀, e₀⟩ := hyV
   refine ⟨ψ₀, hψ₀, ?_⟩
   have e₀' : ψ₀.1 = y.1 := e₀
   have hz : f - y.1 = 0 := by
     refine hOrth E n hn D π hfix _ ((hF _).1 (z - y).2) (inS_sub D π hI ?_) fun ψ hψ u hu hc => ?_
     · rw [← e₀']
-      exact ((hCv E n hn D π hfix ψ₀ hψ₀).2 0 0 ⟨continuous_const, HasCompactSupport.zero⟩ continuous_const).2.2
+      exact ((hCv E n hn D π hfix ψ₀ hψ₀).2 0 0 ⟨continuous_const, HasCompactSupport.zero⟩
+        continuous_const).2.2
     · have h1 := hBw ⟨ψ.1, (hF _).2 (hSl ψ hψ)⟩ (z - y) u hu hc
       have h2 := horth ⟨ψ.1, (hF _).2 (hSl ψ hψ)⟩ (hVm ψ hψ _ rfl)
       rw [h2, mul_zero] at h1

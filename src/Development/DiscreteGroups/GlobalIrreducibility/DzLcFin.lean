@@ -73,7 +73,6 @@ theorem sum_rho_eq_zero
       _ = (Fintype.card U : ℂ) • E := by
         rw [Finset.sum_const, Finset.card_univ, Nat.cast_smul_eq_nsmul]
   have htE : LinearMap.trace ℂ τ E = 0 := by
-
     rw [hE, map_sum]
     exact h
   have hc : (Fintype.card U : ℂ) ≠ 0 := Nat.cast_ne_zero.2 Fintype.card_ne_zero

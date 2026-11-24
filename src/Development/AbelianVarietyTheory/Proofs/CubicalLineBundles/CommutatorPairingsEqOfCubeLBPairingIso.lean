@@ -2,8 +2,11 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.WeilIsAlternatingSkewNatural
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.CubeLBPairingIsoIffWeilPairingCompatibleOverRingStatement
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsUniversalTorsionPairPolAVStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.CubeLBPairingIsoIffWeilPairingCompatibleOverRing
+public import Mathlib.RingTheory.DedekindDomain.Basic
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsUniversalTorsionPairPolAV
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -84,7 +87,7 @@ theorem weilIs_iff_of_lamEq
   have hN : IsLocallyNoetherian (Sp R) :=
     inferInstanceAs (IsLocallyNoetherian (Spec (CommRingCat.of R)))
   obtain ⟨T₀, x₀, y₀, hx₀, hy₀, huniv, hsep⟩ :=
-    GlobalTheory.T.exists_universal_torsion_pair_polAV hL R X Y k hk
+    _root_.GlobalTheory.LamF.exists_universal_torsion_pair hL R X Y k hk
   obtain ⟨a, ha, -⟩ :=
     (hL.weil (Sp R) A k T₀).1 _ _ (comp_pow_eq_one f₁ hx₀) (comp_pow_eq_one f₂ hy₀)
   obtain ⟨b, hb, -⟩ :=
@@ -93,8 +96,8 @@ theorem weilIs_iff_of_lamEq
     apply Units.ext
     refine hsep _ _ fun k' _ _ _ β t => ?_
     have hw :=
-      (GlobalTheory.T.cubeLBPairingIso_iff_weilPairingCompatible_over_ring hL R X Y A B f₁ f₂ g₁ g₂
-        hf₁ hf₂ hg₁ hg₂ k' β).1 hlam
+      (_root_.GlobalTheory.PairingFibre.lamEq_weilEq_over_ring hL R X Y A B f₁ f₂ g₁ g₂ hf₁ hf₂ hg₁
+        hg₂ k' β).1 hlam
     have ha' := CommPairing.weilIs_pull hL.globalFns A.isAb A.isLB t ha
     have hb' := CommPairing.weilIs_pull hL.globalFns B.isAb B.isLB t hb
     obtain ⟨z, hz⟩ := exists_unitOn (K := k') (Units.map t.left.appTop.hom.toMonoidHom a)

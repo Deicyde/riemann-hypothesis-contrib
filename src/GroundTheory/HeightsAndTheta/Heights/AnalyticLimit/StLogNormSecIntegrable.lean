@@ -56,9 +56,6 @@ def LogNormSecIntegrable.Statement : Prop :=
 
 section Inhabitants
 
-open ReciprocityTheory.AnForm.M
-  (p1 fsPot projectiveLinePairSection projLine_isSmoothPotential projLine_isHolomorphicSection)
-
 end Inhabitants
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

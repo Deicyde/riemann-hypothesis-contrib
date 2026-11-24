@@ -101,9 +101,7 @@ theorem sb_ballRatio_le {r : ℕ} (hr : 0 < r) : ballRatio r ≤ Real.exp (1 / (
   have h1 : (1 : ℝ) ≤ r := by exact_mod_cast hr
   have h7 : 1 / (7 * (r : ℝ)) ≤ 1 / 7 := one_div_le_one_div_of_le (by norm_num) (by linarith)
   have hx : 0 < 1 / (7 * (r : ℝ)) := by positivity
-  have he : 1 / (3 * (r : ℝ)) = 7 * (1 / (7 * (r : ℝ))) / 3 := by
-    field_simp
-    try ring
+  have he : 1 / (3 * (r : ℝ)) = 7 * (1 / (7 * (r : ℝ))) / 3 := by field_simp
 
   have key : ballRatio r ≤ 7 * (1 / (7 * (r : ℝ))) / 3 + 1 := by
     unfold ballRatio

@@ -66,15 +66,15 @@ section Graded
 
 variable {σ : Type*} {R : Type*} [CommRing R]
 
-theorem weight_comp_addMonoidHom_apply {M M' : Type*} [AddCommMonoid M] [AddCommMonoid M'] (w : σ → M)
-    (f : M →+ M') (d : σ →₀ ℕ) : Finsupp.weight (fun v => f (w v)) d = f (Finsupp.weight w d) := by
-
+theorem weight_comp_addMonoidHom_apply
+    {M M' : Type*} [AddCommMonoid M] [AddCommMonoid M'] (w : σ → M) (f : M →+ M') (d : σ →₀ ℕ)
+    : Finsupp.weight (fun v => f (w v)) d = f (Finsupp.weight w d) := by
   simp [Finsupp.weight_apply, Finsupp.sum, map_sum, map_nsmul]
 
-theorem weightedHomogeneousComponent_monomial' {M : Type*} [AddCommMonoid M] [DecidableEq M]
-    (w : σ → M) (n : M) (d : σ →₀ ℕ) (c : R) :
-    weightedHomogeneousComponent w n (monomial d c) =
-      if Finsupp.weight w d = n then monomial d c else 0 := by
+theorem weightedHomogeneousComponent_monomial'
+    {M : Type*} [AddCommMonoid M] [DecidableEq M] (w : σ → M) (n : M) (d : σ →₀ ℕ) (c : R)
+    : weightedHomogeneousComponent w n (monomial d c)
+      = if Finsupp.weight w d = n then monomial d c else 0 := by
   ext e
   rw [coeff_weightedHomogeneousComponent]
   by_cases hed : e = d
@@ -83,15 +83,16 @@ theorem weightedHomogeneousComponent_monomial' {M : Type*} [AddCommMonoid M] [De
   · classical
     split_ifs <;> simp [coeff_monomial, Ne.symm hed]
 
-theorem coeff_aeval_C_mul_X_pow {B : Type*} [CommRing B] [Algebra R B] (a : σ → B) (ω : σ → ℕ)
-    (n : ℕ) (p : MvPolynomial σ R) :
-    (aeval (fun v => Polynomial.C (a v) * Polynomial.X ^ ω v) p).coeff n =
-      aeval a (weightedHomogeneousComponent ω n p) := by
+theorem coeff_aeval_C_mul_X_pow
+    {B : Type*} [CommRing B] [Algebra R B] (a : σ → B) (ω : σ → ℕ) (n : ℕ) (p : MvPolynomial σ R)
+    : (aeval (fun v => Polynomial.C (a v) * Polynomial.X ^ ω v) p).coeff n
+      = aeval a (weightedHomogeneousComponent ω n p) := by
   classical
   induction p using MvPolynomial.induction_on' with
   | monomial d c =>
-    have h : aeval (fun v => Polynomial.C (a v) * Polynomial.X ^ ω v) (monomial d c) =
-        Polynomial.C (aeval a (monomial d c)) * Polynomial.X ^ (Finsupp.weight ω d) := by
+    have h
+        : aeval (fun v => Polynomial.C (a v) * Polynomial.X ^ ω v) (monomial d c)
+          = Polynomial.C (aeval a (monomial d c)) * Polynomial.X ^ (Finsupp.weight ω d) := by
       rw [aeval_monomial, aeval_monomial, Finsupp.weight_apply, Finsupp.prod, Finsupp.prod,
         Finsupp.sum, Polynomial.algebraMap_apply]
       simp only [mul_pow, Finset.prod_mul_distrib, ← pow_mul, Finset.prod_pow_eq_pow_sum,
@@ -99,31 +100,36 @@ theorem coeff_aeval_C_mul_X_pow {B : Type*} [CommRing B] [Algebra R B] (a : σ �
       ring
     rw [h, Polynomial.coeff_C_mul_X_pow, weightedHomogeneousComponent_monomial']
     by_cases hd : Finsupp.weight ω d = n
-    · simp only [hd, ↓reduceIte]
-    · simp only [hd, Ne.symm hd, ↓reduceIte, map_zero]
+    · simp only [hd, ↓ reduceIte]
+    · simp only [hd, Ne.symm hd, ↓ reduceIte, map_zero]
   | add p q hp hq => simp only [map_add (f := _), Polynomial.coeff_add, hp, hq]
 
-theorem aeval_weightedHomogeneousComponent_of_forms {K : Type*} [DecidableEq K] {ι : K → Type*}
-    (ω : σ → K → ℕ) (e : σ → MRing ι R) (he : ∀ v, IsMultiHomog (e v) (ω v)) (m : K → ℕ)
-    (p : MvPolynomial σ R) :
-    aeval e (weightedHomogeneousComponent ω m p) =
-      weightedHomogeneousComponent (blockWeight ι) m (aeval e p) := by
+theorem aeval_weightedHomogeneousComponent_of_forms
+    {K : Type*} [DecidableEq K]
+    {ι : K → Type*} (ω : σ → K → ℕ) (e : σ → MRing ι R) (he : ∀ v, IsMultiHomog (e v) (ω v))
+    (m : K → ℕ) (p : MvPolynomial σ R)
+    : aeval e (weightedHomogeneousComponent ω m p)
+      = weightedHomogeneousComponent (blockWeight ι) m (aeval e p) := by
   induction p using MvPolynomial.induction_on' with
   | monomial d c =>
-    have hmon : IsWeightedHomogeneous (blockWeight ι) (aeval e (monomial d c))
-        (Finsupp.weight ω d) := by
+    have hmon
+        : IsWeightedHomogeneous (blockWeight ι) (aeval e (monomial d c)) (Finsupp.weight ω d) := by
       rw [aeval_monomial, Finsupp.weight_apply, algebraMap_eq]
-      have := (isWeightedHomogeneous_C (blockWeight ι) c).mul (IsWeightedHomogeneous.prod d.support
-        (fun v => e v ^ d v) (fun v => d v • ω v) (fun v _ => (he v).pow (d v)))
+      have :=
+        (isWeightedHomogeneous_C (blockWeight ι) c).mul
+          (IsWeightedHomogeneous.prod d.support
+            (fun v => e v ^ d v)
+            (fun v => d v • ω v)
+            (fun v _ => (he v).pow (d v)))
       rw [zero_add] at this
       exact this
     by_cases hdm : Finsupp.weight ω d = m
     · have hmon' : IsWeightedHomogeneous (blockWeight ι) (aeval e (monomial d c)) m := hdm ▸ hmon
       rw [(isWeightedHomogeneous_monomial _ d c hdm).weightedHomogeneousComponent_same,
         hmon'.weightedHomogeneousComponent_same]
-    · rw [(isWeightedHomogeneous_monomial ω d c
-        (m := Finsupp.weight ω d) rfl).weightedHomogeneousComponent_ne m
-        (Ne.symm hdm), hmon.weightedHomogeneousComponent_ne m (Ne.symm hdm), map_zero]
+    · rw [(isWeightedHomogeneous_monomial ω d c (m := Finsupp.weight ω d)
+          rfl).weightedHomogeneousComponent_ne m (Ne.symm hdm),
+        hmon.weightedHomogeneousComponent_ne m (Ne.symm hdm), map_zero]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
 
 end Graded
@@ -146,8 +152,10 @@ def blowUpDegMap (N : K → ℕ) : (Option K → ℕ) →+ (K → ℕ) where
     simp only [Pi.add_apply]
     ring
 
-theorem isMultiHomogIdeal_blowUpOf {P : Ideal (MRing ι R)} (hP : IsMultiHomogIdeal P) (N : K → ℕ)
-    (u : J → MRing ι R) (hu : ∀ j, IsMultiHomog (u j) N) : IsMultiHomogIdeal (blowUpOf P u) := by
+theorem isMultiHomogIdeal_blowUpOf
+    {P : Ideal (MRing ι R)} (hP : IsMultiHomogIdeal P)
+    (N : K → ℕ) (u : J → MRing ι R) (hu : ∀ j, IsMultiHomog (u j) N)
+    : IsMultiHomogIdeal (blowUpOf P u) := by
   classical
   set w := blockWeight (extIdx ι J)
   set L := blowUpDegMap N
@@ -174,13 +182,17 @@ theorem isMultiHomogIdeal_blowUpOf {P : Ideal (MRing ι R)} (hP : IsMultiHomogId
       rw [this]
       exact isWeightedHomogeneous_X R _ _
 
-  have hsubst : blowUpSubst P u = fun v =>
-      Polynomial.C (Ideal.Quotient.mkₐ R P (blowUpAtOne u v)) * Polynomial.X ^ ωT v := by
+  have hsubst
+      : blowUpSubst P u
+        = fun v =>
+          Polynomial.C (Ideal.Quotient.mkₐ R P (blowUpAtOne u v)) * Polynomial.X ^ ωT v := by
     funext v
     obtain ⟨o, i⟩ := v
     cases o <;> simp [blowUpSubst, blowUpAtOne, ωT, w, blockWeight]
-  have hcoeff : ∀ r n, (aeval (R := R) (blowUpSubst P u) r).coeff n =
-      Ideal.Quotient.mk P (aeval (blowUpAtOne u) (weightedHomogeneousComponent ωT n r)) := by
+  have hcoeff
+      : ∀ r n,
+        (aeval (R := R) (blowUpSubst P u) r).coeff n
+          = Ideal.Quotient.mk P (aeval (blowUpAtOne u) (weightedHomogeneousComponent ωT n r)) := by
     intro r n
     rw [hsubst, coeff_aeval_C_mul_X_pow, ← Ideal.Quotient.mkₐ_eq_mk R, ← AlgHom.comp_apply,
       comp_aeval]
@@ -198,18 +210,22 @@ theorem isMultiHomogIdeal_blowUpOf {P : Ideal (MRing ι R)} (hP : IsMultiHomogId
         have := congrFun h1 k
         simp only [L, blowUpDegMap, AddMonoidHom.coe_mk, ZeroHom.coe_mk, h2] at this
         omega
-  have hsplit : ∀ (m : Option K → ℕ) (n : ℕ) (r : MRing (extIdx ι J) R),
-      weightedHomogeneousComponent ωT n (weightedHomogeneousComponent w m r) =
-        if n = m none then weightedHomogeneousComponent ωL (L m) (weightedHomogeneousComponent ωT n r)
-        else 0 := by
+  have hsplit
+      : ∀ (m : Option K → ℕ) (n : ℕ) (r : MRing (extIdx ι J) R),
+        weightedHomogeneousComponent ωT n (weightedHomogeneousComponent w m r)
+          = if n = m none then
+              weightedHomogeneousComponent ωL (L m) (weightedHomogeneousComponent ωT n r)
+            else
+              0 := by
     intro m n r
     ext d
     split_ifs with hn
     · simp only [coeff_weightedHomogeneousComponent, hT, hL, key (Finsupp.weight w d) m]
       subst hn
-      by_cases h1 : Finsupp.weight w d none = m none <;> by_cases h2 : L (Finsupp.weight w d) = L m <;>
-        simp [h1, h2]
-    · simp only [coeff_weightedHomogeneousComponent, hT, key (Finsupp.weight w d) m, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
+      by_cases h1 : Finsupp.weight w d none = m none <;> by_cases h2 : L (Finsupp.weight w d) = L m
+        <;> simp [h1, h2]
+    · simp only [coeff_weightedHomogeneousComponent, hT, key (Finsupp.weight w d) m,
+        AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
       by_cases h1 : Finsupp.weight w d none = n
       · have : ¬ Finsupp.weight w d none = m none := fun h => hn (h1.symm.trans h)
         simp [h1, hn]
@@ -234,10 +250,9 @@ theorem BlowUpModel.proof (h₁ : ReesAlgebraDim.Statement.{u}) : BlowUpModel.St
   intro O _ _ _ K _ _ ι _ J _ P d hP N u hu hne
   have : P.IsPrime := hP.multiProj.isPrime
   set φ : MRing (extIdx ι J) O →ₐ[O] Polynomial (MRing ι O ⧸ P) := aeval (blowUpSubst P u)
-  refine ⟨⟨RingHom.ker_isPrime φ, isMultiHomogIdeal_blowUpOf hP.multiProj.multiHomog N u hu, ?_⟩,
-    ?_, ?_⟩
-  ·
-    intro o
+  refine
+    ⟨⟨RingHom.ker_isPrime φ, isMultiHomogIdeal_blowUpOf hP.multiProj.multiHomog N u hu, ?_⟩, ?_, ?_⟩
+  · intro o
     cases o with
     | none =>
       obtain ⟨j, hj⟩ := hne
@@ -253,15 +268,13 @@ theorem BlowUpModel.proof (h₁ : ReesAlgebraDim.Statement.{u}) : BlowUpModel.St
       change aeval (blowUpSubst P u) (X ⟨some k, i⟩) ≠ 0
       rw [aeval_X]
       simpa [blowUpSubst, Ideal.Quotient.eq_zero_iff_mem] using hi
-  ·
-    ext c
+  · ext c
     rw [Ideal.mem_comap, blowUpOf, RingHom.mem_ker, Ideal.mem_bot]
     change aeval (blowUpSubst P u) (C c) = 0 ↔ c = 0
     rw [aeval_C, Polynomial.algebraMap_apply, Polynomial.C_eq_zero,
       show algebraMap O (MRing ι O ⧸ P) c = Ideal.Quotient.mk P (C c) from rfl,
       Ideal.Quotient.eq_zero_iff_mem, ← Ideal.mem_comap, hP.noTorsion, Ideal.mem_bot]
-  ·
-    set I : Ideal (MRing ι O ⧸ P) := Ideal.span (Set.range fun j => Ideal.Quotient.mk P (u j))
+  · set I : Ideal (MRing ι O ⧸ P) := Ideal.span (Set.range fun j => Ideal.Quotient.mk P (u j))
     have hI : I ≠ ⊥ := by
       obtain ⟨j, hj⟩ := hne
       intro h
@@ -296,8 +309,7 @@ theorem BlowUpModel.proof (h₁ : ReesAlgebraDim.Statement.{u}) : BlowUpModel.St
             change Polynomial.C (Ideal.Quotient.mk P (u i)) * Polynomial.X ∈ reesAlgebra I
             rw [Polynomial.C_mul_X_eq_monomial]
             exact reesAlgebra.monomial_mem.mpr (by rw [pow_one]; exact Ideal.subset_span ⟨i, rfl⟩)
-          | some k =>
-            exact (reesAlgebra I).algebraMap_mem _
+          | some k => exact (reesAlgebra I).algebraMap_mem _
       · intro hx
         rw [← adjoin_monomial_eq_reesAlgebra] at hx
         induction hx using Algebra.adjoin_induction with

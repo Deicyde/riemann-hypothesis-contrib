@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.exists_integral_degeneration_values
     : Laws
       → ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (D : DegPre R),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_integral_degeneration_values
           → ∀ (F : Type) [Field F] [Algebra (FractionRing R) F] (S : ValuationSubring F),
             (∀ r : R, algebraMap (FractionRing R) F (algebraMap R _ r) ∈ S)
               → ∃ (N : NumD F) (ν : NumOf D F N), ν.Integral S := by
-  first
-  | exact @GlobalTheory.ValuesExist.exists_integral_values
-  | exact GlobalTheory.ValuesExist.exists_integral_values
-  | (intros; apply GlobalTheory.ValuesExist.exists_integral_values <;> assumption)
+  first | exact @GlobalTheory.ValuesExist.exists_integral_values

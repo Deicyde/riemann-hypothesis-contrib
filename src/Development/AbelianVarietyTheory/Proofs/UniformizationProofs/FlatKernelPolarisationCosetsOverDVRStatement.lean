@@ -51,6 +51,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.flat_kernelPolarisation_cosets_over_DVR
     : GlobalFnsSt
       → ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.flat_kernelPolarisation_cosets_over_DVR
                       ↔ ∃ y : T ⟶ H, y ≫ j = x)
                   → IsFinite H.hom
                   → Flat H.hom := by
-  first
-  | exact @GlobalTheory.StabFlat.flat_of_isFinite
-  | exact GlobalTheory.StabFlat.flat_of_isFinite
-  | (intros; apply GlobalTheory.StabFlat.flat_of_isFinite <;> assumption)
+  first | exact @GlobalTheory.StabFlat.flat_of_isFinite

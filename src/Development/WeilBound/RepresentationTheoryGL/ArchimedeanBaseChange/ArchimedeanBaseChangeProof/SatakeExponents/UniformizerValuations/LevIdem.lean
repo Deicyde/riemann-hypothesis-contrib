@@ -46,8 +46,6 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheo
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 attribute [local instance] borelG borelF borelH

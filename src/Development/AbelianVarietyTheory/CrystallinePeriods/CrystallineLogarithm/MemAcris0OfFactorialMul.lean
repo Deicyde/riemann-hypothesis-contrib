@@ -311,7 +311,7 @@ theorem Bridge.tower
           (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l)))
             ((Reformulated.AutPerF.acrisZero l ↥(PadicComplexInt l))) x) := by
   intro l _ x
-  first | rfl | exact IsScalarTower.algebraMap_apply _ _ _ x
+  first | rfl
 
 end
 end ScalarTowerAlt
@@ -345,7 +345,7 @@ theorem Bridge.sigA_coeff
               g))
           (w.coeff n) := by
   intro l _ g w n
-  first | exact WittVector.map_coeff _ _ _ | rfl
+  first | exact WittVector.map_coeff _ _ _
 
 end
 end SigmaCoeffA
@@ -1379,11 +1379,7 @@ section
 
 namespace Bridge.RingBasics.SpanPowerIntegralLemmas
 
-theorem norm_eq_val (l : ℕ) [Fact l.Prime] (y : ℂ_[l])
-    : ‖y‖ = (((PadicComplex.valued l).v y : NNReal) : ℝ) := by
-  rw [PadicComplex.norm_eq_norm]
-  simp only [Valuation.norm_def, PadicComplex.RankOne.hom_eq_embedding]
-  rw [Valuation.embedding_restrict (PadicComplex.valued l).v y]
+alias norm_eq_val := _root_.NormEqValuation.Bridge.RingBasics.norm_eq_val
 
 theorem mem_iff (l : ℕ) [Fact l.Prime] (y : ℂ_[l]) : y ∈ PadicComplexInt l ↔ ‖y‖ ≤ 1 := by
   rw [PadicComplexInt, Valuation.mem_valuationSubring_iff, norm_eq_val]
@@ -1730,13 +1726,7 @@ end FrobeniusMulComplex
 namespace IntegralComplexMem
 section
 
-theorem Bridge.RingBasics.mem_OC
-    : ∀ (l : ℕ) [Fact l.Prime] (x : ℂ_[l]), x ∈ PadicComplexInt l ↔ ‖x‖ ≤ 1 := by
-  intro l _ x
-  rw [PadicComplexInt, Valuation.mem_valuationSubring_iff, PadicComplex.norm_eq_norm,
-    Valuation.norm_def, ← NNReal.coe_one, NNReal.coe_le_coe,
-    (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
-    Valuation.embedding_restrict]
+alias Bridge.RingBasics.mem_OC := _root_.SpanPowerIntegral.Bridge.RingBasics.SpanPowerIntegralLemmas.mem_iff
 
 end
 end IntegralComplexMem

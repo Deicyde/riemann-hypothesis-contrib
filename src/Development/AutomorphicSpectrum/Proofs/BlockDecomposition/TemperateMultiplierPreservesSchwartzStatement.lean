@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.temperate_multiplier_preserves_schwartz
         → ∀ φ : Mx D m n → ℂ,
           φ ∈ schwartzA θ m n
             → (fun x => q (fun τ i j => compAt θ τ x i j) * φ x) ∈ schwartzA θ m n := by
-  first
-  | exact @GlobalTheory.CompanionTheory.WSum.mul_mem_schwartzA
-  | exact GlobalTheory.CompanionTheory.WSum.mul_mem_schwartzA
-  | (intros; apply GlobalTheory.CompanionTheory.WSum.mul_mem_schwartzA <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.WSum.mul_mem_schwartzA

@@ -53,9 +53,6 @@ open Formalism.L2.Host (embLL0 CharFrame)
 open GlobalTheory.TwSys GlobalTheory.TwAll GlobalTheory.SupLaw GlobalTheory.LiftLeaf
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.TwInputs.Move
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -74,7 +71,7 @@ def tensMap
     {
       toFun := fun a => (TensorProduct.mk R' K' M' (κ a)).toAddMonoidHom.comp φ
       map_zero' := by ext; simp
-      map_add' := fun _ _ => by ext; simp [TensorProduct.add_tmul]
+      map_add' := fun _ _ => by ext; simp
     }
     fun c a x => by
       change κ (c • a) ⊗ₜ[R'] φ x = κ a ⊗ₜ[R'] φ (c • x)

@@ -49,6 +49,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum GlobalTheory.Chain GlobalTheory.CompactHowe Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.fockPolynomialVector_basisChange_eq_substitution
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D),
       IsStdChar D ψ (-1) → IsInfFam θ
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.fockPolynomialVector_basisChange_eq_substitution
                   (fun _ => 1)
                   (fun _ => 1)
                   BS BT f (substF h (fun τ => ((g τ)⁻¹)ᵀ) P) := by
-  first
-  | exact @GlobalTheory.FockBaseChange.pureTensorO_subst
-  | exact GlobalTheory.FockBaseChange.pureTensorO_subst
-  | (intros; apply GlobalTheory.FockBaseChange.pureTensorO_subst <;> assumption)
+  first | exact @GlobalTheory.FockBaseChange.pureTensorO_subst

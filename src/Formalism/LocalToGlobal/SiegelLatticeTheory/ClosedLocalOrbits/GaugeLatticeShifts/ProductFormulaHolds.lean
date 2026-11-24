@@ -68,11 +68,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 theorem good_eq {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
     : Good X u u' = Set.univ.pi fun _ => GoodLoc (r := D.R.rS) (Tw u) (Tw u') := by
   ext y
-  first
-  | (simp only [Good, GoodLoc, Set.mem_pi, Set.mem_univ, true_implies, Set.mem_setOf_eq])
-  | (simp only [Good, Set.mem_pi, Set.mem_univ, true_implies, Set.mem_setOf_eq]; rfl)
-  | (simp [Good, GoodLoc])
-  | (show _ ↔ _; exact Iff.rfl)
+  first | (simp only [Good, GoodLoc, Set.mem_pi, Set.mem_univ, true_implies, Set.mem_setOf_eq])
 
 theorem product_formula_holds : P5 := by
   intro hJac hDC hSM hU hNH hR D X u u' sc hsc
@@ -83,7 +79,7 @@ theorem product_formula_holds : P5 := by
   have hzp : ∀ w v b, hJ (X.B.I.ε v) (zV X w v) (pV X v b) = 0 := fun w v b => by
     have h0 : hJ (X.B.I.ε v) (pV X v b) (zV X w v) = 0 :=
       (hJ_X X v _ _).trans (by rw [(X.zu_orth w b).2]; simp)
-    rw [hJ_cj, h0, map_zero]
+    rw [_root_.Formalism.L2.SG.PoincareInHH.Cut.hJ_conj, h0, map_zero]
   have hSH : ∀ w v, IsHaarS (SLoc (X.B.I.ε v) (eV X v) (zV X w v)) (muSv X w v) := fun w v =>
     hNH _ _ _ _ _ _ _ _ _ _ (frameLoc_X X w u v) (hep v) (hpp v) (hzp w v) _ _ (muNv_haar X w v)
       (muHv_haar X w v)

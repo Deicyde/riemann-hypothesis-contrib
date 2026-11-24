@@ -121,7 +121,7 @@ theorem integralWith_congr_null
     {S : Set X} (hS : A.IsAnalyticSubset S) (hint : interior S = ∅)
     {g g' : X → ℝ} (hg : ∀ x ∉ S, g x = g' x)
     : integralWith A P Φ g = integralWith A P Φ g' := by
-  first | unfold integralWith | simp only [integralWith]
+  first | unfold integralWith
   refine Finset.sum_congr rfl (fun j _ => ?_)
   have hT : MeasurableSet (A.chart j).target := (A.chart j).open_target.measurableSet
   have hnull : volume ((A.chart j) '' (S ∩ (A.chart j).source)) = 0 := analyticNull A S hS hint j

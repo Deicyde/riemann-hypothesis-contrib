@@ -495,7 +495,7 @@ private theorem finprod_split
   rw [← h]
   congr 1
   refine finprod_congr fun u => ?_
-  simp [Set.mem_diff]
+  simp
 
 end SlopeTestRemainingChoices
 

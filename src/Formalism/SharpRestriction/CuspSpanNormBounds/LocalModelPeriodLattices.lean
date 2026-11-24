@@ -1,33 +1,31 @@
 module
 
-import Formalism.PeriodIntegrals.AlgebraMapMemO
+public import Formalism.HermitianCurvature.StatementI
 public import Formalism.HermitianCurvature.BlockKernelPropertiesOfSteps
 public import Formalism.HermitianCurvature.PrimeToDifferent
 public import Formalism.SharpRestriction.CuspSpanNormBounds.LocalGroupInFamilyNontrivial
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FinrankLeOfMapLe
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.PeriodLatticeFactsSplitOfGeneral
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic
-import Mathlib.Algebra.AffineMonoid.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Coalgebra.IsFrobenius
-import Mathlib.RingTheory.HopfAlgebra.Basic
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.Valuation.Extension
-import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.RingTheory.WittVector.IsPoly
 import Mathlib.Tactic.Basify
 import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Echelon.Zsqrtd
@@ -37,8 +35,6 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.HaveILetI
-import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -54,9 +50,60 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Formalism.PeriodIntegrals.AlgebraMapMemO
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Valuation.Extension
+import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
 import Std.Tactic.BVDecide.Normalize.Prop
 import Formalism.SharpRestriction.CuspSpanNormBounds.ChainLength
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic, Formalism.SharpRestriction.CuspSpanNormBounds.LocalModelPeriodLattices
+
+-- ===== clump member: Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic =====
+-- clump-header: {"m": "Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic", "h": "module\n\npublic import Formalism.HermitianCurvature.StatementI\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+namespace Formalism.FourierDecayAlt.P.Misc
+
+open Formalism.FourierDecayAlt.I Finset Polynomial
+
+theorem selfDualG_holds : SelfDualG := by
+  intro F _ o q hq hq0 a
+  constructor
+  · intro h
+    have h1 := h (1, 1) ⟨o.one_mem, o.one_mem, 0, o.zero_mem, by simp⟩
+    have h2 := h (q, 0) ⟨hq, o.zero_mem, 1, o.one_mem, by simp⟩
+    simp only [mul_one, mul_zero, sub_zero] at h1 h2
+    have e2 : a.1 * q / q = a.1 := by field_simp
+    rw [e2] at h2
+    refine ⟨h2, ?_, (a.1 - a.2) / q, h1, by field_simp⟩
+    have : a.2 = a.1 - q * ((a.1 - a.2) / q) := by field_simp; ring
+    rw [this]
+    exact o.sub_mem h2 (o.mul_mem hq h1)
+  · rintro ⟨ha1, ha2, s, hs, has⟩ b ⟨hb1, hb2, t, ht, hbt⟩
+    have ha : a.1 = a.2 + q * s := by linear_combination has
+    have hb : b.1 = b.2 + q * t := by linear_combination hbt
+    have e : (a.1 * b.1 - a.2 * b.2) / q = a.2 * t + s * b.2 + q * s * t := by
+      rw [ha, hb]; field_simp; ring
+    rw [e]
+    exact o.add_mem (o.add_mem (o.mul_mem ha2 ht) (o.mul_mem hs hb2))
+      (o.mul_mem (o.mul_mem hq hs) ht)
+
+end Formalism.FourierDecayAlt.P.Misc
+
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic =====
+
+-- ===== clump member: Formalism.SharpRestriction.CuspSpanNormBounds.LocalModelPeriodLattices =====
+-- clump-header: {"m": "Formalism.SharpRestriction.CuspSpanNormBounds.LocalModelPeriodLattices", "h": "module\n\nimport Formalism.PeriodIntegrals.AlgebraMapMemO\npublic import Formalism.HermitianCurvature.BlockKernelPropertiesOfSteps\npublic import Formalism.HermitianCurvature.PrimeToDifferent\npublic import Formalism.SharpRestriction.CuspSpanNormBounds.LocalGroupInFamilyNontrivial\npublic import Formalism.HermitianCurvature.HermitianCurvatureProofs.FinrankLeOfMapLe\npublic import Formalism.HermitianCurvature.HermitianCurvatureProofs.PeriodLatticeFactsSplitOfGeneral\npublic import Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferProductMonic\nimport Mathlib.Algebra.AffineMonoid.Basic\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Coalgebra.IsFrobenius\nimport Mathlib.RingTheory.HopfAlgebra.Basic\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.Valuation.Extension\nimport Mathlib.RingTheory.Valuation.Integral\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.HaveILetI\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\nimport Formalism.SharpRestriction.CuspSpanNormBounds.ChainLength\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
@@ -65,7 +112,8 @@ namespace Formalism.MainNotions.LocalModelPeriodLattices
 
 section Global
 
-open NumberField NumberField.IsCMField Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.JointEigenvalueBoundsFromAnyDatum
+open NumberField NumberField.IsCMField Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.JointEigenvalueBoundsFromAnyDatum
 open scoped BigOperators nonZeroDivisors
 
 variable {D : Formalism.BasicNotions.D7}
@@ -73,10 +121,10 @@ variable {D : Formalism.BasicNotions.D7}
 theorem gS_pos (D : Formalism.BasicNotions.D7) : 0 < Lat.gS D :=
   Nat.mul_pos (D.host.g_prime 0).pos (D.host.g_prime 1).pos
 
-theorem cmE (D : Formalism.BasicNotions.D7) : IsCMField D.host.E :=
-  D.host.isCMField_hostE
+theorem cmE (D : Formalism.BasicNotions.D7) : IsCMField D.host.E := D.host.isCMField_hostE
 
-theorem deg_eq (D : Formalism.BasicNotions.D7) : letI := cmE D; Formalism.FourierDecayAlt.S6.deg D.host.E = D.R.f := by
+theorem deg_eq (D : Formalism.BasicNotions.D7)
+    : letI := cmE D; Formalism.FourierDecayAlt.S6.deg D.host.E = D.R.f := by
   have := cmE D
   have h1 := (Formalism.FourierDecayAlt.P.degreeFacts_statement D.host.E).1
   have h2 : Module.finrank ℚ D.host.E = 4 * D.R.ord := D.host.finrank_cmField
@@ -84,19 +132,17 @@ theorem deg_eq (D : Formalism.BasicNotions.D7) : letI := cmE D; Formalism.Fourie
   rw [h2] at h1
   omega
 
-theorem gdd_eq_idl (D : Formalism.BasicNotions.D7) (a b : ℤ) :
-    letI := cmE D; gdd (D := D) a b = Formalism.FourierDecayAlt.S6.idl D.host.E (Lat.gS D) a b := by
-  simp only [gdd, Formalism.FourierDecayAlt.S6.idl, Formalism.FourierDecayAlt.S6.dd, Formalism.BasicNotions.Host.ddE]
+theorem gdd_eq_idl (D : Formalism.BasicNotions.D7) (a b : ℤ)
+    : letI := cmE D
+      gdd (D := D) a b = Formalism.FourierDecayAlt.S6.idl D.host.E (Lat.gS D) a b := by
+  simp only [gdd, Formalism.FourierDecayAlt.S6.idl, Formalism.FourierDecayAlt.S6.dd,
+    Formalism.BasicNotions.Host.ddE]
   rw [mul_comm]
 
 def PlacesTau (D : Formalism.BasicNotions.D7) : Prop :=
   ∀ l : D.host.E, ∏ τ : D.what₂.Tau, ‖D.host.emb (D.eTau τ) l‖ = ∏ w : InfinitePlace D.host.E, w l
 
-theorem rdE_pos (D : Formalism.BasicNotions.D7) : 0 < D.host.rdE := by
-  unfold Formalism.BasicNotions.Host.rdE
-  apply Real.rpow_pos_of_pos
-  have : (discr D.host.E : ℝ) ≠ 0 := by exact_mod_cast NumberField.discr_ne_zero D.host.E
-  exact abs_pos.2 this
+alias rdE_pos := _root_.Formalism.MainNotions.S.rdE_pos
 
 theorem emb_injective (D : Formalism.BasicNotions.D7) : Function.Injective D.host.emb := by
   intro g g' h
@@ -104,11 +150,11 @@ theorem emb_injective (D : Formalism.BasicNotions.D7) : Function.Injective D.hos
     AlgEquiv.ext fun x => D.host.φ₀.injective (RingHom.congr_fun h x)
   exact (D.host.gal).symm.injective h1
 
-theorem conj_emb (D : Formalism.BasicNotions.D7) (g : D.R.GG) :
-    ComplexEmbedding.conjugate (D.host.emb g) = D.host.emb (D.R.cc * g) := by
+theorem conj_emb (D : Formalism.BasicNotions.D7) (g : D.R.GG)
+    : ComplexEmbedding.conjugate (D.host.emb g) = D.host.emb (D.R.cc * g) := by
   refine RingHom.ext fun x => ?_
-  simp only [ComplexEmbedding.conjugate_coe_eq, Formalism.BasicNotions.Host.emb, Formalism.BasicNotions.Host.sigmaOf,
-    RingHom.comp_apply, map_mul]
+  simp only [ComplexEmbedding.conjugate_coe_eq, Formalism.BasicNotions.Host.emb,
+    Formalism.BasicNotions.Host.sigmaOf, RingHom.comp_apply, map_mul]
   rw [← D.host.conjE_apply]
   rfl
 
@@ -116,55 +162,65 @@ theorem cc_notMem (φ : Formalism.HC.Frame) : φ.cc ∉ φ.Psi := by
   rw [Formalism.HC.Frame.mem_Psi_iff]
   simp [Formalism.HC.Frame.cc, Formalism.FrobeniusOrbits.c0]
 
-theorem conjF_eq_complexConj (D : Formalism.BasicNotions.D7) (x : D.host.E) :
-    letI := cmE D; D.conjF x = IsCMField.complexConj D.host.E x := by
+theorem conjF_eq_complexConj (D : Formalism.BasicNotions.D7) (x : D.host.E)
+    : letI := cmE D; D.conjF x = IsCMField.complexConj D.host.E x := by
   have := cmE D
   apply D.host.φ₀.injective
   rw [D.conjF_eq, IsCMField.complexEmbedding_complexConj]
   exact D.host.conjE_apply _ _
 
-def LaIsPeriod (δ : ∀ p, (D.s.atP p).Fp)
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (ν s : ℕ) : Prop :=
+def LaIsPeriod
+    (δ : ∀ p, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (ν s : ℕ)
+    : Prop :=
   ∀ t, t ∈ La M δ ν s ↔ t ∈ gdd (D := D) 1 ν ∧ t - (-1) ^ s * D.conjF t ∈ gdd (D := D) 2 ν
 
-theorem mem_perLat_iff (δ : ∀ p, (D.s.atP p).Fp)
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (ν s : ℕ) (h1 : LaIsPeriod δ M ν s)
-    (t : D.host.E) :
-    letI := cmE D; t ∈ Formalism.FourierDecayAlt.S6.perLat D.host.E (Lat.gS D) ν s ↔ t ∈ La M δ ν s := by
+theorem mem_perLat_iff
+    (δ : ∀ p, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (ν s : ℕ)
+    (h1 : LaIsPeriod δ M ν s)
+    (t : D.host.E)
+    : letI := cmE D
+      t ∈ Formalism.FourierDecayAlt.S6.perLat D.host.E (Lat.gS D) ν s ↔ t ∈ La M δ ν s := by
   have := cmE D
-  rw [h1 t, Formalism.FourierDecayAlt.S6.perLat, Formalism.FourierDecayAlt.P.S6x1.mem_twLat, gdd_eq_idl, gdd_eq_idl,
-    conjF_eq_complexConj]
+  rw [h1 t, Formalism.FourierDecayAlt.S6.perLat, Formalism.FourierDecayAlt.P.S6x1.mem_twLat,
+    gdd_eq_idl, gdd_eq_idl, conjF_eq_complexConj]
 
-theorem unram_of (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (h : ∀ P : Ideal (𝓞 E), P.IsMaximal → ∃ θ t : 𝓞 E,
-      algebraMap (𝓞 E) E t = complexConj E (algebraMap (𝓞 E) E θ) ∧ θ - t ∉ P) :
-    Formalism.FourierDecayAlt.S6.Unram E := by
-  have key : ∀ θ t : 𝓞 E, algebraMap (𝓞 E) E t = complexConj E (algebraMap (𝓞 E) E θ) →
-      θ - t ∈ differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) := by
+theorem unram_of
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (h : ∀ P : Ideal (𝓞 E),
+      P.IsMaximal
+        → ∃ θ t : 𝓞 E, algebraMap (𝓞 E) E t = complexConj E (algebraMap (𝓞 E) E θ) ∧ θ - t ∉ P)
+    : Formalism.FourierDecayAlt.S6.Unram E := by
+  have key
+      : ∀ θ t : 𝓞 E,
+        algebraMap (𝓞 E) E t = complexConj E (algebraMap (𝓞 E) E θ)
+          → θ - t ∈ differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) := by
     intro θ t ht
     have h10 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := one_ne_zero
-    have h1 : algebraMap (𝓞 E) E (θ - t) ∈
-        ((differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) : Ideal (𝓞 E)) :
-          FractionalIdeal (𝓞 E)⁰ E) := by
+    have h1
+        : algebraMap (𝓞 E) E (θ - t)
+          ∈ ((differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) : Ideal (𝓞 E))
+            : FractionalIdeal (𝓞 E)⁰ E) := by
       rw [coeIdeal_differentIdeal (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E),
         FractionalIdeal.mem_inv_iff (FractionalIdeal.dual_ne_zero _ _ h10)]
       intro y hy
       rw [FractionalIdeal.mem_dual h10] at hy
       obtain ⟨a₁, ha₁⟩ := hy 1 (FractionalIdeal.one_mem_one _)
-      obtain ⟨a₂, ha₂⟩ := hy (algebraMap (𝓞 E) E θ)
-        ((FractionalIdeal.mem_one_iff _).2 ⟨θ, rfl⟩)
+      obtain ⟨a₂, ha₂⟩ := hy (algebraMap (𝓞 E) E θ) ((FractionalIdeal.mem_one_iff _).2 ⟨θ, rfl⟩)
       rw [Algebra.traceForm_apply] at ha₁ ha₂
       have e₁ := Formalism.FourierDecayAlt.P.S6x3.trace_eq E (y * 1)
       have e₂ := Formalism.FourierDecayAlt.P.S6x3.trace_eq E (y * algebraMap (𝓞 E) E θ)
       rw [← ha₁] at e₁
       rw [← ha₂] at e₂
       rw [FractionalIdeal.mem_one_iff]
-      refine ⟨algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) a₂ -
-        t * algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) a₁, ?_⟩
+      refine ⟨
+        algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) a₂
+          - t * algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) a₁,
+        ?_
+      ⟩
       rw [map_sub, map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
         IsScalarTower.algebraMap_apply (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) E a₂,
-        IsScalarTower.algebraMap_apply (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) E a₁,
-        e₁, e₂, map_sub, ht, map_mul, mul_one]
+        IsScalarTower.algebraMap_apply (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) E a₁, e₁,
+        e₂, map_sub, ht, map_mul, mul_one]
       ring
     obtain ⟨x, hx, hxe⟩ := (FractionalIdeal.mem_coeIdeal _).1 h1
     have : x = θ - t := (FaithfulSMul.algebraMap_injective (𝓞 E) E) hxe
@@ -178,7 +234,8 @@ theorem unram_of (E : Type) [Field E] [NumberField E] [IsCMField E]
   rw [differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 (maximalRealSubfield E)) (𝓞 E), top,
     Ideal.top_mul]
 
-theorem unramE (D : Formalism.BasicNotions.D7) : letI := cmE D; Formalism.FourierDecayAlt.S6.Unram D.host.E := by
+theorem unramE (D : Formalism.BasicNotions.D7)
+    : letI := cmE D; Formalism.FourierDecayAlt.S6.Unram D.host.E := by
   have := cmE D
   exact unram_of D.host.E D.sp.cm.cmUnram.2.2
 
@@ -186,7 +243,8 @@ end Global
 
 section Local
 
-open Formalism.MainNotions.S.Loc Formalism.FourierDecayAlt Formalism.DoubleCosetMeasures ValuativeRel
+open Formalism.MainNotions.S.Loc Formalism.FourierDecayAlt Formalism.DoubleCosetMeasures
+  ValuativeRel
 open scoped ComplexConjugate ComplexOrder
 
 section Points
@@ -196,28 +254,33 @@ variable {E : Type} [CommRing E]
 def tr {n : ℕ} (w : Pt E n) : A5.Point E :=
   (w.blocks.map (fun b => (b.2 : ℕ)), fun i => (w.blocks.map Prod.fst).getD i 1)
 
-theorem tr_sum {n : ℕ} (w : Pt E n) : (tr w).1.sum = n := by
-  exact w.size
+theorem tr_sum {n : ℕ} (w : Pt E n) : (tr w).1.sum = n := by exact w.size
 
-theorem tr_snoc {n : ℕ} (h : Pt E n) (t : Eˣ) (s : ℕ+) :
-    tr (h.snoc t s) = A5.addBlock (tr h) s t := by
+theorem tr_snoc {n : ℕ} (h : Pt E n) (t : Eˣ) (s : ℕ+)
+    : tr (h.snoc t s) = A5.addBlock (tr h) s t := by
   simp only [tr, Pt.snoc, A5.addBlock, List.map_append, List.map_cons, List.map_nil]
   refine Prod.ext rfl (funext fun i => ?_)
   simp only [Function.update_apply, List.length_map]
   split_ifs with hi
   · subst hi
     simp
-  · simp [List.getD_eq_getElem?_getD, List.getElem?_append, hi]
+  · simp [List.getD_eq_getElem?_getD, List.getElem?_append]
     split_ifs with hlt
     · rfl
     · have h1 : h.blocks.length < i := lt_of_le_of_ne (not_lt.mp hlt) (Ne.symm hi)
       have h2 : h.blocks[i]? = none := List.getElem?_eq_none (by omega)
-      have h3 : [t][i - h.blocks.length]? = none := List.getElem?_eq_none (by simp only [List.length_singleton]; omega)
+      have h3 : [t][i - h.blocks.length]? = none :=
+        List.getElem?_eq_none (by simp only [List.length_singleton]; omega)
       simp [h2, h3]
 
-theorem ptEntryL_eq : ∀ (bs : List (Eˣ × ℕ+)) (a b : ℕ), a < (bs.map (fun b => (b.2 : ℕ))).sum →
-    ptEntryL bs a b = if b = revIn (bs.map (fun b => (b.2 : ℕ))) a then
-      (((bs.map Prod.fst).getD (blk (bs.map (fun b => (b.2 : ℕ))) a) 1 : Eˣ) : E) else 0
+theorem ptEntryL_eq
+    : ∀ (bs : List (Eˣ × ℕ+)) (a b : ℕ),
+      a < (bs.map (fun b => (b.2 : ℕ))).sum
+        → ptEntryL bs a b
+          = if b = revIn (bs.map (fun b => (b.2 : ℕ))) a then
+              (((bs.map Prod.fst).getD (blk (bs.map (fun b => (b.2 : ℕ))) a) 1 : Eˣ) : E)
+            else
+              0
   | [], a, b, h => by simp at h
   | (t, s) :: bs, a, b, h => by
     simp only [List.map_cons, List.sum_cons] at h
@@ -228,33 +291,38 @@ theorem ptEntryL_eq : ∀ (bs : List (Eˣ × ℕ+)) (a b : ℕ), a < (bs.map (fu
       · simp only [hb, if_true, List.getD_cons_zero]
         congr 1
         exact propext ⟨fun _ => by omega, fun _ => by omega⟩
-      · have h1 : ¬ ((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) := by omega
-        have h2 : ¬ (b = (s : ℕ) - 1 - a) := by omega
+      · have h1 : ¬((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) := by omega
+        have h2 : ¬(b = (s : ℕ) - 1 - a) := by omega
         simp [hb, h1, h2]
-    · have h1 : ¬ (a < (s : ℕ) ∧ b < (s : ℕ)) := by omega
+    · have h1 : ¬(a < (s : ℕ) ∧ b < (s : ℕ)) := by omega
       simp only [ha, false_and, if_false]
       by_cases hb : (s : ℕ) ≤ b
       · have h2 : (s : ℕ) ≤ a ∧ (s : ℕ) ≤ b := ⟨by omega, hb⟩
         simp only [h2, and_self, if_true]
         rw [ptEntryL_eq bs (a - s) (b - s) (by omega)]
-        have h3 : (b - (s : ℕ) = revIn (bs.map (fun b => (b.2 : ℕ))) (a - s)) ↔
-            (b = (s : ℕ) + revIn (bs.map (fun b => (b.2 : ℕ))) (a - s)) := by omega
+        have h3
+            : (b - (s : ℕ) = revIn (bs.map (fun b => (b.2 : ℕ))) (a - s))
+              ↔ (b = (s : ℕ) + revIn (bs.map (fun b => (b.2 : ℕ))) (a - s)) := by
+          omega
         simp only [h3, Nat.add_comm 1, List.getD_cons_succ]
-      · have h2 : ¬ ((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) := by omega
-        have h3 : ¬ (b = (s : ℕ) + revIn (bs.map (fun b => (b.2 : ℕ))) (a - s)) := by omega
+      · have h2 : ¬((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) := by omega
+        have h3 : ¬(b = (s : ℕ) + revIn (bs.map (fun b => (b.2 : ℕ))) (a - s)) := by omega
         simp [h2, h3]
 
-theorem mat_eq {n : ℕ} (w : Pt E n) :
-    w.mat = (pt (tr w).1 (tr w).2).submatrix (finCongr (tr_sum w).symm) (finCongr (tr_sum w).symm) := by
+theorem mat_eq {n : ℕ} (w : Pt E n)
+    : w.mat
+      = (pt (tr w).1 (tr w).2).submatrix (finCongr (tr_sum w).symm) (finCongr (tr_sum w).symm) := by
   ext a b
-  simp only [Pt.mat, Matrix.submatrix_apply, pt, tr, finCongr_apply, Fin.val_cast]
+  simp only [Pt.mat, Matrix.submatrix_apply, pt, tr]
   exact ptEntryL_eq w.blocks a b (by rw [w.size]; exact a.2)
 
 theorem det_eq {n : ℕ} (w : Pt E n) : w.mat.det = (pt (tr w).1 (tr w).2).det := by
   rw [mat_eq w, Matrix.det_submatrix_equiv_self]
 
-theorem isInt_inv_of {n : ℕ} (R : Subring E) (A : Matrix (Fin n) (Fin n) E) (hA : IsInt R A)
-    (u : E) (hu : u ∈ R) (h : A.det * u = 1) : IsInt R A⁻¹ := by
+theorem isInt_inv_of
+    {n : ℕ} (R : Subring E) (A : Matrix (Fin n) (Fin n) E) (hA : IsInt R A)
+    (u : E) (hu : u ∈ R) (h : A.det * u = 1)
+    : IsInt R A⁻¹ := by
   have hAinv : A⁻¹ = u • A.adjugate := by
     apply Matrix.inv_eq_right_inv
     rw [Matrix.mul_smul, Matrix.mul_adjugate, smul_smul, mul_comm u, h, one_smul]
@@ -303,10 +371,11 @@ section SelfDual
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem mem_R_split (L : LocE F E) (g : SplitG L) (mu : MeasureTheory.Measure E) (x : E) :
-    x ∈ (⟨L, some g, mu⟩ : Model F E).R ↔ g.e x ∈ Formalism.FourierDecayAlt.I.orderR (𝒪[F]) (g.q : F) := by
-  simp only [Model.R, Subring.mem_comap, Subring.mem_map, RingHom.mem_eqLocus, Formalism.FourierDecayAlt.I.orderR,
-    Set.mem_setOf_eq, RingHom.comp_apply]
+theorem mem_R_split (L : LocE F E) (g : SplitG L) (mu : MeasureTheory.Measure E) (x : E)
+    : x ∈ (⟨L, some g, mu⟩ : Model F E).R
+      ↔ g.e x ∈ Formalism.FourierDecayAlt.I.orderR (𝒪[F]) (g.q : F) := by
+  simp only [Model.R, Subring.mem_comap, Subring.mem_map, RingHom.mem_eqLocus,
+    Formalism.FourierDecayAlt.I.orderR, Set.mem_setOf_eq, RingHom.comp_apply]
   constructor
   · rintro ⟨⟨u, v⟩, huv, hx⟩
     have hx' : g.e x = ((u : F), (v : F)) := hx.symm
@@ -324,8 +393,11 @@ theorem mem_R_split (L : LocE F E) (g : SplitG L) (mu : MeasureTheory.Measure E)
       ring
     · rfl
 
-theorem psiF_cond (hF : IsNonarchimedeanLocalField F) (L : LocE F E) (g : SplitG L) (x : F)
-    (h : ∀ u ∈ 𝒪[F], g.psiF (u * x) = 1) : x ∈ 𝒪[F] := by
+theorem psiF_cond
+    (hF : IsNonarchimedeanLocalField F)
+    (L : LocE F E) (g : SplitG L)
+    (x : F) (h : ∀ u ∈ 𝒪[F], g.psiF (u * x) = 1)
+    : x ∈ 𝒪[F] := by
   by_contra hx
   have hx0 : x ≠ 0 := by
     rintro rfl
@@ -363,28 +435,36 @@ theorem psiF_cond (hF : IsNonarchimedeanLocalField F) (L : LocE F E) (g : SplitG
   rw [e]
   exact h _ ((𝒪[F]).mul_mem y.2 v.2)
 
-theorem selfDual_of_core (M : Model F E) (hOK : M.OK) (a : E) :
-    (∀ r ∈ M.R, M.psiR (a * r) = 1) ↔ a ∈ M.R := by
+theorem selfDual_of_core (M : Model F E) (hOK : M.OK) (a : E)
+    : (∀ r ∈ M.R, M.psiR (a * r) = 1) ↔ a ∈ M.R := by
   have hF := hOK.loc
   obtain ⟨L, _ | g, mu⟩ := M
   · exact L.additive_character_dual_ring a
   · have hq : (g.q : F) ≠ 0 := by
       intro h0
       exact g.q_irr.ne_zero (Subtype.ext h0)
-    have hpsi : ∀ x : E, (⟨L, some g, mu⟩ : Model F E).psiR x =
-        g.psiF (((g.e x).1 - (g.e x).2) / (g.q : F)) := fun x => rfl
+    have hpsi
+        : ∀ x : E,
+          (⟨L, some g, mu⟩ : Model F E).psiR x = g.psiF (((g.e x).1 - (g.e x).2) / (g.q : F)) :=
+      fun x => rfl
     constructor
     · intro h
       rw [mem_R_split]
-      refine (Formalism.FourierDecayAlt.P.self_dual_gamma F (𝒪[F]) (g.q : F) g.q.2 hq (g.e a)).1 ?_
+      refine (_root_.Formalism.FourierDecayAlt.P.Misc.selfDualG_holds F (𝒪[F]) (g.q : F) g.q.2 hq
+        (g.e a)).1 ?_
       intro b hb
       apply psiF_cond hF L g
       intro u hu
       have hr : g.e.symm (u * b.1, u * b.2) ∈ (⟨L, some g, mu⟩ : Model F E).R := by
         rw [mem_R_split, AlgEquiv.apply_symm_apply]
         obtain ⟨h1, h2, t, ht, h3⟩ := hb
-        exact ⟨(𝒪[F]).mul_mem hu h1, (𝒪[F]).mul_mem hu h2, u * t, (𝒪[F]).mul_mem hu ht, by
-          simp only; rw [← mul_sub, h3]; ring⟩
+        exact ⟨
+          (𝒪[F]).mul_mem hu h1,
+          (𝒪[F]).mul_mem hu h2,
+          u * t,
+          (𝒪[F]).mul_mem hu ht,
+          by simp only; rw [← mul_sub, h3]; ring
+        ⟩
       have := h _ hr
       rw [hpsi, map_mul, AlgEquiv.apply_symm_apply] at this
       rw [← this]
@@ -438,8 +518,8 @@ section Min2
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem exists_mul_eq_zero_of_not_isUnit [Module.Finite F E] (y : E) (hy : ¬ IsUnit y) :
-    ∃ a : E, a ≠ 0 ∧ y * a = 0 := by
+theorem exists_mul_eq_zero_of_not_isUnit [Module.Finite F E] (y : E) (hy : ¬ IsUnit y)
+    : ∃ a : E, a ≠ 0 ∧ y * a = 0 := by
   by_contra hne
   push_neg at hne
   apply hy
@@ -459,22 +539,29 @@ theorem unitRep_of_OK (M : Model F E) (hOK : M.OK) (x : E) : ∃ r ∈ M.R, IsUn
   have h1 : ∀ i : Fin 3, ∃ a : E, a ≠ 0 ∧ (x + ((i : ℕ) : E)) * a = 0 := fun i =>
     exists_mul_eq_zero_of_not_isUnit (F := F) _ (hcon _ (natCast_mem M.R _))
   choose a ha0 ha using h1
-  have hli := Module.End.eigenvectors_linearIndependent' (LinearMap.mulLeft F x)
-    (fun i : Fin 3 => -(((i : ℕ) : F))) (by
-      intro i j hij
-      have : ((i : ℕ) : F) = ((j : ℕ) : F) := neg_injective hij
-      exact Fin.ext (Nat.cast_injective this)) a (by
-      intro i
-      refine ⟨?_, ha0 i⟩
-      rw [Module.End.mem_eigenspace_iff, LinearMap.mulLeft_apply, neg_smul, Algebra.smul_def, map_natCast]
-      linear_combination ha i)
+  have hli :=
+    Module.End.eigenvectors_linearIndependent' (LinearMap.mulLeft F x)
+      (fun i : Fin 3 => -(((i : ℕ) : F)))
+      (by
+        intro i j hij
+        have : ((i : ℕ) : F) = ((j : ℕ) : F) := neg_injective hij
+        exact Fin.ext (Nat.cast_injective this))
+      a
+      (by
+        intro i
+        refine ⟨?_, ha0 i⟩
+        rw [Module.End.mem_eigenspace_iff, LinearMap.mulLeft_apply, neg_smul, Algebra.smul_def,
+          map_natCast]
+        linear_combination ha i)
   have := hli.fintype_card_le_finrank
   rw [M.L.rank] at this
   simp at this
 
-theorem unitary_of (M : Model F E) (hOK : M.OK) (hO : IsOpen (M.R : Set E)) (hC : IsCompact (M.R : Set E))
-    (hU : ∃ ϖ : Eˣ, (ϖ : E) ∈ M.R ∧ ∀ x : E, ∃ m : ℕ, (ϖ : E) ^ m * x ∈ M.R) (x : E) :
-    conj (M.psiR x) = M.psiR (-x) := by
+theorem unitary_of
+    (M : Model F E) (hOK : M.OK) (hO : IsOpen (M.R : Set E)) (hC : IsCompact (M.R : Set E))
+    (hU : ∃ ϖ : Eˣ, (ϖ : E) ∈ M.R ∧ ∀ x : E, ∃ m : ℕ, (ϖ : E) ^ m * x ∈ M.R)
+    (x : E)
+    : conj (M.psiR x) = M.psiR (-x) := by
   have := top_of_OK M hOK
   have hψ : ∀ r ∈ M.R, M.psiR r = 1 := by
     intro r hr
@@ -489,8 +576,9 @@ theorem unitary_of (M : Model F E) (hOK : M.OK) (hO : IsOpen (M.R : Set E)) (hC 
   have hfin : Finite (M.R ⧸ Ideal.span {d}) := by
     have : CompactSpace M.R := isCompact_iff_compactSpace.1 hC
     have hopen : IsOpen ((Ideal.span {d}).toAddSubgroup : Set M.R) := by
-      have h1 : ((Ideal.span {d}).toAddSubgroup : Set M.R) =
-          (fun y : M.R => ((u⁻¹ : Eˣ) : E) * (y : E)) ⁻¹' (M.R : Set E) := by
+      have h1
+          : ((Ideal.span {d}).toAddSubgroup : Set M.R)
+            = (fun y : M.R => ((u⁻¹ : Eˣ) : E) * (y : E)) ⁻¹' (M.R : Set E) := by
         ext y
         simp only [Submodule.coe_toAddSubgroup, SetLike.mem_coe, Set.mem_preimage]
         rw [Ideal.mem_span_singleton']
@@ -511,8 +599,7 @@ theorem unitary_of (M : Model F E) (hOK : M.OK) (hO : IsOpen (M.R : Set E)) (hC 
     exact AddSubgroup.quotient_finite_of_isOpen (Ideal.span {d}).toAddSubgroup hopen
   have hN : 0 < Nat.card (M.R ⧸ Ideal.span {d}) := Nat.card_pos
   set N := Nat.card (M.R ⧸ Ideal.span {d}) with hNdef
-  have hux : (u : E) * x ∈ M.R := by
-    simpa only [u, Units.val_pow_eq_pow_val] using hm
+  have hux : (u : E) * x ∈ M.R := by simpa only [u, Units.val_pow_eq_pow_val] using hm
   have h0 : N • (Ideal.Quotient.mk (Ideal.span {d}) ⟨_, hux⟩) = 0 := card_nsmul_eq_zero'
   rw [← map_nsmul, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton'] at h0
   obtain ⟨c, hc⟩ := h0
@@ -523,7 +610,8 @@ theorem unitary_of (M : Model F E) (hOK : M.OK) (hO : IsOpen (M.R : Set E)) (hC 
     have : N • x = c := by
       apply u.isUnit.mul_left_cancel
       rw [mul_comm (u : E) (c : E), hc', mul_smul_comm]
-    rw [this]; exact c.2
+    rw [this]
+    exact c.2
   have hpow : M.psiR x ^ N = 1 := by
     rw [← AddChar.map_nsmul_eq_pow]
     exact hψ _ hNx
@@ -550,29 +638,33 @@ theorem isOpen_OF [IsNonarchimedeanLocalField F] : IsOpen (𝒪[F] : Set F) :=
 theorem isCompact_OF [IsNonarchimedeanLocalField F] : IsCompact (𝒪[F] : Set F) :=
   IsNonarchimedeanLocalField.isCompact_closedBall F 1
 
-theorem mem_O_of_quad (L : LocE F E) (z : E) (t n : 𝒪[F])
-    (h : z * z - algebraMap F E t * z + algebraMap F E n = 0) : z ∈ L.O := by
+theorem mem_O_of_quad
+    (L : LocE F E) (z : E) (t n : 𝒪[F]) (h : z * z - algebraMap F E t * z + algebraMap F E n = 0)
+    : z ∈ L.O := by
   rw [L.O_def]
-  have ht : algebraMap F E (t : F) = algebraMap 𝒪[F] E t := (IsScalarTower.algebraMap_apply 𝒪[F] F E t).symm
-  have hn : algebraMap F E (n : F) = algebraMap 𝒪[F] E n := (IsScalarTower.algebraMap_apply 𝒪[F] F E n).symm
+  have ht : algebraMap F E (t : F) = algebraMap 𝒪[F] E t :=
+    (IsScalarTower.algebraMap_apply 𝒪[F] F E t).symm
+  have hn : algebraMap F E (n : F) = algebraMap 𝒪[F] E n :=
+    (IsScalarTower.algebraMap_apply 𝒪[F] F E n).symm
   rw [ht, hn] at h
   refine ⟨Polynomial.X ^ 2 - Polynomial.C t * Polynomial.X + Polynomial.C n, ?_, ?_⟩
-  · first
-      | monicity!
-      | monicity
-  · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul, Polynomial.eval₂_X_pow,
-      Polynomial.eval₂_C, Polynomial.eval₂_X]
+  · first | monicity!
+  · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul,
+      Polynomial.eval₂_X_pow, Polynomial.eval₂_C, Polynomial.eval₂_X]
     linear_combination h
 
 theorem algebraMap_mem_O (L : LocE F E) (a : 𝒪[F]) : algebraMap F E a ∈ L.O := by
   rw [L.O_def]
-  have h : algebraMap F E (a : F) = algebraMap 𝒪[F] E a := (IsScalarTower.algebraMap_apply 𝒪[F] F E a).symm
+  have h : algebraMap F E (a : F) = algebraMap 𝒪[F] E a :=
+    (IsScalarTower.algebraMap_apply 𝒪[F] F E a).symm
   rw [h]
   exact isIntegral_algebraMap
 
-theorem mem_OF_of_mem_O [Nontrivial E] (L : LocE F E) (a : F) (h : algebraMap F E a ∈ L.O) : a ∈ 𝒪[F] := by
+theorem mem_OF_of_mem_O [Nontrivial E] (L : LocE F E) (a : F) (h : algebraMap F E a ∈ L.O)
+    : a ∈ 𝒪[F] := by
   rw [L.O_def] at h
-  have hinj : Function.Injective ((Algebra.ofId F E).restrictScalars 𝒪[F]) := (algebraMap F E).injective
+  have hinj : Function.Injective ((Algebra.ofId F E).restrictScalars 𝒪[F]) :=
+    (algebraMap F E).injective
   have h' : IsIntegral 𝒪[F] a := (isIntegral_algHom_iff _ hinj).mp h
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.mp h'
   rw [← hy]
@@ -591,10 +683,11 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
 theorem inv_mem_OF (a : F) (h : a ∉ 𝒪[F]) : a⁻¹ ∈ 𝒪[F] := by
   first
-    | exact (ValuationSubring.mem_or_inv_mem _ a).resolve_left h
-    | (rw [Valuation.mem_integer_iff] at h ⊢
-       rw [map_inv₀]
-       exact inv_le_one_of_one_le₀ (le_of_lt (not_le.mp h)))
+  | (
+      rw [Valuation.mem_integer_iff] at h ⊢
+      rw [map_inv₀]
+      exact inv_le_one_of_one_le₀ (le_of_lt (not_le.mp h))
+    )
 
 theorem exists_scale (a : F) : ∃ r : 𝒪[F], (r : F) ≠ 0 ∧ (r : F) * a ∈ 𝒪[F] := by
   by_cases ha : a ∈ 𝒪[F]
@@ -605,8 +698,8 @@ theorem exists_scale (a : F) : ∃ r : 𝒪[F], (r : F) ≠ 0 ∧ (r : F) * a �
     rw [inv_mul_cancel₀ ha0]
     exact one_mem _
 
-theorem exists_pow_mul_mem [IsNonarchimedeanLocalField F] (π : 𝒪[F]) (hπ : Irreducible π) (a : F) :
-    ∃ m : ℕ, ∀ k, m ≤ k → (π : F) ^ k * a ∈ 𝒪[F] := by
+theorem exists_pow_mul_mem [IsNonarchimedeanLocalField F] (π : 𝒪[F]) (hπ : Irreducible π) (a : F)
+    : ∃ m : ℕ, ∀ k, m ≤ k → (π : F) ^ k * a ∈ 𝒪[F] := by
   by_cases h : a ∈ 𝒪[F]
   · exact ⟨0, fun k _ => (𝒪[F]).mul_mem ((𝒪[F]).pow_mem π.2 k) h⟩
   · have h0 : a ≠ 0 := by
@@ -645,7 +738,8 @@ theorem nm_ex (x : E) : ∃ a : F, algebraMap F E a = x * L.cj x := by
 theorem nontrivial_E (L : LocE F E) : Nontrivial E := by
   exact Module.nontrivial_of_finrank_pos (R := F) (by rw [L.rank]; norm_num)
 
-theorem exists_theta : ∃ θ ∈ L.O, L.cj θ = -θ ∧ ∃ D : 𝒪[F], (D : F) ≠ 0 ∧ θ * θ = algebraMap F E D := by
+theorem exists_theta
+    : ∃ θ ∈ L.O, L.cj θ = -θ ∧ ∃ D : 𝒪[F], (D : F) ≠ 0 ∧ θ * θ = algebraMap F E D := by
   apply PI.LocHerm.SlopeTestRemainingChoices.exists_theta <;> assumption
 
 end Top2
@@ -655,18 +749,21 @@ section Top3
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem decomp (L : LocE F E) (θ : E) (hθc : L.cj θ = -θ) (D : F) (hD : θ * θ = algebraMap F E D) (x : E) :
-    ∃ t c : F, algebraMap F E t = x + L.cj x ∧ algebraMap F E c = (x - L.cj x) * θ ∧
-      algebraMap F E (2 * D) * x = algebraMap F E (D * t) + algebraMap F E c * θ := by
+theorem decomp
+    (L : LocE F E) (θ : E) (hθc : L.cj θ = -θ) (D : F) (hD : θ * θ = algebraMap F E D) (x : E)
+    : ∃ t c : F,
+      algebraMap F E t = x + L.cj x ∧ algebraMap F E c = (x - L.cj x) * θ
+        ∧ algebraMap F E (2 * D) * x = algebraMap F E (D * t) + algebraMap F E c * θ := by
   obtain ⟨t, ht⟩ := tr_ex L x
   obtain ⟨c, hc⟩ := (L.cj_fix ((x - L.cj x) * θ)).mp (by rw [map_mul, map_sub, L.cj_cj, hθc]; ring)
   refine ⟨t, c, ht, hc, ?_⟩
   rw [map_mul, map_mul, ht, hc, map_ofNat]
   linear_combination (L.cj x - x) * hD
 
-theorem O_top (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F] [IsTopologicalRing E] :
-    IsOpen (L.O : Set E) ∧ IsCompact (L.O : Set E) ∧
-      ∀ π : 𝒪[F], Irreducible π → ∀ x : E, ∃ m : ℕ, ∀ k, m ≤ k → algebraMap F E π ^ k * x ∈ L.O := by
+theorem O_top (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F] [IsTopologicalRing E]
+    : IsOpen (L.O : Set E) ∧ IsCompact (L.O : Set E)
+      ∧ ∀ π : 𝒪[F],
+        Irreducible π → ∀ x : E, ∃ m : ℕ, ∀ k, m ≤ k → algebraMap F E π ^ k * x ∈ L.O := by
   have := L.top
   have := nontrivial_E L
   obtain ⟨θ, hθO, hθc, D, hD0, hD⟩ := exists_theta L
@@ -696,19 +793,21 @@ theorem O_top (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F] [IsTopo
     exact L.O.add_mem (algebraMap_mem_O L ⟨a, ha⟩) (L.O.mul_mem (algebraMap_mem_O L ⟨b, hb⟩) hθO)
   have hO_open : IsOpen (L.O : Set E) := by
     have h0 : (L.O.toAddSubgroup : Set E) ∈ 𝓝 (0 : E) :=
-      Filter.mem_of_superset ((hopenmap S hS_open).mem_nhds
-        ⟨(0, 0), ⟨(𝒪[F]).zero_mem, (𝒪[F]).zero_mem⟩, map_zero φ⟩) hsub
+      Filter.mem_of_superset
+        ((hopenmap S hS_open).mem_nhds ⟨(0, 0), ⟨(𝒪[F]).zero_mem, (𝒪[F]).zero_mem⟩, map_zero φ⟩)
+        hsub
     exact L.O.toAddSubgroup.isOpen_of_mem_nhds h0
   have hO_closed : IsClosed (L.O : Set E) := L.O.toAddSubgroup.isClosed_of_isOpen hO_open
   refine ⟨hO_open, ?_, ?_⟩
   · refine IsCompact.of_isClosed_subset
-      ((hS_comp.image hcont).image (continuous_const.mul continuous_id :
-        Continuous fun y : E => algebraMap F E (2 * D)⁻¹ * y)) hO_closed ?_
+      ((hS_comp.image hcont).image
+        (continuous_const.mul continuous_id : Continuous fun y : E => algebraMap F E (2 * D)⁻¹ * y))
+      hO_closed ?_
     intro x hx
     obtain ⟨t, c, ht, hc, h⟩ := decomp L θ hθc D hD x
     have htO : t ∈ 𝒪[F] := mem_OF_of_mem_O L t (by rw [ht]; exact L.O.add_mem hx (cj_mem_O L x hx))
-    have hcO : c ∈ 𝒪[F] := mem_OF_of_mem_O L c (by
-      rw [hc]; exact L.O.mul_mem (L.O.sub_mem hx (cj_mem_O L x hx)) hθO)
+    have hcO : c ∈ 𝒪[F] :=
+      mem_OF_of_mem_O L c (by rw [hc]; exact L.O.mul_mem (L.O.sub_mem hx (cj_mem_O L x hx)) hθO)
     refine ⟨_, ⟨((D : F) * t, c), ⟨(𝒪[F]).mul_mem D.2 htO, hcO⟩, rfl⟩, ?_⟩
     rw [hφ]
     exact (hinv x _ h).symm
@@ -717,8 +816,9 @@ theorem O_top (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F] [IsTopo
     obtain ⟨m₁, h₁⟩ := exists_pow_mul_mem π hπ a
     obtain ⟨m₂, h₂⟩ := exists_pow_mul_mem π hπ b
     refine ⟨max m₁ m₂, fun k hk => ?_⟩
-    have e : algebraMap F E π ^ k * φ (a, b) =
-        algebraMap F E ((π : F) ^ k * a) + algebraMap F E ((π : F) ^ k * b) * θ := by
+    have e
+        : algebraMap F E π ^ k * φ (a, b)
+          = algebraMap F E ((π : F) ^ k * a) + algebraMap F E ((π : F) ^ k * b) * θ := by
       rw [hφ, map_mul, map_mul, map_pow]; ring
     rw [e]
     exact L.O.add_mem (algebraMap_mem_O L ⟨_, h₁ k (le_trans (le_max_left _ _) hk)⟩)
@@ -730,9 +830,9 @@ theorem e_algebraMap (L : LocE F E) (g : SplitG L) (c : F) : g.e (algebraMap F E
   rw [AlgEquiv.commutes]
   rfl
 
-theorem R_top (M : Model F E) (hOK : M.OK) :
-    IsOpen (M.R : Set E) ∧ IsCompact (M.R : Set E) ∧
-      ∃ ϖ : Eˣ, (ϖ : E) ∈ M.R ∧ ∀ x : E, ∃ m : ℕ, (ϖ : E) ^ m * x ∈ M.R := by
+theorem R_top (M : Model F E) (hOK : M.OK)
+    : IsOpen (M.R : Set E) ∧ IsCompact (M.R : Set E)
+      ∧ ∃ ϖ : Eˣ, (ϖ : E) ∈ M.R ∧ ∀ x : E, ∃ m : ℕ, (ϖ : E) ^ m * x ∈ M.R := by
   have := hOK.loc
   have := hOK.char0
   have := top_of_OK M hOK
@@ -757,13 +857,20 @@ theorem R_top (M : Model F E) (hOK : M.OK) :
     have hqO : ∀ y ∈ L.O, algebraMap F E g.q * y ∈ (⟨L, some g, mu⟩ : Model F E).R := by
       intro y hy
       rw [L.O_def] at hy
-      have i1 : (g.e y).1 ∈ 𝒪[F] := (Valuation.integer.integers (valuation F)).mem_of_integral
-        (hy.map (((AlgHom.fst F F F).comp g.e.toAlgHom).restrictScalars 𝒪[F]))
-      have i2 : (g.e y).2 ∈ 𝒪[F] := (Valuation.integer.integers (valuation F)).mem_of_integral
-        (hy.map (((AlgHom.snd F F F).comp g.e.toAlgHom).restrictScalars 𝒪[F]))
+      have i1 : (g.e y).1 ∈ 𝒪[F] :=
+        (Valuation.integer.integers (valuation F)).mem_of_integral
+          (hy.map (((AlgHom.fst F F F).comp g.e.toAlgHom).restrictScalars 𝒪[F]))
+      have i2 : (g.e y).2 ∈ 𝒪[F] :=
+        (Valuation.integer.integers (valuation F)).mem_of_integral
+          (hy.map (((AlgHom.snd F F F).comp g.e.toAlgHom).restrictScalars 𝒪[F]))
       rw [mem_R_split, map_mul, e_algebraMap]
-      exact ⟨(𝒪[F]).mul_mem g.q.2 i1, (𝒪[F]).mul_mem g.q.2 i2, (g.e y).1 - (g.e y).2,
-        (𝒪[F]).sub_mem i1 i2, by simp only [Prod.fst_mul, Prod.snd_mul]; ring⟩
+      exact ⟨
+        (𝒪[F]).mul_mem g.q.2 i1,
+        (𝒪[F]).mul_mem g.q.2 i2,
+        (g.e y).1 - (g.e y).2,
+        (𝒪[F]).sub_mem i1 i2,
+        by simp only [Prod.fst_mul, Prod.snd_mul]; ring
+      ⟩
     have hopen : IsOpen ((⟨L, some g, mu⟩ : Model F E).R : Set E) := by
       have hU : IsOpen ((fun x : E => algebraMap F E (g.q : F)⁻¹ * x) ⁻¹' (L.O : Set E)) :=
         h1.preimage (continuous_const.mul continuous_id)
@@ -773,8 +880,12 @@ theorem R_top (M : Model F E) (hOK : M.OK) :
         have := hqO _ hx
         rwa [← mul_assoc, ← map_mul, mul_inv_cancel₀ hq0, map_one, one_mul] at this
       exact (⟨L, some g, mu⟩ : Model F E).R.toAddSubgroup.isOpen_of_mem_nhds h0
-    refine ⟨hopen, IsCompact.of_isClosed_subset h2
-      ((⟨L, some g, mu⟩ : Model F E).R.toAddSubgroup.isClosed_of_isOpen hopen) hRO, ?_⟩
+    refine ⟨
+      hopen,
+      IsCompact.of_isClosed_subset h2
+        ((⟨L, some g, mu⟩ : Model F E).R.toAddSubgroup.isClosed_of_isOpen hopen) hRO,
+      ?_
+    ⟩
     refine ⟨(hq0.isUnit.map (algebraMap F E)).unit, ?_, fun x => ?_⟩
     · have := hqO 1 L.O.one_mem
       rwa [mul_one] at this
@@ -794,11 +905,14 @@ open Topology MeasureTheory
 
 section Mod
 
-variable {E : Type} [CommRing E] [TopologicalSpace E] [IsTopologicalRing E] [MeasurableSpace E] [BorelSpace E]
+variable
+  {E : Type}
+  [CommRing E] [TopologicalSpace E] [IsTopologicalRing E] [MeasurableSpace E] [BorelSpace E]
 
-theorem measure_eq_relIndex_mul (mu : Measure E) [mu.IsAddLeftInvariant] (H A : AddSubgroup E) (hHA : H ≤ A)
-    (hH : IsOpen (H : Set E)) (hA : IsCompact (A : Set E)) :
-    H.relIndex A ≠ 0 ∧ mu (A : Set E) = (H.relIndex A : ENNReal) * mu (H : Set E) := by
+theorem measure_eq_relIndex_mul
+    (mu : Measure E) [mu.IsAddLeftInvariant]
+    (H A : AddSubgroup E) (hHA : H ≤ A) (hH : IsOpen (H : Set E)) (hA : IsCompact (A : Set E))
+    : H.relIndex A ≠ 0 ∧ mu (A : Set E) = (H.relIndex A : ENNReal) * mu (H : Set E) := by
   classical
   have : CompactSpace A := isCompact_iff_compactSpace.1 hA
   have hfin : Finite (A ⧸ H.addSubgroupOf A) :=
@@ -806,16 +920,25 @@ theorem measure_eq_relIndex_mul (mu : Measure E) [mu.IsAddLeftInvariant] (H A : 
   have := Fintype.ofFinite (A ⧸ H.addSubgroupOf A)
   have hidx : H.relIndex A = Fintype.card (A ⧸ H.addSubgroupOf A) := by
     rw [AddSubgroup.relIndex, AddSubgroup.index, Nat.card_eq_fintype_card]
-  have hU : (A : Set E) = ⋃ q : A ⧸ H.addSubgroupOf A,
-      (fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E) := by
+  have hU
+      : (A : Set E)
+        = ⋃ q : A ⧸ H.addSubgroupOf A,
+          (fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E) := by
     ext x
     simp only [Set.mem_iUnion, Set.mem_image, SetLike.mem_coe]
     constructor
     · intro hx
-      refine ⟨QuotientAddGroup.mk (⟨x, hx⟩ : A), -((Quotient.out (QuotientAddGroup.mk (⟨x, hx⟩ : A) :
-        A ⧸ H.addSubgroupOf A) : A) : E) + x, ?_, by abel⟩
-      have h1 : (QuotientAddGroup.mk (Quotient.out (QuotientAddGroup.mk (⟨x, hx⟩ : A) :
-          A ⧸ H.addSubgroupOf A)) : A ⧸ H.addSubgroupOf A) = QuotientAddGroup.mk (⟨x, hx⟩ : A) :=
+      refine ⟨
+        QuotientAddGroup.mk (⟨x, hx⟩ : A),
+        -((Quotient.out (QuotientAddGroup.mk (⟨x, hx⟩ : A) : A ⧸ H.addSubgroupOf A) : A) : E) + x,
+        ?_,
+        by abel
+      ⟩
+      have h1
+          : (QuotientAddGroup.mk (Quotient.out
+                (QuotientAddGroup.mk (⟨x, hx⟩ : A) : A ⧸ H.addSubgroupOf A))
+              : A ⧸ H.addSubgroupOf A)
+            = QuotientAddGroup.mk (⟨x, hx⟩ : A) :=
         Quotient.out_eq' _
       have h2 := QuotientAddGroup.eq.1 h1
       simpa [AddSubgroup.mem_addSubgroupOf] using h2
@@ -836,12 +959,14 @@ theorem measure_eq_relIndex_mul (mu : Measure E) [mu.IsAddLeftInvariant] (H A : 
       linear_combination he
     rw [this]
     exact H.sub_mem hh hh'
-  have hmeas : ∀ q : A ⧸ H.addSubgroupOf A,
-      mu ((fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E)) = mu (H : Set E) := by
+  have hmeas
+      : ∀ q : A ⧸ H.addSubgroupOf A,
+        mu ((fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E)) = mu (H : Set E) := by
     intro q
     rw [Set.image_add_left, measure_preimage_add]
-  have hms : ∀ q : A ⧸ H.addSubgroupOf A,
-      MeasurableSet ((fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E)) := by
+  have hms
+      : ∀ q : A ⧸ H.addSubgroupOf A,
+        MeasurableSet ((fun h : E => ((Quotient.out q : A) : E) + h) '' (H : Set E)) := by
     intro q
     rw [Set.image_add_left]
     exact (hH.preimage (continuous_const.add continuous_id)).measurableSet
@@ -856,17 +981,20 @@ section Mod2
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem modK_of_OK (M : Model F E) (hOK : M.OK) (x : Eˣ) : M.modK (x : E) = A5.modK M.R (x : E) := by
+theorem modK_of_OK (M : Model F E) (hOK : M.OK) (x : Eˣ)
+    : M.modK (x : E) = A5.modK M.R (x : E) := by
   have := top_of_OK M hOK
   have := hOK.borel
   have := hOK.haar.haar
   obtain ⟨hRo, hRc, -⟩ := R_top M hOK
-  have hset : ((A5.mulR M.R (x : E) : AddSubgroup E) : Set E) = (fun y => (x : E) * y) '' (M.R : Set E) := by
+  have hset
+      : ((A5.mulR M.R (x : E) : AddSubgroup E) : Set E)
+        = (fun y => (x : E) * y) '' (M.R : Set E) := by
     ext y
     simp [A5.mulR]
   have hxo : IsOpen ((A5.mulR M.R (x : E) : AddSubgroup E) : Set E) := by
-    have : ((A5.mulR M.R (x : E) : AddSubgroup E) : Set E) =
-        (fun y : E => ((x⁻¹ : Eˣ) : E) * y) ⁻¹' (M.R : Set E) := by
+    have : ((A5.mulR M.R (x : E) : AddSubgroup E) : Set E)
+        = (fun y : E => ((x⁻¹ : Eˣ) : E) * y) ⁻¹' (M.R : Set E) := by
       rw [hset]
       ext y
       simp only [Set.mem_image, SetLike.mem_coe, Set.mem_preimage]
@@ -893,7 +1021,8 @@ theorem modK_of_OK (M : Model F E) (hOK : M.OK) (x : Eˣ) : M.modK (x : E) = A5.
   rw [← hset, e1, ENNReal.toReal_mul, ENNReal.toReal_natCast]
   have e3 := congrArg ENNReal.toReal e2
   rw [ENNReal.toReal_mul, ENNReal.toReal_natCast, ENNReal.toReal_one] at e3
-  have hn2 : (((A5.mulR M.R (x : E)).relIndex M.R.toAddSubgroup : ℕ) : ℝ) ≠ 0 := by exact_mod_cast n2
+  have hn2 : (((A5.mulR M.R (x : E)).relIndex M.R.toAddSubgroup : ℕ) : ℝ) ≠ 0 := by
+    exact_mod_cast n2
   rw [eq_div_iff hn2]
   linear_combination (-(((M.R.toAddSubgroup).relIndex (A5.mulR M.R (x : E)) : ℕ) : ℝ)) * e3
 
@@ -906,15 +1035,12 @@ section KKdef
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem datum_of_OK (M : Model F E) (hOK : M.OK) :
-    haveI := top_of_OK M hOK; A5.LocalDatum E M.R M.psiR := by
+theorem datum_of_OK (M : Model F E) (hOK : M.OK)
+    : haveI := top_of_OK M hOK; A5.LocalDatum E M.R M.psiR := by
   obtain ⟨hO, hC, hU⟩ := R_top M hOK
   haveI := top_of_OK M hOK
   haveI := finite_E M
-  have hart : IsArtinianRing E := by
-    first
-      | exact IsArtinianRing.of_finite F E
-      | infer_instance
+  have hart : IsArtinianRing E := by first | exact IsArtinianRing.of_finite F E
   exact {
     t2 := t2Space_of_model_ok M hOK
     isOpen := hO
@@ -924,7 +1050,8 @@ theorem datum_of_OK (M : Model F E) (hOK : M.OK) :
     red := M.L.reduced
     unitRep := unitRep_of_OK M hOK
     unitary := unitary_of M hOK hO hC hU
-    selfDual := selfDual_of_core M hOK }
+    selfDual := selfDual_of_core M hOK
+  }
 
 def KK (M : Model F E) : Prop :=
   ∀ (n : ℕ) (w w' : Pt E n), M.Kk n w w' = A5.Kp M.R M.psiR (tr w) (tr w')
@@ -938,9 +1065,9 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 variable {M : Model F E}
 
 def KKAll : Prop :=
-  ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    (E : Type) [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-    (M : Model F E), M.OK → KK M
+  ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] (E : Type) [CommRing E] [Algebra F E]
+      [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+    M.OK → KK M
 
 end PartA
 
@@ -954,10 +1081,11 @@ variable {A : Type} [CommRing A]
 
 def redV (I : Ideal A) {n : ℕ} (v : Fin n → A) : Fin n → A ⧸ I := fun i => Ideal.Quotient.mk I (v i)
 
-theorem range_le_of_red {n : ℕ} (Z Z' : Matrix (Fin n) (Fin n) A)
-    (h : redV (Ideal.span {Z'.det}) '' (LinearMap.range Z.mulVecLin : Set (Fin n → A)) ⊆
-      redV (Ideal.span {Z'.det}) '' (LinearMap.range Z'.mulVecLin : Set (Fin n → A))) :
-    LinearMap.range Z.mulVecLin ≤ LinearMap.range Z'.mulVecLin := by
+theorem range_le_of_red
+    {n : ℕ} (Z Z' : Matrix (Fin n) (Fin n) A)
+    (h : redV (Ideal.span {Z'.det}) '' (LinearMap.range Z.mulVecLin : Set (Fin n → A))
+      ⊆ redV (Ideal.span {Z'.det}) '' (LinearMap.range Z'.mulVecLin : Set (Fin n → A)))
+    : LinearMap.range Z.mulVecLin ≤ LinearMap.range Z'.mulVecLin := by
   rintro v ⟨x, rfl⟩
   obtain ⟨w, hwm, hw⟩ := h (Set.mem_image_of_mem _ (LinearMap.mem_range_self _ x))
   obtain ⟨y, rfl⟩ := LinearMap.mem_range.mp hwm
@@ -972,15 +1100,14 @@ theorem range_le_of_red {n : ℕ} (Z Z' : Matrix (Fin n) (Fin n) A)
   refine LinearMap.mem_range.mpr ⟨y + Z'.adjugate.mulVec c, ?_⟩
   funext i
   simp only [Matrix.mulVecLin_apply, Matrix.mulVec_add, Matrix.mulVec_mulVec, Matrix.mul_adjugate]
-  first
-    | rw [Matrix.smul_mulVec_assoc]
-    | rw [Matrix.smul_mulVec]
-    | rw [Matrix.smul_mulVec_eq_smul_mulVec]
+  first | rw [Matrix.smul_mulVec]
   simp only [Matrix.one_mulVec, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
   linear_combination -(hc i)
 
-theorem finite_image_of_factor {α β γ : Type} [Finite γ] (f : α → β) (J : α → γ) (T : Set α)
-    (h : ∀ a ∈ T, ∀ a' ∈ T, J a = J a' → f a = f a') : (f '' T).Finite := by
+theorem finite_image_of_factor
+    {α β γ : Type} [Finite γ]
+    (f : α → β) (J : α → γ) (T : Set α) (h : ∀ a ∈ T, ∀ a' ∈ T, J a = J a' → f a = f a')
+    : (f '' T).Finite := by
   have hs : ∀ c : γ, (f '' (T ∩ J ⁻¹' {c})).Subsingleton := by
     rintro c _ ⟨a, ⟨ha, hac⟩, rfl⟩ _ ⟨a', ⟨ha', hac'⟩, rfl⟩
     exact h a ha a' ha' ((hac : J a = c).trans (hac' : J a' = c).symm)
@@ -995,9 +1122,11 @@ section Fin2
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem lamRaw_eq (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) (v : Fin (m + 1) → M.R) :
-    M.lamRaw ZZ v = Submodule.Quotient.mk
-      (Ring.inverse ((ZZ.Z.det : M.R) : E) * ((ZZ.Z.adjugate.mulVec v (Fin.last m) : M.R) : E)) := by
+theorem lamRaw_eq (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) (v : Fin (m + 1) → M.R)
+    : M.lamRaw ZZ v
+      = Submodule.Quotient.mk
+        (Ring.inverse ((ZZ.Z.det : M.R) : E)
+          * ((ZZ.Z.adjugate.mulVec v (Fin.last m) : M.R) : E)) := by
   simp only [Model.lamRaw, LinearMap.coe_comp, Function.comp_apply, Submodule.mkQ_apply,
     LinearMap.proj_apply, LinearMap.restrictScalars_apply, Matrix.mulVecLin_apply]
   congr 1
@@ -1009,15 +1138,19 @@ theorem lamRaw_eq (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) (v : Fin (m + 1
   congr 1
   exact (RingHom.map_mulVec M.R.subtype ZZ.Z.adjugate v (Fin.last m)).symm
 
-theorem iso_of_inv (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (hd : ZZ.Z.det = ZZ'.Z.det)
-    (h1 : redV (Ideal.span {ZZ.Z.det}) '' (LinearMap.range ZZ.Z.mulVecLin : Set (Fin (m + 1) → M.R)) =
-      redV (Ideal.span {ZZ.Z.det}) '' (LinearMap.range ZZ'.Z.mulVecLin : Set (Fin (m + 1) → M.R)))
-    (h2 : redV (Ideal.span {ZZ.Z.det}) (ZZ.Z.adjugate (Fin.last m)) =
-      redV (Ideal.span {ZZ.Z.det}) (ZZ'.Z.adjugate (Fin.last m))) : Nonempty (M.Iso ZZ ZZ') := by
+theorem iso_of_inv
+    (M : Model F E)
+    {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (hd : ZZ.Z.det = ZZ'.Z.det)
+    (h1 : redV (Ideal.span {ZZ.Z.det}) '' (LinearMap.range ZZ.Z.mulVecLin : Set (Fin (m + 1) → M.R))
+      = redV (Ideal.span {ZZ.Z.det}) '' (LinearMap.range ZZ'.Z.mulVecLin : Set (Fin (m + 1) → M.R)))
+    (h2 : redV (Ideal.span {ZZ.Z.det}) (ZZ.Z.adjugate (Fin.last m))
+      = redV (Ideal.span {ZZ.Z.det}) (ZZ'.Z.adjugate (Fin.last m)))
+    : Nonempty (M.Iso ZZ ZZ') := by
   have hr : LinearMap.range ZZ.Z.mulVecLin = LinearMap.range ZZ'.Z.mulVecLin := by
     apply le_antisymm
     · apply range_le_of_red
-      rw [← hd]; exact h1.le
+      rw [← hd]
+      exact h1.le
     · apply range_le_of_red
       exact h1.ge
   refine ⟨⟨Submodule.quotEquivOfEq _ _ hr, rfl, ?_⟩⟩
@@ -1026,15 +1159,17 @@ theorem iso_of_inv (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (hd : ZZ.Z
   rw [Submodule.quotEquivOfEq_mk]
   show M.lamRaw ZZ' v = M.lamRaw ZZ v
   rw [lamRaw_eq, lamRaw_eq, ← hd, Submodule.Quotient.eq, ← mul_sub, mem_Rsub]
-  have h3 : ∀ j, ∃ r, r * ZZ.Z.det = ZZ'.Z.adjugate (Fin.last m) j - ZZ.Z.adjugate (Fin.last m) j := by
+  have h3
+      : ∀ j, ∃ r, r * ZZ.Z.det = ZZ'.Z.adjugate (Fin.last m) j - ZZ.Z.adjugate (Fin.last m) j := by
     intro j
     have := congrFun h2 j
     simp only [redV] at this
     rw [← Ideal.mem_span_singleton', ← Ideal.Quotient.eq]
     exact this.symm
   choose r hr' using h3
-  have h4 : ZZ'.Z.adjugate.mulVec v (Fin.last m) - ZZ.Z.adjugate.mulVec v (Fin.last m) =
-      ZZ.Z.det * ∑ j, r j * v j := by
+  have h4
+      : ZZ'.Z.adjugate.mulVec v (Fin.last m) - ZZ.Z.adjugate.mulVec v (Fin.last m)
+        = ZZ.Z.det * ∑ j, r j * v j := by
     simp only [Matrix.mulVec, dotProduct]
     rw [← Finset.sum_sub_distrib, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -1044,53 +1179,61 @@ theorem iso_of_inv (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (hd : ZZ.Z
     have hdet : (ZZ.Z.map M.R.subtype).det = ((ZZ.Z.det : M.R) : E) :=
       (RingHom.map_det M.R.subtype ZZ.Z).symm
     rwa [hdet] at h9
-  have h5 : ((ZZ'.Z.adjugate.mulVec v (Fin.last m) : M.R) : E) - ((ZZ.Z.adjugate.mulVec v (Fin.last m) : M.R) : E) =
-      ((ZZ.Z.det : M.R) : E) * ((∑ j, r j * v j : M.R) : E) := by
+  have h5
+      : ((ZZ'.Z.adjugate.mulVec v (Fin.last m) : M.R) : E)
+          - ((ZZ.Z.adjugate.mulVec v (Fin.last m) : M.R) : E)
+        = ((ZZ.Z.det : M.R) : E) * ((∑ j, r j * v j : M.R) : E) := by
     have h8 := congrArg M.R.subtype h4
     rwa [map_sub, map_mul] at h8
   rw [h5, ← mul_assoc, Ring.inverse_mul_cancel _ hU, one_mul]
   exact (∑ j, r j * v j : M.R).2
 
-theorem finite_classes (M : Model F E) (hOK : M.OK) (m : ℕ) (d₀ : M.R) (hd₀ : IsUnit (d₀ : E)) :
-    {c : M.Cls m | ∃ ZZ : M.Mat (m + 1), ZZ.Z.det = d₀ ∧ Quotient.mk (M.isoSetoid m) ZZ = c}.Finite := by
-  have := top_of_OK M hOK
-  obtain ⟨hRo, hRc, -⟩ := R_top M hOK
-  have hfin : Finite (M.R ⧸ Ideal.span {d₀}) := by
-    have : CompactSpace M.R := isCompact_iff_compactSpace.1 hRc
-    obtain ⟨u, hu⟩ := hd₀
-    have hopen : IsOpen ((Ideal.span {d₀}).toAddSubgroup : Set M.R) := by
-      have h1 : ((Ideal.span {d₀}).toAddSubgroup : Set M.R) =
-          (fun y : M.R => ((u⁻¹ : Eˣ) : E) * (y : E)) ⁻¹' (M.R : Set E) := by
-        ext y
-        simp only [Submodule.coe_toAddSubgroup, SetLike.mem_coe, Set.mem_preimage]
-        rw [Ideal.mem_span_singleton']
-        constructor
-        · rintro ⟨c, rfl⟩
-          rw [Subring.coe_mul, ← hu, mul_comm (c : E), ← mul_assoc, Units.inv_mul, one_mul]
-          exact c.2
-        · intro hy
-          refine ⟨⟨_, hy⟩, ?_⟩
-          apply Subtype.ext
-          rw [Subring.coe_mul, ← hu]
-          simp only
-          rw [mul_comm, ← mul_assoc, Units.mul_inv, one_mul]
-      rw [h1]
-      exact hRo.preimage (by fun_prop)
-    exact AddSubgroup.quotient_finite_of_isOpen (Ideal.span {d₀}).toAddSubgroup hopen
-  have key := finite_image_of_factor (Quotient.mk (M.isoSetoid m))
-    (fun ZZ : M.Mat (m + 1) =>
-      (redV (Ideal.span {d₀}) '' (LinearMap.range ZZ.Z.mulVecLin : Set (Fin (m + 1) → M.R)),
-        redV (Ideal.span {d₀}) (ZZ.Z.adjugate (Fin.last m))))
-    {ZZ | ZZ.Z.det = d₀} (by
-      intro ZZ hZ ZZ' hZ' hJ
-      change ZZ.Z.det = d₀ at hZ
-      change ZZ'.Z.det = d₀ at hZ'
-      apply Quotient.sound
-      simp only [Prod.mk.injEq] at hJ
-      exact iso_of_inv M ZZ ZZ' (hZ.trans hZ'.symm) (by rw [hZ]; exact hJ.1) (by rw [hZ]; exact hJ.2))
-  refine key.subset ?_
-  rintro c ⟨ZZ, hZ, rfl⟩
-  exact ⟨ZZ, hZ, rfl⟩
+theorem finite_classes (M : Model F E) (hOK : M.OK) (m : ℕ) (d₀ : M.R) (hd₀ : IsUnit (d₀ : E))
+    : {c : M.Cls m | ∃ ZZ : M.Mat (m + 1), ZZ.Z.det = d₀ ∧ Quotient.mk (M.isoSetoid m) ZZ = c}.Finite :=
+  by
+    have := top_of_OK M hOK
+    obtain ⟨hRo, hRc, -⟩ := R_top M hOK
+    have hfin : Finite (M.R ⧸ Ideal.span {d₀}) := by
+      have : CompactSpace M.R := isCompact_iff_compactSpace.1 hRc
+      obtain ⟨u, hu⟩ := hd₀
+      have hopen : IsOpen ((Ideal.span {d₀}).toAddSubgroup : Set M.R) := by
+        have h1
+            : ((Ideal.span {d₀}).toAddSubgroup : Set M.R)
+              = (fun y : M.R => ((u⁻¹ : Eˣ) : E) * (y : E)) ⁻¹' (M.R : Set E) := by
+          ext y
+          simp only [Submodule.coe_toAddSubgroup, SetLike.mem_coe, Set.mem_preimage]
+          rw [Ideal.mem_span_singleton']
+          constructor
+          · rintro ⟨c, rfl⟩
+            rw [Subring.coe_mul, ← hu, mul_comm (c : E), ← mul_assoc, Units.inv_mul, one_mul]
+            exact c.2
+          · intro hy
+            refine ⟨⟨_, hy⟩, ?_⟩
+            apply Subtype.ext
+            rw [Subring.coe_mul, ← hu]
+            simp only
+            rw [mul_comm, ← mul_assoc, Units.mul_inv, one_mul]
+        rw [h1]
+        exact hRo.preimage (by fun_prop)
+      exact AddSubgroup.quotient_finite_of_isOpen (Ideal.span {d₀}).toAddSubgroup hopen
+    have key :=
+      finite_image_of_factor (Quotient.mk (M.isoSetoid m))
+        (fun ZZ : M.Mat (m + 1) => (
+          redV (Ideal.span {d₀}) '' (LinearMap.range ZZ.Z.mulVecLin : Set (Fin (m + 1) → M.R)),
+          redV (Ideal.span {d₀}) (ZZ.Z.adjugate (Fin.last m))
+        ))
+        {ZZ | ZZ.Z.det = d₀}
+        (by
+          intro ZZ hZ ZZ' hZ' hJ
+          change ZZ.Z.det = d₀ at hZ
+          change ZZ'.Z.det = d₀ at hZ'
+          apply Quotient.sound
+          simp only [Prod.mk.injEq] at hJ
+          exact iso_of_inv M ZZ ZZ' (hZ.trans hZ'.symm) (by rw [hZ]; exact hJ.1)
+            (by rw [hZ]; exact hJ.2))
+    refine key.subset ?_
+    rintro c ⟨ZZ, hZ, rfl⟩
+    exact ⟨ZZ, hZ, rfl⟩
 
 end Fin2
 
@@ -1115,12 +1258,14 @@ theorem isUpUni_uUp {n : ℕ} (w : Pt E n) (y : IN w → E) : IsUpUni (uUp w y) 
   · intro a
     simp [uUp]
 
-theorem nonempty_of_nIso_ne (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (h : M.nIso ZZ ZZ' ≠ 0) :
-    Nonempty (M.Iso ZZ ZZ') := by
+theorem nonempty_of_nIso_ne (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) (h : M.nIso ZZ ZZ' ≠ 0)
+    : Nonempty (M.Iso ZZ ZZ') := by
   exact (Nat.card_ne_zero.mp h).1
 
-theorem exists_mat_of_BB_ne (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.Cls m) (hc : M.BB w c ≠ 0) :
-    ∃ ZZ : M.Mat (m + 1), ((ZZ.Z.det : M.R) : E) = w.mat.det ∧ Quotient.mk (M.isoSetoid m) ZZ = c := by
+theorem exists_mat_of_BB_ne
+    (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.Cls m) (hc : M.BB w c ≠ 0)
+    : ∃ ZZ : M.Mat (m + 1),
+      ((ZZ.Z.det : M.R) : E) = w.mat.det ∧ Quotient.mk (M.isoSetoid m) ZZ = c := by
   obtain ⟨xy, hxy⟩ : ∃ xy, M.bbIntegrand w c xy ≠ 0 := by
     by_contra hcon
     push Not at hcon
@@ -1135,11 +1280,14 @@ theorem exists_mat_of_BB_ne (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.
     rw [Nat.cast_ne_zero] at h1
     have hne := nonempty_of_nIso_ne M _ _ h1
     refine ⟨_, ?_, (Quotient.sound hne).trans (Quotient.out_eq c)⟩
-    have hdet := RingHom.map_det M.R.subtype
-      (Matrix.of fun a b => (⟨(uLow xy.1 * w.mat * uUp w xy.2) a b, h.1 a b⟩ : M.R))
-    have hmap : M.R.subtype.mapMatrix
-        (Matrix.of fun a b => (⟨(uLow xy.1 * w.mat * uUp w xy.2) a b, h.1 a b⟩ : M.R)) =
-        uLow xy.1 * w.mat * uUp w xy.2 := rfl
+    have hdet :=
+      RingHom.map_det M.R.subtype
+        (Matrix.of fun a b => (⟨(uLow xy.1 * w.mat * uUp w xy.2) a b, h.1 a b⟩ : M.R))
+    have hmap
+        : M.R.subtype.mapMatrix (Matrix.of fun a b =>
+            (⟨(uLow xy.1 * w.mat * uUp w xy.2) a b, h.1 a b⟩ : M.R))
+          = uLow xy.1 * w.mat * uUp w xy.2 :=
+      rfl
     have hd2 : (uLow xy.1 * w.mat * uUp w xy.2).det = w.mat.det := by
       rw [Matrix.det_mul, Matrix.det_mul, isLowUni_det E (isLowUni_uLow xy.1),
         isUpUni_det E (isUpUni_uUp w xy.2), one_mul, mul_one]
@@ -1155,12 +1303,13 @@ section Final
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem latZ_eq (M : Model F E) {n : ℕ} (ZZ : M.Mat n) :
-    latZ M.R (ZZ.Z.map M.R.subtype) = LinearMap.range ZZ.Z.mulVecLin := by
+theorem latZ_eq (M : Model F E) {n : ℕ} (ZZ : M.Mat n)
+    : latZ M.R (ZZ.Z.map M.R.subtype) = LinearMap.range ZZ.Z.mulVecLin := by
   ext v
   have hc : ∀ r : M.R, algebraMap M.R E r = (r : E) := fun _ => rfl
-  simp only [Formalism.DoubleCosetMeasures.latZ, Formalism.DoubleCosetMeasures.coeLin, Submodule.mem_comap, LinearMap.mem_range, LinearMap.coe_comp,
-    Function.comp_apply, LinearMap.coe_restrictScalars, Matrix.mulVecLin_apply]
+  simp only [Formalism.DoubleCosetMeasures.latZ, Formalism.DoubleCosetMeasures.coeLin,
+    Submodule.mem_comap, LinearMap.mem_range, LinearMap.coe_comp, Function.comp_apply,
+    LinearMap.coe_restrictScalars, Matrix.mulVecLin_apply]
   constructor
   · rintro ⟨w, hw⟩
     refine ⟨w, funext fun i => Subtype.ext ?_⟩
@@ -1177,3 +1326,6 @@ end Local
 end Formalism.MainNotions.LocalModelPeriodLattices
 
 end
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.SharpRestriction.CuspSpanNormBounds.LocalModelPeriodLattices =====

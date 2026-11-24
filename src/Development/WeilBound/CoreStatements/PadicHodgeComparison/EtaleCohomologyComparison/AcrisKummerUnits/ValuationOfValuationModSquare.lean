@@ -150,7 +150,9 @@ theorem IsTest.sharp_surjective (h : A.IsTest) : Function.Surjective A.sharp := 
     exact ⟨y, by simpa [sub_eq_zero] using hy⟩
   choose r hr using hr
   obtain ⟨a, -, ha⟩ :=
-    RL.tilt_ex A (fun i => r^[i] f) fun i => by rw [Function.iterate_succ_apply', hr]
+    _root_.GlobalTheory.CompanionTheory.Untilt.exists_compatible_roots_of_sharp A
+      (fun i => r^[i] f)
+      fun i => by rw [Function.iterate_succ_apply', hr]
   exact ⟨a 0, ha 0⟩
 
 theorem IsTest.sharp_unit (h : A.IsTest) (u : (A.U)ˣ) : ∃ w : (A.A)ˣ, A.sharp w = u := by

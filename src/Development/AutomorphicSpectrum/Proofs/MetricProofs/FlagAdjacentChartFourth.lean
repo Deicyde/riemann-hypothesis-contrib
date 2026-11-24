@@ -2,10 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsBaseChart
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AevalNeZeroOfNotMem
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentChartSecondStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentChartThirdStatement
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentChartSecond
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentChartThird
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsBlockDiagMapGenBlock
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -141,9 +141,9 @@ theorem mul_elem_apply (L : Matrix (Fin N) (Fin N) ℂ) (ca cb : Fin N) (t : ℂ
   · by_cases e : b = ca
     · subst e
       simp
-    · simp [e, Matrix.single_apply, Ne.symm e]
+    · simp [e, Ne.symm e]
   · intro c _ hc
-    simp [Matrix.single_apply, Ne.symm hc]
+    simp [Ne.symm hc]
   · simp
 
 variable {j : ℕ}
@@ -336,10 +336,11 @@ theorem chart_reads
             ∧ wRho M Rb τ k₀ ca cb F kb r h ε (wPhi M F bl h ε k₀ τ ca cb w) = w := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n d Rb τ a b k₀ ca cb F kb V bl r h ε hW w hw
   obtain ⟨-, E⟩ :=
-    GlobalTheory.T.flag_adjacent_chart_second K ι Φ y Ψ N j M n d Rb τ a b k₀ ca cb F kb V bl r h ε
-      hW
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.WMan.Exact.chart_exact K ι Φ y Ψ N j M n d Rb τ a b k₀
+      ca cb F kb V bl r h ε hW
   have Mm :=
-    GlobalTheory.T.wPhi_mem_mcPts_wP K ι Φ y Ψ N j M n d Rb τ a b k₀ ca cb F kb V bl r h ε hW w hw
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.WMan.Mem.main K ι Φ y Ψ N j M n d Rb τ a b k₀ ca cb F
+      kb V bl r h ε hW w hw
   obtain ⟨-, hbase, hex⟩ := E w hw
   obtain ⟨hb, hbj, hk₀, hca, hcb, -, hF, hBC, hr, -, hh⟩ := hW
   have hwV : wB ε w ∈ V := hw

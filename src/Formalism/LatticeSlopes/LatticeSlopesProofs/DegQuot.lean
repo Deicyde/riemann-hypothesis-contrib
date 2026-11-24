@@ -59,12 +59,16 @@ noncomputable section
 
 namespace Formalism.F
 
-theorem linearIndependent_coe_basis''' {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] {ι : Type*} [Fintype ι]
-    (b : Basis ι ℤ L) : LinearIndependent ℝ (fun i => (b i : E)) := by
+theorem linearIndependent_coe_basis'''
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    {ι : Type*} [Fintype ι]
+    (b : Basis ι ℤ L)
+    : LinearIndependent ℝ (fun i => (b i : E)) := by
   classical
   have hs : Submodule.span ℤ (Set.range fun i => (b i : E)) = L := by
-    have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b := Set.range_comp L.subtype b
+    have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b :=
+      Set.range_comp L.subtype b
     rw [h1, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hd : DiscreteTopology (Submodule.span ℤ (Set.range fun i => (b i : E))) := by
     rw [hs]; infer_instance
@@ -72,17 +76,19 @@ theorem linearIndependent_coe_basis''' {E : Type*} [NormedAddCommGroup E] [Inner
   unfold Set.finrank
   rw [hs, Module.finrank_eq_card_basis b]
 
-theorem discreteTopology_span_range_of_linearIndependent {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    {ι : Type*} [Fintype ι] (c : ι → E) (hc : LinearIndependent ℝ c) :
-    DiscreteTopology (span ℤ (Set.range c)) := by
+theorem discreteTopology_span_range_of_linearIndependent
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    {ι : Type*} [Fintype ι]
+    (c : ι → E) (hc : LinearIndependent ℝ c)
+    : DiscreteTopology (span ℤ (Set.range c)) := by
   classical
   let φ : (ι → ℝ) →ₗ[ℝ] E := Fintype.linearCombination ℝ c
   have hker : LinearMap.ker φ = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro r hr
     funext i
-    exact Fintype.linearIndependent_iff.1 hc r
-      (by rw [← Fintype.linearCombination_apply]; exact hr) i
+    exact Fintype.linearIndependent_iff.1 hc r (by rw [← Fintype.linearCombination_apply]; exact hr)
+      i
   obtain ⟨K, hK, hφ⟩ := LinearMap.exists_antilipschitzWith φ hker
   have hKpos : (0 : ℝ) < K := by exact_mod_cast hK
   have key : ∀ x ∈ Submodule.span ℤ (Set.range c), x ≠ 0 → (K : ℝ)⁻¹ ≤ ‖x‖ := by
@@ -97,7 +103,9 @@ theorem discreteTopology_span_range_of_linearIndependent {E : Type*} [NormedAddC
       apply hx0
       simp [hcon]
     have h1 : (1 : ℝ) ≤ ‖(fun i => (n i : ℝ))‖ := by
-      calc (1 : ℝ) ≤ |(n i : ℝ)| := by exact_mod_cast Int.one_le_abs hi
+      calc
+        (1 : ℝ)
+          ≤ |(n i : ℝ)| := by exact_mod_cast Int.one_le_abs hi
         _ = ‖(n i : ℝ)‖ := (Real.norm_eq_abs _).symm
         _ ≤ ‖(fun i => (n i : ℝ))‖ := norm_le_pi_norm (fun i => (n i : ℝ)) i
     have h2 := hφ.le_mul_dist (fun i => (n i : ℝ)) 0
@@ -118,11 +126,12 @@ theorem discreteTopology_span_range_of_linearIndependent {E : Type*} [NormedAddC
     rw [h]
     simpa using hε
 
-theorem span_range_coe_basis' {E : Type*} [AddCommGroup E] (L : Submodule ℤ E) {ι : Type*}
-    (b : Basis ι ℤ L) : span ℤ (Set.range (fun i => (b i : E))) = L := by
-  have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b := Set.range_comp L.subtype b
-  rw [h1, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
-
+theorem span_range_coe_basis'
+    {E : Type*} [AddCommGroup E] (L : Submodule ℤ E) {ι : Type*} (b : Basis ι ℤ L)
+    : span ℤ (Set.range (fun i => (b i : E))) = L := by
+  rw [show (Set.range fun i => (b i : E)) = L.subtype '' Set.range b from
+      Set.range_comp L.subtype b,
+    Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
 theorem degree_quotient : DegQuot := by
   intro E _ _ _ L N hL hsat
@@ -141,10 +150,7 @@ theorem degree_quotient : DegQuot := by
     rwa [Submodule.orthogonal_orthogonal] at h
   have horth : ∀ u ∈ W, ∀ w ∈ Wᗮ, inner ℝ u w = 0 := by
     intro u hu w hw
-    first
-      | exact (Submodule.mem_orthogonal W w).1 hw u hu
-      | exact (Submodule.mem_orthogonal w).1 hw u hu
-      | exact Submodule.inner_right_of_mem_orthogonal hu hw
+    first | exact (Submodule.mem_orthogonal W w).1 hw u hu
   have hPW : ∀ x ∈ W, P x = 0 := by
     intro x hx
     have h2 : P x ∈ W := by
@@ -167,7 +173,6 @@ theorem degree_quotient : DegQuot := by
     show Module.Finite ℤ (L.map _)
     first
       | exact Module.Finite.map L _
-      | exact Module.Finite.iff_fg.mpr (Submodule.FG.map _ (Module.Finite.iff_fg.mp inferInstance))
   haveI : Module.IsTorsionFree ℤ Q := Module.IsTorsionFree.mk fun r hr x y hxy => by
     have hr0 : r ≠ 0 := hr.ne_zero
     apply Subtype.ext
@@ -201,7 +206,8 @@ theorem degree_quotient : DegQuot := by
         rw [map_zsmul, hℓP]
 
       rw [map_add (f := _), map_sum, map_sum, map_zero, Finset.sum_congr rfl (fun i _ => h1 i),
-      Finset.sum_const_zero, zero_add, Finset.sum_congr rfl (fun j _ => h2 j)] at h
+          Finset.sum_const_zero, zero_add, Finset.sum_congr rfl (fun j _ => h2 j)]
+        at h
       exact h
     have hQz : ∀ j, g (Sum.inr j) = 0 := by
       have h : ∑ j, g (Sum.inr j) • eQ j = 0 := by
@@ -224,8 +230,7 @@ theorem degree_quotient : DegQuot := by
   have hsp : ⊤ ≤ Submodule.span ℤ (Set.range v) := by
     rintro ⟨x, hx⟩ -
     have hPx : P x ∈ Q := (hQmem _).2 ⟨x, hx, rfl⟩
-    obtain ⟨r, hr⟩ : ∃ r : Module.Free.ChooseBasisIndex ℤ Q → ℤ,
-        ∑ j, r j • (eQ j : E) = P x := by
+    obtain ⟨r, hr⟩ : ∃ r : Module.Free.ChooseBasisIndex ℤ Q → ℤ, ∑ j, r j • (eQ j : E) = P x := by
       have h2 := congrArg (fun z : Q => (z : E)) (eQ.sum_repr ⟨P x, hPx⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul] at h2
       exact ⟨_, h2⟩
@@ -236,8 +241,9 @@ theorem degree_quotient : DegQuot := by
           rw [map_sub, map_sum, ← hr]
         simp only [map_zsmul, hℓP]
         exact sub_self _
-    obtain ⟨s, hs⟩ : ∃ s : Module.Free.ChooseBasisIndex ℤ N → ℤ,
-        ∑ i, s i • (bN i : E) = x - ∑ j, r j • ℓ j := by
+    obtain ⟨s, hs⟩
+        : ∃ s : Module.Free.ChooseBasisIndex ℤ N → ℤ,
+          ∑ i, s i • (bN i : E) = x - ∑ j, r j • ℓ j := by
       have h2 := congrArg (fun z : N => (z : E)) (bN.sum_repr ⟨_, hy⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul] at h2
       exact ⟨_, h2⟩
@@ -245,7 +251,7 @@ theorem degree_quotient : DegQuot := by
     refine ⟨Sum.elim s r, ?_⟩
     apply Subtype.ext
     simp only [Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr, Submodule.coe_add,
-      Submodule.coe_sum, Submodule.coe_smul, v, Submodule.coe_mk]
+      Submodule.coe_sum, Submodule.coe_smul, v]
     rw [hs]
     abel
   let cB := Module.Basis.mk hli hsp
@@ -269,7 +275,6 @@ theorem degree_quotient : DegQuot := by
     intro a ha
     have hmem : ∑ j, a j • ℓ j ∈ W := by
       have h1 : P (∑ j, a j • ℓ j) = 0 := by
-
         rw [map_sum]
         simp only [map_smul, hℓP]
         exact ha
@@ -291,8 +296,9 @@ theorem degree_quotient : DegQuot := by
     unfold rk
     rw [Module.finrank_eq_card_basis cB, Module.finrank_eq_card_basis bN,
       Module.finrank_eq_card_basis eQ, Fintype.card_sum]
-  have hα : ∀ j, ∃ α : Module.Free.ChooseBasisIndex ℤ N → ℝ,
-      ∑ i, α i • (bN i : E) = ℓ j - (eQ j : E) := by
+  have hα
+      : ∀ j, ∃ α : Module.Free.ChooseBasisIndex ℤ N → ℝ,
+        ∑ i, α i • (bN i : E) = ℓ j - (eQ j : E) := by
     intro j
     have h := hPsub (ℓ j)
     rw [hℓP, hWspan, Submodule.mem_span_range_iff_exists_fun] at h
@@ -319,28 +325,29 @@ theorem degree_quotient : DegQuot := by
   have hdetM : M.det = 1 := by
     simp only [M]
     rw [Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, Matrix.det_one, one_mul]
-  have hgram : Matrix.gram ℝ v2 = Matrix.fromBlocks (Matrix.gram ℝ fun i => (bN i : E)) 0 0
-      (Matrix.gram ℝ fun j => (eQ j : E)) := by
+  have hgram
+      : Matrix.gram ℝ v2
+        = Matrix.fromBlocks (Matrix.gram ℝ fun i => (bN i : E)) 0 0
+          (Matrix.gram ℝ fun j => (eQ j : E)) := by
     ext a b
-    rcases a with i | j <;> rcases b with i' | j' <;>
-      simp only [Matrix.gram_apply, v2, Sum.elim_inl, Sum.elim_inr, Matrix.fromBlocks_apply₁₁,
+    rcases a with i | j <;> rcases b with i' | j'
+      <;> simp only [Matrix.gram_apply, v2, Sum.elim_inl, Sum.elim_inr, Matrix.fromBlocks_apply₁₁,
         Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂,
         Matrix.zero_apply]
-    all_goals first
-      | rfl
+    all_goals
+      first
       | exact horth _ (hNW _ (bN i).2) _ (heQW j')
       | (rw [real_inner_comm]; exact horth _ (hNW _ (bN i').2) _ (heQW j))
-  have hdet : (Matrix.gram ℝ fun k => ((cB k : L) : E)).det =
-      (Matrix.gram ℝ fun i => (bN i : E)).det * (Matrix.gram ℝ fun j => (eQ j : E)).det := by
+  have hdet
+      : (Matrix.gram ℝ fun k => ((cB k : L) : E)).det
+        = (Matrix.gram ℝ fun i => (bN i : E)).det * (Matrix.gram ℝ fun j => (eQ j : E)).det := by
     rw [hcomb, gram_sum_smul_eq_transpose_mul, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose,
       hdetM, hgram, Matrix.det_fromBlocks_zero₂₁]
     ring
   have hcovL : covol L = Real.sqrt (Matrix.gram ℝ fun k => ((cB k : L) : E)).det :=
     covol_eq_gram E L _ cB
-  have hcovN : covol N = Real.sqrt (Matrix.gram ℝ fun i => (bN i : E)).det :=
-    covol_eq_gram E N _ bN
-  have hcovQ : covol Q = Real.sqrt (Matrix.gram ℝ fun j => (eQ j : E)).det :=
-    covol_eq_gram E Q _ eQ
+  have hcovN : covol N = Real.sqrt (Matrix.gram ℝ fun i => (bN i : E)).det := covol_eq_gram E N _ bN
+  have hcovQ : covol Q = Real.sqrt (Matrix.gram ℝ fun j => (eQ j : E)).det := covol_eq_gram E Q _ eQ
   have hposN : 0 < (Matrix.gram ℝ fun i => (bN i : E)).det :=
     (Matrix.posDef_gram_of_linearIndependent (linearIndependent_coe_basis''' N bN)).det_pos
   have hposQ : 0 < (Matrix.gram ℝ fun j => (eQ j : E)).det :=

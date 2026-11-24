@@ -1,21 +1,17 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
+public import Formalism.FormalGroupWitt.SubstInjectiveV
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FirstDeriv
 public import Formalism.FormalGroupLog.Statement
 public import Formalism.FormalGroupLog.FormalGroupLogProofs.ConstantCoeffSubstOfZero
 public import Formalism.FormalGroupLog.LogDeterminesLaw
-public import Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV
 public import Formalism.TorsionNormIteration.InverseIntegralClasses.SolveExistsProof
 public import Formalism.TorsionNormIteration.LubinTateExample
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Algebra.Order.Star.Int
-import Mathlib.Algebra.Order.Star.Rat
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-import Mathlib.Analysis.Normed.Ring.Ultra
 import Mathlib.Analysis.SpecialFunctions.Bernstein
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
@@ -23,15 +19,13 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -39,7 +33,7 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -52,9 +46,68 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Normed.Ring.Ultra
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.ReduceModChar
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV, Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.CoeffSubstLgFOfDegreeOne
+
+-- ===== clump member: Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV =====
+-- clump-header: {"m": "Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV", "h": "module\n\npublic import Formalism.FormalGroupWitt.SubstInjectiveV\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.GroupTheory.Nilpotent\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+noncomputable section
+
+namespace Formalism.FG
+
+open Formalism.G
+
+namespace PadicFrobeniusSquare
+
+theorem padicInt_norm_le_p {p : ℕ} [Fact p.Prime] (y : ℤ_[p]) (hy : PadicInt.toZMod y = 0)
+    : ‖y‖ ≤ ‖(p : ℤ_[p])‖ := by
+  have h1 : y ∈ RingHom.ker (PadicInt.toZMod (p := p)) := hy
+  rw [PadicInt.ker_toZMod] at h1
+  have h2 : ‖y‖ < 1 := PadicInt.mem_nonunits.1 ((IsLocalRing.mem_maximalIdeal _).1 h1)
+  obtain ⟨z, rfl⟩ := (PadicInt.norm_lt_one_iff_dvd _).1 h2
+  rw [norm_mul]
+  exact mul_le_of_le_one_right (norm_nonneg _) (PadicInt.norm_le_one z)
+
+end PadicFrobeniusSquare
+
+theorem frobenius_lift_padic_square : Formalism.FG.FrobLiftPadicSq := by
+  intro l _
+  refine ⟨Fact.out, ⟨2, two_pos, rfl⟩, Padic.norm_p_lt_one, ?_⟩
+  intro a ha
+  have hz : ∀ z : ZMod l, z ^ l ^ 2 = z := fun z => by
+    rw [pow_two, pow_mul, ZMod.pow_card, ZMod.pow_card]
+  let y : ℤ_[l] := ⟨a, ha⟩
+  have h :=
+    PadicFrobeniusSquare.padicInt_norm_le_p (y - y ^ l ^ 2) (by rw [map_sub, map_pow, hz, sub_self])
+  rw [PadicInt.norm_def, PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_pow,
+      PadicInt.coe_natCast]
+    at h
+  show ‖a - a ^ l ^ 2‖ ≤ ‖(l : ℚ_[l])‖
+  exact h
+
+end Formalism.FG
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV =====
+
+-- ===== clump member: Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.CoeffSubstLgFOfDegreeOne =====
+-- clump-header: {"m": "Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.CoeffSubstLgFOfDegreeOne", "h": "module\n\nimport Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic\npublic import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FirstDeriv\npublic import Formalism.FormalGroupLog.Statement\npublic import Formalism.FormalGroupLog.FormalGroupLogProofs.ConstantCoeffSubstOfZero\npublic import Formalism.FormalGroupLog.LogDeterminesLaw\npublic import Formalism.FormalGroupWitt.FormalGroupWittProofs.FrobSqV\npublic import Formalism.TorsionNormIteration.InverseIntegralClasses.SolveExistsProof\npublic import Formalism.TorsionNormIteration.LubinTateExample\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Algebra.Order.Star.Int\nimport Mathlib.Algebra.Order.Star.Rat\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.Normed.Ring.Ultra\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.SimpleRing.Principal\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.HaveILetI\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
@@ -81,62 +134,75 @@ theorem coeff_one_lgF (p : ℕ) (hp : 2 ≤ p) : PowerSeries.coeff 1 (lgF K p) =
   rw [lgF, PowerSeries.coeff_mk]
   simp [Finset.sum_range_succ, h1]
 
-theorem map_lgF {L : Type} [Field L] (φ : K →+* L) (p : ℕ) :
-    PowerSeries.map φ (lgF K p) = lgF L p := by
+theorem map_lgF {L : Type} [Field L] (φ : K →+* L) (p : ℕ)
+    : PowerSeries.map φ (lgF K p) = lgF L p := by
   ext n
 
   simp only [lgF, PowerSeries.coeff_map, PowerSeries.coeff_mk, map_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   split_ifs <;> simp
 
-theorem cob_eq_zero_iff (F : MvPowerSeries (Fin 2) K) (f : PowerSeries K) :
-    cob F f = 0 ↔ PowerSeries.subst F f = at1 0 f + at1 1 f := by
+theorem cob_eq_zero_iff (F : MvPowerSeries (Fin 2) K) (f : PowerSeries K)
+    : cob F f = 0 ↔ PowerSeries.subst F f = at1 0 f + at1 1 f := by
   rw [cob, sub_sub, sub_eq_zero]
 
-theorem constantCoeff_inVar {ι : Type} (x : ι) (f : PowerSeries K)
-    (hf : PowerSeries.constantCoeff f = 0) : MvPowerSeries.constantCoeff (at1 x f) = 0 :=
+theorem constantCoeff_inVar
+    {ι : Type} (x : ι) (f : PowerSeries K) (hf : PowerSeries.constantCoeff f = 0)
+    : MvPowerSeries.constantCoeff (at1 x f) = 0 :=
   PowerSeries.constantCoeff_subst_eq_zero (by simp) f hf
 
-theorem lgF_subst_inj {ι : Type} (p : ℕ) (hp : 2 ≤ p) (a b : MvPowerSeries ι K)
+theorem lgF_subst_inj
+    {ι : Type}
+    (p : ℕ) (hp : 2 ≤ p)
+    (a b : MvPowerSeries ι K)
     (ha : MvPowerSeries.constantCoeff a = 0) (hb : MvPowerSeries.constantCoeff b = 0)
-    (h : PowerSeries.subst a (lgF K p) = PowerSeries.subst b (lgF K p)) : a = b :=
+    (h : PowerSeries.subst a (lgF K p) = PowerSeries.subst b (lgF K p))
+    : a = b :=
   Formalism.G.substInjective K ι (lgF K p) a b (constantCoeff_lgF p hp) (coeff_one_lgF p hp) ha hb h
 
-theorem law_exists (p : ℕ) (hp : 2 ≤ p) :
-    ∃ F : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff F = 0 ∧ cob F (lgF K p) = 0 := by
+theorem law_exists (p : ℕ) (hp : 2 ≤ p)
+    : ∃ F : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff F = 0 ∧ cob F (lgF K p) = 0 := by
   have h0 : MvPowerSeries.constantCoeff (at1 (0 : Fin 2) (lgF K p) + at1 1 (lgF K p)) = 0 := by
     rw [map_add (f := _), constantCoeff_inVar _ _ (constantCoeff_lgF p hp),
       constantCoeff_inVar _ _ (constantCoeff_lgF p hp), add_zero]
-  obtain ⟨F, hF0, hF⟩ := Formalism.LT.SolveExists_proof K (Fin 2) (lgF K p) _
-    (constantCoeff_lgF p hp) (coeff_one_lgF p hp) h0
+  obtain ⟨F, hF0, hF⟩ :=
+    Formalism.LT.SolveExists_proof K (Fin 2) (lgF K p) _ (constantCoeff_lgF p hp)
+      (coeff_one_lgF p hp) h0
   exact ⟨F, hF0, (cob_eq_zero_iff F _).mpr hF⟩
 
-theorem law_unique (p : ℕ) (hp : 2 ≤ p) (F F' : MvPowerSeries (Fin 2) K)
-    (h0 : MvPowerSeries.constantCoeff F = 0) (h0' : MvPowerSeries.constantCoeff F' = 0)
-    (h : cob F (lgF K p) = 0) (h' : cob F' (lgF K p) = 0) : F = F' :=
-  lgF_subst_inj p hp F F' h0 h0'
-    (by rw [(cob_eq_zero_iff F _).mp h, (cob_eq_zero_iff F' _).mp h'])
+theorem law_unique
+    (p : ℕ) (hp : 2 ≤ p)
+    (F F' : MvPowerSeries (Fin 2) K) (h0 : MvPowerSeries.constantCoeff F = 0)
+    (h0' : MvPowerSeries.constantCoeff F' = 0) (h : cob F (lgF K p) = 0) (h' : cob F' (lgF K p) = 0)
+    : F = F' :=
+  lgF_subst_inj p hp F F' h0 h0' (by rw [(cob_eq_zero_iff F _).mp h, (cob_eq_zero_iff F' _).mp h'])
 
-theorem map_inVar {L ι : Type} [Field L] (φ : K →+* L) (x : ι) (f : PowerSeries K) :
-    MvPowerSeries.map φ (at1 x f) = at1 x (PowerSeries.map φ f) := by
+theorem map_inVar {L ι : Type} [Field L] (φ : K →+* L) (x : ι) (f : PowerSeries K)
+    : MvPowerSeries.map φ (at1 x f) = at1 x (PowerSeries.map φ f) := by
   rw [at1, at1, PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
     MvPowerSeries.map_X]
 
-theorem map_cob {L : Type} [Field L] (φ : K →+* L) (F : MvPowerSeries (Fin 2) K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (f : PowerSeries K) :
-    MvPowerSeries.map φ (cob F f) = cob (MvPowerSeries.map φ F) (PowerSeries.map φ f) := by
+theorem map_cob
+    {L : Type} [Field L]
+    (φ : K →+* L)
+    (F : MvPowerSeries (Fin 2) K) (hF : MvPowerSeries.constantCoeff F = 0)
+    (f : PowerSeries K)
+    : MvPowerSeries.map φ (cob F f) = cob (MvPowerSeries.map φ F) (PowerSeries.map φ f) := by
   rw [cob, cob, map_sub, map_sub, map_inVar, map_inVar,
     PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF)]
 
-theorem map_law {L : Type} [Field L] (φ : K →+* L) (p : ℕ) (F : MvPowerSeries (Fin 2) K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (h : cob F (lgF K p) = 0) :
-    MvPowerSeries.constantCoeff (MvPowerSeries.map φ F) = 0 ∧
-      cob (MvPowerSeries.map φ F) (lgF L p) = 0 := by
+theorem map_law
+    {L : Type} [Field L]
+    (φ : K →+* L)
+    (p : ℕ) (F : MvPowerSeries (Fin 2) K)
+    (hF : MvPowerSeries.constantCoeff F = 0) (h : cob F (lgF K p) = 0)
+    : MvPowerSeries.constantCoeff (MvPowerSeries.map φ F) = 0
+      ∧ cob (MvPowerSeries.map φ F) (lgF L p) = 0 := by
   refine ⟨by rw [MvPowerSeries.constantCoeff_map, hF, map_zero], ?_⟩
   rw [← map_lgF φ p, ← map_cob φ F hF, h, map_zero]
 
-private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : ℕ) :
-    PowerSeries.coeff ((p ^ 2) ^ j) (lgF K p) = ((p : K) ^ j)⁻¹ := by
+private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : ℕ)
+    : PowerSeries.coeff ((p ^ 2) ^ j) (lgF K p) = ((p : K) ^ j)⁻¹ := by
   have hq : 2 ≤ p ^ 2 := by nlinarith
   rw [lgF, PowerSeries.coeff_mk, Finset.sum_eq_single j]
   · simp
@@ -151,14 +217,14 @@ private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : �
     have : j < (p ^ 2) ^ j := Nat.lt_pow_self (by omega)
     omega
 
-private theorem coeff_lgF_eq_zero_of_ne_pow_sq_pow (p n : ℕ) (h : ∀ j, n ≠ (p ^ 2) ^ j) :
-    PowerSeries.coeff n (lgF K p) = 0 := by
+private theorem coeff_lgF_eq_zero_of_ne_pow_sq_pow (p n : ℕ) (h : ∀ j, n ≠ (p ^ 2) ^ j)
+    : PowerSeries.coeff n (lgF K p) = 0 := by
   rw [lgF, PowerSeries.coeff_mk]
   exact Finset.sum_eq_zero (fun i _ => if_neg (h i))
 
-theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
-    lgF K p - (p : K)⁻¹ • PowerSeries.subst ((PowerSeries.X : PowerSeries K) ^ (p ^ 2)) (lgF K p) =
-      PowerSeries.X := by
+theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0)
+    : lgF K p - (p : K)⁻¹ • PowerSeries.subst ((PowerSeries.X : PowerSeries K) ^ (p ^ 2)) (lgF K p)
+      = PowerSeries.X := by
   have hq0 : p ^ 2 ≠ 0 := by positivity
   have hq : 2 ≤ p ^ 2 := by nlinarith
   ext n
@@ -176,8 +242,9 @@ theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
       have hdiv : (p ^ 2) ^ (j + 1) / p ^ 2 = (p ^ 2) ^ j := by
         rw [pow_succ, Nat.mul_div_cancel _ (by positivity)]
       have hne1 : (p ^ 2) ^ (j + 1) ≠ 1 := ne_of_gt (Nat.one_lt_pow (Nat.succ_ne_zero j) (by omega))
-      rw [if_pos hd, hdiv, coeff_lgF_pow_sq_pow_eq_inv_pow p hp, coeff_lgF_pow_sq_pow_eq_inv_pow p hp, if_neg hne1]
-      simp [pow_succ, mul_inv, mul_comm]
+      rw [if_pos hd, hdiv, coeff_lgF_pow_sq_pow_eq_inv_pow p hp,
+        coeff_lgF_pow_sq_pow_eq_inv_pow p hp, if_neg hne1]
+      simp [pow_succ, mul_comm]
   · push_neg at hn
     rw [coeff_lgF_eq_zero_of_ne_pow_sq_pow p n hn]
     have hn1 : n ≠ 1 := fun h => hn 0 (by simp [h])
@@ -190,29 +257,32 @@ theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
       simp [coeff_lgF_eq_zero_of_ne_pow_sq_pow p _ hn']
     · simp
 
-theorem subst_subst {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
-    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a) (f : PowerSeries K) :
-    MvPowerSeries.subst b (PowerSeries.subst a f) =
-      PowerSeries.subst (MvPowerSeries.subst b a) f := by
+theorem subst_subst
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
+    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a)
+    (f : PowerSeries K)
+    : MvPowerSeries.subst b (PowerSeries.subst a f)
+      = PowerSeries.subst (MvPowerSeries.subst b a) f := by
   unfold PowerSeries.subst
   rw [MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.const ha) hb]
 
-theorem subst_single_var {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
-    (x : ι) (f : PowerSeries K) :
-    MvPowerSeries.subst b (at1 x f) = PowerSeries.subst (b x) f := by
+theorem subst_single_var
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b) (x : ι)
+    (f : PowerSeries K)
+    : MvPowerSeries.subst b (at1 x f) = PowerSeries.subst (b x) f := by
   rw [at1, subst_subst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
     MvPowerSeries.subst_X hb]
 
-theorem zeta_pow {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (j : ℕ) :
-    ζ ^ ((p ^ 2) ^ j) = ζ := by
+theorem zeta_pow {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (j : ℕ)
+    : ζ ^ ((p ^ 2) ^ j) = ζ := by
   induction j with
   | zero => simp
   | succ j ih =>
     have hq : p ^ 2 - 1 + 1 = p ^ 2 := Nat.sub_add_cancel (by nlinarith)
     rw [pow_succ, pow_mul, ih, ← hq, pow_succ, hζ, one_mul]
 
-theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) :
-    PowerSeries.rescale ζ (lgF K p) = PowerSeries.C ζ * lgF K p := by
+theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p)
+    : PowerSeries.rescale ζ (lgF K p) = PowerSeries.C ζ * lgF K p := by
   ext n
   rw [PowerSeries.coeff_rescale, PowerSeries.coeff_C_mul]
   by_cases hn : ∃ j, n = (p ^ 2) ^ j
@@ -222,10 +292,11 @@ theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ 
     rw [coeff_lgF_eq_zero_of_ne_pow_sq_pow p n hn]
     simp
 
-theorem lgF_subst_C_mul {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p)
-    (G : MvPowerSeries ι K) (hG : MvPowerSeries.constantCoeff G = 0) :
-    PowerSeries.subst (MvPowerSeries.C ζ * G) (lgF K p) =
-      MvPowerSeries.C ζ * PowerSeries.subst G (lgF K p) := by
+theorem lgF_subst_C_mul
+    {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (G : MvPowerSeries ι K)
+    (hG : MvPowerSeries.constantCoeff G = 0)
+    : PowerSeries.subst (MvPowerSeries.C ζ * G) (lgF K p)
+      = MvPowerSeries.C ζ * PowerSeries.subst G (lgF K p) := by
   have hG' : PowerSeries.HasSubst G := PowerSeries.HasSubst.of_constantCoeff_zero hG
   have hX : PowerSeries.HasSubst (ζ • PowerSeries.X : PowerSeries K) :=
     PowerSeries.HasSubst.of_constantCoeff_zero (by simp; exact Or.inr PowerSeries.constantCoeff_X)
@@ -235,9 +306,12 @@ theorem lgF_subst_C_mul {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) =
     rescale_lgF hζ hp, ← PowerSeries.smul_eq_C_mul, PowerSeries.subst_smul hG',
     MvPowerSeries.smul_eq_C_mul]
 
-theorem coeff_subst_lgF_of_degree_one {ι : Type} (p : ℕ) (hp : 2 ≤ p) (F : MvPowerSeries ι K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (n : ι →₀ ℕ) (hn : n.degree = 1) :
-    MvPowerSeries.coeff n (PowerSeries.subst F (lgF K p)) = MvPowerSeries.coeff n F := by
+theorem coeff_subst_lgF_of_degree_one
+    {ι : Type}
+    (p : ℕ) (hp : 2 ≤ p)
+    (F : MvPowerSeries ι K) (hF : MvPowerSeries.constantCoeff F = 0)
+    (n : ι →₀ ℕ) (hn : n.degree = 1)
+    : MvPowerSeries.coeff n (PowerSeries.subst F (lgF K p)) = MvPowerSeries.coeff n F := by
   classical
   have hdvd : (PowerSeries.X : PowerSeries K) ^ 2 ∣ lgF K p - PowerSeries.X := by
     rw [PowerSeries.X_pow_dvd_iff]
@@ -271,20 +345,27 @@ end Alg
 theorem not_dvd_den {p : ℕ} [Fact p.Prime] (r : ℚ) (h : ‖(r : ℚ_[p])‖ ≤ 1) : ¬ p ∣ r.den := by
   apply GlobalTheory.LocalData.not_dvd_den <;> assumption
 
-theorem norm_ratCast_le_one {K : Type} [NormedField K] [IsUltrametricDist K] {p : ℕ}
-    (hp : p.Prime) (hnp : ‖(p : K)‖ < 1) (r : ℚ) (hr : ¬ p ∣ r.den) : ‖(r : K)‖ ≤ 1 := by
+theorem norm_ratCast_le_one
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    {p : ℕ} (hp : p.Prime) (hnp : ‖(p : K)‖ < 1)
+    (r : ℚ) (hr : ¬ p ∣ r.den)
+    : ‖(r : K)‖ ≤ 1 := by
   have hden : 1 ≤ ‖(r.den : K)‖ := by
     have hcop : Nat.Coprime r.den p := ((Nat.Prime.coprime_iff_not_dvd hp).mpr hr).symm
     have hab : (r.den : ℤ) * Nat.gcdA r.den p + (p : ℤ) * Nat.gcdB r.den p = 1 := by
       rw [← Nat.gcd_eq_gcd_ab, Nat.Coprime.gcd_eq_one hcop, Nat.cast_one]
-    have h1 : (1 : K) = (r.den : K) * ((Nat.gcdA r.den p : ℤ) : K) + (p : K) * ((Nat.gcdB r.den p : ℤ) : K) := by
+    have h1
+        : (1 : K)
+          = (r.den : K) * ((Nat.gcdA r.den p : ℤ) : K)
+            + (p : K) * ((Nat.gcdB r.den p : ℤ) : K) := by
       have h1' := congrArg (Int.cast : ℤ → K) hab
       push_cast at h1'
       exact h1'.symm
     by_contra hlt
     push_neg at hlt
-    have hm := IsUltrametricDist.norm_add_le_max ((r.den : K) * ((Nat.gcdA r.den p : ℤ) : K))
-      ((p : K) * ((Nat.gcdB r.den p : ℤ) : K))
+    have hm :=
+      IsUltrametricDist.norm_add_le_max ((r.den : K) * ((Nat.gcdA r.den p : ℤ) : K))
+        ((p : K) * ((Nat.gcdB r.den p : ℤ) : K))
     rw [← h1, norm_one, norm_mul, norm_mul] at hm
     have ha := IsUltrametricDist.norm_intCast_le_one K (Nat.gcdA r.den p)
     have hb := IsUltrametricDist.norm_intCast_le_one K (Nat.gcdB r.den p)
@@ -297,8 +378,8 @@ theorem norm_ratCast_le_one {K : Type} [NormedField K] [IsUltrametricDist K] {p 
   rw [Rat.cast_def, norm_div]
   exact div_le_one_of_le₀ (hnum.trans hden) (norm_nonneg _)
 
-theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime] :
-    Formalism.G.IsFunEqType p (p ^ 2) (RingHom.id ℚ_[p]) (lgF ℚ_[p] p) := by
+theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime]
+    : Formalism.G.IsFunEqType p (p ^ 2) (RingHom.id ℚ_[p]) (lgF ℚ_[p] p) := by
   have hp2 : 2 ≤ p := hp.out.two_le
   have hpK : (p : ℚ_[p]) ≠ 0 := by exact_mod_cast hp.out.ne_zero
   unfold Formalism.G.IsFunEqType
@@ -308,15 +389,30 @@ theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime] :
   rw [PowerSeries.coeff_X]
   split_ifs <;> simp
 
-theorem law_integral {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] (p : ℕ)
-    (hp : p.Prime) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹) (F : MvPowerSeries (Fin 2) K)
-    (hF0 : MvPowerSeries.constantCoeff F = 0) (hF : cob F (lgF K p) = 0) : Integral F := by
+/--
+Integrality of the addition law for the height-two logarithm
+`lgF(T) = ∑ n ≥ 0, T^(p^(2*n)) / p^n`.
+
+Over `ℚ_[p]`, the identity `lgF(T) - lgF(T^(p^2)) / p = T` gives `funEqType_lgF`, so
+`Formalism.LT.funEqGroup` applies with the identity Frobenius lift and `q = p^2`.
+Uniqueness identifies this integral law with the image of the rational law `FQ`.
+Its rational coefficients therefore have denominators prime to `p`; `norm_ratCast_le_one`
+transfers their integrality to `K`, and uniqueness identifies the resulting law with `F`.
+Only the `ℚ_[p]` step uses the identity endomorphism as a Frobenius lift.
+-/
+theorem law_integral
+    {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K]
+    (p : ℕ) (hp : p.Prime) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    (F : MvPowerSeries (Fin 2) K)
+    (hF0 : MvPowerSeries.constantCoeff F = 0) (hF : cob F (lgF K p) = 0)
+    : Integral F := by
   haveI : Fact p.Prime := ⟨hp⟩
   have hp2 := hp.two_le
   obtain ⟨FQ, hFQ0, hFQ⟩ := law_exists (K := ℚ) p hp2
-  obtain ⟨G, hG0, hGint, hGlog⟩ := Formalism.LT.funEqGroup ℚ_[p] p (p ^ 2) (RingHom.id ℚ_[p])
-    (Formalism.FG.frobenius_lift_padic_square p) (lgF ℚ_[p] p) (constantCoeff_lgF p hp2)
-    (coeff_one_lgF p hp2) (funEqType_lgF p)
+  obtain ⟨G, hG0, hGint, hGlog⟩ :=
+    Formalism.LT.funEqGroup ℚ_[p] p (p ^ 2) (RingHom.id ℚ_[p])
+      (Formalism.FG.frobenius_lift_padic_square p) (lgF ℚ_[p] p) (constantCoeff_lgF p hp2)
+      (coeff_one_lgF p hp2) (funEqType_lgF p)
   have hGcob : cob G (lgF ℚ_[p] p) = 0 := (cob_eq_zero_iff G _).mpr hGlog
   obtain ⟨h0p, hcp⟩ := map_law (Rat.castHom ℚ_[p]) p FQ hFQ0 hFQ
   have hEq := law_unique p hp2 _ G h0p hG0 hcp hGcob
@@ -349,9 +445,10 @@ theorem formal_law_symmetric : LawSymm := by
   intro K _ _ _ p hp hnp F hF
   obtain ⟨hF0, _, hFc⟩ := hF
   have hp2 := hp.two_le
-  have hFl : PowerSeries.subst F (lgF K p) =
-      PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K) (lgF K p) +
-        PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) (lgF K p) :=
+  have hFl
+      : PowerSeries.subst F (lgF K p)
+        = PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K) (lgF K p)
+          + PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) (lgF K p) :=
     (cob_eq_zero_iff F _).mp hFc
   have hFlA : PowerSeries.subst F (lgF K p) = at1 0 (lgF K p) + at1 1 (lgF K p) :=
     (cob_eq_zero_iff F _).mp hFc
@@ -361,15 +458,14 @@ theorem formal_law_symmetric : LawSymm := by
     obtain ⟨h0, hc⟩ := map_law σ p F hF0 hFc
     exact law_unique p hp2 _ F h0 hF0 hc hFc
   · intro ζ hζ
-    have hb : MvPowerSeries.HasSubst
-        (fun a : Fin 2 => MvPowerSeries.C ζ * (MvPowerSeries.X a : MvPowerSeries (Fin 2) K)) :=
+    have hb : MvPowerSeries.HasSubst (fun a : Fin 2 =>
+        MvPowerSeries.C ζ * (MvPowerSeries.X a : MvPowerSeries (Fin 2) K)) :=
       MvPowerSeries.hasSubst_of_constantCoeff_zero (fun a => by simp)
     apply lgF_subst_inj p hp2
     · exact MvPowerSeries.constantCoeff_subst_eq_zero hb (fun a => by simp) hF0
     · simp [hF0]
     · rw [← subst_subst hb (PowerSeries.HasSubst.of_constantCoeff_zero hF0), hFlA,
         MvPowerSeries.subst_add hb, subst_single_var hb, subst_single_var hb]
-      beta_reduce
       rw [lgF_subst_C_mul hζ hp2 (MvPowerSeries.X (0 : Fin 2)) (by simp),
         lgF_subst_C_mul hζ hp2 (MvPowerSeries.X (1 : Fin 2)) (by simp),
         lgF_subst_C_mul hζ hp2 F hF0, hFl, mul_add]
@@ -405,7 +501,11 @@ theorem formal_law_symmetric : LawSymm := by
     · simp
     · rw [← subst_subst hb (PowerSeries.HasSubst.of_constantCoeff_zero hF0), hFlA,
         MvPowerSeries.subst_add hb, subst_single_var hb, subst_single_var hb]
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
       rw [hz, add_zero]
 
 end Formalism.InvariantFactorPaths.G7
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.CoeffSubstLgFOfDegreeOne =====

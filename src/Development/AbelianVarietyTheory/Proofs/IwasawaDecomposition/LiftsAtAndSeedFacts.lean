@@ -217,7 +217,7 @@ theorem not_isConjPl_union
         exact Ideal.Quotient.eq_zero_iff_mem.1 ((map_natCast _ q).trans hzero)
       exact hne k
         (GlobalTheory.ChainEquiv.eq_of_natCast_mem P' hq (D.host.g_prime k)
-          (GlobalTheory.ChainEquiv.natCast_mem_of_isConjPl hc h1) (L.C.P.overP hk))
+          (_root_.GlobalTheory.StepLaw.natCast_mem_of_isConjPl hc h1) (L.C.P.overP hk))
     · exact (hL.Q_pl t P h).2 P' h'
 
 end Places

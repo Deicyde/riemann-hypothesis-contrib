@@ -168,19 +168,14 @@ theorem inS_mul
     | add x y _ _ hx hy => rw [Matrix.mulVec_add, hx, hy]
     | smul c x _ hx => rw [Matrix.mulVec_smul, hx]
   obtain ⟨⟨h1, h2⟩, -⟩ := hn
+  have key : ∀ y, h *ᵥ y = y → (h * n - 1) *ᵥ y = h *ᵥ ((n - 1) *ᵥ y) := by
+    intro y hy
+    rw [Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.mulVec_sub, ← Matrix.mulVec_mulVec,
+      Matrix.one_mulVec]
+    simp only [hy]
   refine ⟨fun a => ?_, ?_⟩
-  · have : (h * n - 1) *ᵥ e a = h *ᵥ ((n - 1) *ᵥ e a) := by
-      rw [Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.mulVec_sub, ← Matrix.mulVec_mulVec,
-        Matrix.one_mulVec]
-      simp only [he]
-    rw [this, hspan _ _ (h1 a)]
-    exact h1 a
-  · have : (h * n - 1) *ᵥ z = h *ᵥ ((n - 1) *ᵥ z) := by
-      rw [Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.mulVec_sub, ← Matrix.mulVec_mulVec,
-        Matrix.one_mulVec]
-      simp only [hz]
-    rw [this, hspan _ _ h2]
-    exact h2
+  · rw [key (e a) (he a), hspan _ _ (h1 a)]; exact h1 a
+  · rw [key z hz, hspan _ _ h2]; exact h2
 
 theorem HNset_iff
     (hF : IsFrameJ ε e f wf z0)

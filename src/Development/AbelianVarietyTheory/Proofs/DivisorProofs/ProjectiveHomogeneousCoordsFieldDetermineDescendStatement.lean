@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -51,6 +52,7 @@ open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory
   GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.projectiveHomogeneousCoords_field_determine_descend
     : (∀ (o K : Type) [CommRing o] [Field K] (n : ℕ) (x x' : Sp K ⟶ PSpace o n)
           (v : Fin (n + 1) → K),
@@ -61,7 +63,4 @@ theorem _root_.GlobalTheory.T.projectiveHomogeneousCoords_field_determine_descen
       ∧ ∀ (o K K' : Type) [CommRing o] [Field K] [Field K'] (n : ℕ) (x : Sp K ⟶ PSpace o n)
           (v : Fin (n + 1) → K) (i : K →+* K'),
         PCrd (spMap i ≫ x) (fun j => i (v j)) → PCrd x v := by
-  first
-  | exact @GlobalTheory.UMin.CrdUniq.main
-  | exact GlobalTheory.UMin.CrdUniq.main
-  | (intros; apply GlobalTheory.UMin.CrdUniq.main <;> assumption)
+  first | exact @GlobalTheory.UMin.CrdUniq.main

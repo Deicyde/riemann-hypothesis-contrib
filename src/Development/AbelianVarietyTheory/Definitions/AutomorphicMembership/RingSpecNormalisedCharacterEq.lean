@@ -610,7 +610,6 @@ def mtL (L : LocAll (lay0 D)) (M : MtFam D) : MtFam (withLoc L) := fun μ j h1 h
   M μ j h1 h2 with
 }
 
-
 def chL (L : LocAll (lay0 D)) (C : NChoice D) : NChoice (withLoc L) := { C with }
 
 def cfL (L : LocAll (lay0 D)) (c : CharFrame D) : CharFrame (withLoc L) := cfTr L.lay c

@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.thetaModelMember_term_mem_maximalIdeal
             → ∀ T : (Fin 8 → Y1) → C → V1,
               𝔪1.Terms x₀ lab T
                 → ∀ (c : C) (mu : Fin 8 → Y1), mu ≠ 0 → T mu c ∈ maximalIdeal V1 := by
-  first
-  | exact @GlobalTheory.Poinc.Sep.HighTerms.term_mem_maximalIdeal
-  | exact GlobalTheory.Poinc.Sep.HighTerms.term_mem_maximalIdeal
-  | (intros; apply GlobalTheory.Poinc.Sep.HighTerms.term_mem_maximalIdeal <;> assumption)
+  first | exact @GlobalTheory.Poinc.Sep.HighTerms.term_mem_maximalIdeal

@@ -59,13 +59,19 @@ namespace GlobalTheory.K5.IntFrac
 
 open Polynomial
 
-theorem mem_adjoin_inv_of_isIntegral' {R K : Type*} [CommRing R] [Field K] [Algebra R K] {z : K}
-    (hz : z ≠ 0) (hi : IsIntegral R z) : z ∈ Algebra.adjoin R {z⁻¹} := by
+theorem mem_adjoin_inv_of_isIntegral'
+    {R K : Type*} [CommRing R] [Field K] [Algebra R K] {z : K} (hz : z ≠ 0) (hi : IsIntegral R z)
+    : z ∈ Algebra.adjoin R {z⁻¹} := by
   apply GlobalTheory.K5.LevClosed.mem_adjoin_inv_of_isIntegral <;> assumption
 
-theorem mem_of_div_le_one : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω] (v : Valuation Ω NNReal), (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x) →
-  ∀ (B : Subalgebra O Ω), (∀ x ∈ B, v x ≤ 1) → ∀ π ∈ B, π ≠ 0 → v π < 1 → (∀ x ∈ B, v x < 1 → x / π ∈ B) →
-  ∀ a ∈ B, ∀ b ∈ B, v (a / b) ≤ 1 → a / b ∈ B := by
+theorem mem_of_div_le_one
+    : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω] (v : Valuation Ω NNReal),
+      (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x)
+        → ∀ (B : Subalgebra O Ω),
+          (∀ x ∈ B, v x ≤ 1)
+            → ∀ π ∈ B,
+              π ≠ 0 → v π < 1 → (∀ x ∈ B, v x < 1 → x / π ∈ B)
+                → ∀ a ∈ B, ∀ b ∈ B, v (a / b) ≤ 1 → a / b ∈ B := by
   intro O Ω _ _ _ v hv B hB π hπB hπ0 hπ1 hdiv
   have hvπ : 0 < v π := pos_iff_ne_zero.mpr ((Valuation.ne_zero_iff v).mpr hπ0)
   have hA : ∀ n : ℕ, ∀ a ∈ B, v (a / π ^ n) ≤ 1 → a / π ^ n ∈ B := by
@@ -79,7 +85,9 @@ theorem mem_of_div_le_one : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O
           rw [map_div₀, map_pow, div_mul_cancel₀]
           exact pow_ne_zero _ hvπ.ne'
         rw [he]
-        calc v (a / π ^ (k + 1)) * v π ^ (k + 1) ≤ 1 * v π ^ (k + 1) := by gcongr
+        calc
+          v (a / π ^ (k + 1)) * v π ^ (k + 1)
+            ≤ 1 * v π ^ (k + 1) := by gcongr
           _ < 1 := by
             rw [one_mul]
             exact pow_lt_one₀ hvπ.le hπ1 (Nat.succ_ne_zero k)

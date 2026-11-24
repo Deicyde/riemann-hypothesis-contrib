@@ -201,7 +201,6 @@ theorem pderiv_subst
   have hL : coeff e (pderiv (R := C) b (subst a R)) = 0 :=
     ordGE_pderiv (n := e.degree + 1) (ordGE_subst ha hRo) b e (by omega)
   have hRr : coeff e (∑ w, pderiv (R := C) b (a w) * subst a (pderiv (R := C) w R)) = 0 := by
-
     rw [map_sum]
     refine Finset.sum_eq_zero fun w _ => ?_
     have h1

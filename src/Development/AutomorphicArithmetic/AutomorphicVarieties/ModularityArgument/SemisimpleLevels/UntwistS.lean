@@ -116,8 +116,8 @@ theorem UpperTheory.V.Lev.untwistS
   have hPμ := GlobalTheory.Published.DeRhamPotSemistable.isPstAt hD T Bw _ hcμ hdR
   have hc := GlobalTheory.Published.ParamAboveModel.isComp_loc (w := w) κ
   rw [htw] at H hP'
-  rw [GlobalTheory.T.fontaineParameter_twist_potentiallySemistable l _ _ ⟨T⟩ ι K Ω A w h O Bw hj n _
-        _ hcR hcμ hP hPμ hP',
+  rw [_root_.GlobalTheory.TwistParamAbove.wdAt_twist l _ _ ⟨T⟩ ι K Ω A w h O Bw hj n _ _ hcR hcμ hP
+        hPμ hP',
       rec_algNorm hrc]
     at H
   rw [rec_algNorm hrc]

@@ -41,8 +41,6 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RowsRe
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up

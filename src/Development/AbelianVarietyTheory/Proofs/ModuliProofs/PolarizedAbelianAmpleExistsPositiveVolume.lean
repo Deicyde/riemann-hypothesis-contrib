@@ -3,9 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.SectionsHaveFiniteDimension
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverIffIsProperAndExistsIsAmpleLB
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.EventuallySectionAndRelAmplePowDivStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HilbertFunctionVanishingIdealVeryAmpleSystemStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsGrowthBasicPropertiesAbelianVarietyStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.EventuallySectionAndRelAmplePowDiv
+public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHomogeneousInf
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HilbertFunctionVanishingIdealVeryAmpleSystem
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionsGrowthBasicPropertiesAbelianVariety
 public import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.ExistsBasisOfIsField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -131,20 +133,18 @@ theorem exists_vol
   have hex
       : ∀ (N : LB P.A.left),
         N.IsLB → ∀ e, ∃ r, SectionsHaveFiniteDimension P.A.hom (lbPow N e) r := fun N hN e =>
-    (GlobalTheory.T.sectionsGrowth_basic_properties_abelianVariety K P (lbPow N e) 0
-      (LB.isLB_linComb hN _ _)).1
+    (_root_.GlobalTheory.VolBasic.vol_basic K P (lbPow N e) 0 (LB.isLB_linComb hN _ _)).1
   have : IsProper P.A.hom := P.isAb.proper
   obtain ⟨d, hd, m, s, hs⟩ :=
     ((relAmple_iff_isAmpleLB_of_isAffine P.A hM).1 hA).exists_veryAmpleBy (R := K) P.A.hom
   have hH : (lbPow M d).IsLB := LB.isLB_linComb hM _ _
   obtain ⟨Q, hQ⟩ :=
-    GlobalTheory.T.hilbertFunction_vanishingIdeal_veryAmpleSystem K (Fin (m + 1)) _ P.A.hom
-      (lbPow M d) s hH (vAmp_of_veryAmpleBy hs)
+    _root_.GlobalTheory.ZV.HilbFn.hilbertFunction_idealOf K (Fin (m + 1)) _ P.A.hom (lbPow M d) s hH
+      (vAmp_of_veryAmpleBy hs)
   have hdR : (0 : ℝ) < d := by exact_mod_cast hd
   have volM : ∀ k, Q.natDegree ≤ k → Vol P.A.hom M k ((Q.coeff k : ℝ) / (d : ℝ) ^ k) := by
     intro k hk
-    refine (GlobalTheory.T.sectionsGrowth_basic_properties_abelianVariety K P M k hM).2.2.2.2.1 d _
-      hd hA ?_
+    refine (_root_.GlobalTheory.VolBasic.vol_basic K P M k hM).2.2.2.2.1 d _ hd hA ?_
     rw [mul_div_cancel₀ _ (by positivity)]
     refine vol_of_eventually (hex _ hH) _ ?_ (tendsto_eval_div_pow Q hk)
     filter_upwards [hQ] with e ⟨r, h1, h2, _⟩
@@ -160,13 +160,12 @@ theorem exists_vol
           → ∃ c : ℕ, ∀ k δ δ', Vol P.A.hom B k δ → Vol P.A.hom A k δ' → δ ≤ (c : ℝ) ^ k * δ' := by
     intro A B hA hB ha
     obtain ⟨c, ⟨⟨t, ht⟩, -⟩, hc⟩ :=
-      ((GlobalTheory.T.eventually_section_and_relAmple_pow_div K P A B hA hB ha).and
+      ((_root_.GlobalTheory.AmpleDominates.eventually_sec_and_relAmple K P A B hA hB ha).and
         (eventually_ge_atTop 1)).exists
     refine ⟨c, fun k δ δ' h1 h2 => ?_⟩
-    exact ((GlobalTheory.T.sectionsGrowth_basic_properties_abelianVariety K P B k hB).2.2.2.2.2
-        (lbPow A c) t (LB.isLB_linComb hA _ _) ht).2 _ _ h1
-      ((GlobalTheory.T.sectionsGrowth_basic_properties_abelianVariety K P A k hA).2.2.2.1 c δ' hc
-        h2)
+    exact ((_root_.GlobalTheory.VolBasic.vol_basic K P B k hB).2.2.2.2.2 (lbPow A c) t
+        (LB.isLB_linComb hA _ _) ht).2 _ _ h1
+      ((_root_.GlobalTheory.VolBasic.vol_basic K P A k hA).2.2.2.1 c δ' hc h2)
   have hdeg : Q.natDegree ≤ P.g := by
     by_contra hlt
     push Not at hlt

@@ -57,8 +57,11 @@ import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsAbelianSchem
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -67,13 +70,15 @@ namespace GlobalTheory.ConnFibre
 
 open GlobalTheory.AbLaw.Seesaw
 
-theorem preconnectedSpace_of_functions (Y : Scheme.{0})
-    (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤) : PreconnectedSpace Y := by
+theorem preconnectedSpace_of_functions
+    (Y : Scheme.{0}) (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤)
+    : PreconnectedSpace Y := by
   apply _root_.GlobalTheory.AlgGroup.preconnectedSpace_of_functions <;> assumption
 
-theorem surjective_appTop {k : Type} [Field k] [IsAlgClosed k] {X : Scheme.{0}}
-    (p : X ⟶ Spec (.of k)) [IsIntegral X] [UniversallyClosed p] :
-    Function.Surjective p.appTop.hom := by
+theorem surjective_appTop
+    {k : Type} [Field k] [IsAlgClosed k]
+    {X : Scheme.{0}} (p : X ⟶ Spec (.of k)) [IsIntegral X] [UniversallyClosed p]
+    : Function.Surjective p.appTop.hom := by
   let F := (Scheme.ΓSpecIso (.of k)).inv ≫ p.appTop
   have hF : F.hom.IsIntegral := by
     apply RingHom.isIntegral_respectsIso.2 (e := (Scheme.ΓSpecIso _).symm.commRingCatIsoToRingEquiv)
@@ -93,19 +98,24 @@ def fnSec (π : X' ⟶ X) (s : Γ(X', ⊤)) : LB.Sec ((Inh.trivLB X).pull π) wh
     rw [Inh.linComb_triv_g, Units.val_one, _root_.one_mul]
     exact (rs_rs _ _ s).trans (rs_rs _ _ s).symm
 
-theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) :=
-  ⟨⟨fun _ => 1⟩, fun i j => by
+theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) := ⟨
+  ⟨fun _ => 1⟩,
+  fun i j => by
     erw [Inh.linComb_triv_g, _root_.one_mul]
-    exact (map_one _).trans (map_one _).symm⟩
+    exact (map_one _).trans (map_one _).symm
+⟩
 
-theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
-    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X)) {g : R →+* F} {π : X' ⟶ X}
-    {f' : X' ⟶ Spec (CommRingCat.of F)} (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
-    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v) :
-    PreconnectedSpace X' := by
+theorem preconnectedSpace_of_line
+    {R F : Type} [CommRing R] [Field F]
+    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X))
+    {g : R →+* F} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of F)}
+    (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
+    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v)
+    : PreconnectedSpace X' := by
   obtain ⟨E, hE⟩ := P.sec F g X' π f' h
-  have key : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
-      rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s = AbLaw.cst f' _ c * loc P π f' v i := fun s => by
+  have key
+      : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
+        rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s = AbLaw.cst f' _ c * loc P π f' v i := fun s => by
     obtain ⟨w, hw⟩ := E.surjective (fnSec π s)
     obtain ⟨c, hc⟩ := hv w.1 w.2
     refine ⟨c, fun i => ?_⟩
@@ -130,14 +140,25 @@ theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
     rw [hc]
     exact mem_of_isUnit (((IsUnit.mk0 c h0).map _).mul (hu i)) hi
 
-theorem geometricallyConnected_of_closedFibre : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (B : Over (Spec (CommRingCat.of V))), Smooth B.hom → IsProjBy B.hom → ∀ (Y₀ : Over (Spec (CommRingCat.of (V ⧸ (IsLocalRing.maximalIdeal V) ^ (0 + 1))))) (b : Y₀.left ⟶ B.left), IsPullback b Y₀.hom B.hom (thick V (IsLocalRing.maximalIdeal V) 0) → GeometricallyConnected Y₀.hom → GeometricallyConnected B.hom := by
+theorem geometricallyConnected_of_closedFibre
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        (B : Over (Spec (CommRingCat.of V))),
+      Smooth B.hom → IsProjBy B.hom
+        → ∀ (Y₀ : Over (Spec (CommRingCat.of (V ⧸ (IsLocalRing.maximalIdeal V) ^ (0 + 1)))))
+            (b : Y₀.left ⟶ B.left),
+          IsPullback b Y₀.hom B.hom (thick V (IsLocalRing.maximalIdeal V) 0)
+            → GeometricallyConnected Y₀.hom
+            → GeometricallyConnected B.hom := by
   intro V _ _ _ B hs hp Y₀ b hb hc
-  obtain ⟨P⟩ := GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj V B.left B.hom hs hp _ (Inh.trivLB_isLB _)
+  obtain ⟨P⟩ :=
+    GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj V B.left B.hom hs hp _
+      (Inh.trivLB_isLB _)
   have hpr : IsProper B.hom := GlobalTheory.AbLaw.isProper_of_isProjBy V B.left B.hom hp
   let L := AlgebraicClosure (IsLocalRing.ResidueField V)
   let g₀ : V →+* L := (algebraMap (IsLocalRing.ResidueField V) L).comp (IsLocalRing.residue V)
   have hg₀ : ∀ a, g₀ a = 0 ↔ a ∈ IsLocalRing.maximalIdeal V := fun a =>
-    (map_eq_zero (algebraMap (IsLocalRing.ResidueField V) L)).trans (IsLocalRing.residue_eq_zero_iff a)
+    (map_eq_zero (algebraMap (IsLocalRing.ResidueField V) L)).trans
+      (IsLocalRing.residue_eq_zero_iff a)
   let q : V ⧸ (IsLocalRing.maximalIdeal V) ^ (0 + 1) →+* L :=
     Ideal.Quotient.lift _ g₀ fun a ha => (hg₀ a).2 (by simpa using ha)
   let y₀ : Spec (CommRingCat.of L) ⟶ _ := Spec.map (CommRingCat.ofHom q)
@@ -146,7 +167,8 @@ theorem geometricallyConnected_of_closedFibre : ∀ (V : Type) [CommRing V] [IsD
     have := (IsPullback.of_hasPullback Y₀.hom y₀).paste_horiz hb
     rwa [← Spec.map_comp] at this
   have hs₀ : Smooth Y₀.hom := MorphismProperty.of_isPullback hb hs
-  have hi := GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ Y₀.hom hs₀ hc
+  have hi :=
+    GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ Y₀.hom hs₀ hc
   have hint : IsIntegral (pullback Y₀.hom y₀) :=
     GeometricallyIntegral.geometrically_isIntegral _ _ _ (.of_hasPullback Y₀.hom y₀)
   have hpr₀ : IsProper (pullback.snd Y₀.hom y₀) := MorphismProperty.of_isPullback h₀ hpr
@@ -166,8 +188,10 @@ theorem geometricallyConnected_of_closedFibre : ∀ (V : Type) [CommRing V] [IsD
     let O : (Spec (CommRingCat.of V)).Opens := ⟨Set.range B.hom, B.hom.isOpenMap.isOpen_range⟩
     have hO : O = ⊤ := by
       refine (IsLocalRing.closedPoint_mem_iff O).1 ⟨(pullback.fst Y₀.hom y₀ ≫ b) x₀, ?_⟩
-      have e : B.hom ((pullback.fst Y₀.hom y₀ ≫ b) x₀) =
-          Spec.map (CommRingCat.ofHom g₀) (pullback.snd Y₀.hom y₀ x₀) := congrArg (fun t => t x₀) h₀.w
+      have e
+          : B.hom ((pullback.fst Y₀.hom y₀ ≫ b) x₀)
+            = Spec.map (CommRingCat.ofHom g₀) (pullback.snd Y₀.hom y₀ x₀) :=
+        congrArg (fun t => t x₀) h₀.w
       refine e.trans (PrimeSpectrum.ext ?_)
       refine ((IsLocalRing.maximalIdeal.isMaximal V).eq_of_le (PrimeSpectrum.isPrime _).ne_top
         fun a ha => ?_).symm

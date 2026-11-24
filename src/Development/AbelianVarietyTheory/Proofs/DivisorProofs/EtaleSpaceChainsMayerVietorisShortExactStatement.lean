@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.etaleSpaceChains_mayerVietoris_shortExact
     : ∀ (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E),
       Cover2 R f g
@@ -52,7 +53,4 @@ theorem _root_.GlobalTheory.T.etaleSpaceChains_mayerVietoris_shortExact
           (ShortComplex.mk
             (biprod.lift ((chains R).map (pullback.fst f g)) (- (chains R).map (pullback.snd f g)))
             (biprod.desc ((chains R).map f) ((chains R).map g)) w).ShortExact := by
-  first
-  | (exact @GlobalTheory.EtC.mv_shortExact)
-  | (exact GlobalTheory.EtC.mv_shortExact)
-  | (intros; apply GlobalTheory.EtC.mv_shortExact <;> assumption)
+  first | (exact @GlobalTheory.EtC.mv_shortExact)

@@ -68,7 +68,7 @@ private theorem es_add (A C : Multiset ℂ) (j : ℕ)
   induction A using Multiset.induction_on generalizing j with
   | empty =>
     rw [Finset.sum_eq_single (0, j)]
-    · simp [es_zero]
+    · simp
     · rintro ⟨i, k⟩ hp hne
       have : 0 < i := by
         rcases Nat.eq_zero_or_pos i with rfl | h
@@ -78,7 +78,7 @@ private theorem es_add (A C : Multiset ℂ) (j : ℕ)
     · simp
   | cons a A ih =>
     cases j with
-    | zero => simp [es_zero]
+    | zero => simp
     | succ j =>
       rw [Multiset.cons_add, es_cons, ih, ih, Finset.Nat.sum_antidiagonal_succ,
         Finset.Nat.sum_antidiagonal_succ]

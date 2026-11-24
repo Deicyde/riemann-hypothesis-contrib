@@ -227,7 +227,9 @@ theorem permutationMatrix_sumCongr : U.wP (sigQ σh σb) = U.blk2 (U.wP σh) 0 0
   induction a using Fin.addCases with
   | left i =>
     induction b using Fin.addCases with
-    | left j => rw [Dx2.SL.b_cc]; simp [U.wP, sigQ_castAdd, Fin.castAdd_inj]
+    | left j =>
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_upper_left]
+      simp [U.wP, sigQ_castAdd, Fin.castAdd_inj]
     | right j =>
       rw [Dx2.SL.b_cn]
       simp only [U.wP, Matrix.of_apply, sigQ_castAdd, Matrix.zero_apply]
@@ -239,14 +241,16 @@ theorem permutationMatrix_sumCongr : U.wP (sigQ σh σb) = U.blk2 (U.wP σh) 0 0
   | right i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_nc]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_left]
       simp only [U.wP, Matrix.of_apply, sigQ_natAdd, Matrix.zero_apply]
       rw [if_neg]
       intro h
       have := congrArg Fin.val h
       simp at this
       omega
-    | right j => rw [Dx2.SL.b_nn]; simp [U.wP, sigQ_natAdd, Fin.natAdd_inj]
+    | right j =>
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_right]
+      simp [U.wP, sigQ_natAdd, Fin.natAdd_inj]
 
 theorem diag_dQ (dh : Fin p → ℂ) (db : Fin s → ℂ)
     : Matrix.diagonal (dQ dh db) = U.blk2 (Matrix.diagonal dh) 0 0 (Matrix.diagonal db) := by
@@ -254,7 +258,9 @@ theorem diag_dQ (dh : Fin p → ℂ) (db : Fin s → ℂ)
   induction a using Fin.addCases with
   | left i =>
     induction b using Fin.addCases with
-    | left j => rw [Dx2.SL.b_cc]; simp [Matrix.diagonal_apply, dQ, Fin.castAdd_inj]
+    | left j =>
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_upper_left]
+      simp [Matrix.diagonal_apply, dQ, Fin.castAdd_inj]
     | right j =>
       rw [Dx2.SL.b_cn, Matrix.diagonal_apply_ne]
       · rfl
@@ -262,10 +268,12 @@ theorem diag_dQ (dh : Fin p → ℂ) (db : Fin s → ℂ)
   | right i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_nc, Matrix.diagonal_apply_ne]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_left, Matrix.diagonal_apply_ne]
       · rfl
       · intro h; have := congrArg Fin.val h; simp at this; omega
-    | right j => rw [Dx2.SL.b_nn]; simp [Matrix.diagonal_apply, dQ, Fin.natAdd_inj]
+    | right j =>
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_right]
+      simp [Matrix.diagonal_apply, dQ, Fin.natAdd_inj]
 
 theorem hMat_sigQ (dh : Fin p → ℂ) (db : Fin s → ℂ)
     : U.hMat (sigQ σh σb) (dQ dh db) = U.blk2 (U.hMat σh dh) 0 0 (U.hMat σb db) := by
@@ -286,7 +294,7 @@ theorem lowW_sigQ (v : U.LW (sigQ σh σb) → ℂ)
   | left i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_cc]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_upper_left]
       simp only [U.lowW, Matrix.add_apply, Matrix.of_apply, Dx2.SL.one_cc]
       congr 1
       by_cases h : j < i ∧ σh.symm j < σh.symm i
@@ -311,7 +319,7 @@ theorem lowW_sigQ (v : U.LW (sigQ σh σb) → ℂ)
   | right i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_nc]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_left]
       simp only [U.lowW, Matrix.add_apply, Matrix.of_apply, Dx2.SL.one_nc, zero_add]
       have h'
           : Fin.castAdd s j < Fin.natAdd p i
@@ -324,7 +332,7 @@ theorem lowW_sigQ (v : U.LW (sigQ σh σb) → ℂ)
       rw [dite_eq_left h']
       rfl
     | right j =>
-      rw [Dx2.SL.b_nn]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_right]
       simp only [U.lowW, Matrix.add_apply, Matrix.of_apply, Dx2.SL.one_nn]
       congr 1
       by_cases h : j < i ∧ σb.symm j < σb.symm i
@@ -368,7 +376,7 @@ theorem upper_split (u : G.UT (p + s) → ℂ)
   | left i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_cc]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_upper_left]
       simp only [G.upper, Matrix.add_apply, Dx2.SL.one_cc, G.strictUpper, Matrix.of_apply]
       congr 1
     | right j =>
@@ -379,7 +387,7 @@ theorem upper_split (u : G.UT (p + s) → ℂ)
   | right i =>
     induction b using Fin.addCases with
     | left j =>
-      rw [Dx2.SL.b_nc]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_left]
       simp only [G.upper, Matrix.add_apply, Dx2.SL.one_nc, G.strictUpper, Matrix.of_apply, zero_add,
         Matrix.zero_apply]
       rw [dite_eq_right]
@@ -387,7 +395,7 @@ theorem upper_split (u : G.UT (p + s) → ℂ)
       have : p + i.val < j.val := h
       omega
     | right j =>
-      rw [Dx2.SL.b_nn]
+      rw [_root_.Formalism.FourierDecayAlt.P.Ux2.block2_apply_lower_right]
       simp only [G.upper, Matrix.add_apply, Dx2.SL.one_nn, G.strictUpper, Matrix.of_apply]
       congr 1
       by_cases h : i < j
@@ -427,7 +435,8 @@ theorem zj_split (v : U.LW (sigQ σh σb) → ℂ) (u : G.UT (p + s) → ℂ)
         (U.headH σh dh (v1 σh σb v) (u1 p s u)) (U.headH σb db (v2 σh σb v) (u2 p s u)) := by
   have hL := Matrix.nonsing_inv_mul _ (Dx2.SL.isUnit_low σh (v1 σh σb v))
   have hW := Matrix.nonsing_inv_mul _ (Dx2.SL.isUnit_wP σh)
-  have hU := Matrix.mul_nonsing_inv _ (Dx2.SL.isUnit_up (u1 p s u))
+  have hU :=
+    Matrix.mul_nonsing_inv _ (_root_.Formalism.FourierDecayAlt.P.Dx2.Split.upper_det (u1 p s u))
   have hHb
       : U.headH σh dh (v1 σh σb v) (u1 p s u) * bN p s u
         = U.wP σh * U.lowW σh (v1 σh σb v) * Matrix.diagonal dh * Bm p s u := by
@@ -487,7 +496,9 @@ theorem upper_fact (u : G.UT (p + s) → ℂ)
   simp only [Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, Matrix.mul_one,
     Equiv.apply_symm_apply]
   unfold bN
-  rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (Dx2.SL.isUnit_up (u1 p s u)), Matrix.one_mul]
+  rw [← Matrix.mul_assoc,
+    Matrix.mul_nonsing_inv _ (_root_.Formalism.FourierDecayAlt.P.Dx2.Split.upper_det (u1 p s u)),
+    Matrix.one_mul]
 
 theorem psiH_split
     (β : ℂ) (a0 : Fin 0 → Fin (p + s) → ℂ) (b0 : Fin (p + s) → Fin 0 → ℂ)
@@ -502,15 +513,15 @@ theorem psiH_split
   rw [← Dx2.SL.psi_add, conj_split, upper_fact u, Dx2.SL.cornerA_zero, Dx2.SL.cornerB_zero,
     Dx2.SL.cornerA_zero, Dx2.SL.cornerB_zero]
   have hlow :=
-    ((Formalism.FourierDecayAlt.P.low_weight_specialisation p σh (U.lowW σh (v1 σh σb v))).mpr
+    ((_root_.Formalism.FourierDecayAlt.P.Ux2.lowWSpec p σh (U.lowW σh (v1 σh σb v))).mpr
       ⟨v1 σh σb v, rfl⟩)
   have hlowb :=
-    ((Formalism.FourierDecayAlt.P.low_weight_specialisation s σb (U.lowW σb (v2 σh σb v))).mpr
+    ((_root_.Formalism.FourierDecayAlt.P.Ux2.lowWSpec s σb (U.lowW σb (v2 σh σb v))).mpr
       ⟨v2 σh σb v, rfl⟩)
   have huh : G.IsUpperUni (G.upper (u1 p s u)) := (Ux2.upper_iff _).mpr (Ux2.upper_uni _)
   have hu2 : G.IsUpperUni (G.upper (u2 p s u)) := (Ux2.upper_iff _).mpr (Ux2.upper_uni _)
   obtain ⟨cA, cB⟩ :=
-    Formalism.FourierDecayAlt.P.character_on_blocks p s (Matrix.of.symm (aN σh σb v))
+    _root_.Formalism.FourierDecayAlt.P.Ux2.charBlock p s (Matrix.of.symm (aN σh σb v))
       (Matrix.of.symm (bN p s u)) (U.wP σh * U.lowW σh (v1 σh σb v) * (U.wP σh)⁻¹)
       (G.upper (u1 p s u)) (U.wP σb * U.lowW σb (v2 σh σb v) * (U.wP σb)⁻¹) (G.upper (u2 p s u))
       hlow.2 hlowb.2 huh hu2
@@ -588,7 +599,7 @@ theorem shG_shF (x) (y : (Fin s → Fin p → ℂ) × (Fin p → Fin s → ℂ))
     : shG σh σb x (shF σh σb x y) = y := by
   have hL := Matrix.nonsing_inv_mul _ (Dx2.SL.isUnit_low σh x.1)
   have hW := Matrix.nonsing_inv_mul _ (Dx2.SL.isUnit_wP σh)
-  have hU := Matrix.mul_nonsing_inv _ (Dx2.SL.isUnit_up x.2)
+  have hU := Matrix.mul_nonsing_inv _ (_root_.Formalism.FourierDecayAlt.P.Dx2.Split.upper_det x.2)
   ext1
   · simp only [shG, shF, Equiv.apply_symm_apply]
     apply (Matrix.of).symm.injective.eq_iff.mpr
@@ -604,7 +615,7 @@ theorem shF_shG (x) (y : (Fin s → Fin p → ℂ) × (Fin p → Fin s → ℂ))
     : shF σh σb x (shG σh σb x y) = y := by
   have hL := Matrix.mul_nonsing_inv _ (Dx2.SL.isUnit_low σh x.1)
   have hW := Matrix.mul_nonsing_inv _ (Dx2.SL.isUnit_wP σh)
-  have hU := Matrix.nonsing_inv_mul _ (Dx2.SL.isUnit_up x.2)
+  have hU := Matrix.nonsing_inv_mul _ (_root_.Formalism.FourierDecayAlt.P.Dx2.Split.upper_det x.2)
   ext1
   · simp only [shG, shF, Equiv.apply_symm_apply]
     apply (Matrix.of).symm.injective.eq_iff.mpr
@@ -901,7 +912,6 @@ theorem integrable_cls
     (Ux13.continuous_psiH β σ).smul (hs.continuous.comp (Ux13.continuous_zjH σ d _))
   obtain ⟨C, hC⟩ := Formalism.FourierDecayAlt.P.aux_statement_17 n 0 σ d hd
   obtain ⟨R, hR⟩ := (show IsCompact (tsupport Ψ) from hc).isBounded.exists_norm_le
-  have hR0 : 0 ≤ max R 0 := le_max_right _ _
   refine hcont.integrable_of_hasCompactSupport ?_
   refine HasCompactSupport.intro (isCompact_closedBall (0 : U.XiH n 0 σ) (|C| * (max R 0) ^ n)) ?_
   intro η hη
@@ -946,9 +956,7 @@ theorem hMat_inj
     exact hd' _ this.symm
   subst hσ
   refine ⟨rfl, funext fun b => ?_⟩
-  have := congrFun (congrFun h (σ.symm b)) b
-  simp only [happ, Equiv.apply_symm_apply, if_true] at this
-  exact this
+  simpa only [happ, Equiv.apply_symm_apply, if_true] using congrFun (congrFun h (σ.symm b)) b
 
 end Formalism.FourierDecayAlt.P.PBJ.Fub
 

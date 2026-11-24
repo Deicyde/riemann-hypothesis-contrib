@@ -63,7 +63,7 @@ theorem eq_and_alg
                       ∈ Qbar) := ⟨
   fun _ _ _ B χ hcc hδ hχ =>
     Formalism.L2.PairingIndexBounds.Eq.SqG.eulerProduct_eq_of_curve_ideal B hcc hδ χ hχ,
-  fun D cc δ B χ hcc hδ hχ => GlobalTheory.ThLoc.algTAll D cc δ B χ hcc hδ hχ
+  fun D cc δ B χ hcc hδ hχ => _root_.GlobalTheory.ThLoc.Alg.algTAll D cc δ B χ hcc hδ hχ
 ⟩
 
 end GlobalTheory.MomEq

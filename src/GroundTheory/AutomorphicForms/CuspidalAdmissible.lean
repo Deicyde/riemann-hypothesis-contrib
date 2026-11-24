@@ -370,7 +370,7 @@ theorem isAdmissible_of_isCuspidal
       intro g
       refine Submodule.span_le.2 ?_
       rintro _ ⟨h, rfl⟩
-      exact Submodule.subset_span ⟨g * h, by simp [map_mul, Module.End.mul_apply]⟩
+      exact Submodule.subset_span ⟨g * h, by simp [map_mul]⟩
     let Wsub : Subrepresentation σ :=
       ⟨Submodule.span ℂ (Set.range fun h : levi F n β => σ h v), fun g _ hx => hstable g hx⟩
     have hW : Wsub = ⊤ :=

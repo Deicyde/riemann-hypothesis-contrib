@@ -59,8 +59,9 @@ namespace Formalism.DworkPowerSeriesWeights
 
 open Formalism.IncomingBounds
 
-theorem asmOne_one_le_norm_two {K : Type u} [NormedField K] [IsUltrametricDist K] {l : ℕ}
-    (hodd : Odd l) (hpi : ‖(l : K)‖ < 1) : 1 ≤ ‖(2 : K)‖ := by
+theorem asmOne_one_le_norm_two
+    {K : Type u} [NormedField K] [IsUltrametricDist K] {l : ℕ} (hodd : Odd l) (hpi : ‖(l : K)‖ < 1)
+    : 1 ≤ ‖(2 : K)‖ := by
   by_contra h
   push_neg at h
   obtain ⟨m, rfl⟩ := hodd
@@ -76,17 +77,22 @@ theorem asmOne_one_le_norm_two {K : Type u} [NormedField K] [IsUltrametricDist K
     ring
   have h2 : ‖(2 : K) * (m : K)‖ < 1 := by
     rw [norm_mul]
-    calc ‖(2 : K)‖ * ‖(m : K)‖ ≤ ‖(2 : K)‖ * 1 :=
-          mul_le_mul_of_nonneg_left (hnat m) (norm_nonneg _)
+    calc
+      ‖(2 : K)‖ * ‖(m : K)‖
+        ≤ ‖(2 : K)‖ * 1 := mul_le_mul_of_nonneg_left (hnat m) (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact h
   have h3 : ‖(1 : K)‖ < 1 := by
     rw [h1, sub_eq_add_neg]
     exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt hpi (by rwa [norm_neg]))
   simp at h3
 
-theorem asmOne_lin_wt {K : Type u} [NormedField K] [IsUltrametricDist K] {ι : Type v} [Fintype ι]
-    {pi : ℝ} (h0 : 0 < pi) (c : ι → K) (hc : ∀ i, ‖c i‖ ≤ 1) (t : ℝ) :
-    WtGe pi (fun _ : ι => t) t (∑ i, MvPowerSeries.C (c i) * MvPowerSeries.X i) := by
+theorem asmOne_lin_wt
+    {K : Type u} [NormedField K] [IsUltrametricDist K]
+    {ι : Type v} [Fintype ι]
+    {pi : ℝ} (h0 : 0 < pi)
+    (c : ι → K) (hc : ∀ i, ‖c i‖ ≤ 1)
+    (t : ℝ)
+    : WtGe pi (fun _ : ι => t) t (∑ i, MvPowerSeries.C (c i) * MvPowerSeries.X i) := by
   classical
   intro n
   unfold MonoWtGe
@@ -108,37 +114,41 @@ theorem asmOne_lin_wt {K : Type u} [NormedField K] [IsUltrametricDist K] {ι : T
     rw [Finset.sum_eq_zero (fun i _ => by rw [if_neg (hn i), mul_zero]), norm_zero]
     exact Real.rpow_nonneg h0.le _
 
-theorem asmOne_lin_const {K : Type u} [NormedField K] {ι : Type v} [Fintype ι] (c : ι → K) :
-    MvPowerSeries.constantCoeff (∑ i, MvPowerSeries.C (c i) * MvPowerSeries.X i) = 0 := by
-
+theorem asmOne_lin_const {K : Type u} [NormedField K] {ι : Type v} [Fintype ι] (c : ι → K)
+    : MvPowerSeries.constantCoeff (∑ i, MvPowerSeries.C (c i) * MvPowerSeries.X i) = 0 := by
   simp [map_sum]
 
-theorem asmOne_smul_wt {K : Type u} [NormedField K] {ι : Type v} {pi : ℝ} {r : ι → ℝ} {w : ℝ}
-    {c : K} (hc : ‖c‖ ≤ 1) {f : MvPowerSeries ι K} (hf : WtGe pi r w f) :
-    WtGe pi r w (c • f) := by
+theorem asmOne_smul_wt
+    {K : Type u} [NormedField K]
+    {ι : Type v} {pi : ℝ} {r : ι → ℝ} {w : ℝ} {c : K} (hc : ‖c‖ ≤ 1)
+    {f : MvPowerSeries ι K} (hf : WtGe pi r w f)
+    : WtGe pi r w (c • f) := by
   intro n
   have h := hf n
   unfold MonoWtGe at h ⊢
   rw [map_smul, smul_eq_mul, norm_mul]
-  calc ‖c‖ * ‖MvPowerSeries.coeff n f‖ ≤ 1 * ‖MvPowerSeries.coeff n f‖ :=
-        mul_le_mul_of_nonneg_right hc (norm_nonneg _)
+  calc
+    ‖c‖ * ‖MvPowerSeries.coeff n f‖
+      ≤ 1 * ‖MvPowerSeries.coeff n f‖ := mul_le_mul_of_nonneg_right hc (norm_nonneg _)
     _ ≤ _ := by rw [one_mul]; exact h
 
-theorem asmOne_smul_const {K : Type u} [NormedField K] {ι : Type v} (c : K)
-    {f : MvPowerSeries ι K} (hf : MvPowerSeries.constantCoeff f = 0) :
-    MvPowerSeries.constantCoeff (c • f) = 0 := by
-  first
-    | simp [hf]
-    | rw [MvPowerSeries.smul_eq_C_mul, map_mul, hf, mul_zero]
+theorem asmOne_smul_const
+    {K : Type u} [NormedField K]
+    {ι : Type v}
+    (c : K)
+    {f : MvPowerSeries ι K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : MvPowerSeries.constantCoeff (c • f) = 0 := by
+  first | simp [hf]
 
-theorem asmOne_zmod2 : ∀ s s' a b : ZMod 2, s.val % 2 = 0 → s'.val % 2 = 1 → s + a = s' + b →
-    a + b = 1 := by
+theorem asmOne_zmod2
+    : ∀ s s' a b : ZMod 2, s.val % 2 = 0 → s'.val % 2 = 1 → s + a = s' + b → a + b = 1 := by
   decide
 
-theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBridges.{u})
-    (hW1 : SubstWt.{u, 0, v}) (hW0 : SubstWt.{u, 0, 0}) (hRM : RadMono.{u, v})
-    (hMW : MulWtLe.{u, v}) (hE : ExpWtLe.{u, v}) (hF : FactVal.{u, v})
-    (hOR : OneLetterRadius) : OneLetterR.{u, v} := by
+theorem oneLetterR_of
+    (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBridges.{u}) (hW1 : SubstWt.{u, 0, v})
+    (hW0 : SubstWt.{u, 0, 0}) (hRM : RadMono.{u, v}) (hMW : MulWtLe.{u, v}) (hE : ExpWtLe.{u, v})
+    (hF : FactVal.{u, v}) (hOR : OneLetterRadius)
+    : OneLetterR.{u, v} := by
   intro K _ _ _ l N0 N1 hl hodd hpi K0 hK0 ζ hζ be hbe ep hep ι _ _ M hM g hg0 hgl U hU sgn hsgn κ
   classical
   have h2n : 1 ≤ ‖(2 : K)‖ := asmOne_one_le_norm_two hodd hpi
@@ -169,9 +179,10 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
     field_simp
     ring
 
-  have wt_sum : ∀ (r : ι → ℝ) (w : ℝ) (s : Finset (Fin N0 × Fin N1))
-      (f : Fin N0 × Fin N1 → MvPowerSeries ι K), (∀ x ∈ s, WtGe π r w (f x)) →
-      WtGe π r w (∑ x ∈ s, f x) := by
+  have wt_sum
+      : ∀ (r : ι → ℝ) (w : ℝ) (s : Finset (Fin N0 × Fin N1))
+          (f : Fin N0 × Fin N1 → MvPowerSeries ι K),
+        (∀ x ∈ s, WtGe π r w (f x)) → WtGe π r w (∑ x ∈ s, f x) := by
     intro r w s f
     refine Finset.induction_on s ?_ ?_
     · intro _ n
@@ -186,15 +197,15 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
       rw [map_add (f := _)]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 h2)
 
-  have cc_subst : ∀ (a : ZMod 2 → MvPowerSeries ι K), (∀ s, MvPowerSeries.constantCoeff (a s) = 0) →
-      ∀ f : MvPowerSeries (ZMod 2) K, MvPowerSeries.constantCoeff f = 0 →
-      MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = 0 := by
+  have cc_subst
+      : ∀ (a : ZMod 2 → MvPowerSeries ι K),
+        (∀ s, MvPowerSeries.constantCoeff (a s) = 0)
+          → ∀ f : MvPowerSeries (ZMod 2) K,
+            MvPowerSeries.constantCoeff f = 0
+              → MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = 0 := by
     intro a ha f hf
     have hs : MvPowerSeries.HasSubst a := by
-      first
-        | exact MvPowerSeries.hasSubst_of_constantCoeff_zero ha
-        | exact MvPowerSeries.HasSubst.of_constantCoeff_zero ha
-        | exact MvPowerSeries.hasSubst_of_constantCoeff_nilpotent fun s => by rw [ha s]; exact IsNilpotent.zero
+      first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero ha
     rw [MvPowerSeries.constantCoeff_subst hs]
     apply finsum_eq_zero_of_forall_eq_zero
     intro d
@@ -207,7 +218,8 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
         exact hd (Finsupp.ext h)
       have h0 : MvPowerSeries.constantCoeff (d.prod fun s e => a s ^ e) = 0 := by
         rw [Finsupp.prod, map_prod]
-        exact Finset.prod_eq_zero (Finsupp.mem_support_iff.2 hs') (by rw [map_pow, ha, zero_pow hs'])
+        exact Finset.prod_eq_zero (Finsupp.mem_support_iff.2 hs')
+          (by rw [map_pow, ha, zero_pow hs'])
       rw [h0, smul_zero]
   have hbe0 : MvPowerSeries.constantCoeff be = 0 := by
     by_contra h
@@ -224,19 +236,31 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
   have hgw : ∀ x, WtGe π (fun _ => rho l) (rho l) (g x) :=
     hG K l hl hpi (Fin N0 × Fin N1) id g hg0 (fun x => by rw [← hlog x]; exact hgl x)
   have hGU : WtGe π (fun _ => rho l) 0 (MvPowerSeries.subst g U) :=
-    hW0 K π hπ0 hpi (Fin N0 × Fin N1) (Fin N0 × Fin N1) g (fun _ => rho l) (fun _ => rho l) 0 U
-      hg0 hgw hUw
-  have hlinw : ∀ (t : ℝ) x,
-      WtGe π (fun _ : ι => t) t (∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) :=
+    hW0 K π hπ0 hpi (Fin N0 × Fin N1) (Fin N0 × Fin N1) g
+      (fun _ => rho l)
+      (fun _ => rho l)
+      0 U hg0 hgw hUw
+  have hlinw
+      : ∀ (t : ℝ) x, WtGe π (fun _ : ι => t) t (∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) :=
     fun t x => asmOne_lin_wt hπ0 (M x) (hM x) t
-  have hlinA : ∀ x, WtGe π (fun _ : ι => gam l) (rho l)
-      (∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) := fun x =>
-    (hRM K π hπ0 hpi ι (fun _ => rho l) (fun _ => gam l) (rho l) (fun _ => hrg)).1 _ (hlinw (rho l) x)
-  have hA : WtGe π (fun _ : ι => gam l) 0
-      (MvPowerSeries.subst (fun x => ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i)
+  have hlinA
+      : ∀ x,
+        WtGe π (fun _ : ι => gam l) (rho l) (∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) :=
+    fun x =>
+      (hRM K π hπ0 hpi ι (fun _ => rho l) (fun _ => gam l) (rho l) (fun _ => hrg)).1 _
+        (hlinw (rho l) x)
+  have hA : WtGe π
+      (fun _ : ι => gam l)
+      0
+      (MvPowerSeries.subst
+        (fun x => ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i)
         (MvPowerSeries.subst g U)) :=
-    hW1 K π hπ0 hpi (Fin N0 × Fin N1) ι _ (fun _ => rho l) (fun _ => gam l) 0 _
-      (fun x => asmOne_lin_const (M x)) hlinA hGU
+    hW1 K π hπ0 hpi (Fin N0 × Fin N1) ι _
+      (fun _ => rho l)
+      (fun _ => gam l)
+      0 _
+      (fun x => asmOne_lin_const (M x))
+      hlinA hGU
   obtain ⟨hS1, hS2⟩ := hS K l 2 hl hodd le_rfl even_two hpi K0 hK0 ζ hζ be hbe
   have hbeW : WtGe π (fun _ : ZMod 2 => gam l) (1 / ((l : ℝ) - 1)) be := by
     intro n
@@ -253,13 +277,15 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
         rw [ZMod.val_natCast] at h''
         exact Nat.odd_iff.2 (h''.trans (by decide))
       have hD := hOR1 α β hodd'
-      have e1 : dot (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) (fun _ : ZMod 2 => rho l) =
-          ((l : ℝ) ^ α + (l : ℝ) ^ β) * rho l := by
+      have e1
+          : dot (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) (fun _ : ZMod 2 => rho l)
+            = ((l : ℝ) ^ α + (l : ℝ) ^ β) * rho l := by
         rw [show Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β) = pureMon l s s' α β from rfl,
           asmR_dot_pureMon]
         ring
-      have e2 : dot (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) (fun _ : ZMod 2 => gam l) =
-          ((l : ℝ) ^ α + (l : ℝ) ^ β) * gam l := by
+      have e2
+          : dot (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) (fun _ : ZMod 2 => gam l)
+            = ((l : ℝ) ^ α + (l : ℝ) ^ β) * gam l := by
         rw [show Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β) = pureMon l s s' α β from rfl,
           asmR_dot_pureMon]
         ring
@@ -272,26 +298,43 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
         exact hD
       nlinarith
     · exact asmR_monoWtGe_rad hπ0 hπ1 (fun _ => hrg) (hS2 n hbi)
-  have haw : ∀ x (s : ZMod 2), WtGe π (fun _ : ι => gam l) (gam l)
-      ((if s = 0 then (1 : K) else ep) • ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) := by
+  have haw
+      : ∀ x (s : ZMod 2),
+        WtGe π
+          (fun _ : ι => gam l)
+          (gam l)
+          ((if s = 0 then (1 : K) else ep) • ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) := by
     intro x s
     refine asmOne_smul_wt ?_ (hlinw (gam l) x)
     split_ifs <;> simp [hep]
-  have hac : ∀ x (s : ZMod 2), MvPowerSeries.constantCoeff
-      ((if s = 0 then (1 : K) else ep) • ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) = 0 :=
-    fun x s => asmOne_smul_const _ (asmOne_lin_const (M x))
-  have hBx : ∀ x, WtGe π (fun _ : ι => gam l) (1 / ((l : ℝ) - 1))
-      (MvPowerSeries.subst (fun s : ZMod 2 => (if s = 0 then (1 : K) else ep) •
-        ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) be) := fun x =>
+  have hac
+      : ∀ x (s : ZMod 2),
+        MvPowerSeries.constantCoeff
+            ((if s = 0 then (1 : K) else ep) • ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i)
+          = 0 := fun x s =>
+    asmOne_smul_const _ (asmOne_lin_const (M x))
+  have hBx
+      : ∀ x,
+        WtGe π
+          (fun _ : ι => gam l)
+          (1 / ((l : ℝ) - 1))
+          (MvPowerSeries.subst
+            (fun s : ZMod 2 =>
+              (if s = 0 then (1 : K) else ep) • ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i)
+            be) := fun x =>
     hW1 K π hπ0 hpi (ZMod 2) ι _ (fun _ => gam l) (fun _ => gam l) _ be (hac x) (haw x) hbeW
   have hsgn1 : ‖sgn‖ = 1 := by rcases hsgn with rfl | rfl <;> simp
   have hsgn2 : ‖sgn / 2‖ ≤ 1 := by
     rw [norm_div, hsgn1]
     exact div_le_one_of_le₀ h2n (by positivity)
   have hBw := asmOne_smul_wt hsgn2 (wt_sum _ _ Finset.univ _ (fun x _ => hBx x))
-  have hBc : MvPowerSeries.constantCoeff ((sgn / 2) • ∑ x : Fin N0 × Fin N1,
-      MvPowerSeries.subst (fun s : ZMod 2 => (if s = 0 then (1 : K) else ep) •
-        ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) be) = 0 := by
+  have hBc
+      : MvPowerSeries.constantCoeff
+          ((sgn / 2)
+            • ∑ x : Fin N0 × Fin N1,
+              MvPowerSeries.subst (fun s : ZMod 2 => (if s = 0 then (1 : K) else ep) •
+                ∑ i, MvPowerSeries.C (M x i) * MvPowerSeries.X i) be)
+        = 0 := by
     refine asmOne_smul_const _ ?_
 
     rw [map_sum]
@@ -314,7 +357,6 @@ theorem oneLetterR_of (hS : LemmaS.{u}) (hG : GenLogWeight.{u, 0}) (hB : LogBrid
   refine (mul_le_mul hf hk (norm_nonneg _) (Real.rpow_nonneg hπ0.le _)).trans (le_of_eq ?_)
   rw [← Real.rpow_add hπ0, asmR_dot_fintype, hdeg]
   congr 1
-  beta_reduce
   linarith [e]
 
 end Formalism.DworkPowerSeriesWeights

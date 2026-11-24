@@ -80,7 +80,4 @@ theorem _root_.GlobalTheory.T.doubledFlatSection_eq_translate_standardSection
                                           ∧ ∀ g : GA D (dblSp A),
                                             (omS (κ (g * p)) Φ).1
                                               = sch ψ A B ν 𝓨 (omh (g, 1) f) := by
-  first
-  | exact @GlobalTheory.StdUnn.flat_swSec_eq_sect
-  | exact GlobalTheory.StdUnn.flat_swSec_eq_sect
-  | (intros; apply GlobalTheory.StdUnn.flat_swSec_eq_sect <;> assumption)
+  first | exact @GlobalTheory.StdUnn.flat_swSec_eq_sect

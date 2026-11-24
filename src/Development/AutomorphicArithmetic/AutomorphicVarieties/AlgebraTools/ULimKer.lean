@@ -82,7 +82,6 @@ theorem UpperTheory.V.AlgebraTools.ULim.mem_smul_top_iff
     obtain ⟨q, hq⟩ := exists_sum_of_mem_span_smul_top g _ hp
     choose q' hq' using fun c => ULim.mk_surjective F I M (q c)
     have h0 : ULim.mk F I M (p - ∑ c, g c • q' c) = 0 := by
-
       rw [map_sub, map_sum, hq]
       simp only [map_smul, hq', sub_self]
     filter_upwards [ULim.mk_eq_zero.1 h0 j] with N hN

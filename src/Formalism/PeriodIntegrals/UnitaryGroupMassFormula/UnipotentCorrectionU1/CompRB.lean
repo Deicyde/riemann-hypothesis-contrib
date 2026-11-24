@@ -145,7 +145,7 @@ theorem main
               ‖Dw w (fun g => ((iteratedDeriv q h (ψ g) : ℝ) : ℂ)) g‖ ≤ K * gN g ^ cs cost w := by
   have hgN : ∀ g : Mat k r, 0 ≤ gN g := by
     intro g
-    first | (unfold gN; positivity) | (simp only [gN]; positivity)
+    first | (unfold gN; positivity)
   intro m
   induction m with
   | zero =>

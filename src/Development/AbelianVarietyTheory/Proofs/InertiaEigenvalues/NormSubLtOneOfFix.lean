@@ -182,7 +182,6 @@ theorem exists_coboundary
   have hθN : ∀ g, ∀ n ∈ N, ρ (g * n) θ = ρ g θ := fun g n hn => by
     rw [map_mul, RingAut.mul_apply, hn θ hθm]
   have htg : ∀ g, ρ g t = t := fun g => by
-
     rw [ht, map_sum, ← hsum (fun g => ρ g θ) hθN g]
     simp only [map_mul, RingAut.mul_apply]
   have htq : t ^ p ^ m = t := by

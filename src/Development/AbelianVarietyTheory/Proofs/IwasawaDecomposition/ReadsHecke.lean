@@ -65,8 +65,6 @@ open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 section Gen
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}

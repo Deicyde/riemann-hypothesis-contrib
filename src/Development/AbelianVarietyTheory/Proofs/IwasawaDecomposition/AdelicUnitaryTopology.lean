@@ -51,14 +51,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.AdelicGroupTop
 
-theorem isTopologicalGroup_HA
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E)
-    {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    : IsTopologicalGroup (HA (AF F) σ J) := by
-  have := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.isTopRing (F := F) (E := E)
-  exact inferInstanceAs (IsTopologicalGroup (HR (AF F) σ J))
-
 theorem adelic_unitary_topology
     : ∀ (D : D7) (V : HSp D),
       LocallyCompactSpace (GA D V) ∧ SecondCountableTopology (GA D V) ∧ T2Space (GA D V)
@@ -74,7 +66,7 @@ theorem adelic_unitary_topology
     h2,
     h3,
     ⟨rfl⟩,
-    isTopologicalGroup_HA D.sp.cm.sig V.gram,
+    _root_.Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA D.sp.cm.sig V.gram,
     hd,
     TopologicalSpace.separableSpace_iff_countable.1 inferInstance
   ⟩

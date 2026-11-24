@@ -155,9 +155,9 @@ theorem isIrreducible_piTensor
   GlobalTheory.ProdFiniteLength.piTensor_isIrreducible_of_schur _
     (fun a => (x a).2.rep.irr)
     fun a φ hφ =>
-      GlobalTheory.SchurAdm.schur_admissible (GL (Fin (x a).1) k) (KO k (Fin (x a).1))
-        GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO _ (x a).rep
-        (x a).2.rep.irr (hA k _ _ _ (x a).2.rep.smooth (x a).2.rep.irr) φ hφ
+      _root_.GlobalTheory.SchurAdmissibility.schur_admissible (GL (Fin (x a).1) k)
+        (KO k (Fin (x a).1)) GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO _
+        (x a).rep (x a).2.rep.irr (hA k _ _ _ (x a).2.rep.smooth (x a).2.rep.irr) φ hφ
 
 theorem exists_isSocle_of_forall_isAtom
     (e : (Σ a, m a) ≃ n)

@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.uniformisation_generic_fibre_cartesian_to_model_bu
               → ∃ σ' : U.SecGF F k,
                 (∀ z J, Good U.LG.L z J → sval σ' (𝟙 _) z J = sval σ (UnifPre.gFK (G := G) F) z J)
                   ∧ ∀ s, U.ExpandsG F k σ' s → U.ExpandsF F k w₀ th s := by
-  first
-  | exact @GlobalTheory.Ex.GenericFibre.exists_isoData
-  | exact GlobalTheory.Ex.GenericFibre.exists_isoData
-  | (intros; apply GlobalTheory.Ex.GenericFibre.exists_isoData <;> assumption)
+  first | exact @GlobalTheory.Ex.GenericFibre.exists_isoData

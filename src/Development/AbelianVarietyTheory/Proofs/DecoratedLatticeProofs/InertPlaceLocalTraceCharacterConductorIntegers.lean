@@ -65,9 +65,6 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.InertFrameLoc
 
-
-
-
 namespace GlobalTheory.InertFrameLoc
 
 section Rigid

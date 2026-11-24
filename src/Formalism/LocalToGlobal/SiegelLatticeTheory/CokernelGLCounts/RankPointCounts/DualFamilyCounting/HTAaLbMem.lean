@@ -142,8 +142,6 @@ theorem smul_aaLb
     rw [smul_comm]
     exact Submodule.smul_mem _ o hx
 
-theorem Lb_le : X.Lb ≤ (VS D).L0 := by rw [X.Lam_split]; exact le_sup_of_le_left le_sup_right
-
 theorem hT_aaLb_mem
     {b : Fin D.R.rS} {y : (VS D).V} (hy : y ∈ aaLb X b) {w : (VS D).V} (hw : w ∈ X.Lb)
     : (VS D).hT y w ∈ aaD D b := by
@@ -157,7 +155,7 @@ theorem hT_aaLb_mem
     obtain ⟨c, hc, l, hl, rfl⟩ := hz
     obtain ⟨o, ho⟩ :=
       Formalism.MainNotions.LatticeGluingRadicals.d_Lam_int (VS D).baseLattice_isUnimodular
-        (Lb_le X hl) (Lb_le X hw)
+        (_root_.Formalism.L2.SG.Pf.Level.Lb_le X hl) (_root_.Formalism.L2.SG.Pf.Level.Lb_le X hw)
     rw [hT_smulL, ← ho, mul_comm]
     exact fi_smul_mem (SS_aaD b c hc) o
   | zero =>

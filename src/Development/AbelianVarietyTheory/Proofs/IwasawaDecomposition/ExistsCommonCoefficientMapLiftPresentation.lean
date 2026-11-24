@@ -168,11 +168,7 @@ theorem formRho_colGl
         • C.rho (Formalism.L2.Col.ratHom hc n γ) v :=
   rfl
 
-theorem castGL_symm_castGL {R : Type} [CommRing R] {m n : ℕ} (h : m = n) (g : GL (Fin m) R)
-    : LiftBrg.castGL h.symm (LiftBrg.castGL h g) = g := by
-  subst h
-  ext a b
-  simp [LiftBrg.castGL]
+alias castGL_symm_castGL := _root_.GlobalTheory.Mem.R3.LiftBrg.StdGroups.castGL_symm_castGL'
 
 theorem exists_oneCoef_presStd
     : ∀ (X : Stages) (px : PreX X.B.toPre) (I : Col2.ColIn X.B px) (hX : X.B.fields.Ok)
@@ -211,7 +207,7 @@ theorem exists_oneCoef_presStd
   obtain ⟨e0, he_rho, he_pair, he_nab, he_del, he_rat, he_li⟩ :=
     vv_cast_equiv X.B.fields.emb (LiftBrg.rkEq X i) (X.B.wts.lamV ((i : ℕ) + 1))
       (fun τ => Bridge.lamLdef (D := X.toD7) (Vc X.toD7 i).rank ((i : ℕ) + 1) τ)
-      (GlobalTheory.T.baseWeight_eq_forcedLiftWeight X i)
+      (_root_.GlobalTheory.Mem.LiftWt.lamV_eq_lamLdef X i)
   let c : VV X.B.fields.K (X.B.wts.lamV ((i : ℕ) + 1)) →ₛₗ[X.B.embLL] (cV i).W := {
     toFun := fun v => c0L (e0 v)
     map_add' := fun v w => by

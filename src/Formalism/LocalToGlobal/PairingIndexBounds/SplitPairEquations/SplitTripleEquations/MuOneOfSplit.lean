@@ -201,12 +201,6 @@ theorem mem_gGrp {Λ₁ Λ₂ Λ₃ A' : AddSubgroup V} {p : V}
     : p ∈ gGrp Λ₁ Λ₂ Λ₃ A' ↔ p ∈ Λ₃ ∧ p ∈ A' ∧ ∃ r, r ∈ Λ₂ ∧ r ∈ A' ∧ p + r ∈ Λ₁ :=
   Iff.rfl
 
-theorem altE_int
-    {H : Sesq V} {Λ : AddSubgroup V} (hsd : IsSelfDual H Λ) {r k : V} (hr : r ∈ Λ) (hk : k ∈ Λ)
-    : ∃ m : ℤ, altE H r k = m := by
-  have : r ∈ dualLat H Λ := by rw [hsd]; exact hr
-  exact this k hk
-
 theorem exp_int_one (m : ℤ) : Complex.exp (2 * (Real.pi : ℂ) * Complex.I * ((m : ℝ) : ℂ)) = 1 := by
   have : 2 * (Real.pi : ℂ) * Complex.I * ((m : ℝ) : ℂ) = (m : ℂ) * (2 * Real.pi * Complex.I) := by
     push_cast; ring
@@ -283,7 +277,8 @@ theorem mu_one_of_split
       push_cast
       ring
     · intro k hk
-      obtain ⟨m, hm⟩ := altE_int hT.sd₂ hs₁2 hk
+      obtain ⟨m, hm⟩ :=
+        _root_.Formalism.L2.Th1.H.CharacterSumTripleLemmas.int_of_selfDual hT.sd₂ hs₁2 hk
       simp only [hχ, hm]
       exact exp_int_one m
   choose! t ht0 ht using hc

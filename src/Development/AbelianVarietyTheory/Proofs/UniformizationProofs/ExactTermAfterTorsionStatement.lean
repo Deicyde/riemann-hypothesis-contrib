@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_nsmul_add_decomp_with_coef_valuation
                     ∧ ∀ (w : Frm D.toPre F 1 g₂.b) l ω,
                       w.IsGen → GtV hϖ hv g₂ l → GenV hϖ hv w ω
                         → v (coef ϑ g₂ w χ) = (((Q χ : ℚ) + l χ + ω : ℚ) : WithTop ℚ) := by
-  first
-  | exact @GlobalTheory.UT.ExactTerm.exact_term_after_torsion
-  | exact GlobalTheory.UT.ExactTerm.exact_term_after_torsion
-  | (intros; apply GlobalTheory.UT.ExactTerm.exact_term_after_torsion <;> assumption)
+  first | exact @GlobalTheory.UT.ExactTerm.exact_term_after_torsion

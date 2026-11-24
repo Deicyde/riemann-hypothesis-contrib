@@ -75,7 +75,4 @@ theorem _root_.GlobalTheory.T.thetaTransform_fixed_by_small_finiteHeisenberg
                           → Formalism.IndefR.Datum.heisO ψ S T u
                               (GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ Φ)
                             = GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ Φ := by
-  first
-  | exact @GlobalTheory.ThetaLevel.thetaTr_level
-  | exact GlobalTheory.ThetaLevel.thetaTr_level
-  | (intros; apply GlobalTheory.ThetaLevel.thetaTr_level <;> assumption)
+  first | exact @GlobalTheory.ThetaLevel.thetaTr_level

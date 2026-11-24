@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 set_option genSizeOfSpec false
 set_option genInjectivity false
@@ -67,6 +65,7 @@ variable
 abbrev chrK_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (t : W.P.T) (j : ℕ)
     : (AE (I.rec7 l Z))ˣ →* Circle :=
   (_root_.GlobalTheory.Fam.pk_z W).toLevCh.mu t (j + 1)
+
 structure QuadraticExtensionData (a : _root_.GlobalTheory.Fam.GeometricFamily W u) (t : W.P.T) where
   Ch₀ : ℕ → Type
   A : TwDat I l Z u (W.P.I.tup t) Ch₀

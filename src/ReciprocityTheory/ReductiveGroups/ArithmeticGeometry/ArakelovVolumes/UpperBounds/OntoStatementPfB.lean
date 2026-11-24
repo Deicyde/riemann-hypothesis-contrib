@@ -68,7 +68,7 @@ theorem cd_nmat (τ : X.Ψ) (a b : Fin r) : ContDiff ℂ ∞ fun z : V (nd X) =>
   unfold nmat
   by_cases h : b < a
   · simp only [dif_pos h]
-    first | fun_prop | exact (EuclideanSpace.proj (𝕜 := ℂ) _).contDiff
+    first | fun_prop
   · simp only [dif_neg h]
     exact contDiff_const
 

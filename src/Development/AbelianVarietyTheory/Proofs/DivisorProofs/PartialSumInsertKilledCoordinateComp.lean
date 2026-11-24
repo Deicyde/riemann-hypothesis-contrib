@@ -53,6 +53,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormal
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.CanonGenIsGen
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -90,12 +91,11 @@ theorem psum_insert_zero_comp
     first
     | rw [Finset.insert_eq_of_mem (by decide)]
     | (
-        simp only [psum, List.foldr_cons, List.foldr_nil, show (List.finRange 2) = [0, 1] by decide,
-          List.filter_cons, List.filter_nil]
+        simp only [psum, show (List.finRange 2) = [0, 1] by decide, List.filter_cons,
+          List.filter_nil]
         try
           simp only [Finset.mem_insert, Finset.mem_singleton, Finset.notMem_empty, decide_true,
-            decide_false, Fin.isValue, zero_ne_one, one_ne_zero, or_true, true_or, or_false,
-            if_true, if_false]
+            decide_false, Fin.isValue, zero_ne_one, one_ne_zero, or_true, or_false, if_true]
         try exact (padd_comp_of_kill p _ _ hx).symm
       )
 

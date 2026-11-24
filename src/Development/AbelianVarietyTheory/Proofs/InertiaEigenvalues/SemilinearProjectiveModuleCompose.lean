@@ -1,8 +1,12 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdIPowLe
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BijectiveOfBijectiveBaseChangeQuotientJacobsonStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSemilinearBaseChangeIffIsBaseChangeStatement
+public import Mathlib.Algebra.Module.Projective
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
+public import Mathlib.RingTheory.Jacobson.Ideal
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BijectiveOfBijectiveBaseChangeQuotientJacobson
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.InvertibleSpanSingleton
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSemilinearBaseChangeIffIsBaseChange
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -172,10 +176,9 @@ theorem semiBC_of_cover
     map_smul' := fun a x => w.map_smulₛₗ a x
   }
   have hv' : IsBaseChange C.A v' :=
-    (GlobalTheory.T.isSemilinearBaseChange_iff_isBaseChange B.A C.A N' N'' v v' fun _ => rfl).1 hv
+    (_root_.GlobalTheory.BSP.semiBC_iff_isBaseChange B.A C.A N' N'' v v' fun _ => rfl).1 hv
   have hw' : IsBaseChange C.A ((v'.restrictScalars A).comp u') := by
-    have :=
-      (GlobalTheory.T.isSemilinearBaseChange_iff_isBaseChange A C.A N N'' w w' fun _ => rfl).1 hwb
+    have := (_root_.GlobalTheory.BSP.semiBC_iff_isBaseChange A C.A N N'' w w' fun _ => rfl).1 hwb
     convert this using 1
     ext x
     exact (hw x).symm
@@ -191,11 +194,11 @@ theorem semiBC_of_cover
   have hJ : adI B ^ 1 ≤ Ideal.jacobson ⊥ :=
     (pow_one (adI B)).le.trans (IsAdicComplete.le_jacobson_bot (adI B))
   have hL : Function.Bijective L :=
-    GlobalTheory.T.bijective_of_bijective_baseChange_quotient_jacobson B.A (adI B ^ 1) hJ
+    _root_.GlobalTheory.BSP.bijective_of_bijective_baseChange_quotient B.A (adI B ^ 1) hJ
       (B.A ⊗[A] N) N' L hB
   have hu' : IsBaseChange B.A u' :=
     IsBaseChange.of_equiv (LinearEquiv.ofBijective L hL) fun x => by
       simp [L, LinearMap.liftBaseChange_tmul]
-  exact (GlobalTheory.T.isSemilinearBaseChange_iff_isBaseChange A B.A N N' u u' fun _ => rfl).2 hu'
+  exact (_root_.GlobalTheory.BSP.semiBC_iff_isBaseChange A B.A N N' u u' fun _ => rfl).2 hu'
 
 end GlobalTheory.BSP

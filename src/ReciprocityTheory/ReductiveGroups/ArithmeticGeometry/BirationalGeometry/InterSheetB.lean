@@ -63,7 +63,7 @@ def secSet
   {G | (∀ y ∉ B, G y = 0) ∧ DifferentiableOn ℂ G B ∧ ∀ y ∈ B, G y ∈ fibre P Ψ y}
 
 theorem coincide_null
-    (hA : OsgoodStatement)
+    (hA : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement)
     {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {c : Fin e → ℂ}
     {r : ℝ} {G G' : (Fin e → ℂ) → ((k : K) → ι k) → ℂ}
     (hG : G ∈ secSet P Ψ (ball c r)) (hG' : G' ∈ secSet P Ψ (ball c r)) (hne : G ≠ G')
@@ -95,7 +95,7 @@ theorem coincide_null
   exact ⟨hy.1, by simp [f, hy.2]⟩
 
 theorem secSet_finite
-    (hA : OsgoodStatement)
+    (hA : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement)
     {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hfin : ∀ y, (fibre P Ψ y).Finite)
     (c : Fin e → ℂ)
@@ -175,7 +175,7 @@ theorem mem_secSet_of_sheet
     exact ⟨γ y, (h y hy).2.1, rfl, (h y hy).2.2⟩
 
 theorem badSet_null
-    (hA : OsgoodStatement)
+    (hA : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement)
     {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hfin : ∀ y, (fibre P Ψ y).Finite)
     : volume (badSet P Ψ) = 0 := by

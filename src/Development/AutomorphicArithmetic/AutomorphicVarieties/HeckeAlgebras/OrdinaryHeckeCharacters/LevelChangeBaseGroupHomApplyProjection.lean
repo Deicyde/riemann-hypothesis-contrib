@@ -58,7 +58,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 noncomputable section
 
 namespace UpperTheory.V.Hi.LvR

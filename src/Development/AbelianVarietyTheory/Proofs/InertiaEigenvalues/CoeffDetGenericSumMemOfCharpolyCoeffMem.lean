@@ -153,7 +153,7 @@ theorem eval₂_charpolyRev
   rw [← coe_eval₂RingHom, Matrix.charpolyRev, RingHom.map_det]
   congr 1
   ext i j
-  by_cases h : i = j <;> simp [h, Matrix.one_apply] <;> ring
+  by_cases h : i = j <;> simp [h] <;> ring
 
 theorem det_sum_smul_mem
     {R ι κ : Type*} [CommRing R] [Fintype ι] [DecidableEq ι]

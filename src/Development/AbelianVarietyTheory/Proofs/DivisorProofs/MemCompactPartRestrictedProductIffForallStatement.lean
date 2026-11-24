@@ -55,7 +55,4 @@ theorem _root_.GlobalTheory.T.mem_compactPart_restrictedProduct_iff_forall
         → ∀ (T : Subgroup X) (Tv : ∀ v, Subgroup (Y v)),
           (∀ x, x ∈ T ↔ ∀ v, pf v x ∈ Tv v) → (∀ v, ∀ a ∈ Tv v, ∀ b ∈ Tv v, a * b = b * a)
             → ∀ x, x ∈ cptPart T ↔ ∀ v, pf v x ∈ cptPart (Tv v) := by
-  first
-  | exact @GlobalTheory.CptPartRestr.mem_cptPart_iff_forall
-  | exact GlobalTheory.CptPartRestr.mem_cptPart_iff_forall
-  | (intros; apply GlobalTheory.CptPartRestr.mem_cptPart_iff_forall <;> assumption)
+  first | exact @GlobalTheory.CptPartRestr.mem_cptPart_iff_forall

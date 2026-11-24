@@ -46,6 +46,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.LminorSubmatrixCastSucc
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FlowMatMulVec
 
 @[expose] public section
 
@@ -126,10 +127,7 @@ theorem Am_mulVec (u : Fin 2 → Fin r → E) (τ : X.Ψ) (y : Fin 2 → ℂ)
     smul_eq_mul]
   exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 
-theorem Cm_mulVec
-    (u : Fin 2 → Fin r → E) (b : X.Ψ → Fin 2 → Fin 2 → ℂ) (τ : X.Ψ) (v : Fin r → ℂ) (i : Fin 2)
-    : (X.Cm u b τ *ᵥ v) i = -(I * X.c τ) * ∑ k, b τ i k * hermC τ.1 X.Gm v (emb τ.1 (u k)) := by
-  exact Cm_mulVec_apply X u b τ v i
+alias Cm_mulVec := _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.Cm_mulVec_apply
 
 theorem zmat_unitary
     (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
@@ -160,11 +158,6 @@ theorem Zb_Zb
   show X.zmat u b τ * mat (X.Zb u b' x) τ = X.zmat u (b + b') τ * mat x τ
   rw [X.mat_Zb, ← Matrix.mul_assoc, X.zmat_mul u hu]
 
-private lemma col_mul_eq_mulVec_col (M N : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) :
-    col (M * N) a = M *ᵥ col N a := by
-  funext k
-  simp [col, Matrix.mul_apply, Matrix.mulVec, dotProduct]
-
 theorem gram_Zb
     (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
     (b : X.Ψ → Fin 2 → Fin 2 → ℂ) (hb : IsHermFam b)
@@ -172,7 +165,7 @@ theorem gram_Zb
     : gram τ.1 X.Gm (mat (X.Zb u b x) τ) = gram τ.1 X.Gm (mat x τ) := by
   rw [X.mat_Zb]
   ext a a'
-  simp only [gram, Matrix.of_apply, col_mul_eq_mulVec_col]
+  simp only [gram, Matrix.of_apply, _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.col_mul]
   exact X.zmat_unitary u hu b hb τ _ _
 
 theorem dmin_Zb

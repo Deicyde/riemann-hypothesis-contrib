@@ -72,7 +72,7 @@ theorem _root_.GlobalTheory.Mem.GelfCheck.rowE_X
   simp only [pderiv_X, Pi.single_apply, Prod.ext_iff]
   split_ifs with hbc
   · subst hbc
-    simp [Finset.sum_ite_eq']
+    simp
   · have hcb : ¬ c = b := fun h => hbc h.symm
     simp [hcb]
 
@@ -154,7 +154,7 @@ private theorem gradedWeyl_gen_coeff_one_and_coeff_zero
       congr 1
       · ring
       · exact Finset.sum_congr rfl fun _ _ => by ring
-    · simp [Pi.single_apply, Prod.ext_iff, hib, Polynomial.coeff_mul_C, hp0, hp1, Finset.sum_mul]
+    · simp [Prod.ext_iff, hib, Polynomial.coeff_mul_C, hp0, hp1, Finset.sum_mul]
       exact Finset.sum_congr rfl fun _ _ => by ring
 
 open MvPolynomial in
@@ -247,13 +247,13 @@ theorem _root_.GlobalTheory.Mem.GelfCheck.trace_pow_apply
     induction k with
     | zero =>
       refine ⟨fun a b hab => ?_, fun a => ?_⟩
-      · simp [Matrix.one_apply, hab.ne]
+      · simp [hab.ne]
       · simp [Matrix.one_apply]
     | succ k ih =>
       obtain ⟨ih1, ih2⟩ := ih
       have expand : ∀ a b, (E ^ (k + 1)) a b v = ∑ m, (E ^ k) a m (E m b v) := by
         intro a b
-        simp [pow_succ, Matrix.mul_apply, LinearMap.sum_apply, Module.End.mul_apply]
+        simp [pow_succ, Matrix.mul_apply, LinearMap.sum_apply]
       have term
           : ∀ a b m,
             a ≤ b
@@ -273,7 +273,7 @@ theorem _root_.GlobalTheory.Mem.GelfCheck.trace_pow_apply
             congrArg
               (fun f : Module.End R V => f v)
               (_root_.GlobalTheory.Mem.GelfCheck.pow_cov h k a m m b)
-          simp only [LinearMap.sub_apply, Module.End.mul_apply, if_pos rfl] at hc
+          simp only [LinearMap.sub_apply, Module.End.mul_apply] at hc
           rw [ih1 a m (lt_of_le_of_lt hab hmb), map_zero, zero_sub] at hc
           rw [if_neg (not_lt.mpr hmb.le), if_neg hmb.ne', ← neg_neg ((E ^ k) a m (E m b v)), hc]
           split_ifs <;> simp

@@ -62,8 +62,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
 namespace GlobalTheory.BaseClassSum
 
 variable {D : D7} {S T : HSp D}

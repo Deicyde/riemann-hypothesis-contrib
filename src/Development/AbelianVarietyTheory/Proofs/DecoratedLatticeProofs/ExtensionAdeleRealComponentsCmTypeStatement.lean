@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.extensionAdele_realComponents_cmType
           ∧ (∀ z τ, θ τ (infPart D (cA D z)) = conj (θ τ (infPart D z)))
           ∧ (∀ x τ, θ τ (infPart D (incA D x)) = tauE D τ x)
           ∧ (∀ z : AE D, (∀ τ, θ τ (infPart D z) = 0) → finPart D z = 0 → z = 0) := by
-  first
-  | exact @GlobalTheory.StdUnn.RealComp.real_components
-  | exact GlobalTheory.StdUnn.RealComp.real_components
-  | (intros; apply GlobalTheory.StdUnn.RealComp.real_components <;> assumption)
+  first | exact @GlobalTheory.StdUnn.RealComp.real_components

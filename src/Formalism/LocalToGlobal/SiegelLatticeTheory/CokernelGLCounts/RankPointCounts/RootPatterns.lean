@@ -77,8 +77,8 @@ theorem mem_rootPat_iff
     : q ∈ rootPat (ptLoc D τ w)
       ↔ q.1 < q.2
         ∧ Formalism.L2.SG.RealObj.blkOf w.1 q.1.1 = Formalism.L2.SG.RealObj.blkOf w.1 q.2.1 := by
-  simp only [rootPat, ptLoc, ptLocS, locBlocks, Set.mem_setOf_eq, blockIdx_loc]
-  simp [Set.mem_toFinset, Finset.mem_filter, Finset.mem_univ]
+  simp only [rootPat, ptLoc, ptLocS, locBlocks, blockIdx_loc]
+  simp [Finset.mem_filter, Finset.mem_univ]
 
 def idxF (τ : D.what₂.Tau) (w : Point D.host.E (D.R.rS + 1))
     : ↥(rootPat (ptLoc D τ w)) ≃ Formalism.L2.SG.RealObj.FreeE w where
@@ -92,15 +92,7 @@ theorem rootCoords_cont (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (p : Point
   unfold Formalism.MainNotions.S.rootCoords
   refine continuous_pi (fun q => ?_)
   unfold flagMat
-  first
-  | fun_prop
-  | (simp only [Matrix.mul_apply, Matrix.of_apply]; fun_prop)
-  | continuity
-  | (
-      exact ((continuous_apply _).comp (continuous_apply _)).comp
-        (Continuous.matrix_mul (Continuous.matrix_mul continuous_const continuous_id)
-          continuous_const)
-    )
+  first | continuity
 
 variable
   {X : HidaSetting D} {θ : ℝ} (C : Choice X θ)

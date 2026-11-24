@@ -123,7 +123,6 @@ theorem over_ext_of_points
       (Over.prodLeftIsoPullback Y Y).hom]
     convert! (inferInstance : IsOpenImmersion (pullback.diagonal Y.hom))
     ext1 <;> simp [← Over.comp_left]
-      <;> first | rw [prod.lift_fst, Over.id_left] | rw [prod.lift_snd, Over.id_left]
   have : JacobsonSpace K.left := LocallyOfFiniteType.jacobsonSpace K.hom
   have hcl : closedPoints K.left ⊆ Set.range (equalizer.ι u v).left := by
     intro x hx

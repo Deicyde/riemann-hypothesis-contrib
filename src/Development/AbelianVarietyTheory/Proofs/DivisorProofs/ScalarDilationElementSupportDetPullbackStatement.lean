@@ -84,7 +84,4 @@ theorem _root_.GlobalTheory.T.scalarDilationElement_support_det_pullback
                         ∧ ∀ t : WO S T,
                           IsHalf e t → actO S T z⁻¹ 1 t ∈ latAll S T ΛS ΛT
                             → t ∈ latAll S T ΛS ΛT := by
-  first
-  | exact @GlobalTheory.DilScalar.scalar_dil_facts
-  | exact GlobalTheory.DilScalar.scalar_dil_facts
-  | (intros; apply GlobalTheory.DilScalar.scalar_dil_facts <;> assumption)
+  first | exact @GlobalTheory.DilScalar.scalar_dil_facts

@@ -70,8 +70,8 @@ theorem cycRestrict_surjective : Function.Surjective cycRestrict := by
   exact AlgEquiv.restrictNormalHom_surjective (F := ℚ) (K₁ := maxCyclotomic)
     (E := AlgebraicClosure ℚ)
 
-theorem coe_cycRestrict_apply (σ : Gal(AlgebraicClosure ℚ/ℚ)) (x : maxCyclotomic)
-    : ((cycRestrict σ x : maxCyclotomic) : AlgebraicClosure ℚ) = σ x :=
+theorem coe_cycRestrict_apply (σ : Gal(AlgebraicClosure ℚ/ℚ)) (x : maxCyclotomic) :
+    ((cycRestrict σ x : maxCyclotomic) : AlgebraicClosure ℚ) = σ x :=
   AlgEquiv.restrictNormal_commutes σ maxCyclotomic x
 
 theorem ker_cycRestrict : cycRestrict.ker = character.ker := by
@@ -93,20 +93,17 @@ def cycCharacter : Gal(maxCyclotomic/ℚ) ≃* ℤ̂ˣ :=
     ((QuotientGroup.quotientMulEquivOfEq ker_cycRestrict).trans
       (QuotientGroup.quotientKerEquivOfSurjective character character_surjective))
 
-theorem cycCharacter_cycRestrict (σ : Gal(AlgebraicClosure ℚ/ℚ))
-    : cycCharacter (cycRestrict σ) = character σ := by
-  have h
-      : (QuotientGroup.quotientKerEquivOfSurjective cycRestrict cycRestrict_surjective).symm
-          (cycRestrict σ)
-        = (σ : Gal(AlgebraicClosure ℚ/ℚ) ⧸ cycRestrict.ker) := by
+theorem cycCharacter_cycRestrict (σ : Gal(AlgebraicClosure ℚ/ℚ)) : cycCharacter (cycRestrict σ) = character σ := by
+  have h : (QuotientGroup.quotientKerEquivOfSurjective cycRestrict cycRestrict_surjective).symm
+      (cycRestrict σ) = (σ : Gal(AlgebraicClosure ℚ/ℚ) ⧸ cycRestrict.ker) := by
     rw [MulEquiv.symm_apply_eq]
     rfl
   rw [cycCharacter, MulEquiv.trans_apply, MulEquiv.trans_apply, h]
   rfl
 
-theorem cycCharacter_spec
-    (τ : Gal(maxCyclotomic/ℚ)) (n : ℕ+) {ζ : maxCyclotomic} (hζ : ζ ^ (n : ℕ) = 1)
-    : τ ζ = ζ ^ (ProfiniteInteger.proj n (cycCharacter τ : ℤ̂)).val := by
+theorem cycCharacter_spec (τ : Gal(maxCyclotomic/ℚ)) (n : ℕ+) {ζ : maxCyclotomic}
+    (hζ : ζ ^ (n : ℕ) = 1) :
+    τ ζ = ζ ^ (ProfiniteInteger.proj n (cycCharacter τ : ℤ̂)).val := by
   obtain ⟨σ, rfl⟩ := cycRestrict_surjective τ
   apply Subtype.ext
   rw [cycCharacter_cycRestrict, SubmonoidClass.coe_pow]
@@ -115,14 +112,11 @@ theorem cycCharacter_spec
 
 def unitPart : IdeleClassGroup ℚ →* ℤ̂ˣ :=
   (Units.map padicEquiv.symm.toRingHom.toMonoidHom).comp
-    ((MonoidHom.snd _ _).comp
-      _root_.GroundTheory.Global.RationalIdeles.ideleClassGroupEquiv.toMulEquiv.toMonoidHom)
+    ((MonoidHom.snd _ _).comp _root_.GroundTheory.Global.RationalIdeles.ideleClassGroupEquiv.toMulEquiv.toMonoidHom)
 
-theorem toPadicInt_unitPart (x : IdeleClassGroup ℚ) (q : Nat.Primes)
-    : toPadicInt q (unitPart x : ℤ̂)
-      = ((_root_.GroundTheory.Global.RationalIdeles.ideleClassGroupEquiv x).2
-          : Π p : Nat.Primes, ℤ_[p])
-        q := by
+theorem toPadicInt_unitPart (x : IdeleClassGroup ℚ) (q : Nat.Primes) :
+    toPadicInt q (unitPart x : ℤ̂) =
+      ((_root_.GroundTheory.Global.RationalIdeles.ideleClassGroupEquiv x).2 : Π p : Nat.Primes, ℤ_[p]) q := by
   change toPadics (padicEquiv.symm _) q = _
   rw [← padicEquiv_apply, RingEquiv.apply_symm_apply]
   rfl
@@ -130,8 +124,8 @@ theorem toPadicInt_unitPart (x : IdeleClassGroup ℚ) (q : Nat.Primes)
 def reciprocityMap : IdeleClassGroup ℚ →* Gal(maxCyclotomic/ℚ) :=
   cycCharacter.symm.toMonoidHom.comp unitPart⁻¹
 
-theorem cycCharacter_reciprocityMap (x : IdeleClassGroup ℚ)
-    : cycCharacter (reciprocityMap x) = (unitPart x)⁻¹ := by
+theorem cycCharacter_reciprocityMap (x : IdeleClassGroup ℚ) :
+    cycCharacter (reciprocityMap x) = (unitPart x)⁻¹ := by
   simp [reciprocityMap]
 
 end RationalSymbol

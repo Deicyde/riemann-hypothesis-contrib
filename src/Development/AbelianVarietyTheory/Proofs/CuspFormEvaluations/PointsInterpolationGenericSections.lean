@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.KronHolPsiStatementHolds
+import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.RestrictionEqZeroIffMemVanishingFiltration
 
 @[expose] public section
 
@@ -52,11 +53,6 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   GlobalTheory.RunIn GlobalTheory.Shares
 
 namespace GlobalTheory.Shares
-
-theorem addL_zero_pts {D : D7} {j : ℕ} (u wL : WeightFamilies.Wt D j) : addL u wL 0 = u := by
-  show wadd u (wsmul 0 wL) = u
-  cases u
-  simp [wadd, wsmul]
 
 theorem rdg_s_apply
     {D : D7} {T : Top D} {h : LawsP T} {j : ℕ} {hj : InR D j} {n : SecNorm (recB h.toLawsCore)}
@@ -150,7 +146,7 @@ theorem points_and_interp
     choose F hFmem hFval using hF
     have hO0 : RdOnto h j wF := by
       have h0 := hO 0
-      rwa [addL_zero_pts] at h0
+      rwa [_root_.Formalism.MainNotions.Gaps.EtaleWeightGaps.addL_zero] at h0
     have hf : ∀ k, F k ∈ ((T.U j T.σ₀).X k).SS (laR T j wF k) := by
       intro k
       rw [← A.hF k]

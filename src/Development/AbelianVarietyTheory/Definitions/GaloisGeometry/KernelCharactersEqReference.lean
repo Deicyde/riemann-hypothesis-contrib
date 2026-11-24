@@ -47,25 +47,22 @@ noncomputable section
 
 namespace GlobalTheory.KerJ.CharModel
 
-open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
+  Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
 open GlobalTheory.Mem.Chr (finPartI finPartI_eq_self unitIdl)
 
 section General
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem prod_inf_mul_finPart (a : Ideles L) :
-    ∃ y : ∀ w : InfinitePlace L, (w.Completion)ˣ, (∏ w, infIdele L w (y w)) * finPartI L a = a := by
+theorem prod_inf_mul_finPart (a : Ideles L)
+    : ∃ y : ∀ w : InfinitePlace L, (w.Completion)ˣ,
+      (∏ w, infIdele L w (y w)) * finPartI L a = a := by
   apply _root_.GlobalTheory.Mem.Chr.Determ.exists_prod_inf_mul_finPart <;> assumption
 
 theorem isFin_finPart (a : Ideles L) : IsFinIdele (finPartI L a) := fun _ => rfl
 
-theorem isUnitary_of_orderDvd {χ : HChar L} {n : ℕ} (hn : 0 < n) (h : χ.OrderDvd n) : χ.IsUnitary := fun x => by
-  have h1 : (χ ^ n).1 x = 1 := by rw [show χ ^ n = 1 from h]; rfl
-  have h2 : χ.1 x ^ n = 1 := by simpa using h1
-  have h3 : ‖((χ.1 x : ℂˣ) : ℂ)‖ ^ n = 1 := by
-    rw [← norm_pow, ← Units.val_pow_eq_pow_val, h2]; simp
-  exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn.ne').1 h3
+alias isUnitary_of_orderDvd := _root_.Formalism.L2.Host.HChar.isUnitary_of_order
 
 end General
 
@@ -75,6 +72,5 @@ theorem eDt_finPart (a : Ideles D.host.E) : Dt.eDt (finPartI D.host.E a) = Dt.eD
   obtain ⟨y, hy⟩ := prod_inf_mul_finPart a
   conv_rhs => rw [← hy]
   rw [map_mul, map_prod, Finset.prod_eq_one fun w _ => Dt.inf w (y w), one_mul]
-
 
 end GlobalTheory.KerJ.CharModel

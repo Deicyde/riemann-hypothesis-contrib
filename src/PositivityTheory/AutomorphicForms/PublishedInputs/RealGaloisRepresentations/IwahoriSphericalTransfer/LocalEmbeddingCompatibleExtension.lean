@@ -45,6 +45,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
   UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.local_embedding_compatible_extension
     : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type)
         [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.local_embedding_compatible_extension
             ∧ ∀ (τ : K →+* Qbar l) (J : Multiset ℤ),
               IsJumpsAt P Bw' ((r.comp (res F Ω K)).comp (Dec (F := K) A).subtype) τ J
                 → IsJumpsAt P Bw (r.comp (Dec (F := F) A).subtype) (τ.comp (algebraMap F K)) J := by
-  first
-  | exact @GlobalTheory.RealGal.dRSstCrysPstJumps_descend
-  | exact GlobalTheory.RealGal.dRSstCrysPstJumps_descend
-  | (intros; apply GlobalTheory.RealGal.dRSstCrysPstJumps_descend <;> assumption)
+  first | exact @GlobalTheory.RealGal.dRSstCrysPstJumps_descend

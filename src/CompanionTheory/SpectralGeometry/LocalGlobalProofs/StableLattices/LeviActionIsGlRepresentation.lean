@@ -228,7 +228,7 @@ theorem adL_comm_apply
       : ∀ a b : Fin n,
         (adL a b x : Cn n V) = ∑ i : Pos n, ∑ l : Pos n, adC a b i l • cre l (ann i x) := by
     intro a b
-    simp [adL, LinearMap.sum_apply, Module.End.mul_apply]
+    simp [adL, LinearMap.sum_apply]
   have t
       : ∀ i l : Pos n,
         (∑ k : Pos n, (adC r v i k * adC p q k l - adC p q i k * adC r v k l)) • cre l (ann i x)

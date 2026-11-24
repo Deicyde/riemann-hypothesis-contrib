@@ -239,7 +239,7 @@ theorem _root_.GlobalTheory.MomOne.lift_change
         ((u : ℂ) + (u' : ℂ) * _root_.Formalism.L2.Ker.JMB.w0 S.d).im = u' * (√(S.d : ℝ) / 2) := by
     intro u u'
     rw [hw0]
-    simp [Complex.add_im, Complex.mul_im, Complex.div_im]
+    simp [Complex.add_im, Complex.mul_im]
   have hbetaim
       : ∀ x w,
         (_root_.Formalism.L2.Ker.JMB.beta S.d S.Hm x w).im
@@ -312,10 +312,7 @@ theorem _root_.GlobalTheory.MomOne.lift_change
       have hcast : ‖(N : ℂ_[q])‖ = ‖(N : ℚ_[q])‖ := by
         rw [← PadicComplex.norm_extends' q (N : ℚ_[q]), map_intCast]
         congr 1
-        first
-        | exact (map_intCast (UniformSpace.Completion.coeRingHom (α := PadicAlgCl q)) N).symm
-        | norm_cast
-        | simp
+        first | exact (map_intCast (UniformSpace.Completion.coeRingHom (α := PadicAlgCl q)) N).symm
       rw [hcast] at hNn
       have hm := (Padic.norm_int_le_pow_iff_dvd N m).1 hNn
       exact (pow_dvd_pow (q : ℤ) (by omega : n ≤ m)).trans hm

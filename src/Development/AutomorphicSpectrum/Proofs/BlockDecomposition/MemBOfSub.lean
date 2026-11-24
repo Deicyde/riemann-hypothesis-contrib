@@ -38,6 +38,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.CechPairings.TotPairing
 
 @[expose] public section
 
@@ -67,12 +68,6 @@ theorem cls_eq_zero (K : Cx.{w} R) {n : ℕ} (x : K.X n) (hx : K.d n x = 0)
     : K.cls x hx = 0 ↔ x ∈ K.B n := by
   unfold Cx.cls
   rw [Submodule.Quotient.mk_eq_zero]
-  rfl
-
-theorem cls_congr
-    (K : Cx.{w} R) {n : ℕ} {x y : K.X n} (e : x = y) (hx : K.d n x = 0) (hy : K.d n y = 0)
-    : K.cls x hx = K.cls y hy := by
-  subst e
   rfl
 
 theorem mem_B_of_sub {n : ℕ} (h : Subsingleton (K.H n)) (x : K.X n) (hx : K.d n x = 0)
@@ -273,7 +268,7 @@ theorem secM_nat
     obtain ⟨b, hb, rfl⟩ := cls_surj L c z
     have e : (inc t').f c (g.f c b) = (coneHom t t' f g hc).f c ((inc t).f c b) :=
       Prod.ext rfl (by change 0 = f.f c 0; rw [map_zero])
-    exact cls_congr _ e _ _
+    exact _root_.CrystallineSemistableComparison.Auxff.cls_congr _ e _ _
   obtain ⟨x, hx, rfl⟩ := cls_surj K c y
   change (sec u').mapH c (f.mapH c (K.cls x hx)) + (inc t').mapH c (l' (f.mapH c (K.cls x hx)))
     = (coneHom t t' f g hc).mapH c ((sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx)))
@@ -281,7 +276,7 @@ theorem secM_nat
   congr 1
   have e : (sec u').f c (f.f c x) = (coneHom t t' f g hc).f c ((sec u).f c x) :=
     Prod.ext (by change -(u'.h c (f.f c x)) = g.f c (-(u.h c x)); rw [hu, map_neg]) rfl
-  exact cls_congr _ e _ _
+  exact _root_.CrystallineSemistableComparison.Auxff.cls_congr _ e _ _
 
 end Basic
 

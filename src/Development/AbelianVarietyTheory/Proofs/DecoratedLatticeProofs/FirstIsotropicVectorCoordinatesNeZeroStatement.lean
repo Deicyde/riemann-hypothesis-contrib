@@ -57,6 +57,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing
   GlobalTheory.FinPl
+
 theorem _root_.GlobalTheory.T.firstIsotropicVector_coordinates_ne_zero
     : ∀ {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
         (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (hr : 1 ≤ D.R.rS),

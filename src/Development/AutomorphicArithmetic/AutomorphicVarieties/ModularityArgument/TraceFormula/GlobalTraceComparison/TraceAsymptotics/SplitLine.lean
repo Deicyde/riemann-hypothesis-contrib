@@ -75,7 +75,7 @@ private theorem rank_le
     fun x _ => ?_
   exact ⟨
     _,
-    GlobalTheory.CompanionTheory.SatAe.countable_orbit ρ x (hs x),
+    _root_.UpperTheory.Reformulated.B.Yhd2.main ρ x (hs x),
     fun _ _ => trivial,
     fun g => Submodule.subset_span ⟨g, rfl⟩
   ⟩

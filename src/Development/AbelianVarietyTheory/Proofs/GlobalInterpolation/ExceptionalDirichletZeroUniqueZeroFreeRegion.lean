@@ -1,10 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ZerosDisc
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DirichletLZerosEqPrimitiveCharacterZerosStatement
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsDirichletLFunctionZeroGapNearOneStatement
-import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LFunctionConjEqZero
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DirichletLZerosEqPrimitiveCharacterZeros
+public import Mathlib.NumberTheory.LSeries.DirichletContinuation
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsDirichletLFunctionZeroGapNearOne
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.OrderNeTop
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LFunctionConjEqZero
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ZeroFreePrincipal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -107,7 +108,7 @@ theorem main
   obtain ⟨cu, hcu, hU⟩ := GlobalTheory.RealZeroNearOne.main
   obtain ⟨cp, hcp, hP⟩ := GlobalTheory.ZeroFreePrincipal.zero_free
   obtain ⟨cz, hcz, hZ⟩ := GlobalTheory.ZeroFreeComplex.zero_free_region
-  obtain ⟨cs, hcs, hS⟩ := GlobalTheory.T.exists_dirichletLFunction_zero_gap_near_one
+  obtain ⟨cs, hcs, hS⟩ := _root_.GlobalTheory.ZeroGapNearOne.exists_gap
   refine ⟨
     min (1 / 8) (min (cu / 2) (cp / 2)),
     lt_min (by norm_num) (lt_min (by linarith) (by linarith)),
@@ -140,7 +141,7 @@ theorem main
       simp at this
       linarith
     have hLχ : LFunction χ β = 0 :=
-      (GlobalTheory.T.dirichletL_zeros_eq_primitiveCharacter_zeros M χ β (by simp; linarith)
+      (_root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter M χ β (by simp; linarith)
         (Or.inr hne)).1.mpr hL
     refine ⟨fun hχ => ?_, hβ, hLχ, by linarith [div_log_le hM hcu.le hcu2]⟩
     rw [hχ] at hLχ
@@ -188,7 +189,7 @@ theorem main
           rw [h] at hre
           simp at hre
         have hL' :=
-          (GlobalTheory.T.dirichletL_zeros_eq_primitiveCharacter_zeros M χ ρ hpos (Or.inr hne)).1.mp
+          (_root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter M χ ρ hpos (Or.inr hne)).1.mp
             hL
         unfold IsExc
         refine ⟨hsq, hbig, hre, ?_⟩

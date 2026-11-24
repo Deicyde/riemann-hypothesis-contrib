@@ -61,14 +61,16 @@ open scoped BigOperators
 namespace GlobalTheory.FinWeil
 
 section
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}
 
 end
 
 open Classical in
 open scoped BigOperators in
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} in
 private lemma lam_idx_sq_eq_idx_of_fixed_ne_zero (hW : _root_.GlobalTheory.FinWeil.IsHeis σ w γ W)
     (lam : ℕ →* ℂ) (hlam : _root_.GlobalTheory.FinWeil.GoodNorm σ lam) {A A' : Submodule R X}
@@ -101,7 +103,8 @@ private lemma lam_idx_sq_eq_idx_of_fixed_ne_zero (hW : _root_.GlobalTheory.FinWe
 
 open Classical in
 open scoped BigOperators in
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} in
 private lemma mul_conj_eq_natCast_of_sq_eq (c : ℂ) (n : ℕ) (h : c ^ 2 = n) :
     c * starRingEnd ℂ c = n := by
@@ -112,7 +115,8 @@ private lemma mul_conj_eq_natCast_of_sq_eq (c : ℂ) (n : ℕ) (h : c ^ 2 = n) :
 
 open Classical in
 open scoped BigOperators in
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} in
 private lemma invariantForm_translate_vacuum_eq_zero
     (hW : _root_.GlobalTheory.FinWeil.IsHeis σ w γ W)
@@ -132,7 +136,8 @@ private lemma invariantForm_translate_vacuum_eq_zero
 
 open Classical in
 open scoped BigOperators in
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} in
 private lemma invariantForm_translate_pair_eq (hW : _root_.GlobalTheory.FinWeil.IsHeis σ w γ W)
     (B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ) (hB : ∀ x u v, B (W x u) (W x v) = B u v) (x y : X) (e e' : M) :
@@ -143,7 +148,8 @@ private lemma invariantForm_translate_pair_eq (hW : _root_.GlobalTheory.FinWeil.
 
 open Classical in
 open scoped BigOperators in
-variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+variable
+  {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
   {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} in
 private lemma invariantForms_eq_of_eq_on_vacua (hW : _root_.GlobalTheory.FinWeil.IsHeis σ w γ W)
     {A : Submodule R X} (hA : _root_.GlobalTheory.FinWeil.SelfDual γ A)
@@ -172,26 +178,38 @@ private lemma invariantForms_eq_of_eq_on_vacua (hW : _root_.GlobalTheory.FinWeil
     LinearMap.ext_on hspan (fun s hs => by simp [hleft s hs])
   simpa using LinearMap.congr_fun hflip u
 
-
 open Classical in
 open scoped BigOperators in
-theorem _root_.GlobalTheory.FinWeil.invForm_intertwiner : ∀ {R X M : Type} [CommRing R]
-    [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R}
-    {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, _root_.GlobalTheory.FinWeil.IsHeis σ w γ W →
-    (∀ x y, ‖γ x y‖ = 1) → ∀ lam : ℕ →* ℂ, _root_.GlobalTheory.FinWeil.GoodNorm σ lam →
-    ∀ A : Submodule R X, _root_.GlobalTheory.FinWeil.SelfDual γ A →
-    Submodule.span ℂ {m : M | ∃ x e, _root_.GlobalTheory.FinWeil.Fixes W A e ∧ m = W x e} = ⊤ →
-    ∀ (φ : X →ₗ[R] X), (∀ x y, γ (φ x) (φ y) = γ x y) → _root_.GlobalTheory.FinWeil.SelfDual γ (A.map φ) →
-    _root_.GlobalTheory.FinWeil.idx A (A.map φ) ≠ 0 → ∀ T : M →ₗ[ℂ] M, (∀ x v, T (W x v) = W (φ x) (T v)) →
-    (∀ e, _root_.GlobalTheory.FinWeil.Fixes W A e → T e = _root_.GlobalTheory.FinWeil.normOp lam W A (A.map φ) e) →
-    ∀ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ, (∀ x u v, B (W x u) (W x v) = B u v) →
-    ∀ u v, B (T u) (T v) = B u v := by
+theorem _root_.GlobalTheory.FinWeil.invForm_intertwiner
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      _root_.GlobalTheory.FinWeil.IsHeis σ w γ W → (∀ x y, ‖γ x y‖ = 1)
+        → ∀ lam : ℕ →* ℂ,
+          _root_.GlobalTheory.FinWeil.GoodNorm σ lam
+            → ∀ A : Submodule R X,
+              _root_.GlobalTheory.FinWeil.SelfDual γ A
+                → Submodule.span ℂ
+                    {m : M | ∃ x e, _root_.GlobalTheory.FinWeil.Fixes W A e ∧ m = W x e}
+                  = ⊤
+                → ∀ (φ : X →ₗ[R] X),
+                  (∀ x y, γ (φ x) (φ y) = γ x y) → _root_.GlobalTheory.FinWeil.SelfDual γ (A.map φ)
+                    → _root_.GlobalTheory.FinWeil.idx A (A.map φ) ≠ 0
+                    → ∀ T : M →ₗ[ℂ] M,
+                      (∀ x v, T (W x v) = W (φ x) (T v))
+                        → (∀ e,
+                          _root_.GlobalTheory.FinWeil.Fixes W A e
+                            → T e = _root_.GlobalTheory.FinWeil.normOp lam W A (A.map φ) e)
+                        → ∀ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ,
+                          (∀ x u v, B (W x u) (W x v) = B u v) → ∀ u v, B (T u) (T v) = B u v := by
   intro R X M _ _ _ _ _ σ w γ W hW _ lam hlam A hA hspan φ _ hA' hidx T hT hTe B hB u v
-  obtain ⟨n, f, hfB, hfu⟩ := _root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero A (A.map φ) hidx
+  obtain ⟨n, f, hfB, hfu⟩ :=
+    _root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero A (A.map φ) hidx
   have hsum := fun e (he : _root_.GlobalTheory.FinWeil.Fixes W A e) =>
     _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal hW A (A.map φ) hA' e he (Fin n) f hfB hfu
-  have hvac : ∀ e e', _root_.GlobalTheory.FinWeil.Fixes W A e → _root_.GlobalTheory.FinWeil.Fixes W A e' →
-      B (T e) (T e') = B e e' := by
+  have hvac
+      : ∀ e e',
+        _root_.GlobalTheory.FinWeil.Fixes W A e → _root_.GlobalTheory.FinWeil.Fixes W A e'
+          → B (T e) (T e') = B e e' := by
     intro e e' he he'
     by_cases he0 : e = 0
     · subst he0
@@ -208,9 +226,8 @@ theorem _root_.GlobalTheory.FinWeil.invForm_intertwiner : ∀ {R X M : Type} [Co
       rw [hn, (hsum e he).1]
     have hterm : ∀ i j, B (W (f i) e) (W (f j) e') = if i = j then B e e' else 0 := by
       intro i j
-      rw [← hB (-f j), hW.comp_of_mem hA' (neg_mem (hfB j)) (hfB i),
-        hW.comp_of_mem hA' (neg_mem (hfB j)) (hfB j), neg_add_cancel,
-        hW.zero]
+      rw [← hB (- f j), hW.comp_of_mem hA' (neg_mem (hfB j)) (hfB i),
+        hW.comp_of_mem hA' (neg_mem (hfB j)) (hfB j), neg_add_cancel, hW.zero]
       split_ifs with hij
       · subst hij
         rw [neg_add_cancel, hW.zero]
@@ -222,15 +239,19 @@ theorem _root_.GlobalTheory.FinWeil.invForm_intertwiner : ∀ {R X M : Type} [Co
     rw [hT' e he, hT' e' he']
 
     simp only [map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, map_sum, LinearMap.sum_apply,
-    smul_eq_mul, hterm, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_const,
-    Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, map_inv₀]
+      smul_eq_mul, hterm, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_const,
+      Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, map_inv₀]
     have hinv : (lam n)⁻¹ * (starRingEnd ℂ (lam n))⁻¹ * n = 1 := by
       rw [← mul_inv, hcn, inv_mul_cancel₀ hn0]
     simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true, Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul]
     linear_combination B e e' * hinv
-  have key := invariantForms_eq_of_eq_on_vacua hW hA hspan ((B.comp T).compl₂ T) B
-    (fun x u v => by simp [hT, hB]) hB (fun e e' he he' => by simpa using hvac e e' he he') u v
+  have key :=
+    invariantForms_eq_of_eq_on_vacua hW hA hspan ((B.comp T).compl₂ T) B
+      (fun x u v => by simp [hT, hB])
+      hB
+      (fun e e' he he' => by simpa using hvac e e' he he')
+      u v
   simpa using key
 
 end GlobalTheory.FinWeil

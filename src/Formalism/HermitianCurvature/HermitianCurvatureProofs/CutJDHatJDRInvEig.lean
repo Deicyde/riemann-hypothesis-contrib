@@ -537,7 +537,7 @@ theorem usage₅
     have hc' : StrictMono c := by simpa [jSetR] using hc
     rw [conclusion₃ hz' P hPV0 hdet hζ c hc', Finset.mul_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl (fun i _ => ?_)
-    split_ifs <;> simp [mul_assoc]
+    split_ifs <;> simp
   rw [Finset.sum_congr rfl e1, Finset.sum_comm, Finset.smul_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [← Finset.smul_sum, Finset.sum_ite_eq', if_pos (hmem i), smul_smul]

@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MonoSpMapRingOfIntegersAlt
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MajorantHarnackHolomorphicHalfPlaneStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MajorantHarnackHolomorphicHalfPlane
 public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.MajLactRmul
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -282,8 +283,7 @@ theorem GlobalTheory.orbit_unipotent_short
       T M hM (Data.emb τ.1 b) (Data.emb τ.1 ξ) ?_
       (fun w k v => maj_natCast_smul X _ τ k v)
       (fun w u v => maj_parallelogram X _ τ u v)
-      (fun w w' hw hw' v =>
-        GlobalTheory.T.majorant_harnack_holomorphic_half_plane E N X T x hd hdom w w' hw hw' τ v)
+      (fun w w' hw hw' v => _root_.GlobalTheory.maj_harnack E N X T x hd hdom w w' hw hw' τ v)
       ?_ ?_
     · intro w hw v
       by_cases hv : v = 0

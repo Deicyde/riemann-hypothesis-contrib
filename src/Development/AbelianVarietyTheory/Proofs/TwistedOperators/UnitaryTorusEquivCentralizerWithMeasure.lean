@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.EllipticPartTestData
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TorusElementCharpolyRegularCentralizerStatement
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TorusElementCharpolyRegularCentralizer
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -142,7 +142,7 @@ theorem torEquiv_cent
   haveI : FiniteDimensional F E := Module.finite_of_finrank_eq_succ hCM.2.2.1
   haveI : FiniteDimensional F (Fld P) := Module.Finite.trans E _
   obtain ⟨-, -, hinj, hrange⟩ :=
-    GlobalTheory.T.torusElement_charpoly_regular_centralizer F E σ hCM r n P J hJ k x φ h
+    _root_.GlobalTheory.TrEll.gam_charpoly_regular_cent F E σ hCM r n P J hJ k x φ h
   let e0 : Tor P k ≃* cent (gam h) :=
     (MonoidHom.ofInjective hinj).trans (MulEquiv.subgroupCongr hrange.symm)
   have he : ∀ t, (e0 t).1 = torEmb h t := fun t => rfl

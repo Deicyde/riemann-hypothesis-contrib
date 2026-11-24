@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSectionOfChg
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EigFrameMatch
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAffineStableLieEigenspaceFrameStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TriIff
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAffineStableLieEigenspaceFrame
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -38,6 +39,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -63,7 +65,7 @@ theorem frameCover_gen
         → FrameCover Y.t (genι Y) (genStr Y) V (HermitianCompactForm.chi c τ) D.p D.q := by
   intro E _ _ _ H D l Xo c O _ β Y V τ hτ z hz
   obtain ⟨U, hU, φ, f, hzU, hs, -⟩ :=
-    GlobalTheory.T.exists_affine_stable_lie_eigenspace_frame E H D l Xo c O β Y z
+    _root_.GlobalTheory.ShFam.EigSpread.exists_stable_eigFrame E H D l Xo c O β Y z
   obtain ⟨⟨v, w, hfr, -⟩, -⟩ :=
     GlobalTheory.DetLine.EigParts.eigFrame_match E H D l Xo c O β Y τ hτ Set.univ Γ(gen Y, U) φ
       hU.fromSpec hs (Set.subset_univ _) f

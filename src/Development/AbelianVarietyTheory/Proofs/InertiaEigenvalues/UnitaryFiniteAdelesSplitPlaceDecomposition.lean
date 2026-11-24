@@ -196,8 +196,6 @@ theorem main
   · show x * y = y * x
     apply Subtype.ext
     apply Units.ext
-    change (((x * y : GAf L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
-      = (((y * x : GAf L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
     apply mat_ext
     intro w
     rw [mul_coe, mul_coe, Matrix.map_mul, Matrix.map_mul]

@@ -131,7 +131,6 @@ theorem sub_linPart_mem_sq
   rw [ker_eval_eq_span] at hp
   obtain ⟨a, rfl⟩ := (Ideal.mem_span_range_iff_exists_fun).1 hp
   have hg : grad w (∑ i, a i * (X i - C (w i))) = fun i => eval w (a i) := by
-
     rw [map_sum]
     simp_rw [grad_mul, grad_X_sub_C, map_sub, eval_X, eval_C, sub_self, zero_smul, add_zero]
     ext i

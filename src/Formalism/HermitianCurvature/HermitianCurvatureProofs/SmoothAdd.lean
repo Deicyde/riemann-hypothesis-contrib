@@ -2,7 +2,9 @@ module
 
 public import Formalism.HermitianCurvature.BesselNonvanishingReduction
 public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.LowSmooth
+public import Formalism.PeriodIntegrals.LowCyc
+public import Formalism.PeriodIntegrals.KFinSmooth
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LowerSmoothStability.ExistsFinStableOfMemSSup
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -51,8 +53,6 @@ open MeasureTheory Matrix
 open scoped InnerProductSpace ENNReal ComplexConjugate ContDiff
 
 noncomputable section
-
-
 
 namespace Formalism.FourierDecayAlt.P.DDSmoothness
 
@@ -148,7 +148,8 @@ theorem DD_smooth
         simp only [Matrix.mul_assoc],
       ha, hb]
   have hw0 : PI.UpqRep.SmoothOnH (PI.UpqRep.Hpk k r) (fun g => σ g w0) :=
-    low_smooth_of_k_finite hK k r ε lam H σ w0 hl ⟨P, ⟨⟨hPu, hPJ⟩, hPun⟩, hDS⟩ hw
+    _root_.PI.UnitaryGroupMassFormula.LowSmooth.lowSmooth_of_kFinSmooth hK k r ε lam H σ w0 hl
+      ⟨P, ⟨⟨hPu, hPJ⟩, hPun⟩, hDS⟩ hw
   have htr
       : ∀ g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
         σ g w0 ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ := by

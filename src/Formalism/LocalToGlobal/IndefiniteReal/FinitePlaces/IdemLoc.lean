@@ -55,8 +55,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-
-
 namespace Formalism.IndefR.Fin
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -66,13 +64,7 @@ section Loc
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
 theorem af_ext {x y : Af F} (h : ∀ w, evalV F w x = evalV F w y) : x = y := by
-  first
-  | exact RestrictedProduct.ext h
-  | exact Subtype.ext (funext h)
-  | (
-      ext w
-      exact h w
-    )
+  first | exact Subtype.ext (funext h)
 
 open Classical in
 def sglV (a : v.adicCompletion F) : Af F := ⟨
@@ -89,18 +81,12 @@ def sglV (a : v.adicCompletion F) : Af F := ⟨
 
 theorem sglV_same (a : v.adicCompletion F) : evalV F v (sglV v a) = a := by
   classical
-  first
-  | exact Pi.single_eq_same (i := v) (x := a)
-  | exact Pi.single_eq_same v a
-  | simp [sglV, evalV]
+  first | exact Pi.single_eq_same (i := v) (x := a)
 
 theorem sglV_ne (a : v.adicCompletion F) {w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v)
     : evalV F w (sglV v a) = 0 := by
   classical
-  first
-  | exact Pi.single_eq_of_ne h a
-  | exact Pi.single_eq_of_ne (i := v) h a
-  | simp [sglV, evalV, h]
+  first | exact Pi.single_eq_of_ne h a
 
 theorem sglV_add (a b : v.adicCompletion F) : sglV v (a + b) = sglV v a + sglV v b := by
   refine af_ext fun w => ?_
@@ -132,7 +118,7 @@ theorem sglV_smul (f : F) (a : v.adicCompletion F)
   rw [map_mul, AlgHom.commutes]
   by_cases h : w = v
   · subst h
-    rw [sglV_same, sglV_same] <;> rfl
+    rw [sglV_same, sglV_same]
   · rw [sglV_ne _ _ h, sglV_ne _ _ h, mul_zero]
 
 theorem sglV_int {a : v.adicCompletion F} (ha : a ∈ v.adicCompletionIntegers F)
@@ -147,17 +133,6 @@ theorem sglV_int {a : v.adicCompletion F} (ha : a ∈ v.adicCompletionIntegers F
       · rw [sglV_ne _ _ h]
         exact zero_mem _
     )
-  | (
-      intro w
-      by_cases h : w = v
-      · subst h
-        show evalV F w (sglV w a) ∈ _
-        rw [sglV_same]
-        exact ha
-      · show evalV F w (sglV v a) ∈ _
-        rw [sglV_ne _ _ h]
-        exact zero_mem _
-    )
 
 def sA : v.adicCompletion F →ₙ+* AF F where
   toFun a := pairA F 0 (sglV v a)
@@ -167,14 +142,7 @@ def sA : v.adicCompletion F →ₙ+* AF F where
 
 theorem sA_smul (f : F) (a : v.adicCompletion F)
     : algebraMap F (AF F) f * sA v a = sA v (algebraMap F (v.adicCompletion F) f * a) := by
-  first
-  | exact Prod.ext (mul_zero _) (sglV_smul v f a)
-  | (
-      refine Prod.ext ?_ ?_
-      · show _ * (0 : Ainf F) = 0
-        exact mul_zero _
-      · exact sglV_smul v f a
-    )
+  first | exact Prod.ext (mul_zero _) (sglV_smul v f a)
 
 theorem sA_one_mul (a : AF F) : sA v 1 * a = sA v (evalV F v (sndA F a)) := by
   refine Prod.ext ?_ ?_
@@ -194,17 +162,7 @@ theorem mem_O_of_integral {y : v.adicCompletion F} (hy : IsIntegral ℤ y) : Val
       have hm :=
         (Valuation.integer.integers (Valued.v : Valuation (v.adicCompletion F) _)).mem_of_integral
           (IsIntegral.tower_top hy)
-      first
-      | exact hm
-      | (
-          obtain ⟨o, rfl⟩ := hm
-          exact o.2
-        )
-      | (
-          rcases hm with ⟨o, ho⟩
-          rw [← ho]
-          exact o.2
-        )
+      first | exact hm
     )
   | (
       have hm :=
@@ -227,20 +185,11 @@ theorem val_coe_lt_one_iff (f : 𝓞 F)
         rw [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
         exact IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap (v := v) (r := f)
       )
-    | simp [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
-        IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
   rw [e]
-  first
-  | exact IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem v f
-  | exact (IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_dvd v f).trans
-      Ideal.dvd_span_singleton
-  | (rw [IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_dvd, Ideal.dvd_span_singleton])
+  first | exact IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem v f
 
 theorem val_coe_le_one (f : 𝓞 F) : Valued.v (((f : F) : v.adicCompletion F)) ≤ 1 := by
   first
-  | exact mem_O_of_integral v
-      ((NumberField.RingOfIntegers.isIntegral_coe f).map
-        (algebraMap F (v.adicCompletion F)).toIntAlgHom)
   | (
       rw [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
         ← IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap (v := v) (r := f) ▸ rfl]
@@ -262,9 +211,7 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
     Formalism.BasicNotions.Examples₂ in
   have adicInt_dvd_iff (x y : (v.adicCompletionIntegers F))
       : x ∣ y ↔ Valued.v (y : (v.adicCompletion F)) ≤ Valued.v (x : (v.adicCompletion F)) := by
-    first
-    | exact (adicInt_integers (K := F) v).dvd_iff_le
-    | exact Valuation.Integers.dvd_iff_le (adicInt_integers (K := F) v)
+    first | exact (adicInt_integers (K := F) v).dvd_iff_le
 
   have adicInt_max_eq_span
       (π : (v.adicCompletionIntegers F)) (hπ : Valued.v (π : (v.adicCompletion F)) = exp (-1 : ℤ))
@@ -279,15 +226,12 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
     have h1
         : ((π ^ n : (v.adicCompletionIntegers F)) : (v.adicCompletion F))
           = (π : (v.adicCompletion F)) ^ n := by
-      first | rfl | push_cast; rfl | simp
+      first | rfl | push_cast; rfl
     have hpow
         : Valued.v ((π ^ n : (v.adicCompletionIntegers F)) : (v.adicCompletion F))
           = exp (-(n : ℤ)) := by
       rw [h1, map_pow, hπ]
-      first
-      | (rw [← WithZero.exp_nsmul]; congr 1; simp)
-      | (rw [← WithZero.exp_nsmul]; simp)
-      | simp [WithZero.exp, ← ofAdd_nsmul]
+      first | (rw [← WithZero.exp_nsmul]; congr 1; simp)
     rw [adicInt_max_eq_span π hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
       adicInt_dvd_iff, hpow]
 
@@ -299,8 +243,7 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
       (x : (v.adicCompletion F)) (h : ∀ n : ℕ, Valued.v x ≤ exp (-(n : ℤ)))
       : x = 0 := by
     by_contra hx
-    have h0 : Valued.v x ≠ 0 := by
-      first | exact (Valuation.ne_zero_iff _).mpr hx | exact (map_ne_zero _).mpr hx | simpa using hx
+    have h0 : Valued.v x ≠ 0 := by first | exact (Valuation.ne_zero_iff _).mpr hx
     obtain ⟨N, hN⟩ := wz_exists_nat_lt (Valued.v x) h0
     exact absurd (h N) (not_le.mpr hN)
 
@@ -310,12 +253,7 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
     have hx' : r < Valued.v x := not_le.mp hx
     have hx0 : Valued.v x ≠ 0 := (lt_of_le_of_lt zero_le' hx').ne'
     have hmem : {y : (v.adicCompletion F) | Valued.v y = Valued.v x} ∈ 𝓝 x := by
-      first
-      | exact Valuation.loc_const hx0
-      | exact Valued.locally_const hx0
-      | exact (Valued.isOpen_sphere (v.adicCompletion F) hx0).mem_nhds rfl
-      | exact (Valued.isClopen_sphere (v.adicCompletion F) hx0).isOpen.mem_nhds rfl
-      | exact (Valued.isOpen_sphere (R := (v.adicCompletion F)) hx0).mem_nhds rfl
+      first | exact Valued.locally_const hx0
     filter_upwards [hmem] with y hy
     show ¬ Valued.v y ≤ r
     rw [show Valued.v y = Valued.v x from hy]
@@ -405,9 +343,7 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
         (N' : v.adicCompletion F) = ((N : F) : v.adicCompletion F) :=
     ⟨⟨_, val_coe_le_one v N⟩, rfl⟩
   have hmon : (Polynomial.X ^ 2 - Polynomial.C t' * Polynomial.X + Polynomial.C N').Monic := by
-    first
-    | monicity!
-    | exact Polynomial.monic_of_natDegree_le_of_coeff_eq_one 2 (by compute_degree!) (by simp)
+    first | monicity!
   have he0
       : Polynomial.eval (0 : v.adicCompletionIntegers F)
           (Polynomial.X ^ 2 - Polynomial.C t' * Polynomial.X + Polynomial.C N')
@@ -460,9 +396,7 @@ theorem roots_exist (t N : 𝓞 F) (hN : N ∈ v.asIdeal) (ht : t ∉ v.asIdeal)
     ha1,
     ?_
   ⟩
-  first
-  | rw [Valuation.map_sub_eq_of_lt_left _ (by rw [ht1]; exact ha1), ht1]
-  | rw [Valuation.map_sub_eq_of_lt_right _ (by rw [ht1]; exact ha1), ht1]
+  first | rw [Valuation.map_sub_eq_of_lt_left _ (by rw [ht1]; exact ha1), ht1]
 
 end Loc
 

@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.SandZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrobeniusIntegralityTensorAinfCoefficients
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeFreeOfCrystallineStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsOfLayers
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeFreeOfCrystalline
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeSandwichAinf
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -275,7 +276,7 @@ theorem sandwich
               IsCrys (P.PD K) T.ρ
                 → ∃ m : ℕ, Sand Mo T ((1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] (AI.π₁ ^ m) : RA LL) := by
   intro l _ P AI K s LL hg Γ R I hI E Mo T hT
-  obtain ⟨b⟩ := GlobalTheory.T.wach_lattice_free_of_crystalline l P AI K s LL hg Γ R I hI E Mo T hT
+  obtain ⟨b⟩ := _root_.GlobalTheory.HWL.lattice_free l P AI K s LL hg Γ R I hI E Mo T hT
   have hp : (P.PD K).p = l := P.PD_p K
   have hx :=
     frobenius_inclusion_X_eq_mul_Q I (by rw [hp]; exact GlobalTheory.Sandwich.φRW_teichmuller LL _)

@@ -67,8 +67,8 @@ theorem hOF_dblG
   simp only [sum_fin_add_add (n := nT), dblG, Matrix.reindex_apply, Matrix.submatrix_apply,
     Equiv.symm_apply_apply, dbl, Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂,
     Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂, Matrix.zero_apply, Matrix.neg_apply,
-    map_zero, map_neg, mul_zero, zero_mul, Finset.sum_const_zero, add_zero, zero_add, mul_neg,
-    neg_mul, Finset.sum_neg_distrib, ← sub_eq_add_neg, topR, botR, Function.comp_apply, id,
+    map_zero, map_neg, mul_zero, zero_mul, Finset.sum_const_zero, add_zero, mul_neg, neg_mul,
+    Finset.sum_neg_distrib, ← sub_eq_add_neg, topR, botR, Function.comp_apply, id,
     Finset.sum_sub_distrib]
   ring
 

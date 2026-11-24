@@ -64,8 +64,8 @@ variable {K : Type} [Field K]
 def evalForm (m : ℕ) : (Fin m → K) →ₗ[K] ProjField K m :=
   Fintype.linearCombination K fun j => algebraMap (MvPolynomial (Fin m) K) (ProjField K m) (X j)
 
-theorem algebraicIndependent_gen (m : ℕ) :
-    AlgebraicIndependent K fun j : Fin m =>
+theorem algebraicIndependent_gen (m : ℕ)
+    : AlgebraicIndependent K fun j : Fin m =>
       algebraMap (MvPolynomial (Fin m) K) (ProjField K m) (X j) :=
   (MvPolynomial.algebraicIndependent_X (Fin m) K).map'
     (f := IsScalarTower.toAlgHom K (MvPolynomial (Fin m) K) (ProjField K m))
@@ -77,9 +77,10 @@ theorem evalForm_ne_zero {m : ℕ} {φ : Fin m → K} (hφ : φ ≠ 0) : evalFor
   apply (algebraicIndependent_gen m).linearIndependent.fintypeLinearCombination_injective
   simpa only [evalForm, map_zero] using h0
 
-theorem mem_of_gen_mem {m : ℕ} (E : IntermediateField K (ProjField K m))
-    (h : ∀ j, algebraMap (MvPolynomial (Fin m) K) (ProjField K m) (X j) ∈ E) (z : ProjField K m) :
-    z ∈ E := by
+theorem mem_of_gen_mem
+    {m : ℕ} (E : IntermediateField K (ProjField K m))
+    (h : ∀ j, algebraMap (MvPolynomial (Fin m) K) (ProjField K m) (X j) ∈ E) (z : ProjField K m)
+    : z ∈ E := by
   have hp : ∀ p : MvPolynomial (Fin m) K, algebraMap _ (ProjField K m) p ∈ E := by
     intro p
     induction p using MvPolynomial.induction_on with
@@ -91,21 +92,21 @@ theorem mem_of_gen_mem {m : ℕ} (E : IntermediateField K (ProjField K m))
   obtain ⟨p, q, -, rfl⟩ := IsFractionRing.div_surjective (A := MvPolynomial (Fin m) K) z
   exact div_mem (hp p) (hp q)
 
-theorem isAlgebraic_of_adjoin {m : ℕ} (S : Set (ProjField K m))
-    (h : ∀ z, z ∈ IntermediateField.adjoin K S) :
-    Algebra.IsAlgebraic (Algebra.adjoin K S) (ProjField K m) := by
+theorem isAlgebraic_of_adjoin
+    {m : ℕ} (S : Set (ProjField K m)) (h : ∀ z, z ∈ IntermediateField.adjoin K S)
+    : Algebra.IsAlgebraic (Algebra.adjoin K S) (ProjField K m) := by
   rw [← IntermediateField.isAlgebraic_adjoin_iff_top]
   exact ⟨fun z => isAlgebraic_algebraMap (⟨z, h z⟩ : IntermediateField.adjoin K S)⟩
 
 theorem trdeg_eq (m : ℕ) : Cardinal.mk (Fin m) = Algebra.trdeg K (ProjField K m) :=
   ((algebraicIndependent_gen m).isTranscendenceBasis_iff_isAlgebraic.mpr
-    (isAlgebraic_of_adjoin _ (mem_of_gen_mem _ fun j =>
-      IntermediateField.subset_adjoin _ _ ⟨j, rfl⟩))).cardinalMk_eq_trdeg
+    (isAlgebraic_of_adjoin _
+      (mem_of_gen_mem _ fun j => IntermediateField.subset_adjoin _ _ ⟨j, rfl⟩))).cardinalMk_eq_trdeg
 
 variable [NumberField K] {i : ℕ}
 
-theorem span_dualLattice (F : HermLattice K i) :
-    Submodule.span K (dualLattice F : Set (Fin i → K)) = ⊤ := by
+theorem span_dualLattice (F : HermLattice K i)
+    : Submodule.span K (dualLattice F : Set (Fin i → K)) = ⊤ := by
   classical
   refine Submodule.eq_top_iff'.mpr fun v => ?_
   obtain ⟨S, hS⟩ := F.fg
@@ -118,7 +119,8 @@ theorem span_dualLattice (F : HermLattice K i) :
       have hg' := hint _ (Finset.mem_image_of_mem _ hg)
       rw [smul_dotProduct, Int.cast_smul_eq_zsmul]
       exact RingHom.mem_range.mpr ((IsIntegralClosure.isIntegral_iff (A := 𝓞 K)).mp hg')
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha⟩ := hx
       obtain ⟨c, hc⟩ := hy
@@ -129,30 +131,29 @@ theorem span_dualLattice (F : HermLattice K i) :
       rw [dotProduct_smul, map_mul, ha]
       rfl
   have hN' : (N : K) ≠ 0 := Int.cast_ne_zero.mpr hN
-  have := Submodule.smul_mem (Submodule.span K (dualLattice F : Set (Fin i → K))) (N : K)⁻¹
-    (Submodule.subset_span hmem)
+  have :=
+    Submodule.smul_mem (Submodule.span K (dualLattice F : Set (Fin i → K))) (N : K)⁻¹
+      (Submodule.subset_span hmem)
   rwa [inv_smul_smul₀ hN'] at this
 
 variable {F : HermLattice K i} {T : Type}
 
-theorem span_basis [Fintype T] (b : Module.Basis T ℤ (dualLattice F)) :
-    Submodule.span K (Set.range fun t => (b t : Fin i → K)) = ⊤ := by
+theorem span_basis [Fintype T] (b : Module.Basis T ℤ (dualLattice F))
+    : Submodule.span K (Set.range fun t => (b t : Fin i → K)) = ⊤ := by
   refine eq_top_iff.mpr ((span_dualLattice F).symm.le.trans (Submodule.span_le.mpr fun φ hφ => ?_))
   have h := congrArg Subtype.val (b.sum_repr ⟨φ, hφ⟩)
   simp only [Submodule.coe_sum, Submodule.coe_smul] at h
   rw [← h]
   exact Submodule.sum_mem _ fun t _ => zsmul_mem (Submodule.subset_span (Set.mem_range_self t)) _
 
-theorem dualLatticeCoord_eq (b : Module.Basis T ℤ (dualLattice F)) (t : T) :
-    dualLatticeCoord b ⟨(), t⟩ = evalForm i (b t : Fin i → K) := by
-
+theorem dualLatticeCoord_eq (b : Module.Basis T ℤ (dualLattice F)) (t : T)
+    : dualLatticeCoord b ⟨(), t⟩ = evalForm i (b t : Fin i → K) := by
   rw [dualLatticeCoord, evalForm, Fintype.linearCombination_apply, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, Algebra.smul_def, IsScalarTower.algebraMap_apply K (MvPolynomial (Fin i) K),
     MvPolynomial.algebraMap_eq]
 
 end DualArithmeticVariety
-
 
 open DualArithmeticVariety in
 theorem DualArithVar.proof (h : CoordConeArithVar.Statement) : DualArithVar.Statement := by
@@ -178,8 +179,8 @@ theorem DualArithVar.proof (h : CoordConeArithVar.Statement) : DualArithVar.Stat
     exact this
   have hwE : ∀ l, w l ∈ IntermediateField.adjoin K (Set.range v) := by
     intro l
-    have hv : ∀ l, v l ∈ IntermediateField.adjoin K (Set.range v) :=
-      fun l => IntermediateField.subset_adjoin _ _ ⟨l, rfl⟩
+    have hv : ∀ l, v l ∈ IntermediateField.adjoin K (Set.range v) := fun l =>
+      IntermediateField.subset_adjoin _ _ ⟨l, rfl⟩
     induction l using Fin.cases with
     | zero => exact hv 0
     | succ m =>
@@ -187,19 +188,23 @@ theorem DualArithVar.proof (h : CoordConeArithVar.Statement) : DualArithVar.Stat
       simpa [v, s, div_mul_cancel₀ _ hw0] using this
   have hall : ∀ z, z ∈ IntermediateField.adjoin K (Set.range v) := by
     refine mem_of_gen_mem _ fun j => ?_
-    have hX : algebraMap (MvPolynomial (Fin (n + 1)) K) (ProjField K (n + 1)) (X j) =
-        evalForm (n + 1) (Pi.single j 1) := by
+    have hX
+        : algebraMap (MvPolynomial (Fin (n + 1)) K) (ProjField K (n + 1)) (X j)
+          = evalForm (n + 1) (Pi.single j 1) := by
       rw [evalForm, Fintype.linearCombination_apply_single, one_smul]
     rw [hX]
-    exact (Submodule.span_le (p := (IntermediateField.adjoin K (Set.range v)).toSubalgebra.toSubmodule)).mpr
+    exact (Submodule.span_le
+        (p := (IntermediateField.adjoin K (Set.range v)).toSubalgebra.toSubmodule)).mpr
       (by rintro _ ⟨l, rfl⟩; exact hwE l) (hspw _)
   have hv : AlgebraicIndependent K v := by
     have := isAlgebraic_of_adjoin _ hall
-    exact (Algebra.IsAlgebraic.isTranscendenceBasis_of_le_trdeg_of_finite K v (trdeg_eq (n + 1)).le).1
+    exact (Algebra.IsAlgebraic.isTranscendenceBasis_of_le_trdeg_of_finite K v
+      (trdeg_eq (n + 1)).le).1
   have hs : AlgebraicIndependent ℚ s :=
     (hv.comp Fin.succ (Fin.succ_injective _)).restrictScalars (algebraMap ℚ K).injective
-  have hint : ∀ z ∈ Submodule.span K (Set.range w),
-      IsIntegral (IntermediateField.adjoin ℚ (Set.range s)) (z / w 0) := by
+  have hint
+      : ∀ z ∈ Submodule.span K (Set.range w),
+        IsIntegral (IntermediateField.adjoin ℚ (Set.range s)) (z / w 0) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem z hz =>
@@ -207,17 +212,26 @@ theorem DualArithVar.proof (h : CoordConeArithVar.Statement) : DualArithVar.Stat
       induction l using Fin.cases with
       | zero => rw [div_self hw0]; exact isIntegral_one
       | succ m =>
-        exact isIntegral_algebraMap (x := (⟨s m, IntermediateField.subset_adjoin _ _ ⟨m, rfl⟩⟩ :
-          IntermediateField.adjoin ℚ (Set.range s)))
-    | zero => rw [zero_div]; exact isIntegral_zero
-    | add x y _ _ hx hy => rw [add_div]; exact hx.add hy
+        exact isIntegral_algebraMap
+          (x :=
+            (⟨s m, IntermediateField.subset_adjoin _ _ ⟨m, rfl⟩⟩
+              : IntermediateField.adjoin ℚ (Set.range s)))
+    | zero =>
+      rw [zero_div]; exact isIntegral_zero
+    | add x y _ _ hx hy =>
+      rw [add_div]; exact hx.add hy
     | smul c x _ hx =>
       rw [Algebra.smul_def, mul_div_assoc]
       set_option synthInstance.maxHeartbeats 200000 in
-        exact ((Algebra.IsIntegral.isIntegral (R := ℚ) c).map
-          (IsScalarTower.toAlgHom ℚ K (ProjField K (n + 1)))).tower_top.mul hx
-  refine h Unit (dualBlocks T) (ProjField K (n + 1)) (dualLatticeCoord b) (fun _ => u 0) n s ⟨()⟩
-    (fun _ => by rw [hy]; exact hw0) hs (fun l => IntermediateField.subset_adjoin _ _ ⟨⟨(), u l.succ⟩, ?_⟩) ?_
+      exact ((Algebra.IsIntegral.isIntegral (R := ℚ) c).map
+        (IsScalarTower.toAlgHom ℚ K (ProjField K (n + 1)))).tower_top.mul hx
+  refine h Unit (dualBlocks T) (ProjField K (n + 1)) (dualLatticeCoord b)
+    (fun _ => u 0)
+    n s ⟨()⟩
+    (fun _ => by rw [hy]; exact hw0)
+    hs
+    (fun l => IntermediateField.subset_adjoin _ _ ⟨⟨(), u l.succ⟩, ?_⟩)
+    ?_
   · show dualLatticeCoord b ⟨(), u l.succ⟩ / dualLatticeCoord b ⟨(), u 0⟩ = w l.succ / w 0
     rw [hy, hy]
   · rintro r ⟨⟨⟨⟩, t⟩, rfl⟩

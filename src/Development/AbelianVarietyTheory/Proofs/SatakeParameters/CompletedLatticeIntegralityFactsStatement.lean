@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.NTheta Formalism.IndefR.Mult
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.completedLattice_integrality
     : ∀ {D : D7} (V : HSp D),
       (∀ a ∈ intAE D, ∀ y ∈ LamHat V, (fun i => a * y i) ∈ LamHat V)
@@ -69,8 +70,4 @@ theorem _root_.GlobalTheory.T.completedLattice_integrality
                   = ε
                     • (1 : Matrix (Fin V.rank) (Fin V.rank)
                       (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) :=
-  by
-    first
-    | exact @GlobalTheory.LatIntFacts.int_facts
-    | exact GlobalTheory.LatIntFacts.int_facts
-    | (intros; apply GlobalTheory.LatIntFacts.int_facts <;> assumption)
+  by first | exact @GlobalTheory.LatIntFacts.int_facts

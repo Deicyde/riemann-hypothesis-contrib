@@ -125,8 +125,7 @@ theorem isPullback_mul {S : Scheme.{0}} (G : Over S) [GrpObj G]
     inv := lift (fst G G * (snd G G)⁻¹) (snd G G)
     hom_inv_id := by
       apply CartesianMonoidalCategory.hom_ext <;> simp [MonObj.comp_mul, GrpObj.comp_inv]
-    inv_hom_id := by
-      apply CartesianMonoidalCategory.hom_ext <;> simp [MonObj.comp_mul, GrpObj.comp_inv]
+    inv_hom_id := by apply CartesianMonoidalCategory.hom_ext <;> simp [MonObj.comp_mul]
   }
   have h : IsPullback (fst G G).left (snd G G).left G.hom G.hom := IsPullback.of_hasPullback _ _
   refine h.of_iso ((Over.forget S).mapIso e.symm) (Iso.refl _) (Iso.refl _) (Iso.refl _) ?_ ?_

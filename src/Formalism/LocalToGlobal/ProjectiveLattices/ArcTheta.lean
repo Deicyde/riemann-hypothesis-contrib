@@ -44,8 +44,6 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace Formalism.L2.Pj
@@ -134,7 +132,6 @@ theorem frame_of_gen
       gs_appLE h _ _ _ g y (hj hy) _
     rw [Category.id_comp] at e1
     rw [e1, e2, hgh]
-    all_goals rfl
   · intro s''
     have hle : ∀ j, m1.φ ⁻¹ᵁ Xo.univ.t.PP.L.U j ≤ g0 ⁻¹ᵁ (PPx x).U (fun _ => j) := by
       intro j y hy

@@ -146,11 +146,11 @@ theorem exists_latticeCompletion_cut_to_places_finiteReal
         hx,
         rfl
       ⟩,
-      fun i => GlobalTheory.KStabBridge.infPart_pair _ _,
+      fun i => _root_.GlobalTheory.LatVac.infPart_pair _ _,
       fun i => ?_
     ⟩
     · rw [map_mul, evalV_indP, if_neg hw, zero_mul]
-    · rw [GlobalTheory.KStabBridge.finPart_pair, one_mul, Algebra.TensorProduct.tmul_mul_tmul,
+    · rw [_root_.GlobalTheory.LatVac.finPart_pair, one_mul, Algebra.TensorProduct.tmul_mul_tmul,
         one_mul]
   | zero =>
     refine ⟨0, zero_mem (latV S L P), fun i => (infPart D).map_zero, fun i => ?_⟩
@@ -204,7 +204,7 @@ theorem mem_latV_iff
   obtain ⟨y', hy', h1, h2⟩ := exists_lift_latV S L P h
   have : y' = y :=
     funext fun i =>
-      GlobalTheory.VacStabFixed.parts_ext
+      _root_.GlobalTheory.SplitScalar.adele_ext
         (by
           rw [((mem_supportedOnPlacesIdeal_iff_components_zero_elsewhere D P _).1 (h1 i)).1,
             ((mem_supportedOnPlacesIdeal_iff_components_zero_elsewhere D P _).1 (hy i)).1])
@@ -279,7 +279,7 @@ theorem levelOpen_of_inK
   · have := GlobalTheory.KStabBridge.latHat_smul _ (one_sub_indP_int P) hz
     rwa [TensorProduct.sub_tmul, ← Algebra.TensorProduct.one_def] at this
   · rw [← fin_sub_one]; exact e_mul_fin (hI i j)
-  · choose lift hl1 hl2 using GlobalTheory.KStabBridge.exists_fin_lift (D := D)
+  · choose lift hl1 hl2 using _root_.GlobalTheory.VacInert.exists_lift (D := D)
     let y : Fin S.rank → AE D := fun i => lift ((indP D P ⊗ₜ[D.host.F] (1 : D.host.E)) * z i)
     have hy : ∀ i, y i ∈ idAt D P := fun i => mem_idAt_of_fin P (hl1 _) (hl2 _)
     have hfy : finPart D ∘ y = (indP D P ⊗ₜ[D.host.F] (1 : D.host.E)) • z := funext fun i => hl2 _
@@ -363,7 +363,7 @@ private theorem selfDual_isFullLattice {D : D7}
       refine ⟨b + c, ?_⟩
       change (b : D.host.E) + c = _
       rw [hb, hc]
-      simp [f, map_add, add_mul, Finset.sum_add_distrib, mul_add]
+      simp [f, add_mul, Finset.sum_add_distrib, mul_add]
     smul_mem' := by
       rintro c x ⟨b, hb⟩
       refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩

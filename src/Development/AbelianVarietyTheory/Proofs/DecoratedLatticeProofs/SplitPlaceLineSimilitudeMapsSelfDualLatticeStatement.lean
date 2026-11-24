@@ -54,6 +54,7 @@ open GlobalTheory.RootEx GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Spl
   GlobalTheory.MiTop GlobalTheory.Fam ValuativeRel
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitPlace_line_similitude_maps_selfDual_lattice
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k) (L L'' : HSp D)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.splitPlace_line_similitude_maps_selfDual_lattice
         → τᴴ * (L.gram * τ) = (-(D.host.xi0 * star D.host.xi0)) • L''.gram
         → ∀ y ∈ GlobalTheory.FinPl.latV L'' LZ (· = q.v),
           (rat τ : Mx D L.rank L''.rank) *ᵥ y ∈ GlobalTheory.FinPl.latV L LL (· = q.v) := by
-  first
-  | exact @GlobalTheory.SplitLineSim.line_sim_maps
-  | exact GlobalTheory.SplitLineSim.line_sim_maps
-  | (intros; apply GlobalTheory.SplitLineSim.line_sim_maps <;> assumption)
+  first | exact @GlobalTheory.SplitLineSim.line_sim_maps

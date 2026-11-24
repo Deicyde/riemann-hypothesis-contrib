@@ -4,11 +4,12 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CombAtS
 public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 public import Formalism.SharpRestriction.CuspSpanNormBounds.BesselShellMomentBounds
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.IndicatorFunctionIdentity
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticePairCharacterIndicatorTransformEqCosetIndStatement
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceBaseVacuumDatumExistsUniqueStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceDatumBoxTensorLineOverVacuumStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ThetaSliceLineSumEqIntertwinerImageStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatIndLastKerRow
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticePairCharacterIndicatorTransformEqCosetInd
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceDatumBoxTensorLineOverVacuum
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ThetaSliceLineSumEqIntertwinerImage
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsClopenIsCompactQLat
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceBaseVacuumDatumExistsUniqueStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -46,7 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatIndLastKerRow
+import Mathlib.Tactic.Basify
 
 @[expose] public section
 
@@ -57,6 +58,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
   GlobalTheory.SeeSaw ValuativeRel IsLocalRing
 open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastKer lastPair cosetInd withRow)
 open GlobalTheory.FinPl.ExtZero (rowFun)
+
 theorem _root_.GlobalTheory.T.lastSeesaw_datum_eq_lattice_pair_over_vacuum
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (p : SplitPt D k) (q : Unif k) (ψ : AddChar (AF D.host.F) ℂ),
@@ -87,8 +89,8 @@ theorem _root_.GlobalTheory.T.lastSeesaw_datum_eq_lattice_pair_over_vacuum
   intro D k _ _ _ _ p q ψ hψ hU χ hχ hc n n' n'' _ _ _ _ _ _ V₀ A L S X T L'' o o'' ζ ζ₀ hζ hζ₀ τ
     lam hτ hlam hG
   obtain ⟨ε, hε⟩ :=
-    GlobalTheory.T.latticePairCharacterIndicator_transform_eq_cosetIndicator D k p q ψ hψ hU χ hχ hc
-      n L S L'' ζ ζ₀ hζ hζ₀ τ lam hτ hlam hG
+    _root_.GlobalTheory.KapStep.kapStep D k p q ψ hψ hU χ hχ hc n L S L'' ζ ζ₀ hζ hζ₀ τ lam hτ hlam
+      hG
   refine ⟨ε, ?_⟩
   intro α α₀ β γ γ₀ hα hγ Q Λ _ Ψ LS LT LX hLS hLT hLX hβQ hγΛ L₁ L₂ f₁ Ξ Φ₂ hΞ hΦ₂ u
   have hchar : charInd (resChar χ hχ q) Q ≠ 0 := by
@@ -101,8 +103,8 @@ theorem _root_.GlobalTheory.T.lastSeesaw_datum_eq_lattice_pair_over_vacuum
     simp only [charInd, vecInd, Q.lat.zero_mem, ite_true, mul_one, Pi.zero_apply] at h0
     exact hne _ h0
   obtain ⟨g₁, T₁, hg₁, hT₁, hT₁a⟩ :=
-    GlobalTheory.T.thetaSlice_lineSum_eq_intertwiner_image D k p n n' ψ hψ hU V₀ A L S o ζ hζ α α₀ β
-      hα Ψ (charInd (resChar χ hχ q) Q) hchar LS hLS L₁ L₂ f₁ Ξ hΞ u
+    _root_.GlobalTheory.LastTgtSlice.main D k p n n' ψ hψ hU V₀ A L S o ζ hζ α α₀ β hα Ψ
+      (charInd (resChar χ hχ q) Q) hchar LS hLS L₁ L₂ f₁ Ξ hΞ u
   obtain ⟨g₃, T₃, hg₃, hT₃, hT₃b⟩ := hε β LS hLS Q g₁ T₁ hg₁ hT₁
   have hO2 : Over ψ β γ LS LT Φ₂ (latInd Q.lat Λ) Φ₂ :=
     ((GlobalTheory.T.splitPlace_baseVacuum_datum_exists_unique D) k p n'' n ψ hψ S T β γ LS LT hLS
@@ -128,9 +130,9 @@ theorem _root_.GlobalTheory.T.lastSeesaw_datum_eq_lattice_pair_over_vacuum
       : tensRow (latInd Q.lat Λ) (cosetInd q Q.lat (ε • Q).red) ∈ SB (Matrix (n'' ⊕ Fin 1) n k) :=
     hrow ▸ GlobalTheory.IndefiniteRowSideFullHecke.IndicatorFunctionIdentity.phiOne_mem _ _
   obtain ⟨g, hg⟩ :=
-    GlobalTheory.T.splitPlace_datum_boxTensor_line_over_vacuum D k p n n'' ψ hψ hU S X T L'' o'' ζ₀
-      hζ₀ β γ γ₀ hγ LS LT LX hLS hLT hLX Φ₂ Φ₂ (latInd Q.lat Λ) hO2 (cosetInd q Q.lat (ε • Q).red)
-      g₃ T₃ hg₃ hT₃ hSB
+    _root_.GlobalTheory.FinPl.BoxDatum.over_boxT D k p n n'' ψ hψ hU S X T L'' o'' ζ₀ hζ₀ β γ γ₀ hγ
+      LS LT LX hLS hLT hLX Φ₂ Φ₂ (latInd Q.lat Λ) hO2 (cosetInd q Q.lat (ε • Q).red) g₃ T₃ hg₃ hT₃
+      hSB
   refine ⟨g, ?_⟩
   rw [← hrow]
   have hl

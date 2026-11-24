@@ -287,7 +287,6 @@ variable
   {D : D7} {u : D.what₂.Word} {eV : (D.mem u).A.vT ≃ PlT D u} {i : ℕ} {hi : i ≤ D.R.m}
   {K : ClsTied u i hi}
 
-
 def formsInOne (V : ValTied u eV i hi K) (dt : DetTie K.lev) : FormsIn (D.fm u) i hi where
   T := (D.mem u).A.T
   bad := badG D

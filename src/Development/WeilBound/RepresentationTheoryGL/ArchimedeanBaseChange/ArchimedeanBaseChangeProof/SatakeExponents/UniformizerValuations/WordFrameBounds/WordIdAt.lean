@@ -51,8 +51,6 @@ open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
-
-
 open PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcN.F2
 
 namespace PositivityTheory.Rg.BcB.F.B3

@@ -48,6 +48,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.symplecticLevel_extends_noetherian_normalDomain
         → ∃ (P : PolAV (Sp R)) (ψ : P.A.left ⟶ P₁.A.left),
           P.g = P₁.g ∧ IsGrpPullback P.A P₁.A (spMap h) ψ ∧ LBIso P.L (P₁.L.pull ψ)
             ∧ Nonempty (Out.Level P K (unitOn ze)) := by
-  first
-  | exact @GlobalTheory.SympLevelExt.level_extends
-  | exact GlobalTheory.SympLevelExt.level_extends
-  | (intros; apply GlobalTheory.SympLevelExt.level_extends <;> assumption)
+  first | exact @GlobalTheory.SympLevelExt.level_extends

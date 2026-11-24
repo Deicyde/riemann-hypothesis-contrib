@@ -47,8 +47,6 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical

@@ -131,11 +131,7 @@ section Comparison₂
 variable {D : D7}
 
 theorem barE_barE (D : D7) (a : 𝓞 D.host.E) : barE D (barE D a) = a := by
-  first
-  | (apply RingOfIntegers.ext; simp [barE])
-  | (apply RingOfIntegers.ext; simp [barE, RingOfIntegers.mapRingEquiv, RingOfIntegers.mapRingHom])
-  | (apply RingOfIntegers.ext; exact IsCMField.complexConj_apply_apply _)
-  | simp [barE]
+  first | (apply RingOfIntegers.ext; simp [barE])
 
 theorem piG_ne_zero' (EX : ErrX D) (i : Fin 2) : ((EX.piG i : 𝓞 D.host.E) : D.host.E) ≠ 0 := by
   intro h0
@@ -159,10 +155,7 @@ theorem barE_piG_mem (EX : ErrX D) (i : Fin 2)
         = (D.host.g i : D.host.E) / ((EX.piG i : 𝓞 D.host.E) : D.host.E) := by
     rw [eq_div_iff hne, mul_comm]; exact h2
   rw [h3]
-  first
-  | exact div_mem (natCast_mem _ _) (EX.piG_K i)
-  | exact IntermediateField.div_mem _ (IntermediateField.natCast_mem _ _) (EX.piG_K i)
-  | exact D.host.K.div_mem (D.host.K.natCast_mem _) (EX.piG_K i)
+  first | exact div_mem (natCast_mem _ _) (EX.piG_K i)
 
 def toOK (x : 𝓞 D.host.E) (hx : (x : D.host.E) ∈ D.host.K) : 𝓞 D.host.K := ⟨
   ⟨(x : D.host.E), hx⟩,
@@ -172,7 +165,7 @@ def toOK (x : 𝓞 D.host.E) (hx : (x : D.host.E) ∈ D.host.K) : 𝓞 D.host.K 
 
 theorem algebraMap_toOK (x : 𝓞 D.host.E) (hx : (x : D.host.E) ∈ D.host.K)
     : algebraMap (𝓞 D.host.K) (𝓞 D.host.E) (toOK x hx) = x := by
-  first | exact RingOfIntegers.ext rfl | rfl | (apply RingOfIntegers.ext; simp [toOK])
+  first | exact RingOfIntegers.ext rfl
 
 abbrev halfI (T : Core D) (i : Fin 2) : Ideal (𝓞 D.host.E) :=
   (T.pb i).asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))
@@ -299,7 +292,7 @@ variable
   (nW Dp Dm : ℕ → ℕ)
 
 theorem tPos_depDataOf : TPos (depDataOf T EX Tn vd aL aF nW Dp Dm) := by
-  first | exact PNat.one_le Tn | exact Tn.pos
+  first | exact PNat.one_le Tn
 
 theorem piSplit_depDataOf [StarRing (𝓞 D.host.E)]
     : PiSplit (H := T.Q.H) (depDataOf T EX Tn vd aL aF nW Dp Dm) := by
@@ -313,7 +306,7 @@ theorem piHalf_depDataOf (h : LawsM T) : PiHalf T.Q.l (depDataOf T EX Tn vd aL a
 
 theorem levelQ_depDataOf [StarRing (𝓞 D.host.E)] (h : LawsM T)
     : LevelQ (l := T.Q.l) (depDataOf T EX Tn vd aL aF nW Dp Dm) := by
-  first | exact level_M T h | (unfold LevelQ; simp [level_M T h, depDataOf, depPageOf])
+  first | exact level_M T h
 
 def HalfEX (T : Core D) (EX : ErrX D) : Prop := ∀ i, barE D (EX.piG i) ∈ halfI T i
 

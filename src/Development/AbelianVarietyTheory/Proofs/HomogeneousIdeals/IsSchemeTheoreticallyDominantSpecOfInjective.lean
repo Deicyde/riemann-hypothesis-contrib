@@ -75,21 +75,9 @@ theorem isSchemeTheoreticallyDominant_spec_of_injective
     {R A : CommRingCat.{u}} (φ : R ⟶ A) (hφ : Function.Injective φ)
     : IsSchemeTheoreticallyDominant (Spec.map φ) := by
   first
-  | exact @_root_.GlobalTheory.SchemeDominantSpecMap.isSchemeTheoreticallyDominant_specMap
-  | exact _root_.GlobalTheory.SchemeDominantSpecMap.isSchemeTheoreticallyDominant_specMap
   | (
       apply _root_.GlobalTheory.SchemeDominantSpecMap.isSchemeTheoreticallyDominant_specMap
         <;> assumption
-    )
-  | (
-      intros
-      apply _root_.GlobalTheory.SchemeDominantSpecMap.isSchemeTheoreticallyDominant_specMap
-        <;> assumption
-    )
-  | (
-      intros
-      apply @_root_.GlobalTheory.SchemeDominantSpecMap.isSchemeTheoreticallyDominant_specMap
-        <;> first | assumption | infer_instance
     )
   | (
       intros

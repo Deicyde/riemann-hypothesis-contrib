@@ -57,7 +57,4 @@ theorem _root_.GlobalTheory.T.isSchwartzBruhatHalf_iff_pullback_matrix
             IsSBHalf a Λ Ψ
               → ∃ Φ ∈ GlobalTheory.SplitWeil.SB (Matrix (Fin m) (Fin n) (Fv D.host.F v)),
                 Ψ = pull a κ Φ := by
-  first
-  | exact @GlobalTheory.HalfCoordSB.isSBHalf_iff_pull
-  | exact GlobalTheory.HalfCoordSB.isSBHalf_iff_pull
-  | (intros; apply GlobalTheory.HalfCoordSB.isSBHalf_iff_pull <;> assumption)
+  first | exact @GlobalTheory.HalfCoordSB.isSBHalf_iff_pull

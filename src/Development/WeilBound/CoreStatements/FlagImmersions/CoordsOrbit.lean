@@ -2,14 +2,16 @@ module
 
 public import Development.WeilBound.CoreStatements.FlagImmersions.Transport
 public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.DifferentiableOnOfTendstoLocallyUniformlyOn
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPointStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsAt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolomorphicCoordsOfGenericPoint
 public import Development.WeilBound.CoreStatements.VolumeEquality.CoverRootsSch
+public import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-public import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
@@ -204,9 +206,9 @@ theorem potLoc : PotLoc := by
   have hco : ∀ t ∈ B, CoordsAt Or.𝔐.ξ RM.y (z t) (γ t) := fun t ht =>
     coords_orbit (hpt t ht.1).2.1 (horb t ht)
   have hz : IsHolTo B z :=
-    GlobalTheory.T.holomorphic_coords_of_generic_point _ _ Or.𝔐.ξ _ _ RM.y Or.𝔐.tie Or.𝔐.all _ B γ z
-      hB (differentiableOn_pi.2 fun q t ht => (hγ t ht q).differentiableAt.differentiableWithinAt)
-      hco
+    _root_.GlobalTheory.CompanionTheory.Ar.PeriodsHol.isHolTo_of_coordsAt_family _ _ Or.𝔐.ξ _ _ RM.y
+      Or.𝔐.tie Or.𝔐.all _ B γ z hB
+      (differentiableOn_pi.2 fun q t ht => (hγ t ht q).differentiableAt.differentiableWithinAt) hco
   have hop : ∀ t ∈ V, Or.Re.π (w t) ∈ Sys.open' := fun t ht => by
     rw [hπ]
     exact (hpt t ht).1

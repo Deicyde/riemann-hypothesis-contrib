@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBPull
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -439,7 +440,6 @@ theorem grep_step (D : DegPre R) (n : ℕ)
     fun y J hJ => ?_
   ⟩
   have C : IsCub (cubV D.cub (T := 𝟙_ _) y J) := isCub_cubV D.cub hJ
-  beta_reduce
   rw [Category.comp_id, C.N_one, C.face, normd_one (u := D.sym) ⟨D.sym_gen, D.sym_rig⟩ hJ]
   simp
 

@@ -50,6 +50,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.heisenbergTranslate_theta_continuous_differentiable_sobolev
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.heisenbergTranslate_theta_continuous_differentiabl
                               ((t⁻¹ : ℂ) • (heisO ψ S T (L t) f - f)
                                 - fun p => deriv (fun t : ℝ => heisO ψ S T (L t) f p) 0))
                           (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
-  first
-  | exact @GlobalTheory.HeisTaylor.heisO_taylor
-  | exact GlobalTheory.HeisTaylor.heisO_taylor
-  | (intros; apply GlobalTheory.HeisTaylor.heisO_taylor <;> assumption)
+  first | exact @GlobalTheory.HeisTaylor.heisO_taylor

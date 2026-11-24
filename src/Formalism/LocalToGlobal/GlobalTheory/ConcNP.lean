@@ -104,7 +104,6 @@ theorem wsum
   have e1 : 2 * (P * P) * (eu + 2 * P * eu) = 2 * (P * P * eu) + 4 * (P ^ 3 * eu) := by ring
   nlinarith [a1, a2, a3, a4, e1]
 
-
 theorem weight_numbers_bound : WeightNumbersBound := by
   intro ε Cs hε hε1
   filter_upwards [Filter.eventually_ge_atTop (max 10 (100 * Cs ^ 2 + 1))] with x hx

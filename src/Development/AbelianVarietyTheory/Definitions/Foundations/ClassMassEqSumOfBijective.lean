@@ -48,6 +48,9 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Adelstab
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.AdelstabL
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Transport
 
 @[expose] public section
 
@@ -326,7 +329,7 @@ theorem exists_swapPts
     : ∃ e : HA R σ J ≃* UPts σ J R, ∀ g,
       (e g : GL (Fin M) (E ⊗[F] R))
         = bc (swapTens F E R : R ⊗[F] E →+* E ⊗[F] R) (HA.mat R σ J g) :=
-  Formalism.UG.Final.UJTransport _ _ (Fin M)
+  _root_.Formalism.UG.P.unitary_group_transport _ _ (Fin M)
     (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR R σ) (Formalism.UG.sigR σ R)
     (swapTens F E R) (RingHom.ext (swapTens_sig R σ)) (JR R J)
 
@@ -560,7 +563,7 @@ theorem finiteClasses_unitary
     map_swapPts_rat]
   exact ⟨
     Formalism.UG.Final.ClassSetFinite F E _ σ J hτ hH hJ.2.isUnit hd,
-    Formalism.UG.Final.AdelicStabFinite F E _ σ J hτ hH hJ.2.isUnit hd
+    _root_.Formalism.UG.P.adelic_stabilizer_finite_holds F E _ σ J hτ hH hJ.2.isUnit hd
   ⟩
 
 theorem finiteClasses_lattice
@@ -577,8 +580,10 @@ theorem finiteClasses_lattice
       (swapPts (Af F) σ J).injective.injOn,
     map_swapPts_rat]
   exact ⟨
-    Formalism.UG.Final.ClassSetFiniteL F E _ σ J hτ hH hJ.2.isUnit hd Λ hΛ hsp,
-    Formalism.UG.Final.AdelicStabFiniteL F E _ σ J hτ hH hJ.2.isUnit hd Λ hΛ hsp
+    _root_.Formalism.UG.P.lattice_class_set_finite_local_holds F E _ σ J hτ hH hJ.2.isUnit hd Λ hΛ
+      hsp,
+    _root_.Formalism.UG.P.adelic_stabilizer_finite_lattice_holds F E _ σ J hτ hH hJ.2.isUnit hd Λ hΛ
+      hsp
   ⟩
 
 theorem unitaryMass_pos

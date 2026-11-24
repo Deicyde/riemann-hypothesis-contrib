@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBlockOrderedSumEquivTrueIndex
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LeadingMinorFlagDensityGlueLowerUnitriangularStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LintegralLeadingMinorFlagDensityPosDefStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LeadingMinorFlagDensityGlueLowerUnitriangular
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LintegralLeadingMinorFlagDensityPosDef
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,8 +65,7 @@ theorem shear_neg_J {p q : ℕ} (Z : Matrix (Fin p) (Fin q) ℂ)
   simp [shear, Jpq, hQ, fromBlocks_neg, fromBlocks_conjTranspose, fromBlocks_multiply,
     sub_eq_neg_add]
 
-theorem flagConst_pos (m : ℕ) : 0 < flagConst m :=
-  Finset.prod_pos fun i _ => by have := Real.pi_pos; positivity
+alias flagConst_pos := _root_.GlobalTheory.TrueCx.flagConst_pos
 
 theorem lintegral_dens_glue
     : ∀ (r p q : ℕ) (e : Fin r ≃ Fin p ⊕ Fin q),
@@ -105,8 +104,7 @@ theorem lintegral_dens_glue
           = (ENNReal.ofReal (d ^ (-(2 * p : ℤ))) * ENNReal.ofReal (dens (hQ Z) b.1))
             * ENNReal.ofReal (dens B b.2) := by
     intro b
-    rw [GlobalTheory.T.leadingMinorFlagDensity_glueLowerUnitriangular r p q e he A (v, b)
-        (by rw [hA]; exact h22 ▸ hu),
+    rw [_root_.GlobalTheory.FlagFibre.dens_glue r p q e he A (v, b) (by rw [hA]; exact h22 ▸ hu),
       hA]
     simp only [← hZ]
     rw [h22, hs, dens_neg, hdd, Complex.norm_real, Real.norm_of_nonneg hd0.le,
@@ -121,9 +119,9 @@ theorem lintegral_dens_glue
       ((measurable_dens _).ennreal_ofReal.const_mul _).aemeasurable
       (measurable_dens _).ennreal_ofReal.aemeasurable,
     lintegral_const_mul _ (measurable_dens _).ennreal_ofReal,
-    GlobalTheory.T.lintegral_leadingMinorFlagDensity_posDef _ _ hH,
-    GlobalTheory.T.lintegral_leadingMinorFlagDensity_posDef _ _ hBp, hdet, hdd,
-    ← Complex.ofReal_inv, Complex.ofReal_re, Complex.ofReal_re]
+    _root_.GlobalTheory.FlagFibre.FlagInt.lintegral_dens _ _ hH,
+    _root_.GlobalTheory.FlagFibre.FlagInt.lintegral_dens _ _ hBp, hdet, hdd, ← Complex.ofReal_inv,
+    Complex.ofReal_re, Complex.ofReal_re]
   have hp := flagConst_pos p
   have hq := flagConst_pos q
   rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity)]

@@ -76,7 +76,7 @@ theorem coh_of_succ
     : x ∈ Coh l := by
   intro a b hab
   induction b, hab using Nat.le_induction with
-  | base => simp [ZMod.castHom_apply, ZMod.cast_id']
+  | base => simp
   | succ n hn ih => rw [← ih, ← h n, ← RingHom.comp_apply, ZMod.castHom_comp]
 
 theorem tensor_form {M : Type*} [AddCommGroup M] [Module ℤ_[l] M] (z : ℚ_[l] ⊗[ℤ_[l]] M)
@@ -88,7 +88,6 @@ theorem tensor_form {M : Type*} [AddCommGroup M] [Module ℤ_[l] M] (z : ℚ_[l]
     refine ⟨b, a • m, nonZeroDivisors.ne_zero hb, ?_⟩
     rw [← TensorProduct.smul_tmul, Algebra.smul_def]
     congr 1
-    try simp [div_eq_mul_inv, mul_comm]
   | add z z' ih ih' =>
     obtain ⟨b, x, hb, rfl⟩ := ih
     obtain ⟨b', x', hb', rfl⟩ := ih'

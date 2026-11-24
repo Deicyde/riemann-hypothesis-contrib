@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_sphericalOperators_rows_normal_eigenspaces
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_sphericalOperators_rows_normal_eigenspaces
                       Good R A.μ0 P → IsLab (Yc D 0) P d
                         → h P (Finsupp.single d 1) x = c P (dualLab d) • x)
                     → x ∈ EEc R SF c := by
-  first
-  | exact @GlobalTheory.Hk3.OpsRows.exists_opsE
-  | exact GlobalTheory.Hk3.OpsRows.exists_opsE
-  | (intros; apply GlobalTheory.Hk3.OpsRows.exists_opsE <;> assumption)
+  first | exact @GlobalTheory.Hk3.OpsRows.exists_opsE

@@ -51,6 +51,7 @@ import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.EigenfunctionFiniteCoefficients
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormPosOfIsUnit
 
 @[expose] public section
 
@@ -89,7 +90,7 @@ theorem exists_frame (W : Submodule ℂ (Fin n → ℂ))
     ext i
     simp only [Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.conjTranspose_apply, B,
       Matrix.of_apply, EuclideanSpace.inner_eq_star_dotProduct, WithLp.ofLp_sum, WithLp.ofLp_smul,
-      Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum]
+      Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun l _ => ?_
     simp only [Pi.star_apply]
@@ -133,7 +134,7 @@ theorem proj_frame {P : Matrix (Fin n) (Fin n) ℂ} (h : Pᴴ = P) (h' : P * P =
   obtain ⟨r, B, h1, h2⟩ := exists_frame (LinearMap.ker (Matrix.toLin' (P - 1)))
   have memP : ∀ x, x ∈ LinearMap.ker (Matrix.toLin' (P - 1)) ↔ P *ᵥ x = x := by
     intro x
-    simp [Matrix.toLin'_apply, Matrix.sub_mulVec, sub_eq_zero]
+    simp [Matrix.toLin'_apply, sub_eq_zero]
   have hRR : (B * Bᴴ) * (B * Bᴴ) = B * Bᴴ := by
     rw [Matrix.mul_assoc, ← Matrix.mul_assoc Bᴴ B Bᴴ, h1, Matrix.one_mul]
   have hPR : P * (B * Bᴴ) = B * Bᴴ :=
@@ -194,8 +195,8 @@ theorem Q_tor (hQ : Q * Q = Q) (hQP : Q * P = 0) (c d : ℂ) : Q * tor P Q c d =
 theorem tor_tor
     (hP : P * P = P) (hQ : Q * Q = Q) (hPQ : P * Q = 0) (hQP : Q * P = 0) (c d c' d' : ℂ)
     : tor P Q c d * tor P Q c' d' = tor P Q (c * c') (d * d') := by
-  simp only [tor, add_mul, mul_add, one_mul, mul_one, smul_mul_assoc, mul_smul_comm, smul_smul, hP,
-    hQ, hPQ, hQP, smul_zero, add_zero]
+  simp only [tor, add_mul, mul_add, one_mul, mul_one, smul_mul_assoc, mul_smul_comm, hP, hQ, hPQ,
+    hQP, smul_zero, add_zero]
   module
 
 theorem tor_one : tor P Q 1 1 = 1 := by simp [tor]
@@ -392,19 +393,18 @@ theorem mid_facts
     simp only [mul_sub, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ, hJ]
     module
   · simp only [mid, smul_mul_assoc]
-    simp only [mul_sub, sub_mul, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ, hJ]
+    simp only [mul_sub, sub_mul, add_mul, mul_one, one_mul, mul_assoc, hJJ, hJ]
     module
   · simp only [mid, mul_smul_comm]
-    simp only [mul_sub, sub_mul, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ, hJ, hPP, h',
-      hi', hi'', mul_zero, zero_mul, sub_zero, add_zero]
+    simp only [mul_sub, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ, hPP, h', hi', hi'',
+      add_zero]
     module
   · simp only [mid, smul_mul_assoc]
-    simp only [mul_sub, sub_mul, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ, hJ, hPP, h',
-      hi', hi'', mul_zero, zero_mul, sub_zero, add_zero]
+    simp only [mul_sub, sub_mul, add_mul, mul_one, one_mul, mul_assoc, hJJ, h', hi', mul_zero,
+      sub_zero, add_zero]
     module
-  · simp only [mid, Matrix.trace_smul, mul_sub, sub_mul, mul_add, add_mul, mul_one, one_mul,
-      mul_assoc, hJJ, hPP, hi', hi'', Matrix.trace_sub, Matrix.trace_add, htr1, htr2, htr3,
-      smul_eq_mul]
+  · simp only [mid, Matrix.trace_smul, mul_sub, mul_add, add_mul, mul_one, one_mul, mul_assoc, hJJ,
+      Matrix.trace_sub, Matrix.trace_add, htr1, htr2, htr3, smul_eq_mul]
     ring
 
 private theorem mul_mul_right_of_mul_eq
@@ -617,27 +617,23 @@ theorem exists_K
   refine ⟨B * Cᴴ + J * (B * (Cᴴ * J)) + D * D'ᴴ + E * E'ᴴ, ?_, ?_, ?_⟩
   · simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
       Matrix.conjTranspose_conjTranspose, hJ', Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc,
-      Matrix.mul_neg, Matrix.neg_mul, neg_neg, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
-      neg_zero, Matrix.mul_one, Matrix.one_mul, hJ, mul_mul_right_of_mul_eq hJ, hBB,
-      mul_mul_right_of_mul_eq hBB, hDD, mul_mul_right_of_mul_eq hDD, hEE,
-      mul_mul_right_of_mul_eq hEE, hBJB', mul_mul_mul_right_of_mul_mul_eq hBJB, hBD,
-      mul_mul_right_of_mul_eq hBD, hBE, mul_mul_right_of_mul_eq hBE, hDB,
-      mul_mul_right_of_mul_eq hDB, hEB, mul_mul_right_of_mul_eq hEB, hDE,
-      mul_mul_right_of_mul_eq hDE, hED, mul_mul_right_of_mul_eq hED, hJD,
-      mul_mul_right_of_mul_eq hJD, hJE, mul_mul_right_of_mul_eq hJE, hDJ,
-      mul_mul_right_of_mul_eq hDJ, hEJ, mul_mul_right_of_mul_eq hEJ]
-    first | exact hC' | (rw [← hC']; abel)
+      Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
+      neg_zero, Matrix.one_mul, mul_mul_right_of_mul_eq hJ, mul_mul_right_of_mul_eq hBB,
+      mul_mul_right_of_mul_eq hDD, mul_mul_right_of_mul_eq hEE,
+      mul_mul_mul_right_of_mul_mul_eq hBJB, mul_mul_right_of_mul_eq hBD,
+      mul_mul_right_of_mul_eq hBE, mul_mul_right_of_mul_eq hDB, mul_mul_right_of_mul_eq hEB,
+      mul_mul_right_of_mul_eq hDE, mul_mul_right_of_mul_eq hED, mul_mul_right_of_mul_eq hJD,
+      mul_mul_right_of_mul_eq hJE, mul_mul_right_of_mul_eq hDJ, mul_mul_right_of_mul_eq hEJ]
+    first | exact hC'
   · simp only [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc, Matrix.mul_neg, Matrix.neg_mul,
-      neg_neg, Matrix.mul_one, Matrix.one_mul, hJ, mul_mul_right_of_mul_eq hJ, hJD,
-      mul_mul_right_of_mul_eq hJD, hJE, mul_mul_right_of_mul_eq hJE, hDJ', hEJ']
+      Matrix.mul_one, Matrix.one_mul, hJ, mul_mul_right_of_mul_eq hJ, mul_mul_right_of_mul_eq hJD,
+      mul_mul_right_of_mul_eq hJE, hDJ', hEJ']
     abel
   · rw [← hCP, ← hBP]
-    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc, Matrix.mul_neg, Matrix.neg_mul,
-      neg_neg, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, neg_zero, Matrix.mul_one,
-      Matrix.one_mul, hJ, mul_mul_right_of_mul_eq hJ, hBB, mul_mul_right_of_mul_eq hBB, hCC,
-      mul_mul_right_of_mul_eq hCC, hBJB', mul_mul_mul_right_of_mul_mul_eq hBJB, hCJC',
-      mul_mul_mul_right_of_mul_mul_eq hCJC, hBD, mul_mul_right_of_mul_eq hBD, hBE,
-      mul_mul_right_of_mul_eq hBE, hDC, mul_mul_right_of_mul_eq hDC, hEC,
+    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc, Matrix.mul_zero, Matrix.zero_mul,
+      add_zero, Matrix.one_mul, mul_mul_right_of_mul_eq hBB, mul_mul_right_of_mul_eq hCC,
+      mul_mul_mul_right_of_mul_mul_eq hBJB, mul_mul_mul_right_of_mul_mul_eq hCJC,
+      mul_mul_right_of_mul_eq hBD, mul_mul_right_of_mul_eq hBE, mul_mul_right_of_mul_eq hDC,
       mul_mul_right_of_mul_eq hEC]
 
 theorem tor_comm
@@ -669,8 +665,7 @@ theorem tor_comm
       _ = 0 := by rw [mul_comm d c, hcd, one_smul, h3, mul_assoc, hpq, mul_one, sub_self]
   · have f1 : (1 - P) * tor P Q c d = 1 - P + (d - 1) • Q := by
       simp only [tor, mul_add, sub_mul, one_mul, mul_one, mul_smul_comm, hP, hPQ, sub_self,
-          smul_zero, add_zero, sub_zero]
-        <;> module
+        smul_zero, add_zero, sub_zero]
     have f2 : tor P Q d c * (1 - Q) = 1 - Q + (d - 1) • P := by
       simp only [tor, mul_sub, add_mul, one_mul, mul_one, smul_mul_assoc, hPQ, hQ, smul_zero,
           add_zero]
@@ -903,8 +898,6 @@ private theorem J_mul_tor_eq_tor_swap_mul_J
   simp only [tor, mul_add, add_mul, mul_one, one_mul, mul_smul_comm, smul_mul_assoc, hJP, hJQ]
   abel
 
-private theorem dOp_eq_log_norm (g : Matrix (Fin n) (Fin n) ℂ) : dOp g = Real.log ‖g‖ := rfl
-
 private theorem log_le_of_le_exp' {x t : ℝ} (hx : 0 ≤ x) (hxt : x ≤ Real.exp t) (ht : 0 ≤ t)
     : Real.log x ≤ t := by
   rcases hx.eq_or_lt with h | h
@@ -1011,7 +1004,7 @@ theorem split_torus
     abel
   · rw [ha]
     exact (exp_tor hPP hQQ hPQ hQP (s : ℂ)).symm
-  · rw [dOp_eq_log_norm, ha, e1, e2]
+  · rw [_root_.GlobalTheory.Count.Cartan.dOp_eq, ha, e1, e2]
     rcases le_or_gt 0 s with hs | hs
     · rw [abs_of_nonneg hs]
       exact log_le_of_le_exp' (norm_nonneg _)
@@ -1036,9 +1029,8 @@ theorem split_torus
     have h2' : ∀ Y, Q * (X * Y) = 0 := fun Y => by rw [← Matrix.mul_assoc, h2, Matrix.zero_mul]
     refine ⟨?_, ?_, ?_⟩
       <;> simp only [add_mul, sub_mul, mul_add, mul_sub, smul_mul_assoc, mul_smul_comm,
-        Matrix.mul_assoc, one_mul, mul_one, h1, h1', h2, h2', hPP, hQQ, hPQ, hQP, hPP', hQQ', hPQ',
-        hQP', Matrix.mul_zero, Matrix.zero_mul, smul_zero, add_zero, zero_add, sub_zero, zero_sub,
-        sub_self, neg_zero]
+        Matrix.mul_assoc, one_mul, mul_one, h1, h2', hQQ, hQP, hPP', hQP', Matrix.mul_zero,
+        smul_zero, add_zero, zero_add, sub_zero, sub_self]
       <;> module
   · obtain ⟨h1, h2, -⟩ := (mem_NW hPh hPP hPW m).1 hm
     rw [← hQ] at h2

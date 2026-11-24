@@ -153,7 +153,7 @@ theorem initPart_pow_mul (v : σ) (e : ℕ) (h : MvPolynomial σ ℚ_[p])
   ext m
   rw [coeff_initPart, c1, c1, coeff_initPart]
   simp only [Finsupp.tsub_apply, Finsupp.single_eq_same]
-  split_ifs <;> first | rfl | omega | (exfalso; omega)
+  split_ifs <;> first | rfl | omega
 
 theorem initPart_zero' (v : σ) (e : ℕ) : initPart v e (0 : MvPolynomial σ ℚ_[p]) = 0 := by
   ext m
@@ -210,8 +210,8 @@ theorem wt_pow
     intro i
     by_cases hi : i = Fin.last K
     · subst hi
-      by_cases hρ : ρ = c <;> simp [hv, Finsupp.single_apply, hρ] <;> (try ring)
-    · simp [hi, Finsupp.single_apply, Ne.symm hi]
+      by_cases hρ : ρ = c <;> simp [hv, hρ] <;> (try ring)
+    · simp [hi]
   refine (Finset.sum_congr rfl fun i _ => hterm i).trans ?_
   rw [Finset.sum_add_distrib, Finset.sum_ite_eq']
   simp

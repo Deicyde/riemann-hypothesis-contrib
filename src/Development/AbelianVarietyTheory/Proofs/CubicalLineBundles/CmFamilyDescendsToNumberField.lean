@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsThetaDegOfIsLocalModel
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.FamilyIdentitiesDescendFieldToDedekindStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.FamilyIdentitiesDescendFieldToDedekind
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.PolCountableAndTangentExt
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -198,7 +198,7 @@ theorem isFam_descends_to_numberField
   choose ψ hψ using all
   exact ⟨
     ψ,
-    GlobalTheory.T.family_identities_descend_field_to_dedekind hL E H k₂ ω₂ C₂ D h T₂ L ψ ℂ ω' C'
+    _root_.GlobalTheory.FamDescent.isFam_descend hL E H k₂ ω₂ C₂ D h T₂ L ψ ℂ ω' C'
       (algebraMap k₂ ℂ) φ₃ T' m₃ ψ' (algebraMap k₂ ℂ).injective e₃ hψ hF,
     hψ
   ⟩

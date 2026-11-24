@@ -51,6 +51,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.exists_partner_combination_good_inert_lift
     : HoweUnram
       → ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.exists_partner_combination_good_inert_lift
           → (∀ P,
             Good R.toRealDat A3.A.μ0 P → Formalism.DivisionValues.conjPl P = P
               → TwoSided R.toRealDat A3.A.μ0 P) := by
-  first
-  | exact @GlobalTheory.VmTwo.twoSided_goodInert
-  | exact GlobalTheory.VmTwo.twoSided_goodInert
-  | (intros; apply GlobalTheory.VmTwo.twoSided_goodInert <;> assumption)
+  first | exact @GlobalTheory.VmTwo.twoSided_goodInert

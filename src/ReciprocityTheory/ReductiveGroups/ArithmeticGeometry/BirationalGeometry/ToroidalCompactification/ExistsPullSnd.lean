@@ -132,7 +132,7 @@ private theorem sameSum_of_prod_pow_eq
       (e (Multiplicative ℤ) fun q => Multiplicative.ofAdd (if q = ψ then (1 : ℤ) else 0))
   simp only [toAdd_prod, toAdd_zpow, toAdd_ofAdd, smul_eq_mul, mul_ite, _root_.mul_one, mul_zero]
     at key
-  convert key <;> simp
+  convert key
 
 theorem GenOf.gen
     (hM : M.IsLB) (a : GenOf M F)
@@ -246,13 +246,7 @@ theorem genOf_cub (x y z : T ⟶ A)
     have c2 : (-1 : ℤ) ^ (3 - ({2} : Finset (Fin 3)).card) = 1 := by decide
     have cE : (-1 : ℤ) ^ (3 - (∅ : Finset (Fin 3)).card) = -1 := by decide
     simp only [c3, c01, c02, c12, c0, c1, c2, cE, zpow_one, zpow_neg_one]
-    first
-    | ac_rfl
-    | (
-        apply Additive.ofMul.injective
-        simp only [ofMul_mul, ofMul_inv]
-        abel
-      )
+    first | ac_rfl
   refine ⟨
     ULift.{0} (Finset (Fin 3)),
     inferInstance,
@@ -304,8 +298,7 @@ theorem genOf_pow (hs : L.IsSymmetric) (y : T ⟶ A) (n : ℕ)
     refine (((genOf_cub c y y⁻¹ y).mul S0.inv).mul (R.pow 2)).congr fun U _ h => ?_
     simp only [mul_inv_cancel, inv_mul_cancel, _root_.one_mul]
     apply Additive.ofMul.injective
-    simp only [ofMul_mul, ofMul_inv, ofMul_pow, ofMul_one, nsmul_add, smul_neg, add_nsmul,
-      one_nsmul]
+    simp only [ofMul_mul, ofMul_inv, ofMul_pow]
     abel!
   have C
       : ∀ k : ℕ,
@@ -324,8 +317,7 @@ theorem genOf_pow (hs : L.IsSymmetric) (y : T ⟶ A) (n : ℕ)
       refine ((genOf_cub c (y ^ k) y y).mul ih).congr fun U _ h => ?_
       rw [pow_succ y k]
       apply Additive.ofMul.injective
-      simp only [ofMul_mul, ofMul_inv, ofMul_pow, ofMul_one, nsmul_add, smul_neg, add_nsmul,
-        one_nsmul]
+      simp only [ofMul_mul, ofMul_inv, ofMul_pow, nsmul_add, smul_neg, add_nsmul, one_nsmul]
       abel!
   induction n with
   | zero => exact R.inv.congr fun U _ h => by simp
@@ -334,8 +326,7 @@ theorem genOf_pow (hs : L.IsSymmetric) (y : T ⟶ A) (n : ℕ)
     refine (((ih.mul C.inv).mul (E.pow n)).mul R).congr fun U _ h => ?_
     rw [pow_succ y n, show (n + 1) ^ 2 = n ^ 2 + n + n + 1 by ring]
     apply Additive.ofMul.injective
-    simp only [ofMul_mul, ofMul_inv, ofMul_pow, ofMul_one, nsmul_add, smul_neg, add_nsmul,
-      one_nsmul]
+    simp only [ofMul_mul, ofMul_inv, ofMul_pow, nsmul_add, smul_neg, add_nsmul, one_nsmul]
     abel!
 
 theorem exists_norm

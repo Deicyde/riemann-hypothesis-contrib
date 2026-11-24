@@ -50,6 +50,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
   GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
+
 theorem _root_.GlobalTheory.T.eventually_sizes_congruences_hostFacts_columnChoices
     : EvLgG fun K B f _ =>
       KPx B f
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.eventually_sizes_congruences_hostFacts_columnChoic
             ∧ ∃ w0,
               GlobalTheory.LamTie.PlacesOk (w.D Z).host (AbsolutelyIrreducibleSpan.q0 (w.D Z))
                 w0 := by
-  first
-  | exact @GlobalTheory.HeightCounting.Up.sizes_host_at_record
-  | exact GlobalTheory.HeightCounting.Up.sizes_host_at_record
-  | (intros; apply GlobalTheory.HeightCounting.Up.sizes_host_at_record <;> assumption)
+  first | exact @GlobalTheory.HeightCounting.Up.sizes_host_at_record

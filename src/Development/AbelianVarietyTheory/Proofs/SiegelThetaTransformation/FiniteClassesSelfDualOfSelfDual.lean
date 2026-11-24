@@ -148,7 +148,6 @@ theorem norm_herm_le
     (hx : ∑ k, ‖τ (x k)‖ ^ 2 ≤ C) (hy : ∑ k, ‖τ (y k)‖ ^ 2 ≤ C)
     : ‖τ (herm 1 x y)‖ ≤ C := by
   have h : ‖τ (herm 1 x y)‖ ≤ ∑ k, (‖τ (x k)‖ ^ 2 + ‖τ (y k)‖ ^ 2) / 2 := by
-
     rw [DualFamily.herm_one_eq, map_sum]
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => ?_)
     have : ‖τ (cc (y k))‖ = ‖τ (y k)‖ := by simp [cc, IsCMField.complexEmbedding_complexConj]

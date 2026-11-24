@@ -55,9 +55,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Matrix GlobalTheory.AdelicLatMove
 open scoped TensorProduct
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.LatStab

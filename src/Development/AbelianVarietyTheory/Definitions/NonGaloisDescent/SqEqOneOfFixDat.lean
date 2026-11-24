@@ -63,12 +63,6 @@ variable
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   {R : RealDat D A Ks} {i : Fin D.R.m}
 
-theorem odd_r (D : D7) : Odd D.R.r := by
-  have := D.R.m_add_three_le_k
-  obtain ⟨a, ha⟩ := D.R.k_even
-  obtain ⟨b, hb⟩ := D.R.m_even
-  exact ⟨a + b - 1, by simp only [Ranks.r]; omega⟩
-
 theorem frame_good
     {F : Face D A} (hC : GlobalTheory.Hk3.Core R F) {B : Base (Vc D i) (Wc D i)} (h : BaseOf R i B)
     : B.F.Good := by

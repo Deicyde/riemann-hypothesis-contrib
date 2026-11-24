@@ -4,9 +4,13 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClas
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabComp
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GeometricallyIntegralIffGeometricallyConnectedOf
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsProjBySmoothIsProperGeometricallyIntegral
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LineBundleTrivialIsoDescendFieldStatement
+public import Mathlib.AlgebraicGeometry.Geometrically.Connected
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LineBundleTrivialIsoDescendField
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PolPull
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RelAmpleOfFieldExtensionBaseChangeStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.NonzeroLocus
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RelAmpleOfFieldExtensionBaseChange
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -127,8 +131,7 @@ theorem iso_down
   have d : LBIso (M.pull h) (N.pull h) :=
     LBIso.trans (pull_isLB hM h) hM' (pull_isLB hN h) a.symm
       (LBIso.trans hM' hN' (pull_isLB hN h) c b)
-  exact (GlobalTheory.T.lineBundle_trivial_iso_descend_field K K' i X₀ _ p₀ _ _ h₁ h₂ h₃ P).2 M N hM
-    hN
+  exact (_root_.GlobalTheory.lb_gen_iso_descend_field K K' i X₀ _ p₀ _ _ h₁ h₂ h₃ P).2 M N hM hN
     (d.chartPull (chartPullSame M _ _ _ (pullback.fst p x) fun _ => rfl)
       (chartPullSame N _ _ _ (pullback.fst p x) fun _ => rfl))
 
@@ -149,7 +152,7 @@ theorem relAmple_down
   have hψ : ψ ≫ φ = pullback.fst _ _ := H.lift_fst _ _ _
   have Q : IsPullback ψ (pullback.snd A.hom (spMap i)) A'.hom x :=
     IsPullback.of_right (hψ ▸ P) (H.lift_snd _ _ _) H
-  exact GlobalTheory.T.relAmple_of_fieldExtension_baseChange K K' i A
+  exact _root_.GlobalTheory.AmpleDescent.relAmple_of_fieldExtension K K' i A
     ((Over.pullback (spMap i)).obj A) (pullback.fst _ _) M (M'.pull ψ) hA
     (isGrpPullback_pullback A _) hM (pull_isLB hM' ψ)
     (a.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull M' ψ ψ rfl)

@@ -716,7 +716,7 @@ theorem val_tied
             ∈ (bcBelow (B.fields.emb τ) w).asIdeal := fun τ => by
       show bcO (B.fields.emb τ) _ ∈ w.asIdeal
       rw [map_natCast]
-      exact GlobalTheory.LvT.Inh.resChar_mem_plEq (I.rec7 l Z) w
+      exact _root_.Formalism.BasicNotions.resChar_mem (I.rec7 l Z) w
     have key
         : ∀ Bm : GL (Fin (B.R.N i)) B.host.E,
           Formalism.L2.Forms.IsLocBasis ((I.rec7 l Z).what₂.places.resChar w)
@@ -732,7 +732,7 @@ theorem val_tied
                     P (eY z)) := by
       intro Bm hB
       refine (mem_localization_delAtr_fn B.fields.emb B.embLL
-        (GlobalTheory.Mem.Col2.lamT (B.hcW u) i) w (by first | exact l1 | exact l1.toIsLattice)
+        (GlobalTheory.Mem.Col2.lamT (B.hcW u) i) w (by first | exact l1)
         (fun _ => Bm)
         (fun τ => isBasisAt_of_isLocBasis hp _ (hbel τ) hB)
         (x.1 c)).trans ?_

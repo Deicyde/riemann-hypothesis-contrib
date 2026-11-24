@@ -114,7 +114,7 @@ variable
 
 theorem symplOHF_add_left (x x' y : WOF F E nS nT)
     : symplOHF σ JS JT xi0 (x + x') y = symplOHF σ JS JT xi0 x y + symplOHF σ JS JT xi0 x' y := by
-  simp only [symplOHF, symplOF, hOF, Matrix.add_apply, mul_add, add_mul, Finset.sum_add_distrib,
+  simp only [symplOHF, symplOF, hOF, Matrix.add_apply, mul_add, Finset.sum_add_distrib,
     map_add (f := _)]
 
 theorem symplOHF_add_right (x y y' : WOF F E nS nT)

@@ -77,7 +77,7 @@ private theorem coeffSum (Λ G : Type) [CommRing Λ] [Group G] [Fintype G] (x : 
       = x := by
   classical
   ext h
-  simp [MonoidAlgebra.single_mul_single, Finsupp.single_apply]
+  simp [MonoidAlgebra.single_mul_single]
 
 private theorem higman
     (Λ G N : Type)
@@ -129,7 +129,7 @@ theorem UpperTheory.V.Pa.Lev.projNorm
     rw [← this]
     conv_lhs => rw [this]
     refine Finset.sum_congr rfl fun g _ => ?_
-    simp [Representation.asModuleEquiv_map_smul, Representation.asModuleEquiv_symm_map_rho]
+    simp [Representation.asModuleEquiv_symm_map_rho]
     rfl
   refine ⟨fun m hm => ⟨φ m, ?_⟩, fun S hS m hm => ?_⟩
   · simpa only [hm] using hφ m
@@ -152,7 +152,6 @@ theorem UpperTheory.V.Pa.Lev.projNorm
         have := I.neg_mem (ha (ρ a⁻¹ x))
         simpa using this
     have h0 : ∑ g : G, φ (ρ g⁻¹ m) = 0 := by
-
       rw [← map_sum, ← map_zero φ, ← hm]
       congr 1
       exact Fintype.sum_equiv (Equiv.inv G) _ _ (fun _ => rfl)

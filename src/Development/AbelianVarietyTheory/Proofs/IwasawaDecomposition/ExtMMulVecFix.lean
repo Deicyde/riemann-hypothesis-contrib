@@ -129,6 +129,7 @@ theorem eq_extM_of_laws
     exact congrFun (h1 _) _
 
 end ExtL
+
 theorem exists_ka_tw
     (u : B.Word)
     (a : I.ι)

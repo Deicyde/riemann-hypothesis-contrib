@@ -53,7 +53,8 @@ public import Mathlib.RingTheory.Flat.TorsionFree
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory
 
@@ -61,12 +62,13 @@ open Polynomial
 
 namespace AICStalk
 
-theorem isIntegrallyClosed_of_aic {A : Type} [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A) :
-    IsIntegrallyClosed A := by
+theorem isIntegrallyClosed_of_aic {A : Type} [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A)
+    : IsIntegrallyClosed A := by
   apply LateralTheory.E.LocalIntegralClosureRoots.isIntegrallyClosed_of_aic <;> assumption
 
-theorem aic_of_ringEquiv {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) (h : GlobalTheory.EtC.AIC R) :
-    GlobalTheory.EtC.AIC S := by
+theorem aic_of_ringEquiv
+    {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) (h : GlobalTheory.EtC.AIC R)
+    : GlobalTheory.EtC.AIC S := by
   intro p hpm hdeg
   have hm : (p.map (e.symm : S →+* R)).Monic := hpm.map _
   have hd : (p.map (e.symm : S →+* R)).natDegree = p.natDegree :=
@@ -75,18 +77,23 @@ theorem aic_of_ringEquiv {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) 
   refine ⟨e a, ?_⟩
   have hp : p = (p.map (e.symm : S →+* R)).map (e : R →+* S) := by
     rw [Polynomial.map_map]; ext n; simp
-  rw [hp, Polynomial.eval_map, show e a = (e : R →+* S) a from rfl, Polynomial.eval₂_at_apply, ha, map_zero]
+  rw [hp, Polynomial.eval_map, show e a = (e : R →+* S) a from rfl, Polynomial.eval₂_at_apply, ha,
+    map_zero]
 
 theorem aic_of_isAlgClosed (K : Type) [Field K] [IsAlgClosed K] : GlobalTheory.EtC.AIC K := by
   intro p _ hdeg
-  obtain ⟨a, ha⟩ := IsAlgClosed.exists_root p (by
-    rw [degree_eq_natDegree (ne_zero_of_natDegree_gt hdeg)]; exact_mod_cast hdeg.ne')
+  obtain ⟨a, ha⟩ :=
+    IsAlgClosed.exists_root p
+      (by rw [degree_eq_natDegree (ne_zero_of_natDegree_gt hdeg)]; exact_mod_cast hdeg.ne')
   exact ⟨a, ha⟩
 
-theorem algebraMap_injective_of_indEt {A O : Type} [CommRing A] [IsDomain A] [CommRing O]
-    [Nontrivial O] [Algebra A O] (h : GlobalTheory.EtC.IndEt A O) : Function.Injective (algebraMap A O) := by
+theorem algebraMap_injective_of_indEt
+    {A O : Type} [CommRing A] [IsDomain A] [CommRing O] [Nontrivial O] [Algebra A O]
+    (h : GlobalTheory.EtC.IndEt A O)
+    : Function.Injective (algebraMap A O) := by
   haveI : Module.Flat A O := GlobalTheory.IndEtaleLocal.flat_of_isIndEtale h
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   by_contra ha0
   have hmem : (1 : O) ∈ Submodule.torsion A O := by
@@ -95,8 +102,11 @@ theorem algebraMap_injective_of_indEt {A O : Type} [CommRing A] [IsDomain A] [Co
   rw [Module.Flat.torsion_eq_bot] at hmem
   exact one_ne_zero ((Submodule.mem_bot A).mp hmem)
 
-theorem isDomain_of_indEt {A O : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A]
-    [CommRing O] [IsLocalRing O] [Algebra A O] (h : GlobalTheory.EtC.IndEt A O) : IsDomain O := by
+theorem isDomain_of_indEt
+    {A O : Type}
+    [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing O] [IsLocalRing O] [Algebra A O]
+    (h : GlobalTheory.EtC.IndEt A O)
+    : IsDomain O := by
   refine @NoZeroDivisors.to_isDomain O _ _ ⟨fun {x y} hxy => ?_⟩
   let I : Ideal (MvPolynomial (Fin 2) A) := Ideal.span {MvPolynomial.X 0 * MvPolynomial.X 1}
   haveI : Algebra.FinitePresentation A (MvPolynomial (Fin 2) A ⧸ I) :=
@@ -112,7 +122,8 @@ theorem isDomain_of_indEt {A O : Type} [CommRing A] [IsDomain A] [IsIntegrallyCl
     have := DFunLike.congr_fun huv (Ideal.Quotient.mkₐ A I (MvPolynomial.X i))
     exact this.trans (MvPolynomial.aeval_X _ i)
   have h0 : w 0 * w 1 = 0 := by
-    have : Ideal.Quotient.mkₐ A I (MvPolynomial.X 0) * Ideal.Quotient.mkₐ A I (MvPolynomial.X 1) = 0 := by
+    have : Ideal.Quotient.mkₐ A I (MvPolynomial.X 0) * Ideal.Quotient.mkₐ A I (MvPolynomial.X 1)
+        = 0 := by
       rw [← map_mul]
       exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self _)
     simp only [w, ← map_mul, this, map_zero]
@@ -122,7 +133,9 @@ theorem isDomain_of_indEt {A O : Type} [CommRing A] [IsDomain A] [IsIntegrallyCl
   have hq : ∀ t ∈ q.primeCompl, IsUnit (v t) := fun t ht => by
     by_contra hc
     exact ht (IsLocalRing.mem_maximalIdeal _ |>.mpr hc)
-  have hm : algebraMap W (Localization.AtPrime q) (w 0) * algebraMap W (Localization.AtPrime q) (w 1) = 0 := by
+  have hm
+      : algebraMap W (Localization.AtPrime q) (w 0) * algebraMap W (Localization.AtPrime q) (w 1)
+        = 0 := by
     rw [← map_mul, h0, map_zero]
   rcases mul_eq_zero.mp hm with h1 | h1
   · obtain ⟨⟨t, ht⟩, hte⟩ := (IsLocalization.map_eq_zero_iff q.primeCompl _ _).mp h1
@@ -134,12 +147,13 @@ theorem isDomain_of_indEt {A O : Type} [CommRing A] [IsDomain A] [IsIntegrallyCl
     rw [map_mul, map_zero, hw] at this
     exact Or.inr (((hq t ht).mul_right_eq_zero).mp this)
 
-
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
-theorem isIntegral_tmul_one {A O : Type} [CommRing A] [IsDomain A] [CommRing O] [Algebra A O]
-    (h : GlobalTheory.EtC.IndEt A O) (o : O) :
-    IsIntegral (FractionRing A) (o ⊗ₜ[A] (1 : FractionRing A)) := by
-  obtain ⟨W, _, _, _, u, v, huv⟩ := GlobalTheory.IndEtaleLocal.exists_etale_factor h (Polynomial.aeval (R := A) o)
+theorem isIntegral_tmul_one
+    {A O : Type} [CommRing A] [IsDomain A] [CommRing O] [Algebra A O]
+    (h : GlobalTheory.EtC.IndEt A O) (o : O)
+    : IsIntegral (FractionRing A) (o ⊗ₜ[A] (1 : FractionRing A)) := by
+  obtain ⟨W, _, _, _, u, v, huv⟩ :=
+    GlobalTheory.IndEtaleLocal.exists_etale_factor h (Polynomial.aeval (R := A) o)
   haveI : Algebra.Etale (FractionRing A) (FractionRing A ⊗[A] W) := Algebra.Etale.baseChange A W _
   haveI : Module.Finite (FractionRing A) (FractionRing A ⊗[A] W) :=
     Algebra.FormallyUnramified.finite_of_free _ _
@@ -156,19 +170,18 @@ theorem isIntegral_tmul_one {A O : Type} [CommRing A] [IsDomain A] [CommRing O] 
 
 end AICStalk
 
-
 open AICStalk in
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
-theorem isField_aic_tensor_fractionRing_of_strictlyHenselian :
-    ∀ (A O : Type) [CommRing A] [IsDomain A] [CommRing O] [Algebra A O], GlobalTheory.EtC.AIC A →
-      GlobalTheory.EtC.SH O → GlobalTheory.EtC.IndEt A O →
-      IsField (O ⊗[A] FractionRing A) ∧ GlobalTheory.EtC.AIC (O ⊗[A] FractionRing A) := by
+theorem isField_aic_tensor_fractionRing_of_strictlyHenselian
+    : ∀ (A O : Type) [CommRing A] [IsDomain A] [CommRing O] [Algebra A O],
+      GlobalTheory.EtC.AIC A → GlobalTheory.EtC.SH O → GlobalTheory.EtC.IndEt A O
+        → IsField (O ⊗[A] FractionRing A) ∧ GlobalTheory.EtC.AIC (O ⊗[A] FractionRing A) := by
   intro A O _ _ _ _ hA hO h
   haveI := isIntegrallyClosed_of_aic hA
   obtain ⟨hH, -⟩ := hO
   haveI := hH
   haveI := isDomain_of_indEt h
-  haveI : IsAlgClosed (FractionRing A) := GlobalTheory.T.isAlgClosed_fractionRing_of_monic_polynomials_have_roots A hA
+  haveI : IsAlgClosed (FractionRing A) := _root_.GlobalTheory.FractionRingRootRange.isAlgClosed_fractionRing A hA
   haveI : IsLocalization (Algebra.algebraMapSubmonoid O (nonZeroDivisors A))
       (O ⊗[A] FractionRing A) := by
     rw [Algebra.isLocalization_iff_isPushout (nonZeroDivisors A) (FractionRing A)]
@@ -190,9 +203,13 @@ theorem isField_aic_tensor_fractionRing_of_strictlyHenselian :
       exact (isIntegral_tmul_one h o).mul isIntegral_algebraMap
     | add x y hx hy => exact hx.add hy
   haveI : Algebra.IsIntegral (FractionRing A) (O ⊗[A] FractionRing A) := ⟨hall⟩
-  let e := RingEquiv.ofBijective _
-    (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := FractionRing A) (K := O ⊗[A] FractionRing A))
-  exact ⟨MulEquiv.isField (Field.toIsField (FractionRing A)) e.symm.toMulEquiv,
-    aic_of_ringEquiv e (aic_of_isAlgClosed _)⟩
+  let e :=
+    RingEquiv.ofBijective _
+      (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := FractionRing A)
+        (K := O ⊗[A] FractionRing A))
+  exact ⟨
+    MulEquiv.isField (Field.toIsField (FractionRing A)) e.symm.toMulEquiv,
+    aic_of_ringEquiv e (aic_of_isAlgClosed _)
+  ⟩
 
 end GlobalTheory

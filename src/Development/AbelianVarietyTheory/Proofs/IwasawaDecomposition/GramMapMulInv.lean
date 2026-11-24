@@ -51,9 +51,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.PlaceVec
 
 open GlobalTheory.AdelicLatMove

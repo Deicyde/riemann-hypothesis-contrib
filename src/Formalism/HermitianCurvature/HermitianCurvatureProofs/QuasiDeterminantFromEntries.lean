@@ -61,14 +61,12 @@ namespace Formalism.FourierDecayAlt.P
 private theorem transpose_mul_J_mul_apply
     {A : Type*} [Ring A] (M N : Matrix (Fin 2) (Fin 2) A) (i j : Fin 2)
     : (Mᵀ * Formalism.YangianSpanCharacter.T.J A * N) i j = M 0 i * N 1 j - M 1 i * N 0 j := by
-  simp [Matrix.mul_apply, Fin.sum_univ_two, Formalism.YangianSpanCharacter.T.J]
-    <;> first | abel | noncomm_ring
+  simp [Matrix.mul_apply, Fin.sum_univ_two, Formalism.YangianSpanCharacter.T.J] <;> first | abel
 
 private theorem mul_J_mul_transpose_apply'
     {A : Type*} [Ring A] (M N : Matrix (Fin 2) (Fin 2) A) (i j : Fin 2)
     : (M * Formalism.YangianSpanCharacter.T.J A * Nᵀ) i j = M i 0 * N j 1 - M i 1 * N j 0 := by
-  simp [Matrix.mul_apply, Fin.sum_univ_two, Formalism.YangianSpanCharacter.T.J]
-    <;> first | abel | noncomm_ring
+  simp [Matrix.mul_apply, Fin.sum_univ_two, Formalism.YangianSpanCharacter.T.J] <;> first | abel
 
 theorem l_shift_from_determinant : LShift := by
   intro 𝕜 A _ _ _ t τinv q S h Y hY hY1
@@ -82,9 +80,7 @@ theorem l_shift_from_determinant : LShift := by
     τinv Y * t Y 1 0
       = τinv Y * t Y 1 0 * (t (Y + 1) 1 1 * τinv (Y + 1)) := by rw [(h4 (Y + 1) hY1).1, mul_one]
     _ = τinv Y * (t Y 1 0 * t (Y + 1) 1 1) * τinv (Y + 1) := by simp only [mul_assoc]
-    _ = τinv Y * (t Y 1 1 * t (Y + 1) 1 0) * τinv (Y + 1) := by rw [e]
-    _ = τinv Y * t Y 1 1 * t (Y + 1) 1 0 * τinv (Y + 1) := by simp only [mul_assoc]
-    _ = t (Y + 1) 1 0 * τinv (Y + 1) := by rw [(h4 Y hY).2, one_mul]
+    _ = t (Y + 1) 1 0 * τinv (Y + 1) := by rw [e, ← mul_assoc, (h4 Y hY).2, one_mul]
 
 theorem quasi_determinant_from_entries : QuasiDetT := by
   intro 𝕜 A _ _ _ t τinv q S h Y hY hY1
@@ -134,16 +130,16 @@ private theorem e1_mul_e2_apply
     : (Formalism.YangianSpanCharacter.T.E1 X * Formalism.YangianSpanCharacter.T.E2 Y) (a, b) (j, l)
       = X a j * Y b l := by
   fin_cases a <;> fin_cases b <;> fin_cases j <;> fin_cases l
-    <;> simp [Matrix.mul_apply, Fintype.sum_prod_type, Fin.sum_univ_two,
-      Formalism.YangianSpanCharacter.T.E1, Formalism.YangianSpanCharacter.T.E2]
+    <;> simp [Matrix.mul_apply, Fintype.sum_prod_type, Formalism.YangianSpanCharacter.T.E1,
+      Formalism.YangianSpanCharacter.T.E2]
 
 private theorem e2_mul_e1_apply
     {B : Type*} [Ring B] (X Y : Matrix (Fin 2) (Fin 2) B) (a b j l : Fin 2)
     : (Formalism.YangianSpanCharacter.T.E2 Y * Formalism.YangianSpanCharacter.T.E1 X) (a, b) (j, l)
       = Y b l * X a j := by
   fin_cases a <;> fin_cases b <;> fin_cases j <;> fin_cases l
-    <;> simp [Matrix.mul_apply, Fintype.sum_prod_type, Fin.sum_univ_two,
-      Formalism.YangianSpanCharacter.T.E1, Formalism.YangianSpanCharacter.T.E2]
+    <;> simp [Matrix.mul_apply, Fintype.sum_prod_type, Formalism.YangianSpanCharacter.T.E1,
+      Formalism.YangianSpanCharacter.T.E2]
 
 private theorem pf_mul_apply
     {B : Type*} [Ring B] (N : Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) B) (i k j l : Fin 2)
@@ -163,13 +159,10 @@ theorem rtt_relation_entries : RTTEntries := by
   intro K B _ _ _ M v u hR i j k l
   have h := congrFun (congrFun hR (i, k)) (j, l)
   rw [mul_assoc, sub_mul, smul_mul_assoc, one_mul, Matrix.sub_apply, Matrix.smul_apply,
-      e1_mul_e2_apply, pf_mul_apply, e1_mul_e2_apply]
+      e1_mul_e2_apply, pf_mul_apply, e1_mul_e2_apply, mul_sub, mul_smul_comm, mul_one,
+      Matrix.sub_apply, Matrix.smul_apply, e2_mul_e1_apply, mul_pf_apply, e2_mul_e1_apply]
     at h
-  rw [mul_sub, mul_smul_comm, mul_one, Matrix.sub_apply, Matrix.smul_apply, e2_mul_e1_apply,
-      mul_pf_apply, e2_mul_e1_apply]
-    at h
-  rw [smul_sub, sub_eq_sub_iff_sub_eq_sub]
-  exact h
+  simpa only [smul_sub, sub_eq_sub_iff_sub_eq_sub] using h
 
 theorem adjoint_l_shift_relation : AdjL := by
   intro 𝕜 A _ _ _ _ t τinv q S RR h hRR Y hY hY1 hst
@@ -211,7 +204,7 @@ theorem divided_difference_l : EtaLevel := by
           = c • Matrix.scalar (Ix S) x := by
     intro c x
     ext i j
-    simp [Matrix.scalar_apply, Matrix.diagonal_apply, smul_ite] <;> split_ifs <;> simp
+    simp [Matrix.scalar_apply, Matrix.diagonal_apply, smul_ite] <;> split_ifs
   have hl0 : L.l0 Y - L.l0 Ya = -((Y - Ya) • (L.ζb * L.GGi)) := by
     simp only [Formalism.FourierDecayAlt.R.LevelData.l0, ← Algebra.smul_def, sub_smul, add_smul]
     abel
@@ -426,7 +419,7 @@ theorem start_is_frame : StartFrame := by
     by_cases h : i = j
     · subst h
       simp [io, Matrix.star_apply, Matrix.scalar_apply]
-    · simp [io, Matrix.star_apply, Matrix.scalar_apply, Matrix.diagonal_apply, h, Ne.symm h]
+    · simp [io, Matrix.star_apply, Matrix.scalar_apply, h, Ne.symm h]
   refine {
     module := ?_
     lowerLeftEntry_commute := ?_
@@ -474,7 +467,7 @@ theorem start_is_frame : StartFrame := by
   · exact star_one _
   · intro Y g hg
     exact hio_comm _ _ (hst.ee_fn Y g hg)
-  · simp [Formalism.FourierDecayAlt.Fr.FrameData.d, Start.frame]
+  · simp [Formalism.FourierDecayAlt.Fr.FrameData.d]
   · intro Y _
     simp only [lift0, Matrix.map_apply, one_mul, mul_one]
     rw [hst.tau Y]

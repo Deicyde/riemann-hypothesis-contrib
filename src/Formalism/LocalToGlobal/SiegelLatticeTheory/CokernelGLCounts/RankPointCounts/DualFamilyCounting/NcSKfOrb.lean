@@ -141,7 +141,7 @@ theorem entries_oev
     funext k
     by_cases h : k = j
     · subst h; simp [ratV, inclR, Algebra.TensorProduct.one_def]
-    · simp [ratV, inclR, Pi.single_apply, h]
+    · simp [ratV, inclR, h]
   rw [e1] at h2
   have h3 := mem_oev_of_std v _ h2 i
   simpa [Matrix.mulVec, dotProduct, Pi.single_apply] using h3

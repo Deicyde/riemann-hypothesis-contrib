@@ -131,7 +131,7 @@ theorem st_locDens_cons_eq_zero
   have h1 : (tsupport ψ)ᶜ ∈ 𝓝 ((A.chart k).symm y) := (isClosed_tsupport ψ).isOpen_compl.mem_nhds hψ
   have h2 := ((A.chart k).continuousAt_symm hy).preimage_mem_nhds h1
   filter_upwards [h2] with y' hy'
-  first | exact image_eq_zero_of_notMem_tsupport hy' | exact image_eq_zero_of_nmem_tsupport hy'
+  first | exact image_eq_zero_of_notMem_tsupport hy'
 
 theorem st_mIntConstPot (A : FinHolAtlas (e + 1) X) (c : ℝ) (Φ : Fin e → LocPot X) (g : X → ℝ)
     : mInt A (Fin.cons (LocPot.ofFun fun _ => c) Φ) g = 0 := by

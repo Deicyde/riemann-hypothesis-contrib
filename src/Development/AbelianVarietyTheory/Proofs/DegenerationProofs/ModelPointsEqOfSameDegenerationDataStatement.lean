@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.model_points_eq_of_same_degeneration_data
     : Laws → Laws2 → Laws3 → Laws4 → Laws5
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.model_points_eq_of_same_degeneration_data
             y ≫ Y.j = jK R ≫ χ → y' ≫ Y.j = jK R ≫ χ' → χ ≫ Y.s = spMap f ≫ spMap b
               → χ' ≫ Y.s = spMap f ≫ spMap b → Y.HasArcData a I f u χ → Y.HasArcData a I f u χ'
               → χ = χ' := by
-  first
-  | exact @GlobalTheory.ArcUnique.eq_of_hasArcData
-  | exact GlobalTheory.ArcUnique.eq_of_hasArcData
-  | (intros; apply GlobalTheory.ArcUnique.eq_of_hasArcData <;> assumption)
+  first | exact @GlobalTheory.ArcUnique.eq_of_hasArcData

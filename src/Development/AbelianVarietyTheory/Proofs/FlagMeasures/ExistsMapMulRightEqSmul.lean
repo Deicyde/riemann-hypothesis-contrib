@@ -170,7 +170,7 @@ theorem exists_lintegral_eq_mul
   classical
   have hind : Measurable (T.indicator (1 : G → ENNReal)) := measurable_one.indicator hT
   have ind_ne_top : ∀ x, T.indicator (1 : G → ENNReal) x ≠ ⊤ := fun x => by
-    by_cases hx : x ∈ T <;> simp [Set.indicator_apply, hx]
+    by_cases hx : x ∈ T <;> simp [hx]
   have hLm
       : ∀ φ : G → ENNReal,
         Measurable φ

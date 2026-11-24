@@ -55,17 +55,31 @@ open scoped RealInnerProductSpace ContDiff Real ComplexOrder Topology
 
 namespace GlobalTheory.Mem.Lift
 
-theorem IsQuadOf.apply_vec {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {B : Type} [NormedAddCommGroup B]
-    [NormedSpace ℂ B] {om : V → V → ℝ} {X : V → V} {κ : Type} [Fintype κ] {c : κ → ℂ} {p q : κ → V}
-    (h : IsQuadOf om X c p q) (L : V →ₗ[ℝ] B) (v : V) :
-    (2 * π * I : ℂ) • ∑ i, c i • ((om (q i) v : ℂ) • L (p i) + (om (p i) v : ℂ) • L (q i)) = L (X v) := by
+theorem IsQuadOf.apply_vec
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {B : Type} [NormedAddCommGroup B] [NormedSpace ℂ B]
+    {om : V → V → ℝ} {X : V → V} {κ : Type} [Fintype κ]
+    {c : κ → ℂ} {p q : κ → V} (h : IsQuadOf om X c p q)
+    (L : V →ₗ[ℝ] B) (v : V)
+    : (2 * π * I : ℂ) • ∑ i, c i • ((om (q i) v : ℂ) • L (p i) + (om (p i) v : ℂ) • L (q i))
+      = L (X v) := by
   rw [SeparatingDual.eq_iff_forall_dual_eq (R := ℂ)]
   intro φ
   have := h ((φ.restrictScalars ℝ).toLinearMap ∘ₗ L) v
 
   simpa [map_sum, ← mul_add] using this
 
-theorem fderiv_eq_quad_comm : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] (B : Type) [NormedAddCommGroup B] [NormedSpace ℂ B] (om : V →L[ℝ] V →L[ℝ] ℝ) (ρ : V → B →L[ℂ] B), (∀ x, om x x = 0) → IsHeis (fun x y => om x y) ρ → ∀ (X : V → V) (κ : Type) [Fintype κ] (c : κ → ℂ) (p q : κ → V), IsQuadOf (fun x y => om x y) X c p q → ∀ f, Sm ρ f → ∀ w, fderiv ℝ (fun u => ρ u f) w (X w) = quad ρ c p q (ρ w f) - ρ w (quad ρ c p q f) := by
+theorem fderiv_eq_quad_comm
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] (B : Type) [NormedAddCommGroup B]
+        [NormedSpace ℂ B] (om : V →L[ℝ] V →L[ℝ] ℝ) (ρ : V → B →L[ℂ] B),
+      (∀ x, om x x = 0) → IsHeis (fun x y => om x y) ρ
+        → ∀ (X : V → V) (κ : Type) [Fintype κ] (c : κ → ℂ) (p q : κ → V),
+          IsQuadOf (fun x y => om x y) X c p q
+            → ∀ f,
+              Sm ρ f
+                → ∀ w,
+                  fderiv ℝ (fun u => ρ u f) w (X w)
+                    = quad ρ c p q (ρ w f) - ρ w (quad ρ c p q f) := by
   intro V _ _ B _ _ om ρ h0 hH X κ _ c p q hQ f hf w
   have C := GlobalTheory.Mem.Lift.DCalc.dH_calculus V B om ρ h0 hH
   obtain ⟨h1, h2, h3, h4, -⟩ := C f hf
@@ -73,9 +87,12 @@ theorem fderiv_eq_quad_comm : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace
     have := h0 (w + X w)
     simp only [map_add (f := _), _root_.add_apply, h0] at this
     linarith
-  have key : ∀ u v, dH ρ u (dH ρ v (ρ w f)) = ρ w (dH ρ u (dH ρ v f))
-      + (2 * π * I : ℂ) • ρ w ((om v w : ℂ) • dH ρ u f + (om u w : ℂ) • dH ρ v f)
-      + ((2 * π * I : ℂ) * ((2 * π * I : ℂ) * ((om v w : ℂ) * (om u w : ℂ)))) • ρ w f := by
+  have key
+      : ∀ u v,
+        dH ρ u (dH ρ v (ρ w f))
+          = ρ w (dH ρ u (dH ρ v f))
+            + (2 * π * I : ℂ) • ρ w ((om v w : ℂ) • dH ρ u f + (om u w : ℂ) • dH ρ v f)
+            + ((2 * π * I : ℂ) * ((2 * π * I : ℂ) * ((om v w : ℂ) * (om u w : ℂ)))) • ρ w f := by
     intro u v
     obtain ⟨-, g2, -, g4, -⟩ := C _ (h1 v)
     have hs : Sm ρ ((2 * π * I * (om v w : ℂ)) • ρ w f) := (smS ρ).smul_mem _ (h2 w)
@@ -83,22 +100,30 @@ theorem fderiv_eq_quad_comm : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace
     simp only [map_add (f := _), map_smul]
     module
   have e1 := hQ.apply_vec (fderiv ℝ (fun u => ρ u f) 0).toLinearMap w
-  have e1' : (2 * π * I : ℂ) • ∑ i, c i • ((om (q i) w : ℂ) • dH ρ (p i) f + (om (p i) w : ℂ) • dH ρ (q i) f)
-      = dH ρ (X w) f := e1
+  have e1'
+      : (2 * π * I : ℂ)
+          • ∑ i, c i • ((om (q i) w : ℂ) • dH ρ (p i) f + (om (p i) w : ℂ) • dH ρ (q i) f)
+        = dH ρ (X w) f :=
+    e1
   have e2 := hQ (Complex.ofRealCLM.toLinearMap ∘ₗ (om.flip w).toLinearMap) w
-  have e2' : 2 * π * I * ∑ i, c i * ((om (q i) w : ℂ) * (om (p i) w : ℂ) + (om (p i) w : ℂ) * (om (q i) w : ℂ))
-      = (om (X w) w : ℂ) := e2
-  have e3 : ∑ i, c i * ((2 * π * I : ℂ) * ((2 * π * I : ℂ) * ((om (q i) w : ℂ) * (om (p i) w : ℂ))))
-      = π * I * (om (X w) w : ℂ) := by
+  have e2'
+      : 2 * π * I
+          * ∑ i, c i * ((om (q i) w : ℂ) * (om (p i) w : ℂ) + (om (p i) w : ℂ) * (om (q i) w : ℂ))
+        = (om (X w) w : ℂ) :=
+    e2
+  have e3
+      : ∑ i, c i * ((2 * π * I : ℂ) * ((2 * π * I : ℂ) * ((om (q i) w : ℂ) * (om (p i) w : ℂ))))
+        = π * I * (om (X w) w : ℂ) := by
     rw [← e2', Finset.mul_sum, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
-  have e4 : ∑ i, c i • (2 * π * I : ℂ) • ρ w ((om (q i) w : ℂ) • dH ρ (p i) f + (om (p i) w : ℂ) • dH ρ (q i) f)
-      = ρ w (dH ρ (X w) f) := by
-
+  have e4
+      : ∑ i, c i • (2 * π * I : ℂ) • ρ w ((om (q i) w : ℂ) • dH ρ (p i) f + (om (p i) w : ℂ) • dH ρ (q i) f)
+        = ρ w (dH ρ (X w) f) := by
     rw [← e1', map_smul, map_sum, Finset.smul_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [map_smul, smul_comm]
-  have e5 : quad ρ c p q (ρ w f) = ρ w (quad ρ c p q f) + ρ w (dH ρ (X w) f)
-      + (π * I * (om (X w) w : ℂ)) • ρ w f := by
+  have e5
+      : quad ρ c p q (ρ w f)
+        = ρ w (quad ρ c p q f) + ρ w (dH ρ (X w) f) + (π * I * (om (X w) w : ℂ)) • ρ w f := by
     rw [← e3, ← e4, Finset.sum_smul]
     unfold quad
 

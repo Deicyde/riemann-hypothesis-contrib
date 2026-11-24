@@ -63,7 +63,6 @@ theorem deg_pderiv_succ
     {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h : f.totalDegree ≤ k + 1)
     : (pderiv i f).totalDegree ≤ k := by
   classical
-
   rw [f.as_sum, map_sum]
   refine totalDegree_finsetSum_le fun s hs => ?_
   rw [pderiv_monomial]
@@ -103,9 +102,9 @@ theorem fockT_lower
       GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.lowO,
       GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn, h1, h2, hil,
       LinearMap.sum_apply]
-  · intro k _ hk; simp [Matrix.single_apply, Ne.symm hk]
+  · intro k _ hk; simp [Ne.symm hk]
   · simp
-  · intro k _ hk; simp [Matrix.single_apply, Ne.symm hk]
+  · intro k _ hk; simp [Ne.symm hk]
   · simp
 
 theorem lower_deg

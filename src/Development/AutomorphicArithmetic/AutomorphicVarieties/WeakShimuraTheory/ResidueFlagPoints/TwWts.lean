@@ -47,7 +47,7 @@ private theorem aux
     : ((x * y ^ n) ^ 2 * z ^ (-(2 * a + n * b))) ^ k = 1 := by
   have e
       : (x * y ^ n) ^ 2 * z ^ (-(2 * a + n * b)) = (x * z ^ (-a)) ^ 2 * (y ^ 2 * z ^ (-b)) ^ n := by
-    simp only [mul_pow, ← zpow_natCast, ← zpow_mul, mul_zpow]
+    simp only [← zpow_natCast, ← zpow_mul, mul_zpow]
     rw [show -(2 * a + (n : ℤ) * b) = -a * 2 + -b * n by ring, zpow_add]
     push_cast
     rw [mul_comm (n : ℤ) 2]

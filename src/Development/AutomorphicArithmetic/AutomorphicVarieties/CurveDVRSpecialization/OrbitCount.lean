@@ -135,7 +135,7 @@ private theorem cycMod_one
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   unfold cycMod cycZ
   ext
-  simp only [MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, Units.val_one]
+  simp only [MonoidHom.comp_apply, Units.coe_map, Units.val_one]
   change PadicInt.toZModPow 1
       ((cyclotomicCharacter Ω l) ((MulSemiringAction.toRingAut (G ℚ Ω) Ω) s)).val
     = 1

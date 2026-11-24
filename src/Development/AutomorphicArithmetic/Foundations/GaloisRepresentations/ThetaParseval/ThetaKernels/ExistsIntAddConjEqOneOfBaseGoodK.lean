@@ -43,8 +43,6 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.UnitaryCo
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice

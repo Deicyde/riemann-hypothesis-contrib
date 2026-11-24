@@ -193,7 +193,7 @@ theorem card_stab (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (x : 
         q ∈ Bridge.stab ((finPt V).comp (GQ V).subtype) (K.comap (finG V)) x
           ↔ finG V (x⁻¹ * finPt V q * x) ∈ K := fun q => by
     rw [Bridge.mem_stab]
-    simp [MulAut.conj_apply]
+    simp
   let f
       : Bridge.stab ((finPt V).comp (GQ V).subtype) (K.comap (finG V)) x
         → {γ : ratFin V // finG V (x⁻¹ * γ * x) ∈ K} := fun q =>

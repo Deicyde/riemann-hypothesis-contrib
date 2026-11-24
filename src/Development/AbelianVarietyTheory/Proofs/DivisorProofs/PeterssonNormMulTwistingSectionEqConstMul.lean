@@ -45,8 +45,6 @@ open NumberField IsDedekindDomain MeasureTheory ReciprocityTheory.ChartRestricti
   Formalism.BasicNotions.TH Formalism.L2.Theta GlobalTheory.AllWt GlobalTheory.FlatLine
   GlobalTheory.FlatTw GlobalTheory.IndefiniteRowSideFullHecke.ComponentMassSum
 
-
-
 noncomputable section
 
 namespace GlobalTheory.FlatTw.PetTw

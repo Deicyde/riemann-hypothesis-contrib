@@ -69,8 +69,7 @@ def chr (χ : G →* kˣ) : Ob k G where
   ρ := {
     toFun := fun g => (χ g : k) • LinearMap.id
     map_one' := by ext; simp
-    map_mul' := fun g h => by
-      ext; simp [mul_smul, Module.End.mul_eq_comp, mul_assoc, mul_comm, mul_left_comm]
+    map_mul' := fun g h => by ext; simp [mul_smul, Module.End.mul_eq_comp, mul_left_comm]
   }
 
 open scoped LaurentSeries PowerSeries in

@@ -136,8 +136,8 @@ theorem vG_disjoint (hPr : Pr.Ok) : Disjoint (Pr.vG 0) (Pr.vG 1) := by
   obtain ⟨x, y, hxy⟩ := hc
   refine w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 ?_)
   rw [← hxy]
-  exact add_mem (Ideal.mul_mem_left _ _ (g_mem_of_vG hPr h0))
-    (Ideal.mul_mem_left _ _ (g_mem_of_vG hPr h1))
+  exact add_mem (Ideal.mul_mem_left _ _ (_root_.Formalism.L2.Col.Primes.Ok.g_mem hPr h0))
+    (Ideal.mul_mem_left _ _ (_root_.Formalism.L2.Col.Primes.Ok.g_mem hPr h1))
 
 theorem primes_over_places
     : ∀ (X : Fields) (Pr : Primes X) (hc : Formalism.BasicNotions.CMData X.F X.E),
@@ -211,7 +211,7 @@ theorem primes_over_places
           have hg : (Pr.g a : 𝓞 X.F) ∈ (w.under (𝓞 X.F)).asIdeal := by
             show (Pr.g a : 𝓞 X.F) ∈ Ideal.comap (algebraMap (𝓞 X.F) (𝓞 X.E)) w.asIdeal
             rw [Ideal.mem_comap, map_natCast]
-            exact g_mem_of_vG hPr hw
+            exact _root_.Formalism.L2.Col.Primes.Ok.g_mem hPr hw
           have hw' : w ∈ Pr.vGs := mem_vGs hw
           have e2 : wOf a (w.under (𝓞 X.F)) hg = ⟨w, hw'⟩ :=
             ((h1 a _ hg ⟨w, hw'⟩).1 (isOver_of_under rfl)).symm
@@ -220,7 +220,7 @@ theorem primes_over_places
           have hg : (Pr.g a : 𝓞 X.F) ∈ (w.under (𝓞 X.F)).asIdeal := by
             show (Pr.g a : 𝓞 X.F) ∈ Ideal.comap (algebraMap (𝓞 X.F) (𝓞 X.E)) w.asIdeal
             rw [Ideal.mem_comap, map_natCast]
-            exact g_mem_of_vG hPr hw
+            exact _root_.Formalism.L2.Col.Primes.Ok.g_mem hPr hw
           exact (eq_of_isOver hc hPr hg (mem_vGs hw) (mem_vGs hw') (isOver_of_under rfl)
             (isOver_of_under he.symm)).symm
       rw [hL, Fin.prod_univ_two, hA 0, hA 1]

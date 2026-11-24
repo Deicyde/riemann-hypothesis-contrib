@@ -159,7 +159,7 @@ theorem mult_unique
   exact h1
 
 theorem ltLog_const (l : ℕ) (hl : 2 ≤ l) : constantCoeff (ltLog K l) = 0 := by
-  first | unfold Formalism.G.ltLog | unfold Formalism.L2.Th1.CM.ltLog
+  first | unfold Formalism.L2.Th1.CM.ltLog
   rw [← coeff_zero_eq_constantCoeff_apply, coeff_mk, dite_eq_right]
   rintro ⟨j, hj⟩
   have h0 : 0 < (l ^ 2) ^ j := pow_pos (pow_pos (by omega) 2) j
@@ -183,12 +183,7 @@ theorem cW_unfold {K : Type} [Field K] (g2 g3 : K) (k : ℕ)
         else
           0 := by
   rw [cW]
-  first
-  | (rw [Nat.strongRecOn_beta]; rfl)
-  | (rw [Nat.strongRecOn'_beta]; rfl)
-  | (rw [Nat.strongRecOn_eq]; rfl)
-  | (unfold Nat.strongRecOn; rw [Nat.strongRec_eq]; rfl)
-  | (exact (Nat.strongRecOn_beta' ..).trans rfl)
+  first | (rw [Nat.strongRecOn_eq]; rfl)
 
 theorem cW_map (k : ℕ) : φ (cW g2 g3 k) = cW (φ g2) (φ g3) k := by
   induction k using Nat.strong_induction_on with
@@ -249,7 +244,7 @@ theorem lgS_map : PowerSeries.map φ (lgS g2 g3) = lgS (φ g2) (φ g3) := by
 
 theorem ltLog_map (l : ℕ) : PowerSeries.map φ (ltLog K l) = ltLog L l := by
   ext n
-  first | unfold Formalism.G.ltLog | unfold Formalism.L2.Th1.CM.ltLog
+  first | unfold Formalism.L2.Th1.CM.ltLog
   rw [coeff_map, coeff_mk, coeff_mk]
   split_ifs <;> simp
 

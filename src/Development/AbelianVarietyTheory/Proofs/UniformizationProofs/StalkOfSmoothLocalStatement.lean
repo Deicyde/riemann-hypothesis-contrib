@@ -56,6 +56,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.stalk_regular_flat_of_smooth
     : ∀ (V : Type) [CommRing V] [IsNoetherianRing V] [IsLocalRing V] (X : Scheme.{0})
         (f : X ⟶ Spec (CommRingCat.of V)) (g : ℕ),
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.stalk_regular_flat_of_smooth
                 → IsNoetherianRing (X.presheaf.stalk x) ∧ σ.Flat
                   ∧ IsRegularLocalRing (X.presheaf.stalk x ⧸ (IsLocalRing.maximalIdeal V).map σ)
                   ∧ ringKrullDim (X.presheaf.stalk x ⧸ (IsLocalRing.maximalIdeal V).map σ) = g := by
-  first
-  | exact @GlobalTheory.StabFlat.stalk_of_smooth_local
-  | exact GlobalTheory.StabFlat.stalk_of_smooth_local
-  | (intros; apply GlobalTheory.StabFlat.stalk_of_smooth_local <;> assumption)
+  first | exact @GlobalTheory.StabFlat.stalk_of_smooth_local

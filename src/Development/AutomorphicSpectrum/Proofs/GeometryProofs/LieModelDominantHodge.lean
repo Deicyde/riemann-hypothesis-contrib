@@ -2,8 +2,12 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompatStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelBaseChangeMapStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeDominantCompat
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelBaseChangeMap
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelPullbackCorrespondence
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -66,7 +70,8 @@ theorem exists_bc
       (M'.pt (j e)).left = Spec.map (CommRingCat.ofHom (dualMap f)) ≫ (M.pt e).left := by
   subst hy
   let _ := f.toAlgebra
-  obtain ⟨j, hj, -⟩ := GlobalTheory.T.lie_model_base_change_map S G R R' x E E' M M'
+  obtain ⟨j, hj, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.lieModel_baseChange S G R R' x E E' M M'
   exact ⟨j, hj⟩
 
 theorem lie_pull_lat
@@ -89,8 +94,8 @@ theorem lie_pull_lat
       : ∀ e, (M'.pt (j e)).left ≫ m.φ = Spec.map (CommRingCat.ofHom (dualMap i)) ≫ (M.pt e).left :=
     hj
   obtain ⟨⟨h₁, h₂⟩, h₃, h₄⟩ :=
-    GlobalTheory.T.lie_lattice_dominant_compat X X' Ω Ω' ξ ξ' f i t.G t'.G m.φ V V' M M' j hξ hξ' hd
-      m.cart t.semi.smooth hj'
+    _root_.GlobalTheory.CompanionTheory.Ar.LiePull.main X X' Ω Ω' ξ ξ' f i t.G t'.G m.φ V V' M M' j
+      hξ hξ' hd m.cart t.semi.smooth hj'
   exact ⟨j, hj', h₁, h₂, h₃, h₄⟩
 
 end GlobalTheory.CompanionTheory.Ar.LiePullSab

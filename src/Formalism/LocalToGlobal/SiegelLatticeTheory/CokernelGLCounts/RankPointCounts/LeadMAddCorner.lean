@@ -173,8 +173,8 @@ theorem leadZZ_model
       unfold Loc.HermSp.ZZplusOf
       rw [hs]
       by_cases hab : a = Fin.last r ∧ b = Fin.last r
-      · simp [π₁, hab, Ecorner, q, div_eq_inv_mul] <;> ring
-      · simp [π₁, hab, Ecorner, q, div_eq_inv_mul] <;> ring
+      · simp [π₁, hab, Ecorner, q, div_eq_inv_mul]
+      · simp [π₁, hab, Ecorner, q, div_eq_inv_mul]
     have e2
         : (Loc.HermSp.ZZplusOf M Zh T T').map π₂
           = (-q⁻¹) • (Zh.map π₂).transpose + (-(T' / q)) • Ecorner r := by
@@ -183,7 +183,7 @@ theorem leadZZ_model
       rw [hs]
       by_cases hab : a = Fin.last r ∧ b = Fin.last r
       · simp [π₂, hab, Ecorner, q, div_eq_inv_mul] <;> ring
-      · simp [π₂, hab, Ecorner, q, div_eq_inv_mul] <;> ring
+      · simp [π₂, hab, Ecorner, q, div_eq_inv_mul]
     have l1 : π₁ (leadM (Loc.HermSp.ZZplusOf M Zh T T') r) = q⁻¹ ^ r * π₁ (leadM Zh r) := by
       rw [← leadM_map, e1, leadM_add_corner, leadM_smul, leadM_map]
     have l2 : π₂ (leadM (Loc.HermSp.ZZplusOf M Zh T T') r) = (-q⁻¹) ^ r * π₂ (leadM Zh r) := by

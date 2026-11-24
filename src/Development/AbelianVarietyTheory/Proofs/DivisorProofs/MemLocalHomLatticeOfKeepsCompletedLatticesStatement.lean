@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.WeilParts
 open scoped TensorProduct Kronecker ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_localHomLattice_of_keeps_completedLattices
     : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
         (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.mem_localHomLattice_of_keeps_completedLattices
                 → ∀ u,
                   u ∈ (latO S T ΛS ΛT fun w => w = v)
                     ↔ actO S T g h u ∈ (latO S T ΛS ΛT fun w => w = v) := by
-  first
-  | exact @GlobalTheory.LocalLatStab.mem_latO_place_iff_actO
-  | exact GlobalTheory.LocalLatStab.mem_latO_place_iff_actO
-  | (intros; apply GlobalTheory.LocalLatStab.mem_latO_place_iff_actO <;> assumption)
+  first | exact @GlobalTheory.LocalLatStab.mem_latO_place_iff_actO

@@ -141,8 +141,6 @@ theorem fgtNat
   rw [← Cochain.comp_assoc_of_first_is_zero_cochain, ← Cochain.comp_assoc_of_first_is_zero_cochain,
     ← Cochain.ofHom_comp, ← Cochain.ofHom_comp, key]
 
-theorem leafRelNat : LeafRelNat := fgtNat
-
 def LeafSecTw : Prop :=
   ∀ (q : ℕ) [NeZero q] (k : Type) [Field k],
     IsUnit (q : k)

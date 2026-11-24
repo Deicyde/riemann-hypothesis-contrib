@@ -87,7 +87,6 @@ theorem anti_of_step {f : Fin r → ℤ} (h : ∀ (a : Fin r) (ha : a.1 + 1 < r)
       intro a ha hb
       exact le_trans (h ⟨a + d, by omega⟩ hb) (ih a ha (by omega))
   intro a b hab
-  have hab' : a.1 ≤ b.1 := hab
   have hb : b = ⟨a.1 + (b.1 - a.1), by have := b.2; omega⟩ := Fin.ext (by simp; omega)
   rw [hb]
   exact H _ a.1 a.2 _
@@ -266,8 +265,7 @@ variable {K : Type} [Field K] {N r : ℕ} [NeZero r]
 
 theorem chWt_zero (LL : ChainLetters N) (c : Fin r) (m : Fin N × Fin r →₀ ℕ)
     : chWt LL 0 c m = 0 := by
-  unfold chWt
-  simp
+  simp [chWt]
 
 theorem ycond_zero_top (LL : ChainLetters N) (M : WithTop ℤ) (h : (0 : WithTop ℤ) ≤ M)
     : YCond K (r := r) LL 0 M = ⊤ := by
@@ -544,8 +542,7 @@ theorem dimY_of
     (hSt : StWeylAt)
     : DimYAt := by
   intro p _ O _ _ _ S N r _ LL q J M hJ
-  have hp : p.Prime := Fact.out
-  have hKz : CharZero (KK O) := dvr_fraction_field_charZero S hp
+  have hKz : CharZero (KK O) := dvr_fraction_field_charZero S (Fact.out : p.Prime)
   obtain ⟨hli, hspan⟩ := hA2 O N r (⟨LL.vec⟩ : Letters (Fin N)) LL.deg
   have hli' : LinearIndependent O (psiR (r := r) O LL) := hli
   have hrange : Submodule.span O (Set.range (psiR (r := r) O LL)) = Pol O r LL.deg := by

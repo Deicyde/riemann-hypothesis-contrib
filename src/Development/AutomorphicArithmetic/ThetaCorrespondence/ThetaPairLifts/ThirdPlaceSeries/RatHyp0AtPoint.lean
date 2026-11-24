@@ -42,8 +42,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.LevelOfOfSameBut
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
@@ -69,7 +67,7 @@ theorem ratHyp0_at_point_alt
             → ∀ j : Fin (Fm.D x i).R.m, RatHyp0 p.T p.R (F2 p) p.κ p.v₀ p.O t j := by
   intro eps Fm x hx i p hp hM t ht hlow j
   obtain ⟨hc, -, hu, -⟩ :=
-    _root_.GlobalTheory.T.links2_of_single_index_twisted _ _ _ _ _ _ _ _ _ _ p hp hM.1
+    _root_.GlobalTheory.BigOn.links2_of_rows_alt _ _ _ _ _ _ _ _ _ _ p hp hM.1
   have hTie : TieIn p.T p.R.toRealDat p.κ p.v₀ :=
     ⟨p.fw.laws, p.fw.alg_eq, p.fw.kap, p.fw.hv₀, p.fw.chiR, p.fw.x0⟩
   exact {

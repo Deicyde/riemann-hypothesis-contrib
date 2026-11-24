@@ -201,7 +201,7 @@ theorem pf_Glob2
         (continuous_const.prodMk continuous_id)
     convert h2 using 1
     ext g
-    simp only [Set.mem_preimage, SetLike.mem_coe, Subgroup.mem_prod, one_mem, and_self, true_and]
+    simp only [Set.mem_preimage, SetLike.mem_coe, Subgroup.mem_prod, one_mem, true_and]
   have hcomm3
       : ∀ s ∈ twCent θ' (e (ratGL E n d)).2, ∀ t ∈ twCent θ' (e (ratGL E n d)).2,
         s * t = t * s := by

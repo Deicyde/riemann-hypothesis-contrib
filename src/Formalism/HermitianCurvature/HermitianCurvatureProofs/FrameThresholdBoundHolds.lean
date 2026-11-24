@@ -155,7 +155,3 @@ theorem frame_threshold_bound : FrameThresholdBound := by
         ring
 
 end Formalism.FourierDecayAlt.P.PBD
-
-theorem Formalism.FourierDecayAlt.P.frame_threshold_bound_holds
-    : Formalism.FourierDecayAlt.P.PBD.FrameThresholdBound :=
-  Formalism.FourierDecayAlt.P.PBD.frame_threshold_bound

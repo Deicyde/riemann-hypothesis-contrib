@@ -65,7 +65,7 @@ theorem circle_pow (ψ : Ideles L →* Circle) (hψ : Continuous ψ)
       continuous_id
       (fun _ => rfl)
       (GlobalTheory.UnUnitCmp.Val.intFin L)
-      (fun W hW => GlobalTheory.AdLat.OpenLat.exists_nsmul_adele L W hW)
+      (fun W hW => _root_.GlobalTheory.LocalNormBound.main L W hW)
       GlobalTheory.UnUnitCmp.Val.finite_quot ψ hψ
   exact ⟨
     m,

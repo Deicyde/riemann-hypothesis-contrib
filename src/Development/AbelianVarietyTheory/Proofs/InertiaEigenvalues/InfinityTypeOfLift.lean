@@ -4,8 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 public import Formalism.LocalToGlobal.GaloisLevelStructure.DefsAut
 public import Mathlib.Data.Matrix.PEquiv
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsComp
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgWeightHighestWeightExistsUniqueAntitoneStatement
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolynomialRepGLComplexAlgebraicWeightEvalPointStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgWeightHighestWeightExistsUniqueAntitone
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolyRep
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolynomialRepGLComplexAlgebraicWeightEvalPoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -106,16 +107,9 @@ theorem conj_conj (τ : L →+* ℂ)
     : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ := by
   ext x; simp
 
-theorem conj_ne (τ : L →+* ℂ) : ComplexEmbedding.conjugate τ ≠ τ := by
-  intro h
-  have h1 : ComplexEmbedding.IsReal τ := ComplexEmbedding.isReal_iff.2 h
-  have h2 := IsTotallyComplex.isComplex (InfinitePlace.mk τ)
-  rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_mk_iff] at h2
-  exact h2 h1
-
 theorem evPt_eq_tinv (τ : L →+* ℂ) (B : GL (Fin n) ℂ)
     : evPt τ B = evPt (ComplexEmbedding.conjugate τ) (tinv B) := by
-  have hne := conj_ne τ
+  have hne := _root_.GlobalTheory.AlgWtHW.conjugate_ne_self τ
   funext p
   rcases p with ⟨σ, i, j⟩
   by_cases h1 : σ = τ
@@ -125,7 +119,7 @@ theorem evPt_eq_tinv (τ : L →+* ℂ) (B : GL (Fin n) ℂ)
     · subst h2
       simp [NG.evPt, tinv, hne]
     · have h3 : σ ≠ ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) := by rwa [conj_conj]
-      simp [NG.evPt, h1, h2, h3]
+      simp [NG.evPt, h1, h2]
 
 theorem inv_upper {B : GL (Fin n) ℂ} (hB : B.val.BlockTriangular id)
     : (B⁻¹).val.BlockTriangular id := by
@@ -152,8 +146,7 @@ theorem hwAt_of_conj
     : a.HWAt τ (fun i => - lam' (Fin.rev i)) := by
   obtain ⟨ι, hι1, hι2, b, P, hP, v, hv0, hv⟩ := h
   have hR :=
-    GlobalTheory.T.isPolynomialRepGLComplex_algebraicWeight_evalPoint L n a ι b P hP
-      (ComplexEmbedding.conjugate τ)
+    _root_.GlobalTheory.AlgWtHW.isPolyRep_evPt L n a ι b P hP (ComplexEmbedding.conjugate τ)
   refine ⟨
     ι,
     hι1,
@@ -216,8 +209,7 @@ theorem infOf_conj
     (h : a.HWAt τ lam) (h' : a.HWAt (ComplexEmbedding.conjugate τ) lam')
     : infOf lam' = (infOf lam).map Neg.neg := by
   have e :=
-    (GlobalTheory.T.algWeight_highestWeight_exists_unique_antitone L n a τ).1.unique h
-      (hwAt_of_conj h')
+    (_root_.GlobalTheory.AlgWtHW.hw_exists_unique_antitone L n a τ).1.unique h (hwAt_of_conj h')
   have hl : lam' = fun i => - lam (Fin.rev i) := by funext i; rw [e]; simp
   subst hl
   unfold infOf
@@ -287,8 +279,6 @@ theorem evLgG_of_forall
 end GlobalTheory.LiftInfRef
 
 namespace GlobalTheory.LiftInfRef
-
-attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 end GlobalTheory.LiftInfRef
 

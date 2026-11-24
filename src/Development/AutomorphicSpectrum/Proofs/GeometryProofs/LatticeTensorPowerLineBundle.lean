@@ -67,7 +67,7 @@ theorem div_mem_of_isGenAt
     rw [← htΛ, hsΛ]
     exact Submodule.mem_span_singleton_self s
   obtain ⟨r, hr⟩ := Submodule.mem_span_singleton.mp hmem
-  have hr' : (r : Ω) * t = s := by first | exact hr | simpa [Subring.smul_def] using hr
+  have hr' : (r : Ω) * t = s := by first | exact hr
   rw [← hr', mul_div_assoc, div_self ht0, _root_.mul_one]
   exact r.2
 

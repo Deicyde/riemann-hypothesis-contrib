@@ -87,8 +87,8 @@ def mulLb (k r : ℕ) : Mat k r →L[ℝ] Mat k r →L[ℝ] Mat k r :=
 theorem vf_eq_b (b : Bool) (X g : Mat k r)
     : vf b X g = (if b then -(mulLb k r X g) else mulRb k r X g) := by
   cases b
-  · first | rfl | simp [vf, mulLb, mulRb, mulL, mulR]
-  · first | rfl | simp [vf, mulLb, mulRb, mulL, mulR]
+  · first | rfl
+  · first | rfl
 
 theorem vf_contDiff
     {P : Type*} [NormedAddCommGroup P] [NormedSpace ℝ P]
@@ -97,13 +97,9 @@ theorem vf_contDiff
     : ContDiff ℝ ∞ (fun q => vf b (X q) (g q)) := by
   cases b
   · have h := ((mulRb k r).contDiff.comp hX).clm_apply hg
-    first
-    | exact h.congr fun q => by rw [vf_eq_b]; rfl
-    | (convert h using 1; funext q; rw [vf_eq_b]; rfl)
+    first | (convert h using 1; funext q; rw [vf_eq_b]; rfl)
   · have h := (((mulLb k r).contDiff.comp hX).clm_apply hg).neg
-    first
-    | exact h.congr fun q => by rw [vf_eq_b]; rfl
-    | (convert h using 1; funext q; rw [vf_eq_b]; rfl)
+    first | (convert h using 1; funext q; rw [vf_eq_b]; rfl)
 
 def Phi (F' : Mat k r → E) : (j : ℕ) → (Fin j → Bool) → (Fin j → Mat k r) × Mat k r → E
   | 0, _, q => F' q.2
@@ -113,10 +109,7 @@ def Phi (F' : Mat k r → E) : (j : ℕ) → (Fin j → Bool) → (Fin j → Mat
       q.2 (vf (bs 0) (q.1 0) q.2)
 
 theorem top_add_one_le : (∞ : WithTop ℕ∞) + 1 ≤ ∞ := by
-  first
-  | (rw [← WithTop.coe_one, ← WithTop.coe_add, top_add])
-  | simp
-  | exact le_of_eq (by norm_cast)
+  first | (rw [← WithTop.coe_one, ← WithTop.coe_add, top_add])
 
 theorem phi_contDiffAt
     (F' : Mat k r → E) {U : Set (Mat k r)} (hU : IsOpen U) (hF : ContDiffOn ℝ ∞ F' U)

@@ -109,11 +109,7 @@ theorem isIso_of_pull
 
 end Pull
 
-theorem spMap_comp₂
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) := by
-  simp only [spMap, ← Spec.map_comp]
-  rfl
+alias spMap_comp₂ := _root_.GlobalTheory.TanMod.spMap_comp'
 
 theorem spMap_frac_cancel
     {V K A : Type} [CommRing V] [CommRing K] [Algebra V K] [IsFractionRing V K] [CommRing A]

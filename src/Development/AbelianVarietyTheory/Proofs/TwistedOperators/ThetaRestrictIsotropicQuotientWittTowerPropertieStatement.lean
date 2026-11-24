@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaRestrictIsotropicQuotient_wittTower_properties
     : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
         (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E),
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.thetaRestrictIsotropicQuotient_wittTower_propertie
                           res V V' W C B μ 𝓨 (heisO ψ V W (isoPart V W C y) f)
                             = res V V' W C B μ 𝓨 f)
                   ∧ ∃ f, IsThetaFunO ψ V W f ∧ res V V' W C B μ 𝓨 f ≠ 0 := by
-  first
-  | exact @GlobalTheory.TowerRestrict.res_theta
-  | exact GlobalTheory.TowerRestrict.res_theta
-  | (intros; apply GlobalTheory.TowerRestrict.res_theta <;> assumption)
+  first | exact @GlobalTheory.TowerRestrict.res_theta

@@ -59,6 +59,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.special_linear_generated_by_transvections
     : ∀ (R : Type) [CommRing R],
       (∀ a b : R, IsCoprime a b → ∃ t : R, IsUnit (a + t * b))
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.special_linear_generated_by_transvections
           (∀ (i j : Fin n),
               i ≠ j → ∀ (t : R) (u : GL (Fin n) R), u.1 = Matrix.transvection i j t → u ∈ H)
             → ∀ a : GL (Fin n) R, Matrix.GeneralLinearGroup.det a = 1 → a ∈ H := by
-  first
-  | exact @GlobalTheory.GLGen.mem_of_det_eq_one
-  | exact GlobalTheory.GLGen.mem_of_det_eq_one
-  | (intros; apply GlobalTheory.GLGen.mem_of_det_eq_one <;> assumption)
+  first | exact @GlobalTheory.GLGen.mem_of_det_eq_one

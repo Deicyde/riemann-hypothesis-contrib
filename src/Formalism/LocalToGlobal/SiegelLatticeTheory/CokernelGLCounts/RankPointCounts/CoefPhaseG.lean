@@ -240,7 +240,6 @@ variable
   {δ : ∀ p : PlF D, (D.s.atP p).Fp} {u u' : D.what₂.Word}
   {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
-
 theorem local_phase_typed_places (hA : ∀ p, Agree δ M p) : PhaseLocG M δ u u' F0 what₂ := by
   intro γ w F' L U hrel hgen hN p hMp
   obtain ⟨-, -, hLu, hUu, e⟩ := hN
@@ -468,7 +467,7 @@ theorem local_phase_typed_places (hA : ∀ p, Agree δ M p) : PhaseLocG M δ u u
     rw [mul_assoc, ← map_mul, mul_inv_cancel₀ hδ, map_one, mul_one, ← map_neg] at h
     rw [← h, g.fractionFieldToGenericStalk_algebraMap_eq, hge, map_mul, AlgEquiv.commutes]
     congr 1
-    simp only [Prod.fst_mul, Prod.snd_mul, Prod.algebraMap_apply, RingHom.id_apply]
+    simp only [Prod.fst_mul, Prod.snd_mul, Prod.algebraMap_apply]
     rw [← adeleInfiniteComponent_apply, ← adele_ext_components]
     have e1
         : p1 sg.e ((D.s.atP p).ιE (s / ((gS D : ℕ) : D.host.E)))

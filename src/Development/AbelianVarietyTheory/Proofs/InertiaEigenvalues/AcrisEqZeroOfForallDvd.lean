@@ -63,38 +63,43 @@ def InJ (w : Per.Ainf l) : Prop := ∃ c : Per.OC l, Per.θ l w = (l : Per.OC l)
 
 def IsLogJ (w : Per.Ainf l) (y : Per.Acris l) : Prop :=
   ∀ r : ℕ, ∃ N : ℕ, ∀ n ≥ N, ∃ s : Per.Acris0 l,
-    ((n.factorial : ℕ) : Per.AinfP l) * (s : Per.AinfP l) =
-      ∑ k ∈ Finset.range n, (-1) ^ k * ((n.factorial / (k + 1) : ℕ) : Per.AinfP l) *
-        (algebraMap (Per.Ainf l) (Per.AinfP l) w) ^ (k + 1) ∧
-    ∃ z : Per.Acris l, y - algebraMap (Per.Acris0 l) (Per.Acris l) s = ((l : ℕ) : Per.Acris l) ^ r * z
+    ((n.factorial : ℕ) : Per.AinfP l) * (s : Per.AinfP l)
+        = ∑ k ∈ Finset.range n, (-1) ^ k * ((n.factorial / (k + 1) : ℕ) : Per.AinfP l) *
+            (algebraMap (Per.Ainf l) (Per.AinfP l) w) ^ (k + 1)
+      ∧ ∃ z : Per.Acris l,
+        y - algebraMap (Per.Acris0 l) (Per.Acris l) s = ((l : ℕ) : Per.Acris l) ^ r * z
 
 theorem isLogJ_zero : IsLogJ (0 : Per.Ainf l) 0 := fun _ => ⟨0, fun _ _ => ⟨0, by simp, 0, by simp⟩⟩
 
-private theorem acris_eq_zero_of_forall_dvd (x : Per.Acris l)
-    (h : ∀ r : ℕ, ∃ z : Per.Acris l, x = ((l : ℕ) : Per.Acris l) ^ r * z) : x = 0 := by
+private theorem acris_eq_zero_of_forall_dvd
+    (x : Per.Acris l) (h : ∀ r : ℕ, ∃ z : Per.Acris l, x = ((l : ℕ) : Per.Acris l) ^ r * z)
+    : x = 0 := by
   refine IsHausdorff.haus (I := Ideal.span {((l : ℕ) : Per.Acris l)})
     (GlobalTheory.MemLoc.acris_basic l).1.toIsHausdorff x fun r => ?_
   obtain ⟨z, hz⟩ := h r
   rw [SModEq.zero, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, Ideal.mem_span_singleton]
   exact ⟨z, hz⟩
 
-theorem isLogJ_unique {w : Per.Ainf l} {y y' : Per.Acris l} (h : IsLogJ w y) (h' : IsLogJ w y') :
-    y = y' := by
+theorem isLogJ_unique {w : Per.Ainf l} {y y' : Per.Acris l} (h : IsLogJ w y) (h' : IsLogJ w y')
+    : y = y' := by
   rw [← sub_eq_zero]
   refine acris_eq_zero_of_forall_dvd (y - y') fun r => ?_
   obtain ⟨N, hN⟩ := h r
   obtain ⟨N', hN'⟩ := h' r
   obtain ⟨s, hs, z, hz⟩ := hN (max N N') (le_max_left _ _)
   obtain ⟨s', hs', z', hz'⟩ := hN' (max N N') (le_max_right _ _)
-  have : s = s' := Subtype.ext
-    ((GlobalTheory.RingBasics.isUnit_nat l _ (Nat.factorial_ne_zero _)).mul_left_cancel (hs.trans hs'.symm))
+  have : s = s' :=
+    Subtype.ext ((GlobalTheory.RingBasics.isUnit_nat l _ (Nat.factorial_ne_zero _)).mul_left_cancel
+      (hs.trans hs'.symm))
   subst this
   have key : y - y' = ((l : ℕ) : Per.Acris l) ^ r * (z - z') := by linear_combination hz - hz'
   exact ⟨z - z', key⟩
 
-theorem isLogJ_extends {f : Per.Ainf l →+* Per.Ainf l} {F : Per.Acris l →+* Per.Acris l}
-    (hf : GlobalTheory.CrisMaps.Extends f F) {w : Per.Ainf l} {y : Per.Acris l}
-    (hy : IsLogJ w y) : IsLogJ (f w) (F y) := by
+theorem isLogJ_extends
+    {f : Per.Ainf l →+* Per.Ainf l} {F : Per.Acris l →+* Per.Acris l}
+    (hf : GlobalTheory.CrisMaps.Extends f F)
+    {w : Per.Ainf l} {y : Per.Acris l} (hy : IsLogJ w y)
+    : IsLogJ (f w) (F y) := by
   intro r
   obtain ⟨N, hN⟩ := hy r
   refine ⟨N, fun n hn => ?_⟩
@@ -102,7 +107,9 @@ theorem isLogJ_extends {f : Per.Ainf l →+* Per.Ainf l} {F : Per.Acris l →+* 
   refine ⟨⟨Per.extP f s, hf.mem _ s.2⟩, ?_, F z, ?_⟩
   · have := congrArg (Per.extP f) hs
 
-    simpa only [map_mul, map_natCast, map_sum, map_pow, map_neg, map_one, GlobalTheory.RingBasics.awayMap_algebraMap₂] using this
+    simpa only [map_mul, map_natCast, map_sum, map_pow, map_neg, map_one,
+        GlobalTheory.RingBasics.awayMap_algebraMap₂]
+      using this
   · have := congrArg F hz
     rw [map_sub, map_mul, map_pow, map_natCast, hf.env] at this
     exact this

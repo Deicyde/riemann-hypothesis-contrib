@@ -2,8 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.CdScaleTieIff
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsFdegSmulOfIsDS
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowHCParameterIsHCParamAndFormalDegreePosStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueScaleIsScaleStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowHCParameterIsHCParamAndFormalDegreePos
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueScaleIsScale
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -89,7 +89,7 @@ theorem exists_isDS_isFdeg_trueDsig
               → IsFdeg ((trueScale cd _ (epsSH R) : ENNReal) • Formalism.REAL.muG (epsSH R)) σ d
               → d = trueDsig R P := by
   intro hE hF cd R P
-  have hpar := (GlobalTheory.T.rowHCParameter_isHCParam_and_formalDegree_pos R P).1
+  have hpar := (_root_.GlobalTheory.Mem.Vol.lamSH_isHCParam_and_trueDsig_pos R P).1
   have key
       : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
           (σ : Matrix (Fin (2 * R.rS + R.k + 1)) (Fin (2 * R.rS + R.k + 1)) ℂ → (H →L[ℂ] H))
@@ -101,8 +101,8 @@ theorem exists_isDS_isFdeg_trueDsig
     have : Nontrivial H := hσ.2.1
     obtain ⟨w, hw⟩ := exists_ne (0 : H)
     rw [← fdegOf_eq_of_isFdeg _ σ d hd w hw]
-    exact hF cd (trueScale cd) (GlobalTheory.T.cdScaleIs_trueScale' cd) _ (epsSH R) (lamSH R P) hpar
-      H σ w hσ hw
+    exact hF cd (trueScale cd) (_root_.GlobalTheory.Mem.Vol.ScaleExists.trueScale_isScale cd) _
+      (epsSH R) (lamSH R P) hpar H σ w hσ hw
   refine ⟨?_, key⟩
   obtain ⟨H, i1, i2, σ, hσ⟩ := hE _ (epsSH R) (lamSH R P) hpar
   obtain ⟨d, hd⟩ :=

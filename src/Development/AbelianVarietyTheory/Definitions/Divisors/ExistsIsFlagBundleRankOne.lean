@@ -47,7 +47,6 @@ import Formalism.SharpRestriction.Divisibility.WeightThresholdDefs
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry NumberField MvPolynomial Filter Topology

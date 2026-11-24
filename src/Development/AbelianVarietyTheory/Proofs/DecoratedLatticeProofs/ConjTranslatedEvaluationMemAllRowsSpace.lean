@@ -119,7 +119,7 @@ theorem re_fix_of_row
     : X.B.Re (star (hm.toLp f)) = star (hm.toLp f) := by
   have hs : MemLp (fun x => star (f x)) 2 (muX X) := hm.star
   rw [star_toLp_eq X hm hs]
-  have hK := Formalism.L2.SG.Closed.level_subgroup_is_group X
+  have hK := _root_.Formalism.L2.SG.Pf.level_subgroup_character_unitary X
   have hKL := Formalism.L2.SG.Closed.level_subgroup_properties X
   have hKM : MeasurableSet X.K2 :=
     (Formalism.L2.SG.PoincareInHH.Cut.level_subgroup_isClopen X hK hKL).isOpen.measurableSet
@@ -193,7 +193,7 @@ theorem real_shift
         funext σ
         by_cases hσ : σ = τ
         · subst hσ; simp [ws]
-        · simp [ws, hσ, Function.update_of_ne hσ]
+        · simp [ws, hσ]
       have hE :=
         Formalism.IndefR.Eqv.KerDiag.mult_equiv θ M J χ hU τ (ha τ) (ws s) ⟨_, hsm τ⟩
           (by simp only [hws])

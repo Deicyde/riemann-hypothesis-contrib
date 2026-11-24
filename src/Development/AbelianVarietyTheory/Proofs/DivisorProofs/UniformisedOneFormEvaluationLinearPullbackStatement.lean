@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham
   GlobalTheory.CechDR GlobalTheory.CechPer
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.uniformisedOneFormEvaluation_linear_pullback
     : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g),
       ∀ (A' : Over (Sp ℂ)) [GrpObj A'] (g' : ℕ) (L' : LB A'.left) (u' : HolUnif A' L' g')
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.uniformisedOneFormEvaluation_linear_pullback
               ∧ ∀ ξ,
                 evForm u'.ex p.1.1.1 z ((semiHom_secPull h p).m1 ξ)
                   = (evForm u.ex p.1.2.1 (M z) ξ).comp M := by
-  first
-  | exact @GlobalTheory.CechPer.evForm_secPull
-  | exact GlobalTheory.CechPer.evForm_secPull
-  | (intros; apply GlobalTheory.CechPer.evForm_secPull <;> assumption)
+  first | exact @GlobalTheory.CechPer.evForm_secPull

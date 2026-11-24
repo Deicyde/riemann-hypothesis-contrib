@@ -63,6 +63,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.heisenbergOperator_thetaFunctional_mixedSourceModel
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -94,7 +95,4 @@ theorem _root_.GlobalTheory.T.heisenbergOperator_thetaFunctional_mixedSourceMode
                     (_root_.I195MixedCoordinates_0bc2bf51bedd9bcbcf543475.source d) T ψ v.μ v.𝓕 f
                       (rat x) w)
                   (f (d.ext0 T w)) := by
-  first
-  | exact @GlobalTheory.HeisMixSource.heis_mixS
-  | exact GlobalTheory.HeisMixSource.heis_mixS
-  | (intros; apply GlobalTheory.HeisMixSource.heis_mixS <;> assumption)
+  first | exact @GlobalTheory.HeisMixSource.heis_mixS

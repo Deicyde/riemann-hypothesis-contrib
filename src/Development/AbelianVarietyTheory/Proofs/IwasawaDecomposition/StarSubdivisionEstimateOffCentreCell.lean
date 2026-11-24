@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StarDepthToFunNonneg
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EllEqOfInRCone
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StarDepthLeOnCentreCellStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StarDepthLeOnCentreCell
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -147,8 +147,8 @@ theorem off_cell
   intro E _ _ _ H q ψ w b hψ hw X _ _ _ _ hX hgen m γ N ℓ hγ hN hsw β₀ hβ₀ hβ₀n hw₀ hc₀ m' s h hcut
     hpos C hC K hK β hβ hβn hoff
   have hon :=
-    (GlobalTheory.T.starDepth_le_on_centre_cell E H q ψ w hψ hw X hX m γ hγ β₀ hβ₀ hβ₀n hw₀ hc₀ m' s
-      h hcut hpos).1
+    (_root_.GlobalTheory.PolFan.starDepth_on_cell E H q ψ w hψ hw X hX m γ hγ β₀ hβ₀ hβ₀n hw₀ hc₀ m'
+      s h hcut hpos).1
   obtain ⟨n, u, hu, hun, hlψ, hlp, hub, hu1, t, ht, hsum⟩ := hgen β hβ hβn
   have hh₀ : (1 : ℝ) ≤ h β₀ := by exact_mod_cast hpos
   have hoffu

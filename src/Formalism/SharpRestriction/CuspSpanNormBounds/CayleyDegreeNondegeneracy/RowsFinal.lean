@@ -61,10 +61,6 @@ variable
   (Y : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
     LoopTie (Fm.D x i) (Fm.L x i) (X x hx i) u u' C1)
 
-theorem rows_rdE_pos (D : D7) : 0 < D.host.rdE := by
-  unfold Host.rdE
-  exact Real.rpow_pos_of_pos (abs_pos.2 (by exact_mod_cast NumberField.discr_ne_zero D.host.E)) _
-
 def FamilyGramHypotheses : Prop :=
   ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
     wordPairNormRelation (X x hx i) u u'
@@ -73,7 +69,7 @@ def FamilyGramHypotheses : Prop :=
 
 theorem family_gram_facts_of_hypotheses (h : FamilyGramHypotheses Fm C1 X Y)
     : rows_TiesF Fm C1 X Y := fun x hx i u u' => ⟨
-  rows_TermPtsTie_of _ (rows_rdE_pos _) (h x hx i u u').1,
+  rows_TermPtsTie_of _ (_root_.Formalism.MainNotions.S.rdE_pos _) (h x hx i u u').1,
   (h x hx i u u').2.1,
   (h x hx i u u').2.2.1
 ⟩

@@ -57,6 +57,8 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaCore
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.LevelFrameOfLaws
 import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ThetaKeyRuleExistsOfAlgebraicInvariants
+import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ValueAtNormalForm
 
 @[expose] public section
 
@@ -72,17 +74,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 section Sections
 
 variable {R : Type} [CommRing R]
-
-theorem constFn_mul {X : Scheme.{0}} (f : X ⟶ Sp R) (U : X.Opens) (a b : R)
-    : constFn f U (a * b) = constFn f U a * constFn f U b := by
-  simp only [constFn, map_mul]
-
-theorem constFn_one {X : Scheme.{0}} (f : X ⟶ Sp R) (U : X.Opens) : constFn f U 1 = 1 := by
-  simp only [constFn, map_one]
-
-theorem constFn_pow {X : Scheme.{0}} (f : X ⟶ Sp R) (U : X.Opens) (a : R) (n : ℕ)
-    : constFn f U (a ^ n) = constFn f U a ^ n := by
-  simp only [constFn, map_pow]
 
 theorem constFn_congr {X : Scheme.{0}} {f f' : X ⟶ Sp R} (h : f = f') (U : X.Opens) (a : R)
     : constFn f U a = constFn f' U a := by
@@ -100,10 +91,10 @@ variable {X : Over (Sp R)} {L : LB X.left}
 theorem IsMul.trans
     {s t u : L.Sec} {a b : R} (h₁ : IsMul (X := X) s a t) (h₂ : IsMul (X := X) t b u)
     : IsMul (X := X) s (a * b) u := fun i => by
-  rw [h₁ i, h₂ i, constFn_mul, _root_.mul_assoc]
+  rw [h₁ i, h₂ i, _root_.GlobalTheory.KeyPow.constFn_mul, _root_.mul_assoc]
 
 theorem isMul_self (s : L.Sec) : IsMul (X := X) s 1 s := fun i => by
-  rw [constFn_one, _root_.one_mul]
+  rw [_root_.GlobalTheory.KeyPow.constFn_one, _root_.one_mul]
 
 theorem Generates.isUnit
     {s t : L.Sec} (hs : Generates (X := X) s) (ht : Generates (X := X) t)
@@ -130,7 +121,8 @@ theorem isMul_boxSec
   have e : ∀ k : Fin N, (pr G N k ≫ G.hom) = (pow G N).hom := fun k =>
     Over.w (Pi.π (fun _ : Fin N => G) k)
   simp only [h (j _), map_mul, appLE_constFn, constFn_congr (e _)]
-  exact (prod_const_mul _ _).trans (congrArg (· * _) (constFn_pow _ _ _ _).symm)
+  exact (prod_const_mul _ _).trans
+    (congrArg (· * _) (_root_.GlobalTheory.PowChange.constFn_pow _ _ _ _).symm)
 
 end Sections
 

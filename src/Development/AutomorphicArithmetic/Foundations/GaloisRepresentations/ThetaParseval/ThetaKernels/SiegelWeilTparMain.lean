@@ -46,8 +46,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix

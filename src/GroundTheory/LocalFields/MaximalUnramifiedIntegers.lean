@@ -53,9 +53,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
-
 noncomputable section
 
 namespace GroundTheory.LocalField

@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.integrable_standardPair_theta_weilRange
                   → ∀ (Φ : schwartzA θ V.rank n) (g : G D n),
                     Integrable (GlobalTheory.AutomorphicL2Unitary.descend (GQ V) (theta ω Φ g))
                       (autMeasure V ν) := by
-  first
-  | exact @GlobalTheory.StdThetaInt.integrable_theta
-  | exact GlobalTheory.StdThetaInt.integrable_theta
-  | (intros; apply GlobalTheory.StdThetaInt.integrable_theta <;> assumption)
+  first | exact @GlobalTheory.StdThetaInt.integrable_theta

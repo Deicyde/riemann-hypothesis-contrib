@@ -74,10 +74,7 @@ theorem nontrivial_of_simple (V : FDRep ℂ G) (h : Simple V) : Nontrivial V := 
   by_contra hn
   rw [not_nontrivial_iff_subsingleton] at hn
   apply CategoryTheory.id_nonzero V
-  first
-  | (ext x; exact Subsingleton.elim _ _)
-  | (apply Action.Hom.ext; ext x; exact Subsingleton.elim _ _)
-  | (ext; exact Subsingleton.elim _ _)
+  first | (ext x; exact Subsingleton.elim _ _)
 
 theorem exists_simple_constituent
     {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]

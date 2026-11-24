@@ -155,7 +155,7 @@ private theorem deriv_deriv_half_log_quadratic_at_zero (N P C : ℝ) (hN : 0 < N
         fun t => (P + C * t) / (N + 2 * t * P + t ^ 2 * C) := by
     filter_upwards [hev] with t ht
     rw [(((hq t).log ht).div_const 2).deriv]
-    field_simp <;> ring
+    field_simp
   rw [hd.deriv_eq]
   have h4 := (((hasDerivAt_id' (0 : ℝ)).const_mul C).const_add P).div (hq 0) hq0
   rw [show (fun t : ℝ => (P + C * t) / (N + 2 * t * P + t ^ 2 * C))
@@ -163,7 +163,7 @@ private theorem deriv_deriv_half_log_quadratic_at_zero (N P C : ℝ) (hN : 0 < N
       rfl,
     h4.deriv]
   simp only [mul_zero, zero_mul, add_zero, mul_one, zero_pow two_ne_zero]
-  field_simp <;> ring
+  field_simp
 
 theorem levi_fs_zero
     {κ : Type} [Fintype κ]
@@ -541,7 +541,6 @@ theorem g_pos
     have h0 : levi (fun u => (G ((R.A.chart j).symm u)).re) v w = 0 := levi_re_analytic hGa w
     rw [h0, mul_zero, add_zero,
       levi_comp w hτ ((contDiffAt_log_prod_fsMetric_rho_blk hblk).of_le h2)]
-    beta_reduce
     rw [levi_log_prod_fsMetric_eq_sum hblk]
     have hnn
         : ∀ k,

@@ -130,7 +130,7 @@ theorem columns_iff
           intro h'
           subst h'
           exact absurd hba (not_le.2 hj)
-        simp [Pi.single_apply, this]
+        simp [this]
       | zero =>
         have : (φ ∘ (0 : Fin n → A)) = 0 := by funext; simp
         rw [this]

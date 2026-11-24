@@ -126,7 +126,7 @@ theorem exists_of_gOrb_ne
             * Matrix.GeneralLinearGroup.map (algebraMap O K) k := by
       rw [hk, mul_inv_cancel_left]
     have hMat := congrArg Units.val hM
-    simp only [jU, Units.val_mul, Units.coe_map, MonoidHom.coe_coe, AlgHom.coe_toRingHom,
+    simp only [jU, Units.val_mul, Units.coe_map, MonoidHom.coe_coe,
         Matrix.GeneralLinearGroup.coe_scalar, Matrix.scalar_apply,
         Matrix.GeneralLinearGroup.val_map_apply]
       at hMat
@@ -144,8 +144,7 @@ theorem exists_of_gOrb_ne
         ← Matrix.det_mul, Units.inv_mul, Matrix.det_one, mul_one]
     refine ⟨w, Matrix.GeneralLinearGroup.det k, (k : Matrix (Fin 2) (Fin 2) O).trace, ?_, ?_⟩
     · rw [← j_det j hj, hdt, hMat]
-      simp [Matrix.det_fin_two, Matrix.diagonal_mul, Matrix.GeneralLinearGroup.val_det_apply]
-        <;> ring
+      simp [Matrix.det_fin_two, Matrix.GeneralLinearGroup.val_det_apply] <;> ring
     · rw [← j_trace j hj, htr, hMat]
       simp [Matrix.trace_fin_two, Matrix.diagonal_mul] <;> ring
   by_contra hcon

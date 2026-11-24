@@ -49,6 +49,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
+
 theorem _root_.GlobalTheory.T.integrable_majorant_coordinate_coset_measure
     : ∀ (D : D7) (θ : InfFam D),
       IsInfFam θ
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.integrable_majorant_coordinate_coset_measure
           IsFiniteMeasureOnCompacts μ → (∀ᵐ x ∂μ, ∀ i j, ¬ P i j → x i j = a i j)
             → (∀ t : Mx D m n, (∀ i j, ¬ P i j → t i j = 0) → Measure.map (fun x => x + t) μ = μ)
             → ∃ N : ℕ, ∀ K : Set (Mx D m n), IsCompact K → Integrable (maj θ K N) μ := by
-  first
-  | exact @GlobalTheory.Unf.MajInt.maj_integrable
-  | exact GlobalTheory.Unf.MajInt.maj_integrable
-  | (intros; apply GlobalTheory.Unf.MajInt.maj_integrable <;> assumption)
+  first | exact @GlobalTheory.Unf.MajInt.maj_integrable

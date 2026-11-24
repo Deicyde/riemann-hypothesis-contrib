@@ -102,7 +102,7 @@ theorem alg_fst
   have : (TrivSqZeroExt.fstHom R R R).toRingHom.comp (algebraMap R (DualNumber R))
       = RingHom.id R := by
     ext r
-    simp [TrivSqZeroExt.algebraMap_eq_inl]
+    simp
   rw [this]
   exact Spec.map_id _
 

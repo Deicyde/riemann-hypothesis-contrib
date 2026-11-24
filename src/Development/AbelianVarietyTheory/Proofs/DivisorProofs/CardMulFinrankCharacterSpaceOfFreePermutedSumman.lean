@@ -104,7 +104,6 @@ theorem card_mul_finrank_eig_of_free
         inv_mul_cancel, Units.val_one, one_smul, Finset.sum_const, Finset.card_univ]
       rw [← Nat.cast_smul_eq_nsmul K, smul_smul, ← hn, inv_mul_cancel₀ hn0, one_smul]
   have htr : LinearMap.trace K V P = n⁻¹ * (finrank K V : K) := by
-
     simp only [P, map_smul, map_sum, smul_eq_mul]
     congr 1
     rw [Finset.sum_eq_single 1]

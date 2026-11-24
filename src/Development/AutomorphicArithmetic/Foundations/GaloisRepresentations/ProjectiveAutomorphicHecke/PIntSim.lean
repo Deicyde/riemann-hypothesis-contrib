@@ -62,8 +62,8 @@ private theorem rel
   · ext i j
     by_cases hij : i = j
     · subst hij
-      simp [RingHom.mapMatrix_apply, sim, Matrix.one_apply]
-    · simp [RingHom.mapMatrix_apply, sim, Matrix.one_apply, hij]
+      simp [RingHom.mapMatrix_apply, sim]
+    · simp [RingHom.mapMatrix_apply, sim, hij]
 
 open GroundTheory.Global.AdeleBaseChange in
 private theorem val_le

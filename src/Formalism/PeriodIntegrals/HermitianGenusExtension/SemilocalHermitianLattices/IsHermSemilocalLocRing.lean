@@ -61,15 +61,15 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
 namespace BE
 
-theorem exists_gen {R : Type*} [CommRing R] [IsDedekindDomain R] {I P Q : Ideal R} (hI : I ≠ ⊥)
-    (hP : P.IsPrime) (hQ : Q.IsPrime) :
-    ∃ r ∈ I, r ≠ 0 ∧ ∃ s : R, s ∉ P ∧ s ∉ Q ∧ ∀ x ∈ I, ∃ y : R, s * x = r * y := by
+theorem exists_gen
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    {I P Q : Ideal R} (hI : I ≠ ⊥) (hP : P.IsPrime) (hQ : Q.IsPrime)
+    : ∃ r ∈ I, r ≠ 0 ∧ ∃ s : R, s ∉ P ∧ s ∉ Q ∧ ∀ x ∈ I, ∃ y : R, s * x = r * y := by
   have key : ∀ P : Ideal R, P.IsPrime → ¬ I ≤ I * P := by
     intro P hP hle
-    have h1 : I * P = I * ⊤ := by
-      rw [Ideal.mul_top]; exact le_antisymm Ideal.mul_le_left hle
+    have h1 : I * P = I * ⊤ := by rw [Ideal.mul_top]; exact le_antisymm Ideal.mul_le_left hle
     exact hP.ne_top (mul_left_cancel₀ hI h1)
-  have h1 : ¬ ((I : Set R) ⊆ (I * P : Ideal R) ∪ (I * Q : Ideal R)) := by
+  have h1 : ¬((I : Set R) ⊆ (I * P : Ideal R) ∪ (I * Q : Ideal R)) := by
     intro h
     rcases Ideal.subset_union.1 h with h | h
     · exact key P hP h
@@ -81,7 +81,7 @@ theorem exists_gen {R : Type*} [CommRing R] [IsDedekindDomain R] {I P Q : Ideal 
   have hle : Ideal.span {r} ≤ I := (Ideal.span_singleton_le_iff_mem I).2 hrI
   obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.2 hle
   have hmem : r ∈ I * J := hJ ▸ Ideal.mem_span_singleton_self r
-  have h2 : ¬ ((J : Set R) ⊆ (P : Ideal R) ∪ (Q : Ideal R)) := by
+  have h2 : ¬((J : Set R) ⊆ (P : Ideal R) ∪ (Q : Ideal R)) := by
     intro h
     rcases Ideal.subset_union.1 h with h | h
     · exact hrP (Ideal.mul_mono_right h hmem)
@@ -92,9 +92,12 @@ theorem exists_gen {R : Type*} [CommRing R] [IsDedekindDomain R] {I P Q : Ideal 
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 h3
   exact ⟨y, by rw [mul_comm s x, ← hy, mul_comm]⟩
 
-theorem avoid_two {R : Type*} [CommRing R] {P Q : Ideal R} (hQ : Q.IsPrime) {a s m : R} (k : R)
-    (ha : a ∈ P) (hsP : s ∉ P) (hsQ : s ∉ Q) (hm : m ∉ Q) :
-    (s - k * a ∉ P ∧ s - k * a ∉ Q) ∨ (s - (k + m) * a ∉ P ∧ s - (k + m) * a ∉ Q) := by
+theorem avoid_two
+    {R : Type*} [CommRing R]
+    {P Q : Ideal R} (hQ : Q.IsPrime)
+    {a s m : R}
+    (k : R) (ha : a ∈ P) (hsP : s ∉ P) (hsQ : s ∉ Q) (hm : m ∉ Q)
+    : (s - k * a ∉ P ∧ s - k * a ∉ Q) ∨ (s - (k + m) * a ∉ P ∧ s - (k + m) * a ∉ Q) := by
   have hP : ∀ c : R, s - c * a ∉ P := by
     intro c h
     apply hsP
@@ -116,20 +119,31 @@ theorem avoid_two {R : Type*} [CommRing R] {P Q : Ideal R} (hQ : Q.IsPrime) {a s
 
 end BE
 
-theorem principal_locRing (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+theorem principal_locRing
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
     (A : AddSubgroup K) (hA : ∀ s ∈ locRing p, ∀ a ∈ A, s * a ∈ A) (h0 : ∃ a ∈ A, a ≠ 0)
-    (ht : ∃ t : K, t ≠ 0 ∧ ∀ a ∈ A, t * a ∈ locRing p) :
-    ∃ α ∈ A, α ≠ 0 ∧ ∀ a ∈ A, a * α⁻¹ ∈ locRing p := by
+    (ht : ∃ t : K, t ≠ 0 ∧ ∀ a ∈ A, t * a ∈ locRing p)
+    : ∃ α ∈ A, α ≠ 0 ∧ ∀ a ∈ A, a * α⁻¹ ∈ locRing p := by
   apply Formalism.HermitianLattices.Ext.L3.WA.principal_locRing <;> assumption
 
-theorem unit_or_locRing {p : Ideal (𝓞 K)} (hp : p.IsPrime) (a : K) (ha : a ∈ locRing p)
-    (κ : K) (hκ : κ ∈ locRing p) (μ : K) (hna : a⁻¹ ∉ locRing p) (hμ : IsUnitIn (locRing p) μ) :
-    IsUnitIn (locRing p) (1 - κ * a) ∨ IsUnitIn (locRing p) (1 - (κ + μ) * a) := by
+theorem unit_or_locRing
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    (a : K) (ha : a ∈ locRing p)
+    (κ : K) (hκ : κ ∈ locRing p)
+    (μ : K)
+    (hna : a⁻¹ ∉ locRing p) (hμ : IsUnitIn (locRing p) μ)
+    : IsUnitIn (locRing p) (1 - κ * a) ∨ IsUnitIn (locRing p) (1 - (κ + μ) * a) := by
   apply Formalism.HermitianLattices.Ext.L3.WA.unit_or_locRing <;> assumption
 
-theorem isHermSemilocal_locRing (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)}
-    (hp : p.IsMaximal) : IsHermSemilocal (locRing p) :=
-  ⟨fun _ ha => star_mem_locRing hp.isPrime ha, frac_locRing p, unram_locRing hK hp,
-    principal_locRing hK hp, unit_or_locRing hp.isPrime⟩
+theorem isHermSemilocal_locRing
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    : IsHermSemilocal (locRing p) := ⟨
+  fun _ ha => star_mem_locRing hp.isPrime ha,
+  frac_locRing p,
+  unram_locRing hK hp,
+  principal_locRing hK hp,
+  unit_or_locRing hp.isPrime
+⟩
 
 end ReciprocityTheory.ChartRestriction.L3.WA

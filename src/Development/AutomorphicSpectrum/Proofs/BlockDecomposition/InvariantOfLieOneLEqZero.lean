@@ -74,7 +74,7 @@ theorem cuspRapidDecaySiegelGL : GlobalTheory.Published.CuspRapidDecaySiegelGL :
   have hs := GlobalTheory.CompanionTheory.ArchSmooth.sm_mem_archSmooth E a φ
   have hc : Continuous φ.1 := ContAut.continuous_of_isOpen_stab E a φ hφ.1.level
   exact GlobalTheory.CompanionTheory.SiegelDecay.rapid_decay_of_one_parabolic_bounds E a φ.1 hc
-    (GlobalTheory.CompanionTheory.GGPS.ggps_bound E a φ.1 hs
+    (_root_.GlobalTheory.CompanionTheory.GGPS.smooth_automorphic_open_invariant E a φ.1 hs
       (GlobalTheory.CompanionTheory.LeftInv.isLeftInvariant_of_isAutForm E a φ hφ.1)
       (GlobalTheory.CompanionTheory.AutLevel.exists_open_level E a φ hφ.1)
       (GlobalTheory.CompanionTheory.CuspBridge.isCuspidal_of_isCuspForm E a φ hφ)
@@ -116,7 +116,7 @@ theorem cuspFin_pos {a : ℕ} (ha : 0 < a) : CuspFin E a := by
     (GlobalTheory.CompanionTheory.CuspSubspace.mem_of_mem_span_cuspForms) E a L W ρ J
   set z := lie E a (oneL E a) with hz
   obtain ⟨p, hpm, hp⟩ :=
-    GlobalTheory.CompanionTheory.Affgl.minpoly_on_killed E a J hJ z
+    _root_.GlobalTheory.CompanionTheory.Affgl.exists_monic_aeval_apply_eq_zero E a J hJ z
       (GlobalTheory.CompanionTheory.CapelliTrace.lie_oneL_mem_Zalg E a)
   obtain ⟨T, w, hTw⟩ := (GlobalTheory.CompanionTheory.LinearODE.deriv_zero_eq_sum) p hpm
   have hstab : ∀ φ ∈ V, z φ ∈ V := by

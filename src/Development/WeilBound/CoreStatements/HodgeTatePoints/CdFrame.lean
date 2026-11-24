@@ -369,7 +369,7 @@ theorem ex_ph1A
               (ReciprocityTheory.ChartRestriction.G.DVR.invGen_isGen _ _ _ _ (hpe m _))))
         (fun m U _ h => by
           simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, th_pt, pe_pt, pt_sub,
-            Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, pt_X, pt_law hch, zpow_neg,
+            Matrix.cons_val_zero, Matrix.cons_val_one, pt_X, pt_law hch, zpow_neg,
             Finset.prod_inv_distrib]
           erw [prod_cube3 t.G (fun p : jOG x0 d m 3 ⟶ t.G => h p.left)]
           rw [prod_cube2 t.G (fun p : jOG x0 d m 3 ⟶ t.G => h p.left),
@@ -480,7 +480,7 @@ theorem ex_ph2A
               (ReciprocityTheory.ChartRestriction.G.DVR.invGen_isGen _ _ _ _ (hpe m _))))
         (fun m U _ h => by
           simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, th_pt, pe_pt, pt_sub,
-            Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, pt_X, pt_law hch, zpow_neg,
+            Matrix.cons_val_zero, Matrix.cons_val_one, pt_X, pt_law hch, zpow_neg,
             Finset.prod_inv_distrib]
           erw [prod_cube3 t.G (fun p : jOG x0 d m 3 ⟶ t.G => h p.left)]
           rw [prod_cube2_swap (fun p : jOG x0 d m 3 ⟶ t.G => h p.left),
@@ -632,8 +632,8 @@ theorem ex_adA
         (fun m => hpe m _)
         (fun m U _ h => by
           simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, wl_pt, wl_pt', pe_pt,
-            pt_sub, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, pt_X, pt_act hch,
-            zpow_neg, Finset.prod_inv_distrib]
+            pt_sub, Matrix.cons_val_zero, Matrix.cons_val_one, pt_X, pt_act hch, zpow_neg,
+            Finset.prod_inv_distrib]
           simp only [inv_mul_cancel_right])
         (fun m y J hJ =>
           (val_mul hJ _ _ _).trans

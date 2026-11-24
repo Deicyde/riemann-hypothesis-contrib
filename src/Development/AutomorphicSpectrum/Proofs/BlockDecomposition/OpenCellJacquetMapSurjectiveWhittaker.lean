@@ -2,15 +2,17 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenFns
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsGenericIffIsGenericFor
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactUnipotentSubgroupFiniteGenerationStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactUnipotentSubgroupFiniteGeneration
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCompactSubgroupOfFinset
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellFunctionCompactSupportUnipotentStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellFunctionCompactSupportUnipotent
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellJacquetIntegralVolumeStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellLeviUnipotentConjugationStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellUnipotentUniquenessClosedStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProjectionToTwistedEigenfunctionSupportStatement
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothVectorCompactUnipotentFixerStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnipotentRadicalDecompositionNormalStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProjectionToTwistedEigenfunctionSupport
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnipotentRadicalDecompositionNormal
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenCellUnipotentUniquenessClosed
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothVectorCompactUnipotentFixer
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -142,15 +144,15 @@ theorem openFns_whittaker
   intro k _ _ _ _ ψ hψ h N d hd W _ _ ρ hρ
   obtain ⟨J, vol, hU, hL, hV⟩ :=
     GlobalTheory.T.open_cell_jacquet_integral_volume k ψ hψ h N d hd ρ hρ
-  obtain ⟨hfac, -⟩ := GlobalTheory.T.unipotent_radical_decomposition_normal k h N d hd
+  obtain ⟨hfac, -⟩ := _root_.GlobalTheory.CompanionTheory.Rodier.unipB_eq_levi_mul_rad k h N d hd
   obtain ⟨hl1, hl2⟩ := GlobalTheory.T.open_cell_levi_unipotent_conjugation k ψ h N d hd
-  obtain ⟨-, huniq, -⟩ := GlobalTheory.T.open_cell_unipotent_uniqueness_closed k h N d hd
+  obtain ⟨-, huniq, -⟩ := _root_.GlobalTheory.CompanionTheory.Rodier.unipU_open_cell k h N d hd
   have hUB : unipU k d hd ≤ unipB k (Fin N) := inf_le_left
   have hLB : unipL k d hd ≤ unipB k (Fin N) := inf_le_left
   have surj : Function.Surjective J := by
     intro v
     obtain ⟨L₀, hL₀U, hc, hO, hθ, f, hf, h1, h2⟩ :=
-      GlobalTheory.T.exists_bump_section_on_compact_unipotent k ψ hψ h N d hd ρ hρ v
+      _root_.GlobalTheory.CompanionTheory.Rodier.OpenBump.exists_openFns_bump k ψ hψ h N d hd ρ hρ v
     obtain ⟨hpos, hJ⟩ := hV L₀ hL₀U hc hO
     have e :=
       hJ ⟨f, hf⟩ v
@@ -207,8 +209,8 @@ theorem openFns_whittaker
           → J f ∈ twKer ρ (unipM k d) (whitM d ψ) := by
     intro f hf
     have hs :=
-      GlobalTheory.T.compact_unipotent_subgroup_finite_generation k ψ hψ h N d hd ρ
-        (unipB k (Fin N)) le_rfl
+      _root_.GlobalTheory.CompanionTheory.Rodier.OpenExact.mem_span_openFns_of_mem_twKer k ψ hψ h N
+        d hd ρ (unipB k (Fin N)) le_rfl
         (fun s hs =>
           GlobalTheory.CompanionTheory.UnipExhaust.exists_compact_subgroup_of_finset k N s hs)
         (whitChar ψ N)
@@ -226,14 +228,15 @@ theorem openFns_whittaker
         J f = 0 → f.1 ∈ twKer (parInd (stdBlocks d hd) ρ) (unipB k (Fin N)) (whitChar ψ N) := by
     intro f hf
     obtain ⟨L, hLU, hLc, hLO, hsupp⟩ :=
-      GlobalTheory.T.open_cell_function_compact_support_unipotent k h N d hd ρ hρ f.1 f.2
+      _root_.GlobalTheory.CompanionTheory.Rodier.exists_compact_open_support k h N d hd ρ hρ f.1 f.2
     have hLB' : L ≤ unipB k (Fin N) := hLU.trans hUB
     let θL : L →* ℂˣ := (whitChar ψ N).comp (Subgroup.inclusion hLB')
     have hopen : IsOpen (θL.ker : Set L) :=
       (GlobalTheory.Whittaker.isSmoothChar_whitChar (N := N) hψ).preimage
         (f := Subgroup.inclusion hLB') (continuous_subtype_val.subtype_mk fun x => hLB' x.2)
     obtain ⟨f', hd1, hd2, hd3⟩ :=
-      GlobalTheory.T.projection_to_twisted_eigenfunction_support _ _ L hLc θL hopen f.1
+      _root_.GlobalTheory.CompanionTheory.TwAvgInd.exists_twisted_average_smInd _ _ L hLc θL hopen
+        f.1
     have hsupp'
         : ∀ g,
           f'.1.1 g ≠ 0
@@ -248,7 +251,8 @@ theorem openFns_whittaker
       obtain ⟨p, hp, u, hu, e⟩ := hsupp' g hg
       exact ⟨p, hp, u, hLB' hu, e⟩
     have hdiff :=
-      GlobalTheory.T.compact_unipotent_subgroup_finite_generation k ψ hψ h N d hd ρ L hLB'
+      _root_.GlobalTheory.CompanionTheory.Rodier.OpenExact.mem_span_openFns_of_mem_twKer k ψ hψ h N
+        d hd ρ L hLB'
         (fun s hs => ⟨L, le_rfl, hs, hLc⟩)
         θL
         (fun q hq => rfl)

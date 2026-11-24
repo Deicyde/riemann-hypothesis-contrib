@@ -71,7 +71,7 @@ private def extRep
     simp [h1]
   map_mul' g h := by
     refine LinearMap.ext fun x => ?_
-    simp [hc, add_assoc, add_comm, add_left_comm]
+    simp [hc, add_comm, add_left_comm]
 
 private theorem extRep_apply
     {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]

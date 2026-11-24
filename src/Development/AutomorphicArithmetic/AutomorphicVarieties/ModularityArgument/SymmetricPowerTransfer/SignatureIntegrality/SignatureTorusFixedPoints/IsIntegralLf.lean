@@ -158,7 +158,7 @@ private theorem conj_w (M : Matrix (Fin 2) (Fin 2) (Lsq K Δ))
     : (!![0, -1; 1, 0] : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) * M * !![0, 1; -1, 0]
       = !![M 1 1, -M 1 0; -M 0 1, M 0 0] := by
   rw [Matrix.eta_fin_two M]
-  simp [Matrix.mul_fin_two]
+  simp
 
 private theorem mem_DX (g : GL (Fin 2) (Lsq K Δ))
     : g ∈ DX Δ

@@ -196,7 +196,7 @@ theorem exists_selfDual
         fun y hy => ?_
     ⟩
     · rw [hE_smul, one_mul]; exact ⟨⟨_, (hY.dual y).1 hy x hx⟩, rfl⟩
-    · simp only [OneMemClass.coe_one, map_one, one_smul]
+    · simp only [map_one, one_smul]
       refine (hY.dual y).2 fun x hx => ?_
       obtain ⟨o, ho⟩ := hy x hx
       rw [hE_smul, one_mul] at ho

@@ -387,7 +387,6 @@ theorem lift_of_frame
     rw [e1, e2]
     linear_combination (-hf L S.Hm (c i.castSucc) (c j.castSucc)) * hσ2
   have hyΛ : ∀ j, n (y j) ∈ Λ := fun j => by
-
     simp only [hy, map_sub, map_sum, map_smul]
     refine sub_mem (hcΛ _) (sum_mem_O S _ _ (fun i => mul_mem hσ ?_) fun i => (hng _).1)
     rw [← hni]
@@ -412,7 +411,6 @@ theorem lift_of_frame
         · have :=
             h ((n * m).symm x)
               ((hmem _).2 (by
-                change (n * m) ((n * m).symm x) ∈ Λ
                 rw [LinearEquiv.apply_symm_apply]
                 exact hx))
           rwa [← hNi, LinearEquiv.apply_symm_apply] at this

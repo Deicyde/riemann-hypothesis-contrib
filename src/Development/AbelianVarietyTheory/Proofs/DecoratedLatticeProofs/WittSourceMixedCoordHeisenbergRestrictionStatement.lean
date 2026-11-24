@@ -66,6 +66,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.wittSourceMixedCoord_heisenbergRestriction
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S S₀ T : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ),
       (0 < ρ
@@ -92,7 +93,4 @@ theorem _root_.GlobalTheory.T.wittSourceMixedCoord_heisenbergRestriction
             = (_root_.I195MixedCoordinates_61fbc522a99e851221ffe16d.source d) T ψ μ 𝓕
               (heisO ψ S T (d.extX T x) f) 0)
         ∧ (∀ b, d.nB b ∈ NI S d.e) ∧ ∀ c, d.nC c ∈ NI S d.e := by
-  first
-  | exact @GlobalTheory.Bridge.heis_bridge
-  | exact GlobalTheory.Bridge.heis_bridge
-  | (intros; apply GlobalTheory.Bridge.heis_bridge <;> assumption)
+  first | exact @GlobalTheory.Bridge.heis_bridge

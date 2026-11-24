@@ -118,10 +118,7 @@ theorem cptPart_map_sub
       ← (hP.isClosedEmbedding_subtypeVal).closure_image_eq]
     have : (Subtype.val '' (Subgroup.zpowers x : Set P)) = (Subgroup.zpowers (x : G) : Set G) := by
       rw [← Subgroup.coe_subtype, ← Subgroup.coe_map, MonoidHom.map_zpowers]
-    first
-    | (convert Iff.rfl using 3; exact this.symm)
-    | (convert Iff.rfl using 3; exact this)
-    | exact this ▸ Iff.rfl
+    first | (convert Iff.rfl using 3; exact this.symm)
   ext y
   constructor
   · rintro ⟨x, ⟨hx, hx'⟩, rfl⟩

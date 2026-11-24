@@ -87,7 +87,4 @@ theorem _root_.GlobalTheory.T.heisenbergOperator_isotropic_translation_char_spli
                                   ι φ₁ Z
                                     = psiLoc ψ v (- pairM Z (coX t b c u))
                                       * ι φ (Z + coY σ X Y t b c u) := by
-  first
-  | exact @GlobalTheory.HeisFlip.heis_trans_char
-  | exact GlobalTheory.HeisFlip.heis_trans_char
-  | (intros; apply GlobalTheory.HeisFlip.heis_trans_char <;> assumption)
+  first | exact @GlobalTheory.HeisFlip.heis_trans_char

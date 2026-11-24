@@ -151,19 +151,10 @@ section Facts
 
 variable {D : D7} {X : HidaSetting D} {θ : ℝ}
 
-private theorem host_v_pos' (D : D7) : 0 < D.host.v := by
-  have hd : (0 : ℝ) < |(NumberField.discr D.host.E : ℝ)| :=
-    abs_pos.mpr (Int.cast_ne_zero.mpr (NumberField.discr_ne_zero D.host.E))
-  have hr : 0 < D.host.rdE := by
-    unfold Formalism.BasicNotions.Host.rdE
-    exact Real.rpow_pos_of_pos hd _
-  unfold Formalism.BasicNotions.Host.v
-  linarith
-
 theorem theta_pos (C : Choice X θ) (u : D.what₂.Word) (τ : D.what₂.Tau) : 0 < θ := by
   by_contra hθ
   push_neg at hθ
-  have hv := host_v_pos' D
+  have hv := _root_.Formalism.L2.SG.Pf.Choice.host_v_pos D
   have hq := C.nuS_q u τ
   unfold muNB kapN haarLie muS at hq
   simp (disch :=
@@ -187,8 +178,7 @@ theorem theta_pos (C : Choice X θ) (u : D.what₂.Word) (τ : D.what₂.Tau) : 
     unfold Formalism.REAL.muG
     exact (isOpen_univ.measure_pos _ Set.univ_nonempty).ne'
   have h1 := hq (fun _ => 1) measurable_const
-  simp only [lintegral_const, Measure.coe_zero, Pi.zero_apply, zero_mul, lintegral_zero, mul_one]
-    at h1
+  simp only [lintegral_const, Measure.coe_zero, Pi.zero_apply] at h1
   unfold muGB at h1
   rw [Measure.map_apply hmeas MeasurableSet.univ, Set.preimage_univ] at h1
   simp only [one_mul, mul_zero, zero_mul] at h1
@@ -250,10 +240,6 @@ private theorem conj_mem_lemma
     : C.Qi τ * uMat γ * C.Q τ
       ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) := by
   obtain ⟨h1, h2, h3, -⟩ := C.isT τ
-  have hγ
-      : (uMat γ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * uMat γ
-        = Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) :=
-    γ.2
   have hA
       : ∀ M : Matrix (Fin X.B.I.n) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ,
         (C.Qi τ)ᴴ * ((C.Q τ)ᴴ * M) = M := fun M => by
@@ -267,7 +253,7 @@ private theorem conj_mem_lemma
       : ∀ M : Matrix (Fin X.B.I.n) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ,
         (uMat γ)ᴴ * (Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * (uMat γ * M))
           = Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * M := fun M => by
-    rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hγ]
+    rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, γ.2]
   show (C.Qi τ * uMat γ * C.Q τ)ᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * (C.Qi τ * uMat γ * C.Q τ) =
     Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS
   rw [← h3]
@@ -323,17 +309,14 @@ def cS (D : D7) : ℂ := ((2 * D.host.ka / ((D.host.g 0 : ℝ) * (D.host.g 1 : �
 theorem cS_ne (D : D7) : cS D ≠ 0 := by
   have hka : 0 < D.host.ka := by
     unfold Formalism.BasicNotions.Host.ka
-    exact div_pos Real.pi_pos (host_v_pos' D)
+    exact div_pos Real.pi_pos (_root_.Formalism.L2.SG.Pf.Choice.host_v_pos D)
   have hg0 : ((D.host.g 0 : ℕ) : ℝ) ≠ 0 := by exact_mod_cast (D.host.g_prime 0).ne_zero
   have hg1 : ((D.host.g 1 : ℕ) : ℝ) ≠ 0 := by exact_mod_cast (D.host.g_prime 1).ne_zero
   unfold cS
   exact Complex.ofReal_ne_zero.mpr (div_ne_zero (mul_ne_zero two_ne_zero hka.ne')
     (mul_ne_zero hg0 hg1))
 
-theorem conjUH (C : Choice X θ) (τ : D.what₂.Tau) (γ : Formalism.REAL.UJ (X.B.I.ε (vOf X τ)))
-    : C.Qi τ * uMat γ * C.Q τ
-      ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) := by
-  exact conj_mem_lemma C τ γ
+alias conjUH := _root_.Formalism.L2.SG.Pf.WuBL.conj_mem_lemma
 
 theorem norm_psi
     (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) (m : Formalism.FourierDecayAlt.B.Mat k r)
@@ -385,13 +368,13 @@ theorem sideQ
               = wT C u τ (x * C.y τ))
         ∧ l2SG (C.nuS u τ) (fun x => wT C u τ (x * C.y τ)) ≠ 0
         ∧ l2SG (C.nuS u τ) (fun x => wT C u τ (x * C.y τ)) < ⊤ := by
-  obtain ⟨hwsm, hw1, hSH, hWc, hWe, hWr, hne, hfin⟩ := hLF u τ
+  obtain ⟨_, hw1, hSH, hWc, hWe, hWr, hne, hfin⟩ := hLF u τ
   have hθ := theta_pos C u τ
   obtain ⟨h, hgap, hok⟩ := hGp D hG τ
   obtain ⟨hz, hTz⟩ := Formalism.L2.SG.Pf.zTr C u τ
   have hT : 0 < Formalism.QuantumDeterminants.Tz D.R.k D.R.rS (zB X (C.Qi τ) u τ) := by
     rw [hTz]; exact Tr_pos D u
-  obtain ⟨h1, h2, hg, -⟩ := C.isT τ
+  obtain ⟨_, h2, hg, -⟩ := C.isT τ
   have hy := C.y_mem τ
   obtain ⟨hrep, hiso⟩ := sigB_rep C τ
   have hHG := haarTr C τ
@@ -432,9 +415,7 @@ theorem sideQ
   · obtain ⟨P, hP, hmem⟩ := C.y_low τ
     refine ⟨P, hP, ?_, hmem⟩
     show ‖X.B.σ (vOf X τ) (C.Q τ * C.y τ * C.Qi τ) (X.B.w (vOf X τ))‖ = 1
-    have := hiso (C.y τ) hy (X.B.w (vOf X τ))
-    rw [← hw1]
-    exact this
+    simpa only [sigB, ← hw1] using hiso (C.y τ) hy (X.B.w (vOf X τ))
   · exact hWc.comp (continuous_id.matrix_mul continuous_const).continuousOn hmaps
   · intro hh hhU m hm g hgU
     show wT C u τ (hh * m * g * C.y τ) = _ • _
@@ -532,11 +513,7 @@ theorem wuBesselOfLoc
             * ((C.y τ)ᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * C.y τ) by
         simp only [Matrix.mul_assoc],
       hy, hHinv]
-  have hyi2 : C.y τ * yi = 1 := by
-    first
-    | exact mul_eq_one_comm.mp hyi1
-    | exact (Matrix.mul_eq_one_comm (M := yi)).mp hyi1
-    | (letI := Matrix.invertibleOfLeftInverse (C.y τ) yi hyi1; exact Matrix.mul_invOf_self (C.y τ))
+  have hyi2 : C.y τ * yi = 1 := by first | exact mul_eq_one_comm.mp hyi1
   have hyiU
       : yiᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * yi
         = Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS := by

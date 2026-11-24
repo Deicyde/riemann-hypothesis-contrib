@@ -286,7 +286,6 @@ theorem face
         exact hs _)
       (fun j => (hT _).comp hPd.differentiableOn (fun y hy => hy))
       (fun j j' y hy hy' => by
-        beta_reduce
         rw [hTT _ _ _ hy hy']
         have :=
           prod_alt_erase a

@@ -158,7 +158,7 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
         (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
       (he.1 ρ).comp contDiff_snd.contDiffOn fun x hx => hx.2
     have hwc : ContDiff ℝ ∞ (fun x : MA.E (D.parOf S v).r => MA.wq S.G.k x (D.parOf S v).TT) := by
-      have hn := cutTr_normSq_contDiff
+      have hn := _root_.Formalism.FourierDecayAlt.P.JCx1.contDiff_normSq
       unfold MA.wq
       fun_prop
     have hwp
@@ -180,7 +180,7 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
     show ContDiffOn ℝ MA.sm (MA.ext p) (MA.Qset _ _)
     have hG : ContDiff ℝ ∞ (fun x : MA.E (D.parOf S v).r =>
         (∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT)) := by
-      have hn := cutTr_normSq_contDiff
+      have hn := _root_.Formalism.FourierDecayAlt.P.JCx1.contDiff_normSq
       fun_prop
     have hGp
         : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT,

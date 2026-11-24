@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 namespace UpperTheory.V.Z.Bc
 structure Hypotheses4Z' : Prop where

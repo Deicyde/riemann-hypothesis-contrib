@@ -51,7 +51,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation Topology Filter
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation Topology Filter
 
 variable {l : ℕ} [hl : Fact l.Prime]
 

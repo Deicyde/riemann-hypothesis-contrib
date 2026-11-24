@@ -168,7 +168,6 @@ def UpTie (P : LvTied u A i hi) (K : ClsTied u i hi) (W : ValTied u A.eV i hi K)
                 (fun s => g (K.y ((D.fm u).up i v c (P.pr v c z))) (W.eY s))
               = fun s => g (K.y c * η) (W.eY s)
 
-
 def UpNatTie (P : LvTied u A i hi) (K : ClsTied u i hi) (W : ValTied u A.eV i hi K) : Prop :=
   ∀ v c (z : ↥(Ld D u i hi c)),
     (D.fm u).fv i v c (P.pr v c z) = 1
@@ -192,7 +191,6 @@ def UpNatTie (P : LvTied u A i hi) (K : ClsTied u i hi) (W : ValTied u A.eV i hi
           ∧ ∀ (h : (D.mem u).C.Y i → ℂ) s s',
             IsTr (atInf (embT D) γ.1.1) (W.eY s') (W.eY s)
               → (D.fm u).upT i v c (P.pr v c z) h s = (((K.lev.chi κ)⁻¹ : ℂˣ) : ℂ) * h s'
-
 
 def DnNatTie (P : LvTied u A i hi) (K : ClsTied u i hi) (W : ValTied u A.eV i hi K) : Prop :=
   ∀ v c (g : Module.Dual ((D.mem u).A.Fv v) ((D.fm u).lk i v c)),

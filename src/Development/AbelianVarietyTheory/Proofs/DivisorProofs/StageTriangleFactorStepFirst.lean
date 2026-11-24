@@ -201,17 +201,6 @@ theorem isGood_reG
   ⟨g.hM'.rat, g.hM'.vac, g.hM'.std, g.hM'.haar, g.hM'.dom⟩
 ⟩
 
-theorem resEtaPow_quot
-    {R K' : Type} [CommRing R] [CommRing K'] [Algebra R K']
-    {K : Subgroup Rˣ} {χ χ' : K'ˣ →* Circle} {n m : ℕ}
-    (h : GlobalTheory.WeilM.ResEtaPow K χ n) (h' : GlobalTheory.WeilM.ResEtaPow K χ' m)
-    : GlobalTheory.WeilM.ResEtaPow K (χ / χ') (n + m) := by
-  intro a
-  rw [MonoidHom.div_apply, Circle.coe_div, h a, h' a]
-  split_ifs
-  · simp
-  · rw [div_eq_mul_inv, ← inv_pow, inv_neg, inv_one, ← pow_add]
-
 theorem stepAlpha_cast
     {e₁ e₂ s : ℤˣ} (h : StepAlpha σ e₁ e₂ s)
     (B : Base F E)
@@ -242,12 +231,6 @@ end GlobalTheory.SqStepBig
 
 end
 
-noncomputable section
-
 namespace GlobalTheory.SqStepBig
 
-open GlobalTheory.Square
-
 end GlobalTheory.SqStepBig
-
-end

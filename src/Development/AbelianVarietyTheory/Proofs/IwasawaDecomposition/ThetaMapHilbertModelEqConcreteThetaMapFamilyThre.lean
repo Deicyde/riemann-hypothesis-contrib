@@ -58,15 +58,6 @@ noncomputable section
 
 namespace GlobalTheory.Mem.ThetaRead3
 
-theorem lift_postOn
-    {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
-    (M : DSModel V S) (L : (GA D V → ℂ) →ₗ[ℂ] (GA D V → ℂ)) (X : MMap M)
-    : PiTensorProduct.lift (postOn M L X) = L ∘ₗ PiTensorProduct.lift X := by
-  apply PiTensorProduct.ext
-  apply MultilinearMap.ext
-  intro v
-  simp [postOn]
-
 theorem thF_congr
     {D : D7} {G : Type} [Group G] [Fintype G]
     {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
@@ -157,7 +148,8 @@ theorem thetaP_read
   have hUw : PiTensorProduct.lift U = w' := LinearEquiv.apply_symm_apply _ w'
   have h1 := (Y.mjRead i (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1) xM)).symm.trans hth
   change PiTensorProduct.lift _ = R.eWf i (sg0 D A3.A) ∘ₗ w' at h1
-  rw [← hUw, sub_eq_zero.1 hw0, ← lift_postOn, ← hE.thG i t zt] at h1
+  rw [← hUw, sub_eq_zero.1 hw0, ← _root_.GlobalTheory.ThetaFireLift.lift_postOn, ← hE.thG i t zt]
+    at h1
   exact (hM.HW i (sg0 D A3.A)).1 (PiTensorProduct.lift.injective h1)
 
 end GlobalTheory.Mem.ThetaRead3

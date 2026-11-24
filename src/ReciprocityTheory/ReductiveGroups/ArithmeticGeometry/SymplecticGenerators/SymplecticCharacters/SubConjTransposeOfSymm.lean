@@ -133,8 +133,6 @@ theorem sp_keyH
     have hJ : (Matrix.J (Fin g) ℤ).map (Int.castRingHom ℂ) = Matrix.J (Fin g) ℂ := by
       ext i j
       rcases i with i | i <;> rcases j with j | j <;> simp [Matrix.J, Matrix.one_apply]
-      all_goals (try split_ifs)
-      all_goals (try simp_all)
     have := congrArg (fun M => M.map (Int.castRingHom ℂ)) h1
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, hJ] at this
     exact this
@@ -142,8 +140,7 @@ theorem sp_keyH
       Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
     at h3
   obtain ⟨e11, e12, e21, e22⟩ := Matrix.fromBlocks_inj.mp h3
-  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.zero_mul,
-      Matrix.neg_mul, Matrix.one_mul]
+  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.neg_mul]
     at e11 e12 e21 e22
   have hA := blk_conjTranspose₁₁ γ
   have hB := blk_conjTranspose₁₂ γ
@@ -173,8 +170,6 @@ theorem sp_keyT
     have hJ : (Matrix.J (Fin g) ℤ).map (Int.castRingHom ℂ) = Matrix.J (Fin g) ℂ := by
       ext i j
       rcases i with i | i <;> rcases j with j | j <;> simp [Matrix.J, Matrix.one_apply]
-      all_goals (try split_ifs)
-      all_goals (try simp_all)
     have := congrArg (fun M => M.map (Int.castRingHom ℂ)) h1
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, hJ] at this
     exact this
@@ -182,8 +177,7 @@ theorem sp_keyT
       Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
     at h3
   obtain ⟨e11, e12, e21, e22⟩ := Matrix.fromBlocks_inj.mp h3
-  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.zero_mul,
-      Matrix.neg_mul, Matrix.one_mul]
+  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.neg_mul]
     at e11 e12 e21 e22
   set A := (cMat γ).toBlocks₁₁
   set B := (cMat γ).toBlocks₁₂
@@ -311,8 +305,6 @@ theorem sp_A
     have hJ : (Matrix.J (Fin g) ℤ).map (Int.castRingHom ℂ) = Matrix.J (Fin g) ℂ := by
       ext i j
       rcases i with i | i <;> rcases j with j | j <;> simp [Matrix.J, Matrix.one_apply]
-      all_goals (try split_ifs)
-      all_goals (try simp_all)
     have := congrArg (fun M => M.map (Int.castRingHom ℂ)) h1
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, hJ] at this
     exact this
@@ -320,8 +312,7 @@ theorem sp_A
       Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
     at h3
   obtain ⟨e11, _, e21, _⟩ := Matrix.fromBlocks_inj.mp h3
-  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.zero_mul,
-      Matrix.neg_mul, Matrix.one_mul]
+  simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.neg_mul]
     at e11 e21
   have key : (jAut γ τ)ᵀ * ((cMat γ).toBlocks₁₁ - spAct γ τ * (cMat γ).toBlocks₂₁) = 1 := by
     rw [hσ, Matrix.mul_sub, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hJt,

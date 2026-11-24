@@ -293,7 +293,6 @@ theorem bdFacts : CAR → BdFacts := by
       (fun k => lift_ann _ k)
       (fun k => lift_Gop _ c d)
       ?_
-    beta_reduce
     have hrow
         : ∀ k : NC ε,
           (lift ε (E c d) : Module.End ℂ (Ch ε V)) * lift ε (E k.1.1 k.1.2)
@@ -345,7 +344,6 @@ theorem bdFacts : CAR → BdFacts := by
       (fun k => lift_cre _ k)
       (fun k => lift_Gop _ c d)
       ?_
-    beta_reduce
     have hrow
         : ∀ k : NC ε,
           (lift ε (E c d) : Module.End ℂ (Ch ε V)) * lift ε (E k.1.2 k.1.1)

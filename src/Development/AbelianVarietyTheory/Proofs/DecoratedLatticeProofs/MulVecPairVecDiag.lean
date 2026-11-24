@@ -117,7 +117,7 @@ theorem isotropic_diag
     congrArg₂
       (fun a b => a + b)
       (congrArg₂ (fun a b => a + b) h11 h12) (congrArg₂ (fun a b => a + b) h21 h22)
-  simp only [add_zero, add_neg_cancel] at this
+  simp only [add_zero] at this
   rw [← sub_eq_zero] at this
   rw [← this]
   abel

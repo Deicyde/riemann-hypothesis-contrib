@@ -44,6 +44,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
   Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.adelicMatrixCongruenceBadPrime_iff_completion
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.adelicMatrixCongruenceBadPrime_iff_completion
                     (adAt B.host.F P.1 (z.1 r s)
                       - (1 : Matrix (Fin n) (Fin n) (P.1.adicCompletion B.fields.E)) r s)
                   ≤ WithZero.exp (-(N : ℤ))) := by
-  first
-  | exact @GlobalTheory.Mem.Col2.AdT.AdelicValuationDictionary.main
-  | exact GlobalTheory.Mem.Col2.AdT.AdelicValuationDictionary.main
-  | (intros; apply GlobalTheory.Mem.Col2.AdT.AdelicValuationDictionary.main <;> assumption)
+  first | exact @GlobalTheory.Mem.Col2.AdT.AdelicValuationDictionary.main

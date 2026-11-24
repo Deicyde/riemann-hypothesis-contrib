@@ -62,13 +62,7 @@ theorem absNorm_le_norm
   have hbc : b * c = FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) l := by
     rw [hc, ← mul_assoc, mul_inv_cancel₀ hb, one_mul]
   have hc1 : c ≤ 1 := by
-    have h1 : c ≤ b⁻¹ * b := by
-      first
-      | exact mul_le_mul_right hs _
-      | (
-          rw [← FractionalIdeal.coe_le_coe, FractionalIdeal.coe_mul, FractionalIdeal.coe_mul]
-          exact Submodule.mul_le_mul_right (FractionalIdeal.coe_le_coe.mpr hs)
-        )
+    have h1 : c ≤ b⁻¹ * b := by first | exact mul_le_mul_right hs _
     rwa [inv_mul_cancel₀ hb] at h1
   obtain ⟨I, hI⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.mp hc1
   have hc0 : c ≠ 0 := by

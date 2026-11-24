@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -51,6 +52,7 @@ open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory
   GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.isThetaConstantListOfFibre_pullback_field_extension
     : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (L : LB G.left)
         (ρ : LB.Gen (L.pull (eSec G))),
@@ -61,7 +63,4 @@ theorem _root_.GlobalTheory.T.isThetaConstantListOfFibre_pullback_field_extensio
             → ∃ pt' : Fin N → (Over.mk (spMap i ≫ x) ⟶ G),
               (∀ a, (pt' a).left = spMap i ≫ (pt a).left)
                 ∧ ThList G L ρ m (spMap i ≫ x) (SecAt.pull G L θ i) pt' (fun a => i (c a)) := by
-  first
-  | exact @GlobalTheory.UMin.ThPull.thList_pull
-  | exact GlobalTheory.UMin.ThPull.thList_pull
-  | (intros; apply GlobalTheory.UMin.ThPull.thList_pull <;> assumption)
+  first | exact @GlobalTheory.UMin.ThPull.thList_pull

@@ -48,6 +48,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.thetaSetup_labelling_transport_galoisConjugate
     : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (Z : Scheme.{0})
         (i : F.X ⟶ Z) (X₁ : Setup F W i),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.thetaSetup_labelling_transport_galoisConjugate
                         (yy : D.X.S.Gam →+ ModN (D.X.S.r * D.X.S.N) (Fin 8 → c.T.D.toPre.X)),
                       IsLab D.X D.ε (D.lift c y h) yy
                         → IsLab D.X D.ε (D.lift c (y ≫ s) h') (yy.comp a.toAddMonoidHom) := by
-  first
-  | exact @GlobalTheory.Poinc.GalTrans.isLab_conj
-  | exact GlobalTheory.Poinc.GalTrans.isLab_conj
-  | (intros; apply GlobalTheory.Poinc.GalTrans.isLab_conj <;> assumption)
+  first | exact @GlobalTheory.Poinc.GalTrans.isLab_conj

@@ -2,14 +2,15 @@ module
 
 public import Development.AutomorphicArithmetic.CupPullbacks.ConstCompSingle
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.QuasiIsoHypercohomologyBijectiveStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCupProductGradedCommStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCupUnitAndPrimitiveRootClassesStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.PullHlComp
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCupProductGradedComm
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCupUnitAndPrimitiveRootClasses
 public import Mathlib.Algebra.Homology.Embedding.ExtendHomotopy
+public import Mathlib.AlgebraicTopology.SimplicialObject.ChainHomotopy
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
-public import Mathlib.AlgebraicTopology.SimplicialObject.ChainHomotopy
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
 import Mathlib.Analysis.SpecialFunctions.Bernstein
@@ -155,8 +156,7 @@ private theorem hT_c
     simp only [Function.comp_apply]
     congr 1
     apply Fin.ext
-    simp only [sa_val, Fin.coe_castSucc, Fin.val_succ, Fin.val_mk] at hx hy ⊢
-    all_goals (split_ifs at hx hy ⊢ <;> omega)
+    simp only [sa_val, Fin.coe_castSucc, Fin.val_succ] at hx hy ⊢
 
 private theorem hT_d
     {A : Type} [One A] {n : ℕ} (j : Fin (n + 1)) (v : Fin (n + 2) → A) (k : Fin (n + 2))
@@ -179,7 +179,7 @@ private theorem hT_e
     simp only [Function.comp_apply]
     congr 1
     apply Fin.ext
-    simp only [sa_val, Fin.coe_castSucc, Fin.val_succ, Fin.val_mk] at hx hy ⊢
+    simp only [sa_val, Fin.coe_castSucc, Fin.val_succ] at hx hy ⊢
     split_ifs at hx hy ⊢ <;> omega
 
 private theorem hT_f
@@ -194,8 +194,7 @@ private theorem hT_f
     simp only [Function.comp_apply]
     congr 1
     apply Fin.ext
-    simp only [pa_val, Fin.coe_castSucc, Fin.val_succ, Fin.val_mk] at hx hy ⊢
-    all_goals (split_ifs at hx hy ⊢ <;> omega)
+    simp only [pa_val, Fin.coe_castSucc, Fin.val_succ] at hx hy ⊢
 
 private theorem hT_g
     {A : Type} [One A]
@@ -209,7 +208,7 @@ private theorem hT_g
     simp only [Function.comp_apply]
     congr 1
     apply Fin.ext
-    simp only [pa_val, Fin.coe_castSucc, Fin.val_succ, Fin.val_mk] at hx hy ⊢
+    simp only [pa_val, Fin.coe_castSucc, Fin.val_succ] at hx hy ⊢
     split_ifs at hx hy ⊢ <;> omega
 
 private theorem hT_map
@@ -558,7 +557,8 @@ private theorem chains_qi (R : Type) [CommRing R] (E : Spc)
 
 private theorem eqv1 (R : Type) [CommRing R] (E : Spc) (F : Shv R) : Eqv R (fst1 E) F := by
   haveI := chains_qi R E
-  exact fun n => GlobalTheory.T.quasiIso_hypercohomology_bijective R ((chains R).map (fst1 E)) F n
+  exact fun n =>
+    _root_.GlobalTheory.EtC.quasiIso_hypercohomology_bijective' R ((chains R).map (fst1 E)) F n
 
 section
 variable {q : ℕ} {X : Spc}
@@ -577,9 +577,9 @@ private theorem cast_bij {n i n' i' : ℤ} (h1 : n = n') (h2 : i = i')
 
 private theorem cup_one' [NeZero q] (hX : Inv q X) {n i : ℤ} (x : Ht q X n i)
     : cup q x (one q X) = x.cast (by ring) (by ring) := by
-  rw [GlobalTheory.T.tateTwistCupProduct_graded_comm q X x (one q X),
-    (GlobalTheory.T.tateTwistCup_unit_and_primitiveRoot_classes q).1 X hX x, mul_zero,
-    Int.negOnePow_zero, one_smul, cast_cast]
+  rw [_root_.GlobalTheory.EtC.cup_comm q X x (one q X),
+    (_root_.GlobalTheory.EtC.CupGen.main q).1 X hX x, mul_zero, Int.negOnePow_zero, one_smul,
+    cast_cast]
 
 private theorem cup_one_cast
     [NeZero q] (hX : Inv q X) {n i m j : ℤ} (x : Ht q X n i) (hm : 0 = m) (hj : 0 = j)

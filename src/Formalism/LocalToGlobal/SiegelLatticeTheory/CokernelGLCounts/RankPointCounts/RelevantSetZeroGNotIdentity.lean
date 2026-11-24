@@ -88,8 +88,8 @@ theorem exists_nfFull_of_relevant_of_G_eq_zero
   have hpos : 0 < (σ ((Tu D u : ℕ) : D.host.E)).re := by
     rw [map_natCast, Complex.natCast_re]
     exact_mod_cast tie_Tu_pos D u
-  refine Formalism.HermitianLatticeCounting.Final.S6.normalForm D.host.E (hS D).V σ (nfH (hS D))
-    D.R.rS _ _
+  refine _root_.Formalism.HermitianLatticeCounting.P.existsNormalForm D.host.E (hS D).V σ
+    (nfH (hS D)) D.R.rS _ _
     (fun x => p_starConj D σ x)
     hpos hpos (nf_pos _ _ (p_posX D _ (tie_Tu_pos D u) _) σ)
     (nf_pos _ _ (p_posX D _ (tie_Tu_pos D u) _) σ)
@@ -148,8 +148,8 @@ theorem delta_pos_le_height_sq
     exact Real.one_le_rpow (by linarith) (by positivity)
   unfold k2S
   rw [← Finset.prod_pow]
-  refine Formalism.HermitianLatticeCounting.Final.S6.normSgBound D.what₂.Tau D.R.rS D.R.f _ _
-    (H1C large₂ CH) _ (szf_card_Tau D) (by linarith)
+  refine _root_.Formalism.HermitianLatticeCounting.P.norm_singular_value_bound D.what₂.Tau D.R.rS
+    D.R.f _ _ (H1C large₂ CH) _ (szf_card_Tau D) (by linarith)
     (two_pow_le_height_bound _ CH C _ _ _ hb (two_rank_add_two_eq_m D) hCH hC)
     (fun τ => (hpos τ).le)
     (fun τ => ?_)
@@ -190,8 +190,8 @@ theorem localNorm_le_height_sq
   rw [hPF]
   unfold k2S
   rw [← Finset.prod_pow]
-  refine Formalism.HermitianLatticeCounting.Final.S6.normSgBound D.what₂.Tau D.R.rS D.R.f _ _
-    (H1C large₂ CH) _ (szf_card_Tau D) (by linarith)
+  refine _root_.Formalism.HermitianLatticeCounting.P.norm_singular_value_bound D.what₂.Tau D.R.rS
+    D.R.f _ _ (H1C large₂ CH) _ (szf_card_Tau D) (by linarith)
     (two_pow_le_height_bound _ CH C _ _ _ hb (two_rank_add_two_eq_m D) hCH hC)
     (fun τ => ?_)
     (fun τ => ?_)

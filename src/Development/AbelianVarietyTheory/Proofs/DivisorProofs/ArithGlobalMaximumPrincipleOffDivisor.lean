@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CharZeroFunctionField
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxPrincipleNearStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxPrincipleNear
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,7 +65,7 @@ theorem max_principle_global
                         → f ∈ P.Bl N 0 (Real.exp (δ * N) * R) := by
   intro k _ X _ p D hX P s hs hs0 δ hδ
   classical
-  choose W ρ hW hρ H using GlobalTheory.T.exists_nhds_nu_le_exp_mul_of_far_bound k X p D hX P s hs hs0 δ hδ
+  choose W ρ hW hρ H using _root_.GlobalTheory.VolBr.Pair.max_principle_near k X p D hX P s hs hs0 δ hδ
   haveI : Finite (k →+* ℂ) := hX.finite_emb
   have hcov
       : ∀ σ : k →+* ℂ, ∃ t : Finset (CxPts p σ), (Set.univ : Set (CxPts p σ)) ⊆ ⋃ x ∈ t, W σ x := by

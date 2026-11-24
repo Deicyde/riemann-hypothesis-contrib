@@ -49,6 +49,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.complexConjugation_maps_multiplicitySpace
     : ∀ {D : D7} {V : HSp D} {S S' : D.what₂.Tau → SPar} (θ : InfFam D) (M : DSModel V S)
         (M' : DSModel V S') (c : ∀ τ, M'.H τ ≃ₗᵢ⋆[ℂ] M.H τ),
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.complexConjugation_maps_multiplicitySpace
           ∧ ∀ J χ, ∀ T ∈ Mult θ M J χ, ∃ T' ∈ Mult θ M' J (fun k => star (χ k)),
             ∀ (v' : M'.Vec) (v : M.Vec),
               (∀ τ, (v τ : M.H τ) = c τ (v' τ)) → ∀ g, T' v' g = star (T v g) := by
-  first
-  | exact @GlobalTheory.ConjMult.conj_mult
-  | exact GlobalTheory.ConjMult.conj_mult
-  | (intros; apply GlobalTheory.ConjMult.conj_mult <;> assumption)
+  first | exact @GlobalTheory.ConjMult.conj_mult

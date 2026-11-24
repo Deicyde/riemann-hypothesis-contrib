@@ -450,10 +450,7 @@ theorem exists_descent_symmetric
   obtain ⟨M, hM, w, hw, hw'⟩ :=
     exists_descent_compat_of_galois
       (t := fun c => ((toUnit A ≫ i c) * 𝟙 A).left)
-      hL
-      (by
-        beta_reduce
-        rw [map_one, MonObj.comp_one, _root_.one_mul, Over.id_left])
+      hL (by rw [map_one, MonObj.comp_one, _root_.one_mul, Over.id_left])
       (fun c c' => by
         rw [← Over.comp_left, comp_transl, ← _root_.mul_assoc, ← MonObj.comp_mul, ← map_mul,
           mul_comm c'])

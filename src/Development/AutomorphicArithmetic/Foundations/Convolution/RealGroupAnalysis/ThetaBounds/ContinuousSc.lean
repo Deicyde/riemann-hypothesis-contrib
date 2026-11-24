@@ -63,10 +63,10 @@ private theorem infGL_scalarE
   refine ga_ext ?_ ?_
   · rw [pInf_infGL]
     ext i j
-    by_cases e : i = j <;> simp [Matrix.diagonal_apply, e, h1]
+    by_cases e : i = j <;> simp [e, h1]
   · rw [pFin_infGL]
     ext i j
-    by_cases e : i = j <;> simp [Matrix.diagonal_apply, e, h2]
+    by_cases e : i = j <;> simp [e, h2]
 
 section SlopeTestRemainingChoices
 

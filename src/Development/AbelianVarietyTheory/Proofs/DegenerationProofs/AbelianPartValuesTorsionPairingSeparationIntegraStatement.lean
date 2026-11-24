@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.abelianPartValues_torsion_pairing_separation_integral
     : Laws → Laws2 → BrUthSt
       → ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (D : DegPre R),
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.abelianPartValues_torsion_pairing_separation_integ
             CExt R ⊥ C
               → ∀ (N : NumD C) (ν : NumOf D C N),
                 ν.IntN → ∀ n : ℕ, n.Prime → Odd n → ‖(n : C)‖ = 1 → N.Tors n D.P.g := by
-  first
-  | exact @GlobalTheory.ValuesTorsion.tors_of_integral
-  | exact GlobalTheory.ValuesTorsion.tors_of_integral
-  | (intros; apply GlobalTheory.ValuesTorsion.tors_of_integral <;> assumption)
+  first | exact @GlobalTheory.ValuesTorsion.tors_of_integral

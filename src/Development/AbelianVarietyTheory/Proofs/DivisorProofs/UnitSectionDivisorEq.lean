@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqOne
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -60,9 +61,7 @@ theorem actOn_tmul_tmul'
     (R : Type) [CommRing R] [Algebra ℚ R]
     (r a : R) (c : C) (v : V)
     : actOn rep R (r ⊗ₜ c) (a ⊗ₜ v) = (r * a) ⊗ₜ rep c v := by
-  simp only [actOn, Algebra.TensorProduct.lift_tmul, Algebra.ofId_apply, AlgHom.coe_comp,
-    Function.comp_apply, Module.End.mul_apply, Algebra.algebraMap_eq_smul_one, LinearMap.smul_apply,
-    Module.End.one_apply]
+  simp only [actOn]
   change r • (rep c).baseChange R (a ⊗ₜ v) = _
   rw [LinearMap.baseChange_tmul, TensorProduct.smul_tmul', smul_eq_mul]
 

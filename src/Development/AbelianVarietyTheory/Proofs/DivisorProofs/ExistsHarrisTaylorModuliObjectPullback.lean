@@ -211,7 +211,7 @@ theorem isTanScal_pull
         = 𝟙 _ := by
     refine (Spec.map_comp _ _).symm.trans ((congrArg Spec.map ?_).trans (Spec.map_id _))
     ext a
-    simp [TrivSqZeroExt.algebraMap_eq_inl]
+    simp
   refine and_congr ?_ ?_
   · rw [one, he]
     refine ⟨

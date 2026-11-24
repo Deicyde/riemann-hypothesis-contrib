@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.uniformisation_torsion_maps_compatible_in_level
     : LL
       → AllUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.uniformisation_torsion_maps_compatible_in_level
                   → (QkToAkU U.toUnifPre F k p x ↔ QkToAkU U.toUnifPre F N q x))
                 ∧ (p.y = q.y → GtPtF.IsNsmul n q.g p.g → QkToAkU U.toUnifPre F N q x
                   → QkToAkU U.toUnifPre F k p (x ^ n)) := by
-  first
-  | exact @GlobalTheory.LevelCompat.qkToAkU_level
-  | exact GlobalTheory.LevelCompat.qkToAkU_level
-  | (intros; apply GlobalTheory.LevelCompat.qkToAkU_level <;> assumption)
+  first | exact @GlobalTheory.LevelCompat.qkToAkU_level

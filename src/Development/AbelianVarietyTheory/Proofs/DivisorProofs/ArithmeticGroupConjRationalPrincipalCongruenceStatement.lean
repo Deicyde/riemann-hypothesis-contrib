@@ -79,7 +79,4 @@ theorem _root_.GlobalTheory.T.arithmeticGroup_conj_rational_principalCongruence
                           * (γ : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map τ
                         = (γ' : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map τ
                           * archM V (th k ⟨τ, hτ⟩) g := by
-  first
-  | exact @GlobalTheory.MsRepsFwd.conj_rat_congr
-  | exact GlobalTheory.MsRepsFwd.conj_rat_congr
-  | (intros; apply GlobalTheory.MsRepsFwd.conj_rat_congr <;> assumption)
+  first | exact @GlobalTheory.MsRepsFwd.conj_rat_congr

@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.unfold_over_flagUnipotent_thetaLift
     : ∀ (D : D7),
       Descent D
@@ -66,8 +67,4 @@ theorem _root_.GlobalTheory.T.unfold_over_flagUnipotent_thetaLift
                             𝓑 vW.μ
                           ∧ ∫ n in vN.𝓝, Th n.1 * liftS om vW.μ vW.𝓕 G Φ n.1 ∂vN.ν
                             = ∫ h in 𝓑, G h * fl ψ d W vS vb vU Th (rat x₀) (om (1, h) Φ) ∂vW.μ :=
-  by
-    first
-    | exact @GlobalTheory.Unf.unfold_over_N_lift
-    | exact GlobalTheory.Unf.unfold_over_N_lift
-    | (intros; apply GlobalTheory.Unf.unfold_over_N_lift <;> assumption)
+  by first | exact @GlobalTheory.Unf.unfold_over_N_lift

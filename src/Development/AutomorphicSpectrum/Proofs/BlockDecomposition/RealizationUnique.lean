@@ -85,7 +85,6 @@ theorem eq_of_unit_smul_combination
       F φ
         = F (∑ s, φ (bs s) • bs.coord s) := by rw [e]
       _ = _ := by
-
         rw [map_sum]
         exact Finset.sum_congr rfl fun s _ => by rw [hF, mul_comm]
   ext φ

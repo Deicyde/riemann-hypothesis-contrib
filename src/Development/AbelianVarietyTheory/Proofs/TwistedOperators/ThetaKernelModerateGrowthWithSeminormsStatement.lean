@@ -45,9 +45,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
   Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaKernel_moderateGrowth_with_seminorms
     : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.ThetaKernelGrowth.ThetaGrowth D := by
-  first
-  | exact @GlobalTheory.KernelSeminorm.thetaGrowth_onObjects
-  | exact GlobalTheory.KernelSeminorm.thetaGrowth_onObjects
-  | (intros; apply GlobalTheory.KernelSeminorm.thetaGrowth_onObjects <;> assumption)
+  first | exact @GlobalTheory.KernelSeminorm.thetaGrowth_onObjects

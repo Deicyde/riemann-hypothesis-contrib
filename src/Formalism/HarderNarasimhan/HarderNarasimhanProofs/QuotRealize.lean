@@ -220,7 +220,7 @@ theorem exists_mat
     (WithLp.linearEquiv 2 ℂ (κ → ℂ)).toLinearMap ∘ₗ e.toLinearEquiv.toLinearMap ∘ₗ T.rangeRestrict
   have hf : ∀ z, ‖(WithLp.toLp 2 (f z) : EuclideanSpace ℂ κ)‖ = ‖T z‖ := by
     intro z
-    simp [f, LinearIsometryEquiv.norm_map]
+    simp [f]
   have hinj : Function.Injective f := by
     intro z w hzw
     apply hT
@@ -358,8 +358,7 @@ theorem pv_top
     funext i
     by_cases h : i = j
     · subst h; simp [Formalism.HermitianLatticesTheory.vecAt]
-    · simp [Formalism.HermitianLatticesTheory.vecAt, Finsupp.single_apply, Pi.single_apply, h,
-        Ne.symm h]
+    · simp [Formalism.HermitianLatticesTheory.vecAt, h]
   have key
       : ∀ j,
         (WithLp.equiv 2 (ι → ℂ)).symm (Formalism.HermitianLatticesTheory.fcoord b X v (b j))
@@ -377,7 +376,7 @@ theorem pv_top
     funext i
     simp only [hf]
     conv_lhs => rw [WithLp.equiv_apply, e]
-    simp [Matrix.mulVec, dotProduct, Pi.single_apply, Finset.sum_apply, mul_comm]
+    simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
   rw [hz]
   exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (key j)
 
@@ -480,9 +479,6 @@ theorem proj_eq_tv (hc : ∀ k, U.mkQ (c k) = b'' k) (v : InfinitePlace K) (x : 
     first
     | exact (Submodule.starProjection_apply_eq_zero_iff _).mpr
         (Submodule.le_orthogonal_orthogonal _ hm)
-    | exact (Submodule.starProjection_eq_zero_iff _).mpr (Submodule.le_orthogonal_orthogonal _ hm)
-    | simp [Submodule.le_orthogonal_orthogonal _ hm]
-    | simpa using Submodule.le_orthogonal_orthogonal _ hm
   have hsplit
       : Formalism.HermitianLatticesTheory.fcoord b X v x
         = Formalism.HermitianLatticesTheory.fcoord b X v (x - ∑ k, r k • c k)

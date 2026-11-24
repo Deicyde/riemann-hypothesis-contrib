@@ -56,6 +56,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.local_model_weil_operator_trivialAtPlace_isModel
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k)
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.local_model_weil_operator_trivialAtPlace_isModel
                 → ∀ g ∈ GlobalTheory.FinPl.grpOff V (· = q.v),
                   ∀ h ∈ GlobalTheory.FinPl.grpOff W (· = q.v),
                     (ofSplit q).IsModel ψ FV FW ((ω (g, h)) ∘ₗ Tm) := by
-  first
-  | exact @GlobalTheory.LocModMove.isModel_weil_off
-  | exact GlobalTheory.LocModMove.isModel_weil_off
-  | (intros; apply GlobalTheory.LocModMove.isModel_weil_off <;> assumption)
+  first | exact @GlobalTheory.LocModMove.isModel_weil_off

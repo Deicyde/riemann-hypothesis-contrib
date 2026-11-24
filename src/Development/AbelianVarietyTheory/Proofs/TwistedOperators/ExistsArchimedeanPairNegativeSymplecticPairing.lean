@@ -174,11 +174,6 @@ private theorem star_dotProduct_mulVec_star_comm
       rw [hG]
       ring
     )
-  | (
-      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-      rw [hG]
-      ring
-    )
 
 private theorem dotProduct_mulVec_star_invariant
     {n : ℕ} {G θ : Matrix (Fin n) (Fin n) ℂ} (hθ : θᵀ * G * θ.map star = G) (u v : Fin n → ℂ)

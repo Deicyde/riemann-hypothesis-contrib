@@ -58,16 +58,7 @@ noncomputable section
 
 namespace GlobalTheory.SymExtendDvr
 
-theorem isGrpPullback_of_iso
-    {S : Scheme.{0}} {A B : Over S} [GrpObj A] [GrpObj B] (e : A ≅ B) [IsMonHom e.hom]
-    : IsGrpPullback A B (𝟙 S) e.hom.left := by
-  have : IsIso e.hom.left := inferInstanceAs (IsIso ((Over.forget S).map e.hom))
-  refine ⟨IsPullback.of_horiz_isIso ⟨by simp⟩, fun T x y x₀ y₀ hx hy => ?_⟩
-  let u : Over.mk (T.hom ≫ 𝟙 S) ⟶ T := Over.homMk (𝟙 _) (by simp)
-  have e₁ : x₀ = u ≫ x ≫ e.hom := Over.OverMorphism.ext (hx.trans (Category.id_comp _).symm)
-  have e₂ : y₀ = u ≫ y ≫ e.hom := Over.OverMorphism.ext (hy.trans (Category.id_comp _).symm)
-  rw [e₁, e₂, ← MonObj.comp_mul, ← MonObj.mul_comp]
-  exact Category.id_comp _
+alias isGrpPullback_of_iso := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.isGrpPullback_of_iso
 
 theorem hypS_of_generic
     : (∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]

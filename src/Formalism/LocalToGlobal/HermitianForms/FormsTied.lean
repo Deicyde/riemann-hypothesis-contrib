@@ -179,7 +179,6 @@ theorem rhoT_eq
     (g) (hg : g ∈ AdFun K.lev (embT D))
     : (D.mem u).A.rhoT v a (fun c s => g (K.y c) (W.eY s)) = fun c s => g (K.y c * δ) (W.eY s) := by
   funext c
-  rw [(D.fm u).rhoT_dil]
-  exact W.dilT v a k hk c δ hδ g hg
+  simpa only [(D.fm u).rhoT_dil] using W.dilT v a k hk c δ hδ g hg
 
 end Formalism.L2.Forms

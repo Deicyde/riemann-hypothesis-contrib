@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_section_primitiveBundle_translate_localRing
     : Laws → Laws2
       → ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_section_primitiveBundle_translate_localRing
             LBIso O
               (LB.LinComb P.L (K := Fin 2) ![((toUnit P.A ≫ x) * 𝟙 P.A).left, 𝟙 P.A.left]
                 ![1, -1]) := by
-  first
-  | exact @GlobalTheory.PrimitiveOverLocalRing.exists_section_translate
-  | exact GlobalTheory.PrimitiveOverLocalRing.exists_section_translate
-  | (intros; apply GlobalTheory.PrimitiveOverLocalRing.exists_section_translate <;> assumption)
+  first | exact @GlobalTheory.PrimitiveOverLocalRing.exists_section_translate

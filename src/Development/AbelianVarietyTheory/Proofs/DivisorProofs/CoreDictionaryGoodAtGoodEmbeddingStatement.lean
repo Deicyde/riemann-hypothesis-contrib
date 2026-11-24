@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.coreDictionary_good_at_good_embedding
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.coreDictionary_good_at_good_embedding
                   (castDict hV (T.dict ((i : ℕ) + 1) (res T σ)))
                   (castDict hV (T.mu ((i : ℕ) + 1) (res T σ))) (T.cE ((i : ℕ) + 1) (res T σ))
                   (levG (Wc D i) (R.βW i) (R.datWp i R.triv)) := by
-  first
-  | exact @GlobalTheory.HolDict.goodDict_core
-  | exact GlobalTheory.HolDict.goodDict_core
-  | (intros; apply GlobalTheory.HolDict.goodDict_core <;> assumption)
+  first | exact @GlobalTheory.HolDict.goodDict_core

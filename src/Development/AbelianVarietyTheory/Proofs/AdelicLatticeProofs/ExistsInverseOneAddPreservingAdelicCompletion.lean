@@ -119,7 +119,7 @@ theorem _root_.GlobalTheory.UnRep.Nakayama.valuation_natCast_lt_one
   have h2 := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := F) v (N : 𝓞 F)
   rw [← h2] at h
   convert h using 2
-  first | simp | norm_cast | (push_cast; rfl)
+  first | simp
 
 variable {E : Type} [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
@@ -185,7 +185,7 @@ theorem _root_.GlobalTheory.UnRep.exists_inverse_one_add_preserving_hat
     have h := integral_tmul_smul_mem_hat (F := F) c.2 hz
     convert h using 1
     funext i
-    simp [Subring.smul_def, Algebra.smul_def] <;> rfl
+    simp [Algebra.smul_def] <;> rfl
   let ΛA : Submodule A (Fin n → _root_.GlobalTheory.AdLat.RA F E) := {
     Λ with
     smul_mem' := fun c z hz ↦ hsmulA c hz
@@ -220,7 +220,7 @@ theorem _root_.GlobalTheory.UnRep.exists_inverse_one_add_preserving_hat
         | mem y hy =>
           have h1 : (fun i ↦ b ⊗ₜ[F] y i) = (⟨b, hb⟩ : A) • g y := by
             funext i
-            simp [hg, Subring.smul_def, Algebra.smul_def, Algebra.TensorProduct.tmul_mul_tmul]
+            simp [hg, Algebra.smul_def, Algebra.TensorProduct.tmul_mul_tmul]
             rfl
           rw [h1]
           exact Submodule.smul_mem _ _ (Submodule.subset_span (by simp; exact ⟨y, hy, rfl⟩))
@@ -355,7 +355,7 @@ theorem _root_.GlobalTheory.UnRep.exists_inverse_one_add_preserving_hat
       by_cases hj : j = i
       · subst hj
         simp [Algebra.TensorProduct.one_def]
-      · simp [Pi.single_apply, hj]
+      · simp [hj]
     rw [← h1]
     exact hi
   choose w hw using hsingle

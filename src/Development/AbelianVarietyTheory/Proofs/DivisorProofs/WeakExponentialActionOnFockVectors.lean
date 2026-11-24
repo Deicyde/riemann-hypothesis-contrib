@@ -89,7 +89,7 @@ theorem flow
         (fun s : ℝ => NormedSpace.exp ((1 - s) • A))
         (-(A * NormedSpace.exp ((1 - s) • A))) s := by
       have := e1.scomp s ((hasDerivAt_id s).const_sub 1)
-      simp only [neg_smul, one_smul, id] at this
+      simp only [neg_smul, one_smul] at this
       exact this
     have e3 := (coordCLM x i).hasFDerivAt.comp_hasDerivAt s e2
     have e4 : coordCLM x i (-(A * NormedSpace.exp ((1 - s) • A))) = - (A *ᵥ c s) i := by
@@ -138,7 +138,7 @@ theorem hasSum_exp_mulVec
         LinearMap.toContinuousLinearMap ψ (((n.factorial : ℂ))⁻¹ • A ^ n)
           = ((n.factorial : ℂ))⁻¹ * φ ((A ^ n) *ᵥ x) := fun n => by
     show ψ _ = _
-    simp [ψ, Matrix.smul_mulVec]
+    simp [ψ]
   simp only [e] at h
   exact h
 

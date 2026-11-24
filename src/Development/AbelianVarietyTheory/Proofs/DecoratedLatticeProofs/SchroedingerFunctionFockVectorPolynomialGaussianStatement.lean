@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.schroedingerFunction_fockVector_polynomial_gaussia
                             → ∀ f,
                               IsFockVec ψ θ (dblSp A) B s' sB f
                                 → sch ψ A B ν 𝓨 f ∈ fockA θ B A.rank l sB := by
-  first
-  | exact @GlobalTheory.StdUnn.sch_mem_fockA
-  | exact GlobalTheory.StdUnn.sch_mem_fockA
-  | (intros; apply GlobalTheory.StdUnn.sch_mem_fockA <;> assumption)
+  first | exact @GlobalTheory.StdUnn.sch_mem_fockA

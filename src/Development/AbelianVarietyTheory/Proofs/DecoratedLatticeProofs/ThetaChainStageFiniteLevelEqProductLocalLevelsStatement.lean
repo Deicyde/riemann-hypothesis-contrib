@@ -53,6 +53,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric
 attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.thetaChainStage_finiteLevel_eq_product_localLevels
     : ∀ D : D7,
       ForStageQ D fun c w _ s =>
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.thetaChainStage_finiteLevel_eq_product_localLevels
                 GlobalTheory.AdelicU.proj D.sp.cm.sig s.V.gram v κ
                   ∈ GlobalTheory.AdelicU.stabLoc D.sp.cm.sig s.V.gram s.Λ v)
           ∧ ∃ mR, IsLevMeas s mR := by
-  first
-  | exact @GlobalTheory.ChainTw.LevLoc.levLoc
-  | exact GlobalTheory.ChainTw.LevLoc.levLoc
-  | (intros; apply GlobalTheory.ChainTw.LevLoc.levLoc <;> assumption)
+  first | exact @GlobalTheory.ChainTw.LevLoc.levLoc

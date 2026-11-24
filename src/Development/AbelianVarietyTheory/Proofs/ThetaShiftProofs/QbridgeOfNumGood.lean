@@ -2,8 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.ModelsAt
 public import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.QatOfBridge
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.IsNumberFieldFunctionalBoundedCompExtensionStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.IsNumberFieldFunctionalBoundedCompExtension
 public import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.DegreeInfimum.PlaceDegreeSums
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.Rationality.KerCorePf
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -36,7 +37,6 @@ import Mathlib.Tactic.NormNum.NatSqrt
 import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.Rationality.KerCorePf
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.Rationality.LocalQuotientRank
 
 @[expose] public section
@@ -108,7 +108,7 @@ theorem qbridge_of_numGood
           fun v hv => by
             have := LinearMap.mem_ker.1 (hf.1 hv)
             simp [LinearMap.mem_ker, this],
-          GlobalTheory.T.isNumberFieldFunctionalBounded_comp_extension _ _ _ _ _ _ _ K' K₁ e f hf.2
+          _root_.GlobalTheory.ArcCM.numGood_comp _ _ _ _ _ _ _ K' K₁ e f hf.2
         ⟩,
         fun _ => rfl
       ⟩)

@@ -1,7 +1,8 @@
 module
 
 public import Formalism.LocalRingCardinality.DataTheta
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockActionPowAnalyticVectorNormLeStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockActionPowAnalyticVectorNormLe
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AnalyticOnNhdOrbitOfDerivSeqNormEq
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -39,7 +40,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
 import Formalism.SharpRestriction.Divisibility.SchurIrreducible
 
 @[expose] public section
@@ -80,7 +80,7 @@ theorem analyticOnNhd_orbit_pol
       (fun k t => ?_)
       a
     have hb :=
-      (GlobalTheory.T.fockAction_pow_analyticVector_norm_le p q r s F.H F.ι
+      (_root_.GlobalTheory.FockAnalytic.omAct_pow_norm_le p q r s F.H F.ι
         (isFockIsometry_of_fockData F) Y P.totalDegree k P le_rfl).2
     simp only [f]
     rw [F.isom]

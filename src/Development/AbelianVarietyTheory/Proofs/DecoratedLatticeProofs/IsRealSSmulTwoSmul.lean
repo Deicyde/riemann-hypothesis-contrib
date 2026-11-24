@@ -84,17 +84,6 @@ theorem biComb_smul
   rw [h1, comb_smul]
   rfl
 
-theorem isThetaFunO_smul
-    {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} (c : ℂ) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f)
-    : IsThetaFunO ψ S T (c • f) := {
-  quasi γ w := by simp only [Pi.smul_apply, smul_eq_mul]; rw [hf.quasi]; ring
-  level := by
-    obtain ⟨U, hUo, hU⟩ := hf.level
-    exact ⟨U, hUo, fun u hu hi => by rw [heisO_smul, hU u hu hi]⟩
-  cont := continuous_const.mul hf.cont
-  smooth k L hL hfin w := contDiff_const.mul (hf.smooth k L hL hfin w)
-}
-
 theorem isLatVac_smul
     {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D}
     (c : ℂ)
@@ -114,11 +103,12 @@ theorem isBiVac_smul
   · intro v
     have e : (fun u => (c • C) u v) = c • fun u => C u v := rfl
     rw [e]
-    exact ⟨isThetaFunO_smul c (h.left v).1, isLatVac_smul c (h.left v).2⟩
+    exact ⟨_root_.GlobalTheory.OrientedHeis.theta_smul c (h.left v).1, isLatVac_smul c (h.left v).2⟩
   · intro u
     have e : (c • C) u = c • C u := rfl
     rw [e]
-    exact ⟨isThetaFunO_smul c (h.right u).1, isLatVac_smul c (h.right u).2⟩
+    exact
+      ⟨_root_.GlobalTheory.OrientedHeis.theta_smul c (h.right u).1, isLatVac_smul c (h.right u).2⟩
 
 theorem isBiSmooth_smul {A S A' : HSp D} (c : ℂ) {C : WO A S → WO S A' → ℂ} (h : IsBiSmooth C)
     : IsBiSmooth (c • C) := fun n L L' hL hL' h0 h0' u v => by

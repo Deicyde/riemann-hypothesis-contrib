@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR For
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CuspMult
+
 theorem _root_.GlobalTheory.T.finrank_killed_eq_of_equal_multiplicities
     : ∀ (H : Type) [Group H] [TopologicalSpace H] (X Y : Type) [AddCommGroup X] [Module ℂ X]
         [AddCommGroup Y] [Module ℂ Y] (ρ : Representation ℂ H X) (ρ' : Representation ℂ H Y)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.finrank_killed_eq_of_equal_multiplicities
         → FiniteDimensional ℂ (C' ⊓ killed ρ' I : Submodule ℂ Y)
         → Module.finrank ℂ (C ⊓ killed ρ I : Submodule ℂ X)
           = Module.finrank ℂ (C' ⊓ killed ρ' I : Submodule ℂ Y) := by
-  first
-  | exact @GlobalTheory.RepCount.finrank_inf_killed_eq
-  | exact GlobalTheory.RepCount.finrank_inf_killed_eq
-  | (intros; apply GlobalTheory.RepCount.finrank_inf_killed_eq <;> assumption)
+  first | exact @GlobalTheory.RepCount.finrank_inf_killed_eq

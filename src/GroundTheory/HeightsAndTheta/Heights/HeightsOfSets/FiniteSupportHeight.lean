@@ -66,7 +66,7 @@ theorem evalCone_map
 
 theorem finite_support_height
     {ι : Type} [Fintype ι] [DecidableEq ι]
-    {n : ι → ℕ} (A : HermLine n) (x : Cone n (AlgebraicClosure ℚ)) (hx : BlockNonzero x)
+    {n : ι → ℕ} (A : Heights.HermLine n) (x : Cone n (AlgebraicClosure ℚ)) (hx : BlockNonzero x)
     : (Function.support fun v : FinitePlace (coordField x) ↦
       ∑ k, (A.deg k : ℝ) * Real.log (⨆ i, v (coordVec x k i))).Finite := by
   classical

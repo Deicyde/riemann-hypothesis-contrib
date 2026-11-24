@@ -61,7 +61,6 @@ theorem obj_pull
         (S S' : Scheme.{0}) (s : S ⟶ Sp B) (s' : S' ⟶ Sp B') (f : S' ⟶ S),
       j b.ρ = b'.ρ → j b.ζ = b'.ζ → f ≫ s = s' ≫ spMap j
         → ∀ o : Obj D l b s, ∃ o' : Obj D l b' s', Nonempty (ObjMap o' o f) :=
-  ObjPull.objPull_of_lie_of_ample LiePull.lieMult_pull
-    (PolPull.pol_pull_of_relAmple_local AmpleLocal.relAmple_of_locally)
+  ObjPull.objPull_of_pol (PolPull.pol_pull_of_relAmple_local AmpleLocal.relAmple_of_locally)
 
 end GlobalTheory

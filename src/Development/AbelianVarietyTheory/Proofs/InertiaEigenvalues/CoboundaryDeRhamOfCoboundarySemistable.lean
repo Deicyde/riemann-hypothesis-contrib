@@ -2,8 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.EqOfPowEqOneOfNormSubLt
 public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEquivariantLogSemistableToDeRhamStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LTensorSemistableToDeRhamEquivariantStatement
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LocalPrimeGaloisActionPeriodT
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEquivariantLogSemistableToDeRham
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LTensorSemistableToDeRhamEquivariant
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -60,9 +61,9 @@ theorem cocycle_dies_dR_of_dies_st
         → ∃ b : V ⊗[ℚ_[l]] P.R.BdR, ∀ g,
           c g ⊗ₜ[ℚ_[l]] (1 : P.R.BdR) = actVdR (P.PD K) ρ g b - b := by
   intro l _ P AI T K V _ _ ρ c z hz
-  obtain ⟨ι, hC, hEq⟩ := GlobalTheory.T.exists_equivariant_log_semistable_to_deRham l P AI T
+  obtain ⟨ι, hC, hEq⟩ := _root_.GlobalTheory.BstLog.iota_exists l P AI T
   obtain ⟨hst, -, hone⟩ :=
-    GlobalTheory.T.lTensor_semistable_to_deRham_equivariant l P ι hC hEq K V ρ
+    _root_.GlobalTheory.InertiaEigenvalues.lTensor_iota_equivariant l P ι hC hEq K V ρ
   refine ⟨LinearMap.lTensor V ι.toLinearMap z, fun g => ?_⟩
   rw [← hone (c g), hz g, map_sub, hst g z]
 

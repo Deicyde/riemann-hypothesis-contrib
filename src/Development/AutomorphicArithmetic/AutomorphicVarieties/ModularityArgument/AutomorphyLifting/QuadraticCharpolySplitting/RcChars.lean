@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+public import Mathlib.RingTheory.PicardGroup
 
 @[expose] public section
 
@@ -73,8 +74,9 @@ theorem charPol_of_chars
   obtain ⟨hG, hZ⟩ := GlobalTheory.geometricLemma_and_zelevinskyPolynomialRing
   obtain ⟨𝔪, hm⟩ := GlobalTheory.langlandsExhaustionGL_holds (w.adicCompletion E) x
   have he : GlobalTheory.RoadU.chars ξ hξ = msupp 𝔪 :=
-    GlobalTheory.LocGL.SupportUnique.hasSupport_unique hG GlobalTheory.Laid.bzfin_holds hZ _ x _ _
-      hs (GlobalTheory.LocGL.hasSupport_msupp_of_isL hZ _ 𝔪 x hm)
+    GlobalTheory.LocGL.SupportUnique.hasSupport_unique hG
+      _root_.GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness hZ _ x _ _ hs
+      (GlobalTheory.LocGL.hasSupport_msupp_of_isL hZ _ 𝔪 x hm)
   have hsum : (rc x).charPol g = ((msupp 𝔪).map fun y => (rc y).charPol g).prod := by
     rw [H.langlands 𝔪.toList x (by rw [Multiset.coe_toList]; exact hm), segSum,
       CuspExt.charPol_sumList, List.map_map, msupp, Multiset.map_bind, Multiset.prod_bind]

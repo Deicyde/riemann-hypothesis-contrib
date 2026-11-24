@@ -54,9 +54,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.HeightCounting.ThetaSt
 
 section Gen

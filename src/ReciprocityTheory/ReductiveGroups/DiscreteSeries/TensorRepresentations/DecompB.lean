@@ -77,9 +77,7 @@ theorem dc_tensF_single_true
   simp only [tensF, cond_true, tensVd_coord, Pi.sub_apply, Pi.single_apply]
   by_cases h1 : c' = c <;> by_cases h2 : c' = b <;> by_cases h3 : a = c <;> subst_vars <;> simp_all
 
-theorem dc_mem_tensSub {M : Type*} [AddCommGroup M] [Module ℂ M] {S : Submodule ℂ M} {f : Fin n → M}
-    : f ∈ tensSub S ↔ ∀ c, f c ∈ S := by
-  simp [tensSub, Submodule.mem_pi]
+alias dc_mem_tensSub := _root_.ReciprocityTheory.ChartRestriction.DS.tset_mem
 
 theorem dc_tens_gen_le
     {M : Type*} [AddCommGroup M] [Module ℂ M]

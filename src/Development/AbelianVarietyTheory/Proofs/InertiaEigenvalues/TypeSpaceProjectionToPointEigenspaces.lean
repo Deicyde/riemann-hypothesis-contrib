@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.RowsExhaust
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CoeffMonicPolySum
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteCosetsHeckeSetAtSplitPlaceOutsideLevelStatement
+public import Formalism.LocalToGlobal.GaloisLevelStructure.DefsAut
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteCosetsHeckeSetAtSplitPlaceOutsideLevel
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitExEveryDatum
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
@@ -167,8 +168,8 @@ theorem tN_lin
     (k : ℕ) (c : ℂ) (f f' : GAf D.host.E D.R.nV → (M.loc i).wt.W)
     : tN (M.loc i).J s ϖ k (c • f + f') = c • tN (M.loc i).J s ϖ k f + tN (M.loc i).J s ϖ k f' := by
   have hfin :=
-    GlobalTheory.T.finite_cosets_heckeSet_at_splitPlace_outside_level D.host.E D.R.nV (M.loc i).J
-      (M.loc i).χ (badPl D i) (HT.J_hyp i) s ϖ k (not_bad_of_splitOut HT i hw s hc) hu
+    _root_.GlobalTheory.TSetFin.finite_image_tSet D.host.E D.R.nV (M.loc i).J (M.loc i).χ
+      (badPl D i) (HT.J_hyp i) s ϖ k (not_bad_of_splitOut HT i hw s hc) hu
   simp only [tN]
   rw [GlobalTheory.PtLocalEig.heckeD_add _ _ _ _ hfin c f f', smul_add, smul_comm]
 

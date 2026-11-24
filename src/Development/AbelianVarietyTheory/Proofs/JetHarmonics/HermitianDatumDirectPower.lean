@@ -51,8 +51,11 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRin
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj
 open scoped TensorProduct
@@ -61,58 +64,80 @@ namespace GlobalTheory
 
 noncomputable section
 
-def diagEnd {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] {n : ℕ}
-    (e : U ≃ₗ[ℝ] (Fin n → V)) (f : V →ₗ[ℝ] V) : U →ₗ[ℝ] U :=
+def diagEnd
+    {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V]
+    {n : ℕ} (e : U ≃ₗ[ℝ] (Fin n → V))
+    (f : V →ₗ[ℝ] V)
+    : U →ₗ[ℝ] U :=
   e.symm.toLinearMap ∘ₗ (LinearMap.pi fun i => f ∘ₗ LinearMap.proj i) ∘ₗ e.toLinearMap
 
-theorem diagEnd_apply {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] {n : ℕ}
-    (e : U ≃ₗ[ℝ] (Fin n → V)) (f : V →ₗ[ℝ] V) (x : U) (i : Fin n) : e (diagEnd e f x) i = f (e x i) := by
+theorem diagEnd_apply
+    {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V]
+    {n : ℕ} (e : U ≃ₗ[ℝ] (Fin n → V))
+    (f : V →ₗ[ℝ] V) (x : U) (i : Fin n)
+    : e (diagEnd e f x) i = f (e x i) := by
   simp [diagEnd]
 
-theorem diagEnd_comp {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] {n : ℕ}
-    (e : U ≃ₗ[ℝ] (Fin n → V)) (f g : V →ₗ[ℝ] V) : diagEnd e f ∘ₗ diagEnd e g = diagEnd e (f ∘ₗ g) := by
+theorem diagEnd_comp
+    {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V]
+    {n : ℕ} (e : U ≃ₗ[ℝ] (Fin n → V))
+    (f g : V →ₗ[ℝ] V)
+    : diagEnd e f ∘ₗ diagEnd e g = diagEnd e (f ∘ₗ g) := by
   ext x
   apply e.injective
   funext i
   simp [diagEnd_apply]
 
-theorem trace_diagEnd {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V]
-    [Module.Finite ℝ V] {n : ℕ} (e : U ≃ₗ[ℝ] (Fin n → V)) (f : V →ₗ[ℝ] V) :
-    LinearMap.trace ℝ U (diagEnd e f) = n * LinearMap.trace ℝ V f := by
+theorem trace_diagEnd
+    {U V : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [Module.Finite ℝ V]
+    {n : ℕ} (e : U ≃ₗ[ℝ] (Fin n → V))
+    (f : V →ₗ[ℝ] V)
+    : LinearMap.trace ℝ U (diagEnd e f) = n * LinearMap.trace ℝ V f := by
   have h1 : diagEnd e f = e.symm.conj (LinearMap.pi fun i => f ∘ₗ LinearMap.proj i) := by
     ext x; simp [diagEnd, LinearEquiv.conj_apply]
-  have h2 : (LinearMap.pi fun i => f ∘ₗ LinearMap.proj i : (Fin n → V) →ₗ[ℝ] (Fin n → V)) =
-      ∑ i, LinearMap.single ℝ (fun _ : Fin n => V) i ∘ₗ (f ∘ₗ LinearMap.proj i) := by
-    apply LinearMap.ext; intro x
+  have h2
+      : (LinearMap.pi fun i => f ∘ₗ LinearMap.proj i : (Fin n → V) →ₗ[ℝ] (Fin n → V))
+        = ∑ i, LinearMap.single ℝ (fun _ : Fin n => V) i ∘ₗ (f ∘ₗ LinearMap.proj i) := by
+    apply LinearMap.ext
+    intro x
     funext j
     simp [LinearMap.sum_apply, Finset.sum_apply, Pi.single_apply]
 
   rw [h1, LinearMap.trace_conj', h2, map_sum]
-  have h3 : ∀ i : Fin n, LinearMap.trace ℝ _ (LinearMap.single ℝ (fun _ : Fin n => V) i ∘ₗ (f ∘ₗ LinearMap.proj i)) =
-      LinearMap.trace ℝ V f := by
+  have h3
+      : ∀ i : Fin n,
+        LinearMap.trace ℝ _ (LinearMap.single ℝ (fun _ : Fin n => V) i ∘ₗ (f ∘ₗ LinearMap.proj i))
+          = LinearMap.trace ℝ V f := by
     intro i
     rw [LinearMap.trace_comp_comm']
     congr 1
-    ext x; simp
+    ext x
+    simp
   simp [h3]
 
-def powForm {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ) :
-    LinearMap.BilinForm ℤ (Fin n → L) :=
+def powForm {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ)
+    : LinearMap.BilinForm ℤ (Fin n → L) :=
   ∑ i, B.compl₁₂ (LinearMap.proj i) (LinearMap.proj i)
 
-theorem powForm_apply {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ) (x y : Fin n → L) :
-    powForm B n x y = ∑ i, B (x i) (y i) := by
+theorem powForm_apply
+    {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ) (x y : Fin n → L)
+    : powForm B n x y = ∑ i, B (x i) (y i) := by
   simp [powForm, LinearMap.sum_apply]
 
-theorem powForm_single {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ) (x : Fin n → L)
-    (i : Fin n) (y : L) : powForm B n x (Pi.single i y) = B (x i) y := by
+theorem powForm_single
+    {L : Type} [AddCommGroup L]
+    (B : LinearMap.BilinForm ℤ L)
+    (n : ℕ) (x : Fin n → L) (i : Fin n)
+    (y : L)
+    : powForm B n x (Pi.single i y) = B (x i) y := by
   rw [powForm_apply, Finset.sum_eq_single i]
   · simp
   · intro j _ hj; simp [Pi.single_eq_of_ne hj]
   · simp
 
-theorem powForm_bijective {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (hB : Function.Bijective B)
-    (n : ℕ) : Function.Bijective (powForm B n) := by
+theorem powForm_bijective
+    {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (hB : Function.Bijective B) (n : ℕ)
+    : Function.Bijective (powForm B n) := by
   constructor
   · intro x y h
     funext i
@@ -127,19 +152,20 @@ theorem powForm_bijective {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm �
     rw [powForm_single, hx]
     rfl
 
-theorem powForm_baseChange {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ)
-    (x y : ℝ ⊗[ℤ] (Fin n → L)) :
-    (powForm B n).baseChange ℝ x y =
-      ∑ i, B.baseChange ℝ (TensorProduct.piRight ℤ ℝ ℝ (fun _ : Fin n => L) x i)
-        (TensorProduct.piRight ℤ ℝ ℝ (fun _ : Fin n => L) y i) := by
+theorem powForm_baseChange
+    {L : Type} [AddCommGroup L] (B : LinearMap.BilinForm ℤ L) (n : ℕ) (x y : ℝ ⊗[ℤ] (Fin n → L))
+    : (powForm B n).baseChange ℝ x y
+      = ∑ i, B.baseChange ℝ (TensorProduct.piRight ℤ ℝ ℝ (fun _ : Fin n => L) x i)
+          (TensorProduct.piRight ℤ ℝ ℝ (fun _ : Fin n => L) y i) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
-  | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, Pi.add_apply, ha, hb, Finset.sum_add_distrib]
+  | add a b ha hb =>
+    simp only [map_add (f := _), LinearMap.add_apply, Pi.add_apply, ha, hb, Finset.sum_add_distrib]
   | tmul r u =>
     induction y using TensorProduct.induction_on with
     | zero => simp
     | add a b ha hb => simp only [map_add (f := _), Pi.add_apply, ha, hb, Finset.sum_add_distrib]
-    | tmul s v => simp [powForm_apply, Finset.sum_smul, Finset.sum_mul]
+    | tmul s v => simp [powForm_apply, Finset.sum_smul]
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
@@ -148,7 +174,8 @@ def powDatum (D : Datum H) (n : ℕ) : Datum H where
   fin := by haveI := D.fin; infer_instance
   proj := by
     haveI := D.proj
-    exact Module.Projective.of_equiv (DFinsupp.linearEquivFunOnFintype (R := 𝓞 E) (M := fun _ : Fin n => D.La))
+    exact Module.Projective.of_equiv (DFinsupp.linearEquivFunOnFintype (R := 𝓞 E)
+      (M := fun _ : Fin n => D.La))
   EF := powForm D.EF n
   alt := fun x => by simp [powForm_apply, D.alt]
   unimod := powForm_bijective D.EF D.unimod n
@@ -203,21 +230,31 @@ def powDatum (D : Datum H) (n : ℕ) : Datum H where
           apply e.injective
           funext i
           simp [diagEnd_apply, he, A0]
-      have ht' : t = n * ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
-        ((D.p : ℂ) * τ (a : E) + (D.q : ℂ) * starRingEnd ℂ (τ (a : E))) := by
+      have ht'
+          : t
+            = n
+              * ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+                ((D.p : ℂ) * τ (a : E) + (D.q : ℂ) * starRingEnd ℂ (τ (a : E))) := by
         rw [ht, Finset.mul_sum]
         refine Finset.sum_congr rfl fun τ _ => ?_
-        push_cast; ring
+        push_cast
+        ring
       rw [hAA, diagEnd_comp, diagEnd_comp, trace_diagEnd, trace_diagEnd, k1, ← k1, k2, k3, ht']
       refine ⟨rfl, ?_, ?_⟩
       · rw [Complex.mul_re, Complex.natCast_re, Complex.natCast_im]; ring
       · rw [Complex.mul_im, Complex.natCast_re, Complex.natCast_im]; ring
 
-theorem exists_datum_pow : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (n : ℕ),
-    ∃ (Dw' : Datum H) (e : Dw'.La ≃ₗ[𝓞 E] (Fin n → Dw.La)),
-      (∀ x y, Dw'.EF x y = ∑ i, Dw.EF (e x i) (e y i)) ∧ Dw'.p = n * Dw.p ∧ Dw'.q = n * Dw.q :=
-  fun E _ _ _ _ Dw n => ⟨powDatum Dw n, LinearEquiv.refl (𝓞 E) (Fin n → Dw.La),
-    fun x y => powForm_apply Dw.EF n x y, rfl, rfl⟩
+theorem exists_datum_pow
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (n : ℕ),
+      ∃ (Dw' : Datum H) (e : Dw'.La ≃ₗ[𝓞 E] (Fin n → Dw.La)),
+        (∀ x y, Dw'.EF x y = ∑ i, Dw.EF (e x i) (e y i)) ∧ Dw'.p = n * Dw.p
+          ∧ Dw'.q = n * Dw.q := fun E _ _ _ _ Dw n => ⟨
+  powDatum Dw n,
+  LinearEquiv.refl (𝓞 E) (Fin n → Dw.La),
+  fun x y => powForm_apply Dw.EF n x y,
+  rfl,
+  rfl
+⟩
 
 end
 end GlobalTheory

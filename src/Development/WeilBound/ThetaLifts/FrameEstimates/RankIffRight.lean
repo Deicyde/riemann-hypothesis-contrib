@@ -122,7 +122,8 @@ theorem rank_of_map
     rw [← LinearMap.ker_eq_bot, ← Submodule.finrank_eq_zero]
     have h1 := LinearMap.finrank_range_add_finrank_ker ((x.map t)ᵀ.mulVecLin)
     rw [Module.finrank_fin_fun] at h1
-    have h2 : Module.finrank k (LinearMap.range ((x.map t)ᵀ.mulVecLin)) = n := (Matrix.finrank_range_mulVecLin _).trans h
+    have h2 : Module.finrank k (LinearMap.range ((x.map t)ᵀ.mulVecLin)) = n :=
+      (Matrix.finrank_range_mulVecLin _).trans h
     omega
   have hinj2 : Function.Injective (xᵀ.mulVecLin) := by
     set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in

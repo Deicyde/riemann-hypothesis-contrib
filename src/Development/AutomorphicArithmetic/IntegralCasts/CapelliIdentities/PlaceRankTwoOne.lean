@@ -62,68 +62,67 @@ public import Mathlib.RingTheory.Norm.Transitivity
 
 namespace UpperTheory.Reformulated.B.placeRankTwoOne
 
-noncomputable def Jm : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ :=
-  fun {n} ε => Matrix.diagonal fun a => if ε a = Bool.true then 1 else -1
+noncomputable def Jm : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ := fun {n} ε =>
+  Matrix.diagonal fun a => if ε a = Bool.true then 1 else -1
 
 noncomputable def inUJ : {n : ℕ} → (Fin n → Bool) → Matrix (Fin n) (Fin n) ℂ → Prop :=
-  fun {n} ε g =>
-    g.conjTranspose * Jm ε * g =
-      Jm ε
+  fun {n} ε g => g.conjTranspose * Jm ε * g = Jm ε
 
-theorem aux3 : ∀ {n : ℕ} (ε : Fin n → Bool)
-  {g h : (Matrix (Fin n) (Fin n) ℂ)ˣ},
-  g ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} →
-    h ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} →
-      g * h ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} := by
+theorem aux3
+    : ∀ {n : ℕ} (ε : Fin n → Bool) {g h : (Matrix (Fin n) (Fin n) ℂ)ˣ},
+      g ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val}
+        → h ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val}
+        → g * h ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} := by
   intro n ε g h hg hh
   have hg' : g.val.conjTranspose * Jm ε * g.val = Jm ε := hg
   have hh' : h.val.conjTranspose * Jm ε * h.val = Jm ε := hh
   change (g.val * h.val).conjTranspose * Jm ε * (g.val * h.val) = Jm ε
-  calc (g.val * h.val).conjTranspose * Jm ε * (g.val * h.val)
-      = h.val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * h.val := by
-        simp only [Matrix.conjTranspose_mul, mul_assoc]
+  calc
+    (g.val * h.val).conjTranspose * Jm ε * (g.val * h.val)
+        = h.val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * h.val := by
+      simp only [Matrix.conjTranspose_mul, mul_assoc]
     _ = Jm ε := by rw [hg', hh']
 
-theorem aux4 : ∀ {n : ℕ} (ε : Fin n → Bool),
-  (1 : Matrix (Fin n) (Fin n) ℂ).conjTranspose * Jm ε * 1 =
-    Jm ε := by
+theorem aux4
+    : ∀ {n : ℕ} (ε : Fin n → Bool),
+      (1 : Matrix (Fin n) (Fin n) ℂ).conjTranspose * Jm ε * 1 = Jm ε := by
   intro n ε
   change (1 : Matrix (Fin n) (Fin n) ℂ).conjTranspose * Jm ε * 1 = Jm ε
   simp
 
-theorem aux5 : ∀ {n : ℕ} (ε : Fin n → Bool)
-  {g : (Matrix (Fin n) (Fin n) ℂ)ˣ},
-  g ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} →
-    g⁻¹ ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} := by
+theorem aux5
+    : ∀ {n : ℕ} (ε : Fin n → Bool) {g : (Matrix (Fin n) (Fin n) ℂ)ˣ},
+      g ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val}
+        → g⁻¹ ∈ {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val} := by
   intro n ε g hg
   have hg' : g.val.conjTranspose * Jm ε * g.val = Jm ε := hg
   change (g⁻¹).val.conjTranspose * Jm ε * (g⁻¹).val = Jm ε
-  calc (g⁻¹).val.conjTranspose * Jm ε * (g⁻¹).val
+  calc
+    (g⁻¹).val.conjTranspose * Jm ε * (g⁻¹).val
       = (g⁻¹).val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * (g⁻¹).val := by rw [hg']
     _ = (g.val * (g⁻¹).val).conjTranspose * Jm ε * (g.val * (g⁻¹).val) := by
-        simp only [Matrix.conjTranspose_mul, mul_assoc]
+      simp only [Matrix.conjTranspose_mul, mul_assoc]
     _ = Jm ε := by rw [Units.mul_inv]; simp
 
-noncomputable def UJ : {n : ℕ} → (Fin n → Bool) → Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ :=
-  fun {n} ε =>
-    { carrier := {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val},
-      mul_mem' := @aux3 n ε,
-      one_mem' := aux4 ε,
-      inv_mem' := @aux5 n ε }
+noncomputable def UJ
+    : {n : ℕ} → (Fin n → Bool) → Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ := fun {n} ε => {
+  carrier := {g : (Matrix (Fin n) (Fin n) ℂ)ˣ | inUJ ε g.val}
+  mul_mem' := @aux3 n ε
+  one_mem' := aux4 ε
+  inv_mem' := @aux5 n ε
+}
 
-@[reducible] noncomputable def instMeasurableSpaceUJ : (n : ℕ) →
-  (ε : Fin n → Bool) → MeasurableSpace ↥(UJ ε) :=
+@[reducible]
+noncomputable def instMeasurableSpaceUJ : (n : ℕ) → (ε : Fin n → Bool) → MeasurableSpace ↥(UJ ε) :=
   fun n ε => borel ↥(UJ ε)
 
 attribute [local instance] instMeasurableSpaceUJ
 
-theorem aux8 : ∀ {n : ℕ} (ε : Fin n → Bool),
-  IsTopologicalGroup ↥(UJ ε) := by
+theorem aux8 : ∀ {n : ℕ} (ε : Fin n → Bool), IsTopologicalGroup ↥(UJ ε) := by
   intro n ε
   infer_instance
 
-theorem aux9 : ∀ (n : ℕ) (ε : Fin n → Bool),
-  BorelSpace ↥(UJ ε) := by
+theorem aux9 : ∀ (n : ℕ) (ε : Fin n → Bool), BorelSpace ↥(UJ ε) := by
   intro n ε
   exact ⟨rfl⟩
 
@@ -137,20 +136,20 @@ private theorem Jm_sq {n : ℕ} (ε : Fin n → Bool) : Jm ε * Jm ε = 1 := by
   funext a
   split_ifs <;> simp
 
-private theorem normSq_det {n : ℕ} {ε : Fin n → Bool}
-    {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) : Complex.normSq g.det = 1 := by
+private theorem normSq_det {n : ℕ} {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
+    : Complex.normSq g.det = 1 := by
   have hJ : (Jm ε).det ≠ 0 := fun h => by
     have := congrArg Matrix.det (Jm_sq ε)
     simp [h] at this
   have h := congrArg Matrix.det (show gᴴ * Jm ε * g = Jm ε from hg)
-  rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, mul_right_comm,
-    mul_eq_right₀ hJ] at h
+  rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, mul_right_comm, mul_eq_right₀ hJ]
+    at h
   have h2 := Complex.normSq_eq_conj_mul_self (z := g.det)
   exact_mod_cast h2.trans h
 
-private theorem norm_inv_entry {n : ℕ} {ε : Fin n → Bool}
-    {g : (Matrix (Fin n) (Fin n) ℂ)ˣ} (hg : inUJ ε g.val) (i j : Fin n) :
-    ‖(g⁻¹).val i j‖ = ‖g.val j i‖ := by
+private theorem norm_inv_entry
+    {n : ℕ} {ε : Fin n → Bool} {g : (Matrix (Fin n) (Fin n) ℂ)ˣ} (hg : inUJ ε g.val) (i j : Fin n)
+    : ‖(g⁻¹).val i j‖ = ‖g.val j i‖ := by
   have h : (g⁻¹).val = Jm ε * g.valᴴ * Jm ε := by
     apply Units.inv_eq_of_mul_eq_one_left
     have h0 : g.valᴴ * Jm ε * g.val = Jm ε := hg
@@ -162,86 +161,87 @@ private theorem norm_inv_entry {n : ℕ} {ε : Fin n → Bool}
 
 end JLemmas
 
-private theorem isClosed_UJ {n : ℕ} (ε : Fin n → Bool) :
-    IsClosed (UJ ε : Set (Matrix (Fin n) (Fin n) ℂ)ˣ) :=
-  isClosed_eq (f := fun g : (Matrix (Fin n) (Fin n) ℂ)ˣ => g.val.conjTranspose * Jm ε * g.val)
+private theorem isClosed_UJ {n : ℕ} (ε : Fin n → Bool)
+    : IsClosed (UJ ε : Set (Matrix (Fin n) (Fin n) ℂ)ˣ) :=
+  isClosed_eq
+    (f := fun g : (Matrix (Fin n) (Fin n) ℂ)ˣ => g.val.conjTranspose * Jm ε * g.val)
     ((Units.continuous_val.matrix_conjTranspose.mul continuous_const).mul Units.continuous_val)
     continuous_const
 
-private theorem isCompact_bdd {n : ℕ} (ε : Fin n → Bool) (r : ℝ) :
-    IsCompact {g : UJ ε | ∀ i j, ‖g.val.val i j‖ ≤ r} := by
+private theorem isCompact_bdd {n : ℕ} (ε : Fin n → Bool) (r : ℝ)
+    : IsCompact {g : UJ ε | ∀ i j, ‖g.val.val i j‖ ≤ r} := by
   have hC := (isCompact_closedBall (0 : ℂ) r).matrix (m := Fin n) (n := Fin n)
   have he := Units.isClosedEmbedding_embedProduct.comp (isClosed_UJ ε).isClosedEmbedding_subtypeVal
   refine (he.isCompact_preimage (hC.prod (hC.image MulOpposite.continuous_op))).of_isClosed_subset
     ?_ fun g hg => ⟨fun i j => ?_, (g.val⁻¹).val, fun i j => ?_, rfl⟩
   · simp only [Set.setOf_forall]
-    exact isClosed_iInter fun i => isClosed_iInter fun j => isClosed_le
-      ((Units.continuous_val.comp continuous_subtype_val).matrix_elem i j).norm continuous_const
+    exact isClosed_iInter fun i =>
+      isClosed_iInter fun j =>
+        isClosed_le ((Units.continuous_val.comp continuous_subtype_val).matrix_elem i j).norm
+          continuous_const
   · exact mem_closedBall_zero_iff.2 (hg i j)
   · exact mem_closedBall_zero_iff.2 ((norm_inv_entry g.2 i j).trans_le (hg j i))
 
-theorem laurent_T_neg_one_mul_T_one : ∀ (n : ℕ) (ε : Fin n → Bool),
-  LocallyCompactSpace ↥(UJ ε) := by
+theorem laurent_T_neg_one_mul_T_one
+    : ∀ (n : ℕ) (ε : Fin n → Bool), LocallyCompactSpace ↥(UJ ε) := by
   intro n ε
   haveI : LocallyCompactSpace (Matrix (Fin n) (Fin n) ℂ) :=
     inferInstanceAs (LocallyCompactSpace (Fin n → Fin n → ℂ))
   exact (isClosed_UJ ε).locallyCompactSpace
 
-noncomputable def muG : {n : ℕ} →
-  (ε : Fin n → Bool) → MeasureTheory.Measure ↥(UJ ε) :=
-  fun {n} ε => by
-    letI := aux8 ε
-    letI := aux9 n ε
-    letI := laurent_T_neg_one_mul_T_one n ε
-    exact MeasureTheory.Measure.haar
+noncomputable def muG
+    : {n : ℕ} → (ε : Fin n → Bool) → MeasureTheory.Measure ↥(UJ ε) := fun {n} ε => by
+  letI := aux8 ε
+  letI := aux9 n ε
+  letI := laurent_T_neg_one_mul_T_one n ε
+  exact MeasureTheory.Measure.haar
 
-noncomputable def hs : {n : ℕ} → Matrix (Fin n) (Fin n) ℂ → ℝ :=
-  fun {n} g => ∑ i, ∑ j, ‖g i j‖ ^ 2
+noncomputable def hs : {n : ℕ} → Matrix (Fin n) (Fin n) ℂ → ℝ := fun {n} g => ∑ i, ∑ j, ‖g i j‖ ^ 2
 
-noncomputable def hsG : {n : ℕ} →
-  {ε : Fin n → Bool} → ↥(UJ ε) → ℝ :=
-  fun {n} {ε} g => hs g.val.val
+noncomputable def hsG : {n : ℕ} → {ε : Fin n → Bool} → ↥(UJ ε) → ℝ := fun {n} {ε} g => hs g.val.val
 
 noncomputable def VolGrowth : Prop :=
-∀ (n : ℕ) (ε : Fin n → Bool),
-  ∃ C,
-    ∀ (R : ℝ),
-      1 ≤ R →
-        (muG ε)
-            {g | hsG g ≤ R ^ 2} ≤
-          ENNReal.ofReal (C * R ^ (2 * n ^ 2))
+  ∀ (n : ℕ) (ε : Fin n → Bool), ∃ C, ∀ (R : ℝ),
+    1 ≤ R → (muG ε) {g | hsG g ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (2 * n ^ 2))
 
 section Helpers
 open MeasureTheory Matrix
 
-private theorem fub {G E : Type*} [MeasurableSpace G] [MeasurableSpace E]
-    (μ : Measure G) (ν : Measure E) [SFinite μ] [SFinite ν] {S : Set (G × E)} (hS : MeasurableSet S)
-    {B : Set G} (hB : MeasurableSet B) {V : Set E} (hV : MeasurableSet V) {c k : ENNReal}
+private theorem fub
+    {G E : Type*} [MeasurableSpace G] [MeasurableSpace E]
+    (μ : Measure G) (ν : Measure E) [SFinite μ] [SFinite ν]
+    {S : Set (G × E)} (hS : MeasurableSet S)
+    {B : Set G} (hB : MeasurableSet B)
+    {V : Set E} (hV : MeasurableSet V)
+    {c k : ENNReal}
     (h1 : ∀ g ∈ B, c ≤ ν (Prod.mk g ⁻¹' S)) (h2 : ∀ x, μ ((fun g => (g, x)) ⁻¹' S) ≤ k)
-    (h3 : ∀ g x, (g, x) ∈ S → x ∈ V) : c * μ B ≤ k * ν V := by
-  calc c * μ B = ∫⁻ g, B.indicator (fun _ => c) g ∂μ := by
-        rw [lintegral_indicator_const hB]
+    (h3 : ∀ g x, (g, x) ∈ S → x ∈ V)
+    : c * μ B ≤ k * ν V := by
+  calc
+    c * μ B
+      = ∫⁻ g, B.indicator (fun _ => c) g ∂μ := by rw [lintegral_indicator_const hB]
     _ ≤ ∫⁻ g, ν (Prod.mk g ⁻¹' S) ∂μ := by
-        refine lintegral_mono fun g => ?_
-        by_cases hg : g ∈ B
-        · simpa [hg] using h1 g hg
-        · simp [hg]
+      refine lintegral_mono fun g => ?_
+      by_cases hg : g ∈ B
+      · simpa [hg] using h1 g hg
+      · simp [hg]
     _ = ∫⁻ x, μ ((fun g => (g, x)) ⁻¹' S) ∂ν := by
-        rw [← Measure.prod_apply hS, Measure.prod_apply_symm hS]
+      rw [← Measure.prod_apply hS, Measure.prod_apply_symm hS]
     _ ≤ ∫⁻ x, V.indicator (fun _ => k) x ∂ν := by
-        refine lintegral_mono fun x => ?_
-        by_cases hx : x ∈ V
-        · simpa [hx] using h2 x
-        · have : (fun g => (g, x)) ⁻¹' S = ∅ :=
-            Set.eq_empty_of_forall_notMem fun g hg => hx (h3 g x hg)
-          simp [this]
+      refine lintegral_mono fun x => ?_
+      by_cases hx : x ∈ V
+      · simpa [hx] using h2 x
+      · have : (fun g => (g, x)) ⁻¹' S = ∅ :=
+          Set.eq_empty_of_forall_notMem fun g hg => hx (h3 g x hg)
+        simp [this]
     _ = k * ν V := by rw [lintegral_indicator_const hV]
 
-private def act {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (x : Fin n → Fin n → ℂ) :
-    Fin n → Fin n → ℂ := fun j => g *ᵥ x j
+private def act {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (x : Fin n → Fin n → ℂ)
+    : Fin n → Fin n → ℂ := fun j =>
+  g *ᵥ x j
 
-private theorem act_mul {n : ℕ} (g h : Matrix (Fin n) (Fin n) ℂ)
-    (x : Fin n → Fin n → ℂ) : act (g * h) x = act g (act h x) := by
+private theorem act_mul {n : ℕ} (g h : Matrix (Fin n) (Fin n) ℂ) (x : Fin n → Fin n → ℂ)
+    : act (g * h) x = act g (act h x) := by
   funext j
   simp [act, Matrix.mulVec_mulVec]
 
@@ -249,27 +249,33 @@ private theorem act_one {n : ℕ} (x : Fin n → Fin n → ℂ) : act 1 x = x :=
   funext j
   simp [act]
 
-private theorem act_sub {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
-    (x y : Fin n → Fin n → ℂ) : act g (x - y) = act g x - act g y := by
+private theorem act_sub {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → Fin n → ℂ)
+    : act g (x - y) = act g x - act g y := by
   funext j
   simp [act, Matrix.mulVec_sub]
 
-private theorem norm_act_le {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) {r : ℝ}
-    (hr : 0 ≤ r) (hg : ∀ i j, ‖g i j‖ ≤ r) (x : Fin n → Fin n → ℂ) :
-    ‖act g x‖ ≤ n * r * ‖x‖ := by
+private theorem norm_act_le
+    {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
+    {r : ℝ} (hr : 0 ≤ r) (hg : ∀ i j, ‖g i j‖ ≤ r)
+    (x : Fin n → Fin n → ℂ)
+    : ‖act g x‖ ≤ n * r * ‖x‖ := by
   have h0 : 0 ≤ n * r * ‖x‖ := by positivity
   refine (pi_norm_le_iff_of_nonneg h0).2 fun j => (pi_norm_le_iff_of_nonneg h0).2 fun i => ?_
-  calc ‖act g x j i‖ = ‖∑ k, g i k * x j k‖ := rfl
+  calc
+    ‖act g x j i‖
+      = ‖∑ k, g i k * x j k‖ := rfl
     _ ≤ ∑ _k : Fin n, r * ‖x‖ := by
-        refine norm_sum_le_of_le _ fun k _ => ?_
-        rw [norm_mul]
-        exact mul_le_mul (hg i k) ((norm_le_pi_norm (x j) k).trans (norm_le_pi_norm x j))
-          (norm_nonneg _) hr
+      refine norm_sum_le_of_le _ fun k _ => ?_
+      rw [norm_mul]
+      exact mul_le_mul (hg i k) ((norm_le_pi_norm (x j) k).trans (norm_le_pi_norm x j))
+        (norm_nonneg _) hr
     _ = n * r * ‖x‖ := by simp [mul_assoc]
 
-private theorem vol_act {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
-    (hg : Complex.normSq g.det = 1) (ν : Measure (Fin n → Fin n → ℂ)) [ν.IsAddHaarMeasure]
-    (s : Set (Fin n → Fin n → ℂ)) : ν (act g ⁻¹' s) = ν s := by
+private theorem vol_act
+    {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (hg : Complex.normSq g.det = 1)
+    (ν : Measure (Fin n → Fin n → ℂ)) [ν.IsAddHaarMeasure]
+    (s : Set (Fin n → Fin n → ℂ))
+    : ν (act g ⁻¹' s) = ν s := by
   let f : (Fin n → Fin n → ℂ) →ₗ[ℝ] (Fin n → Fin n → ℂ) :=
     LinearMap.pi fun j => ((Matrix.toLin' g).restrictScalars ℝ).comp (LinearMap.proj j)
   have hf : LinearMap.det f = 1 := by
@@ -280,10 +286,11 @@ private theorem vol_act {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
   rw [this, Measure.addHaar_preimage_linearMap _ (by rw [hf]; exact one_ne_zero), hf]
   simp
 
-private theorem entry_le {n : ℕ} (h : Matrix (Fin n) (Fin n) ℂ)
-    (v : Fin n → Fin n → ℂ)
+private theorem entry_le
+    {n : ℕ} (h : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → Fin n → ℂ)
     (hv : v ∈ Metric.ball (fun j : Fin n => (Pi.single j 1 : Fin n → ℂ)) (1 / (2 * n + 2)))
-    (hw : ‖act h v‖ ≤ 2) (i j : Fin n) : ‖h i j‖ ≤ 4 := by
+    (hw : ‖act h v‖ ≤ 2) (i j : Fin n)
+    : ‖h i j‖ ≤ 4 := by
   set e : Fin n → Fin n → ℂ := fun j : Fin n => (Pi.single j 1 : Fin n → ℂ) with he
   have h1 : ∀ i j, ‖h i j‖ ≤ ‖act h e‖ := fun i j => by
     have : h i j = act h e j i := by simp [act, he]
@@ -300,12 +307,13 @@ private theorem entry_le {n : ℕ} (h : Matrix (Fin n) (Fin n) ℂ)
   have := h1 i j
   nlinarith
 
-private theorem norm_le_two {n : ℕ} (v : Fin n → Fin n → ℂ)
-    (hv : v ∈ Metric.ball (fun j : Fin n => (Pi.single j 1 : Fin n → ℂ)) (1 / (2 * n + 2))) :
-    ‖v‖ ≤ 2 := by
+private theorem norm_le_two
+    {n : ℕ} (v : Fin n → Fin n → ℂ)
+    (hv : v ∈ Metric.ball (fun j : Fin n => (Pi.single j 1 : Fin n → ℂ)) (1 / (2 * n + 2)))
+    : ‖v‖ ≤ 2 := by
   set e : Fin n → Fin n → ℂ := fun j : Fin n => (Pi.single j 1 : Fin n → ℂ) with he
-  have h1 : ‖e‖ ≤ 1 := (pi_norm_le_iff_of_nonneg zero_le_one).2 fun j => by
-    simp [he, Pi.norm_single]
+  have h1 : ‖e‖ ≤ 1 :=
+    (pi_norm_le_iff_of_nonneg zero_le_one).2 fun j => by simp [he, Pi.norm_single]
   have h3 : ‖v - e‖ < 1 / (2 * n + 2) := by rwa [mem_ball_iff_norm] at hv
   have h4 : (1 : ℝ) / (2 * n + 2) ≤ 1 := by
     rw [div_le_one (by positivity)]
@@ -348,20 +356,23 @@ theorem volume_growth : VolGrowth := by
   have hval : Continuous fun g : UJ ε => g.val.val :=
     Units.continuous_val.comp continuous_subtype_val
   have hB : IsClosed {g : UJ ε | hsG g ≤ R ^ 2} := by
-    simpa only [hsG, hs] using isClosed_le (f := fun g : UJ ε => ∑ i, ∑ j, ‖g.val.val i j‖ ^ 2)
-      (continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-        (hval.matrix_elem i j).norm.pow 2) continuous_const
+    simpa only [hsG, hs] using
+      isClosed_le
+        (f := fun g : UJ ε => ∑ i, ∑ j, ‖g.val.val i j‖ ^ 2)
+        (continuous_finsetSum _ fun i _ =>
+          continuous_finsetSum _ fun j _ => (hval.matrix_elem i j).norm.pow 2)
+        continuous_const
   have hact : Continuous fun p : UJ ε × (Fin n → Fin n → ℂ) => act (p.1⁻¹).val.val p.2 :=
-    continuous_pi fun j => (hval.comp continuous_fst.inv).matrix_mulVec
-      ((continuous_apply j).comp continuous_snd)
+    continuous_pi fun j =>
+      (hval.comp continuous_fst.inv).matrix_mulVec ((continuous_apply j).comp continuous_snd)
   have hcancel : ∀ (g : UJ ε) x, act g.val.val (act (g⁻¹).val.val x) = x := fun g x => by
     rw [← act_mul, Subgroup.coe_inv, Units.mul_inv, act_one]
-  have key := fub (muG ε) ν
-    (S := {p | hsG p.1 ≤ R ^ 2 ∧ act (p.1⁻¹).val.val p.2 ∈ V})
-    ((hB.preimage continuous_fst).measurableSet.inter
-      (Metric.isOpen_ball.preimage hact).measurableSet)
-    hB.measurableSet (V := Metric.closedBall 0 (2 * n * R)) measurableSet_closedBall
-    (c := ν V) (k := muG ε K) ?_ ?_ ?_
+  have key :=
+    fub (muG ε) ν (S := {p | hsG p.1 ≤ R ^ 2 ∧ act (p.1⁻¹).val.val p.2 ∈ V})
+      ((hB.preimage continuous_fst).measurableSet.inter
+        (Metric.isOpen_ball.preimage hact).measurableSet)
+      hB.measurableSet (V := Metric.closedBall 0 (2 * n * R)) measurableSet_closedBall (c := ν V)
+      (k := muG ε K) ?_ ?_ ?_
   · have hd : Module.finrank ℝ (Fin n → Fin n → ℂ) = 2 * n ^ 2 := by
       simp [Module.finrank_pi_fintype]
       ring
@@ -374,8 +385,9 @@ theorem volume_growth : VolGrowth := by
     rw [← vol_act (g⁻¹).val.val (normSq_det (g⁻¹).2) ν V]
     exact MeasureTheory.measure_mono fun x hx => ⟨hg, hx⟩
   · intro x
-    rcases Set.eq_empty_or_nonempty ((fun g : UJ ε => (g, x)) ⁻¹'
-      {p | hsG p.1 ≤ R ^ 2 ∧ act (p.1⁻¹).val.val p.2 ∈ V}) with h | ⟨g₀, hg₀⟩
+    rcases Set.eq_empty_or_nonempty
+        ((fun g : UJ ε => (g, x)) ⁻¹' {p | hsG p.1 ≤ R ^ 2 ∧ act (p.1⁻¹).val.val p.2 ∈ V})
+      with h | ⟨g₀, hg₀⟩
     · rw [h]
       simp
     · rw [← MeasureTheory.measure_preimage_mul (muG ε) g₀⁻¹ K]
@@ -387,9 +399,14 @@ theorem volume_growth : VolGrowth := by
   · intro g x hg
     have h1 : ∀ i j, ‖g.val.val i j‖ ≤ R := fun i j => by
       refine (pow_le_pow_iff_left₀ (norm_nonneg _) hR0 two_ne_zero).1 (le_trans ?_ hg.1)
-      exact (Finset.single_le_sum (f := fun j => ‖g.val.val i j‖ ^ 2) (fun _ _ => by positivity)
-        (Finset.mem_univ j)).trans (Finset.single_le_sum
-          (f := fun i => ∑ j, ‖g.val.val i j‖ ^ 2) (fun _ _ => by positivity) (Finset.mem_univ i))
+      exact (Finset.single_le_sum
+          (f := fun j => ‖g.val.val i j‖ ^ 2)
+          (fun _ _ => by positivity)
+          (Finset.mem_univ j)).trans
+        (Finset.single_le_sum
+          (f := fun i => ∑ j, ‖g.val.val i j‖ ^ 2)
+          (fun _ _ => by positivity)
+          (Finset.mem_univ i))
     have h2 := norm_act_le _ hR0 h1 (act (g⁻¹).val.val x)
     rw [hcancel] at h2
     have h3 := mul_le_mul_of_nonneg_left (norm_le_two _ hg.2) (show 0 ≤ n * R by positivity)

@@ -53,7 +53,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-
 set_option autoImplicit false
 
 noncomputable section

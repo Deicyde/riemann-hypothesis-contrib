@@ -45,8 +45,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace GlobalTheory.NonIntegralFrameExample

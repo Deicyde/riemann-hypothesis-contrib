@@ -89,14 +89,6 @@ theorem mh_C (r : ℤ) : IsMultiHomog (MvPolynomial.C r : MRing ι) 0 := by
   subst hm0
   simp
 
-private theorem isMultiHomog_mul_of_mRing
-    {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
-    : IsMultiHomog (f * g) (a + b) := by
-  classical
-  intro m hm k
-  obtain ⟨m1, h1, m2, h2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul f g hm)
-  simp only [Finsupp.coe_add, Pi.add_apply, Finset.sum_add_distrib, hf m1 h1 k, hg m2 h2 k]
-
 theorem mh_prod
     {I : Type} (S : Finset I)
     {f : I → MRing ι} {d : I → K → ℕ} (h : ∀ i ∈ S, IsMultiHomog (f i) (d i))
@@ -108,8 +100,8 @@ theorem mh_prod
     simpa using mh_C (ι := ι) 1
   · intro i S hi ih h
     rw [Finset.prod_insert hi, Finset.sum_insert hi]
-    exact isMultiHomog_mul_of_mRing (h i (Finset.mem_insert_self i S))
-      (ih fun j hj => h j (Finset.mem_insert_of_mem hj))
+    exact _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul
+      (h i (Finset.mem_insert_self i S)) (ih fun j hj => h j (Finset.mem_insert_of_mem hj))
 
 end Forms
 
@@ -158,15 +150,16 @@ theorem hv_add
     dg + dg',
     g * hp' + g' * hp,
     hp * hp',
-    mh_add (isMultiHomog_mul_of_mRing hg hh') ?_,
-    isMultiHomog_mul_of_mRing hh hh',
+    mh_add (_root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hg hh')
+      ?_,
+    _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hh hh',
     fun k => by simp,
     ?_,
     ?_,
     ?_
   ⟩
   · rw [add_comm dg dg']
-    exact isMultiHomog_mul_of_mRing hg' hh
+    exact _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hg' hh
   · simp only [map_add (f := _), map_mul, ey, ey']
     ring
   · rw [map_mul]

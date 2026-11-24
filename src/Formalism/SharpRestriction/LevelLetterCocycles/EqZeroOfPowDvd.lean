@@ -73,17 +73,14 @@ theorem eq_X_mul_unit
   refine ⟨u, ?_, hu⟩
   have hc : PowerSeries.coeff 1 s = PowerSeries.constantCoeff u := by
     rw [hu]
-    first | simp [PowerSeries.coeff_succ_X_mul] | exact PowerSeries.coeff_succ_X_mul 0 u
+    first | simp [PowerSeries.coeff_succ_X_mul]
   rw [PowerSeries.isUnit_iff_constantCoeff]
   rw [hc] at h1
   exact isUnit_iff_ne_zero.mpr h1
 
 private theorem algebraMap_powerSeries_self_eq_C {R : Type} [CommRing R] (a : R)
     : algebraMap R (PowerSeries R) a = PowerSeries.C a := by
-  first
-  | rfl
-  | (rw [Algebra.algebraMap_eq_smul_one, PowerSeries.smul_eq_C_mul, mul_one])
-  | simp [PowerSeries.algebraMap_apply']
+  first | rfl
 
 private theorem constantCoeff_aeval_eq_eval_constantCoeff (y : PowerSeries K) (r : K[X])
     : PowerSeries.constantCoeff (Polynomial.aeval y r) = r.eval (PowerSeries.constantCoeff y) := by
@@ -134,7 +131,7 @@ theorem eq_zero_of_pow_dvd
     exact (Polynomial.isCoprime_X_sub_C_of_isUnit_sub (sub_ne_zero.mpr hxy).isUnit).pow
   have hdeg' : (∏ c ∈ cs, (Polynomial.X - Polynomial.C c) ^ b).natDegree = cs.card * b := by
     rw [Polynomial.natDegree_prod _ _ (fun c _ => pow_ne_zero _ (Polynomial.X_sub_C_ne_zero c))]
-    simp [Polynomial.natDegree_pow, Polynomial.natDegree_X_sub_C, mul_comm]
+    simp [Polynomial.natDegree_pow, mul_comm]
   have := Polynomial.natDegree_le_of_dvd hprod hr
   omega
 
@@ -151,14 +148,7 @@ theorem algHom_coe
 private theorem aeval_map_algebraMap_eq_aeval
     {O : Type} [CommRing O] [Algebra O K] (y : PowerSeries K) (r : O[X])
     : Polynomial.aeval y (r.map (algebraMap O K)) = Polynomial.aeval y r := by
-  first
-  | exact Polynomial.aeval_map_algebraMap K y r
-  | (
-      refine Polynomial.induction_on r (fun a => ?_) (fun p q hp hq => ?_) (fun n a _ => ?_)
-      · simp [algebraMap_powerSeries_self_eq_C, PowerSeries.algebraMap_apply']
-      · simp only [Polynomial.map_add (f := _), map_add (f := _), hp, hq]
-      · simp [algebraMap_powerSeries_self_eq_C, PowerSeries.algebraMap_apply']
-    )
+  first | exact Polynomial.aeval_map_algebraMap K y r
 
 theorem dvd_of_vanish
     {O : Type}

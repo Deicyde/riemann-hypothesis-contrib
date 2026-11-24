@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FourierFlatCharacterDatumFiniteFieldStatement
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FourierFlatCharacterDatumFiniteField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -55,8 +56,6 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
-
-
 
 namespace GlobalTheory.FlatFourierQ
 
@@ -131,8 +130,8 @@ theorem omegaQ_eq_unit_mul_flat_transform
       intro PP
       letI := Ideal.Quotient.field PP.1.asIdeal
       obtain ⟨C, m, h0, h1, h2, h3⟩ :=
-        GlobalTheory.T.fourier_flat_character_datum_finiteField (kP PP.1) (ψP PP.1) (ξ PP.1) r n
-          (hQ _ PP.2).1 (hQ _ PP.2).2.1
+        _root_.GlobalTheory.fourier_flatDatum_finite (kP PP.1) (ψP PP.1) (ξ PP.1) r n (hQ _ PP.2).1
+          (hQ _ PP.2).2.1
       exact ⟨C, m, h0, h1, by rw [Nat.card_eq_fintype_card]; exact h2, h3⟩
     choose C m hC0 hCi hCm hCe using hloc
     refine ⟨(∏ PP : ↥Q, C PP)⁻¹, ?_, fun ub => ?_⟩
@@ -158,7 +157,7 @@ theorem omegaQ_eq_unit_mul_flat_transform
           convert dite_prod' Q (fun PP => IsUnit (topL r (Y PP)).det) (fun PP h => ((ξ PP h.unit : ℂˣ) : ℂ))
         rw [e0, Finset.attach_eq_univ]
         refine Finset.prod_congr rfl fun PP _ => ?_
-        simp only [dif_pos PP.2, Subtype.coe_eta]
+        simp only [dif_pos PP.2]
       simp only [hf, ← Finset.prod_mul_distrib]
       have hs :=
         Finset.prod_univ_sum

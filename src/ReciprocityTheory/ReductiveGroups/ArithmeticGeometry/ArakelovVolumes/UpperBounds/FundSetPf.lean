@@ -85,14 +85,6 @@ theorem lact_inv {Ψ : Finset (E →+* ℂ)} (δ : GL (Fin r) E) (y : Frame Ψ r
     : lact δ⁻¹ (lact δ y) = y := by
   rw [← lact_mul, inv_mul_cancel, lact_one]
 
-theorem nb_uniq
-    {N N' B B' : Matrix (Fin r) (Fin r) ℂ} (hN : ∀ a c : Fin r, a < c → N a c = 0)
-    (hN1 : ∀ a, N a a = 1) (hN' : ∀ a c : Fin r, a < c → N' a c = 0) (hN'1 : ∀ a, N' a a = 1)
-    (hB : ∀ a c : Fin r, c < a → B a c = 0) (hB' : ∀ a c : Fin r, c < a → B' a c = 0)
-    (hBd : B.det ≠ 0) (h : N * B = N' * B')
-    : N = N' := by
-  exact Bl.general_b_fact_ter.goal1 hN hN1 hN' hN'1 hB hB' hBd h
-
 theorem cpt_uniq
     (X : Data E r)
     {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
@@ -107,7 +99,7 @@ theorem cpt_uniq
     have h2 : ExF.nM X z τ * mat b τ = ExF.nM X z' τ * mat b' τ := by
       have := congrArg (fun M => (mat x0 τ)⁻¹ * M) h1
       simpa only [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _ hu] using this
-    exact nb_uniq
+    exact _root_.Bl.general_b_fact_ter.goal1
       (fun a c hac => ExF.nM_upper X z τ hac)
       (ExF.nM_diag X z τ)
       (fun a c hac => ExF.nM_upper X z' τ hac)
@@ -370,6 +362,6 @@ open NumberField
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem fundSet_holds : FundSetStatement (E := E) := FundSetPf.fundSet_main
+alias fundSet_holds := _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.FundSetPf.fundSet_main
 
 end ReciprocityTheory.ChartRestriction.G.AR.Up

@@ -47,8 +47,6 @@ open Formalism.BasicNotions Formalism.MainNotions NumberField
 
 variable {D : D7} (Λ : CutD D)
 
-
-
 @[reducible]
 def nchTr (x : NChoice D) : NChoice (cut D Λ) := { x with }
 

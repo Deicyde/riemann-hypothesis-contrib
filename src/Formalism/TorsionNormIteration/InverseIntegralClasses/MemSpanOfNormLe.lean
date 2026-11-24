@@ -62,7 +62,7 @@ theorem norm_sigma_le
   have h1 : ‖σ a - a ^ q‖ ≤ ‖(p : K)‖ := hσ a ha
   have h2 : ‖a ^ q‖ ≤ 1 := by
     rw [norm_pow]
-    first | exact pow_le_one₀ (norm_nonneg a) ha | exact pow_le_one q (norm_nonneg a) ha
+    first | exact pow_le_one₀ (norm_nonneg a) ha
   calc
     ‖σ a‖
       = ‖(σ a - a ^ q) + a ^ q‖ := by rw [sub_add_cancel]
@@ -74,7 +74,7 @@ def sigmaO {p q : ℕ} {σ : K →+* K} (hσ : IsFrobLift p q σ) (hp : ‖(p : 
   (σ.comp (unitBall K).subtype).codRestrict (unitBall K) (fun x => norm_sigma_le hσ hp x.1 x.2)
 
 theorem natCast_coe (p : ℕ) : (((p : unitBall K)) : K) = (p : K) := by
-  first | exact map_natCast (unitBall K).subtype p | simp
+  first | exact map_natCast (unitBall K).subtype p
 
 theorem norm_le_of_mem_span {p : ℕ} (x : unitBall K) (hx : x ∈ Ideal.span {((p : ℕ) : unitBall K)})
     : ‖(x : K)‖ ≤ ‖(p : K)‖ := by
@@ -94,9 +94,7 @@ theorem mem_span_of_norm_le
     : x ∈ Ideal.span {((p : ℕ) : unitBall K)} := by
   have hy : ‖(x : K) / (p : K)‖ ≤ 1 := by
     rw [norm_div]
-    first
-    | exact div_le_one_of_le₀ hx (norm_nonneg _)
-    | exact (div_le_one (norm_pos_iff.mpr hp0)).mpr hx
+    first | exact div_le_one_of_le₀ hx (norm_nonneg _)
   refine Ideal.mem_span_singleton'.mpr ⟨⟨(x : K) / (p : K), hy⟩, ?_⟩
   apply Subtype.ext
   show (x : K) / (p : K) * ((p : unitBall K) : K) = (x : K)
@@ -151,9 +149,9 @@ theorem main
           (Ideal.Quotient.mk (Ideal.span {((p : ℕ) : unitBall K)})) := by
     refine RingHom.ext fun c => ?_
     rw [RingHom.comp_apply, RingHom.comp_apply, iterateFrobenius_def, ← map_pow]
-    first | rw [Ideal.Quotient.eq] | rw [Ideal.Quotient.mk_eq_mk_iff_sub_mem]
+    first | rw [Ideal.Quotient.eq]
     apply mem_span_of_norm_le hp0
-    first | exact hσ c.1 c.2 | (push_cast; exact hσ c.1 c.2)
+    first | exact hσ c.1 c.2
   have h1
       : MvPowerSeries.map (Ideal.Quotient.mk (Ideal.span {((p : ℕ) : unitBall K)}))
           (MvPowerSeries.map (sigmaO hσ hp) (liftO A hA))
@@ -183,7 +181,7 @@ theorem main
       : MvPowerSeries.map (unitBall K).subtype (MvPowerSeries.map (sigmaO hσ hp) (liftO A hA))
         = MvPowerSeries.map σ A := by
     ext d
-    first | rfl | (simp only [MvPowerSeries.coeff_map]; rfl)
+    first | rfl
   have hsub
       : MvPowerSeries.map (unitBall K).subtype
           ((liftO A hA) ^ (p ^ h)

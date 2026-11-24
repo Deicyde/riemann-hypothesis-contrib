@@ -38,9 +38,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-attribute [-instance]
-  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual

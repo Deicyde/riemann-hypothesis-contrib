@@ -58,9 +58,6 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGenerators
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.DatumFourier
 
 open NumberField Matrix Complex MeasureTheory IsDedekindDomain

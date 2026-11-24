@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Ex
 open scoped BigOperators
+
 theorem _root_.GlobalTheory.T.norm_rep_generators_and_thetaSeriesTerm
     : ∀ (C : Type) [NormedField C] (N : NumD C) (q : QuadraticMap ℤ N.X ℝ),
       N.Int q
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.norm_rep_generators_and_thetaSeriesTerm
                 ‖N.txT m p χ‖
                   = Real.exp (-(q (p.1.1.toAdd + m • χ) / (m : ℝ) ^ 2))
                     * ‖N.th (N.c χ * p.1.2.b ^ m)‖ := by
-  first
-  | exact @GlobalTheory.Ex.norm_QT_s_and_norm_txT
-  | exact GlobalTheory.Ex.norm_QT_s_and_norm_txT
-  | (intros; apply GlobalTheory.Ex.norm_QT_s_and_norm_txT <;> assumption)
+  first | exact @GlobalTheory.Ex.norm_QT_s_and_norm_txT

@@ -46,8 +46,11 @@ import Mathlib.Topology.Sheaves.Init
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.simp_span :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E}, LocFin q → ∀ (n : ℕ) (t : Fin (n + 1) → Vert q), t ∈ simp q T (n + 1) → ∀ k ∈ T, (∀ y, (∀ j, q y (t j).1 = 1) → q y k = 0) → k = 0 := by
+theorem UpperTheory.V.ConeExtensionAcyclic.simp_span
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E},
+      LocFin q
+        → ∀ (n : ℕ) (t : Fin (n + 1) → Vert q),
+          t ∈ simp q T (n + 1) → ∀ k ∈ T, (∀ y, (∀ j, q y (t j).1 = 1) → q y k = 0) → k = 0 := by
   intro E Y _ _ q T hq n t ht k hk hkq
   obtain ⟨x, hx, hxt⟩ := ht
   by_contra hk0

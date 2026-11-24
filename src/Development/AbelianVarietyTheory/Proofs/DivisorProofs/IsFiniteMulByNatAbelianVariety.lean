@@ -83,7 +83,7 @@ theorem isFinite_mul
   obtain ⟨r, hr⟩ : ∃ r : LB.Gen (H.pull (eSec B)), r.IsGen :=
     DVR.exists_gen_of_isLB_local (V := k) _ (LB.isLB_pull hH _)
   obtain ⟨M, hM⟩ :=
-    (GlobalTheory.T.abelianScheme_cubical_bundle_exists_and_maps hG _ B hB).1 ⟨H, r, hH, hr⟩
+    (_root_.GlobalTheory.AbPackage.abelian_cp hG _ B hB).1 ⟨H, r, hH, hr⟩
       (GlobalTheory.AbLaw.CubeProj.exists_gen_theta_abelianVariety hG k B hB hproj H hH) hsym
   have hiso : LBIso (AbLaw.pw H ((n ^ 2 : ℕ) : ℤ)) (H.pull (𝟙 B ^ n).left) := by
     have h := GlobalTheory.T.lbIso_pw_sq_pull_pow_of_isLocalRing k B M n

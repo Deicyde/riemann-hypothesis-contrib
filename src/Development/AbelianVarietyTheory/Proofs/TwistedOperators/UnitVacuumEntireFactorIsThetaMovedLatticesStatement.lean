@@ -47,6 +47,7 @@ open IsDedekindDomain NumberField Matrix MvPolynomial
 open GlobalTheory.SignedHC GlobalTheory.ChiGrid Formalism.L2.DIV Formalism.L2.Ker
   GlobalTheory.FunObj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitVacuumEntireFactor_isTheta_movedLattices
     : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
         (frS : GL (Fin S.rank) D.host.E) (frT : GL (Fin T.rank) D.host.E),
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.unitVacuumEntireFactor_isTheta_movedLattices
                                 * Φ (GlobalTheory.FockPos.zCo θ frS frT w))
                         → (fun Y => Φ (δ⁻¹ • Y)) ∈ Formalism.MainNotions.TaylorLogMetric.Th D
                           (Formalism.MainNotions.TaylorLogMetric.tor0 D D.host.ccK δ) Ls Lt := by
-  first
-  | exact @GlobalTheory.ThetaLawMoved.theta_of_vacuum_moved
-  | exact GlobalTheory.ThetaLawMoved.theta_of_vacuum_moved
-  | (intros; apply GlobalTheory.ThetaLawMoved.theta_of_vacuum_moved <;> assumption)
+  first | exact @GlobalTheory.ThetaLawMoved.theta_of_vacuum_moved

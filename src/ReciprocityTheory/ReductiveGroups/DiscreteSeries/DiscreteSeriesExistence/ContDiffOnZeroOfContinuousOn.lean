@@ -66,19 +66,14 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 variable {n : ℕ} {ε : Fin n → Bool}
 
 theorem slm_le_inf (N : ℕ) : (N : WithTop ℕ∞) + 1 ≤ ∞ := by
-  first
-  | exact_mod_cast (le_top : ((N + 1 : ℕ) : ℕ∞) ≤ ⊤)
-  | (norm_cast; exact le_top)
+  first | exact_mod_cast (le_top : ((N + 1 : ℕ) : ℕ∞) ≤ ⊤) | (norm_cast; exact le_top)
 
 theorem slm_le_inf' (N : ℕ) : (N : WithTop ℕ∞) ≤ ∞ := by
-  first
-  | exact_mod_cast (le_top : ((N : ℕ) : ℕ∞) ≤ ⊤)
-  | (norm_cast; exact le_top)
+  first | exact_mod_cast (le_top : ((N : ℕ) : ℕ∞) ≤ ⊤) | (norm_cast; exact le_top)
 
 theorem slm_hd_iff {f : ℝ → Matrix (Fin n) (Fin n) ℂ} {f' : Matrix (Fin n) (Fin n) ℂ} {s : ℝ}
     : HasDerivAt f f' s ↔ ∀ i j, HasDerivAt (fun t => f t i j) (f' i j) s := by
-  first
-  | exact hasDerivAt_pi.trans (forall_congr' fun i => hasDerivAt_pi)
+  first | exact hasDerivAt_pi.trans (forall_congr' fun i => hasDerivAt_pi)
 
 theorem slm_hd_mul
     {f g : ℝ → Matrix (Fin n) (Fin n) ℂ} {f' g' : Matrix (Fin n) (Fin n) ℂ} {s : ℝ}
@@ -88,8 +83,7 @@ theorem slm_hd_mul
   have hf' := slm_hd_iff.mp hf
   have hg' := slm_hd_iff.mp hg
   simp only [Matrix.mul_apply, Matrix.add_apply, ← Finset.sum_add_distrib]
-  first
-  | exact HasDerivAt.fun_sum fun k _ => (hf' i k).mul (hg' k j)
+  first | exact HasDerivAt.fun_sum fun k _ => (hf' i k).mul (hg' k j)
 
 theorem slm_hd_conjT
     {f : ℝ → Matrix (Fin n) (Fin n) ℂ} {f' : Matrix (Fin n) (Fin n) ℂ} {s : ℝ}
@@ -148,7 +142,7 @@ def slmG (C : ι → Y →L[ℝ] ℝ) (fd : X →L[ℝ] Y) (w : ι → E) : X �
 
 theorem slmG_apply (C : ι → Y →L[ℝ] ℝ) (fd : X →L[ℝ] Y) (w : ι → E) (W : X)
     : slmG C fd w W = ∑ i, (C i (fd W)) • w i := by
-  simp [slmG, ContinuousLinearMap.sum_apply]
+  simp [slmG]
 
 theorem slmG_cd
     {V : Set X} (hV : IsOpen V)
@@ -164,10 +158,7 @@ theorem slmG_cd
 
 theorem contDiffOn_zero_of_continuousOn {V : Set X} {f : X → E} (h : ContinuousOn f V)
     : ContDiffOn ℝ ((0 : ℕ) : WithTop ℕ∞) f V := by
-  first
-  | exact contDiffOn_zero.mpr h
-  | (rw [Nat.cast_zero]; exact contDiffOn_zero.mpr h)
-  | (simp only [Nat.cast_zero, CharP.cast_eq_zero]; exact contDiffOn_zero.mpr h)
+  first | exact contDiffOn_zero.mpr h
 
 theorem slm_gen_hD
     {V : Set X} (hV : IsOpen V)
@@ -313,8 +304,7 @@ theorem slmG_mat_apply
       = ∑ a, ∑ b, ((m q * fderiv ℝ γ q W) a b) • v a b := by
   refine (slmG_apply (Y := Matrix (Fin n) (Fin n) ℂ) slmC (fderiv ℝ γ q) _ W).trans ?_
   simp only [Fintype.sum_prod_type, Fintype.sum_bool, slmC, slmc, ↓ reduceIte, Bool.false_eq_true,
-    ContinuousLinearMap.coe_comp', Function.comp_apply, slmEnt_apply, Complex.reCLM_apply,
-    Complex.imCLM_apply, Matrix.mul_apply, Finset.sum_smul]
+    Matrix.mul_apply, Finset.sum_smul]
   refine Finset.sum_congr rfl fun a _ =>
     Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun k _ => ?_
   rw [← re_mul_add_im_mul_I (fderiv ℝ γ q W k b) (m q a k)]

@@ -178,11 +178,6 @@ private theorem open_ker
   rw [this]
   exact isClosed_eq hc continuous_const
 
-private theorem norm_le_one_of_int
-    (l : ℕ) [Fact l.Prime] (x : PadicAlgCl l) (hx : IsIntegral ℤ_[l] x)
-    : ‖x‖ ≤ 1 :=
-  _root_.UpperTheory.Reformulated.B.NormLeOneOfIsIntegral.norm_le_one_of_isIntegral l x hx
-
 private theorem residue_eq
     {l : ℕ} [Fact l.Prime] (c : Coef l) (a b : c.O) (h : ‖(a : PadicAlgCl l) - b‖ < 1)
     : residue c.O a = residue c.O b := by
@@ -191,7 +186,8 @@ private theorem residue_eq
   have h1 : ‖((u : c.O) : PadicAlgCl l)‖ * ‖((u⁻¹ : c.Oˣ) : c.O).1‖ = 1 := by
     rw [← norm_mul, ← Subalgebra.coe_mul, Units.mul_inv]; simp
   have h3 : ‖((u⁻¹ : c.Oˣ) : c.O).1‖ ≤ 1 :=
-    norm_le_one_of_int l _ ((Algebra.IsIntegral.isIntegral (R := ℤ_[l]) _).map c.O.val)
+    _root_.UpperTheory.Reformulated.B.NormLeOneOfIsIntegral.norm_le_one_of_isIntegral l _
+      ((Algebra.IsIntegral.isIntegral (R := ℤ_[l]) _).map c.O.val)
   have h2 : ‖((u : c.O) : PadicAlgCl l)‖ < 1 := by rw [hu]; exact h
   have h4 := norm_nonneg ((u : c.O) : PadicAlgCl l)
   nlinarith

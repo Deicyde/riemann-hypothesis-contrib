@@ -50,6 +50,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaKernel_iterated_integrals_swap
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
         (χS χT : (AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.thetaKernel_iterated_integrals_swap
                   GlobalTheory.Grow.RapidDec S G → GlobalTheory.Grow.RapidDec T F
                     → ∫ h in X', ∫ g in X, thetaKO om g h f * F h * conj (G g) ∂ν ∂ν'
                       = ∫ g in X, ∫ h in X', thetaKO om g h f * F h * conj (G g) ∂ν' ∂ν := by
-  first
-  | exact @GlobalTheory.ChainOnto.ThetaSwap.integral_swap
-  | exact GlobalTheory.ChainOnto.ThetaSwap.integral_swap
-  | (intros; apply GlobalTheory.ChainOnto.ThetaSwap.integral_swap <;> assumption)
+  first | exact @GlobalTheory.ChainOnto.ThetaSwap.integral_swap

@@ -51,9 +51,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.ExportSeries
 
 variable {D : D7}

@@ -2,7 +2,7 @@ module
 
 public import Mathlib.Topology.Algebra.InfiniteSum.Defs
 public import Mathlib.Topology.MetricSpace.Pseudo.Defs
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteProductMultipliableStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteProductMultipliable
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,7 +59,7 @@ theorem tail_eq_mul_tail_insert
     (S : Finset ι) (v : ι) (hv : v ∉ S)
     : ∏' w : {w // w ∉ S}, a w.1 = a v * ∏' w : {w // w ∉ insert v S}, a w.1 := by
   have h :=
-    (GlobalTheory.T.infinite_product_multipliable {w // w ∉ S}
+    (_root_.GlobalTheory.CompanionTheory.SW.AbsTprod.abs_tprod {w // w ∉ S}
       (fun w => a w.1)
       (hs.comp_injective Subtype.val_injective)).2.1 {⟨v, hv⟩}
   rw [h.2, Finset.prod_singleton]
@@ -93,7 +93,7 @@ theorem tail_pos
     {ι : Type}
     (a : ι → ℝ) (hs : Summable (fun v => |a v - 1|)) (S : Finset ι) (hpos : ∀ v, v ∉ S → 0 < a v)
     : 0 < ∏' w : {w // w ∉ S}, a w.1 :=
-  (GlobalTheory.T.infinite_product_multipliable {w // w ∉ S}
+  (_root_.GlobalTheory.CompanionTheory.SW.AbsTprod.abs_tprod {w // w ∉ S}
     (fun w => a w.1)
     (hs.comp_injective Subtype.val_injective)).2.2.1 (fun w => hpos w.1 w.2)
 

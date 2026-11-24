@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
 open scoped ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.gridFiniteDatumVector_theta_fockVacuum
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts}
         {G : GlobalTheory.ChiGrid.GridData L sc} (W : G.Weil) {U : Set T}
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.gridFiniteDatumVector_theta_fockVacuum
               ∧ ∀ τ,
                 IsFockVacAt (heisO W.ψ (G.pS p) (G.pT p)) W.θ τ
                   (cplxO (G.cartS W.cart p τ) (G.onT W.cart p τ)) (Z.vec d) := by
-  first
-  | exact @GlobalTheory.FockRealVec.vec_theta_fock
-  | exact GlobalTheory.FockRealVec.vec_theta_fock
-  | (intros; apply GlobalTheory.FockRealVec.vec_theta_fock <;> assumption)
+  first | exact @GlobalTheory.FockRealVec.vec_theta_fock

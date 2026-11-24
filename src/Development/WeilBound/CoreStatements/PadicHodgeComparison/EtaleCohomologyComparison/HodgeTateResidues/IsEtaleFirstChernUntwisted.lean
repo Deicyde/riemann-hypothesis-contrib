@@ -73,7 +73,6 @@ def IsEtaleFirstChernUntwisted (r : E.Roots l) {M : Model l K} (D : E.LineData M
       ∧ ∀ n, v.lev n = (cup (l ^ n) (x n) (rootClass (-1) (r.zetaX M n))).cast rfl rfl
 
 variable (l K) in
-
 structure HTPre where
   h : ∀ (M : Model l K) (a n : ℕ), M.V n →+ (Module.Dual K (Hdg M.q a n) →+ ℂ_[l])
   lin

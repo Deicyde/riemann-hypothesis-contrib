@@ -67,9 +67,11 @@ namespace Formalism.L2.Pj.CurveCount
 
 open MvPolynomial
 
-theorem eval₂_mul_homog {R S σ : Type*} [CommSemiring R] [CommSemiring S] (f : R →+* S) (c : S) (g : σ → S)
-    {P : MvPolynomial σ R} {k : ℕ} (hP : P.IsHomogeneous k) :
-    P.eval₂ f (fun i => c * g i) = c ^ k * P.eval₂ f g := by
+theorem eval₂_mul_homog
+    {R S σ : Type*} [CommSemiring R] [CommSemiring S]
+    (f : R →+* S) (c : S) (g : σ → S)
+    {P : MvPolynomial σ R} {k : ℕ} (hP : P.IsHomogeneous k)
+    : P.eval₂ f (fun i => c * g i) = c ^ k * P.eval₂ f g := by
   rw [MvPolynomial.eval₂_eq, MvPolynomial.eval₂_eq, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hdeg : ∑ i ∈ m.support, m i = k := by
@@ -78,9 +80,11 @@ theorem eval₂_mul_homog {R S σ : Type*} [CommSemiring R] [CommSemiring S] (f 
   simp only [mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hdeg]
   ring
 
-theorem aeval_div_homog {K L σ : Type*} [Field K] [Field L] [Algebra K L] (g : σ → L) (c : L)
-    {P : MvPolynomial σ K} {k : ℕ} (hP : P.IsHomogeneous k) :
-    aeval (fun i => g i / c) P = c⁻¹ ^ k * aeval g P := by
+theorem aeval_div_homog
+    {K L σ : Type*} [Field K] [Field L] [Algebra K L]
+    (g : σ → L) (c : L)
+    {P : MvPolynomial σ K} {k : ℕ} (hP : P.IsHomogeneous k)
+    : aeval (fun i => g i / c) P = c⁻¹ ^ k * aeval g P := by
   have h := eval₂_mul_homog (algebraMap K L) c⁻¹ g hP
   show MvPolynomial.eval₂ (algebraMap K L) (fun i => g i / c) P =
     c⁻¹ ^ k * MvPolynomial.eval₂ (algebraMap K L) g P
@@ -89,13 +93,17 @@ theorem aeval_div_homog {K L σ : Type*} [Field K] [Field L] [Algebra K L] (g : 
   funext i
   rw [div_eq_mul_inv, mul_comm]
 
-theorem exists_indep_ratios {K κ : Type*} [Field K] [Field κ] [Algebra K κ] {N D : ℕ} (x : Fin N → κ) (a : Fin N)
-    (hxa : x a ≠ 0) (t : Fin (D + 1) × Fin N → κ) (ht : AlgebraicIndependent K t)
-    (hlin : ∀ i : Fin D, ∑ k, t (i.succ, k) * x k = 0) (hlin0 : ∑ k, t (0, k) * x k = 1) :
-    ∃ s : Finset κ, s.card = D ∧ (↑s : Set κ) ⊆ Set.range (fun i => x i / x a) ∧
-      AlgebraicIndepOn K id (↑s : Set κ) := by
+theorem exists_indep_ratios
+    {K κ : Type*} [Field K] [Field κ] [Algebra K κ]
+    {N D : ℕ} (x : Fin N → κ) (a : Fin N) (hxa : x a ≠ 0) (t : Fin (D + 1) × Fin N → κ)
+    (ht : AlgebraicIndependent K t) (hlin : ∀ i : Fin D, ∑ k, t (i.succ, k) * x k = 0)
+    (hlin0 : ∑ k, t (0, k) * x k = 1)
+    : ∃ s : Finset κ,
+      s.card = D ∧ (↑s : Set κ) ⊆ Set.range (fun i => x i / x a)
+        ∧ AlgebraicIndepOn K id (↑s : Set κ) := by
   classical
-  have : FaithfulSMul K κ := (faithfulSMul_iff_algebraMap_injective K κ).mpr (algebraMap K κ).injective
+  have : FaithfulSMul K κ :=
+    (faithfulSMul_iff_algebraMap_injective K κ).mpr (algebraMap K κ).injective
   set r : Fin N → κ := fun i => x i / x a with hr
   let t2 : Fin (D + 1) × ↥(Finset.univ.erase a) → κ := fun p => t (p.1, p.2.1)
   set T2 : Set κ := insert (x a)⁻¹ (Set.range t2) with hT2
@@ -114,7 +122,9 @@ theorem exists_indep_ratios {K κ : Type*} [Field K] [Field κ] [Algebra K κ] {
     rintro ⟨i, k⟩
     by_cases hk : k = a
     · rw [hk]
-      have e : t (i, a) = (if i = 0 then 1 else 0) * (x a)⁻¹ - ∑ l ∈ Finset.univ.erase a, t (i, l) * r l := by
+      have e
+          : t (i, a)
+            = (if i = 0 then 1 else 0) * (x a)⁻¹ - ∑ l ∈ Finset.univ.erase a, t (i, l) * r l := by
         have h := hc i
         rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a)] at h
         rw [← h, add_mul, Finset.sum_mul, add_sub_assoc, ← Finset.sum_sub_distrib]
@@ -122,7 +132,8 @@ theorem exists_indep_ratios {K κ : Type*} [Field K] [Field κ] [Algebra K κ] {
           mul_inv_cancel₀ hxa, mul_one]
       rw [e]
       refine Subalgebra.sub_mem _ (Subalgebra.mul_mem _ ?_ hzS)
-        (Subalgebra.sum_mem _ fun l hl => Subalgebra.mul_mem _ (htS i l (Finset.ne_of_mem_erase hl)) (hrS l))
+        (Subalgebra.sum_mem _ fun l hl =>
+          Subalgebra.mul_mem _ (htS i l (Finset.ne_of_mem_erase hl)) (hrS l))
       split_ifs
       · exact Subalgebra.one_mem _
       · exact Subalgebra.zero_mem _
@@ -142,12 +153,14 @@ theorem exists_indep_ratios {K κ : Type*} [Field K] [Field κ] [Algebra K κ] {
       rw [← Set.image_univ]
       refine (Set.encard_image_le _ _).trans ?_
       rw [Set.encard_univ, ENat.card_eq_coe_fintype_card, Fintype.card_prod, Fintype.card_fin,
-        Fintype.card_coe, Finset.card_erase_of_mem (Finset.mem_univ a), Finset.card_univ, Fintype.card_fin]
+        Fintype.card_coe, Finset.card_erase_of_mem (Finset.mem_univ a), Finset.card_univ,
+        Fintype.card_fin]
     rw [Nat.cast_add, Nat.cast_one]
     exact add_le_add h4 le_rfl
   have h5 : (((D + 1) * N : ℕ) : ℕ∞) ≤ (Set.range t).encard := by
     have := ht.injective.encard_range
-    rw [ENat.card_eq_coe_fintype_card, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin] at this
+    rw [ENat.card_eq_coe_fintype_card, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
+      at this
     exact this.ge
   have hfin : M.eRk (Set.range r) ≠ ⊤ :=
     ne_top_of_le_ne_top (Set.finite_range r).encard_lt_top.ne (M.eRk_le_encard _)
@@ -179,14 +192,18 @@ theorem exists_indep_ratios {K κ : Type*} [Field K] [Field κ] [Algebra K κ] {
   · rw [Set.Finite.coe_toFinset]
     exact AlgebraicIndependent.matroid_indep_iff.mp (hB.indep.subset hB'sub)
 
-theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K κ] [Algebra K Ω] {N D : ℕ}
-    (v : Fin N → Ω) (x : Fin N → κ) (a : Fin N) (hva : v a ≠ 0) (hxa : x a ≠ 0)
+theorem countCore
+    {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K κ] [Algebra K Ω]
+    {N D : ℕ} (v : Fin N → Ω) (x : Fin N → κ) (a : Fin N) (hva : v a ≠ 0) (hxa : x a ≠ 0)
     (htr : Algebra.trdeg K (IntermediateField.adjoin K (Set.range fun i => v i / v a)) ≤ D)
-    (htrans : ∀ Q : MvPolynomial (Fin N) K, aeval (fun i => v i / v a) Q = 0 → aeval (fun i => x i / x a) Q = 0)
+    (htrans : ∀ Q : MvPolynomial (Fin N) K,
+      aeval (fun i => v i / v a) Q = 0 → aeval (fun i => x i / x a) Q = 0)
     (t : Fin (D + 1) × Fin N → κ) (ht : AlgebraicIndependent K t)
     (hlin : ∀ i : Fin D, ∑ k, t (i.succ, k) * x k = 0) (hlin0 : ∑ k, t (0, k) * x k = 1)
-    (P : MvPolynomial (Fin N) K) {k : ℕ} (hP : P.IsHomogeneous k) (hPv : aeval v P ≠ 0) :
-    aeval x P ≠ 0 := by
+    (P : MvPolynomial (Fin N) K)
+    {k : ℕ} (hP : P.IsHomogeneous k)
+    (hPv : aeval v P ≠ 0)
+    : aeval x P ≠ 0 := by
   classical
   intro hxP
   set ρ : Fin N → Ω := fun i => v i / v a with hρ
@@ -194,8 +211,7 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
   have hα0 : aeval ρ P ≠ 0 := by
     rw [hρ, aeval_div_homog v (v a) hP]
     exact mul_ne_zero (pow_ne_zero _ (inv_ne_zero hva)) hPv
-  have hσP : aeval σ P = 0 := by
-    rw [hσ, aeval_div_homog x (x a) hP, hxP, mul_zero]
+  have hσP : aeval σ P = 0 := by rw [hσ, aeval_div_homog x (x a) hP, hxP, mul_zero]
   obtain ⟨s, hscard, hsub, hind⟩ := exists_indep_ratios (K := K) x a hxa t ht hlin hlin0
   have hf : ∀ e : s, ∃ i, σ i = (e : κ) := fun e => hsub e.2
   choose f hfe using hf
@@ -208,25 +224,23 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
     have h2 := htrans (rename f Q) h1
     rw [aeval_rename, h3] at h2
     exact (algebraicIndependent_iff.mp hy) Q h2
-  have hρA : ∀ i, ρ i ∈ IntermediateField.adjoin K (Set.range ρ) :=
-    fun i => IntermediateField.subset_adjoin K _ ⟨i, rfl⟩
+  have hρA : ∀ i, ρ i ∈ IntermediateField.adjoin K (Set.range ρ) := fun i =>
+    IntermediateField.subset_adjoin K _ ⟨i, rfl⟩
   let ρA : Fin N → IntermediateField.adjoin K (Set.range ρ) := fun i => ⟨ρ i, hρA i⟩
-  have hvalρ : ∀ Q : MvPolynomial (Fin N) K,
-      IntermediateField.val _ (aeval ρA Q) = aeval ρ Q := by
+  have hvalρ : ∀ Q : MvPolynomial (Fin N) K, IntermediateField.val _ (aeval ρA Q) = aeval ρ Q := by
     intro Q
     induction Q using MvPolynomial.induction_on
-    next c =>
-      simp only [MvPolynomial.aeval_C, AlgHom.commutes]
-    next p q hp hq =>
-      rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
+    next c => simp only [MvPolynomial.aeval_C, AlgHom.commutes]
+    next p q hp hq => rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
     next p i hp =>
       rw [map_mul, map_mul, map_mul, hp, MvPolynomial.aeval_X, MvPolynomial.aeval_X]
       rfl
   have hnot : ¬ AlgebraicIndependent K (fun o : Option s => o.elim (aeval ρ P) (ρ ∘ f)) := by
     intro hI
-    let w : Option s → IntermediateField.adjoin K (Set.range ρ) :=
-      fun o => o.elim (aeval ρA P) (fun e => ρA (f e))
-    have hcomp : (IntermediateField.val _) ∘ w = fun o : Option s => o.elim (aeval ρ P) (ρ ∘ f) := by
+    let w : Option s → IntermediateField.adjoin K (Set.range ρ) := fun o =>
+      o.elim (aeval ρA P) (fun e => ρA (f e))
+    have hcomp
+        : (IntermediateField.val _) ∘ w = fun o : Option s => o.elim (aeval ρ P) (ρ ∘ f) := by
       funext o
       cases o with
       | none => exact hvalρ P
@@ -241,8 +255,9 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
     by_contra hna
     exact hnot ((huind.option_iff_transcendental _).mpr hna)
   set α := aeval ρ P with hαdef
-  have hex : ∃ n, ∃ p : Polynomial (Algebra.adjoin K (Set.range (ρ ∘ f))),
-      p ≠ 0 ∧ Polynomial.aeval α p = 0 ∧ p.natDegree = n := by
+  have hex
+      : ∃ n, ∃ p : Polynomial (Algebra.adjoin K (Set.range (ρ ∘ f))),
+        p ≠ 0 ∧ Polynomial.aeval α p = 0 ∧ p.natDegree = n := by
     obtain ⟨p, hp0, hp⟩ := halg
     exact ⟨_, p, hp0, hp, rfl⟩
   obtain ⟨p, hp0, hpα, hpn⟩ := Nat.find_spec hex
@@ -270,8 +285,9 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
         exact hp0 rfl
       omega
     exact Nat.find_min hex (hpn ▸ hdeg) ⟨p.divX, hd0, hdα, rfl⟩
-  have hQ : ∀ c : Algebra.adjoin K (Set.range (ρ ∘ f)), ∃ Q : MvPolynomial s K,
-      aeval (ρ ∘ f) Q = (c : Ω) := by
+  have hQ
+      : ∀ c : Algebra.adjoin K (Set.range (ρ ∘ f)), ∃ Q : MvPolynomial s K,
+        aeval (ρ ∘ f) Q = (c : Ω) := by
     intro c
     have hc : (c : Ω) ∈ (MvPolynomial.aeval (R := K) (ρ ∘ f)).range := by
       rw [← Algebra.adjoin_range_eq_range_aeval]
@@ -279,8 +295,8 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
     obtain ⟨Q, hQ⟩ := hc
     exact ⟨Q, hQ⟩
   choose Qc hQc using hQ
-  have hT : aeval ρ (∑ j ∈ Finset.range (p.natDegree + 1), rename f (Qc (p.coeff j)) * P ^ j) = 0 := by
-
+  have hT
+      : aeval ρ (∑ j ∈ Finset.range (p.natDegree + 1), rename f (Qc (p.coeff j)) * P ^ j) = 0 := by
     rw [map_sum]
     simp only [map_mul, map_pow, aeval_rename, hQc]
     rw [← hpα, Polynomial.aeval_eq_sum_range]
@@ -290,8 +306,10 @@ theorem countCore {K κ Ω : Type*} [Field K] [Field κ] [Field Ω] [Algebra K �
   have hT2 := htrans _ hT
 
   rw [map_sum, Finset.sum_range_succ'] at hT2
-  simp only [map_mul, map_pow, aeval_rename, hσP, ne_eq, Nat.add_eq_zero, one_ne_zero, and_false,
-    not_false_eq_true, zero_pow, mul_zero, Finset.sum_const_zero, zero_add, pow_zero, mul_one] at hT2
+  simp only [map_mul, map_pow, aeval_rename, hσP, ne_eq, Nat.add_eq_zero_iff, one_ne_zero,
+      and_false, not_false_eq_true, zero_pow, mul_zero, Finset.sum_const_zero, zero_add, pow_zero,
+      mul_one]
+    at hT2
   rw [h3] at hT2
   have h4 := (algebraicIndependent_iff.mp hy) _ hT2
   have h5 := hQc (p.coeff 0)

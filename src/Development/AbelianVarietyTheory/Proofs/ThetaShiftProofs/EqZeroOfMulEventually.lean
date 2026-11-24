@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsThetaL2NormSquared
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTangentEigenbasisExponentialStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.UnFree
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTangentEigenbasisExponential
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsThetaPt
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueFrameChangeByMatrices
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExponentialDerivativeAtZeroIsTangent
@@ -230,7 +231,7 @@ theorem existsUnique_anFr
   obtain ⟨-, hder, -⟩ := GlobalTheory.isDerivAt0_ex_isTanAt E H Dw l Xo _ _ _ Uw.F Ha.i _ hP
   refine existsUnique_of_exists_of_unique ?_ ?_
   · obtain ⟨u, hu, htan, heig, hbas⟩ :=
-      GlobalTheory.T.exists_tangent_eigenbasis_exponential E H Dw l Xo c σ Uw.g Uw.e Uw.F Ha.i _ hP
+      _root_.GlobalTheory.LieFrame.exists_eigenbasis E H Dw l Xo c σ Uw.g Uw.e Uw.F Ha.i _ hP
     obtain ⟨fr, hfr⟩ := Θ.frame w hw
     obtain ⟨s, hs⟩ := hfr.2.2.2.2
     obtain ⟨t, ht, hval⟩ :=

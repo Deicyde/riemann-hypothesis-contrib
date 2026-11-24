@@ -4,10 +4,11 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.OnePl
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitalSquareEqHilbertSchmidtNormalisedVector
 public import Formalism.SharpRestriction.CuspSpanNormBounds.NormalizedLocalScale
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CutoffComputesBesselQuotientIntegral
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnipotentHaarMeasureRatioStatement
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Admissible
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnipotentHaarMeasureRatio
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselNeZeroOfCyclicOrbit
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsOrbQuotWithDensity
 import Formalism.FormalDegreeBessel.FinalG
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselNeZeroOfCyclicOrbit
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.ComponentFamilySettingOfSetting
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.IntegrableUnipotentNormRpowNeg
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConstruction
@@ -474,7 +475,7 @@ theorem exists_orbQuot
     {μ : Measure (Mt k r)} (h : B.IsHaarOn (C6.Rset g⁻¹) μ)
     {M : ℝ} (hM : 0 ≤ M) (hI : Integrable (fun x => B.gN (Matrix.of x) ^ (-M)) μ)
     : ∃ ν, IsOrbQuot L g (μ.map (conjM g)) ν := by
-  obtain ⟨cN, hN⟩ := GlobalTheory.T.exists_unipotentHaarMeasure_ratio k r
+  obtain ⟨cN, hN⟩ := _root_.GlobalTheory.ThA.exists_isRatioN k r
   have := P.Dx2.OrbJ.sigmaF h
   have hu := unit_det hg
   have hθ : Measurable fun p : PairSp k r => P.Dx3.cut μ M p.swap :=

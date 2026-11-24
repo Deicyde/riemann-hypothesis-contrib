@@ -116,7 +116,7 @@ theorem exists_beta
           Matrix.cons_val_three, Matrix.head_cons, Matrix.tail_cons, eSec_act, Category.comp_id,
           Finset.univ_unique, Finset.prod_singleton, Finset.univ_eq_empty, Finset.prod_empty]
         apply Additive.ofMul.injective
-        simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_one]
+        simp only [ofMul_mul, ofMul_zpow, ofMul_one]
         abel)
       _ hg
   have hB :=

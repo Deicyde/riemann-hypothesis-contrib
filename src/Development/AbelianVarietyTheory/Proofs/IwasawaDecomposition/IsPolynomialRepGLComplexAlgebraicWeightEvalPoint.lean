@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ConjugateNeSelf
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgebraicWeightPolyMatrixMultiplicativeStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolyRep
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgebraicWeightPolyMatrixMultiplicative
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -100,7 +101,7 @@ theorem isPolyRep_evPt
     (h : Agrees a b P)
     (τ : L →+* ℂ)
     : IsPolyRep (fun B => evM P (evPt τ B)) := by
-  obtain ⟨h1, hm⟩ := GlobalTheory.T.algebraicWeight_polyMatrix_multiplicative L n a ι b P h
+  obtain ⟨h1, hm⟩ := _root_.GlobalTheory.AlgWtMul.evM_mul L n a ι b P h
   refine ⟨?_, ?_, ?_⟩
   · show evM P (evPt τ 1) = 1
     rw [evPt_eq_upt, tauPt_one]

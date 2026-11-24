@@ -2,11 +2,11 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLocalGeneratorStableBaseChangeStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueGlueSectionsPrincipalCoverStatement
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueScaledBaseChangeFibreSectionStatement
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionCalculusStatement
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionNonvanishingIffStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLocalGeneratorStableBaseChange
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueGlueSectionsPrincipalCover
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueScaledBaseChangeFibreSection
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionCalculus
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionNonvanishingIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -56,10 +56,7 @@ noncomputable section
 
 namespace GlobalTheory.Frames.NonzeroGenerates
 
-theorem spMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  rw [spMap, spMap, spMap, ← Spec.map_comp]; rfl
+alias spMap_comp' := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem spMap_id' {A : Type} [CommRing A] : spMap (RingHom.id A) = 𝟙 (Sp A) :=
   Spec.map_id (CommRingCat.of A)
@@ -73,43 +70,42 @@ theorem eq_id_comp (x : Sp S ⟶ Xo.X) : x = spMap (RingHom.id S) ≫ x := by
 
 theorem scal_mul (x : Sp S ⟶ Xo.X) (a b : S) (i : (PPx x).ι)
     : scal x (a * b) i = scal x a i * scal x b i :=
-  ((GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
+  ((_root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
     (eq_id_comp x)).2.2.2 a b i).1
 
 theorem scal_one (x : Sp S ⟶ Xo.X) (i : (PPx x).ι) : scal x 1 i = 1 :=
-  ((GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
+  ((_root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
     (eq_id_comp x)).2.2.2 1 1 i).2.2
 
 theorem secBC_id_iff (x : Sp S ⟶ Xo.X) (a : S) (s t : LB.Sec (PPx x))
     : SecBC (RingHom.id S) a x x s t ↔ ∀ i, t.f i = scal x a i * s.f i :=
-  (GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
+  (_root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S S S _ _ x x x (eq_id_comp x)
     (eq_id_comp x)).2.1 a s t
 
 theorem exists_mul (x : Sp S ⟶ Xo.X) (a : S) (s : LB.Sec (PPx x))
     : ∃ t : LB.Sec (PPx x), ∀ i, t.f i = scal x a i * s.f i := by
   obtain ⟨t, ht, -⟩ :=
-    GlobalTheory.T.existsUnique_scaledBaseChange_fibreSection E H Dw l Xo S S (RingHom.id S) a x x
+    _root_.GlobalTheory.Frames.SecPull.existsUnique_secBC E H Dw l Xo S S (RingHom.id S) a x x
       (eq_id_comp x) s
   exact ⟨t, (secBC_id_iff x a s t).1 ht⟩
 
 theorem exists_pull
     (φ : S →+* T) (x : Sp S ⟶ Xo.X) (x' : Sp T ⟶ Xo.X) (hx : x' = spMap φ ≫ x) (s : LB.Sec (PPx x))
     : ∃ s' : LB.Sec (PPx x'), SecBC φ 1 x x' s s' :=
-  (GlobalTheory.T.existsUnique_scaledBaseChange_fibreSection E H Dw l Xo S T φ 1 x x' hx s).exists
+  (_root_.GlobalTheory.Frames.SecPull.existsUnique_secBC E H Dw l Xo S T φ 1 x x' hx s).exists
 
 theorem pull_trans_iff
     {φ : S →+* T} {ψ : T →+* U} {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X} {x'' : Sp U ⟶ Xo.X}
     (hx : x' = spMap φ ≫ x) (hx' : x'' = spMap ψ ≫ x')
     {a : S} {s s' s''} (h : SecBC φ a x x' s s')
     : SecBC ψ 1 x' x'' s' s'' ↔ SecBC (ψ.comp φ) a x x'' s s'' :=
-  (GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S T U φ ψ x x' x'' hx hx').1 a
-    s s' s'' h
+  (_root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S T U φ ψ x x' x'' hx hx').1 a s s' s'' h
 
 theorem pull_mul_iff
     {φ : S →+* T} {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X} (hx : x' = spMap φ ≫ x)
     {a : S} {s : LB.Sec (PPx x)} {s' t' : LB.Sec (PPx x')} (h : SecBC φ 1 x x' s s')
     : SecBC φ a x x' s t' ↔ ∀ i, t'.f i = scal x' (φ a) i * s'.f i :=
-  (GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S T T φ _ x x' x' hx
+  (_root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S T T φ _ x x' x' hx
     (eq_id_comp x')).2.2.1 a s s' t' h
 
 theorem pull_iff_of_mul
@@ -157,8 +153,7 @@ theorem secNZ_pull
     {φ : S →+* T} {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X} (hx : x' = spMap φ ≫ x)
     {s : LB.Sec (PPx x)} {s' : LB.Sec (PPx x')} (h : SecBC φ 1 x x' s s') (hs : SecNZ x s)
     : SecNZ x' s' := fun p' =>
-  (GlobalTheory.T.scaledBaseChange_fibreSection_nonvanishing_iff E H Dw l Xo S T φ x x' hx s s' h
-    p').2 (hs _)
+  (_root_.GlobalTheory.Frames.secBC_nonvanishing_iff E H Dw l Xo S T φ x x' hx s s' h p').2 (hs _)
 
 end GlobalTheory.Frames.NonzeroGenerates
 
@@ -179,7 +174,7 @@ theorem GlobalTheory.Frames.secGen_of_secNZ
     by_contra hn
     obtain ⟨m, hm, hle⟩ := Ideal.exists_le_maximal _ hn
     obtain ⟨g, hg, θ, hθ⟩ :=
-      GlobalTheory.T.exists_local_generator_stable_baseChange hBC E H Dw l Xo S x ⟨m, hm.isPrime⟩
+      _root_.GlobalTheory.Frames.exists_local_generator hBC E H Dw l Xo S x ⟨m, hm.isPrime⟩
     refine hg (hle (Ideal.subset_span ?_))
     intro T _ ψ φ hφ s' hs'
     have e : spMap φ ≫ x = spMap ψ ≫ spMap (algebraMap S (Localization.Away g)) ≫ x := by
@@ -244,7 +239,7 @@ theorem GlobalTheory.Frames.secGen_of_secNZ
   have hh : Ideal.span (Set.range h) = ⊤ := by rw [hr]; exact (Ideal.eq_top_iff_one _).2 h1
   have hmem : ∀ i, h i ∈ G := fun i => hF (F.equivFin.symm i).2
   have glue :=
-    GlobalTheory.T.existsUnique_glue_sections_principal_cover E H Dw l Xo S x F.card h hh
+    _root_.GlobalTheory.SecGlue.existsUnique_glue E H Dw l Xo S x F.card h hh
       (fun i => tl (h i))
       (fun i j α β hα hβ u hu => by
         have e1

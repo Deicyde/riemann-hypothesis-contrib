@@ -107,8 +107,8 @@ theorem isPullO_id
     }
     ?_ a
   intro p b
-  simp only [pairRes, pairPull, secPull, Sec.res, CoefMap.restrict]
-  simp [Scheme.Hom.appLE, mp]
+  simp only [pairRes, pairPull, CoefMap.restrict]
+  simp [mp]
   rfl
 
 abbrev pb {Y A : Over (Sp R)} (f : Y ⟶ A) : HO1 A.hom →ₗ[R] HO1 Y.hom := pullHO1 (overW f)

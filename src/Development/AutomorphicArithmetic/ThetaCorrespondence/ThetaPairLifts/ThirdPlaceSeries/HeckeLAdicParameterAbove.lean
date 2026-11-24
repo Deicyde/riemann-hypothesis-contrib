@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TripleAtt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal

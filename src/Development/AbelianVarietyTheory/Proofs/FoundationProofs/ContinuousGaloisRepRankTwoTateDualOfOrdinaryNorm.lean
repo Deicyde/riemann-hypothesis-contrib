@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InertialOrderFifteenCharAuxiliaryPrimeSpec
 
 @[expose] public section
 
@@ -56,15 +57,6 @@ theorem cyc_cont' {Ω : Type} [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prim
         (continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val)).comp
     (continuous_cycZ ℚ Ω l)
 
-theorem units_cont
-    {Γ R : Type}
-    [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Monoid R] [TopologicalSpace R]
-    (f : Γ →* Rˣ) (h : Continuous fun s => (f s : R))
-    : Continuous f := by
-  refine Units.continuous_iff.2 ⟨h, ?_⟩
-  simp only [← map_inv]
-  exact h.comp continuous_inv
-
 theorem continuous_galoisRepRankTwoTateDual
     : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
         (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
@@ -73,7 +65,7 @@ theorem continuous_galoisRepRankTwoTateDual
   have hW : Continuous fun s => ((W s : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)) :=
     Units.continuous_val.comp hN.cont
   have hd : Continuous (dt W) := by
-    apply units_cont
+    apply _root_.GlobalTheory.GalChar.continuous_units
     show Continuous fun s => (Matrix.GeneralLinearGroup.det (W s) : Qbar l)
     simp only [Matrix.GeneralLinearGroup.val_det_apply]
     exact hW.matrix_det
@@ -81,7 +73,7 @@ theorem continuous_galoisRepRankTwoTateDual
   have hχ : Continuous (cycBar ℚ Ω l * (dt W)⁻¹) := by
     show Continuous fun s => cycBar ℚ Ω l s * ((dt W) s)⁻¹
     exact hc.mul hd.inv
-  apply units_cont
+  apply _root_.GlobalTheory.GalChar.continuous_units
   show Continuous fun s => ((tw W (cycBar ℚ Ω l * (dt W)⁻¹) s : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l))
   simp only [tw_val]
   exact (Units.continuous_val.comp hχ).smul hW

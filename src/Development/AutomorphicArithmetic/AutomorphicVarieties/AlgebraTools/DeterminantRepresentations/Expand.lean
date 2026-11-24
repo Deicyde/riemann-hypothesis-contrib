@@ -179,7 +179,7 @@ theorem UpperTheory.V.AlgebraTools.Det.expand
       rfl
     rw [hw]
     by_contra hne
-    simp [Finsupp.single_apply, Ne.symm hne] at h1
+    simp [Ne.symm hne] at h1
     exact hd h1.symm
   obtain ⟨c, hc⟩ := hom_two _ hP
   have hev
@@ -190,7 +190,7 @@ theorem UpperTheory.V.AlgebraTools.Det.expand
     rw [← hc B s t, ← genEval B 2 y2 ![s, t]]
     congr 1
     rw [Fin.sum_univ_two]
-    simp [y2, MonoidAlgebra.one_def, MonoidAlgebra.smul_single']
+    simp [y2, MonoidAlgebra.one_def]
   have hlam : ∀ i ∈ Finset.range (n + 1), D.lam i y = c i := by
     intro i hi
     have hchi

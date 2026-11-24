@@ -59,7 +59,7 @@ theorem continuous_gpProj
     apply continuous_induced_rng.2
     have hv : Continuous (fun h : GlobalTheory.BZMir.Leib.MirabolicParabolic k m j =>
         ((h : GlobalTheory.BZMir.Mir k (m + j)) : GL (Fin (m + j + 1)) k)) := by
-      first | exact continuous_subtype_val.comp continuous_subtype_val | fun_prop
+      first | exact continuous_subtype_val.comp continuous_subtype_val
     exact hv
   have hlevi :=
     (GlobalTheory.SmGL.LeviInt.levi_integral_facts k _ _ _

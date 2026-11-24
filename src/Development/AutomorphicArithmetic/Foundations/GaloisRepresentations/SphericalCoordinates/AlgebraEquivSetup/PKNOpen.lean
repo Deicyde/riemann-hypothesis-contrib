@@ -115,7 +115,7 @@ private theorem principalCongruence_map_iff
       : ∀ i k,
         ((GeneralLinearGroup.map (pLoc E w) M).val - 1) i k = pLoc E w ((M.val - 1) i k) := by
     intro i k
-    by_cases hik : i = k <;> simp [Matrix.sub_apply, Matrix.one_apply, hik]
+    by_cases hik : i = k <;> simp [Matrix.sub_apply, hik]
   simp only [Cong1, h]
 
 end UpperTheory.Gal.W2.Seed

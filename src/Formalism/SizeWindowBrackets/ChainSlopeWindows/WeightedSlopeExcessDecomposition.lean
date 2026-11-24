@@ -213,13 +213,11 @@ theorem lower_bound_simplified
   obtain ⟨-, -, -, -, -, -, a7, -, -⟩ := H2
   exact a7.symm.trans (by
     first
-    | rfl
     | (
         show ∑ w ∈ W, 2 * l w * io w = _
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl (fun w _ => mul_assoc _ _ _)
-      )
-    | (show ∑ w ∈ W, 2 * (l w * io w) = _; rw [Finset.mul_sum]))
+      ))
 
 theorem claimHigh_valid
     (W : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ) (tau sg' : ι → ℝ)

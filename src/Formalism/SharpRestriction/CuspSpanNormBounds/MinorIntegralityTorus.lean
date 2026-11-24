@@ -74,7 +74,7 @@ theorem one_le_abs_norm
   have hy : y ≠ 0 := by
     intro h
     apply h0
-    first | exact congrArg Subtype.val h | simpa [y] using congrArg (algebraMap (𝓞 K) K) h
+    first | exact congrArg Subtype.val h
   have hN : Algebra.norm ℤ y ≠ 0 := Algebra.norm_ne_zero_iff.mpr hy
   have hc : ((Algebra.norm ℤ y : ℤ) : ℚ) = Algebra.norm ℚ x := Algebra.coe_norm_int y
   rw [← hc]
@@ -199,7 +199,7 @@ theorem pair_int
   obtain ⟨r, hr⟩ := Submodule.mem_one.mp (hx y hy)
   have hr' : ((hS D).hT y) x = algebraMap (𝓞 D.host.E) D.host.E r := hr.symm
   rw [hr']
-  first | exact r.2 | exact RingOfIntegers.isIntegral_coe r | exact RingOfIntegers.isIntegral r
+  first | exact r.2
 
 end Fr
 

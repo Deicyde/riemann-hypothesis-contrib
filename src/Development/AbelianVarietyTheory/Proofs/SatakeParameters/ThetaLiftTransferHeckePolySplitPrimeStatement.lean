@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaLift_transfer_heckePoly_splitPrime
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.thetaLift_transfer_heckePoly_splitPrime
                     (C (D.what₂.embLL (A.etaVal P : D.what₂.LL) * (A.q P : ℂ) ^ ((D.R.t + 1) / 2))
                       * X)
                   * ((A.fam.L i t).blockProd P).map D.what₂.embLL := by
-  first
-  | exact @GlobalTheory.ThetaPrimeHecke.transfer_and_heckePoly
-  | exact GlobalTheory.ThetaPrimeHecke.transfer_and_heckePoly
-  | (intros; apply GlobalTheory.ThetaPrimeHecke.transfer_and_heckePoly <;> assumption)
+  first | exact @GlobalTheory.ThetaPrimeHecke.transfer_and_heckePoly

@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_weilDatum_doubled_of_schrodingerFormulas
                             ∧ algebraMap D.host.F D.host.E lam = -D.host.xi0 / μ ∧ ψ = shift ψ₀ lam
                             ∧ IsChart A μ κ ∧ IsWeilDatumO ψ₀ (dblSp A) V 1 χ⁻¹ omh
                             ∧ IsTransport ψ₀ θ A V ν 𝓨 omh κ ω := by
-  first
-  | exact @GlobalTheory.StdUnn.SchDatum.exists_datum
-  | exact GlobalTheory.StdUnn.SchDatum.exists_datum
-  | (intros; apply GlobalTheory.StdUnn.SchDatum.exists_datum <;> assumption)
+  first | exact @GlobalTheory.StdUnn.SchDatum.exists_datum

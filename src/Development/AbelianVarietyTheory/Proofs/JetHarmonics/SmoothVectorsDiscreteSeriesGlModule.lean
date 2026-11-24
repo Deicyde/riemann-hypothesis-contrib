@@ -87,7 +87,7 @@ theorem smooth_gl_module
                 R.IsE Q E ∧ Formalism.REAL.GlRel E := by
   intro hK k r ε mu R hDS Q hQ
   obtain ⟨hmem, hlin, hadd, -, hbr, -⟩ :=
-    GlobalTheory.T.complexifiedDerivedAction_lieHom_gramAdjoint hK k r ε mu R hDS
+    _root_.GlobalTheory.ComplexifiedAction.complexified_action hK k r ε mu R hDS
   have h0 : (0 : R.H) ∈ R.sm := R.smSub.zero_mem
   have hz : ∀ Y, R.dC Y 0 = 0 := fun Y => by
     have h := hlin Y 1 0 h0 0 h0

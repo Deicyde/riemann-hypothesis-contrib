@@ -300,10 +300,7 @@ theorem matching_unitary_eq
         (k.1 : GL (Fin (D.R.N i)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F))
           ∈ UPts (sigD D) (gramN D i hi) (FiniteAdeleRing (𝓞 D.host.F) D.host.F) := by
     intro k
-    first
-    | exact ((K.lev.U_eq _).1 k.2).1
-    | exact (K.lev.U_eq _).1 k.2
-    | exact ((K.lev.U_eq _).mp k.2).1
+    first | exact ((K.lev.U_eq _).1 k.2).1
   have e1 := eq_mul_inv_of_mul_eq h1
   have e2 := eq_mul_inv_of_mul_eq h2
   have e3

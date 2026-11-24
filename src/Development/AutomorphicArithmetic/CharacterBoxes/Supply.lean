@@ -70,12 +70,10 @@ theorem at_of_from
     : G.At p.L := by
   have h1 := h.1
   have h2 := h.field
-  have h3 := h.2.1
   subst h1
-  have h4 : p.D.host.TT = H.TT := Finset.image_injective (Formalism.HC.Frame.A.val_injective _) h3
-  unfold At
-  rw [eq_of_heq h2, h4]
-  exact hG
+  have h4 : p.D.host.TT = H.TT :=
+    Finset.image_injective (Formalism.HC.Frame.A.val_injective _) h.2.1
+  simpa [At, eq_of_heq h2, h4] using hG
 
 end FReq
 

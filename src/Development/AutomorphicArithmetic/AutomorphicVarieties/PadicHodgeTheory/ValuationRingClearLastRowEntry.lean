@@ -362,7 +362,7 @@ theorem UpperTheory.V.Loc.lemma2c
             UpperTheory.V.UnitaryThreeInertia.TriIn D.η D.Ψ (Iq l)
               ((GG.map (algebraMap K K')).comp r) h := by
   intro hP l _ O _ _ _ _ _ _ _ D U K _ _ r ⟨f, hr, hf⟩
-  obtain ⟨-, hp, hl, -⟩ := UpperTheory.V.Loc.rtBasic hP D U
+  obtain ⟨-, hp, hl, -⟩ := _root_.GlobalTheory.OrdLoc.component_basic hP D U
   haveI : IsDomain (D.Rt U) := Ideal.Quotient.isDomain _
   let φ : U.R →ₐ[O] FractionRing (D.Rt U) :=
     (IsScalarTower.toAlgHom O (D.Rt U) (FractionRing (D.Rt U))).comp (Ideal.Quotient.mkₐ O _)

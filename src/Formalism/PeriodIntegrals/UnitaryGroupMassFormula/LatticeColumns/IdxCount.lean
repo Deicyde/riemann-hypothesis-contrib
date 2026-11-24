@@ -158,7 +158,7 @@ theorem lIdxH_eq_of_red
   rw [hc] at hpos
   have hgl : Nat.card (GL (Fin D.R.k) (ZMod (gOf p))) = glkC D.R.k (gOf p) := by
     unfold glkC
-    first | rfl | (rw [Matrix.card_GL_field, ZMod.card]; done) | done
+    first | rfl
   rw [hgl] at hmul
   rw [eq_div_iff (by exact_mod_cast hpos.ne'), ← hmul]
   push_cast

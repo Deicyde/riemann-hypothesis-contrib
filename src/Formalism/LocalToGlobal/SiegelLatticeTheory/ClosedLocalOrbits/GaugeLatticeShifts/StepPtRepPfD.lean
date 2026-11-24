@@ -338,7 +338,7 @@ theorem locMain
             B.wb i0 i0 1 (Matrix.diagonal fun i => if i = i0 then φ else 1) := by
   obtain ⟨hZ, hlt⟩ := gv_facts A.T_pos B.T_pos Z hG
   have hcL : (Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) (Fin.last r) = Z⁻¹ (Fin.last r) (Fin.last r) := by
-    simp [mulVec_single_one]
+    simp
   rw [← hcL] at hlt
   set q : ℝ := (A.T)⁻¹ - B.T * ‖(Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) (Fin.last r)‖ ^ 2 with hqdef
   have hq : 0 < q := by

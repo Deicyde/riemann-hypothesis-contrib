@@ -1,13 +1,16 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountableStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompactStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ArithmeticUnitaryGroupDiscreteStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteCovolumeUnimodularStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramMatrixLocalGlobalStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitaryGroupFiniteVolumeStatement
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountable
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompact
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ArithmeticUnitaryGroupDiscrete
+public import Mathlib.MeasureTheory.Group.FundamentalDomain
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteCovolumeUnimodular
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramMatrixLocalGlobal
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
+public import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitaryGroupFiniteVolume
 public import Development.WeilBound.CoreStatements.ThetaDilations.ThetaLint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -78,14 +81,15 @@ theorem thetaMeas_gram_indep
                   thetaMeas σ J μ 𝓕 {X | gramE σ J X = T}
                     = thetaMeas σ J μ' 𝓕' {X | gramE σ J X = T} := by
   intro F E _ _ _ _ _ σ hcm M J hJ μ μ' 𝓕 𝓕' hμ h𝓕 hμ' h𝓕₂ n T
-  obtain ⟨⟨_, _, _⟩, -⟩ := GlobalTheory.T.adeles_locally_compact_second_countable F
+  obtain ⟨⟨_, _, _⟩, -⟩ := _root_.GlobalTheory.CompanionTheory.AdeleTop.adele_top F
   obtain ⟨_, _, _, _, -, -, -, hB, -, hg⟩ :=
-    GlobalTheory.T.tensor_locally_compact_ring F E σ hcm (AF F)
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hcm (AF F)
   have := hB n M
   obtain ⟨_, _, _, _, _, hact⟩ :=
-    GlobalTheory.T.adelic_unitary_group_locally_compact F E σ hcm M J hJ (AF F)
+    _root_.GlobalTheory.CompanionTheory.SW.TopH.topH_props F E σ hcm M J hJ (AF F)
   obtain ⟨ac, a1, a2, ag⟩ := hact n
-  have hrat := (GlobalTheory.T.gram_matrix_local_global F E σ hcm M J hJ n 0 T).2
+  have hrat :=
+    (_root_.GlobalTheory.CompanionTheory.SW.GramLocal.gram_local F E σ hcm M J hJ n 0 T).2
   have hl :=
     PositivityTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hcm M J hJ μ 𝓕 hμ h𝓕 n
       {X | gramE σ J X = T}
@@ -96,13 +100,17 @@ theorem thetaMeas_gram_indep
     Algebra.TensorProduct.includeRight_injective (AdeleRing.algebraMap_injective _ _)
   have hri : Function.Injective (ratTup (F := F) (AF F) : (Fin n → Fin M → E) → _) := fun X Y h =>
     funext fun a => funext fun i => hinj (congrFun (congrFun h a) i)
-  have hfin := ((GlobalTheory.T.unitary_group_finite_volume F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
+  have hfin :=
+    ((_root_.GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
   have : μ.IsHaarMeasure := hμ
   have : μ'.IsHaarMeasure := hμ'
   let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J
-  have : Countable Γ := (GlobalTheory.T.arithmetic_unitary_group_discrete F E σ hcm M J hJ).1
+  have : Countable Γ :=
+    (_root_.GlobalTheory.CompanionTheory.SW.rational_countable_discrete F E σ hcm M J hJ).1
   have h𝓕₁ : IsFundamentalDomain Γ 𝓕 μ := h𝓕
-  have h0 := (GlobalTheory.T.finite_covolume_unimodular (HA (AF F) σ J) Γ μ 𝓕 h𝓕₁ hfin).1
+  have h0 :=
+    (_root_.GlobalTheory.CompanionTheory.SW.LatticeUnimod.unimodular_of_isFundamentalDomain
+      (HA (AF F) σ J) Γ μ 𝓕 h𝓕₁ hfin).1
   have hsm : μ' = Measure.haarScalarFactor μ' μ • μ := Measure.isMulLeftInvariant_eq_smul μ' μ
   have hc0 : Measure.haarScalarFactor μ' μ ≠ 0 :=
     (Measure.haarScalarFactor_pos_of_isHaarMeasure μ' μ).ne'

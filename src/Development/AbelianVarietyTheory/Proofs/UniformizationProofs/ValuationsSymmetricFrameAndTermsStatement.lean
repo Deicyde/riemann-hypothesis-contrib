@@ -77,7 +77,4 @@ theorem _root_.GlobalTheory.T.valuations_symmetricFrame_and_terms
                                     → ∀ χ,
                                       (((Q (m • χ + p.y) : ℚ) / (m ^ 2 : ℕ) : ℚ) : WithTop ℚ)
                                         ≤ v (coef ϑ g' w' χ) := by
-  first
-  | exact @GlobalTheory.UT.TxVal.main
-  | exact GlobalTheory.UT.TxVal.main
-  | (intros; apply GlobalTheory.UT.TxVal.main <;> assumption)
+  first | exact @GlobalTheory.UT.TxVal.main

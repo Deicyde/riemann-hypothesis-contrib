@@ -42,9 +42,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
-
 noncomputable section
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal

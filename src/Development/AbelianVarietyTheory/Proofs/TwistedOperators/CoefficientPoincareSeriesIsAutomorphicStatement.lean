@@ -50,6 +50,7 @@ open GlobalTheory.ChainFr GlobalTheory.SepRows GlobalTheory.SepPer Matrix
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
+
 theorem _root_.GlobalTheory.T.coefficientPoincareSeries_isAutomorphic
     : ∀ (D : D7) (θ : InfFam D),
       IsInfFam θ
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.coefficientPoincareSeries_isAutomorphic
                       poin θ M (congLev D.sp.cm V.gram Λ 𝔪) v c
                           (Function.update a τ (M.rep τ k (a τ)))
                         = rTr V (atTau θ V τ k) (poin θ M (congLev D.sp.cm V.gram Λ 𝔪) v c a) := by
-  first
-  | exact @GlobalTheory.PoinAut.poin_aut
-  | exact GlobalTheory.PoinAut.poin_aut
-  | (intros; apply GlobalTheory.PoinAut.poin_aut <;> assumption)
+  first | exact @GlobalTheory.PoinAut.poin_aut

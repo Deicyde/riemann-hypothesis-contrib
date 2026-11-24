@@ -76,7 +76,6 @@ theorem valCrit_proj
   haveI : ValuationRing V := by
     first
       | exact inferInstance
-      | exact ValuationRing.of_isDiscreteValuationRing V
   let S : ValuativeCommSq f := ⟨V, K, y, spMap b, ⟨hy⟩⟩
   obtain ⟨l⟩ := (hE S).exists_lift
   exact ⟨l.l, l.fac_right, l.fac_left⟩
@@ -106,7 +105,6 @@ theorem exists_family
       rw [dite_eq_left rfl]
       rfl
     )
-  | simp
 
 end Proofs
 

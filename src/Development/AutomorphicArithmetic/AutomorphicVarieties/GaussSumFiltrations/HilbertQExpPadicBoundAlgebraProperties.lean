@@ -58,7 +58,7 @@ theorem small_filtration
   obtain ⟨b, hb, hbs⟩ := hg
   have hr : 0 ≤ r := (norm_nonneg _).trans (har 0)
   have hs : 0 ≤ s := (norm_nonneg _).trans (hbs 0)
-  obtain ⟨h1, h2, -, h4⟩ := GlobalTheory.T.qExpansion_linear_combination F f g a b c ha hb
+  obtain ⟨h1, h2, -, h4⟩ := _root_.GlobalTheory.HilbertThetaSeries.hasQ_lin F f g a b c ha hb
   refine ⟨
     ⟨a + b, h1, fun ξ => ?_⟩,
     ?_,
@@ -69,7 +69,7 @@ theorem small_filtration
   ⟩
   · rw [Pi.add_apply, map_add (f := _)]
     exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le_max (har ξ) (hbs ξ))
-  · obtain ⟨d, hd, hds⟩ := GlobalTheory.T.qExpansion_mul_finite_convolution F f g a b ha hb
+  · obtain ⟨d, hd, hds⟩ := _root_.GlobalTheory.HilbertThetaSeries.hasQ_mul F f g a b ha hb
     refine ⟨d, hd, fun ξ => ?_⟩
     obtain ⟨t, ht⟩ := hds ξ
 
@@ -89,13 +89,3 @@ open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.Conjuga
   GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
   GlobalTheory.HilbertThetaSeries
 open scoped Matrix
-theorem _root_.GlobalTheory.T.hilbertQExp_padicBound_algebra_properties
-    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime]
-        (ι : Qbar p ≃+* ℂ) (r s : ℝ) (f g : Hn F → ℂ) (c : ℂ),
-      Small ι r f → Small ι s g
-        → Small ι (max r s) (f + g) ∧ Small ι (r * s) (f * g) ∧ Small ι (‖ι.symm c‖ * r) (c • f)
-          ∧ (r ≤ s → Small ι s f) ∧ 0 ≤ r ∧ Small ι ‖ι.symm c‖ (fun _ : Hn F => c) := by
-  first
-  | exact @GlobalTheory.HilbertThetaSeries.small_filtration
-  | exact GlobalTheory.HilbertThetaSeries.small_filtration
-  | (intros; apply GlobalTheory.HilbertThetaSeries.small_filtration <;> assumption)

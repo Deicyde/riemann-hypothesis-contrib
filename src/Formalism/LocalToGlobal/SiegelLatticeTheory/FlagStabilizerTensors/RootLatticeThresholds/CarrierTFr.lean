@@ -222,7 +222,7 @@ theorem onCut_setting
           = (S.G.place (S.pl v)).v S.l - 1 / 2 - de S.l * (S.G.place (S.pl v)).Del := by
     intro de
     simp only [Formalism.FourierDecayAlt.Sz.Cfg.u, if_neg hl1, if_neg hlk, Nat.add_sub_cancel]
-  simp only [Formalism.FourierDecayAlt.I.OnCut, Formalism.FourierDecayAlt.D.parOf, hu]
+  simp only [Formalism.FourierDecayAlt.I.OnCut, hu]
   have hN : (0 : ℝ) ≤ (S.Ntop : ℝ) := Nat.cast_nonneg _
   have hD : 5 ≤ (S.G.place (S.pl v)).Del := by nlinarith [pow_nonneg hN 3]
   rcases hw.1 S.l with h0 | h0 <;> rcases hw'.1 S.l with h0' | h0'
@@ -299,9 +299,7 @@ theorem isBuiltPlace_carrierInT
     hA,
     ?_
   ⟩
-  · first
-    | exact Formalism.L2.SG.DataInst.unram_host D
-    | exact Formalism.L2.SG.Pf.CarrierSz.unram_host D
+  · first | exact Formalism.L2.SG.DataInst.unram_host D
   · exact onCut_setting _ hw hw' hl1 hl2 hne hG
 
 theorem exists_Cc_data
@@ -351,12 +349,7 @@ theorem exists_Cc_data
                 (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st
                 (l + 1) := by
   have hLAB : Formalism.FourierDecayAlt.JCT.LevelsActualBuilt := by
-    first
-    | exact Formalism.FourierDecayAlt.P.levels_of_built_setting
-    | exact Formalism.FourierDecayAlt.P.JCT.levelsActualBuilt_proof
-    | exact Formalism.FourierDecayAlt.JCT.levelsActualBuilt
-    | exact Formalism.FourierDecayAlt.P.levelsActualBuilt_proof
-    | exact Formalism.FourierDecayAlt.P.levelsActualBuilt
+    first | exact Formalism.FourierDecayAlt.P.levels_of_built_setting
   obtain ⟨Cc, hC⟩ := hLAB
   refine ⟨Cc, ?_⟩
   intro D X θ C u u' e he hv CA de de' l grid grid1 fc c ν' m₀ Θ TP A₀ hB j

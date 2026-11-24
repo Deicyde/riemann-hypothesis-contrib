@@ -99,7 +99,6 @@ theorem hhFl_word
           (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1)
           (fun k => GroundTheory.Heights₂.Heights.LowerBoundFree.xLine Ψ N (w k))) := by
   have hdeg : (∑ i, Finsupp.single (w i) (1 : ℕ)).degree = dimFl Ψ N + 1 := by
-
     rw [map_sum]
     simp [Finsupp.degree_single]
   rw [HhModel.hhFl_monomial, hdeg]

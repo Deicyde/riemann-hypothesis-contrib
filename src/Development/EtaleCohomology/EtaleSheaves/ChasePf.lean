@@ -253,8 +253,7 @@ theorem Chase_of : DiagramChase₂ := by
               ≫ pullback.fst (D.map (g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ U)).ι
                 (D.map (g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ V)).ι) := by
         apply (cancel_mono (Scheme.Opens.ι _)).1
-        simp [Category.assoc, rL, rT, Scheme.Hom.resLE_comp_ι_assoc, psi_inv_fst,
-          (reassoc_of% psi_inv_fst), psi_inv_snd, pullback.condition_assoc, Cone.w]
+        simp [Category.assoc, rT, psi_inv_fst, pullback.condition_assoc]
       have E4
           : (pullback.snd (D.map (g4 ≫ g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ U)).ι
                 (D.map (g4 ≫ g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ V)).ι
@@ -265,8 +264,7 @@ theorem Chase_of : DiagramChase₂ := by
               ≫ pullback.snd (D.map (g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ U)).ι
                 (D.map (g1 ≫ f1) ⁻¹ᵁ (e.hom ⁻¹ᵁ V)).ι) := by
         apply (cancel_mono (Scheme.Opens.ι _)).1
-        simp [Category.assoc, rL, rT, Scheme.Hom.resLE_comp_ι_assoc, psi_inv_fst,
-          (reassoc_of% psi_inv_fst), psi_inv_snd, pullback.condition_assoc, Cone.w]
+        simp [Category.assoc, rT, psi_inv_snd, pullback.condition_assoc]
       rw [hdC, ha3d, hb3d]
       simp only [map_sub]
       rw [pp24 E3, pp24 E4]

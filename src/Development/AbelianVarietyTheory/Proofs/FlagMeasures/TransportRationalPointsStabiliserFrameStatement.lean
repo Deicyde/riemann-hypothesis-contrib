@@ -45,6 +45,7 @@ open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
   Formalism.L2.SG.ColDict GlobalTheory.St
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.transport_rational_points_stabiliser_frame
     : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V)
         (ιA : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.transport_rational_points_stabiliser_frame
                       (Formalism.UG.inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) g
                   → sTil X wt (iotaI X u γ : X.B.I.Ginf)
                     = Formalism.L2.Forms.atInf (Formalism.L2.Forms.embT D) g.1 := by
-  first
-  | exact @GlobalTheory.transport_rational_points
-  | exact GlobalTheory.transport_rational_points
-  | (intros; apply GlobalTheory.transport_rational_points <;> assumption)
+  first | exact @GlobalTheory.transport_rational_points

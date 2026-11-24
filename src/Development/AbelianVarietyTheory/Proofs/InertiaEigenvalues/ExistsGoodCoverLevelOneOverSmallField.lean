@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.Ration
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
 public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.RatDatOfReal
 public import Formalism.SharpRestriction.Divisibility.LiftErrorLocal
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.NumericalConsequencesOfPinsStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.CuspidalL2Subspace
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsGenFrGenFr
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.NumericalConsequencesOfPins
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsGoodCoverGalois
 public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
 import Mathlib.Algebra.Order.Floor.Extended
@@ -140,7 +142,7 @@ theorem exists_goodCover_small
     hroots j hV hOM hFP n
   haveI : Normal ℚ (smallF D) := smallF_normal D hgal
   have hle : T.Q.c.F ≤ smallF D := core_le_small T Rl cG S YS hLaws hTie.alg j
-  have hnum := GlobalTheory.T.numerical_consequences_of_pins D T.Q hLaws.toLawsM.pins
+  have hnum := _root_.GlobalTheory.PinNum.numerics_of_pins D T.Q hLaws.toLawsM.pins
   have hMg : T.Q.l.M = D.host.g 0 * D.host.g 1 := hLaws.toLawsM.pins.2.1.1
   have hz : ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta (T.Q.l.M * 1) ∈ smallF D := by
     rw [mul_one, ← hnum.2.2.1]; exact hle T.Q.c.zeta_mem

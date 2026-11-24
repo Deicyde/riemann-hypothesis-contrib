@@ -58,7 +58,6 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
 
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp.TwConj
@@ -258,7 +257,6 @@ theorem eq_smul_of_conj
   have e1 := Fintype.linearIndependent_iffₛ.1 hφ _ _ h1
   have e2 := Fintype.linearIndependent_iffₛ.1 hφ _ _ h2
   have e3 : ∀ a, ρ'.ek i b k (A a) = c * ν * ν'⁻¹ * ρ'.ek i b k (A' a) := fun a => by
-
     rw [← e2, ← hτ _ (Or.inr ⟨a, rfl⟩), e1, map_sum]
     exact Finset.sum_congr rfl fun l _ => by rw [map_mul, hfix]
   have hinj :=

@@ -1,11 +1,11 @@
 module
 
 public import Formalism.SharpRestriction.CuspSpanNormBounds.GlobAut
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitaryHaarBiInvariantStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitaryHaarBiInvariant
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AestronglyMeasurableCompRep
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalUnitaryPointsDiscreteFundamentalDomain
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StrongApproximationUnitaryUnipotentRadical
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FiniteAdelicUnitaryCongruenceTopology
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalUnitaryPointsDiscreteFundamentalDomainStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StrongApproximationUnitaryUnipotentRadicalStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -364,9 +364,8 @@ theorem cuspidal_closed_stable
   intro B
   classical
   obtain ⟨hT2, hLC, hSC, -⟩ := GlobalTheory.CongTop.adelic_topology B.I
-  obtain ⟨Γ, hΓset, hΓc, hΓfin, hΓfd⟩ :=
-    GlobalTheory.T.rationalUnitaryPoints_discrete_fundamentalDomain B.I
-  have h8 := GlobalTheory.T.adelicUnitaryHaar_bi_invariant B.I B.μf
+  obtain ⟨Γ, hΓset, hΓc, hΓfin, hΓfd⟩ := _root_.GlobalTheory.RatDiscrete.rational_points B.I
+  have h8 := _root_.GlobalTheory.AdelicUnimod.adelic_unimodular B.I B.μf
   have : (B.I.muA B.μf).IsMulLeftInvariant := ⟨h8.1⟩
   have : (B.I.muA B.μf).IsMulRightInvariant := ⟨h8.2.1⟩
   have : SFinite (B.I.muA B.μf) := by
@@ -399,7 +398,7 @@ theorem cuspidal_closed_stable
               → ∃ Cp : Set B.I.GA, IsCompact Cp ∧ ∀ᵐ m ∂ν, ∃ γ : Γ, (γ : B.I.GA)⁻¹ * m ∈ Cp := by
     intro W hW ν hνW
     obtain ⟨-, -, -, -, Cp, hCp, -, hCpm⟩ :=
-      GlobalTheory.T.strong_approximation_unitaryUnipotentRadical B.I W hW
+      _root_.GlobalTheory.UnipApprox.strong_approximation B.I W hW
     refine ⟨Cp, hCp, ?_⟩
     have hN : ∀ᵐ m ∂ν, m ∈ B.I.NA W := ae_iff.2 hνW.2.2.1
     filter_upwards [hN] with m hm

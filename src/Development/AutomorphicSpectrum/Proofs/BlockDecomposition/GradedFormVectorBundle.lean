@@ -1,8 +1,10 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StCocycle
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoordinatesRestrictAffineOpenStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InOpenFiniteInfIffStatement
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.CapOComp
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.SEqOne
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoordinatesRestrictAffineOpen
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InOpenFiniteInfIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -89,7 +91,7 @@ theorem st_iff {Q : ObjectProperty (Thick (LL q))} {W : X.Opens} (T : Thick (LL 
 theorem inU_capO {ι : Type} (U : ι → X.Opens) {n : ℕ} (i : Fin n → ι) (T : Thick (LL q))
     : InU (capO U i) T ↔ ∀ a, InU (U (i a)) T := by
   have e : capO U i = ⨅ a ∈ (Finset.univ : Finset (Fin n)), U (i a) := by simp [capO]
-  rw [e, GlobalTheory.T.inOpen_finite_inf_iff (fun a => U (i a)) Finset.univ T]
+  rw [e, _root_.GlobalTheory.CompanionTheory.Thick.inU_iInf_finset (fun a => U (i a)) Finset.univ T]
   simp
 
 theorem capT_eq (l s : ℕ) {ι : Type} (U : ι → X.Opens) {n : ℕ} (i : Fin (n + 1) → ι)
@@ -171,7 +173,7 @@ theorem free_at
     {P : ObjectProperty (Thick (LL q))} (hP : P = SS q l s W)
     : Free W P r u := by
   subst hP
-  obtain ⟨c', hc'⟩ := GlobalTheory.T.coordinates_restrict_affine_open c h hW
+  obtain ⟨c', hc'⟩ := _root_.GlobalTheory.CompanionTheory.CoordRes.main c h hW
   exact hL l s hb q c' u (isLift_res h hu hc') r hr
 
 theorem chg

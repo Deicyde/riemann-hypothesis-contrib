@@ -66,7 +66,7 @@ private theorem ncard_orbit_in_stabilizer_eq_relIndex
       : MulAction.stabilizer (MulAction.stabilizer G y) t
         = (MulAction.stabilizer G t).subgroupOf (MulAction.stabilizer G y) := by
     ext g
-    simp [Subgroup.mem_subgroupOf, MulAction.mem_stabilizer_iff, Subgroup.smul_def]
+    simp [MulAction.mem_stabilizer_iff, Subgroup.smul_def]
   have h2
       : MulAction.orbit (MulAction.stabilizer G y) t
         = {x : X | ∃ g : G, g • y = y ∧ g • t = x} := by
@@ -164,11 +164,6 @@ theorem ncard_biUnion_finset
       (fun i hi => hf i (Finset.mem_insert_of_mem hi))
       (hd.subset (Finset.coe_subset.2 (Finset.subset_insert a s)))]
 
-theorem ncard_orb {X Y : Type*} [MulAction G X] [MulAction G Y] (t : X) (y : Y)
-    : {x : X | ∃ g : G, g • y = y ∧ g • t = x}.ncard
-      = (MulAction.stabilizer G t).relIndex (MulAction.stabilizer G y) := by
-  exact ncard_orbit_in_stabilizer_eq_relIndex t y
-
 theorem sum_relIndex_fibre
     {X Y : Type*} [MulAction G X] [MulAction G Y]
     (π : X → Y) (hπ : ∀ (g : G) x, π (g • x) = g • π x)
@@ -206,7 +201,8 @@ theorem sum_relIndex_fibre
       intro t ht
       rw [Finset.mem_filter] at ht
       apply Set.finite_of_ncard_ne_zero
-      rw [ncard_orb, ← ht.2]
+      rw [_root_.Formalism.HermitianLattices.Ext.L3.LIOrb.ncard_orbit_in_stabilizer_eq_relIndex,
+        ← ht.2]
       exact hfin t ht.1
     have hdisj
         : (↑(sX.filter (fun t => π t = y)) : Set X).PairwiseDisjoint
@@ -223,7 +219,7 @@ theorem sum_relIndex_fibre
     push_cast
     refine Finset.sum_congr rfl fun t ht => ?_
     rw [Finset.mem_filter] at ht
-    rw [ncard_orb, ht.2]
+    rw [_root_.Formalism.HermitianLattices.Ext.L3.LIOrb.ncard_orbit_in_stabilizer_eq_relIndex, ht.2]
   symm
   calc
     ∑ y ∈ sY, (Nat.card {x // x ∈ A ∧ π x = y} : ℝ) * w y

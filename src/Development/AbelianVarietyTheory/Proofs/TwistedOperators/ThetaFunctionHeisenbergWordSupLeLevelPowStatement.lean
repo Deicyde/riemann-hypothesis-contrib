@@ -59,6 +59,7 @@ open GlobalTheory.SquareComm
 open scoped Pointwise
 open Formalism.IndefR.Datum
 open GlobalTheory.Grid
+
 theorem _root_.GlobalTheory.T.thetaFunction_heisenbergWord_sup_le_level_pow
     : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.thetaFunction_heisenbergWord_sup_le_level_pow
                                       (GlobalTheory.Size.heisDer ψ θ) l f)
                                     ≤ ENNReal.ofReal (C * (n : ℝ) ^ B) * GlobalTheory.Size.sobO
                                       (V := V) (W := X) ψ θ μ 𝓕 (k + l.length) f := by
-  first
-  | exact @GlobalTheory.LevelSupBound.supN_word_le
-  | exact GlobalTheory.LevelSupBound.supN_word_le
-  | (intros; apply GlobalTheory.LevelSupBound.supN_word_le <;> assumption)
+  first | exact @GlobalTheory.LevelSupBound.supN_word_le

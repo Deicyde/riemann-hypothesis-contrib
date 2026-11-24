@@ -60,8 +60,6 @@ public import Lean.Meta.Injective
 
 @[expose] public section
 
-
-
 section
 section
 namespace GlobalTheory.Mem.LiteralAutomorphy

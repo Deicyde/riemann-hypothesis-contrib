@@ -227,9 +227,7 @@ theorem contracts_chain
         σ 0 (g 0) v))) = σ (Fin.last (m + 1)) (g (Fin.last (m + 1))) (π' (LinearMap.lTensor _ π₀ (ψ (f ⊗ₜ v))))
       obtain ⟨y, rfl⟩ := e.surjective f
       induction y using TensorProduct.induction_on with
-      | zero =>
-        simp only [map_zero, TensorProduct.zero_tmul]
-        all_goals exact (map_zero _).symm
+      | zero => simp only [map_zero, TensorProduct.zero_tmul]
       | tmul t a =>
         rw [he, hψ, hψ, LinearMap.lTensor_tmul, LinearMap.lTensor_tmul]
         have h0

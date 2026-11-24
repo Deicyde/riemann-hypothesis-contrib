@@ -166,7 +166,7 @@ theorem val_const
     rw [Scheme.Hom.appLE_comp_appLE]
     have : ∀ (q : Sp K ⟶ Sp K) (_ : q = 𝟙 _) e, q.appLE ⊤ ⊤ e = 𝟙 _ := by
       rintro _ rfl e
-      simp only [Scheme.Hom.appLE, Scheme.Hom.id_app, Category.id_comp]
+      simp only [Scheme.Hom.appLE, Scheme.Hom.id_app]
       exact (Sp K).presheaf.map_id _
     exact this _ hz _
   have h2
@@ -756,7 +756,6 @@ theorem card_zeros_on_torsion_coset_le
   · obtain ⟨h', hh'⟩ := hpull K P N k h
     refine ⟨h', fun z => ?_⟩
     rw [hh']
-    beta_reduce
     rw [e z]
     rfl
 

@@ -41,8 +41,6 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabF
 
 @[expose] public section
 
-
-
 section
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
@@ -52,6 +50,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 namespace GlobalTheory.GoodFirst
+
 theorem firstTermCondition_forall_stages_alt
     : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt
       → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists,
@@ -60,7 +59,7 @@ theorem firstTermCondition_forall_stages_alt
   intro hP hL
   have h :=
     GlobalTheory.HeightCounting.Up.RowModel.overRows_allSt
-      (_root_.GlobalTheory.T.nonGalois_typeVec_fixed_by_e0 hP)
+      (_root_.GlobalTheory.TypeVec.exists_typeVec_nonGalois_ne_zero hP)
   refine EvG.imp h fun _ _ _ _ _ hK => large₂.imp hK fun B f T _ H kp fo tr w s P x l => ?_
   have hloc := H kp fo tr w s P x
   have ty : TypesTrue (Dof x).ntypes (Fr.at (w.st x.o.Z) f).P (Fr.at (w.st x.o.Z) f).W := x.fits.grp
@@ -75,6 +74,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
   GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
+
 theorem _root_.GlobalTheory.T.allSt_goodFTAll_of_levelA
     : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt
       → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists,

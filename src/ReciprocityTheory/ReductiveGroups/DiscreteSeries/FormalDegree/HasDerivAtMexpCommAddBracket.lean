@@ -299,7 +299,7 @@ private theorem pmat_spectral {ε : Fin n → Bool} (y : PCoord ε → ℂ)
         * (((pmat_isHermitian y).eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ))ᴴ := by
   have h := (pmat_isHermitian y).spectral_theorem
   conv_lhs => rw [h]
-  first | rfl | simp [Function.comp_def, Matrix.star_eq_conjTranspose, pev]
+  first | rfl
 
 theorem hasDerivAt_exp_two {ε : Fin n → Bool} (y : PCoord ε → ℂ) (W : Matrix (Fin n) (Fin n) ℂ)
     : HasDerivAt

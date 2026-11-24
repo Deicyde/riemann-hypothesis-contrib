@@ -3,10 +3,12 @@ module
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ResBound
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapAevalNab
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapExactMiddle
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelObjAndAbcStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelPreimageOfInjectiveFinDimRepModelHomStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TwistedModelAdmissibleCocycles
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelObjAndAbc
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelPreimageOfInjectiveFinDimRepModelHom
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelPushOfSurjective
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistedPhiGammaModelCharacterEqStandardStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistedPhiGammaModelCharacterEqStandard
+public import Mathlib.LinearAlgebra.Eigenspace.Minpoly
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -18,7 +20,6 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.LinearAlgebra.Eigenspace.Minpoly
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -137,7 +138,7 @@ theorem exists_model_repr_inZZ
     rw [h]
     change _ = (((1 : G →* kˣ) σ : kˣ) : k) • p x
     simp
-  obtain ⟨oE, -, hAB, hC⟩ := GlobalTheory.T.obj_and_abc_of_model F M E NE hNE
+  obtain ⟨oE, -, hAB, hC⟩ := _root_.GlobalTheory.Models.model_obj_and_abc F M E NE hNE
   have oA := F.obj_sub A E a ha hai oE
   have o1 := F.obj_one
   have hq : M.Model (chr 1) (F.push E (chr 1) p NE) :=
@@ -147,7 +148,7 @@ theorem exists_model_repr_inZZ
   have hpush : ∀ i, F.push E (chr 1) p NE i = Submodule.span k⟦X⟧ {F.unit i} := fun i => by
     rw [← M.χ_zero i]
     exact congrFun
-      (GlobalTheory.T.twistedPhiGammaModel_character_eq_standard F M h1 h2 h3 0 le_rfl
+      (_root_.GlobalTheory.Models.CharModel.model_chr_eq F M h1 h2 h3 0 le_rfl
         (by exact_mod_cast Dt.one_le_letterBlockLength) _ (hq' _ (by simp)))
       i
   have hε : ∀ i, ∃ ε ∈ NE i, F.map E (chr 1) p i ε = F.unit i := fun i => by
@@ -171,7 +172,7 @@ theorem exists_model_repr_inZZ
     F.pre A E a NE,
     b,
     g,
-    GlobalTheory.T.model_preimage_of_injective_finDimRepModelHom F M A E a NE ha hai hNE,
+    _root_.GlobalTheory.Models.SubModel.model_pre F M A E a NE ha hai hNE,
     ⟨E, a, p, e, ε, oE, ha, hp, hai, hex, hpe, hez, fun i => ⟨hεp i, hb i, hg i⟩⟩,
     fun i => ⟨?_, ?_, ?_, ?_⟩
   ⟩

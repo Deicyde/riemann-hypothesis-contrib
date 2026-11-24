@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaDistribution_invariant_rationalTarget
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.thetaDistribution_invariant_rationalTarget
                       IsFinWeil ψ S T ΛS ΛT (η ^ S.rank) (η ^ T.rank) of → IsInfWeil ψ θ S T oi
                         → ∀ γ' ∈ GQ T, ∀ f,
                           IsThetaFunO ψ S T f → of (1, γ') (oi (1, γ') f) 0 = f 0 := by
-  first
-  | exact @GlobalTheory.RatAut.automorphy_target
-  | exact GlobalTheory.RatAut.automorphy_target
-  | (intros; apply GlobalTheory.RatAut.automorphy_target <;> assumption)
+  first | exact @GlobalTheory.RatAut.automorphy_target

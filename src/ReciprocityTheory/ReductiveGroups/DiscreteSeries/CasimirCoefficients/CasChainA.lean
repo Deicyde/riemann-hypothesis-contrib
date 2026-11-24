@@ -235,7 +235,7 @@ theorem cca_contDiffOn_nat [FiniteDimensional ℂ X] [CompleteSpace E] {U : Set 
       intro u
       exact ih (cca_differentiableOn_fderiv_apply hU hF u)
     rw [Nat.cast_succ, contDiffOn_succ_iff_fderiv_of_isOpen hU]
-    first | exact ⟨hF, fun h => absurd h (by simp), hk⟩ | exact ⟨hF, hk⟩
+    first | exact ⟨hF, fun h => absurd h (by simp), hk⟩
 
 theorem cca_contDiffOn
     [FiniteDimensional ℂ X] [CompleteSpace E]

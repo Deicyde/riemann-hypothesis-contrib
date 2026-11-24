@@ -46,6 +46,7 @@ open MeasureTheory Matrix GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.PairLift
+
 theorem _root_.GlobalTheory.T.fockVectors_conjAdjointPullback_bijection
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
       IsStdChar D ψ (-1) → IsInfFam θ
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.fockVectors_conjAdjointPullback_bijection
               IsVacF ψ θ A B f
                 → IsVacF ψ θ B A (dag S T f)
                   ∧ ∀ P, ptF ψ θ B A (dag S T f) (j P) = dag S T (ptF ψ θ A B f P) := by
-  first
-  | exact @GlobalTheory.FockAdjoint.fock_dag
-  | exact GlobalTheory.FockAdjoint.fock_dag
-  | (intros; apply GlobalTheory.FockAdjoint.fock_dag <;> assumption)
+  first | exact @GlobalTheory.FockAdjoint.fock_dag

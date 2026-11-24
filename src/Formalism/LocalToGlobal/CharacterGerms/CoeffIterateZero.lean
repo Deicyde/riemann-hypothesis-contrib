@@ -148,11 +148,7 @@ theorem noConst_iff (t : B → MvPowerSeries Z k)
     simpa using h0
   · intro h c A hA
     have hA0 : A.degree = 0 := by omega
-    have hA1 : A = 0 := by
-      first
-      | exact (Finsupp.degree_eq_zero_iff A).mp hA0
-      | exact Finsupp.degree_eq_zero_iff.mp hA0
-      | simpa using hA0
+    have hA1 : A = 0 := by first | exact (Finsupp.degree_eq_zero_iff A).mp hA0
     subst hA1
     simpa using h c
 
@@ -196,13 +192,7 @@ theorem coeff_Ps (t : I → MvPowerSeries I C) (c : I) (μ : I →₀ ℕ)
   rfl
 
 theorem two_le_pow (s : ℕ) : 2 ≤ V.l ^ (s + 1) := by
-  first
-  | exact V.3.two_le.trans (Nat.le_self_pow (Nat.succ_ne_zero s) _)
-  | exact le_trans V.3.two_le (Nat.le_self_pow (by omega) _)
-  | calc
-      2 ≤ V.l := V.3.two_le
-      _ = V.l ^ 1 := (pow_one _).symm
-      _ ≤ V.l ^ (s + 1) := Nat.pow_le_pow_right V.3.pos (by omega)
+  first | exact V.3.two_le.trans (Nat.le_self_pow (Nat.succ_ne_zero s) _)
 
 theorem contr : Contr S.Ps := by
   refine ⟨?_, ?_⟩

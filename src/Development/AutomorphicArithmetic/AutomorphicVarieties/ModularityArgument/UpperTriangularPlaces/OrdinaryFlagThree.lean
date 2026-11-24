@@ -46,9 +46,6 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuLinked.M
 
 @[expose] public section
 
-attribute [-instance]
-  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
-
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
   Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.U3
   UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.Th UpperTheory.V.Z.J
@@ -106,13 +103,12 @@ private theorem weight_rev_eq_neg (i : Fin 3) : wt1 i.rev = - wt1 i := by
 private theorem left_conj_pos
     {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = 1) (h2 : y.right = 1)
     : (x * y * x⁻¹).left = x.left * y.left * x.left⁻¹ := by
-  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_one]
+  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2]
 
 private theorem left_conj_neg
     {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = -1) (h2 : y.right = 1)
     : (x * y * x⁻¹).left = x.left * theta y.left * x.left⁻¹ := by
-  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_neg_one, sgnAct_one,
-    theta_theta]
+  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_neg_one, theta_theta]
 
 private theorem conj_left
     {D A : Type} [Group D] [CommRing A]

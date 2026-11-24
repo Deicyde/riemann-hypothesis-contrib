@@ -51,7 +51,6 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JEvExi
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH

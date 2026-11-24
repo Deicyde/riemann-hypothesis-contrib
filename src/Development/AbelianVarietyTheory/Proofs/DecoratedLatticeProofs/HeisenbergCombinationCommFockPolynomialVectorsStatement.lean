@@ -50,6 +50,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heisenberg_combination_comm_fockPolynomialVectors
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D),
       IsStdChar D ψ (-1) → IsInfFam θ
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.heisenberg_combination_comm_fockPolynomialVectors
                   ∑ i, a i • heisO ψ S T (y i) (pureTensorO ψ θ S T sS sT BS BT f φ)
                       = pureTensorO ψ θ S T sS sT BS BT (∑ i, a i • heisO ψ S T (y i) f) φ
                     ∧ pureTensorO ψ θ S T sS sT BS BT (0 : WO S T → ℂ) φ = 0 := by
-  first
-  | exact @GlobalTheory.FockFiniteHeis.heis_comb_pureTensorO
-  | exact GlobalTheory.FockFiniteHeis.heis_comb_pureTensorO
-  | (intros; apply GlobalTheory.FockFiniteHeis.heis_comb_pureTensorO <;> assumption)
+  first | exact @GlobalTheory.FockFiniteHeis.heis_comb_pureTensorO

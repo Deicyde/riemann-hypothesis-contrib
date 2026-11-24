@@ -144,7 +144,7 @@ theorem rank_le
     : Module.rank ℂ (goodPart θ M J χ e ⊓ hPart M J0 ok pl q Sg : Submodule ℂ (MMap M))
       ≤ Module.rank ℂ
         (goodPart θ M' J χ' e' ⊓ hPart M' J0 ok pl q Sg' : Submodule ℂ (MMap M')) := by
-  obtain ⟨h, hM⟩ := GlobalTheory.T.complexConjugation_maps_multiplicitySpace θ M M' c hc
+  obtain ⟨h, hM⟩ := _root_.GlobalTheory.ConjMult.conj_mult θ M M' c hc
   have key
       : ∀ T ∈ (goodPart θ M J χ e ⊓ hPart M J0 ok pl q Sg : Submodule ℂ (MMap M)),
         conjMap M M' c h T

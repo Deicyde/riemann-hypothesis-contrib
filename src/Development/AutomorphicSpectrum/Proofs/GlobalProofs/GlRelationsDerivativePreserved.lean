@@ -3,12 +3,14 @@ module
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsSubquotientDetRepParInd
 public import Formalism.RealPlaceAnalysis.StatementE
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CapelliDetBlockLeviCongrModUpperBlockIdeal
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CapelliDetBlockLeviCongrModUpperBlockIdealStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CapelliLeviFactorizationSum
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CapelliOperatorsCommute
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CapelliPolynomialCoefficientsIdeal
-import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MonicFactorCoefficientsIntegralStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.QuantumDeterminantPolynomialCoefficients
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ContinuousConjFin
+import Mathlib.Basic.Complex.Basic
+import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MonicFactorCoefficientsIntegral
 import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -48,7 +50,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ContinuousConjFin
 
 @[expose] public section
 
@@ -79,8 +80,8 @@ theorem isIntegral_coeff_of_shifted_prod
       refine Finset.prod_congr rfl fun i _ => ?_
       simp [eval_comp, map_add (f := _)]
     have key :=
-      GlobalTheory.T.monic_factor_coefficients_integral A (P a) Q (c a) 0
-        (hm a (Finset.mem_insert_self a s)) hQm
+      _root_.GlobalTheory.CompanionTheory.IntFac.isIntegral_coeff_of_shifted_product A (P a) Q (c a)
+        0 (hm a (Finset.mem_insert_self a s)) hQm
         (fun u => by
           rw [add_zero, hQe]
           have := h u
@@ -223,7 +224,7 @@ theorem map_qdet_eq_map_blocks
     Subtype.ext (by
       have := hX a b c' d
       split_ifs at this ⊢ <;> simpa [Xs] using this)
-  have key := GlobalTheory.T.capelliDet_block_levi_congr_mod_upperBlockIdeal S n h Xs hXr u
+  have key := _root_.GlobalTheory.CapHC.qdet_blocks_congr S n h Xs hXr u
   let Lm : S →ₗ[ℂ] Q := {
     toFun := fun w => L ((w : Module.End ℂ W) G)
     map_add' := fun a b => by simp

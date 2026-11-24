@@ -73,12 +73,9 @@ def mfact (m : σ →₀ ℕ) : ℕ := ∏ k ∈ m.support, (m k).factorial
 def fockS (f g : MvPolynomial σ K) : K :=
   ∑ m ∈ f.support, star (f.coeff m) * g.coeff m * (mfact m : K)
 
-theorem fockS_eq_sum (f g : MvPolynomial σ K) (s : Finset (σ →₀ ℕ)) (hs : f.support ⊆ s) :
-    fockS f g = ∑ m ∈ s, star (f.coeff m) * g.coeff m * (mfact m : K) := by
-  refine Finset.sum_subset hs ?_
-  intro m _ hm
-  rw [notMem_support_iff.mp hm]
-  simp
+theorem fockS_eq_sum (f g : MvPolynomial σ K) (s : Finset (σ →₀ ℕ)) (hs : f.support ⊆ s)
+    : fockS f g = ∑ m ∈ s, star (f.coeff m) * g.coeff m * (mfact m : K) := by
+  refine Finset.sum_subset hs fun m _ hm => by simp [notMem_support_iff.mp hm]
 
 def fockL : MvPolynomial σ K →ₗ⋆[K] MvPolynomial σ K →ₗ[K] K :=
   LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K) fockS
@@ -87,14 +84,17 @@ def fockL : MvPolynomial σ K →ₗ⋆[K] MvPolynomial σ K →ₗ[K] K :=
       intro f f' g
       rw [fockS_eq_sum (f + f') g (f.support ∪ f'.support) support_add,
         fockS_eq_sum f g (f.support ∪ f'.support) Finset.subset_union_left,
-        fockS_eq_sum f' g (f.support ∪ f'.support) Finset.subset_union_right, ← Finset.sum_add_distrib]
+        fockS_eq_sum f' g (f.support ∪ f'.support) Finset.subset_union_right,
+        ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun m _ => ?_
-      rw [MvPolynomial.coeff_add, star_add]; ring)
+      rw [MvPolynomial.coeff_add, star_add]
+      ring)
     (by
       intro c f g
       rw [fockS_eq_sum (c • f) g f.support (support_smul), fockS, smul_eq_mul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun m _ => ?_
-      rw [MvPolynomial.coeff_smul, smul_eq_mul, star_mul', starRingEnd_apply]; ring)
+      rw [MvPolynomial.coeff_smul, smul_eq_mul, star_mul', starRingEnd_apply]
+      ring)
     (by
       intro f g g'
       simp only [fockS, MvPolynomial.coeff_add, mul_add, add_mul, Finset.sum_add_distrib])
@@ -114,30 +114,39 @@ variable {K : Type} [Field K] {ι : Type} [Fintype ι] {n : ℕ}
 
 abbrev Pol (K ι : Type) [Field K] (n : ℕ) : Type := MvPolynomial (ι × Fin n × Fin n) K
 
-def ten (f : ι → MvPolynomial (Fin n × Fin n) K) : Pol K ι n := ∏ τ, Formalism.GradedWeylDivisibility.blockEmb K τ (f τ)
+def ten (f : ι → MvPolynomial (Fin n × Fin n) K) : Pol K ι n :=
+  ∏ τ, Formalism.GradedWeylDivisibility.blockEmb K τ (f τ)
 
 def VV (K : Type) [Field K] (lam : ι → DomWeight n) : Submodule K (Pol K ι n) :=
   Formalism.GradedWeylDivisibility.tensorLat K K fun τ => nablaSq K n (lam τ)
 
-def detTwK (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) : K := ∏ τ, detPow K n (g τ) (lam τ).detShift
+def detTwK (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) : K :=
+  ∏ τ, detPow K n (g τ) (lam τ).detShift
 
 def trAct (g : ι → GL (Fin n) K) : Pol K ι n →ₐ[K] Pol K ι n :=
-  Formalism.GradedWeylDivisibility.blockAct K fun τ => ((g τ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)ᵀ
+  Formalism.GradedWeylDivisibility.blockAct K fun τ =>
+    ((g τ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)ᵀ
 
 def actP (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) : Pol K ι n →ₗ[K] Pol K ι n :=
   detTwK lam g • (trAct g).toLinearMap
 
-theorem blockAct_comp (g h : ι → Matrix (Fin n) (Fin n) K) :
-    (Formalism.GradedWeylDivisibility.blockAct K (n := n) g).comp (Formalism.GradedWeylDivisibility.blockAct K h) = Formalism.GradedWeylDivisibility.blockAct K fun τ => h τ * g τ := by
+theorem blockAct_comp (g h : ι → Matrix (Fin n) (Fin n) K)
+    : (Formalism.GradedWeylDivisibility.blockAct K (n := n) g).comp
+        (Formalism.GradedWeylDivisibility.blockAct K h)
+      = Formalism.GradedWeylDivisibility.blockAct K fun τ => h τ * g τ := by
   apply MvPolynomial.algHom_ext
   intro v
 
-  simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.blockAct, aeval_X, map_sum, map_mul, algHom_C, Matrix.mul_apply]
+  simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.blockAct, aeval_X, map_sum,
+    map_mul, algHom_C, Matrix.mul_apply]
   simp only [algebraMap_eq, Finset.mul_sum, Finset.sum_mul, ← C_mul]
   rw [Finset.sum_comm]
   simp [C_mul, mul_assoc]
 
-theorem blockAct_one : Formalism.GradedWeylDivisibility.blockAct K (n := n) (fun _ : ι => (1 : Matrix (Fin n) (Fin n) K)) = AlgHom.id K _ := by
+theorem blockAct_one
+    : Formalism.GradedWeylDivisibility.blockAct K (n := n)
+        (fun _ : ι => (1 : Matrix (Fin n) (Fin n) K))
+      = AlgHom.id K _ := by
   apply MvPolynomial.algHom_ext
   intro v
   simp only [Formalism.GradedWeylDivisibility.blockAct, aeval_X, Matrix.one_apply, AlgHom.id_apply]
@@ -148,30 +157,22 @@ theorem blockAct_one : Formalism.GradedWeylDivisibility.blockAct K (n := n) (fun
   · simp
 
 theorem trAct_mul (g h : ι → GL (Fin n) K) : trAct (g * h) = (trAct g).comp (trAct h) := by
-  unfold trAct
-  rw [blockAct_comp]
+  simp only [trAct, blockAct_comp]
   congr 1
   funext τ
   simp [Matrix.transpose_mul]
 
 theorem trAct_one : trAct (1 : ι → GL (Fin n) K) = AlgHom.id K _ := by
-  unfold trAct
-  rw [← blockAct_one]
-  congr 1
-  funext τ
-  simp
+  simpa [trAct] using blockAct_one (K := K) (ι := ι) (n := n)
 
-theorem detTwK_mul (lam : ι → DomWeight n) (g h : ι → GL (Fin n) K) :
-    detTwK lam (g * h) = detTwK lam g * detTwK lam h := by
+theorem detTwK_mul (lam : ι → DomWeight n) (g h : ι → GL (Fin n) K)
+    : detTwK lam (g * h) = detTwK lam g * detTwK lam h := by
   unfold detTwK
   rw [← Finset.prod_mul_distrib]
-  refine Finset.prod_congr rfl fun τ _ => ?_
-  simp [detPow, mul_zpow]
+  exact Finset.prod_congr rfl fun τ _ => by simp [detPow, mul_zpow]
 
 theorem detTwK_one (lam : ι → DomWeight n) : detTwK lam (1 : ι → GL (Fin n) K) = 1 := by
-  unfold detTwK
-  refine Finset.prod_eq_one fun τ _ => ?_
-  simp [detPow]
+  simp [detTwK, detPow]
 
 def rhoP (lam : ι → DomWeight n) : (ι → GL (Fin n) K) →* Module.End K (Pol K ι n) where
   toFun g := actP lam g
@@ -182,16 +183,19 @@ def rhoP (lam : ι → DomWeight n) : (ι → GL (Fin n) K) →* Module.End K (P
   map_mul' g h := by
     apply LinearMap.ext
     intro F
-    simp only [actP, detTwK_mul, trAct_mul, Module.End.mul_apply, mul_comm (detTwK lam g), LinearMap.smul_apply, AlgHom.toLinearMap_apply,
-      AlgHom.comp_apply, map_smul, smul_smul]
+    simp only [actP, detTwK_mul, trAct_mul, Module.End.mul_apply, mul_comm (detTwK lam g),
+      LinearMap.smul_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply, map_smul, smul_smul]
 
-theorem polyAction_mem_VV (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) {F : Pol K ι n} (hF : F ∈ VV K lam) :
-    actP lam g F ∈ VV K lam := by
-  have h := (Formalism.GradedWeylDivisibility.blockActTensor K K ι n n
-      (fun τ => ((g τ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)ᵀ)).2
-    (fun τ => nablaSq K n (lam τ)) (fun τ => nablaSq K n (lam τ))
-    (fun τ f hf => Formalism.GradedWeylDivisibility.dualWeylRowStable K n n _ _ f hf) F hF
-  exact (VV K lam).smul_mem (detTwK lam g) h
+theorem polyAction_mem_VV
+    (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) {F : Pol K ι n} (hF : F ∈ VV K lam)
+    : actP lam g F ∈ VV K lam := by
+  exact (VV K lam).smul_mem (detTwK lam g)
+    ((Formalism.GradedWeylDivisibility.blockActTensor K K ι n n
+        (fun τ => ((g τ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)ᵀ)).2
+      (fun τ => nablaSq K n (lam τ))
+      (fun τ => nablaSq K n (lam τ))
+      (fun τ f hf => Formalism.GradedWeylDivisibility.dualWeylRowStable K n n _ _ f hf)
+      F hF)
 
 def rhoK (lam : ι → DomWeight n) : (ι → GL (Fin n) K) →* Module.End K (VV K lam) where
   toFun g := (actP lam g).restrict fun _ hF => polyAction_mem_VV lam g hF
@@ -216,13 +220,13 @@ def extNorm (K : Type) [Field K] [StarRing K] (lam : ι → DomWeight n) : K :=
 def gramTw (lam : ι → DomWeight n) (G : ι → Matrix (Fin n) (Fin n) K) : K :=
   ∏ τ, (G τ).det ^ (lam τ).detShift
 
-def pairP (lam : ι → DomWeight n) (G : ι → Matrix (Fin n) (Fin n) K) :
-    Pol K ι n →ₗ⋆[K] Pol K ι n →ₗ[K] K :=
-  (gramTw lam G / extNorm K lam) •
-    (fockL (K := K)).compl₂ (Formalism.GradedWeylDivisibility.blockAct K fun τ => (G τ)ᵀ).toLinearMap
+def pairP (lam : ι → DomWeight n) (G : ι → Matrix (Fin n) (Fin n) K)
+    : Pol K ι n →ₗ⋆[K] Pol K ι n →ₗ[K] K :=
+  (gramTw lam G / extNorm K lam) • (fockL (K := K)).compl₂
+    (Formalism.GradedWeylDivisibility.blockAct K fun τ => (G τ)ᵀ).toLinearMap
 
-def pairK (lam : ι → DomWeight n) (G : ι → Matrix (Fin n) (Fin n) K) :
-    VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K :=
+def pairK (lam : ι → DomWeight n) (G : ι → Matrix (Fin n) (Fin n) K)
+    : VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K :=
   (pairP lam G).domRestrict₁₂ (VV K lam) (VV K lam)
 
 end Space
@@ -231,36 +235,48 @@ section Lattices
 
 variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] {n : ℕ}
 
-def toK (K : Type) [Field K] [NumberField K] (σ : Type) : MvPolynomial σ (𝓞 K) →ₗ[𝓞 K] MvPolynomial σ K :=
+def toK (K : Type) [Field K] [NumberField K] (σ : Type)
+    : MvPolynomial σ (𝓞 K) →ₗ[𝓞 K] MvPolynomial σ K :=
   (mapAlgHom (Algebra.ofId (𝓞 K) K)).toLinearMap
 
-def nabStd (K : Type) [Field K] [NumberField K] (lam : ι → DomWeight n) : Submodule (𝓞 K) (Pol K ι n) :=
-  Formalism.GradedWeylDivisibility.tensorLat (𝓞 K) K fun τ => (nablaSq (𝓞 K) n (lam τ)).map (toK K _)
+def nabStd (K : Type) [Field K] [NumberField K] (lam : ι → DomWeight n)
+    : Submodule (𝓞 K) (Pol K ι n) :=
+  Formalism.GradedWeylDivisibility.tensorLat (𝓞 K) K fun τ =>
+    (nablaSq (𝓞 K) n (lam τ)).map (toK K _)
 
-def delStd (K : Type) [Field K] [NumberField K] (lam : ι → DomWeight n) : Submodule (𝓞 K) (Pol K ι n) :=
+def delStd (K : Type) [Field K] [NumberField K] (lam : ι → DomWeight n)
+    : Submodule (𝓞 K) (Pol K ι n) :=
   Formalism.GradedWeylDivisibility.tensorLat (𝓞 K) K fun τ => (delSq (𝓞 K) n (lam τ)).map (toK K _)
 
 def colLat (B : GL (Fin n) K) : Submodule (𝓞 K) (Fin n → K) :=
-  Submodule.span (𝓞 K) (Set.range fun j : Fin n => fun a : Fin n => (B : Matrix (Fin n) (Fin n) K) a j)
+  Submodule.span (𝓞 K)
+    (Set.range fun j : Fin n => fun a : Fin n => (B : Matrix (Fin n) (Fin n) K) a j)
 
-def IsBasisAt (w : HeightOneSpectrum (𝓞 K)) (M : Submodule (𝓞 K) (Fin n → K)) (B : GL (Fin n) K) : Prop :=
-  Formalism.HermitianLatticesTheory.localization₂ w.asIdeal M = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (colLat B)
+def IsBasisAt (w : HeightOneSpectrum (𝓞 K)) (M : Submodule (𝓞 K) (Fin n → K)) (B : GL (Fin n) K)
+    : Prop :=
+  Formalism.HermitianLatticesTheory.localization₂ w.asIdeal M
+    = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (colLat B)
 
-def transLat (lam : ι → DomWeight n) (T : Submodule (𝓞 K) (Pol K ι n))
-    (M : ι → Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (Pol K ι n) :=
+def transLat
+    (lam : ι → DomWeight n) (T : Submodule (𝓞 K) (Pol K ι n)) (M : ι → Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (Pol K ι n) :=
   ⨅ (w : HeightOneSpectrum (𝓞 K)) (B : ι → GL (Fin n) K) (_ : ∀ τ, IsBasisAt w (M τ) (B τ)),
     (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal T).comap ((actP lam B⁻¹).restrictScalars (𝓞 K))
 
-def nabP (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (Pol K ι n) :=
+def nabP (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (Pol K ι n) :=
   transLat lam (nabStd K lam) M
 
-def delP (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (Pol K ι n) :=
+def delP (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (Pol K ι n) :=
   transLat lam (delStd K lam) M
 
-def nabK (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (VV K lam) :=
+def nabK (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (VV K lam) :=
   (nabP lam M).comap ((VV K lam).subtype.restrictScalars (𝓞 K))
 
-def delK (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (VV K lam) :=
+def delK (lam : ι → DomWeight n) (M : ι → Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (VV K lam) :=
   (delP lam M).comap ((VV K lam).subtype.restrictScalars (𝓞 K))
 
 def dualFr (M : Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (Fin n → K) where
@@ -278,8 +294,8 @@ def dualFr (M : Submodule (𝓞 K) (Fin n → K)) : Submodule (𝓞 K) (Fin n �
     rw [smul_dotProduct]
     exact Submodule.smul_mem _ c (ha x hx)
 
-def hdualFr [StarRing K] (G : Matrix (Fin n) (Fin n) K) (M : Submodule (𝓞 K) (Fin n → K)) :
-    Submodule (𝓞 K) (Fin n → K) where
+def hdualFr [StarRing K] (G : Matrix (Fin n) (Fin n) K) (M : Submodule (𝓞 K) (Fin n → K))
+    : Submodule (𝓞 K) (Fin n → K) where
   carrier := {x | ∀ y ∈ M, star y ⬝ᵥ (G *ᵥ x) ∈ (1 : Submodule (𝓞 K) K)}
   add_mem' := by
     intro a b ha hb y hy
@@ -303,13 +319,16 @@ section Basis
 
 variable {ι : Type} [Fintype ι] {n : ℕ}
 
-def ssB (K : Type) [Field K] (ν : Fin n → ℕ) : Formalism.GradedWeylDivisibility.ssIdx n n ν → MvPolynomial (Fin n × Fin n) K :=
+def ssB (K : Type) [Field K] (ν : Fin n → ℕ)
+    : Formalism.GradedWeylDivisibility.ssIdx n n ν → MvPolynomial (Fin n × Fin n) K :=
   (Formalism.GradedWeylDivisibility.sSBasis K n n ν).choose
 
-abbrev VVIdx (lam : ι → DomWeight n) : Type := ∀ τ, Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW
+abbrev VVIdx (lam : ι → DomWeight n) : Type :=
+  ∀ τ, Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW
 
 instance (lam : ι → DomWeight n) : Finite (VVIdx lam) :=
-  haveI : ∀ τ, Finite (Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW) := fun _ => (Formalism.GradedWeylDivisibility.sSIdxFinite n n _).to_subtype
+  haveI : ∀ τ, Finite (Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW) := fun _ =>
+    (Formalism.GradedWeylDivisibility.sSIdxFinite n n _).to_subtype
   Pi.finite
 
 instance (lam : ι → DomWeight n) : Fintype (VVIdx lam) := Fintype.ofFinite _
@@ -317,26 +336,32 @@ instance (lam : ι → DomWeight n) : Fintype (VVIdx lam) := Fintype.ofFinite _
 def bVVfun (K : Type) [Field K] (lam : ι → DomWeight n) (i : VVIdx lam) : Pol K ι n :=
   ten fun τ => ssB K (lam τ).natW (i τ)
 
-theorem bVVfun_spec (K : Type) [Field K] (lam : ι → DomWeight n) :
-    LinearIndependent K (bVVfun K lam) ∧ Submodule.span K (Set.range (bVVfun K lam)) = VV K lam := by
+theorem bVVfun_spec (K : Type) [Field K] (lam : ι → DomWeight n)
+    : LinearIndependent K (bVVfun K lam)
+      ∧ Submodule.span K (Set.range (bVVfun K lam)) = VV K lam := by
   classical
-  exact Formalism.GradedWeylDivisibility.tensorBasis K K ι n n (fun τ => Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW)
-    (fun τ => nablaSq K n (lam τ)) (fun τ => ssB K (lam τ).natW)
+  exact Formalism.GradedWeylDivisibility.tensorBasis K K ι n n
+    (fun τ => Formalism.GradedWeylDivisibility.ssIdx n n (lam τ).natW)
+    (fun τ => nablaSq K n (lam τ))
+    (fun τ => ssB K (lam τ).natW)
     (fun τ => (Formalism.GradedWeylDivisibility.sSBasis K n n (lam τ).natW).choose_spec.1.1)
     (fun τ => (Formalism.GradedWeylDivisibility.sSBasis K n n (lam τ).natW).choose_spec.1.2.1)
 
 def bVV (K : Type) [Field K] (lam : ι → DomWeight n) : Module.Basis (VVIdx lam) K (VV K lam) :=
   (Module.Basis.span (bVVfun_spec K lam).1).map (LinearEquiv.ofEq _ _ (bVVfun_spec K lam).2)
 
-theorem bVV_coe (K : Type) [Field K] (lam : ι → DomWeight n) (i : VVIdx lam) :
-    ((bVV K lam i : VV K lam) : Pol K ι n) = bVVfun K lam i := by
+theorem bVV_coe (K : Type) [Field K] (lam : ι → DomWeight n) (i : VVIdx lam)
+    : ((bVV K lam i : VV K lam) : Pol K ι n) = bVVfun K lam i := by
   simp [bVV, Module.Basis.span_apply]
 
 end Basis
 
 section ESide
 
-variable {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K] {ι : Type} [Fintype ι] {n : ℕ}
+variable
+  {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
+  {n : ℕ}
   (emb : ι → E →+* K)
 
 def tauLat (τ : ι) (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (𝓞 K) (Fin n → K) :=
@@ -357,12 +382,15 @@ def invTrK : (ι → GL (Fin n) K) →* (ι → GL (Fin n) K) where
 
 def gramK (J : Matrix (Fin n) (Fin n) E) : ι → Matrix (Fin n) (Fin n) K := fun τ => J.map (emb τ)
 
-def gramKd (J : Matrix (Fin n) (Fin n) E) : ι → Matrix (Fin n) (Fin n) K := fun τ => ((J.map (emb τ))⁻¹)ᵀ
+def gramKd (J : Matrix (Fin n) (Fin n) E) : ι → Matrix (Fin n) (Fin n) K := fun τ =>
+  ((J.map (emb τ))⁻¹)ᵀ
 
-def rhoV (lam : ι → DomWeight n) : GL (Fin n) E →* Module.End K (VV K lam) := (rhoK lam).comp (embGL emb)
+def rhoV (lam : ι → DomWeight n) : GL (Fin n) E →* Module.End K (VV K lam) :=
+  (rhoK lam).comp (embGL emb)
 
-def pairV [StarRing K] (lam : ι → DomWeight n) (J : Matrix (Fin n) (Fin n) E) :
-    VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K := pairK lam (gramK emb J)
+def pairV [StarRing K] (lam : ι → DomWeight n) (J : Matrix (Fin n) (Fin n) E)
+    : VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K :=
+  pairK lam (gramK emb J)
 
 def nabAt (lam : ι → DomWeight n) (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (𝓞 K) (VV K lam) :=
   nabK lam fun τ => tauLat emb τ L
@@ -373,8 +401,9 @@ def delAt (lam : ι → DomWeight n) (L : Submodule (𝓞 E) (Fin n → E)) : Su
 def rhoVr (lam : ι → DomWeight n) : GL (Fin n) E →* Module.End K (VV K lam) :=
   (rhoK lam).comp (invTrK.comp (embGL emb))
 
-def pairVr [StarRing K] (lam : ι → DomWeight n) (J : Matrix (Fin n) (Fin n) E) :
-    VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K := pairK lam (gramKd emb J)
+def pairVr [StarRing K] (lam : ι → DomWeight n) (J : Matrix (Fin n) (Fin n) E)
+    : VV K lam →ₗ⋆[K] VV K lam →ₗ[K] K :=
+  pairK lam (gramKd emb J)
 
 def nabAtr (lam : ι → DomWeight n) (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (𝓞 K) (VV K lam) :=
   nabK lam fun τ => dualFr (tauLat emb τ L)

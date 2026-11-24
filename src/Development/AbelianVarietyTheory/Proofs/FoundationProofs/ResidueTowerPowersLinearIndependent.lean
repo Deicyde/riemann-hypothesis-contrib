@@ -84,7 +84,6 @@ theorem field_indep
   let c' : ℕ → K := fun j => if h : j < p ^ N then ⟨c j, hc j h⟩ else 0
   let P : K[X] := ∑ j ∈ Finset.range (p ^ N), monomial j (c' j)
   have hP : aeval t P = 0 := by
-
     rw [← hs, map_sum]
     refine Finset.sum_congr rfl fun j hj => ?_
     rw [aeval_monomial]

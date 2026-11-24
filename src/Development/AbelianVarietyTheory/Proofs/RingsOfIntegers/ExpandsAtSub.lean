@@ -83,10 +83,7 @@ theorem expandsAt_sub
           = sval (f₁ α) (ReciprocityTheory.ChartRestriction.G.DVR.pGl U e) y J
             - sval (f₂ α) (ReciprocityTheory.ChartRestriction.G.DVR.pGl U e) y J := by
     intro α
-    first
-    | exact gs_of_eq_sub _ _ _ (hf α _)
-    | (unfold sval; exact gs_of_eq_sub _ _ _ (hf α _))
-    | (simp only [sval]; exact gs_of_eq_sub _ _ _ (hf α _))
+    first | exact gs_of_eq_sub _ _ _ (hf α _)
   refine ⟨fun α hα => ?_, fun jL hjL => ?_⟩
   · rw [hs α, z1 α (fun h => hα (Finset.mem_union_left _ h)),
       z2 α (fun h => hα (Finset.mem_union_right _ h)), sub_zero]

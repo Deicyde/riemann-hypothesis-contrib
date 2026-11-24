@@ -1,7 +1,7 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HasStepCharts
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagGapSameBaseOrbitStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagGapSameBaseOrbit
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagGapTorusInvariant
 import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsValueAtOfTorus
 import Mathlib.Algebra.Order.Floor.Extended
@@ -125,8 +125,9 @@ theorem main
     have h2 : basePart M.blk z₂ q = c' q.1.1 * basePart M.blk z₁ q := rfl
     rw [h2, h1, mul_assoc]
   have hg : stepGap M BM p z₂ = stepGap M BM p z :=
-    GlobalTheory.T.flag_gap_same_base_orbit K ι Φ y Ψ N j M n BM p (pr y') z₂ z hpr hz₂m hz hz₂o
-      (hbase hz₂v) (fun k hk m => eq_on_block hb hz₂v (hr k (Or.inr hk)) m)
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.stepGap_eq_of_base_block K ι Φ y Ψ N j M n BM p
+      (pr y') z₂ z hpr hz₂m hz hz₂o (hbase hz₂v)
+      (fun k hk m => eq_on_block hb hz₂v (hr k (Or.inr hk)) m)
   rw [← ht, hg]
 
 end GlobalTheory.CompanionTheory.Ar.PB.StepW.Wgt

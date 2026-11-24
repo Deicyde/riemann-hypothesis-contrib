@@ -77,7 +77,7 @@ theorem cK_map
   | add x y hx hy =>
     simp only [cK] at hx hy ⊢
     simp [map_add (f := _), hx, hy]
-  | tmul r e => simp [cK, Algebra.TensorProduct.basis_repr_tmul, Algebra.smul_def]
+  | tmul r e => simp [cK, Algebra.TensorProduct.basis_repr_tmul]
 
 variable
   (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [SecondCountableTopology R]

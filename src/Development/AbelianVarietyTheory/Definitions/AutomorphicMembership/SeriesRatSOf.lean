@@ -99,10 +99,6 @@ def UntwRatS : Prop :=
                                 IsRat T i hV C (κ i)
                                   (fun g => ph * thetaKO (R.ωP i A.μ0) s g (harmVec R i u w f))
 
-theorem seriesRatS_of (h : SeriesRat) : SeriesRatS := by
-  first
-  | exact h
-  | exact fun D G _ _ Pl0 T0 A T _ R F κ v₀ a b c d e f g i hV hp _ =>
-      h D G Pl0 T0 A T R F κ v₀ a b c d e f g i hV hp
+theorem seriesRatS_of (h : SeriesRat) : SeriesRatS := by first | exact h
 
 end GlobalTheory.SerStd

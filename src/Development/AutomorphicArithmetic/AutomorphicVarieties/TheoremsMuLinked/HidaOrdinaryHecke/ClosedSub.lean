@@ -88,7 +88,7 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.closedSub
       exact Ideal.mem_map_of_mem _ hts
     have h2 : q (t - s) ∈ J ^ k := by
       rw [pow_mul] at h1
-      first | exact Ideal.pow_right_mono hn k h1 | exact pow_le_pow_left' hn k h1
+      first | exact Ideal.pow_right_mono hn k h1
     have h3 : q (t - s) ∈ ((maximalIdeal O) ^ k • ⊤ : Submodule O (T ⧸ I)) := by
       rw [Ideal.smul_top_eq_map, Ideal.map_pow]
       exact h2

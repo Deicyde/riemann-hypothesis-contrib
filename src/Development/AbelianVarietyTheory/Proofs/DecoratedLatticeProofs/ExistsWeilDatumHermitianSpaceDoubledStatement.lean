@@ -61,7 +61,4 @@ theorem _root_.GlobalTheory.T.exists_weilDatum_hermitianSpaceDoubled
           (om : WRep A B),
         IsWeilDatumO ψ A B χA χB om
           → ∃ omh : WRep (dblSp A) B, IsWeilDatumO ψ (dblSp A) B 1 χB omh := by
-  first
-  | exact @GlobalTheory.Core.Rk.exists_doubled_weilDatum
-  | exact GlobalTheory.Core.Rk.exists_doubled_weilDatum
-  | (intros; apply GlobalTheory.Core.Rk.exists_doubled_weilDatum <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.exists_doubled_weilDatum

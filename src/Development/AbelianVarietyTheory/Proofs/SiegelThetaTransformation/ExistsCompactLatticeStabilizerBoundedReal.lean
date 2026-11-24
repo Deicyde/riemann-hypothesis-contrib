@@ -53,17 +53,22 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory NumberField
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.StabCompact
 
-theorem exists_compact_of_entries {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+theorem exists_compact_of_entries
+    {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
     (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [T2Space R]
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : J.det ≠ 0)
-    (C : Set (R ⊗[F] E)) (hC : IsCompact C) :
-    ∃ K : Set (HA R σ J), IsCompact K ∧ ∀ h : HA R σ J, (∀ i j, (HA.mat R σ J h).1 i j ∈ C) → h ∈ K := by
+    (σ : E →ₐ[F] E)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : J.det ≠ 0)
+    (C : Set (R ⊗[F] E)) (hC : IsCompact C)
+    : ∃ K : Set (HA R σ J),
+      IsCompact K ∧ ∀ h : HA R σ J, (∀ i j, (HA.mat R σ J h).1 i j ∈ C) → h ∈ K := by
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : IsTopologicalRing (R ⊗[F] E) := IsModuleTopology.isTopologicalRing R _
   obtain ⟨e⟩ := GlobalTheory.AdelicUnitaryTop.nonempty_homeomorph (F := F) (E := E) R
@@ -71,44 +76,59 @@ theorem exists_compact_of_entries {F E : Type} [Field F] [Field E] [Algebra F E]
   have hc : IsClosed (HR R σ J : Set (GL (Fin M) (R ⊗[F] E))) := by
     have hv : Continuous fun g : GL (Fin M) (R ⊗[F] E) => (g : Matrix (Fin M) (Fin M) (R ⊗[F] E)) :=
       Units.continuous_val
-    exact isClosed_eq (((hv.matrix_map (GlobalTheory.AdelicUnitaryTop.continuous_sigR R σ)).matrix_transpose.matrix_mul
-      continuous_const).matrix_mul hv) continuous_const
-  let S : Set (Matrix (Fin M) (Fin M) (R ⊗[F] E)) := Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => C
+    exact isClosed_eq
+      (((hv.matrix_map (GlobalTheory.AdelicUnitaryTop.continuous_sigR R
+        σ)).matrix_transpose.matrix_mul continuous_const).matrix_mul hv)
+      continuous_const
+  let S : Set (Matrix (Fin M) (Fin M) (R ⊗[F] E)) :=
+    Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => C
   have hS : IsCompact S := isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hC
-  let f : Matrix (Fin M) (Fin M) (R ⊗[F] E) → (Matrix (Fin M) (Fin M) (R ⊗[F] E))ᵐᵒᵖ :=
-    fun A => MulOpposite.op (JR (F := F) R J⁻¹ * (Formalism.UG.cT (sigR R σ) A * JR (F := F) R J))
-  have hf : Continuous f := MulOpposite.continuous_op.comp (continuous_const.matrix_mul
-    ((continuous_id.matrix_map (GlobalTheory.AdelicUnitaryTop.continuous_sigR R σ)).matrix_transpose.matrix_mul
+  let f : Matrix (Fin M) (Fin M) (R ⊗[F] E) → (Matrix (Fin M) (Fin M) (R ⊗[F] E))ᵐᵒᵖ := fun A =>
+    MulOpposite.op (JR (F := F) R J⁻¹ * (Formalism.UG.cT (sigR R σ) A * JR (F := F) R J))
+  have hf : Continuous f :=
+    MulOpposite.continuous_op.comp (continuous_const.matrix_mul ((continuous_id.matrix_map
+        (GlobalTheory.AdelicUnitaryTop.continuous_sigR R σ)).matrix_transpose.matrix_mul
       continuous_const))
-  have hemb := (Units.isClosedEmbedding_embedProduct (α := Matrix (Fin M) (Fin M) (R ⊗[F] E))).comp
-    hc.isClosedEmbedding_subtypeVal
+  have hemb :=
+    (Units.isClosedEmbedding_embedProduct (α := Matrix (Fin M) (Fin M) (R ⊗[F] E))).comp
+      hc.isClosedEmbedding_subtypeVal
   refine ⟨_, hemb.isCompact_preimage (hS.prod (hS.image hf)), fun h hh => ?_⟩
   have hm : (HA.mat R σ J h).1 ∈ S := fun i _ j _ => hh i j
   refine ⟨hm, (HA.mat R σ J h).1, hm, ?_⟩
-  have hu : Formalism.UG.cT (sigR R σ) (HA.mat R σ J h).1 * JR (F := F) R J * (HA.mat R σ J h).1 = JR (F := F) R J := h.2
+  have hu
+      : Formalism.UG.cT (sigR R σ) (HA.mat R σ J h).1 * JR (F := F) R J * (HA.mat R σ J h).1
+        = JR (F := F) R J :=
+    h.2
   have h1 : JR (F := F) R J⁻¹ * JR (F := F) R J = 1 := by
     unfold JR
-    rw [← Matrix.map_mul, Matrix.nonsing_inv_mul _ (Ne.isUnit hJ), Matrix.map_one _ (map_zero _) (map_one _)]
+    rw [← Matrix.map_mul, Matrix.nonsing_inv_mul _ (Ne.isUnit hJ),
+      Matrix.map_one _ (map_zero _) (map_one _)]
   change MulOpposite.op _ = MulOpposite.op ((HA.mat R σ J h)⁻¹).1
   congr 1
   refine (Units.inv_eq_of_mul_eq_one_left ?_).symm
   rw [Matrix.mul_assoc, hu, h1]
 
-theorem exists_compact_latHat (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {M : ℕ} (L : Submodule (𝓞 E) (Fin M → E)) (hL : L.FG) :
-    ∃ C : Set (Fin M → Af F ⊗[F] E), IsCompact C ∧ ∀ y ∈ latHat F E (L : Set (Fin M → E)), y ∈ C := by
+theorem exists_compact_latHat
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {M : ℕ} (L : Submodule (𝓞 E) (Fin M → E)) (hL : L.FG)
+    : ∃ C : Set (Fin M → Af F ⊗[F] E),
+      IsCompact C ∧ ∀ y ∈ latHat F E (L : Set (Fin M → E)), y ∈ C := by
   apply GlobalTheory.Mem.Vol.StabGroup.exists_compact_latHat <;> assumption
 
-theorem exists_compact_entries (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {M : ℕ} (L : Submodule (𝓞 E) (Fin M → E)) (hL : L.FG)
-    (hsp : Submodule.span E (L : Set (Fin M → E)) = ⊤) :
-    ∃ C : Set (Af F ⊗[F] E), IsCompact C ∧ ∀ A : Matrix (Fin M) (Fin M) (Af F ⊗[F] E),
-      (∀ y ∈ latHat F E (L : Set (Fin M → E)), A.mulVec y ∈ latHat F E (L : Set (Fin M → E))) →
-      ∀ i j, A i j ∈ C := by
+theorem exists_compact_entries
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {M : ℕ}
+    (L : Submodule (𝓞 E) (Fin M → E)) (hL : L.FG) (hsp : Submodule.span E (L : Set (Fin M → E)) = ⊤)
+    : ∃ C : Set (Af F ⊗[F] E),
+      IsCompact C
+        ∧ ∀ A : Matrix (Fin M) (Fin M) (Af F ⊗[F] E),
+          (∀ y ∈ latHat F E (L : Set (Fin M → E)), A.mulVec y ∈ latHat F E (L : Set (Fin M → E)))
+            → ∀ i j, A i j ∈ C := by
   apply GlobalTheory.Mem.Vol.StabGroup.exists_compact_entries <;> assumption
 
-theorem det_gram_ne_zero {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E) :
-    S.gram.det ≠ 0 := by
+theorem det_gram_ne_zero
+    {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E)
+    : S.gram.det ≠ 0 := by
   intro h
   obtain ⟨v, hv, h0⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h
   apply hv
@@ -127,9 +147,12 @@ theorem det_gram_ne_zero {E : Type} [Field E] [NumberField E] [StarRing E] (S : 
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hi, smul_zero]
   exact S.frame.equivFun.symm.map_eq_zero_iff.1 hy
 
-theorem exists_compact_adele (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ))
-    (hθ : IsInfFam θ) (R : ℝ) (C : Set (Af D.host.F ⊗[D.host.F] D.host.E)) (hC : IsCompact C) :
-    ∃ K : Set (AE D), IsCompact K ∧ ∀ z : AE D, finPart D z ∈ C → (∀ ρ, ‖θ ρ (infPart D z)‖ ≤ R) → z ∈ K := by
+theorem exists_compact_adele
+    (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (hθ : IsInfFam θ)
+    (R : ℝ)
+    (C : Set (Af D.host.F ⊗[D.host.F] D.host.E)) (hC : IsCompact C)
+    : ∃ K : Set (AE D),
+      IsCompact K ∧ ∀ z : AE D, finPart D z ∈ C → (∀ ρ, ‖θ ρ (infPart D z)‖ ≤ R) → z ∈ K := by
   haveI : IsModuleTopology (AF D.host.F) (AE D) := ⟨rfl⟩
   haveI : ContinuousAdd (AE D) := IsModuleTopology.toContinuousAdd (AF D.host.F) _
   obtain ⟨s, hs⟩ := GlobalTheory.RealLineAt.exists_inverse_chart hθ
@@ -142,18 +165,39 @@ theorem exists_compact_adele (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗
     (he (e.symm (0, w))).2.symm.trans (by rw [e.apply_symm_apply])
   have hB : IsCompact (Set.pi Set.univ fun _ : D.what₂.Tau => Metric.closedBall (0 : ℂ) R) :=
     isCompact_univ_pi fun _ => isCompact_closedBall _ _
-  refine ⟨_, (hB.prod hC).image ((hs.cont.comp continuous_fst).add (hj.comp continuous_snd)), fun z hz hR => ?_⟩
-  refine ⟨(fun ρ => θ ρ (infPart D z), finPart D z), ⟨fun ρ _ => mem_closedBall_zero_iff.2 (hR ρ), hz⟩, ?_⟩
+  refine ⟨
+    _,
+    (hB.prod hC).image ((hs.cont.comp continuous_fst).add (hj.comp continuous_snd)),
+    fun z hz hR => ?_
+  ⟩
+  refine ⟨
+    (fun ρ => θ ρ (infPart D z), finPart D z),
+    ⟨fun ρ _ => mem_closedBall_zero_iff.2 (hR ρ), hz⟩,
+    ?_
+  ⟩
   refine sub_eq_zero.1 (hs.ext _ ?_ fun τ => ?_)
   · change finPart D (s (fun ρ => θ ρ (infPart D z)) + j (finPart D z) - z) = 0
     rw [RingHom.map_sub, RingHom.map_add (f := _), hs.fin, hj2, zero_add, sub_self]
   · change θ τ (infPart D (s (fun ρ => θ ρ (infPart D z)) + j (finPart D z) - z)) = 0
-    rw [RingHom.map_sub, RingHom.map_add (f := _), hj1, add_zero, RingHom.map_sub, hs.comp, sub_self]
+    rw [RingHom.map_sub, RingHom.map_add (f := _), hj1, add_zero, RingHom.map_sub, hs.comp,
+      sub_self]
 
-theorem exists_compact_stab : ∀ (D : D7) (V : HSp D) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)), IsInfFam θ → ∀ R : ℝ, ∃ K : Set (GA D V), IsCompact K ∧ ∀ h : GA D V, (∀ y, y ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V) ↔ (finMat D.sp.cm.sig V.gram h).mulVec y ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V)) → (∀ ρ i j, ‖infMat D.sp.cm.sig V.gram (θ ρ) h i j‖ ≤ R) → h ∈ K := by
+theorem exists_compact_stab
+    : ∀ (D : D7) (V : HSp D) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
+      IsInfFam θ
+        → ∀ R : ℝ, ∃ K : Set (GA D V),
+          IsCompact K
+            ∧ ∀ h : GA D V,
+              (∀ y,
+                  y ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V)
+                    ↔ (finMat D.sp.cm.sig V.gram h).mulVec y
+                      ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V))
+                → (∀ ρ i j, ‖infMat D.sp.cm.sig V.gram (θ ρ) h i j‖ ≤ R)
+                → h ∈ K := by
   intro D V θ hθ R
   let f := V.frame.equivFun.toLinearMap
-  let L : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) := V.L0.map (f.restrictScalars (𝓞 D.host.E))
+  let L : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) :=
+    V.L0.map (f.restrictScalars (𝓞 D.host.E))
   have hL : (L : Set (Fin V.rank → D.host.E)) = L0c D V := by
     ext v
     constructor
@@ -177,42 +221,55 @@ theorem exists_compact_stab : ∀ (D : D7) (V : HSp D) (θ : D.what₂.Tau → (
           (V.frame.equivFun.trans (starLinearEquiv D.host.E)).trans V.frame.equivFun.symm
         let g : V.V →ₗ[D.host.E] Module.Dual D.host.E W :=
           (LinearMap.domRestrict' W).comp (V.hT.comp e.toLinearMap)
-        have hdim : Module.finrank D.host.E (Module.Dual D.host.E W) <
-            Module.finrank D.host.E V.V := by
+        have hdim
+            : Module.finrank D.host.E (Module.Dual D.host.E W) < Module.finrank D.host.E V.V := by
           rw [Subspace.dual_finrank_eq]
           exact Submodule.finrank_lt h
         obtain ⟨z, hz, hz₀⟩ :=
           Submodule.exists_mem_ne_zero_of_ne_bot (LinearMap.ker_ne_bot_of_finrank_lt (f := g) hdim)
         have hsmul (a : D.host.E) : a • e z ∈ V.L0 := by
           rw [← V.baseLattice_isUnimodular]
-          simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual,
-            Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply]
+          simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+            Submodule.mem_comap, LinearMap.restrictScalars_apply]
           intro y hy
           have hzy : V.hT (e z) y = 0 :=
-            congrArg (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩)
+            congrArg
+              (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩)
               (LinearMap.mem_ker.mp hz)
           have hyz : V.hT y (e z) = 0 := by
             have hh := V.herm.eq (e z) y
             simpa [hzy] using hh.symm
           simp [hyz]
         let i : D.host.E →ₗ[𝓞 D.host.E] V.L0 :=
-          ((LinearMap.toSpanSingleton D.host.E _ (e z)).restrictScalars (𝓞 D.host.E)).codRestrict V.L0 hsmul
-        let : Module.Finite (𝓞 D.host.E) V.L0 := Module.Finite.iff_fg.mpr V.standardTuple_isLattice.fg
-        let : Module.Finite (𝓞 D.host.E) D.host.E := Module.Finite.of_injective i fun a b hab =>
-          smul_left_injective D.host.E (fun hzero => hz₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+          ((LinearMap.toSpanSingleton D.host.E _ (e z)).restrictScalars (𝓞 D.host.E)).codRestrict
+            V.L0 hsmul
+        let : Module.Finite (𝓞 D.host.E) V.L0 :=
+          Module.Finite.iff_fg.mpr V.standardTuple_isLattice.fg
+        let : Module.Finite (𝓞 D.host.E) D.host.E :=
+          Module.Finite.of_injective i fun a b hab =>
+            smul_left_injective D.host.E
+              (fun hzero => hz₀ (e.map_eq_zero_iff.mp hzero))
+              (congrArg Subtype.val hab)
         exact RingOfIntegers.not_isField D.host.E
-          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E) (Field.toIsField D.host.E))
-      rw [hspan]; trivial
+          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E)
+            (Field.toIsField D.host.E))
+      rw [hspan]
+      trivial
     have := Submodule.mem_map_of_mem (f := f) hx
     rw [Submodule.map_span] at this
     exact this
-  obtain ⟨C, hC, hCe⟩ := exists_compact_entries D.host.F D.host.E L (V.standardTuple_isLattice.fg.map _) hsp
+  obtain ⟨C, hC, hCe⟩ :=
+    exists_compact_entries D.host.F D.host.E L (V.standardTuple_isLattice.fg.map _) hsp
   rw [hL] at hCe
   obtain ⟨C', hC', hCe'⟩ := exists_compact_adele D θ hθ R C hC
   haveI := GlobalTheory.AdelicUnitaryTop.t2Space_adeleRing_numberField D.host.F
   haveI : Module.Finite D.host.F D.host.E := Module.Finite.of_restrictScalars_finite ℚ _ _
-  obtain ⟨K, hK, hKe⟩ := exists_compact_of_entries (AF D.host.F) D.sp.cm.sig V.gram (det_gram_ne_zero V) C' hC'
-  exact ⟨K, hK, fun h h1 h2 => hKe h fun i j =>
-    hCe' _ (hCe _ (fun y hy => (h1 y).1 hy) i j) fun ρ => h2 ρ i j⟩
+  obtain ⟨K, hK, hKe⟩ :=
+    exists_compact_of_entries (AF D.host.F) D.sp.cm.sig V.gram (det_gram_ne_zero V) C' hC'
+  exact ⟨
+    K,
+    hK,
+    fun h h1 h2 => hKe h fun i j => hCe' _ (hCe _ (fun y hy => (h1 y).1 hy) i j) fun ρ => h2 ρ i j
+  ⟩
 
 end GlobalTheory.StabCompact

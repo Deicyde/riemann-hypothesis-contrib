@@ -69,8 +69,7 @@ private theorem pol2 {Q : Type} [CommRing Q] (x y z : Q)
     : (!![z, 0; y, x] : Matrix (Fin 2) (Fin 2) Q)
       = Jmat (R := Q) 2 * (!![x, 0; y, z])ᵀ * Jmat (R := Q) 2 := by
   ext i j
-  fin_cases i <;> fin_cases j
-    <;> simp [Jmat, Matrix.mul_apply, Fin.sum_univ_two, Matrix.transpose_apply]
+  fin_cases i <;> fin_cases j <;> simp [Jmat, Matrix.mul_apply, Fin.sum_univ_two]
 
 private theorem ord2
     {H Q : Type} [CommRing Q]
@@ -99,7 +98,7 @@ private theorem hom_ex
   · intro g g'
     simp only [h]
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, map_mul] <;> ring
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, map_mul]
 
 private theorem isLocallyConstant_psi_restrict_of_isOpen_ker
     {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} (hΨ : IsOpen (F.Ψ.ker : Set F.Γ))
@@ -141,7 +140,7 @@ private theorem rep_ex
     rw [mul_comm, ← mul_assoc, inv_mul_cancel, one_mul]
   have a0 : a 1 = 0 := by
     have h1 := hmul 1 1
-    simp only [mul_one, map_one, Units.val_one, one_smul, inv_one] at h1
+    simp only [mul_one] at h1
     simpa using h1
   have hmul' : ∀ g g', a (g * g') = a g * p g' + q g * a g' := by
     intro g g'

@@ -57,6 +57,7 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
   UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.aux_statement_23
     : ∀ (F K : Type) [Field F] [NumberField F] [Field K] [NumberField K]
         (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 K))
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.aux_statement_23
                     (GlobalTheory.SmGL.iwahori (w.adicCompletion K) (Fin a))
                   ≠ ⊥)
               ∧ (GlobalTheory.SmGL.IsSpherical σ.ρ → GlobalTheory.SmGL.IsSpherical σ'.ρ) := by
-  first
-  | exact @GlobalTheory.CompletionIso.iwahori_spherical_transfer
-  | exact GlobalTheory.CompletionIso.iwahori_spherical_transfer
-  | (intros; apply GlobalTheory.CompletionIso.iwahori_spherical_transfer <;> assumption)
+  first | exact @GlobalTheory.CompletionIso.iwahori_spherical_transfer

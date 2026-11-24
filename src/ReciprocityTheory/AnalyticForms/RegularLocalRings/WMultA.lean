@@ -106,8 +106,7 @@ private theorem ring_ord_ringEquiv_apply
   let o3 := Ideal.relIsoOfBijective (e : A →+* B) e.bijective
   have h3 : o3 (Ideal.span {e z}) = Ideal.span {z} := hI
   exact (Submodule.comapMkQRelIso _).trans
-    (((o3.Ici _).trans (OrderIso.setCongr _ _ (by rw [h3]))).trans
-      (Submodule.comapMkQRelIso _).symm)
+    (((o3.Ici _).trans (Set.orderIsoOfEq _ _ (by rw [h3]))).trans (Submodule.comapMkQRelIso _).symm)
 
 theorem ord_isLocalization_eq_exponent
     {R : Type*} [CommRing R] [IsRegularLocalRing R]

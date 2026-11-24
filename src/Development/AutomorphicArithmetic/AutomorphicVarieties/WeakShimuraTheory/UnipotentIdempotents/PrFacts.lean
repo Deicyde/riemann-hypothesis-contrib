@@ -87,7 +87,7 @@ theorem UpperTheory.V.Ws.Lk.prFacts
         : ∃ a : ℕ,
           (QuotientGroup.mk' _ g : TopologicalAbelianization (Dec (F := L) (s.A v))) ^ l ^ a
             = 1 := by
-      first | exact exists_orderOf_eq_prime_pow_iff.1 hg' | exact hg' | simpa using hg'
+      first | exact hg'
     refine ⟨a, ?_⟩
     rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at ha
     have hle

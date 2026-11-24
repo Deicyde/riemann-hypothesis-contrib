@@ -50,7 +50,6 @@ namespace GlobalTheory.VacuumFockLaws
 
 theorem vacuumFock_onObjects
     : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.VacuumFockVectors.VacuumFock D := fun D =>
-  vacuumFock_of_thetaSquareIntegrable D
-    (GlobalTheory.ThetaSquare.thetaFunctions_squareIntegrable_heisenbergUnitary D)
+  vacuumFock_of_thetaSquareIntegrable D (_root_.GlobalTheory.ThetaSquare.theta_square_integrable D)
 
 end GlobalTheory.VacuumFockLaws

@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Algebra.Azumaya.Basic
 
 @[expose] public section
 
@@ -190,11 +191,6 @@ theorem mem_closure_mat {m n : ℕ} {y : Mx D m n} (hy : y.map (infPart D) = 0)
   choose ℓ hℓ using hx'
   exact ⟨Matrix.of ℓ, by ext i j; exact hℓ i j⟩
 
-theorem actO_fin {S T : HSp D} (g : GA D S) (h : GA D T) {x : WO S T} (hx : x.map (infPart D) = 0)
-    : (actO S T g h x).map (infPart D) = 0 := by
-  unfold actO
-  rw [Matrix.map_mul, Matrix.map_mul, hx, Matrix.mul_zero, Matrix.zero_mul]
-
 private theorem continuous_actO_one {S T : HSp D} (h : GA D T) : Continuous (actO S T 1 h) := by
   haveI := IsModuleTopology.isTopologicalRing (AF D.host.F) (AE D)
   unfold actO
@@ -214,7 +210,7 @@ theorem exists_approx
             + w := by
   haveI := IsModuleTopology.isTopologicalRing (AF D.host.F) (AE D)
   obtain ⟨U, hUo, hU⟩ := hf.level
-  have hy : (actO S T 1 g x).map (infPart D) = 0 := actO_fin 1 g hx
+  have hy : (actO S T 1 g x).map (infPart D) = 0 := _root_.GlobalTheory.LatNhds.actO_fin 1 g hx
   have hVo : IsOpen {v : WO S T | actO S T 1 g⁻¹ (actO S T 1 g x - v) ∈ U} :=
     hUo.preimage ((continuous_actO_one (S := S) g⁻¹).comp (continuous_const.sub continuous_id))
   have h0 : actO S T 1 g⁻¹ 0 = 0 := by
@@ -239,7 +235,7 @@ theorem exists_approx
         = actO S T 1 g⁻¹ (ℓ.map (finRat D)) :=
     congrArg _ hrat
   have hw : (actO S T 1 g⁻¹ (actO S T 1 g x - ℓ.map (finRat D))).map (infPart D) = 0 := by
-    refine actO_fin 1 g⁻¹ ?_
+    refine _root_.GlobalTheory.LatNhds.actO_fin 1 g⁻¹ ?_
     ext i j
     have hij : infPart D (actO S T 1 g x i j) = 0 := by simpa using congrFun (congrFun hy i) j
     simp [hij, infPart_finRat]

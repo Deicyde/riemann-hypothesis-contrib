@@ -344,9 +344,7 @@ theorem exists_val (g : GtPtF D F) : ∃ c, ν.Pt g c := by
   exact e
 
 omit y in
-theorem val_unique {g : GtPtF D F} {c c' : N.Gt} (h : ν.Pt g c) (h' : ν.Pt g c') : c = c' :=
-  NumD.Gt.ext (ν.eA.injective (h.1.trans h'.1.symm))
-    (funext fun χ => Units.ext ((h.2 χ).trans (h'.2 χ).symm))
+alias val_unique := _root_.GlobalTheory.Ex.NumOf.pt_unique
 
 omit y in
 theorem exists_pt (c : N.Gt) : ∃ g, ν.Pt g c := by

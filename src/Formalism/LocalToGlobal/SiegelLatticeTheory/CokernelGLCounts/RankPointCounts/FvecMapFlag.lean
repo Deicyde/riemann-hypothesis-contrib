@@ -63,7 +63,7 @@ theorem omp_congr
   have hF' : F'.fvec = G'.fvec := funext h'
   have hZ : Zhat F F' = Zhat G G' := by
     unfold Zhat
-    first | rw [hF, hF'] | (simp only [hF, hF']; rfl)
+    first | rw [hF, hF']
   refine ⟨?_, hZ⟩
   unfold omp
   rw [hZ, hF']

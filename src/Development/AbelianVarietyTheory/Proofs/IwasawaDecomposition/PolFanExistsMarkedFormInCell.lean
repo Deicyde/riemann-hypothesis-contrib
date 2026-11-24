@@ -4,11 +4,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MarkV
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBaryStageStart
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BilinFormExistsPrimitiveOfNeZero
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CarrierDimLeOfAddCellGenerators
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellLeastDimVanishesWhereFormVanishesDiagonalStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellLeastDimVanishesWhereFormVanishesDiagonal
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteBilinFormAbsLe
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeCellOfInFaceOfCellFormCMFieldStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeCellOfInFaceOfCellFormCMField
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InvFunEvalZAddOfLinearOnRealCone
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemClosureSumIndecomposableFaceOfAdditiveStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemClosureSumIndecomposableFaceOfAdditive
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -103,13 +103,6 @@ theorem cone_sum {S : Finset (LinearMap.BilinForm ℤ X)} (h : ∀ x ∈ S, InRC
   exact cone_add (h a (Finset.mem_insert_self a S))
     (ih fun x hx => h x (Finset.mem_insert_of_mem hx))
 
-private theorem toReal_eq_sum_smul_toReal_of_coe_eq
-    {x : LinearMap.BilinForm ℤ X} {c : Fin m → ℝ}
-    (h : ∀ a b, (x a b : ℝ) = ∑ i, c i * (γ i a b : ℝ))
-    : toReal x = ∑ i, c i • toReal (γ i) := by
-  ext a b
-  simp [toReal_apply, LinearMap.sum_apply, h a b]
-
 theorem cone_smul_iff {g : ℕ} (hg : 0 < g) {x : LinearMap.BilinForm ℤ X}
     : InRCone γ ((g : ℤ) • x) ↔ InRCone γ x := by
   have hg' : (g : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hg.ne'
@@ -119,7 +112,7 @@ theorem cone_smul_iff {g : ℕ} (hg : 0 < g) {x : LinearMap.BilinForm ℤ X}
     refine ⟨
       fun i => c i / g,
       fun i => div_nonneg (hc i) (Nat.cast_nonneg g),
-      toReal_eq_sum_smul_toReal_of_coe_eq fun a b => ?_
+      _root_.GlobalTheory.PolFan.Mark.Exist.toReal_eq_sum_smul_of_coe_eq_sum fun a b => ?_
     ⟩
     have e := apply_of_cone h a b
     rw [hv] at e
@@ -132,7 +125,7 @@ theorem cone_smul_iff {g : ℕ} (hg : 0 < g) {x : LinearMap.BilinForm ℤ X}
     refine ⟨
       fun i => g * c i,
       fun i => mul_nonneg (Nat.cast_nonneg g) (hc i),
-      toReal_eq_sum_smul_toReal_of_coe_eq fun a b => ?_
+      _root_.GlobalTheory.PolFan.Mark.Exist.toReal_eq_sum_smul_of_coe_eq_sum fun a b => ?_
     ⟩
     rw [hv, apply_of_cone h a b, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
@@ -265,8 +258,8 @@ theorem inFace_iff
   have hβp := cone_nonneg hτ.nonneg hβ
   constructor
   · rintro ⟨hxb, hxp, -, hadd, hlab⟩
-    exact GlobalTheory.T.inRealCone_cell_of_inFace_of_cellForm_CMField E H q ψ lab hψ hl X hX hD m τ
-      hτ β hβb hβp hβ x hxb hxp hadd hlab
+    exact _root_.GlobalTheory.PolFan.Mark.FaceIn.inRCone_of_add E H q ψ lab hψ hl X hX hD m τ hτ β
+      hβb hβp hβ x hxb hxp hadd hlab
   · intro hx
     obtain ⟨c, hc, hcx⟩ := id hx
     have hbx := cone_add hβ hx
@@ -275,8 +268,8 @@ theorem inFace_iff
       cone_nonneg hτ.nonneg hx,
       fun y hy =>
         cone_vanish hx fun j =>
-          GlobalTheory.T.cell_leastDim_vanishes_where_form_vanishes_diagonal E H q ψ lab hψ hl X hX
-            hD m τ hτ β hβb hβp hβ hr j y hy,
+          _root_.GlobalTheory.PolFan.Mark.vanish_of_inRCone_of_genRank_le E H q ψ lab hψ hl X hX hD
+            m τ hτ β hβb hβp hβ hr j y hy,
       evalZ_add_of_linearOn_inRCone (𝓞 E) ψ X m τ hτ.linear β x hβ hx,
       ?_
     ⟩
@@ -341,8 +334,8 @@ theorem exists_isMarked_inRCone
   have hστ : InRCone τ (∑ x ∈ S, x) := cone_sum hScone
   have F := fun x => inFace_iff hψ hl hX hD hτ hβτ hr x
   have hcl : β ∈ AddSubmonoid.closure {y | IsIndec H.bar ψ lab β y} := by
-    refine GlobalTheory.T.mem_closure_sum_indecomposable_face_of_additive (𝓞 E) H.bar ψ lab X β ?_
-      ?_ ?_ β ((F β).2 hβτ)
+    refine _root_.GlobalTheory.PolFan.Mark.mem_closure_isIndec (𝓞 E) H.bar ψ lab X β ?_ ?_ ?_ β
+      ((F β).2 hβτ)
     · intro x y hx hy
       exact ⟨
         (F _).2 (cone_add ((F x).1 hx) ((F y).1 hy)),
@@ -432,8 +425,8 @@ theorem exists_isMarked_inRCone
   unfold InFace at hface
   obtain ⟨-, -, -, hadd, hlabeq⟩ := hface
   have hv₀ : InRCone v β₀ :=
-    GlobalTheory.T.inRealCone_cell_of_inFace_of_cellForm_CMField E H q ψ lab hψ hl X hX hD m v hv β
-      hb hp hvβ β₀ hβ₀b hβ₀p hadd hlabeq
+    _root_.GlobalTheory.PolFan.Mark.FaceIn.inRCone_of_add E H q ψ lab hψ hl X hX hD m v hv β hb hp
+      hvβ β₀ hβ₀b hβ₀p hadd hlabeq
   refine ⟨β₀, ?_, hv₀⟩
   unfold IsMarked
   refine ⟨hβ₀b, hβ₀p, hprim, hlab0, S, fun x => ?_, g, hg, hgβ⟩

@@ -97,7 +97,7 @@ theorem isUnivRing_bc
     let A' : Subalgebra R (R × A) := AlgHom.equalizer f1 f2
     have memA' : ∀ p : R × A, p ∈ A' ↔ algebraMap R R' p.1 = aug p.2 := by
       intro p
-      first | exact Iff.rfl | simp [A', f1, f2, AlgHom.mem_equalizer]
+      first | exact Iff.rfl
     let aug' : A' →ₐ[R] R := (AlgHom.fst R R A).comp A'.val
     let snd' : A' →ₐ[R] A := (AlgHom.snd R R A).comp A'.val
     have hJ' : (RingHom.ker aug') ^ (m + 1) = ⊥ := by

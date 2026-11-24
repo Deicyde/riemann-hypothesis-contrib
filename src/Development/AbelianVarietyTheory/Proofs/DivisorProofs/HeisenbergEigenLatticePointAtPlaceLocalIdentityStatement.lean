@@ -77,7 +77,4 @@ theorem _root_.GlobalTheory.T.heisenbergEigen_latticePointAtPlace_localIdentity
                               ⬝ᵥ (GlobalTheory.LatVac.locCo co v γ).2))
                       * f (ξ + (GlobalTheory.LatVac.locCo co v γ).1)
                     = χ * f ξ := by
-  first
-  | exact @GlobalTheory.LatVac.heis_at_local_identity
-  | exact GlobalTheory.LatVac.heis_at_local_identity
-  | (intros; apply GlobalTheory.LatVac.heis_at_local_identity <;> assumption)
+  first | exact @GlobalTheory.LatVac.heis_at_local_identity

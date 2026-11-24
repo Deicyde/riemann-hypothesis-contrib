@@ -66,7 +66,7 @@ theorem cj_id_apply {X : Type} (f : X → ℂ) (x : X) : cj id f x = starRingEnd
 theorem hecke_inv {χ : (AE D)ˣ →* Circle} (h : IsHeckeChar D χ) : IsHeckeChar D χ⁻¹ :=
   ⟨(h.1.inv : Continuous fun x => (χ x)⁻¹), fun x => by rw [MonoidHom.inv_apply, h.2 x, inv_one]⟩
 
-theorem enorm_conj (z : ℂ) : ‖starRingEnd ℂ z‖ₑ = ‖z‖ₑ := by simp [enorm]
+theorem enorm_conj (z : ℂ) : ‖starRingEnd ℂ z‖ₑ = ‖z‖ₑ := by simp
 
 theorem mt_negGA_symm (V : HSp D) (g : GA D (negSp V))
     : mt V ((negGA V).symm g) = mt (negSp V) g := by

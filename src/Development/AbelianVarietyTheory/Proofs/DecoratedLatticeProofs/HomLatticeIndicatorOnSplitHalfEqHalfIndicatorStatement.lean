@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
 open GlobalTheory.FinPl
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.homLatticeIndicator_on_split_half_eq_half_indicator
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (p : SplitPt D k) (n n' : Type) [Fintype n] [DecidableEq n]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.homLatticeIndicator_on_split_half_eq_half_indicato
           α.IsLat LS ΛS → β.IsLat LT ΛT
             → extFun α β (latInd ΛS ΛT)
               = halfInd p.e (latO S T (LS : Set _) (LT : Set _) (· = p.v)) := by
-  first
-  | exact @GlobalTheory.FinPl.LatIndHalf.extFun_latInd_eq_halfInd
-  | exact GlobalTheory.FinPl.LatIndHalf.extFun_latInd_eq_halfInd
-  | (intros; apply GlobalTheory.FinPl.LatIndHalf.extFun_latInd_eq_halfInd <;> assumption)
+  first | exact @GlobalTheory.FinPl.LatIndHalf.extFun_latInd_eq_halfInd

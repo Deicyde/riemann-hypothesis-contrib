@@ -103,9 +103,7 @@ theorem RestrRes_of
       (fun _ => inferInstance)
   let ε : sgl ((restr φ).obj F) ⟶ T := e ≫ M.map (resAug F)
   refine ⟨T, σ, ε, ?_, fun U s => Function.bijective_id, ?_⟩
-  · first
-    | exact quasiIso_comp (hφ := hq1) (hφ' := hq2)
-    | exact @quasiIso_comp _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hq1 hq2
+  · first | exact quasiIso_comp (hφ := hq1) (hφ' := hq2)
   · intro U a
     have h2
         : Sec.map (e.f 0)

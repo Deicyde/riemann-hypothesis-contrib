@@ -43,9 +43,7 @@ noncomputable section
 
 open scoped Classical
 
-
 set_option maxSynthPendingDepth 3
-
 
 namespace PositivityTheory.Rg.BcB.F.ChiPin
 

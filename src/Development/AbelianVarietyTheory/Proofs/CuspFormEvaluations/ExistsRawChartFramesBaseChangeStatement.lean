@@ -47,6 +47,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_rawChart_frames_baseChange
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (S S' : Type) [CommRing S] [CommRing S'] (ψ : S →+* S')
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.exists_rawChart_frames_baseChange
                   LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
                     (rpe (spMap ψ ≫ x0) d x' e' m (fun i j => MvPolynomial.map ψ (φ i j)))
                     (LB.pullGen Xo.univ.t.PP.L _ _ (rpe x0 d x e m φ) (rjBC ψ x0 d m n').left) := by
-  first
-  | exact @GlobalTheory.RawFrameBC.exists_frames
-  | exact GlobalTheory.RawFrameBC.exists_frames
-  | (intros; apply GlobalTheory.RawFrameBC.exists_frames <;> assumption)
+  first | exact @GlobalTheory.RawFrameBC.exists_frames

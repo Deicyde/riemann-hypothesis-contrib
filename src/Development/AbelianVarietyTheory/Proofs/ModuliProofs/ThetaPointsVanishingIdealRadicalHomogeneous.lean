@@ -43,63 +43,87 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM.ThIdeal
 
-theorem hasTh_unit_mul {o : Type} [CommRing o] {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)}
-    {S : Scheme.{0}} {s : S ⟶ Sp o} {t : TObj g (N' ^ 2) J b s} {R : Type} [CommRing R]
-    {x : Sp R ⟶ S} {v : Ix g (N' ^ 2) → R} (h : t.HasTh x v) (c : R) (hc : IsUnit c) :
-    t.HasTh x (fun a => c * v a) := by
+theorem hasTh_unit_mul
+    {o : Type} [CommRing o]
+    {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)} {S : Scheme.{0}} {s : S ⟶ Sp o}
+    {t : TObj g (N' ^ 2) J b s} {R : Type} [CommRing R]
+    {x : Sp R ⟶ S} {v : Ix g (N' ^ 2) → R} (h : t.HasTh x v)
+    (c : R) (hc : IsUnit c)
+    : t.HasTh x (fun a => c * v a) := by
   apply GlobalTheory.ZM.TObj.HasTh.unit_mul <;> assumption
 
-theorem coeff_scale {R R' σ : Type} [CommRing R] [CommRing R'] (β : R →+* R') (w : σ → R')
-    (F : MvPolynomial σ R) (e : ℕ) :
-    (MvPolynomial.eval₂Hom ((Polynomial.C : R' →+* Polynomial R').comp β)
-      (fun i => Polynomial.X * Polynomial.C (w i)) F).coeff e =
-      MvPolynomial.eval₂Hom β w (MvPolynomial.homogeneousComponent e F) := by
+theorem coeff_scale
+    {R R' σ : Type} [CommRing R] [CommRing R']
+    (β : R →+* R') (w : σ → R') (F : MvPolynomial σ R) (e : ℕ)
+    : (MvPolynomial.eval₂Hom ((Polynomial.C : R' →+* Polynomial R').comp β)
+        (fun i => Polynomial.X * Polynomial.C (w i))
+        F).coeff e
+      = MvPolynomial.eval₂Hom β w (MvPolynomial.homogeneousComponent e F) := by
   induction F using MvPolynomial.induction_on' with
   | monomial d c =>
     have hm : MvPolynomial.monomial d c ∈ MvPolynomial.homogeneousSubmodule σ R d.degree :=
       MvPolynomial.isHomogeneous_monomial c rfl
     rw [MvPolynomial.homogeneousComponent_of_mem hm]
     have : MvPolynomial.eval₂Hom ((Polynomial.C : R' →+* Polynomial R').comp β)
-      (fun i => Polynomial.X * Polynomial.C (w i)) (MvPolynomial.monomial d c) =
-        Polynomial.C (MvPolynomial.eval₂Hom β w (MvPolynomial.monomial d c)) * Polynomial.X ^ d.degree := by
+          (fun i => Polynomial.X * Polynomial.C (w i))
+          (MvPolynomial.monomial d c)
+        = Polynomial.C (MvPolynomial.eval₂Hom β w (MvPolynomial.monomial d c))
+          * Polynomial.X ^ d.degree := by
       simp only [MvPolynomial.eval₂Hom_monomial, Finsupp.prod, mul_pow, Finset.prod_mul_distrib,
-        Finset.prod_pow_eq_pow_sum, map_mul, map_prod, map_pow, RingHom.comp_apply, Finsupp.degree_apply]
+        Finset.prod_pow_eq_pow_sum, map_mul, map_prod, map_pow, RingHom.comp_apply,
+        Finsupp.degree_apply]
       ring
     rw [this, Polynomial.coeff_C_mul_X_pow]
     split_ifs <;> simp
   | add p q hp hq => simp only [map_add (f := _), Polynomial.coeff_add, hp, hq]
 
-theorem component_eq_zero {R σ : Type} [CommRing R] (β : R →+* ℂ) (w : σ → ℂ)
-    (F : MvPolynomial σ R) (e : ℕ)
-    (h : ∀ c : ℂ, c ≠ 0 → MvPolynomial.eval₂Hom β (fun i => c * w i) F = 0) :
-    MvPolynomial.eval₂Hom β w (MvPolynomial.homogeneousComponent e F) = 0 := by
+theorem component_eq_zero
+    {R σ : Type} [CommRing R]
+    (β : R →+* ℂ) (w : σ → ℂ) (F : MvPolynomial σ R)
+    (e : ℕ) (h : ∀ c : ℂ, c ≠ 0 → MvPolynomial.eval₂Hom β (fun i => c * w i) F = 0)
+    : MvPolynomial.eval₂Hom β w (MvPolynomial.homogeneousComponent e F) = 0 := by
   rw [← coeff_scale]
   have : MvPolynomial.eval₂Hom ((Polynomial.C : ℂ →+* Polynomial ℂ).comp β)
-      (fun i => Polynomial.X * Polynomial.C (w i)) F = 0 := by
+        (fun i => Polynomial.X * Polynomial.C (w i))
+        F
+      = 0 := by
     apply Polynomial.eq_zero_of_infinite_isRoot
-    refine Set.Infinite.mono (s := {0}ᶜ) (fun c hc => ?_) (Set.finite_singleton (0 : ℂ)).infinite_compl
-    have h1 := MvPolynomial.map_eval₂Hom ((Polynomial.C : ℂ →+* Polynomial ℂ).comp β)
-      (fun i => Polynomial.X * Polynomial.C (w i)) (Polynomial.evalRingHom c) F
+    refine
+      Set.Infinite.mono (s := {0}ᶜ) (fun c hc => ?_) (Set.finite_singleton (0 : ℂ)).infinite_compl
+    have h1 :=
+      MvPolynomial.map_eval₂Hom ((Polynomial.C : ℂ →+* Polynomial ℂ).comp β)
+        (fun i => Polynomial.X * Polynomial.C (w i))
+        (Polynomial.evalRingHom c) F
     rw [Set.mem_ofPred_eq, Polynomial.IsRoot.def, ← Polynomial.coe_evalRingHom, h1, ← h c hc]
     congr 2
     · ext r; simp
     · ext i; simp [_root_.mul_comm c]
   rw [this, Polynomial.coeff_zero]
 
-theorem mem_thIdeal {o : Type} [CommRing o] {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)} (em : o →+* ℂ)
-    (C : TObj g (N' ^ 2) J b (spMap em) → Prop) (F : MvPolynomial (Ix g (N' ^ 2)) o) :
-    F ∈ thIdeal em C ↔ ∀ t v, C t → t.HasTh (𝟙 _) v → MvPolynomial.eval₂Hom em v F = 0 := by
+theorem mem_thIdeal
+    {o : Type} [CommRing o]
+    {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)}
+    (em : o →+* ℂ) (C : TObj g (N' ^ 2) J b (spMap em) → Prop)
+    (F : MvPolynomial (Ix g (N' ^ 2)) o)
+    : F ∈ thIdeal em C ↔ ∀ t v, C t → t.HasTh (𝟙 _) v → MvPolynomial.eval₂Hom em v F = 0 := by
   simp only [thIdeal, Ideal.mem_iInf, RingHom.mem_ker, and_imp]
 
-theorem thIdeal_radical_homogeneous_torsionFree :
-    ∀ (o : Type) [CommRing o] (g N' : ℕ) (J : Type) (b : TBase o (N' ^ 2)) (em : o →+* ℂ) (C : TObj g (N' ^ 2) J b (spMap em) → Prop), Function.Injective em → (thIdeal em C).IsRadical ∧ (∀ F ∈ thIdeal em C, ∀ e, MvPolynomial.homogeneousComponent e F ∈ thIdeal em C) ∧ ∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ thIdeal em C → F ∈ thIdeal em C := by
+theorem thIdeal_radical_homogeneous_torsionFree
+    : ∀ (o : Type) [CommRing o] (g N' : ℕ) (J : Type) (b : TBase o (N' ^ 2)) (em : o →+* ℂ)
+        (C : TObj g (N' ^ 2) J b (spMap em) → Prop),
+      Function.Injective em
+        → (thIdeal em C).IsRadical
+          ∧ (∀ F ∈ thIdeal em C, ∀ e, MvPolynomial.homogeneousComponent e F ∈ thIdeal em C)
+          ∧ ∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ thIdeal em C → F ∈ thIdeal em C := by
   intro o _ g N' J b em C hem
   refine ⟨fun F hF => ?_, fun F hF e => ?_, fun c F hc hF => ?_⟩
   · obtain ⟨n, hn⟩ := hF

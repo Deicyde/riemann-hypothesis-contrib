@@ -2,13 +2,13 @@ module
 
 public import Mathlib.Analysis.Matrix.MeasurableSpace
 public import Formalism.LocalToGlobal.Divisibility.QLocTied
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CardGLFiniteFieldEqPowMulProdStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CardResidueRingCompletionChosenUniformiserStatement
+public import Formalism.SharpRestriction.Divisibility.ZetaProductPairs
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CardGLFiniteFieldEqPowMulProd
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CardResidueRingCompletionChosenUniformiser
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAddHaarCompletionIntegralMatricesVolOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAddHaarCompletionIntegralMatricesVolOneStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHaarGLCompletionIntegersVolOneStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHaarGLCompletionIntegersVolOne
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsNrm
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLocalAtCompletionIntegersChosenUniformiserStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLocalAtCompletionIntegersChosenUniformiser
 public import Formalism.DoubleCosetMeasures.LatticeCoset
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TopoAF
 import Mathlib.Algebra.Order.Floor.Extended
@@ -59,6 +59,7 @@ import Mathlib.Topology.Connected.Separation
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.HostPins
+import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.LemmaU
 
 @[expose] public section
 
@@ -259,7 +260,7 @@ theorem isOpen_OP : IsOpen ((OP P : Subring (P.adicCompletion L)) : Set (P.adicC
   simp [intMat]
 
 theorem mem_adicCompletionIntegers_iff₂ (x : P.adicCompletion L) : x ∈ OP P ↔ Valued.v x ≤ 1 := by
-  first | exact Iff.rfl | exact HeightOneSpectrum.mem_adicCompletionIntegers _ _ _
+  first | exact Iff.rfl
 
 theorem piP_mem : ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) ∈ OP P := by
   rw [mem_adicCompletionIntegers_iff₂]
@@ -306,8 +307,7 @@ theorem isUnitAt_det {r : ℕ} {k : GL (Fin r) (P.adicCompletion L)} (hk : k ∈
           ((k⁻¹ : GL (Fin r) (P.adicCompletion L))
             : Matrix (Fin r) (Fin r) (P.adicCompletion L)).det := by
       rw [← map_mul, hmul, map_one]
-    _ ≤ Valued.v (k : Matrix (Fin r) (Fin r) (P.adicCompletion L)).det * 1 := by
-      first | exact mul_le_mul_left' b _ | exact mul_le_mul_of_nonneg_left b (zero_le _) | gcongr
+    _ ≤ Valued.v (k : Matrix (Fin r) (Fin r) (P.adicCompletion L)).det * 1 := by first | gcongr
     _ = _ := mul_one _
 
 end Loc
@@ -410,8 +410,7 @@ theorem absNorm_ne_zero₂ : qP P ≠ 0 := by
 theorem finite_kF
     : Finite (kF (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) (piP_mem P)) :=
   Nat.finite_of_card_ne_zero (by
-    rw [GlobalTheory.T.card_residueRing_completion_chosenUniformiser L P (piP_mem P)]
-    exact absNorm_ne_zero₂ P)
+    rw [_root_.GlobalTheory.ResidueCardUnif.card_kF_piP L P (piP_mem P)]; exact absNorm_ne_zero₂ P)
 
 theorem vol_Jset
     (r : ℕ)
@@ -420,24 +419,25 @@ theorem vol_Jset
     (h1 : ν₁ (intMat (OP P) r r) = 1)
     : (ν₁ (Jset (GLint (OP P) r))).toReal
       = Formalism.MainNotions.ZetaProductPairs.qE (qP P : ℝ) 1 r := by
-  haveI := isMaximal_span (piP_mem P) (GlobalTheory.T.isLocalAt_completionIntegers_chosenUniformiser L P)
+  haveI := isMaximal_span (piP_mem P) (_root_.GlobalTheory.Mem.HD.isLocalAt_adicCompletionIntegers_uniformizer L P)
   letI : Field (kF (OP P) _ (piP_mem P)) := Ideal.Quotient.field _
   letI : Fintype (kF (OP P) _ (piP_mem P)) := @Fintype.ofFinite _ (finite_kF P)
   have hc : Nat.card (kF (OP P) _ (piP_mem P)) = qP P :=
-    GlobalTheory.T.card_residueRing_completion_chosenUniformiser L P (piP_mem P)
+    _root_.GlobalTheory.ResidueCardUnif.card_kF_piP L P (piP_mem P)
   have h :=
     Formalism.DoubleCosetMeasures.Final.volJadd (P.adicCompletion L) (OP P) (isOpen_OP P) _
       (piP_mem P) (Units.ne_zero _)
-      (GlobalTheory.T.isLocalAt_completionIntegers_chosenUniformiser L P) (finite_kF P) r ν₁
-      (GLint (OP P) r)
+      (_root_.GlobalTheory.Mem.HD.isLocalAt_adicCompletionIntegers_uniformizer L P) (finite_kF P) r
+      ν₁ (GLint (OP P) r)
       (fun g hg => hg.1)
       le_rfl
   rw [Formalism.DoubleCosetMeasures.Final.glRed (P.adicCompletion L) (OP P) _ (piP_mem P)
-        (Units.ne_zero _) (GlobalTheory.T.isLocalAt_completionIntegers_chosenUniformiser L P)
-        (finite_kF P) r,
+        (Units.ne_zero _)
+        (_root_.GlobalTheory.Mem.HD.isLocalAt_adicCompletionIntegers_uniformizer L P) (finite_kF P)
+        r,
       h1, mul_one, hc]
     at h
-  have hG := GlobalTheory.T.card_GL_finiteField_eq_pow_mul_prod (kF (OP P) _ (piP_mem P)) r
+  have hG := _root_.GlobalTheory.Mem.card_GL_eq_pow_mul_qE (kF (OP P) _ (piP_mem P)) r
   rw [Fintype.card_eq_nat_card, hc] at hG
   have h' := congrArg ENNReal.toReal h
   rw [ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_natCast, ENNReal.toReal_natCast, hG]
@@ -453,7 +453,7 @@ theorem vol_II
     : (ν₂ (IIset (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L))).toReal
       = (qP P : ℝ) ^ (-((t * r : ℕ) : ℤ)) := by
   have hq : (Nat.card (kF (OP P) _ (piP_mem P)) : ENNReal) = (qP P : ENNReal) := by
-    rw [GlobalTheory.T.card_residueRing_completion_chosenUniformiser L P (piP_mem P)]
+    rw [_root_.GlobalTheory.ResidueCardUnif.card_kF_piP L P (piP_mem P)]
   have h :=
     Formalism.DoubleCosetMeasures.Final.volII (P.adicCompletion L) (OP P) (isOpen_OP P) _
       (piP_mem P) (Units.ne_zero _) (finite_kF P) t r ν₂
@@ -507,11 +507,9 @@ theorem stepAt_one
       Units.ne_zero _
     rw [MonoidHom.mul_apply, Units.val_mul, hν.unr _ hu, (hnrm _).1 hu, Real.one_rpow]
     simp [Units.val_inv_eq_inv_val, hd]
-  obtain ⟨μ, hμ, hμ1⟩ := GlobalTheory.T.exists_haar_GL_completion_integers_vol_one L P r
-  obtain ⟨ν₁, hν₁, hs₁, hν₁1⟩ :=
-    GlobalTheory.T.exists_addHaar_completionIntegralMatrices_vol_one L P r r
-  obtain ⟨ν₂, hν₂, hs₂, hν₂1⟩ :=
-    GlobalTheory.T.exists_addHaar_completionIntegralMatrices_vol_one L P t r
+  obtain ⟨μ, hμ, hμ1⟩ := _root_.GlobalTheory.haar_glInt_one L P r
+  obtain ⟨ν₁, hν₁, hs₁, hν₁1⟩ := _root_.GlobalTheory.HaarMat.exists_haar_intMat L P r r
+  obtain ⟨ν₂, hν₂, hs₂, hν₂1⟩ := _root_.GlobalTheory.HaarMat.exists_haar_intMat L P t r
   haveI := hν₁
   haveI := hν₂
   haveI := hs₁
@@ -533,7 +531,7 @@ theorem stepAt_one
       | exact ((measurable_add_const c.1).comp measurable_fst).prod_mk ((measurable_add_const c.2).comp measurable_snd)⟩
   have hc : ∀ g, mcoef (OP P) μ (fun _ : GL (Fin r) (P.adicCompletion L) => (1 : ℂ)) g = 1 := by
     intro g
-    simp [mcoef, setIntegral_const, Measure.real, hμ1]
+    simp [mcoef, Measure.real, hμ1]
   show IsStep (OP P) _ nrm δ (fun _ => ν) r t 0 _
   unfold IsStep
   rw [Nat.zero_mul, Nat.zero_add, Nat.one_mul]
@@ -570,8 +568,8 @@ theorem stepAt_one
             = 1 := by
       intro k; simp [hδ.unitary]
     have key :=
-      Formalism.DoubleCosetMeasures.Final.lemmaUSplit (P.adicCompletion L) r t (OP P) (isOpen_OP P)
-        _ (Units.ne_zero (piP P)) (GLint (OP P) r) (isCompact_GLint P r)
+      _root_.Formalism.DoubleCosetMeasures.P.LemmaU.lemmaU (P.adicCompletion L) r t (OP P)
+        (isOpen_OP P) _ (Units.ne_zero (piP P)) (GLint (OP P) r) (isCompact_GLint P r)
         (fun k hk => hk.1)
         ((δ.comp (GeneralLinearGroup.det.comp (GLint (OP P) r).subtype))⁻¹) hρ (ν * δ) nrm 1 hchar
         (mcoef (OP P) μ fun _ => (1 : ℂ)) hlam μ ν₁ ν₂

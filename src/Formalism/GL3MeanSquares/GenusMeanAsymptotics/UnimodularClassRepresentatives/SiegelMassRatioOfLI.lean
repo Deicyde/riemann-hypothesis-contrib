@@ -78,8 +78,7 @@ theorem massConst_all
     | succ m ih =>
       rcases Nat.eq_zero_or_pos m with rfl | hpos
       · have he : Finset.Icc 2 (0 + 1) = ∅ := Finset.Icc_eq_empty (by norm_num)
-        rw [he, Finset.prod_empty, mul_one]
-        exact h1
+        simpa [he, Finset.prod_empty, mul_one] using h1
       · have hc := ih hpos
         have hP
             : 0 < ∏ j ∈ Finset.Icc 2 m, Formalism.HermitianLatticesTheory.massRatioRightSide K j :=

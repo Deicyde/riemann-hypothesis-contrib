@@ -50,6 +50,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.isThetaFunction_superposition_orthogonalSlices
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.isThetaFunction_superposition_orthogonalSlices
             → ∀ (Ω : Type) [MeasurableSpace Ω] (μ : Measure Ω) (k : Ω → WO B T) (a : Ω → ℂ),
               Measurable k → Integrable a μ
                 → IsThetaFunO ψ A T fun u => ∫ w, a w * F ((o.resS T).symm (u, k w)) ∂μ := by
-  first
-  | exact @GlobalTheory.SuperposS.superpos_isTheta
-  | exact GlobalTheory.SuperposS.superpos_isTheta
-  | (intros; apply GlobalTheory.SuperposS.superpos_isTheta <;> assumption)
+  first | exact @GlobalTheory.SuperposS.superpos_isTheta

@@ -48,6 +48,7 @@ open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
   Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.rational_unipotent_groups_lattices_global_coordinates
     : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
       Formalism.MainNotions.S.Cnt.Stand D u u' → 4 * D.R.rS + 7 ≤ D.R.k
@@ -87,7 +88,4 @@ theorem _root_.GlobalTheory.T.rational_unipotent_groups_lattices_global_coordina
                               m (frame (lf D (X.Fu u')) b) = ∑ a, A' a b • frame (lf D (X.Fu u')) a)
                             ∧ MovesTo F00 F'0 (lf D (X.Fu u)) t.frame (ρ * n) (U * A)
                               (U' * A') := by
-  first
-  | exact @GlobalTheory.HL.GrpCoord.grp_coords
-  | exact GlobalTheory.HL.GrpCoord.grp_coords
-  | (intros; apply GlobalTheory.HL.GrpCoord.grp_coords <;> assumption)
+  first | exact @GlobalTheory.HL.GrpCoord.grp_coords

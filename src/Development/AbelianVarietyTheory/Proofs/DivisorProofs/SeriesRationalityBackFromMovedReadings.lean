@@ -53,9 +53,6 @@ noncomputable section
 
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.UnframeForms
 
 variable

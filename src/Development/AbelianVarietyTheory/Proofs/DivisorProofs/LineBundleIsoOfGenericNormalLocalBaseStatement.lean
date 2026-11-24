@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -53,6 +54,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
+
 theorem _root_.GlobalTheory.T.lineBundleIso_of_generic_normal_local_base
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R]
         [IsIntegrallyClosed R],
@@ -62,7 +64,4 @@ theorem _root_.GlobalTheory.T.lineBundleIso_of_generic_normal_local_base
             L.IsLB → L'.IsLB
               → LBIso (L.pull (pullback.fst H.hom (jK R))) (L'.pull (pullback.fst H.hom (jK R)))
               → LBIso L L' := by
-  first
-  | exact @GlobalTheory.Mum.lbIso_of_generic_local
-  | exact GlobalTheory.Mum.lbIso_of_generic_local
-  | (intros; apply GlobalTheory.Mum.lbIso_of_generic_local <;> assumption)
+  first | exact @GlobalTheory.Mum.lbIso_of_generic_local

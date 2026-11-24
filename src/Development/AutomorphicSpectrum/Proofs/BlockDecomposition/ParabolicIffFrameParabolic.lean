@@ -231,7 +231,7 @@ theorem exists_isPar_iff_mem_uQ
       : (diagCols (Fin n) : Matrix (Fin n ⊕ Fin n) (Fin n) E).map (inclR (F := F) (E := E) (AF F))
         = diagCols (Fin n) := by
     ext r j
-    rcases r with i | i <;> by_cases h : i = j <;> simp [diagCols, Matrix.one_apply, h]
+    rcases r with i | i <;> by_cases h : i = j <;> simp [diagCols, h]
   have hB
       : ((bA (F := F) b : GL (Fin n ⊕ Fin n) (AE F E))
             : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) (AE F E))

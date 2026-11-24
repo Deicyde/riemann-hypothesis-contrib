@@ -172,7 +172,7 @@ theorem GlobalTheory.EtC.laurent_vanishing_finite
                 → ∀ s i : ℤ,
                   2 ≤ s → s < n → Subsingleton (Ht q (sp (LaurentPolynomial T)) s i) := by
   intro q _ n hyp A _ _ hA hq
-  refine GlobalTheory.T.finiteAlgebra_strictlyHenselian_induction A hA
+  refine _root_.GlobalTheory.EtC.GmStep.FinSH.induction_principle A hA
     (fun T _ _ => ∀ s i : ℤ, 2 ≤ s → s < n → Subsingleton (Ht q (sp (LaurentPolynomial T)) s i))
     ?_ ?_ ?_ ?_
   · intro T T' _ _ _ _ e hT s i h2 hs

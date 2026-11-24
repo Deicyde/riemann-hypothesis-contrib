@@ -158,7 +158,7 @@ theorem two_q_notMem (hO : OffQ D) (G : GridData L sc) {w : Pl D.host.E} (hw : w
     rw [← G.pl.under_w hv] at hpv
     change algebraMap (𝓞 D.host.F) (𝓞 D.host.E) _ ∈ (G.pl.w v).asIdeal at hpv
     rwa [map_natCast] at hpv
-  exact GlobalTheory.AAUnit.natCast_notMem_of_coprime _ (coprime_two_q hp hp2 hpq) hpw
+  exact _root_.GlobalTheory.HalfCompare.not_mem_of_coprime _ (coprime_two_q hp hp2 hpq) hpw
 
 theorem aa_le_one
     (hO : OffQ D)
@@ -212,13 +212,6 @@ attribute [local instance]
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem genMap_add (S T : HSp D) (s : Fin S.rank → D.host.E) (t t' : Fin T.rank → D.host.E)
-    : GlobalTheory.LatVac.genMap S T 1 s (t + t')
-      = GlobalTheory.LatVac.genMap S T 1 s t + GlobalTheory.LatVac.genMap S T 1 s t' := by
-  ext p q
-  simp only [GlobalTheory.LatVac.genMap, Matrix.of_apply, Matrix.add_apply, Pi.add_apply]
-  ring
-
 theorem genMap_smul
     (S T : HSp D) (s : Fin S.rank → D.host.E) (c : D.host.E) (t : Fin T.rank → D.host.E)
     : GlobalTheory.LatVac.genMap S T 1 s (c • t) = c • GlobalTheory.LatVac.genMap S T 1 s t := by
@@ -226,10 +219,6 @@ theorem genMap_smul
   simp only [GlobalTheory.LatVac.genMap, Matrix.of_apply, Matrix.smul_apply, Pi.smul_apply,
     smul_eq_mul]
   ring
-
-theorem genMap_zero (S T : HSp D) (s : Fin S.rank → D.host.E)
-    : GlobalTheory.LatVac.genMap S T 1 s (0 : Fin T.rank → D.host.E) = 0 := by
-  ext p q; simp [GlobalTheory.LatVac.genMap]
 
 theorem map_smul_eToEAf {m n : ℕ} (c : D.host.E) (Y : Matrix (Fin m) (Fin n) D.host.E)
     : (c • Y).map (eToEAf D) = eToEAf D c • Y.map (eToEAf D) := by
@@ -298,7 +287,7 @@ theorem local_le
         _ = κ := mul_one κ
     | zero =>
       intro a b
-      rw [genMap_zero, Matrix.map_zero _ (eToEAf D).map_zero,
+      rw [_root_.GlobalTheory.LatVacFull.genMap_zero_right, Matrix.map_zero _ (eToEAf D).map_zero,
         show Comparison₂.fr (B.β i 0) (B.β (i + 1) 0)
               (0 : Matrix (Fin (G.V (.grid i 0)).rank) (Fin (G.V (.grid (i + 1) 0)).rank) (EAf D))
             = 0 by
@@ -306,8 +295,8 @@ theorem local_le
       simp
     | add x y _ _ hx hy =>
       intro a b
-      rw [genMap_add, Matrix.map_add _ (eToEAf D).map_add, Comparison₂.fr_add, Matrix.add_apply,
-        RingHom.map_add (f := _)]
+      rw [_root_.GlobalTheory.LatVacFull.genMap_add_right, Matrix.map_add _ (eToEAf D).map_add,
+        Comparison₂.fr_add, Matrix.add_apply, RingHom.map_add (f := _)]
       exact Valuation.map_add_le _ (hx a b) (hy a b)
     | smul r x _ hx =>
       intro a b

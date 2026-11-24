@@ -51,19 +51,22 @@ noncomputable section
 namespace PI.VolStabSW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.AdicCompletionValuation
 
 section Local
 
 variable (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-theorem countable_numberField : Countable F :=
-  Finsupp.Countable.of_moduleFinite (R := ℚ)
+theorem countable_numberField : Countable F := Finsupp.Countable.of_moduleFinite (R := ℚ)
 
 theorem separableSpace_Fv : TopologicalSpace.SeparableSpace (Fv F v) := by
   have := countable_numberField F
-  exact ⟨⟨Set.range (algebraMap F (Fv F v)), Set.countable_range _,
-    IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap F v⟩⟩
+  exact ⟨⟨
+    Set.range (algebraMap F (Fv F v)),
+    Set.countable_range _,
+    IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap F v
+  ⟩⟩
 
 theorem secondCountable_Fv : SecondCountableTopology (Fv F v) := by
   have := separableSpace_Fv F v

@@ -453,8 +453,8 @@ theorem exists_norm_sym
     exists_gen hL (φ' := ![(snd T A).left, (snd T A ≫ ι[A]).left]) (ε' := ![k, -k])
       (fun U _ h => by
         simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_two,
-          Matrix.cons_val_zero, Matrix.cons_val_one, o₁, o₂, neg_neg, zpow_neg, inv_inv,
-          inv_mul_cancel, _root_.mul_one])
+          Matrix.cons_val_zero, Matrix.cons_val_one, o₁, o₂, zpow_neg, inv_inv, inv_mul_cancel,
+          _root_.mul_one])
       (LB.mulGen L _ _ _ _ nu (LB.invGen L _ _ (LB.pullGen L _ _ nu o.left)))
       (mulGen_isGen _ _ _ _ _ _ _ hnu (invGen_isGen _ _ _ _ (pullGen_isGen _ _ _ _ hnu _)))
   have v'
@@ -584,7 +584,7 @@ theorem sq_frame_of_symmetric
       (GeneratorPullback.powGen U.LG.L _ _ (LB.invGen U.LG.L _ _ U.symG) N)
       (powGen_isGen _ _ _ _ (invGen_isGen _ _ _ _ U.symG_gen) N)
   obtain ⟨⟨κ, hκ⟩, hP⟩ :=
-    GlobalTheory.T.expansion_pullback_section_endomorphism hL R I hA D A G hS U F E
+    _root_.GlobalTheory.UT.PullExp.main hL R I hA D A G hS U F E
       (fun a b e => neg_injective ((eh a).symm.trans (e.trans (eh b))))
       N N hN hN ⟨β, hβ⟩
   have hP' :=

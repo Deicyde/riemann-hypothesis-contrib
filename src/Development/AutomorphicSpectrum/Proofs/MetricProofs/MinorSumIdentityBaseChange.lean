@@ -48,36 +48,50 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersecti
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.MinorAny
 
-theorem minorIJ_map {R S : Type} [CommRing R] [CommRing S] {N : ℕ} (f : R →+* S)
-    (A : Matrix (Fin N) (Fin N) R) (I J : Finset (Fin N)) :
-    minorIJ (A.map f) I J = f (minorIJ A I J) := by
+theorem minorIJ_map
+    {R S : Type} [CommRing R] [CommRing S]
+    {N : ℕ}
+    (f : R →+* S) (A : Matrix (Fin N) (Fin N) R) (I J : Finset (Fin N))
+    : minorIJ (A.map f) I J = f (minorIJ A I J) := by
   unfold minorIJ
   split_ifs with e
   · rw [RingHom.map_det]
     rfl
   · exact (map_zero f).symm
 
-def gap {N : ℕ} {Ω : Type} [Field Ω] (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω)
-    (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N)) (S : Type) [CommRing S] [Algebra Ω S]
-    (h : Matrix (Fin N) (Fin N) S) : S :=
-  algebraMap Ω S c₀ * ∑ I, algebraMap Ω S (coef I) * minorIJ (T.map (algebraMap Ω S) * h) I J -
-    algebraMap Ω S c₁ * ∑ I, algebraMap Ω S (u I) * minorIJ h I J
+def gap
+    {N : ℕ} {Ω : Type} [Field Ω]
+    (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω) (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N))
+    (S : Type) [CommRing S] [Algebra Ω S]
+    (h : Matrix (Fin N) (Fin N) S)
+    : S :=
+  algebraMap Ω S c₀ * ∑ I, algebraMap Ω S (coef I) * minorIJ (T.map (algebraMap Ω S) * h) I J
+    - algebraMap Ω S c₁ * ∑ I, algebraMap Ω S (u I) * minorIJ h I J
 
-theorem gap_map {N : ℕ} {Ω : Type} [Field Ω] (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω)
-    (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N)) {S S' : Type} [CommRing S] [Algebra Ω S]
-    [CommRing S'] [Algebra Ω S'] (f : S →ₐ[Ω] S') (h : Matrix (Fin N) (Fin N) S) :
-    f (gap T c₀ c₁ coef u J S h) = gap T c₀ c₁ coef u J S' (h.map f.toRingHom) := by
-  have hm : ∀ (M : Matrix (Fin N) (Fin N) S) (I J : Finset (Fin N)),
-      f (minorIJ M I J) = minorIJ (M.map f.toRingHom) I J :=
-    fun M I J => (minorIJ_map f.toRingHom M I J).symm
-  have hT : (T.map (algebraMap Ω S) * h).map f.toRingHom = T.map (algebraMap Ω S') * h.map f.toRingHom := by
+theorem gap_map
+    {N : ℕ} {Ω : Type} [Field Ω]
+    (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω) (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N))
+    {S S' : Type} [CommRing S] [Algebra Ω S] [CommRing S'] [Algebra Ω S']
+    (f : S →ₐ[Ω] S') (h : Matrix (Fin N) (Fin N) S)
+    : f (gap T c₀ c₁ coef u J S h) = gap T c₀ c₁ coef u J S' (h.map f.toRingHom) := by
+  have hm
+      : ∀ (M : Matrix (Fin N) (Fin N) S) (I J : Finset (Fin N)),
+        f (minorIJ M I J) = minorIJ (M.map f.toRingHom) I J := fun M I J =>
+    (minorIJ_map f.toRingHom M I J).symm
+  have hT
+      : (T.map (algebraMap Ω S) * h).map f.toRingHom
+        = T.map (algebraMap Ω S') * h.map f.toRingHom := by
     rw [Matrix.map_mul, Matrix.map_map]
     congr 1
     congr 1
@@ -86,7 +100,16 @@ theorem gap_map {N : ℕ} {Ω : Type} [Field Ω] (T : Matrix (Fin N) (Fin N) Ω)
 
   simp only [gap, map_sub, map_mul, map_sum, AlgHom.commutes, hm, hT]
 
-theorem minor_any : ∀ (Ω : Type) [Field Ω] [Infinite Ω] (N j : ℕ) (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω) (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N)), (∀ h : Matrix (Fin N) (Fin N) Ω, IsBlockDiag j h → c₀ * ∑ I, coef I * minorIJ (T * h) I J = c₁ * ∑ I, u I * minorIJ h I J) → ∀ (S : Type) [CommRing S] [Algebra Ω S] (h : Matrix (Fin N) (Fin N) S), IsBlockDiag j h → algebraMap Ω S c₀ * ∑ I, algebraMap Ω S (coef I) * minorIJ (T.map (algebraMap Ω S) * h) I J = algebraMap Ω S c₁ * ∑ I, algebraMap Ω S (u I) * minorIJ h I J := by
+theorem minor_any
+    : ∀ (Ω : Type) [Field Ω] [Infinite Ω] (N j : ℕ) (T : Matrix (Fin N) (Fin N) Ω) (c₀ c₁ : Ω)
+        (coef u : Finset (Fin N) → Ω) (J : Finset (Fin N)),
+      (∀ h : Matrix (Fin N) (Fin N) Ω,
+          IsBlockDiag j h → c₀ * ∑ I, coef I * minorIJ (T * h) I J = c₁ * ∑ I, u I * minorIJ h I J)
+        → ∀ (S : Type) [CommRing S] [Algebra Ω S] (h : Matrix (Fin N) (Fin N) S),
+          IsBlockDiag j h
+            → algebraMap Ω S c₀
+                * ∑ I, algebraMap Ω S (coef I) * minorIJ (T.map (algebraMap Ω S) * h) I J
+              = algebraMap Ω S c₁ * ∑ I, algebraMap Ω S (u I) * minorIJ h I J := by
   intro Ω _ _ N j T c₀ c₁ coef u J hyp S _ _ h hh
   have hT : T.map (algebraMap Ω Ω) = T := Matrix.ext fun _ _ => rfl
   have key : ∀ M : Matrix (Fin N) (Fin N) Ω, IsBlockDiag j M → gap T c₀ c₁ coef u J Ω M = 0 := by

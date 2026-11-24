@@ -61,6 +61,7 @@ attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
+
 theorem _root_.GlobalTheory.T.liftsChar_of_residueChar_at_splitPlace
     : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (PP : Pl D.host.E) (a : (kP PP)ˣ →* ℂˣ),
       GlobalTheory.StepLaw.ResAt χ PP a
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.liftsChar_of_residueChar_at_splitPlace
                   (∃ e, IsIdemOf φ e ∧ (1 - e) * (x : AE D) = 1 - e ∧ rdA φ (x : AE D) = y)
                     → μ y = Circle.toUnits (χ x))
                 → LiftsChar φ PP μ a := by
-  first
-  | exact @GlobalTheory.ResLift.liftsChar_of_resAt
-  | exact GlobalTheory.ResLift.liftsChar_of_resAt
-  | (intros; apply GlobalTheory.ResLift.liftsChar_of_resAt <;> assumption)
+  first | exact @GlobalTheory.ResLift.liftsChar_of_resAt

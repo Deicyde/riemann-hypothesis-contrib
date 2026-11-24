@@ -104,7 +104,7 @@ theorem iota_mul (A B : Matrix (Fin k) (Fin k) ℂ)
       : ∀ X : Matrix (Fin k) (Fin (2 * r + k + 1)) ℂ, (Ew k r)ᵀ * (Ew k r * X) = X := fun X => by
     rw [← Matrix.mul_assoc, h, Matrix.one_mul]
   simp only [iota, Matrix.mul_add, Matrix.add_mul, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one,
-    Matrix.one_mul, Matrix.mul_assoc, h1, h2]
+    Matrix.one_mul, Matrix.mul_assoc, h2]
   abel
 
 theorem iota_one : iota (k := k) (r := r) 1 = 1 := by simp [iota]
@@ -143,8 +143,8 @@ private lemma hpk_apply_of_outer_index (i j : Fin (2 * r + k + 1)) :
     Hpk k r i j = if j = tau k r i then sgn k r i else 0 := by
   have hi := i.isLt
   have hj := j.isLt
-  simp only [Hpk, tau, sgn, Fin.ext_iff, Fin.val_mk]
-  split_ifs <;> first | rfl | omega | norm_num
+  simp only [Hpk, tau, sgn, Fin.ext_iff]
+  split_ifs <;> first | rfl | omega
 
 theorem hpk_mul_apply'
     {X : Type*} (A : Matrix (Fin (2 * r + k + 1)) X ℂ) (i : Fin (2 * r + k + 1)) (j : X)
@@ -161,8 +161,8 @@ theorem hpk_Ew : Hpk k r * Ew k r = Ew k r := by
   rw [hpk_mul_apply']
   have hi := i.isLt
   have hc := c.isLt
-  simp only [Ew, sgn, tau, pW, Fin.ext_iff, Fin.val_mk]
-  split_ifs <;> first | rfl | omega | (simp; done) | norm_num
+  simp only [Ew, sgn, tau, pW, Fin.ext_iff]
+  split_ifs <;> first | rfl | omega | (simp; done)
 
 theorem EwT_hpk : (Ew k r)ᵀ * Hpk k r = (Ew k r)ᵀ := by
   have h := congrArg Matrix.conjTranspose (hpk_Ew (k := k) (r := r))
@@ -283,7 +283,7 @@ private lemma Ew_transpose_mul_iota (A : Matrix (Fin k) (Fin k) ℂ) :
   have h' : ∀ X : Matrix (Fin k) (Fin k) ℂ, (Ew k r)ᵀ * (Ew k r * X) = X := fun X => by
     rw [← Matrix.mul_assoc, h, Matrix.one_mul]
   simp only [iota, Matrix.mul_add, Matrix.add_mul, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one,
-    Matrix.one_mul, Matrix.mul_assoc, h, h', sub_self, zero_add]
+    Matrix.mul_assoc, h, h', sub_self, zero_add]
 
 theorem iota_surj
     {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UWset k r (wLastV k r))
@@ -677,14 +677,12 @@ theorem phi_mul (g h : ↥(Formalism.REAL.UJ (εT k)))
   rw [← iota_mul]
   rfl
 
-theorem iota_linv (A : Matrix (Fin k) (Fin k) ℂ) : (Ew k r)ᵀ * iota (r := r) A * Ew k r = A :=
-  Ew_transpose_mul_iota A
-
 theorem iota_inj {A B : Matrix (Fin k) (Fin k) ℂ} (h : iota (r := r) A = iota (r := r) B)
     : A = B := by
   calc
-    A = (Ew k r)ᵀ * iota (r := r) A * Ew k r := (iota_linv A).symm
-    _ = B := by rw [h, iota_linv]
+    A = (Ew k r)ᵀ * iota (r := r) A * Ew k r :=
+      (_root_.Formalism.L2.SG.Pf.GV.Ew_transpose_mul_iota A).symm
+    _ = B := by rw [h, _root_.Formalism.L2.SG.Pf.GV.Ew_transpose_mul_iota]
 
 theorem cont_phi : Continuous (phi k r) := by
   show Continuous fun g : ↥(Formalism.REAL.UJ (εT k)) =>
@@ -701,11 +699,7 @@ theorem phi_surj
   let u : (Matrix (Fin k) (Fin k) ℂ)ˣ := ⟨
     (Ew k r)ᵀ * s * Ew k r,
     ((Ew k r)ᵀ * s * Ew k r)ᴴ,
-    (by
-      first
-      | exact mul_eq_one_comm.mp hs2
-      | exact Matrix.mul_eq_one_comm.mp hs2
-      | exact (Matrix.mul_eq_one_comm_of_equiv (Equiv.refl _)).mp hs2),
+    (by first | exact mul_eq_one_comm.mp hs2),
     hs2
   ⟩
   have hu : u ∈ Formalism.REAL.UJ (εT k) := by
@@ -831,9 +825,7 @@ theorem vol_ball_eq (ρ : ℝ)
     ext x
     simp only [Set.mem_preimage, Metric.mem_ball, dist_zero_right, LinearIsometryEquiv.norm_map]
   rw [← hpre]
-  first
-  | exact (hmp.measure_preimage measurableSet_ball.nullMeasurableSet).symm
-  | exact (hmp.measure_preimage measurableSet_ball).symm
+  first | exact (hmp.measure_preimage measurableSet_ball.nullMeasurableSet).symm
 
 end Formalism.L2.SG.Pf.GV
 
@@ -925,9 +917,7 @@ theorem gauge_measure_is_haar : IsHaarOn (SW k r) (nu0 k r) := by
     rw [nu0, Measure.map_map hlm cont_phi.measurable, hcomp,
       ← Measure.map_map cont_phi.measurable hml]
     congr 1
-    first
-    | exact MeasureTheory.map_mul_left_eq_self _ g0
-    | exact MeasureTheory.Measure.map_mul_left_eq_self _ g0
+    first | exact MeasureTheory.map_mul_left_eq_self _ g0
 
 theorem gauge_measure_ball_ratio
     : Tendsto

@@ -54,9 +54,11 @@ namespace GlobalTheory.HermClass
 
 open Module Submodule NumberField
 
-theorem finite_between {E V : Type} [Field E] [CharZero E] [AddCommGroup V] [Module E V]
-    (L₀ : Submodule ℤ V) (h₀ : L₀.FG) {M : ℤ} (hM : M ≠ 0) :
-    {L : Submodule ℤ V | L₀ ≤ L ∧ ∀ x ∈ L, (M : E) • x ∈ L₀}.Finite := by
+theorem finite_between
+    {E V : Type} [Field E] [CharZero E] [AddCommGroup V] [Module E V]
+    (L₀ : Submodule ℤ V) (h₀ : L₀.FG)
+    {M : ℤ} (hM : M ≠ 0)
+    : {L : Submodule ℤ V | L₀ ≤ L ∧ ∀ x ∈ L, (M : E) • x ∈ L₀}.Finite := by
   classical
   have hcast : ∀ x : V, (M : E) • x = M • x := fun x => Int.cast_smul_eq_zsmul E M x
   let μ : V →ₗ[ℤ] V := M • LinearMap.id
@@ -81,8 +83,10 @@ theorem finite_between {E V : Type} [Field E] [CharZero E] [AddCommGroup V] [Mod
   have : Finite (Submodule ℤ (L' ⧸ K)) :=
     Finite.of_injective (fun P : Submodule ℤ (L' ⧸ K) => (P : Set (L' ⧸ K))) SetLike.coe_injective
   let g : Submodule ℤ V → Submodule ℤ (L' ⧸ K) := fun L => (L.comap L'.subtype).map K.mkQ
-  have key : ∀ L : Submodule ℤ V, L ∈ {L : Submodule ℤ V | L₀ ≤ L ∧ ∀ x ∈ L, (M : E) • x ∈ L₀} →
-      ((g L).comap K.mkQ).map L'.subtype = L := by
+  have key
+      : ∀ L : Submodule ℤ V,
+        L ∈ {L : Submodule ℤ V | L₀ ≤ L ∧ ∀ x ∈ L, (M : E) • x ∈ L₀}
+          → ((g L).comap K.mkQ).map L'.subtype = L := by
     rintro L ⟨hle, hM'⟩
     have hK : K ≤ L.comap L'.subtype := fun x hx => hle hx
     have hL' : L ≤ L' := fun x hx => show μ x ∈ L₀ by rw [hμ, ← hcast]; exact hM' x hx
@@ -93,40 +97,50 @@ theorem finite_between {E V : Type} [Field E] [CharZero E] [AddCommGroup V] [Mod
   exact (key L₁ h₁).symm.trans
     ((congrArg (fun P => (P.comap K.mkQ).map L'.subtype) h12).trans (key L₂ h₂))
 
-theorem exists_finite_representatives {α : Type*} {β : Type*} (f : α → β)
-    (hf : (Set.range f).Finite) : ∃ S : Set α, S.Finite ∧ ∀ a, ∃ s ∈ S, f s = f a := by
+theorem exists_finite_representatives
+    {α : Type*} {β : Type*} (f : α → β) (hf : (Set.range f).Finite)
+    : ∃ S : Set α, S.Finite ∧ ∀ a, ∃ s ∈ S, f s = f a := by
   classical
   have : Finite (Set.range f) := hf.to_subtype
   refine ⟨Set.range (fun b : Set.range f => b.2.choose), Set.finite_range _, fun a => ?_⟩
-  exact ⟨(⟨f a, a, rfl⟩ : Set.range f).2.choose, ⟨⟨f a, a, rfl⟩, rfl⟩,
-    (⟨f a, a, rfl⟩ : Set.range f).2.choose_spec⟩
+  exact ⟨
+    (⟨f a, a, rfl⟩ : Set.range f).2.choose,
+    ⟨⟨f a, a, rfl⟩, rfl⟩,
+    (⟨f a, a, rfl⟩ : Set.range f).2.choose_spec
+  ⟩
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDimensional E V]
-    (h : V →ₗ[E] V →ₗ⋆[E] E) (hs : ∀ x y, h y x = star (h x y))
-    (hnd : ∀ y, (∀ x, h y x = 0) → y = 0) {N m : ℤ} (hN : N ≠ 0) (hm : m ≠ 0)
-    {α : Type*} {ι : Type*} [Finite ι] (Λ : α → Submodule ℤ V) (t : α → ι → V)
+theorem exists_finite_classes
+    {V : Type} [AddCommGroup V] [Module E V] [FiniteDimensional E V]
+    (h : V →ₗ[E] V →ₗ⋆[E] E)
+    (hs : ∀ x y, h y x = star (h x y)) (hnd : ∀ y, (∀ x, h y x = 0) → y = 0)
+    {N m : ℤ} (hN : N ≠ 0) (hm : m ≠ 0)
+    {α : Type*} {ι : Type*} [Finite ι]
+    (Λ : α → Submodule ℤ V) (t : α → ι → V)
     (hfg : ∀ a, (Λ a).FG) (hsp : ∀ a, span E (Λ a : Set V) = ⊤)
     (hO : ∀ a, ∀ c : E, IsIntegral ℤ c → ∀ x ∈ Λ a, c • x ∈ Λ a)
     (hint : ∀ a, ∀ x ∈ Λ a, ∀ y ∈ Λ a, IsIntegral ℤ (h x y))
-    (hdual : ∀ a y, (∀ x ∈ Λ a, IsIntegral ℤ (h y x)) → (N : E) • y ∈ Λ a)
-    (ht : ∀ a i, t a i ∈ Λ a) :
-    ∃ S : Set α, S.Finite ∧ ∀ a, ∃ s ∈ S, ∃ γ : V ≃ₗ[E] V, (∀ x y, h (γ x) (γ y) = h x y) ∧
-      (∀ x, x ∈ Λ a ↔ γ x ∈ Λ s) ∧ ∀ i, ∃ y ∈ Λ s, γ (t a i) - t s i = m • y := by
+    (hdual : ∀ a y, (∀ x ∈ Λ a, IsIntegral ℤ (h y x)) → (N : E) • y ∈ Λ a) (ht : ∀ a i, t a i ∈ Λ a)
+    : ∃ S : Set α,
+      S.Finite
+        ∧ ∀ a, ∃ s ∈ S, ∃ γ : V ≃ₗ[E] V,
+          (∀ x y, h (γ x) (γ y) = h x y) ∧ (∀ x, x ∈ Λ a ↔ γ x ∈ Λ s)
+            ∧ ∀ i, ∃ y ∈ Λ s, γ (t a i) - t s i = m • y := by
   classical
   set n := finrank E V with hn
   obtain ⟨S₀, hS₀f, hS₀0, hS₀⟩ := exists_finite_orthogonal_lengths (E := E) n hN
-  have hv : ∀ a, ∃ v : Fin n → V, (∀ i, v i ∈ Λ a) ∧
-      (∀ i j, i ≠ j → h (v i) (v j) = 0) ∧ ∀ i, h (v i) (v i) ∈ S₀ := fun a =>
+  have hv
+      : ∀ a, ∃ v : Fin n → V,
+        (∀ i, v i ∈ Λ a) ∧ (∀ i j, i ≠ j → h (v i) (v j) = 0) ∧ ∀ i, h (v i) (v i) ∈ S₀ := fun a =>
     hS₀ V h (Λ a) hn.symm hs hnd (hfg a) (hsp a) (hO a) (hint a) (hdual a)
   choose v hvΛ hvo hvS using hv
   have hexp : ∀ a (c : Fin n → E) (y : V), h (∑ i, c i • v a i) y = ∑ i, c i * h (v a i) y := by
     intro a c y
 
     simp [map_sum, LinearMap.sum_apply, smul_eq_mul]
-  have hexp2 : ∀ a (x : V) (c : Fin n → E),
-      h x (∑ j, c j • v a j) = ∑ j, star (c j) * h x (v a j) := by
+  have hexp2
+      : ∀ a (x : V) (c : Fin n → E), h x (∑ j, c j • v a j) = ∑ j, star (c j) * h x (v a j) := by
     intro a x c
 
     simp [map_sum, smul_eq_mul, starRingEnd_apply]
@@ -151,8 +165,10 @@ theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDi
   have hΦsymm : ∀ a c, (Φ a).symm c = ∑ i, c i • v a i := by
     intro a c
     simp [Φ, b, Basis.equivFun_symm_apply]
-  have hgram : ∀ a (c c' : Fin n → E), h (∑ i, c i • v a i) (∑ j, c' j • v a j) =
-      ∑ i, c i * (star (c' i) * h (v a i) (v a i)) := by
+  have hgram
+      : ∀ a (c c' : Fin n → E),
+        h (∑ i, c i • v a i) (∑ j, c' j • v a j)
+          = ∑ i, c i * (star (c' i) * h (v a i) (v a i)) := by
     intro a c c'
     rw [hexp]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -168,7 +184,8 @@ theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDi
     intro c
     simp [L₀, Submodule.mem_pi, mem_integralClosure_iff]
   have hL₀fg : L₀.FG := Submodule.fg_pi fun _ => fg_integers E
-  let P : α → Submodule ℤ (Fin n → E) := fun a => (Λ a).map ((Φ a : V →ₗ[E] (Fin n → E)).restrictScalars ℤ)
+  let P : α → Submodule ℤ (Fin n → E) := fun a =>
+    (Λ a).map ((Φ a : V →ₗ[E] (Fin n → E)).restrictScalars ℤ)
   have hmemP : ∀ a c, c ∈ P a ↔ (Φ a).symm c ∈ Λ a := by
     intro a c
     constructor
@@ -194,8 +211,9 @@ theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDi
       rw [this]
       exact (hMT _ ⟨_, hvS a i, rfl⟩).mul (hint a _ hx _ (hvΛ a i))
   have hB := finite_between (E := E) L₀ hL₀fg hM0
-  have hres : ∀ Q : Submodule ℤ (Fin n → E), ∃ R : Set (Fin n → E), R.Finite ∧
-      (Q.FG → ∀ x ∈ Q, ∃ ρ ∈ R, ∃ y ∈ Q, x = ρ + m • y) := by
+  have hres
+      : ∀ Q : Submodule ℤ (Fin n → E), ∃ R : Set (Fin n → E),
+        R.Finite ∧ (Q.FG → ∀ x ∈ Q, ∃ ρ ∈ R, ∃ y ∈ Q, x = ρ + m • y) := by
     intro Q
     by_cases hQ : Q.FG
     · obtain ⟨R, hRf, -, hR⟩ := exists_finite_residues Q hQ hm
@@ -208,8 +226,8 @@ theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDi
   let f : α → (Fin n → E) × Submodule ℤ (Fin n → E) × (ι → Fin n → E) := fun a =>
     (fun i => h (v a i) (v a i), P a, ρ a)
   have hfin : (Set.range f).Finite := by
-    refine ((Set.Finite.pi fun _ => hS₀f).prod (hB.prod
-      (Set.Finite.pi fun _ => hB.biUnion fun Q _ => hRf Q))).subset ?_
+    refine ((Set.Finite.pi fun _ => hS₀f).prod
+      (hB.prod (Set.Finite.pi fun _ => hB.biUnion fun Q _ => hRf Q))).subset ?_
     rintro _ ⟨a, rfl⟩
     exact ⟨fun i _ => hvS a i, hPB a, fun i _ => Set.mem_biUnion (hPB a) (hρR a i)⟩
   obtain ⟨S, hSf, hS⟩ := exists_finite_representatives f hfin
@@ -233,7 +251,11 @@ theorem exists_finite_classes {V : Type} [AddCommGroup V] [Module E V] [FiniteDi
     simp only [LinearEquiv.trans_apply]
     exact e1.symm.trans e2
   · intro i
-    refine ⟨(Φ s).symm (y a i - y s i), (hmemP s _).1 (sub_mem (by rw [hP]; exact hyP a i) (hyP s i)), ?_⟩
+    refine ⟨
+      (Φ s).symm (y a i - y s i),
+      (hmemP s _).1 (sub_mem (by rw [hP]; exact hyP a i) (hyP s i)),
+      ?_
+    ⟩
     apply (Φ s).injective
     simp only [LinearEquiv.trans_apply, map_sub, map_zsmul, LinearEquiv.apply_symm_apply]
     rw [hρeq a i, hρeq s i, congrFun hρ' i, smul_sub]

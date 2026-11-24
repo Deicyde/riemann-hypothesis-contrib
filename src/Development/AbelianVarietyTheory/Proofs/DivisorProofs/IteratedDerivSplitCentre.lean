@@ -87,8 +87,7 @@ theorem hasDerivAt_splitCentre (ψ : Sm E a) (g : GA E a) (s : ℝ)
           (expU fun _ : InfinitePlace E => ((0 : ℝ) : ℂ))
         = 1 := by
     ext i j w
-    by_cases h : i = j
-      <;> simp [Matrix.scalar_apply, Matrix.diagonal_apply, expU, Matrix.one_apply, h]
+    by_cases h : i = j <;> simp [Matrix.scalar_apply, expU, h]
   have h :=
     hasDerivAt_curve ψ (g * splitCentre E a s)
       (fun t =>

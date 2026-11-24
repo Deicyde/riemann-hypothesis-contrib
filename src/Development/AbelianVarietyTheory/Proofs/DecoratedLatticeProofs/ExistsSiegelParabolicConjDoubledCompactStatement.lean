@@ -57,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_siegel_parabolic_conj_doubled_compact
           IsMaj A a
             → ∀ κ : GA D (dblSp A) ≃* G D A.rank,
               IsChart A μ κ → ∃ p : siegel A, IsConj A a κ p := by
-  first
-  | exact @GlobalTheory.StdUnn.ConjElt.exists_isConj
-  | exact GlobalTheory.StdUnn.ConjElt.exists_isConj
-  | (intros; apply GlobalTheory.StdUnn.ConjElt.exists_isConj <;> assumption)
+  first | exact @GlobalTheory.StdUnn.ConjElt.exists_isConj

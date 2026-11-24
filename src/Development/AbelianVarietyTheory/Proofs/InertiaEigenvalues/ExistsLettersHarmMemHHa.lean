@@ -55,7 +55,6 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
 
-
 noncomputable section
 namespace GlobalTheory.FockLetters
 variable {D : D7} {H : Geo.Tor.Host D.host.E}

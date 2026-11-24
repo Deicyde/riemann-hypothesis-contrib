@@ -71,17 +71,6 @@ theorem isOpen_integral
 def denSet (κ : Type) (m : ℕ) : Set (κ → FiniteAdeleRing (𝓞 F) F) :=
   {y | ∀ i (v : HeightOneSpectrum (𝓞 F)), ‖(m : v.adicCompletion F) * y i v‖ ≤ 1}
 
-theorem natCast_mul_apply (m : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (v : HeightOneSpectrum (𝓞 F))
-    : ((m : FiniteAdeleRing (𝓞 F) F) * a) v = (m : v.adicCompletion F) * a v := by
-  have hm : (m : FiniteAdeleRing (𝓞 F) F) v = (m : v.adicCompletion F) := by
-    induction m with
-    | zero => rfl
-    | succ n ih =>
-      rw [Nat.cast_succ, Nat.cast_succ]
-      change (n : FiniteAdeleRing (𝓞 F) F) v + 1 = _
-      rw [ih]
-  simp [hm]
-
 theorem isOpen_denSet (κ : Type) [Finite κ] (m : ℕ) : IsOpen (denSet (F := F) κ m) := by
   have h
       : denSet (F := F) κ m
@@ -90,8 +79,8 @@ theorem isOpen_denSet (κ : Type) [Finite κ] (m : ℕ) : IsOpen (denSet (F := F
           {a : FiniteAdeleRing (𝓞 F) F | ∀ v : HeightOneSpectrum (𝓞 F), a v ∈ v.adicCompletionIntegers F} :=
     by
       ext y
-      simp only [denSet, Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, natCast_mul_apply,
-        norm_le_one_iff_mem]
+      simp only [denSet, Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage,
+        _root_.GlobalTheory.AdeleDenominators.natCast_mul_apply, norm_le_one_iff_mem]
   rw [h]
   exact isOpen_iInter_of_finite fun i =>
     isOpen_integral.preimage ((continuous_const_mul _).comp (continuous_apply i))
@@ -102,7 +91,8 @@ theorem norm_mul_le_one_of_dvd
     : ‖(m' : v.adicCompletion F) * z‖ ≤ 1 := by
   obtain ⟨k, rfl⟩ := hd
   rw [Nat.cast_mul, mul_comm (m : v.adicCompletion F), mul_assoc, norm_mul]
-  exact mul_le_one₀ (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v k) (norm_nonneg _) hz
+  exact mul_le_one₀ (_root_.GlobalTheory.AdicNatCastNorm.norm_natCast_adicCompletion_le_one v k)
+    (norm_nonneg _) hz
 
 theorem denSet_mono (κ : Type) {m m' : ℕ} (hd : m ∣ m') : denSet (F := F) κ m ⊆ denSet κ m' :=
   fun _ hy i v => norm_mul_le_one_of_dvd hd (hy i v)
@@ -118,7 +108,7 @@ theorem exists_denom (a : FiniteAdeleRing (𝓞 F) F)
     have : ‖a v‖ ≤ 1 := (norm_le_one_iff_mem v _).2 hmem
     exact max_eq_left (by exact_mod_cast this)
   obtain ⟨d, hd, -, h⟩ :=
-    GlobalTheory.SmoothForms.denom_global (F := F)
+    _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator (F := F)
       (fun v => max 1 ‖a v‖₊)
       (fun v => le_max_left _ _)
       hf

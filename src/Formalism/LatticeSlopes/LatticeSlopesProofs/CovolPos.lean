@@ -55,9 +55,12 @@ noncomputable section
 
 namespace Formalism.F
 
-theorem linearIndependent_coe_basis {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (L : Submodule ℤ E) [hL : DiscreteTopology L] {ι : Type*} [Fintype ι]
-    (b : Basis ι ℤ L) : LinearIndependent ℝ (fun i => (b i : E)) := by
+theorem linearIndependent_coe_basis
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [hL : DiscreteTopology L]
+    {ι : Type*} [Fintype ι]
+    (b : Basis ι ℤ L)
+    : LinearIndependent ℝ (fun i => (b i : E)) := by
   apply Formalism.F.linearIndependent_coe_basis' <;> assumption
 
 theorem covol_pos' : CovolPos := by
@@ -67,9 +70,9 @@ theorem covol_pos' : CovolPos := by
   apply Real.sqrt_pos.2
   exact (Matrix.posDef_gram_of_linearIndependent (linearIndependent_coe_basis L _)).det_pos
 
-theorem discreteTopology_span_singleton {E : Type*} [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] {v : E} (hv : v ≠ 0) :
-    DiscreteTopology (span ℤ ({v} : Set E)) := by
+theorem discreteTopology_span_singleton
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {v : E} (hv : v ≠ 0)
+    : DiscreteTopology (span ℤ ({v} : Set E)) := by
   have hv' : 0 < ‖v‖ := norm_pos_iff.2 hv
   rw [discreteTopology_iff_isOpen_singleton_zero]
   have hs : ({0} : Set (span ℤ ({v} : Set E))) = Metric.ball 0 ‖v‖ := by
@@ -101,14 +104,9 @@ theorem covol_basic_properties : CovolBasic := by
     have hli : LinearIndependent ℤ (fun _ : Unit => v) := by
       have hR : LinearIndependent ℝ (fun _ : Unit => v) := by
         rw [linearIndependent_unique_iff]
-        first
-          | exact hv
-          | (intro r hr; exact (smul_eq_zero.1 hr).resolve_right hv)
-      first
-        | exact hR.restrict_scalars' ℤ
-        | exact hR.restrict_scalars (by intro a c h; simpa using h)
-    have hr : span ℤ (Set.range fun _ : Unit => v) = span ℤ ({v} : Set E) := by
-      rw [Set.range_const]
+        first | exact hv
+      first | exact hR.restrict_scalars' ℤ
+    have hr : span ℤ (Set.range fun _ : Unit => v) = span ℤ ({v} : Set E) := by rw [Set.range_const]
     let b : Basis Unit ℤ (span ℤ ({v} : Set E)) := (Basis.span hli).map (LinearEquiv.ofEq _ _ hr)
     have hb : (fun i => (b i : E)) = fun _ => v := by
       funext i

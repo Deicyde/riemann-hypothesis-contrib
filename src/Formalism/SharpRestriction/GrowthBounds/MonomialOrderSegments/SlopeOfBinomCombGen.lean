@@ -287,34 +287,38 @@ section DiagCost
 
 open MvPolynomial
 
-
 theorem dg_one_fun (F : MvPolynomial σ K) : dg (fun _ => (1 : K)) F = F := by
   ext α
-  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul]
+  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   ring
 
 theorem dg_mul_fun (f g : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
     : dg (fun α => f α * g α) F = dg f (dg g F) := by
   ext α
-  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul]
+  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   ring
 
 theorem dg_add_fun (f g : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
     : dg (fun α => f α + g α) F = dg f F + dg g F := by
   ext α
-  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul]
+  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   ring
 
 theorem dg_smul_fun (a : K) (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
     : dg (fun α => a * f α) F = a • dg f F := by
   ext α
-  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul]
+  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   ring
 
 theorem dg_sub_fun (f g : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
     : dg (fun α => f α - g α) F = dg f F - dg g F := by
   ext α
-  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul]
+  simp only [coeff_dg, MvPolynomial.coeff_add, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul,
+    smul_eq_mul]
   ring
 
 def CostV

@@ -150,12 +150,6 @@ theorem enorm_dag (S T : HSp D) (f : WO S T → ℂ) (y : WO T S)
   simp only [dag]
   rw [← ofReal_norm_eq_enorm, ← ofReal_norm_eq_enorm, Complex.norm_conj]
 
-theorem isSplitIdem_cA {e : AE D} (he : IsSplitIdem D e) : IsSplitIdem D (cA D e) := by
-  obtain ⟨h1, h2, v, ε, hε, h3⟩ := he
-  refine
-    ⟨by rw [← map_mul, h1], by rw [GlobalTheory.DualPairCheck.cA_cA, mul_comm, h2], v, ε, hε, ?_⟩
-  rw [GlobalTheory.DualPairCheck.cA_cA, add_comm, h3]
-
 theorem suppAt_cA {e : AE D} {V : HSp D} {g : GA D V} (h : SuppAt e V g) : SuppAt (cA D e) V g := by
   intro i j
   rw [GlobalTheory.DualPairCheck.cA_cA, add_comm]
@@ -235,7 +229,8 @@ theorem exists_conj_weilDatum
     obtain ⟨x', hx', hxx⟩ := exists_detAt_cA he hx
     obtain ⟨y', hy', hyy⟩ := exists_detAt_cA he hy
     obtain ⟨r, hr, hℓ⟩ :=
-      H.om_split (cA D e) (isSplitIdem_cA he) g h (suppAt_cA hSg) (suppAt_cA hTh) x' y' hx' hy'
+      H.om_split (cA D e) (_root_.GlobalTheory.SplitScalar.isSplitIdem_conj he) g h (suppAt_cA hSg)
+        (suppAt_cA hTh) x' y' hx' hy'
     refine ⟨r, hr, fun ℓ hinv f hf => ?_⟩
     let ℓω : (WO S T → ℂ) →ₗ[ℂ] ℂ := {
       toFun := fun F => starRingEnd ℂ (ℓ (dag S T F))

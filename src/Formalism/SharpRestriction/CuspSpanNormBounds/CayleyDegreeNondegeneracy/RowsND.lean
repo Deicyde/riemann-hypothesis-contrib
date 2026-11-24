@@ -275,7 +275,7 @@ theorem rows_nd_count
     have h2
         : rows_DeZ D u u' s x y ≤ (HHZ D large₂.sc.b c x * HHZ D large₂.sc.b c y) ^ (3 : ℝ) := by
       have :=
-        (Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.deNonDegBound D.R.f s (gg D)
+        (_root_.Formalism.HermitianLatticeCounting.P.nondegenerateFactorBound D.R.f s (gg D)
           (wordPairGramProduct D u u' x) (wordPairGramProduct D u u' y) (HHZ D large₂.sc.b c x)
           (HHZ D large₂.sc.b c y) hg2 (gramProductG0_pos Y h.hH.1 h.hT gx).le
           (gramProductG0_pos Y h.hH.1 h.hT gy).le (gramProductG0_le_height Y h.hH h.hHH h.hT gx)
@@ -345,8 +345,8 @@ theorem rows_nd_prod
         (rows_nZ_pos Y h hZ).le),
       mul_div_cancel₀ _ (rows_nZ_pos Y h hZ).ne']
   have n1 :=
-    Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.nonDegRow D.R.k D.R.f s (gg D)
-      D.host.v (NT D u) (wordPairGramProduct D u u' x) (wordPairGramProduct D u u' y)
+    _root_.Formalism.HermitianLatticeCounting.P.nondegenerateRowBound D.R.k D.R.f s (gg D) D.host.v
+      (NT D u) (wordPairGramProduct D u u' x) (wordPairGramProduct D u u' y)
       (XiS D u (HHZ D large₂.sc.b c x * HHZ D large₂.sc.b c y) c s)
       ((HHZ D large₂.sc.b c x * HHZ D large₂.sc.b c y) ^ pairCountExponent D c s
         * (c * s * D.R.f) ^ (6 * s * D.R.f))

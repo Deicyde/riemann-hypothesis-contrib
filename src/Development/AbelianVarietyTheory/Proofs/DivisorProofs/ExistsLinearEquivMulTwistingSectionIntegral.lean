@@ -41,8 +41,6 @@ import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.ComponentMassSum
 
 @[expose] public section
 
-
-
 open NumberField IsDedekindDomain MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor
   ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions
   Formalism.BasicNotions.TH Formalism.L2.Theta GlobalTheory.AllWt GlobalTheory.FlatLine

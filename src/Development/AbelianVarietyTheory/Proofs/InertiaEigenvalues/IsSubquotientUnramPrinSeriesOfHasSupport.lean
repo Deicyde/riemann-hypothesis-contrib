@@ -73,14 +73,8 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 def permGL {n : ℕ} (σ : Equiv.Perm (Fin n)) : GL (Fin n) k := ⟨
   σ.toPEquiv.toMatrix,
   σ.symm.toPEquiv.toMatrix,
-  by
-    rw [PEquiv.toMatrix_toPEquiv_mul]
-    ext i j
-    simp [PEquiv.toMatrix_apply, Matrix.one_apply, eq_comm],
-  by
-    rw [PEquiv.toMatrix_toPEquiv_mul]
-    ext i j
-    simp [PEquiv.toMatrix_apply, Matrix.one_apply, eq_comm]
+  by rw [PEquiv.toMatrix_toPEquiv_mul]; ext i j; simp [PEquiv.toMatrix_apply, Matrix.one_apply],
+  by rw [PEquiv.toMatrix_toPEquiv_mul]; ext i j; simp [PEquiv.toMatrix_apply, Matrix.one_apply]
 ⟩
 
 theorem permGL_conj_apply {n : ℕ} (σ : Equiv.Perm (Fin n)) (g : GL (Fin n) k) (i j : Fin n)

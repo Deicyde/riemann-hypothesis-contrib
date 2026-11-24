@@ -59,7 +59,6 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
 
-
 noncomputable section
 
 namespace GlobalTheory.SingleDatum

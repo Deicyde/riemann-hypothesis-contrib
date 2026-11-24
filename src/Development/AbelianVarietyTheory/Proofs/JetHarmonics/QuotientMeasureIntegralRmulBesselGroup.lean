@@ -2,9 +2,9 @@ module
 
 public import Formalism.PeriodIntegrals.QuotInv
 public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPrAlt
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.BesselSubgroupProductMeasureIsHaarStatement
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuotientMeasureRightInvariantStatement
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.UnitaryGroupMatGroupUnimodularStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.BesselSubgroupProductMeasureIsHaar
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuotientMeasureRightInvariant
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.UnitaryGroupMatGroupUnimodular
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.UhMeasurableSet
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -92,10 +92,9 @@ theorem quot_integral_rmul
   classical
   intro k r Wp _ _ _ _ z π u μW μN μG νq F hS hF hinv _ g hg
   obtain ⟨hz, hT, -, -, hW, hN, hG, hq⟩ := hS
-  obtain ⟨hGG, hGH⟩ := GlobalTheory.T.isMatGroup_GG_and_haar_right_invariant k r
+  obtain ⟨hGG, hGH⟩ := _root_.GlobalTheory.unitaryGroup_matGroup_unimodular k r
   obtain ⟨hGH1, hGH2⟩ := hGH μG hG
-  obtain ⟨hSG, hsub, hS1, hS2⟩ :=
-    GlobalTheory.T.besselSubgroup_product_measure_isHaar k r z μW μN hz hT hW hN
+  obtain ⟨hSG, hsub, hS1, hS2⟩ := _root_.GlobalTheory.muSof_isHaar k r z μW μN hz hT hW hN
   have hset : PI.QuotientSetting (GG k r) (Formalism.QuantumDeterminants.Sset k r z) μG
       (muSof μW μN) νq :=
     ⟨hGG, hSG, hsub, hGH1, hS1, hGH2, hS2, hq⟩
@@ -122,7 +121,7 @@ theorem quot_integral_rmul
             = F (Matrix.of x) := fun x hx =>
     Set.piecewise_eq_of_mem _ _ _ hx
   have key :=
-    quot_integral_rmul_of_measurable GlobalTheory.T.quotientMeasure_right_invariant hset _ hm
+    quot_integral_rmul_of_measurable _root_.GlobalTheory.QuotRightInv.quotInv hset _ hm
       (fun s hs x hx => by
         rw [hval x hx]
         exact (hval (fun i j => (s * Matrix.of x) i j) (hGG.2.2.1 s (hsub hs) _ hx)).trans

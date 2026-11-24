@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """rh-buildq restore: register every known input-hash -> artifact mapping with Lake, once.
 
-usage: pool-restore.py [--ancestor REV] <project-dir> [extra-revision ...]
+usage: pool-restore.py --state DIR --artifacts DIR --toolchain DIR [--ancestor REV] <project-dir> [extra-revision ...]
 
-Collects (public, no credentials) and merges into .lake/rh-buildq-pool.jsonl, first entry wins:
+Collects (public, no credentials) and merges into <state>/pool.jsonl, first entry wins:
   with --ancestor REV: the map of a successful CI build with REV's exact build inputs
                        (ci/inputs/<fingerprint>.json, else ci/revisions/<REV>.json), checked
                        like scripts/ci-cache-get.py does: receipt bound to the input fingerprint,
@@ -15,12 +15,18 @@ Collects (public, no credentials) and merges into .lake/rh-buildq-pool.jsonl, fi
                                           (e.g. maps published for a PR head or GitHub's merge commit)
 Then, at the same time: `lake cache add` of the mappings not yet registered locally (in
 parallel shards; Lake writes one file per mapping) and a curl download of the artifacts missing
-locally (fetch-artifacts.py). With --ancestor, Mathlib's cache (`lake exe mathlib/cache get`)
-is fetched first, alongside the map downloads. Nothing is unpacked here: `lake build` with
-LAKE_RESTORE_ARTIFACTS=true unpacks a module exactly when the module's own input hash is
-mapped and its artifact is local; anything else is compiled.
+locally (fetch-artifacts.py) into the artifacts directory. Nothing is unpacked here: `lake
+build` with LAKE_RESTORE_ARTIFACTS=true unpacks a module exactly when the module's own input
+hash is mapped and its artifact is local; anything else is compiled. Mathlib and the other
+dependencies are not fetched here: fragment.py copies them in from trusted preparation.
 
 The project must be checked out at the build target; REV is read from Git objects only.
+
+Sandbox (sandbox.py): this script is trusted host code and never evaluates the project's
+lakefile. Its only `lake` command, `lake cache add`, runs in the offline bubblewrap sandbox with
+the project as the only writable path and the toolchain at /opt/lean. The host writes its maps
+and the downloaded artifacts outside the project: the sandbox sees the maps read-only, and the
+artifacts read-only at .lake/cache/artifacts. The host does not write into the project.
 
 Environment (all optional, set from job.env by run-build.sh):
   MAP_PREFIX       key prefix for the pool and maps (default rh-buildq; tests use their own)
@@ -29,7 +35,7 @@ Environment (all optional, set from job.env by run-build.sh):
                    rh-shard chunks this build requires
   RESTORE_SHARDS   parallel `lake cache add` processes (default 16)
 """
-import gzip, hashlib, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
+import gzip, hashlib, importlib.util, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -42,6 +48,10 @@ SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 HASH = re.compile(r"[0-9a-f]{16}\Z")
 ARTIFACT = re.compile(r"[0-9a-f]{16}\.ltar\Z")
 T0 = time.time()
+HERE = Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_file_location("rh_buildq_sandbox", HERE / "sandbox.py")
+sandbox = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(sandbox)
 
 
 def log(msg):
@@ -149,116 +159,124 @@ def write_map(path, entries):
     path.write_text(json.dumps(SCHEMA) + "\n" + "".join(json.dumps([k, v]) + "\n" for k, v in sorted(entries.items())))
 
 
-def mathlib_get(P):
-    env = dict(os.environ, MATHLIB_CACHE_GET_URL=os.environ.get("MATHLIB_CACHE_GET_URL", "https://cache.mathlib.org/mathlib4"))
-    for attempt in range(1, 4):
-        if subprocess.run(["lake", "exe", "mathlib/cache", "get"], cwd=P, env=env, stdin=subprocess.DEVNULL).returncode == 0:
-            return True
-        log(f"Mathlib cache get attempt {attempt} failed")
-        time.sleep(20)
-    return False
+def lake_env(P):
+    return {"LAKE_CACHE_DIR": str(P / ".lake/cache"), "LAKE_CONFIG": str(P / "lakefile.toml")}
 
 
-def register(P, fresh, env):
+def register(P, fresh, state, toolchain, artifacts):
     """`lake cache add` in parallel shards. Each mapping is an independent file write in Lake
     (Cache.writeMap), so shards cannot conflict; the first, small shard runs alone so that only
     one process creates the outputs directory and elaborates any lakefile."""
     items = sorted(fresh.items())
     n = max(1, min(int(os.environ.get("RESTORE_SHARDS", "16")), len(items) // 2000 or 1))
     cmd = ["lake", "cache", "add", "--service", SERVICE, "--repo", REPO]
-    with tempfile.TemporaryDirectory(prefix="pool-add-", dir=P / ".lake") as t:
+    with tempfile.TemporaryDirectory(prefix="pool-add-", dir=state) as t:
+        # Offline; the shard files are outside the project and read-only in the sandbox.
+        prefix = sandbox.command(P, toolchain, ro=[t], ro_at=[(artifacts, P / ".lake/cache/artifacts")], env=lake_env(P))
         first, rest = items[:100], items[100:]
         write_map(Path(t) / "0.jsonl", dict(first))
-        subprocess.run([*cmd, str(Path(t) / "0.jsonl")], cwd=P, env=env, check=True)
+        subprocess.run([*prefix, *cmd, str(Path(t) / "0.jsonl")], env=sandbox.host_env(), check=True)
         procs = []
         for i in range(n):
             part = rest[i::n]
             if part:
                 f = Path(t) / f"{i + 1}.jsonl"
                 write_map(f, dict(part))
-                procs.append(subprocess.Popen([*cmd, str(f)], cwd=P, env=env))
+                procs.append(subprocess.Popen([*prefix, *cmd, str(f)], env=sandbox.host_env()))
         codes = [p.wait() for p in procs]
         if any(codes):
             raise subprocess.CalledProcessError(max(codes), cmd)
     return n
 
 
+def registered(P):
+    """Input hashes Lake has already registered (.lake/cache/outputs/<scope>/<hash>.json). The
+    sandbox can write there, so the listing does not follow links."""
+    have = set()
+    try:
+        top = sandbox.open_dir(P, ".lake/cache/outputs")
+    except (OSError, ValueError):
+        return have
+    try:
+        for _, dirs, files, _ in os.fwalk(".", dir_fd=top):
+            have.update(f[:-5] for f in files if f.endswith(".json"))
+    finally:
+        os.close(top)
+    return have
+
+
 def main():
     args = sys.argv[1:]
-    ancestor = None
-    if args[:1] == ["--ancestor"]:
-        ancestor, args = args[1] or None, args[2:]
+    opts = {}
+    while args and args[0] in ("--ancestor", "--state", "--toolchain", "--artifacts"):
+        opts[args[0]], args = args[1], args[2:]
+    ancestor = opts.get("--ancestor") or None
+    state, toolchain = Path(opts["--state"]).resolve(), Path(opts["--toolchain"]).resolve()
+    artifacts = Path(opts["--artifacts"]).resolve()
+    if artifacts.name != "artifacts":
+        raise SystemExit("pool-restore: --artifacts must be a directory named artifacts")
     P = Path(args[0]).resolve()
     extra = args[1:]
-    (P / ".lake").mkdir(exist_ok=True)   # a fresh clone without an ancestor restore has no .lake yet
-    with ThreadPoolExecutor(1) as mathlib:
-        ml = mathlib.submit(mathlib_get, P) if ancestor else None
-        tc = (P / "lean-toolchain").read_text().strip()
-        tcdir = tc.replace("/", "--").replace(":", "---")
-        git = lambda *a: subprocess.check_output(["git", "-C", str(P), *a], text=True).split()
-        head = git("rev-parse", "HEAD")[0]
-        revs = git("rev-list", "--parents", "-n", "1", "HEAD") + extra
-        prefix = os.environ.get("MAP_PREFIX") or "rh-buildq"
-        keys = [f"{prefix}/pool/{tcdir}.jsonl", f"{prefix}/maps/{head}.jsonl"]
-        if os.environ.get("MAP_NAME"):
-            keys.append(f"{prefix}/maps/{os.environ['MAP_NAME']}.jsonl")
-        keys += os.environ.get("POOL_EXTRA_MAPS", "").split()
-        keys += [f"revisions/{REPO}/tc/{tcdir}/{r}.jsonl" for r in dict.fromkeys(revs)]
-        with ThreadPoolExecutor(8) as pool:
-            ci = pool.submit(ci_map, P, ancestor) if ancestor else None
-            blobs = list(pool.map(fetch, keys))
-            try:
-                merged, shas = ci.result() if ci else ({}, {})
-            except Exception as e:   # a corrupt receipt must not stop the other maps from restoring
-                log(f"ERROR: ancestor CI map rejected ({e}); continuing without it")
-                merged, shas = {}, {}
-        if ancestor:
-            log(f"ancestor {ancestor}: {len(merged)} CI mappings")
-        for key, data in zip(keys, blobs):
-            if not data:
-                log(f"{key}: none")
-                continue
-            lines = data.decode().splitlines()
-            if not lines or json.loads(lines[0]) != SCHEMA:
-                log(f"{key}: unexpected schema, skipped")
-                continue
-            n = 0
-            for l in lines[1:]:
-                if l:
-                    k, v = json.loads(l)
-                    if k not in merged:
-                        merged[k] = v; n += 1
-            log(f"{key}: {len(lines) - 1} entries ({n} new)")
-        out = P / ".lake/rh-buildq-pool.jsonl"
-        write_map(out, merged)
-        log(f"{len(merged)} mappings in total")
-        if not merged:
-            if ml:
-                ml.result()
-            return
-        cache = P / ".lake/cache"
-        fetch_cmd = [sys.executable, "-I", str(Path(__file__).with_name("fetch-artifacts.py")), str(out), str(cache)]
-        if shas:
-            (P / ".lake/rh-buildq-sha256.json").write_text(json.dumps(shas))
-            fetch_cmd += ["--sha256", str(P / ".lake/rh-buildq-sha256.json")]
-        downloads = subprocess.Popen(fetch_cmd)
-        env = dict(os.environ, LAKE_CACHE_DIR=str(cache), LAKE_CONFIG=str(P / "lakefile.toml"))
-        env.pop("LAKE_ARTIFACT_CACHE", None)
-        if ml:
-            ok = ml.result()
-            log("Mathlib cache " + ("restored" if ok else "NOT restored; Lake will build Mathlib"))
+    state.mkdir(parents=True, exist_ok=True)
+    artifacts.mkdir(exist_ok=True)
+    git = lambda *a: subprocess.check_output(["git", "-C", str(P), *a], text=True).split()
+    tc = subprocess.check_output(["git", "-C", str(P), "show", "HEAD:lean-toolchain"], text=True).strip()
+    tcdir = tc.replace("/", "--").replace(":", "---")
+    head = git("rev-parse", "HEAD")[0]
+    revs = git("rev-list", "--parents", "-n", "1", "HEAD") + extra
+    prefix = os.environ.get("MAP_PREFIX") or "rh-buildq"
+    keys = [f"{prefix}/pool/{tcdir}.jsonl", f"{prefix}/maps/{head}.jsonl"]
+    if os.environ.get("MAP_NAME"):
+        keys.append(f"{prefix}/maps/{os.environ['MAP_NAME']}.jsonl")
+    keys += os.environ.get("POOL_EXTRA_MAPS", "").split()
+    keys += [f"revisions/{REPO}/tc/{tcdir}/{r}.jsonl" for r in dict.fromkeys(revs)]
+    with ThreadPoolExecutor(8) as pool:
+        ci = pool.submit(ci_map, P, ancestor) if ancestor else None
+        blobs = list(pool.map(fetch, keys))
+        try:
+            merged, shas = ci.result() if ci else ({}, {})
+        except Exception as e:   # a corrupt receipt must not stop the other maps from restoring
+            log(f"ERROR: ancestor CI map rejected ({e}); continuing without it")
+            merged, shas = {}, {}
+    if ancestor:
+        log(f"ancestor {ancestor}: {len(merged)} CI mappings")
+    for key, data in zip(keys, blobs):
+        if not data:
+            log(f"{key}: none")
+            continue
+        lines = data.decode().splitlines()
+        if not lines or json.loads(lines[0]) != SCHEMA:
+            log(f"{key}: unexpected schema, skipped")
+            continue
+        n = 0
+        for l in lines[1:]:
+            if l:
+                k, v = json.loads(l)
+                if not HASH.fullmatch(k) or not ARTIFACT.fullmatch(v):
+                    continue
+                if k not in merged:
+                    merged[k] = v; n += 1
+        log(f"{key}: {len(lines) - 1} entries ({n} new)")
+    out = state / "pool.jsonl"
+    write_map(out, merged)
+    log(f"{len(merged)} mappings in total")
+    if not merged:
+        return
+    # Trusted code on the host, writing only into <artifacts> (outside the work tree).
+    fetch_cmd = [sys.executable, "-I", str(HERE / "fetch-artifacts.py"), str(out), str(artifacts.parent)]
+    if shas:
+        (state / "sha256.json").write_text(json.dumps(shas))
+        fetch_cmd += ["--sha256", str(state / "sha256.json")]
+    downloads = subprocess.Popen(fetch_cmd)
     # On a warm tree register only new mappings (Lake keeps one
     # .lake/cache/outputs/<scope>/<input-hash>.json per mapping).
-    have = set()
-    for d in (cache / "outputs").glob("*"):
-        if d.is_dir():
-            have.update(f.name[:-5] for f in os.scandir(d) if f.name.endswith(".json"))
+    have = registered(P)
     fresh = {k: v for k, v in merged.items() if k not in have}
     log(f"registering {len(fresh)} mappings not yet registered locally")
     failed = False
     if fresh:
         try:
-            shards = register(P, fresh, env)
+            shards = register(P, fresh, state, toolchain, artifacts)
             log(f"registered {len(fresh)} mappings ({shards} parallel lake cache add)")
         except (OSError, subprocess.CalledProcessError) as e:
             log(f"ERROR: lake cache add failed ({e})"); failed = True

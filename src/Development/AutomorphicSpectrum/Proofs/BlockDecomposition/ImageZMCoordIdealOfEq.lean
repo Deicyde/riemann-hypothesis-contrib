@@ -99,7 +99,7 @@ theorem imageZ_mCoordIdeal_of_eq
       refine MvPolynomial.ringHom_ext (fun r => ?_) (fun p => ?_)
       · simp
       · simp only [ψ, Geo.mConeMap, RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-          aeval_X, rename_X, map_mul, map_C, map_X, scaleT, algHom_C, rename_C]
+          aeval_X, rename_X, map_mul, map_C, map_X, scaleT, algHom_C]
         rw [hv p, h p]
         simp only [MvPolynomial.algebraMap_eq, rename_C]
         rw [← mul_assoc, ← C_mul, mul_comm (b p.1), mul_assoc, mul_inv_cancel₀ (hb p.1), mul_one]

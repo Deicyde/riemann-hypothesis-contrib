@@ -71,18 +71,20 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
   have hfa : AnalyticOnNhd ℂ f U :=
     GroundTheory.Heights₂.Heights.ImplicitCurve.analyticOnNhd_of_differentiableOn hU hf
 
-  let Q : ℕ → Prop := fun m => ∃ t ∈ U, ∃ v : Fin m → Fin k → ℂ,
-    LinearIndependent ℂ (fun j => fderiv ℂ f t (v j))
+  let Q : ℕ → Prop := fun m =>
+    ∃ t ∈ U, ∃ v : Fin m → Fin k → ℂ, LinearIndependent ℂ (fun j => fderiv ℂ f t (v j))
   have hQ0 : Q 0 := by
     obtain ⟨t, ht⟩ := hUne
     exact ⟨t, ht, Fin.elim0, linearIndependent_empty_type⟩
   have hspec : Q (Nat.findGreatest Q d) := Nat.findGreatest_spec (Nat.zero_le d) hQ0
-  have hle : ∀ m, m ≤ d → Q m → m ≤ Nat.findGreatest Q d := fun m hmd hm => Nat.le_findGreatest hmd hm
+  have hle : ∀ m, m ≤ d → Q m → m ≤ Nat.findGreatest Q d := fun m hmd hm =>
+    Nat.le_findGreatest hmd hm
   have hrd : Nat.findGreatest Q d ≤ d := Nat.findGreatest_le d
   generalize Nat.findGreatest Q d = r at hspec hle hrd
   obtain ⟨s, hs, v, hv⟩ := hspec
-  have hmax : ∀ t ∈ U, ∀ u : Fin (r + 1) → Fin k → ℂ,
-      ¬ LinearIndependent ℂ (fun j => fderiv ℂ f t (u j)) := by
+  have hmax
+      : ∀ t ∈ U, ∀ u : Fin (r + 1) → Fin k → ℂ,
+        ¬ LinearIndependent ℂ (fun j => fderiv ℂ f t (u j)) := by
     intro t ht u hu
     have hcard : r + 1 ≤ d := by simpa using hu.fintype_card_le_finrank
     have := hle (r + 1) hcard ⟨t, ht, u, hu⟩
@@ -93,7 +95,8 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
     rw [LinearMap.ker_eq_bot']
     intro c hc
     funext j
-    exact Fintype.linearIndependent_iff.1 hv c (by simpa [T, Fintype.linearCombination_apply] using hc) j
+    exact Fintype.linearIndependent_iff.1 hv c
+      (by simpa [T, Fintype.linearCombination_apply] using hc) j
   obtain ⟨Λ, hΛ⟩ := T.exists_leftInverse_of_injective hT
   have hΛv : ∀ j, Λ (fderiv ℂ f s (v j)) = Pi.single j 1 := by
     intro j
@@ -118,22 +121,24 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
       exact (Pi.basisFun ℂ (Fin r)).linearIndependent
     exact hc.eventually h0.eventually
 
-  obtain ⟨w, hw, hw0⟩ : ∃ w ∈ LinearMap.ker (Λ ∘ₗ (fderiv ℂ f s : (Fin k → ℂ) →ₗ[ℂ] (Fin d → ℂ))), w ≠ 0 := by
+  obtain ⟨w, hw, hw0⟩
+      : ∃ w ∈ LinearMap.ker (Λ ∘ₗ (fderiv ℂ f s : (Fin k → ℂ) →ₗ[ℂ] (Fin d → ℂ))), w ≠ 0 := by
     obtain ⟨x, y, hxy, hne⟩ := Function.not_injective_iff.1 (hninj s hs)
     refine ⟨x - y, ?_, sub_ne_zero.2 hne⟩
     simp [map_sub, hxy]
   have hw' : Λ (fderiv ℂ f s w) = 0 := by simpa using hw
 
   let A' : ℂ × (Fin r → ℂ) →L[ℂ] (Fin k → ℂ) :=
-    (ContinuousLinearMap.fst ℂ ℂ (Fin r → ℂ)).smulRight w +
-      ∑ j, ((ContinuousLinearMap.proj j).comp (ContinuousLinearMap.snd ℂ ℂ (Fin r → ℂ))).smulRight (v j)
+    (ContinuousLinearMap.fst ℂ ℂ (Fin r → ℂ)).smulRight w
+      + ∑ j, ((ContinuousLinearMap.proj j).comp (ContinuousLinearMap.snd ℂ ℂ (Fin r → ℂ))).smulRight (v j)
   have hA' : ∀ p : ℂ × (Fin r → ℂ), A' p = p.1 • w + ∑ j, p.2 j • v j := by
     intro p
     simp [A']
   have hLA : ∀ p : ℂ × (Fin r → ℂ), Λ (fderiv ℂ f s (A' p)) = p.2 := by
     intro p
 
-    rw [hA', map_add (f := _), map_add (f := _), map_smul, map_smul, hw', smul_zero, zero_add, map_sum, map_sum]
+    rw [hA', map_add (f := _), map_add (f := _), map_smul, map_smul, hw', smul_zero, zero_add,
+      map_sum, map_sum]
     simp only [map_smul, hΛv]
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
@@ -143,14 +148,17 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
     have h1 : HasFDerivAt (fun p => s + A' p) A' (0 : ℂ × (Fin r → ℂ)) := A'.hasFDerivAt.const_add s
     have h2 : HasFDerivAt f (fderiv ℂ f s) (s + A' 0) := by
       simpa using hfs.differentiableAt.hasFDerivAt
-    exact Λc.hasFDerivAt.comp _ (HasFDerivAt.comp (f := fun p => s + A' p) (0 : ℂ × (Fin r → ℂ)) h2 h1)
+    exact Λc.hasFDerivAt.comp _
+      (HasFDerivAt.comp (f := fun p => s + A' p) (0 : ℂ × (Fin r → ℂ)) h2 h1)
   have hHc : ContDiffAt ℂ 1 H 0 := by
     have hf1 : ContDiffAt ℂ 1 f (s + A' 0) := by simpa using hfs.contDiffAt
     exact Λc.contDiff.contDiffAt.comp _
-      (ContDiffAt.comp (f := fun p => s + A' p) (0 : ℂ × (Fin r → ℂ)) hf1 (contDiff_const.add A'.contDiff).contDiffAt)
+      (ContDiffAt.comp
+        (f := fun p => s + A' p)
+        (0 : ℂ × (Fin r → ℂ)) hf1 (contDiff_const.add A'.contDiff).contDiffAt)
   have hinv : (fderiv ℂ H 0 ∘L ContinuousLinearMap.inr ℂ ℂ (Fin r → ℂ)).IsInvertible := by
-    have : fderiv ℂ H 0 ∘L ContinuousLinearMap.inr ℂ ℂ (Fin r → ℂ) =
-        ContinuousLinearMap.id ℂ (Fin r → ℂ) := by
+    have : fderiv ℂ H 0 ∘L ContinuousLinearMap.inr ℂ ℂ (Fin r → ℂ)
+        = ContinuousLinearMap.id ℂ (Fin r → ℂ) := by
       rw [hHd.fderiv]
       refine ContinuousLinearMap.ext fun c => ?_
       simpa [hΛc] using hLA (0, c)
@@ -167,12 +175,14 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
   let P : ℂ → Fin k → ℂ := fun z => s + A' (z, ψ z)
   have hP0 : P 0 = s := by simp [P, hψ0, hA']
   have hPcont : ContinuousAt P 0 :=
-    continuousAt_const.add (A'.continuous.continuousAt.comp (continuousAt_id.prodMk hψc.continuousAt))
+    continuousAt_const.add (A'.continuous.continuousAt.comp (continuousAt_id.prodMk
+      hψc.continuousAt))
   rw [← hP0] at hev
   obtain ⟨δ, hδ, hball⟩ :=
     Metric.eventually_nhds_iff_ball.1 (((hPcont.eventually hev).and hψeq).and hψd)
   have hPd : ∀ z ∈ ball (0 : ℂ) δ, DifferentiableAt ℂ P z := fun z hz =>
-    (differentiableAt_const _).add (A'.differentiableAt.comp z (differentiableAt_id.prodMk (hball z hz).2))
+    (differentiableAt_const _).add
+      (A'.differentiableAt.comp z (differentiableAt_id.prodMk (hball z hz).2))
   have hPU : ∀ z ∈ ball (0 : ℂ) δ, P z ∈ U := fun z hz => (hball z hz).1.1.1
   have hfd : ∀ z ∈ ball (0 : ℂ) δ, DifferentiableAt ℂ f (P z) := fun z hz =>
     (hf _ (hPU z hz)).differentiableAt (hU.mem_nhds (hPU z hz))
@@ -190,7 +200,9 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
     have hg0 : fderiv ℂ (fun z => Λc (f (P z))) z = 0 := by
       rw [hloc.fderiv_eq]
       exact fderiv_const_apply _
-    have hgc : fderiv ℂ (fun z => Λc (f (P z))) z = Λc.comp ((fderiv ℂ f (P z)).comp (fderiv ℂ P z)) := by
+    have hgc
+        : fderiv ℂ (fun z => Λc (f (P z))) z
+          = Λc.comp ((fderiv ℂ f (P z)).comp (fderiv ℂ P z)) := by
       rw [← hcomp]
       have h := fderiv_comp z Λc.differentiableAt ((hfd z hz).comp z (hPd z hz))
       rw [ContinuousLinearMap.fderiv] at h
@@ -198,14 +210,18 @@ theorem CriticalFibreInfinite.proof : CriticalFibreInfinite.Statement := by
     have hx : Λ (fderiv ℂ f (P z) (fderiv ℂ P z 1)) = 0 := by
       have := congrArg (fun L => L 1) (hgc.symm.trans hg0)
       simpa [hΛc] using this
-    have := IndefiniteRowSideFullHecke.ComplexSets.HolomorphicFibreInfinite.kernel_eq_of_maximal (fderiv ℂ f (P z)) v Λ (hmax _ (hPU z hz)) (hball z hz).1.1.2 hx
+    have :=
+      IndefiniteRowSideFullHecke.ComplexSets.HolomorphicFibreInfinite.kernel_eq_of_maximal
+        (fderiv ℂ f (P z)) v Λ (hmax _ (hPU z hz)) (hball z hz).1.1.2 hx
     rw [hcomp]
     refine ContinuousLinearMap.ext_ring ?_
     simpa using this
   have hconst : ∀ z ∈ ball (0 : ℂ) δ, f (P z) = f s := by
     intro z hz
-    have := isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball (0 : ℂ) δ).isPreconnected
-      (fun z hz => ((hfd z hz).comp z (hPd z hz)).differentiableWithinAt) hzero hz (mem_ball_self hδ)
+    have :=
+      isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball (0 : ℂ) δ).isPreconnected
+        (fun z hz => ((hfd z hz).comp z (hPd z hz)).differentiableWithinAt)
+        hzero hz (mem_ball_self hδ)
     simpa [hP0] using this
 
   have hPinj : Function.Injective P := by

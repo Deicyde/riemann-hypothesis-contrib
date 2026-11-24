@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.uniformisation_endomorphism_character_map_constant
     : LL
       → ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.uniformisation_endomorphism_character_map_constant
                     ⟶ splitTorus _ D.toPre.X,
                   TorusEndOf D.toPre.X h t
                     ∧ (U.gt e).i ≫ (Over.pullback (thick R I e)).map aG = t ≫ (U.gt e).i := by
-  first
-  | exact @GlobalTheory.unifPre_end_character_const
-  | exact GlobalTheory.unifPre_end_character_const
-  | (intros; apply GlobalTheory.unifPre_end_character_const <;> assumption)
+  first | exact @GlobalTheory.unifPre_end_character_const

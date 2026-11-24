@@ -47,6 +47,7 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
   Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.lattice_tuple_bases_span_at_places
     : ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D}
         {Kc : G.Consts} {Dx : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Dx cX}
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.lattice_tuple_bases_span_at_places
                       (sysS H X std).dG_spec (sysS H X std).om j La.2)
                     v
                   : Matrix _ _ ((sysS H X std).G.P.Qq v)) := by
-  first
-  | exact @GlobalTheory.TwV.Joint.basesAt_span
-  | exact GlobalTheory.TwV.Joint.basesAt_span
-  | (intros; apply GlobalTheory.TwV.Joint.basesAt_span <;> assumption)
+  first | exact @GlobalTheory.TwV.Joint.basesAt_span

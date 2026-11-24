@@ -3,7 +3,7 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSymm
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CauchyRiemannIffDifferentiableOnComplex
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFibreCoords
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueUniformisingVectorVerticalTangentStatement
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueUniformisingVectorVerticalTangent
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -153,8 +153,8 @@ theorem exists_differentiableOn_vertical
   have key
       : ∀ z ∈ B, ∃ v : Fin P₀.g → ℂ, ∀ W f,
         G z ∈ dom u m W → s z W f = fderiv ℂ (fn u m W f) (G z) v := fun z hz =>
-    (GlobalTheory.T.existsUnique_uniformising_vector_vertical_tangent P₀ u Hm χ hU R x₀ X p m hsm
-      hpb (G z) (s z) (hs z hz).1 (hs z hz).2).exists
+    (_root_.GlobalTheory.KS.VertFamily.existsUnique_vector P₀ u Hm χ hU R x₀ X p m hsm hpb (G z)
+      (s z) (hs z hz).1 (hs z hz).2).exists
   choose! w hw using key
   refine ⟨w, fun z₁ hz₁ => ?_, hw⟩
   refine DifferentiableAt.differentiableWithinAt ?_

@@ -88,7 +88,7 @@ theorem comp
     have hit : i < t.length := by omega
     have := haci i hi.le
     have := hbci i hit.le
-    show u.center i = imageIdealSheaf (a i hi.le ≫ b i hit.le) (s.center i)
+    show u.center i = _root_.FunctorialResolution.Blowup.schemeImageIdeal (a i hi.le ≫ b i hit.le) (s.center i)
     rw [hbc i hit, hac i hi, imageIdealSheaf_comp]
   · intro i hi
     have hit : i < t.length := by omega
@@ -150,8 +150,10 @@ theorem of_isomorphic_source
     · intro i hi
       have hi' : i < s.length := by omega
       have h1
-          : imageIdealSheaf (e i hi'.le).hom ((s'.center i).comap (e i hi'.le).hom)
-            = imageIdealSheaf (e i hi'.le).hom (s.center i) := by
+          : _root_.FunctorialResolution.Blowup.schemeImageIdeal (e i hi'.le).hom
+              ((s'.center i).comap (e i hi'.le).hom)
+            = _root_.FunctorialResolution.Blowup.schemeImageIdeal (e i hi'.le).hom
+              (s.center i) := by
         rw [hce i hi']
       rw [imageIdealSheaf_comap] at h1
       have h2 : inv (e i hi'.le).hom = (e i hi'.le).inv :=

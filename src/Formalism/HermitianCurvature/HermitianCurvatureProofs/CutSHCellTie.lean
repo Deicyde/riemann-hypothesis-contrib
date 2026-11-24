@@ -58,7 +58,7 @@ private theorem castV_liftVec_liftVec_eq_castV_liftVec_succ
       = D.castV h2 (QuantumDeterminants.liftVec k (j + 1) ρ v) := by
   funext p
   simp only [D.castV, QuantumDeterminants.liftVec, Fin.coe_cast]
-  split_ifs <;> first | rfl | (exfalso; omega) | (congr 1; ext; simp only [Fin.coe_cast]; omega)
+  split_ifs <;> first | rfl | (exfalso; omega)
 
 private theorem consC_castM_ιLev_mem_DomR_of_mem_DomR
     {k ρ m : ℕ} (e : 1 + ρ = m)
@@ -104,7 +104,3 @@ theorem cell_compatibility : CellTie := by
   exact consC_castM_ιLev_mem_DomR_of_mem_DomR e ht _ _ x.1 x.2 hx
 
 end Formalism.FourierDecayAlt.P.CutSH
-
-theorem Formalism.FourierDecayAlt.P.cell_compatibility_identity
-    : Formalism.FourierDecayAlt.P.CutSH.CellTie :=
-  Formalism.FourierDecayAlt.P.CutSH.cell_compatibility

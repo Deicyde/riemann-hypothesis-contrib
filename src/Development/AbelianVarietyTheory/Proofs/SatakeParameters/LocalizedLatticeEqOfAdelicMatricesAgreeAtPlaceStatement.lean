@@ -43,6 +43,7 @@ import Mathlib.Topology.Sheaves.Init
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
   Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV
 open Formalism.UG (bc prV)
+
 theorem _root_.GlobalTheory.T.localizedLattice_eq_of_adelic_matrices_agree_at_place
     : ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D}
         {Kc : G.Consts} {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX}
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.localizedLattice_eq_of_adelic_matrices_agree_at_pl
                   IsOver v (seamP t.seam P.1)
                     → bc (prV (E := D.host.E) v) x₁.1 = bc (prV (E := D.host.E) v) x.1)
                 → p₁.deco.1.at P.1 = p.deco.1.at P.1 := by
-  first
-  | exact @GlobalTheory.LatAway.decoAt_eq
-  | exact GlobalTheory.LatAway.decoAt_eq
-  | (intros; apply GlobalTheory.LatAway.decoAt_eq <;> assumption)
+  first | exact @GlobalTheory.LatAway.decoAt_eq

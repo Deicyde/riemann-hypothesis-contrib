@@ -56,9 +56,6 @@ namespace GlobalTheory.TwistChr
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 10000] GlobalTheory.GalChar.isTorsionFree_field
 
-
-
-
 theorem hecke_eq_of_frob
     {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     {art : Ideles E →* Gab E Ω} (ha : IsGlobalArtin art)

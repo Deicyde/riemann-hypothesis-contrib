@@ -743,9 +743,7 @@ theorem Lf_int
     rw [e]
     exact mul_mem r.2 (hx i)
 
-theorem single_mem (i : Fin I.n)
-    : ∃ N : ℤ, N ≠ 0 ∧ (Pi.single i (N : I.E) : Fin I.n → I.E) ∈ I.L := by
-  apply _root_.UpperTheory.Reformulated.B.ModuliIntegralCharts.single_mem <;> assumption
+alias single_mem := _root_.UpperTheory.Reformulated.B.ModuliIntegralCharts.single_mem
 
 end Lat
 

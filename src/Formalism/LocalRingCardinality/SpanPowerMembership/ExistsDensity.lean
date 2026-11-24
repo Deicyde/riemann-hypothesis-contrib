@@ -90,11 +90,8 @@ theorem expG_cont : Continuous C.expG := by
   rw [h]
   have hc : Continuous (fun Z : 𝔸 => exp Z) := by
     first
-    | exact NormedSpace.exp_continuous (𝕂 := ℝ)
-    | exact (NormedSpace.exp_continuous (𝕂 := ℝ) (𝔸 := 𝔸))
     | exact continuous_iff_continuousAt.2 fun Z =>
         (NormedSpace.exp_analytic (𝕂 := ℝ) Z).continuousAt
-    | exact NormedSpace.exp_continuous
   exact hc.comp continuous_subtype_val
 
 theorem exists_rho

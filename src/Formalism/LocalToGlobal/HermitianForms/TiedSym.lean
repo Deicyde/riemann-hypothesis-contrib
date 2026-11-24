@@ -59,8 +59,7 @@ theorem rSym_rSD (R : Ranks) : rSym R.k (rSD R) = R.r := by
 theorem le_of_succ_m {R : Ranks} {i : ℕ} (h : i + 1 ≤ R.m) : i ≤ R.m := by omega
 
 theorem succ_pred_m (R : Ranks) : R.m - 1 + 1 ≤ R.m := by
-  have := R.two_le_m
-  omega
+  exact le_of_eq (Nat.sub_add_cancel (by have := R.two_le_m; omega))
 
 variable {D : D7}
 
@@ -209,8 +208,6 @@ structure FormsTiedSym
 
 attribute [instance] FormsTiedSym.YbFin FormsTiedSym.YbAct
 
-theorem k_le_N (R : Ranks) (i : ℕ) : R.k ≤ R.N i := by
-  unfold Ranks.N
-  exact Nat.le_add_right _ _
+theorem k_le_N (R : Ranks) (i : ℕ) : R.k ≤ R.N i := by exact Nat.le_add_right _ _
 
 end Formalism.L2.Forms

@@ -51,6 +51,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 open GlobalTheory.ZV
+
 theorem _root_.GlobalTheory.T.thetaSections_veryAmple_periodic
     : Out.Laws → Out.Laws2
       → ∀ (o : Type) [CommRing o] (g N' : ℕ) (J : Type) (b : TBase o (N' ^ 2)) (K : Type) [Field K]
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.thetaSections_veryAmple_periodic
               (∀ i, (a i).val ≡ (a' i).val [MOD m ^ 2]) → ∀ j, (σ a).f j = (σ a').f j)
             ∧ TorsBasis t.A (N' ^ 2) t.pt
             ∧ ∀ x : Out.baseOver (Sp K) ⟶ t.A, x ^ N' = 1 → ∃ h, t.lab h ^ N' = x := by
-  first
-  | exact @GlobalTheory.embSec_veryAmple_periodic
-  | exact GlobalTheory.embSec_veryAmple_periodic
-  | (intros; apply GlobalTheory.embSec_veryAmple_periodic <;> assumption)
+  first | exact @GlobalTheory.embSec_veryAmple_periodic

@@ -339,9 +339,7 @@ theorem rank_le_count
   rw [← h']
   have hlt : Module.rank LL (FiniteCohomology PD ρ) < Cardinal.aleph0 :=
     Module.rank_lt_aleph0_iff.mpr hfin
-  first
-  | exact le_of_eq (Module.finrank_eq_rank (R := LL) (M := FiniteCohomology PD ρ)).symm
-  | exact (Cardinal.cast_toNat_of_lt_aleph0 hlt).symm.le
+  first | exact le_of_eq (Module.finrank_eq_rank (R := LL) (M := FiniteCohomology PD ρ)).symm
 
 end Count
 
@@ -469,7 +467,7 @@ theorem colD_eq (x' : X') (n : ℕ)
       haveI := evalTower i (R' := R') x'
       colD (K := FractionRing (D.nd.O i)) (V := EvalSp (D.nd.O i) d R' x') r χ (Γn i dc n)
         = cobK (repE i dc r χ x' n) := by
-  first | rfl | exact LinearMap.ext fun v => funext fun g => rfl
+  first | rfl
 
 abbrev repX (x' : X') (n : ℕ) (hn : K.plOf i dc n ∈ placesOver D.host.E (D.nd.l i))
     : letI := evalModO i (R' := R') x'
@@ -631,7 +629,7 @@ theorem finrank_TrV (x' : X') {LL : Type} [Field LL] (e : FractionRing (D.nd.O i
         = Module.finrank LL (TrV e (EvalSp (D.nd.O i) d R' x')) :=
     congrArg Cardinal.toNat h
   rw [← h2]
-  first | simp | exact Module.finrank_fintype_fun_eq_card _
+  first | simp
 
 def grepX (x' : X') (l : K.Col i dc) (hc : ContX i dc r χ x' l)
     : GRep (Br.G D.nbr i _ (col_over i dc l)) ℚ_[D.nd.l i] (Br.LL D.nbr i _ (col_over i dc l))
@@ -694,7 +692,7 @@ theorem goodW_of
       (TruncatedSeriesCountingIdentities.CoefExt.self (D := D) (i := i) (hw := hw))).2.2.2
   have hDR := hF (grepW i dc ρ π l hc) hcr
   have hpos : 0 < Module.finrank (Br.LL D.nbr i _ hw) (Fin D.R.r → Br.LL D.nbr i _ hw) := by
-    first | (rw [Module.finrank_fin_fun]; exact hr) | simpa using hr
+    first | (rw [Module.finrank_fin_fun]; exact hr)
   exact filLow_of_dR (Br.PD D.loc D.nbr i _ hw) (repW i dc ρ π (K.colIdx i dc l) hw) hpos hDR
 
 end Dr

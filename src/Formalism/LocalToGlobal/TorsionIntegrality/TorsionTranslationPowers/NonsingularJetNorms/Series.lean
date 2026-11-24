@@ -244,7 +244,6 @@ theorem rootInt
         exact h1.symm
       set S : K⟦X⟧ := ∑ i ∈ range N, g ^ i * A ^ (N - 1 - i) with hS
       have hS0 : constantCoeff S = (N : K) := by
-
         rw [hS, map_sum]
         simp [h0, hA0]
       have hfac : g ^ N - A ^ N = X ^ n * (B * S) := by

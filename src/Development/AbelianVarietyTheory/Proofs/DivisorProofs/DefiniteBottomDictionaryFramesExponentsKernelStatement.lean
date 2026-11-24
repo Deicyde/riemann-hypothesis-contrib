@@ -49,6 +49,7 @@ open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTh
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.definiteBottom_dictionary_frames_exponents_kernel
     : GBig fun {D} {T} {Lc} {sc} G _ _ _ _ =>
       ∀ (W : G.Weil) (i j : Fin D.R.m) (A A' WW : HSp D) (X : Tri T A A' WW),
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.definiteBottom_dictionary_frames_exponents_kernel
                   ∧ ∀ P g h,
                     thetaKO (X.ω' t) g h (fockF W.ψ W.θ false FA' FW (X.f' t) P)
                       = X.ker' W.ψ W.θ t P h g := by
-  first
-  | exact @GlobalTheory.BotDict.bottom_dictionary
-  | exact GlobalTheory.BotDict.bottom_dictionary
-  | (intros; apply GlobalTheory.BotDict.bottom_dictionary <;> assumption)
+  first | exact @GlobalTheory.BotDict.bottom_dictionary

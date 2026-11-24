@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaKernel_orthonormalFrame_inDomain_periodLinear
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T),
       (∃ B, C.IsB B)
@@ -78,7 +79,4 @@ theorem _root_.GlobalTheory.T.thetaKernel_orthonormalFrame_inDomain_periodLinear
                   ∧ C.xB (C.mvB g B)
                     = C.X.lmulC (fun σ => (compAt C.θ (C.m.e.symm σ) (mt T g)).map conj) (C.xB B)
                   ∧ ∀ ga, IsRatOf T ga g → C.xB (C.mvB g B) = lact ga (C.xB B) := by
-  first
-  | exact @GlobalTheory.Ker.onBasis_frame_period
-  | exact GlobalTheory.Ker.onBasis_frame_period
-  | (intros; apply GlobalTheory.Ker.onBasis_frame_period <;> assumption)
+  first | exact @GlobalTheory.Ker.onBasis_frame_period

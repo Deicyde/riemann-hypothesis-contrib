@@ -46,9 +46,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
@@ -200,9 +197,8 @@ private theorem iwasawa (O : Subring K) (hO : ∀ x : K, x ∈ O ∨ x⁻¹ ∈ 
     ⟩
     apply Units.ext
     ext i j
-    fin_cases i <;> fin_cases j
-      <;> simp [aff, sw, Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal_apply] <;> field_simp
-      <;> ring
+    fin_cases i <;> fin_cases j <;> simp [aff, sw, Matrix.mul_apply, Matrix.diagonal_apply]
+      <;> field_simp <;> ring
   · have h0 : g 1 1 ≠ 0 := by
       intro h0
       apply h
@@ -221,9 +217,8 @@ private theorem iwasawa (O : Subring K) (hO : ∀ x : K, x ∈ O ∨ x⁻¹ ∈ 
     ⟩
     apply Units.ext
     ext i j
-    fin_cases i <;> fin_cases j
-      <;> simp [aff, sw, Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal_apply] <;> field_simp
-      <;> ring
+    fin_cases i <;> fin_cases j <;> simp [aff, sw, Matrix.mul_apply, Matrix.diagonal_apply]
+      <;> field_simp <;> ring
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 private theorem act_tor_uni (ρ : Representation ℂ (GL (Fin 2) K) V) (a : Kˣ) (x : K) (y : V)
     : ρ (aff a 0) (ρ (aff 1 x) y) = ρ (aff 1 (a * x)) (ρ (aff a 0) y) := by
@@ -324,7 +319,6 @@ private theorem gen
   have hy : N.mkQ v ≠ 0 := fun h =>
     not_mem_ker O π hπ hπ' ρ htor v hv hf S lam hU ((Submodule.Quotient.mk_eq_zero N).1 h)
   have he : (S.card : ℂ) • τ π (N.mkQ v) = (lam : ℂ) • N.mkQ v := by
-
     rw [← map_smul N.mkQ, ← hU, map_sum]
     simp only [hq, Finset.sum_const, Nat.cast_smul_eq_nsmul]
   have hS : (S.card : ℂ) ≠ 0 := by

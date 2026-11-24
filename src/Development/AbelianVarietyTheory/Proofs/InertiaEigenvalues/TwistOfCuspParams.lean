@@ -66,9 +66,6 @@ open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 section General
 
 variable {D : D7}

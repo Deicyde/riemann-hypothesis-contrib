@@ -109,6 +109,11 @@ end GlobalTheory.Mem.R3.Rw
 
 namespace GlobalTheory.Mem.R3.Rw
 
+/--
+Constructs the common integral lattice `Lr` over `𝓞 B.LL` place by place: a vector `x` lies
+in `prescribedRowLat W jE` iff for every finite place `w`, some `w`-unit `d ∈ 𝓞 B.LL` scales `x`
+into the `𝓞 B.LL`-span of `{y | jE y ∈ W.what₂.RRset (W.what₂.muAt w)}`.
+-/
 def prescribedRowLat
     {B : Base} {C : Cols B} (W : RowsRest B C) {m : ℕ} (jE : (Fin m → B.LL) →ₛₗ[B.embLL] W.EE)
     : Submodule (𝓞 B.LL) (Fin m → B.LL) where
@@ -134,6 +139,11 @@ end GlobalTheory.Mem.R3.Rw
 
 namespace GlobalTheory.Mem.R3.Rw
 
+/--
+Assembles a `DivStage` from a `PkB` package, gluing the place-by-place common lattice
+`RR` (`prescribedRowLat`), the per-word restricted lattices `Nu`, and the bilinear pairing
+`Bk = bkOf` into a single `DivData` structure with `HH = sFrame Nu h + RR.muMax`.
+-/
 theorem exists_divStage_of_pk
     : ∀ (B : Base) (C : Cols B) (G : Type) [Group G] (p : PkB B C G) (e : PerD p)
         (W₀ : RowsRest B C) (n : Nums p W₀) (η : ℕ → B.places.Pl → ℚ) (hη : ∀ j w, 0 ≤ η j w),

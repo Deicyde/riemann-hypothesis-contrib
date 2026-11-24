@@ -142,7 +142,6 @@ theorem jetAddDeg_of
     rw [Finset.sum_apply, _root_.sum_apply]
   choose k hk using fun z => hrat N N' (c * c') (x + rep z) (hRz z) m hm
   have h3 : (A.chiF a b N N')⁻¹ * jetC A.cD (A.thInd Sall N N' c x) m = A.σ₀ (∑ z, k z) := by
-
     rw [map_sum]
     simp only [hk]
     unfold jetC

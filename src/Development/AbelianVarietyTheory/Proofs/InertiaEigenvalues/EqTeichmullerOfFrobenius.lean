@@ -2,8 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsOfLayers
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConstantCoeffTeichSub
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicPowerSeriesAlgHomActionLawsStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MemEurOfTeichmullerSeries
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicPowerSeriesAlgHomActionLaws
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TiltWittEqZeroOfPrimeMulEqZero
+public import Mathlib.NumberTheory.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -16,7 +18,6 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.NumberTheory.Basic
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -188,7 +189,6 @@ theorem ext_exists
     },
     hA
   ⟩
-  change F _ = _
   rw [IsScalarTower.algebraMap_apply O A E, hA, f.commutes]
 
 def cst (O : Type) [CommRing O] (n : ℕ) : (ZMod n → O) →ₐ[O] LetA O n :=
@@ -229,7 +229,6 @@ theorem let_exists
     GlobalTheory.Cyc.IoMap.algHom_exists (R := O) y
       (GlobalTheory.Per.AinfComplete.summ_of_precomplete y) (sep_of_haus y)
   have h1 : ∑ i, u (Pi.single i 1) = 1 := by
-
     rw [← map_sum, Finset.univ_sum_single (fun _ : ZMod n => (1 : O))]
     exact map_one u
   have h2
@@ -361,7 +360,7 @@ theorem εroot_pow (s : ℕ) : AI.εroot s ^ l ^ s = AI.ε := by
     exact ih
 
 theorem εroot_ne_one (s : ℕ) : AI.εroot s ≠ 1 := fun h =>
-  AI.ε_ne_one (by rw [← εroot_pow AI s, h, one_pow])
+  AI.ε_ne_one (by rw [← _root_.GlobalTheory.Cyc.εroot_pow AI s, h, one_pow])
 
 theorem εroot_sub_not_unit (s : ℕ) : ¬ IsUnit (AI.εroot s - 1) := by
   intro h
@@ -382,7 +381,7 @@ theorem io_binomial
     (io : ℤ_[l]⟦X⟧ →ₐ[ℤ_[l]] Ainf l) (hio : GlobalTheory.Cyc.IsIo (AI.εroot s) io)
     : io (binomialSeries ℤ_[l] c) = WittVector.teichmuller l (AI.actT g (AI.εroot s)) := by
   have hφ := ((GlobalTheory.Cyc.IoMap.main l _ (εroot_sub_not_unit AI s)).2 io hio).1
-  obtain ⟨hX, hmul, -⟩ := GlobalTheory.T.cyclotomicPowerSeriesAlgHom_action_laws l ℤ_[l]
+  obtain ⟨hX, hmul, -⟩ := _root_.GlobalTheory.Cyc.act_laws l ℤ_[l]
   have hcyc : ∀ c, GlobalTheory.Cyc.cyc l ℤ_[l] c = binomialSeries ℤ_[l] c - 1 := fun c => by
     simp [GlobalTheory.Cyc.cyc]
   have h1 : GlobalTheory.Cyc.phi l ℤ_[l] (binomialSeries ℤ_[l] c) = binomialSeries ℤ_[l] c ^ l := by

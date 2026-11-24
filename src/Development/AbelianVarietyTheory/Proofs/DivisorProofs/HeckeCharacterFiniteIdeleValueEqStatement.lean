@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.heckeCharacter_finiteIdele_value_eq
           IsFinIdl x y
             → ((ν x : Circle) : ℂ)
               = ((χ.1 (GlobalTheory.Mem.Col2.SplitChar.finIdl D y) : ℂˣ) : ℂ) := by
-  first
-  | exact @GlobalTheory.FinIdlRead.chr_finIdl
-  | exact GlobalTheory.FinIdlRead.chr_finIdl
-  | (intros; apply GlobalTheory.FinIdlRead.chr_finIdl <;> assumption)
+  first | exact @GlobalTheory.FinIdlRead.chr_finIdl

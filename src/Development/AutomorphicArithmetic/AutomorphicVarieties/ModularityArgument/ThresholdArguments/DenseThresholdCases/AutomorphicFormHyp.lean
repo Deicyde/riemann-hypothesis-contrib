@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 namespace UpperTheory.V.Af
 open UpperTheory.V.Published

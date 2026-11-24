@@ -55,7 +55,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 open TensorProduct in
 private theorem op_eig
     {A K M W ι : Type}

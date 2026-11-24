@@ -241,7 +241,6 @@ theorem exists_vanishing
       by simp,
       ?_
     ⟩
-    beta_reduce
     rw [liftM_eq D M hM]
     simp
   | insert τ' S _ ih =>

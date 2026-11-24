@@ -141,4 +141,10 @@ def zLow (j : ℕ) (r s : Fin n) : M2 n :=
        else
          fromBlocks (single r s 1) 0 0 0)
 
+theorem iter_cast
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {F : V → ℂ} {c : V} {m m' : ℕ} (h : m = m') (v : Fin m → V)
+    : iteratedFDeriv ℂ m F c v = iteratedFDeriv ℂ m' F c (v ∘ Fin.cast h.symm) := by
+  subst h; rfl
+
 end PositivityTheory.Rg.Sw.LVs.TC

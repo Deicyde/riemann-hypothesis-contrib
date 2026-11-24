@@ -52,6 +52,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.NonemptyIsLimitBaseChange
 
 @[expose] public section
 
@@ -151,7 +152,7 @@ theorem ovH_comp
     (φ : B →ₐ[K] C) (ψ : C →ₐ[K] E)
     : ovH (ψ.comp φ) = ovH ψ ≫ ovH φ := by
   ext1
-  simp only [Over.comp_left, ovH_left, sp_comp]
+  simp only [Over.comp_left, ovH_left, _root_.GlobalTheory.spMap_comp_ring]
   rfl
 
 theorem ovH_id {B : Type} [CommRing B] [Algebra K B] : ovH (AlgHom.id K B) = 𝟙 (ovO B) := by
@@ -283,4 +284,4 @@ theorem GlobalTheory.TorsConst.torsion_eq_const
     ext x <;> simp [TrivSqZeroExt.algebraMap_eq_inl]
   conv_lhs => rw [key]
   rw [Over.comp_left, GlobalTheory.TorsConst.ovH_left, ← e, ← Category.assoc,
-    GlobalTheory.TorsConst.sp_comp]
+    _root_.GlobalTheory.spMap_comp_ring]

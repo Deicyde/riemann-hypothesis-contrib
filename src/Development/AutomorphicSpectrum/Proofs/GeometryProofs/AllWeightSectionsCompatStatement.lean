@@ -49,6 +49,7 @@ open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.Char
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
 open scoped Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.all_weight_sections_compat
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
         (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.all_weight_sections_compat
                 → ∀ k, ∀ y ∈ ((U σ).X k).dom,
                   (⟨k, y⟩ : Σ k, Frame ((U σ).X k).Ψ r) ∈ GlobalTheory.AllWt.framesOn (U σ) Z
                     ↔ Over (U σ) (e Z) k := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Rec.bridge_allWt
-  | exact GlobalTheory.CompanionTheory.Ar.Rec.bridge_allWt
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.Rec.bridge_allWt <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.Rec.bridge_allWt

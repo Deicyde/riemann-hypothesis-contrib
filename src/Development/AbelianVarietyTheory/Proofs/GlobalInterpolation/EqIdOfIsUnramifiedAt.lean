@@ -49,6 +49,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DisjointSpanPerpLat
 
 @[expose] public section
 
@@ -117,16 +118,6 @@ open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
 variable
   {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
-private lemma isCMExt_conj_conj (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) (x : E) : σ (σ x) = x := by
-  obtain ⟨-, -, -, hτ⟩ := h
-  let τ : E →+* ℂ := (IsAlgClosed.lift (M := ℂ) (R := ℚ) (S := E)).toRingHom
-  apply τ.injective
-  rw [hτ, hτ, star_star]
-
-open scoped TensorProduct in
-open NumberField IsDedekindDomain MeasureTheory Topology in
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
 theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem
     (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (σ : E →ₐ[F] E)
@@ -147,7 +138,9 @@ theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem
     rw [← hPv, (show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]
   haveI : P.LiesOver v.asIdeal := ⟨hPv.symm⟩
   haveI : Algebra.IsUnramifiedAt (𝓞 F) P := hv ⟨P, hPp, hPne⟩ ⟨hPv.symm⟩
-  let σ' : E ≃ₐ[F] E := AlgEquiv.ofBijective σ (Function.Involutive.bijective (isCMExt_conj_conj h))
+  let σ' : E ≃ₐ[F] E :=
+    AlgEquiv.ofBijective σ
+      (Function.Involutive.bijective (_root_.GlobalTheory.SelfDualLatticeCompare.conj_conj h))
   haveI : IsGalois F E := by
     refine IsGalois.of_fixedField_eq_bot F E (eq_bot_iff.mpr fun x hx => ?_)
     exact IntermediateField.mem_bot.mpr (isCMExt_mem_range_of_conj_fixed h
@@ -170,11 +163,11 @@ theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem
   obtain ⟨t, ht⟩ :=
     _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x + y) (by
       show σ ((x : E) + σ x) = (x : E) + σ x
-      rw [map_add (f := _), isCMExt_conj_conj h, add_comm])
+      rw [map_add (f := _), _root_.GlobalTheory.SelfDualLatticeCompare.conj_conj h, add_comm])
   obtain ⟨n, hn⟩ :=
     _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x * y) (by
       show σ ((x : E) * σ x) = (x : E) * σ x
-      rw [map_mul, isCMExt_conj_conj h, mul_comm])
+      rw [map_mul, _root_.GlobalTheory.SelfDualLatticeCompare.conj_conj h, mul_comm])
   refine ⟨x, t, n, ?_, ?_, ?_⟩
   · rw [← hy]
     exact (congrArg (fun z : 𝓞 E => (z : E)) ht).symm

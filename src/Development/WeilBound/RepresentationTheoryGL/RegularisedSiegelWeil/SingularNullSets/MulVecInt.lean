@@ -56,9 +56,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
 open GlobalTheory.RegSch (ikS projS Lvl)
 
-
-
-
 namespace PositivityTheory.Rg.Rsw.L.LGenK
 
 variable {D : D7} {n : ℕ}

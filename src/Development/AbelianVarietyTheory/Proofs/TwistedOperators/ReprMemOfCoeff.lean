@@ -52,23 +52,29 @@ open Formalism.L2.DIV MvPolynomial
 namespace GlobalTheory.RowRat
 
 theorem exists_proj (K' : Subfield ℂ) : ∃ φ : ℂ →ₗ[K'] ℂ, (∀ x : K', φ x = x) ∧ ∀ x, φ x ∈ K' := by
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K' ℂ)
-    (LinearMap.ker_eq_bot.2 (FaithfulSMul.algebraMap_injective K' ℂ))
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K' ℂ)
+      (LinearMap.ker_eq_bot.2 (FaithfulSMul.algebraMap_injective K' ℂ))
   refine ⟨(Algebra.linearMap K' ℂ).comp g, fun x => ?_, fun x => (g x).2⟩
   have h := congrArg (fun f => f x) hg
   simp only [LinearMap.comp_apply, LinearMap.id_apply] at h
   show algebraMap K' ℂ (g (Algebra.linearMap K' ℂ x)) = algebraMap K' ℂ x
   rw [h]
 
-theorem val_eq_sum_repr {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n) (v : VV ℂ lam) :
-    v.1 = ∑ a, (bVV ℂ lam).repr v a • bVVfun ℂ lam a := by
+theorem val_eq_sum_repr
+    {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n) (v : VV ℂ lam)
+    : v.1 = ∑ a, (bVV ℂ lam).repr v a • bVVfun ℂ lam a := by
   conv_lhs => rw [← (bVV ℂ lam).sum_repr v]
   rw [Submodule.coe_sum]
   simp only [Submodule.coe_smul, bVV_coe]
 
-theorem coeff_mem_of_repr {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n) {L : Type} [Field L]
-    (κ : L →+* ℂ) (v : VV ℂ lam) (h : ∀ a, (bVV ℂ lam).repr v a ∈ Set.range κ) (m : ι × Fin n × Fin n →₀ ℕ) :
-    AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ := by
+theorem coeff_mem_of_repr
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n)
+    {L : Type} [Field L]
+    (κ : L →+* ℂ) (v : VV ℂ lam) (h : ∀ a, (bVV ℂ lam).repr v a ∈ Set.range κ)
+    (m : ι × Fin n × Fin n →₀ ℕ)
+    : AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ := by
   rw [val_eq_sum_repr, coeff_sum, ← RingHom.coe_fieldRange]
   refine Subfield.sum_mem _ fun a _ => ?_
   obtain ⟨P, hP⟩ := bVVfun_int ℂ lam a
@@ -81,9 +87,13 @@ end GlobalTheory.RowRat
 namespace GlobalTheory.RowRat
 open Formalism.L2.DIV MvPolynomial
 
-theorem repr_mem_of_coeff {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n) {L : Type} [Field L]
-    (κ : L →+* ℂ) (v : VV ℂ lam) (h : ∀ m, AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ) (a : VVIdx lam) :
-    (bVV ℂ lam).repr v a ∈ Set.range κ := by
+theorem repr_mem_of_coeff
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n)
+    {L : Type} [Field L]
+    (κ : L →+* ℂ) (v : VV ℂ lam) (h : ∀ m, AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ)
+    (a : VVIdx lam)
+    : (bVV ℂ lam).repr v a ∈ Set.range κ := by
   set K' := κ.fieldRange
   obtain ⟨φ, hφ1, hφ2⟩ := exists_proj K'
   set c := fun a => (bVV ℂ lam).repr v a
@@ -93,11 +103,14 @@ theorem repr_mem_of_coeff {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Forma
     exact ⟨((AddMonoidAlgebra.coeff P m : ℤ) : L), by simp⟩
   have key : ∑ b, (c b - φ (c b)) • bVVfun ℂ lam b = 0 := by
     ext m
-    have e1 : AddMonoidAlgebra.coeff v.1 m = ∑ b, c b * AddMonoidAlgebra.coeff (bVVfun ℂ lam b) m := by
+    have e1
+        : AddMonoidAlgebra.coeff v.1 m = ∑ b, c b * AddMonoidAlgebra.coeff (bVVfun ℂ lam b) m := by
       rw [val_eq_sum_repr, coeff_sum]; simp [c]
-    have e2 : φ (AddMonoidAlgebra.coeff v.1 m) = AddMonoidAlgebra.coeff v.1 m := hφ1 ⟨_, RingHom.mem_fieldRange.2 (h m)⟩
-    have e3 : φ (AddMonoidAlgebra.coeff v.1 m) = ∑ b, φ (c b) * AddMonoidAlgebra.coeff (bVVfun ℂ lam b) m := by
-
+    have e2 : φ (AddMonoidAlgebra.coeff v.1 m) = AddMonoidAlgebra.coeff v.1 m :=
+      hφ1 ⟨_, RingHom.mem_fieldRange.2 (h m)⟩
+    have e3
+        : φ (AddMonoidAlgebra.coeff v.1 m)
+          = ∑ b, φ (c b) * AddMonoidAlgebra.coeff (bVVfun ℂ lam b) m := by
       rw [e1, map_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
       have : c b * AddMonoidAlgebra.coeff (bVVfun ℂ lam b) m = (⟨_, hK b m⟩ : K') • c b := by
@@ -116,10 +129,15 @@ end GlobalTheory.RowRat
 namespace GlobalTheory.RowRat
 open Formalism.L2.DIV MvPolynomial
 
-theorem coeff_map_mem {ι : Type} [Fintype ι] {n n' : ℕ} {σ : ι → Formalism.BasicNotions.DomWeight n} {σ' : ι → Formalism.BasicNotions.DomWeight n'} {L : Type} [Field L] (κ : L →+* ℂ)
-    (f : VV ℂ σ →ₗ[ℂ] VV ℂ σ') (hf : ∀ a b, (bVV ℂ σ').repr (f (bVV ℂ σ b)) a ∈ Set.range κ) (v : VV ℂ σ)
-    (hv : ∀ m, AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ) (m : ι × Fin n' × Fin n' →₀ ℕ) :
-    AddMonoidAlgebra.coeff (f v).1 m ∈ Set.range κ := by
+theorem coeff_map_mem
+    {ι : Type} [Fintype ι]
+    {n n' : ℕ} {σ : ι → Formalism.BasicNotions.DomWeight n}
+    {σ' : ι → Formalism.BasicNotions.DomWeight n'} {L : Type} [Field L]
+    (κ : L →+* ℂ) (f : VV ℂ σ →ₗ[ℂ] VV ℂ σ')
+    (hf : ∀ a b, (bVV ℂ σ').repr (f (bVV ℂ σ b)) a ∈ Set.range κ)
+    (v : VV ℂ σ) (hv : ∀ m, AddMonoidAlgebra.coeff v.1 m ∈ Set.range κ)
+    (m : ι × Fin n' × Fin n' →₀ ℕ)
+    : AddMonoidAlgebra.coeff (f v).1 m ∈ Set.range κ := by
   refine coeff_mem_of_repr σ' κ _ (fun a => ?_) m
   have e : f v = ∑ b, (bVV ℂ σ).repr v b • f (bVV ℂ σ b) := by
     conv_lhs => rw [← (bVV ℂ σ).sum_repr v]
@@ -127,10 +145,12 @@ theorem coeff_map_mem {ι : Type} [Fintype ι] {n n' : ℕ} {σ : ι → Formali
     simp only [map_sum, map_smul]
   rw [e]
 
-  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
+  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul]
   rw [← RingHom.coe_fieldRange]
   refine Subfield.sum_mem _ fun b _ => ?_
-  exact Subfield.mul_mem _ (RingHom.mem_fieldRange.2 (repr_mem_of_coeff σ κ v hv b)) (RingHom.mem_fieldRange.2 (hf a b))
+  exact Subfield.mul_mem _ (RingHom.mem_fieldRange.2 (repr_mem_of_coeff σ κ v hv b))
+    (RingHom.mem_fieldRange.2 (hf a b))
 
 end GlobalTheory.RowRat
 

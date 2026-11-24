@@ -704,8 +704,7 @@ def LowAt (j : ℕ) (v : X.Pl) (g : ℝ) : Prop :=
           g
 
 theorem geC_mono {x : Y.Kc} {g g' : ℝ} (h : g' ≤ g) (hx : Y.geC x g) : Y.geC x g' := by
-  intro a b hb hab
-  exact hx a b hb (hab.trans (mul_le_mul_of_nonneg_right h (by exact_mod_cast hb.le)))
+  exact fun a b hb hab => hx a b hb (hab.trans (mul_le_mul_of_nonneg_right h (Nat.cast_nonneg b)))
 
 theorem LowAt.mono {j : ℕ} {v : X.Pl} {g g' : ℝ} (h : g' ≤ g) (hg : Y.LowAt j v g)
     : Y.LowAt j v g' := fun U hU I n =>
@@ -958,11 +957,9 @@ theorem lowAt_max
     (j : ℕ) (hj : j < X.mm)
     (g : ℝ) (hg : g ≤ max (X.g0v v (j + 1)) 0)
     : Y.LowAt j v g := by
-  rcases le_total (X.g0v v (j + 1)) 0 with h0 | h0
-  · rw [max_eq_right h0] at hg
-    exact Pend.LowAt.mono Y hg (hZ v j hj)
-  · rw [max_eq_left h0] at hg
-    exact Pend.LowAt.mono Y hg (hU v j hj)
+  rcases le_max_iff.mp hg with h | h
+  · exact Pend.LowAt.mono Y h (hU v j hj)
+  · exact Pend.LowAt.mono Y h (hZ v j hj)
 
 def NumCmp
     (D : Formalism.BasicNotions.D7) (L : SizeData₂ D) (X : Inst D L) (Y : LatInst D) (K : Consts)

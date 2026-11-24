@@ -225,13 +225,9 @@ theorem isLo_inv {L : Matrix (Fin n) (Fin n) K} (h : IsLo L) : IsLo L⁻¹ := by
   rw [← Matrix.transpose_nonsing_inv] at h2
   exact ⟨fun a => h2.1 a, fun a b hab => h2.2 a b hab⟩
 
-theorem det_up' {U : Matrix (Fin n) (Fin n) K} (h : IsUp U) : U.det = 1 := by
-  have hbt : U.BlockTriangular id := fun i j hij => h.2 j i hij
-  rw [Matrix.det_of_isUpperTriangular hbt]
-  simp [h.1]
+alias det_up' := _root_.Formalism.L2.SG.Pf.AtPt.det_up
 
-theorem det_lo' {L : Matrix (Fin n) (Fin n) K} (h : IsLo L) : L.det = 1 := by
-  rw [← Matrix.det_transpose]; exact det_up' (isUp_transpose h)
+alias det_lo' := _root_.Formalism.L2.SG.Pf.AtPt.det_lo
 
 end Tri
 
@@ -265,13 +261,6 @@ variable
   {D : Formalism.BasicNotions.D7}
   {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
 
-theorem alg_mem_O' (p : PlF D) {c : (D.s.atP p).Fp} (hc : c ∈ 𝒪[(D.s.atP p).Fp])
-    : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c ∈ (D.s.atP p).O := by
-  rw [(D.s.atP p).O_def]
-  have h := isIntegral_algebraMap (R := 𝒪[(D.s.atP p).Fp]) (A := (D.s.atP p).Ep) (x := ⟨c, hc⟩)
-  rw [IsScalarTower.algebraMap_apply 𝒪[(D.s.atP p).Fp] (D.s.atP p).Fp (D.s.atP p).Ep] at h
-  exact h
-
 theorem iotaE_alg (p : PlF D) (x : D.host.F)
     : (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)
       = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF x) :=
@@ -293,8 +282,10 @@ theorem yP_int
   rw [eu', iotaE_alg, map_inv₀] at hu2
   unfold yP
   refine ⟨?_, ?_⟩
-  · rw [map_mul]; exact Subring.mul_mem _ (alg_mem_O' p hd1) hu1
-  · rw [mul_inv, map_mul]; exact Subring.mul_mem _ (alg_mem_O' p hd2) hu2
+  · rw [map_mul]
+    exact Subring.mul_mem _ (_root_.Formalism.L2.SG.Pf.LocModel.LM.algebraMap_mem_O p hd1) hu1
+  · rw [mul_inv, map_mul]
+    exact Subring.mul_mem _ (_root_.Formalism.L2.SG.Pf.LocModel.LM.algebraMap_mem_O p hd2) hu2
 
 theorem tupZ_eq_x0L_at
     (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
@@ -417,8 +408,8 @@ theorem atMat_zT
   have hz : zT γ = ZhatL (lf D F0) hex.choose.2.1 := by unfold zT; rw [hn]
   obtain ⟨F₁, hR₁, -, hc₁⟩ := hat
   have hw : w = hex.choose.1 :=
-    pt_eq_of_cells cell_point_uniqueness (Formalism.L2.SG.Closed.TermFun_holds D u u') hrows γ hR₁
-      hRep hc₁ ⟨_, _, hL, hU, e⟩
+    pt_eq_of_cells cell_point_uniqueness (_root_.term_function_const D u u') hrows γ hR₁ hRep hc₁
+      ⟨_, _, hL, hU, e⟩
   exact ⟨_, _, hL, hU, by rw [hz, hw]; exact e⟩
 
 end TermRestr
@@ -724,7 +715,7 @@ theorem zzplus_locF'
         CntLocal.ZhatLoc, LsDatumB.sgnP, Matrix.mul_diagonal, Matrix.of_apply, hge, hgq, map_mul,
         map_sub, snd_proj_symm, apply_ite (p2 sg.e), map_zero, zhat_locF', Prod.fst_mul,
         Prod.snd_mul, ← adeleInfiniteComponent_apply, ← adele_ext_components, hs', hs1, hcj1, hcj2,
-        hs2, hm2, hf1, hf2, Tu, map_neg, Zd.hcj p]
+        hs2, hm2, hf1, hf2, Tu, Zd.hcj p]
       split_ifs with h
       · obtain ⟨rfl, rfl⟩ := h
         simp only [Fin.val_last, Nat.sub_self, pow_zero]

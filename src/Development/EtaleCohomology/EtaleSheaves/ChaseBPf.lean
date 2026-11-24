@@ -138,9 +138,7 @@ theorem pL_pm
     : pL c e U V (g ≫ f) ≫ pm D e U V f g = pL c e U V f := by
   apply pullback.hom_ext <;> simp only [pL, pm, pullback.map]
     <;> simp only [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_snd,
-      pullback.lift_snd_assoc, IsPullback.isoPullback_hom_fst, IsPullback.isoPullback_hom_fst_assoc,
-      IsPullback.isoPullback_hom_snd, IsPullback.isoPullback_hom_snd_assoc, rL_ι, rL_ι_assoc,
-      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι, rD_ι_assoc, rL_rD, rL_rD_assoc]
+      pullback.lift_snd_assoc, rL_rD]
 
 theorem km_pL
     {D : J ⥤ Scheme.{0}} (c : Cone D)
@@ -150,16 +148,12 @@ theorem km_pL
   apply pullback.hom_ext
   · rw [← cancel_mono (lv D e U f).ι]
     simp only [pL, km, kv, pullback.map, Category.assoc]
-    simp only [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_snd,
-      pullback.lift_snd_assoc, IsPullback.isoPullback_hom_fst, IsPullback.isoPullback_hom_fst_assoc,
-      IsPullback.isoPullback_hom_snd, IsPullback.isoPullback_hom_snd_assoc, rL_ι, rL_ι_assoc,
-      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι, rD_ι_assoc, rL_rD, rL_rD_assoc]
+    simp only [Category.assoc, pullback.lift_fst_assoc, IsPullback.isoPullback_hom_fst_assoc, rL_ι,
+      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc]
   · rw [← cancel_mono (lv D e V f).ι]
     simp only [pL, km, kv, pullback.map, Category.assoc]
-    simp only [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_snd,
-      pullback.lift_snd_assoc, IsPullback.isoPullback_hom_fst, IsPullback.isoPullback_hom_fst_assoc,
-      IsPullback.isoPullback_hom_snd, IsPullback.isoPullback_hom_snd_assoc, rL_ι, rL_ι_assoc,
-      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι, rD_ι_assoc, rL_rD, rL_rD_assoc]
+    simp only [Category.assoc, pullback.lift_snd_assoc, IsPullback.isoPullback_hom_snd_assoc, rL_ι,
+      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc]
 
 theorem kv_pm
     (D : J ⥤ Scheme.{0})
@@ -169,16 +163,12 @@ theorem kv_pm
   apply pullback.hom_ext
   · rw [← cancel_mono (lv D e U f).ι]
     simp only [pm, kv, pullback.map, Category.assoc]
-    simp only [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_snd,
-      pullback.lift_snd_assoc, IsPullback.isoPullback_hom_fst, IsPullback.isoPullback_hom_fst_assoc,
-      IsPullback.isoPullback_hom_snd, IsPullback.isoPullback_hom_snd_assoc, rL_ι, rL_ι_assoc,
-      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι, rD_ι_assoc, rL_rD, rL_rD_assoc]
+    simp only [Category.assoc, pullback.lift_fst_assoc, IsPullback.isoPullback_hom_fst_assoc,
+      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι]
   · rw [← cancel_mono (lv D e V f).ι]
     simp only [pm, kv, pullback.map, Category.assoc]
-    simp only [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_snd,
-      pullback.lift_snd_assoc, IsPullback.isoPullback_hom_fst, IsPullback.isoPullback_hom_fst_assoc,
-      IsPullback.isoPullback_hom_snd, IsPullback.isoPullback_hom_snd_assoc, rL_ι, rL_ι_assoc,
-      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι, rD_ι_assoc, rL_rD, rL_rD_assoc]
+    simp only [Category.assoc, pullback.lift_snd_assoc, IsPullback.isoPullback_hom_snd_assoc,
+      Scheme.homOfLE_ι, Scheme.homOfLE_ι_assoc, rD_ι]
 
 theorem pL_fst
     {D : J ⥤ Scheme.{0}} (c : Cone D)

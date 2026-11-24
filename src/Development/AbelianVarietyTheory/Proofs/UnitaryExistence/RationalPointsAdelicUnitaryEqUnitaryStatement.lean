@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.rational_points_adelicUnitary_eq_unitary
     : ∀ (D : D7) (V : HSp D),
       (∀ γ, γ ∈ GQ V ↔ ∃ γ', IsRat V γ γ')
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.rational_points_adelicUnitary_eq_unitary
               ∧ ∀ τ θ,
                 Formalism.MainNotions.StandardLattice.IsInfEmb τ θ
                   → archM V θ γ = (γ' : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map τ := by
-  first
-  | exact @GlobalTheory.Member.RatElt.rational_elements
-  | exact GlobalTheory.Member.RatElt.rational_elements
-  | (intros; apply GlobalTheory.Member.RatElt.rational_elements <;> assumption)
+  first | exact @GlobalTheory.Member.RatElt.rational_elements

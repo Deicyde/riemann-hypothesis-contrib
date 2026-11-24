@@ -73,7 +73,7 @@ theorem leading_minor_ne_zero
 theorem atSomeAll_holds : Formalism.L2.SG.TermTieOf.AtSomeAll := by
   intro D X Y u u' t hG hrel
   obtain ⟨F', ⟨hP, hmk⟩, hR⟩ := hrel
-  have hf := Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) _ ((Y.rowsOK u).1 t.lam t.mem)
+  have hf := _root_.term_function_const D u u' (X.Fu u) _ ((Y.rowsOK u).1 t.lam t.mem)
   have hGv : Gval (lf D (X.Fu u)) F' ≠ 0 := by
     have e := Formalism.L2.SG.TermDef.Gt_mk hf.1 ⟨F', hP⟩
     rw [hmk] at e
@@ -95,7 +95,7 @@ theorem atSomeAll_holds : Formalism.L2.SG.TermTieOf.AtSomeAll := by
   refine ⟨L, U, hL, hU, ?_⟩
   rw [← hZ]
   funext a b
-  first | rfl | (simp [ZhatOM, ZhatL, Matrix.submatrix_apply]; rfl)
+  first | rfl
 
 end Formalism.L2.SG.LeadingMinorsNonvanishing
 

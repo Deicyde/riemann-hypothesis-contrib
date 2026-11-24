@@ -50,6 +50,8 @@ import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
 import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsAdmOnOfFiniteDimensional
 import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.ExistsStandardIndModule
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviModulusOneLinearReductiveExpMulExp
+import Formalism.FormalDegreeBessel.FormalDegreeRatio.IOCentral
 
 @[expose] public section
 
@@ -108,22 +110,6 @@ theorem one_le_wt {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) (a : Fin n) 
           (fun _ _ => by positivity)
           (Finset.mem_univ a)
 
-theorem inUJ_mul {a b : Matrix (Fin n) (Fin n) ℂ} (ha : inUJ ε a) (hb : inUJ ε b)
-    : inUJ ε (a * b) := by
-  unfold inUJ at *
-  calc
-    (a * b)ᴴ * Jm ε * (a * b)
-      = bᴴ * (aᴴ * Jm ε * a) * b := by rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
-    _ = Jm ε := by rw [ha, hb]
-
-theorem isUnit_of_inUJ' {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) : IsUnit g := by
-  have h : Jm ε * gᴴ * Jm ε * g = 1 := by
-    calc
-      Jm ε * gᴴ * Jm ε * g
-        = Jm ε * (gᴴ * Jm ε * g) := by simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [hg, Jm_mul_self]
-  exact ⟨⟨g, Jm ε * gᴴ * Jm ε, mul_eq_one_comm.mp h, h⟩, rfl⟩
-
 theorem isCompact_wt_le (ε : Fin n → Bool) (R : ℝ)
     : IsCompact {h : Matrix (Fin n) (Fin n) ℂ | inUJ ε h ∧ wt h ≤ R} := by
   have hwt : Continuous (wt : Matrix (Fin n) (Fin n) ℂ → ℝ) := by
@@ -172,7 +158,10 @@ theorem pow_bound
     · simp [inUJ]
     · simp [hrep.1]
   | succ m ih =>
-    refine ⟨by rw [pow_succ]; exact inUJ_mul ih.1 hh, fun x => ?_⟩
+    refine ⟨
+      by rw [pow_succ]; exact _root_.Formalism.QuantumDeterminants.io_inUJ_mul ih.1 hh,
+      fun x => ?_
+    ⟩
     rw [pow_succ, hrep.2 _ ih.1 _ hh, ContinuousLinearMap.comp_apply]
     calc
       ‖π (h ^ m) (π h x)‖
@@ -262,16 +251,6 @@ theorem herm_exp_injective
     : A = B := by
   rw [← CFC.log_exp A hA, ← CFC.log_exp B hB, h]
 
-def signUnit (ε : Fin n → Bool) : (Matrix (Fin n) (Fin n) ℂ)ˣ :=
-  ⟨Jm ε, Jm ε, Jm_mul_self ε, Jm_mul_self ε⟩
-
-theorem exp_sign_conj (A : Matrix (Fin n) (Fin n) ℂ)
-    : NormedSpace.exp (Jm ε * A * Jm ε) = Jm ε * NormedSpace.exp A * Jm ε :=
-  Matrix.exp_units_conj' (signUnit ε) A
-
-theorem sign_sign_mul (x : Matrix (Fin n) (Fin n) ℂ) : Jm ε * (Jm ε * x) = x := by
-  rw [← Matrix.mul_assoc, Jm_mul_self, Matrix.one_mul]
-
 theorem left_inv_of_inUJ {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
     : Jm ε * gᴴ * Jm ε * g = 1 := by
   calc
@@ -279,23 +258,20 @@ theorem left_inv_of_inUJ {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
       = Jm ε * (gᴴ * Jm ε * g) := by simp only [Matrix.mul_assoc]
     _ = 1 := by rw [hg, Jm_mul_self]
 
-theorem right_inv_of_inUJ {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
-    : g * (Jm ε * gᴴ * Jm ε) = 1 :=
-  mul_eq_one_comm.mp (left_inv_of_inUJ hg)
-
 theorem sign_conj_log
     {g L : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) (hL : Lᴴ = L) (he : NormedSpace.exp L = gᴴ * g)
     : Jm ε * L * Jm ε = -L := by
   refine herm_exp_injective ?_ ?_ ?_
   · rw [conjTranspose_mul, conjTranspose_mul, Jm_conjTranspose, hL, Matrix.mul_assoc]
   · rw [conjTranspose_neg, hL]
-  · rw [exp_sign_conj, he, Matrix.exp_neg, he]
+  · rw [_root_.GlobalTheory.LeviPolar.exp_conj_J, he, Matrix.exp_neg, he]
     refine (Matrix.inv_eq_left_inv ?_).symm
     calc
       Jm ε * (gᴴ * g) * Jm ε * (gᴴ * g) = (Jm ε * gᴴ) * (g * (Jm ε * gᴴ * Jm ε)) * (Jm ε * g) := by
-        simp only [Matrix.mul_assoc, sign_sign_mul]
+        simp only [Matrix.mul_assoc, _root_.GlobalTheory.LeviPolar.J_J_mul]
       _ = 1 := by
-        rw [right_inv_of_inUJ hg, Matrix.mul_one, ← Matrix.mul_assoc]; exact left_inv_of_inUJ hg
+        rw [_root_.GlobalTheory.LeviPolar.mul_conj_J hg, Matrix.mul_one, ← Matrix.mul_assoc]
+        exact left_inv_of_inUJ hg
 
 theorem exp_log_inUJ
     {g L : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) (hL : Lᴴ = L) (he : NormedSpace.exp L = gᴴ * g)
@@ -303,13 +279,13 @@ theorem exp_log_inUJ
     : inUJ ε (NormedSpace.exp (s • L)) := by
   unfold inUJ
   have hJE : Jm ε * NormedSpace.exp (s • L) * Jm ε = NormedSpace.exp ((-s) • L) := by
-    rw [← exp_sign_conj, Matrix.mul_smul, Matrix.smul_mul, sign_conj_log hg hL he, smul_neg,
-      neg_smul]
+    rw [← _root_.GlobalTheory.LeviPolar.exp_conj_J, Matrix.mul_smul, Matrix.smul_mul,
+      sign_conj_log hg hL he, smul_neg, neg_smul]
   rw [exp_smul_herm hL]
   calc
     NormedSpace.exp (s • L) * Jm ε * NormedSpace.exp (s • L)
         = Jm ε * (Jm ε * NormedSpace.exp (s • L) * Jm ε) * NormedSpace.exp (s • L) := by
-      simp only [Matrix.mul_assoc, sign_sign_mul]
+      simp only [Matrix.mul_assoc, _root_.GlobalTheory.LeviPolar.J_J_mul]
     _ = Jm ε := by
       rw [hJE, Matrix.mul_assoc, exp_smul_add, neg_add_cancel, zero_smul, NormedSpace.exp_zero,
         Matrix.mul_one]
@@ -347,7 +323,8 @@ theorem polyGrowth_of_isometric_on_K
   have hw0 : 0 < wt g := by linarith
   have hlog0 : 0 ≤ Real.log (wt g) := Real.log_nonneg hw
   obtain ⟨L, -, hLs, hLe, -⟩ :=
-    GlobalTheory.posDef_conjTranspose_mul_self_eq_exp_polynomial n g (isUnit_of_inUJ' hg')
+    GlobalTheory.posDef_conjTranspose_mul_self_eq_exp_polynomial n g
+      (_root_.GlobalTheory.LeviPolar.isUnit_of_inUJ hg')
   have hLh : L.IsHermitian := hLs
   obtain ⟨m, hm⟩ : ∃ m : ℕ, m = ⌈Real.log (wt g)⌉₊ + 1 := ⟨_, rfl⟩
   have hm0 : 0 < m := by omega
@@ -367,7 +344,7 @@ theorem polyGrowth_of_isometric_on_K
     field_simp
   obtain ⟨Q, hQ⟩ : ∃ Q, Q = NormedSpace.exp ((-(1 / 2) : ℝ) • L) := ⟨_, rfl⟩
   have hQU : inUJ ε Q := hQ ▸ exp_log_inUJ hg' hLs hLe _
-  have hk : inUJ ε (g * Q) := inUJ_mul hg' hQU
+  have hk : inUJ ε (g * Q) := _root_.Formalism.QuantumDeterminants.io_inUJ_mul hg' hQU
   have hku : (g * Q)ᴴ * (g * Q) = 1 := by
     have hQh : Qᴴ = Q := by rw [hQ]; exact exp_smul_herm hLs _
     rw [conjTranspose_mul, hQh]

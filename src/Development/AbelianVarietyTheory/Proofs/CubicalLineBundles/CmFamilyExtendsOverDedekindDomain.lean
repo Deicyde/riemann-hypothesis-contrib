@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsThetaDegOfIsLocalModel
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.AbelianSchemeHomExtendsDedekindOfIsGrpPullbackAl
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.FamilyIdentitiesDescendFieldToDedekindStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.FamilyIdentitiesDescendFieldToDedekind
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -67,8 +67,8 @@ theorem isFam_extends_dedekind
   choose ψ hψ using key
   exact ⟨
     ψ,
-    GlobalTheory.T.family_identities_descend_field_to_dedekind hL E H R ω C D h T L ψ K ω' C'
-      (algebraMap R K) φ T' m ψ' (IsFractionRing.injective R K) hφ hψ hψ',
+    _root_.GlobalTheory.FamDescent.isFam_descend hL E H R ω C D h T L ψ K ω' C' (algebraMap R K) φ
+      T' m ψ' (IsFractionRing.injective R K) hφ hψ hψ',
     hψ
   ⟩
 

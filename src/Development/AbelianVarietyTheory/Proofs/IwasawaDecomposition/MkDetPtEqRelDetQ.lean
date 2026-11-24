@@ -67,7 +67,7 @@ theorem ordSub_conj
     (P : HeightOneSpectrum (𝓞 E))
     : ordSub (conjPrime₂ P) (detSub N) = - ordSub P (detSub N) := by
   have hfr (w : HeightOneSpectrum (𝓞 E)) : IsFr w N (latFr w N) := by
-    first | exact isFr_latFr w ⟨hN, hu⟩ | exact isFr_latFr w hN
+    first | exact isFr_latFr w ⟨hN, hu⟩
   have hfull : Submodule.IsFullLattice E N := by
     letI : Submodule.IsLattice E N := hN
     refine ⟨?_⟩

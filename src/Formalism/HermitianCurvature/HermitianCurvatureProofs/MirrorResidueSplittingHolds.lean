@@ -92,7 +92,7 @@ theorem residue_splitting_holds : ResidueSplittingModelAlgebra := by
   have hDriDr : L.Dri * L.Dr = 1 := by
     rw [Formalism.FourierDecayAlt.P.MAx3.H.cl_comm L (Formalism.FourierDecayAlt.P.MAx3.H.memDri L)
       (Formalism.FourierDecayAlt.P.MAx3.H.memDr L)]
-    exact Formalism.FourierDecayAlt.P.MAx3.H.Dr_Dri' L
+    exact _root_.Formalism.FourierDecayAlt.P.RuleGD.Dr_Dri L
 
   have hterm
       : ∀ l ∈ Finset.Icc 1 (P.k - 1),
@@ -191,7 +191,7 @@ theorem mirror_residue_splitting_holds : MirrorResidueSplittingModelAlgebra := b
   have hDrbiDrb : L.Drbi * L.Drb = 1 := by
     rw [Formalism.FourierDecayAlt.P.MAx3.H.cl_comm L (Formalism.FourierDecayAlt.P.MAx3.H.memDrbi L)
       (Formalism.FourierDecayAlt.P.MAx3.H.memDrb L)]
-    exact Formalism.FourierDecayAlt.P.MAx3.H.Drb_Drbi' L
+    exact _root_.Formalism.FourierDecayAlt.P.RuleGD.Drb_Drbi L
   have cDD : L.Dr * L.Drb = L.Drb * L.Dr :=
     Formalism.FourierDecayAlt.P.MAx3.H.cl_comm L (Formalism.FourierDecayAlt.P.MAx3.H.memDr L)
       (Formalism.FourierDecayAlt.P.MAx3.H.memDrb L)

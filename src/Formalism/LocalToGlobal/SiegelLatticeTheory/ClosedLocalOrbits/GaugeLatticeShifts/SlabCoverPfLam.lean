@@ -54,23 +54,30 @@ import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLattic
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PoincareInHH.Cut Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.KExpCut
-  Formalism.L2.SG.Full Formalism.L2.SG.Pf.Slab Formalism.L2.SG.Pf.Vanish2
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PoincareInHH.Cut
+  Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.KExpCut Formalism.L2.SG.Full Formalism.L2.SG.Pf.Slab
+  Formalism.L2.SG.Pf.Vanish2
 open Matrix
 
 namespace Formalism.L2.SG.Pf.SlabCoverPf
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem exists_ker_mat {E : Type*} [Field E] {n : ℕ} (W : Submodule E (Fin n → E)) :
-    ∃ (k : ℕ) (B : Matrix (Fin k) (Fin n) E), ∀ w, B *ᵥ w = 0 ↔ w ∈ W := by
+theorem exists_ker_mat {E : Type*} [Field E] {n : ℕ} (W : Submodule E (Fin n → E))
+    : ∃ (k : ℕ) (B : Matrix (Fin k) (Fin n) E), ∀ w, B *ᵥ w = 0 ↔ w ∈ W := by
   classical
   let b := Module.finBasis E ((Fin n → E) ⧸ W)
-  refine ⟨Module.finrank E ((Fin n → E) ⧸ W), Matrix.of fun i j => b.coord i (W.mkQ (Pi.single j 1)),
-    fun w => ?_⟩
-  have key : ∀ i, ((Matrix.of fun i j => b.coord i (W.mkQ (Pi.single j 1))) *ᵥ w) i =
-      b.coord i (W.mkQ w) := by
+  refine ⟨
+    Module.finrank E ((Fin n → E) ⧸ W),
+    Matrix.of fun i j => b.coord i (W.mkQ (Pi.single j 1)),
+    fun w => ?_
+  ⟩
+  have key
+      : ∀ i,
+        ((Matrix.of fun i j => b.coord i (W.mkQ (Pi.single j 1))) *ᵥ w) i
+          = b.coord i (W.mkQ w) := by
     intro i
     conv_rhs => rw [show w = ∑ j, w j • Pi.single j 1 by
       funext x; simp [Finset.sum_apply, Pi.single_apply]]
@@ -89,21 +96,24 @@ theorem exists_ker_mat {E : Type*} [Field E] {n : ℕ} (W : Submodule E (Fin n �
     rw [key]
     simp [(Submodule.Quotient.mk_eq_zero W).2 hw]
 
-theorem rv_desc {D : D7} (X : HidaSetting D) (v : InfinitePlace X.B.I.F) (T : Set (Fin X.B.I.n → X.B.I.E))
-    (w : Fin X.B.I.n → X.B.I.E) (h : rv X.B.I v w ∈ Submodule.span ℂ (rv X.B.I v '' T)) :
-    w ∈ Submodule.span X.B.I.E T := by
+theorem rv_desc
+    {D : D7} (X : HidaSetting D) (v : InfinitePlace X.B.I.F) (T : Set (Fin X.B.I.n → X.B.I.E))
+    (w : Fin X.B.I.n → X.B.I.E) (h : rv X.B.I v w ∈ Submodule.span ℂ (rv X.B.I v '' T))
+    : w ∈ Submodule.span X.B.I.E T := by
   classical
   obtain ⟨k, B, hB⟩ := exists_ker_mat (Submodule.span X.B.I.E T)
   rw [← hB w]
-  have hφ : ∀ y : Fin X.B.I.n → X.B.I.E,
-      (B.map (X.B.I.φ v)) *ᵥ (fun i => X.B.I.φ v (y i)) = fun i => X.B.I.φ v ((B *ᵥ y) i) := by
+  have hφ
+      : ∀ y : Fin X.B.I.n → X.B.I.E,
+        (B.map (X.B.I.φ v)) *ᵥ (fun i => X.B.I.φ v (y i)) = fun i => X.B.I.φ v ((B *ᵥ y) i) := by
     intro y
     funext i
 
     simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
   have hrv : ∀ y, (fun i => X.B.I.φ v (y i)) = X.B.I.P v *ᵥ rv X.B.I v y := by
     intro y
-    rw [rv, Matrix.mulVec_mulVec, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.one_mulVec]
+    rw [rv, Matrix.mulVec_mulVec, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv,
+      Matrix.one_mulVec]
   let M : (Fin X.B.I.n → ℂ) →ₗ[ℂ] (Fin k → ℂ) := Matrix.mulVecLin (B.map (X.B.I.φ v) * X.B.I.P v)
   have hM : ∀ y, M (rv X.B.I v y) = fun i => X.B.I.φ v ((B *ᵥ y) i) := by
     intro y
@@ -131,8 +141,10 @@ def toVHom {D : D7} (X : HidaSetting D) : (Fin X.B.I.n → X.B.I.E) →+ (VS D).
     exact left_eq_add.1 h
   map_add' := toV_add X
 
-theorem toV_span {D : D7} (X : HidaSetting D) {S : Set (Fin D.R.rS)} {w : Fin X.B.I.n → X.B.I.E}
-    (hw : w ∈ Submodule.span X.B.I.E (X.eR '' S)) : toV X w ∈ Submodule.span D.host.E (X.eX '' S) := by
+theorem toV_span
+    {D : D7} (X : HidaSetting D)
+    {S : Set (Fin D.R.rS)} {w : Fin X.B.I.n → X.B.I.E} (hw : w ∈ Submodule.span X.B.I.E (X.eR '' S))
+    : toV X w ∈ Submodule.span D.host.E (X.eX '' S) := by
   induction hw using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨a, ha, rfl⟩ := hy
@@ -153,35 +165,41 @@ theorem nilradical_rational_lattice : NRatLam := by
   intro D X Y u ρ ν hKL hν h1 _ hK2
   obtain ⟨γ, hγU, hγinf, hγfin⟩ := hν
 
-  have hrvg : ∀ (v : InfinitePlace X.B.I.F) (y : Fin X.B.I.n → X.B.I.E),
-      rv X.B.I v ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ y) =
-        uMat (ν.1 v) *ᵥ rv X.B.I v y := by
+  have hrvg
+      : ∀ (v : InfinitePlace X.B.I.F) (y : Fin X.B.I.n → X.B.I.E),
+        rv X.B.I v ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ y)
+          = uMat (ν.1 v) *ᵥ rv X.B.I v y := by
     intro v y
     rw [hγinf v, rv, rv]
-    simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one]
+    simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc,
+      Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one]
     rw [← Matrix.mulVec_mulVec]
     congr 1
     funext i
 
     simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
-  have hsub : ∀ (v : InfinitePlace X.B.I.F) (y : Fin X.B.I.n → X.B.I.E),
-      (uMat (ν.1 v) - 1) *ᵥ rv X.B.I v y =
-        rv X.B.I v ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ y - y) := by
+  have hsub
+      : ∀ (v : InfinitePlace X.B.I.F) (y : Fin X.B.I.n → X.B.I.E),
+        (uMat (ν.1 v) - 1) *ᵥ rv X.B.I v y
+          = rv X.B.I v ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ y - y) := by
     intro v y
     rw [Matrix.sub_mulVec, Matrix.one_mulVec, ← hrvg]
     exact (map_sub (Formalism.L2.SG.Pf.Level.rvHom X v) _ _).symm
 
-  have hdesc : ∀ (S : Set (Fin D.R.rS)) (x : (VS D).V),
-      (∀ v, (uMat (ν.1 v) - 1) *ᵥ rv X.B.I v (X.crd x) ∈
-        Submodule.span ℂ ((fun a => rv X.B.I v (X.eR a)) '' S)) →
-      matEC X γ x - x ∈ Submodule.span D.host.E (X.eX '' S) := by
+  have hdesc
+      : ∀ (S : Set (Fin D.R.rS)) (x : (VS D).V),
+        (∀ v,
+            (uMat (ν.1 v) - 1) *ᵥ rv X.B.I v (X.crd x)
+              ∈ Submodule.span ℂ ((fun a => rv X.B.I v (X.eR a)) '' S))
+          → matEC X γ x - x ∈ Submodule.span D.host.E (X.eX '' S) := by
     intro S x hx
     obtain ⟨v⟩ : Nonempty (InfinitePlace X.B.I.F) := inferInstance
     have h := hx v
     rw [hsub, ← Set.image_image (fun w => rv X.B.I v w) X.eR S] at h
     have hw := rv_desc X v _ _ h
-    have e : matEC X γ x - x =
-        toV X ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ X.crd x - X.crd x) := by
+    have e
+        : matEC X γ x - x
+          = toV X ((γ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ X.crd x - X.crd x) := by
       rw [← matE_crdC X γ x, ← crd_sub', toV_crd]
     rw [e]
     exact toV_span X hw
@@ -192,12 +210,22 @@ theorem nilradical_rational_lattice : NRatLam := by
   refine ⟨?_, ?_, ?_⟩
   · rw [isAutLam_iff]
     refine ⟨fun x y => matE_isomC X γ hγU x y, fun y => ?_⟩
-    rw [(Y.cs u).lat_eq ρ (matEC X γ y), (Y.cs u).lat_eq ρ y, matE_inclC, ← hγfin, Matrix.mulVec_mulVec]
-    have hk : ∀ w, w ∈ X.B.I.Lf ↔ X.B.I.fmat ((((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ν.2 *
-        (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)) *ᵥ w ∈ X.B.I.Lf := hKL.2.1 _ hK2
-    have e : X.B.I.fmat (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * X.B.I.fmat ν.2 =
-        X.B.I.fmat ((((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ν.2 * (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)) *
-          X.B.I.fmat (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ := by
+    rw [(Y.cs u).lat_eq ρ (matEC X γ y), (Y.cs u).lat_eq ρ y, matE_inclC, ← hγfin,
+      Matrix.mulVec_mulVec]
+    have hk
+        : ∀ w,
+          w ∈ X.B.I.Lf
+            ↔ X.B.I.fmat
+                  ((((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ν.2
+                    * (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u))
+                *ᵥ w
+              ∈ X.B.I.Lf :=
+      hKL.2.1 _ hK2
+    have e
+        : X.B.I.fmat (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * X.B.I.fmat ν.2
+          = X.B.I.fmat
+              ((((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ν.2 * (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u))
+            * X.B.I.fmat (((Y.cs u).h ρ : X.B.I.Gf) * X.xu u)⁻¹ := by
       simp [AutInst.fmat, Matrix.mul_assoc]
     rw [e, ← Matrix.mulVec_mulVec]
     exact (hk _).symm
@@ -209,7 +237,8 @@ theorem nilradical_rational_lattice : NRatLam := by
       (matEC X γ : (VS D).V →ₗ[D.host.E] (VS D).V) - LinearMap.id
     have hL : ∀ y, Lm y = matEC X γ y - y := fun y => rfl
     rw [← hL]
-    refine (Submodule.span_le (p := (Submodule.span D.host.E (X.eX '' {i | i.1 < j})).comap Lm)).2 ?_ hx
+    refine (Submodule.span_le (p := (Submodule.span D.host.E (X.eX '' {i | i.1 < j})).comap Lm)).2
+      ?_ hx
     rintro _ ⟨i, hi, rfl⟩
     show X.eX i ∈ (Submodule.span D.host.E (X.eX '' {i | i.1 < j})).comap Lm
     rw [Submodule.mem_comap, hL]
@@ -227,8 +256,9 @@ theorem nilradical_rational_lattice : NRatLam := by
       exact Submodule.subset_span ⟨a, rfl⟩
     change matEC X γ x - x ∈ Submodule.span D.host.E (Set.range (X.Fu u).e)
     rw [X.Fu_e u]
-    have hsp : Submodule.span D.host.E (X.eX '' {b : Fin D.R.rS | b.1 < D.R.rS}) =
-        Submodule.span D.host.E (Set.range X.eX) := by
+    have hsp
+        : Submodule.span D.host.E (X.eX '' {b : Fin D.R.rS | b.1 < D.R.rS})
+          = Submodule.span D.host.E (Set.range X.eX) := by
       congr 1
       ext y
       simp

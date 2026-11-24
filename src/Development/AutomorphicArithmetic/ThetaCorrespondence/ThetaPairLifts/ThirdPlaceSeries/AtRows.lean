@@ -39,8 +39,6 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Strict
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.LiftRef

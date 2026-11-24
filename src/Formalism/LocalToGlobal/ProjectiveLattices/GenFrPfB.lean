@@ -114,17 +114,11 @@ theorem gfpVec_tmap (hx : IsUnivChart _ n xc) (a : 𝓞 E) (cc : Fin n → L)
   have ht
       : tvec (x := xc) (tmap hx ((Over.pullback x).map (Xo.univ.t.act.act a)) cc)
         = tvec (x := xc) cc ≫ (Over.pullback x).map (Xo.univ.t.act.act a) := by
-    first
-    | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_tmap hx _ cc
-    | exact (ReciprocityTheory.ChartRestriction.G.Chart.tvec_tmap hx _ cc).symm
-    | exact (ReciprocityTheory.ChartRestriction.G.Chart.tcoord_spec hx
-        (tvec (x := xc) cc ≫ (Over.pullback x).map (Xo.univ.t.act.act a)) _).symm
+    first | exact ReciprocityTheory.ChartRestriction.G.Chart.tvec_tmap hx _ cc
   have e1
       : ((Over.pullback x).map (Xo.univ.t.act.act a)).left ≫ pullback.fst Xo.univ.t.G.hom x
         = pullback.fst Xo.univ.t.G.hom x ≫ (Xo.univ.t.act.act a).left := by
     simp
-    all_goals
-      first | exact pullback.lift_fst _ _ _ | erw [pullback.lift_fst] | (rw [limit.lift_π]; rfl)
   simp only [gfpVec, ht, Over.comp_left, Category.assoc, e1]
 
 theorem gfp_bc {L' : Type} [Field L'] [Algebra L L'] (hx : IsUnivChart _ n xc)
@@ -243,9 +237,7 @@ theorem gfp_basis
     Submodule.eq_of_le_of_finrank_eq hle hfr
   have hspan : cc ∈ Submodule.span L (Set.range d) := heq ▸ hcc
   obtain ⟨a, ha⟩ : ∃ a : Fin (Dw.mult τ) → L, ∑ i, a i • d i = cc := by
-    first
-    | exact (Submodule.mem_span_range_iff_exists_fun L).1 hspan
-    | exact Submodule.mem_span_range_iff_exists_fun.1 hspan
+    first | exact (Submodule.mem_span_range_iff_exists_fun L).1 hspan
   refine ⟨a, (gfp_comb_iff hx d a cc).2 ha.symm, ?_⟩
   intro a' ha'
   have h2 : cc = ∑ j, a' j • d j := (gfp_comb_iff hx d a' cc).1 ha'

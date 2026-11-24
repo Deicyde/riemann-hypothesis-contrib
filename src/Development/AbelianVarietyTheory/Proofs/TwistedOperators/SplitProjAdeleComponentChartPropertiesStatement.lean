@@ -55,7 +55,4 @@ theorem _root_.GlobalTheory.T.splitProjAdeleComponent_chart_properties
         → GlobalTheory.SplitHecke.Chart e v (rdA φ) ∧ (∀ a : AE D, rdE φ (toEAf D a) = rdA φ a)
           ∧ (∀ x : D.host.E, rdA φ (incA D x) = rdQ φ x) ∧ Continuous (rdA φ)
           ∧ ∀ e', IsIdemOf φ e' → e' = e := by
-  first
-  | exact @GlobalTheory.SplitProjChart.chart_rdA
-  | exact GlobalTheory.SplitProjChart.chart_rdA
-  | (intros; apply GlobalTheory.SplitProjChart.chart_rdA <;> assumption)
+  first | exact @GlobalTheory.SplitProjChart.chart_rdA

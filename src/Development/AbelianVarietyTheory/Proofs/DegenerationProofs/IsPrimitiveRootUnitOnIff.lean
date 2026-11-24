@@ -2,21 +2,29 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaLevelObjectDescendsFgSubfield
 public import Development.AbelianVarietyTheory.Definitions.Degenerations.RigGen
-import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsSymmetryHypothesisSpreadFromGenericFibre
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianSchemeDescentSmoothDimensionStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsAlgClosedJoinOfTwoFieldExtensions
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFinsetIsProjOverDescendsStatement
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLineBundleDescentToSubfieldStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbelianSchemeGerms
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianSchemeDescentSmoothDimension
+import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsCommonAlgClosedExtension
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFinsetIsProjOverDescends
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLineBundleDescentToSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaObjOfDescendedData
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GrpObjDescendsToLargeSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsMonHomIffOfIsGrpPullback
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LineBundleTrivialIsoDescendField
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MorphismsDescendToLargeSubfieldStatement
+import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.MorphismsDescendToLargeSubfield
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RelAmpleOfFieldExtensionBaseChange
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RigidifiedSymmetricKernelTrivialDescendFieldExtStatement
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.NonzeroLocus
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RigidifiedSymmetricKernelTrivialDescendFieldExt
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilIsGrpPullbackOfCommute
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilPairingFieldExtensionIffStatement
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilPairingFieldExtensionIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -57,7 +65,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbelianSchemeGerms
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBLocal
 import Std.Tactic.BVDecide.Normalize.Prop
@@ -186,7 +193,8 @@ theorem level_descend
     intro K' _ x
     obtain ⟨x', rfl⟩ := Spec.map_surjective x
     obtain ⟨Ω, _, _, j, j', hj⟩ :=
-      GlobalTheory.exists_algClosed_join_of_two_field_extensions K₀ K K' i x'.hom
+      _root_.GlobalTheory.CommonAlgClosedExtension.exists_common_algClosed_extension K₀ K K' i
+        x'.hom
     have hc : spMap j' ≫ Spec.map x' = spMap j ≫ spMap i := by
       rw [← Spec.map_comp, ← Spec.map_comp]
       congr 1
@@ -244,8 +252,9 @@ theorem level_descend
       (GlobalTheory.weilIs_grpPullback_of_comm _ _ A₀ Q.A (spMap i) φ L₀ Q.L hL Q.isLB hp hw _ k
         (t.pt a) (t.pt a') (U ≫ pt₀ a) (U ≫ pt₀ a') _ (hpt a).symm (hpt a').symm).1 (t.pairing a a')
     rw [unitOn_zpow] at h₁ ⊢
-    refine (GlobalTheory.T.weilPairing_fieldExtension_iff _ A₀ K₀ K i (𝟙 _) L₀ k (pt₀ a) (pt₀ a') _
-      hab hL).1 ?_
+    refine
+      (_root_.GlobalTheory.weilIs_fieldExt_iff _ A₀ K₀ K i (𝟙 _) L₀ k (pt₀ a) (pt₀ a') _ hab hL).1
+        ?_
     rw [map_zpow]
     exact (weilIs_congr (by simp) L₀ k _ _ _ _ rfl rfl _).1 h₁
 
@@ -283,7 +292,7 @@ theorem descends_to_fg_field
   let β : o →+* K := algebraMap o K
   let act : Bool → (t.A ⟶ t.A) := fun j => cond j w wd
   obtain ⟨s₀, H₀⟩ :=
-    GlobalTheory.T.exists_finset_isProjOver_descends_to_subfield K (gen β ∅) t.A.left t.A.hom
+    _root_.GlobalTheory.exists_finset_isProjOver_descends K (gen β ∅) t.A.left t.A.hom
       (GlobalTheory.ProjSpace.isProjOver_of_relAmple t.ample)
   obtain ⟨X₀, p₀, φ, hp₀, sq⟩ :=
     H₀ (gen β s₀) (gen_mono β (Finset.empty_subset _)) (subset_gen β le_rfl)
@@ -296,17 +305,17 @@ theorem descends_to_fg_field
   obtain ⟨s₁, H₁⟩ :=
     GlobalTheory.grpObj_descends_to_large_subfield K (gen β s₀) (Over.mk p₀) t.A φ sq
   obtain ⟨s₂, H₂⟩ :=
-    GlobalTheory.T.exists_lineBundle_descent_to_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ t.L
+    _root_.GlobalTheory.LBDescent.exists_lb_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ t.L
       t.isLB sq
   obtain ⟨s₃, H₃⟩ :=
-    GlobalTheory.T.exists_descent_of_morphisms_to_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ X₀
+    _root_.GlobalTheory.morphisms_descend_to_large_subfield K (gen β s₀) X₀ t.A.left p₀ t.A.hom φ X₀
       p₀ Bool
       (fun j => (act j).left ≫ φ)
       sq
       (fun j => by rw [Category.assoc, sq.w, ← Category.assoc, Over.w])
   obtain ⟨s₄, H₄⟩ :=
-    GlobalTheory.T.exists_descent_of_morphisms_to_subfield K (gen β s₀) (Sp (gen β s₀)) (Sp K) (𝟙 _)
-      (𝟙 _) (spMap (gen β s₀).subtype) X₀ p₀ (Fin (2 * t.g))
+    _root_.GlobalTheory.morphisms_descend_to_large_subfield K (gen β s₀) (Sp (gen β s₀)) (Sp K)
+      (𝟙 _) (𝟙 _) (spMap (gen β s₀).subtype) X₀ p₀ (Fin (2 * t.g))
       (fun a => (lev.pt a).left ≫ φ)
       (IsPullback.of_vert_isIso ⟨by simp⟩)
       (fun a => by
@@ -353,10 +362,11 @@ theorem descends_to_fg_field
     · rw [Category.assoc, hψ₁, Category.assoc, e₁, (hf₁ j).1]
     · rw [Category.assoc, hψ₂, ← Category.assoc, Over.w, Category.assoc, Over.w, hψ₂]
   obtain ⟨hab, hdim⟩ :=
-    GlobalTheory.T.abelian_scheme_descent_smooth_dimension _ K (gen β s).subtype A₁ t.A ψ hG t.isAb
+    _root_.GlobalTheory.FieldDescentAb.isAbelianScheme_and_relDim_descend _ K (gen β s).subtype A₁
+      t.A ψ hG t.isAb
   obtain ⟨hr, hs, hk⟩ :=
-    GlobalTheory.T.rigidified_symmetric_kernelTrivial_descend_fieldExt _ K (gen β s).subtype A₁ t.A
-      ψ L₁ t.L hab hG hL₁ t.isLB hL
+    _root_.GlobalTheory.PolDescent.rigidified_sym_kTriv_descend _ K (gen β s).subtype A₁ t.A ψ L₁
+      t.L hab hG hL₁ t.isLB hL
   have hamp :=
     GlobalTheory.AmpleDescent.relAmple_of_fieldExtension _ K (gen β s).subtype A₁ t.A ψ L₁ t.L hab
       hG hL₁ t.isLB hL t.ample

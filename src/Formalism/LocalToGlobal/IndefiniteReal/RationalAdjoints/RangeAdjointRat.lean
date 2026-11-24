@@ -151,7 +151,6 @@ theorem range_adjoint_rat
           exact ⟨star a, by rw [← ha, star_compat σ jR h hiso (bb l) (hli.ne_zero l)]⟩)
     choose a ha using hcoord
     have hr' : jR (∑ k, a k • bb k) = LinearMap.adjoint Θ (e i) := by
-
       rw [← hc, hf, Fintype.linearCombination_apply, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [LinearMap.map_smulₛₗ, ha]

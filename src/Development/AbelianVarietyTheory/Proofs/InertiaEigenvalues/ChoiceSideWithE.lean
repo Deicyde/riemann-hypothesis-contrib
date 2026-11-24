@@ -51,8 +51,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 section Choice
 
 variable {D : D7}

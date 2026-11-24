@@ -50,8 +50,6 @@ open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
-
 namespace UpperTheory.V.Z.J.D
 
 section Abs

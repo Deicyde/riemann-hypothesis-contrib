@@ -373,7 +373,6 @@ theorem step_of_linear
   have hinf : (Set.range (Int.cast : ℤ → ℝ)).Infinite :=
     Set.infinite_range_of_injective Int.cast_injective
   have h₁ (a b : ℤ) : (P b).eval (a : ℝ) = G (a + b) := by
-
     rw [← hG, add_pow, map_sum, eval_finsetSum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [eval_monomial, _root_.smul_pow, mul_comm _ ((D + 1).choose j : R), ← nsmul_eq_mul (α := R),

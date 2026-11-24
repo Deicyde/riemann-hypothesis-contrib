@@ -167,7 +167,7 @@ theorem valHom_constFn
     revert h₁
     rw [hx]
     intro h₁
-    simp only [Scheme.Hom.appLE, Scheme.Hom.id_app, Category.id_comp]
+    simp only [Scheme.Hom.appLE, Scheme.Hom.id_app]
     exact (Category.id_comp _).trans ((Sp R).presheaf.map_id _)
   change ((Scheme.ΓSpecIso (CommRingCat.of R)).inv
       ≫ (p.appLE ⊤ U (fun _ _ => trivial) ≫ x.appLE U ⊤ h)

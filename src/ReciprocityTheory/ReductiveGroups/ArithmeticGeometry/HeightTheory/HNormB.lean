@@ -137,9 +137,7 @@ theorem local_norm
       IsScalarTower.algebraMap_apply R (Localization.AtPrime p) F a, ← map_mul, hspec]
   refine ⟨?_, a, s, ha, hs, ?_⟩
   · rw [hset]
-    first
-    | exact ValPl.placesOver_finite (O := Localization.AtPrime p) (F := F) (L := L)
-    | exact ValPl.placesOver_finite (O := Localization.AtPrime p) (L := L)
+    first | exact ValPl.placesOver_finite (O := Localization.AtPrime p) (F := F) (L := L)
   · rw [hset, hN, e1, mul_assoc, e2]
     rfl
 

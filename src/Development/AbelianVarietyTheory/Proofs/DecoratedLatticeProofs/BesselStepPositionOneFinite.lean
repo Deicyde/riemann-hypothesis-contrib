@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ToOneSucc
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLinearIsQuotIntTIntStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsQuotientInvariantIntegralExchangeToPositionOneStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsLinearIsQuotIntTInt
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsQuotientInvariantIntegralExchangeToPositionOne
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.QuotientIntegralParabolicUnfolding
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -44,7 +45,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
 
 @[expose] public section
 
@@ -74,11 +74,11 @@ theorem GlobalTheory.PosOne.quotInt_one_comb
     B hB F z hz
   haveI : ν.IsAddHaarMeasure := hν.1
   obtain ⟨Rr, hRr, hRrN⟩ :=
-    GlobalTheory.T.exists_linear_isQuotInt_tInt_alt k n n' c P hP hPc ψ hψ hψ1 ν μ hμ μX μG A σ hσ B
-      hB F ρ' hρ'
+    _root_.GlobalTheory.PosOne.RrLin.exists_linear_isQuotInt_tInt k n n' c P hP hPc ψ hψ hψ1 ν μ hμ
+      μX μG A σ hσ B hB F ρ' hρ'
   have hone :=
-    GlobalTheory.T.isQuotientInvariantIntegral_exchange_toPositionOne k n n' c P hP hPc ψ hψ hψ1 ν
-      hν μ hμ μX μG A σ hσ B hB F ρ' hρ' Rr hRr Φ
+    _root_.GlobalTheory.PosOneIntegral.isQuotInt_toOne k n n' c P hP hPc ψ hψ hψ1 ν hν μ hμ μX μG A
+      σ hσ B hB F ρ' hρ' Rr hRr Φ
   have hcomb : toOne ν ρ' P Rr Φ = comb e fun g => Rr (ρ' g Φ) := he Rr hRrN
   have heq : comb e z = comb e fun g => Rr (ρ' g Φ) := by
     unfold comb

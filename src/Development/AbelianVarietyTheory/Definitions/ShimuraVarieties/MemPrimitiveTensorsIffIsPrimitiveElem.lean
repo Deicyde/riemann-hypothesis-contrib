@@ -1161,10 +1161,10 @@ theorem isGroupLikeElem_tensor_map
   congr 1
   · rw [← AlgHom.comp_apply, ← AlgHom.comp_apply]
     congr 1
-    ext <;> simp [Algebra.TensorProduct.one_def]
+    ext <;> simp
   · rw [← AlgHom.comp_apply, ← AlgHom.comp_apply]
     congr 1
-    ext <;> simp [Algebra.TensorProduct.one_def]
+    ext <;> simp
 
 variable
   {H K : Type*} [CommSemiring H] [Bialgebra R H] [CommSemiring K] [Bialgebra R K] {u : H ⊗[R] K}

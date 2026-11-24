@@ -152,7 +152,6 @@ theorem exists_smul_of_rank_le_aleph0 (hV : Module.rank ℂ V ≤ ℵ₀) (φ : 
     simp only [LinearMap.map_smul_of_tower] at h3
     rw [Finset.sum_congr rfl (fun k hk => by rw [key k hk])] at h3
     have h4 : aeval φ (∑ k ∈ s, C (g k) * ∏ j ∈ s.erase k, (X - C j)) v = 0 := by
-
       rw [← h3, map_sum, LinearMap.sum_apply]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_mul, aeval_C, Module.End.mul_apply, Module.algebraMap_end_apply]
@@ -298,8 +297,7 @@ theorem exists_tmul_mem
     intro t y
     induction y using TensorProduct.induction_on with
     | zero => simp
-    | tmul a n =>
-      simp [e, TensorProduct.equivFinsuppOfBasisRight_apply_tmul_apply, TensorProduct.smul_tmul']
+    | tmul a n => simp [e, TensorProduct.smul_tmul']
     | add y z hy hz => simp [hy, hz, TensorProduct.add_tmul]
   have hpure : ∀ v : ∀ i, X i, e x p ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ v ∈ N := by
     intro v

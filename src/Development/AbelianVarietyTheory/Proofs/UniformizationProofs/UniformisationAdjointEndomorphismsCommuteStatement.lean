@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.uniformisation_adjoint_endomorphisms_commute
     : LL → TwistBCSpanStatement → TWM.VRatioGtStatement → TWStatement → UUStatement
       → AllUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.uniformisation_adjoint_endomorphisms_commute
                   → ∀ (p p' : QkPt D.toPre F k) x,
                     p'.y = E'.h p.y → E.Act p.g p'.g → QkToAkU U.toUnifPre F k p x
                       → QkToAkU U.toUnifPre F k p' (x ≫ E.aA) := by
-  first
-  | exact @GlobalTheory.Balanced.main
-  | exact GlobalTheory.Balanced.main
-  | (intros; apply GlobalTheory.Balanced.main <;> assumption)
+  first | exact @GlobalTheory.Balanced.main

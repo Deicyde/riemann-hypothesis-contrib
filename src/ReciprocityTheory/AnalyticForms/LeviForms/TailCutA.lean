@@ -140,9 +140,7 @@ theorem interior_bdry_eq_empty
   obtain ⟨ψ, -, hyψ, hsrc, σ, -, -, u, -, hu, hfac⟩ := hSNC y
   have hVo : IsOpen (interior (bdry s) ∩ ψ.source) := isOpen_interior.inter ψ.open_source
   have hOo : IsOpen (ψ '' (interior (bdry s) ∩ ψ.source)) := by
-    first
-    | exact ψ.isOpen_image_of_subset_source hVo Set.inter_subset_right
-    | exact ψ.isOpen_image_source_inter isOpen_interior
+    first | exact ψ.isOpen_image_of_subset_source hVo Set.inter_subset_right
   have hw0 : ψ y ∈ ψ '' (interior (bdry s) ∩ ψ.source) := ⟨y, ⟨hy, hyψ⟩, rfl⟩
 
   have hT

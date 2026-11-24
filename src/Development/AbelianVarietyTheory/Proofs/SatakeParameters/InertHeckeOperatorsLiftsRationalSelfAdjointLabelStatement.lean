@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.inertHeckeOperators_lifts_rational_selfAdjoint_labels
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -78,7 +79,4 @@ theorem _root_.GlobalTheory.T.inertHeckeOperators_lifts_rational_selfAdjoint_lab
                       IsOpsV R j t h
                         → ∀ f,
                           R.jV j t (op i f) = h (pl i) (Finsupp.single (ty i) 1) (R.jV j t f) := by
-  first
-  | exact @GlobalTheory.InertHeckeLift.inert_lifts
-  | exact GlobalTheory.InertHeckeLift.inert_lifts
-  | (intros; apply GlobalTheory.InertHeckeLift.inert_lifts <;> assumption)
+  first | exact @GlobalTheory.InertHeckeLift.inert_lifts

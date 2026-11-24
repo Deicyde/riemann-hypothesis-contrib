@@ -111,7 +111,7 @@ theorem coef_embed
     exact Filter.Eventually.of_forall fun g => (occA_coef_Eword dual hσ hD _ w f g.2).symm
   · intro k hk f' _ hff g hg
     show ∑ c, _ = ∑ c, _
-    rw [occA_tensGrp_mul dual hσ hg hk, ← hff]
+    rw [_root_.ReciprocityTheory.ChartRestriction.DS.tensor_group_mul_kDiag dual hσ hg hk, ← hff]
 
 theorem occ_exists
     (dual : Bool)
@@ -138,9 +138,12 @@ theorem occ_exists
           (genSub (smE ε (rreg ε)) (datumV ε Ψ' v₀')) ι
         ∧ ∀ x ∈ genSub (smE ε (rreg ε)) (datumV ε Ψ' v₀'),
           eeF dual (smE ε (rreg ε)) (ι x) = poleF dual lam s • ι x := by
-  have hB := occB_pairing_ne dual hP hP' hv₀' hpos hpos' (occB_memLp_psi hgap hP hv₀ hW) s hlam'
+  have hB :=
+    occB_pairing_ne dual hP hP' hv₀' hpos hpos'
+      (_root_.ReciprocityTheory.ChartRestriction.DS.psi_weighted_memLp hgap hP hv₀ hW) s hlam'
   obtain ⟨ps, hps, hne⟩ :=
-    occC_exists_ps dual hgap hP hv₀ hgap' hP' hv₀' hW (occC_pairing dual hgap hP hv₀ hP' hW hB)
+    occC_exists_ps dual hgap hP hv₀ hgap' hP' hv₀' hW
+      (_root_.ReciprocityTheory.ChartRestriction.DS.occurrence_pairing dual hgap hP hv₀ hP' hW hB)
   obtain ⟨ι, hι⟩ := occAdj_emb dual hgap hP hv₀ hgap' hP' hv₀' hps hne
   exact ⟨ι, hι, occD_eeF dual hP hP' s hlam' hι⟩
 

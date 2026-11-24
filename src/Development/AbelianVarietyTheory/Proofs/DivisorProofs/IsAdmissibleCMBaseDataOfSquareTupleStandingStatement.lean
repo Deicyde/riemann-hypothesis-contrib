@@ -66,7 +66,4 @@ theorem _root_.GlobalTheory.T.isAdmissibleCMBaseData_of_squareTupleStanding
         → ∀ B : Base D.host.F D.host.E,
           B.ψ = W.ψ → (∀ v ∈ B.P, ∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v)
             → B.IsGood D.sp.cm.sig := by
-  first
-  | exact @GlobalTheory.FunObj.base_isGood_of_standing
-  | exact GlobalTheory.FunObj.base_isGood_of_standing
-  | (intros; apply GlobalTheory.FunObj.base_isGood_of_standing <;> assumption)
+  first | exact @GlobalTheory.FunObj.base_isGood_of_standing

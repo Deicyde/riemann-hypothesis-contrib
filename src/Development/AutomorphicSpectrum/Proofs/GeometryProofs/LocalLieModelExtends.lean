@@ -280,7 +280,6 @@ theorem lieLat_germs_eq_sections
   have hjβ : ∀ u, j (β u) = j₀ u := fun u =>
     LieVB.pt_left_inj M (by rw [hj, hβ, ← Category.assoc, LieVB.spMap_dual_comp, hφρ, hj₀])
   have hjc : j (∑ k, (ρ (r (i, k)) * w) • β (b₀ k)) = c i := by
-
     rw [hs i, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [j.map_smulₛₗ, hjβ]

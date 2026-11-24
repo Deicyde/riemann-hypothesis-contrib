@@ -1,11 +1,12 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
-import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.PolBaseChangeOfRelAmpleLocal
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsUniqueDifferentialMonHomLieBasisStatement
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermitianMetricDifferentialEqOfPairingRelationStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsUniqueDifferentialMonHomLieBasis
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermitianMetricDifferentialEqOfPairingRelation
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LbIsoCubeLBMulRightOf
-import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LieLatticeFgAndSpanEqTopRingOfIntegersStatement
+public import ReciprocityTheory.GeometryOfNumbers.LatticeCovolumes.ArakelovDegreeEqDegreeOfFamily
+import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.PolBaseChangeOfRelAmpleLocal
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LieLatticeFgAndSpanEqTopRingOfIntegers
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -45,7 +46,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
-public import ReciprocityTheory.GeometryOfNumbers.LatticeCovolumes.ArakelovDegreeEqDegreeOfFamily
 import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
@@ -171,7 +171,7 @@ theorem deg_lieLat_eq
               deg h (F.eigLat act τ) = deg h' (F'.eigLat act τ) := by
   intro hU hL K _ _ P F F' h h' hh hh'
   obtain ⟨⟨M, hM, -⟩, -⟩ :=
-    GlobalTheory.T.existsUnique_differential_monHom_lieBasis K P F P F' (𝟙 P.A) inferInstance
+    _root_.GlobalTheory.CM.DiffCoord.existsUnique_isDiffOf K P F P F' (𝟙 P.A) inferInstance
   have hN : F.IsDiffOf F (𝟙 P.A) LinearMap.id := fun u c hc => by
     rw [Category.comp_id]
     exact hc
@@ -179,9 +179,9 @@ theorem deg_lieLat_eq
     GlobalTheory.PolBaseChange.lbIso_refl (GlobalTheory.LamCalc.cubeLB_isLB P.isLB _)
   have hiso : ∀ s c c', h'.form s (M c) (M c') = h.form s c c' := fun s c c' => by
     simpa using
-      GlobalTheory.T.hermitianMetric_differential_eq_of_pairing_relation hU hL K P F P F' h h'
-        (𝟙 P.A) (𝟙 P.A) M LinearMap.id hh hh' inferInstance inferInstance hlam hM hN s c c'
-  have hFG := (GlobalTheory.T.lieLattice_fg_and_span_eq_top_ringOfIntegers K P F).1
+      _root_.GlobalTheory.HermHom.form_diff_eq hU hL K P F P F' h h' (𝟙 P.A) (𝟙 P.A) M LinearMap.id
+        hh hh' inferInstance inferInstance hlam hM hN s c c'
+  have hFG := (_root_.GlobalTheory.CM.LieLattice.lieLat_fg_and_span_eq_top K P F).1
   refine ⟨?_, fun O _ act τ => ?_⟩
   · have e := image_coord F F' hM (fun _ => True)
     simp only [and_true] at e

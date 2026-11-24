@@ -88,10 +88,7 @@ theorem mk_lt
     rw [if_neg (not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex w))]
   have hd : Module.finrank ℝ (mixedSpace K) = 2 * nrComplexPlaces K := by
     rw [mixedEmbedding.finrank, ← card_add_two_mul_card_eq_rank, hr, zero_add]
-  have hL : minkowskiBound K I ≠ ⊤ := by
-    first
-    | exact (minkowskiBound_lt_top K I).ne
-    | exact (minkowskiBound_lt_top (K := K) (I := I)).ne
+  have hL : minkowskiBound K I ≠ ⊤ := by first | exact (minkowskiBound_lt_top K I).ne
   have hR : volume (convexBodyLT K f) ≠ ⊤ := by
     rw [convexBodyLT_volume]
     simp
@@ -102,9 +99,8 @@ theorem mk_lt
     unfold minkowskiBound
     rw [volume_fundamentalDomain_fractionalIdealLatticeBasis, volume_fundamentalDomain_latticeBasis,
       hd]
-    simp [hm, hr, convexBodyLTFactor, f, hmx]
-    rw [ENNReal.toReal_ofReal (by
-        first | exact_mod_cast FractionalIdeal.absNorm_nonneg _ | positivity),
+    simp [hr, convexBodyLTFactor, f, hmx]
+    rw [ENNReal.toReal_ofReal (by first | exact_mod_cast FractionalIdeal.absNorm_nonneg _),
       Int.norm_eq_abs]
     have e
         : ∀ N s : ℝ,
@@ -121,7 +117,7 @@ theorem mk_lt
           ring
         _ = N * 2 ^ nrComplexPlaces K * s := by rw [inv_mul_cancel₀ h2, mul_one]
     rw [e]
-    first | exact h | linarith [h]
+    first | exact h
   obtain ⟨a, ha, ha0, hlt⟩ := exists_ne_zero_mem_ideal_lt K I key
   exact ⟨a, ha, ha0, fun w => lt_of_lt_of_eq (hlt w) (Real.coe_toNNReal _ (hg w).le)⟩
 

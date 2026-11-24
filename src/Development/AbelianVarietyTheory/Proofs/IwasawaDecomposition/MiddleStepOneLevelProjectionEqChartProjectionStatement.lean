@@ -65,7 +65,4 @@ theorem _root_.GlobalTheory.T.middleStep_oneLevel_projection_eq_chart_projection
                   z'.1 = z.1
                     → ((F u).lvC i h1 h2).prk v c z'
                       = ((F u).lv i (le_of_succ_m h2)).prk v c z := by
-  first
-  | exact @GlobalTheory.Mem.Col2.HAt.pr_lvC_eq_lv
-  | exact GlobalTheory.Mem.Col2.HAt.pr_lvC_eq_lv
-  | (intros; apply GlobalTheory.Mem.Col2.HAt.pr_lvC_eq_lv <;> assumption)
+  first | exact @GlobalTheory.Mem.Col2.HAt.pr_lvC_eq_lv

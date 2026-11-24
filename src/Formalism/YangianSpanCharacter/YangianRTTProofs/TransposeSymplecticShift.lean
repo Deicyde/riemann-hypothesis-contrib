@@ -89,7 +89,6 @@ theorem planeWaveIntertwining : Formalism.YangianSpanCharacter.T.PlaneWave := by
     fin_cases i <;> fin_cases j
       <;> simp [Formalism.YangianSpanCharacter.T.Tm, Formalism.YangianSpanCharacter.T.Uinv,
         Matrix.mul_apply, Fin.sum_univ_two, hfc, hfci]
-      <;> simp only [mul_add, add_mul, mul_neg, neg_mul, hpf, key, Algebra.commutes]
-      <;> first | noncomm_ring | abel
+      <;> simp only [mul_add, hpf, key, Algebra.commutes] <;> first | noncomm_ring
 
 end Formalism.YangianSpanCharacter.P

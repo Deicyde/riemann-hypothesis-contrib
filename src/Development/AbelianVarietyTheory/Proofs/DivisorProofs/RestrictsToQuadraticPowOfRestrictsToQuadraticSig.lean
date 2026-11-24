@@ -2,10 +2,12 @@ module
 
 public import Formalism.LocalToGlobal.IndefiniteReal.DatumF
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsIdeleNotMulNormStatement
+public import Mathlib.NumberTheory.NumberField.AdeleRing
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsIdeleNotMulNorm
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsFundamentalDomainOfHaar
-import Development.AbelianVarietyTheory.Proofs.HeightProofs.QuadraticExtNormFormOverAlgebraStatement
-import Development.AbelianVarietyTheory.Proofs.HeightProofs.QuadraticFormIdeleValuesMemNhdsOneStatement
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.QuadraticExtNormFormOverAlgebra
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.QuadraticFormIdeleValuesMemNhdsOne
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -90,7 +92,7 @@ theorem exists_form {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
           a ∈ (normI F E).range
             ↔ ∃ x y : AF F, (a : AF F) = x ^ 2 - algebraMap F (AF F) δ * y ^ 2 := by
   obtain ⟨δ, hδ, hh⟩ :=
-    GlobalTheory.T.quadraticExt_norm_form_over_algebra F E σ h.2.2.1 (sig_invol h) (sig_ne h)
+    _root_.GlobalTheory.QuadNormBase.norm_form F E σ h.2.2.1 (sig_invol h) (sig_ne h)
   obtain ⟨h1, h2⟩ := hh (AF F)
   have hN
       : ∀ z : AF F ⊗[F] E,
@@ -113,13 +115,13 @@ theorem isOpen_normGrp {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
   obtain ⟨δ, hδ, hf⟩ := exists_form h
   have h0 : δ ≠ 0 := fun e => hδ (e ▸ IsSquare.zero)
   refine Subgroup.isOpen_of_mem_nhds _
-    (Filter.mem_of_superset (GlobalTheory.T.quadraticForm_ideleValues_mem_nhds_one F δ h0)
-      fun a ha => ?_)
+    (Filter.mem_of_superset (_root_.GlobalTheory.QNorm.norm_form_mem_nhds_one F δ h0) fun a ha =>
+      ?_)
   exact Subgroup.mem_sup_right ((hf a).2 ha)
 
 theorem normGrp_ne_top {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : normGrp F E ≠ ⊤ := by
   obtain ⟨δ, hδ, hf⟩ := exists_form h
-  obtain ⟨a, ha⟩ := GlobalTheory.T.exists_idele_ne_algebraMap_mul_norm_of_not_isSquare F δ hδ
+  obtain ⟨a, ha⟩ := _root_.GlobalTheory.QNorm.exists_idele_not_mul_norm F δ hδ
   intro e
   have hm : a ∈ normGrp F E := e ▸ Subgroup.mem_top a
   obtain ⟨_, ⟨t, rfl⟩, n, hn, rfl⟩ := Subgroup.mem_sup.1 hm

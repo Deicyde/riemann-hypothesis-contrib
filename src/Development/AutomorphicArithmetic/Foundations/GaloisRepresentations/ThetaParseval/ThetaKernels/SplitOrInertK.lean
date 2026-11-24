@@ -42,8 +42,6 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceSplitOrInert
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes

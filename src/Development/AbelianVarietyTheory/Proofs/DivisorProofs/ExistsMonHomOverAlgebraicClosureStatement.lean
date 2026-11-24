@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_mon_hom_over_algebraic_closure
     : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [IsAlgClosed Ω] [Algebra K Ω]
         (A A' : Over (Sp K)) [GrpObj A] [GrpObj A'],
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_mon_hom_over_algebraic_closure
                 ∧ GlobalTheory.Spread.bcMap A.hom (algebraicClosure K Ω).val ≫ g.left
                     ≫ pullback.fst _ _
                   = f.left ≫ pullback.fst _ _ := by
-  first
-  | exact @GlobalTheory.ChowRigid.chow_rigidity
-  | exact GlobalTheory.ChowRigid.chow_rigidity
-  | (intros; apply GlobalTheory.ChowRigid.chow_rigidity <;> assumption)
+  first | exact @GlobalTheory.ChowRigid.chow_rigidity

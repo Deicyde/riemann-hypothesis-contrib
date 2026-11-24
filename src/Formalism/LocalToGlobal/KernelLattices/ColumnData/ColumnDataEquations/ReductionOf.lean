@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
 import Formalism.LocalToGlobal.PairingIndexBounds.SplitPairEquations.IntegralSquareRoots.HenselQuad
+import Formalism.LocalToGlobal.KernelLattices.ColumnData.IsAdmissibleFlagPairOfUnitriangularLeftAutomorph
 
 @[expose] public section
 
@@ -98,9 +99,9 @@ theorem e3a
   have m0
       : B.thZero N N' ∈ TaylorLogMetric.Th D B.tor (StandardLatticesGL3.stdL D N)
         (StandardLatticesGL3.stdL D N') :=
-    mem_ThSp_of' _ _ _ _ h0
+    _root_.Formalism.L2.Ker.Cd.mem_ThSp_of _ _ _ _ h0
   have mH : B.thHalf N N' L ∈ TaylorLogMetric.Th D B.tor L (StandardLatticesGL3.stdL D N') :=
-    mem_ThSp_of' _ _ _ _
+    _root_.Formalism.L2.Ker.Cd.mem_ThSp_of _ _ _ _
       (mvTh B hL (admissible_of_integral_conj_le hN hN' (sS N) (sS N'))
         (admissible_of_integral_conj_le hN hN' hLs (sS N')) h0)
   have eB :=
@@ -155,14 +156,14 @@ theorem e3b
   have m0
       : B.thZero N N' ∈ TaylorLogMetric.Th D B.tor (StandardLatticesGL3.stdL D N)
         (StandardLatticesGL3.stdL D N') :=
-    mem_ThSp_of' _ _ _ _ h0
+    _root_.Formalism.L2.Ker.Cd.mem_ThSp_of _ _ _ _ h0
   have mH
       : TaylorLogMetric.Iop D B.tor
           (TaylorLogMetric.La D B.tor (StandardLatticesGL3.stdL D N)
             (StandardLatticesGL3.stdL D N'))
           (TaylorLogMetric.La D B.tor (StandardLatticesGL3.stdL D N) L') (B.thZero N N')
         ∈ TaylorLogMetric.Th D B.tor (StandardLatticesGL3.stdL D N) L' :=
-    mem_ThSp_of' _ _ _ _
+    _root_.Formalism.L2.Ker.Cd.mem_ThSp_of _ _ _ _
       (mvTh B hL (admissible_of_integral_conj_le hN hN' (sS N) (sS N'))
         (admissible_of_integral_conj_le hN hN' (sS N) hL's) h0)
   have sq1 :=

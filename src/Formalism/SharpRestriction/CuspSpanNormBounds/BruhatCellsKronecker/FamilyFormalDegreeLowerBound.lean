@@ -242,9 +242,7 @@ theorem szh_k_le
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, -, hb, -⟩ := hH
   have hj := hb τ 1 le_rfl (by have := D.R.two_le_m; omega)
   refine hkC.trans ((le_max_left _ _).trans (hj.1.trans (hj.2.trans (le_of_eq ?_))))
-  first
-  | exact szh_b_sq large₂
-  | (unfold Formalism.BasicNotions.Scale.b; rw [← Real.exp_nat_mul]; congr 1; push_cast; ring)
+  first | exact szh_b_sq large₂
 
 end Rec
 

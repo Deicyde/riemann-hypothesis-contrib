@@ -55,8 +55,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
 namespace GlobalTheory.FlatRInv
 
 variable {D : D7}
@@ -73,12 +71,6 @@ theorem mem_congGrp_iff (V : HSp D) (I : Ideal (AE D)) (g : GA D V)
   rw [MonoidHom.mem_ker, MonoidHom.comp_apply, Units.ext_iff]
   rfl
 
-theorem unitaryMatrix_wittCoreEmbedding {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (h : GA D S₀)
-    : mt S (d.emb0 h) = d.jX ⬝ d.pX + d.j0 ⬝ mt S₀ h ⬝ d.p0 + d.jY ⬝ d.pY := by
-  conv_lhs => rw [← Matrix.mul_one (mt S (d.emb0 h)), ← d.sum_eq_one]
-  simp only [Matrix.mul_add, ← Matrix.mul_assoc, d.wittDecomp_anisotropicEmbedding_inclX,
-    d.wittDecomp_anisotropicEmbedding_inclAnisotropic, d.wittDecomp_anisotropicEmbedding_inclY]
-
 theorem wittCoreEmbedding_preserves_supportedUnitarySubgroup
     {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (P : Pl D → Prop) {h : GA D S₀} (hh : h ∈ grpAt S₀ P)
     : d.emb0 h ∈ grpAt S P := by
@@ -91,7 +83,7 @@ theorem wittCoreEmbedding_preserves_supportedUnitarySubgroup
           (A + B).map (Ideal.Quotient.mk (idAt D P))
             = A.map (Ideal.Quotient.mk (idAt D P)) + B.map (Ideal.Quotient.mk (idAt D P)) :=
       fun A B => Matrix.map_add _ (Ideal.Quotient.mk (idAt D P)).map_add A B
-    rw [unitaryMatrix_wittCoreEmbedding]
+    rw [_root_.GlobalTheory.MixModel.HypDec.unitaryMatrix_wittCoreEmbedding]
     simp only [hadd, Matrix.map_mul, hh, Matrix.mul_one]
   rw [key, d.sum_eq_one]
   exact Matrix.map_one _ (Ideal.Quotient.mk (idAt D P)).map_zero

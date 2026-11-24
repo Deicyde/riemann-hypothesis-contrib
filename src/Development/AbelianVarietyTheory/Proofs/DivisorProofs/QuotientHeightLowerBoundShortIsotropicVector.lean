@@ -115,7 +115,8 @@ theorem exists_denom_adele (a : Af F) : ∃ d : ℕ, 0 < d ∧ (d : Af F) * a �
   have hf : (Function.mulSupport fun v => max 1 ‖evalV F v a‖₊).Finite := by
     refine (Filter.eventually_cofinite.1 a.2).subset fun v hv hv' => hv (max_eq_left ?_)
     exact_mod_cast Valued.toNormedField.norm_le_one_iff.2 hv'
-  obtain ⟨d, hd, -, h⟩ := GlobalTheory.SmoothForms.denom_global _ (fun v => le_max_left _ _) hf
+  obtain ⟨d, hd, -, h⟩ :=
+    _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator _ (fun v => le_max_left _ _) hf
   refine ⟨d, hd, mem_intRing.2 fun v => ?_⟩
   rw [map_mul, map_natCast]
   exact h v _ (le_max_right _ _)
@@ -142,7 +143,8 @@ theorem exists_emb_large (b : Module.Basis (Fin m) F E)
             → ∃ σ : E →+* ℂ, 1 ≤ (d * e : ℝ) * ‖σ x‖ := by
   obtain ⟨d, hd, h⟩ :=
     exists_common_denom (integralClosure ℤ E).toSubring b fun k => by
-      obtain ⟨k, hk, r, hr⟩ := GlobalTheory.SmoothForms.denom_exists_int (b k)
+      obtain ⟨k, hk, r, hr⟩ :=
+        _root_.GlobalTheory.NatMulMemRingOfIntegers.exists_nat_mul_mem_ringOfIntegers (b k)
       exact ⟨k, hk, hr ▸ r.2⟩
   refine ⟨d, hd, fun x e he hx hl => ?_⟩
   have hi : IsIntegral ℤ (((d * e : ℕ) : E) * x) := by
@@ -258,7 +260,7 @@ theorem exists_denom_le_height
           (d : Af D.host.F) * finCoord D (finMat D.sp.cm.sig V.gram g i j) k
             ∈ intRing D.host.F := by
   obtain ⟨d₁, hd₁, hle, hint⟩ :=
-    GlobalTheory.SmoothForms.denom_global
+    _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator
       (fun v => finHt V v g)
       (fun v => le_max_left _ _)
       (finHt_mulSupport_finite V g)

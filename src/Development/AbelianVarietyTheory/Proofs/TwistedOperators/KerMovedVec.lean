@@ -56,6 +56,6 @@ variable
 
 theorem toPair_mul (p : Pair T) (g g' : GA D (G.V p.small)) (h h' : GA D (G.V p.big))
     : G.toPair p (g * g') (h * h') = G.toPair p g h * G.toPair p g' h' := by
-  cases p <;> simp [GridData.toPair, map_mul, Prod.ext_iff]
+  cases p <;> simp [GridData.toPair, map_mul]
 
 end GlobalTheory.RowClaim

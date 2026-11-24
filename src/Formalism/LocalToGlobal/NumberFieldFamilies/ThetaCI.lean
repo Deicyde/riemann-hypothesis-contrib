@@ -214,8 +214,8 @@ theorem inf_inj {y : Ainf D.host.F ⊗[D.host.F] D.host.E} (h : ∀ τ, th0 D τ
     have e1 := congrArg Complex.re e
     have e2 := congrArg Complex.im e
     simp only [Complex.add_re, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im, Complex.mul_re,
-        Complex.mul_im, Complex.I_re, Complex.I_im, zero_mul, mul_zero, one_mul, sub_zero, add_zero,
-        zero_add, Complex.zero_re, Complex.zero_im, sub_self]
+        Complex.mul_im, Complex.I_re, Complex.I_im, zero_mul, mul_zero, one_mul, add_zero, zero_add,
+        Complex.zero_re, Complex.zero_im, sub_self]
       at e1 e2
     exact ⟨
       (map_eq_zero _).1 e1,

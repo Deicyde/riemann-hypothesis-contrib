@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.SiegelWeilLocal.Ortho
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.HermitianFormUnitaryOneOne
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AbsOpIntIntegrable
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CompletedTensorDiscreteSeriesIrreducibleFormalDe
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ConvolutionSmoothL2Statement
+public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.ConvolutionSmoothL2
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ConvolutionSmoothL2
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsClosedEmbeddingEntriesInf
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RightRegularRepUnitaryStronglyContinuous
 import Mathlib.Algebra.Order.Floor.Extended
@@ -93,7 +94,7 @@ theorem exists_contRep_bound
   have hai : Integrable a (muInf B.I) := by
     refine hvi.norm.mono' hac.aestronglyMeasurable (Filter.Eventually.of_forall fun g => ?_)
     rw [norm_smul, hU.2.2.1, hw1, mul_one]
-  obtain ⟨C, hC⟩ := GlobalTheory.T.convolutionSmoothL2_of_def B B.g hn hg a hsm haS
+  obtain ⟨C, hC⟩ := _root_.GlobalTheory.SmoothGrowth.convolutionSmoothL2 B B.g hn hg a hsm haS
   refine ⟨C, fun A hA hK => ?_⟩
   have hRU := GlobalTheory.RightRegFund.rightReg_unitary_continuous B
   obtain ⟨P, hP1, hP2⟩ :=

@@ -51,6 +51,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.lineBundleKernel_flat_of_finite_noetherian_local
     : GlobalFnsSt
       → ∀ (V : Type) [CommRing V] [IsNoetherianRing V] [IsLocalRing V] (B : Over (Sp V)) [GrpObj B]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.lineBundleKernel_flat_of_finite_noetherian_local
                     GlobalTheory.MemKL B L x ↔ ∃ z : T ⟶ H, z ≫ j = x)
                   → IsFinite H.hom
                   → Flat H.hom := by
-  first
-  | exact @GlobalTheory.StabFlatLocal.flat_of_isFinite
-  | exact GlobalTheory.StabFlatLocal.flat_of_isFinite
-  | (intros; apply GlobalTheory.StabFlatLocal.flat_of_isFinite <;> assumption)
+  first | exact @GlobalTheory.StabFlatLocal.flat_of_isFinite

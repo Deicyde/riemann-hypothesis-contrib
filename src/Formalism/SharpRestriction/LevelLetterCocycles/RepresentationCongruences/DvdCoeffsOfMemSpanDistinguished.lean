@@ -1,16 +1,7 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.MemPairOfMemSingle
-import Mathlib.Data.Nat.Totient
-import Mathlib.Data.Rat.Floor
 public import Mathlib.RingTheory.Ideal.BigOperators
-import Mathlib.RingTheory.LocalRing.ResidueField.Basic
-import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
-import Mathlib.Tactic.Continuity.Init
-import Mathlib.Tactic.Linter.Style
-import Mathlib.Tactic.NormNum.GCD
-import Mathlib.Tactic.Positivity.Finset
-import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -22,12 +13,13 @@ section ContMAux
 
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem ContM_dvd_iff_residue {ϖ : O} (hϖ : Irreducible ϖ) (a : O) :
-    ϖ ∣ a ↔ IsLocalRing.residue O a = 0 := by
+theorem ContM_dvd_iff_residue {ϖ : O} (hϖ : Irreducible ϖ) (a : O)
+    : ϖ ∣ a ↔ IsLocalRing.residue O a = 0 := by
   rw [IsLocalRing.residue_eq_zero_iff, hϖ.maximalIdeal_eq, Ideal.mem_span_singleton]
 
-theorem ContM_dvd_of_map_eq_zero {ϖ : O} (hϖ : Irreducible ϖ) {a : O⟦X⟧}
-    (ha : a.map (IsLocalRing.residue O) = 0) : C ϖ ∣ a := by
+theorem ContM_dvd_of_map_eq_zero
+    {ϖ : O} (hϖ : Irreducible ϖ) {a : O⟦X⟧} (ha : a.map (IsLocalRing.residue O) = 0)
+    : C ϖ ∣ a := by
   have hc : ∀ n, ϖ ∣ coeff n a := fun n => by
     rw [ContM_dvd_iff_residue hϖ]
     have h := congrArg (coeff n) ha
@@ -37,12 +29,12 @@ theorem ContM_dvd_of_map_eq_zero {ϖ : O} (hϖ : Irreducible ϖ) {a : O⟦X⟧}
   ext n
   rw [coeff_C_mul, coeff_mk, hb n]
 
-theorem ContM_map_C_unif {ϖ : O} (hϖ : Irreducible ϖ) :
-    (C ϖ : O⟦X⟧).map (IsLocalRing.residue O) = 0 := by
+theorem ContM_map_C_unif {ϖ : O} (hϖ : Irreducible ϖ)
+    : (C ϖ : O⟦X⟧).map (IsLocalRing.residue O) = 0 := by
   rw [map_C, (ContM_dvd_iff_residue hϖ ϖ).1 dvd_rfl, map_zero]
 
-theorem ContM_cancel_unif {ϖ : O} (hϖ : Irreducible ϖ) {G : O⟦X⟧} (hG : IsDist G) (k : ℕ) :
-    ∀ {x a : O⟦X⟧}, C ϖ ^ k * x = a * G → G ∣ x := by
+theorem ContM_cancel_unif {ϖ : O} (hϖ : Irreducible ϖ) {G : O⟦X⟧} (hG : IsDist G) (k : ℕ)
+    : ∀ {x a : O⟦X⟧}, C ϖ ^ k * x = a * G → G ∣ x := by
   induction k with
   | zero =>
     intro x a h
@@ -68,9 +60,12 @@ theorem ContM_cancel_unif {ϖ : O} (hϖ : Irreducible ϖ) {G : O⟦X⟧} (hG : I
       linear_combination h
     · exact absurd hG0 hG
 
-theorem ContM_mem_of_unif_mul {ϖ : O} (hϖ : Irreducible ϖ) {G : O⟦X⟧} (hG : IsDist G) (k : ℕ)
-    {H : O⟦X⟧} (h : C ϖ ^ k * H ∈ Ideal.span {G, C ϖ ^ (k + 1)}) :
-    H ∈ Ideal.span {G, C ϖ} := by
+theorem ContM_mem_of_unif_mul
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {G : O⟦X⟧} (hG : IsDist G)
+    (k : ℕ)
+    {H : O⟦X⟧} (h : C ϖ ^ k * H ∈ Ideal.span {G, C ϖ ^ (k + 1)})
+    : H ∈ Ideal.span {G, C ϖ} := by
   rw [Ideal.mem_span_pair] at h
   obtain ⟨a, b, hab⟩ := h
   have h2 : C ϖ ^ k * (H - b * C ϖ) = a * G := by linear_combination -hab
@@ -78,18 +73,18 @@ theorem ContM_mem_of_unif_mul {ϖ : O} (hϖ : Irreducible ϖ) {G : O⟦X⟧} (hG
   rw [Ideal.mem_span_pair]
   exact ⟨t, b, by linear_combination -ht⟩
 
-theorem ContM_order_unit {K : Type*} [Field K] {w : K⟦X⟧} (hw : IsUnit w) : w.order = 0 := by
-  obtain ⟨v, rfl⟩ := hw
-  have h := order_mul (v : K⟦X⟧) (↑v⁻¹ : K⟦X⟧)
-  rw [Units.mul_inv, order_one] at h
-  exact (add_eq_zero.1 h.symm).1
+theorem ContM_order_unit {K : Type*} [Field K] {w : K⟦X⟧} (hw : IsUnit w) : w.order = 0 :=
+  order_zero_of_isUnit hw
 
 variable [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
-theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
-    (S : Finset ℕ) (y : ℕ) (hS : ∀ i ∈ S, i < y) (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ S, IsUnit (u i))
-    (c : ℕ → O) (h : (∑ i ∈ S, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ}) :
-    ∀ i ∈ S, ϖ ∣ c i := by
+theorem dvd_coeffs_of_mem_span_distinguished
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
+    (S : Finset ℕ) (y : ℕ) (hS : ∀ i ∈ S, i < y)
+    (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ S, IsUnit (u i))
+    (c : ℕ → O) (h : (∑ i ∈ S, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ})
+    : ∀ i ∈ S, ϖ ∣ c i := by
   classical
   set f := IsLocalRing.residue O with hfdef
   set g := Xg.map f with hgdef
@@ -104,7 +99,9 @@ theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg
   have himg : (∑ i ∈ S, (u i).map f * C (f (c i)) * g ^ i) = a.map f * g ^ y := by
     have h1 := congrArg (PowerSeries.map f) hab
 
-    simp only [map_add (f := _), map_mul, map_pow, map_sum, map_C, hfϖ, map_zero, mul_zero, add_zero] at h1
+    simp only [map_add (f := _), map_mul, map_pow, map_sum, map_C, hfϖ, map_zero, mul_zero,
+        add_zero]
+      at h1
     exact h1.symm
   intro i hi
   by_contra hnd
@@ -112,25 +109,24 @@ theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg
     ⟨i, Finset.mem_filter.2 ⟨hi, fun h0 => hnd ((ContM_dvd_iff_residue hϖ _).2 h0)⟩⟩
   obtain ⟨i₀, hi₀T, hmin⟩ := Finset.exists_min_image _ id hT
   rw [Finset.mem_filter] at hi₀T
-  have hlt : i₀ * wdeg Xg < y * wdeg Xg := by nlinarith [hS i₀ hi₀T.1]
+  have hDpos : 0 < wdeg Xg := Nat.zero_lt_one.trans_le hD
+  have hlt : i₀ * wdeg Xg < y * wdeg Xg := mul_lt_mul_of_pos_right (hS i₀ hi₀T.1) hDpos
   have hL : coeff (i₀ * wdeg Xg) (a.map f * g ^ y) = 0 := by
     apply coeff_of_lt_order
     rw [order_mul, order_pow, hord]
-    calc ((i₀ * wdeg Xg : ℕ) : ℕ∞) < ((y * wdeg Xg : ℕ) : ℕ∞) := by exact_mod_cast hlt
-      _ = y • (wdeg Xg : ℕ∞) := by
-        rw [nsmul_eq_mul]
-        push_cast
-        rfl
+    calc
+      ((i₀ * wdeg Xg : ℕ) : ℕ∞)
+        < ((y * wdeg Xg : ℕ) : ℕ∞) := ENat.natCast_lt_natCast.mpr hlt
+      _ = y • (wdeg Xg : ℕ∞) := by rw [nsmul_eq_mul, ENat.natCast_mul]
       _ ≤ (a.map f).order + y • (wdeg Xg : ℕ∞) := le_add_self
-  have hterm : ∀ i ∈ S, f (c i) ≠ 0 →
-      ((u i).map f * C (f (c i)) * g ^ i).order = ((i * wdeg Xg : ℕ) : ℕ∞) := by
+  have hterm
+      : ∀ i ∈ S,
+        f (c i) ≠ 0 → ((u i).map f * C (f (c i)) * g ^ i).order = ((i * wdeg Xg : ℕ) : ℕ∞) := by
     intro i hi hci
     rw [order_mul, order_mul, order_pow, hord, ContM_order_unit ((hu i hi).map (PowerSeries.map f)),
-      ContM_order_unit ((isUnit_iff_ne_zero.2 hci).map C), zero_add, zero_add, nsmul_eq_mul]
-    push_cast
-    rfl
+      ContM_order_unit ((isUnit_iff_ne_zero.2 hci).map C), zero_add, zero_add, nsmul_eq_mul,
+      ENat.natCast_mul]
   have hR : coeff (i₀ * wdeg Xg) (∑ i ∈ S, (u i).map f * C (f (c i)) * g ^ i) ≠ 0 := by
-
     rw [map_sum, Finset.sum_eq_single i₀]
     · have ho := hterm i₀ hi₀T.1 hi₀T.2
       have hne : ((u i₀).map f * C (f (c i₀)) * g ^ i₀) ≠ 0 := by
@@ -146,16 +142,18 @@ theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg
         rw [hterm j hj hcj]
         have hle : i₀ ≤ j := hmin j (Finset.mem_filter.2 ⟨hj, hcj⟩)
         have hlt' : i₀ < j := lt_of_le_of_ne hle (Ne.symm hne)
-        have hD' : 1 ≤ wdeg Xg := hD
-        exact_mod_cast (by nlinarith : i₀ * wdeg Xg < j * wdeg Xg)
+        exact ENat.natCast_lt_natCast.mpr (mul_lt_mul_of_pos_right hlt' hDpos)
     · intro h0
       exact absurd hi₀T.1 h0
   exact hR (by rw [himg]; exact hL)
 
-theorem ContM_Kk {ϖ : O} (hϖ : Irreducible ϖ) {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
-    (S : Finset ℕ) (y : ℕ) (hS : ∀ i ∈ S, i < y) (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ S, IsUnit (u i)) :
-    ∀ (k : ℕ) (c : ℕ → O), (∑ i ∈ S, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ ^ k} →
-      ∀ i ∈ S, ϖ ^ k ∣ c i := by
+theorem ContM_Kk
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
+    (S : Finset ℕ) (y : ℕ) (hS : ∀ i ∈ S, i < y)
+    (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ S, IsUnit (u i))
+    : ∀ (k : ℕ) (c : ℕ → O),
+      (∑ i ∈ S, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ ^ k} → ∀ i ∈ S, ϖ ^ k ∣ c i := by
   intro k
   induction k with
   | zero =>
@@ -195,15 +193,19 @@ theorem ContM_iSup_le (m : ℕ∞) : ⨆ (k : ℕ) (_ : (k : ℕ∞) ≤ m), (k 
 
 end ContMAux
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 variable {ϖ : O} (hϖ : Irreducible ϖ)
 include hϖ
 
-theorem Mprime {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg) (I : Finset ℕ)
-    (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ I, IsUnit (u i)) (c : ℕ → O) (hc : ∀ i ∈ I, c i ≠ 0) (y k : ℕ) :
-    (∑ i ∈ I, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ ^ k} ↔
-      ∀ i ∈ I, i < y → (k : ℕ∞) ≤ IsDiscreteValuationRing.addVal O (c i) := by
+theorem Mprime
+    {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
+    (I : Finset ℕ) (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ I, IsUnit (u i))
+    (c : ℕ → O) (hc : ∀ i ∈ I, c i ≠ 0)
+    (y k : ℕ)
+    : (∑ i ∈ I, u i * C (c i) * Xg ^ i) ∈ Ideal.span {Xg ^ y, C ϖ ^ k}
+      ↔ ∀ i ∈ I, i < y → (k : ℕ∞) ≤ IsDiscreteValuationRing.addVal O (c i) := by
   classical
   have hdv : ∀ i, ((k : ℕ∞) ≤ IsDiscreteValuationRing.addVal O (c i) ↔ ϖ ^ k ∣ c i) := by
     intro i
@@ -220,22 +222,29 @@ theorem Mprime {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg) (I : Finset
   constructor
   · intro h i hi hiy
     rw [hdv]
-    have hsplit : (∑ j ∈ I.filter (· < y), u j * C (c j) * Xg ^ j) ∈
-        Ideal.span {Xg ^ y, (C ϖ : O⟦X⟧) ^ k} := by
+    have hsplit
+        : (∑ j ∈ I.filter (· < y), u j * C (c j) * Xg ^ j)
+          ∈ Ideal.span {Xg ^ y, (C ϖ : O⟦X⟧) ^ k} := by
       have heq := Finset.sum_filter_add_sum_filter_not I (· < y) (fun j => u j * C (c j) * Xg ^ j)
-      have hnot : (∑ j ∈ I.filter (fun j => ¬ j < y), u j * C (c j) * Xg ^ j) ∈
-          Ideal.span {Xg ^ y, (C ϖ : O⟦X⟧) ^ k} := by
+      have hnot
+          : (∑ j ∈ I.filter (fun j => ¬ j < y), u j * C (c j) * Xg ^ j)
+            ∈ Ideal.span {Xg ^ y, (C ϖ : O⟦X⟧) ^ k} := by
         apply Ideal.sum_mem
         intro j hj
         rw [Finset.mem_filter] at hj
         exact hbig j (by omega)
-      have h3 : (∑ j ∈ I.filter (· < y), u j * C (c j) * Xg ^ j) =
-          (∑ j ∈ I, u j * C (c j) * Xg ^ j) - ∑ j ∈ I.filter (fun j => ¬ j < y), u j * C (c j) * Xg ^ j := by
+      have h3
+          : (∑ j ∈ I.filter (· < y), u j * C (c j) * Xg ^ j)
+            = (∑ j ∈ I, u j * C (c j) * Xg ^ j)
+              - ∑ j ∈ I.filter (fun j => ¬ j < y), u j * C (c j) * Xg ^ j := by
         rw [← heq, add_sub_cancel_right]
       rw [h3]
       exact Ideal.sub_mem _ h hnot
-    exact ContM_Kk hϖ hX hD (I.filter (· < y)) y (fun j hj => (Finset.mem_filter.1 hj).2) u
-      (fun j hj => hu j (Finset.mem_filter.1 hj).1) k c hsplit i (Finset.mem_filter.2 ⟨hi, hiy⟩)
+    exact ContM_Kk hϖ hX hD (I.filter (· < y)) y
+      (fun j hj => (Finset.mem_filter.1 hj).2)
+      u
+      (fun j hj => hu j (Finset.mem_filter.1 hj).1)
+      k c hsplit i (Finset.mem_filter.2 ⟨hi, hiy⟩)
   · intro h
     apply Ideal.sum_mem
     intro i hi
@@ -249,13 +258,18 @@ theorem Mprime {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg) (I : Finset
       exact Ideal.mul_mem_right _ _ hmem
     · exact hbig i (by omega)
 
-theorem Mprime_cont {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg) (I : Finset ℕ)
-    (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ I, IsUnit (u i)) (c : ℕ → O) (hc : ∀ i ∈ I, c i ≠ 0) (y : ℕ) :
-    cont ϖ (Xg ^ y) (∑ i ∈ I, u i * C (c i) * Xg ^ i) =
-      ⨅ i ∈ I.filter (· < y), IsDiscreteValuationRing.addVal O (c i) := by
+theorem Mprime_cont
+    {Xg : O⟦X⟧} (hX : IsDist Xg) (hD : 1 ≤ wdeg Xg)
+    (I : Finset ℕ) (u : ℕ → O⟦X⟧) (hu : ∀ i ∈ I, IsUnit (u i))
+    (c : ℕ → O) (hc : ∀ i ∈ I, c i ≠ 0)
+    (y : ℕ)
+    : cont ϖ (Xg ^ y) (∑ i ∈ I, u i * C (c i) * Xg ^ i)
+      = ⨅ i ∈ I.filter (· < y), IsDiscreteValuationRing.addVal O (c i) := by
   unfold cont
-  have hm : ∀ k : ℕ, (∑ i ∈ I, u i * C (c i) * Xg ^ i) ∈ Ideal.span {C ϖ ^ k, Xg ^ y} ↔
-      (k : ℕ∞) ≤ ⨅ i ∈ I.filter (· < y), IsDiscreteValuationRing.addVal O (c i) := by
+  have hm
+      : ∀ k : ℕ,
+        (∑ i ∈ I, u i * C (c i) * Xg ^ i) ∈ Ideal.span {C ϖ ^ k, Xg ^ y}
+          ↔ (k : ℕ∞) ≤ ⨅ i ∈ I.filter (· < y), IsDiscreteValuationRing.addVal O (c i) := by
     intro k
     rw [Set.pair_comm, Mprime hϖ hX hD I u hu c hc y k, le_iInf₂_iff]
     simp only [Finset.mem_filter]

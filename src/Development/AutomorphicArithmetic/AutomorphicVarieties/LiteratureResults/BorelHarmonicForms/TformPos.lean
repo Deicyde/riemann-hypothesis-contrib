@@ -40,17 +40,20 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-private theorem tform_star_mul_self_eq_sum_cmp {W : Type} [AddCommGroup W] [Module ℂ W] {d : ℕ}
-    (H : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ) (B : Matrix (Fin d) (Fin d) ℂ) (x : W ⊗[ℂ] (Fin d → ℂ)) :
-    tform H (star B * B) x x = ∑ k, H (∑ i, B k i • Bor.cmp i x) (∑ j, B k j • Bor.cmp j x) := by
+private theorem tform_star_mul_self_eq_sum_cmp
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {d : ℕ}
+    (H : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ) (B : Matrix (Fin d) (Fin d) ℂ) (x : W ⊗[ℂ] (Fin d → ℂ))
+    : tform H (star B * B) x x = ∑ k, H (∑ i, B k i • Bor.cmp i x) (∑ j, B k j • Bor.cmp j x) := by
   rw [tform_apply]
 
-  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul, smul_eq_mul,
-  Matrix.mul_apply, Matrix.star_apply, starRingEnd_apply, Finset.sum_mul, Finset.mul_sum,
-  RingHom.id_apply]
+  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+    Matrix.mul_apply, Matrix.star_apply, starRingEnd_apply, Finset.sum_mul, Finset.mul_sum,
+    RingHom.id_apply]
   conv_lhs => arg 2; ext a; rw [Finset.sum_comm]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -59,13 +62,12 @@ private theorem tform_star_mul_self_eq_sum_cmp {W : Type} [AddCommGroup W] [Modu
   ring
 
 open scoped ComplexOrder MatrixOrder in
-theorem UpperTheory.V.Lit.Bor.tformPos :
-    UpperTheory.V.Lit.Bor.TformPos := by
+theorem UpperTheory.V.Lit.Bor.tformPos : UpperTheory.V.Lit.Bor.TformPos := by
   intro W _ _ d H N G hH hG
   classical
   have h0 : 0 ≤ G := Matrix.nonneg_iff_posSemidef.mpr hG.posSemidef
-  obtain ⟨B, hBs, -, hBB⟩ := sub_zero G ▸
-    CFC.exists_sqrt_of_isSelfAdjoint_of_quasispectrumRestricts h0.isSelfAdjoint
+  obtain ⟨B, hBs, -, hBB⟩ :=
+    sub_zero G ▸ CFC.exists_sqrt_of_isSelfAdjoint_of_quasispectrumRestricts h0.isSelfAdjoint
       (QuasispectrumRestricts.nnreal_of_nonneg h0)
   have hB : G = star B * B := by rw [hBs.star_eq, hBB, sub_zero]
   have hself : ∀ y : W, H y y = ((H y y).re : ℂ) := by
@@ -89,7 +91,7 @@ theorem UpperTheory.V.Lit.Bor.tformPos :
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     rw [hH.herm, ← hG.isHermitian.apply j i]
-    simp [mul_comm]
+    simp
   · intro x hx
     rw [hB, tform_star_mul_self_eq_sum_cmp, Complex.re_sum]
     exact Finset.sum_nonneg fun k _ => hH.nonneg _ (hz x hx k)

@@ -60,57 +60,49 @@ local notation "ℚ̄" => AlgebraicClosure ℚ
 
 section Lift
 
-theorem isOpen_stabilizer_ringOfIntegers (b : 𝓞 ℚ̄)
-    : IsOpen (MulAction.stabilizer Gal(ℚ̄/ℚ) b : Set Gal(ℚ̄/ℚ)) := by
+theorem isOpen_stabilizer_ringOfIntegers (b : 𝓞 ℚ̄) :
+    IsOpen (MulAction.stabilizer Gal(ℚ̄/ℚ) b : Set Gal(ℚ̄/ℚ)) := by
   have : FiniteDimensional ℚ ℚ⟮(b : ℚ̄)⟯ :=
     adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral _)
-  refine Subgroup.isOpen_mono (H₁ := (ℚ⟮(b : ℚ̄)⟯).fixingSubgroup)
-    (fun σ hσ => ?_)
+  refine Subgroup.isOpen_mono (H₁ := (ℚ⟮(b : ℚ̄)⟯).fixingSubgroup) (fun σ hσ => ?_)
     (ℚ⟮(b : ℚ̄)⟯).fixingSubgroup_isOpen
   rw [MulAction.mem_stabilizer_iff]
-  exact RingOfIntegers.ext ((mem_fixingSubgroup_iff _ σ).mp hσ (b : ℚ̄)
-    (mem_adjoin_simple_self ℚ _))
+  exact RingOfIntegers.ext ((mem_fixingSubgroup_iff _ σ).mp hσ (b : ℚ̄) (mem_adjoin_simple_self ℚ _))
 
 noncomputable abbrev ringOfIntegersIncl (L : IntermediateField ℚ ℚ̄) : 𝓞 L →+* 𝓞 ℚ̄ :=
   RingOfIntegers.mapRingHom (algebraMap L ℚ̄)
 
-theorem exists_mem_stabilizer_of_comap_eq
-    (L : IntermediateField ℚ ℚ̄)
-    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime]
-    (τ : Gal(ℚ̄/ℚ)) (h : (τ⁻¹ • P).comap (ringOfIntegersIncl L) = P.comap (ringOfIntegersIncl L))
-    : ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, ∀ x ∈ L, σ x = τ x := by
+theorem exists_mem_stabilizer_of_comap_eq (L : IntermediateField ℚ ℚ̄) (P : Ideal (𝓞 ℚ̄))
+    [P.IsPrime] (τ : Gal(ℚ̄/ℚ))
+    (h : (τ⁻¹ • P).comap (ringOfIntegersIncl L) = P.comap (ringOfIntegersIncl L)) :
+    ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, ∀ x ∈ L, σ x = τ x := by
   let G := L.fixingSubgroup
   let _ : Algebra (𝓞 L) (𝓞 ℚ̄) := (ringOfIntegersIncl L).toAlgebra
   let _ : TopologicalSpace (𝓞 ℚ̄) := ⊥
   have : DiscreteTopology (𝓞 ℚ̄) := ⟨rfl⟩
   have : CompactSpace G :=
     isCompact_iff_compactSpace.mp (InfiniteGalois.fixingSubgroup_isClosed L).isCompact
-  have hfix : ∀ (g : G) (a : 𝓞 L), g • ringOfIntegersIncl L a = ringOfIntegersIncl L a := fun g a =>
-    RingOfIntegers.ext ((mem_fixingSubgroup_iff _ _).1 g.2 _ (a : L).2)
-  have : SMulCommClass G (𝓞 L) (𝓞 ℚ̄) :=
-    ⟨fun g a b => by
-      rw [Algebra.smul_def, Algebra.smul_def, smul_mul', RingHom.algebraMap_toAlgebra, hfix]⟩
-  have : ContinuousSMul G (𝓞 ℚ̄) :=
-    continuousSMul_iff_stabilizer_isOpen.2 fun b =>
-      (isOpen_stabilizer_ringOfIntegers b).preimage continuous_subtype_val
-  have : Algebra.IsInvariant (𝓞 L) (𝓞 ℚ̄) G :=
-    ⟨fun b hb => by
-      have hmem : (b : ℚ̄) ∈ fixedField L.fixingSubgroup := by
-        rw [mem_fixedField_iff]
-        intro f hf
-        exact congrArg (fun c : 𝓞 ℚ̄ => (c : ℚ̄)) (hb ⟨f, hf⟩)
-      rw [InfiniteGalois.fixedField_fixingSubgroup] at hmem
-      have hint : IsIntegral ℤ (⟨b, hmem⟩ : L) :=
-        (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ L ℚ̄) (algebraMap L ℚ̄).injective).1
-          b.isIntegral_coe
-      exact ⟨⟨⟨b, hmem⟩, hint⟩, RingOfIntegers.ext rfl⟩⟩
-  obtain ⟨g, hg⟩ :=
-    Algebra.IsInvariant.exists_smul_of_under_eq_of_profinite (A := 𝓞 L) (G := G) P (τ⁻¹ • P) h.symm
+  have hfix : ∀ (g : G) (a : 𝓞 L), g • ringOfIntegersIncl L a = ringOfIntegersIncl L a :=
+    fun g a => RingOfIntegers.ext ((mem_fixingSubgroup_iff _ _).1 g.2 _ (a : L).2)
+  have : SMulCommClass G (𝓞 L) (𝓞 ℚ̄) := ⟨fun g a b => by
+    rw [Algebra.smul_def, Algebra.smul_def, smul_mul', RingHom.algebraMap_toAlgebra, hfix]⟩
+  have : ContinuousSMul G (𝓞 ℚ̄) := continuousSMul_iff_stabilizer_isOpen.2 fun b =>
+    (isOpen_stabilizer_ringOfIntegers b).preimage continuous_subtype_val
+  have : Algebra.IsInvariant (𝓞 L) (𝓞 ℚ̄) G := ⟨fun b hb => by
+    have hmem : (b : ℚ̄) ∈ fixedField L.fixingSubgroup := by
+      rw [mem_fixedField_iff]
+      intro f hf
+      exact congrArg (fun c : 𝓞 ℚ̄ => (c : ℚ̄)) (hb ⟨f, hf⟩)
+    rw [InfiniteGalois.fixedField_fixingSubgroup] at hmem
+    have hint : IsIntegral ℤ (⟨b, hmem⟩ : L) :=
+      (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ L ℚ̄) (algebraMap L ℚ̄).injective).1
+        b.isIntegral_coe
+    exact ⟨⟨⟨b, hmem⟩, hint⟩, RingOfIntegers.ext rfl⟩⟩
+  obtain ⟨g, hg⟩ := Algebra.IsInvariant.exists_smul_of_under_eq_of_profinite
+    (A := 𝓞 L) (G := G) P (τ⁻¹ • P) h.symm
   refine ⟨τ * g, ?_, fun x hx => ?_⟩
   · rw [MulAction.mem_stabilizer_iff, mul_smul]
-    calc
-      τ • ((g : Gal(ℚ̄/ℚ)) • P)
-        = τ • (g • P) := rfl
+    calc τ • ((g : Gal(ℚ̄/ℚ)) • P) = τ • (g • P) := rfl
       _ = τ • (τ⁻¹ • P) := by rw [hg]; rfl
       _ = P := smul_inv_smul τ P
   · change τ ((g : Gal(ℚ̄/ℚ)) x) = τ x
@@ -120,34 +112,28 @@ end Lift
 
 section Cyclotomic
 
-theorem modCharacter_eq_of_eqOn
-    {M : ℕ} [NeZero M] {σ τ : Gal(ℚ̄/ℚ)} (h : ∀ x ∈ rootsOfUnityField M, σ x = τ x)
-    : modCharacter M σ = modCharacter M τ :=
+theorem modCharacter_eq_of_eqOn {M : ℕ} [NeZero M] {σ τ : Gal(ℚ̄/ℚ)}
+    (h : ∀ x ∈ rootsOfUnityField M, σ x = τ x) : modCharacter M σ = modCharacter M τ :=
   Units.ext (modCharacter_unique σ fun t ht => by
     rw [h t (subset_adjoin ℚ _ ht), modCharacter_spec τ ht])
 
-theorem redUnits_character (q : Nat.Primes) (k : ℕ) (σ : Gal(ℚ̄/ℚ))
-    : (redUnits q k (Units.map (toPadicInt q).toMonoidHom (character σ)) : ZMod ((q : ℕ) ^ k))
-      = (modCharacter ((q : ℕ) ^ k) σ : ZMod ((q : ℕ) ^ k)) := by
+theorem redUnits_character (q : Nat.Primes) (k : ℕ) (σ : Gal(ℚ̄/ℚ)) :
+    (redUnits q k (Units.map (toPadicInt q).toMonoidHom (character σ)) : ZMod ((q : ℕ) ^ k)) =
+      (modCharacter ((q : ℕ) ^ k) σ : ZMod ((q : ℕ) ^ k)) := by
   rw [coe_redUnits, Units.coe_map]
   change PadicInt.toZModPow k (toPadicInt q (character σ : ℤ̂)) = _
   rw [toZModPow_toPadicInt]
   exact proj_character (primePowPNat q k) σ
 
-theorem exists_mem_stabilizer_modCharacter_eq_prime
-    {p : ℕ} [Fact p.Prime]
-    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime] [hP : P.LiesOver (Ideal.span {(p : ℤ)})]
-    {M : ℕ} [NeZero M]
-    (hM : ¬ p ∣ M)
-    : ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, (modCharacter M σ : ZMod M) = p := by
+theorem exists_mem_stabilizer_modCharacter_eq_prime {p : ℕ} [Fact p.Prime] (P : Ideal (𝓞 ℚ̄))
+    [P.IsPrime] [hP : P.LiesOver (Ideal.span {(p : ℤ)})] {M : ℕ} [NeZero M] (hM : ¬ p ∣ M) :
+    ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, (modCharacter M σ : ZMod M) = p := by
   set L := rootsOfUnityField M
   let Q : Ideal (𝓞 L) := P.comap (ringOfIntegersIncl L)
-  have : Q.LiesOver (Ideal.span {(p : ℤ)}) :=
-    ⟨by
-      rw [Ideal.under, Ideal.comap_comap,
-        show (ringOfIntegersIncl L).comp (algebraMap ℤ (𝓞 L)) = algebraMap ℤ (𝓞 ℚ̄) from
-          RingHom.ext_int _ _]
-      exact hP.over⟩
+  have : Q.LiesOver (Ideal.span {(p : ℤ)}) := ⟨by
+    rw [Ideal.under, Ideal.comap_comap, show (ringOfIntegersIncl L).comp (algebraMap ℤ (𝓞 L)) =
+      algebraMap ℤ (𝓞 ℚ̄) from RingHom.ext_int _ _]
+    exact hP.over⟩
   obtain ⟨τ₀, hτ₀, -⟩ := existsUnique_isArithFrobAt p L Q hM
   let τ : Gal(ℚ̄/ℚ) := τ₀.liftNormal ℚ̄
   have hτ : ∀ x : L, τ (x : ℚ̄) = (τ₀ x : ℚ̄) := fun x => τ₀.liftNormal_commutes ℚ̄ x
@@ -170,13 +156,10 @@ theorem exists_mem_stabilizer_modCharacter_eq_prime
   rw [← isArithFrobAt_restrictNormal_iff M p Q hM σ, hres]
   exact hτ₀
 
-theorem eq_of_natCast_mem_rootsOfUnityField
-    {p : ℕ} [hp : Fact p.Prime]
-    (k : ℕ)
+theorem eq_of_natCast_mem_rootsOfUnityField {p : ℕ} [hp : Fact p.Prime] (k : ℕ)
     {Q₁ Q₂ : Ideal (𝓞 (rootsOfUnityField (p ^ (k + 1))))} [Q₁.IsPrime] [Q₂.IsPrime]
     (h₁ : (p : 𝓞 (rootsOfUnityField (p ^ (k + 1)))) ∈ Q₁)
-    (h₂ : (p : 𝓞 (rootsOfUnityField (p ^ (k + 1)))) ∈ Q₂)
-    : Q₁ = Q₂ := by
+    (h₂ : (p : 𝓞 (rootsOfUnityField (p ^ (k + 1)))) ∈ Q₂) : Q₁ = Q₂ := by
   let L := rootsOfUnityField (p ^ (k + 1))
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot ℚ̄ (p ^ (k + 1))
   let ζL : L := ⟨ζ, subset_adjoin ℚ _ hζ.pow_eq_one⟩
@@ -186,25 +169,24 @@ theorem eq_of_natCast_mem_rootsOfUnityField
   have hmax : (Ideal.span {hζL.toInteger - 1}).IsMaximal :=
     ((Ideal.span_singleton_prime hprime.ne_zero).2 hprime).isMaximal
       (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hprime.ne_zero)
-  have key : ∀ Q : Ideal (𝓞 L), Q.IsPrime → (p : 𝓞 L) ∈ Q → Q = Ideal.span {hζL.toInteger - 1} := by
+  have key : ∀ Q : Ideal (𝓞 L), Q.IsPrime → (p : 𝓞 L) ∈ Q →
+      Q = Ideal.span {hζL.toInteger - 1} := by
     intro Q hQ hpQ
     refine (hmax.eq_of_le hQ.ne_top ?_).symm
     rw [Ideal.span_singleton_le_iff_mem, ← Ideal.Quotient.eq_zero_iff_mem]
-    have : CharP (𝓞 L ⧸ Q) p :=
-      (CharP.charP_iff_prime_eq_zero hp.out).2 (by
-        rw [← map_natCast (Ideal.Quotient.mk Q), Ideal.Quotient.eq_zero_iff_mem]
-        exact hpQ)
+    have : CharP (𝓞 L ⧸ Q) p := (CharP.charP_iff_prime_eq_zero hp.out).2 (by
+      rw [← map_natCast (Ideal.Quotient.mk Q), Ideal.Quotient.eq_zero_iff_mem]
+      exact hpQ)
     have h1 : (Ideal.Quotient.mk Q (hζL.toInteger - 1)) ^ (p ^ (k + 1)) = 0 := by
-      rw [map_sub, map_one, sub_pow_char_pow, ← map_pow, (hζL.toInteger_isPrimitiveRoot).pow_eq_one,
-        map_one, one_pow, sub_self]
+      rw [map_sub, map_one, sub_pow_char_pow, ← map_pow,
+        (hζL.toInteger_isPrimitiveRoot).pow_eq_one, map_one, one_pow, sub_self]
     exact (pow_eq_zero_iff (pow_ne_zero _ hp.out.ne_zero)).1 h1
   rw [key Q₁ ‹_› h₁, key Q₂ ‹_› h₂]
 
-theorem exists_mem_stabilizer_modCharacter_eq_of_prime_pow
-    {p : ℕ} [hp : Fact p.Prime]
-    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime] [hP : P.LiesOver (Ideal.span {(p : ℤ)})]
-    (k : ℕ) (a : (ZMod (p ^ (k + 1)))ˣ)
-    : ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, modCharacter (p ^ (k + 1)) σ = a := by
+theorem exists_mem_stabilizer_modCharacter_eq_of_prime_pow {p : ℕ} [hp : Fact p.Prime]
+    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime] [hP : P.LiesOver (Ideal.span {(p : ℤ)})] (k : ℕ)
+    (a : (ZMod (p ^ (k + 1)))ˣ) :
+    ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, modCharacter (p ^ (k + 1)) σ = a := by
   obtain ⟨τ, hτ⟩ := exists_modCharacter_eq (p ^ (k + 1)) a
   set L := rootsOfUnityField (p ^ (k + 1))
   have hpP : ((p : ℕ) : 𝓞 ℚ̄) ∈ P := by
@@ -228,12 +210,10 @@ end Cyclotomic
 
 section Component
 
-theorem exists_degreeComponent_ne_one (q : Nat.Primes) (w : ℤ_[q]ˣ) (hw : padicUnitsLog q w ≠ 1)
-    : ∃ N,
-      0 < N
-        ∧ ∀ σ : Gal(ℚ̄/ℚ),
-          (modCharacter ((q : ℕ) ^ N) σ : ZMod ((q : ℕ) ^ N)) = PadicInt.toZModPow N (w : ℤ_[q])
-            → degreeComponent q σ ≠ 1 := by
+theorem exists_degreeComponent_ne_one (q : Nat.Primes) (w : ℤ_[q]ˣ)
+    (hw : padicUnitsLog q w ≠ 1) :
+    ∃ N, 0 < N ∧ ∀ σ : Gal(ℚ̄/ℚ), (modCharacter ((q : ℕ) ^ N) σ : ZMod ((q : ℕ) ^ N)) =
+      PadicInt.toZModPow N (w : ℤ_[q]) → degreeComponent q σ ≠ 1 := by
   obtain ⟨n, hn⟩ : ∃ n, PadicInt.toZModPow n (Multiplicative.toAdd (padicUnitsLog q w)) ≠ 0 := by
     by_contra! hcon
     apply hw
@@ -241,9 +221,8 @@ theorem exists_degreeComponent_ne_one (q : Nat.Primes) (w : ℤ_[q]ˣ) (hw : pad
       PadicInt.ext_of_toZModPow.mp fun n => by rw [hcon n, map_zero]
     rw [← ofAdd_toAdd (padicUnitsLog q w), h0, ofAdd_zero]
   refine ⟨n + unitsLevel q, by have := unitsLevel_ne_zero q; omega, fun σ hσ h1 => hn ?_⟩
-  have hred
-      : redUnits q (n + unitsLevel q) (Units.map (toPadicInt q).toMonoidHom (character σ))
-        = redUnits q (n + unitsLevel q) w :=
+  have hred : redUnits q (n + unitsLevel q) (Units.map (toPadicInt q).toMonoidHom (character σ)) =
+      redUnits q (n + unitsLevel q) w :=
     Units.ext (by rw [redUnits_character, hσ, coe_redUnits])
   rw [toZModPow_padicUnitsLog, ← hred, ← toZModPow_padicUnitsLog, ← degreeComponent_apply, h1,
     toAdd_one, map_zero]
@@ -254,11 +233,9 @@ theorem genLog_ne_zero (ℓ : ℕ) [hℓ : Fact ℓ.Prime] : genLog ℓ ≠ 0 :=
   rw [h, Nat.coprime_zero_right] at this
   exact hℓ.out.one_lt.ne' this
 
-theorem exists_mem_stabilizer_degreeComponent_ne_one
-    {p : ℕ} [hp : Fact p.Prime]
-    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime] [P.LiesOver (Ideal.span {(p : ℤ)})]
-    (q : Nat.Primes)
-    : ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, degreeComponent q σ ≠ 1 := by
+theorem exists_mem_stabilizer_degreeComponent_ne_one {p : ℕ} [hp : Fact p.Prime]
+    (P : Ideal (𝓞 ℚ̄)) [P.IsPrime] [P.LiesOver (Ideal.span {(p : ℤ)})] (q : Nat.Primes) :
+    ∃ σ ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, degreeComponent q σ ≠ 1 := by
   have : NeZero (q : ℕ) := ⟨q.2.ne_zero⟩
   by_cases hpq : p = q
   · have hw : padicUnitsLog q (genPadicUnit q) ≠ 1 := by
@@ -269,8 +246,8 @@ theorem exists_mem_stabilizer_degreeComponent_ne_one
     obtain ⟨N, hN, hσ⟩ := exists_degreeComponent_ne_one q _ hw
     obtain ⟨k, rfl⟩ : ∃ k, N = k + 1 := ⟨N - 1, by omega⟩
     subst hpq
-    obtain ⟨σ, hσP, hσa⟩ :=
-      exists_mem_stabilizer_modCharacter_eq_of_prime_pow P k (redUnits q (k + 1) (genPadicUnit q))
+    obtain ⟨σ, hσP, hσa⟩ := exists_mem_stabilizer_modCharacter_eq_of_prime_pow P k
+      (redUnits q (k + 1) (genPadicUnit q))
     exact ⟨σ, hσP, hσ σ (by rw [hσa, coe_redUnits])⟩
   · have hcop : Nat.Coprime q p := (Nat.coprime_primes q.2 hp.out).2 (Ne.symm hpq)
     have hw : padicUnitsLog q (isUnit_natCast_of_coprime (q : ℕ) hcop).unit ≠ 1 := by
@@ -292,16 +269,15 @@ end Component
 
 section Image
 
-theorem isClosed_stabilizer (P : Ideal (𝓞 ℚ̄))
-    : IsClosed (MulAction.stabilizer Gal(ℚ̄/ℚ) P : Set Gal(ℚ̄/ℚ)) := by
+theorem isClosed_stabilizer (P : Ideal (𝓞 ℚ̄)) :
+    IsClosed (MulAction.stabilizer Gal(ℚ̄/ℚ) P : Set Gal(ℚ̄/ℚ)) := by
   let _ : TopologicalSpace (𝓞 ℚ̄) := ⊥
   have : DiscreteTopology (𝓞 ℚ̄) := ⟨rfl⟩
   have : ContinuousSMul Gal(ℚ̄/ℚ) (𝓞 ℚ̄) :=
     continuousSMul_iff_stabilizer_isOpen.2 isOpen_stabilizer_ringOfIntegers
-  have hset
-      : (MulAction.stabilizer Gal(ℚ̄/ℚ) P : Set Gal(ℚ̄/ℚ))
-        = (⋂ x ∈ P, (fun σ : Gal(ℚ̄/ℚ) => σ • x) ⁻¹' (P : Set (𝓞 ℚ̄)))
-          ∩ ⋂ x ∈ P, (fun σ : Gal(ℚ̄/ℚ) => σ⁻¹ • x) ⁻¹' (P : Set (𝓞 ℚ̄)) := by
+  have hset : (MulAction.stabilizer Gal(ℚ̄/ℚ) P : Set Gal(ℚ̄/ℚ)) =
+      (⋂ x ∈ P, (fun σ : Gal(ℚ̄/ℚ) => σ • x) ⁻¹' (P : Set (𝓞 ℚ̄))) ∩
+        ⋂ x ∈ P, (fun σ : Gal(ℚ̄/ℚ) => σ⁻¹ • x) ⁻¹' (P : Set (𝓞 ℚ̄)) := by
     ext σ
     simp only [SetLike.mem_coe, MulAction.mem_stabilizer_iff, Set.mem_inter_iff, Set.mem_iInter,
       Set.mem_preimage]

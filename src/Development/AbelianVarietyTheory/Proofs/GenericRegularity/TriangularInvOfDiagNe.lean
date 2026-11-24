@@ -1,8 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.RegularCharts.MatrixTwoByTwoCongr
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.IsCombAtIffCoordinateCombinationStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ModelChartLiftCoordsGeneratorIndepStatement
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.IsCombAtIffCoordinateCombination
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ModelChartLiftCoordsGeneratorIndep
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -128,7 +128,7 @@ theorem frBor_of_tie
     Category.id_comp _,
     fun i h => ?_
   ⟩
-  · refine (GlobalTheory.T.isCombAt_iff_coordinate_combination E H Dw l Xo c O β Y M L f y.x Λ
+  · refine (_root_.GlobalTheory.Reg.VecComb.isCombAt_iff_vec E H Dw l Xo c O β Y M L f y.x Λ
       (Dw.mult τ)
       (fun j k => (u τ * b τ) k j)
       (y.u τ)
@@ -136,8 +136,8 @@ theorem frBor_of_tie
       (zu τ i)
       (fun j => hΛ τ j)).mpr ?_
     have hv :=
-      (GlobalTheory.T.modelChartLift_coords_generator_indep E H Dw l Xo c O β Y M L f y.x Λ' Λ).1 _
-        _ (hΛ'u τ i)
+      (_root_.GlobalTheory.Reg.LiftUnique.lift_indep E H Dw l Xo c O β Y M L f y.x Λ' Λ).1 _ _
+        (hΛ'u τ i)
     convert hv using 1
     ext k
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]

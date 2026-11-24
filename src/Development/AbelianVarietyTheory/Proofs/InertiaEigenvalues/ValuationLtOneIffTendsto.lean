@@ -87,7 +87,7 @@ def twistEquiv
     LinearMap.ext fun x => by
       have e := LinearMap.congr_fun (φ.isIntertwining' g) x
       simp only [LinearMap.comp_apply] at e
-      simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, twist_apply, map_smul]
+      simp only [LinearMap.comp_apply, twist_apply, map_smul]
       congr 1
 
 end GlobalTheory.TypeRec.TwistInert

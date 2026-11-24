@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdIPowLe
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteProjectiveModuleElementDescentEqualizerStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrismCoverInjectiveAndDescentStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.InvertibleSpanSingleton
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteProjectiveModuleElementDescentEqualizer
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PrismCoverInjectiveAndDescent
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -80,13 +81,13 @@ theorem Eval.effective_of_cover
               → ∃ y, V.v h f y = z := by
   intro l _ K bk d S B C N _ _ V h f hc
   obtain ⟨D, p, q, hpo⟩ := hc.stable.po C h
-  obtain ⟨hinj, hrange⟩ := GlobalTheory.T.prism_cover_injective_and_descent l _ B C h hc
+  obtain ⟨hinj, hrange⟩ := _root_.GlobalTheory.BSP.cover_injective_and_descent l _ B C h hc
   haveI := V.fin
   haveI := V.proj
   have hcomm : p.f.comp h.f = q.f.comp h.f := congrArg Hom.f hpo.comm
   have key :=
-    GlobalTheory.T.finite_projective_module_element_descent_equalizer B.A C.A D.A h.f p.f q.f hcomm
-      hinj (hrange D p q hpo) N (Fin d → C.A) (Fin d → D.A) (V.v h f) (matCoordMap p.f 1)
+    _root_.GlobalTheory.BSP.ProjDescent.descent B.A C.A D.A h.f p.f q.f hcomm hinj
+      (hrange D p q hpo) N (Fin d → C.A) (Fin d → D.A) (V.v h f) (matCoordMap p.f 1)
       (matCoordMap q.f (S.ε (p.comp f) (q.comp f))) (V.v (p.comp h) (p.comp f)) (V.bc h f)
       (V.bc (p.comp h) (p.comp f))
       (fun x => by

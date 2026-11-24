@@ -51,6 +51,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Fo
   NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.conjugatedIntertwiner_hasColumnLevel
     : GlobalTheory.Published.DiscreteSeriesClassification
       → ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.conjugatedIntertwiner_hasColumnLevel
                           (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ g k)
                         = levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) k
                           * GlobalTheory.ConjRowMult.conjMap X (MP R) c Φ h t u g := by
-  first
-  | exact @GlobalTheory.ConjRowLevel.conjMap_level
-  | exact GlobalTheory.ConjRowLevel.conjMap_level
-  | (intros; apply GlobalTheory.ConjRowLevel.conjMap_level <;> assumption)
+  first | exact @GlobalTheory.ConjRowLevel.conjMap_level

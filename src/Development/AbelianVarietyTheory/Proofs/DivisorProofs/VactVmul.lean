@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ZetaActRefl
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeierstrassPTorsionIsModularFamilyStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeierstrassPTorsionIsModularFamily
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -62,7 +62,7 @@ theorem main
       IsFam (gact N D) 2 (fun α => wp N (vmul e (α * D)))
         ∧ IsFam (gact N D) 3 (fun α => wpd N (vmul e (α * D))) := by
   intro N _ D e
-  obtain ⟨h2, h3⟩ := GlobalTheory.T.weierstrassP_torsion_isModularFamily N
+  obtain ⟨h2, h3⟩ := _root_.GlobalTheory.WpFam.isFam_wp_wpd N
   refine ⟨fun α γ => ?_, fun α γ => ?_⟩
   · have h := h2 (vmul e (α * D)) γ
     rw [vact_vmul] at h

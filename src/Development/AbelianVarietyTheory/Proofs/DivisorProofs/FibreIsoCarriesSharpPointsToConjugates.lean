@@ -54,6 +54,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBPull
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.SectionArithmetic
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -383,7 +384,6 @@ theorem kap_rel
         push_cast
         module)
       (fun y J hJ => by
-        beta_reduce
         rw [comp_id_pow, comp_id_pow, one_pow, one_pow, Category.comp_id, normd_one hκ hJ,
           normd_one hκ' hJ]
         simp)
@@ -491,7 +491,6 @@ theorem exists_psi
             = (gm T.hom z ⊤ a * val t T.hom z J) ^ N := fun T z J hJ => by
     have C : IsCub (cubV D.cub (T := T) z J) := isCub_cubV D.cub hJ
     rw [vΨ T 1 z J hJ]
-    beta_reduce
     rw [Over.w, Category.comp_id, Finset.prod_eq_one fun i _ => C.face _ _, _root_.one_mul]
   refine ⟨Ψ, hΨ, fun κ hκ T z J hJ => ?_, fun χ z J hJ => ?_⟩
   · obtain ⟨x, hx⟩ :=
@@ -526,7 +525,6 @@ theorem exists_psi
   · have d := Frames.charVal_nsmul g χ hJ N
     rw [hgN, zero_val χ hJ, _root_.one_mul] at d
     rw [vΨ _ _ z J hJ, mul_pow (val (g.s χ) _ z J), ha z J hJ]
-    beta_reduce
     rw [Over.w]
     refine congrArg₂ (· * ·) (Eq.trans (Finset.prod_congr rfl fun i _ => ?_) d) rfl
     rw [Category.comp_id, MonObj.comp_pow, ← Category.assoc, comp_toUnit, ← hgb]
@@ -574,7 +572,7 @@ theorem exists_vals
             h ((D.c χ).left ≫ ((toUnit D.P.A ≫ b c) * 𝟙 D.P.A).left) ^ (-(N : ℤ)) * _ = _
           rw [comp_transl, Category.comp_id, Category.id_comp, toUnit_unit, Category.id_comp]
           apply Additive.ofMul.injective
-          simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, ofMul_one, ← natCast_zsmul]
+          simp only [ofMul_mul, ofMul_zpow, ofMul_pow, ← natCast_zsmul]
           module)
     obtain ⟨s', hs'⟩ :=
       exists_powSec hL θ (b c * D.c χ).left N u hu (K' := PEmpty) PEmpty.elim PEmpty.elim
@@ -621,7 +619,7 @@ theorem exists_vals
         show (_ ^ (((1 : ℕ) : ℤ) - 1) * _ ^ (1 : ℤ) * _ ^ (-1 : ℤ) * _ ^ (1 : ℤ)) ^ 1 *
           (h (toUnit (T₁ ⊗ D.P.A) ≫ D.c χ).left ^ (1 : ℤ) * h (1 : T₁ ⊗ D.P.A ⟶ D.P.A).left ^ (-1 : ℤ)) = _
         apply Additive.ofMul.injective
-        simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, ofMul_one]
+        simp only [ofMul_mul, ofMul_zpow, ofMul_pow]
         module)
   obtain ⟨lam, hlam⟩ := hθ (FractionRing V) T₁.hom t
   obtain ⟨z⟩ := exists_pt (R := V) (F := FractionRing V)

@@ -82,6 +82,5 @@ theorem guard_of
     σ hσ
 
 def ThruAway : Prop := PlainRec → Thru false
-def AIsoTwOf : Prop := FlagLaws → WinTw → AIsoTw
 
 end UpperTheory.V.Z.Win

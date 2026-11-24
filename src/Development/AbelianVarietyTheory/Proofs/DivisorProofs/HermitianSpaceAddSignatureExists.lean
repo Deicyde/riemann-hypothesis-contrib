@@ -49,7 +49,9 @@ import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links GlobalTheory.ChiGrid
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links GlobalTheory.ChiGrid
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct nonZeroDivisors Pointwise
 
@@ -61,21 +63,27 @@ section Generic
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem coords_gram (B : HSpace E) (x y : B.V) :
-    ∑ l, (∑ k, star (B.frame.repr x k) * B.gram k l) * B.frame.repr y l = B.hT x y := by
+theorem coords_gram (B : HSpace E) (x y : B.V)
+    : ∑ l, (∑ k, star (B.frame.repr x k) * B.gram k l) * B.frame.repr y l = B.hT x y := by
   conv_rhs => rw [← B.frame.sum_repr x, ← B.frame.sum_repr y]
 
   simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-  Finset.sum_mul, HSpace.gram, RingHom.id_apply, starRingEnd_apply, Finset.mul_sum]
+    Finset.sum_mul, HSpace.gram, RingHom.id_apply, starRingEnd_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => by ring
 
 def middleSymmetricBasisVector (E : Type) [Field E] (c : ℕ) (p : Fin c) : Fin c → E :=
-  Pi.single p (if 2 * p.1 + 1 ≤ c then 1 else -1 / 2) +
-    Pi.single p.rev (if 2 * p.1 + 1 < c then 1 else if 2 * p.1 + 1 = c then 0 else 1 / 2)
+  Pi.single p (if 2 * p.1 + 1 ≤ c then 1 else -1 / 2) + Pi.single p.rev
+    (if 2 * p.1 + 1 < c then
+       1
+     else if 2 * p.1 + 1 = c then
+       0
+     else
+       1 / 2)
 
-theorem middleSymmetricBasisVectors_gram_antiDiagonal (c : ℕ) (neg : Bool) (p q : Fin c) :
-    Examples₂.diagForm c (GlobalTheory.UnitPerp.negFrom c (if neg then c / 2 else (c + 1) / 2)) (middleSymmetricBasisVector E c p) (middleSymmetricBasisVector E c q) =
-      antiDiagonalSignGramMatrix c (if neg then -1 else 1) p q := by
+theorem middleSymmetricBasisVectors_gram_antiDiagonal (c : ℕ) (neg : Bool) (p q : Fin c)
+    : Examples₂.diagForm c (GlobalTheory.UnitPerp.negFrom c (if neg then c / 2 else (c + 1) / 2))
+        (middleSymmetricBasisVector E c p) (middleSymmetricBasisVector E c q)
+      = antiDiagonalSignGramMatrix c (if neg then -1 else 1) p q := by
   have hp := p.2
   have hq := q.2
   obtain ⟨P, hP⟩ : ∃ P, P = if neg then c / 2 else (c + 1) / 2 := ⟨_, rfl⟩
@@ -83,8 +91,9 @@ theorem middleSymmetricBasisVectors_gram_antiDiagonal (c : ℕ) (neg : Bool) (p 
   have hm : 2 * p.1 + 1 = c → (P ≤ p.1 ↔ neg = true) := by
     intro h; rw [hP]; cases neg <;> simp <;> omega
   rw [← hP]
-  simp only [middleSymmetricBasisVector, map_add (f := _), LinearMap.add_apply, Examples₂.diagForm_single_left, Pi.single_apply, Pi.add_apply,
-    GlobalTheory.UnitPerp.negFrom, Examples₂.sgn, antiDiagonalSignGramMatrix, Fin.ext_iff, Fin.val_rev, decide_eq_true_eq]
+  simp only [middleSymmetricBasisVector, map_add (f := _), LinearMap.add_apply,
+    Examples₂.diagForm_single_left, Pi.single_apply, GlobalTheory.UnitPerp.negFrom, Examples₂.sgn,
+    antiDiagonalSignGramMatrix, Fin.ext_iff, Fin.val_rev, decide_eq_true_eq]
   generalize p.1 = a at *
   generalize q.1 = b at *
   clear hP
@@ -99,14 +108,17 @@ theorem middleSymmetricBasisVectors_gram_antiDiagonal (c : ℕ) (neg : Bool) (p 
     cases neg <;> simp
   · subst h1
     rcases (show 2 * a + 1 < c ∨ c < 2 * a + 1 by omega) with h | h
-    · simp only [if_pos h.le, if_pos h, if_neg (show ¬ P ≤ a by omega), if_pos (show P ≤ c - (a + 1) by omega), if_neg h2]
+    · simp only [if_pos h.le, if_pos h, if_neg (show ¬ P ≤ a by omega),
+        if_pos (show P ≤ c - (a + 1) by omega), if_neg h2]
       simp
     · simp only [if_neg h.not_ge, if_neg h.not_gt, if_neg h.ne', if_pos (show P ≤ a by omega),
         if_neg (show ¬ P ≤ c - (a + 1) by omega), if_neg h2]
       norm_num
-  · rcases (show (2 * a + 1 < c ∧ c < 2 * b + 1) ∨ (2 * b + 1 < c ∧ c < 2 * a + 1) by omega) with ⟨h, h'⟩ | ⟨h', h⟩
-    · simp only [if_pos h.le, if_pos h, if_neg (show ¬ P ≤ a by omega), if_pos (show P ≤ c - (a + 1) by omega),
-        if_neg h'.not_ge, if_neg h'.not_gt, if_neg h'.ne', if_neg h1, if_pos h2]
+  · rcases (show (2 * a + 1 < c ∧ c < 2 * b + 1) ∨ (2 * b + 1 < c ∧ c < 2 * a + 1) by omega) with
+      ⟨h, h'⟩ | ⟨h', h⟩
+    · simp only [if_pos h.le, if_pos h, if_neg (show ¬ P ≤ a by omega),
+        if_pos (show P ≤ c - (a + 1) by omega), if_neg h'.not_ge, if_neg h'.not_gt, if_neg h'.ne',
+        if_neg h1, if_pos h2]
       norm_num
     · simp only [if_neg h.not_ge, if_neg h.not_gt, if_neg h.ne', if_pos (show P ≤ a by omega),
         if_neg (show ¬ P ≤ c - (a + 1) by omega), if_pos h'.le, if_pos h', if_neg h1, if_pos h2]
@@ -115,32 +127,50 @@ theorem middleSymmetricBasisVectors_gram_antiDiagonal (c : ℕ) (neg : Bool) (p 
 
 end Generic
 
-theorem exists_hermitian_space_add_signature (D : D7) (A : HSp D) (p q c : ℕ) (neg : Bool) (hA : A.SigOK) (hs : ∀ τ, A.sig τ = (p, q)) :
-    ∃ B : HSp D, Nonempty (HermitianOrthogonalExtensionData A B c (if neg then -1 else 1)) ∧ B.SigOK ∧
-      ∀ τ, B.sig τ = (p + (if neg then c / 2 else (c + 1) / 2), q + (if neg then (c + 1) / 2 else c / 2)) := by
+theorem exists_hermitian_space_add_signature
+    (D : D7) (A : HSp D) (p q c : ℕ) (neg : Bool) (hA : A.SigOK) (hs : ∀ τ, A.sig τ = (p, q))
+    : ∃ B : HSp D,
+      Nonempty (HermitianOrthogonalExtensionData A B c (if neg then -1 else 1)) ∧ B.SigOK
+        ∧ ∀ τ,
+          B.sig τ
+            = (
+              p + (if neg then c / 2 else (c + 1) / 2),
+              q + (if neg then (c + 1) / 2 else c / 2)
+            ) := by
   have hc : c = (if neg then c / 2 else (c + 1) / 2) + (if neg then (c + 1) / 2 else c / 2) := by
     split_ifs <;> omega
   have hW := GlobalTheory.UnitPerp.ofKind_stdSpace (E := D.host.E) hc
   set W : HSp D := Examples₂.stdSpace Examples₂.star_isIntegral c (GlobalTheory.UnitPerp.negFrom c (if neg then c / 2 else (c + 1) / 2))
     (if neg then c / 2 else (c + 1) / 2) (if neg then (c + 1) / 2 else c / 2) with hWd
-  refine ⟨GlobalTheory.Doubling.hsum A W, ⟨?_⟩, GlobalTheory.Doubling.sigOK_hsum hA hW.2.1, fun τ => ?_⟩
-  · refine
-      { ι := LinearMap.inl _ _ _
-        isom := GlobalTheory.Doubling.isIsomEmb_inl A W
-        a := fun k j => (GlobalTheory.Doubling.hsum A W).frame.repr ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V) k
-        gram := Matrix.ext fun i j => ?_
-        perp := Matrix.ext fun i j => ?_
-        rank := rfl }
-    · refine Eq.trans (coords_gram (GlobalTheory.Doubling.hsum A W) ((0, middleSymmetricBasisVector D.host.E c i) : A.V × W.V)
-        ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V)) ?_
+  refine
+    ⟨GlobalTheory.Doubling.hsum A W, ⟨?_⟩, GlobalTheory.Doubling.sigOK_hsum hA hW.2.1, fun τ => ?_⟩
+  · refine {
+      ι := LinearMap.inl _ _ _
+      isom := GlobalTheory.Doubling.isIsomEmb_inl A W
+      a := fun k j =>
+        (GlobalTheory.Doubling.hsum A W).frame.repr
+          ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V) k
+      gram := Matrix.ext fun i j => ?_
+      perp := Matrix.ext fun i j => ?_
+      rank := rfl
+    }
+    · refine Eq.trans
+        (coords_gram (GlobalTheory.Doubling.hsum A W)
+          ((0, middleSymmetricBasisVector D.host.E c i) : A.V × W.V)
+          ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V))
+        ?_
       refine (GlobalTheory.Doubling.orthSum_apply A W _ _).trans ?_
       rw [map_zero, zero_add]
       exact middleSymmetricBasisVectors_gram_antiDiagonal c neg i j
-    · refine Eq.trans ?_ ((coords_gram (GlobalTheory.Doubling.hsum A W) ((A.frame i, 0) : A.V × W.V)
-        ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V)).trans ?_)
-      · have e : frameMat (GlobalTheory.Doubling.hsum A W) A (LinearMap.inl _ _ _) =
-            fun k i => (GlobalTheory.Doubling.hsum A W).frame.repr ((A.frame i, 0) : A.V × W.V) k :=
-          Matrix.ext fun k i => LinearMap.toMatrix_apply A.frame (GlobalTheory.Doubling.hsum A W).frame _ k i
+    · refine Eq.trans ?_
+        ((coords_gram (GlobalTheory.Doubling.hsum A W) ((A.frame i, 0) : A.V × W.V)
+          ((0, middleSymmetricBasisVector D.host.E c j) : A.V × W.V)).trans ?_)
+      · have e
+            : frameMat (GlobalTheory.Doubling.hsum A W) A (LinearMap.inl _ _ _)
+              = fun k i =>
+                (GlobalTheory.Doubling.hsum A W).frame.repr ((A.frame i, 0) : A.V × W.V) k :=
+          Matrix.ext fun k i =>
+            LinearMap.toMatrix_apply A.frame (GlobalTheory.Doubling.hsum A W).frame _ k i
         rw [e]
         rfl
       · refine (GlobalTheory.Doubling.orthSum_apply A W _ _).trans ?_

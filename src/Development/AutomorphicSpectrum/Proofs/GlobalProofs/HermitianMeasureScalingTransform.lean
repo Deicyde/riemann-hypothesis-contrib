@@ -1,9 +1,10 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasureStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalRankOneDensityUniformizerPower
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.AdeleLC
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TensTop
 import Mathlib.Algebra.Order.Floor.Extended
@@ -91,7 +92,8 @@ theorem coordK_map_unit
     : (GlobalTheory.CompanionTheory.SW.coordK R b lam).map
         (fun y => algebraMap R (R ⊗[F] E) (u : R) * y)
       = (c ^ d) • GlobalTheory.CompanionTheory.SW.coordK R b lam := by
-  obtain ⟨hr, -, -, -, -, -, hh, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
+  obtain ⟨hr, -, -, -, -, -, hh, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ R
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
   have hb := hh d b
   have hemb : MeasurableEmbedding (fun (y : R ⊗[F] E) (k : Fin d) =>
@@ -125,10 +127,12 @@ theorem coordW_map_unit
                       = (c ^ (d * M))
                         • GlobalTheory.CompanionTheory.SW.coordW (Ainf F) b lam 1 M := by
   intro F E _ _ _ _ _ σ hσ M d b lam hlam t ht c h
-  obtain ⟨j1, j2, j3, j4, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ (Ainf F)
+  obtain ⟨j1, j2, j3, j4, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Ainf F)
   haveI : BorelSpace (Ainf F ⊗[F] E) := ⟨rfl⟩
   haveI : BorelSpace (Ainf F) := ⟨rfl⟩
-  obtain ⟨hK, -, -⟩ := GlobalTheory.T.coordinate_haar_measure F E σ hσ (Ainf F) d b lam hlam
+  obtain ⟨hK, -, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ (Ainf F) d b lam hlam
   haveI := hK
   obtain ⟨u, rfl⟩ := ht
   set f : Ainf F ⊗[F] E → Ainf F ⊗[F] E := fun y => algebraMap (Ainf F) (Ainf F ⊗[F] E) (u : Ainf F) * y with hf

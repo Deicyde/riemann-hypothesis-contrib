@@ -77,13 +77,14 @@ theorem log_exp_mul_le_of_generator_sup_bound
           ≤ ℓ + 10 * L * a + 200 * f * r * n * L := by
   intro f r n d L ℓ a rd lam t c S v p1 hL hf hr hrn hda ha hn hfL hrd hrdL hlam hlamL ht hℓ hp1
     hp1ℓ hc hcL hS hSv hv
+  have hL0 : 0 ≤ L := by linarith only [hL]
   have hf' : 0 < f := by omega
   have hr' : 0 < r := by omega
   have hn' : 0 < n := by omega
   have hf0 : (0 : ℝ) < f := by exact_mod_cast hf'
   have hr0 : (0 : ℝ) < r := by exact_mod_cast hr'
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn'
-  have hrd0 : (0 : ℝ) < rd := by linarith
+  have hrd0 : (0 : ℝ) < rd := zero_lt_one.trans_le hrd
   have hfr0 : (0 : ℝ) < ((f * r : ℕ) : ℝ) := by exact_mod_cast Nat.mul_pos hf' hr'
   have hrnR : (r : ℝ) ≤ n := by exact_mod_cast hrn
   have hd0 : (0 : ℝ) ≤ d := Nat.cast_nonneg d
@@ -129,20 +130,17 @@ theorem log_exp_mul_le_of_generator_sup_bound
       push_cast
       ring
     have hlr : Real.log r ≤ Real.log n := Real.log_le_log hr0 hrnR
-    have hlogf0 : 0 ≤ Real.log f := Real.log_nonneg (by exact_mod_cast hf)
-    have hlogr0 : 0 ≤ Real.log r := Real.log_nonneg (by exact_mod_cast hr)
     rw [hX, Real.log_div (by positivity) (by positivity),
       Real.log_mul (by positivity) (by positivity), Real.log_mul (by norm_num) (by positivity), e1,
       e2, e3, e5]
     rw [e4] at hlamL
-    nlinarith
+    linarith only [hfL, hlr, hn, hrdL, hlamL, hlogpi]
   have hC : Real.log (1 + X) ≤ 55 * L := by
-    have :=
-      log_one_add_le_log_two_add_of_log_le X (3.5 * Real.log 2 + 49 * L) hX0 (by nlinarith) hlogX
-    nlinarith
-  have hRHS0 : 0 ≤ ℓ + 10 * L * a + 200 * f * r * n * L := by
-    nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ L) ha0,
-      mul_nonneg (by linarith : (0:ℝ) ≤ (f:ℝ) * r * n) (by linarith : (0:ℝ) ≤ L)]
+    have h :=
+      log_one_add_le_log_two_add_of_log_le X (3.5 * Real.log 2 + 49 * L) hX0
+        (by linarith only [hlog2', hL]) hlogX
+    linarith only [h, hlog2, hL]
+  have hRHS0 : 0 ≤ ℓ + 10 * L * a + 200 * f * r * n * L := by positivity
   rcases hS.eq_or_lt with hS0 | hSpos
   · rw [← hS0, mul_zero, Real.log_zero]
     exact hRHS0
@@ -151,31 +149,33 @@ theorem log_exp_mul_le_of_generator_sup_bound
     rcases Nat.eq_zero_or_pos d with hd | hd
     · subst hd
       simp only [hEdef, Nat.cast_zero, zero_div, Real.rpow_zero, Real.log_one, zero_mul, sub_zero]
-      exact ⟨one_pos, by nlinarith⟩
+      exact ⟨one_pos, by positivity⟩
     · have hdR : (0 : ℝ) < d := by exact_mod_cast hd
       have hB : 0 < Real.pi * Real.exp 1 * t * d := by positivity
       refine ⟨Real.rpow_pos_of_pos hB _, ?_⟩
       rw [hEdef, Real.log_rpow hB, Real.log_mul (by positivity) hdR.ne',
         Real.log_mul (by positivity) ht.ne', Real.log_mul hpi.ne' (Real.exp_pos 1).ne',
         Real.log_mul hpi.ne' ht.ne', Real.log_exp]
-      have hld : Real.log d ≤ 2 * L := (Real.log_le_log hdR (by linarith)).trans ha
-      nlinarith [mul_le_mul_of_nonneg_left hld (by linarith : (0:ℝ) ≤ d / 2),
-        mul_nonneg (by linarith : (0:ℝ) ≤ a - d) (by linarith : (0:ℝ) ≤ 1 + 2 * L),
-        mul_nonneg ha0 (by linarith : (0:ℝ) ≤ L - 2)]
+      have hld : Real.log d ≤ 2 * L := (Real.log_le_log hdR (by linarith only [hda])).trans ha
+      calc
+        _ = (d : ℝ) * ((1 + Real.log d) / 2) := by ring
+        _ ≤ d * (10 * L) := mul_le_mul_of_nonneg_left (by linarith only [hld, hL]) hd0
+        _ ≤ a * (10 * L) := mul_le_mul_of_nonneg_right hda (by positivity)
+        _ = _ := mul_comm _ _
   obtain ⟨hE0, hEb⟩ := hE
-  have hvpos : 0 < v := by linarith
+  have hvpos : 0 < v := by linarith only [hSpos, hSv]
   have hcpos : 0 < c := by
     rcases hc.eq_or_lt with h | h
     · rw [← h, zero_mul] at hv
-      linarith
+      exact (hvpos.not_ge hv).elim
     · exact h
   have hp1pos : 0 < p1 := by
     rcases hp1.eq_or_lt with h | h
     · rw [← h, zero_mul, zero_mul, zero_mul, mul_zero] at hv
-      linarith
+      exact (hvpos.not_ge hv).elim
     · exact h
   have hsq2 : 0 < Real.sqrt 2 := by positivity
-  have hC0 : 0 < 1 + X := by linarith
+  have hC0 : 0 < 1 + X := by positivity
   have hprod
       : Real.log (c * (p1 * E * Real.sqrt 2 * (1 + X) ^ (f * r * n)))
         = Real.log c + Real.log p1 + Real.log E + Real.log 2 / 2
@@ -197,10 +197,10 @@ theorem log_exp_mul_le_of_generator_sup_bound
     have := Real.log_le_log hp1pos hp1ℓ
     rwa [Real.log_exp] at this
   have hKC : ((f : ℝ) * r * n) * Real.log (1 + X) ≤ ((f : ℝ) * r * n) * (55 * L) :=
-    mul_le_mul_of_nonneg_left hC (by linarith)
-  have hKL : 2 ≤ ((f : ℝ) * r * n) * L := by nlinarith
+    mul_le_mul_of_nonneg_left hC (by positivity)
+  have hKL : 2 ≤ ((f : ℝ) * r * n) * L := hL.trans (le_mul_of_one_le_left hL0 hK1)
   rw [Real.log_mul (Real.exp_pos _).ne' hSpos.ne', Real.log_exp]
   rw [hprod] at hlv
-  nlinarith
+  linarith only [hlS, hlv, hlc, hlp, hEb, hKC, hKL, hlog2]
 
 end GlobalTheory

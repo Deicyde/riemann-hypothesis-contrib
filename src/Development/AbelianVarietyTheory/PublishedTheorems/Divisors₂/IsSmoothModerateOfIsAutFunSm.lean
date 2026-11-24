@@ -203,9 +203,7 @@ theorem gram_mulVec (X : Matrix (Fin n) (Fin r) E) (z : Fin n → E) (i : Fin r)
       = toLinearMapₛₗ₂' E (σ : E →+* E) (RingHom.id E) J (Xᵀ i) z :=
   gram_apply (s := 1) X (of fun a _ => z a) i 0
 
-theorem sigma_sigma (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
-  obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
-  exact τ.injective (by rw [h.2.2.2, h.2.2.2, star_star])
+alias sigma_sigma := _root_.GlobalTheory.AdelicU.cm_conj_conj
 
 theorem exists_cons
     {E V : Type} [Field E] [CharZero E] [AddCommGroup V] [Module E V]
@@ -255,7 +253,6 @@ theorem exists_isWittFrame (h : IsCMExt F E σ) (hJ : IsHermND σ J)
     simp only [B, toLinearMapₛₗ₂'_apply, smul_eq_mul, RingHom.id_apply, RingHom.coe_coe]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have hs : ∀ u v, B u v = (σ : E →+* E) (B v u) := fun u v => by
-
     simp only [hB, map_sum, map_mul, RingHom.coe_coe, sigma_sigma h, hJ.1]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring

@@ -54,7 +54,9 @@ import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMa
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff
 
 namespace Formalism.L2.Fam.ThC
@@ -75,16 +77,14 @@ theorem countable_primes : Countable (HeightOneSpectrum (𝓞 F)) := by
   have h : Function.Surjective fun s : Finset (𝓞 F) => Ideal.span (s : Set (𝓞 F)) := fun I =>
     (IsNoetherian.noetherian I)
   have := h.countable
-  exact Function.Injective.countable (f := HeightOneSpectrum.asIdeal) fun _ _ e => HeightOneSpectrum.ext e
+  exact Function.Injective.countable (f := HeightOneSpectrum.asIdeal) fun _ _ e =>
+    HeightOneSpectrum.ext e
 
 theorem sc_Fv (v : HeightOneSpectrum (𝓞 F)) : SecondCountableTopology (v.adicCompletion F) := by
   have := countable_F F
   have : TopologicalSpace.SeparableSpace (v.adicCompletion F) :=
     ⟨_, Set.countable_range _, v.denseRange_algebraMap F⟩
   infer_instance
-
-theorem sc_Af : SecondCountableTopology (FiniteAdeleRing (𝓞 F) F) := by
-  apply GlobalTheory.AdelicUnitaryTop.secondCountable_finiteAdele <;> assumption
 
 variable {F} {E : Type} [Field E] [NumberField E] [Algebra F E]
 

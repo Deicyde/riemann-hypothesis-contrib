@@ -68,15 +68,6 @@ section
 
 variable {Y : Scheme.{u}}
 
-theorem sameNontrivialBoundary_refl (L : List Y.IdealSheafData)
-    : MarkedIdealWithBoundary.SameNontrivialBoundary L L :=
-  MarkedIdealWithBoundary.SameNontrivialBoundary.refl L
-
-theorem sameNontrivialBoundary_symm
-    {L L' : List Y.IdealSheafData} (h : MarkedIdealWithBoundary.SameNontrivialBoundary L L')
-    : MarkedIdealWithBoundary.SameNontrivialBoundary L' L :=
-  h.symm
-
 theorem sameNontrivialBoundary_nontrivialPart (L : List Y.IdealSheafData)
     : MarkedIdealWithBoundary.SameNontrivialBoundary (MarkedIdealWithBoundary.nontrivialPart L)
       L := by
@@ -99,7 +90,10 @@ theorem sameNontrivialBoundary_cons
     {D : Y.IdealSheafData} {L L' : List Y.IdealSheafData}
     (h : MarkedIdealWithBoundary.SameNontrivialBoundary L L')
     : MarkedIdealWithBoundary.SameNontrivialBoundary (D :: L) (D :: L') :=
-  sameNontrivialBoundary_append (sameNontrivialBoundary_refl [D]) h
+  sameNontrivialBoundary_append
+    (_root_.FunctorialResolution.EmbeddedResolution.MarkedIdealWithBoundary.SameNontrivialBoundary.refl
+      [D])
+    h
 
 theorem sameNontrivialBoundary_cancel_left
     {L₁ L₂ L₁' L₂' : List Y.IdealSheafData}
@@ -140,15 +134,18 @@ theorem lastBoundary_eq_append
     : t.boundary t.length
       = R.boundary.map (t.iteratedStrictTransform t.length)
         ++ t.boundaryFrom ([] : List R.scheme.IdealSheafData) t.length := by
-  rw [← MarkedBlowupSequenceData.toBlowupSequenceData_boundary_eq t t.length le_rfl,
-    ← BlowupSequenceData.boundary_append, List.append_nil]
+  rw
+    [← _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toBlowupSequenceData_boundary_eq_boundary_of_le
+        t t.length le_rfl,
+      ← BlowupSequenceData.boundary_append, List.append_nil]
 
 theorem length_boundary_le_length_lastBoundary
     (R : MarkedIdealWithBoundary.{u})
     (t : MarkedBlowupSequenceData R.structMap R.ideal R.mult R.boundary)
     : R.boundary.length ≤ (t.boundary t.length).length := by
   have h : t.boundaryFrom R.boundary t.length = t.boundary t.length :=
-    MarkedBlowupSequenceData.toBlowupSequenceData_boundary_eq t t.length le_rfl
+    _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toBlowupSequenceData_boundary_eq_boundary_of_le
+      t t.length le_rfl
   have h3 : (t.boundary t.length).length = R.boundary.length + t.length := by
     rw [← h]
     exact BlowupSequenceData.boundary_length _ _ _
@@ -362,12 +359,14 @@ theorem lastMap_comp_projectionToBase : D.lastMap ≫ s.proj s.length = s'.proj 
       : s.toMarkedSequenceOfBlowups.toSequenceOfBlowups.projectionToBase
           s.toMarkedSequenceOfBlowups.toSequenceOfBlowups.length
         = s.proj s.length :=
-    toMarkedSequence_projectionToBase s _
+    _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toMarkedSequence_projectionToBase
+      s _
   have e2
       : s'.toMarkedSequenceOfBlowups.toSequenceOfBlowups.projectionToBase
           s'.toMarkedSequenceOfBlowups.toSequenceOfBlowups.length
         = s'.proj s'.length :=
-    toMarkedSequence_projectionToBase s' _
+    _root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toMarkedSequence_projectionToBase
+      s' _
   rw [e1, e2] at h
   exact h
 
@@ -412,14 +411,18 @@ theorem iteratedStrictTransform_comap_lastMap
       = s'.iteratedStrictTransform s'.length (M.comap q) := by
   have hz0s
       : s.toMarkedSequenceOfBlowups.toSequenceOfBlowups.projectionToBase 0 = s.isoZero.hom := by
-    rw [toMarkedSequence_projectionToBase s 0,
-      MarkedBlowupSequenceData.projectionToBase_eq_toBlowupSequenceData_projectionToBase,
-      BlowupSequenceData.projectionToBase_zero]
+    rw
+      [_root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toMarkedSequence_projectionToBase
+          s 0,
+        MarkedBlowupSequenceData.projectionToBase_eq_toBlowupSequenceData_projectionToBase,
+        BlowupSequenceData.projectionToBase_zero]
   have hz0s'
       : s'.toMarkedSequenceOfBlowups.toSequenceOfBlowups.projectionToBase 0 = s'.isoZero.hom := by
-    rw [toMarkedSequence_projectionToBase s' 0,
-      MarkedBlowupSequenceData.projectionToBase_eq_toBlowupSequenceData_projectionToBase,
-      BlowupSequenceData.projectionToBase_zero]
+    rw
+      [_root_.FunctorialResolution.EmbeddedResolution.MarkedBlowupSequenceData.toMarkedSequence_projectionToBase
+          s' 0,
+        MarkedBlowupSequenceData.projectionToBase_eq_toBlowupSequenceData_projectionToBase,
+        BlowupSequenceData.projectionToBase_zero]
   have hsq :=
     SequenceOfBlowupsPullback.mapToEarlierScheme_comp_projectionToBase D 0 (Nat.zero_le _) 0
       (Nat.zero_le _)
@@ -515,7 +518,9 @@ private theorem sameNontrivialBoundary_take_succ_of_getElem_eq
     : MarkedIdealWithBoundary.SameNontrivialBoundary ((L.take (n + 1)).map f) (M.take (m + 1)) := by
   rw [List.take_succ_eq_append_getElem hn, List.take_succ_eq_append_getElem hm, List.map_append,
     List.map_cons, List.map_nil, hf]
-  exact sameNontrivialBoundary_append h (sameNontrivialBoundary_refl _)
+  exact sameNontrivialBoundary_append h
+    (_root_.FunctorialResolution.EmbeddedResolution.MarkedIdealWithBoundary.SameNontrivialBoundary.refl
+      _)
 
 theorem sameNontrivialBoundary_lastBoundary_take
     [AlgebraicGeometry.Flat q]
@@ -532,7 +537,9 @@ theorem sameNontrivialBoundary_lastBoundary_take
     intro _
     rw [survivingBoundaryCount_zero]
     simp only [List.take_zero, List.map_nil]
-    exact sameNontrivialBoundary_refl _
+    exact
+      _root_.FunctorialResolution.EmbeddedResolution.MarkedIdealWithBoundary.SameNontrivialBoundary.refl
+        _
   | succ n ih =>
     intro hn
     have hi : n < S.boundary.length := by omega
@@ -728,7 +735,8 @@ theorem pullbackAlong_derivedTriple_eq
       (MaxContactCoverData.derivedTriple (pullbackWithNontrivialBoundary S q) s' hftT
         (extra.map fun A => A.comap D.lastMap) keep').boundary)
     (hp := ?_) (hI := ?_) (hm := ?_) (hE := ?_)
-  · simp only [LowerDimReductionPullback.structureMorphism_derivedTriple]
+  · simp
+      only [_root_.FunctorialResolution.EmbeddedResolution.MaxContactCoverData.derivedTriple_structureMorphism]
     exact lastMap_comp_structureMorphism S q s s' D
   · simp only [LowerDimReductionPullback.ideal_derivedTriple]
     exact tunedIdealAtLength_comap_lastMap S q s s' D hstar hV hV' hftS hftT hsm

@@ -158,7 +158,7 @@ theorem key (Φ : V → ℂ) (hc : Continuous Φ) (hs : HasCompactSupport Φ) (z
           (hχc.comp ((continuous_snd.add continuous_const).prodMk continuous_fst))
       exact hcont.aestronglyMeasurable
     · filter_upwards with p
-      simp [Function.uncurry, norm_mul, hn]
+      simp [Function.uncurry, hn]
   rw [integral_integral_swap hint]
   have h2
       : ∀ x,
@@ -218,7 +218,7 @@ theorem selfDual_of_pairs
         continuous_const)).aestronglyMeasurable).indicator (hMo k).measurableSet
     · filter_upwards with y
       by_cases hy : y ∈ (M k : Set V)
-      · simp [Set.indicator_of_mem hy, norm_mul, hn]
+      · simp [Set.indicator_of_mem hy, hn]
       · simp [Set.indicator_of_notMem hy]
     · filter_upwards with y
       refine tendsto_const_nhds.congr' ?_

@@ -50,9 +50,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 section Guard
 
 open Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR GlobalTheory.BigTop

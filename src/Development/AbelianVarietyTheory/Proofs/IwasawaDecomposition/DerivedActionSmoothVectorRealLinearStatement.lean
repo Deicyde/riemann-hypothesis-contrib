@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Matrix Filter
 open scoped TensorProduct ContDiff InnerProductSpace Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.derived_action_smooth_vector_real_linear
     : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.derived_action_smooth_vector_real_linear
               dRep (trRep σ P) (X + Y) w = dRep (trRep σ P) X w + dRep (trRep σ P) Y w)
             ∧ ∀ (a : ℝ), ∀ X ∈ lieG G,
               dRep (trRep σ P) (a • X) w = (a : ℂ) • dRep (trRep σ P) X w := by
-  first
-  | exact @GlobalTheory.SmVecLinear.dRep_linear
-  | exact GlobalTheory.SmVecLinear.dRep_linear
-  | (intros; apply GlobalTheory.SmVecLinear.dRep_linear <;> assumption)
+  first | exact @GlobalTheory.SmVecLinear.dRep_linear

@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmoothConeInteriorDefiniteBalancedForm
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteMinimiserSystemsSmoothConeStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteMinimiserSystemsSmoothCone
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -177,7 +177,6 @@ theorem exists_nat_comb_of_infinite
         at this
     rw [Finset.sum_eq_zero fun j _ => by rw [if_neg (ho j).symm]; simp] at this
     have hk' : (k : ℤ) ≠ 0 := by exact_mod_cast hk0.ne'
-    push_cast at this
     exact (mul_eq_zero.1 this).resolve_left hk'
   have hp : ∀ n ∈ s, ∀ j, 0 ≤ (n : ℤ) * bb.repr B' (Sum.inl j) + bb.repr B₀ (Sum.inl j) := by
     intro n hn j
@@ -282,7 +281,7 @@ theorem exists_finite_cones
     have hdick :=
       fun (x : Σ m : ℕ, Fin m → LinearMap.BilinForm ℤ (Fin r → ℤ))
           (h : IsCone id φ x.2 ∧ (∀ y, y ≠ 0 → 0 < ∑ j, x.2 j y y)) =>
-        GlobalTheory.T.finite_minimiser_systems_smooth_cone φ W hW N hN r x.1 x.2 h.1 h.2
+        _root_.GlobalTheory.Poinc.MinSys.finite_minimiser_systems φ W hW N hN r x.1 x.2 h.1 h.2
     let Fμ
         : (Σ m : ℕ, Fin m → LinearMap.BilinForm ℤ (Fin r → ℤ))
           → Set ((Fin 8 → Fin r → ZMod N) → (Fin 8 → Fin r → ℤ)) := fun x =>

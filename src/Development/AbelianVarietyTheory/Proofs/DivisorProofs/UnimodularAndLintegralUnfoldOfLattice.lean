@@ -77,7 +77,7 @@ theorem isMulRightInvariant_of_lattice
   have h1 : (c : ENNReal) * ν 𝓑 = 1 * ν 𝓑 := by
     calc
       (c : ENNReal) * ν 𝓑
-        = (c • ν) 𝓑 := by simp [Measure.smul_apply]
+        = (c • ν) 𝓑 := by simp
       _ = (ν.map (· * x)) 𝓑 := by rw [hc]
       _ = 1 * ν 𝓑 := by rw [one_mul]; exact hmap.trans hm
   have hc1 : c = 1 := by

@@ -44,9 +44,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
   Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.lieAction_fockOperators_scalars_trace
     : ∀ D : D7, GlobalTheory.ChainFr.LieFockAll D := by
-  first
-  | exact @GlobalTheory.LieScalar.lieFockAll
-  | exact GlobalTheory.LieScalar.lieFockAll
-  | (intros; apply GlobalTheory.LieScalar.lieFockAll <;> assumption)
+  first | exact @GlobalTheory.LieScalar.lieFockAll

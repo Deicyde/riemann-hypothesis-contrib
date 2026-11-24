@@ -91,20 +91,13 @@ theorem ev_pow_mul_sub (v : HeightOneSpectrum (𝓞 F)) {W : Set (Fv F v)} (hW :
     ((unifV_spec v).2.1.eventually ((Valued.is_topological_valuation _).mpr ⟨γ, subset_rfl⟩)).exists
   refine ⟨n, fun s hs => hγ ?_⟩
   have hs' : Valued.v s ≤ 1 := hs
-  have hs'' : Valued.v.restrict s ≤ 1 := by
-    first
-    | simpa using hs'
-    | exact_mod_cast hs'
-    | (rw [← map_one Valued.v.restrict]; simpa [Valuation.restrict_le_iff] using hs')
+  have hs'' : Valued.v.restrict s ≤ 1 := by first | simpa using hs'
   show Valued.v.restrict (unifV v ^ n * s) < _
   rw [map_mul]
   have h1
       : Valued.v.restrict (unifV v ^ n) * Valued.v.restrict s
         ≤ Valued.v.restrict (unifV v ^ n) := by
-    first
-    | exact mul_le_of_le_one_right' hs''
-    | exact (mul_le_mul' le_rfl hs'').trans (mul_one _).le
-    | exact mul_le_of_le_one_right (zero_le _) hs''
+    first | exact mul_le_of_le_one_right' hs''
   exact lt_of_le_of_lt h1 hn
 
 def U0 (I : Finset (HeightOneSpectrum (𝓞 F))) (n : HeightOneSpectrum (𝓞 F) → ℕ)
@@ -132,17 +125,12 @@ theorem isOpen_adelic_neighbourhood
     : IsOpen (U0 I n : Set (Af F)) := by
   have hO : ∀ w : HeightOneSpectrum (𝓞 F), IsOpen (w.adicCompletionIntegers F : Set (Fv F w)) := by
     intro w
-    first
-    | exact Valued.isOpen_valuationSubring _
-    | exact Valued.valuationSubring_isOpen _
-    | exact (w.adicCompletionIntegers F).isOpen
+    first | exact Valued.isOpen_valuationSubring _
   have hev : ∀ w : HeightOneSpectrum (𝓞 F), Continuous fun y : Af F => y w := by
     intro w
-    first | exact RestrictedProduct.continuous_eval w | exact RestrictedProduct.continuous_apply w
+    first | exact RestrictedProduct.continuous_eval w
   have h1 : IsOpen {y : Af F | ∀ w, y w ∈ w.adicCompletionIntegers F} := by
-    first
-    | exact RestrictedProduct.isOpen_forall_mem hO
-    | exact RestrictedProduct.isOpen_forall_mem (fun w => hO w)
+    first | exact RestrictedProduct.isOpen_forall_mem hO
   have h2 : IsOpen {y : Af F | ∀ w ∈ I, (unifV w ^ n w)⁻¹ * y w ∈ w.adicCompletionIntegers F} := by
     have e
         : {y : Af F | ∀ w ∈ I, (unifV w ^ n w)⁻¹ * y w ∈ w.adicCompletionIntegers F}

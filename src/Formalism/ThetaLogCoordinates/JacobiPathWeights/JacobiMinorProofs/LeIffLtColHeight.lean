@@ -215,9 +215,7 @@ theorem path_ncard
   · rw [if_pos hv] at h
     exact changed_ncard (ha _ hi) (ha _ hi.le) h
   · rw [if_neg hv] at h
-    have := changed_ncard (ha _ hi.le) (ha _ hi) h
-    simp only [ne_comm] at this ⊢
-    exact this
+    simpa only [ne_comm] using changed_ncard (ha _ hi.le) (ha _ hi) h
 
 theorem path_finite
     {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ} (hp : IsPath n isVec B μ N)
@@ -229,9 +227,7 @@ theorem path_finite
   · rw [if_pos hv] at h
     exact changed_finite (ha _ hi) (ha _ hi.le) h
   · rw [if_neg hv] at h
-    have := changed_finite (ha _ hi.le) (ha _ hi) h
-    simp only [ne_comm] at this ⊢
-    exact this
+    simpa only [ne_comm] using changed_finite (ha _ hi.le) (ha _ hi) h
 
 end Paths
 

@@ -74,6 +74,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.wittDecomposition_mixedCoords_rank_zero
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       (∀ (S S₀ T : HSp D) (d : HypDec S S₀ 0) (μ : Measure (Mx D T.rank 0))
@@ -90,7 +91,4 @@ theorem _root_.GlobalTheory.T.wittDecomposition_mixedCoords_rank_zero
                 = fun w => f (d.inc0 S w))
         ∧ ∀ (S S₀ : HSp D) (d : HypDec S S₀ 0),
           (∀ a, d.levi a = 1) ∧ (∀ b, d.nB b = 1) ∧ ∀ c, d.nC c = 1 := by
-  first
-  | exact @GlobalTheory.Unf.mixRankZero
-  | exact GlobalTheory.Unf.mixRankZero
-  | (intros; apply GlobalTheory.Unf.mixRankZero <;> assumption)
+  first | exact @GlobalTheory.Unf.mixRankZero

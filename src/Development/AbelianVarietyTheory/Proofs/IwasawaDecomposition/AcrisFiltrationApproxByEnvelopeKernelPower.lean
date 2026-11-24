@@ -67,9 +67,7 @@ theorem dense_ker_of_bounded
   · rw [map_add (f := _), map_mul, map_natCast]
     ring
 
-theorem ev_algebraMap (l : ℕ) [Fact l.Prime] (n : ℕ) (a : Per.AinfP l)
-    : Per.ev l n (algebraMap (Per.AinfP l) (Per.BdRp l) a) = Ideal.Quotient.mk _ a :=
-  GlobalTheory.RingIface.ev_alg l n a
+alias ev_algebraMap := _root_.GlobalTheory.RingIface.ev_alg
 
 theorem fil_dense
     : ∀ (l : ℕ) [Fact l.Prime], ∀ j : Per.Acris l →+* Per.BdRp l,

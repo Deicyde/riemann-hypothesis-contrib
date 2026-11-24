@@ -57,8 +57,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace GlobalTheory.AlgLawsCompare
@@ -267,7 +265,7 @@ theorem reFrame : Formalism.L2.PjFree.ReFrame Xo c := by
   obtain ⟨zx, zo, zu, zt, ze, zb, zs, zg⟩ := z
   simp only at hx
   subst hx
-  obtain ⟨u0, hu0⟩ := IntRebase.gen_unit' (x := y0.1.x) zs y0.1.s zg y0.1.gen
+  obtain ⟨u0, hu0⟩ := _root_.GlobalTheory.Frames.ChgOf.gen_unit' (x := y0.1.x) zs y0.1.s zg y0.1.gen
   refine ⟨
     ⟨
       IntRebase.rebase₂ y0.1 _ hK,

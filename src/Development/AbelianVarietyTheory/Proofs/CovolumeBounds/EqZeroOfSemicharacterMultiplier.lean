@@ -538,10 +538,6 @@ theorem finrank_thetaLevelChar (hτ : τ ∈ SiegelH ι) (hN : 0 < N)
     LinearIndependent.of_comp (thetaLevelChar a b N τ).subtype h
   simpa using h'.fintype_card_le_finrank
 
-theorem finrank_thetaLevel (hτ : τ ∈ SiegelH ι) (hN : 0 < N)
-    : Module.finrank ℂ (thetaLevel N τ) = N ^ Fintype.card ι :=
-  thetaLevelChar_zero N τ ▸ finrank_thetaLevelChar hτ hN
-
 theorem span_levelTheta
     (hτ : τ ∈ SiegelH ι) (hN : 0 < N)
     {κ : Type*} {r : κ → ι → ℤ} (hr : Function.Bijective fun k i => (r k i : ZMod N))

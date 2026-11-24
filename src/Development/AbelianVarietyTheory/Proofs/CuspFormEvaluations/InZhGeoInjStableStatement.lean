@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.inZh_geoInj_stable_alt
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (n : ℕ) (Λ : GenLat E n) (N : ℕ),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.inZh_geoInj_stable_alt
         ∧ (Λ.TrivAt l.M
           → ∀ (T : Over Xo.X) (u : Fin n → (T ⟶ Xo.univ.t.G)),
             (∀ b, u b ^ N = 1 ∧ ∃ j : ℕ, KilledBy Xo (l.Mb ^ j) (u b)) → InZh Xo Λ N u) := by
-  first
-  | exact @GlobalTheory.inZh_geoInj_stable
-  | exact GlobalTheory.inZh_geoInj_stable
-  | (intros; apply GlobalTheory.inZh_geoInj_stable <;> assumption)
+  first | exact @GlobalTheory.inZh_geoInj_stable

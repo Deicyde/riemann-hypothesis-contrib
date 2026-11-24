@@ -263,7 +263,6 @@ theorem sum_mem_lev_iff
     : (∑ c, X a c * σS (p c)) ∈ lev hG.pS k ↔ (∑ c, p c * X c a) ∈ lev hG.pS k := by
   rw [← sig_mem_lev_iff hG k (∑ c, X a c * σS (p c))]
   have : σS (∑ c, X a c * σS (p c)) = ∑ c, p c * X c a := by
-
     rw [map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     have h := congrFun (congrFun hX c) a

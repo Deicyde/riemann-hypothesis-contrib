@@ -71,7 +71,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -81,9 +82,8 @@ namespace GlobalTheory.ThetaLiouville
 
 open Matrix Complex
 
-theorem conj_form {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (hH : Hm.IsHermitian) (w l : Fin g → ℂ) :
-    l ⬝ᵥ Hm.mulVec (star w) = (starRingEnd ℂ) (w ⬝ᵥ Hm.mulVec (star l)) := by
-
+theorem conj_form {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (hH : Hm.IsHermitian) (w l : Fin g → ℂ)
+    : l ⬝ᵥ Hm.mulVec (star w) = (starRingEnd ℂ) (w ⬝ᵥ Hm.mulVec (star l)) := by
   simp only [dotProduct, mulVec, map_sum, map_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -94,9 +94,9 @@ theorem conj_form {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (hH : Hm.IsHermiti
   rw [h1]
   ring
 
-theorem exists_basis_in {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ))
-    (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤) :
-    ∃ (s : Set (Fin g → ℂ)) (b : Module.Basis s ℝ (Fin g → ℂ)), Finite s ∧ ∀ i, b i ∈ Λ := by
+theorem exists_basis_in
+    {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ)) (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+    : ∃ (s : Set (Fin g → ℂ)) (b : Module.Basis s ℝ (Fin g → ℂ)), Finite s ∧ ∀ i, b i ∈ Λ := by
   obtain ⟨s, hs, hsp, hli⟩ := exists_linearIndependent ℝ (Λ : Set (Fin g → ℂ))
   let b := Module.Basis.mk hli (by rw [Subtype.range_coe, hsp, hΛ])
   refine ⟨s, b, ?_, ?_⟩
@@ -111,36 +111,39 @@ namespace GlobalTheory.ThetaLiouville
 
 open Matrix Complex
 
-theorem im_form_mem_int (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ))
-    (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+theorem im_form_mem_int
+    (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
     (Hm : Matrix (Fin g) (Fin g) ℂ) (hH : Hm.IsHermitian) (w : Fin g → ℂ) (θ : (Fin g → ℂ) → ℂ)
     (hθ : Differentiable ℂ θ) (hθ0 : ∀ z, θ z ≠ 0)
-    (hper : ∀ l ∈ Λ, ∀ z, θ (z + l) = Complex.exp (Real.pi * (w ⬝ᵥ Hm.mulVec (star l))) * θ z) :
-    ∀ l ∈ Λ, ∃ n : ℤ, (w ⬝ᵥ Hm.mulVec (star l)).im = n := by
+    (hper : ∀ l ∈ Λ, ∀ z, θ (z + l) = Complex.exp (Real.pi * (w ⬝ᵥ Hm.mulVec (star l))) * θ z)
+    : ∀ l ∈ Λ, ∃ n : ℤ, (w ⬝ᵥ Hm.mulVec (star l)).im = n := by
   set u : Fin g → ℂ := Hm.mulVec (star w) with hu
   let ψ : (Fin g → ℂ) → ℂ := fun z => θ z * Complex.exp (-(Real.pi * (z ⬝ᵥ u)))
   have hlin : Differentiable ℂ (fun z : Fin g → ℂ => z ⬝ᵥ u) := by
     have : (fun z : Fin g → ℂ => z ⬝ᵥ u) = fun z => ∑ i, z i * u i := rfl
     rw [this]
     exact Differentiable.fun_sum fun i _ => (differentiable_apply i).mul_const _
-  have hψ : Differentiable ℂ ψ :=
-    hθ.mul ((hlin.const_mul _).neg.cexp)
+  have hψ : Differentiable ℂ ψ := hθ.mul ((hlin.const_mul _).neg.cexp)
 
-  have hshift : ∀ l ∈ Λ, ∀ z, ψ (z + l) = ψ z *
-      Complex.exp (Real.pi * (((2 * (w ⬝ᵥ Hm.mulVec (star l)).im : ℝ) : ℂ) * I)) := by
+  have hshift
+      : ∀ l ∈ Λ, ∀ z,
+        ψ (z + l)
+          = ψ z * Complex.exp (Real.pi * (((2 * (w ⬝ᵥ Hm.mulVec (star l)).im : ℝ) : ℂ) * I)) := by
     intro l hl z
     have hc := conj_form Hm hH w l
     simp only [ψ, hper l hl z, add_dotProduct]
     rw [hc]
     set a := w ⬝ᵥ Hm.mulVec (star l)
-    have hsub : a - (starRingEnd ℂ) a = ((2 * a.im : ℝ) : ℂ) * I := by
-      rw [Complex.sub_conj]
+    have hsub : a - (starRingEnd ℂ) a = ((2 * a.im : ℝ) : ℂ) * I := by rw [Complex.sub_conj]
     rw [← hsub]
-    rw [show -(↑Real.pi * (z ⬝ᵥ u + (starRingEnd ℂ) a)) =
-        -(↑Real.pi * (z ⬝ᵥ u)) + (-(↑Real.pi * (starRingEnd ℂ) a)) by ring,
+    rw [show -(↑Real.pi * (z ⬝ᵥ u + (starRingEnd ℂ) a))
+          = -(↑Real.pi * (z ⬝ᵥ u)) + (-(↑Real.pi * (starRingEnd ℂ) a)) by
+        ring,
       Complex.exp_add,
-      show (↑Real.pi * (a - (starRingEnd ℂ) a)) = ↑Real.pi * a + (-(↑Real.pi * (starRingEnd ℂ) a))
-        by ring, Complex.exp_add]
+      show (↑Real.pi * (a - (starRingEnd ℂ) a))
+          = ↑Real.pi * a + (-(↑Real.pi * (starRingEnd ℂ) a)) by
+        ring,
+      Complex.exp_add]
     ring
   have hnorm : ∀ l ∈ Λ, ∀ z, ‖ψ (z + l)‖ = ‖ψ z‖ := by
     intro l hl z
@@ -163,8 +166,7 @@ theorem im_form_mem_int (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ))
     rw [isBounded_iff_forall_norm_le]
     refine ⟨C, ?_⟩
     rintro _ ⟨z, rfl⟩
-    have hz : z = ZSpan.fract b z + (ZSpan.floor b z : Fin g → ℂ) := by
-      rw [ZSpan.fract_apply]; abel
+    have hz : z = ZSpan.fract b z + (ZSpan.floor b z : Fin g → ℂ) := by rw [ZSpan.fract_apply]; abel
     rw [hz, hnorm _ (hspan _ (ZSpan.floor b z).2)]
     exact hC _ (subset_closure (ZSpan.fract_mem_fundamentalDomain b z))
   intro l hl
@@ -180,8 +182,8 @@ theorem im_form_mem_int (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ))
   have hI : (I : ℂ) ≠ 0 := Complex.I_ne_zero
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have h2 : ((w ⬝ᵥ Hm.mulVec (star l)).im : ℂ) = n := by
-    have : (Real.pi : ℂ) * 2 * I * ((w ⬝ᵥ Hm.mulVec (star l)).im : ℂ) =
-        (Real.pi : ℂ) * 2 * I * n := by
+    have : (Real.pi : ℂ) * 2 * I * ((w ⬝ᵥ Hm.mulVec (star l)).im : ℂ)
+        = (Real.pi : ℂ) * 2 * I * n := by
       push_cast at hn
       linear_combination hn
     have h0 : (Real.pi : ℂ) * 2 * I ≠ 0 := mul_ne_zero (mul_ne_zero hpi two_ne_zero) hI

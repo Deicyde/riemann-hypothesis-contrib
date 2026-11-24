@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.realization_family_normal_operators
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.realization_family_normal_operators
       R.toLevCh.Is A.μ0 → R.IsFam → R.IsModels
         → (∀ t, ∃ h, IsOpsX R t h ∧ NormalFam (Good R t) h)
           ∧ ∀ i t, ∃ h, IsOpsV R i t h ∧ NormalFam (Good R t) h := by
-  first
-  | exact @GlobalTheory.DefiniteOps.definite_ops
-  | exact GlobalTheory.DefiniteOps.definite_ops
-  | (intros; apply GlobalTheory.DefiniteOps.definite_ops <;> assumption)
+  first | exact @GlobalTheory.DefiniteOps.definite_ops

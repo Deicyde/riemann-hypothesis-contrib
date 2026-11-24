@@ -1,10 +1,11 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.BlochKatoSelmerVanishes
-import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PadicHodgePropertiesConjInvariant
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PeriodRingsRegularPhiSurjectiveFilStatement
+public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PeriodRingsRegularPhiSurjectiveFil
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TiedIsCrysDual
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
 import Formalism.AdmissibleDesigns.InvariantsEqBotIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -107,8 +108,8 @@ theorem UpperTheory.potentiallyCrystalline_contragredient
     have := L₁.2
     have hd :=
       GlobalTheory.Per.TiedDual.tied_isCrys_dual l (UpperTheory.V.Loc.PP l)
-        (UpperTheory.V.Loc.AIP l) T
-        (GlobalTheory.T.periodRings_regular_phi_surjective_fil l _ _ T).1 K' L₁ _ _ hc
+        (UpperTheory.V.Loc.AIP l) T (_root_.GlobalTheory.MemLoc.tied_regular_and_onto l _ _ T).1 K'
+        L₁ _ _ hc
     refine Formalism.MainNotions.N.K.Norm.isCrys_congr _ (dotProductEquiv ↥L₁.1 (Fin n)).symm
       (dot_symm _ _ fun g x y => ?_) hd
     change x ⬝ᵥ (Bw.repE L₁ r₁ _ y) = (Bw.repE L₁ (tinv r₁) _ x) ⬝ᵥ y

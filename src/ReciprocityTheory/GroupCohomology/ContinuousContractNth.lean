@@ -71,28 +71,34 @@ structure TRep (R : Type u) [CommRing R] (G : Type u) [Group G] [TopologicalSpac
 
 attribute [instance] TRep.acg TRep.mod TRep.top TRep.tag TRep.ccs
 
-variable {G G' G'' : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [Group G'] [TopologicalSpace G'] [IsTopologicalGroup G']
-  [Group G''] [TopologicalSpace G''] [IsTopologicalGroup G'']
+variable
+  {G G' G'' : Type u}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group G'] [TopologicalSpace G']
+  [IsTopologicalGroup G'] [Group G''] [TopologicalSpace G''] [IsTopologicalGroup G'']
 
-theorem dn_dn {M : Type u} [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
-    [ContinuousConstSMul R M] (rho : Representation R G M) (n : ℕ) (f : (Fin n → G) → M) :
-    dn rho (n + 1) (dn rho n f) = 0 := by
+theorem dn_dn
+    {M : Type u} [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+    [ContinuousConstSMul R M]
+    (rho : Representation R G M)
+    (n : ℕ) (f : (Fin n → G) → M)
+    : dn rho (n + 1) (dn rho n f) = 0 := by
   have h := groupCohomology.inhomogeneousCochains.d_comp_d (Rep.of rho) (n := n)
   exact congrArg (fun φ => φ.hom f) h
 
-theorem continuous_contractNth (n : ℕ) (j : Fin (n + 1)) :
-    Continuous fun g : Fin (n + 1) → G => Fin.contractNth j (· * ·) g := by
+theorem continuous_contractNth (n : ℕ) (j : Fin (n + 1))
+    : Continuous fun g : Fin (n + 1) → G => Fin.contractNth j (· * ·) g := by
   refine continuous_pi fun k => ?_
   unfold Fin.contractNth
   split_ifs <;> fun_prop
 
-theorem continuous_dn (M : TRep R G) (n : ℕ) {f : (Fin n → G) → M.V} (hf : Continuous f) :
-    Continuous (dn M.rho n f) := by
+theorem continuous_dn (M : TRep R G) (n : ℕ) {f : (Fin n → G) → M.V} (hf : Continuous f)
+    : Continuous (dn M.rho n f) := by
   have h1 : Continuous fun g : Fin (n + 1) → G => M.rho (g 0) (f fun i => g i.succ) :=
-    M.cont.comp (f := fun g : Fin (n + 1) → G => (g 0, f fun i => g i.succ))
+    M.cont.comp
+      (f := fun g : Fin (n + 1) → G => (g 0, f fun i => g i.succ))
       ((continuous_apply 0).prodMk (hf.comp (continuous_pi fun i => continuous_apply _)))
-  exact h1.add (continuous_finsetSum _ fun j _ => (hf.comp (continuous_contractNth n j)).const_smul _)
+  exact h1.add (continuous_finsetSum _ fun j _ =>
+    (hf.comp (continuous_contractNth n j)).const_smul _)
 
 namespace TRep
 
@@ -106,8 +112,10 @@ abbrev H (M : TRep R G) (n : ℕ) := M.coch.H n
 def res (M : TRep R G) (φ : G' →* G) (hφ : Continuous φ) : TRep R G' where
   V := M.V
   rho := M.rho.comp φ
-  cont := M.cont.comp (f := fun p : G' × M.V => (φ p.1, p.2))
-    ((hφ.comp continuous_fst).prodMk continuous_snd)
+  cont :=
+    M.cont.comp
+      (f := fun p : G' × M.V => (φ p.1, p.2))
+      ((hφ.comp continuous_fst).prodMk continuous_snd)
 
 abbrev resSub (M : TRep R G) (U : Subgroup G) : TRep R U := M.res U.subtype continuous_subtype_val
 
@@ -120,26 +128,33 @@ structure Pair (M : TRep R G) (M' : TRep R G') where
   u_cont : Continuous u
   equiv : ∀ g m, u (M.rho (φ g) m) = M'.rho g (u m)
 
-theorem contractNth_map (φ : G' →* G) (n : ℕ) (j : Fin (n + 1)) (g : Fin (n + 1) → G') :
-    (fun i => φ (Fin.contractNth j (· * ·) g i)) = Fin.contractNth j (· * ·) fun i => φ (g i) := by
+theorem contractNth_map (φ : G' →* G) (n : ℕ) (j : Fin (n + 1)) (g : Fin (n + 1) → G')
+    : (fun i => φ (Fin.contractNth j (· * ·) g i))
+      = Fin.contractNth j (· * ·) fun i => φ (g i) := by
   funext k
   unfold Fin.contractNth
   split_ifs <;> simp
 
 def Pair.hom {M : TRep R G} {M' : TRep R G'} (P : Pair M M') : Cx.Hom M.coch M'.coch where
-  f n :=
-    { toFun := fun f => ⟨fun g => P.u (f.1 fun i => P.φ (g i)),
-        P.u_cont.comp (Continuous.comp f.2 (continuous_pi fun i => P.φ_cont.comp (continuous_apply i)))⟩
-      map_add' := fun f f' => Subtype.ext (funext fun g => map_add P.u _ _)
-      map_smul' := fun r f => Subtype.ext (funext fun g => map_smul P.u _ _) }
+  f n := {
+    toFun := fun f => ⟨
+      fun g => P.u (f.1 fun i => P.φ (g i)),
+      P.u_cont.comp (Continuous.comp f.2
+        (continuous_pi fun i => P.φ_cont.comp (continuous_apply i)))
+    ⟩
+    map_add' := fun f f' => Subtype.ext (funext fun g => map_add P.u _ _)
+    map_smul' := fun r f => Subtype.ext (funext fun g => map_smul P.u _ _)
+  }
   comm n f := by
     refine Subtype.ext (funext fun g => ?_)
     show P.u (dn M.rho n f.1 fun i => P.φ (g i)) = dn M'.rho n (fun g => P.u (f.1 fun i => P.φ (g i))) g
 
     simp only [dn_apply, map_add (f := _), map_sum, map_smul, P.equiv, contractNth_map]
 
-def Pair.ofMap {M M' : TRep R G} (u : M.V →ₗ[R] M'.V) (hu : Continuous u)
-    (he : ∀ g m, u (M.rho g m) = M'.rho g (u m)) : Pair M M' :=
+def Pair.ofMap
+    {M M' : TRep R G}
+    (u : M.V →ₗ[R] M'.V) (hu : Continuous u) (he : ∀ g m, u (M.rho g m) = M'.rho g (u m))
+    : Pair M M' :=
   ⟨MonoidHom.id G, u, continuous_id, hu, he⟩
 
 def Pair.res (M : TRep R G) (φ : G' →* G) (hφ : Continuous φ) : Pair M (M.res φ hφ) :=
@@ -152,14 +167,16 @@ structure admitted {A B C : TRep R G} (i : Pair A B) (p : Pair B C) : Prop where
   exact : Function.Exact i.u p.u
   sec : ∃ s : C.V → B.V, Continuous s ∧ ∀ c, p.u (s c) = c
 
-def IsInvRep (M : TRep R G) (N : Subgroup G) [N.Normal] (Q : TRep R (G ⧸ N)) (P : Pair Q M) : Prop :=
-  P.φ = QuotientGroup.mk' N ∧ Topology.IsEmbedding P.u ∧
-    ∀ m, m ∈ LinearMap.range P.u ↔ ∀ g ∈ N, M.rho g m = m
+def IsInvRep (M : TRep R G) (N : Subgroup G) [N.Normal] (Q : TRep R (G ⧸ N)) (P : Pair Q M)
+    : Prop :=
+  P.φ = QuotientGroup.mk' N ∧ Topology.IsEmbedding P.u
+    ∧ ∀ m, m ∈ LinearMap.range P.u ↔ ∀ g ∈ N, M.rho g m = m
 
 def rep (U : Subgroup G) (x : G) : G := (Quotient.mk (QuotientGroup.rightRel U) x).out
 
 theorem mul_rep_inv_mem (U : Subgroup G) (x : G) : x * (rep U x)⁻¹ ∈ U :=
-  QuotientGroup.rightRel_apply.1 (Quotient.exact (Quotient.out_eq (Quotient.mk (QuotientGroup.rightRel U) x)))
+  QuotientGroup.rightRel_apply.1 (Quotient.exact (Quotient.out_eq (Quotient.mk
+    (QuotientGroup.rightRel U) x)))
 
 def retr (U : Subgroup G) (x : G) : U := ⟨x * (rep U x)⁻¹, mul_rep_inv_mem U x⟩
 
@@ -175,21 +192,25 @@ structure Pairing (M N P : TRep R G) where
   cont : Continuous fun x : M.V × N.V => β x.1 x.2
   equiv : ∀ g m n, β (M.rho g m) (N.rho g n) = P.rho g (β m n)
 
-def cupFun {M N P : TRep R G} (b : Pairing M N P) (p q : ℕ) (f : (Fin p → G) → M.V)
-    (f' : (Fin q → G) → N.V) (g : Fin (p + q) → G) : P.V :=
+def cupFun
+    {M N P : TRep R G} (b : Pairing M N P)
+    (p q : ℕ) (f : (Fin p → G) → M.V) (f' : (Fin q → G) → N.V) (g : Fin (p + q) → G)
+    : P.V :=
   b.β (f fun i => g (Fin.castAdd q i))
     (N.rho (List.ofFn fun i => g (Fin.castAdd q i)).prod (f' fun j => g (Fin.natAdd p j)))
 
-def IsCup {M N P : TRep R G} (b : Pairing M N P)
-    (cup : ∀ p q, M.H p →ₗ[R] N.H q →ₗ[R] P.H (p + q)) : Prop :=
+def IsCup {M N P : TRep R G} (b : Pairing M N P) (cup : ∀ p q, M.H p →ₗ[R] N.H q →ₗ[R] P.H (p + q))
+    : Prop :=
   ∀ p q (x : M.coch.X p) (y : N.coch.X q) (hx : M.coch.d p x = 0) (hy : N.coch.d q y = 0),
-    ∃ (z : P.coch.X (p + q)) (hz : P.coch.d (p + q) z = 0), z.1 = cupFun b p q x.1 y.1 ∧
-      cup p q (M.coch.cls p x hx) (N.coch.cls q y hy) = P.coch.cls (p + q) z hz
+    ∃ (z : P.coch.X (p + q)) (hz : P.coch.d (p + q) z = 0),
+      z.1 = cupFun b p q x.1 y.1
+        ∧ cup p q (M.coch.cls p x hx) (N.coch.cls q y hy) = P.coch.cls (p + q) z hz
 
 def IsCoind (U : Subgroup G) (M : TRep R U) (C : TRep R G) (ev : Pair C M) : Prop :=
-  ev.φ = U.subtype ∧ ∃ j : C.V → C(G, M.V), Topology.IsEmbedding j ∧
-    (∀ c g, j c g = ev.u (C.rho g c)) ∧
-    ∀ f : C(G, M.V), (∀ (x : U) g, f (x * g) = M.rho x (f g)) → f ∈ Set.range j
+  ev.φ = U.subtype
+    ∧ ∃ j : C.V → C(G, M.V),
+      Topology.IsEmbedding j ∧ (∀ c g, j c g = ev.u (C.rho g c))
+        ∧ ∀ f : C(G, M.V), (∀ (x : U) g, f (x * g) = M.rho x (f g)) → f ∈ Set.range j
 
 structure SelData (M : TRep R G) (ι : Type u) where
   D : ι → Type u

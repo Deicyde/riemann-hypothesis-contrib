@@ -55,9 +55,5 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP GlobalTheory.Core.Rk.SWLaw
 open GlobalTheory.Core.Rk.SW
 
-
 theorem _root_.GlobalTheory.T.schrodingerTheta_eq_schwartzBruhat : ∀ D : D7, SchSchwartz D := by
-  first
-  | exact @GlobalTheory.SchSchwartzAll.schSchwartz
-  | exact GlobalTheory.SchSchwartzAll.schSchwartz
-  | (intros; apply GlobalTheory.SchSchwartzAll.schSchwartz <;> assumption)
+  first | exact @GlobalTheory.SchSchwartzAll.schSchwartz

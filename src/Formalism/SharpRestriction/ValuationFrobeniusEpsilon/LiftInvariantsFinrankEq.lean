@@ -191,7 +191,7 @@ def adAct
   toFun X := if g ∈ GF then r0 g * X * (r0 g)⁻¹ else -(r0 g * X.transpose * (r0 g)⁻¹)
   map_add' X Y := by
     split_ifs <;> simp [Matrix.mul_add, Matrix.add_mul, Matrix.transpose_add, add_comm]
-  map_smul' c X := by split_ifs <;> simp [Matrix.mul_smul, Matrix.smul_mul, Matrix.transpose_smul]
+  map_smul' c X := by split_ifs <;> simp [Matrix.transpose_smul]
 
 def invSub
     {G k : Type} [Field k]

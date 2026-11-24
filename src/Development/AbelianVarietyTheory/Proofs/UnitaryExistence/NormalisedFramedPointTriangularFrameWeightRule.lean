@@ -3,8 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.NormConst
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsCombAtIffIsDerivAt0
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ThetaPointsChangeLevelIsometryLinearMapStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.TriangularFrameMovesPeriodBlockTriangularStatement
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ThetaPointsChangeLevelIsometryLinearMap
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.TriangularFrameMovesPeriodBlockTriangular
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -136,8 +137,7 @@ theorem normUn_bor
                   Dom a n → toC (wchar (ex Dw a n) t) = bchar (laU (unfOf e F M un) a n k) b := by
   intro hS E _ _ _ H Dw l Xo c σ g e F r M un k T hG hB hN hU x b hb h
   obtain ⟨h₀, hdet, hP, htri, -, -, hw⟩ :=
-    GlobalTheory.T.triangularFrame_moves_period_blockTriangular E H Dw l Xo c σ g e F r M hG hB hN k
-      T.Pf T.per x.1 x.2 b hb
+    _root_.GlobalTheory.per_bor E H Dw l Xo c σ g e F r M hG hB hN k T.Pf T.per x.1 x.2 b hb
   obtain ⟨κ, hκ, hy⟩ := hU x
   obtain ⟨κ', hκ', hy'⟩ := hU ⟨_, h⟩
   have hx : T.co.symm x.1 ∈ T.co ⁻¹' (M.X k).dom := by
@@ -145,8 +145,8 @@ theorem normUn_bor
   have hx' : T.co.symm (rmul x.1 b) ∈ T.co ⁻¹' (M.X k).dom := by
     simpa only [Set.mem_preimage, ContinuousLinearEquiv.apply_symm_apply] using h
   obtain ⟨hxx, hder, t₀, hsec, ht₀⟩ :=
-    GlobalTheory.T.thetaPoints_change_levelIsometry_linearMap hS E H Dw l Xo c σ g e F r M k T _ hx
-      _ hx' κ κ' _ _ (LinearEquiv.refl _ _) h₀ hy hy'
+    _root_.GlobalTheory.ThetaPtChg.thetaPt_change hS E H Dw l Xo c σ g e F r M k T _ hx _ hx' κ κ' _
+      _ (LinearEquiv.refl _ _) h₀ hy hy'
       ⟨fun _ _ => rfl, fun a _ => ⟨0, by simp⟩, fun a => ⟨0, by simp⟩⟩
       (fun a => by
         simp only [ContinuousLinearEquiv.apply_symm_apply, LinearEquiv.refl_apply]

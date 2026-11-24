@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTangentModuleUniversalGroupStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionCalculusStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsCombAt
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTangentModuleUniversalGroup
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBaseChangeFibreSectionCalculus
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -62,10 +63,10 @@ theorem frChg_refl_and_comp
     have : spMap (RingHom.id S) = 𝟙 (Sp S) := Spec.map_id _
     rw [this, Category.id_comp]
   obtain ⟨-, h2, -, h4⟩ :=
-    GlobalTheory.T.scaledBaseChange_fibreSection_calculus E H Dw l Xo S S S (RingHom.id S)
-      (RingHom.id S) y.x y.x y.x hid hid
+    _root_.GlobalTheory.Frames.SecCalc.sec_calc E H Dw l Xo S S S (RingHom.id S) (RingHom.id S) y.x
+      y.x y.x hid hid
   obtain ⟨N, _, _, v, ρ, hinj, htan, hcomb, -, -⟩ :=
-    GlobalTheory.T.exists_tangent_module_universal_group E H Dw l Xo S y.x
+    _root_.GlobalTheory.TanMod.exists_tangent_module E H Dw l Xo S y.x
   have hb : ∀ τ i, ∃ m, v m = y.u τ i := fun τ i => (htan _).1 (y.tan τ i)
   choose b hb using hb
   have hu : ∀ τ, y.u τ = fun i => v (b τ i) := fun τ => funext fun i => (hb τ i).symm

@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.uniformization_split_formal_group_law_equivariant
     : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : Out.DegData R I)
         (A : Out.PolAV (Spec (CommRingCat.of (FractionRing R))))
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.uniformization_split_formal_group_law_equivariant
                     → ∃ N : OE →+* Matrix (Fin r) (Fin r) ℤ, ∀ a,
                       lin Q * lin (α a) = lin (αB a) * lin Q
                         ∧ lin (α a) * lin J = lin J * (N a).map (Int.castRingHom R) := by
-  first
-  | exact @GlobalTheory.unif_extSer_equivariant
-  | exact GlobalTheory.unif_extSer_equivariant
-  | (intros; apply GlobalTheory.unif_extSer_equivariant <;> assumption)
+  first | exact @GlobalTheory.unif_extSer_equivariant

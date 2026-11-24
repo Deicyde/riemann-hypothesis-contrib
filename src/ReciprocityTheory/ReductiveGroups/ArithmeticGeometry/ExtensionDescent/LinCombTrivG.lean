@@ -88,7 +88,7 @@ theorem linComb_triv_g
   apply Finset.prod_eq_one
   intro k _
   rw [hg, map_one]
-  first | exact (congrArg (· ^ ε k) (map_one _)).trans (one_zpow _) | (erw [map_one, one_zpow])
+  first | exact (congrArg (· ^ ε k) (map_one _)).trans (one_zpow _)
 
 theorem powOver_triv_g
     {S : Scheme.{0}} (A : Over S) (U : S.Opens) (N : ℕ) (j j' : (powOver A (trivLB A.left) U N).ι)
@@ -100,13 +100,8 @@ theorem surj_appLE
     : Function.Surjective (f.appLE ⊤ D e).hom := by
   subst hD
   have h1 : IsIso (homOfLE e) := ⟨⟨homOfLE le_top, rfl, rfl⟩⟩
-  have h2 : IsIso (f.appLE ⊤ ⊤ e) := by
-    first
-    | (rw [Scheme.Hom.appLE]; infer_instance)
-    | (show IsIso (f.app ⊤ ≫ X.presheaf.map (homOfLE e).op); infer_instance)
-  first
-  | exact (ConcreteCategory.bijective_of_isIso (f.appLE ⊤ ⊤ e)).2
-  | exact (asIso (f.appLE ⊤ ⊤ e)).commRingCatIsoToRingEquiv.surjective
+  have h2 : IsIso (f.appLE ⊤ ⊤ e) := by first | (rw [Scheme.Hom.appLE]; infer_instance)
+  first | exact (ConcreteCategory.bijective_of_isIso (f.appLE ⊤ ⊤ e)).2
 
 variable (S : Scheme.{0})
 

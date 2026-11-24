@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.eigenspaceDim_add_split_exact_transpose
     : ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (O : Type) [CommRing O] [Algebra O C]
         (OE : Type) [CommRing OE] [IsDomain OE] [CharZero OE] [Module.Free ℤ OE]
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.eigenspaceDim_add_split_exact_transpose
             → ∀ τ : OE →+* C,
               eigDim C ρ τ = eigDim C ρA τ + eigDim C ρB τ
                 ∧ eigDim C (fun a => (ρ a)ᵀ) τ = eigDim C ρ τ := by
-  first
-  | exact @GlobalTheory.EigAdd.eigDim_add_transpose
-  | exact GlobalTheory.EigAdd.eigDim_add_transpose
-  | (intros; apply GlobalTheory.EigAdd.eigDim_add_transpose <;> assumption)
+  first | exact @GlobalTheory.EigAdd.eigDim_add_transpose

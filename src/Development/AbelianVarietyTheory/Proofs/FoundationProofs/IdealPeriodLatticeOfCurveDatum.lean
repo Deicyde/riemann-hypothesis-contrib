@@ -52,16 +52,20 @@ import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZ
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.CurveLattice
 
 open scoped UpperHalfPlane nonZeroDivisors Real
 
-theorem eisG_eq_G (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
-    {k : ℕ} (hk : k ≠ 0) : eisG Λ k = L.G (2 * k) := by
-  have h1 : eisG Λ k = ∑' z : ℂ, ({w : ℂ | w ∈ Λ ∧ w ≠ 0}).indicator (fun w => (w ^ (2 * k))⁻¹) z := by
+theorem eisG_eq_G
+    (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) {k : ℕ} (hk : k ≠ 0)
+    : eisG Λ k = L.G (2 * k) := by
+  have h1
+      : eisG Λ k = ∑' z : ℂ, ({w : ℂ | w ∈ Λ ∧ w ≠ 0}).indicator (fun w => (w ^ (2 * k))⁻¹) z := by
     rw [← tsum_subtype, eisG]
     exact tsum_congr fun w => one_div _
   have h2 : L.G (2 * k) = ∑' z : ℂ, (L.lattice : Set ℂ).indicator (fun w => (w ^ (2 * k))⁻¹) z := by
@@ -75,16 +79,18 @@ theorem eisG_eq_G (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ �
 
 section
 
-variable {Λ : AddSubgroup ℂ} {a : ℂ} {τ : ℍ} (ha : a ≠ 0)
-  (h : ∀ x, x ∈ Λ ↔ ∃ m n : ℤ, a * (m * (τ : ℂ) + n) = x)
+variable
+  {Λ : AddSubgroup ℂ} {a : ℂ} {τ : ℍ}
+  (ha : a ≠ 0) (h : ∀ x, x ∈ Λ ↔ ∃ m n : ℤ, a * (m * (τ : ℂ) + n) = x)
 include ha
 
 theorem indep_of_tau : LinearIndependent ℝ ![a * (τ : ℂ), a] := by
   rw [LinearIndependent.pair_iff]
   intro s t e
-  have e2 : (s * τ + t : ℂ) = 0 := mul_left_cancel₀ ha (by
-    simp only [Complex.real_smul] at e
-    linear_combination e)
+  have e2 : (s * τ + t : ℂ) = 0 :=
+    mul_left_cancel₀ ha (by
+      simp only [Complex.real_smul] at e
+      linear_combination e)
   have e3 : s = 0 := by simpa [τ.im_ne_zero] using congrArg Complex.im e2
   exact ⟨e3, by simpa [e3] using e2⟩
 
@@ -113,8 +119,8 @@ theorem area_of_tau : area Λ = ‖a‖ ^ 2 * τ.im := by
 
 end
 
-theorem mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ w : ℂ) :
-    w ∈ lamOf D cc δ ↔ ∃ c ∈ cc, w = δ * D.host.φ₀ (((c : D.host.K) : D.host.E)) := by
+theorem mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ w : ℂ)
+    : w ∈ lamOf D cc δ ↔ ∃ c ∈ cc, w = δ * D.host.φ₀ (((c : D.host.K) : D.host.E)) := by
   constructor
   · intro hw
     induction hw using AddSubgroup.closure_induction with
@@ -134,19 +140,22 @@ theorem finrank_hostK (D : D7) : Module.finrank ℚ D.host.K = 2 :=
 
 theorem discr_hostK (D : D7) : NumberField.discr D.host.K = -(D.host.d : ℤ) :=
   discr_eq_neg_of_sq_eq (finrank_hostK D) D.host.hyp.2.1.squarefree
-    (by have := D.host.hyp.2.2.2.1; omega)
-    (Formalism.FrobeniusOrbits.SplitK.bK_sq (D.host.sqd_sq))
+    (by have := D.host.hyp.2.2.2.1; omega) (Formalism.FrobeniusOrbits.SplitK.bK_sq (D.host.sqd_sq))
 
-theorem exists_tau (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥) :
-    ∃ (a : ℂ) (τ : ℍ), a ≠ 0 ∧ (Ideal.absNorm cc : ℝ) = 2 * ‖a‖ ^ 2 * τ.im / √(D.host.d) ∧
-      ∀ δ x : ℂ, x ∈ lamOf D cc δ ↔ ∃ m n : ℤ, δ * a * (m * (τ : ℂ) + n) = x := by
+theorem exists_tau (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥)
+    : ∃ (a : ℂ) (τ : ℍ),
+      a ≠ 0 ∧ (Ideal.absNorm cc : ℝ) = 2 * ‖a‖ ^ 2 * τ.im / √(D.host.d)
+        ∧ ∀ δ x : ℂ, x ∈ lamOf D cc δ ↔ ∃ m n : ℤ, δ * a * (m * (τ : ℂ) + n) = x := by
   let σ : D.host.K →+* ℂ := D.host.φ₀.comp D.host.K.val.toRingHom
   let I : (Ideal (𝓞 D.host.K))⁰ := ⟨cc, mem_nonZeroDivisors_of_ne_zero hcc⟩
-  obtain ⟨L, hL⟩ := QuadraticZeta.exists_periodPair (finrank_hostK D) (discr_hostK D) σ
-    (FractionalIdeal.mk0 D.host.K I)
+  obtain ⟨L, hL⟩ :=
+    QuadraticZeta.exists_periodPair (finrank_hostK D) (discr_hostK D) σ
+      (FractionalIdeal.mk0 D.host.K I)
   obtain ⟨a, τ, ha, h⟩ := exists_lattice_eq_mul_tau L
-  have h' : ∀ z, z ∈ σ '' (cc : FractionalIdeal (𝓞 D.host.K)⁰ D.host.K) ↔
-      ∃ m n : ℤ, a * (m * (τ : ℂ) + n) = z := fun z => by
+  have h'
+      : ∀ z,
+        z ∈ σ '' (cc : FractionalIdeal (𝓞 D.host.K)⁰ D.host.K)
+          ↔ ∃ m n : ℤ, a * (m * (τ : ℂ) + n) = z := fun z => by
     rw [← h, ← SetLike.mem_coe, hL]
     rfl
   have hN := QuadraticZeta.absNorm_eq_of_image (finrank_hostK D) (discr_hostK D) σ ha h'
@@ -162,7 +171,17 @@ theorem exists_tau (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥) :
     obtain ⟨c, hc, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
     exact ⟨c, hc, by rw [mul_assoc, ← e]; rfl⟩
 
-theorem lattice_of_curve : ∀ (D : D7), admG1 D → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ → (∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ (lamOf D cc δ) = AddSubgroup.closure {w₁, w₂}) ∧ δ ≠ 0 ∧ TaylorLogMetric.discr (lamOf D cc δ) = 1 ∧ area (lamOf D cc δ) = ‖δ‖ ^ 2 * (Ideal.absNorm cc : ℝ) * Real.sqrt D.host.d / 2 ∧ (∀ a : 𝓞 D.host.K, ∀ w ∈ (lamOf D cc δ), D.host.φ₀ (((a : D.host.K) : D.host.E)) * w ∈ (lamOf D cc δ)) := by
+theorem lattice_of_curve
+    : ∀ (D : D7),
+      admG1 D
+        → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
+          Crv D cc δ
+            → (∃ w₁ w₂ : ℂ,
+                LinearIndependent ℝ ![w₁, w₂] ∧ (lamOf D cc δ) = AddSubgroup.closure {w₁, w₂})
+              ∧ δ ≠ 0 ∧ TaylorLogMetric.discr (lamOf D cc δ) = 1
+              ∧ area (lamOf D cc δ) = ‖δ‖ ^ 2 * (Ideal.absNorm cc : ℝ) * Real.sqrt D.host.d / 2
+              ∧ (∀ a : 𝓞 D.host.K, ∀ w ∈ (lamOf D cc δ),
+                D.host.φ₀ (((a : D.host.K) : D.host.E)) * w ∈ (lamOf D cc δ)) := by
   intro D _ cc δ ⟨⟨hcc, _⟩, hδ⟩
   obtain ⟨a, τ, ha, hN, h⟩ := exists_tau D cc hcc
   have h1 := discr_of_tau (by simpa using ha) (h 1)
@@ -175,9 +194,11 @@ theorem lattice_of_curve : ∀ (D : D7), admG1 D → ∀ (cc : Ideal (𝓞 D.hos
     simp [*] at hδ'
   have hda : δ * a ≠ 0 := mul_ne_zero hδ0 ha
   refine ⟨⟨_, _, indep_of_tau (τ := τ) hda, eq_closure_of_tau (h δ)⟩, hδ0, ?_, ?_, ?_⟩
-  · rw [discr_of_tau hda (h δ), show (2 * π / (δ * a) : ℂ) ^ 12 * ModularForm.discriminant τ =
-      ((2 * π / a) ^ 12 * ModularForm.discriminant τ) / δ ^ 12 by field_simp, ← hδ',
-      div_self (pow_ne_zero _ hδ0)]
+  · rw [discr_of_tau hda (h δ),
+      show (2 * π / (δ * a) : ℂ) ^ 12 * ModularForm.discriminant τ
+          = ((2 * π / a) ^ 12 * ModularForm.discriminant τ) / δ ^ 12 by
+        field_simp,
+      ← hδ', div_self (pow_ne_zero _ hδ0)]
   · have hd : 0 < √(D.host.d : ℝ) := Real.sqrt_pos.2 (by exact_mod_cast D.host.hyp.2.1.pos)
     rw [area_of_tau hda (h δ), hN, norm_mul]
     field_simp

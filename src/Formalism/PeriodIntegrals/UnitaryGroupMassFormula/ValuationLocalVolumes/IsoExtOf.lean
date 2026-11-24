@@ -56,13 +56,11 @@ variable
   {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
   (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
-theorem one_mem_O : (1 : Fv F v ⊗[F] E) ∈ OEv (E := E) v := (PI.OmLocU.Orb.oSub (E := E) v).1
-
 theorem prod_int {m : ℕ} (f : Fin m → Fv F v ⊗[F] E) (hf : ∀ i, f i ∈ OEv (E := E) v)
     : ∏ i, f i ∈ OEv (E := E) v :=
   Finset.prod_induction _ (· ∈ OEv (E := E) v)
     (fun _ _ => oEv_mul v)
-    (one_mem_O v)
+    (_root_.PI.OmLocU.oEv_one v)
     (fun i _ => hf i)
 
 theorem det_int
@@ -84,7 +82,7 @@ theorem adj_int
   split_ifs
   · rw [Pi.single_apply]
     split_ifs
-    · exact one_mem_O v
+    · exact _root_.PI.OmLocU.oEv_one v
     · exact oEv_zero v
   · exact hA k l
 

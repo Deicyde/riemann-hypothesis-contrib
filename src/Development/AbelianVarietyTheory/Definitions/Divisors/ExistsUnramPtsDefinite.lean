@@ -41,8 +41,6 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace GlobalTheory.FlatTw

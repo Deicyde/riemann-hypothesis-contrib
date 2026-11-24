@@ -103,7 +103,4 @@ theorem _root_.GlobalTheory.T.rationalPhaseThetaSeries_expands_cuspForms_smallFi
                                                     u h (c x) g)
                                                 e f
                                               ∧ ∀ k, e k ∈ (embLL0 D).fieldRange := by
-  first
-  | exact @GlobalTheory.SeriesTie.RatExpand.expands_of_isRatPhase
-  | exact GlobalTheory.SeriesTie.RatExpand.expands_of_isRatPhase
-  | (intros; apply GlobalTheory.SeriesTie.RatExpand.expands_of_isRatPhase <;> assumption)
+  first | exact @GlobalTheory.SeriesTie.RatExpand.expands_of_isRatPhase

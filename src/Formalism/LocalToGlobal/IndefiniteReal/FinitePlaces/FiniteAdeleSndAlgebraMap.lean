@@ -43,7 +43,9 @@ import Formalism.LocalToGlobal.IndefiniteReal.InjectiveDecompositionAction
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction NumberField IsDedekindDomain
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -58,24 +60,29 @@ theorem finite_adele_fst_mul (x y : AF F) : (x * y).1 = x.1 * y.1 := rfl
 theorem finite_adele_fst_add (x y : AF F) : (x + y).1 = x.1 + y.1 := rfl
 theorem finite_adele_fst_sub (x y : AF F) : (x - y).1 = x.1 - y.1 := rfl
 theorem finite_adele_fst_one : (1 : AF F).1 = 1 := rfl
-theorem finite_adele_snd_mul (x y : AF F) (v : HeightOneSpectrum (𝓞 F)) : (x * y).2 v = x.2 v * y.2 v := rfl
-theorem finite_adele_snd_add (x y : AF F) (v : HeightOneSpectrum (𝓞 F)) : (x + y).2 v = x.2 v + y.2 v := rfl
-theorem finite_adele_snd_sub (x y : AF F) (v : HeightOneSpectrum (𝓞 F)) : (x - y).2 v = x.2 v - y.2 v := rfl
+theorem finite_adele_snd_mul (x y : AF F) (v : HeightOneSpectrum (𝓞 F))
+    : (x * y).2 v = x.2 v * y.2 v :=
+  rfl
+theorem finite_adele_snd_add (x y : AF F) (v : HeightOneSpectrum (𝓞 F))
+    : (x + y).2 v = x.2 v + y.2 v :=
+  rfl
+theorem finite_adele_snd_sub (x y : AF F) (v : HeightOneSpectrum (𝓞 F))
+    : (x - y).2 v = x.2 v - y.2 v :=
+  rfl
 theorem finite_adele_snd_one (v : HeightOneSpectrum (𝓞 F)) : (1 : AF F).2 v = 1 := rfl
-theorem finite_adele_snd_algebraMap (c : F) (v : HeightOneSpectrum (𝓞 F)) :
-    (algebraMap F (AF F) c).2 v = algebraMap F (v.adicCompletion F) c := rfl
+theorem finite_adele_snd_algebraMap (c : F) (v : HeightOneSpectrum (𝓞 F))
+    : (algebraMap F (AF F) c).2 v = algebraMap F (v.adicCompletion F) c :=
+  rfl
 
 abbrev epv (v : HeightOneSpectrum (𝓞 F)) : AF F := pairA F 0 (single v 1)
 
 theorem epv_fst (v : HeightOneSpectrum (𝓞 F)) : (epv v).1 = 0 := rfl
 theorem epv_self (v : HeightOneSpectrum (𝓞 F)) : (epv v).2 v = 1 := by
   classical
-  first
-  | exact Pi.single_eq_same v (1 : v.adicCompletion F)
+  first | exact Pi.single_eq_same v (1 : v.adicCompletion F)
 theorem epv_ne {v w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v) : (epv v).2 w = 0 := by
   classical
-  first
-  | exact Pi.single_eq_of_ne h (1 : v.adicCompletion F)
+  first | exact Pi.single_eq_of_ne h (1 : v.adicCompletion F)
 
 theorem epv_sq (v : HeightOneSpectrum (𝓞 F)) : epv v * epv v = epv v := by
   refine Prod.ext ?_ ?_
@@ -94,21 +101,24 @@ end Comp
 
 section Split
 
-variable {D : D7} (δ : D.host.E) (hδ : D.sp.cm.sig δ = -δ) (hδ0 : δ ≠ 0) (Δ : D.host.F)
+variable
+  {D : D7} (δ : D.host.E) (hδ : D.sp.cm.sig δ = -δ) (hδ0 : δ ≠ 0) (Δ : D.host.F)
   (hΔ : algebraMap D.host.F D.host.E Δ = δ * δ)
 
-
 include hΔ hδ0 hδ in
-theorem exists_splitIdem' (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCompletion D.host.F)
-    (hs : s * s = algebraMap D.host.F (v.adicCompletion D.host.F) Δ) :
-    ∃ e, IsSplitIdem D e ∧ e + cA D e = algebraMap (AF D.host.F) (AE D) (epv v) := by
+theorem exists_splitIdem'
+    (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCompletion D.host.F)
+    (hs : s * s = algebraMap D.host.F (v.adicCompletion D.host.F) Δ)
+    : ∃ e, IsSplitIdem D e ∧ e + cA D e = algebraMap (AF D.host.F) (AE D) (epv v) := by
   classical
-  have hc : ∀ (a : AF D.host.F) (x : D.host.E), cA D (a ⊗ₜ[D.host.F] x) = a ⊗ₜ[D.host.F] D.sp.cm.sig x := by
+  have hc
+      : ∀ (a : AF D.host.F) (x : D.host.E),
+        cA D (a ⊗ₜ[D.host.F] x) = a ⊗ₜ[D.host.F] D.sp.cm.sig x := by
     intro a x
-    first
-    | rfl
+    first | rfl
   have h2F : (2 : v.adicCompletion D.host.F) ≠ 0 := by
-    have h := (algebraMap D.host.F (v.adicCompletion D.host.F)).injective.ne (two_ne_zero (α := D.host.F))
+    have h :=
+      (algebraMap D.host.F (v.adicCompletion D.host.F)).injective.ne (two_ne_zero (α := D.host.F))
     rw [map_ofNat, map_zero] at h
     exact h
   have hΔ0 : Δ ≠ 0 := by
@@ -123,19 +133,19 @@ theorem exists_splitIdem' (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCom
     exact (map_eq_zero_iff _ (algebraMap D.host.F (v.adicCompletion D.host.F)).injective).mp h0
   have hsv : ∀ t : v.adicCompletion D.host.F, (single v t) v = t := by
     intro t
-    first
-    | exact Pi.single_eq_same v t
-  have hsw : ∀ (t : v.adicCompletion D.host.F) (w : HeightOneSpectrum (𝓞 D.host.F)), w ≠ v →
-      (single v t) w = 0 := by
+    first | exact Pi.single_eq_same v t
+  have hsw
+      : ∀ (t : v.adicCompletion D.host.F) (w : HeightOneSpectrum (𝓞 D.host.F)),
+        w ≠ v → (single v t) w = 0 := by
     intro t w hw
-    first
-    | exact Pi.single_eq_of_ne hw t
+    first | exact Pi.single_eq_of_ne hw t
   have hAF : ∀ x y : AF D.host.F, x.1 = y.1 → (∀ w, x.2 w = y.2 w) → x = y := by
     intro x y h1 h2
     refine Prod.ext h1 ?_
     apply RestrictedProduct.ext
     exact h2
-  obtain ⟨a, ha⟩ : ∃ a : AF D.host.F, a = pairA D.host.F 0 (single v (2 : v.adicCompletion D.host.F)⁻¹) :=
+  obtain ⟨a, ha⟩
+      : ∃ a : AF D.host.F, a = pairA D.host.F 0 (single v (2 : v.adicCompletion D.host.F)⁻¹) :=
     ⟨_, rfl⟩
   obtain ⟨b, hb⟩ : ∃ b : AF D.host.F, b = pairA D.host.F 0 (single v (2 * s)⁻¹) := ⟨_, rfl⟩
   have ha1 : a.1 = 0 := by rw [ha]; rfl
@@ -203,7 +213,8 @@ theorem exists_splitIdem' (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCom
   obtain ⟨d, hd⟩ : ∃ d : AE D, d = (1 : AF D.host.F) ⊗ₜ[D.host.F] δ := ⟨_, rfl⟩
   have kd : d * d = ι ΔA := by
     rw [hd, Algebra.TensorProduct.tmul_mul_tmul, mul_one, ← hΔ, hιt,
-      show algebraMap D.host.F D.host.E Δ = Δ • (1 : D.host.E) from Algebra.algebraMap_eq_smul_one Δ,
+      show algebraMap D.host.F D.host.E Δ = Δ • (1 : D.host.E) from
+        Algebra.algebraMap_eq_smul_one Δ,
       ← TensorProduct.smul_tmul, Algebra.smul_def, mul_one]
   have k1 : ι a * ι a + ι ΔA * (ι b * ι b) = ι a := by
     simpa only [map_add (f := _), map_mul] using congrArg ι A1
@@ -211,13 +222,13 @@ theorem exists_splitIdem' (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCom
     simpa only [map_add (f := _), map_mul] using congrArg ι A2
   have k3 : ι a * ι a - ι ΔA * (ι b * ι b) = 0 := by
     simpa only [map_sub, map_mul, map_zero] using congrArg ι A3
-  have k4 : ι a + ι a = ι (epv v) := by
-    simpa only [map_add (f := _)] using congrArg ι A4
+  have k4 : ι a + ι a = ι (epv v) := by simpa only [map_add (f := _)] using congrArg ι A4
   have hcι : ∀ x, cA D (ι x) = ι x := by
     intro x
     rw [hιt, hc, map_one]
   have hcd : cA D (ι b * d) = -(ι b * d) := by
-    rw [hιt, hd, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, hc, hδ, TensorProduct.tmul_neg]
+    rw [hιt, hd, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, hc, hδ,
+      TensorProduct.tmul_neg]
   have hce : cA D (ι a + ι b * d) = ι a - ι b * d := by
     rw [map_add (f := _), hcι, hcd, sub_eq_add_neg]
   have hsum : ι a + ι b * d + cA D (ι a + ι b * d) = algebraMap (AF D.host.F) (AE D) (epv v) := by
@@ -228,7 +239,6 @@ theorem exists_splitIdem' (v : HeightOneSpectrum (𝓞 D.host.F)) (s : v.adicCom
   · rw [hce]
     linear_combination k3 - ι b * ι b * kd
   · exact ⟨single v 1, rfl, epv_self v, fun v' hv' => epv_ne hv'⟩
-
 
 end Split
 

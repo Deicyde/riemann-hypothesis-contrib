@@ -46,6 +46,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
 import Development.AbelianVarietyTheory.Definitions.Divisors.SymTupOne
 import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.DivMemOfForallPowSuccDivPowMem
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -71,7 +72,7 @@ theorem exists_cdvr_dominating
     have hC : Function.Injective (PowerSeries.C (R := R)) := PowerSeries.C_injective
     have : CharZero (PowerSeries R) := charZero_of_injective_ringHom hC
     have hc : IsAdicComplete (IsLocalRing.maximalIdeal (PowerSeries R)) (PowerSeries R) := by
-      first | infer_instance | (rw [PowerSeries.maximalIdeal_eq_span_X]; infer_instance)
+      first | infer_instance
     have hl : IsLocalHom (PowerSeries.C (R := R)) := by
       constructor
       intro a ha

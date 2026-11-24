@@ -438,16 +438,10 @@ end Pieri
 
 theorem strips_mem : StripsMem := by
   unfold StripsMem
-  first
-  | exact fun n μ ν b => ⟨Pieri.mem_stripsUp μ ν b, Pieri.mem_stripsDown μ ν b⟩
-  | exact ⟨fun n μ ν b => Pieri.mem_stripsUp μ ν b, fun n μ ν b => Pieri.mem_stripsDown μ ν b⟩
-  | done
+  first | exact fun n μ ν b => ⟨Pieri.mem_stripsUp μ ν b, Pieri.mem_stripsDown μ ν b⟩
 
 theorem gelfand_tsetlin_pieri : GTPieri := by
   unfold GTPieri
-  first
-  | exact fun n μ b hμ => ⟨Pieri.up n μ b hμ, Pieri.down n μ b hμ⟩
-  | exact ⟨fun n μ b hμ => Pieri.up n μ b hμ, fun n μ b hμ => Pieri.down n μ b hμ⟩
-  | done
+  first | exact fun n μ b hμ => ⟨Pieri.up n μ b hμ, Pieri.down n μ b hμ⟩
 
 end Formalism.InvariantFactorPaths.GelfandTsetlinBases

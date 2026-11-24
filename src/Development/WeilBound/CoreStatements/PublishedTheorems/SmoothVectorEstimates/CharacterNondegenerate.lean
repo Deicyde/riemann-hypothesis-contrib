@@ -44,7 +44,9 @@ import Mathlib.Topology.Sheaves.Init
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter BoundedContinuousFunction
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun Formalism.UG Formalism.L2.Host
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun
+  Formalism.UG Formalism.L2.Host
 
 namespace PositivityTheory.jumpWindows
 
@@ -66,8 +68,8 @@ theorem sInf_mul (z : Cinf E) (x : Ad E) : sInf E z * x = sInf E (z * pInf E x) 
   · rw [map_mul, pFin_sInf, pFin_sInf, zero_mul]
 
 theorem continuous_sInf : Continuous (sInf E) :=
-  ((continuous_infEq E).prodMk continuous_const :
-    Continuous fun x : Cinf E => ((infEq E x, 0) : InfiniteAdeleRing E × Af E))
+  ((continuous_infEq E).prodMk continuous_const
+    : Continuous fun x : Cinf E => ((infEq E x, 0) : InfiniteAdeleRing E × Af E))
 
 omit [_root_.NumberField.IsTotallyComplex E] in
 theorem nonempty_pl : Nonempty (Pl E) := by
@@ -77,7 +79,8 @@ theorem nonempty_pl : Nonempty (Pl E) := by
 theorem continuous_chi {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) : Continuous (chi ψ) :=
   hψ.cont.comp continuous_sInf
 
-theorem chi_nondeg {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (z : Cinf E) (hz : ∀ w, chi ψ (z * w) = 1) : z = 0 := by
+theorem chi_nondeg {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (z : Cinf E) (hz : ∀ w, chi ψ (z * w) = 1)
+    : z = 0 := by
   obtain ⟨d, hd⟩ := hψ.ann (sInf E z) fun c => by rw [sInf_mul]; exact hz _
   have hd0 : d = 0 := by
     by_contra h0
@@ -89,16 +92,20 @@ theorem chi_nondeg {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (z : Cinf E) (hz 
     exact zero_ne_one h2
   rw [← pInf_sInf z, hd, hd0, map_zero, map_zero]
 
-theorem sInf_lastE (k : ℕ) (y : UnipotentBlockColumnIndex a k k → Cinf E) :
-    sInf E (lastE k y) = lastE k (fun t => sInf E (y t)) := by
-
+theorem sInf_lastE (k : ℕ) (y : UnipotentBlockColumnIndex a k k → Cinf E)
+    : sInf E (lastE k y) = lastE k (fun t => sInf E (y t)) := by
   simp only [lastE, map_sum]
   refine Finset.sum_congr rfl fun t _ => ?_
   split_ifs <;> simp
 
-theorem polyBd : PolyBd (repI E a) := ⟨1, 0, zero_le_one, fun g x => by
-  show ‖Rt E a (infGL E a g) x‖ ≤ 1 * _ ^ 0 * ‖x‖
-  rw [pow_zero, mul_one, one_mul, norm_Rt]⟩
+theorem polyBd : PolyBd (repI E a) := ⟨
+  1,
+  0,
+  zero_le_one,
+  fun g x => by
+    show ‖Rt E a (infGL E a g) x‖ ≤ 1 * _ ^ 0 * ‖x‖
+    rw [pow_zero, mul_one, one_mul, norm_Rt]
+⟩
 
 end CharacterNondegenerate
 
@@ -109,53 +116,81 @@ theorem whittaker_nondegenerate_character : S7 → MirabolicColumnBlock → G0 �
   obtain ⟨hcI, hcLI, hcIf, -, -, -, hcomm, -, hb, -⟩ := hG0 E a
   obtain ⟨hΛ, hRt, hGood, hlaw⟩ := hG5 E a ψ hψ
   obtain ⟨hdec, -, -, hBlk1, -⟩ := hS10 (Cinf E) a (n + 1)
-  obtain ⟨η, r, hη1, hr1, hmir, -, -, hv⟩ := hS7 (InfinitePlace E) a (XB E a) (repI E a) polyBd n hn (chi ψ)
-    (continuous_chi hψ) (fun z => hψ.norm _) (chi_nondeg hψ) Set.univ Filter.univ_mem
+  obtain ⟨η, r, hη1, hr1, hmir, -, -, hv⟩ :=
+    hS7 (InfinitePlace E) a (XB E a) (repI E a) polyBd n hn (chi ψ) (continuous_chi hψ)
+      (fun z => hψ.norm _)
+      (chi_nondeg hψ) Set.univ Filter.univ_mem
   have memY : ∀ Z : Submodule ℂ (XB E a), YOK ψ S Z → ∀ g, ∀ x ∈ Z, repI E a g x ∈ Z :=
     fun Z hZ g x hx => hZ.stable _ (fun w _ => hcLI w g) x hx
-  have whB : ∀ x : XB E a, Good ψ (a - 1) x → ∀ (y : UnipotentBlockColumnIndex a (n + 1) (n + 1) → Cinf E) (g : GA E a),
-      Wh ψ x (infGL E a (blkU y) * g) = chi ψ (lastE (n + 1) y) * Wh ψ x g := by
+  have whB
+      : ∀ x : XB E a,
+        Good ψ (a - 1) x
+          → ∀ (y : UnipotentBlockColumnIndex a (n + 1) (n + 1) → Cinf E) (g : GA E a),
+            Wh ψ x (infGL E a (blkU y) * g) = chi ψ (lastE (n + 1) y) * Wh ψ x g := by
     intro x hx y g
     rw [hb, chi_apply, sInf_lastE]
     exact (hlaw x hx).2.2 (n + 1) n.succ_pos _ g
-  have lawOf : ∀ Z : Submodule ℂ (XB E a), YOK ψ S Z → ∀ g' : GA E a, cInf g' = 1 →
-      ∀ Λ : XB E a →L[ℂ] ℂ, (∀ x : XB E a, Good ψ (a - 1) x → Λ x = Wh ψ x g') →
-      ∀ x ∈ Z, ∀ y : UnipotentBlockColumnIndex a (n + 1) (n + 1) → Cinf E,
-        Λ (repI E a (blkU y) x) = chi ψ (lastE (n + 1) y) * Λ x := by
+  have lawOf
+      : ∀ Z : Submodule ℂ (XB E a),
+        YOK ψ S Z
+          → ∀ g' : GA E a,
+            cInf g' = 1
+              → ∀ Λ : XB E a →L[ℂ] ℂ,
+                (∀ x : XB E a, Good ψ (a - 1) x → Λ x = Wh ψ x g')
+                  → ∀ x ∈ Z, ∀ y : UnipotentBlockColumnIndex a (n + 1) (n + 1) → Cinf E,
+                    Λ (repI E a (blkU y) x) = chi ψ (lastE (n + 1) y) * Λ x := by
     intro Z hZ g' hg' Λ hΛg x hx y
     have hx' := hZ.good x hx
     change Λ (Rt E a (infGL E a (blkU y)) x) = _
     rw [hΛg _ (hGood x _ hx'), hΛg x hx', hRt, hcomm g' hg', whB x hx']
-  have levOf : ∀ x x' : XB E a, Lev S x → (∀ Z : Submodule ℂ (XB E a), IsClosed (Z : Set (XB E a)) →
-      (∀ g, ∀ y ∈ Z, repI E a g y ∈ Z) → x ∈ Z → x' ∈ Z) → Lev S x' := by
+  have levOf
+      : ∀ x x' : XB E a,
+        Lev S x
+          → (∀ Z : Submodule ℂ (XB E a),
+            IsClosed (Z : Set (XB E a)) → (∀ g, ∀ y ∈ Z, repI E a g y ∈ Z) → x ∈ Z → x' ∈ Z)
+          → Lev S x' := by
     intro x x' hx hZ w hw
     refine Filter.mem_of_superset (hx w hw) fun u hu => ?_
     have hu' : Rt E a (fl a w u) x = x := hu
     let T : XB E a →L[ℂ] XB E a := Rt E a (fl a w u) - ContinuousLinearMap.id ℂ _
     have hmem : ∀ y, T y = 0 ↔ Rt E a (fl a w u) y = y := fun y => by simp [T, sub_eq_zero]
-    have hk := hZ _ T.isClosed_ker (fun g y hy => by
-        rw [LinearMap.mem_ker] at hy ⊢
-        refine (hmem _).2 ?_
-        have hy' := (hmem y).1 hy
-        change Rt E a (fl a w u) (Rt E a (infGL E a g) y) = Rt E a (infGL E a g) y
-        rw [← ContinuousLinearMap.mul_apply, ← map_mul, hcomm _ (hcIf w u), map_mul,
-          ContinuousLinearMap.mul_apply, hy'])
-      (LinearMap.mem_ker.2 ((hmem x).2 hu'))
+    have hk :=
+      hZ _ T.isClosed_ker
+        (fun g y hy => by
+          rw [LinearMap.mem_ker] at hy ⊢
+          refine (hmem _).2 ?_
+          have hy' := (hmem y).1 hy
+          change Rt E a (fl a w u) (Rt E a (infGL E a g) y) = Rt E a (infGL E a g) y
+          rw [← ContinuousLinearMap.mul_apply, ← map_mul, hcomm _ (hcIf w u), map_mul,
+            ContinuousLinearMap.mul_apply, hy'])
+        (LinearMap.mem_ker.2 ((hmem x).2 hu'))
     rw [LinearMap.mem_ker] at hk
     exact (hmem x').1 hk
   obtain ⟨v, hvs, hvP⟩ := hv φ hsm
   obtain ⟨v', hvs', hvP'⟩ := hv φ' hsm'
   obtain ⟨hvY, hvΛ⟩ := hvP Y hY.closed (memY Y hY) hφY
   obtain ⟨hvY', hvΛ'⟩ := hvP' Y' hY'.closed (memY Y' hY') hφY'
-  have conv : ∀ (g' : GA E a) (Λ : XB E a →L[ℂ] ℂ), (∀ x : XB E a, Good ψ (a - 1) x → Λ x = Wh ψ x g') →
-      ∀ x : XB E a, Good ψ (a - 1) x → ∀ k, Λ (repI E a k x) = Wh ψ x (g' * infGL E a k) := by
+  have conv
+      : ∀ (g' : GA E a) (Λ : XB E a →L[ℂ] ℂ),
+        (∀ x : XB E a, Good ψ (a - 1) x → Λ x = Wh ψ x g')
+          → ∀ x : XB E a, Good ψ (a - 1) x → ∀ k, Λ (repI E a k x) = Wh ψ x (g' * infGL E a k) := by
     intro g' Λ hΛg x hx k
     change Λ (Rt E a (infGL E a k) x) = _
     rw [hΛg _ (hGood x _ hx), hRt]
   have hgY := hY.good
   have hgY' := hY'.good
-  refine ⟨v, hvY, v', hvY', hvs, hvs', levOf φ v hlev fun Z hc hs hx => (hvP Z hc hs hx).1,
-    levOf φ' v' hlev' fun Z hc hs hx => (hvP' Z hc hs hx).1, ?_, ?_⟩
+  refine ⟨
+    v,
+    hvY,
+    v',
+    hvY',
+    hvs,
+    hvs',
+    levOf φ v hlev fun Z hc hs hx => (hvP Z hc hs hx).1,
+    levOf φ' v' hlev' fun Z hc hs hx => (hvP' Z hc hs hx).1,
+    ?_,
+    ?_
+  ⟩
   · obtain ⟨Λ₁, hΛ₁⟩ := hΛ 1
     have e1 := hvΛ Λ₁ (lawOf Y hY 1 (map_one _) Λ₁ hΛ₁) 1 hBlk1
     rw [conv 1 Λ₁ hΛ₁ v (hgY v hvY), conv 1 Λ₁ hΛ₁ φ (hgY φ hφY), hr1, map_one, one_mul] at e1

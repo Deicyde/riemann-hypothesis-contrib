@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.doubling_eulerProduct_farRight
       → ∀ D : D7,
         SphFactor D → LocalZetaOn D (fun _ => True) → ParamBoundOn D (fun _ => True)
           → EulerRight D := by
-  first
-  | exact @GlobalTheory.Core.Rk.EulerProd.eulerRight
-  | exact GlobalTheory.Core.Rk.EulerProd.eulerRight
-  | (intros; apply GlobalTheory.Core.Rk.EulerProd.eulerRight <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.EulerProd.eulerRight

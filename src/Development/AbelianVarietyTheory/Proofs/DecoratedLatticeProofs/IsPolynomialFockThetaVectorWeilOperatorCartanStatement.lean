@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.isPolynomialFockThetaVector_weilOperator_cartan
             → ∀ (sS sS' : RealMat S) (sT : RealMat T) (g : GA D S),
               (∀ τ, sS' τ * compAt θ τ (mt S g) = compAt θ τ (mt S g) * sS τ)
                 → ∀ f, IsFockVec ψ θ S T sS sT f → IsFockVec ψ θ S T sS' sT (om (g, 1) f) := by
-  first
-  | exact @GlobalTheory.FockMove.isFockVec_om
-  | exact GlobalTheory.FockMove.isFockVec_om
-  | (intros; apply GlobalTheory.FockMove.isFockVec_om <;> assumption)
+  first | exact @GlobalTheory.FockMove.isFockVec_om

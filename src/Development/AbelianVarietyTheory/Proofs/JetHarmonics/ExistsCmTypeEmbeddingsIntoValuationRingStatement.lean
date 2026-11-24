@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
   ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open GlobalTheory.CharDepth TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_cmType_embeddings_into_valuation_ring
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l)
         (T : CDVR) (io : c.F →+* T.Fr) (p : ℕ) [Fact p.Prime] (X : ValExt T p),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_cmType_embeddings_into_valuation_ring
           ∧ IsTypes X io (fun τ => X.ι.comp (τT τ)) ∧ Function.Injective (fun τ => X.ι.comp (τT τ))
           ∧ (∀ τ τ', τ (H.rt : E) = τ' (H.rt : E) ↔ X.ι (τT τ H.rt) = X.ι (τT τ' H.rt))
           ∧ ∀ τ a, τT (ComplexEmbedding.conjugate τ) a = τT τ (H.bar a) := by
-  first
-  | exact @GlobalTheory.CharDepth.exists_types_valuationRing
-  | exact GlobalTheory.CharDepth.exists_types_valuationRing
-  | (intros; apply GlobalTheory.CharDepth.exists_types_valuationRing <;> assumption)
+  first | exact @GlobalTheory.CharDepth.exists_types_valuationRing

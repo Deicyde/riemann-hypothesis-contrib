@@ -368,7 +368,7 @@ theorem parts_mem (hG : IsUnit G) (hh : Gᴴ = G) (Z : Matrix (Fin n) (Fin n) �
   · show _ + _ = 0
     rw [conjTranspose_smul, conjTranspose_sub, Matrix.smul_mul, Matrix.mul_smul, Matrix.sub_mul,
       Matrix.mul_sub, h1, h2]
-    have : star (1 / (2 * Complex.I) : ℂ) = -(1 / (2 * Complex.I)) := by simp [div_neg]
+    have : star (1 / (2 * Complex.I) : ℂ) = -(1 / (2 * Complex.I)) := by simp
     rw [this]
     module
 

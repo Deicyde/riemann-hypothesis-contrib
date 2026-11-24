@@ -85,9 +85,9 @@ def xn (n : ℕ) : On p n := Ideal.Quotient.mk _ (C X)
 def yn (n : ℕ) : On p n := Ideal.Quotient.mk _ X
 
 def IsDlog (n : ℕ) (w α β : On p n) : Prop :=
-  (xn p n * yn p n) • KaehlerDifferential.D (O0 p) (On p n) w =
-    (w * xn p n * α) • KaehlerDifferential.D (O0 p) (On p n) (yn p n) +
-    (w * yn p n * β) • KaehlerDifferential.D (O0 p) (On p n) (xn p n)
+  (xn p n * yn p n) • KaehlerDifferential.D (O0 p) (On p n) w
+    = (w * xn p n * α) • KaehlerDifferential.D (O0 p) (On p n) (yn p n)
+      + (w * yn p n * β) • KaehlerDifferential.D (O0 p) (On p n) (xn p n)
 
 def fPi (n : ℕ) (k l : ℤ) (α β α' β' : On p n) : On p n :=
   α * ((l : On p n) * xn p n + (xn p n - 1) * β') - ((k : On p n) * xn p n + (xn p n - 1) * β) * α'
@@ -116,22 +116,19 @@ def Gn (T : Tower p Ω) (n : ℕ) : Subgroup (Gal p Ω) :=
 def IsEmb (T : Tower p Ω) (n : ℕ) (ι : On p n →ₐ[O0 p] Ω) : Prop :=
   ι (xn p n) = T.ζ n ∧ ι (yn p n) = T.qq n
 
-
 variable (p) in
 def IsInt (x : Ω) : Prop := IsIntegral (O0 p) x
-
 
 variable (p) in
 def Cong (k : ℕ) (x y : Ω) : Prop := ∃ z : Ω, IsInt (p := p) z ∧ x - y = (p : Ω) ^ k * z
 
-def IsKum (T : Tower p Ω) (n : ℕ) (H : Subgroup (Gal p Ω)) (r : Ω) (a : Gal p Ω → ZMod (p ^ n)) : Prop :=
+def IsKum (T : Tower p Ω) (n : ℕ) (H : Subgroup (Gal p Ω)) (r : Ω) (a : Gal p Ω → ZMod (p ^ n))
+    : Prop :=
   ∀ g ∈ H, g r = T.ζ n ^ (a g).val * r
-
 
 variable (p) in
 def IsAlgZp (x : Ω) : Prop :=
   ∃ P : Polynomial ℤ_[p], P ≠ 0 ∧ Polynomial.aeval x (P.map (algebraMap ℤ_[p] (O0 p))) = 0
-
 
 variable (p) in
 def Ggeo (Ω : Type*) [Field Ω] [Algebra (O0 p) Ω] : Subgroup (Gal p Ω) where
@@ -146,10 +143,13 @@ def Ggeo (Ω : Type*) [Field Ω] [Algebra (O0 p) Ω] : Subgroup (Gal p Ω) where
     exact a.symm_apply_apply x
 
 def LocallyConstantOneCochain (k : ℕ) (w : Gal p Ω → Ω) : Prop :=
-  (∀ g, IsInt (p := p) (w g)) ∧ ∀ g, ∃ S : Finset Ω, ∀ h : Gal p Ω, (∀ x ∈ S, h x = g x) → Cong (p := p) k (w h) (w g)
+  (∀ g, IsInt (p := p) (w g))
+    ∧ ∀ g, ∃ S : Finset Ω, ∀ h : Gal p Ω, (∀ x ∈ S, h x = g x) → Cong (p := p) k (w h) (w g)
 
 def Cob2 (k : ℕ) (H : Subgroup (Gal p Ω)) (ξ : Gal p Ω → Gal p Ω → Ω) : Prop :=
-  ∃ w : Gal p Ω → Ω, LocallyConstantOneCochain k w ∧ ∀ g ∈ H, ∀ h ∈ H, Cong (p := p) k (ξ g h) (g (w h) - w (g * h) + w g)
+  ∃ w : Gal p Ω → Ω,
+    LocallyConstantOneCochain k w
+      ∧ ∀ g ∈ H, ∀ h ∈ H, Cong (p := p) k (ξ g h) (g (w h) - w (g * h) + w g)
 
 def Cob1 (k : ℕ) (H : Subgroup (Gal p Ω)) (c : Gal p Ω → Ω) : Prop :=
   ∃ x : Ω, IsInt (p := p) x ∧ ∀ g ∈ H, Cong (p := p) k (c g) (g x - x)
@@ -164,8 +164,8 @@ section Ring
 
 variable (p : ℕ) [hp : Fact p.Prime]
 
-theorem natCast_pow_dvd_iff (k : ℕ) (f : Lau p) :
-    (p : Lau p) ^ k ∣ f ↔ ∀ n, (p : ℤ_[p]) ^ k ∣ f.coeff n := by
+theorem natCast_pow_dvd_iff (k : ℕ) (f : Lau p)
+    : (p : Lau p) ^ k ∣ f ↔ ∀ n, (p : ℤ_[p]) ^ k ∣ f.coeff n := by
   have hc : (p : Lau p) ^ k = HahnSeries.C ((p : ℤ_[p]) ^ k) := by rw [map_pow, map_natCast]
   have hne : (p : ℤ_[p]) ^ k ≠ 0 := pow_ne_zero _ (by exact_mod_cast hp.out.ne_zero)
   constructor
@@ -183,8 +183,8 @@ theorem natCast_pow_dvd_iff (k : ℕ) (f : Lau p) :
       rw [hc, HahnSeries.C_mul_eq_smul, HahnSeries.coeff_smul, hcn n]
       rfl
 
-theorem dvd_iff_map (f : Lau p) :
-    (p : Lau p) ∣ f ↔ f.map (PadicInt.toZMod (p := p)).toNonUnitalRingHom = 0 := by
+theorem dvd_iff_map (f : Lau p)
+    : (p : Lau p) ∣ f ↔ f.map (PadicInt.toZMod (p := p)).toNonUnitalRingHom = 0 := by
   have := natCast_pow_dvd_iff p 1 f
   simp only [pow_one] at this
   rw [this]
@@ -216,16 +216,17 @@ theorem prime_lau : Prime (p : Lau p) := by
 theorem mem_pI_pow (k : ℕ) (f : Lau p) : f ∈ pI p ^ k ↔ (p : Lau p) ^ k ∣ f := by
   rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton]
 
-theorem seq_sub_dvd (x : AdicCompletion.AdicCauchySequence (pI p) (Lau p)) {m n : ℕ} (h : m ≤ n) :
-    (p : Lau p) ^ m ∣ x.1 n - x.1 m := by
+theorem seq_sub_dvd (x : AdicCompletion.AdicCauchySequence (pI p) (Lau p)) {m n : ℕ} (h : m ≤ n)
+    : (p : Lau p) ^ m ∣ x.1 n - x.1 m := by
   have h1 := AdicCompletion.AdicCauchySequence.mk_eq_mk h x
   rw [Submodule.Quotient.eq] at h1
   rw [← mem_pI_pow]
   simpa using h1
 
-theorem exists_not_dvd (x : AdicCompletion.AdicCauchySequence (pI p) (Lau p))
-    (hx : AdicCompletion.mk (pI p) (Lau p) x ≠ 0) :
-    ∃ a, ∀ n, a ≤ n → ¬ (p : Lau p) ^ a ∣ x.1 n := by
+theorem exists_not_dvd
+    (x : AdicCompletion.AdicCauchySequence (pI p) (Lau p))
+    (hx : AdicCompletion.mk (pI p) (Lau p) x ≠ 0)
+    : ∃ a, ∀ n, a ≤ n → ¬ (p : Lau p) ^ a ∣ x.1 n := by
   by_contra hcon
   push_neg at hcon
   apply hx
@@ -241,7 +242,8 @@ instance charZero_completed_ring : CharZero (O0 p) := by
   intro n hn
   have h1 := congrArg (AdicCompletion.evalₐ (pI p) n) hn
   rw [map_natCast, map_zero, ← map_natCast (Ideal.Quotient.mk (pI p ^ n)),
-    Ideal.Quotient.eq_zero_iff_mem, mem_pI_pow, natCast_pow_dvd_iff] at h1
+      Ideal.Quotient.eq_zero_iff_mem, mem_pI_pow, natCast_pow_dvd_iff]
+    at h1
   have h2 := h1 0
   have hc : (n : Lau p) = HahnSeries.C (n : ℤ_[p]) := by rw [map_natCast]
   rw [hc, HahnSeries.C_apply, HahnSeries.coeff_single_same] at h2
@@ -284,15 +286,16 @@ theorem not_isUnit_p : ¬ IsUnit (p : O0 p) := by
 
 theorem isUnit_qO : IsUnit (qO p) := by
   refine IsUnit.map _ (IsUnit.of_mul_eq_one (HahnSeries.single (-1 : ℤ) (1 : ℤ_[p])) ?_)
-  rw [HahnSeries.single_mul_single]; simp [HahnSeries.single_zero_one]
+  rw [HahnSeries.single_mul_single]
+  simp [HahnSeries.single_zero_one]
 
 theorem isClo_algebraicClosure : IsClo p (AlgebraicClosure (FractionRing (O0 p))) := by
   refine ⟨?_, ?_, inferInstance⟩
   · rw [IsScalarTower.algebraMap_eq (O0 p) (FractionRing (O0 p))]
     exact (algebraMap (FractionRing (O0 p)) _).injective.comp (IsFractionRing.injective _ _)
   · exact IsFractionRing.comap_isAlgebraic_iff.mpr
-      (inferInstance : Algebra.IsAlgebraic (FractionRing (O0 p))
-        (AlgebraicClosure (FractionRing (O0 p))))
+      (inferInstance
+        : Algebra.IsAlgebraic (FractionRing (O0 p)) (AlgebraicClosure (FractionRing (O0 p))))
 
 end Ring
 
@@ -300,14 +303,12 @@ section Field
 
 variable {p : ℕ} [hp : Fact p.Prime] {Ω : Type*} [Field Ω] [Algebra (O0 p) Ω]
 
-theorem charZero_of_isClo (h : IsClo p Ω) : CharZero Ω :=
-  charZero_of_injective_algebraMap h.inj
+theorem charZero_of_isClo (h : IsClo p Ω) : CharZero Ω := charZero_of_injective_algebraMap h.inj
 
-theorem tw_prim_step {Ω : Type*} [Field Ω] {ζ z : Ω} {n : ℕ}
-    (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) (hz : z ^ p = ζ) :
-    IsPrimitiveRoot z (p ^ (n + 2)) := by
-  have h1 : z ^ (p ^ (n + 2)) = 1 := by
-    rw [pow_succ' p (n + 1), pow_mul, hz, hζ.pow_eq_one]
+theorem tw_prim_step
+    {Ω : Type*} [Field Ω] {ζ z : Ω} {n : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) (hz : z ^ p = ζ)
+    : IsPrimitiveRoot z (p ^ (n + 2)) := by
+  have h1 : z ^ (p ^ (n + 2)) = 1 := by rw [pow_succ' p (n + 1), pow_mul, hz, hζ.pow_eq_one]
   obtain ⟨k, hk, hko⟩ := (Nat.dvd_prime_pow hp.out).1 (orderOf_dvd_of_pow_eq_one h1)
   rcases Nat.lt_or_ge k (n + 2) with hlt | hge
   · exfalso
@@ -325,14 +326,14 @@ theorem tw_prim_step {Ω : Type*} [Field Ω] {ζ z : Ω} {n : ℕ}
     rw [← hk2, ← hko]
     exact IsPrimitiveRoot.orderOf z
 
-theorem tw_exists_prim_p (Ω : Type*) [Field Ω] [IsAlgClosed Ω] [CharZero Ω] :
-    ∃ z : Ω, IsPrimitiveRoot z p := by
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (cyclotomic p Ω)
-    (ne_of_gt (degree_cyclotomic_pos p Ω hp.out.pos))
+theorem tw_exists_prim_p (Ω : Type*) [Field Ω] [IsAlgClosed Ω] [CharZero Ω]
+    : ∃ z : Ω, IsPrimitiveRoot z p := by
+  obtain ⟨z, hz⟩ :=
+    IsAlgClosed.exists_root (cyclotomic p Ω) (ne_of_gt (degree_cyclotomic_pos p Ω hp.out.pos))
   exact ⟨z, (isRoot_cyclotomic_iff).1 hz⟩
 
-theorem tw_exists_root_chain {Ω : Type*} [Field Ω] [IsAlgClosed Ω] (a : Ω) :
-    ∃ f : ℕ → Ω, f 0 = a ∧ ∀ n, f (n + 1) ^ p = f n := by
+theorem tw_exists_root_chain {Ω : Type*} [Field Ω] [IsAlgClosed Ω] (a : Ω)
+    : ∃ f : ℕ → Ω, f 0 = a ∧ ∀ n, f (n + 1) ^ p = f n := by
   choose r hr using fun x : Ω => IsAlgClosed.exists_pow_nat_eq x hp.out.pos
   refine ⟨fun n => r^[n] a, rfl, fun n => ?_⟩
   show r^[n + 1] a ^ p = r^[n] a
@@ -349,12 +350,8 @@ theorem nonempty_tower (h : IsClo p Ω) : Nonempty (Tower p Ω) := by
     induction n with
     | zero => simpa [hf0] using hz
     | succ m ih => exact tw_prim_step ih (hf m)
-  refine ⟨{ ζ := fun n => Nat.casesOn n 1 f
-            qq := g
-            prim := ?_
-            ζpow := ?_
-            q0 := hg0
-            qpow := hg }⟩
+  refine
+    ⟨{ ζ := fun n => Nat.casesOn n 1 f, qq := g, prim := ?_, ζpow := ?_, q0 := hg0, qpow := hg }⟩
   · intro n
     cases n with
     | zero => simpa using IsPrimitiveRoot.one
@@ -381,8 +378,8 @@ theorem exists_isEmb (T : Tower p Ω) (n : ℕ) : ∃ ι : On p n →ₐ[O0 p] �
   have hpos : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
   refine ⟨Ideal.Quotient.liftₐ (towerIdeal p n) (aevalTower (aeval (T.ζ n)) (T.qq n)) ?_, ?_, ?_⟩
   · intro a ha
-    have : towerIdeal p n ≤
-        RingHom.ker (aevalTower (aeval (T.ζ n) : (O0 p)[X] →ₐ[O0 p] Ω) (T.qq n)) := by
+    have : towerIdeal p n
+        ≤ RingHom.ker (aevalTower (aeval (T.ζ n) : (O0 p)[X] →ₐ[O0 p] Ω) (T.qq n)) := by
       rw [towerIdeal, Ideal.span_le]
       rintro b (rfl | rfl)
       · have := (T.prim n).isRoot_cyclotomic hpos
@@ -396,8 +393,9 @@ theorem exists_isEmb (T : Tower p Ω) (n : ℕ) : ∃ ι : On p n →ₐ[O0 p] �
   · show aevalTower (aeval (T.ζ n) : (O0 p)[X] →ₐ[O0 p] Ω) (T.qq n) X = _
     simp
 
-theorem mem_gn (T : Tower p Ω) (n : ℕ) (g : Gal p Ω) :
-    g ∈ Gn T n ↔ g (T.ζ n) = T.ζ n ∧ g (T.qq n) = T.qq n := Iff.rfl
+theorem mem_gn (T : Tower p Ω) (n : ℕ) (g : Gal p Ω)
+    : g ∈ Gn T n ↔ g (T.ζ n) = T.ζ n ∧ g (T.qq n) = T.qq n :=
+  Iff.rfl
 
 theorem isInt_gal (g : Gal p Ω) {x : Ω} (hx : IsInt (p := p) x) : IsInt (p := p) (g x) :=
   IsIntegral.map g.toAlgHom hx
@@ -406,32 +404,33 @@ theorem isInt_intCast (m : ℤ) : IsInt (p := p) (m : Ω) := by
   rw [IsInt, ← map_intCast (algebraMap (O0 p) Ω)]
   exact isIntegral_algebraMap
 
-theorem cong_refl (k : ℕ) (x : Ω) : Cong (p := p) k x x :=
-  ⟨0, isIntegral_zero, by simp⟩
+theorem cong_refl (k : ℕ) (x : Ω) : Cong (p := p) k x x := ⟨0, isIntegral_zero, by simp⟩
 
-theorem cong_trans {k : ℕ} {x y z : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k y z) : Cong (p := p) k x z := by
+theorem cong_trans {k : ℕ} {x y z : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k y z)
+    : Cong (p := p) k x z := by
   obtain ⟨a, ha, e⟩ := h
   obtain ⟨b, hb, e'⟩ := h'
   exact ⟨a + b, IsIntegral.add ha hb, by linear_combination e + e'⟩
 
-theorem cong_add {k : ℕ} {x y x' y' : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k x' y') :
-    Cong (p := p) k (x + x') (y + y') := by
+theorem cong_add {k : ℕ} {x y x' y' : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k x' y')
+    : Cong (p := p) k (x + x') (y + y') := by
   obtain ⟨a, ha, e⟩ := h
   obtain ⟨b, hb, e'⟩ := h'
   exact ⟨a + b, IsIntegral.add ha hb, by linear_combination e + e'⟩
 
-theorem cong_sub {k : ℕ} {x y x' y' : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k x' y') :
-    Cong (p := p) k (x - x') (y - y') := by
+theorem cong_sub {k : ℕ} {x y x' y' : Ω} (h : Cong (p := p) k x y) (h' : Cong (p := p) k x' y')
+    : Cong (p := p) k (x - x') (y - y') := by
   obtain ⟨a, ha, e⟩ := h
   obtain ⟨b, hb, e'⟩ := h'
   exact ⟨a - b, IsIntegral.sub ha hb, by linear_combination e - e'⟩
 
-theorem cong_mul_right {k : ℕ} {x y c : Ω} (h : Cong (p := p) k x y) (hc : IsInt (p := p) c) :
-    Cong (p := p) k (x * c) (y * c) := by
+theorem cong_mul_right {k : ℕ} {x y c : Ω} (h : Cong (p := p) k x y) (hc : IsInt (p := p) c)
+    : Cong (p := p) k (x * c) (y * c) := by
   obtain ⟨a, ha, e⟩ := h
   exact ⟨a * c, IsIntegral.mul ha hc, by linear_combination c * e⟩
 
-theorem cong_gal {k : ℕ} {x y : Ω} (g : Gal p Ω) (h : Cong (p := p) k x y) : Cong (p := p) k (g x) (g y) := by
+theorem cong_gal {k : ℕ} {x y : Ω} (g : Gal p Ω) (h : Cong (p := p) k x y)
+    : Cong (p := p) k (g x) (g y) := by
   obtain ⟨a, ha, e⟩ := h
   refine ⟨g a, isInt_gal g ha, ?_⟩
   rw [← map_sub, e, map_mul, map_pow, map_natCast]
@@ -453,13 +452,16 @@ theorem not_cong_one_zero (h : IsClo p Ω) (k : ℕ) (hk : k ≠ 0) : ¬ Cong (p
     Algebra.IsIntegral.isLocalHom _ _
   exact not_isUnit_p p ((isUnit_pow_iff hk).1 (isUnit_of_map_unit _ _ hu))
 
-theorem zeta_pow_eq_iff (T : Tower p Ω) (k a b : ℕ) :
-    T.ζ k ^ a = T.ζ k ^ b ↔ a ≡ b [MOD p ^ k] := by
+theorem zeta_pow_eq_iff (T : Tower p Ω) (k a b : ℕ)
+    : T.ζ k ^ a = T.ζ k ^ b ↔ a ≡ b [MOD p ^ k] := by
   rw [(T.prim k).eq_orderOf]
   exact (T.prim k).isOfFinOrder (pow_ne_zero _ hp.out.ne_zero) |>.pow_eq_pow_iff_modEq
 
-theorem exists_isKum (T : Tower p Ω) (n : ℕ) (H : Subgroup (Gal p Ω)) {r : Ω} (hr : r ≠ 0)
-    (hH : ∀ g ∈ H, g (r ^ p ^ n) = r ^ p ^ n) : ∃ a, IsKum T n H r a := by
+theorem exists_isKum
+    (T : Tower p Ω)
+    (n : ℕ) (H : Subgroup (Gal p Ω))
+    {r : Ω} (hr : r ≠ 0) (hH : ∀ g ∈ H, g (r ^ p ^ n) = r ^ p ^ n)
+    : ∃ a, IsKum T n H r a := by
   classical
   haveI : NeZero (p ^ n) := ⟨pow_ne_zero _ hp.out.ne_zero⟩
   have : ∀ g : Gal p Ω, ∃ a : ZMod (p ^ n), g ∈ H → g r = T.ζ n ^ a.val * r := by
@@ -473,8 +475,8 @@ theorem exists_isKum (T : Tower p Ω) (n : ℕ) (H : Subgroup (Gal p Ω)) {r : �
   choose a ha using this
   exact ⟨a, ha⟩
 
-theorem exists_isCyc (T : Tower p Ω) (k : ℕ) :
-    ∃ χ : Gal p Ω → ZMod (p ^ k), ∀ g : Gal p Ω, g (T.ζ k) = T.ζ k ^ (χ g).val := by
+theorem exists_isCyc (T : Tower p Ω) (k : ℕ)
+    : ∃ χ : Gal p Ω → ZMod (p ^ k), ∀ g : Gal p Ω, g (T.ζ k) = T.ζ k ^ (χ g).val := by
   haveI : NeZero (p ^ k) := ⟨pow_ne_zero _ hp.out.ne_zero⟩
   have : ∀ g : Gal p Ω, ∃ a : ZMod (p ^ k), g (T.ζ k) = T.ζ k ^ a.val := by
     intro g
@@ -484,23 +486,28 @@ theorem exists_isCyc (T : Tower p Ω) (k : ℕ) :
   choose a ha using this
   exact ⟨a, ha⟩
 
-theorem isCyc_eq_one_iff {T : Tower p Ω} {k : ℕ} {χ : Gal p Ω → ZMod (p ^ k)}
+theorem isCyc_eq_one_iff
+    {T : Tower p Ω} {k : ℕ} {χ : Gal p Ω → ZMod (p ^ k)}
     (h : ∀ g : Gal p Ω, g (T.ζ k) = T.ζ k ^ (χ g).val)
-    (g : Gal p Ω) : χ g = 1 ↔ g (T.ζ k) = T.ζ k := by
+    (g : Gal p Ω)
+    : χ g = 1 ↔ g (T.ζ k) = T.ζ k := by
   haveI : NeZero (p ^ k) := ⟨pow_ne_zero _ hp.out.ne_zero⟩
   rw [h g]
   conv_rhs => rhs; rw [← pow_one (T.ζ k)]
   rw [zeta_pow_eq_iff, ← ZMod.natCast_eq_natCast_iff]
   simp
 
-theorem isKum_mul {T : Tower p Ω} {n : ℕ} {χ : Gal p Ω → ZMod (p ^ n)}
+theorem isKum_mul
+    {T : Tower p Ω} {n : ℕ} {χ : Gal p Ω → ZMod (p ^ n)}
     (hχ : ∀ g : Gal p Ω, g (T.ζ n) = T.ζ n ^ (χ g).val)
-    {H : Subgroup (Gal p Ω)} {r : Ω} (hr : r ≠ 0) {a : Gal p Ω → ZMod (p ^ n)}
-    (ha : IsKum T n H r a) {g h : Gal p Ω} (hg : g ∈ H) (hh : h ∈ H) :
-    a (g * h) = a g + χ g * a h := by
+    {H : Subgroup (Gal p Ω)} {r : Ω} (hr : r ≠ 0)
+    {a : Gal p Ω → ZMod (p ^ n)} (ha : IsKum T n H r a)
+    {g h : Gal p Ω} (hg : g ∈ H) (hh : h ∈ H)
+    : a (g * h) = a g + χ g * a h := by
   have e := ha (g * h) (H.mul_mem hg hh)
   rw [AlgEquiv.mul_apply, ha h hh, map_mul, map_pow, hχ g, ha g hg, ← pow_mul, ← mul_assoc,
-    ← pow_add] at e
+      ← pow_add]
+    at e
   have e' := mul_right_cancel₀ hr e
   haveI : NeZero (p ^ n) := ⟨pow_ne_zero _ hp.out.ne_zero⟩
   rw [zeta_pow_eq_iff, ← ZMod.natCast_eq_natCast_iff] at e'

@@ -68,10 +68,7 @@ theorem top_le_iff_cpt [IsLocalRing A] (x : Sp A ⟶ X) (U : X.Opens)
   · intro h
     exact h (show cpt A ∈ (⊤ : (Sp A).Opens) from trivial)
   · intro h z _
-    first
-    | exact (IsLocalRing.specializes_closedPoint z).mem_open (x ⁻¹ᵁ U).isOpen h
-    | exact ((PrimeSpectrum.le_iff_specializes z (cpt A)).mp
-        (IsLocalRing.le_maximalIdeal z.isPrime.ne_top)).mem_open (x ⁻¹ᵁ U).isOpen h
+    first | exact (IsLocalRing.specializes_closedPoint z).mem_open (x ⁻¹ᵁ U).isOpen h
 
 theorem toStkA_valR (x : Sp A ⟶ X) (U : X.Opens) (z : Sp A) (ht : ⊤ ≤ x ⁻¹ᵁ U) (a : Γ(X, U)ˣ)
     : toStkA z (valR x U a.val) = (gm x z U a).val := by
@@ -232,7 +229,7 @@ private theorem gm_pullU_eq_gm_comp
   by_cases hz : r z ∈ h ⁻¹ᵁ V
   · have hz' : (r ≫ h) z ∈ V := hz
     simp only [gm, dite_eq_left hz, dite_eq_left hz']
-    all_goals first | rfl | (ext; simp [pullU, Scheme.comp_app])
+    all_goals first | rfl
   · have hz' : (r ≫ h) z ∉ V := hz
     simp only [gm, dite_eq_right hz, dite_eq_right hz', MonoidHom.one_apply]
 
@@ -331,8 +328,6 @@ section Thick
 
 theorem thick_mono (R : Type) [CommRing R] (I : Ideal R) (n : ℕ) : Mono (Out.thick R I n) := by
   first
-  | exact inferInstance
-  | exact (IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective).mono
   | (
       haveI := IsClosedImmersion.spec_of_surjective
          (CommRingCat.ofHom (Ideal.Quotient.mk (I ^ (n + 1)))) Ideal.Quotient.mk_surjective
@@ -352,14 +347,11 @@ theorem thick_map_eq
   have m1
       : ((Over.pullback (Out.thick R I n)).map ψ).left ≫ pullback.fst G'.hom (Out.thick R I n)
         = pullback.fst G.hom (Out.thick R I n) ≫ ψ.left := by
-    first
-    | (simp [Over.pullback]; done)
-    | (simp [Over.pullback]; exact pullback.lift_fst _ _ _)
-    | exact pullback.lift_fst _ _ _
+    first | (simp [Over.pullback]; done)
   have m2
       : ((Over.pullback (Out.thick R I n)).map ψ).left ≫ pullback.snd G'.hom (Out.thick R I n)
         = pullback.snd G.hom (Out.thick R I n) := by
-    first | (simp [Over.pullback]; done) | (simp [Over.pullback]) | exact pullback.lift_snd _ _ _
+    first | (simp [Over.pullback]; done)
   apply pullback.hom_ext
   · rw [hh', m1]
   · rw [m2, ← cancel_mono (Out.thick R I n), Category.assoc,

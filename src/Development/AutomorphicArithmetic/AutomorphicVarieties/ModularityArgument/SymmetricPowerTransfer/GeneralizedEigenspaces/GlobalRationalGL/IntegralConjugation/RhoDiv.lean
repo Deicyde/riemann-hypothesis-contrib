@@ -68,10 +68,7 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.rhoDiv
     rw [P.φ_alg, IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers,
       IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers, cv, h1, h2,
       ← IsDedekindDomain.HeightOneSpectrum.valuation_liesOver L (un w) w x]
-    first
-    | exact pow_le_one_iff he
-    | exact pow_le_one_iff_of_nonneg zero_le' he
-    | exact pow_le_one_iff_of_nonneg (zero_le' (a := _)) he
+    first | exact pow_le_one_iff he
   have hd : DenseRange (cv (un w)) :=
     IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap (Lp L) (un w)
   have hc := P.φ_cont (un w) w rfl

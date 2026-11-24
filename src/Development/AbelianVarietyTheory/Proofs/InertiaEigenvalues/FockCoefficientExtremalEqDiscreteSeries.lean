@@ -529,7 +529,6 @@ theorem coef_eq
   have key :=
     eq_const_mul hO (thetaIP μ 𝓕 J J) (horb J hJ) hB
       (fun u hu s => by
-        beta_reduce
         have e
             : om (1, L (torEl (x0Mat M) s * u)) J
               = om (1, L (torEl (x0Mat M) s)) (om (1, L u) J) := by

@@ -39,9 +39,6 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicCases.S
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal

@@ -3,12 +3,13 @@ module
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaPartD
 public import Development.AbelianVarietyTheory.BlockTheory.SiegelEisenstein.GramMatrixAdjoint
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.BigCellDefs
-import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.StarPurelyImaginaryEqNeg
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RationalAdelicMatricesSelfAnnihilator
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SecondOnCommonRangeOfSecond
-import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualOfCovolumeOneStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousHermPart
+import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.StarPurelyImaginaryEqNeg
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualOfCovolumeOne
 import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemElt
 import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCSecondCountable
 import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
@@ -169,7 +170,7 @@ theorem hR_tup (V : HSp D) (x y : Mx D V.rank r) (a b : Fin r)
     : hR (AF D.host.F) D.sp.cm.sig V.gram (fun i => x i a) (fun i => y i b)
       = GlobalTheory.StdUnn.inner V x y a b := by
   simp only [hR, Formalism.UG.hform, JR, GlobalTheory.StdUnn.inner, Matrix.mul_apply,
-    Finset.mul_sum, Finset.sum_mul]
+    Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   change _ = (cA D (x i a)) * (incA D (V.gram i j) * y j b)
   rw [mul_assoc]
@@ -345,7 +346,8 @@ theorem sdHerm_map
   have ht : Continuous (Algebra.trace (AF D.host.F) (AE D)) :=
     IsModuleTopology.continuous_of_linearMap (Algebra.trace (AF D.host.F) (AE D))
   have hsd : SelfDual lam (pairH ψ) := by
-    refine GlobalTheory.T.selfDual_of_fundamentalDomain_volume_eq_one _ (ratHerm D r) K hK hKc _
+    refine _root_.GlobalTheory.CovolumeOneSelfDual.selfDual_of_covolume_one _ (ratHerm D r) K hK hKc
+      _
       (fun y => ?_)
       (fun x y => ?_)
       (fun x x' y => ?_)

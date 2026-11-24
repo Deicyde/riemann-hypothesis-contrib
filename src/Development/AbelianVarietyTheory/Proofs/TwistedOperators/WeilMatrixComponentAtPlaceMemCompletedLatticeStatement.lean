@@ -56,7 +56,4 @@ theorem _root_.GlobalTheory.T.weilMatrixComponentAtPlace_mem_completedLattice
           wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v = p)
             ∧ u - wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v ≠ p)
             ∧ ((∀ v, P v → Sum.inl v ≠ p) → wAt p u = 0) := by
-  first
-  | exact @GlobalTheory.LatticeLocal.wAt_mem_latO
-  | exact GlobalTheory.LatticeLocal.wAt_mem_latO
-  | (intros; apply GlobalTheory.LatticeLocal.wAt_mem_latO <;> assumption)
+  first | exact @GlobalTheory.LatticeLocal.wAt_mem_latO

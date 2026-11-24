@@ -50,6 +50,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Formalism.LocalToGlobal.HilbertRowConditions.CenterIdempotentAction
 import Formalism.LocalToGlobal.IndefiniteReal.RecTie
+import Formalism.LocalToGlobal.Columns.RecLevelHost
 
 @[expose] public section
 
@@ -63,8 +64,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
   GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 open GlobalTheory.Mem.R3.LiftBrg
-
-
 
 namespace GlobalTheory.Mem.R3.LiftBrg.SplitLoc
 
@@ -137,8 +136,7 @@ theorem bc_prV_swap_eq_one_iff
             (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV D.host.F w)
             (AlgHom.id D.host.F D.host.E))).map τ := by
     ext i j
-    simp only [Formalism.UG.bc, Units.coe_map, MonoidHom.coe_coe, RingHom.mapMatrix_apply,
-      Matrix.map_apply]
+    simp only [Formalism.UG.bc, Units.coe_map, Matrix.map_apply]
     exact prV_swap w _
   rw [e]
   constructor
@@ -358,7 +356,7 @@ theorem loc_iff
     rcases Formalism.L2.Col.mhl_over_eq X.toD7.sp.cm hv PP hov with h | h
     · subst h
       refine hoffset.2.2 PP (Or.inr hPP) ?_
-      rw [Formalism.L2.Col.conjIdeal_asIdeal, ← hPb, Formalism.L2.Col.conjPrime_conjPrime]
+      rw [Formalism.L2.Col.conjIdeal_asIdeal, ← hPb, _root_.Formalism.L2.Col.rlh_conjP_conjP]
     · rw [hPb] at h
       subst h
       exact hoffset.2.1 (Or.inr hPP)

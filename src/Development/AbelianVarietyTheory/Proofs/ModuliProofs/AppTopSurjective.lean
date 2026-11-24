@@ -57,22 +57,13 @@ namespace GlobalTheory.BaseChangeFns
 
 private theorem surjective_appTop_of_iso {X Y : Scheme.{0}} (e : X ≅ Y)
     : Function.Surjective e.hom.appTop.hom := by
-  first
-  | exact (ConcreteCategory.bijective_of_isIso e.hom.appTop).2
-  | exact (ConcreteCategory.bijective_of_isIso (e.hom.app ⊤)).2
-  | exact fun a => ⟨
-      e.inv.appTop.hom a,
-      by rw [← CommRingCat.comp_apply, ← Scheme.comp_appTop, e.inv_hom_id, Scheme.id_appTop]; rfl
-    ⟩
+  first | exact (ConcreteCategory.bijective_of_isIso (e.hom.app ⊤)).2
 
 private theorem surjective_appTop_comp
     {X Y Z : Scheme.{0}} (p : X ⟶ Y) (q : Y ⟶ Z) (hp : Function.Surjective p.appTop.hom)
     (hq : Function.Surjective q.appTop.hom)
     : Function.Surjective (p ≫ q).appTop.hom := by
-  first
-  | exact hp.comp hq
-  | (rw [Scheme.comp_appTop, CommRingCat.hom_comp, RingHom.coe_comp]; exact hp.comp hq)
-  | exact surj_comp hp hq
+  first | exact hp.comp hq
 
 private theorem surjective_of_comp_surjective_of_injective
     {A B C : CommRingCat}
@@ -85,12 +76,7 @@ private theorem surjective_of_comp_surjective_of_injective
 private theorem injective_presheaf_map_eqToHom {X : Scheme.{0}} {V W : X.Opens} (p : V = W)
     : Function.Injective (X.presheaf.map (eqToHom p).op).hom := by
   subst p
-  first
-  | (intro a b hab; simpa using hab)
-  | (
-      simp only [eqToHom_refl, op_id, Functor.map_id, CommRingCat.hom_id]
-      exact Function.injective_id
-    )
+  first | (intro a b hab; simpa using hab)
 
 private theorem isAbelianScheme_pullback'
     {S₀ S : Scheme.{0}} {B : Over S₀} [GrpObj B] (t : S ⟶ S₀) (hB : IsAbelianScheme B)
@@ -100,16 +86,16 @@ private theorem isAbelianScheme_pullback'
   have h3 := hB.geomConnected
   have h4 := hB.comm
   constructor
-  case comm => first | infer_instance | exact Functor.obj.instIsCommMonObj _
+  case comm => first | infer_instance
   case smooth =>
     show Smooth (pullback.snd B.hom t)
-    first | infer_instance | exact MorphismProperty.pullback_snd _ _ h1
+    first | infer_instance
   case proper =>
     show IsProper (pullback.snd B.hom t)
-    first | infer_instance | exact MorphismProperty.pullback_snd _ _ h2
+    first | infer_instance
   case geomConnected =>
     show GeometricallyConnected (pullback.snd B.hom t)
-    first | infer_instance | exact MorphismProperty.pullback_snd _ _ h3
+    first | infer_instance
 
 theorem appTop_surjective
     (hG : Out.GlobalFnsSt)

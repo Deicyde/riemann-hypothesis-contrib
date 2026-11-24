@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.stepVector_lift_pair_flagLevel_realized_chain
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type}
         {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.stepVector_lift_pair_flagLevel_realized_chain
                 → (levChi _ (R.βY k) (flagL (R.datYt t k R.triv)) κ)⁻¹ • R.ωY t k (κ, κ') (R.vY t k)
                   = (levChi _ (R.βY (k + 1)) (flagL (R.datYt t (k + 1) R.triv)) κ')⁻¹
                     • R.vY t k := by
-  first
-  | exact @GlobalTheory.StepVecLaw.stepVec_lifts
-  | exact GlobalTheory.StepVecLaw.stepVec_lifts
-  | (intros; apply GlobalTheory.StepVecLaw.stepVec_lifts <;> assumption)
+  first | exact @GlobalTheory.StepVecLaw.stepVec_lifts

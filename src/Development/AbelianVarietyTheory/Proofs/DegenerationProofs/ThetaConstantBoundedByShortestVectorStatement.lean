@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.thetaConstant_bounded_by_shortestVector
     : Laws → Laws2 → UTorsSt
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.thetaConstant_bounded_by_shortestVector
                 l.yy x = QuotientAddGroup.mk w
                   ∧ ‖y₀ ⟨S.th x, S.th_mem x⟩‖
                     ≤ S.delta y₀ * Real.exp (-(l.q w / ((S.r * S.N : ℕ) : ℝ) ^ 2))) := by
-  first
-  | exact @GlobalTheory.ZH.TestVal.main
-  | exact GlobalTheory.ZH.TestVal.main
-  | (intros; apply GlobalTheory.ZH.TestVal.main <;> assumption)
+  first | exact @GlobalTheory.ZH.TestVal.main

@@ -120,7 +120,7 @@ theorem specFirst_rename_shiftVar (q : MvPolynomial (Fin e × Fin n) F)
   rfl
 
 theorem specFirst_zero_of_isMultiHomog
-    {δ : ℕ} (hδ : 1 ≤ δ) {f : MvPolynomial (Fin (e + 1) × Fin n) F} (hf : IsMultiHomog δ f)
+    {δ : ℕ} (hδ : 1 ≤ δ) {f : MvPolynomial (Fin (e + 1) × Fin n) F} (hf : Heights.IsMultiHomog δ f)
     : specFirst f 0 = 0 := by
   classical
   unfold specFirst
@@ -158,7 +158,9 @@ theorem eval_map_splitFirst
     · intro a
       simp [splitFirst, MvPolynomial.algebraMap_eq]
     · rintro ⟨i, m⟩
-      induction i using Fin.cases <;> simp [splitFirst, specFirstVar, MvPolynomial.algebraMap_eq, MvPolynomial.bind₁_X_right] <;> rfl
+      induction i using Fin.cases
+        <;> simp [splitFirst, specFirstVar, MvPolynomial.algebraMap_eq, MvPolynomial.bind₁_X_right]
+        <;> rfl
   exact RingHom.congr_fun h f
 
 end ChartChoiceAlgClosed

@@ -3,7 +3,8 @@ module
 public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContinuousOfContinuousTrace
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemisimpleTraceForm.SemisimpleOfTraceFormNondegenerate
-import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemisimpleTraceForm.TraceNilpotentAscent
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemisimpleTraceForm.TraceNilStep
+import Lemmata.IdempotentTraceVanishing.TraceAevalEqZero
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -61,8 +62,8 @@ theorem eq_zero_of_trace_mul_eq_zero
   intro k Γ _ _ _ a r hr M hM hg
   have hnd : PI.SSAscent.UnitaryGroupMassFormula.TrNondeg (PI.SSAscent.UnitaryGroupMassFormula.imAlg
       r) :=
-    PI.SSAscent.UnitaryGroupMassFormula.downStep_of
-      PI.SSAscent.UnitaryGroupMassFormula.trace_nilpotent_ascent k Γ a r hr
+    PI.SSAscent.UnitaryGroupMassFormula.downStep_of _root_.Bl.IdempotentTraceVanishing.goal1 k Γ a r
+      hr
   refine hnd M ((GlobalTheory.SSCont.mem_imAlg_iff r M).2 hM) fun y hy => ?_
   have hy' := (GlobalTheory.SSCont.mem_imAlg_iff r y).1 hy
   clear hy

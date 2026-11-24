@@ -122,8 +122,8 @@ theorem prod_dlB
     (hU : S6.Unram E) (hg : 0 < S.g) (i : ℕ)
     : ∏ _v : Fin S.f, KB.dlB S i 1
       = ZLattice.covolume (J.eLat E (S6.perLat E S.g (S6.nuBlock S.G.r i 1) 1) 1) := by
-  rw [unipotent_dual_lattice_covolume E hU S.g _ 1 hg, Finset.prod_const, Finset.card_univ,
-    Fintype.card_fin]
+  rw [_root_.Formalism.FourierDecayAlt.P.Dx2.NH.nhat E hU S.g _ 1 hg, Finset.prod_const,
+    Finset.card_univ, Fintype.card_fin]
   have hf : S.f = S6.deg E := by
     rw [← (Formalism.FourierDecayAlt.P.S6x2.degreeFacts E).2.1, Fintype.card_congr S.pl.symm,
       Fintype.card_fin]

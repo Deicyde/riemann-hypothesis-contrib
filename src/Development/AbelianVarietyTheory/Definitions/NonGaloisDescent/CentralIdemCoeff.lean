@@ -202,8 +202,6 @@ def LocBound {k : ℕ} (M : GE D.nd →* Matrix (Fin k) (Fin k) (D.nd.O i)) (e :
       (HfD (Br.PD D.loc D.nbr i w hw) (Br.locLat D.nbr i w hw M))
     ≤ (e : ℕ∞) * lenOl (Br.PD D.loc D.nbr i w hw) (O := Br.OLL D.nbr i w hw)
 
-
-
 def HfChar : Prop :=
   (∀ c ∈ Finset.Icc 2 D.R.t,
       HfD (Br.PD D.loc D.nbr i w hw) (Br.locLat D.nbr i w hw (chiRatO D.nd i c))

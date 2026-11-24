@@ -61,32 +61,43 @@ namespace RueckertNullstellensatz
 
 variable {σ : Type} [Fintype σ] {w : σ → ℂ}
 
-theorem exists_of_mem_holGermIdeal {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ) {φ : holGerms w}
-    (hφ : φ ∈ holGermIdeal w p) :
-    ∃ h : Fin k → (σ → ℂ) → ℂ, (∀ i, AnalyticAt ℂ (h i) w) ∧
-      (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
-  apply GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.PrimeGermPrimitivePresentation.exists_of_mem_holGermIdeal <;> assumption
+theorem exists_of_mem_holGermIdeal
+    {k : ℕ} (p : Fin k → (σ → ℂ) → ℂ) {φ : holGerms w} (hφ : φ ∈ holGermIdeal w p)
+    : ∃ h : Fin k → (σ → ℂ) → ℂ,
+      (∀ i, AnalyticAt ℂ (h i) w)
+        ∧ (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
+  apply
+      GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.PrimeGermPrimitivePresentation.exists_of_mem_holGermIdeal
+    <;> assumption
 
-theorem mem_holGermIdeal_of_eq {k : ℕ} {p : Fin k → (σ → ℂ) → ℂ} (hp : ∀ i, AnalyticAt ℂ (p i) w)
-    {h : Fin k → (σ → ℂ) → ℂ} (hh : ∀ i, AnalyticAt ℂ (h i) w) (φ : holGerms w)
-    (hφ : (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)) :
-    φ ∈ holGermIdeal w p := by
-  have hsum : φ = ∑ i, (⟨(h i : Germ (𝓝 w) ℂ), h i, hh i, rfl⟩ : holGerms w) *
-      ⟨(p i : Germ (𝓝 w) ℂ), p i, hp i, rfl⟩ := by
+theorem mem_holGermIdeal_of_eq
+    {k : ℕ} {p : Fin k → (σ → ℂ) → ℂ} (hp : ∀ i, AnalyticAt ℂ (p i) w)
+    {h : Fin k → (σ → ℂ) → ℂ} (hh : ∀ i, AnalyticAt ℂ (h i) w)
+    (φ : holGerms w)
+    (hφ : (φ : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ))
+    : φ ∈ holGermIdeal w p := by
+  have hsum
+      : φ
+        = ∑ i, (⟨(h i : Germ (𝓝 w) ℂ), h i, hh i, rfl⟩ : holGerms w) *
+          ⟨(p i : Germ (𝓝 w) ℂ), p i, hp i, rfl⟩ := by
     apply Subtype.ext
-    rw [hφ, show (fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) = ∑ i, h i * p i by
-      funext z; simp [Finset.sum_apply]]
+    rw [hφ,
+      show (fun z => ∑ i, h i z * p i z : (σ → ℂ) → ℂ) = ∑ i, h i * p i by
+        funext z; simp [Finset.sum_apply]]
 
-    rw [show ((∑ i, h i * p i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) = Germ.coeRingHom (𝓝 w) (∑ i, h i * p i) from rfl,
-    map_sum, AddSubmonoidClass.coe_finsetSum]
+    rw [show ((∑ i, h i * p i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)
+          = Germ.coeRingHom (𝓝 w) (∑ i, h i * p i) from
+        rfl,
+      map_sum, AddSubmonoidClass.coe_finsetSum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul]
     rfl
   rw [hsum]
   exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem proof (hNoeth : AnalyticGermsNoetherian.Statement) (hPrime : PrimeGermNullstellensatz.Statement) :
-    RueckertNullstellensatz.Statement := by
+theorem proof
+    (hNoeth : AnalyticGermsNoetherian.Statement) (hPrime : PrimeGermNullstellensatz.Statement)
+    : RueckertNullstellensatz.Statement := by
   intro σ _ w k f g hf hg hvan
   let G : holGerms w := ⟨(g : Germ (𝓝 w) ℂ), g, hg, rfl⟩
   have : IsNoetherianRing (holGerms w) := hNoeth σ w
@@ -105,8 +116,8 @@ theorem proof (hNoeth : AnalyticGermsNoetherian.Statement) (hPrime : PrimeGermNu
         exact ⟨j, Subtype.ext (hj.trans (hps j)).symm⟩
       · rintro ⟨j, rfl⟩
         exact ⟨j, (hps j).symm⟩
-    have hfmem : ∀ i, (⟨(f i : Germ (𝓝 w) ℂ), f i, hf i, rfl⟩ : holGerms w) ∈ holGermIdeal w p := fun i =>
-      hPeq ▸ hfP (Ideal.subset_span ⟨i, rfl⟩)
+    have hfmem : ∀ i, (⟨(f i : Germ (𝓝 w) ℂ), f i, hf i, rfl⟩ : holGerms w) ∈ holGermIdeal w p :=
+      fun i => hPeq ▸ hfP (Ideal.subset_span ⟨i, rfl⟩)
     choose c _ hc using fun i => exists_of_mem_holGermIdeal p (hfmem i)
     have hfev : ∀ᶠ z in 𝓝 w, ∀ i, f i z = ∑ j, c i j z * p j z :=
       eventually_all.2 fun i => Germ.coe_eq.1 (hc i)
@@ -122,7 +133,9 @@ theorem proof (hNoeth : AnalyticGermsNoetherian.Statement) (hPrime : PrimeGermNu
     exact Ideal.mul_mem_left _ G hm
   obtain ⟨h, hh, hgh⟩ := exists_of_mem_holGermIdeal f hm'
   refine ⟨m + 1, h, Nat.succ_pos m, hh, ?_⟩
-  have hG : ((G ^ (m + 1) : holGerms w) : Germ (𝓝 w) ℂ) = ((g ^ (m + 1) : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
+  have hG
+      : ((G ^ (m + 1) : holGerms w) : Germ (𝓝 w) ℂ)
+        = ((g ^ (m + 1) : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) := by
     rw [Germ.coe_pow]
     rfl
   rw [hG] at hgh

@@ -60,10 +60,6 @@ open Formalism.UG
 
 variable {R : Type} [CommRing R]
 
-theorem cT_mul_gen (σ : R →+* R) {m p q : Type} [Fintype p] (M : Matrix m p R) (N : Matrix p q R)
-    : cT σ (M * N) = cT σ N * cT σ M := by
-  simp only [cT, Matrix.map_mul, Matrix.transpose_mul]
-
 theorem cT_one_gen (σ : R →+* R) {n : Type} [Fintype n] [DecidableEq n]
     : cT σ (1 : Matrix n n R) = 1 := by
   simp [cT]
@@ -82,11 +78,11 @@ theorem conj_mem
   have h2 : (T : Matrix n n R) * ((T⁻¹ : GL n R) : Matrix n n R) = 1 := by
     rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
   have h3 : cT σ ((T⁻¹ : GL n R) : Matrix n n R) * cT σ (T : Matrix n n R) = 1 := by
-    rw [← cT_mul_gen, h2, cT_one_gen]
+    rw [← _root_.Formalism.UG.cT_mul, h2, cT_one_gen]
   have hJ : J = ((c⁻¹ : Rˣ) : R) • (cT σ (T : Matrix n n R) * Q * T) := by
     rw [hT, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_smul]
   rw [hJ]
-  simp only [Units.val_mul, cT_mul_gen, Matrix.mul_smul, Matrix.smul_mul]
+  simp only [Units.val_mul, _root_.Formalism.UG.cT_mul, Matrix.mul_smul, Matrix.smul_mul]
   congr 1
   calc
     _ = cT σ (T : Matrix n n R) * cT σ (g : Matrix n n R)
@@ -105,7 +101,7 @@ theorem conj_back
   have h2 : (T : Matrix n n R) * ((T⁻¹ : GL n R) : Matrix n n R) = 1 := by
     rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
   have h3 : cT σ ((T⁻¹ : GL n R) : Matrix n n R) * cT σ (T : Matrix n n R) = 1 := by
-    rw [← cT_mul_gen, h2, cT_one_gen]
+    rw [← _root_.Formalism.UG.cT_mul, h2, cT_one_gen]
   have hJ : J = ((c⁻¹ : Rˣ) : R) • (cT σ (T : Matrix n n R) * Q * T) := by
     rw [hT, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_smul]
   rw [hJ, Matrix.mul_smul, Matrix.smul_mul]

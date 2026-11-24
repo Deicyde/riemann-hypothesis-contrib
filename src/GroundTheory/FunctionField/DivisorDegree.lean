@@ -66,7 +66,6 @@ theorem linearIndependent_pow_of_transcendental {x : K} (hx : Transcendental k x
   intro g hg i
   set p : k[X] := ∑ j : Fin N, monomial (j : ℕ) (g j) with hp
   have hpx : aeval x p = 0 := by
-
     rw [hp, map_sum, ← hg]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [aeval_monomial, Algebra.smul_def]

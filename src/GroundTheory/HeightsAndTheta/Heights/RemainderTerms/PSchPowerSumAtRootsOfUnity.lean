@@ -56,7 +56,8 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem SchPowerSumAtRootsOfUnity.rootOfUnity_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k) : IsPrimitiveRoot (rootOfUnity k) k := by
+theorem SchPowerSumAtRootsOfUnity.rootOfUnity_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k)
+    : IsPrimitiveRoot (rootOfUnity k) k := by
   simpa [rootOfUnity] using Complex.isPrimitiveRoot_exp k (by omega)
 
 theorem SchPowerSumAtRootsOfUnity.proof : SchPowerSumAtRootsOfUnity.Statement := by
@@ -64,14 +65,14 @@ theorem SchPowerSumAtRootsOfUnity.proof : SchPowerSumAtRootsOfUnity.Statement :=
   have hprim := SchPowerSumAtRootsOfUnity.rootOfUnity_isPrimitiveRoot hk
 
   simp only [psum, map_sum, map_pow, aeval_X]
-  have hsum : ∑ i : Fin N, rootOfUnityPoint N k i ^ j =
-      ∑ i ∈ range k, (rootOfUnity k ^ j) ^ i := by
+  have hsum : ∑ i : Fin N, rootOfUnityPoint N k i ^ j = ∑ i ∈ range k, (rootOfUnity k ^ j) ^ i := by
     unfold rootOfUnityPoint
     rw [Fin.sum_univ_eq_sum_range (fun i => (if i < k then rootOfUnity k ^ i else 0) ^ j) N,
       ← Finset.sum_range_add_sum_Ico _ hkN]
     rw [Finset.sum_eq_zero (s := Ico k N) (fun i hi => by
-      simp only [Finset.mem_Ico] at hi
-      simp [show ¬ i < k by omega, zero_pow (show j ≠ 0 by omega)]), add_zero]
+        simp only [Finset.mem_Ico] at hi
+        simp [show ¬ i < k by omega, zero_pow (show j ≠ 0 by omega)]),
+      add_zero]
     refine Finset.sum_congr rfl fun i hi => ?_
     simp only [Finset.mem_range] at hi
     simp [hi, ← pow_mul, mul_comm]

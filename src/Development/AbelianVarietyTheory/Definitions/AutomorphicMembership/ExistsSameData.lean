@@ -45,9 +45,6 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Rows NumberField Is
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.TwInputs.Move
 
 section Defs
@@ -2228,9 +2225,6 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0 FullRk SgJ
 open Formalism.L2.Host (embLL0 CharFrame)
 open GlobalTheory.TwSys GlobalTheory.TwAll GlobalTheory.SupLaw GlobalTheory.LiftLeaf
 open scoped TensorProduct
-
-
-
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

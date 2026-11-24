@@ -109,8 +109,8 @@ theorem exists_binary_eq_adicCompletion
   haveI : Finite (𝓞 F ⧸ v.asIdeal) := v.asIdeal.finiteQuotientOfFreeOfNeBot v.ne_bot
   letI := Ideal.Quotient.field v.asIdeal
   obtain ⟨r, s, hrs⟩ :=
-    UnramifiedHermitian.exists_binary_eq_of_finite (a := Ideal.Quotient.mk v.asIdeal a)
-      (n := Ideal.Quotient.mk v.asIdeal n)
+    _root_.GlobalTheory.BinaryFormUniversal.binary_form_universal
+      (a := Ideal.Quotient.mk v.asIdeal a) (n := Ideal.Quotient.mk v.asIdeal n)
       (by
         intro h
         apply hD

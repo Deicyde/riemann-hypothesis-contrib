@@ -1,9 +1,9 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.CuspFlowEqTorusAction
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.CuspFlowEqTorusAction
 public import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.MaximalCuspKernels.MaxCuspsSt
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.CountableOfIsAddFundamentalDomain
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.CuspFlowEqTorusActionStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.PeriodLatticeCountable
 import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.MaximalCuspKernels.MaxCuspsPfA
 import Formalism.LocalToGlobal.ProjectiveLattices.RdOrbIntOfLatZ
 import Mathlib.Algebra.Order.Floor.Extended
@@ -51,7 +51,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.PeriodLatticeCountable
 
 @[expose] public section
 
@@ -68,13 +67,14 @@ noncomputable def dotForm {ι : Type} [Fintype ι] (c : ℝ) (v : ι → ℝ) : 
     simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => by ring
 
-theorem dotForm_apply {ι : Type} [Fintype ι] (c : ℝ) (v t : ι → ℝ) :
-    dotForm c v t = c * ∑ k, v k * t k := rfl
+theorem dotForm_apply {ι : Type} [Fintype ι] (c : ℝ) (v t : ι → ℝ)
+    : dotForm c v t = c * ∑ k, v k * t k :=
+  rfl
 
-theorem coefFn_eq_cubeCoeff {Ω : Type} {N : ℕ} (act : (Fin N → ℝ) → Ω → Ω) (ph : Fin N → ℝ)
-    (P : Ω → ℂ) (x : Ω) :
-    coefFn act ph P x =
-      cubeCoeff (Pi.basisFun ℝ (Fin N)) (fun t => P (act t x)) (dotForm 1 ph) := by
+theorem coefFn_eq_cubeCoeff
+    {Ω : Type} {N : ℕ} (act : (Fin N → ℝ) → Ω → Ω) (ph : Fin N → ℝ) (P : Ω → ℂ) (x : Ω)
+    : coefFn act ph P x
+      = cubeCoeff (Pi.basisFun ℝ (Fin N)) (fun t => P (act t x)) (dotForm 1 ph) := by
   have h : ∀ t : Fin N → ℝ, ∑ i, t i • Pi.basisFun ℝ (Fin N) i = t := fun t =>
     (Pi.basisFun ℝ (Fin N)).sum_repr t
   unfold coefFn cubeCoeff cube
@@ -86,19 +86,31 @@ theorem coefFn_eq_cubeCoeff {Ω : Type} {N : ℕ} (act : (Fin N → ℝ) → Ω 
     Finset.sum_congr rfl fun k _ => mul_comm (t k) (ph k)
   simp only [integrand, chr, eNeg, dotForm_apply, one_mul, hphase]
 
-theorem herm_comb {E : Type} [Field E] [NumberField E] [IsCMField E] {r ρ : ℕ} {X : Data E r}
-    (cu : CuspFD X ρ) (η : Fin ρ → E) :
-    herm X.Gm (∑ a, η a • cu.e a) (∑ a, η a • cu.e a) = 0 := by
+theorem herm_comb
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r ρ : ℕ} {X : Data E r} (cu : CuspFD X ρ) (η : Fin ρ → E)
+    : herm X.Gm (∑ a, η a • cu.e a) (∑ a, η a • cu.e a) = 0 := by
   apply GlobalTheory.CuspFlow.herm_comb_eq_zero <;> assumption
 
-theorem coefFn_eq_zero_of_killed : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r), (∀ cu : CuspFD X ρ, ∃ bs, IsZBasis X cu bs) → ∀ (la : Wt X.Ψ r), (∀ (cu : CuspFD X ρ) (β : Matrix (Fin ρ) (Fin ρ) E), β ∈ zGam X cu → ∀ γ ∈ X.Γ, (γ : Matrix (Fin r) (Fin r) E) = zMatE X cu.e β → X.χ la γ = 1) → ∀ (c : ℝ) (P : Frame X.Ψ r → ℂ), P ∈ X.SSgt la c → ∀ (cu : CuspFD X ρ) (χ : Matrix (Fin ρ) (Fin ρ) E), IsExpoFD X cu χ → KilledFD X cu χ c → ∀ x ∈ X.dom, coefFn (zAct X cu) (phZ X cu χ) P x = 0 := by
+theorem coefFn_eq_zero_of_killed
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r),
+      (∀ cu : CuspFD X ρ, ∃ bs, IsZBasis X cu bs)
+        → ∀ (la : Wt X.Ψ r),
+          (∀ (cu : CuspFD X ρ) (β : Matrix (Fin ρ) (Fin ρ) E),
+              β ∈ zGam X cu
+                → ∀ γ ∈ X.Γ, (γ : Matrix (Fin r) (Fin r) E) = zMatE X cu.e β → X.χ la γ = 1)
+            → ∀ (c : ℝ) (P : Frame X.Ψ r → ℂ),
+              P ∈ X.SSgt la c
+                → ∀ (cu : CuspFD X ρ) (χ : Matrix (Fin ρ) (Fin ρ) E),
+                  IsExpoFD X cu χ → KilledFD X cu χ c
+                    → ∀ x ∈ X.dom, coefFn (zAct X cu) (phZ X cu χ) P x = 0 := by
   intro E _ _ _ r ρ X hbas la hchi c P hP cu χ hχ hK x hx
   obtain ⟨η, hη0, hηΛ, hηc⟩ := hK
   have hb : IsZBasis X cu (zBas X cu) := Classical.epsilon_spec (hbas cu)
   have hsec : X.IsSec la P := hP.1.1.1
   have hdom : ∀ u, zAct X cu u x ∈ X.dom := fun u =>
     zAct_mem_dom X cu (zBas_skew X cu (hbas cu)) u x hx
-  obtain ⟨L, hL1, hL2, hL3⟩ := GlobalTheory.T.cuspFlow_eq_torusAction E r ρ X cu hb η hηΛ
+  obtain ⟨L, hL1, hL2, hL3⟩ := _root_.GlobalTheory.CuspFlow.flow_eq_zAct E r ρ X cu hb η hηΛ
   have hiso : X.IsIso (∑ a, η a • cu.e a) :=
     ⟨hηΛ, herm_comb cu η, fun h => hη0 (funext (Fintype.linearIndependent_iff.1 cu.ind η h))⟩
   set ν : X.Ψ → ℝ := fun τ => (τ.1 (hq χ η)).re with hν
@@ -124,10 +136,10 @@ theorem coefFn_eq_zero_of_killed : ∀ (E : Type) [Field E] [NumberField E] [IsC
     rfl
   have hex := PeriodLatticeCountable.fd_exists X la
   obtain ⟨-, hD, h0, h1⟩ := hex.choose_spec
-  obtain ⟨H₁, -, -⟩ := partialCoeff_spec_cube (Pi.basisFun ℝ (Fin (nZ X ρ))) hD h0.ne' h1.ne L hgc
-    (fun i => hper _ fun k => ⟨if k = i then 1 else 0, by
-      by_cases h : k = i <;> simp [h]⟩)
-    (fun l hl => hper _ (hL3 la l hl))
+  obtain ⟨H₁, -, -⟩ :=
+    partialCoeff_spec_cube (Pi.basisFun ℝ (Fin (nZ X ρ))) hD h0.ne' h1.ne L hgc
+      (fun i => hper _ fun k => ⟨if k = i then 1 else 0, by by_cases h : k = i <;> simp [h]⟩)
+      (fun l hl => hper _ (hL3 la l hl))
   obtain ⟨-, -, -, B⟩ := H₁ (dotForm 2 ν) hfreq
   rw [coefFn_eq_cubeCoeff]
   refine B.1 ?_ _ (fun i => ?_) hcomp

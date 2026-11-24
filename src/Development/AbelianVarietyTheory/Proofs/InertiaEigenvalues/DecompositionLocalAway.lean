@@ -214,7 +214,7 @@ theorem decomp_chi
       by_cases hc : c = c0
       · subst hc
         simp [chiM, twistM, mapM, Matrix.mulVec, dotProduct, c0]
-      · simp [Pi.single_apply, hc]
+      · simp [hc]
 
 theorem chiM_cont (c : ℕ) : Continuous fun g => chiM (D := D) (i := i) c g := by
   have : (fun g => chiM (D := D) (i := i) c g)
@@ -340,7 +340,7 @@ theorem locC_rDuO
       C.inc ((D.nbr i w hw).toLL (rTwO D.nd i r x (decS D.nd w (Br.iota D.nbr i w hw g⁻¹)) b a))
   rw [← map_mul, ← map_mul, map_inv, map_inv]
   congr 2
-  all_goals (simp [rDuO, rTwO, T2O, WpO, twistM, dualM] <;> ring)
+  all_goals (simp [rDuO, rTwO, twistM, dualM] <;> ring)
 
 theorem locC_T2O
     (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw)
@@ -357,6 +357,5 @@ theorem locC_T2O
       C.inc ((D.nbr i w hw).toLL (WpO D.nd i ρ π (decS D.nd w (Br.iota D.nbr i w hw g⁻¹)) b a))
   rw [← map_mul, ← map_mul, map_inv, map_inv]
   congr 2
-  all_goals (simp [rDuO, rTwO, T2O, WpO, twistM, dualM] <;> ring)
 
 end GlobalTheory.CrysChiOne

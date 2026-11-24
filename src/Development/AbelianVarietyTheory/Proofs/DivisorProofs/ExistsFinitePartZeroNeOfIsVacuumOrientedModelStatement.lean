@@ -57,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_finitePartZero_ne_of_isVacuum_orientedModel
         (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ) (LS : Set (Fin S.rank → D.host.E))
         (LT : Set (Fin T.rank → D.host.E)) (f : WO S T → ℂ),
       IsVacO ψ θ S T sS sT LS LT f → ∃ w : WO S T, w.map (finPart D) = 0 ∧ f w ≠ 0 := by
-  first
-  | exact @GlobalTheory.VacNonzeroReal.exists_finPart_zero_ne
-  | exact GlobalTheory.VacNonzeroReal.exists_finPart_zero_ne
-  | (intros; apply GlobalTheory.VacNonzeroReal.exists_finPart_zero_ne <;> assumption)
+  first | exact @GlobalTheory.VacNonzeroReal.exists_finPart_zero_ne

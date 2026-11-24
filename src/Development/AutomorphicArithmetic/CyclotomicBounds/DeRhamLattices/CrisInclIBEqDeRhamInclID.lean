@@ -49,8 +49,6 @@ open scoped Formalism.Per
 open GlobalTheory.BKGal.HatVal
 open scoped GlobalTheory.BKGal.HatVal
 
-
-
 theorem _root_.UpperTheory.KN.crisIncl_iB_eq_deRhamIncl_iD
     : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
         [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K]

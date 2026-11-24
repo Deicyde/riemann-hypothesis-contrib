@@ -4,7 +4,7 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZeroOfForallXiPowDvd
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCompatibleRootsOfUnityAndTiltPadic
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KerThetaLocalizedEqSpanFontaineXiElementStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KerThetaLocalizedEqSpanFontaineXiElement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -104,7 +104,7 @@ theorem algebraMap_AinfP_BdRp_injective (l : ℕ) [Fact l.Prime]
     (fun n a h => XiHaus.xi_sat he n a h)
     (GlobalTheory.MemLoc.eq_zero_of_forall_xi_pow_dvd l e he) x
     fun n => ?_
-  rw [← GlobalTheory.T.kerThetaLocalized_eq_span_fontaineXiElement l e he,
+  rw [← _root_.GlobalTheory.MemLoc.ker_localizedTheta_eq_span_xi l e he,
     ← Ideal.Quotient.eq_zero_iff_mem]
   have h1 : Per.ev l n (algebraMap (Per.AinfP l) (Per.BdRp l) x) = Ideal.Quotient.mk _ x :=
     GlobalTheory.RingIface.ev_alg l n x

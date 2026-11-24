@@ -48,11 +48,9 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Connected.Separation
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValSubLtIff
 
 @[expose] public section
-
-
-
 
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
@@ -80,15 +78,7 @@ private theorem val_of_norm
   refine congrArg _ (Multiplicative.toAdd.injective ?_)
   rw [toAdd_pow, nsmul_eq_mul, WithZero.toAdd_unzero_eq_log hy, WithZero.toAdd_unzero_eq_log hx, h2]
 variable [Algebra K L]
-private theorem normV_under (w : HeightOneSpectrum (𝓞 L))
-    : normV w = normV (w.under (𝓞 K)) ^ w.asIdeal.inertiaDeg (𝓞 K) := by
-  have : w.asIdeal.LiesOver (w.under (𝓞 K)).asIdeal := ⟨rfl⟩
-  have := w.isMaximal
-  have := (w.under (𝓞 K)).isMaximal
-  simp only [normV, ← Ideal.absNorm_eq_natCard]
-  show Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal ^ w.asIdeal.inertiaDeg (𝓞 K)
-  rw [← Ideal.absNorm_relNorm (𝓞 K) (𝓞 L) w.asIdeal,
-    Ideal.relNorm_eq_pow_of_isMaximal w.asIdeal (w.under (𝓞 K)).asIdeal, map_pow]
+private alias normV_under := _root_.GlobalTheory.DelEps.WeilRes.normV_eq_pow
 private theorem tendsto_under'
     : Filter.Tendsto
       (fun w : HeightOneSpectrum (𝓞 L) => w.under (𝓞 K))

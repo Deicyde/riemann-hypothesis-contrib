@@ -80,8 +80,7 @@ theorem gm_comp_top
   have m1 : (r ≫ τ) w ∈ (⊤ : Y.Opens) := trivial
   have m2 : r w ∈ (⊤ : Z.Opens) := trivial
   rw [dite_eq_left m1, dite_eq_left m2]
-  simp only [MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, Scheme.Hom.comp_app,
-    CommRingCat.comp_apply]
+  simp only [MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, Scheme.Hom.comp_app]
   rw [← h]
   rfl
 
@@ -107,7 +106,7 @@ theorem exists_ratio
   apply Units.ext
   simp only [MonoidHom.coe_comp, Function.comp_apply, Units.coe_map, MonoidHom.coe_coe]
   try erw [Function.comp_apply]
-  simp only [Units.coe_map, MonoidHom.coe_coe]
+  simp only [Units.coe_map]
   erw [← Scheme.Hom.germ_stalkMap_apply, ← Scheme.Hom.germ_stalkMap_apply]
   erw [TopCat.Presheaf.germ_res_apply]
 
@@ -128,9 +127,9 @@ theorem val_charGen
       (show (w ≫ (fst (splitTorus S X) G).left) z ∈ (⊤ : (splitTorus S X).left.Opens) from trivial)]
   apply Units.ext
   simp only [MonoidHom.coe_comp, Function.comp_apply, Units.coe_map, MonoidHom.coe_coe,
-    Scheme.Hom.comp_app, CommRingCat.comp_apply]
+    Scheme.Hom.comp_app]
   erw [Function.comp_apply]
-  simp only [Units.coe_map, MonoidHom.coe_coe]
+  simp only [Units.coe_map]
   erw [← Scheme.Hom.germ_stalkMap_apply, ← Scheme.Hom.germ_stalkMap_apply]
   erw [TopCat.Presheaf.germ_res_apply]
   simp only [Units.coe_map, MonoidHom.coe_coe]

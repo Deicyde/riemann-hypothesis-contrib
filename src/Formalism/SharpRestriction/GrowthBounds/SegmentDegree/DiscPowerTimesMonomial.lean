@@ -184,11 +184,6 @@ theorem famEl_eq
         plEmb, nmEmb, map_mul, rename_rename, Function.comp_def, plVar, tanVar]
       ring
     )
-  | (
-      simp only [famEl, memA, discPowerTimesMonomial, memMu, memPl, memG, PsiPl, PsiTan, segRen,
-        plEmb, nmEmb, map_mul, rename_rename, Function.comp_def]
-      ring_nf
-    )
 
 end Dat
 

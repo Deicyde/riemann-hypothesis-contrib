@@ -48,6 +48,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.spherical_label_operators_on_hyperspecial_fixed_vectors
     : ∀ {D : D7} (V : HSp D) (P : Pl D.host.E),
       (∀ d R,
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.spherical_label_operators_on_hyperspecial_fixed_ve
             → ∃ d,
               IsLab V P d ∧ (∀ γ ∈ rep V P d, ∃ k₁ ∈ hyp V P, ∃ k₂ ∈ hyp V P, γ = k₁ * g * k₂)
                 ∧ ∀ γ ∈ rep V P (dualLab d), ∃ k₁ ∈ hyp V P, ∃ k₂ ∈ hyp V P, γ = k₁ * g⁻¹ * k₂ := by
-  first
-  | exact @GlobalTheory.SphLabelOps.label_operators
-  | exact GlobalTheory.SphLabelOps.label_operators
-  | (intros; apply GlobalTheory.SphLabelOps.label_operators <;> assumption)
+  first | exact @GlobalTheory.SphLabelOps.label_operators

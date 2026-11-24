@@ -258,7 +258,7 @@ private theorem core
       mul_comm]
     congr 1
     rw [hind, integral_indicator hTm, setIntegral_const, Measure.real, cT]
-    simp [TF, Measure.real]
+    simp [TF]
 
 private theorem iy_mul_mem_WW {L : ℕ} {r : ℝ} (hr : r ≠ 0) {τ : (A ℚ)ˣ} (hτ : τ ∈ TT L)
     : iy r * τ ∈ WW L := by

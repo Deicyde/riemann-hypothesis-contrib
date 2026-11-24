@@ -64,13 +64,6 @@ theorem not_two_primes
   rw [← e]
   exact P.add_mem (P.mul_mem_left _ h1) (P.mul_mem_left _ h2)
 
-theorem unrAt_mul
-    {L : Type} [Field L] [NumberField L]
-    {χ χ' : HChar L} {v : HeightOneSpectrum (𝓞 L)} (h : χ.UnrAt v) (h' : χ'.UnrAt v)
-    : (χ * χ').UnrAt v := fun x hx => by
-  change χ.loc v x * χ'.loc v x = 1
-  rw [h x hx, h' x hx, one_mul]
-
 theorem unrAt_one {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
     : (1 : HChar L).UnrAt v := fun _ _ =>
   rfl
@@ -115,7 +108,7 @@ theorem unrAt_of_mem_set
   · exact hdel
   · exact hdel'
   · unfold TwDat.xiTw
-    refine unrAt_mul ?_ (unrAt_of_isTwist B.host ?_ (T.psi_tw w) hv)
+    refine _root_.Formalism.L2.Host.HChar.UnrAt.mul ?_ (unrAt_of_isTwist B.host ?_ (T.psi_tw w) hv)
     · split_ifs
       · exact hdel'
       · exact hdel

@@ -142,9 +142,6 @@ end SystemIndependence
 
 section Inhabitant
 
-open ReciprocityTheory.AnForm.M (p1)
-open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (projLineChartData)
-
 end Inhabitant
 
 end

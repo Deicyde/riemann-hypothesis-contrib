@@ -2,7 +2,8 @@ module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PoleLengthBound.AssembleAlt
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.HasseJidPow
-import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.HassePresH
+import Formalism.PeriodIntegrals.HassePresH
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HasseDerivativeFiltration.HasseMemHfr
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HasseJacobsonPowers.SfrMulMemJHfr
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -63,7 +64,8 @@ theorem mem_pow_smul_top_iff
 
 theorem hasse_preserves_kernel (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO))
     : HKPres G la := fun β x hx =>
-  (mem_HK X la G.w).2 (hasse_presentation X la G.w wF β x ((mem_HK X la G.w).1 hx))
+  (mem_HK X la G.w).2
+    (_root_.PI.UnitaryGroupMassFormula.HassePresH.main X la G.w wF β x ((mem_HK X la G.w).1 hx))
 
 theorem leading_coeff_eq_zero_of_jet
     {N : ℕ}

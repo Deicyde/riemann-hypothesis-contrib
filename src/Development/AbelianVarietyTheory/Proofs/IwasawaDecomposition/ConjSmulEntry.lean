@@ -147,7 +147,6 @@ theorem redM_adj_congr
     · intro u v hu hv
       rw [Pi.single_add, map_add (f := _), hu, hv, add_zero]
   have h3 : g (x - x') = 0 := by
-
     rw [← Finset.univ_sum_single (x - x'), map_sum]
     exact Finset.sum_eq_zero fun b _ => h0 b _ (hx b)
   rw [hg, hg]

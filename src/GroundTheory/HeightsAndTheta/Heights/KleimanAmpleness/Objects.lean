@@ -604,8 +604,7 @@ def chartRing (I : Chart x) : Subalgebra S Ω where
     rw [div_add_div _ _ (eval_ne_zero_of_mem_monos I hs) (eval_ne_zero_of_mem_monos I hs')]
     simp only [map_add (f := _), map_mul]
   zero_mem' := ⟨0, 1, 0, one_mem _, isHomogeneous_zero _ _ _, isHomogeneous_one _ _, by simp⟩
-  algebraMap_mem' r :=
-    ⟨C r, 1, 0, one_mem _, isHomogeneous_C _ _, isHomogeneous_one _ _, by simp [aeval_C]⟩
+  algebraMap_mem' r := ⟨C r, 1, 0, one_mem _, isHomogeneous_C _ _, isHomogeneous_one _ _, by simp⟩
 
 variable (S x) in
 def twistMod (c : ℤ) (I : Chart x) : Submodule (chartRing S x I) Ω :=

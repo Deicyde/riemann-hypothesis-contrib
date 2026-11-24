@@ -244,7 +244,6 @@ theorem proof (hSES : KH.CechSESStatement) (hMap : KH.CechMapDegStatement)
 
   obtain ⟨y, hy_def⟩ : ∃ y, y = t₁ • LocalizedModule.mk m₀ t₀ - ∑ j, p j • z j I := ⟨_, rfl⟩
   have hLy : locMap (KH.cellMon S I.1) h y = 0 := by
-
     rw [hy_def, map_sub, map_smul, map_sum, locMap_mk, e₁, sub_eq_zero]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, hzh]
@@ -297,7 +296,6 @@ theorem proof (hSES : KH.CechSESStatement) (hMap : KH.CechMapDegStatement)
     rw [this]
     exact LocalizedModule.mk_cancel_common_left _ _ _
   have hgy : t₂ • y = t₁ • ∑ l, p' l • KH.cechMap S ι g 0 (z' l) I := by
-
     rw [← hgv, ← mul_smul, mul_comm, mul_smul, ← map_smul, e₂, map_sum]
     refine congrArg _ (Finset.sum_congr rfl fun l _ => ?_)
     rw [map_smul]

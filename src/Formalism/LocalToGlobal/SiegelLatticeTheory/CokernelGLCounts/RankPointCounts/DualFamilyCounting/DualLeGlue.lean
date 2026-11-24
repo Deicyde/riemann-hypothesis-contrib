@@ -68,12 +68,7 @@ variable
 theorem memW (hG : Good hc M T 𝔭 Λ) {b : V} (hb : b ∈ locF 𝔭 (dualIn h (orthK h U) T))
     : b ∈ orthK h U := by
   obtain ⟨x, -, rfl⟩ := hG.oW b hb
-  first
-  | exact Submodule.projection_apply_mem _ _ _ _
-  | exact Submodule.projection_apply_mem _ _ _
-  | exact Submodule.projection_apply_mem _ _
-  | exact (orthK h U).projection_apply_mem _ _ _
-  | (unfold prO; simp)
+  first | exact Submodule.projection_apply_mem _ _
 
 theorem mem_glue_of
     (hG₀ : Good hc M T 𝔭 Λ₀)
@@ -82,14 +77,8 @@ theorem mem_glue_of
     (hx' : Submodule.Quotient.mk x' = P (Submodule.Quotient.mk ⟨prO hc.symm y, hG₀.iW y hy⟩))
     : prO hc y + x' ∈ glue hc T 𝔭 Λ₀ P := by
   have hx'W : (x' : V) ∈ orthK h U := memW hG₀ x'.2
-  have hyU : prO hc y ∈ U := by
-    first
-    | exact Submodule.projection_apply_mem _ _ _ _
-    | exact Submodule.projection_apply_mem _ _ _
-    | exact Submodule.projection_apply_mem _ _
-    | (unfold prO; simp)
-  have h0 : prO hc.symm (prO hc y) = 0 := by
-    first | exact prO_symm_of_mem_U hyU | (rw [prO_apply]; simp [hyU]) | (unfold prO; simp [hyU])
+  have hyU : prO hc y ∈ U := by first | exact Submodule.projection_apply_mem _ _
+  have h0 : prO hc.symm (prO hc y) = 0 := by first | (rw [prO_apply]; simp [hyU])
   refine ⟨x', ?_, y, hy, ⟨prO hc.symm y, hG₀.iW y hy⟩, rfl, ?_, hx'⟩
   · rw [map_add (f := _), orth_projection_symm_of_mem (hc' := hc) hx'W, h0, zero_add]
   · rw [map_add (f := _), prO_of_mem_U (hc' := hc) hyU,
@@ -107,11 +96,7 @@ theorem glue_inf_U (hG₀ : Good hc M T 𝔭 Λ₀) (hd₀ : dualF h 𝔭 Λ₀ 
     have hxy : prO hc y = x := by rw [hU, prO_of_mem_U (hc' := hc) hxU]
     have hcW : (c : V) ∈ orthK h U := by
       rw [hcy]
-      first
-      | exact Submodule.projection_apply_mem _ _ _ _
-      | exact Submodule.projection_apply_mem _ _ _
-      | exact Submodule.projection_apply_mem _ _
-      | (unfold prO; simp)
+      first | exact Submodule.projection_apply_mem _ _
     have hcO : ∀ u ∈ U, h u (c : V) = 0 := by
       intro u hu
       simp only [orthK, Submodule.mem_iInf, LinearMap.mem_ker] at hcW
@@ -133,11 +118,7 @@ theorem glue_inf_U (hG₀ : Good hc M T 𝔭 Λ₀) (hd₀ : dualF h 𝔭 Λ₀ 
           rw [map_add (f := _), LinearMap.add_apply]
         rw [e1, hcO (prO hc z) ?_]
         · simp
-        · first
-          | exact Submodule.projection_apply_mem _ _ _ _
-          | exact Submodule.projection_apply_mem _ _ _
-          | exact Submodule.projection_apply_mem _ _
-          | (unfold prO; simp)
+        · first | exact Submodule.projection_apply_mem _ _
       rw [e]
       exact Submodule.neg_mem _ h2
     have hxΛ : x ∈ Λ₀ := by
@@ -176,11 +157,7 @@ theorem glue_inf_orthK_eq_locF (hG₀ : Good hc M T 𝔭 Λ₀)
       exact e
     have hyW : y ∈ orthK h U := by
       rw [← hyc, hcy]
-      first
-      | exact Submodule.projection_apply_mem _ _ _ _
-      | exact Submodule.projection_apply_mem _ _ _
-      | exact Submodule.projection_apply_mem _ _
-      | (unfold prO; simp)
+      first | exact Submodule.projection_apply_mem _ _
     have hyT : y ∈ locF 𝔭 T := by
       rw [← hG₀.cW]
       exact Submodule.mem_inf.2 ⟨hy, hyW⟩

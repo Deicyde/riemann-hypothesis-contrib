@@ -60,13 +60,6 @@ open Formalism.L2.Th1.CM
 
 variable (l : ℕ) [Fact l.Prime]
 
-theorem kq_norm_l_lt : ‖(l : ℂ_[l])‖ < 1 := by
-  have e : (l : ℂ_[l]) = algebraMap ℚ_[l] ℂ_[l] (l : ℚ_[l]) := (map_natCast _ _).symm
-  rw [e, norm_algebraMap']
-  first
-  | exact Padic.norm_p_lt_one
-  | (rw [Padic.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt))
-
 theorem kq_add_le (x y : ℂ_[l]) (r : ℝ) (hx : ‖x‖ ≤ r) (hy : ‖y‖ ≤ r) : ‖x + y‖ ≤ r :=
   (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
 
@@ -78,7 +71,7 @@ private theorem kq_intnorm_lemma (n : ℤ) : ‖(n : ℂ_[l])‖ = ‖(n : ℚ_[
 
 theorem kq_int_le (n : ℤ) : ‖(n : ℂ_[l])‖ ≤ 1 := by
   rw [kq_intnorm_lemma]
-  first | exact padicNormE.norm_int_le_one n | exact Padic.norm_int_le_one n
+  first | exact Padic.norm_int_le_one n
 
 theorem kq_int_dvd (n : ℤ) (h : (l : ℤ) ∣ n) : ‖(n : ℂ_[l])‖ ≤ ‖(l : ℂ_[l])‖ := by
   obtain ⟨m, rfl⟩ := h
@@ -90,9 +83,7 @@ theorem kq_int_unit (n : ℤ) (h : ¬ (l : ℤ) ∣ n) : ‖(n : ℂ_[l])‖ = 1
   refine le_antisymm (kq_int_le l n) ?_
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp (Fact.out : l.Prime)
   have hc : IsCoprime (l : ℤ) n := by
-    first
-    | exact (Irreducible.coprime_iff_not_dvd hp.irreducible).mpr h
-    | exact (Prime.coprime_iff_not_dvd hp).mpr h
+    first | exact (Irreducible.coprime_iff_not_dvd hp.irreducible).mpr h
   obtain ⟨a, b, hab⟩ := hc
   have e : (a : ℂ_[l]) * (l : ℂ_[l]) + (b : ℂ_[l]) * (n : ℂ_[l]) = 1 := by exact_mod_cast hab
   have h1 :=
@@ -100,7 +91,7 @@ theorem kq_int_unit (n : ℤ) (h : ¬ (l : ℤ) ∣ n) : ‖(n : ℂ_[l])‖ = 1
   rw [e, norm_one, norm_mul, norm_mul] at h1
   rcases le_max_iff.mp h1 with h2 | h2
   · exact absurd (h2.trans (mul_le_of_le_one_left (norm_nonneg _) (kq_int_le l a)))
-      (not_le.mpr (kq_norm_l_lt l))
+      (not_le.mpr (_root_.ReciprocityTheory.ChartRestriction.L1.norm_prime_lt_one_complexPadic l))
   · exact h2.trans (mul_le_of_le_one_left (norm_nonneg _) (kq_int_le l b))
 
 theorem kq_zmod (n : ℤ) (h : (n : ZMod l) = 0) : ‖(n : ℂ_[l])‖ ≤ ‖(l : ℂ_[l])‖ :=
@@ -178,9 +169,11 @@ theorem kq_mem
     (δ : ℂ_[l]) (hδ : δ ^ 2 = -(d : ℂ_[l])) (hn : ‖δ‖ = 1)
     : δ ∈ MaximalUnramifiedExtension l := by
   obtain ⟨ξ, hξ, hξδ⟩ :=
-    tch_near l δ hn.le 2 (by norm_num) ‖(l : ℂ_[l])‖ (kq_norm_l_lt l)
+    tch_near l δ hn.le 2 (by norm_num) ‖(l : ℂ_[l])‖
+      (_root_.ReciprocityTheory.ChartRestriction.L1.norm_prime_lt_one_complexPadic l)
       (norm_sqrtNeg_pow_prime_sq_sub d hl hld hin δ hδ hn)
-  have hlt : ‖δ - ξ‖ < 1 := hξδ.trans_lt (kq_norm_l_lt l)
+  have hlt : ‖δ - ξ‖ < 1 :=
+    hξδ.trans_lt (_root_.ReciprocityTheory.ChartRestriction.L1.norm_prime_lt_one_complexPadic l)
   have hξ1 : ‖ξ‖ = 1 := by
     refine le_antisymm (tch_norm_le l hξ) (not_lt.mp fun h => ?_)
     have : ‖(δ - ξ) + ξ‖ < 1 := kq_add_lt l _ _ 1 hlt h
@@ -305,12 +298,15 @@ theorem kur_quad
       have hsum : (2 : ℂ_[l]) * δ = (δ - δ ^ l) + (δ ^ l + δ) := by ring
       have h2d : ‖(2 : ℂ_[l]) * δ‖ = 1 := by rw [norm_mul, h2, hn, one_mul]
       have hlt :=
-        kq_add_lt l _ _ 1 (hf'.trans_lt (kq_norm_l_lt l))
-          ((kq_pow_l d hl hld hin δ hδ hn).trans_lt (kq_norm_l_lt l))
+        kq_add_lt l _ _ 1
+          (hf'.trans_lt (_root_.ReciprocityTheory.ChartRestriction.L1.norm_prime_lt_one_complexPadic
+            l))
+          ((kq_pow_l d hl hld hin δ hδ hn).trans_lt
+            (_root_.ReciprocityTheory.ChartRestriction.L1.norm_prime_lt_one_complexPadic l))
       rw [← hsum, h2d] at hlt
       exact lt_irrefl 1 hlt
     · exact h
-  have e2 : ((2 : MaximalUnramifiedExtension l) : ℂ_[l]) = 2 := by first | rfl | norm_cast | simp
+  have e2 : ((2 : MaximalUnramifiedExtension l) : ℂ_[l]) = 2 := by first | rfl
   have hA2 : (⟨a, haK⟩ : MaximalUnramifiedExtension l) * 2 = 1 - D := by
     apply Subtype.ext
     show a * ((2 : MaximalUnramifiedExtension l) : ℂ_[l]) = ((1 - D : MaximalUnramifiedExtension l) : ℂ_[l])

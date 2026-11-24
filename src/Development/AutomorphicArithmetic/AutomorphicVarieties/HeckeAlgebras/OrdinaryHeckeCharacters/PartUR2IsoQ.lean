@@ -53,7 +53,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem raF_big
     {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp]
     (X : Frame Γ Ga Gp)

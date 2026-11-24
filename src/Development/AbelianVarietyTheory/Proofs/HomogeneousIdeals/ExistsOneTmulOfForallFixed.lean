@@ -69,7 +69,6 @@ theorem repr_apply_of_semilinear
     (w : M) (i : ι)
     : b.repr (φ w) i = s (b.repr w i) := by
   classical
-
   conv_lhs => rw [← b.linearCombination_repr w, Finsupp.linearCombination_apply, Finsupp.sum,
   map_sum, map_sum]
   simp only [hφ, map_smul, Basis.repr_self, Finsupp.coe_finsetSum, Finset.sum_apply,

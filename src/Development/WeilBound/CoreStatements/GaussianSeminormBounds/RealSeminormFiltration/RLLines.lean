@@ -359,18 +359,6 @@ section Adele
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_moved {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : ∃ β : E, σ β ≠ β := by
-  by_contra hne
-  push Not at hne
-  have := h.2.1
-  obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
-  refine IsTotallyComplex.complexEmbedding_not_isReal τ ?_
-  rw [ComplexEmbedding.isReal_iff]
-  ext y
-  have := h.2.2.2 τ y
-  rw [hne y] at this
-  simpa using this.symm
-
 theorem im_ne_zero {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : σ β ≠ β) (τ : E →+* ℂ)
     : (τ β).im ≠ 0 := by
   intro h0
@@ -454,7 +442,7 @@ theorem eq_zero_of_piInf
     (τ : ∀ w : InfinitePlace F, EmbOver E w) (x : AE F E)
     (hx : At (evI F) x) (hinf : ∀ w, piInf (τ w) x = 0)
     : x = 0 := by
-  obtain ⟨β, hβ⟩ := exists_moved h
+  obtain ⟨β, hβ⟩ := _root_.GlobalTheory.AdelicU.exists_cm_conj_ne h
   obtain ⟨B, hB0, hB1⟩ := exists_basis h hβ
   have hdec := eq_add_tmul B x
   set C := Algebra.TensorProduct.basis (AF F) B with hC
@@ -512,7 +500,7 @@ theorem exists_section {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (τ : ∀ w : I
     : ∃ s : (InfinitePlace F → ℂ) → AE F E,
       Continuous s ∧ ∀ z, At (evI F) (s z) ∧ ∀ w, piInf (τ w) (s z) = z w := by
   have hF := h.1
-  obtain ⟨β, hβ⟩ := exists_moved h
+  obtain ⟨β, hβ⟩ := _root_.GlobalTheory.AdelicU.exists_cm_conj_ne h
   have him : ∀ w, ((τ w).1 β).im ≠ 0 := fun w => im_ne_zero h hβ _
   let e : ∀ w : InfinitePlace F, w.Completion ≃ᵢ ℝ := fun w =>
     InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal w)

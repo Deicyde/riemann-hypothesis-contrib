@@ -74,14 +74,10 @@ theorem loc_cont
   unfold Br.loc Br.locM Br.locO mapM
   simp only [MonoidHom.coe_comp]
   refine Continuous.comp ?_ (Continuous.comp (Continuous.comp ?_ (Continuous.comp hM ?_)) ?_)
-  · first
-    | exact continuous_id.matrix_map continuous_subtype_val
-    | exact continuous_id.matrix_map continuous_induced_dom
+  · first | exact continuous_id.matrix_map continuous_subtype_val
   · exact continuous_id.matrix_map (D.nbr i w hw).eO_cont
   · exact continuous_subtype_val
-  · first
-    | exact (D.nbr i w hw).e_symm_cont
-    | exact continuous_subtype_val.comp (D.nbr i w hw).e_symm_cont
+  · first | exact (D.nbr i w hw).e_symm_cont
 
 theorem contW_of (hρ : Continuous fun g => rhoO D.nd i ρ π g) (l : K.Col i dc)
     : KDim.ContW (i := i) (dc := dc) (ρ := ρ) (π := π) l := by
@@ -91,7 +87,7 @@ theorem contW_of (hρ : Continuous fun g => rhoO D.nd i ρ π g) (l : K.Col i dc
       Matrix.mulVec (Br.loc D.nbr i _ (KDim.col_over i dc l) (WpO D.nd i ρ π) g) v :=
     hL.matrix_mulVec continuous_const
   refine h2.congr fun g => ?_
-  first | rfl | simp [KDim.repW, matRep, Matrix.toLinAlgEquiv'_apply]
+  first | rfl
 
 end Formalism.MainNotions.N.KOrb
 

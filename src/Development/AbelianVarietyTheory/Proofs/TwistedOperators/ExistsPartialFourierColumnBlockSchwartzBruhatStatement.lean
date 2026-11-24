@@ -74,7 +74,4 @@ theorem _root_.GlobalTheory.T.exists_partialFourier_columnBlock_schwartzBruhat
                   = fun Z => (ψ (pairM Z R - pairM Z T) : ℂ) * 𝓕 Ξ Z)
             ∧ ∀ Ξ ∈ GlobalTheory.WeilM.SB (Matrix A C k), ∀ n,
               IsNatDatum ϖ n (𝓕 Ξ) → fourierSum ψ⁻¹ ϖ n P (𝓕 Ξ) = Ξ := by
-  first
-  | exact @GlobalTheory.ColFourier.exists_blockFourier
-  | exact GlobalTheory.ColFourier.exists_blockFourier
-  | (intros; apply GlobalTheory.ColFourier.exists_blockFourier <;> assumption)
+  first | exact @GlobalTheory.ColFourier.exists_blockFourier

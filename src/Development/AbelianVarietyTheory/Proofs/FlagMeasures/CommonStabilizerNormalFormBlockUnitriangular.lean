@@ -1,11 +1,10 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsNormalFormStabilizerMeasure
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CommonStabilizerSetEqRangeNormalFormStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CommonStabilizerSetEqRangeNormalForm
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MapConjLebesgueCommonStabilizerNormalForm
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StabilizerHaarUnimodularNormal
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormalFormFlagZeroMiddleInverseMinorOrthogonal
-import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StabilizerHaarUnimodularNormal
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StabilizerHaarUnimodularNormalStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -127,7 +126,7 @@ theorem volume_pTop : (volume : Measure (PTop k r r)) Set.univ = 1 := by
   haveI : IsEmpty {p : UT r // r ≤ p.1.1.val} := ⟨fun p => absurd p.2 (not_le.2 p.1.1.1.2)⟩
   rw [← Set.univ_prod_univ, Measure.volume_eq_prod, Measure.prod_prod, ← Set.univ_prod_univ,
     Measure.volume_eq_prod, Measure.prod_prod]
-  simp [volume_pi, Measure.pi_univ]
+  simp [volume_pi]
 
 theorem lebesgueCommonStabilizerNormalForm_full_eq (β : Fin r → ℕ)
     : lebR0 k r r β = lebR k r β := by
@@ -177,10 +176,10 @@ theorem stabiliser_normal
     rw [← NfMid.tz_eq h0, hw]
     exact tz_last
   obtain ⟨hR, hC⟩ :=
-    GlobalTheory.T.commonStabilizerSet_eq_range_normalForm k r r le_rfl (g₀ *ᵥ w) w g₀ β 1 hzW hwW
-      hT h0
+    _root_.GlobalTheory.Amp.rset_normal0 k r r le_rfl (g₀ *ᵥ w) w g₀ β 1 hzW hwW hT h0
   obtain ⟨hH, hU⟩ :=
-    GlobalTheory.T.stabilizer_haar_unimodular_normal k r r le_rfl (g₀ *ᵥ w) w g₀ β 1 hzW hwW hT h0
+    _root_.GlobalTheory.Amp.StabHaar.lebesgue_haar_unimodular_stabilizer k r r le_rfl (g₀ *ᵥ w) w g₀
+      β 1 hzW hwW hT h0
   have hM := RConj.lebR0_map_conjM_eq_of_isNormalZero k r r le_rfl (g₀ *ᵥ w) w g₀ β 1 hzW hwW hT h0
   rw [lebesgueCommonStabilizerNormalForm_full_eq] at hH hU hM
   rw [range_rEl] at hR

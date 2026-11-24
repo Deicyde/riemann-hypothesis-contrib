@@ -1,51 +1,10 @@
 module
 
-public import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
+public import Mathlib.CategoryTheory.Sites.SheafCohomology.ExactSequences
 public import Mathlib.Combinatorics.Quiver.ReflQuiver
 public import Mathlib.RingTheory.WittVector.IsPoly
 public import Mathlib.Tactic.ReduceModChar
-import Mathlib.Algebra.Order.Floor.Extended
-import Mathlib.Algebra.Order.Floor.Semifield
-import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
-import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Combinatorics.Enumerative.DyckWord
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
-import Mathlib.Data.NNRat.Floor
-import Mathlib.Data.Nat.Choose.Multinomial
-import Mathlib.Geometry.Euclidean.Volume.Basic
-import Mathlib.NumberTheory.Chebyshev
-import Mathlib.NumberTheory.Height.NumberField
-import Mathlib.NumberTheory.Height.Projectivization
-import Mathlib.NumberTheory.LucasLehmer
-import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Echelon.Zsqrtd
-import Mathlib.Tactic.Inclusion.Extension.Core.Core
-import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Lemma
-import Mathlib.Tactic.NormNum.Irrational
-import Mathlib.Tactic.NormNum.IsCoprime
-import Mathlib.Tactic.NormNum.IsSquare
-import Mathlib.Tactic.NormNum.LegendreSymbol
-import Mathlib.Tactic.NormNum.ModEq
-import Mathlib.Tactic.NormNum.NatFib
-import Mathlib.Tactic.NormNum.NatLog
-import Mathlib.Tactic.NormNum.NatSqrt
-import Mathlib.Tactic.NormNum.Ordinal
-import Mathlib.Tactic.NormNum.Parity
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
-import Mathlib.CategoryTheory.Sites.SheafCohomology.ExactSequences
 
 @[expose] public section
 
@@ -63,8 +22,8 @@ section ExtIso
 
 variable {𝒜 : Type*} [Category 𝒜] [Abelian 𝒜] [HasExt.{w'} 𝒜]
 
-noncomputable def extAddEquivOfIsoLeft {X X' : 𝒜} (e : X ≅ X') (Y : 𝒜) (n : ℕ) :
-    Ext X Y n ≃+ Ext X' Y n where
+noncomputable def extAddEquivOfIsoLeft {X X' : 𝒜} (e : X ≅ X') (Y : 𝒜) (n : ℕ)
+    : Ext X Y n ≃+ Ext X' Y n where
   toFun x := (Ext.mk₀ e.inv).comp x (zero_add n)
   invFun x := (Ext.mk₀ e.hom).comp x (zero_add n)
   left_inv x := by simp
@@ -78,33 +37,26 @@ private lemma extAddEquiv₀_comp_mk₀ {X Y Z : 𝒜} (x : Ext X Y 0) (f : Y �
 
 end ExtIso
 
-section Terminal
-
-variable [HasSheafify J AddCommGrpCat.{v}]
-
-variable [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
-
-end Terminal
-
 section Zero
 
-noncomputable def freeYonedaHomAddEquiv (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v}) :
-    (yoneda.obj U ⋙ AddCommGrpCat.free.{v} ⟶ P) ≃+ P.obj (op U) where
+noncomputable def freeYonedaHomAddEquiv (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v})
+    : (yoneda.obj U ⋙ AddCommGrpCat.free.{v} ⟶ P) ≃+ P.obj (op U) where
   toEquiv := ((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj U) P).trans yonedaEquiv
   map_add' _ _ := rfl
 
 lemma freeYonedaHomAddEquiv_apply (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v})
     (g : yoneda.obj U ⋙ AddCommGrpCat.free.{v} ⟶ P) :
-    freeYonedaHomAddEquiv U P g = g.app (op U) (FreeAbelianGroup.of (𝟙 U)) := rfl
+    freeYonedaHomAddEquiv U P g = g.app (op U) (FreeAddCommGroup.of (𝟙 U)) := rfl
 
 variable [HasSheafify J AddCommGrpCat.{v}]
 
-noncomputable abbrev freeSheaf (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}]
-    (U : C) : Sheaf J AddCommGrpCat.{v} :=
+noncomputable abbrev freeSheaf
+    (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] (U : C)
+    : Sheaf J AddCommGrpCat.{v} :=
   (presheafToSheaf J AddCommGrpCat.{v}).obj (yoneda.obj U ⋙ AddCommGrpCat.free)
 
-noncomputable def freeSheafHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) :=
+noncomputable def freeSheafHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) :=
   ((sheafificationAdjunction J AddCommGrpCat.{v}).homAddEquiv _ F).trans
     (freeYonedaHomAddEquiv U F.obj)
 
@@ -117,8 +69,8 @@ lemma freeSheafHomAddEquiv_naturality (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
 
 variable [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
 
-noncomputable def H'.equiv₀ (F : Sheaf J AddCommGrpCat.{v}) (U : C) :
-    F.H' 0 U ≃+ F.obj.obj (op U) :=
+noncomputable def H'.equiv₀ (F : Sheaf J AddCommGrpCat.{v}) (U : C)
+    : F.H' 0 U ≃+ F.obj.obj (op U) :=
   (Ext.addEquiv₀ (X := freeSheaf J U) (Y := F)).trans (freeSheafHomAddEquiv U F)
 
 lemma cohomologyPresheafFunctor_map_app_apply {F G : Sheaf J AddCommGrpCat.{v}} (φ : F ⟶ G)
@@ -142,10 +94,10 @@ variable [HasSheafify J AddCommGrpCat.{v}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{
 
 lemma H.eq_zero_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] {n : ℕ}
     (x : Sheaf.H F (n + 1)) : x = 0 :=
-  Ext.eq_zero_of_injective x
+  Subsingleton.elim x 0
 
-instance H'.subsingleton_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] (n : ℕ)
-    (U : C) : Subsingleton (F.H' (n + 1) U) :=
+instance H'.subsingleton_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] (n : ℕ) (U : C)
+    : Subsingleton (F.H' (n + 1) U) :=
   subsingleton_of_forall_eq 0 fun x =>
     Ext.eq_zero_of_injective (show Ext (freeSheaf J U) F (n + 1) from x)
 
@@ -153,31 +105,35 @@ end Injective
 
 section LongExact
 
+-- Match Mathlib's independent universes for the site's morphisms and the coefficient groups.
+-- Identifying them here makes the kernel repeatedly unfold the Ext construction.
+universe w
+
 private lemma exact_ab_zero_apply {T : ShortComplex AddCommGrpCat.{w'}}
     (hT : T.Exact) (x : T.X₁) : T.g (T.f x) = 0 :=
   ((ShortComplex.ab_exact_iff_function_exact T).mp hT).apply_apply_eq_zero x
 
-variable [HasSheafify J AddCommGrpCat.{v}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
-  {S : ShortComplex (Sheaf J AddCommGrpCat.{v})} (hS : S.ShortExact)
+variable
+  [HasSheafify J AddCommGrpCat.{w}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{w})]
+  {S : ShortComplex (Sheaf J AddCommGrpCat.{w})} (hS : S.ShortExact)
 
 noncomputable def H.δ (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁) : Sheaf.H S.X₃ n₀ →+ Sheaf.H S.X₁ n₁ :=
-  hS.extClass.postcomp _ h
+  Sheaf.H.δ hS n₀ n₁ h
 
 lemma H.δ_apply (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₃ n₀) :
     H.δ hS n₀ n₁ h x = x.comp hS.extClass h := rfl
 
-
 include hS in
-theorem H.exact₂ {n : ℕ} (y : Sheaf.H S.X₂ n) (hy : Sheaf.H.map S.g n y = 0) :
-    ∃ x : Sheaf.H S.X₁ n, Sheaf.H.map S.f n x = y :=
+theorem H.exact₂ {n : ℕ} (y : Sheaf.H S.X₂ n) (hy : Sheaf.H.map S.g n y = 0)
+    : ∃ x : Sheaf.H S.X₁ n, Sheaf.H.map S.f n x = y :=
   Sheaf.H.longSequence_exact₂ hS y hy
 
-theorem H.exact₃ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (y : Sheaf.H S.X₃ n₀)
-    (hy : H.δ hS n₀ n₁ h y = 0) : ∃ x : Sheaf.H S.X₂ n₀, Sheaf.H.map S.g n₀ x = y :=
+theorem H.exact₃ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (y : Sheaf.H S.X₃ n₀) (hy : H.δ hS n₀ n₁ h y = 0)
+    : ∃ x : Sheaf.H S.X₂ n₀, Sheaf.H.map S.g n₀ x = y :=
   Sheaf.H.longSequence_exact₃ hS y h hy
 
-theorem H.exact₁ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₁ n₁)
-    (hx : Sheaf.H.map S.f n₁ x = 0) : ∃ y : Sheaf.H S.X₃ n₀, H.δ hS n₀ n₁ h y = x :=
+theorem H.exact₁ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₁ n₁) (hx : Sheaf.H.map S.f n₁ x = 0)
+    : ∃ y : Sheaf.H S.X₃ n₀, H.δ hS n₀ n₁ h y = x :=
   Sheaf.H.longSequence_exact₁ hS x hx h
 
 lemma H.map_g_map_f {n : ℕ} (x : Sheaf.H S.X₁ n) :

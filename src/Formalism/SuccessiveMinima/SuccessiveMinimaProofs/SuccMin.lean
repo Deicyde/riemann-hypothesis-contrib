@@ -87,10 +87,7 @@ theorem finite_lat_inter
     : ((L : Set E) ∩ s).Finite := by
   haveI : ProperSpace E := FiniteDimensional.proper_real E
   have hcl : IsClosed (L : Set E) := L.toAddSubgroup.isClosed_of_discrete
-  have hd : IsDiscrete (L : Set E) := by
-    first
-    | exact ⟨‹DiscreteTopology L›⟩
-    | exact isDiscrete_iff_discreteTopology.mpr ‹DiscreteTopology L›
+  have hd : IsDiscrete (L : Set E) := by first | exact ⟨‹DiscreteTopology L›⟩
   rw [Set.inter_comm]
   exact Metric.finite_isBounded_inter_isClosed hd hs hcl
 

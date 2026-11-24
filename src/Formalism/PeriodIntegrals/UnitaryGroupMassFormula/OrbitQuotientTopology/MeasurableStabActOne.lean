@@ -96,7 +96,7 @@ theorem continuous_stabAct (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1
     : Continuous (fun p : Mt k r × PairSp k r => stabAct g (Matrix.of p.1) p.2) := by
   have hof : Continuous (fun x : Mt k r => Matrix.of x) := continuous_id
   unfold stabAct
-  first | fun_prop | continuity
+  first | fun_prop
 
 theorem measurable_stabAct (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     : Measurable (fun p : Mt k r × PairSp k r => stabAct g (Matrix.of p.1) p.2) :=
@@ -105,9 +105,7 @@ theorem measurable_stabAct (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1
 theorem measurable_stabAct_inv (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     : Measurable (fun p : Mt k r × PairSp k r => stabAct g (Matrix.of p.1)⁻¹ p.2) := by
   have hf : Measurable (fun p : Mt k r × PairSp k r => (minv p.1, p.2)) := by
-    first
-    | exact (measurable_minv.comp measurable_fst).prodMk measurable_snd
-    | exact (measurable_minv.comp measurable_fst).prod_mk measurable_snd
+    first | exact (measurable_minv.comp measurable_fst).prodMk measurable_snd
   exact (measurable_stabAct g).comp hf
 
 theorem measurable_stabAct_one (g a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
@@ -115,7 +113,7 @@ theorem measurable_stabAct_one (g a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r +
   have hof : Continuous (fun x : Mt k r => Matrix.of x) := continuous_id
   have hc : Continuous (stabAct (k := k) (r := r) g a) := by
     unfold stabAct
-    first | fun_prop | continuity
+    first | fun_prop
   exact hc.measurable
 
 private theorem hpk_sq_lemma (k r : ℕ) : Hpk k r * Hpk k r = 1 := by
@@ -127,35 +125,27 @@ private theorem hpk_sq_lemma (k r : ℕ) : Hpk k r * Hpk k r = 1 := by
   · by_cases hij : i = j
     · subst hij
       rw [if_pos rfl]
-      simp only [Hpk, Fin.ext_iff, Fin.val_mk, eq_self_iff_true, and_true]
-      split_ifs <;> first
-        | (exfalso; (try simp only [Fin.val_mk] at *); omega)
-        | (simp_all; done)
-        | norm_num
+      simp only [Hpk, Fin.ext_iff]
+      split_ifs <;> first | (exfalso; (try simp only at *); omega) | (simp_all; done)
     · rw [if_neg hij]
       rw [Fin.ext_iff] at hij
-      simp only [Hpk, Fin.ext_iff, Fin.val_mk]
-      split_ifs <;> first
-        | (exfalso; (try simp only [Fin.val_mk] at *); omega)
-        | (simp_all; done)
-        | norm_num
+      simp only [Hpk, Fin.ext_iff]
+      split_ifs <;> first | (exfalso; (try simp only at *); omega) | (simp_all; done)
   · intro l _ hl
     rw [Ne, Fin.ext_iff, Fin.val_mk] at hl
     simp only [Hpk, Fin.ext_iff]
-    split_ifs at *
-      <;> first | (exfalso; (try simp only [Fin.val_mk] at *); omega) | (simp_all; done) | norm_num
+    split_ifs at * <;> first | (exfalso; (try simp only at *); omega) | (simp_all; done)
   · intro h
     exact absurd (Finset.mem_univ _) h
 
 private theorem isUnit_det_of_mem_UH'
     {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
     : IsUnit g.det := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have h : Hpk k r * gᴴ * Hpk k r * g = 1 := by
     calc
       Hpk k r * gᴴ * Hpk k r * g
         = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [hg', hpk_sq_lemma k r]
+      _ = 1 := by rw [hg, hpk_sq_lemma k r]
   exact Matrix.isUnit_det_of_left_inverse h
 
 theorem stabAct_comp
@@ -214,13 +204,13 @@ theorem pairMeas_inv
     intro s
     have hc : Continuous (lmulM (k := k) (r := r) s) := by
       unfold lmulM
-      first | fun_prop | continuity
+      first | fun_prop
     exact hc.measurable
   have hp
       : ∀ s : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
         Measurable (Prod.map (id : Mt k r → Mt k r) (lmulM (k := k) (r := r) s)) := by
     intro s
-    first | exact measurable_id.prodMap (hl s) | exact measurable_id.prod_map (hl s)
+    first | exact measurable_id.prodMap (hl s)
   rw [stabAct_eq_map, pairMeas, ← Measure.map_prod_map _ _ (hp a) (hp _),
     ← Measure.map_prod_map _ _ measurable_id (hl a),
     ← Measure.map_prod_map _ _ measurable_id (hl _), Measure.map_id, Measure.map_id, hN a ha.1,

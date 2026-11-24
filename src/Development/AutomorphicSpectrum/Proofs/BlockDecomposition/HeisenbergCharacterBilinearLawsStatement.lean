@@ -50,6 +50,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
   PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heisenberg_character_bilinear_laws
     : ∀ {D : D7} {ρ p : ℕ} (ψ : AddChar (AF D.host.F) ℂ),
       IsCharAF D.host.F ψ
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.heisenberg_character_bilinear_laws
                 = 1)
             ∧ Continuous (fun v : Mx D ρ p × Mx D ρ p =>
               GlobalTheory.CompanionTheory.FJE.chv ψ b₀ v.1 v.2) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.FJE.chv_facts
-  | exact GlobalTheory.CompanionTheory.FJE.chv_facts
-  | (intros; apply GlobalTheory.CompanionTheory.FJE.chv_facts <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.FJE.chv_facts

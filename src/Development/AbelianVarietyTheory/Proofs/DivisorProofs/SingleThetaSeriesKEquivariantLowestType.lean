@@ -131,7 +131,7 @@ theorem singleSeries_kEquiv
     GlobalTheory.JointHarm.onb_eq_one (hR.models.BV i ρ)
   have hBu : ∀ ρ, IsUnit (R.BV i ρ) := fun ρ => IsUnit.of_mul_eq_one_right _ (hBS ρ)
   obtain ⟨x₁, x₂, x₃, hx⟩ :=
-    GlobalTheory.T.lowestKType_coefficientWeight_eq_minorWeights D i (sg0 D A) (sgAt_mk _ R.hv0)
+    _root_.GlobalTheory.JointHarm.weights_of_minors D i (sg0 D A) (sgAt_mk _ R.hv0)
       (R.MW i (sg0 D A)) (hR.models.order i)
   have hrk : (Wc D i).rank = D.R.r := D.sp.W_rank _ (Nat.le_add_left _ _) i.2
   have hpq : ∀ ρ, ((Wc D i).sig (tauE D ρ)).1 + ((Wc D i).sig (tauE D ρ)).2 = (Wc D i).rank :=

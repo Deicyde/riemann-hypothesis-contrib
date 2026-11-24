@@ -50,7 +50,8 @@ noncomputable section
 
 open scoped Classical
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef Formalism.L2.SG.PairVal Matrix
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef Formalism.L2.SG.PairVal Matrix
 
 namespace Formalism.L2.SG.Pf.StabilizerIndexVolumes
 
@@ -58,8 +59,8 @@ section Frames
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem hT_span_zero {T : E} (F : FlagG S r T) (y : S.V) (hy : y ∈ Submodule.span E (Set.range F.e)) :
-    S.hT y F.z = 0 := by
+theorem hT_span_zero {T : E} (F : FlagG S r T) (y : S.V) (hy : y ∈ Submodule.span E (Set.range F.e))
+    : S.hT y F.z = 0 := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨a, rfl⟩ := hx
@@ -80,15 +81,20 @@ theorem z_mem_orth {T : E} (F : FlagG S r T) : F.z ∈ orth S F.X := by
   intro x hx
   exact hT_span_zero F x hx
 
-theorem tri_exists {T : E} (F : FlagG S r T) (s : S.V ≃ₗ[E] S.V)
-    (h1 : ∀ j, ∀ x ∈ F.Xa (j + 1), s x - x ∈ F.Xa j) (h2 : ∀ x ∈ orth S F.X, s x - x ∈ F.X) :
-    ∃ uu : Matrix (Fin (r + 1)) (Fin (r + 1)) E, IsUpUni uu ∧ ∀ b, s (F.fvec b) = ∑ c, uu c b • F.fvec c := by
+theorem tri_exists
+    {T : E} (F : FlagG S r T)
+    (s : S.V ≃ₗ[E] S.V)
+    (h1 : ∀ j, ∀ x ∈ F.Xa (j + 1), s x - x ∈ F.Xa j) (h2 : ∀ x ∈ orth S F.X, s x - x ∈ F.X)
+    : ∃ uu : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+      IsUpUni uu ∧ ∀ b, s (F.fvec b) = ∑ c, uu c b • F.fvec c := by
   classical
-  have hcol : ∀ a : Fin r, ∃ l : Fin r → E, (∀ i : Fin r, ¬ i.val < a.val → l i = 0) ∧
-      s (F.e a) - F.e a = ∑ i, l i • F.e i := by
+  have hcol
+      : ∀ a : Fin r, ∃ l : Fin r → E,
+        (∀ i : Fin r, ¬ i.val < a.val → l i = 0) ∧ s (F.e a) - F.e a = ∑ i, l i • F.e i := by
     intro a
     have hmem : F.e a ∈ F.Xa (a.val + 1) :=
-      Submodule.subset_span (Set.mem_image_of_mem F.e (show a ∈ {i : Fin r | i.1 < a.1 + 1} from Nat.lt_succ_self _))
+      Submodule.subset_span (Set.mem_image_of_mem F.e
+        (show a ∈ {i : Fin r | i.1 < a.1 + 1} from Nat.lt_succ_self _))
     have h := h1 a.val (F.e a) hmem
     rw [FlagG.Xa, Finsupp.mem_span_image_iff_linearCombination] at h
     obtain ⟨l, hl, hlx⟩ := h
@@ -101,19 +107,27 @@ theorem tri_exists {T : E} (F : FlagG S r T) (s : S.V ≃ₗ[E] S.V)
     obtain ⟨c, hc⟩ := h
     exact ⟨c, hc.symm⟩
   obtain ⟨cz, hcz⟩ := hz
-  refine ⟨fun c b => Fin.lastCases (Fin.lastCases 1 (fun i => cz i) c)
-      (fun a => Fin.lastCases 0 (fun i => l a i + if i = a then 1 else 0) c) b, ?_, ?_⟩
+  refine ⟨
+    fun c b =>
+      Fin.lastCases (Fin.lastCases 1 (fun i => cz i) c)
+        (fun a => Fin.lastCases 0 (fun i => l a i + if i = a then 1 else 0) c)
+        b,
+    ?_,
+    ?_
+  ⟩
   · intro i j
     induction j using Fin.lastCases with
     | last =>
       induction i using Fin.lastCases with
       | last => simp
       | cast i =>
-        exact ⟨fun h => absurd h (lt_asymm (Fin.castSucc_lt_last i)), fun h => absurd h (Fin.castSucc_lt_last i).ne⟩
+        exact ⟨
+          fun h => absurd h (lt_asymm (Fin.castSucc_lt_last i)),
+          fun h => absurd h (Fin.castSucc_lt_last i).ne
+        ⟩
     | cast a =>
       induction i using Fin.lastCases with
-      | last =>
-        refine ⟨fun _ => by simp, fun h => absurd h.symm (Fin.castSucc_lt_last a).ne⟩
+      | last => refine ⟨fun _ => by simp, fun h => absurd h.symm (Fin.castSucc_lt_last a).ne⟩
       | cast i =>
         simp only [Fin.lastCases_castSucc]
         refine ⟨fun h => ?_, fun h => ?_⟩
@@ -128,40 +142,44 @@ theorem tri_exists {T : E} (F : FlagG S r T) (s : S.V ≃ₗ[E] S.V)
     induction b using Fin.lastCases with
     | last =>
       rw [Fin.sum_univ_castSucc]
-      simp only [Fin.lastCases_last, Fin.lastCases_castSucc, FlagG.fvec, Fin.snoc_castSucc, Fin.snoc_last, one_smul]
+      simp only [Fin.lastCases_last, Fin.lastCases_castSucc, FlagG.fvec, Fin.snoc_castSucc,
+        Fin.snoc_last, one_smul]
       rw [← hcz]
       abel
     | cast a =>
       rw [Fin.sum_univ_castSucc]
-      simp only [Fin.lastCases_last, Fin.lastCases_castSucc, FlagG.fvec, Fin.snoc_castSucc, Fin.snoc_last,
-        zero_smul, add_zero, add_smul, Finset.sum_add_distrib, ite_smul, one_smul, Finset.sum_ite_eq',
-        Finset.mem_univ, if_true]
+      simp only [Fin.lastCases_last, Fin.lastCases_castSucc, FlagG.fvec, Fin.snoc_castSucc,
+        Fin.snoc_last, zero_smul, add_zero, add_smul, Finset.sum_add_distrib, ite_smul, one_smul,
+        Finset.sum_ite_eq', Finset.mem_univ, if_true]
       rw [← hlsum a]
       abel
 
-theorem coef_unique {n : ℕ} {f : Fin n → S.V} (hf : LinearIndependent E f) (v : Fin n → S.V)
-    (A B : Matrix (Fin n) (Fin n) E) (hA : ∀ b, v b = ∑ c, A c b • f c) (hB : ∀ b, v b = ∑ c, B c b • f c) :
-    A = B := by
+theorem coef_unique
+    {n : ℕ} {f : Fin n → S.V}
+    (hf : LinearIndependent E f) (v : Fin n → S.V) (A B : Matrix (Fin n) (Fin n) E)
+    (hA : ∀ b, v b = ∑ c, A c b • f c) (hB : ∀ b, v b = ∑ c, B c b • f c)
+    : A = B := by
   ext c b
   have h : ∑ c, (A c b - B c b) • f c = 0 := by
     simp only [sub_smul, Finset.sum_sub_distrib]
     rw [← hA b, ← hB b, sub_self]
   exact sub_eq_zero.mp (Fintype.linearIndependent_iff.mp hf _ h c)
 
-theorem zhat_conj {T T' : E} (F : FlagG S r T) (F' : FlagG S r T') (s : S.V ≃ₗ[E] S.V)
-    (hs : ∀ x y, S.hT (s x) (s y) = S.hT x y) (uu uu' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hu : ∀ b, s (F.fvec b) = ∑ c, uu c b • F.fvec c) (hu' : ∀ b, s (F'.fvec b) = ∑ c, uu' c b • F'.fvec c) :
-    Zhat F F' = uu.conjTranspose * Zhat F F' * uu' := by
+theorem zhat_conj
+    {T T' : E} (F : FlagG S r T) (F' : FlagG S r T')
+    (s : S.V ≃ₗ[E] S.V) (hs : ∀ x y, S.hT (s x) (s y) = S.hT x y)
+    (uu uu' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hu : ∀ b, s (F.fvec b) = ∑ c, uu c b • F.fvec c)
+    (hu' : ∀ b, s (F'.fvec b) = ∑ c, uu' c b • F'.fvec c)
+    : Zhat F F' = uu.conjTranspose * Zhat F F' * uu' := by
   ext a b
   have key : S.hT (F.fvec a) (F'.fvec b) = S.hT (s (F.fvec a)) (s (F'.fvec b)) := (hs _ _).symm
   simp only [Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply]
   rw [key, hu a, hu' b]
 
-  simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, map_smul, LinearMap.smul_apply, smul_eq_mul,
-  starRingEnd_apply, RingHom.id_apply, Finset.mul_sum, Finset.sum_mul]
-  first
-  | exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-  | (rw [Finset.sum_comm]; exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring)
+  simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+    starRingEnd_apply, RingHom.id_apply, Finset.mul_sum, Finset.sum_mul]
+  first | exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 end Frames
 
@@ -169,7 +187,8 @@ section Mat
 
 variable {K : Type*} [Field K] {r : ℕ}
 
-def sgnM (r : ℕ) : Matrix (Fin (r + 1)) (Fin (r + 1)) K := Matrix.diagonal fun b => (-1 : K) ^ (r - b.val)
+def sgnM (r : ℕ) : Matrix (Fin (r + 1)) (Fin (r + 1)) K :=
+  Matrix.diagonal fun b => (-1 : K) ^ (r - b.val)
 
 theorem zhatOM_eq (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) : ZhatOM Z = Z * sgnM r := by
   ext a b
@@ -182,8 +201,8 @@ theorem sgnM_sq : (sgnM r : Matrix (Fin (r + 1)) (Fin (r + 1)) K) * sgnM r = 1 :
   rw [← mul_pow]
   simp
 
-theorem up_sgn {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni M) :
-    IsUpUni (sgnM r * M * sgnM r) := by
+theorem up_sgn {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni M)
+    : IsUpUni (sgnM r * M * sgnM r) := by
   intro i j
   have hs : ∀ b : Fin (r + 1), ((-1 : K) ^ (r - b.val)) * (-1) ^ (r - b.val) = 1 := fun b => by
     rw [← mul_pow]; simp
@@ -194,8 +213,9 @@ theorem up_sgn {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni M) :
 
 end Mat
 
-theorem lo_conjT {E : Type} [Field E] [StarRing E] {n : ℕ} {M : Matrix (Fin n) (Fin n) E}
-    (h : IsUpUni M) : IsLoUni M.conjTranspose := by
+theorem lo_conjT
+    {E : Type} [Field E] [StarRing E] {n : ℕ} {M : Matrix (Fin n) (Fin n) E} (h : IsUpUni M)
+    : IsLoUni M.conjTranspose := by
   intro i j
   simp only [Matrix.conjTranspose_apply]
   refine ⟨fun hij => by rw [(h j i).1 hij, star_zero], fun hij => ?_⟩
@@ -204,12 +224,13 @@ theorem lo_conjT {E : Type} [Field E] [StarRing E] {n : ℕ} {M : Matrix (Fin n)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem volume_index_b_stable (D : D7) (u u' : D.what₂.Word)
-    (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
+theorem volume_index_b_stable
+    (D : D7) (u u' : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
     (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V))
     (δ : ∀ p : Formalism.MainNotions.S.LocalSplitGroups.PlF D, (D.s.atP p).Fp)
-    (M : ∀ p : Formalism.MainNotions.S.LocalSplitGroups.PlF D, Formalism.MainNotions.S.Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) :
-    BinSt D u u' F0 what₂ δ M := by
+    (M : ∀ p : Formalism.MainNotions.S.LocalSplitGroups.PlF D,
+      Formalism.MainNotions.S.Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
+    : BinSt D u u' F0 what₂ δ M := by
   intro hSt _hyps _hag t w F' L U _hrel _hgen hN hG
   obtain ⟨_, _, hL, hU, hZ⟩ := hN
   rw [zhatOM_eq] at hZ
@@ -240,7 +261,8 @@ theorem volume_index_b_stable (D : D7) (u u' : D.what₂.Word)
       have := congrArg (fun v => (VS D).hT v (F'.fl.fvec b)) hg
 
       simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-      starRingEnd_apply, map_zero, LinearMap.zero_apply] at this
+          starRingEnd_apply, map_zero, LinearMap.zero_apply]
+        at this
       simpa [Matrix.vecMul, dotProduct, Zhat, brS] using this
     · exact frame_indep F0 hT
   intro x hx
@@ -260,7 +282,12 @@ theorem volume_index_b_stable (D : D7) (u u' : D.what₂.Word)
       rw [hZ]
       simp only [Matrix.mul_assoc]
       rw [Matrix.nonsing_inv_mul_cancel_left _ _ hLu, Matrix.mul_nonsing_inv _ hUu, Matrix.mul_one]
-    refine ⟨?_, U * (sgnM D.R.rS * vv * sgnM D.R.rS) * U⁻¹, up_mul (up_mul hU (up_sgn hvv)) (up_inv hU), ?_⟩
+    refine ⟨
+      ?_,
+      U * (sgnM D.R.rS * vv * sgnM D.R.rS) * U⁻¹,
+      up_mul (up_mul hU (up_sgn hvv)) (up_inv hU),
+      ?_
+    ⟩
     · rw [hau]
       exact lo_mul (lo_mul (lo_inv hL) (lo_conjT huu0)) hL
     · rw [hau, hW]
@@ -268,7 +295,8 @@ theorem volume_index_b_stable (D : D7) (u u' : D.what₂.Word)
       simp only [Matrix.mul_assoc]
       rw [Matrix.mul_nonsing_inv_cancel_left _ _ hLu, Matrix.nonsing_inv_mul_cancel_left _ _ hUu,
         ← Matrix.mul_assoc (sgnM D.R.rS) (sgnM D.R.rS), hS, Matrix.one_mul,
-        ← Matrix.mul_assoc (Zhat F0 F'.fl) vv, ← Matrix.mul_assoc uu.conjTranspose (Zhat F0 F'.fl * vv),
+        ← Matrix.mul_assoc (Zhat F0 F'.fl) vv,
+        ← Matrix.mul_assoc uu.conjTranspose (Zhat F0 F'.fl * vv),
         ← Matrix.mul_assoc uu.conjTranspose (Zhat F0 F'.fl), ← hZc]
   | one => exact h1
   | mul a b _ _ ha hb => exact hmul a ha b hb

@@ -56,6 +56,7 @@ open GlobalTheory.Mem.Th (CptF)
 open GlobalTheory.Core.Rk.IP
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.Exh GlobalTheory.RegSW
+
 theorem _root_.GlobalTheory.T.adelic_iwasawa_decomposition_wittIsotropicStabilizer
     : ∀ (D : D7) (T T₀ : HSp D) (r : ℕ) (d : HypDec T T₀ r) (b : GL (Fin T.rank) (AE D)),
       (∀ v : FinPl D,
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.adelic_iwasawa_decomposition_wittIsotropicStabiliz
             → Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v)
         → IsMaj T b
         → HasIw d (Kmax T b) := by
-  first
-  | exact @GlobalTheory.Core.Rk.IwAd.hasIw_Kmax
-  | exact GlobalTheory.Core.Rk.IwAd.hasIw_Kmax
-  | (intros; apply GlobalTheory.Core.Rk.IwAd.hasIw_Kmax <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.IwAd.hasIw_Kmax

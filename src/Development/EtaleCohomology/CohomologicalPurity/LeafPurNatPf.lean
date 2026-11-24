@@ -73,11 +73,6 @@ theorem fold_map {P' P : Arrow Spc} (ψ : P' ⟶ P)
           erw [pushout.inl_desc, pushout.inl_desc]
           simp
         )
-      | (
-          erw [pushout.inr_desc_assoc, Category.assoc, Category.assoc]
-          erw [pushout.inr_desc, pushout.inr_desc]
-          simp
-        )
     )
 
 theorem proj_pull (q : ℕ) {P' P : Arrow Spc} (ψ : P' ⟶ P) (n i : ℤ) (c : Ht q (dbl P) n i)
@@ -210,9 +205,8 @@ theorem purOf_nat
       (by simp only [abv, Arrow.mk_hom]; exact pullback.lift_fst _ _ _)
   have hsq : abvMap P'.U t'.π ≫ opnMap φ.f _ _ φ.le = ψ ≫ abvMap P.U t.π := by
     apply Arrow.hom_ext
-    · simp only [Arrow.comp_left, abvMap, opnMap, ψ, Arrow.homMk_left]
-      exact (pullback.lift_snd _ _ _).symm
-    · simp only [Arrow.comp_right, abvMap, opnMap, ψ, Arrow.homMk_right]; exact hb.symm
+    · simp only [Arrow.comp_left, abvMap, opnMap, ψ]; exact (pullback.lift_snd _ _ _).symm
+    · simp only [Arrow.comp_right, abvMap, opnMap, ψ]; exact hb.symm
   apply purOf_char t' q _ n i _ _ (pull _ b _ _ e)
   · rw [← pull_comp, ← pull_comp,
       show pullback.fst t'.π (sch.map P'.ι) ≫ b = c ≫ pullback.fst t.π (sch.map P.ι) from
@@ -243,8 +237,7 @@ theorem pull_of_right
 def idHom {d : ℕ} (P : SP d) : P.Hom P where
   f := 𝟙 _
   g := 𝟙 _
-  cart := by
-    first | exact IsPullback.of_vert_isIso ⟨by simp⟩ | exact IsPullback.of_horiz_isIso ⟨by simp⟩
+  cart := by first | exact IsPullback.of_vert_isIso ⟨by simp⟩
   le := fun x hx => hx
 
 end PurNatPf

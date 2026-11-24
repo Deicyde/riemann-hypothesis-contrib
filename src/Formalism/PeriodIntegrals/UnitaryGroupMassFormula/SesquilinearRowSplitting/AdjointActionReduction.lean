@@ -121,8 +121,7 @@ theorem alg_inj (D : D7) : Function.Injective (algebraMap (𝓞 D.host.F) (𝓞 
   ext
   simpa using h'
 
-theorem ddS_ne (D : D7) : ddS D ≠ 0 :=
-  PI.ScalarPairDr.W.ddS_ne_zero D
+theorem ddS_ne (D : D7) : ddS D ≠ 0 := PI.ScalarPairDr.W.ddS_ne_zero D
 
 theorem ddS_cstab (D : D7) : CStab (ddS D) := by
   have hfix

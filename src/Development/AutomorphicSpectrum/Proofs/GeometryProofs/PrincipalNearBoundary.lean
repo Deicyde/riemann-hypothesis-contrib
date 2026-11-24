@@ -2,16 +2,21 @@ module
 
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.SlopeBoundSt
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartFactorsThroughStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsDvrThroughDiscPointStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLogPeriodFamilyStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FamilyExpLogCoverBoundStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixLeftStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixMiddleStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixRightStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartFactorsThrough
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.AdmissiblePadicIntMaximalIdeal
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsDvrThroughDiscPoint
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
+public import Development.AbelianVarietyTheory.Definitions.Uniformization.PointEqOfSubsingleton
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLogPeriodFamily
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExponentialFamilyPeriods
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FamilyExpLogCoverBound
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsAbLift
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixLeft
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixMiddle
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HolUnifPeriodMatrixRight
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerivAt0ZeroOfFixed
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LogPeriodLimitStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PolarizedAbelianPartPrincipalStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LogPeriodLimit
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PolarizedAbelianPartPrincipal
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,7 +59,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 
 @[expose] public section
 
@@ -169,8 +173,10 @@ theorem abPart_principal_and_bound
                         → c.re ≤ K * ∑ i, ‖x i‖ ^ 2 := by
   intro E _ _ _ H D l Xo σ n a C hpq hσ
   obtain ⟨ρ₀, Λ, _, L, e, hρ0, hρ1, hlink⟩ :=
-    GlobalTheory.T.exists_log_period_family E H D l Xo σ n a C hpq hσ
-  obtain ⟨ρ₁, Cb, h1, h2, hL⟩ := GlobalTheory.T.log_period_limit n a C.g Λ L
+    _root_.GlobalTheory.CompanionTheory.Ar.Flat.Link.exists_logPeriods_famExp E H D l Xo σ n a C hpq
+      hσ
+  obtain ⟨ρ₁, Cb, h1, h2, hL⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.RiemannLimit.bounded_on_limit_lattice n a C.g Λ L
   have hol : Flat.IsHolPts (Metric.ball 0 ρ₀) C.ψ :=
     ⟨Metric.isOpen_ball, fun r => (C.hol.2 r).mono (Metric.ball_subset_ball hρ1)⟩
   have hprin
@@ -178,15 +184,17 @@ theorem abPart_principal_and_bound
         IsPrincipal P.tB := by
     intro z hz P
     obtain ⟨V, _, _, _, f, r, tV, mV, hV, hr, hker, hrf, hpol⟩ :=
-      GlobalTheory.T.exists_dvr_through_disc_point E H D l Xo σ n a C z hz
+      _root_.GlobalTheory.CompanionTheory.Ar.QuotLoc.exists_curve_through_point E H D l Xo σ n a C z
+        hz
     have key
         : ∀ (z₀ : Sp ℂ ⟶ Sp C.R),
           z₀ = spMap r ≫ spMap f → ∀ P : AbPart C.t z₀, IsPrincipal P.tB := by
       rintro _ rfl P
       obtain ⟨m', -⟩ :=
-        GlobalTheory.T.abelian_part_factors_through E H _ _ tV C.t _ mV ℂ (spMap r) P
-      exact GlobalTheory.T.polarized_abelian_part_principal E H V r tV hV hr hker hpol
-        ⟨P.tK, m', P.τ, P.tB, P.e, P.e_hom, P.act, P.pp⟩
+        _root_.GlobalTheory.CompanionTheory.Ar.AbPartPull.exists_sabMap_tK E H _ _ tV C.t _ mV ℂ
+          (spMap r) P
+      exact _root_.GlobalTheory.CompanionTheory.Relay.polarized_abelian_part_principal E H V r tV hV
+        hr hker hpol ⟨P.tK, m', P.τ, P.tB, P.e, P.e_hom, P.act, P.pp⟩
     refine key _ ?_ P
     rw [← hrf]
     show Spec.map (CommRingCat.ofHom (r.comp f)) = _
@@ -208,16 +216,16 @@ theorem abPart_principal_and_bound
   have hb1 : (ρ₀ : ℂ) • z' ∈ Metric.ball (0 : Fin n → ℂ) 1 := Metric.ball_subset_ball hρ1 hb
   obtain ⟨ws, W, per, hws, hlim, hper, hfour, -, hsix⟩ := hL z' hz'
   obtain ⟨hA, hB, hC⟩ :=
-    GlobalTheory.T.family_exp_log_cover_bound E H C.R C.t C.g n a C.M C.ψ ρ₀ e Λ L hρ0 hρ1 hol hlink
-      z' hz1 ws W per hws hlim hper hfour
+    _root_.GlobalTheory.CompanionTheory.Ar.QuotLoc.limit_lattice E H C.R C.t C.g n a C.M C.ψ ρ₀ e Λ
+      L hρ0 hρ1 hol hlink z' hz1 ws W per hws hlim hper hfour
   intro P
   have hP := hprin _ hb1 P
   refine ⟨hP, ?_⟩
   intro Mz hMz x v c hv hc
   obtain ⟨-, -, -, A, iA, φ, g', u, Hm, χ, v', w', a', b', hφ, hAH, hv', hw', ha', hb', rfl⟩ := hc
   obtain ⟨ℓ, hℓ⟩ :=
-    GlobalTheory.T.hol_unif_period_matrix_left E H C.R C.t C.g n C.M _ C.ψ e _ P A iA φ g' u Hm χ hb
-      hφ hAH hP
+    _root_.GlobalTheory.CompanionTheory.Ar.QuotLoc.exists_isAbLift E H C.R C.t C.g n C.M _ C.ψ e _ P
+      A iA φ g' u Hm χ hb hφ hAH hP
   have e1 : a' = ℓ x :=
     GlobalTheory.CompanionTheory.Ar.QuotLoc.DiffL.isDiff_eq_lift E H C.R C.t C.g n C.M _ C.ψ e _ P A
       iA φ g' u Hm χ ℓ hb hφ hAH hP hℓ Mz hMz x v v' a' hv hv' ha'
@@ -225,8 +233,8 @@ theorem abPart_principal_and_bound
     GlobalTheory.CompanionTheory.Ar.QuotLoc.DiffL.isDiff_eq_lift E H C.R C.t C.g n C.M _ C.ψ e _ P A
       iA φ g' u Hm χ ℓ hb hφ hAH hP hℓ Mz hMz x v w' b' hv hw' hb'
   obtain ⟨hin, honto⟩ :=
-    GlobalTheory.T.hol_unif_period_matrix_right E H C.R C.t C.g n C.M _ C.ψ e _ P A iA φ g' u Hm χ ℓ
-      hb hφ hAH hP hℓ
+    _root_.GlobalTheory.CompanionTheory.Ar.QuotLoc.periods_map_onto_lattice E H C.R C.t C.g n C.M _
+      C.ψ e _ P A iA φ g' u Hm χ ℓ hb hφ hAH hP hℓ
   obtain ⟨Hb, hH1, hH2, hH3⟩ := exists_pull_form ℓ Hm hAH.1
   have hE : ∀ x x' : W, (per x ⬝ᵥ Hb *ᵥ star (per x')).im = ((L.E x x' : ℤ) : ℝ) := by
     intro x x'
@@ -237,8 +245,8 @@ theorem abPart_principal_and_bound
         (Units.mk0 _ (Complex.exp_ne_zero (-(2 * Real.pi * Complex.I) * ((L.E x x' : ℤ) : ℂ) / N)))
         x x' hN rfl
     have :=
-      GlobalTheory.T.hol_unif_period_matrix_middle E H C.R C.t C.g n C.M _ C.ψ e _ P A iA φ g' u Hm
-        χ ℓ hb hφ hAH hP hℓ N _ (per x) (per x') hN (hA x) (hA x') hw
+      _root_.GlobalTheory.CompanionTheory.Ar.QuotLoc.Pair.cubWeil_eq_exp_riemann E H C.R C.t C.g n
+        C.M _ C.ψ e _ P A iA φ g' u Hm χ ℓ hb hφ hAH hP hℓ N _ (per x) (per x') hN (hA x) (hA x') hw
     rw [Units.val_mk0] at this
     have c : (((L.E x x' : ℤ) : ℝ) : ℂ) = ((L.E x x' : ℤ) : ℂ) := by push_cast; rfl
     rw [c]

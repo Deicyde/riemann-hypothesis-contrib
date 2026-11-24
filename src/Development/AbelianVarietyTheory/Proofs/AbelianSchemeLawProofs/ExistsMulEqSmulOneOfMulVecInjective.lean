@@ -213,7 +213,7 @@ theorem exists_kernel_certificate
     · obtain ⟨k, rfl⟩ := hj
       have : Q i (s k) = (Q * S) i k := by simp [S, Matrix.mul_apply, Matrix.one_apply]
       rw [this, hQS]
-      simp [E, Matrix.mul_apply, Matrix.one_apply, hfs]
+      simp [E, Matrix.mul_apply, hfs]
     · obtain ⟨k, hk⟩ : ∃ k, f k = j := ⟨e.symm ⟨j, hj⟩, by simp [f]⟩
       subst hk
       simp [E, Matrix.mul_apply, Matrix.one_apply, hf.eq_iff]

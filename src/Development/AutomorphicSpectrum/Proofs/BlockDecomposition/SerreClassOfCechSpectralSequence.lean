@@ -92,24 +92,28 @@ def idxF (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) : C ⥤ Typ
   obj T := {α // U α T}
   map φ := TypeCat.ofHom fun a => ⟨a.1, hU a.1 φ a.2⟩
 
-def idxπ (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) : idxF U hU ⟶ (Functor.const C).obj PUnit where
+def idxπ (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α))
+    : idxF U hU ⟶ (Functor.const C).obj PUnit where
   app T := TypeCat.ofHom fun _ => PUnit.unit
 
-def tupF (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) {p : ℕ} (i : Fin (p + 1) → ι) :
-    (capT U i).FullSubcategory ⥤ (CH.cech (idxπ U hU) p).Elements where
-  obj T := (CH.cech (idxπ U hU) p).elementsMk T.obj
-    ⟨fun k => ⟨i k, T.property k⟩, fun _ _ => rfl⟩
+def tupF (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) {p : ℕ} (i : Fin (p + 1) → ι)
+    : (capT U i).FullSubcategory ⥤ (CH.cech (idxπ U hU) p).Elements where
+  obj T := (CH.cech (idxπ U hU) p).elementsMk T.obj ⟨fun k => ⟨i k, T.property k⟩, fun _ _ => rfl⟩
   map φ := ⟨φ.hom, Subtype.ext (funext fun k => Subtype.ext rfl)⟩
 
 variable {R : Type} [CommRing R]
 
-def tupM (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) {p : ℕ} (i : Fin (p + 1) → ι) :
-    CH.Mor (CH.elF (CH.cech (idxπ U hU) p) F) ((capT U i).ι ⋙ F) (RingHom.id R) where
+def tupM
+    (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α))
+    (F : C ⥤ ModuleCat.{w} R)
+    {p : ℕ} (i : Fin (p + 1) → ι)
+    : CH.Mor (CH.elF (CH.cech (idxπ U hU) p) F) ((capT U i).ι ⋙ F) (RingHom.id R) where
   G := tupF U hU i
   τ _ := LinearMap.id
   nat _ _ := rfl
 
-abbrev dbl (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) : DCx.{max u v w} R :=
+abbrev dbl (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R)
+    : DCx.{max u v w} R :=
   (CH.cechCos (idxπ U hU) F).dcx
 
 end Nerve
@@ -118,18 +122,24 @@ section Serre
 
 variable {R : Type} [CommRing R] (𝒮 : Serre.{w} R)
 
-theorem serre_of_injective {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (f : M →ₗ[R] N) (hf : Function.Injective f) (hN : 𝒮.P N) : 𝒮.P M := by
+theorem serre_of_injective
+    {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (f : M →ₗ[R] N) (hf : Function.Injective f)
+    (hN : 𝒮.P N)
+    : 𝒮.P M := by
   refine 𝒮.mid PUnit.{w + 1} M N 0 f ?_ (𝒮.zero _ inferInstance) hN
   intro x
   constructor
   · intro hx
-    exact ⟨0, hf (by simpa using hx.symm) ⟩
+    exact ⟨0, hf (by simpa using hx.symm)⟩
   · rintro ⟨y, rfl⟩
     simp
 
-theorem serre_of_surjective {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (f : M →ₗ[R] N) (hf : Function.Surjective f) (hM : 𝒮.P M) : 𝒮.P N := by
+theorem serre_of_surjective
+    {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (f : M →ₗ[R] N) (hf : Function.Surjective f)
+    (hM : 𝒮.P M)
+    : 𝒮.P N := by
   refine 𝒮.mid M N PUnit.{w + 1} f 0 ?_ hM (𝒮.zero _ inferInstance)
   intro x
   constructor
@@ -138,16 +148,22 @@ theorem serre_of_surjective {M N : Type w} [AddCommGroup M] [Module R M] [AddCom
   · rintro _
     rfl
 
-theorem serre_of_equiv {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (e : M ≃ₗ[R] N) (hM : 𝒮.P M) : 𝒮.P N :=
+theorem serre_of_equiv
+    {M N : Type w} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (e : M ≃ₗ[R] N) (hM : 𝒮.P M)
+    : 𝒮.P N :=
   serre_of_surjective 𝒮 e.toLinearMap e.surjective hM
 
-theorem serre_step {Z H E : Type w} [AddCommGroup Z] [Module R Z] [AddCommGroup H] [Module R H] [AddCommGroup E] [Module R E]
-    (c : Z →ₗ[R] H) (ψ : Z →ₗ[R] E) (B : Submodule R H) (hk : ∀ z, ψ z = 0 → c z ∈ B)
-    (hB : 𝒮.P B) (hE : 𝒮.P E) : 𝒮.P (LinearMap.range c) := by
+theorem serre_step
+    {Z H E : Type w}
+    [AddCommGroup Z] [Module R Z] [AddCommGroup H] [Module R H] [AddCommGroup E] [Module R E]
+    (c : Z →ₗ[R] H) (ψ : Z →ₗ[R] E) (B : Submodule R H) (hk : ∀ z, ψ z = 0 → c z ∈ B) (hB : 𝒮.P B)
+    (hE : 𝒮.P E)
+    : 𝒮.P (LinearMap.range c) := by
   set B' : Submodule R (LinearMap.range c) := B.comap (LinearMap.range c).subtype with hB'
   have h1 : 𝒮.P B' := by
-    refine serre_of_injective 𝒮 (f := (((LinearMap.range c).subtype.comp B'.subtype).codRestrict B fun x => x.2)) ?_ hB
+    refine serre_of_injective 𝒮
+      (f := (((LinearMap.range c).subtype.comp B'.subtype).codRestrict B fun x => x.2)) ?_ hB
     intro x y h
     have h' : ((x.1 : LinearMap.range c) : H) = y.1 := congrArg (fun t : B => (t : H)) h
     exact Subtype.ext (Subtype.ext h')
@@ -157,7 +173,8 @@ theorem serre_step {Z H E : Type w} [AddCommGroup Z] [Module R Z] [AddCommGroup 
   have h3 : 𝒮.P (LinearMap.range c ⧸ B') := by
     refine serre_of_surjective 𝒮 ((LinearMap.ker ψ).liftQ (B'.mkQ.comp c.rangeRestrict) ?_) ?_ h2
     · intro z hz
-      simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+      simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply,
+        Submodule.Quotient.mk_eq_zero]
       exact hk z hz
     · intro x
       obtain ⟨y, rfl⟩ := Submodule.mkQ_surjective _ x
@@ -182,8 +199,7 @@ def Zf (a : ℕ) : Submodule R (K.tot.Z n) where
     change c • x.1.1 p q = 0
     rw [hx p q h, smul_zero]
 
-def clsZ (a : ℕ) : Zf K n a →ₗ[R] K.tot.H n :=
-  (Submodule.mkQ _).comp (Zf K n a).subtype
+def clsZ (a : ℕ) : Zf K n a →ₗ[R] K.tot.H n := (Submodule.mkQ _).comp (Zf K n a).subtype
 
 def Ff (a : ℕ) : Submodule R (K.tot.H n) := LinearMap.range (clsZ K n a)
 
@@ -191,7 +207,11 @@ end Filt
 
 section Pieces
 
-theorem pi_H_bij : ∀ {R : Type} [CommRing R] {A : Cx.{w} R} {I : Type} (B : I → Cx.{w} R) (φ : ∀ i, Cx.Hom A (B i) (RingHom.id R)), (∀ q, Function.Bijective (fun (x : A.X q) i => (φ i).f q x)) → ∀ q, Function.Bijective (fun (x : A.H q) i => (φ i).mapH q x) := by
+theorem pi_H_bij
+    : ∀ {R : Type} [CommRing R] {A : Cx.{w} R} {I : Type} (B : I → Cx.{w} R)
+        (φ : ∀ i, Cx.Hom A (B i) (RingHom.id R)),
+      (∀ q, Function.Bijective (fun (x : A.X q) i => (φ i).f q x))
+        → ∀ q, Function.Bijective (fun (x : A.H q) i => (φ i).mapH q x) := by
   intro R _ A I B φ hb q
   constructor
   · intro x y hxy
@@ -233,12 +253,12 @@ theorem pi_H_bij : ∀ {R : Type} [CommRing R] {A : Cx.{w} R} {I : Type} (B : I 
     rw [P.mapH_cls _ q z hdz h2, hy i]
     exact ((P.cls_surj (B i) q).2.2.1 _ _ _ _).2 (by rw [hzi, sub_self]; exact Submodule.zero_mem _)
 
-theorem const_H : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F : C ⥤ ModuleCat.{w} R) (n : ℕ), Nonempty (CH.H F n ≃ₗ[R] CH.H (CH.elF ((Functor.const C).obj PUnit.{1}) F) n) := by
+theorem const_H
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F : C ⥤ ModuleCat.{w} R) (n : ℕ),
+      Nonempty (CH.H F n ≃ₗ[R] CH.H (CH.elF ((Functor.const C).obj PUnit.{1}) F) n) := by
   intro R _ C _ F n
   let E : C ⥤ Type := (Functor.const C).obj PUnit.{1}
-  let G : C ⥤ E.Elements :=
-    { obj := fun T => E.elementsMk T PUnit.unit
-      map := fun φ => ⟨φ, rfl⟩ }
+  let G : C ⥤ E.Elements := { obj := fun T => E.elementsMk T PUnit.unit, map := fun φ => ⟨φ, rfl⟩ }
   let m : CH.Mor F (CH.elF E F) (RingHom.id R) := CH.Mor.restrict F (Functor.Elements.π E)
   have hb : ∀ k, Function.Bijective (m.hom.f k) := by
     intro k
@@ -250,10 +270,12 @@ theorem const_H : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F :
       exact ⟨fun c => y (c ⋙ G), funext fun s => rfl⟩
   exact ⟨LinearEquiv.ofBijective (m.hom.mapH n) (P.mapH_bij m.hom hb n)⟩
 
-theorem mapH_sum {R : Type} [CommRing R] {A B : Cx.{w} R} {κ : Type} [Fintype κ] (ψ : Cx.Hom A B (RingHom.id R))
-    (φ : κ → Cx.Hom A B (RingHom.id R)) (c : κ → ℤ) (q : ℕ)
-    (h : ∀ x, ψ.f q x = ∑ k, c k • (φ k).f q x) (x : A.H q) :
-    ψ.mapH q x = ∑ k, c k • (φ k).mapH q x := by
+theorem mapH_sum
+    {R : Type} [CommRing R]
+    {A B : Cx.{w} R} {κ : Type} [Fintype κ]
+    (ψ : Cx.Hom A B (RingHom.id R)) (φ : κ → Cx.Hom A B (RingHom.id R)) (c : κ → ℤ) (q : ℕ)
+    (h : ∀ x, ψ.f q x = ∑ k, c k • (φ k).f q x) (x : A.H q)
+    : ψ.mapH q x = ∑ k, c k • (φ k).mapH q x := by
   obtain ⟨z, rfl⟩ := Submodule.mkQ_surjective _ x
   have e : ψ.mapZ q z = ∑ k, c k • (φ k).mapZ q z := by
     refine Subtype.ext ?_
@@ -264,12 +286,21 @@ theorem mapH_sum {R : Type} [CommRing R] {A B : Cx.{w} R} {κ : Type} [Fintype �
   rw [e, map_sum]
   exact Finset.sum_congr rfl fun k _ => map_zsmul _ _ _
 
-theorem col_comm : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {ι : Type} (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ) (x : ((dbl U hU F).col p).H q), (cechH F U q).d p (fun i => (tupM U hU F i).pull q x) = fun i => (tupM U hU F i).pull q ((colMap (dbl U hU F) p).mapH q x) := by
+theorem col_comm
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {ι : Type} (U : ι → ObjectProperty C)
+        (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ)
+        (x : ((dbl U hU F).col p).H q),
+      (cechH F U q).d p (fun i => (tupM U hU F i).pull q x)
+        = fun i => (tupM U hU F i).pull q ((colMap (dbl U hU F) p).mapH q x) := by
   intro R _ C _ ι U hU F p q x
   funext i
-  have h1 := mapH_sum (colMap (dbl U hU F) p)
-    (fun k : Fin (p + 2) => (CH.elMor (CH.cechMap (idxπ U hU) k.succAbove) F).hom) (fun k => (-1 : ℤ) ^ (k : ℕ)) q
-    (fun a => Cos.d_apply ((CH.cechCos (idxπ U hU) F).cos q) p a) x
+  have h1 :=
+    mapH_sum (colMap (dbl U hU F) p)
+      (fun k : Fin (p + 2) => (CH.elMor (CH.cechMap (idxπ U hU) k.succAbove) F).hom)
+      (fun k => (-1 : ℤ) ^ (k : ℕ))
+      q
+      (fun a => Cos.d_apply ((CH.cechCos (idxπ U hU) F).cos q) p a)
+      x
 
   rw [h1, map_sum, Cos.d_apply, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -281,43 +312,61 @@ end Pieces
 
 section Nerve2
 
-variable {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {ι : Type}
-  (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) {p q : ℕ}
+variable
+  {R : Type} [CommRing R]
+  {C : Type u} [Category.{v} C]
+  {ι : Type} (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α))
+  (F : C ⥤ ModuleCat.{w} R)
+  {p q : ℕ}
 
-def tupI (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) : Fin (p + 1) → ι :=
-  fun a => ((s.obj 0).2.1 a).1
+def tupI (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) : Fin (p + 1) → ι := fun a =>
+  ((s.obj 0).2.1 a).1
 
-theorem tupI_val (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) (k : Fin (q + 1)) (a : Fin (p + 1)) :
-    tupI U hU s a = ((s.obj k).2.1 a).1 :=
-  congrArg (fun z : (CH.cech (idxπ U hU) p).obj (s.obj k).1 => (z.1 a).1) (s.map (homOfLE (Fin.zero_le k))).2
+theorem tupI_val
+    (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) (k : Fin (q + 1)) (a : Fin (p + 1))
+    : tupI U hU s a = ((s.obj k).2.1 a).1 :=
+  congrArg
+    (fun z : (CH.cech (idxπ U hU) p).obj (s.obj k).1 => (z.1 a).1)
+    (s.map (homOfLE (Fin.zero_le k))).2
 
-def tupL (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) :
-    ComposableArrows (capT U (tupI U hU s)).FullSubcategory q :=
+def tupL (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q)
+    : ComposableArrows (capT U (tupI U hU s)).FullSubcategory q :=
   (capT U (tupI U hU s)).lift (s ⋙ Functor.Elements.π _) fun k a =>
     hU _ (s.map (homOfLE (Fin.zero_le k))).1 ((s.obj 0).2.1 a).2
 
-theorem tup_eval (f : CH.Cn (CH.elF (CH.cech (idxπ U hU) p) F) q)
-    (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q) :
-    @Eq (F.obj (s.obj (Fin.last q)).1) (f (tupL U hU s ⋙ tupF U hU (tupI U hU s))) (f s) := by
+theorem tup_eval
+    (f : CH.Cn (CH.elF (CH.cech (idxπ U hU) p) F) q)
+    (s : ComposableArrows (CH.cech (idxπ U hU) p).Elements q)
+    : @Eq (F.obj (s.obj (Fin.last q)).1) (f (tupL U hU s ⋙ tupF U hU (tupI U hU s))) (f s) := by
   let E := CH.cech (idxπ U hU) p
   let c := s ⋙ Functor.Elements.π E
-  let liftDiagram (y : ∀ k, E.obj (c.obj k))
-      (hy : ∀ {a b : Fin (q + 1)} (φ : a ⟶ b), E.map (c.map φ) (y a) = y b) :
-      ComposableArrows E.Elements q :=
-    { obj k := E.elementsMk (c.obj k) (y k)
-      map φ := Functor.Elements.homMk (c.map φ) (hy φ)
-      map_id k := Functor.Elements.hom_ext (c.map_id k)
-      map_comp φ ψ := Functor.Elements.hom_ext (c.map_comp φ ψ) }
-  have eval_eq {y y' : ∀ k, E.obj (c.obj k)} hy hy' (e : y = y') :
-      @Eq (F.obj (c.obj (Fin.last q))) (f (liftDiagram y hy)) (f (liftDiagram y' hy')) := by
+  let liftDiagram
+      (y : ∀ k, E.obj (c.obj k))
+      (hy : ∀ {a b : Fin (q + 1)} (φ : a ⟶ b), E.map (c.map φ) (y a) = y b)
+      : ComposableArrows E.Elements q := {
+    obj k := E.elementsMk (c.obj k) (y k)
+    map φ := Functor.Elements.homMk (c.map φ) (hy φ)
+    map_id k := Functor.Elements.hom_ext (c.map_id k)
+    map_comp φ ψ := Functor.Elements.hom_ext (c.map_comp φ ψ)
+  }
+  have eval_eq {y y' : ∀ k, E.obj (c.obj k)} hy hy' (e : y = y')
+      : @Eq (F.obj (c.obj (Fin.last q))) (f (liftDiagram y hy)) (f (liftDiagram y' hy')) := by
     subst y'
     rfl
   let t := tupL U hU s ⋙ tupF U hU (tupI U hU s)
-  exact eval_eq (y := fun k => (t.obj k).val) (y' := fun k => (s.obj k).val)
-    (fun φ => (t.map φ).2) (fun φ => (s.map φ).2)
+  exact eval_eq
+    (y := fun k => (t.obj k).val)
+    (y' := fun k => (s.obj k).val)
+    (fun φ => (t.map φ).2)
+    (fun φ => (s.map φ).2)
     (funext fun k => Subtype.ext (funext fun a => Subtype.ext (tupI_val U hU s k a)))
 
-theorem tup_bij : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {ι : Type} (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ), Function.Bijective (fun (x : CH.Cn (CH.elF (CH.cech (idxπ U hU) p) F) q) (i : Fin (p + 1) → ι) => (tupM U hU F i).pullC q x) := by
+theorem tup_bij
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {ι : Type} (U : ι → ObjectProperty C)
+        (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ),
+      Function.Bijective (fun (x : CH.Cn (CH.elF (CH.cech (idxπ U hU) p) F) q)
+          (i : Fin (p + 1) → ι) =>
+        (tupM U hU F i).pullC q x) := by
   intro R _ C _ ι U hU F p q
   constructor
   · intro x y h
@@ -333,8 +382,8 @@ section Lead
 
 variable {R : Type} [CommRing R] (K : DCx.{w} R) {n : ℕ}
 
-theorem dv_lead (x : ∀ p q, K.X p q) (hD : K.D x = 0) (a q : ℕ) (h0 : ∀ p q, p < a → x p q = 0) :
-    K.dv a q (x a q) = 0 := by
+theorem dv_lead (x : ∀ p q, K.X p q) (hD : K.D x = 0) (a q : ℕ) (h0 : ∀ p q, p < a → x p q = 0)
+    : K.dv a q (x a q) = 0 := by
   have h1 := congrFun (congrFun hD a) (q + 1)
   rw [DCx.D_apply] at h1
   have h2 : K.Dh x a (q + 1) = 0 := by
@@ -346,7 +395,8 @@ theorem dv_lead (x : ∀ p q, K.X p q) (hD : K.D x = 0) (a q : ℕ) (h0 : ∀ p 
   rw [h2, zero_add] at h1
   exact Auxfb.zsm_cancel a _ h1
 
-theorem dh_lead (x : ∀ p q, K.X p q) (hD : K.D x = 0) (a q : ℕ) : K.dh a q (x a q) ∈ (K.col (a + 1)).B q := by
+theorem dh_lead (x : ∀ p q, K.X p q) (hD : K.D x = 0) (a q : ℕ)
+    : K.dh a q (x a q) ∈ (K.col (a + 1)).B q := by
   have h1 := congrFun (congrFun hD (a + 1)) q
   rw [DCx.D_apply] at h1
   cases q with
@@ -368,8 +418,8 @@ def lead (a q : ℕ) : Zf K n a →ₗ[R] K.X a q where
   map_smul' _ _ := rfl
 
 def leadC (a q : ℕ) : Zf K n a →ₗ[R] (K.col a).H q :=
-  (Submodule.mkQ _).comp ((lead K a q).codRestrict ((K.col a).Z q) fun z =>
-    dv_lead K z.1.1.1 (D_zero K z.1) a q z.2)
+  (Submodule.mkQ _).comp
+    ((lead K a q).codRestrict ((K.col a).Z q) fun z => dv_lead K z.1.1.1 (D_zero K z.1) a q z.2)
 
 theorem leadC_eq (a q : ℕ) (z : Zf K n a) (h) : leadC K a q z = (K.col a).cls (z.1.1.1 a q) h := rfl
 
@@ -384,15 +434,21 @@ theorem leadC_mem (a q : ℕ) (z : Zf K n a) : leadC K a q z ∈ (colH K q).Z a 
 def leadE (a q : ℕ) : Zf K n a →ₗ[R] (colH K q).H a :=
   (Submodule.mkQ _).comp ((leadC K a q).codRestrict ((colH K q).Z a) (leadC_mem K a q))
 
-theorem leadE_eq (a q : ℕ) (z : Zf K n a) : leadE K a q z = (colH K q).cls (leadC K a q z) (leadC_mem K a q z) := rfl
+theorem leadE_eq (a q : ℕ) (z : Zf K n a)
+    : leadE K a q z = (colH K q).cls (leadC K a q z) (leadC_mem K a q z) :=
+  rfl
 
-theorem lower {a : ℕ} (z : Zf K n a) (W : ∀ p q, K.X p q) (hs : ∀ p q, p + q + 1 ≠ n → W p q = 0)
-    (hW : ∀ p r, p < a + 1 → (z.1.1.1 - K.D W) p r = 0) : clsZ K n a z ∈ Ff K n (a + 1) := by
+theorem lower
+    {a : ℕ} (z : Zf K n a)
+    (W : ∀ p q, K.X p q)
+    (hs : ∀ p q, p + q + 1 ≠ n → W p q = 0) (hW : ∀ p r, p < a + 1 → (z.1.1.1 - K.D W) p r = 0)
+    : clsZ K n a z ∈ Ff K n (a + 1) := by
   have hDW : K.D W ∈ K.T n := Auxfb.Dmem' K n W hs
   have hT : z.1.1.1 - K.D W ∈ K.T n := Submodule.sub_mem _ z.1.1.2 hDW
-  have hc : K.tot.d n ⟨_, hT⟩ = 0 := Subtype.ext (by
-    change K.D (z.1.1.1 - K.D W) = 0
-    rw [map_sub, K.DD, D_zero K z.1, sub_zero])
+  have hc : K.tot.d n ⟨_, hT⟩ = 0 :=
+    Subtype.ext (by
+      change K.D (z.1.1.1 - K.D W) = 0
+      rw [map_sub, K.DD, D_zero K z.1, sub_zero])
   refine ⟨⟨⟨⟨_, hT⟩, hc⟩, hW⟩, ?_⟩
   refine ((P.cls_surj K.tot n).2.2.1 _ _ hc z.1.2).2 ?_
   have e : z.1.1.1 - K.D W - z.1.1.1 = K.D (-W) := by rw [map_neg]; abel
@@ -403,14 +459,17 @@ theorem lower {a : ℕ} (z : Zf K n a) (W : ∀ p q, K.X p q) (hs : ∀ p q, p +
     rw [Submodule.mem_bot]
     refine Subtype.ext ?_
     change z.1.1.1 - K.D W - z.1.1.1 = 0
-    rw [hW0]; simp
+    rw [hW0]
+    simp
   | succ m =>
     have hWT : -W ∈ K.T m := Submodule.neg_mem _ fun p q h => hs p q (by omega)
     exact ⟨⟨_, hWT⟩, Subtype.ext e.symm⟩
 
-theorem lower_fin (x : ∀ p q, K.X p q) (hT : x ∈ K.T n) {a q : ℕ} (haq : a + q = n) (h0 : ∀ p q, p < a → x p q = 0)
-    (W : ∀ p q, K.X p q) (hW : ∀ p r, p < a + 1 → K.D W p r = K.sgl a q (x a q) p r) :
-    ∀ p r, p < a + 1 → (x - K.D W) p r = 0 := by
+theorem lower_fin
+    (x : ∀ p q, K.X p q) (hT : x ∈ K.T n)
+    {a q : ℕ} (haq : a + q = n) (h0 : ∀ p q, p < a → x p q = 0) (W : ∀ p q, K.X p q)
+    (hW : ∀ p r, p < a + 1 → K.D W p r = K.sgl a q (x a q) p r)
+    : ∀ p r, p < a + 1 → (x - K.D W) p r = 0 := by
   intro p r hp
   rw [Pi.sub_apply, Pi.sub_apply, hW p r hp]
   by_cases h : p = a ∧ r = q
@@ -421,10 +480,13 @@ theorem lower_fin (x : ∀ p q, K.X p q) (hT : x ∈ K.T n) {a q : ℕ} (haq : a
     · exact h0 p r hpa
     · exact hT p r (by omega)
 
-theorem lower_vert (x : ∀ p q, K.X p q) (hT : x ∈ K.T n) {a q : ℕ} (haq : a + q = n) (h0 : ∀ p q, p < a → x p q = 0)
-    (v₁ : K.X a q) (W₁ : ∀ p q, K.X p q) (hs : ∀ p q, p + q + 1 ≠ n → W₁ p q = 0) (hW₁ : K.D W₁ = K.sgl a q v₁)
-    (hv : x a q - v₁ ∈ (K.col a).B q) :
-    ∃ W : ∀ p q, K.X p q, (∀ p q, p + q + 1 ≠ n → W p q = 0) ∧ ∀ p r, p < a + 1 → (x - K.D W) p r = 0 := by
+theorem lower_vert
+    (x : ∀ p q, K.X p q) (hT : x ∈ K.T n)
+    {a q : ℕ} (haq : a + q = n) (h0 : ∀ p q, p < a → x p q = 0) (v₁ : K.X a q) (W₁ : ∀ p q, K.X p q)
+    (hs : ∀ p q, p + q + 1 ≠ n → W₁ p q = 0) (hW₁ : K.D W₁ = K.sgl a q v₁)
+    (hv : x a q - v₁ ∈ (K.col a).B q)
+    : ∃ W : ∀ p q, K.X p q,
+      (∀ p q, p + q + 1 ≠ n → W p q = 0) ∧ ∀ p r, p < a + 1 → (x - K.D W) p r = 0 := by
   cases q with
   | zero =>
     have h1 : x a 0 = v₁ := sub_eq_zero.1 ((Submodule.mem_bot R).1 hv)
@@ -432,17 +494,22 @@ theorem lower_vert (x : ∀ p q, K.X p q) (hT : x ∈ K.T n) {a q : ℕ} (haq : 
   | succ q =>
     obtain ⟨u, hu⟩ := hv
     have hu' : K.dv a q u = x a (q + 1) - v₁ := hu
-    refine ⟨W₁ + (-1 : ℤ) ^ a • K.sgl a q u, fun p r h => ?_, lower_fin K x hT haq h0 _ fun p r hp => ?_⟩
+    refine
+      ⟨W₁ + (-1 : ℤ) ^ a • K.sgl a q u, fun p r h => ?_, lower_fin K x hT haq h0 _ fun p r hp => ?_⟩
     · show W₁ p r + (-1 : ℤ) ^ a • K.sgl a q u p r = 0
       rw [hs p r h, K.sgl_ne u (by omega)]
       simp
     · have hsq : ((-1 : ℤ) ^ a * (-1) ^ a) = 1 := by rw [← mul_pow]; simp
-      rw [map_add (f := _), map_zsmul, K.D_sgl, hW₁, hu', smul_add, smul_smul, hsq, one_smul, map_sub]
+      rw [map_add (f := _), map_zsmul, K.D_sgl, hW₁, hu', smul_add, smul_smul, hsq, one_smul,
+        map_sub]
       simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply]
       rw [K.sgl_ne (K.dh a q u) (Or.inl (by omega) : p ≠ a + 1 ∨ r ≠ q)]
       simp
 
-theorem psi_exists : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (n a q : ℕ), a + q = n → ∃ ψ : Zf K n a →ₗ[R] (colH K q).H a, ∀ z, ψ z = 0 → clsZ K n a z ∈ Ff K n (a + 1) := by
+theorem psi_exists
+    : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (n a q : ℕ),
+      a + q = n
+        → ∃ ψ : Zf K n a →ₗ[R] (colH K q).H a, ∀ z, ψ z = 0 → clsZ K n a z ∈ Ff K n (a + 1) := by
   intro R _ K n a q haq
   refine ⟨leadE K a q, fun z hz => ?_⟩
   have hv : (K.col a).d q (z.1.1.1 a q) = 0 := dv_lead K z.1.1.1 (D_zero K z.1) a q z.2
@@ -450,8 +517,10 @@ theorem psi_exists : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (n a q : ℕ), 
     ((P.cls_surj (colH K q) a).2.1 _ _).1 ((leadE_eq K a q z).symm.trans hz)
   have hx : z.1.1.1 ∈ K.T n := z.1.1.2
   have h0 : ∀ p q, p < a → z.1.1.1 p q = 0 := z.2
-  suffices h : ∃ (v₁ : K.X a q) (W₁ : ∀ p q, K.X p q), (∀ p q, p + q + 1 ≠ n → W₁ p q = 0) ∧
-      K.D W₁ = K.sgl a q v₁ ∧ z.1.1.1 a q - v₁ ∈ (K.col a).B q by
+  suffices h
+      : ∃ (v₁ : K.X a q) (W₁ : ∀ p q, K.X p q),
+        (∀ p q, p + q + 1 ≠ n → W₁ p q = 0) ∧ K.D W₁ = K.sgl a q v₁
+          ∧ z.1.1.1 a q - v₁ ∈ (K.col a).B q by
     obtain ⟨v₁, W₁, hs, hW₁, hd⟩ := h
     obtain ⟨W, hW, hl⟩ := lower_vert K _ hx haq h0 v₁ W₁ hs hW₁ hd
     exact lower K z W hW hl
@@ -490,8 +559,9 @@ theorem Ff_top_subsingleton (K : DCx.{w} R) (n : ℕ) : Subsingleton (Ff K n (n 
   obtain ⟨y, b, rfl⟩ := y
   rw [h0 a, h0 b]
 
-theorem serre_Ff (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ)
-    (h : ∀ p q, p + q = n → 𝒮.P ((colH K q).H p)) : ∀ k a, a + k = n + 1 → 𝒮.P (Ff K n a) := by
+theorem serre_Ff
+    (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ) (h : ∀ p q, p + q = n → 𝒮.P ((colH K q).H p))
+    : ∀ k a, a + k = n + 1 → 𝒮.P (Ff K n a) := by
   intro k
   induction k with
   | zero =>
@@ -504,8 +574,9 @@ theorem serre_Ff (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ)
     obtain ⟨ψ, hψ⟩ := psi_exists K n a q hq
     exact serre_step 𝒮 (clsZ K n a) ψ (Ff K n (a + 1)) hψ (ih (a + 1) (by omega)) (h a q hq)
 
-theorem serre_tot (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ)
-    (h : ∀ p q, p + q = n → 𝒮.P ((colH K q).H p)) : 𝒮.P (K.tot.H n) := by
+theorem serre_tot
+    (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ) (h : ∀ p q, p + q = n → 𝒮.P ((colH K q).H p))
+    : 𝒮.P (K.tot.H n) := by
   refine serre_of_surjective 𝒮 (Ff K n 0).subtype ?_ (serre_Ff 𝒮 K n h (n + 1) 0 (by omega))
   intro x
   obtain ⟨z, rfl⟩ := Submodule.mkQ_surjective _ x
@@ -513,21 +584,27 @@ theorem serre_tot (𝒮 : Serre.{w} R) (K : DCx.{w} R) (n : ℕ)
 
 variable {C : Type u} [Category.{v} C] {ι : Type}
 
-def colCmp (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (q : ℕ) :
-    Cx.Hom (colH (dbl U hU F) q) (cechH F U q).cx (RingHom.id R) where
+def colCmp (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (q : ℕ)
+    : Cx.Hom (colH (dbl U hU F) q) (cechH F U q).cx (RingHom.id R) where
   f p := LinearMap.pi fun i => (tupM U hU F i).pull q
   comm p x := col_comm U hU F p q x
 
-theorem colCmp_bij (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ) :
-    Function.Bijective ((colCmp U hU F q).f p) :=
-  pi_H_bij (fun i : Fin (p + 1) → ι => CH.cx ((capT U i).ι ⋙ F)) (fun i => (tupM U hU F i).hom)
-    (fun q => tup_bij U hU F p q) q
+theorem colCmp_bij
+    (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (F : C ⥤ ModuleCat.{w} R) (p q : ℕ)
+    : Function.Bijective ((colCmp U hU F q).f p) :=
+  pi_H_bij
+    (fun i : Fin (p + 1) → ι => CH.cx ((capT U i).ι ⋙ F))
+    (fun i => (tupM U hU F i).hom)
+    (fun q => tup_bij U hU F p q)
+    q
 
 end Main
 
-theorem serre_cech : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{0} R) {ι : Type}
-    (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (hc : ∀ T, ∃ α, U α T) (𝒮 : Serre.{1} R) (n : ℕ),
-    (∀ p q, p + q = n → 𝒮.P ((cechH F U q).cx.H p)) → 𝒮.P (CH.H F n) := by
+theorem serre_cech
+    : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{0} R) {ι : Type}
+        (U : ι → ObjectProperty C) (hU : ∀ α, Cosieve (U α)) (hc : ∀ T, ∃ α, U α T)
+        (𝒮 : Serre.{1} R) (n : ℕ),
+      (∀ p q, p + q = n → 𝒮.P ((cechH F U q).cx.H p)) → 𝒮.P (CH.H F n) := by
   intro R _ C _ F ι U hU hc 𝒮 n h
   have hs : ∀ T, Function.Surjective ((idxπ U hU).app T) := by
     intro T x

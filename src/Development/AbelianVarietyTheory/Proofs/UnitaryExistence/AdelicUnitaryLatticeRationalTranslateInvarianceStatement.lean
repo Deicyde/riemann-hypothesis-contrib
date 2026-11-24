@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.adelicUnitaryLattice_rationalTranslate_invariance
     : ∀ (D : D7) (V : HSp D),
       (∀ γ γ' h,
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.adelicUnitaryLattice_rationalTranslate_invariance
         ∧ (∀ (N : ℕ) h k,
           FinCong V N k → latG V (h * k) = latG V h ∧ latGHat V (h * k) = latGHat V h)
         ∧ ∀ h h', latG V h = latG V h' → FinCong V 1 (h⁻¹ * h') := by
-  first
-  | exact @GlobalTheory.Member.latG_move
-  | exact GlobalTheory.Member.latG_move
-  | (intros; apply GlobalTheory.Member.latG_move <;> assumption)
+  first | exact @GlobalTheory.Member.latG_move

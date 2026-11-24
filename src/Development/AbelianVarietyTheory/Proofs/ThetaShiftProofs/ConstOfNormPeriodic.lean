@@ -482,7 +482,7 @@ theorem genVal_cube_of_face
     have :=
       differentiable_genVal hL ht p.left (q := id) differentiable_id
         (z := fun w => cubeLift ![w, b, c])
-        (fun I => Differentiable.fun_sum fun k _ => by fin_cases k <;> simp <;> fun_prop)
+        (fun I => Differentiable.fun_sum fun k _ => by fin_cases k <;> simp)
         (fun w => by rw [id, hp]; exact isLift_cube u _)
     simpa only [id, hp] using this
   have hper

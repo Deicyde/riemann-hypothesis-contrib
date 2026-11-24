@@ -61,7 +61,6 @@ open Formalism.L2.Theta GlobalTheory.ExportSeries GlobalTheory.ConjTwist
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp

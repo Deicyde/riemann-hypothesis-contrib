@@ -82,7 +82,7 @@ theorem gram_loc
     rw [mul_smul, ← hfr, smul_smul, inv_mul_cancel₀ hζ, one_smul]
   have hmap : (fr * u.map star).map star = fr.map star * u := by
     ext i j
-    simp [Matrix.mul_apply, star_sum]
+    simp [Matrix.mul_apply]
   rw [hmap, Matrix.transpose_mul]
   calc
     (u.map star)ᵀ * frᵀ * J * (fr.map star * u)

@@ -97,11 +97,13 @@ structure IsFunctorialPrincipalization (A : PrincipalizationAlgorithm.{u}) : Pro
         [AlgebraicGeometry.Smooth p] [AlgebraicGeometry.LocallyOfFiniteType p]
         [AlgebraicGeometry.QuasiCompact p] (j : S ⟶ X) [IsClosedImmersion j] (_ : j ≫ p = pS)
         (c : ℕ) (_ : 1 ≤ c) (_ : HasEtaleCoordCodim p j c) (I : S.IdealSheafData)
-        (hI : NonzeroOnComponents I) (hIX : NonzeroOnComponents (imageIdealSheaf j I))
+        (hI : NonzeroOnComponents I)
+        (hIX : NonzeroOnComponents (_root_.FunctorialResolution.Blowup.schemeImageIdeal j I))
         (hES : InStrictNormalCrossingPosition pS ([] : List S.IdealSheafData))
         (hEX : InStrictNormalCrossingPosition p ([] : List X.IdealSheafData)),
       IsPushforwardBlowupSeq j (A k S pS I hI [] hES).toSequenceOfBlowups
-        (A k X p (imageIdealSheaf j I) hIX [] hEX).toSequenceOfBlowups
+        (A k X p (_root_.FunctorialResolution.Blowup.schemeImageIdeal j I) hIX []
+          hEX).toSequenceOfBlowups
   base_change
     : ∀ (k : Type u) [Field k] [CharZero k] (X : Scheme.{u}) (p : X ⟶ Spec (CommRingCat.of k))
         [AlgebraicGeometry.Smooth p] [AlgebraicGeometry.LocallyOfFiniteType p]

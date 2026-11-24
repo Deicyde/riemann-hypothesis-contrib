@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfDivisibilityBreuilKisinFactsStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfDivisibilityBreuilKisinFacts
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -134,7 +134,7 @@ theorem GlobalTheory.BSP.oe_mod_l
         ∧ ∀ y ∈ bk.OE.map (WittVector.constantCoeff (p := l) (R := Cb l)),
           y⁻¹ ∈ bk.OE.map (WittVector.constantCoeff (p := l) (R := Cb l)) := by
   intro l _ K bk
-  have hflat : bk.flat ≠ 0 := (GlobalTheory.T.ainf_divisibility_breuilKisin_facts l K bk).2.2.2.1
+  have hflat : bk.flat ≠ 0 := (_root_.GlobalTheory.BSP.AinfDiv.main l K bk).2.2.2.1
   have hf : algebraMap (OCb l) (Cb l) bk.flat ≠ 0 :=
     (map_ne_zero_iff _ (IsFractionRing.injective (OCb l) (Cb l))).2 hflat
   have hunit : IsUnit (bk.evW X) := by

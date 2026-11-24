@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
+
 theorem _root_.GlobalTheory.T.exists_section_extending_torsionPoints_support
     : GlobalTheory.UT.LL
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_section_extending_torsionPoints_support
                   x ≫ W.ι = x' ≫ pullback.snd _ _ ≫ U₀.ι
                     → x' ≫ pullback.fst _ _ = x' ≫ pullback.snd _ _ ≫ Q.u₀ ≫ (ρ.pt a).left
                     → x ≫ h ≫ Q.G.ι = x' ≫ Q.a₀ := by
-  first
-  | exact @GlobalTheory.ZH.TorsionSection.exists_section
-  | exact GlobalTheory.ZH.TorsionSection.exists_section
-  | (intros; apply GlobalTheory.ZH.TorsionSection.exists_section <;> assumption)
+  first | exact @GlobalTheory.ZH.TorsionSection.exists_section

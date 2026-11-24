@@ -152,7 +152,7 @@ theorem isDerivAt0_pt
       funext c
       by_cases h : c = a
       · subst h; simp
-      · simp [Pi.single_apply, h]
+      · simp [h]
     rw [h3]
     exact e.diff b hb a
   have hs

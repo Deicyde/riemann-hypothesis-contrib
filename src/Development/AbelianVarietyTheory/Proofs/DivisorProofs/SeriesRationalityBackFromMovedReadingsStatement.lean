@@ -47,6 +47,7 @@ open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheor
   GlobalTheory.OnTies GlobalTheory.SeriesTie GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RealGeo GlobalTheory.Unframe GlobalTheory.UnframePt
+
 theorem _root_.GlobalTheory.T.seriesRationality_back_from_movedReadings
     : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 I0 T0 : Type}
         {A3 : FamIn3 D.what₂.LL Γ Pl0 I0 (List ℕ) T0 D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.seriesRationality_back_from_movedReadings
           ∀ (v₀ : ∀ (j : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec) (ρ : Setup D.ntw)
               (hρ : ρ.Good) (i : D.ntw.Tw) (j : Fin D.R.m) (b : Bool),
             RatRow YS' v₀ hρ i j b → RatRow YS v₀ hρ i j b := by
-  first
-  | exact @GlobalTheory.UnframeForms.ratRow_back
-  | exact GlobalTheory.UnframeForms.ratRow_back
-  | (intros; apply GlobalTheory.UnframeForms.ratRow_back <;> assumption)
+  first | exact @GlobalTheory.UnframeForms.ratRow_back

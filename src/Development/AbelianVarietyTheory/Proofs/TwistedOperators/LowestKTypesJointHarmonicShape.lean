@@ -1,8 +1,8 @@
 module
 
 public import Formalism.LocalRingCardinality.DataTheta
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockInUnitarySStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockUnitaryStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockInUnitaryS
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockUnitary
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -55,10 +55,8 @@ theorem lowestKTypes_jointShape
           ∧ JointShape _ _ _ _ (blattner (lamA al be ga de)) (blattner (lamA' t al be ga de))
           ∧ JointShape _ _ _ _ (blattner (lamA al be ga de)) (blattner (lamM' t al be ga de)) := by
   intro t al be ga de h
-  obtain ⟨hA, hpA, hpA', -, -⟩ :=
-    GlobalTheory.T.lowest_kTypes_jointShape_block_unitary t al be ga de h
-  obtain ⟨hM, hpM', -, -⟩ :=
-    GlobalTheory.T.lowestKTypes_jointShape_block_in_unitaryS t al be ga de h
+  obtain ⟨hA, hpA, hpA', -, -⟩ := _root_.GlobalTheory.LowestTypes.lowest_types t al be ga de h
+  obtain ⟨hM, hpM', -, -⟩ := _root_.GlobalTheory.TypesMirror.types_mirror t al be ga de h
   exact ⟨⟨hpA, hpA', hpM'⟩, hA, hM⟩
 
 end GlobalTheory

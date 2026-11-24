@@ -3,7 +3,7 @@ module
 public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EventuallyClosedOfDictClosed
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamComparisonIsFilteredStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamComparisonIsFiltered
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SecondTwistSmallIffExactlyAtAndFinClause
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -71,7 +71,7 @@ variable
 def mulR : BdR →ₐ[Qp] Module.End LL (V ⊗[Qp] BdR) where
   toFun b := AlgebraTensorModule.map LinearMap.id (LinearMap.mulLeft Qp b)
   map_one' := by ext; simp
-  map_mul' a b := by ext; simp [mul_assoc]
+  map_mul' a b := by ext; simp
   map_zero' := by ext; simp
   map_add' a b := by ext; simp [add_mul, tmul_add]
   commutes' c := by ext; simp [Algebra.smul_def, ← tmul_smul]
@@ -396,7 +396,7 @@ theorem multV_twist_char
   intro l _ P AI T K LL V _ _ _ _ _ ρ ρ' ν χ hν hρ hdR τ b h a
   haveI := (P.PD K).finK
   obtain ⟨m, k, β, d, hd, h1⟩ :=
-    GlobalTheory.T.deRham_comparison_isFiltered l P AI T K LL (Fin 1 → ↥LL.1) ν hdR 0 1
+    _root_.GlobalTheory.DRFil.deRham_filtered l P AI T K LL (Fin 1 → ↥LL.1) ν hdR 0 1
       ⟨1 ⊗ₜ ⟨1, (P.PD K).one_mem⟩, rfl⟩
   have key :=
     finrank_twist (P.PD K) (Pi.evalAlgHom ↥LL.1 (fun _ : Fin 1 => ↥LL.1) 0) ρ ρ' ν χ hν hρ k β d hd

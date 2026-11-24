@@ -108,21 +108,6 @@ theorem col_std
   rw [h']
   simp [Formalism.QuantumDeterminants.bvec, Pi.single_apply]
 
-theorem mulVec_fix_of_supp
-    {m : ℕ} (y : Matrix (Fin m) (Fin m) ℂ) (v : Fin m → ℂ)
-    (h : ∀ j, v j ≠ 0 → ∀ i, y i j = if i = j then 1 else 0)
-    : y *ᵥ v = v := by
-  first
-  | exact UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp ..
-  | (apply UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp
-        <;> first | assumption | infer_instance
-    )
-
 theorem sum_blk
     {k r : ℕ} (f : Fin (2 * r + k + 1) → ℂ)
     (hf : ∀ l : Fin (2 * r + k + 1), ¬(r ≤ l.val ∧ l.val < r + k) → f l = 0)
@@ -194,7 +179,7 @@ theorem std_out
     hy
   set v := Formalism.QuantumDeterminants.Hpk k r *ᵥ Formalism.QuantumDeterminants.bvec i with hv
   have hyv : y *ᵥ v = v := by
-    refine mulVec_fix_of_supp y v fun m hm => hcol m ?_
+    refine _root_.UpperTheory.Reformulated.B.Qi20.mulVec_fix_of_supp y v fun m hm => hcol m ?_
     intro hmB
     apply hm
     rw [hv, mulVec_bvec_apply']

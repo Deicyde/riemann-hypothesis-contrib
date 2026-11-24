@@ -277,8 +277,8 @@ theorem adv_mul (a b : O) (x x' y : T ⟶ A)
         (pullGen_isGen _ _ _ _ (hw b)
           (lift (powPr A (0 : Fin 3)) ((powPr A (2 : Fin 3)) ≫ o.act (star a))).left))
       x x' y hJ
-  simp only [val_mul hJ, val_ros _ _ hJ, val_cubG c _ hJ, MonObj.comp_mul, ← Category.assoc, tup_0,
-      tup_1, tup_2, MonObj.one_comp, _root_.mul_one, h1, face]
+  simp only [val_mul hJ, val_ros _ _ hJ, ← Category.assoc, tup_0, tup_2, MonObj.one_comp,
+      _root_.mul_one, h1]
     at key
   exact key
 
@@ -322,8 +322,8 @@ theorem adv_add (a b : O) (x x' y : T ⟶ A)
         (cubG_isGen c (powPr A (0 : Fin 3)) ((powPr A (2 : Fin 3)) ≫ o.act (star a))
           ((powPr A (2 : Fin 3)) ≫ o.act (star b))))
       x x' y hJ
-  simp only [val_mul hJ, val_ros _ _ hJ, val_cubG c _ hJ, MonObj.comp_mul, ← Category.assoc, tup_0,
-      tup_1, tup_2, MonObj.one_comp, _root_.mul_one, h1, face]
+  simp only [val_mul hJ, val_ros _ _ hJ, val_cubG c _ hJ, ← Category.assoc, tup_0, tup_2,
+      MonObj.one_comp, _root_.mul_one, h1, face]
     at key
   exact key
 
@@ -360,7 +360,7 @@ theorem adv_sy (a : O) (x x' y : T ⟶ A)
       (pullGen_isGen _ _ _ _ (hw 1) (lift (powPr A (0 : Fin 3)) (powPr A (2 : Fin 3))).left) x x' y
       hJ
   simp only [val_mul hJ, val_ros _ _ hJ, val_cubG c _ hJ, MonObj.comp_mul, ← Category.assoc, tup_0,
-      tup_1, tup_2, MonObj.one_comp, _root_.mul_one, h1, face]
+      tup_2, _root_.mul_one, h1]
     at key
   exact key
 

@@ -1,7 +1,6 @@
 module
 
-import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.ProdSubLtEqFactorial
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.FormalDegreeG2.FdDefs
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.ProdSubLtEqFactorial
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.PmatIsHermitian
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.Residue
 import Mathlib.Algebra.Order.Floor.Extended
@@ -59,8 +58,8 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem sCoef_lamT (lam : Fin n → ℝ) (t : ℕ) {i : ℕ} (hi : i + 1 < n) :
-    sCoef (lamT lam t) i = sCoef lam i + t := by
+theorem sCoef_lamT (lam : Fin n → ℝ) (t : ℕ) {i : ℕ} (hi : i + 1 < n)
+    : sCoef (lamT lam t) i = sCoef lam i + t := by
   simp only [sCoef, dif_pos hi, lamT, Dvec, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
   push_cast
   ring
@@ -68,23 +67,25 @@ theorem sCoef_lamT (lam : Fin n → ℝ) (t : ℕ) {i : ℕ} (hi : i + 1 < n) :
 theorem sCoef_zero_of (i : ℕ) (hi : i + 1 < n) : sCoef (0 : Fin n → ℝ) i = 1 := by
   simp [sCoef, dif_pos hi]
 
-theorem ph_lamT (lam : Fin n → ℝ) (t : ℕ) (X : Matrix (Fin n) (Fin n) ℂ) :
-    Ph (lamT lam t) X = Ph lam X + (t : ℝ) * Ph (0 : Fin n → ℝ) X := by
+theorem ph_lamT (lam : Fin n → ℝ) (t : ℕ) (X : Matrix (Fin n) (Fin n) ℂ)
+    : Ph (lamT lam t) X = Ph lam X + (t : ℝ) * Ph (0 : Fin n → ℝ) X := by
   simp only [Ph, Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i hi => ?_
   have hi' : i + 1 < n := by simp at hi; omega
   rw [sCoef_lamT lam t hi', sCoef_zero_of i hi']
   ring
 
-theorem lamT_apply (lam : Fin n → ℝ) (t : ℕ) (a : Fin n) :
-    lamT lam t a = lam a + (t : ℝ) * ((n : ℝ) - 1 - ((a : ℕ) : ℝ)) := by
+theorem lamT_apply (lam : Fin n → ℝ) (t : ℕ) (a : Fin n)
+    : lamT lam t a = lam a + (t : ℝ) * ((n : ℝ) - 1 - ((a : ℕ) : ℝ)) := by
   simp [lamT, Dvec]
 
-theorem lamT_sub (lam : Fin n → ℝ) (t : ℕ) (a b : Fin n) :
-    lamT lam t a - lamT lam t b = (lam a - lam b) + (t : ℝ) * (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
+theorem lamT_sub (lam : Fin n → ℝ) (t : ℕ) (a b : Fin n)
+    : lamT lam t a - lamT lam t b
+      = (lam a - lam b) + (t : ℝ) * (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
   rw [lamT_apply, lamT_apply]; ring
 
-theorem strictAnti_lamT {lam : Fin n → ℝ} (hlam : StrictAnti lam) (t : ℕ) : StrictAnti (lamT lam t) := by
+theorem strictAnti_lamT {lam : Fin n → ℝ} (hlam : StrictAnti lam) (t : ℕ)
+    : StrictAnti (lamT lam t) := by
   intro a b hab
   have h1 := hlam hab
   have h2 : ((a : ℕ) : ℝ) < ((b : ℕ) : ℝ) := by exact_mod_cast hab
@@ -92,37 +93,23 @@ theorem strictAnti_lamT {lam : Fin n → ℝ} (hlam : StrictAnti lam) (t : ℕ) 
   have := lamT_sub lam t b a
   nlinarith
 
-theorem isHCParam_lamT {lam : Fin n → ℝ} (hlam : IsHCParam lam) (t : ℕ) : IsHCParam (lamT lam t) := by
-  apply ReciprocityTheory.ChartRestriction.DS.isHCParam_lamT <;> assumption
-
-theorem gap_lamT {ε : Fin n → Bool} {lam : Fin n → ℝ} {h : ℝ} (hlam : StrictAnti lam)
-    (hgap : GapAtLeast ε lam h) (t : ℕ) : GapAtLeast ε (lamT lam t) (h + t) := by
-  apply ReciprocityTheory.ChartRestriction.DS.gap_lamT <;> assumption
-
 theorem vand_pos {lam : Fin n → ℝ} (hlam : StrictAnti lam) : 0 < Vand lam := by
   unfold Vand
   refine Finset.prod_pos fun a _ => Finset.prod_pos fun b hb => ?_
   simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hb
   exact sub_pos.2 (hlam hb)
 
-theorem ratioV_eq_vand {μ : Fin n → ℝ} (hμ : StrictAnti μ) (s : Fin n) :
-    ratioV μ s = Vand (μ + Pi.single s 1) / Vand μ := by
-  apply ReciprocityTheory.ChartRestriction.DS.ratioV_eq_vand <;> assumption
-
-theorem prod_sub_lt_eq_factorial (b : Fin n) :
-    ∏ a ∈ univ.filter (fun a : Fin n => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) = ((b : ℕ).factorial : ℝ) := by
-  apply ReciprocityTheory.ChartRestriction.DS.prod_sub_lt_eq_factorial <;> assumption
-
-theorem prod_pairs_eq_factorial (n : ℕ) :
-    ∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) =
-      ∏ i ∈ range n, (i.factorial : ℝ) := by
-  rw [Finset.prod_comm' (t' := univ) (s' := fun b => univ.filter (fun a : Fin n => a < b))
+theorem prod_pairs_eq_factorial (n : ℕ)
+    : ∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))
+      = ∏ i ∈ range n, (i.factorial : ℝ) := by
+  rw [Finset.prod_comm' (t' := univ)
+    (s' := fun b => univ.filter (fun a : Fin n => a < b))
     (fun x y => by simp)]
   simp_rw [prod_sub_lt_eq_factorial]
   exact Fin.prod_univ_eq_prod_range (fun i => (i.factorial : ℝ)) n
 
-theorem dimVlam_eq_vand {lam : Fin n → ℝ} (hlam : StrictAnti lam) :
-    dimVlam lam = Vand lam / ∏ i ∈ range n, (i.factorial : ℝ) := by
+theorem dimVlam_eq_vand {lam : Fin n → ℝ} (hlam : StrictAnti lam)
+    : dimVlam lam = Vand lam / ∏ i ∈ range n, (i.factorial : ℝ) := by
   unfold dimVlam Vand
   rw [prod_pairs_eq_factorial]
   congr 1

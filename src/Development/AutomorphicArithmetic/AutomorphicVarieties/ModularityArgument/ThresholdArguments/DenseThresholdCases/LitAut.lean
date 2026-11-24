@@ -37,9 +37,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 namespace GlobalTheory.Mem.LiteralAutomorphy
 open ReciprocityTheory.Gal Formalism.GaloisCohomology GlobalTheory.Published
@@ -57,7 +54,6 @@ structure LitLocAlt : Prop where
   multi : LanglandsMultisegments
   exh : LanglandsExhaustionGL
   cos : StandardCosocleGL
-  conv : LocalConverseGL
   dzi : DepthZeroInduction
   brauer : BrauerDegreeZero
   chev : ChevalleyUnits

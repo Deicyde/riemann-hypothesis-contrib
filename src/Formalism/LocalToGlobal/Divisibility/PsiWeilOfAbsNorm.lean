@@ -87,7 +87,7 @@ theorem psiWeil_iff
     have hb : xiBar D (pl kv).1 * c = (((z.val : ℤ)) : kP (pl kv).1) := by
       apply (res kv).injective
       rw [map_intCast, ← hz]
-      simp [ZMod.natCast_zmod_val]
+      simp
     rw [h kv c _ hb, ZMod.stdAddChar_apply, ZMod.toCircle_apply]
     push_cast
     ring_nf

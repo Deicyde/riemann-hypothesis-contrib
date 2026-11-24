@@ -44,6 +44,7 @@ import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGeneratorNeZero
 import Development.AbelianVarietyTheory.Definitions.Divisors.KernelNormConstantSpec
 import Development.AbelianVarietyTheory.Definitions.Foundations.StrictInterlaceIffDescEnum
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SelfDualLatticePairingDual
 
 @[expose] public section
 
@@ -75,13 +76,6 @@ theorem continuous_finTmul (e : D.host.E)
         : Continuous fun _ : Af D.host.F => ((1 : AF D.host.F) ⊗ₜ[D.host.F] e : AE D))
   refine h2.congr fun x => ?_
   rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
-
-theorem infPart_finTmul (x : Af D.host.F) (e : D.host.E)
-    : infPart D (pairA D.host.F 0 x ⊗ₜ[D.host.F] e) = 0 := by
-  show (Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E)) (pairA D.host.F 0 x ⊗ₜ[D.host.F] e) = 0
-  rw [Algebra.TensorProduct.map_tmul]
-  show (0 : Ainf D.host.F) ⊗ₜ[D.host.F] _ = 0
-  rw [TensorProduct.zero_tmul]
 
 theorem finPart_infTmul (x : Ainf D.host.F) (e : D.host.E)
     : finPart D (pairA D.host.F x 0 ⊗ₜ[D.host.F] e) = 0 := by
@@ -115,7 +109,7 @@ theorem decomp_AE (V : AddSubgroup (AE D)) (hV : IsOpen (V : Set (AE D))) (z : A
       algebraMap D.host.F D.host.E c * e,
       _,
       hc,
-      infPart_finTmul _ _,
+      _root_.GlobalTheory.LatVac.infPart_pair _ _,
       _,
       finPart_infTmul (a.1 - algebraMap D.host.F (Ainf D.host.F) c) e,
       ?_

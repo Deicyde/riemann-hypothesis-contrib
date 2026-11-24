@@ -81,7 +81,6 @@ def XPart.geo
     : Geo D :=
   ⟨a.c, bot, mid, a.top⟩
 
-
 structure YPart (a : XPart D u) where
   bot : StAt (D.sp.Y 0)
   mid : ℕ → GlobalTheory.ChainOnto.PiLocalization₂ D

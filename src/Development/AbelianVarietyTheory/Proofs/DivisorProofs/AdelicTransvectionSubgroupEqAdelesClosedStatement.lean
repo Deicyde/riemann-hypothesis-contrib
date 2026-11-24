@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.adelicTransvectionSubgroup_eq_adeles_closed
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
       IsInfFam θ
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.adelicTransvectionSubgroup_eq_adeles_closed
                   → ∃ z ∈ ZI V ξ, z ∈ GinfC V ∧ ∀ τ, archM V (θ τ) z = m τ)
               ∧ ∀ z ∈ ZI V ξ,
                 (matHom V z).1.mulVec (fun i => incA D (ξ i)) = fun i => incA D (ξ i) := by
-  first
-  | exact @GlobalTheory.HolDict.TransvGroup.transvection_group
-  | exact GlobalTheory.HolDict.TransvGroup.transvection_group
-  | (intros; apply GlobalTheory.HolDict.TransvGroup.transvection_group <;> assumption)
+  first | exact @GlobalTheory.HolDict.TransvGroup.transvection_group

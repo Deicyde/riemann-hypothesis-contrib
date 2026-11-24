@@ -43,23 +43,29 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.UnrOutside
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep Formalism.L2.Host Formalism.UG GlobalTheory.LFun
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep Formalism.L2.Host Formalism.UG
+  GlobalTheory.LFun
 open scoped ENNReal ComplexConjugate nonZeroDivisors
 
 noncomputable section
 
 namespace GlobalTheory.ZEulLocal
 
-theorem wtS_eq_sum (n : ℕ) (a : Fin n → ℤ) :
-    GlobalTheory.CellDec.wtS n a = ∑ i : Fin n, ((n : ℤ) - 1 - 2 * (i : ℕ)) * a i := by
+theorem wtS_eq_sum (n : ℕ) (a : Fin n → ℤ)
+    : GlobalTheory.CellDec.wtS n a = ∑ i : Fin n, ((n : ℤ) - 1 - 2 * (i : ℕ)) * a i := by
   apply GlobalTheory.WeightSumSplit.wtS_eq <;> assumption
 
-
 open GlobalTheory.JSW in
-theorem localTerm_eq : ∀ (q : ℕ), 0 < q → ∀ (n : ℕ) (α β : Fin n → ℂ) (x : ℝ) (v : Fin n → ℤ), (∀ i, 0 ≤ v i) → Antitone v →
-    (((q : ℝ) ^ GlobalTheory.CellDec.wtS n v : ℝ) : ℂ) *
-      (GlobalTheory.JSW.sphW q α (fun i => (v i).toNat) * conj (GlobalTheory.JSW.sphW q β (fun i => (v i).toNat))) *
-      (((q : ℝ) ^ (-x * ∑ i, (v i : ℝ)) : ℝ) : ℂ) = GlobalTheory.ZEul.rsTerm q α β x v := by
+theorem localTerm_eq
+    : ∀ (q : ℕ),
+      0 < q
+        → ∀ (n : ℕ) (α β : Fin n → ℂ) (x : ℝ) (v : Fin n → ℤ),
+          (∀ i, 0 ≤ v i) → Antitone v
+            → (((q : ℝ) ^ GlobalTheory.CellDec.wtS n v : ℝ) : ℂ)
+                * (GlobalTheory.JSW.sphW q α (fun i => (v i).toNat)
+                  * conj (GlobalTheory.JSW.sphW q β (fun i => (v i).toNat)))
+                * (((q : ℝ) ^ (-x * ∑ i, (v i : ℝ)) : ℝ) : ℂ)
+              = GlobalTheory.ZEul.rsTerm q α β x v := by
   intro q hq n α β x v h0 hv
   have hqR : (0 : ℝ) < q := by exact_mod_cast hq
   have hl : Antitone (fun i => (v i).toNat) := fun i j hij => Int.toNat_le_toNat (hv hij)
@@ -85,7 +91,9 @@ theorem localTerm_eq : ∀ (q : ℕ), 0 < q → ∀ (n : ℕ) (α β : Fin n →
   have key : (q : ℝ) ^ GlobalTheory.CellDec.wtS n v * (A * A) = 1 := by
     rw [hA', ← Real.rpow_add hqR, ← Real.rpow_intCast, ← Real.rpow_add hqR, hW]
     rw [show cR + (-cR / 2 + -cR / 2) = 0 by ring, Real.rpow_zero]
-  have key2 : (((q : ℝ) ^ (-x * ∑ i, (v i : ℝ)) : ℝ) : ℂ) = ((q : ℂ) ^ (-(x : ℂ))) ^ (∑ i, (v i).toNat) := by
+  have key2
+      : (((q : ℝ) ^ (-x * ∑ i, (v i : ℝ)) : ℝ) : ℂ)
+        = ((q : ℂ) ^ (-(x : ℂ))) ^ (∑ i, (v i).toNat) := by
     have e : (q : ℂ) ^ (-(x : ℂ)) = (((q : ℝ) ^ (-x) : ℝ) : ℂ) := by
       rw [Complex.ofReal_cpow hqR.le]
       push_cast
@@ -95,11 +103,13 @@ theorem localTerm_eq : ∀ (q : ℕ), 0 < q → ∀ (n : ℕ) (α β : Fin n →
     push_cast
     refine Finset.sum_congr rfl fun i _ => ?_
     exact_mod_cast (Int.toNat_of_nonneg (h0 i)).symm
-  rw [sphW, sphW, if_pos hl, if_pos hl, hc, hA, GlobalTheory.ZEul.rsTerm, if_pos ⟨h0, hv⟩, key2, map_mul,
-    Complex.conj_ofReal]
-  calc _ = (((q : ℝ) ^ GlobalTheory.CellDec.wtS n v * (A * A) : ℝ) : ℂ) *
-        (schurAt (fun i => (v i).toNat) α * conj (schurAt (fun i => (v i).toNat) β) *
-          ((q : ℂ) ^ (-(x : ℂ))) ^ (∑ i, (v i).toNat)) := by push_cast; ring
+  rw [sphW, sphW, if_pos hl, if_pos hl, hc, hA, GlobalTheory.ZEul.rsTerm, if_pos ⟨h0, hv⟩, key2,
+    map_mul, Complex.conj_ofReal]
+  calc
+    _ = (((q : ℝ) ^ GlobalTheory.CellDec.wtS n v * (A * A) : ℝ) : ℂ)
+        * (schurAt (fun i => (v i).toNat) α * conj (schurAt (fun i => (v i).toNat) β)
+          * ((q : ℂ) ^ (-(x : ℂ))) ^ (∑ i, (v i).toNat)) := by
+      push_cast; ring
     _ = _ := by rw [key]; simp
 
 end GlobalTheory.ZEulLocal

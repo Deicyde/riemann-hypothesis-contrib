@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.gridRowLevel_zero_inf_unitary_eq_datumLevel
         → ∀ (t : T) (h : 0 ≤ D.R.m),
           HEq (S.levRow t 0 h ⊓ UA D.sp.cm (G.V (.grid 0 D.R.m)).gram)
             (lev D.sp.cm D.sp.X'.gram L.βX (L.datXt t)) := by
-  first
-  | exact @GlobalTheory.FunObj.levRow_zero_eq_lev
-  | exact GlobalTheory.FunObj.levRow_zero_eq_lev
-  | (intros; apply GlobalTheory.FunObj.levRow_zero_eq_lev <;> assumption)
+  first | exact @GlobalTheory.FunObj.levRow_zero_eq_lev

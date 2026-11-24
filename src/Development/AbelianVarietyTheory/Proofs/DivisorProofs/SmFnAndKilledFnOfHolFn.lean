@@ -171,7 +171,7 @@ private theorem lminor_neg_diagonal_neg_sgn_eq_psgn (q : ℕ) (i : Fin (n + 1))
   unfold ReciprocityTheory.ChartRestriction.G.FD.lminor ReciprocityTheory.ChartRestriction.G.FD.psgn
   rw [← Matrix.diagonal_neg, neg_neg, Matrix.submatrix_diagonal _ _ (Fin.castLE_injective _),
     Matrix.det_diagonal]
-  simp only [Function.comp_apply, Pi.neg_apply, neg_neg, Fin.coe_castLE]
+  simp only [Function.comp_apply, Fin.coe_castLE]
   rw [Complex.ofReal_prod]
   exact Fin.prod_univ_eq_prod_range
     (fun a => ((ReciprocityTheory.ChartRestriction.G.FD.sgn q a : ℝ) : ℂ))
@@ -474,8 +474,7 @@ theorem derC_eq
   obtain ⟨hH, _⟩ := dets_ne (h τ)
   obtain ⟨c1, c2⟩ := conj_facts (herm_of_orth (h τ)) hH Z
   have s1 : star (1 / 2 : ℂ) = 1 / 2 := by simp
-  have s2 : star (1 / (2 * Complex.I)) = -(1 / (2 * Complex.I)) := by
-    simp [Complex.star_def, Complex.conj_I, div_neg]
+  have s2 : star (1 / (2 * Complex.I)) = -(1 / (2 * Complex.I)) := by simp [Complex.conj_I]
   have l1 : (1 / 2 : ℂ) • (Z + conjH (Hm τ) Z) ∈ lieH (Hm τ) := by
     show ((1 / 2 : ℂ) • (Z + conjH (Hm τ) Z))ᴴ * Hm τ + Hm τ * ((1 / 2 : ℂ) • (Z + conjH (Hm τ) Z)) = 0
     rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.smul_mul, Matrix.mul_smul,
@@ -606,10 +605,10 @@ theorem killed_of_holFn
       rw [Finset.prod_eq_single a
         (fun a' _ ha' => by simp [hE, Matrix.single_apply, Ne.symm ha'])
         (by simp)]
-      simp [hE, Matrix.single_apply]
+      simp [hE]
     · refine Finset.prod_eq_one fun a' _ => ?_
       have hn : ¬(a = a' ∧ c = a') := fun hh2 => hh (hh2.1.trans hh2.2.symm)
-      simp [hE, Matrix.single_apply, hn]
+      simp [hE, hn]
   have hcont : Continuous fun t : ℝ => ((1 : Mt n) + (t : ℂ) • E).det :=
     (continuous_const.add (Complex.continuous_ofReal.smul continuous_const)).matrix_det
   have hev : ∀ᶠ t : ℝ in nhds (0 : ℝ), ((1 : Mt n) + (t : ℂ) • E).det ≠ 0 :=
@@ -626,7 +625,7 @@ theorem killed_of_holFn
       have h1 : HasDerivAt (fun s : ℂ => (1 + s) ^ w τ a) (w τ a : ℂ) ((0 : ℝ) : ℂ) := by
         rw [Complex.ofReal_zero]
         convert h0 using 1
-        all_goals first | rfl | simp [Function.comp_def]
+        all_goals first | rfl | simp
       exact h1.comp_ofReal
     · exact hasDerivAt_const _ _
   have hL : HasDerivAt

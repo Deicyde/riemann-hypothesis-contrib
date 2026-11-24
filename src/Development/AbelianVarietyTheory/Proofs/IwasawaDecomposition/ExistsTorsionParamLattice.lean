@@ -228,7 +228,7 @@ theorem finrank_torsionField_le
   let A' : WeierstrassCurve H :=
     A.map (IntermediateField.inclusion (le_sup_right : F ≤ H)).toRingHom
   have hA : A'.baseChange ℂ = A.baseChange ℂ := by
-    simp only [A', WeierstrassCurve.baseChange, WeierstrassCurve.map_map]
+    simp only [A', WeierstrassCurve.baseChange]
     rfl
   have : (A.baseChange ℂ).IsElliptic := inferInstanceAs (A.map _).IsElliptic
   have : A'.IsElliptic := by

@@ -52,9 +52,9 @@ open MvPolynomial GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Hei
 
 namespace GlobalTheory.CompanionTheory.Ar.PB
 
-theorem formPoly_isHomogeneous_and_eval (σ : Type) [Fintype σ] (n : ℕ) (a : (Fin n → σ) → ℝ) :
-    (formPoly n a).IsHomogeneous n ∧
-      ∀ c : σ → ℝ, eval c (formPoly n a) = ∑ w : Fin n → σ, a w * ∏ j, c (w j) := by
+theorem formPoly_isHomogeneous_and_eval (σ : Type) [Fintype σ] (n : ℕ) (a : (Fin n → σ) → ℝ)
+    : (formPoly n a).IsHomogeneous n
+      ∧ ∀ c : σ → ℝ, eval c (formPoly n a) = ∑ w : Fin n → σ, a w * ∏ j, c (w j) := by
   classical
   refine ⟨?_, fun c => ?_⟩
   · unfold formPoly

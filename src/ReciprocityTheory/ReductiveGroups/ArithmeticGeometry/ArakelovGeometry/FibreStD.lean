@@ -61,7 +61,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.Fib
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Polynomial Module
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  Polynomial Module
 
 variable {Ω : Type*} [Field Ω] [CharZero Ω] {κ : Type*} {D : ℕ}
 
@@ -73,11 +74,8 @@ theorem coord_ne_zero {ι : Type*} (y : ι → Ω) (h : coordIdeal ℤ y = ⊥) 
   rw [h, Ideal.mem_bot] at hmem
   exact MvPolynomial.X_ne_zero k hmem
 
-theorem div_mem_fnField (x : κ → Ω) (i j : κ) : x i / x j ∈ fnField x := by
-  exact IntermediateField.subset_adjoin ℚ {t | ∃ i j, t = x i / x j} ⟨i, j, rfl⟩
-
-theorem deh_mem_fnField {ι : Type*} (y : ι → Ω) (i₀ : ι) (m : MvPolynomial ι ℤ) :
-    deh y i₀ m ∈ fnField y := by
+theorem deh_mem_fnField {ι : Type*} (y : ι → Ω) (i₀ : ι) (m : MvPolynomial ι ℤ)
+    : deh y i₀ m ∈ fnField y := by
   rw [deh_apply]
   induction m using MvPolynomial.induction_on
   · rw [MvPolynomial.eval₂_C]
@@ -85,33 +83,39 @@ theorem deh_mem_fnField {ι : Type*} (y : ι → Ω) (i₀ : ι) (m : MvPolynomi
   · rw [MvPolynomial.eval₂_add]
     exact add_mem ‹_› ‹_›
   · rw [MvPolynomial.eval₂_mul, MvPolynomial.eval₂_X]
-    exact mul_mem ‹_› (div_mem_fnField y _ i₀)
+    exact mul_mem ‹_›
+      (_root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.div_mem_fnField
+        y _ i₀)
 
 def dehK (y : Fin (D + 1) → Ω) : MvPolynomial (Fin (D + 1)) ℤ →+* fnField y :=
   (deh y 0).codRestrict (fnField y).toSubfield.toSubring fun m => deh_mem_fnField y 0 m
 
-@[simp] theorem coe_dehK (y : Fin (D + 1) → Ω) (m : MvPolynomial (Fin (D + 1)) ℤ) :
-    ((dehK y m : fnField y) : Ω) = deh y 0 m := rfl
+@[simp]
+theorem coe_dehK (y : Fin (D + 1) → Ω) (m : MvPolynomial (Fin (D + 1)) ℤ)
+    : ((dehK y m : fnField y) : Ω) = deh y 0 m :=
+  rfl
 
-def chartGen (y : Fin (D + 1) → Ω) (k : {k : Fin (D + 1) // k ≠ 0}) : fnField y :=
-  ⟨y k / y 0, div_mem_fnField y k 0⟩
+def chartGen (y : Fin (D + 1) → Ω) (k : {k : Fin (D + 1) // k ≠ 0}) : fnField y := ⟨
+  y k / y 0,
+  _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.div_mem_fnField y k 0
+⟩
 
 def chartRing (y : Fin (D + 1) → Ω) : Subalgebra ℤ (fnField y) :=
   Algebra.adjoin ℤ (Set.range (chartGen y))
 
-theorem aeval_chartGen (y : Fin (D + 1) → Ω) (g : MvPolynomial {k : Fin (D + 1) // k ≠ 0} ℤ) :
-    ((MvPolynomial.aeval (chartGen y) g : fnField y) : Ω) =
-      deh y 0 (MvPolynomial.rename Subtype.val g) := by
+theorem aeval_chartGen (y : Fin (D + 1) → Ω) (g : MvPolynomial {k : Fin (D + 1) // k ≠ 0} ℤ)
+    : ((MvPolynomial.aeval (chartGen y) g : fnField y) : Ω)
+      = deh y 0 (MvPolynomial.rename Subtype.val g) := by
   induction g using MvPolynomial.induction_on with
-  | C a => simp [deh_apply]
+  | C a => simp
   | add p q hp hq => simp only [map_add (f := _), AddMemClass.coe_add, hp, hq]
   | mul_X p i hp =>
     simp only [map_mul, MvPolynomial.aeval_X, MvPolynomial.rename_X, MulMemClass.coe_mul, hp]
     congr 1
     simp [deh_apply, chartGen]
 
-theorem chartGen_indep (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥) :
-    AlgebraicIndependent ℤ (chartGen y) := by
+theorem chartGen_indep (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
+    : AlgebraicIndependent ℤ (chartGen y) := by
   classical
   rw [algebraicIndependent_iff_injective_aeval, injective_iff_map_eq_zero]
   intro g hg
@@ -120,7 +124,8 @@ theorem chartGen_indep (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
   have h1 : deh y 0 G = 0 := by
     rw [← aeval_chartGen]
     change (((MvPolynomial.aeval (chartGen y) g : fnField y)) : Ω) = 0
-    rw [hg]; rfl
+    rw [hg]
+    rfl
   have hH := homog_isHomogeneous (0 : Fin (D + 1)) G le_rfl
   have h2 : MvPolynomial.aeval y (homog 0 G.totalDegree G) = 0 := by
     rw [MvPolynomial.aeval_def, algebraMap_int_eq, eval₂_homog y 0 hy0 G le_rfl, h1, mul_zero]
@@ -143,16 +148,16 @@ theorem chartGen_indep (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
     rwa [mul_eq_zero, or_iff_right (pow_ne_zero _ (by simp [v]))] at this
   simpa using h6
 
-theorem chartRing_closed (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥) :
-    IsIntegrallyClosed (chartRing y) := by
+theorem chartRing_closed (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
+    : IsIntegrallyClosed (chartRing y) := by
   have hind := chartGen_indep y hfree
   haveI : UniqueFactorizationMonoid (chartRing y) :=
     MulEquiv.uniqueFactorizationMonoid hind.aevalEquiv.toRingEquiv.toMulEquiv inferInstance
   haveI : IsDomain (chartRing y) := Subalgebra.isDomain _
   exact UniqueFactorizationMonoid.instIsIntegrallyClosed
 
-theorem chartRing_frac (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥) :
-    IsFractionRing (chartRing y) (fnField y) := by
+theorem chartRing_frac (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
+    : IsFractionRing (chartRing y) (fnField y) := by
   have hl : y 0 ≠ 0 := coord_ne_zero y hfree 0
   refine IsFractionRing.of_field _ _ fun z => ?_
   have hinj : Function.Injective (algebraMap (chartRing y) Ω) := by
@@ -163,8 +168,11 @@ theorem chartRing_frac (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
     intro i
     by_cases hi : i = 0
     · subst hi; rw [div_self hl]; exact F.one_mem
-    · refine ⟨algebraMap (chartRing y) (FractionRing (chartRing y))
-        ⟨chartGen y ⟨i, hi⟩, Algebra.subset_adjoin ⟨_, rfl⟩⟩, ?_⟩
+    · refine ⟨
+        algebraMap (chartRing y) (FractionRing (chartRing y))
+          ⟨chartGen y ⟨i, hi⟩, Algebra.subset_adjoin ⟨_, rfl⟩⟩,
+        ?_
+      ⟩
       rw [IsFractionRing.lift_algebraMap hinj]
       rfl
   have hle : (fnField y).toSubfield ≤ F := by
@@ -174,8 +182,7 @@ theorem chartRing_frac (y : Fin (D + 1) → Ω) (hfree : coordIdeal ℤ y = ⊥)
       rw [eq_ratCast]
       exact SubfieldClass.ratCast_mem F q
     · rintro _ ⟨i, j, rfl⟩
-      have : y i / y j = (y i / y 0) / (y j / y 0) := by
-        rw [div_div_div_cancel_right₀ hl]
+      have : y i / y j = (y i / y 0) / (y j / y 0) := by rw [div_div_div_cancel_right₀ hl]
       change y i / y j ∈ F
       rw [this]
       exact F.div_mem (hgen i) (hgen j)
@@ -192,23 +199,26 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.Fib
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Polynomial Module IntermediateField
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  Polynomial Module IntermediateField
 
 variable {Ω : Type*} [Field Ω] [CharZero Ω] {ι : Type} [Fintype ι] {D : ℕ}
 
-theorem coord_div_isIntegral (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e) (i : ι) :
-    IsIntegral (chartRing (x ∘ e)) (x i / x (e 0)) := by
-  apply ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.coord_div_isIntegral <;> assumption
+theorem coord_div_isIntegral (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e) (i : ι)
+    : IsIntegral (chartRing (x ∘ e)) (x i / x (e 0)) := by
+  apply ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.coord_div_isIntegral
+    <;> assumption
 
 abbrev Lx (x : ι → Ω) (e : Fin (D + 1) → ι) : IntermediateField (fnField (x ∘ e)) Ω :=
   extendScalars (fnField_comp_le x e)
 
-theorem Lx_eq (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0) :
-    Lx x e = adjoin (fnField (x ∘ e)) (Set.range fun i => x i / x (e 0)) := by
+theorem Lx_eq (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0)
+    : Lx x e = adjoin (fnField (x ∘ e)) (Set.range fun i => x i / x (e 0)) := by
   apply le_antisymm
   · intro t ht
-    have key : fnField x ≤
-        (adjoin (fnField (x ∘ e)) (Set.range fun i => x i / x (e 0))).restrictScalars ℚ := by
+    have key
+        : fnField x
+          ≤ (adjoin (fnField (x ∘ e)) (Set.range fun i => x i / x (e 0))).restrictScalars ℚ := by
       refine IntermediateField.adjoin_le_iff.mpr ?_
       rintro s ⟨i, j, rfl⟩
       have hi : x i / x (e 0) ∈ adjoin (fnField (x ∘ e)) (Set.range fun i => x i / x (e 0)) :=
@@ -225,10 +235,12 @@ theorem Lx_eq (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0) :
     exact key ht
   · rw [IntermediateField.adjoin_le_iff]
     rintro t ⟨i, rfl⟩
-    exact div_mem_fnField x i (e 0)
+    exact
+      _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.div_mem_fnField x
+        i (e 0)
 
-theorem Lx_finite (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e) :
-    FiniteDimensional (fnField (x ∘ e)) (Lx x e) := by
+theorem Lx_finite (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e)
+    : FiniteDimensional (fnField (x ∘ e)) (Lx x e) := by
   have hx0 : x (e 0) ≠ 0 := coord_ne_zero (x ∘ e) h.free 0
   have hint : ∀ t ∈ Set.range (fun i => x i / x (e 0)), IsIntegral (fnField (x ∘ e)) t := by
     rintro t ⟨i, rfl⟩
@@ -236,11 +248,14 @@ theorem Lx_finite (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e)
   rw [Lx_eq x e hx0]
   exact IntermediateField.finiteDimensional_adjoin hint
 
-def gL (x : ι → Ω) (e : Fin (D + 1) → ι) (i : ι) : Lx x e :=
-  ⟨x i / x (e 0), div_mem_fnField x i (e 0)⟩
+def gL (x : ι → Ω) (e : Fin (D + 1) → ι) (i : ι) : Lx x e := ⟨
+  x i / x (e 0),
+  _root_.ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.TraceNormBounds.div_mem_fnField x i
+    (e 0)
+⟩
 
-theorem adjoin_gL (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0) :
-    adjoin (fnField (x ∘ e)) (Set.range (gL x e)) = ⊤ := by
+theorem adjoin_gL (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0)
+    : adjoin (fnField (x ∘ e)) (Set.range (gL x e)) = ⊤ := by
   apply IntermediateField.map_injective (Lx x e).val
   have htop : (⊤ : IntermediateField (fnField (x ∘ e)) (Lx x e)).map (Lx x e).val = Lx x e := by
     ext z
@@ -253,8 +268,8 @@ theorem adjoin_gL (x : ι → Ω) (e : Fin (D + 1) → ι) (hx0 : x (e 0) ≠ 0)
   rw [IntermediateField.adjoin_map, ← Set.range_comp, htop]
   exact (Lx_eq x e hx0).symm
 
-theorem exists_primitive (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e) :
-    ∃ c : ι → ℤ, (fnField (x ∘ e))⟮∑ i, (c i : Lx x e) * gL x e i⟯ = ⊤ := by
+theorem exists_primitive (x : ι → Ω) (e : Fin (D + 1) → ι) (h : IsProjFrame x e)
+    : ∃ c : ι → ℤ, (fnField (x ∘ e))⟮∑ i, (c i : Lx x e) * gL x e i⟯ = ⊤ := by
   have hx0 : x (e 0) ≠ 0 := coord_ne_zero (x ∘ e) h.free 0
   have := Lx_finite x e h
   exact exists_int_primitive (gL x e) (adjoin_gL x e hx0)

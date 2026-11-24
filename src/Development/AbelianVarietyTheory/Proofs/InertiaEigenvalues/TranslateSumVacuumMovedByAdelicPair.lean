@@ -74,9 +74,6 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
 
-
-
-
 namespace GlobalTheory.AdTh.MovedSum
 
 open GlobalTheory.AdTh.MovedDatum

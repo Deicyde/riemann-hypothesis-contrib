@@ -3,10 +3,15 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.SlopeBoundSt
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeHermitianFormExists
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductConjugateStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductConjugate
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueSemilinear
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteProjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChangeStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteProjective
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChange
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -48,7 +53,6 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AmplePt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCRing
 
 @[expose] public section
 
@@ -126,7 +130,7 @@ theorem exists_metric
     | tmul w b =>
       rw [tm σ z a, tm σ w b, conjMap_smul, conjMap_smul, cm, cm]
       simp only [map_smul, map_smulₛₗ, LinearMap.smul_apply, hc, smul_eq_mul, map_mul,
-        Complex.conj_conj, RingHom.id_apply]
+        Complex.conj_conj]
 
 end Linear
 
@@ -157,7 +161,8 @@ theorem exists_fibre_equiv
     map_add' := map_add j
     map_smul' := fun a v => j.map_smulₛₗ a v
   }
-  have hb : IsBaseChange ℂ j' := GlobalTheory.T.lie_model_isBaseChange S G (𝓞 L) ℂ x V W M Mσ j' hj
+  have hb : IsBaseChange ℂ j' :=
+    _root_.GlobalTheory.CompanionTheory.Ar.lieModel_isBaseChange S G (𝓞 L) ℂ x V W M Mσ j' hj
   let l : ComplexAt σ ≃ₗ[𝓞 L] ℂ := {
     toFun := (ofComplex σ).symm
     invFun := ofComplex σ
@@ -182,11 +187,6 @@ theorem exists_fibre_equiv
       simp
     | add a b ha hb' => rw [smul_add, map_add (f := _), map_add (f := _), ha, hb', smul_add]
   · exact (he 1 a).trans (by simp)
-
-theorem spectrumMap_comp
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  rw [spMap, spMap, spMap, CommRingCat.ofHom_comp, Spec.map_comp]
 
 theorem dualMap_comp_alt
     {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
@@ -219,7 +219,7 @@ theorem polarised_at
   obtain ⟨t', ⟨m₁⟩⟩ := exists_sab (spMap σ) tK
   obtain ⟨n, -⟩ := sabComp pullCubComp E H _ _ _ _ _ _ _ _ m m₁
   have e : spMap σ ≫ spMap (algebraMap (𝓞 L) L) = spMap (σ.comp (algebraMap (𝓞 L) L)) ≫ 𝟙 _ := by
-    rw [Category.comp_id, spectrumMap_comp]
+    rw [Category.comp_id, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
   refine ⟨t', e ▸ n, ?_, ?_⟩
   · exact MorphismProperty.of_isPullback (P := @IsProper) m₁.cart.1 hP
   · obtain ⟨w, gw, -⟩ := m₁.lin
@@ -235,7 +235,8 @@ theorem hodgeInnerProduct_conj_of_eq
     (hw : w'.left = spMap (dualMap (starRingEnd ℂ)) ≫ w.left) (h : HodgeIP t.G t.PP.L z v w c)
     : HodgeIP t.G t.PP.L z' v' w' (starRingEnd ℂ c) := by
   subst hz
-  exact GlobalTheory.T.hodge_inner_product_conjugate E H X t z v w v' w' c hv hw h
+  exact _root_.GlobalTheory.CompanionTheory.Ar.HodgeConj.hodgeInnerProduct_conj_abelianScheme E H X
+    t z v w v' w' c hv hw h
 
 end Geo
 
@@ -250,7 +251,8 @@ theorem exists_hermitianBundle
   intro E _ _ _ H L _ _ t tK m hK
   haveI : Smooth t.G.hom := t.semi.smooth
   obtain ⟨V, i₁, i₂, ⟨M⟩⟩ := GlobalTheory.CompanionTheory.Ar.lieModel_exists _ t.G (𝓞 L) (𝟙 _)
-  obtain ⟨hf, hpj⟩ := GlobalTheory.T.lie_model_finite_projective _ t.G (𝓞 L) (𝟙 _) V M
+  obtain ⟨hf, hpj⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.lieModel_finite_projective _ t.G (𝓞 L) (𝟙 _) V M
   have hW := fun σ : L →+* ℂ =>
     GlobalTheory.CompanionTheory.Ar.lieModel_exists _ t.G ℂ
       (spMap (σ.comp (algebraMap (𝓞 L) L)) ≫ 𝟙 _)
@@ -274,7 +276,7 @@ theorem exists_hermitianBundle
     have e₁
         : spMap (dualMap ((conjugate σ).comp (algebraMap (𝓞 L) L)))
           = spMap (dualMap (starRingEnd ℂ)) ≫ spMap (dualMap (σ.comp (algebraMap (𝓞 L) L))) := by
-      rw [hcs, dualMap_comp_alt, spectrumMap_comp]
+      rw [hcs, dualMap_comp_alt, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
     exact (lifts_left M (hj _ x)).trans
       ((congrArg (· ≫ (M.pt x).left) e₁).trans
         ((Category.assoc _ _ _).trans
@@ -283,7 +285,8 @@ theorem exists_hermitianBundle
       : ∀ σ : L →+* ℂ,
         spMap ((conjugate σ).comp (algebraMap (𝓞 L) L)) ≫ 𝟙 _
           = spMap (starRingEnd ℂ) ≫ spMap (σ.comp (algebraMap (𝓞 L) L)) ≫ 𝟙 _ := fun σ => by
-    rw [Category.comp_id, Category.comp_id, hcs, spectrumMap_comp]
+    rw [Category.comp_id, Category.comp_id, hcs,
+      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
   obtain ⟨mt, hmt⟩ :=
     exists_metric W e h hh hp fun σ x y => by
       rw [he, he, he, he]

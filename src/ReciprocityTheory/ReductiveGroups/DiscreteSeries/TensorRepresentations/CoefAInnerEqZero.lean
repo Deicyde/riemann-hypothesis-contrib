@@ -273,7 +273,7 @@ theorem coefA_ofSum
         (innerₛₗ ℂ (b k))
     refine ⟨x, ((hmemE x).mp hxE).1, ((hmemE x).mp hxE).2, fun y hy hTy => ?_⟩
     rw [hxr y ((hmemE y).mpr ⟨hy, hTy⟩)]
-    first | rfl | simp
+    first | rfl
   choose x hxM hxT hxr using hx
   refine ⟨ι (∑ k, x k), Submodule.mem_map_of_mem (Submodule.sum_mem _ (fun k _ => hxM k)), ?_⟩
   intro y hy

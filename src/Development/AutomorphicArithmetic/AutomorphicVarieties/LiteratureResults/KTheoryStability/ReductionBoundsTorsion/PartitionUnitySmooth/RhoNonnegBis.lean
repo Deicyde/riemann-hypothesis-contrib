@@ -299,7 +299,6 @@ private theorem abs_ratio_perturbation_bound_of_estimates
     _ ≤ (160 * K + 40) * δ * s * Q * Zh * (C1 * FinalFormK) := by gcongr
     _ = (160 * K + 40) * C1 * δ / s * Q * (s ^ 2 * FinalFormK * Zh) := by field_simp
 
-
 theorem pf_GTLip : GTLip := by
   unfold GTLip Basic Count TLip
   intro hB hC L _ _ N hN

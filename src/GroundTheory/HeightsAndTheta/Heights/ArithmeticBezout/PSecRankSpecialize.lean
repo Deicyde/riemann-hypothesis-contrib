@@ -134,7 +134,6 @@ theorem SecRankSpecialize.proof : SecRankSpecialize.Statement := by
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hb, ← hr i, algebraMap_smul]
     have hz : ρ (x - ∑ i, r i • b i) = 0 := by
-
       rw [map_sub, map_sum]
       simp only [map_smul]
       rw [hsum, sub_self]

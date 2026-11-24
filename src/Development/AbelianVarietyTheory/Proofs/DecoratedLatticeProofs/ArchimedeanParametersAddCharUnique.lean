@@ -62,9 +62,6 @@ namespace GlobalTheory.StdUnn.RealPar
 
 variable {D : D7}
 
-
-
-
 theorem finPart_cA_eq (z : AE D)
     : finPart D (cA D z)
       = Algebra.TensorProduct.map (AlgHom.id D.host.F (Af D.host.F)) D.sp.cm.sig (finPart D z) := by

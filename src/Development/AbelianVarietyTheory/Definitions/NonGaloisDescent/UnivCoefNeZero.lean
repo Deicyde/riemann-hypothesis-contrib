@@ -55,9 +55,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open Formalism.IndefR.Links (PolF)
 open scoped TensorProduct ComplexOrder
 
-
-
-
 namespace GlobalTheory.ExportSeries.Model
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

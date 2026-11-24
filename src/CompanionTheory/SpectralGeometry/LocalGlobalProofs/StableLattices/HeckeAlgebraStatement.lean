@@ -135,7 +135,6 @@ theorem T_dd (g : G) : (T g).1 (dd K) = ∑ y ∈ (hp g).toFinset, Finsupp.singl
   h1 g _ (by simp)
 
 theorem augmentation_of_hecke_operator (g : G) : eps K ((T g).1 (dd K)) = q hp g := by
-
   rw [T_dd T hp h1, map_sum]
   simp [eps_single, q]
 
@@ -202,7 +201,6 @@ theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g
     have e1 : eps K ((T g * T h).1 (dd K)) = c * q hp u := by
       rw [hfix, map_smul, ← T_dd T hp h1 u, augmentation_of_hecke_operator T hp h1, smul_eq_mul]
     have e2 : eps K ((T g * T h).1 (dd K)) = q hp g * q hp h := by
-
       rw [hw, map_sum]
       simp only [eps_lam, augmentation_of_hecke_operator T hp h1]
       simp [q, mul_comm]

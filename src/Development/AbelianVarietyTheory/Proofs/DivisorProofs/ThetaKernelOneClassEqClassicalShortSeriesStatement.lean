@@ -54,6 +54,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaKernel_oneClass_eq_classicalShortSeries
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : Formalism.L2.DIV.FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks]
@@ -136,7 +137,4 @@ theorem _root_.GlobalTheory.T.thetaKernel_oneClass_eq_classicalShortSeries
                                                   (latR (rank_Wc i) (latG (Wc D i) k)) v (hatC l₂ φ)
                                                   Y)
                                                 P (frMove R.θ (Wc D i) (rank_Wc i) X k x₀) := by
-  first
-  | exact @GlobalTheory.AdTh.ShortSeriesCore.thetaKO_eq_short_series_core
-  | exact GlobalTheory.AdTh.ShortSeriesCore.thetaKO_eq_short_series_core
-  | (intros; apply GlobalTheory.AdTh.ShortSeriesCore.thetaKO_eq_short_series_core <;> assumption)
+  first | exact @GlobalTheory.AdTh.ShortSeriesCore.thetaKO_eq_short_series_core

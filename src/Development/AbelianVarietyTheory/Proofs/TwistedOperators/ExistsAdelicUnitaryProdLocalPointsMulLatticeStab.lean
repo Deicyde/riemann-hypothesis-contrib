@@ -315,11 +315,11 @@ theorem exists_prod_local_mul_latStab
                         w) := by
   intro F E _ _ _ _ _ σ B a a' G hG h hinf T₀
   obtain ⟨S₁, hS₁⟩ :=
-    GlobalTheory.T.exists_finset_integral_adele_mulVec_mem_lattice_closure F E _ (mat h) G.W.L
-      hG.hW.lat
+    _root_.GlobalTheory.AdelicLatticeIntegral.exists_finset_smul_mulVec_mem_closure F E _ (mat h)
+      G.W.L hG.hW.lat
   obtain ⟨S₂, hS₂⟩ :=
-    GlobalTheory.T.exists_finset_integral_adele_mulVec_mem_lattice_closure F E _ (mat h⁻¹) G.W.L
-      hG.hW.lat
+    _root_.GlobalTheory.AdelicLatticeIntegral.exists_finset_smul_mulVec_mem_closure F E _ (mat h⁻¹)
+      G.W.L hG.hW.lat
   set S := T₀ ∪ S₁ ∪ S₂ with hSdef
   have heS : idemS F S * idemS F S = idemS F S := idemS_mul_self S
   have heS' : (1 - idemS F S) * (1 - idemS F S) = 1 - idemS F S := by
@@ -339,7 +339,7 @@ theorem exists_prod_local_mul_latStab
     intro w hw X Xs γ
     have hw1 : w ∉ S₁ := fun h' => hw (by simp [hSdef, h'])
     have hw2 : w ∉ S₂ := fun h' => hw (by simp [hSdef, h'])
-    refine GlobalTheory.T.tensorLattice_mul_transpose_stable_iff F E X (a + a') Xs G.W w (mat k)
+    refine _root_.GlobalTheory.LatStab.latAtV_mul_transpose_iff F E X (a + a') Xs G.W w (mat k)
       (mat k⁻¹) (mat_inv_mul k) ?_ ?_ γ
     · intro u hu hint y hy
       rw [← Matrix.smul_mulVec, mat_loc, smul_phi_compl (hnot w hw u hu), Matrix.smul_mulVec]

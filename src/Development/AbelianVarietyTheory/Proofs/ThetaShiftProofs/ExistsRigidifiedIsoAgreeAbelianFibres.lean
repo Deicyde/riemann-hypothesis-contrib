@@ -174,7 +174,7 @@ theorem main
     simp only [gm, dif_pos h₁, dif_pos h₂, MonoidHom.comp_apply]
     ext
     simp only [Units.coe_map, pullU, MonoidHom.coe_coe]
-    first | rfl | (rw [Scheme.comp_app]; rfl)
+    first | rfl
 
   have gm_maps_pt
       {X : Scheme.{0}} {L' L : LB X} {w : LB.Iso L' L} {Y : Scheme.{0}} {φ : Y ⟶ X}

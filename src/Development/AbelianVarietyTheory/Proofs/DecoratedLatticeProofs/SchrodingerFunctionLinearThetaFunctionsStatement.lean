@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.schrodingerFunction_linear_thetaFunctions
                   IsThetaFunO ψ (dblSp A) B (f + f') ∧ IsThetaFunO ψ (dblSp A) B (c • f)
                     ∧ sch ψ A B ν 𝓨 (f + f') = sch ψ A B ν 𝓨 f + sch ψ A B ν 𝓨 f'
                     ∧ sch ψ A B ν 𝓨 (c • f) = c • sch ψ A B ν 𝓨 f := by
-  first
-  | exact @GlobalTheory.StdUnn.sch_linear
-  | exact GlobalTheory.StdUnn.sch_linear
-  | (intros; apply GlobalTheory.StdUnn.sch_linear <;> assumption)
+  first | exact @GlobalTheory.StdUnn.sch_linear

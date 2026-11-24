@@ -160,7 +160,7 @@ theorem left_tens
     rw [Finset.sum_eq_single b]
     · simp [Matrix.mul_apply, Matrix.single_apply]
     · intro k _ hk
-      simp [Matrix.mul_apply, Matrix.single_apply, Ne.symm hk]
+      simp [Matrix.mul_apply, Ne.symm hk]
     · simp
   show tensCoef X (c p) j ((tens X).E a b u) g = ∑ s, ∑ t, M s t *
       (((l s t).mapDomain (fun i' => (i', j)) + (if s = j then Finsupp.single (p, t) 1 else 0) : (ι × Fin n) →₀ ℂ).sum

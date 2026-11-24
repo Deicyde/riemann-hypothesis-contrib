@@ -46,11 +46,14 @@ open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHeck
 
 namespace GlobalTheory
 
-theorem det_ne_zero_of_hasSig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {r s : ℕ} (h : HasSig M r s) : M.det ≠ 0 := by
+theorem det_ne_zero_of_hasSig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {r s : ℕ} (h : HasSig M r s)
+    : M.det ≠ 0 := by
   apply _root_.PositivityTheory.ThKG.Tow.det_ne_zero_of_hasSig <;> assumption
 
-theorem isUnit_det_of_isHerm : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (n : ℕ) (X : Spc F E n) (r s : ℕ), X.IsHerm σ B r s → IsUnit X.J.det := by
+theorem isUnit_det_of_isHerm
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (n : ℕ) (X : Spc F E n) (r s : ℕ),
+      X.IsHerm σ B r s → IsUnit X.J.det := by
   intro F E _ _ _ _ _ σ B n X r s hX
   obtain ⟨w⟩ : Nonempty (InfinitePlace F) := inferInstance
   have h := det_ne_zero_of_hasSig (hX.sig w)

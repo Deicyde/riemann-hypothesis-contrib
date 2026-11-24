@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.petersson_coefficient_bounded_spherical_unramified
                       proj D.sp.cm.sig A.gram v x = 1
                         → IsSphCoef A L v par fun y =>
                           rcoef m u₁ u₂ (x * emb D.sp.cm.sig A.gram v y) := by
-  first
-  | exact @GlobalTheory.Core.Rk.SphCoef.isSphCoef_rcoef
-  | exact GlobalTheory.Core.Rk.SphCoef.isSphCoef_rcoef
-  | (intros; apply GlobalTheory.Core.Rk.SphCoef.isSphCoef_rcoef <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.SphCoef.isSphCoef_rcoef

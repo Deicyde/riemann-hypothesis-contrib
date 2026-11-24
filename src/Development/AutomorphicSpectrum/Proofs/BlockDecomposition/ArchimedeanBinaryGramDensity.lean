@@ -4,8 +4,9 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianMatricesLocallyCompactBorel
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdelesLocalRingTotallyReal
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitsOpenEmbeddingLocalTensorStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitsOpenEmbeddingLocalTensor
+import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -234,7 +235,7 @@ theorem fibre_integral
   haveI := h4
   haveI := hlam
   obtain ⟨iTR, iLC, iSC, iT2, -, htr, -, iB, -, -⟩ :=
-    GlobalTheory.T.tensor_locally_compact_ring F E σ h R
+    _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ h R
   haveI := iB 1 M
   haveI := iTR
   haveI := iLC
@@ -244,7 +245,7 @@ theorem fibre_integral
   haveI := jB
   obtain ⟨g, hg, hgram⟩ := hlift M J hJ
   have hunits : IsOpenEmbedding (Units.val : (R ⊗[F] E)ˣ → R ⊗[F] E) :=
-    GlobalTheory.T.units_open_embedding_local_tensor F E σ h R hloc
+    _root_.GlobalTheory.CompanionTheory.SW.KUnits.units_val_isOpenEmbedding F E σ h R hloc
   set B : Set (HermR R σ 1) := {S | IsUnit (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)).det} with hBdef
   set U : Set (Fin 1 → Fin M → R ⊗[F] E) := {X | IsUnit (gramR R σ J X).det} with hUdef
   have hB : IsOpen B := by

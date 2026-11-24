@@ -66,37 +66,47 @@ variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 abbrev UG (ι : Type) (n : ℕ) : Type := ι → Matrix.unitaryGroup (Fin n) ℂ
 
-def linSub {σ : Type} [Fintype σ] [DecidableEq σ] :
-    (ι → Matrix σ σ ℂ) →* Module.End ℂ (MvPolynomial (ι × σ) ℂ) where
-  toFun M := (aeval (R := ℂ) fun p : ι × σ => ∑ j, C (M p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)).toLinearMap
+def linSub {σ : Type} [Fintype σ] [DecidableEq σ]
+    : (ι → Matrix σ σ ℂ) →* Module.End ℂ (MvPolynomial (ι × σ) ℂ) where
+  toFun M :=
+    (aeval (R := ℂ) fun p : ι × σ =>
+      ∑ j, C (M p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)).toLinearMap
   map_one' := by
-    have : (aeval (R := ℂ) fun p : ι × σ => ∑ j, C ((1 : ι → Matrix σ σ ℂ) p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ))
+    have : (aeval (R := ℂ) fun p : ι × σ =>
+          ∑ j, C ((1 : ι → Matrix σ σ ℂ) p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ))
         = AlgHom.id ℂ _ := by
       ext1 p
       simp [Matrix.one_apply, apply_ite C]
-    rw [this]; rfl
+    rw [this]
+    rfl
   map_mul' M N := by
-    have : (aeval (R := ℂ) fun p : ι × σ => ∑ j, C ((M * N) p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ))
-        = (aeval (R := ℂ) fun p : ι × σ => ∑ j, C (M p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)).comp
-          (aeval (R := ℂ) fun p : ι × σ => ∑ j, C (N p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)) := by
+    have : (aeval (R := ℂ) fun p : ι × σ =>
+          ∑ j, C ((M * N) p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ))
+        = (aeval (R := ℂ) fun p : ι × σ =>
+            ∑ j, C (M p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)).comp
+          (aeval (R := ℂ) fun p : ι × σ =>
+            ∑ j, C (N p.1 j p.2) * (X (p.1, j) : MvPolynomial (ι × σ) ℂ)) := by
       ext1 p
 
-      simp only [aeval_X, AlgHom.comp_apply, map_sum, map_mul, aeval_C, algebraMap_eq, Pi.mul_apply, Matrix.mul_apply,
-      Finset.sum_mul, Finset.mul_sum]
+      simp only [aeval_X, AlgHom.comp_apply, map_sum, map_mul, aeval_C, algebraMap_eq, Pi.mul_apply,
+        Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-    rw [this]; rfl
+    rw [this]
+    rfl
 
 def detU (n : ℕ) : Matrix.unitaryGroup (Fin n) ℂ →* ℂˣ :=
-  ((Matrix.detMonoidHom (n := Fin n) (R := ℂ)).comp (Matrix.unitaryGroup (Fin n) ℂ).subtype).toHomUnits
+  ((Matrix.detMonoidHom (n := Fin n) (R := ℂ)).comp
+    (Matrix.unitaryGroup (Fin n) ℂ).subtype).toHomUnits
 
 def detChar (n : ℕ) (k : ι → ℤ) : UG ι n →* ℂˣ where
   toFun g := ∏ τ, detU n (g τ) ^ k τ
   map_one' := by simp
   map_mul' g h := by simp [mul_zpow, Finset.prod_mul_distrib]
 
-def twist {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (χ : G →* ℂˣ) (ρ : Representation ℂ G V) :
-    Representation ℂ G V where
+def twist
+    {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (χ : G →* ℂˣ) (ρ : Representation ℂ G V)
+    : Representation ℂ G V where
   toFun g := (χ g : ℂ) • ρ g
   map_one' := by simp
   map_mul' g h := by simp [mul_smul, smul_comm (χ h : ℂ) (χ g : ℂ)]
@@ -111,7 +121,8 @@ def homMat (a b : ℕ) : UG ι a × UG ι b →* (ι → Matrix (Fin b × Fin a)
     simp [Matrix.mul_kronecker_mul, star_mul, Matrix.transpose_mul]
 
 def fock (a b : ℕ) (α β : ι → ℤ) : Representation ℂ (UG ι a × UG ι b) (Pol ι a b) :=
-  twist ((detChar a α).comp (MonoidHom.fst _ _) * (detChar b β).comp (MonoidHom.snd _ _)) (linSub.comp (homMat a b))
+  twist ((detChar a α).comp (MonoidHom.fst _ _) * (detChar b β).comp (MonoidHom.snd _ _))
+    (linSub.comp (homMat a b))
 
 def leftRep (n : ℕ) : Representation ℂ (UG ι n) (Pol ι n n) :=
   (linSub.comp (homMat n n)).comp (MonoidHom.inr _ _)
@@ -125,18 +136,22 @@ def hwVec (n : ℕ) (lam : ι → ℕ → ℤ) : Pol ι n n :=
 def weylSub (n : ℕ) (lam : ι → ℕ → ℤ) : Submodule ℂ (Pol ι n n) :=
   Submodule.span ℂ (Set.range fun g : UG ι n => leftRep n g (hwVec n lam))
 
-theorem span_orbit_le {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (v : V) (g : G) :
-    Submodule.span ℂ (Set.range fun h : G => ρ h v) ≤ (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
+theorem span_orbit_le
+    {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (v : V) (g : G)
+    : Submodule.span ℂ (Set.range fun h : G => ρ h v)
+      ≤ (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨h, rfl⟩
   refine Submodule.subset_span ⟨g * h, ?_⟩
   simp
 
-theorem weylSub_le (n : ℕ) (lam : ι → ℕ → ℤ) (g : UG ι n) : weylSub n lam ≤ (weylSub n lam).comap (leftRep n g) :=
+theorem weylSub_le (n : ℕ) (lam : ι → ℕ → ℤ) (g : UG ι n)
+    : weylSub n lam ≤ (weylSub n lam).comap (leftRep n g) :=
   span_orbit_le (leftRep n) (hwVec n lam) g
 
 def weylRep (n : ℕ) (lam : ι → ℕ → ℤ) : Representation ℂ (UG ι n) (weylSub n lam) :=
-  twist (detChar n fun τ => lam τ (n - 1)) (Representation.subrepresentation (leftRep n) (weylSub n lam) (weylSub_le n lam))
+  twist (detChar n fun τ => lam τ (n - 1))
+    (Representation.subrepresentation (leftRep n) (weylSub n lam) (weylSub_le n lam))
 
 def hw (p : List ℚ) (i : ℕ) : ℤ := ⌊p.getD i 0 - (((p.length : ℚ) - 1) / 2 - i)⌋
 
@@ -167,9 +182,9 @@ namespace Entries
 variable {S : Sizes} (P : Entries S)
 
 def orderList : List ℚ :=
-  P.a 0 :: ((List.finRange S.m).flatMap fun i => block (P.c i) S.s ++ [P.a i.succ]) ++
-    ((List.finRange (S.k - 1)).flatMap fun i => [(P.v i : ℚ), P.u i]) ++
-    ((List.finRange S.m).flatMap fun j => (-P.b j : ℚ) :: block (-P.e j) S.t)
+  P.a 0 :: ((List.finRange S.m).flatMap fun i => block (P.c i) S.s ++ [P.a i.succ])
+    ++ ((List.finRange (S.k - 1)).flatMap fun i => [(P.v i : ℚ), P.u i])
+    ++ ((List.finRange S.m).flatMap fun j => (- P.b j : ℚ) :: block (- P.e j) S.t)
 
 structure Good : Prop where
   a_half : ∀ l, ∃ z : ℤ, P.a l = z + 1 / 2
@@ -177,13 +192,14 @@ structure Good : Prop where
   order : P.orderList.Pairwise (· > ·)
 
 def psiPar : List ℚ :=
-  P.a 0 :: ((List.finRange S.m).flatMap fun i => block (P.c i) (S.s - 1) ++ [P.a i.succ]) ++ (List.finRange (S.k - 1)).map P.u
+  P.a 0 :: ((List.finRange S.m).flatMap fun i => block (P.c i) (S.s - 1) ++ [P.a i.succ])
+    ++ (List.finRange (S.k - 1)).map P.u
 
-def bigPar : List ℚ := P.psiPar ++ (List.finRange S.m).flatMap fun j => block (-P.e j) (S.t + 1)
+def bigPar : List ℚ := P.psiPar ++ (List.finRange S.m).flatMap fun j => block (- P.e j) (S.t + 1)
 
 def basePar : List ℚ :=
-  (List.finRange (S.k - 1)).map (fun i => (P.v i : ℚ)) ++
-    (List.finRange S.m).flatMap fun j => (-P.b j : ℚ) :: block (-P.e j) S.t
+  (List.finRange (S.k - 1)).map (fun i => (P.v i : ℚ))
+    ++ (List.finRange S.m).flatMap fun j => (- P.b j : ℚ) :: block (- P.e j) S.t
 
 def smallPar : List ℚ := ((List.finRange S.m).flatMap fun i => block (P.c i) S.s) ++ P.basePar
 
@@ -200,30 +216,38 @@ def nC (i : ℕ) : ℕ := S.k + S.m - 1 + S.m * S.t + i * S.s
 theorem nC_succ : S.nC S.m + 1 = S.nR S.m := by
   have := S.k_pos
   unfold nC nR
-  rw [mul_add, mul_one]; omega
+  rw [mul_add, mul_one]
+  omega
 
 end Sizes
 
-def embedE {n N : ℕ} (e : Fin n ⊕ Fin 1 ≃ Fin N) : Matrix.unitaryGroup (Fin n) ℂ →* Matrix.unitaryGroup (Fin N) ℂ where
-  toFun y := ⟨Matrix.reindex e e (Matrix.fromBlocks y.1 0 0 (1 : Matrix (Fin 1) (Fin 1) ℂ)), by
-    rw [Matrix.mem_unitaryGroup_iff]
-    have hy : y.1 * (y.1)ᴴ = 1 := (Matrix.mem_unitaryGroup_iff).1 y.2
-    simp [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv,
-      Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply, hy]⟩
+def embedE {n N : ℕ} (e : Fin n ⊕ Fin 1 ≃ Fin N)
+    : Matrix.unitaryGroup (Fin n) ℂ →* Matrix.unitaryGroup (Fin N) ℂ where
+  toFun y := ⟨
+    Matrix.reindex e e (Matrix.fromBlocks y.1 0 0 (1 : Matrix (Fin 1) (Fin 1) ℂ)),
+    by
+      rw [Matrix.mem_unitaryGroup_iff]
+      have hy : y.1 * (y.1)ᴴ = 1 := (Matrix.mem_unitaryGroup_iff).1 y.2
+      simp [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_submatrix,
+        Matrix.submatrix_mul_equiv, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply, hy]
+  ⟩
   map_one' := by apply Subtype.ext; simp
   map_mul' y z := by
     apply Subtype.ext
     simp [Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
 
-def embed1 {n N : ℕ} (h : n + 1 = N) : Matrix.unitaryGroup (Fin n) ℂ →* Matrix.unitaryGroup (Fin N) ℂ :=
+def embed1 {n N : ℕ} (h : n + 1 = N)
+    : Matrix.unitaryGroup (Fin n) ℂ →* Matrix.unitaryGroup (Fin N) ℂ :=
   embedE (finSumFinEquiv.trans (finCongr h))
 
 def embed {n N : ℕ} (h : n + 1 = N) : UG ι n →* UG ι N := MonoidHom.compLeft (embed1 h) ι
 
-abbrev Gc (ι : Type) (S : Sizes) : Type := (∀ j : Fin S.m, UG ι (S.nR j)) × (∀ i : Fin (S.m + 1), UG ι (S.nC i))
+abbrev Gc (ι : Type) (S : Sizes) : Type :=
+  (∀ j : Fin S.m, UG ι (S.nR j)) × (∀ i : Fin (S.m + 1), UG ι (S.nC i))
 
 def rowComp (S : Sizes) : Gc ι S →* ∀ j : Fin (S.m + 1), UG ι (S.nR j) where
-  toFun g := Fin.snoc (α := fun j : Fin (S.m + 1) => UG ι (S.nR j)) g.1 (embed S.nC_succ (g.2 (Fin.last _)))
+  toFun g :=
+    Fin.snoc (α := fun j : Fin (S.m + 1) => UG ι (S.nR j)) g.1 (embed S.nC_succ (g.2 (Fin.last _)))
   map_one' := by
     funext j
     refine Fin.lastCases ?_ (fun j => ?_) j
@@ -239,15 +263,22 @@ def rowComp (S : Sizes) : Gc ι S →* ∀ j : Fin (S.m + 1), UG ι (S.nR j) whe
 variable {S : Sizes} (P : ι → Entries S)
 
 def rowFock (j : Fin S.m) : Representation ℂ (Gc ι S) (Pol ι (S.nR j.castSucc) (S.nR j.succ)) :=
-  (fock _ _ (fun τ => (P τ).e j - (S.nR j.succ / 2 : ℕ)) (fun τ => -(P τ).e j + (S.nR j.castSucc / 2 : ℕ))).comp
+  (fock _ _
+      (fun τ => (P τ).e j - (S.nR j.succ / 2 : ℕ))
+      (fun τ => - (P τ).e j + (S.nR j.castSucc / 2 : ℕ))).comp
     (((Pi.evalMonoidHom _ j.castSucc).prod (Pi.evalMonoidHom _ j.succ)).comp (rowComp S))
 
 def colFock (i : Fin S.m) : Representation ℂ (Gc ι S) (Pol ι (S.nC i.castSucc) (S.nC i.succ)) :=
-  (fock _ _ (fun τ => (P τ).c i.rev - ((S.nC i.succ + 1) / 2 : ℕ)) (fun τ => -(P τ).c i.rev + ((S.nC i.castSucc + 1) / 2 : ℕ))).comp
+  (fock _ _
+      (fun τ => (P τ).c i.rev - ((S.nC i.succ + 1) / 2 : ℕ))
+      (fun τ => - (P τ).c i.rev + ((S.nC i.castSucc + 1) / 2 : ℕ))).comp
     (((Pi.evalMonoidHom _ i.castSucc).prod (Pi.evalMonoidHom _ i.succ)).comp (MonoidHom.snd _ _))
 
-def piTprod {G J : Type} [Monoid G] {V : J → Type} [∀ j, AddCommGroup (V j)] [∀ j, Module ℂ (V j)]
-    (ρ : ∀ j, Representation ℂ G (V j)) : Representation ℂ G (⨂[ℂ] j, V j) :=
+def piTprod
+    {G J : Type} [Monoid G]
+    {V : J → Type} [∀ j, AddCommGroup (V j)] [∀ j, Module ℂ (V j)]
+    (ρ : ∀ j, Representation ℂ G (V j))
+    : Representation ℂ G (⨂[ℂ] j, V j) :=
   PiTensorProduct.mapMonoidHom.comp (Pi.monoidHom ρ)
 
 def psiWt (τ : ι) : ℕ → ℤ := hw (P τ).psiPar
@@ -268,18 +299,21 @@ abbrev OM : Type :=
 def omRep : Representation ℂ (Gc ι S) (OM P) :=
   (piTprod (rowFock P)).tprod ((piTprod (colFock P)).tprod ((psiRep P).tprod (baseRep P).dual))
 
-def invFun {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) : Submodule ℂ (Module.Dual ℂ V) where
+def invFun {G V : Type} [Monoid G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+    : Submodule ℂ (Module.Dual ℂ V) where
   carrier := {l | ∀ g x, l (ρ g x) = l x}
   add_mem' h h' g x := by simp [h g x, h' g x]
   zero_mem' _ _ := rfl
   smul_mem' c _ h g x := by simp [h g x]
 
 def Interlace (big small : List ℚ) : Prop :=
-  big.length = small.length + 1 ∧ ∀ i (h : i < small.length) (h' : i + 1 < big.length), big[i] > small[i] ∧ small[i] > big[i + 1]
+  big.length = small.length + 1
+    ∧ ∀ i (h : i < small.length) (h' : i + 1 < big.length),
+      big[i] > small[i] ∧ small[i] > big[i + 1]
 
 def OneLine : Prop :=
-  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S : Sizes) (P : ι → Entries S), (∀ τ, (P τ).Good) →
-    Module.finrank ℂ (invFun (omRep P)) = 1
+  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S : Sizes) (P : ι → Entries S),
+    (∀ τ, (P τ).Good) → Module.finrank ℂ (invFun (omRep P)) = 1
 
 theorem length_block (x : ℚ) (n : ℕ) : (block x n).length = n := by simp [block]
 
@@ -305,12 +339,16 @@ theorem length_small (Q : Entries S) : Q.smallPar.length = S.nC S.m := by
   simp [Entries.smallPar, List.length_flatMap, length_block, Sizes.nC] at this ⊢
   omega
 
-theorem hw_exact (p : List ℚ) (h : ∀ x ∈ p, ∃ z : ℤ, x = z + ((p.length : ℚ) - 1) / 2) (i : ℕ) (hi : i < p.length) :
-    (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
+theorem hw_exact
+    (p : List ℚ) (h : ∀ x ∈ p, ∃ z : ℤ, x = z + ((p.length : ℚ) - 1) / 2)
+    (i : ℕ) (hi : i < p.length)
+    : (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
   obtain ⟨z, hz⟩ := h _ (List.getElem_mem hi)
   have : p.getD i 0 - (((p.length : ℚ) - 1) / 2 - i) = ((z + i : ℤ) : ℚ) := by
     rw [List.getD_eq_getElem _ _ hi, hz]; push_cast; ring
-  rw [hw, this, Int.floor_intCast, hz]; push_cast; ring
+  rw [hw, this, Int.floor_intCast, hz]
+  push_cast
+  ring
 
 theorem block_odd (c : ℤ) {n : ℕ} (hn : Odd n) : ∀ x ∈ block c n, ∃ z : ℤ, x = z := by
   obtain ⟨r, rfl⟩ := hn
@@ -324,15 +362,18 @@ theorem block_even (c : ℤ) {n : ℕ} (hn : Even n) : ∀ x ∈ block c n, ∃ 
   obtain ⟨i, -, rfl⟩ := List.mem_map.1 hx
   exact ⟨c + r - i - 1, by push_cast; ring⟩
 
-theorem hw_of_half (p : List ℚ) (hl : Even p.length) (h : ∀ x ∈ p, ∃ z : ℤ, x = z + 1 / 2) (i : ℕ) (hi : i < p.length) :
-    (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
+theorem hw_of_half
+    (p : List ℚ) (hl : Even p.length) (h : ∀ x ∈ p, ∃ z : ℤ, x = z + 1 / 2)
+    (i : ℕ) (hi : i < p.length)
+    : (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
   refine hw_exact p (fun x hx => ?_) i hi
   obtain ⟨z, rfl⟩ := h x hx
   obtain ⟨r, hr⟩ := hl
   exact ⟨z + 1 - r, by rw [hr]; push_cast; ring⟩
 
-theorem hw_of_int (p : List ℚ) (hl : Odd p.length) (h : ∀ x ∈ p, ∃ z : ℤ, x = z) (i : ℕ) (hi : i < p.length) :
-    (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
+theorem hw_of_int
+    (p : List ℚ) (hl : Odd p.length) (h : ∀ x ∈ p, ∃ z : ℤ, x = z) (i : ℕ) (hi : i < p.length)
+    : (hw p i : ℚ) = p[i] - (((p.length : ℚ) - 1) / 2 - i) := by
   refine hw_exact p (fun x hx => ?_) i hi
   obtain ⟨z, rfl⟩ := h x hx
   obtain ⟨r, hr⟩ := hl
@@ -351,8 +392,9 @@ theorem odd_nC {i : ℕ} (hi : Even i) : Odd (S.nC i) := by
 theorem psi_half (Q : Entries S) (hQ : Q.Good) : ∀ x ∈ Q.psiPar, ∃ z : ℤ, x = z + 1 / 2 := by
   have hs : Even (S.s - 1) := by obtain ⟨r, hr⟩ := S.s_odd; exact ⟨r, by omega⟩
   intro x hx
-  simp only [Entries.psiPar, List.cons_append, List.mem_cons, List.mem_append, List.mem_flatMap, List.mem_map,
-    List.not_mem_nil, or_false] at hx
+  simp only [Entries.psiPar, List.cons_append, List.mem_cons, List.mem_append, List.mem_flatMap,
+      List.mem_map, List.not_mem_nil, or_false]
+    at hx
   rcases hx with rfl | ⟨i, -, h | rfl⟩ | ⟨i, -, rfl⟩
   exacts [hQ.a_half _, block_even _ hs x h, hQ.a_half _, hQ.u_half _]
 
@@ -361,27 +403,27 @@ theorem base_int (Q : Entries S) : ∀ x ∈ Q.basePar, ∃ z : ℤ, x = z := by
   simp only [Entries.basePar, List.mem_cons, List.mem_append, List.mem_flatMap, List.mem_map] at hx
   rcases hx with ⟨i, -, rfl⟩ | ⟨j, -, rfl | h⟩
   · exact ⟨_, rfl⟩
-  · exact ⟨-Q.b j, by push_cast; ring⟩
-  · exact block_odd (-Q.e j) S.t_odd x (by exact_mod_cast h)
+  · exact ⟨- Q.b j, by push_cast; ring⟩
+  · exact block_odd (- Q.e j) S.t_odd x (by exact_mod_cast h)
 
-theorem hw_psi (Q : Entries S) (hQ : Q.Good) (i : ℕ) (hi : i < Q.psiPar.length) :
-    (hw Q.psiPar i : ℚ) = Q.psiPar[i] - (((Q.psiPar.length : ℚ) - 1) / 2 - i) :=
+theorem hw_psi (Q : Entries S) (hQ : Q.Good) (i : ℕ) (hi : i < Q.psiPar.length)
+    : (hw Q.psiPar i : ℚ) = Q.psiPar[i] - (((Q.psiPar.length : ℚ) - 1) / 2 - i) :=
   hw_of_half _ (length_psi Q ▸ even_nR 0) (psi_half Q hQ) i hi
 
-theorem hw_big (Q : Entries S) (hQ : Q.Good) (i : ℕ) (hi : i < Q.bigPar.length) :
-    (hw Q.bigPar i : ℚ) = Q.bigPar[i] - (((Q.bigPar.length : ℚ) - 1) / 2 - i) := by
+theorem hw_big (Q : Entries S) (hQ : Q.Good) (i : ℕ) (hi : i < Q.bigPar.length)
+    : (hw Q.bigPar i : ℚ) = Q.bigPar[i] - (((Q.bigPar.length : ℚ) - 1) / 2 - i) := by
   refine hw_of_half _ (length_big Q ▸ even_nR _) (fun x hx => ?_) i hi
   rcases List.mem_append.1 hx with h | h
   · exact psi_half Q hQ x h
   · obtain ⟨j, -, h⟩ := List.mem_flatMap.1 h
-    exact block_even (-Q.e j) S.t_odd.add_one x (by exact_mod_cast h)
+    exact block_even (- Q.e j) S.t_odd.add_one x (by exact_mod_cast h)
 
-theorem hw_base (Q : Entries S) (i : ℕ) (hi : i < Q.basePar.length) :
-    (hw Q.basePar i : ℚ) = Q.basePar[i] - (((Q.basePar.length : ℚ) - 1) / 2 - i) :=
+theorem hw_base (Q : Entries S) (i : ℕ) (hi : i < Q.basePar.length)
+    : (hw Q.basePar i : ℚ) = Q.basePar[i] - (((Q.basePar.length : ℚ) - 1) / 2 - i) :=
   hw_of_int _ (length_base Q ▸ odd_nC ⟨0, rfl⟩) (base_int Q) i hi
 
-theorem hw_small (Q : Entries S) (i : ℕ) (hi : i < Q.smallPar.length) :
-    (hw Q.smallPar i : ℚ) = Q.smallPar[i] - (((Q.smallPar.length : ℚ) - 1) / 2 - i) := by
+theorem hw_small (Q : Entries S) (i : ℕ) (hi : i < Q.smallPar.length)
+    : (hw Q.smallPar i : ℚ) = Q.smallPar[i] - (((Q.smallPar.length : ℚ) - 1) / 2 - i) := by
   refine hw_of_int _ (length_small Q ▸ odd_nC S.m_even) (fun x hx => ?_) i hi
   rcases List.mem_append.1 hx with h | h
   · obtain ⟨j, -, h⟩ := List.mem_flatMap.1 h

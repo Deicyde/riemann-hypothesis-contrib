@@ -58,7 +58,7 @@ theorem sub_map
   have :=
     ConcreteCategory.congr_hom
       (NatTrans.congr_app (f.naturality (SimplexCategory.subinterval j l h).op) (op U)) x
-  simp only [NatTrans.comp_app, types_comp_apply, ConcreteCategory.comp_apply] at this
+  simp only [NatTrans.comp_app, ConcreteCategory.comp_apply] at this
   exact this.symm
 
 theorem isAW_pull

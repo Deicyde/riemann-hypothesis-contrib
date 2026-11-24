@@ -58,35 +58,38 @@ open HeckeCharacterZeroLocus.SiegelWeilU
 
 namespace GlobalTheory.SiegelWeilConvCompare
 
-theorem exists_coord_pi {X : Type} [AddCommGroup X] [TopologicalSpace X] {k : ℕ}
-    (e : X ≃ₜ (Fin k → ℝ)) (he : ∀ x y, e (x + y) = e x + e y) (κ : Type) [Fintype κ] :
-    ∃ (n : ℕ) (e' : (κ → X) ≃ₜ (Fin n → ℝ)), ∀ x y, e' (x + y) = e' x + e' y := by
+theorem exists_coord_pi
+    {X : Type} [AddCommGroup X] [TopologicalSpace X]
+    {k : ℕ} (e : X ≃ₜ (Fin k → ℝ)) (he : ∀ x y, e (x + y) = e x + e y)
+    (κ : Type) [Fintype κ]
+    : ∃ (n : ℕ) (e' : (κ → X) ≃ₜ (Fin n → ℝ)), ∀ x y, e' (x + y) = e' x + e' y := by
   let e1 : (κ → X) ≃ₜ (κ → Fin k → ℝ) := Homeomorph.piCongrRight fun _ => e
-  have h1 : ∀ x y, e1 (x + y) = e1 x + e1 y := by
-    intro x y; funext i; exact he (x i) (y i)
-  let L := ContinuousLinearEquiv.ofFinrankEq (𝕜 := ℝ) (E := κ → Fin k → ℝ)
-    (F := Fin (Module.finrank ℝ (κ → Fin k → ℝ)) → ℝ) (Module.finrank_fin_fun ℝ).symm
+  have h1 : ∀ x y, e1 (x + y) = e1 x + e1 y := by intro x y; funext i; exact he (x i) (y i)
+  let L :=
+    ContinuousLinearEquiv.ofFinrankEq (𝕜 := ℝ) (E := κ → Fin k → ℝ)
+      (F := Fin (Module.finrank ℝ (κ → Fin k → ℝ)) → ℝ) (Module.finrank_fin_fun ℝ).symm
   refine ⟨_, e1.trans L.toHomeomorph, fun x y => ?_⟩
   show L (e1 (x + y)) = L (e1 x) + L (e1 y)
   rw [h1, map_add (f := _)]
 
-theorem exists_coord_Ainf (F : Type) [Field F] [NumberField F] [IsTotallyReal F] :
-    ∃ (k : ℕ) (e : Ainf F ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
+theorem exists_coord_Ainf (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    : ∃ (k : ℕ) (e : Ainf F ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
   apply _root_.PI.AprimeInfW.sq_coord_Ainf <;> assumption
 
-theorem exists_coord_tens (F E : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field E]
-    [NumberField E] [Algebra F E] :
-    ∃ (k : ℕ) (e : Ainf F ⊗[F] E ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
+theorem exists_coord_tens
+    (F E : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field E] [NumberField E] [Algebra F E]
+    : ∃ (k : ℕ) (e : Ainf F ⊗[F] E ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
   classical
   let R := Ainf F
   let b := Module.Free.chooseBasis R (R ⊗[F] E)
   let eL : (R ⊗[F] E) ≃ₗ[R] (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) := b.equivFun
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R (R ⊗[F] E)
-  let e0 : R ⊗[F] E ≃ₜ (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) :=
-    { toEquiv := eL.toEquiv
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap eL.toLinearMap
-      continuous_invFun := IsModuleTopology.continuous_of_linearMap eL.symm.toLinearMap }
+  let e0 : R ⊗[F] E ≃ₜ (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) := {
+    toEquiv := eL.toEquiv
+    continuous_toFun := IsModuleTopology.continuous_of_linearMap eL.toLinearMap
+    continuous_invFun := IsModuleTopology.continuous_of_linearMap eL.symm.toLinearMap
+  }
   obtain ⟨k0, eA, hA⟩ := exists_coord_Ainf F
   obtain ⟨k, e1, h1⟩ := exists_coord_pi eA hA (Module.Free.ChooseBasisIndex R (R ⊗[F] E))
   refine ⟨k, e0.trans e1, fun x y => ?_⟩
@@ -99,9 +102,13 @@ variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] [S
 
 end Zero
 
-theorem measure_fundamentalDomain_pos (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (μ) (hμ : IsHaarH F E σ M J μ)
-    (𝓕) (h : IsFDH F E σ M J μ 𝓕) : 0 < μ 𝓕 := by
+theorem measure_fundamentalDomain_pos
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+    (μ) (hμ : IsHaarH F E σ M J μ)
+    (𝓕) (h : IsFDH F E σ M J μ 𝓕)
+    : 0 < μ 𝓕 := by
   haveI : μ.IsHaarMeasure := hμ
   haveI : Countable E := (Module.Free.chooseBasis ℚ E).equivFun.toEquiv.injective.countable
   haveI : Countable (Matrix (Fin M) (Fin M) E) := inferInstanceAs (Countable (Fin M → Fin M → E))
@@ -126,19 +133,23 @@ theorem measure_fundamentalDomain_pos (F E : Type) [Field F] [NumberField F] [Fi
 
 section HermTop
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
   (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
 
 def tensHomeo {κ : Type} [Finite κ] (b : Module.Basis κ F E) : R ⊗[F] E ≃ₜ (κ → R) :=
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R (R ⊗[F] E)
-  { toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
+  {
+    toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
     continuous_toFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.toLinearMap
     continuous_invFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.symm.toLinearMap }
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.symm.toLinearMap
+  }
 
 end HermTop
-
 
 end GlobalTheory.SiegelWeilConvCompare

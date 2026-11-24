@@ -49,8 +49,6 @@ import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.Tr
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HodgeOfTrue
@@ -96,7 +94,6 @@ theorem locPar_ofChar_unr_and_frobEig
         UpperTheory.One.M.opn _ (_root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h)
       obtain ⟨a, ha, ε, H⟩ := hOpn
     )
-  | obtain ⟨a, ha, ε, -, H⟩ := _root_.GlobalTheory.CuspRep.ParLawsT.isRecT_locRecT hL h
   have e2
       : _root_.GlobalTheory.CuspRep.ParLawsT.locParT hL (CG.ofChar χ) h
         = WD.mk (WDRep.diag h fun _ : Fin 1 => (χ.val w)⁻¹) := by

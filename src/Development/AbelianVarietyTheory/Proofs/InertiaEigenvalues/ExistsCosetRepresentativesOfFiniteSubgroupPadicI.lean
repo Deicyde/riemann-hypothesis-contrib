@@ -56,16 +56,24 @@ open PowerSeries
 
 namespace GlobalTheory
 
-theorem padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2)
-    (δ : ℤ_[l]) {n : ℕ} (hn : n ≠ 0) (hδ : δ ^ n = 1) (h1 : PadicInt.toZMod δ = 1) : δ = 1 := by
+theorem padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one
+    {l : ℕ} [hl : Fact l.Prime]
+    (h2 : l ≠ 2)
+    (δ : ℤ_[l])
+    {n : ℕ} (hn : n ≠ 0) (hδ : δ ^ n = 1)
+    (h1 : PadicInt.toZMod δ = 1)
+    : δ = 1 := by
   apply GlobalTheory.CycFr.TraceOnePlusX.eq_one_of_pow_eq_one <;> assumption
 
-theorem exists_coset_representatives_of_finite_subgroup_padicInt_units {l : ℕ} [hl : Fact l.Prime]
-    (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ] (h2 : l ≠ 2) :
-    ∃ (e : ℕ) (a : Fin e → ℕ), e * Nat.card Δ = l - 1 ∧ (∀ τ, ¬ l ∣ a τ) ∧
-      (∀ τ τ', τ ≠ τ' → (a τ : ZMod l) ^ Nat.card Δ ≠ (a τ' : ZMod l) ^ Nat.card Δ) ∧
-      ∀ x : ZMod l, x ≠ 0 → ∃! p : Fin e × Δ,
-        x = (a p.1 : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) := by
+theorem exists_coset_representatives_of_finite_subgroup_padicInt_units
+    {l : ℕ} [hl : Fact l.Prime] (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ] (h2 : l ≠ 2)
+    : ∃ (e : ℕ) (a : Fin e → ℕ),
+      e * Nat.card Δ = l - 1 ∧ (∀ τ, ¬ l ∣ a τ)
+        ∧ (∀ τ τ', τ ≠ τ' → (a τ : ZMod l) ^ Nat.card Δ ≠ (a τ' : ZMod l) ^ Nat.card Δ)
+        ∧ ∀ x : ZMod l,
+          x ≠ 0
+            → ∃! p : Fin e × Δ,
+              x = (a p.1 : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) := by
   classical
   let g : Δ →* (ZMod l)ˣ :=
     (Units.map (PadicInt.toZMod (p := l) : ℤ_[l] →+* ZMod l).toMonoidHom).comp Δ.subtype
@@ -79,7 +87,8 @@ theorem exists_coset_representatives_of_finite_subgroup_padicInt_units {l : ℕ}
       have : d ^ Nat.card Δ = 1 := pow_card_eq_one'
       have := congrArg (fun z : Δ => ((z : ℤ_[l]ˣ) : ℤ_[l])) this
       simpa only [SubgroupClass.coe_pow, Units.val_pow_eq_pow_val, OneMemClass.coe_one,
-        Units.val_one] using this
+          Units.val_one]
+        using this
     exact Subtype.ext (Units.ext (padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one h2 _ hs hp h1))
   let H : Subgroup (ZMod l)ˣ := g.range
   have hH : Nat.card H = Nat.card Δ := (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
@@ -117,12 +126,12 @@ theorem exists_coset_representatives_of_finite_subgroup_padicInt_units {l : ℕ}
     exact hne (hreq _ _ (hHmem _ (by rw [mul_pow, inv_pow, h', inv_mul_cancel])))
   · intro x hx
     let u : (ZMod l)ˣ := Units.mk0 x hx
-    have hu : (r (φ u))⁻¹ * u ∈ H := by
-      rw [← QuotientGroup.eq, hr, Equiv.symm_apply_apply]
+    have hu : (r (φ u))⁻¹ * u ∈ H := by rw [← QuotientGroup.eq, hr, Equiv.symm_apply_apply]
     obtain ⟨d, hd⟩ := hu
-    have hform : ∀ p : Fin (Nat.card ((ZMod l)ˣ ⧸ H)) × Δ,
-        x = (((r p.1 : ZMod l).val : ℕ) : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) ↔
-          u = r p.1 * g p.2 := by
+    have hform
+        : ∀ p : Fin (Nat.card ((ZMod l)ˣ ⧸ H)) × Δ,
+          x = (((r p.1 : ZMod l).val : ℕ) : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l])
+            ↔ u = r p.1 * g p.2 := by
       intro p
       rw [hcast, ← hg, Units.ext_iff]
       rfl

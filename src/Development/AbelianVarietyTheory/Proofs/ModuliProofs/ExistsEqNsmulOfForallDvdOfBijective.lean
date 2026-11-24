@@ -55,17 +55,21 @@ public import Mathlib.Algebra.Group.Subgroup.Finite
 
 namespace GlobalTheory
 
-theorem exists_eq_nsmul_of_forall_dvd_of_bijective {La : Type} [AddCommGroup La]
-    (EF : LinearMap.BilinForm ℤ La) (hEF : Function.Bijective EF) (N : ℕ) (hN : 0 < N) (c : La)
-    (hc : ∀ x, (N : ℤ) ∣ EF c x) : ∃ b, c = N • b := by
-  let g : La →ₗ[ℤ] ℤ :=
-    { toFun := fun x => EF c x / N
-      map_add' := fun x y => by
-        simp only [map_add (f := _)]
-        exact Int.add_ediv_of_dvd_left (hc x)
-      map_smul' := fun r x => by
-        simp only [map_smul, smul_eq_mul, RingHom.id_apply]
-        exact Int.mul_ediv_assoc r (hc x) }
+theorem exists_eq_nsmul_of_forall_dvd_of_bijective
+    {La : Type} [AddCommGroup La]
+    (EF : LinearMap.BilinForm ℤ La) (hEF : Function.Bijective EF)
+    (N : ℕ) (hN : 0 < N)
+    (c : La) (hc : ∀ x, (N : ℤ) ∣ EF c x)
+    : ∃ b, c = N • b := by
+  let g : La →ₗ[ℤ] ℤ := {
+    toFun := fun x => EF c x / N
+    map_add' := fun x y => by
+      simp only [map_add (f := _)]
+      exact Int.add_ediv_of_dvd_left (hc x)
+    map_smul' := fun r x => by
+      simp only [map_smul, smul_eq_mul, RingHom.id_apply]
+      exact Int.mul_ediv_assoc r (hc x)
+  }
   obtain ⟨b, hb⟩ := hEF.2 g
   refine ⟨b, hEF.1 ?_⟩
   ext x
@@ -73,10 +77,12 @@ theorem exists_eq_nsmul_of_forall_dvd_of_bijective {La : Type} [AddCommGroup La]
   rw [map_nsmul, LinearMap.smul_apply, h1, nsmul_eq_mul]
   exact (Int.mul_ediv_cancel' (hc x)).symm
 
-private theorem card_mul_card_orthogonal_eq_card_of_nondegenerate {Q : Type} [AddCommGroup Q] [Finite Q] (N : ℕ)
-    [NeZero N] (B : Q →+ Q →+ ZMod N) (hL : ∀ y, (∀ x, B y x = 0) → y = 0)
-    (U : AddSubgroup Q) :
-    Nat.card U * Nat.card (⨅ t ∈ U, (B t).ker : AddSubgroup Q) = Nat.card Q := by
+private theorem card_mul_card_orthogonal_eq_card_of_nondegenerate
+    {Q : Type} [AddCommGroup Q] [Finite Q]
+    (N : ℕ) [NeZero N]
+    (B : Q →+ Q →+ ZMod N) (hL : ∀ y, (∀ x, B y x = 0) → y = 0)
+    (U : AddSubgroup Q)
+    : Nat.card U * Nat.card (⨅ t ∈ U, (B t).ker : AddSubgroup Q) = Nat.card Q := by
   classical
   have : Fintype Q := Fintype.ofFinite Q
   set V : AddSubgroup Q := ⨅ t ∈ U, (B t).ker with hV
@@ -138,16 +144,19 @@ private theorem card_mul_card_orthogonal_eq_card_of_nondegenerate {Q : Type} [Ad
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   exact_mod_cast hC
 
-private theorem exists_rel_of_dvd_pairing_of_card_mul_eq {La Q P : Type} [AddCommGroup La] [AddCommGroup Q]
-    [Finite Q] (N : ℕ) [NeZero N] (π : La →+ Q) (B : Q →+ Q →+ ZMod N)
-    (hπeq : ∀ a a', π a = π a' → ∃ c, a' = a + N • c)
+private theorem exists_rel_of_dvd_pairing_of_card_mul_eq
+    {La Q P : Type} [AddCommGroup La] [AddCommGroup Q] [Finite Q]
+    (N : ℕ) [NeZero N]
+    (π : La →+ Q) (B : Q →+ Q →+ ZMod N) (hπeq : ∀ a a', π a = π a' → ∃ c, a' = a + N • c)
     (hL : ∀ y, (∀ x, B y x = 0) → y = 0) (hR : ∀ x, (∀ y, B y x = 0) → x = 0)
     (E : La → La → ℤ) (hE : ∀ a a', ((E a a' : ℤ) : ZMod N) = B (π a) (π a'))
-    (T : Set P) (R : La → P → Prop) (hRinv : ∀ a b p, R a p → R (a + N • b) p)
+    (T : Set P)
+    (R : La → P → Prop) (hRinv : ∀ a b p, R a p → R (a + N • b) p)
     (hRfun : ∀ a p p', R a p → R a p' → p = p') (hRsurj : ∀ p, ∃ a, R a p)
     (hcard : Nat.card P * Nat.card T = Nat.card Q)
     (horth : ∀ a p a' p', R a p → p ∈ T → R a' p' → (N : ℤ) ∣ E a a')
-    (a : La) (ha : ∀ a' p', R a' p' → (N : ℤ) ∣ E a a') : ∃ p, R a p := by
+    (a : La) (ha : ∀ a' p', R a' p' → (N : ℤ) ∣ E a a')
+    : ∃ p, R a p := by
   classical
   have hz : ∀ a a', (N : ℤ) ∣ E a a' → B (π a) (π a') = 0 := fun a a' h => by
     rw [← hE]; exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mpr h
@@ -156,13 +165,14 @@ private theorem exists_rel_of_dvd_pairing_of_card_mul_eq {La Q P : Type} [AddCom
   set U : AddSubgroup Q := AddSubgroup.closure ST with hUdef
   set V : AddSubgroup Q := ⨅ t ∈ U, (B t).ker with hVdef
   set W : AddSubgroup Q := ⨅ x ∈ V, (B.flip x).ker with hWdef
-  have hmemV : ∀ x, x ∈ V ↔ ∀ t ∈ U, B t x = 0 := by
-    intro x; simp [hVdef, AddSubgroup.mem_iInf]
-  have hmemW : ∀ y, y ∈ W ↔ ∀ x ∈ V, B y x = 0 := by
-    intro y; simp [hWdef, AddSubgroup.mem_iInf]
-  have h1 : Nat.card U * Nat.card V = Nat.card Q := card_mul_card_orthogonal_eq_card_of_nondegenerate N B hL U
+  have hmemV : ∀ x, x ∈ V ↔ ∀ t ∈ U, B t x = 0 := by intro x; simp [hVdef, AddSubgroup.mem_iInf]
+  have hmemW : ∀ y, y ∈ W ↔ ∀ x ∈ V, B y x = 0 := by intro y; simp [hWdef, AddSubgroup.mem_iInf]
+  have h1 : Nat.card U * Nat.card V = Nat.card Q :=
+    card_mul_card_orthogonal_eq_card_of_nondegenerate N B hL U
   have h2 : Nat.card V * Nat.card W = Nat.card Q :=
-    card_mul_card_orthogonal_eq_card_of_nondegenerate N B.flip (fun x hx => hR x (fun y => by simpa using hx y)) V
+    card_mul_card_orthogonal_eq_card_of_nondegenerate N B.flip
+      (fun x hx => hR x (fun y => by simpa using hx y))
+      V
   have hSV : S ⊆ (V : Set Q) := by
     rintro q ⟨a', p', hr, rfl⟩
     rw [SetLike.mem_coe, hmemV]
@@ -181,7 +191,8 @@ private theorem exists_rel_of_dvd_pairing_of_card_mul_eq {La Q P : Type} [AddCom
     exact (hmemV x).mp hx t ht
   have hPS : Nat.card P ≤ Nat.card S := by
     refine Nat.card_le_card_of_injective
-      (fun p => ⟨π (hRsurj p).choose, (hRsurj p).choose, p, (hRsurj p).choose_spec, rfl⟩) ?_
+      (fun p => ⟨π (hRsurj p).choose, (hRsurj p).choose, p, (hRsurj p).choose_spec, rfl⟩)
+      ?_
     intro p p' h
     have h' : π (hRsurj p).choose = π (hRsurj p').choose := congrArg Subtype.val h
     obtain ⟨c, hc⟩ := hπeq _ _ h'
@@ -190,7 +201,8 @@ private theorem exists_rel_of_dvd_pairing_of_card_mul_eq {La Q P : Type} [AddCom
     exact hRfun _ _ _ this (hRsurj p').choose_spec
   have hTST : Nat.card T ≤ Nat.card ST := by
     refine Nat.card_le_card_of_injective
-      (fun p : T => ⟨π (hRsurj p).choose, (hRsurj p).choose, p, (hRsurj p).choose_spec, p.2, rfl⟩) ?_
+      (fun p : T => ⟨π (hRsurj p).choose, (hRsurj p).choose, p, (hRsurj p).choose_spec, p.2, rfl⟩)
+      ?_
     intro p p' h
     have h' : π (hRsurj p).choose = π (hRsurj p').choose := congrArg Subtype.val h
     obtain ⟨c, hc⟩ := hπeq _ _ h'
@@ -248,42 +260,55 @@ private theorem exists_rel_of_dvd_pairing_of_card_mul_eq {La Q P : Type} [AddCom
   obtain ⟨c, hc⟩ := hπeq _ _ he
   exact ⟨p0, hc ▸ hRinv a0 c p0 h0⟩
 
-theorem exists_rel_of_forall_dvd_of_card_mul :
-    ∀ (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] (EF : LinearMap.BilinForm ℤ La), Function.Bijective EF → ∀ (N : ℕ), 0 < N → ∀ (P : Type) (T : Set P) (R : La → P → Prop), (∀ a b p, R a p → R (a + N • b) p) → (∀ a p p', R a p → R a p' → p = p') → (∀ p, ∃ a, R a p) → Nat.card P * Nat.card T = N ^ Module.finrank ℤ La → (∀ a p a' p', R a p → p ∈ T → R a' p' → (N : ℤ) ∣ EF a a') → ∀ a, (∀ a' p', R a' p' → (N : ℤ) ∣ EF a a') → ∃ p, R a p := by
+theorem exists_rel_of_forall_dvd_of_card_mul
+    : ∀ (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La]
+        (EF : LinearMap.BilinForm ℤ La),
+      Function.Bijective EF
+        → ∀ (N : ℕ),
+          0 < N
+            → ∀ (P : Type) (T : Set P) (R : La → P → Prop),
+              (∀ a b p, R a p → R (a + N • b) p) → (∀ a p p', R a p → R a p' → p = p')
+                → (∀ p, ∃ a, R a p) → Nat.card P * Nat.card T = N ^ Module.finrank ℤ La
+                → (∀ a p a' p', R a p → p ∈ T → R a' p' → (N : ℤ) ∣ EF a a')
+                → ∀ a, (∀ a' p', R a' p' → (N : ℤ) ∣ EF a a') → ∃ p, R a p := by
   intro La _ _ _ EF hEF N hN P T R hRinv hRfun hRsurj hcard horth a ha
   classical
   have : NeZero N := ⟨hN.ne'⟩
   let b := Module.Free.chooseBasis ℤ La
   let M : Matrix (Module.Free.ChooseBasisIndex ℤ La) (Module.Free.ChooseBasisIndex ℤ La) (ZMod N) :=
     fun i j => ((EF (b i) (b j) : ℤ) : ZMod N)
-  let π : La →+ (Module.Free.ChooseBasisIndex ℤ La → ZMod N) :=
-    { toFun := fun a i => ((b.repr a i : ℤ) : ZMod N)
-      map_zero' := by ext i; simp
-      map_add' := by intro x y; ext i; simp }
-  let B : (Module.Free.ChooseBasisIndex ℤ La → ZMod N) →+
-      (Module.Free.ChooseBasisIndex ℤ La → ZMod N) →+ ZMod N :=
-    AddMonoidHom.mk' (fun y => AddMonoidHom.mk' (fun x => dotProduct (Matrix.vecMul y M) x)
-      (fun x x' => dotProduct_add _ _ _))
+  let π : La →+ (Module.Free.ChooseBasisIndex ℤ La → ZMod N) := {
+    toFun := fun a i => ((b.repr a i : ℤ) : ZMod N)
+    map_zero' := by ext i; simp
+    map_add' := by intro x y; ext i; simp
+  }
+  let B
+      : (Module.Free.ChooseBasisIndex ℤ La → ZMod N) →+ (Module.Free.ChooseBasisIndex ℤ La → ZMod N)
+        →+ ZMod N :=
+    AddMonoidHom.mk'
+      (fun y =>
+        AddMonoidHom.mk'
+          (fun x => dotProduct (Matrix.vecMul y M) x)
+          (fun x x' => dotProduct_add _ _ _))
       (fun y y' => by ext x; simp [Matrix.add_vecMul, add_dotProduct])
   have hBapp : ∀ y x, B y x = dotProduct (Matrix.vecMul y M) x := fun _ _ => rfl
   have hπapp : ∀ a i, π a i = ((b.repr a i : ℤ) : ZMod N) := fun _ _ => rfl
   have hE : ∀ a a', ((EF a a' : ℤ) : ZMod N) = B (π a) (π a') := by
     intro a a'
     have hZ : EF a a' = ∑ i, ∑ j, b.repr a i * EF (b i) (b j) * b.repr a' j := by
-      calc EF a a' = EF (∑ i, b.repr a i • b i) (∑ j, b.repr a' j • b j) := by
-            rw [b.sum_repr, b.sum_repr]
+      calc
+        EF a a'
+          = EF (∑ i, b.repr a i • b i) (∑ j, b.repr a' j • b j) := by rw [b.sum_repr, b.sum_repr]
         _ = _ := by
-
-            simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+          simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
             Finset.mul_sum]
-            rw [Finset.sum_comm]
-            refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-            ring
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+          ring
     rw [hZ, hBapp]
     simp only [Matrix.vecMul, dotProduct, hπapp, M, Int.cast_sum, Int.cast_mul, Finset.sum_mul]
     rw [Finset.sum_comm]
-  have hπN : ∀ c, π ((N : ℕ) • c) = 0 := by
-    intro c; ext i; simp [hπapp]
+  have hπN : ∀ c, π ((N : ℕ) • c) = 0 := by intro c; ext i; simp [hπapp]
   have hdiv : ∀ a, (∀ y, B (π a) y = 0) → ∃ c, a = N • c := by
     intro a h
     apply exists_eq_nsmul_of_forall_dvd_of_bijective EF hEF N hN a
@@ -313,7 +338,8 @@ theorem exists_rel_of_forall_dvd_of_card_mul :
       simp only at h
       rw [h, sub_self, zero_dotProduct]
     exact sub_eq_zero.mp (hL _ h')
-  have hsv : Function.Surjective (fun y => Matrix.vecMul y M) := Finite.injective_iff_surjective.mp hinj
+  have hsv : Function.Surjective (fun y => Matrix.vecMul y M) :=
+    Finite.injective_iff_surjective.mp hinj
   have hR : ∀ x, (∀ y, B y x = 0) → x = 0 := by
     intro x hx
     ext i
@@ -326,7 +352,8 @@ theorem exists_rel_of_forall_dvd_of_card_mul :
   have hQ : Nat.card (Module.Free.ChooseBasisIndex ℤ La → ZMod N) = N ^ Module.finrank ℤ La := by
     rw [Nat.card_eq_fintype_card, Fintype.card_fun, ZMod.card,
       Module.finrank_eq_card_chooseBasisIndex]
-  exact exists_rel_of_dvd_pairing_of_card_mul_eq N π B hπeq hL hR (fun a a' => EF a a') hE T R hRinv hRfun hRsurj
-    (hcard.trans hQ.symm) horth a ha
+  exact exists_rel_of_dvd_pairing_of_card_mul_eq N π B hπeq hL hR
+    (fun a a' => EF a a')
+    hE T R hRinv hRfun hRsurj (hcard.trans hQ.symm) horth a ha
 
 end GlobalTheory

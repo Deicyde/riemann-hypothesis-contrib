@@ -66,7 +66,4 @@ theorem _root_.GlobalTheory.T.split_idempotent_base_function_identity
                     ∧ ∀ x,
                       IsLocal ψ θ S T sS sT ΛS ΛT (.inl v) x
                         → ∃ Φ, IsSBHalf a (latO S T ΛS ΛT fun _ => True) Φ ∧ Tm Φ = x := by
-  first
-  | exact @GlobalTheory.PlaceModelOnto.placeModel_onto_local
-  | exact GlobalTheory.PlaceModelOnto.placeModel_onto_local
-  | (intros; apply GlobalTheory.PlaceModelOnto.placeModel_onto_local <;> assumption)
+  first | exact @GlobalTheory.PlaceModelOnto.placeModel_onto_local

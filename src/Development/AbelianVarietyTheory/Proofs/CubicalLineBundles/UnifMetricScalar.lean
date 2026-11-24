@@ -419,7 +419,7 @@ theorem isMetric_of_isOrtho
             * hermForm Wu.Hm (Pi.single (W.e.symm ⟨b, j⟩) 1) (Pi.single (W.e.symm ⟨b, i⟩) 1) := by
     intro b i j
     rw [hH]
-    simp [hermForm, Matrix.smul_mulVec, Pi.single_apply, Matrix.one_apply]
+    simp [hermForm, Matrix.one_apply]
     split_ifs <;> simp_all <;> ring
   exact isMetricAt_of Φ hg u Wu.Hm χ Wu.θ Wu.Fd w
     (fun b i => Pi.single (W.e.symm ⟨b, i⟩) 1)

@@ -70,7 +70,8 @@ open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory
 
 section Basic
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
   {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
 theorem cnorm_sq (u : ι → ℂ) : cnorm u ^ 2 = ∑ i, ‖u i‖ ^ 2 := by
@@ -84,17 +85,20 @@ theorem cnorm_nonneg (u : ι → ℂ) : 0 ≤ cnorm u := by
 theorem cnorm_eq_zero {u : ι → ℂ} (h : cnorm u = 0) : u = 0 := by
   unfold cnorm at h
   rw [Real.sqrt_eq_zero (Finset.sum_nonneg fun i _ => sq_nonneg _),
-    Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg _)] at h
+      Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg _)]
+    at h
   funext i
   have hi := h i (Finset.mem_univ i)
   simpa using hi
 
-theorem normAt_eq_zero (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
-    (hX : IsUnit (X v).det) {x : V} (h : normAt b X v x = 0) : x = 0 := by
+theorem normAt_eq_zero
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (hX : IsUnit (X v).det)
+    {x : V} (h : normAt b X v x = 0)
+    : x = 0 := by
   have h1 : (X v)⁻¹.mulVec (vecAt b v x) = 0 := cnorm_eq_zero h
   have h2 : vecAt b v x = 0 := by
-    have h3 : (X v).mulVec ((X v)⁻¹.mulVec (vecAt b v x)) = 0 := by
-      rw [h1, Matrix.mulVec_zero]
+    have h3 : (X v).mulVec ((X v)⁻¹.mulVec (vecAt b v x)) = 0 := by rw [h1, Matrix.mulVec_zero]
     rwa [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hX, Matrix.one_mulVec] at h3
   apply b.repr.injective
   ext i
@@ -102,8 +106,9 @@ theorem normAt_eq_zero (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι 
   simp only [vecAt, Pi.zero_apply, map_eq_zero] at h4
   simpa using h4
 
-theorem majAt_self (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
-    (x : V) : majAt b X v x x = ((normAt b X v x ^ 2 : ℝ) : ℂ) := by
+theorem majAt_self
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x : V)
+    : majAt b X v x x = ((normAt b X v x ^ 2 : ℝ) : ℂ) := by
   show (∑ i, star (fcoord b X v x i) * fcoord b X v x i) =
     (((cnorm (fcoord b X v x)) ^ 2 : ℝ) : ℂ)
   rw [cnorm_sq]
@@ -113,13 +118,14 @@ theorem majAt_self (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
   push_cast
   ring
 
-theorem normAt_eq_sqrt (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
-    (x : V) : normAt b X v x = Real.sqrt (majAt b X v x x).re := by
+theorem normAt_eq_sqrt
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x : V)
+    : normAt b X v x = Real.sqrt (majAt b X v x x).re := by
   rw [majAt_self, Complex.ofReal_re]
   exact (Real.sqrt_sq (cnorm_nonneg _)).symm
 
-theorem isSesq_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) :
-    IsSesq (fun v => majAt b X v) := by
+theorem isSesq_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
+    : IsSesq (fun v => majAt b X v) := by
   intro v
   have hadd : ∀ x y : V, fcoord b X v (x + y) = fcoord b X v x + fcoord b X v y := by
     intro x y
@@ -140,15 +146,15 @@ theorem isSesq_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
   · simp only [majAt, hadd, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   · simp only [majAt, hsmul, Pi.smul_apply, smul_eq_mul, star_mul', Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    first
-    | (rw [Complex.star_def]; ring)
+    first | (rw [Complex.star_def]; ring)
   · simp only [majAt, hsmul, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     ring
 
-theorem sesq_eq_sum {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (b : Basis ι K V)
-    (v : InfinitePlace K) (x y : V) :
-    H v x y = ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) * gramOf b (H v) i j * vecAt b v y j := by
+theorem sesq_eq_sum
+    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H)
+    (b : Basis ι K V) (v : InfinitePlace K) (x y : V)
+    : H v x y = ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) * gramOf b (H v) i j * vecAt b v y j := by
   obtain ⟨h1, h2, h3, h4⟩ := hH v
   have hz1 : ∀ y, H v 0 y = 0 := by
     intro y
@@ -160,15 +166,17 @@ theorem sesq_eq_sum {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (b
     have e := h2 x 0 0
     rw [add_zero] at e
     linear_combination (-1 : ℂ) * e
-  have hsumL : ∀ (s : Finset ι) (c : ι → K) (y : V),
-      H v (∑ i ∈ s, c i • b i) y = ∑ i ∈ s, starRingEnd ℂ (v.embedding (c i)) * H v (b i) y := by
+  have hsumL
+      : ∀ (s : Finset ι) (c : ι → K) (y : V),
+        H v (∑ i ∈ s, c i • b i) y = ∑ i ∈ s, starRingEnd ℂ (v.embedding (c i)) * H v (b i) y := by
     intro s c y
     refine Finset.induction_on s ?_ ?_
     · simp [hz1]
     · intro a s ha ih
       rw [Finset.sum_insert ha, Finset.sum_insert ha, h1, h3, ih]
-  have hsumR : ∀ (s : Finset ι) (c : ι → K) (x : V),
-      H v x (∑ i ∈ s, c i • b i) = ∑ i ∈ s, v.embedding (c i) * H v x (b i) := by
+  have hsumR
+      : ∀ (s : Finset ι) (c : ι → K) (x : V),
+        H v x (∑ i ∈ s, c i • b i) = ∑ i ∈ s, v.embedding (c i) * H v x (b i) := by
     intro s c x
     refine Finset.induction_on s ?_ ?_
     · simp [hz2]
@@ -179,8 +187,8 @@ theorem sesq_eq_sum {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (b
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem gramOf_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) :
-    gramOf b (majAt b X v) = ((X v)⁻¹).conjTranspose * (X v)⁻¹ := by
+theorem gramOf_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
+    : gramOf b (majAt b X v) = ((X v)⁻¹).conjTranspose * (X v)⁻¹ := by
   have hv : ∀ i, vecAt b v (b i) = Pi.single i 1 := by
     intro i
     funext j
@@ -189,21 +197,24 @@ theorem gramOf_maj (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
     by_cases hj : j = i
     · subst hj
       simp
-    · simp [Finsupp.single_apply, Pi.single_apply, hj, Ne.symm hj]
+    · simp [hj]
   have hf : ∀ i k, fcoord b X v (b i) k = (X v)⁻¹ k i := by
     intro i k
     simp [fcoord, hv, Matrix.mulVec, dotProduct, Pi.single_apply]
   ext i j
   simp [gramOf, majAt, hf, Matrix.mul_apply, Matrix.conjTranspose_apply]
 
-theorem sesq_ext {F G : V → V → ℂ} {σ : K →+* ℂ} (hσ : ∃ a : K, (σ a).im ≠ 0)
-    (hF : (∀ x x' y, F (x + x') y = F x y + F x' y) ∧ (∀ x y y', F x (y + y') = F x y + F x y') ∧
-      (∀ (a : K) x y, F (a • x) y = starRingEnd ℂ (σ a) * F x y) ∧
-      (∀ (a : K) x y, F x (a • y) = σ a * F x y))
-    (hG : (∀ x x' y, G (x + x') y = G x y + G x' y) ∧ (∀ x y y', G x (y + y') = G x y + G x y') ∧
-      (∀ (a : K) x y, G (a • x) y = starRingEnd ℂ (σ a) * G x y) ∧
-      (∀ (a : K) x y, G x (a • y) = σ a * G x y))
-    (h : ∀ x, F x x = G x x) (x y : V) : F x y = G x y := by
+theorem sesq_ext
+    {F G : V → V → ℂ} {σ : K →+* ℂ} (hσ : ∃ a : K, (σ a).im ≠ 0)
+    (hF : (∀ x x' y, F (x + x') y = F x y + F x' y) ∧ (∀ x y y', F x (y + y') = F x y + F x y')
+      ∧ (∀ (a : K) x y, F (a • x) y = starRingEnd ℂ (σ a) * F x y)
+      ∧ (∀ (a : K) x y, F x (a • y) = σ a * F x y))
+    (hG : (∀ x x' y, G (x + x') y = G x y + G x' y) ∧ (∀ x y y', G x (y + y') = G x y + G x y')
+      ∧ (∀ (a : K) x y, G (a • x) y = starRingEnd ℂ (σ a) * G x y)
+      ∧ (∀ (a : K) x y, G x (a • y) = σ a * G x y))
+    (h : ∀ x, F x x = G x x)
+    (x y : V)
+    : F x y = G x y := by
   obtain ⟨a, ha⟩ := hσ
   obtain ⟨hF1, hF2, hF3, hF4⟩ := hF
   obtain ⟨hG1, hG2, hG3, hG4⟩ := hG
@@ -227,8 +238,8 @@ theorem sesq_ext {F G : V → V → ℂ} {σ : K →+* ℂ} (hσ : ∃ a : K, (�
   · exact absurd h0 hne
   · exact sub_eq_zero.1 h0
 
-theorem exists_im_ne_zero [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K) :
-    ∃ a : K, (v.embedding a).im ≠ 0 := by
+theorem exists_im_ne_zero [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K)
+    : ∃ a : K, (v.embedding a).im ≠ 0 := by
   have hc : v.IsComplex := IsTotallyComplex.isComplex v
   rw [InfinitePlace.isComplex_iff] at hc
   by_contra hcon
@@ -309,16 +320,18 @@ theorem Iso.frameOK (I : Iso A B) (h : FrameOK A) : FrameOK B := by
   rw [Matrix.det_isEmpty]
   exact isUnit_one
 
-def Iso.withL (I : Iso A B) (L' : Submodule (𝓞 K) A.V) :
-    Iso (withL A L') (HLatOps.withL B (L'.map (I.e.toLinearMap.restrictScalars (𝓞 K)))) where
+def Iso.withL (I : Iso A B) (L' : Submodule (𝓞 K) A.V)
+    : Iso (withL A L') (HLatOps.withL B (L'.map (I.e.toLinearMap.restrictScalars (𝓞 K)))) where
   e := I.e
   map_L := rfl
   norm := I.norm
 
 theorem frame_free : FrameFree := by
   intro K V ι κ _ _ _ _ _ _ _ _ _ _ _ b X b' X' hX hX' hn L hL
-  obtain ⟨h1, -, h3, h4, h5, -, -⟩ := rerealize K V ι V κ b X b' X' LinearMap.id hX hX'
-    Function.injective_id (fun v x => (hn v x).symm) L hL
+  obtain ⟨h1, -, h3, h4, h5, -, -⟩ :=
+    rerealize K V ι V κ b X b' X' LinearMap.id hX hX' Function.injective_id
+      (fun v x => (hn v x).symm)
+      L hL
   have hid : L.map ((LinearMap.id : V →ₗ[K] V).restrictScalars (𝓞 K)) = L := by
     ext x
     simp
@@ -328,13 +341,15 @@ theorem frame_free : FrameFree := by
   · unfold muMaxDef; rw [h4]
   · unfold muMinDef; rw [h5]
 
-theorem Iso.maj [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (v : InfinitePlace K) (x y : A.V) :
-    majAt B.b B.X v (I.e x) (I.e y) = majAt A.b A.X v x y := by
+theorem Iso.maj
+    [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (v : InfinitePlace K) (x y : A.V)
+    : majAt B.b B.X v (I.e x) (I.e y) = majAt A.b A.X v x y := by
   obtain ⟨a, ha⟩ := exists_im_ne_zero v
   have hA := isSesq_maj A.b A.X v
   have hB := isSesq_maj B.b B.X v
-  refine sesq_ext (F := fun x y => majAt B.b B.X v (I.e x) (I.e y)) (G := majAt A.b A.X v)
-    (σ := v.embedding) ⟨a, ha⟩ ⟨?_, ?_, ?_, ?_⟩ hA ?_ x y
+  refine sesq_ext
+    (F := fun x y => majAt B.b B.X v (I.e x) (I.e y))
+    (G := majAt A.b A.X v) (σ := v.embedding) ⟨a, ha⟩ ⟨?_, ?_, ?_, ?_⟩ hA ?_ x y
   · intro x x' y
     simp only [map_add (f := _)]
     exact hB.1 _ _ _
@@ -356,30 +371,32 @@ end IsoSec
 section Forms
 
 open scoped MatrixOrder in
-theorem exists_frame {ι : Type} [Fintype ι] [DecidableEq ι] {G : Matrix ι ι ℂ} (hG : G.PosDef) :
-    ∃ B : Matrix ι ι ℂ, IsUnit B.det ∧ B.conjTranspose * B = G := by
+theorem exists_frame {ι : Type} [Fintype ι] [DecidableEq ι] {G : Matrix ι ι ℂ} (hG : G.PosDef)
+    : ∃ B : Matrix ι ι ℂ, IsUnit B.det ∧ B.conjTranspose * B = G := by
   have hex : ∃ B : Matrix ι ι ℂ, G = B.conjTranspose * B := by
     first
     | exact Matrix.posSemidef_iff_eq_conjTranspose_mul_self.1 hG.posSemidef
-    | (obtain ⟨B, hB⟩ := Matrix.posSemidef_iff_eq_conjTranspose_mul_self.1 hG.posSemidef
-       exact ⟨B, hB⟩)
-    | (have h0 : (0 : Matrix ι ι ℂ) ≤ G := Matrix.nonneg_iff_posSemidef.2 hG.posSemidef
-       refine ⟨CFC.sqrt G, ?_⟩
-       have hs : (CFC.sqrt G).conjTranspose = CFC.sqrt G := (CFC.sqrt_nonneg G).isSelfAdjoint
-       rw [hs]
-       exact (CFC.sqrt_mul_sqrt_self G h0).symm)
+    | (
+        obtain ⟨B, hB⟩ := Matrix.posSemidef_iff_eq_conjTranspose_mul_self.1 hG.posSemidef
+        exact ⟨B, hB⟩
+      )
+    | (
+        have h0 : (0 : Matrix ι ι ℂ) ≤ G := Matrix.nonneg_iff_posSemidef.2 hG.posSemidef
+        refine ⟨CFC.sqrt G, ?_⟩
+        have hs : (CFC.sqrt G).conjTranspose = CFC.sqrt G := (CFC.sqrt_nonneg G).isSelfAdjoint
+        rw [hs]
+        exact (CFC.sqrt_mul_sqrt_self G h0).symm
+      )
   obtain ⟨B, hB⟩ := hex
   refine ⟨B, ?_, hB.symm⟩
-  have hdet : G.det ≠ 0 := by
-    first
-    | exact hG.det_pos.ne'
+  have hdet : G.det ≠ 0 := by first | exact hG.det_pos.ne'
   rw [isUnit_iff_ne_zero]
   intro h0
   apply hdet
   rw [hB, Matrix.det_mul, h0, mul_zero]
 
-theorem frameOf_spec {ι : Type} [Fintype ι] [DecidableEq ι] {G : Matrix ι ι ℂ} (hG : G.PosDef) :
-    IsUnit (frameOf G).det ∧ ((frameOf G)⁻¹).conjTranspose * (frameOf G)⁻¹ = G := by
+theorem frameOf_spec {ι : Type} [Fintype ι] [DecidableEq ι] {G : Matrix ι ι ℂ} (hG : G.PosDef)
+    : IsUnit (frameOf G).det ∧ ((frameOf G)⁻¹).conjTranspose * (frameOf G)⁻¹ = G := by
   have h := exists_frame hG
   have hspec := Classical.choose_spec h
   unfold frameOf
@@ -393,26 +410,37 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K]
 theorem of_form_spec : OfFormSpec := by
   unfold OfFormSpec
   intro K V ι _ _ _ _ _ _ _ _ _ b L H hH hP
-  have hF : ∀ v, IsUnit (frameOf (gramOf b (H v))).det ∧
-      ((frameOf (gramOf b (H v)))⁻¹).conjTranspose * (frameOf (gramOf b (H v)))⁻¹ =
-        gramOf b (H v) := fun v => frameOf_spec (hP v)
+  have hF
+      : ∀ v,
+        IsUnit (frameOf (gramOf b (H v))).det
+          ∧ ((frameOf (gramOf b (H v)))⁻¹).conjTranspose * (frameOf (gramOf b (H v)))⁻¹
+            = gramOf b (H v) := fun v =>
+    frameOf_spec (hP v)
   have hmaj : ∀ v x y, majAt b (fun v => frameOf (gramOf b (H v))) v x y = H v x y := by
     intro v x y
-    have e1 : majAt b (fun v => frameOf (gramOf b (H v))) v x y =
-        ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) *
-          gramOf b (majAt b (fun v => frameOf (gramOf b (H v))) v) i j * vecAt b v y j :=
+    have e1
+        : majAt b (fun v => frameOf (gramOf b (H v))) v x y
+          = ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) *
+              gramOf b (majAt b (fun v => frameOf (gramOf b (H v))) v) i j * vecAt b v y j :=
       sesq_eq_sum (isSesq_maj b _) b v x y
-    have e2 : H v x y = ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) * gramOf b (H v) i j *
-        vecAt b v y j := sesq_eq_sum hH b v x y
+    have e2
+        : H v x y
+          = ∑ i, ∑ j, starRingEnd ℂ (vecAt b v x i) * gramOf b (H v) i j *
+            vecAt b v y j :=
+      sesq_eq_sum hH b v x y
     rw [e1, e2, gramOf_maj, (hF v).2]
   refine ⟨fun v => (hF v).1, hmaj, fun v x => ?_⟩
   rw [normAt_eq_sqrt]
   exact congrArg (fun t => Real.sqrt t.re) (hmaj v x x)
 
-theorem posAt_comp {V ι W κ : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
-    [AddCommGroup W] [Module K W] [Fintype κ] [DecidableEq κ] (b : Basis ι K V) (c : Basis κ K W)
-    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (hP : PosAt b H) (f : W →ₗ[K] V)
-    (hf : Function.Injective f) : PosAt c (fun v x y => H v (f x) (f y)) := by
+theorem posAt_comp
+    {V ι W κ : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι] [AddCommGroup W]
+    [Module K W] [Fintype κ] [DecidableEq κ]
+    (b : Basis ι K V)
+    (c : Basis κ K W)
+    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (hP : PosAt b H)
+    (f : W →ₗ[K] V) (hf : Function.Injective f)
+    : PosAt c (fun v x y => H v (f x) (f y)) := by
   intro v
   have hG := hP v
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective f (LinearMap.ker_eq_bot.2 hf)
@@ -440,12 +468,13 @@ theorem posAt_comp {V ι W κ : Type} [AddCommGroup V] [Module K V] [Fintype ι]
     rfl
   show (gramOf c (fun x y => H v (f x) (f y))).PosDef
   rw [hgram]
-  first
-  | exact hG.conjTranspose_mul_mul_same hinj
+  first | exact hG.conjTranspose_mul_mul_same hinj
 
-theorem isSesq_comp {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
-    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (f : W →ₗ[K] V) :
-    IsSesq (fun v x y => H v (f x) (f y)) := by
+theorem isSesq_comp
+    {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H)
+    (f : W →ₗ[K] V)
+    : IsSesq (fun v x y => H v (f x) (f y)) := by
   intro v
   obtain ⟨h1, h2, h3, h4⟩ := hH v
   refine ⟨fun x x' y => ?_, fun x y y' => ?_, fun a x y => ?_, fun a x y => ?_⟩
@@ -458,9 +487,11 @@ theorem isSesq_comp {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] 
   · simp only [map_smul]
     exact h4 _ _ _
 
-theorem posAt_maj {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
-    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det) :
-    PosAt b (fun v => majAt b X v) := by
+theorem posAt_maj
+    {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    : PosAt b (fun v => majAt b X v) := by
   intro v
   show (gramOf b (majAt b X v)).PosDef
   rw [gramOf_maj]
@@ -468,8 +499,7 @@ theorem posAt_maj {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [Deci
     intro a c hac
     have h1 := congrArg (X v).mulVec hac
     simpa [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (hX v)] using h1
-  first
-  | exact Matrix.PosDef.conjTranspose_mul_self _ hinj
+  first | exact Matrix.PosDef.conjTranspose_mul_self _ hinj
 
 end Forms
 
@@ -477,36 +507,42 @@ section Pull
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem pull_spec1 (B : HLat K) {W κ : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
-    [IsScalarTower (𝓞 K) K W] [Fintype κ] [DecidableEq κ] (c : Basis κ K W) (f : W →ₗ[K] B.V)
-    (hB : FrameOK B) (hf : Function.Injective f) :
-    FrameOK (pull B c f) ∧
-    (∀ v (x y : W), majAt (pull B c f).b (pull B c f).X v x y = majAt B.b B.X v (f x) (f y)) ∧
-    (∀ v (x : W), normAt (pull B c f).b (pull B c f).X v x = normAt B.b B.X v (f x)) := by
-  have hS : IsSesq (fun v x y => majAt B.b B.X v (f x) (f y)) :=
-    isSesq_comp (isSesq_maj B.b B.X) f
+theorem pull_spec1
+    (B : HLat K)
+    {W κ : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+    [Fintype κ] [DecidableEq κ]
+    (c : Basis κ K W)
+    (f : W →ₗ[K] B.V)
+    (hB : FrameOK B) (hf : Function.Injective f)
+    : FrameOK (pull B c f)
+      ∧ (∀ v (x y : W), majAt (pull B c f).b (pull B c f).X v x y = majAt B.b B.X v (f x) (f y))
+      ∧ (∀ v (x : W), normAt (pull B c f).b (pull B c f).X v x = normAt B.b B.X v (f x)) := by
+  have hS : IsSesq (fun v x y => majAt B.b B.X v (f x) (f y)) := isSesq_comp (isSesq_maj B.b B.X) f
   have hPos : PosAt c (fun v x y => majAt B.b B.X v (f x) (f y)) :=
     posAt_comp B.b c (isSesq_maj B.b B.X) (posAt_maj B.b B.X hB) f hf
   obtain ⟨h1, h2, h3⟩ := of_form_spec K W κ c (B.L.comap (f.restrictScalars (𝓞 K))) _ hS hPos
   refine ⟨h1, h2, fun v x => ?_⟩
   rw [h3, normAt_eq_sqrt]
 
-theorem map_comap_eq' {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
-    [IsScalarTower (𝓞 K) K W] (f : W →ₗ[K] V) (L : Submodule (𝓞 K) V) :
-    (L.comap (f.restrictScalars (𝓞 K))).map (f.restrictScalars (𝓞 K)) =
-      L ⊓ (LinearMap.range f).restrictScalars (𝓞 K) := by
+theorem map_comap_eq'
+    {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+    (f : W →ₗ[K] V) (L : Submodule (𝓞 K) V)
+    : (L.comap (f.restrictScalars (𝓞 K))).map (f.restrictScalars (𝓞 K))
+      = L ⊓ (LinearMap.range f).restrictScalars (𝓞 K) := by
   rw [Submodule.map_comap_eq, inf_comm]
-  first
-  | rfl
+  first | rfl
 
-theorem rkK_map {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
-    [IsScalarTower (𝓞 K) K W] (f : W →ₗ[K] V) (hf : Function.Injective f)
-    (N : Submodule (𝓞 K) W) : rkK (N.map (f.restrictScalars (𝓞 K))) = rkK N := by
+theorem rkK_map
+    {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+    (f : W →ₗ[K] V) (hf : Function.Injective f)
+    (N : Submodule (𝓞 K) W)
+    : rkK (N.map (f.restrictScalars (𝓞 K))) = rkK N := by
   unfold rkK
-  have hs : Submodule.span K ((N.map (f.restrictScalars (𝓞 K)) : Submodule (𝓞 K) V) : Set V) =
-      (Submodule.span K (N : Set W)).map f := by
+  have hs
+      : Submodule.span K ((N.map (f.restrictScalars (𝓞 K)) : Submodule (𝓞 K) V) : Set V)
+        = (Submodule.span K (N : Set W)).map f := by
     rw [Submodule.map_coe, ← Submodule.span_image]
     rfl
   rw [hs]
@@ -523,23 +559,30 @@ theorem pull_spec : PullSpec := by
     rw [map_comap_eq']
     exact Formalism.LFunctionChainParameters.slopeLatticeData.fg_of_le hL inf_le_left
   refine ⟨h1, h2, h3, fun hL => ?_, fun hG => ⟨h1, hfg hG.2.1, ?_⟩⟩
-  · obtain ⟨-, -, r3, r4, r5, -, -⟩ := rerealize K W κ B.V B.ι (pull B c f).b (pull B c f).X B.b B.X f
-      h1 hB hf (fun v x => (h3 v x).symm) (pull B c f).L (hfg hL)
-    have hm : (pull B c f).L.map (f.restrictScalars (𝓞 K)) =
-        B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K) := map_comap_eq' f B.L
+  · obtain ⟨-, -, r3, r4, r5, -, -⟩ :=
+      rerealize K W κ B.V B.ι (pull B c f).b (pull B c f).X B.b B.X f h1 hB hf
+        (fun v x => (h3 v x).symm)
+        (pull B c f).L (hfg hL)
+    have hm
+        : (pull B c f).L.map (f.restrictScalars (𝓞 K))
+          = B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K) :=
+      map_comap_eq' f B.L
     rw [hm] at r3 r4 r5
     refine ⟨hfg hL, ?_, ?_, ?_, ?_⟩
     · show rkK (pull B c f).L = rkK (B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K))
       rw [← hm, rkK_map f hf]
     · show muDef (pull B c f).b (pull B c f).X (pull B c f).L =
         muDef B.b B.X (B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K))
-      unfold muDef; rw [r3]
+      unfold muDef
+      rw [r3]
     · show muMaxDef (pull B c f).b (pull B c f).X (pull B c f).L =
         muMaxDef B.b B.X (B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K))
-      unfold muMaxDef; rw [r4]
+      unfold muMaxDef
+      rw [r4]
     · show muMinDef (pull B c f).b (pull B c f).X (pull B c f).L =
         muMinDef B.b B.X (B.L ⊓ (LinearMap.range f).restrictScalars (𝓞 K))
-      unfold muMinDef; rw [r5]
+      unfold muMinDef
+      rw [r5]
   · rw [eq_top_iff]
     intro x _
     have hx : f x ∈ Submodule.span K (B.L : Set B.V) := by rw [hG.2.2]; trivial
@@ -569,8 +612,8 @@ theorem cnorm_sq_eq (u : ι → ℂ) : ((cnorm u ^ 2 : ℝ) : ℂ) = star u ⬝�
   push_cast
   ring
 
-theorem cnorm_mulVec {M : Matrix κ ι ℂ} (h : M.conjTranspose * M = 1) (a : ι → ℂ) :
-    cnorm (M.mulVec a) = cnorm a := by
+theorem cnorm_mulVec {M : Matrix κ ι ℂ} (h : M.conjTranspose * M = 1) (a : ι → ℂ)
+    : cnorm (M.mulVec a) = cnorm a := by
   have h2 : ((cnorm (M.mulVec a) ^ 2 : ℝ) : ℂ) = ((cnorm a ^ 2 : ℝ) : ℂ) := by
     rw [cnorm_sq_eq, cnorm_sq_eq, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
       Matrix.mulVec_mulVec, h, Matrix.one_mulVec]
@@ -583,19 +626,22 @@ section DualSec
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {A B : HLat K}
 
-theorem vecAt_basis {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
-    (b : Basis ι K V) (v : InfinitePlace K) (i : ι) : vecAt b v (b i) = Pi.single i 1 := by
+theorem vecAt_basis
+    {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
+    (b : Basis ι K V) (v : InfinitePlace K) (i : ι)
+    : vecAt b v (b i) = Pi.single i 1 := by
   funext j
   simp only [vecAt]
   rw [b.repr_self]
   by_cases hj : j = i
   · subst hj
     simp
-  · simp [Finsupp.single_apply, Pi.single_apply, hj, Ne.symm hj]
+  · simp [hj]
 
-theorem fcoord_basis {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
-    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (i : ι) :
-    fcoord b X v (b i) = ((X v)⁻¹).col i := by
+theorem fcoord_basis
+    {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (i : ι)
+    : fcoord b X v (b i) = ((X v)⁻¹).col i := by
   unfold fcoord
   rw [vecAt_basis]
   ext j
@@ -604,10 +650,12 @@ theorem fcoord_basis {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [D
 def Iso.umat (I : Iso A B) (v : InfinitePlace K) : Matrix B.ι A.ι ℂ :=
   (B.X v)⁻¹ * (LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding * A.X v
 
-theorem Iso.fcoord_eq (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K) (x : A.V) :
-    fcoord B.b B.X v (I.e x) = (I.umat v).mulVec (fcoord A.b A.X v x) := by
-  have hv : vecAt B.b v (I.e x) =
-      ((LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding).mulVec (vecAt A.b v x) := by
+theorem Iso.fcoord_eq (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K) (x : A.V)
+    : fcoord B.b B.X v (I.e x) = (I.umat v).mulVec (fcoord A.b A.X v x) := by
+  have hv
+      : vecAt B.b v (I.e x)
+        = ((LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding).mulVec
+          (vecAt A.b v x) := by
     funext i
     show v.embedding (B.b.repr (I.e x) i) =
       (((LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding).mulVec
@@ -619,15 +667,17 @@ theorem Iso.fcoord_eq (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K) (x : 
   simp only [Iso.umat, Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (hA v),
     Matrix.mul_one]
 
-theorem Iso.umat_star_mul [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A)
-    (v : InfinitePlace K) : (I.umat v).conjTranspose * I.umat v = 1 := by
+theorem Iso.umat_star_mul
+    [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K)
+    : (I.umat v).conjTranspose * I.umat v = 1 := by
   have hcol : ∀ i, fcoord B.b B.X v (I.e (A.b i)) = fun k => (I.umat v * (A.X v)⁻¹) k i := by
     intro i
     rw [I.fcoord_eq hA, fcoord_basis]
     ext k
     simp [Matrix.mulVec, dotProduct, Matrix.mul_apply]
-  have hG : (I.umat v * (A.X v)⁻¹).conjTranspose * (I.umat v * (A.X v)⁻¹) =
-      ((A.X v)⁻¹).conjTranspose * (A.X v)⁻¹ := by
+  have hG
+      : (I.umat v * (A.X v)⁻¹).conjTranspose * (I.umat v * (A.X v)⁻¹)
+        = ((A.X v)⁻¹).conjTranspose * (A.X v)⁻¹ := by
     ext i j
     have h1 := I.maj v (A.b i) (A.b j)
     have h2 := congrFun (congrFun (gramOf_maj A.b A.X v) i) j
@@ -646,18 +696,22 @@ theorem Iso.umat_star_mul [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) 
     rw [hG2, Matrix.one_mul]
   exact hPu.mul_right_cancel hG3
 
-theorem Iso.umat_mul_symm (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K) :
-    I.umat v * I.symm.umat v = 1 := by
+theorem Iso.umat_mul_symm (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K)
+    : I.umat v * I.symm.umat v = 1 := by
   have hB := I.frameOK hA
-  have hM : (LinearMap.toMatrix A.b B.b I.e.toLinearMap) *
-      (LinearMap.toMatrix B.b A.b I.symm.e.toLinearMap) = 1 := by
+  have hM
+      : (LinearMap.toMatrix A.b B.b I.e.toLinearMap)
+          * (LinearMap.toMatrix B.b A.b I.symm.e.toLinearMap)
+        = 1 := by
     rw [← LinearMap.toMatrix_comp]
     have hc : I.e.toLinearMap ∘ₗ I.symm.e.toLinearMap = LinearMap.id := by
       ext y
       exact I.e.apply_symm_apply y
     rw [hc, LinearMap.toMatrix_id]
-  have hM' : (LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding *
-      (LinearMap.toMatrix B.b A.b I.symm.e.toLinearMap).map v.embedding = 1 := by
+  have hM'
+      : (LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding
+          * (LinearMap.toMatrix B.b A.b I.symm.e.toLinearMap).map v.embedding
+        = 1 := by
     rw [← Matrix.map_mul, hM, Matrix.map_one _ (map_zero _) (map_one _)]
   unfold Iso.umat
   simp only [Matrix.mul_assoc]
@@ -665,20 +719,21 @@ theorem Iso.umat_mul_symm (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K) :
     ← Matrix.mul_assoc ((LinearMap.toMatrix A.b B.b I.e.toLinearMap).map v.embedding), hM',
     Matrix.one_mul, Matrix.nonsing_inv_mul _ (hB v)]
 
-theorem Iso.umat_conjTranspose [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A)
-    (v : InfinitePlace K) : (I.umat v).conjTranspose = I.symm.umat v := by
-  calc (I.umat v).conjTranspose
-      = (I.umat v).conjTranspose * (I.umat v * I.symm.umat v) := by
-        rw [I.umat_mul_symm hA, Matrix.mul_one]
-    _ = I.symm.umat v := by
-        rw [← Matrix.mul_assoc, I.umat_star_mul hA, Matrix.one_mul]
+theorem Iso.umat_conjTranspose
+    [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K)
+    : (I.umat v).conjTranspose = I.symm.umat v := by
+  calc
+    (I.umat v).conjTranspose = (I.umat v).conjTranspose * (I.umat v * I.symm.umat v) := by
+      rw [I.umat_mul_symm hA, Matrix.mul_one]
+    _ = I.symm.umat v := by rw [← Matrix.mul_assoc, I.umat_star_mul hA, Matrix.one_mul]
 
-theorem Iso.umat_mul_star [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A)
-    (v : InfinitePlace K) : I.umat v * (I.umat v).conjTranspose = 1 := by
+theorem Iso.umat_mul_star
+    [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A) (v : InfinitePlace K)
+    : I.umat v * (I.umat v).conjTranspose = 1 := by
   rw [I.umat_conjTranspose hA, I.umat_mul_symm hA]
 
-def Iso.dual [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A) :
-    Iso (HLatOps.dual A) (HLatOps.dual B) where
+def Iso.dual [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK A)
+    : Iso (HLatOps.dual A) (HLatOps.dual B) where
   e := I.e.symm.dualMap
   map_L := by
     ext g
@@ -699,8 +754,9 @@ def Iso.dual [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK
       cnorm (fcoord A.b.dualBasis (dualFrame A.X) v f)
     set φB := fcoord B.b.dualBasis (dualFrame B.X) v (I.e.symm.dualMap f) with hφB
     set φA := fcoord A.b.dualBasis (dualFrame A.X) v f with hφA
-    have hpair : ∀ x : A.V, ((I.umat v).transpose.mulVec φB) ⬝ᵥ fcoord A.b A.X v x =
-        φA ⬝ᵥ fcoord A.b A.X v x := by
+    have hpair
+        : ∀ x : A.V,
+          ((I.umat v).transpose.mulVec φB) ⬝ᵥ fcoord A.b A.X v x = φA ⬝ᵥ fcoord A.b A.X v x := by
       intro x
       rw [Matrix.mulVec_transpose, ← Matrix.dotProduct_mulVec, ← I.fcoord_eq hA]
       have h1 := DualPolygon.ident_sum_fcoord B.b B.X hB v (I.e.symm.dualMap f) (I.e x)
@@ -711,19 +767,22 @@ def Iso.dual [_root_.NumberField.IsTotallyComplex K] (I : Iso A B) (hA : FrameOK
       rw [h3] at h1
       exact h1.trans h2.symm
     have hw : (I.umat v).transpose.mulVec φB = φA := by
-      have h0 : ∀ i, (Matrix.vecMul ((I.umat v).transpose.mulVec φB) (A.X v)⁻¹) i =
-          (Matrix.vecMul φA (A.X v)⁻¹) i := by
+      have h0
+          : ∀ i,
+            (Matrix.vecMul ((I.umat v).transpose.mulVec φB) (A.X v)⁻¹) i
+              = (Matrix.vecMul φA (A.X v)⁻¹) i := by
         intro i
         have := hpair (A.b i)
         rw [fcoord_basis] at this
         exact this
-      have h1 : Matrix.vecMul ((I.umat v).transpose.mulVec φB) (A.X v)⁻¹ =
-          Matrix.vecMul φA (A.X v)⁻¹ := funext h0
+      have h1
+          : Matrix.vecMul ((I.umat v).transpose.mulVec φB) (A.X v)⁻¹ = Matrix.vecMul φA (A.X v)⁻¹ :=
+        funext h0
       have h2 := congrArg (fun w => Matrix.vecMul w (A.X v)) h1
       simpa [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ (hA v)] using h2
     have hU : ((I.umat v).transpose).conjTranspose * (I.umat v).transpose = 1 := by
-      have : ((I.umat v).transpose).conjTranspose * (I.umat v).transpose =
-          (I.umat v * (I.umat v).conjTranspose).transpose := by
+      have : ((I.umat v).transpose).conjTranspose * (I.umat v).transpose
+          = (I.umat v * (I.umat v).conjTranspose).transpose := by
         rw [Matrix.transpose_mul]
         congr 1
       rw [this, I.umat_mul_star hA, Matrix.transpose_one]
@@ -746,11 +805,12 @@ theorem dual_numbers : DualNumbers := by
     simp only [HLat.rank] at hr
     omega
   have hs1 := sizeMu K A.V A.ι A.b A.X hG.1 A.L hG.2.1 hL
-  have hs2 := sizeMu K (Module.Dual K A.V) A.ι A.b.dualBasis (dualFrame A.X) hXd
-    (dualLat A.L) hd.1 hdne
+  have hs2 :=
+    sizeMu K (Module.Dual K A.V) A.ι A.b.dualBasis (dualFrame A.X) hXd (dualLat A.L) hd.1 hdne
   simp only at hs1 hs2
-  have hc : logDisc K / (2 * (Module.finrank ℚ K : ℝ)) =
-      logDisc K / (Module.finrank ℚ K : ℝ) / 2 := by rw [div_div, mul_comm]
+  have hc
+      : logDisc K / (2 * (Module.finrank ℚ K : ℝ)) = logDisc K / (Module.finrank ℚ K : ℝ) / 2 := by
+    rw [div_div, mul_comm]
   refine ⟨?_, ?_, ?_⟩
   · show muDef A.b.dualBasis (dualFrame A.X) (dualLat A.L) = -muDef A.b A.X A.L
     rw [hs2.2.1, hs1.2.1, hd.2.2.2.1, Real.log_inv]
@@ -782,9 +842,10 @@ section Emb
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem frameOK_of_emb (A B : HLat K) (ψ : A.V →ₗ[K] B.V) (hB : FrameOK B)
-    (hψ : Function.Injective ψ) (hn : ∀ v x, normAt A.b A.X v x = normAt B.b B.X v (ψ x)) :
-    FrameOK A := by
+theorem frameOK_of_emb
+    (A B : HLat K) (ψ : A.V →ₗ[K] B.V) (hB : FrameOK B) (hψ : Function.Injective ψ)
+    (hn : ∀ v x, normAt A.b A.X v x = normAt B.b B.X v (ψ x))
+    : FrameOK A := by
   intro v
   by_contra hv
   have h0 : ∀ y : A.V, y = 0 := by
@@ -804,23 +865,28 @@ theorem emb_numbers : EmbNumbers := by
   intro K _ _ _ A B ψ hB hψ hn
   have hA := frameOK_of_emb A B ψ hB hψ hn
   refine ⟨hA, fun N => ⟨(rkK_map ψ hψ N).symm, fun hN => ?_⟩⟩
-  obtain ⟨h1, -, h3, h4, h5, -, -⟩ := rerealize K A.V A.ι B.V B.ι A.b A.X B.b B.X ψ hA hB hψ
-    (fun v x => (hn v x).symm) N hN
+  obtain ⟨h1, -, h3, h4, h5, -, -⟩ :=
+    rerealize K A.V A.ι B.V B.ι A.b A.X B.b B.X ψ hA hB hψ (fun v x => (hn v x).symm) N hN
   refine ⟨?_, ?_, ?_, ?_⟩
   · show muDef A.b A.X N = muDef B.b B.X (N.map (ψ.restrictScalars (𝓞 K)))
-    unfold muDef; rw [h3]
+    unfold muDef
+    rw [h3]
   · show muMaxDef A.b A.X N = muMaxDef B.b B.X (N.map (ψ.restrictScalars (𝓞 K)))
-    unfold muMaxDef; rw [h4]
+    unfold muMaxDef
+    rw [h4]
   · show muMinDef A.b A.X N = muMinDef B.b B.X (N.map (ψ.restrictScalars (𝓞 K)))
-    unfold muMinDef; rw [h5]
+    unfold muMinDef
+    rw [h5]
   · show (2 / (finrank ℚ K : ℝ)) * Real.log (ht A.b A.X N) =
       (2 / (finrank ℚ K : ℝ)) * Real.log (ht B.b B.X (N.map (ψ.restrictScalars (𝓞 K))))
     rw [h1]
 
-theorem comap_fg {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
-    [IsScalarTower (𝓞 K) K W] (f : W →ₗ[K] V) (hf : Function.Injective f)
-    {L : Submodule (𝓞 K) V} (hL : L.FG) : (L.comap (f.restrictScalars (𝓞 K))).FG := by
+theorem comap_fg
+    {V W : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+    (f : W →ₗ[K] V) (hf : Function.Injective f)
+    {L : Submodule (𝓞 K) V} (hL : L.FG)
+    : (L.comap (f.restrictScalars (𝓞 K))).FG := by
   apply Submodule.fg_of_fg_map_injective (f.restrictScalars (𝓞 K)) hf
   rw [map_comap_eq']
   have hN : IsNoetherian (𝓞 K) L := isNoetherian_of_fg_of_noetherian L hL
@@ -832,8 +898,9 @@ section Ext
 
 open TensorProduct
 
-variable {K K' : Type} [Field K] [NumberField K] [StarRing K] [Field K'] [NumberField K']
-  [StarRing K'] [Algebra K K']
+variable
+  {K K' : Type}
+  [Field K] [NumberField K] [StarRing K] [Field K'] [NumberField K'] [StarRing K'] [Algebra K K']
 
 end Ext
 

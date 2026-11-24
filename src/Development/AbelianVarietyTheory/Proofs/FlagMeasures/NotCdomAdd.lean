@@ -3,7 +3,7 @@ module
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ActSingleNeZero
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactCasimirHighestWeight
 public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.DerivedModuleCoefficientsAndStableFlowsStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.DerivedModuleCoefficientsAndStableFlows
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IsCompactInvariantCompactSpan
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -157,8 +157,7 @@ theorem kType_iff
               → KHighest ε E μ u ∧ (kSpan ε E u).map V.subtype = S
                 ∧ FiniteDimensional ℂ (kSpan ε E u) := by
   intro n ε H _ _ _ σ V E hσ hD
-  obtain ⟨-, hst, hwt⟩ :=
-    GlobalTheory.T.derivedModule_coefficients_and_stable_flows n ε H σ V E hσ hD
+  obtain ⟨-, hst, hwt⟩ := _root_.GlobalTheory.Jet.Coef.coef_flow n ε H σ V E hσ hD
   have hR : KRel ε E := glRel_kRel ε E hD.1
   have hU : KUnit ε E := isUnitary_kUnit ε E hD.2.1
   have hIrr : KIrr :=

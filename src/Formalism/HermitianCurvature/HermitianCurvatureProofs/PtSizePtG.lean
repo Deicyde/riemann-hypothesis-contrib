@@ -65,7 +65,7 @@ def okG (m : ℕ) (Kc : Set ℂ) : (ℂ × ℂ) ⊕ ℂ → Prop
 
 theorem ptSize_ptG (h' : C.LPt) (m : ℕ) (q : (ℂ × ℂ) ⊕ ℂ)
     : D.ptSize (ptG h' m q) = D.ptSize h' + (m + 2) := by
-  cases q <;> simp [ptG, D.ptSize, List.map_append, List.sum_append] <;> omega
+  cases q <;> simp [ptG, D.ptSize, List.map_append, List.sum_append]
 
 def GermPlace : Prop :=
   ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]

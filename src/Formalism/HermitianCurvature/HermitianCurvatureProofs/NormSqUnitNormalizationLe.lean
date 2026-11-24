@@ -94,7 +94,7 @@ lemma n1_eI_eq_card {n : ℕ} (I : Finset (Fin n)) : N1 (eI I) = I.card := by
     split_ifs <;> rfl
   simp only [h]
   rw [Finset.sum_boole]
-  simp [Finset.filter_mem_eq_inter]
+  simp
 
 lemma Ninf_eI {n : ℕ} (I : Finset (Fin n)) : Ninf (eI I) ≤ 1 := by
   unfold Ninf
@@ -458,7 +458,7 @@ theorem family_expansion_of_parts
     _ = ((d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n)) ^ (P.r + 1) := by
       rw [hsq]; ring
     _ ≤ (2 * (d.n * Real.sqrt d.n) * d.H) ^ (P.r + 1) := by
-      first | exact pow_le_pow_left₀ hbase hb2 _ | exact pow_le_pow_left hbase hb2 _
+      first | exact pow_le_pow_left₀ hbase hb2 _
     _ = (2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H) ^ (P.r + 1) := by rw [hn32]
 
 theorem coefficient_growth_le_power

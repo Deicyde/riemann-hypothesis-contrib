@@ -301,7 +301,7 @@ private theorem nat_mul_factorial_bound
                 * (g : Matrix (Fin n) (Fin n) k) p p
               = (g : Matrix (Fin n) (Fin n) k) i p := by
           field_simp
-        simp only [bp, mul_zero, sub_zero, a, if_pos hip, e, sub_self]
+        simp only [bp, mul_zero, a, if_pos hip, e, sub_self]
     obtain ⟨u, hu, d, hd, c, hc', e⟩ :=
       ih (by omega) (U⁻¹ * g * L⁻¹) (K.mul_mem (K.mul_mem (K.inv_mem hU.1) hg) (K.inv_mem hL.1))
         hclean

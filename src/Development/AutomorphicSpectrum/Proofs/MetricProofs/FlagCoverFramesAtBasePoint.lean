@@ -57,25 +57,6 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.CovGraph
 
-theorem regAt_valAt_sum
-    {K : Type} [Fintype K]
-    {ι : K → Type} [∀ k, Fintype (ι k)]
-    {Ω : Type} [Field Ω]
-    {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x))
-    {α : Type} (s : Finset α) (f : α → Ω) (hf : ∀ a ∈ s, RegAt x (mCoordIdeal z) (f a))
-    : RegAt x (mCoordIdeal z) (∑ a ∈ s, f a)
-      ∧ valAt x (∑ a ∈ s, f a) z = ∑ a ∈ s, valAt x (f a) z := by
-  obtain ⟨h0, -, v0, -, hst⟩ :=
-    GlobalTheory.CompanionTheory.Ar.PB.ValRing.regAt_valAt_ring K ι Ω x z hz
-  induction s using Finset.induction_on with
-  | empty => simpa using ⟨h0, v0⟩
-  | insert a s ha ih =>
-    obtain ⟨ih1, ih2⟩ := ih fun b hb => hf b (Finset.mem_insert_of_mem hb)
-    have hfa := hf a (Finset.mem_insert_self a s)
-    obtain ⟨-, r, -, v⟩ := hst _ _ hfa ih1
-    rw [Finset.sum_insert ha, Finset.sum_insert ha]
-    exact ⟨r, v.trans (by rw [ih2])⟩
-
 theorem coE_regAt_valAt
     : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
         (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
@@ -152,8 +133,11 @@ theorem coE_regAt_valAt
       rw [v1, (hu I).2, (hmin I I').2]
       rfl
     have hin := fun I =>
-      regAt_valAt_sum hz (Finset.univ.filter (IsStepRows N j p.2)) _ fun I' _ => (hterm I I').1
-    have hout := regAt_valAt_sum hz Finset.univ _ fun I _ => (hin I).1
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg.reg_sum hz
+        (Finset.univ.filter (IsStepRows N j p.2)) _ fun I' _ => (hterm I I').1
+    have hout :=
+      _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg.reg_sum hz Finset.univ _ fun I _ =>
+        (hin I).1
     refine ⟨hout.1, ?_⟩
     refine hout.2.trans (Finset.sum_congr rfl fun I _ => ?_)
     rw [(hin I).2]

@@ -64,8 +64,6 @@ noncomputable section
 namespace GlobalTheory.LatStdStab
 open Matrix
 
-
-
 theorem latAt_mul_inv_eq_stdL
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts}
         {G : GlobalTheory.ChiGrid.GridData L sc} {W : G.Weil} (S : GridChoice W Set.univ)

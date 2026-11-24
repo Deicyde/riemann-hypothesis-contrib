@@ -52,6 +52,7 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 open GlobalTheory.LN
 open GlobalTheory.PsiRing
+
 theorem _root_.GlobalTheory.T.psiEven_descend_baseChange
     : GlobalFnsSt
       → ∀ (R V : Type) [CommRing R] [IsDomain R] [CommRing V] [IsDomain V] (φ : R →+* V)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.psiEven_descend_baseChange
           → (∀ x, (D'.c x).left ≫ β = spMap φ ≫ (D.c (xe x)).left)
           → ∀ gam : (TK V).left ⟶ (TK R).left,
             gam ≫ jK R = jK V ≫ spMap φ → PsiCmp D D' β v xe gam → D'.PsiEven → D.PsiEven := by
-  first
-  | exact @GlobalTheory.PsiRing.psiEven_descend
-  | exact GlobalTheory.PsiRing.psiEven_descend
-  | (intros; apply GlobalTheory.PsiRing.psiEven_descend <;> assumption)
+  first | exact @GlobalTheory.PsiRing.psiEven_descend

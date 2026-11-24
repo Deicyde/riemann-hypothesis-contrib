@@ -4,7 +4,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.FamilyConstants
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdAtKStdOfTwist
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdAtToEAfOfIsIdemSum
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceProjectionEqOfPrimeComponentEqStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ReferenceCharactersFactorTame
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceProjectionEqOfPrimeComponentEq
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -42,8 +45,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -59,6 +60,7 @@ open GlobalTheory.AdForm
 end GlobalTheory.Fam.MovedJoin
 namespace GlobalTheory.Fam
 open GlobalTheory.AdForm GlobalTheory.Fam.MovedJoin
+
 theorem QuadraticExtensionData.Reads.movedAt
     : ∀ {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws}
         {Z : TC.Later B (I.cols l)} {L : SizeData₂ (I.rec7 l Z)} {hT : GatTies (I.rec7 l Z)}
@@ -150,7 +152,7 @@ theorem QuadraticExtensionData.Reads.movedAt
       rfl
     have hk0 : (Formalism.L2.Theta.mt _ k₀).map (J.G i).q.pr = 1 := by
       refine map_eq_one_of_pr _ _ fun c d =>
-        GlobalTheory.T.splitPlaceProjection_eq_of_primeComponent_eq _ _ hidem _ _ ?_
+        _root_.GlobalTheory.SplitProj.pr_eq_of_adAt _ _ hidem _ _ ?_
       have h1 :=
         congrFun (congrFun hfin (finCongr (rankN (I.rec7 l Z) ((J.G i).s + 1) hm) c))
           (finCongr (rankN (I.rec7 l Z) ((J.G i).s + 1) hm) d)
@@ -197,7 +199,7 @@ theorem QuadraticExtensionData.Reads.movedAt
                 (J.P i) (Pi.single (e b) 1) x) := by
         have h5 := hent' (J.A.kA ((J.G i).s + 1) β) x (e b)
         exact (congrArg (adAt B.host.F (J.P i).1) h5).symm.trans h1
-      have h3 := GlobalTheory.T.splitPlaceProjection_eq_of_primeComponent_eq _ _ hidem _ _ h2
+      have h3 := _root_.GlobalTheory.SplitProj.pr_eq_of_adAt _ _ hidem _ _ h2
       have h4 : (finCongr (rankN (I.rec7 l Z) ((J.G i).s + 1) hm)).symm (e b) = e' b :=
         Fin.ext ((he b).trans (he' b).symm)
       refine h3.symm.trans ?_

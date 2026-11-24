@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnipotentComposition.Development
 
 @[expose] public section
 
@@ -89,7 +90,8 @@ theorem rAdj_realMul
     have e1 := hval Φ (c, Matrix.of x)
     have e2 := hval Ψ (c, Matrix.of x)
     simp only at e1 e2
-    rw [e1, e2, hsVec_smul_rd, hsVec_smul_rd, inner_smul_left, inner_smul_right,
+    rw [e1, e2, _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul,
+      _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul, inner_smul_left, inner_smul_right,
       Complex.conj_ofReal]
   exact ⟨htest, htest, fun Φ Ψ _ => hip Φ Ψ, fun Φ Ψ _ => hip Φ Ψ⟩
 
@@ -133,7 +135,8 @@ theorem rAdj_mulPair
     funext c
     congr 1
     funext x
-    rw [hW, hW', hsVec_smul_rd, hsVec_smul_rd, inner_smul_left, inner_smul_right]
+    rw [hW, hW', _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul,
+      _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul, inner_smul_left, inner_smul_right]
   have h2 : ∀ Φ Ψ : RadSp k r z z' π π', radIp μ (W' Φ) Ψ = radIp μ Φ (W Ψ) := by
     intro Φ Ψ
     unfold radIp
@@ -141,7 +144,9 @@ theorem rAdj_mulPair
     funext c
     congr 1
     funext x
-    rw [hW, hW', hsVec_smul_rd, hsVec_smul_rd, inner_smul_left, inner_smul_right, Complex.conj_conj]
+    rw [hW, hW', _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul,
+      _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul, inner_smul_left, inner_smul_right,
+      Complex.conj_conj]
   exact ⟨
     ⟨ht W m hW, ht W' _ hW', fun Φ Ψ _ => h1 Φ Ψ, fun Φ Ψ _ => h2 Φ Ψ⟩,
     ⟨ht W' _ hW', ht W m hW, fun Φ Ψ _ => h2 Φ Ψ, fun Φ Ψ _ => h1 Φ Ψ⟩

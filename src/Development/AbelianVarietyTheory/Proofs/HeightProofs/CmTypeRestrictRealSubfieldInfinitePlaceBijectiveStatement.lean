@@ -51,11 +51,9 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.cmType_restrict_realSubfield_infinitePlace_bijective
     : ∀ D : D7,
       Function.Bijective fun τ : D.what₂.Tau =>
         NumberField.InfinitePlace.mk ((tauE D τ).comp (algebraMap D.host.F D.host.E)) := by
-  first
-  | exact @GlobalTheory.CMTypePlaces.places_bijective
-  | exact GlobalTheory.CMTypePlaces.places_bijective
-  | (intros; apply GlobalTheory.CMTypePlaces.places_bijective <;> assumption)
+  first | exact @GlobalTheory.CMTypePlaces.places_bijective

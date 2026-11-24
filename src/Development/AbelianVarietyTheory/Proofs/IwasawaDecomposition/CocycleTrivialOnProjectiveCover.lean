@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsFrameCover
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueSpecializes
 
 @[expose] public section
 
@@ -64,15 +65,12 @@ private theorem valR_ne_zero_of_mem_basicOpen
     have h3 := congrArg (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom h0
     rw [map_zero] at h3
     rw [← h3]
-    first | exact (Iso.hom_inv_id_apply (Scheme.ΓSpecIso (CommRingCat.of A)) _).symm | simp
+    first | exact (Iso.hom_inv_id_apply (Scheme.ΓSpecIso (CommRingCat.of A)) _).symm
   have h4 : z ∈ w ⁻¹ᵁ X.basicOpen s := hs
   rw [Scheme.preimage_basicOpen] at h4
   have e1 : (Sp A).basicOpen ((w.appLE V ⊤ h).hom s) = ⊤ ⊓ (Sp A).basicOpen ((w.app V).hom s) := by
     show (Sp A).basicOpen ((Sp A).presheaf.map (homOfLE h).op ((w.app V).hom s)) = _
-    first
-    | exact Scheme.basicOpen_res _ _ _
-    | rw [Scheme.basicOpen_res]
-    | simp only [Scheme.basicOpen_res]
+    first | exact Scheme.basicOpen_res _ _ _
   have h2 : z ∈ (Sp A).basicOpen ((w.appLE V ⊤ h).hom s) := by
     rw [e1, top_inf_eq]
     exact h4
@@ -108,33 +106,6 @@ theorem eq_of_valR
   rw [← hz] at hy
   exact absurd hsub (valR_ne_zero_of_mem_basicOpen (Y.fromSpecResidueField y) V hw (f - g) _ hy)
 
-theorem le_inf'
-    {C : Type} [CommRing C]
-    {Y : Scheme.{0}} (w : Sp C ⟶ Y)
-    {U V : Y.Opens} (h : ⊤ ≤ w ⁻¹ᵁ U) (h' : ⊤ ≤ w ⁻¹ᵁ V)
-    : ⊤ ≤ w ⁻¹ᵁ (U ⊓ V) := by
-  rw [Scheme.Hom.preimage_inf]
-  exact le_inf h h'
-
-private theorem valR_resG_iwasawa_decomposition
-    {A : Type} [CommRing A]
-    {X : Scheme.{0}} (x : Sp A ⟶ X)
-    {U V : X.Opens} (e : V ≤ U) (h : ⊤ ≤ x ⁻¹ᵁ V) (s : Γ(X, U))
-    : valR x V (resG X e s) = valR x U s := by
-  have hU : ⊤ ≤ x ⁻¹ᵁ U := h.trans (fun z hz => e hz)
-  unfold valR
-  rw [dite_eq_left h, dite_eq_left hU]
-  congr 1
-  show (X.presheaf.map (homOfLE e).op ≫ x.appLE V ⊤ h).hom s = _
-  rw [Scheme.Hom.map_appLE]
-
-private theorem valR_mul_degeneration
-    {A : Type} [CommRing A]
-    {X : Scheme.{0}} (x : Sp A ⟶ X) (V : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ V) (s t : Γ(X, V))
-    : valR x V (s * t) = valR x V s * valR x V t := by
-  unfold valR
-  rw [dite_eq_left h, dite_eq_left h, dite_eq_left h, map_mul, map_mul]
-
 theorem valR_frac_mul
     {A τ : Type} [CommRing A] [SetLike τ A] [AddSubgroupClass τ A]
     (𝒜 : ℕ → τ) [GradedRing 𝒜]
@@ -146,13 +117,15 @@ theorem valR_frac_mul
     : valR y U₁ (frac 𝒜 U₁ a c ha hc h₁)
       = valR y U₂ (frac 𝒜 U₂ b c hb hc h₂) * valR y U₃ (frac 𝒜 U₃ a b ha hb h₃) := by
   have hW : ⊤ ≤ y ⁻¹ᵁ (U₁ ⊓ U₂ ⊓ U₃) :=
-    GlobalTheory.TwistEmb.le_inf' y (GlobalTheory.TwistEmb.le_inf' y y₁ y₂) y₃
+    _root_.GlobalTheory.Specialise.le_preimage_inf y
+      (_root_.GlobalTheory.Specialise.le_preimage_inf y y₁ y₂) y₃
   have e1 : U₁ ⊓ U₂ ⊓ U₃ ≤ U₁ := inf_le_left.trans inf_le_left
   have e2 : U₁ ⊓ U₂ ⊓ U₃ ≤ U₂ := inf_le_left.trans inf_le_right
   have e3 : U₁ ⊓ U₂ ⊓ U₃ ≤ U₃ := inf_le_right
-  rw [← valR_resG_iwasawa_decomposition y e1 hW, ← valR_resG_iwasawa_decomposition y e2 hW,
-    ← valR_resG_iwasawa_decomposition y e3 hW, ← valR_mul_degeneration y _ hW, resG_frac, resG_frac,
-    resG_frac]
+  rw [← _root_.GlobalTheory.ZH.CrdCalc.valR_res y e1 hW,
+    ← _root_.GlobalTheory.ZH.CrdCalc.valR_res y e2 hW,
+    ← _root_.GlobalTheory.ZH.CrdCalc.valR_res y e3 hW, ← _root_.GlobalTheory.Points.valR_mul y _ hW,
+    resG_frac, resG_frac, resG_frac]
   congr 1
   exact (frac_mul_eq (by ring)).symm
 
@@ -305,9 +278,7 @@ theorem exists_cover
     ?_
   ⟩
   · have ha : IsAffineOpen (Proj.basicOpen (grading O N) (F i)) := by
-      first
-      | exact Proj.isAffineOpen_basicOpen (grading O N) (F i) (hF i) hd
-      | exact Proj.isAffineOpen_basicOpen (grading O N) (F i) (f_deg := hF i) (hm := hd)
+      first | exact Proj.isAffineOpen_basicOpen (grading O N) (F i) (hF i) hd
     exact ha.preimage e
   · exact eq_top_iff.mpr fun x _ => TopologicalSpace.Opens.mem_iSup.mpr (hcov x)
   · have h6 :=
@@ -329,7 +300,7 @@ theorem exists_cover
           ≤ w
             ⁻¹ᵁ (e
               ⁻¹ᵁ (Proj.basicOpen (grading O N) (F i) ⊓ Proj.basicOpen (grading O N) (F i'))) :=
-      GlobalTheory.TwistEmb.le_inf' w hi hi'
+      _root_.GlobalTheory.Specialise.le_preimage_inf w hi hi'
     have a1 :=
       valR_app_eq_valR_comp w e (Proj.basicOpen (grading O N) (F i)) hi
         (frac (grading O N) (Proj.basicOpen (grading O N) (F i)) (F i₀) (F i) (hF i₀) (hF i) le_rfl)
@@ -350,14 +321,6 @@ theorem exists_cover
         hi hii' hi'
     exact a1.trans (a4.trans (congrArg₂ (· * ·) a2.symm a3.symm))
 
-private theorem valR_pow_iwasawa_decomposition
-    {A : Type} [CommRing A]
-    {X : Scheme.{0}} (x : Sp A ⟶ X) (V : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ V) (s : Γ(X, V))
-    (m : ℕ)
-    : valR x V (s ^ m) = valR x V s ^ m := by
-  unfold valR
-  rw [dite_eq_left h, dite_eq_left h, map_pow, map_pow]
-
 private theorem le_preimage_basicOpen_of_valR_ne_zero
     {k : Type} [Field k]
     {X : Scheme.{0}}
@@ -371,16 +334,13 @@ private theorem le_preimage_basicOpen_of_valR_ne_zero
         : (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom
             ((Scheme.ΓSpecIso (CommRingCat.of k)).hom.hom ((w.appLE V ⊤ h).hom s))
           = (w.appLE V ⊤ h).hom s := by
-      first | exact Iso.hom_inv_id_apply (Scheme.ΓSpecIso (CommRingCat.of k)) _ | simp
+      first | exact Iso.hom_inv_id_apply (Scheme.ΓSpecIso (CommRingCat.of k)) _
     rwa [e] at h3
   have h5 : (Sp k).basicOpen ((w.appLE V ⊤ h).hom s) = ⊤ := by
-    first | exact Scheme.basicOpen_of_isUnit _ hu | exact Scheme.basicOpen_of_isUnit hu
+    first | exact Scheme.basicOpen_of_isUnit _ hu
   have e1 : (Sp k).basicOpen ((w.appLE V ⊤ h).hom s) = ⊤ ⊓ (Sp k).basicOpen ((w.app V).hom s) := by
     show (Sp k).basicOpen ((Sp k).presheaf.map (homOfLE h).op ((w.app V).hom s)) = _
-    first
-    | exact Scheme.basicOpen_res _ _ _
-    | rw [Scheme.basicOpen_res]
-    | simp only [Scheme.basicOpen_res]
+    first | exact Scheme.basicOpen_res _ _ _
   rw [e1, top_inf_eq] at h5
   have h6 : w ⁻¹ᵁ X.basicOpen s = (Sp k).basicOpen ((w.app V).hom s) :=
     Scheme.preimage_basicOpen w s
@@ -401,43 +361,33 @@ theorem exists_ext
   have hD : X.basicOpen t ≤ V := X.basicOpen_le t
   by_cases hwD : ⊤ ≤ w ⁻¹ᵁ X.basicOpen t
   · have hb' : valR w V b = valR w W f * valR w V t ^ n := by
-      rw [← valR_resG_iwasawa_decomposition w hD hwD b,
-        ← valR_resG_iwasawa_decomposition w hW hwD f, ← valR_resG_iwasawa_decomposition w hD hwD t,
-        ← valR_pow_iwasawa_decomposition w _ hwD, ← valR_mul_degeneration w _ hwD]
+      rw [← _root_.GlobalTheory.ZH.CrdCalc.valR_res w hD hwD b,
+        ← _root_.GlobalTheory.ZH.CrdCalc.valR_res w hW hwD f,
+        ← _root_.GlobalTheory.ZH.CrdCalc.valR_res w hD hwD t,
+        ← _root_.GlobalTheory.Points.valR_pow w _ hwD,
+        ← _root_.GlobalTheory.Points.valR_mul w _ hwD]
       congr 1
       exact hb.symm
-    rw [valR_mul_degeneration w V hw, valR_pow_iwasawa_decomposition w V hw, hb']
+    rw [_root_.GlobalTheory.Points.valR_mul w V hw, _root_.GlobalTheory.Points.valR_pow w V hw, hb']
     ring
   · have ht : valR w V t = 0 := by
       by_contra hne
       exact hwD (le_preimage_basicOpen_of_valR_ne_zero w V hw t hne)
-    rw [valR_mul_degeneration w V hw, valR_pow_iwasawa_decomposition w V hw, ht]
+    rw [_root_.GlobalTheory.Points.valR_mul w V hw, _root_.GlobalTheory.Points.valR_pow w V hw, ht]
     simp [pow_add, pow_succ]
 
 private theorem valF_eq_valR_iwasawa_decomposition
     {k : Type} [Field k] {X : Scheme.{0}} (w : Sp k ⟶ X) (V : X.Opens) (f : Γ(X, V))
     : valF w V f = valR w V f := by
   unfold valF valR
-  first | rfl | (split_ifs <;> rfl)
-
-private theorem valR_one_iwasawa_decomposition
-    {A : Type} [CommRing A] {X : Scheme.{0}} (x : Sp A ⟶ X) (V : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ V)
-    : valR x V 1 = 1 := by
-  unfold valR
-  rw [dite_eq_left h, map_one, map_one]
-
-private theorem valR_zero_iwasawa_decomposition
-    {A : Type} [CommRing A] {X : Scheme.{0}} (x : Sp A ⟶ X) (V : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ V)
-    : valR x V 0 = 0 := by
-  unfold valR
-  rw [dite_eq_left h, map_zero, map_zero]
+  first | rfl
 
 private theorem valR_res_units_coe
     {A : Type} [CommRing A]
     {X : Scheme.{0}} (x : Sp A ⟶ X)
     {U V : X.Opens} (e : V ≤ U) (h : ⊤ ≤ x ⁻¹ᵁ V) (u : Γ(X, U)ˣ)
     : valR x V ((res e u : Γ(X, V)ˣ) : Γ(X, V)) = valR x U u :=
-  valR_resG_iwasawa_decomposition x e h u
+  _root_.GlobalTheory.ZH.CrdCalc.valR_res x e h u
 
 private theorem res_mul_res_eq_res_of_valR_cocycle
     {X : Scheme.{0}} [IsReduced X]
@@ -456,12 +406,12 @@ private theorem res_mul_res_eq_res_of_valR_cocycle
   have hi : ⊤ ≤ w ⁻¹ᵁ V i := fun z hz => (TopologicalSpace.Opens.mem_inf.mp (e1 (hw hz))).1
   have hj : ⊤ ≤ w ⁻¹ᵁ V j := fun z hz => (TopologicalSpace.Opens.mem_inf.mp (e1 (hw hz))).2
   have hl : ⊤ ≤ w ⁻¹ᵁ V l := fun z hz => (TopologicalSpace.Opens.mem_inf.mp (e2 (hw hz))).2
-  rw [valR_mul_degeneration w W hw, valR_res_units_coe w e1 hw, valR_res_units_coe w e2 hw,
-    valR_res_units_coe w e3 hw]
+  rw [_root_.GlobalTheory.Points.valR_mul w W hw, valR_res_units_coe w e1 hw,
+    valR_res_units_coe w e2 hw, valR_res_units_coe w e3 hw]
   have c1 := hcoc k w i j l hi hj
   have c2 := hcoc k w j l l hj hl
   have c3 := hcoc k w i l l hi hl
-  rw [htt l, valR_one_iwasawa_decomposition w _ hl, mul_one] at c2 c3
+  rw [htt l, _root_.GlobalTheory.Points.valR_one w _ hl, mul_one] at c2 c3
   rw [← c2, ← c3, c1]
 
 private theorem transition_self_eq_one_of_valR_cocycle
@@ -479,8 +429,8 @@ private theorem transition_self_eq_one_of_valR_cocycle
   intro k _ w hw
   have hi : ⊤ ≤ w ⁻¹ᵁ V i := fun z hz => (TopologicalSpace.Opens.mem_inf.mp (hw hz)).1
   have c := hcoc k w i i i hi hi
-  rw [htt i, valR_one_iwasawa_decomposition w _ hi, mul_one] at c
-  rw [valR_one_iwasawa_decomposition w _ hw]
+  rw [htt i, _root_.GlobalTheory.Points.valR_one w _ hi, mul_one] at c
+  rw [_root_.GlobalTheory.Points.valR_one w _ hw]
   exact c.symm
 
 theorem exists_twist_embedding
@@ -558,11 +508,11 @@ theorem exists_twist_embedding
     have hwU : ⊤ ≤ w ⁻¹ᵁ U (σ i) := hw.trans (fun z hz => hVU i hz)
     have e1 := congrArg (fun M => M b b') (hG1 k w (σ i) hwU)
     simp only [Matrix.map_apply, valF_eq_valR_iwasawa_decomposition] at e1
-    rw [hx i b i b' k w hw, htt i, valR_one_iwasawa_decomposition w _ hw, one_pow, one_mul, e1,
+    rw [hx i b i b' k w hw, htt i, _root_.GlobalTheory.Points.valR_one w _ hw, one_pow, one_mul, e1,
       Matrix.one_apply, Matrix.one_apply]
     split_ifs
-    · exact (valR_one_iwasawa_decomposition w _ hw).symm
-    · exact (valR_zero_iwasawa_decomposition w _ hw).symm
+    · exact (_root_.GlobalTheory.Points.valR_one w _ hw).symm
+    · exact (_root_.GlobalTheory.Points.valR_zero w _ hw).symm
   have hlaw
       : ∀ (k : Type) [Field k] (w : Sp k ⟶ X) (i i' : Fin m),
         ⊤ ≤ w ⁻¹ᵁ V i → ⊤ ≤ w ⁻¹ᵁ V i'
@@ -571,17 +521,17 @@ theorem exists_twist_embedding
               • ((A i').map (valF w (V i'))
                 * (G (σ i') (σ i)).map (valF w (U (σ i') ⊓ U (σ i)))) := by
     intro k _ w i i' hi hi'
-    have hii' : ⊤ ≤ w ⁻¹ᵁ (V i ⊓ V i') := GlobalTheory.TwistEmb.le_inf' w hi hi'
+    have hii' : ⊤ ≤ w ⁻¹ᵁ (V i ⊓ V i') := _root_.GlobalTheory.Specialise.le_preimage_inf w hi hi'
     have hUi : ⊤ ≤ w ⁻¹ᵁ U (σ i) := hi.trans (fun z hz => hVU i hz)
     have hUi' : ⊤ ≤ w ⁻¹ᵁ U (σ i') := hi'.trans (fun z hz => hVU i' hz)
     ext r b
     simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.mul_apply, smul_eq_mul,
       valF_eq_valR_iwasawa_decomposition, hA]
-    rw [Units.val_pow_eq_pow_val, valR_pow_iwasawa_decomposition w _ hii']
+    rw [Units.val_pow_eq_pow_val, _root_.GlobalTheory.Points.valR_pow w _ hii']
     cases ε.symm r with
     | none =>
-      simp only [Option.elim_none, valR_zero_iwasawa_decomposition w _ hi,
-        valR_zero_iwasawa_decomposition w _ hi', zero_mul, Finset.sum_const_zero, mul_zero]
+      simp only [Option.elim_none, _root_.GlobalTheory.Points.valR_zero w _ hi,
+        _root_.GlobalTheory.Points.valR_zero w _ hi', zero_mul, Finset.sum_const_zero, mul_zero]
     | some p =>
       obtain ⟨i₁, a⟩ := p
       simp only [Option.elim_some]

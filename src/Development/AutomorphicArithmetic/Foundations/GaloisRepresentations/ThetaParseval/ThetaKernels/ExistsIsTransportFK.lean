@@ -45,8 +45,6 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZ
 
 @[expose] public section
 
-
-
 section
 open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
@@ -133,7 +131,7 @@ theorem exists_isTransportF_k
     constructor
     · intro hf
       obtain ⟨Φ, hΦ, h⟩ :=
-        _root_.GlobalTheory.T.schrodinger_model_intertwining F E σ B hB nS nT JS JT hS hT ξ₀ hξ0 hσξ
+        _root_.GlobalTheory.ThetaOntoF.exists_thV_eqF_k F E σ B hB nS nT JS JT hS hT ξ₀ hξ0 hσξ
           hω.std _ (numCoordF co τ) he hr f hf
       refine ⟨_, comp_mem_schA τ.symm hΦ, ?_⟩
       rw [thetaTr_eqF co τ, ← h]
@@ -142,8 +140,8 @@ theorem exists_isTransportF_k
       simp [Function.comp_def]
     · rintro ⟨Φ, hΦ, rfl⟩
       rw [thetaTr_eqF co τ]
-      exact _root_.GlobalTheory.T.schrodinger_model_isomorphism F E σ B hB nS nT JS JT hS hT ξ₀ hξ0
-        hσξ hω.std _ (numCoordF co τ) he hr _ (comp_mem_schA τ hΦ)
+      exact _root_.GlobalTheory.ThetaTransformF.isThetaFunOF_thV_k F E σ B hB nS nT JS JT hS hT ξ₀
+        hξ0 hσξ hω.std _ (numCoordF co τ) he hr _ (comp_mem_schA τ hΦ)
   obtain ⟨om, hom⟩ :=
     exists_transport' _ _ _ hadd (thetaTr_smulF co) hinj hon (ω.comp (pairHomF hS hξ0 hA hB'))
       fun p f hf => hω.om_pres _ f hf

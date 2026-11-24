@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
+
 theorem _root_.GlobalTheory.T.le_preimage_openPart_iff_testCoordinates
     : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
         (ρ : S.Real) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J),
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.le_preimage_openPart_iff_testCoordinates
                 → Crd (Q.O1.pull (Q.P.hom ⁻¹ᵁ Q.W tm.l).ι) (Q.σ tm.l) x
                   ((tm.m.map fun a => IsLocalRing.residue (OO p) (t.u.j a)).mulVec w)
                 → (⊤ ≤ (x ≫ (Q.P.hom ⁻¹ᵁ Q.W tm.l).ι) ⁻¹ᵁ Q.G ↔ ∃ i, t.cls i = 0 ∧ w i ≠ 0) := by
-  first
-  | exact @GlobalTheory.ZH.TestCrit.le_preimage_G_iff_test
-  | exact GlobalTheory.ZH.TestCrit.le_preimage_G_iff_test
-  | (intros; apply GlobalTheory.ZH.TestCrit.le_preimage_G_iff_test <;> assumption)
+  first | exact @GlobalTheory.ZH.TestCrit.le_preimage_G_iff_test

@@ -2,7 +2,7 @@ module
 
 public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 public import Mathlib.RingTheory.WittVector.Defs
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WittVectorGaussNormUltrametricStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WittVectorGaussNormUltrametric
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -100,7 +100,8 @@ theorem witt_gaussNorm_mul
                 → ∀ x y, N (x * y) = N x * N y := by
   intro l hl R _ _ _ a h01 h0 h1 hmul hadd r hr0 hr1 N hN x y
   obtain ⟨Nadd, Nneg, Nmul⟩ :=
-    GlobalTheory.T.witt_vector_gauss_norm_ultrametric l R a h01 h0 h1 hmul hadd r hr0 hr1 N hN
+    _root_.GlobalTheory.WittGauss.gaussNorm_ultrametric_submul l R a h01 h0 h1 hmul hadd r hr0 hr1 N
+      hN
   set T : WittVector l R → ℕ → ℝ := fun x n => a (x.coeff n) ^ ((1 : ℝ) / (l : ℝ) ^ n) * r ^ n
     with hT
   have hN' : ∀ x, N x = ⨆ n, T x n := hN

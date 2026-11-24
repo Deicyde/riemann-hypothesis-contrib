@@ -66,8 +66,7 @@ theorem mem_scale {c : Kf} {M : Submodule O V} {x : V} : x ∈ scale c M ↔ ∃
 
 theorem scale_one (M : Submodule O V) : scale (1 : Kf) M = M := by
   ext x
-  rw [mem_scale]
-  simp
+  simp [mem_scale]
 
 end Gen
 
@@ -155,8 +154,7 @@ theorem vGeK_mul
     ring
 
 theorem vGeK_zero_iff {x : X.G.Kf} : X.vGeK x 0 ↔ x ∈ X.intK := by
-  rw [vGeK_iff, mem_intK, vsc_def]
-  simp
+  simp [vGeK_iff X, mem_intK X, vsc_def]
 
 theorem vGeK_one : X.vGeK 1 0 := by exact (vGeK_zero_iff X).2 ((mem_intK X).2 ⟨1, map_one _⟩)
 
@@ -195,8 +193,7 @@ theorem Rep.mul
 
 theorem Rep.inv {x : X.G.Kf} {N : ℤ} (hx : Rep X x N) : Rep X x⁻¹ (-N) := by
   obtain ⟨u, rfl⟩ := hx
-  refine ⟨u⁻¹, ?_⟩
-  rw [mul_inv, zpow_neg, map_units_inv]
+  exact ⟨u⁻¹, by rw [mul_inv, zpow_neg, map_units_inv]⟩
 
 theorem Rep.one : Rep X 1 0 := by exact ⟨1, by simp⟩
 
@@ -213,11 +210,8 @@ theorem Rep.pow (hfr : IsFractionRing X.G.O X.G.Kf) {x : X.G.Kf} {N : ℤ} (hx :
 theorem Rep.zpow (hfr : IsFractionRing X.G.O X.G.Kf) {x : X.G.Kf} {N : ℤ} (hx : Rep X x N) (k : ℤ)
     : Rep X (x ^ k) (k * N) := by
   rcases Int.eq_nat_or_neg k with ⟨n, rfl | rfl⟩
-  · have := Rep.pow X hfr hx n
-    rwa [zpow_natCast]
-  · have := Rep.inv X (Rep.pow X hfr hx n)
-    rw [zpow_neg, zpow_natCast, neg_mul]
-    exact this
+  · simpa [zpow_natCast] using Rep.pow X hfr hx n
+  · simpa [zpow_neg, zpow_natCast, neg_mul] using Rep.inv X (Rep.pow X hfr hx n)
 
 theorem Rep.ofP : Rep X (p : X.G.Kf) X.eO := by
   obtain ⟨u, hu⟩ := X.eO_spec
@@ -241,7 +235,7 @@ theorem exists_rep (hfr : IsFractionRing X.G.O X.G.Kf) {x : X.G.Kf} (hx : x ≠ 
   dsimp only [piK]
   rw [zpow_sub₀ hp, zpow_natCast, zpow_natCast, Units.val_mul]
   simp only [map_mul, map_pow, map_units_inv]
-  first | (field_simp; done) | (field_simp; ring)
+  first | (field_simp; done)
 
 theorem vGeK_iff_of_rep
     (hfr : IsFractionRing X.G.O X.G.Kf) {x : X.G.Kf} {N : ℤ} (hx : Rep X x N) (g : ℝ)
@@ -281,8 +275,7 @@ theorem vEqK_iff_of_rep
   · rintro ⟨h1, h2⟩
     have he : 0 < X.eO := by
       by_contra h0
-      have h00 : X.eO = 0 := by omega
-      have h0' : (X.eO : ℝ) = 0 := by exact_mod_cast h00
+      have h0' : (X.eO : ℝ) = 0 := by exact_mod_cast (show X.eO = 0 by omega)
       have h4 := h2 (g + 1) (by linarith)
       rw [h0', mul_zero] at h4 h1
       linarith
@@ -293,16 +286,14 @@ theorem vEqK_iff_of_rep
     have h5 : (N : ℝ) / X.eO * X.eO = N := by field_simp
     linarith [h2 ((N : ℝ) / X.eO) (by rw [lt_div_iff₀ hepos]; exact hlt)]
   · rintro ⟨he, h⟩
-    have hepos : (0 : ℝ) < X.eO := by exact_mod_cast he
     refine ⟨h.le, fun g' hg' => ?_⟩
     rw [← h]
-    exact mul_lt_mul_of_pos_right hg' hepos
+    exact mul_lt_mul_of_pos_right hg' (by exact_mod_cast he)
 
 theorem vEqK.ne_zero {x : X.G.Kf} {g : ℝ} (h : X.vEqK x g) : x ≠ 0 := by
   rintro rfl
-  have h' := h
-  unfold Sys.vEqK at h'
-  exact h'.2 (g + 1) (by linarith) (vGeK_zero X _)
+  unfold Sys.vEqK at h
+  exact h.2 (g + 1) (by linarith) (vGeK_zero X _)
 
 theorem vEqK.rep (hfr : IsFractionRing X.G.O X.G.Kf) {x : X.G.Kf} {g : ℝ} (h : X.vEqK x g)
     : ∃ N : ℤ, Rep X x N ∧ 0 < X.eO ∧ g * (X.eO : ℝ) = N := by
@@ -405,8 +396,7 @@ theorem vGe_mono
   rw [vsc_def, vsc_def, e, zpow_add₀ (piK_ne X hfr), zpow_natCast, map_pow]
 
 theorem vGe_zero_iff {j : ℕ} {F : X.Fm j} : X.vGe j F 0 ↔ F ∈ X.Int j := by
-  rw [vGe_iff, vsc_def]
-  simp
+  simp [vGe_iff X, vsc_def]
 
 theorem vGe_smul
     (hfr : IsFractionRing X.G.O X.G.Kf)
@@ -514,12 +504,7 @@ theorem tail_nonneg (h : Std p n' k1 t m c r TT a b lam0 w) (j l : ℕ)
 theorem clExp_nonneg (h : Std p n' k1 t m c r TT a b lam0 w) (j l : ℕ) (hl : l ≤ r)
     : 0 ≤ clExp t r lam0 w (j + 1) l := by
   rw [clExp_eq (j + 1) l hl]
-  apply add_nonneg
-  · apply Finset.sum_nonneg
-    intro s _
-    have := D_ge h s l hl
-    linarith
-  · exact tail_nonneg h j l
+  exact add_nonneg (Finset.sum_nonneg (fun s _ => by linarith [D_ge h s l hl])) (tail_nonneg h j l)
 
 theorem clExp_ge_al (h : Std p n' k1 t m c r TT a b lam0 w) (j : ℕ)
     : ∑ s ∈ TT.filter (fun s => ¬ IsOddPos s), al TT lam0 s ≤ clExp t r lam0 w (j + 1) r := by
@@ -541,11 +526,7 @@ theorem clExp_ge_al (h : Std p n' k1 t m c r TT a b lam0 w) (j : ℕ)
             (∑ i ∈ Icc 1 r, lamI lam0 s i - ∑ i ∈ Icc 1 (r - r), lamI lam0 s i + (r : ℤ) * w 1 s) :=
     by
       refine Finset.sum_le_sum fun s _ => ?_
-      have := D_ge_al h s
-      simp only [Nat.sub_self]
-      have e0 : ∑ i ∈ Icc 1 0, lamI lam0 s i = 0 := by simp
-      rw [e0]
-      linarith
+      simpa using D_ge_al h s
   linarith
 
 theorem mu_le
@@ -646,12 +627,13 @@ theorem Cii
     : (∀ l ≤ X.G.P.r, X.vGeK (X.cl v m (j + 1) l) 0)
       ∧ X.vGeK (X.cl v m (j + 1) X.G.P.r) (X.alEven v) := by
   have hfr := frac_of_place X v
-  constructor
-  · intro l hl
-    refine vGeK_mono X hfr ?_ (vGeK_cl X v m hm (j + 1) hj l)
-    exact_mod_cast clExp_nonneg (X.std v) j l hl
-  · refine vGeK_mono X hfr ?_ (vGeK_cl X v m hm (j + 1) hj X.G.P.r)
-    exact_mod_cast clExp_ge_al (X.std v) j
+  refine ⟨
+    fun l hl =>
+      vGeK_mono X hfr (by exact_mod_cast clExp_nonneg (X.std v) j l hl)
+        (vGeK_cl X v m hm (j + 1) hj l),
+    vGeK_mono X hfr (by exact_mod_cast clExp_ge_al (X.std v) j)
+      (vGeK_cl X v m hm (j + 1) hj X.G.P.r)
+  ⟩
 
 theorem vEqK_mHat
     (v : X.Pl) (u m : ℕ → X.G.Kf)
@@ -661,10 +643,10 @@ theorem vEqK_mHat
   have hfr := frac_of_place X v
   obtain ⟨_, _, he, _⟩ := vEqK.rep X hfr (hm l hl)
   unfold mHat
-  have h1 : X.vEqK (∏ l' ∈ Icc 1 (l - 1), u l') 0 :=
-    vEqK_prod_units X hfr he _ _ fun l' hl' => hu l' (by rw [mem_Icc] at hl hl' ⊢; omega)
-  have h2 := vEqK_mul X hfr (hm l hl) (vEqK_inv X hfr h1)
-  simpa using h2
+  simpa using
+    vEqK_mul X hfr (hm l hl)
+      (vEqK_inv X hfr
+        (vEqK_prod_units X hfr he _ _ fun l' hl' => hu l' (by rw [mem_Icc] at hl hl' ⊢; omega)))
 
 theorem theorem_of_alternate_form
     (D : Formalism.BasicNotions.D7) (h : KernelCommutationUpToUnits D X)
@@ -694,9 +676,7 @@ theorem CiiiGen
   obtain ⟨_, _, he, _⟩ := vEqK.rep X hfr (hu (j + 1) (mem_Icc.2 ⟨by omega, le_rfl⟩))
   have hU : ∀ i : ℕ, X.vGeK ((∏ l ∈ Icc 1 (j + 1), u l) ^ (-(i : ℤ))) 0 := by
     intro i
-    have h1 : X.vEqK (∏ l ∈ Icc 1 (j + 1), u l) 0 := vEqK_prod_units X hfr he _ _ hu
-    have h2 := (vEqK_zpow X hfr h1 (-(i : ℤ))).1
-    simpa using h2
+    simpa using (vEqK_zpow X hfr (vEqK_prod_units X hfr he _ _ hu) (-(i : ℤ))).1
   unfold Sys.Zop
   refine vGe_sum X _ _ fun l hl => ?_
   have hl' : l ≤ X.G.P.r := Nat.lt_succ_iff.1 (mem_range.1 hl)
@@ -730,8 +710,7 @@ theorem Ciii
   refine
     CiiiGen X v u m j (fun l hl => hu l (by rw [mem_Icc] at hl ⊢; omega)) hc hcr _ (h3 v j hj).2 ?_
   intro G hG
-  refine vGe_mono X (frac_of_place X v) (le_of_eq ?_) (h2b v j hj G hG)
-  ring
+  exact vGe_mono X (frac_of_place X v) (le_of_eq (by ring)) (h2b v j hj G hG)
 
 theorem eO_pos (v : X.Pl) : 0 < X.eO := by
   rcases Nat.eq_zero_or_pos X.eO with h0 | h0

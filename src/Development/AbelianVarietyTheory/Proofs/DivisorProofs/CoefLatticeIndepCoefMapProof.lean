@@ -53,9 +53,6 @@ open GlobalTheory.OnTies
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.CoefIndepProof
 
 theorem coefIndep : GlobalTheory.BaseCmp.CoefIndep := by

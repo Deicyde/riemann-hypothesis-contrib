@@ -270,7 +270,6 @@ theorem sval_rel
     (fun κ => congrArg J (liftB_fam hD hT hΘ₁ hΘ₂ ρ x κ))).trans (e.trans ?_)
   exact congrArg₂ (· * ·) (congrArg Units.val p) rfl
 
-
 include hT hΘ₁ hΘ₂ in
 theorem phiVal_pull
     (hG : GlobalFnsSt)

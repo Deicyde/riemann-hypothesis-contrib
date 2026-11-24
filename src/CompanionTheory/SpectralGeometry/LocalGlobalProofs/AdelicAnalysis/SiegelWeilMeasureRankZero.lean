@@ -2,7 +2,7 @@ module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountable
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompactStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompact
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ArithmeticUnitaryGroupDiscrete
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteCovolumeUnimodular
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitaryGroupFiniteVolume
@@ -163,7 +163,7 @@ theorem swMeas_zero
     ((GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hCM M J hJ).2 μ hμ).2 𝓕 h𝓕
   obtain ⟨⟨hLC, hSC, hT2⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
   obtain ⟨tg, lc, sc, t2, bs, -⟩ :=
-    GlobalTheory.T.adelic_unitary_group_locally_compact F E σ hCM M J hJ (AF F)
+    _root_.GlobalTheory.CompanionTheory.SW.TopH.topH_props F E σ hCM M J hJ (AF F)
   let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J
   haveI : Countable Γ := (GlobalTheory.CompanionTheory.SW.rational_countable_discrete F E σ hCM M J hJ).1
   haveI : μ.IsHaarMeasure := hμ

@@ -54,8 +54,6 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Mem GlobalTheory.Mem.R3.Tr Formalism.IndefR.Datum
 
-
-
 namespace GlobalTheory.HeightCounting.SerCopy
 
 variable {B : GlobalTheory.Mem.Base} {C : Cols B} {a : Late B C} (b : Late B C)

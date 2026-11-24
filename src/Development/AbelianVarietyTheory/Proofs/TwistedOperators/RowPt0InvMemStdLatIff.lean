@@ -58,9 +58,6 @@ attribute [local instance]
 
 noncomputable section
 
-
-
-
 namespace GlobalTheory.FirstRowLat
 
 variable {D : D7}

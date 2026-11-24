@@ -87,7 +87,7 @@ theorem mem_H0Lat {T : LocLat S.G S.Qp S.LL S.O} (t : ↥T.L.T)
     : t ∈ invariantLattice T ↔ ∀ g, T.actT g t = t := by
   simp only [invariantLattice, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
     LinearMap.id_apply, sub_eq_zero]
-  first | rfl | exact Iff.rfl | (constructor <;> intro h g <;> exact h g)
+  first | rfl
 
 theorem mem_fixDD {T : LocLat S.G S.Qp S.LL S.O} (x : S.W.DD T)
     : x ∈ fixDD S.W T

@@ -281,7 +281,7 @@ theorem BlockImageGenDeg.proof
 
   apply Int.cast_injective (α := ℚ)
   unfold genDeg GroundTheory.Heights₂.Heights.NumbersDVR.intNum
-  convert key using 6 <;> rfl
+  convert key using 6
 
 end
 

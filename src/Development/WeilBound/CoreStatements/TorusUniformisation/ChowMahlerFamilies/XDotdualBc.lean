@@ -54,8 +54,8 @@ namespace PositivityTheory.Xgn.A_dotdual_bc
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 
-theorem mem_dotDual (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) (w : Fin m → Ω) :
-    w ∈ dotDual R L ↔ ∀ v ∈ L, v ⬝ᵥ w ∈ R := by
+theorem mem_dotDual (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) (w : Fin m → Ω)
+    : w ∈ dotDual R L ↔ ∀ v ∈ L, v ⬝ᵥ w ∈ R := by
   simp only [dotDual, AddSubgroup.mem_iInf, AddSubgroup.mem_comap]
   rfl
 
@@ -67,14 +67,14 @@ theorem dot_bij (m : ℕ) : Function.Bijective (dotProductBilin Ω Ω (m := Fin 
   rw [h]
   exact (dotProductEquiv Ω (Fin m)).bijective
 
-theorem exists_system (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω))
-    (h : LocFree R m L) : ∃ (k : ℕ) (v l : Fin k × Fin m → Fin m → Ω), (∀ i, v i ∈ L) ∧
-      (∀ i, l i ∈ dotDual R L) ∧ ∀ j j', ∑ i, l i j * v i j' = if j' = j then 1 else 0 := by
-  let L' : Submodule R (Fin m → Ω) :=
-    { L with smul_mem' := fun a e he => h.1 a a.2 e he }
+theorem exists_system (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) (h : LocFree R m L)
+    : ∃ (k : ℕ) (v l : Fin k × Fin m → Fin m → Ω),
+      (∀ i, v i ∈ L) ∧ (∀ i, l i ∈ dotDual R L)
+        ∧ ∀ j j', ∑ i, l i j * v i j' = if j' = j then 1 else 0 := by
+  let L' : Submodule R (Fin m → Ω) := { L with smul_mem' := fun a e he => h.1 a a.2 e he }
   obtain ⟨k, φ, v, hφ, hv⟩ := LocFreeProj.exists_dualBasis (L := L') (r := m) h
-  refine ⟨k, fun i => v i, fun i j => φ i (Pi.single j 1), fun i => (v i).2, fun i => ?_,
-    fun j j' => ?_⟩
+  refine
+    ⟨k, fun i => v i, fun i j => φ i (Pi.single j 1), fun i => (v i).2, fun i => ?_, fun j j' => ?_⟩
   · rw [mem_dotDual]
     intro e he
     have h1 : e ⬝ᵥ (fun j => φ i (Pi.single j 1)) = φ i e := by
@@ -89,18 +89,26 @@ theorem exists_system (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m �
   · have := congrFun (hv (Pi.single j 1)) j'
     simpa [Finset.sum_apply, Pi.single_apply] using this
 
-theorem bc_dot {C : Type} [Field C] [Algebra Ω C] {m : ℕ} (a b : Fin m → Ω) :
-    bcMap Ω C (Fin m) a ⬝ᵥ bcMap Ω C (Fin m) b = algebraMap Ω C (a ⬝ᵥ b) := by
-
+theorem bc_dot {C : Type} [Field C] [Algebra Ω C] {m : ℕ} (a b : Fin m → Ω)
+    : bcMap Ω C (Fin m) a ⬝ᵥ bcMap Ω C (Fin m) b = algebraMap Ω C (a ⬝ᵥ b) := by
   simp [dotProduct, bcMap, map_sum]
 
 end PositivityTheory.Xgn.A_dotdual_bc
 
 open PositivityTheory.Xgn.A_dotdual_bc in
-theorem PositivityTheory.Xgn.t_dotdual_bc : ∀ {o Ω C : Type} [CommRing o] [Field Ω] [Field C] [Algebra o Ω] [Algebra o C] [Algebra Ω C] [IsScalarTower o Ω C] (R : Subalgebra o Ω) (RC : Subalgebra o C), (∀ a ∈ R, algebraMap Ω C a ∈ RC) → ∀ (m : ℕ) (L : AddSubgroup (Fin m → Ω)), LocFree R m L → LocFree R m (dotDual R L) ∧ dotDual R (dotDual R L) = L ∧ dotDual RC (spanOver RC (bcMap Ω C (Fin m) '' L)) = spanOver RC (bcMap Ω C (Fin m) '' (dotDual R L : AddSubgroup (Fin m → Ω))) := by
+theorem PositivityTheory.Xgn.t_dotdual_bc
+    : ∀ {o Ω C : Type} [CommRing o] [Field Ω] [Field C] [Algebra o Ω] [Algebra o C] [Algebra Ω C]
+        [IsScalarTower o Ω C] (R : Subalgebra o Ω) (RC : Subalgebra o C),
+      (∀ a ∈ R, algebraMap Ω C a ∈ RC)
+        → ∀ (m : ℕ) (L : AddSubgroup (Fin m → Ω)),
+          LocFree R m L
+            → LocFree R m (dotDual R L) ∧ dotDual R (dotDual R L) = L
+              ∧ dotDual RC (spanOver RC (bcMap Ω C (Fin m) '' L))
+                = spanOver RC (bcMap Ω C (Fin m) '' (dotDual R L : AddSubgroup (Fin m → Ω))) := by
   intro o Ω C _ _ _ _ _ _ _ R RC hR m L h
-  obtain ⟨h1, h2⟩ := DualLattice.locFree_dual R (dotProductBilin Ω Ω (m := Fin m) (A := Ω))
-    (dot_bij m) m L (dotDual R L) h (fun w => mem_dotDual R L w)
+  obtain ⟨h1, h2⟩ :=
+    DualLattice.locFree_dual R (dotProductBilin Ω Ω (m := Fin m) (A := Ω)) (dot_bij m) m L
+      (dotDual R L) h (fun w => mem_dotDual R L w)
   refine ⟨h1, ?_, ?_⟩
   · ext v
     rw [mem_dotDual, h2]
@@ -113,8 +121,10 @@ theorem PositivityTheory.Xgn.t_dotdual_bc : ∀ {o Ω C : Type} [CommRing o] [Fi
     rw [mem_dotDual] at hu
     have key : u = ∑ i, (bcMap Ω C (Fin m) (v i) ⬝ᵥ u) • bcMap Ω C (Fin m) (l i) := by
       funext j
-      have h3 : ∀ j', ∑ i, algebraMap Ω C (l i j) * algebraMap Ω C (v i j')
-          = if j' = j then 1 else 0 := fun j' => by
+      have h3
+          : ∀ j',
+            ∑ i, algebraMap Ω C (l i j) * algebraMap Ω C (v i j')
+              = if j' = j then 1 else 0 := fun j' => by
         have := congrArg (algebraMap Ω C) (hs j j')
 
         rw [map_sum] at this
@@ -124,14 +134,22 @@ theorem PositivityTheory.Xgn.t_dotdual_bc : ∀ {o Ω C : Type} [CommRing o] [Fi
       have h4 : ∀ (x : Fin m → Ω) j, bcMap Ω C (Fin m) x j = algebraMap Ω C (x j) := fun _ _ => rfl
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, dotProduct, h4, Finset.sum_mul]
       rw [Finset.sum_comm]
-      calc u j = ∑ j', (if j' = j then 1 else 0) * u j' := by simp
-        _ = _ := Finset.sum_congr rfl fun j' _ => by
-          rw [← h3, Finset.sum_mul]
-          exact Finset.sum_congr rfl fun i _ => by ring
+      calc
+        u j
+          = ∑ j', (if j' = j then 1 else 0) * u j' := by simp
+        _ = _ :=
+          Finset.sum_congr rfl fun j' _ => by
+            rw [← h3, Finset.sum_mul]
+            exact Finset.sum_congr rfl fun i _ => by ring
     rw [key]
     refine AddSubgroup.sum_mem _ fun i _ => AddSubgroup.subset_closure ?_
-    refine ⟨_, hu _ (AddSubgroup.subset_closure ⟨1, RC.one_mem, _, ⟨v i, hv i, rfl⟩, ?_⟩), _,
-      ⟨l i, hl i, rfl⟩, rfl⟩
+    refine ⟨
+      _,
+      hu _ (AddSubgroup.subset_closure ⟨1, RC.one_mem, _, ⟨v i, hv i, rfl⟩, ?_⟩),
+      _,
+      ⟨l i, hl i, rfl⟩,
+      rfl
+    ⟩
     rw [one_smul]
   · refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨a, ha, _, ⟨w, hw, rfl⟩, rfl⟩

@@ -60,9 +60,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Admis
 
 @[expose] public section
 
-
-
-
 section
 noncomputable section
 open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual

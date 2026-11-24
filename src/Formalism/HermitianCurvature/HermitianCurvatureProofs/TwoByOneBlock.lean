@@ -71,7 +71,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.TwoByOneBlock
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 section PartA
 
@@ -86,17 +87,15 @@ lemma emb_out_col (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * 
     embWb k r μ q j = if q = j then 1 else 0 := by
   unfold embWb
   rw [dif_neg (fun h => hj h.2)]
-  by_cases h : q = j
-  · subst h; rw [if_pos ⟨rfl, hj⟩, if_pos rfl]
-  · rw [if_neg (fun h' => h h'.1), if_neg h]
+  have hj' : ¬ (r ≤ j.val ∧ j.val ≤ r + k) := hj
+  by_cases h : q = j <;> simp [h, hj']
 
 lemma emb_out_row (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + k + 1)) (hq : ¬ mid k r q) :
     embWb k r μ q j = if q = j then 1 else 0 := by
   unfold embWb
   rw [dif_neg (fun h => hq h.1)]
-  by_cases h : q = j
-  · rw [if_pos ⟨h, hq⟩, if_pos h]
-  · rw [if_neg (fun h' => h h'.1), if_neg h]
+  change (if q = j ∧ ¬ mid k r q then 1 else 0) = if q = j then 1 else 0
+  simp [hq]
 
 lemma emb_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + k + 1)) (hq : mid k r q) (hj : mid k r j) :
     embWb k r μ q j = μ ⟨q.val - r, by have := hq; omega⟩ ⟨j.val - r, by have := hj; omega⟩ := by
@@ -111,7 +110,6 @@ lemma bc_mid_col (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) �
 
 lemma bc_mid_row_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
     (hi : mid k r i) (hj : ¬ mid k r j) : bigCell k r c μ i j = 0 := by
-  have h1 := hi
   have hjl := j.isLt
   unfold bigCell
   by_cases hj1 : j.val < r
@@ -134,8 +132,6 @@ lemma bc_out_row (c : Fin r → ℂ) (μ ν : Matrix (Fin (k + 1)) (Fin (k + 1))
 lemma bc_one_mid (c : Fin r → ℂ) (i j : Fin (2 * r + k + 1)) (hi : mid k r i) (hj : mid k r j) :
     bigCell k r c 1 i j = if i = j then 1 else 0 := by
   rw [bc_mid_col c 1 i j hj, dif_pos hi, Matrix.one_apply]
-  have h1 := hi
-  have h2 := hj
   simp only [Fin.ext_iff]
   by_cases h : i.val = j.val
   · rw [if_pos (by omega), if_pos h]
@@ -353,13 +349,11 @@ lemma emb_conjTranspose (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : (embWb k
       obtain ⟨y, rfl⟩ := mid_exists hj
       rw [emb_wI, emb_wI, Matrix.conjTranspose_apply]
     · rw [emb_out_row _ _ _ hj, emb_out_col _ _ _ hj]
-      by_cases h : i = j
-      · rw [if_pos h.symm, if_pos h, star_one]
-      · rw [if_neg (fun h' => h h'.symm), if_neg h, star_zero]
+      simp only [show i = j ↔ j = i from eq_comm]
+      by_cases h : j = i <;> simp [h]
   · rw [emb_out_col _ _ _ hi, emb_out_row _ _ _ hi]
-    by_cases h : i = j
-    · rw [if_pos h.symm, if_pos h, star_one]
-    · rw [if_neg (fun h' => h h'.symm), if_neg h, star_zero]
+    simp only [show i = j ↔ j = i from eq_comm]
+    by_cases h : j = i <;> simp [h]
 
 lemma emb_form_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (a b : Fin (k + 1)) :
     ((embWb k r μ)ᴴ * Hpk k r * embWb k r μ) (wI k r a) (wI k r b) = (μᴴ * Hb k * μ) a b := by
@@ -491,8 +485,7 @@ lemma UWset_iff {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mat k r
     obtain ⟨μ, hμ, rfl⟩ := (UWb_iff g).1 ⟨hg, hfix⟩
     refine ⟨μ, hμ, ?_, rfl⟩
     rw [← jV_wbPart hz, emb_mulVec_jV] at hgz
-    have := congrArg (wbPart k r) hgz
-    rwa [wbPart_jV, wbPart_jV] at this
+    simpa only [wbPart_jV] using congrArg (wbPart k r) hgz
   · rintro ⟨μ, hμ, hfz, rfl⟩
     obtain ⟨h1, h2⟩ := emb_mem_UWb (r := r) hμ
     refine ⟨h1, h2, ?_⟩
@@ -502,12 +495,7 @@ theorem uWbFacts : UWbFacts := by
   intro k r
   refine ⟨?_, ?_, ?_⟩
   · ext g
-    rw [UWb_iff]
-    constructor
-    · rintro ⟨μ, hμ, rfl⟩
-      exact ⟨μ, hμ, rfl⟩
-    · rintro ⟨μ, hμ, rfl⟩
-      exact ⟨μ, hμ, rfl⟩
+    simpa only [Set.mem_image, UH, eq_comm] using UWb_iff g
   · rintro z g ⟨hg, hfix, _⟩
     exact ⟨hg, hfix⟩
   · intro c m hm
@@ -544,44 +532,46 @@ lemma herm_symm (hH : Hᴴ = H) (x y : Fin m → ℂ) : herm H y x = star (herm 
   rw [← Matrix.star_dotProduct, Matrix.star_mulVec, hH, ← Matrix.dotProduct_mulVec]
 
 lemma herm_self_real (hH : Hᴴ = H) (x : Fin m → ℂ) : herm H x x = ((herm H x x).re : ℂ) := by
-  have h := herm_symm H hH x x
+  have h := congrArg Complex.im (herm_symm H hH x x)
+  simp only [Complex.star_def, Complex.conj_im] at h
   apply Complex.ext
   · simp
-  · have h2 := congrArg Complex.im h
-    simp only [Complex.star_def, Complex.conj_im] at h2
-    simp only [Complex.ofReal_im]
+  · simp only [Complex.ofReal_im]
     linarith
 
 end Herm
 
-theorem herm_UH {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ} (hg : g ∈ UH H) (x y : Fin m → ℂ) :
-    herm H (g *ᵥ x) (g *ᵥ y) = herm H x y := by
+theorem herm_UH {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ} (hg : g ∈ UH H) (x y : Fin m → ℂ)
+    : herm H (g *ᵥ x) (g *ᵥ y) = herm H x y := by
   have hg' : gᴴ * H * g = H := hg
   unfold herm
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hg']
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
+    hg']
 
-theorem mem_UH_of_herm {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ}
-    (h : ∀ x y : Fin m → ℂ, herm H (g *ᵥ x) (g *ᵥ y) = herm H x y) : g ∈ UH H := by
+theorem mem_UH_of_herm
+    {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ}
+    (h : ∀ x y : Fin m → ℂ, herm H (g *ᵥ x) (g *ᵥ y) = herm H x y)
+    : g ∈ UH H := by
   show gᴴ * H * g = H
   ext i j
   have h1 := h (Pi.single j 1) (Pi.single i 1)
   unfold herm at h1
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec] at h1
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+    at h1
   simpa [Pi.star_single] using h1
 
-def qrefl {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (d : Fin m → ℂ) (c : ℂ) : Matrix (Fin m) (Fin m) ℂ :=
+def qrefl {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (d : Fin m → ℂ) (c : ℂ)
+    : Matrix (Fin m) (Fin m) ℂ :=
   1 + c • Matrix.vecMulVec d (star d ᵥ* H)
 
 lemma qrefl_mulVec {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (d : Fin m → ℂ) (c : ℂ) (x : Fin m → ℂ) :
     qrefl H d c *ᵥ x = x + (c * herm H x d) • d := by
   have h1 : Matrix.vecMulVec d (star d ᵥ* H) *ᵥ x = herm H x d • d := by
+    rw [Matrix.vecMulVec_mulVec]
     unfold herm
     rw [Matrix.dotProduct_mulVec]
     ext i
-    simp only [Matrix.vecMulVec_apply, Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
-    apply Finset.sum_congr rfl
-    intro j _
-    ring
+    simp [mul_comm]
   unfold qrefl
   rw [Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, h1, smul_smul]
 
@@ -624,20 +614,23 @@ lemma exists_phase (s : ℂ) (q : ℝ) : ∃ θ : ℂ, θ * star θ = 1 ∧ ∃ 
     · have := norm_nonneg s
       nlinarith
 
-theorem UH_mul {m : ℕ} {H g h : Matrix (Fin m) (Fin m) ℂ} (hg : g ∈ UH H) (hh : h ∈ UH H) : g * h ∈ UH H := by
+theorem UH_mul {m : ℕ} {H g h : Matrix (Fin m) (Fin m) ℂ} (hg : g ∈ UH H) (hh : h ∈ UH H)
+    : g * h ∈ UH H := by
   apply mem_UH_of_herm
   intro x y
   rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, herm_UH hg, herm_UH hh]
 
-theorem trans {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (a b : Fin m → ℂ) (q : ℝ) (hq : q ≠ 0)
-    (ha : herm H a a = q) (hb : herm H b b = q) :
-    ∃ g ∈ UH H, g *ᵥ a = b ∧ ∀ x, herm H x a = 0 → herm H x b = 0 → g *ᵥ x = x := by
+theorem trans
+    {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (a b : Fin m → ℂ)
+    (q : ℝ) (hq : q ≠ 0) (ha : herm H a a = q) (hb : herm H b b = q)
+    : ∃ g ∈ UH H, g *ᵥ a = b ∧ ∀ x, herm H x a = 0 → herm H x b = 0 → g *ᵥ x = x := by
   obtain ⟨θ, hθ, t, ht, hqt⟩ := exists_phase (herm H a b) q
   have hqd : (q : ℝ) - t ≠ 0 := by
     intro h
     have : q * q ≤ 0 := by
       have : t = q := by linarith
-      rw [this] at hqt; exact hqt
+      rw [this] at hqt
+      exact hqt
     have h2 : 0 < q * q := mul_self_pos.2 hq
     linarith
   have hqdC : (q : ℂ) - t ≠ 0 := by exact_mod_cast hqd
@@ -651,7 +644,8 @@ theorem trans {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (a b : 
     rw [hd, herm_add_right, herm_smul_right, ha, star_neg]
     linear_combination -ht
   have hdd : herm H d d = 2 * ((q : ℂ) - t) := by
-    rw [hd, herm_add_left, herm_smul_left, ← hd, had, hd, herm_add_right, herm_smul_right, hb, hba, star_neg]
+    rw [hd, herm_add_left, herm_smul_left, ← hd, had, hd, herm_add_right, herm_smul_right, hb, hba,
+      star_neg]
     linear_combination (q : ℂ) * hθ - ht'
   have hR : qrefl H d (-1 / ((q : ℂ) - t)) ∈ UH H := by
     apply qrefl_mem H hH
@@ -678,28 +672,31 @@ theorem trans {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (a b : 
       linear_combination hθ
     rw [h2, one_smul]
   · intro x hxa hxb
-    have hxd : herm H x d = 0 := by
-      rw [hd, herm_add_right, herm_smul_right, hxa, hxb]; simp
-    rw [← Matrix.mulVec_mulVec, qrefl_mulVec H d, hxd, mul_zero, zero_smul, add_zero, qrefl_mulVec, hxb, mul_zero,
-      zero_smul, add_zero]
+    have hxd : herm H x d = 0 := by rw [hd, herm_add_right, herm_smul_right, hxa, hxb]; simp
+    rw [← Matrix.mulVec_mulVec, qrefl_mulVec H d, hxd, mul_zero, zero_smul, add_zero, qrefl_mulVec,
+      hxb, mul_zero, zero_smul, add_zero]
 
-theorem trans_fix {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (z v₁ v₂ : Fin m → ℂ) (T : ℝ) (hT : T ≠ 0)
-    (hz : herm H z z = -(T : ℂ)) (h12 : herm H v₁ v₁ = herm H v₂ v₂) (hζ : herm H v₁ z = herm H v₂ z)
-    (hne : (herm H v₁ v₁).re * T + Complex.normSq (herm H v₁ z) ≠ 0) :
-    ∃ g ∈ UH H, g *ᵥ z = z ∧ g *ᵥ v₁ = v₂ := by
+theorem trans_fix
+    {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (hH : Hᴴ = H) (z v₁ v₂ : Fin m → ℂ)
+    (T : ℝ) (hT : T ≠ 0) (hz : herm H z z = -(T : ℂ))
+    (h12 : herm H v₁ v₁ = herm H v₂ v₂) (hζ : herm H v₁ z = herm H v₂ z)
+    (hne : (herm H v₁ v₁).re * T + Complex.normSq (herm H v₁ z) ≠ 0)
+    : ∃ g ∈ UH H, g *ᵥ z = z ∧ g *ᵥ v₁ = v₂ := by
   have hTC : (T : ℂ) ≠ 0 := by exact_mod_cast hT
   set ζ : ℂ := herm H v₁ z with hζdef
   set q : ℝ := ((herm H v₁ v₁).re * T + Complex.normSq ζ) / T with hqdef
   have hq : q ≠ 0 := div_ne_zero hne hT
-  have key : ∀ v : Fin m → ℂ, herm H v z = ζ → herm H v v = herm H v₁ v₁ →
-      herm H (v + (ζ / T) • z) (v + (ζ / T) • z) = q ∧ herm H z (v + (ζ / T) • z) = 0 := by
+  have key
+      : ∀ v : Fin m → ℂ,
+        herm H v z = ζ → herm H v v = herm H v₁ v₁
+          → herm H (v + (ζ / T) • z) (v + (ζ / T) • z) = q ∧ herm H z (v + (ζ / T) • z) = 0 := by
     intro v hv hvv
     have hzv : herm H z v = star ζ := by rw [herm_symm H hH v z, hv]
     have hst : star (ζ / (T : ℂ)) = star ζ / T := by simp
-    have hns : (Complex.normSq ζ : ℂ) = ζ * star ζ := by
-      rw [Complex.star_def, Complex.mul_conj]
+    have hns : (Complex.normSq ζ : ℂ) = ζ * star ζ := by rw [Complex.star_def, Complex.mul_conj]
     constructor
-    · simp only [herm_add_left, herm_add_right, herm_smul_left, herm_smul_right, hv, hzv, hz, hvv, hst]
+    · simp only [herm_add_left, herm_add_right, herm_smul_left, herm_smul_right, hv, hzv, hz, hvv,
+        hst]
       rw [herm_self_real H hH v₁, hqdef]
       push_cast
       rw [hns]
@@ -728,14 +725,12 @@ lemma herm_star {m : ℕ} {H : Matrix (Fin m) (Fin m) ℂ} (hH : Hᴴ = H) (x y 
   rw [← Matrix.star_dotProduct_star, star_star, Matrix.star_mulVec, hH, ← Matrix.dotProduct_mulVec]
 
 lemma herm_self_eq (z : Fin (2 * r + k + 1) → ℂ) : herm (Hpk k r) z z = -((Tz k r z : ℝ) : ℂ) := by
-  have h := herm_star (hpkFacts k r).1 z z
-  have him : (herm (Hpk k r) z z).im = 0 := by
-    have := congrArg Complex.im h
-    simp only [Complex.star_def, Complex.conj_im] at this
-    linarith
+  have h := congrArg Complex.im (herm_star (hpkFacts k r).1 z z)
+  simp only [Complex.star_def, Complex.conj_im] at h
   apply Complex.ext
   · simp [Tz]
-  · simp [him]
+  · simp
+    linarith
 
 lemma inv_fix {a : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (ha : a ∈ UH (Hb k)) {x : Fin (k + 1) → ℂ}
     (hx : a *ᵥ x = x) : a⁻¹ *ᵥ x = x := by
@@ -765,13 +760,12 @@ lemma sec_vec {z z' : Fin (2 * r + k + 1) → ℂ} {μsec : ℂ → Matrix (Fin 
       herm (Hpk k r) (embWb k r (μsec ζ) *ᵥ z') (embWb k r (μsec ζ) *ᵥ z') = herm (Hpk k r) z' z' ∧
       herm (Hpk k r) (embWb k r (μsec ζ) *ᵥ z') z = ζ := by
   obtain ⟨hU, hval⟩ := hsec.2 ζ hζ
-  have hU' : μsec ζ ∈ UH (Hb k) := hU
   have e : embWb k r (μsec ζ) *ᵥ z' = jV k r (μsec ζ *ᵥ wbPart k r z') := by
     conv_lhs => rw [← jV_wbPart hz']
     rw [emb_mulVec_jV]
   rw [e]
   refine ⟨inWb_jV _, ?_, ?_⟩
-  · rw [herm_jV, herm_UH hU']
+  · rw [herm_jV, herm_UH hU]
     conv_rhs => rw [← jV_wbPart hz']
     rw [herm_jV]
   · conv_lhs => rw [← jV_wbPart hz]
@@ -780,11 +774,10 @@ lemma sec_vec {z z' : Fin (2 * r + k + 1) → ℂ} {μsec : ℂ → Matrix (Fin 
 theorem rankOneMem : RankOneMem := by
   intro k r z z' μsec hz hz' hsec ζ hζ h hh h' hh'
   obtain ⟨hU, hval⟩ := hsec.2 ζ hζ
-  have hU' : μsec ζ ∈ UH (Hb k) := hU
   obtain ⟨η, hη, hηz, rfl⟩ := (UWset_iff hz h).1 hh
   obtain ⟨η', hη', hηz', rfl⟩ := (UWset_iff hz' h').1 hh'
   rw [emb_inv hη, ← emb_mul, ← emb_mul]
-  refine ⟨(UWb_iff _).2 ⟨_, UHb_mul (UHb_mul (UHb_inv hη).2 hU') hη', rfl⟩, ?_⟩
+  refine ⟨(UWb_iff _).2 ⟨_, UHb_mul (UHb_mul (UHb_inv hη).2 hU) hη', rfl⟩, ?_⟩
   conv_lhs => rw [← jV_wbPart hz', ← jV_wbPart hz]
   rw [emb_mulVec_jV, herm_jV, ← Matrix.mulVec_mulVec, hηz', ← Matrix.mulVec_mulVec]
   conv_lhs => rw [← inv_fix hη hηz]
@@ -794,7 +787,6 @@ theorem rankOneCoord : RankOneCoord := by
   intro k r z z' μsec _ hz hz' hT _ hsec m hm hζ
   set ζ := herm (Hpk k r) (m *ᵥ z') z with hζdef
   obtain ⟨hU, _⟩ := hsec.2 ζ hζ
-  have hU' : μsec ζ ∈ UH (Hb k) := hU
   obtain ⟨s1, s2, s3⟩ := sec_vec hz hz' hsec hζ
   obtain ⟨ν, hν, rfl⟩ := (UWb_iff m).1 hm
   have e : embWb k r ν *ᵥ z' = jV k r (ν *ᵥ wbPart k r z') := by
@@ -804,11 +796,13 @@ theorem rankOneCoord : RankOneCoord := by
     rw [e, herm_jV, herm_UH hν]
     conv_rhs => rw [← jV_wbPart hz']
     rw [herm_jV]
-  obtain ⟨h, hh, hv⟩ := orbit (v₁ := embWb k r ν *ᵥ z') (v₂ := embWb k r (μsec ζ) *ᵥ z') hz
-    (by rw [e]; exact inWb_jV _) s1 hT.ne' (by rw [n1, s2]) (by rw [s3]) (by
-      rw [n1, herm_self_eq z', ← hζdef]
-      simp only [Complex.neg_re, Complex.ofReal_re]
-      nlinarith)
+  obtain ⟨h, hh, hv⟩ :=
+    orbit (v₁ := embWb k r ν *ᵥ z') (v₂ := embWb k r (μsec ζ) *ᵥ z') hz (by rw [e]; exact inWb_jV _)
+      s1 hT.ne' (by rw [n1, s2]) (by rw [s3])
+      (by
+        rw [n1, herm_self_eq z', ← hζdef]
+        simp only [Complex.neg_re, Complex.ofReal_re]
+        nlinarith)
   obtain ⟨η, hη, hηz, rfl⟩ := (UWset_iff hz h).1 hh
   have hfix : ((μsec ζ)⁻¹ * η * ν) *ᵥ wbPart k r z' = wbPart k r z' := by
     have h1 : η *ᵥ (ν *ᵥ wbPart k r z') = μsec ζ *ᵥ wbPart k r z' := by
@@ -818,13 +812,18 @@ theorem rankOneCoord : RankOneCoord := by
       conv_lhs => rw [← jV_wbPart hz']
       rw [emb_mulVec_jV, wbPart_jV]
     rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, h1, Matrix.mulVec_mulVec,
-      Matrix.nonsing_inv_mul _ (UHb_inv hU').1, Matrix.one_mulVec]
-  refine ⟨embWb k r η, hh, embWb k r ((μsec ζ)⁻¹ * η * ν),
-    (UWset_iff hz' _).2 ⟨_, UHb_mul (UHb_mul (UHb_inv hU').2 hη) hν, hfix, rfl⟩, ?_⟩
+      Matrix.nonsing_inv_mul _ (UHb_inv hU).1, Matrix.one_mulVec]
+  refine ⟨
+    embWb k r η,
+    hh,
+    embWb k r ((μsec ζ)⁻¹ * η * ν),
+    (UWset_iff hz' _).2 ⟨_, UHb_mul (UHb_mul (UHb_inv hU).2 hη) hν, hfix, rfl⟩,
+    ?_
+  ⟩
   rw [emb_inv hη, ← emb_mul, ← emb_mul]
   congr 1
   rw [Matrix.mul_assoc (μsec ζ)⁻¹, ← Matrix.mul_assoc _ (μsec ζ)⁻¹, Matrix.mul_assoc η⁻¹,
-    Matrix.mul_nonsing_inv _ (UHb_inv hU').1, Matrix.mul_one, ← Matrix.mul_assoc,
+    Matrix.mul_nonsing_inv _ (UHb_inv hU).1, Matrix.mul_one, ← Matrix.mul_assoc,
     Matrix.nonsing_inv_mul _ (UHb_inv hη).1, Matrix.one_mul]
 
 end PartC
@@ -898,7 +897,8 @@ lemma vol_Sq_le (n : ℕ) {b : ℝ} (hb : 0 ≤ b) :
   rw [hset, Measure.addHaar_smul, hfr, pow_mul, Real.sq_sqrt hb, abs_of_nonneg (pow_nonneg hb _)]
   rfl
 
-def dens (n : ℕ) : Measure ℝ := (volume.restrict (Ioi (0 : ℝ))).withDensity fun t => ENNReal.ofReal (t ^ n)
+def dens (n : ℕ) : Measure ℝ :=
+  (volume.restrict (Ioi (0 : ℝ))).withDensity fun t => ENNReal.ofReal (t ^ n)
 
 lemma dens_Iic (n : ℕ) (b : ℝ) : dens n (Iic b) = ENNReal.ofReal ((max b 0) ^ (n + 1) / (n + 1)) := by
   unfold dens
@@ -951,9 +951,8 @@ lemma cs_meas (T T' : ℝ) : Measurable (cs T T') := by
 
 lemma cs_real_sq {T T' s : ℝ} (hT : 0 < T) (hT' : 0 < T') (hs : 0 < s) :
     (-(√T * √(T' / s))) ^ 2 = T * T' / s := by
-  calc (-(√T * √(T' / s))) ^ 2 = (√T) ^ 2 * (√(T' / s)) ^ 2 := by ring
-    _ = T * (T' / s) := by rw [Real.sq_sqrt hT.le, Real.sq_sqrt (div_pos hT' hs).le]
-    _ = T * T' / s := by ring
+  rw [neg_sq, mul_pow, Real.sq_sqrt hT.le, Real.sq_sqrt (div_pos hT' hs).le]
+  ring
 
 lemma cs_sq {T T' s : ℝ} (hT : 0 < T) (hT' : 0 < T') (hs : 0 < s) :
     Complex.normSq (cs T T' s) = T * T' / s := by
@@ -961,7 +960,8 @@ lemma cs_sq {T T' s : ℝ} (hT : 0 < T) (hT' : 0 < T') (hs : 0 < s) :
   rw [Complex.normSq_ofReal, ← sq, cs_real_sq hT hT' hs]
 
 def Wf (n : ℕ) (T T' : ℝ) (φ : ℂ → ℝ≥0∞) : ℂ → ℝ≥0∞ :=
-  {ζ : ℂ | T * T' < Complex.normSq ζ}.indicator fun ζ => ENNReal.ofReal ((Complex.normSq ζ - T * T') ^ n) * φ ζ
+  {ζ : ℂ | T * T' < Complex.normSq ζ}.indicator fun ζ =>
+    ENNReal.ofReal ((Complex.normSq ζ - T * T') ^ n) * φ ζ
 
 lemma Wf_meas (n : ℕ) (T T' : ℝ) {φ : ℂ → ℝ≥0∞} (hφ : Measurable φ) : Measurable (Wf n T T' φ) := by
   unfold Wf
@@ -993,32 +993,25 @@ lemma lint_scale {a : ℝ} (ha : a ≠ 0) {g : ℂ → ℝ≥0∞} (hg : Measura
   rw [h, lintegral_smul_measure] at h2
   simpa only [Complex.real_smul, smul_eq_mul] using h2
 
-def Ff (T T' : ℝ) (φ : ℂ → ℝ≥0∞) (y : ℂ) : ℝ → ℝ≥0∞ := (Ioc 0 T').indicator fun s => φ (cs T T' s * y)
+def Ff (T T' : ℝ) (φ : ℂ → ℝ≥0∞) (y : ℂ) : ℝ → ℝ≥0∞ :=
+  (Ioc 0 T').indicator fun s => φ (cs T T' s * y)
 
 lemma Ff_meas (T T' : ℝ) {φ : ℂ → ℝ≥0∞} (hφ : Measurable φ) :
     Measurable fun p : ℂ × ℝ => Ff T T' φ p.1 p.2 := by
-  have : (fun p : ℂ × ℝ => Ff T T' φ p.1 p.2) =
-      (Prod.snd ⁻¹' Ioc 0 T').indicator fun p : ℂ × ℝ => φ (cs T T' p.2 * p.1) := by
-    funext p
-    by_cases h : p.2 ∈ Ioc 0 T'
-    · rw [Ff, Set.indicator_of_mem h, Set.indicator_of_mem (show p ∈ Prod.snd ⁻¹' Ioc 0 T' from h)]
-    · rw [Ff, Set.indicator_of_notMem h, Set.indicator_of_notMem (show ¬ p ∈ Prod.snd ⁻¹' Ioc 0 T' from h)]
-  rw [this]
-  exact (hφ.comp (((cs_meas T T').comp measurable_snd).mul measurable_fst)).indicator (measurable_snd measurableSet_Ioc)
+  unfold Ff
+  change Measurable ((Prod.snd ⁻¹' Ioc 0 T').indicator fun p : ℂ × ℝ =>
+    φ (cs T T' p.2 * p.1))
+  exact (hφ.comp (((cs_meas T T').comp measurable_snd).mul measurable_fst)).indicator
+    (measurable_snd measurableSet_Ioc)
 
 def Rf (n : ℕ) (T T' : ℝ) (φ : ℂ → ℝ≥0∞) (y : ℂ) : ℝ → ℝ≥0∞ :=
   (Ioc 0 T').indicator fun s => ENNReal.ofReal ((s / (T * T')) ^ n) * Wf n T T' φ (cs T T' s * y)
 
 lemma Rf_meas (n : ℕ) (T T' : ℝ) {φ : ℂ → ℝ≥0∞} (hφ : Measurable φ) :
     Measurable fun p : ℂ × ℝ => Rf n T T' φ p.1 p.2 := by
-  have : (fun p : ℂ × ℝ => Rf n T T' φ p.1 p.2) =
-      (Prod.snd ⁻¹' Ioc 0 T').indicator fun p : ℂ × ℝ =>
-        ENNReal.ofReal ((p.2 / (T * T')) ^ n) * Wf n T T' φ (cs T T' p.2 * p.1) := by
-    funext p
-    by_cases h : p.2 ∈ Ioc 0 T'
-    · rw [Rf, Set.indicator_of_mem h, Set.indicator_of_mem (show p ∈ Prod.snd ⁻¹' Ioc 0 T' from h)]
-    · rw [Rf, Set.indicator_of_notMem h, Set.indicator_of_notMem (show ¬ p ∈ Prod.snd ⁻¹' Ioc 0 T' from h)]
-  rw [this]
+  unfold Rf
+  change Measurable ((Prod.snd ⁻¹' Ioc 0 T').indicator fun p : ℂ × ℝ =>
+    ENNReal.ofReal ((p.2 / (T * T')) ^ n) * Wf n T T' φ (cs T T' p.2 * p.1))
   refine Measurable.indicator ?_ (measurable_snd measurableSet_Ioc)
   exact (ENNReal.measurable_ofReal.comp ((measurable_snd.div_const _).pow_const _)).mul
     ((Wf_meas n T T' hφ).comp (((cs_meas T T').comp measurable_snd).mul measurable_fst))
@@ -1105,64 +1098,84 @@ lemma outer_eq (n : ℕ) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {φ : ℂ → 
       (Ioc 0 T').indicator (fun s => ENNReal.ofReal ((s / (T * T')) ^ n) * ENNReal.ofReal (s / (T * T'))) s *
         ∫⁻ ζ : ℂ, Wf n T T' φ ζ := by
   by_cases hs : s ∈ Ioc 0 T'
-  · have hs0 : 0 < s := hs.1
-    simp only [Rf, Set.indicator_of_mem hs]
+  · simp only [Rf, Set.indicator_of_mem hs]
     have hm : Measurable fun y : ℂ => Wf n T T' φ (cs T T' s * y) :=
       (Wf_meas n T T' hφ).comp (measurable_const_mul _)
     rw [lintegral_const_mul _ hm]
     have hne : -(√T * √(T' / s)) ≠ 0 :=
-      neg_ne_zero.2 (mul_pos (Real.sqrt_pos.2 hT) (Real.sqrt_pos.2 (div_pos hT' hs0))).ne'
+      neg_ne_zero.2 (mul_pos (Real.sqrt_pos.2 hT) (Real.sqrt_pos.2 (div_pos hT' hs.1))).ne'
     unfold cs
-    rw [lint_scale hne (Wf_meas n T T' hφ), cs_real_sq hT hT' hs0, inv_div, mul_assoc]
+    rw [lint_scale hne (Wf_meas n T T' hφ), cs_real_sq hT hT' hs.1, inv_div, mul_assoc]
   · simp only [Rf, Set.indicator_of_notMem hs, lintegral_zero, zero_mul]
 
-theorem push_calc (k : ℕ) (hk : 1 ≤ k) (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T') :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ ∀ φ : ℂ → ℝ≥0∞, Measurable φ →
-      (∫⁻ u : Fin (k + 1) → ℂ in {u | 0 < Nq k u ∧ Nq k u ≤ T'},
-          φ (((-(√T * √(T' / Nq k u)) : ℝ) : ℂ) * u (Fin.last k))) =
-        c * ∫⁻ ζ : ℂ, ENNReal.ofReal (zWeight k T T' ζ) * φ ζ := by
+theorem push_calc (k : ℕ) (hk : 1 ≤ k) (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T')
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ∞
+        ∧ ∀ φ : ℂ → ℝ≥0∞,
+          Measurable φ
+            → (∫⁻ u : Fin (k + 1) → ℂ in {u | 0 < Nq k u ∧ Nq k u ≤ T'},
+                  φ (((-(√T * √(T' / Nq k u)) : ℝ) : ℂ) * u (Fin.last k)))
+              = c * ∫⁻ ζ : ℂ, ENNReal.ofReal (zWeight k T T' ζ) * φ ζ := by
   obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
   have hc0 : ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) ≠ 0 := mul_ne_zero (by simp) (Vb_ne_zero _)
-  have hct : ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) ≠ ∞ := ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) (Vb_ne_top _)
-  refine ⟨((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) * Jc n T T', mul_ne_zero hc0 (Jc_ne_zero n hT hT'),
-    ENNReal.mul_ne_top hct (Jc_ne_top n hT hT'), ?_⟩
+  have hct : ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) ≠ ∞ :=
+    ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) (Vb_ne_top _)
+  refine ⟨
+    ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) * Jc n T T',
+    mul_ne_zero hc0 (Jc_ne_zero n hT hT'),
+    ENNReal.mul_ne_top hct (Jc_ne_top n hT hT'),
+    ?_
+  ⟩
   intro φ hφ
   rw [lint_Wf]
   have hNq : Measurable (Nq (n + 1)) := by
     unfold Nq
     exact (Complex.continuous_normSq.measurable.comp (measurable_pi_apply _)).sub
-      (Finset.measurable_sum _ fun i _ => Complex.continuous_normSq.measurable.comp (measurable_pi_apply _))
+      (Finset.measurable_sum _ fun i _ =>
+        Complex.continuous_normSq.measurable.comp (measurable_pi_apply _))
   have hA : MeasurableSet {u : Fin (n + 1 + 1) → ℂ | 0 < Nq (n + 1) u ∧ Nq (n + 1) u ≤ T'} :=
     (measurableSet_lt measurable_const hNq).inter (measurableSet_le hNq measurable_const)
   rw [← lintegral_indicator hA]
-  let Φ : ℂ × (Fin (n + 1) → ℂ) → ℝ≥0∞ := fun p => Ff T T' φ p.1 (Complex.normSq p.1 - Sq (n + 1) p.2)
+  let Φ : ℂ × (Fin (n + 1) → ℂ) → ℝ≥0∞ := fun p =>
+    Ff T T' φ p.1 (Complex.normSq p.1 - Sq (n + 1) p.2)
   have hΦ : Measurable Φ :=
-    (Ff_meas T T' hφ).comp (measurable_fst.prodMk ((Complex.continuous_normSq.measurable.comp measurable_fst).sub
-      ((Sq_cont _).measurable.comp measurable_snd)))
+    (Ff_meas T T' hφ).comp
+      (measurable_fst.prodMk ((Complex.continuous_normSq.measurable.comp measurable_fst).sub
+        ((Sq_cont _).measurable.comp measurable_snd)))
   have e := volume_preserving_piFinSuccAbove (fun _ : Fin (n + 1 + 1) => ℂ) (Fin.last (n + 1))
-  have h1 : ∀ u : Fin (n + 1 + 1) → ℂ,
-      {u : Fin (n + 1 + 1) → ℂ | 0 < Nq (n + 1) u ∧ Nq (n + 1) u ≤ T'}.indicator
-        (fun u => φ (((-(√T * √(T' / Nq (n + 1) u)) : ℝ) : ℂ) * u (Fin.last (n + 1)))) u =
-      Φ (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1 + 1) => ℂ) (Fin.last (n + 1)) u) := by
+  have h1
+      : ∀ u : Fin (n + 1 + 1) → ℂ,
+        {u : Fin (n + 1 + 1) → ℂ | 0 < Nq (n + 1) u ∧ Nq (n + 1) u ≤ T'}.indicator
+            (fun u => φ (((-(√T * √(T' / Nq (n + 1) u)) : ℝ) : ℂ) * u (Fin.last (n + 1))))
+            u
+          = Φ (MeasurableEquiv.piFinSuccAbove
+            (fun _ : Fin (n + 1 + 1) => ℂ)
+            (Fin.last (n + 1)) u) := by
     intro u
-    have hv : MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1 + 1) => ℂ) (Fin.last (n + 1)) u =
-        (u (Fin.last (n + 1)), fun j : Fin (n + 1) => u j.castSucc) := by
+    have hv
+        : MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1 + 1) => ℂ) (Fin.last (n + 1)) u
+          = (u (Fin.last (n + 1)), fun j : Fin (n + 1) => u j.castSucc) := by
       simp [MeasurableEquiv.piFinSuccAbove, Fin.insertNthEquiv]
       rfl
     rw [hv]
     show _ = (Ioc 0 T').indicator (fun s => φ (cs T T' s * u (Fin.last (n + 1)))) (Nq (n + 1) u)
     rw [Set.indicator_apply, Set.indicator_apply]
     rfl
-  rw [lintegral_congr h1, e.lintegral_comp hΦ, Measure.volume_eq_prod, lintegral_prod _ hΦ.aemeasurable]
-  have h2 : ∀ y : ℂ, (∫⁻ x : Fin (n + 1) → ℂ, Φ (y, x)) =
-      ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) * ∫⁻ s : ℝ, Rf n T T' φ y s := fun y => inner_eq n hT hT' hφ y
-  have hJ : Measurable ((Ioc 0 T').indicator
-      fun s : ℝ => ENNReal.ofReal ((s / (T * T')) ^ n) * ENNReal.ofReal (s / (T * T'))) :=
+  rw [lintegral_congr h1, e.lintegral_comp hΦ, Measure.volume_eq_prod,
+    lintegral_prod _ hΦ.aemeasurable]
+  have h2
+      : ∀ y : ℂ,
+        (∫⁻ x : Fin (n + 1) → ℂ, Φ (y, x))
+          = ((n + 1 : ℕ) * Vb (n + 1) : ℝ≥0∞) * ∫⁻ s : ℝ, Rf n T T' φ y s := fun y =>
+    inner_eq n hT hT' hφ y
+  have hJ : Measurable ((Ioc 0 T').indicator fun s : ℝ =>
+      ENNReal.ofReal ((s / (T * T')) ^ n) * ENNReal.ofReal (s / (T * T'))) :=
     ((ENNReal.measurable_ofReal.comp ((measurable_id.div_const _).pow_const _)).mul
       (ENNReal.measurable_ofReal.comp (measurable_id.div_const _))).indicator measurableSet_Ioc
   rw [lintegral_congr h2, lintegral_const_mul _ (Rf_meas n T T' hφ).lintegral_prod_right',
-    lintegral_lintegral_swap (Rf_meas n T T' hφ).aemeasurable, lintegral_congr (outer_eq n hT hT' hφ),
-    lintegral_mul_const _ hJ, lintegral_indicator measurableSet_Ioc]
+    lintegral_lintegral_swap (Rf_meas n T T' hφ).aemeasurable,
+    lintegral_congr (outer_eq n hT hT' hφ), lintegral_mul_const _ hJ,
+    lintegral_indicator measurableSet_Ioc]
   unfold Jc
   ring
 
@@ -1205,12 +1218,12 @@ def scl (k : ℕ) (T' : ℝ) (u : Fin (k + 1) → ℂ) : Fin (k + 1) → ℂ := 
 
 def shell (k : ℕ) (T' : ℝ) : Set (Fin (k + 1) → ℂ) := {u | 0 < Nq k u ∧ Nq k u ≤ T'}
 
-def σb (k : ℕ) (T' : ℝ) : Measure (Fin (k + 1) → ℂ) := ((volume : Measure (Fin (k + 1) → ℂ)).restrict (shell k T')).map (scl k T')
+def σb (k : ℕ) (T' : ℝ) : Measure (Fin (k + 1) → ℂ) :=
+  ((volume : Measure (Fin (k + 1) → ℂ)).restrict (shell k T')).map (scl k T')
 
 lemma scl_meas (T' : ℝ) : Measurable (scl k T') := by
   unfold scl
-  have h : Measurable (Nq k) := Nq_cont.measurable
-  exact (Complex.measurable_ofReal.comp ((measurable_const.div h).sqrt)).smul measurable_id
+  exact (Complex.measurable_ofReal.comp ((measurable_const.div Nq_cont.measurable).sqrt)).smul measurable_id
 
 lemma shell_meas (T' : ℝ) : MeasurableSet (shell k T') :=
   (measurableSet_lt measurable_const Nq_cont.measurable).inter (measurableSet_le Nq_cont.measurable measurable_const)
@@ -1218,13 +1231,15 @@ lemma shell_meas (T' : ℝ) : MeasurableSet (shell k T') :=
 lemma mulVec_meas {m : ℕ} (μ : Matrix (Fin m) (Fin m) ℂ) : Measurable (fun u : Fin m → ℂ => μ *ᵥ u) :=
   (Continuous.matrix_mulVec continuous_const continuous_id).measurable
 
-theorem map_mulVec_volume {ι : Type} [Fintype ι] [DecidableEq ι] (M : Matrix ι ι ℂ) (h : ‖M.det‖ = 1) :
-    Measure.map (fun x : ι → ℂ => M *ᵥ x) volume = volume := by
+theorem map_mulVec_volume
+    {ι : Type} [Fintype ι] [DecidableEq ι] (M : Matrix ι ι ℂ) (h : ‖M.det‖ = 1)
+    : Measure.map (fun x : ι → ℂ => M *ᵥ x) volume = volume := by
   have hdet : LinearMap.det ((Matrix.toLin' M).restrictScalars ℝ) = 1 := by
     rw [LinearMap.det_restrictScalars, LinearMap.det_toLin', Algebra.norm_complex_apply,
       Complex.normSq_eq_norm_sq, h, one_pow]
-  have h2 := Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (ι → ℂ))
-    (f := (Matrix.toLin' M).restrictScalars ℝ) (by rw [hdet]; exact one_ne_zero)
+  have h2 :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (ι → ℂ))
+      (f := (Matrix.toLin' M).restrictScalars ℝ) (by rw [hdet]; exact one_ne_zero)
   rw [hdet] at h2
   have h3 : Measure.map (fun x : ι → ℂ => M *ᵥ x) volume = ENNReal.ofReal |(1 : ℝ)⁻¹| • volume := h2
   simpa using h3
@@ -1240,8 +1255,7 @@ lemma σb_inv (T' : ℝ) {μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hμ : μ
   congr 1
   have h2 : (fun u => μ *ᵥ u) ⁻¹' shell k T' = shell k T' := by
     ext u
-    show (0 < Nq k (μ *ᵥ u) ∧ Nq k (μ *ᵥ u) ≤ T') ↔ (0 < Nq k u ∧ Nq k u ≤ T')
-    rw [Nq_UH hμ]
+    simp [shell, Nq_UH hμ]
   conv_lhs => rw [← h2]
   rw [← Measure.restrict_map (mulVec_meas μ) (shell_meas T'), map_mulVec_volume μ (UHb_det hμ)]
 
@@ -1273,9 +1287,8 @@ lemma σb_push (hk : 1 ≤ k) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') (zb : Fin
   have hgi := UHb_inv hg
   have hf : (fun u => herm (Hb k) u zb) = (fun u => herm (Hb k) u z₀) ∘ (fun u => g⁻¹ *ᵥ u) := by
     funext u
-    have := herm_UH hg (g⁻¹ *ᵥ u) z₀
-    rw [hgz, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hgi.1, Matrix.one_mulVec] at this
-    exact this
+    simpa [hgz, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hgi.1, Matrix.one_mulVec] using
+      herm_UH hg (g⁻¹ *ᵥ u) z₀
   have hm0 : Measurable (fun u : Fin (k + 1) → ℂ => herm (Hb k) u z₀) := by
     simp only [herm_Hb]
     fun_prop
@@ -1303,27 +1316,29 @@ variable {k r : ℕ}
 lemma jV_meas : Measurable (jV k r) := by
   refine measurable_pi_iff.2 fun i => ?_
   unfold jV
-  by_cases h : r ≤ i.val ∧ i.val ≤ r + k
-  · simp only [dif_pos h]; exact measurable_pi_apply _
-  · simp only [dif_neg h]; exact measurable_const
+  split_ifs <;> (first | exact measurable_pi_apply _ | exact measurable_const)
 
 def adjF (x : Mt k r) : Mt k r := (Matrix.of x : Mat k r).adjugate
 
 def detF (x : Mt k r) : ℂ := (Matrix.of x : Mat k r).det
 
-theorem detF_cont : Continuous (detF (k := k) (r := r)) := Continuous.matrix_det (continuous_id (X := Mat k r))
+theorem detF_cont : Continuous (detF (k := k) (r := r)) :=
+  Continuous.matrix_det (continuous_id (X := Mat k r))
 
-theorem adjF_cont : Continuous (adjF (k := k) (r := r)) := Continuous.matrix_adjugate (continuous_id (X := Mat k r))
+theorem adjF_cont : Continuous (adjF (k := k) (r := r)) :=
+  Continuous.matrix_adjugate (continuous_id (X := Mat k r))
 
 theorem invM_smul : (invM : Mt k r → Mt k r) = fun x => (detF x)⁻¹ • adjF x := by
   funext x
   show (Ring.inverse (Matrix.of x : Mat k r).det • (Matrix.of x : Mat k r).adjugate : Mat k r) = _
-  rw [Ring.inverse_eq_inv']; rfl
+  rw [Ring.inverse_eq_inv']
+  rfl
 
 theorem invM_meas : Measurable (invM : Mt k r → Mt k r) := by
   rw [invM_smul]; exact detF_cont.measurable.inv.smul adjF_cont.measurable
 
-def act (h : Mt k r) (v : Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → ℂ := ((Matrix.of h : Mat k r)⁻¹ : Mat k r) *ᵥ v
+def act (h : Mt k r) (v : Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → ℂ :=
+  ((Matrix.of h : Mat k r)⁻¹ : Mat k r) *ᵥ v
 
 lemma act_meas' : Measurable (fun p : (Fin (2 * r + k + 1) → ℂ) × Mt k r => act p.2 p.1) := by
   refine measurable_pi_iff.2 fun i => ?_
@@ -1397,27 +1412,23 @@ lemma avg {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {μW : Measure (Mt
   have : ∀ᵐ h : Mt k r ∂μW, ∫⁻ v, F (act h v) ∂σV k r T' = ∫⁻ v, F v ∂σV k r T' := by
     filter_upwards [hae] with h hh
     have hi := σV_inv T' (UWset_inv_mem_UWb hz (h := Matrix.of h) hh)
-    calc ∫⁻ v, F (act h v) ∂σV k r T'
-        = ∫⁻ v, F v ∂((σV k r T').map (fun v => ((Matrix.of h : Mat k r)⁻¹ : Mat k r) *ᵥ v)) :=
-          (lintegral_map hF (mulVec_meas _)).symm
-      _ = _ := by rw [hi]
+    simp only [act]
+    rw [← lintegral_map hF (mulVec_meas _), hi]
   rw [lintegral_congr_ae this, lintegral_const, mul_comm]
 
 lemma avg_orbit {z : Fin (2 * r + k + 1) → ℂ} {μW : Measure (Mt k r)}
     (hW : IsHaarOn (UWset k r z) μW) {F : (Fin (2 * r + k + 1) → ℂ) → ℝ≥0∞} (hF : Measurable F)
     {h₁ : Mat k r} (hh₁ : h₁ ∈ UWset k r z) (v : Fin (2 * r + k + 1) → ℂ) :
     ∫⁻ h, F (act h v) ∂μW = ∫⁻ h, F (act h (h₁ *ᵥ v)) ∂μW := by
-  have hunit := GV_unit hh₁.1
   have hF2 : Measurable (fun y : Mt k r => F (act y (h₁ *ᵥ v))) :=
     hF.comp (act_meas_left _)
   have hlc : Continuous (lmulM h₁ : Mt k r → Mt k r) := by
     unfold lmulM
     exact (continuous_const (y := h₁)).matrix_mul (continuous_id (X := Mat k r))
-  have hlm : Measurable (lmulM h₁ : Mt k r → Mt k r) := hlc.measurable
   conv_rhs => rw [← hW.left h₁ hh₁]
-  rw [lintegral_map hF2 hlm]
+  rw [lintegral_map hF2 hlc.measurable]
   refine lintegral_congr fun h => ?_
-  rw [act_lmul hunit]
+  rw [act_lmul (GV_unit hh₁.1)]
 
 lemma herm_Hb_meas (zb : Fin (k + 1) → ℂ) : Measurable (fun u : Fin (k + 1) → ℂ => herm (Hb k) u zb) := by
   simp only [herm_Hb]
@@ -1474,28 +1485,39 @@ lemma key (hk : 1 ≤ k) {z z' : Fin (2 * r + k + 1) → ℂ} {μsec : ℂ → M
 
 theorem hypInv : HypInv := by
   intro k r z z' μsec μW hk hz hz' hT hT' hsec hW m hm
-  have hdef : hypMeas k r z z' μsec μW =
-      (((volume : Measure ℂ).withDensity fun ζ => ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW).map
-        (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z')) := rfl
+  have hdef
+      : hypMeas k r z z' μsec μW
+        = (((volume : Measure ℂ).withDensity fun ζ =>
+            ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW).map
+          (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z')) :=
+    rfl
   rw [hdef]
   have : IsFiniteMeasureOnCompacts μW := ⟨fun K hK => hW.finite_compact K hK⟩
   have : SigmaFinite μW := inferInstance
-  have hf : AEMeasurable (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z'))
-      (((volume : Measure ℂ).withDensity fun ζ => ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW) := by
+  have hf : AEMeasurable
+      (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z'))
+      (((volume : Measure ℂ).withDensity fun ζ =>
+        ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW) := by
     have hs := RankOneEmbeddings.R1.secF_meas hsec
     have hm := RankOneEmbeddings.R1.measurable_inv_mulVec_embWb_of_measSec (r := r) hs z'
     refine hm.aemeasurable.congr ?_
-    have hae : ∀ᵐ p ∂(((volume : Measure ℂ).withDensity fun ζ => ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW),
-        Tz k r z * Tz k r z' < Complex.normSq p.1 := by
-      apply (Measure.ae_prod_iff_ae_ae ((isOpen_lt continuous_const Complex.continuous_normSq).measurableSet.preimage measurable_fst)).2
+    have hae
+        : ∀ᵐ p ∂(((volume : Measure ℂ).withDensity fun ζ => ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW),
+          Tz k r z * Tz k r z' < Complex.normSq p.1 := by
+      apply (Measure.ae_prod_iff_ae_ae
+        ((isOpen_lt continuous_const Complex.continuous_normSq).measurableSet.preimage
+          measurable_fst)).2
       filter_upwards [ae_weight k (Tz k r z) (Tz k r z')] with ζ hζ
       exact Filter.Eventually.of_forall fun _ => hζ
     filter_upwards [hae] with p hp
     rw [RankOneEmbeddings.R1.secF_on (show p.1 ∈ RankOneEmbeddings.R1.Om k r z z' from hp)]
     rfl
   obtain ⟨c, hc0, hc1, hkey⟩ := key hk hz hz' hT hT' hsec hW hf
-  have hν : (((volume : Measure ℂ).withDensity fun ζ => ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW).map
-        (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z')) = c⁻¹ • ((μW Set.univ) • σV k r (Tz k r z')) := by
+  have hν
+      : (((volume : Measure ℂ).withDensity fun ζ =>
+            ENNReal.ofReal (zWeight k (Tz k r z) (Tz k r z') ζ)).prod μW).map
+          (fun p : ℂ × Mt k r => act p.2 (embWb k r (μsec p.1) *ᵥ z'))
+        = c⁻¹ • ((μW Set.univ) • σV k r (Tz k r z')) := by
     rw [← hkey, smul_smul, ENNReal.inv_mul_cancel hc0 hc1, one_smul]
   rw [hν, Measure.map_smul _ ((mulVec_meas m).aemeasurable.smul_measure _),
     Measure.map_smul _ (mulVec_meas m).aemeasurable, σV_inv _ hm]
@@ -1508,7 +1530,8 @@ namespace Formalism.FourierDecayAlt.P
 
 theorem unipotent_weyl_properties : Formalism.FourierDecayAlt.B2.UWbFacts := TwoByOneBlock.uWbFacts
 
-theorem weight_factorization : Formalism.FourierDecayAlt.B2.WeightFactor := TwoByOneBlock.weightFactor
+theorem weight_factorization : Formalism.FourierDecayAlt.B2.WeightFactor :=
+  TwoByOneBlock.weightFactor
 
 theorem hyperbolic_element_inverse : Formalism.FourierDecayAlt.B2.HypInv := TwoByOneBlock.hypInv
 
@@ -1517,7 +1540,8 @@ theorem b2_rank_one_mem : Formalism.FourierDecayAlt.B2.RankOneMem := TwoByOneBlo
 theorem b2_rank_one_coord : Formalism.FourierDecayAlt.B2.RankOneCoord := TwoByOneBlock.rankOneCoord
 
 theorem rank_one_integration_formula : Formalism.FourierDecayAlt.B2.RankOneInt :=
-  rank_one_formula_of_parts haar_measure_unique_up_to_scalar opposite_weyl_subgroup_closed weyl_subgroup_closed weyl_subgroup_compact
-    unipotent_weyl_properties b2_rank_one_mem b2_rank_one_coord hyperbolic_element_inverse
+  rank_one_formula_of_parts haar_measure_unique_up_to_scalar opposite_weyl_subgroup_closed
+    weyl_subgroup_closed weyl_subgroup_compact unipotent_weyl_properties b2_rank_one_mem
+    b2_rank_one_coord hyperbolic_element_inverse
 
 end Formalism.FourierDecayAlt.P

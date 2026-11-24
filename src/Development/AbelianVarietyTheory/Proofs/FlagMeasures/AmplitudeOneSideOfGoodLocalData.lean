@@ -3,8 +3,9 @@ module
 public import Formalism.SharpRestriction.CuspSpanNormBounds.NormalizedLocalScale
 public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPrAlt
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.BlockAnti
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FlagUnipotentLebesgueMeasureIsHaarOnStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarLieNilpotentEqLebesgueStatement
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.UpperOff
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FlagUnipotentLebesgueMeasureIsHaarOn
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarLieNilpotentEqLebesgue
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HcTypeWIrreducibleAndSchurAverage
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DerivedActionDiscreteSeriesProperties
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FrechetContinuousContinuousOnOrbitHasDerivAt
@@ -139,7 +140,7 @@ theorem isHaarOn_smul
 theorem haarLie_eq (x : ℝ)
     : haarLie (Nset k r) (ENNReal.ofReal x)
       = ENNReal.ofReal (x * 2 ^ (r * (k + 1) + r * (r - 1))) • lebN k r := by
-  have h := GlobalTheory.T.haar_lie_nilpotent_eq_lebesgue k r
+  have h := _root_.GlobalTheory.Amp.NLie.haarLie_eq_lebN k r
   unfold haarLie at h ⊢
   rw [one_smul] at h
   rw [h, smul_smul, mul_comm x, ENNReal.ofReal_mul (by positivity),
@@ -174,7 +175,7 @@ theorem oneSide_of
     hG,
     hW,
     hW1,
-    isHaarOn_smul (GlobalTheory.T.flagUnipotentLebesgueMeasure_isHaarOn k r) (by positivity),
+    isHaarOn_smul (_root_.GlobalTheory.Amp.NHaar.isHaarOn_lebN k r) (by positivity),
     hq,
     fun n _ => by unfold psi; rw [mul_comm]; exact Complex.norm_exp_ofReal_mul_I _,
     fun a ha m hm g hg => ?_,

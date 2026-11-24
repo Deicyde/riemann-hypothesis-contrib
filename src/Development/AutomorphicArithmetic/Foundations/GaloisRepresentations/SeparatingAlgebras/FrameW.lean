@@ -173,7 +173,7 @@ theorem UpperTheory.Gal.Gen.frameW_pf
               q
             = t j h
               * AddMonoidAlgebra.coeff (y : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a) q := by
-        simp [MvPolynomial.coeff_smul]
+        simp
       rw [e1, map_mul, norm_mul]
       have hlpos : (0 : ℝ) < (l : ℝ) := by linarith
       calc

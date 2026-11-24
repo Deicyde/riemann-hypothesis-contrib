@@ -50,6 +50,7 @@ open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 attribute [local instance] Over.cartesianMonoidalCategory
 open Classical
+
 theorem _root_.GlobalTheory.T.exists_linearEquiv_labelledLattices_unitaryTraits
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
       1 ≤ Dw.p + Dw.q
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_linearEquiv_labelledLattices_unitaryTraits
                 UIsLabW X wi ct yy → UIsLabW X wi ct' yy'
                   → ∃ e : ct.T.P.D.toPre.X ≃ₗ[𝓞 E] ct'.T.P.D.toPre.X, ∀ a μ,
                     yy a = QuotientAddGroup.mk μ → yy' a = QuotientAddGroup.mk (e μ) := by
-  first
-  | exact @GlobalTheory.UPoinc.exists_linearEquiv_labelled_of_uIsLabW
-  | exact GlobalTheory.UPoinc.exists_linearEquiv_labelled_of_uIsLabW
-  | (intros; apply GlobalTheory.UPoinc.exists_linearEquiv_labelled_of_uIsLabW <;> assumption)
+  first | exact @GlobalTheory.UPoinc.exists_linearEquiv_labelled_of_uIsLabW

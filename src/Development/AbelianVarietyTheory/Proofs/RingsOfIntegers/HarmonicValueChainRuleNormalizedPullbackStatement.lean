@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.harmonic_value_chain_rule_normalized_pullback
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)],
@@ -62,7 +64,4 @@ theorem _root_.GlobalTheory.T.harmonic_value_chain_rule_normalized_pullback
                       P ∈ HH c w n
                         → hv Xo c nab y k' F' P
                           = algebraMap c.F S (nrm Dw c w a) * hv Xo c nab y k F P := by
-  first
-  | exact @GlobalTheory.PlaceInt.hv_pulls
-  | exact GlobalTheory.PlaceInt.hv_pulls
-  | (intros; apply GlobalTheory.PlaceInt.hv_pulls <;> assumption)
+  first | exact @GlobalTheory.PlaceInt.hv_pulls

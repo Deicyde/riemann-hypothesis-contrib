@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.cosetSum_along_mulEquiv_subgroups
                     → GlobalTheory.Eis.CosetConv P₁ Γ₁ Φ₁ g)
                   ∧ GlobalTheory.Eis.cosetSum P₁ Γ₁ Φ₁ g
                     = c * GlobalTheory.Eis.cosetSum P₂ Γ₂ Φ₂ (κ (g * x)) := by
-  first
-  | exact @GlobalTheory.StdUnn.cosetSum_along_mulEquiv
-  | exact GlobalTheory.StdUnn.cosetSum_along_mulEquiv
-  | (intros; apply GlobalTheory.StdUnn.cosetSum_along_mulEquiv <;> assumption)
+  first | exact @GlobalTheory.StdUnn.cosetSum_along_mulEquiv

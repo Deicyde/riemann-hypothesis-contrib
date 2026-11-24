@@ -77,7 +77,7 @@ theorem gampi_letter (c : ZMod n) {x : W.DD T} (hx : x ∈ letS W T c)
     show W.γ₀ W.gamK ((letE c : LetA O n) j) = (letE c : LetA O n) j
     rcases eq_or_ne j c with rfl | h
     · simp [letE]
-    · simp [letE, Pi.single_apply, h]
+    · simp [letE, h]
   have key
       : ∀ y : W.DD T,
         W.γD T W.gamK ((letE c : LetA O n) • y) = (letE c : LetA O n) • W.γD T W.gamK y := by

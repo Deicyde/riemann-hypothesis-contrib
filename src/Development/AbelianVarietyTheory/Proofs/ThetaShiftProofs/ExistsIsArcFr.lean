@@ -4,13 +4,14 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianSchemeDimRigidifiedSym
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ConstantArcEigenbasisFlatBaseChange
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroupStatement
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArcStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueThetaOf
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieCombStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ThetaSectionOfArcNonzeroOnFibres
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.MemNonzeroLocusOfPull
 public import Formalism.LocalToGlobal.ProjectiveLattices.ArcTheta
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsConstantLieBasisArcGroup
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArc
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LieImgIffIsLieComb
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.MemNonzeroLocusOfPull
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,7 +55,6 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.T
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.LiePush
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.OneArc
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaCore
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.ChartLaw
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.UnivChartLoc
 import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.ArcLineFunctions.ArcSPin
@@ -93,7 +93,7 @@ theorem tan_iff (w : epsR S ⟶ t'.G) : IsTanAt x (w.left ≫ m.φ) ↔ IsTangen
       rw [Category.assoc, hw, a, ← spMap_comp]
       have : (TrivSqZeroExt.fstHom S S S).toRingHom.comp (algebraMap S (DualNumber S))
           = RingHom.id S := by
-        ext r; simp [TrivSqZeroExt.algebraMap_eq_inl]
+        ext r; simp
       rw [this]
       exact Spec.map_id _
   · intro h
@@ -222,7 +222,7 @@ theorem GlobalTheory.ArcQ.exists_isArcFr
     intro hG E _ _ _ H Dw l Xo c O _ β Y A _ _ _ _ b a χ W ρ e hB S _ ι hflat t' m2
     obtain ⟨v₀, hv₀, hB⟩ := hB
     obtain ⟨g, e₁, v, M, hev, hv, hcomb, hM⟩ :=
-      GlobalTheory.T.exists_constantLieBasis_arcGroup hG E H Dw l Xo c O β Y A b a χ W
+      _root_.GlobalTheory.ConstLie.exists_const_basis hG E H Dw l Xo c O β Y A b a χ W
     have hsm : Smooth W.t.G.hom := W.t.semi.smooth
     have hmon : ∀ x, IsMonHom (W.t.act.act x) := W.t.act.hom
     have hmon' : ∀ x, IsMonHom (t'.act.act x) := t'.act.hom
@@ -233,12 +233,12 @@ theorem GlobalTheory.ArcQ.exists_isArcFr
         : ∀ τ k, ∃ U : Fin g → A,
           IsLieComb (fun j => PowerSeries.C (R := A) (U j)) v (v₀ τ k) := fun τ k => by
       have ht : GtTanR (e τ k) :=
-        ((GlobalTheory.T.exists_unique_constant_tangent_vectors_along_arc hG E H Dw l Xo c O β Y A b
-          a χ W (e τ k)).2 _ (hv₀ τ k)).2 ((hB τ).1 k).1
+        ((_root_.GlobalTheory.ConstLie.main hG E H Dw l Xo c O β Y A b a χ W (e τ k)).2 _
+          (hv₀ τ k)).2 ((hB τ).1 k).1
       obtain ⟨U, hU, -⟩ := hcomb _ ht
       exact ⟨
         U,
-        (GlobalTheory.T.lieImg_iff_isLieComb_of_gtComb hG E H Dw l Xo c O β Y A b a χ W g U e₁
+        (_root_.GlobalTheory.ConstLin.lieImg_iff_isLieComb hG E H Dw l Xo c O β Y A b a χ W g U e₁
           (e τ k) v _
           (fun i => (hev i).2)
           hU).1 (hv₀ τ k)

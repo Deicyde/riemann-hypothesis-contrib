@@ -55,8 +55,6 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MtRead
 
-
-
 namespace GlobalTheory.MtLev
 
 theorem blockSizes_sub_eq_twoBlock {n : ℕ} (r : ℕ)

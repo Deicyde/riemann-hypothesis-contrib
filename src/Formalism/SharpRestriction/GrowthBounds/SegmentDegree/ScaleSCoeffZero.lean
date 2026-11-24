@@ -58,34 +58,37 @@ section Kill
 
 variable {R σ : Type} [CommRing R] (S : Set σ)
 
-
 open Classical in
 def kill : MvPolynomial σ R →ₐ[R] MvPolynomial σ R :=
   aeval fun v => if v ∈ S then 0 else MvPolynomial.X v
 
-
 open Classical in
 def scaleS : MvPolynomial σ R →ₐ[R] Polynomial (MvPolynomial σ R) :=
-  aeval fun v => if v ∈ S then Polynomial.X * Polynomial.C (MvPolynomial.X v) else Polynomial.C (MvPolynomial.X v)
-
+  aeval fun v =>
+    if v ∈ S then
+      Polynomial.X * Polynomial.C (MvPolynomial.X v)
+    else
+      Polynomial.C (MvPolynomial.X v)
 
 open Classical in
 def offDeg : (σ →₀ ℕ) →+ ℕ := Finsupp.liftAddHom fun v => if v ∈ S then AddMonoidHom.id ℕ else 0
 
-theorem scaleS_monomial (m : σ →₀ ℕ) :
-    scaleS (R := R) S (monomial m 1) = Polynomial.C (monomial m 1) * Polynomial.X ^ offDeg S m := by
+theorem scaleS_monomial (m : σ →₀ ℕ)
+    : scaleS (R := R) S (monomial m 1)
+      = Polynomial.C (monomial m 1) * Polynomial.X ^ offDeg S m := by
   classical
   induction m using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg =>
-    have : (monomial (f + g) (1 : R)) = monomial f 1 * monomial g 1 := by
-      rw [monomial_mul, one_mul]
+    have : (monomial (f + g) (1 : R)) = monomial f 1 * monomial g 1 := by rw [monomial_mul, one_mul]
     rw [this, map_mul, hf, hg, map_add (f := _), pow_add, map_mul]
     ring
   | single v k =>
     rw [← MvPolynomial.X_pow_eq_monomial, map_pow]
     by_cases hv : v ∈ S
-    · have h1 : scaleS (R := R) S (MvPolynomial.X v) = Polynomial.X * Polynomial.C (MvPolynomial.X v) := by
+    · have h1
+          : scaleS (R := R) S (MvPolynomial.X v)
+            = Polynomial.X * Polynomial.C (MvPolynomial.X v) := by
         simp [scaleS, hv]
       have h2 : offDeg S (Finsupp.single v k) = k := by simp [offDeg, hv]
       rw [h1, h2, mul_pow, Polynomial.C_pow, mul_comm]
@@ -96,8 +99,10 @@ theorem scaleS_monomial (m : σ →₀ ℕ) :
 
 theorem scaleS_coeff_zero (f : MvPolynomial σ R) : (scaleS S f).coeff 0 = kill S f := by
   classical
-  have h : (Polynomial.constantCoeff.comp (scaleS (R := R) S : MvPolynomial σ R →+* Polynomial (MvPolynomial σ R))) =
-      (kill (R := R) S : MvPolynomial σ R →+* MvPolynomial σ R) := by
+  have h
+      : (Polynomial.constantCoeff.comp
+          (scaleS (R := R) S : MvPolynomial σ R →+* Polynomial (MvPolynomial σ R)))
+        = (kill (R := R) S : MvPolynomial σ R →+* MvPolynomial σ R) := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp [scaleS, kill, MvPolynomial.algebraMap_eq]
@@ -106,9 +111,10 @@ theorem scaleS_coeff_zero (f : MvPolynomial σ R) : (scaleS S f).coeff 0 = kill 
   have := congrArg (fun g => g f) h
   simpa [Polynomial.constantCoeff_apply] using this
 
-theorem li_of_kill {ι : Type} (m : ι → σ →₀ ℕ) (w : ι → MvPolynomial σ R)
-    (h : LinearIndependent R fun q => monomial (m q) (1 : R) * kill S (w q)) :
-    LinearIndependent R fun q => monomial (m q) (1 : R) * w q := by
+theorem li_of_kill
+    {ι : Type} (m : ι → σ →₀ ℕ) (w : ι → MvPolynomial σ R)
+    (h : LinearIndependent R fun q => monomial (m q) (1 : R) * kill S (w q))
+    : LinearIndependent R fun q => monomial (m q) (1 : R) * w q := by
   classical
   rw [linearIndependent_iff'] at h ⊢
   intro s a hsum
@@ -129,10 +135,14 @@ theorem li_of_kill {ι : Type} (m : ι → σ →₀ ℕ) (w : ι → MvPolynomi
     rw [this, zero_smul]
   have hΘ := congrArg (fun P => (scaleS S P).coeff δ) hsum'
 
-  simp only [map_sum, map_smul, map_mul, scaleS_monomial, Polynomial.finsetSum_coeff, Polynomial.coeff_smul,
-  map_zero, Polynomial.coeff_zero] at hΘ
-  have hterm : ∀ q ∈ s', (Polynomial.C (monomial (m q) (1 : R)) * Polynomial.X ^ offDeg S (m q) *
-      scaleS S (w q)).coeff δ = if offDeg S (m q) = δ then monomial (m q) (1 : R) * kill S (w q) else 0 := by
+  simp only [map_sum, map_smul, map_mul, scaleS_monomial, Polynomial.finsetSum_coeff,
+      Polynomial.coeff_smul, map_zero, Polynomial.coeff_zero]
+    at hΘ
+  have hterm
+      : ∀ q ∈ s',
+        (Polynomial.C (monomial (m q) (1 : R)) * Polynomial.X ^ offDeg S (m q)
+            * scaleS S (w q)).coeff δ
+          = if offDeg S (m q) = δ then monomial (m q) (1 : R) * kill S (w q) else 0 := by
     intro q hq
     rw [mul_assoc, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow_mul']
     have hle := hmin q hq
@@ -142,7 +152,9 @@ theorem li_of_kill {ι : Type} (m : ι → σ →₀ ℕ) (w : ι → MvPolynomi
     · exact absurd (le_of_eq h2) h1
     · rw [mul_zero]
   rw [Finset.sum_congr rfl fun q hq => by rw [hterm q hq]] at hΘ
-  have hΘ' : ∑ q ∈ s'.filter (fun q => offDeg S (m q) = δ), a q • (monomial (m q) (1 : R) * kill S (w q)) = 0 := by
+  have hΘ'
+      : ∑ q ∈ s'.filter (fun q => offDeg S (m q) = δ), a q • (monomial (m q) (1 : R) * kill S (w q))
+        = 0 := by
     rw [Finset.sum_filter]
     refine Eq.trans (Finset.sum_congr rfl fun q _ => ?_) hΘ
     split_ifs <;> simp
@@ -163,22 +175,28 @@ omit [NeZero n'] in
 def monTau (j : ℤ) (u : Fin r × Fin r → ℕ) : ℤ × Fin (r + K) →₀ ℕ :=
   ∑ v : Fin r × Fin r, Finsupp.single (X.F.fr j v.1.val, Fin.castAdd K v.2) (u v)
 
-def wordEl (O : Type) [CommRing O] (j : ℤ)
-    (q : (Fin (segN X.F j + 1) → Fin (r + K) → ℤ) × (ℤ → Finset (Fin K)) × (Fin r × Fin r → ℕ)) : SegRing O r K :=
+def wordEl
+    (O : Type) [CommRing O]
+    (j : ℤ)
+    (q : (Fin (segN X.F j + 1) → Fin (r + K) → ℤ) × (ℤ → Finset (Fin K)) × (Fin r × Fin r → ℕ))
+    : SegRing O r K :=
   segRen X.F j O (r + K) (PsiPl O (plPart q.1) (Ican (plPart q.1)) * PsiTan O (tanPart q.1) q.2.1)
 
 end Dat
 
 def RestKey (C₀ : ℝ) : Prop :=
-  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r) (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O], UniformizedDVR p O → X.Hyp p K → C₀ ≤ X.CLa → C₀ ≤ X.Ck →
-    ∀ (j : ℤ) (b : ℤ → ℕ), X.BOK p K j b →
-      LinearIndependent O fun q : X.Idx p K j (X.restr j b) =>
-        monomial (X.monTau K j q.1.2.2) (1 : O) * kill (X.offSet K j) (X.wordEl K O j q.1)
+  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r) (O : Type) [CommRing O]
+      [IsDomain O] [IsDiscreteValuationRing O],
+    UniformizedDVR p O → X.Hyp p K → C₀ ≤ X.CLa → C₀ ≤ X.Ck
+      → ∀ (j : ℤ) (b : ℤ → ℕ),
+        X.BOK p K j b
+          → LinearIndependent O fun q : X.Idx p K j (X.restr j b) =>
+            monomial (X.monTau K j q.1.2.2) (1 : O) * kill (X.offSet K j) (X.wordEl K O j q.1)
 
-theorem fr_injective {n' r : ℕ} [NeZero n'] (F : Frames n' r) {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) :
-    Function.Injective fun a : Fin r => F.fr j a.val :=
-  fun a b hab => Fin.ext (TE.fr_inj hV j a.val b.val a.isLt b.isLt hab)
+theorem fr_injective
+    {n' r : ℕ} [NeZero n'] (F : Frames n' r) {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
+    : Function.Injective fun a : Fin r => F.fr j a.val := fun a b hab =>
+  Fin.ext (TE.fr_inj hV j a.val b.val a.isLt b.isLt hab)
 
 theorem plEmb_injective (O : Type) [CommRing O] (r K : ℕ) : Function.Injective (plEmb O r K) := by
   apply rename_injective
@@ -188,20 +206,28 @@ theorem plEmb_injective (O : Type) [CommRing O] (r K : ℕ) : Function.Injective
 
 theorem restInd_of (C₀ : ℝ) (hK : RestKey C₀) : RestInd C₀ := by
   intro p n' r K _ _ _ X O _ _ _ S hX hLa hk j b hB
-  have h1 := li_of_kill (X.offSet K j) (fun q : X.Idx p K j (X.restr j b) => X.monTau K j q.1.2.2)
-    (fun q => X.wordEl K O j q.1) (hK p n' r K X O S hX hLa hk j b hB)
+  have h1 :=
+    li_of_kill (X.offSet K j)
+      (fun q : X.Idx p K j (X.restr j b) => X.monTau K j q.1.2.2)
+      (fun q => X.wordEl K O j q.1)
+      (hK p n' r K X O S hX hLa hk j b hB)
   set c0 : MvPolynomial (ℤ × Fin r) O := X.Dw O j ^ X.m0 K *
       (∏ i : Fin r, MvPolynomial.X (X.F.fr (j - 1) i.val, (0 : Fin r)) ^
         ((b (X.F.fr (j - 1) i.val) : ℤ) - X.Bw p K j (X.F.fr (j - 1) i.val)).toNat) with hc0
-  have hD : X.Dw O j ≠ 0 := Formalism.MainNotions.G.Joints.StandardMonomialSpace.detX_ne_zero _ (fr_injective X.F hX.valid (j - 1))
+  have hD : X.Dw O j ≠ 0 :=
+    Formalism.MainNotions.G.Joints.StandardMonomialSpace.detX_ne_zero _
+      (fr_injective X.F hX.valid (j - 1))
   have hc0ne : c0 ≠ 0 := by
-    refine mul_ne_zero (pow_ne_zero _ hD) (Finset.prod_ne_zero_iff.mpr fun i _ => pow_ne_zero _ (X_ne_zero _))
+    refine mul_ne_zero (pow_ne_zero _ hD)
+      (Finset.prod_ne_zero_iff.mpr fun i _ => pow_ne_zero _ (X_ne_zero _))
   have hc : plEmb O r K c0 ≠ 0 := (map_ne_zero_iff _ (plEmb_injective O r K)).mpr hc0ne
-  have h2 := h1.map' (LinearMap.mulLeft O (plEmb O r K c0))
-    (LinearMap.ker_eq_bot.mpr fun x y hxy => mul_left_cancel₀ hc hxy)
-  have heq : (fun q : X.Idx p K j (X.restr j b) => X.famEl p K O j b q.1) =
-      (⇑(LinearMap.mulLeft O ((plEmb O r K) c0)) ∘
-        fun q : X.Idx p K j (X.restr j b) => (monomial (X.monTau K j q.1.2.2)) (1 : O) * X.wordEl K O j q.1) := by
+  have h2 :=
+    h1.map' (LinearMap.mulLeft O (plEmb O r K c0))
+      (LinearMap.ker_eq_bot.mpr fun x y hxy => mul_left_cancel₀ hc hxy)
+  have heq
+      : (fun q : X.Idx p K j (X.restr j b) => X.famEl p K O j b q.1)
+        = (⇑(LinearMap.mulLeft O ((plEmb O r K) c0)) ∘ fun q : X.Idx p K j (X.restr j b) =>
+          (monomial (X.monTau K j q.1.2.2)) (1 : O) * X.wordEl K O j q.1) := by
     funext q
     simp only [Function.comp, LinearMap.mulLeft_apply]
     unfold Dat.famEl Dat.wordEl Dat.monTau

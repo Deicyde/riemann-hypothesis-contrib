@@ -146,7 +146,6 @@ theorem intertwines
   rw [h4] at h3
   have h5 := h3.unique h2
   have h6 : tL (∑ a, ∑ b, X a b • G a b ξ) = ∑ a, ∑ b, X a b • t (G a b ξ) := by
-
     simp only [map_sum, map_smul]
     rfl
   rw [h6] at h5

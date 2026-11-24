@@ -159,7 +159,7 @@ theorem lowU_mem_KO
   ext r s
   rcases r with r | r <;> rcases s with s | s
     <;> simp [lowU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
-  all_goals first | rfl | (split_ifs <;> simp)
+  all_goals first | rfl
 
 theorem upU_mem_KO
     {n : Type} [Fintype n] [DecidableEq n]
@@ -178,7 +178,7 @@ theorem upU_mem_KO
   ext r s
   rcases r with r | r <;> rcases s with s | s
     <;> simp [upU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
-  all_goals first | rfl | (split_ifs <;> simp)
+  all_goals first | rfl
 
 theorem nonarchimedeanLocalField_secondCountable_t2Space
     : SecondCountableTopology k ∧ T2Space k := by

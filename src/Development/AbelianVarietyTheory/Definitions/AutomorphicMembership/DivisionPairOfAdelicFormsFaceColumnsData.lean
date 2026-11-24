@@ -56,7 +56,6 @@ variable
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure TwIn (ex : Extra D L hT Gi Gl K Yd cX) : Type 1 where
   G : Type
   [grp : Group G]

@@ -468,7 +468,7 @@ private theorem ineAb_level
   have e2 : χ i (γ⁻¹ * (s : G K Ω) * γ) = χ i s := by
     rw [map_mul, map_mul, map_inv, mul_comm (χ i γ)⁻¹, mul_assoc, mul_comm _ (χ i γ)]
     simp
-  simp [e2]
+  simp
 
 private theorem isPlaceOver_under'
     {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)} (h : IsPlaceOver A w)

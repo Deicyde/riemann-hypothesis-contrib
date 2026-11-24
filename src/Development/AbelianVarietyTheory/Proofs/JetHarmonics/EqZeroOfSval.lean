@@ -102,8 +102,7 @@ theorem eq_zero_of_sval
 
 theorem aF_comp (oa : D.toPre.OAct O) (a a' : O)
     : aF D F oa a ≫ aF D F oa a' = aF D F oa (a' * a) := by
-  have : oa.onB.act (a' * a) = oa.onB.act a ≫ oa.onB.act a' := by
-    first | exact oa.onB.map_mul _ _ | (rw [mul_comm]; exact oa.onB.map_mul _ _)
+  have : oa.onB.act (a' * a) = oa.onB.act a ≫ oa.onB.act a' := by first | exact oa.onB.map_mul _ _
   simp [aF, DegPre.prB, this]
 
 theorem zF_aF (oa : D.toPre.OAct O) (a : O)
@@ -114,7 +113,7 @@ theorem zF_aF (oa : D.toPre.OAct O) (a : O)
   apply CartesianMonoidalCategory.hom_ext
   · rw [aF, Category.assoc, lift_fst]
   · rw [aF, Category.assoc, lift_snd, ← Category.assoc, z₂, MonObj.one_comp]
-    first | done | exact z₂.symm
+    first | done
 
 end GlobalTheory.PullComp
 

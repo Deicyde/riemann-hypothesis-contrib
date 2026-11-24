@@ -95,7 +95,6 @@ theorem aeval_div_mem
     [Fintype T] {s : MRing (fun _ : Unit => T)} (hs : IsMultiHomog s (fun _ => 1)) (t : T)
     : aeval y s / y ⟨(), t⟩ ∈ chartRingZ y (fun _ => t) := by
   classical
-
   rw [s.as_sum, map_sum, Finset.sum_div]
   refine Subalgebra.sum_mem _ fun m hm => ?_
   rw [aeval_monomial, mul_div_assoc]

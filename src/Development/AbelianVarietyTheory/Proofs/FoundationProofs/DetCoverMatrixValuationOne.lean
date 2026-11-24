@@ -53,18 +53,18 @@ namespace GlobalTheory.GLintCover
 section
 variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)}
 
-theorem v_eq_one_of_mul {x y : v.adicCompletion F} (hx : x ∈ Formalism.UG.Ov F v) (hy : y ∈ Formalism.UG.Ov F v)
-    (hxy : x * y = 1) : Valued.v x = 1 := by
+theorem v_eq_one_of_mul
+    {x y : v.adicCompletion F}
+    (hx : x ∈ Formalism.UG.Ov F v) (hy : y ∈ Formalism.UG.Ov F v) (hxy : x * y = 1)
+    : Valued.v x = 1 := by
   have h1 : Valued.v x * Valued.v y = 1 := by rw [← map_mul, hxy, map_one]
   have hy1 : Valued.v y ≤ 1 := hy
   have hx1 : Valued.v x ≤ 1 := hx
   refine le_antisymm hx1 ?_
-  calc (1 : WithZero (Multiplicative ℤ)) = Valued.v x * Valued.v y := h1.symm
+  calc
+    (1 : WithZero (Multiplicative ℤ))
+      = Valued.v x * Valued.v y := h1.symm
     _ ≤ Valued.v x := mul_le_of_le_one_right' hy1
-
-theorem det_v {n : ℕ} {X : GL (Fin n) (v.adicCompletion F)} (hX : X ∈ GLint (Fin n) (Formalism.UG.Ov F v)) :
-    Valued.v (X : Matrix (Fin n) (Fin n) (v.adicCompletion F)).det = 1 := by
-  apply GlobalTheory.valued_det_eq_one_of_glint <;> assumption
 
 variable {n : ℕ} {ϖ : v.adicCompletion F} {a : Fin n → ℤ}
 
@@ -74,21 +74,9 @@ end GlobalTheory.GLintCover
 noncomputable section
 namespace GlobalTheory.GLintCover
 
-section Count
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {n : ℕ}
-
-variable {ϖ : v.adicCompletion F} {a : Fin n → ℤ}
-
-end Count
 end GlobalTheory.GLintCover
 
 noncomputable section
 namespace GlobalTheory.GLintCover
-
-section Main
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {n : ℕ}
-variable {ϖ : v.adicCompletion F} {a : Fin n → ℤ}
-
-end Main
 
 end GlobalTheory.GLintCover

@@ -306,7 +306,6 @@ theorem restLatW_of
     (hb_rec T I hJ u w hg) (clsCrd D u 0 (Nat.zero_le _) c) (((T u).cls0).y c)
     (((T u).cls0).y_lat c) (hle_rec T u c) B' hB' i g γ κ hpt v
 
-
 theorem restGramW_of (T : ∀ u : D.what₂.Word, Forms0 D u) (I : CmpIn D X) : RestGramW I := by
   intro u w hg c B' hB' v a b
   exact gramW_gen ((T u).cls0).lev (locAt X u w hg I.B) (locInt_locAt X u w hg I.B) hg.1

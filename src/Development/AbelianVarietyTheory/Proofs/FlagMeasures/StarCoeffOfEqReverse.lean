@@ -143,7 +143,7 @@ theorem star_coeff_of_reverse
     split_ifs
     · refine Finset.prod_eq_zero (Finset.mem_univ kv) ?_
       rw [D.ntypes.eSer_zero _ _ (fun h => h.2.2 h0)]
-      first | rfl | simp
+      first | rfl
     · rfl
   have key : ∀ a, star (T a) = T (Φ a) := by
     intro a

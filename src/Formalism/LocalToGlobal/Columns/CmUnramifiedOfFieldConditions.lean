@@ -80,28 +80,9 @@ structure LinOn
 
 namespace LinOn
 
-variable
-  {w : HeightOneSpectrum (𝓞 K)} {N : Submodule (𝓞 K) V} {A : Type}
-  [AddCommGroup A] [Module (𝓞 K ⧸ w.asIdeal) A]
-  {g : V → A}
-
 end LinOn
 
 end Frame
-
-section Fibre
-
-variable
-  {E : Type} [Field E] [NumberField E] [StarRing E]
-  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
-
-end Fibre
-
-section Abstract
-
-variable {A H D D₀ : Type} [Group A] [Group H] [MulAction (A × H) D] [MulAction A D₀]
-
-end Abstract
 
 section Mass
 
@@ -152,12 +133,6 @@ theorem finite_autU (hE : PosStar E) (N : UniLat E n) : Finite (autU E n N) := b
 
 end Mass
 
-section MassGenus
-
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-
-end MassGenus
-
 section Count
 
 variable
@@ -169,22 +144,6 @@ def DecoSet.lat (d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)) : UniLat E
 
 end Count
 
-section Idx
-
-variable
-  {E K : Type} [Field E] [NumberField E] [Field K]
-  {n : ℕ} {SG : Finset (HeightOneSpectrum (𝓞 E))} (Λ : LevFam E K n SG)
-
-end Idx
-
-section FormCount
-
-variable
-  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
-  (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
-
-end FormCount
-
 section IdxQ
 
 theorem card_res {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
@@ -192,16 +151,6 @@ theorem card_res {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (�
   exact (Ideal.absNorm_eq_natCard w.asIdeal).symm
 
 end IdxQ
-
-section Cols
-
-variable {X : Fields} {Pr : Primes X} {R : Ranks}
-
-theorem rankN_zero (R : Ranks) : R.N 0 = R.k := by simp [Ranks.N]
-
-variable (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-
-end Cols
 
 section Inst
 
@@ -216,22 +165,6 @@ theorem vandN_congr {x y : ℕ → ℝ} {N : ℕ} (h : ∀ i j, i < N → j < N 
     Finset.prod_congr rfl fun j hj => h i j (Finset.mem_range.1 hi) (Finset.mem_Ico.1 hj).2
 
 end Inst
-
-section Rows
-
-open Finset Formalism.LogVandermondeBounds.StandardLattice
-
-variable {X : Fields} {Pr : Primes X} {R : Ranks}
-
-variable (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-
-end Rows
-
-section WeylTest
-
-open Finset Formalism.LogVandermondeBounds.StandardLattice Formalism.GradedWeylDivisibility
-
-end WeylTest
 
 section Unram
 
@@ -279,19 +212,5 @@ theorem cm_unramified_of_field_conditions {X : Fields} (hX : X.AbelianUnramified
   rw [h2]
 
 end Unram
-
-section Weighted
-
-variable {A H D D₀ : Type} [Group A] [Group H] [MulAction (A × H) D] [MulAction A D₀]
-
-variable
-  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
-  (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
-
-end Weighted
-
-section Whole
-
-end Whole
 
 end Formalism.L2.Col

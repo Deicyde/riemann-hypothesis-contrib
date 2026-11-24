@@ -56,14 +56,17 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem genericMatrixInverse_eq_adjugate (R : Type*) [CommRing R] (n : ℕ) :
-    genericMatrixInverse R n = (IsLocalization.Away.invSelf (S := GLCoord R n) (genMat R n).det) •
-      ((genMat R n).adjugate.map (algebraMap _ (GLCoord R n))) := by
+theorem genericMatrixInverse_eq_adjugate (R : Type*) [CommRing R] (n : ℕ)
+    : genericMatrixInverse R n
+      = (IsLocalization.Away.invSelf (S := GLCoord R n) (genMat R n).det)
+        • ((genMat R n).adjugate.map (algebraMap _ (GLCoord R n))) := by
   ext i j
   simp [genericMatrixInverse, Matrix.smul_apply]
 
-theorem genericMatrixInverse_mul (R : Type*) [CommRing R] (n : ℕ) : genericMatrixInverse R n * genericMatrixRootWeights R n = 1 := by
-  rw [genericMatrixInverse_eq_adjugate, genericMatrixRootWeights, Matrix.smul_mul, ← Matrix.map_mul, Matrix.adjugate_mul]
+theorem genericMatrixInverse_mul (R : Type*) [CommRing R] (n : ℕ)
+    : genericMatrixInverse R n * genericMatrixRootWeights R n = 1 := by
+  rw [genericMatrixInverse_eq_adjugate, genericMatrixRootWeights, Matrix.smul_mul, ← Matrix.map_mul,
+    Matrix.adjugate_mul]
   ext i j
   simp only [Matrix.smul_apply, Matrix.map_apply, Matrix.one_apply, smul_eq_mul]
   split_ifs
@@ -71,8 +74,10 @@ theorem genericMatrixInverse_mul (R : Type*) [CommRing R] (n : ℕ) : genericMat
     exact IsLocalization.Away.mul_invSelf _
   · simp
 
-theorem genericMatrix_mul_inverse (R : Type*) [CommRing R] (n : ℕ) : genericMatrixRootWeights R n * genericMatrixInverse R n = 1 := by
-  rw [genericMatrixInverse_eq_adjugate, genericMatrixRootWeights, Matrix.mul_smul, ← Matrix.map_mul, Matrix.mul_adjugate]
+theorem genericMatrix_mul_inverse (R : Type*) [CommRing R] (n : ℕ)
+    : genericMatrixRootWeights R n * genericMatrixInverse R n = 1 := by
+  rw [genericMatrixInverse_eq_adjugate, genericMatrixRootWeights, Matrix.mul_smul, ← Matrix.map_mul,
+    Matrix.mul_adjugate]
   ext i j
   simp only [Matrix.smul_apply, Matrix.map_apply, Matrix.one_apply, smul_eq_mul]
   split_ifs
@@ -84,25 +89,24 @@ section asm
 
 variable {R : Type} [Field R] {ι : Type} [Fintype ι] (LL : Letters ι) {n : ℕ} (S : Set ι)
 
-theorem generated_submodule_stable (G : MvPolynomial (ι × Fin n) R) (g : MvPolynomial (ι × Fin n) R →ₗ[R] MvPolynomial (ι × Fin n) R)
-    (hg : g ∈ polUZgens R LL S) : ∀ x ∈ polGenSub R LL S G, g x ∈ polGenSub R LL S G := by
-  intro x hx
-  induction hx using Submodule.span_induction with
-  | mem y hy =>
-    obtain ⟨u, hu, rfl⟩ := hy
+theorem generated_submodule_stable
+    (G : MvPolynomial (ι × Fin n) R)
+    (g : MvPolynomial (ι × Fin n) R →ₗ[R] MvPolynomial (ι × Fin n) R) (hg : g ∈ polUZgens R LL S)
+    : ∀ x ∈ polGenSub R LL S G, g x ∈ polGenSub R LL S G := by
+  have hs : polGenSub R LL S G ≤ (polGenSub R LL S G).comap g := by
+    apply Submodule.span_le.mpr
+    rintro _ ⟨u, hu, rfl⟩
+    change g (u G) ∈ polGenSub R LL S G
     exact Submodule.subset_span ⟨g * u, Submonoid.mul_mem _ (Submonoid.subset_closure hg) hu, rfl⟩
-  | zero => simp
-  | add y z _ _ hy hz =>
-    rw [map_add (f := _)]
-    exact Submodule.add_mem _ hy hz
-  | smul c y _ hy =>
-    rw [map_smul]
-    exact Submodule.smul_mem _ c hy
+  exact fun x hx => hs hx
 
-theorem self_mem_generated_submodule (G : MvPolynomial (ι × Fin n) R) : G ∈ polGenSub R LL S G := Submodule.subset_span ⟨1, Submonoid.one_mem _, rfl⟩
+theorem self_mem_generated_submodule (G : MvPolynomial (ι × Fin n) R) : G ∈ polGenSub R LL S G :=
+  Submodule.subset_span ⟨1, Submonoid.one_mem _, rfl⟩
 
-theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusActsThroughWeight) (hGr : BinomialStableContainsComponents) (G : MvPolynomial (ι × Fin n) R) :
-    ∀ m ∈ (genericTranslate LL S G).support, wtS LL S m ∈ polWts LL S (polGenSub R LL S G) := by
+theorem generic_translate_weights_mem
+    (hT : TransvectionExpansion) (hTo : TorusActsThroughWeight)
+    (hGr : BinomialStableContainsComponents) (G : MvPolynomial (ι × Fin n) R)
+    : ∀ m ∈ (genericTranslate LL S G).support, wtS LL S m ∈ polWts LL S (polGenSub R LL S G) := by
   classical
   set W := polGenSub R LL S G with hWdef
   have hW2 : ∀ a k, ∀ x ∈ W, binomPol R LL S a k x ∈ W := fun a k x hx =>
@@ -116,8 +120,10 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
   let ψ : GLCoord R n →+* K := algebraMap (GLCoord R n) K
   have hψ : Function.Injective ψ := IsFractionRing.injective (GLCoord R n) K
   let φ : R →+* K := ψ.comp (coefficientMap R n)
-  have good_of : ∀ h h' : Matrix (Fin n) (Fin n) K,
-      (∀ w ∈ W, matrixSubst LL S φ h h' w ∈ scalarExtension φ W) → SubstitutionPreservesExtension LL S φ W h h' := by
+  have good_of
+      : ∀ h h' : Matrix (Fin n) (Fin n) K,
+        (∀ w ∈ W, matrixSubst LL S φ h h' w ∈ scalarExtension φ W)
+          → SubstitutionPreservesExtension LL S φ W h h' := by
     intro h h' hw
     unfold SubstitutionPreservesExtension
     intro x hx
@@ -127,22 +133,31 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
       obtain ⟨w, hwW, rfl⟩ := hy
       rw [matrixSubst_map]
       exact hw w hwW
-    | zero => simp
+    | zero =>
+      simp
     | add y z _ _ hy hz =>
       rw [map_add (f := _)]
       exact Submodule.add_mem _ hy hz
     | smul c y _ hy =>
-      rw [MvPolynomial.smul_eq_C_mul, map_mul, matrixSubst_C, RingHom.id_apply, ← MvPolynomial.smul_eq_C_mul]
+      rw [MvPolynomial.smul_eq_C_mul, map_mul, matrixSubst_C, RingHom.id_apply,
+        ← MvPolynomial.smul_eq_C_mul]
       exact Submodule.smul_mem _ c hy
-  have good_mul : ∀ h1 h1' h2 h2' : Matrix (Fin n) (Fin n) K, SubstitutionPreservesExtension LL S φ W h1 h1' →
-      SubstitutionPreservesExtension LL S φ W h2 h2' → SubstitutionPreservesExtension LL S φ W (h1 * h2) (h2' * h1') := by
+  have good_mul
+      : ∀ h1 h1' h2 h2' : Matrix (Fin n) (Fin n) K,
+        SubstitutionPreservesExtension LL S φ W h1 h1'
+          → SubstitutionPreservesExtension LL S φ W h2 h2'
+          → SubstitutionPreservesExtension LL S φ W (h1 * h2) (h2' * h1') := by
     intro h1 h1' h2 h2' g1 g2
     unfold SubstitutionPreservesExtension at g1 g2 ⊢
     intro x hx
     rw [← matrixSubst_comp]
     exact g1 _ (g2 x hx)
-  have good_tr : ∀ (a b : Fin n), a ≠ b → ∀ t : K,
-      SubstitutionPreservesExtension LL S φ W (Matrix.transvection a b t) (Matrix.transvection a b (-t)) := by
+  have good_tr
+      : ∀ (a b : Fin n),
+        a ≠ b
+          → ∀ t : K,
+            SubstitutionPreservesExtension LL S φ W (Matrix.transvection a b t)
+              (Matrix.transvection a b (-t)) := by
     intro a b hab t
     apply good_of
     intro w hw
@@ -150,23 +165,30 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
     refine Submodule.sum_mem _ fun k _ => ?_
     rw [← MvPolynomial.smul_eq_C_mul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, hWd a b k hab w hw, rfl⟩)
-  have good_diag : ∀ u : Fin n → Kˣ, SubstitutionPreservesExtension LL S φ W (Matrix.diagonal fun a => ((u a : Kˣ) : K))
-      (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) := by
+  have good_diag
+      : ∀ u : Fin n → Kˣ,
+        SubstitutionPreservesExtension LL S φ W (Matrix.diagonal fun a => ((u a : Kˣ) : K))
+          (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) := by
     intro u
     apply good_of
     intro w hw
 
     rw [MvPolynomial.as_sum w, map_sum]
-    have hmono : ∀ m ∈ w.support, matrixSubst LL S φ (Matrix.diagonal fun a => ((u a : Kˣ) : K))
-        (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) (MvPolynomial.monomial m (w.coeff m)) =
-        (((∏ a, u a ^ (wtS LL S m a) : Kˣ) : K)) • MvPolynomial.map φ (MvPolynomial.monomial m (w.coeff m)) := by
+    have hmono
+        : ∀ m ∈ w.support,
+          matrixSubst LL S φ (Matrix.diagonal fun a => ((u a : Kˣ) : K))
+              (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) (MvPolynomial.monomial m (w.coeff m))
+            = (((∏ a, u a ^ (wtS LL S m a) : Kˣ) : K))
+              • MvPolynomial.map φ (MvPolynomial.monomial m (w.coeff m)) := by
       intro m _
       rw [hTo R K ι LL n S φ u m (w.coeff m), MvPolynomial.map_monomial, MvPolynomial.smul_monomial,
         smul_eq_mul]
       congr 1
       exact mul_comm _ _
     rw [Finset.sum_congr rfl hmono,
-      ← Finset.sum_fiberwise_of_maps_to (g := fun m => wtS LL S m) (t := w.support.image (fun m => wtS LL S m))
+      ← Finset.sum_fiberwise_of_maps_to
+        (g := fun m => wtS LL S m)
+        (t := w.support.image (fun m => wtS LL S m))
         (fun m hm => Finset.mem_image_of_mem _ hm)]
     refine Submodule.sum_mem _ fun ν _ => ?_
     convert Submodule.smul_mem _ (((∏ a, u a ^ (ν a) : Kˣ) : K))
@@ -180,13 +202,16 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
     · ext m
       simp
     · rw [(Finset.mem_filter.mp hm).2]
-  have good_list : ∀ l : List (Matrix.TransvectionStruct (Fin n) K),
-      SubstitutionPreservesExtension LL S φ W (l.map Matrix.TransvectionStruct.toMatrix).prod
-        (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod ∧
-      (l.map Matrix.TransvectionStruct.toMatrix).prod *
-        (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod = 1 ∧
-      (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod *
-        (l.map Matrix.TransvectionStruct.toMatrix).prod = 1 := by
+  have good_list
+      : ∀ l : List (Matrix.TransvectionStruct (Fin n) K),
+        SubstitutionPreservesExtension LL S φ W (l.map Matrix.TransvectionStruct.toMatrix).prod
+            (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod
+          ∧ (l.map Matrix.TransvectionStruct.toMatrix).prod
+              * (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod
+            = 1
+          ∧ (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod
+              * (l.map Matrix.TransvectionStruct.toMatrix).prod
+            = 1 := by
     intro l
     induction l with
     | nil =>
@@ -198,12 +223,10 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
       exact hx
     | cons t l ih =>
       obtain ⟨hg, h1, h2⟩ := ih
-      have ht1 : t.toMatrix * Matrix.transvection t.i t.j (-t.c) = 1 := by
-        exact t.mul_inv
-      have ht2 : Matrix.transvection t.i t.j (-t.c) * t.toMatrix = 1 := by
-        exact t.inv_mul
-      simp only [List.map_cons, List.prod_cons, List.reverse_cons, List.map_append, List.prod_append,
-        List.map_nil, List.prod_nil, mul_one]
+      have ht1 : t.toMatrix * Matrix.transvection t.i t.j (-t.c) = 1 := by exact t.mul_inv
+      have ht2 : Matrix.transvection t.i t.j (-t.c) * t.toMatrix = 1 := by exact t.inv_mul
+      simp only [List.map_cons, List.prod_cons, List.reverse_cons, List.map_append,
+        List.prod_append, List.map_nil, List.prod_nil, mul_one]
       generalize (l.map Matrix.TransvectionStruct.toMatrix).prod = P at hg h1 h2 ⊢
       generalize (l.reverse.map fun t => Matrix.transvection t.i t.j (-t.c)).prod = P' at hg h1 h2 ⊢
       refine ⟨good_mul _ _ _ _ (good_tr t.i t.j t.hij t.c) hg, ?_, ?_⟩
@@ -212,9 +235,11 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
   set A : Matrix (Fin n) (Fin n) K := (genericMatrixInverse R n).map ψ with hAdef
   set A' : Matrix (Fin n) (Fin n) K := (genericMatrixRootWeights R n).map ψ with hA'def
   have hAA' : A * A' = 1 := by
-    rw [hAdef, hA'def, ← Matrix.map_mul, genericMatrixInverse_mul, Matrix.map_one _ (map_zero ψ) (map_one ψ)]
+    rw [hAdef, hA'def, ← Matrix.map_mul, genericMatrixInverse_mul,
+      Matrix.map_one _ (map_zero ψ) (map_one ψ)]
   have hA'A : A' * A = 1 := by
-    rw [hAdef, hA'def, ← Matrix.map_mul, genericMatrix_mul_inverse, Matrix.map_one _ (map_zero ψ) (map_one ψ)]
+    rw [hAdef, hA'def, ← Matrix.map_mul, genericMatrix_mul_inverse,
+      Matrix.map_one _ (map_zero ψ) (map_one ψ)]
   obtain ⟨l1, l2, D, hAdec⟩ := Matrix.Pivot.exists_list_transvec_mul_diagonal_mul_list_transvec A
   obtain ⟨g1, e1, f1⟩ := good_list l1
   obtain ⟨g2, e2, f2⟩ := good_list l2
@@ -238,7 +263,8 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
   have hu1 : (Matrix.diagonal fun a => ((u a : Kˣ) : K)) = Matrix.diagonal D := by
     ext i j
     simp [u, Matrix.diagonal_apply]
-  have hu2 : (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) = Matrix.diagonal fun a => (D a)⁻¹ := by
+  have hu2
+      : (Matrix.diagonal fun a => (((u a)⁻¹ : Kˣ) : K)) = Matrix.diagonal fun a => (D a)⁻¹ := by
     ext i j
     simp [u, Matrix.diagonal_apply]
   rw [hu1, hu2] at gd
@@ -253,11 +279,13 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
       rw [hAdec]
       simp only [mul_assoc]
       rw [← mul_assoc P2 P2', e2, one_mul, ← mul_assoc (Matrix.diagonal D), hdd, one_mul, e1]
-    calc P2' * ((Matrix.diagonal fun a => (D a)⁻¹) * P1')
+    calc
+      P2' * ((Matrix.diagonal fun a => (D a)⁻¹) * P1')
         = (A' * A) * (P2' * ((Matrix.diagonal fun a => (D a)⁻¹) * P1')) := by rw [hA'A, one_mul]
       _ = A' := by rw [mul_assoc, hAX, mul_one]
   rw [← hAdec, hX] at gA
-  have hGW : MvPolynomial.map φ G ∈ scalarExtension φ W := Submodule.subset_span ⟨G, self_mem_generated_submodule LL S G, rfl⟩
+  have hGW : MvPolynomial.map φ G ∈ scalarExtension φ W :=
+    Submodule.subset_span ⟨G, self_mem_generated_submodule LL S G, rfl⟩
   have hHK : MvPolynomial.map ψ (genericTranslate LL S G) ∈ scalarExtension φ W := by
     rw [genericTranslate, map_matrixSubst, ← hAdef, ← hA'def, ← matrixSubst_map]
     exact gA _ hGW
@@ -268,14 +296,19 @@ theorem generic_translate_weights_mem (hT : TransvectionExpansion) (hTo : TorusA
 
 end asm
 
-theorem generated_module_weight_lemma_of_interfaces (hT : TransvectionExpansion) (hTo : TorusActsThroughWeight) (hGr : BinomialStableContainsComponents) (hSt : TwistExponentsAreWeightEntries) (hSp : GenericMonomialsSpecialise) :
-    GeneratedModuleWeightDescription := by
+theorem generated_module_weight_lemma_of_interfaces
+    (hT : TransvectionExpansion) (hTo : TorusActsThroughWeight)
+    (hGr : BinomialStableContainsComponents) (hSt : TwistExponentsAreWeightEntries)
+    (hSp : GenericMonomialsSpecialise)
+    : GeneratedModuleWeightDescription := by
   intro R _ ι _ LL n _ S
   refine ⟨fun G θ => ?_, fun G M => ?_⟩
   · rw [valS, hSt R ι LL n S (lastIdx n) G, Finset.le_inf_iff]
     constructor
     · intro h
-      exact weights_property_of_generic_translate (LL := LL) (S := S) (j := lastIdx n) (Pr := fun z => θ ≤ z) hT hTo hSp G
+      exact weights_property_of_generic_translate (LL := LL) (S := S) (j := lastIdx n)
+        (Pr := fun z => θ ≤ z)
+        hT hTo hSp G
         (fun m hm => by
           have := h _ (Finset.mem_image_of_mem _ hm)
           simpa using this)
@@ -286,7 +319,9 @@ theorem generated_module_weight_lemma_of_interfaces (hT : TransvectionExpansion)
   · rw [lam1S, hSt R ι LL n S 0 G, Finset.sup_le_iff]
     constructor
     · intro h
-      exact weights_property_of_generic_translate (LL := LL) (S := S) (j := 0) (Pr := fun z => z ≤ M) hT hTo hSp G
+      exact weights_property_of_generic_translate (LL := LL) (S := S) (j := 0)
+        (Pr := fun z => z ≤ M)
+        hT hTo hSp G
         (fun m hm => by
           have := h _ (Finset.mem_image_of_mem _ hm)
           simpa using this)

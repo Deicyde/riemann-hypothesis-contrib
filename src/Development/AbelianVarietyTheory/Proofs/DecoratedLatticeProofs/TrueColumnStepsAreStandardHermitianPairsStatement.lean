@@ -52,6 +52,7 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.KJInf Formalism.L2.Ker
 open GlobalTheory.SeeSaw GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.trueColumnSteps_are_standardHermitianPairs
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.trueColumnSteps_are_standardHermitianPairs
               ∧ (I.rec7 l Z).sp.X'.gram = 1 ∧ (∀ τ, B.fields.embC I.A.σ₀ τ = tauE (I.rec7 l Z) τ)
               ∧ (∀ τ, I.J.cD τ ≠ 0)
               ∧ ∀ (V : HSp (I.rec7 l Z)) (g : GA (I.rec7 l Z) V), ∃ x, IsDetRoot V g x := by
-  first
-  | exact @GlobalTheory.AdForm.StdStepsT.stdPair_steps_all
-  | exact GlobalTheory.AdForm.StdStepsT.stdPair_steps_all
-  | (intros; apply GlobalTheory.AdForm.StdStepsT.stdPair_steps_all <;> assumption)
+  first | exact @GlobalTheory.AdForm.StdStepsT.stdPair_steps_all

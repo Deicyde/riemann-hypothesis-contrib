@@ -48,11 +48,12 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.MLI
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj
 open scoped Pointwise
 
-theorem absNorm_smul_eq {E : Type} [Field E] [NumberField E] (σ : E ≃ₐ[ℚ] E) (I : Ideal (𝓞 E)) :
-    Ideal.absNorm (σ • I) = Ideal.absNorm I := by
+theorem absNorm_smul_eq {E : Type} [Field E] [NumberField E] (σ : E ≃ₐ[ℚ] E) (I : Ideal (𝓞 E))
+    : Ideal.absNorm (σ • I) = Ideal.absNorm I := by
   rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
   exact (Nat.card_congr (Ideal.quotientEquiv I (σ • I) (MulSemiringAction.toRingEquiv _ _ σ)
     (by rw [Ideal.pointwise_smul_def]; rfl)).toEquiv).symm
@@ -61,8 +62,8 @@ theorem halfDiffNorm : HalfDiffNormSt := by
   intro D
   obtain ⟨hspec, -⟩ := D.host.𝔟_spec
 
-  have hN : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) =
-      Ideal.absNorm D.host.𝔟 ^ 2 := by
+  have hN
+      : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) = Ideal.absNorm D.host.𝔟 ^ 2 := by
     rw [hspec, map_mul, absNorm_smul_eq, sq]
 
   have htow := differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 ↥D.host.K) (𝓞 D.host.E)
@@ -74,7 +75,8 @@ theorem halfDiffNorm : HalfDiffNormSt := by
     apply hne
     rw [htow, h]
     simp
-  have hle : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) ≤ (discr D.host.E).natAbs := by
+  have hle
+      : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) ≤ (discr D.host.E).natAbs := by
     rw [← hdisc, htow, map_mul]
     apply Nat.le_mul_of_pos_right
     rw [Nat.pos_iff_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]
@@ -94,12 +96,6 @@ theorem halfDiffNorm : HalfDiffNormSt := by
   push_cast at hlog
   rw [← hlog]
   exact Real.log_le_log (by positivity) hsq
-
-theorem bb_ne_bot (D : D7) : D.host.𝔟 ≠ ⊥ := by
-  intro h
-  have h0 := (halfDiffNorm D).1
-  rw [h, Ideal.absNorm_bot] at h0
-  exact lt_irrefl 0 h0
 
 theorem finrank_E (D : D7) : Module.finrank ℚ D.host.E = 2 * D.R.f := by
   apply ReciprocityTheory.ChartRestriction.G.PullbackSections.PfTorusFrame.finrank_eq <;> assumption

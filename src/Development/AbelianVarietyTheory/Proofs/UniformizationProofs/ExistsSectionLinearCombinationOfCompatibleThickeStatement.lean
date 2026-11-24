@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_section_linearCombination_of_compatible_thickenings
     : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R),
       IsAdicComplete I R
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_section_linearCombination_of_compatible_thi
                         Good L z J
                           → sval s (r ≫ pullback.fst Y.hom (thick R I e)) z J
                             = sval (f e) r z J := by
-  first
-  | exact @GlobalTheory.SecAlgLinComb.exists_sec_linComb
-  | exact GlobalTheory.SecAlgLinComb.exists_sec_linComb
-  | (intros; apply GlobalTheory.SecAlgLinComb.exists_sec_linComb <;> assumption)
+  first | exact @GlobalTheory.SecAlgLinComb.exists_sec_linComb

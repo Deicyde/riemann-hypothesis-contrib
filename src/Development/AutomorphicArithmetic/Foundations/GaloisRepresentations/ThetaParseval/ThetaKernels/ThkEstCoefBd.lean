@@ -45,8 +45,6 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FinPartId
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain MeasureTheory Matrix
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU

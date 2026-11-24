@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.LineSCShortExact
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralSubOfIsForm
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GlueMeasUnivNeTopOfCompactStatement
+import Development.AbelianVarietyTheory.Definitions.Divisors.ChartMeasApplyOfSubset
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GlueMeasUnivNeTopOfCompact
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GluedChartDensityMeasureAddOfCompatibleOn
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -197,7 +198,7 @@ theorem part_finite [CompactSpace M] {α : A.Fld} (hα : A.IsForm α) (ε : ℤ�
   have e : A.part α ε = G A (fun i v => ((ε : ℤ) : ℝ) * A.reDens α i v) :=
     part_eq A α ε _ fun _ _ => rfl
   have fin : G A (fun i v => ((ε : ℤ) : ℝ) * A.reDens α i v) univ ≠ ∞ :=
-    GlobalTheory.T.glueMeas_univ_ne_infty_of_continuousOn A.e A.cover A.holo
+    _root_.GlobalTheory.glueMeas_univ_ne_top_of_compact A.e A.cover A.holo
       (fun i v => ((ε : ℤ) : ℝ) * A.reDens α i v)
       h.1 h.2
   refine ⟨?_⟩

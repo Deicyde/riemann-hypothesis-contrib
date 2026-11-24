@@ -240,7 +240,7 @@ theorem capelli_levi_factorization
     Subtype.ext (by
       have := glRel_Eop (a := n 0 + n 1) τ a b c' d
       split_ifs at this ⊢ <;> simpa [X] using this)
-  have key := GlobalTheory.SpehInfChar.qdet_sub_blocks_mem S n h X hX u
+  have key := _root_.GlobalTheory.CapHC.qdet_blocks_congr S n h X hX u
   have hB0
       : Formalism.REAL.qdet
           (fun p q : Fin (n 0) =>
@@ -303,7 +303,7 @@ theorem capelli_levi_factorization
     refine Submodule.span_le.2 ?_
     rintro _ ⟨p, q, w, hpq, rfl⟩
     change (Eop τ p q ((w : Module.End ℂ (Sm E (n 0 + n 1))) F)).1 ℓ = 0
-    exact GlobalTheory.SpehInfChar.Eop_leviEmb_eq_zero E n h _ (hSL w.2 F hψ) τ p q hpq _
+    exact _root_.GlobalTheory.UnipKill.eop_leviEmb_eq_zero E n h _ (hSL w.2 F hψ) τ p q hpq _
   have h1 := hker key
   rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at h1
   have hL : ∀ w : S, L w = ((S.val w) F).1 ℓ := fun _ => rfl

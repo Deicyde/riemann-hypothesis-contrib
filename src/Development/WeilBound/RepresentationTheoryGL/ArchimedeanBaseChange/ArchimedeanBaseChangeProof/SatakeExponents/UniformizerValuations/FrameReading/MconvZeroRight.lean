@@ -41,8 +41,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 noncomputable section
 
-
-
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.E
   PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8

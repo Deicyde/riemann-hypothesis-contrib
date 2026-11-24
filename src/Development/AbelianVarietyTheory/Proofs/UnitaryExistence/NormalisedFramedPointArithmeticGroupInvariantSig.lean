@@ -3,10 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.NormConst
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExponentialDerivativeAtZeroIsTangent
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndCompStatement
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.UnivFrame
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FrameChangeByMatricesReflAndComp
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LowerTriIsUnitDet
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.PerFrLact
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ThetaPointsChangeLevelIsometryLinearMapStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ThetaPointsChangeLevelIsometryLinearMap
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -102,8 +103,8 @@ theorem normUn_gamma
     rw [T.co.apply_symm_apply]
     exact h
   obtain ⟨hx, hd, t₀, hsec, ht⟩ :=
-    GlobalTheory.T.thetaPoints_change_levelIsometry_linearMap hS E H Dw l Xo c σ g e F r M k T _ hb
-      _ hb' κ κ' (un k x) (un k ⟨_, h⟩) gam 1 hy hy' hgam
+    _root_.GlobalTheory.ThetaPtChg.thetaPt_change hS E H Dw l Xo c σ g e F r M k T _ hb _ hb' κ κ'
+      (un k x) (un k ⟨_, h⟩) gam 1 hy hy' hgam
       (fun a => by
         rw [T.co.apply_symm_apply, T.co.apply_symm_apply, Matrix.one_mulVec]; exact hP x.1 x.2 a)
   have hu : ∀ τ i, (un k ⟨_, h⟩).u τ i = (un k x).u τ i := fun τ i => by
@@ -133,8 +134,8 @@ theorem normUn_gamma
       hsec
     ⟩
     rw [hu]
-    exact (GlobalTheory.T.frameChangeByMatrices_refl_and_comp E H Dw l Xo c (CAt σ) (un k x)
-      (un k x) (un k x)).1.2.1 τ i
+    exact (_root_.GlobalTheory.Frames.frChg_refl_and_comp E H Dw l Xo c (CAt σ) (un k x) (un k x)
+      (un k x)).1.2.1 τ i
   · exact wchar_ex_sign Dw _ ht2 (fun _ => rfl) a n hn.2
 
 end GlobalTheory.FrameUnif

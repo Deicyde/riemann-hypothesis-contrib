@@ -54,6 +54,7 @@ open Formalism.IndefR Formalism.IndefR.Links GlobalTheory.MixModel GlobalTheory.
   GlobalTheory.Grow GlobalTheory.ChiGrid GlobalTheory.Unf GlobalTheory.FunObj GlobalTheory.RowUnf
   GlobalTheory.RowChain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaGrid_lastRow_column_characters_differ
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (Wl : G.Weil) (t : T),
       ∃ χz : (AE D)ˣ →* Circle,
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.thetaGrid_lastRow_column_characters_differ
             j < D.R.m → (D.R.m - 1 - j) % 2 = 1
               → G.chrS (.mu t D.R.m j) = G.chrS (.top t j) * χz
                 ∧ G.chrT (.mu t D.R.m j) = G.chrT (.top t j)) := by
-  first
-  | exact @GlobalTheory.RowChars.rowChars
-  | exact GlobalTheory.RowChars.rowChars
-  | (intros; apply GlobalTheory.RowChars.rowChars <;> assumption)
+  first | exact @GlobalTheory.RowChars.rowChars

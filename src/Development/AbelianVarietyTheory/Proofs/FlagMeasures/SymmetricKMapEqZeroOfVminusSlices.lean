@@ -263,7 +263,6 @@ theorem jet_map_eq_zero
       · exact hstab a b hab _ (hstab b a hab.symm _ hf)
       · exact Submodule.zero_mem _
     have hCasT : T (CasK ε (arrE E (j + 1)) f) = CasK ε E (T f) := by
-
       rw [compactCasimir_apply, compactCasimir_apply, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
 

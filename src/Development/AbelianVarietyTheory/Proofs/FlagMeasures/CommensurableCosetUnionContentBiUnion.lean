@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.HermLat
 public import Mathlib.Order.CompletePartialOrder
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CommensurableCosetUnionContentIndependentNonnegStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CommensurableCosetUnionContentIndependentNonneg
+public import Mathlib.Data.Set.Card.Arithmetic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -15,7 +16,6 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Data.Nat.Choose.Multinomial
-public import Mathlib.Data.Set.Card.Arithmetic
 import Mathlib.Geometry.Euclidean.Volume.Basic
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
@@ -72,15 +72,12 @@ theorem exists_common_goodSub
       exact AddSubgroup.relIndex_ne_zero_trans hA0.1 hB.2.1
     refine ⟨
       A ⊓ B,
-      (GlobalTheory.T.commensurableCosetUnionContent_independent_nonneg W0 ∅).2.1 A _ hA0
-        inf_le_left h1,
+      (_root_.GlobalTheory.HL.cont_independent_pos W0 ∅).2.1 A _ hA0 inf_le_left h1,
       fun i hi => ?_
     ⟩
     rcases Finset.mem_insert.1 hi with rfl | hi
-    · exact (GlobalTheory.T.commensurableCosetUnionContent_independent_nonneg W0 _).2.1 B _ hB
-        inf_le_right h2
-    · exact (GlobalTheory.T.commensurableCosetUnionContent_independent_nonneg W0 _).2.1 A _
-        (hA i hi) inf_le_left h1
+    · exact (_root_.GlobalTheory.HL.cont_independent_pos W0 _).2.1 B _ hB inf_le_right h2
+    · exact (_root_.GlobalTheory.HL.cont_independent_pos W0 _).2.1 A _ (hA i hi) inf_le_left h1
 
 theorem cont_biUnion
     : ∀ {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) {ι : Type} (s : Finset ι) (S : ι → Set W),
@@ -103,9 +100,9 @@ theorem cont_biUnion
     · rw [himg]
       exact Set.Finite.biUnion s.finite_toSet fun i hi => (hA i hi).2.2.2
   refine ⟨⟨A, hU⟩, fun hd => ?_⟩
-  rw [(GlobalTheory.T.commensurableCosetUnionContent_independent_nonneg W0 _).1 A hU,
+  rw [(_root_.GlobalTheory.HL.cont_independent_pos W0 _).1 A hU,
     Finset.sum_congr rfl fun i hi =>
-      (GlobalTheory.T.commensurableCosetUnionContent_independent_nonneg W0 (S i)).1 A (hA i hi),
+      (_root_.GlobalTheory.HL.cont_independent_pos W0 (S i)).1 A (hA i hi),
     ← Finset.sum_mul, himg]
   congr 1
   have key :=

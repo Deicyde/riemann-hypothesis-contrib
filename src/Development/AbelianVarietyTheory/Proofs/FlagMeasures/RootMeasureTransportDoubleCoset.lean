@@ -187,7 +187,7 @@ private theorem flagMat_conj_eq_of_mem_UWset
     exact _root_.Formalism.QuantumDeterminants.WeylGroupFacts.row_of_fixed_col hU _
       (_root_.Formalism.QuantumDeterminants.WeylGroupFacts.col_of_fix (hb a).2) j
   ext i j
-  simp only [_root_.Formalism.MainNotions.S.flagMat, Matrix.of_apply]
+  simp only [_root_.Formalism.MainNotions.S.flagMat]
   split_ifs with hi
   · rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
       hfix (_root_.Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv hh),

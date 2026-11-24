@@ -1,5 +1,6 @@
 module
 
+import Formalism.LocalToGlobal.SubmoduleMembership
 public import Formalism.LocalToGlobal.KernelLattices.XiIndCClass
 public import Formalism.LocalToGlobal.TorsionIntegrality.QuadraticSemicharacters.CayleyGaussianIntegrals.LocalComponentGL
 public import Formalism.LocalToGlobal.TorsionIntegrality.QuadraticSemicharacters.CayleyGaussianIntegrals.LogarithmEquivalence
@@ -263,29 +264,8 @@ theorem mem_of_forall_locP
     (M : Submodule (𝓞 E) W)
     {x : W} (h : ∀ Q : HeightOneSpectrum (𝓞 E), x ∈ localization₂ Q.asIdeal M)
     : x ∈ M := by
-  let I : Ideal (𝓞 E) := {
-    carrier := {r | r • x ∈ M}
-    add_mem' := fun {r s} hr hs => by
-      show (r + s) • x ∈ M
-      rw [add_smul]
-      exact M.add_mem hr hs
-    zero_mem' := by
-      show (0 : 𝓞 E) • x ∈ M
-      rw [zero_smul]
-      exact M.zero_mem
-    smul_mem' := fun r s hs => by
-      show (r • s) • x ∈ M
-      rw [smul_eq_mul, mul_smul]
-      exact M.smul_mem r hs
-  }
-  by_cases hI : I = ⊤
-  · have h1 : (1 : 𝓞 E) ∈ I := by rw [hI]; trivial
-    have h2 : (1 : 𝓞 E) • x ∈ M := h1
-    rwa [one_smul] at h2
-  · obtain ⟨m, hm, hIm⟩ := Ideal.exists_le_maximal I hI
-    obtain ⟨s, hs, hsx⟩ :=
-      h ⟨m, hm.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hm (RingOfIntegers.not_isField E)⟩
-    exact absurd (hIm hsx) hs
+  exact Submodule.mem_of_forall_heightOne_exists_smul_mem (NumberField.RingOfIntegers.not_isField E)
+    M x h
 
 theorem tw_mem_of
     (M : Submodule (𝓞 E) W)
@@ -976,15 +956,7 @@ theorem exists_int_mul_integral (a : E) : ∃ e : ℤ, e ≠ 0 ∧ IsIntegral �
   obtain ⟨e, he, hea⟩ := halg.exists_integral_multiple
   exact ⟨e, he, by rwa [zsmul_eq_mul] at hea⟩
 
-theorem exists_smul_mem (L : Submodule (𝓞 E) W) (hL : Submodule.span E (L : Set W) = ⊤) (y : W)
-    : ∃ ν : 𝓞 E, ν ≠ 0 ∧ ν • y ∈ L := by
-  first
-  | exact Bl.general_b_fact_third_ter.goal1 ..
-  | (apply Bl.general_b_fact_third_ter.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_third_ter.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_third_ter.goal1 <;> assumption)
-  | (intros; apply @Bl.general_b_fact_third_ter.goal1 <;> assumption)
-  | (apply @Bl.general_b_fact_third_ter.goal1 <;> first | assumption | infer_instance)
+alias exists_smul_mem := _root_.Bl.general_b_fact_third_ter.goal1
 
 theorem exists_smul_le
     (L₁ L : Submodule (𝓞 E) W) (h₁ : L₁.FG) (hL : Submodule.span E (L : Set W) = ⊤)

@@ -69,9 +69,7 @@ theorem coord_contDiff (l : Fin m) : ContDiff ℝ ∞ (fun x : Fin m → ℂ => 
   contDiff_apply ℝ (fun _ => ℂ) l
 
 theorem conjCoord_contDiff (l : Fin m) : ContDiff ℝ ∞ (fun x : Fin m → ℂ => star (x l)) := by
-  first
-  | exact ContDiff.star (contDiff_apply ℝ (fun _ => ℂ) l)
-  | exact (Complex.conjCLE.contDiff).comp (contDiff_apply ℝ (fun _ => ℂ) l)
+  first | exact (Complex.conjCLE.contDiff).comp (contDiff_apply ℝ (fun _ => ℂ) l)
 
 theorem fderiv_apply_contDiffOn
     {f : (Fin m → ℂ) → E} (hf : ContDiffOn ℝ ∞ f (OmX m)) (v : Fin m → ℂ)
@@ -90,9 +88,6 @@ theorem wirtBar_contDiffOn {f : (Fin m → ℂ) → E} (hf : ContDiffOn ℝ ∞ 
   first
   | exact
       ((fderiv_apply_contDiffOn hf _).add ((fderiv_apply_contDiffOn hf _).const_smul _)).const_smul
-        _
-  | exact
-      ((fderiv_apply_contDiffOn hf _).sub ((fderiv_apply_contDiffOn hf _).const_smul _)).const_smul
         _
 
 theorem differentiableAt_of_mem
@@ -149,7 +144,7 @@ theorem linear_operators_holds : LinOps := by
     ⟨differentiableAt_of_mem hf hx, differentiableAt_of_mem hg hx⟩
   fin_cases i <;> refine ⟨funext fun x => ?_, funext fun x => ?_⟩
     <;> simp only [opL, pOp, cOp, ciOp, pbOp, cbOp, cbiOp, wirt, wirtBar, Pi.add_apply,
-      Pi.smul_apply, Fin.isValue]
+      Pi.smul_apply]
     <;> (try split_ifs with hx)
     <;> (
       try

@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.weil_vacuum_finite_selfDualLattice_splitting
                             → ∀ x y : (AE D)ˣ,
                               FinUnit x → FinUnit y → IsDetRoot S k x → IsDetRoot T k' y
                                 → om (k, k') f = ((((χT x)⁻¹ * χS y : Circle)) : ℂ) • f := by
-  first
-  | exact @GlobalTheory.FinVac.om_vacuum_finite
-  | exact GlobalTheory.FinVac.om_vacuum_finite
-  | (intros; apply GlobalTheory.FinVac.om_vacuum_finite <;> assumption)
+  first | exact @GlobalTheory.FinVac.om_vacuum_finite

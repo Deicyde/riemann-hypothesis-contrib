@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 100] LieRing.ofAssociativeRing
+
 theorem _root_.GlobalTheory.T.unitary_lie_generators_rep
     : ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) ℂ),
       Jᴴ = J → IsUnit J.det
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.unitary_lie_generators_rep
                     ρ X ∈ Submodule.span ℂ
                       (Set.range fun p : Fin n × Fin n =>
                         ρ (P p.1 p.2) + Complex.I • ρ (Q p.1 p.2)) := by
-  first
-  | exact @GlobalTheory.UnitaryLieComplexification.glRel_and_span
-  | exact GlobalTheory.UnitaryLieComplexification.glRel_and_span
-  | (intros; apply GlobalTheory.UnitaryLieComplexification.glRel_and_span <;> assumption)
+  first | exact @GlobalTheory.UnitaryLieComplexification.glRel_and_span

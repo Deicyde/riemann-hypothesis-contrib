@@ -56,13 +56,16 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreEig
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HermitianPreEigenvalues Polynomial Module
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HermitianPreEigenvalues Polynomial Module
 
 namespace GlobalTheory.LenMap
 
-theorem isTorsionFree_submodule {R : Type*} [CommRing R] [IsDomain R] {M : Type*} [AddCommGroup M]
-    [Module R M] (h : ∀ (c : R) (x : M), c ≠ 0 → c • x = 0 → x = 0) (N : Submodule R M) :
-    Module.IsTorsionFree R N := by
+theorem isTorsionFree_submodule
+    {R : Type*} [CommRing R] [IsDomain R]
+    {M : Type*} [AddCommGroup M] [Module R M]
+    (h : ∀ (c : R) (x : M), c ≠ 0 → c • x = 0 → x = 0) (N : Submodule R M)
+    : Module.IsTorsionFree R N := by
   refine ⟨fun r hr x y hxy => ?_⟩
   have hr0 : r ≠ 0 := hr.ne_zero
   have h1 : r • ((x : M) - y) = 0 := by
@@ -71,11 +74,14 @@ theorem isTorsionFree_submodule {R : Type*} [CommRing R] [IsDomain R] {M : Type*
     rw [smul_sub, this, sub_self]
   exact Subtype.ext (sub_eq_zero.1 (h r _ hr0 h1))
 
-theorem exists_basis_sum {R : Type*} [CommRing R] {M M' : Type*} [AddCommGroup M] [Module R M]
-    [AddCommGroup M'] [Module R M'] (f : M →ₗ[R] M') (Z : Submodule R M) {ι κ : Type*}
-    [Fintype ι] [Fintype κ] (d : Basis ι R ↥(Z ⊓ LinearMap.ker f)) (e : Basis κ R ↥(Z.map f))
-    (σ : κ → M) (hσZ : ∀ j, σ j ∈ Z) (hσf : ∀ j, f (σ j) = e j) :
-    ∃ b : Basis (ι ⊕ κ) R Z, ∀ k, (b k : M) = Sum.elim (fun i => (d i : M)) σ k := by
+theorem exists_basis_sum
+    {R : Type*} [CommRing R]
+    {M M' : Type*} [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
+    (f : M →ₗ[R] M') (Z : Submodule R M)
+    {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (d : Basis ι R ↥(Z ⊓ LinearMap.ker f))
+    (e : Basis κ R ↥(Z.map f)) (σ : κ → M) (hσZ : ∀ j, σ j ∈ Z) (hσf : ∀ j, f (σ j) = e j)
+    : ∃ b : Basis (ι ⊕ κ) R Z, ∀ k, (b k : M) = Sum.elim (fun i => (d i : M)) σ k := by
   classical
   let w : ι ⊕ κ → M := Sum.elim (fun i => (d i : M)) σ
   have hwZ : ∀ k, w k ∈ Z := by
@@ -132,16 +138,22 @@ end GlobalTheory.LenMap
 
 namespace GlobalTheory.LenMap
 
-variable {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {M : Type} [AddCommGroup M]
-  [Module (Int0 v) M]
+variable
+  {C : Type} [Field C]
+  (v : AddValuation C (WithTop ℝ))
+  {M : Type} [AddCommGroup M] [Module (Int0 v) M]
 
-theorem val_det_eq {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Submodule (Int0 v) M}
+theorem val_det_eq
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {X' X : Submodule (Int0 v) M}
     (hle : X' ≤ X) (b c : Basis ι (Int0 v) X) (b' c' : Basis ι (Int0 v) X')
-    (A B : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
-    (hB : ∀ k, (c' k : M) = ∑ i, B i k • (c i : M)) : v (A.det : C) = v (B.det : C) := by
-  have key : ∀ (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
-      (A : Matrix ι ι (Int0 v)), (∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) →
-      LinearMap.toMatrix b' b (Submodule.inclusion hle) = A := by
+    (A B : Matrix ι ι (Int0 v))
+    (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) (hB : ∀ k, (c' k : M) = ∑ i, B i k • (c i : M))
+    : v (A.det : C) = v (B.det : C) := by
+  have key
+      : ∀ (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X') (A : Matrix ι ι (Int0 v)),
+        (∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
+          → LinearMap.toMatrix b' b (Submodule.inclusion hle) = A := by
     intro b b' A hA
     ext i k
     have : Submodule.inclusion hle (b' k) = ∑ i, A i k • b i := by
@@ -157,13 +169,15 @@ theorem val_det_eq {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Submodule (
   have u2 : IsUnit (c'.toMatrix b').det := by
     letI := c'.invertibleToMatrix b'
     exact Matrix.isUnit_det_of_invertible _
-  rw [hAB, Matrix.det_mul, Matrix.det_mul, Subring.coe_mul, Subring.coe_mul, v.map_mul,
-    v.map_mul, v_unit v u1, v_unit v u2, zero_add, add_zero]
+  rw [hAB, Matrix.det_mul, Matrix.det_mul, Subring.coe_mul, Subring.coe_mul, v.map_mul, v.map_mul,
+    v_unit v u1, v_unit v u2, zero_add, add_zero]
 
-theorem relLen_iff_of_basis {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Submodule (Int0 v) M}
-    (hle : X' ≤ X) (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
-    (A : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) (r : ℝ) :
-    RelLen v X' X r ↔ v (A.det : C) = r := by
+theorem relLen_iff_of_basis
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {X' X : Submodule (Int0 v) M} (hle : X' ≤ X) (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
+    (A : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
+    (r : ℝ)
+    : RelLen v X' X r ↔ v (A.det : C) = r := by
   constructor
   · rintro ⟨n, c, c', B, hB, hr⟩
     let e := b.indexEquiv c
@@ -180,9 +194,11 @@ theorem relLen_iff_of_basis {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Su
       exact (Equiv.sum_comp e.symm (fun i => A i (e.symm k) • (b i : M))).symm
     · rw [Matrix.det_reindex_self]; exact h
 
-theorem card_eq_of_relLen {ι ι' : Type} [Fintype ι] [Fintype ι'] {X' X : Submodule (Int0 v) M}
-    {r : ℝ} (h : RelLen v X' X r) (b : Basis ι (Int0 v) X) (b' : Basis ι' (Int0 v) X') :
-    Fintype.card ι = Fintype.card ι' := by
+theorem card_eq_of_relLen
+    {ι ι' : Type} [Fintype ι] [Fintype ι']
+    {X' X : Submodule (Int0 v) M} {r : ℝ}
+    (h : RelLen v X' X r) (b : Basis ι (Int0 v) X) (b' : Basis ι' (Int0 v) X')
+    : Fintype.card ι = Fintype.card ι' := by
   obtain ⟨n, c, c', -, -, -⟩ := h
   rw [Fintype.card_congr (b.indexEquiv c), Fintype.card_congr (b'.indexEquiv c')]
 
@@ -190,7 +206,14 @@ end GlobalTheory.LenMap
 
 namespace GlobalTheory.LenMap
 
-theorem relLen_map_iff : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M M' : Type) [AddCommGroup M] [Module (Int0 v) M] [AddCommGroup M'] [Module (Int0 v) M'], (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0) → (∀ (c : Int0 v) (x : M'), c ≠ 0 → c • x = 0 → x = 0) → ∀ (f : M →ₗ[Int0 v] M') (X' X : Submodule (Int0 v) M), X' ≤ X → X ⊓ LinearMap.ker f ≤ X' → Module.Finite (Int0 v) X → Module.Finite (Int0 v) X' → ∀ r : ℝ, (RelLen v X' X r ↔ RelLen v (X'.map f) (X.map f) r) := by
+theorem relLen_map_iff
+    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M M' : Type) [AddCommGroup M]
+        [Module (Int0 v) M] [AddCommGroup M'] [Module (Int0 v) M'],
+      (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0)
+        → (∀ (c : Int0 v) (x : M'), c ≠ 0 → c • x = 0 → x = 0)
+        → ∀ (f : M →ₗ[Int0 v] M') (X' X : Submodule (Int0 v) M),
+          X' ≤ X → X ⊓ LinearMap.ker f ≤ X' → Module.Finite (Int0 v) X → Module.Finite (Int0 v) X'
+            → ∀ r : ℝ, (RelLen v X' X r ↔ RelLen v (X'.map f) (X.map f) r) := by
   intro C _ v M M' _ _ _ _ htM htM' f X' X hle hker hX hX' r
   classical
   haveI := isTorsionFree_submodule htM' (X.map f)
@@ -260,7 +283,7 @@ theorem relLen_map_iff : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop �
       simp [A, Matrix.toBlocks₁₁, hinl, Finsupp.single_apply, Matrix.one_apply, eq_comm]
     have h21 : A.toBlocks₂₁ = 0 := by
       ext i k
-      simp [A, Matrix.toBlocks₂₁, hinl, Finsupp.single_apply]
+      simp [A, Matrix.toBlocks₂₁, hinl]
     have hdet : A.det = B.det := by
       conv_lhs => rw [← Matrix.fromBlocks_toBlocks A, h11, h21]
       rw [Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, one_mul]

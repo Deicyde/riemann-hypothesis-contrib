@@ -104,7 +104,7 @@ theorem sheetDensity_nonneg
       Inter.SheetHessPSD.proof K ι P e Ψ (N j) y w _ (hNs j) (hNp j) hγ.choose_spec
     unfold maDensity
     exact mul_nonneg (by positivity)
-      (ReciprocityTheory.AnForm.A.mdisc_nonneg_of_posSemidef _ hpsd).2
+      (_root_.ReciprocityTheory.AnForm.A.mixedDiscriminant_nonneg_of_gram _ hpsd).2
   · exact le_rfl
 
 end PtsSemiPosMassFinite

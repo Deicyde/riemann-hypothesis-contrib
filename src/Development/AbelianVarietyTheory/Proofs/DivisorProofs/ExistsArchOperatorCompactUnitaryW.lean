@@ -2,9 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicSchwartzSpaceTranslateMemOfMem
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFiniteWeightComplementaryArchimedeanSchwarStatement
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFiniteWeightComplementaryArchimedeanSchwar
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsSchwartzArchimedeanSliceAdelicSchwartz
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeisenbergCommutingOperatorBlindToArchimedeanFibStatement
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeisenbergCommutingOperatorIndependentOfArchimedeanFiber
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -135,8 +135,7 @@ theorem exists_op_of_UAt
       : ∀ Φ ∈ GlobalTheory.WeilM.schA F (Fin n × Fin d), om x Φ ∈ GlobalTheory.WeilM.schA F _ :=
     fun Φ hΦ => hW.pres x Φ hΦ
   have hcomm := comm_offI hw x hx1 hx2
-  obtain ⟨R, hR0, hR⟩ :=
-    GlobalTheory.T.exists_finiteWeight_complementary_archimedeanSchwartz (F := F) (Fin n × Fin d)
+  obtain ⟨R, hR0, hR⟩ := _root_.GlobalTheory.ArchRest.exists_rest_arch (F := F) (Fin n × Fin d)
   have hB
       : ∀ f : SInf F (Fin n × Fin d), ∃ g : SInf F (Fin n × Fin d), ∀ t,
         g t = (R 0)⁻¹ * om x (tens (evI F) (⇑f) R) (liftI t) := by
@@ -216,7 +215,7 @@ theorem exists_op_of_UAt
     field_simp
     ring
   have h0 :=
-    GlobalTheory.T.heisenbergCommuting_operator_independent_of_archimedeanFibres ψ T0 hψ hkeep
+    _root_.GlobalTheory.FinFibre.fibre_zero ψ T0 hψ hkeep
       (fun u hu p q Φ hΦ => hcomm u hu p q Φ hΦ)
       (Φ₁ - Φ₂) (sub_mem hr.2 hm₂) y hfz
   rw [map_sub, Pi.sub_apply, sub_eq_zero] at h0

@@ -45,6 +45,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsUnifOfIsMumfo
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalModelStructureMap
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -57,6 +58,7 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues Formalism.L2.Pj
+
 theorem _root_.GlobalTheory.T.tauCoordinate_eq_unit_mul_psi_quotient
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (D : DegPre R) (a b : D.X)
         (x x₁ x₂ x₃ : (FractionRing R)ˣ),
@@ -65,7 +67,4 @@ theorem _root_.GlobalTheory.T.tauCoordinate_eq_unit_mul_psi_quotient
           (x : FractionRing R)
             = algebraMap R (FractionRing R) u * x₁ * (x₂ : FractionRing R)⁻¹
               * (x₃ : FractionRing R)⁻¹ := by
-  first
-  | exact @GlobalTheory.TauCoordQuot.main
-  | exact GlobalTheory.TauCoordQuot.main
-  | (intros; apply GlobalTheory.TauCoordQuot.main <;> assumption)
+  first | exact @GlobalTheory.TauCoordQuot.main

@@ -54,8 +54,6 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
 open PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.Bc.ArchbcB.B
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 attribute [local instance]
@@ -113,7 +111,6 @@ theorem gRead_mono
     {P Q : Prop} (hPQ : P → Q) (h : GRead gen β m v P)
     : GRead gen β m v Q := fun s χ h1 h2 h3 =>
   hPQ (h s χ h1 h2 h3)
-
 
 theorem frameRead_of (h1 : BlockCand) (h2 : CandTOut) : FrameRead := by
   intro hR hD E _ _ _ hE n hn π hπ S T F₀ F h

@@ -142,7 +142,7 @@ theorem adelicLattice_spec
   exists_approx I.L g hg,
   incl_mem_iff I.L I.L_fg I.L_span,
   span_lamAf I.L I.L_span,
-  GlobalTheory.AutInhab.lamAf_fg I.L I.L_fg,
+  _root_.GlobalTheory.VectorInclusion.lamAf_fg I.L I.L_fg,
   GlobalTheory.AutInhab.lamAf_absorbs I.L I.L_span
 ⟩
 

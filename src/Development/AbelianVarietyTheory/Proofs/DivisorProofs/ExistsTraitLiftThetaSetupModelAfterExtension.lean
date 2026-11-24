@@ -57,10 +57,7 @@ open GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc.TraitLift
 
-theorem spMap_comp'
-    {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R''] (f : R' →+* R'') (g : R →+* R')
-    : spMap f ≫ spMap g = spMap (f.comp g) := by
-  rw [← Spec.map_comp]; rfl
+alias spMap_comp' := _root_.Formalism.L2.Pj.spMap_comp_ring
 
 theorem mem_of_closedPoint
     {Y : Scheme.{0}} (U : Set Y) (hU : IsOpen U)

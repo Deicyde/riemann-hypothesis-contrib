@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContDiffDerivSnoc
 
 @[expose] public section
 
@@ -423,32 +424,6 @@ private theorem sobCont_zero_twisted_operators
     : Sobolev₂ Lie σ (0 : H →ₗ[ℂ] ℂ) :=
   ⟨[], 0, by simp, fun w _ => by simp⟩
 
-private theorem sobCont_add_twisted_operators
-    {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {Lie : Set (Matrix (Fin n) (Fin n) ℂ)} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    {ℓ ℓ' : H →ₗ[ℂ] ℂ} (h : Sobolev₂ Lie σ ℓ) (h' : Sobolev₂ Lie σ ℓ')
-    : Sobolev₂ Lie σ (ℓ + ℓ') := by
-  obtain ⟨S, C, hS, hC⟩ := h
-  obtain ⟨S', C', hS', hC'⟩ := h'
-  refine ⟨S ++ S', |C| + |C'|, fun l hl => ?_, fun w hw => ?_⟩
-  · rcases List.mem_append.1 hl with hl | hl
-    · exact hS l hl
-    · exact hS' l hl
-  · have e1 := hC w hw
-    have e2 := hC' w hw
-    have p1 : 0 ≤ (S.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
-      List.sum_nonneg fun y hy => by
-        obtain ⟨l, _, rfl⟩ := List.mem_map.1 hy
-        exact norm_nonneg _
-    have p2 : 0 ≤ (S'.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
-      List.sum_nonneg fun y hy => by
-        obtain ⟨l, _, rfl⟩ := List.mem_map.1 hy
-        exact norm_nonneg _
-    rw [List.map_append, List.sum_append, LinearMap.add_apply]
-    have e3 := norm_add_le (ℓ w) (ℓ' w)
-    nlinarith [mul_le_mul_of_nonneg_right (le_abs_self C) p1, mul_le_mul_of_nonneg_right (le_abs_self C') p2,
-      mul_nonneg (abs_nonneg C) p2, mul_nonneg (abs_nonneg C') p1]
-
 private theorem sobCont_smul_twisted_operators
     {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     {Lie : Set (Matrix (Fin n) (Fin n) ℂ)} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
@@ -480,7 +455,7 @@ private theorem equivariant_and_sobCont_slice {T : MMap M} (hT : T ∈ Mult θ M
       rfl
     · obtain ⟨ℓ, h1, h2⟩ := hT.2 τ v y
       obtain ⟨ℓ', h1', h2'⟩ := hT'.2 τ v y
-      exact ⟨ℓ + ℓ', sobCont_add_twisted_operators h1 h1', fun w => by simp [h2, h2']⟩
+      exact ⟨ℓ + ℓ', _root_.GlobalTheory.MultMem.sobCont_add h1 h1', fun w => by simp [h2, h2']⟩
   | smul c T _ hT =>
     refine ⟨fun τ g hg v w hw => ?_, fun τ v y => ?_⟩
     · rw [MultilinearMap.smul_apply, MultilinearMap.smul_apply, hT.1 τ g hg v w hw]
@@ -508,7 +483,6 @@ theorem multT_eq_zero
   have hxsum : x = ∑ a : f.support, f a • PiTensorProduct.tprod ℂ (a : M.Vec) := by
     rw [← hf, Finsupp.sum, ← Finset.sum_coe_sort]
   have h0 : ∑ a : f.support, f a • T a = 0 := by
-
     rw [hxsum, map_sum] at h
     simpa only [map_smul, huT] using h
   obtain ⟨w', hw'⟩ : ∃ w' : M.Vec, tprodInnerFun w' x ≠ 0 := by
@@ -531,7 +505,6 @@ theorem multT_eq_zero
     fun a => MultilinearMap.map_smul_univ T (fun τ => ⟪w' τ, (a : M.Vec) τ⟫_ℂ) w
   simp only [hA, smul_smul, ← Finset.sum_smul] at h1
   have hs : ∑ a : f.support, f a * ∏ τ, ⟪w' τ, (a : M.Vec) τ⟫_ℂ = tprodInnerFun w' x := by
-
     rw [hxsum, map_sum]
     simp only [map_smul, tprodInnerFun_tprod, smul_eq_mul]
   rw [hs] at h1

@@ -53,6 +53,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -69,13 +70,6 @@ noncomputable section
 namespace GlobalTheory.Mum.UnifEven
 
 open GlobalTheory.UU GlobalTheory.LN
-
-theorem isAdmissible_maximalIdeal_of_completeNormalCharZero
-    {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] (hB : Base R)
-    : admitted R (maximalIdeal R) := by
-  refine ⟨hB.1, hB.1.2.2.2, hB.2, (maximalIdeal.isMaximal R).isPrime, ?_⟩
-  letI := Ideal.Quotient.field (maximalIdeal R)
-  infer_instance
 
 theorem exists_setting
     {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R]
@@ -143,7 +137,8 @@ theorem GlobalTheory.Mum.exists_unif_even
   obtain ⟨⟨hL, hL2, hL3, -, -⟩, -⟩ := GlobalTheory.lawsAndExpansions
   have hE := GlobalTheory.LN.ega_holds
   have hU := GlobalTheory.uniformisation_dvr_unconditional
-  have hR := GlobalTheory.Mum.UnifEven.isAdmissible_maximalIdeal_of_completeNormalCharZero hB
+  have hR :=
+    _root_.GlobalTheory.Mum.PreUnifEven.isAdmissibleCompleteLocalDomainPrime_of_completeNormal hB
   have := hR.1.1
   have := hR.2.2.1
   have hI := hR.2.2.2.1

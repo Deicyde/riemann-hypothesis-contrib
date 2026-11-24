@@ -58,39 +58,33 @@ import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.HCFFromRecipA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host nonZeroDivisors
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+  nonZeroDivisors
 
 namespace GlobalTheory.HeckeProduct
 
 section Comp
 variable (L : Type) [Field L] [NumberField L]
 
-theorem localIdele_snd_self (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) :
-    ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).2 v = x := by
+theorem localIdele_snd_self (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ)
+    : ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).2 v = x := by
   classical
   show (Pi.mulSingle v (x : v.adicCompletion L) : ∀ w : HeightOneSpectrum (𝓞 L), w.adicCompletion L) v = x
   convert Pi.mulSingle_eq_same v (x : v.adicCompletion L)
 
-theorem localIdele_snd_ne (v w : HeightOneSpectrum (𝓞 L)) (h : w ≠ v) (x : (v.adicCompletion L)ˣ) :
-    ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).2 w = 1 := by
+theorem localIdele_snd_ne (v w : HeightOneSpectrum (𝓞 L)) (h : w ≠ v) (x : (v.adicCompletion L)ˣ)
+    : ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).2 w = 1 := by
   classical
   show (Pi.mulSingle v (x : v.adicCompletion L) : ∀ w : HeightOneSpectrum (𝓞 L), w.adicCompletion L) w = 1
   convert Pi.mulSingle_eq_of_ne h (x : v.adicCompletion L)
 
-theorem localIdele_fst (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) :
-    ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).1 = 1 := rfl
+theorem localIdele_fst (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ)
+    : ((localIdele L v x : Ideles L) : AdeleRing (𝓞 L) L).1 = 1 :=
+  rfl
 
-theorem infIdele_fst_self (w : InfinitePlace L) (x : (w.Completion)ˣ) :
-    ((infIdele L w x : Ideles L) : AdeleRing (𝓞 L) L).1 w = x := by
-  classical
-  show (Pi.mulSingle w (x : w.Completion) : ∀ u : InfinitePlace L, u.Completion) w = x
-  convert Pi.mulSingle_eq_same w (x : w.Completion)
+alias infIdele_fst_self := _root_.ReciprocityTheory.Neutral.Bridge.HCFR.infIdele_fst_self
 
-theorem infIdele_fst_ne (w u : InfinitePlace L) (h : u ≠ w) (x : (w.Completion)ˣ) :
-    ((infIdele L w x : Ideles L) : AdeleRing (𝓞 L) L).1 u = 1 := by
-  classical
-  show (Pi.mulSingle w (x : w.Completion) : ∀ u : InfinitePlace L, u.Completion) u = 1
-  convert Pi.mulSingle_eq_of_ne h (x : w.Completion)
+alias infIdele_fst_ne := _root_.ReciprocityTheory.Neutral.Bridge.HCFR.infIdele_fst_ne
 
 end Comp
 
@@ -105,15 +99,20 @@ def finPart : Ideles F →* (FiniteAdeleRing (𝓞 F) F)ˣ :=
 
 variable {F}
 
-theorem infDiag_parts (k : Fˣ) : infPart F (infDiag k) = infPart F (diagUnits F k) ∧ finPart F (infDiag k) = 1 := by
+theorem infDiag_parts (k : Fˣ)
+    : infPart F (infDiag k) = infPart F (diagUnits F k) ∧ finPart F (infDiag k) = 1 := by
   classical
   constructor
   · apply Units.ext
     funext w
     rw [infDiag, MonoidHom.finsetProd_apply, map_prod, Units.coe_prod]
-    have e : (∏ u : InfinitePlace F, ((infPart F (((infIdele F u).comp (atInf u)) k) : (InfiniteAdeleRing F)ˣ) :
-        InfiniteAdeleRing F)) w = ∏ u : InfinitePlace F, ((infPart F (((infIdele F u).comp (atInf u)) k) :
-          (InfiniteAdeleRing F)ˣ) : InfiniteAdeleRing F) w := Finset.prod_apply _ _ _
+    have e
+        : (∏ u : InfinitePlace F, ((infPart F (((infIdele F u).comp (atInf u)) k) : (InfiniteAdeleRing F)ˣ) :
+            InfiniteAdeleRing F))
+            w
+          = ∏ u : InfinitePlace F, ((infPart F (((infIdele F u).comp (atInf u)) k) :
+            (InfiniteAdeleRing F)ˣ) : InfiniteAdeleRing F) w :=
+      Finset.prod_apply _ _ _
     rw [e, Finset.prod_eq_single w]
     · exact infIdele_fst_self F w _
     · intro u _ hu
@@ -128,57 +127,79 @@ section Product
 
 variable {F : Type} [Field F] [NumberField F]
 
-
 open Classical in
-def cut (a : FiniteAdeleRing (𝓞 F) F) (T : Finset (HeightOneSpectrum (𝓞 F))) : FiniteAdeleRing (𝓞 F) F :=
-  ⟨fun v => if v ∈ T then a v else 1, by
+def cut (a : FiniteAdeleRing (𝓞 F) F) (T : Finset (HeightOneSpectrum (𝓞 F)))
+    : FiniteAdeleRing (𝓞 F) F := ⟨
+  fun v => if v ∈ T then a v else 1,
+  by
     refine Filter.eventually_cofinite.mpr (T.finite_toSet.subset fun w hw => ?_)
     by_contra h
     apply hw
     have h' : w ∉ T := h
     simp only [h', if_false]
-    exact one_mem _⟩
+    exact one_mem _
+⟩
 
-theorem tendsto_cut (a : FiniteAdeleRing (𝓞 F) F) : Filter.Tendsto (cut a) Filter.atTop (nhds a) := by
+theorem tendsto_cut (a : FiniteAdeleRing (𝓞 F) F)
+    : Filter.Tendsto (cut a) Filter.atTop (nhds a) := by
   apply GlobalTheory.Mem.Chr.CharModel.tendsto_cut <;> assumption
 
-theorem prod_local (k : Fˣ) (T : Finset (HeightOneSpectrum (𝓞 F))) :
-    ((infDiag k * ∏ v ∈ T, localIdele F v (atFin v k) : Ideles F) : AdeleRing (𝓞 F) F) =
-      (((diagUnits F k : Ideles F) : AdeleRing (𝓞 F) F).1, cut ((diagUnits F k : Ideles F) : AdeleRing (𝓞 F) F).2 T) := by
+theorem prod_local (k : Fˣ) (T : Finset (HeightOneSpectrum (𝓞 F)))
+    : ((infDiag k * ∏ v ∈ T, localIdele F v (atFin v k) : Ideles F) : AdeleRing (𝓞 F) F)
+      = (
+        ((diagUnits F k : Ideles F) : AdeleRing (𝓞 F) F).1,
+        cut ((diagUnits F k : Ideles F) : AdeleRing (𝓞 F) F).2 T
+      ) := by
   classical
   refine Prod.ext ?_ ?_
-  · change ((infPart F (infDiag k * ∏ v ∈ T, localIdele F v (atFin v k)) : (InfiniteAdeleRing F)ˣ) : InfiniteAdeleRing F) = _
-    have e : ∏ v ∈ T, infPart F (localIdele F v (atFin v k)) = 1 := Finset.prod_eq_one (fun v _ => Units.ext rfl)
+  · change ((infPart F (infDiag k * ∏ v ∈ T, localIdele F v (atFin v k)) : (InfiniteAdeleRing F)ˣ)
+        : InfiniteAdeleRing F)
+      = _
+    have e : ∏ v ∈ T, infPart F (localIdele F v (atFin v k)) = 1 :=
+      Finset.prod_eq_one (fun v _ => Units.ext rfl)
     rw [map_mul, map_prod, (infDiag_parts k).1, e, mul_one]
     rfl
-  · change ((finPart F (infDiag k * ∏ v ∈ T, localIdele F v (atFin v k)) : (FiniteAdeleRing (𝓞 F) F)ˣ) : FiniteAdeleRing (𝓞 F) F) = _
+  · change ((finPart F (infDiag k * ∏ v ∈ T, localIdele F v (atFin v k))
+          : (FiniteAdeleRing (𝓞 F) F)ˣ)
+        : FiniteAdeleRing (𝓞 F) F)
+      = _
     rw [map_mul, (infDiag_parts k).2, one_mul]
     induction T using Finset.induction_on with
-    | empty => rw [Finset.prod_empty, map_one]; exact Subtype.ext (funext fun v => by simp [cut]; rfl)
+    | empty =>
+      rw [Finset.prod_empty, map_one]; exact Subtype.ext (funext fun v => by simp [cut]; rfl)
     | insert u T hu ih =>
       rw [Finset.prod_insert hu, map_mul, Units.val_mul, ih]
       refine Subtype.ext (funext fun v => ?_)
-      change ((localIdele F u (atFin u k) : Ideles F) : AdeleRing (𝓞 F) F).2 v * (if v ∈ T then _ else 1) =
-        if v ∈ insert u T then _ else 1
+      change ((localIdele F u (atFin u k) : Ideles F) : AdeleRing (𝓞 F) F).2 v
+          * (if v ∈ T then _ else 1)
+        = if v ∈ insert u T then _ else 1
       by_cases h : v = u
       · subst h
-        rw [localIdele_snd_self, if_neg hu, if_pos (Finset.mem_insert_self _ _), mul_one]; rfl
+        rw [localIdele_snd_self, if_neg hu, if_pos (Finset.mem_insert_self _ _), mul_one]
+        rfl
       · rw [localIdele_snd_ne F u v h, one_mul]; simp [h]
 
-theorem tendsto_prod_local (k : Fˣ) :
-    Filter.Tendsto (fun T : Finset (HeightOneSpectrum (𝓞 F)) => infDiag k * ∏ v ∈ T, localIdele F v (atFin v k))
+theorem tendsto_prod_local (k : Fˣ)
+    : Filter.Tendsto
+      (fun T : Finset (HeightOneSpectrum (𝓞 F)) => infDiag k * ∏ v ∈ T, localIdele F v (atFin v k))
       Filter.atTop (nhds (diagUnits F k)) := by
   apply GlobalTheory.Mem.Chr.CharModel.tendsto_prod_local <;> assumption
 
-theorem locK_unr (χ : HChar F) {v : HeightOneSpectrum (𝓞 F)} (h : χ.UnrAt v) (k : Fˣ) :
-    χ.locK v k = χ.val v ^ ordF v k := by
+theorem locK_unr (χ : HChar F) {v : HeightOneSpectrum (𝓞 F)} (h : χ.UnrAt v) (k : Fˣ)
+    : χ.locK v k = χ.val v ^ ordF v k := by
   apply GlobalTheory.Mem.Chr.CharModel.locK_unr <;> assumption
 
 theorem finite_ordF (k : Fˣ) : {v : HeightOneSpectrum (𝓞 F) | ordF v k ≠ 0}.Finite := by
-  have h := Filter.eventually_cofinite.1 (GlobalTheory.Idele.ord_vw_eventually_zero (FiniteAdeleRing.unitEmbedding (𝓞 F) F k))
+  have h :=
+    Filter.eventually_cofinite.1 (GlobalTheory.Idele.ord_vw_eventually_zero
+      (FiniteAdeleRing.unitEmbedding (𝓞 F) F k))
   refine h.subset fun v hv h0 => hv ?_
-  have hk : Valued.v (((FiniteAdeleRing.unitEmbedding (𝓞 F) F k : (FiniteAdeleRing (𝓞 F) F)ˣ) :
-      FiniteAdeleRing (𝓞 F) F) v) = v.valuation F (k : F) :=
+  have hk
+      : Valued.v
+          (((FiniteAdeleRing.unitEmbedding (𝓞 F) F k : (FiniteAdeleRing (𝓞 F) F)ˣ)
+              : FiniteAdeleRing (𝓞 F) F)
+            v)
+        = v.valuation F (k : F) :=
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (k : F)
   rw [GlobalTheory.Idele.ord_vw, hk] at h0
   exact h0

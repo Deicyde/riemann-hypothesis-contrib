@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FstTszeSec
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsJetExtensionSquareZeroStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsJetExtensionSquareZero
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -90,7 +90,7 @@ theorem jet_sh
           = TrivSqZeroExt.inl (sh e y) + TrivSqZeroExt.inr (fun a ↦ dw a (sh e y)) := fun y ↦
     rfl
   obtain ⟨χ, hdeg, h0, h1, hφ⟩ :=
-    GlobalTheory.T.exists_jet_extension_square_zero K (T := K.jet k')
+    _root_.GlobalTheory.AnPer.Charts.exists_jet_factor K (T := K.jet k')
       (ptHom (K.triv k') e ≫ jet0 k') (ptHom (K.triv k') e ≫ jet1 k')
       (fun a ↦ TrivSqZeroExt.inr (Pi.single a 1))
       rfl

@@ -50,7 +50,8 @@ import Formalism.LocalToGlobal.IndefiniteReal.Bridge
 
 @[expose] public section
 
-open Formalism.IndefR.Bridge Formalism.L2.DIV Formalism.DivisionValues Formalism.L2.Col NumberField MeasureTheory Polynomial
+open Formalism.IndefR.Bridge Formalism.L2.DIV Formalism.DivisionValues Formalism.L2.Col NumberField
+  MeasureTheory Polynomial
 
 noncomputable section
 
@@ -63,27 +64,36 @@ variable {K V ι : Type} [Field K] [AddCommGroup V] [Module K V] [Fintype ι]
 def coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F] K) (v : V) : V :=
   ∑ i, φ (b.repr v i) • b i
 
-theorem repr_coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F] K) (v : V) (i : ι) :
-    b.repr (coordMap F b φ v) i = φ (b.repr v i) := by
+theorem repr_coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F] K) (v : V) (i : ι)
+    : b.repr (coordMap F b φ v) i = φ (b.repr v i) := by
   unfold coordMap
   rw [b.repr_sum_self]
 
-theorem coordMap_sum (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F] K) {α : Type} [Fintype α]
-    (x : α → K) (w : α → V) (hw : ∀ a i, b.repr (w a) i ∈ F) :
-    coordMap F b φ (∑ a, x a • w a) = ∑ a, φ (x a) • w a := by
+theorem coordMap_sum
+    (F : Subfield K)
+    (b : Module.Basis ι K V)
+    (φ : K →ₗ[F] K)
+    {α : Type} [Fintype α]
+    (x : α → K)
+    (w : α → V) (hw : ∀ a i, b.repr (w a) i ∈ F)
+    : coordMap F b φ (∑ a, x a • w a) = ∑ a, φ (x a) • w a := by
   apply b.repr.injective
   ext i
   rw [repr_coordMap]
 
-  simp only [map_sum, map_smul, Finset.sum_apply', Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
+  simp only [map_sum, map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul]
   refine Finset.sum_congr rfl fun a _ => ?_
   have h := φ.map_smul (⟨b.repr (w a) i, hw a i⟩ : F) (x a)
   simp only [Subfield.smul_def, smul_eq_mul] at h
   rw [mul_comm (x a), h, mul_comm]
 
-theorem map_coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F] K) (g : V →ₗ[K] V)
-    (hg : ∀ i j, b.repr (g (b j)) i ∈ F) (v : V) :
-    g (coordMap F b φ v) = coordMap F b φ (g v) := by
+theorem map_coordMap
+    (F : Subfield K)
+    (b : Module.Basis ι K V)
+    (φ : K →ₗ[F] K)
+    (g : V →ₗ[K] V) (hg : ∀ i j, b.repr (g (b j)) i ∈ F)
+    (v : V)
+    : g (coordMap F b φ v) = coordMap F b φ (g v) := by
   have h1 : g v = ∑ j, b.repr v j • g (b j) := by
     conv_lhs => rw [← b.sum_repr v]
 
@@ -92,10 +102,11 @@ theorem map_coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F
 
   simp only [coordMap, map_sum, map_smul]
 
-theorem exists_retraction (F : Subfield K) :
-    ∃ φ : K →ₗ[F] K, (∀ x, φ x ∈ F) ∧ ∀ x ∈ F, φ x = x := by
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap F K)
-    (LinearMap.ker_eq_bot.2 (algebraMap F K).injective)
+theorem exists_retraction (F : Subfield K)
+    : ∃ φ : K →ₗ[F] K, (∀ x, φ x ∈ F) ∧ ∀ x ∈ F, φ x = x := by
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap F K)
+      (LinearMap.ker_eq_bot.2 (algebraMap F K).injective)
   refine ⟨(Algebra.linearMap F K).comp g, fun x => (g x).2, fun x hx => ?_⟩
   have h := LinearMap.congr_fun hg ⟨x, hx⟩
   have h' : g x = ⟨x, hx⟩ := h
@@ -106,27 +117,28 @@ end General
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K)
 
-theorem hasRatBasis_of_act
-    (h : ∀ c (γ : S.Gam c) i j, S.bV.repr (S.ρ c γ (S.bV j)) i ∈ cmMax K) : S.HasRatBasis := by
+theorem hasRatBasis_of_act (h : ∀ c (γ : S.Gam c) i j, S.bV.repr (S.ρ c γ (S.bV j)) i ∈ cmMax K)
+    : S.HasRatBasis := by
   classical
   haveI : Module.Finite (cmMax K) K := Module.Finite.of_restrictScalars_finite ℚ (cmMax K) K
   let e := Module.finBasis (cmMax K) K
   let s : Set S.Forms := {f | S.IsRat (f : S.Cl → S.V)}
   have hs : ⊤ ≤ Submodule.span K s := by
     intro f _
-    let φ : Fin (Module.finrank (cmMax K) K) → (K →ₗ[cmMax K] K) :=
-      fun k => (Algebra.linearMap (cmMax K) K).comp (e.coord k)
-    let g : Fin (Module.finrank (cmMax K) K) → S.Forms := fun k =>
-      ⟨fun c => coordMap (cmMax K) S.bV (φ k) ((f : S.Cl → S.V) c), fun c γ => by
-        rw [map_coordMap (cmMax K) S.bV (φ k) (S.ρ c γ) (h c γ), f.2 c γ]⟩
+    let φ : Fin (Module.finrank (cmMax K) K) → (K →ₗ[cmMax K] K) := fun k =>
+      (Algebra.linearMap (cmMax K) K).comp (e.coord k)
+    let g : Fin (Module.finrank (cmMax K) K) → S.Forms := fun k => ⟨
+      fun c => coordMap (cmMax K) S.bV (φ k) ((f : S.Cl → S.V) c),
+      fun c γ => by rw [map_coordMap (cmMax K) S.bV (φ k) (S.ρ c γ) (h c γ), f.2 c γ]
+    ⟩
     have hf : f = ∑ k, e k • g k := by
       apply Subtype.ext
       funext c
       apply S.bV.repr.injective
       ext i
 
-      simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul,
-      Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul, g, repr_coordMap]
+      simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum,
+        map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul, g, repr_coordMap]
       conv_lhs => rw [← e.sum_repr (S.bV.repr ((f : S.Cl → S.V) c) i)]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [mul_comm]
@@ -142,8 +154,9 @@ theorem hasRatBasis_of_act
   rw [Module.Basis.reindex_apply]
   exact Module.Basis.ofSpan_subset hs ⟨_, rfl⟩
 
-theorem repr_mem_of_isRat (h : S.HasRatBasis) (f : S.Forms) (hf : S.IsRat (f : S.Cl → S.V)) (a : Fin S.dim) :
-    S.basis.repr f a ∈ cmMax K := by
+theorem repr_mem_of_isRat
+    (h : S.HasRatBasis) (f : S.Forms) (hf : S.IsRat (f : S.Cl → S.V)) (a : Fin S.dim)
+    : S.basis.repr f a ∈ cmMax K := by
   have hb : ∀ i, S.IsRat (S.basis i : S.Cl → S.V) := by
     have : S.basis = h.choose := by
       unfold CSD.basis
@@ -173,7 +186,13 @@ end GlobalTheory.FormsDescent
 
 namespace GlobalTheory
 
-theorem forms_rat : ∀ {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K), ((∀ c (γ : S.Gam c) i j, S.bV.repr (S.ρ c γ (S.bV j)) i ∈ cmMax K) → S.HasRatBasis) ∧ ∀ T : Module.End K S.Forms, S.HasRatBasis → (∀ f : S.Forms, S.IsRat (f : S.Cl → S.V) → S.IsRat ((T f : S.Forms) : S.Cl → S.V)) → ∀ a b, LinearMap.toMatrix S.basis S.basis T a b ∈ cmMax K := by
+theorem forms_rat
+    : ∀ {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K),
+      ((∀ c (γ : S.Gam c) i j, S.bV.repr (S.ρ c γ (S.bV j)) i ∈ cmMax K) → S.HasRatBasis)
+        ∧ ∀ T : Module.End K S.Forms,
+          S.HasRatBasis
+            → (∀ f : S.Forms, S.IsRat (f : S.Cl → S.V) → S.IsRat ((T f : S.Forms) : S.Cl → S.V))
+            → ∀ a b, LinearMap.toMatrix S.basis S.basis T a b ∈ cmMax K := by
   intro K _ _ _ S
   refine ⟨FormsDescent.hasRatBasis_of_act S, fun T h hT a b => ?_⟩
   rw [LinearMap.toMatrix_apply]

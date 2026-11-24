@@ -2,9 +2,11 @@ module
 
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsUnipotentInvariantCompactlySupportedWeightStatement
+public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsUnipotentInvariantCompactlySupportedWeight
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SelfdualMeasureTransportEquiv
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdelesLocalRingTotallyReal
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SelfdualMeasureTransportEquivStatement
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -456,7 +458,7 @@ theorem sd_core
     continuous_invFun := hh.symm.continuous
   }
   have hT :=
-    GlobalTheory.T.selfdual_measure_transport_equiv (HermR R σ n) (Idx n d → R) e ν
+    _root_.GlobalTheory.CompanionTheory.SW.selfDual_transport (HermR R σ n) (Idx n d → R) e ν
       (fun x y => ψR (x ⬝ᵥ ((formB σ b n).map (algebraMap F R) *ᵥ y)))
   have hp
       : (fun S T : HermR R σ n => ψR (pairHerm R σ n S T))
@@ -505,8 +507,8 @@ theorem sdHerm_eq_coord
   obtain ⟨hinv, -⟩ := HaarCoord.conj_facts hcm
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hcm.2.2.1]; omega)
   obtain ⟨cinf, c, hu, h1, h2⟩ :=
-    GlobalTheory.T.exists_unipotentInvariant_compactlySupported_weight F hcm.1 laminf lam hinf hv ψ
-      hψ (HermSd.Idx n d) (HermSd.formB σ b n) (HermSd.formB_isSymm hinv b n)
+    _root_.GlobalTheory.CompanionTheory.SW.SdCoord.selfDual_coord F hcm.1 laminf lam hinf hv ψ hψ
+      (HermSd.Idx n d) (HermSd.formB σ b n) (HermSd.formB_isSymm hinv b n)
       (HermSd.formB_det hinv b n)
   refine ⟨cinf, c, hu, ?_, fun v => ?_⟩
   · obtain ⟨a1, a2, a3, a4, -⟩ := GlobalTheory.CompanionTheory.SW.isLocR_Ainf F hcm.1

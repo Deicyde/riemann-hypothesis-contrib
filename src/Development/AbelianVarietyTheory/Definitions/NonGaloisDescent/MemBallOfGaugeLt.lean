@@ -402,7 +402,7 @@ theorem _root_.GlobalTheory.BSP.isDiscMap_map
         ‖_root_.GlobalTheory.BSP.Disc.map f h x‖ ≤ ‖x‖)
       x ?_ ?_
     · refine isClosed_le (continuous_norm.comp ?_) continuous_norm
-      simp only [_root_.GlobalTheory.BSP.Disc.map, UniformSpace.Completion.mapRingHom_apply]
+      simp only [_root_.GlobalTheory.BSP.Disc.map]
       exact UniformSpace.Completion.continuous_map
     · intro y
       change

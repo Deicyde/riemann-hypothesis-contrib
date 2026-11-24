@@ -49,6 +49,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw GlobalTheory.FinPl
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.unitaryFiniteAdelicGroup_split_finitePlaceSet
     : ∀ (D : D7) (V : HSp D) (Q : Finset (Pl D)),
       IsClosed (grpAt V (· ∈ Q) : Set (GA D V)) ∧ IsClosed (grpAt V (· ∉ Q) : Set (GA D V))
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.unitaryFiniteAdelicGroup_split_finitePlaceSet
               a * b ∈ jacGrp d → a ∈ jacGrp d ∧ b ∈ jacGrp d)
             ∧ ∀ (A L : HSp D) (o : OrthDec V₀ A L), ∀ a ∈ grpAt V (· ∈ Q), ∀ b ∈ grpAt V (· ∉ Q),
               a * b ∈ besGrp d o → a ∈ besGrp d o ∧ b ∈ besGrp d o := by
-  first
-  | exact @GlobalTheory.FinPl.SetCut.grp_split
-  | exact GlobalTheory.FinPl.SetCut.grp_split
-  | (intros; apply GlobalTheory.FinPl.SetCut.grp_split <;> assumption)
+  first | exact @GlobalTheory.FinPl.SetCut.grp_split

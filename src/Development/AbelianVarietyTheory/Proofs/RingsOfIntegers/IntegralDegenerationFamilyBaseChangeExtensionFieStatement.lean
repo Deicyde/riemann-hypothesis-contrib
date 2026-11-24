@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.integralDegenerationFamily_baseChange_extensionFie
           → ∀ (F : Type) [Field F] [Algebra (FractionRing R) F], ∃ θ : Fam D.toPre F k, ∀ α,
             GeneratorPullback.SecScal D.toPre.P.L (DegPre.famφ D.toPre F α) (DegPre.famε k) (θ.s α)
               (D.toPre.famφB α) (DegPre.famε k) (g α) (DegPre.prB D.toPre F).left 1 := by
-  first
-  | exact @GlobalTheory.FamBaseChange.main
-  | exact GlobalTheory.FamBaseChange.main
-  | (intros; apply GlobalTheory.FamBaseChange.main <;> assumption)
+  first | exact @GlobalTheory.FamBaseChange.main

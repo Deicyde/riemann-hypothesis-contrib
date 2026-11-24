@@ -91,7 +91,6 @@ theorem commute_cap_lie (τ : InfinitePlace E) (u : ℂ) (X : Lie E a)
     : Commute (cap τ u) (lie E a X) := by
   classical
   have hX : lie E a X = ∑ i, ∑ j, lieS E a i j (X i j) := by
-
     simp only [lieS_apply, ← map_sum]
     exact congrArg _ (Matrix.matrix_eq_sum_single (Matrix.of X))
   rw [hX]
@@ -162,7 +161,9 @@ theorem commute_cap_rt_infGL (τ : InfinitePlace E) (u : ℂ) (y : GL (Fin a) (R
   have h := GlobalTheory.CapAdInv.qdet_semiconj _ _ _ (rt_Eop y τ) (u + ((a : ℂ) - 1) / 2)
   let c : Rinf E →+* ℂ := Complex.ofRealHom.comp (Pi.evalRingHom (fun _ => ℝ) τ)
   have hQP : ((y⁻¹).val.map c) * (y.val.map c) = 1 := by rw [← Matrix.map_mul, Units.inv_mul]; simp
-  have h2 := GlobalTheory.CapAdInv.qdet_ad _ (glRel_Eop τ) _ _ hQP (u + ((a : ℂ) - 1) / 2)
+  have h2 :=
+    _root_.GlobalTheory.QuantumMinorAdjacentSwap.qdet_conj _ (glRel_Eop τ) _ _ hQP
+      (u + ((a : ℂ) - 1) / 2)
   exact (h.trans (congrArg (· * rt E a (infGL E a y)) h2)).symm
 
 theorem commute_cap_act (τ : InfinitePlace E) (u : ℂ) (o : Op E a)

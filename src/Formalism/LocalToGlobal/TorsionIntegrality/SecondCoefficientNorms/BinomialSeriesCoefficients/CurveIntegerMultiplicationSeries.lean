@@ -147,7 +147,8 @@ theorem curveEndoAll_of (hD : CurveSecondLogDerivative) : CurveEndoAll := by
           hs
         ⟩)
   refine ⟨fun α => ⟨(hall α).1, (hall α).2.1, (hall α).2.2, ?_⟩, ?_⟩
-  · exact jetAdj K R (logSer W) (expSer W) _ (τ α) (τ (star α)) hlp hPh.1 (hall α).2.2
+  · exact _root_.Formalism.L2.Th1.C.jetAdjoint' K R (logSer W) (expSer W) _ (τ α) (τ (star α)) hlp
+      hPh.1 (hall α).2.2
   · have hm := (hall (-1)).2.1
     rw [star_neg, star_one, map_neg, map_one] at hm
     exact jetOne K R (logSer W) (expSer W) _ hlp hl' hPh.1 hm h2

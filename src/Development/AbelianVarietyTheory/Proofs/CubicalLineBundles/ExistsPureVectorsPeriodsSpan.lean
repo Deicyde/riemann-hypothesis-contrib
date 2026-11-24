@@ -65,7 +65,6 @@ theorem span_pure_periods_eq_top
     intro a
     obtain ⟨x, hx⟩ := h a
     have h1 : (n : ℂ) • Pe a ∈ W := by
-
       rw [Nat.cast_smul_eq_nsmul, ← map_nsmul, hx, map_sum]
       refine W.sum_mem fun j _ => Submodule.subset_span ?_
       have h2 := Z.pure j (x j)

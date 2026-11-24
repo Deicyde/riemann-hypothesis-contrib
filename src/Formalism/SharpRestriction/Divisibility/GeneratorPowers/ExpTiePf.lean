@@ -239,8 +239,7 @@ theorem jetSubstPS_psJet
     : (jetSubstPS (m := m) (fun p : Fin 1 × Fin d => φ p.2)) (psJet m f)
       = psJet m (subst (fun p : Fin 1 × Fin d => φ p.2) f) := by
   have hs : MvPowerSeries.HasSubst (fun p : Fin 1 × Fin d => φ p.2) := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => h0 p.2)
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => h0 p.2)
   have hpoly
       : ∀ P : MvPolynomial (Fin 1 × Fin d) S,
         (jetSubstPS (m := m) (fun p : Fin 1 × Fin d => φ p.2)) (Ideal.Quotient.mk
@@ -268,8 +267,7 @@ theorem jetSubstPS_psJet
               = AddMonoidAlgebra.coeff (psTrunc m (φ n.2)) 0 from
             rfl,
           coeff_psTrunc_lemma_2 m _ 0 (by simp)]
-        first
-        | (rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply]; exact h0 n.2)
+        first | (rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply]; exact h0 n.2)
       have hX
           : (jetSubstPS (m := m) (fun p : Fin 1 × Fin d => φ p.2)) (Ideal.Quotient.mk
               (orig S (Fin 1 × Fin d) ^ (m + 1)) (MvPolynomial.X n))
@@ -354,10 +352,7 @@ theorem exp_pow_inv
     rw [add_neg_cancel, PowerSeries.rescale_one, RingHom.id_apply] at h2
     rw [h2, PowerSeries.rescale_zero, RingHom.comp_apply, PowerSeries.constantCoeff_exp, map_one]
   rw [h1, one_pow]
-  first
-  | exact PowerSeries.subst_one hs
-  | exact (PowerSeries.substAlgHom hs).map_one
-  | simp [← PowerSeries.coe_substAlgHom hs]
+  first | simp [← PowerSeries.coe_substAlgHom hs]
 
 theorem isValueAt_of_eq
     {S0 : Scheme.{0}} (A : Over S0) [GrpObj A]

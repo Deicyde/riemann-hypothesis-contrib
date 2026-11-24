@@ -50,6 +50,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.hermitianAdjoint_symplectic_action_theta_heisenberg
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -77,7 +78,4 @@ theorem _root_.GlobalTheory.T.hermitianAdjoint_symplectic_action_theta_heisenber
                 = GlobalTheory.IndefiniteRowSideFullHecke.ConjugateAdjointDagger.cj
                   (GlobalTheory.IndefiniteRowSideFullHecke.ConjugateAdjointDagger.dagger T S)
                   (heisO ψ S T w f) := by
-  first
-  | exact @GlobalTheory.AdjointPair.adjoint_clauses
-  | exact GlobalTheory.AdjointPair.adjoint_clauses
-  | (intros; apply GlobalTheory.AdjointPair.adjoint_clauses <;> assumption)
+  first | exact @GlobalTheory.AdjointPair.adjoint_clauses

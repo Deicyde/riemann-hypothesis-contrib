@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 100] LieRing.ofAssociativeRing
+
 theorem _root_.GlobalTheory.T.exists_finite_cosets_adelicUnitary_bounded_denominator
     : ∀ (D : D7) (V : HSp D) (U : Subgroup (GA D V)),
       IsOpen (U : Set (GA D V))
@@ -53,7 +54,4 @@ theorem _root_.GlobalTheory.T.exists_finite_cosets_adelicUnitary_bounded_denomin
           0 < d
             → ∃ S : Finset (GA D V), ∀ k ∈ GfC V,
               BddDen V d k → ∃ x ∈ S, x⁻¹ * k ∈ U ∧ x⁻¹ * k ∈ GfC V := by
-  first
-  | exact @GlobalTheory.SmoothForms.Cover.exists_finset_cover
-  | exact GlobalTheory.SmoothForms.Cover.exists_finset_cover
-  | (intros; apply GlobalTheory.SmoothForms.Cover.exists_finset_cover <;> assumption)
+  first | exact @GlobalTheory.SmoothForms.Cover.exists_finset_cover

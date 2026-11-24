@@ -54,6 +54,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_grpObj_isGrpPullback_of_isPullback'
     : ∀ (R R' : Type) [CommRing R] [CommRing R'] (σ : R →+* R') (A : Over (Sp R)) [GrpObj A]
         (X' : Scheme.{0}) (s' : X' ⟶ Sp R') (φ : X' ⟶ A.left),
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_grpObj_isGrpPullback_of_isPullback'
           IsGrpPullback (Over.mk s' : Over (Sp R')) A (spMap σ) φ
             ∧ (IsAbelianScheme A → IsAbelianScheme (Over.mk s' : Over (Sp R')))
             ∧ ∀ g, SmoothOfRelativeDimension g A.hom → SmoothOfRelativeDimension g s' := by
-  first
-  | exact @GlobalTheory.AbCoh.exists_grpObj_isGrpPullback_of_isPullback
-  | exact GlobalTheory.AbCoh.exists_grpObj_isGrpPullback_of_isPullback
-  | (intros; apply GlobalTheory.AbCoh.exists_grpObj_isGrpPullback_of_isPullback <;> assumption)
+  first | exact @GlobalTheory.AbCoh.exists_grpObj_isGrpPullback_of_isPullback

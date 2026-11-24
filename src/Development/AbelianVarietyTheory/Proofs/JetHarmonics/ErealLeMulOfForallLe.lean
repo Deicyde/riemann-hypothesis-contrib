@@ -52,16 +52,19 @@ import Formalism.LocalToGlobal.Divisibility.Numbers
 
 set_option autoImplicit false
 
-open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral
+  Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField
+  IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.GoodDepth
 
-theorem ramOverZ_ne_zero' {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K)) :
-    ramOverZ la ≠ 0 := by
+theorem ramOverZ_ne_zero' {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
+    : ramOverZ la ≠ 0 := by
   apply Formalism.MainNotions.ModuliIntegralCharts.H1.H1algLink.ramOverZ_ne_zero <;> assumption
 
-theorem ereal_le_mul_of_forall_le {x : EReal} {e B : ℝ} (he : 0 < e)
-    (h : ∀ ν : ℝ, ((e * ν : ℝ) : EReal) ≤ x → ν ≤ B) : x ≤ ((e * B : ℝ) : EReal) := by
+theorem ereal_le_mul_of_forall_le
+    {x : EReal} {e B : ℝ} (he : 0 < e) (h : ∀ ν : ℝ, ((e * ν : ℝ) : EReal) ≤ x → ν ≤ B)
+    : x ≤ ((e * B : ℝ) : EReal) := by
   by_contra hx
   obtain ⟨r, hr1, hr2⟩ := EReal.lt_iff_exists_real_btwn.1 (not_le.1 hx)
   have h1 : r / e ≤ B := h (r / e) (by rw [mul_div_cancel₀ _ he.ne']; exact hr2.le)
@@ -69,17 +72,28 @@ theorem ereal_le_mul_of_forall_le {x : EReal} {e B : ℝ} (he : 0 < e)
   rw [div_le_iff₀ he] at h1
   linarith [mul_comm e B]
 
-theorem nuW_bound_of_charts : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (lv : Level H) (Xo : Moduli Dw lv) (c : Coeff lv) [StarRing (𝓞 E)], IntChartEx Xo c →
-  ∀ (la : HeightOneSpectrum (𝓞 c.F)) (k : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (B : ℝ), 0 ≤ B →
-  (∀ (T : CDVR) (io : c.F →+* T.Fr) (e : ℕ), OverLa la T.V io e → ∀ y : IntFr Xo c T io, y.IsAlg → ∀ (C : IntChart T io y) (ν : ℝ), (((ramOverZ la : ℝ) * ν : ℝ) : EReal) ≤ nuLocC C e k a n → ν ≤ B) →
-  nuW Xo c la k a n ≠ ⊤ ∧ (nuW Xo c la k a n).toReal / (ramOverZ la : ℝ) ≤ B ∧ (B = 0 → nuW Xo c la k a n = 0) := by
+theorem nuW_bound_of_charts
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (lv : Level H)
+        (Xo : Moduli Dw lv) (c : Coeff lv) [StarRing (𝓞 E)],
+      IntChartEx Xo c
+        → ∀ (la : HeightOneSpectrum (𝓞 c.F)) (k : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (B : ℝ),
+          0 ≤ B
+            → (∀ (T : CDVR) (io : c.F →+* T.Fr) (e : ℕ),
+              OverLa la T.V io e
+                → ∀ y : IntFr Xo c T io,
+                  y.IsAlg
+                    → ∀ (C : IntChart T io y) (ν : ℝ),
+                      (((ramOverZ la : ℝ) * ν : ℝ) : EReal) ≤ nuLocC C e k a n → ν ≤ B)
+            → nuW Xo c la k a n ≠ ⊤ ∧ (nuW Xo c la k a n).toReal / (ramOverZ la : ℝ) ≤ B
+              ∧ (B = 0 → nuW Xo c la k a n = 0) := by
   intro E _ _ _ H Dw lv Xo c _ hEx la k a n B hB h
   have he : (0 : ℝ) < (ramOverZ la : ℝ) := by
     exact_mod_cast Nat.pos_of_ne_zero (ramOverZ_ne_zero' la)
   have hsup : nuSup Xo c la k a n ≤ (((ramOverZ la : ℝ) * B : ℝ) : EReal) := by
     unfold nuSup
-    refine iSup_le fun T => iSup_le fun io => iSup_le fun e => iSup_le fun hO => iSup_le fun y =>
-      iSup_le fun hy => ?_
+    refine iSup_le fun T =>
+      iSup_le fun io => iSup_le fun e => iSup_le fun hO => iSup_le fun y => iSup_le fun hy => ?_
     obtain ⟨C⟩ := hEx T io y hy
     exact (iInf_le (fun C : IntChart T io y => nuLocC C e k a n) C).trans
       (ereal_le_mul_of_forall_le he (h T io e hO y hy C))
@@ -89,7 +103,8 @@ theorem nuW_bound_of_charts : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
   have hW0 : 0 ≤ nuW Xo c la k a n := le_max_left _ _
   refine ⟨ne_top_of_le_ne_top (EReal.coe_ne_top _) hW, ?_, fun hB0 => ?_⟩
   · rw [div_le_iff₀ he, mul_comm]
-    have := EReal.toReal_le_toReal hW (ne_bot_of_le_ne_bot EReal.zero_ne_bot hW0) (EReal.coe_ne_top _)
+    have :=
+      EReal.toReal_le_toReal hW (ne_bot_of_le_ne_bot EReal.zero_ne_bot hW0) (EReal.coe_ne_top _)
     rwa [EReal.toReal_coe] at this
   · rw [hB0, mul_zero, EReal.coe_zero] at hW
     exact le_antisymm hW hW0

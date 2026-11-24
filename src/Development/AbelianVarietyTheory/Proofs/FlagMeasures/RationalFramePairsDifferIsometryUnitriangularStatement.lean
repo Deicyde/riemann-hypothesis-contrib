@@ -46,6 +46,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
   GlobalTheory.LocOver
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.rationalFramePairs_differ_isometry_unitriangular
     : ∀ (D : D7) {T T' : D.host.E} (F F00 : LFlag (D.sp.Y 0) D.R.rS T)
         (F' F'0 : LFlag (D.sp.Y 0) D.R.rS T') (w : Point D.host.E (D.R.rS + 1)),
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.rationalFramePairs_differ_isometry_unitriangular
           ∧ ∃ γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT,
             Tri D.host.E (frame F00) (fun a => γ (frame F a))
               ∧ Tri D.host.E (frame F'0) (fun a => γ (frame F' a)) := by
-  first
-  | exact @GlobalTheory.LocOver.witt_frames_at_point
-  | exact GlobalTheory.LocOver.witt_frames_at_point
-  | (intros; apply GlobalTheory.LocOver.witt_frames_at_point <;> assumption)
+  first | exact @GlobalTheory.LocOver.witt_frames_at_point

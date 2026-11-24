@@ -89,8 +89,7 @@ theorem half_idem_int
     push_cast
     exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ hm))
   have hiff := (hes PP hPP).2 (2 : 𝓞 D.host.E) two_ne_zero
-  have hc : ((2 : 𝓞 D.host.E) : D.host.E) = 2 := by
-    first | rfl | simp | exact map_ofNat _ 2 | norm_cast
+  have hc : ((2 : 𝓞 D.host.E) : D.host.E) = 2 := by first | rfl
   rw [hc] at hiff
   rw [mul_comm]
   by_contra hc'

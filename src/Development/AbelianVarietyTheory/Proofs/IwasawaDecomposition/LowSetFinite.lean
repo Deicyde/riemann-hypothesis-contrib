@@ -51,10 +51,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
 set_option genInjectivity false
 set_option genSizeOfSpec false
-
 
 namespace GlobalTheory.HeightCounting.RatSide
 

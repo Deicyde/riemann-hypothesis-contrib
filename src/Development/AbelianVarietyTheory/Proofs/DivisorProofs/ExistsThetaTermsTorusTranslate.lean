@@ -49,6 +49,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -169,16 +170,14 @@ theorem exists_terms_translate
   intro g n F W Z i X₁ z₁ act x₀ _ V _ _ _ ev X _ m t δ 𝔪 C lab _ T hT c τ hτ
   obtain ⟨x, fr, th, w₀, s, g', w, hx, hfr, hth, hw₀, hexp, hg', hTc⟩ := hT
   obtain ⟨χ, hχ1, hχ⟩ :=
-    GlobalTheory.T.exists_torusTorsionPoint_of_label_orthogonal g n F W Z i X₁ z₁ act V ev X m t δ 𝔪
-      τ hτ
+    _root_.GlobalTheory.Poinc.Sep.TorPt.exists_torus_char g n F W Z i X₁ z₁ act V ev X m t δ 𝔪 τ hτ
   obtain ⟨p₀, hp₀y, hg₀⟩ := GlobalTheory.ZH.TorusPerp.exists_qkPt_tor 𝔪.D.3 χ hχ1
   obtain ⟨p, xτ, hpy, hpg, hpq, hxτ⟩ := hχ p₀.g hg₀
   have hxadd :=
-    GlobalTheory.T.memberTorsionPoints_additive_label g n F W Z i X₁ z₁ act V ev X m t δ 𝔪 x hx
-      (lab c) τ xτ hxτ
+    _root_.GlobalTheory.Poinc.PtAdd.x_add g n F W Z i X₁ z₁ act V ev X m t δ 𝔪 x hx (lab c) τ xτ hxτ
   obtain ⟨ρA, hρA, hρfr⟩ :=
-    GlobalTheory.T.exists_rigidification_matchingFrames_torsionFrames g n F W Z i X₁ z₁ act V ev X m
-      t δ 𝔪 x fr hx hfr
+    _root_.GlobalTheory.Poinc.IntTerm.exists_rig_torsFrame_of_match g n F W Z i X₁ z₁ act V ev X m t
+      δ 𝔪 x fr hx hfr
   obtain ⟨hg'o, hwc, hover⟩ := hg' c
   have hadd : (g' c).IsAdd p₀.g (g' c + p₀.g) := (GlobalTheory.TorusExt.isAdd_iff_eq _ _ _).mpr rfl
   obtain ⟨hb, -⟩ := GlobalTheory.UT.ThetaAverage.val_translate hg₀ hadd
@@ -189,9 +188,9 @@ theorem exists_terms_translate
     subst hb
     exact ⟨w c, hwc, fun _ _ _ => rfl⟩
   obtain ⟨e₂, he₂t, he₂o⟩ :=
-    GlobalTheory.T.torusExtension_translate_liesOver_product_torsionFrame g n F W Z i X₁ z₁ act V ev
-      X m t δ 𝔪 w₀ hw₀ ρA hρA (x (lab c)) (fr (lab c)) (hρfr _) (g' c) (w c) hg'o hwc hover χ hχ1
-      p₀.g hg₀ p xτ hpy hpg hpq (g' c + p₀.g) hadd w₂ hw₂ (x (lab c + τ)) hxadd
+    _root_.GlobalTheory.Poinc.Tors.Translate.over_translate g n F W Z i X₁ z₁ act V ev X m t δ 𝔪 w₀
+      hw₀ ρA hρA (x (lab c)) (fr (lab c)) (hρfr _) (g' c) (w c) hg'o hwc hover χ hχ1 p₀.g hg₀ p xτ
+      hpy hpg hpq (g' c + p₀.g) hadd w₂ hw₂ (x (lab c + τ)) hxadd
   obtain ⟨κ, hκ0, hκ⟩ := exists_frAt_ratio he₂t.2.1 (hfr (lab c + τ)).1
   obtain ⟨w', hw'gen, hw'⟩ :=
     GlobalTheory.UT.TorsionValue.exists_frm_scale w₂ hw₂gen (inv_ne_zero hκ0)

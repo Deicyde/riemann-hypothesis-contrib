@@ -63,14 +63,21 @@ namespace GlobalTheory.EtaleDescent
 
 open TensorProduct
 
-theorem exists_etale_model_of_isColimit :
-    ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D), IsColimit c → ∀ (A : Type) [CommRing A] [Algebra c.pt A] [Algebra.Etale c.pt A], ∃ (j : J), (letI : Algebra (D.obj j) c.pt := (c.ι.app j).hom.toAlgebra; ∃ (Aj : Type) (_ : CommRing Aj) (_ : Algebra (D.obj j) Aj), Algebra.Etale (D.obj j) Aj ∧ Nonempty (TensorProduct (D.obj j) c.pt Aj ≃ₐ[c.pt] A)) := by
+theorem exists_etale_model_of_isColimit
+    : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D),
+      IsColimit c
+        → ∀ (A : Type) [CommRing A] [Algebra c.pt A] [Algebra.Etale c.pt A], ∃ (j : J),
+          (letI : Algebra (D.obj j) c.pt := (c.ι.app j).hom.toAlgebra
+           ∃ (Aj : Type) (_ : CommRing Aj) (_ : Algebra (D.obj j) Aj),
+             Algebra.Etale (D.obj j) Aj
+               ∧ Nonempty (TensorProduct (D.obj j) c.pt Aj ≃ₐ[c.pt] A)) := by
   intro J _ _ D c hc A _ _ _
   classical
   have hc' := isColimitOfPreserves (forget _) hc
   obtain ⟨ι, σ, _, _, P, hP⟩ :=
     (Algebra.Etale.iff_isStandardSmoothOfRelativeDimension_zero (R := c.pt) (S := A)).mp
-      inferInstance |>.out
+        inferInstance
+      |>.out
 
   obtain ⟨j, hj⟩ : ∃ j, P.coeffs ⊆ Set.range (c.ι.app j).hom := by
     have hfin := P.finite_coeffs
@@ -122,8 +129,11 @@ theorem exists_etale_model_of_isColimit :
     change (D.map g).hom (E.coeff m) = 0
     by_cases hm : m ∈ E.support
     · have hw := c'.w (WidePushoutShape.Hom.init ⟨m, hm⟩)
-      have h3 : (D.map g).hom (E.coeff m) = (D.map ((WidePushoutShape.wideSpan j k f).map
-          (WidePushoutShape.Hom.init ⟨m, hm⟩) ≫ c'.ι.app (some ⟨m, hm⟩))).hom (E.coeff m) := by
+      have h3
+          : (D.map g).hom (E.coeff m)
+            = (D.map
+              ((WidePushoutShape.wideSpan j k f).map (WidePushoutShape.Hom.init ⟨m, hm⟩)
+                ≫ c'.ι.app (some ⟨m, hm⟩))).hom (E.coeff m) := by
         rw [hw]
       rw [h3, Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply]
       erw [hf ⟨m, hm⟩]
@@ -142,7 +152,9 @@ theorem exists_etale_model_of_isColimit :
     (Algebra.TensorProduct.includeRight).comp (Ideal.Quotient.mkₐ _ _)
   have hφrel : ∀ i, φ (P.relationOfHasCoeffs (D.obj j) i) = 0 := by
     intro i
-    change Algebra.TensorProduct.includeRight (Ideal.Quotient.mk _ (P.relationOfHasCoeffs (D.obj j) i)) = 0
+    change Algebra.TensorProduct.includeRight (Ideal.Quotient.mk _
+        (P.relationOfHasCoeffs (D.obj j) i))
+      = 0
     rw [Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.subset_span (Set.mem_range_self i)), map_zero]
   have hφE : φ E = 0 := by
     rw [MvPolynomial.aeval_unique φ, MvPolynomial.aeval_def,
@@ -153,17 +165,21 @@ theorem exists_etale_model_of_isColimit :
   have hQ : IsUnit Q.jacobian := by
     rw [Algebra.PreSubmersivePresentation.baseChange_jacobian, hP₀]
     refine IsUnit.of_mul_eq_one (φ (P.invJacobianOfHasCoeffs (D.obj j))) ?_
-    have h1 : P.jacobianOfHasCoeffs (D.obj j) * P.invJacobianOfHasCoeffs (D.obj j) =
-        ∑ i, P.jacobianRelationsOfHasCoeffs (D.obj j) i * P.relationOfHasCoeffs (D.obj j) i
-          - E + 1 := by
+    have h1
+        : P.jacobianOfHasCoeffs (D.obj j) * P.invJacobianOfHasCoeffs (D.obj j)
+          = ∑ i, P.jacobianRelationsOfHasCoeffs (D.obj j) i * P.relationOfHasCoeffs (D.obj j) i - E
+            + 1 := by
       rw [hEdef]; ring
     have h2 := congr(φ $h1)
 
     simp only [map_mul, map_add (f := _), map_sub, map_sum, map_one, hφrel, mul_zero,
-    Finset.sum_const_zero, hφE, sub_zero, zero_add] at h2
+        Finset.sum_const_zero, hφE, sub_zero, zero_add]
+      at h2
     exact h2
-  let Q' : Algebra.SubmersivePresentation (D.obj K) (D.obj K ⊗[D.obj j] M) ι σ :=
-    { toPreSubmersivePresentation := Q, jacobian_isUnit := hQ }
+  let Q' : Algebra.SubmersivePresentation (D.obj K) (D.obj K ⊗[D.obj j] M) ι σ := {
+    toPreSubmersivePresentation := Q
+    jacobian_isUnit := hQ
+  }
   haveI : Algebra.IsStandardSmoothOfRelativeDimension 0 (D.obj K) (D.obj K ⊗[D.obj j] M) :=
     Q'.isStandardSmoothOfRelativeDimension (by rw [← hP]; rfl)
   refine ⟨K, D.obj K ⊗[D.obj j] M, inferInstance, inferInstance, inferInstance, ⟨?_⟩⟩

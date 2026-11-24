@@ -73,8 +73,7 @@ theorem constant_zero_zero_point {n : ℕ} (P : Pt C n d) (hP : ∀ j, constantC
   · simp
   · exact hP i
 
-theorem coordinate_point_constantCoeff {n : ℕ} (k : Fin n) : ∀ j, constantCoeff (pt C d k j) = 0 :=
-  fun j => z0_pt k j
+alias coordinate_point_constantCoeff := _root_.Formalism.L2.FormalSeriesBounds.PartialDerivEval.z0_pt
 
 theorem eval_eval_pair
     {m n : ℕ} {a b : Pt C m d} (hab : Z0 (![a, b] : Fin 2 → Pt C m d))

@@ -2,7 +2,7 @@ module
 
 public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LinearIndepOnOfInvariant
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RatioInvariantInK0Statement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RatioInvariantInK0
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -63,7 +63,8 @@ theorem dcris_finite_le_of_tied
   have := (P.PD K).finK₀
   have := LL.2
   refine finite_finrank_le (P.PD K).actB
-    (fun b b' hb h => GlobalTheory.T.ratio_invariant_in_K0 l P AI T K b' b hb fun g hg => ?_)
+    (fun b b' hb h =>
+      _root_.GlobalTheory.Per.FracInv.tied_frac_invariant l P AI T K b' b hb fun g hg => ?_)
     ρ
   have h1 := h ⟨g, hg⟩
   rw [P.PD_actB, P.PD_actB] at h1

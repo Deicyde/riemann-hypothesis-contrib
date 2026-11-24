@@ -48,17 +48,19 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW Topology
 open scoped TensorProduct
 open PI.AdicCompletionValuation
 
 def SemisimpleTens : Prop :=
-  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → IsSemisimpleRing (Ainf F ⊗[F] E)
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
+    IsCMExt F E σ → IsSemisimpleRing (Ainf F ⊗[F] E)
 
-theorem exists_dual_of_linIndep {K : Type} [CommRing K] [IsSemisimpleRing K] {a M : ℕ}
-    (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z) (c : Fin a → K) :
-    ∃ w : Fin M → K, ∀ i, ∑ k, Z i k * w k = c i := by
+theorem exists_dual_of_linIndep
+    {K : Type} [CommRing K] [IsSemisimpleRing K]
+    {a M : ℕ} (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z) (c : Fin a → K)
+    : ∃ w : Fin M → K, ∀ i, ∑ k, Z i k * w k = c i := by
   classical
   let ι : (Fin a → K) →ₗ[K] (Fin M → K) := Fintype.linearCombination K Z
   have hinj : Function.Injective ι := by
@@ -81,10 +83,8 @@ theorem exists_dual_of_linIndep {K : Type} [CommRing K] [IsSemisimpleRing K] {a 
   refine ⟨fun k => ∑ i', c i' * p (Pi.single k 1) i', fun i => ?_⟩
   have hZi : Z i = ∑ k, Z i k • (Pi.single k (1 : K) : Fin M → K) := by
     funext j; simp [Finset.sum_apply, Pi.single_apply]
-  have hι : ι (Pi.single i 1) = Z i := by
-    simp [ι, Fintype.linearCombination_apply_single]
-  have e1 : ∑ k, Z i k * ∑ i', c i' * p (Pi.single k 1) i' =
-      ∑ i', c i' * (p (Z i)) i' := by
+  have hι : ι (Pi.single i 1) = Z i := by simp [ι, Fintype.linearCombination_apply_single]
+  have e1 : ∑ k, Z i k * ∑ i', c i' * p (Pi.single k 1) i' = ∑ i', c i' * (p (Z i)) i' := by
     conv_rhs => rw [hZi]
 
     simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
@@ -98,7 +98,8 @@ theorem freeSurj_of (h : SemisimpleTens) : FreeSurj := by
   have := h F E σ hCM
   have hσ : ∀ x, σ (σ x) = x := sigma_invol σ hCM.2.2.2
   let s := sigR (Ainf F) σ
-  let Z : Fin a → Fin M → Ainf F ⊗[F] E := fun i => Matrix.vecMul (fun l => s (X i l)) (JR (F := F) (Ainf F) J)
+  let Z : Fin a → Fin M → Ainf F ⊗[F] E := fun i =>
+    Matrix.vecMul (fun l => s (X i l)) (JR (F := F) (Ainf F) J)
   have hZh : ∀ i y, hR (Ainf F) σ J (X i) y = ∑ k, Z i k * y k := by
     intro i y
     simp only [hR, Formalism.UG.hform, Z, Matrix.vecMul, dotProduct, Finset.sum_mul]
@@ -116,7 +117,8 @@ theorem freeSurj_of (h : SemisimpleTens) : FreeSurj := by
       funext j
       have := congrFun hg j
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Z, Matrix.vecMul, dotProduct,
-        Finset.mul_sum, Pi.zero_apply] at this
+          Finset.mul_sum, Pi.zero_apply]
+        at this
       simp only [Matrix.vecMul, dotProduct, v, Finset.sum_mul, Pi.zero_apply]
       rw [Finset.sum_comm]
       rw [← this]
@@ -124,7 +126,8 @@ theorem freeSurj_of (h : SemisimpleTens) : FreeSurj := by
     have hv : v = 0 := by
       have := congrArg (fun u => Matrix.vecMul u (JR (F := F) (Ainf F) J)⁻¹) hv0
       simp only [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hJu, Matrix.vecMul_one,
-        Matrix.zero_vecMul] at this
+          Matrix.zero_vecMul]
+        at this
       exact this
     have hX0 : ∑ i, s (g i) • X i = 0 := by
       funext l
@@ -136,14 +139,16 @@ theorem freeSurj_of (h : SemisimpleTens) : FreeSurj := by
     have e2 := congrArg s this
     simp only [s, sigR_invol (Ainf F) σ hσ, map_zero] at e2
     exact e2
-  let half : Ainf F ⊗[F] E := algebraMap F (Ainf F ⊗[F] E) (1/2)
+  let half : Ainf F ⊗[F] E := algebraMap F (Ainf F ⊗[F] E) (1 / 2)
   have hh : half + half = 1 := by
-    simp only [half, ← map_add (f := _)]; norm_num
-    first | rfl | exact Algebra.TensorProduct.one_def.symm
+    simp only [half, ← map_add (f := _)]
+    norm_num
+    first | rfl
   have hsh : s half = half := (Algebra.TensorProduct.map (AlgHom.id F (Ainf F)) σ).commutes _
-  have hw : ∀ j, ∃ w : Fin M → Ainf F ⊗[F] E, ∀ i, ∑ k, Z i k * w k =
-      half * (S : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) i j :=
-    fun j => exists_dual_of_linIndep Z hZ _
+  have hw
+      : ∀ j, ∃ w : Fin M → Ainf F ⊗[F] E, ∀ i,
+        ∑ k, Z i k * w k = half * (S : Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) i j := fun j =>
+    exists_dual_of_linIndep Z hZ _
   choose Y hY using hw
   refine ⟨Y, ?_⟩
   funext i j

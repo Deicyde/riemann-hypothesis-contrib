@@ -82,11 +82,9 @@ theorem det_blockDiagonal'
     congr 1
     ext k k'
     show Matrix.blockDiagonal' M ⟨c, k⟩ ⟨c, k'⟩ = M c k k'
-    first | exact Matrix.blockDiagonal'_apply_eq M c k k' | simp [Matrix.blockDiagonal'_apply]
+    first | exact Matrix.blockDiagonal'_apply_eq M c k k'
   letI : LinearOrder ι := LinearOrder.lift' (Fintype.equivFin ι) (Fintype.equivFin ι).injective
-  first
-  | rw [(Matrix.blockTriangular_blockDiagonal' M).det]
-  | rw [Matrix.BlockTriangular.det (Matrix.blockTriangular_blockDiagonal' M)]
+  first | rw [(Matrix.blockTriangular_blockDiagonal' M).det]
   rw [Finset.prod_congr rfl (fun c _ => hblk c)]
   refine Finset.prod_subset (Finset.subset_univ _) ?_
   intro c _ hc
@@ -136,9 +134,7 @@ theorem length_quot
     rw [← Ring.ord_eq_addVal]
     rfl
   have hdet : Associated (α.det (b' ∘ σ)) (∏ i, s i) := by
-    have key :=
-      ReciprocityTheory.MultiplicativeHeights.det_subtype_comp_associated_prod α N hrank
-        (α.equiv (Basis.span hli) σ)
+    have key := _root_.Bl.general_b_fact_tail.goal1 α N hrank (α.equiv (Basis.span hli) σ)
     convert key using 1
     rw [← LinearMap.det_toMatrix α, Basis.det_apply]
     congr 1

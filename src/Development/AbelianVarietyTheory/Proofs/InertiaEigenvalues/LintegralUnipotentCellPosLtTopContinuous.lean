@@ -363,7 +363,7 @@ theorem exists_levelAt_subset
           = if v ∈ S then ((m + 1 : ℕ) : ℤ) else 0 := fun v => by
     rw [FractionalIdeal.count_prod E v S _ fun w _ => hne w]
     simp only [FractionalIdeal.count_pow, FractionalIdeal.count_maximal, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq, Finset.sum_ite_eq']
+      Finset.sum_ite_eq']
   refine ⟨
     Units.mk0 _ (Finset.prod_ne_zero_iff.2 fun w (_ : w ∈ S) => hne w),
     fun v hv => ?_,

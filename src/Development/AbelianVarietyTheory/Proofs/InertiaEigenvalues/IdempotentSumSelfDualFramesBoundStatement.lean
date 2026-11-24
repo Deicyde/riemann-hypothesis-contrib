@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.idempotent_sum_self_dual_frames_bound
             → ∀ t : WO S T,
               IsHalf (cA D e) t → IsIntM (frMapAdj S T βS βT t)
                 → t ∈ latO S T ΛS ΛT (fun _ => True) := by
-  first
-  | exact @GlobalTheory.HalfAdjLattice.mem_latO_of_adj_int
-  | exact GlobalTheory.HalfAdjLattice.mem_latO_of_adj_int
-  | (intros; apply GlobalTheory.HalfAdjLattice.mem_latO_of_adj_int <;> assumption)
+  first | exact @GlobalTheory.HalfAdjLattice.mem_latO_of_adj_int

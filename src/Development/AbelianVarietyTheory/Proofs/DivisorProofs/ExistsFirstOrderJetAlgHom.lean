@@ -76,7 +76,7 @@ def jet
     · simp
     · simp [Derivation.leibniz]; ring
   map_zero' := by ext <;> simp
-  map_add' f g := by ext <;> simp <;> ring
+  map_add' f g := by ext <;> simp
   commutes' c := by ext <;> simp [TrivSqZeroExt.algebraMap_eq_inl]
 
 theorem jet_spec

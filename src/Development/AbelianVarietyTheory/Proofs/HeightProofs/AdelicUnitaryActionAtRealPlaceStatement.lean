@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.adelicUnitary_action_at_real_place
     : ∀ (D : D7) (θ : InfFam D),
       IsInfFam θ
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.adelicUnitary_action_at_real_place
                   = actC V W (infMat D.sp.cm.sig V.gram (θ τ) k)
                     (infMat D.sp.cm.sig W.gram (θ τ) k') (wAt θ V W τ x))
               ∧ (IsRealW V W x → IsRealW V W (actHom V W k k' x)) := by
-  first
-  | exact @GlobalTheory.FockCompare.RealAction.real_action
-  | exact GlobalTheory.FockCompare.RealAction.real_action
-  | (intros; apply GlobalTheory.FockCompare.RealAction.real_action <;> assumption)
+  first | exact @GlobalTheory.FockCompare.RealAction.real_action

@@ -207,14 +207,14 @@ private theorem fin_dec
   · intro i j
     refine ad_ext (fun u => ?_) (fun v => ?_)
     · rw [ent_inf, infAt_fin, map_zero]
-      simp [Matrix.one_apply]
+      simp
     · rw [ent_fin]
       by_cases hv : v ∈ im w
       · obtain ⟨i₀, -, rfl⟩ := Finset.mem_image.1 hv
         rw [c₄', map_zero]
         exact par_low _ _ i j
       · rw [d₄' _ _ hv]
-        simp [Matrix.one_apply]
+        simp
         rfl
 
 private theorem mod_S

@@ -48,6 +48,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 100] LieRing.ofAssociativeRing
+
 theorem _root_.GlobalTheory.T.unitary_reduction_polynomial_height_bound
     : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D),
       IsInfFam θ → OrthoSmall D.host.E → DenomBound θ V
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.unitary_reduction_polynomial_height_bound
                           θ V g
                         : ℝ)
                       ^ M := by
-  first
-  | exact @GlobalTheory.SmoothForms.Reduce.reduction
-  | exact GlobalTheory.SmoothForms.Reduce.reduction
-  | (intros; apply GlobalTheory.SmoothForms.Reduce.reduction <;> assumption)
+  first | exact @GlobalTheory.SmoothForms.Reduce.reduction

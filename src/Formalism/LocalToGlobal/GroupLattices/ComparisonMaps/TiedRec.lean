@@ -59,7 +59,7 @@ def tEL (D : D7) : D.what₂.Tau → D.host.E →+* D.what₂.LL := fun τ =>
 theorem tEL_emb (D : D7) (τ : D.what₂.Tau) (x : D.host.E)
     : D.what₂.embLL (tEL D τ x) = embT D τ x := by
   simp only [tEL, embT, Formalism.BasicNotions.Host.emb, RingHom.comp_apply]
-  first | exact RingHom.congr_fun D.embE_φ₀ _ | exact D.embE_φ₀ _ | (rw [← D.embE_φ₀]; rfl)
+  first | exact RingHom.congr_fun D.embE_φ₀ _
 
 def locAt
     (X : Formalism.L2.Herm.Herm0 D)

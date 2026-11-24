@@ -49,18 +49,20 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem ldtensor_blockAct_comp (K : Type*) [CommRing K] {S : Type*} {k n : ℕ}
-    (g : S → Matrix (Fin k) (Fin k) K) (s : S) :
-    (blockAct K (n := n) g).comp (blockEmb K (k := k) (n := n) s) =
-      (blockEmb K s).comp (rowAct K (g s)) := by
+theorem ldtensor_blockAct_comp
+    (K : Type*) [CommRing K] {S : Type*} {k n : ℕ} (g : S → Matrix (Fin k) (Fin k) K) (s : S)
+    : (blockAct K (n := n) g).comp (blockEmb K (k := k) (n := n) s)
+      = (blockEmb K s).comp (rowAct K (g s)) := by
   apply MvPolynomial.algHom_ext
   intro v
 
-  simp [blockEmb, blockAct, rowAct, map_sum, rename_C]
+  simp [blockEmb, blockAct, rowAct, map_sum]
 
-theorem ldtensor_blockAct_blockEmb (K : Type*) [CommRing K] {S : Type*} {k n : ℕ}
-    (g : S → Matrix (Fin k) (Fin k) K) (s : S) (F : MvPolynomial (Fin k × Fin n) K) :
-    blockAct K g (blockEmb K s F) = blockEmb K s (rowAct K (g s) F) := by
+theorem ldtensor_blockAct_blockEmb
+    (K : Type*) [CommRing K]
+    {S : Type*} {k n : ℕ}
+    (g : S → Matrix (Fin k) (Fin k) K) (s : S) (F : MvPolynomial (Fin k × Fin n) K)
+    : blockAct K g (blockEmb K s F) = blockEmb K s (rowAct K (g s) F) := by
   exact AlgHom.congr_fun (ldtensor_blockAct_comp K g s) F
 
 theorem block_action_tensor : BlockActTensor := by

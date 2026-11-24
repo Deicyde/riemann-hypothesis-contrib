@@ -73,11 +73,13 @@ theorem ind_of_not {a x : V} {L : AddSubgroup V} (h : x - a ∉ L) : ind a L x =
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.ind_of_not <;> assumption
 
 omit [TopologicalSpace V] in
-theorem ind_congr {a b x y : V} {L L' : AddSubgroup V} (h : x - a ∈ L ↔ y - b ∈ L') : ind a L x = ind b L' y := by
+theorem ind_congr {a b x y : V} {L L' : AddSubgroup V} (h : x - a ∈ L ↔ y - b ∈ L')
+    : ind a L x = ind b L' y := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.ind_congr <;> assumption
 
 omit [TopologicalSpace V] in
-theorem ind_add {a l : V} {L : AddSubgroup V} (x : V) (hl : l ∈ L) : ind a L (x + l) = ind a L x := by
+theorem ind_add {a l : V} {L : AddSubgroup V} (x : V) (hl : l ∈ L)
+    : ind a L (x + l) = ind a L x := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.ind_add <;> assumption
 
 section top
@@ -90,11 +92,13 @@ theorem CO.sup {L L' : AddSubgroup V} (h : CO L) (h' : CO L') : CO (L ⊔ L') :=
 theorem CO.inf {L L' : AddSubgroup V} (h : CO L) (h' : IsOpen (L' : Set V)) : CO (L ⊓ L') := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.CO.inf <;> assumption
 
-theorem isOpen_coset (a : V) {L : AddSubgroup V} (h : IsOpen (L : Set V)) : IsOpen {x | x - a ∈ L} := by
+theorem isOpen_coset (a : V) {L : AddSubgroup V} (h : IsOpen (L : Set V))
+    : IsOpen {x | x - a ∈ L} := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.isOpen_coset <;> assumption
 
-theorem lc_of_inv {f : V → ℂ} {L : AddSubgroup V} (h : IsOpen (L : Set V)) (hf : ∀ x, ∀ l ∈ L, f (x + l) = f x) :
-    IsLocallyConstant f := by
+theorem lc_of_inv
+    {f : V → ℂ} {L : AddSubgroup V} (h : IsOpen (L : Set V)) (hf : ∀ x, ∀ l ∈ L, f (x + l) = f x)
+    : IsLocallyConstant f := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.lc_of_inv <;> assumption
 
 theorem sb_ind [T2Space V] (a : V) {L : AddSubgroup V} (h : CO L) : SB (ind a L) := by
@@ -119,24 +123,30 @@ theorem sb_zero : SB (0 : V → ℂ) := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_zero <;> assumption
 
 omit [AddCommGroup V] in
-theorem sb_sum {α : Type} (s : Finset α) {f : α → V → ℂ} (h : ∀ a ∈ s, SB (f a)) : SB (∑ a ∈ s, f a) := by
+theorem sb_sum {α : Type} (s : Finset α) {f : α → V → ℂ} (h : ∀ a ∈ s, SB (f a))
+    : SB (∑ a ∈ s, f a) := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_sum <;> assumption
 
 omit [AddCommGroup V] in
 theorem sb_homeo {f : V → ℂ} (hf : SB f) (e : V ≃ₜ V) : SB (f ∘ e) := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_homeo <;> assumption
 
-theorem sb_span [IsTopologicalAddGroup V] {φ : V → ℂ} (hφ : SB φ) {L : AddSubgroup V} (hL : IsOpen (L : Set V))
-    (hinv : ∀ x, ∀ l ∈ L, φ (x + l) = φ x) : ∃ s : Finset V, φ = ∑ a ∈ s, φ a • ind a L := by
+theorem sb_span
+    [IsTopologicalAddGroup V]
+    {φ : V → ℂ} (hφ : SB φ)
+    {L : AddSubgroup V} (hL : IsOpen (L : Set V)) (hinv : ∀ x, ∀ l ∈ L, φ (x + l) = φ x)
+    : ∃ s : Finset V, φ = ∑ a ∈ s, φ a • ind a L := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_span <;> assumption
 
 variable [MeasurableSpace V] {χ : V → V → ℂ} {μ : Measure V}
 
-theorem co_cpt (h : NADual V χ μ) {K : Set V} (hK : IsCompact K) : ∃ L : AddSubgroup V, CO L ∧ K ⊆ L := by
+theorem co_cpt (h : NADual V χ μ) {K : Set V} (hK : IsCompact K)
+    : ∃ L : AddSubgroup V, CO L ∧ K ⊆ L := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.co_cpt <;> assumption
 
-theorem sb_level (h : NADual V χ μ) {φ : V → ℂ} (hφ : SB φ) :
-    ∃ L L' : AddSubgroup V, CO L ∧ CO L' ∧ L' ≤ L ∧ (∀ x, x ∉ L → φ x = 0) ∧ ∀ x, ∀ l ∈ L', φ (x + l) = φ x := by
+theorem sb_level (h : NADual V χ μ) {φ : V → ℂ} (hφ : SB φ)
+    : ∃ L L' : AddSubgroup V,
+      CO L ∧ CO L' ∧ L' ≤ L ∧ (∀ x, x ∉ L → φ x = 0) ∧ ∀ x, ∀ l ∈ L', φ (x + l) = φ x := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_level <;> assumption
 
 section chi
@@ -185,7 +195,8 @@ theorem sb_int {φ : V → ℂ} (hφ : SB φ) : Integrable φ μ := by
 theorem sb_chi {φ : V → ℂ} (hφ : SB φ) (y : V) : SB fun x => φ x * χ x y := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.sb_chi <;> assumption
 
-theorem fou_add {f g : V → ℂ} (hf : SB f) (hg : SB g) : fou χ μ (f + g) = fou χ μ f + fou χ μ g := by
+theorem fou_add {f g : V → ℂ} (hf : SB f) (hg : SB g)
+    : fou χ μ (f + g) = fou χ μ f + fou χ μ g := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.fou_add <;> assumption
 
 omit h in
@@ -193,13 +204,16 @@ theorem fou_smul (c : ℂ) (f : V → ℂ) : fou χ μ (c • f) = c • fou χ 
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.fou_smul <;> assumption
 
 omit h [AddCommGroup V] [MeasurableSpace V] in
-theorem map_sum_sb {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
-    (hsm : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ) {α : Type} (s : Finset α) (c : α → ℂ) {f : α → V → ℂ}
-    (hf : ∀ a, SB (f a)) : T (∑ a ∈ s, c a • f a) = ∑ a ∈ s, c a • T (f a) := by
+theorem map_sum_sb
+    {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
+    (hsm : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ)
+    {α : Type} (s : Finset α) (c : α → ℂ)
+    {f : α → V → ℂ} (hf : ∀ a, SB (f a))
+    : T (∑ a ∈ s, c a • f a) = ∑ a ∈ s, c a • T (f a) := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.map_sum_sb <;> assumption
 
-theorem fou_ind {L : AddSubgroup V} (hL : CO L) (a y : V) :
-    fou χ μ (ind a L) y = ((μ L).toReal : ℂ) * χ a y * ind 0 (perpG h L) y := by
+theorem fou_ind {L : AddSubgroup V} (hL : CO L) (a y : V)
+    : fou χ μ (ind a L) y = ((μ L).toReal : ℂ) * χ a y * ind 0 (perpG h L) y := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.fou_ind <;> assumption
 
 theorem fou_sb {φ : V → ℂ} (hφ : SB φ) : SB (fou χ μ φ) ∧ ∀ x, fou χ μ (fou χ μ φ) x = φ (-x) := by
@@ -208,10 +222,12 @@ theorem fou_sb {φ : V → ℂ} (hφ : SB φ) : SB (fou χ μ φ) ∧ ∀ x, fou
 theorem planch {φ : V → ℂ} (hφ : SB φ) : ∫ y, ‖fou χ μ φ y‖ ^ 2 ∂μ = ∫ x, ‖φ x‖ ^ 2 ∂μ := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.planch <;> assumption
 
-theorem schur {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
+theorem schur
+    {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
     (hsm : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ)
     (hch : ∀ y φ, SB φ → T (fun u => χ u y * φ u) = fun u => χ u y * T φ u)
-    (htr : ∀ x φ, SB φ → T (fun u => φ (u + x)) = fun u => T φ (u + x)) : ∃ c : ℂ, ∀ φ, SB φ → T φ = c • φ := by
+    (htr : ∀ x φ, SB φ → T (fun u => φ (u + x)) = fun u => T φ (u + x))
+    : ∃ c : ℂ, ∀ φ, SB φ → T φ = c • φ := by
   apply PositivityTheory.PlacePermOperatorBicommutantSpan.schur <;> assumption
 
 end chi

@@ -173,8 +173,7 @@ theorem finrank_cotangentSpace_eq_of_ringEquiv
           = (maximalIdeal B).toCotangent (f a • ⟨g x, hA x.2⟩) := by
       rw [map_smul]
       exact algebraMap_smul (ResidueField B) (f a) _
-    have e2 : i (residue A a) = residue B (f a) := by
-      first | rfl | exact IsLocalRing.ResidueField.map_residue (f : A →+* B) a | simp [i]
+    have e2 : i (residue A a) = residue B (f a) := by first | rfl
     have hj : ∀ m, j m = j₁ m := fun _ => rfl
     rw [hj, hj, e1, e2, Ideal.mapCotangent_toCotangent, Ideal.mapCotangent_toCotangent, e3]
     congr 1

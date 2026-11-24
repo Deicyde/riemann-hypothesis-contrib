@@ -1,51 +1,8 @@
 module
 
+import Mathlib.Analysis.Complex.Polynomial.Basic
 public import Formalism.PadicSubsetSums.CentralIdempotents.EigenbasisOfDistinctRoots
-import Mathlib.Algebra.Order.Floor.Extended
-import Mathlib.Algebra.Order.Floor.Semifield
-import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
-import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Combinatorics.Enumerative.DyckWord
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
-import Mathlib.Data.NNRat.Floor
-import Mathlib.Data.Nat.Choose.Multinomial
-import Mathlib.Geometry.Euclidean.Volume.Basic
 public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-import Mathlib.NumberTheory.Chebyshev
-import Mathlib.NumberTheory.Height.NumberField
-import Mathlib.NumberTheory.Height.Projectivization
-import Mathlib.NumberTheory.LucasLehmer
-import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.WittVector.IsPoly
-import Mathlib.Tactic.Echelon.Zsqrtd
-import Mathlib.Tactic.Inclusion.Extension.Core.Core
-import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Lemma
-import Mathlib.Tactic.Linter.Style
-import Mathlib.Tactic.NormNum.Irrational
-import Mathlib.Tactic.NormNum.IsCoprime
-import Mathlib.Tactic.NormNum.IsSquare
-import Mathlib.Tactic.NormNum.LegendreSymbol
-import Mathlib.Tactic.NormNum.ModEq
-import Mathlib.Tactic.NormNum.NatFib
-import Mathlib.Tactic.NormNum.NatLog
-import Mathlib.Tactic.NormNum.NatSqrt
-import Mathlib.Tactic.NormNum.Ordinal
-import Mathlib.Tactic.NormNum.Parity
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.Polynomial.Basic
-import Mathlib.Tactic.ReduceModChar
-import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -57,26 +14,16 @@ private lemma cyc {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
     (w : V) (hw : w ≠ 0) (S : Submodule ℂ V) (f : Module.End ℂ V)
     (hf : ∀ g : G, f (ρ g w) ∈ S) : ∀ v, f v ∈ S := by
   intro v
-  have hU : Submodule.span ℂ (Set.range fun g => ρ g w) = ⊤ := by
-    have hinv : ∀ g : G, ∀ x ∈ Submodule.span ℂ (Set.range fun g => ρ g w),
-        ρ g x ∈ Submodule.span ℂ (Set.range fun g => ρ g w) := by
-      intro g x hx
-      have hle : Submodule.span ℂ (Set.range fun g => ρ g w) ≤
-          (Submodule.span ℂ (Set.range fun g => ρ g w)).comap (ρ g) := by
-        rw [Submodule.span_le]
-        rintro _ ⟨g', rfl⟩
-        exact Submodule.subset_span ⟨g * g', by simp [map_mul]⟩
-      exact hle hx
-    rcases hirr _ hinv with h | h
-    · exfalso
-      apply hw
-      have hmem : w ∈ Submodule.span ℂ (Set.range fun g => ρ g w) :=
-        Submodule.subset_span ⟨1, by simp⟩
-      rw [h] at hmem
-      simpa using hmem
-    · exact h
-  have hle : Submodule.span ℂ (Set.range fun g => ρ g w) ≤ S.comap f := by
-    rw [Submodule.span_le]
+  let U := Submodule.span ℂ (Set.range fun g => ρ g w)
+  have hinv (g : G) : U ≤ U.comap (ρ g) := by
+    apply Submodule.span_le.mpr
+    rintro _ ⟨g', rfl⟩
+    exact Submodule.subset_span ⟨g * g', by simp [map_mul]⟩
+  have hwU : w ∈ U := Submodule.subset_span ⟨1, by simp⟩
+  have hU : U = ⊤ :=
+    (hirr U (fun g _ hx => hinv g hx)).resolve_left (fun h => hw (by simpa [h] using hwU))
+  have hle : U ≤ S.comap f := by
+    apply Submodule.span_le.mpr
     rintro _ ⟨g, rfl⟩
     exact hf g
   rw [hU] at hle
@@ -130,54 +77,70 @@ private lemma core {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] [Finit
   calc Module.finrank ℂ W ≤ Module.finrank ℂ (ℂ ∙ w0) := Submodule.finrank_mono hle
     _ = 1 := finrank_span_singleton hw0
 
-theorem goal1 :
-  ∀ {G : Type} [inst : Group.{0} G] [inst_1 : Fintype.{0} G] {V : Type} [inst_2 : AddCommGroup.{0} V]
-  [inst_3 : Module.{0, 0} Complex V] [FiniteDimensional.{0, 0} Complex V] (ρ : Representation.{0, 0, 0} Complex G V)
-  (J : Subgroup.{0} G) (χ : MonoidHom.{0, 0} (Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x) (Units.{0} Complex)),
-  (∀ (g g' : G),
-      Eq.{1}
-        (HMul.hMul.{0, 0, 0}
-          (HMul.hMul.{0, 0, 0}
-            (HMul.hMul.{0, 0, 0} (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
-              (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g))
-            (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ))
-          (HMul.hMul.{0, 0, 0}
-            (HMul.hMul.{0, 0, 0} (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
-              (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g'))
-            (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)))
-        (HMul.hMul.{0, 0, 0}
-          (HMul.hMul.{0, 0, 0}
-            (HMul.hMul.{0, 0, 0} (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
-              (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g'))
-            (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ))
-          (HMul.hMul.{0, 0, 0}
-            (HMul.hMul.{0, 0, 0} (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
-              (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g))
-            (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)))) →
-    Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.IsIrr ρ →
-      LE.le.{0}
-        (Module.finrank.{0, 0} Complex
-          (Subtype.{1} fun (x : V) ↦
-            Membership.mem.{0, 0}
-              (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ
-                (fun (u : Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x) ↦ Subtype.val.{1} u)
-                fun (u : Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x) ↦
-                Units.val.{0} (DFunLike.coe.{1, 1, 1} χ u))
-              x))
-        1 := by
+theorem goal1
+    : ∀ {G : Type} [inst : Group.{0} G] [inst_1 : Fintype.{0} G] {V : Type}
+        [inst_2 : AddCommGroup.{0} V] [inst_3 : Module.{0, 0} Complex V]
+        [FiniteDimensional.{0, 0} Complex V] (ρ : Representation.{0, 0, 0} Complex G V)
+        (J : Subgroup.{0} G)
+        (χ : MonoidHom.{0, 0} (Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x)
+          (Units.{0} Complex)),
+      (∀ (g g' : G),
+          Eq.{1}
+            (HMul.hMul.{0, 0, 0}
+              (HMul.hMul.{0, 0, 0}
+                (HMul.hMul.{0, 0, 0}
+                  (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
+                  (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g))
+                (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ))
+              (HMul.hMul.{0, 0, 0}
+                (HMul.hMul.{0, 0, 0}
+                  (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
+                  (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g'))
+                (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)))
+            (HMul.hMul.{0, 0, 0}
+              (HMul.hMul.{0, 0, 0}
+                (HMul.hMul.{0, 0, 0}
+                  (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
+                  (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g'))
+                (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ))
+              (HMul.hMul.{0, 0, 0}
+                (HMul.hMul.{0, 0, 0}
+                  (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ)
+                  (DFunLike.coe.{1, 1, 1} (MonoidAlgebra.of.{0, 0} Complex G) g))
+                (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ))))
+        → Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.IsIrr ρ
+        → LE.le.{0}
+          (Module.finrank.{0, 0} Complex
+            (Subtype.{1} fun (x : V) ↦
+              Membership.mem.{0, 0}
+                (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ
+                  (fun (u : Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x) ↦
+                    Subtype.val.{1} u)
+                  fun (u : Subtype.{1} fun (x : G) ↦ Membership.mem.{0, 0} J x) ↦
+                    Units.val.{0} (DFunLike.coe.{1, 1, 1} χ u))
+                x))
+          1 := by
   intro G inst inst_1 V inst_2 inst_3 inst_4 ρ J χ hcomm hirr
   classical
   have hirr2 := hirr
   rw [Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.IsIrr.eq_def] at hirr2
-  obtain ⟨P, hPdef⟩ : ∃ P : Module.End ℂ V, P = ρ.asAlgebraHom (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J χ) :=
+  obtain ⟨P, hPdef⟩
+      : ∃ P : Module.End ℂ V,
+        P = ρ.asAlgebraHom (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem J
+          χ) :=
     ⟨_, rfl⟩
   have hP : ∀ v, P v = ∑ u : J, ((↑(Nat.card J) : ℂ)⁻¹ * ↑(χ u)⁻¹) • ρ ↑u v := by
     intro v
 
-    rw [hPdef, Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem.eq_def, map_sum, LinearMap.sum_apply]
+    rw [hPdef, Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.twistedIdem.eq_def, map_sum,
+      LinearMap.sum_apply]
     refine Finset.sum_congr rfl (fun u _ => ?_)
     rw [map_smul, LinearMap.smul_apply, Representation.asAlgebraHom_of]
-  have hPW : ∀ v, P v ∈ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ (fun u : J => u.val) (fun u => (χ u).val) := by
+  have hPW
+      : ∀ v,
+        P v ∈ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ
+          (fun u : J => u.val)
+          (fun u => (χ u).val) := by
     intro v
     rw [Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace.eq_def]
     show ∀ u : J, ρ ↑u (P v) = (χ u : ℂ) • P v
@@ -185,11 +148,16 @@ theorem goal1 :
 
     rw [hP, map_sum, Finset.smul_sum]
     refine Fintype.sum_equiv (Equiv.mulLeft u0) _ _ (fun u => ?_)
-    simp only [Equiv.coe_mulLeft, map_smul, Subgroup.coe_mul, map_mul, Module.End.mul_apply, smul_smul,
-      mul_inv_rev, Units.val_mul]
+    simp only [Equiv.coe_mulLeft, map_smul, Subgroup.coe_mul, map_mul, Module.End.mul_apply,
+      smul_smul, mul_inv_rev, Units.val_mul]
     congr 1
     linear_combination (-((↑(Nat.card J) : ℂ)⁻¹ * ↑(χ u)⁻¹)) * Units.inv_mul (χ u0)
-  have hPfix : ∀ w ∈ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ (fun u : J => u.val) (fun u => (χ u).val), P w = w := by
+  have hPfix
+      : ∀ w
+          ∈ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace ρ
+            (fun u : J => u.val)
+            (fun u => (χ u).val),
+        P w = w := by
     intro w hw
     rw [Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.eqvSpace.eq_def] at hw
     have hw' : ∀ u : J, ρ ↑u w = (χ u : ℂ) • w := hw

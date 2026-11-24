@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TranslateMomentsAll
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.EmbHInjective
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PerLatticeFactsStatement
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PerLatticeFacts
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -71,7 +71,7 @@ theorem exists_lift_halfAO
           t - x ∈ mulLat c (homAt S N N') := by
   intro X A a b S N N' cA c hfg hne _ hU hN hN' hcA hc x hx
   obtain ⟨-, hfull, -, hloc⟩ :=
-    GlobalTheory.T.per_relIndex_ne_zero_and_mem_locP_iff X A a b N N' hfg hne hN hN'
+    _root_.GlobalTheory.MomT.LatFin.per_lattice_facts X A a b N N' hfg hne hN hN'
   have hF : GlobalTheory.ThetaMove.Full (per A N N') := fun y => by
     obtain ⟨n, hn, hy⟩ := hfull y
     exact ⟨n, hn, by rwa [natCast_smul_eq_ring]⟩

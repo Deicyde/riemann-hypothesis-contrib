@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.thetaKernel_leftInvariant_rational_unitary
           IsWeil ψ false M X χ χ' ω
             → ∀ Φ ∈ algF ψ θ false A B, ∀ γ ∈ GQ M, ∀ (g : GA D M) (h : GA D X),
               thetaKO ω (γ * g) h Φ = thetaKO ω g h Φ := by
-  first
-  | exact @GlobalTheory.SquareComm.ThetaLeft.main
-  | exact GlobalTheory.SquareComm.ThetaLeft.main
-  | (intros; apply GlobalTheory.SquareComm.ThetaLeft.main <;> assumption)
+  first | exact @GlobalTheory.SquareComm.ThetaLeft.main

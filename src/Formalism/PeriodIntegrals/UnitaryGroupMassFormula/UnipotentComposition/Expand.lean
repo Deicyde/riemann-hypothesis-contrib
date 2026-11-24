@@ -124,7 +124,7 @@ theorem hasDerivAt_listSum
     exact (h a (by simp)).add (ih fun b hb => h b (List.mem_cons_of_mem _ hb))
 
 theorem RdV_eq_Dx {k r : ℕ} (X : Mat k r) (f : Mat k r → E) : RdV X f = Dx (false, X) f := by
-  first | rfl | simp [Dx]
+  first | rfl
 
 theorem ck_Rw
     {k r m : ℕ} {F : Mat k r → E} (hF : CkOn (m : ℕ∞) (GV k r) F)

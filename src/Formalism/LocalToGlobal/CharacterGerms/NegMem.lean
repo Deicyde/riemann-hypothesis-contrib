@@ -57,7 +57,8 @@ open Formalism.IncomingBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 variable {C : Type} [Field C]
 
-theorem tyS_add {l : ℕ} (hl : 2 ≤ l) (a b : ℕ → C) : tyS l (fun s => a s + b s) = tyS l a + tyS l b := by
+theorem tyS_add {l : ℕ} (hl : 2 ≤ l) (a b : ℕ → C)
+    : tyS l (fun s => a s + b s) = tyS l a + tyS l b := by
   ext n
   simp only [tyS, PowerSeries.coeff_mk, map_add (f := _), ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun s _ => ?_
@@ -65,26 +66,46 @@ theorem tyS_add {l : ℕ} (hl : 2 ≤ l) (a b : ℕ → C) : tyS l (fun s => a s
 
 namespace RawChart
 
-variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
+variable
+  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
 
 def AddCvSt (V : VF C) : Prop :=
-  ∀ γ γ' : κ → PowerSeries C, IsCv V γ → IsCv V γ' →
-    ∃ γ'' : κ → PowerSeries C, IsCv V γ'' ∧
-      (∀ i, alongCv γ'' (X.lg i) = alongCv γ (X.lg i) + alongCv γ' (X.lg i)) ∧
-      ∀ v : κ → C, (∀ i, V.Ge 0 (v i)) →
-        PowerSeries.constantCoeff (alongCv γ'' (X.sg v) - alongCv γ (X.sg v) - alongCv γ' (X.sg v)) = 0 ∧
-        ∀ n, V.Ge 0 (PowerSeries.coeff n (alongCv γ'' (X.sg v) - alongCv γ (X.sg v) - alongCv γ' (X.sg v)))
+  ∀ γ γ' : κ → PowerSeries C,
+    IsCv V γ → IsCv V γ'
+      → ∃ γ'' : κ → PowerSeries C,
+        IsCv V γ'' ∧ (∀ i, alongCv γ'' (X.lg i) = alongCv γ (X.lg i) + alongCv γ' (X.lg i))
+          ∧ ∀ v : κ → C,
+            (∀ i, V.Ge 0 (v i))
+              → PowerSeries.constantCoeff
+                    (alongCv γ'' (X.sg v) - alongCv γ (X.sg v) - alongCv γ' (X.sg v))
+                  = 0
+                ∧ ∀ n,
+                  V.Ge 0
+                    (PowerSeries.coeff n
+                      (alongCv γ'' (X.sg v) - alongCv γ (X.sg v) - alongCv γ' (X.sg v)))
 
-theorem add_mem (V : VF C) (g : Fin 2) (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 0 (X.u g c i))
-    (x y : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g) (hy : y ∈ X.TySet V g) : x + y ∈ X.TySet V g := by
+theorem add_mem
+    (V : VF C) (g : Fin 2) (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 0 (X.u g c i))
+    (x y : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g) (hy : y ∈ X.TySet V g)
+    : x + y ∈ X.TySet V g := by
   have hl2 := V.l_prime.two_le
   obtain ⟨γ, lam, hγ, hlam, h1, h2⟩ := hx
   obtain ⟨γ', lam', hγ', hlam', h1', h2'⟩ := hy
   obtain ⟨γ'', hγ'', hL, hS⟩ := hA γ γ' hγ hγ'
-  have hty : ∀ n, tyS V.l (fun s => (x + y) s n) = tyS V.l (fun s => x s n) + tyS V.l (fun s => y s n) :=
+  have hty
+      : ∀ n, tyS V.l (fun s => (x + y) s n) = tyS V.l (fun s => x s n) + tyS V.l (fun s => y s n) :=
     fun n => tyS_add hl2 _ _
-  refine ⟨γ'', fun q => lam q + lam' q + (alongCv γ'' (X.sg (X.u (1 - g) q)) - alongCv γ (X.sg (X.u (1 - g) q)) -
-    alongCv γ' (X.sg (X.u (1 - g) q))), hγ'', ?_, ?_, ?_⟩
+  refine ⟨
+    γ'',
+    fun q =>
+      lam q + lam' q
+        + (alongCv γ'' (X.sg (X.u (1 - g) q)) - alongCv γ (X.sg (X.u (1 - g) q))
+          - alongCv γ' (X.sg (X.u (1 - g) q))),
+    hγ'',
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro q
     obtain ⟨c0, cI⟩ := hS (X.u (1 - g) q) (hu (1 - g) q)
     refine ⟨?_, fun n => ?_⟩
@@ -97,12 +118,20 @@ theorem add_mem (V : VF C) (g : Fin 2) (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [hty, smul_add]
   · intro q
-    have hs : ∀ c : I g, (if X.ty g c = X.ty (1 - g) q then
-          X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => (x + y) s (Sum.inl c)) else 0) =
-        (if X.ty g c = X.ty (1 - g) q then
-          X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => x s (Sum.inl c)) else 0) +
-        (if X.ty g c = X.ty (1 - g) q then
-          X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => y s (Sum.inl c)) else 0) := by
+    have hs
+        : ∀ c : I g,
+          (if X.ty g c = X.ty (1 - g) q then
+             X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => (x + y) s (Sum.inl c))
+           else
+             0)
+            = (if X.ty g c = X.ty (1 - g) q then
+                 X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => x s (Sum.inl c))
+               else
+                 0)
+              + (if X.ty g c = X.ty (1 - g) q then
+                   X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => y s (Sum.inl c))
+                 else
+                   0) := by
       intro c
       rw [hty]
       split_ifs
@@ -112,20 +141,22 @@ theorem add_mem (V : VF C) (g : Fin 2) (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 
     rw [Finset.sum_add_distrib, hty, h2 q, h2' q]
     abel
 
-private theorem powerSeries_rescale_smul (a c : C) (f : PowerSeries C) :
-    PowerSeries.rescale a (c • f) = c • PowerSeries.rescale a f := by
+private theorem powerSeries_rescale_smul (a c : C) (f : PowerSeries C)
+    : PowerSeries.rescale a (c • f) = c • PowerSeries.rescale a f := by
   ext n
   simp only [PowerSeries.coeff_rescale, PowerSeries.coeff_smul, smul_eq_mul]
   ring
 
-private theorem alongCv_rescale_eq_rescale_alongCv {σ : Type} [Finite σ] {γ : σ → PowerSeries C}
-    (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0) (a : C) (f : MvPowerSeries σ C) :
-    alongCv (fun i => PowerSeries.rescale a (γ i)) f = PowerSeries.rescale a (alongCv γ f) := by
+private theorem alongCv_rescale_eq_rescale_alongCv
+    {σ : Type} [Finite σ]
+    {γ : σ → PowerSeries C} (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
+    (a : C) (f : MvPowerSeries σ C)
+    : alongCv (fun i => PowerSeries.rescale a (γ i)) f = PowerSeries.rescale a (alongCv γ f) := by
   simp only [PowerSeries.rescale_eq_subst]
   exact alongCv_repar hγ (by simp) f
 
-private theorem tyS_neg_eq_rescale_neg_one_of_odd {l : ℕ} (hl : Odd l) (a : ℕ → C) :
-    tyS l (fun s => -a s) = PowerSeries.rescale (-1) (tyS l a) := by
+private theorem tyS_neg_eq_rescale_neg_one_of_odd {l : ℕ} (hl : Odd l) (a : ℕ → C)
+    : tyS l (fun s => - a s) = PowerSeries.rescale (-1) (tyS l a) := by
   ext n
   simp only [tyS, PowerSeries.coeff_mk, PowerSeries.coeff_rescale, Finset.mul_sum]
   refine Finset.sum_congr rfl fun s _ => ?_
@@ -134,14 +165,14 @@ private theorem tyS_neg_eq_rescale_neg_one_of_odd {l : ℕ} (hl : Odd l) (a : �
     ring
   · ring
 
-private theorem isCv_rescale_neg_one (V : VF C) {σ : Type} {γ : σ → PowerSeries C} (h : IsCv V γ) :
-    IsCv V (fun i => PowerSeries.rescale (-1 : C) (γ i)) := by
+private theorem isCv_rescale_neg_one (V : VF C) {σ : Type} {γ : σ → PowerSeries C} (h : IsCv V γ)
+    : IsCv V (fun i => PowerSeries.rescale (-1 : C) (γ i)) := by
   intro i
   show PowerSeries.constantCoeff (PowerSeries.rescale (-1 : C) (γ i)) = 0 ∧
     ∀ n, V.Ge 0 (PowerSeries.coeff n (PowerSeries.rescale (-1 : C) (γ i)))
   refine ⟨?_, fun n => ?_⟩
-  · rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_rescale, pow_zero, one_mul,
-      PowerSeries.coeff_zero_eq_constantCoeff_apply]
+  · rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_rescale, pow_zero,
+      one_mul, PowerSeries.coeff_zero_eq_constantCoeff_apply]
     exact (h i).1
   · have h2 := (h i).2 n
     rw [PowerSeries.coeff_rescale]
@@ -153,15 +184,22 @@ private theorem isCv_rescale_neg_one (V : VF C) {σ : Type} {γ : σ → PowerSe
       rw [V.v.map_neg]
       exact h2
 
-theorem neg_mem (V : VF C) (g : Fin 2) (hodd : V.l ≠ 2) (x : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g) :
-    -x ∈ X.TySet V g := by
+theorem neg_mem
+    (V : VF C) (g : Fin 2) (hodd : V.l ≠ 2) (x : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g)
+    : -x ∈ X.TySet V g := by
   have hl : Odd V.l := V.l_prime.odd_of_ne_two hodd
   unfold RawChart.TySet at hx ⊢
   obtain ⟨γ, lam, hγ, hlam, hlg, hq⟩ := hx
   have hγ0 : ∀ i, PowerSeries.constantCoeff (γ i) = 0 := fun i => (hγ i).1
   rw [Set.mem_setOf_eq]
-  refine ⟨fun i => PowerSeries.rescale (-1 : C) (γ i), fun q => PowerSeries.rescale (-1 : C) (lam q),
-    isCv_rescale_neg_one V hγ, isCv_rescale_neg_one V hlam, ?_, ?_⟩
+  refine ⟨
+    fun i => PowerSeries.rescale (-1 : C) (γ i),
+    fun q => PowerSeries.rescale (-1 : C) (lam q),
+    isCv_rescale_neg_one V hγ,
+    isCv_rescale_neg_one V hlam,
+    ?_,
+    ?_
+  ⟩
   · intro i
     simp only [Pi.neg_apply]
 
@@ -172,12 +210,14 @@ theorem neg_mem (V : VF C) (g : Fin 2) (hodd : V.l ≠ 2) (x : ℕ → I g ⊕ J
     simp only [Pi.neg_apply]
     rw [tyS_neg_eq_rescale_neg_one_of_odd hl, hq q, alongCv_rescale_eq_rescale_alongCv hγ0]
 
-    simp only [tyS_neg_eq_rescale_neg_one_of_odd hl, map_add (f := _), map_sub, map_sum, apply_ite ⇑(PowerSeries.rescale (-1 : C)), map_zero,
-    powerSeries_rescale_smul]
+    simp only [tyS_neg_eq_rescale_neg_one_of_odd hl, map_add (f := _), map_sub, map_sum,
+      apply_ite ⇑(PowerSeries.rescale (-1 : C)), map_zero, powerSeries_rescale_smul]
 
-theorem sum_mem (V : VF C) (g : Fin 2) (h0 : (0 : ℕ → I g ⊕ JJ I g → C) ∈ X.TySet V g)
-    (hadd : ∀ x y, x ∈ X.TySet V g → y ∈ X.TySet V g → x + y ∈ X.TySet V g) {ι : Type} (s : Finset ι)
-    (f : ι → ℕ → I g ⊕ JJ I g → C) (hf : ∀ i ∈ s, f i ∈ X.TySet V g) : ∑ i ∈ s, f i ∈ X.TySet V g := by
+theorem sum_mem
+    (V : VF C) (g : Fin 2) (h0 : (0 : ℕ → I g ⊕ JJ I g → C) ∈ X.TySet V g)
+    (hadd : ∀ x y, x ∈ X.TySet V g → y ∈ X.TySet V g → x + y ∈ X.TySet V g)
+    {ι : Type} (s : Finset ι) (f : ι → ℕ → I g ⊕ JJ I g → C) (hf : ∀ i ∈ s, f i ∈ X.TySet V g)
+    : ∑ i ∈ s, f i ∈ X.TySet V g := by
   classical
   revert hf
   refine Finset.induction_on s ?_ ?_
@@ -186,7 +226,8 @@ theorem sum_mem (V : VF C) (g : Fin 2) (h0 : (0 : ℕ → I g ⊕ JJ I g → C) 
     exact h0
   · intro a s ha ih hf
     rw [Finset.sum_insert ha]
-    exact hadd _ _ (hf a (Finset.mem_insert_self a s)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
+    exact hadd _ _ (hf a (Finset.mem_insert_self a s))
+      (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
 
 end RawChart
 

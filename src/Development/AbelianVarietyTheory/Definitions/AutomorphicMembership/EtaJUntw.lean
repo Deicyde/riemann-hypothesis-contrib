@@ -106,7 +106,6 @@ def InUse (R : RealDat D A Ks) (t : T) : Prop := t = A.μ0 ∨ ∃ w, R.mu w = t
 abbrev useFam (R : RealDat D A Ks) : FamIn D.what₂.LL G Pl0 {t // InUse R t} D.R.m :=
   subFam A (InUse R) (Or.inl rfl)
 
-
 def useReal (R : RealDat D A Ks) : RealDat D (useFam R) Ks where
   toLevCh := subLev R.toLevCh (InUse R)
   hv0 := R.hv0
@@ -342,7 +341,6 @@ end Metric
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure RowT (D : D7) (fr : CharFrame D) (xi : D.what₂.Tup → HChar D.host.E) : Type 1 where
   G : Type
   [grp : Group G]

@@ -53,6 +53,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.shortThetaValue_complexPoint_eq_classicalTheta
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -94,7 +95,4 @@ theorem _root_.GlobalTheory.T.shortThetaValue_complexPoint_eq_classicalTheta
                                                 (MvPolynomial.rename eL
                                                   (MvPolynomial.map (algebraMap c.F ℂ) P))
                                                 x := by
-  first
-  | exact @GlobalTheory.Dict.shortValAt_eq_thP
-  | exact GlobalTheory.Dict.shortValAt_eq_thP
-  | (intros; apply GlobalTheory.Dict.shortValAt_eq_thP <;> assumption)
+  first | exact @GlobalTheory.Dict.shortValAt_eq_thP

@@ -43,9 +43,6 @@ open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.
   IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.Base
 open scoped Matrix
 
-attribute [-instance]
-  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
-
 namespace UpperTheory.V.Th.Db
 
 theorem algClo

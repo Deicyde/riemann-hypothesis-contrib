@@ -52,8 +52,6 @@ open scoped TensorProduct
 
 noncomputable section
 
-
-
 namespace GlobalTheory.SelfDualAt
 
 variable {D : D7}

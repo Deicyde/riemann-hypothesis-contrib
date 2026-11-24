@@ -143,7 +143,7 @@ theorem mix_map'
     : (f • a + (1 - f) • (1 : Matrix n n A)).map ψ
       = ψ f • a.map ψ + (1 - ψ f) • (1 : Matrix n n B) := by
   ext i j
-  by_cases h : i = j <;> simp [Matrix.one_apply, h]
+  by_cases h : i = j <;> simp [h]
 
 theorem mix_conj'
     {A : Type} [CommRing A]

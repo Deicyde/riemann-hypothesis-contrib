@@ -46,8 +46,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.SemiposAtOfPositive
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
   Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
@@ -56,6 +54,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
 noncomputable section
 namespace GlobalTheory.ThetaSizeBounds
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem run_params_alt
     : _root_.GlobalTheory.CovTop.SizeCondition
       → _root_.GlobalTheory.CovTop.CoversCondition fun Fm x _ ι p i Y PP C =>

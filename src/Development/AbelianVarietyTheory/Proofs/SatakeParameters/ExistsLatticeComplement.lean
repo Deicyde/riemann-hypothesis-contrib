@@ -222,7 +222,7 @@ private theorem exists_quotient_of_eigenvector_lemma_2
     ext k l
     refine Fin.cases ?_ (fun j => ?_) k <;> refine Fin.cases ?_ (fun m => ?_) l
       <;> simp [T, T', Matrix.mul_apply, sub_mul, Finset.sum_sub_distrib, ← hu', Matrix.one_apply,
-        Fin.succAbove_ne, Fin.succ_ne_zero, eq_comm]
+        Fin.succ_ne_zero, eq_comm]
 
   have hT2 : T * T' = 1 := mul_eq_one_comm.mp hT
   let B : Γ → Matrix (Fin (n + 1)) (Fin (n + 1)) O := fun g =>
@@ -267,7 +267,7 @@ private theorem exists_quotient_of_eigenvector_lemma_2
       ext i k
       simp only [Matrix.submatrix_apply]
       rw [hBmul, Matrix.mul_apply, Fin.sum_univ_succ, hB0]
-      simp [Matrix.mul_apply, Matrix.one_apply, Fin.succ_ne_zero]
+      simp [Matrix.mul_apply, Fin.succ_ne_zero]
   }
   have hσ : ∀ g, σ g = (B g).submatrix Fin.succ Fin.succ := fun g => rfl
   have hmap
@@ -292,7 +292,7 @@ private theorem exists_quotient_of_eigenvector_lemma_2
       ext i x
       have h2 : (B g * T') i.succ x = ∑ j : Fin n, B g i.succ j.succ * T' j.succ x := by
         rw [Matrix.mul_apply, Fin.sum_univ_succ, hB0]
-        simp [Matrix.one_apply, Fin.succ_ne_zero]
+        simp [Fin.succ_ne_zero]
       have h := congrFun (congrFun (hBT g) (Fin.succ i)) x
       rw [h2] at h
       simpa [Matrix.mul_apply] using h
@@ -321,7 +321,7 @@ private theorem exists_quotient_of_eigenvector_lemma_2
     have hrest : ∀ i : Fin n, (B g).charmatrix i.succ 0 = 0 := by
       intro i
       rw [Matrix.charmatrix_apply_ne _ _ _ (Fin.succ_ne_zero i), hB0]
-      simp [Matrix.one_apply, Fin.succ_ne_zero]
+      simp [Fin.succ_ne_zero]
     simp only [hrest, mul_zero, zero_mul, Finset.sum_const_zero, add_zero, hsub]
     rw [Matrix.charmatrix_apply_eq, hB0]
     simp only [Matrix.one_apply_eq, mul_one, Fin.val_zero, pow_zero, one_mul]
@@ -412,8 +412,7 @@ theorem _root_.GlobalTheory.LatticeComplement.exists_lattice_complement
       rw [e1, e2, Matrix.trace_eq_neg_charpoly_nextCoeff,
         Matrix.trace_eq_neg_charpoly_nextCoeff ((ρ₀ g : GL (Fin r) L) : Matrix (Fin r) (Fin r) L),
         h1]
-      simp only [χK, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, RingHom.comp_apply,
-        Finset.sum_neg_distrib]
+      simp only [χK, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, Finset.sum_neg_distrib]
       ring
     haveI : CharZero L := (RingHom.charZero_iff f.injective).mp inferInstance
     obtain ⟨v, hv0, hv⟩ :=

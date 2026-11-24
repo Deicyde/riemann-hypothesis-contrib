@@ -43,17 +43,19 @@ import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.AffineG
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep MeasureTheory PositivityTheory.Affgl GlobalTheory.CompanionTheory.CTFin
+open NumberField GlobalTheory.CuspRep MeasureTheory PositivityTheory.Affgl
+  GlobalTheory.CompanionTheory.CTFin
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CTFin.UniSol
 
-theorem exists_finset_separating {K : Type} (A : Submodule ℂ (K → ℂ)) [FiniteDimensional ℂ A] :
-    ∃ S : Finset K, ∀ c ∈ A, (∀ κ ∈ S, c κ = 0) → c = 0 := by
+theorem exists_finset_separating {K : Type} (A : Submodule ℂ (K → ℂ)) [FiniteDimensional ℂ A]
+    : ∃ S : Finset K, ∀ c ∈ A, (∀ κ ∈ S, c κ = 0) → c = 0 := by
   classical
-  have key : ∀ (n : ℕ) (B : Submodule ℂ A), Module.finrank ℂ B = n →
-      ∃ S : Finset K, ∀ c ∈ B, (∀ κ ∈ S, (c : K → ℂ) κ = 0) → c = 0 := by
+  have key
+      : ∀ (n : ℕ) (B : Submodule ℂ A),
+        Module.finrank ℂ B = n → ∃ S : Finset K, ∀ c ∈ B, (∀ κ ∈ S, (c : K → ℂ) κ = 0) → c = 0 := by
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>
@@ -79,7 +81,10 @@ theorem exists_finset_separating {K : Type} (A : Submodule ℂ (K → ℂ)) [Fin
           have := Submodule.finrank_lt_finrank_of_lt hlt
           omega
         obtain ⟨S', hS'⟩ := ih _ hrk B' rfl
-        refine ⟨insert κ0 S', fun c hc hvan => hS' c ?_ (fun κ hκ => hvan κ (Finset.mem_insert_of_mem hκ))⟩
+        refine ⟨
+          insert κ0 S',
+          fun c hc hvan => hS' c ?_ (fun κ hκ => hvan κ (Finset.mem_insert_of_mem hκ))
+        ⟩
         refine Submodule.mem_inf.mpr ⟨hc, LinearMap.mem_ker.mpr ?_⟩
         exact hvan κ0 (Finset.mem_insert_self κ0 S')
   obtain ⟨S, hS⟩ := key _ ⊤ rfl
@@ -87,8 +92,10 @@ theorem exists_finset_separating {K : Type} (A : Submodule ℂ (K → ℂ)) [Fin
   have h0 := hS ⟨c, hc⟩ Submodule.mem_top hvan
   exact congrArg Subtype.val h0
 
-theorem finiteDimensional_coeffSpan {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (ρ : Representation ℂ K W) : FiniteDimensional ℂ (GlobalTheory.Published.AutFin.coeffSpan ρ) := by
+theorem finiteDimensional_coeffSpan
+    {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ K W)
+    : FiniteDimensional ℂ (GlobalTheory.Published.AutFin.coeffSpan ρ) := by
   classical
   let b := Module.Free.chooseBasis ℂ W
   let m : (Module.Free.ChooseBasisIndex ℂ W) × (Module.Free.ChooseBasisIndex ℂ W) → (K → ℂ) :=
@@ -123,8 +130,11 @@ theorem finiteDimensional_coeffSpan {K W : Type} [Group K] [AddCommGroup W] [Mod
     exact Submodule.sum_mem _ (fun ij _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨ij, rfl⟩))
   exact Submodule.finiteDimensional_of_le hle
 
-theorem coeffSpan_unisolvent : ∀ (K W : Type) [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (ρ : Representation ℂ K W), ∃ S : Finset K, ∀ c ∈ GlobalTheory.Published.AutFin.coeffSpan ρ, (∀ κ ∈ S, c κ = 0) → c = 0 := by
+theorem coeffSpan_unisolvent
+    : ∀ (K W : Type) [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+        (ρ : Representation ℂ K W),
+      ∃ S : Finset K, ∀ c ∈ GlobalTheory.Published.AutFin.coeffSpan ρ,
+        (∀ κ ∈ S, c κ = 0) → c = 0 := by
   intro K W _ _ _ _ ρ
   haveI := finiteDimensional_coeffSpan ρ
   exact exists_finset_separating _

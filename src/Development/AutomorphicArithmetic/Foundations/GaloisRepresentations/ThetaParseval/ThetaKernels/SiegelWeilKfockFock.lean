@@ -42,8 +42,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical
@@ -63,7 +61,7 @@ theorem fockMem_k : _root_.PositivityTheory.SiegelWeilFormula.FockMem_k := by
       fun P => _root_.PositivityTheory.SiegelWeilFormula.KFock.away_tens_k R w Ψ hΨ P,
       _root_.PositivityTheory.SiegelWeilFormula.KFock.away_inv_k R w Ψ hΨ
     ⟩,
-    fun w f hf => _root_.PositivityTheory.SiegelWeilFormula.KFock.fock_dec_k R w f hf
+    fun w f hf => _root_.UpperTheory.Reformulated.B.Glb2.fock_dec_k R w f hf
   ⟩
 theorem T_sub_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (Φ Φ' : d.Fn)
     : d.T (Φ - Φ') = d.T Φ - d.T Φ' := by

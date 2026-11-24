@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.shiftedAdditiveCharacter_archimedeanParameters
                     ∧ ∃ l : D.what₂.Tau → ℝ,
                       HasRealPar (shift ψ lam) θ l
                         ∧ ∀ τ, |l τ| = ‖tauE D τ D.host.xi0‖ / ‖tauE D τ μ‖ := by
-  first
-  | exact @GlobalTheory.StdUnn.shift_char_realPar
-  | exact GlobalTheory.StdUnn.shift_char_realPar
-  | (intros; apply GlobalTheory.StdUnn.shift_char_realPar <;> assumption)
+  first | exact @GlobalTheory.StdUnn.shift_char_realPar

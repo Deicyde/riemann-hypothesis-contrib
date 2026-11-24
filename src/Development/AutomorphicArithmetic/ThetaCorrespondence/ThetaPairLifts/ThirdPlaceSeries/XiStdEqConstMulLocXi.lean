@@ -52,8 +52,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 section Loc
@@ -99,6 +97,7 @@ variable
   {Gl : Formalism.MainNotions.G.LatInst (I.rec7 l Z)} {Kc : Formalism.MainNotions.G.Consts}
   {Yd : DivX (I.rec7 l Z)} {cX : ExtraC} {ex : Extra (I.rec7 l Z) L hT Gi Gl Kc Yd cX}
   {W : _root_.GlobalTheory.MiS.RealPackAlt ex} {u : B.Word}
+
 theorem valuation_frs_sub_kronecker_lt_one
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     {a : _root_.GlobalTheory.Fam.GeometricFamily W u} {t : W.P.T}
@@ -156,6 +155,7 @@ theorem valuation_frs_sub_kronecker_lt_one
   exact GlobalTheory.SeeSaw.BaseFrame.lift_near_one (y := 1) (by rw [one_mul]; exact h9)
     (by rw [one_mul]; exact h9) h9 (hJ.is.base j hm β).2 ⟨P.1, hP⟩ hk
     (GlobalTheory.TopStep.liftFr_spec (J.A.p0 j β).1.1.deco.2 ⟨P.1, hP⟩) r c
+
 theorem fm_beta_eq
     {a : _root_.GlobalTheory.Fam.GeometricFamily W u} (hIs : a.Is) (hTr : a.True)
     (hA : ∀ r s, (a.g.oT B.R.m rfl).iA r s = if r.val = s.val then 1 else 0) (n : Fin a.n)
@@ -201,6 +201,7 @@ theorem fm_beta_eq
     show ∑ b, _root_.GlobalTheory.Fam.TopLoc.embeddingAtLocalFactor a n ((a.g.oT _ (a.G n).hs).iB r b) * _root_.GlobalTheory.Fam.TopLoc.embeddingAtLocalFactor a n (a.o.ζ₀ b) = _
     exact Finset.sum_congr rfl fun b _ =>
       (map_mul (_root_.GlobalTheory.Fam.TopLoc.embeddingAtLocalFactor a n) _ _).symm
+
 theorem xiStd_eq_const_mul_locXi_alt
     : ∀ {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws}
         {Z : TC.Later B (I.cols l)} {L : SizeData₂ (I.rec7 l Z)} {hT : GatTies (I.rec7 l Z)}

@@ -79,11 +79,12 @@ attribute [local instance] zuAlg
 abbrev GA : CommRingCat.{0} := CommRingCat.of (AddMonoidAlgebra Γ(Y.left, V) X)
 
 def ptY : Spec (GA (X := X) (V := V)) ⟶ Y.left :=
-  Spec.map (CommRingCat.ofHom (algebraMap Γ(Y.left, V) (AddMonoidAlgebra Γ(Y.left, V) X))) ≫ hV.fromSpec
+  Spec.map (CommRingCat.ofHom (algebraMap Γ(Y.left, V) (AddMonoidAlgebra Γ(Y.left, V) X)))
+    ≫ hV.fromSpec
 
 def ptZ : Spec (GA (X := X) (V := V)) ⟶ Spec (torusRing ZU X) :=
-  Spec.map (CommRingCat.ofHom
-    (algebraMap (AddMonoidAlgebra ZU.{0} X) (AddMonoidAlgebra Γ(Y.left, V) X)))
+  Spec.map (CommRingCat.ofHom (algebraMap (AddMonoidAlgebra ZU.{0} X)
+    (AddMonoidAlgebra Γ(Y.left, V) X)))
 
 def ptT : Spec (GA (X := X) (V := V)) ⟶ (splitTorus S X).left :=
   pullback.lift (ptZ (X := X) (V := V)) (ptY hV ≫ Y.hom) (specULiftZIsTerminal.hom_ext _ _)
@@ -94,12 +95,10 @@ def pt : Spec (GA (X := X) (V := V)) ⟶ (splitTorus S X ⊗ Y).left :=
 lemma pt_snd : pt hV ≫ (snd (splitTorus S X) Y).left = ptY hV := by
   first
   | exact pullback.lift_snd _ _ _
-  | simp [pt]
 
 lemma pt_fst : pt hV ≫ (fst (splitTorus S X) Y).left = ptT hV := by
   first
   | exact pullback.lift_fst _ _ _
-  | simp [pt]
 
 lemma ptY_preimage : ptY (X := X) hV ⁻¹ᵁ V = ⊤ := by
   apply eq_top_iff.mpr
@@ -116,10 +115,10 @@ lemma pt_le : (⊤ : (Spec (GA (X := X) (V := V))).Opens) ≤
     exact (ptY_preimage hV).ge (show p ∈ (⊤ : (Spec (GA (X := X) (V := V))).Opens) from trivial)
   exact h1
 
-def ev : Γ((splitTorus S X ⊗ Y).left, (snd (splitTorus S X) Y).left ⁻¹ᵁ V) →+*
-    AddMonoidAlgebra Γ(Y.left, V) X :=
-  (Scheme.ΓSpecIso (GA (X := X) (V := V))).hom.hom.comp
-    ((pt hV).appLE _ ⊤ (pt_le hV)).hom
+def ev
+    : Γ((splitTorus S X ⊗ Y).left, (snd (splitTorus S X) Y).left ⁻¹ᵁ V)
+      →+* AddMonoidAlgebra Γ(Y.left, V) X :=
+  (Scheme.ΓSpecIso (GA (X := X) (V := V))).hom.hom.comp ((pt hV).appLE _ ⊤ (pt_le hV)).hom
 
 lemma tle {A B : Scheme.{0}} (f : A ⟶ B) : (⊤ : A.Opens) ≤ f ⁻¹ᵁ ⊤ := by
   intro p _
@@ -135,10 +134,6 @@ lemma specMap_appLE_top {R R' : CommRingCat.{0}} (f : R ⟶ R') (e) :
   have h1 : (Spec.map f).appLE ⊤ ⊤ e = (Spec.map f).appTop := by
     first
     | (rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]; rfl)
-    | (simp only [Scheme.Hom.appLE]
-       erw [show (homOfLE e).op = 𝟙 (Opposite.op (⊤ : (Spec R').Opens)) from Subsingleton.elim _ _,
-         CategoryTheory.Functor.map_id, Category.comp_id]
-       rfl)
   rw [h1, Scheme.ΓSpecIso_naturality, ← Category.assoc, Iso.inv_hom_id, Category.id_comp]
 
 lemma specMap_fromSpec_appLE {R : CommRingCat.{0}} (f : Γ(Y.left, V) ⟶ R) (e) :
@@ -169,7 +164,7 @@ lemma charUnit_val (χ : X) :
     (charUnit S X χ).val = ((tFst (S := S) X).appLE ⊤ ⊤
       (tle _)).hom
       ((Scheme.ΓSpecIso (torusRing ZU X)).inv.hom (AddMonoidAlgebra.single χ 1)) := by
-  simp [charUnit, res, pullU, Scheme.Hom.appLE, AddMonoidAlgebra.of_apply]
+  simp [charUnit, res, pullU, Scheme.Hom.appLE]
   rfl
 
 lemma ev_chi (χ : X) :
@@ -203,28 +198,35 @@ lemma coeff_sum_single {A : Type} [CommRing A] (s : Finset X) (g : X → A) (χ�
     (∑ c ∈ s, AddMonoidAlgebra.single c (g c)).coeff χ₀ = g χ₀ := by
   classical
   first
-  | simp [AddMonoidAlgebra.coeff, Finsupp.finsetSum_apply, Finsupp.single_apply, h]
   | simp [Finsupp.finsetSum_apply, Finsupp.single_apply, h]
-  | simp [AddMonoidAlgebra.coeff_sum, AddMonoidAlgebra.coeff_single, h]
 
-theorem eq_zero_of_sum {V : Y.left.Opens} (s : Finset X) (h : X → Γ(Y.left, V))
-    (hs : ∑ χ ∈ s, ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ) *
-      ((snd (splitTorus S X) Y).left.app V).hom (h χ) = 0) :
-    ∀ χ ∈ s, h χ = 0 := by
+theorem eq_zero_of_sum
+    {V : Y.left.Opens} (s : Finset X) (h : X → Γ(Y.left, V))
+    (hs
+      : ∑ χ ∈ s, ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ) *
+          ((snd (splitTorus S X) Y).left.app V).hom (h χ)
+        = 0)
+    : ∀ χ ∈ s, h χ = 0 := by
   intro χ₀ hχ₀
   refine TopCat.Presheaf.section_ext Y.left.sheaf V (h χ₀) 0 fun x hx => ?_
   obtain ⟨W, hW, hxW, hWV⟩ : ∃ W : Y.left.Opens, IsAffineOpen W ∧ x ∈ W ∧ W ≤ V := by
-    obtain ⟨_, ⟨W, hW, rfl⟩, hxW, hWV⟩ := (Y.left.isBasis_affineOpens).exists_subset_of_mem_open hx V.2
+    obtain ⟨_, ⟨W, hW, rfl⟩, hxW, hWV⟩ :=
+      (Y.left.isBasis_affineOpens).exists_subset_of_mem_open hx V.2
     exact ⟨W, hW, hxW, hWV⟩
   have hle : (snd (splitTorus S X) Y).left ⁻¹ᵁ W ≤ (snd (splitTorus S X) Y).left ⁻¹ᵁ V :=
     fun y hy => hWV hy
-  have e1 : ∀ χ : X, ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE hle).op).hom
-      (((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ)) =
-      ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ) := by
+  have e1
+      : ∀ χ : X,
+        ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE hle).op).hom
+            (((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ))
+          = ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (chiP X Y χ) := by
     intro c; rw [← CommRingCat.comp_apply, ← Functor.map_comp]; rfl
-  have e2 : ∀ c : Γ(Y.left, V), ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE hle).op).hom
-      (((snd (splitTorus S X) Y).left.app V).hom c) =
-      ((snd (splitTorus S X) Y).left.app W).hom ((Y.left.presheaf.map (homOfLE hWV).op).hom c) := by
+  have e2
+      : ∀ c : Γ(Y.left, V),
+        ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE hle).op).hom
+            (((snd (splitTorus S X) Y).left.app V).hom c)
+          = ((snd (splitTorus S X) Y).left.app W).hom
+            ((Y.left.presheaf.map (homOfLE hWV).op).hom c) := by
     intro c
     rw [← CommRingCat.comp_apply, ← CommRingCat.comp_apply, Scheme.Hom.app_eq_appLE,
       Scheme.Hom.app_eq_appLE, Scheme.Hom.appLE_map, Scheme.Hom.map_appLE]
@@ -234,9 +236,11 @@ theorem eq_zero_of_sum {V : Y.left.Opens} (s : Finset X) (h : X → Γ(Y.left, V
   have hev := congrArg (ev hW) hres
 
   simp only [map_sum, map_mul, map_zero, ev_chi, ev_snd, AddMonoidAlgebra.single_mul_single,
-  add_zero, one_mul] at hev
+      add_zero, one_mul]
+    at hev
   have hc := congrArg (fun f => f.coeff χ₀) hev
-  rw [coeff_sum_single X s _ χ₀ hχ₀, AddMonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply] at hc
+  rw [coeff_sum_single X s _ χ₀ hχ₀, AddMonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply]
+    at hc
   have hg := TopCat.Presheaf.germ_res_apply Y.left.presheaf (homOfLE hWV) x hxW (h χ₀)
   rw [hc, map_zero] at hg
   exact hg.symm.trans (map_zero _).symm

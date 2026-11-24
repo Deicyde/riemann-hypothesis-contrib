@@ -224,13 +224,6 @@ theorem whitGenLtOf
 
 end PositivityTheory.SiegelWeilFormula.Gen.W
 
-theorem PositivityTheory.SiegelWeilFormula.Gen.whitGenLtOf
-    : PositivityTheory.SiegelWeilFormula.Gen.LocFin2
-      → PositivityTheory.SiegelWeilFormula.Gen.UnrWhit
-      → PositivityTheory.SiegelWeilFormula.Gen.RealWhit
-      → PositivityTheory.SiegelWeilFormula.Gen.FactorX
-      → PositivityTheory.PfSWUS.HMass.SiegelDensitiesLowA
-      → PositivityTheory.SiegelWeilFormula.Gen.WhitGenLt :=
-  PositivityTheory.SiegelWeilFormula.Gen.W.whitGenLtOf
+alias PositivityTheory.SiegelWeilFormula.Gen.whitGenLtOf := _root_.PositivityTheory.SiegelWeilFormula.Gen.W.whitGenLtOf
 
 end

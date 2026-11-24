@@ -3,9 +3,9 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.PermutesRefl
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.GlobalFnsHolds
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.WeilIsAlternatingSkewNatural
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ConjugationActsOnCmTorsionByMultiplicationStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CyclotomicCharacterEqCmMultiplierNormStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsConjSplitPointLatticeLinearMapStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ConjugationActsOnCmTorsionByMultiplication
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CyclotomicCharacterEqCmMultiplierNorm
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsConjSplitPointLatticeLinearMap
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInjectiveOfCommRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -82,22 +82,9 @@ theorem conj_of_sq {ρ : ℂ} (hρ : ρ ^ 2 = -(H.d : ℂ)) : starRingEnd ℂ ρ
     nlinarith [sq_nonneg x]
   · exact h
 
-theorem bar_rt : H.bar H.rt = -H.rt := by
-  obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
-  have h4 : (φ (H.rt : E)) ^ 2 = -(H.d : ℂ) := by
-    have := congrArg (fun a : 𝓞 E => φ (a : E)) H.rt_sq
-    simpa using this
-  apply Subtype.ext
-  show ((H.bar H.rt : 𝓞 E) : E) = ((-H.rt : 𝓞 E) : E)
-  apply φ.injective
-  rw [H.bar_eq, IsCMField.complexEmbedding_complexConj, conj_of_sq h4]
-  simp
+alias bar_rt := _root_.GlobalTheory.ConjSplit.bar_rt
 
-theorem cmHost_bar_halfIntegerGenerator : H.bar H.w0 = 1 - H.w0 := by
-  have h := congrArg H.bar H.two_weight_eq_one_add_root
-  rw [map_mul, map_add (f := _), map_one, bar_rt, map_ofNat] at h
-  apply mul_left_cancel₀ (two_ne_zero (α := 𝓞 E))
-  linear_combination h + H.two_weight_eq_one_add_root
+alias cmHost_bar_halfIntegerGenerator := _root_.GlobalTheory.ConjSplit.cmHost_bar_halfIntegerGenerator
 
 theorem bar_mul_wE (s : ℤ × ℤ)
     : H.bar (wE H s) * wE H s
@@ -253,8 +240,8 @@ theorem exists_isometry_of_conj_split
                                       • P' (Φ (wE H s • a + H.bar (wE H s) • b)))).left := by
   intro E _ _ _ H D l Xo σ g ty F h1 hσ hty hA τ hτ C io hio i P hP i' P' hP' hs hu
   obtain ⟨Φ, hinj, hp, hm, hact⟩ :=
-    GlobalTheory.T.exists_conj_split_point_lattice_linear_map E H D l Xo σ g ty F h1 hσ hty hA τ hτ
-      C io hio i P hP i' P' hP' hs hu
+    _root_.GlobalTheory.ConjSplit.exists_conj_lattice_map E H D l Xo σ g ty F h1 hσ hty hA τ hτ C io
+      hio i P hP i' P' hP' hs hu
   have hiso : ∀ x y, (F.Di i').EF (Φ x) (Φ y) = (F.Di i).EF x y := by
     intro x y
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 (hs.ge (Submodule.mem_top (x := x)))
@@ -264,11 +251,10 @@ theorem exists_isometry_of_conj_split
           0 < n
             → (n : ℤ) ∣ (F.Di i').EF (Φ (a + b)) (Φ (a' + b')) - (F.Di i).EF (a + b) (a' + b') := by
       intro n hn
-      obtain ⟨⟨s, hs⟩, -⟩ :=
-        GlobalTheory.T.conjugation_acts_on_cm_torsion_by_multiplication E H C τ hτ io hio n hn
+      obtain ⟨⟨s, hs⟩, -⟩ := _root_.GlobalTheory.CompRat.Acts.main E H C τ hτ io hio n hn
       have k :=
         conj_pairing F τ hP hP' hu hn (hact n s hn hs a ha b hb) (hact n s hn hs a' ha' b' hb')
-      have hN := GlobalTheory.T.cyclotomicCharacter_eq_cmMultiplier_norm E H C τ hτ io n s hn hs
+      have hN := _root_.GlobalTheory.MultiplierNorm.map_zeta_eq_zpow_norm E H C τ hτ io n s hn hs
       have hb1 := bar_mul_wE (H := H) s
       generalize s.1 ^ 2 + s.1 * s.2 + s.2 ^ 2 * (((H.d : ℤ) + 1) / 4) = N at hN hb1
       have hb2 : H.bar (H.bar (wE H s)) * H.bar (wE H s) = N := by rw [bar_bar, mul_comm, hb1]

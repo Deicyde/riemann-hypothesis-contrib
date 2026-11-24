@@ -45,6 +45,7 @@ open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
   Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
   GlobalTheory.NormSum GlobalTheory.FinWeil
 open scoped BigOperators
+
 theorem _root_.GlobalTheory.T.adelicWeil_vacuum_fixed_and_translates_span
     : ∀ (D : D7),
       admG1 D
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.adelicWeil_vacuum_fixed_and_translates_span
                     → ∃ h : e0 ∈ TTs D (tor0 D cc δ) N N',
                       Fixes WA (latA D cc N N') ⟨e0, h⟩
                         ∧ Submodule.span ℂ (Set.range fun ζ => WA ζ ⟨e0, h⟩) = ⊤ := by
-  first
-  | exact @GlobalTheory.FinWeil.Vacuum.vacuum_fixed_span
-  | exact GlobalTheory.FinWeil.Vacuum.vacuum_fixed_span
-  | (intros; apply GlobalTheory.FinWeil.Vacuum.vacuum_fixed_span <;> assumption)
+  first | exact @GlobalTheory.FinWeil.Vacuum.vacuum_fixed_span

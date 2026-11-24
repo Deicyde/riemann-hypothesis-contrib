@@ -93,10 +93,7 @@ theorem finite_place_sum_le
     (w : FinitePlace K) (t : Finset ι) (a : ι → K)
     {M : ℝ} (hM : 0 ≤ M) (h : ∀ i ∈ t, w (a i) ≤ M)
     : w (∑ i ∈ t, a i) ≤ M := by
-  first
-  | exact Bl.general_b_fact_left_extra.goal1 ..
-  | (apply Bl.general_b_fact_left_extra.goal1 <;> assumption)
-  | (intros; apply Bl.general_b_fact_left_extra.goal1 <;> assumption)
+  first | (apply Bl.general_b_fact_left_extra.goal1 <;> assumption)
 
 theorem finite_place_sum_lt
     {ι : Type*}

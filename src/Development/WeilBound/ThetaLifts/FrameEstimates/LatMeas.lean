@@ -50,18 +50,21 @@ noncomputable section
 namespace PositivityTheory.ThKEst
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 namespace LatticeQuotientMeasure
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 variable (F) in
 def e0 : AF F := ((0 : Ainf F), (1 : Af F))
 
-theorem at_iff {M : Type} [AddCommGroup M] [Module (AF F) M] (z : M) : At (evI F) z ↔ e0 F • z = 0 := by
+theorem at_iff {M : Type} [AddCommGroup M] [Module (AF F) M] (z : M)
+    : At (evI F) z ↔ e0 F • z = 0 := by
   constructor
   · intro h
     apply h
@@ -70,7 +73,8 @@ theorem at_iff {M : Type} [AddCommGroup M] [Module (AF F) M] (z : M) : At (evI F
   · intro h u hu
     have hu1 : u.1 = 0 := by
       have hu' : (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F) u.1 = 0 := hu
-      exact (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (hu'.trans (map_zero _).symm)
+      exact (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).injective
+        (hu'.trans (map_zero _).symm)
     have hue : u = u * e0 F := by
       refine Prod.ext ?_ ?_
       · show u.1 = u.1 * (0 : Ainf F)
@@ -105,15 +109,19 @@ theorem continuous_piInf {w : InfinitePlace F} (τ : EmbOver E w) : Continuous (
 
 variable {n d : ℕ}
 
-theorem continuous_sz (τ : ∀ w : InfinitePlace F, EmbOver E w) : Continuous (sz τ : Ten F E n d → ℝ) := by
-  exact continuous_finsetSum _ fun w _ => continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-    ((continuous_piInf (τ w)).comp (continuous_id.matrix_elem i j)).norm
+theorem continuous_sz (τ : ∀ w : InfinitePlace F, EmbOver E w)
+    : Continuous (sz τ : Ten F E n d → ℝ) := by
+  exact continuous_finsetSum _ fun w _ =>
+    continuous_finsetSum _ fun i _ =>
+      continuous_finsetSum _ fun j _ =>
+        ((continuous_piInf (τ w)).comp (continuous_id.matrix_elem i j)).norm
 
-theorem isClosed_supp {C : Set (Ten F E n d)} (hC : IsCompact C) :
-    IsClosed {z : Ten F E n d | ∃ c ∈ C, At (evI F) (z - c)} := by
+theorem isClosed_supp {C : Set (Ten F E n d)} (hC : IsCompact C)
+    : IsClosed {z : Ten F E n d | ∃ c ∈ C, At (evI F) (z - c)} := by
   haveI := t2Space_cm_host_adeles F E
-  have hset : {z : Ten F E n d | ∃ c ∈ C, At (evI F) (z - c)} =
-      (fun z : Ten F E n d => e0 F • z) ⁻¹' ((fun c : Ten F E n d => e0 F • c) '' C) := by
+  have hset
+      : {z : Ten F E n d | ∃ c ∈ C, At (evI F) (z - c)}
+        = (fun z : Ten F E n d => e0 F • z) ⁻¹' ((fun c : Ten F E n d => e0 F • c) '' C) := by
     ext z
     simp only [Set.mem_setOf_eq, Set.mem_preimage, Set.mem_image, at_iff, smul_sub, sub_eq_zero]
     constructor
@@ -124,20 +132,24 @@ theorem isClosed_supp {C : Set (Ten F E n d)} (hC : IsCompact C) :
   rw [hset]
   exact (hC.image (continuous_const_smul (e0 F))).isClosed.preimage (continuous_const_smul (e0 F))
 
-theorem measurable_maj {G : Type} [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G]
-    (τ : ∀ w : InfinitePlace F, EmbOver E w) {C : Set (Ten F E n d)} (hC : IsCompact C) (N : ℕ)
-    {f : G → Ten F E n d} (hf : Continuous f) : Measurable fun g => maj τ C N (f g) := by
+theorem measurable_maj
+    {G : Type} [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G]
+    (τ : ∀ w : InfinitePlace F, EmbOver E w)
+    {C : Set (Ten F E n d)} (hC : IsCompact C)
+    (N : ℕ)
+    {f : G → Ten F E n d} (hf : Continuous f)
+    : Measurable fun g => maj τ C N (f g) := by
   have hcl := isClosed_supp (F := F) (E := E) (n := n) (d := d) hC
   delta maj
   refine Measurable.ite (hcl.preimage hf).measurableSet ?_ measurable_const
   exact ((continuous_const.add ((continuous_sz τ).comp hf)).measurable.pow_const N).inv
 
 omit [NumberField E] in
-theorem continuous_mat_inv {J : Matrix (Fin n) (Fin n) E} : Continuous fun g : UA σ J => mat g⁻¹ := by
+theorem continuous_mat_inv {J : Matrix (Fin n) (Fin n) E}
+    : Continuous fun g : UA σ J => mat g⁻¹ := by
   exact Units.continuous_coe_inv.comp continuous_subtype_val
 
 end LatticeQuotientMeasure
-
 
 open LatticeQuotientMeasure in
 theorem latMeas : LatMeas := by
@@ -149,7 +161,8 @@ theorem latMeas : LatMeas := by
   haveI : BorelSpace (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.UA σ J) := ⟨rfl⟩
   delta latSum
   refine Measurable.tsum fun x => ENNReal.measurable_ofReal.comp ?_
-  exact measurable_maj τ hC N ((continuous_mat_inv.matrix_mul continuous_const).matrix_mul continuous_const)
+  exact measurable_maj τ hC N
+    ((continuous_mat_inv.matrix_mul continuous_const).matrix_mul continuous_const)
 
 end PositivityTheory.ThKEst
 

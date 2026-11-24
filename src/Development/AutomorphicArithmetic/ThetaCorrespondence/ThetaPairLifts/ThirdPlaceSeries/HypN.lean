@@ -42,8 +42,6 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.OffRange
 
 @[expose] public section
 
-
-
 section
 section
 noncomputable section

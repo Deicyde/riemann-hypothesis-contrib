@@ -89,7 +89,7 @@ theorem hform_single_left
     by_cases h : r = i
     · subst h
       simp
-    · simp [Pi.single_apply, h]
+    · simp [h]
   rw [hform_eq, hs]
   simp
 

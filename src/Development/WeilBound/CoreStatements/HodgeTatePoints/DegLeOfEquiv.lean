@@ -3,12 +3,12 @@ module
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsSplitGaussChars
 public import Mathlib.RingTheory.Coalgebra.IsFrobenius
 public import Mathlib.RingTheory.HopfAlgebra.Basic
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.BundleDegreeEqSumValuationsStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeAdditiveSubQuotientStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeInvariantLinearEquivStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualLatticeDegreeNegStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ShortExactFirstTermBundleStatement
-import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundlesStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.BundleDegreeEqSumValuations
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeAdditiveSubQuotient
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeInvariantLinearEquiv
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualLatticeDegreeNeg
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ShortExactFirstTermBundle
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundles
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -70,7 +70,7 @@ theorem basis_mem
     (h : IsLatOf C i b L) (q : Fin n)
     : b q ∈ L := by
   refine (h _).2 fun r => ?_
-  by_cases e : q = r <;> simp [e, Finsupp.single_apply]
+  by_cases e : q = r <;> simp [e]
 
 theorem smul_mem_lat
     {i : C.I} {n : ℕ} {b : Module.Basis (Fin n) K V} {L : AddSubgroup V} (h : IsLatOf C i b L)
@@ -98,7 +98,9 @@ theorem deg_triv
     : IsBun C L ∧ deg C L = 0 := by
   have hb : IsBun C L := Inhab.isBun_of_basis C b L h
   refine ⟨hb, ?_⟩
-  rw [(GlobalTheory.T.bundle_degree_eq_sum_valuations K C V L n b (fun _ => b) hb h).2]
+  rw [(_root_.GlobalTheory.CompanionTheory.Ar.Crv.DegFormula.deg_formula K C V L n b
+    (fun _ => b)
+    hb h).2]
   simp [Module.Basis.det_self]
 
 end SlopeTestRemainingChoices
@@ -111,9 +113,11 @@ theorem deg_mono
   choose b hb using hL.1
   choose b' hb' using hL'.1
   obtain ⟨hf, e⟩ :=
-    GlobalTheory.T.bundle_degree_eq_sum_valuations K C V L _ (Module.finBasis K V) b hL hb
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegFormula.deg_formula K C V L _
+      (Module.finBasis K V) b hL hb
   obtain ⟨hf', e'⟩ :=
-    GlobalTheory.T.bundle_degree_eq_sum_valuations K C V L' _ (Module.finBasis K V) b' hL' hb'
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegFormula.deg_formula K C V L' _
+      (Module.finBasis K V) b' hL' hb'
   rw [e, e']
   refine finsum_le_finsum' (hf.subset fun i hi h1 => hi (by simp [h1]))
     (hf'.subset fun i hi h1 => hi (by simp [h1])) fun i => ?_
@@ -134,7 +138,7 @@ theorem deg_le_of_equiv
     (hL : IsBun C L) (hL' : IsBun C L') (h : ∀ i, ∀ x ∈ L i, e x ∈ L' i)
     : deg C L ≤ deg C L' := by
   obtain ⟨hM, hd⟩ :=
-    GlobalTheory.T.degree_invariant_linear_equiv K C V V' L
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegEquiv.deg_equiv K C V V' L
       (fun i => (L i).comap e.symm.toLinearMap.toAddMonoidHom)
       e hL
       (fun i x => by simp)
@@ -150,8 +154,9 @@ theorem deg_inj
         → subDeg C L W ≤ subDeg C L' (W.map f) := by
   intro K _ C V _ _ _ V' _ _ _ L L' f W hL hL' hf hh
   exact deg_le_of_equiv (Submodule.equivMapOfInjective f hf W)
-    (GlobalTheory.T.sub_and_quotient_bundles K C V L W hL).1
-    (GlobalTheory.T.sub_and_quotient_bundles K C V' L' _ hL').1 fun i x hx => hh i x hx
+    (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V L W hL).1
+    (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V' L' _ hL').1
+    fun i x hx => hh i x hx
 
 theorem subdeg_trivial
     : ∀ (K : Type) [Field K] (C : ACurve K) (V : Type) [AddCommGroup V] [Module K V]
@@ -160,7 +165,8 @@ theorem subdeg_trivial
       (∀ i, IsLatOf C i b (L i)) → subDeg C L W ≤ 0 := by
   intro K _ C V _ _ _ n b L W h
   obtain ⟨hL, h0⟩ := deg_triv b h
-  have hs := GlobalTheory.T.degree_additive_sub_quotient K C V L W hL
+  have hs :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuotDeg.deg_eq_subDeg_add_deg_quot K C V L W hL
   obtain ⟨κ, a, ha, hsp, hli⟩ := exists_linearIndependent' K (fun q => W.mkQ (b q))
   have : Finite κ := Finite.of_injective a ha
   have : Fintype κ := Fintype.ofFinite κ
@@ -171,15 +177,17 @@ theorem subdeg_trivial
   have hc : ∀ q, c q = W.mkQ (b (a ((Fintype.equivFin κ).symm q))) := fun q => by simp [c]
   obtain ⟨hM, hM0⟩ := deg_triv (C := C) c (fun i => Inhab.isLatOf_latOf C i c)
   have :=
-    deg_mono K C _ _ _ hM (GlobalTheory.T.sub_and_quotient_bundles K C V L W hL).2 fun i y hy => by
-      rw [← c.sum_repr y]
-      refine sum_mem fun q _ => ⟨
-        c.repr y q • b (a ((Fintype.equivFin κ).symm q)),
-        smul_mem_lat (h i) (hy q) (basis_mem (h i) _),
-        ?_
-      ⟩
-      rw [hc]
-      simp
+    deg_mono K C _ _ _ hM
+      (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V L W hL).2
+      fun i y hy => by
+        rw [← c.sum_repr y]
+        refine sum_mem fun q _ => ⟨
+          c.repr y q • b (a ((Fintype.equivFin κ).symm q)),
+          smul_mem_lat (h i) (hy q) (basis_mem (h i) _),
+          ?_
+        ⟩
+        rw [hc]
+        simp
   omega
 
 theorem ses_restrict
@@ -214,8 +222,8 @@ theorem ses_restrict
     · obtain ⟨y, hy, e⟩ := (hB z).1 z.2
       exact ⟨⟨y, hy⟩, Subtype.ext e⟩
   obtain ⟨-, hI, hd⟩ :=
-    GlobalTheory.T.short_exact_first_term_bundle K C _ _ _ _ _ _ f' g'
-      (GlobalTheory.T.sub_and_quotient_bundles K C V' L' X hL').1 hse
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.deg_shortExact K C _ _ _ _ _ _ f' g'
+      (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V' L' X hL').1 hse
   refine ⟨_, hI, hd, fun i z => ⟨?_, ?_⟩⟩
   · rintro ⟨y, hy, rfl⟩
     exact ⟨y, hy, y.2, rfl⟩
@@ -233,9 +241,11 @@ theorem subdeg_ses
   intro K _ C V _ _ _ V' _ _ _ V'' _ _ _ L L' L'' f g X hL' h
   obtain ⟨I, hI, hd, hm⟩ :=
     ses_restrict hL' h (X.comap f) X (X.map g) (fun _ => Iff.rfl) (fun _ => Iff.rfl)
-  have hL'' := (GlobalTheory.T.short_exact_first_term_bundle K C _ _ _ _ _ _ f g hL' h).2.1
+  have hL'' :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.Crv.deg_shortExact K C _ _ _ _ _ _ f g hL' h).2.1
   have : deg C I ≤ subDeg C L'' (X.map g) :=
-    deg_mono K C _ _ _ hI (GlobalTheory.T.sub_and_quotient_bundles K C V'' L'' _ hL'').1
+    deg_mono K C _ _ _ hI
+      (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V'' L'' _ hL'').1
       fun i z hz => by
         obtain ⟨y, hy, -, e⟩ := (hm i z).1 hz
         exact (h.2.2.2.2 i z).2 ⟨y, hy, e⟩
@@ -259,7 +269,8 @@ theorem subdeg_orth
     · simpa using LinearMap.congr_fun hu (Pi.single j 1)
     · obtain ⟨u, hu⟩ := exists_dot ψ
       exact ⟨u, LinearMap.ext hu⟩
-  obtain ⟨hD, -, hbi⟩ := GlobalTheory.T.dual_lattice_degree_neg K C _ _ L _ hL hbij
+  obtain ⟨hD, -, hbi⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegDual.deg_dual K C _ _ L _ hL hbij
   let B₀ : (Fin d → K) →ₗ[K] W →ₗ[K] K := ((dotProductBilin K K).comp W.subtype).flip
   have hB₀ : ∀ φ (w : W), B₀ φ w = (w : Fin d → K) ⬝ᵥ φ := fun _ _ => rfl
   let B : ((Fin d → K) ⧸ X) →ₗ[K] W →ₗ[K] K :=
@@ -282,8 +293,8 @@ theorem subdeg_orth
       rw [hB, dotProduct_comm, hu]
       rfl
   obtain ⟨-, hq, -⟩ :=
-    GlobalTheory.T.dual_lattice_degree_neg K C _ _ _ B
-      (GlobalTheory.T.sub_and_quotient_bundles K C _ _ X hD).2 hBb
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegDual.deg_dual K C _ _ _ B
+      (_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C _ _ X hD).2 hBb
   have he : dualLat C (quot C (dualLat C L (dotProductBilin K K)) X) B = sub C L W := by
     funext i
     ext w
@@ -297,7 +308,8 @@ theorem subdeg_orth
       exact H _ ⟨φ, hφ, rfl⟩
     · rintro H _ ⟨φ, hφ, rfl⟩
       exact H φ hφ
-  have hs := GlobalTheory.T.degree_additive_sub_quotient K C _ _ X hD
+  have hs :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuotDeg.deg_eq_subDeg_add_deg_quot K C _ _ X hD
   rw [he] at hq
   unfold dotDual
   unfold subDeg at hs ⊢

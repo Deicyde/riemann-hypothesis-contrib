@@ -98,7 +98,8 @@ theorem block_schur2
     · exact ⟨_, hκ, fun p q => ⟨rfl, rfl, rfl⟩⟩
     · exact ⟨_, hB v, fun p q => ⟨rfl, rfl, rfl⟩⟩
   choose K hKp hKv using hB2
-  have hP := Formalism.FourierDecayAlt.P.schur_product (X ⊕ X) (Option ι) (Y.disjSum Y) K hKp
+  have hP :=
+    _root_.Formalism.FourierDecayAlt.P.Jx7.t_SchurProduct (X ⊕ X) (Option ι) (Y.disjSum Y) K hKp
   have h2 :=
     Formalism.FourierDecayAlt.P.JCx1.decay.psd_compress (Y.disjSum Y)
       (fun x y => ∏ o, K o x y)
@@ -148,7 +149,9 @@ theorem gN_psd
     : TB.PSDOn Z (KB.gN S v ε j (w.1 v)) := by
   have h0 := hpos v ε hε j hj w Z
   have h1 :=
-    Formalism.FourierDecayAlt.P.diagonal_scaling C.LPt Z _ (fun _ => (√(S.sizeAt v (w.1 v)))⁻¹) h0
+    _root_.Formalism.FourierDecayAlt.P.Jx7.t_DiagScale C.LPt Z _
+      (fun _ => (√(S.sizeAt v (w.1 v)))⁻¹)
+      h0
   refine psd_congr Z _ _ (fun x _ y _ => ?_) h1
   unfold KB.gN
   have hs := sizeAt_nonneg S v (w.1 v)

@@ -61,6 +61,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
   GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.exists_smooth_conj_invariant_metric
     : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (a : K → ℤ), ∃ A : HermLine J,
       A.a = a ∧ IsSmoothHerm A ∧ IsConjInvariantH A := by

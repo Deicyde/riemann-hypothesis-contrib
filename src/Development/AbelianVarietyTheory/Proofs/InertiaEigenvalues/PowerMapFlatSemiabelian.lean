@@ -88,7 +88,7 @@ theorem exists_norm_mul_pow_le
         _ = (1 + C) ^ M * (1 + ‖u‖) ^ M := mul_pow _ _ _
         _ ≤ (1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M)) :=
           mul_le_mul_of_nonneg_left
-            (GlobalTheory.SchwartzBruhatMoments.one_add_pow_le (norm_nonneg u) M) (by positivity)
+            (_root_.GlobalTheory.OneAddPowBound.one_add_pow_le (norm_nonneg u) M) (by positivity)
     have h4 : ‖φ u‖ * (1 + ‖S u‖) ^ M ≤ (1 + C) ^ M * 2 ^ M * (A₀ + A₁) := by
       calc
         ‖φ u‖ * (1 + ‖S u‖) ^ M ≤ ‖φ u‖ * ((1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M))) :=

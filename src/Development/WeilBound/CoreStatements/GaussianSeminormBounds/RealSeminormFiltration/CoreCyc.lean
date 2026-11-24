@@ -99,7 +99,7 @@ theorem words
         refine Submodule.mem_inf.2 ⟨hLW F hF x hx1, ?_⟩
         simp only [Submodule.mem_iInf, Submodule.mem_comap]
         intro E hE
-        have e : E (F x) = F (E x) + (E * F - F * E) x := by simp [Module.End.mul_apply]
+        have e : E (F x) = F (E x) + (E * F - F * E) x := by simp
         rw [e]
         exact W.add_mem (hLW F hF _ (hx2 E hE)) (hx2 _ (hS E hE F (hL hF)))
     intro E hE x hx

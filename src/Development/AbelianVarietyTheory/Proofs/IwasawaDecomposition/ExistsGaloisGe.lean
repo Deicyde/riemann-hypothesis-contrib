@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsRationalUnitaryDeterminantMapRationalUnitaryTo
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgebraicHeckeCharValuesInNumberFieldStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgebraicHeckeCharValuesInNumberField
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HostCmEmbeddingProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -107,8 +107,7 @@ theorem frame_values
             ∧ C.del'.ValuesIn 0 M.val.toRingHom ∧ ∀ k a, ((C.W.om k a : ℂˣ) : ℂ) ∈ M := by
   intro R H e C he
   obtain ⟨c, -, hcm, -⟩ := GlobalTheory.Mem.HostCM.host_cm R H
-  have alg :=
-    GlobalTheory.T.algebraicHeckeChar_values_in_numberField H.F H.E c (R.Psi) (embPsi H) hcm
+  have alg := _root_.GlobalTheory.Mem.ValAlg.values_in_numberField H.F H.E c (R.Psi) (embPsi H) hcm
   choose Me hMe hMe' using fun φ : H.E →+* ℂ => exists_of_emb φ
   have hmu
       : ∀ j, ∃ M : IntermediateField ℚ ℂ,

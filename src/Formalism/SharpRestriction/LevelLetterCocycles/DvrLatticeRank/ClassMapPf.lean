@@ -154,11 +154,7 @@ theorem classMapPf_local
             <;> simp only [Submodule.coe_sub, Prod.fst_sub, Prod.snd_sub, hm, sub_eq_zero.mp hw0]
       ⟩
     have hsub : W.clK T (pr - pr') = W.clK T pr - W.clK T pr' := by
-      first
-      | exact map_sub (W.clK T) pr pr'
-      | exact (W.clK T).map_sub pr pr'
-      | exact LinearMap.map_sub _ _ _
-      | simp
+      first | exact map_sub (W.clK T) pr pr'
     rw [hsub, sub_eq_zero] at hk
     exact hk
   · have h1 := hf pr hy hz
@@ -203,7 +199,7 @@ theorem classMapPf_of
   have hQ : W.Q = W.q := by
     show (W.φA ^ (W.s - 1)) W.q = W.q
     rw [hs1]
-    first | rfl | simp
+    first | rfl
   have hNγ : ∀ x ∈ W.N T, W.γD T W.gam x ∈ W.N T := by exact fun x hx => W.N_Γ T W.gam x hx
   have hsm
       : ∀ (a : LetA O n) (y : W.DD T),

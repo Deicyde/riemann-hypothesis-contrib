@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.doublingSeesawTensorMap_polynomial_fock_vector
                 (Matrix.fromBlocks (sA τ) 0 0 (- sA τ)).submatrix finSumFinEquiv.symm
                   finSumFinEquiv.symm)
               sB (delta A B Φ₁ Φ₂) := by
-  first
-  | exact @GlobalTheory.Core.Rk.FockBox.isFockVec_delta
-  | exact GlobalTheory.Core.Rk.FockBox.isFockVec_delta
-  | (intros; apply GlobalTheory.Core.Rk.FockBox.isFockVec_delta <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.FockBox.isFockVec_delta

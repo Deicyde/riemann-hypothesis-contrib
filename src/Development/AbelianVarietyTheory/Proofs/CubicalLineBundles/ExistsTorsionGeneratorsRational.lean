@@ -92,10 +92,7 @@ theorem exists_weilIs
   rw [e]
   exact H n x y c hc
 
-theorem unitOn_injective {k : Type} [CommRing k]
-    : Function.Injective (unitOn (R := k)) := fun a b h =>
-  Units.ext ((ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of k)).inv).1
-    (congrArg Units.val h))
+alias unitOn_injective := _root_.GlobalTheory.unitOn_injective_of_commRing
 
 section Ext
 

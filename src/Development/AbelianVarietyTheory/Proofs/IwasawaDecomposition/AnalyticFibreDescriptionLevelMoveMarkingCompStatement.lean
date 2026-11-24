@@ -81,7 +81,4 @@ theorem _root_.GlobalTheory.T.analyticFibre_description_levelMove_marking_comp
             → ∀ A : AnFib X bas idx e x L y, ∃ A' : AnFib X bas idx e x L y',
               (∀ th, A.Reads 1 y.s th → A'.Reads 1 y'.s th)
                 ∧ ∀ mk : Dw.La →ₗ[𝓞 E] (Fin r → E), A.Marked mk → A'.Marked (mk ∘ₗ gM) := by
-  first
-  | exact @GlobalTheory.Dict.FibreMove.anFib_levR_id
-  | exact GlobalTheory.Dict.FibreMove.anFib_levR_id
-  | (intros; apply GlobalTheory.Dict.FibreMove.anFib_levR_id <;> assumption)
+  first | exact @GlobalTheory.Dict.FibreMove.anFib_levR_id

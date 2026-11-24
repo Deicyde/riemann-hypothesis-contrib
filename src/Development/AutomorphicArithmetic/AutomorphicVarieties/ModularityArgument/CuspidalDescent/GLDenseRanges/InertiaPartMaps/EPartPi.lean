@@ -65,8 +65,6 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
-
 namespace UpperTheory.V.Z.Desc.V0
 
 section Comp
@@ -435,7 +433,6 @@ private theorem part_eqE
 end U
 
 end UpperTheory.V.Z.Desc.V0
-
 
 open UpperTheory.V.Z.Desc.V0 in
 theorem UpperTheory.V.Z.Desc.V0.yDimE

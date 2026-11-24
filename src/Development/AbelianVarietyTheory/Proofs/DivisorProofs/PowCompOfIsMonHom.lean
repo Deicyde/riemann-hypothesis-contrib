@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -66,11 +67,6 @@ open Classical
 noncomputable section
 
 namespace GlobalTheory.SpreadTorMatch
-
-theorem spMap_comp_ringHom'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  simp [spMap]
 
 theorem section_over_local
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (G : Over (Sp R)) [GrpObj G]
@@ -120,7 +116,7 @@ theorem section_over_local
   obtain ⟨_, hsm, _, _, _, _⟩ := hG
   obtain ⟨e, he⟩ :=
     GlobalTheory.LiePull.exists_pushEquiv hmV (Over.mk (spMap u)) (spMap (u.comp ψ))
-      (spMap_comp_ringHom' ψ u)
+      (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp ψ u)
 
   have hzk : z ^ k = 1 := by
     apply (GlobalTheory.splitTorusPointsEquiv (Sp V) X' (Over.mk (spMap u))).injective
@@ -153,7 +149,8 @@ theorem section_over_local
         = spMap (ResidueField.map u) ≫ spMap (residue V) := by
     rw [Category.assoc, Over.w z]
     show spMap (residue W) ≫ spMap u = _
-    rw [← spMap_comp_ringHom', ← spMap_comp_ringHom', hres]
+    rw [← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp,
+      ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, hres]
   let z₁ : Over.mk (spMap (ResidueField.map u)) ⟶ splitTorus (Sp (ResidueField V)) X' :=
     Over.homMk (hb.1.lift _ _ hw) (hb.1.lift_snd _ _ _)
   have key
@@ -233,7 +230,8 @@ theorem section_over_field
   have hw : (spMap w ≫ z.left) ≫ (splitTorus (Sp V) D'.toPre.X).hom = spMap σ ≫ spMap α := by
     rw [Category.assoc, Over.w z]
     show spMap w ≫ spMap u = _
-    rw [← spMap_comp_ringHom', ← spMap_comp_ringHom', hwu]
+    rw [← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp,
+      ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, hwu]
   let z₀ : Over.mk (spMap σ) ⟶ splitTorus (Sp Ω) D'.toPre.X :=
     Over.homMk (hb2.1.lift _ _ hw) (hb2.1.lift_snd _ _ _)
   have key : z₀.left ≫ GlobalTheory.SplitTorus.bcMap (spMap α) D'.toPre.X = spMap w ≫ z.left :=
@@ -447,7 +445,7 @@ theorem torMatch_of_spread
       (fun χ => by rw [← eW]; try rfl)
   obtain ⟨e, he⟩ :=
     GlobalTheory.LiePull.exists_pushEquiv hβ (Over.mk (spMap φ)) (spMap (φ.comp g))
-      (spMap_comp_ringHom' g φ)
+      (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp g φ)
   have hxy : s O (φ.comp g) (τ'O.comp ρm) hτO = e (s' O φ τ'O hτ'O) := by
     refine GlobalTheory.LocalRigid.eq_of_pow_eq_of_closedPoint (Sp R) G hsm O (spMap (φ.comp g)) k
       hkO _ _ ?_ Ω' c hc ?_

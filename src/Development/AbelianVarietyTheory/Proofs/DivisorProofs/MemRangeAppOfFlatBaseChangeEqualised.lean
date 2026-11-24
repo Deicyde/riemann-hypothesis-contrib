@@ -53,6 +53,7 @@ import Mathlib.Tactic.ReduceModChar
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.CanonGenIsGen
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -69,12 +70,6 @@ noncomputable section
 namespace GlobalTheory.Mum.AffDesc
 
 open TensorProduct
-
-theorem appLE_eq_of_eq
-    {X Y : Scheme.{0}} {f g : X ⟶ Y}
-    (h : f = g) (U : Y.Opens) (V : X.Opens) (e : V ≤ f ⁻¹ᵁ U) (e' : V ≤ g ⁻¹ᵁ U)
-    : f.appLE U V e = g.appLE U V e' := by
-  subst h; rfl
 
 theorem isoPushout_desc_tmul
     {R0 A B : Type} [CommRing R0] [CommRing A] [CommRing B] [Algebra R0 A] [Algebra R0 B]
@@ -113,7 +108,7 @@ theorem appLE_apply_appLE
   have a := Scheme.Hom.appLE_comp_appLE f g U V W e₁ e₂
   have b := Scheme.Hom.appLE_comp_appLE f' g' U V' W e₁' e₂'
   have c :=
-    appLE_eq_of_eq h U W
+    _root_.GlobalTheory.PowSec.appLE_congr h U W
       (by rw [Scheme.Hom.comp_preimage]; exact le_trans e₂ (Scheme.Hom.preimage_mono f e₁))
       (by rw [Scheme.Hom.comp_preimage]; exact le_trans e₂' (Scheme.Hom.preimage_mono f' e₁'))
   exact congrArg (fun φ => CommRingCat.Hom.hom φ x) (a.trans (c.trans b.symm))
@@ -149,8 +144,7 @@ theorem mem_range_app_of_flat
   haveI : CompactSpace (pullback π π : Scheme) :=
     QuasiCompact.compactSpace_of_compactSpace (pullback.fst π π ≫ π)
   have hUY1 : p ⁻¹ᵁ V = q ⁻¹ᵁ ⊤ ⊓ p ⁻¹ᵁ V := by simp
-  have hUY2 : pullback.fst p p ⁻¹ᵁ (p ⁻¹ᵁ V) = r ⁻¹ᵁ ⊤ ⊓ (pullback.fst p p ≫ p) ⁻¹ᵁ V := by
-    simp [Scheme.Hom.comp_preimage]
+  have hUY2 : pullback.fst p p ⁻¹ᵁ (p ⁻¹ᵁ V) = r ⁻¹ᵁ ⊤ ⊓ (pullback.fst p p ≫ p) ⁻¹ᵁ V := by simp
   have i1 :=
     isIso_pushoutSection_of_isQuasiSeparated_of_flat_right H.flip (US := ⊤) (UX := ⊤) (UT := V)
       le_top le_top hUY1 (isAffineOpen_top _) hV isCompact_univ isQuasiSeparated_univ
@@ -201,7 +195,8 @@ theorem mem_range_app_of_flat
         (Scheme.Hom.appLE_comp_appLE (pullback.snd π π) π ⊤ ⊤ ⊤ le_top le_top)).trans
       (congrArg
         (fun φ => CommRingCat.Hom.hom φ x)
-        (appLE_eq_of_eq (pullback.condition (f := π) (g := π)).symm _ _ _ _))
+        (_root_.GlobalTheory.PowSec.appLE_congr (pullback.condition (f := π) (g := π)).symm _ _ _
+          _))
   let d : Γ(S, ⊤) →ₗ[Γ(Sp R, ⊤)] Γ(pullback π π, ⊤) := {
     toFun := fun x => (pullback.fst π π).appLE ⊤ ⊤ le_top x - (pullback.snd π π).appLE ⊤ ⊤ le_top x
     map_add' := fun x x' => by simp only [map_add (f := _)]; abel
@@ -262,7 +257,7 @@ theorem mem_range_app_of_flat
           (pullback.fst p p ⁻¹ᵁ (p ⁻¹ᵁ V)) le_rfl hEq.ge)).trans
       (congrArg
         (fun φ => CommRingCat.Hom.hom φ a)
-        (appLE_eq_of_eq (pullback.condition (f := p) (g := p)).symm V
+        (_root_.GlobalTheory.PowSec.appLE_congr (pullback.condition (f := p) (g := p)).symm V
           (pullback.fst p p ⁻¹ᵁ (p ⁻¹ᵁ V)) _ _))
   have key
       : ∀ t,

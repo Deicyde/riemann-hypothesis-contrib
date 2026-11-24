@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 open ReciprocityTheory.ChartRestriction.G.TB (dLin transF IsInvPair dAct)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ChartCmp
+
 theorem _root_.GlobalTheory.T.mvPowerSeriesJetEq_calculus
     : ∀ (R : Type) [CommRing R] (m : ℕ),
       (∀ (σ : Type) (f f' g g' : MvPowerSeries σ R),
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.mvPowerSeriesJetEq_calculus
         ∧ (∀ (σ : Type) [Fintype σ] [DecidableEq σ] (f g : MvPowerSeries σ R),
           JEq m f g ↔ psJet m f = psJet m g)
         ∧ (∀ (σ : Type) (f g : MvPowerSeries σ R), (∀ m', JEq m' f g) → f = g) := by
-  first
-  | exact @GlobalTheory.ChartCmp.JCalc.jeq_calculus
-  | exact GlobalTheory.ChartCmp.JCalc.jeq_calculus
-  | (intros; apply GlobalTheory.ChartCmp.JCalc.jeq_calculus <;> assumption)
+  first | exact @GlobalTheory.ChartCmp.JCalc.jeq_calculus

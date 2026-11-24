@@ -85,12 +85,7 @@ theorem loU_mul {A B : Matrix (Fin N) (Fin N) K} (hA : LoU A) (hB : LoU B) : LoU
 
 theorem upU_mul {A B : Matrix (Fin N) (Fin N) K} (hA : UpU A) (hB : UpU B) : UpU (A * B) := by
   first
-  | exact UpperTheory.Reformulated.B.Qh21.upU_mul ..
   | (apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> first | assumption | infer_instance)
   | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA hB
   | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA
   | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B
@@ -141,9 +136,8 @@ theorem eq_self_of_le
   | _ n ih =>
     intro a ha
     rcases (hle a).lt_or_eq with hlt | heq
-    · exfalso
-      have h1 : f (f a) = f a := ih (f a).val (by rw [← ha]; exact hlt) (f a) rfl
-      exact (ne_of_lt hlt) (hf h1)
+    · have h1 : f (f a) = f a := ih (f a).val (by rw [← ha]; exact hlt) (f a) rfl
+      exact absurd (hf h1) (ne_of_lt hlt)
     · exact heq
 
 def mono (π : Fin N → Fin N) (c : Fin N → K) : Matrix (Fin N) (Fin N) K := fun a b =>
@@ -209,9 +203,7 @@ theorem mono_uniq
   have hid : ∀ a, π (ρ a) = a := eq_self_of_le hinj hle
   have hpr : π = ρ := by
     funext a
-    have := congrArg π (hid a)
-    rw [hπ] at this
-    exact this.symm
+    simpa only [hρ] using hid (ρ a)
   refine ⟨hpr, ?_⟩
   funext a
   have h2 := e a (π a)

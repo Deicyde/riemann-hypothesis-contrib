@@ -52,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.KeyPow GlobalTheory.KeyFam GlobalTheory.ZM GlobalTheory.AbLaw
+
 theorem _root_.GlobalTheory.T.exists_lieBasis_away_avoiding_two_primes
     : ∀ (R : Type) [CommRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (n : ℕ),
       SmoothOfRelativeDimension n G.hom
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.exists_lieBasis_away_avoiding_two_primes
                 → (epsR (Localization.Away r)
                   ⟶ (Over.pullback (spMap (algebraMap R (Localization.Away r)))).obj G),
               IsLieBasis v := by
-  first
-  | exact @GlobalTheory.LieTwo.lie_free_near_two_primes
-  | exact GlobalTheory.LieTwo.lie_free_near_two_primes
-  | (intros; apply GlobalTheory.LieTwo.lie_free_near_two_primes <;> assumption)
+  first | exact @GlobalTheory.LieTwo.lie_free_near_two_primes

@@ -138,7 +138,7 @@ theorem mkP_eval (m : ℕ) (c : ℕ → ℂ) (z : ℂ)
 open Polynomial in
 theorem mkP_coeff (m : ℕ) (c : ℕ → ℂ) (k : ℕ)
     : (mkP m c).coeff k = if k < m + 1 then c k else 0 := by
-  simp [mkP, finsetSum_coeff, coeff_C_mul, coeff_X_pow]
+  simp [mkP, coeff_C_mul, coeff_X_pow]
 
 theorem ld_rpow (q : ℕ) (s x : ℝ) (hx : 0 < x) : ld q (fun y => y ^ s) x = s ^ q * x ^ s := by
   unfold ld

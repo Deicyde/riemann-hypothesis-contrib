@@ -95,7 +95,7 @@ theorem star_mem_schA {F : Type} [Field F] [NumberField F] (κ : Type) [Fintype 
     have := (schA F κ).smul_mem (star c) hx
     convert this using 1
     funext z
-    simp [star_mul', mul_comm]
+    simp [star_mul']
 
 end GlobalTheory.ConjSch
 

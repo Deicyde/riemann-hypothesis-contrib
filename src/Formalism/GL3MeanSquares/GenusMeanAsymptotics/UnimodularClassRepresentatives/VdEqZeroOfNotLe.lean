@@ -90,7 +90,7 @@ theorem discrIdeal_ne_bot
     {L : Submodule (𝓞 K) V}
     (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
     : discrIdeal h L ≠ ⊥ := by
-  choose n hn hnx using fun i => Formalism.HermitianLatticesTheory.traceReal_mult L hL (finBasis K V i)
+  choose n hn hnx using fun i => _root_.Bl.general_b_fact_second'''''.goal1 L hL (finBasis K V i)
   have hli : LinearIndependent K (fun i => n i • finBasis K V i) := by
     have h1 :=
       (finBasis K V).linearIndependent.units_smul

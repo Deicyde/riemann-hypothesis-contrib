@@ -2,11 +2,12 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AcrisTorsionFreeComplete
-import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AssociatedPowOfUnits
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AwayOfInjective
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BdRFiltrationKerThetaGeneratorFactsStatement
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BdRFiltrationKerThetaGeneratorFacts
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PeriodRingsGaloisActionLawsFrobeniusComm
+import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -161,7 +162,7 @@ theorem periods_over_Acris
   have hA := (GlobalTheory.MemLoc.AwayT.away_and_inj l C).1
   obtain ⟨_, _, -, -, -, hFilt, -⟩ := GlobalTheory.MemLoc.BdRDVR.core_dvr l C
   obtain ⟨-, hmul, -, hiff, -, -, hinj⟩ :=
-    GlobalTheory.T.bdR_filtration_ker_theta_generator_facts l C (xi C.ε) C.ker_theta.symm
+    _root_.GlobalTheory.MemLoc.seed_fil l C (xi C.ε) C.ker_theta.symm
   have AL := GlobalTheory.MemLoc.ActLaws.act_laws l
   obtain ⟨N₁, h₁⟩ := exists_lift C hA U
   obtain ⟨N₂, h₂⟩ := exists_lift C hA U'

@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.doublingVector_fockPair_isCompactFinite
             → ∀ Φ₁ Φ₂,
               IsFockVec ψ θ A B sA sB Φ₁ → IsFockVec ψ θ A B sA sB Φ₂
                 → IsKFinVec omh (Khat A a) (delta A B Φ₁ Φ₂) := by
-  first
-  | exact @GlobalTheory.Core.Rk.IP.delta_isKFinVec
-  | exact GlobalTheory.Core.Rk.IP.delta_isKFinVec
-  | (intros; apply GlobalTheory.Core.Rk.IP.delta_isKFinVec <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.IP.delta_isKFinVec

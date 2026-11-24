@@ -56,8 +56,6 @@ open scoped InnerProductSpace ENNReal NNReal ComplexConjugate
 
 noncomputable section
 
-
-
 namespace CompanionTheory.Lime.BM
 
 open Formalism.FourierDecayAlt.ThreeDimData Formalism.FourierDecayAlt.P.DDSmoothness

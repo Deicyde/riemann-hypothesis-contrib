@@ -44,7 +44,10 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.LatVac
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.LatVac
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -52,8 +55,8 @@ namespace GlobalTheory.LatVacFull
 
 variable {D : D7}
 
-theorem exists_nat_integral {E : Type} [Field E] [NumberField E] (c : E) :
-    ∃ n : ℕ, 0 < n ∧ ∃ d : 𝓞 E, (d : E) = n * c := by
+theorem exists_nat_integral {E : Type} [Field E] [NumberField E] (c : E)
+    : ∃ n : ℕ, 0 < n ∧ ∃ d : 𝓞 E, (d : E) = n * c := by
   apply GlobalTheory.NatMulMemRingOfIntegers.exists_nat_mul_mem_ringOfIntegers <;> assumption
 
 theorem AA_ne_zero (D : D7) : D.host.AA ≠ 0 := by
@@ -69,11 +72,13 @@ theorem AA_ne_zero (D : D7) : D.host.AA ≠ 0 := by
     exact differentIdeal_ne_bot h1
 
 section
-variable (S T : HSp D) (s x y : Fin S.rank → D.host.E) (t u v : Fin T.rank → D.host.E) (a c : D.host.E)
+variable
+  (S T : HSp D) (s x y : Fin S.rank → D.host.E) (t u v : Fin T.rank → D.host.E) (a c : D.host.E)
 
 theorem genMap_one (ha0 : a ≠ 0) : genMap S T 1 s t = a⁻¹ • genMap S T a s t := by
   ext i j
-  simp only [genMap, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul, ← mul_assoc, inv_mul_cancel₀ ha0]
+  simp only [genMap, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul, ← mul_assoc,
+    inv_mul_cancel₀ ha0]
 
 theorem genMap_zero_right : genMap S T 1 s 0 = 0 := by
   ext i j
@@ -85,12 +90,13 @@ theorem genMap_add_right : genMap S T 1 s (u + v) = genMap S T 1 s u + genMap S 
 
 theorem genMap_smul_right : genMap S T 1 s (c • u) = c • genMap S T 1 s u := by
   ext i j
-  simp only [genMap, Matrix.of_apply, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul, one_mul, mul_assoc]
+  simp only [genMap, Matrix.of_apply, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul, one_mul,
+    mul_assoc]
 
 theorem genMap_zero_left : genMap S T 1 0 t = 0 := by
   ext i j
-  simp only [genMap, Matrix.of_apply, Pi.zero_apply, Matrix.zero_apply, star_zero, mul_zero, zero_mul,
-    Finset.sum_const_zero]
+  simp only [genMap, Matrix.of_apply, Pi.zero_apply, Matrix.zero_apply, star_zero, mul_zero,
+    zero_mul, Finset.sum_const_zero]
 
 theorem genMap_add_left : genMap S T 1 (x + y) t = genMap S T 1 x t + genMap S T 1 y t := by
   ext i j
@@ -105,8 +111,8 @@ theorem genMap_smul_left : genMap S T 1 (c • x) t = star c • genMap S T 1 x 
 
 end
 
-def sat (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E)) :
-    Submodule D.host.E (Matrix (Fin T.rank) (Fin S.rank) D.host.E) where
+def sat (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
+    : Submodule D.host.E (Matrix (Fin T.rank) (Fin S.rank) D.host.E) where
   carrier := {M | ∃ N : ℕ, 0 < N ∧ N • M ∈ latRat S T LS LT}
   zero_mem' := ⟨1, one_pos, by simp⟩
   add_mem' := by
@@ -121,14 +127,17 @@ def sat (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank
     obtain ⟨m, hm, d, hd⟩ := exists_nat_integral c
     refine ⟨m * n, Nat.mul_pos hm hn, ?_⟩
     have h := smul_mem_latRat d hx
-    have e : (m * n) • c • x = (d : D.host.E) • n • x := by
-      rw [hd]; ext i j; simp; ring
-    rw [e]; exact h
+    have e : (m * n) • c • x = (d : D.host.E) • n • x := by rw [hd]; ext i j; simp; ring
+    rw [e]
+    exact h
 
-theorem genMap_mem_sat (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
-    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (hS : Submodule.IsFullLattice D.host.E ΛS)
-    (hT : Submodule.IsFullLattice D.host.E ΛT) (s : Fin S.rank → D.host.E) (t : Fin T.rank → D.host.E) :
-    genMap S T 1 s t ∈ sat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) := by
+theorem genMap_mem_sat
+    (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
+    (hS : Submodule.IsFullLattice D.host.E ΛS) (hT : Submodule.IsFullLattice D.host.E ΛT)
+    (s : Fin S.rank → D.host.E) (t : Fin T.rank → D.host.E)
+    : genMap S T 1 s t
+      ∈ sat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) := by
   obtain ⟨a, ha0, ha⟩ : ∃ a : D.host.E, a ≠ 0 ∧ a ∈ D.host.AA := by
     by_contra h
     push_neg at h
@@ -156,11 +165,14 @@ theorem genMap_mem_sat (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.ran
   | add x y _ _ hx hy => rw [genMap_add_left]; exact add_mem hx hy
   | smul c x _ hx => rw [genMap_smul_left]; exact Submodule.smul_mem _ _ hx
 
-theorem latRat_full (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+theorem latRat_full
+    (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
     (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (hS : Submodule.IsFullLattice D.host.E ΛS)
-    (hT : Submodule.IsFullLattice D.host.E ΛT) (M : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    ∃ N : ℕ, 0 < N ∧
-      N • M ∈ latRat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) := by
+    (hT : Submodule.IsFullLattice D.host.E ΛT) (M : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : ∃ N : ℕ,
+      0 < N
+        ∧ N • M
+          ∈ latRat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) := by
   change M ∈ sat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))
   have e : M = ∑ i, genMap S T 1 (fun k => star ((M * S.gram⁻¹) i k)) (Pi.single i 1) := by
     ext i j

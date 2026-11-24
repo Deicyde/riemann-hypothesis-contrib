@@ -2,9 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsImg
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AevalNeZeroOfNotMem
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishingStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticThirdStatement
-import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPointsStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishing
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticThird
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPoints
 import Development.AutomorphicSpectrum.Proofs.MetricProofs.SameOrbitRefl
 import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.CoordinateIdeals.MemMCoordIdealOfAevalEqZero
 import Mathlib.Algebra.Order.Floor.Extended
@@ -158,13 +159,6 @@ theorem exists_value_family
       heq a
     ⟩
 
-theorem ne_zero_of_X_notMem
-    {t : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal t)
-    : t q ≠ 0 := fun h0 =>
-  h (by
-    show mConeMap t (X q) = 0
-    rw [mConeMap, aeval_X, h0, map_zero, zero_mul])
-
 theorem X_notMem_of_ne_zero {t : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h0 : t q ≠ 0)
     : (X q : MRing ι) ∉ mCoordIdeal t := fun hm => by
   have h' : mConeMap t (X q) = 0 := hm
@@ -195,10 +189,7 @@ variable
   {Φ' : Type} [Field Φ']
   {y' : (Σ k, ι' k) → Φ'}
 
-theorem basePart_orbit {σ : Type} (blk : σ → Option K) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : SameOrbit (basePart blk z) (basePart blk z') := by
-  obtain ⟨c, hc, rfl⟩ := h
-  exact ⟨fun k => c k.1, fun k => hc k.1, rfl⟩
+alias basePart_orbit := _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.sameOrbit_basePart
 
 theorem comp_orbit
     {L L' : Type} [Fintype L] [Fintype L']
@@ -257,7 +248,10 @@ theorem good_open
   refine ⟨
     W₁ ∩ W₂ ∩ (W₃ ∩ W₄) ∩ {t | ∀ k, t ⟨k, F.c k⟩ ≠ 0},
     ?_,
-    ⟨⟨⟨m₁, m₂⟩, m₃, m₄⟩, fun k => ne_zero_of_X_notMem (hF.1 k)⟩,
+    ⟨
+      ⟨⟨m₁, m₂⟩, m₃, m₄⟩,
+      fun k => _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.coord_ne (hF.1 k)
+    ⟩,
     ?_,
     ?_
   ⟩
@@ -379,7 +373,8 @@ theorem flag_transfer
             = c
               * ∑ I, uu m I * ∑ I', if IsStepRows N j i I' then
                 minorIJ A I I' * ∑ m', u' I' m' * z₀ m' else 0 := by
-  obtain ⟨hCB, hvan', -, -⟩ := GlobalTheory.T.block_diagonal_minor_vanishing ℂ N j i hj
+  obtain ⟨hCB, hvan', -, -⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.MinorCalc.minors_main ℂ N j i hj
   have hvan : ∀ I, ¬ IsStepRows N j i I → minorIJ (T * h) I (stepCols N j i) = 0 := fun I hI => by
     rcases hvan' (T * h) I hTh hI with e | e
     · exact e
@@ -453,13 +448,13 @@ theorem lift_inverse
                       CovMap.IsImg Cv z'' w → SameOrbit (f w) z'' := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv d hP hP' z hz w₀ hw₀ hImg V V' s hV hw₀V
     hV' hzV' hs hsO
-  obtain ⟨P1, P2, P3⟩ := GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M
-  obtain ⟨Q1, Q2, Q3⟩ := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
+  obtain ⟨P1, P2, P3⟩ := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K ι Φ y Ψ N j M
+  obtain ⟨Q1, Q2, Q3⟩ := _root_.GlobalTheory.CompanionTheory.Ar.PB.CPts.main K' ι' Φ' y' Ψ N j M'
   have hb := Q1 z hz
   have hwb₀ := P1 w₀ hw₀
   have hbase :=
-    GlobalTheory.T.flag_cover_arithmetic_third K ι Φ y Ψ N j M K' ι' Φ' y' M' Cv d hP hP' z hz w₀
-      hImg
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.img_lies_over K ι Φ y Ψ N j M K' ι' Φ'
+      y' M' Cv d hP hP' z hz w₀ hImg
   obtain ⟨F', hF', hG'⟩ := Q2 _ hb
   obtain ⟨F, hF, hG⟩ := P2 _ hwb₀
   obtain ⟨W₁, hW₁o, hW₁m, hW₁s, hW₁g⟩ := good_open M F hwb₀ hG
@@ -512,7 +507,8 @@ theorem lift_inverse
     have hb'' := Q1 z'' hzp
     have hg'' := hW₂g _ hzU.1.2
     obtain ⟨z₁, hz₁o, hz₁n⟩ :=
-      exists_normalised M' F' (z := z'') fun k => ne_zero_of_X_notMem (hg''.1 k)
+      exists_normalised M' F' (z := z'') fun k =>
+        _root_.GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.coord_ne (hg''.1 k)
     have hz₁ : z₁ ∈ mcPts (mCoordIdeal y') := mem_mcPts_of_sameOrbit hP'.2.1.2.1 hz₁o hzp
     have ho₁ := basePart_orbit M'.blk hz₁o
     have ht := Q1 z₁ hz₁

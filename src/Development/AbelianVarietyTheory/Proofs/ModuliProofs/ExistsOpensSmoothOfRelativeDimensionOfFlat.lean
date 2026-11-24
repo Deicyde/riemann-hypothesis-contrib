@@ -56,8 +56,10 @@ import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -65,23 +67,28 @@ set_option backward.isDefEq.respectTransparency false
 
 namespace GlobalTheory.ProperFlatNearFibre
 
-theorem exists_opens_smoothOfRelativeDimension_of_flat {R : CommRingCat.{0}} {Z T : Scheme.{0}}
-    (s : Z ⟶ Spec R) [LocallyOfFinitePresentation s] [Flat s] (t : T ⟶ Spec R) (g : ℕ)
-    (h : SmoothOfRelativeDimension g (pullback.snd s t)) (z : Z) (w : T) (hw : s z = t w) :
-    ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s) := by
+theorem exists_opens_smoothOfRelativeDimension_of_flat
+    {R : CommRingCat.{0}} {Z T : Scheme.{0}} (s : Z ⟶ Spec R)
+    [LocallyOfFinitePresentation s] [Flat s]
+    (t : T ⟶ Spec R) (g : ℕ) (h : SmoothOfRelativeDimension g (pullback.snd s t))
+    (z : Z) (w : T) (hw : s z = t w)
+    : ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s) := by
   apply GlobalTheory.SmoothNearFibre.exists_opens_of_flat <;> assumption
 
-theorem smoothOfRelativeDimension_pullback_snd {Z T S : Scheme.{0}} (s : Z ⟶ S) (t : T ⟶ S)
-    (g : ℕ) (h : ∀ (z : Z) (w : T), s z = t w →
-      ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s)) :
-    SmoothOfRelativeDimension g (pullback.snd s t) := by
-  let V : {W : Z.Opens // SmoothOfRelativeDimension g (W.ι ≫ s)} → (pullback s t).Opens :=
-    fun W => pullback.fst s t ⁻¹ᵁ W.1
+theorem smoothOfRelativeDimension_pullback_snd
+    {Z T S : Scheme.{0}} (s : Z ⟶ S) (t : T ⟶ S)
+    (g : ℕ)
+    (h
+      : ∀ (z : Z) (w : T), s z = t w → ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s))
+    : SmoothOfRelativeDimension g (pullback.snd s t) := by
+  let V : {W : Z.Opens // SmoothOfRelativeDimension g (W.ι ≫ s)} → (pullback s t).Opens := fun W =>
+    pullback.fst s t ⁻¹ᵁ W.1
   have htop : iSup V = ⊤ := by
     rw [← top_le_iff]
     intro y _
-    obtain ⟨W, hW, hW'⟩ := h (pullback.fst s t y) (pullback.snd s t y) (by
-      rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, pullback.condition])
+    obtain ⟨W, hW, hW'⟩ :=
+      h (pullback.fst s t y) (pullback.snd s t y)
+        (by rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, pullback.condition])
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨⟨W, hW'⟩, hW⟩
   have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension.{0} g) :=
     HasRingHomProperty.instIsZariskiLocalAtSource
@@ -90,10 +97,16 @@ theorem smoothOfRelativeDimension_pullback_snd {Z T S : Scheme.{0}} (s : Z ⟶ S
     fun W => ?_
   exact MorphismProperty.of_isPullback (P := @SmoothOfRelativeDimension.{0} g)
     ((isPullback_morphismRestrict (pullback.fst s t) W.1).paste_vert
-      (IsPullback.of_hasPullback s t)) W.2
+      (IsPullback.of_hasPullback s t))
+    W.2
 
-theorem exists_away_smoothOfRelativeDimension :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (g : ℕ) (K : Type) [Field K] (x : R →+* K), IsProper s → Flat s → SmoothOfRelativeDimension g (pullback.snd s (spMap x)) → ∃ f : R, x f ≠ 0 ∧ SmoothOfRelativeDimension g (pullback.snd s (spMap (algebraMap R (Localization.Away f)))) := by
+theorem exists_away_smoothOfRelativeDimension
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (g : ℕ)
+        (K : Type) [Field K] (x : R →+* K),
+      IsProper s → Flat s → SmoothOfRelativeDimension g (pullback.snd s (spMap x))
+        → ∃ f : R,
+          x f ≠ 0 ∧ SmoothOfRelativeDimension g
+            (pullback.snd s (spMap (algebraMap R (Localization.Away f)))) := by
   intro R _ _ Z s g K _ x hs hf h
   have : LocallyOfFinitePresentation s := inferInstance
   let U : Z.Opens := ⨆ W : {W : Z.Opens // SmoothOfRelativeDimension g (W.ι ≫ s)}, W.1

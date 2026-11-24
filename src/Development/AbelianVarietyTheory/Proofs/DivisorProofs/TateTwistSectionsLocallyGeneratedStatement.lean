@@ -46,6 +46,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.tateTwist_sections_locally_generated
     : ∀ (q : ℕ) [NeZero q] (i : ℤ),
       (∀ (U : Scheme.{0}) (y : Sec (tw q i) U),
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.tateTwist_sections_locally_generated
             → (∀ (U : Scheme.{0}) (ζ ξ : Prim q Γ(U, ⊤)) (a : (ZMod q)ˣ),
               ξ.1 = ζ.1 ^ (a : ZMod q).val → e U ξ = ((a ^ i : (ZMod q)ˣ) : ZMod q).val • e U ζ)
             → ∃! φ : tw q i ⟶ M, ∀ U ζ, Sec.map φ (twGen i ζ) = e U ζ := by
-  first
-  | (exact @GlobalTheory.EtC.twist_sections)
-  | (exact GlobalTheory.EtC.twist_sections)
-  | (intros; apply GlobalTheory.EtC.twist_sections <;> assumption)
+  first | (exact @GlobalTheory.EtC.twist_sections)

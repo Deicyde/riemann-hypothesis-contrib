@@ -100,9 +100,6 @@ open GlobalTheory.PlaceModel GlobalTheory.PlaceDatum GlobalTheory.AdForm GlobalT
 
 variable {D : D7}
 
-
-
-
 theorem isSBHalf_prodHalf
     {m n : ℕ} {a b : AE D} (ha : a * a = a) (hb : b * b = b)
     {Λ : AddSubgroup (Mx D m n)} (hΛ : ∀ e : AE D, e * e = e → ∀ u ∈ Λ, e • u ∈ Λ)

@@ -47,6 +47,7 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
 @[expose] public section
 
 open GlobalTheory.FinPl GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing Matrix
+
 theorem _root_.GlobalTheory.T.unramifiedCharacter_det_latticeStabilizer_eq_one
     : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
         (n : Type) [Fintype n] [DecidableEq n] (L : Submodule 𝒪[k] (n → k)),

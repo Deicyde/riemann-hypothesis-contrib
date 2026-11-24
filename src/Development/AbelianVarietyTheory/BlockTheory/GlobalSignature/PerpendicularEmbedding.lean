@@ -70,8 +70,7 @@ theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.he
     : _root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.herm x x
       = (_root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.qf x : ℂ) := by
   simp [_root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.herm,
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.qf, Complex.star_def,
-    Complex.mul_conj]
+    _root_.GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding.qf, Complex.mul_conj]
 
 open MeasureTheory Matrix in
 open scoped ENNReal in

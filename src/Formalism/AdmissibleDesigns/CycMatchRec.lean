@@ -154,10 +154,9 @@ theorem cycMatch_rec
   simp only [eK, RingEquiv.ofBijective_apply, Br.toLLK, IsFractionRing.lift_algebraMap,
     LocBridge.toLL, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingHom.coe_coe, epsU,
     Glob.epsO, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, cycLL, Br.PD,
-    RingHom.toMonoidHom_eq_coe, RingHom.coe_monoidHom_mk, MonoidHom.coe_mk, OneHom.coe_mk,
-    LocBridge.eO_alg]
+    RingHom.toMonoidHom_eq_coe, LocBridge.eO_alg]
   rw [← IsScalarTower.algebraMap_apply, hχ, ← hP]
-  first | exact IsScalarTower.algebraMap_apply ℤ_[D.nd.l i] ℚ_[D.nd.l i] _ _ | rfl
+  first | exact IsScalarTower.algebraMap_apply ℤ_[D.nd.l i] ℚ_[D.nd.l i] _ _
 
 end RecC
 

@@ -57,6 +57,7 @@ attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
   GlobalTheory.LocalData.isLocalField
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
+
 theorem _root_.GlobalTheory.T.exists_charts_at_twist_places_chain
     : ∀ D : D7,
       ForStageQ D fun c w j s =>
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.exists_charts_at_twist_places_chain
                       ∧ (∀ (x : (AE D)ˣ) (y : (Fv D.host.F v)ˣ),
                         (∃ e, IsIdemOf φ e ∧ (1 - e) * (x : AE D) = 1 - e ∧ rdA φ (x : AE D) = y)
                           → μ y = Circle.toUnits (χ x)) := by
-  first
-  | exact @GlobalTheory.TwistChart.charts_at_twist
-  | exact GlobalTheory.TwistChart.charts_at_twist
-  | (intros; apply GlobalTheory.TwistChart.charts_at_twist <;> assumption)
+  first | exact @GlobalTheory.TwistChart.charts_at_twist

@@ -101,8 +101,6 @@ theorem gatRec_n_frob
         rfl]
       exact orderOf_injective _ (fun a b h => congrArg Prod.snd h) _
     )
-  | simp [zPsi, Prod.orderOf]
-  | simp [zPsi, Prod.orderOf_mk]
 
 include hg in
 theorem gatRec_step_frob
@@ -118,14 +116,11 @@ theorem gatRec_step_frob
     rw [frob_eq D hg P τ hτ]
     refine Prod.ext ?_ ?_
     · show ((1, 1) : G0) = c0 * c0
-      first | rfl | decide | simp [c0]
+      first | rfl
     · show D.R.iota (hP D p) = D.R.iota (hP D p) * 1
       rw [mul_one]
   rw [mul_assoc, ← hz]
   simp only [gatRec_pos, Equiv.trans_apply, Equiv.apply_symm_apply]
-  first
-  | exact congrArg Subtype.val (posG_step (zPsi D.R.toFrame (D.R.iota (hP D p))) v s)
-  | exact congrArg Subtype.val (posG_step v s)
-  | exact congrArg Subtype.val (posG_step (z := (zPsi D.R.toFrame (D.R.iota (hP D p)))) v s)
+  first | exact congrArg Subtype.val (posG_step (zPsi D.R.toFrame (D.R.iota (hP D p))) v s)
 
 end Formalism.L2.G

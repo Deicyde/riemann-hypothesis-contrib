@@ -61,29 +61,34 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField MvPolynomial
 
-theorem uniformizer_of_residue_indep {Ω : Type} [Field Ω] {σ τ : Type}
-    (w : AddValuation (FractionRing (MvPolynomial σ Ω)) (WithTop ℤ)) (hw : IsNormDiscrete w)
-    (t : τ → FractionRing (MvPolynomial σ Ω)) (ht : ∀ s, t s ∈ vRing w)
-    (hind : letI := ReciprocityTheory.MultiplicativeHeights.residueAlgebra (vRing w) (algebraMap Ω (FractionRing (MvPolynomial σ Ω)))
-      AlgebraicIndependent (IsLocalRing.ResidueField
-          ((vRing w).comap (algebraMap Ω (FractionRing (MvPolynomial σ Ω)))))
-        (fun s => IsLocalRing.residue (vRing w) ⟨t s, ht s⟩))
+theorem uniformizer_of_residue_indep
+    {Ω : Type} [Field Ω]
+    {σ τ : Type} (w : AddValuation (FractionRing (MvPolynomial σ Ω)) (WithTop ℤ))
+    (hw : IsNormDiscrete w) (t : τ → FractionRing (MvPolynomial σ Ω)) (ht : ∀ s, t s ∈ vRing w)
+    (hind
+      : letI :=
+          ReciprocityTheory.MultiplicativeHeights.residueAlgebra (vRing w)
+            (algebraMap Ω (FractionRing (MvPolynomial σ Ω)))
+        AlgebraicIndependent
+          (IsLocalRing.ResidueField ((vRing w).comap
+            (algebraMap Ω (FractionRing (MvPolynomial σ Ω)))))
+          (fun s => IsLocalRing.residue (vRing w) ⟨t s, ht s⟩))
     (g : σ → MvPolynomial τ Ω)
-    (hg : ∀ x, algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) (X x) =
-      aeval t (g x)) :
-    ∃ π : Ω, w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) π) = 1 := by
+    (hg
+      : ∀ x, algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) (X x) = aeval t (g x))
+    : ∃ π : Ω, w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) π) = 1 := by
   classical
   obtain ⟨hw1, f, hf⟩ := hw
   obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := MvPolynomial σ Ω) f
   have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
-  have key : ∀ P : MvPolynomial σ Ω,
-      algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) P =
-        aeval t (bind₁ g P) := by
+  have key
+      : ∀ P : MvPolynomial σ Ω,
+        algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) P
+          = aeval t (bind₁ g P) := by
     intro P
     induction P using MvPolynomial.induction_on with
     | C a =>
-      rw [bind₁_C_right, aeval_C, ← MvPolynomial.algebraMap_eq,
-        ← IsScalarTower.algebraMap_apply]
+      rw [bind₁_C_right, aeval_C, ← MvPolynomial.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
     | add P Q hP hQ => simp only [map_add (f := _), hP, hQ]
     | mul_X P x hP => simp only [map_mul, hP, bind₁_X_right, hg]
   have hinj := IsFractionRing.injective (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω))
@@ -101,38 +106,45 @@ theorem uniformizer_of_residue_indep {Ω : Type} [Field Ω] {σ τ : Type}
   rw [← key] at hc hd
   have hqa : algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) q ≠ 0 := by
     intro h0; exact hq0 (hinj (by rw [h0, map_zero]))
-  have hda : algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d ≠ 0 :=
-    (map_ne_zero _).2 hd0
+  have hda : algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d ≠ 0 := (map_ne_zero _).2 hd0
   refine ⟨c / d, ?_⟩
-  have h1 : w (algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) p) =
-      1 + w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d) := by
+  have h1
+      : w (algebraMap (MvPolynomial σ Ω) (FractionRing (MvPolynomial σ Ω)) p)
+        = 1 + w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d) := by
     rw [← hf, ← hd, ← AddValuation.map_mul, div_mul_cancel₀ _ hqa]
-  have h2 : w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) c) =
-      w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) (c / d)) +
-        w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d) := by
+  have h2
+      : w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) c)
+        = w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) (c / d))
+          + w (algebraMap Ω (FractionRing (MvPolynomial σ Ω)) d) := by
     rw [← AddValuation.map_mul, ← map_mul, div_mul_cancel₀ _ hd0]
   exact ValuationResidueLemmas.wt_cancel (hw1 _ hda) (by rw [← h2, ← hc, h1])
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-
-
-theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal (KTp K d.D d.N))
-    (hp : p ∈ d.HtOne) (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (hw : w ∈ d.OverP c p) :
-    (∀ a : Ω c, a ≠ 0 → d.Wres c w a = 0) ∨
-    (d.admitted c (d.Wres c w) ∧ IsTrivOn K (d.Wres c w) ∧
-      ∃ j0, d.w j0 c ≠ 0 ∧ (∀ j, 0 ≤ d.Wres c w (ratio (Ω := Ω c) (d.w j c) (d.w j0 c))) ∧
-        w (∑ j, d.sH c (MvPolynomial.X (0, j)) *
-          algebraMap (Ω c) (OmS (Ω c) d.D d.N) (ratio (Ω := Ω c) (d.w j c) (d.w j0 c))) = 0) := by
+theorem PlaceTrivialOrPositive
+    (hd : d.AxH 𝒜) (h : d.S1)
+    (c : ι)
+    (p : Ideal (KTp K d.D d.N)) (hp : p ∈ d.HtOne)
+    (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (hw : w ∈ d.OverP c p)
+    : (∀ a : Ω c, a ≠ 0 → d.Wres c w a = 0)
+      ∨ (d.admitted c (d.Wres c w) ∧ IsTrivOn K (d.Wres c w)
+        ∧ ∃ j0,
+          d.w j0 c ≠ 0 ∧ (∀ j, 0 ≤ d.Wres c w (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))
+            ∧ w
+                (∑ j, d.sH c (MvPolynomial.X (0, j)) *
+                  algebraMap (Ω c) (OmS (Ω c) d.D d.N) (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))
+              = 0) := by
   classical
   by_cases htriv : ∀ a : Ω c, a ≠ 0 → d.Wres c w a = 0
   · exact Or.inl htriv
@@ -160,13 +172,18 @@ theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal 
   let t' : TVar d.D d.N → vRing w := fun e => ⟨d.sH c (X e), (hw.2 (X e)).1⟩
   let ρ : Fin (d.N + 1) → IsLocalRing.ResidueField (vRing (d.Wres c w)) := fun j =>
     IsLocalRing.residue _ ⟨ratio (Ω := Ω c) (d.w j c) (d.w j0 c), hint j⟩
-  have hres : ∀ i, i ≠ 0 → IsLocalRing.residue (vRing w) (t' (i, j0)) =
-      -∑ j ∈ Finset.univ.erase j0, IsLocalRing.residue (vRing w) (t' (i, j)) *
-        algebraMap _ (IsLocalRing.ResidueField (vRing w)) (ρ j) := by
+  have hres
+      : ∀ i,
+        i ≠ 0
+          → IsLocalRing.residue (vRing w) (t' (i, j0))
+            = - ∑ j ∈ Finset.univ.erase j0, IsLocalRing.residue (vRing w) (t' (i, j)) *
+                 algebraMap _ (IsLocalRing.ResidueField (vRing w)) (ρ j) := by
     intro i hi
-    have hV : t' (i, j0) = -∑ j ∈ Finset.univ.erase j0, t' (i, j) *
-        comapIncl (vRing w) (algebraMap (Ω c) (OmS (Ω c) d.D d.N))
-          ⟨ratio (Ω := Ω c) (d.w j c) (d.w j0 c), hint j⟩ := by
+    have hV
+        : t' (i, j0)
+          = - ∑ j ∈ Finset.univ.erase j0, t' (i, j) *
+            comapIncl (vRing w) (algebraMap (Ω c) (OmS (Ω c) d.D d.N))
+              ⟨ratio (Ω := Ω c) (d.w j c) (d.w j0 c), hint j⟩ := by
       apply Subtype.ext
       push_cast
       exact d.genericHomAt_relation hd c j0 hw0 hq i hi
@@ -191,39 +208,49 @@ theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal 
     intro r
     obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective r
     exact ⟨x.1, rfl⟩
-  have hc : ∀ a, algebraMap (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
-      (IsLocalRing.ResidueField (vRing w)) (ψ a) = IsLocalRing.residue (vRing w) (φ a) := by
+  have hc
+      : ∀ a,
+        algebraMap (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
+            (IsLocalRing.ResidueField (vRing w)) (ψ a)
+          = IsLocalRing.residue (vRing w) (φ a) := by
     intro a
     show IsLocalRing.residue (vRing w) (comapIncl (vRing w) (algebraMap (Ω c) (OmS (Ω c) d.D d.N))
       (comapIncl (vRing (d.Wres c w)) (algebraMap K (Ω c)) ⟨a, hoK a⟩)) = _
     exact congrArg _ (Subtype.ext (IsScalarTower.algebraMap_apply K (Ω c) _ a).symm)
-  have hu : AlgebraicIndependent (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
+  have hu : AlgebraicIndependent
+      (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
       (fun e : {e // e ≠ e0} => IsLocalRing.residue (vRing w) (t' e.1)) := by
-    apply algebraicIndependent_residue_of_isUnit (vRing w) φ ψ hψ hc (fun e : {e // e ≠ e0} => t' e.1)
+    apply algebraicIndependent_residue_of_isUnit (vRing w) φ ψ hψ hc
+      (fun e : {e // e ≠ e0} => t' e.1)
     intro q hq
     have hq0 : q ≠ 0 := by rintro rfl; exact hq (map_zero _)
     have hnot := he0 q hq0
-    have hcoe : ((eval₂ φ (fun e : {e // e ≠ e0} => t' e.1) q : vRing w) : OmS (Ω c) d.D d.N) =
-        d.sH c (rename Subtype.val q) := by
+    have hcoe
+        : ((eval₂ φ (fun e : {e // e ≠ e0} => t' e.1) q : vRing w) : OmS (Ω c) d.D d.N)
+          = d.sH c (rename Subtype.val q) := by
       have e1 := eval₂_comp_left (vRing w).subtype φ (fun e : {e // e ≠ e0} => t' e.1) q
-      have e2 : (vRing w).subtype.comp φ = algebraMap K (OmS (Ω c) d.D d.N) := RingHom.ext fun _ => rfl
+      have e2 : (vRing w).subtype.comp φ = algebraMap K (OmS (Ω c) d.D d.N) :=
+        RingHom.ext fun _ => rfl
       rw [e2] at e1
       refine e1.trans ?_
       conv_rhs => rw [MvPolynomial.aeval_unique (d.sH c), aeval_rename, aeval_def]
       rfl
     have h0 := (hw.2 (rename Subtype.val q)).1
-    have h1 : ¬ (0 < w (d.sH c (rename Subtype.val q))) := fun h => hnot ((hw.2 _).2.mp h)
+    have h1 : ¬(0 < w (d.sH c (rename Subtype.val q))) := fun h => hnot ((hw.2 _).2.mp h)
     have hv0 : w (d.sH c (rename Subtype.val q)) = 0 := le_antisymm (not_lt.mp h1) h0
     have he : eval₂ φ (fun e : {e // e ≠ e0} => t' e.1) q = ⟨d.sH c (rename Subtype.val q), h0⟩ :=
       Subtype.ext hcoe
     rw [he]
     exact isUnit_of_val_eq_zero' w h0 hv0
-  let tb : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} → IsLocalRing.ResidueField (vRing w) :=
-    fun e => IsLocalRing.residue (vRing w) (t' e.1)
-  have hmemG : ∀ (M : Type) [Field M] [Algebra M (IsLocalRing.ResidueField (vRing w))],
-      (∀ j, ∃ m : M, algebraMap M (IsLocalRing.ResidueField (vRing w)) m =
-        algebraMap (IsLocalRing.ResidueField (vRing (d.Wres c w))) _ (ρ j)) →
-      ∀ e : {e // e ≠ e0}, IsLocalRing.residue (vRing w) (t' e.1) ∈ Algebra.adjoin M (Set.range tb) := by
+  let tb : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} → IsLocalRing.ResidueField (vRing w) := fun e =>
+    IsLocalRing.residue (vRing w) (t' e.1)
+  have hmemG
+      : ∀ (M : Type) [Field M] [Algebra M (IsLocalRing.ResidueField (vRing w))],
+        (∀ j, ∃ m : M,
+            algebraMap M (IsLocalRing.ResidueField (vRing w)) m
+              = algebraMap (IsLocalRing.ResidueField (vRing (d.Wres c w))) _ (ρ j))
+          → ∀ e : {e // e ≠ e0},
+            IsLocalRing.residue (vRing w) (t' e.1) ∈ Algebra.adjoin M (Set.range tb) := by
     intro M _ _ hM e
     obtain ⟨⟨i, j⟩, he⟩ := e
     by_cases hij : i = 0 ∨ j ≠ j0
@@ -237,43 +264,55 @@ theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal 
       · obtain ⟨m, hm⟩ := hM j
         rw [← hm]
         exact Subalgebra.algebraMap_mem _ m
-  have hcard : Fintype.card {e : TVar d.D d.N // e ≠ e0} =
-      Fintype.card {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} + (d.D - 1) := by
-    rw [card_subtype_ne', card_baseOrOffColumn, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
+  have hcard
+      : Fintype.card {e : TVar d.D d.N // e ≠ e0}
+        = Fintype.card {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} + (d.D - 1) := by
+    rw [card_subtype_ne', card_baseOrOffColumn, Fintype.card_prod, Fintype.card_fin,
+      Fintype.card_fin]
     have h3 := hd.D_ge
     have h4 : d.D + 1 ≤ (d.D + 1) * (d.N + 1) := Nat.le_mul_of_pos_right _ (Nat.succ_pos _)
     omega
-  obtain ⟨htrW, hindW⟩ := trdeg_eq_of_card tb _ hu (hmemG _ fun j => ⟨ρ j, rfl⟩) (d.D - 1) htr hcard (fun _ => rfl)
-  let k1 := IntermediateField.adjoin (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
-    {r | ∃ j, ∃ h : ratio (Ω := Ω c) (d.w j c) (d.w j0 c) ∈ vRing (d.Wres c w),
-      r = IsLocalRing.residue (vRing (d.Wres c w)) ⟨_, h⟩}
+  obtain ⟨htrW, hindW⟩ :=
+    trdeg_eq_of_card tb _ hu (hmemG _ fun j => ⟨ρ j, rfl⟩) (d.D - 1) htr hcard (fun _ => rfl)
+  let k1 :=
+    IntermediateField.adjoin
+      (IsLocalRing.ResidueField ((vRing (d.Wres c w)).comap (algebraMap K (Ω c))))
+      {r | ∃ j, ∃ h : ratio (Ω := Ω c) (d.w j c) (d.w j0 c) ∈ vRing (d.Wres c w),
+        r = IsLocalRing.residue (vRing (d.Wres c w)) ⟨_, h⟩}
   letI ik1 : Algebra k1 (IsLocalRing.ResidueField (vRing w)) :=
     ((algebraMap (IsLocalRing.ResidueField (vRing (d.Wres c w))) (IsLocalRing.ResidueField (vRing w))).comp
       (algebraMap k1 (IsLocalRing.ResidueField (vRing (d.Wres c w))))).toAlgebra
   have hk1le := (trdeg_le_of_injective k1.val Subtype.val_injective).trans htr
-  obtain ⟨htrk1, -⟩ := trdeg_eq_of_card (E := k1) tb _ hu
-    (hmemG k1 fun j => ⟨⟨ρ j, IntermediateField.subset_adjoin _ _ ⟨j, hint j, rfl⟩⟩, rfl⟩) (d.D - 1) hk1le hcard (fun _ => rfl)
+  obtain ⟨htrk1, -⟩ :=
+    trdeg_eq_of_card (E := k1) tb _ hu
+      (hmemG k1 fun j => ⟨⟨ρ j, IntermediateField.subset_adjoin _ _ ⟨j, hint j, rfl⟩⟩, rfl⟩)
+      (d.D - 1) hk1le hcard (fun _ => rfl)
   have hRC : d.ResCond c (d.Wres c w) (d.D - 1) := ⟨htrW, j0, hw0, fun j => hint j, htrk1⟩
 
-  have hz0mem : (∑ j, d.sH c (X (0, j)) * algebraMap (Ω c) (OmS (Ω c) d.D d.N)
-      (ratio (Ω := Ω c) (d.w j c) (d.w j0 c))) ∈ vRing w :=
+  have hz0mem
+      : (∑ j, d.sH c (X (0, j)) * algebraMap (Ω c) (OmS (Ω c) d.D d.N)
+          (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))
+        ∈ vRing w :=
     sum_mem fun j _ => mul_mem (hw.2 (X (0, j))).1 (hint j)
-  have hz0V : (⟨_, hz0mem⟩ : vRing w) = ∑ j, t' (0, j) *
-      comapIncl (vRing w) (algebraMap (Ω c) (OmS (Ω c) d.D d.N)) ⟨_, hint j⟩ := by
+  have hz0V
+      : (⟨_, hz0mem⟩ : vRing w)
+        = ∑ j, t' (0, j) *
+          comapIncl (vRing w) (algebraMap (Ω c) (OmS (Ω c) d.D d.N)) ⟨_, hint j⟩ := by
     apply Subtype.ext
     push_cast
     rfl
-  have hres0 : IsLocalRing.residue (vRing w) ⟨_, hz0mem⟩ =
-      ∑ j, algebraMap (IsLocalRing.ResidueField (vRing (d.Wres c w))) _ (ρ j) *
-        tb ⟨(0, j), Or.inl rfl⟩ := by
-
+  have hres0
+      : IsLocalRing.residue (vRing w) ⟨_, hz0mem⟩
+        = ∑ j, algebraMap (IsLocalRing.ResidueField (vRing (d.Wres c w))) _ (ρ j) *
+            tb ⟨(0, j), Or.inl rfl⟩ := by
     rw [hz0V, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, mul_comm]
     rfl
-  have hli := hindW.linearIndependent.comp
-    (fun j : Fin (d.N + 1) => (⟨(0, j), Or.inl rfl⟩ : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0}))
-    (fun a b hab => by simpa using hab)
+  have hli :=
+    hindW.linearIndependent.comp
+      (fun j : Fin (d.N + 1) => (⟨(0, j), Or.inl rfl⟩ : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0}))
+      (fun a b hab => by simpa using hab)
   have hρ0 : ρ j0 = 1 := by
     have e : (⟨ratio (Ω := Ω c) (d.w j0 c) (d.w j0 c), hint j0⟩ : vRing (d.Wres c w)) = 1 :=
       Subtype.ext (scalarRatio_eq hw0 (one_smul _ _).symm)
@@ -281,26 +320,36 @@ theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal 
     rw [e, map_one]
   have hne : IsLocalRing.residue (vRing w) ⟨_, hz0mem⟩ ≠ 0 := by
     intro h0
-    have := Fintype.linearIndependent_iff.mp hli ρ (by
-      rw [← h0, hres0]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [Algebra.smul_def]
-      rfl) j0
+    have :=
+      Fintype.linearIndependent_iff.mp hli ρ
+        (by
+          rw [← h0, hres0]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [Algebra.smul_def]
+          rfl)
+        j0
     rw [hρ0] at this
     exact one_ne_zero this
-  have hunit : w (∑ j, d.sH c (X (0, j)) * algebraMap (Ω c) (OmS (Ω c) d.D d.N)
-      (ratio (Ω := Ω c) (d.w j c) (d.w j0 c))) = 0 :=
+  have hunit
+      : w
+          (∑ j, d.sH c (X (0, j)) * algebraMap (Ω c) (OmS (Ω c) d.D d.N)
+            (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))
+        = 0 :=
     val_eq_zero_of_isUnit' w hz0mem ((IsLocalRing.residue_ne_zero_iff_isUnit _).mp hne)
 
   have hNorm : IsNormDiscrete (d.Wres c w) := by
     refine ⟨fun x hx => hw.1.1 _ ((map_ne_zero _).mpr hx), ?_⟩
     let G : TVar d.D d.N → MvPolynomial {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} (Ω c) := fun e =>
-      if h : e.1 = 0 ∨ e.2 ≠ j0 then X ⟨e, h⟩ else
-        -∑ j ∈ (Finset.univ.erase j0).attach,
-          X ⟨(e.1, j.1), Or.inr (Finset.ne_of_mem_erase j.2)⟩ *
-            C (ratio (Ω := Ω c) (d.w j.1 c) (d.w j0 c))
-    have hG : ∀ e, d.sH c (X e) =
-        aeval (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1)) (G e) := by
+      if h : e.1 = 0 ∨ e.2 ≠ j0 then
+        X ⟨e, h⟩
+      else
+        - ∑ j ∈ (Finset.univ.erase j0).attach,
+           X ⟨(e.1, j.1), Or.inr (Finset.ne_of_mem_erase j.2)⟩ *
+             C (ratio (Ω := Ω c) (d.w j.1 c) (d.w j0 c))
+    have hG
+        : ∀ e,
+          d.sH c (X e)
+            = aeval (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1)) (G e) := by
       rintro ⟨i, j⟩
       by_cases h : i = 0 ∨ j ≠ j0
       · simp only [G, dite_eq_left h, aeval_X]
@@ -311,20 +360,28 @@ theorem PlaceTrivialOrPositive (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal 
         subst j
         rw [d.genericHomAt_relation hd c _ hw0 hq i hi]
         congr 1
-        exact (Finset.sum_attach _ (fun j => d.sH c (X (i, j)) *
-          algebraMap (Ω c) (OmS (Ω c) d.D d.N) (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))).symm
-    have hg : ∀ x : SVar d.D d.N,
-        algebraMap (MvPolynomial (SVar d.D d.N) (Ω c)) (OmS (Ω c) d.D d.N) (X x) =
-          aeval (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1))
-            (Sum.elim (fun _ => G (0, d.jc c)) (fun ik => G (ik.1, (d.jc c).succAbove ik.2)) x) := by
+        exact (Finset.sum_attach _ (fun j =>
+          d.sH c (X (i, j))
+            * algebraMap (Ω c) (OmS (Ω c) d.D d.N) (ratio (Ω := Ω c) (d.w j c) (d.w j0 c)))).symm
+    have hg
+        : ∀ x : SVar d.D d.N,
+          algebraMap (MvPolynomial (SVar d.D d.N) (Ω c)) (OmS (Ω c) d.D d.N) (X x)
+            = aeval
+              (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1))
+              (Sum.elim
+                (fun _ => G (0, d.jc c))
+                (fun ik => G (ik.1, (d.jc c).succAbove ik.2))
+                x) := by
       rintro (_ | ⟨i, k⟩)
       · rw [Sum.elim_inl, ← hG]
         simp [Data.sH, sHom, genericImage_base]
       · rw [Sum.elim_inr, ← hG]
         simp [Data.sH, sHom, genericImage_succAbove]
-    obtain ⟨π, hπ⟩ := uniformizer_of_residue_indep w hw.1
-      (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1))
-      (fun e => (hw.2 (X e.1)).1) hindW _ hg
+    obtain ⟨π, hπ⟩ :=
+      uniformizer_of_residue_indep w hw.1
+        (fun e : {e : TVar d.D d.N // e.1 = 0 ∨ e.2 ≠ j0} => d.sH c (X e.1))
+        (fun e => (hw.2 (X e.1)).1)
+        hindW _ hg
     exact ⟨π, hπ⟩
   exact ⟨⟨hNorm, Or.inr ⟨hvK, hRC⟩⟩, hvK, j0, hw0, fun j => hint j, hunit⟩
 

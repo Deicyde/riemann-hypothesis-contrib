@@ -47,8 +47,6 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BoundAtTwoT
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N

@@ -67,17 +67,13 @@ theorem bigCell_of (hLU : LUStatement (E := E)) : BigCellStatement (E := E) := b
   have hopen : IsOpen X.dom := by
     have hmat : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => mat x τ := by
       intro τ
-      first
-      | exact continuous_apply τ
-      | (unfold mat; exact continuous_apply τ)
-      | fun_prop
-      | continuity
+      first | exact continuous_apply τ
     have hgram : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => gram τ.1 X.Gm (mat x τ) := by
       intro τ
       refine continuous_matrix fun a b => ?_
       simp only [gram, hermC, col, Matrix.of_apply]
       have h := hmat τ
-      first | fun_prop | continuity
+      first | fun_prop
     have hdet : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => (mat x τ).det := fun τ =>
       (hmat τ).matrix_det
     have hmin

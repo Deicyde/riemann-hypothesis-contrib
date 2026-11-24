@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPullbackSchBc
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EquivOfStalkwiseBaseChangeStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForallFinset
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EquivOfStalkwiseBaseChange
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCohomologyEquivalenceBasicProperties
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -124,7 +125,7 @@ theorem eqv_sch_of_stalks
                 → Eqv R (sch.map (pullback.map (f ≫ p) s p s f (𝟙 _) (𝟙 _) (by simp) (by simp))) F)
             → Eqv R (sch.map f) F := by
   intro R _ F hF Y X S f p _ _ _ _ hst
-  refine GlobalTheory.T.equiv_of_stalkwise_base_change R F S (sch.obj Y) (sch.obj X) (sch.map f)
+  refine _root_.GlobalTheory.EtC.LocGlobSp.main R F S (sch.obj Y) (sch.obj X) (sch.map f)
     (sch.map p) hF ?_ (qcqsOver_sch p) ?_
   · rw [← Functor.map_comp]; exact qcqsOver_sch (f ≫ p)
   · intro O _ s hs

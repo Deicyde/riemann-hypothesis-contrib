@@ -83,7 +83,4 @@ theorem _root_.GlobalTheory.T.realPolynomialVector_reached_by_realDatum
                     → ∀ f ∈ Γ.M.Pol Bs.ψ Bs.emb, ∃ a,
                       IsDatumA W e Γ (tensT W a τ)
                         (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ) := by
-  first
-  | exact @GlobalTheory.BigNZ.DatReal.datum_real
-  | exact GlobalTheory.BigNZ.DatReal.datum_real
-  | (intros; apply GlobalTheory.BigNZ.DatReal.datum_real <;> assumption)
+  first | exact @GlobalTheory.BigNZ.DatReal.datum_real

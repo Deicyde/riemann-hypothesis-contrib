@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.discreteSeriesModel_unitary_irreducible_orthonormal
     : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (τ : D.what₂.Tau),
       CompleteSpace (M.H τ) ∧ IsURepOn (Formalism.QuantumDeterminants.UH (gramAt D V τ)) (M.rep τ)
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.discreteSeriesModel_unitary_irreducible_orthonorma
               x0Mat M τ * Matrix.single a c 1 * (x0Mat M τ)⁻¹
                 = (M.fr τ)⁻¹ * Matrix.single (arr (nNeg (M.ε τ)) a) (arr (nNeg (M.ε τ)) c) 1
                   * M.fr τ) := by
-  first
-  | exact @GlobalTheory.HolDict.ModelRep.model_rep
-  | exact GlobalTheory.HolDict.ModelRep.model_rep
-  | (intros; apply GlobalTheory.HolDict.ModelRep.model_rep <;> assumption)
+  first | exact @GlobalTheory.HolDict.ModelRep.model_rep

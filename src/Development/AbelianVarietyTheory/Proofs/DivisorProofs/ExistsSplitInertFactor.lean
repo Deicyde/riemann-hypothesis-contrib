@@ -117,7 +117,7 @@ theorem phi_mem_OhE
   refine add_mem (mul_mem he (hA i j)) (mul_mem (sub_mem (one_mem _) he) ?_)
   by_cases h : i = j
   · simp [Matrix.one_apply, h, one_mem]
-  · simp [Matrix.one_apply, h, zero_mem]
+  · simp [h, zero_mem]
 
 theorem hatId_mul
     {𝔪 : Ideal (𝓞 D.host.E)} {x : AE D} (hx : x ∈ hatId D 𝔪) {s : AE D} (hs : s ∈ OhE D)

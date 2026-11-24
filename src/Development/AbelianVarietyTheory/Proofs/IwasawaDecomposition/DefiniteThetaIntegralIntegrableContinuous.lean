@@ -94,7 +94,7 @@ theorem theta_integral_integrable_continuous
         → (∀ g, IntegrableOn (fun h => thetaKO ω g h s * F h) 𝓕 ν)
           ∧ Continuous (Lift.liftInt ν 𝓕 (thetaKO ω) s F) := by
   intro D ψ V W χS χT ω ν 𝓕 s F hω hpos hν h𝓕 hs hF hFinv
-  obtain ⟨C, hC, hcov⟩ := GlobalTheory.definite_unitary_cocompact W hpos
+  obtain ⟨C, hC, hcov⟩ := _root_.GlobalTheory.DefiniteQuotient.exists_compact W hpos
   obtain ⟨hcont, hinv⟩ := GlobalTheory.thetaKO_continuous_and_rat_invariant ψ V W χS χT ω hω s hs
   have hK : Continuous fun p : GA D V × GA D W => thetaKO ω p.1 p.2 s * F p.2 :=
     hcont.mul (hF.comp continuous_snd)

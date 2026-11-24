@@ -55,7 +55,9 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.Cha
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -65,9 +67,11 @@ namespace GlobalTheory.WdAinf
 
 open WittVector Ideal
 
-variable (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal}
+  (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 abbrev WRing (ϖ : PreTilt O p) := Ainf.A p O ⧸ span {(p : Ainf.A p O) ^ 2, teichmuller p ϖ}
 
@@ -190,8 +194,9 @@ lemma nil_ker (hv : v.Integers O) (ϖ : PreTilt O p) (hϖ : ϖ.untilt = (p : O))
   refine ⟨n * 2, ?_⟩
   rw [pow_mul, ← hy, mul_pow, p_sq, mul_zero]
 
-variable (hv : v.Integers O) (ε : PreTilt O p)
-  (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+variable
+  (hv : v.Integers O)
+  (ε : PreTilt O p) (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
   (ϖ : PreTilt O p) (hϖ : ϖ.untilt = (p : O))
 include hv hε hϖ
 
@@ -220,32 +225,38 @@ lemma psiW_surj : Function.Surjective (psiW p O hv ε hε ϖ hϖ) := by
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
   exact ⟨Ideal.Quotient.mk _ (Ideal.Quotient.mk _ a), rfl⟩
 
-def LW : LAlg (Ainf.R0 p O ε) :=
-  { carrier := WRing p O ϖ, alg := (toW p O hv ε hε ϖ hϖ).toAlgebra, loc := W_local p O hv ϖ hϖ }
-
+def LW : LAlg (Ainf.R0 p O ε) := {
+  carrier := WRing p O ϖ
+  alg := (toW p O hv ε hε ϖ hϖ).toAlgebra
+  loc := W_local p O hv ϖ hϖ
+}
 
 omit hϖ in
-def LK : LAlg (Ainf.R0 p O ε) :=
-  { carrier := ResK O hv, alg := ((resO O hv).comp (Ainf.thetaBar p O hv ε hε)).toAlgebra }
+def LK : LAlg (Ainf.R0 p O ε) := {
+  carrier := ResK O hv
+  alg := ((resO O hv).comp (Ainf.thetaBar p O hv ε hε)).toAlgebra
+}
 
-def piWL : LHom (LW p O hv ε hε ϖ hϖ) ((Ainf.ainfTowerL p O hv ε hε).R 0) :=
-  ⟨{ toRingHom := piW p O ϖ hϖ
-     commutes' := fun r => by
+def piWL : LHom (LW p O hv ε hε ϖ hϖ) ((Ainf.ainfTowerL p O hv ε hε).R 0) := ⟨
+  {
+    toRingHom := piW p O ϖ hϖ
+    commutes' := fun r => by
       obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective r
-      rfl },
-    TowerExample.isLocalHom_of_surj _ (piW_surj p O hv ϖ hϖ)⟩
-
+      rfl
+  },
+  TowerExample.isLocalHom_of_surj _ (piW_surj p O hv ϖ hϖ)
+⟩
 
 omit hϖ in
-def rho1L : LHom ((Ainf.ainfTowerL p O hv ε hε).R 0) (LK p O hv ε hε) :=
-  ⟨{ toRingHom := rho1 p O hv
-     commutes' := fun _ => rfl },
-    TowerExample.isLocalHom_of_surj _ (modPToValuationResidueField_surjective p O hv)⟩
+def rho1L : LHom ((Ainf.ainfTowerL p O hv ε hε).R 0) (LK p O hv ε hε) := ⟨
+  { toRingHom := rho1 p O hv, commutes' := fun _ => rfl },
+  TowerExample.isLocalHom_of_surj _ (modPToValuationResidueField_surjective p O hv)
+⟩
 
-def psiL : LHom ((Ainf.ainfTowerL p O hv ε hε).R' 1) (LW p O hv ε hε ϖ hϖ) :=
-  ⟨{ toRingHom := psiW p O hv ε hε ϖ hϖ
-     commutes' := fun _ => rfl },
-    TowerExample.isLocalHom_of_surj _ (psiW_surj p O hv ε hε ϖ hϖ)⟩
+def psiL : LHom ((Ainf.ainfTowerL p O hv ε hε).R' 1) (LW p O hv ε hε ϖ hϖ) := ⟨
+  { toRingHom := psiW p O hv ε hε ϖ hϖ, commutes' := fun _ => rfl },
+  TowerExample.isLocalHom_of_surj _ (psiW_surj p O hv ε hε ϖ hϖ)
+⟩
 
 omit hϖ in
 lemma thetaBar_surj : Function.Surjective (Ainf.thetaBar p O hv ε hε) := by
@@ -278,28 +289,44 @@ end GlobalTheory.WdAinf
 
 namespace GlobalTheory
 
-theorem wData_ainfTower_exists :
-  (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
-    (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p) (ϖ : PreTilt O p), ϖ.untilt = (p : O) →
-    ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W), Function.Surjective pr →
-    RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ} →
-    (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c') ∧
-    (∀ (n : ℕ) (a : Fin n → PreTilt O p), ∑ j, pr (WittVector.teichmuller p (a j)) = pr (WittVector.teichmuller p (∑ j, a j)) +
-      p * pr (WittVector.teichmuller p (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p)) (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j)) (wS p n)))) ∧
-    (∀ c : PreTilt O p, WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)} → pr (WittVector.teichmuller p c) = 0)) →
-  (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
-    (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p),
-    ∃ (K : LAlg (Ainf.R0 p O ε)) (wd : WData (Ainf.ainfTowerL p O hv ε hε) K), IsNilOver wd.ρW ∧ maximalIdeal (K : Type) = ⊥ ∧
-      IsLocalHom (algebraMap (Ainf.R0 p O ε) (K : Type))) := by
+theorem wData_ainfTower_exists
+    : (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+          {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+          [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
+          (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+          (ϖ : PreTilt O p),
+        ϖ.untilt = (p : O)
+          → ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W),
+            Function.Surjective pr
+              → RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ}
+              → (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c')
+                ∧ (∀ (n : ℕ) (a : Fin n → PreTilt O p),
+                  ∑ j, pr (WittVector.teichmuller p (a j))
+                    = pr (WittVector.teichmuller p (∑ j, a j))
+                      + p * pr (WittVector.teichmuller p
+                        (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p))
+                          (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j))
+                          (wS p n))))
+                ∧ (∀ c : PreTilt O p,
+                  WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)}
+                    → pr (WittVector.teichmuller p c) = 0))
+      → (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+          {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+          [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
+          (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p),
+        ∃ (K : LAlg (Ainf.R0 p O ε)) (wd : WData (Ainf.ainfTowerL p O hv ε hε) K),
+          IsNilOver wd.ρW ∧ maximalIdeal (K : Type) = ⊥
+            ∧ IsLocalHom (algebraMap (Ainf.R0 p O ε) (K : Type))) := by
   intro H p _ C _ _ _ v O _ _ _ _ hv ε hε
   obtain ⟨⟨ϖ, hϖ⟩, -⟩ := a0 p C v O hv
-  obtain ⟨h1, h2, h3⟩ := H p O hv ε hε ϖ hϖ (WdAinf.WRing p O ϖ) (Ideal.Quotient.mk _)
-    Ideal.Quotient.mk_surjective Ideal.mk_ker
+  obtain ⟨h1, h2, h3⟩ :=
+    H p O hv ε hε ϖ hϖ (WdAinf.WRing p O ϖ) (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
+      Ideal.mk_ker
   obtain ⟨u, hu⟩ := WdAinf.xi_img p O hv ε hε ϖ hϖ
-  refine ⟨WdAinf.LK p O hv ε hε,
-    { W := WdAinf.LW p O hv ε hε ϖ hϖ
+  refine ⟨
+    WdAinf.LK p O hv ε hε,
+    {
+      W := WdAinf.LW p O hv ε hε ϖ hϖ
       ρW := (WdAinf.rho1L p O hv ε hε).comp (WdAinf.piWL p O hv ε hε ϖ hϖ)
       ρ1 := WdAinf.rho1L p O hv ε hε
       ψ := WdAinf.psiL p O hv ε hε ϖ hϖ
@@ -313,20 +340,37 @@ theorem wData_ainfTower_exists :
         obtain ⟨a0, rfl⟩ := Ideal.Quotient.mk_surjective a
         obtain ⟨a1, rfl⟩ := Ideal.Quotient.mk_surjective a0
         rfl
-      b := Units.map (Ideal.Quotient.mk (Ideal.span {(p : Ainf.A p O) ^ 2,
-        WittVector.teichmuller p ϖ})).toMonoidHom u
+      b :=
+        Units.map
+          (Ideal.Quotient.mk (Ideal.span {
+            (p : Ainf.A p O) ^ 2,
+            WittVector.teichmuller p ϖ
+          })).toMonoidHom
+          u
       ξ_img := hu
       Rb := PreTilt O p
-      T := (Ideal.Quotient.mk (Ideal.span {(p : Ainf.A p O) ^ 2,
-        WittVector.teichmuller p ϖ})).toMonoidHom.comp (WittVector.teichmuller p)
+      T :=
+        (Ideal.Quotient.mk (Ideal.span {
+          (p : Ainf.A p O) ^ 2,
+          WittVector.teichmuller p ϖ
+        })).toMonoidHom.comp (WittVector.teichmuller p)
       decomp := h1
       witt_add := h2
-      T_kill := fun c hc => h3 c (by
-        have hc' : Ideal.Quotient.mk (Ideal.span {(p : O) ^ (0 + 1)})
-          (WittVector.fontaineTheta O p (WittVector.teichmuller p c)) = 0 := hc
-        rwa [Ideal.Quotient.eq_zero_iff_mem, zero_add, pow_one] at hc') },
-    ⟨(WdAinf.modPToValuationResidueField_surjective p O hv).comp (WdAinf.piW_surj p O hv ϖ hϖ),
-      fun w hw => WdAinf.nil_ker p O hv ϖ hϖ w hw⟩,
-    WdAinf.LK_max p O hv ε hε, WdAinf.LK_localHom p O hv ε hε⟩
+      T_kill := fun c hc =>
+        h3 c (by
+          have hc'
+              : Ideal.Quotient.mk (Ideal.span {(p : O) ^ (0 + 1)})
+                  (WittVector.fontaineTheta O p (WittVector.teichmuller p c))
+                = 0 :=
+            hc
+          rwa [Ideal.Quotient.eq_zero_iff_mem, zero_add, pow_one] at hc')
+    },
+    ⟨
+      (WdAinf.modPToValuationResidueField_surjective p O hv).comp (WdAinf.piW_surj p O hv ϖ hϖ),
+      fun w hw => WdAinf.nil_ker p O hv ϖ hϖ w hw
+    ⟩,
+    WdAinf.LK_max p O hv ε hε,
+    WdAinf.LK_localHom p O hv ε hε
+  ⟩
 
 end GlobalTheory

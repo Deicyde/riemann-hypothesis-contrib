@@ -1,9 +1,9 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsSplitGaussChars
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeAdditiveSubQuotientStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeInvariantLinearEquivStatement
-import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundlesStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeAdditiveSubQuotient
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DegreeInvariantLinearEquiv
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundles
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -60,7 +60,9 @@ theorem deg_shortExact
         → IsBun C L ∧ IsBun C L'' ∧ deg C L' = deg C L + deg C L'' := by
   intro K _ C V _ _ _ V' _ _ _ V'' _ _ _ L L' L'' f g hL' hSE
   obtain ⟨hf, hfg, hg, hL, hL''⟩ := hSE
-  have hsub := GlobalTheory.T.sub_and_quotient_bundles K C V' L' (LinearMap.range f) hL'
+  have hsub :=
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuot.isBun_sub_quot K C V' L' (LinearMap.range f)
+      hL'
   obtain ⟨e1, he1⟩ : ∃ e : V ≃ₗ[K] LinearMap.range f, ∀ x, (e x : V') = f x :=
     ⟨LinearEquiv.ofInjective f hf, fun x => by simp⟩
   have hker : LinearMap.range f = LinearMap.ker g := (LinearMap.exact_iff.mp hfg).symm
@@ -95,13 +97,14 @@ theorem deg_shortExact
       have h3 : e2 (Submodule.Quotient.mk y) = e2 z := by rw [he2, hyz]
       exact h3
   obtain ⟨hLb, hdL⟩ :=
-    GlobalTheory.T.degree_invariant_linear_equiv K C (LinearMap.range f) V
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegEquiv.deg_equiv K C (LinearMap.range f) V
       (GlobalTheory.CompanionTheory.Ar.Crv.sub C L' (LinearMap.range f)) L e1.symm hsub.1 hc1
   obtain ⟨hL''b, hdL''⟩ :=
-    GlobalTheory.T.degree_invariant_linear_equiv K C (V' ⧸ LinearMap.range f) V''
+    _root_.GlobalTheory.CompanionTheory.Ar.Crv.DegEquiv.deg_equiv K C (V' ⧸ LinearMap.range f) V''
       (GlobalTheory.CompanionTheory.Ar.Crv.quot C L' (LinearMap.range f)) L'' e2 hsub.2 hc2
   refine ⟨hLb, hL''b, ?_⟩
-  rw [GlobalTheory.T.degree_additive_sub_quotient K C V' L' (LinearMap.range f) hL']
+  rw [_root_.GlobalTheory.CompanionTheory.Ar.Crv.SubQuotDeg.deg_eq_subDeg_add_deg_quot K C V' L'
+    (LinearMap.range f) hL']
   unfold GlobalTheory.CompanionTheory.Ar.Crv.subDeg
   rw [hdL, hdL'']
 

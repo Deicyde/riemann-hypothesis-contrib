@@ -91,37 +91,42 @@ lemma Hf_self {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (v : Fin r → �
   rw [X.Hf_eq_two_ppos, X.hermC_ppos_self, hmj, hpp, Complex.ofReal_sub, Complex.ofReal_mul, e1, e2]
   norm_num
 
-private theorem hermC_smul_left_embedding (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (c : ℂ)
-    (u w : Fin r → ℂ) : hermC τ G (c • u) w = c * hermC τ G u w := by
-  simp only [hermC, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-  ring
+private alias hermC_smul_left_embedding := _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC_smul_left
 
-private theorem hermC_finset_sum_left' (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) {ι : Type*}
-    [Fintype ι] (c : ι → ℂ) (u : ι → Fin r → ℂ) (w : Fin r → ℂ) :
-    hermC τ G (∑ i, c i • u i) w = ∑ i, c i * hermC τ G (u i) w := by
+private theorem hermC_finset_sum_left'
+    (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
+    {ι : Type*} [Fintype ι]
+    (c : ι → ℂ) (u : ι → Fin r → ℂ) (w : Fin r → ℂ)
+    : hermC τ G (∑ i, c i • u i) w = ∑ i, c i * hermC τ G (u i) w := by
   simp only [hermC, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum]
   refine (Finset.sum_congr rfl fun a _ => Finset.sum_comm).trans (Finset.sum_comm.trans ?_)
   simp only [mul_assoc]
 
-private theorem hermC_finset_sum_right_of_conj_symm (τ : E →+* ℂ) {G : Matrix (Fin r) (Fin r) E}
-    (hG : ∀ a b, cc (G a b) = G b a) {ι : Type*} [Fintype ι] (c : ι → ℂ) (u : ι → Fin r → ℂ)
-    (w : Fin r → ℂ) : hermC τ G w (∑ i, c i • u i) = ∑ i, conj (c i) * hermC τ G w (u i) := by
-
+private theorem hermC_finset_sum_right_of_conj_symm
+    (τ : E →+* ℂ)
+    {G : Matrix (Fin r) (Fin r) E} (hG : ∀ a b, cc (G a b) = G b a)
+    {ι : Type*} [Fintype ι]
+    (c : ι → ℂ) (u : ι → Fin r → ℂ) (w : Fin r → ℂ)
+    : hermC τ G w (∑ i, c i • u i) = ∑ i, conj (c i) * hermC τ G w (u i) := by
   rw [← ReciprocityTheory.ChartRestriction.G.FD.hermC_conj τ hG, hermC_finset_sum_left', map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, ReciprocityTheory.ChartRestriction.G.FD.hermC_conj τ hG]
 
-private theorem hermC_smul_right_of_conj_symm (τ : E →+* ℂ) {G : Matrix (Fin r) (Fin r) E}
-    (hG : ∀ a b, cc (G a b) = G b a) (c : ℂ) (u w : Fin r → ℂ) :
-    hermC τ G w (c • u) = conj c * hermC τ G w u := by
+private theorem hermC_smul_right_of_conj_symm
+    (τ : E →+* ℂ)
+    {G : Matrix (Fin r) (Fin r) E} (hG : ∀ a b, cc (G a b) = G b a)
+    (c : ℂ) (u w : Fin r → ℂ)
+    : hermC τ G w (c • u) = conj c * hermC τ G w u := by
   rw [← ReciprocityTheory.ChartRestriction.G.FD.hermC_conj τ hG, hermC_smul_left_embedding, map_mul,
     ReciprocityTheory.ChartRestriction.G.FD.hermC_conj τ hG]
 
-private theorem hermC_sum_smul_sum_smul_of_conj_symm (τ : E →+* ℂ) {G : Matrix (Fin r) (Fin r) E}
-    (hG : ∀ a b, cc (G a b) = G b a) {ι : Type*} [Fintype ι] (c : ι → ℂ) (u : ι → Fin r → ℂ) :
-    hermC τ G (∑ i, c i • u i) (∑ i, c i • u i) =
-      ∑ i, ∑ j, c i * hermC τ G (u i) (u j) * conj (c j) := by
+private theorem hermC_sum_smul_sum_smul_of_conj_symm
+    (τ : E →+* ℂ)
+    {G : Matrix (Fin r) (Fin r) E} (hG : ∀ a b, cc (G a b) = G b a)
+    {ι : Type*} [Fintype ι]
+    (c : ι → ℂ) (u : ι → Fin r → ℂ)
+    : hermC τ G (∑ i, c i • u i) (∑ i, c i • u i)
+      = ∑ i, ∑ j, c i * hermC τ G (u i) (u j) * conj (c j) := by
   rw [hermC_finset_sum_left']
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hermC_finset_sum_right_of_conj_symm τ hG, Finset.mul_sum]

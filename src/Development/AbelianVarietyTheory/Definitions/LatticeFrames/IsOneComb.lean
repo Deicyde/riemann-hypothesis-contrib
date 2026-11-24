@@ -128,7 +128,6 @@ def Dbl2.val
   S.B'.per ψ (biLift S.oma S.omb S.B.vA S.J.v0 φ (biComb ψ _ _ _ c₁ c₂ (S.con Φ₁ Φ₂ g h₁ h₂)))
     (rTrans h₂ f)
 
-
 structure QStep (S : Dbl2 ψ σ) where
   k : Type
   [fld : Field k]

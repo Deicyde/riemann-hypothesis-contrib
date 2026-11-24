@@ -202,7 +202,6 @@ theorem exists_greatest_proper_invariant_submodule_of_side
     fun β hβ x hx => ?_
   ⟩
   have cas : ∀ u v, β (casK (units act) u) v = β u (casK (units act) v) := fun u v => by
-
     simp only [casK, LinearMap.sum_apply, map_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     split_ifs with hab

@@ -141,7 +141,7 @@ theorem toMatrix_ad
     · subst hab; simp
     · simp [hab, Ne.symm hab]
   · simp [Matrix.sub_apply, Matrix.mul_apply, Matrix.single_apply, Matrix.algebraMap_matrix_apply,
-      hjk, Matrix.diagonal_apply_ne _ hjk]
+      hjk]
     by_cases hab : a = b
     · subst hab; simp [Ne.symm hjk]
     · simp [hab, Ne.symm hab, Ne.symm hjk]

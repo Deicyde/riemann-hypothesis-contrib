@@ -45,6 +45,7 @@ import Mathlib.Topology.Sheaves.Init
 open NumberField IsDedekindDomain MeasureTheory Topology
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
+
 theorem _root_.GlobalTheory.T.twoStep_pair_measure_finite_on_compacts
     : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
         (σ : E →ₐ[F] E),
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.twoStep_pair_measure_finite_on_compacts
               StepData σ J x a B J' → OnOrbit R σ J x m → IsFiniteMeasureOnCompacts m
                 → IsFiniteMeasureOnCompacts m' → IsInvTup R σ J' m' → TwoStep R σ J x B m m' N
                 → IsFiniteMeasureOnCompacts N := by
-  first
-  | exact @GlobalTheory.GaugeEx.twoStep_finite_on_compacts
-  | exact GlobalTheory.GaugeEx.twoStep_finite_on_compacts
-  | (intros; apply GlobalTheory.GaugeEx.twoStep_finite_on_compacts <;> assumption)
+  first | exact @GlobalTheory.GaugeEx.twoStep_finite_on_compacts

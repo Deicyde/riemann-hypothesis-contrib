@@ -415,7 +415,7 @@ theorem degWave_of (hS : SlicePolyAll) : KB.DegWave := by
       simp only [smul_eq_mul]
   have hinj : ∀ a, Function.Injective (fun i => grid (Fin.rev a) i) := fun a => hgrid _
   have hE :=
-    Formalism.FourierDecayAlt.P.extract_K_bound ℂ K (2 * j)
+    _root_.Formalism.FourierDecayAlt.P.LagrangeExtraction.extractK ℂ K (2 * j)
       (fun _ => s)
       W
       (fun a => grid (Fin.rev a))

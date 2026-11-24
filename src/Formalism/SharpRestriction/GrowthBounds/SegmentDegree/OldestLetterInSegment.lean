@@ -49,49 +49,59 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section Rows
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r]
 
-
 open Classical in
-def evL (F : Frames n' r) (j x : ℤ) : List ℤ := ((F.letters j).filter fun z => Even z ∧ z < x).sort (· ≤ ·)
+def evL (F : Frames n' r) (j x : ℤ) : List ℤ :=
+  ((F.letters j).filter fun z => Even z ∧ z < x).sort (· ≤ ·)
 
-theorem row_eq (X : Dat n' r) (j x : ℤ) (i : Fin r) :
-    X.row j x i = (evL X.F j x).getD ((evL X.F j x).length - r + i.val) 0 := rfl
+theorem row_eq (X : Dat n' r) (j x : ℤ) (i : Fin r)
+    : X.row j x i = (evL X.F j x).getD ((evL X.F j x).length - r + i.val) 0 :=
+  rfl
 
-theorem oldest_eq (F : Frames n' r) (j x : ℤ) : F.oldest j x = (evL F j x).getD ((evL F j x).length - r) 0 := rfl
+theorem oldest_eq (F : Frames n' r) (j x : ℤ)
+    : F.oldest j x = (evL F j x).getD ((evL F j x).length - r) 0 :=
+  rfl
 
-theorem mem_evL (F : Frames n' r) (j x z : ℤ) : z ∈ evL F j x ↔ z ∈ F.letters j ∧ Even z ∧ z < x := by
+theorem mem_evL (F : Frames n' r) (j x z : ℤ)
+    : z ∈ evL F j x ↔ z ∈ F.letters j ∧ Even z ∧ z < x := by
   classical
   unfold evL
   rw [Finset.mem_sort, Finset.mem_filter]
 
-theorem bk_fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) (i : ℕ) :
-    ∀ i', i < i' → i' < r → F.fr j i < F.fr j i' :=
+theorem bk_fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) (i : ℕ)
+    : ∀ i', i < i' → i' < r → F.fr j i < F.fr j i' :=
   TE.fr_lt hV j i
 
-theorem bk_fr_le {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) (i i' : ℕ) (h : i ≤ i') (h' : i' < r) :
-    F.fr j i ≤ F.fr j i' :=
+theorem bk_fr_le
+    {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) (i i' : ℕ) (h : i ≤ i') (h' : i' < r)
+    : F.fr j i ≤ F.fr j i' :=
   TE.fr_le hV j i i' h h'
 
-theorem r_le_length {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j x : ℤ) (hx : x ∈ F.letters j)
-    (hW : ¬ F.IsW j x) : r ≤ (evL F j x).length := by
+theorem r_le_length
+    {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁)
+    (j x : ℤ) (hx : x ∈ F.letters j) (hW : ¬ F.IsW j x)
+    : r ≤ (evL F j x).length := by
   have hr : 0 < r := Nat.pos_of_ne_zero (NeZero.ne r)
   have hW' : F.fr (j - 1) (r - 1) < x := lt_of_not_ge hW
   have h4 : F.fr (j - 1) (r - 1) < F.fr j 0 := by
     have := hV.2.2.2.1 (j - 1)
     rwa [sub_add_cancel] at this
   have hj0 : F.fr j 0 ≤ F.fr j (r - 1) := bk_fr_le hV j 0 (r - 1) (Nat.zero_le _) (by omega)
-  have hsub : (Finset.range r).image (fun i => F.fr (j - 1) i) ⊆
-      (F.letters j).filter (fun z => Even z ∧ z < x) := by
+  have hsub
+      : (Finset.range r).image (fun i => F.fr (j - 1) i)
+        ⊆ (F.letters j).filter (fun z => Even z ∧ z < x) := by
     intro y hy
     rw [Finset.mem_image] at hy
     obtain ⟨i, hi, rfl⟩ := hy
     rw [Finset.mem_range] at hi
-    have hle : F.fr (j - 1) i ≤ F.fr (j - 1) (r - 1) := bk_fr_le hV (j - 1) i (r - 1) (by omega) (by omega)
+    have hle : F.fr (j - 1) i ≤ F.fr (j - 1) (r - 1) :=
+      bk_fr_le hV (j - 1) i (r - 1) (by omega) (by omega)
     have hge : F.fr (j - 1) 0 ≤ F.fr (j - 1) i := bk_fr_le hV (j - 1) 0 i (Nat.zero_le _) hi
     have h5 := hV.2.2.2.2.1 (j - 1) i hi
     rw [Finset.mem_filter]
@@ -117,8 +127,8 @@ theorem evL_nodup (F : Frames n' r) (j x : ℤ) : (evL F j x).Nodup := by
   unfold evL
   exact Finset.sort_nodup _ _
 
-theorem evL_mono (F : Frames n' r) (j x : ℤ) {a b : ℕ} (hab : a ≤ b) (hb : b < (evL F j x).length) :
-    (evL F j x)[a]'(lt_of_le_of_lt hab hb) ≤ (evL F j x)[b]'hb := by
+theorem evL_mono (F : Frames n' r) (j x : ℤ) {a b : ℕ} (hab : a ≤ b) (hb : b < (evL F j x).length)
+    : (evL F j x)[a]'(lt_of_le_of_lt hab hb) ≤ (evL F j x)[b]'hb := by
   have hp : (evL F j x).Pairwise (· ≤ ·) := Finset.pairwise_sort _ _
   rcases Nat.lt_or_eq_of_le hab with h1 | h1
   · exact List.pairwise_iff_getElem.mp hp a b _ hb h1
@@ -136,7 +146,8 @@ theorem late_row_injective : LateIndexInjective := by
     intro i
     have := i.isLt
     omega
-  have hrow : ∀ i : Fin r, X.row j x i = (evL X.F j x)[(evL X.F j x).length - r + i.val]'(hidx i) := by
+  have hrow
+      : ∀ i : Fin r, X.row j x i = (evL X.F j x)[(evL X.F j x).length - r + i.val]'(hidx i) := by
     intro i
     rw [row_eq, List.getD_eq_getElem]
   refine ⟨?_, ?_⟩

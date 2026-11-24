@@ -61,8 +61,6 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
 open PositivityTheory.RgTw (Mat G)
 open scoped Classical
 
-
-
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace PositivityTheory.Rg.BcB.F.F0

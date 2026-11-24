@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.fockVacua_triple_proportional_to_nonzero
         → ∀ f₀,
           f₀ ≠ 0 → Γ.M.IsGauss B.ψ B.emb f₀
             → ∀ g, Γ.M.IsGauss B.ψ B.emb g → ∃ c : ℂ, g = c • f₀ := by
-  first
-  | exact @GlobalTheory.GaussLine.gauss_eq_smul
-  | exact GlobalTheory.GaussLine.gauss_eq_smul
-  | (intros; apply GlobalTheory.GaussLine.gauss_eq_smul <;> assumption)
+  first | exact @GlobalTheory.GaussLine.gauss_eq_smul

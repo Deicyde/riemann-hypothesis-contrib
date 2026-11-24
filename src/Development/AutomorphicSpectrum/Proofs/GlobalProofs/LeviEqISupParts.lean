@@ -173,15 +173,6 @@ def frameProj (B : Set (Fin r)) : Matrix (Fin n) (Fin n) E :=
 
 variable {σ J X Y}
 
-theorem yJx (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J X Y)
-    : Formalism.UG.cT (σ : E →+* E) Y * J * X = 1 := by
-  have hcJ : Formalism.UG.cT (σ : E →+* E) J = J := by ext i j; simp [Formalism.UG.cT, hJ.1 i j]
-  have hcc : Formalism.UG.cT (σ : E →+* E) (Formalism.UG.cT (σ : E →+* E) X) = X := by
-    ext i j; simp [Formalism.UG.cT, sig_sig σ hCM]
-  have := congrArg (Formalism.UG.cT (σ : E →+* E)) hW.xy
-  rwa [Formalism.UG.cT_mul, Formalism.UG.cT_mul, hcJ, hcc, Formalism.UG.cT_one, ← Matrix.mul_assoc]
-    at this
-
 theorem xJ_frameProj (hW : IsWittFrame σ J X Y) (B : Set (Fin r))
     : Formalism.UG.cT (σ : E →+* E) X * J * frameProj σ J X Y B
       = blockDiag B * (Formalism.UG.cT (σ : E →+* E) X * J) := by
@@ -193,8 +184,8 @@ theorem yJ_frameProj
     (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J X Y) (B : Set (Fin r))
     : Formalism.UG.cT (σ : E →+* E) Y * J * frameProj σ J X Y B
       = blockDiag B * (Formalism.UG.cT (σ : E →+* E) Y * J) := by
-  simp only [frameProj, Matrix.mul_add, ← Matrix.mul_assoc, hW.yy, yJx hCM hJ hW, Matrix.zero_mul,
-    Matrix.one_mul, add_zero]
+  simp only [frameProj, Matrix.mul_add, ← Matrix.mul_assoc, hW.yy,
+    _root_.GlobalTheory.StdPar.yx hCM hJ hW, Matrix.zero_mul, Matrix.one_mul, add_zero]
   exact Matrix.mul_assoc _ _ _
 
 theorem frameProj_selfAdj (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (B : Set (Fin r))

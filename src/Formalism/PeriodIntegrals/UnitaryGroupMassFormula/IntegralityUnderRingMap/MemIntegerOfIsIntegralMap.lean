@@ -74,7 +74,7 @@ theorem mem_integer_of_isIntegral
     {F : Type} [Field F] [ValuativeRel F] {s : F} (hs : IsIntegral 𝒪[F] s)
     : s ∈ 𝒪[F] := by
   have h := (Valuation.integer.integers (ValuativeRel.valuation F)).mem_of_integral hs
-  first | exact h | simpa using h | (obtain ⟨y, hy⟩ := h; rw [← hy]; exact y.2)
+  first | exact h
 
 theorem mem_integer_of_isIntegral_map
     {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]

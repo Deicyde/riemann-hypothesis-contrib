@@ -67,10 +67,12 @@ section Adjoint
 
 variable {σ τ : Type*} [Fintype σ] [Fintype τ]
 
-theorem pderiv_algHom_of_linear {R : Type*} [CommRing R]
+theorem pderiv_algHom_of_linear
+    {R : Type*} [CommRing R]
     (G : MvPolynomial τ R →ₐ[R] MvPolynomial σ R) (M : σ → τ → R)
-    (hG : ∀ j, G (X j) = ∑ i, M i j • X i) (i : σ) (Q : MvPolynomial τ R) :
-    pderiv i (G Q) = ∑ j, M i j • G (pderiv j Q) := by
+    (hG : ∀ j, G (X j) = ∑ i, M i j • X i)
+    (i : σ) (Q : MvPolynomial τ R)
+    : pderiv i (G Q) = ∑ j, M i j • G (pderiv j Q) := by
   classical
   induction Q using MvPolynomial.induction_on with
   | C r => simp [algHom_C]
@@ -82,7 +84,7 @@ theorem pderiv_algHom_of_linear {R : Type*} [CommRing R]
       rw [Finset.sum_eq_single k]
       · simp [smul_eq_C_mul, mul_comm]
       · intro j _ hj
-        simp [pderiv_X, Pi.single_apply, hj.symm]
+        simp [pderiv_X, hj.symm]
       · simp
     rw [map_mul, Derivation.leibniz, hP, h1, smul_eq_mul, smul_eq_mul, ← h2, Finset.mul_sum,
       ← Finset.sum_add_distrib]
@@ -90,34 +92,37 @@ theorem pderiv_algHom_of_linear {R : Type*} [CommRing R]
     rw [Derivation.leibniz, map_add (f := _), smul_add, smul_eq_mul, smul_eq_mul, map_mul G (X k),
       mul_smul_comm]
 
-
 omit [Fintype τ] in
-theorem constantCoeff_algHom_of_linear {R : Type*} [CommRing R]
+theorem constantCoeff_algHom_of_linear
+    {R : Type*} [CommRing R]
     (G : MvPolynomial τ R →ₐ[R] MvPolynomial σ R) (M : σ → τ → R)
-    (hG : ∀ j, G (X j) = ∑ i, M i j • X i) (Q : MvPolynomial τ R) :
-    constantCoeff (G Q) = constantCoeff Q := by
+    (hG : ∀ j, G (X j) = ∑ i, M i j • X i)
+    (Q : MvPolynomial τ R)
+    : constantCoeff (G Q) = constantCoeff Q := by
   induction Q using MvPolynomial.induction_on with
   | C r => simp [algHom_C]
   | add P Q hP hQ => simp [hP, hQ]
   | mul_X P k hP => simp [hG, smul_eq_C_mul]
 
-theorem fockInner_algHom_of_linear (F : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial τ ℂ)
-    (G : MvPolynomial τ ℂ →ₐ[ℂ] MvPolynomial σ ℂ) (M : σ → τ → ℂ)
+theorem fockInner_algHom_of_linear
+    (F : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial τ ℂ) (G : MvPolynomial τ ℂ →ₐ[ℂ] MvPolynomial σ ℂ)
+    (M : σ → τ → ℂ)
     (hF : ∀ i, F (X i) = ∑ j, M i j • X j) (hG : ∀ j, G (X j) = ∑ i, star (M i j) • X i)
-    (P : MvPolynomial σ ℂ) (Q : MvPolynomial τ ℂ) : fockInner (F P) Q = fockInner P (G Q) := by
+    (P : MvPolynomial σ ℂ) (Q : MvPolynomial τ ℂ)
+    : fockInner (F P) Q = fockInner P (G Q) := by
   induction P using MvPolynomial.induction_on generalizing Q with
   | C r =>
     have := constantCoeff_algHom_of_linear G _ hG Q
     rw [constantCoeff_eq] at this
-    rw [algHom_C, algebraMap_eq, C_apply, C_apply, fockInner_monomial_left,
-      fockInner_monomial_left, this]
+    rw [algHom_C, algebraMap_eq, C_apply, C_apply, fockInner_monomial_left, fockInner_monomial_left,
+      this]
     simp [constantCoeff_eq]
-  | add P P' hP hP' => rw [map_add (f := _), fockInner_add_left, fockInner_add_left, hP, hP']
+  | add P P' hP hP' =>
+    rw [map_add (f := _), fockInner_add_left, fockInner_add_left, hP, hP']
   | mul_X P k hP =>
-
     rw [mul_comm P, fockInner_X_mul_left, pderiv_algHom_of_linear G _ hG, map_mul, hF,
-    Finset.sum_mul, ← fockInnerₛₗ_apply, ← fockInnerₛₗ_apply, map_sum, map_sum,
-    LinearMap.sum_apply]
+      Finset.sum_mul, ← fockInnerₛₗ_apply, ← fockInnerₛₗ_apply, map_sum, map_sum,
+      LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [fockInnerₛₗ_apply, fockInnerₛₗ_apply, smul_mul_assoc, fockInner_smul_left,
       fockInner_smul_right, fockInner_X_mul_left, hP]
@@ -125,31 +130,36 @@ theorem fockInner_algHom_of_linear (F : MvPolynomial σ ℂ →ₐ[ℂ] MvPolyno
 
 variable {T κ : Type*} [Fintype T] [Fintype κ] {p q : ℕ}
 
-theorem fockInner_colSubst (A B : T → Matrix κ κ ℂ) (P Q : Poly ℂ T p q κ) :
-    fockInner (colSubst A B P) Q =
-      fockInner P (colSubst (fun t => (A t)ᴴ) (fun t => (B t)ᴴ) Q) := by
+theorem fockInner_colSubst (A B : T → Matrix κ κ ℂ) (P Q : Poly ℂ T p q κ)
+    : fockInner (colSubst A B P) Q
+      = fockInner P (colSubst (fun t => (A t)ᴴ) (fun t => (B t)ᴴ) Q) := by
   classical
-  refine fockInner_algHom_of_linear _ _ (fun v w => if v.1 = w.1 ∧ v.2.1 = w.2.1 then
-    Sum.elim (fun _ => A v.1 v.2.2 w.2.2) (fun _ => B v.1 w.2.2 v.2.2) v.2.1 else 0) ?_ ?_ P Q
+  refine fockInner_algHom_of_linear _ _
+    (fun v w =>
+      if v.1 = w.1 ∧ v.2.1 = w.2.1 then
+        Sum.elim (fun _ => A v.1 v.2.2 w.2.2) (fun _ => B v.1 w.2.2 v.2.2) v.2.1
+      else
+        0)
+    ?_ ?_ P Q
   · rintro ⟨t, a | b, k⟩
     · rw [colSubst_X_xVar, xForm_apply]
-      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite C]
+      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul]
     · rw [colSubst_X_yVar, yForm_apply]
-      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite C]
+      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul]
   · rintro ⟨t, a | b, k⟩
     · rw [colSubst_X_xVar, xForm_apply]
-      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite C, apply_ite star]
+      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite star]
     · rw [colSubst_X_yVar, yForm_apply]
-      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite C, apply_ite star]
+      simp [Fintype.sum_prod_type, ite_and, smul_eq_C_mul, apply_ite star]
 
-theorem fockInner_colAct [DecidableEq κ] (g : T → GL κ ℂ) (P Q : Poly ℂ T p q κ) :
-    fockInner (colAct ℂ T p q κ g P) Q = fockInner P (colAct ℂ T p q κ (star g) Q) := by
+theorem fockInner_colAct [DecidableEq κ] (g : T → GL κ ℂ) (P Q : Poly ℂ T p q κ)
+    : fockInner (colAct ℂ T p q κ g P) Q = fockInner P (colAct ℂ T p q κ (star g) Q) := by
   rw [colAct_apply, colAct_apply, fockInner_colSubst]
   rfl
 
-theorem exists_fockInner_sub_eq_zero {σ : Type*} (W : Submodule ℂ (MvPolynomial σ ℂ))
-    [FiniteDimensional ℂ W] (P : MvPolynomial σ ℂ) :
-    ∃ Q ∈ W, ∀ w ∈ W, fockInner (P - Q) w = 0 := by
+theorem exists_fockInner_sub_eq_zero
+    {σ : Type*} (W : Submodule ℂ (MvPolynomial σ ℂ)) [FiniteDimensional ℂ W] (P : MvPolynomial σ ℂ)
+    : ∃ Q ∈ W, ∀ w ∈ W, fockInner (P - Q) w = 0 := by
   let b := Module.finBasis ℂ W
   let L : MvPolynomial σ ℂ →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) :=
     LinearMap.pi fun i => (fockInnerₛₗ σ ℂ).flip (b i)
@@ -164,13 +174,14 @@ theorem exists_fockInner_sub_eq_zero {σ : Type*} (W : Submodule ℂ (MvPolynomi
     rw [map_smul, fockInnerₛₗ_apply, fockInner_smul_right]
     exact mul_eq_zero_of_right _ (congrFun h i)
   have hinj : Function.Injective (L ∘ₗ W.subtype) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     have := hL x hx x x.2
     rw [fockInner_self] at this
     exact Subtype.ext (fockNormSq_eq_zero.mp (RCLike.ofReal_eq_zero.mp this))
-  obtain ⟨x, hx⟩ := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).mp hinj
-    (L P)
+  obtain ⟨x, hx⟩ :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).mp hinj (L P)
   exact ⟨x, x.2, hL _ (by rw [map_sub, ← hx]; simp)⟩
 
 end Adjoint

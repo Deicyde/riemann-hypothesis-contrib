@@ -1,7 +1,7 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.UsedLocalConclusion
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeLaterClausesHoldStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeLaterClausesHold
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -51,7 +51,7 @@ theorem usedLocalConclusion_and_prvE
         ∧ DeltaInvariantLattices.ConclusionE D HW F := by
   intro D HW F Cm
   obtain ⟨p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, c2, a, b, c, d, l3, hE⟩ :=
-    GlobalTheory.T.wachLattice_laterClauses_hold D HW F Cm
+    _root_.GlobalTheory.NL.wach_used_clauses D HW F Cm
   refine ⟨
     ⟨
       fun l _ K s LL g => ⟨

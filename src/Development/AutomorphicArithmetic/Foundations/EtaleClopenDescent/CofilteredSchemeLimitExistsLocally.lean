@@ -52,14 +52,16 @@ namespace UpperTheory.Cb.GluingProjections
 
 variable {J : Type} [SmallCategory J] (D : J ⥤ Scheme.{0}) (j₀ : J)
 
-private def res {V U : (D.obj j₀).Opens} (h : V ≤ U) : opensDiagram D j₀ V ⟶ opensDiagram D j₀ U where
+private def res {V U : (D.obj j₀).Opens} (h : V ≤ U)
+    : opensDiagram D j₀ V ⟶ opensDiagram D j₀ U where
   app j := Scheme.homOfLE _ (Scheme.Hom.preimage_mono _ h)
   naturality j k f := by
     dsimp only [opensDiagram]
     rw [← cancel_mono (Scheme.Opens.ι _)]
     simp
 
-private def q (U : (D.obj j₀).Opens) : opensDiagram D j₀ U ⟶ (Functor.const _).obj (U : Scheme) where
+private def q (U : (D.obj j₀).Opens)
+    : opensDiagram D j₀ U ⟶ (Functor.const _).obj (U : Scheme) where
   app j := D.map j.hom ∣_ U
   naturality j k f := by
     dsimp only [opensDiagram]
@@ -157,7 +159,8 @@ private def P : (D.obj j₀).directedAffineCover.I₀ ⥤ Scheme.{0} where
     simp
 
 private def pr : P D j₀ ⟶ (D.obj j₀).directedAffineCover.functorOfLocallyDirected where
-  app U := limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) (T j₀) ≫ (q D j₀ (coverOpen D j₀ U)).app (T j₀)
+  app U :=
+    limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) (T j₀) ≫ (q D j₀ (coverOpen D j₀ U)).app (T j₀)
   naturality {_U _V} f := (isPullback_limMap D j₀ (coverOpen_le D j₀ f)).w
 
 private def gd : (D.obj j₀).directedAffineCover.RelativeGluingData where
@@ -166,20 +169,23 @@ private def gd : (D.obj j₀).directedAffineCover.RelativeGluingData where
   equifibered {_U _V} f := isPullback_limMap D j₀ (coverOpen_le D j₀ f)
 
 private def glπ (j : Over j₀) : (gd D j₀).glued ⟶ D.obj j.left :=
-  colimit.desc (gd D j₀).functor
-    { pt := D.obj j.left
-      ι :=
-        { app U := limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j ≫
-            (opensDiagramι D j₀ (coverOpen D j₀ U)).app j
-          naturality {U V} f := by
-            have h1 : (res D j₀ (coverOpen_le D j₀ f)).app j ≫
-                (opensDiagramι D j₀ (coverOpen D j₀ V)).app j =
-                (opensDiagramι D j₀ (coverOpen D j₀ U)).app j :=
-              Scheme.homOfLE_ι (D.obj j.left) (Scheme.Hom.preimage_mono _ (coverOpen_le D j₀ f))
-            exact (limMap_π_assoc (res D j₀ (coverOpen_le D j₀ f)) j
-              ((opensDiagramι D j₀ (coverOpen D j₀ V)).app j)).trans
-              ((congrArg (limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j ≫ ·) h1).trans
-                (Category.comp_id _).symm) } }
+  colimit.desc (gd D j₀).functor {
+    pt := D.obj j.left
+    ι := {
+      app U :=
+        limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j
+          ≫ (opensDiagramι D j₀ (coverOpen D j₀ U)).app j
+      naturality {U V} f := by
+        have h1
+            : (res D j₀ (coverOpen_le D j₀ f)).app j ≫ (opensDiagramι D j₀ (coverOpen D j₀ V)).app j
+              = (opensDiagramι D j₀ (coverOpen D j₀ U)).app j :=
+          Scheme.homOfLE_ι (D.obj j.left) (Scheme.Hom.preimage_mono _ (coverOpen_le D j₀ f))
+        exact (limMap_π_assoc (res D j₀ (coverOpen_le D j₀ f)) j
+            ((opensDiagramι D j₀ (coverOpen D j₀ V)).app j)).trans
+          ((congrArg (limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j ≫ ·) h1).trans
+            (Category.comp_id _).symm)
+    }
+  }
 
 private lemma ι_glπ (U : (D.obj j₀).directedAffineCover.I₀) (j : Over j₀) :
     colimit.ι (gd D j₀).functor U ≫ glπ D j₀ j =
@@ -200,16 +206,17 @@ private lemma gluing_projection_T_eq_base : glπ D j₀ (T j₀) = (gd D j₀).t
 
 private def glCone : Cone (Over.forget j₀ ⋙ D) where
   pt := (gd D j₀).glued
-  π :=
-    { app j := glπ D j₀ j
-      naturality j k f := by
-        refine colimit.hom_ext fun U => ?_
-        change colimit.ι (gd D j₀).functor U ≫ 𝟙 _ ≫ glπ D j₀ k =
-          colimit.ι (gd D j₀).functor U ≫ glπ D j₀ j ≫ D.map f.left
-        rw [Category.id_comp, ι_glπ, reassoc_of% (ι_glπ D j₀ U j)]
-        have := (opensDiagramι D j₀ (coverOpen D j₀ U)).naturality f
-        rw [← limit.w (opensDiagram D j₀ (coverOpen D j₀ U)) f, Category.assoc]
-        exact congrArg (limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j ≫ ·) this }
+  π := {
+    app j := glπ D j₀ j
+    naturality j k f := by
+      refine colimit.hom_ext fun U => ?_
+      change colimit.ι (gd D j₀).functor U ≫ 𝟙 _ ≫ glπ D j₀ k
+        = colimit.ι (gd D j₀).functor U ≫ glπ D j₀ j ≫ D.map f.left
+      rw [Category.id_comp, ι_glπ, reassoc_of% (ι_glπ D j₀ U j)]
+      have := (opensDiagramι D j₀ (coverOpen D j₀ U)).naturality f
+      rw [← limit.w (opensDiagram D j₀ (coverOpen D j₀ U)) f, Category.assoc]
+      exact congrArg (limit.π (opensDiagram D j₀ (coverOpen D j₀ U)) j ≫ ·) this
+  }
 
 private lemma gl_local_ext {Z : Scheme.{0}} (U : (D.obj j₀).directedAffineCover.I₀)
     (a b : Z ⟶ (gd D j₀).glued) (c : Z ⟶ (D.obj j₀).directedAffineCover.X U)
@@ -262,12 +269,12 @@ omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j�
 private lemma s_w (j : Over j₀) : s.π.app j ≫ D.map j.hom = sT D j₀ s :=
   s.w (Over.homMk j.hom : j ⟶ T j₀)
 
-private def leg (U : (D.obj j₀).Opens) (j : Over j₀) :
-    pullback (sT D j₀ s) U.ι ⟶ (opensDiagram D j₀ U).obj j :=
+private def leg (U : (D.obj j₀).Opens) (j : Over j₀)
+    : pullback (sT D j₀ s) U.ι ⟶ (opensDiagram D j₀ U).obj j :=
   (isPullback_morphismRestrict (D.map j.hom) U).lift (pullback.snd _ _)
     (pullback.fst _ _ ≫ s.π.app j)
-    (pullback.condition.symm.trans
-      ((Category.assoc _ _ _).trans (congrArg (pullback.fst _ _ ≫ ·) (s_w D j₀ s j))).symm)
+    (pullback.condition.symm.trans ((Category.assoc _ _ _).trans
+      (congrArg (pullback.fst _ _ ≫ ·) (s_w D j₀ s j))).symm)
 
 omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1)] in
 private lemma leg_ι (U : (D.obj j₀).Opens) (j : Over j₀) :
@@ -277,23 +284,25 @@ private lemma leg_ι (U : (D.obj j₀).Opens) (j : Over j₀) :
 
 private def legCone (U : (D.obj j₀).Opens) : Cone (opensDiagram D j₀ U) where
   pt := pullback (sT D j₀ s) U.ι
-  π :=
-    { app j := leg D j₀ s U j
-      naturality j k f := by
-        rw [← cancel_mono ((opensDiagramι D j₀ U).app k)]
-        have h1 := (opensDiagramι D j₀ U).naturality f
-        have h2 := s.w f
-        simp only [Functor.const_obj_map, Category.assoc, h1, leg_ι]
-        rw [reassoc_of% (leg_ι D j₀ s U j), h2]
-        exact Category.id_comp _ }
+  π := {
+    app j := leg D j₀ s U j
+    naturality j k f := by
+      rw [← cancel_mono ((opensDiagramι D j₀ U).app k)]
+      have h1 := (opensDiagramι D j₀ U).naturality f
+      have h2 := s.w f
+      simp only [Functor.const_obj_map, Category.assoc, h1, leg_ι]
+      rw [reassoc_of% (leg_ι D j₀ s U j), h2]
+      exact Category.id_comp _
+  }
 
-private def pullOpen (U : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).I₀) :
-    (D.obj j₀).directedAffineCover.I₀ := U
+private def pullOpen (U : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).I₀)
+    : (D.obj j₀).directedAffineCover.I₀ :=
+  U
 
-private def locLift (U : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).I₀) :
-    ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).X U ⟶ (gd D j₀).glued :=
-  limit.lift _ (legCone D j₀ s (coverOpen D j₀ (pullOpen D j₀ s U))) ≫
-    colimit.ι (gd D j₀).functor (pullOpen D j₀ s U)
+private def locLift (U : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).I₀)
+    : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).X U ⟶ (gd D j₀).glued :=
+  limit.lift _ (legCone D j₀ s (coverOpen D j₀ (pullOpen D j₀ s U)))
+    ≫ colimit.ι (gd D j₀).functor (pullOpen D j₀ s U)
 
 private lemma locLift_glπ (U : ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)).I₀) (j : Over j₀) :
     locLift D j₀ s U ≫ glπ D j₀ j =
@@ -304,7 +313,8 @@ private lemma locLift_glπ (U : ((D.obj j₀).directedAffineCover.pullback₁ (s
 
 private def glLift : s.pt ⟶ (gd D j₀).glued :=
   Scheme.Cover.glueMorphisms ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s))
-    (fun U => locLift D j₀ s U) (fun U V => by
+    (fun U => locLift D j₀ s U)
+    (fun U V => by
       refine gl_hom_ext D j₀ _ _ fun j => ?_
       rw [Category.assoc, Category.assoc, locLift_glπ, locLift_glπ]
       exact (Category.assoc _ _ _).symm.trans
@@ -320,18 +330,23 @@ end Lift
 private def isLimitGlCone : IsLimit (glCone D j₀) where
   lift s := glLift D j₀ s
   fac s j := glLift_glπ D j₀ s j
-  uniq s m hm := gl_hom_ext D j₀ _ _ fun j => by
-    rw [glLift_glπ]
-    exact hm j
+  uniq s m hm :=
+    gl_hom_ext D j₀ _ _ fun j => by
+      rw [glLift_glπ]
+      exact hm j
 
 end Glue
 
 end UpperTheory.Cb.GluingProjections
 
-theorem UpperTheory.Cb.cofiltered_scheme_limit_exists_locally :
-    LateralTheory.E.BuildCut.LimInt → LateralTheory.E.t_E2Cut.Cont → LateralTheory.E.t_E2Cut.MV → LateralTheory.E.HasLimPf.Loc := by
+theorem UpperTheory.Cb.cofiltered_scheme_limit_exists_locally
+    : LateralTheory.E.BuildCut.LimInt → LateralTheory.E.t_E2Cut.Cont → LateralTheory.E.t_E2Cut.MV
+      → LateralTheory.E.HasLimPf.Loc := by
   intro _ _ _ J _ _ D j₀ _ hlim
   letI : ∀ U : (D.obj j₀).directedAffineCover.I₀,
       HasLimit (opensDiagram D j₀ U.1) :=
     fun U => hlim U.1 U.2
-  exact ⟨⟨⟨UpperTheory.Cb.GluingProjections.glCone D j₀, UpperTheory.Cb.GluingProjections.isLimitGlCone D j₀⟩⟩⟩
+  exact ⟨⟨⟨
+    UpperTheory.Cb.GluingProjections.glCone D j₀,
+    UpperTheory.Cb.GluingProjections.isLimitGlCone D j₀
+  ⟩⟩⟩

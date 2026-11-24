@@ -1,9 +1,10 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompactAdeleRingModNumberField
 public import Mathlib.NumberTheory.NumberField.AdeleRing
 public import Formalism.LocalToGlobal.GlobalTheory.GL1.CompactFixesLattice.ExistsDenOfIsCompactAdele
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.IntAdCpctOpen
+public import Formalism.LocalToGlobal.AdelicCompactOpens.IntAdelesCompactOpen
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdicIntegersCompact.IsCompactAdicCompletionIntegers
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompactAdeleRingModNumberField
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -57,13 +58,11 @@ namespace Formalism.IndefR.Eqv.G5
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem adl_exists_place_ge_one (r : 𝓞 F) (hr : r ≠ 0) :
-    ∃ w : InfinitePlace F, 1 ≤ w (r : F) := by
+theorem adl_exists_place_ge_one (r : 𝓞 F) (hr : r ≠ 0) : ∃ w : InfinitePlace F, 1 ≤ w (r : F) := by
   classical
   by_contra h
   push_neg at h
-  have hnn : ∀ w : InfinitePlace F, 0 ≤ w (r : F) := fun w => by
-    first | positivity | exact w.nonneg _ | exact InfinitePlace.nonneg w _
+  have hnn : ∀ w : InfinitePlace F, 0 ≤ w (r : F) := fun w => by first | positivity
   have hN : (1 : ℝ) ≤ ((|Algebra.norm ℚ (r : F)| : ℚ) : ℝ) := by
     rw [← Algebra.coe_norm_int]
     have hz : Algebra.norm ℤ r ≠ 0 := Algebra.norm_ne_zero_iff.mpr hr
@@ -80,14 +79,15 @@ theorem adl_exists_place_ge_one (r : 𝓞 F) (hr : r ≠ 0) :
 
 open scoped AdeleRing
 
-
 variable (F) in
 def adlNbhd (F : Type) [Field F] [NumberField F] : Set (AdeleRing (𝓞 F) F) :=
   {x | (∀ w, ‖x.1 w‖ < 1) ∧ ∀ v, x.2 v ∈ v.adicCompletionIntegers F}
 
 theorem adl_isOpen_nbhd : IsOpen (adlNbhd F) := by
   have h1 : IsOpen {y : InfiniteAdeleRing F | ∀ w, ‖y w‖ < 1} := by
-    have e : {y : InfiniteAdeleRing F | ∀ w, ‖y w‖ < 1} = Set.pi Set.univ (fun _ => Metric.ball 0 1) := by
+    have e
+        : {y : InfiniteAdeleRing F | ∀ w, ‖y w‖ < 1}
+          = Set.pi Set.univ (fun _ => Metric.ball 0 1) := by
       ext y
       constructor
       · intro h w _
@@ -99,11 +99,7 @@ theorem adl_isOpen_nbhd : IsOpen (adlNbhd F) := by
   have h2 : IsOpen {y : FiniteAdeleRing (𝓞 F) F | ∀ v, y v ∈ v.adicCompletionIntegers F} := by
     apply RestrictedProduct.isOpen_forall_mem
     intro v
-    first
-      | exact IsDedekindDomain.HeightOneSpectrum.isOpen_adicCompletionIntegers F v
-      | exact v.isOpen_adicCompletionIntegers F
-      | exact Valued.isOpen_integer _
-      | exact Valued.integer_isOpen _
+    first | exact Valued.isOpen_integer _
   exact h1.prod h2
 
 theorem adl_zero_mem_nbhd : (0 : AdeleRing (𝓞 F) F) ∈ adlNbhd F := by
@@ -111,14 +107,15 @@ theorem adl_zero_mem_nbhd : (0 : AdeleRing (𝓞 F) F) ∈ adlNbhd F := by
   · have h0 : (0 : AdeleRing (𝓞 F) F).1 w = 0 := rfl
     rw [h0, norm_zero]
     exact one_pos
-  · first | exact zero_mem _ | simp
+  · first | exact zero_mem _
 
-theorem adl_norm_algebraMap (x : F) (w : InfinitePlace F) :
-    ‖(algebraMap F (InfiniteAdeleRing F) x) w‖ = w x := by
+theorem adl_norm_algebraMap (x : F) (w : InfinitePlace F)
+    : ‖(algebraMap F (InfiniteAdeleRing F) x) w‖ = w x := by
   rw [InfiniteAdeleRing.algebraMap_apply]
   exact AbsoluteValue.Completion.norm_coe (WithAbs.toAbs w.1 x)
 
-theorem adl_eq_zero_of_mem_nbhd (a : F) (ha : algebraMap F (AdeleRing (𝓞 F) F) a ∈ adlNbhd F) : a = 0 := by
+theorem adl_eq_zero_of_mem_nbhd (a : F) (ha : algebraMap F (AdeleRing (𝓞 F) F) a ∈ adlNbhd F)
+    : a = 0 := by
   obtain ⟨hinf, hfin⟩ := ha
   obtain ⟨r, hr⟩ : ∃ r : 𝓞 F, algebraMap (𝓞 F) F r = a := by
     apply IsDedekindDomain.HeightOneSpectrum.mem_integers_of_valuation_le_one
@@ -135,30 +132,40 @@ theorem adl_eq_zero_of_mem_nbhd (a : F) (ha : algebraMap F (AdeleRing (𝓞 F) F
     rw [← hr, map_zero]
   obtain ⟨w, hw⟩ := adl_exists_place_ge_one r hr0
   have h1 := hinf w
-  have e1 : (algebraMap F (AdeleRing (𝓞 F) F) a).1 w = (algebraMap F (InfiniteAdeleRing F) a) w := rfl
+  have e1 : (algebraMap F (AdeleRing (𝓞 F) F) a).1 w = (algebraMap F (InfiniteAdeleRing F) a) w :=
+    rfl
   rw [e1, adl_norm_algebraMap, ← hr] at h1
   have h2 : w (r : F) < 1 := h1
   linarith
 
-theorem adl_inf_cocompact : ∃ C : Set (InfiniteAdeleRing F), IsCompact C ∧
-    ∀ y, ∃ r : 𝓞 F, y - algebraMap F _ (r : F) ∈ C := by
+theorem adl_inf_cocompact
+    : ∃ C : Set (InfiniteAdeleRing F),
+      IsCompact C ∧ ∀ y, ∃ r : 𝓞 F, y - algebraMap F _ (r : F) ∈ C := by
   apply GlobalTheory.AdeleCocompact.exists_compact_infinite <;> assumption
 
-theorem adl_cocompact : ∃ K : Set (AdeleRing (𝓞 F) F), IsCompact K ∧
-    ∀ x, ∃ a : F, x - algebraMap F _ a ∈ K := by
+theorem adl_cocompact
+    : ∃ K : Set (AdeleRing (𝓞 F) F), IsCompact K ∧ ∀ x, ∃ a : F, x - algebraMap F _ a ∈ K := by
   obtain ⟨C, hC, hCy⟩ := adl_inf_cocompact (F := F)
-  refine ⟨C ×ˢ {x : FiniteAdeleRing (𝓞 F) F | ∀ v, x v ∈ v.adicCompletionIntegers F},
-    hC.prod (finiteAdeleIntegers_compactOpen F).2, fun x => ?_⟩
-  obtain ⟨u, hu⟩ := Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.exists_sub_mem_intAd x.2
+  refine ⟨
+    C ×ˢ {x : FiniteAdeleRing (𝓞 F) F | ∀ v, x v ∈ v.adicCompletionIntegers F},
+    hC.prod (_root_.PI.IntAdCpctOpenWork.main F).2,
+    fun x => ?_
+  ⟩
+  obtain ⟨u, hu⟩ :=
+    Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.exists_sub_mem_intAd
+      x.2
   obtain ⟨r, hr⟩ := hCy (x.1 - algebraMap F _ u)
   refine ⟨u + r, ?_, ?_⟩
   · show x.1 - algebraMap F (InfiniteAdeleRing F) (u + r) ∈ C
     rw [map_add (f := _), ← sub_sub]
     exact hr
-  · have : x.2 - algebraMap F (FiniteAdeleRing (𝓞 F) F) (u + r) =
-        (x.2 - algebraMap F _ u) - algebraMap F _ (r : F) := by rw [map_add (f := _), sub_sub]
+  · have : x.2 - algebraMap F (FiniteAdeleRing (𝓞 F) F) (u + r)
+        = (x.2 - algebraMap F _ u) - algebraMap F _ (r : F) := by
+      rw [map_add (f := _), sub_sub]
     show ∀ v, (x.2 - algebraMap F (FiniteAdeleRing (𝓞 F) F) (u + r)) v ∈ _
     rw [this]
-    exact sub_mem hu (Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.algebraMap_mem_intAd r)
+    exact sub_mem hu
+      (Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.algebraMap_mem_intAd
+        r)
 
 end Formalism.IndefR.Eqv.G5

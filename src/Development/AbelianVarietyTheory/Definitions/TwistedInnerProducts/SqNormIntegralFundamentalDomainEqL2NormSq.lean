@@ -614,7 +614,6 @@ theorem l2O_om_apply_eq_of_isThetaFunO
     (p : GA D V × GA D W)
     : l2O μ 𝓕 (om p f) = l2O μ 𝓕 f :=
   (ENNReal.pow_right_strictMono two_ne_zero).injective (by
-    beta_reduce
     rw [l2O_sq_eq_lintegral μ 𝓕 _ (hom.om_pres p f h).cont, l2O_sq_eq_lintegral μ 𝓕 f h.cont,
       hom.om_unit μ 𝓕 hμ h𝓕 p f h])
 

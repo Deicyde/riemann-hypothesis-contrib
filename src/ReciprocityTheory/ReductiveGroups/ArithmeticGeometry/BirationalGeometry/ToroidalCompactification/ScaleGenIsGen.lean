@@ -69,11 +69,7 @@ theorem gm_scaleGen
       : X.presheaf.map (homOfLE (le_top : M.U i ≤ ⊤)).op ≫ r.app (M.U i)
           ≫ Z.presheaf.germ (r ⁻¹ᵁ M.U i) z h
         = r.app ⊤ ≫ Z.presheaf.germ (r ⁻¹ᵁ ⊤) z hT := by
-    first
-    | (rw [Scheme.Hom.naturality_assoc]; congr 1; exact TopCat.Presheaf.germ_res _ _ _ _)
-    | (simp only [Scheme.Hom.naturality_assoc]; congr 1; exact TopCat.Presheaf.germ_res _ _ _ _)
-    | (simp [Scheme.Hom.naturality_assoc]; congr 1; exact TopCat.Presheaf.germ_res _ _ _ _)
-    | (simp [Scheme.Hom.naturality_assoc]; erw [TopCat.Presheaf.germ_res]; rfl)
+    first | (rw [Scheme.Hom.naturality_assoc]; congr 1; exact TopCat.Presheaf.germ_res _ _ _ _)
   have key : gm r z (M.U i) (res le_top c) = gm r z ⊤ c := by
     unfold gm
     rw [dite_eq_left h, dite_eq_left hT]

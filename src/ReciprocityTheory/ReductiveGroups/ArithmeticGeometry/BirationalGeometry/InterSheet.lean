@@ -164,7 +164,7 @@ theorem density_eq
   simp only [maDensity, hj]
 
 theorem sheet_analyticAt
-    (hA : OsgoodStatement)
+    (hA : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement)
     {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {y : Fin e → ℂ}
     {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} (h : IsSheet P Ψ y w γ)
     : AnalyticAt ℂ γ y := by
@@ -174,7 +174,8 @@ theorem sheet_analyticAt
   exact
     hA e U _ hUo (fun y' hy' => (differentiableAt_pi.mp (hU hy') p).differentiableWithinAt) y hyU
 
-theorem sheetIndep_of (hA : OsgoodStatement) (hfib : FibreFiniteStatement)
+theorem sheetIndep_of
+    (hA : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement) (hfib : FibreFiniteStatement)
     : SheetIndepStatement := by
   intro K _ ι _ P e Ψ L A s hvar hgood hL _ hs
   have hbad := badSet_null hA (hfib K ι P e Ψ hvar hgood)

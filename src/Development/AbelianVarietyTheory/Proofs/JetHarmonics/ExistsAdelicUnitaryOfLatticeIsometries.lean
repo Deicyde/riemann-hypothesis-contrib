@@ -3,9 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FormPlus
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
 public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUnitaryExistsWithPrescribedPartsStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.EquivariantFiniteGroup
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUnitaryExistsWithPrescribedParts
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ComponentAttainedAtBaseFrame
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.NegIndexTransposeOfHasSignature
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 import Formalism.LocalRingCardinality.ConjSqrtMinusD
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -43,7 +45,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 
 @[expose] public section
 
@@ -124,7 +125,7 @@ theorem exists_adelic_of_isometry
         have := s.mult n hn a a'
         rwa [hν, one_mul] at this)
   obtain ⟨u, -, hug⟩ :=
-    (GlobalTheory.T.adelicUnitary_exists_with_prescribed_parts D V).1 gf
+    (_root_.GlobalTheory.UnitaryGlue.adelic_glue D V).1 gf
       (comp_mem_HR _ _ _ c _ (fun _ => rfl) _ gf hg3)
   have h1
       : (latGHat V 1 : Set (Fin V.rank → AdLat.RA D.host.F D.host.E))

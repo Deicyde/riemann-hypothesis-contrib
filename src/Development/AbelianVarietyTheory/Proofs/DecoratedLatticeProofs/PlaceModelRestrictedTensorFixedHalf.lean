@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.LatticeFrames.JointSmooth
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.NotMemSpanOfCommute
 
 @[expose] public section
 
@@ -57,19 +58,13 @@ namespace GlobalTheory.FinPl.PutIn.Factor
 
 variable {D : D7}
 
-theorem half_nsmul {m n : ℕ} {e : AE D} {x : Mx D m n} (hx : IsHalf e x) (k : ℕ)
-    : IsHalf e (k • x) := fun i j => by
-  have h := hx i j
-  simp only [Matrix.smul_apply, nsmul_eq_mul]
-  linear_combination (k : AE D) * h
-
 theorem isSBHalf_of_half_eq
     {S T : HSp D} {b : AE D} {Λ Λ' : AddSubgroup (WO S T)} {Ψ : WO S T → ℂ}
     (hΛ : ∀ t, IsHalf b t → (t ∈ Λ' ↔ t ∈ Λ)) (hΨ : IsSBHalf b Λ' Ψ)
     : IsSBHalf b Λ Ψ := by
   obtain ⟨hsupp, k, hk, hinv, hfin⟩ := hΨ
   refine ⟨hsupp, k, hk, fun u hu hub t => hinv u ((hΛ u hub).2 hu) hub t, fun t ht => ?_⟩
-  exact (hΛ _ (half_nsmul (hsupp t ht) k)).1 (hfin t ht)
+  exact (hΛ _ (_root_.GlobalTheory.SplitScalar.isHalf_nsmul (hsupp t ht) k)).1 (hfin t ht)
 
 theorem half_smul_self {m n : ℕ} {b : AE D} {x : Mx D m n} (hx : IsHalf b x) : b • x = x := by
   ext i j; exact hx i j
@@ -111,8 +106,10 @@ theorem isSBHalf_tens
       ext i j
       simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, nsmul_eq_mul, Nat.cast_mul]
       ring
-    rw [tens_apply, tens_apply, hA, hB, iΦ _ (AddSubgroup.nsmul_mem Λ hsub kΨ) (half_nsmul hau kΨ),
-      iΨ _ (AddSubgroup.nsmul_mem Λ hbu kΦ) (half_nsmul (half_of_idem hb u) kΦ)]
+    rw [tens_apply, tens_apply, hA, hB,
+      iΦ _ (AddSubgroup.nsmul_mem Λ hsub kΨ) (_root_.GlobalTheory.SplitScalar.isHalf_nsmul hau kΨ),
+      iΨ _ (AddSubgroup.nsmul_mem Λ hbu kΦ)
+        (_root_.GlobalTheory.SplitScalar.isHalf_nsmul (half_of_idem hb u) kΦ)]
   · obtain ⟨h1, h2⟩ := hne t ht
     have hC : (kΦ * kΨ) • t = kΨ • (kΦ • (t - b • t)) + kΦ • (kΨ • (b • t)) := by
       ext i j

@@ -63,7 +63,7 @@ theorem entry (n : ℕ) (w : Fin n → k) (a b : Fin (n + 1))
   rfl
 
 theorem ePG_true_eq (i t : ℕ) (b : Fin t) : ePG i t ⟨true, b⟩ = Fin.castSucc (Fin.natAdd i b) := by
-  first | rfl | (ext; simp [GlobalTheory.BZMir.Leib.ePG])
+  first | rfl
 
 theorem ePG_false_eq (i t : ℕ) (a : Fin i)
     : ePG i t ⟨false, Fin.castSucc a⟩ = Fin.castSucc (Fin.castAdd t a) := by

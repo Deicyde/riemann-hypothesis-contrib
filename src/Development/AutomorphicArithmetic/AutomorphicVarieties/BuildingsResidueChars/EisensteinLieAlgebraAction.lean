@@ -61,7 +61,7 @@ private theorem complex_linear_combination_eq_half_of_relations
   linear_combination (norm := skip) (a - Complex.I * b) * hE
     + (-κ/2) * (Complex.I * d - c) * h1 + (-κ/2) * (a - Complex.I * b) * h2
   ring_nf
-  simp only [Complex.I_sq, Complex.I_pow_four]
+  simp only [Complex.I_sq]
   ring_nf
 
 theorem UpperTheory.eisenstein_lie_algebra_action : UpperTheory.V.Sd.Eis.LieAlg := by

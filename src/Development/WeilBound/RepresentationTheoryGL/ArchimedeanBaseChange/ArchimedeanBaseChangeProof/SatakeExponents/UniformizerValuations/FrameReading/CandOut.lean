@@ -52,8 +52,6 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
   PositivityTheory.Rg.BcB.F.RS
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F
 
 attribute [local instance]

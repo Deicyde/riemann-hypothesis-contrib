@@ -78,13 +78,6 @@ theorem tan_push (w : epsR S ⟶ G')
     show (toUnit T ≫ η[H]).left = _
     rw [Over.comp_left]
     congr 1
-    all_goals
-      first
-      | simpa using Over.w (toUnit T)
-      | (
-          have e := Over.w (toUnit T)
-          rwa [show (𝟙_ (Over Y)).hom = 𝟙 Y from rfl, Category.comp_id] at e
-        )
   have hmul
       : ∀ {T : Over (Sp S)} (a b : T ⟶ G'),
         pushPt h.1.w (a * b) = pushPt h.1.w a * pushPt h.1.w b := fun {T} a b =>
@@ -102,9 +95,6 @@ theorem tan_push (w : epsR S ⟶ G')
     simp only [epsR, Over.mk_hom, Geo.Tor.spMap, ← Spec.map_comp]
     rw [← Spec.map_id]
     congr 1
-    all_goals
-      ext r
-      first | (simp [TrivSqZeroExt.algebraMap_eq_inl]; done) | (simp; done)
   let t : Over.mk (𝟙 (Sp S)) ⟶ epsR S :=
     Over.homMk (Geo.Tor.spMap (TrivSqZeroExt.fstHom S S S).toRingHom) hfa
   rw [oneL]
@@ -155,7 +145,7 @@ theorem comb_push {n : ℕ} (c : Fin n → S) (v : Fin n → (epsR S ⟶ G')) (w
       intro i
       simp only [epsR, Over.mk_hom, Geo.Tor.spMap, ← Spec.map_comp]
       congr 1
-      ext r <;> first | simp [epsScaleR] | simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
+      ext r <;> first | simp [epsScaleR]
     let u' : Fin n → (epsR S ⟶ G') := fun i =>
       Over.homMk (Geo.Tor.spMap (epsScaleR (c i)) ≫ (v i).left)
         (by rw [Category.assoc, Over.w (v i)]; exact hs i)
@@ -181,15 +171,11 @@ theorem comb_baseChange
     intro s
     simp only [epsR, Over.mk_hom, Geo.Tor.spMap, ← Spec.map_comp]
     congr 1
-    ext r <;> first | simp [epsScaleR] | simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
+    ext r <;> first | simp [epsScaleR]
   have hd : Geo.Tor.spMap (dualMapR f) ≫ (epsR R).hom = (epsR S).hom ≫ Geo.Tor.spMap f := by
     simp only [epsR, Over.mk_hom, Geo.Tor.spMap, ← Spec.map_comp]
     congr 1
-    ext r <;> first
-      | (simp [dualMapR, TrivSqZeroExt.algebraMap_eq_inl]; done)
-      | (simp [dualMapR]; done)
-      | simp [dualMapR, TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.fst_inl,
-          TrivSqZeroExt.snd_inl]
+    ext r <;> first | (simp [dualMapR, TrivSqZeroExt.algebraMap_eq_inl]; done)
   have hcomm
       : ∀ i,
         Geo.Tor.spMap (dualMapR f) ≫ Geo.Tor.spMap (epsScaleR (c i))
@@ -199,10 +185,9 @@ theorem comb_baseChange
     congr 1
     ext a <;> first
       | (simp [dualMapR, epsScaleR]; done)
-      | (simp [dualMapR, epsScaleR, smul_eq_mul, map_mul]; done)
-      | (simp [dualMapR, epsScaleR, smul_eq_mul, map_mul, mul_comm]; done)
-      | (simp [dualMapR, epsScaleR, smul_eq_mul, map_mul, TrivSqZeroExt.algebraMap_eq_inl]; done)
-      | (simp [dualMapR, epsScaleR, smul_eq_mul, TrivSqZeroExt.algebraMap_eq_inl]; clear * -; done)
+      | (simp [dualMapR, epsScaleR, smul_eq_mul]; done)
+      | (simp [dualMapR, epsScaleR, smul_eq_mul, mul_comm]; done)
+      | (simp [dualMapR, epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]; done)
   let d : Over.mk ((epsR S).hom ≫ Geo.Tor.spMap f) ⟶ epsR R :=
     Over.homMk (Geo.Tor.spMap (dualMapR f)) hd
   have cm : ∀ a b : epsR R ⟶ G₀, d ≫ (a * b) = (d ≫ a) * (d ≫ b) := fun a b => by
@@ -257,13 +242,6 @@ theorem eq_of_comb_single
     show (toUnit T ≫ η[H]).left = _
     rw [Over.comp_left]
     congr 1
-    all_goals
-      first
-      | simpa using Over.w (toUnit T)
-      | (
-          have e := Over.w (toUnit T)
-          rwa [show (𝟙_ (Over Y)).hom = 𝟙 Y from rfl, Category.comp_id] at e
-        )
   have single
       : ∀ {m : ℕ} (a : Fin m → (epsR S ⟶ G')) (k : Fin m),
         (∀ i, i ≠ k → a i = 1) → (List.ofFn a).prod = a k := by
@@ -287,22 +265,12 @@ theorem eq_of_comb_single
         = (epsR S).hom ≫ Geo.Tor.spMap (TrivSqZeroExt.fstHom S S S).toRingHom := by
     simp only [epsR, Over.mk_hom, Geo.Tor.spMap, ← Spec.map_comp]
     congr 1
-    all_goals
-      (
-        ext r <;> first
-          | (simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]; done)
-          | (simp [epsScaleR]; done)
-      )
+    all_goals (ext r <;> first | (simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]; done))
   have h1 : Geo.Tor.spMap (epsScaleR (1 : S)) = 𝟙 _ := by
     simp only [Geo.Tor.spMap]
     rw [← Spec.map_id]
     congr 1
-    all_goals
-      (
-        ext r <;> first
-          | (simp [epsScaleR]; done)
-          | (simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]; done)
-      )
+    all_goals (ext r <;> first | (simp [epsScaleR]; done))
   have hu1 : ∀ i, i ≠ j → u i = 1 := by
     intro i hi
     apply Over.OverMorphism.ext

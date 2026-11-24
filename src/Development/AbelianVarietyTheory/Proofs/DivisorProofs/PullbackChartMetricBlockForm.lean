@@ -109,7 +109,7 @@ theorem cHess_comp_apply
     have := Complex.conjCLE.differentiableAt.comp v ((hPa k a).restrictScalars ℝ)
     simpa [Function.comp_def] using this
   show wd n j (wdb n k (g ∘ F)) v = _
-  rw [wd_congr n j _ _ v (hwdb k),
+  rw [@wd_congr n j _ _ v (hwdb k),
     fc_wd_sum n j Finset.univ
       (fun a y => wdb d a g (F y) * (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a))
       v

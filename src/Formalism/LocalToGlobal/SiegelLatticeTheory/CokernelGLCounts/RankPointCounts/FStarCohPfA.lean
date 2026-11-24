@@ -121,13 +121,7 @@ theorem decomp
     {x : V} (hx : x ∈ Λ)
     : ∃ c : ι → E, (∀ j, c j ∈ M.L.O) ∧ ∀ i, H.h (x - ∑ j, c j • v j) (v i) = 0 := by
   obtain ⟨N, hNO, hNG⟩ := hN
-  have hGN : H.gram v * N = 1 := by
-    first
-    | exact mul_eq_one_comm.1 hNG
-    | (
-        rw [← Matrix.inv_eq_left_inv hNG]
-        exact Matrix.mul_nonsing_inv _ (Matrix.isUnit_det_of_left_inverse hNG)
-      )
+  have hGN : H.gram v * N = 1 := by first | exact mul_eq_one_comm.1 hNG
   refine ⟨N *ᵥ fun k => H.h x (v k), fun j => ?_, fun i => ?_⟩
   · show ∑ k, N j k * H.h x (v k) ∈ M.L.O
     exact sum_mem fun k _ => mul_mem (hNO j k) (hI x hx (v k) (hv k))
@@ -208,7 +202,6 @@ theorem f_mem_MMfam {r : ℕ} (t : Term V M r) (a : Fin (r + 1)) : t.f a ∈ Set
       generalize M.split = s
       cases s <;> rfl
     )
-  | (rcases hs : M.split with _ | g <;> simp [hs])
 
 theorem X_le_MMfam {r : ℕ} (t : Term V M r)
     : H.X t.f ≤ Submodule.span E (Set.range (H.MMfam t)) := by

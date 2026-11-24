@@ -203,7 +203,7 @@ theorem exists_dualBasis
         exact ihx.add ihz
       | smul c x hx ih =>
         have heq : p (c • x) = star (c : D.host.E) * p x := by
-          simp only [p, Pi.smul_apply, algebraMap_smul, star_mul', Finset.mul_sum]
+          simp only [p, Pi.smul_apply, Finset.mul_sum]
           apply Finset.sum_congr rfl
           intro i _
           apply Finset.sum_congr rfl
@@ -223,7 +223,7 @@ theorem exists_dualBasis
         have heq
             : (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
               = (b : 𝓞 D.host.E) • p x := by
-          simp only [p, Pi.smul_apply, algebraMap_smul, Algebra.smul_def, Finset.mul_sum]
+          simp only [p, Algebra.smul_def, Finset.mul_sum]
           apply Finset.sum_congr rfl
           intro i _
           apply Finset.sum_congr rfl
@@ -338,8 +338,8 @@ theorem exists_dualBasis
     rw [hc', h3, ← key, star_star]
   · have := congrFun (hid (Pi.single b 1)) a
     rw [Finset.sum_apply] at this
-    simp only [Pi.smul_apply, smul_eq_mul, hw, Pi.single_apply, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [hw, Pi.single_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
+        if_true]
       at this
     simp only [hs'row]
     rw [this]

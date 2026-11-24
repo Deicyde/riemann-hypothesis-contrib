@@ -48,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
   Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.cmFrame_jetPoints_are_exponential_jets
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l) [Algebra c.F ℂ] (y : FrPt Xo c ℂ) (g : ℕ)
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.cmFrame_jetPoints_are_exponential_jets
             Φ.toAnFr.JetMap m a.left Λ
               → Φ.toAnFr.JetMap m (a ≫ Xo.univ.t.act.act α).left (tyAct ty α ∘ₗ Λ))
           ∧ Φ.toAnFr.JetMap (n := 1) m (Φ.jx m).left (LinearMap.proj 0) := by
-  first
-  | exact @GlobalTheory.AnVal.jetPts_jetMap
-  | exact GlobalTheory.AnVal.jetPts_jetMap
-  | (intros; apply GlobalTheory.AnVal.jetPts_jetMap <;> assumption)
+  first | exact @GlobalTheory.AnVal.jetPts_jetMap

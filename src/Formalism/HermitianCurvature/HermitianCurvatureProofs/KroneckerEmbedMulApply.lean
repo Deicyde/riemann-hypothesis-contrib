@@ -116,7 +116,7 @@ theorem J_map
       try
         (
           ext x y
-          simp only [Matrix.neg_apply, Matrix.one_apply, Matrix.diagonal_apply, Matrix.smul_apply]
+          simp only [Matrix.neg_apply, Matrix.one_apply, Matrix.diagonal_apply]
           split_ifs <;> simp
         )
     )

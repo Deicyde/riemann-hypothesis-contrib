@@ -67,7 +67,4 @@ theorem _root_.GlobalTheory.T.exists_KFinite_iteratedCompactAverage_approx
                         ∧ GlobalTheory.Size.growthSob θ N.V d 0
                             (φ - GlobalTheory.CuspApproxAll.avgList θ N e l φ)
                           ≤ ENNReal.ofReal η := by
-  first
-  | exact @GlobalTheory.KAvgApprox.approx_avgList
-  | exact GlobalTheory.KAvgApprox.approx_avgList
-  | (intros; apply GlobalTheory.KAvgApprox.approx_avgList <;> assumption)
+  first | exact @GlobalTheory.KAvgApprox.approx_avgList

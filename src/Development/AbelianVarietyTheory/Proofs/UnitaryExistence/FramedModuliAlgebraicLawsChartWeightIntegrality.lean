@@ -2,9 +2,12 @@ module
 
 public import Formalism.LocalToGlobal.ProjectiveLattices.UnitIndepOfCharts
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ChartCoverFOfSectionBaseChangeStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRingStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IntegralLatticeStructureUniqueStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.FrameCharts
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ChartCoverFOfSectionBaseChange
+public import Formalism.LocalToGlobal.ProjectiveLattices.AllTest
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
+public import Formalism.LocalToGlobal.ProjectiveLattices.FrameProofs
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IntegralLatticeStructureUnique
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -68,9 +71,9 @@ theorem algebraic_laws
                   FrBor t y y' → evR Xo c f y' = wchar (ex Dw a n) t * evR Xo c f y := by
   intro hB E _ _ _ H Dw l Xo c
 
-  have hTest := GlobalTheory.T.framedPoint_reduced_from_testRing hB E H Dw l Xo c
-  have hCov := GlobalTheory.T.chartCoverF_of_sectionBaseChange hB E H Dw l Xo c
-  have hLat := GlobalTheory.T.integralLattice_structure_unique E H Dw l Xo c
+  have hTest := _root_.GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw l Xo c
+  have hCov := _root_.GlobalTheory.Frames.chartCoverF_of_secBaseChange hB E H Dw l Xo c
+  have hLat := _root_.GlobalTheory.Frames.intLatU_holds E H Dw l Xo c
   have hFr : FrChartF Xo c := frChartF_of hCov
   have hBor : BorChartF Xo c := borChartF_of_cover hCov
   refine ⟨

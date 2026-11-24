@@ -215,7 +215,7 @@ theorem degAt_X [DecidableEq ι] (v : ι × Fin n)
   by_cases ha : a = x
   · subst ha
     simp [multideg, Finsupp.single_apply, Prod.ext_iff]
-  · simp [multideg, Finsupp.single_apply, Prod.ext_iff, ha]
+  · simp [multideg, Prod.ext_iff, ha]
 
 theorem degAt_of_supported
     {P : MvPolynomial (ι × Fin n) R}
@@ -289,7 +289,7 @@ theorem ordDeg_prod
       have := congrArg Fin.val h.2
       simp only [Fin.coe_castAdd, Fin.coe_natAdd] at this
       omega
-    simp only [Finsupp.add_apply, Finset.sum_add_distrib, h1, Finset.sum_const_zero, zero_add]
+    simp only [Finsupp.add_apply, h1, zero_add]
     rw [← hG hx b0 hb0]
     exact Finset.sum_congr rfl fun c _ => Finsupp.mapDomain_apply_of_injective hi2 b0 (x, c)
   · have h1
@@ -302,7 +302,7 @@ theorem ordDeg_prod
       have := congrArg Fin.val h.2
       simp only [Fin.coe_castAdd, Fin.coe_natAdd] at this
       omega
-    simp only [Finsupp.add_apply, Finset.sum_add_distrib, h1, Finset.sum_const_zero, add_zero]
+    simp only [Finsupp.add_apply, h1, add_zero]
     rw [← hA hx a0 ha0]
     exact Finset.sum_congr rfl fun c _ => Finsupp.mapDomain_apply_of_injective hi1 a0 (x, c)
 

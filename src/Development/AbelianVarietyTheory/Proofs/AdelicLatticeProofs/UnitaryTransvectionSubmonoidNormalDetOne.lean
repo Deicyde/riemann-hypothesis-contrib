@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.IsHermHyperbolic
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.TransvectionIdentitiesUnitaryStatement
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.TransvectionIdentitiesUnitary
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -99,7 +99,7 @@ theorem tvGen_normal
                   → ∃ m' ∈ TvGen σ G, γ * m = m' * γ ∧ ∃ m'' ∈ TvGen σ G, m * γ = γ * m'') := by
   intro E _ _ n σ G hG
   obtain ⟨-, -, hmul, hdet, hU, hconj, -, hUmul⟩ :=
-    GlobalTheory.T.transvection_identities_unitary E n σ G hG.invol hG.herm
+    _root_.GlobalTheory.UTrans.Calc.calculus E n σ G hG.invol hG.herm
   refine ⟨fun γ h => ⟨h.det_mul_conj_det hG.det_ne, h.nonsing_inv hG.det_ne⟩, ?_⟩
   have key
       : ∀ m ∈ TvGen σ G,

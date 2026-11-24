@@ -60,7 +60,7 @@ private theorem comp_rel
   refine Eq.trans ?_ (h.trans ?_)
   · rfl
   · ext i j
-    by_cases hij : i = j <;> simp [hij, Matrix.one_apply, sim]
+    by_cases hij : i = j <;> simp [hij, sim]
 
 private theorem val_sim
     {E : Type} [Field E] [NumberField E] [IsCMField E]

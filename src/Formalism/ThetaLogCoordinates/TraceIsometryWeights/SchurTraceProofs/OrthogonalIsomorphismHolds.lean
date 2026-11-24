@@ -222,9 +222,8 @@ theorem pol_le_iSup (LL L2 : Letters N) (j : ℕ) (Cs : Finset (Fin r))
   refine iSup_le fun i => ?_
   refine le_iSup_of_le (Function.extend (⇑(enumC Cs)) i.2.2.2.choose 0) ?_
   rw [isoC_eq]
-  have hcomp : Function.extend (⇑(enumC Cs)) i.2.2.2.choose 0 ∘ ⇑(enumC Cs) = i.2.2.2.choose := by
-    funext a
-    exact (enumC Cs).injective.extend_apply _ _ a
+  have hcomp : Function.extend (⇑(enumC Cs)) i.2.2.2.choose 0 ∘ ⇑(enumC Cs) = i.2.2.2.choose :=
+    funext fun a => (enumC Cs).injective.extend_apply _ _ a
   rw [hcomp]
   refine (GAe p LL j (enumC Cs)).gS_le ?_ ((GAe p LL j (enumC Cs)).gS_stable _)
   rw [Set.singleton_subset_iff]
@@ -235,8 +234,7 @@ theorem span_isomorphism_holds : SpanIso := by
   rw [eq_top_iff]
   intro x _
   rw [x.as_sum]
-  refine Submodule.sum_mem _ fun m _ => ?_
-  exact pol_le_iSup LL _ j Cs (monomial_mem_pol LL m _)
+  exact Submodule.sum_mem _ fun m _ => pol_le_iSup LL _ j Cs (monomial_mem_pol LL m _)
 
 theorem fock_wt_ne
     (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
@@ -248,9 +246,7 @@ theorem fock_wt_ne
   apply fock_disjoint
   intro m hmx hmy
   obtain ⟨a, ha⟩ := Function.ne_iff.mp hne
-  have h1 : wt LL j (e a) m = μ a := hx hmx a
-  have h2 : wt LL j (e a) m = ν a := hy hmy a
-  exact ha (h1.symm.trans h2)
+  exact ha ((hx hmx a).symm.trans (hy hmy a))
 
 theorem gS_le_perpV
     (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
@@ -312,8 +308,7 @@ theorem orthogonal_isomorphism_holds : OrthIso := by
   have hne' : la ∘ (enumC Cs) ≠ mu ∘ (enumC Cs) := by
     obtain ⟨c, hc, hlc⟩ := hne
     obtain ⟨a, rfl⟩ := enumC_surj Cs hc
-    intro h
-    exact hlc (congrFun h a)
+    exact fun h => hlc (congrFun h a)
   have hB : (GAe p LL j (enumC Cs)).Stable
       ((GAe p LL j (enumC Cs)).gS {v | (GAe p LL j (enumC Cs)).IsHW (mu ∘ enumC Cs) v}) :=
     (GAe p LL j (enumC Cs)).gS_stable _

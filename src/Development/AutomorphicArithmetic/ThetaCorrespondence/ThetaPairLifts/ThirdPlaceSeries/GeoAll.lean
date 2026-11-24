@@ -39,8 +39,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 set_option genSizeOfSpec false
 set_option genInjectivity false
@@ -61,6 +59,7 @@ variable
   {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}
   {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX}
   (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word)
+
 structure GeometricFamily where
   g : Geo D
   j : SmT (_root_.GlobalTheory.Fam.pk_z W).MX →ₗ[ℂ] (Formalism.L2.Forms.FrP D → ℂ)

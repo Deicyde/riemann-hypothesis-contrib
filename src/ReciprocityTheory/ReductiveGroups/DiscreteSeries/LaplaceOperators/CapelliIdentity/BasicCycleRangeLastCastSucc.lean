@@ -85,7 +85,7 @@ theorem permIns_bijective {p : ℕ}
       refine Equiv.ext fun j => ?_
       have hj := congrArg (fun σ : Equiv.Perm (Fin (p + 1)) => σ j.succ) h'
       simp only [permIns_succ] at hj
-      first | exact Fin.succAbove_right_injective hj | exact Fin.succAbove_right_inj.mp hj
+      first | exact Fin.succAbove_right_injective hj
     rw [hτ]
   · simp [Fintype.card_perm, Nat.factorial_succ]
 
@@ -98,7 +98,6 @@ theorem basic_zsmul_sign {𝒰 : Type*} [Ring 𝒰] [Algebra ℂ 𝒰] (i : ℕ)
     : ((-1 : ℤ) ^ i * s) • (a * b) = (-1 : ℂ) ^ i • (a * (s • b)) := by
   have h1 : ((-1 : ℂ) ^ i) = (((-1 : ℤ) ^ i : ℤ) : ℂ) := by simp
   rw [h1, Int.cast_smul_eq_zsmul ℂ, mul_smul_comm, mul_smul]
-  all_goals rfl
 
 theorem basic_sign_mul_sign {p : ℕ} (τ σ : Equiv.Perm (Fin p))
     : ((Equiv.Perm.sign τ : ℤˣ) : ℤ) * ((Equiv.Perm.sign (τ * σ) : ℤˣ) : ℤ)
@@ -108,10 +107,7 @@ theorem basic_sign_mul_sign {p : ℕ} (τ σ : Equiv.Perm (Fin p))
 theorem basic_eq_zero_of_eq_neg
     {𝒰 : Type*} [AddCommGroup 𝒰] [Module ℂ 𝒰] (c : 𝒰) (h : c = ((-1 : ℤˣ) : ℤ) • c)
     : c = 0 := by
-  have h' : c = -c := by
-    first
-    | (rw [Units.val_neg, Units.val_one, neg_one_smul] at h; exact h)
-    | (simp only [Units.val_neg, Units.val_one, neg_smul, one_smul] at h; exact h)
+  have h' : c = -c := by first | (rw [Units.val_neg, Units.val_one, neg_one_smul] at h; exact h)
   have h2 : (2 : ℂ) • c = 0 := by
     rw [two_smul]
     nth_rewrite 2 [h']
@@ -231,7 +227,7 @@ theorem cminor_intertwine
   refine Finset.sum_congr rfl fun σ _ => ?_
   have h1 := LinearMap.congr_fun (key σ) v
   simp only [LinearMap.comp_apply] at h1
-  first | (rw [LinearMap.smul_apply, LinearMap.smul_apply, map_zsmul, h1]) | simp [h1, map_zsmul]
+  first | (rw [LinearMap.smul_apply, LinearMap.smul_apply, map_zsmul, h1])
 
 end Module
 

@@ -138,7 +138,7 @@ theorem isExpSer_one {R : Type} [CommRing R] : IsExpSer (1 : PowerSeries R) := b
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · simp
   · have : m + n ≠ 0 := by omega
-    simp [hm.ne', this]
+    simp [hm.ne']
 
 theorem mk_exp_add
     {R : Type} [CommRing R]

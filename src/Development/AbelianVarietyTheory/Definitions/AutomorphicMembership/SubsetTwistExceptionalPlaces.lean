@@ -55,8 +55,6 @@ open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 def TauTrue {D : D7} (X : NExpTied D) : Prop :=
   ∃ τ : ℕ → ∀ kv : (Σ k : Fin 2, D.nd.PlG k), (ZMod (D.host.g kv.1))ˣ →* (↥D.LL0)ˣ, ∀ i j b kv x,
     1 ≤ j → j ≤ D.R.m

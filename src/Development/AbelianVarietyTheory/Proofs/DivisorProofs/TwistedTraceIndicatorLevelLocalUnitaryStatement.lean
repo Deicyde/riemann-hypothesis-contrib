@@ -45,6 +45,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.twistedTrace_indicator_level_localUnitary
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
         (K' : Subgroup (UL n w)),
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.twistedTrace_indicator_level_localUnitary
               = ((K'.relIndex (KL n w) : ℕ) : ℂ)⁻¹ * (Module.finrank ℂ (fixed σ.ρ K') : ℂ)
             ∧ (Module.finrank ℂ (fixed σ.ρ K') = 0
               → ∀ g, twTr σ.ρ (KL n w) K' g LinearMap.id = 0) := by
-  first
-  | exact @GlobalTheory.TwTrUnit.twTr_unit
-  | exact GlobalTheory.TwTrUnit.twTr_unit
-  | (intros; apply GlobalTheory.TwTrUnit.twTr_unit <;> assumption)
+  first | exact @GlobalTheory.TwTrUnit.twTr_unit

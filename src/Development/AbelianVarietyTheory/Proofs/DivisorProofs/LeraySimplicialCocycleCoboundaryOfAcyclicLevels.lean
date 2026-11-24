@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForallFinset
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafBasicPropertiStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.GalMapMul
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInjectiveResolutionEtaleSheafBasicProperti
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSpaceCohomologyPresheafClassesAsCocyclesStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -66,8 +67,7 @@ theorem peel
           δ n N β = c ∧ ∀ (p q : ℤ) (hpq : p + n = q), -(k : ℤ) < p → β.v p q hpq = 0 := by
   obtain ⟨cl, -, hcl, hcl0, -⟩ :=
     GlobalTheory.T.etaleSpaceCohomology_presheaf_classes_as_cocycles R F
-  obtain ⟨-, -, -, -, -, hpos⟩ :=
-    GlobalTheory.T.chosenInjectiveResolutionEtaleSheaf_basic_properties R F
+  obtain ⟨-, -, -, -, -, hpos⟩ := _root_.GlobalTheory.EtC.res_basic R F
   intro k
   induction k with
   | zero =>
@@ -123,8 +123,7 @@ theorem leray_inj
             IsCls (R := R) (E := E) (n := n + 1) s 0
               → ∃ t : (free R).obj (E.obj (op ⦋n⦌)) ⟶ F, cobd (R := R) (E := E) (n := n) t = s := by
   intro R _ F E n hH
-  obtain ⟨-, hneg, hmono, ⟨w, hex⟩, -, hpos⟩ :=
-    GlobalTheory.T.chosenInjectiveResolutionEtaleSheaf_basic_properties R F
+  obtain ⟨-, hneg, hmono, ⟨w, hex⟩, -, hpos⟩ := _root_.GlobalTheory.EtC.res_basic R F
   constructor
   · rintro s ⟨z, hz0, hz⟩
     rw [CohomologyClass.mk_eq_zero_iff] at hz0
@@ -200,7 +199,7 @@ theorem leray_inj
     refine ⟨(((n + 1 : ℕ) : ℤ).negOnePow : ℤ) • ((chainsXIso R E n).inv ≫ t'), ?_⟩
     rw [hs]
     simp only [D, cobd, Preadditive.sum_comp, Preadditive.comp_zsmul, Preadditive.zsmul_comp,
-      Finset.smul_sum, smul_smul, Category.assoc]
+      Finset.smul_sum, smul_smul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [mul_comm]
 

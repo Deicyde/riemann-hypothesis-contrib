@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_torus_invariantField_const_coeffs
       (∀ a, IsInv Y.H (v a) (dd a))
         → ∀ ℓ : Dd.toPre.X →+ R, ∃ c : Fin n → R,
           GlobalTheory.HeatMod.IsTorField Y (GlobalTheory.HeatMod.combF Y.H.hom dd c) ℓ := by
-  first
-  | exact @GlobalTheory.HeatMod.TorField.exists_isTorField
-  | exact GlobalTheory.HeatMod.TorField.exists_isTorField
-  | (intros; apply GlobalTheory.HeatMod.TorField.exists_isTorField <;> assumption)
+  first | exact @GlobalTheory.HeatMod.TorField.exists_isTorField

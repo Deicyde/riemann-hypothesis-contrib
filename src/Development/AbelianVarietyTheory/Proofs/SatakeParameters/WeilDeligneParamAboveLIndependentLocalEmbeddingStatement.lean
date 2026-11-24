@@ -59,6 +59,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 open Formalism.BasicNotions.Loc
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.weilDeligneParamAbove_l_independent_localEmbedding
     : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
       Nonempty (LocTied l P AI)
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.weilDeligneParamAbove_l_independent_localEmbedding
           Continuous (fun g => ((r g : GL (Fin a) (Om l)) : Matrix (Fin a) (Fin a) (Om l)))
             → GlobalTheory.Pst.IsPstAt P Bw r → GlobalTheory.Pst.IsPstAt P Bw' r
             → GlobalTheory.Pst.wdAt P ι Bw h hj r = GlobalTheory.Pst.wdAt P ι Bw' h hj' r := by
-  first
-  | exact @GlobalTheory.Pst.BridgeParam.wdAt_indep_bridge
-  | exact GlobalTheory.Pst.BridgeParam.wdAt_indep_bridge
-  | (intros; apply GlobalTheory.Pst.BridgeParam.wdAt_indep_bridge <;> assumption)
+  first | exact @GlobalTheory.Pst.BridgeParam.wdAt_indep_bridge

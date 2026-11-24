@@ -81,11 +81,11 @@ theorem UpperTheory.Gal.TranscendenceTraces.trRed_of
   }
   have hov1 : τ1.Over t := by
     intro A a
-    rw [hτ1, hσ1, hovQ A a, hf0, GlobalTheory.T.restrictScalarsResolutionMap_augmentation_spec]
+    rw [hτ1, hσ1, hovQ A a, hf0, _root_.GlobalTheory.EtC.restrMap_spec']
     rfl
   have hov2 : τ2.Over t := by
     intro A a
-    rw [hτ2, hσ2, hf0, hovq A, GlobalTheory.T.restrictScalarsResolutionMap_augmentation_spec, key]
+    rw [hτ2, hσ2, hf0, hovq A, _root_.GlobalTheory.EtC.restrMap_spec', key]
     rfl
   obtain ⟨a, ha⟩ := (hRp (ZMod Q) (res (ZMod Q) (tw Q i)) Z n).1 x
   have r1 :=

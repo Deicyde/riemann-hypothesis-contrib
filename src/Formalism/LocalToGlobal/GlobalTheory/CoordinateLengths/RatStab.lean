@@ -129,7 +129,7 @@ theorem rat_diag
         by_cases hj : j = i
         · subst hj
           simp [hi]
-        · simp [hj, Function.update_of_ne hj]
+        · simp [hj]
       rw [h2, Formalism.UG.P.wact_rowAct_mul, AlgHom.comp_apply]
       exact ih _ (rat_diag_step D ν hν i (e i) (he i) (he0 i) q hq)
   have h3

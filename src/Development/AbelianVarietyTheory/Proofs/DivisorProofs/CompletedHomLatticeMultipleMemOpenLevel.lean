@@ -75,7 +75,7 @@ theorem exists_nsmul_smul_mem
   have hφ : Continuous φ := continuous_pi fun i => continuous_pi fun j => hp.smul continuous_const
   have h0 : φ 0 = 0 := Matrix.ext fun i j => zero_smul (AF D.host.F) (y i j)
   obtain ⟨N, hN, h⟩ :=
-    GlobalTheory.AdLat.OpenLat.exists_nsmul_adele D.host.F (φ ⁻¹' U)
+    _root_.GlobalTheory.LocalNormBound.main D.host.F (φ ⁻¹' U)
       (hφ.continuousAt.preimage_mem_nhds (hU.mem_nhds (h0 ▸ U.zero_mem)))
   refine ⟨N, hN, fun α hα => ?_⟩
   have h1 : φ (N • α) ∈ U := h α hα

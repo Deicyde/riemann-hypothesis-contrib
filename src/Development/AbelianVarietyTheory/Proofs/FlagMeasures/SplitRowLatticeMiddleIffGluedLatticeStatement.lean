@@ -45,6 +45,7 @@ open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
   Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitRowLattice_middle_iff_gluedLattice
     : ∀ (D : D7) (u : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D),
       1 ≤ Tu D u → IsBase D u F0 → IsRowLat D F0 Λ
@@ -54,7 +55,4 @@ theorem _root_.GlobalTheory.T.splitRowLattice_middle_iff_gluedLattice
           ∧ (∀ L' : LatW D, ∀ L ∈ glueSet D u L',
             IsRowLat D F0 (XS D F0 ⊔ L ⊔ YS D) ∧ IsSplit D F0 (XS D F0 ⊔ L ⊔ YS D)
               ∧ (XS D F0 ⊔ L ⊔ YS D) ⊓ toO (hS D) (Wb D) = L) := by
-  first
-  | exact @GlobalTheory.LoopC.RowGlue.main
-  | exact GlobalTheory.LoopC.RowGlue.main
-  | (intros; apply GlobalTheory.LoopC.RowGlue.main <;> assumption)
+  first | exact @GlobalTheory.LoopC.RowGlue.main

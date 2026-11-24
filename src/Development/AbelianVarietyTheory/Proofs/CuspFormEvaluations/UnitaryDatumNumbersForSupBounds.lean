@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.LatOfLamSt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.SumSingleEmbeddingExtendLe
 
 @[expose] public section
 
@@ -80,22 +81,6 @@ theorem one_le_dE (E : Type) [Field E] [NumberField E] : 1 ≤ dE E := by
   unfold dE
   rw [← Int.cast_abs]
   exact_mod_cast Int.one_le_abs (NumberField.discr_ne_zero E)
-
-private lemma sum_ext0_le_sum {l : ℕ} (a : Fin l → ℕ) (M : ℕ) : ∑ i : Fin M, ext0 a (i : ℕ) ≤ ∑ i, a i := by
-  rw [Fin.sum_univ_eq_sum_range (fun i => ext0 a i) M]
-  have h1 : ∑ i ∈ Finset.range M, ext0 a i = ∑ i ∈ (Finset.range M).filter (· < l), ext0 a i := by
-    rw [Finset.sum_filter]
-    refine Finset.sum_congr rfl (fun i _ => ?_)
-    split_ifs with hi
-    · rfl
-    · simp [ext0, hi]
-  have h2 : ∑ i ∈ (Finset.range M).filter (· < l), ext0 a i ≤ ∑ i ∈ Finset.range l, ext0 a i :=
-    Finset.sum_le_sum_of_subset (fun i hi => by simp at hi ⊢; omega)
-  have h3 : ∑ i ∈ Finset.range l, ext0 a i = ∑ i, a i := by
-    rw [← Fin.sum_univ_eq_sum_range (fun i => ext0 a i) l]
-    refine Finset.sum_congr rfl (fun i _ => ?_)
-    simp [ext0, i.isLt]
-  omega
 
 theorem record_dictionary
     : ∀ (D : D7) (T : Top D) (_h : LawsP T) (j : ℕ) (_hj : InR D j) (w : WeightFamilies.Wt D j),
@@ -151,7 +136,9 @@ theorem record_dictionary
       refine Finset.sum_le_sum (fun t _ => ?_)
       rw [Finset.sum_eq_single (DV.tauEmb D t)]
       · simp only [↓ reduceIte]
-        exact sum_ext0_le_sum _ _
+        exact
+          _root_.ReciprocityTheory.ChartRestriction.G.PullbackSections.PfTies1.sum_extendByZero_le_sum
+            _ _
       · intro τ _ hτ
         simp [hτ]
       · intro hn
@@ -160,7 +147,9 @@ theorem record_dictionary
       refine Finset.sum_le_sum (fun t _ => ?_)
       rw [Finset.sum_eq_single (conjEmb (DV.tauEmb D t))]
       · simp only [↓ reduceIte]
-        exact sum_ext0_le_sum _ _
+        exact
+          _root_.ReciprocityTheory.ChartRestriction.G.PullbackSections.PfTies1.sum_extendByZero_le_sum
+            _ _
       · intro τ _ hτ
         simp [hτ]
       · intro hn

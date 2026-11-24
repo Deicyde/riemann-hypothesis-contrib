@@ -269,7 +269,6 @@ theorem pstep_rank
       exact ⟨a, ha⟩
     choose a ha using hint
     have hsum : φ (∑ j, a j • xr j) = 0 := by
-
       rw [map_sum]
       simp only [hφ, ha]
       simp only [Algebra.smul_def, mul_smul]

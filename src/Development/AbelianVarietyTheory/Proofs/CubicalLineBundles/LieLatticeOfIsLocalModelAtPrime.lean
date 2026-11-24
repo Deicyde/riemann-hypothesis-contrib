@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsThetaDegOfIsLocalModel
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.IsAbelianSchemeAndExtendOfGenericHoms
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LieLatticeLocalizationModelLieAlgebraStatement
+public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LieLatticeLocalizationModelLieAlgebra
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -216,7 +217,7 @@ theorem lieLat_of_isLocalModel
       exact y.basis
     exact this _ _
   obtain ⟨h₁, h₂⟩ :=
-    GlobalTheory.T.lieLattice_localization_modelLieAlgebra K P F R 𝔭.asIdeal.primeCompl y.P.A
+    _root_.GlobalTheory.CM.LieLoc.lieLat_localization K P F R 𝔭.asIdeal.primeCompl y.P.A
       (e.hom.left ≫ pullback.fst _ _) ψ _ v' M
       (((isGrpPullback_of_iso e).comp hp).congr (Category.id_comp _) rfl) hψ
       ((Category.assoc _ _ _).symm.trans ((congrArg (· ≫ pullback.fst _ _) hψe).trans hψ')) hb

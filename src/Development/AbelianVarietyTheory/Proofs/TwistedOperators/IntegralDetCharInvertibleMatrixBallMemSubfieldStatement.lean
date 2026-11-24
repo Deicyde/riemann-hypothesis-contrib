@@ -68,7 +68,4 @@ theorem _root_.GlobalTheory.T.integral_detChar_invertibleMatrixBall_mem_subfield
                   (∀ i j, valuation k (y i j - x i j) ≤ valuation k (c : k)) → y.det ≠ 0)
                 → ∫ g in {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)}, (ν (gdet g) : ℂ) * apow (gdet g) z ∂(haarVol J)
                   ∈ F := by
-  first
-  | exact @GlobalTheory.GLBallInt.integral_glBall_mem
-  | exact GlobalTheory.GLBallInt.integral_glBall_mem
-  | (intros; apply GlobalTheory.GLBallInt.integral_glBall_mem <;> assumption)
+  first | exact @GlobalTheory.GLBallInt.integral_glBall_mem

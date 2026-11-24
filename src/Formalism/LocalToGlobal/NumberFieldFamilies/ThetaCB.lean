@@ -63,12 +63,7 @@ theorem isInfEmb_unique
     (τ : E →+* ℂ) {θ θ' : Ainf F ⊗[F] E →+* ℂ} (h : IsInfEmb τ θ) (h' : IsInfEmb τ θ')
     : θ = θ' := by
   first
-  | exact UpperTheory.Reformulated.B.Qh26.isInfEmb_unique ..
   | (apply UpperTheory.Reformulated.B.Qh26.isInfEmb_unique <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qh26.isInfEmb_unique <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique <;> first | assumption | infer_instance)
   | exact @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique F E ‹_› ‹_› ‹_› ‹_› ‹_› τ θ θ' h h'
   | exact @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique F E ‹_› ‹_› ‹_› ‹_› ‹_› τ θ θ' h
   | exact @UpperTheory.Reformulated.B.Qh26.isInfEmb_unique F E ‹_› ‹_› ‹_› ‹_› ‹_› τ θ θ'

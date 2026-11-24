@@ -142,7 +142,8 @@ end
 
 theorem stepPotDual : StepPotDual := by
   classical
-  intro D hT i r hr Xs w hw n ⟨K', h, hN, hF, hS, Sig, Fr, hFr, hst, h1, hc, hx⟩
+  intro D hT i r hr Xs w hw n hP
+  obtain ⟨K', h, hN, hF, hS, Sig, Fr, hFr, hst, h1, hc, hx⟩ := hP
   refine ⟨
     K',
     h,
@@ -170,7 +171,7 @@ theorem stepPotDual : StepPotDual := by
         (Sig.image (fun a => a⁻¹)) (hx x).1
         (hx x).2).2 (dotProductBilin _ _) (isDual1_loc D i w hw r x) (fun b => by
       rw [Finset.mem_image]
-      exact ⟨fun ⟨a, ha, e⟩ => ⟨a, ha, e.symm⟩, fun ⟨a, ha, e⟩ => ⟨a, ha, e.symm⟩⟩)
+      exact exists_congr fun _ => and_congr_right fun _ => eq_comm)
 
 end GlobalTheory.PotDual
 

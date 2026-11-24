@@ -45,6 +45,7 @@ open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
   Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
   GlobalTheory.NormSum
 open scoped BigOperators
+
 theorem _root_.GlobalTheory.T.definiteThetaPair_testVector_expansion
     : ∀ (D : D7),
       Inp D
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.definiteThetaPair_testVector_expansion
                         k' ∈ intG D P.d → TrivAt D p (g : GL (Fin P.a) (AE D))
                           → TrivAt D p ((g' * k' : GA D P.d) : GL (Fin P.d) (AE D))
                           → ‖lamC lam c‖ = 1) := by
-  first
-  | exact @GlobalTheory.NormSum.Expand.om_expand
-  | exact GlobalTheory.NormSum.Expand.om_expand
-  | (intros; apply GlobalTheory.NormSum.Expand.om_expand <;> assumption)
+  first | exact @GlobalTheory.NormSum.Expand.om_expand

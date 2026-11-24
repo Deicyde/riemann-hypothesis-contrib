@@ -79,10 +79,7 @@ theorem MuVal.norm
     : ‖mu g‖ = 1 := by
   obtain ⟨x, hx⟩ := h.1 g
   rw [h.2 g x hx]
-  first
-  | exact Circle.norm_coe _
-  | exact Circle.abs_coe _
-  | exact mem_sphere_zero_iff_norm.mp (χ x).2
+  first | exact Circle.norm_coe _
 
 def FinUnit (x : (AE D)ˣ) : Prop :=
   infPart D (x : AE D) = 1 ∧ finPart D (x : AE D) ∈ intAE D

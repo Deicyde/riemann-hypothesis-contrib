@@ -49,12 +49,15 @@ import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.Uppe
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
 open scoped ENNReal
 
 namespace GlobalTheory.ChartCount
 
-theorem card_strictLower (r : ℕ) : Fintype.card {p : Fin r × Fin r // p.2 < p.1} = r * (r - 1) / 2 := by
+theorem card_strictLower (r : ℕ)
+    : Fintype.card {p : Fin r × Fin r // p.2 < p.1} = r * (r - 1) / 2 := by
   rw [Fintype.card_congr (Equiv.subtypeProdEquivSigmaSubtype (fun (a b : Fin r) => b < a)),
     Fintype.card_sigma]
   have h : ∀ a : Fin r, Fintype.card {b : Fin r // b < a} = (a : ℕ) := by
@@ -65,12 +68,13 @@ theorem card_strictLower (r : ℕ) : Fintype.card {p : Fin r × Fin r // p.2 < p
   simp only [h]
   rw [Fin.sum_univ_eq_sum_range (fun i => i) r, Finset.sum_range_id]
 
-theorem two_mul_card_Psi {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) :
-    2 * X.Ψ.card = Module.finrank ℚ E := by
+theorem two_mul_card_Psi {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
+    : 2 * X.Ψ.card = Module.finrank ℚ E := by
   apply GlobalTheory.TwoLines.two_mul_card_cmType <;> assumption
 
-theorem fdeg_and_nd : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
-    fdeg E = X.Ψ.card ∧ nd X = X.Ψ.card * (r * (r - 1) / 2) := by
+theorem fdeg_and_nd
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      fdeg E = X.Ψ.card ∧ nd X = X.Ψ.card * (r * (r - 1) / 2) := by
   intro E _ _ _ r X
   refine ⟨?_, ?_⟩
   · have h := two_mul_card_Psi X

@@ -91,7 +91,7 @@ theorem UpperTheory.V.Ws.Pt.ptPair
   have hres : resLe T.F_le s' = cF * resLe T.F_le s * cF⁻¹ := by
     ext x
     have hx := DFunLike.congr_fun hs x
-    first | exact hx | simpa [cF] using hx
+    first | exact hx
   have hconj := K.conj s s' hs
   rw [K.rho_val, K.rho_val, hres, map_mul, map_mul]
   have hA := form_gsp (hr (resLe T.F_le s))
@@ -135,7 +135,4 @@ theorem UpperTheory.V.Ws.Pt.ptPair
   rw [eq_inv_of_mul_eq_one_left e3]
   have hz : (1 - ((4 : ℕ) : ℤ)) = -3 := by norm_num
   rw [hz]
-  first
-  | simp [zpow_neg, Units.val_zpow_eq_zpow_val]
-  | (rw [MonoidHom.zpow_apply]; simp [zpow_neg, Units.val_zpow_eq_zpow_val])
-  | done
+  first | simp [zpow_neg]

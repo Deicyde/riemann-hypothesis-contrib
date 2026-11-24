@@ -99,12 +99,7 @@ theorem exists_gfc (V : HSp D) (γ : GL (Fin V.rank) (Ef D)) (hγ : Unimod (OA D
       rw [hT_crd D.sp.cm]
       exact h _ hy
   obtain ⟨k, hkG, hk⟩ := GlobalTheory.VolumeRatioTypings.exists_conj V L h1 h2
-  refine ⟨
-    k,
-    hkG,
-    eq_lat (fun x => ?_) (by
-      first | exact isLattice_crdLat V V.standardTuple_isLattice | exact isFullLattice_crdLat V)
-  ⟩
+  refine ⟨k, hkG, eq_lat (fun x => ?_) (by first | exact isFullLattice_crdLat V)⟩
   have hk'
       : ∀ y,
         y ∈ GlobalTheory.AdLat.hat D.host.F (crdLat V V.L0 : Set (Fin V.rank → D.host.E))

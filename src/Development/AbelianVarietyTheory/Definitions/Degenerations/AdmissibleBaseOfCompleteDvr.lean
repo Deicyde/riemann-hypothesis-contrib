@@ -414,10 +414,7 @@ def AllA
       (b : c.V W₀ →+* O') (ϖ : O') (a : ArcIn D l (c.V W₀).subtype O' b),
     GlobalTheory.LN.ArcBase O' ϖ → P Y a
 
-theorem spMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  rw [← Spec.map_comp]; rfl
+alias spMap_comp' := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem ArcPt.comp
     {Y : Model Xo c β} {R₁ R₂ : Type} [CommRing R₁] [IsDomain R₁] [CommRing R₂] [IsDomain R₂]

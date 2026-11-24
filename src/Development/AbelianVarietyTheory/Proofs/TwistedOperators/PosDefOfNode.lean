@@ -2,14 +2,15 @@ module
 
 public import Development.AbelianVarietyTheory.Statements.HeckeThetaIntegrals.StepUnfold
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfOpenCompact
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicUnitaryTopology
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DefiniteThetaIntegralIntegrableContinuous
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FockPolynomialVectorsOfSmoothThetaStable
-import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DefiniteUnitaryCocompact
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.GridFiniteDatumVectorThetaFockVacuum
+public import Development.AbelianVarietyTheory.Definitions.Divisors.BasePlaceNotMemChiGridBadPlaces
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaKernelGridRationalLeftInvariant
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicUnitaryTopology
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DefiniteUnitaryCocompact
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegrableOnFundamentalDomain
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaKOContinuousAndRatInvariant
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaKernelGridRationalLeftInvariantStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -83,7 +84,7 @@ theorem step
     {a : Arrow T} {f : Sch G a} (hg : Good W M a f) {F : Fn G a.src} (hF : IsInvCont a.src F)
     : LiftConv W M a f F ∧ IsInvCont a.tgt (liftA W M a f F) := by
   obtain ⟨hK, hinv, hpos, hH, hfd⟩ := hg
-  obtain ⟨C, hC, hcov⟩ := GlobalTheory.definite_unitary_cocompact _ hpos
+  obtain ⟨C, hC, hcov⟩ := _root_.GlobalTheory.DefiniteQuotient.exists_compact _ hpos
   obtain ⟨_, _, _, _, _, _, _⟩ :=
     GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D (G.V a.src)
   obtain ⟨_, _, _, _, _, _, _⟩ :=
@@ -173,8 +174,7 @@ theorem good_col
     GlobalTheory.thetaKO_continuous_and_rat_invariant W.ψ _ _ _ _ _ (W.om_is _ hr) f hf
   exact ⟨
     hc,
-    fun γ hγ γ' hγ' g h =>
-      GlobalTheory.T.thetaKernel_grid_rational_left_invariant W _ hr f hf γ hγ γ' hγ' g h,
+    fun γ hγ γ' hγ' g h => _root_.GlobalTheory.RowReal.ker_rat_left W _ hr f hf γ hγ γ' hγ' g h,
     hpos,
     hM.haar_fund.1,
     hM.haar_fund.2
@@ -192,8 +192,7 @@ theorem good_row
     GlobalTheory.thetaKO_continuous_and_rat_invariant W.ψ _ _ _ _ _ (W.om_is _ hr) f hf
   refine ⟨
     ?_,
-    fun γ hγ γ' hγ' g h =>
-      GlobalTheory.T.thetaKernel_grid_rational_left_invariant W _ hr f hf γ hγ γ' hγ' g h,
+    fun γ hγ γ' hγ' g h => _root_.GlobalTheory.RowReal.ker_rat_left W _ hr f hf γ hγ γ' hγ' g h,
     hpos,
     hM.haar_fund.1,
     hM.haar_fund.2

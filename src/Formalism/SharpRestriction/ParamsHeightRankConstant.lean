@@ -158,18 +158,8 @@ theorem FamP.large_sup {eps : ℝ} (Fm : FamP eps) (K K' : TransportedAlt) (CH :
   constructor
   · intro h
     exact ⟨
-      h.mono ⟨
-        le_max_left _ _,
-        fun _ => le_max_left _ _,
-        fun _ => le_max_left _ _,
-        fun _ => le_max_left _ _
-      ⟩,
-      h.mono ⟨
-        le_max_right _ _,
-        fun _ => le_max_right _ _,
-        fun _ => le_max_right _ _,
-        fun _ => le_max_right _ _
-      ⟩
+      h.mono (by simp [TransportedAlt.le, TransportedAlt.sup]),
+      h.mono (by simp [TransportedAlt.le, TransportedAlt.sup])
     ⟩
   · rintro ⟨h, h'⟩
     exact ⟨
@@ -207,9 +197,8 @@ theorem Closed.imp
     (hP : Closed 𝒞 P) (h : ∀ {eps : ℝ} (Fm : FamP eps) (CH : ℝ), 0 < eps → P Fm CH → Q Fm CH)
     : Closed 𝒞 Q := by
   obtain ⟨a, ha, hP⟩ := hP
-  refine ⟨a, ha, fun e he hle => ?_⟩
-  obtain ⟨K, hK⟩ := hP e he hle
-  exact ⟨K, fun Fm CH hc hL => h Fm CH he (hK Fm CH hc hL)⟩
+  exact
+    ⟨a, ha, fun e he hle => (hP e he hle).imp fun K hK Fm CH hc hL => h Fm CH he (hK Fm CH hc hL)⟩
 
 def TuSize {eps : ℝ} (Fm : FamP eps) : Prop :=
   ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,

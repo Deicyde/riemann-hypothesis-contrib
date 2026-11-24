@@ -54,8 +54,6 @@ namespace Formalism.IndefR.Eqv
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 open Classical
 
 variable (D : D7)

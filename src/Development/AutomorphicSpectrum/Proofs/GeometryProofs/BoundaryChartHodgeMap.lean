@@ -1,5 +1,8 @@
 module
 
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeGram
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsRigTransport
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
@@ -7,22 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionEqAndW
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.VerticalDerivativeInCoordinates
 public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ExistsHolUnifReparam
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.SmulPeriodMapMkZeroFstEqNegForm
-import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsDerivAt0OfIsPullback
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLinearLiftOfAdditiveFamily
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExponentialSurjectiveSemiabelian
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeGramPullbackIff
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeHermitianFormExists
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointLatticeDataStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerivAt0CompLinMap
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUniqueLeftBasisCoordsAdicCompletion
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointLatticeData
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodLatticeDiscreteFree
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
@@ -34,8 +35,6 @@ import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -43,7 +42,6 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -57,7 +55,76 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.PermFinTwoUniv
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsDerivAt0OfIsPullback
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerivAt0CompLinMap
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Linter.Style
+import Development.AbelianVarietyTheory.Proofs.ToricGeometry.AppellHumbertDataOfIsoCube
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram, Development.AutomorphicSpectrum.Proofs.GeometryProofs.BoundaryChartHodgeMap
+
+-- ===== clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram =====
+-- clump-header: {"m": "Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram", "h": "module\n\npublic import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj\npublic import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeGram\npublic import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsRigTransport\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools\nimport GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.PermFinTwoUniv\n\n"}
+section -- clump:auto
+@[expose] public section
+
+noncomputable section
+
+namespace GlobalTheory.CompanionTheory.Ar.Fl
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
+open scoped Matrix ComplexOrder
+
+theorem hodgeForm_of_isHodgeGram
+    (S : Scheme.{0}) (G : Over S) [GrpObj G]
+    (L : LB G.left)
+    (x : Sp ℂ ⟶ S) (n : ℕ) (v : Fin n → (epsAt x ⟶ G)) (Γ : Matrix (Fin n) (Fin n) ℂ)
+    (hL : L.IsLB) (hv : ∀ i, IsTanAt G x (v i)) (h : Fl.IsHodgeGram G L x v Γ) (i j : Fin n)
+    : HodgeForm G L x (v i) (v j) (Γ i j) := by
+  obtain ⟨Q, ψ, v', u, Hm, χ, W, hp, hiso, hAH, hvW, hΓ⟩ := h
+  have hM := pull_isLB hL ψ
+  obtain ⟨w, hw⟩ := LBIso.symm hiso
+  exact ⟨
+    hL,
+    hv i,
+    hv j,
+    Q.A,
+    inferInstance,
+    ψ,
+    Q.g,
+    GlobalTheory.TorsionTauCompare.transport Q.isLB hM hw u,
+    Hm,
+    χ,
+    v' i,
+    v' j,
+    W i,
+    W j,
+    hp,
+    GlobalTheory.TorsionTauCompare.isAH_transport Q.isLB hM hw u hAH,
+    (hvW i).1,
+    (hvW j).1,
+    (hvW i).2,
+    (hvW j).2,
+    hΓ i j
+  ⟩
+
+end GlobalTheory.CompanionTheory.Ar.Fl
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram =====
+
+-- ===== clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.BoundaryChartHodgeMap =====
+-- clump-header: {"m": "Development.AutomorphicSpectrum.Proofs.GeometryProofs.BoundaryChartHodgeMap", "h": "module\n\npublic import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart\npublic import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin\npublic import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames\npublic import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionEqAndWeilIsOfIsHolTo\npublic import Development.AbelianVarietyTheory.Proofs.ModuliProofs.VerticalDerivativeInCoordinates\npublic import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ExistsHolUnifReparam\npublic import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.SmulPeriodMapMkZeroFstEqNegForm\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLinearLiftOfAdditiveFamily\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExponentialSurjectiveSemiabelian\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeFormOfIsHodgeGram\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeGramPullbackIff\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeHermitianFormExists\npublic import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsUniqueLeftBasisCoordsAdicCompletion\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointLatticeData\npublic import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PeriodLatticeDiscreteFree\nimport Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsDerivAt0OfIsPullback\nimport Development.AutomorphicSpectrum.Proofs.GeometryProofs.InteriorPointPolarised\nimport Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerivAt0CompLinMap\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools\nimport Development.AbelianVarietyTheory.Proofs.ToricGeometry.AppellHumbertDataOfIsoCube\n\n"}
+section -- clump:auto
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
@@ -74,18 +141,6 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.ChartUnif
 section Lin
 
 variable {g : ℕ}
-
-theorem hf_add_left (Hm : Matrix (Fin g) (Fin g) ℂ) (x x' y : Fin g → ℂ)
-    : hermForm Hm (x + x') y = hermForm Hm x y + hermForm Hm x' y := by
-  simp [hermForm, add_dotProduct]
-
-theorem hf_smul_left (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (x y : Fin g → ℂ)
-    : hermForm Hm (c • x) y = c * hermForm Hm x y := by
-  simp [hermForm, smul_dotProduct]
-
-theorem hf_add_right (Hm : Matrix (Fin g) (Fin g) ℂ) (x y y' : Fin g → ℂ)
-    : hermForm Hm x (y + y') = hermForm Hm x y + hermForm Hm x y' := by
-  simp [hermForm, star_add, Matrix.mulVec_add, dotProduct_add]
 
 theorem hf_real_right (Hm : Matrix (Fin g) (Fin g) ℂ) (r : ℝ) (x y : Fin g → ℂ)
     : hermForm Hm x (r • y) = r * hermForm Hm x y := by
@@ -108,13 +163,13 @@ theorem hermForm_adj
   let D : (Fin g → ℂ) → (Fin g → ℂ) → ℂ := fun x y =>
     hermForm R.Hm (R.B a x) y - hermForm R.Hm x (R.B a' y)
   have hl : ∀ x x' y, D (x + x') y = D x y + D x' y := fun x x' y => by
-    simp only [D, map_add (f := _), hf_add_left]
+    simp only [D, map_add (f := _), _root_.GlobalTheory.AppellHumbertTrivial.hermForm_add_left]
     ring
   have hr : ∀ x y y', D x (y + y') = D x y + D x y' := fun x y y' => by
-    simp only [D, map_add (f := _), hf_add_right]
+    simp only [D, map_add (f := _), _root_.GlobalTheory.SelfCube.herm_add_right]
     ring
   have hc : ∀ (c : ℂ) x y, D (c • x) y = c * D x y := fun c x y => by
-    simp only [D, map_smul, hf_smul_left]
+    simp only [D, map_smul, _root_.GlobalTheory.AppellHumbertTrivial.hermForm_smul_left]
     ring
   have hrr : ∀ (r : ℝ) x y, D x (r • y) = r * D x y := fun r x y => by
     have e : R.B a' (r • y) = r • R.B a' y := by rw [real_smul_eq, map_smul, real_smul_eq]
@@ -468,8 +523,8 @@ theorem exists_unif_of_interior
   have hpol :=
     HodgeMetric.polarisedAt_of_interior E H D l Xo c Y S Ω K J y 𝔐 (spMap (C.ψ b) ≫ jj) hint
   obtain ⟨g', Λ, i₁, i₂, R', x, hF, -, -⟩ :=
-    GlobalTheory.T.interior_point_lattice_data hG.2.2.2.2.1 E H D l Xo c Y S Ω K J y 𝔐
-      (spMap (C.ψ b) ≫ jj) hD hint hG Empty
+    _root_.GlobalTheory.CompanionTheory.Ar.Cusp.FibreEx.exists_riemLat_of_interior hG.2.2.2.2.1 E H
+      D l Xo c Y S Ω K J y 𝔐 (spMap (C.ψ b) ≫ jj) hD hint hG Empty
       (fun i => i.elim)
       (fun i => i.elim)
   obtain ⟨A, iA, φ, u', χ', hp, hAH, hact', hinj, hmem, -⟩ := hF
@@ -527,7 +582,7 @@ theorem exists_unif_of_interior
     ext k
     by_cases h : k = c
     · subst h; simp
-    · simp [Pi.single_apply, h]
+    · simp [h]
   have hs
       : ∀ (Q : Matrix (Fin C.g) (Fin C.g) ℂ) c d,
         hermForm Q (Pi.single c 1) (Pi.single d 1) = Q c d := fun Q c d => by
@@ -535,7 +590,7 @@ theorem exists_unif_of_interior
       ext k
       by_cases h : k = d
       · subst h; simp
-      · simp [Pi.single_apply, h]
+      · simp [h]
     simp [hermForm, this]
   have hG1 :=
     (hR C.g _ w
@@ -650,3 +705,7 @@ theorem exists_unif_of_interior
 end Main
 
 end GlobalTheory.CompanionTheory.Ar.Cusp.ChartUnif
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.BoundaryChartHodgeMap =====

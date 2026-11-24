@@ -56,9 +56,6 @@ open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalis
 open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies
   GlobalTheory.OnCmp
 
-
-
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TraceLevelPf

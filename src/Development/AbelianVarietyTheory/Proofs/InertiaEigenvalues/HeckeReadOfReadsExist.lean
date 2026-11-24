@@ -53,9 +53,6 @@ open Formalism.IndefR.Lev (levG flag1L)
 open Formalism.MainNotions.IntegralHeckeForms (HkIdx)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

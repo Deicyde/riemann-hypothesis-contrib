@@ -54,6 +54,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.short_thetaSeries_dominant_weight_isCuspForm
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.short_thetaSeries_dominant_weight_isCuspForm
           → (Dw.p + Dw.q ≤ n → ∃ ph ψ x₀, d.PhiPin ph ψ x₀)
           → ∀ (nab : NabV Xo c) (bad nV : ℕ) (a : (E →+* ℂ) × ℕ → ℕ),
             ShortInCusp Xo c nab bad nV (Formalism.L2.PjFree.cusp Xo c U) a n d := by
-  first
-  | exact @GlobalTheory.Dict.shortInCusp_cusp
-  | exact GlobalTheory.Dict.shortInCusp_cusp
-  | (intros; apply GlobalTheory.Dict.shortInCusp_cusp <;> assumption)
+  first | exact @GlobalTheory.Dict.shortInCusp_cusp

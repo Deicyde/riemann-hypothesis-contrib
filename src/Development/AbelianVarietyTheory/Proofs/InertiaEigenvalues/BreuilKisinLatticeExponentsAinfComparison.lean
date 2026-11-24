@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsPotential
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemRangeCoeffTensorAinfOfFrobeniusEqMatrixMulStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TeichmullerSubOneAinfPropertiesCompatibleRootsStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsGenIsUnitSub
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemRangeCoeffTensorAinfOfFrobeniusEqMatrixMul
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TeichmullerSubOneAinfPropertiesCompatibleRoots
 import Development.AutomorphicArithmetic.IntegralCasts.CrystallinePeriods.Kernel
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -67,7 +68,7 @@ theorem integral_of_frob
     (v : n → OW l O) (Y : Matrix n n (OA l O))
     (h : ∀ i, frobOW l O (v i) = (Y.map (inclO l O) *ᵥ v) i)
     : ∀ i, v i ∈ (inclO l O).range :=
-  GlobalTheory.T.mem_range_coeffTensorAinf_of_frobenius_eq_matrix_mul l O v Y h
+  _root_.GlobalTheory.FrobIntTensor.mem_range_inclO l O v Y h
 
 theorem integral_of_frob_row
     {n : Type} [Fintype n]
@@ -282,7 +283,7 @@ theorem exponents
               ∧ ∀ v ∈ LA t ϖ P, ∃ z : TW (OA l O) T,
                 I.j (inclO l O (1 ⊗ₜ (muOf ε ^ α)) • v) = TWincl (inclO l O) T z := by
   intro l _ a e _ _ O K _ _ _ _ _ _ _ _ _ _ t ϖ ι _ _ P T I α β hα hβ ε δ hε hδ
-  obtain ⟨-, h2⟩ := GlobalTheory.T.teichmullerSubOneAinf_properties_compatibleRoots l
+  obtain ⟨-, h2⟩ := _root_.GlobalTheory.MuOfEps.main l
   obtain ⟨⟨ξ, hξ, hμ⟩, hφ, -⟩ := h2 ε δ hε hδ
   obtain ⟨u, hu⟩ := Ideal.span_singleton_eq_span_singleton.1 ((ϖ.span_ev_eis a).trans hξ.symm)
   have hsplit

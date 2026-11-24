@@ -1,7 +1,7 @@
 module
 
+public import Mathlib.RingTheory.LaurentSeries
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicExistsIff
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZpowSmulMem
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -15,18 +15,14 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Coalgebra.IsFrobenius
-import Mathlib.RingTheory.Henselian
-import Mathlib.RingTheory.HopfAlgebra.Basic
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.RegularLocalRing.Defs
-import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.RingTheory.WittVector.IsPoly
 import Mathlib.Tactic.Basify
 import Mathlib.Tactic.ENatToNat
@@ -37,7 +33,6 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.HaveILetI
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -53,14 +48,146 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Linter.HaveILetI
 import Std.Tactic.BVDecide.Normalize.Prop
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemOfAssembleMem
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul", "h": "module\n\npublic import Mathlib.RingTheory.LaurentSeries\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Algebra.Order.Star.Int\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+open scoped LaurentSeries PowerSeries
+
+namespace GlobalTheory.PsiBasis
+
+variable {k : Type} [Field k]
+
+noncomputable def comp (l : ℕ) (hl : 0 < l) (i : ℕ) : k⸨X⸩ →ₗ[k] k⸨X⸩ where
+  toFun y := {
+    coeff := fun m => y.coeff (l * m + i)
+    isPWO_support' := by
+      apply Set.IsWF.isPWO
+      apply BddBelow.isWF
+      refine ⟨min 0 (y.order - i), fun m hm => ?_⟩
+      by_contra h
+      apply hm
+      apply HahnSeries.coeff_eq_zero_of_lt_order
+      have h1 : m < 0 := lt_of_lt_of_le (not_le.1 h) (min_le_left _ _)
+      have h2 : m < y.order - i := lt_of_lt_of_le (not_le.1 h) (min_le_right _ _)
+      have h3 : (1 : ℤ) ≤ l := by exact_mod_cast hl
+      nlinarith
+  }
+  map_add' x y := by ext m; simp
+  map_smul' c x := by ext m; simp
+
+theorem comp_coeff (l : ℕ) (hl : 0 < l) (i : ℕ) (y : k⸨X⸩) (m : ℤ)
+    : (comp l hl i y).coeff m = y.coeff (l * m + i) :=
+  rfl
+
+theorem p_zpow (s : ℤ)
+    : (HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ s = HahnSeries.single s 1 := by
+  cases s with
+  | ofNat n => simp [HahnSeries.single_pow]
+  | negSucc n =>
+    rw [zpow_negSucc, HahnSeries.single_pow, HahnSeries.inv_single]
+    simp [Int.negSucc_eq]
+
+theorem p_pow (s : ℕ)
+    : (HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ s = HahnSeries.single (s : ℤ) 1 := by
+  simp [HahnSeries.single_pow]
+
+theorem mem_iff (s : ℤ) (x : k⸨X⸩)
+    : (∃ b : k⟦X⟧, x = (HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ s * (b : k⸨X⸩))
+      ↔ ∀ m < s, x.coeff m = 0 := by
+  rw [p_zpow]
+  constructor
+  · rintro ⟨b, rfl⟩ m hm
+    rw [HahnSeries.coeff_single_mul, PowerSeries.coeff_coe, if_pos (by omega), mul_zero]
+  · intro h
+    refine ⟨PowerSeries.mk fun n => x.coeff (s + n), ?_⟩
+    ext m
+    rw [HahnSeries.coeff_single_mul, PowerSeries.coeff_coe, one_mul]
+    split_ifs with hm
+    · exact h m (by omega)
+    · rw [PowerSeries.coeff_mk]; congr 1; omega
+
+section
+variable
+  (l : ℕ) (hl : 0 < l)
+  (φ : k⸨X⸩ →+* k⸨X⸩)
+  (hφ : ∀ (x : k⸨X⸩) (m : ℤ), (φ x).coeff m = if (l : ℤ) ∣ m then x.coeff (m / l) else 0)
+include hl hφ
+
+theorem comp_pow_mul {i j : ℕ} (hi : i < l) (hj : j < l) (a : k⸨X⸩)
+    : comp l hl i ((HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ j * φ a)
+      = if j = i then a else 0 := by
+  ext m
+  have hl' : (l : ℤ) ≠ 0 := by exact_mod_cast hl.ne'
+  rw [comp_coeff, p_pow, HahnSeries.coeff_single_mul, one_mul, hφ]
+  by_cases h : j = i
+  · subst h
+    simp [Int.mul_ediv_cancel_left _ hl']
+  · rw [if_neg h, if_neg]
+    · simp
+    · intro hd
+      have : (l : ℤ) ∣ (i : ℤ) - j := by
+        have h2 := dvd_sub hd (dvd_mul_right (l : ℤ) m)
+        have e : (l : ℤ) * m + i - j - l * m = i - j := by ring
+        rwa [e] at h2
+      have := Int.eq_zero_of_abs_lt_dvd this (by rw [abs_lt]; constructor <;> omega)
+      omega
+
+theorem comp_one_add_pow_mul {i j : ℕ} (hi : i < l) (hj : j < l) (a : k⸨X⸩)
+    : comp l hl i ((1 + (HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩)) ^ j * φ a)
+      = (j.choose i) • a := by
+  rw [add_comm, add_pow, Finset.sum_mul, map_sum]
+  have : ∀ m ∈ Finset.range (j + 1),
+      comp l hl i
+          ((HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ m * 1 ^ (j - m) * (j.choose m : k⸨X⸩) * φ a)
+        = if m = i then (j.choose i) • a else 0 := by
+    intro m hm
+    have hm' : m < l := by have := Finset.mem_range.1 hm; omega
+    rw [one_pow, mul_one, mul_assoc, ← map_natCast φ, ← map_mul, comp_pow_mul l hl φ hφ hi hm']
+    split_ifs with h
+    · subst h; rw [nsmul_eq_mul]
+    · rfl
+  rw [Finset.sum_congr rfl this, Finset.sum_ite_eq']
+  split_ifs with h
+  · rfl
+  · rw [Nat.choose_eq_zero_of_lt (by simpa using h), zero_smul]
+
+end
+
+noncomputable def psi (l : ℕ) (hl : 0 < l) : k⸨X⸩ →ₗ[k] k⸨X⸩ :=
+  ∑ i ∈ Finset.range l, ((-1 : ℤ) ^ i) • comp l hl i
+
+theorem psi_apply (l : ℕ) (hl : 0 < l) (y : k⸨X⸩)
+    : psi l hl y = ∑ i ∈ Finset.range l, ((-1 : ℤ) ^ i) • comp l hl i y := by
+  simp only [psi, LinearMap.sum_apply, LinearMap.smul_apply]
+
+end GlobalTheory.PsiBasis
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul =====
+
+-- ===== clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemOfAssembleMem =====
+-- clump-header: {"m": "Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemOfAssembleMem", "h": "module\n\npublic import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicExistsIff\npublic import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompOneAddPowMul\npublic import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZpowSmulMem\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Algebra.Order.Star.Int\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Coalgebra.IsFrobenius\nimport Mathlib.RingTheory.Henselian\nimport Mathlib.RingTheory.HopfAlgebra.Basic\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.RegularLocalRing.Defs\nimport Mathlib.RingTheory.SimpleRing.Principal\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.HaveILetI\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
 namespace GlobalTheory.PsiShiftProof
 open scoped LaurentSeries PowerSeries
-open GlobalTheory.PhiGam GlobalTheory.PhiGam.Inh GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters GlobalTheory.PsiLemmaCompare
+open GlobalTheory.PhiGam GlobalTheory.PhiGam.Inh GlobalTheory.IndefiniteRowSideFullHecke
+  GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters GlobalTheory.PsiLemmaCompare
 
 section Filt
 variable {k : Type} [Field k]
@@ -79,17 +206,17 @@ theorem mem_Dp {s : ℤ} {x : k⸨X⸩} : x ∈ Dp k s ↔ ∃ b : k⟦X⟧, x =
 theorem mem_Dp_coeff {s : ℤ} {x : k⸨X⸩} : x ∈ Dp k s ↔ ∀ m < s, x.coeff m = 0 :=
   mem_Dp.trans (PsiBasis.mem_iff s x)
 
-theorem mem_Dp_zero {x : k⸨X⸩} : x ∈ Dp k 0 ↔ ∃ b : k⟦X⟧, x = (b : k⸨X⸩) := by
-  simp [mem_Dp]
+theorem mem_Dp_zero {x : k⸨X⸩} : x ∈ Dp k 0 ↔ ∃ b : k⟦X⟧, x = (b : k⸨X⸩) := by simp [mem_Dp]
 
 theorem coe_mem (b : k⟦X⟧) : (b : k⸨X⸩) ∈ Dp k 0 := mem_Dp_zero.2 ⟨b, rfl⟩
 
-theorem Dp_mul {s t u : ℤ} {x y : k⸨X⸩} (hx : x ∈ Dp k s) (hy : y ∈ Dp k t) (h : u ≤ s + t) :
-    x * y ∈ Dp k u := by
+theorem Dp_mul {s t u : ℤ} {x y : k⸨X⸩} (hx : x ∈ Dp k s) (hy : y ∈ Dp k t) (h : u ≤ s + t)
+    : x * y ∈ Dp k u := by
   obtain ⟨a, rfl⟩ := mem_Dp.1 hx
   obtain ⟨b, rfl⟩ := mem_Dp.1 hy
   refine sh_le_sh_of_le h _ (mem_Dp.2 ⟨a * b, ?_⟩)
-  rw [zpow_add₀ (vv_ne_zero k), map_mul]; ring
+  rw [zpow_add₀ (vv_ne_zero k), map_mul]
+  ring
 
 theorem Dp_mono {s t : ℤ} (h : t ≤ s) {x : k⸨X⸩} (hx : x ∈ Dp k s) : x ∈ Dp k t :=
   sh_le_sh_of_le h _ hx
@@ -101,8 +228,7 @@ theorem pow_mem (s : ℕ) : vv k ^ s ∈ Dp k s := by simpa using zpow_mem (k :=
 theorem order_mem (x : k⸨X⸩) : x ∈ Dp k x.order :=
   mem_Dp_coeff.2 fun _ hm => HahnSeries.coeff_eq_zero_of_lt_order hm
 
-theorem one_not_mem : (1 : k⸨X⸩) ∉ Dp k 1 := fun h => by
-  simpa using mem_Dp_coeff.1 h 0 one_pos
+theorem one_not_mem : (1 : k⸨X⸩) ∉ Dp k 1 := fun h => by simpa using mem_Dp_coeff.1 h 0 one_pos
 
 theorem one_add_pow_mem (j : ℕ) : (1 + vv k) ^ j ∈ Dp k 0 :=
   mem_Dp_zero.2 ⟨(1 + PowerSeries.X) ^ j, by simp [vv_eq_coe_X]⟩
@@ -113,9 +239,11 @@ theorem mem_of_one_add_mul {s : ℤ} {x : k⸨X⸩} (h : (1 + vv k) * x ∈ Dp k
   have := Dp_mul (coe_mem (inv1 (1 : k))) h (u := s) (by simp)
   rwa [← mul_assoc, mul_comm _ (1 + vv k), h0, one_mul] at this
 
-theorem map_mem {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, ∃ b : k⟦X⟧, σ (a : k⸨X⸩) = (b : k⸨X⸩)) {e : ℕ}
-    (hv : ∃ u : (k⟦X⟧)ˣ, σ (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ e) {a : ℤ} {x : k⸨X⸩} (hx : x ∈ Dp k a) :
-    σ x ∈ Dp k (e * a) := by
+theorem map_mem
+    {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, ∃ b : k⟦X⟧, σ (a : k⸨X⸩) = (b : k⸨X⸩))
+    {e : ℕ} (hv : ∃ u : (k⟦X⟧)ˣ, σ (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ e)
+    {a : ℤ} {x : k⸨X⸩} (hx : x ∈ Dp k a)
+    : σ x ∈ Dp k (e * a) := by
   obtain ⟨u, hu⟩ := hv
   obtain ⟨b, rfl⟩ := mem_Dp.1 hx
   obtain ⟨c, hc⟩ := hint b
@@ -128,9 +256,12 @@ theorem map_mem {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, ∃ b :
   rw [map_mul, map_zpow₀, hu, hc, map_mul, this, mul_zpow, zpow_mul, zpow_natCast]
   ring
 
-theorem mem_of_map_mem {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, ∃ b : k⟦X⟧, σ (a : k⸨X⸩) = (b : k⸨X⸩)) {e : ℕ}
-    (hv : ∃ u : (k⟦X⟧)ˣ, σ (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ e) {a s : ℤ} (hs : e * (a - 1) < s)
-    {x : k⸨X⸩} (hx : σ x ∈ Dp k s) : x ∈ Dp k a := by
+theorem mem_of_map_mem
+    {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, ∃ b : k⟦X⟧, σ (a : k⸨X⸩) = (b : k⸨X⸩))
+    {e : ℕ} (hv : ∃ u : (k⟦X⟧)ˣ, σ (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ e)
+    {a s : ℤ} (hs : e * (a - 1) < s)
+    {x : k⸨X⸩} (hx : σ x ∈ Dp k s)
+    : x ∈ Dp k a := by
   by_cases h0 : x = 0
   · rw [h0]; exact Submodule.zero_mem _
   by_contra hc
@@ -140,11 +271,12 @@ theorem mem_of_map_mem {σ : k⸨X⸩ →+* k⸨X⸩} (hint : ∀ a : k⟦X⟧, 
   have h2 : x.order + (x⁻¹).order = 0 := by
     rw [← HahnSeries.order_mul h0 (inv_ne_zero h0), mul_inv_cancel₀ h0, HahnSeries.order_one]
   have h3 := map_mem hint hv (order_mem x⁻¹)
-  have h4 := Dp_mul hx h3 (u := 1) (by
-    have : (x⁻¹).order = -x.order := by omega
-    rw [this]
-    have : (0 : ℤ) ≤ e := by positivity
-    nlinarith)
+  have h4 :=
+    Dp_mul hx h3 (u := 1) (by
+      have : (x⁻¹).order = -x.order := by omega
+      rw [this]
+      have : (0 : ℤ) ≤ e := by positivity
+      nlinarith)
   rw [← map_mul, mul_inv_cancel₀ h0, map_one] at h4
   exact one_not_mem h4
 
@@ -155,8 +287,8 @@ variable (k : Type) [Field k] (l : ℕ) [hl : Fact l.Prime]
 
 def psiPi : k⸨X⸩ →ₗ[k] k⸨X⸩ := PsiBasis.psi l hl.out.pos
 
-theorem phi_coeff (x : k⸨X⸩) (m : ℤ) :
-    (phiPi k l x).coeff m = if (l : ℤ) ∣ m then x.coeff (m / l) else 0 := by
+theorem phi_coeff (x : k⸨X⸩) (m : ℤ)
+    : (phiPi k l x).coeff m = if (l : ℤ) ∣ m then x.coeff (m / l) else 0 := by
   split_ifs with h
   · obtain ⟨q, rfl⟩ := h
     rw [phiPi_coeff_mul, Int.mul_ediv_cancel_left _ (by exact_mod_cast hl.out.ne_zero)]
@@ -173,13 +305,16 @@ theorem phi_mem {s : ℤ} {x : k⸨X⸩} (hx : x ∈ Dp k s) : phiPi k l x ∈ D
     exact hx q (lt_of_mul_lt_mul_left hm hl'.le)
   · rfl
 
-theorem psi_pow_mul {j : ℕ} (hj : j < l) (a : k⸨X⸩) :
-    psiPi k l ((1 + vv k) ^ j * phiPi k l a) = if j = 0 then a else 0 := by
+theorem psi_pow_mul {j : ℕ} (hj : j < l) (a : k⸨X⸩)
+    : psiPi k l ((1 + vv k) ^ j * phiPi k l a) = if j = 0 then a else 0 := by
   rw [psiPi, PsiBasis.psi_apply]
-  have : ∀ i ∈ Finset.range l, ((-1 : ℤ) ^ i) • PsiBasis.comp l hl.out.pos i ((1 + vv k) ^ j * phiPi k l a)
-      = ((-1 : ℤ) ^ i * (j.choose i : ℤ)) • a := by
+  have : ∀ i ∈ Finset.range l,
+      ((-1 : ℤ) ^ i) • PsiBasis.comp l hl.out.pos i ((1 + vv k) ^ j * phiPi k l a)
+        = ((-1 : ℤ) ^ i * (j.choose i : ℤ)) • a := by
     intro i hi
-    have := PsiBasis.comp_one_add_pow_mul l hl.out.pos (phiPi k l) (phi_coeff k l) (Finset.mem_range.1 hi) hj a
+    have :=
+      PsiBasis.comp_one_add_pow_mul l hl.out.pos (phiPi k l) (phi_coeff k l) (Finset.mem_range.1 hi)
+        hj a
     rw [vv, this, mul_smul, natCast_zsmul]
   rw [Finset.sum_congr rfl this, ← Finset.sum_smul,
     ← Finset.sum_subset (Finset.range_subset_range.2 (show j + 1 ≤ l from hj)),
@@ -190,15 +325,14 @@ theorem psi_pow_mul {j : ℕ} (hj : j < l) (a : k⸨X⸩) :
     simp
 
 theorem psi_assemble (y : Fin l → k⸨X⸩) : psiPi k l (assemble k l y) = y 0 := by
-
   rw [assemble, map_sum, Finset.sum_eq_single 0]
   · rw [psi_pow_mul k l (0 : Fin l).2, if_pos (by simp)]
   · intro j _ hj
     rw [psi_pow_mul k l j.2, if_neg (by simpa using hj)]
   · simp
 
-theorem psi_coeff (y : k⸨X⸩) (m : ℤ) :
-    (psiPi k l y).coeff m = ∑ i ∈ Finset.range l, ((-1 : ℤ) ^ i) • y.coeff (l * m + i) := by
+theorem psi_coeff (y : k⸨X⸩) (m : ℤ)
+    : (psiPi k l y).coeff m = ∑ i ∈ Finset.range l, ((-1 : ℤ) ^ i) • y.coeff (l * m + i) := by
   rw [psiPi, PsiBasis.psi_apply, HahnSeries.coeff_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [HahnSeries.coeff_smul, PsiBasis.comp_coeff]
@@ -213,8 +347,8 @@ theorem psi_mem {s t : ℤ} (h : l * t ≤ s) {y : k⸨X⸩} (hy : y ∈ Dp k s)
   rw [hy, smul_zero]
   nlinarith
 
-theorem psi_coeff_zero {y : k⸨X⸩} (hy : y ∈ Dp k (l - 1)) :
-    (psiPi k l y).coeff 0 = ((-1 : ℤ) ^ (l - 1)) • y.coeff (l - 1) := by
+theorem psi_coeff_zero {y : k⸨X⸩} (hy : y ∈ Dp k (l - 1))
+    : (psiPi k l y).coeff 0 = ((-1 : ℤ) ^ (l - 1)) • y.coeff (l - 1) := by
   have h1 := hl.out.pos
   rw [psi_coeff, Finset.sum_eq_single (l - 1)]
   · congr 2; omega
@@ -224,7 +358,8 @@ theorem psi_coeff_zero {y : k⸨X⸩} (hy : y ∈ Dp k (l - 1)) :
     omega
   · intro h; exact absurd (Finset.mem_range.2 (by omega)) h
 
-theorem mem_of_psi_eq_zero {y : k⸨X⸩} (hy : y ∈ Dp k (l - 1)) (h : psiPi k l y = 0) : y ∈ Dp k l := by
+theorem mem_of_psi_eq_zero {y : k⸨X⸩} (hy : y ∈ Dp k (l - 1)) (h : psiPi k l y = 0)
+    : y ∈ Dp k l := by
   have h1 := psi_coeff_zero k l hy
   rw [h, HahnSeries.coeff_zero, eq_comm, zsmul_eq_mul, mul_eq_zero] at h1
   have h2 := h1.resolve_left (by simp)
@@ -240,10 +375,13 @@ theorem psi_phi_mul (a x : k⸨X⸩) : psiPi k l (phiPi k l a * x) = a * psiPi k
     exact Finset.sum_congr rfl fun j _ => by ring
   rw [this, psi_assemble, psi_assemble]
 
-theorem psi_comm (σ : k⸨X⸩ →+* k⸨X⸩) (hφ : ∀ x, σ (phiPi k l x) = phiPi k l (σ x))
-    (hj : ∀ j : ℕ, 0 < j → j < l → ∃ (i : ℕ) (w : k⸨X⸩), 0 < i ∧ i < l ∧
-      σ ((1 + vv k) ^ j) = (1 + vv k) ^ i * phiPi k l w) (x : k⸨X⸩) :
-    psiPi k l (σ x) = σ (psiPi k l x) := by
+theorem psi_comm
+    (σ : k⸨X⸩ →+* k⸨X⸩) (hφ : ∀ x, σ (phiPi k l x) = phiPi k l (σ x))
+    (hj : ∀ j : ℕ,
+      0 < j → j < l
+        → ∃ (i : ℕ) (w : k⸨X⸩), 0 < i ∧ i < l ∧ σ ((1 + vv k) ^ j) = (1 + vv k) ^ i * phiPi k l w)
+    (x : k⸨X⸩)
+    : psiPi k l (σ x) = σ (psiPi k l x) := by
   obtain ⟨y, rfl⟩ := (assemble_bijective k l).2 x
 
   rw [psi_assemble, assemble, map_sum, map_sum, Finset.sum_eq_single 0]
@@ -254,7 +392,8 @@ theorem psi_comm (σ : k⸨X⸩ →+* k⸨X⸩) (hφ : ∀ x, σ (phiPi k l x) =
     rw [map_mul, h2, hφ, mul_assoc, ← map_mul, psi_pow_mul k l h1, if_neg h0.ne']
   · simp
 
-theorem assemble_mem {s : ℤ} {y : Fin l → k⸨X⸩} (h : ∀ j, y j ∈ Dp k s) : assemble k l y ∈ Dp k (l * s) :=
+theorem assemble_mem {s : ℤ} {y : Fin l → k⸨X⸩} (h : ∀ j, y j ∈ Dp k s)
+    : assemble k l y ∈ Dp k (l * s) :=
   Submodule.sum_mem _ fun j _ => Dp_mul (one_add_pow_mem j) (phi_mem k l (h j)) (by simp)
 
 variable [CharP k l]
@@ -263,17 +402,22 @@ theorem phi_one_add : phiPi k l (1 + vv k) = (1 + vv k) ^ l := by
   haveI : CharP k⸨X⸩ l := charP_of_injective_algebraMap (algebraMap k k⸨X⸩).injective l
   rw [map_add (f := _), map_one, phiPi_vv, add_pow_char, one_pow]
 
-theorem mem_of_assemble_mem {s : ℤ} {y : Fin l → k⸨X⸩} (h : assemble k l y ∈ Dp k (l * s)) (j : Fin l) :
-    y j ∈ Dp k s := by
+theorem mem_of_assemble_mem
+    {s : ℤ} {y : Fin l → k⸨X⸩} (h : assemble k l y ∈ Dp k (l * s)) (j : Fin l)
+    : y j ∈ Dp k s := by
   have h1 := psi_mem k l le_rfl (Dp_mul (one_add_pow_mem (l - j)) h (u := l * s) (by simp))
   apply mem_of_one_add_mul
   convert h1 using 1
   have hj := j.2
-  have key : ∀ i : Fin l, (j : ℕ) ≤ i → (1 + vv k) ^ (l - j) * ((1 + vv k) ^ (i : ℕ) * phiPi k l (y i)) =
-      (1 + vv k) ^ ((i : ℕ) - j) * phiPi k l ((1 + vv k) * y i) := by
+  have key
+      : ∀ i : Fin l,
+        (j : ℕ) ≤ i
+          → (1 + vv k) ^ (l - j) * ((1 + vv k) ^ (i : ℕ) * phiPi k l (y i))
+            = (1 + vv k) ^ ((i : ℕ) - j) * phiPi k l ((1 + vv k) * y i) := by
     intro i hi
     rw [map_mul, phi_one_add, ← mul_assoc, ← mul_assoc, ← pow_add, ← pow_add]
-    congr 2; omega
+    congr 2
+    omega
 
   rw [assemble, Finset.mul_sum, map_sum, Finset.sum_eq_single j]
   · rw [key j le_rfl, psi_pow_mul k l (by omega), if_pos (by omega)]
@@ -304,12 +448,14 @@ theorem opp_mul (m : ℕ) (z : ℤ_[l]) : onePlusPow k l (m * z) = onePlusPow k 
 theorem opp_dvd (z : ℤ_[l]) : PowerSeries.X ∣ onePlusPow k l z - 1 :=
   PowerSeries.X_dvd_iff.2 (binom_const z)
 
-theorem hom_opp (σ : k⟦X⟧ →+* k⟦X⟧) (m : ℕ) (h : σ (1 + PowerSeries.X) = (1 + PowerSeries.X) ^ m) (z : ℤ_[l]) :
-    σ (onePlusPow k l z) = onePlusPow k l z ^ m := by
+theorem hom_opp
+    (σ : k⟦X⟧ →+* k⟦X⟧) (m : ℕ) (h : σ (1 + PowerSeries.X) = (1 + PowerSeries.X) ^ m) (z : ℤ_[l])
+    : σ (onePlusPow k l z) = onePlusPow k l z ^ m := by
   haveI : CharP k⟦X⟧ l := charP_of_injective_algebraMap (algebraMap k k⟦X⟧).injective l
   have hX : PowerSeries.X ∣ σ PowerSeries.X := by
     rw [map_add (f := _), map_one, ← eq_sub_iff_add_eq'] at h
-    rw [h, PowerSeries.X_dvd_iff]; simp
+    rw [h, PowerSeries.X_dvd_iff]
+    simp
   have key : ∀ N : ℕ, PowerSeries.X ^ N ∣ σ (onePlusPow k l z) - onePlusPow k l z ^ m := by
     intro N
     obtain ⟨w, hw⟩ := Ideal.mem_span_singleton.1 (PadicInt.appr_spec N z)
@@ -321,9 +467,12 @@ theorem hom_opp (σ : k⟦X⟧ →+* k⟦X⟧) (m : ℕ) (h : σ (1 + PowerSerie
       have h3 : PowerSeries.X ∣ onePlusPow k l w ^ m - 1 :=
         (opp_dvd w).trans (by simpa using sub_dvd_pow_sub_pow (onePlusPow k l w) 1 m)
       simpa using dvd_sub h2 h3
-    rw [hz, opp_add, opp_nat, opp_mul, map_mul, map_pow, map_pow, h, mul_pow, ← pow_mul, ← pow_mul, ← pow_mul,
-      mul_comm m, ← mul_sub, mul_comm (l ^ N) m, pow_mul (onePlusPow k l w), ← sub_pow_char_pow]
-    exact ((pow_dvd_pow _ (Nat.lt_pow_self hl.out.one_lt).le).trans (pow_dvd_pow_of_dvd h1 _)).mul_left _
+    rw [hz, opp_add, opp_nat, opp_mul, map_mul, map_pow, map_pow, h, mul_pow, ← pow_mul, ← pow_mul,
+      ← pow_mul, mul_comm m, ← mul_sub, mul_comm (l ^ N) m, pow_mul (onePlusPow k l w),
+      ← sub_pow_char_pow]
+    exact
+      ((pow_dvd_pow _ (Nat.lt_pow_self hl.out.one_lt).le).trans (pow_dvd_pow_of_dvd h1 _)).mul_left
+        _
   rw [← sub_eq_zero]
   ext n
   exact PowerSeries.X_pow_dvd_iff.1 (key (n + 1)) n (by omega)
@@ -331,24 +480,30 @@ theorem hom_opp (σ : k⟦X⟧ →+* k⟦X⟧) (m : ℕ) (h : σ (1 + PowerSerie
 def delPi (k : Type) [Field k] [CharP k l] (t : ℤ_[l]ˣ) : k⸨X⸩ →+* k⸨X⸩ :=
   substHom (onePlusPow k l t - 1) (binom_const _) (binom_unit_ne t)
 
-theorem delPi_coe (t : ℤ_[l]ˣ) (a : k⟦X⟧) :
-    delPi k t (a : k⸨X⸩) = ((a.subst (onePlusPow k l t - 1) : k⟦X⟧) : k⸨X⸩) := substHom_coe _ _ _ a
+theorem delPi_coe (t : ℤ_[l]ˣ) (a : k⟦X⟧)
+    : delPi k t (a : k⸨X⸩) = ((a.subst (onePlusPow k l t - 1) : k⟦X⟧) : k⸨X⸩) :=
+  substHom_coe _ _ _ a
 
 theorem delPi_eq (t : ℤ_[l]ˣ) (x : k⸨X⸩) : FrobeniusBinomialReduction.actπ k l t x = delPi k t x :=
   substL_eq _ (binom_const _) (binom_unit_ne t) x
 
-theorem delPi_comm (t : ℤ_[l]ˣ) (m : ℕ) (h0 : PowerSeries.constantCoeff ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) = 0)
-    (h1 : ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) ≠ 0) (x : k⸨X⸩) :
-    delPi k t (substHom _ h0 h1 x) = substHom _ h0 h1 (delPi k t x) := by
+theorem delPi_comm
+    (t : ℤ_[l]ˣ)
+    (m : ℕ) (h0 : PowerSeries.constantCoeff ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) = 0)
+    (h1 : ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) ≠ 0)
+    (x : k⸨X⸩)
+    : delPi k t (substHom _ h0 h1 x) = substHom _ h0 h1 (delPi k t x) := by
   have ha := PowerSeries.HasSubst.of_constantCoeff_zero' h0
   have hb : PowerSeries.HasSubst (onePlusPow k l t - 1) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' (binom_const (k := k) (t : ℤ_[l]))
-  have key : PowerSeries.subst (onePlusPow k l t - 1) ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) =
-      PowerSeries.subst ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) (onePlusPow k l t - 1) := by
-    have := hom_opp (PowerSeries.substAlgHom ha : k⟦X⟧ →ₐ[k] k⟦X⟧).toRingHom m
-      (by simp [PowerSeries.substAlgHom_X]) t
-    rw [← PowerSeries.coe_substAlgHom ha, ← PowerSeries.coe_substAlgHom hb, map_sub, map_sub, map_pow, map_add (f := _),
-      PowerSeries.substAlgHom_X, map_one, map_one]
+  have key
+      : PowerSeries.subst (onePlusPow k l t - 1) ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1)
+        = PowerSeries.subst ((1 + PowerSeries.X : k⟦X⟧) ^ m - 1) (onePlusPow k l t - 1) := by
+    have :=
+      hom_opp (PowerSeries.substAlgHom ha : k⟦X⟧ →ₐ[k] k⟦X⟧).toRingHom m
+        (by simp [PowerSeries.substAlgHom_X]) t
+    rw [← PowerSeries.coe_substAlgHom ha, ← PowerSeries.coe_substAlgHom hb, map_sub, map_sub,
+      map_pow, map_add (f := _), PowerSeries.substAlgHom_X, map_one, map_one]
     rw [show (PowerSeries.substAlgHom ha : k⟦X⟧ →ₐ[k] k⟦X⟧) (onePlusPow k l t) = _ from this]
     simp
   have : (delPi k t).comp (substHom _ h0 h1) = (substHom _ h0 h1).comp (delPi k t) := by
@@ -359,23 +514,25 @@ theorem delPi_comm (t : ℤ_[l]ˣ) (m : ℕ) (h0 : PowerSeries.constantCoeff ((1
 
 theorem frob_eq : ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) = PowerSeries.X ^ l := by
   haveI : CharP k⟦X⟧ l := charP_of_injective_algebraMap (algebraMap k k⟦X⟧).injective l
-  rw [add_pow_char]; simp
+  rw [add_pow_char]
+  simp
 
 theorem frob_ne : ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) ≠ 0 := by
   rw [frob_eq]; exact pow_ne_zero _ PowerSeries.X_ne_zero
 
-theorem phi_eq_subst (x : k⸨X⸩) :
-    phiPi k l x = substHom ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) (by simp) frob_ne x := by
+theorem phi_eq_subst (x : k⸨X⸩)
+    : phiPi k l x = substHom ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) (by simp) frob_ne x := by
   rw [phiPi_eq, FrobeniusBinomialReduction.frobπ, ← substL_eq, frob_eq]
 
 theorem del_phi (t : ℤ_[l]ˣ) (x : k⸨X⸩) : delPi k t (phiPi k l x) = phiPi k l (delPi k t x) := by
   rw [phi_eq_subst, phi_eq_subst, delPi_comm]
 
-theorem phi_opp (w : ℤ_[l]) :
-    phiPi k l (onePlusPow k l w : k⟦X⟧) = ((onePlusPow k l w ^ l : k⟦X⟧) : k⸨X⸩) := by
+theorem phi_opp (w : ℤ_[l])
+    : phiPi k l (onePlusPow k l w : k⟦X⟧) = ((onePlusPow k l w ^ l : k⟦X⟧) : k⸨X⸩) := by
   have ha : PowerSeries.HasSubst ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' (by simp)
-  have := hom_opp (PowerSeries.substAlgHom ha : k⟦X⟧ →ₐ[k] k⟦X⟧).toRingHom l
+  have :=
+    hom_opp (PowerSeries.substAlgHom ha : k⟦X⟧ →ₐ[k] k⟦X⟧).toRingHom l
       (by simp [PowerSeries.substAlgHom_X]) w
   rw [phi_eq_subst, substHom_coe, ← this, ← PowerSeries.coe_substAlgHom ha]
   rfl
@@ -395,15 +552,17 @@ theorem psi_del (t : ℤ_[l]ˣ) (x : k⸨X⸩) : psiPi k l (delPi k t x) = delPi
   · rintro rfl
     have h2 : (l : ℤ_[l]) ∣ (j : ℤ_[l]) := by
       rw [← Units.dvd_mul_right (u := t)]; exact ⟨w, by simpa using hw⟩
-    have h3 : ‖((j : ℤ) : ℤ_[l])‖ < 1 := by
-      rw [PadicInt.norm_lt_one_iff_dvd]; simpa using h2
+    have h3 : ‖((j : ℤ) : ℤ_[l])‖ < 1 := by rw [PadicInt.norm_lt_one_iff_dvd]; simpa using h2
     rw [PadicInt.norm_int_lt_one_iff_dvd, Int.natCast_dvd_natCast] at h3
     exact absurd (Nat.le_of_dvd h0 h3) (by omega)
-  · rw [map_pow, del_one_add, phi_opp, ← map_pow, ← opp_mul, ← opp_mul, eq_add_of_sub_eq' hw, opp_add, opp_nat]
+  · rw [map_pow, del_one_add, phi_opp, ← map_pow, ← opp_mul, ← opp_mul, eq_add_of_sub_eq' hw,
+      opp_add, opp_nat]
     simp [vv_eq]
 
 def gamPi (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] : k⸨X⸩ →ₐ[k] k⸨X⸩ :=
-  extend (PowerSeries.substAlgHom (PowerSeries.HasSubst.of_constantCoeff_zero' (gam_const (k := k) (l := l))))
+  extend
+    (PowerSeries.substAlgHom (PowerSeries.HasSubst.of_constantCoeff_zero' (gam_const (k := k)
+      (l := l))))
     (by rw [PowerSeries.substAlgHom_X]; exact gam_ne)
 
 theorem gamPi_eq (x : k⸨X⸩) : gamPi k l x = substHom _ (gam_const (k := k) (l := l)) gam_ne x := by
@@ -428,22 +587,26 @@ theorem gam_phi (x : k⸨X⸩) : gamPi k l (phiPi k l x) = phiPi k l (gamPi k l 
   have ha : PowerSeries.HasSubst ((1 + PowerSeries.X : k⟦X⟧) ^ l - 1) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' (by simp)
   have hb := PowerSeries.HasSubst.of_constantCoeff_zero' (gam_const (k := k) (l := l))
-  have : (gamPi k l : k⸨X⸩ →+* k⸨X⸩).comp (phiPi k l) = (phiPi k l).comp (gamPi k l : k⸨X⸩ →+* k⸨X⸩) := by
+  have : (gamPi k l : k⸨X⸩ →+* k⸨X⸩).comp (phiPi k l)
+      = (phiPi k l).comp (gamPi k l : k⸨X⸩ →+* k⸨X⸩) := by
     refine hom_ext fun a => ?_
     simp only [RingHom.comp_apply, RingHom.coe_coe, gamPi_eq, phi_eq_subst, substHom_coe]
     rw [PowerSeries.subst_comp_subst_apply ha hb, PowerSeries.subst_comp_subst_apply hb ha]
     congr 2
     rw [← PowerSeries.coe_substAlgHom ha, ← PowerSeries.coe_substAlgHom hb]
-    simp only [map_sub, map_pow, map_add (f := _), map_one, PowerSeries.substAlgHom_X, add_sub_cancel, ← pow_mul, mul_comm]
+    simp only [map_sub, map_pow, map_add (f := _), map_one, PowerSeries.substAlgHom_X,
+      add_sub_cancel, ← pow_mul, mul_comm]
   exact RingHom.congr_fun this x
 
-theorem gam_pow (j : ℕ) : gamPi k l ((1 + vv k) ^ j) = (1 + vv k) ^ j * phiPi k l ((1 + vv k) ^ j) := by
+theorem gam_pow (j : ℕ)
+    : gamPi k l ((1 + vv k) ^ j) = (1 + vv k) ^ j * phiPi k l ((1 + vv k) ^ j) := by
   rw [map_pow, map_pow, gam_one_add, phi_one_add, ← mul_pow, pow_add, pow_one]
 
 theorem psi_gam (x : k⸨X⸩) : psiPi k l (gamPi k l x) = gamPi k l (psiPi k l x) :=
   psi_comm k l (gamPi k l : k⸨X⸩ →+* k⸨X⸩) gam_phi (fun j h0 h1 => ⟨j, _, h0, h1, gam_pow j⟩) x
 
-theorem gam_vv (h5 : 5 ≤ l) : ∃ c : k⟦X⟧, gamPi k l (vv k) = vv k * (1 + (c : k⸨X⸩) * vv k ^ 2) := by
+theorem gam_vv (h5 : 5 ≤ l)
+    : ∃ c : k⟦X⟧, gamPi k l (vv k) = vv k * (1 + (c : k⸨X⸩) * vv k ^ 2) := by
   haveI : CharP k⸨X⸩ l := charP_of_injective_algebraMap (algebraMap k k⸨X⸩).injective l
   have h := gam_one_add (k := k) (l := l)
   rw [map_add (f := _), map_one, pow_add, pow_one, add_pow_char, one_pow] at h
@@ -455,8 +618,10 @@ theorem gam_vv (h5 : 5 ≤ l) : ∃ c : k⟦X⟧, gamPi k l (vv k) = vv k * (1 +
 
 theorem gam_sub_mem (h5 : 5 ≤ l) {x : k⸨X⸩} (hx : x ∈ Dp k 0) : gamPi k l x - x ∈ Dp k 2 := by
   obtain ⟨c, hc⟩ := gam_vv (k := k) h5
-  have step : ∀ (s : ℤ), s ≤ 1 → (∀ b : k⟦X⟧, gamPi k l b - b ∈ Dp k s) →
-      ∀ b : k⟦X⟧, gamPi k l b - b ∈ Dp k (s + 1) := by
+  have step
+      : ∀ (s : ℤ),
+        s ≤ 1 → (∀ b : k⟦X⟧, gamPi k l b - b ∈ Dp k s)
+          → ∀ b : k⟦X⟧, gamPi k l b - b ∈ Dp k (s + 1) := by
     intro s hs h a
     set b : k⟦X⟧ := PowerSeries.mk fun n => PowerSeries.coeff (n + 1) a
     have ha : (a : k⸨X⸩) = vv k * (b : k⸨X⸩) + algebraMap k k⸨X⸩ (PowerSeries.constantCoeff a) := by
@@ -466,7 +631,8 @@ theorem gam_sub_mem (h5 : 5 ≤ l) {x : k⸨X⸩} (hx : x ∈ Dp k 0) : gamPi k 
     have : gamPi k l a - a = vv k ^ 1 * (gamPi k l b - b) + vv k ^ 3 * ((c * t : k⟦X⟧) : k⸨X⸩) := by
       rw [ha, map_add (gamPi k l), map_mul (gamPi k l), AlgHom.commutes, hc, ht, map_mul]; ring
     rw [this]
-    exact Submodule.add_mem _ (Dp_mul (pow_mem 1) (h b) (by omega)) (Dp_mul (pow_mem 3) (coe_mem _) (by omega))
+    exact Submodule.add_mem _ (Dp_mul (pow_mem 1) (h b) (by omega))
+      (Dp_mul (pow_mem 3) (coe_mem _) (by omega))
   obtain ⟨a, rfl⟩ := mem_Dp_zero.1 hx
   refine step 1 le_rfl (step 0 zero_le_one fun b => ?_) a
   obtain ⟨t, ht⟩ := gam_int (l := l) b
@@ -482,7 +648,8 @@ def piLat (k : Type) [Field k] (n : ℕ) : Submodule k⟦X⟧ (Fin n → k⸨X�
   Submodule.pi Set.univ fun _ => stdLat k
 
 theorem mem_sh_piLat {s : ℤ} {y : Fin n → k⸨X⸩} : y ∈ sh s (piLat k n) ↔ ∀ i, y i ∈ Dp k s := by
-  simp only [Dp, mem_sh_iff_smul_mem, piLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Pi.smul_apply]
+  simp only [Dp, mem_sh_iff_smul_mem, piLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff,
+    Pi.smul_apply]
 
 theorem isLat_piLat : IsLat (piLat k n) := by
   refine ⟨Submodule.fg_pi fun _ => isLat_stdLat.1, ?_⟩
@@ -498,50 +665,62 @@ theorem exists_mem_sh (y : Fin n → k⸨X⸩) : ∃ s, y ∈ sh s (piLat k n) :
   obtain ⟨s, hs⟩ := (Set.finite_range fun i => (y i).order).bddBelow
   exact ⟨s, mem_sh_piLat.2 fun i => Dp_mono (hs ⟨i, rfl⟩) (order_mem _)⟩
 
-def semiOp (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩) : (Fin n → k⸨X⸩) →ₗ[k] (Fin n → k⸨X⸩) :=
+def semiOp (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩)
+    : (Fin n → k⸨X⸩) →ₗ[k] (Fin n → k⸨X⸩) :=
   ((Matrix.toLin' H).restrictScalars k) ∘ₗ (lin σ).compLeft (Fin n)
 
-theorem semiOp_apply (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩) (y : Fin n → k⸨X⸩) (i : Fin n) :
-    semiOp σ H y i = ∑ m, H i m * σ (y m) := rfl
+theorem semiOp_apply
+    (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩) (y : Fin n → k⸨X⸩) (i : Fin n)
+    : semiOp σ H y i = ∑ m, H i m * σ (y m) :=
+  rfl
 
-theorem semi_semiOp (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩) : Semi σ (semiOp σ H) := by
+theorem semi_semiOp (σ : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : Matrix (Fin n) (Fin n) k⸨X⸩)
+    : Semi σ (semiOp σ H) := by
   intro a x
   funext i
   simp only [semiOp_apply, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => by ring
 
-theorem twist_bij (h5 : 5 ≤ l) (H : Matrix (Fin n) (Fin n) k⸨X⸩) (hH : ∀ i m, (H - 1) i m ∈ Dp k 2)
-    {j : ℕ} (h0 : 0 < j) (h1 : j < l) (s : ℤ) :
-    Set.BijOn (fun y => (1 + vv k) ^ j • semiOp (gamPi k l) H y - y) (sh s (piLat k n)) (sh (s + 1) (piLat k n)) := by
-  refine TwistShift.bijOn_twist (gamPi k l) _ (semi_semiOp _ H) gam_int (gam_vv h5) _ isLat_piLat ?_ j ?_ s
+theorem twist_bij
+    (h5 : 5 ≤ l)
+    (H : Matrix (Fin n) (Fin n) k⸨X⸩) (hH : ∀ i m, (H - 1) i m ∈ Dp k 2)
+    {j : ℕ} (h0 : 0 < j) (h1 : j < l)
+    (s : ℤ)
+    : Set.BijOn
+      (fun y => (1 + vv k) ^ j • semiOp (gamPi k l) H y - y)
+      (sh s (piLat k n)) (sh (s + 1) (piLat k n)) := by
+  refine TwistShift.bijOn_twist (gamPi k l) _ (semi_semiOp _ H) gam_int (gam_vv h5) _ isLat_piLat ?_
+    j ?_ s
   · intro x hx
     rw [← sh_zero_eq (piLat k n), mem_sh_piLat] at hx
     refine mem_sh_piLat.2 fun i => ?_
-    have : (semiOp (gamPi k l) H x - x) i =
-        ∑ m, (H - 1) i m * gamPi k l (x m) + (gamPi k l (x i) - x i) := by
+    have : (semiOp (gamPi k l) H x - x) i
+        = ∑ m, (H - 1) i m * gamPi k l (x m) + (gamPi k l (x i) - x i) := by
       simp [semiOp_apply, sub_mul, Matrix.one_apply]
     rw [this]
-    refine Submodule.add_mem _ (Submodule.sum_mem _ fun m _ => Dp_mul (t := 0) (hH i m) ?_ (by simp))
-      (gam_sub_mem h5 (hx i))
+    refine Submodule.add_mem _
+      (Submodule.sum_mem _ fun m _ => Dp_mul (t := 0) (hH i m) ?_ (by simp)) (gam_sub_mem h5 (hx i))
     obtain ⟨a, ha⟩ := mem_Dp_zero.1 (hx m)
     obtain ⟨b, hb⟩ := gam_int (l := l) a
-    rw [ha, hb]; exact coe_mem _
+    rw [ha, hb]
+    exact coe_mem _
   · rw [Ne, CharP.cast_eq_zero_iff k l]
     exact Nat.not_dvd_of_pos_of_lt h0 h1
 
-theorem op_assemble (H : Matrix (Fin n) (Fin n) k⸨X⸩) (y : Fin l → Fin n → k⸨X⸩) (i : Fin n) :
-    ∑ m, phiPi k l (H i m) * gamPi k l (assemble k l fun j => y j m) - assemble k l (fun j => y j i) =
-      assemble k l fun j => ((1 + vv k) ^ (j : ℕ) • semiOp (gamPi k l) H (y j) - y j) i := by
-
-  simp only [assemble, map_sum, map_mul (gamPi k l), gam_pow, gam_phi, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
-  semiOp_apply, map_sub, map_mul (phiPi k l), mul_sub, Finset.sum_sub_distrib, Finset.mul_sum]
+theorem op_assemble (H : Matrix (Fin n) (Fin n) k⸨X⸩) (y : Fin l → Fin n → k⸨X⸩) (i : Fin n)
+    : ∑ m, phiPi k l (H i m) * gamPi k l (assemble k l fun j => y j m)
+        - assemble k l (fun j => y j i)
+      = assemble k l fun j => ((1 + vv k) ^ (j : ℕ) • semiOp (gamPi k l) H (y j) - y j) i := by
+  simp only [assemble, map_sum, map_mul (gamPi k l), gam_pow, gam_phi, Pi.sub_apply, Pi.smul_apply,
+    smul_eq_mul, semiOp_apply, map_sub, map_mul (phiPi k l), mul_sub, Finset.sum_sub_distrib,
+    Finset.mul_sum]
   rw [Finset.sum_comm]
   congr 1
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 omit [CharP k l] in
-theorem exists_assemble (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0) :
-    ∃ y : Fin l → Fin n → k⸨X⸩, y 0 = 0 ∧ x = fun i => assemble k l fun j => y j i := by
+theorem exists_assemble (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0)
+    : ∃ y : Fin l → Fin n → k⸨X⸩, y 0 = 0 ∧ x = fun i => assemble k l fun j => y j i := by
   choose y hy using fun i => (assemble_bijective k l).2 (x i)
   refine ⟨fun j i => y i j, funext fun i => ?_, funext fun i => (hy i).symm⟩
   change y i 0 = 0
@@ -550,19 +729,25 @@ theorem exists_assemble (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 
 variable (h5 : 5 ≤ l) (H : Matrix (Fin n) (Fin n) k⸨X⸩) (hH : ∀ i m, (H - 1) i m ∈ Dp k 2)
 include h5 hH
 
-theorem core_maps {s : ℤ} (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0) (hs : ∀ i, x i ∈ Dp k (l * s))
-    (i : Fin n) : psiPi k l (∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i) = 0 ∧
-      ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i ∈ Dp k (l * (s + 1)) := by
+theorem core_maps
+    {s : ℤ} (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0) (hs : ∀ i, x i ∈ Dp k (l * s))
+    (i : Fin n)
+    : psiPi k l (∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i) = 0
+      ∧ ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i ∈ Dp k (l * (s + 1)) := by
   obtain ⟨y, h0, rfl⟩ := exists_assemble x hx
   rw [op_assemble, psi_assemble]
   refine ⟨by simp [h0], assemble_mem k l fun j => ?_⟩
   by_cases hj : j = 0
   · simp [hj, h0]
-  · exact mem_sh_piLat.1 ((twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).1
-      (mem_sh_piLat.2 fun i => mem_of_assemble_mem k l (hs i) j)) i
+  · exact mem_sh_piLat.1
+      ((twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).1
+        (mem_sh_piLat.2 fun i => mem_of_assemble_mem k l (hs i) j))
+      i
 
-theorem core_inj (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0)
-    (h : ∀ i, ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i = 0) : x = 0 := by
+theorem core_inj
+    (x : Fin n → k⸨X⸩)
+    (hx : ∀ i, psiPi k l (x i) = 0) (h : ∀ i, ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i = 0)
+    : x = 0 := by
   obtain ⟨y, h0, rfl⟩ := exists_assemble x hx
   have hz : assemble k l 0 = 0 := by simp [assemble]
   have : ∀ j, y j = 0 := by
@@ -570,7 +755,8 @@ theorem core_inj (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0)
     by_cases hj : j = 0
     · rw [hj, h0]
     obtain ⟨s, hs⟩ := exists_mem_sh (y j)
-    refine (twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).2.1 hs (Submodule.zero_mem _) ?_
+    refine (twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).2.1 hs
+      (Submodule.zero_mem _) ?_
     funext i
     have h1 := h i
     rw [op_assemble, ← hz] at h1
@@ -578,17 +764,20 @@ theorem core_inj (x : Fin n → k⸨X⸩) (hx : ∀ i, psiPi k l (x i) = 0)
   funext i
   simp [this, assemble]
 
-theorem core_surj {s : ℤ} (z : Fin n → k⸨X⸩) (hz : ∀ i, psiPi k l (z i) = 0) (hs : ∀ i, z i ∈ Dp k (l * (s + 1))) :
-    ∃ x : Fin n → k⸨X⸩, (∀ i, psiPi k l (x i) = 0) ∧ (∀ i, x i ∈ Dp k (l * s)) ∧
-      ∀ i, ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i = z i := by
+theorem core_surj
+    {s : ℤ} (z : Fin n → k⸨X⸩) (hz : ∀ i, psiPi k l (z i) = 0) (hs : ∀ i, z i ∈ Dp k (l * (s + 1)))
+    : ∃ x : Fin n → k⸨X⸩,
+      (∀ i, psiPi k l (x i) = 0) ∧ (∀ i, x i ∈ Dp k (l * s))
+        ∧ ∀ i, ∑ m, phiPi k l (H i m) * gamPi k l (x m) - x i = z i := by
   obtain ⟨w, h0, rfl⟩ := exists_assemble z hz
-  have : ∀ j : Fin l, ∃ y ∈ sh s (piLat k n), (j = 0 → y = 0) ∧
-      (1 + vv k) ^ (j : ℕ) • semiOp (gamPi k l) H y - y = w j := by
+  have : ∀ j : Fin l, ∃ y ∈ sh s (piLat k n),
+      (j = 0 → y = 0) ∧ (1 + vv k) ^ (j : ℕ) • semiOp (gamPi k l) H y - y = w j := by
     intro j
     by_cases hj : j = 0
     · exact ⟨0, Submodule.zero_mem _, fun _ => rfl, by simp [hj, h0]⟩
-    obtain ⟨y, hy, h⟩ := (twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).2.2
-      (mem_sh_piLat.2 fun i => mem_of_assemble_mem k l (hs i) j)
+    obtain ⟨y, hy, h⟩ :=
+      (twist_bij h5 H hH (Nat.pos_of_ne_zero (by simpa using hj)) j.2 s).2.2 (mem_sh_piLat.2
+        fun i => mem_of_assemble_mem k l (hs i) j)
     exact ⟨y, hy, fun e => absurd e hj, h⟩
   choose y h1 h2 h3 using this
   refine ⟨fun i => assemble k l fun j => y j i, fun i => ?_, fun i => ?_, fun i => ?_⟩
@@ -599,3 +788,7 @@ theorem core_surj {s : ℤ} (z : Fin n → k⸨X⸩) (hz : ∀ i, psiPi k l (z i
 end Core
 
 end GlobalTheory.PsiShiftProof
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemOfAssembleMem =====

@@ -124,7 +124,7 @@ theorem exists_cofRel_hw
   have hmem : hw R le_rfl (nuDual ν) ∈ weyl R (m + 1) (m + 1) le_rfl (nuDual ν) :=
     Submodule.subset_span ⟨[], rfl⟩
   have hJ :=
-    Formalism.UG.Final.WeylGLStable R (m + 1) (m + 1) le_rfl (nuDual ν) (antiDiagGL R (m + 1)) _
+    _root_.Formalism.UG.P.wlocal_global R (m + 1) (m + 1) le_rfl (nuDual ν) (antiDiagGL R (m + 1)) _
       hmem
   have hnext : ∀ (μ : Fin (m + 1) → ℕ) (s : Fin m), nuNext μ s.castSucc = μ s.succ := by
     intro μ s

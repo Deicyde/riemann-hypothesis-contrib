@@ -339,7 +339,6 @@ theorem eΔ_of (C₀ : Coord W I W.one) (e₀ : C₀.V) (he₀ : ∀ i, C₀.t i
     W.γD W.one δ e
       = W.γD W.one δ ((∑ i, (letE i : LetA O n)) • e) := by rw [hsum, one_smul]
     _ = (∑ i, (letE i : LetA O n)) • e := by
-
       rw [Finset.sum_smul, map_sum]
       simp only [key]
     _ = e := by rw [hsum, one_smul]
@@ -351,9 +350,7 @@ theorem ext_of
     : ∀ κ ∈ Zf C, ∃ (R : RealExt C C₀) (hE : R.Exact),
       IsSESLat (Qp := Qp) R.ι R.π ∧ CrysLat PD R.Y ∧ (R.ext hE).Rep e₀ κ.1 κ.2 := by
   intro κ hκ
-  simp only [Zf, ZfD, AddSubgroup.mem_comap, Submodule.mem_toAddSubgroup, Submodule.mem_map,
-      Submodule.mem_comap]
-    at hκ
+  simp only [Zf, ZfD, AddSubgroup.mem_comap, Submodule.mem_toAddSubgroup] at hκ
   obtain ⟨w, hw, hweq⟩ := hκ
   have h1 : (w : W.DD T × W.DD T).1 = tot C κ.1 := congrArg Prod.fst hweq
   have h2 : (w : W.DD T × W.DD T).2 = tot C κ.2 := congrArg Prod.snd hweq

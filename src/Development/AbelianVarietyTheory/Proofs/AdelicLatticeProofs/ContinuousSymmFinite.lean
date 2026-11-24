@@ -75,7 +75,8 @@ theorem continuous_symm_finite
   intro W hW
   obtain ⟨N, hN, hNW⟩ := h0 W hW
   rw [Filter.mem_map]
-  refine Filter.mem_of_superset (GlobalTheory.AdLat.OpenLat.nsmul_integral_mem_nhds E N hN) ?_
+  refine Filter.mem_of_superset
+    (_root_.GlobalTheory.IntegralNeighbourhoodZero.nsmul_integral_mem_nhds_zero E N hN) ?_
   rintro _ ⟨a, ha, rfl⟩
   rw [Set.mem_preimage, map_nsmul]
   apply hNW

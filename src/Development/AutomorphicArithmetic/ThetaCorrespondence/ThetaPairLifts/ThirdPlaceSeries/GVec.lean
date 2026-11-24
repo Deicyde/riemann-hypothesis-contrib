@@ -39,8 +39,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 set_option genSizeOfSpec false
 noncomputable section

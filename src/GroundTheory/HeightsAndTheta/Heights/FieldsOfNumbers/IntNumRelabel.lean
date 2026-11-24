@@ -76,9 +76,10 @@ def precompOrderIso : (K₂ → ℤ) ≃o (K₁ → ℤ) where
     · intro h k
       exact h (e k)
 
-theorem eventualValue_congr {K K' : Type*} {f : (K → ℤ) → ℤ} {g : (K' → ℤ) → ℤ}
-    (h : ∀ c, (∀ᶠ m in atTop, f m = c) ↔ ∀ᶠ m in atTop, g m = c) :
-    eventualValue f = eventualValue g := by
+theorem eventualValue_congr
+    {K K' : Type*} {f : (K → ℤ) → ℤ} {g : (K' → ℤ) → ℤ}
+    (h : ∀ c, (∀ᶠ m in atTop, f m = c) ↔ ∀ᶠ m in atTop, g m = c)
+    : eventualValue f = eventualValue g := by
   unfold eventualValue
   by_cases hf : ∃ c, ∀ᶠ m in atTop, f m = c
   · have hg : ∃ c, ∀ᶠ m in atTop, g m = c := hf.imp fun c hc => (h c).1 hc
@@ -90,29 +91,30 @@ theorem eventualValue_congr {K K' : Type*} {f : (K → ℤ) → ℤ} {g : (K' �
   · have hg : ¬ ∃ c, ∀ᶠ m in atTop, g m = c := fun ⟨c, hc⟩ => hf ⟨c, (h c).2 hc⟩
     rw [dite_eq_right hf, dite_eq_right hg]
 
-theorem eventualValue_precomp (g : (K₁ → ℤ) → ℤ) :
-    eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
+theorem eventualValue_precomp (g : (K₁ → ℤ) → ℤ)
+    : eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
   refine eventualValue_congr fun c => ?_
   rw [← (precompOrderIso e).map_atTop, Filter.eventually_map]
   rfl
 
-theorem mixedDiff_precomp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ) :
-    mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
+theorem mixedDiff_precomp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ)
+    : mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
   apply _root_.GroundTheory.Heights₂.Heights.FieldNumbers.RenameIntNum.mixedDiff_comp <;> assumption
 
 end Eventual
 
 section Rename
 
-variable {K₁ K₂ : Type*} [DecidableEq K₁] [DecidableEq K₂] {ι₁ : K₁ → Type*} {ι₂ : K₂ → Type*}
+variable
+  {K₁ K₂ : Type*} [DecidableEq K₁] [DecidableEq K₂]
+  {ι₁ : K₁ → Type*} {ι₂ : K₂ → Type*}
   (e : K₁ ≃ K₂) (φ : (Σ k, ι₁ k) ≃ (Σ k, ι₂ k)) (hφ : ∀ v, (φ v).1 = e v.1)
   {F : Type*} [Field F]
 
-
 include hφ in
-theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ) :
-    Finsupp.weight (blockWeight ι₂) (Finsupp.mapDomain φ d) =
-      Finsupp.weight (blockWeight ι₁) d ∘ e.symm := by
+theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ)
+    : Finsupp.weight (blockWeight ι₂) (Finsupp.mapDomain φ d)
+      = Finsupp.weight (blockWeight ι₁) d ∘ e.symm := by
   induction d using Finsupp.induction_linear with
   | zero => funext k; simp
   | add a b ha hb =>
@@ -124,13 +126,13 @@ theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ) :
     simp only [blockWeight, hφ, Pi.smul_apply, Function.comp_apply, Pi.single_apply,
       Equiv.symm_apply_eq]
 
-
 include hφ in
-theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ) :
-    gradedPiece (I.map (renameEquiv F φ)) d =
-      (gradedPiece I (d ∘ e)).map
-        ((Ideal.quotientEquivAlg I (I.map (renameEquiv F φ)) (renameEquiv F φ) (Ideal.map_coe _ _).symm).toLinearEquiv :
-          (MRing ι₁ F ⧸ I) →ₗ[F] MRing ι₂ F ⧸ I.map (renameEquiv F φ)) := by
+theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ)
+    : gradedPiece (I.map (renameEquiv F φ)) d
+      = (gradedPiece I (d ∘ e)).map
+        ((Ideal.quotientEquivAlg I (I.map (renameEquiv F φ)) (renameEquiv F φ)
+            (Ideal.map_coe _ _).symm).toLinearEquiv
+          : (MRing ι₁ F ⧸ I) →ₗ[F] MRing ι₂ F ⧸ I.map (renameEquiv F φ)) := by
   rw [gradedPiece_eq_span, gradedPiece_eq_span, Submodule.map_span, Set.image_image]
   congr 1
   ext x
@@ -151,17 +153,15 @@ theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ) :
     funext k
     simp
 
-
 include hφ in
-theorem finrank_gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ) :
-    Module.finrank F (gradedPiece (I.map (renameEquiv F φ)) d) =
-      Module.finrank F (gradedPiece I (d ∘ e)) := by
+theorem finrank_gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ)
+    : Module.finrank F (gradedPiece (I.map (renameEquiv F φ)) d)
+      = Module.finrank F (gradedPiece I (d ∘ e)) := by
   rw [gradedPiece_map_rename e φ hφ, LinearEquiv.finrank_map_eq]
 
-
 include hφ in
-theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ) :
-    hilbFn (I.map (renameEquiv F φ)) m = hilbFn I (m ∘ e) := by
+theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ)
+    : hilbFn (I.map (renameEquiv F φ)) m = hilbFn I (m ∘ e) := by
   unfold hilbFn
   have hpos : (∀ k, 0 ≤ m k) ↔ ∀ k, 0 ≤ (m ∘ e) k :=
     ⟨fun h k => h (e k), fun h k => by simpa using h (e.symm k)⟩
@@ -170,10 +170,9 @@ theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ) :
     exact congrArg _ (finrank_gradedPiece_map_rename e φ hφ I (fun k => (m k).toNat))
   · rw [if_neg h, if_neg (mt hpos.2 h)]
 
-
 include hφ in
-theorem intNum_map_rename (I : Ideal (MRing ι₁ F)) {n : ℕ} (bs : Fin n → K₂ → ℤ) :
-    intNum F (I.map (renameEquiv F φ)) bs = intNum F I (fun i => bs i ∘ e) := by
+theorem intNum_map_rename (I : Ideal (MRing ι₁ F)) {n : ℕ} (bs : Fin n → K₂ → ℤ)
+    : intNum F (I.map (renameEquiv F φ)) bs = intNum F I (fun i => bs i ∘ e) := by
   unfold intNum
   have h : hilbFn (I.map (renameEquiv F φ)) = fun m => hilbFn I (m ∘ e) :=
     funext (hilbFn_map_rename e φ hφ I)

@@ -47,6 +47,7 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
   ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
+
 theorem _root_.GlobalTheory.T.uniformisationAt_correspond_of_cartesian
     : ∀ (O : Type) [Ring O] (bar : O → O) (g : ℕ) (ρ : O →+* Matrix (Fin g) (Fin g) ℂ) (R R' : Type)
         [CommRing R] [CommRing R'] (σ : R →+* ℂ) (σ' : R' →+* ℂ) (Λ : Type) (F : Fam R O Λ g)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.uniformisationAt_correspond_of_cartesian
               ∧ ∀ e,
                 UnifAt F σ ρ N D' t P (y' ≫ f) e
                   → ∃ e', UnifAt F' σ' ρ N D' t P y' e' ∧ ∀ z, (e z).left = (e' z).left ≫ φ := by
-  first
-  | exact @GlobalTheory.unifAt_correspond_of_cartesian
-  | exact GlobalTheory.unifAt_correspond_of_cartesian
-  | (intros; apply GlobalTheory.unifAt_correspond_of_cartesian <;> assumption)
+  first | exact @GlobalTheory.unifAt_correspond_of_cartesian

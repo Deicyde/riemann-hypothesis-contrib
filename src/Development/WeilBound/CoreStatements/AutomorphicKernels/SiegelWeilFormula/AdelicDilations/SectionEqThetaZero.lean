@@ -146,7 +146,9 @@ theorem fcVal
   obtain ⟨hUo, hR, hs, hp, hd, hcont, hinv, hfar⟩ := hE
   obtain ⟨hadd, hbd⟩ := fcAll d' hc T g
   obtain ⟨hDiff, hComm⟩ :=
-    lamDeriv (rat2 σ d'.Y) (fun f => fc d'.B.ψ d'.b nb lam 𝓖 f T g) hadd hbd U Ê hUo hd hcont hinv
+    _root_.GlobalTheory.CompanionTheory.HolFamily.functional_commutes_iteratedDeriv (rat2 σ d'.Y)
+      (fun f => fc d'.B.ψ d'.b nb lam 𝓖 f T g)
+      hadd hbd U Ê hUo hd hcont hinv
   have hpt
       : ∀ g', ∀ i ≤ p.rootMultiplicity (s0 d'.m d'.n),
         iteratedDeriv i (Ê · g') (s0 d'.m d'.n)

@@ -138,17 +138,13 @@ theorem transversal_mul
       rw [← mul_assoc, hsd, inv_mul_cancel_right]
     · rintro ⟨s', ⟨x, ⟨d', hd', rfl⟩⟩⟩ h
       have h0 : (s' : G) * (d' * γ) = γ' := h
-      have h' : ((s', (⟨d', hd'⟩ : D)).1 : G) * ((s', (⟨d', hd'⟩ : D)).2 : G) = γ' * γ⁻¹ := by
-        show (s' : G) * d' = γ' * γ⁻¹
+      have h' : (s' : G) * d' = γ' * γ⁻¹ := by
         rw [← h0]
         group
       have e0 := huniq (s', ⟨d', hd'⟩) h'
-      have e1 : s' = s := congrArg Prod.fst e0
-      have e2 : d' = (d : G) := congrArg (fun p : S × D => (p.2 : G)) e0
-      subst e1
+      obtain rfl : s' = s := congrArg Prod.fst e0
       refine Prod.ext rfl (Subtype.ext ?_)
-      show d' * γ = (d : G) * γ
-      rw [e2]
+      exact congrArg (fun p : S × D => (p.2 : G) * γ) e0
 
 theorem poinc_left_inv
     (Γ S : Subgroup G) (D : Set G) (hD : FoldBound.IsRightTransversal Γ S D)
@@ -348,9 +344,7 @@ theorem ph_Rph
       intro z
       refine ph_eq_zero X u hK T _ ?_
       simpa using hd
-    refine ⟨?_, ?_⟩
-    · simp [hz0]
-    · simp [hz0, ph_eq_zero X u hK T y hd]
+    simp [hz0, ph_eq_zero X u hK T y hd]
 
 theorem phProps_of
     (hK : X.LevelSubgroupCharacter)

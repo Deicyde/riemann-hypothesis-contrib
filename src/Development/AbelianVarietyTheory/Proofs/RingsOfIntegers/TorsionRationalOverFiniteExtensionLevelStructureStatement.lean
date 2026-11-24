@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.torsion_rational_over_finite_extension_level_structure
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (K : Type) [Field K] (x : Sp K ⟶ Xo.X) (M : ℕ),
@@ -61,7 +63,4 @@ theorem _root_.GlobalTheory.T.torsion_rational_over_finite_extension_level_struc
                   ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o)
                   ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a)
                   ∧ ∀ w : (ptO Xo x ⟶ Xo.univ.t.G), w ^ M = 1 → ∃ a, ev a = w) := by
-  first
-  | exact @GlobalTheory.torsion_rational_over_finite_extension
-  | exact GlobalTheory.torsion_rational_over_finite_extension
-  | (intros; apply GlobalTheory.torsion_rational_over_finite_extension <;> assumption)
+  first | exact @GlobalTheory.torsion_rational_over_finite_extension

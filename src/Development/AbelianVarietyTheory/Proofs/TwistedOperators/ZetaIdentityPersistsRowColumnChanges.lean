@@ -2,7 +2,6 @@ module
 
 public import Mathlib.Analysis.Matrix.MeasurableSpace
 public import Formalism.DoubleCosetMeasures.StatementZ
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RankEqCardIffExistsFrameMatrixFirstColumnBlock
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsGivenStageEqOne
 import Development.AbelianVarietyTheory.Definitions.Divisors.LineOppositeParabolicUnitaryLeviSectionEq
@@ -114,7 +113,7 @@ theorem shellSum_mul_left
           φ (g₀.val * g.val) * (ν (gdet g) : ℂ) * apow (gdet g) z
             = ((ν (gdet g₀) : ℂ))⁻¹ * F (g₀ * g) := by
       intro g
-      simp only [hF, gdet_mul, apow_mul, hz, map_mul, Units.val_mul, one_mul]
+      simp only [hF, apow_mul, hz, map_mul, Units.val_mul, one_mul]
       field_simp
     have hR
         : ∀ g : GL (Fin a) k,
@@ -217,7 +216,7 @@ theorem exists_smallF_rows
           = (lam * ((ν (gdet g₀) : ℂ))⁻¹ * (apow (gdet g₀) ((Fintype.card C : ℂ) / 2))⁻¹)
             * F (renum e (g₀ * g)) := by
     intro g
-    simp only [hF, renum_mul_reindex, gdet_renum, gdet_mul, map_mul, Units.val_mul, apow_mul, hCC,
+    simp only [hF, renum_mul_reindex, gdet_renum, map_mul, Units.val_mul, apow_mul, hCC,
       Matrix.mul_assoc]
     field_simp
   have h2 := hint F
@@ -249,7 +248,6 @@ theorem exists_reindex_unit
       simp [reindex_apply]
     ext
     simp only [gdet, Matrix.GeneralLinearGroup.val_det_apply, Units.val_mul]
-    change det (reindex τ eC u.val) = _
     rw [hsub, det_permute, det_submatrix_equiv_self]
     simp
 

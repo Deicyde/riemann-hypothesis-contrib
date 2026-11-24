@@ -1,9 +1,9 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqPowOfKummerClassOfUnitEqZero
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSheafSectionsExtAndGlueStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSheafSectionsExtAndGlue
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleToSheafifyLocallyBijectiveAndLiftStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqPowOfKummerClassOfUnitEqZero
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -47,13 +47,15 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 namespace UpperTheory
 open Polynomial
 
-private def evalX {A : Type} [CommRing A] (a : A) : ℤ[X] →+* A := Polynomial.eval₂RingHom (Int.castRingHom A) a
+private def evalX {A : Type} [CommRing A] (a : A) : ℤ[X] →+* A :=
+  Polynomial.eval₂RingHom (Int.castRingHom A) a
 
 private lemma evalX_X {A : Type} [CommRing A] (a : A) : evalX a X = a := by simp [evalX]
 
@@ -165,7 +167,7 @@ private lemma unitSec_inj {U : Scheme.{0}} (u v : (Γ(U, ⊤))ˣ) (h : unitSec u
     have h1 := unitSec_mul (u * v⁻¹) v
     rw [inv_mul_cancel_right, h] at h1
     exact (right_eq_add.mp h1)
-  obtain ⟨S, hS, hl⟩ := (GlobalTheory.T.etaleToSheafify_locally_bijective_and_lift ℤ (Scheme.Γ ⋙ unitsF)).2.1 U
+  obtain ⟨S, hS, hl⟩ := (_root_.GlobalTheory.EtC.toSheafify_loc_bij_lift ℤ (Scheme.Γ ⋙ unitsF)).2.1 U
     (ULift.up (Additive.ofMul (u * v⁻¹)) : ULift (Additive (Γ(U, ⊤))ˣ)) h0
   have h1 : u * v⁻¹ = 1 := sepU S hS _ _ fun V g hg => by
     have h2 := hl V g hg
@@ -178,8 +180,8 @@ private lemma unitSec_inj {U : Scheme.{0}} (u v : (Γ(U, ⊤))ˣ) (h : unitSec u
 end UpperTheory
 
 open UpperTheory in
-theorem UpperTheory.exists_unit_eq_multiplicativeGroup_section :
-    ∀ (X : Scheme.{0}) (b : Sec Gm X), ∃ u : (Γ(X, ⊤))ˣ, unitSec u = b := by
+theorem UpperTheory.exists_unit_eq_multiplicativeGroup_section
+    : ∀ (X : Scheme.{0}) (b : Sec Gm X), ∃ u : (Γ(X, ⊤))ˣ, unitSec u = b := by
   apply GlobalTheory.EtC.KumZero.unitSec_surjective <;> assumption
 
 end

@@ -92,9 +92,9 @@ private theorem pyc_kosZ_mono
   intro s _
   have h1 := hc.1 s (Set.mem_univ _)
   by_cases hs : (s.card : ℤ) = m
-  · simp only [kos, acx, if_pos hs] at h1 ⊢
+  · simp only [if_pos hs] at h1 ⊢
     exact h h1
-  · simp only [kos, acx, if_neg hs] at h1 ⊢
+  · simp only [if_neg hs] at h1 ⊢
     exact h1
 
 private theorem pyc_kstep

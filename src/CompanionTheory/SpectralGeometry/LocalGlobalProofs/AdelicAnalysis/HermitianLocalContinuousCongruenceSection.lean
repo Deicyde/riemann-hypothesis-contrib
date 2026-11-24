@@ -1,7 +1,7 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianOrbitLocalSectionSubgroupStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianOrbitLocalSectionSubgroup
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -75,12 +75,12 @@ theorem exists_local_section
                           * (g S' : Matrix (Fin n) (Fin n) (R ⊗[F] E)) := by
   intro F E _ _ _ _ _ σ hσ R _ _ _ _ _ hR n S hS
   obtain ⟨Q, o, -, -, ho, hform⟩ :=
-    GlobalTheory.T.hermitian_orbit_local_section_subgroup F E σ hσ R hR n S hS
+    _root_.GlobalTheory.CompanionTheory.SW.tri_slice F E σ hσ R hR n S hS
   have hc : cT (sigR R σ) (1 : Matrix (Fin n) (Fin n) (R ⊗[F] E)) = 1 := by
     ext i j
     by_cases h : i = j
     · subst h; simp [cT]
-    · simp [cT, Matrix.one_apply, h, Ne.symm h]
+    · simp [cT, h, Ne.symm h]
   have ho1 : o 1 = S := by
     apply Subtype.ext
     rw [hform]

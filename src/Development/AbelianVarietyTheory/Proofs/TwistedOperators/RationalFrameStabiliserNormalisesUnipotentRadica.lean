@@ -41,6 +41,8 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.AdjointIsotropicDecomposition
 import Formalism.LocalToGlobal.IndefiniteReal.IndefiniteWeightData
 import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
+import Mathlib.Algebra.Azumaya.Basic
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.MemberDatumOfFlagTie
 
 @[expose] public section
 
@@ -63,17 +65,13 @@ theorem incA_injective (D : D7) : Function.Injective (incA D) :=
   Algebra.TensorProduct.includeRight_injective (NumberField.AdeleRing.algebraMap_injective
     (𝓞 D.host.F) D.host.F)
 
-theorem mt_mul (W : HSp D) (g h : GA D W)
-    : Formalism.L2.Theta.mt W (g * h) = Formalism.L2.Theta.mt W g * Formalism.L2.Theta.mt W h := by
-  simp [Formalism.L2.Theta.mt]
-
 theorem mt_inv_mul (W : HSp D) (g : GA D W)
     : Formalism.L2.Theta.mt W g⁻¹ * Formalism.L2.Theta.mt W g = 1 := by
-  rw [← mt_mul]; simp [Formalism.L2.Theta.mt]
+  rw [← _root_.GlobalTheory.BesselCompare.mt_mul]; simp [Formalism.L2.Theta.mt]
 
 theorem mt_mul_inv (W : HSp D) (g : GA D W)
     : Formalism.L2.Theta.mt W g * Formalism.L2.Theta.mt W g⁻¹ = 1 := by
-  rw [← mt_mul]; simp [Formalism.L2.Theta.mt]
+  rw [← _root_.GlobalTheory.BesselCompare.mt_mul]; simp [Formalism.L2.Theta.mt]
 
 theorem mt_mul_frame
     (W : HSp D) {s : ℕ} (L : Matrix (Fin W.rank) (Fin s) D.host.E) (n : GA D W) (hn : n ∈ NI W L)
@@ -86,7 +84,7 @@ theorem mt_mul_frame
   | one =>
     simp [Formalism.L2.Theta.mt]
   | mul x y _ _ hx hy =>
-    rw [mt_mul, Matrix.mul_assoc, hy, hx]
+    rw [_root_.GlobalTheory.BesselCompare.mt_mul, Matrix.mul_assoc, hy, hx]
   | inv x _ hx =>
     calc
       Formalism.L2.Theta.mt W x⁻¹ * L.map (incA D)
@@ -97,7 +95,8 @@ theorem mt_conj_sub_one (W : HSp D) (γ m : GA D W)
     : Formalism.L2.Theta.mt W (γ * m * γ⁻¹) - 1
       = Formalism.L2.Theta.mt W γ * (Formalism.L2.Theta.mt W m - 1)
         * Formalism.L2.Theta.mt W γ⁻¹ := by
-  rw [mt_mul, mt_mul, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, mt_mul_inv]
+  rw [_root_.GlobalTheory.BesselCompare.mt_mul, _root_.GlobalTheory.BesselCompare.mt_mul,
+    Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, mt_mul_inv]
 
 theorem conj_sub_one_kills_frame_of_fixed
     (W : HSp D)

@@ -70,7 +70,6 @@ theorem IsWeightedHomogeneous.bind₁
     (hφ : ∀ x, IsWeightedHomogeneous w' (φ x) (w x))
     : IsWeightedHomogeneous w' (bind₁ φ f) m := by
   classical
-
   rw [f.as_sum, map_sum]
   apply IsWeightedHomogeneous.sum
   intro d hd
@@ -86,8 +85,9 @@ theorem IsWeightedHomogeneous.bind₁
 variable {k n : ℕ}
 
 theorem IsMultiHomog.specFirst
-    {δ : ℕ} {f : MvPolynomial (Fin (k + 1) × Fin n) R} (hf : IsMultiHomog δ f) (u : Fin n → R)
-    : IsMultiHomog δ (specFirst f u) := by
+    {δ : ℕ} {f : MvPolynomial (Fin (k + 1) × Fin n) R} (hf : Heights.IsMultiHomog δ f)
+    (u : Fin n → R)
+    : Heights.IsMultiHomog δ (specFirst f u) := by
   rw [isMultiHomog_iff] at hf ⊢
   intro i
   refine IsWeightedHomogeneous.bind₁ (hf i.succ) _ fun x => ?_

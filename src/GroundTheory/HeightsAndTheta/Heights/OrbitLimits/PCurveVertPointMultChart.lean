@@ -71,7 +71,6 @@ theorem aeval_mul_of_homog
     {f : MRing ι} {d : K → ℕ} (hf : IsMultiHomog f d)
     : aeval (fun p => r p * t p.1) f = aeval r f * ∏ k, t k ^ d k := by
   classical
-
   rw [f.as_sum, map_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
   rw [aeval_monomial, aeval_monomial, mul_assoc]

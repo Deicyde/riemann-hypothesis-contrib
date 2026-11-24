@@ -38,13 +38,12 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
   Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
   NumberField IsDedekindDomain Polynomial
+
 theorem _root_.GlobalTheory.T.side_multiplicity_character_alt
     : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
         (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (low : Finset ℕ)
@@ -65,8 +64,5 @@ theorem _root_.GlobalTheory.T.side_multiplicity_character_alt
             (Au : _root_.GlobalTheory.HeightCounting.AutomorphicSpecialisation A M tp.tup Sp.iq L.Y
               L.C),
           Nonempty (TwOpen (withLoc L) (chL L C) (cfL L cf) (tpL L tp) (mtL L M) low) := by
-  first
-  | exact @_root_.GlobalTheory.HeightCounting.FitTw.nonempty_twOpen_alt
-  | exact _root_.GlobalTheory.HeightCounting.FitTw.nonempty_twOpen_alt
-  | (intros; apply _root_.GlobalTheory.HeightCounting.FitTw.nonempty_twOpen_alt <;> assumption)
+  first | exact @_root_.GlobalTheory.HeightCounting.FitTw.nonempty_twOpen_alt
 end

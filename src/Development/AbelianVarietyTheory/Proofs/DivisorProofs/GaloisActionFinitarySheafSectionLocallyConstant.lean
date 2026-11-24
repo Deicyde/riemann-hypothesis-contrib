@@ -98,7 +98,7 @@ def cocone : Cocone (diag Ω) where
   ι := {
     app := fun s => CommRingCat.ofHom (sr Ω s).subtype
     naturality := fun s t h => by
-      simp only [Functor.const_obj_map, Category.comp_id]
+      simp only [Functor.const_obj_map]
       exact incl_comp_subtype Ω h.le
   }
 
@@ -150,8 +150,8 @@ theorem galois_sec_isLocallyConstant
   intro R _ F hF K Ω _ _ _ _ x
   classical
   obtain ⟨s, y, hy⟩ :=
-    (((GlobalTheory.T.preservesFilteredColimits_moduleCat_iff_forget_iff_elements (ULift.{1} R)
-        (onRings F)).2.1 hF)
+    (((_root_.GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements
+        (ULift.{1} R) (onRings F)).2.1 hF)
       (Finset Ω) (diag Ω) (cocone Ω) (coconeIsColimit Ω)).1 x
   have key
       : ∀ τ : Ω ≃ₐ[K] Ω,

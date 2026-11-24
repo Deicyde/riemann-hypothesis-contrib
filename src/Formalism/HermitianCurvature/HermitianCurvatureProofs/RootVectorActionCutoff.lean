@@ -177,7 +177,6 @@ theorem map_qminor
   rw [map_mul, map_intCast, map_list_prod, List.map_ofFn]
   congr 2
   congr 1
-  congr 1
   funext k
   simp only [Function.comp_apply, Tm, map_add]
   split_ifs <;> simp
@@ -191,7 +190,6 @@ theorem qminor_reindex
   unfold qminor
   refine Finset.sum_congr rfl fun σ _ => ?_
   congr 2
-  congr 1
   congr 1
   funext l
   simp only [Tm, Function.comp_apply]

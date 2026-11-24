@@ -98,7 +98,6 @@ structure SideTie
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure RowsTieSum (R : RealDat D A Ks) (F : Face D A) (X0 : BaseLevelRowSide D) where
   tup : T → D.what₂.Tup
   tup_inj : Function.Injective tup
@@ -160,7 +159,6 @@ structure RowsTieSum (R : RealDat D A Ks) (F : Face D A) (X0 : BaseLevelRowSide 
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure RowsTie (R : RealDat D A Ks) (F : Face D A) (X0 : BaseLevelRowSide D) where
   tup : T → D.what₂.Tup
   tup_inj : Function.Injective tup

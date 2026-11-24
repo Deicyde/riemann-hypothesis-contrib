@@ -110,8 +110,7 @@ theorem normRep_atPt
     (hG : t.G ≠ 0)
     : t.atPt w' := by
   obtain ⟨⟨h, hmk⟩, -, hL, hU, hZ⟩ := hN
-  have hGF :=
-    (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam ((Y.rowsOK u).1 t.lam t.mem)).1
+  have hGF := (_root_.term_function_const D u u' (X.Fu u) t.lam ((Y.rowsOK u).1 t.lam t.mem)).1
   have hG' : Formalism.MainNotions.S.Lat.Gval (lf D (X.Fu u)) F' ≠ 0 := by
     intro h0
     apply hG

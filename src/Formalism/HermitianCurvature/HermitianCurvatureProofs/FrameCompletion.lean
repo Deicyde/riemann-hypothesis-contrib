@@ -62,59 +62,73 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P.QrD
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P.QrD
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace HermitianFormSums
 
-theorem herm_lsum {N : ℕ} {ι : Type*} (H : Matrix (Fin N) (Fin N) ℂ) (s : Finset ι) (c : ι → ℂ) (v : ι → Fin N → ℂ)
-    (w : Fin N → ℂ) : herm H (∑ a ∈ s, c a • v a) w = ∑ a ∈ s, c a * herm H (v a) w := by
+theorem herm_lsum
+    {N : ℕ} {ι : Type*}
+    (H : Matrix (Fin N) (Fin N) ℂ) (s : Finset ι) (c : ι → ℂ) (v : ι → Fin N → ℂ) (w : Fin N → ℂ)
+    : herm H (∑ a ∈ s, c a • v a) w = ∑ a ∈ s, c a * herm H (v a) w := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [herm]
-  | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, Qx8.herm_add_left', Qx8.herm_smul_left', ih]
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, Qx8.herm_add_left', Qx8.herm_smul_left', ih]
 
-theorem herm_rsum {N : ℕ} {ι : Type*} (H : Matrix (Fin N) (Fin N) ℂ) (s : Finset ι) (c : ι → ℂ) (v : ι → Fin N → ℂ)
-    (w : Fin N → ℂ) : herm H w (∑ a ∈ s, c a • v a) = ∑ a ∈ s, star (c a) * herm H w (v a) := by
+theorem herm_rsum
+    {N : ℕ} {ι : Type*}
+    (H : Matrix (Fin N) (Fin N) ℂ) (s : Finset ι) (c : ι → ℂ) (v : ι → Fin N → ℂ) (w : Fin N → ℂ)
+    : herm H w (∑ a ∈ s, c a • v a) = ∑ a ∈ s, star (c a) * herm H w (v a) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [herm]
-  | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, Qx8.herm_add_right', Qx8.herm_smul_right', ih]
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, Qx8.herm_add_right', Qx8.herm_smul_right', ih]
 
 variable {k r : ℕ}
 
-theorem inWb_sum {ι : Type*} (s : Finset ι) (c : ι → ℂ) (v : ι → Fin (2 * r + k + 1) → ℂ)
-    (hv : ∀ a, inWb k r (v a)) : inWb k r (∑ a ∈ s, c a • v a) := by
+theorem inWb_sum
+    {ι : Type*}
+    (s : Finset ι) (c : ι → ℂ) (v : ι → Fin (2 * r + k + 1) → ℂ) (hv : ∀ a, inWb k r (v a))
+    : inWb k r (∑ a ∈ s, c a • v a) := by
   intro i hi
   rw [Finset.sum_apply]
   apply Finset.sum_eq_zero
   intro a _
   rw [Pi.smul_apply, hv a i hi, smul_zero]
 
-theorem herm_comb {m : ℕ} {vs : List (Fin (2 * r + k + 1) → ℂ)} {C : Fin m → Fin (2 * r + k + 1) → ℂ}
-    (hC : IsFrameOf k r vs C) (f g : Fin m → ℂ) :
-    herm (Hpk k r) (∑ a, f a • C a) (∑ b, g b • C b) = ∑ a, f a * star (g a) := by
+theorem herm_comb
+    {m : ℕ} {vs : List (Fin (2 * r + k + 1) → ℂ)} {C : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hC : IsFrameOf k r vs C) (f g : Fin m → ℂ)
+    : herm (Hpk k r) (∑ a, f a • C a) (∑ b, g b • C b) = ∑ a, f a * star (g a) := by
   rw [herm_lsum]
-  apply Finset.sum_congr rfl
-  intro a _
-  rw [herm_rsum]
-  simp only [hC.2.1, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  simp only [herm_rsum, hC.2.1, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ,
+    if_true]
 
-theorem sum_mdim {X : Type*} [AddCommMonoid X] (F : ℕ → X) :
-    ∑ j : Fin (mdim k r (Fin.last r)), F j.val = ∑ a : Fin k, F a.val + F k := by
-  rw [Fin.sum_univ_eq_sum_range, AnisotropicColumnSums.mdim_last, Finset.sum_range_succ, Fin.sum_univ_eq_sum_range]
+theorem sum_mdim {X : Type*} [AddCommMonoid X] (F : ℕ → X)
+    : ∑ j : Fin (mdim k r (Fin.last r)), F j.val = ∑ a : Fin k, F a.val + F k := by
+  rw [Fin.sum_univ_eq_sum_range, AnisotropicColumnSums.mdim_last, Finset.sum_range_succ,
+    Fin.sum_univ_eq_sum_range]
 
-theorem complete {x : Fin (2 * r + k + 1) → ℂ} {Bs : Fin k → Fin (2 * r + k + 1) → ℂ} (hx : inWb k r x)
-    (hxx : herm (Hpk k r) x x ≠ 0) (hB : IsFrameOf k r [x] Bs) {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) :
-    v = ∑ a, herm (Hpk k r) v (Bs a) • Bs a + (herm (Hpk k r) v x * (herm (Hpk k r) x x)⁻¹) • x := by
+theorem complete
+    {x : Fin (2 * r + k + 1) → ℂ} {Bs : Fin k → Fin (2 * r + k + 1) → ℂ}
+    (hx : inWb k r x) (hxx : herm (Hpk k r) x x ≠ 0) (hB : IsFrameOf k r [x] Bs)
+    {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v)
+    : v
+      = ∑ a, herm (Hpk k r) v (Bs a) • Bs a
+        + (herm (Hpk k r) v x * (herm (Hpk k r) x x)⁻¹) • x := by
   apply Formalism.FourierDecayAlt.P.SkewHermitianParts.complete <;> assumption
 
-theorem complete0 {x : Fin (2 * r + k + 1) → ℂ} {Bs : Fin k → Fin (2 * r + k + 1) → ℂ} (hx : inWb k r x)
-    (hxx : herm (Hpk k r) x x ≠ 0) (hB : IsFrameOf k r [x] Bs) {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v)
-    (hvx : herm (Hpk k r) v x = 0) : v = ∑ a, herm (Hpk k r) v (Bs a) • Bs a := by
-  have h := complete hx hxx hB hv
-  rwa [hvx, zero_mul, zero_smul, add_zero] at h
+theorem complete0
+    {x : Fin (2 * r + k + 1) → ℂ} {Bs : Fin k → Fin (2 * r + k + 1) → ℂ}
+    (hx : inWb k r x) (hxx : herm (Hpk k r) x x ≠ 0) (hB : IsFrameOf k r [x] Bs)
+    {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (hvx : herm (Hpk k r) v x = 0)
+    : v = ∑ a, herm (Hpk k r) v (Bs a) • Bs a := by
+  simpa [hvx] using complete hx hxx hB hv
 
 theorem hzz {z : Fin (2 * r + k + 1) → ℂ} (hT : 0 < Tz k r z) : herm (Hpk k r) z z ≠ 0 := by
   intro h
@@ -122,10 +136,14 @@ theorem hzz {z : Fin (2 * r + k + 1) → ℂ} (hT : 0 < Tz k r z) : herm (Hpk k 
   rw [h] at hT
   simp at hT
 
-theorem ec_sum (hE : Formalism.FourierDecayAlt.Qr.EcLie) {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] [FiniteDimensional ℂ W]
-    {z : Fin (2 * r + k + 1) → ℂ} {π : Mx k r → (W →L[ℂ] W)} (hπ : IsRepW k r z π) {ι : Type*} (s : Finset ι)
-    (c : ι → ℂ) (Z : ι → Mx k r) (hZ : ∀ i, InGlW k r z (Z i)) (Z0 : Mx k r) (h0 : InGlW k r z Z0) :
-    InGlW k r z (∑ i ∈ s, c i • Z i) ∧ ecOp π (∑ i ∈ s, c i • Z i) = ∑ i ∈ s, c i • ecOp π (Z i) := by
+theorem ec_sum
+    (hE : Formalism.FourierDecayAlt.Qr.EcLie)
+    {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] [FiniteDimensional ℂ W]
+    {z : Fin (2 * r + k + 1) → ℂ} {π : Mx k r → (W →L[ℂ] W)} (hπ : IsRepW k r z π)
+    {ι : Type*} (s : Finset ι) (c : ι → ℂ) (Z : ι → Mx k r) (hZ : ∀ i, InGlW k r z (Z i))
+    (Z0 : Mx k r) (h0 : InGlW k r z Z0)
+    : InGlW k r z (∑ i ∈ s, c i • Z i)
+      ∧ ecOp π (∑ i ∈ s, c i • Z i) = ∑ i ∈ s, c i • ecOp π (Z i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -137,9 +155,15 @@ theorem ec_sum (hE : Formalism.FourierDecayAlt.Qr.EcLie) {W : Type} [NormedAddCo
     rw [Finset.sum_insert ha, Finset.sum_insert ha]
     exact ⟨h2.1, by rw [h2.2, h1.2, ih.2]⟩
 
-theorem frame_sub {m : ℕ} {z e : Fin (2 * r + k + 1) → ℂ} {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
-    (hB : IsFrameOf k r [z, e] Bs) : IsFrameOf k r [z] Bs :=
-  ⟨hB.1, hB.2.1, fun a v hv => hB.2.2 a v (by simp only [List.mem_cons, List.not_mem_nil, or_false] at hv ⊢; exact Or.inl hv)⟩
+theorem frame_sub
+    {m : ℕ} {z e : Fin (2 * r + k + 1) → ℂ} {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hB : IsFrameOf k r [z, e] Bs)
+    : IsFrameOf k r [z] Bs := ⟨
+  hB.1,
+  hB.2.1,
+  fun a v hv =>
+    hB.2.2 a v (by simp only [List.mem_cons, List.not_mem_nil, or_false] at hv ⊢; exact Or.inl hv)
+⟩
 
 end HermitianFormSums
 
@@ -164,7 +188,12 @@ theorem exists_frame_two : Formalism.FourierDecayAlt.Qr.FrameExists2 := by
     exact absurd (Subsingleton.elim i j) hij
   obtain ⟨b, hb⟩ := hon.exists_orthonormalBasis_extension_of_card_eq (by simp)
   have hbl : b (Fin.last n) = εE := hb _ rfl
-  refine ⟨fun j => ∑ a, (b j.castSucc) a • C a, fun j => HermitianFormSums.inWb_sum _ _ _ hC.1, fun i j => ?_, fun j v hv => ?_⟩
+  refine ⟨
+    fun j => ∑ a, (b j.castSucc) a • C a,
+    fun j => HermitianFormSums.inWb_sum _ _ _ hC.1,
+    fun i j => ?_,
+    fun j v hv => ?_
+  ⟩
   · rw [HermitianFormSums.herm_comb hC, ← hin, orthonormal_iff_ite.1 b.orthonormal]
     by_cases h : i = j
     · subst h; simp
@@ -180,11 +209,15 @@ theorem exists_frame_two : Formalism.FourierDecayAlt.Qr.FrameExists2 := by
     · rw [hexp, HermitianFormSums.herm_comb hC]
       have h1 : ∑ a, (b j.castSucc) a * star (ε a) = inner ℂ (b (Fin.last n)) (b j.castSucc) := by
         rw [hin, hbl]
-      rw [show (∑ a, (b j.castSucc) a * star (herm (Hpk (n + 1) r) v (C a))) = ∑ a, (b j.castSucc) a * star (ε a) from rfl,
+      rw [show (∑ a, (b j.castSucc) a * star (herm (Hpk (n + 1) r) v (C a)))
+            = ∑ a, (b j.castSucc) a * star (ε a) from
+          rfl,
         h1, orthonormal_iff_ite.1 b.orthonormal, if_neg]
       exact (Fin.castSucc_lt_last j).ne'
 
-theorem qr_frameChange_of : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.FourierDecayAlt.Qr.FrameGl → Formalism.FourierDecayAlt.Qr.FrameChange := by
+theorem qr_frameChange_of
+    : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.FourierDecayAlt.Qr.FrameGl
+      → Formalism.FourierDecayAlt.Qr.FrameChange := by
   intro hEc hFG W _ _ _ n r z e π Bs Bs' hz hT he hez hee hπ hB hB' w
   have hB1 := HermitianFormSums.frame_sub hB
   have hB1' := HermitianFormSums.frame_sub hB'
@@ -217,14 +250,17 @@ theorem qr_frameChange_of : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.Fou
   set Q : Matrix (Fin n) (Fin n) ℂ := Matrix.of fun b d => herm (Hpk (n + 1) r) (Bs' d) (Bs b) with hQ
   have hexp : ∀ a, Bs a = ∑ c, P c a • Bs' c := by
     intro a
-    have h := HermitianFormSums.complete0 hz (HermitianFormSums.hzz hT) hC (hB.1 a) (hB.2.2 a z (by simp))
+    have h :=
+      HermitianFormSums.complete0 hz (HermitianFormSums.hzz hT) hC (hB.1 a) (hB.2.2 a z (by simp))
     rw [Fin.sum_univ_castSucc, hCl, hB.2.2 a e (by simp), zero_smul, add_zero] at h
     simp only [hCc] at h
     exact h
   have hQP : Q * P = 1 := by
     ext b a
     rw [Matrix.mul_apply, Matrix.one_apply]
-    have h1 : herm (Hpk (n + 1) r) (Bs a) (Bs b) = herm (Hpk (n + 1) r) (∑ c, P c a • Bs' c) (Bs b) := by
+    have h1
+        : herm (Hpk (n + 1) r) (Bs a) (Bs b)
+          = herm (Hpk (n + 1) r) (∑ c, P c a • Bs' c) (Bs b) := by
       rw [← hexp a]
     rw [HermitianFormSums.herm_lsum, hB.2.1] at h1
     rw [show (if b = a then (1 : ℂ) else 0) = if a = b then 1 else 0 by simp only [eq_comm], h1]
@@ -233,9 +269,11 @@ theorem qr_frameChange_of : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.Fou
     simp only [hQ, Matrix.of_apply]
     ring
   have hPQ : P * Q = 1 := mul_eq_one_comm.1 hQP
-  have hunit : ∀ a b, unitB (Hpk (n + 1) r) Bs a b =
-      ∑ x ∈ (Finset.univ : Finset (Fin n)) ×ˢ (Finset.univ : Finset (Fin n)),
-        (P x.1 a * Q b x.2) • unitB (Hpk (n + 1) r) Bs' x.1 x.2 := by
+  have hunit
+      : ∀ a b,
+        unitB (Hpk (n + 1) r) Bs a b
+          = ∑ x ∈ (Finset.univ : Finset (Fin n)) ×ˢ (Finset.univ : Finset (Fin n)),
+              (P x.1 a * Q b x.2) • unitB (Hpk (n + 1) r) Bs' x.1 x.2 := by
     intro a b
     rw [Finset.sum_product]
     ext p q
@@ -243,8 +281,12 @@ theorem qr_frameChange_of : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.Fou
       have := congrFun (hexp a) p
       rw [Finset.sum_apply] at this
       exact this
-    have h2 : herm (Hpk (n + 1) r) (bvec q) (Bs b) = ∑ d, Q b d * herm (Hpk (n + 1) r) (bvec q) (Bs' d) := by
-      have h3 : herm (Hpk (n + 1) r) (bvec q) (Bs b) = herm (Hpk (n + 1) r) (bvec q) (∑ d, P d b • Bs' d) := by
+    have h2
+        : herm (Hpk (n + 1) r) (bvec q) (Bs b)
+          = ∑ d, Q b d * herm (Hpk (n + 1) r) (bvec q) (Bs' d) := by
+      have h3
+          : herm (Hpk (n + 1) r) (bvec q) (Bs b)
+            = herm (Hpk (n + 1) r) (bvec q) (∑ d, P d b • Bs' d) := by
         rw [← hexp b]
       rw [h3, HermitianFormSums.herm_rsum]
       apply Finset.sum_congr rfl
@@ -260,8 +302,12 @@ theorem qr_frameChange_of : Formalism.FourierDecayAlt.Qr.EcLie → Formalism.Fou
   have hEB : EB π Bs = Econj (EB π Bs') P Q := by
     funext a b
     unfold EB Econj
-    rw [hunit a b, (HermitianFormSums.ec_sum hEc hπ _ _ (fun x : Fin n × Fin n => unitB (Hpk (n + 1) r) Bs' x.1 x.2)
-      (fun x => QrD.frame_lie hB1' x.1 x.2) _ (QrD.frame_lie hB1' a a)).2, Finset.sum_product]
+    rw [hunit a b,
+      (HermitianFormSums.ec_sum hEc hπ _ _
+        (fun x : Fin n × Fin n => unitB (Hpk (n + 1) r) Bs' x.1 x.2)
+        (fun x => QrD.frame_lie hB1' x.1 x.2)
+        _ (QrD.frame_lie hB1' a a)).2,
+      Finset.sum_product]
     ext v
     simp
   rw [hEB]

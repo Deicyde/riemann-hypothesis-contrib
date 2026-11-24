@@ -122,8 +122,7 @@ theorem rowE_mul_embX (p : ℕ) (u : n → k) (g : GL n k)
     fromBlocks_multiply]
   congr 1 <;> simp
   ext l s
-  by_cases h : l.val + 1 = p
-    <;> simp [h, Matrix.mul_apply, Matrix.vecMul, dotProduct, Matrix.mulVec, mul_comm]
+  by_cases h : l.val + 1 = p <;> simp [h, Matrix.mul_apply, dotProduct, Matrix.mulVec, mul_comm]
 
 theorem colE_mul_embX (p : ℕ) (u : n → k) (g : GL n k)
     : colE c p u * embX c g = embX c g * colE c p ((g⁻¹).val.mulVec u) := by

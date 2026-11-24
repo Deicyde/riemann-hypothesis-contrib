@@ -1,8 +1,9 @@
 module
 
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.CpRegPhRegOfNonneg
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularChartDataPropertiesStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularizedWeightTendstoC2Statement
+public import GroundTheory.HeightsAndTheta.Heights.Regularisation.Statements
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularChartDataProperties
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularizedWeightTendstoC2
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -61,7 +62,8 @@ theorem tendstoUniformlyOn_regWeight_of_isCompact_subset_Yo
       S.IsTied
         → ∀ K' ⊆ S.R.Yo, IsCompact K' → TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) K' := by
   intro K _ ι _ P n M Xo B S hS K' hK' hc
-  have hYo : IsOpen S.R.Yo := (GlobalTheory.T.regular_chart_data_properties n M.Xc M.atlas S.R).1
+  have hYo : IsOpen S.R.Yo :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.Giv.regData_open_part n M.Xc M.atlas S.R).1
   rw [← tendstoLocallyUniformlyOn_iff_tendstoUniformlyOn_of_compact hc]
   intro u hu x hx
   obtain ⟨j, hj⟩ := M.atlas.cover x
@@ -77,8 +79,8 @@ theorem tendstoUniformlyOn_regWeight_of_isCompact_subset_Yo
         ⊆ (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' S.R.Yo :=
     (Metric.closedBall_subset_ball (by linarith)).trans hball
   have hU :=
-    (GlobalTheory.T.regularized_weight_tendsto_C2 K ι P n M Xo B S hS j _ hsub
-      (isCompact_closedBall _ _)).1
+    (_root_.GlobalTheory.CompanionTheory.Ar.Giv.regWeight_tendsto_C2_of_tied K ι P n M Xo B S hS j _
+      hsub (isCompact_closedBall _ _)).1
   refine ⟨
     (M.atlas.chart j).source ∩ (M.atlas.chart j) ⁻¹' Metric.ball (M.atlas.chart j x) (ε / 2),
     mem_nhdsWithin_of_mem_nhds

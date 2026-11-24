@@ -75,14 +75,13 @@ theorem exists_conj_of_algHom
       rw [Matrix.single_mul_single_same, mul_one]
     · rw [Matrix.single_mul_single_of_ne _ _ _ _ h, map_zero]
   have hsum : ∑ j, θ (Matrix.single j j (1 : B)) = 1 := by
-
     rw [← map_sum, ← map_one θ]
     congr 1
     ext p q
     rw [Matrix.sum_apply, Finset.sum_eq_single p]
     · simp [Matrix.single_apply, Matrix.one_apply]
     · intro j _ hj
-      simp [Matrix.single_apply, hj]
+      simp [hj]
     · simp
   have hne : θ (Matrix.single i0 i0 (1 : B)) ≠ 0 := by
     intro h0
@@ -146,7 +145,7 @@ theorem exists_conj_of_algHom
     rw [Matrix.sum_apply, Finset.sum_eq_single p]
     · simp [Matrix.single_apply, Matrix.diagonal_apply]
     · intro j _ hj
-      simp [Matrix.single_apply, hj]
+      simp [hj]
     · simp
   have hJ : IsUnit (∑ l, θ (Matrix.single l i0 (1 : B)) * Matrix.single b l 1).det := by
     have h5 := congrArg Matrix.det hKJ

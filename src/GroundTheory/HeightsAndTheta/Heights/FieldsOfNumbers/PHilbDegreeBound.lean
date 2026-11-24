@@ -68,13 +68,15 @@ variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {F : Type u} [
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem isHomogeneous_of_isMultiHomogIdeal {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I) :
-    I.IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) := by
-  apply GroundTheory.Heights₂.Heights.NumbersDVR.HilbDegBound.isHomogeneous_of_isMultiHomogIdeal <;> assumption
+theorem isHomogeneous_of_isMultiHomogIdeal {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
+    : I.IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) := by
+  apply GroundTheory.Heights₂.Heights.NumbersDVR.HilbDegBound.isHomogeneous_of_isMultiHomogIdeal
+    <;> assumption
 
-theorem isMultiHomogIdeal_sup_span {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
-    {s : MRing ι F} {c : K → ℕ} (hs : IsMultiHomog s c) :
-    IsMultiHomogIdeal (I ⊔ Ideal.span {s}) := by
+theorem isMultiHomogIdeal_sup_span
+    {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
+    {s : MRing ι F} {c : K → ℕ} (hs : IsMultiHomog s c)
+    : IsMultiHomogIdeal (I ⊔ Ideal.span {s}) := by
   classical
   have h2 : (Ideal.span {s}).IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) :=
     Ideal.homogeneous_span _ _ fun x hx => ⟨c, (Set.mem_singleton_iff.mp hx) ▸ hs⟩
@@ -82,19 +84,18 @@ theorem isMultiHomogIdeal_sup_span {I : Ideal (MRing ι F)} (hI : IsMultiHomogId
   exact weightedHomogeneousComponent_mem_of_mem
     (h := (isHomogeneous_of_isMultiHomogIdeal hI).sup h2) (hp := hf) (m := b)
 
-
 omit [Fintype K] [DecidableEq K] in
-theorem colon_span_eq_of_isPrime {P : Ideal (MRing ι F)} (hP : P.IsPrime) {s : MRing ι F}
-    (hs : s ∉ P) : P.colon (Ideal.span {s}) = P := by
+theorem colon_span_eq_of_isPrime
+    {P : Ideal (MRing ι F)} (hP : P.IsPrime) {s : MRing ι F} (hs : s ∉ P)
+    : P.colon (Ideal.span {s}) = P := by
   ext x
   rw [Ideal.mem_colon_span_singleton]
   exact ⟨fun h => (hP.mem_or_mem h).resolve_right hs, fun h => P.mul_mem_right s h⟩
 
-
 omit [Fintype K] [DecidableEq K] in
-theorem ringKrullDim_sup_span_add_one_le {P : Ideal (MRing ι F)} [P.IsPrime] {s : MRing ι F}
-    (hs : s ∉ P) :
-    ringKrullDim (MRing ι F ⧸ (P ⊔ Ideal.span {s})) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
+theorem ringKrullDim_sup_span_add_one_le
+    {P : Ideal (MRing ι F)} [P.IsPrime] {s : MRing ι F} (hs : s ∉ P)
+    : ringKrullDim (MRing ι F ⧸ (P ⊔ Ideal.span {s})) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
   refine ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor le_sup_left)
     (Ideal.Quotient.factor_surjective le_sup_left) (r := Ideal.Quotient.mk P s) ?_ ?_
   · exact mem_nonZeroDivisors_of_ne_zero (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem])
@@ -118,16 +119,21 @@ theorem lt_of_add_one_le_natCast {x : WithBot ℕ∞} {n : ℕ} (h : x + 1 ≤ n
 
 end Lemmas
 
-theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.{u})
-    (h2 : HilbExactDivide.Statement.{u}) (h3 : PolyOfDiffs.Statement)
-    (h4 : PrimeFiltration.Statement.{u}) (hU : EventuallyPolyUnique.Statement)
-    (hS : EventuallyPolyShift.Statement) (hZ : HilbIrrelevantZero.Statement.{u})
-    (hD : RelevantPrimeDimGe.Statement.{u})
-    (F : Type u) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (n : ℕ) :
-    ∀ I : Ideal (MRing ι F), IsMultiHomogIdeal I → ringKrullDim (MRing ι F ⧸ I) < n →
-      ∀ p : MvPolynomial K ℚ, EventuallyPoly (hilbFn I) p → p ≠ 0 →
-      ((p.totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ I) := by
+theorem totalDegree_add_card_le_ringKrullDim
+    (h1 : HilbEventuallyPoly.Statement.{u}) (h2 : HilbExactDivide.Statement.{u})
+    (h3 : PolyOfDiffs.Statement) (h4 : PrimeFiltration.Statement.{u})
+    (hU : EventuallyPolyUnique.Statement) (hS : EventuallyPolyShift.Statement)
+    (hZ : HilbIrrelevantZero.Statement.{u}) (hD : RelevantPrimeDimGe.Statement.{u})
+    (F : Type u) [Field F]
+    (K : Type) [Fintype K] [DecidableEq K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (n : ℕ)
+    : ∀ I : Ideal (MRing ι F),
+      IsMultiHomogIdeal I → ringKrullDim (MRing ι F ⧸ I) < n
+        → ∀ p : MvPolynomial K ℚ,
+          EventuallyPoly (hilbFn I) p → p ≠ 0
+            → ((p.totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞)
+              ≤ ringKrullDim (MRing ι F ⧸ I) := by
   induction n with
   | zero =>
     intro I _ hlt p hp hp0
@@ -146,10 +152,13 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
     have : EventuallyPoly (hilbFn I) 0 := Filter.Eventually.of_forall fun m => by simp [hz]
     exact hp0 (hU K _ p 0 hp this)
   | succ n ih =>
-    have prime : ∀ P : Ideal (MRing ι F), P.IsPrime → IsMultiHomogIdeal P →
-        ringKrullDim (MRing ι F ⧸ P) < (n + 1 : ℕ) → ∀ p : MvPolynomial K ℚ,
-        EventuallyPoly (hilbFn P) p → p ≠ 0 →
-        ((p.totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ P) := by
+    have prime
+        : ∀ P : Ideal (MRing ι F),
+          P.IsPrime → IsMultiHomogIdeal P → ringKrullDim (MRing ι F ⧸ P) < (n + 1 : ℕ)
+            → ∀ p : MvPolynomial K ℚ,
+              EventuallyPoly (hilbFn P) p → p ≠ 0
+                → ((p.totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞)
+                  ≤ ringKrullDim (MRing ι F ⧸ P) := by
       intro P hPp hPh hlt p hp hp0
       by_cases hrel : IsRelevant P
       swap
@@ -167,8 +176,10 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
           | top => exact absurd hlt (by simp)
           | coe a => exact ⟨a, rfl⟩
       have hKN : Fintype.card K ≤ N := by rw [hN] at hge; exact_mod_cast hge
-      have hdiff : ∀ k, ∃ q : MvPolynomial K ℚ, (q = 0 ∨ q.totalDegree < N - Fintype.card K) ∧
-          EventuallyPoly (diffStep (Pi.single k 1) (hilbFn P)) q := by
+      have hdiff
+          : ∀ k, ∃ q : MvPolynomial K ℚ,
+            (q = 0 ∨ q.totalDegree < N - Fintype.card K)
+              ∧ EventuallyPoly (diffStep (Pi.single k 1) (hilbFn P)) q := by
         intro k
         have hs : IsMultiHomog (X ⟨k, i k⟩ : MRing ι F) (Pi.single k 1) :=
           isWeightedHomogeneous_X _ _ _
@@ -211,16 +222,21 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
     choose pj hpj using fun j => h1 F K ι (Q j) (hQ j).2.1
     choose q hq hqdeg hq0 using fun j => hS K _ (pj j) (fun k => (c j k : ℤ)) (hpj j)
     have hsumP : EventuallyPoly (hilbFn I) (∑ j, q j) := by
-      have hall : ∀ᶠ m in Filter.atTop, ∀ j, (hilbFn (Q j) (m - fun k => (c j k : ℤ)) : ℚ) =
-          eval (fun k => (m k : ℚ)) (q j) := Filter.eventually_all.mpr hq
+      have hall
+          : ∀ᶠ m in Filter.atTop, ∀ j, (hilbFn (Q j) (m - fun k => (c j k : ℤ)) : ℚ) =
+            eval (fun k => (m k : ℚ)) (q j) :=
+        Filter.eventually_all.mpr hq
       filter_upwards [hall, hsum] with m hm hm'
 
       rw [hm', map_sum]
       push_cast
       exact Finset.sum_congr rfl fun j _ => hm j
     have hpq := hU K _ p _ hp hsumP
-    have hDQ : ∀ j, q j ≠ 0 → (((q j).totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞) ≤
-        ringKrullDim (MRing ι F ⧸ I) := by
+    have hDQ
+        : ∀ j,
+          q j ≠ 0
+            → (((q j).totalDegree + Fintype.card K : ℕ) : WithBot ℕ∞)
+              ≤ ringKrullDim (MRing ι F ⧸ I) := by
       intro j hj
       have hpj0 : pj j ≠ 0 := fun h => hj (hq0 j h)
       have hle : ringKrullDim (MRing ι F ⧸ Q j) ≤ ringKrullDim (MRing ι F ⧸ I) :=
@@ -229,8 +245,8 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
       have hb := prime (Q j) (hQ j).1 (hQ j).2.1 (hle.trans_lt hlt) (pj j) (hpj j) hpj0
       refine le_trans ?_ (hb.trans hle)
       have := hqdeg j
-      exact_mod_cast (show (q j).totalDegree + Fintype.card K ≤
-        (pj j).totalDegree + Fintype.card K by omega)
+      exact_mod_cast
+        (show (q j).totalDegree + Fintype.card K ≤ (pj j).totalDegree + Fintype.card K by omega)
     classical
     set T := Finset.univ.filter fun j => q j ≠ 0 with hT
     have hpT : p = ∑ j ∈ T, q j := by rw [hpq, hT, Finset.sum_filter_ne_zero]
@@ -247,11 +263,12 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
     exact_mod_cast (show p.totalDegree + Fintype.card K ≤ (q j).totalDegree + Fintype.card K by
       omega)
 
-theorem HilbDegreeBound.proof (h1 : HilbEventuallyPoly.Statement.{u})
-    (h2 : HilbExactDivide.Statement.{u}) (h3 : PolyOfDiffs.Statement)
-    (h4 : PrimeFiltration.Statement.{u}) (hU : EventuallyPolyUnique.Statement)
-    (hS : EventuallyPolyShift.Statement) (hZ : HilbIrrelevantZero.Statement.{u})
-    (hD : RelevantPrimeDimGe.Statement.{u}) : HilbDegreeBound.Statement.{u} := by
+theorem HilbDegreeBound.proof
+    (h1 : HilbEventuallyPoly.Statement.{u}) (h2 : HilbExactDivide.Statement.{u})
+    (h3 : PolyOfDiffs.Statement) (h4 : PrimeFiltration.Statement.{u})
+    (hU : EventuallyPolyUnique.Statement) (hS : EventuallyPolyShift.Statement)
+    (hZ : HilbIrrelevantZero.Statement.{u}) (hD : RelevantPrimeDimGe.Statement.{u})
+    : HilbDegreeBound.Statement.{u} := by
   intro F _ K _ _ ι _ I hI
   refine ⟨fun _ p hp hp0 => ?_, fun hrel => hZ F K ι I hrel⟩
   have key := fun n => totalDegree_add_card_le_ringKrullDim h1 h2 h3 h4 hU hS hZ hD F K ι n I hI

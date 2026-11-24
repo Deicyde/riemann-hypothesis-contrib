@@ -48,6 +48,7 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.augmentation_sigma_map_basic_properties
     : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
         (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (R₁ : Type) [CommRing R₁]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.augmentation_sigma_map_basic_properties
         → (∀ y, σ y ∈ I.map (algebraMap R B)) ∧ (∀ b y, σ ((1 ⊗ₜ p b) * y) = b * σ y)
           ∧ (∀ b₀ : B₀, σ (1 ⊗ₜ b₀) = 0)
           ∧ ∀ x ∈ I.map (algebraMap R B), ∃ y, α.KerQ y ∧ σ y = x := by
-  first
-  | exact @GlobalTheory.Obs.sig_basic
-  | exact GlobalTheory.Obs.sig_basic
-  | (intros; apply GlobalTheory.Obs.sig_basic <;> assumption)
+  first | exact @GlobalTheory.Obs.sig_basic

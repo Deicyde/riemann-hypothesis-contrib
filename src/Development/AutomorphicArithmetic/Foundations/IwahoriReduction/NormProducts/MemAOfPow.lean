@@ -5,11 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Nor
 public import Mathlib.RingTheory.AdicCompletion.Noetherian
 public import Mathlib.RingTheory.Coalgebra.IsFrobenius
 public import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Development.AbelianVarietyTheory.Definitions.Foundations.Letter
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUnitEvalEqKummerClass
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerCompletionNoPrimeTorsion
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LocalPowerUnitsTowerClosureProperties
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TowerUnitClassModPrimePowProperties
+public import Mathlib.RingTheory.AdicCompletion.Completeness
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUnitEvalEqKummerClassStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerCompletionNoPrimeTorsionStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LocalPowerUnitsTowerClosurePropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TowerUnitClassModPrimePowPropertiesStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -26,7 +32,6 @@ import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
-public import Mathlib.RingTheory.AdicCompletion.Completeness
 import Mathlib.RingTheory.Radical.NatInt
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
@@ -67,7 +72,7 @@ private theorem pow_tf
   | zero => simpa using h
   | succ k ih =>
     apply ih
-    apply GlobalTheory.T.kummerCompletion_no_prime_torsion X l
+    apply _root_.GlobalTheory.KZ.BettiB.khat_no_l_torsion X l
     rw [← mul_smul, ← pow_succ']
     exact h
 
@@ -80,9 +85,7 @@ private theorem eval_down
     : AdicCompletion.eval (idl l) (X.Kl l) m x = X.cls l m f := by
   induction e with
   | zero => simpa using h
-  | succ e ih =>
-    exact ih ((GlobalTheory.T.towerUnitClassModPrimePow_properties Ω ε X l (m + e)).2.2.2.2.2.2 x f
-      h)
+  | succ e ih => exact ih ((_root_.GlobalTheory.KZ.H3.cls_props Ω ε X l (m + e)).2.2.2.2.2.2 x f h)
 
 private theorem mem_A_of_pow
     {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
@@ -95,9 +98,8 @@ private theorem mem_A_of_pow
     exact ⟨φ, h2, h1⟩
   refine Submodule.subset_span ?_
   intro m
-  obtain ⟨f, hf, ef⟩ := GlobalTheory.T.exists_unit_eval_eq_kummer_class ε X hj l (m + e) _ h
-  obtain ⟨hsurj, hker, hmul, hone, -, -, -⟩ :=
-    GlobalTheory.T.towerUnitClassModPrimePow_properties Ω ε X l (m + e)
+  obtain ⟨f, hf, ef⟩ := _root_.GlobalTheory.KZ.ES.exists_un_eval_eq_cls ε X hj l (m + e) _ h
+  obtain ⟨hsurj, hker, hmul, hone, -, -, -⟩ := _root_.GlobalTheory.KZ.H3.cls_props Ω ε X l (m + e)
   obtain ⟨g, hg⟩ := hsurj (AdicCompletion.eval (idl l) (X.Kl l) (m + e) k)
   have hpow : ∀ t : ℕ, X.cls l (m + e) (g ^ t) = t • X.cls l (m + e) g := by
     intro t
@@ -108,13 +110,13 @@ private theorem mem_A_of_pow
     rw [hpow, hg, ← Nat.cast_smul_eq_nsmul ℤ_[l], ← map_smul, Nat.cast_pow, ef]
   obtain ⟨t, ht⟩ := (hker _ _).1 h1
   obtain ⟨-, umul, -, upow, -, -, -⟩ :=
-    GlobalTheory.T.localPowerUnitsTower_closure_properties ε X ε.injective hj (l ^ (m + e))
+    _root_.GlobalTheory.KZ.UnClosure.un_closure ε X ε.injective hj (l ^ (m + e))
   have hU : g ^ (l ^ e) ∈ X.Un (l ^ e * l ^ m) := by
     rw [← pow_add, add_comm e m, ht]
     exact umul _ _ hf (upow t)
   have hgU : g ∈ X.Un (l ^ m) :=
-    (GlobalTheory.T.localPowerUnitsTower_closure_properties ε X ε.injective hj (l ^ e)).2.2.2.2.2.2
-      (l ^ m) g (pow_pos (Fact.out : l.Prime).pos e) hU
+    (_root_.GlobalTheory.KZ.UnClosure.un_closure ε X ε.injective hj (l ^ e)).2.2.2.2.2.2 (l ^ m) g
+      (pow_pos (Fact.out : l.Prime).pos e) hU
   exact ⟨g, hgU, eval_down ε X l m e k g hg.symm⟩
 
 private theorem mem_BSet
@@ -173,7 +175,6 @@ theorem UpperTheory.Kd.K4.pur
       : ∀ i, ∃ k : X.Khat l, ((l : ℤ_[l]) ^ n) • k = ((l : ℤ_[l]) ^ V.det.valuation) • cf i := by
     intro i
     have h1 : V.det • cf i ∈ LinearMap.ker (AdicCompletion.eval (idl l) (X.Kl l) n) := by
-
       rw [LinearMap.mem_ker, e1 i, map_sum]
       refine Finset.sum_eq_zero fun t _ => ?_
       have h2 := h0 ![((t : ℕ) : ℤ_[l]), 1]

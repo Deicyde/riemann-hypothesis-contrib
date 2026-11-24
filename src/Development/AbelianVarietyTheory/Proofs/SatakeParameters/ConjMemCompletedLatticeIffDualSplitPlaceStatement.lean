@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.conj_mem_completedLattice_iff_dual_splitPlace
     : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
       IsSplitIdem D e → Chart e v π
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.conj_mem_completedLattice_iff_dual_splitPlace
                   IsInt (Ov D v)
                     (((fun i => π (cA D (y i))) ᵥ* ((V.gram.map fun a => π (incA D a)) * β.1))
                       j) := by
-  first
-  | exact @GlobalTheory.SplitDualLat.conj_mem_lamHat_iff
-  | exact GlobalTheory.SplitDualLat.conj_mem_lamHat_iff
-  | (intros; apply GlobalTheory.SplitDualLat.conj_mem_lamHat_iff <;> assumption)
+  first | exact @GlobalTheory.SplitDualLat.conj_mem_lamHat_iff

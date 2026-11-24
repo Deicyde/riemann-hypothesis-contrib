@@ -158,7 +158,7 @@ theorem factorCasimir_ncV_one {F : Big n 1 M} (hF : F ∈ ncV ε V 1)
     · by_cases h2 : q = b
       · subst h2
         simp [h1, hz _ _ hpq, fun x => hz x x rfl]
-      · simp [h1, h2, fun x => hz x x rfl]
+      · simp [h1, h2]
   · have hpq' : p ≠ q := fun h => hpq (h ▸ rfl)
     trans ∑ a, ∑ b ∈ univ.filter (fun b => ε b = ε a),
       ((if p = a then F (fun _ => (p, q)) else 0) + (if q = b then F (fun _ => (p, q)) else 0))
@@ -168,10 +168,10 @@ theorem factorCasimir_ncV_one {F : Big n 1 M} (hF : F ∈ ncV ε V 1)
         by_cases h2 : q = b
         · subst h2
           simp [hpq', Ne.symm hpq']
-        · simp [h2, hpq', Ne.symm hpq']
+        · simp [h2, Ne.symm hpq']
       · by_cases h2 : q = b
         · subst h2
-          simp [h1, hpq', Ne.symm hpq']
+          simp [h1, hpq']
         · simp [h1, h2]
     · simp only [Finset.sum_add_distrib]
       have h1
@@ -191,13 +191,7 @@ theorem factorCasimir_ncV_one {F : Big n 1 M} (hF : F ∈ ncV ε V 1)
         have hf : (univ.filter fun a => ε q = ε a) = univ.filter fun a => ¬(ε a = ε p) :=
           Finset.filter_congr fun a _ => hbool _ _ _ hpq
         rw [hf]
-        first
-        | rw [Finset.filter_card_add_filter_neg_card_eq_card, Finset.card_univ, Fintype.card_fin]
-        | rw [Finset.card_filter_add_card_filter_not, Finset.card_univ, Fintype.card_fin]
-        | rw [← Finset.card_union_of_disjoint (Finset.disjoint_filter_filter_neg _ _ _),
-            Finset.filter_union_filter_neg_eq, Finset.card_univ, Fintype.card_fin]
-        | rw [← Finset.card_union_eq_card_add_card.2 (Finset.disjoint_filter_filter_neg _ _ _),
-            Finset.filter_union_filter_neg_eq, Finset.card_univ, Fintype.card_fin]
+        first | rw [Finset.card_filter_add_card_filter_not, Finset.card_univ, Fintype.card_fin]
       rw [h1, h2, ← add_smul, hcard, Nat.cast_smul_eq_nsmul]
 
 theorem factorCasimir_nonneg (k : ℕ) (F : Big n k M)
@@ -357,8 +351,8 @@ theorem crossOp_mem_ncV
     refine forall_congr' fun j => ?_
     by_cases hj : j = i
     · subst hj
-      simp [Function.update_apply, h1, h2]
-    · simp [Function.update_apply, hj]
+      simp [h1, h2]
+    · simp [hj]
   have hval
       : (crossOp ε E k i F) κ
         = ∑ a, ∑ b ∈ univ.filter (fun b => ε b = ε a),

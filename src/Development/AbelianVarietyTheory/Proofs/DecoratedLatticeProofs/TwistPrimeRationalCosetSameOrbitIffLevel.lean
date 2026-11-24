@@ -58,7 +58,7 @@ open GlobalTheory.TwBridge.Lev
 
 theorem inX_zero {E : Type} [Field E] (n : ℕ) (x : Fin n → E) : Loc.inX E n 0 x = x := by
   funext l
-  simp [Loc.inX, show l.1 < n from l.2]
+  simp [Loc.inX]
 
 theorem mem_prX_zero
     {E : Type} [Field E]

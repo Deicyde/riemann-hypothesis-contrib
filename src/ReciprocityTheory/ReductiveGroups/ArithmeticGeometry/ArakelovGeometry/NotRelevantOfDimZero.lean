@@ -179,14 +179,8 @@ theorem card_le_dim
     exact h2 (heq ▸ h1)
   let f : Fin (Fintype.card K + 1) → PrimeSpectrum.zeroLocus (P : Set (MRing ι)) := fun j =>
     ⟨⟨Q j, hQp j⟩, fun x hx => hPQ j hx⟩
-  let s : LTSeries (PrimeSpectrum.zeroLocus (P : Set (MRing ι))) := ⟨
-    Fintype.card K,
-    f,
-    fun j => by
-      first
-      | exact Subtype.mk_lt_mk.mpr (PrimeSpectrum.asIdeal_lt_asIdeal.mp (hlt j j.isLt))
-      | exact (hlt j j.isLt)
-  ⟩
+  let s : LTSeries (PrimeSpectrum.zeroLocus (P : Set (MRing ι))) :=
+    ⟨Fintype.card K, f, fun j => by first | exact (hlt j j.isLt)⟩
   rw [ringKrullDim_quotient]
   exact Order.LTSeries.length_le_krullDim s
 

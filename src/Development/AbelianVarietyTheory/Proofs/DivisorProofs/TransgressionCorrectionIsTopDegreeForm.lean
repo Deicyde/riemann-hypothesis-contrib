@@ -1,9 +1,12 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EndValuedForm11Coeffs
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AemeasurableChartOfLocallyContinuousDensityStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousAtTransgressionTopCoeffComplexStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TransgressionDensityHolomorphicChartEtaleStatement
+public import Mathlib.LinearAlgebra.Complex.FiniteDimensional
+public import Mathlib.Topology.Separation.CompletelyRegular
+public import ReciprocityTheory.L2DbarEstimates.IsLocalHomeomorph
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AemeasurableChartOfLocallyContinuousDensity
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousAtTransgressionTopCoeffComplex
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TransgressionDensityHolomorphicChartEtale
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChernDensityFrameIndepChartJacobianFactor
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHolomorphicInvertibleFrameCoordinates
 import Mathlib.Algebra.Order.Floor.Extended
@@ -63,9 +66,9 @@ theorem isTopForm_corrDens
               (corrDens E H₀ H ρ) (ptsIn X.str σ O) := by
   intro F _ σ X m E O H H₀ hM hM₀ ρ hρ
   refine ⟨fun i j y hy hi hj => ?_, fun i => ?_⟩
-  · exact GlobalTheory.T.transgressionDensity_holomorphicChart_etale E O H H₀ hM hM₀ hρ i.holo j hy
-      hi hj (E.nonempty (under y)).choose_spec
-  · refine GlobalTheory.T.aemeasurable_chart_of_locally_continuous_density i.e (isOpen_ptsIn O)
+  · exact _root_.GlobalTheory.GoodTop.corrTop_holoChart_trans E O H H₀ hM hM₀ hρ i.holo j hy hi hj
+      (E.nonempty (under y)).choose_spec
+  · refine _root_.GlobalTheory.GoodTop.aemeasurable_chart_of_locally_continuous i.e (isOpen_ptsIn O)
       fun y hy hc => ?_
     set A := (E.nonempty (under y)).choose with hAdef
     have hA : A ∈ E.S (under y) := (E.nonempty (under y)).choose_spec
@@ -82,7 +85,7 @@ theorem isTopForm_corrDens
       have hρ1 : ContDiffAt ℝ 1 (fun v => ρ (i.e.symm v)) (i.e y) :=
         ((contDiffOn_chart (S := Set.univ) (fun z _ => hρ z) i).contDiffAt hs).of_le (by norm_cast)
       have hc0 :=
-        GlobalTheory.T.continuousAt_transgressionTopCoeffComplex hρ1
+        _root_.GlobalTheory.GoodTop.continuousAt_corrC hρ1
           (hM₀.mContDiffAt_chart mem_ptsIn_top i hc hA ())
           (hM₀.isUnit_det_chart mem_ptsIn_top i hc hA ()) (hM.mContDiffAt_chart hy i hc hA ())
           (hM.isUnit_det_chart hy i hc hA ())
@@ -90,8 +93,8 @@ theorem isTopForm_corrDens
     · filter_upwards [(isOpen_ptsIn O).mem_nhds hy, i.e.open_source.mem_nhds hc, GlobalTheory.FrameLift.eventually_mem hA]
         with z hzO hzc hAz
       have h :=
-        GlobalTheory.T.transgressionDensity_holomorphicChart_etale E O H H₀ hM hM₀ hρ i.holo i hzO
-          hzc hzc hAz
+        _root_.GlobalTheory.GoodTop.corrTop_holoChart_trans E O H H₀ hM hM₀ hρ i.holo i hzO hzc hzc
+          hAz
       rw [AlgChart.transDet_self i hzc, norm_one, one_pow, one_mul] at h
       exact h.symm
 

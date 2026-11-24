@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsRationalUnitaryDeterminantMapRationalUnitaryTo
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsRationalUnitaryDeterminantMapRationalUnitary
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdeleCharacterTrivialOnLocalUnitsStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdeleCharacterTrivialOnLocalUnits
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -90,7 +90,7 @@ theorem kernel_open_and_factor
     fun χ hT hta hu => (Subgroup.closure_le _).2 ?_
   ⟩
   rintro a (ha | ⟨v, k, rfl⟩)
-  · refine GlobalTheory.T.idele_character_trivial_on_local_units H.E χ.1 χ.2.1 (finPartI H.E a)
+  · refine _root_.GlobalTheory.Mem.LocTriv.eq_one_of_local H.E χ.1 χ.2.1 (finPartI H.E a)
       (finPartI_mem_unitIdl.2 ha.1)
       (fun _ => rfl)
       fun v x hx => ?_

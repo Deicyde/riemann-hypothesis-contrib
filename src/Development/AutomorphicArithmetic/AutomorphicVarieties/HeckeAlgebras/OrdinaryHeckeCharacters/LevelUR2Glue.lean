@@ -69,7 +69,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 theorem UpperTheory.V.Hi.levelUR2Glue
     : ∀ (A R P κ : Type) [CommRing A] [CommRing R] [AddCommGroup P] [Module A P] [Nonempty κ]
         (N : κ → Submodule A P) (μ : ∀ k, R →+* Module.End A (N k)),

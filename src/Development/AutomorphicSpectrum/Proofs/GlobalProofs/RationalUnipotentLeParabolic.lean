@@ -90,7 +90,7 @@ theorem ratPts_unip_le_leftSub
         (fun i => ({x ∈ S | x < Fin.castLE hs i} : Finset (Fin m)).card)
         (fun _ => rfl)
     have hpar :=
-      GlobalTheory.ConstTrans.unip_le_parFlag _ _ D.sp.cm.sig hCM _ V.gram hH m X Y hW T S
+      _root_.GlobalTheory.StdParFlag.unip_le_parFlag _ _ D.sp.cm.sig hCM _ V.gram hH m X Y hW T S
         (S.max' hS) hST hkS hle
     have hxx
         : Formalism.UG.cT (↑D.sp.cm.sig) (X.submatrix id (Fin.castLE hs)) * V.gram

@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsNormalisedThetaSub
 
 @[expose] public section
 
@@ -176,10 +177,6 @@ theorem continuous_pInf_ad : Continuous (pInf E) :=
     ((InfinitePlace.Completion.isometryEquivComplexOfIsComplex (IsTotallyComplex.isComplex
       w)).continuous.comp (continuous_apply w)).comp continuous_fst
 
-theorem continuous_conj_ad : Continuous (conjAd E) :=
-  ((continuous_infEq E).comp (continuous_star.comp continuous_pInf_ad)).prodMk
-    ((continuous_conjFin _).comp continuous_snd)
-
 theorem isClosedEmbedding_finU
     : Topology.IsClosedEmbedding (fun x : finU (E := E) (n := n) => ((x : UA E n) : GA E n)) := by
   haveI : T2Space (FiniteAdeleRing (𝓞 E) E) :=
@@ -191,7 +188,8 @@ theorem isClosedEmbedding_finU
     show IsClosed {g : GA E n | ((g : Matrix (Fin n) (Fin n) (Ad E)).map (conjAd E))ᵀ * 1 *
       (g : Matrix (Fin n) (Fin n) (Ad E)) = 1}
     exact isClosed_eq
-      (((Units.continuous_val.matrix_map continuous_conj_ad).matrix_transpose.matrix_mul
+      (((Units.continuous_val.matrix_map
+          _root_.GlobalTheory.ThetaPull.continuous_conjAd).matrix_transpose.matrix_mul
         continuous_const).matrix_mul Units.continuous_val)
       continuous_const
   have h2 : IsClosed ((finU (E := E) (n := n) : Subgroup (UA E n)) : Set (UA E n)) := by

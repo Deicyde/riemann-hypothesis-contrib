@@ -51,6 +51,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Good SchurAll TwoSided IsLab)
+
 theorem _root_.GlobalTheory.T.inertEigenvalues_iff_thetaLift_inertLabels
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -79,11 +80,4 @@ theorem _root_.GlobalTheory.T.inertEigenvalues_iff_thetaLift_inertLabels
               ↔ (∀ P d,
                 Good R.toRealDat A3.A.μ0 P → conjPl P = P → IsLab (Wc D j) P d
                   → c P d = c' P d)) := by
-  first
-  | exact @GlobalTheory.InertTransferW.inertEigenvalues_iff_thetaLift_inertLabels_alt
-  | exact GlobalTheory.InertTransferW.inertEigenvalues_iff_thetaLift_inertLabels_alt
-  | (
-      intros
-      apply GlobalTheory.InertTransferW.inertEigenvalues_iff_thetaLift_inertLabels_alt
-        <;> assumption
-    )
+  first | exact @GlobalTheory.InertTransferW.inertEigenvalues_iff_thetaLift_inertLabels_alt

@@ -61,7 +61,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private lemma nt_expand {R : Type*} [Ring R] (y : R) (m : ℕ) :
     ∃ w : R, (1 + y) ^ m = 1 + m • y + (m.choose 2) • (y * y) + y * y * y * w := by
   induction m with

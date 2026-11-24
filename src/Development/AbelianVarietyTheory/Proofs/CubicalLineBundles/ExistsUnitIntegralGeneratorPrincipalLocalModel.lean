@@ -46,8 +46,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj

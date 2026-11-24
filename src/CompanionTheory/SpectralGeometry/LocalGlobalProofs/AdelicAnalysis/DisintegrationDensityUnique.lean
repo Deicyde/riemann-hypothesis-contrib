@@ -2,7 +2,7 @@ module
 
 public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.DisintegrationDensityContinuousStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.DisintegrationDensityContinuous
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -276,7 +276,7 @@ theorem isContDensityOn_fibreIntegral
                       ∧ ∀ b, Integrable φ (fib b) := by
   intro V X Y _ _ _ _ _ _ _ _ _ _ _ _ μ ν _ _ _ f g ι hι hg hf B hB fib h φ hc hs
   have hfin :=
-    (GlobalTheory.T.fibre_family_locallyFinite_measurable_bdd_on_compact V X Y μ ν f g ι hι hg hf B
+    (_root_.GlobalTheory.CompanionTheory.SW.FibreFam.fibre_family_basic V X Y μ ν f g ι hι hg hf B
       hB fib h).1
   have hcongr
       : ∀ {ψ : V → ℂ} {K : Set X},

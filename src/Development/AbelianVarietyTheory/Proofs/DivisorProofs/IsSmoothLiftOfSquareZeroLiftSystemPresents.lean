@@ -158,7 +158,7 @@ theorem Presents.preimage_eq
     (U : AffOp X₀)
     : i ⁻¹ᵁ (P.y U).opensRange = (affPt s₀ U.unop).opensRange := by
   ext x
-  simp only [Scheme.Hom.mem_preimage, Scheme.Hom.coe_opensRange, Set.mem_range]
+  simp only [Scheme.Hom.coe_opensRange, Set.mem_range]
   constructor
   · rintro ⟨w, hw⟩
     obtain ⟨z, rfl⟩ := spMap_p_surjective hI S U w

@@ -351,7 +351,6 @@ private theorem core
           ⊆ above S := fun w hw => by
       obtain ⟨w, -, rfl⟩ := Finset.mem_map.1 hw
       refine (memSM w.1).2 ?_
-      change w.1.under (𝓞 K) ∈ S
       rw [under_eq]
       exact hv
     rw [← Finset.prod_subset hsub (fun w hw hw' => ?_), Finset.prod_map]

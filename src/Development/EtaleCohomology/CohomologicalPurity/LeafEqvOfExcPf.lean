@@ -112,13 +112,6 @@ theorem hki (R : Type) [CommRing R] {K : Cx R} (F : Shv R) (n : ℤ) (x : HK R K
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)
   simp [zcomp]
 
-theorem hkc'
-    (R : Type) [CommRing R]
-    {K L M : Cx R} (f : K ⟶ L) (g : L ⟶ M)
-    (F : Shv R) (n : ℤ) (x : HK R M F n)
-    : HK.pull R (f ≫ g) F n x = HK.pull R f F n (HK.pull R g F n x) :=
-  hkc R f g F n x
-
 section
 variable {P' P : Arrow Spc} (φ : P' ⟶ P)
 open LateralTheory.CohomologicalPurity LateralTheory.CohomologicalPurity.TubeCut
@@ -230,18 +223,22 @@ theorem key
   have hh0
       : pull _ (hh φ) _ n y
         = HK.pull _ ((chains (ZMod q)).map (hh φ) ≫ pM) (tw q i) n (HK.pull _ κ (tw q i) n x) := by
-    rw [← hkc', Category.assoc, hπ, hy, ← pull_comp, ← hs, hx]
+    rw [← _root_.LateralTheory.CohomologicalPurity.EquivalenceOfExcision.hkc, Category.assoc, hπ,
+      hy, ← pull_comp, ← hs, hx]
     change HK.pull _ ((chains (ZMod q)).map _) _ n _ = _
     have hhs : hh φ ≫ dbl.inl (Jr φ) ≫ ss φ = hh φ := by
       rw [etale_mapping_cylinder_double_section_inl_comp]; exact Category.comp_id _
-    rw [← hkc', ← Category.assoc, ← (chains (ZMod q)).map_comp, Category.assoc, hhs]
+    rw [← _root_.LateralTheory.CohomologicalPurity.EquivalenceOfExcision.hkc, ← Category.assoc,
+      ← (chains (ZMod q)).map_comp, Category.assoc, hhs]
   have hz : HK.pull _ κ (tw q i) n x = 0 := by
     apply (e P' n).injective
     rw [map_zero]
     apply Subtype.ext
     rw [hp, ← hh0, h2]
     rfl
-  have hx0 : x = 0 := by rw [← hki _ (tw q i) n x, ← hκ, hkc', hz, map_zero]
+  have hx0 : x = 0 := by
+    rw [← hki _ (tw q i) n x, ← hκ,
+      _root_.LateralTheory.CohomologicalPurity.EquivalenceOfExcision.hkc, hz, map_zero]
   rw [hy, ← hs, hx0, map_zero]
   rfl
 

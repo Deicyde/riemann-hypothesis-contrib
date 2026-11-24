@@ -1,9 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinClosedDiscNormMulMultiplicativeStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscCoefficientsTopologicallyFreeStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasisStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinClosedDiscNormMulMultiplicative
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscCoefficientsTopologicallyFree
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasis
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopologicalBasisBasicFacts
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -81,14 +81,14 @@ theorem linDisjoint_disc
     : ∃ δ a : bk.S, δ ≠ 0 ∧ sA δ * x = sA a * y := by
   obtain ⟨hρ0, hρ1⟩ := breuilKisinDatum_uniformizer_radius_pos_lt_one bk
   obtain ⟨cD, hc1, hc2, -⟩ :=
-    GlobalTheory.T.closedDisc_coefficients_topologicallyFree l K bk A sA ι TB bk.ρ₀ hρ0 hρ1 j hj
+    _root_.GlobalTheory.BSP.disc_coefficients l K bk A sA ι TB bk.ρ₀ hρ0 hρ1 j hj
   haveI : IsAdicComplete bk.J bk.S := bk.complete
   have hH : IsHausdorff bk.J bk.S := inferInstance
   obtain ⟨hz, -⟩ := GlobalTheory.BSP.TopBasis.basic_facts bk.S A sA bk.J ι TB hH
   have hinj : Function.Injective (toDisc l (X : bk.S) bk.ρ₀) :=
-    (GlobalTheory.T.closedDisc_toDisc_injective_of_adicBasis l K bk bk.S (RingHom.id _) Unit
+    (_root_.GlobalTheory.BSP.toDisc_injective_of_topBasis l K bk bk.S (RingHom.id _) Unit
       (TopBasis.self bk.J) bk.ρ₀ hρ0 hρ1).1
-  have hmul := GlobalTheory.T.breuilKisin_closedDisc_norm_mul_multiplicative l K bk bk.ρ₀ hρ0 hρ1
+  have hmul := _root_.GlobalTheory.BSP.GaussMul.norm_mul l K bk bk.ρ₀ hρ0 hρ1
 
   have key
       : ∀ i,

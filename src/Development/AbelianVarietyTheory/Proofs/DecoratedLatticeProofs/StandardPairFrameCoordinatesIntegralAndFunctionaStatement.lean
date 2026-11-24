@@ -72,7 +72,4 @@ theorem _root_.GlobalTheory.T.standardPair_frameCoordinates_integral_and_functio
                                   (show (I.rec7 l Z).host.E from
                                     (B.fields.conjO (X.piT u) : B.fields.E)))
                             ∧ a = residue 𝒪[k] (s * y r₀) := by
-  first
-  | exact @GlobalTheory.AdForm.stdT_pair_coords
-  | exact GlobalTheory.AdForm.stdT_pair_coords
-  | (intros; apply GlobalTheory.AdForm.stdT_pair_coords <;> assumption)
+  first | exact @GlobalTheory.AdForm.stdT_pair_coords

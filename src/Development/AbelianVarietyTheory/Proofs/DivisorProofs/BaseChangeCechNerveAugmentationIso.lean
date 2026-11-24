@@ -62,9 +62,9 @@ theorem bc_cechAug_iso
         e₁.hom ≫ (bcMap (cechAug f) (sch.map r)).app U = cechAug _ ≫ e₂.hom := by
   intro S W V r f U
   obtain ⟨m, hm, -⟩ :=
-    GlobalTheory.T.etaleCechNerve_baseChange_isPullback _ _ _ _
-      (pullback.fst f (pullback.fst r U.hom)) (pullback.snd f (pullback.fst r U.hom)) f
-      (pullback.fst r U.hom) (IsPullback.of_hasPullback _ _)
+    _root_.GlobalTheory.cech_baseChange _ _ _ _ (pullback.fst f (pullback.fst r U.hom))
+      (pullback.snd f (pullback.fst r U.hom)) f (pullback.fst r U.hom)
+      (IsPullback.of_hasPullback _ _)
   have hQ := sch_isPullback (IsPullback.of_hasPullback r U.hom)
   have hP := hm.paste_vert hQ
   refine ⟨hP.isoPullback, hQ.isoPullback, ?_⟩

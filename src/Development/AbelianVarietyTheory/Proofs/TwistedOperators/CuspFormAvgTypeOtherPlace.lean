@@ -141,8 +141,7 @@ theorem avgF_Rder
   have hR : ∀ ψ ∈ 𝒟, ∀ τ'' X, X ∈ lieAt V τ'' → Rder θ V τ'' X ψ ∈ 𝒟 := fun _ h _ _ hX =>
     GlobalTheory.CuspLie.isAutFunSm_Rder hθ hX h
   have F :=
-    GlobalTheory.T.compactAverage_smoothFamily_closedUnderDerivatives D θ hθ V K μ
-      (GlobalTheory.RealAverage.famSpan θ V τ κ 𝒟)
+    _root_.GlobalTheory.AvgFam.avg_closed D θ hθ V K μ (GlobalTheory.RealAverage.famSpan θ V τ κ 𝒟)
       (GlobalTheory.RealAverage.famSpan_cont hθ hκ hU h𝒟)
       (GlobalTheory.RealAverage.famSpan_sm hθ hU h𝒟)
       (GlobalTheory.RealAverage.famSpan_Rder hθ hκ hU h𝒟 hR)

@@ -1,7 +1,7 @@
 module
 
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishingStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalMinorVanishing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -147,7 +147,8 @@ theorem detFac_ne_zero
   intro h0
   have hu : IsUnit T.det := hd.isUnit
   have h :=
-    ((GlobalTheory.T.block_diagonal_minor_vanishing Ω N j i hj).2.2.2 T T⁻¹ hT (hT.inv hu)).2
+    ((_root_.GlobalTheory.CompanionTheory.Ar.PB.MinorCalc.minors_main Ω N j i hj).2.2.2 T T⁻¹ hT
+      (hT.inv hu)).2
   rw [Matrix.mul_nonsing_inv _ hu, detFac_one, h0, zero_mul] at h
   exact one_ne_zero h
 
@@ -197,7 +198,7 @@ theorem plucker_change_of_frame
         minorIJ ((F₁.T p.1)⁻¹ * F₂.T p.1 * unitCols I' (stepCols N j p.2) hI'.1) I
             (stepCols N j p.2)
           = minorIJ ((F₁.T p.1)⁻¹ * F₂.T p.1) I I' := fun I => by
-    rw [(GlobalTheory.T.block_diagonal_minor_vanishing M.Ω N j p.2 hj).1]
+    rw [(_root_.GlobalTheory.CompanionTheory.Ar.PB.MinorCalc.minors_main M.Ω N j p.2 hj).1]
     simp only [minor_unitCols, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
       if_true]
   have hr

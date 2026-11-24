@@ -62,10 +62,8 @@ private lemma umon_le_uzmon {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [
   simp only [Formalism.MainNotions.G.UZgens, Set.mem_ofPred_eq]
   by_cases h : a = b
   · subst h
-    refine Or.inr ⟨a, 1, ?_⟩
-    simp [Formalism.MainNotions.G.binomE]
-  · refine Or.inl ⟨a, b, 1, h, ?_⟩
-    simp [Formalism.MainNotions.G.divPowE]
+    exact Or.inr ⟨a, 1, by simp [Formalism.MainNotions.G.binomE]⟩
+  · exact Or.inl ⟨a, b, 1, h, by simp [Formalism.MainNotions.G.divPowE]⟩
 
 private lemma clear_den {O K V : Type*} [CommRing O] [IsDomain O] [Field K] [Algebra O K]
     [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
@@ -80,10 +78,8 @@ private lemma clear_den {O K V : Type*} [CommRing O] [IsDomain O] [Field K] [Alg
     refine ⟨a * b, mul_ne_zero ha hb, ?_⟩
     rw [smul_add]
     apply D.add_mem
-    · rw [mul_comm a b, mul_smul]
-      exact D.smul_mem b hax
-    · rw [mul_smul]
-      exact D.smul_mem a hbz
+    · simpa [mul_comm a b, mul_smul] using D.smul_mem b hax
+    · simpa [mul_smul] using D.smul_mem a hbz
   | smul c x _ hx =>
     obtain ⟨o, ho, hox⟩ := hx
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective O c
@@ -99,8 +95,8 @@ theorem goal1
     {n : ℕ} {O : Type u_1} [inst : CommRing O] [inst_1 : IsDomain O] [IsDiscreteValuationRing O]
     {V : Type u_2} [inst_3 : AddCommGroup V] [inst_4 : Module (KK O) V] [inst_5 : Module O V]
     [inst_6 : IsScalarTower O (KK O) V]
-    {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V} :
-    IsIrrHW E lam v → ∀ y : V, ∃ o : O, o ≠ 0 ∧ o • y ∈ Delta (O := O) E v := by
+    {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V}
+    : IsIrrHW E lam v → ∀ y : V, ∃ o : O, o ≠ 0 ∧ o • y ∈ Delta (O := O) E v := by
   intro h y
   have hy : y ∈ Submodule.span (KK O) {x | ∃ u ∈ Umon E, x = u v} := by
     rw [h.2.2.2]

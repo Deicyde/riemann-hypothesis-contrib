@@ -50,6 +50,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
   GlobalTheory.WeilParts GlobalTheory.StepLaw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.typePlaces_localDatum_blockTriangular_law
     : ∀ (D : D7) (a b r t j : ℕ) (ha : r ≤ a) (hb : r ≤ b),
       a = r + j * t → b = r + (j + 1) * t
@@ -69,7 +70,4 @@ theorem _root_.GlobalTheory.T.typePlaces_localDatum_blockTriangular_law
                     : ℂˣ)
                   : ℂ)⁻¹
                 * omegaG (datY a r t j ha Pg Q (LevelP.triv Pg r ℂ) χ ξ Frm.B) (χ (j + 1)) y := by
-  first
-  | exact @GlobalTheory.StepLaw.TypeDatum.omegaG_law
-  | exact GlobalTheory.StepLaw.TypeDatum.omegaG_law
-  | (intros; apply GlobalTheory.StepLaw.TypeDatum.omegaG_law <;> assumption)
+  first | exact @GlobalTheory.StepLaw.TypeDatum.omegaG_law

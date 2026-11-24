@@ -57,14 +57,12 @@ open Finset Matrix MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.ActEquivK
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 PositivityTheory.RgDs.K
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
+  PositivityTheory.RgDs.K
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ} {ε : Fin n → Bool}
-
-lemma jm_inv (ε : Fin n → Bool) : (Formalism.REAL.Jm ε)⁻¹ = Formalism.REAL.Jm ε :=
-  Matrix.inv_eq_left_inv (signature_matrix_sq ε)
 
 lemma hinvol (ε : Fin n → Bool) : AAInvW.HInvol (Formalism.REAL.Jm ε) := by
   refine ⟨?_, signature_matrix_sq ε⟩
@@ -79,10 +77,10 @@ lemma eabH_eq (a b : Fin n) (f : Matrix (Fin n) (Fin n) ℂ → ℂ) :
   funext g
   have h1 : Formalism.QuantumDeterminants.hpart1 (Formalism.REAL.Jm ε) (Matrix.single a b 1) = Formalism.REAL.cpart1 ε (Matrix.single a b 1) := by
     unfold Formalism.QuantumDeterminants.hpart1 Formalism.REAL.cpart1
-    rw [jm_inv]
+    rw [_root_.Formalism.REAL.f1alg_inv_J]
   have h2 : Formalism.QuantumDeterminants.hpart2 (Formalism.REAL.Jm ε) (Matrix.single a b 1) = Formalism.REAL.cpart2 ε (Matrix.single a b 1) := by
     unfold Formalism.QuantumDeterminants.hpart2 Formalism.REAL.cpart2
-    rw [jm_inv]
+    rw [_root_.Formalism.REAL.f1alg_inv_J]
   unfold Formalism.QuantumDeterminants.EabH
   rw [h1, h2]
   rfl
@@ -106,10 +104,6 @@ lemma eab_local {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ} (a b : Fin n)
     (hg : Formalism.REAL.inUJ ε g) : Formalism.REAL.Eab ε a b f g = Formalism.REAL.Eab ε a b f' g := by
   rw [← eabH_eq, ← eabH_eq]
   exact AAInvW.eab_h_local n (Formalism.REAL.Jm ε) ℂ f f' a b g (hinvol ε) h hg
-
-lemma eab_zero (a b : Fin n) (g : Matrix (Fin n) (Fin n) ℂ) :
-    Formalism.REAL.Eab ε a b (fun _ => (0 : ℂ)) g = 0 := by
-  simp [Formalism.REAL.Eab, Formalism.REAL.Ec, Formalism.REAL.Rd]
 
 lemma eab_lin {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ} (c : ℂ) (a b : Fin n)
     (hf : Formalism.REAL.SmoothOnG ε f) (hf' : Formalism.REAL.SmoothOnG ε f')
@@ -136,7 +130,7 @@ lemma eab_sum {ι : Type*} (s : Finset ι) (c : ι → ℂ) (F : ι → Matrix (
       ∑ i ∈ s, c i * Formalism.REAL.Eab ε a b (F i) g := by
   classical
   induction s using Finset.induction_on with
-  | empty => simpa using eab_zero (ε := ε) a b g
+  | empty => simpa using _root_.Formalism.REAL.lie_derivative_const_zero (ε := ε) a b g
   | insert i s hi ih =>
     simp only [Finset.sum_insert hi]
     have e : (fun x => c i * F i x + ∑ j ∈ s, c j * F j x) =
@@ -223,8 +217,8 @@ theorem actEquiv : ActEquiv := by
   have hk : Formalism.REAL.inUJ ε (toMK k) := (mir_inUJ_iff ε _).2 k.1.2
   have hJ : ∀ v, Formalism.REAL.SmoothOnG ε (jfun Ψ T.w v) := fun v =>
     pdA_smooth_clm (pdA_coef T.w v) (f := Ψ) hP.2.2.1
-  have hJk : ∀ v y, Formalism.REAL.inUJ ε y →
-      jfun Ψ T.w v (y * toMK k) = jfun Ψ T.w (T.op k v) y := by
+  have hJk
+      : ∀ v y, Formalism.REAL.inUJ ε y → jfun Ψ T.w v (y * toMK k) = jfun Ψ T.w (T.op k v) y := by
     intro v y hy
     show inner ℂ T.w (Ψ (y * toMK k) v) = inner ℂ T.w (Ψ y (T.op k v))
     have h1 := hP.1 1 k y ((mir_inUJ_iff ε _).1 hy)
@@ -235,20 +229,25 @@ theorem actEquiv : ActEquiv := by
   rw [rightRegular_toL2 ε _ (show toMK k ∈ UJset ε from k.1.2)]
   refine toL2_congr_of_forall_inUJ_eq fun g hg' => ?_
   have hg : Formalism.REAL.inUJ ε g := (mir_inUJ_iff ε _).2 hg'
-  have hL : ∀ x : Wd n m, Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (a x))) (g * toMK k) =
-      ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (x.2 i) (w i)) *
-        Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a x))) g := by
+  have hL
+      : ∀ x : Wd n m,
+        Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (a x))) (g * toMK k)
+          = ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (x.2 i) (w i)) *
+              Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a x))) g := by
     intro x
     refine (eword_mul_right (hJ (a x)) hk x.1 x.2 g hg).trans (Finset.sum_congr rfl fun w _ => ?_)
     rw [eword_local (List.ofFn w) (f' := jfun Ψ T.w (T.op k (a x))) (fun y hy => hJk _ y hy) hg]
-  have hR : ∀ x : Wd n m, Formalism.REAL.Eword ε (ofW x)
-        (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) g =
-      ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (w i) (x.2 i)) *
-        Formalism.REAL.Eword ε (ofW x) (jfun Ψ T.w (T.op k (a ⟨x.1, w⟩))) g := by
+  have hR
+      : ∀ x : Wd n m,
+        Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) g
+          = ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (w i) (x.2 i)) *
+              Formalism.REAL.Eword ε (ofW x) (jfun Ψ T.w (T.op k (a ⟨x.1, w⟩))) g := by
     intro x
-    have e : (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) = fun y =>
-        ∑ w ∈ (Finset.univ : Finset (Fin x.1 → Fin n × Fin n)), (∏ i, adC (toMK k) (w i) (x.2 i)) *
-          jfun Ψ T.w (T.op k (a ⟨x.1, w⟩)) y := by
+    have e
+        : (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x)))
+          = fun y =>
+            ∑ w ∈ (Finset.univ : Finset (Fin x.1 → Fin n × Fin n)), (∏ i, adC (toMK k) (w i) (x.2 i)) *
+              jfun Ψ T.w (T.op k (a ⟨x.1, w⟩)) y := by
       funext y
 
       simp only [rhoA, map_sum, map_smul, inner_sum, inner_smul_right, jfun]
@@ -260,8 +259,10 @@ theorem actEquiv : ActEquiv := by
   simp only [hL, hR]
   rw [Fintype.sum_sigma, Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun l _ => ?_
-  exact Finset.sum_comm (s := (Finset.univ : Finset (Fin (l : ℕ) → Fin n × Fin n))) (t := Finset.univ)
-    (f := fun y w => (∏ i, adC (toMK k) (y i) (w i)) *
-      Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a ⟨l, y⟩))) g)
+  exact Finset.sum_comm (s := (Finset.univ : Finset (Fin (l : ℕ) → Fin n × Fin n)))
+    (t := Finset.univ)
+    (f := fun y w =>
+      (∏ i, adC (toMK k) (y i) (w i))
+        * Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a ⟨l, y⟩))) g)
 
 end GlobalTheory.CompanionTheory.ActEquivK

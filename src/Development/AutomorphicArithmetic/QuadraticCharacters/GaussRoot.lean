@@ -98,7 +98,6 @@ theorem exists_gauss
           rw [ZMod.natCast_zmod_val]
     let u : (ZMod d)ˣ := ZMod.unitOfCoprime a ha
     have hG : σ (gaussSum χ ψ) = gaussSum χ (ψ.mulShift u) := by
-
       simp only [gaussSum, map_sum, map_mul, AddChar.mulShift_apply]
       refine Finset.sum_congr rfl (fun x _ => ?_)
       rw [hσψ]

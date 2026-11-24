@@ -90,14 +90,10 @@ theorem _root_.GlobalTheory.QFam.IsFam.esymm_slash
     (fun t => t.map e.symm.toEmbedding)
     ?_ ?_ ?_ ?_ ?_
   · intro t ht
-    simp only [Finset.mem_coe, Finset.mem_powersetCard, Finset.subset_univ, true_and,
-        Finset.card_map]
-      at ht ⊢
+    simp only [Finset.mem_powersetCard, Finset.subset_univ, true_and, Finset.card_map] at ht ⊢
     exact ht
   · intro t ht
-    simp only [Finset.mem_coe, Finset.mem_powersetCard, Finset.subset_univ, true_and,
-        Finset.card_map]
-      at ht ⊢
+    simp only [Finset.mem_powersetCard, Finset.subset_univ, true_and, Finset.card_map] at ht ⊢
     exact ht
   · intro t _
     simp [Finset.map_map]

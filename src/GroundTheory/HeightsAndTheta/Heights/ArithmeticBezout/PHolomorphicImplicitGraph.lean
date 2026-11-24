@@ -58,9 +58,10 @@ noncomputable section
 
 namespace HolomorphicImplicitGraph
 
-theorem exists_coordSplitting {n m : ℕ} (L : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] (Fin (n - m) → ℂ))
-    (hL : finrank ℂ (LinearMap.ker L) = m) :
-    ∃ e : Fin n ≃ Fin m ⊕ Fin (n - m), ∀ v : EuclideanSpace ℂ (Fin n),
+theorem exists_coordSplitting
+    {n m : ℕ}
+    (L : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] (Fin (n - m) → ℂ)) (hL : finrank ℂ (LinearMap.ker L) = m)
+    : ∃ e : Fin n ≃ Fin m ⊕ Fin (n - m), ∀ v : EuclideanSpace ℂ (Fin n),
       (∀ j k, e j = Sum.inl k → v j = 0) → L v = 0 → v = 0 := by
   classical
   have hmn : m ≤ n := by
@@ -105,8 +106,12 @@ theorem exists_coordSplitting {n m : ℕ} (L : EuclideanSpace ℂ (Fin n) →ₗ
 
     simp [w, map_sum, map_smul]
   have hsum : ∑ c, v (a c) • w (a c) = 0 := by
-    rw [Fintype.sum_of_injective a ha (fun c => v (a c) • w (a c)) (fun j => v j • w j)
-      (fun j hj => by rw [hout j hj, zero_smul]) (fun c => rfl), ← hv', hLv]
+    rw [Fintype.sum_of_injective a ha
+        (fun c => v (a c) • w (a c))
+        (fun j => v j • w j)
+        (fun j hj => by rw [hout j hj, zero_smul])
+        (fun c => rfl),
+      ← hv', hLv]
   have hin : ∀ c, v (a c) = 0 := Fintype.linearIndependent_iff.1 hli (fun c => v (a c)) hsum
   refine PiLp.ext fun j => ?_
   by_cases hj : j ∈ s
@@ -160,8 +165,8 @@ theorem HolomorphicImplicitGraph.proof : HolomorphicImplicitGraph.Statement := b
     rfl
   let P := hFc.contDiffAt.toOpenPartialHomeomorph F (f' := A) (by rw [hA]; exact hFd y) one_ne_zero
 
-  let W : Set (EuclideanSpace ℂ (Fin n)) := (fun z => fderiv ℂ F z) ⁻¹'
-    Set.range ((↑) : (EuclideanSpace ℂ (Fin n) ≃L[ℂ] (Fin n → ℂ)) → _)
+  let W : Set (EuclideanSpace ℂ (Fin n)) :=
+    (fun z => fderiv ℂ F z) ⁻¹' Set.range ((↑) : (EuclideanSpace ℂ (Fin n) ≃L[ℂ] (Fin n → ℂ)) → _)
   have hW : IsOpen W := ContinuousLinearEquiv.isOpen.preimage (hFc.continuous_fderiv one_ne_zero)
   have hyW : y ∈ W := ⟨A, by rw [hA]; exact (hFd y).fderiv.symm⟩
   have hWinj : ∀ z ∈ W, Injective (D z) := by
@@ -173,8 +178,12 @@ theorem HolomorphicImplicitGraph.proof : HolomorphicImplicitGraph.Statement := b
   have hU : IsOpen U := (P.open_source.inter hV).inter hW
   have hyU : y ∈ U := ⟨⟨ContDiffAt.mem_toOpenPartialHomeomorph_source _ _ _, hyV⟩, hyW⟩
 
-  let ι : EuclideanSpace ℂ (Fin m) →L[ℂ] (Fin n → ℂ) := ContinuousLinearMap.pi fun j =>
-    Sum.elim (fun k => EuclideanSpace.proj k) (fun _ => (0 : EuclideanSpace ℂ (Fin m) →L[ℂ] ℂ)) (e j)
+  let ι : EuclideanSpace ℂ (Fin m) →L[ℂ] (Fin n → ℂ) :=
+    ContinuousLinearMap.pi fun j =>
+      Sum.elim
+        (fun k => EuclideanSpace.proj k)
+        (fun _ => (0 : EuclideanSpace ℂ (Fin m) →L[ℂ] ℂ))
+        (e j)
   let g := P.symm
   let Φ : EuclideanSpace ℂ (Fin m) → EuclideanSpace ℂ (Fin (n - m)) := fun x =>
     WithLp.toLp 2 fun i => g (ι x) (e.symm (Sum.inr i))
@@ -237,8 +246,7 @@ theorem HolomorphicImplicitGraph.proof : HolomorphicImplicitGraph.Statement := b
     have hgx := hgdiff x hx
     let g' := fderiv ℂ g (ι x)
     have hGd : HasFDerivAt (graphPt e Φ) (g'.comp ι) x := by
-      have h1 : HasFDerivAt (fun x => g (ι x)) (g'.comp ι) x :=
-        hgx.hasFDerivAt.comp x ι.hasFDerivAt
+      have h1 : HasFDerivAt (fun x => g (ι x)) (g'.comp ι) x := hgx.hasFDerivAt.comp x ι.hasFDerivAt
       refine h1.congr_of_eventuallyEq ?_
       filter_upwards [hΩ.mem_nhds hx] with x' hx' using hG x' hx'.1
     have hDg : ∀ w, D (g (ι x)) (g' w) = w := by
@@ -252,7 +260,8 @@ theorem HolomorphicImplicitGraph.proof : HolomorphicImplicitGraph.Statement := b
       simpa using this
     rw [hGd.fderiv, hG x hx.1]
     ext u
-    simp only [LinearMap.mem_range, Submodule.mem_iInf, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
+    simp only [LinearMap.mem_range, Submodule.mem_iInf, LinearMap.mem_ker,
+      ContinuousLinearMap.coe_coe]
     constructor
     · rintro ⟨v, rfl⟩ i
       have := congr_fun (hDg (ι v)) (e.symm (Sum.inr i))

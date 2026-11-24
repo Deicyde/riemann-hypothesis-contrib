@@ -66,37 +66,32 @@ public import Mathlib.Analysis.Calculus.Deriv.Pow
 
 namespace UpperTheory.Reformulated.B.Gwa7
 
-@[reducible] noncomputable def U2 : Type :=
-↥(Matrix.unitaryGroup (Fin 2) ℂ)
+@[reducible]
+noncomputable def U2 : Type := ↥(Matrix.unitaryGroup (Fin 2) ℂ)
 
-@[reducible] noncomputable def instMeasurableSpaceU2 : MeasurableSpace
-  U2 :=
-borel U2
+@[reducible]
+noncomputable def instMeasurableSpaceU2 : MeasurableSpace U2 := borel U2
 
 attribute [local instance] instMeasurableSpaceU2
 
 theorem aux3 : IsTopologicalGroup ↥(unitary (Matrix (Fin 2) (Fin 2) ℂ)) := by
   exact (inferInstance : IsTopologicalGroup (Matrix.unitaryGroup (Fin 2) ℂ))
 
-theorem aux4 : BorelSpace U2 := by
-  exact ⟨rfl⟩
+theorem aux4 : BorelSpace U2 := by exact ⟨rfl⟩
 
-private theorem compact_unitary :
-    CompactSpace (Matrix.unitaryGroup (Fin 2) ℂ) := by
+private theorem compact_unitary : CompactSpace (Matrix.unitaryGroup (Fin 2) ℂ) := by
   refine isCompact_iff_compactSpace.1 ?_
-  have hK : IsCompact (Set.pi Set.univ fun _ : Fin 2 => Set.pi Set.univ fun _ : Fin 2 =>
-      Metric.closedBall (0 : ℂ) 1) :=
+  have hK : IsCompact (Set.pi Set.univ fun _ : Fin 2 =>
+      Set.pi Set.univ fun _ : Fin 2 => Metric.closedBall (0 : ℂ) 1) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   refine IsCompact.of_isClosed_subset (X := Matrix (Fin 2) (Fin 2) ℂ) hK
     (isClosed_unitary (R := Matrix (Fin 2) (Fin 2) ℂ)) ?_
   intro U hU i _ j _
   simpa using entry_norm_bound_of_unitary hU i j
 
-theorem aux5 : CompactSpace ↥(Matrix.unitaryGroup (Fin 2) ℂ) := by
-  exact compact_unitary
+theorem aux5 : CompactSpace ↥(Matrix.unitaryGroup (Fin 2) ℂ) := by exact compact_unitary
 
-theorem aux6 : Nonempty U2 := by
-  exact ⟨1⟩
+theorem aux6 : Nonempty U2 := by exact ⟨1⟩
 
 noncomputable def μK : MeasureTheory.Measure U2 := by
   letI : BorelSpace U2 := aux4
@@ -107,40 +102,43 @@ noncomputable def μK : MeasureTheory.Measure U2 := by
 section Algebra
 variable {A : Type*} [NormedCommRing A] [NormedAlgebra ℂ A]
 
-private theorem deriv_zero (φ : A →L[ℂ] ℂ) {f : ℂ → A} {f' : A}
-    (hf : HasDerivAt f f' 0) (h : ∀ t, φ (f t) = 0) : φ f' = 0 := by
+private theorem deriv_zero
+    (φ : A →L[ℂ] ℂ) {f : ℂ → A} {f' : A} (hf : HasDerivAt f f' 0) (h : ∀ t, φ (f t) = 0)
+    : φ f' = 0 := by
   have h1 : HasDerivAt (fun t => φ (f t)) (φ f') 0 := φ.hasFDerivAt.comp_hasDerivAt 0 hf
   have h2 : (fun t => φ (f t)) = fun _ => (0 : ℂ) := funext h
   rw [h2] at h1
   exact h1.unique (hasDerivAt_const 0 0)
 
-private theorem line_deriv (x y : A) :
-    HasDerivAt (fun t : ℂ => x + t • y) y 0 := by
+private theorem line_deriv (x y : A) : HasDerivAt (fun t : ℂ => x + t • y) y 0 := by
   simpa using ((hasDerivAt_id (0 : ℂ)).smul_const y).const_add x
 
-private theorem step_one (φ : A →L[ℂ] ℂ) (x y c : A) (n : ℕ)
-    (h : ∀ s : ℂ, φ ((x + s • y) ^ (n + 1) * c) = 0) : φ (x ^ n * y * c) = 0 := by
-  have h1 := deriv_zero φ
-    (((line_deriv x y).pow (n + 1)).mul_const c) h
-  have h2 : ((n + 1 : ℕ) : A) * (x + (0 : ℂ) • y) ^ (n + 1 - 1) * y * c
-      = ((n + 1 : ℕ) : ℂ) • (x ^ n * y * c) := by
+private theorem step_one
+    (φ : A →L[ℂ] ℂ) (x y c : A) (n : ℕ) (h : ∀ s : ℂ, φ ((x + s • y) ^ (n + 1) * c) = 0)
+    : φ (x ^ n * y * c) = 0 := by
+  have h1 := deriv_zero φ (((line_deriv x y).pow (n + 1)).mul_const c) h
+  have h2
+      : ((n + 1 : ℕ) : A) * (x + (0 : ℂ) • y) ^ (n + 1 - 1) * y * c
+        = ((n + 1 : ℕ) : ℂ) • (x ^ n * y * c) := by
     simp only [Algebra.smul_def, map_natCast, map_zero, zero_mul, add_zero, Nat.add_sub_cancel]
     ring
   rw [h2, map_smul, smul_eq_mul] at h1
   exact (mul_eq_zero.1 h1).resolve_left (Nat.cast_ne_zero.2 (Nat.succ_ne_zero n))
 
-private theorem step_two (φ : A →L[ℂ] ℂ) (x x' y y' c Δ : A) (κ : ℂ) (n : ℕ)
-    (hΔ : x' * y = x * y' - κ • Δ)
-    (h : ∀ t : ℂ, φ ((x + t • x') ^ (n + 1) * (y + t • y') * c) = 0)
-    (h' : φ (x ^ n * Δ * c) = 0) : φ (x ^ (n + 1) * y' * c) = 0 := by
-  have h1 := deriv_zero φ
-    ((((line_deriv x x').pow (n + 1)).mul
-      (line_deriv y y')).mul_const c) h
-  have h2 : (((n + 1 : ℕ) : A) * (x + (0 : ℂ) • x') ^ (n + 1 - 1) * x' * (y + (0 : ℂ) • y')
-      + (x + (0 : ℂ) • x') ^ (n + 1) * y') * c
-      = ((n + 2 : ℕ) : ℂ) • (x ^ (n + 1) * y' * c) - (((n + 1 : ℕ) : ℂ) * κ) • (x ^ n * Δ * c) := by
+private theorem step_two
+    (φ : A →L[ℂ] ℂ) (x x' y y' c Δ : A) (κ : ℂ) (n : ℕ) (hΔ : x' * y = x * y' - κ • Δ)
+    (h : ∀ t : ℂ, φ ((x + t • x') ^ (n + 1) * (y + t • y') * c) = 0) (h' : φ (x ^ n * Δ * c) = 0)
+    : φ (x ^ (n + 1) * y' * c) = 0 := by
+  have h1 := deriv_zero φ ((((line_deriv x x').pow (n + 1)).mul (line_deriv y y')).mul_const c) h
+  have h2
+      : (((n + 1 : ℕ) : A) * (x + (0 : ℂ) • x') ^ (n + 1 - 1) * x' * (y + (0 : ℂ) • y')
+            + (x + (0 : ℂ) • x') ^ (n + 1) * y')
+          * c
+        = ((n + 2 : ℕ) : ℂ) • (x ^ (n + 1) * y' * c)
+          - (((n + 1 : ℕ) : ℂ) * κ) • (x ^ n * Δ * c) := by
     simp only [Algebra.smul_def, map_natCast, map_zero, zero_mul, add_zero, Nat.add_sub_cancel,
-      map_mul] at hΔ ⊢
+        map_mul]
+      at hΔ ⊢
     push_cast
     linear_combination ((n : A) + 1) * x ^ n * c * hΔ
   have h3 := h2 ▸ h1
@@ -150,22 +148,21 @@ private theorem step_two (φ : A →L[ℂ] ℂ) (x x' y y' c Δ : A) (κ : ℂ) 
 private def lin (p q r s : A) (a b c d : ℂ) : A :=
   (a * c) • p + (a * d) • q + (b * c) • r + (b * d) • s
 
-private theorem mul_lin (φ : A →L[ℂ] ℂ) (p q r s z : A) (D : ℤ → A)
-    (hD : ∀ m, D (m + 1) = (p * s - q * r) * D m)
+private theorem mul_lin
+    (φ : A →L[ℂ] ℂ) (p q r s z : A) (D : ℤ → A) (hD : ∀ m, D (m + 1) = (p * s - q * r) * D m)
     (h : ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ), φ (lin p q r s a b c d ^ n * D m * z) = 0)
-    (a' b' c' d' : ℂ) (n : ℕ) (m : ℤ) (a b c d : ℂ) :
-    φ (lin p q r s a b c d ^ n * D m *
-      (lin p q r s a' b' c' d' * z)) = 0 := by
+    (a' b' c' d' : ℂ) (n : ℕ) (m : ℤ) (a b c d : ℂ)
+    : φ (lin p q r s a b c d ^ n * D m * (lin p q r s a' b' c' d' * z)) = 0 := by
   cases n with
   | zero =>
     rw [← h 1 m a' b' c' d']
     congr 1
     ring
   | succ n =>
-    have key := step_two φ (lin p q r s a b c d)
-      (lin p q r s a b c' d') (lin p q r s a' b' c d)
-      (lin p q r s a' b' c' d') (D m * z) (p * s - q * r)
-      ((a * b' - b * a') * (c * d' - d * c')) n ?_ ?_ ?_
+    have key :=
+      step_two φ (lin p q r s a b c d) (lin p q r s a b c' d') (lin p q r s a' b' c d)
+        (lin p q r s a' b' c' d') (D m * z) (p * s - q * r) ((a * b' - b * a') * (c * d' - d * c'))
+        n ?_ ?_ ?_
     · rw [← key]
       congr 1
       ring
@@ -183,9 +180,8 @@ private theorem mul_lin (φ : A →L[ℂ] ℂ) (p q r s z : A) (D : ℤ → A)
 
 end Algebra
 
-private theorem unit_vec (a b : ℂ) :
-    ∃ r α β : ℂ, a = r * α ∧ b = r * β ∧
-      α * (starRingEnd ℂ) α + β * (starRingEnd ℂ) β = 1 := by
+private theorem unit_vec (a b : ℂ)
+    : ∃ r α β : ℂ, a = r * α ∧ b = r * β ∧ α * (starRingEnd ℂ) α + β * (starRingEnd ℂ) β = 1 := by
   by_cases h0 : Complex.normSq a + Complex.normSq b = 0
   · have ha := Complex.normSq_nonneg a
     have hb := Complex.normSq_nonneg b
@@ -216,20 +212,17 @@ private theorem det_ne (k : U2) : k.1.det ≠ 0 :=
   (Unitary.isUnit_coe (U := ⟨_, Matrix.det_of_mem_unitary k.2⟩)).ne_zero
 
 private noncomputable def detPow (m : ℤ) : C(U2, ℂ) :=
-  ⟨fun k => k.1.det ^ m, continuous_subtype_val.matrix_det.zpow₀ m
-    fun k => Or.inl (det_ne k)⟩
+  ⟨fun k => k.1.det ^ m, continuous_subtype_val.matrix_det.zpow₀ m fun k => Or.inl (det_ne k)⟩
 
-private theorem star_eq (k : U2) :
-    star k.1 = (k.1.det)⁻¹ • k.1.adjugate := by
+private theorem star_eq (k : U2) : star k.1 = (k.1.det)⁻¹ • k.1.adjugate := by
   have h1 : star k.1 * k.1 = 1 := Matrix.mem_unitaryGroup_iff'.1 k.2
-  have h2 : star k.1 * (k.1 * k.1.adjugate) = k.1.adjugate := by
-    rw [← mul_assoc, h1, one_mul]
+  have h2 : star k.1 * (k.1 * k.1.adjugate) = k.1.adjugate := by rw [← mul_assoc, h1, one_mul]
   rw [Matrix.mul_adjugate, Matrix.mul_smul, mul_one] at h2
   rw [← h2, smul_smul, inv_mul_cancel₀ (det_ne k), one_smul]
 
 open UpperTheory.Reformulated.B.Gwa7 in
-private theorem entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
-    entry i j = lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
+private theorem entry_lin [CompactSpace U2] (i j : Fin 2)
+    : ∃ a b c d : ℂ, entry i j = lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
   fin_cases i <;> fin_cases j
   · exact ⟨1, 0, 1, 0, by simp [lin]⟩
   · exact ⟨1, 0, 0, 1, by simp [lin]⟩
@@ -237,8 +230,10 @@ private theorem entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
   · exact ⟨0, 1, 0, 1, by simp [lin]⟩
 
 open UpperTheory.Reformulated.B.Gwa7 in
-private theorem star_entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
-    star (entry i j) = detPow (-1) * lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
+private theorem star_entry_lin [CompactSpace U2] (i j : Fin 2)
+    : ∃ a b c d : ℂ,
+      star (entry i j)
+        = detPow (-1) * lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d := by
   have h : ∀ k : U2, star (k.1 i j) = (k.1.det)⁻¹ * k.1.adjugate j i := fun k => by
     have := congrFun (congrFun (star_eq k) j) i
     simpa [Matrix.star_apply] using this
@@ -253,34 +248,40 @@ private theorem star_entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : �
     simp [lin, detPow, entry, Matrix.adjugate_fin_two]
 
 open UpperTheory.Reformulated.B.Gwa7 in
-private theorem lin_eq [CompactSpace U2] (a b c d : ℂ) :
-    ∃ (r : ℂ) (l₁ l₂ : U2), ∀ k : U2,
-    lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d k = r * (l₁ * k * l₂).1 0 0 := by
+private theorem lin_eq [CompactSpace U2] (a b c d : ℂ)
+    : ∃ (r : ℂ) (l₁ l₂ : U2), ∀ k : U2,
+      lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d k = r * (l₁ * k * l₂).1 0 0 := by
   obtain ⟨r, α, β, rfl, rfl, h⟩ := unit_vec a b
   obtain ⟨s, γ, δ, rfl, rfl, h'⟩ := unit_vec c d
-  refine ⟨r * s, ⟨!![α, β; -(starRingEnd ℂ) β, (starRingEnd ℂ) α], ?_⟩,
-    ⟨!![γ, -(starRingEnd ℂ) δ; δ, (starRingEnd ℂ) γ], ?_⟩, fun k => ?_⟩
+  refine ⟨
+    r * s,
+    ⟨!![α, β; -(starRingEnd ℂ) β, (starRingEnd ℂ) α], ?_⟩,
+    ⟨!![γ, -(starRingEnd ℂ) δ; δ, (starRingEnd ℂ) γ], ?_⟩,
+    fun k => ?_
+  ⟩
   · rw [Matrix.mem_unitaryGroup_iff]
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply] <;>
-      first | linear_combination h | ring
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply]
+      <;> first | linear_combination h | ring
   · rw [Matrix.mem_unitaryGroup_iff']
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply] <;>
-      first | linear_combination h' | ring
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply]
+      <;> first | linear_combination h' | ring
   · simp [lin, entry, Matrix.mul_apply, Fin.sum_univ_two, Matrix.vecMul, dotProduct]
     ring
 
 open UpperTheory.Reformulated.B.Gwa7 in
-private theorem functional_zero [CompactSpace U2] (φ : C(U2, ℂ) →L[ℂ] ℂ)
+private theorem functional_zero
+    [CompactSpace U2]
+    (φ : C(U2, ℂ) →L[ℂ] ℂ)
     (h : ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ),
       φ (lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d ^ n * detPow m * 1) = 0)
-    (f : C(U2, ℂ)) : φ f = 0 := by
+    (f : C(U2, ℂ))
+    : φ f = 0 := by
   open scoped Pointwise in
-  let P : C(U2, ℂ) → Prop := fun z => ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ),
-    φ (lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d ^ n * detPow m * z) = 0
+  let P : C(U2, ℂ) → Prop := fun z =>
+    ∀ (n : ℕ) (m : ℤ) (a b c d : ℂ),
+      φ (lin (entry 0 0) (entry 0 1) (entry 1 0) (entry 1 1) a b c d ^ n * detPow m * z) = 0
   have hD : ∀ m, detPow (m + 1) = (entry 0 0 * entry 1 1 - entry 0 1 * entry 1 0) * detPow m := by
     intro m
     ext k
@@ -305,8 +306,7 @@ private theorem functional_zero [CompactSpace U2] (φ : C(U2, ℂ) →L[ℂ] ℂ
         rw [e]
         exact mul_lin φ _ _ _ _ z detPow hD hz a b c d
       · obtain ⟨a, b, c, d, e⟩ := star_entry_lin ij.1 ij.2
-        have hx' : x = star (entry ij.1 ij.2) := by
-          rw [← star_star x, ← hx]
+        have hx' : x = star (entry ij.1 ij.2) := by rw [← star_star x, ← hx]
         rw [hx', e]
         intro n m a' b' c' d'
         rw [← mul_lin φ _ _ _ _ z detPow hD hz a b c d n (m + -1) a' b' c' d', ← hD']
@@ -340,10 +340,12 @@ private theorem functional_zero [CompactSpace U2] (φ : C(U2, ℂ) →L[ℂ] ℂ
   simpa [hD0] using this
 
 open UpperTheory.Reformulated.B.Gwa7 MeasureTheory in
-private theorem main [CompactSpace U2] [BorelSpace U2] (μ : Measure U2)
-    [IsFiniteMeasure μ] [μ.IsOpenPosMeasure] {g : U2 → ℂ} (hg : Continuous g)
-    (h : ∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
-      ∫ k, (l₁ * k * l₂).1 0 0 ^ n * k.1.det ^ q * g k ∂μ = 0) : g = 0 := by
+private theorem main
+    [CompactSpace U2] [BorelSpace U2]
+    (μ : Measure U2) [IsFiniteMeasure μ] [μ.IsOpenPosMeasure]
+    {g : U2 → ℂ} (hg : Continuous g)
+    (h : ∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2), ∫ k, (l₁ * k * l₂).1 0 0 ^ n * k.1.det ^ q * g k ∂μ = 0)
+    : g = 0 := by
   let G : C(U2, ℂ) := star ⟨g, hg⟩
   let φ : C(U2, ℂ) →L[ℂ] ℂ :=
     (innerSL ℂ (ContinuousMap.toLp 2 μ ℂ G)).comp (ContinuousMap.toLp 2 μ ℂ)
@@ -366,15 +368,15 @@ private theorem main [CompactSpace U2] [BorelSpace U2] (μ : Measure U2)
   ext k
   simpa [G] using congrArg (fun F : C(U2, ℂ) => F k) h2
 
-theorem eq_zero_of_forall_integral_coeff : ∀
-  {g : U2 → ℂ},
-  Continuous g →
-    (∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
-        ∫ (k : U2),
-            ((l₁ * k * l₂ : U2) : Matrix (Fin 2) (Fin 2) ℂ) 0 0 ^ n *
-              (k : Matrix (Fin 2) (Fin 2) ℂ).det ^ q * g k ∂μK =
-          0) →
-      g = 0 := by
+theorem eq_zero_of_forall_integral_coeff
+    : ∀ {g : U2 → ℂ},
+      Continuous g
+        → (∀ (n : ℕ) (q : ℤ) (l₁ l₂ : U2),
+          ∫ (k : U2),
+              ((l₁ * k * l₂ : U2) : Matrix (Fin 2) (Fin 2) ℂ) 0 0 ^ n *
+                (k : Matrix (Fin 2) (Fin 2) ℂ).det ^ q * g k ∂μK
+            = 0)
+        → g = 0 := by
   intro g hg h
   haveI : CompactSpace U2 := aux5
   haveI : BorelSpace U2 := aux4

@@ -50,8 +50,6 @@ noncomputable section
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
   GlobalTheory.JHMult Zc Zc.M Zc.Cos
 
-
-
 namespace CompanionTheory.Groth
 
 def Steps (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]

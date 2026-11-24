@@ -57,16 +57,19 @@ namespace Formalism.LatticeBaseChangeAlt
 
 open Module
 
-theorem linearIndependent_of_isBaseChange_alt {K K' V V₁ ι : Type} [Field K] [Field K'] [Algebra K K']
-    [AddCommGroup V] [Module K V] [AddCommGroup V₁] [Module K' V₁] [Module K V₁]
-    [IsScalarTower K K' V₁] (j : V →ₗ[K] V₁) (hj : IsBaseChange K' j) (v : ι → V)
-    (hv : LinearIndependent K v) : LinearIndependent K' (fun i => j (v i)) := by
+theorem linearIndependent_of_isBaseChange_alt
+    {K K' V V₁ ι : Type} [Field K] [Field K'] [Algebra K K'] [AddCommGroup V] [Module K V]
+    [AddCommGroup V₁] [Module K' V₁] [Module K V₁] [IsScalarTower K K' V₁]
+    (j : V →ₗ[K] V₁) (hj : IsBaseChange K' j)
+    (v : ι → V) (hv : LinearIndependent K v)
+    : LinearIndependent K' (fun i => j (v i)) := by
   apply Formalism.LatticeBaseChangeAlt.LatticeIndexBis.indep_baseChange <;> assumption
 
-theorem span_image_span_alt {K K' V V₁ : Type} [Field K] [Field K'] [Algebra K K']
-    [AddCommGroup V] [Module K V] [AddCommGroup V₁] [Module K' V₁] [Module K V₁]
-    [IsScalarTower K K' V₁] (j : V →ₗ[K] V₁) (s : Set V) :
-    Submodule.span K' (j '' (Submodule.span K s : Set V)) = Submodule.span K' (j '' s) := by
+theorem span_image_span_alt
+    {K K' V V₁ : Type} [Field K] [Field K'] [Algebra K K'] [AddCommGroup V] [Module K V]
+    [AddCommGroup V₁] [Module K' V₁] [Module K V₁] [IsScalarTower K K' V₁]
+    (j : V →ₗ[K] V₁) (s : Set V)
+    : Submodule.span K' (j '' (Submodule.span K s : Set V)) = Submodule.span K' (j '' s) := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
@@ -74,9 +77,7 @@ theorem span_image_span_alt {K K' V V₁ : Type} [Field K] [Field K'] [Algebra K
       rw [← Submodule.map_span]
       exact Submodule.mem_map_of_mem hx
     exact Submodule.span_le_restrictScalars K K' _ h1
-  · first
-    | exact Submodule.span_mono (Set.image_mono Submodule.subset_span)
-    | exact Submodule.span_mono (Set.image_subset _ Submodule.subset_span)
+  · first | exact Submodule.span_mono (Set.image_mono Submodule.subset_span)
 
 theorem finrank_span_image_alt : FinrankSpanImage := by
   intro O O' K K' V V₁ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ j hj V'
@@ -85,8 +86,9 @@ theorem finrank_span_image_alt : FinrankSpanImage := by
   have hw : LinearIndependent K w := b.linearIndependent.map' V'.subtype V'.ker_subtype
   have hspan : Submodule.span K (Set.range w) = V' := by
     rw [Set.range_comp, ← Submodule.map_span, b.span_eq, Submodule.map_subtype_top]
-  have h1 : Submodule.span K' (j '' (V' : Set V)) =
-      Submodule.span K' (Set.range (fun i => j (w i))) := by
+  have h1
+      : Submodule.span K' (j '' (V' : Set V))
+        = Submodule.span K' (Set.range (fun i => j (w i))) := by
     have h2 := span_image_span_alt (K' := K') j (Set.range w)
     rw [hspan] at h2
     rw [h2, ← Set.range_comp]
@@ -104,20 +106,21 @@ theorem isLattice_span_image_alt : IsLatticeSpanImage := by
       ← IsScalarTower.algebraMap_apply]
   obtain ⟨⟨S, hS⟩, hM2⟩ := hM
   let P : Submodule O' V₁ := Submodule.span O' (j '' (S : Set V))
-  let Q : Submodule O V :=
-    { carrier := {x | j x ∈ P}
-      add_mem' := fun {a b} ha hb => by
-        show j (a + b) ∈ P
-        rw [map_add (f := _)]
-        exact P.add_mem ha hb
-      zero_mem' := by
-        show j 0 ∈ P
-        rw [map_zero]
-        exact P.zero_mem
-      smul_mem' := fun c x hx => by
-        show j (c • x) ∈ P
-        rw [hsm]
-        exact P.smul_mem _ hx }
+  let Q : Submodule O V := {
+    carrier := {x | j x ∈ P}
+    add_mem' := fun {a b} ha hb => by
+      show j (a + b) ∈ P
+      rw [map_add (f := _)]
+      exact P.add_mem ha hb
+    zero_mem' := by
+      show j 0 ∈ P
+      rw [map_zero]
+      exact P.zero_mem
+    smul_mem' := fun c x hx => by
+      show j (c • x) ∈ P
+      rw [hsm]
+      exact P.smul_mem _ hx
+  }
   have hQ : Submodule.span O (S : Set V) ≤ Q :=
     Submodule.span_le.mpr (fun x hx => Submodule.subset_span ⟨x, hx, rfl⟩)
   have hNP : Submodule.span O' (j '' (M : Set V)) = P := by

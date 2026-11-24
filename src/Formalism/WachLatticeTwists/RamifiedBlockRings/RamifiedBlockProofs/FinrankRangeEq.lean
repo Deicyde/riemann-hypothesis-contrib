@@ -74,8 +74,8 @@ theorem blockPoly_map
   ext i j
   by_cases h : i = j
   · subst h
-    simp [Matrix.one_apply]
-  · simp [Matrix.one_apply, h]
+    simp
+  · simp [h]
 
 theorem r_mem'
     {O K : Type} [CommRing O] [CommRing K] [Algebra O K]

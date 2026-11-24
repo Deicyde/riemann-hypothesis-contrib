@@ -66,10 +66,7 @@ theorem atInf_inv_isUnit
     : IsUnit (atInf (embT D) A⁻¹ τ).det := by
   unfold atInf
   have h := (Matrix.isUnit_nonsing_inv_det A hA).map (embT D τ)
-  first
-  | (rw [RingHom.map_det, RingHom.mapMatrix_apply] at h; exact h)
-  | simpa [RingHom.map_det] using h
-  | simpa [AlgHom.map_det] using h
+  first | (rw [RingHom.map_det, RingHom.mapMatrix_apply] at h; exact h)
 
 variable
   (Tf : FormsTied D u)

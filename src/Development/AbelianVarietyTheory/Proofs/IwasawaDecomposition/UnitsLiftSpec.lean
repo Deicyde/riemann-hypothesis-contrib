@@ -47,6 +47,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.Objects
 import Formalism.LocalToGlobal.NormalizedHeckeFactors.TypesDefs
+import Mathlib.RingTheory.PicardGroup
 
 @[expose] public section
 
@@ -59,9 +60,6 @@ open Formalism.L2.Fam.NPC Formalism.L2.Fam.NPC.BaseC
 noncomputable section
 
 namespace GlobalTheory.HeckeLocN
-
-
-
 
 variable {D : D7}
 

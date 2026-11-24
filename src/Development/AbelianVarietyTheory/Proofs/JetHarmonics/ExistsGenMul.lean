@@ -120,7 +120,7 @@ theorem exists_gen_mul
           (Eq.trans ?_ (l b₂).symm)
         rw [hb, mul_comm p.g.b p₁.g.b]
         apply Additive.ofMul.injective
-        simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
+        simp [Fin.prod_univ_succ, ofMul_mul, ofMul_inv, ofMul_pow]
         module)
       (LB.mulGen D.P.L _ _ _ _ (LB.mulGen D.P.L _ _ _ _ N (p.g.s p₁.y))
         (LB.mulGen D.P.L _ _ _ _ w w₁))

@@ -48,8 +48,9 @@ public import Mathlib.Analysis.Normed.Group.Ultra
 
 namespace GlobalTheory.CloseToUnitNorm
 
-theorem norm_eq_one_of_close {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (h : ‖u - 1‖ < 1) : ‖u‖ = 1 := by
+theorem norm_eq_one_of_close
+    {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (h : ‖u - 1‖ < 1)
+    : ‖u‖ = 1 := by
   apply le_antisymm
   · have h1 := IsUltrametricDist.norm_add_le_max (u - 1) (1 : C)
     rw [sub_add_cancel, norm_one] at h1
@@ -60,8 +61,9 @@ theorem norm_eq_one_of_close {C : Type} [NormedField C] [IsUltrametricDist C] (u
     · exact h2
     · exact absurd h (not_lt.mpr h2)
 
-theorem norm_pow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (hu : ‖u‖ = 1) (n : ℕ) : ‖u ^ n - 1‖ ≤ ‖u - 1‖ := by
+theorem norm_pow_sub_one_le
+    {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (hu : ‖u‖ = 1) (n : ℕ)
+    : ‖u ^ n - 1‖ ≤ ‖u - 1‖ := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -71,8 +73,9 @@ theorem norm_pow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u 
     rw [norm_mul, hu, one_mul]
     exact ih
 
-theorem norm_zpow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (h : ‖u - (1 : C)‖ < (1 : ℝ)) (i : ℤ) : ‖u ^ i - (1 : C)‖ ≤ ‖u - (1 : C)‖ := by
+theorem norm_zpow_sub_one_le
+    {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (h : ‖u - (1 : C)‖ < (1 : ℝ)) (i : ℤ)
+    : ‖u ^ i - (1 : C)‖ ≤ ‖u - (1 : C)‖ := by
   apply GlobalTheory.UnitNormPowerSubOne.norm_zpow_sub_one_le <;> assumption
 
 end GlobalTheory.CloseToUnitNorm

@@ -48,13 +48,18 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GroundTheory.Global GroundTheory.Global.SemiLocal PositivityTheory.Rg.Tf.Geo
+open NumberField IsDedekindDomain GroundTheory.Global GroundTheory.Global.SemiLocal
+  PositivityTheory.Rg.Tf.Geo
 open scoped TensorProduct
 
 namespace UpperTheory.ConvolutionTheory.L1
 
-private theorem pi_factor {ι : Type*} [Fintype ι] [DecidableEq ι] {k : ι → Type*} [∀ i, Field (k i)]
-    {K : Type*} [Field K] (φ : (∀ i, k i) →+* K) : ∃ w, ∀ b : ∀ i, k i, b w = 0 → φ b = 0 := by
+private theorem pi_factor
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {k : ι → Type*} [∀ i, Field (k i)]
+    {K : Type*} [Field K]
+    (φ : (∀ i, k i) →+* K)
+    : ∃ w, ∀ b : ∀ i, k i, b w = 0 → φ b = 0 := by
   have h1 : ∑ i, φ (Pi.single i 1) = 1 := by
     have h : (∑ x, Pi.single x 1 : ∀ i, k i) = 1 := Finset.univ_sum_single (1 : ∀ i, k i)
 
@@ -76,45 +81,54 @@ private theorem pi_factor {ι : Type*} [Fintype ι] [DecidableEq ι] {k : ι →
 section
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-private theorem comp_eq (v : HeightOneSpectrum (𝓞 F)) (φ : CompletionsOver E v →+* v.adicCompletion F)
+private theorem comp_eq
+    (v : HeightOneSpectrum (𝓞 F)) (φ : CompletionsOver E v →+* v.adicCompletion F)
     (hφ : ∀ a, φ (incFin E v a) = a)
-    (hs : ∀ w : PlacesOver E v, Function.Surjective (completionMap v w.1)) :
-    ∃ w : PlacesOver E v, ∀ b, completionMap v w.1 (φ b) = b w := by
+    (hs : ∀ w : PlacesOver E v, Function.Surjective (completionMap v w.1))
+    : ∃ w : PlacesOver E v, ∀ b, completionMap v w.1 (φ b) = b w := by
   classical
   obtain ⟨w, hw⟩ := pi_factor φ
   refine ⟨w, fun b => ?_⟩
   obtain ⟨a, ha⟩ := hs w (b w)
-  have h : φ (b - incFin E v a) = 0 := hw _ (by
-    change b w - completionMap v w.1 a = 0
-    rw [ha, sub_self])
+  have h : φ (b - incFin E v a) = 0 :=
+    hw _ (by
+      change b w - completionMap v w.1 a = 0
+      rw [ha, sub_self])
   rw [map_sub, hφ, sub_eq_zero] at h
   rw [h, ha]
 
-private noncomputable def pt (v : HeightOneSpectrum (𝓞 F)) (w : PlacesOver E v)
-    (hs : Function.Surjective (completionMap v w.1)) : E →ₐ[F] v.adicCompletion F where
-  toRingHom := (RingEquiv.ofBijective (completionMap v w.1)
-    ⟨(completionMap v w.1).injective, hs⟩).symm.toRingHom.comp (algebraMap E (w.1.adicCompletion E))
+private noncomputable def pt
+    (v : HeightOneSpectrum (𝓞 F)) (w : PlacesOver E v)
+    (hs : Function.Surjective (completionMap v w.1))
+    : E →ₐ[F] v.adicCompletion F where
+  toRingHom :=
+    (RingEquiv.ofBijective (completionMap v w.1)
+        ⟨(completionMap v w.1).injective, hs⟩).symm.toRingHom.comp
+      (algebraMap E (w.1.adicCompletion E))
   commutes' r := by
     change (RingEquiv.ofBijective (completionMap v w.1) _).symm _ = _
     rw [RingEquiv.symm_apply_eq]
     change _ = completionMap v w.1 _
     rw [completionMap_algebraMap, ← IsScalarTower.algebraMap_apply]
 
-private theorem completionMap_pt (v : HeightOneSpectrum (𝓞 F)) (w : PlacesOver E v)
-    (hs : Function.Surjective (completionMap v w.1)) (x : E) :
-    completionMap v w.1 (pt v w hs x) = algebraMap E (w.1.adicCompletion E) x :=
-  (RingEquiv.ofBijective (completionMap v w.1) ⟨(completionMap v w.1).injective, hs⟩).apply_symm_apply _
+private theorem completionMap_pt
+    (v : HeightOneSpectrum (𝓞 F)) (w : PlacesOver E v)
+    (hs : Function.Surjective (completionMap v w.1))
+    (x : E)
+    : completionMap v w.1 (pt v w hs x) = algebraMap E (w.1.adicCompletion E) x :=
+  (RingEquiv.ofBijective (completionMap v w.1)
+    ⟨(completionMap v w.1).injective, hs⟩).apply_symm_apply _
 
 end
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.finSplit :
-    UpperTheory.ConvolutionTheory.L1.FinSplit := by
+theorem UpperTheory.ConvolutionTheory.L1.finSplit : UpperTheory.ConvolutionTheory.L1.FinSplit := by
   intro F E _ _ _ _ _ _ σ hσ m hm v w₀ hs
   classical
-  obtain ⟨e, he, hshift⟩ := UpperTheory.ConvolutionTheory.L1.galSplit F E σ hσ m hm (v.adicCompletion F)
-    (CompletionsOver E v) (tensorEquiv' E v) (pt v w₀ (hs w₀))
+  obtain ⟨e, he, hshift⟩ :=
+    UpperTheory.ConvolutionTheory.L1.galSplit F E σ hσ m hm (v.adicCompletion F)
+      (CompletionsOver E v) (tensorEquiv' E v) (pt v w₀ (hs w₀))
   have hinc : ∀ r, incFin E v r = tensorEquiv' E v (1 ⊗ₜ r) := fun r => by
     rw [tensorEquiv'_tmul, map_one, one_mul]
     rfl
@@ -125,14 +139,17 @@ theorem UpperTheory.ConvolutionTheory.L1.finSplit :
     funext i
     rw [Algebra.smul_def, map_mul, Pi.mul_apply, Pi.smul_apply, smul_eq_mul]
     exact congrArg (· * e b i) (hdiag a i)
-  let L : CompletionsOver E v ≃ₗ[v.adicCompletion F] (Fin (m + 1) → v.adicCompletion F) :=
-    { e.toAddEquiv with map_smul' := hsmul }
-  let D : Split (incFin E v) (galFin σ v) m :=
-    { e := e
-      cont := IsModuleTopology.continuous_of_linearMap L.toLinearMap
-      cont_symm := IsModuleTopology.continuous_of_linearMap L.symm.toLinearMap
-      map_diag := hdiag
-      map_shift := hshift }
+  let L : CompletionsOver E v ≃ₗ[v.adicCompletion F] (Fin (m + 1) → v.adicCompletion F) := {
+    e.toAddEquiv with
+    map_smul' := hsmul
+  }
+  let D : Split (incFin E v) (galFin σ v) m := {
+    e := e
+    cont := IsModuleTopology.continuous_of_linearMap L.toLinearMap
+    cont_symm := IsModuleTopology.continuous_of_linearMap L.symm.toLinearMap
+    map_diag := hdiag
+    map_shift := hshift
+  }
   have hcomp : ∀ i, ∃ w : PlacesOver E v, ∀ b, completionMap v w.1 (e b i) = b w := fun i =>
     comp_eq v ((Pi.evalRingHom _ i).comp e.toRingHom) (fun a => hdiag a i) hs
   choose w hw using hcomp

@@ -168,9 +168,7 @@ theorem existsUnique_eq
       : harmFn (Wc D i).rank B.w B.F.BS P
         ∈ (harm (Wc D i).rank B.w B.F.BS).map (harmFn (Wc D i).rank B.w B.F.BS) :=
     Submodule.mem_map_of_mem hP
-  rw [GlobalTheory.T.fockHarmonicValueSpace_map_eq_dualWeylModuleFunctions D _ _ B.w B.F.BS hB.wt
-        (pq_le hB),
-      hlam]
+  rw [_root_.GlobalTheory.ExportSeries.Onto.map_harm_eq D _ _ B.w B.F.BS hB.wt (pq_le hB), hlam]
     at h1
   have hs
       : Submodule.span ℂ

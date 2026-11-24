@@ -60,12 +60,9 @@ namespace Formalism.FourierDecayAlt.P.FourierUniquenessMirabolic
 
 open Formalism.FourierDecayAlt.G
 
-private lemma wMat_mul_apply_eq_rev {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (r c : Fin m) :
-    (wMat m * M) r c = M r.rev c := by
-  simp [wMat, Matrix.mul_apply]
+private alias wMat_mul_apply_eq_rev := _root_.Formalism.FourierDecayAlt.P.G2.wMat_mul_apply
 
-private lemma wMat_mulVec_apply_eq_rev {m : ℕ} (v : Fin m → ℂ) (r : Fin m) : (wMat m *ᵥ v) r = v r.rev := by
-  simp [wMat, Matrix.mulVec, dotProduct]
+private alias wMat_mulVec_apply_eq_rev := _root_.Formalism.FourierDecayAlt.P.G2.wMat_mulVec_apply
 
 private lemma finSumFinEquiv_symm_castSucc_eq_inl {n : ℕ} (i : Fin n) :
     finSumFinEquiv.symm (Fin.castSucc i : Fin (n + 1)) = (Sum.inl i : Fin n ⊕ Fin 1) := by
@@ -74,41 +71,37 @@ private lemma finSumFinEquiv_symm_castSucc_eq_inl {n : ℕ} (i : Fin n) :
 private lemma finSumFinEquiv_symm_last_eq_inr (n : ℕ) : finSumFinEquiv.symm (Fin.last n) = (Sum.inr 0 : Fin n ⊕ Fin 1) := by
   rw [Equiv.symm_apply_eq]; rfl
 
-theorem wM_succ_last {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (i : Fin n) :
-    (wMat (n + 1) * Mcoord t X B ρ σ) i.succ (Fin.last n) = B i := by
+theorem wM_succ_last
+    {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (i : Fin n)
+    : (wMat (n + 1) * Mcoord t X B ρ σ) i.succ (Fin.last n) = B i := by
   rw [wMat_mul_apply_eq_rev]
-  first
-    | simp [Mcoord, blk, Fin.rev_succ, Fin.rev_zero, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
-    | simp [Mcoord, blk, Fin.rev_succ, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
+  first | simp [Mcoord, blk, Fin.rev_succ, wMat_mulVec_apply_eq_rev]
 
-theorem wM_succ_cast {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (i j : Fin n) :
-    (wMat (n + 1) * Mcoord t X B ρ σ) i.succ j.castSucc = t * (1 : Matrix (Fin n) (Fin n) ℂ) i j + X i j := by
+theorem wM_succ_cast
+    {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (i j : Fin n)
+    : (wMat (n + 1) * Mcoord t X B ρ σ) i.succ j.castSucc
+      = t * (1 : Matrix (Fin n) (Fin n) ℂ) i j + X i j := by
   rw [wMat_mul_apply_eq_rev]
-  first
-    | simp [Mcoord, blk, Fin.rev_succ, Fin.rev_zero, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
-    | simp [Mcoord, blk, Fin.rev_succ, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
+  first | simp [Mcoord, blk, Fin.rev_succ, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
 
-theorem wM_zero_cast {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (j : Fin n) :
-    (wMat (n + 1) * Mcoord t X B ρ σ) 0 j.castSucc = ρ j := by
+theorem wM_zero_cast
+    {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) (j : Fin n)
+    : (wMat (n + 1) * Mcoord t X B ρ σ) 0 j.castSucc = ρ j := by
   rw [wMat_mul_apply_eq_rev]
-  first
-    | simp [Mcoord, blk, Fin.rev_succ, Fin.rev_zero, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
-    | simp [Mcoord, blk, Fin.rev_succ, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
+  first | simp [Mcoord, blk, Fin.rev_zero, wMat_mulVec_apply_eq_rev]
 
-theorem wM_zero_last {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) :
-    (wMat (n + 1) * Mcoord t X B ρ σ) 0 (Fin.last n) = σ := by
+theorem wM_zero_last {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ)
+    : (wMat (n + 1) * Mcoord t X B ρ σ) 0 (Fin.last n) = σ := by
   rw [wMat_mul_apply_eq_rev]
-  first
-    | simp [Mcoord, blk, Fin.rev_succ, Fin.rev_zero, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
-    | simp [Mcoord, blk, Fin.rev_succ, finSumFinEquiv_symm_castSucc_eq_inl, finSumFinEquiv_symm_last_eq_inr, wMat_mulVec_apply_eq_rev, wMat_mul_apply_eq_rev]
+  first | simp [Mcoord, blk, Fin.rev_zero, wMat_mulVec_apply_eq_rev]
 
-theorem diagonal_cons_succ {n : ℕ} (a b : ℂ) (x : Fin n → ℂ) (i : Fin n) (j : Fin (n + 1)) :
-    Matrix.diagonal (Fin.cons a x : Fin (n + 1) → ℂ) i.succ j =
-      Matrix.diagonal (Fin.cons b x : Fin (n + 1) → ℂ) i.succ j := by
+theorem diagonal_cons_succ {n : ℕ} (a b : ℂ) (x : Fin n → ℂ) (i : Fin n) (j : Fin (n + 1))
+    : Matrix.diagonal (Fin.cons a x : Fin (n + 1) → ℂ) i.succ j
+      = Matrix.diagonal (Fin.cons b x : Fin (n + 1) → ℂ) i.succ j := by
   simp only [Matrix.diagonal_apply, Fin.cons_succ]
 
-theorem xOf_redOf (m : ℕ) (p : XY m) (k : Fin (m + 1)) :
-    xOf (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2 k = p.1 k := by
+theorem xOf_redOf (m : ℕ) (p : XY m) (k : Fin (m + 1))
+    : xOf (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2 k = p.1 k := by
   refine Fin.lastCases ?_ (fun k => ?_) k
   · rw [G6.xOf_last]
     simp [redOf, triXY, strictUpper, Fin.succ_last]
@@ -116,10 +109,11 @@ theorem xOf_redOf (m : ℕ) (p : XY m) (k : Fin (m + 1)) :
     have h : k.castSucc < k.succ := Fin.castSucc_lt_succ
     simp [redOf, triXY, strictUpper, h]
 
-theorem wM_redOf (m : ℕ) (t ρ₁ : ℂ) (p : XY m) :
-    wMat (m + 2) * Mcoord t (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2
-        (Fin.cons ρ₁ (redOf m p).2.1) (redOf m p).1 =
-      t • subShift (m + 2) + Matrix.diagonal (Fin.cons ρ₁ p.1 : Fin (m + 2) → ℂ) + strictUpper p.2 := by
+theorem wM_redOf (m : ℕ) (t ρ₁ : ℂ) (p : XY m)
+    : wMat (m + 2) * Mcoord t (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2
+        (Fin.cons ρ₁ (redOf m p).2.1) (redOf m p).1
+      = t • subShift (m + 2) + Matrix.diagonal (Fin.cons ρ₁ p.1 : Fin (m + 2) → ℂ)
+        + strictUpper p.2 := by
   apply Formalism.FourierDecayAlt.P.WeakApproximationGL.matrix_redOf <;> assumption
 
 end Formalism.FourierDecayAlt.P.FourierUniquenessMirabolic
@@ -159,8 +153,11 @@ theorem cofactor_lower_bound_radius : Formalism.FourierDecayAlt.G.CofLowerR := b
     rw [hLdef, mul_pow, mul_assoc]
     exact mul_le_mul_of_nonneg_left
       (le_trans (G6.rpow_bound m hT hT1 hε2) (Real.sqrt_le_iff.mpr ⟨hq0.le, hTq⟩)) (by positivity)
-  have hRb := G6.remainder_norm_le_strict_upper (t := t) hL hT1 hS (fun i j => (hX i j).trans hRL) (fun i => (hB i).trans hRL)
-    (fun k => (hρ' k).trans hRL)
+  have hRb :=
+    G6.remainder_norm_le_strict_upper (t := t) hL hT1 hS
+      (fun i j => (hX i j).trans hRL)
+      (fun i => (hB i).trans hRL)
+      (fun k => (hρ' k).trans hRL)
   have h1 : ‖t ^ (m + 1) * σ‖ ≤ L ^ (m + 2) * ‖t‖ := by
     rw [norm_mul, norm_pow, mul_comm]
     refine mul_le_mul (le_trans (hσ.trans hRL) (le_self_pow₀ hL (by omega)))
@@ -168,24 +165,24 @@ theorem cofactor_lower_bound_radius : Formalism.FourierDecayAlt.G.CofLowerR := b
   have h2 : ‖Cof X B t * ρ₁‖ ≤ ‖Cof X B t‖ * L := by
     rw [norm_mul]
     exact mul_le_mul_of_nonneg_left (hρ₁.trans hRL) (norm_nonneg _)
-  have hDeq : D = t ^ (m + 1) * σ - Cof X B t * ρ₁ - R0 X B ρ' t := by
-    rw [hrel]; ring
+  have hDeq : D = t ^ (m + 1) * σ - Cof X B t * ρ₁ - R0 X B ρ' t := by rw [hrel]; ring
   have h3 : ‖D‖ ≤ L ^ (m + 2) * ‖t‖ + ‖Cof X B t‖ * L + Cm * (L ^ (m + 2) * ‖t‖) := by
-    calc ‖D‖ = ‖t ^ (m + 1) * σ - Cof X B t * ρ₁ - R0 X B ρ' t‖ := by rw [← hDeq]
+    calc
+      ‖D‖
+        = ‖t ^ (m + 1) * σ - Cof X B t * ρ₁ - R0 X B ρ' t‖ := by rw [← hDeq]
       _ ≤ ‖t ^ (m + 1) * σ‖ + ‖Cof X B t * ρ₁‖ + ‖R0 X B ρ' t‖ :=
-          le_trans (norm_sub_le _ _) (add_le_add_left (norm_sub_le _ _) _)
+        le_trans (norm_sub_le _ _) (add_le_add_left (norm_sub_le _ _) _)
       _ ≤ _ := add_le_add (add_le_add h1 h2) hRb
   have h4 : (Cm + 1) * (L ^ (m + 2) * ‖t‖) ≤ d / 2 := by
-    calc (Cm + 1) * (L ^ (m + 2) * ‖t‖) ≤ (Cm + 1) * (R' ^ (m + 2) * q) :=
-          mul_le_mul_of_nonneg_left hsq (by positivity)
+    calc
+      (Cm + 1) * (L ^ (m + 2) * ‖t‖)
+        ≤ (Cm + 1) * (R' ^ (m + 2) * q) := mul_le_mul_of_nonneg_left hsq (by positivity)
       _ = d / 2 := by rw [hq]; field_simp
   have h5 : d / 2 ≤ ‖Cof X B t‖ * L := by
     have := hD D hDK
     nlinarith
-  have hinv : ‖t‖ ^ ε = L₀⁻¹ := by
-    rw [hL₀def, Real.rpow_neg hT.le, inv_inv]
-  have e : d / (2 * R') * L₀⁻¹ = d / 2 / L := by
-    rw [hLdef]; field_simp
+  have hinv : ‖t‖ ^ ε = L₀⁻¹ := by rw [hL₀def, Real.rpow_neg hT.le, inv_inv]
+  have e : d / (2 * R') * L₀⁻¹ = d / 2 / L := by rw [hLdef]; field_simp
   rw [hinv, e, div_le_iff₀ hL0]
   exact h5
 

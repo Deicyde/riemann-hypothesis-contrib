@@ -49,8 +49,6 @@ set_option autoImplicit false
 
 noncomputable section
 
-
-
 open CategoryTheory AlgebraicGeometry Limits GlobalTheory.LogCris DividedPowers
 
 namespace CrystallineSemistableComparison.Pb.Kap
@@ -71,7 +69,8 @@ theorem hcOf (m n : ℕ) (c : Acris l)
     c
 
 abbrev chK (M : Model l K) (m s : ℕ) : Chain.{1} (per l K).A (S.L m).A (S.L m).B K :=
-  chainOf (hS.lev m) M s (qb_le (hS.lev m) M s) (rHof (dOf S hS hC m) (hcOf S hS hC m) M s)
+  chainOf (hS.lev m) M s (_root_.CrystallineSemistableComparison.Pb.Kap.qb_le_pf (hS.lev m) M s)
+    (rHof (dOf S hS hC m) (hcOf S hS hC m) M s)
 
 def rhoK
     {M : Model l K} (a : (dat Amp).Ch M)

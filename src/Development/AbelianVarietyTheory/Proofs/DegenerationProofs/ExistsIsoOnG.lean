@@ -2,7 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Degenerations.NotAllMatchRankZero
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.DegenerationDataTorsionStructureAlgClosed
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.MulqLawsStatement
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.SepticCharacterInjective
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.MulqLaws
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -165,7 +166,7 @@ theorem txT_eq
     : N.txT m p p₁.1.1.toAdd
       = (N.ψ p₁.1.1.toAdd * N.wp q p₁ * mulq N.θ N.σ m p₁.1.2.b : Oˣ)
         * N.uth m p.1.2.b p₁.1.2.b := by
-  have a := (GlobalTheory.T.mulq_dbl_cubN_relations O N.toNumB m m p₁.1.2.b p.1.2.b).2.1
+  have a := (_root_.GlobalTheory.Ex.mulq_laws O N.toNumB m m p₁.1.2.b p.1.2.b).2.1
   have c := cubN_mul_exp N.cub m m p.1.2.b p₁.1.2.b
   rw [← sq] at c
   have key

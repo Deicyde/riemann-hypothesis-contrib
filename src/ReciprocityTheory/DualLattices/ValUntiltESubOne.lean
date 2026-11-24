@@ -132,9 +132,11 @@ private lemma val_prim_root {C : Type*} [Field C] (v : Valuation C NNReal) {p : 
 
 section Ainf
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] {v : Valuation C NNReal}
-  {O : Type} [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C NNReal} {O : Type}
+  [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 private lemma untilt_sub_one (x : PreTilt O p) :
     ∃ t : O, (x - 1).untilt = x.untilt - 1 + p * t := by
@@ -248,27 +250,32 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
 
 end Ainf
 
-theorem xiNu (p : ℕ) [hp : Fact p.Prime] (C : Type) [Field C] (v : Valuation C NNReal)
-    (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
-    [IsAdicComplete (span {(p : O)}) O] (hK : KerThetaStatement p O) :
-    XiNuStatement p C v O := by
+theorem xiNu
+    (p : ℕ) [hp : Fact p.Prime]
+    (C : Type) [Field C]
+    (v : Valuation C NNReal)
+    (O : Type)
+    [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+    (hK : KerThetaStatement p O)
+    : XiNuStatement p C v O := by
   intro ε hv hζ
   haveI : IsDomain O := hv.hom_inj.isDomain (algebraMap O C)
   set e := (frobeniusEquiv (PreTilt O p) p).symm ε with he
   have hep : e ^ p = ε := by
     first
     | exact frobeniusEquiv_symm_pow_p p ε
-    | (have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O p) p ε
-       rwa [frobenius_def] at h3)
+    | (
+        have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O p) p ε
+        rwa [frobenius_def] at h3
+      )
   have hT : ∀ x : PreTilt O p, fontaineTheta O p (teichmuller p x) = x.untilt := by
     intro x
-    first
-    | exact fontaineTheta_teichmuller x
-  have h1 : teichmuller p ε - 1 =
-      (∑ i ∈ Finset.range p, teichmuller p e ^ i) * (teichmuller p e - 1) := by
+    first | exact fontaineTheta_teichmuller x
+  have h1
+      : teichmuller p ε - 1
+        = (∑ i ∈ Finset.range p, teichmuller p e ^ i) * (teichmuller p e - 1) := by
     rw [geom_sum_mul, ← map_pow, hep]
-  have h2 : fontaineTheta O p (teichmuller p e - 1) = e.untilt - 1 := by
-    rw [map_sub, map_one, hT]
+  have h2 : fontaineTheta O p (teichmuller p e - 1) = e.untilt - 1 := by rw [map_sub, map_one, hT]
   have hne : algebraMap O C (e.untilt - 1) ≠ 0 := by
     intro h0
     apply hζ.ne_one hp.out.one_lt
@@ -283,7 +290,6 @@ theorem xiNu (p : ℕ) [hp : Fact p.Prime] (C : Type) [Field C] (v : Valuation C
     rw [← h3, h2]
     exact pow_ne_zero _ ((Valuation.ne_zero_iff v).mpr hne)
   have hxi : (∑ i ∈ Finset.range p, teichmuller p e ^ i) ∈ RingHom.ker (fontaineTheta O p) := by
-
     rw [RingHom.mem_ker, map_sum]
     simp only [map_pow, hT]
     exact hζ.geom_sum_eq_zero hp.out.one_lt
@@ -291,14 +297,10 @@ theorem xiNu (p : ℕ) [hp : Fact p.Prime] (C : Type) [Field C] (v : Valuation C
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.mp hxi
   have hmul : ∀ x y : PreTilt O p, (x * y).untilt = x.untilt * y.untilt := by
     intro x y
-    first
-    | exact PreTilt.untilt_mul x y
-    | exact map_mul _ x y
+    first | exact PreTilt.untilt_mul x y | exact map_mul _ x y
   have hpow : ∀ (x : PreTilt O p) (n : ℕ), (x ^ n).untilt = x.untilt ^ n := by
     intro x n
-    first
-    | exact PreTilt.untilt_pow x n
-    | exact map_pow _ x n
+    first | exact PreTilt.untilt_pow x n | exact map_pow _ x n
   have hone : (1 : PreTilt O p).untilt = 1 := by
     have h5 := hpow (1 : PreTilt O p) 0
     rwa [pow_zero, pow_zero] at h5
@@ -315,14 +317,14 @@ theorem xiNu (p : ℕ) [hp : Fact p.Prime] (C : Type) [Field C] (v : Valuation C
   simp only [hmul, hpow, map_mul, map_pow] at hw
   rw [val_untilt_e_sub_one hv e hζ, hpf, map_natCast] at hw
   have hm1 : v (algebraMap O C ((-1 : PreTilt O p).untilt)) = 1 := by
-    have h5 : ((-1 : PreTilt O p).untilt) ^ 2 = 1 := by
-      rw [← hpow, neg_one_sq, hone]
+    have h5 : ((-1 : PreTilt O p).untilt) ^ 2 = 1 := by rw [← hpow, neg_one_sq, hone]
     have h6 : v (algebraMap O C ((-1 : PreTilt O p).untilt)) ^ 2 = 1 := by
       rw [← map_pow, ← map_pow, h5, map_one, map_one]
     exact (pow_eq_one_iff_of_nonneg (by positivity) two_ne_zero).mp h6
   rw [hm1, one_mul] at hw
   have hX : v (algebraMap O C (WittVector.constantCoeff a).untilt) = 1 := by
-    have h7 : v (algebraMap O C (WittVector.constantCoeff a).untilt) * v (p : C) = 1 * v (p : C) := by
+    have h7
+        : v (algebraMap O C (WittVector.constantCoeff a).untilt) * v (p : C) = 1 * v (p : C) := by
       rw [one_mul]
       exact hw
     exact mul_right_cancel₀ hvp h7

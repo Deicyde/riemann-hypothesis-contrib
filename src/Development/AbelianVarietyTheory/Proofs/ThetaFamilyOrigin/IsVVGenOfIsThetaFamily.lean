@@ -160,7 +160,6 @@ theorem char_ext
     refine (Finset.univ_sum_single a).symm.trans (Finset.sum_congr rfl fun i _ => ?_)
     rw [← Pi.single_smul, nsmul_one, ZMod.natCast_zmod_val]
   have : F a = F' a := by
-
     rw [e, map_sum, map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [map_nsmul, map_nsmul]; exact congrArg _ (h i)
   exact this

@@ -60,7 +60,8 @@ namespace PI.VolStabS
 
 namespace PositiveNearLattice
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct
 
 section Coord
@@ -70,40 +71,44 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E] {d : ℕ} (b : Module.Ba
 def crd (R : Type) [CommRing R] [Algebra F R] (y : R ⊗[F] E) (k : Fin d) : R :=
   (Algebra.TensorProduct.basis R b).repr y k
 
-theorem crd_map {R S : Type} [CommRing R] [Algebra F R] [CommRing S] [Algebra F S]
-    (f : R →ₐ[F] S) (y : R ⊗[F] E) (k : Fin d) :
-    crd b S (Algebra.TensorProduct.map f (AlgHom.id F E) y) k = f (crd b R y k) := by
+theorem crd_map
+    {R S : Type} [CommRing R] [Algebra F R] [CommRing S] [Algebra F S]
+    (f : R →ₐ[F] S) (y : R ⊗[F] E) (k : Fin d)
+    : crd b S (Algebra.TensorProduct.map f (AlgHom.id F E) y) k = f (crd b R y k) := by
   induction y using TensorProduct.induction_on with
   | zero => simp [crd]
-  | tmul r e =>
-    simp [crd, Algebra.TensorProduct.basis_repr_tmul, Algebra.TensorProduct.map_tmul]
+  | tmul r e => simp [crd, Algebra.TensorProduct.basis_repr_tmul, Algebra.TensorProduct.map_tmul]
   | add x y hx hy =>
     simp only [crd] at hx hy ⊢
-    rw [map_add (f := _), map_add (f := _), Finsupp.add_apply, hx, hy, map_add (f := _), Finsupp.add_apply, map_add (f := _)]
+    rw [map_add (f := _), map_add (f := _), Finsupp.add_apply, hx, hy, map_add (f := _),
+      Finsupp.add_apply, map_add (f := _)]
 
-theorem crd_incl (R : Type) [CommRing R] [Algebra F R] (x : E) (k : Fin d) :
-    crd b R (inclR R x) k = algebraMap F R (b.repr x k) := by
+theorem crd_incl (R : Type) [CommRing R] [Algebra F R] (x : E) (k : Fin d)
+    : crd b R (inclR R x) k = algebraMap F R (b.repr x k) := by
   simp [crd, inclR, Algebra.TensorProduct.basis_repr_tmul]
 
-theorem eq_sum_crd (R : Type) [CommRing R] [Algebra F R] (y : R ⊗[F] E) :
-    y = ∑ i, crd b R y i • ((1 : R) ⊗ₜ[F] b i) := by
+theorem eq_sum_crd (R : Type) [CommRing R] [Algebra F R] (y : R ⊗[F] E)
+    : y = ∑ i, crd b R y i • ((1 : R) ⊗ₜ[F] b i) := by
   have := (Algebra.TensorProduct.basis R b).sum_repr y
   simp only [Algebra.TensorProduct.basis_apply] at this
   exact this.symm
 
 variable [FiniteDimensional F E]
 
-theorem continuous_crd (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-    [IsTopologicalRing R] (k : Fin d) : Continuous (fun y : R ⊗[F] E => crd b R y k) :=
+theorem continuous_crd
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] (k : Fin d)
+    : Continuous (fun y : R ⊗[F] E => crd b R y k) :=
   IsModuleTopology.continuous_of_linearMap ((Algebra.TensorProduct.basis R b).coord k)
 
 include b in
-theorem continuous_map_tens {R S : Type} [CommRing R] [Algebra F R] [TopologicalSpace R]
-    [IsTopologicalRing R] [CommRing S] [Algebra F S] [TopologicalSpace S] [IsTopologicalRing S]
-    (f : R →ₐ[F] S) (hf : Continuous f) :
-    Continuous (Algebra.TensorProduct.map f (AlgHom.id F E)) := by
-  have e : (⇑(Algebra.TensorProduct.map f (AlgHom.id F E))) =
-      fun y => ∑ k, f (crd b R y k) • ((1 : S) ⊗ₜ[F] b k) := by
+theorem continuous_map_tens
+    {R S : Type} [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [CommRing S]
+    [Algebra F S] [TopologicalSpace S] [IsTopologicalRing S]
+    (f : R →ₐ[F] S) (hf : Continuous f)
+    : Continuous (Algebra.TensorProduct.map f (AlgHom.id F E)) := by
+  have e
+      : (⇑(Algebra.TensorProduct.map f (AlgHom.id F E)))
+        = fun y => ∑ k, f (crd b R y k) • ((1 : S) ⊗ₜ[F] b k) := by
     funext y
     rw [eq_sum_crd b S (Algebra.TensorProduct.map f (AlgHom.id F E) y)]
     simp only [crd_map]
@@ -115,11 +120,14 @@ end Coord
 
 section Loc
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  {d : ℕ} (b : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
 theorem isClosed_int : IsClosed (v.adicCompletionIntegers F : Set (v.adicCompletion F)) :=
-  (ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers v).isClosed
+  (ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers
+    v).isClosed
 
 theorem isClopen_latV (a M : ℕ) : IsClopen (latV (M := M) (n := a) b v) := by
   apply PI.VolStabSW.PositiveNearLattice.isClopen_latV <;> assumption
@@ -127,10 +135,12 @@ theorem isClopen_latV (a M : ℕ) : IsClopen (latV (M := M) (n := a) b v) := by
 theorem isCompact_latV (a M : ℕ) : IsCompact (latV (M := M) (n := a) b v) := by
   apply PI.VolStabSW.PositiveNearLattice.isCompact_latV <;> assumption
 
-theorem isSB_latV (a M : ℕ) :
-    IsSB ((latV (M := M) (n := a) b v).indicator (fun _ => (1 : ℂ))) := by
-  refine ⟨(LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ))
-    (isClopen_latV b v a M)).isLocallyConstant, ?_⟩
+theorem isSB_latV (a M : ℕ) : IsSB ((latV (M := M) (n := a) b v).indicator (fun _ => (1 : ℂ))) := by
+  refine ⟨
+    (LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ))
+      (isClopen_latV b v a M)).isLocallyConstant,
+    ?_
+  ⟩
   exact HasCompactSupport.intro' (isCompact_latV b v a M) (isClopen_latV b v a M).isClosed
     fun Y hY => Set.indicator_of_notMem hY _
 
@@ -140,13 +150,16 @@ section Main
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem exists_int_basis [FiniteDimensional F E] {a M : ℕ} (X0 : Fin a → Fin M → E) :
-    ∃ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ x i k, ∃ m : 𝓞 F, (m : F) = b.repr (X0 x i) k := by
+theorem exists_int_basis [FiniteDimensional F E] {a M : ℕ} (X0 : Fin a → Fin M → E)
+    : ∃ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ x i k, ∃ m : 𝓞 F,
+      (m : F) = b.repr (X0 x i) k := by
   classical
   let b0 := Module.finBasis F E
-  let s : Finset F := Finset.univ.image
-    (fun p : Fin a × Fin M × Fin (Module.finrank F E) => b0.repr (X0 p.1 p.2.1) p.2.2)
-  obtain ⟨⟨β, hβ⟩, hint⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 F)) s
+  let s : Finset F :=
+    Finset.univ.image (fun p : Fin a × Fin M × Fin (Module.finrank F E) =>
+      b0.repr (X0 p.1 p.2.1) p.2.2)
+  obtain ⟨⟨β, hβ⟩, hint⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 F)) s
   have hβ0 : (β : F) ≠ 0 := by
     intro h
     exact nonZeroDivisors.ne_zero hβ (RingOfIntegers.coe_eq_zero_iff.1 h)
@@ -161,8 +174,9 @@ theorem exists_int_basis [FiniteDimensional F E] {a M : ℕ} (X0 : Fin a → Fin
 
 variable [FiniteDimensional F E] {d : ℕ} (b : Module.Basis (Fin d) F E)
 
-theorem continuous_orbit (σ : E →ₐ[F] E) {M a : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (X : Fin a → Fin M → AF F ⊗[F] E) : Continuous (fun g : HA (AF F) σ J => g • X) := by
+theorem continuous_orbit
+    (σ : E →ₐ[F] E) {M a : ℕ} (J : Matrix (Fin M) (Fin M) E) (X : Fin a → Fin M → AF F ⊗[F] E)
+    : Continuous (fun g : HA (AF F) σ J => g • X) := by
   have hm : Continuous (fun g : HA (AF F) σ J =>
       ((HA.mat (AF F) σ J g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E))) :=
     Units.continuous_val.comp continuous_subtype_val
@@ -172,23 +186,25 @@ theorem continuous_orbit (σ : E →ₐ[F] E) {M a : ℕ} (J : Matrix (Fin M) (F
   exact hm.matrix_mulVec continuous_const
 
 include b in
-theorem continuous_projInf {M a : ℕ} :
-    Continuous (projInf (F := F) (E := E) (M := M) (n := a)) :=
-  continuous_pi fun x => continuous_pi fun i =>
-    (continuous_map_tens b (fstA F) (by exact continuous_fst)).comp
-      ((continuous_apply i).comp (continuous_apply x))
+theorem continuous_projInf {M a : ℕ} : Continuous (projInf (F := F) (E := E) (M := M) (n := a)) :=
+  continuous_pi fun x =>
+    continuous_pi fun i =>
+      (continuous_map_tens b (fstA F) (by exact continuous_fst)).comp
+        ((continuous_apply i).comp (continuous_apply x))
 
 include b in
-theorem continuous_projFin {M a : ℕ} :
-    Continuous (projFin (F := F) (E := E) (M := M) (n := a)) :=
-  continuous_pi fun x => continuous_pi fun i =>
-    (continuous_map_tens b (sndA F) (by exact continuous_snd)).comp
-      ((continuous_apply i).comp (continuous_apply x))
+theorem continuous_projFin {M a : ℕ} : Continuous (projFin (F := F) (E := E) (M := M) (n := a)) :=
+  continuous_pi fun x =>
+    continuous_pi fun i =>
+      (continuous_map_tens b (sndA F) (by exact continuous_snd)).comp
+        ((continuous_apply i).comp (continuous_apply x))
 
-theorem exists_smooth_nonneg_pos {a M N : ℕ} (e0 : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin N → ℝ))
-    (he0 : ∀ x y, e0 (x + y) = e0 x + e0 y) (x0 : Fin a → Fin M → Ainf F ⊗[F] E) :
-    ∃ fi : (Fin a → Fin M → Ainf F ⊗[F] E) → ℝ, Continuous fi ∧ HasCompactSupport fi ∧
-      (∀ y, 0 ≤ fi y) ∧ fi x0 ≠ 0 ∧ Formalism.L2.SG.Pf.NcWeil.IsSmoothCc F E (fun Y => (fi Y : ℂ)) := by
+theorem exists_smooth_nonneg_pos
+    {a M N : ℕ} (e0 : (Fin a → Fin M → Ainf F ⊗[F] E) ≃ₜ (Fin N → ℝ))
+    (he0 : ∀ x y, e0 (x + y) = e0 x + e0 y) (x0 : Fin a → Fin M → Ainf F ⊗[F] E)
+    : ∃ fi : (Fin a → Fin M → Ainf F ⊗[F] E) → ℝ,
+      Continuous fi ∧ HasCompactSupport fi ∧ (∀ y, 0 ≤ fi y) ∧ fi x0 ≠ 0
+        ∧ Formalism.L2.SG.Pf.NcWeil.IsSmoothCc F E (fun Y => (fi Y : ℂ)) := by
   let β : ContDiffBump (e0 x0) := ⟨1, 2, one_pos, one_lt_two⟩
   let eA : (Fin a → Fin M → Ainf F ⊗[F] E) ≃+ (Fin N → ℝ) := { e0.toEquiv with map_add' := he0 }
   have hsupp : HasCompactSupport (fun Y => β (e0 Y)) := β.hasCompactSupport.comp_homeomorph e0
@@ -208,52 +224,66 @@ end Main
 end PositiveNearLattice
 
 open PositiveNearLattice
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct
 
-def TestNear : Prop := InCtx fun F E _ _ _ _ _ σ M J a X0 _hT =>
-  ∃ φ : (Fin a → Fin M → AF F ⊗[F] E) → ℝ, (∀ X, 0 ≤ φ X) ∧ IsAdmS F E (fun X => (φ X : ℂ)) ∧
-    ∃ U : Set (HA (AF F) σ J), IsOpen U ∧ U.Nonempty ∧
-      ∀ g ∈ U, 0 < φ (g • ratTup (AF F) X0)
+def TestNear : Prop :=
+  InCtx fun F E _ _ _ _ _ σ M J a X0 _hT =>
+    ∃ φ : (Fin a → Fin M → AF F ⊗[F] E) → ℝ,
+      (∀ X, 0 ≤ φ X) ∧ IsAdmS F E (fun X => (φ X : ℂ))
+        ∧ ∃ U : Set (HA (AF F) σ J), IsOpen U ∧ U.Nonempty ∧ ∀ g ∈ U, 0 < φ (g • ratTup (AF F) X0)
 
 theorem testNear_holds : TestNear := by
   intro F E _ _ _ _ _ σ hE M J _hJ _ha _hc a _ha1 _ha2 X0 _hT _hdet
   have : Module.Finite F E := Module.finite_of_finrank_pos (by rw [hE.2.2.1]; norm_num)
   obtain ⟨d, b, hb⟩ := exists_int_basis (F := F) X0
   obtain ⟨N0, _, eV, _, hV, _⟩ := tensR_holds F E σ hE M J _hJ _ha _hc a _ha1 _ha2 X0 _hT _hdet
-  obtain ⟨fi, hfic, hfc, hf0, hfx, hsm⟩ := exists_smooth_nonneg_pos eV hV (projInf (ratTup (AF F) X0))
-  let ind : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℝ :=
-    fun v => (latV b v).indicator (fun _ => (1 : ℝ))
-  let φ : (Fin a → Fin M → AF F ⊗[F] E) → ℝ :=
-    fun X => fi (projInf X) * ∏ᶠ v, ind v (projV v (projFin X))
+  obtain ⟨fi, hfic, hfc, hf0, hfx, hsm⟩ :=
+    exists_smooth_nonneg_pos eV hV (projInf (ratTup (AF F) X0))
+  let ind : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℝ := fun v =>
+    (latV b v).indicator (fun _ => (1 : ℝ))
+  let φ : (Fin a → Fin M → AF F ⊗[F] E) → ℝ := fun X =>
+    fi (projInf X) * ∏ᶠ v, ind v (projV v (projFin X))
   have hφ0 : ∀ X, 0 ≤ φ X := fun X =>
     mul_nonneg (hf0 _) (finprod_nonneg fun v => Set.indicator_nonneg (fun _ _ => zero_le_one) _)
-  have hcast : ∀ v (Y : Fin a → Fin M → Fv F v ⊗[F] E),
-      ((ind v Y : ℝ) : ℂ) = (latV b v).indicator (fun _ => (1 : ℂ)) Y := by
+  have hcast
+      : ∀ v (Y : Fin a → Fin M → Fv F v ⊗[F] E),
+        ((ind v Y : ℝ) : ℂ) = (latV b v).indicator (fun _ => (1 : ℂ)) Y := by
     intro v Y
     by_cases h : Y ∈ latV b v <;> simp [ind, h]
   have hadm : IsAdmS F E (fun X => (φ X : ℂ)) := by
-    refine ⟨d, b, fun Y => (fi Y : ℂ),
+    refine ⟨
+      d,
+      b,
+      fun Y => (fi Y : ℂ),
       fun Y => ∏ᶠ v, (latV b v).indicator (fun _ => (1 : ℂ)) (projV v Y),
       fun v => (latV b v).indicator (fun _ => (1 : ℂ)),
-      Complex.continuous_ofReal.comp hfic, hfc.comp_left Complex.ofReal_zero,
+      Complex.continuous_ofReal.comp hfic,
+      hfc.comp_left Complex.ofReal_zero,
       ⟨fun v => isSB_latV b v a M, Filter.Eventually.of_forall fun v => rfl, fun X => rfl⟩,
-      fun X => ?_, hsm⟩
+      fun X => ?_,
+      hsm
+    ⟩
     simp only [φ, Complex.ofReal_mul, ← hcast]
     congr 1
     exact Complex.ofRealHom.toMonoidHom.map_finprod_of_injective Complex.ofReal_injective _
-  let U : Set (HA (AF F) σ J) := {g | 0 < fi (projInf (g • ratTup (AF F) X0))} ∩
-    ⋂ x, ⋂ i, ⋂ k, (fun g : HA (AF F) σ J =>
-      crd b (Af F) (projFin (g • ratTup (AF F) X0) x i) k) ⁻¹' ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.Oint F
+  let U : Set (HA (AF F) σ J) :=
+    {g | 0 < fi (projInf (g • ratTup (AF F) X0))}
+      ∩ ⋂ x, ⋂ i, ⋂ k, (fun g : HA (AF F) σ J =>
+          crd b (Af F) (projFin (g • ratTup (AF F) X0) x i) k) ⁻¹' ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.Oint F
   have horb := continuous_orbit σ J (ratTup (AF F) X0)
   refine ⟨φ, hφ0, hadm, U, ?_, ⟨1, ?_⟩, ?_⟩
-  · refine (isOpen_lt continuous_const
-      (hfic.comp ((continuous_projInf b).comp horb))).inter ?_
-    refine isOpen_iInter_of_finite fun x => isOpen_iInter_of_finite fun i =>
-      isOpen_iInter_of_finite fun k => ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_Oint.preimage ?_
+  · refine (isOpen_lt continuous_const (hfic.comp ((continuous_projInf b).comp horb))).inter ?_
+    refine isOpen_iInter_of_finite fun x =>
+      isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun k =>
+          ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_Oint.preimage
+            ?_
     have hpf : Continuous fun g : HA (AF F) σ J => projFin (g • ratTup (AF F) X0) :=
       (continuous_projFin b).comp horb
-    exact (continuous_crd b (Af F) k).comp ((continuous_apply i).comp ((continuous_apply x).comp hpf))
+    exact (continuous_crd b (Af F) k).comp
+      ((continuous_apply i).comp ((continuous_apply x).comp hpf))
   · refine ⟨?_, ?_⟩
     · show 0 < fi (projInf ((1 : HA (AF F) σ J) • ratTup (AF F) X0))
       rw [one_smul]
@@ -264,16 +294,19 @@ theorem testNear_holds : TestNear := by
       have e : crd b (Af F) (projFin (ratTup (AF F) X0) x i) k = algebraMap F (Af F) (m : F) := by
         simp only [projFin, ratTup, crd_map, crd_incl, AlgHom.commutes, hm]
       rw [e]
-      exact ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.algebraMap_int_mem_Oint m
+      exact
+        ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.algebraMap_int_mem_Oint
+          m
   · rintro g ⟨h1, h2⟩
     simp only [Set.mem_iInter, Set.mem_preimage] at h2
     have hone : ∀ v, ind v (projV v (projFin (g • ratTup (AF F) X0))) = 1 := by
       intro v
       refine Set.indicator_of_mem ?_ _
       intro x i k
-      have e : (Algebra.TensorProduct.basis (Fv F v) b).repr
-          (projV v (projFin (g • ratTup (AF F) X0)) x i) k =
-          evalV F v (crd b (Af F) (projFin (g • ratTup (AF F) X0) x i) k) := by
+      have e
+          : (Algebra.TensorProduct.basis (Fv F v) b).repr
+              (projV v (projFin (g • ratTup (AF F) X0)) x i) k
+            = evalV F v (crd b (Af F) (projFin (g • ratTup (AF F) X0) x i) k) := by
         rw [← crd_map]
         rfl
       rw [e]

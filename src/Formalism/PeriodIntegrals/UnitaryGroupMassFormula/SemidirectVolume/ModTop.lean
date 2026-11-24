@@ -123,8 +123,7 @@ theorem mat_inv_eq (hJ : IsHermND σ J) (g : HA R σ J)
   set Ji : Matrix (Fin M) (Fin M) (R ⊗[F] E) := (J⁻¹).map (inclR (F := F) R) with hJi
   have hmem : Formalism.UG.cT (sigR R σ) A * JR (F := F) R J * A = JR (F := F) R J := g.2
   have hAB : A * B = 1 := by
-    have e : (HA.mat R σ J g⁻¹ : GL (Fin M) (R ⊗[F] E)) = (HA.mat R σ J g)⁻¹ := by
-      first | rfl | exact Subgroup.coe_inv _
+    have e : (HA.mat R σ J g⁻¹ : GL (Fin M) (R ⊗[F] E)) = (HA.mat R σ J g)⁻¹ := by first | rfl
     rw [hA, hB, e]
     exact Units.mul_inv _
   have hJJ : Ji * JR (F := F) R J = 1 := by
@@ -168,7 +167,7 @@ theorem continuous_into_HA
     exact (continuous_const.matrix_mul hcT).matrix_mul continuous_const
   have hGL : Continuous fun x => (HA.mat R σ J (f x) : GL (Fin M) (R ⊗[F] E)) :=
     Units.continuous_iff.2 ⟨hf, hI⟩
-  first | exact continuous_induced_rng.2 hGL | exact hGL.subtype_mk fun x => (f x).2
+  first | exact continuous_induced_rng.2 hGL
 
 end HAcont
 

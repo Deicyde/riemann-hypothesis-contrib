@@ -70,7 +70,7 @@ theorem t_BoxSumLattice : BoxSumLattice := by
   have hC1 : 0 < max |C₀| 1 := lt_of_lt_of_le one_pos (le_max_right _ _)
   have hwl : ∀ (w : InfinitePlace E) (l : E), 0 ≤ w l := by
     intro w l
-    first | exact w.nonneg l | exact apply_nonneg w l | exact w.1.nonneg l
+    first | exact apply_nonneg w l
   have hfac
       : ∀ (z : InfinitePlace E → ℝ) (l : E) (w : InfinitePlace E),
         0 ≤ z w → 0 ≤ min 1 ((z w / w l) ^ K) := fun z l w hz =>
@@ -128,8 +128,7 @@ theorem t_BoxSumLattice : BoxSumLattice := by
   have heq : (Θ / a) ^ n = N / ∏ w, y w := by
     rw [hprody, hT, mul_comm, ← div_div, div_self hNpos.ne', one_div, ← inv_pow, inv_div]
   have hS' : ∀ l ∈ S, l ∈ aa ∧ l ≠ 0 := fun l hl => ⟨hL l (hS l hl).1, (hS l hl).2⟩
-  have h2 : 2 < Θ / a := by
-    first | (rw [lt_div_iff₀ hapos]; linarith) | (rw [lt_div_iff hapos]; linarith)
+  have h2 : 2 < Θ / a := by first | (rw [lt_div_iff₀ hapos]; linarith)
   have h3 : (3 : ℝ) ≤ K := by exact_mod_cast hK
   have hB := hC₀ E aa haa y (Θ / a) K hypos h2 h3 heq S hS'
   have hZ : (Θ / a) ^ (-((K : ℝ) - 5 / 2)) = a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)) := by
@@ -147,7 +146,7 @@ theorem t_BoxSumLattice : BoxSumLattice := by
         rw [div_eq_mul_inv, div_eq_mul_inv]
         exact mul_le_mul_of_nonneg_right (hxy w) (inv_nonneg.mpr (hwl w l))
       have hd0 : 0 ≤ x w / w l := div_nonneg (hx w) (hwl w l)
-      first | exact pow_le_pow_left hd0 hd K | exact pow_le_pow_left₀ hd0 hd K
+      first | exact pow_le_pow_left₀ hd0 hd K
     _ ≤ (C₀ * (Θ / a) ^ (-((K : ℝ) - 5 / 2))) ^ n := hB
     _ ≤ (max |C₀| 1 * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) ^ n := by
       rw [hZ, mul_assoc (max |C₀| 1)]
@@ -162,7 +161,7 @@ theorem t_BoxSumLattice : BoxSumLattice := by
           ≤ |(C₀ * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n| := le_abs_self _
         _ = (|C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n := by
           rw [abs_pow, abs_mul, abs_of_pos hZpos]
-        _ ≤ _ := by first | exact pow_le_pow_left h0 hle n | exact pow_le_pow_left₀ h0 hle n
+        _ ≤ _ := by first | exact pow_le_pow_left₀ h0 hle n
 
 theorem t_LatticeSumsJoint : LatticeSumsJoint := by
   intro hBS
@@ -186,9 +185,7 @@ theorem t_LatticeSumsJoint : LatticeSumsJoint := by
       rw [div_eq_mul_inv, div_eq_mul_inv]
       exact mul_le_mul_of_nonneg_right hca (inv_nonneg.mpr hΘ0.le)
     have hle : (c / Θ) ^ D.f ≤ (a / Θ) ^ D.f := by
-      first
-      | exact pow_le_pow_left (div_nonneg hc hΘ0.le) hcd _
-      | exact pow_le_pow_left₀ (div_nonneg hc hΘ0.le) hcd _
+      first | exact pow_le_pow_left₀ (div_nonneg hc hΘ0.le) hcd _
     have hprod'
         : ∏ w, z (e.symm w)
           ≤ (a / Θ) ^ Fintype.card (InfinitePlace E) * √(FractionalIdeal.absNorm aa : ℝ) := by
@@ -309,12 +306,7 @@ theorem mext {y z : euclidean.mixedSpace E} (h : ∀ w, y.snd w = z.snd w) : y =
   have h2 : y.snd = z.snd := by
     ext w
     exact h w
-  first
-  | exact WithLp.prod_ext h1 h2
-  | exact WithLp.ofLp_injective 2 (Prod.ext h1 h2)
-  | exact WithLp.ofLp_injective (Prod.ext h1 h2)
-  | (apply WithLp.prod_ext <;> assumption)
-  | (rcases y with ⟨y⟩; rcases z with ⟨z⟩; exact congrArg (WithLp.toLp 2) (Prod.ext h1 h2))
+  first | exact WithLp.ofLp_injective 2 (Prod.ext h1 h2)
 
 def phiL : CV E ≃ₗ[ℝ] euclidean.mixedSpace E where
   toFun x :=
@@ -341,11 +333,7 @@ def ee : CV E ≃L[ℝ] mixedSpace E := (phi E).toContinuousLinearEquiv.trans (e
 theorem ee_mp : MeasurePreserving (ee E) := by
   have h : ⇑(ee E) = ⇑(euclidean.toMixed E) ∘ ⇑(phi E) := rfl
   rw [h]
-  first
-  | exact (euclidean.volumePreserving_toMixed E).comp (phi E).measurePreserving
-  | exact euclidean.volumePreserving_toMixed.comp (phi E).measurePreserving
-  | exact (euclidean.volumePreserving_toMixed E).comp
-      (LinearIsometryEquiv.measurePreserving (phi E))
+  first | exact (euclidean.volumePreserving_toMixed E).comp (phi E).measurePreserving
 
 theorem ee_cemb (t : E) : ee E (cemb E t) = mixedEmbedding E t := by
   ext w
@@ -384,11 +372,7 @@ end Formalism.FourierDecayAlt.P.Jx2
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem lattice_sums_joint : Formalism.FourierDecayAlt.J.LatticeSumsJoint := Jx2.t_LatticeSumsJoint
-
 theorem block_lattices : Formalism.FourierDecayAlt.J.BlockLattices := Jx2.t_BlockLattices
-
-theorem embedding_facts : Formalism.FourierDecayAlt.J.EmbFacts := Jx2.t_EmbFacts
 
 theorem euclidean_frame : Formalism.FourierDecayAlt.J.EuclidFrame := Jx2.t_EuclidFrame
 

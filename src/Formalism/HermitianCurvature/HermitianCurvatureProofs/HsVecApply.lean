@@ -57,7 +57,8 @@ namespace Formalism.FourierDecayAlt.P.HilbertSchmidtVectorization
 
 open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 def hsInv (v : PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp)) : Wq →L[ℂ] Wp :=
@@ -90,8 +91,8 @@ def hsE : (Wq →L[ℂ] Wp) ≃ₗ[ℂ] PiLp 2 (fun _ : Fin (Module.finrank ℂ 
   left_inv := hsInv_hsVec
   right_inv := hsVec_hsInv
 
-def conjE (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) :
-    PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) →L[ℂ] PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) :=
+def conjE (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp))
+    : PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) →L[ℂ] PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) :=
   LinearMap.toContinuousLinearMap (hsE.toLinearMap ∘ₗ T.toLinearMap ∘ₗ hsE.symm.toLinearMap)
 
 def adjH (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp) :=
@@ -108,8 +109,8 @@ lemma conjE_hsVec (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) (A : Wq �
   show hsE (T (hsE.symm (hsE A))) = _
   rw [LinearEquiv.symm_apply_apply]; rfl
 
-theorem adjH_spec (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) (A B : Wq →L[ℂ] Wp) :
-    hsInner (T A) B = hsInner A (adjH T B) := by
+theorem adjH_spec (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) (A B : Wq →L[ℂ] Wp)
+    : hsInner (T A) B = hsInner A (adjH T B) := by
   unfold hsInner
   rw [hsE_adjH, ContinuousLinearMap.adjoint_inner_left, conjE_hsVec]
 
@@ -138,9 +139,6 @@ lemma adjH_smul (c : ℝ) (T : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) : 
   rw [← Complex.coe_smul, adjH_smulC, Complex.conj_ofReal, Complex.coe_smul]
 
 def adjR : ((Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) →L[ℝ] ((Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp)) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := adjH
-      map_add' := adjH_add
-      map_smul' := adjH_smul }
+  LinearMap.toContinuousLinearMap { toFun := adjH, map_add' := adjH_add, map_smul' := adjH_smul }
 
 end Formalism.FourierDecayAlt.P.HilbertSchmidtVectorization

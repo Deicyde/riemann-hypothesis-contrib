@@ -58,7 +58,7 @@ private theorem cjEnt_rel
   rw [map_mul] at h2
   refine h2.trans ?_
   ext i j
-  by_cases hij : i = j <;> simp [hij, Matrix.one_apply, sim]
+  by_cases hij : i = j <;> simp [hij, sim]
 
 theorem UpperTheory.Gal.Int.Geo.Pl.Tj.cjEnt : UpperTheory.Gal.Int.Geo.Pl.Tj.CjEnt := by
   intro E _ _ _ n g w i k

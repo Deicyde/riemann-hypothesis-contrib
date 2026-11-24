@@ -47,8 +47,6 @@ import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
@@ -92,6 +90,7 @@ variable
   {Yd : DivX (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G)} {cX : ExtraC}
   {ex : Extra (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G) L hT Gi Gl Kc Yd cX}
   {W : _root_.GlobalTheory.MiS.RealPackAlt ex} {u : B.Word}
+
 theorem exists_sameData_atType
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     (a : _root_.GlobalTheory.Fam.GeometricFamily W u)
@@ -236,6 +235,7 @@ theorem midXi_isLocFac'
     (a.G n).cg_mid j c H,
     fun _ => rfl
   ⟩
+
 theorem locXi_eq_mul_midXi_alt
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     {a : _root_.GlobalTheory.Fam.GeometricFamily W u} (ha : a.Is)

@@ -49,6 +49,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTh
   GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.gaussianReading_finiteRationalHeisenbergTranslate
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (a b : ℕ)
         (hS : S.rank = a) (hT : T.rank = b) (δ : ℂ) (sc : ℝ),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.gaussianReading_finiteRationalHeisenbergTranslate
                 → xiN θ S T hS hT δ sc (heisO ψ S T v f)
                   = Formalism.L2.Th1.H.opU (HV sc) (embH (tauE D) δ (toHom S T hS hT γ))
                     (xiN θ S T hS hT δ sc f) := by
-  first
-  | exact @GlobalTheory.AdForm.HeisRead.xiN_heisO_finOf
-  | exact GlobalTheory.AdForm.HeisRead.xiN_heisO_finOf
-  | (intros; apply GlobalTheory.AdForm.HeisRead.xiN_heisO_finOf <;> assumption)
+  first | exact @GlobalTheory.AdForm.HeisRead.xiN_heisO_finOf

@@ -98,8 +98,7 @@ theorem linMap_one {n : ℕ} (a : Pt k n d) (ha : GP a)
     : comp1 (LogExpAdaptedGauge.linMap (1 : Matrix (Fin d) (Fin d) k)) a = a := by
   classical
   funext i
-  rw [germComp_matrixLinearMap_apply _ _ ha, Finset.sum_eq_single i]
-    <;> simp +contextual [Matrix.one_apply, eq_comm]
+  rw [germComp_matrixLinearMap_apply _ _ ha, Finset.sum_eq_single i] <;> simp +contextual [eq_comm]
 
 end Calc
 

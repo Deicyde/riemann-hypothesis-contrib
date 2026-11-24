@@ -58,10 +58,6 @@ noncomputable section
 
 namespace GlobalTheory.PullVanish
 
-theorem withBot_lt_of_add_one_le_nat {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ (n : WithBot ℕ∞))
-    : a < (n : WithBot ℕ∞) :=
-  withBot_lt_of_add_one_lt (lt_of_le_of_lt h (by exact_mod_cast Nat.lt_succ_self n))
-
 theorem topSelf_pull_eq_zero_of_not_dominant
     : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp k)
         (q : Y ⟶ Sp k) (D : ℕ),
@@ -82,7 +78,7 @@ theorem topSelf_pull_eq_zero_of_not_dominant
   have h2 : topologicalKrullDim (closure ({genericPoint X} : Set X)) = topologicalKrullDim X := by
     rw [(genericPoint_spec X).def]
     exact (Homeomorph.Set.univ X).isHomeomorph.topologicalKrullDim_eq
-  have h3 := withBot_lt_of_add_one_le_nat (h1.trans (h2.trans_le hX))
+  have h3 := _root_.GlobalTheory.VB.lt_of_add_one_le_natCast (h1.trans (h2.trans_le hX))
   have h :=
     interNum_pull_eq_zero k 0 D Y X (hs ▸ hq) (by rwa [Nat.zero_add]) π h3
       (fun i => i.elim0)

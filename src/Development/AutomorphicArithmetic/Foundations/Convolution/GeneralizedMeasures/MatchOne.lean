@@ -148,7 +148,7 @@ private theorem unitSet_top
         = Set.pi Set.univ fun w : PlacesOver E v =>
           (𝒪[w.1.adicCompletion E] : Set (w.1.adicCompletion E)) := by
     ext x
-    simp [O, Subring.mem_iInf]
+    simp [O]
   have hc : IsCompact (O : Set (CompletionsOver E v)) := by
     rw [hO]
     exact isCompact_univ_pi fun w =>

@@ -151,7 +151,7 @@ theorem UpperTheory.V.Th.Coc.lc
           = (c₀ • M) a b := by
     intro M
     simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, bar, Matrix.map_apply,
-      Matrix.smul_apply, Matrix.of_apply, smul_ite, smul_zero, smul_eq_mul, mul_one, ite_and]
+      Matrix.smul_apply, Matrix.of_apply, smul_eq_mul, ite_and]
     simp only [apply_ite (algebraMap O X), map_zero, mul_ite, mul_zero, Finset.sum_ite_eq',
       Finset.mem_univ, if_true, Algebra.smul_def, mul_one]
     rw [mul_comm]

@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.exists_unitary_equiv_inv_transpose_of_gram_inv
               (Formalism.L2.Theta.mt T (φ g)).submatrix e₂ e₂ = (Formalism.L2.Theta.mt S' g⁻¹)ᵀ)
             ∧ (∀ e g, SuppAt e S' g → SuppAt e T (φ g))
             ∧ ∀ g, (Formalism.L2.Theta.mt T (φ g)).det = (Formalism.L2.Theta.mt S' g⁻¹).det := by
-  first
-  | exact @GlobalTheory.InvTransposeIso.grp_contra
-  | exact GlobalTheory.InvTransposeIso.grp_contra
-  | (intros; apply GlobalTheory.InvTransposeIso.grp_contra <;> assumption)
+  first | exact @GlobalTheory.InvTransposeIso.grp_contra

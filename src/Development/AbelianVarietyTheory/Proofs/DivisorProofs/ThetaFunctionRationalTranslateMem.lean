@@ -2,9 +2,10 @@ module
 
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InducedTypeThetaGenusOnePermutes
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLineStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaSpaceSelfDualPairAtMostLine
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.VacuumUnderAdelicPairModulusOne
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.WeilOperatorRationalTranslateMemThetaFunctions
+public import Formalism.LocalToGlobal.UnitaryNorms.CharTied
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -46,7 +47,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGene
 import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
 import Development.AbelianVarietyTheory.Definitions.Divisors.NatCastSmulMemHatL
 import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
-public import Formalism.LocalToGlobal.UnitaryNorms.CharTied
 
 @[expose] public section
 
@@ -73,8 +73,7 @@ theorem wd_rat_mem_TT
   obtain ⟨hd, m, hm, hFm⟩ := hF
   have hg := (GlobalTheory.InducedType.induced_type D).1
   have hint :=
-    (GlobalTheory.T.theta_space_selfDual_pair_at_most_line D hg cc δ hc N N'
-      (La0 D (tor0 D cc δ) N N')
+    (_root_.GlobalTheory.ThetaLine.theta_line D hg cc δ hc N N' (La0 D (tor0 D cc δ) N N')
       (GlobalTheory.NormSum.VacMove.klat _ (GlobalTheory.NormSum.VacMove.moves_one D N)
         (GlobalTheory.NormSum.VacMove.moves_one D N'))).2.2.1
   refine ⟨

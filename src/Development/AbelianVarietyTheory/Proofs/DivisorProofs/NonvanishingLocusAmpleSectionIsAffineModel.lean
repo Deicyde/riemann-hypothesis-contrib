@@ -2,8 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRatioOfWeight
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsProperSemiAbelianFamily
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LineBundlePowSectionsRationalFunctionsLociStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RegularNonvanishingLocusSectionPropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LineBundlePowSectionsRationalFunctionsLoci
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RegularNonvanishingLocusSectionProperties
 import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsAffineOpenNonzeroLocusOfUniversallyClosed
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -73,8 +73,8 @@ theorem main
                       under y ∈ U
                         ∧ ∀ w : (fnOf U h).range, ratVal (w : X.functionField) y = φ w := by
   intro k _ X _ p D hV P hA e g he hg hg0
-  obtain ⟨u, hu⟩ := (GlobalTheory.T.lineBundlePow_sections_rationalFunctions_loci k X p P e).2 g hg
-  have hN := GlobalTheory.T.regularNonvanishingLocusSection_properties k X p P (e : ℤ) 0 g hg
+  obtain ⟨u, hu⟩ := (_root_.GlobalTheory.HSAmp.pow_sec_dict k X p P e).2 g hg
+  have hN := _root_.GlobalTheory.HSAmp.nv_rules k X p P (e : ℤ) 0 g hg
   have : IsProper p := GlobalTheory.ProperFamily.isProper_of_isProjOver hV.isProjOver
   have hU : IsAffineOpen (ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus u) :=
     IsAmpleLB.isAffineOpen_nonzeroLocus p hA he u

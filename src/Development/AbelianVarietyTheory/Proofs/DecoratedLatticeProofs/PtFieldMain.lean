@@ -56,7 +56,11 @@ theorem ptField_main
         ∧ ∀ (u : D.what₂.Word) (c : (D.fm u).clsP),
           Nat.card ((D.fm u).stabilizer₂ c) ∣ (D.mem u).C.DGam := by
   intro D
-  refine ⟨D.tcLL, GlobalTheory.isConjAt_exists_main D.what₂.LL ⟨D.what₂.embLL, D.starLL_cx⟩, ?_⟩
+  refine ⟨
+    D.tcLL,
+    _root_.GlobalTheory.exists_isConjAt_of_embedding D.what₂.LL ⟨D.what₂.embLL, D.starLL_cx⟩,
+    ?_
+  ⟩
   intro u c
   exact (Subgroup.card_dvd_of_injective _ ((D.fm u).stabMap_inj c)).trans
     ((D.mem u).C.dvd_DGam _ le_rfl _)

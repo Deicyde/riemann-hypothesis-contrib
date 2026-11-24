@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfForallPowDvd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmegaBaseChangeFiniteProjectiveReflexive
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PadicContinuousEvaluationExistsUniqueSubstNaturaStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PadicContinuousEvaluationExistsUniqueSubstNatura
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -94,8 +94,8 @@ theorem ev_nmul
     GlobalTheory.isAdicComplete_of_finite_projective _ _
   haveI : IsAdicComplete (Ideal.span {(p : G.A n)}) (G.A n) := isAdicComplete_ring_of_module (O := O) p
   have hT :=
-    (GlobalTheory.T.padicContinuousEvaluation_existsUnique_subst_natural p O (G.A n) (Fin d) (c.x n)
-      (c.nil n)).2 (c.ev n) (c.isEval n)
+    (_root_.GlobalTheory.CEval.continuous_eval p O (G.A n) (Fin d) (c.x n) (c.nil n)).2 (c.ev n)
+      (c.isEval n)
   have hsucc
       : ∀ (k : ℕ) (j : Fin d),
         nmul c.μ (k + 1) j

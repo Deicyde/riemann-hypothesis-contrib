@@ -45,8 +45,6 @@ import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 
 @[expose] public section
 
-
-
 noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections

@@ -195,11 +195,6 @@ theorem nsq_rho_split (ε : Fin n → Bool) : nsq (rho n) = nsq (rhoC ε) + nsq 
   rw [← hs, carU_nsq_add, dot_rhoC_rhoHol]
   ring
 
-section Unitary
-variable {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
-
-end Unitary
-
 section Value
 variable {W : Type*} [AddCommGroup W] [Module ℂ W]
 
@@ -219,7 +214,7 @@ theorem pair_apply_khw
   · simp only [Module.End.mul_apply, hd, map_smul, smul_smul, if_true]
     push_cast
     ring_nf
-  · simp [Module.End.mul_apply, hba h, h.ne', not_lt_of_gt h]
+  · simp [hba h, h.ne', not_lt_of_gt h]
 
 theorem casimirK_khwVec_compact
     (ε : Fin n → Bool)
@@ -249,19 +244,6 @@ theorem casimirK_khwVec_compact
     μ (rhoC ε)
     (fun a => by unfold rhoC; ring)
 
-theorem E_comm_sgE
-    {E cp cm : Fin n → Fin n → Module.End ℂ W} (hEC : CommutesCAR E cp cm)
-    (ε : Fin n → Bool) (a b c d : Fin n)
-    : E a b * sgE ε cp cm c d = sgE ε cp cm c d * E a b := by
-  have h1 : ∀ i j k l, E a b * (cp i j * cm k l) = (cp i j * cm k l) * E a b := by
-    intro i j k l
-    rw [← mul_assoc, (hEC a b i j).1, mul_assoc, (hEC a b k l).2, mul_assoc]
-  unfold sgE
-  split_ifs
-  · rw [mul_sum, sum_mul]; exact sum_congr rfl fun x _ => h1 _ _ _ _
-  · rw [mul_neg, neg_mul, mul_sum, sum_mul]; congr 1; exact sum_congr rfl fun x _ => h1 _ _ _ _
-  · simp
-
 theorem diagE_compact
     {E cp cm : Fin n → Fin n → Module.End ℂ W}
     (hE : IsGlRep E) (hC : IsCAR cp cm) (hEC : CommutesCAR E cp cm)
@@ -273,8 +255,9 @@ theorem diagE_compact
   simp only [if_true] at e1 e2
   rw [sub_eq_iff_eq_add] at e1 e2
   unfold diagE
-  rw [add_mul, mul_add, mul_add, add_mul, mul_add, mul_add, E_comm_sgE hEC ε a b b a,
-    E_comm_sgE hEC ε b a a b, e1, e2]
+  rw [add_mul, mul_add, mul_add, add_mul, mul_add, mul_add,
+    _root_.ReciprocityTheory.ChartRestriction.DS.csq_E_comm_sgE hEC ε a b b a,
+    _root_.ReciprocityTheory.ChartRestriction.DS.csq_E_comm_sgE hEC ε b a a b, e1, e2]
   abel
 
 theorem khw_real_identity (ε : Fin n → Bool) (δ : Fin n → ℝ)

@@ -64,9 +64,6 @@ open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie Glo
   GlobalTheory.OnCmp
 open scoped TensorProduct
 
-
-
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BaseCmp
@@ -183,7 +180,7 @@ theorem kerDat_xiR_ne
   have hv : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k) = 1 := by
     rw [Valuation.map_eq_of_sub_lt _ hk']; exact hx
   have hv1 : PP.valuation D.host.E k = 1 := by
-    rw [← GlobalTheory.ChainOnto.TameRes.val_alg]; exact hv
+    rw [← _root_.Formalism.UG.P.levelaf_valued_algebraMap]; exact hv
   have hk0 : k ≠ 0 := by
     rintro rfl
     simp at hv1

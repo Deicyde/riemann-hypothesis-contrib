@@ -49,9 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.torsionCoordinates_eq_degenerationSeries
     : HV → BrGtSt → BrFamSt → EVSt := by
-  first
-  | exact @GlobalTheory.Ex.CoordSeries.coord_eq_series
-  | exact GlobalTheory.Ex.CoordSeries.coord_eq_series
-  | (intros; apply GlobalTheory.Ex.CoordSeries.coord_eq_series <;> assumption)
+  first | exact @GlobalTheory.Ex.CoordSeries.coord_eq_series

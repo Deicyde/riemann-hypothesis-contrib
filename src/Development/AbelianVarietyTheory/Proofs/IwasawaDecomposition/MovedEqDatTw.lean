@@ -46,8 +46,6 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK HkIdx)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.Mem.R3
 
 theorem dat_ext_heq

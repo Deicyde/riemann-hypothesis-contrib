@@ -154,7 +154,7 @@ theorem nl_of_pi0Lam
     · simp only [lE, pow_zero, one_mul]
       rw [Finset.sum_eq_single k]
       · simp
-      · intro i _ hik; simp [Pi.single_apply, Ne.symm hik]
+      · intro i _ hik; simp [Ne.symm hik]
       · simp
 
 variable [IsDomain O]

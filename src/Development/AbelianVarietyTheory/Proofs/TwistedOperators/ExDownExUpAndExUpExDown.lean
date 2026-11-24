@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Foundations.SimpleSum
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTransformInversionLocalFieldPiStatement
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExchangeSupportAndFourierRelationStatement
+public import Development.AbelianVarietyTheory.Definitions.Foundations.MatrixMeasurableSpace
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTransformInversionLocalFieldPi
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExchangeSupportAndFourierRelation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -141,8 +142,9 @@ theorem exDown_exUp_and_exUp_exDown
   intro k _ _ _ _ _ _ n _ _ c p hp hpc ψ hψc hψ1 ν hsd A _ _ σ hσ l v
   have : ν.IsAddHaarMeasure := hsd.1
   have hT :=
-    GlobalTheory.T.rootExchange_support_and_fourier_relation k n c p hp hpc ψ hψc hψ1 ν A σ hσ l v
-  have hF := GlobalTheory.T.fourier_transform_inversion_localFieldPi k n ψ hψc hψ1 ν hsd
+    _root_.GlobalTheory.RootEx.ExchangeSupport.exchange_support k n c p hp hpc ψ hψc hψ1 ν A σ hσ l
+      v
+  have hF := _root_.GlobalTheory.SplitWeil.FourierPi.fourier_pi k n ψ hψc hψ1 ν hsd
   constructor
   · intro hN
     obtain ⟨hSB, -, hint⟩ := hT.1 hN

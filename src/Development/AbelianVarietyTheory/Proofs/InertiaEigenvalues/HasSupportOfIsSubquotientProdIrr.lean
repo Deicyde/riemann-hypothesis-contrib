@@ -536,7 +536,6 @@ theorem exists_hasSupport
     push_neg at hne
     have h2 : Finsupp.single x (1 : ℤ) = Ψ.symm P := (Ψ.symm_apply_apply _).symm
     have h3 : Ψ.symm P x = 0 := by
-
       rw [MvPolynomial.as_sum P, map_sum, Finsupp.finsetSum_apply]
       refine Finset.sum_eq_zero fun m _ => ?_
       have h4

@@ -326,7 +326,6 @@ theorem coneBox_finite (𝔣 𝔟 : Ideal (𝓞 F)) {r : ℕ} (w : Fin r → �
   rintro _ ⟨y, ⟨-, t, ht, e⟩, rfl⟩
   refine ⟨y.isIntegral_coe, fun φ => ?_⟩
   have h1 : ‖φ (y : F)‖ ≤ ∑ i, ‖φ (w i : F)‖ := by
-
     rw [e, map_sum]
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
     rw [map_mul, map_ratCast, norm_mul, Complex.norm_ratCast]

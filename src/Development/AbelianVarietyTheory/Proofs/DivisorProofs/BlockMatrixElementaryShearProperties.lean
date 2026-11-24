@@ -67,7 +67,7 @@ theorem shear_ne
     (σ : ι) (h : σ ≠ τ)
     : shear τ a b t σ = 1 := by
   ext i j
-  simp [shear, Sigma.mk.inj_iff, h]
+  simp [shear, h]
 
 theorem shear_props
     : ∀ (ι : Type) (m : ι → ℕ) (τ : ι) (a b : Fin (m τ)),

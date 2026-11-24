@@ -58,7 +58,7 @@ theorem UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker
     ?_
   ⟩
   · change x⁻¹ * x ∈ η.ker
-    simp [MonoidHom.mem_ker]
+    simp
   · intro y hy
     have hy' : η (x⁻¹ * y) = 1 := hy
     rw [map_mul, map_inv] at hy'

@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.adelicLinearCoordinates_continuous_keep_parts
         ∧ (∀ x,
           x.map (infPart D) = 0
             ↔ GlobalTheory.SWQ.inf (e x).1 = 0 ∧ GlobalTheory.SWQ.inf (e x).2 = 0) := by
-  first
-  | exact @GlobalTheory.AdelicCoord.coord
-  | exact GlobalTheory.AdelicCoord.coord
-  | (intros; apply GlobalTheory.AdelicCoord.coord <;> assumption)
+  first | exact @GlobalTheory.AdelicCoord.coord

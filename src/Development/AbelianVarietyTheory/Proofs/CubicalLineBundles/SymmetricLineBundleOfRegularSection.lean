@@ -2,7 +2,8 @@ module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.NonzeroLocus
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.IsoLineBundleOfRegularPullbacksSameZeroSchemeStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.IsoLineBundleOfRegularPullbacksSameZeroScheme
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -97,7 +98,7 @@ theorem sym_of_regular_section
   refine ⟨⊤, trivial, ?_⟩
   haveI : IsIso (GrpObj.inv : A ⟶ A).left :=
     inferInstanceAs (IsIso ((Over.forget S).map (GrpObj.inv : A ⟶ A)))
-  refine GlobalTheory.T.isoLineBundle_of_regularPullbacks_sameZeroScheme A.left _ L θ _ _ hL
+  refine _root_.GlobalTheory.SameZeroScheme.exists_isGen_linComb A.left _ L θ _ _ hL
     (fun i V h => appLE_mem_nonZeroDivisors _ _ _ (hreg i) V h)
     (fun i V h => appLE_mem_nonZeroDivisors _ _ _ (hreg i) V h)
     ?_

@@ -195,7 +195,6 @@ private theorem moves_inv_of_moves
   intro g x y
   have := hw (w⁻¹ * g * w⁻¹⁻¹) x y
   rw [← this]
-  congr 2
   group
 
 open ValuativeRel MeasureTheory in

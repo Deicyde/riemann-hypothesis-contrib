@@ -51,6 +51,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.lineBundle_product_acyclic_of_affine_base_acyclic
     : ∀ (K : Type) [Field K] (Z T : Scheme.{0}) (p : Z ⟶ T) (g : T ⟶ Spec (CommRingCat.of K))
         (X : Scheme.{0}) (q : Z ⟶ X) (h : X ⟶ Spec (CommRingCat.of K)),
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.lineBundle_product_acyclic_of_affine_base_acyclic
                       → (∀ (κ : Type) [LinearOrder κ] [Fintype κ] (D : κ → (Y).Opens),
                         (∀ i, IsAffineOpen (D i)) → ⨆ i, D i = ⊤
                           → (cechLB (f) (F.pull π) D).Acyclic)) := by
-  first
-  | exact @GlobalTheory.ProductAcyclic.acyclic_of_over_affine_and_converse
-  | exact GlobalTheory.ProductAcyclic.acyclic_of_over_affine_and_converse
-  | (intros; apply GlobalTheory.ProductAcyclic.acyclic_of_over_affine_and_converse <;> assumption)
+  first | exact @GlobalTheory.ProductAcyclic.acyclic_of_over_affine_and_converse

@@ -49,20 +49,13 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
 @[expose] public section
 
 open scoped TensorProduct Matrix Classical GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.RealLift
 open GlobalTheory.HoweD
 
 namespace GlobalTheory.HoweD
-
-theorem jm_conjTranspose (p q : ℕ) : (Formalism.BasicNotions.TH.Jm p q)ᴴ = Formalism.BasicNotions.TH.Jm p q := by
-  unfold Formalism.BasicNotions.TH.Jm Formalism.UG.Jpq
-  rw [Matrix.fromBlocks_conjTranspose]
-  simp
-
-theorem jm_mul_self (p q : ℕ) : Formalism.BasicNotions.TH.Jm p q * Formalism.BasicNotions.TH.Jm p q = 1 := by
-  unfold Formalism.BasicNotions.TH.Jm Formalism.UG.Jpq
-  rw [Matrix.fromBlocks_multiply]
-  simp [Matrix.fromBlocks_one]
 
 theorem upq_span (p q : ℕ) (Z : Mat p q) : ∃ X ∈ upq p q, ∃ Y ∈ upq p q, Z = X + Complex.I • Y := by
   apply GlobalTheory.FockTensor.exists_upq_add <;> assumption

@@ -49,6 +49,7 @@ open NumberField IsDedekindDomain
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC
   GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.cm_galois_representation_crystalline
     : GlobalTheory.Published.GaloisRepOfPolarizedCuspidal
       → GlobalTheory.Published.HeckeLAdicCharacter → GlobalTheory.Published.HeckeLAdicCharacterAbove
@@ -91,7 +92,4 @@ theorem _root_.GlobalTheory.T.cm_galois_representation_crystalline
                                                     ((z : ℂ)
                                                       * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ)
                                                         ^ f))).prod := by
-  first
-  | exact @GlobalTheory.CsdTwistGal.exists_galRep_csd_twist
-  | exact GlobalTheory.CsdTwistGal.exists_galRep_csd_twist
-  | (intros; apply GlobalTheory.CsdTwistGal.exists_galRep_csd_twist <;> assumption)
+  first | exact @GlobalTheory.CsdTwistGal.exists_galRep_csd_twist

@@ -87,12 +87,7 @@ theorem holSub_mul
     (hP : P ∈ holSub X la) (hQ : Q ∈ holSub X la')
     : P * Q ∈ holSub X (la + la') := by
   first
-  | exact UpperTheory.Reformulated.B.Qe28.holSub_mul ..
   | (apply UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qe28.holSub_mul <;> first | assumption | infer_instance)
   | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q hP hQ
   | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q hP
   | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q

@@ -92,7 +92,9 @@ theorem deg
   obtain ⟨-, hIc, hIi⟩ := hI Φ hΦ
   set s := s0 d.m d.n with hsdef
   set A : d.G → ℂ := fun g => iteratedDeriv j (Ê · g) s with hAdef
-  have hAc : Continuous A := famCont U Ê hUo hd hcont _ hs j
+  have hAc : Continuous A :=
+    _root_.GlobalTheory.CompanionTheory.HolFamily.continuous_iteratedDeriv_family U Ê hUo hd hcont _
+      hs j
   have hAi : ∀ γ ∈ rat2 σ d.Y, ∀ g, A (γ * g) = A g := fun γ hγ g =>
     derivInv U Ê hUo _ hs γ g (fun z hz => hinv z hz γ hγ g) j
 
@@ -108,9 +110,14 @@ theorem deg
     ring
 
   let w : InfinitePlace F := Classical.arbitrary _
-  obtain ⟨y, hy⟩ := dilEx d.n (Pi.single L.i₀ 1) 1
-  obtain ⟨pp, qq, e, hpq, hhol⟩ := holA H R hmn hΦ hv hE w j hj hlow
-  obtain ⟨hlawA, huA⟩ := holCoef H R L w hc hT A hAc hAi pp qq e hpq hhol
+  obtain ⟨y, hy⟩ :=
+    _root_.PositivityTheory.SiegelWeilFormula.AStep.dilEx_pf d.n (Pi.single L.i₀ 1) 1
+  obtain ⟨pp, qq, e, hpq, hhol⟩ :=
+    _root_.PositivityTheory.SiegelWeilFormula.AStep.exists_isHolW_iteratedDeriv H R hmn hΦ hv hE w j
+      hj hlow
+  obtain ⟨hlawA, huA⟩ :=
+    _root_.PositivityTheory.SiegelWeilFormula.AStep.holCoef_pf H R L w hc hT A hAc hAi pp qq e hpq
+      hhol
   obtain ⟨uM, ν, 𝓤, hu⟩ := (H.uEx F E σ d R L).1
   obtain ⟨nb', lam', 𝓖', hc'⟩ := H.coefEx F E σ L.sd
   obtain ⟨t', hct⟩ := H.cTSplit F E σ d R L _ _ hsec hEis
@@ -143,7 +150,7 @@ theorem deg
     intro c φ x'
     simp only [avg, fc, mul_assoc]
     simp only [integral_const_mul]
-  have hhol1 := avgHol H L hE hc T hT hu
+  have hhol1 := _root_.PositivityTheory.SiegelWeilFormula.AStep.avgHol_pf H L hE hc T hT hu
 
   have hsep :=
     lawSep U p (max t t') s j
@@ -173,7 +180,8 @@ theorem deg
         have h1 := (hfar z (lt_of_le_of_lt (le_max_left _ _) hz)).2
         have e1 : Ê z = fun g => p.eval z * d.eis (d.sec0 Φ) s z g := funext h1
         rw [e1, havg_smul, (hc2 z (lt_of_le_of_lt (le_max_right _ _) hz)).1 _])
-      (cOneVal H R L R' hIH hΦ hv hc hc' hT x) (cOneVal H R L R' hIH hΦ hv hc hc' hT _)
+      (_root_.PositivityTheory.SiegelWeilFormula.AStep.cOneVal_pf H R L R' hIH hΦ hv hc hc' hT x)
+      (_root_.PositivityTheory.SiegelWeilFormula.AStep.cOneVal_pf H R L R' hIH hΦ hv hc hc' hT _)
       (fun z hz => by
         rw [(hc2 z (lt_of_le_of_lt (le_max_right _ _) hz)).2 x]
         congr 1
@@ -199,8 +207,14 @@ theorem deg
         (fun z => cOne d L (d.sec0 Φ) s z nb' lam' 𝓖' T' x)
         (fun z => cOne d L (d.sec0 Φ) s z nb' lam' 𝓖' T' (R.ι w y * x))
         0 (d.n : ℂ) 2 s _ _
-        (fun z _ => by rw [cOneLaw H R L hΦ w hc' T' 1 y hy z x]; congr 1; push_cast; ring_nf)
-        (cOneVal H R L R' hIH hΦ hv hc hc' hT x) (cOneVal H R L R' hIH hΦ hv hc hc' hT _)
+        (fun z _ => by
+          rw [_root_.PositivityTheory.SiegelWeilFormula.AStep.cOneLaw_pf H R L hΦ w hc' T' 1 y hy z
+            x]
+          congr 1
+          push_cast
+          ring_nf)
+        (_root_.PositivityTheory.SiegelWeilFormula.AStep.cOneVal_pf H R L R' hIH hΦ hv hc hc' hT x)
+        (_root_.PositivityTheory.SiegelWeilFormula.AStep.cOneVal_pf H R L R' hIH hΦ hv hc hc' hT _)
     have e2 : (d.n : ℂ) + 2 * s = d.m := by rw [hsdef, s0]; ring
     rw [e2] at this
     linear_combination this / 2

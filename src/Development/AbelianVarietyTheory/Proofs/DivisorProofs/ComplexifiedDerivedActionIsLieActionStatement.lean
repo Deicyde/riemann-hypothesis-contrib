@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.complexifiedDerivedAction_isLieAction
     : ∀ (n : ℕ) (Hm : Mt n) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         [CompleteSpace H] (σ : Mt n → (H →L[ℂ] H)),
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.complexifiedDerivedAction_isLieAction
               ∧ (∀ g ∈ Formalism.QuantumDeterminants.UH Hm, ∀ Z,
                 σ g (dRepC Hm σ Z v) = dRepC Hm σ (g * Z * g⁻¹) (σ g v))
               ∧ ∀ Z, ⟪dRepC Hm σ Z v, v'⟫_ℂ = - ⟪v, dRepC Hm σ (conjH Hm Z) v'⟫_ℂ := by
-  first
-  | exact @GlobalTheory.HolDict.LieAct.main
-  | exact GlobalTheory.HolDict.LieAct.main
-  | (intros; apply GlobalTheory.HolDict.LieAct.main <;> assumption)
+  first | exact @GlobalTheory.HolDict.LieAct.main

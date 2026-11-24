@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntegralPowerExpansion
 
 @[expose] public section
 
@@ -59,14 +60,6 @@ private theorem equivV {K : Type} [Field K] [NumberField K] (v : HeightOneSpectr
   haveI : (Valued.v : Valuation (v.adicCompletion K) (WithZero (Multiplicative ℤ))).Compatible :=
     Valuation.Compatible.ofValuation _
   exact ValuativeRel.isEquiv _ _
-
-private theorem le_of_lt_one {a : WithZero (Multiplicative ℤ)} (h : a < 1)
-    : a ≤ WithZero.exp (-1 : ℤ) := by
-  by_cases h0 : a = 0
-  · simp [h0]
-  · rw [← WithZero.exp_log h0, ← WithZero.exp_zero, WithZero.exp_lt_exp] at h
-    rw [← WithZero.exp_log h0, WithZero.exp_le_exp]
-    omega
 
 private theorem v_unif {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
     : Valued.v ((unif (v.adicCompletion K) : (v.adicCompletion K)ˣ) : v.adicCompletion K)
@@ -91,10 +84,15 @@ private theorem v_unif {K : Type} [Field K] [NumberField K] (v : HeightOneSpectr
         Units.mk0 p hp0,
         (equivV v).lt_one_iff_lt_one.2 (by rw [Units.val_mk0, hp]; exact hlt),
         fun x hx =>
-          ((equivV v) _ _).2
-            (by rw [Units.val_mk0, hp]; exact le_of_lt_one ((equivV v).lt_one_iff_lt_one.1 hx))
+          ((equivV v) _ _).2 (by
+            rw [Units.val_mk0, hp]
+            exact _root_.GlobalTheory.Proof.IntegralPowerExpansion.le_exp_neg_one_of_lt_one
+              ((equivV v).lt_one_iff_lt_one.1 hx))
       ⟩
-  refine le_antisymm (le_of_lt_one ((equivV v).lt_one_iff_lt_one.1 hs.1)) ?_
+  refine le_antisymm
+    (_root_.GlobalTheory.Proof.IntegralPowerExpansion.le_exp_neg_one_of_lt_one
+      ((equivV v).lt_one_iff_lt_one.1 hs.1))
+    ?_
   rw [← hp]
   exact ((equivV v) _ _).1 (hs.2 p ((equivV v).lt_one_iff_lt_one.2 (by rw [hp]; exact hlt)))
 

@@ -76,7 +76,7 @@ theorem gv_measurable : @MeasurableSet (Mt k r) _ (GV k r) := by
 
 theorem gN_cont : Continuous (fun g : Mt k r => gN (Matrix.of g : Mat k r)) := by
   unfold gN
-  first | fun_prop | continuity
+  first | fun_prop
 
 theorem ae_G (D : RealPlaceData k r Wp Wp) : ∀ᵐ x ∂D.μG, Matrix.of x ∈ GV k r := by
   exact ae_iff.mpr D.haarG.conc
@@ -128,7 +128,7 @@ theorem test_bound {φ : Mat k r → ℂ} (hφ : IsTestG φ)
       rw [Set.indicator_of_mem hx', Pi.one_apply, mul_one]
       exact (hM x hx').trans (le_max_left _ _)
     · rw [hK0 x hx hxK]
-      simp [Set.indicator_apply, hxK]
+      simp [hxK]
 
 theorem int_ind (D : RealPlaceData k r Wp Wp) {K : Set (Mat k r)} (hK : IsCompact K)
     : Integrable (fun x : Mt k r => K.indicator (1 : Mat k r → ℝ) (Matrix.of x)) D.μG := by
@@ -141,10 +141,7 @@ theorem int_ind (D : RealPlaceData k r Wp Wp) {K : Set (Mat k r)} (hK : IsCompac
     rfl
   rw [he]
   refine (integrable_indicator_iff hm).2 ?_
-  first
-  | exact integrableOn_const.2 (Or.inr hfin)
-  | exact integrableOn_const hfin.ne
-  | exact integrableOn_const (C := (1 : ℝ)) hfin.ne
+  first | exact integrableOn_const hfin.ne
 
 theorem gN_integrable (D : RealPlaceData k r Wp Wp) (hGN : GNIntSharp) {A : ℝ} (hA : AB k r ≤ A)
     : Integrable (fun y : Mt k r => gN (Matrix.of y) ^ (-A)) D.μG := by
@@ -261,8 +258,7 @@ theorem test_of_contDiff
     fun x _ hx => ?_
   ⟩
   · exact (Complex.ofRealCLM.contDiff.comp hg).contDiffOn
-  · have h0 : g x = 0 := by
-      first | exact image_eq_zero_of_notMem_tsupport hx | exact image_eq_zero_of_nmem_tsupport hx
+  · have h0 : g x = 0 := by first | exact image_eq_zero_of_notMem_tsupport hx
     simp [h0]
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1.TopH

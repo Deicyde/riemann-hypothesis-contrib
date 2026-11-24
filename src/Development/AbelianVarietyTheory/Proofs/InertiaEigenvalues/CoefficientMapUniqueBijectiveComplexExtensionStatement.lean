@@ -51,6 +51,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.coefficientMap_unique_bijective_complex_extension
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.coefficientMap_unique_bijective_complex_extension
             → ∃ c : VsV D i ℂ →ₗ[ℂ] (R.cV i).W,
               ExtC R i (inC M.c') M.c0' c ∧ Function.Bijective c
                 ∧ ∀ c', ExtC R i (inC M.c') M.c0' c' → c' = c := by
-  first
-  | exact @GlobalTheory.CoefExtC.exists_extC_bijective_unique
-  | exact GlobalTheory.CoefExtC.exists_extC_bijective_unique
-  | (intros; apply GlobalTheory.CoefExtC.exists_extC_bijective_unique <;> assumption)
+  first | exact @GlobalTheory.CoefExtC.exists_extC_bijective_unique

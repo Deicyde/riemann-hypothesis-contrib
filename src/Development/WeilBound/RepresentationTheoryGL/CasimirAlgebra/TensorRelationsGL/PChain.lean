@@ -1,7 +1,7 @@
 module
 
+public import Formalism.RealPlaceAnalysis.StatementE
 public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.QdetFacts
-public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -21,7 +21,6 @@ import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
 import Mathlib.RingTheory.Radical.NatInt
 import Mathlib.RingTheory.WittVector.IsPoly
-import Mathlib.Tactic.Basify
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -41,10 +40,149 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ReduceModChar
 import Std.Tactic.BVDecide.Normalize.Prop
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA, Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChain
+
+-- ===== clump member: Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA =====
+-- clump-header: {"m": "Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA", "h": "module\n\npublic import Formalism.RealPlaceAnalysis.StatementE\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+noncomputable section
+
+open Formalism.REAL Matrix
+
+namespace PositivityTheory.Rg.Cz
+
+namespace ChainP
+
+section gen
+variable {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+
+theorem intCast_comp (f : V →ₗ[ℂ] W) (z : ℤ)
+    : f ∘ₗ ((z : Module.End ℂ V)) = ((z : Module.End ℂ W)) ∘ₗ f := by
+  refine LinearMap.ext fun v => ?_
+  simp
+
+theorem ofFn_comp
+    (f : V →ₗ[ℂ] W)
+    {t : ℕ} (A : Fin t → Module.End ℂ V) (B : Fin t → Module.End ℂ W) (h : ∀ k, f ∘ₗ A k = B k ∘ₗ f)
+    : f ∘ₗ (List.ofFn A).prod = (List.ofFn B).prod ∘ₗ f := by
+  induction t with
+  | zero => refine LinearMap.ext fun v => ?_; simp
+  | succ t ih =>
+    rw [List.ofFn_succ, List.ofFn_succ, List.prod_cons, List.prod_cons, Module.End.mul_eq_comp,
+      Module.End.mul_eq_comp, ← LinearMap.comp_assoc, h 0, LinearMap.comp_assoc,
+      ih (fun k => A k.succ) (fun k => B k.succ) (fun k => h _), LinearMap.comp_assoc]
+
+theorem qdet_comp
+    {n : ℕ} (f : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V)
+    (F : Fin n → Fin n → Module.End ℂ W) (h : ∀ a b, f ∘ₗ E a b = F a b ∘ₗ f)
+    (u : ℂ)
+    : f ∘ₗ qdet E u = qdet F u ∘ₗ f := by
+  unfold qdet qminor
+  have key
+      : ∀ σ : Equiv.Perm (Fin n),
+        f ∘ₗ (((Equiv.Perm.sign σ : ℤ) : Module.End ℂ V)
+            * (List.ofFn fun k : Fin n => Tm E (u - (k : ℂ)) (id (σ k)) (id k)).prod)
+          = (((Equiv.Perm.sign σ : ℤ) : Module.End ℂ W)
+              * (List.ofFn fun k : Fin n => Tm F (u - (k : ℂ)) (id (σ k)) (id k)).prod)
+            ∘ₗ f := fun σ => by
+    rw [Module.End.mul_eq_comp, Module.End.mul_eq_comp, ← LinearMap.comp_assoc, intCast_comp,
+      LinearMap.comp_assoc, ofFn_comp f _ _ (fun k => ?_), LinearMap.comp_assoc]
+    simp only [Tm]
+    rw [LinearMap.comp_add, LinearMap.add_comp, h]
+    congr 1
+    split_ifs
+    · refine LinearMap.ext fun v => ?_; simp
+    · simp
+  refine LinearMap.ext fun v => ?_
+
+  simp only [LinearMap.comp_apply, LinearMap.sum_apply, map_sum]
+  exact Finset.sum_congr rfl fun σ _ => LinearMap.congr_fun (key σ) v
+
+theorem listSub_comp
+    (f : V →ₗ[ℂ] W) (A : Module.End ℂ V) (B : Module.End ℂ W) (h : f ∘ₗ A = B ∘ₗ f) (L : List ℂ)
+    : f ∘ₗ (L.map fun r => A - algebraMap ℂ _ r).prod
+      = (L.map fun r => B - algebraMap ℂ _ r).prod ∘ₗ f := by
+  have key : ∀ r : ℂ, f ∘ₗ (A - algebraMap ℂ _ r) = (B - algebraMap ℂ _ r) ∘ₗ f := by
+    intro r
+    ext v
+    have hv := LinearMap.congr_fun h v
+    simp only [LinearMap.comp_apply] at hv
+    simp [hv]
+  induction L with
+  | nil =>
+    ext v
+    simp
+  | cons r L ih =>
+    rw [List.map_cons, List.map_cons, List.prod_cons, List.prod_cons, Module.End.mul_eq_comp,
+      Module.End.mul_eq_comp, ← LinearMap.comp_assoc, key r, LinearMap.comp_assoc, ih,
+      ← LinearMap.comp_assoc]
+
+theorem listSub_commute (A T : Module.End ℂ V) (h : Commute A T) (L : List ℂ)
+    : Commute (L.map fun r => A - algebraMap ℂ _ r).prod T := by
+  apply Commute.list_prod_left
+  intro x hx
+  obtain ⟨r, -, rfl⟩ := List.mem_map.1 hx
+  exact h.sub_left (Algebra.commutes r T)
+
+theorem listSub_pairwise (A : Module.End ℂ V) (L : List ℂ)
+    : (L.map fun r => A - algebraMap ℂ _ r).Pairwise Commute := by
+  rw [List.pairwise_map]
+  exact List.pairwise_of_forall fun r s =>
+    ((Commute.refl A).sub_left (Algebra.commutes r A)).sub_right (Algebra.commutes s _).symm
+
+theorem listSub_kill
+    (A : Module.End ℂ V)
+    {n : ℕ}
+    (l : Fin n → ℂ) (c : Fin n) (h0 : (List.ofFn fun k => A - algebraMap ℂ _ (l k)).prod = 0)
+    : (((List.ofFn l).erase (l c)).map fun r => A - algebraMap ℂ _ r).prod
+        * (A - algebraMap ℂ _ (l c))
+      = 0 := by
+  have hm : l c ∈ List.ofFn l := by simp
+  have h1 : ((List.ofFn l).map fun r => A - algebraMap ℂ (Module.End ℂ V) r).prod = 0 := by
+    rw [List.map_ofFn]
+    exact h0
+  rw [((List.perm_cons_erase hm).map _).prod_eq' (listSub_pairwise A _), List.map_cons,
+      List.prod_cons]
+    at h1
+  rw [(listSub_commute A _ ((Commute.refl A).sub_right (Algebra.commutes _ A).symm) _).eq]
+  exact h1
+
+theorem adjoin_commute
+    {A : Type} [Ring A] [Algebra ℂ A] (s : Set A) (T : A) (hs : ∀ x ∈ s, Commute x T)
+    : ∀ g ∈ Algebra.adjoin ℂ s, Commute g T := by
+  intro g hg
+  have hle : Algebra.adjoin ℂ s ≤ Subalgebra.centralizer ℂ {T} :=
+    Algebra.adjoin_le fun x hx => by
+      rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]
+      intro y hy
+      rw [Set.mem_singleton_iff.1 hy]
+      exact (hs x hx).symm.eq
+  have h2 := hle hg
+  rw [Subalgebra.mem_centralizer_iff] at h2
+  exact (h2 T (Set.mem_singleton T)).symm
+
+end gen
+
+end ChainP
+
+end PositivityTheory.Rg.Cz
+
+end
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA =====
+
+-- ===== clump member: Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChain =====
+-- clump-header: {"m": "Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChain", "h": "module\n\npublic import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.QdetFacts\npublic import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChainA\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Gamma.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.WittVector.IsPoly\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\nimport Std.Tactic.BVDecide.Normalize.Prop\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
@@ -57,19 +195,25 @@ namespace ChainP
 
 variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
 
-def Good (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (ℓ : M →ₗ[ℂ] ℂ) (top : Fin n) (m : ℕ)
-    (co : Fin m → Fin n) (g : Module.End ℂ (TV n M (Fin m))) : Prop :=
-  g ∈ Algebra.adjoin ℂ (Set.range fun j : Fin m => xJ E j) ∧
-    ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g ≠ 0 ∧
-    (∀ j, (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g) ∘ₗ xJ E j =
-      (l (co j) + ((Finset.univ.filter fun i => i < j ∧ co i = co j).card : ℂ)) •
-        (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g)) ∧
-    ∀ u : ℂ, (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g) ∘ₗ qdet (tE (Finset.univ : Finset (Fin m)) E) u =
-      (∏ k, (u + l k + ((Finset.univ.filter fun p => co p = k).card : ℂ))) • (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g)
+def Good
+    (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (ℓ : M →ₗ[ℂ] ℂ) (top : Fin n)
+    (m : ℕ) (co : Fin m → Fin n) (g : Module.End ℂ (TV n M (Fin m)))
+    : Prop :=
+  g ∈ Algebra.adjoin ℂ (Set.range fun j : Fin m => xJ E j)
+    ∧ ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g ≠ 0
+    ∧ (∀ j,
+      (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g) ∘ₗ xJ E j
+        = (l (co j) + ((Finset.univ.filter fun i => i < j ∧ co i = co j).card : ℂ))
+          • (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g))
+    ∧ ∀ u : ℂ,
+      (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g) ∘ₗ qdet (tE (Finset.univ : Finset (Fin m)) E) u
+        = (∏ k, (u + l k + ((Finset.univ.filter fun p => co p = k).card : ℂ)))
+          • (ℓ ∘ₗ LinearMap.proj (fun _ => top) ∘ₗ g)
 
-theorem card1 {m : ℕ} (co : Fin (m + 1) → Fin n) (i : Fin m) :
-    (Finset.univ.filter fun p : Fin (m + 1) => p < i.castSucc ∧ co p = co i.castSucc).card =
-      (Finset.univ.filter fun p : Fin m => p < i ∧ (co ∘ Fin.castSucc) p = (co ∘ Fin.castSucc) i).card := by
+theorem card1 {m : ℕ} (co : Fin (m + 1) → Fin n) (i : Fin m)
+    : (Finset.univ.filter fun p : Fin (m + 1) => p < i.castSucc ∧ co p = co i.castSucc).card
+      = (Finset.univ.filter fun p : Fin m =>
+        p < i ∧ (co ∘ Fin.castSucc) p = (co ∘ Fin.castSucc) i).card := by
   symm
   apply Finset.card_bij (fun p _ => p.castSucc)
   · intro p hp
@@ -91,9 +235,9 @@ theorem card1 {m : ℕ} (co : Fin (m + 1) → Fin n) (i : Fin m) :
       exact hb.2
     · exact Fin.ext rfl
 
-theorem card2 {m : ℕ} (co : Fin (m + 1) → Fin n) :
-    (Finset.univ.filter fun p : Fin (m + 1) => p < Fin.last m ∧ co p = co (Fin.last m)).card =
-      (Finset.univ.filter fun p : Fin m => (co ∘ Fin.castSucc) p = co (Fin.last m)).card := by
+theorem card2 {m : ℕ} (co : Fin (m + 1) → Fin n)
+    : (Finset.univ.filter fun p : Fin (m + 1) => p < Fin.last m ∧ co p = co (Fin.last m)).card
+      = (Finset.univ.filter fun p : Fin m => (co ∘ Fin.castSucc) p = co (Fin.last m)).card := by
   symm
   apply Finset.card_bij (fun p _ => p.castSucc)
   · intro p hp
@@ -111,21 +255,29 @@ theorem card2 {m : ℕ} (co : Fin (m + 1) → Fin n) :
       exact hb.2
     · exact Fin.ext rfl
 
-theorem card3 {m : ℕ} (co : Fin (m + 1) → Fin n) (k : Fin n) :
-    (Finset.univ.filter fun p : Fin (m + 1) => co p = k).card =
-      (Finset.univ.filter fun p : Fin m => (co ∘ Fin.castSucc) p = k).card + if co (Fin.last m) = k then 1 else 0 := by
+theorem card3 {m : ℕ} (co : Fin (m + 1) → Fin n) (k : Fin n)
+    : (Finset.univ.filter fun p : Fin (m + 1) => co p = k).card
+      = (Finset.univ.filter fun p : Fin m => (co ∘ Fin.castSucc) p = k).card
+        + if co (Fin.last m) = k then 1 else 0 := by
   rw [Finset.card_filter, Finset.card_filter, Fin.sum_univ_castSucc]
   rfl
 
-theorem xJ_comm (hT : TensorGl) (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E) (m : ℕ) (j : Fin m)
-    (a b : Fin n) : Commute (xJ E j) (tE (Finset.univ : Finset (Fin m)) E a b) := by
+theorem xJ_comm
+    (hT : TensorGl)
+    (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E)
+    (m : ℕ) (j : Fin m)
+    (a b : Fin n)
+    : Commute (xJ E j) (tE (Finset.univ : Finset (Fin m)) E a b) := by
   obtain ⟨-, h2, h3, -⟩ := hT n M (Fin m) E hE Finset.univ
   unfold xJ
   exact (h2 j (Finset.mem_univ _) a b).add_left
     (Commute.sum_left _ _ _ fun i _ => h3 _ (fun p => by simp) a b)
 
-theorem base (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (hl : HasChar E l) (ℓ : M →ₗ[ℂ] ℂ)
-    (hℓ : ℓ ≠ 0) (top : Fin n) (co : Fin 0 → Fin n) : Good E l ℓ top 0 co 1 := by
+theorem base
+    (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (hl : HasChar E l)
+    (ℓ : M →ₗ[ℂ] ℂ) (hℓ : ℓ ≠ 0)
+    (top : Fin n) (co : Fin 0 → Fin n)
+    : Good E l ℓ top 0 co 1 := by
   refine ⟨Subalgebra.one_mem _, ?_, fun j => j.elim0, ?_⟩
   · intro h
     apply hℓ
@@ -133,8 +285,11 @@ theorem base (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (hl 
     have := LinearMap.congr_fun h (fun _ => v)
     simpa using this
   · intro u
-    have hc : ∀ a b : Fin n, (LinearMap.proj (fun _ : Fin 0 => top) : TV n M (Fin 0) →ₗ[ℂ] M) ∘ₗ
-        tE (Finset.univ : Finset (Fin 0)) E a b = E a b ∘ₗ LinearMap.proj (fun _ : Fin 0 => top) := by
+    have hc
+        : ∀ a b : Fin n,
+          (LinearMap.proj (fun _ : Fin 0 => top) : TV n M (Fin 0) →ₗ[ℂ] M)
+              ∘ₗ tE (Finset.univ : Finset (Fin 0)) E a b
+            = E a b ∘ₗ LinearMap.proj (fun _ : Fin 0 => top) := by
       intro a b
       refine LinearMap.ext fun x => ?_
       simp [tE, lift]
@@ -145,10 +300,11 @@ theorem base (E : Fin n → Fin n → Module.End ℂ M) (l : Fin n → ℂ) (hl 
     rw [hx, hl u]
     simp
 
-theorem liftAdj (hC : Curry) (E : Fin n → Fin n → Module.End ℂ M) (m : ℕ) :
-    ∀ g ∈ Algebra.adjoin ℂ (Set.range fun j : Fin m => xJ E j), ∃ g' ∈ Algebra.adjoin ℂ
-      (Set.range fun j : Fin (m + 1) => xJ E j), curF n M m 1 ∘ₗ g' =
-        (lift g : Module.End ℂ (TV n (TV n M (Fin m)) (Fin 1))) ∘ₗ curF n M m 1 := by
+theorem liftAdj (hC : Curry) (E : Fin n → Fin n → Module.End ℂ M) (m : ℕ)
+    : ∀ g ∈ Algebra.adjoin ℂ (Set.range fun j : Fin m => xJ E j),
+      ∃ g' ∈ Algebra.adjoin ℂ (Set.range fun j : Fin (m + 1) => xJ E j),
+        curF n M m 1 ∘ₗ g'
+          = (lift g : Module.End ℂ (TV n (TV n M (Fin m)) (Fin 1))) ∘ₗ curF n M m 1 := by
   intro g hg
   induction hg using Algebra.adjoin_induction with
   | mem x hx =>
@@ -179,25 +335,32 @@ theorem liftAdj (hC : Curry) (E : Fin n → Fin n → Module.End ℂ M) (m : ℕ
     rw [hs, Module.End.mul_eq_comp, Module.End.mul_eq_comp, ← LinearMap.comp_assoc, ex,
       LinearMap.comp_assoc, ey, LinearMap.comp_assoc]
 
-private theorem pmap_lift_lemma {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {P : Type} (f : V →ₗ[ℂ] W) (X : Module.End ℂ V) (Y : Module.End ℂ W) (h : f ∘ₗ X = Y ∘ₗ f) :
-    (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ lift X =
-      lift Y ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
+private theorem pmap_lift_lemma
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {P : Type}
+    (f : V →ₗ[ℂ] W) (X : Module.End ℂ V) (Y : Module.End ℂ W) (h : f ∘ₗ X = Y ∘ₗ f)
+    : (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ lift X
+      = lift Y ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
   refine LinearMap.ext fun v => funext fun I => ?_
   simpa [lift] using LinearMap.congr_fun h (v I)
 
-private theorem pmap_eAt_lemma_2 {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {P : Type} [DecidableEq P] (f : V →ₗ[ℂ] W) (p : P) (a b : Fin n) :
-    (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ eAt p a b =
-      eAt p a b ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
+private theorem pmap_eAt_lemma_2
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {P : Type} [DecidableEq P]
+    (f : V →ₗ[ℂ] W) (p : P) (a b : Fin n)
+    : (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ eAt p a b
+      = eAt p a b ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
   refine LinearMap.ext fun v => funext fun I => ?_
   by_cases h : I p = a <;> simp [eAt, h]
 
-private theorem pmap_Om_lemma_3 {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {P : Type} [DecidableEq P] (f : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V)
-    (F : Fin n → Fin n → Module.End ℂ W) (h : ∀ a b, f ∘ₗ E a b = F a b ∘ₗ f) (p : P) :
-    (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ Om E p =
-      Om F p ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
+private theorem pmap_Om_lemma_3
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {P : Type} [DecidableEq P]
+    (f : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W)
+    (h : ∀ a b, f ∘ₗ E a b = F a b ∘ₗ f)
+    (p : P)
+    : (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ Om E p
+      = Om F p ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
   refine LinearMap.ext fun v => ?_
 
   simp only [Om, LinearMap.comp_apply, LinearMap.sum_apply, map_sum, Module.End.mul_apply]
@@ -207,14 +370,19 @@ private theorem pmap_Om_lemma_3 {V W : Type} [AddCommGroup V] [Module ℂ V] [Ad
   simp only [LinearMap.comp_apply] at hA hB
   rw [hA, hB]
 
-private theorem pmap_tE_lemma_4 {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {P : Type} [DecidableEq P] (S : Finset P) (f : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V)
-    (F : Fin n → Fin n → Module.End ℂ W) (h : ∀ a b, f ∘ₗ E a b = F a b ∘ₗ f) (a b : Fin n) :
-    (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ tE S E a b =
-      tE S F a b ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
+private theorem pmap_tE_lemma_4
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {P : Type} [DecidableEq P]
+    (S : Finset P)
+    (f : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W)
+    (h : ∀ a b, f ∘ₗ E a b = F a b ∘ₗ f)
+    (a b : Fin n)
+    : (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) ∘ₗ tE S E a b
+      = tE S F a b ∘ₗ (LinearMap.pi fun I : P → Fin n => f ∘ₗ LinearMap.proj I) := by
   refine LinearMap.ext fun v => ?_
 
-  simp only [tE, LinearMap.comp_apply, LinearMap.add_apply, LinearMap.sum_apply, map_sum, map_add (f := _)]
+  simp only [tE, LinearMap.comp_apply, LinearMap.add_apply, LinearMap.sum_apply, map_sum,
+    map_add (f := _)]
   have hA := LinearMap.congr_fun (pmap_lift_lemma (P := P) f _ _ (h a b)) v
   simp only [LinearMap.comp_apply] at hA
   rw [hA]
@@ -223,10 +391,14 @@ private theorem pmap_tE_lemma_4 {V W : Type} [AddCommGroup V] [Module ℂ V] [Ad
   have hB := LinearMap.congr_fun (pmap_eAt_lemma_2 f p a b) v
   simpa only [LinearMap.comp_apply] using hB
 
-theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : WallQuot)
-    (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E) (l : Fin n → ℂ) (ℓ : M →ₗ[ℂ] ℂ)
-    (hWh : IsWh E ℓ) (top : Fin n) (htop : (top : ℕ) + 1 = n) (m : ℕ) (co : Fin (m + 1) → Fin n)
-    (ih : ∃ g, Good E l ℓ top m (co ∘ Fin.castSucc) g) : ∃ g, Good E l ℓ top (m + 1) co g := by
+theorem step
+    (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : WallQuot)
+    (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E)
+    (l : Fin n → ℂ)
+    (ℓ : M →ₗ[ℂ] ℂ) (hWh : IsWh E ℓ)
+    (top : Fin n) (htop : (top : ℕ) + 1 = n)
+    (m : ℕ) (co : Fin (m + 1) → Fin n) (ih : ∃ g, Good E l ℓ top m (co ∘ Fin.castSucc) g)
+    : ∃ g, Good E l ℓ top (m + 1) co g := by
   obtain ⟨g, hG⟩ := ih
   unfold Good at hG ⊢
   obtain ⟨hgA, hg0, hgj, hgq⟩ := hG
@@ -244,8 +416,14 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
     refine Finset.prod_congr rfl fun k _ => ?_
     simp only [hl']
     ring
-  obtain ⟨N0, F0, hF0gl, -, hF0ch, hF0int, hN0⟩ := hW n (TV n M (Fin m)) Unit (fun _ => E')
-    (fun _ => hE'gl) (fun τ τ' h => absurd (Subsingleton.elim τ τ') h) (fun _ => l') ℓ' (fun _ u => hq' u)
+  obtain ⟨N0, F0, hF0gl, -, hF0ch, hF0int, hN0⟩ :=
+    hW n (TV n M (Fin m)) Unit
+      (fun _ => E')
+      (fun _ => hE'gl)
+      (fun τ τ' h => absurd (Subsingleton.elim τ τ') h)
+      (fun _ => l')
+      ℓ'
+      (fun _ u => hq' u)
   have hFgl : GlRel (F0 ()) := hF0gl ()
   have hFch : HasChar (F0 ()) l' := hF0ch ()
   have hFint : ∀ a b, N0.mkQ ∘ₗ E' a b = F0 () a b ∘ₗ N0.mkQ := hF0int ()
@@ -308,33 +486,41 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
     exact (hψapp (PE z fun _ => top)).symm
   obtain ⟨hcb, hctE, hccast, hcnat, -, -, -⟩ := hC n M E m 1
   have hnat : Fin.natAdd m (0 : Fin 1) = Fin.last m := Fin.ext (by simp)
-  have hxJ0 : xJ E' (0 : Fin 1) = Om' := by
-    simp [xJ, hOm']
+  have hxJ0 : xJ E' (0 : Fin 1) = Om' := by simp [xJ, hOm']
   have hcurX : curF n M m 1 ∘ₗ xJ E (Fin.last m) = Om' ∘ₗ curF n M m 1 := by
     have := hcnat 0
     rw [hnat, hxJ0] at this
     exact this
   obtain ⟨g1, hg1A, hg1⟩ := liftAdj hC E m g hgA
-  have hcurP : curF n M m 1 ∘ₗ (L.map fun r => xJ E (Fin.last m) -
-      algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod = PE ∘ₗ curF n M m 1 :=
+  have hcurP
+      : curF n M m 1 ∘ₗ (L.map fun r =>
+          xJ E (Fin.last m) - algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod
+        = PE ∘ₗ curF n M m 1 :=
     listSub_comp _ _ _ hcurX L
-  have hliftP : ∀ X : Module.End ℂ (TV n M (Fin m)), (∀ a b, Commute X (E' a b)) →
-      ∀ w, PE (lift X w) = lift X (PE w) := by
+  have hliftP
+      : ∀ X : Module.End ℂ (TV n M (Fin m)),
+        (∀ a b, Commute X (E' a b)) → ∀ w, PE (lift X w) = lift X (PE w) := by
     intro X hX w
     have h1 : Commute (lift X : Module.End ℂ (TV n (TV n M (Fin m)) (Fin 1))) Om' :=
       pmap_Om_lemma_3 (P := Fin 1) X E' E' (fun a b => (hX a b).eq) 0
     have h2 := LinearMap.congr_fun (listSub_commute Om' (lift X) h1.symm L).eq w
     simpa only [Module.End.mul_apply] using h2
-  have happend : ∀ y : TV n M (Fin (m + 1)),
-      y (fun _ => top) = curF n M m 1 y (fun _ => top) (fun _ => top) := by
+  have happend
+      : ∀ y : TV n M (Fin (m + 1)),
+        y (fun _ => top) = curF n M m 1 y (fun _ => top) (fun _ => top) := by
     intro y
     simp only [curF, LinearMap.pi_apply, LinearMap.proj_apply]
     congr 1
     funext i
     refine Fin.addCases (fun i => ?_) (fun j => ?_) i <;> simp
-  have hφ : ∀ x, ℓ (((L.map fun r => xJ E (Fin.last m) -
-      algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod * g1) x (fun _ => top)) =
-      ℓ' (PE (curF n M m 1 x) (fun _ => top)) := by
+  have hφ
+      : ∀ x,
+        ℓ
+            (((L.map fun r =>
+                  xJ E (Fin.last m) - algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod
+                * g1)
+              x (fun _ => top))
+          = ℓ' (PE (curF n M m 1 x) (fun _ => top)) := by
     intro x
     have h1 := LinearMap.congr_fun hcurP (g1 x)
     have h2 := LinearMap.congr_fun hg1 x
@@ -344,13 +530,14 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
     rfl
   have hkill' : PF * (OmF - algebraMap ℂ _ (l' (co (Fin.last m)))) = 0 :=
     listSub_kill OmF l' (co (Fin.last m)) hkill
-  have hlastkey : ∀ w, ℓ' (PE (Om' w) (fun _ => top)) =
-      l' (co (Fin.last m)) • ℓ' (PE w (fun _ => top)) := by
+  have hlastkey
+      : ∀ w, ℓ' (PE (Om' w) (fun _ => top)) = l' (co (Fin.last m)) • ℓ' (PE w (fun _ => top)) := by
     intro w
     have e1 : PE (Om' w) - l' (co (Fin.last m)) • PE w = PE (Om' w - l' (co (Fin.last m)) • w) := by
       rw [map_sub, map_smul]
-    have e2 : Q (Om' w - l' (co (Fin.last m)) • w) =
-        (OmF - algebraMap ℂ _ (l' (co (Fin.last m)))) (Q w) := by
+    have e2
+        : Q (Om' w - l' (co (Fin.last m)) • w)
+          = (OmF - algebraMap ℂ _ (l' (co (Fin.last m)))) (Q w) := by
       have := LinearMap.congr_fun hQOm w
       simp only [LinearMap.comp_apply] at this
       rw [map_sub, map_smul, this, LinearMap.sub_apply, Module.algebraMap_end_apply]
@@ -361,14 +548,17 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
       rw [hΦ, e2, e3]
       simp
     rw [← e1] at e4
-    have e5 : (PE (Om' w) - l' (co (Fin.last m)) • PE w) (fun _ => top) =
-        PE (Om' w) (fun _ => top) - l' (co (Fin.last m)) • PE w (fun _ => top) := rfl
+    have e5
+        : (PE (Om' w) - l' (co (Fin.last m)) • PE w) (fun _ => top)
+          = PE (Om' w) (fun _ => top) - l' (co (Fin.last m)) • PE w (fun _ => top) :=
+      rfl
     rw [e5, map_sub, map_smul, sub_eq_zero] at e4
     exact e4
   obtain ⟨hTFgl, hOmFc, -, -⟩ := hT n (TV n M (Fin m) ⧸ N0) (Fin 1) (F0 ()) hFgl Finset.univ
   have hPFtE : ∀ a b, PF ∘ₗ tE Finset.univ (F0 ()) a b = tE Finset.univ (F0 ()) a b ∘ₗ PF :=
     fun a b => (listSub_commute _ _ (hOmFc 0 (Finset.mem_univ _) a b) L).eq
-  have hWinv : ∀ a b, ∀ w ∈ LinearMap.range PF, tE Finset.univ (F0 ()) a b w ∈ LinearMap.range PF := by
+  have hWinv
+      : ∀ a b, ∀ w ∈ LinearMap.range PF, tE Finset.univ (F0 ()) a b w ∈ LinearMap.range PF := by
     rintro a b _ ⟨y, rfl⟩
     refine ⟨tE Finset.univ (F0 ()) a b y, ?_⟩
     have := LinearMap.congr_fun (hPFtE a b) y
@@ -382,30 +572,49 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
     intro y
     have h1 := LinearMap.congr_fun hkill' y
     have h2 := hOO y
-    simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply, map_sub, map_smul,
-      LinearMap.zero_apply] at h1 h2
+    simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply, map_sub,
+        map_smul, LinearMap.zero_apply]
+      at h1 h2
     rw [← h2]
     exact sub_eq_zero.mp h1
-  have hFW := hSq (LinearMap.range PF) (LinearMap.range PF)
-    (fun a b => (tE Finset.univ (F0 ()) a b).restrict (hWinv a b)) LinearMap.id hWinv hWO (co (Fin.last m))
-    Function.surjective_id (fun a b w => rfl) (fun w => by
-      obtain ⟨_, y, rfl⟩ := w
-      exact Subtype.ext (hWsc y))
-  have hWchar : ∀ u y, qdet (tE Finset.univ (F0 ())) u (PF y) =
-      (∏ k, (u + Function.update l' (co (Fin.last m)) (l' (co (Fin.last m)) + 1) k)) • PF y := by
+  have hFW :=
+    hSq (LinearMap.range PF) (LinearMap.range PF)
+      (fun a b => (tE Finset.univ (F0 ()) a b).restrict (hWinv a b))
+      LinearMap.id hWinv hWO (co (Fin.last m)) Function.surjective_id
+      (fun a b w => rfl)
+      (fun w => by
+        obtain ⟨_, y, rfl⟩ := w
+        exact Subtype.ext (hWsc y))
+  have hWchar
+      : ∀ u y,
+        qdet (tE Finset.univ (F0 ())) u (PF y)
+          = (∏ k, (u + Function.update l' (co (Fin.last m)) (l' (co (Fin.last m)) + 1) k))
+            • PF y := by
     intro u y
-    have hsub := LinearMap.congr_fun (qdet_comp (LinearMap.range PF).subtype
-      (fun a b => (tE Finset.univ (F0 ()) a b).restrict (hWinv a b)) (tE Finset.univ (F0 ()))
-      (fun a b => LinearMap.ext fun w => rfl) u) ⟨PF y, y, rfl⟩
+    have hsub :=
+      LinearMap.congr_fun
+        (qdet_comp (LinearMap.range PF).subtype
+          (fun a b => (tE Finset.univ (F0 ()) a b).restrict (hWinv a b))
+          (tE Finset.univ (F0 ()))
+          (fun a b => LinearMap.ext fun w => rfl)
+          u)
+        ⟨PF y, y, rfl⟩
     simp only [LinearMap.comp_apply] at hsub
     rw [hFW u] at hsub
     simpa using hsub.symm
-  refine ⟨(L.map fun r => xJ E (Fin.last m) -
-      algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod * g1, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    (L.map fun r => xJ E (Fin.last m) - algebraMap ℂ (Module.End ℂ (TV n M (Fin (m + 1)))) r).prod
+      * g1,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine Subalgebra.mul_mem _ (list_prod_mem ?_) hg1A
     intro x hx
     obtain ⟨r, -, rfl⟩ := List.mem_map.mp hx
-    exact Subalgebra.sub_mem _ (Algebra.subset_adjoin ⟨Fin.last m, rfl⟩) (Subalgebra.algebraMap_mem _ r)
+    exact Subalgebra.sub_mem _ (Algebra.subset_adjoin ⟨Fin.last m, rfl⟩)
+      (Subalgebra.algebraMap_mem _ r)
   · intro h0
     apply hnv hψ0 L hLlen
     refine LinearMap.ext fun v => ?_
@@ -442,8 +651,9 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
     have hq1 := LinearMap.congr_fun (qdet_comp (curF n M m 1) _ _ hctE u) x
     simp only [LinearMap.comp_apply] at hq1
     rw [hq1, hΦ, hΦ]
-    have hq2 := LinearMap.congr_fun (qdet_comp Q _ _
-      (pmap_tE_lemma_4 Finset.univ N0.mkQ E' (F0 ()) hFint) u) (curF n M m 1 x)
+    have hq2 :=
+      LinearMap.congr_fun (qdet_comp Q _ _ (pmap_tE_lemma_4 Finset.univ N0.mkQ E' (F0 ()) hFint) u)
+        (curF n M m 1 x)
     simp only [LinearMap.comp_apply] at hq2
     rw [hq2]
     have hq3 := LinearMap.congr_fun (qdet_comp PF _ _ hPFtE u) (Q (curF n M m 1 x))
@@ -464,8 +674,9 @@ theorem step (hT : TensorGl) (hC : Curry) (hS : StepChar) (hH : Height) (hW : Wa
 
 end ChainP
 
-theorem chain_of : TensorGl → JMComm → Curry → StepFormula → QdetFacts → StepChar → Height → WallQuot →
-    Chain := by
+theorem chain_of
+    : TensorGl → JMComm → Curry → StepFormula → QdetFacts → StepChar → Height → WallQuot
+      → Chain := by
   intro hT _ hC _ _ hS hH hW n M _ _ E hE l hl ℓ hℓ hWh top htop m
   induction m with
   | zero => intro co; exact ⟨1, ChainP.base E l hl ℓ hℓ top co⟩
@@ -476,3 +687,6 @@ theorem chain_of : TensorGl → JMComm → Curry → StepFormula → QdetFacts �
 end PositivityTheory.Rg.Cz
 
 end
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PChain =====

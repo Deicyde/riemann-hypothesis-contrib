@@ -5,8 +5,8 @@ public import Mathlib.AlgebraicGeometry.Noetherian
 public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.IsOpenOfMemIrreducibleComponentsOfFinite
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ExistsLineBundleExtension
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsProjectiveModel
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlueLineBundlesStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LbIsoOfDisjointCoverStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlueLineBundles
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LbIsoOfDisjointCover
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -127,11 +127,11 @@ theorem GlobalTheory.exists_lineBundle_extension_of_isDomain
         (pull_isLB hL _)
     exact ⟨M, hM, φ, hφ⟩
   choose M hM hML using key
-  obtain ⟨N, hN, hNM⟩ := GlobalTheory.T.exists_lineBundle_glue_disjoint_cover X A V hd hc M hM
+  obtain ⟨N, hN, hNM⟩ := _root_.GlobalTheory.glue_lineBundles X A V hd hc M hM
   refine ⟨
     N,
     hN,
-    GlobalTheory.T.lbIso_of_lbIso_on_disjoint_cover Y A
+    _root_.GlobalTheory.DisjointCoverLB.lbIso_of_disjoint_cover Y A
       (fun a => j ⁻¹ᵁ V a)
       (fun a b y ha hb => hd a b _ ha hb)
       (fun y => hc (j y))

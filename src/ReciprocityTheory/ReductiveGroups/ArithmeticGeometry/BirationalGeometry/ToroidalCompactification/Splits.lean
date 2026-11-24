@@ -107,7 +107,7 @@ private theorem pullU_comp_lemma
     {X Y Z : Scheme.{0}} (b : Z ⟶ Y) (a : Y ⟶ X) (W : X.Opens) (u : Γ(X, W)ˣ)
     : pullU b (a ⁻¹ᵁ W) (pullU a W u) = pullU (b ≫ a) W u := by
   apply Units.ext
-  first | (simp [pullU]; done) | (simp [pullU]; rfl) | rfl
+  first | (simp [pullU]; done) | (simp [pullU]; rfl)
 
 private theorem res_pullU_eq_mul_of_eq_of_eq
     {T Y P : Scheme.{0}} (W : Y.Opens) (u : Γ(Y, W)ˣ) (c : Γ(T, ⊤)ˣ) (F : P ⟶ T) (A S A' S' : P ⟶ Y)
@@ -131,13 +131,8 @@ theorem equivL
   rw [map_mul, pullU_res₂, pullU_res₂] at h'
   have key :=
     res_pullU_eq_mul_of_eq_of_eq W u c (b ≫ f₁) (b ≫ act₁) (b ≫ s₁) (act₂ ≫ a) (s₂ ≫ a) ha.symm
-      hs.symm (b.preimage_mono le₁) (b.preimage_mono t₁)
-      (by
-        first
-        | exact h'
-        | (rw [pullU_comp_lemma, pullU_comp_lemma, pullU_comp_lemma] at h'; exact h'))
-      le₂ t₂
-  first | exact key | (rw [pullU_comp_lemma, pullU_comp_lemma]; exact key)
+      hs.symm (b.preimage_mono le₁) (b.preimage_mono t₁) (by first | exact h') le₂ t₂
+  first | exact key
 
 theorem normL
     {S Y Z : Scheme.{0}} (e₁ : S ⟶ Y) (e₂ : S ⟶ Z) (a : Z ⟶ Y) (he : e₂ ≫ a = e₁) (W : Y.Opens)
@@ -147,10 +142,7 @@ theorem normL
         * res inf_le_right r
       = 1 := by
   subst he
-  first
-  | exact h
-  | (rw [pullU_comp_lemma]; exact h)
-  | (convert h using 4; exact pullU_comp_lemma e₂ a W u)
+  first | exact h
 
 theorem liftNC_comp₀
     {A B C X : Type} [CommRing A] [CommRing B] [CommRing C] [AddCommGroup X]
@@ -197,8 +189,7 @@ theorem liftNC_comp
   rw [← liftNC_comp₀]
   congr 1
   ext x
-  first | exact (key (Multiplicative.toAdd x)).symm | simpa using (key x).symm
-
+  first | exact (key (Multiplicative.toAdd x)).symm
 
 theorem isGt_of_iso (e : G₁ ≅ G₂) [IsMonHom e.hom] (h : E.IsGt G₁) : E.IsGt G₂ := by
   obtain ⟨d⟩ := h
@@ -317,7 +308,6 @@ theorem splitsAt
     (IntermediateField.isSeparable_adjoin_iff_isSeparable _ _).2
       (by rintro _ ⟨i, rfl⟩; exact sepσ _)
   have hmem : ∀ z : k, σ z ∈ k' := fun z => by
-
     rw [← bs.sum_repr z, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul, Algebra.smul_def,

@@ -45,8 +45,6 @@ import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.AbelianAt
 
 set_option autoImplicit false
 
-
-
 noncomputable section
 
 namespace GlobalTheory.RunJoin

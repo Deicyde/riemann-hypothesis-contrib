@@ -51,6 +51,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.tameHeckeChar_splitSupported_eq_prod_residue
     : ∀ (D : D7) (c : (AE D)ˣ →* Circle) (χ : Formalism.L2.Host.HChar D.host.E)
         (P : Finset (Pl D.host.E)) (e : AE D) (ρ : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ),
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.tameHeckeChar_splitSupported_eq_prod_residue
           (x : AE D) = e * a + (1 - e) → (a' : Lev.EAf D) = toEAf D a
             → (∀ PP ∈ P, (u PP : kP PP) = resS D.host.F PP a')
             → ((c x : Circle) : ℂ) = ∏ PP ∈ P, ((ρ PP (u PP) : ℂˣ) : ℂ) := by
-  first
-  | exact @GlobalTheory.TameSplitChar.char_eq_prod_res
-  | exact GlobalTheory.TameSplitChar.char_eq_prod_res
-  | (intros; apply GlobalTheory.TameSplitChar.char_eq_prod_res <;> assumption)
+  first | exact @GlobalTheory.TameSplitChar.char_eq_prod_res

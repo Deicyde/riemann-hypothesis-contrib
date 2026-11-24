@@ -352,7 +352,7 @@ theorem degLift_of (hL : LiftDegAll) : KB.DegLift := by
       simp only [smul_eq_mul]
   have hinj : ∀ a, Function.Injective (fun i => grid (Fin.rev a) i) := fun a => hgrid _
   have hE :=
-    Formalism.FourierDecayAlt.P.extract_K_bound ℂ K (2 * (j - s) + s)
+    _root_.Formalism.FourierDecayAlt.P.LagrangeExtraction.extractK ℂ K (2 * (j - s) + s)
       (fun _ => (-1 : ℂ) ^ (s - 1) * (t⁻¹ - t'⁻¹))
       W
       (fun a => grid (Fin.rev a))

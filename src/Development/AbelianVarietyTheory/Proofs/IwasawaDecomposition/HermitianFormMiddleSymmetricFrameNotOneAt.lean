@@ -104,7 +104,7 @@ theorem GlobalTheory.Mem.SymChar.Resid.hA_bw_symVec_not_ewAt
     have e
         : ((Fin.rev (⟨j.1 - D.R.rS, by omega⟩ : Fin D.R.k)) = m)
           ↔ j.val = D.R.rS + D.R.k - 1 - m.val := by
-      rw [Fin.ext_iff, Fin.val_rev]; simp only [Fin.val_mk]; constructor <;> intro h <;> omega
+      rw [Fin.ext_iff, Fin.val_rev]; simp only; constructor <;> intro h <;> omega
     have := hB (Fin.rev ⟨j.1 - D.R.rS, by omega⟩)
     by_cases h' : j.val = D.R.rS + D.R.k - 1 - m.val
     · rw [if_pos h']; rwa [if_pos (e.2 h')] at this

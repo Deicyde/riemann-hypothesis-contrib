@@ -47,6 +47,7 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.axesO1_of_projective_rank_cup
     : (∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ),
         IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.axesO1_of_projective_rank_cup
             ∧ ∃ e : ⋀[R]^2 (HO1 A.hom) ≃ₗ[R] GlobalTheory.CatCoh.H2 (OAff A.hom), ∀ a b,
               e (exteriorPower.ιMulti R 2 ![a, b]) = GlobalTheory.CatCoh.cup (OAff A.hom) a b)
       → AxesVanishingStructureSheafDegOne := by
-  first
-  | exact @GlobalTheory.Obs.axesO1_of_cohomology_structure
-  | exact GlobalTheory.Obs.axesO1_of_cohomology_structure
-  | (intros; apply GlobalTheory.Obs.axesO1_of_cohomology_structure <;> assumption)
+  first | exact @GlobalTheory.Obs.axesO1_of_cohomology_structure

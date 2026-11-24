@@ -63,6 +63,7 @@ theorem push_injective {S S' : Scheme.{0}} (A : Over S) [GrpObj A] (x : S' ⟶ S
   · exact h'
   · exact (Over.w a).trans (Over.w b).symm
 
+set_option synthInstance.maxHeartbeats 200000 in
 theorem locally_const_torsion
     : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A],
       IsAbelianScheme A
@@ -112,7 +113,8 @@ theorem locally_const_torsion
   have hDE
       : D ≫ GlobalTheory.PointQuot.constDesc (fun c : P => c.1) = Sigma.desc (fun c : P => c.1) :=
     Sigma.hom_ext _ _ fun c => by
-      rw [← Category.assoc, Sigma.ι_desc, Sigma.ι_desc, GlobalTheory.PointQuot.constPt_desc]
+      rw [← Category.assoc, Sigma.ι_comp_desc, Sigma.ι_comp_desc,
+        GlobalTheory.PointQuot.constPt_desc]
   obtain ⟨U, hwU, c, hc⟩ := GlobalTheory.PointQuot.locally_const_desc (fun c : P => c.1) (g ≫ D) w
   have hU : GlobalTheory.PointQuot.openι Z' U ≫ z' = toUnit _ ≫ c.1 := by
     rw [← hc, ← hgz, ← hDE]

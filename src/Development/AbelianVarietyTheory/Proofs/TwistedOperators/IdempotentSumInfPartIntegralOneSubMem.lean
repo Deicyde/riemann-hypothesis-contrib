@@ -57,8 +57,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-
-
 namespace GlobalTheory.IdemSumIdeal
 
 section Generic
@@ -136,7 +134,6 @@ theorem isIdemSum_props
   intro D e P d h
   obtain ⟨⟨es, hes, he⟩, -⟩ := id h
   have hint : toEAf D e ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
-
     rw [he, map_sum]
     exact sum_mem fun w hw => (idemOf_toEAf (hes w hw)).mem
   refine ⟨?_, hint, ?_⟩

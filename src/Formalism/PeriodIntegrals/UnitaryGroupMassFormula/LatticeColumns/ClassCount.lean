@@ -121,7 +121,7 @@ theorem classCountStep_of
   have htriv := hS X hb hK u hGF hL hStab
   have hneC : Nonempty (Formalism.L2.SG.ColsDim.Classes (PoincareSetting.iotaF X u)
       (PoincareSetting.Ku X u hK)) := by
-    first | infer_instance | exact ⟨Quotient.mk _ 1⟩ | exact ⟨DoubleCoset.mk _ _ 1⟩
+    first | infer_instance
   have hpos : 0 < Nat.card (ClsHA X hb u) := by
     rw [← hcard]
     exact Nat.card_pos

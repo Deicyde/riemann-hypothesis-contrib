@@ -71,7 +71,4 @@ theorem _root_.GlobalTheory.T.annihilationOperator_schroedingerFunctions_doubled
                                       (annih (heisO ψ (dblSp A) B) θ τ (cplxO (s' τ) (sB τ))
                                         (X * (dblDec A).qX.map (tauE D τ)) f)
                                     = annS B l sB θ τ X (sch ψ A B ν 𝓨 f) := by
-  first
-  | exact @GlobalTheory.StdUnnAnnih.annih_sch
-  | exact GlobalTheory.StdUnnAnnih.annih_sch
-  | (intros; apply GlobalTheory.StdUnnAnnih.annih_sch <;> assumption)
+  first | exact @GlobalTheory.StdUnnAnnih.annih_sch

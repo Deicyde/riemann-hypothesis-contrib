@@ -69,10 +69,7 @@ theorem repr_transport
     rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Module.Basis.mk_apply, Function.comp_apply]
-    first
-    | exact LinearMap.map_smulₛₗ ι (b.repr x i) (b i)
-    | exact map_smulₛₗ ι (b.repr x i) (b i)
-    | simp
+    first | exact LinearMap.map_smulₛₗ ι (b.repr x i) (b i)
   rw [hx, Module.Basis.repr_sum_self]
 
 theorem charpoly_transport_basis

@@ -156,7 +156,7 @@ theorem isLTNorm_congr
     (l : ℕ) [Fact l.Prime]
     (ι : ℂ ≃+* ℂ_[l]) (g2 g3 s2 ε : MaximalUnramifiedExtension l)
     : IsLTNorm l L ι g2 g3 s2 ε ↔ IsLTNorm l L' ι g2 g3 s2 ε := by
-  obtain ⟨-, -, -, -, hs, -, -, h2, h3⟩ := Formalism.L2.Th1.F.latticeOnly L L' h
+  obtain ⟨-, -, -, -, hs, -, -, h2, h3⟩ := _root_.Formalism.L2.Th1.F.lattice_only L L' h
   unfold IsLTNorm
   rw [h2, h3, hs]
 
@@ -166,7 +166,7 @@ theorem th0Char_congr
     {x : ℂ} (hx : x ∈ L'.lattice)
     : Formalism.L2.Th1.F.thetaZeroCharacter L ω₀ x
       = Formalism.L2.Th1.F.thetaZeroCharacter L' ω₀' x := by
-  obtain ⟨-, -, -, hA, -, -, -, -, -⟩ := Formalism.L2.Th1.F.latticeOnly L L' h
+  obtain ⟨-, -, -, hA, -, -, -, -, -⟩ := _root_.Formalism.L2.Th1.F.lattice_only L L' h
   obtain ⟨k, hk⟩ := Formalism.L2.Th1.F.altEInt L' x ((ω₀ - ω₀') / 2) hx hω
   have e0
       : x * (starRingEnd ℂ) ω₀ / (Formalism.L2.Th1.F.area L' : ℂ)

@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsTied
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
   Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain

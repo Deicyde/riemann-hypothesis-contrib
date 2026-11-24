@@ -55,8 +55,6 @@ open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.PlaceRead
 
 variable {D : D7}

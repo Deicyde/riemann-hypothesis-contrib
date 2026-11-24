@@ -73,12 +73,6 @@ theorem hermC_move
   rw [CompactEntryBounds.hermC_expand X, CompactEntryBounds.hermC_expand X₂]
   simp only [hγ, Matrix.one_mulVec]
 
-theorem col_mul (A Y : Matrix (Fin r) (Fin r) ℂ) (c : Fin r)
-    : ReciprocityTheory.ChartRestriction.G.FD.col (A * Y) c
-      = A *ᵥ ReciprocityTheory.ChartRestriction.G.FD.col Y c := by
-  funext i
-  simp [ReciprocityTheory.ChartRestriction.G.FD.col, Matrix.mul_apply, Matrix.mulVec, dotProduct]
-
 theorem gram_move
     (X X₂ : Data E r)
     {γ : Matrix (Fin r) (Fin r) E} (hγ : ∀ v w, herm X.Gm (γ *ᵥ v) (γ *ᵥ w) = herm X₂.Gm v w)
@@ -87,7 +81,8 @@ theorem gram_move
       = ReciprocityTheory.ChartRestriction.G.FD.gram τ X₂.Gm Y := by
   ext a b
   simp only [ReciprocityTheory.ChartRestriction.G.FD.gram, Matrix.of_apply]
-  rw [col_mul, col_mul, hermC_move X X₂ hγ]
+  rw [_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.col_mul,
+    _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.col_mul, hermC_move X X₂ hγ]
 
 def majM
     (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
@@ -120,7 +115,8 @@ theorem majM_move
     (M : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → ℂ)
     : majM τ X.Gm p hp (γ.map τ * M) (γ.map τ *ᵥ v) = majM τ X₂.Gm p hp M v := by
   unfold majM
-  simp only [col_mul, hermC_move X X₂ hγ, gram_move X X₂ hγ]
+  simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.col_mul, hermC_move X X₂ hγ,
+    gram_move X X₂ hγ]
 
 theorem maj_move
     (X X₂ : Data E r)

@@ -50,6 +50,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heckeCharacterisation_places_of_weakCharacterisation
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.heckeCharacterisation_places_of_weakCharacterisati
                 ∧ (conjPl P ≠ P → ∃ P0 ∈ A3.A.ok A3.A.μ0, R.pl P0 = P))
           ∧ (∀ c, R.EEc c = EEc R.toRealDat R.SF c) ∧ (∀ i c, R.Wc' i c = Wcc R.toRealDat R.SF i c)
           ∧ (A3.A.ok A3.A.μ0).Nonempty := by
-  first
-  | exact @GlobalTheory.CoreThree.heckeCharacterisation_places_parts_of_weak
-  | exact GlobalTheory.CoreThree.heckeCharacterisation_places_parts_of_weak
-  | (intros; apply GlobalTheory.CoreThree.heckeCharacterisation_places_parts_of_weak <;> assumption)
+  first | exact @GlobalTheory.CoreThree.heckeCharacterisation_places_parts_of_weak

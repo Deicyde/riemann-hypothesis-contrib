@@ -175,7 +175,7 @@ theorem hat_e_eq
 theorem conjP_coeff {G : Type} [Group G] (P γ : G) (a : MonoidAlgebra ℂ G)
     : (MonoidAlgebra.single P 1 * a * MonoidAlgebra.single P⁻¹ 1).coeff γ
       = a.coeff (P⁻¹ * γ * P) := by
-  simp [MonoidAlgebra.single_mul_apply, MonoidAlgebra.mul_single_apply, mul_assoc]
+  simp [mul_assoc]
 
 theorem Ehat_eq
     (P : G0g D.nd) (ψ : ∀ kv : (Σ k : Fin 2, D.nd.PlG k), AddChar (ZMod (D.host.g kv.1)) ℂ)

@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsGenOfIn
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsMemNonzeroLocus
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LamIsoOfPairings
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LbIsoCubeLBOfWeilIsAdjoint
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SeesawTrivialityOnDenseFibresProductAbelianStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SeesawTrivialityOnDenseFibresProductAbelian
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -165,8 +167,8 @@ theorem exists_gen_fibre
             rw [← e₀, Over.comp_left, Category.assoc]))
         refine (Fintype.prod_sum_type _).trans ?_
         simp only [Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_succ, Fin.prod_univ_zero,
-          Matrix.cons_val_zero, Matrix.cons_val_succ, ← Over.comp_left, e₁, e₂, e₃, Category.assoc,
-          zpow_neg, zpow_one, _root_.mul_one]
+          Matrix.cons_val_zero, Matrix.cons_val_succ, ← Over.comp_left, e₁, e₂, e₃, zpow_neg,
+          zpow_one, _root_.mul_one]
         ac_rfl)
       (LB.mulGen P.L _ _ _ _ (LB.pullGen P.L _ _ u₀ (lift (toUnit Y) f₂).left)
         (LB.pullGen P.L _ _ σ (toUnit Y).left))
@@ -220,7 +222,7 @@ theorem lamEq_of_weilEq
           (fun h => by rw [reassoc_of% h, MonObj.one_comp])
           (fun h => by rw [reassoc_of% h, MonObj.one_comp]))
     exact exists_gen_div _ _ _ _ _ _ _ (lbIso_of_gens A.isLB B.isLB _ _ _ _ u hu u' hu')
-  refine T.seesaw_triviality_on_dense_fibres_product_abelian hL.globalFns k X.A Y.A
+  refine _root_.GlobalTheory.triv_of_triv_on_dense_fibres_prod_abelian hL.globalFns k X.A Y.A
     (LB.div (LB.LinComb B.L (sqφ (fst X.A Y.A ≫ g₁) (snd X.A Y.A ≫ g₂)) sqε)
       (LB.LinComb A.L (sqφ (fst X.A Y.A ≫ f₁) (snd X.A Y.A ≫ f₂)) sqε))
     Y.L X.isAb Y.isAb Y.isLB Y.ample

@@ -46,6 +46,7 @@ import Mathlib.Topology.Sheaves.Init
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.GlobalTheory.T.besselCharacter_unipotentRadical_properties
     : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ),
       Formalism.QuantumDeterminants.inWb k r z
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.besselCharacter_unipotentRadical_properties
               g * g' ∈ Formalism.QuantumDeterminants.UWset k r z
                 ∧ g⁻¹ ∈ Formalism.QuantumDeterminants.UWset k r z ∧ g ∈ GG k r)
           ∧ ∀ m ∈ Formalism.QuantumDeterminants.Nset k r, m ∈ GG k r := by
-  first
-  | exact @GlobalTheory.BesselPsi.psi_character
-  | exact GlobalTheory.BesselPsi.psi_character
-  | (intros; apply GlobalTheory.BesselPsi.psi_character <;> assumption)
+  first | exact @GlobalTheory.BesselPsi.psi_character

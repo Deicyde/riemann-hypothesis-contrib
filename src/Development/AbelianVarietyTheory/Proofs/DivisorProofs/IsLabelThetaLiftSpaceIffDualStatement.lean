@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.isLabel_thetaLiftSpace_iff_dual
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.isLabel_thetaLiftSpace_iff_dual
           Good R A.μ0 P
             → (IsLab (Wc D i) P d ↔ IsLab (Yc D 0) P (dualLab d))
               ∧ (IsLab (Wc D i) P d ↔ IsLab (Yc D 0) P d) := by
-  first
-  | exact @GlobalTheory.LabEq.isLab_W_iff
-  | exact GlobalTheory.LabEq.isLab_W_iff
-  | (intros; apply GlobalTheory.LabEq.isLab_W_iff <;> assumption)
+  first | exact @GlobalTheory.LabEq.isLab_W_iff

@@ -44,6 +44,7 @@ open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRes
   Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory GlobalTheory.DeRham GlobalTheory.Cris
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.kodairaSpencerRow_dual_eigenvector_mem_span_field
     : ∀ {K : Type} [Field K] {A : Over (Sp K)} [GrpObj A] [IsCommMonObj A]
         {A' : Over (Sp (DualNumber K))} [GrpObj A'] {i : A.left ⟶ A'.left}
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.kodairaSpencerRow_dual_eigenvector_mem_span_field
               (∀ z, χ τb (cO z) = χ τ z)
                 → ∀ (j : Fin (m τb)), ∃ cf : Fin (m τ) → K, ∃ w,
                   IsLieComb cf (ub τ) w ∧ GlobalTheory.FlagTan.IsKSRow h ψ hb ⟨τb, j⟩ w := by
-  first
-  | exact @GlobalTheory.KSExist.ksRow_exists_lieComb
-  | exact GlobalTheory.KSExist.ksRow_exists_lieComb
-  | (intros; apply GlobalTheory.KSExist.ksRow_exists_lieComb <;> assumption)
+  first | exact @GlobalTheory.KSExist.ksRow_exists_lieComb

@@ -45,6 +45,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.exists_unique_admissible_localComponent_definiteUnitary
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
       Unr E
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.exists_unique_admissible_localComponent_definiteUn
                           IsOpen (U : Set (UL n w)) → FiniteDimensional ℂ (fixed σ.ρ U))
                     ∧ ∀ σ σ' : SmIrr (UL n w),
                       IsCompU π w σ → IsCompU π w σ' → Nonempty (σ.ρ.Equiv σ'.ρ) := by
-  first
-  | exact @GlobalTheory.BCT.LocCompU.exists_unique_locComp
-  | exact GlobalTheory.BCT.LocCompU.exists_unique_locComp
-  | (intros; apply GlobalTheory.BCT.LocCompU.exists_unique_locComp <;> assumption)
+  first | exact @GlobalTheory.BCT.LocCompU.exists_unique_locComp

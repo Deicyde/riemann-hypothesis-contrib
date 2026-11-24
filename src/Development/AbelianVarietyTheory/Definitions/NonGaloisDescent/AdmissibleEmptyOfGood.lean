@@ -66,9 +66,6 @@ open Formalism.IndefR.Links (PolF)
 open Formalism.L2.NTheta (IsIdemAt)
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.ExportSeries
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -536,8 +533,8 @@ theorem exists_frame_good
       show IsLocalization.IsInteger (𝓞 D.host.E) (pairing x ((d : 𝓞 D.host.E) • y))
       have hscale (z : Fin V.rank → D.host.E)
           : pairing z ((d : 𝓞 D.host.E) • y) = (d : 𝓞 D.host.E) • pairing z y := by
-        simp only [pairing, Pi.smul_apply, Algebra.smul_def, Finset.mul_sum, Finset.sum_mul,
-          mul_assoc, mul_left_comm, mul_comm]
+        simp only [pairing, Pi.smul_apply, Algebra.smul_def, Finset.sum_mul, mul_assoc,
+          mul_left_comm, mul_comm]
       rw [hscale]
       refine Submodule.span_induction
         (p := fun z _ => IsLocalization.IsInteger (𝓞 D.host.E) ((d : 𝓞 D.host.E) • pairing z y))
@@ -566,7 +563,7 @@ theorem exists_frame_good
   obtain ⟨βS, hβS⟩ := GlobalTheory.AdelicFrame.exists_isFrame (F := D.host.F) _ dS.1.fg (hsp S dS)
   obtain ⟨βT, hβT⟩ := GlobalTheory.AdelicFrame.exists_isFrame (F := D.host.F) _ dT.1.fg (hsp T dT)
   obtain ⟨f₀, hf₀⟩ :=
-    GlobalTheory.Member.vacuum_oriented_exists D ψ θ hψ hθ S T
+    _root_.GlobalTheory.VacuumO.vacExists D ψ θ hψ hθ S T
       (fun _ => 1)
       sT hS hT
       (fun τ => GlobalTheory.GalLift.Vec.isCartanInv_one (hBS τ))

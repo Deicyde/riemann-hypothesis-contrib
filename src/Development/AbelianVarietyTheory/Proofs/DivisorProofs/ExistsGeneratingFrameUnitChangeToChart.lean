@@ -207,7 +207,8 @@ theorem exists_keyAt_units
         (fun j => (hv' j).trans (by rw [hF]; rfl))
         (hMat i)).2 (hvv' i)
     rw [← Category.assoc, e, Category.assoc, hvM, FlagMod.ev_spMap _ yt M.U hz,
-      FlagMod.dualMap_comp, KeyAtBC.spMap_comp₀, Category.assoc]
+      FlagMod.dualMap_comp, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp,
+      Category.assoc]
     rfl
 
 end GlobalTheory.KeyFramePoint

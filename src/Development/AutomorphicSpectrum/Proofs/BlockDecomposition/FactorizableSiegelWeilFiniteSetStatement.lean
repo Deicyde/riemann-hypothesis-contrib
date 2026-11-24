@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.factorizable_siegel_weil_finite_set
                   GlobalTheory.Published.SiegelOneVector.IsSchwartzArch φ
                     → (∀ v, IsCompact (A v) ∧ IsOpen (A v)) → (∀ v, v ∉ S → A v = latV b v)
                     → GlobalTheory.Published.SiegelOneVector.IsSchwartzBruhat (pureN φ A) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.WhitFree.pureN_isSchwartzBruhat
-  | exact GlobalTheory.CompanionTheory.WhitFree.pureN_isSchwartzBruhat
-  | (intros; apply GlobalTheory.CompanionTheory.WhitFree.pureN_isSchwartzBruhat <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.WhitFree.pureN_isSchwartzBruhat

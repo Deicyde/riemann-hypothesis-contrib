@@ -548,11 +548,6 @@ end Formalism.FourierDecayAlt.P.Qx8
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.Qx8
-
-attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
-
 end Formalism.FourierDecayAlt.P
 
 namespace Formalism.FourierDecayAlt.P.Qx8
@@ -1943,14 +1938,6 @@ theorem cd_tL (hU₀ : IsOpen U₀) (z z' : Fin (2 * r + k + 1) → ℂ) (Y : �
 
 end CDentries
 
-section Germ
-
-open Topology
-
-variable {m : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-
-end Germ
-
 section FamMod
 
 open Topology
@@ -2009,19 +1996,6 @@ theorem tl_comb
 
 end FamRing
 
-section Step
-
-open Topology Formalism.YangianSpanCharacter.T
-
-variable
-  {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type}
-  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
-  {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
-
-variable {i : Fin (r + 1)} {Dc : (Fin r → ℂ) → Set (Mx k r)}
-
-end Step
-
 section Final
 
 open Topology Formalism.YangianSpanCharacter.T
@@ -2053,11 +2027,6 @@ end Formalism.FourierDecayAlt.P.Qx8
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.Qx8
-
-attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
-
 end Formalism.FourierDecayAlt.P
 
 namespace Formalism.FourierDecayAlt.P.Qx8
@@ -2066,19 +2035,6 @@ open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
   Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
-
-section OneParam
-
-open Topology intervalIntegral
-
-variable {W : Type*} [NormedAddCommGroup W] [NormedSpace ℂ W] [CompleteSpace W]
-
-theorem oneParam_diff
-    (φ : ℝ → (W →L[ℂ] W)) (hc : Continuous φ) (h0 : φ 0 = 1) (hadd : ∀ s t, φ (s + t) = φ s * φ t)
-    : DifferentiableAt ℝ φ 0 :=
-  _root_.UpperTheory.Reformulated.B.OneParameterGroupDifferentiableAtZero.main φ hc h0 hadd
-
-end OneParam
 
 section RepDer
 
@@ -2203,7 +2159,7 @@ theorem rep_hasDeriv
     have := lcurve_cont X (1 : Mx k r)
     simpa only [Matrix.mul_one] using this
   have hφ :=
-    oneParam_diff
+    _root_.UpperTheory.Reformulated.B.OneParameterGroupDifferentiableAtZero.main
       (fun t : ℝ => π (NormedSpace.exp ((t : ℂ) • X)))
       (hcont.comp_continuous hce hX) (by simp [NormedSpace.exp_zero, hrep.1])
       (fun s t => by
@@ -2800,34 +2756,8 @@ theorem frame_sub
 
 end Spectral
 
-section Core
-
-open Formalism.FourierDecayAlt.M
-
-variable
-  {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type}
-  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
-  {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
-
-end Core
-
-section Core2
-
-open Formalism.FourierDecayAlt.M
-
-variable
-  {Wp Wq : Type}
-  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
-
-end Core2
-
 end Formalism.FourierDecayAlt.P.Qx8
 
 namespace Formalism.FourierDecayAlt.P
-
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.Qx8
-
-attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 end Formalism.FourierDecayAlt.P

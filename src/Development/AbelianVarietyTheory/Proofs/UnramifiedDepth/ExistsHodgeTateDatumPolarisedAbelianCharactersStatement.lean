@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_hodgeTateDatum_polarisedAbelian_characters
     : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
         (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
@@ -71,7 +72,4 @@ theorem _root_.GlobalTheory.T.exists_hodgeTateDatum_polarisedAbelian_characters
                           lin (fun j => MvPowerSeries.map io (α a j)) * S = S * H.ρL (1 ⊗ₜ[ℤ] a))
                         ∧ ∀ i, ∃ u : PS O 1 g,
                           IsCh (F.mapF io) u ∧ Sᵀ *ᵥ dl u = fun l => H.Ht l i := by
-  first
-  | exact @GlobalTheory.ChF.exists_htd_characters_base
-  | exact GlobalTheory.ChF.exists_htd_characters_base
-  | (intros; apply GlobalTheory.ChF.exists_htd_characters_base <;> assumption)
+  first | exact @GlobalTheory.ChF.exists_htd_characters_base

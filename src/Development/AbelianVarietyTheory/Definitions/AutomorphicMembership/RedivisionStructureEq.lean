@@ -79,7 +79,6 @@ def New.ofDiv (D : D7) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V)
     : New D :=
   ⟨SNew.self D, N, h⟩
 
-
 def reX (X : HidaSetting D) : HidaSetting (reD D Z) := { X with }
 
 end GlobalTheory.Mem.SRe

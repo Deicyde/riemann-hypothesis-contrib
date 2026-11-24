@@ -68,7 +68,7 @@ theorem wt_pos {a b : WithTop ℤ} (ha : 0 ≤ a) (hb : 0 < b) : 0 < a + b := by
     (0 : WithTop ℤ)
       < b := hb
     _ = 0 + b := (zero_add b).symm
-    _ ≤ a + b := by first | exact add_le_add_right ha b | exact add_le_add_left ha b | gcongr
+    _ ≤ a + b := by first | exact add_le_add_left ha b
 
 theorem wt_nonneg_of_add {a b c : WithTop ℤ} (hb : b ≠ ⊤) (h : a + b = c) (hc : b ≤ c) : 0 ≤ a := by
   induction b using WithTop.recTopCoe with
@@ -88,7 +88,6 @@ variable {F : Type*} [Field F] (v : AddValuation F (WithTop ℤ))
 private lemma mem_iff_lemma (y : F) : y ∈ vRing v ↔ 0 ≤ v y := by
   first
     | exact Iff.rfl
-    | exact Valuation.mem_valuationSubring_iff _ _
 
 theorem val_eq_zero_of_isUnit (x : vRing v) (hx : IsUnit x) : v (x : F) = 0 := by
   obtain ⟨y, hy⟩ := hx.exists_right_inv
@@ -113,10 +112,7 @@ theorem isUnit_of_val_eq_zero (x : vRing v) (hx : v (x : F) = 0) : IsUnit x := b
     apply Subtype.ext
     show (x : F) * (x : F)⁻¹ = 1
     exact mul_inv_cancel₀ hx0
-  first
-  | exact IsUnit.of_mul_eq_one _ hmul
-  | exact isUnit_of_mul_eq_one x _ hmul
-  | exact ⟨⟨x, _, hmul, by rw [mul_comm]; exact hmul⟩, rfl⟩
+  first | exact IsUnit.of_mul_eq_one _ hmul
 
 theorem mem_max_iff (x : vRing v) : x ∈ maximalIdeal (vRing v) ↔ 0 < v (x : F) := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
@@ -172,9 +168,6 @@ theorem val_eval_eq_zero
         conv_rhs => rw [P.as_sum]
         rfl
       )
-    | exact MvPolynomial.mem_range_map_iff_coeffs_subset.2 (fun c hc' => by
-        obtain ⟨β, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hc'
-        exact ⟨⟨_, hc β⟩, rfl⟩)
 
   have hQ1
       : ((MvPolynomial.eval₂
@@ -190,14 +183,14 @@ theorem val_eval_eq_zero
         (ReciprocityTheory.MultiplicativeHeights.comapInclusion (vRing w) (algebraMap Ω U))
         (fun s => (⟨t s, ht s⟩ : vRing w))
         P₀
-    first | exact h2 | (rw [← h2]; rfl)
+    first | exact h2
   have hhom
       : (residue (vRing w)).comp
           (ReciprocityTheory.MultiplicativeHeights.comapInclusion (vRing w) (algebraMap Ω U))
         = (algebraMap (ResidueField ((vRing w).comap (algebraMap Ω U)))
           (ResidueField (vRing w))).comp (residue ((vRing w).comap (algebraMap Ω U))) := by
     ext x
-    first | rfl | exact (IsLocalRing.ResidueField.map_residue _ _).symm
+    first | rfl
   have hkey
       : MvPolynomial.aeval
           (fun s => residue (vRing w) ⟨t s, ht s⟩)
@@ -229,7 +222,7 @@ theorem val_eval_eq_zero
     rw [← hkey]
     intro h0
     apply hne0
-    first | exact algebraicIndependent_iff.1 hind _ h0 | exact hind (by rw [h0, map_zero])
+    first | exact algebraicIndependent_iff.1 hind _ h0
   have h5 := (residue_ne_zero_iff w _).1 hne
   rw [hQ1] at h5
   exact h5
@@ -245,9 +238,7 @@ theorem exists_val_coeff
     : ∃ c : Ω, c ≠ 0 ∧ w (MvPolynomial.aeval t P) = w (algebraMap Ω U c) := by
   classical
   have hsupp : P.support.Nonempty := by
-    first
-    | exact Finsupp.support_nonempty_iff.2 hP
-    | (rw [Finset.nonempty_iff_ne_empty, Ne, MvPolynomial.support_eq_empty]; exact hP)
+    first | (rw [Finset.nonempty_iff_ne_empty, Ne, MvPolynomial.support_eq_empty]; exact hP)
 
   obtain ⟨β₀, hβ₀, hmin⟩ :=
     Finset.exists_min_image P.support (fun β => w (algebraMap Ω U (P.coeff β))) hsupp

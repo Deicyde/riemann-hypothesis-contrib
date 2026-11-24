@@ -49,6 +49,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.sphericalOperator_eigenvalues_determined_by_params
     : ∀ (D : D7) (V : HSp D) (J : Set (GA D V)) (χ : GA D V → ℂ)
         (Sb : Finset (HeightOneSpectrum (𝓞 D.host.F))),
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.sphericalOperator_eigenvalues_determined_by_params
           ∀ f : GA D V → ℂ,
             GlobalTheory.LFun.IsParamFunV V Sb f B
               → ∀ P d R, Hecke₂ V J χ Sb P d R → heckeLin V R f = a P d • f := by
-  first
-  | exact @GlobalTheory.ParamEigen.eig_of_param
-  | exact GlobalTheory.ParamEigen.eig_of_param
-  | (intros; apply GlobalTheory.ParamEigen.eig_of_param <;> assumption)
+  first | exact @GlobalTheory.ParamEigen.eig_of_param

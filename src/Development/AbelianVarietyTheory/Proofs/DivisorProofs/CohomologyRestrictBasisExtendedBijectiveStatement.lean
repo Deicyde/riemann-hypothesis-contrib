@@ -48,6 +48,7 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.cohomology_restrict_basis_extended_bijective
     : ∀ (R₀ R₁ : Type) [CommRing R₀] [CommRing R₁] [Algebra R₀ R₁] (X : Scheme.{0}) (s : X ⟶ Sp R₀)
         (C' : Type) [Category.{0} C'] [Quiver.IsThin C'] (G : C' ⥤ AffOp X),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.cohomology_restrict_basis_extended_bijective
                 ∧ (G.obj t₃).unop.1 ≤ U)
         → Function.Bijective (extMap R₁ (CoefMap.restrict (OAff s) G)).pull1
           ∧ Function.Bijective (extMap R₁ (CoefMap.restrict (OAff s) G)).pull2 := by
-  first
-  | exact @GlobalTheory.Obs.BasisExt.restrict_ext_bijective
-  | exact GlobalTheory.Obs.BasisExt.restrict_ext_bijective
-  | (intros; apply GlobalTheory.Obs.BasisExt.restrict_ext_bijective <;> assumption)
+  first | exact @GlobalTheory.Obs.BasisExt.restrict_ext_bijective

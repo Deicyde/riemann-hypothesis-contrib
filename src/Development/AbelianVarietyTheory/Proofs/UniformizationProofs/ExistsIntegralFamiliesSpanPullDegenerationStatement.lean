@@ -86,7 +86,4 @@ theorem _root_.GlobalTheory.T.exists_integral_families_span_pullDegeneration
                               = (∏ κ, Geo.Tor.gw hD.w (r ≫ (D'.famφB x) κ) z (p κ) (q κ) ^ (DegPre.famε k) κ).val
                                 * Geo.Tor.gs r z (LB.wchart D'.P.L (D'.famφB x) q) ((f' i x).f q))))
                   ∧ Submodule.span (FractionRing R') (Set.range F') = ⊤ := by
-  first
-  | exact @GlobalTheory.FamSpan.exists_span
-  | exact GlobalTheory.FamSpan.exists_span
-  | (intros; apply GlobalTheory.FamSpan.exists_span <;> assumption)
+  first | exact @GlobalTheory.FamSpan.exists_span

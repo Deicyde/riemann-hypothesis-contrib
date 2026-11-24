@@ -50,9 +50,11 @@ open PowerSeries GlobalTheory.CycFr
 
 namespace GlobalTheory.CycFr
 
-theorem padicInt_algebraMap_injective_of_charZero {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O]
-    [IsDomain O] [CharZero O] [Algebra ℤ_[l] O] : Function.Injective (algebraMap ℤ_[l] O) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem padicInt_algebraMap_injective_of_charZero
+    {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Algebra ℤ_[l] O]
+    : Function.Injective (algebraMap ℤ_[l] O) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   by_contra hx0
   rw [PadicInt.unitCoeff_spec hx0, map_mul, map_pow, map_natCast] at hx
@@ -61,16 +63,18 @@ theorem padicInt_algebraMap_injective_of_charZero {l : ℕ} [Fact l.Prime] (O : 
   have hp : (l : O) ^ x.valuation = 0 := (mul_eq_zero.1 hx).resolve_left hu.ne_zero
   exact (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero) (pow_eq_zero_iff'.1 hp).1
 
-theorem exists_eq_X_pow_mul_of_ne_zero {O : Type} [CommRing O] {a : O⟦X⟧} (ha : a ≠ 0) :
-    ∃ (m : ℕ) (w : O⟦X⟧), a = X ^ m * w ∧ constantCoeff w ≠ 0 := by
+theorem exists_eq_X_pow_mul_of_ne_zero {O : Type} [CommRing O] {a : O⟦X⟧} (ha : a ≠ 0)
+    : ∃ (m : ℕ) (w : O⟦X⟧), a = X ^ m * w ∧ constantCoeff w ≠ 0 := by
   refine ⟨a.order.toNat, a.divXPowOrder, X_pow_order_mul_divXPowOrder.symm, ?_⟩
   rw [constantCoeff_divXPowOrder]
   exact coeff_order ha
 
-theorem X_pow_card_dvd_of_invariant {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O]
-    [CharZero O] [Algebra ℤ_[l] O] (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ] (a : O⟦X⟧)
-    (h0 : constantCoeff a = 0) (ha : ∀ δ ∈ Δ, act O (δ : ℤ_[l]) a = a) :
-    (X : O⟦X⟧) ^ Nat.card Δ ∣ a := by
+theorem X_pow_card_dvd_of_invariant
+    {l : ℕ} [Fact l.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [CharZero O] [Algebra ℤ_[l] O]
+    (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ]
+    (a : O⟦X⟧) (h0 : constantCoeff a = 0) (ha : ∀ δ ∈ Δ, act O (δ : ℤ_[l]) a = a)
+    : (X : O⟦X⟧) ^ Nat.card Δ ∣ a := by
   by_cases ha0 : a = 0
   · rw [ha0]
     exact dvd_zero _
@@ -95,26 +99,28 @@ theorem X_pow_card_dvd_of_invariant {l : ℕ} [Fact l.Prime] {O : Type} [CommRin
       exact sub_eq_zero.1 ((mul_eq_zero.1 h2).resolve_right hw)
     apply padicInt_algebraMap_injective_of_charZero O
     rw [map_pow, h1, map_one]
-  have hexp : Monoid.exponent Δ ∣ m := Monoid.exponent_dvd_of_forall_pow_eq_one fun g => by
-    apply Subtype.ext
-    apply Units.ext
-    simp [hpow g g.2]
+  have hexp : Monoid.exponent Δ ∣ m :=
+    Monoid.exponent_dvd_of_forall_pow_eq_one fun g => by
+      apply Subtype.ext
+      apply Units.ext
+      simp [hpow g g.2]
   rw [IsCyclic.exponent_eq_card] at hexp
   exact (pow_dvd_pow X (Nat.le_of_dvd hm hexp)).trans (dvd_mul_right _ _)
 
-theorem X_pow_dvd_mk_sub_sum {O : Type} [CommRing O] (c : ℕ → O) (N : ℕ) :
-    (X : O⟦X⟧) ^ N ∣ PowerSeries.mk c - ∑ k ∈ Finset.range N, C (c k) * X ^ k := by
+theorem X_pow_dvd_mk_sub_sum {O : Type} [CommRing O] (c : ℕ → O) (N : ℕ)
+    : (X : O⟦X⟧) ^ N ∣ PowerSeries.mk c - ∑ k ∈ Finset.range N, C (c k) * X ^ k := by
   rw [X_pow_dvd_iff]
   intro m hm
 
   simp [map_sum, hm]
 
-theorem injective_and_range_eq_invariants {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O]
-    [IsDomain O] [CharZero O] [Algebra ℤ_[l] O] (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ]
-    (j : O⟦X⟧ →ₐ[O] O⟦X⟧) (hj : Associated (j X) (X ^ Nat.card Δ))
-    (hinv : ∀ δ ∈ Δ, act O (δ : ℤ_[l]) (j X) = j X) :
-    Function.Injective j ∧
-      ∀ a, (∃ b, j b = a) ↔ ∀ δ ∈ Δ, act O (δ : ℤ_[l]) a = a := by
+theorem injective_and_range_eq_invariants
+    {l : ℕ} [Fact l.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [CharZero O] [Algebra ℤ_[l] O]
+    (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ]
+    (j : O⟦X⟧ →ₐ[O] O⟦X⟧)
+    (hj : Associated (j X) (X ^ Nat.card Δ)) (hinv : ∀ δ ∈ Δ, act O (δ : ℤ_[l]) (j X) = j X)
+    : Function.Injective j ∧ ∀ a, (∃ b, j b = a) ↔ ∀ δ ∈ Δ, act O (δ : ℤ_[l]) a = a := by
   have hd : 0 < Nat.card Δ := Nat.card_pos
   obtain ⟨u, hu⟩ := hj
   have hjX0 : j X ≠ 0 := by
@@ -122,11 +128,13 @@ theorem injective_and_range_eq_invariants {l : ℕ} [Fact l.Prime] {O : Type} [C
     rw [h, zero_mul] at hu
     exact pow_ne_zero _ X_ne_zero hu.symm
   have hXj : (X : O⟦X⟧) ∣ j X := by
-    have e : j X = X ^ Nat.card Δ * ((u⁻¹ : O⟦X⟧ˣ) : O⟦X⟧) := by rw [← hu, mul_assoc, Units.mul_inv, mul_one]
+    have e : j X = X ^ Nat.card Δ * ((u⁻¹ : O⟦X⟧ˣ) : O⟦X⟧) := by
+      rw [← hu, mul_assoc, Units.mul_inv, mul_one]
     rw [e]
     exact (dvd_pow_self (X : O⟦X⟧) hd.ne').mul_right _
   have hinj : Function.Injective j := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro b hb
     by_contra hb0
     obtain ⟨m, w, rfl, hw⟩ := exists_eq_X_pow_mul_of_ne_zero hb0
@@ -138,9 +146,11 @@ theorem injective_and_range_eq_invariants {l : ℕ} [Fact l.Prime] {O : Type} [C
   have hact : ∀ δ ∈ Δ, (act O (δ : ℤ_[l])).comp j = j := fun δ hδ =>
     algHom_ext_X _ _ (by rw [AlgHom.comp_apply, hinv δ hδ]; exact hXj)
       (by rw [AlgHom.comp_apply, hinv δ hδ])
-  have hstep : ∀ q : O⟦X⟧, (∀ δ ∈ Δ, act O (δ : ℤ_[l]) q = q) →
-      ∃ q' : O⟦X⟧, (∀ δ ∈ Δ, act O (δ : ℤ_[l]) q' = q') ∧
-        q = C (constantCoeff q) + j X * q' := by
+  have hstep
+      : ∀ q : O⟦X⟧,
+        (∀ δ ∈ Δ, act O (δ : ℤ_[l]) q = q)
+          → ∃ q' : O⟦X⟧,
+            (∀ δ ∈ Δ, act O (δ : ℤ_[l]) q' = q') ∧ q = C (constantCoeff q) + j X * q' := by
     intro q hq
     have h0 : constantCoeff (q - C (constantCoeff q)) = 0 := by simp
     have hi : ∀ δ ∈ Δ, act O (δ : ℤ_[l]) (q - C (constantCoeff q)) = q - C (constantCoeff q) := by
@@ -171,12 +181,15 @@ theorem injective_and_range_eq_invariants {l : ℕ} [Fact l.Prime] {O : Type} [C
         have e2 : (sq N).1 = C (c N) + j X * (sq (N + 1)).1 := by
           rw [e1]
           exact hf2 _ _
-        calc a = ∑ k ∈ Finset.range N, C (c k) * j X ^ k + j X ^ N * (sq N).1 := ih
-          _ = ∑ k ∈ Finset.range N, C (c k) * j X ^ k +
-              j X ^ N * (C (c N) + j X * (sq (N + 1)).1) := by rw [← e2]
+        calc
+          a = ∑ k ∈ Finset.range N, C (c k) * j X ^ k + j X ^ N * (sq N).1 := ih
+          _ = ∑ k ∈ Finset.range N, C (c k) * j X ^ k
+              + j X ^ N * (C (c N) + j X * (sq (N + 1)).1) := by
+            rw [← e2]
           _ = _ := by rw [Finset.sum_range_succ]; ring
-    have hjsum : ∀ N, j (∑ k ∈ Finset.range N, C (c k) * X ^ k) =
-        ∑ k ∈ Finset.range N, C (c k) * j X ^ k := by
+    have hjsum
+        : ∀ N,
+          j (∑ k ∈ Finset.range N, C (c k) * X ^ k) = ∑ k ∈ Finset.range N, C (c k) * j X ^ k := by
       intro N
 
       simp [map_sum, algHom_C]

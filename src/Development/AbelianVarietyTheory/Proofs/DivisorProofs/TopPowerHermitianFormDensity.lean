@@ -94,7 +94,7 @@ def row (a : Fin n) : (Fin n → ℂ) →ₗ[ℂ] Ev n where
 theorem coe_row (a : Fin n) (w : Fin n → ℂ)
     : (row a w : Alt n)
       = dz a * ExteriorAlgebra.ι ℂ (∑ b, w b • Pi.single (Sum.inr b) (1 : ℂ)) := by
-  simp [row, sym, dzb, Finset.mul_sum, mul_smul_comm]
+  simp [row, sym, dzb, Finset.mul_sum]
 
 theorem row_mul_row (a : Fin n) (w : Fin n → ℂ) : row a w * row a w = 0 := by
   apply Subtype.ext
@@ -116,11 +116,7 @@ def altRows (n : ℕ) : (Fin n → ℂ) [⋀^Fin n]→ₗ[ℂ] Ev n where
         (Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ j⟩),
       ← mul_assoc, hij, row_mul_row_of_ne, zero_mul]
 
-theorem altRows_apply (v : Fin n → Fin n → ℂ) : altRows n v = ∏ a, row a (v a) := by
-  first
-  | rfl
-  | simp only [altRows, AlternatingMap.coe_mk, MultilinearMap.compLinearMap_apply,
-      MultilinearMap.mkPiAlgebra_apply]
+theorem altRows_apply (v : Fin n → Fin n → ℂ) : altRows n v = ∏ a, row a (v a) := by first | rfl
 
 theorem alt_eq_det_smul
     {K M N : Type} [CommRing K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]

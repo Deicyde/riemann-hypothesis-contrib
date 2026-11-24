@@ -66,7 +66,7 @@ theorem perExt_of_coord
     : C.perExt R' y = k (C.perExt R y) := by
   have h : C.perExt R' = (k.toLinearMap.restrictScalars ℝ) ∘ₗ C.perExt R := by
     refine C.bas.ext fun i => ?_
-    simp [perExt, Module.Basis.constr_basis, hk]
+    simp [perExt, hk]
   rw [h]
   rfl
 

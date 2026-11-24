@@ -64,10 +64,7 @@ open Classical
 
 namespace GlobalTheory.PolSemiAbModel
 
-theorem spMap_comp'
-    {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T)
-    : spMap g ≫ spMap f = spMap (g.comp f) := by
-  simp [spMap, ← Spec.map_comp]
+alias spMap_comp' := _root_.GlobalTheory.spMap_comp_ring
 
 theorem exists_model
     : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLocalRing W],

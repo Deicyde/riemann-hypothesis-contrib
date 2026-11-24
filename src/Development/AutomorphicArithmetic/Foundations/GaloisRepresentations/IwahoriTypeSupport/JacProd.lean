@@ -361,7 +361,6 @@ theorem stepL_tensor {n : ℕ} (G : Grp k n) : G.StepL_tensor := by
   exact Tensor₂.exists_factor_vec (fun b => (s b).ρ) a (E y) hEy _ _ hK
 
 open P_spCount in
-
 theorem stepL_spCount {n : ℕ} (G : Grp k n) : G.StepL_spCount := by
   intro hL c hc hres
   have hE

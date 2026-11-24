@@ -59,9 +59,6 @@ noncomputable section
 
 open Matrix
 
-
-
-
 namespace GlobalTheory.HLatStd
 
 variable {D : D7} {V : HSp D}

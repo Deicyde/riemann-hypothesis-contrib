@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.formalGroupTranslate_automorphism_and_matrixKernel
     : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
         [IsAdicComplete (maximalIdeal V) V] [CharZero V] (d : ℕ) (O : Type) [CommRing O]
@@ -63,7 +65,4 @@ theorem _root_.GlobalTheory.T.formalGroupTranslate_automorphism_and_matrixKernel
                   ∧ (∀ b, (cpt (δ b) : Pt V 0 d) = addV B.G.F (cpt (α b)) (cpt (β b)))
                   ∧ (∀ f, shift B.G.F α (shift B.G.F β f) = shift B.G.F δ f)
                   ∧ (α ∈ kerM B p → β ∈ kerM B p → δ ∈ kerM B p) := by
-  first
-  | exact @GlobalTheory.PlaceInt.shift_kerM
-  | exact GlobalTheory.PlaceInt.shift_kerM
-  | (intros; apply GlobalTheory.PlaceInt.shift_kerM <;> assumption)
+  first | exact @GlobalTheory.PlaceInt.shift_kerM

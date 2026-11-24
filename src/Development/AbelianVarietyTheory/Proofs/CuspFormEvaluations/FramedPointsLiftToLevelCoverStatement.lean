@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.framedPoints_lift_to_levelCover
     : Laws
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.framedPoints_lift_to_levelCover
             (∀ a : c.F, algebraMap d.c₂.F S (d.eF a) = algebraMap c.F S a)
               → ∀ (t : Ix Dw → Sˣ) (y y' : FrPt Xo c S) (y₂ y₂' : FrPt d.Xo₂ d.c₂ S),
                 FrOver d y₂ y → FrOver d y₂' y' → y₂'.x = y₂.x → FrBor t y y' → FrBor t y₂ y₂' := by
-  first
-  | exact @GlobalTheory.frames_lift_to_cover
-  | exact GlobalTheory.frames_lift_to_cover
-  | (intros; apply GlobalTheory.frames_lift_to_cover <;> assumption)
+  first | exact @GlobalTheory.frames_lift_to_cover

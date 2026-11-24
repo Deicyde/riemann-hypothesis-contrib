@@ -1,11 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboundarySmul
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupLawCoboundaryTwoCoboundaryOneStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MvPowerSeriesReductionModPrimeRulesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowerSeriesEvalTwoGroupsRulesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReductionCommutesFormalGroupLawCoboundariesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubstSubSubstIntegralOfIntegralDifferentialStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupLawCoboundaryTwoCoboundaryOne
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MvPowerSeriesReductionModPrimeRules
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowerSeriesEvalTwoGroupsRules
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReductionCommutesFormalGroupLawCoboundaries
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubstSubSubstIntegralOfIntegralDifferential
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -63,11 +63,11 @@ theorem cob2_cob1_lift_mem_intBy_and_swap_sub_mem
   intro p _ k _ _ _ d μ hμ f hf
   have hL : ∀ i, constantCoeff (Katz.lift p (μ i)) = 0 := fun i => constantCoeff_lift p (hμ.const i)
   obtain ⟨hcc1, hcc2, -⟩ :=
-    GlobalTheory.T.formalGroupLawCoboundaryTwo_coboundaryOne (Fr p k) d
+    _root_.GlobalTheory.Katz.formalGroupLawCoboundaryTwo_coboundaryOne_alt (Fr p k) d
       (fun i => Katz.lift p (μ i))
       hL f
-  have hred := GlobalTheory.T.reduction_commutes_formalGroupLawCoboundaries p k d μ hμ.const
-  have hr := GlobalTheory.T.mvPowerSeries_reduction_mod_prime_rules p k (Fin d ⊕ Fin d)
+  have hred := _root_.GlobalTheory.Katz.red_coboundaries p k d μ hμ.const
+  have hr := _root_.GlobalTheory.Katz.red_rules p k (Fin d ⊕ Fin d)
 
   have hX3
       : ∀ (j : Fin d ⊕ (Fin d ⊕ Fin d)),
@@ -81,15 +81,14 @@ theorem cob2_cob1_lift_mem_intBy_and_swap_sub_mem
         (∀ i, constantCoeff (a i) = 0) → (∀ i, constantCoeff (b i) = 0)
           → ∀ i, constantCoeff (op (fun i => Katz.lift p (μ i)) a b i) = 0 := by
     intro a b ha hb i
-    exact
-      ((GlobalTheory.T.powerSeriesEvalTwoGroups_rules (Fr p k) d _ Empty a b ha hb).2.2.2.1 _).trans
-        (hL i)
+    exact ((_root_.GlobalTheory.Katz.SubstCalc.powerSeriesEvalTwoGroups_rules_alt (Fr p k) d _ Empty
+      a b ha hb).2.2.2.1 _).trans (hL i)
   refine ⟨?_, ?_⟩
   · rw [hcc1]
     have hA := hop x1 _ hx1 (hop x2 x3 hx2 hx3)
     have hB := hop _ x3 (hop x1 x2 hx1 hx2) hx3
-    refine GlobalTheory.T.subst_sub_subst_integral_of_integral_differential p k (Fin d)
-      (Fin d ⊕ (Fin d ⊕ Fin d)) _ _ (op μ x1 (op μ x2 x3)) f hA hB
+    refine _root_.GlobalTheory.Katz.subst_sub_subst_mem_intBy p k (Fin d) (Fin d ⊕ (Fin d ⊕ Fin d))
+      _ _ (op μ x1 (op μ x2 x3)) f hA hB
       (fun i => (hred.2.2.1 i).1)
       (fun i => ?_)
       hf
@@ -101,11 +100,12 @@ theorem cob2_cob1_lift_mem_intBy_and_swap_sub_mem
       fun j => constantCoeff_X j
     have hS : ∀ i, constantCoeff (swap (Katz.lift p (μ i))) = 0 := by
       intro i
-      exact ((GlobalTheory.T.powerSeriesEvalTwoGroups_rules (Fr p k) d _ Empty _ _
+      exact ((_root_.GlobalTheory.Katz.SubstCalc.powerSeriesEvalTwoGroups_rules_alt (Fr p k) d _
+        Empty _ _
         (fun j => hXs _)
         (fun j => hXs _)).2.2.2.1 _).trans (hL i)
-    refine GlobalTheory.T.subst_sub_subst_integral_of_integral_differential p k (Fin d)
-      (Fin d ⊕ Fin d) _ _ μ f hS hL
+    refine _root_.GlobalTheory.Katz.subst_sub_subst_mem_intBy p k (Fin d) (Fin d ⊕ Fin d) _ _ μ f hS
+      hL
       (fun i => ?_)
       (fun i => (hr.2.2.1 (μ i)))
       hf

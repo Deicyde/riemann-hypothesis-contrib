@@ -75,10 +75,7 @@ theorem term_mul (c c' : X → O) (g g' : G)
     : term r c g * term r c' g' = term r (c * c') (g * g') := by
   funext x
   simp only [term, Pi.mul_apply, map_mul]
-  first
-  | exact smul_mul_smul_comm _ _ _ _
-  | exact smul_mul_smul _ _ _ _
-  | simp [Matrix.smul_mul, Matrix.mul_smul, smul_smul, mul_comm]
+  first | exact smul_mul_smul_comm _ _ _ _
 
 theorem mem_tSpan_iff (F : X → Matrix d d K)
     : F ∈ tSpan T r

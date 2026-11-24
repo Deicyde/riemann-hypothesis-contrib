@@ -64,8 +64,7 @@ theorem κ₁_ne {k₀ k : K} (h : k ≠ k₀) : κ₁ k₀ k = some k := if_neg
 theorem κ₁_inj (k₀ : K) : Function.Injective (κ₁ k₀) := by
   intro a b h
   unfold κ₁ at h
-  split_ifs at h with ha hb hb
-    <;> first | exact ha.trans hb.symm | (cases h; rfl) | cases h | exact Option.some_injective _ h
+  split_ifs at h with ha hb hb <;> first | exact ha.trans hb.symm | (cases h; rfl)
 
 theorem isBlockMap_v₁ (k₀ : K)
     : IsBlockMap (ι := ι) (ι' := fun o : Option K => ι (o.getD k₀)) (κ₁ k₀) (v₁ k₀) := by
@@ -98,10 +97,7 @@ theorem isBlockMap_v₁ (k₀ : K)
       have hk : k ≠ k₀ := by
         intro hk
         unfold κ₁ at hj
-        split_ifs at hj with h1 <;> first
-          | (cases hj; exact h1 hk)
-          | cases hj
-          | exact h1 ((Option.some_injective _ hj).trans hk)
+        split_ifs at hj with h1 <;> first | (cases hj; exact h1 hk)
       refine ⟨⟨k, x⟩, ?_⟩
       unfold v₁
       rw [dite_eq_right hk]
@@ -131,10 +127,7 @@ theorem pullDeg_κ₁ (k₀ : K) (xi : K → ℤ) (o : Option K)
     · have hn : ¬ ∃ j : K, κ₁ k₀ j = some k := by
         rintro ⟨j, hj⟩
         unfold κ₁ at hj
-        split_ifs at hj with h1 <;> first
-          | (cases hj; exact h1 hk)
-          | cases hj
-          | exact h1 ((Option.some_injective _ hj).trans hk)
+        split_ifs at hj with h1 <;> first | (cases hj; exact h1 hk)
       rw [Function.extend_apply' _ _ _ hn]
       simp [hk]
     · have e := (κ₁_inj k₀).extend_apply xi 0 k

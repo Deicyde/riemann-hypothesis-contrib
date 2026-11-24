@@ -186,8 +186,7 @@ theorem _root_.GlobalTheory.RootEx.UnfoldShape.mem_chainLat
     funext r
     rcases r with r | i
     · simp [_root_.GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms.inX,
-        _root_.GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms.aux, Finset.sum_apply,
-        Pi.single_apply]
+        _root_.GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms.aux, Finset.sum_apply]
     · simp [_root_.GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms.inX,
         _root_.GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms.aux, Finset.sum_apply,
         Pi.single_apply, Subring.smul_def, ha i]

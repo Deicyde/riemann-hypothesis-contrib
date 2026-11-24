@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.thetaSystem_hasTests_of_real_point
     : GlobalTheory.Published.SemistableReductionSt → ThmUSt → Laws → Laws2 → UTorsSt
       → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.thetaSystem_hasTests_of_real_point
               → ∃ (u : ρ.UTest p y₀) (l : u.Lab) (τ : S.Test p y₀),
                 l.Match τ
                   ∧ ∀ x ∈ Fs, x ∈ Set.range (algebraMap (FractionRing u.V) (PadicAlgCl p)) := by
-  first
-  | exact @GlobalTheory.ZH.hasTests_of_real
-  | exact GlobalTheory.ZH.hasTests_of_real
-  | (intros; apply GlobalTheory.ZH.hasTests_of_real <;> assumption)
+  first | exact @GlobalTheory.ZH.hasTests_of_real

@@ -54,6 +54,7 @@ open GlobalTheory.SphTheta (IsStd CayleyRule intMat liftPar)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke IsCommensurated Tj SatU ordL Ov)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heckeChar_value_inert_place_and_segment
     : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ),
       IsHeckeChar D χ → Formalism.L2.Theta.ResEta D χ n
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.heckeChar_value_inert_place_and_segment
                   → seg w z t
                     = (GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace.str qu
                       t).map (z * ·) := by
-  first
-  | exact @GlobalTheory.ChainOnto.val_seg_of_isInertAt
-  | exact GlobalTheory.ChainOnto.val_seg_of_isInertAt
-  | (intros; apply GlobalTheory.ChainOnto.val_seg_of_isInertAt <;> assumption)
+  first | exact @GlobalTheory.ChainOnto.val_seg_of_isInertAt

@@ -39,8 +39,6 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FillP
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.NPin

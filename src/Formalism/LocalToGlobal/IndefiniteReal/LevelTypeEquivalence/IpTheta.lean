@@ -42,8 +42,9 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
 open scoped TensorProduct ContDiff ENNReal
 
 namespace Formalism.IndefR.Eqv
@@ -56,12 +57,12 @@ section Basic
 
 variable {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D}
 
-theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsThetaFunO ψ S T g) :
-    IsThetaFunO ψ S T (f + g) := by
+theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsThetaFunO ψ S T g)
+    : IsThetaFunO ψ S T (f + g) := by
   apply Formalism.IndefR.Fock.CCR.theta_add <;> assumption
 
-theorem thetaO_smul {f : WO S T → ℂ} (c : ℂ) (hf : IsThetaFunO ψ S T f) : IsThetaFunO ψ S T (c • f) := by
-
+theorem thetaO_smul {f : WO S T → ℂ} (c : ℂ) (hf : IsThetaFunO ψ S T f)
+    : IsThetaFunO ψ S T (c • f) := by
   obtain ⟨U1, hU1, h1⟩ := hf.level
   constructor
   · intro γ w
@@ -86,7 +87,8 @@ end L2
 
 section Unit
 
-variable {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}
+variable
+  {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}
   {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)}
 
 end Unit

@@ -46,6 +46,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.transvectionSubgroup_cocompact_haar_fundamentalDomain
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
       IsInfFam θ
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.transvectionSubgroup_cocompact_haar_fundamentalDom
                     γ ∈ GQ V
                       ∧ ∃ u ∈ ZI V ξ,
                         u ∈ GinfC V ∧ ∃ k ∈ ZI V ξ, k ∈ GfC V ∧ k ∈ U ∧ z = γ * u * k := by
-  first
-  | exact @GlobalTheory.TransvMeasure.transvection_measure
-  | exact GlobalTheory.TransvMeasure.transvection_measure
-  | (intros; apply GlobalTheory.TransvMeasure.transvection_measure <;> assumption)
+  first | exact @GlobalTheory.TransvMeasure.transvection_measure

@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR GlobalTheory.WeilParts
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.levelCharacters_unramified_off_levelPlaces
     : ∀ (D : D7) (T0 : Type) (L : LevCh D T0) (μ0 : T0),
       L.Is μ0
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.levelCharacters_unramified_off_levelPlaces
                     → (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)
                       ≠ P.under (𝓞 D.host.F))
                 → (L.xiH t).UnrAt P ∧ ∀ j, (L.C.mu0 j).UnrAt P := by
-  first
-  | exact @GlobalTheory.levCh_unramified_places
-  | exact GlobalTheory.levCh_unramified_places
-  | (intros; apply GlobalTheory.levCh_unramified_places <;> assumption)
+  first | exact @GlobalTheory.levCh_unramified_places

@@ -76,12 +76,6 @@ theorem mem_adjoin_mod
     intro G
     rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.eval₂_map, Polynomial.hom_eval₂]
     congr 1
-    all_goals
-      (
-        ext x
-        simp only [RingHom.comp_apply]
-        exact (IsLocalRing.ResidueField.algebraMap_residue x).symm
-      )
   intro n
   induction n with
   | zero => intro b; exact ⟨0, Subalgebra.zero_mem _, b, by simp⟩
@@ -160,12 +154,6 @@ theorem residue_aeval (α : B) (G : A[X])
     : residue B (aeval α G) = aeval (residue B α) (G.map (residue A)) := by
   rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.eval₂_map, Polynomial.hom_eval₂]
   congr 1
-  all_goals
-    (
-      ext x
-      simp only [RingHom.comp_apply]
-      exact (IsLocalRing.ResidueField.algebraMap_residue x).symm
-    )
 
 theorem adjoin_residue_gen [Finite (ResidueField B)]
     : ∃ γ : ResidueField B, Algebra.adjoin (ResidueField A) {γ} = ⊤ := by

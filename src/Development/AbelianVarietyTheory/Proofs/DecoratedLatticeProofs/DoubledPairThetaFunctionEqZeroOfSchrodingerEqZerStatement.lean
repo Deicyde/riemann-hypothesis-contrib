@@ -61,7 +61,4 @@ theorem _root_.GlobalTheory.T.doubledPairThetaFunction_eq_zero_of_schrodinger_eq
         → ∀ (A B : HSp D) (ν : Measure (WO A B)) (𝓨 : Set (WO A B)),
           IsCovolOne (ratL B A) ν 𝓨
             → ∀ f, IsThetaFunO ψ (dblSp A) B f → sch ψ A B ν 𝓨 f = 0 → f = 0 := by
-  first
-  | exact @GlobalTheory.Core.Rk.SchwInj.eq_zero_of_sch_eq_zero
-  | exact GlobalTheory.Core.Rk.SchwInj.eq_zero_of_sch_eq_zero
-  | (intros; apply GlobalTheory.Core.Rk.SchwInj.eq_zero_of_sch_eq_zero <;> assumption)
+  first | exact @GlobalTheory.Core.Rk.SchwInj.eq_zero_of_sch_eq_zero

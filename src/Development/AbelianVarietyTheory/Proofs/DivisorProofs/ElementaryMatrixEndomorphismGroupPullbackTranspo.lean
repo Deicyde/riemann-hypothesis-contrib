@@ -35,6 +35,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -62,11 +63,6 @@ theorem ext_of_pb
   apply Over.OverMorphism.ext
   apply h.1.hom_ext e
   rw [Over.w x, Over.w y]
-
-theorem one_left_eq {T : Scheme.{0}} {X M : Over T} [GrpObj M]
-    : (1 : X ⟶ M).left = X.hom ≫ η[M].left := by
-  rw [Hom.one_def, Over.comp_left]
-  congr 1
 
 theorem mul_comp_lift
     {T T' : Scheme.{0}} {t : T' ⟶ T} {B : Over T} {B' : Over T'} [GrpObj B] [GrpObj B']
@@ -98,20 +94,6 @@ theorem isMonHom_lift
   · have := mul_comp_lift h e (fst B' B') (snd B' B')
     simpa [Hom.mul_def] using this
 
-theorem unit_pull
-    {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G]
-    {G' : Over S'} [GrpObj G']
-    {φ : G'.left ⟶ G.left} (hG : IsGrpPullback G' G f φ)
-    : η[G'].left ≫ φ = f ≫ η[G].left := by
-  have h := hG.2 (𝟙_ _) 1 1 (pushPt hG.1.w 1) (pushPt hG.1.w 1) rfl rfl
-  rw [_root_.mul_one] at h
-  have h3 : pushPt hG.1.w (1 : 𝟙_ (Over S') ⟶ G') * pushPt hG.1.w 1 = pushPt hG.1.w 1 :=
-    Over.OverMorphism.ext h
-  have h4 : (1 : 𝟙_ (Over S') ⟶ G').left ≫ φ = (1 : Over.mk ((𝟙_ (Over S')).hom ≫ f) ⟶ G).left :=
-    congrArg Over.Hom.left (mul_eq_left.1 h3)
-  rw [one_left_eq, one_left_eq] at h4
-  simpa using h4
-
 theorem matEnd_pull
     : ∀ {T T' : Scheme.{0}} {t : T' ⟶ T} {B C : Over T} [GrpObj B] [GrpObj C] {B' C' : Over T'}
         [GrpObj B'] [GrpObj C'] {φB : B'.left ⟶ B.left} {χ : C'.left ⟶ C.left}
@@ -129,8 +111,10 @@ theorem matEnd_pull
   rw [key, hw w]
   split_ifs
   · exact (hpr b).symm
-  · rw [one_left_eq, one_left_eq, ← Category.assoc, hB.1.w, Category.assoc, Category.assoc,
-      unit_pull hC]
+  · rw [_root_.ReciprocityTheory.ChartRestriction.G.Chart.one_left',
+      _root_.ReciprocityTheory.ChartRestriction.G.Chart.one_left', ← Category.assoc, hB.1.w,
+      Category.assoc, Category.assoc,
+      _root_.ReciprocityTheory.ChartRestriction.G.Out.PullGtPf.IsGrpPullback.one_left hC]
 
 end GlobalTheory.MatEndPull
 

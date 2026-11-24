@@ -53,6 +53,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.fullTorsionObject_existsUnique_moduliPoint
     : HV → Laws6 → GlobalTheory.LN.UDvrSt → GlobalTheory.LN.HomExtSt → ThetaPtDeterminesSt
       → EndDeterminedOnTorsionSt → ThetaUnifAV
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.fullTorsionObject_existsUnique_moduliPoint
             ∧ (∀ y : Sp K ⟶ Xo.XF c, ∃ o, FullAt Y y o)
             ∧ ∀ (K' : Type) [Field K'] (f : K →+* K') y o o',
               FullAt Y y o → FullExt f o o' → FullAt Y (spMap f ≫ y) o' := by
-  first
-  | exact @GlobalTheory.FullPoint.fullAt_existsUnique_exists_ext
-  | exact GlobalTheory.FullPoint.fullAt_existsUnique_exists_ext
-  | (intros; apply GlobalTheory.FullPoint.fullAt_existsUnique_exists_ext <;> assumption)
+  first | exact @GlobalTheory.FullPoint.fullAt_existsUnique_exists_ext

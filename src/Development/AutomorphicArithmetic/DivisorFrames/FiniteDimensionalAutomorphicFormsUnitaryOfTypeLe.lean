@@ -57,7 +57,7 @@ theorem UpperTheory.finiteDimensional_automorphicForms_unitary_of_type_level
                 ∧ ∀ k ∈ K, ∀ v, RU E n (k : finU (E := E) (n := n)) (f v) = f v)
             → FiniteDimensional ℂ M := by
   intro E _ _ _ n S _ _ _ ρ K hK M hM
-  obtain ⟨R, hR⟩ := GlobalTheory.T.definiteUnitary_classSet_finite E n K hK
+  obtain ⟨R, hR⟩ := _root_.GlobalTheory.DefU.ClassFin.classSet_finite E n K hK
   let T : M →ₗ[ℂ] (R → Module.Dual ℂ S) := {
     toFun := fun f s => (LinearMap.proj (R := ℂ) (φ := fun _ : UA E n => ℂ) (s : UA E n)).comp f.1
     map_add' := fun _ _ => rfl

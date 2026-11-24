@@ -1,8 +1,8 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HodgeXD
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingIsoOfComponentIsosStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingRestrictCompatStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingIsoOfComponentIsos
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingRestrictCompat
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -61,7 +61,7 @@ theorem kun_res
     (b₂ : ∀ a n, Function.Bijective ((resU (E.F₂ a) k₂).pull n))
     (b₃ : ∀ a n, Function.Bijective ((resU (E.F₃ a) k₃).pull n))
     : (E.Kun U₁ U₂ U₃ h₁ h₂ ↔ E.Kun U₁' U₂' U₃' h₁' h₂') :=
-  GlobalTheory.T.pairing_iso_of_component_isos
+  _root_.GlobalTheory.CompanionTheory.KunGlue.Transfer.kunE_iff
     (P := fun a => CH.cx (U₁.ι ⋙ E.F₁ a))
     (Q := fun a => CH.cx (U₂.ι ⋙ E.F₂ a))
     (T := fun a => CH.cx (U₃.ι ⋙ E.F₃ a))
@@ -74,6 +74,7 @@ theorem kun_res
     (fun a => (resU (E.F₂ a) k₂).hom)
     (fun a => (resU (E.F₃ a) k₃).hom)
     b₁ b₂ b₃
-    (fun ha _ _ _ h x y => GlobalTheory.T.pairing_restrict_compat E h₁ h₂ h₁' h₂' k₁ k₂ k₃ ha h x y)
+    (fun ha _ _ _ h x y =>
+      _root_.GlobalTheory.CompanionTheory.KunGlue.pr_res E h₁ h₂ h₁' h₂' k₁ k₂ k₃ ha h x y)
 
 end GlobalTheory.CompanionTheory.KunGlue

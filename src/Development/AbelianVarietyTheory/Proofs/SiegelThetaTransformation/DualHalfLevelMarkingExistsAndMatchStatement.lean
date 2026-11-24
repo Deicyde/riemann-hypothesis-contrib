@@ -53,6 +53,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.dual_half_level_marking_exists_and_match
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
         (l : Geo.Tor.Level H) (r : ℕ) (X : Data E r) (L : Lt E r) (mk : Dw.La →ₗ[𝓞 E] (Fin r → E))
@@ -73,7 +74,4 @@ theorem _root_.GlobalTheory.T.dual_half_level_marking_exists_and_match
           ∧ conjI (Mfr l) = l.Mb ∧ Mfr l * l.Mb = Ideal.span {(l.M : 𝓞 E)}
           ∧ ∀ n N : ℕ,
             0 < N → ∃ Y : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E, IsRoots l L mk N Y := by
-  first
-  | exact @GlobalTheory.Dict.DualMark.dual_marking
-  | exact GlobalTheory.Dict.DualMark.dual_marking
-  | (intros; apply GlobalTheory.Dict.DualMark.dual_marking <;> assumption)
+  first | exact @GlobalTheory.Dict.DualMark.dual_marking

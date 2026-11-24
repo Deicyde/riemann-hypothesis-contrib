@@ -62,7 +62,4 @@ theorem _root_.GlobalTheory.T.splitPlace_column_mem_completedLattice_iff_frame_i
                       ((((frCo φ β)⁻¹ : GL (Fin V.rank) (Fv D.host.F v)).1 *ᵥ fun k => rdA φ (y k))
                         i)
                     ≤ 1 := by
-  first
-  | exact @GlobalTheory.SplitFrameColumn.frame_column
-  | exact GlobalTheory.SplitFrameColumn.frame_column
-  | (intros; apply GlobalTheory.SplitFrameColumn.frame_column <;> assumption)
+  first | exact @GlobalTheory.SplitFrameColumn.frame_column

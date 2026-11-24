@@ -52,6 +52,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.thetaLift_carrying_of_base_tuple_rows
     : GlobalTheory.Published.CuspRapidDecay → HoweUnram
       → ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.thetaLift_carrying_of_base_tuple_rows
                     ∧ A3.heckeLI j t k = A3.heckeLI j t (k.1, y))
           → R.PGEquiv F → (∀ b, (lv (F.fc (R.toCx3 F).zs) b).Pos)
           → (∀ c, R.EEc c ≠ ⊥ → ∃ p, R.Carries p c) := by
-  first
-  | exact @GlobalTheory.Hk3.carries_of_rows_top
-  | exact GlobalTheory.Hk3.carries_of_rows_top
-  | (intros; apply GlobalTheory.Hk3.carries_of_rows_top <;> assumption)
+  first | exact @GlobalTheory.Hk3.carries_of_rows_top

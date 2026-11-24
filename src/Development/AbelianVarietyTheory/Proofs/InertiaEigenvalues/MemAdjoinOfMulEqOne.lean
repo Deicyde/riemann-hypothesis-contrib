@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.UnitLemmaGroup
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsUnitBasePointAdjoinTwistedSigmaStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsUnitBasePointAdjoinTwistedSigma
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,37 +54,42 @@ namespace GlobalTheory.UnitLemma.TwistUnit
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem mem_adjoin_of_mul_eq_one {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {s t : A}
-    (h : s * t = 1) (ht : IsIntegral O t) : t ∈ Algebra.adjoin O {s} := by
-  exact GlobalTheory.UnitLemma.UnitBase.mem_adjoin_of_mul_eq_one' h ht
-
-theorem adjoin_stab {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {s : A} (L : Submodule O A)
-    (hL : ∀ y ∈ L, s * y ∈ L) {a : A} (ha : a ∈ Algebra.adjoin O {s}) : ∀ y ∈ L, a * y ∈ L := by
+theorem adjoin_stab
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    {s : A} (L : Submodule O A) (hL : ∀ y ∈ L, s * y ∈ L)
+    {a : A} (ha : a ∈ Algebra.adjoin O {s})
+    : ∀ y ∈ L, a * y ∈ L := by
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
     rw [Set.mem_singleton_iff] at hx
-    subst hx; exact hL
+    subst hx
+    exact hL
   | algebraMap r =>
     intro y hy
-    rw [← Algebra.smul_def]; exact L.smul_mem r hy
+    rw [← Algebra.smul_def]
+    exact L.smul_mem r hy
   | add x z _ _ hx hz =>
     intro y hy
-    rw [add_mul]; exact L.add_mem (hx y hy) (hz y hy)
+    rw [add_mul]
+    exact L.add_mem (hx y hy) (hz y hy)
   | mul x z _ _ hx hz =>
     intro y hy
-    rw [mul_assoc]; exact hx _ (hz y hy)
+    rw [mul_assoc]
+    exact hx _ (hz y hy)
 
 variable {K : UQ}
 
-theorem trace_σ (B : InvAlg K) (a : B.A) :
-    Algebra.trace K.E B.A (B.σ a) = K.c (Algebra.trace K.E B.A a) := by
+theorem trace_σ (B : InvAlg K) (a : B.A)
+    : Algebra.trace K.E B.A (B.σ a) = K.c (Algebra.trace K.E B.A a) := by
   classical
   let b := Module.Free.chooseBasis K.E B.A
   have hsm : ∀ (e : K.E) (y : B.A), B.σ (e • y) = K.c e • B.σ y := by
     intro e y
     rw [Algebra.smul_def, map_mul, B.σ_alg, ← Algebra.smul_def]
   have hli : LinearIndependent K.E ((B.σ : B.A →+ B.A) ∘ b) := by
-    refine b.linearIndependent.map_of_injective_injective (fun r => K.c.symm r) (B.σ : B.A →+ B.A) ?_ ?_ ?_
+    refine b.linearIndependent.map_of_injective_injective
+      (fun r => K.c.symm r)
+      (B.σ : B.A →+ B.A) ?_ ?_ ?_
     · intro r hr
       simpa using hr
     · intro m hm
@@ -116,12 +121,13 @@ theorem trace_σ (B : InvAlg K) (a : B.A) :
     rw [h1, b'.repr_sum_self]
 
   rw [Algebra.trace_eq_matrix_trace b', Algebra.trace_eq_matrix_trace b, Matrix.trace, Matrix.trace,
-  map_sum]
+    map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [Matrix.diag_apply, Algebra.leftMulMatrix_eq_repr_mul]
   rw [hb', ← map_mul, hrepr]
 
-theorem mem_range_c (e : K.E) : K.c e ∈ (algebraMap K.O K.E).range ↔ e ∈ (algebraMap K.O K.E).range := by
+theorem mem_range_c (e : K.E)
+    : K.c e ∈ (algebraMap K.O K.E).range ↔ e ∈ (algebraMap K.O K.E).range := by
   constructor
   · rintro ⟨a, ha⟩
     obtain ⟨b, hb⟩ := K.c_int a
@@ -131,18 +137,26 @@ theorem mem_range_c (e : K.E) : K.c e ∈ (algebraMap K.O K.E).range ↔ e ∈ (
     obtain ⟨b, hb⟩ := K.c_int a
     exact ⟨b, hb.symm⟩
 
-theorem trace_σ_mem (B : InvAlg K) (a : B.A) :
-    Algebra.trace K.E B.A (B.σ a) ∈ (algebraMap K.O K.E).range ↔
-      Algebra.trace K.E B.A a ∈ (algebraMap K.O K.E).range := by
+theorem trace_σ_mem (B : InvAlg K) (a : B.A)
+    : Algebra.trace K.E B.A (B.σ a) ∈ (algebraMap K.O K.E).range
+      ↔ Algebra.trace K.E B.A a ∈ (algebraMap K.O K.E).range := by
   rw [trace_σ, mem_range_c]
 
-theorem twisted_unit_eq_unit : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Separable → IsIntegral K.O B.g →
-    ∀ (ε : B.A), (ε = 1 ∨ ε = -1) → ∃ β₀ : B.Aˣ, B.σ (β₀ : B.A) = β₀ * (ε * B.g) ∧
-      ∀ x : B.Aˣ, B.σ (x : B.A) = x →
-        {L : Submodule K.O B.A | IsLat K.O K.E L ∧ ∀ z, z ∈ L ↔ ∀ y ∈ L,
-          B.herm (β₀ * x) y z ∈ (algebraMap K.O K.E).range} = B.X x := by
+theorem twisted_unit_eq_unit
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.g * B.σ B.g = 1 → B.P.Separable → IsIntegral K.O B.g
+        → ∀ (ε : B.A),
+          (ε = 1 ∨ ε = -1)
+            → ∃ β₀ : B.Aˣ,
+              B.σ (β₀ : B.A) = β₀ * (ε * B.g)
+                ∧ ∀ x : B.Aˣ,
+                  B.σ (x : B.A) = x
+                    → {L : Submodule K.O B.A | IsLat K.O K.E L ∧ ∀ z, z ∈ L ↔ ∀ y ∈ L,
+                        B.herm (β₀ * x) y z ∈ (algebraMap K.O K.E).range}
+                      = B.X x := by
   intro K B hg hs hi ε hε
-  obtain ⟨β₀, hβ, hb1, hb2⟩ := GlobalTheory.T.exists_unit_basePoint_adjoin_twisted_sigma K B hg hs hi ε hε
+  obtain ⟨β₀, hβ, hb1, hb2⟩ :=
+    _root_.GlobalTheory.UnitLemma.UnitBase.exists_unit_base K B hg hs hi ε hε
   refine ⟨β₀, hβ, fun x hx => ?_⟩
   set R := (algebraMap K.O K.E).range with hR
   set T := Algebra.trace K.E B.A with hT
@@ -151,8 +165,12 @@ theorem twisted_unit_eq_unit : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 �
     rcases hε with rfl | rfl
     · rw [one_mul]
     · rw [neg_one_mul, map_neg, neg_mem_iff]
-  have hstab : ∀ L : Submodule K.O B.A, (∀ y ∈ L, B.g * y ∈ L) → ∀ w : B.A,
-      ((∀ y ∈ L, T ((β₀ : B.A) * x * y * B.σ w) ∈ R) ↔ ∀ y ∈ L, T ((x : B.A) * y * B.σ w) ∈ R) := by
+  have hstab
+      : ∀ L : Submodule K.O B.A,
+        (∀ y ∈ L, B.g * y ∈ L)
+          → ∀ w : B.A,
+            ((∀ y ∈ L, T ((β₀ : B.A) * x * y * B.σ w) ∈ R)
+              ↔ ∀ y ∈ L, T ((x : B.A) * y * B.σ w) ∈ R) := by
     intro L hL w
     have s1 := adjoin_stab L hL hb1
     have s2 := adjoin_stab L hL hb2
@@ -166,31 +184,35 @@ theorem twisted_unit_eq_unit : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 �
     · intro h y hy
       have := h _ (s1 y hy)
       rwa [show (x : B.A) * ((β₀ : B.A) * y) * B.σ w = β₀ * x * y * B.σ w by ring] at this
-  have hX' : ∀ (L : Submodule K.O B.A) (w : B.A),
-      ((∀ y ∈ L, T ((x : B.A) * w * B.σ y) ∈ R) ↔ ∀ y ∈ L, T ((x : B.A) * y * B.σ w) ∈ R) := by
+  have hX'
+      : ∀ (L : Submodule K.O B.A) (w : B.A),
+        ((∀ y ∈ L, T ((x : B.A) * w * B.σ y) ∈ R) ↔ ∀ y ∈ L, T ((x : B.A) * y * B.σ w) ∈ R) := by
     intro L w
     refine forall₂_congr fun y _ => ?_
     rw [← trace_σ_mem B]
-    rw [show B.σ ((x : B.A) * w * B.σ y) = x * y * B.σ w by
-      rw [map_mul, map_mul, hx, B.σ_σ]; ring]
-  have hsym : ∀ a b : B.A, T ((β₀ : B.A) * x * a * B.σ b) ∈ R ↔
-      T ((β₀ : B.A) * x * (B.g * b) * B.σ a) ∈ R := by
+    rw [show B.σ ((x : B.A) * w * B.σ y) = x * y * B.σ w by rw [map_mul, map_mul, hx, B.σ_σ]; ring]
+  have hsym
+      : ∀ a b : B.A,
+        T ((β₀ : B.A) * x * a * B.σ b) ∈ R ↔ T ((β₀ : B.A) * x * (B.g * b) * B.σ a) ∈ R := by
     intro a b
     rw [← trace_σ_mem B ((β₀ : B.A) * x * a * B.σ b),
       show B.σ ((β₀ : B.A) * x * a * B.σ b) = ε * ((β₀ : B.A) * x * (B.g * b) * B.σ a) by
-        rw [map_mul, map_mul, map_mul, hβ, hx, B.σ_σ]; ring, hεT]
+        rw [map_mul, map_mul, map_mul, hβ, hx, B.σ_σ]; ring,
+      hεT]
   have hgg : B.σ B.g * B.g = 1 := by rw [mul_comm]; exact hg
-  have hgad : B.g ∈ Algebra.adjoin K.O {B.σ B.g} := mem_adjoin_of_mul_eq_one hgg hi
+  have hgad : B.g ∈ Algebra.adjoin K.O {B.σ B.g} :=
+    _root_.GlobalTheory.UnitLemma.UnitBase.mem_adjoin_of_mul_eq_one' hgg hi
   ext L
-  simp only [Set.mem_setOf_eq, InvAlg.X, InvAlg.herm, Units.val_mul, ← hT, ← hR]
+  simp only [Set.mem_setOf_eq, InvAlg.X, InvAlg.herm, ← hT, ← hR]
   constructor
   · rintro ⟨hLat, hU⟩
     have h1 : ∀ y ∈ L, B.σ B.g * y ∈ L := by
       intro y hy
       rw [hU]
       intro y' hy'
-      rw [hsym, show (β₀ : B.A) * x * (B.g * (B.σ B.g * y)) * B.σ y' = β₀ * x * y * B.σ y' by
-        linear_combination ((β₀ : B.A) * x * y * B.σ y') * hg]
+      rw [hsym,
+        show (β₀ : B.A) * x * (B.g * (B.σ B.g * y)) * B.σ y' = β₀ * x * y * B.σ y' by
+          linear_combination ((β₀ : B.A) * x * y * B.σ y') * hg]
       exact (hU y').1 hy' y hy
     have h2 : ∀ y ∈ L, B.g * y ∈ L := adjoin_stab L h1 hgad
     refine ⟨hLat, h2, fun y => ?_⟩

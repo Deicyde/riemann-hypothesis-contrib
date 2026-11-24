@@ -186,7 +186,8 @@ theorem CalcC_proof : CalcC := by
     have h : ‖(((l : ℕ) : MaximalUnramifiedExtension l) : ℂ_[l])‖ = (l : ℝ)⁻¹ := hU.2.2.1
     simpa using h
   have hP := BrC.logPair (K := ℂ_[l]) hl
-  obtain ⟨F', hF'⟩ := (Formalism.InvariantFactorPaths.G7.Top.lawExists ℂ_[l] l hU.1 hnl).1
+  obtain ⟨F', hF'⟩ :=
+    (_root_.Formalism.InvariantFactorPaths.G7.formal_law_exists ℂ_[l] l hU.1 hnl).1
   have hph
       : PowerSeries.constantCoeff (PowerSeries.map (MaximalUnramifiedExtension l).subtype
           (phFF l g2 g3 s2 ε))
@@ -222,7 +223,7 @@ theorem CalcC_proof : CalcC := by
       (Formalism.L2.Th1.C.intBinomScalar ℂ_[l] _) hz hs
   let _ : StarRing (BrC.Osub σ) := BrC.starO hσ
   have key :=
-    Formalism.L2.Th1.C.normAdjAll ℂ_[l] (unitBall ℂ_[l]) _ _ _ hFr (BrC.Osub σ)
+    _root_.Formalism.L2.Th1.C.norm_adjoint_all_places ℂ_[l] (unitBall ℂ_[l]) _ _ _ hFr (BrC.Osub σ)
       ((MaximalUnramifiedExtension l).subtype.comp (BrC.Osub σ).subtype)
       (fun α => endInt hU α.2.1 α.2.2)
       (fun z hz => hbin z.1 z.2.1 (congrArg Subtype.val hz))

@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.isSchwartzBruhatAdelicMatrix_of_mem_adelicSchwartz
           ∀ φ ∈ GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz.schwartzA θ m n,
             GlobalTheory.IndefiniteRowSideFullHecke.SchwartzBruhatMixedFamilies.IsSchwartzBruhat
               φ := by
-  first
-  | exact @GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA
-  | exact GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA
-  | (intros; apply GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA <;> assumption)
+  first | exact @GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA

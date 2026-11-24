@@ -130,12 +130,12 @@ theorem inclusion_from_rows_identity_zero
     : incM F (Matrix.fromRows (1 : Matrix (Fin n) (Fin n) E) (0 : Matrix (Fin n) (Fin n) E))
       = Matrix.fromRows (1 : Matrix (Fin n) (Fin n) (AE F E))
         (0 : Matrix (Fin n) (Fin n) (AE F E)) := by
-  ext (i | i) j <;> by_cases h : i = j <;> simp [incM, Matrix.one_apply, h]
+  ext (i | i) j <;> by_cases h : i = j <;> simp [incM, h]
 
 omit [NumberField E] in
 theorem incM_diagCols
     : incM F (diagCols (Fin n) : Matrix (Fin n ⊕ Fin n) (Fin n) E) = diagCols (Fin n) := by
-  ext (i | i) j <;> by_cases h : i = j <;> simp [incM, diagCols, Matrix.one_apply, h]
+  ext (i | i) j <;> by_cases h : i = j <;> simp [incM, diagCols, h]
 
 theorem frame_cols {b : GL (Fin n ⊕ Fin n) E} (hb : IsFrame2 σ Y b)
     : ∃ t₀ : GL (Fin n) E,

@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.exists_grpObj_isAbelianScheme_smoothLift_nilpotent
                           l ≫ m.left = (μ[A₀]).left ≫ i
                             → ∃ _ : GrpObj X,
                               IsGrpPullback A₀ X (spMap π) i ∧ IsAbelianScheme X := by
-  first
-  | exact @GlobalTheory.LiftGroupLaw.exists_grpObj_isAbelianScheme
-  | exact GlobalTheory.LiftGroupLaw.exists_grpObj_isAbelianScheme
-  | (intros; apply GlobalTheory.LiftGroupLaw.exists_grpObj_isAbelianScheme <;> assumption)
+  first | exact @GlobalTheory.LiftGroupLaw.exists_grpObj_isAbelianScheme

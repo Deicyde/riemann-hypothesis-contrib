@@ -53,15 +53,18 @@ import Development.AbelianVarietyTheory.Definitions.Foundations.NormEulerPolySub
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.ThetaSumNe
 
-theorem exists_mem_schA_thetaSum_ne_zero : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ],
-    ∃ φ ∈ schA F κ, thetaSum F φ ≠ 0 := by
+theorem exists_mem_schA_thetaSum_ne_zero
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ], ∃ φ ∈ schA F κ,
+      thetaSum F φ ≠ 0 := by
   apply GlobalTheory.CompanionTheory.ThetaAdm.exists_thetaSum_ne_zero <;> assumption
 
 end GlobalTheory.ThetaSumNe

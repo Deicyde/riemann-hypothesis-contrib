@@ -63,7 +63,4 @@ theorem _root_.GlobalTheory.T.exists_trait_moduli_of_stalk_completeDVR
                 ∧ (∀ a, γ (M.stalkHom x a) = algebraMap T.V (FractionRing T.V) (f (θ a)))
                 ∧ jK T.V ≫ spMap (f.comp θ) ≫ M.Z.fromSpecStalk x = spMap γ ≫ M.pt
                 ∧ T.y = spMap γ ≫ y₀ := by
-  first
-  | exact @GlobalTheory.Poinc.exists_trait_of_stalk_dvr
-  | exact GlobalTheory.Poinc.exists_trait_of_stalk_dvr
-  | (intros; apply GlobalTheory.Poinc.exists_trait_of_stalk_dvr <;> assumption)
+  first | exact @GlobalTheory.Poinc.exists_trait_of_stalk_dvr

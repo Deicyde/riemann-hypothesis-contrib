@@ -72,10 +72,4 @@ theorem _root_.GlobalTheory.T.euler_product_almost_all_standard
                       ∧ ∫ X, pureN φ A X ∂I
                         = (c : ℂ) * (∫ X, φ X ∂minf) * (∏ v ∈ S, ((m v (A v)).toReal : ℂ))
                           * ((∏' v : {v // v ∉ S}, (m v.1 (latV b v.1)).toReal : ℝ) : ℂ) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN
-  | exact GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN

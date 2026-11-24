@@ -127,6 +127,6 @@ theorem packet_conditions_closed (h1 : LatticeFinitelyGenerated) (h2 : ExistsBou
     assumption
   · rw [Nat.cast_pos]
     refine @Nat.card_pos _ _ (h2 _ _ _ M _ _ hMfg ?_ ?_ ?_ ?_)
-    all_goals first | assumption | (intro y hy; rw [← SetLike.mem_coe, hM]; aesop) | aesop
+    all_goals first | assumption | (intro y hy; rw [← SetLike.mem_coe, hM]; aesop)
 
 end Formalism.L2.SG.Pf.Tau

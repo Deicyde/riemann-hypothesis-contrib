@@ -106,10 +106,7 @@ theorem realize_smul_eq
       rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, inv_mul_cancel₀ hc0, one_smul,
         Matrix.nonsing_inv_mul _ (hX v)]
     simp only [Formalism.HermitianLatticesTheory.fcoord, hi]
-    first
-    | exact Matrix.smul_mulVec _ _ _
-    | exact Matrix.smul_mulVec_assoc _ _ _
-    | (funext i; simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc])
+    first | exact Matrix.smul_mulVec _ _ _
   ext p
   rw [rscMap_apply]
   by_cases h : p.2.2 = 0
@@ -126,7 +123,7 @@ theorem realize_smul_eq
       simp [Formalism.HermitianLatticesTheory.realize, Formalism.HermitianLatticesTheory.realizeRaw,
         h]
     rw [e1, e2, hf]
-    simp [← Complex.ofReal_inv, Complex.re_ofReal_mul]
+    simp [← Complex.ofReal_inv]
   · have e1
         : (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v) x) p
           = (Formalism.HermitianLatticesTheory.fcoord b
@@ -140,7 +137,7 @@ theorem realize_smul_eq
       simp [Formalism.HermitianLatticesTheory.realize, Formalism.HermitianLatticesTheory.realizeRaw,
         h]
     rw [e1, e2, hf]
-    simp [← Complex.ofReal_inv, Complex.im_ofReal_mul]
+    simp [← Complex.ofReal_inv]
 end
 
 theorem rescaleCovol_of (h1 : PlaceSplit) (h2 : GramBlock) (h3 : PlLat) : RescaleCovol := by

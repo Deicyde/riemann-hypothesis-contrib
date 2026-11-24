@@ -1,7 +1,8 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueLinearLiftUniformisedFibresStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniqueLinearLiftUniformisedFibres
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInjectiveOfCommRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -235,11 +236,11 @@ theorem fibrewise
     rw [h0]
     exact hP'.2.2.1
   obtain ⟨f, hf, -⟩ :=
-    GlobalTheory.T.existsUnique_linear_lift_uniformised_fibres X X t.G t.G y y g g e e' (𝟙 _)
+    _root_.GlobalTheory.existsUnique_linear_lift_fibre X X t.G t.G y y g g e e' (𝟙 _)
       (MonoidHom.id _) t.semi.smooth ha ha' hh hh' hd' dk' (Category.id_comp _)
       (fun _ => Category.comp_id _)
   obtain ⟨f', hf', -⟩ :=
-    GlobalTheory.T.existsUnique_linear_lift_uniformised_fibres X X t.G t.G y y g g e' e (𝟙 _)
+    _root_.GlobalTheory.existsUnique_linear_lift_fibre X X t.G t.G y y g g e' e (𝟙 _)
       (MonoidHom.id _) t.semi.smooth ha' ha hh' hh hd dk (Category.id_comp _)
       (fun _ => Category.comp_id _)
   obtain ⟨h, gam, h1, h2, h3⟩ :=

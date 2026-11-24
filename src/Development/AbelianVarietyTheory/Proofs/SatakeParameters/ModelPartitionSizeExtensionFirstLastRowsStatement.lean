@@ -47,6 +47,7 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
   Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
   Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.modelPartition_size_extension_firstLast_rows
     : ∀ {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7)
         (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau) (j : ℕ) (hN : RankTie X D j)

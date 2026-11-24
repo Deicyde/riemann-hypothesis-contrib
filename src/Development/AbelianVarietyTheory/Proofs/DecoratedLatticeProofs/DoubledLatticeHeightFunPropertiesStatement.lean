@@ -64,8 +64,4 @@ theorem _root_.GlobalTheory.T.doubledLatticeHeightFun_properties
                 (hgtL A L a g : ℝ)
                   = (∏ w, GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift.hgtW A a w (projArch D.sp.cm.sig A.gram w g))
                     * ∏ v ∈ Sf, GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift.hgtV A L v (proj D.sp.cm.sig A.gram v g) :=
-  by
-    first
-    | exact @GlobalTheory.Core.Rk.IP.hgtL_props
-    | exact GlobalTheory.Core.Rk.IP.hgtL_props
-    | (intros; apply GlobalTheory.Core.Rk.IP.hgtL_props <;> assumption)
+  by first | exact @GlobalTheory.Core.Rk.IP.hgtL_props

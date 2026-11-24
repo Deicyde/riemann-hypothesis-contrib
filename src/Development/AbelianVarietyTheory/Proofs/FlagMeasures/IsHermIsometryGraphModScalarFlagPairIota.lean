@@ -1,7 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.NormalFormDualOrthogonalLast
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePairNormalFormGeometrySummaryStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePairNormalFormGeometrySummary
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsLocalizedModuleSubtype
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -423,8 +423,7 @@ theorem isModIso_iota
             → IsModIso H (g : 𝓞 K) (flagPairDefinitePartLattice N.F' N.F Λ)
               (flagPairDefinitePartLattice N.F N.F' Λ) (iotaGraph N.F N.F' Λ (g : 𝓞 K)) := by
   intro K V _ _ _ _ _ _ _ _ H hK r N g Λ hg ⟨⟨hU, hF, hF'⟩, hA⟩
-  obtain ⟨-, -, -, -, -, -, -, hl, hl'⟩ :=
-    (GlobalTheory.T.hermFramePairNormalForm_geometry_summary K V H hK r N).1
+  obtain ⟨-, -, -, -, -, -, -, hl, hl'⟩ := (_root_.GlobalTheory.DegCnt.NF.geometry K V H hK r N).1
   have hA' : IsAdm N.F' N.F Λ (g : 𝓞 K) := by
     refine isAdm_symm (fun a => ?_) hA
     refine Fin.lastCases ?_ (fun b => ?_) a

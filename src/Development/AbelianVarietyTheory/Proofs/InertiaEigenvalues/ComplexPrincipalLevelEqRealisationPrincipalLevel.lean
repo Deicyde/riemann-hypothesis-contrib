@@ -48,8 +48,6 @@ open Formalism.IndefR.Links
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.Lev Formalism.L2.DIV Formalism.IndefR.Mult
 
-
-
 namespace GlobalTheory.SeriesTie.LevKProof
 
 variable {D : D7}

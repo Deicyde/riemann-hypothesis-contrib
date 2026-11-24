@@ -135,7 +135,7 @@ theorem tensorHom_prop
   have e
       : (f ⊗ₘ g).left
         = pullback.map A.hom C.hom B.hom D.hom f.left g.left (𝟙 S) (by simp) (by simp) := by
-    first | rfl | simp
+    first | rfl
   rw [e]
   exact P.pullbackMap hf hg (Over.w f).symm (Over.w g).symm
 
@@ -280,12 +280,10 @@ theorem torusExtension_of_prod
     (asIso (lift (SplitTorusPow.torusMap _ (AddMonoidHom.inl E₁.X E₂.X))
       (SplitTorusPow.torusMap _ (AddMonoidHom.inr E₁.X E₂.X)))).symm
     (asIso (lift a₁ a₂)).symm (Iso.refl _) (Iso.refl _) ?_ ?_ ?_ ?_
-  · simp only [Iso.refl_hom, Category.comp_id, Iso.symm_hom, asIso_inv, Category.assoc,
-      IsIso.inv_hom_id]
+  · simp only [Iso.symm_hom, asIso_inv]
     simp only [← Category.assoc, IsIso.inv_hom_id, Category.id_comp]
   · exact toUnit_unique _ _
-  · simp only [Iso.refl_hom, Category.comp_id, Iso.symm_hom, asIso_inv, Category.assoc,
-      IsIso.inv_hom_id_assoc]
+  · simp only [Iso.refl_hom, Category.comp_id, Iso.symm_hom, asIso_inv, IsIso.inv_hom_id_assoc]
   · simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
 
 theorem isSemiAbelian_tensor

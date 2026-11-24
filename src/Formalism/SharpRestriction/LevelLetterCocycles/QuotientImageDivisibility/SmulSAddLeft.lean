@@ -97,10 +97,7 @@ theorem LB_smul {m : ℤ} {f : ℤ → V} (hf : LB m f) (c : LL) : LB m (c • f
   simp [hf k hk]
 
 private theorem exists_nat_gt_int_sub (k m : ℤ) : ∃ N : ℕ, k - m < N := by
-  first
-  | exact exists_nat_gt (k - m)
-  | exact ⟨(k - m).toNat + 1, by omega⟩
-  | exact ⟨(k - m).toNat + 1, by have := Int.self_le_toNat (k - m); omega⟩
+  first | exact exists_nat_gt (k - m)
 
 theorem smulS_add {m : ℤ} {f f' : ℤ → V} (hf : LB m f) (hf' : LB m f') (g : PowerSeries LL)
     : smulS g (f + f') = smulS g f + smulS g f' := by
@@ -142,12 +139,9 @@ private theorem smulS_C_eq_smul_of_LB {m : ℤ} {f : ℤ → V} (hf : LB m f) (c
     exact absurd (Finset.mem_range.mpr (Nat.succ_pos N)) h0
 
 theorem smulS_one {m : ℤ} {f : ℤ → V} (hf : LB m f) : smulS (1 : PowerSeries LL) f = f := by
-  first
-  | simpa using smulS_C_eq_smul_of_LB hf (1 : LL)
-  | (have h1 := smulS_C_eq_smul_of_LB hf (1 : LL); rwa [map_one, one_smul] at h1)
+  first | simpa using smulS_C_eq_smul_of_LB hf (1 : LL)
 
-theorem smulS_C {m : ℤ} {f : ℤ → V} (hf : LB m f) (c : LL) : smulS (PowerSeries.C c) f = c • f := by
-  exact smulS_C_eq_smul_of_LB hf c
+alias smulS_C := _root_.Formalism.MainNotions.N.Pv.LocalLengthBound.Ser.smulS_C_eq_smul_of_LB
 
 theorem smulS_X_pow {m : ℤ} {f : ℤ → V} (hf : LB m f) (K : ℕ)
     : smulS ((PowerSeries.X : PowerSeries LL) ^ K) f = fun k => f (k - K) := by
@@ -178,11 +172,10 @@ theorem smulS_mul {m : ℤ} {f : ℤ → V} (hf : LB m f) (g h : PowerSeries LL)
         Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk]
       refine Finset.sum_congr rfl fun i hi => ?_
       have hin : i ≤ n := by
-        simp only [Finset.mem_range, Nat.succ_eq_add_one] at hi
+        simp only [Finset.mem_range] at hi
         omega
       have e : k - (n : ℤ) = k - i - ((n - i : ℕ) : ℤ) := by omega
       rw [e]
-      try rfl
     _ = ∑ i ∈ Finset.range N, ∑ n ∈ Finset.Ico i N,
           (PowerSeries.coeff i g * PowerSeries.coeff (n - i) h) • f (k - i - (n - i : ℕ)) :=
       Finset.sum_comm' fun n i => by
@@ -212,12 +205,7 @@ theorem smulS_mul {m : ℤ} {f : ℤ → V} (hf : LB m f) (g h : PowerSeries LL)
 theorem smulS_inv
     {m : ℤ} {f : ℤ → V} (hf : LB m f) (u : PowerSeries LL) (hu : PowerSeries.constantCoeff u ≠ 0)
     : smulS u⁻¹ (smulS u f) = f := by
-  have h1 : u⁻¹ * u = 1 := by
-    first
-    | exact PowerSeries.inv_mul_cancel u hu
-    | exact PowerSeries.inv_mul_cancel hu
-    | exact PowerSeries.inv_mul_cancel _ hu
-    | (rw [mul_comm]; exact PowerSeries.mul_inv_cancel u hu)
+  have h1 : u⁻¹ * u = 1 := by first | exact PowerSeries.inv_mul_cancel u hu
   rw [← smulS_mul hf, h1, smulS_one hf]
 
 def Dg (Fil : ℤ → Submodule LL V) (s : ℤ) (f : ℤ → V) : Prop := ∀ k, f k ∈ Fil (s - k)

@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.MonodromyZeroOfWeilDeligneRepClassIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsPowEqPowOfWeilDegreeEqSmoothStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WeilGroupIsSemisimpleOfSemisimpleFrobStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsPowEqPowOfWeilDegreeEqSmooth
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WeilGroupIsSemisimpleOfSemisimpleFrob
+public import Mathlib.LinearAlgebra.JordanChevalley
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -17,7 +18,6 @@ import Mathlib.Data.NNRat.Floor
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
 import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-public import Mathlib.LinearAlgebra.JordanChevalley
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -212,7 +212,7 @@ theorem exists_frobenius_semisimplification
   have huρ : ∀ τ, Commute (u : End ℂ V) (ρ τ) := by
     intro τ
     obtain ⟨m, hm, e⟩ :=
-      GlobalTheory.T.exists_pow_eq_pow_of_weilDegree_eq_smooth E Ω A w h V ρ hρ (frob (h := h))
+      _root_.GlobalTheory.WeilDeligne.exists_pow_eq_pow_of_deg_eq E Ω A w h V ρ hρ (frob (h := h))
         (τ * frob (h := h) * τ⁻¹) (by simp)
     have c1 : f ^ m * ρ τ = (1 : ℂ) • (ρ τ * f ^ m) := by
       rw [one_smul]
@@ -258,8 +258,8 @@ theorem exists_frobenius_semisimplification
       ρ',
       N,
       hsm,
-      GlobalTheory.T.weilGroup_isSemisimple_of_semisimple_frob E Ω A w h V ρ' hsm (frob (h := h))
-        deg_frob (hfr ▸ hss),
+      _root_.GlobalTheory.WeilDeligne.isSemisimple_of_isSemisimple_frob E Ω A w h V ρ' hsm
+        (frob (h := h)) deg_frob (hfr ▸ hss),
       hN,
       fun σ => ?_
     ⟩,

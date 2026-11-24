@@ -57,7 +57,4 @@ theorem _root_.GlobalTheory.T.existsUnique_pureTensor_restrictedFamily
       IsBase ψ θ S T sS sT ΛS ΛT f₀ → IsCovolOne (ratL T S) μ 𝓕
         → ∀ (x : Place D → WO S T → ℂ),
           IsRestricted ψ θ S T sS sT ΛS ΛT f₀ x → ∃! f, IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x f := by
-  first
-  | exact @GlobalTheory.PureTensorExists.existsUnique_isPure
-  | exact GlobalTheory.PureTensorExists.existsUnique_isPure
-  | (intros; apply GlobalTheory.PureTensorExists.existsUnique_isPure <;> assumption)
+  first | exact @GlobalTheory.PureTensorExists.existsUnique_isPure

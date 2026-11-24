@@ -64,7 +64,4 @@ theorem _root_.GlobalTheory.T.exists_nonzero_complementary_adelicSchwartz_functi
         → ∃ r : (κ → AF F) → ℂ,
           GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (evFin F v) f r
             ∧ ∃ x₀, r x₀ ≠ 0 := by
-  first
-  | exact @GlobalTheory.RestComplement.exists_rest_ne_zero
-  | exact GlobalTheory.RestComplement.exists_rest_ne_zero
-  | (intros; apply GlobalTheory.RestComplement.exists_rest_ne_zero <;> assumption)
+  first | exact @GlobalTheory.RestComplement.exists_rest_ne_zero

@@ -98,7 +98,7 @@ theorem injective_toField
   have hx0 : x = 0 := hA (by rw [hx, map_zero])
   rw [hx0, map_zero] at hs'
   have hu : IsUnit (algebraMap A O s) := IsLocalization.map_units O s
-  first | exact hu.mul_left_eq_zero.1 hs' | exact hu.mul_right_eq_zero.1 hs'
+  first | exact hu.mul_left_eq_zero.1 hs'
 
 include m in
 theorem pointIdeal_eq_map [Algebra A Ω] [Algebra O Ω] [IsScalarTower A O Ω]

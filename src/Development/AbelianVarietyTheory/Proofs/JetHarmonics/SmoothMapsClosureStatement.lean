@@ -46,6 +46,7 @@ import Mathlib.Topology.Sheaves.Init
 open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
   MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.GlobalTheory.T.smooth_maps_closure
     : PI.KFinSmooth
       → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ)
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.smooth_maps_closure
             ∧ ∀ (Wp : Type) [NormedAddCommGroup Wp] (T : R.H → R'.H) (Bm : R'.H → Wp),
               SmMap R R' T → PI.BesselMapUniq.IsCWCont (k := k) (r := r) R'.σ Bm
                 → PI.BesselMapUniq.IsCWCont (k := k) (r := r) R.σ (fun v => Bm (T v)) := by
-  first
-  | exact @GlobalTheory.SmMapAct.smMap_act
-  | exact GlobalTheory.SmMapAct.smMap_act
-  | (intros; apply GlobalTheory.SmMapAct.smMap_act <;> assumption)
+  first | exact @GlobalTheory.SmMapAct.smMap_act

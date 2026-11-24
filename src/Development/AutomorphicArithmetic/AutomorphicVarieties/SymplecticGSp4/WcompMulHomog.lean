@@ -131,7 +131,6 @@ private theorem span_coeffs
   obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hx
   choose G hG using fun i => W.surj (a i)
   have h1 : f - ∑ i, G i * e i ∈ RingHom.ker W.π := by
-
     rw [RingHom.mem_ker, map_sub, hf, ← ha, map_sum]
     simp [hG, heg]
   have key : ∀ j, W.π (wcomp O W.wt j f) = ∑ i, W.π (wcomp O W.wt (j - c i) (G i)) * g i := by

@@ -68,26 +68,32 @@ open scoped Pointwise
 
 section General
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
-  {V : Type*} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V} {N M Nbar K : Subgroup G}
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [TotallyDisconnectedSpace G]
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {ρ : Representation ℂ G V} {N M Nbar K : Subgroup G}
 
-theorem mk_fixedProj_eq (hρ : IsSmooth ρ) (hKc : IsCompact (K : Set G)) (hKo : IsOpen (K : Set G))
+theorem mk_fixedProj_eq
+    (hρ : IsSmooth ρ) (hKc : IsCompact (K : Set G)) (hKo : IsOpen (K : Set G))
     (hfact : ∀ k ∈ K, ∃ x ∈ K ⊓ N, ∃ y ∈ K ⊓ M, ∃ z ∈ K ⊓ Nbar, k = x * y * z)
     {w : V} (hwNbar : ∀ z ∈ K ⊓ Nbar, ρ z w = w)
-    (hwM : ∀ y ∈ K ⊓ M, Representation.Coinvariants.mk (ρ.comp N.subtype) (ρ y w) =
-      Representation.Coinvariants.mk (ρ.comp N.subtype) w) :
-    Representation.Coinvariants.mk (ρ.comp N.subtype) (fixedProj ρ hρ hKc hKo w : V) =
-      Representation.Coinvariants.mk (ρ.comp N.subtype) w := by
+    (hwM : ∀ y ∈ K ⊓ M,
+      Representation.Coinvariants.mk (ρ.comp N.subtype) (ρ y w)
+        = Representation.Coinvariants.mk (ρ.comp N.subtype) w)
+    : Representation.Coinvariants.mk (ρ.comp N.subtype) (fixedProj ρ hρ hKc hKo w : V)
+      = Representation.Coinvariants.mk (ρ.comp N.subtype) w := by
   classical
-  have hterm : ∀ k ∈ K, Representation.Coinvariants.mk (ρ.comp N.subtype) (ρ k w) =
-      Representation.Coinvariants.mk (ρ.comp N.subtype) w := by
+  have hterm
+      : ∀ k ∈ K,
+        Representation.Coinvariants.mk (ρ.comp N.subtype) (ρ k w)
+          = Representation.Coinvariants.mk (ρ.comp N.subtype) w := by
     intro k hk
     obtain ⟨x, hx, y, hy, z, hz, rfl⟩ := hfact k hk
     rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hwNbar z hz,
       mk_apply_of_mem ρ N (Subgroup.mem_inf.1 hx).2, hwM y hy]
-  obtain ⟨N', -, -, hN'U, hnorm, hfin⟩ := exists_normal_subgroup hKc hKo
-    ((hρ w).mem_nhds (one_mem (stabilizerOf ρ w)))
+  obtain ⟨N', -, -, hN'U, hnorm, hfin⟩ :=
+    exists_normal_subgroup hKc hKo ((hρ w).mem_nhds (one_mem (stabilizerOf ρ w)))
   have := Fintype.ofFinite (K ⧸ N'.subgroupOf K)
   have hw' : w ∈ fixedVectors ρ N' := fun k hk => hN'U hk
   set c : ℂ := (Fintype.card (K ⧸ N'.subgroupOf K) : ℂ)
@@ -96,8 +102,9 @@ theorem mk_fixedProj_eq (hρ : IsSmooth ρ) (hKc : IsCompact (K : Set G)) (hKo :
     Submodule.smul_mem _ _ (cosetSum_mem_fixedVectors ρ hnorm hw')
   have hey : fixedProj ρ hρ hKc hKo w = ⟨c⁻¹ • cosetSum ρ K N' w, hyK⟩ := by
     rw [fixedProj_eq_iff]
-    have heq : w - c⁻¹ • cosetSum ρ K N' w =
-        c⁻¹ • ∑ q : K ⧸ N'.subgroupOf K, (w - ρ ((Quotient.out q : K) : G) w) := by
+    have heq
+        : w - c⁻¹ • cosetSum ρ K N' w
+          = c⁻¹ • ∑ q : K ⧸ N'.subgroupOf K, (w - ρ ((Quotient.out q : K) : G) w) := by
       rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, ← cosetSum_apply, smul_sub,
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hc, one_smul]
     show w - c⁻¹ • cosetSum ρ K N' w ∈ coinvariantsKer ρ K
@@ -108,42 +115,47 @@ theorem mk_fixedProj_eq (hρ : IsSmooth ρ) (hKc : IsCompact (K : Set G)) (hKo :
   rw [hey]
   show Representation.Coinvariants.mk (ρ.comp N.subtype) (c⁻¹ • cosetSum ρ K N' w) = _
 
-  rw [map_smul, cosetSum_apply, map_sum,
-  Finset.sum_congr rfl fun q _ => hterm _ (Quotient.out q).2, Finset.sum_const,
-  Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hc, one_smul]
+  rw [map_smul, cosetSum_apply, map_sum, Finset.sum_congr rfl fun q _ => hterm _ (Quotient.out q).2,
+    Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hc,
+    one_smul]
 
 end General
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {n : ℕ} {V : Type*} [AddCommGroup V] [Module ℂ V]
 
 def IsSupercuspidal (π : Representation ℂ (GL (Fin n) F) V) : Prop :=
   ∀ γ : Fin n → ℕ, (∃ i j, γ i ≠ γ j) → Subsingleton (JacquetModule F n γ π)
 
-def matrixCoeff (π : Representation ℂ (GL (Fin n) F) V) (v : V) (f : Module.Dual ℂ V)
-    (g : GL (Fin n) F) : ℂ :=
+def matrixCoeff
+    (π : Representation ℂ (GL (Fin n) F) V) (v : V) (f : Module.Dual ℂ V) (g : GL (Fin n) F)
+    : ℂ :=
   f (π g v)
 
 def IsCompactModCenter (φ : GL (Fin n) F → ℂ) : Prop :=
-  ∃ C : Set (GL (Fin n) F), IsCompact C ∧
-    Function.support φ ⊆ (Subgroup.center (GL (Fin n) F) : Set (GL (Fin n) F)) * C
+  ∃ C : Set (GL (Fin n) F),
+    IsCompact C ∧ Function.support φ ⊆ (Subgroup.center (GL (Fin n) F) : Set (GL (Fin n) F)) * C
 
 section Compact
 
 variable {π : Representation ℂ (GL (Fin n) F) V}
 
-theorem exists_finset_of_isSupercuspidal (hsc : IsSupercuspidal π) {S : Finset (Fin n)}
-    (hS : ∃ i j, i ∈ S ∧ j ∉ S) (w : V) :
-    ∃ U : Finset (GL (Fin n) F), (∀ u ∈ U, u ∈ unipotentRadical F n (splitFun S)) ∧
-      w ∈ Submodule.span ℂ {y | ∃ u ∈ U, ∃ x, y = π u x - x} := by
+theorem exists_finset_of_isSupercuspidal
+    (hsc : IsSupercuspidal π) {S : Finset (Fin n)} (hS : ∃ i j, i ∈ S ∧ j ∉ S) (w : V)
+    : ∃ U : Finset (GL (Fin n) F),
+      (∀ u ∈ U, u ∈ unipotentRadical F n (splitFun S))
+        ∧ w ∈ Submodule.span ℂ {y | ∃ u ∈ U, ∃ x, y = π u x - x} := by
   classical
   obtain ⟨i, j, hi, hj⟩ := hS
   have hsub := hsc (splitFun S) ⟨i, j, by simp [splitFun, hi, hj]⟩
-  have hw : w ∈ Representation.Coinvariants.ker (π.comp (unipotentRadical F n (splitFun S)).subtype) :=
+  have hw
+      : w ∈ Representation.Coinvariants.ker (π.comp (unipotentRadical F n (splitFun S)).subtype) :=
     (Representation.Coinvariants.mk_eq_zero _).1 (Subsingleton.elim _ _)
   obtain ⟨T, hT, hwT⟩ := Submodule.mem_span_finite_of_mem_span hw
-  have hpre : ∀ y ∈ T, ∃ gv : unipotentRadical F n (splitFun S) × V,
-      π (gv.1 : GL (Fin n) F) gv.2 - gv.2 = y := by
+  have hpre
+      : ∀ y ∈ T, ∃ gv : unipotentRadical F n (splitFun S) × V,
+        π (gv.1 : GL (Fin n) F) gv.2 - gv.2 = y := by
     intro y hy
     obtain ⟨gv, h⟩ := hT hy
     exact ⟨gv, h⟩
@@ -156,24 +168,25 @@ theorem exists_finset_of_isSupercuspidal (hsc : IsSupercuspidal π) {S : Finset 
     intro y hy
     exact ⟨((pre y).1 : GL (Fin n) F), Finset.mem_image_of_mem _ hy, (pre y).2, (hpre y hy).symm⟩
 
-theorem diagPow_const_mem_center (c : ℤ) :
-    Cartan.diagPow F n (fun _ => c) ∈ Subgroup.center (GL (Fin n) F) :=
+theorem diagPow_const_mem_center (c : ℤ)
+    : Cartan.diagPow F n (fun _ => c) ∈ Subgroup.center (GL (Fin n) F) :=
   Matrix.GeneralLinearGroup.mem_center_iff_val_mem_range_scalar.2
     ⟨(uniformizer F : F) ^ c, by rw [Matrix.scalar_apply, Cartan.coe_diagPow]⟩
 
-theorem isCompactModCenter_matrixCoeff (hπ : IsSmooth π) (hsc : IsSupercuspidal π) (v : V)
-    {f : Module.Dual ℂ V} (hf : f ∈ smoothVectors (Representation.dual π)) :
-    IsCompactModCenter (matrixCoeff π v f) := by
+theorem isCompactModCenter_matrixCoeff
+    (hπ : IsSmooth π) (hsc : IsSupercuspidal π) (v : V)
+    {f : Module.Dual ℂ V} (hf : f ∈ smoothVectors (Representation.dual π))
+    : IsCompactModCenter (matrixCoeff π v f) := by
   classical
   obtain ⟨m₁, -, hm₁⟩ := (hasBasis_nhds_one F n).mem_iff.1 ((hπ v).mem_nhds (one_mem _))
-  obtain ⟨m₂, -, hm₂⟩ := (hasBasis_nhds_one F n).mem_iff.1
-    ((mem_smoothVectors.1 hf).mem_nhds (one_mem _))
+  obtain ⟨m₂, -, hm₂⟩ :=
+    (hasBasis_nhds_one F n).mem_iff.1 ((mem_smoothVectors.1 hf).mem_nhds (one_mem _))
   set m := max m₁ m₂
   set K := congruenceSubgroup F n m
   have hvK : v ∈ fixedVectors π K := fun k hk =>
     hm₁ (congruenceSubgroup_antitone F n (le_max_left _ _) hk)
-  have hfK : ∀ k ∈ K, ∀ x, f (π k x) = f x := mem_fixedVectors_dual.1 fun k hk =>
-    hm₂ (congruenceSubgroup_antitone F n (le_max_right _ _) hk)
+  have hfK : ∀ k ∈ K, ∀ x, f (π k x) = f x :=
+    mem_fixedVectors_dual.1 fun k hk => hm₂ (congruenceSubgroup_antitone F n (le_max_right _ _) hk)
   set K₀ := integralGL F n
   have : CompactSpace K₀ := isCompact_iff_compactSpace.1 (isCompact_integralGL F n)
   have hQ : Finite (K₀ ⧸ K.subgroupOf K₀) := by
@@ -190,26 +203,35 @@ theorem isCompactModCenter_matrixCoeff (hπ : IsSmooth π) (hsc : IsSupercuspida
       (b := Quotient.out (QuotientGroup.mk (⟨k, hk⟩ : K₀) : K₀ ⧸ K.subgroupOf K₀))
       (QuotientGroup.out_eq' _).symm
   let V₂ : Finset V := R.image fun r => π r v
-  have hU : ∀ S : Finset (Fin n), (∃ i j, i ∈ S ∧ j ∉ S) → ∀ w : V,
-      ∃ U : Finset (GL (Fin n) F), (∀ u ∈ U, u ∈ unipotentRadical F n (splitFun S)) ∧
-        w ∈ Submodule.span ℂ {y | ∃ u ∈ U, ∃ x, y = π u x - x} :=
-    fun S hS w => exists_finset_of_isSupercuspidal hsc hS w
+  have hU
+      : ∀ S : Finset (Fin n),
+        (∃ i j, i ∈ S ∧ j ∉ S)
+          → ∀ w : V, ∃ U : Finset (GL (Fin n) F),
+            (∀ u ∈ U, u ∈ unipotentRadical F n (splitFun S))
+              ∧ w ∈ Submodule.span ℂ {y | ∃ u ∈ U, ∃ x, y = π u x - x} := fun S hS w =>
+    exists_finset_of_isSupercuspidal hsc hS w
   choose! Uf hUf1 hUf2 using hU
-  let Uall : Finset (GL (Fin n) F) := Finset.univ.biUnion fun S : Finset (Fin n) => V₂.biUnion (Uf S)
-  obtain ⟨t, ht⟩ := exists_pow_mul_mem_of_isCompact F n
-    ((Uall ∪ Uall.image fun u => u⁻¹ : Finset (GL (Fin n) F)) : Set (GL (Fin n) F)).toFinite.isCompact
-  have hbu : ∀ u ∈ Uall, ∀ i j, (uniformizer F : F) ^ t * u i j ∈ 𝒪[F] :=
-    fun u hu => ht _ (by simp [hu])
-  have hbu' : ∀ u ∈ Uall, ∀ i j, (uniformizer F : F) ^ t * (u⁻¹ : GL (Fin n) F) i j ∈ 𝒪[F] :=
-    fun u hu => ht _ (by simp only [Finset.coe_union, Finset.coe_image, Set.mem_union,
-      Set.mem_image, Finset.mem_coe]; exact Or.inr ⟨u, hu, rfl⟩)
+  let Uall : Finset (GL (Fin n) F) :=
+    Finset.univ.biUnion fun S : Finset (Fin n) => V₂.biUnion (Uf S)
+  obtain ⟨t, ht⟩ :=
+    exists_pow_mul_mem_of_isCompact F n
+      ((Uall ∪ Uall.image fun u => u⁻¹ : Finset (GL (Fin n) F))
+        : Set (GL (Fin n) F)).toFinite.isCompact
+  have hbu : ∀ u ∈ Uall, ∀ i j, (uniformizer F : F) ^ t * u i j ∈ 𝒪[F] := fun u hu =>
+    ht _ (by simp [hu])
+  have hbu'
+      : ∀ u ∈ Uall, ∀ i j, (uniformizer F : F) ^ t * (u⁻¹ : GL (Fin n) F) i j ∈ 𝒪[F] := fun u hu =>
+    ht _ (by
+      simp only [Finset.coe_union, Finset.coe_image, Set.mem_union, Set.mem_image, Finset.mem_coe]
+      exact Or.inr ⟨u, hu, rfl⟩)
   set C : ℤ := ((t + m : ℕ) : ℤ) + 1 with hCdef
   have hC : ((t + m : ℕ) : ℤ) < C := lt_add_one _
   have hC0 : 0 < C := by positivity
   let Nset : Finset (Fin n → ℤ) := Fintype.piFinset fun _ => Finset.Icc 0 (n * C)
-  let Cset : Set (GL (Fin n) F) := ⋃ ν ∈ (Nset : Set (Fin n → ℤ)),
-    (fun p : GL (Fin n) F × GL (Fin n) F => p.1 * Cartan.diagPow F n ν * p.2) ''
-      ((K₀ : Set (GL (Fin n) F)) ×ˢ (K₀ : Set (GL (Fin n) F)))
+  let Cset : Set (GL (Fin n) F) :=
+    ⋃ ν ∈ (Nset : Set (Fin n → ℤ)),
+      (fun p : GL (Fin n) F × GL (Fin n) F => p.1 * Cartan.diagPow F n ν * p.2) ''
+        ((K₀ : Set (GL (Fin n) F)) ×ˢ (K₀ : Set (GL (Fin n) F)))
   have hCset : IsCompact Cset :=
     Nset.finite_toSet.isCompact_biUnion fun ν _ =>
       ((isCompact_integralGL F n).prod (isCompact_integralGL F n)).image (by fun_prop)
@@ -224,23 +246,23 @@ theorem isCompactModCenter_matrixCoeff (hπ : IsSmooth π) (hsc : IsSupercuspida
     apply hg
     set S : Finset (Fin n) :=
       Finset.univ.filter fun j => (fun _ : Fin n => (0 : ℕ)) j = b ∧ θ ≤ μ j with hSdef
-    have hS : ∃ i j, i ∈ S ∧ j ∉ S :=
-      ⟨i, j, by simp [S, hib, hiθ], by simp [S, hjb, not_le.2 hjθ]⟩
+    have hS : ∃ i j, i ∈ S ∧ j ∉ S := ⟨i, j, by simp [S, hib, hiθ], by simp [S, hjb, not_le.2 hjθ]⟩
     have hsp := hUf2 S hS (π r₂ v)
     set a := Cartan.diagPow F n μ
-    have hker : Submodule.span ℂ {y | ∃ u ∈ Uf S (π r₂ v), ∃ x, y = π u x - x} ≤
-        LinearMap.ker (f ∘ₗ π k₁ ∘ₗ π a) := by
+    have hker
+        : Submodule.span ℂ {y | ∃ u ∈ Uf S (π r₂ v), ∃ x, y = π u x - x}
+          ≤ LinearMap.ker (f ∘ₗ π k₁ ∘ₗ π a) := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨u, hu, x, rfl⟩
-      have huA : u ∈ Uall := Finset.mem_biUnion.2 ⟨S, Finset.mem_univ _,
-        Finset.mem_biUnion.2 ⟨π r₂ v, hwV, hu⟩⟩
+      have huA : u ∈ Uall :=
+        Finset.mem_biUnion.2 ⟨S, Finset.mem_univ _, Finset.mem_biUnion.2 ⟨π r₂ v, hwV, hu⟩⟩
       have huN := hUf1 S hS (π r₂ v) u hu
-      have hlev : ∀ w : GL (Fin n) F, w ∈ levi F n (fun _ : Fin n => (0 : ℕ)) :=
-        fun w => mem_levi.2 fun i j h => absurd rfl h
+      have hlev : ∀ w : GL (Fin n) F, w ∈ levi F n (fun _ : Fin n => (0 : ℕ)) := fun w =>
+        mem_levi.2 fun i j h => absurd rfl h
       have hconj : a * u * a⁻¹ ∈ K :=
         diagPow_conj_mem_congruenceSubgroup hC (apply_eq_or_gap hgap (hlev u) huN)
-          (apply_eq_or_gap hgap (hlev u⁻¹) ((unipotentRadical F n _).inv_mem huN))
-          (hbu u huA) (hbu' u huA)
+          (apply_eq_or_gap hgap (hlev u⁻¹) ((unipotentRadical F n _).inv_mem huN)) (hbu u huA)
+          (hbu' u huA)
       have hconj' : k₁ * (a * u * a⁻¹) * k₁⁻¹ ∈ K := conj_mem_congruenceSubgroup F n hk₁ hconj
       simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
         map_sub]
@@ -253,9 +275,11 @@ theorem isCompactModCenter_matrixCoeff (hπ : IsSmooth π) (hsc : IsSupercuspida
     show f (π (k₁ * a * k₂) v) = 0
     rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hr₂v]
     exact this
-  ·
-    let c₀ : ℤ := if h : ∃ k : Fin n, True then
-      (Finset.univ.image μ).min' ⟨_, Finset.mem_image_of_mem μ (Finset.mem_univ h.choose)⟩ else 0
+  · let c₀ : ℤ :=
+      if h : ∃ k : Fin n, True then
+        (Finset.univ.image μ).min' ⟨_, Finset.mem_image_of_mem μ (Finset.mem_univ h.choose)⟩
+      else
+        0
     have hc₀le : ∀ k, c₀ ≤ μ k := by
       intro k
       simp only [c₀, dif_pos (⟨k, trivial⟩ : ∃ k : Fin n, True)]
@@ -282,8 +306,13 @@ theorem isCompactModCenter_matrixCoeff (hπ : IsSmooth π) (hsc : IsSupercuspida
       funext j
       simp [ν]
     have hz := diagPow_const_mem_center (F := F) (n := n) c₀
-    refine Set.mem_mul.2 ⟨Cartan.diagPow F n (fun _ => c₀), hz, k₁ * Cartan.diagPow F n ν * k₂,
-      Set.mem_biUnion hν ⟨(k₁, k₂), ⟨hk₁, hk₂⟩, rfl⟩, ?_⟩
+    refine Set.mem_mul.2 ⟨
+      Cartan.diagPow F n (fun _ => c₀),
+      hz,
+      k₁ * Cartan.diagPow F n ν * k₂,
+      Set.mem_biUnion hν ⟨(k₁, k₂), ⟨hk₁, hk₂⟩, rfl⟩,
+      ?_
+    ⟩
     rw [hμ, diagPow_add, ← mul_assoc k₁, Subgroup.mem_center_iff.1 hz k₁]
     group
 

@@ -39,8 +39,6 @@ import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
@@ -64,6 +62,7 @@ end Gen
 section Chars
 open Formalism.L2.Host
 end Chars
+
 theorem heckeOpen_withLoc_alt
     : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
         (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (low : Finset ℕ)

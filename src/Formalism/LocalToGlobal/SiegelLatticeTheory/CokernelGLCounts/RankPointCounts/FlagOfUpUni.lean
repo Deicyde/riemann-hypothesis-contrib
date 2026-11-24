@@ -52,7 +52,8 @@ noncomputable section
 
 open scoped Classical
 open Module Matrix
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermOp
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermOp
 
 namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 
@@ -60,7 +61,8 @@ section Uni
 
 variable {K : Type*} [Field K] {N : ℕ}
 
-theorem upUni_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUpUni A) (hB : IsUpUni B) : IsUpUni (A * B) := by
+theorem upUni_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUpUni A) (hB : IsUpUni B)
+    : IsUpUni (A * B) := by
   apply Formalism.L2.SG.Pf.StabilizerIndexVolumes.up_mul <;> assumption
 
 theorem loUni_iff_ct {A : Matrix (Fin N) (Fin N) K} [StarRing K] : IsLoUni A ↔ IsUpUni Aᴴ := by
@@ -94,8 +96,8 @@ theorem loUni_det {A : Matrix (Fin N) (Fin N) K} (h : IsLoUni A) : A.det = 1 := 
 theorem upUni_inv {A : Matrix (Fin N) (Fin N) K} (h : IsUpUni A) : IsUpUni A⁻¹ := by
   apply Formalism.L2.SG.Pf.StabilizerIndexVolumes.up_inv <;> assumption
 
-theorem loUni_mul {A B : Matrix (Fin N) (Fin N) K} [StarRing K] (hA : IsLoUni A) (hB : IsLoUni B) :
-    IsLoUni (A * B) := by
+theorem loUni_mul {A B : Matrix (Fin N) (Fin N) K} [StarRing K] (hA : IsLoUni A) (hB : IsLoUni B)
+    : IsLoUni (A * B) := by
   rw [loUni_iff_ct, conjTranspose_mul]
   exact upUni_mul (loUni_iff_ct.1 hB) (loUni_iff_ct.1 hA)
 
@@ -103,8 +105,9 @@ theorem loUni_inv {A : Matrix (Fin N) (Fin N) K} [StarRing K] (h : IsLoUni A) : 
   rw [loUni_iff_ct, conjTranspose_nonsing_inv]
   exact upUni_inv (loUni_iff_ct.1 h)
 
-theorem upUni_last {r : ℕ} {A : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni A) (c : Fin (r + 1)) :
-    A (Fin.last r) c = if c = Fin.last r then 1 else 0 := by
+theorem upUni_last
+    {r : ℕ} {A : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni A) (c : Fin (r + 1))
+    : A (Fin.last r) c = if c = Fin.last r then 1 else 0 := by
   by_cases hc : c = Fin.last r
   · subst hc; rw [if_pos rfl]; exact (h _ _).2 rfl
   · rw [if_neg hc]
@@ -114,10 +117,12 @@ end Uni
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem flag_of_upUni (F : FlagG S r T) (g : S.V →ₗ[E] S.V) (N : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hN : IsUpUni N) (hg : ∀ b, g (F.fvec b) = ∑ c, N c b • F.fvec c) :
-    (∀ j, ∀ x ∈ F.Xa (j + 1), g x - x ∈ F.Xa j) ∧ g F.z - F.z ∈ F.X := by
-  have hdiff : ∀ b, g (F.fvec b) - F.fvec b = ∑ c ∈ Finset.univ.filter (· < b), N c b • F.fvec c := by
+theorem flag_of_upUni
+    (F : FlagG S r T) (g : S.V →ₗ[E] S.V) (N : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hN : IsUpUni N) (hg : ∀ b, g (F.fvec b) = ∑ c, N c b • F.fvec c)
+    : (∀ j, ∀ x ∈ F.Xa (j + 1), g x - x ∈ F.Xa j) ∧ g F.z - F.z ∈ F.X := by
+  have hdiff
+      : ∀ b, g (F.fvec b) - F.fvec b = ∑ c ∈ Finset.univ.filter (· < b), N c b • F.fvec c := by
     intro b
     rw [hg b, ← Finset.sum_filter_add_sum_filter_not Finset.univ (· < b)]
     have h2 : ∑ c ∈ Finset.univ.filter (fun c => ¬ c < b), N c b • F.fvec c = F.fvec b := by
@@ -127,7 +132,8 @@ theorem flag_of_upUni (F : FlagG S r T) (g : S.V →ₗ[E] S.V) (N : Matrix (Fin
         have : b < c := lt_of_le_of_ne (not_lt.1 (Finset.mem_filter.1 hc).2) (Ne.symm hcb)
         rw [(hN c b).1 this, zero_smul]
       · intro hb; exfalso; apply hb; simp
-    rw [h2]; abel
+    rw [h2]
+    abel
   have he : ∀ a : Fin r, g (F.e a) - F.e a ∈ F.Xa a := by
     intro a
     have := hdiff (Fin.castSucc a)
@@ -137,7 +143,7 @@ theorem flag_of_upUni (F : FlagG S r T) (g : S.V →ₗ[E] S.V) (N : Matrix (Fin
     have hc' : c < Fin.castSucc a := (Finset.mem_filter.1 hc).2
     have hcl : c ≠ Fin.last r := ne_of_lt (lt_trans hc' (Fin.castSucc_lt_last a))
     obtain ⟨c', rfl⟩ := Fin.exists_castSucc_eq.2 hcl
-    simp only [FlagG.fvec, Fin.snoc_castSucc]
+    simp only [Fin.snoc_castSucc]
     exact Submodule.subset_span ⟨c', by simpa using hc', rfl⟩
   refine ⟨fun j x hx => ?_, ?_⟩
   · induction hx using Submodule.span_induction with
@@ -156,7 +162,7 @@ theorem flag_of_upUni (F : FlagG S r T) (g : S.V →ₗ[E] S.V) (N : Matrix (Fin
     refine Submodule.sum_mem _ fun c hc => Submodule.smul_mem _ _ ?_
     have hcl : c ≠ Fin.last r := ne_of_lt (Finset.mem_filter.1 hc).2
     obtain ⟨c', rfl⟩ := Fin.exists_castSucc_eq.2 hcl
-    simp only [FlagG.fvec, Fin.snoc_castSucc]
+    simp only [Fin.snoc_castSucc]
     exact Submodule.subset_span ⟨c', rfl⟩
 
 end Formalism.L2.SG.NGCut.NormalVectorPairings

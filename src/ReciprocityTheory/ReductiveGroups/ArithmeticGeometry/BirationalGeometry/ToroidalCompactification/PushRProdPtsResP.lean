@@ -276,7 +276,6 @@ theorem frameLieBC
     show Smooth (pullback.snd G.hom (fB S (Localization.Away s)))
     first
     | infer_instance
-    | exact MorphismProperty.pullback_snd (P := @Smooth) _ _ (inferInstance : Smooth G.hom)
   haveI hpr : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
   let φp : Localization.AtPrime (RingHom.ker φ) →+* k :=
     IsLocalization.lift (M := (RingHom.ker φ).primeCompl)
@@ -288,7 +287,6 @@ theorem frameLieBC
     show Smooth (pullback.snd G.hom (fB S (Localization.AtPrime (RingHom.ker φ))))
     first
     | infer_instance
-    | exact MorphismProperty.pullback_snd (P := @Smooth) _ _ (inferInstance : Smooth G.hom)
   have hsp : Geo.Tor.spMap φ = Geo.Tor.spMap φp ≫ fB S (Localization.AtPrime (RingHom.ker φ)) := by
     simp only [Geo.Tor.spMap, fB]
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, hφ]
@@ -314,7 +312,7 @@ theorem frameLieBC
     rw [← Category.assoc, Geo.Tor.spMap, Geo.Tor.spMap, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
       hring]
   · rw [Category.assoc, pullback.lift_snd]
-    simp only [resP, pullR, Over.homMk_left, Category.assoc, IsPullback.lift_snd]
+    simp only [resP, pullR, Over.homMk_left, Category.assoc]
     rw [← Category.assoc, Over.w (u' j)]
     simp only [Geo.Tor.epsR, sp, Over.mk_hom, Geo.Tor.spMap]
     erw [IsPullback.lift_snd]

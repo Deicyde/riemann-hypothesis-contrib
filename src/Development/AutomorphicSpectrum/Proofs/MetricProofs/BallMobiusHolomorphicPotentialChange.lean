@@ -122,8 +122,7 @@ theorem den_gram {u : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (W : Matrix
   simp only [IsSgU, sgI, fromBlocks_conjTranspose, fromBlocks_multiply] at hu
   have h := Matrix.fromBlocks_inj.1 hu
   obtain ⟨h11, h12, h21, h22⟩ := h
-  simp only [Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, Matrix.mul_one, Matrix.mul_neg,
-      Matrix.neg_mul]
+  simp only [Matrix.mul_zero, add_zero, zero_add, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul]
     at h11 h12 h21 h22
   simp only [den, num, toBlocks_fromBlocks₁₁, toBlocks_fromBlocks₁₂, toBlocks_fromBlocks₂₁,
     toBlocks_fromBlocks₂₂]

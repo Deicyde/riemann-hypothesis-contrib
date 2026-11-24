@@ -457,9 +457,7 @@ theorem trC_tmul (x y : I.E) (a : Af I.F) : trC I x (y ⊗ₜ a) = Algebra.trace
 
 theorem nt_trace_int (x : 𝓞 I.E)
     : Algebra.trace I.F I.E (x : I.E) ∈ (algebraMap (𝓞 I.F) I.F).range := by
-  have : IsIntegral ℤ (Algebra.trace I.F I.E (x : I.E)) :=
-    Algebra.isIntegral_trace (RingOfIntegers.isIntegral_coe x)
-  exact ⟨⟨_, this⟩, rfl⟩
+  exact ⟨⟨_, Algebra.isIntegral_trace (RingOfIntegers.isIntegral_coe x)⟩, rfl⟩
 
 theorem nt_intAd_of_int (t : 𝓞 I.F)
     : algebraMap I.F (Af I.F) (t : I.F) ∈ Formalism.UG.intAd I.F := by
@@ -472,9 +470,7 @@ theorem nt_int_of_intAd (c : I.F) (h : algebraMap I.F (Af I.F) c ∈ Formalism.U
     : c ∈ (algebraMap (𝓞 I.F) I.F).range := by
   refine mem_integers_of_valuation_le_one (R := 𝓞 I.F) (K := I.F) _ fun v => ?_
   rw [← valuedAdicCompletion_eq_valuation', ← mem_adicCompletionIntegers]
-  have h2 := h v
-  rw [FiniteAdeleRing.algebraMap_apply] at h2
-  exact h2
+  simpa [FiniteAdeleRing.algebraMap_apply] using h v
 
 def phiInt : 𝓞 I.E ⊗[ℤ] Formalism.UG.intAd I.F →ₐ[ℤ] I.E ⊗[I.F] Af I.F :=
   Algebra.TensorProduct.productMap
@@ -546,9 +542,9 @@ open scoped TensorProduct
 variable (I : AutInst)
 
 theorem nt_int_mul_of (x : I.E) : ∃ m : ℤ, m ≠ 0 ∧ IsIntegral ℤ ((m : I.E) * x) := by
-  have h1 : IsAlgebraic ℚ x := Algebra.IsAlgebraic.isAlgebraic x
-  have h2 : IsAlgebraic ℤ x := (IsFractionRing.isAlgebraic_iff ℤ ℚ I.E).2 h1
-  obtain ⟨y, hy, hi⟩ := h2.exists_integral_multiple
+  obtain ⟨y, hy, hi⟩ :=
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ I.E).2
+      (Algebra.IsAlgebraic.isAlgebraic x)).exists_integral_multiple
   exact ⟨y, hy, by rwa [zsmul_eq_mul] at hi⟩
 
 theorem nt_dual
@@ -712,8 +708,7 @@ theorem kset_open : IsOpen I.Kset := by
         ?_
       ⟩
     ⟩
-    · rw [Matrix.sub_mulVec, Matrix.one_mulVec]
-      exact sub_mem ((hx y).1 hy) hy
+    · simpa [Matrix.sub_mulVec] using sub_mem ((hx y).1 hy) hy
     · simp
   · exact fun hx => hx.1
 
@@ -872,8 +867,7 @@ theorem wz_lemma (γ δ : WithZero (Multiplicative ℤ)) (h : γ < 1) (hδ : ∀
   have h2
       : Multiplicative.toAdd d
         ≤ (((-(Multiplicative.toAdd d)).toNat + 1 : ℕ) : ℤ) * Multiplicative.toAdd t := by
-    have := Multiplicative.toAdd_le.2 hk
-    rwa [toAdd_pow, nsmul_eq_mul] at this
+    simpa [toAdd_pow, nsmul_eq_mul] using Multiplicative.toAdd_le.2 hk
   have h3 : (0 : ℤ) ≤ ((-(Multiplicative.toAdd d)).toNat : ℤ) := Nat.cast_nonneg _
   have h4 : -(Multiplicative.toAdd d) ≤ ((-(Multiplicative.toAdd d)).toNat : ℤ) :=
     Int.self_le_toNat _
@@ -920,14 +914,7 @@ theorem nt_intBasis
     b0.isUnitSMul (w := fun i => ((n i : ℤ) : I.F)) (fun i => (Int.cast_ne_zero.2 (hn0 i)).isUnit),
     fun i => ?_
   ⟩
-  have : b0.isUnitSMul
-        (w := fun i => ((n i : ℤ) : I.F))
-        (fun i => (Int.cast_ne_zero.2 (hn0 i)).isUnit)
-        i
-      = ((n i : ℤ) : I.E) * b0 i := by
-    simp only [Module.Basis.isUnitSMul_apply, Algebra.smul_def, map_intCast]
-  rw [this]
-  exact hnI i
+  simpa only [Module.Basis.isUnitSMul_apply, Algebra.smul_def, map_intCast] using hnI i
 
 theorem trC_intAf (x : 𝓞 I.E) {t : I.E ⊗[I.F] Af I.F} (ht : t ∈ IntAf I.F I.E)
     : trC I x t ∈ Formalism.UG.intAd I.F := by
@@ -1166,9 +1153,7 @@ theorem gmap_inv
     : Formalism.HermitianLatticesTheory.gmap a⁻¹ L = L' := by
   rw [← h, ← gmap_mul, inv_mul_cancel, gmap_one]
 
-theorem xflag_zero : Xflag F 0 = ⊥ := by
-  show Submodule.span E (F.fl.e '' {i | i.1 < 0}) = ⊥
-  simp
+alias xflag_zero := _root_.Formalism.L2.SG.FourParts.Xflag_zero
 
 theorem xflag_mono (j : ℕ) : Xflag F j ≤ Xflag F (j + 1) :=
   Submodule.span_mono (Set.image_mono fun i (hi : i.1 < j) => Nat.lt_succ_of_lt hi)
@@ -1335,8 +1320,7 @@ theorem ginf_disc_of_lat
 
 theorem isSFund_of_discrete (Sg : Subgroup I.Ginf) [DiscreteTopology Sg]
     : ∃ Ω, Formalism.L2.SG.HidaSetting.IsSFund I (Sg : Set I.Ginf) Ω := by
-  obtain ⟨F, hF, h1, h2⟩ := exists_strictFund Sg
-  exact ⟨F, hF, h1, h2⟩
+  exact exists_strictFund Sg
 
 end GinfDisc
 
@@ -1417,22 +1401,22 @@ theorem dcrel_of
       rw [xa_mapFlag] at hx ⊢
       obtain ⟨y, hy, rfl⟩ := hx
       refine ⟨n' y - y, hn'.2.1 j y hy, ?_⟩
-      simp [le_mul_app, le_inv_app, map_sub]
+      simp [le_inv_app, map_sub]
     · change x ∈ orth S (mapFlag γ hγ F'.fl).X at hx
       change _ ∈ (mapFlag γ hγ F'.fl).X
       rw [x_mapFlag] at hx ⊢
       have hy := orth_map γ hγ _ x hx
       refine ⟨n' (γ.symm x) - γ.symm x, hn'.2.2 _ hy, ?_⟩
-      simp [le_mul_app, le_inv_app, map_sub]
+      simp [le_inv_app, map_sub]
   refine ⟨n, hn, γ * n' * γ⁻¹, hm, fun a => ?_, ?_⟩
   · rw [mapLF, mapLF, dite_eq_left hγ, dite_eq_left hγ₂]
     show (mapFlag γ₂ hγ₂ F'.fl).fvec a = n ((γ * n' * γ⁻¹) ((mapFlag γ hγ F'.fl).fvec a))
     rw [fvec_mapFlag, fvec_mapFlag, h]
-    simp [le_mul_app, le_inv_app]
+    simp [le_inv_app]
   · rw [mapLF, mapLF, dite_eq_left hγ, dite_eq_left hγ₂]
     show γ₂ F'.zt = n ((γ * n' * γ⁻¹) (γ F'.zt))
     rw [h]
-    simp [le_mul_app, le_inv_app]
+    simp [le_inv_app]
 
 end Gen
 
@@ -1665,12 +1649,10 @@ theorem NOsub_discrete (hK : X.LevelSubgroupCharacter) : DiscreteTopology (NOsub
       have hk : (X.xu u)⁻¹ * γ.2 * X.xu u ∈ X.B.I.Kset := h3.1
       have hxu := X.xu_K u
       have hγK : γ.2 ∈ X.B.I.Kset := by
-        have := kset_mul X (kset_mul X hxu hk) (kset_inv X hxu)
-        simpa [mul_assoc] using this
+        simpa [mul_assoc] using kset_mul X (kset_mul X hxu hk) (kset_inv X hxu)
       have := hW γ hγ h hγK
       simp [this]
-  rw [e]
-  exact hWo.preimage continuous_subtype_val
+  simpa [e] using hWo.preimage continuous_subtype_val
 
 theorem fundNC_holds
     : ∀ (D : Formalism.BasicNotions.D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
@@ -1679,8 +1661,7 @@ theorem fundNC_holds
   intro D X hK u
   have := NOsub_discrete X u hK
   obtain ⟨Ω, hΩ⟩ := isSFund_of_discrete X.B.I (NOsub X u hK)
-  rw [NOsub_coe] at hΩ
-  exact ⟨Ω, hΩ⟩
+  exact ⟨Ω, NOsub_coe X u hK ▸ hΩ⟩
 
 end NO
 

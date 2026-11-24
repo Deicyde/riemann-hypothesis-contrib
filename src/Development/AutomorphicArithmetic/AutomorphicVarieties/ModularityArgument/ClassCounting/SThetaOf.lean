@@ -92,7 +92,7 @@ private theorem gl_hom_transvection_eq_one_of_ne_zero_of_ne_one
     · by_cases hrs : r = s
       · subst hrs
         simp [Ne.symm hs]
-      · simp [hs, Ne.symm hs, hrs]
+      · simp [Ne.symm hs, hrs]
     · by_cases hrs : r = s
       · subst hrs
         simp [hr, Ne.symm hr]

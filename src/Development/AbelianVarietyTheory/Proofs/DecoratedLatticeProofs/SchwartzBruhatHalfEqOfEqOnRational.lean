@@ -55,9 +55,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 
 noncomputable section
 
-
-
-
 theorem GlobalTheory.RatHalfDense.tmul_split
     {F E A : Type} [Field F] [CommRing E] [Algebra F E] [CommRing A] [Algebra F A]
     (a : E)

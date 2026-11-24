@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -130,8 +131,7 @@ private theorem per_act
     apply Submodule.span_mono
     rintro _ ⟨w, rfl⟩
     exact ⟨_, hQ w⟩
-  · simp [Matrix.IsHermitian, Matrix.conjTranspose_smul, hH.eq, Complex.star_def,
-      Complex.conj_ofReal]
+  · simp [Matrix.IsHermitian, Matrix.conjTranspose_smul, hH.eq]
   · rw [hsc, Complex.re_ofReal_mul]
     exact mul_pos hr (hpos z hz)
   · rw [← act_inv L β y u, ← act_inv L β y w, hQ, hQ, hsc, form_act, Complex.im_ofReal_mul, him]

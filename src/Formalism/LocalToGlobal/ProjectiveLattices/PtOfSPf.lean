@@ -1,30 +1,38 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointBaseChangeLaws
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsCombAt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+public import Formalism.LocalToGlobal.ProjectiveLattices.GenFrPf
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeC
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.BcField
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeA
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeB
 public import Formalism.LocalToGlobal.ProjectiveLattices.PtOfSInst
 public import Formalism.LocalToGlobal.ProjectiveLattices.CurveLoc
 public import Formalism.LocalToGlobal.ProjectiveLattices.CurveOpen
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Formalism.LocalToGlobal.ProjectiveLattices.CurveInj
 public import Formalism.LocalToGlobal.ProjectiveLattices.CurveUnit
-public import Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
 import Mathlib.NumberTheory.LucasLehmer
 import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
+import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.Tactic.Echelon.Zsqrtd
 import Mathlib.Tactic.Inclusion.Extension.Core.Core
 import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
@@ -45,24 +53,153 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RankPf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.UnivChartLoc
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointBaseChangeLaws
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC, Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPf
+
+-- ===== clump member: Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC", "h": "module\n\npublic import Formalism.LocalToGlobal.ProjectiveLattices.IsCombAt\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt\npublic import Formalism.LocalToGlobal.ProjectiveLattices.GenFrPf\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Bernstein\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Data.Nat.Choose.Multinomial\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.LinearAlgebra.LinearIndependent.BaseChange\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Henselian\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.RingTheory.RegularLocalRing.Defs\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RankPf\nimport ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.UnivChartLoc\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeC\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.BcField\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeA\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.GenBridgeB\n\n"}
+section -- clump:auto
 @[expose] public section
 
 set_option autoImplicit false
-
 
 noncomputable section
 
 namespace Formalism.L2.Pj
 
-open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open scoped CategoryTheory.Obj
+
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+
+theorem pos_ppx_le
+    {S T : Type} [CommRing S] [CommRing T]
+    {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X} (pm : Gx x' ⟶ Gx x)
+    (hs : pm ≫ (snd (Over.mk x) Xo.univ.t.G).left = (snd (Over.mk x') Xo.univ.t.G).left)
+    (i : Fin 1 → Xo.univ.t.PP.L.ι)
+    : (PPx x').U i ≤ pm ⁻¹ᵁ (PPx x).U i := by
+  intro p hp
+  have hp'
+      : ∀ k, p ∈ (snd (Over.mk x') Xo.univ.t.G).left.base ⁻¹' (Xo.univ.t.PP.L.U (i k) : Set _) :=
+    Set.mem_iInter.1 hp
+  have e := congrArg (fun f : Gx x' ⟶ Xo.univ.t.G.left => f.base p) hs
+  show pm.base p ∈ ⋂ k, (snd (Over.mk x) Xo.univ.t.G).left.base ⁻¹' (Xo.univ.t.PP.L.U (i k) : Set _)
+  refine Set.mem_iInter.2 fun k => ?_
+  show (pm ≫ (snd (Over.mk x) Xo.univ.t.G).left).base p ∈ (Xo.univ.t.PP.L.U (i k) : Set _)
+  rw [e]
+  exact hp' k
+
+theorem pos_frMap
+    (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
+    (hT : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt)
+    {K₁ K₂ : Type} [Field K₁] [Field K₂] [Algebra c.F K₁] [Algebra c.F K₂]
+    (φ : K₁ →ₐ[c.F] K₂) (y : FrPt Xo c K₁)
+    : ∃ z : FrPt Xo c K₂, FrMap φ y z := by
+  classical
+  let _ : Algebra K₁ K₂ := φ.toRingHom.toAlgebra
+  have htow : ∀ r : c.F, algebraMap c.F K₂ r = algebraMap K₁ K₂ (algebraMap c.F K₁ r) := fun r =>
+    (φ.commutes r).symm
+  have : FaithfulSMul K₁ K₂ :=
+    (faithfulSMul_iff_algebraMap_injective K₁ K₂).2 (algebraMap K₁ K₂).injective
+  obtain ⟨n, xc, hx⟩ :=
+    ReciprocityTheory.ChartRestriction.G.Chart.univChartLoc ((Over.pullback y.x).obj Xo.univ.t.G)
+  have hco : ∀ τ i, ∃ cc, y.u τ i = gfpVec y.x xc cc := fun τ i => gfp_exists hx _ (y.tan τ i)
+  choose d hdu using hco
+  have hdW : ∀ τ i, d τ i ∈ gfpEig (c := c) hx τ := fun τ i =>
+    (gfp_eig_iff hx τ _).1 (by rw [← hdu τ i]; exact y.eig τ i)
+  have hd : ∀ τ, LinearIndependent K₁ (d τ) := by
+    intro τ
+    rw [Fintype.linearIndependent_iff]
+    intro g hg
+    have hu : y.u τ = fun i => gfpVec y.x xc (d τ i) := funext (hdu τ)
+    have h0 : (0 : Fin n → K₁) ∈ gfpEig (c := c) hx τ := Submodule.zero_mem _
+    obtain ⟨a, -, ha⟩ := y.basis τ (gfpVec y.x xc 0) (gfp_tan hx 0) ((gfp_eig_iff hx τ 0).2 h0)
+    have e1 : IsCombAt y.x (y.u τ) g (gfpVec y.x xc 0) := by
+      rw [hu]
+      exact (gfp_comb_iff hx (d τ) g 0).2 hg.symm
+    have e2 : IsCombAt y.x (y.u τ) 0 (gfpVec y.x xc 0) := by
+      rw [hu]
+      exact (gfp_comb_iff hx (d τ) 0 0).2 (by simp)
+    have e3 := (ha g e1).trans (ha 0 e2).symm
+    exact fun i => congrFun e3 i
+  obtain ⟨xc', hx', hv, htm⟩ := gfp_bc (L' := K₂) hx
+  have hx0' := gfp_over_bc htow y.x_over
+  have hW' : ∀ τ j, (algebraMap K₁ K₂ ∘ d τ j) ∈ gfpEig (c := c) hx' τ := by
+    intro τ j
+    have h0 := hdW τ j
+    unfold gfpEig at h0 ⊢
+    rw [ReciprocityTheory.ChartRestriction.G.Chart.mem_eigLat_iff] at h0 ⊢
+    intro a
+    rw [htm a (d τ j), h0 a]
+    funext k
+    simp only [Function.comp_apply, Pi.smul_apply, smul_eq_mul, map_mul, htow]
+  have hli : ∀ τ, LinearIndependent K₂ (fun i => algebraMap K₁ K₂ ∘ d τ i) := fun τ =>
+    linearIndependent_algebraMap_comp_iff.mpr (hd τ)
+  refine ⟨
+    ⟨
+      spMap (algebraMap K₁ K₂) ≫ y.x,
+      hx0',
+      fun τ i => gfpVec _ xc' (algebraMap K₁ K₂ ∘ d τ i),
+      fun τ i => gfp_tan hx' _,
+      fun τ i => (gfp_eig_iff hx' τ _).2 (hW' τ i),
+      fun τ w hw he => gfp_basis hx0' hx' τ _ (hli τ) (hW' τ) w hw he,
+      ReciprocityTheory.ChartRestriction.G.PullbackSections.secCP
+        (ReciprocityTheory.ChartRestriction.G.PullbackSections.cpS (algebraMap K₁ K₂) y.x) y.s,
+      fun s' =>
+        ReciprocityTheory.ChartRestriction.G.PullbackSections.genBC_frame y.x hS hT
+          (algebraMap K₁ K₂) y.s y.gen s'
+    ⟩,
+    rfl,
+    fun τ i => ?_,
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.bcPm (algebraMap K₁ K₂) y.x,
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.bcPm_snd _ _,
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.bcPm_fst _ _,
+    fun i h => rfl
+  ⟩
+  show gfpVec _ xc' (algebraMap K₁ K₂ ∘ d τ i) = spMap (dualMap φ.toRingHom) ≫ y.u τ i
+  rw [hdu τ i]
+  exact hv (d τ i)
+
+end Formalism.L2.Pj
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC =====
+
+-- ===== clump member: Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPf =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPf", "h": "module\n\nimport Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointBaseChangeLaws\npublic import Formalism.LocalToGlobal.ProjectiveLattices.PtOfSInst\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveLoc\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveOpen\npublic import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveInj\npublic import Formalism.LocalToGlobal.ProjectiveLattices.CurveUnit\npublic import Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Basify\nimport Mathlib.Tactic.ENatToNat\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\n\n"}
+section -- clump:auto
+@[expose] public section
+
+set_option autoImplicit false
+
+noncomputable section
+
+namespace Formalism.L2.Pj
+
+open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.WeightAlgebra
+  Formalism.MainNotions.Gaps.EtaleWeightGaps
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor TensorProduct
 
-theorem pos_factor {K' Fr R L : Type} [Field K'] [CommRing Fr] [CommRing R] [Field L] [Algebra K' Fr] [Algebra K' R]
-    [Algebra K' L] (φZ : Fr →ₐ[K'] R) (ψ : Fr →ₐ[K'] L) (hker : ∀ f, φZ f = 0 → ψ f = 0)
-    (hloc : ∀ r, ∃ a p, ψ p ≠ 0 ∧ φZ p * r = φZ a) : ∃ χ : R →ₐ[K'] L, ∀ f, χ (φZ f) = ψ f := by
+theorem pos_factor
+    {K' Fr R L : Type}
+    [Field K'] [CommRing Fr] [CommRing R] [Field L] [Algebra K' Fr] [Algebra K' R] [Algebra K' L]
+    (φZ : Fr →ₐ[K'] R) (ψ : Fr →ₐ[K'] L)
+    (hker : ∀ f, φZ f = 0 → ψ f = 0) (hloc : ∀ r, ∃ a p, ψ p ≠ 0 ∧ φZ p * r = φZ a)
+    : ∃ χ : R →ₐ[K'] L, ∀ f, χ (φZ f) = ψ f := by
   classical
   choose a p hp hr using hloc
   have key : ∀ r a' p', ψ p' ≠ 0 → φZ p' * r = φZ a' → ψ (a r) / ψ (p r) = ψ a' / ψ p' := by
@@ -75,7 +212,17 @@ theorem pos_factor {K' Fr R L : Type} [Field K'] [CommRing Fr] [CommRing R] [Fie
     rw [div_eq_div_iff (hp r) hp', h1]
   let χf : R → L := fun r => ψ (a r) / ψ (p r)
   have hχ : ∀ r a' p', ψ p' ≠ 0 → φZ p' * r = φZ a' → χf r = ψ a' / ψ p' := key
-  refine ⟨{ toFun := χf, map_one' := ?_, map_mul' := ?_, map_zero' := ?_, map_add' := ?_, commutes' := ?_ }, ?_⟩
+  refine ⟨
+    {
+      toFun := χf
+      map_one' := ?_
+      map_mul' := ?_
+      map_zero' := ?_
+      map_add' := ?_
+      commutes' := ?_
+    },
+    ?_
+  ⟩
   · rw [hχ 1 1 1 (by simp) (by simp)]
     simp
   · intro r s
@@ -86,7 +233,8 @@ theorem pos_factor {K' Fr R L : Type} [Field K'] [CommRing Fr] [CommRing R] [Fie
   · rw [hχ 0 0 1 (by simp) (by simp)]
     simp
   · intro r s
-    rw [hχ (r + s) (a r * p s + a s * p r) (p r * p s) (by rw [map_mul]; exact mul_ne_zero (hp r) (hp s))
+    rw [hχ (r + s) (a r * p s + a s * p r) (p r * p s)
+      (by rw [map_mul]; exact mul_ne_zero (hp r) (hp s))
       (by simp only [map_add (f := _), map_mul]; rw [← hr r, ← hr s]; ring)]
     simp only [χf, map_add (f := _), map_mul]
     rw [div_add_div _ _ (hp r) (hp s)]
@@ -102,23 +250,32 @@ theorem pos_factor {K' Fr R L : Type} [Field K'] [CommRing Fr] [CommRing R] [Fie
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem pos_dualMap_comp {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T) :
-    dualMap (g.comp f) = (dualMap g).comp (dualMap f) :=
+theorem pos_dualMap_comp
+    {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T)
+    : dualMap (g.comp f) = (dualMap g).comp (dualMap f) :=
   RingHom.ext fun x => by ext <;> simp [dualMap]
 
-theorem pos_frMap_trans {S T U : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T] [CommRing U]
-    [Algebra c.F U] {φ : S →ₐ[c.F] T} {ψ : T →ₐ[c.F] U} {y : FrPt Xo c S} {z : FrPt Xo c T} {w : FrPt Xo c U}
-    (h₁ : FrMap φ y z) (h₂ : FrMap ψ z w) : FrMap (ψ.comp φ) y w := by
+theorem pos_frMap_trans
+    {S T U : Type}
+    [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T] [CommRing U] [Algebra c.F U]
+    {φ : S →ₐ[c.F] T} {ψ : T →ₐ[c.F] U} {y : FrPt Xo c S} {z : FrPt Xo c T} {w : FrPt Xo c U}
+    (h₁ : FrMap φ y z) (h₂ : FrMap ψ z w)
+    : FrMap (ψ.comp φ) y w := by
   apply GlobalTheory.FramedBaseChange.trans <;> assumption
 
-theorem pos_evR (hWD : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)) (f : Rul Xo c)
+theorem pos_evR
+    (hWD : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z))
+    (f : Rul Xo c)
     (hf : IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) f)
-    {K₁ K₂ : Type} [CommRing K₁] [Algebra c.F K₁] [CommRing K₂] [Algebra c.F K₂] (φ : K₁ →ₐ[c.F] K₂)
-    (y₁ : FrPt Xo c K₁) (hT1 : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y₁)
-    (y₂ : FrPt Xo c K₂) (hm : FrMap φ y₁ y₂) : evR Xo c f y₂ = φ (evR Xo c f y₁) := by
+    {K₁ K₂ : Type} [CommRing K₁] [Algebra c.F K₁] [CommRing K₂] [Algebra c.F K₂]
+    (φ : K₁ →ₐ[c.F] K₂) (y₁ : FrPt Xo c K₁)
+    (hT1 : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y₁)
+    (y₂ : FrPt Xo c K₂) (hm : FrMap φ y₁ y₂)
+    : evR Xo c f y₂ = φ (evR Xo c f y₁) := by
   have hT2 : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y₂ := by
     obtain ⟨p, ψ, y', hy'⟩ := hT1
     exact ⟨p, φ.comp ψ, y', pos_frMap_trans hy' hm⟩
@@ -131,44 +288,60 @@ end Gen
 
 section Rec
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
-  (N : ℕ) {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL) {Ω : Type} [Field Ω] [Algebra B.KO Ω]
-  (gF : X.Forms →ₐ[B.KO] Ω) {L : Type} [Field L] [Algebra (Kp X la N) L] (χ : RZs X la N Ω gF w →ₐ[Kp X la N] L)
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+  (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
+  (N : ℕ)
+  {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
+  {Ω : Type} [Field Ω] [Algebra B.KO Ω]
+  (gF : X.Forms →ₐ[B.KO] Ω)
+  {L : Type} [Field L] [Algebra (Kp X la N) L]
+  (χ : RZs X la N Ω gF w →ₐ[Kp X la N] L)
 
-theorem pos_psiZ_alg (a : B.KO) :
-    CurveLoc.psiZ X la N w gF (algebraMap B.KO Ω a) = algebraMap (Kp X la N) (RZs X la N Ω gF w)
-      (algebraMap (X.Kl la) (Kp X la N) (algebraMap B.KO (X.Kl la) a)) := by
+theorem pos_psiZ_alg (a : B.KO)
+    : CurveLoc.psiZ X la N w gF (algebraMap B.KO Ω a)
+      = algebraMap (Kp X la N) (RZs X la N Ω gF w)
+        (algebraMap (X.Kl la) (Kp X la N) (algebraMap B.KO (X.Kl la) a)) := by
   rw [CurveLoc.psiZ_apply]
-  have e1 : ((1 : X.Kl la) ⊗ₜ[B.KO] algebraMap B.KO Ω a : X.Kl la ⊗[B.KO] Ω) =
-      algebraMap B.KO (X.Kl la) a ⊗ₜ[B.KO] (1 : Ω) := by
-    rw [Algebra.algebraMap_eq_smul_one (A := Ω), Algebra.algebraMap_eq_smul_one (A := X.Kl la), ← TensorProduct.smul_tmul]
-  rw [e1, CurveLoc.tmul_eq, one_mul, IsScalarTower.algebraMap_apply (Kp X la N) (RZ X la N Ω) (RZs X la N Ω gF w),
+  have e1
+      : ((1 : X.Kl la) ⊗ₜ[B.KO] algebraMap B.KO Ω a : X.Kl la ⊗[B.KO] Ω)
+        = algebraMap B.KO (X.Kl la) a ⊗ₜ[B.KO] (1 : Ω) := by
+    rw [Algebra.algebraMap_eq_smul_one (A := Ω), Algebra.algebraMap_eq_smul_one (A := X.Kl la),
+      ← TensorProduct.smul_tmul]
+  rw [e1, CurveLoc.tmul_eq, one_mul,
+    IsScalarTower.algebraMap_apply (Kp X la N) (RZ X la N Ω) (RZs X la N Ω gF w),
     Algebra.algebraMap_eq_smul_one (A := RZ X la N Ω)]
   rfl
 
-theorem pos_inv :
-    χ (CurveLoc.invS X la N w gF) = (χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w)
-      (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))))⁻¹ := by
+theorem pos_inv
+    : χ (CurveLoc.invS X la N w gF)
+      = (χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w)
+        (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))))⁻¹ := by
   have e := congrArg χ (CurveLoc.weight_zero_section_mul_inv X la N w gF)
   rw [map_mul, map_one] at e
   exact eq_inv_of_mul_eq_one_right e
 
-theorem pos_sec_ne :
-    χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w) (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))) ≠ 0 := by
+theorem pos_sec_ne
+    : χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w)
+        (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0)))
+      ≠ 0 := by
   have e := congrArg χ (CurveLoc.weight_zero_section_mul_inv X la N w gF)
   rw [map_mul, map_one] at e
   exact left_ne_zero_of_mul_eq_one e
 
-theorem pos_sec_eval :
-    χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w) (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))) =
-      ∑ k, algebraMap (Kp X la N) L (@algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (0, k))) *
-        χ (CurveLoc.psiZ X la N w gF (gF (X.inc wL (w k)))) := by
-  have e : rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0) =
-      ∑ k, (@algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (0, k))) • rzMap X la N Ω gF (emb X la N (X.inc wL (w k))) := by
-    unfold Formalism.MainNotions.Gaps.EtaleWeightGaps.sec
+theorem pos_sec_eval
+    : χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w)
+        (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0)))
+      = ∑ k, algebraMap (Kp X la N) L (@algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (0, k))) *
+          χ (CurveLoc.psiZ X la N w gF (gF (X.inc wL (w k)))) := by
+  have e
+      : rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0)
+        = ∑ k, (@algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (0, k))) • rzMap X la N Ω gF (emb X la N (X.inc wL (w k))) :=
+    by
+      unfold Formalism.MainNotions.Gaps.EtaleWeightGaps.sec
 
-    rw [map_sum]
-    simp only [map_smul]
+      rw [map_sum]
+      simp only [map_smul]
   refine (congrArg (fun v => χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w) v)) e).trans ?_
 
   simp only [map_sum]
@@ -176,10 +349,13 @@ theorem pos_sec_eval :
   rw [Algebra.smul_def, map_mul, map_mul, ← IsScalarTower.algebraMap_apply, AlgHom.commutes,
     CurveLoc.alg_rzMap_emb]
 
-theorem phi_fraction_base_value (k : ℕ) (F : X.Forms) (hF : emb X la N F ∈ Vw X la N (addL (wt0 D j) wL k)) :
-    χ (phiZ X la N Ω gF w (fr0 X la w k ⟨emb X la N F, hF⟩)) =
-      χ (CurveLoc.psiZ X la N w gF (gF F)) *
-        (χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w) (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))))⁻¹ ^ k := by
+theorem phi_fraction_base_value
+    (k : ℕ) (F : X.Forms) (hF : emb X la N F ∈ Vw X la N (addL (wt0 D j) wL k))
+    : χ (phiZ X la N Ω gF w (fr0 X la w k ⟨emb X la N F, hF⟩))
+      = χ (CurveLoc.psiZ X la N w gF (gF F))
+        * (χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w)
+            (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))))⁻¹
+          ^ k := by
   rw [CurveLoc.phiZ_of_eq X la N w gF _ k _ rfl, map_mul, map_pow, CurveLoc.alg_rzMap_emb, pos_inv]
 
 end Rec
@@ -188,117 +364,166 @@ section Inst
 
 variable {D : D7} {T : Top D} (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
 
-theorem pos_natural {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u) :
-    IsNatural (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) (F : T.R j) :=
+theorem pos_natural {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u)
+    : IsNatural (K := T.Q.c.F)
+      (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S)
+      (fun φ y z => FrMap φ y z)
+      (F : T.R j) :=
   (cusp_le_sec (T.Q.Xo j) T.Q.c (T.U j) _ _ (cutR_le T.C j u F.2)).1
 
-theorem pos_birAt (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG) {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF)
-    (hB : BIRSt h j hj hG G) (Z : Comp (T.Q.Xo j) T.Q.c) :
-    CurveLoc.BirAt (recPlus h j hj) G.N G.w (formsEvR j hG hFT Z) := by
+theorem pos_birAt
+    (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG)
+    {ka wL wF : WeightFamilies.Wt D j}
+    (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)
+    (Z : Comp (T.Q.Xo j) T.Q.c)
+    : CurveLoc.BirAt (recPlus h j hj) G.N G.w (formsEvR j hG hFT Z) := by
   intro a
   obtain ⟨k, g, p, hp, hne, he⟩ := hB Z a
-  have hw : (fun i => formsEvR j hG hFT Z ((recPlus h j hj).inc wL (G.w i))) =
-      fun i => evC hG Z ((G.w i : (recB h.toLawsCore).Cusp j wL) : T.R j) :=
+  have hw
+      : (fun i => formsEvR j hG hFT Z ((recPlus h j hj).inc wL (G.w i)))
+        = fun i => evC hG Z ((G.w i : (recB h.toLawsCore).Cusp j wL) : T.R j) :=
     funext fun i => curveUnit_gF_inc h j hj hG hFT Z wL (G.w i)
   have e := congrArg (fun v => MvPolynomial.aeval v p) hw
   refine ⟨k, g, p, hp, fun h0 => hne (e.symm.trans h0), ?_⟩
   exact (congrArg (a * ·) e).trans (he.trans (curveUnit_gF_inc h j hj hG hFT Z _ g).symm)
 
-def PtOfSBody (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c) {ka wL wF : WeightFamilies.Wt D j}
-    (G : GlobalFamilyData (recPlus h j hj) ka wL wF)
-    (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO)) : Prop :=
-  ∀ (L : Type) [Field L] [Algebra (Kp (recPlus h j hj) la G.N) L]
-    (φ : OsK (recPlus h j hj) la G.w →ₐ[Kp (recPlus h j hj) la G.N] L),
-    ∃ (alg : T.Q.c.F →+* L) (y : letI := alg.toAlgebra; FrPt (T.Q.Xo j) T.Q.c L),
-      (letI := alg.toAlgebra; ∃ (Z : Comp (T.Q.Xo j) T.Q.c) (ψ : Om Z →ₐ[T.Q.c.F] L), FrMap ψ (genFr hG Z) y) ∧
-      (∀ a : T.Q.c.F, alg a = algebraMap (Kp (recPlus h j hj) la G.N) L
-        (@algebraMap ((recPlus h j hj).Kl la) (Kp (recPlus h j hj) la G.N) _ _ (Kp.algKl (recPlus h j hj) la G.N)
-          (algebraMap T.Q.c.F ((recPlus h j hj).Kl la) a))) ∧
-      letI := alg.toAlgebra
-      (∑ k, algebraMap (Kp (recPlus h j hj) la G.N) L
-          (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *
-          evR (T.Q.Xo j) T.Q.c ((G.w k : T.R j)) y) ≠ 0 ∧
-      ∀ (k : ℕ) (g : (recB h.toLawsCore).Cusp j (addL (wt0 D j) wL k)),
-        φ (toOsK (recPlus h j hj) la G.w (fr0 (recPlus h j hj) la G.w k
-          ⟨emb (recPlus h j hj) la G.N ((recPlus h j hj).inc _ g), emb_mem_Vw (recPlus h j hj) la G.N _ g⟩)) =
-        evR (T.Q.Xo j) T.Q.c ((g : T.R j)) y /
-          (∑ k', algebraMap (Kp (recPlus h j hj) la G.N) L
-            (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k'))) *
-            evR (T.Q.Xo j) T.Q.c ((G.w k' : T.R j)) y) ^ k
-
-
-
-theorem ptOfS_all [Finite (Comp (T.Q.Xo j) T.Q.c)] (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
-    (hTw : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt) (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG) (hV : GenValInjSt h j hG)
-    {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)
+def PtOfSBody
+    (h : LawsP T)
+    (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
+    {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF)
     (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO))
-    (hC : ∀ Z, CurveLoc.CountQAt (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)) :
-    PtOfSBody h j hj hG G la := by
+    : Prop :=
+  ∀ (L : Type) [Field L] [Algebra (Kp (recPlus h j hj) la G.N) L]
+      (φ : OsK (recPlus h j hj) la G.w →ₐ[Kp (recPlus h j hj) la G.N] L),
+    ∃ (alg : T.Q.c.F →+* L) (y : letI := alg.toAlgebra; FrPt (T.Q.Xo j) T.Q.c L),
+      (letI := alg.toAlgebra
+       ∃ (Z : Comp (T.Q.Xo j) T.Q.c) (ψ : Om Z →ₐ[T.Q.c.F] L), FrMap ψ (genFr hG Z) y)
+        ∧ (∀ a : T.Q.c.F,
+          alg a
+            = algebraMap (Kp (recPlus h j hj) la G.N) L
+              (@algebraMap ((recPlus h j hj).Kl la) (Kp (recPlus h j hj) la G.N) _ _
+                (Kp.algKl (recPlus h j hj) la G.N) (algebraMap T.Q.c.F ((recPlus h j hj).Kl la) a)))
+        ∧ letI := alg.toAlgebra
+          (∑ k, algebraMap (Kp (recPlus h j hj) la G.N) L
+              (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *
+              evR (T.Q.Xo j) T.Q.c ((G.w k : T.R j)) y)
+              ≠ 0
+            ∧ ∀ (k : ℕ) (g : (recB h.toLawsCore).Cusp j (addL (wt0 D j) wL k)),
+              φ (toOsK (recPlus h j hj) la G.w
+                  (fr0 (recPlus h j hj) la G.w k ⟨
+                    emb (recPlus h j hj) la G.N ((recPlus h j hj).inc _ g),
+                    emb_mem_Vw (recPlus h j hj) la G.N _ g
+                  ⟩))
+                = evR (T.Q.Xo j) T.Q.c ((g : T.R j)) y
+                  / (∑ k', algebraMap (Kp (recPlus h j hj) la G.N) L
+                      (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k'))) *
+                      evR (T.Q.Xo j) T.Q.c ((G.w k' : T.R j)) y)
+                    ^ k
+
+theorem ptOfS_all
+    [Finite (Comp (T.Q.Xo j) T.Q.c)]
+    (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
+    (hTw : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt)
+    (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG)
+    (hV : GenValInjSt h j hG)
+    {ka wL wF : WeightFamilies.Wt D j}
+    (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)
+    (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO))
+    (hC : ∀ Z, CurveLoc.CountQAt (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z))
+    : PtOfSBody h j hj hG G la := by
   classical
   have := Fintype.ofFinite (Comp (T.Q.Xo j) T.Q.c)
   intro L _ _ φ
-  let ψ : ↥(Frac0 (recPlus h j hj) la G.w) →ₐ[Kp (recPlus h j hj) la G.N] L := φ.comp (toOsK (recPlus h j hj) la G.w)
+  let ψ : ↥(Frac0 (recPlus h j hj) la G.w) →ₐ[Kp (recPlus h j hj) la G.N] L :=
+    φ.comp (toOsK (recPlus h j hj) la G.w)
   have hψ : ∀ f, ψ f = φ (toOsK (recPlus h j hj) la G.w f) := fun f => rfl
   have hQ : (RingHom.ker ψ).IsPrime := RingHom.ker_isPrime _
   have hJ : Jid (recPlus h j hj) la G.w ≤ RingHom.ker ψ := fun x hx => by
     rw [RingHom.mem_ker, hψ, (toOsK_eq_zero_iff (recPlus h j hj) la G.w x).2 hx, map_zero]
-  have hinf : (Finset.univ : Finset (Comp (T.Q.Xo j) T.Q.c)).inf
-      (fun Z => RingHom.ker (phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w)) ≤ RingHom.ker ψ := by
+  have hinf
+      : (Finset.univ : Finset (Comp (T.Q.Xo j) T.Q.c)).inf
+          (fun Z => RingHom.ker (phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w))
+        ≤ RingHom.ker ψ := by
     intro f hf
     have hf' : ∀ Z, phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w f = 0 := fun Z =>
-      RingHom.mem_ker.1 (Finset.inf_le (f := fun Z => RingHom.ker (phiZ (recPlus h j hj) la G.N (Om Z)
-        (formsEvR j hG hFT Z) G.w)) (Finset.mem_univ Z) hf)
+      RingHom.mem_ker.1 (Finset.inf_le
+        (f := fun Z => RingHom.ker (phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w))
+        (Finset.mem_univ Z) hf)
     rw [curveInj h j hj hG hFT hV G la f hf']
     exact Ideal.zero_mem _
   obtain ⟨Z, -, hZ⟩ := (Ideal.IsPrime.inf_le' hQ).1 hinf
-  obtain ⟨χ, hχ⟩ := pos_factor (phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w) ψ
-    (fun f hf => RingHom.mem_ker.1 (hZ (RingHom.mem_ker.2 hf))) (fun r => by
-      obtain ⟨a, p, hp, hr⟩ := CurveLoc.loc_of_bir (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)
-        (pos_birAt h j hj hG hFT G hB Z) (hC Z) r
-      exact ⟨a, p, fun h0 => hp _ hQ hJ hZ (RingHom.mem_ker.2 h0), hr⟩)
-  have hgF : ∀ (u : WeightFamilies.Wt D j) (F : (recB h.toLawsCore).Cusp j u),
-      formsEvR j hG hFT Z ((recPlus h j hj).inc u F) = evC hG Z (F : T.R j) := fun u F =>
+  obtain ⟨χ, hχ⟩ :=
+    pos_factor (phiZ (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w) ψ
+      (fun f hf => RingHom.mem_ker.1 (hZ (RingHom.mem_ker.2 hf)))
+      (fun r => by
+        obtain ⟨a, p, hp, hr⟩ :=
+          CurveLoc.loc_of_bir (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)
+            (pos_birAt h j hj hG hFT G hB Z) (hC Z) r
+        exact ⟨a, p, fun h0 => hp _ hQ hJ hZ (RingHom.mem_ker.2 h0), hr⟩)
+  have hgF
+      : ∀ (u : WeightFamilies.Wt D j) (F : (recB h.toLawsCore).Cusp j u),
+        formsEvR j hG hFT Z ((recPlus h j hj).inc u F) = evC hG Z (F : T.R j) := fun u F =>
     curveUnit_gF_inc h j hj hG hFT Z u F
-  let alg : T.Q.c.F →+* L := (algebraMap (Kp (recPlus h j hj) la G.N) L).comp
-    ((@algebraMap ((recPlus h j hj).Kl la) (Kp (recPlus h j hj) la G.N) _ _ (Kp.algKl (recPlus h j hj) la G.N)).comp
-      (algebraMap T.Q.c.F ((recPlus h j hj).Kl la)))
+  let alg : T.Q.c.F →+* L :=
+    (algebraMap (Kp (recPlus h j hj) la G.N) L).comp
+      ((@algebraMap ((recPlus h j hj).Kl la) (Kp (recPlus h j hj) la G.N) _ _
+        (Kp.algKl (recPlus h j hj) la G.N)).comp (algebraMap T.Q.c.F ((recPlus h j hj).Kl la)))
   let _ : Algebra T.Q.c.F L := alg.toAlgebra
-  let ι : Om Z →+* L := χ.toRingHom.comp (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z))
+  let ι : Om Z →+* L :=
+    χ.toRingHom.comp (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z))
   have hι : ∀ a : T.Q.c.F, ι (algebraMap T.Q.c.F (Om Z) a) = alg a := fun a =>
-    (congrArg χ (pos_psiZ_alg (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) a)).trans (χ.commutes _)
+    (congrArg χ (pos_psiZ_alg (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) a)).trans
+      (χ.commutes _)
   let ιA : Om Z →ₐ[T.Q.c.F] L := { ι with commutes' := hι }
   obtain ⟨y, hy⟩ := pos_frMap hS hTw ιA (genFr hG Z)
-  have hval : ∀ {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u),
-      evR (T.Q.Xo j) T.Q.c (F : T.R j) y = ι (evC hG Z (F : T.R j)) := fun F =>
+  have hval
+      : ∀ {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u),
+        evR (T.Q.Xo j) T.Q.c (F : T.R j) y = ι (evC hG Z (F : T.R j)) := fun F =>
     pos_evR (h.evalWD j hj) _ (pos_natural h j F) ιA (genFr hG Z) (hFT Z) y hy
-  have hF : ∀ {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u),
-      χ (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)
-        (formsEvR j hG hFT Z ((recPlus h j hj).inc u F))) = evR (T.Q.Xo j) T.Q.c (F : T.R j) y := fun F =>
-    (congrArg (fun v => χ (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) v)) (hgF _ F)).trans
-      (hval F).symm
-  have hs : χ (algebraMap (RZ (recPlus h j hj) la G.N (Om Z)) (RZs (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w)
-      (rzMap (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec (recPlus h j hj) la G.w 0))) =
-      ∑ k, algebraMap (Kp (recPlus h j hj) la G.N) L
-        (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *
-        evR (T.Q.Xo j) T.Q.c ((G.w k : (recB h.toLawsCore).Cusp j wL) : T.R j) y :=
+  have hF
+      : ∀ {u : WeightFamilies.Wt D j} (F : (recB h.toLawsCore).Cusp j u),
+        χ (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)
+            (formsEvR j hG hFT Z ((recPlus h j hj).inc u F)))
+          = evR (T.Q.Xo j) T.Q.c (F : T.R j) y := fun F =>
+    (congrArg
+      (fun v => χ (CurveLoc.psiZ (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) v))
+      (hgF _ F)).trans (hval F).symm
+  have hs
+      : χ (algebraMap (RZ (recPlus h j hj) la G.N (Om Z))
+          (RZs (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z) G.w)
+          (rzMap (recPlus h j hj) la G.N (Om Z) (formsEvR j hG hFT Z)
+            (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec (recPlus h j hj) la G.w 0)))
+        = ∑ k, algebraMap (Kp (recPlus h j hj) la G.N) L
+            (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *
+            evR (T.Q.Xo j) T.Q.c ((G.w k : (recB h.toLawsCore).Cusp j wL) : T.R j) y :=
     (pos_sec_eval (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) χ).trans
       (Finset.sum_congr rfl fun k _ => congrArg _ (hF (G.w k)))
   refine ⟨alg, y, ⟨Z, ιA, hy⟩, fun a => rfl, ?_, fun k g => ?_⟩
   · rw [← hs]
     exact pos_sec_ne (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) χ
-  · refine ((hχ _).trans (hψ _)).symm.trans ((phi_fraction_base_value (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) χ k
-      ((recPlus h j hj).inc _ g) (emb_mem_Vw (recPlus h j hj) la G.N _ g)).trans ?_)
+  · refine ((hχ _).trans (hψ _)).symm.trans
+      ((phi_fraction_base_value (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z) χ k
+        ((recPlus h j hj).inc _ g) (emb_mem_Vw (recPlus h j hj) la G.N _ g)).trans ?_)
     rw [hs, div_eq_mul_inv, inv_pow]
     exact congrArg (· * _) (hF g)
 
-theorem ptOfS_of [Finite (Comp (T.Q.Xo j) T.Q.c)] (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
-    (hTw : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt) (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG) (hV : GenValInjSt h j hG)
-    {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)
+theorem ptOfS_of
+    [Finite (Comp (T.Q.Xo j) T.Q.c)]
+    (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
+    (hTw : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt)
+    (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG)
+    (hV : GenValInjSt h j hG)
+    {ka wL wF : WeightFamilies.Wt D j}
+    (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)
     (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO))
-    (hC : ∀ Z, CurveLoc.CountQAt (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z)) :
-    PtOfSSt h j hj hG G la :=
-  fun _ => ptOfS_all h j hj hG hS hTw hFT hV G hB la hC
+    (hC : ∀ Z, CurveLoc.CountQAt (recPlus h j hj) la G.N G.w (formsEvR j hG hFT Z))
+    : PtOfSSt h j hj hG G la := fun _ =>
+  ptOfS_all h j hj hG hS hTw hFT hV G hB la hC
 
 end Inst
 
 end Formalism.L2.Pj
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPf =====

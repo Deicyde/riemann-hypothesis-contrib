@@ -66,11 +66,7 @@ variable {Xo : Moduli Dw l}
 theorem act_zero : Xo.univ.t.act.act 0 = 1 := by
   have h := Xo.univ.t.act.add 0 0
   rw [add_zero] at h
-  first
-  | exact mul_eq_left.mp h.symm
-  | exact mul_right_eq_self.mp h.symm
-  | exact self_eq_mul_right.mp h
-  | simpa using h
+  first | exact mul_eq_left.mp h.symm
 
 private theorem comp_psum_lemma
     {T T' : Over Xo.X} (f : T' ⟶ T) {n : ℕ} (xs : Fin n → (T ⟶ Xo.univ.t.G)) (S : Finset (Fin n))
@@ -80,12 +76,12 @@ private theorem comp_psum_lemma
   induction L with
   | nil =>
     simp only [List.foldr_nil, pzero]
-    first | simp | rw [← Category.assoc, CartesianMonoidalCategory.comp_toUnit]
+    first | simp
   | cons k L ih =>
     simp only [List.foldr_cons]
     rw [← ih]
     simp only [padd]
-    first | rw [CartesianMonoidalCategory.comp_lift_assoc] | simp
+    first | rw [CartesianMonoidalCategory.comp_lift_assoc]
 
 theorem comp_cφ
     {T T' : Over Xo.X} (f : T' ⟶ T)
@@ -127,7 +123,7 @@ theorem prod_cφ2
     pzero_eq_lemma_3, Finset.card_empty, Finset.card_singleton]
   clear hsum hU f0 f1 f2 f3 c3
   try norm_num only
-  try simp only [zpow_one, zpow_neg, zpow_neg_one]
+  try simp only [zpow_one, zpow_neg]
   rw [mul_assoc (h (Over.Hom.left (1 : T ⟶ Xo.univ.t.G))),
     mul_assoc (h (Over.Hom.left (1 : T ⟶ Xo.univ.t.G))), mul_assoc (h (xs 0 * 1).left)⁻¹]
 
@@ -163,14 +159,13 @@ theorem cocycle_product_three
     List.foldr_nil, padd_eq_lemma_2, pzero_eq_lemma_3, Finset.card_empty, Finset.card_singleton]
   clear hsum hU f0 f1 f2 f3 f4 f5 f6 f7 c4 c5 c6 c7
   try norm_num only
-  try simp only [zpow_one, zpow_neg, zpow_neg_one]
+  try simp only [zpow_one, zpow_neg]
   repeat rw [mul_assoc (h (1 : T ⟶ Xo.univ.t.G).left)⁻¹]
   repeat rw [mul_assoc (h (xs 0 * 1).left)]
   repeat rw [mul_assoc (h (xs 1 * 1).left)]
   repeat rw [mul_assoc (h (xs 2 * 1).left)]
   repeat rw [mul_assoc (h (xs 0 * (xs 1 * 1)).left)⁻¹]
   repeat rw [mul_assoc (h (xs 0 * (xs 2 * 1)).left)⁻¹]
-  all_goals exact (rfl : (0 : ℕ) = 0)
 
 abbrev AdTy (Xo : Moduli Dw l) (a : 𝓞 E) : Type :=
   LB.Gen (LB.LinComb Xo.univ.t.PP.L
@@ -247,10 +242,10 @@ theorem exists_betaRaw
   intro U _ hU
   unfold betaφ betaε
   simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_one,
-    Fin.prod_univ_four, comp_cφ, comp_thφ, Category.comp_id, zpow_neg, zpow_one, neg_neg,
+    Fin.prod_univ_four, comp_cφ, comp_thφ, Category.comp_id, zpow_neg, zpow_one,
     Finset.prod_inv_distrib, prod_cφ2, cocycle_product_three, Matrix.cons_val_zero,
     Matrix.cons_val_one, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.head_cons,
-    Matrix.tail_cons, x3, lift_fst, lift_snd_assoc, lift_snd, lift_fst_assoc, Category.id_comp]
+    Matrix.tail_cons, x3, lift_fst, lift_snd_assoc, lift_snd, lift_fst_assoc]
   have h1 : ∀ p q : 𝓞 E, Xo.univ.t.act.act p * Xo.univ.t.act.act q = Xo.univ.t.act.act (p + q) :=
     fun p q => (Xo.univ.t.act.add p q).symm
   have h2 : ∀ p q : 𝓞 E, Xo.univ.t.act.act p ≫ Xo.univ.t.act.act q = Xo.univ.t.act.act (p * q) :=
@@ -261,7 +256,7 @@ theorem exists_betaRaw
   simp only [h3, h1, h2, hbb, h4, h5]
   ring_nf
   apply Additive.ofMul.injective
-  simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow]
+  simp only [ofMul_mul, ofMul_inv, ofMul_zpow]
   abel
 
 end Formalism.MainNotions.ModuliIntegralCharts.H1.ExpGC

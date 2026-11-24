@@ -43,6 +43,7 @@ open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheor
   Formalism.UG
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.unitary_iwahori_facts
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
       Unr E
@@ -58,7 +59,4 @@ theorem _root_.GlobalTheory.T.unitary_iwahori_facts
                     GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) u
                         ∈ UJ (cj w) (antiJ (w.adicCompletion E) n)
                       ↔ ∀ i, cj w (u i) * u (Fin.rev i) = 1 := by
-  first
-  | exact @GlobalTheory.CompanionTheory.UnitaryWitt.unitary_hyperbolic_basis
-  | exact GlobalTheory.CompanionTheory.UnitaryWitt.unitary_hyperbolic_basis
-  | (intros; apply GlobalTheory.CompanionTheory.UnitaryWitt.unitary_hyperbolic_basis <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.UnitaryWitt.unitary_hyperbolic_basis

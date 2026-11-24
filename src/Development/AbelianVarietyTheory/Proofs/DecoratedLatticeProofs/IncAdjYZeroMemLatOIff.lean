@@ -43,6 +43,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.Basify
 
 @[expose] public section
 
@@ -59,17 +60,7 @@ noncomputable section
 namespace GlobalTheory.SeeSaw.LastPrim
 variable {D : D7}
 
-theorem latV_entry_mem'
-    {S : HSp D} {L : Lat S} {P : Pl D → Prop} {y : Fin S.rank → AE D}
-    (hy : y ∈ latV S L P) (i : Fin S.rank)
-    : y i ∈ idAt D P := by
-  induction hy using AddSubgroup.closure_induction with
-  | mem z hz =>
-    obtain ⟨β, -, hβ, c, -, x, -, rfl⟩ := hz
-    exact GlobalTheory.FinPl.LatMem.tmul_mem_idAt hβ _
-  | zero => exact zero_mem _
-  | add z z' _ _ hz hz' => exact add_mem hz hz'
-  | neg z _ hz => exact neg_mem hz
+alias latV_entry_mem' := _root_.GlobalTheory.FinPlLoc.latV_idAt
 
 theorem incAdj_yZero_mulVec
     : ∀ (D : D7) (ρ : ℕ) (B : BesLev D ρ) (J : JacLev D ρ) (hρ : 0 < ρ) (a : AE D)
@@ -87,10 +78,9 @@ theorem incAdj_yZero_mulVec
     intro i
     simp only [ell, Fin.ext_iff]
     split_ifs with h1 h2 h2 <;> first | omega | simp
-  simp only [HypDec.incAdj_apply, HypDec.incY_apply, yZero, zEll, adj_smul, adj_neg, colMul,
-    Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.smul_apply, Matrix.neg_apply, adj,
-    Matrix.transpose_apply, Matrix.map_apply, Matrix.vecMulVec_apply, smul_eq_mul, map_mul, map_neg,
-    hell]
+  simp only [HypDec.incAdj_apply, HypDec.incY_apply, yZero, zEll, colMul, Matrix.mulVec, dotProduct,
+    Matrix.mul_apply, Matrix.smul_apply, Matrix.neg_apply, adj, Matrix.transpose_apply,
+    Matrix.map_apply, Matrix.vecMulVec_apply, smul_eq_mul, map_mul, map_neg, hell]
   rw [Finset.sum_congr rfl fun l _ => by
     rw [Finset.sum_eq_single (⟨ρ - 1, by omega⟩ : Fin ρ)
       (fun i _ hi => by simp [hi])

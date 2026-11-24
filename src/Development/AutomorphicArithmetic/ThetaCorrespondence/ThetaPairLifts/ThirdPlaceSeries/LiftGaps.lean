@@ -42,8 +42,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
 
 @[expose] public section
 
-
-
 section
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi

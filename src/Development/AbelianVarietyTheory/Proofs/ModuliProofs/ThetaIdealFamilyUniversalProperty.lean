@@ -7,10 +7,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaConstantsLocallyOnBase
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaLevelAbelianSchemePullback
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConstantsIffOfThetaLevelPullback
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConstantsRingBaseChangeStatement
+public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConstantsRingBaseChange
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaConstantsUniqueUpToUnit
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaCosetNonvanishingOfHasThStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaLevelIsoUniqueOfDenseCommonFibresStatement
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaCosetNonvanishingOfHasTh
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaLevelIsoUniqueOfDenseCommonFibres
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaLevelShapePrimitivityPullbackDescentStatement
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ThetaPointsVanishingIdealRadicalHomogeneous
 import Mathlib.Algebra.Order.Floor.Extended
@@ -73,15 +74,9 @@ theorem spMap_surj {R R' : Type} [CommRing R] [CommRing R'] (x : Sp R' ⟶ Sp R)
     : ∃ β : R →+* R', spMap β = x :=
   ⟨(Spec.preimage x).hom, Spec.map_preimage x⟩
 
-theorem spMap_comp_eq
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (h : B →+* C)
-    : spMap h ≫ spMap f = spMap (h.comp f) := by
-  rw [← Spec.map_comp]; rfl
+alias spMap_comp_eq := _root_.GlobalTheory.ZM.ClosedCoord.spMap_comp_eq
 
-theorem spMap_inj
-    {R R' : Type} [CommRing R] [CommRing R'] {f f' : R →+* R'} (h : spMap f = spMap f')
-    : f = f' :=
-  congrArg CommRingCat.Hom.hom (Spec.map_injective h)
+alias spMap_inj := _root_.GlobalTheory.ZM.DenseFib.spMap_inj
 
 open MvPolynomial in
 theorem eval₂_scale
@@ -116,8 +111,8 @@ theorem isTM_unique
   obtain ⟨ψ, hψ⟩ := tMap_iff.1 hw'
   obtain ⟨χ, rfl, hχ⟩ := hψ.cancel (h.congr (Category.id_comp z).symm rfl)
   obtain ⟨χ', rfl, hχ'⟩ := hψ.cancel (h'.congr (Category.id_comp z).symm rfl)
-  rw [(GlobalTheory.T.thetaLevel_iso_unique_of_dense_common_fibres hL hL2 o g N' J b m R β w w' hm
-    hd ho ?_).2 χ χ' hχ.1 hχ'.1 hχ.2.1 hχ'.2.1 fun i => (hχ.2.2.1 i).trans (hχ'.2.2.1 i).symm]
+  rw [(_root_.GlobalTheory.TUniq.iso_unique_of_dense hL hL2 o g N' J b m R β w w' hm hd ho ?_).2 χ
+    χ' hχ.1 hχ'.1 hχ.2.1 hχ'.2.1 fun i => (hχ.2.2.1 i).trans (hχ'.2.2.1 i).symm]
   refine Dense.mono (fun p _ => ?_) dense_univ
   obtain ⟨u, hu⟩ := tObj_pull o g _ J b _ _ _ _ ((Sp R).fromSpecResidueField p) w rfl
   refine ⟨(Sp R).residueField p, inferInstance, (Sp R).fromSpecResidueField p, u, ?_, hu, ?_⟩
@@ -136,7 +131,7 @@ theorem exists_hasTh_field
     rintro _ ⟨q, rfl⟩
     rwa [Subsingleton.elim (α := PrimeSpectrum K) q (IsLocalRing.closedPoint K)]
   obtain ⟨ρ, hρ⟩ := spMap_surj (IsOpenImmersion.lift x y hr)
-  have := GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b S s t R K ρ x v hv
+  have := _root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b S s t R K ρ x v hv
   rw [hρ, IsOpenImmersion.lift_fac] at this
   exact ⟨_, this⟩
 
@@ -158,15 +153,15 @@ theorem eval_eq_zero_of_fromC
     (hasTh_iff_of_tmap o g N' J b _ _ t _ _ tx y K _ v h1).2 (by rwa [Category.id_comp])
   have a2 : tx.HasTh (𝟙 _) (fun a => i (v₀ a)) :=
     (hasTh_iff_of_tmap o g N' J b _ _ t₀ _ _ tx _ K _ _ h2).2 (by
-      have := GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b _ _ t₀ K₀ K i _ v₀ hv₀
+      have := _root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b _ _ t₀ K₀ K i _ v₀ hv₀
       rwa [Category.comp_id, ← Category.id_comp (spMap i)] at this)
   have a3 : tc.HasTh (𝟙 _) (fun a => j (v₀ a)) :=
     (hasTh_iff_of_tmap o g N' J b _ _ t₀ _ _ tc _ ℂ _ _ h3).2 (by
-      have := GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b _ _ t₀ K₀ ℂ j _ v₀ hv₀
+      have := _root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b _ _ t₀ K₀ ℂ j _ v₀ hv₀
       rwa [Category.comp_id, ← Category.id_comp (spMap j)] at this)
   obtain ⟨c, hc⟩ :=
-    GlobalTheory.T.thetaCosetNonvanishing_of_hasTh hL hL2 o g N' J b _ _ tx n K _ _ ⊥ hn hd a2
-      Ideal.isPrime_bot 0
+    _root_.GlobalTheory.coset_of_hasTh hL hL2 o g N' J b _ _ tx n K _ _ ⊥ hn hd a2 Ideal.isPrime_bot
+      0
   obtain ⟨u, hu⟩ :=
     hasTh_unique_unit hL hL2 o g N' J b _ _ tx K _ _ _ a2 a1
       (Ideal.eq_top_of_isUnit_mem _ (Ideal.subset_span ⟨_, rfl⟩) (Ne.isUnit (by simpa using hc)))
@@ -223,8 +218,7 @@ theorem inMM_of_dense
     : InMM n N' (thIdeal em C) β v := by
   refine ⟨
     fun F hF => ?_,
-    fun q hq =>
-      GlobalTheory.T.thetaCosetNonvanishing_of_hasTh hL hL2 o g N' J b S s t n R x v q hn hd hv hq
+    fun q hq => _root_.GlobalTheory.coset_of_hasTh hL hL2 o g N' J b S s t n R x v q hn hd hv hq
   ⟩
   by_contra hne
   have hb : PrimeSpectrum.basicOpen (MvPolynomial.eval₂ β v F) ≠ ⊥ := fun h =>
@@ -235,7 +229,7 @@ theorem inMM_of_dense
   have h0 :=
     eval_eq_zero_of_fromC hL hL2 hn hd ho hem t _ hy (ψ.comp β)
       (by rw [Category.assoc, hβ, spMap_comp_eq]) _
-      (GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b S s t R K ψ x v hv) F hF
+      (_root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b S s t R K ψ x v hv) F hF
   refine hp (show ψ (MvPolynomial.eval₂ β v F) ∈ (show PrimeSpectrum K from q).asIdeal from ?_)
   rw [MvPolynomial.eval₂_comp_left]
   exact (show MvPolynomial.eval₂ (ψ.comp β) (ψ ∘ v) F = 0 from h0) ▸ Ideal.zero_mem _
@@ -262,8 +256,8 @@ theorem tMap_affine
   obtain ⟨tx, htx⟩ := tObj_pull o g _ J b _ _ s _ x t hβ.symm
   obtain ⟨ux, hux⟩ := tObj_pull o g _ J b _ _ sM _ y u (hxy.trans hβ.symm)
   have key : TMap tx ux (𝟙 _) := by
-    refine (GlobalTheory.T.thetaLevel_iso_unique_of_dense_common_fibres hL hL2 o g N' J b m R β tx
-      ux hm hd ho (Dense.mono (fun p hp => ?_) (dense_affine hD x))).1
+    refine (_root_.GlobalTheory.TUniq.iso_unique_of_dense hL hL2 o g N' J b m R β tx ux hm hd ho
+      (Dense.mono (fun p hp => ?_) (dense_affine hD x))).1
     obtain ⟨K, _, ψ, ⟨q, rfl⟩, K₀, _, β₀, i, j, t₀, tK, tc, -, -, h1, h2, h3, hc⟩ := hp
     let a := algebraMap K (AlgebraicClosure K)
     have ez : spMap a ≫ spMap ψ = spMap (a.comp ψ) := spMap_comp_eq _ _
@@ -286,10 +280,8 @@ theorem tMap_affine
       hu _ _ t' _ s2
         ((hasTh_iff_of_tmap o g N' J b _ _ t _ _ t' _ _ _ _ m1).2 (by
           rw [Category.id_comp]
-          exact GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b S s t R _ (a.comp ψ)
-            x v hv))
-        (GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g N' J b M sM u R _ (a.comp ψ) y v
-          hv')
+          exact _root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b S s t R _ (a.comp ψ) x v hv))
+        (_root_.GlobalTheory.hasTh_baseChange hL2 o g N' J b M sM u R _ (a.comp ψ) y v hv')
     have m4 : TMap u' t' (𝟙 _) := tMap_cancel ht' (by rwa [Category.id_comp])
     have m5 := tMap_comp m4 m3
     rw [Category.id_comp] at m5
@@ -390,8 +382,7 @@ theorem family_universal
         · rw [← Scheme.Hom.comp_apply, e1, hr]
         · obtain ⟨ρ, hρ⟩ := spMap_surj (R' := T) a
           have h :=
-            GlobalTheory.T.hasThetaConstants_ring_baseChange hL2 o g _ J b S s' t _ T ρ (x i) (v i)
-              (hv i)
+            _root_.GlobalTheory.hasTh_baseChange hL2 o g _ J b S s' t _ T ρ (x i) (v i) (hv i)
           rw [hρ] at h
           refine uniq T _ _ _ ?_ (tr i T a _ h) (tr i' T a' _ (by rw [e2, ← e1]; exact h))
           rw [Category.assoc, Category.assoc, hy, hy, ← Category.assoc, ← Category.assoc]

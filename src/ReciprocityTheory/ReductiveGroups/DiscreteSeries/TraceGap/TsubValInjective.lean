@@ -54,6 +54,7 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TraceGap.MemTenso
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TraceGap.ProdModeCharExp
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.BridgeWt
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.CFCoreA
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.VNormSqLowKSubRootLt
 
 @[expose] public section
 
@@ -360,7 +361,7 @@ theorem tOp_isKTypeOf
     have hv0' : tsubVal S v ≠ 0 := fun h => hv0 (tsubVal_injective (h.trans (map_zero _).symm))
     obtain ⟨l, hl, rfl⟩ :=
       kLow_wt_eq_lowWt hKA (fun a y y' => tensorForm_diagAction_adjoint hU rfl y y') hwK hvS hv0' hμ
-    exact cdom_lowWt γ l hl
+    exact _root_.ReciprocityTheory.ChartRestriction.DS.CDom_lowWt γ l hl
 
 theorem tSub_nontrivial {γ : Fin n → ℝ} (hS : IsKIrrHW ε (diagE ε (eT E) cpT cmT) γ S)
     : Nontrivial (TSub S) := by

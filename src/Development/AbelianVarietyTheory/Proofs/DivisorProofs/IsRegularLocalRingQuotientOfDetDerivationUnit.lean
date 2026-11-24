@@ -139,7 +139,6 @@ theorem isRegularLocalRing_quotient
     intro g hg i
     choose a ha using fun j => residue_surjective (g j)
     have h1 : (maximalIdeal A).toCotangent (∑ j, a j • τ j) = 0 := by
-
       rw [map_sum, ← hg]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_smul, ← ha j]

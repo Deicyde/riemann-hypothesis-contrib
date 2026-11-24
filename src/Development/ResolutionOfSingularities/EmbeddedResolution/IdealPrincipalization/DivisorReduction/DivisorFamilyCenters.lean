@@ -65,7 +65,7 @@ theorem divisorFamily_canonicalAlgorithmRules_eq_divisorReductionSeq
 private theorem support_imageIdealSheaf_nonempty
     {X Y : Scheme.{u}} (f : X ⟶ Y) (hf : IsClosedImmersion f) (J : X.IdealSheafData)
     (h : ((J.support : Set ↥X)).Nonempty)
-    : (((imageIdealSheaf f J).support : Set ↥Y)).Nonempty := by
+    : (((_root_.FunctorialResolution.Blowup.schemeImageIdeal f J).support : Set ↥Y)).Nonempty := by
   have := hf
   obtain ⟨x, hx⟩ := h
   have hmem : x ∈ Set.range ⇑J.subschemeι := by
@@ -257,7 +257,7 @@ theorem DivisorReduction.divisorReductionSeq_center_nonempty
               (DivisorReduction.lowerIdealWithoutBlowup T)
               (DivisorReduction.lowerBoundaryWithoutBlowup T)
               (L (DivisorReduction.restrictToDivisor T j hj)) hpr).center i
-            = imageIdealSheaf
+            = _root_.FunctorialResolution.Blowup.schemeImageIdeal
               (embeddingIntoAmbientBlowupSequence (T.boundary.get ⟨j, hj⟩).subschemeι
                 (MarkedBlowupSequenceData.ofMarkedSequence (L (DivisorReduction.restrictToDivisor T
                   j hj))).toBlowupSequenceData
@@ -328,7 +328,7 @@ theorem DivisorReduction.divisorReductionSeq_center_nonempty
                 (DivisorReduction.lowerIdealAfterBlowup T j hj)
                 (DivisorReduction.lowerBoundaryAfterBlowup T j hj)
                 (L (DivisorReduction.restrictTwistedToDivisor T j hj)) hpr).center k
-              = imageIdealSheaf
+              = _root_.FunctorialResolution.Blowup.schemeImageIdeal
                 (embeddingIntoAmbientBlowupSequence (T.boundary.get ⟨j, hj⟩).subschemeι
                   (MarkedBlowupSequenceData.ofMarkedSequence (L
                     (DivisorReduction.restrictTwistedToDivisor T j hj))).toBlowupSequenceData

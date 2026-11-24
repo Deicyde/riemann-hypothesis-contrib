@@ -283,7 +283,7 @@ theorem sum_diag (E : Fin n → Fin n → Module.End ℂ W) (d : Fin n → ℂ) 
 
 theorem sum_single (E : Fin n → Fin n → Module.End ℂ W) (a b : Fin n) (c : ℂ) (v : W)
     : ∑ i, ∑ j, Matrix.single a b c i j • E i j v = c • E a b v := by
-  simp [Matrix.single_apply, ite_and, ite_smul, Finset.sum_ite_eq, Finset.sum_ite_eq']
+  simp [Matrix.single_apply, ite_and, ite_smul, Finset.sum_ite_eq]
 
 theorem isWeight_root
     {E : Fin n → Fin n → Module.End ℂ W} (hE : GlRel E)
@@ -358,17 +358,9 @@ theorem group_zero (hσ : IsURepOn (UJset ε) σ) (Z : Matrix (Fin n) (Fin n) �
   rw [Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, hσ.1.1]
   rfl
 
-private theorem Jm_mul_JmFlagMeasures (ε : Fin n → Bool)
-    : Formalism.REAL.Jm ε * Formalism.REAL.Jm ε = 1 := by
-  simp only [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal]
-  rw [← Matrix.diagonal_one]
-  congr 1
-  funext a
-  split <;> norm_num
-
 private theorem inUJ_exp_smul_of_inG {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inG ε Z) (t : ℝ)
     : Formalism.REAL.inUJ ε (NormedSpace.exp ((t : ℂ) • Z)) := by
-  have hJJ := Jm_mul_JmFlagMeasures ε
+  have hJJ := _root_.Formalism.REAL.Jm_mul_self ε
   have hst : star (t : ℂ) = t := by simp
   have hAg : ((t : ℂ) • Z)ᴴ * Formalism.REAL.Jm ε + Formalism.REAL.Jm ε * ((t : ℂ) • Z) = 0 := by
     have hZ' : Zᴴ * Formalism.REAL.Jm ε + Formalism.REAL.Jm ε * Z = 0 := hZ
@@ -463,7 +455,7 @@ theorem isWeight_of_isWtOn
     intro t
     rw [Finset.sum_eq_single a]
     · simp; ring
-    · intro b _ hb; simp [Pi.single_apply, hb]
+    · intro b _ hb; simp [hb]
     · simp
   have hf
       : GlobalTheory.IndefiniteRowSideFullHecke.OrbitDifferenceSpace.orbit σ
@@ -495,7 +487,7 @@ theorem isWeight_of_isWtOn
         = Complex.I • E a a v := by
     rw [Finset.sum_eq_single a]
     · simp
-    · intro b _ hb; simp [Pi.single_apply, hb]
+    · intro b _ hb; simp [hb]
     · simp
   rw [hs] at h3
   apply Subtype.ext
@@ -549,8 +541,7 @@ theorem kStable_comap
         = (1 / 2 : ℂ) • (((1 : ℂ) • E a b x - star (1 : ℂ) • E b a x : Vs) : H)
           + (-(Complex.I / 2)) • ((Complex.I • E a b x - star Complex.I • E b a x : Vs) : H) := by
     simp only [Submodule.coe_sub, Submodule.coe_smul, star_one, Complex.star_def, Complex.conj_I]
-    match_scalars
-      <;> first | linear_combination (1 / 2 : ℂ) * hI | linear_combination (-1 / 2 : ℂ) * hI
+    match_scalars <;> first | linear_combination (1 / 2 : ℂ) * hI
   show ((E a b x : Vs) : H) ∈ S
   rw [key]
   exact S.add_mem (S.smul_mem _ h1) (S.smul_mem _ h2)

@@ -2,9 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TypeOrthOfAvTied
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsWildInertiaCyclotomicElement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClassSumEqConstMulPeterssonStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgWtExistsInvFormStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDoubleCosetsDefiniteUnitaryMaximalLevelStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClassSumEqConstMulPetersson
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgWtExistsInvForm
+public import Formalism.AlgebraicWeights.IsAlgWeight
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDoubleCosetsDefiniteUnitaryMaximalLevel
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SmoothAdmissibleUnitaryMemSupIsotypicParts
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsFiniteClass
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteDimensionalForms
@@ -87,9 +88,6 @@ theorem indep_of_orth
     iSup₂_le fun j hj y hy => horth i j (Ne.symm hj) x hx1 y hy
   exact (Submodule.mem_bot ℂ).2 (hpos i x hx1 (hle hx2))
 
-theorem isoRep_refl (S : Submodule ℂ (GAf L n → W)) : NG.IsoRep S S :=
-  ⟨LinearEquiv.refl ℂ S, fun _ _ _ e => by simpa using e⟩
-
 theorem isoTyp_le (S : Submodule ℂ (GAf L n → W)) : NG.isoTyp ρ S ≤ NG.AFall L n ρ :=
   sSup_le fun _ hU => hU.1.1.le
 
@@ -104,7 +102,7 @@ theorem isoTyp_subrep (S : Submodule ℂ (GAf L n → W)) : NG.IsSubrep ρ (NG.i
   ⟨isoTyp_le S, fun h f hf => isoTyp_stable S h f hf⟩
 
 theorem le_isoTyp {S : Submodule ℂ (GAf L n → W)} (hS : NG.IsIrrRep ρ S) : S ≤ NG.isoTyp ρ S :=
-  le_sSup ⟨hS, isoRep_refl S⟩
+  le_sSup ⟨hS, _root_.Formalism.L2.NG.IsoRep.refl S⟩
 
 theorem isoTyp_eq
     {S S' : Submodule ℂ (GAf L n → W)} (hS : ∀ h, ∀ f ∈ S, NG.rt L n h f ∈ S) (h : NG.IsoRep S S')
@@ -320,7 +318,7 @@ theorem typeSp_decomp
   classical
   obtain ⟨N, hN, hNJ⟩ := hlev
   haveI hW : FiniteDimensional ℂ a.W := a.alg.1
-  have hT := GlobalTheory.T.finite_doubleCosets_definiteUnitary_maximalLevel L n
+  have hT := _root_.GlobalTheory.DefiniteClassFinite.exists_finset_double_cosets_Umax L n
   have hfin
       : ∀ N : ℕ,
         0 < N
@@ -333,8 +331,8 @@ theorem typeSp_decomp
       (Submodule.span_le.2 ?_)
     rintro f ⟨hf, hκ⟩
     exact ⟨hf.1, hκ⟩
-  obtain ⟨β, hβ⟩ := GlobalTheory.T.algWt_exists_invForm' L n a
-  obtain ⟨B, hB, -⟩ := GlobalTheory.T.class_sum_eq_const_mul_petersson L n a β hβ
+  obtain ⟨β, hβ⟩ := _root_.GlobalTheory.algWt_exists_invForm L n a
+  obtain ⟨B, hB, -⟩ := _root_.GlobalTheory.ClassPet.classSum_eq_pet L n a β hβ
   have hG : GlobalTheory.TypeOrthogonality.Good a.ρ B := hB
   set V := NG.TypeSp a.ρ J χ with hVdef
   have hVA : V ≤ NG.AFall L n a.ρ := fun f hf => hf.1
@@ -419,7 +417,6 @@ theorem typeSp_decomp
   have hy1 : ∀ i : P, ∀ w ∈ NG.isoTyp a.ρ (S i), B y w = 0 := by
     intro i w hw
     have e : B y w = B (x - p i) w - ∑ j ∈ Finset.univ.erase i, B (p j) w := by
-
       simp only [hy, map_sub, map_sum, LinearMap.sub_apply, LinearMap.sum_apply]
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i)]
       ring

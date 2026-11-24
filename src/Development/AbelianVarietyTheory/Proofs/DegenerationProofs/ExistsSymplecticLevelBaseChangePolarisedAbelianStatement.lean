@@ -55,6 +55,7 @@ open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ThetaReal
+
 theorem _root_.GlobalTheory.T.exists_symplecticLevel_baseChange_polarisedAbelian
     : Laws
       → ∀ (S S' : Scheme.{0}) [IsLocallyNoetherian S] [IsLocallyNoetherian S'] (f : S' ⟶ S)
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.exists_symplecticLevel_baseChange_polarisedAbelian
               → ∀ lev : Out.Level P k ze, ∃ lev' : Out.Level P' k ze',
                 ∀ (i : Fin (2 * P.g)) (i' : Fin (2 * P'.g)),
                   (i : ℕ) = i' → (lev'.pt i').left ≫ φ = f ≫ (lev.pt i).left := by
-  first
-  | exact @GlobalTheory.exists_level_baseChange
-  | exact GlobalTheory.exists_level_baseChange
-  | (intros; apply GlobalTheory.exists_level_baseChange <;> assumption)
+  first | exact @GlobalTheory.exists_level_baseChange

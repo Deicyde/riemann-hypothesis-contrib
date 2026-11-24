@@ -49,6 +49,7 @@ open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
+
 theorem _root_.GlobalTheory.T.siegelWeil_lagrangian_term_stronglyMeasurable
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V W : HSp D) (χV χW : (AE D)ˣ →* Circle)
         (om : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)) (μ : Measure (WO V W))
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.siegelWeil_lagrangian_term_stronglyMeasurable
                   × Matrix (Fin W.rank) (Fin W.rank) D.host.E,
               StronglyMeasurable (fun p : GA D W × GA D W =>
                 lagTerm μ 𝓕 C (om (1, p.1) f₁) (om (1, p.2) f₂)) := by
-  first
-  | exact @GlobalTheory.RallisMeas.lagTerm_stronglyMeasurable
-  | exact GlobalTheory.RallisMeas.lagTerm_stronglyMeasurable
-  | (intros; apply GlobalTheory.RallisMeas.lagTerm_stronglyMeasurable <;> assumption)
+  first | exact @GlobalTheory.RallisMeas.lagTerm_stronglyMeasurable

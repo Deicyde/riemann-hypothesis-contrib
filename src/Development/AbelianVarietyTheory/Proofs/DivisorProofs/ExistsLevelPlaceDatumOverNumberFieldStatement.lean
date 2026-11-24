@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_level_place_datum_over_number_field
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.exists_level_place_datum_over_number_field
                             → ∃ φ : (Fin (Vc D i).rank → La ⧸ (J • ⊤ : Submodule (𝓞 D.host.E) La))
                                 → M',
                               PhiIs R i M'.val.toRingHom t ι (J • ⊤) φ := by
-  first
-  | exact @GlobalTheory.LevelDatum.exists_phi
-  | exact GlobalTheory.LevelDatum.exists_phi
-  | (intros; apply GlobalTheory.LevelDatum.exists_phi <;> assumption)
+  first | exact @GlobalTheory.LevelDatum.exists_phi

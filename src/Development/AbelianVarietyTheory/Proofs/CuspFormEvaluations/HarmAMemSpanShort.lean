@@ -2,7 +2,7 @@ module
 
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsShortHarmonicFamilyUnimodularStatement
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsShortHarmonicFamilyUnimodular
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -155,8 +155,8 @@ theorem harmA_mem_span_short
     intro E _ _ _ H Dw l c n
     refine ⟨harmL_std c n, fun hn a L hL h1 h2 h3 h4 P hP => ?_⟩
     obtain ⟨S, hS, hspan, -⟩ :=
-      GlobalTheory.T.exists_short_harmonic_family_unimodular E H Dw l c n ⟨stdLat E n⟩
-        (std_unimod n) (std_fg n) hn a L hL h1 h2 h3 h4
+      _root_.GlobalTheory.Harm.exists_short_harmL_family E H Dw l c n ⟨stdLat E n⟩ (std_unimod n)
+        (std_fg n) hn a L hL h1 h2 h3 h4
     refine Submodule.span_mono (fun Q hQ => ?_) (hspan P hP.1)
     exact ⟨harmL_std c n a ▸ (hS Q hQ).1, (hS Q hQ).2⟩
 

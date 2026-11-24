@@ -253,7 +253,7 @@ theorem FilV_anti' (a : ℤ)
 theorem mu_mul (c d : K) (x : V ⊗[Qp] BdR) : μ (c * d) x = μ c (μ d x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
-  | tmul a b => simp [mulVdR, mul_assoc]
+  | tmul a b => simp [mulVdR]
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
 
 theorem mu_add (c d : K) (x : V ⊗[Qp] BdR) : μ (c + d) x = μ c x + μ d x := by

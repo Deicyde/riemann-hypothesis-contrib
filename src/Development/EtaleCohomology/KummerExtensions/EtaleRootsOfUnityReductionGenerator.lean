@@ -45,4 +45,4 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 theorem LateralTheory.Ext.etale_roots_of_unity_reduction_generator
     : LateralTheory.EtaleFoundations.EtaleRootsOfUnityReductionMapGenerator :=
-  GlobalTheory.T.tateTwistReductionResolutionMap_generator
+  _root_.GlobalTheory.EtC.RedExists.red_exists

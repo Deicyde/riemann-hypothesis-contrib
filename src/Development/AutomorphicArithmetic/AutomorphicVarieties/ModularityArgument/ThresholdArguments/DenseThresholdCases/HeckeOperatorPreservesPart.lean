@@ -47,9 +47,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
   Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
@@ -477,6 +474,7 @@ theorem hecke_operator_preserves_part
       (zero_mem _)
       (fun _ _ => add_mem)
       fun q => h1 _ F hF
+
 theorem UpperTheory.V.Hi.partAct0_alt
     : _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureRankNHypothesis
       → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)

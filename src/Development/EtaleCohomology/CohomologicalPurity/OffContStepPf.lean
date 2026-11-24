@@ -214,24 +214,7 @@ theorem dbl.inl_map {P' P : Arrow Spc} (φ : P' ⟶ P)
     : dbl.inl P' ≫ dbl.map φ = φ.right ≫ dbl.inl P :=
   pushout.inl_desc (f := P'.hom) (g := P'.hom) _ _ _
 
-theorem dbl.map_comp {P'' P' P : Arrow Spc} (φ : P'' ⟶ P') (ψ : P' ⟶ P)
-    : dbl.map (φ ≫ ψ) = dbl.map φ ≫ dbl.map ψ := by
-  set_option synthInstance.maxHeartbeats 200000 in
-    apply pushout.hom_ext
-  · change dbl.inl P'' ≫ dbl.map (φ ≫ ψ) = dbl.inl P'' ≫ dbl.map φ ≫ dbl.map ψ
-    rw [dbl.inl_map, ← Category.assoc, dbl.inl_map, Category.assoc, dbl.inl_map, ← Category.assoc]
-    rfl
-  · change dbl.inr P'' ≫ dbl.map (φ ≫ ψ) = dbl.inr P'' ≫ dbl.map φ ≫ dbl.map ψ
-    rw [dbl.inr_map, ← Category.assoc, dbl.inr_map, Category.assoc, dbl.inr_map, ← Category.assoc]
-    rfl
-
-theorem Hs.pullComp
-    (q : ℕ) {P'' P' P : Arrow Spc} (φ : P'' ⟶ P') (ψ : P' ⟶ P) (n i : ℤ) (x : Hs q P n i)
-    : Hs.pull q (φ ≫ ψ) n i x = Hs.pull q φ n i (Hs.pull q ψ n i x) := by
-  apply Subtype.ext
-  change GlobalTheory.EtC.pull _ (dbl.map (φ ≫ ψ)) _ n x.1
-    = GlobalTheory.EtC.pull _ (dbl.map φ) _ n (GlobalTheory.EtC.pull _ (dbl.map ψ) _ n x.1)
-  rw [dbl.map_comp, GlobalTheory.EtC.pull_comp]
+alias dbl.map_comp := _root_.LateralTheory.CohomologicalPurity.dbl.map_comp'
 
 theorem Hs.fgt_pull (q : ℕ) {P' P : Arrow Spc} (φ : P' ⟶ P) (n i : ℤ) (x : Hs q P n i)
     : Hs.fgt q P' n i (Hs.pull q φ n i x)
@@ -302,13 +285,15 @@ theorem pairFiveR_inj
       : Hs.pull q (c M) _ _
           (Hs.pull q (F.map g1.op) _ _ s - Hs.pull q (F.map g2.op) _ _ (δ q _ m i a))
         = 0 := by
-    rw [map_sub, ← Hs.pullComp, ← Hs.pullComp, hc, hc, hu, sub_self]
+    rw [map_sub, ← _root_.LateralTheory.CohomologicalPurity.Hs.pull_comp',
+      ← _root_.LateralTheory.CohomologicalPurity.Hs.pull_comp', hc, hc, hu, sub_self]
   obtain ⟨p, h, hp⟩ := (hS (m + 1)).2 M _ hd
   rw [map_sub, sub_eq_zero] at hp
   have hp'
       : Hs.pull q (F.map (g1 ≫ h).op) _ _ s
         = δ q _ m i (pull _ (F.map (g2 ≫ h).op).left (tw q i) m a) := by
-    rw [op_comp, F.map_comp, Hs.pullComp, hp, ← Hs.pullComp, ← F.map_comp, ← op_comp,
+    rw [op_comp, F.map_comp, _root_.LateralTheory.CohomologicalPurity.Hs.pull_comp', hp,
+      ← _root_.LateralTheory.CohomologicalPurity.Hs.pull_comp', ← F.map_comp, ← op_comp,
       hnat q _ _ _ (hm p) (hm l)]
   refine ⟨p, f ≫ g1 ≫ h, ?_⟩
   have e : F.map (f ≫ g1 ≫ h).op = F.map (g1 ≫ h).op ≫ F.map f.op := by rw [op_comp, F.map_comp]

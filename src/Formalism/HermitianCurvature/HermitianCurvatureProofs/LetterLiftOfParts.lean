@@ -134,11 +134,7 @@ theorem comm_TP {L : LevelData A r} {x : A} (hx : ∀ y ∈ siteOps L, Commute x
     rw [List.mem_reverse, List.mem_ofFn] at hM
     obtain ⟨l, rfl⟩ := hM
     fin_cases i <;> fin_cases j <;> simp [Formalism.FourierDecayAlt.R.LevelData.Tl, hc, hci]
-      <;> first
-        | exact Commute.add_right (Algebra.commutes Y x).symm (hp l)
-        | exact hc l
-        | exact (hc l).neg_right
-        | exact hci l
+      <;> first | exact Commute.add_right (Algebra.commutes Y x).symm (hp l)
   exact ⟨key _ hT 0 0, key _ hT 1 0⟩
 
 theorem comm_TM {L : LevelData A r} {x : A} (hx : ∀ y ∈ siteOps L, Commute x y) (Y : ℂ)
@@ -168,11 +164,7 @@ theorem comm_TM {L : LevelData A r} {x : A} (hx : ∀ y ∈ siteOps L, Commute x
     rw [List.mem_reverse, List.mem_ofFn] at hM
     obtain ⟨l, rfl⟩ := hM
     fin_cases i <;> fin_cases j <;> simp [Formalism.FourierDecayAlt.R.LevelData.Tvl, hc, hci]
-      <;> first
-        | exact Commute.sub_right (Algebra.commutes Y x).symm (hp l)
-        | exact hc l
-        | exact (hc l).neg_right
-        | exact hci l
+      <;> first | exact Commute.sub_right (Algebra.commutes Y x).symm (hp l)
   exact ⟨key _ hT 0 0, key _ hT 1 0⟩
 
 theorem ent3

@@ -42,8 +42,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.LevelOfOfSameBut
 
 @[expose] public section
 
-
-
 section
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj

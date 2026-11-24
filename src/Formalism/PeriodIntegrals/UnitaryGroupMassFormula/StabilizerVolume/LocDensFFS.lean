@@ -203,7 +203,7 @@ theorem ffH_snd (J : Matrix (Fin M) (Fin M) (k × k)) (x y : Fin M → k × k)
 private theorem ffGram_apply
     (J : Matrix (Fin M) (Fin M) (k × k)) (X : Fin a → Fin M → k × k) (r s : Fin a)
     : ffGram (swapR k) J X r s = ffH (swapR k) J (X r) (X s) := by
-  first | rfl | simp [ffGram] | (unfold ffGram; simp)
+  first | rfl
 
 private theorem fst_ffGram_eq_V1_mul_map_fst
     (J : Matrix (Fin M) (Fin M) (k × k)) (X : Fin a → Fin M → k × k) (r s : Fin a)

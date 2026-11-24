@@ -94,7 +94,6 @@ theorem relation_descends_along_functional
   rw [hgoal]
   refine Finset.sum_eq_zero fun j _ => ?_
   have h5 : ∑ s, φ (c s) * α s j = φ (∑ s, c s * σ (α s j)) := by
-
     rw [map_sum]
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [mul_comm (c s), hφ]

@@ -81,7 +81,7 @@ theorem coe_single (a : Fin (r + 1))
   by_cases h : j = a
   · subst h
     simp
-  · simp [Pi.single_apply, h]
+  · simp [h]
 
 theorem mk_eq_zero_of
     (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O)

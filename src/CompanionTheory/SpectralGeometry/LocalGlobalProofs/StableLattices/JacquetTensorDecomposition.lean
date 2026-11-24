@@ -76,8 +76,7 @@ theorem term_two_by_two_exchange
         + Tm E y q d * Tm E x p c := by
   simp only [Tm, Algebra.algebraMap_eq_smul_one]
   split_ifs
-    <;> simp only [add_mul, mul_add, smul_mul_assoc, mul_smul_comm, one_mul, mul_one, zero_add,
-      zero_mul, mul_zero, add_zero, smul_smul, smul_zero, zero_smul]
+    <;> simp only [add_mul, mul_add, smul_mul_assoc, mul_smul_comm, one_mul, mul_one, zero_add]
     <;> module
 
 theorem list_prod_ofFn_update_adjacent

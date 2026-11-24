@@ -92,11 +92,11 @@ theorem mem_of_mirProj_eq_one' {n : ℕ} (u : Mir k n) (hu : mirabolicProjection
   induction a using Fin.lastCases with
   | last =>
     rw [hlb]
-    induction b using Fin.lastCases <;> simp [unip, colMat, Matrix.one_apply, eLast,
-      Fin.castSucc_ne_last, (Fin.castSucc_ne_last _).symm]
+    induction b using Fin.lastCases
+      <;> simp [unip, colMat, eLast, Fin.castSucc_ne_last, (Fin.castSucc_ne_last _).symm]
   | cast a =>
     induction b using Fin.lastCases with
-    | last => simp [unip, colMat, Matrix.one_apply, Fin.castSucc_ne_last]
+    | last => simp [unip, colMat, Fin.castSucc_ne_last]
     | cast b =>
       rw [hb]
       simp [unip, colMat, Matrix.one_apply, Fin.castSucc_ne_last]
@@ -181,7 +181,7 @@ theorem Cl_left
         have := congrArg Fin.val e'
         simp at this
         omega
-      simp [eLast, Pi.single_apply, this]
+      simp [eLast, this]
     · rw [hpg_entry _ ((HPG k (i + 1) (t + 1)).inv_mem hh) l (by omega) h2 c, mul_zero]
 
 theorem Cl_right
@@ -212,7 +212,7 @@ theorem Cl_right
       have := congrArg Fin.val e'
       simp at this
       omega
-    simp [eLast, Pi.single_apply, this]
+    simp [eLast, this]
   · simp [colMat, hl]
 
 end Alg

@@ -1,9 +1,11 @@
 module
 
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StageData
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasureStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianMatricesLocallyCompactBorelStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
+public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianMatricesLocallyCompactBorel
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -94,19 +96,20 @@ theorem subst_row_translate
     haveI := hSC
     haveI := hT2
     obtain ⟨iTR, iLC, iSC, iT2, -, -, -, iB, -, -⟩ :=
-      GlobalTheory.T.tensor_locally_compact_ring F E σ D.hCM R
+      _root_.GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ D.hCM R
     haveI := iTR
     haveI := iLC
     haveI := iSC
     haveI := iT2
     obtain ⟨jLC, jSC, jT2, jB, -⟩ :=
-      GlobalTheory.T.hermitian_matrices_locally_compact_borel F E σ D.hCM R n
+      _root_.GlobalTheory.CompanionTheory.SW.HermTop.herm_top F E σ D.hCM R n
     haveI := jLC
     haveI := jSC
     haveI := jT2
     haveI := jB
     haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
-    obtain ⟨hK, -, hH⟩ := GlobalTheory.T.coordinate_haar_measure F E σ D.hCM R d b lam D.hlam
+    obtain ⟨hK, -, hH⟩ :=
+      _root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ D.hCM R d b lam D.hlam
     haveI := hK
     haveI := hH n
     have hVU

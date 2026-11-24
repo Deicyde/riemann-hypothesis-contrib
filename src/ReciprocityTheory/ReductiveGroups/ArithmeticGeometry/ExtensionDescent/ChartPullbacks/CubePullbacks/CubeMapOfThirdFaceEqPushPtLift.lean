@@ -79,7 +79,6 @@ lemma eSec_hom {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] : eSec H ≫ H.hom
 lemma psum_empty {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] [IsCommMonObj H] {T : Over S₀} {n : ℕ}
     (x : Fin n → (T ⟶ H)) : psum H x ∅ = pzero H T := by
   first
-    | rfl
     | simp [psum, pzero]
 
 lemma padd_pzero {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] [IsCommMonObj H] {T : Over S₀}
@@ -130,7 +129,7 @@ lemma tb_comp {T T' : Over S'} (a : T' ⟶ T) (y : T ⟶ G') :
 lemma tb_pzero (T : Over S') : tb m (pzero G' T) = pzero G ((Over.map m.e).obj T) := by
   ext
   rw [tb_left, pzero_left, pzero_left, Category.assoc, m.e_comm]
-  all_goals first | rfl | simp
+  all_goals first | rfl
 
 lemma psum_01 {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] [IsCommMonObj H] {T : Over S₀}
     (x : Fin 3 → (T ⟶ H)) : psum H x {0, 1} = padd H (x 0) (x 1) := by
@@ -221,19 +220,16 @@ theorem face_comm (i : Fin 3)
   · have h :=
       lift_triple_comm_pullback m (L2 m) (pzero G' (G2 G')) (x2 G' 0) (x2 G' 1) (pzero G (G2 G))
         (x2 G 0) (x2 G 1) (tb_pzero' m (L2 m)) (pullback_proj_square m 0) (pullback_proj_square m 1)
-    first
-    | exact h
+    first | exact h
   · have h :=
       lift_triple_comm_pullback m (L2 m) (x2 G' 0) (pzero G' (G2 G')) (x2 G' 1) (x2 G 0)
         (pzero G (G2 G)) (x2 G 1) (pullback_proj_square m 0) (tb_pzero' m (L2 m))
         (pullback_proj_square m 1)
-    first
-    | exact h
+    first | exact h
   · have h :=
       lift_triple_comm_pullback m (L2 m) (x2 G' 0) (x2 G' 1) (pzero G' (G2 G')) (x2 G 0) (x2 G 1)
         (pzero G (G2 G)) (pullback_proj_square m 0) (pullback_proj_square m 1) (tb_pzero' m (L2 m))
-    first
-    | exact h
+    first | exact h
 
 theorem swap_first_two_comm
     : (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ m.F3

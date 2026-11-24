@@ -65,8 +65,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 variable {D : D7}
 
 variable

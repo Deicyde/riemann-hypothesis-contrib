@@ -187,7 +187,7 @@ theorem UpperTheory.V.UnitaryThreeInertia.rig_sub
       simpa using this
     have hc := ((UpperTheory.V.HV.compIne Ω N l hl.out (A F.vl) hv).2 c.O ψ).1 _ hI'
     rw [hΨ, UpperTheory.V.Chr.Psi, MonoidHom.mul_apply, hc, hs2, mul_one]
-    first | exact MonoidHom.zpow_apply _ _ _ | simp [MonoidHom.zpow_apply, MonoidHom.pow_apply]
+    first | exact MonoidHom.zpow_apply _ _ _
   · have hdx
         : (l : ℤ_[l])
           ∣ ((cycZ ℚ Ω l (x : Formalism.ConjugateSelfDual.G ℚ Ω) : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by

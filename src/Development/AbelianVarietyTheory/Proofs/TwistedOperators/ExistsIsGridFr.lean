@@ -95,10 +95,9 @@ theorem exists_isGridFr (W : G.Weil) {X : Node} (hX : X.InRange D.R.m)
         <;> · ext a b
               by_cases h : a = b
               · subst h
-                cases h' : ε τ a <;> simp [Formalism.REAL.Jm, Matrix.mul_apply,
-                  Matrix.diagonal_apply, h', Matrix.one_apply]
-              · simp [Formalism.REAL.Jm, Matrix.mul_apply, Matrix.diagonal_apply, h,
-                  Matrix.one_apply]
+                cases h' : ε τ a
+                  <;> simp [Formalism.REAL.Jm, Matrix.mul_apply, Matrix.diagonal_apply, h']
+              · simp [Formalism.REAL.Jm, Matrix.mul_apply, Matrix.diagonal_apply, h]
     rw [Matrix.isUnit_iff_isUnit_det] at h1 ⊢
     rw [Matrix.det_mul] at h1
     exact isUnit_of_mul_isUnit_right h1

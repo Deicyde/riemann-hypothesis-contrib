@@ -47,30 +47,35 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
+open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets
+  Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
 
 namespace GlobalTheory.PerpBaseChange
 
-private theorem dual_span_sum_eq_zero {E A : Type} [Field E] [CommRing A] (ι : E →+* A) {n : ℕ}
-    (S : Set (Module.Dual E (Fin n → E))) (u : Fin n → A)
-    (hu : ∀ φ ∈ S, ∑ j, ι (φ (Pi.single j 1)) * u j = 0) :
-    ∀ ψ ∈ Submodule.span E S, ∑ j, ι (ψ (Pi.single j 1)) * u j = 0 := by
+private theorem dual_span_sum_eq_zero
+    {E A : Type} [Field E] [CommRing A]
+    (ι : E →+* A)
+    {n : ℕ} (S : Set (Module.Dual E (Fin n → E))) (u : Fin n → A)
+    (hu : ∀ φ ∈ S, ∑ j, ι (φ (Pi.single j 1)) * u j = 0)
+    : ∀ ψ ∈ Submodule.span E S, ∑ j, ι (ψ (Pi.single j 1)) * u j = 0 := by
   intro ψ hψ
   induction hψ using Submodule.span_induction with
   | mem x hx => exact hu x hx
   | zero => simp
   | add x y _ _ hx hy =>
-    simp only [LinearMap.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib, hx, hy, add_zero]
+    simp only [LinearMap.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib, hx, hy,
+      add_zero]
   | smul c x _ hx =>
     simp only [LinearMap.smul_apply, smul_eq_mul, map_mul, mul_assoc]
     rw [← Finset.mul_sum, hx, mul_zero]
 
-theorem mem_span_of_forms {E A : Type} [Field E] [CommRing A] (ι : E →+* A) {n : ℕ}
-    (S : Set (Module.Dual E (Fin n → E))) (u : Fin n → A)
-    (hu : ∀ φ ∈ S, ∑ j, ι (φ (Pi.single j 1)) * u j = 0) :
-    u ∈ Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' {y | ∀ φ ∈ S, φ y = 0}) := by
+theorem mem_span_of_forms
+    {E A : Type} [Field E] [CommRing A]
+    (ι : E →+* A)
+    {n : ℕ} (S : Set (Module.Dual E (Fin n → E))) (u : Fin n → A)
+    (hu : ∀ φ ∈ S, ∑ j, ι (φ (Pi.single j 1)) * u j = 0)
+    : u ∈ Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' {y | ∀ φ ∈ S, φ y = 0}) := by
   classical
-
   set D : Submodule E (Module.Dual E (Fin n → E)) := Submodule.span E S with hD
   set K : Submodule E (Fin n → E) := D.dualCoannihilator with hK
   have hKset : ∀ y, y ∈ K ↔ ∀ φ ∈ S, φ y = 0 := by
@@ -97,8 +102,9 @@ theorem mem_span_of_forms {E A : Type} [Field E] [CommRing A] (ι : E →+* A) {
 
   have hrow : ∀ i, (LinearMap.proj i - LinearMap.proj i ∘ₗ P : Module.Dual E (Fin n → E)) ∈ D := by
     intro i
-    have hmem : (LinearMap.proj i - LinearMap.proj i ∘ₗ P : Module.Dual E (Fin n → E)) ∈
-        K.dualAnnihilator := by
+    have hmem
+        : (LinearMap.proj i - LinearMap.proj i ∘ₗ P : Module.Dual E (Fin n → E))
+          ∈ K.dualAnnihilator := by
       rw [Submodule.mem_dualAnnihilator]
       intro k hk
       simp [hPid k hk]
@@ -107,7 +113,8 @@ theorem mem_span_of_forms {E A : Type} [Field E] [CommRing A] (ι : E →+* A) {
     intro i
     have h0 := dual_span_sum_eq_zero ι S u hu _ (hrow i)
     simp only [LinearMap.sub_apply, LinearMap.proj_apply, LinearMap.comp_apply, map_sub, sub_mul,
-      Finset.sum_sub_distrib, sub_eq_zero] at h0
+        Finset.sum_sub_distrib, sub_eq_zero]
+      at h0
     rw [← h0]
     simp [Pi.single_apply]
   have hu' : u = ∑ j, u j • (fun i => ι (P (Pi.single j 1) i)) := by
@@ -115,61 +122,87 @@ theorem mem_span_of_forms {E A : Type} [Field E] [CommRing A] (ι : E →+* A) {
     rw [hcoord i]
     simp [Finset.sum_apply, mul_comm]
   rw [hu']
-  refine Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨P (Pi.single j 1), ?_, rfl⟩)
+  refine Submodule.sum_mem _ fun j _ =>
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨P (Pi.single j 1), ?_, rfl⟩)
   exact (hKset _).1 (hPK _)
 
-def formRight {E : Type} [CommRing E] (σ : E →+* E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-    (w : Fin n → E) : Module.Dual E (Fin n → E) where
+def formRight
+    {E : Type} [CommRing E] (σ : E →+* E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (w : Fin n → E)
+    : Module.Dual E (Fin n → E) where
   toFun y := Formalism.UG.hform σ J w y
   map_add' y z := by simp [Formalism.UG.hform, mul_add, Finset.sum_add_distrib]
   map_smul' c y := by
     simp only [Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem formRight_apply {E : Type} [CommRing E] (σ : E →+* E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-    (w y : Fin n → E) : formRight σ J w y = Formalism.UG.hform σ J w y := rfl
+theorem formRight_apply
+    {E : Type} [CommRing E] (σ : E →+* E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (w y : Fin n → E)
+    : formRight σ J w y = Formalism.UG.hform σ J w y :=
+  rfl
 
-private theorem hform_add_right_flag_measures {A : Type} [CommRing A] (s : A →+* A) {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) A) (x y z : Fin n → A) :
-    Formalism.UG.hform s J x (y + z) = Formalism.UG.hform s J x y + Formalism.UG.hform s J x z := by
+private theorem hform_add_right_flag_measures
+    {A : Type} [CommRing A] (s : A →+* A) {n : ℕ} (J : Matrix (Fin n) (Fin n) A) (x y z : Fin n → A)
+    : Formalism.UG.hform s J x (y + z)
+      = Formalism.UG.hform s J x y + Formalism.UG.hform s J x z := by
   simp only [Formalism.UG.hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-private theorem hform_smul_right_flag_measures {A : Type} [CommRing A] (s : A →+* A) {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) A) (c : A) (x y : Fin n → A) :
-    Formalism.UG.hform s J x (c • y) = c * Formalism.UG.hform s J x y := by
+private theorem hform_smul_right_flag_measures
+    {A : Type} [CommRing A]
+    (s : A →+* A)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) A)
+    (c : A) (x y : Fin n → A)
+    : Formalism.UG.hform s J x (c • y) = c * Formalism.UG.hform s J x y := by
   simp only [Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-private theorem hform_add_left_flag_measures' {A : Type} [CommRing A] (s : A →+* A) {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) A) (x x' y : Fin n → A) :
-    Formalism.UG.hform s J (x + x') y = Formalism.UG.hform s J x y + Formalism.UG.hform s J x' y := by
+private theorem hform_add_left_flag_measures'
+    {A : Type} [CommRing A]
+    (s : A →+* A)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) A) (x x' y : Fin n → A)
+    : Formalism.UG.hform s J (x + x') y
+      = Formalism.UG.hform s J x y + Formalism.UG.hform s J x' y := by
   simp only [Formalism.UG.hform, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
 
-private theorem hform_smul_left_flag_measures {A : Type} [CommRing A] (s : A →+* A) {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) A) (c : A) (x y : Fin n → A) :
-    Formalism.UG.hform s J (c • x) y = s c * Formalism.UG.hform s J x y := by
+private theorem hform_smul_left_flag_measures
+    {A : Type} [CommRing A]
+    (s : A →+* A)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) A)
+    (c : A) (x y : Fin n → A)
+    : Formalism.UG.hform s J (c • x) y = s c * Formalism.UG.hform s J x y := by
   simp only [Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem perpSet_baseChange : ∀ (E A : Type) [Field E] [CommRing A] (σ : E →+* E) (s : A →+* A) (ι : E →+* A) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (W : Submodule E (Fin n → E)), (∀ e, s (ι e) = ι (σ e)) → perpSet s (J.map ι) (Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' (W : Set (Fin n → E)))) = (Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' perpSet σ J W) : Set (Fin n → A)) := by
+theorem perpSet_baseChange
+    : ∀ (E A : Type) [Field E] [CommRing A] (σ : E →+* E) (s : A →+* A) (ι : E →+* A) (n : ℕ)
+        (J : Matrix (Fin n) (Fin n) E) (W : Submodule E (Fin n → E)),
+      (∀ e, s (ι e) = ι (σ e))
+        → perpSet s (J.map ι)
+            (Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' (W : Set (Fin n → E))))
+          = (Submodule.span A ((fun w : Fin n → E => fun i => ι (w i)) '' perpSet σ J W)
+            : Set (Fin n → A)) := by
   intro E A _ _ σ s ι n J W hs
   classical
-
-  have key : ∀ w z : Fin n → E, Formalism.UG.hform s (J.map ι) (fun i => ι (w i)) (fun i => ι (z i)) =
-      ι (Formalism.UG.hform σ J w z) := by
+  have key
+      : ∀ w z : Fin n → E,
+        Formalism.UG.hform s (J.map ι) (fun i => ι (w i)) (fun i => ι (z i))
+          = ι (Formalism.UG.hform σ J w z) := by
     intro w z
 
     simp only [Formalism.UG.hform, Matrix.map_apply, hs, map_sum, map_mul]
 
-  have pair : ∀ (w : Fin n → E) (y : Fin n → A), Formalism.UG.hform s (J.map ι) (fun i => ι (w i)) y =
-      ∑ j, ι (formRight σ J w (Pi.single j 1)) * y j := by
+  have pair
+      : ∀ (w : Fin n → E) (y : Fin n → A),
+        Formalism.UG.hform s (J.map ι) (fun i => ι (w i)) y
+          = ∑ j, ι (formRight σ J w (Pi.single j 1)) * y j := by
     intro w y
 
-    simp only [formRight_apply, Formalism.UG.hform, Matrix.map_apply, hs, Pi.single_apply, mul_ite, mul_one,
-    mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true, map_sum, map_mul,
-    Finset.sum_mul]
+    simp only [formRight_apply, Formalism.UG.hform, Matrix.map_apply, hs, Pi.single_apply, mul_ite,
+      mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, map_sum, map_mul,
+      Finset.sum_mul]
     rw [Finset.sum_comm]
-  have hset : {z : Fin n → E | ∀ φ ∈ formRight σ J '' (W : Set (Fin n → E)), φ z = 0} = perpSet σ J W := by
+  have hset
+      : {z : Fin n → E | ∀ φ ∈ formRight σ J '' (W : Set (Fin n → E)), φ z = 0}
+        = perpSet σ J W := by
     ext z
     simp only [Set.mem_setOf_eq, Set.mem_image, forall_exists_index, and_imp,
       forall_apply_eq_imp_iff₂, perpSet, formRight_apply, SetLike.mem_coe]

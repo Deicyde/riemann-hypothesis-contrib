@@ -3,8 +3,10 @@ module
 public import Development.WeilBound.CoreStatements.PublishedTheorems.SmoothVectorEstimates.WhittakerVanishingImpliesZero
 public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShalikaBound.lift_levelP_alt₂
 public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShalikaBound.FormQuasiInvariantMirabolic
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalUpperUnipotentAdelicUpperUnipotentStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WhittakerLawUpperTriangularUnipotentAdelicStatement
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.DifferentiableAtChart
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalUpperUnipotentAdelicUpperUnipotent
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnipotentBlockColumnIndex
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WhittakerLawUpperTriangularUnipotentAdelic
 public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShalikaBound.SatakeEigenvalues
 import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 import Mathlib.Algebra.Order.Floor.Extended
@@ -152,9 +154,9 @@ theorem law
     (g : GA E a)
     : f (fl a w n * g) = GroundTheory.Automorphic.Whittaker.psiN (psiW ψ w) n * f g := by
   obtain ⟨t1, t2, t3⟩ :=
-    GlobalTheory.T.localUpperUnipotent_adelic_upperUnipotent E a w n (fun i j hij => hn.1 hij) hn.2
+    _root_.GlobalTheory.CuspRep.locTri_adelic E a w n (fun i j hij => hn.1 hij) hn.2
   have :=
-    GlobalTheory.T.whittakerLaw_upperTriangularUnipotent_adelic E a ψ f
+    _root_.GlobalTheory.CuspGeneric.tri_law E a ψ f
       (fun k hk y g => by rw [dot_eLast]; exact hf k hk y g)
       _ t1 t2 g
   change f (finGL E a (locGL E a w n) * g) = _

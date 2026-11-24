@@ -187,7 +187,7 @@ theorem count_odd (N : ℕ) : |∑ n ∈ Icc 1 N, ao n - N / 2| ≤ 1 / 2 := by
         ring
   rw [this]
   unfold ao
-  split_ifs <;> simp [abs_le] <;> norm_num
+  split_ifs <;> simp
 
 theorem tsum_odd (t : ℝ) (ht : 0 < t)
     : ∑' n : ℕ, ao n * Real.exp (-(t * n)) = Real.exp (-t) / (1 - Real.exp (-t) ^ 2) := by

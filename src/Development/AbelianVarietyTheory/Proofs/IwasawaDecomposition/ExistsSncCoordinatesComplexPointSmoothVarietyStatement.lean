@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLatBasisZero
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -47,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
   GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_snc_coordinates_complexPoint_smoothVariety
     : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.{0}) (p : Y ⟶ Sp k) (n : ℕ)
         (D : TopologicalSpace.Closeds Y) (σ : k →+* ℂ),
@@ -57,7 +59,4 @@ theorem _root_.GlobalTheory.T.exists_snc_coordinates_complexPoint_smoothVariety
             ∧ IsHolTo e.target (fun z => (e.symm z).1)
             ∧ ∀ x ∈ e.source,
               (x.1 (IsLocalRing.closedPoint ℂ) ∉ D ↔ ∀ j : Fin n, (j : ℕ) < a → e x j ≠ 0) := by
-  first
-  | exact @GlobalTheory.SncChart.exists_coords
-  | exact GlobalTheory.SncChart.exists_coords
-  | (intros; apply GlobalTheory.SncChart.exists_coords <;> assumption)
+  first | exact @GlobalTheory.SncChart.exists_coords

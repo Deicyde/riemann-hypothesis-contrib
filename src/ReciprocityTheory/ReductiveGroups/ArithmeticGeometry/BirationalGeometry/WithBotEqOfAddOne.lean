@@ -1,15 +1,13 @@
 module
 
 public import Mathlib.Data.ENat.Basic
-import Lean.Elab.Tactic.NormCast
-import Lean.Elab.Tactic.Omega
 
 @[expose] public section
 
 namespace ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ}
-    (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞)) : a = (n : WithBot ℕ∞) := by
+theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞))
+    : a = (n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot =>
     rw [WithBot.bot_add] at h

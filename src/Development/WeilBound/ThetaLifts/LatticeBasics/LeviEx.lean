@@ -53,28 +53,45 @@ noncomputable section
 namespace GlobalTheory.ThK.Dbl
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
-theorem exists_conj {S R : Type} [CommRing S] [CommRing R] [Algebra S R] (c : R →ₐ[S] R) {n k : Type} [Fintype n] [DecidableEq n]
-    [Fintype k] [DecidableEq k] (J : Matrix n n R) (P : Matrix n k R) (Q : Matrix k n R) (h1 : P * Q = 1) (h2 : Q * P = 1)
-    (D D' : Matrix k k R) (h3 : D * D' = 1) (h4 : D' * D = 1) (h : Dᵀ * (Pᵀ * J * P.map c) * D.map c = Pᵀ * J * P.map c) :
-    ∃ g : UG c J, g.1.1 * P = P * D := by
-  have mm : ∀ {a b e : Type} [Fintype b] (A : Matrix a b R) (B : Matrix b e R), (A * B).map c = A.map c * B.map c :=
-    fun A B => Matrix.map_mul (f := c.toRingHom)
+theorem exists_conj
+    {S R : Type} [CommRing S] [CommRing R] [Algebra S R]
+    (c : R →ₐ[S] R)
+    {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [DecidableEq k]
+    (J : Matrix n n R)
+    (P : Matrix n k R) (Q : Matrix k n R) (h1 : P * Q = 1) (h2 : Q * P = 1)
+    (D D' : Matrix k k R)
+    (h3 : D * D' = 1) (h4 : D' * D = 1) (h : Dᵀ * (Pᵀ * J * P.map c) * D.map c = Pᵀ * J * P.map c)
+    : ∃ g : UG c J, g.1.1 * P = P * D := by
+  have mm
+      : ∀ {a b e : Type} [Fintype b] (A : Matrix a b R) (B : Matrix b e R),
+        (A * B).map c = A.map c * B.map c := fun A B =>
+    Matrix.map_mul (f := c.toRingHom)
   have u : ∀ A B : Matrix k k R, A * B = 1 → P * A * Q * (P * B * Q) = 1 := fun A B e => by
-    rw [show P * A * Q * (P * B * Q) = P * (A * (Q * P) * B) * Q by simp only [Matrix.mul_assoc], h2, mul_one, e,
-      Matrix.mul_one, h1]
-  refine ⟨⟨⟨P * D * Q, P * D' * Q, u _ _ h3, u _ _ h4⟩, ?_⟩, by simp only [Matrix.mul_assoc, h2, Matrix.mul_one]⟩
+    rw [show P * A * Q * (P * B * Q) = P * (A * (Q * P) * B) * Q by simp only [Matrix.mul_assoc],
+      h2, mul_one, e, Matrix.mul_one, h1]
+  refine ⟨
+    ⟨⟨P * D * Q, P * D' * Q, u _ _ h3, u _ _ h4⟩, ?_⟩,
+    by simp only [Matrix.mul_assoc, h2, Matrix.mul_one]
+  ⟩
   show (P * D * Q)ᵀ * J * (P * D * Q).map c = J
-  calc _ = Qᵀ * (Dᵀ * (Pᵀ * J * P.map c) * D.map c) * Q.map c := by simp only [mm, Matrix.transpose_mul, Matrix.mul_assoc]
-    _ = (P * Q)ᵀ * J * (P * Q).map c := by rw [h]; simp only [mm, Matrix.transpose_mul, Matrix.mul_assoc]
+  calc
+    _ = Qᵀ * (Dᵀ * (Pᵀ * J * P.map c) * D.map c) * Q.map c := by
+      simp only [mm, Matrix.transpose_mul, Matrix.mul_assoc]
+    _ = (P * Q)ᵀ * J * (P * Q).map c := by
+      rw [h]; simp only [mm, Matrix.transpose_mul, Matrix.mul_assoc]
     _ = J := by rw [h1, Matrix.map_one _ (map_zero c) (map_one c)]; simp
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 omit [NumberField E] in
-theorem incM_mul {a b e : Type} [Fintype b] (A : Matrix a b E) (B : Matrix b e E) : incM F (A * B) = incM F A * incM F B :=
+theorem incM_mul {a b e : Type} [Fintype b] (A : Matrix a b E) (B : Matrix b e E)
+    : incM F (A * B) = incM F A * incM F B :=
   Matrix.map_mul
 
 omit [NumberField E] in
@@ -89,9 +106,9 @@ theorem leviEx : LeviEx := by
     exact τ.injective (by rw [hB.cm.2.2.2, hB.cm.2.2.2, star_star])
   let N : Matrix (Fin d) (Fin 2) E := (Matrix.of ![H.x, H.y])ᵀ
   let P := Matrix.fromCols H.ι N
-  have hsk (x y : Fin d → E) : form σ W.J x y = -σ (form σ W.J y x) := by
-
-    simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, inv, hW.skew, ← Finset.sum_neg_distrib]
+  have hsk (x y : Fin d → E) : form σ W.J x y = - σ (form σ W.J y x) := by
+    simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, inv, hW.skew,
+      ← Finset.sum_neg_distrib]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   have hFull : W.L.IsFullLattice E := by
@@ -114,7 +131,8 @@ theorem leviEx : LeviEx := by
       exact funext fun i => σ.injective ((congrFun hy i).trans (map_zero σ).symm)
     have horth (x : Fin d → E) (hx : x ∈ W.L) : form σ W.J y x = 0 := by
       have hz' : z ⬝ᵥ W.Jᵀ *ᵥ x = 0 :=
-        congrArg (fun f : Module.Dual E U => f ⟨x, Submodule.subset_span hx⟩)
+        congrArg
+          (fun f : Module.Dual E U => f ⟨x, Submodule.subset_span hx⟩)
           (LinearMap.mem_ker.mp hz)
       have hzero : form σ W.J x y = 0 := by
         rw [Matrix.dotProduct_transpose_mulVec] at hz'
@@ -124,12 +142,14 @@ theorem leviEx : LeviEx := by
       have hzform (x : Fin d → E) (hx : x ∈ W.L) : form σ W.J (a • y) x = 0 := by
         simpa only [form, smul_dotProduct, smul_eq_mul] using
           (show a * form σ W.J y x = 0 by rw [horth x hx, mul_zero])
-      exact (hW.dual _).2 fun x hx o => by rw [hzform x hx, mul_zero, map_zero]; exact isIntegral_zero
+      exact (hW.dual _).2 fun x hx o => by
+        rw [hzform x hx, mul_zero, map_zero]; exact isIntegral_zero
     let i : E →ₗ[𝓞 E] W.L :=
       ((LinearMap.toSpanSingleton E _ y).restrictScalars (𝓞 E)).codRestrict W.L hline
     let : Module.Finite (𝓞 E) W.L := Module.Finite.iff_fg.mpr hW.lat.fg
-    let : Module.Finite (𝓞 E) E := Module.Finite.of_injective i fun a b hab =>
-      smul_left_injective E hy₀ (congrArg Subtype.val hab)
+    let : Module.Finite (𝓞 E) E :=
+      Module.Finite.of_injective i fun a b hab =>
+        smul_left_injective E hy₀ (congrArg Subtype.val hab)
     exact RingOfIntegers.not_isField E
       (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 E) E) (Field.toIsField E))
   have su : Function.Surjective P.mulVec := fun z => by
@@ -144,7 +164,8 @@ theorem leviEx : LeviEx := by
     simp [P, N, Matrix.mulVec, dotProduct]
     ring
   obtain ⟨Q, h1⟩ := Matrix.mulVec_surjective_iff_exists_right_inverse.1 su
-  have h2 : Q * P = 1 := (Matrix.mul_eq_one_comm_of_equiv (Fintype.equivOfCardEq (by simp [hH.rank]))).1 h1
+  have h2 : Q * P = 1 :=
+    (Matrix.mul_eq_one_comm_of_equiv (Fintype.equivOfCardEq (by simp [hH.rank]))).1 h1
   have o1 : H.ιᵀ * W.J * N.map σ = 0 := by
     ext i j
     have := hH.orth (Pi.single i 1)
@@ -156,8 +177,9 @@ theorem leviEx : LeviEx := by
     ext j i
     have := congrArg σ (congrFun (congrFun o1 i) j)
 
-    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, inv, hW.skew, Matrix.zero_apply,
-    map_zero, Finset.sum_mul] at this ⊢
+    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, inv,
+        hW.skew, Matrix.zero_apply, map_zero, Finset.sum_mul]
+      at this ⊢
     rw [Finset.sum_comm, ← neg_eq_zero, ← this, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [← Finset.sum_neg_distrib]
@@ -166,22 +188,30 @@ theorem leviEx : LeviEx := by
     rw [← hH.gram, ← o1]
     conv_rhs => enter [3]; rw [← o2]
     simp only [P]
-    rw [Matrix.transpose_fromCols, Matrix.fromRows_mul, Matrix.fromCols_map, Matrix.fromRows_mul_fromCols]
-  have one : ∀ {k : Type} [DecidableEq k], incM F (1 : Matrix k k E) = 1 := Matrix.map_one _ (map_zero _) (map_one _)
-  have gr' : (incM F P)ᵀ * incM F W.J * (incM F P).map (cA σ) =
-      Matrix.fromBlocks (incM F W₁.J) 0 0 (incM F (Nᵀ * W.J * N.map σ)) := by
-    rw [incM_conj, show (incM F P)ᵀ = incM F Pᵀ from rfl, ← incM_mul, ← incM_mul, gr, incM, Matrix.fromBlocks_map,
-      Matrix.map_zero _ (map_zero _), Matrix.map_zero _ (map_zero _)]
+    rw [Matrix.transpose_fromCols, Matrix.fromRows_mul, Matrix.fromCols_map,
+      Matrix.fromRows_mul_fromCols]
+  have one : ∀ {k : Type} [DecidableEq k], incM F (1 : Matrix k k E) = 1 :=
+    Matrix.map_one _ (map_zero _) (map_one _)
+  have gr'
+      : (incM F P)ᵀ * incM F W.J * (incM F P).map (cA σ)
+        = Matrix.fromBlocks (incM F W₁.J) 0 0 (incM F (Nᵀ * W.J * N.map σ)) := by
+    rw [incM_conj, show (incM F P)ᵀ = incM F Pᵀ from rfl, ← incM_mul, ← incM_mul, gr, incM,
+      Matrix.fromBlocks_map, Matrix.map_zero _ (map_zero _), Matrix.map_zero _ (map_zero _)]
     rfl
-  obtain ⟨m, hm⟩ := exists_conj (cA σ) (incM F W.J) (incM F P) (incM F Q) (by rw [← incM_mul, h1, one])
-    (by rw [← incM_mul, h2, one]) (Matrix.fromBlocks (mat h₁) 0 0 1) (Matrix.fromBlocks (h₁.1⁻¹).1 0 0 1)
-    (by simp [Matrix.fromBlocks_multiply, mat]) (by simp [Matrix.fromBlocks_multiply, mat]) (by
-      have e : (mat h₁)ᵀ * incM F W₁.J * (mat h₁).map (cA σ) = incM F W₁.J := h₁.2
-      rw [gr', Matrix.fromBlocks_map, Matrix.fromBlocks_transpose, Matrix.map_one _ (map_zero _) (map_one _),
-        Matrix.map_zero _ (map_zero _), Matrix.map_zero _ (map_zero _)]
-      simp [Matrix.fromBlocks_multiply, e])
-  rw [show incM F P = Matrix.fromCols (incM F H.ι) (incM F N) from Matrix.fromCols_map _ _ _, Matrix.mul_fromCols,
-    Matrix.fromCols_mul_fromBlocks, Matrix.fromCols_ext_iff] at hm
+  obtain ⟨m, hm⟩ :=
+    exists_conj (cA σ) (incM F W.J) (incM F P) (incM F Q) (by rw [← incM_mul, h1, one])
+      (by rw [← incM_mul, h2, one]) (Matrix.fromBlocks (mat h₁) 0 0 1)
+      (Matrix.fromBlocks (h₁.1⁻¹).1 0 0 1) (by simp [Matrix.fromBlocks_multiply, mat])
+      (by simp [Matrix.fromBlocks_multiply, mat])
+      (by
+        have e : (mat h₁)ᵀ * incM F W₁.J * (mat h₁).map (cA σ) = incM F W₁.J := h₁.2
+        rw [gr', Matrix.fromBlocks_map, Matrix.fromBlocks_transpose,
+          Matrix.map_one _ (map_zero _) (map_one _), Matrix.map_zero _ (map_zero _),
+          Matrix.map_zero _ (map_zero _)]
+        simp [Matrix.fromBlocks_multiply, e])
+  rw [show incM F P = Matrix.fromCols (incM F H.ι) (incM F N) from Matrix.fromCols_map _ _ _,
+      Matrix.mul_fromCols, Matrix.fromCols_mul_fromBlocks, Matrix.fromCols_ext_iff]
+    at hm
   simp only [Matrix.mul_zero, Matrix.mul_one, add_zero, zero_add] at hm
   refine ⟨m, ?_, ?_, hm.1⟩
   · rw [Units.val_one, one_smul]

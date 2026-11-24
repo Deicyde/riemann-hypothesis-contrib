@@ -84,8 +84,6 @@ end Dcris
 
 variable {l : ℕ} [Fact l.Prime]
 
-
-
 theorem algebraMap_OL (LL : FinExt l) (z : ℤ_[l])
     : algebraMap ↥(OL LL) ↥LL.1 (algebraMap ℤ_[l] ↥(OL LL) z)
       = algebraMap ℚ_[l] ↥LL.1 (z : ℚ_[l]) := by

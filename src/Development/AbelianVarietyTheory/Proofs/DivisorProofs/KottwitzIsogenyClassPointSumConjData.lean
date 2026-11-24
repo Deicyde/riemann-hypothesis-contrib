@@ -121,8 +121,8 @@ theorem card_stab_translate
     : Nat.card (stab ι₁ ι₂ K₁ K₂ ((ι₁ y, ι₂ y) * x * k)) = Nat.card (stab ι₁ ι₂ K₁ K₂ x) := by
   rw [Subgroup.mem_prod] at hk
   refine (Nat.card_congr (Equiv.subtypeEquiv (MulAut.conj y).toEquiv fun z => ?_)).symm
-  simp only [SetLike.mem_coe, mem_stab, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv,
-    MulAut.conj_apply, Prod.fst_mul, Prod.snd_mul, map_mul, map_inv]
+  simp only [mem_stab, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply,
+    Prod.fst_mul, Prod.snd_mul, map_mul, map_inv]
   have e1
       : (ι₁ y * x.1 * k.1)⁻¹ * (ι₁ y * ι₁ z * (ι₁ y)⁻¹) * (ι₁ y * x.1 * k.1)
         = k.1⁻¹ * (x.1⁻¹ * ι₁ z * x.1) * k.1 := by
@@ -172,10 +172,10 @@ theorem pointSum_conj_data
     ?_ ?_
   · rintro _ ⟨y, rfl⟩
     refine ⟨y, ?_⟩
-    ext <;> simp [MulAut.conj_apply]
+    ext <;> simp
   · rintro _ ⟨y, rfl⟩
     refine ⟨y, ?_⟩
-    ext <;> simp [MulAut.conj_apply] <;> group
+    ext <;> simp <;> group
   · rintro _ ⟨y, rfl⟩ k hk x
     have hk' := (Subgroup.mem_prod).1 hk
     simp only [MonoidHom.prod_apply] at *

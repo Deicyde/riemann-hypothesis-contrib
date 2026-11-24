@@ -1,10 +1,8 @@
 module
 
-import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.GlobalConditionOfProductFormula
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol
 public import Formalism.PeriodIntegrals.LocFramePrim
 public import Mathlib.Algebra.AffineMonoid.Basic
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -28,7 +26,6 @@ import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
-import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -41,33 +38,82 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.GlobalConditionOfProductFormula
+import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
-import Mathlib.Topology.Sheaves.Init
 
+-- This file was produced by scripts/clump.py from the modules listed below.
+-- Members: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint, Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocVolPrim
+
+-- ===== clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint", "h": "module\n\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol\npublic import Formalism.PeriodIntegrals.LocFramePrim\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
+@[expose] public section
+
+noncomputable section
+
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.SG.Sub Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.L2.SG.HidaSetting
+open scoped TensorProduct Classical
+
+namespace ChkLocFramePrim
+
+theorem primX_of
+    (hS : PI.LocFramePrim.Statement)
+    {D : Formalism.BasicNotions.D7} (X : HidaSetting D) (w : D.what₂.Word)
+    (Lb : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E)) (hFG : X.B.I.L.FG)
+    (hsplit : X.B.I.L
+      = PI.LocFramePrim.latSpan
+          (fun a : Fin D.R.rS => PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))
+          (frameOf X w).e
+        ⊔ Lb
+        ⊔ PI.LocFramePrim.latSpan
+          (fun a : Fin D.R.rS => (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))⁻¹)
+          (frameOf X w).f)
+    (hind : LinearIndependent X.B.I.E (Fin.append (frameOf X w).e (frameOf X w).f))
+    (hdir : ∀ y ∈ Lb,
+      y ∈ Submodule.span X.B.I.E (Set.range (frameOf X w).e ∪ Set.range (frameOf X w).f) → y = 0)
+    (hz : (frameOf X w).z ∈ Lb)
+    (hzp : ∀ c : X.B.I.E, c • (frameOf X w).z ∈ Lb → ∃ o : 𝓞 X.B.I.E, (o : X.B.I.E) = c)
+    : PrimX X w := fun v =>
+  hS X.B.I.F X.B.I.E v X.B.I.n D.R.rS X.B.I.L Lb (frameOf X w).e (frameOf X w).f (frameOf X w).z hFG
+    hsplit hind hdir hz hzp
+
+end ChkLocFramePrim
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint =====
+
+-- ===== clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocVolPrim =====
+-- clump-header: {"m": "Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocVolPrim", "h": "module\n\nimport Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.GlobalConditionOfProductFormula\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol\npublic import Formalism.PeriodIntegrals.LocFramePrim\npublic import Mathlib.Algebra.AffineMonoid.Basic\npublic import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocFramePrimJoint\nimport Mathlib.Algebra.Order.Floor.Extended\nimport Mathlib.Algebra.Order.Floor.Semifield\nimport Mathlib.Algebra.Order.Interval.Basic\nimport Mathlib.Analysis.Complex.UpperHalfPlane.Basic\nimport Mathlib.Analysis.Normed.Algebra.GelfandRadius\nimport Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp\nimport Mathlib.Combinatorics.Enumerative.DyckWord\nimport Mathlib.Combinatorics.SimpleGraph.Triangle.Removal\nimport Mathlib.Data.NNRat.Floor\nimport Mathlib.Geometry.Euclidean.Volume.Basic\nimport Mathlib.NumberTheory.Chebyshev\nimport Mathlib.NumberTheory.Height.NumberField\nimport Mathlib.NumberTheory.Height.Projectivization\nimport Mathlib.NumberTheory.LucasLehmer\nimport Mathlib.NumberTheory.SelbergSieve\nimport Mathlib.RingTheory.Radical.NatInt\nimport Mathlib.Tactic.Echelon.Zsqrtd\nimport Mathlib.Tactic.Inclusion.Extension.Core.Core\nimport Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp\nimport Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic\nimport Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses\nimport Mathlib.Tactic.Linter.Style\nimport Mathlib.Tactic.NormNum.Irrational\nimport Mathlib.Tactic.NormNum.IsCoprime\nimport Mathlib.Tactic.NormNum.IsSquare\nimport Mathlib.Tactic.NormNum.LegendreSymbol\nimport Mathlib.Tactic.NormNum.ModEq\nimport Mathlib.Tactic.NormNum.NatFib\nimport Mathlib.Tactic.NormNum.NatLog\nimport Mathlib.Tactic.NormNum.NatSqrt\nimport Mathlib.Tactic.NormNum.Ordinal\nimport Mathlib.Tactic.NormNum.Parity\nimport Mathlib.Tactic.NormNum.Prime\nimport Mathlib.Tactic.NormNum.RealSqrt\nimport Mathlib.Tactic.Polynomial.Basic\nimport Mathlib.Tactic.ReduceModChar\nimport Mathlib.Topology.Sheaves.Init\n\n"}
+section -- clump:auto
 @[expose] public section
 
 noncomputable section
 
 namespace Formalism.L2.SG.Pf.LocVolPrim
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.Sub Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets
-  Formalism.L2.SG.HidaSetting
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.L2.SG.HidaSetting
 open scoped nonZeroDivisors
 
 section Iso
 
 variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
 
-theorem isIntegral_iff_of_ringEquiv (ι : K ≃+* L) (x : K) : IsIntegral ℤ (ι x) ↔ IsIntegral ℤ x := by
+theorem isIntegral_iff_of_ringEquiv (ι : K ≃+* L) (x : K)
+    : IsIntegral ℤ (ι x) ↔ IsIntegral ℤ x := by
   constructor
   · intro h
     simpa using h.map (ι.symm.toRingHom.toIntAlgHom)
   · intro h
     simpa using h.map (ι.toRingHom.toIntAlgHom)
 
-theorem int_iff (ι : K ≃+* L) (x : K) :
-    (∃ o : 𝓞 L, algebraMap (𝓞 L) L o = ι x) ↔ ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x := by
+theorem int_iff (ι : K ≃+* L) (x : K)
+    : (∃ o : 𝓞 L, algebraMap (𝓞 L) L o = ι x) ↔ ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x := by
   exact (IsIntegralClosure.isIntegral_iff (R := ℤ) (A := 𝓞 L)).symm.trans
     ((isIntegral_iff_of_ringEquiv ι x).trans (IsIntegralClosure.isIntegral_iff (R := ℤ) (A := 𝓞 K)))
 
@@ -84,7 +130,8 @@ theorem corr_symm {A B} (h : CorrFI ι A B) (y : L) : ι.symm y ∈ A ↔ y ∈ 
   have := h (ι.symm y)
   rwa [RingEquiv.apply_symm_apply] at this
 
-theorem corr_mul {A B A' B'} (h : CorrFI ι A B) (h' : CorrFI ι A' B') : CorrFI ι (A * A') (B * B') := by
+theorem corr_mul {A B A' B'} (h : CorrFI ι A B) (h' : CorrFI ι A' B')
+    : CorrFI ι (A * A') (B * B') := by
   intro y
   constructor
   · intro hy
@@ -96,7 +143,8 @@ theorem corr_mul {A B A' B'} (h : CorrFI ι A B) (h' : CorrFI ι A' B') : CorrFI
     · intro x x' hx hx'
       show ι (x + x') ∈ B * B'
       rw [map_add (f := _)]
-      exact FractionalIdeal.mem_coe.1 (add_mem (FractionalIdeal.mem_coe.2 hx) (FractionalIdeal.mem_coe.2 hx'))
+      exact FractionalIdeal.mem_coe.1 (add_mem (FractionalIdeal.mem_coe.2 hx)
+        (FractionalIdeal.mem_coe.2 hx'))
   · intro hy
     have key : ι.symm (ι y) ∈ A * A' := by
       refine FractionalIdeal.mul_induction_on (C := fun t => ι.symm t ∈ A * A') hy ?_ ?_
@@ -107,7 +155,8 @@ theorem corr_mul {A B A' B'} (h : CorrFI ι A B) (h' : CorrFI ι A' B') : CorrFI
       · intro x x' hx hx'
         show ι.symm (x + x') ∈ A * A'
         rw [map_add (f := _)]
-        exact FractionalIdeal.mem_coe.1 (add_mem (FractionalIdeal.mem_coe.2 hx) (FractionalIdeal.mem_coe.2 hx'))
+        exact FractionalIdeal.mem_coe.1 (add_mem (FractionalIdeal.mem_coe.2 hx)
+          (FractionalIdeal.mem_coe.2 hx'))
     rwa [RingEquiv.symm_apply_apply] at key
 
 theorem corr_pow {A B} (h : CorrFI ι A B) : ∀ k : ℕ, CorrFI ι (A ^ k) (B ^ k)
@@ -126,21 +175,24 @@ theorem corr_inv {A B} (h : CorrFI ι A B) (hA : A ≠ 0) (hB : B ≠ 0) : CorrF
     rw [← map_mul] at h1
     exact (corr_one ι _).2 h1
 
-theorem corr_zpow_neg {A B} (h : CorrFI ι A B) (hA : A ≠ 0) (hB : B ≠ 0) (k : ℕ) :
-    CorrFI ι (A ^ (-(k : ℤ))) (B ^ (-(k : ℤ))) := by
+theorem corr_zpow_neg {A B} (h : CorrFI ι A B) (hA : A ≠ 0) (hB : B ≠ 0) (k : ℕ)
+    : CorrFI ι (A ^ (-(k : ℤ))) (B ^ (-(k : ℤ))) := by
   rw [zpow_neg, zpow_neg, zpow_natCast, zpow_natCast]
   exact corr_inv ι (corr_pow ι h k) (pow_ne_zero _ hA) (pow_ne_zero _ hB)
 
-theorem mem_dual_one_iff (t : K) :
-    t ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 K)⁰ K) ↔
-      ∀ s : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (t * (s : K)) = z := by
+theorem mem_dual_one_iff (t : K)
+    : t ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 K)⁰ K)
+      ↔ ∀ s : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (t * (s : K)) = z := by
   apply Formalism.MainNotions.BridgeLemma.mem_dual_iff <;> assumption
 
-theorem mem_diff_iff (x : 𝓞 K) : x ∈ differentIdeal ℤ (𝓞 K) ↔
-    ∀ b : K, (∀ s : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (b * (s : K)) = z) →
-      ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = (x : K) * b := by
-  have h1 : (x : K) ∈ ((differentIdeal ℤ (𝓞 K) : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) ↔
-      x ∈ differentIdeal ℤ (𝓞 K) := by
+theorem mem_diff_iff (x : 𝓞 K)
+    : x ∈ differentIdeal ℤ (𝓞 K)
+      ↔ ∀ b : K,
+        (∀ s : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (b * (s : K)) = z)
+          → ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = (x : K) * b := by
+  have h1
+      : (x : K) ∈ ((differentIdeal ℤ (𝓞 K) : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)
+        ↔ x ∈ differentIdeal ℤ (𝓞 K) := by
     rw [FractionalIdeal.mem_coeIdeal]
     constructor
     · rintro ⟨x', hx', hxx⟩
@@ -149,7 +201,7 @@ theorem mem_diff_iff (x : 𝓞 K) : x ∈ differentIdeal ℤ (𝓞 K) ↔
     · intro hx
       exact ⟨x, hx, rfl⟩
   rw [← h1, coeIdeal_differentIdeal ℤ ℚ K (𝓞 K),
-    FractionalIdeal.mem_inv_iff (by first | exact FractionalIdeal.dual_ne_zero ℤ ℚ one_ne_zero | exact FractionalIdeal.dual_ne_zero one_ne_zero)]
+    FractionalIdeal.mem_inv_iff (by first | exact FractionalIdeal.dual_ne_zero ℤ ℚ one_ne_zero)]
   constructor
   · intro H b hb
     have := H b ((mem_dual_one_iff b).2 hb)
@@ -166,8 +218,8 @@ def intEquiv : 𝓞 K ≃+* 𝓞 L := RingOfIntegers.mapRingEquiv ι
 
 theorem intEquiv_coe (x : 𝓞 K) : ((intEquiv ι x : 𝓞 L) : L) = ι (x : K) := rfl
 
-theorem diff_mem_map (x : 𝓞 K) (hx : x ∈ differentIdeal ℤ (𝓞 K)) :
-    intEquiv ι x ∈ differentIdeal ℤ (𝓞 L) := by
+theorem diff_mem_map (x : 𝓞 K) (hx : x ∈ differentIdeal ℤ (𝓞 K))
+    : intEquiv ι x ∈ differentIdeal ℤ (𝓞 L) := by
   rw [mem_diff_iff] at hx ⊢
   intro b hb
   have hb' : ∀ s : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (ι.symm b * (s : K)) = z := by
@@ -177,12 +229,13 @@ theorem diff_mem_map (x : 𝓞 K) (hx : x ∈ differentIdeal ℤ (𝓞 K)) :
     rw [← trace_map ι, map_mul, RingEquiv.apply_symm_apply, ← intEquiv_coe]
     exact hz
   obtain ⟨o, ho⟩ := hx _ hb'
-  have key := (int_iff ι (ι.symm (((intEquiv ι x : 𝓞 L) : L) * b))).2
-    ⟨o, by rw [ho, map_mul, intEquiv_coe, RingEquiv.symm_apply_apply]⟩
+  have key :=
+    (int_iff ι (ι.symm (((intEquiv ι x : 𝓞 L) : L) * b))).2
+      ⟨o, by rw [ho, map_mul, intEquiv_coe, RingEquiv.symm_apply_apply]⟩
   simpa using key
 
-theorem diff_map_eq :
-    Ideal.map (intEquiv ι : 𝓞 K →+* 𝓞 L) (differentIdeal ℤ (𝓞 K)) = differentIdeal ℤ (𝓞 L) := by
+theorem diff_map_eq
+    : Ideal.map (intEquiv ι : 𝓞 K →+* 𝓞 L) (differentIdeal ℤ (𝓞 K)) = differentIdeal ℤ (𝓞 L) := by
   apply le_antisymm
   · exact Ideal.map_le_iff_le_comap.2 (fun x hx => diff_mem_map ι x hx)
   · intro y hy
@@ -203,18 +256,25 @@ variable {D : D7} (X : HidaSetting D)
 
 def iotaF : X.B.I.F ≃+* D.host.F :=
   RingEquiv.ofBijective
-    { toFun := fun a => ⟨X.ιE (algebraMap X.B.I.F X.B.I.E a), (X.ιE_F _).mpr ⟨a, rfl⟩⟩
+    {
+      toFun := fun a => ⟨X.ιE (algebraMap X.B.I.F X.B.I.E a), (X.ιE_F _).mpr ⟨a, rfl⟩⟩
       map_one' := by ext; simp
       map_mul' := fun a b => by ext; simp
       map_zero' := by ext; simp
-      map_add' := fun a b => by ext; simp }
-    ⟨RingHom.injective _, fun y => by
-      obtain ⟨a, ha⟩ := (X.ιE_F y).mp y.2
-      exact ⟨a, Subtype.ext ha⟩⟩
+      map_add' := fun a b => by ext; simp
+    }
+    ⟨
+      RingHom.injective _,
+      fun y => by
+        obtain ⟨a, ha⟩ := (X.ιE_F y).mp y.2
+        exact ⟨a, Subtype.ext ha⟩
+    ⟩
 
-private theorem dd_ne_lemma (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] :
-    ((Ideal.map (algebraMap (𝓞 F) (𝓞 E)) (differentIdeal ℤ (𝓞 F)) : Ideal (𝓞 E)) :
-      FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
+private theorem dd_ne_lemma
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : ((Ideal.map (algebraMap (𝓞 F) (𝓞 E)) (differentIdeal ℤ (𝓞 F)) : Ideal (𝓞 E))
+        : FractionalIdeal (𝓞 E)⁰ E)
+      ≠ 0 := by
   have hinj : Function.Injective (algebraMap (𝓞 F) (𝓞 E)) := by
     intro x y hxy
     apply RingOfIntegers.ext
@@ -228,9 +288,9 @@ theorem ddS_ne (D : D7) : ddS D ≠ 0 := dd_ne_lemma _ _
 
 theorem ddE_ne : PI.LocFramePrim.ddE (E := X.B.I.E) X.B.I.F ≠ 0 := dd_ne_lemma _ _
 
-private theorem corr_map_lemma_2 {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    (ι : K ≃+* L) (I : Ideal (𝓞 K)) :
-    CorrFI ι (I : FractionalIdeal (𝓞 K)⁰ K)
+private theorem corr_map_lemma_2
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] (ι : K ≃+* L) (I : Ideal (𝓞 K))
+    : CorrFI ι (I : FractionalIdeal (𝓞 K)⁰ K)
       ((I.map (intEquiv ι : 𝓞 K →+* 𝓞 L) : Ideal (𝓞 L)) : FractionalIdeal (𝓞 L)⁰ L) := by
   have hle : I.map (intEquiv ι : 𝓞 K →+* 𝓞 L) ≤ I.comap ((intEquiv ι).symm : 𝓞 L →+* 𝓞 K) :=
     Ideal.map_le_iff_le_comap.2 (fun x hx => by
@@ -252,25 +312,29 @@ private theorem corr_map_lemma_2 {K L : Type} [Field K] [NumberField K] [Field L
       rw [← intEquiv_coe, RingEquiv.apply_symm_apply]
 
 theorem dd_corr : CorrFI X.ιE (PI.LocFramePrim.ddE X.B.I.F) (ddS D) := by
-  have hmap : Ideal.map (intEquiv X.ιE : 𝓞 X.B.I.E →+* 𝓞 D.host.E)
-      (Ideal.map (algebraMap (𝓞 X.B.I.F) (𝓞 X.B.I.E)) (differentIdeal ℤ (𝓞 X.B.I.F))) =
-      Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)) := by
+  have hmap
+      : Ideal.map (intEquiv X.ιE : 𝓞 X.B.I.E →+* 𝓞 D.host.E)
+          (Ideal.map (algebraMap (𝓞 X.B.I.F) (𝓞 X.B.I.E)) (differentIdeal ℤ (𝓞 X.B.I.F)))
+        = Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)) := by
     rw [Ideal.map_map, ← diff_map_eq (iotaF X), Ideal.map_map]
     congr 1
-  have := corr_map_lemma_2 X.ιE (Ideal.map (algebraMap (𝓞 X.B.I.F) (𝓞 X.B.I.E)) (differentIdeal ℤ (𝓞 X.B.I.F)))
+  have :=
+    corr_map_lemma_2 X.ιE
+      (Ideal.map (algebraMap (𝓞 X.B.I.F) (𝓞 X.B.I.E)) (differentIdeal ℤ (𝓞 X.B.I.F)))
   rw [hmap] at this
   exact this
 
-theorem aa_corr (a : Fin D.R.rS) :
-    CorrFI X.ιE (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ)))) (aaD D a) := by
+theorem aa_corr (a : Fin D.R.rS)
+    : CorrFI X.ιE (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ)))) (aaD D a) := by
   have hk : -((D.R.rS : ℤ) - ((a : ℕ) : ℤ)) = -(((D.R.rS - (a : ℕ) : ℕ)) : ℤ) := by
     rw [Nat.cast_sub a.2.le]
   unfold aaD
   rw [hk]
   exact corr_zpow_neg _ (dd_corr X) (ddE_ne X) (ddS_ne D) _
 
-theorem aainv_corr (a : Fin D.R.rS) :
-    CorrFI X.ιE (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))⁻¹ (aaD D a)⁻¹ := corr_inv _ (aa_corr X a) (zpow_ne_zero _ (ddE_ne X)) (zpow_ne_zero _ (ddS_ne D))
+theorem aainv_corr (a : Fin D.R.rS)
+    : CorrFI X.ιE (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))⁻¹ (aaD D a)⁻¹ :=
+  corr_inv _ (aa_corr X a) (zpow_ne_zero _ (ddE_ne X)) (zpow_ne_zero _ (ddS_ne D))
 
 end Data
 
@@ -280,8 +344,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem intEquiv_symm_coe {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] (ι : K ≃+* L)
-    (t : 𝓞 L) : (((intEquiv ι).symm t : 𝓞 K) : K) = ι.symm (t : L) := by
+theorem intEquiv_symm_coe
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] (ι : K ≃+* L) (t : 𝓞 L)
+    : (((intEquiv ι).symm t : 𝓞 K) : K) = ι.symm (t : L) := by
   apply ι.injective
   rw [← intEquiv_coe]
   simp only [RingEquiv.apply_symm_apply]
@@ -302,14 +367,14 @@ theorem crd_cinv (x : Fin X.B.I.n → X.B.I.E) : crd X (cinv X x) = x := by
 theorem cinv_add (x y : Fin X.B.I.n → X.B.I.E) : cinv X (x + y) = cinv X x + cinv X y := by
   simp only [cinv, Pi.add_apply, map_add (f := _), add_smul, Finset.sum_add_distrib]
 
-theorem cinv_zero : cinv X 0 = 0 := by
-  simp [cinv]
+theorem cinv_zero : cinv X 0 = 0 := by simp [cinv]
 
-theorem cinv_smul (c : X.B.I.E) (x : Fin X.B.I.n → X.B.I.E) : cinv X (c • x) = X.ιE c • cinv X x := by
+theorem cinv_smul (c : X.B.I.E) (x : Fin X.B.I.n → X.B.I.E)
+    : cinv X (c • x) = X.ιE c • cinv X x := by
   simp only [cinv, Pi.smul_apply, smul_eq_mul, map_mul, mul_smul, Finset.smul_sum]
 
-theorem cinv_osmul (o : 𝓞 X.B.I.E) (x : Fin X.B.I.n → X.B.I.E) :
-    cinv X (o • x) = intEquiv X.ιE o • cinv X x := by
+theorem cinv_osmul (o : 𝓞 X.B.I.E) (x : Fin X.B.I.n → X.B.I.E)
+    : cinv X (o • x) = intEquiv X.ιE o • cinv X x := by
   have h1 : o • x = (o : X.B.I.E) • x := by
     funext i
     simp only [Pi.smul_apply]
@@ -329,52 +394,58 @@ theorem crd_smul (c : D.host.E) (y : (VS D).V) : crd X (c • y) = X.ιE.symm c 
   funext i
   simp [crdOf, map_smul, smul_eq_mul, map_mul]
 
-theorem crd_osmul (o : 𝓞 D.host.E) (y : (VS D).V) :
-    crd X (o • y) = (intEquiv X.ιE).symm o • crd X y := by
+theorem crd_osmul (o : 𝓞 D.host.E) (y : (VS D).V)
+    : crd X (o • y) = (intEquiv X.ιE).symm o • crd X y := by
   rw [algebra_compatible_smul D.host.E o y, crd_smul]
   funext i
   show X.ιE.symm (o : D.host.E) * crd X y i = (((intEquiv X.ιE).symm o : 𝓞 X.B.I.E) : X.B.I.E) * crd X y i
   rw [intEquiv_symm_coe]
 
-theorem span_corr (S : Set (Fin X.B.I.n → X.B.I.E)) (S2 : Set (VS D).V) (h1 : ∀ y ∈ S, cinv X y ∈ S2)
-    (h2 : ∀ x ∈ S2, crd X x ∈ S) (y : Fin X.B.I.n → X.B.I.E) :
-    y ∈ Submodule.span (𝓞 X.B.I.E) S ↔ cinv X y ∈ Submodule.span (𝓞 D.host.E) S2 := by
+theorem span_corr
+    (S : Set (Fin X.B.I.n → X.B.I.E)) (S2 : Set (VS D).V)
+    (h1 : ∀ y ∈ S, cinv X y ∈ S2) (h2 : ∀ x ∈ S2, crd X x ∈ S)
+    (y : Fin X.B.I.n → X.B.I.E)
+    : y ∈ Submodule.span (𝓞 X.B.I.E) S ↔ cinv X y ∈ Submodule.span (𝓞 D.host.E) S2 := by
   constructor
   · intro hy
-    let M : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E) :=
-      { carrier := {y | cinv X y ∈ Submodule.span (𝓞 D.host.E) S2}
-        add_mem' := fun {a b} ha hb => by
-          simp only [Set.mem_ofPred_eq, cinv_add] at *
-          exact add_mem ha hb
-        zero_mem' := by
-          simp only [Set.mem_ofPred_eq, cinv_zero]
-          exact zero_mem _
-        smul_mem' := fun o a ha => by
-          simp only [Set.mem_ofPred_eq, cinv_osmul] at *
-          exact Submodule.smul_mem _ _ ha }
+    let M : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E) := {
+      carrier := {y | cinv X y ∈ Submodule.span (𝓞 D.host.E) S2}
+      add_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_ofPred_eq, cinv_add] at *
+        exact add_mem ha hb
+      zero_mem' := by
+        simp only [Set.mem_ofPred_eq, cinv_zero]
+        exact zero_mem _
+      smul_mem' := fun o a ha => by
+        simp only [Set.mem_ofPred_eq, cinv_osmul] at *
+        exact Submodule.smul_mem _ _ ha
+    }
     have hle : Submodule.span (𝓞 X.B.I.E) S ≤ M :=
       Submodule.span_le.2 (fun a ha => Submodule.subset_span (h1 a ha))
     exact hle hy
   · intro hy
-    let M : Submodule (𝓞 D.host.E) (VS D).V :=
-      { carrier := {x | crd X x ∈ Submodule.span (𝓞 X.B.I.E) S}
-        add_mem' := fun {a b} ha hb => by
-          simp only [Set.mem_ofPred_eq, crd_add] at *
-          exact add_mem ha hb
-        zero_mem' := by
-          simp only [Set.mem_ofPred_eq, crd_zero]
-          exact zero_mem _
-        smul_mem' := fun o a ha => by
-          simp only [Set.mem_ofPred_eq, crd_osmul] at *
-          exact Submodule.smul_mem _ _ ha }
+    let M : Submodule (𝓞 D.host.E) (VS D).V := {
+      carrier := {x | crd X x ∈ Submodule.span (𝓞 X.B.I.E) S}
+      add_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_ofPred_eq, crd_add] at *
+        exact add_mem ha hb
+      zero_mem' := by
+        simp only [Set.mem_ofPred_eq, crd_zero]
+        exact zero_mem _
+      smul_mem' := fun o a ha => by
+        simp only [Set.mem_ofPred_eq, crd_osmul] at *
+        exact Submodule.smul_mem _ _ ha
+    }
     have hle : Submodule.span (𝓞 D.host.E) S2 ≤ M :=
       Submodule.span_le.2 (fun a ha => Submodule.subset_span (h2 a ha))
     have h3 : crd X (cinv X y) ∈ Submodule.span (𝓞 X.B.I.E) S := hle hy
     rwa [crd_cinv] at h3
 
-theorem sup_corr {A B : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E)} {A2 B2 : Submodule (𝓞 D.host.E) (VS D).V}
-    (hA : ∀ y, y ∈ A ↔ cinv X y ∈ A2) (hB : ∀ y, y ∈ B ↔ cinv X y ∈ B2) (y : Fin X.B.I.n → X.B.I.E) :
-    y ∈ A ⊔ B ↔ cinv X y ∈ A2 ⊔ B2 := by
+theorem sup_corr
+    {A B : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E)} {A2 B2 : Submodule (𝓞 D.host.E) (VS D).V}
+    (hA : ∀ y, y ∈ A ↔ cinv X y ∈ A2) (hB : ∀ y, y ∈ B ↔ cinv X y ∈ B2)
+    (y : Fin X.B.I.n → X.B.I.E)
+    : y ∈ A ⊔ B ↔ cinv X y ∈ A2 ⊔ B2 := by
   rw [Submodule.mem_sup, Submodule.mem_sup]
   constructor
   · rintro ⟨a, ha, b, hb, rfl⟩
@@ -383,10 +454,12 @@ theorem sup_corr {A B : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E)} {A2 
     refine ⟨crd X a, (hA _).2 (by rwa [cinv_crd]), crd X b, (hB _).2 (by rwa [cinv_crd]), ?_⟩
     rw [← crd_add, hab, crd_cinv]
 
-theorem latSpan_corr {r : ℕ} (aa : Fin r → FractionalIdeal (𝓞 X.B.I.E)⁰ X.B.I.E)
+theorem latSpan_corr
+    {r : ℕ} (aa : Fin r → FractionalIdeal (𝓞 X.B.I.E)⁰ X.B.I.E)
     (aa2 : Fin r → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (h : ∀ a, CorrFI X.ιE (aa a) (aa2 a))
-    (w : Fin r → (VS D).V) (y : Fin X.B.I.n → X.B.I.E) :
-    y ∈ PI.LocFramePrim.latSpan aa (fun a => crd X (w a)) ↔ cinv X y ∈ latSpanS aa2 w := by
+    (w : Fin r → (VS D).V)
+    (y : Fin X.B.I.n → X.B.I.E)
+    : y ∈ PI.LocFramePrim.latSpan aa (fun a => crd X (w a)) ↔ cinv X y ∈ latSpanS aa2 w := by
   unfold PI.LocFramePrim.latSpan latSpanS
   refine span_corr X _ _ ?_ ?_ y
   · rintro _ ⟨a, x, hx, rfl⟩
@@ -406,18 +479,24 @@ def LbC : Submodule (𝓞 X.B.I.E) (Fin X.B.I.n → X.B.I.E) where
 
 theorem mem_LbC (y : Fin X.B.I.n → X.B.I.E) : y ∈ LbC X ↔ cinv X y ∈ X.Lb := Iff.rfl
 
-theorem split_crd (w : D.what₂.Word) :
-    X.B.I.L = PI.LocFramePrim.latSpan
-        (fun a : Fin D.R.rS => PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ)))) (frameOf X w).e ⊔
-      LbC X ⊔ PI.LocFramePrim.latSpan
-        (fun a : Fin D.R.rS => (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))⁻¹) (frameOf X w).f := by
+theorem split_crd (w : D.what₂.Word)
+    : X.B.I.L
+      = PI.LocFramePrim.latSpan
+          (fun a : Fin D.R.rS => PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))
+          (frameOf X w).e
+        ⊔ LbC X
+        ⊔ PI.LocFramePrim.latSpan
+          (fun a : Fin D.R.rS => (PI.LocFramePrim.ddE X.B.I.F ^ (-((D.R.rS : ℤ) - (a : ℕ))))⁻¹)
+          (frameOf X w).f := by
   ext y
   rw [X.L_eq y]
   change cinv X y ∈ (VS D).L0 ↔ _
   rw [X.Lam_split]
   symm
-  exact sup_corr X (fun y => sup_corr X (fun y => latSpan_corr X _ _ (aa_corr X) X.eX y)
-    (fun y => mem_LbC X y) y) (fun y => latSpan_corr X _ _ (aainv_corr X) X.fY y) y
+  exact sup_corr X
+    (fun y => sup_corr X (fun y => latSpan_corr X _ _ (aa_corr X) X.eX y) (fun y => mem_LbC X y) y)
+    (fun y => latSpan_corr X _ _ (aainv_corr X) X.fY y)
+    y
 
 end Crd
 
@@ -427,31 +506,27 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem cinv_sum {ι : Type} (s : Finset ι) (x : ι → Fin X.B.I.n → X.B.I.E) :
-    cinv X (∑ j ∈ s, x j) = ∑ j ∈ s, cinv X (x j) := by
-
+theorem cinv_sum {ι : Type} (s : Finset ι) (x : ι → Fin X.B.I.n → X.B.I.E)
+    : cinv X (∑ j ∈ s, x j) = ∑ j ∈ s, cinv X (x j) := by
   simp only [cinv, Finset.sum_apply, map_sum, Finset.sum_smul]
   exact Finset.sum_comm
 
 theorem fe (a b : Fin D.R.rS) : (VS D).hT (X.fY b) (X.eX a) = if a = b then 1 else 0 := by
   have h : starRingEnd D.host.E ((VS D).hT (X.eX a) (X.fY b)) = (VS D).hT (X.fY b) (X.eX a) := by
-    first
-      | exact (VS D).herm (X.eX a) (X.fY b)
-      | exact (VS D).herm.eq (X.eX a) (X.fY b)
-      | exact LinearMap.IsSymm.eq (VS D).herm (X.eX a) (X.fY b)
+    first | exact (VS D).herm.eq (X.eX a) (X.fY b)
   rw [← h, X.ef]
   split_ifs <;> simp
 
-theorem pair_f (α β : Fin D.R.rS → D.host.E) (b : Fin D.R.rS) :
-    (VS D).hT (X.fY b) ((∑ a, α a • X.eX a) + ∑ a, β a • X.fY a) = α b := by
+theorem pair_f (α β : Fin D.R.rS → D.host.E) (b : Fin D.R.rS)
+    : (VS D).hT (X.fY b) ((∑ a, α a • X.eX a) + ∑ a, β a • X.fY a) = α b := by
   simp [fe, X.ff, Finset.sum_ite_eq']
 
-theorem pair_e (α β : Fin D.R.rS → D.host.E) (b : Fin D.R.rS) :
-    (VS D).hT (X.eX b) ((∑ a, α a • X.eX a) + ∑ a, β a • X.fY a) = β b := by
+theorem pair_e (α β : Fin D.R.rS → D.host.E) (b : Fin D.R.rS)
+    : (VS D).hT (X.eX b) ((∑ a, α a • X.eX a) + ∑ a, β a • X.fY a) = β b := by
   simp [X.ee, X.ef, Finset.sum_ite_eq]
 
-theorem indep_V (G : Fin (D.R.rS + D.R.rS) → D.host.E) (hG : ∑ i, G i • Fin.append X.eX X.fY i = 0) :
-    ∀ i, G i = 0 := by
+theorem indep_V (G : Fin (D.R.rS + D.R.rS) → D.host.E) (hG : ∑ i, G i • Fin.append X.eX X.fY i = 0)
+    : ∀ i, G i = 0 := by
   rw [Fin.sum_univ_add] at hG
   simp only [Fin.append_left, Fin.append_right] at hG
   have hα : ∀ b, G (Fin.castAdd D.R.rS b) = 0 := fun b => by
@@ -465,8 +540,8 @@ theorem indep_V (G : Fin (D.R.rS + D.R.rS) → D.host.E) (hG : ∑ i, G i • Fi
   intro i
   exact Fin.addCases hα hβ i
 
-theorem hind_crd (w : D.what₂.Word) :
-    LinearIndependent X.B.I.E (Fin.append (frameOf X w).e (frameOf X w).f) := by
+theorem hind_crd (w : D.what₂.Word)
+    : LinearIndependent X.B.I.E (Fin.append (frameOf X w).e (frameOf X w).f) := by
   rw [Fintype.linearIndependent_iff]
   intro g hg i
   have h1 : ∑ j, X.ιE (g j) • Fin.append X.eX X.fY j = 0 := by
@@ -484,8 +559,10 @@ theorem hind_crd (w : D.what₂.Word) :
   have := indep_V X (fun j => X.ιE (g j)) h1 i
   simpa using this
 
-theorem dir_V (x : (VS D).V) (hx : x ∈ X.Lb)
-    (hs : x ∈ Submodule.span D.host.E (Set.range X.eX ∪ Set.range X.fY)) : x = 0 := by
+theorem dir_V
+    (x : (VS D).V)
+    (hx : x ∈ X.Lb) (hs : x ∈ Submodule.span D.host.E (Set.range X.eX ∪ Set.range X.fY))
+    : x = 0 := by
   rw [Submodule.span_union, Submodule.mem_sup] at hs
   obtain ⟨u, hu, v, hv, rfl⟩ := hs
   rw [Submodule.mem_span_range_iff_exists_fun] at hu hv
@@ -499,21 +576,25 @@ theorem dir_V (x : (VS D).V) (hx : x ∈ X.Lb)
     exact (X.Lb_perp _ hx b).1
   simp [hα, hβ]
 
-theorem dir_crd (w : D.what₂.Word) : ∀ y ∈ LbC X,
-    y ∈ Submodule.span X.B.I.E (Set.range (frameOf X w).e ∪ Set.range (frameOf X w).f) → y = 0 := by
+theorem dir_crd (w : D.what₂.Word)
+    : ∀ y ∈ LbC X,
+      y ∈ Submodule.span X.B.I.E (Set.range (frameOf X w).e ∪ Set.range (frameOf X w).f)
+        → y = 0 := by
   intro y hy hs
-  let M : Submodule X.B.I.E (Fin X.B.I.n → X.B.I.E) :=
-    { carrier := {y | cinv X y ∈ Submodule.span D.host.E (Set.range X.eX ∪ Set.range X.fY)}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq, cinv_add] at *
-        exact add_mem ha hb
-      zero_mem' := by
-        simp only [Set.mem_ofPred_eq, cinv_zero]
-        exact zero_mem _
-      smul_mem' := fun c a ha => by
-        simp only [Set.mem_ofPred_eq, cinv_smul] at *
-        exact Submodule.smul_mem _ _ ha }
-  have hle : Submodule.span X.B.I.E (Set.range (frameOf X w).e ∪ Set.range (frameOf X w).f) ≤ M := by
+  let M : Submodule X.B.I.E (Fin X.B.I.n → X.B.I.E) := {
+    carrier := {y | cinv X y ∈ Submodule.span D.host.E (Set.range X.eX ∪ Set.range X.fY)}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq, cinv_add] at *
+      exact add_mem ha hb
+    zero_mem' := by
+      simp only [Set.mem_ofPred_eq, cinv_zero]
+      exact zero_mem _
+    smul_mem' := fun c a ha => by
+      simp only [Set.mem_ofPred_eq, cinv_smul] at *
+      exact Submodule.smul_mem _ _ ha
+  }
+  have hle
+      : Submodule.span X.B.I.E (Set.range (frameOf X w).e ∪ Set.range (frameOf X w).f) ≤ M := by
     rw [Submodule.span_le]
     rintro _ (⟨a, rfl⟩ | ⟨a, rfl⟩)
     · show cinv X (crd X (X.eX a)) ∈ Submodule.span D.host.E (Set.range X.eX ∪ Set.range X.fY)
@@ -530,8 +611,8 @@ theorem hz_crd (w : D.what₂.Word) : (frameOf X w).z ∈ LbC X := by
   rw [cinv_crd]
   exact X.zu_Lb w
 
-theorem hzp_crd (w : D.what₂.Word) :
-    ∀ c : X.B.I.E, c • (frameOf X w).z ∈ LbC X → ∃ o : 𝓞 X.B.I.E, (o : X.B.I.E) = c := by
+theorem hzp_crd (w : D.what₂.Word)
+    : ∀ c : X.B.I.E, c • (frameOf X w).z ∈ LbC X → ∃ o : 𝓞 X.B.I.E, (o : X.B.I.E) = c := by
   intro c hc
   have h1 : cinv X ((frameOf X w).z) = X.zu w := cinv_crd X (X.zu w)
   have hv : X.ιE c • X.zu w ∈ X.Lb := by
@@ -540,7 +621,8 @@ theorem hzp_crd (w : D.what₂.Word) :
   have hLb : X.Lb ≤ (VS D).L0 := by
     rw [X.Lam_split]
     exact le_sup_right.trans le_sup_left
-  have hker : Submodule.span D.host.E (Set.range X.eX) ≤ LinearMap.ker ((VS D).hT.flip (X.zu w)) := by
+  have hker
+      : Submodule.span D.host.E (Set.range X.eX) ≤ LinearMap.ker ((VS D).hT.flip (X.zu w)) := by
     rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
     simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.flip_apply]
@@ -557,14 +639,21 @@ theorem hzp_crd (w : D.what₂.Word) :
     rw [map_smul, smul_eq_mul, h0, mul_zero]
   obtain ⟨-, -, -, -, hprim⟩ := X.Fu_fixed w
   simp only [X.flagZVector] at hprim
-  obtain ⟨o, ho⟩ := hprim (X.ιE c)
-    (Submodule.mem_inf.2 ⟨Submodule.mem_sup_left (Submodule.mem_inf.2 ⟨hLb hv, hmem⟩), hmem⟩)
+  obtain ⟨o, ho⟩ :=
+    hprim (X.ιE c)
+      (Submodule.mem_inf.2 ⟨Submodule.mem_sup_left (Submodule.mem_inf.2 ⟨hLb hv, hmem⟩), hmem⟩)
   refine ⟨(intEquiv X.ιE).symm o, ?_⟩
   rw [intEquiv_symm_coe, ho, RingEquiv.symm_apply_apply]
 
 end Hyp
 
-theorem primX {D : D7} (X : HidaSetting D) (w : D.what₂.Word) (hS : PI.LocFramePrim.Statement) : PrimX X w := ChkLocFramePrim.primX_of hS X w (LbC X) X.B.I.L_fg (split_crd X w) (hind_crd X w) (dir_crd X w)
+theorem primX {D : D7} (X : HidaSetting D) (w : D.what₂.Word) (hS : PI.LocFramePrim.Statement)
+    : PrimX X w :=
+  ChkLocFramePrim.primX_of hS X w (LbC X) X.B.I.L_fg (split_crd X w) (hind_crd X w) (dir_crd X w)
     (hz_crd X w) (hzp_crd X w)
 
 end Formalism.L2.SG.Pf.LocVolPrim
+end -- clump:auto
+end -- clump:auto
+end -- clump:auto
+-- ===== end clump member: Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LocVolPrim =====

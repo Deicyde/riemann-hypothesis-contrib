@@ -214,14 +214,6 @@ def atL (L : Submodule (𝓞 K) V) : Submodule (Rl l K) V := Submodule.span (Rl 
 theorem mem_atL_iff {L : Submodule (𝓞 K) V} {x : V} : x ∈ atL l K L ↔ ∃ s ∈ Ml l K, s • x ∈ L := by
   first
   | exact UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff ..
-  | (apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff
-        <;> first | assumption | infer_instance
-    )
   | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L
       x
   | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L

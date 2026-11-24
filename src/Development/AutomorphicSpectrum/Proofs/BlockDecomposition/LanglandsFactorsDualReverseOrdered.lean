@@ -3,7 +3,8 @@ module
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.ZelevinskyCosocles.LUnlinkedComm
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IrreducibleAdmissibleGL
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DualClassInvolutive
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SegmentDualPrecedesIffStatement
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.LSegJacquet
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SegmentDualPrecedesIff
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,7 +60,8 @@ theorem exists_revOrdered_dual
   obtain ⟨Δ, ⟨-, hord⟩, hL⟩ := hx
   refine ⟨
     fun i => segDual (Δ i),
-    fun i j hij hp => hord i j hij ((GlobalTheory.T.segment_dual_precedes_iff hA _ _).1 hp),
+    fun i j hij hp =>
+      hord i j hij ((_root_.GlobalTheory.CompanionTheory.SegDualPrec.segDual_precedes hA _ _).1 hp),
     fun i => ?_
   ⟩
   rw [GlobalTheory.CompanionTheory.Zcore.dualCl_eq_of hA (x i)]

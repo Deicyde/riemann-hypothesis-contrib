@@ -56,11 +56,11 @@ variable {D : D7} {S T : HSp D}
 
 theorem eInf_mul_eFin : eInf D * eFin D = 0 := by
   simp only [eInf, eFin, pairA]
-  first | exact Prod.ext (mul_zero _) (zero_mul _) | (refine Prod.ext ?_ ?_ <;> simp)
+  first | exact Prod.ext (mul_zero _) (zero_mul _)
 
 theorem eInf_add_eFin : eInf D + eFin D = 1 := by
   simp only [eInf, eFin, pairA]
-  first | exact Prod.ext (add_zero _) (zero_add _) | (refine Prod.ext ?_ ?_ <;> simp)
+  first | exact Prod.ext (add_zero _) (zero_add _)
 
 theorem cA_smul (c : AF D.host.F) (z : AE D) : cA D (c • z) = c • cA D z := by
   unfold cA sigR
@@ -70,11 +70,10 @@ theorem cA_smul (c : AF D.host.F) (z : AE D) : cA D (c • z) = c • cA D z := 
   | add x y hx hy => rw [smul_add, map_add (f := _), map_add (f := _), hx, hy, smul_add]
 
 theorem hO_smul_right (c : AF D.host.F) (x y : WO S T) : hO S T x (c • y) = c • hO S T x y := by
-  simp only [hO, Finset.smul_sum, Matrix.smul_apply, Pi.smul_apply, cA_smul, mul_smul_comm,
-    smul_mul_assoc]
+  simp only [hO, Finset.smul_sum, Matrix.smul_apply, cA_smul, mul_smul_comm, smul_mul_assoc]
 
 theorem hO_smul_left (c : AF D.host.F) (x y : WO S T) : hO S T (c • x) y = c • hO S T x y := by
-  simp only [hO, Finset.smul_sum, Matrix.smul_apply, Pi.smul_apply, mul_smul_comm, smul_mul_assoc]
+  simp only [hO, Finset.smul_sum, Matrix.smul_apply, mul_smul_comm]
 
 theorem symplOH_smul_right (c : AF D.host.F) (x y : WO S T)
     : symplOH S T x (c • y) = c * symplOH S T x y := by

@@ -87,7 +87,7 @@ theorem exists_pow_mul_le_one
     calc
       Valued.v a ^ d * Valued.v (a ^ m * s) ≤ 1 * Valued.v (a ^ m * s) := by
         gcongr
-        first | exact pow_le_one₀ zero_le ha.le | exact pow_le_one₀ zero_le' ha.le
+        first | exact pow_le_one₀ zero_le ha.le
       _ = Valued.v (a ^ m * s) := one_mul _
       _ < 1 := hs
   obtain ⟨m, hm⟩ :=
@@ -132,10 +132,7 @@ theorem GlobalTheory.CompanionTheory.Mass.MeanV.exists_common_denominator
         Valued.v (algebraMap F (Fv F v) x) = v.valuation F x := by
     intro v x
     show Valued.v ((x : v.adicCompletion F)) = v.valuation F x
-    first
-    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
-    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' x
-    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := v) x
+    first | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
   have h4
       : ∀ x : F, (∀ v : HeightOneSpectrum (𝓞 F), v.valuation F x ≤ 1) → ∃ y : 𝓞 F, (y : F) = x := by
     intro x hx

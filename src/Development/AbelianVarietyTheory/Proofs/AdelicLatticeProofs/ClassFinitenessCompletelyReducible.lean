@@ -1,14 +1,15 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsRatPolyEvalEqTensorPowerSumRightActionStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsTensorStabiliserClosedSLOrbitStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FiniteIntegralClassesClosedOrbitStatement
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsRatPolyEvalEqTensorPowerSumRightAction
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsTensorStabiliserClosedSLOrbit
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FiniteIntegralClassesClosedOrbit
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsFiniteAdeleLikePairElementary
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.RatMemRatZariskiClosurePoints
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.RatZariskiClosurePointsIsGroup
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SpecialLinearClassNumberOneAdelic
 import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MatrixKroneckerPowerTensorActionAlgebra
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.RatMemRatZariskiClosurePointsStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.RatZariskiClosurePointsIsGroupStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SpecialLinearClassNumberOneAdelicStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -85,13 +86,14 @@ theorem cf_of_ss
   intro ι _ _ Γ R _ _ R₀ hΓ hss hA
   classical
   obtain ⟨m, d, t, hfix, hstab, hcl⟩ :=
-    GlobalTheory.T.exists_tensor_stabiliser_closed_SL_orbit ι Γ hΓ hss
-  obtain ⟨Φ, hΦ⟩ := GlobalTheory.T.exists_ratPoly_eval_eq_tensorPowerSumRightAction ι m d t
-  obtain ⟨-, hmul, hadj, hdet⟩ := GlobalTheory.T.ratZariskiClosurePoints_isGroup ι Γ hΓ.toIsPre R
-  obtain ⟨hrat, hratR⟩ := GlobalTheory.T.rat_mem_ratZariskiClosurePoints ι Γ
+    _root_.GlobalTheory.ClassFin.exists_tensor_stabiliser_closed_orbit ι Γ hΓ hss
+  obtain ⟨Φ, hΦ⟩ := _root_.GlobalTheory.ClassFin.exists_mvPolynomial_ev_eq_act ι m d t
+  obtain ⟨-, hmul, hadj, hdet⟩ := _root_.GlobalTheory.ClassFin.pts_group ι Γ hΓ.toIsPre R
+  obtain ⟨hrat, hratR⟩ := _root_.GlobalTheory.ClassFin.RatPts.rat_mem_pts ι Γ
   obtain ⟨D, hD, hDt⟩ :=
     (adelicPair_elementary R R₀ hA).2.1 (TIdx ι d) (fun k => algebraMap ℚ R (t k))
-  obtain ⟨Z, hZ⟩ := GlobalTheory.T.finite_integral_classes_closedOrbit ι m d t hcl D hD
+  obtain ⟨Z, hZ⟩ :=
+    _root_.GlobalTheory.ClassFin.finite_integral_classes_closed_orbit ι m d t hcl D hD
   have hone : ∀ (S : Type) [CommRing S] (s : TIdx ι d → S), act d s 1 = s := fun S _ s =>
     ((tpow_act_algebra ι S).2 m d s).1
   have hact
@@ -126,7 +128,7 @@ theorem cf_of_ss
   have key : ∀ x ∈ pts Γ R, ∃ z ∈ Z, ∃ p, P z p ∧ x = p.1.map (algebraMap ℚ R) * p.2 := by
     intro x hx
     obtain ⟨h, k, hh, hk, hkint, rfl⟩ :=
-      GlobalTheory.T.specialLinear_classNumber_one_adelic ι R R₀ hA x (hdet x hx)
+      _root_.GlobalTheory.ClassFin.sl_class_number_one ι R R₀ hA x (hdet x hx)
     have hkk : k * k.adjugate = 1 := by rw [Matrix.mul_adjugate, hk, one_smul]
     have e1
         : act d (fun k => algebraMap ℚ R (t k)) k.adjugate

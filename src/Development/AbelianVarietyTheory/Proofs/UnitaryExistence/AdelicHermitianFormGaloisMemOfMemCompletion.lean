@@ -2,8 +2,8 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionFractionalIdealProperties
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionSelfDualOfSelfDualLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeRationalVectorsInAdelicTranslateStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionSelfDualOfSelfDualLattice
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeRationalVectorsInAdelicTranslate
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -124,11 +124,8 @@ theorem latOf_selfDual
               (∑ a, ∑ b, v a * G a b * c (y b)) ∈ J)
             ↔ v ∈ latOf F (g : Matrix (Fin n) (Fin n) (RA F E)) L := by
   intro F E _ _ _ _ _ n L c G J g hfg hspan hc hG hdet hJ hL hg v
-  have hd :=
-    GlobalTheory.T.adelicCompletion_selfDual_of_selfDual_lattice F E n L c G J hfg hspan hc hG hdet
-      hJ hL
-  obtain ⟨Λ, hΛ, -, -, hhat⟩ :=
-    GlobalTheory.T.exists_lattice_rationalVectorsInAdelicTranslate F E n L g hfg hspan
+  have hd := _root_.GlobalTheory.AdLat.hat_selfDual F E n L c G J hfg hspan hc hG hdet hJ hL
+  obtain ⟨Λ, hΛ, -, -, hhat⟩ := _root_.GlobalTheory.AdLat.exists_lattice_latOf F E n L g hfg hspan
   constructor
   · intro hv
     have hz

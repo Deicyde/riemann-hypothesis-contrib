@@ -70,7 +70,7 @@ private theorem padd_comp_eq_padd_comp_of_isMonHom
 private theorem comp_padd_eq_padd_comp {T T' H : Over S} [GrpObj H] (x : T ⟶ T') (a b : T' ⟶ H)
     : x ≫ padd H a b = padd H (x ≫ a) (x ≫ b) := by
   unfold padd
-  first | simp | simp [Hom.mul_def] | simp [comp_lift_assoc]
+  first | simp [comp_lift_assoc]
 
 theorem rosatiφ_comp
     (q : G' ⟶ G) [IsMonHom q]

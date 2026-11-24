@@ -40,17 +40,22 @@ import Std.Tactic.BVDecide.Normalize.Prop
 @[expose] public section
 
 open scoped MatrixGroups Matrix Classical
-open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4 UpperTheory.V.Z.Kato.Nb
+open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
+  UpperTheory.V.Z.Kato.Nb
 
 namespace UpperTheory.V.Z.Kato.Nb
 
-private theorem xs_cast {d M : ℕ} [NeZero M] (h : d ∣ M) (z : ZMod M) :
-    ((z.val : ℕ) : ZMod d) = ZMod.castHom h (ZMod d) z := by
+private theorem xs_cast {d M : ℕ} [NeZero M] (h : d ∣ M) (z : ZMod M)
+    : ((z.val : ℕ) : ZMod d) = ZMod.castHom h (ZMod d) z := by
   rw [ZMod.castHom_apply, ZMod.natCast_val]
 
-private theorem xs_eval {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ)
-    (k k' : ℤ_[l]) (a : X.Khat l) (h : PadicInt.toZModPow n k = PadicInt.toZModPow n k') :
-    AdicCompletion.eval (idl l) (X.Kl l) n (k • a - k' • a) = 0 := by
+private theorem xs_eval
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (n : ℕ) (k k' : ℤ_[l])
+    (a : X.Khat l) (h : PadicInt.toZModPow n k = PadicInt.toZModPow n k')
+    : AdicCompletion.eval (idl l) (X.Kl l) n (k • a - k' • a) = 0 := by
   have h1 : k - k' ∈ (idl l) ^ n := by
     rw [Ideal.span_singleton_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, h, sub_self]
   rw [← sub_smul, map_smul]
@@ -58,9 +63,11 @@ private theorem xs_eval {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* �
   rw [← hv, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
   exact Submodule.smul_mem_smul h1 Submodule.mem_top
 
-private theorem xs_cD (N M₀ M : ℕ) [NeZero N] [NeZero M] (hM : M = N * M₀) (c : ZMod M)
-    (m : Matrix (Fin 2) (Fin 2) (ZMod M)) (h : ((m 1 0).val : ZMod N) = 0) :
-    cD N M₀ (c • m) = ((c.val : ℕ) : ZMod M₀) • cD N M₀ m := by
+private theorem xs_cD
+    (N M₀ M : ℕ) [NeZero N] [NeZero M]
+    (hM : M = N * M₀) (c : ZMod M)
+    (m : Matrix (Fin 2) (Fin 2) (ZMod M)) (h : ((m 1 0).val : ZMod N) = 0)
+    : cD N M₀ (c • m) = ((c.val : ℕ) : ZMod M₀) • cD N M₀ m := by
   have hM₀ : M₀ ∣ M := ⟨N, by rw [hM, mul_comm]⟩
   have key : ∀ z : ZMod M, ((c * z).val : ZMod M₀) = (c.val : ZMod M₀) * (z.val : ZMod M₀) := by
     intro z
@@ -71,23 +78,34 @@ private theorem xs_cD (N M₀ M : ℕ) [NeZero N] [NeZero M] (hM : M = N * M₀)
     rw [ZMod.val_mul, hq]
     generalize c.val = cv
     rw [hM, mul_left_comm, Nat.mul_mod_mul_left, Nat.mul_div_cancel_left _ hN]
-  have hq' : (m 1 0).val / N = q := by
-    rw [hq, Nat.mul_div_cancel_left _ hN]
+  have hq' : (m 1 0).val / N = q := by rw [hq, Nat.mul_div_cancel_left _ hN]
   ext i j
   fin_cases i <;> fin_cases j
-  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue]
-  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Nat.cast_mul, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue, Fin.mk_one]
+  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Matrix.of_apply, Matrix.cons_val',
+      Matrix.cons_val_zero, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue]
+  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Nat.cast_mul, Matrix.of_apply,
+      Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val',
+      Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue, Fin.mk_one]
     ring
-  · simp only [cD, Matrix.smul_apply, smul_eq_mul, h10, hq', ZMod.natCast_mod, Nat.cast_mul, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue, Fin.mk_one]
-  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue, Fin.mk_one]
+  · simp only [cD, Matrix.smul_apply, smul_eq_mul, h10, hq', ZMod.natCast_mod, Nat.cast_mul,
+      Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.empty_val', Matrix.cons_val_fin_one, Fin.zero_eta, Fin.isValue, Fin.mk_one]
+  · simp only [cD, Matrix.smul_apply, smul_eq_mul, key, Matrix.of_apply, Matrix.cons_val',
+      Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Fin.isValue, Fin.mk_one]
 
-private theorem xs_Cnd (l N M : ℕ) [Fact l.Prime] [NeZero M] (hN : N ∣ M) (hl : l ∣ M) (g : SL(2, ℤ)) (ν : (ZMod M)ˣ)
-    (hν : ((ν : ZMod M).val : ZMod N) = 1) (m : Matrix (Fin 2) (Fin 2) (ZMod M)) :
-    Cnd l N g ((ν : ZMod M) • m) ↔ Cnd l N g m := by
+private theorem xs_Cnd
+    (l N M : ℕ) [Fact l.Prime] [NeZero M]
+    (hN : N ∣ M) (hl : l ∣ M) (g : SL(2, ℤ))
+    (ν : (ZMod M)ˣ) (hν : ((ν : ZMod M).val : ZMod N) = 1)
+    (m : Matrix (Fin 2) (Fin 2) (ZMod M))
+    : Cnd l N g ((ν : ZMod M) • m) ↔ Cnd l N g m := by
   have key : ∀ z : ZMod M, (((ν : ZMod M) * z).val : ZMod N) = (z.val : ZMod N) := by
     intro z
     rw [xs_cast hN, xs_cast hN, map_mul, ← xs_cast hN, hν, one_mul]
-  have key' : ∀ z : ZMod M, (((ν : ZMod M) * z).val : ZMod l) = ZMod.castHom hl (ZMod l) (ν : ZMod M) * (z.val : ZMod l) := by
+  have key'
+      : ∀ z : ZMod M,
+        (((ν : ZMod M) * z).val : ZMod l)
+          = ZMod.castHom hl (ZMod l) (ν : ZMod M) * (z.val : ZMod l) := by
     intro z
     rw [xs_cast hl, xs_cast hl, map_mul]
   have hu : IsUnit (ZMod.castHom hl (ZMod l) (ν : ZMod M)) := (ν.isUnit).map _
@@ -96,10 +114,11 @@ private theorem xs_Cnd (l N M : ℕ) [Fact l.Prime] [NeZero M] (hN : N ∣ M) (h
   rw [mul_left_comm, mul_left_comm (↑(en g 0 0) : ZMod l)]
   exact hu.mul_right_inj
 
-private theorem xs_sum {R ι A B : Type} [CommRing R] [AddCommGroup A] [AddCommGroup B] [Module R A] [Module R B]
-    (L : A →ₗ[R] B) (e : ι ≃ ι) (s t : Finset ι) (f g : ι → A) (h : ∀ i, i ∈ s ↔ e i ∈ t)
-    (h' : ∀ i ∈ s, L (f i - g (e i)) = 0) : L (∑ i ∈ s, f i - ∑ i ∈ t, g i) = 0 := by
-
+private theorem xs_sum
+    {R ι A B : Type} [CommRing R] [AddCommGroup A] [AddCommGroup B] [Module R A] [Module R B]
+    (L : A →ₗ[R] B) (e : ι ≃ ι) (s t : Finset ι) (f g : ι → A)
+    (h : ∀ i, i ∈ s ↔ e i ∈ t) (h' : ∀ i ∈ s, L (f i - g (e i)) = 0)
+    : L (∑ i ∈ s, f i - ∑ i ∈ t, g i) = 0 := by
   rw [← Finset.sum_equiv e (t := t) (g := g) h (fun _ _ => rfl), ← Finset.sum_sub_distrib, map_sum]
   exact Finset.sum_eq_zero h'
 

@@ -176,7 +176,7 @@ private theorem gm_pullU_eq_gm_comp
   simp only [gm, dif_pos h₁, dif_pos h₂, MonoidHom.comp_apply]
   ext
   simp only [Units.coe_map, pullU, MonoidHom.coe_coe]
-  first | rfl | (rw [Scheme.comp_app]; rfl)
+  first | rfl
 
 theorem gm_maps_pt
     {L' L : LB X} {w : LB.Iso L' L} {Y : Scheme.{0}} {φ : Y ⟶ X} {a : LB.Gen (L'.pull φ)}
@@ -248,7 +248,7 @@ theorem isoPullId_maps
           (pullU (eSec G) ((L.L.pull (𝟙 G.left)).U (j PUnit.unit) ⊓ L'.L.U (i PUnit.unit))
             ((isoPullId w (rfl : 𝟙 G.left = 𝟙 G.left)).s (j PUnit.unit, i PUnit.unit))) := by
     simp only [LB.linCombIso, zpow_one]
-    first | exact Fintype.prod_unique _ | exact Fintype.prod_unique | simp
+    first | exact Fintype.prod_unique _
   refine res_eq_mul_res_of_gm_id_eq_mul (fun z hz => ?_)
   have hz1' := mem_pull.1 (mem_pull.1 hz.1)
   have hz2' := mem_pull.1 hz.2
@@ -318,10 +318,7 @@ private theorem isoPullId_isGen_of_isGen
           (pullU (𝟙 X) (L.U (J PUnit.unit) ⊓ L.U (J' PUnit.unit))
             (L.g (J PUnit.unit) (J' PUnit.unit))) := by
     change (∏ _k : PUnit, _) = _
-    first
-    | (rw [Fintype.prod_unique]; exact zpow_one _)
-    | exact (Fintype.prod_unique _).trans (zpow_one _)
-    | simp
+    first | exact (Fintype.prod_unique _).trans (zpow_one _)
   refine res_eq_mul_res_of_gm_id_eq_mul (fun z hz => ?_)
   have hz' : (𝟙 X) z ∈ ((L.pull (𝟙 X)).U J ⊓ L'.U k) ⊓ ((L.pull (𝟙 X)).U J' ⊓ L'.U k') := hz
   have hJa' := mem_pull.1 hz'.1.1
@@ -409,7 +406,7 @@ theorem isPullUnif_of_uniq
     (bc : G ≅ (Over.pullback (specOf (RingHom.id R))).obj G)
     (hbc : bc.hom.left ≫ pullback.fst G.hom (specOf (RingHom.id R)) = 𝟙 _)
     : IsPullUnif (RingHom.id R) hD bc U U' := by
-  have he₀ : specOf (RingHom.id R) = 𝟙 _ := by first | simp [specOf] | exact Spec.map_id _ | rfl
+  have he₀ : specOf (RingHom.id R) = 𝟙 _ := by first | simp [specOf]
   have he
       : eSec G ≫ bc.hom.left ≫ pullback.fst G.hom (specOf (RingHom.id R))
         = specOf (RingHom.id R) ≫ eSec G := by
@@ -445,7 +442,7 @@ theorem isPullUnif_of_uniq
     · exact ((gm_pullU_eq_gm_comp (𝟙 _) (𝟙 _) y
         (U :=
           (LB.div (D.toPre.P.L.pull (U.gt n).pG.left) (U.LG.L.pull (fstG I n G).left)).U (jM, jL))
-        hy.1.2 ((U.w n).s (jM, jL))).trans (by rw [Category.comp_id] <;> rfl)).symm
+        hy.1.2 ((U.w n).s (jM, jL))).trans (by rw [Category.comp_id])).symm
     · exact (gm_pullU_eq_gm_comp (fstG I n G).left (𝟙 _) y
           (U := (LB.div U.LG.L U'.LG.L).U (jL PUnit.unit, jL')) hyh4
           (wL.s (jL PUnit.unit, jL'))).trans

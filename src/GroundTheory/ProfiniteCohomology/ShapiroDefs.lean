@@ -62,27 +62,27 @@ section Maps
 
 variable (U : Subgroup G)
 
-noncomputable def coindEvalOne (B : Rep.{u} k U) :
-    Rep.res U.subtype (Rep.coind U.subtype B) ⟶ B :=
-  Rep.ofHom ⟨(LinearMap.proj (1 : G)).comp (Representation.coindV U.subtype B.ρ).subtype,
+noncomputable def coindEvalOne (B : Rep.{u} k U) : Rep.res U.subtype (Rep.coind U.subtype B) ⟶ B :=
+  Rep.ofHom ⟨
+    (LinearMap.proj (1 : G)).comp (Representation.coindV U.subtype B.ρ).subtype,
     fun u => by
       ext f
       change f.1 (1 * (u : G)) = B.ρ u (f.1 1)
       rw [one_mul]
-      simpa using f.2 u 1⟩
+      simpa using f.2 u 1
+  ⟩
 
-noncomputable def coindUnit (A : Rep.{u} k G) :
-    A ⟶ Rep.coind U.subtype (Rep.res U.subtype A) :=
+noncomputable def coindUnit (A : Rep.{u} k G) : A ⟶ Rep.coind U.subtype (Rep.res U.subtype A) :=
   Rep.resCoindToHom U.subtype A (Rep.res U.subtype A) (𝟙 _)
 
 @[simp]
-theorem coindUnit_hom_apply (A : Rep.{u} k G) (a : A) (x : G) :
-    ((coindUnit U A).hom a).1 x = A.ρ x a :=
+theorem coindUnit_hom_apply (A : Rep.{u} k G) (a : A) (x : G)
+    : ((coindUnit U A).hom a).1 x = A.ρ x a :=
   rfl
 
-theorem coindUnit_comp_coindEvalOne (A : Rep.{u} k G) :
-    (Rep.resFunctor U.subtype).map (coindUnit U A) ≫ coindEvalOne U (Rep.res U.subtype A) =
-      𝟙 _ := by
+theorem coindUnit_comp_coindEvalOne (A : Rep.{u} k G)
+    : (Rep.resFunctor U.subtype).map (coindUnit U A) ≫ coindEvalOne U (Rep.res U.subtype A)
+      = 𝟙 _ := by
   ext a
   change A.ρ 1 a = a
   simp
@@ -91,13 +91,12 @@ section Trace
 
 variable (A : Rep.{u} k G)
 
-noncomputable def coindTraceTerm (c : G ⧸ U) :
-    Rep.coind U.subtype (Rep.res U.subtype A) →ₗ[k] A :=
+noncomputable def coindTraceTerm (c : G ⧸ U) : Rep.coind U.subtype (Rep.res U.subtype A) →ₗ[k] A :=
   A.ρ c.out ∘ₗ (LinearMap.proj c.out⁻¹).comp
     (Representation.coindV U.subtype (Rep.res U.subtype A).ρ).subtype
 
-theorem coindTraceTerm_apply (f : Rep.coind U.subtype (Rep.res U.subtype A)) (x : G) :
-    coindTraceTerm U A (x : G ⧸ U) f = A.ρ x (f.1 x⁻¹) := by
+theorem coindTraceTerm_apply (f : Rep.coind U.subtype (Rep.res U.subtype A)) (x : G)
+    : coindTraceTerm U A (x : G ⧸ U) f = A.ρ x (f.1 x⁻¹) := by
   change A.ρ (x : G ⧸ U).out (f.1 (x : G ⧸ U).out⁻¹) = A.ρ x (f.1 x⁻¹)
   obtain ⟨u, hu⟩ : ∃ u : U, (x : G ⧸ U).out = x * u := by
     have h := QuotientGroup.mk_out_eq_mul U x
@@ -115,23 +114,26 @@ variable [U.FiniteIndex]
 attribute [local instance] Subgroup.fintypeQuotientOfFiniteIndex
 
 noncomputable def coindTrace : Rep.coind U.subtype (Rep.res U.subtype A) ⟶ A :=
-  Rep.ofHom ⟨∑ c : G ⧸ U, coindTraceTerm U A c, fun g => by
-    ext f
-    change (∑ c : G ⧸ U, coindTraceTerm U A c) ((Rep.coind U.subtype (Rep.res U.subtype A)).ρ g f) =
-      A.ρ g ((∑ c : G ⧸ U, coindTraceTerm U A c) f)
+  Rep.ofHom ⟨
+    ∑ c : G ⧸ U, coindTraceTerm U A c,
+    fun g => by
+      ext f
+      change (∑ c : G ⧸ U, coindTraceTerm U A c) ((Rep.coind U.subtype (Rep.res U.subtype A)).ρ g f)
+        = A.ρ g ((∑ c : G ⧸ U, coindTraceTerm U A c) f)
 
-    rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
-    refine (Fintype.sum_equiv (MulAction.toPerm g) _ _ fun c => ?_).symm
-    induction c using QuotientGroup.induction_on with
-    | H x =>
-      simp only [MulAction.toPerm_apply, MulAction.Quotient.smul_mk]
-      rw [coindTraceTerm_apply, coindTraceTerm_apply]
-      change A.ρ g (A.ρ x (f.1 x⁻¹)) = A.ρ (g * x) (f.1 ((g * x)⁻¹ * g))
-      rw [← Module.End.mul_apply, ← map_mul]
-      simp [mul_inv_rev, mul_assoc]⟩
+      rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+      refine (Fintype.sum_equiv (MulAction.toPerm g) _ _ fun c => ?_).symm
+      induction c using QuotientGroup.induction_on with
+      | H x =>
+        simp only [MulAction.toPerm_apply, MulAction.Quotient.smul_mk]
+        rw [coindTraceTerm_apply, coindTraceTerm_apply]
+        change A.ρ g (A.ρ x (f.1 x⁻¹)) = A.ρ (g * x) (f.1 ((g * x)⁻¹ * g))
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp [mul_inv_rev, mul_assoc]
+  ⟩
 
-theorem coindTrace_hom_apply (f : Rep.coind U.subtype (Rep.res U.subtype A)) :
-    (coindTrace U A).hom f = ∑ c : G ⧸ U, coindTraceTerm U A c f := by
+theorem coindTrace_hom_apply (f : Rep.coind U.subtype (Rep.res U.subtype A))
+    : (coindTrace U A).hom f = ∑ c : G ⧸ U, coindTraceTerm U A c f := by
   simp [coindTrace]
 
 theorem coindUnit_comp_coindTrace : coindUnit U A ≫ coindTrace U A = U.index • 𝟙 A := by
@@ -157,8 +159,8 @@ section Discrete
 
 variable (U : OpenSubgroup G) (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B]
 
-theorem isLocallyConstant_coind (f : Rep.coind (U : Subgroup G).subtype B) :
-    IsLocallyConstant (f.1 : G → B) := by
+theorem isLocallyConstant_coind (f : Rep.coind (U : Subgroup G).subtype B)
+    : IsLocallyConstant (f.1 : G → B) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   set S : Set G := Subtype.val '' (stabilizer B.ρ (f.1 x) : Set (U : Subgroup G))
@@ -174,22 +176,23 @@ theorem isLocallyConstant_coind (f : Rep.coind (U : Subgroup G).subtype B) :
   rw [hy', f.2 u x]
   exact (mem_stabilizer _ _ _).1 hu
 
-noncomputable def coindToLocallyConstant (f : Rep.coind (U : Subgroup G).subtype B) :
-    LocallyConstant G B :=
+noncomputable def coindToLocallyConstant (f : Rep.coind (U : Subgroup G).subtype B)
+    : LocallyConstant G B :=
   ⟨f.1, isLocallyConstant_coind U B f⟩
 
-instance isDiscreteRep_coind [CompactSpace G] :
-    IsDiscreteRep (Rep.coind (U : Subgroup G).subtype B) :=
-  ⟨fun f => Subgroup.isOpen_of_mem_nhds (g := 1) _ <|
-    Filter.mem_of_superset (eventually_forall_mul_eq (coindToLocallyConstant U B f))
-      fun g (hg : ∀ x, f.1 (x * g) = f.1 x) => Subtype.ext (funext fun x => hg x)⟩
+instance isDiscreteRep_coind [CompactSpace G]
+    : IsDiscreteRep (Rep.coind (U : Subgroup G).subtype B) :=
+  ⟨fun f =>
+    Subgroup.isOpen_of_mem_nhds (g := 1) _ <|
+      Filter.mem_of_superset (eventually_forall_mul_eq (coindToLocallyConstant U B f))
+        fun g (hg : ∀ x, f.1 (x * g) = f.1 x) => Subtype.ext (funext fun x => hg x)⟩
 
-instance finiteIndex_openSubgroup [CompactSpace G] (U : OpenSubgroup G) :
-    (U : Subgroup G).FiniteIndex :=
+instance finiteIndex_openSubgroup [CompactSpace G] (U : OpenSubgroup G)
+    : (U : Subgroup G).FiniteIndex :=
   Subgroup.finiteIndex_of_finite_quotient
 
-instance compactSpace_openSubgroup [CompactSpace G] (U : OpenSubgroup G) :
-    CompactSpace (U : Subgroup G) :=
+instance compactSpace_openSubgroup [CompactSpace G] (U : OpenSubgroup G)
+    : CompactSpace (U : Subgroup G) :=
   isCompact_iff_compactSpace.mp (U.isClosed.isCompact)
 
 end Discrete
@@ -198,14 +201,15 @@ section Shapiro
 
 variable [CompactSpace G] (U : OpenSubgroup G) (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B]
 
-noncomputable def shapiroMap (n : ℕ) :
-    cohomology (Rep.coind (U : Subgroup G).subtype B) n ⟶ cohomology B n :=
+noncomputable def shapiroMap (n : ℕ)
+    : cohomology (Rep.coind (U : Subgroup G).subtype B) n ⟶ cohomology B n :=
   cohomologyMapAlong (U : Subgroup G).subtype (continuous_subgroup_subtype _)
     (coindEvalOne (U : Subgroup G) B) n
 
-theorem shapiroMap_eq (n : ℕ) :
-    shapiroMap U B n = cohomologyMapAlong (U : Subgroup G).subtype
-      (continuous_subgroup_subtype _) (coindEvalOne (U : Subgroup G) B) n :=
+theorem shapiroMap_eq (n : ℕ)
+    : shapiroMap U B n
+      = cohomologyMapAlong (U : Subgroup G).subtype (continuous_subgroup_subtype _)
+        (coindEvalOne (U : Subgroup G) B) n :=
   rfl
 
 end Shapiro

@@ -50,8 +50,9 @@ noncomputable section
 
 namespace GlobalTheory.StdFrame
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR
-  Formalism.IndefR.Links Formalism.IndefR.FWT
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT
 open scoped TensorProduct Matrix
 
 section Space
@@ -66,13 +67,15 @@ theorem OrthFrame.gram_eq {V : HSpace E} (h : OrthFrame V) : V.gram = 1 := by
   rw [Matrix.one_apply]
   exact h.1 a b
 
-theorem OrthFrame.mem_iff {V : HSpace E} (h : OrthFrame V) (x : Fin V.rank → E) :
-    ∑ a, x a • V.frame a ∈ V.L0 ↔ ∀ a, x a ∈ (1 : Submodule (𝓞 E) E) := by
+theorem OrthFrame.mem_iff {V : HSpace E} (h : OrthFrame V) (x : Fin V.rank → E)
+    : ∑ a, x a • V.frame a ∈ V.L0 ↔ ∀ a, x a ∈ (1 : Submodule (𝓞 E) E) := by
   constructor
   · intro hx a
     have hd : ∑ a, x a • V.frame a ∈ Formalism.HermitianLatticesTheory.dual V.hT V.L0 := by
       rw [V.baseLattice_isUnimodular]; exact hx
-    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap] at hd
+    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+        Submodule.mem_comap]
+      at hd
     have h1 : V.hT (V.frame a) (∑ b, x b • V.frame b) ∈ (1 : Submodule (𝓞 E) E) := hd _ (h.2 a)
 
     simpa [map_sum, map_smul, h.1] using h1
@@ -84,8 +87,10 @@ theorem OrthFrame.mem_iff {V : HSpace E} (h : OrthFrame V) (x : Fin V.rank → E
 
 def reframe (V : HSpace E) (b : Module.Basis (Fin V.rank) E V.V) : HSpace E := { V with frame := b }
 
-theorem exists_orthFrame (V : HSpace E) {n : ℕ} (hn : V.rank = n) (h : Formalism.HermitianLatticesTheory.IsOrthoLattice V.hT V.L0 n) :
-    ∃ b, OrthFrame (reframe V b) := by
+theorem exists_orthFrame
+    (V : HSpace E)
+    {n : ℕ} (hn : V.rank = n) (h : Formalism.HermitianLatticesTheory.IsOrthoLattice V.hT V.L0 n)
+    : ∃ b, OrthFrame (reframe V b) := by
   subst hn
   obtain ⟨e, h1, h2, h3, h4⟩ := h
   refine ⟨Module.Basis.mk h1 h2.ge, fun (a b : Fin V.rank) => ?_, fun (a : Fin V.rank) => ?_⟩
@@ -102,7 +107,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem hLat_one {D : D7} (V : HSp D) : Bridge.hLat V 1 = GlobalTheory.Member.latC V := by
   obtain ⟨-, -, hfg, hsp, -⟩ := GlobalTheory.Member.latHat_eq_hat_and_gram D V
-  have key := (GlobalTheory.AdLat.hat_rational_points_and_approx D.host.F D.host.E V.rank _ hfg hsp).1
+  have key :=
+    (GlobalTheory.AdLat.hat_rational_points_and_approx D.host.F D.host.E V.rank _ hfg hsp).1
   unfold Bridge.hLat
   rw [← Submodule.span_eq (GlobalTheory.Member.latC V)]
   congr 1
@@ -114,11 +120,15 @@ theorem hLat_one {D : D7} (V : HSp D) : Bridge.hLat V 1 = GlobalTheory.Member.la
   rw [Matrix.one_mulVec]
   exact Iff.rfl
 
-theorem vStd_iff_gram_and_lattice (D : D7) (i : Fin D.R.m) :
-    VStd D i ↔ (Vc D i).gram = 1 ∧
-      L0c D (Vc D i) = ((Submodule.pi Set.univ (fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E)) :
-        Submodule (𝓞 D.host.E) (Fin (Vc D i).rank → D.host.E)) : Set (Fin (Vc D i).rank → D.host.E)) := by
-  rw [VStd, hLat_one, ← GlobalTheory.Member.coe_selfDualLatticeInFrameCoordinates_eq, SetLike.coe_set_eq]
+theorem vStd_iff_gram_and_lattice (D : D7) (i : Fin D.R.m)
+    : VStd D i
+      ↔ (Vc D i).gram = 1
+        ∧ L0c D (Vc D i)
+          = ((Submodule.pi Set.univ (fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E))
+              : Submodule (𝓞 D.host.E) (Fin (Vc D i).rank → D.host.E))
+            : Set (Fin (Vc D i).rank → D.host.E)) := by
+  rw [VStd, hLat_one, ← GlobalTheory.Member.coe_selfDualLatticeInFrameCoordinates_eq,
+    SetLike.coe_set_eq]
 
 def FrameChoice (D : D7) (i : Fin D.R.m) : Prop := OrthFrame (D.sp.V ((i : ℕ) + 1))
 
@@ -129,34 +139,31 @@ theorem vStd_of_frameChoice : ∀ (D : D7) (i : Fin D.R.m), FrameChoice D i → 
   rw [SetLike.mem_coe, Submodule.mem_pi]
   exact (h.mem_iff x).trans ⟨fun k a _ => k a, fun k a => k a trivial⟩
 
-theorem nV_pos (R : Ranks) : 0 < R.nV := by
-  have := R.rank_add_five_le
-  unfold Ranks.nV
-  omega
-
-theorem neg_eq_false_of_vStd (D : D7) (i : Fin D.R.m) (h : VStd D i) : D.sp.Vneg ((i : ℕ) + 1) = false := by
+theorem neg_eq_false_of_vStd (D : D7) (i : Fin D.R.m) (h : VStd D i)
+    : D.sp.Vneg ((i : ℕ) + 1) = false := by
   by_contra hneg
   rw [Bool.not_eq_false] at hneg
   let τ := D.host.φ₀
   have hs := D.sp.V_sig ((i : ℕ) + 1) τ
   rw [factVSig _ _ D.sp _ (by omega) (by omega) τ, if_pos hneg] at hs
-  have h1 : Formalism.UG.HasSignature ((Matrix.of fun a b => (Vc D i).hT ((Vc D i).frame a) ((Vc D i).frame b)).map τ)
-      (Vc D i).rank 0 := by
+  have h1 : Formalism.UG.HasSignature
+      ((Matrix.of fun a b => (Vc D i).hT ((Vc D i).frame a) ((Vc D i).frame b)).map τ) (Vc D i).rank
+      0 := by
     have h0 : (Matrix.of fun a b => (Vc D i).hT ((Vc D i).frame a) ((Vc D i).frame b)) = 1 := h.1
     rw [h0, Matrix.map_one _ (map_zero _) (map_one _)]
     simpa using Formalism.UG.P.stdform_sig_one (n := Fin (Vc D i).rank)
   have h2 := (sig_family (Vc D i) τ (D.sp.cm.cmUnram.2.1 τ) _ h1 hs).1
-  have := nV_pos D.R
+  have := _root_.Formalism.L2.Col.nV_pos D.R
   simp only at h2
   omega
 
-theorem neg_eq_false_of_posDef (D : D7) (i : Fin D.R.m) (h : (Vc D i).IsPosDef) :
-    D.sp.Vneg ((i : ℕ) + 1) = false := by
+theorem neg_eq_false_of_posDef (D : D7) (i : Fin D.R.m) (h : (Vc D i).IsPosDef)
+    : D.sp.Vneg ((i : ℕ) + 1) = false := by
   by_contra hneg
   rw [Bool.not_eq_false] at hneg
   have h1 := factVSig _ _ D.sp ((i : ℕ) + 1) (by omega) (by omega) D.host.φ₀
   rw [if_pos hneg] at h1
   have h2 := congrArg Prod.snd ((h D.host.φ₀).symm.trans h1)
-  exact (nV_pos D.R).ne h2
+  exact (_root_.Formalism.L2.Col.nV_pos D.R).ne h2
 
 end GlobalTheory.StdFrame

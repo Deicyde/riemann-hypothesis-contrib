@@ -79,7 +79,7 @@ theorem chiRatAll_of_reads
     obtain ⟨n, hn, h⟩ := hfin (chOf c)
     exact ⟨n, hn, fun κ _ => h κ⟩
   obtain ⟨x, hx, ⟨q, hq⟩, -⟩ :=
-    GlobalTheory.T.exists_levelElement_same_character_near_bad I hOk hP l Z u a i hi bad Ch chOf K k
+    _root_.GlobalTheory.Mem.Col2.AdT.LevelElt.exists_level_elt I hOk hP l Z u a i hi bad Ch chOf K k
       hR c hF κ
   obtain ⟨κ', hg, hq', -⟩ := (hR.lev c x.1 q hq).1 x.2
   have hc := hR.chr c x κ' hg (by rw [hq']; exact hq)

@@ -237,8 +237,9 @@ theorem nonzeroOnComponents_ideal_of_isAdmissible
   | zero =>
     intro _
     rw [s.ideal_zero]
-    exact nonzeroOnComponents_comap_iso_hom s.toSequenceOfBlowups.isoZero T.ideal
-      hT.nonzeroOnComponents
+    exact
+      _root_.FunctorialResolution.EmbeddedResolution.PrincipalizationIsoTransport.nonzeroOnComponents_comap_iso
+        s.toSequenceOfBlowups.isoZero T.ideal hT.nonzeroOnComponents
   | succ n ih =>
     intro hn
     have hlt : n < s.toSequenceOfBlowups.length := hn

@@ -56,11 +56,12 @@ namespace GlobalTheory
 
 open KaehlerDifferential IsLocalRing Module
 
-theorem isFreeGen_dForm_uniformiser_cons : ∀ (k V : Type) [Field k] [CharZero k] [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] (α : k →+* V) (n : ℕ) (t : V) (w : Fin n → V), α.EssFiniteType →
-    Irreducible t → Nonempty (Module.Basis (Fin (n + 1)) V (Omega α)) →
-    (∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ α w P)) →
-    IsFreeGen V (dForm α (Fin.cons t w : Fin (n + 1) → V)) := by
+theorem isFreeGen_dForm_uniformiser_cons
+    : ∀ (k V : Type) [Field k] [CharZero k] [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        (α : k →+* V) (n : ℕ) (t : V) (w : Fin n → V),
+      α.EssFiniteType → Irreducible t → Nonempty (Module.Basis (Fin (n + 1)) V (Omega α))
+        → (∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ α w P))
+        → IsFreeGen V (dForm α (Fin.cons t w : Fin (n + 1) → V)) := by
   intro k V _ _ _ _ _ α n t w hft ht hb₀ hw
   obtain ⟨b₀⟩ := hb₀
   letI := α.toAlgebra
@@ -94,9 +95,10 @@ theorem isFreeGen_dForm_uniformiser_cons : ∀ (k V : Type) [Field k] [CharZero 
     convert this using 1
     funext i
     simp [ι, hb]
-  have ht₀ : algebraMap V κ t = 0 := (residue_eq_zero_iff t).mpr (by
-    rw [ht.maximalIdeal_eq]
-    exact Ideal.mem_span_singleton_self t)
+  have ht₀ : algebraMap V κ t = 0 :=
+    (residue_eq_zero_iff t).mpr (by
+      rw [ht.maximalIdeal_eq]
+      exact Ideal.mem_span_singleton_self t)
   let z : Fin (n + 1) → V := Fin.cons t w
   have hli : LinearIndependent κ (TensorProduct.mk V κ Ω[V⁄k] 1 ∘ fun i => D k V (z i)) := by
     rw [Fintype.linearIndependent_iff]
@@ -105,8 +107,9 @@ theorem isFreeGen_dForm_uniformiser_cons : ∀ (k V : Type) [Field k] [CharZero 
     simp only [Function.comp_apply, TensorProduct.mk_apply, z, Fin.cons_zero, Fin.cons_succ] at hg
     have hφ := congrArg (mapBaseChange k V κ) hg
 
-    simp only [map_add (f := _), map_sum, map_smul, map_zero, mapBaseChange_tmul, one_smul, map_D, ht₀,
-    Derivation.map_zero, smul_zero, zero_add] at hφ
+    simp only [map_add (f := _), map_sum, map_smul, map_zero, mapBaseChange_tmul, one_smul, map_D,
+        ht₀, smul_zero, zero_add]
+      at hφ
     have hs : ∀ i : Fin n, g i.succ = 0 :=
       Fintype.linearIndependent_iff.mp hdli (fun i => g i.succ) hφ
     simp only [hs, zero_smul, Finset.sum_const_zero, add_zero] at hg
@@ -116,14 +119,18 @@ theorem isFreeGen_dForm_uniformiser_cons : ∀ (k V : Type) [Field k] [CharZero 
       · exact absurd h (one_tmul_D_ne_zero k ht)
     intro i
     exact Fin.cases h0 hs i
-  have hsp := hli.span_eq_top_of_card_eq_finrank' (by
-    rw [Fintype.card_fin, Module.finrank_eq_card_basis (b₀.baseChange κ), Fintype.card_fin])
+  have hsp :=
+    hli.span_eq_top_of_card_eq_finrank' (by
+      rw [Fintype.card_fin, Module.finrank_eq_card_basis (b₀.baseChange κ), Fintype.card_fin])
   haveI : Module.Free V Ω[V⁄k] := Module.Free.of_basis b₀
   haveI : Module.Finite V Ω[V⁄k] := Module.Finite.of_basis b₀
   haveI : Module.FinitePresentation V Ω[V⁄k] := Module.finitePresentation_of_finite V _
-  obtain ⟨b, hb⟩ := Module.exists_basis_of_basis_baseChange (R := V) (fun i => D k V (z i)) hli hsp
-    (Module.Flat.rTensor_preserves_injective_linearMap (maximalIdeal V).subtype
-      Subtype.val_injective)
+  obtain ⟨b, hb⟩ :=
+    Module.exists_basis_of_basis_baseChange (R := V)
+      (fun i => D k V (z i))
+      hli hsp
+      (Module.Flat.rTensor_preserves_injective_linearMap (maximalIdeal V).subtype
+        Subtype.val_injective)
   exact isFreeGen_dForm z b hb
 
 end GlobalTheory

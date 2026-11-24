@@ -191,7 +191,6 @@ theorem swapHom_fst
   rfl
 
 open Formalism.IndefR.DatumF Sw in
-
 theorem dblS_of_dblT (H : TargetDoubling) : SourceDoubling := by
   intro F E _ _ _ _ _ σ B hB nS nT JS JT hS hT ξ₀ hξ hσξ hL χS χT cS cT rS rT ω hω JA JB ξ hA hBm κ
     _ co hrat om hom

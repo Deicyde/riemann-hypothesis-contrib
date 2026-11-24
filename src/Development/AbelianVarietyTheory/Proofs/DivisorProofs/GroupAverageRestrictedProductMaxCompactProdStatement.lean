@@ -56,7 +56,4 @@ theorem _root_.GlobalTheory.T.groupAverage_restrictedProduct_maxCompact_prod
             → avg (fun k : (⨅ v, (K v).comap (pf v) : Subgroup X) =>
                 ∏ᶠ v, u v ⟨pf v k, Subgroup.mem_iInf.1 k.2 v⟩)
               = ∏ᶠ v, avg (u v) := by
-  first
-  | exact @GlobalTheory.AvgRestr.avg_restr_prod
-  | exact GlobalTheory.AvgRestr.avg_restr_prod
-  | (intros; apply GlobalTheory.AvgRestr.avg_restr_prod <;> assumption)
+  first | exact @GlobalTheory.AvgRestr.avg_restr_prod

@@ -207,7 +207,4 @@ theorem main : ExpNegGlue := by
 
 end PositivityTheory.Rg.Rs.JExpNegGlue
 
-theorem PositivityTheory.Rg.Rs.expNegGlue_holds : PositivityTheory.Rg.Rs.ExpNegGlue :=
-  PositivityTheory.Rg.Rs.JExpNegGlue.main
-
 end

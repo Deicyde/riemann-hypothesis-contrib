@@ -78,7 +78,6 @@ theorem herm_smul_right (c : ℂ) (u w : EuclideanSpace ℂ ι)
   exact Finset.sum_congr rfl fun i _ => by ring
 
 theorem herm_conj (u w : EuclideanSpace ℂ ι) : (starRingEnd ℂ) (Hf u w) = Hf w u := by
-
   simp only [Hf, map_sum, map_mul, Complex.conj_conj]
   exact Finset.sum_congr rfl fun i _ => by ring
 

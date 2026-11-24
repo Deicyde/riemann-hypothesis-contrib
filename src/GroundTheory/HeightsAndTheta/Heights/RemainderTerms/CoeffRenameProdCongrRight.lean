@@ -108,7 +108,8 @@ theorem coeff_rho_antisym {R : Type*} [CommRing R] (P : MvPolynomial (Fin f × F
       = ∑ w, ((permSign f N w : ℤ) : R) * AddMonoidAlgebra.coeff P (stairExp f N w) := by
   rw [coeff_sum]
   refine Fintype.sum_equiv (Equiv.inv _) _ _ (fun w => ?_)
-  rw [MvPolynomial.coeff_smul, smul_eq_mul, coeff_rename_prodCongrRight, Equiv.inv_apply, permSign_inv]
+  rw [MvPolynomial.coeff_smul, smul_eq_mul, coeff_rename_prodCongrRight, Equiv.inv_apply,
+    permSign_inv]
   congr 2
 
 theorem blockVandermonde_eq_sum (f N : ℕ)

@@ -80,8 +80,7 @@ theorem sumBd_w_le_one
   have h2 := sumBdFsq_nonneg M.toBlocks₁₂
   have hN : 1 ≤ Complex.normSq (det M.toBlocks₂₂) := by linarith
   have hpos : 0 < Complex.normSq (det M.toBlocks₂₂) := by linarith
-  have hinv : (Complex.normSq (det M.toBlocks₂₂))⁻¹ ≤ 1 := by
-    first | exact inv_le_one_of_one_le₀ hN | exact inv_le_one hN
+  have hinv : (Complex.normSq (det M.toBlocks₂₂))⁻¹ ≤ 1 := by first | exact inv_le_one_of_one_le₀ hN
   exact ⟨Real.rpow_nonneg (inv_nonneg.2 hpos.le) _, Real.rpow_le_one (inv_nonneg.2 hpos.le) hinv hs⟩
 
 theorem sumBd_w_le_big

@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
 import Development.AbelianVarietyTheory.Definitions.Divisors.ToRingActOpOfRingAct
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -219,7 +220,7 @@ theorem zarhinBundle_kernel
       (mkZ c.A B (fun _ => 1) (fun j' => if j' = j then fst c.A T ≫ la else 1))
   rw [pull_zCls] at e
   simp only [mkZ_pa', mkZ_pb'] at e
-  simp only [← Category.assoc, mkZ_pa', mkZ_pb'] at e
+  simp only [← Category.assoc, mkZ_pb'] at e
   have t2
       : ∀ i,
         ∑ j', quat d j' i • evc hQ.isLB ((snd c.A T ≫ x) ≫ pa c.A B i)

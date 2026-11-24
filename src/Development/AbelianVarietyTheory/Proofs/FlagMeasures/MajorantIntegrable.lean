@@ -1,8 +1,9 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LayerProd
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarBallGrowthUnitaryJStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegrableExpNegMulOfSublevelGrowthStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarBallGrowthUnitaryJ
+public import Mathlib.MeasureTheory.Function.L1Space.Integrable
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegrableExpNegMulOfSublevelGrowth
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormPosOfIsUnit
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -90,10 +91,10 @@ theorem dOp_eq_zero {n : ℕ} (ε : Fin n → Bool) (h0 : rkR ε = 0) (g : UJ ε
     rcases hall with hf | ht
     · right
       ext i j
-      by_cases hij : i = j <;> simp [Jm, Matrix.diagonal_apply, Matrix.one_apply, hf, hij]
+      by_cases hij : i = j <;> simp [Jm, hf, hij]
     · left
       ext i j
-      by_cases hij : i = j <;> simp [Jm, Matrix.diagonal_apply, Matrix.one_apply, ht, hij]
+      by_cases hij : i = j <;> simp [Jm, Matrix.one_apply, ht, hij]
   have hg : inUJ ε (uMat g) := g.2
   have hu : uMat g ∈ Matrix.unitaryGroup (Fin n) ℂ := by
     rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
@@ -119,7 +120,7 @@ theorem majorant_integrable
           (fun g : UJ ε => decE (rkR ε) h (dOp (uMat g)) * Real.exp (s * dOp (uMat g)))
           (muG ε) := by
   intro n ε h s hh hcase
-  obtain ⟨C, -, hC⟩ := GlobalTheory.T.haar_ball_growth_unitaryJ n ε
+  obtain ⟨C, -, hC⟩ := _root_.GlobalTheory.BallVol.ballVol n ε
   have hcont : Continuous (fun g : UJ ε => dOp (uMat g)) :=
     (GlobalTheory.Count.Cartan.cartan_distances n ε).2.2.2.2
   have hmeas : Measurable (fun g : UJ ε => dOp (uMat g)) := hcont.measurable
@@ -134,7 +135,7 @@ theorem majorant_integrable
   by_cases hq : rkR ε = 0
   · have hz : ∀ g : UJ ε, dOp (uMat g) = 0 := fun g => dOp_eq_zero ε hq g
     have hI :=
-      GlobalTheory.T.integrable_exp_neg_mul_of_sublevel_le_exp (UJ ε) (muG ε)
+      _root_.GlobalTheory.integrable_exp_neg_mul_of_sublevel_growth (UJ ε) (muG ε)
         (fun g => dOp (uMat g))
         (4 * n * rkR ε) (4 * n * rkR ε + 1) C hmeas
         (fun g => by simp [hz g])
@@ -155,7 +156,7 @@ theorem majorant_integrable
         (lt_div_iff₀ (by linarith : (0 : ℝ) < 8 * Real.sqrt (rkR ε))).mpr (by linarith)
       linarith
     have hI :=
-      (GlobalTheory.T.integrable_exp_neg_mul_of_sublevel_le_exp (UJ ε) (muG ε)
+      (_root_.GlobalTheory.integrable_exp_neg_mul_of_sublevel_growth (UJ ε) (muG ε)
           (fun g => dOp (uMat g))
           (4 * n * rkR ε) (h / (8 * Real.sqrt (rkR ε)) - s) C hmeas hpos hC hab).const_mul
         (Real.exp (h / 8))

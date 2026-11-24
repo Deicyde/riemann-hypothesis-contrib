@@ -78,8 +78,8 @@ theorem subframe_map_posSemidef {A : Matrix (Fin g) (Fin g) ℝ} (h : A.PosSemid
     simp only [dotProduct, mulVec, Complex.re_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [Pi.star_apply, Matrix.map_apply, Complex.mul_re, Complex.re_sum, Complex.im_sum,
-      Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.re_ofReal_mul,
-      Complex.im_ofReal_mul, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+      Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.im_ofReal_mul, Complex.ofReal_re,
+      Complex.ofReal_im, zero_mul, sub_zero]
     ring
   have him := hH.im_star_dotProduct_mulVec_self x
   rw [RCLike.im_to_complex] at him
@@ -107,7 +107,7 @@ theorem subframe_inv_bounds
           = t • (1 : Matrix (Fin g) (Fin g) ℂ) := by
     intro t
     ext i j
-    by_cases hij : i = j <;> simp [Matrix.one_apply, hij, Complex.real_smul]
+    by_cases hij : i = j <;> simp [hij, Complex.real_smul]
   have hc1 : (c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosDef := Matrix.PosDef.one.smul hc
   have hle1 : c • (1 : Matrix (Fin g) (Fin g) ℝ) ≤ Y := Matrix.le_iff.mpr h1
   have hle2 : Y ≤ D • (1 : Matrix (Fin g) (Fin g) ℝ) := Matrix.le_iff.mpr h2
@@ -156,7 +156,8 @@ theorem subframe_gram_posDef (F : Matrix (Fin g) (Fin k) ℂ) (h : F.rank = k)
   have hr : (F.map star).rank = k := by
     have he : F.map star = (Fᴴ)ᵀ := by ext i j; simp [Matrix.conjTranspose_apply]
     rw [he, Matrix.rank_transpose, Matrix.rank_conjTranspose, h]
-  have hr' : Module.finrank ℂ (LinearMap.range (F.map star).mulVecLin) = k := by simpa only [Matrix.finrank_range_mulVecLin] using hr
+  have hr' : Module.finrank ℂ (LinearMap.range (F.map star).mulVecLin) = k := by
+    simpa only [Matrix.finrank_range_mulVecLin] using hr
   have hsum := LinearMap.finrank_range_add_finrank_ker (F.map star).mulVecLin
   rw [Module.finrank_fin_fun, hr'] at hsum
   have hker0 : Module.finrank ℂ (LinearMap.ker (F.map star).mulVecLin) = 0 := by omega

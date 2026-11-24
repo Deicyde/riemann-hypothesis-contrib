@@ -51,6 +51,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.rowEigensystem_carried_by_finite_type
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -70,7 +71,4 @@ theorem _root_.GlobalTheory.T.rowEigensystem_carried_by_finite_type
                   ∧ A3.heckeLI j t k = A3.heckeLI j t (k.1, y))
         → R.PGEquiv F → Nonempty A3.fam3.base3.Ix
         → (∀ c, R.EEc c ≠ ⊥ → ∃ p, R.Carries p c) := by
-  first
-  | exact @GlobalTheory.Div.carries_of_eEc_ne_bot
-  | exact GlobalTheory.Div.carries_of_eEc_ne_bot
-  | (intros; apply GlobalTheory.Div.carries_of_eEc_ne_bot <;> assumption)
+  first | exact @GlobalTheory.Div.carries_of_eEc_ne_bot

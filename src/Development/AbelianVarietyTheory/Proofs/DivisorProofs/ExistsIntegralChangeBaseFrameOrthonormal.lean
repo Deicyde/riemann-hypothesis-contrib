@@ -114,7 +114,6 @@ theorem exists_coeff
     have : y ∈ Submodule.span ℤ (Set.range x) := hx ▸ Submodule.mem_top
     obtain ⟨n, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 this
     have e : ((∑ j, n j • x j : 𝓞 E) : E) = ∑ j, n j • (x j : E) := by
-
       rw [RingOfIntegers.coe_eq_algebraMap, map_sum]
       exact Finset.sum_congr rfl fun j _ => map_zsmul _ _ _
 

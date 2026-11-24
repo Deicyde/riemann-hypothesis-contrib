@@ -44,6 +44,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
   Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.couplingCosetInFrames_shape_at_bad_prime
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.couplingCosetInFrames_shape_at_bad_prime
                         → CongE P.1 ((I.cst a).D P) g g'
                         → GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P (g z) z
                         → ∀ z', g' z' ∈ cosetIn p P ↔ z' ∈ cosetIn p P) := by
-  first
-  | exact @GlobalTheory.Mem.Col2.AdT.CosShape.cosShape
-  | exact GlobalTheory.Mem.Col2.AdT.CosShape.cosShape
-  | (intros; apply GlobalTheory.Mem.Col2.AdT.CosShape.cosShape <;> assumption)
+  first | exact @GlobalTheory.Mem.Col2.AdT.CosShape.cosShape

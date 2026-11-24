@@ -109,8 +109,7 @@ theorem hw_rhoC_allPos (k : ℕ) (a : Fin k)
 
 theorem weyl_dimension_formula_unitary
     : Formalism.MainNotions.LocalBesselAndTopKernel.AdmittedWeylDimension := by
-  intro k' u H _ _ π _ hT
-  obtain ⟨_, _, hU, hK⟩ := hT
+  rintro k' u H _ _ π _ ⟨_, _, hU, hK⟩
   have hUK : Formalism.MainNotions.S.IsURepOn
       (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k')) π :=
     hw_isURepOn_mono (hw_kset_subset _) hU

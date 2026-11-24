@@ -77,7 +77,6 @@ theorem ext_frame_of_quotient_kernel
   have hTP : ∀ i j, T i (Fin.castAdd q j) = P i j := by
     intro i
     have e : ∑ j, T i (Fin.castAdd q j) • v j = ∑ j, P i j • v j := by
-
       rw [← hπh i, ← hT i, map_sum, Fin.sum_univ_add]
       simp [hπ1, hπ2]
     have e2 : ∑ j, (T i (Fin.castAdd q j) - P i j) • v j = 0 := by
@@ -141,7 +140,6 @@ theorem ext_frame_of_quotient_kernel
       have hdiff : y - ∑ i, r i • h i ∈ H := H.sub_mem hy hsumH
       have hπd : π (y - ∑ i, r i • h i) = 0 := by
         have e : π (∑ i, r i • h i) = ∑ i, r i • ∑ j, P i j • v j := by
-
           rw [map_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [← hπh i, Subring.smul_def, Subring.smul_def, map_smul]

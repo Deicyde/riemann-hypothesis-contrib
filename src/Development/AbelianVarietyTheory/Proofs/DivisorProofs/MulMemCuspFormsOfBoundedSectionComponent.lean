@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FlagComponentFramedPointFrame
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsUnramPtsDefinite
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSecReadingDecreasingIntegerExponentsStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSecReadingDecreasingIntegerExponents
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,8 +65,8 @@ theorem mul_mem_cuspOn_of_bdd
   intro E _ _ _ H Dw l Xo c r U x Z G₀ s hK hU hpq h0 hdec hs hZ hb G hG f hf
   exact mul_mem_cuspOn_of_isSec h0 hs hZ
     (fun σ hσ k =>
-      GlobalTheory.T.isSec_reading_decreasing_integer_exponents E H Dw l Xo c σ r (U σ) hK hσ
-        (hU σ hσ) hpq G₀ h0 hdec s hs k)
+      _root_.GlobalTheory.FlatTw.Hol.isSec_modelWt_rdU E H Dw l Xo c σ r (U σ) hK hσ (hU σ hσ) hpq
+        G₀ h0 hdec s hs k)
     hb hG hf
 
 end GlobalTheory.BddCusp

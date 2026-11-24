@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
   GlobalTheory.SeeSaw GlobalTheory.FinPl
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.heisenbergCombination_disjoint_places_commute_vacua
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -76,7 +77,4 @@ theorem _root_.GlobalTheory.T.heisenbergCombination_disjoint_places_commute_vacu
                 IsSelfDualC S LS → IsSelfDualC T LT
                   → (Vac ψ S T LS LT (fun p => P p ∨ P' p) f
                     ↔ Vac ψ S T LS LT P f ∧ Vac ψ S T LS LT P' f) := by
-  first
-  | exact @GlobalTheory.DisjComb.main
-  | exact GlobalTheory.DisjComb.main
-  | (intros; apply GlobalTheory.DisjComb.main <;> assumption)
+  first | exact @GlobalTheory.DisjComb.main

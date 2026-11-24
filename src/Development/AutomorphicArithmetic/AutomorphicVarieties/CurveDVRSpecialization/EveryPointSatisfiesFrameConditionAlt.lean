@@ -52,10 +52,9 @@ private theorem chi_map_ofRep
   rw [← Matrix.charpoly_map]
   simp only [GDet.chi, GDet.map, GDet.ofRep]
   rw [Matrix.charpoly]
-  simp only [MonoidHom.comp_apply, MonoidHom.coe_coe, Matrix.coe_detMonoidHom]
+  simp only [MonoidHom.comp_apply, Matrix.coe_detMonoidHom]
   congr 1
-  simp only [MonoidAlgebra.mapRingHom_single, map_one, GDet.repAlg, AlgHom.toRingHom_eq_coe,
-    RingHom.coe_coe, map_sub, MonoidAlgebra.lift_single]
+  simp only [MonoidAlgebra.mapRingHom_single, map_one, GDet.repAlg, AlgHom.toRingHom_eq_coe]
   refine Matrix.ext fun i k => ?_
   simp [Matrix.charmatrix_apply, Matrix.one_apply, Matrix.smul_apply]
   rw [Matrix.diagonal_apply]
@@ -180,7 +179,7 @@ private theorem absolute_irreducible_rank_four
     show algebraMap (ResidueField O) y.K (algebraMap O (ResidueField O) z) =
       PowerSeries.constantCoeff (algebraMap O y.A z)
     rw [← IsScalarTower.algebraMap_apply]
-    first | rfl | simp [PowerSeries.algebraMap_apply']
+    first | rfl
   · have hred := congrArg (fun D => GDet.chi D (MonoidAlgebra.single g 1)) y.red
     simp only [Resid.Dbar, chi_map_ofRep] at hred
     rw [hred]

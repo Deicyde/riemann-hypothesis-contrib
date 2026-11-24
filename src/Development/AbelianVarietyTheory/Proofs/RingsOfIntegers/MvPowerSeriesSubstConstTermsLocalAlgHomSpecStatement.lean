@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.mvPowerSeriesSubstConstTerms_local_algHom_spec
     : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
         [IsAdicComplete (maximalIdeal V) V] [CharZero V] (σ τ ρ : Type) [Finite σ] [Finite τ]
@@ -62,7 +64,4 @@ theorem _root_.GlobalTheory.T.mvPowerSeriesSubstConstTerms_local_algHom_spec
           ∧ ∀ b : τ → MvPowerSeries ρ V,
             (∀ j, MvPowerSeries.constantCoeff (b j) ∈ maximalIdeal V)
               → ∀ f, evC b (evC a f) = evC (fun j => evC b (a j)) f := by
-  first
-  | exact @GlobalTheory.PlaceInt.evC_spec
-  | exact GlobalTheory.PlaceInt.evC_spec
-  | (intros; apply GlobalTheory.PlaceInt.evC_spec <;> assumption)
+  first | exact @GlobalTheory.PlaceInt.evC_spec

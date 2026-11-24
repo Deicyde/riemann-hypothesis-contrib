@@ -69,20 +69,19 @@ variable {K}
 
 theorem isUnit_unit_add {η : 𝒪[K]ˣ} {x : 𝒪[K]} (hx : x ∈ 𝓂[K]) : IsUnit ((η : 𝒪[K]) + x) := by
   have h1 : IsUnit (1 + (η⁻¹ : 𝒪[K]ˣ) * x) := by
-    simpa using isUnit_one_sub_self_of_mem_nonunits (-(((η⁻¹ : 𝒪[K]ˣ) : 𝒪[K]) * x))
-      ((IsLocalRing.mem_maximalIdeal _).mp (neg_mem (Ideal.mul_mem_left _ _ hx)))
+    simpa using
+      isUnit_one_sub_self_of_mem_nonunits (-(((η⁻¹ : 𝒪[K]ˣ) : 𝒪[K]) * x))
+        ((IsLocalRing.mem_maximalIdeal _).mp (neg_mem (Ideal.mul_mem_left _ _ hx)))
   have : (η : 𝒪[K]) + x = η * (1 + (η⁻¹ : 𝒪[K]ˣ) * x) := by
     rw [mul_add, mul_one, ← mul_assoc, Units.mul_inv, one_mul]
   rw [this]
   exact η.isUnit.mul h1
 
-theorem exists_root_of_dvd {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) (f : 𝒪[K][X]) (a : 𝒪[K]) (k : ℕ)
-    (ε : 𝒪[K]ˣ) (hd : f.derivative.eval a = ϖ ^ k * ε) (hf : ϖ ^ (2 * k + 1) ∣ f.eval a) :
-    ∃ b, f.eval b = 0 ∧ ϖ ^ (k + 1) ∣ b - a :=
-  _root_.UpperTheory.Reformulated.B.AdicCompleteRootExistence.exists_root_of_dvd hϖ f a k ε hd hf
+alias exists_root_of_dvd := _root_.UpperTheory.Reformulated.B.AdicCompleteRootExistence.exists_root_of_dvd
 
-theorem eq_one_of_pow_eq_one {m : ℕ} (hm : (m : 𝓀[K]) ≠ 0) {u : 𝒪[K]ˣ}
-    (hu : u ∈ unitFiltration K 1) (h : u ^ m = 1) : u = 1 := by
+theorem eq_one_of_pow_eq_one
+    {m : ℕ} (hm : (m : 𝓀[K]) ≠ 0) {u : 𝒪[K]ˣ} (hu : u ∈ unitFiltration K 1) (h : u ^ m = 1)
+    : u = 1 := by
   have hres : residue 𝒪[K] (u : 𝒪[K]) = 1 := by
     have := (residue_eq_zero_iff _).mpr (by have := mem_unitFiltration.mp hu; rwa [pow_one] at this)
     rwa [map_sub, map_one, sub_eq_zero] at this
@@ -111,54 +110,60 @@ theorem natCast_card_residueField_sub_one_ne_zero : ((Nat.card 𝓀[K] - 1 : ℕ
 
 variable {K}
 
-theorem exists_teichmuller_lift (ζ : 𝓀[K]ˣ) :
-    ∃ u : 𝒪[K]ˣ, u ^ (Nat.card 𝓀[K] - 1) = 1 ∧ unitsToResidue K u = ζ := by
+theorem exists_teichmuller_lift (ζ : 𝓀[K]ˣ)
+    : ∃ u : 𝒪[K]ˣ, u ^ (Nat.card 𝓀[K] - 1) = 1 ∧ unitsToResidue K u = ζ := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[K]
   set n := Nat.card 𝓀[K] - 1 with hn
   have hn0 : n ≠ 0 := by have := one_lt_card_residueField K; omega
   obtain ⟨a, ha⟩ := residue_surjective (ζ : 𝓀[K])
-  have hζ : ζ ^ n = 1 := by
-    rw [hn, ← Nat.card_units]; exact pow_card_eq_one'
+  have hζ : ζ ^ n = 1 := by rw [hn, ← Nat.card_units]; exact pow_card_eq_one'
   set f : 𝒪[K][X] := X ^ n - 1
   have hfa : f.eval a ∈ 𝓂[K] := by
     rw [← residue_eq_zero_iff]
     simp [f, ha, ← Units.val_pow_eq_pow_val, hζ]
   have hd : IsUnit (f.derivative.eval a) := by
     rw [← residue_ne_zero_iff_isUnit]
-    simp only [f, derivative_sub, derivative_X_pow, derivative_one, sub_zero, eval_mul,
-      eval_pow, eval_X, eval_natCast, map_mul, map_natCast, map_pow, ha]
+    simp only [f, derivative_sub, derivative_X_pow, derivative_one, sub_zero, eval_mul, eval_pow,
+      eval_X, eval_natCast, map_mul, map_natCast, map_pow, ha]
     exact mul_ne_zero (natCast_card_residueField_sub_one_ne_zero K) (pow_ne_zero _ ζ.ne_zero)
-  obtain ⟨b, hb, hba⟩ := exists_root_of_dvd hϖ f a 0 hd.unit (by simp)
-    (by simpa using (mem_maximalIdeal_iff_dvd hϖ).mp hfa)
+  obtain ⟨b, hb, hba⟩ :=
+    exists_root_of_dvd hϖ f a 0 hd.unit (by simp)
+      (by simpa using (mem_maximalIdeal_iff_dvd hϖ).mp hfa)
   have hbn : b ^ n = 1 := by simpa [f, sub_eq_zero] using hb
   have hbu : IsUnit b := (isUnit_pow_iff hn0).mp (hbn ▸ isUnit_one)
   refine ⟨hbu.unit, ?_, ?_⟩
   · ext; simp [hbn]
   · ext
-    rw [coe_unitsToResidue, IsUnit.unit_spec, ← ha, ← sub_eq_zero, ← map_sub,
-      residue_eq_zero_iff, mem_maximalIdeal_iff_dvd hϖ]
+    rw [coe_unitsToResidue, IsUnit.unit_spec, ← ha, ← sub_eq_zero, ← map_sub, residue_eq_zero_iff,
+      mem_maximalIdeal_iff_dvd hϖ]
     simpa using hba
 
-theorem eq_of_pow_card_sub_one {u w : 𝒪[K]ˣ} (hu : u ^ (Nat.card 𝓀[K] - 1) = 1)
-    (hw : w ^ (Nat.card 𝓀[K] - 1) = 1) (h : unitsToResidue K u = unitsToResidue K w) :
-    u = w := by
+theorem eq_of_pow_card_sub_one
+    {u w : 𝒪[K]ˣ} (hu : u ^ (Nat.card 𝓀[K] - 1) = 1) (hw : w ^ (Nat.card 𝓀[K] - 1) = 1)
+    (h : unitsToResidue K u = unitsToResidue K w)
+    : u = w := by
   have hmem : u * w⁻¹ ∈ unitFiltration K 1 := by
     rw [← ker_unitsToResidue, MonoidHom.mem_ker, map_mul, map_inv, h, mul_inv_cancel]
-  have := eq_one_of_pow_eq_one (natCast_card_residueField_sub_one_ne_zero K) hmem
-    (by rw [mul_pow, inv_pow, hu, hw, inv_one, mul_one])
+  have :=
+    eq_one_of_pow_eq_one (natCast_card_residueField_sub_one_ne_zero K) hmem
+      (by rw [mul_pow, inv_pow, hu, hw, inv_one, mul_one])
   rwa [mul_inv_eq_one] at this
 
 variable (K)
 
 noncomputable def teichmuller : 𝓀[K]ˣ →* 𝒪[K]ˣ where
   toFun ζ := (exists_teichmuller_lift ζ).choose
-  map_one' := eq_of_pow_card_sub_one (exists_teichmuller_lift 1).choose_spec.1 (one_pow _)
-    (by rw [(exists_teichmuller_lift 1).choose_spec.2, map_one])
-  map_mul' ζ η := eq_of_pow_card_sub_one (exists_teichmuller_lift (ζ * η)).choose_spec.1
-    (by rw [mul_pow, (exists_teichmuller_lift ζ).choose_spec.1,
-      (exists_teichmuller_lift η).choose_spec.1, one_mul])
-    (by rw [(exists_teichmuller_lift (ζ * η)).choose_spec.2, map_mul,
-      (exists_teichmuller_lift ζ).choose_spec.2, (exists_teichmuller_lift η).choose_spec.2])
+  map_one' :=
+    eq_of_pow_card_sub_one (exists_teichmuller_lift 1).choose_spec.1 (one_pow _)
+      (by rw [(exists_teichmuller_lift 1).choose_spec.2, map_one])
+  map_mul' ζ η :=
+    eq_of_pow_card_sub_one (exists_teichmuller_lift (ζ * η)).choose_spec.1
+      (by
+        rw [mul_pow, (exists_teichmuller_lift ζ).choose_spec.1,
+          (exists_teichmuller_lift η).choose_spec.1, one_mul])
+      (by
+        rw [(exists_teichmuller_lift (ζ * η)).choose_spec.2, map_mul,
+          (exists_teichmuller_lift ζ).choose_spec.2, (exists_teichmuller_lift η).choose_spec.2])
 
 variable {K}
 
@@ -166,12 +171,11 @@ variable {K}
 theorem unitsToResidue_teichmuller (ζ : 𝓀[K]ˣ) : unitsToResidue K (teichmuller K ζ) = ζ :=
   (exists_teichmuller_lift ζ).choose_spec.2
 
-theorem teichmuller_pow_card_sub_one (ζ : 𝓀[K]ˣ) :
-    teichmuller K ζ ^ (Nat.card 𝓀[K] - 1) = 1 :=
+theorem teichmuller_pow_card_sub_one (ζ : 𝓀[K]ˣ) : teichmuller K ζ ^ (Nat.card 𝓀[K] - 1) = 1 :=
   (exists_teichmuller_lift ζ).choose_spec.1
 
-theorem unitsMulInvTeichmuller_mem (u : 𝒪[K]ˣ) :
-    u * (teichmuller K (unitsToResidue K u))⁻¹ ∈ unitFiltration K 1 := by
+theorem unitsMulInvTeichmuller_mem (u : 𝒪[K]ˣ)
+    : u * (teichmuller K (unitsToResidue K u))⁻¹ ∈ unitFiltration K 1 := by
   rw [← ker_unitsToResidue, MonoidHom.mem_ker, map_mul, map_inv, unitsToResidue_teichmuller,
     mul_inv_cancel]
 
@@ -181,26 +185,30 @@ end Teichmuller
 
 section Powers
 
-theorem exists_pow_eq_of_mem {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) {m k : ℕ} (hm : m ≠ 0)
-    {ε : 𝒪[K]ˣ} (hmk : (m : 𝒪[K]) = ϖ ^ k * ε) {w : 𝒪[K]ˣ}
-    (hw : w ∈ unitFiltration K (2 * k + 1)) : ∃ x : 𝒪[K]ˣ, x ^ m = w := by
+theorem exists_pow_eq_of_mem
+    {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ)
+    {m k : ℕ} (hm : m ≠ 0)
+    {ε : 𝒪[K]ˣ} (hmk : (m : 𝒪[K]) = ϖ ^ k * ε)
+    {w : 𝒪[K]ˣ} (hw : w ∈ unitFiltration K (2 * k + 1))
+    : ∃ x : 𝒪[K]ˣ, x ^ m = w := by
   set f : 𝒪[K][X] := X ^ m - C (w : 𝒪[K])
-  obtain ⟨b, hb, -⟩ := exists_root_of_dvd hϖ f 1 k ε
-    (by
-      simp only [f, derivative_sub, derivative_C, sub_zero, derivative_X_pow, eval_mul,
-        eval_C, eval_pow, eval_X, one_pow, mul_one]
-      exact hmk)
-    (by
-      have := (mem_maximalIdeal_pow_iff hϖ).mp (mem_unitFiltration.mp hw)
-      have e : f.eval 1 = -((w : 𝒪[K]) - 1) := by simp [f]
-      rw [e, dvd_neg]
-      exact this)
+  obtain ⟨b, hb, -⟩ :=
+    exists_root_of_dvd hϖ f 1 k ε
+      (by
+        simp only [f, derivative_sub, derivative_C, sub_zero, derivative_X_pow, eval_mul, eval_C,
+          eval_pow, eval_X, one_pow, mul_one]
+        exact hmk)
+      (by
+        have := (mem_maximalIdeal_pow_iff hϖ).mp (mem_unitFiltration.mp hw)
+        have e : f.eval 1 = -((w : 𝒪[K]) - 1) := by simp [f]
+        rw [e, dvd_neg]
+        exact this)
   have hbm : b ^ m = w := by simpa [f, sub_eq_zero] using hb
   have hbu : IsUnit b := (isUnit_pow_iff hm).mp (hbm ▸ w.isUnit)
   exact ⟨hbu.unit, by ext; simp [hbm]⟩
 
-theorem exists_unitFiltration_le_range_pow {m : ℕ} (hm : (m : K) ≠ 0) :
-    ∃ N, unitFiltration K N ≤ (powMonoidHom m : 𝒪[K]ˣ →* 𝒪[K]ˣ).range := by
+theorem exists_unitFiltration_le_range_pow {m : ℕ} (hm : (m : K) ≠ 0)
+    : ∃ N, unitFiltration K N ≤ (powMonoidHom m : 𝒪[K]ˣ →* 𝒪[K]ˣ).range := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[K]
   have hm' : (m : 𝒪[K]) ≠ 0 := fun h ↦ hm (by have := congrArg Subtype.val h; simpa using this)
   have hm0 : m ≠ 0 := by rintro rfl; simp at hm
@@ -209,8 +217,8 @@ theorem exists_unitFiltration_le_range_pow {m : ℕ} (hm : (m : K) ≠ 0) :
   obtain ⟨x, hx⟩ := exists_pow_eq_of_mem hϖ hm0 (ε := ε) (by rw [hk, mul_comm]) hw
   exact ⟨x, hx⟩
 
-theorem finite_quotient_range_pow {m : ℕ} (hm : (m : K) ≠ 0) :
-    Finite (Kˣ ⧸ (powMonoidHom m : Kˣ →* Kˣ).range) := by
+theorem finite_quotient_range_pow {m : ℕ} (hm : (m : K) ≠ 0)
+    : Finite (Kˣ ⧸ (powMonoidHom m : Kˣ →* Kˣ).range) := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[K]
   obtain ⟨N, hN⟩ := exists_unitFiltration_le_range_pow hm
   have hm0 : m ≠ 0 := by rintro rfl; simp at hm
@@ -224,8 +232,8 @@ theorem finite_quotient_range_pow {m : ℕ} (hm : (m : K) ≠ 0) :
     exact ⟨unitsIncl K x, by simp⟩
   set ψ' := QuotientGroup.lift _ ψ hle
   set π := uniformizerUnit hϖ
-  let g : Fin m × (𝒪[K]ˣ ⧸ unitFiltration K N) → Kˣ ⧸ H :=
-    fun p ↦ (QuotientGroup.mk π : Kˣ ⧸ H) ^ (p.1 : ℕ) * ψ' p.2
+  let g : Fin m × (𝒪[K]ˣ ⧸ unitFiltration K N) → Kˣ ⧸ H := fun p ↦
+    (QuotientGroup.mk π : Kˣ ⧸ H) ^ (p.1 : ℕ) * ψ' p.2
   refine Finite.of_surjective g ?_
   intro y
   obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective y
@@ -251,8 +259,8 @@ theorem finite_quotient_range_pow {m : ℕ} (hm : (m : K) ≠ 0) :
   refine ⟨π ^ q, ?_⟩
   rw [powMonoidHom_apply, mul_right_comm (π ^ r.toNat), inv_mul_cancel_left]
 
-theorem finite_quotient_range_pow_of_charZero [CharZero K] {m : ℕ} (hm : m ≠ 0) :
-    Finite (Kˣ ⧸ (powMonoidHom m : Kˣ →* Kˣ).range) :=
+theorem finite_quotient_range_pow_of_charZero [CharZero K] {m : ℕ} (hm : m ≠ 0)
+    : Finite (Kˣ ⧸ (powMonoidHom m : Kˣ →* Kˣ).range) :=
   finite_quotient_range_pow (Nat.cast_ne_zero.mpr hm)
 
 end Powers

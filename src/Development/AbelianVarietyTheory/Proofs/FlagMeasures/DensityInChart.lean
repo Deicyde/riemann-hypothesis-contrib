@@ -3,7 +3,7 @@ module
 public import Formalism.PeriodIntegrals.QuotInv
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.UpperOff
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ClosedMatrixSubgroupTheorem
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniqueHaarDensityAtIdentityStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniqueHaarDensityAtIdentity
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDensityOriginOfAlmostHomogeneous
 import Mathlib.Algebra.Order.Archimedean.Real.Hom
 import Mathlib.Algebra.Order.Floor.Extended
@@ -558,7 +558,7 @@ theorem density_in_chart
               (𝓝[>] 0) (𝓝 c) := by
   intro m S μ c hS hμ hc E _ _ Φ L hΦ0 hΦS hD
   obtain ⟨hlie, hnb⟩ := GlobalTheory.ClosedMatGroup.closed_subgroup m S hS
-  obtain ⟨c₀, -, -, hu⟩ := GlobalTheory.T.exists_unique_haarDensity_at_identity m S μ hS hμ
+  obtain ⟨c₀, -, -, hu⟩ := _root_.GlobalTheory.MatHaarDensity.exists_hasDens m S μ hS hμ
   have hct : c ≠ ⊤ := by rw [hu c hc]; exact ENNReal.ofReal_ne_top
   haveI : FiniteDimensional ℝ E := L.symm.toLinearEquiv.finiteDimensional
   haveI : CompleteSpace E := FiniteDimensional.complete ℝ E

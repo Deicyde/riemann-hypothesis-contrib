@@ -116,8 +116,8 @@ theorem mem_rB_pull
   rw [preimage_inf] at e
   subst e
   have hff :=
-    GlobalTheory.T.finiteEtale_functionField_integralClosure_differentials Z Y p p' c hc
-      inferInstance inferInstance d hK hL hg
+    _root_.GlobalTheory.W1.SchFF.finiteEtale_functionField Z Y p p' c hc inferInstance inferInstance
+      d hK hL hg
   obtain ⟨hi1, -, hi3, -⟩ :=
     hff.2 (I.inf U) (hU.ne I) hV' (rB ℂ Z.functionField x I) (ringOn p' hL _ hV') (hU.affine I hI)
       (fun y => hU.ring I hI y)
@@ -140,8 +140,8 @@ theorem isFinCover_pull
     : IsFinCover ℂ Y.functionField x
       ∧ IsAffCover p' (fun i => c ⁻¹ᵁ U i) (rB ℂ Y.functionField x) := by
   have hff :=
-    GlobalTheory.T.finiteEtale_functionField_integralClosure_differentials Z Y p p' c hc
-      inferInstance inferInstance d hK hL hg
+    _root_.GlobalTheory.W1.SchFF.finiteEtale_functionField Z Y p p' c hc inferInstance inferInstance
+      d hK hL hg
   have hgen : ∀ i, genericPoint Y ∈ c ⁻¹ᵁ U i := fun i => by
     change c (genericPoint Y) ∈ U i
     rw [generic_map c]

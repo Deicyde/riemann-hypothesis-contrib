@@ -52,7 +52,6 @@ open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 private theorem locU_congr
     {L : Type} [Field L] [NumberField L] [IsCMField L]
     {n : ℕ} {w u : Plc L} (h : u.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L)))

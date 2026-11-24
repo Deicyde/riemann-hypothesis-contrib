@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.H90RangeEqNormOneOfIsQuad
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdeleCharacterTrivialOnLocalUnits
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemKDSupUnitIdlIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RelativeLatticeDeterminantClassLawsStatement
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsRationalUnitaryDeterminantMapRationalUnitaryTo
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RelativeLatticeDeterminantClassLaws
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TildeCharacterOnUnitary
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FiniteAdeleStrongApproximationModNat
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IntegralFiniteAdeleCompleteSeparated
@@ -150,11 +151,11 @@ def trueDtPackQ (C : HFrame H e) : DtPack H :=
     relDet_mul := fun N L L' L'' =>
       (toDtTMod_bijective H SQ).1 (by
         rw [map_mul, toDtTMod_relDetQ, toDtTMod_relDetQ, toDtTMod_relDetQ]
-        exact (GlobalTheory.T.relativeLatticeDeterminantClass_laws R H N).2.1 L L' L'')
+        exact (_root_.GlobalTheory.Mem.Chr.relDetT_laws R H N).2.1 L L' L'')
     relDet_smul := fun N L L' γ h =>
       (toDtTMod_bijective H SQ).1 (by
         rw [toDtTMod_relDetQ, toDtTMod_mk, toDtT_e1Q]
-        exact (GlobalTheory.T.relativeLatticeDeterminantClass_laws R H N).2.2 L L' γ h)
+        exact (_root_.GlobalTheory.Mem.Chr.relDetT_laws R H N).2.2 L L' γ h)
   }
 
 theorem trueDtPackQ_relDet (C : HFrame H e)

@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
+
 theorem _root_.GlobalTheory.T.uniformisation_endomorphisms_to_complete_dvr
     : LL
       → AllU fun {R} _ _ {I} {D} {A} {G} _ _ U =>
@@ -80,7 +81,4 @@ theorem _root_.GlobalTheory.T.uniformisation_endomorphisms_to_complete_dvr
                         → ∀ g₁ g₂ g₁' g₂',
                           IsPullGtF φ hD F g₁ g₁' → IsPullGtF φ hD F g₂ g₂'
                             → (E.Act g₁ g₂ ↔ E'.Act g₁' g₂') := by
-  first
-  | exact @GlobalTheory.UT.EndBaseChange.main
-  | exact GlobalTheory.UT.EndBaseChange.main
-  | (intros; apply GlobalTheory.UT.EndBaseChange.main <;> assumption)
+  first | exact @GlobalTheory.UT.EndBaseChange.main

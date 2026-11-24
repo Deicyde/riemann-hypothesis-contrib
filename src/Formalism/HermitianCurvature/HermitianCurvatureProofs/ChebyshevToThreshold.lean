@@ -53,24 +53,30 @@ open scoped ComplexConjugate
 
 namespace Formalism.FourierDecayAlt.P.Jx10
 
-theorem pull {α X : Type} [DecidableEq X] (η : α → X) (F : Finset α) (k : X → X → ℂ)
-    (h : A5.IsPSD (F.image η) k) : A5.IsPSD F (fun x y => k (η x) (η y)) := by
+theorem pull
+    {α X : Type} [DecidableEq X]
+    (η : α → X) (F : Finset α) (k : X → X → ℂ) (h : A5.IsPSD (F.image η) k)
+    : A5.IsPSD F (fun x y => k (η x) (η y)) := by
   apply Formalism.FourierDecayAlt.P.Jx9.pull <;> assumption
 
-theorem inter_of_module (E : Type) [Field E] [NumberField E] [IsCMField E] (L : Submodule ℤ E)
-    (hL : ∀ (a : 𝓞 (maximalRealSubfield E)) (t : E), t ∈ L →
-      algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L) (t : E)
-    (h : ∀ P : Ideal (𝓞 (maximalRealSubfield E)), P.IsMaximal → t ∈ S6.locAt E P L) : t ∈ L := by
+theorem inter_of_module
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (L : Submodule ℤ E)
+    (hL : ∀ (a : 𝓞 (maximalRealSubfield E)) (t : E),
+      t ∈ L → algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L)
+    (t : E) (h : ∀ P : Ideal (𝓞 (maximalRealSubfield E)), P.IsMaximal → t ∈ S6.locAt E P L)
+    : t ∈ L := by
   by_contra ht
-  let I : Ideal (𝓞 (maximalRealSubfield E)) :=
-    { carrier := {a | algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, map_add (f := _), add_mul] at ha hb ⊢
-        exact L.add_mem ha hb
-      zero_mem' := by simp
-      smul_mem' := fun c {a} ha => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul, mul_assoc] at ha ⊢
-        exact hL c _ ha }
+  let I : Ideal (𝓞 (maximalRealSubfield E)) := {
+    carrier := {a | algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, map_add (f := _), add_mul] at ha hb ⊢
+      exact L.add_mem ha hb
+    zero_mem' := by simp
+    smul_mem' := fun c {a} ha => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul, mul_assoc] at ha ⊢
+      exact hL c _ ha
+  }
   have hI : I ≠ ⊤ := by
     intro hI
     apply ht
@@ -86,7 +92,6 @@ theorem inter_of_module (E : Type) [Field E] [NumberField E] [IsCMField E] (L : 
 end Formalism.FourierDecayAlt.P.Jx10
 
 namespace Formalism.FourierDecayAlt.P
-
 
 open Classical in
 theorem local_kernel_psd : Formalism.FourierDecayAlt.J.LocalKernelPSD := by
@@ -126,9 +131,10 @@ theorem pull_lattice_typed : Formalism.FourierDecayAlt.J.PullLatticeTyped := by
   rw [hT E g ν s hg hpd P hP hgP K o σ hσ t]
   show (u : K × K) * (σ.prod (σ.comp (IsCMField.complexConj E).toAlgHom.toRingHom)) t ∈ R ↔ _
   rw [hR, hu]
-  have e : (((g : K)⁻¹, (-1) ^ s * (g : K)⁻¹) : K × K) *
-      (σ.prod (σ.comp (IsCMField.complexConj E).toAlgHom.toRingHom)) t =
-      (σ t / (g : K), (-1) ^ s * σ (IsCMField.complexConj E t) / (g : K)) := by
+  have e
+      : (((g : K)⁻¹, (-1) ^ s * (g : K)⁻¹) : K × K)
+          * (σ.prod (σ.comp (IsCMField.complexConj E).toAlgHom.toRingHom)) t
+        = (σ t / (g : K), (-1) ^ s * σ (IsCMField.complexConj E t) / (g : K)) := by
     ext
     · simp [div_eq_mul_inv, mul_comm]
     · simp [div_eq_mul_inv]; ring

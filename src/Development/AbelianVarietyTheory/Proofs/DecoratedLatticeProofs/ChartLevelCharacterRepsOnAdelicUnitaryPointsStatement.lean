@@ -53,6 +53,7 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.KJInf Formalism.L2.Ker
 open GlobalTheory.SeeSaw GlobalTheory.Unf
+
 theorem _root_.GlobalTheory.T.chartLevelCharacterReps_on_adelicUnitaryPoints
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X) (l : I.Laws) (Z : TC.Later B (I.cols l)) (i : ℕ)
         (hi : i ≤ B.R.m) {T : ℕ} {bad : Set (HeightOneSpectrum (𝓞 B.host.F))} {cl : Type}
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.chartLevelCharacterReps_on_adelicUnitaryPoints
           ∧ (∀ (g : U) (κ : K.lev.U),
             κ.1.1 = finM _ (rankN (I.rec7 l Z) i hi) g.1 → chi g = K.lev.chi κ)
           ∧ (∀ c, h c ∈ GfC _ ∧ finM _ (rankN (I.rec7 l Z) i hi) (h c) = (K.y c).1.1) := by
-  first
-  | exact @GlobalTheory.ChartLevRead.levData
-  | exact GlobalTheory.ChartLevRead.levData
-  | (intros; apply GlobalTheory.ChartLevRead.levData <;> assumption)
+  first | exact @GlobalTheory.ChartLevRead.levData

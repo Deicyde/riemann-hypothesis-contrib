@@ -148,8 +148,10 @@ theorem gaussCongruence : GaussCongruenceStatement := by
   · refine Ideal.add_mem _ ?_ (Ideal.mul_mem_right _ _ hc)
 
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_add (f := _), map_one, map_sum]
-    have e : ∀ a : F, Ideal.Quotient.mk m (ω⁻¹ a * (t a : O)) =
-        ι (a⁻¹ * algebraMap (ZMod p) F (Algebra.trace (ZMod p) F a)) := by
+    have e
+        : ∀ a : F,
+          Ideal.Quotient.mk m (ω⁻¹ a * (t a : O))
+            = ι (a⁻¹ * algebraMap (ZMod p) F (Algebra.trace (ZMod p) F a)) := by
       intro a
       rw [map_mul, map_mul, MulChar.inv_apply', hω, map_natCast, ← map_natCast ι, ht,
         ZMod.natCast_val]
@@ -157,11 +159,12 @@ theorem gaussCongruence : GaussCongruenceStatement := by
     simp_rw [e]
 
     rw [← map_sum, sum_inv_mul_trace p F, map_neg, map_one, add_neg_cancel]
-  · calc ∑ a : F, ω⁻¹ a * (1 + c) ^ t a
-        = ∑ a : F, (ω⁻¹ a + c * (ω⁻¹ a * (t a : O) + c * (ω⁻¹ a * r (t a)))) :=
-          Finset.sum_congr rfl fun a _ => by rw [hr]; ring
+  · calc
+      ∑ a : F, ω⁻¹ a * (1 + c) ^ t a
+          = ∑ a : F, (ω⁻¹ a + c * (ω⁻¹ a * (t a : O) + c * (ω⁻¹ a * r (t a)))) :=
+        Finset.sum_congr rfl fun a _ => by rw [hr]; ring
       _ = ∑ a : F, ω⁻¹ a + c * (∑ a : F, ω⁻¹ a * (t a : O) + c * ∑ a : F, ω⁻¹ a * r (t a)) := by
-          rw [Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum]
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum]
       _ = _ := by rw [hsum0]; ring
 
 end ReciprocityTheory.PGsh

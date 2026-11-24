@@ -45,6 +45,7 @@ import Mathlib.Topology.Sheaves.Init
 open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp Formalism.BasicNotions
   Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
+
 theorem _root_.GlobalTheory.T.amplitudes_relevant_cell_monomial_rep
     : ∀ (D : D7) τ w w' θ (W : LocW D.R.k D.R.rS) (hW : GoodW D τ w w' θ W)
         (lam0 : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A₀ : LocS W) (hA : GoodS D lam0 A₀)
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.amplitudes_relevant_cell_monomial_rep
                         ∧ (∀ l, DminN W.z W.z' γ l = DminN W.z W.z' g₀ l)
                         ∧ ∀ (lam : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A : LocS W),
                           GoodS D lam A → A.J νR γ = s • A.J ν₀ g₀ := by
-  first
-  | exact @GlobalTheory.CellRed.amp_at_monomial
-  | exact GlobalTheory.CellRed.amp_at_monomial
-  | (intros; apply GlobalTheory.CellRed.amp_at_monomial <;> assumption)
+  first | exact @GlobalTheory.CellRed.amp_at_monomial

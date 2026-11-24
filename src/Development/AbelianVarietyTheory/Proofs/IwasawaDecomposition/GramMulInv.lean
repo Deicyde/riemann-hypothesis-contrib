@@ -44,7 +44,9 @@ import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Matrix
 open GlobalTheory.DualPairCheck
 open scoped TensorProduct
 
@@ -68,13 +70,15 @@ theorem gram_conj (V : HSp D) : ((V.gram.map (incA D)).map (cA D))ᵀ = V.gram.m
 section Generic
 variable {A : Type} [CommRing A] {m n : ℕ}
 
-theorem inv_conj (σ : A →+* A) (P Pi : Matrix (Fin n) (Fin n) A) (h : P * Pi = 1) (hP : (P.map σ)ᵀ = P) :
-    (Pi.map σ)ᵀ = Pi := by
+theorem inv_conj
+    (σ : A →+* A) (P Pi : Matrix (Fin n) (Fin n) A) (h : P * Pi = 1) (hP : (P.map σ)ᵀ = P)
+    : (Pi.map σ)ᵀ = Pi := by
   have h' : Pi * P = 1 := mul_eq_one_comm.1 h
   have h2 : P * (Pi.map σ)ᵀ = 1 := by
     rw [← hP, ← Matrix.transpose_mul, ← Matrix.map_mul, h',
       Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one]
-  calc _ = (Pi * P) * (Pi.map σ)ᵀ := by rw [h', Matrix.one_mul]
+  calc
+    _ = (Pi * P) * (Pi.map σ)ᵀ := by rw [h', Matrix.one_mul]
     _ = _ := by rw [Matrix.mul_assoc, h2, Matrix.mul_one]
 
 end Generic

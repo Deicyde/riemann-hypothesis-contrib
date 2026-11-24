@@ -79,9 +79,7 @@ theorem fnFG_of (h : KapFG Xo c) : FnFG Xo c := by
         : IsScalarTower.toAlgHom c.F (kap Z) (Om Z) a
           ∈ (IntermediateField.adjoin c.F (s : Set (kap Z))).map
             (IsScalarTower.toAlgHom c.F (kap Z) (Om Z)) := by
-      first
-      | exact ⟨a, ha, rfl⟩
-      | (rw [← SetLike.mem_coe, IntermediateField.coe_map]; exact Set.mem_image_of_mem _ ha)
+      first | exact ⟨a, ha, rfl⟩
     rw [IntermediateField.adjoin_map] at h1
     refine IntermediateField.adjoin.mono _ _ _ ?_ h1
     rintro _ ⟨b, hb, rfl⟩
@@ -119,7 +117,6 @@ private lemma isAlgebraic_frac_lemma {A K : Type} [CommRing A] [IsDomain A] [Fie
   · intro h0
     have h1 := congrArg (fun f : Polynomial A => f.coeff 1) h0
     simp at h1
-    try exact nonZeroDivisors.ne_zero q.2 h1
   · rw [IsFractionRing.mk'_eq_div]
     simp only [map_sub, map_mul, Polynomial.aeval_C, Polynomial.aeval_X]
     rw [mul_div_cancel₀ _ hq, sub_self]
@@ -138,20 +135,14 @@ theorem fnTrdeg_of (d : ℕ) (h : KapTrdeg Xo c d) : FnTrdeg Xo c (d + Nat.card 
     (faithfulSMul_iff_algebraMap_injective _ _).mpr (algebraMap (kap Z) (Om Z)).injective
   have e1
       : Algebra.trdeg (kap Z) (MvPolynomial (FlagVar Dw) (kap Z)) = Cardinal.mk (FlagVar Dw) := by
-    first
-    | (rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id])
-    | (rw [Algebra.trdeg_mvPolynomial, Cardinal.lift_id])
-    | (rw [MvPolynomial.trdeg_eq, Cardinal.lift_id])
-    | (rw [MvPolynomial.lift_trdeg, Cardinal.lift_id])
-    | (rw [Algebra.trdeg_MvPolynomial, Cardinal.lift_id])
-    | (rw [MvPolynomial.trdeg_eq_cardinalMk, Cardinal.lift_id])
+    first | (rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id])
   have e2 : Algebra.trdeg (MvPolynomial (FlagVar Dw) (kap Z)) (Om Z) = 0 := by
     unfold Algebra.trdeg
     refine le_antisymm (ciSup_le' fun s => ?_) zero_le
     refine (Cardinal.mk_eq_zero_iff.mpr ⟨fun x => ?_⟩).le
     exact s.2.transcendental x (isAlgebraic_frac_lemma _)
   have hcard : Cardinal.mk (FlagVar Dw) = ((Nat.card (FlagVar Dw) : ℕ) : Cardinal) := by
-    first | exact Nat.cast_card.symm | simp [Cardinal.mk_fintype, Nat.card_eq_fintype_card]
+    first | exact Nat.cast_card.symm
   have T1 := lift_trdeg_add_eq (kap Z) (MvPolynomial (FlagVar Dw) (kap Z)) (Om Z)
   have T2 := lift_trdeg_add_eq c.F (kap Z) (Om Z)
   simp only [Cardinal.lift_id] at T1 T2

@@ -86,7 +86,4 @@ theorem _root_.GlobalTheory.T.weil_model_projection_factorisation
                 (∀ v, φ v ∈ GlobalTheory.WeilM.SB _) → (∀ᶠ v in Filter.cofinite, φ v = M.vac v)
                   → q (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ)
                     = pr f ⊗ₜ GlobalTheory.SmallThetaModules.pureT s (fun v => pv v (φ v)) := by
-  first
-  | exact @GlobalTheory.PureLift.exists_pureLift
-  | exact GlobalTheory.PureLift.exists_pureLift
-  | (intros; apply GlobalTheory.PureLift.exists_pureLift <;> assumption)
+  first | exact @GlobalTheory.PureLift.exists_pureLift

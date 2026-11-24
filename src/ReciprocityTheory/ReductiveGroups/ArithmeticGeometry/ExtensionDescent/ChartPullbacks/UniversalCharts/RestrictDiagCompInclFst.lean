@@ -81,7 +81,7 @@ def qD (i : Fin 2) : DualNumber R →ₐ[R] JetR R (Fin 2) 1 :=
       ring)
     (fun r a => by
       simp only [LinearMap.toSpanSingleton_apply, Algebra.smul_def, MulOpposite.smul_eq_mul_unop,
-        MulOpposite.unop_op, map_mul, Algebra.ofId_apply, Algebra.algebraMap_self, RingHom.id_apply]
+        MulOpposite.unop_op, map_mul, Algebra.ofId_apply]
       ring)
 
 theorem qD_apply (i : Fin 2) (a : DualNumber R)
@@ -97,10 +97,8 @@ theorem jetAug_comp_qD (i : Fin 2) : (jetAug R (Fin 2) 1).comp (qD i) = fstD R :
 theorem delta_sq : (RingHom.ker (TrivSqZeroExt.fstHom R R (R × R))) ^ (1 + 1) = ⊥ := by
   rw [← le_bot_iff, pow_two, Ideal.mul_le]
   intro a ha b hb
-  have ha0 : a.fst = 0 := ha
-  have hb0 : b.fst = 0 := hb
-  rw [Ideal.mem_bot, show a = TrivSqZeroExt.inr a.snd from TrivSqZeroExt.ext ha0 rfl,
-    show b = TrivSqZeroExt.inr b.snd from TrivSqZeroExt.ext hb0 rfl, TrivSqZeroExt.inr_mul_inr]
+  rw [Ideal.mem_bot, show a = TrivSqZeroExt.inr a.snd from TrivSqZeroExt.ext ha rfl,
+    show b = TrivSqZeroExt.inr b.snd from TrivSqZeroExt.ext hb rfl, TrivSqZeroExt.inr_mul_inr]
 
 def deltaJ : JetR R (Fin 2) 1 →ₐ[R] TrivSqZeroExt R (R × R) :=
   jetLift (R := R) (RingHom.ker (TrivSqZeroExt.fstHom R R (R × R))) delta_sq
@@ -200,11 +198,11 @@ theorem tcoord_mul {w₁ w₂ : sp (R₀ := R) (DualNumber R) ⟶ G} (h₁ : IsT
       restrictDiag_comp_incl_fst, restrictDiag_comp_incl_snd]
   have e1 : w₁ = spMap (dualLift (fun j => (rD (LinearMap.fst R R R) (ψ (zR 1 j))).snd)) ≫ x 1 := by
     rw [← key, hval]
-    simp only [LinearMap.fst_apply, LinearMap.snd_apply]
+    simp only [LinearMap.fst_apply]
     rw [scaleD_one, spMap_id, Category.id_comp, spMap_scaleD_zero h₂, _root_.mul_one]
   have e2 : w₂ = spMap (dualLift (fun j => (rD (LinearMap.snd R R R) (ψ (zR 1 j))).snd)) ≫ x 1 := by
     rw [← key, hval]
-    simp only [LinearMap.fst_apply, LinearMap.snd_apply]
+    simp only [LinearMap.snd_apply]
     rw [scaleD_one, spMap_id, Category.id_comp, spMap_scaleD_zero h₁, _root_.one_mul]
   have e12
       : w₁ * w₂
@@ -231,11 +229,12 @@ theorem tcoord_scale (c : R) {w : sp (R₀ := R) (DualNumber R) ⟶ G} (h : IsTa
 
 theorem tcoord_one : tcoord hx (1 : sp (R₀ := R) (DualNumber R) ⟶ G) isTan_one = 0 := by
   apply tcoord_eq
-  have : dualLift (R := R) (0 : Fin n → R)
-      = (Algebra.ofId R (DualNumber R)).comp (jetAug R (Fin n) 1) :=
+  have h
+      : dualLift (R := R) (0 : Fin n → R)
+        = (Algebra.ofId R (DualNumber R)).comp (jetAug R (Fin n) 1) :=
     jet_ext fun j => by
       rw [dualLift_zR, AlgHom.comp_apply, jetAug_zR, map_zero, Pi.zero_apply,
         TrivSqZeroExt.inr_zero]
-  rw [this, ← spMap_comp, Category.assoc, spMap_jetAug_alt hx, comp_one']
+  rw [h, ← spMap_comp, Category.assoc, spMap_jetAug_alt hx, comp_one']
 
 end ReciprocityTheory.ChartRestriction.G.Chart

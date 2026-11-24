@@ -51,9 +51,13 @@ import Mathlib.Topology.Sheaves.Init
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.der_hom :
-    ∀ (O A B Q : Type) [CommRing O] [CommRing A] [Algebra O A] [CommRing B] [Algebra O B] [AddCommGroup Q] [Module O Q] [Module B Q] [Module Bᵐᵒᵖ Q] [IsCentralScalar B Q] [IsScalarTower O B Q] [Module Oᵐᵒᵖ Q] [IsCentralScalar O Q] [IsScalarTower O Bᵐᵒᵖ Q] (x : A →ₐ[O] B) (D : A → Q),
-      (∃ D' ∈ PtDer x Q, ⇑D' = D) ↔ ∃ y : A →ₐ[O] TrivSqZeroExt B Q, ∀ f, (y f).fst = x f ∧ (y f).snd = D f := by
+theorem UpperTheory.V.Alg.der_hom
+    : ∀ (O A B Q : Type) [CommRing O] [CommRing A] [Algebra O A] [CommRing B] [Algebra O B]
+        [AddCommGroup Q] [Module O Q] [Module B Q] [Module Bᵐᵒᵖ Q] [IsCentralScalar B Q]
+        [IsScalarTower O B Q] [Module Oᵐᵒᵖ Q] [IsCentralScalar O Q] [IsScalarTower O Bᵐᵒᵖ Q]
+        (x : A →ₐ[O] B) (D : A → Q),
+      (∃ D' ∈ PtDer x Q, ⇑D' = D)
+        ↔ ∃ y : A →ₐ[O] TrivSqZeroExt B Q, ∀ f, (y f).fst = x f ∧ (y f).snd = D f := by
   intro O A B Q _ _ _ _ _ _ _ _ _ _ _ _ _ _ x D
   constructor
   · rintro ⟨D', hD', rfl⟩
@@ -62,12 +66,17 @@ theorem UpperTheory.V.Alg.der_hom :
       have h := hL 1 1
       simp only [mul_one, map_one, one_smul] at h
       exact left_eq_add.mp h
-    refine ⟨{ toFun := fun f => TrivSqZeroExt.inl (x f) + TrivSqZeroExt.inr (D' f)
-              map_one' := ?_
-              map_mul' := ?_
-              map_zero' := ?_
-              map_add' := ?_
-              commutes' := ?_ }, fun f => ?_⟩
+    refine ⟨
+      {
+        toFun := fun f => TrivSqZeroExt.inl (x f) + TrivSqZeroExt.inr (D' f)
+        map_one' := ?_
+        map_mul' := ?_
+        map_zero' := ?_
+        map_add' := ?_
+        commutes' := ?_
+      },
+      fun f => ?_
+    ⟩
     · ext <;> simp [h1]
     · intro f g
       ext
@@ -87,9 +96,7 @@ theorem UpperTheory.V.Alg.der_hom :
   · rintro ⟨y, hy⟩
     have hD : ∀ f, D f = (y f).snd := fun f => (hy f).2.symm
     have hX : ∀ f, x f = (y f).fst := fun f => (hy f).1.symm
-    refine ⟨{ toFun := D
-              map_add' := ?_
-              map_smul' := ?_ }, ?_, rfl⟩
+    refine ⟨{ toFun := D, map_add' := ?_, map_smul' := ?_ }, ?_, rfl⟩
     · intro f g
       simp only [hD, map_add (f := _), TrivSqZeroExt.snd_add]
     · intro r f

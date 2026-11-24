@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Statements.PrincipalLattices.LogHermFormOfUnitDiscriminant
 public import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
-public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsPolarisedAbelianSchemeLieBasisInvariantsStatement
+public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsPolarisedAbelianSchemeLieBasisInvariants
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.LatticeDeterminedByInvariants
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -68,7 +68,7 @@ theorem exists_polAV_latticeFamily
                   ∧ s W.Δ = (Lf s).g₂ ^ 3 - 27 * (Lf s).g₃ ^ 2) := by
   intro hU hB R _ W hΔ
   obtain ⟨P, v, hg, hv, hbc, hs⟩ :=
-    GlobalTheory.T.exists_polarisedAbelianScheme_lieBasis_invariants R W hΔ
+    _root_.GlobalTheory.WeierstrassCurve.exists_polAV_invariants R W hΔ
   have hex
       : ∀ s : R →+* ℂ, ∃ L : PeriodPair,
         s W.c₄ = 12 * L.g₂ ∧ s W.c₆ = 216 * L.g₃ ∧ s W.Δ = L.g₂ ^ 3 - 27 * L.g₃ ^ 2 := fun s => by

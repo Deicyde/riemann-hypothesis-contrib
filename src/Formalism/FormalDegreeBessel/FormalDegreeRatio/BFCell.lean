@@ -172,8 +172,7 @@ lemma sum_mid (f : Fin (2 * r + k + 1) → ℂ)
 end BruhatBigCell
 
 open GBasic BruhatBigCell in
-theorem big_cell_mem_holds : BigCellMem := by
-  apply GlobalTheory.bigCell_mem_unitary <;> assumption
+theorem big_cell_mem_holds : BigCellMem := by apply GlobalTheory.bigCell_mem_unitary <;> assumption
 
 namespace BruhatBigCell
 
@@ -211,8 +210,10 @@ theorem big_cell_coordinate_holds : BigCellZhat := by
   · set bb : Fin r := ⟨b.val, hb1⟩
     have hf : fvec k r z' b = bvec (eI k r bb) := by unfold fvec; rw [dite_eq_left hb1]
     rw [hf]
-    have hw : ∀ p, (Hpk k r *ᵥ (bigCell k r c μ *ᵥ bvec (eI k r bb))) p =
-        if p = eI k r bb then c bb else 0 := by
+    have hw
+        : ∀ p,
+          (Hpk k r *ᵥ (bigCell k r c μ *ᵥ bvec (eI k r bb))) p
+            = if p = eI k r bb then c bb else 0 := by
       intro p
       rw [hpk_mulVec_apply, mulVec_bvec, col_lo c μ _ _ bb rfl]
       by_cases hp : p = eI k r bb
@@ -220,7 +221,9 @@ theorem big_cell_coordinate_holds : BigCellZhat := by
         rw [if_pos rfl, sgn_of_ne _ (by simp only [eI, bb]; omega),
           if_pos (by rw [sig_lo _ _ _ (by simp [eI])]; simp [eI]), one_mul]
       · rw [if_neg hp, if_neg, mul_zero]
-        intro h; apply hp; apply Fin.ext
+        intro h
+        apply hp
+        apply Fin.ext
         have h' : (sig k r p).val = 2 * r + k - b.val := h
         have := sig_val k r p
         show p.val = b.val
@@ -233,7 +236,8 @@ theorem big_cell_coordinate_holds : BigCellZhat := by
       rw [if_pos rfl, if_pos (by simp [eI, bb]), dite_eq_left hb1]
       simp only [star_one, one_mul]
       rfl
-    · rw [if_neg hab, if_neg (by simp only [eI, bb]; intro h; exact hab (Fin.ext h)), star_zero, zero_mul]
+    · rw [if_neg hab, if_neg (by simp only [eI, bb]; intro h; exact hab (Fin.ext h)), star_zero,
+        zero_mul]
   · have hbr : b.val = r := by omega
     have hf : fvec k r z' b = z' := by unfold fvec; rw [dite_eq_right hb1]
     rw [hf]
@@ -241,7 +245,8 @@ theorem big_cell_coordinate_holds : BigCellZhat := by
     · set aa : Fin r := ⟨a.val, ha1⟩
       have hfa : fvec k r z a = bvec (eI k r aa) := by unfold fvec; rw [dite_eq_left ha1]
       rw [hfa, if_neg (by intro h; rw [h] at ha1; exact hb1 ha1)]
-      rw [herm, star_bvec_dot, hpk_mulVec_apply, sgn_of_ne _ (by simp only [eI, aa]; omega), one_mul, mulVec, dotProduct]
+      rw [herm, star_bvec_dot, hpk_mulVec_apply, sgn_of_ne _ (by simp only [eI, aa]; omega),
+        one_mul, mulVec, dotProduct]
       apply Finset.sum_eq_zero
       intro q _
       have hs : (sig k r (eI k r aa)).val = 2 * r + k - aa.val := by
@@ -264,13 +269,16 @@ theorem big_cell_minors_holds : BigCellMinors := by
   have hD := dmin_diag z z' (bigCell k r c μ) d hZ
   have hlo : ∀ (x : Fin (r + 1)) (hx : x.val < r), d x = c ⟨x.val, hx⟩ := by
     intro x hx; simp only [hd]; rw [dite_eq_left hx]
-  have part1 : ∀ l : Fin (r + 1), Dmin k r z z' (bigCell k r c μ) ⟨l.val, by omega⟩ =
-      ∏ a : Fin r with a.val < l.val, c a := by
+  have part1
+      : ∀ l : Fin (r + 1),
+        Dmin k r z z' (bigCell k r c μ) ⟨l.val, by omega⟩
+          = ∏ a : Fin r with a.val < l.val, c a := by
     intro l
     rw [hD]
     have hl : l.val ≤ r := by omega
-    have hs : (Finset.univ.filter fun a : Fin r => a.val < l.val) =
-        Finset.univ.map (Fin.castLEEmb hl) := by
+    have hs
+        : (Finset.univ.filter fun a : Fin r => a.val < l.val)
+          = Finset.univ.map (Fin.castLEEmb hl) := by
       ext a
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map, Fin.castLEEmb]
       constructor
@@ -288,8 +296,9 @@ theorem big_cell_minors_holds : BigCellMinors := by
     have e2 := part1 ⟨a.val, by omega⟩
     simp only at e1 e2
     rw [e1, e2]
-    have hs : (Finset.univ.filter fun b : Fin r => b.val < a.val + 1) =
-        insert a (Finset.univ.filter fun b : Fin r => b.val < a.val) := by
+    have hs
+        : (Finset.univ.filter fun b : Fin r => b.val < a.val + 1)
+          = insert a (Finset.univ.filter fun b : Fin r => b.val < a.val) := by
       ext b
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
       omega
@@ -305,8 +314,9 @@ theorem big_cell_minors_holds : BigCellMinors := by
       intro i; rw [hlo _ (by simp)]; rfl
     have e2 : ∀ i : Fin r, d (Fin.castLE (Nat.le_succ r) i) = c i := by
       intro i; rw [hlo _ (by simp)]; rfl
-    have e3 : d (Fin.castLE (le_refl (r + 1)) (Fin.last r)) =
-        herm (Hpk k r) (bigCell k r c μ *ᵥ z') z := by
+    have e3
+        : d (Fin.castLE (le_refl (r + 1)) (Fin.last r))
+          = herm (Hpk k r) (bigCell k r c μ *ᵥ z') z := by
       simp only [hd]; rw [dite_eq_right (by simp)]
     simp only [e1, e2, e3]
     have hP : (∏ i : Fin r, c i) ≠ 0 := Finset.prod_ne_zero_iff.2 (fun b _ => hc b)

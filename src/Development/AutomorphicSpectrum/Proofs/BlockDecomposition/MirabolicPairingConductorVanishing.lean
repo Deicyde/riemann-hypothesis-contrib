@@ -1,7 +1,7 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ShearGL
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicPairingConductorBoundStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicPairingConductorBound
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,7 +65,8 @@ theorem exists_evVal
         → ∀ (v : V) (v' : V'), ∃ A, EvVal ν ψ T B v v' A := by
   intro k _ _ _ _ _ _ ν _ ψ c n V V' _ _ _ _ T T' B s hψ hc hT hT' hB v v'
   obtain ⟨r, hr⟩ :=
-    GlobalTheory.T.mirabolic_pairing_conductor_bound ν ψ c T T' B s hψ hc hT hT' hB 1 v v'
+    _root_.GlobalTheory.CompanionTheory.MirPair.JJ_preimage_box_eq_JJ_box ν ψ c T T' B s hψ hc hT
+      hT' hB 1 v v'
   refine ⟨JJ ν ψ T B (box (n + 1) (c * r⁻¹) : Set (Fin (n + 1) → k)) v v', c * r⁻¹, fun t ht => ?_⟩
   have hc' : valuation k ((c * (c * r⁻¹)⁻¹ : kˣ) : k) ≤ valuation k (r : k) := by
     have : c * (c * r⁻¹)⁻¹ = r := by

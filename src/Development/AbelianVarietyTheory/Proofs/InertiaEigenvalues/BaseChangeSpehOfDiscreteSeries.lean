@@ -4,7 +4,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsUn
 public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.IsNormalisedOfIsDiscrete
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DiscreteAutomorphicRepGLLocalComponentIsUnitarisStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.EqOfNodupSumMultisetOfEq
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsAlgebraicWeightOfAutomorphicDefiniteUnitarStatement
+public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BaseChangeDefiniteUnitary
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsAlgebraicWeightOfAutomorphicDefiniteUnitar
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsNormalisedThetaSub
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SatakeParameterSphericalProductSpehQuotientsStatement
 import Mathlib.Algebra.Order.Floor.Extended
@@ -224,5 +225,5 @@ theorem GlobalTheory.BcSpeh.bcSpeh_of_baseChange
   obtain ⟨c, N, h, V, σ, m, bc⟩ := H1 E hE n hn π hπ
   choose a d P _ hPn hPs using fun i => (H2 E (N i) (bc.pos i)).1 (V i) (bc.discrete i)
   exact GlobalTheory.BcSpehProof.baseChange_speh_of_discreteSeries H2
-    GlobalTheory.T.exists_algebraicWeight_of_automorphic_definiteUnitary hn hπ bc a d P hPn hPs
+    _root_.GlobalTheory.DefU.exists_hasWeightAt_of_isAutRepU hn hπ bc a d P hPn hPs
     fun i => (hPs i).mul_eq.symm

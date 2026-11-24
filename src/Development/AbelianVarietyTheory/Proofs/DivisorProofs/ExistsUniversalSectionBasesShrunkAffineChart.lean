@@ -46,6 +46,7 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalMod
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
 import ReciprocityTheory.AnalyticForms.RegularLocalRings.JacChartA
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -124,7 +125,7 @@ theorem GlobalTheory.Poinc.exists_univBasis_affineChart
     GlobalTheory.exists_isPolFibre hL.polBaseChange (Subalgebra.inclusion h).toRingHom P
   refine ⟨U, h, P', φ, hUU₀, hU, hwU, hφ, hiso.symm, hg, ?_, ?_⟩
   · obtain ⟨c₁, hc₁⟩ :=
-      GlobalTheory.T.universalBasis_move_baseChange _ _ _ P P' φ hφ hiso.symm _ _ _ τ₁ hτ₁ b₁ hb₁
+      _root_.GlobalTheory.UnivBasisMove.univBasis_move _ _ _ P P' φ hφ hiso.symm _ _ _ τ₁ hτ₁ b₁ hb₁
     haveI : Unique (Fin (1 ^ P.g)) := by rw [one_pow]; infer_instance
     have key : GlobalTheory.ThetaReal.UnivBasis P' ((1 : ℕ) : ℤ) (fun _ : Fin 1 => c₁ default) := by
       intro T hT u
@@ -138,7 +139,7 @@ theorem GlobalTheory.Poinc.exists_univBasis_affineChart
       ⟩
     exact ⟨SecM.toSec P'.A (c₁ default), key⟩
   · obtain ⟨c₂, hc₂⟩ :=
-      GlobalTheory.T.universalBasis_move_baseChange _ _ _ P P' φ hφ hiso.symm _ _ _ τ₂ hτ₂ b₂ hb₂
+      _root_.GlobalTheory.UnivBasisMove.univBasis_move _ _ _ P P' φ hφ hiso.symm _ _ _ τ₂ hτ₂ b₂ hb₂
     let e : Fin (N ^ P.g) ≃ Fin (N ^ P'.g) := finCongr (by rw [hg])
     refine ⟨fun i => c₂ (e.symm i), fun T hT u => ?_⟩
     have h2 := @hc₂ T hT u

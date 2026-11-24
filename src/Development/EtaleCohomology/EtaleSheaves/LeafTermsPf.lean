@@ -171,16 +171,14 @@ theorem base_zero_iso : IsIso (WidePullback.base (fun _ : Fin 0 => f)) := ⟨⟨
       WidePullback.hom_ext _ _ _ (fun j => j.elim0) (by
         simp [WidePullback.lift_π, WidePullback.lift_π_assoc, WidePullback.lift_base,
           WidePullback.lift_base_assoc]),
-      by
-        simp [WidePullback.lift_π, WidePullback.lift_π_assoc, WidePullback.lift_base,
-          WidePullback.lift_base_assoc]
+      by simp
     ⟩
 ⟩⟩
 
 theorem base_proper [IsProper f] : ∀ n : ℕ, IsProper (WidePullback.base (fun _ : Fin n => f))
   | 0 => by
     have := base_zero_iso f
-    first | infer_instance | exact MorphismProperty.of_isIso (P := @IsProper) _
+    first | infer_instance
   | n + 1 => by
     have := base_proper n
     have hi : IsIso (toPb f n) := ⟨⟨ofPb f n, toPb_ofPb f n, ofPb_toPb f n⟩⟩

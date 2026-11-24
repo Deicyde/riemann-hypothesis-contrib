@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TeichmullerInertiaLabelCondition
+import Mathlib.RingTheory.PicardGroup
 
 @[expose] public section
 
@@ -116,7 +117,6 @@ private theorem orbit_of_sums
   let l1 : (Kˣ →* ℂˣ) →₀ ℂ := ∑ i ∈ Finset.range n, Finsupp.single (θ ^ g ^ i) 1
   let l2 : (Kˣ →* ℂˣ) →₀ ℂ := ∑ i ∈ Finset.range n, Finsupp.single (θ' ^ g ^ i) 1
   have hl : Finsupp.linearCombination ℂ v l1 = Finsupp.linearCombination ℂ v l2 := by
-
     simp only [l1, l2, map_sum, Finsupp.linearCombination_single, one_smul]
     funext z
     simp only [Finset.sum_apply, v, MonoidHom.pow_apply, Units.val_pow_eq_pow_val]

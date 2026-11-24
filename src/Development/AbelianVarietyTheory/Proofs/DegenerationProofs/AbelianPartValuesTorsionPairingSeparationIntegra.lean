@@ -364,8 +364,8 @@ theorem tors_of_integral
   · obtain ⟨-, hc⟩ :=
       hU (n ^ j) ho.pow (hj j) {b : N.A // b ^ (n ^ j) ^ 2 = 1} Subtype.val Subtype.property
     obtain ⟨-, hs, -, hsep⟩ :=
-      GlobalTheory.T.thetaCoordinates_exist_unique_separate_points hL C _ D.P
-        (jFK (R := R) C ≫ jK R) (n ^ j) ho.pow (hj j) {b : N.A // b ^ (n ^ j) ^ 2 = 1}
+      _root_.GlobalTheory.CoordSep.coord_exists_unique_separate hL C _ D.P (jFK (R := R) C ≫ jK R)
+        (n ^ j) ho.pow (hj j) {b : N.A // b ^ (n ^ j) ^ 2 = 1}
         (fun i => ν.eA i.1)
         fun i => (tor _ _).2 i.2
     have h3 : 3 ≤ n ^ j := by

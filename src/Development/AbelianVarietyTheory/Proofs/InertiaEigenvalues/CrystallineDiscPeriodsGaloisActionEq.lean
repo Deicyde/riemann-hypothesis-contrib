@@ -1,11 +1,11 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinMemIdealPowOfXPowMulMem
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfAdicTopologicalBasisOverBreuilKisin
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinAinfDiscIsDomainNormBounds
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasis
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinMemIdealPowOfXPowMulMem
 import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfAdicTopologicalBasisOverBreuilKisinStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinAinfDiscIsDomainNormBoundsStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedDiscToDiscInjectiveOfAdicBasisStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,7 +54,9 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -62,26 +64,15 @@ noncomputable section
 
 namespace GlobalTheory.BSP
 
-theorem ringHom_ext_of_sep_galPer {R B : Type} [CommRing R] [CommRing B] {f g : R⟦X⟧ →+* B}
-    (hC : ∀ r, f (C r) = g (C r)) (hX : f X = g X) (hsep : ∀ b : B, (∀ n, f X ^ n ∣ b) → b = 0) :
-    f = g := by
-  have hp : ∀ p : Polynomial R, f p = g p := fun p => by
-    induction p using Polynomial.induction_on with
-    | C a => simpa using hC a
-    | add p q hp hq => simp [hp, hq]
-    | monomial n a _ => simp [hC, hX]
-  ext1 a
-  rw [← sub_eq_zero]
-  refine hsep _ fun n => ?_
-  rw [a.eq_X_pow_mul_shift_add_trunc n, map_add (f := _), map_add (f := _), hp, map_mul, map_mul, map_pow, map_pow, ← hX]
-  exact ⟨_, by rw [add_sub_add_right_eq_sub, ← mul_sub]⟩
-
-theorem mat_mul_right_cancel_galPer {R : Type} [CommRing R] [IsDomain R] {n : Type} [Fintype n] [DecidableEq n]
-    {A B P : Matrix n n R} (hP : P.det ≠ 0) (h : A * P = B * P) : A = B := by
+theorem mat_mul_right_cancel_galPer
+    {R : Type} [CommRing R] [IsDomain R]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {A B P : Matrix n n R} (hP : P.det ≠ 0) (h : A * P = B * P)
+    : A = B := by
   have h2 : (A - B) * P = 0 := by rw [Matrix.sub_mul, h, sub_self]
   have h3 : P.det • (A - B) = 0 := by
-    rw [← Matrix.mul_one (A - B), ← Matrix.mul_smul, ← Matrix.mul_adjugate P, ← Matrix.mul_assoc, h2,
-      Matrix.zero_mul]
+    rw [← Matrix.mul_one (A - B), ← Matrix.mul_smul, ← Matrix.mul_adjugate P, ← Matrix.mul_assoc,
+      h2, Matrix.zero_mul]
   rw [← sub_eq_zero]
   ext i j
   have h4 := congr_fun₂ h3 i j
@@ -89,8 +80,11 @@ theorem mat_mul_right_cancel_galPer {R : Type} [CommRing R] [IsDomain R] {n : Ty
   rw [Matrix.zero_apply]
   exact (mul_eq_zero.1 h4).resolve_left hP
 
-theorem mat_smul_cancel_galPer {R : Type} [CommRing R] [IsDomain R] {m n : Type} {c : R} (hc : c ≠ 0)
-    {A B : Matrix m n R} (h : c • A = c • B) : A = B := by
+theorem mat_smul_cancel_galPer
+    {R : Type} [CommRing R] [IsDomain R]
+    {m n : Type} {c : R} (hc : c ≠ 0)
+    {A B : Matrix m n R} (h : c • A = c • B)
+    : A = B := by
   ext i j
   have h1 := congr_fun₂ h i j
   rw [Matrix.smul_apply, Matrix.smul_apply, smul_eq_mul, smul_eq_mul] at h1
@@ -102,32 +96,35 @@ namespace BK
 
 variable (bk : BK K)
 
-theorem X_pow_mem_J_galPer : (X : bk.S) ^ bk.Ep.natDegree ∈ bk.J := by
-  apply GlobalTheory.BSP.BK.X_pow_natDegree_mem_lE <;> assumption
+alias X_pow_mem_J_galPer := _root_.GlobalTheory.BSP.BK.X_pow_natDegree_mem_J
 
 theorem ev_sep_galPer (b : Ainf l) (hb : ∀ n, bk.ev X ^ n ∣ b) : b = 0 := by
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
   have hc := tb.complete
   refine IsHausdorff.haus hc.toIsHausdorff b fun n => ?_
   rw [SModEq.zero, Ideal.smul_eq_mul, Ideal.mul_top]
   obtain ⟨c, hc⟩ := hb (bk.Ep.natDegree * n)
   rw [hc, pow_mul, ← map_pow]
-  exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow (Ideal.mem_map_of_mem bk.ev bk.X_pow_mem_J_galPer) n)
+  exact Ideal.mul_mem_right _ _
+    (Ideal.pow_mem_pow (Ideal.mem_map_of_mem bk.ev bk.X_pow_mem_J_galPer) n)
 
-theorem σA_ev_galPer {g : ↥(GK K)} (hg : bk.FixFlat g) (a : bk.S) : Per.σA (g : GQ l) (bk.ev a) = bk.ev a := by
+theorem σA_ev_galPer {g : ↥(GK K)} (hg : bk.FixFlat g) (a : bk.S)
+    : Per.σA (g : GQ l) (bk.ev a) = bk.ev a := by
   have hg' : Per.σF (g : GQ l) bk.flat = bk.flat := hg
   have hX : ((Per.σA (g : GQ l)).comp bk.ev) X = bk.ev X := by
     show Per.σA _ (bk.ev X) = bk.ev X
     rw [bk.ev_X, GlobalTheory.RingIface.sigA_teich, hg']
-  have h := ringHom_ext_of_sep_galPer (f := (Per.σA (g : GQ l)).comp bk.ev) (g := bk.ev)
-    (fun w => by
-      show Per.σA _ (bk.ev (C w)) = bk.ev (C w)
-      rw [bk.ev_C, bk.gal_w]) hX
-    (fun b hb => bk.ev_sep_galPer b fun n => by rw [← hX]; exact hb n)
+  have h :=
+    _root_.GlobalTheory.Fon.ps_hom_ext (f := (Per.σA (g : GQ l)).comp bk.ev) (g := bk.ev)
+      (fun w => by
+        show Per.σA _ (bk.ev (C w)) = bk.ev (C w)
+        rw [bk.ev_C, bk.gal_w])
+      hX
+      (fun b hb => bk.ev_sep_galPer b fun n => by rw [← hX]; exact hb n)
   exact RingHom.congr_fun h a
 
 theorem ev_injective_galPer : Function.Injective bk.ev := by
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
   have key : ∀ a, tb.c tb.i₀ (bk.ev a * tb.b tb.i₀) = a := fun a => by
     rw [tb.c_mul, tb.c_self, mul_one]
   intro a a' h
@@ -141,39 +138,50 @@ theorem ρ₀_pos_lt_one_galPer : 0 < bk.ρ₀ ∧ bk.ρ₀ < 1 := by
 
 end BK
 
-theorem seed_gal_periods : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l) (hτ : bk.IsPer τ) (d : ℕ)
-    (ρ : ↥(GK K) → Matrix (Fin d) (Fin d) ℤ_[l]) (hρ : ∀ g, IsUnit (ρ g)) (s : Seed bk d ρ τ),
-    ∀ g : ↥(GK K), bk.FixFlat g → ∀ G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀, IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G →
-      (∀ j : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀, IsDiscMap (l := _) (u := _) (ρ := _) bk.ev j → ∀ x, G (j x) = j x) ∧
-      bk.iA τ ^ s.N • ((ρ g).map (bk.iA.comp (algebraMap ℤ_[l] (Ainf l))) * s.W.map G) =
-        G (bk.iA τ) ^ s.N • s.W := by
+theorem seed_gal_periods
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l) (hτ : bk.IsPer τ) (d : ℕ)
+        (ρ : ↥(GK K) → Matrix (Fin d) (Fin d) ℤ_[l]) (hρ : ∀ g, IsUnit (ρ g)) (s : Seed bk d ρ τ),
+      ∀ g : ↥(GK K),
+        bk.FixFlat g
+          → ∀ G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀,
+            IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G
+              → (∀ j : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀,
+                  IsDiscMap (l := _) (u := _) (ρ := _) bk.ev j → ∀ x, G (j x) = j x)
+                ∧ bk.iA τ ^ s.N • ((ρ g).map (bk.iA.comp (algebraMap ℤ_[l] (Ainf l))) * s.W.map G)
+                  = G (bk.iA τ) ^ s.N • s.W := by
   intro l _ K bk τ _ d ρ _ s g hg G hG
   obtain ⟨h0, h1⟩ := bk.ρ₀_pos_lt_one_galPer
-  haveI : IsDomain (bk.DA bk.ρ₀) := (GlobalTheory.T.breuilKisin_ainfDisc_isDomain_norm_bounds l K bk bk.ρ₀ h0 h1).1
-  obtain ⟨ι, ⟨tb⟩⟩ := GlobalTheory.T.ainf_adicTopologicalBasis_over_breuilKisin l K bk
-  have hinj : Function.Injective bk.iA := (GlobalTheory.T.closedDisc_toDisc_injective_of_adicBasis l K bk (Ainf l) bk.ev ι tb bk.ρ₀ h0 h1).1
+  haveI : IsDomain (bk.DA bk.ρ₀) := (_root_.GlobalTheory.BSP.discAinf_isDomain l K bk bk.ρ₀ h0 h1).1
+  obtain ⟨ι, ⟨tb⟩⟩ := _root_.GlobalTheory.BSP.AinfTopBasis.main l K bk
+  have hinj : Function.Injective bk.iA :=
+    (_root_.GlobalTheory.BSP.toDisc_injective_of_topBasis l K bk (Ainf l) bk.ev ι tb bk.ρ₀ h0 h1).1
   have hGS : ∀ a, G (bk.iA (bk.ev a)) = bk.iA (bk.ev a) := fun a => by
     show G (toDisc l (bk.ev X) bk.ρ₀ (bk.ev a)) = _
     rw [hG.ext, bk.σA_ev_galPer hg]
   have hGτ : G (bk.iA τ) = bk.iA (Per.σA (g : GQ l) τ) := hG.ext τ
   refine ⟨fun j hj x => ?_, ?_⟩
-  · have hGj : IsDiscMap (l := _) (u := _) (ρ := _) bk.ev (G.comp j) :=
-      ⟨fun a => by
+  · have hGj : IsDiscMap (l := _) (u := _) (ρ := _) bk.ev (G.comp j) := ⟨
+      fun a => by
         show G (j (toDisc l X bk.ρ₀ a)) = _
-        rw [hj.ext]; exact hGS a,
-       fun x => (hG.norm_le _).trans (hj.norm_le x)⟩
+        rw [hj.ext]
+        exact hGS a,
+      fun x => (hG.norm_le _).trans (hj.norm_le x)
+    ⟩
     exact RingHom.congr_fun (IsDiscMap.unique hGj hj) x
   · have he : bk.iA (bk.ev bk.E) ≠ 0 := fun h =>
-      bk.E_ne_zero (bk.ev_injective_galPer (hinj (h.trans (map_zero _).symm) |>.trans (map_zero _).symm))
+      bk.E_ne_zero (bk.ev_injective_galPer (hinj (h.trans (map_zero _).symm)
+        |>.trans (map_zero _).symm))
     have hl0 : ((l : ℕ) : bk.DA bk.ρ₀) ≠ 0 := (isUnit_l_disc l (bk.ev X) bk.ρ₀).ne_zero
     have hdet : (s.X'.map bk.iS).det ≠ 0 := by
       intro h0'
       have hm := congrArg (fun M => (M.map bk.iS).det) s.X_mul
       rw [Matrix.map_mul, Matrix.det_mul, h0', mul_zero] at hm
-      have hc : (((l : bk.S) ^ s.c₂ * bk.E ^ (2 * s.N)) • (1 : Matrix (Fin d) (Fin d) bk.S)).map bk.iS =
-          bk.iS ((l : bk.S) ^ s.c₂ * bk.E ^ (2 * s.N)) • (1 : Matrix (Fin d) (Fin d) (bk.DA bk.ρ₀)) := by
+      have hc
+          : (((l : bk.S) ^ s.c₂ * bk.E ^ (2 * s.N)) • (1 : Matrix (Fin d) (Fin d) bk.S)).map bk.iS
+            = bk.iS ((l : bk.S) ^ s.c₂ * bk.E ^ (2 * s.N))
+              • (1 : Matrix (Fin d) (Fin d) (bk.DA bk.ρ₀)) := by
         ext i j
-        by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
+        by_cases hij : i = j <;> simp [hij]
       rw [hc, Matrix.det_smul, Matrix.det_one, mul_one] at hm
       have h3 := pow_eq_zero_iff'.1 hm.symm
       rw [map_mul, map_pow, map_pow, map_natCast] at h3

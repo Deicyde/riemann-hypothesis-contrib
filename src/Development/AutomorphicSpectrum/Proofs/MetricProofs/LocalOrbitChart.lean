@@ -136,7 +136,8 @@ theorem exists_linear_separation
   let W : Submodule ℂ (σ → ℂ) := LinearMap.ker M.mulVecLin
   have hW : Module.finrank ℂ W ≤ n := by
     have h := LinearMap.finrank_range_add_finrank_ker M.mulVecLin
-    have h' : Module.finrank ℂ (LinearMap.range M.mulVecLin) = M.rank := Matrix.finrank_range_mulVecLin M
+    have h' : Module.finrank ℂ (LinearMap.range M.mulVecLin) = M.rank :=
+      Matrix.finrank_range_mulVecLin M
     simp only [Module.finrank_fintype_fun_eq_card] at h
     show Module.finrank ℂ (LinearMap.ker M.mulVecLin) ≤ n
     omega

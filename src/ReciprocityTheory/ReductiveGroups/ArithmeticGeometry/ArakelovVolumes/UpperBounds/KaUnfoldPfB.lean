@@ -296,14 +296,6 @@ theorem cont_cpt (X : Data E r) (x0 : Frame X.Ψ r) : Continuous (cpt X x0) := b
   refine continuous_finsetSum _ fun k _ => continuous_const.mul ?_
   split_ifs <;> fun_prop
 
-theorem lu_unique
-    {n : ℕ} {N N' B B' : Matrix (Fin n) (Fin n) ℂ}
-    (hN : N.BlockTriangular OrderDual.toDual) (hN' : N'.BlockTriangular OrderDual.toDual)
-    (hd : ∀ i, N i i = 1) (hd' : ∀ i, N' i i = 1) (hB : B.BlockTriangular id)
-    (hB' : B'.BlockTriangular id) (hBd : B.det ≠ 0) (h : N * B = N' * B')
-    : N = N' := by
-  exact Bl.general_b_fact_variant.goal1 hN hN' hd hd' hB hB' hBd h
-
 theorem nM_low (X : Data E r) (z : V (nd X)) (τ : X.Ψ)
     : (ExF.nM X z τ).BlockTriangular OrderDual.toDual := fun _ _ hca =>
   ExF.nM_upper X z τ hca
@@ -332,8 +324,9 @@ theorem cpt_inj
         Matrix.nonsing_inv_mul_cancel_left _ _ hu, Matrix.nonsing_inv_mul_cancel_left _ _ hu]
       at this
   have hn : ∀ τ, ExF.nM X z τ = ExF.nM X z' τ := fun τ =>
-    lu_unique (nM_low X z τ) (nM_low X z' τ) (ExF.nM_diag X z τ) (ExF.nM_diag X z' τ)
-      (FrameDegreeData.upper_of_bor X hb τ) (FrameDegreeData.upper_of_bor X hb' τ) (hb τ).1 (hN τ)
+    _root_.Bl.general_b_fact_variant.goal1 (nM_low X z τ) (nM_low X z' τ) (ExF.nM_diag X z τ)
+      (ExF.nM_diag X z' τ) (FrameDegreeData.upper_of_bor X hb τ)
+      (FrameDegreeData.upper_of_bor X hb' τ) (hb τ).1 (hN τ)
   refine ⟨nmat_inj X hn, ?_⟩
   funext τ
   have hu : IsUnit (ExF.nM X z τ).det := by rw [ExF.det_nM]; exact isUnit_one

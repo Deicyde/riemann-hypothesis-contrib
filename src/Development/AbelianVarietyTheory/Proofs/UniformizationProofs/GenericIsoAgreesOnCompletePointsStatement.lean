@@ -154,7 +154,4 @@ theorem _root_.GlobalTheory.T.generic_iso_agrees_on_complete_points_alt
                                       * Geo.Tor.gw (U'.w e) r z jM' (fun _ => jL')
                                     = Geo.Tor.gw (U.w e) (r ≫ (j e).hom.left) z jM (fun _ => jL)
                                       * gm ρ z ⊤ v := by
-  first
-  | exact @GlobalTheory.generic_iso_agrees_on_complete_points
-  | exact GlobalTheory.generic_iso_agrees_on_complete_points
-  | (intros; apply GlobalTheory.generic_iso_agrees_on_complete_points <;> assumption)
+  first | exact @GlobalTheory.generic_iso_agrees_on_complete_points

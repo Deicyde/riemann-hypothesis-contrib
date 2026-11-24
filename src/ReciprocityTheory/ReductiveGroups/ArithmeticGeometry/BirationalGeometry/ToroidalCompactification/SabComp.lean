@@ -118,7 +118,7 @@ theorem psum_single
     : psum G x {i} = x i := by
   have e : (List.finRange 3).filter (· ∈ ({i} : Finset (Fin 3))) = [i] := by fin_cases i <;> decide
   simp only [psum, e, List.foldr_cons, List.foldr_nil, padd, pzero]
-  first | simp | exact MonObj.lift_comp_one_right _ _
+  first | simp
 
 theorem hom_ext_triple
     {S : Scheme.{0}} (G : Over S)

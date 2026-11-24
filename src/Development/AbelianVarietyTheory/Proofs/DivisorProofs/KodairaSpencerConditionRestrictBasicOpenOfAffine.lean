@@ -111,11 +111,7 @@ theorem spMap_comp'
     : spMap β ≫ spMap α = spMap (β.comp α) := by
   rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
 
-theorem dualMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (α : A →+* B) (β : B →+* C)
-    : (dualMap β).comp (dualMap α) = dualMap (β.comp α) := by
-  refine RingHom.ext fun x => ?_
-  ext <;> simp [dualMap]
+alias dualMap_comp' := _root_.GlobalTheory.Frames.Glue.dual_comp
 
 theorem isKS_basicOpen
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]

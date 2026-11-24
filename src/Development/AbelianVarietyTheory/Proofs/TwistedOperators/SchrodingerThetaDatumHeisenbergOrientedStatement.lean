@@ -50,6 +50,7 @@ open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMode
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
+
 theorem _root_.GlobalTheory.T.schrodingerThetaDatum_heisenberg_oriented
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
       IsInfFam θ
@@ -81,7 +82,4 @@ theorem _root_.GlobalTheory.T.schrodingerThetaDatum_heisenberg_oriented
                           IsDatum M ψ cS Φ f
                             → ∀ w : Matrix (Fin S.rank) (Fin d) (AE D),
                               IsDatum M ψ cS (M.co.rho ψ w Φ) (heisO ψ (sgn ε S) X (cS w) f) := by
-  first
-  | exact @GlobalTheory.SquareAgree.HeisCov.isDatum_rho
-  | exact GlobalTheory.SquareAgree.HeisCov.isDatum_rho
-  | (intros; apply GlobalTheory.SquareAgree.HeisCov.isDatum_rho <;> assumption)
+  first | exact @GlobalTheory.SquareAgree.HeisCov.isDatum_rho

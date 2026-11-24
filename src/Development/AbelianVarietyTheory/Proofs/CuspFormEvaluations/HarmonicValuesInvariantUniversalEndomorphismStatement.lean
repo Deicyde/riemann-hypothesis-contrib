@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
   Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.harmonic_values_invariant_universal_endomorphism
     : Laws → ChartIndepSt2
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
@@ -94,8 +95,4 @@ theorem _root_.GlobalTheory.T.harmonic_values_invariant_universal_endomorphism
                               * ((Gx y.x).presheaf.map (homOfLE h₂).op).hom ((F b).f (fun _ => j))))
                       → ∑ m ∈ P.support, algebraMap c.F S (P.coeff m) * ∏ b, nab y' ((N : ℤ) ^ 2) (F' b) (colOf m b)
                         = ∑ m ∈ P.support, algebraMap c.F S (P.coeff m) * ∏ b, nab y ((N : ℤ) ^ 2) (F b) (colOf m b) :=
-  by
-    first
-    | exact @GlobalTheory.ChartPush.nab_harmonic_invariant
-    | exact GlobalTheory.ChartPush.nab_harmonic_invariant
-    | (intros; apply GlobalTheory.ChartPush.nab_harmonic_invariant <;> assumption)
+  by first | exact @GlobalTheory.ChartPush.nab_harmonic_invariant

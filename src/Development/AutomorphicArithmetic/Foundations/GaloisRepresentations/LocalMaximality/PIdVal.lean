@@ -142,8 +142,8 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of
   have hgEq : ∀ y ∈ omB ℂ K B d, y = (τ y / om) • dtS K x Finset.univ := by
     intro y hy
     have h1 :=
-      (GlobalTheory.T.exists_topDegreeCoefficientForm_and_eq_on_top_forms ℂ F K d (xv x) cov).2 τ hτ
-        y (mem_deg_of_mem_omB B d y hy)
+      (_root_.GlobalTheory.PD.isTop_exists_and_eq ℂ F K d (xv x) cov).2 τ hτ y
+        (mem_deg_of_mem_omB B d y hy)
     rw [hvol, smul_smul, div_mul_cancel₀ _ omne]
     exact h1
   have hgLoc : ∀ (e : fib ℂ K (xv x)), ∀ y ∈ omB ℂ K B d, τ y / om ∈ loc B e.1 := by
@@ -174,7 +174,7 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of
       exact ⟨c, fun _ => hc⟩
     · exact ⟨0, fun h => absurd h hv⟩
   choose φ hφ using hφ
-  obtain ⟨ρ, hρ⟩ := GlobalTheory.T.exists_laurentConstantTermForm_functionField ℂ F d (xv x) cov.pd
+  obtain ⟨ρ, hρ⟩ := _root_.GlobalTheory.exists_isRes ℂ F d (xv x) cov.pd
   refine ⟨
     fun k S => τ (w' k * dtS K x S) / om,
     b,
@@ -199,7 +199,7 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of
   have claim1 : ∀ k, t k ∈ rA ℂ (xv x) {0} := by
     intro k
     have h1 :=
-      (GlobalTheory.T.complementaryModule_standardOpens_iff ℂ F K d (xv x) cov τ hτ {0} ⟨0, by simp⟩
+      (_root_.GlobalTheory.ComplStd.complementary_iff ℂ F K d (xv x) cov τ hτ {0} ⟨0, by simp⟩
           (om * (g k * h))).2
         ⟨
           (h : K) • (w' k * dtS K x S),

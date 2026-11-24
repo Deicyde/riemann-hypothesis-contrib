@@ -67,7 +67,7 @@ theorem exists_compact_annihilator_finiteAdeles_traceChar
         = Complex.exp (2 * Real.pi * Complex.I * ((Algebra.trace ℚ F x : ℚ) : ℂ)))
     (O : Set (Af F)) (hO : O ∈ nhds (0 : Af F))
     : ∃ K : Set (Af F), IsCompact K ∧ ∀ x : Af F, (∀ t ∈ O, ψ (pairA F 0 (t * x)) = 1) → x ∈ K := by
-  obtain ⟨N, hN, hNO⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F O hO
+  obtain ⟨N, hN, hNO⟩ := _root_.GlobalTheory.LocalNormBound.main F O hO
   obtain ⟨t, ht⟩ := exists_idealOf_eq (GlobalTheory.StdDual.codiff_ne_zero (F := F))
   let c : Af F := algebraMap F (Af F) ((N : F)⁻¹) * (t : Af F)
   refine ⟨

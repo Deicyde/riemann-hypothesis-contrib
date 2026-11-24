@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -75,13 +76,6 @@ theorem sp_endo_eq_id
     rw [map_div₀]
     exact congrArg₂ (· / ·) ea eb
   rw [hψ, Spec.map_id]
-
-theorem lbIso_pull_along
-    {X Y Z : Scheme.{0}} {L : LB X} {M : LB Y} {φ : Y ⟶ X} (h : LBIso M (L.pull φ)) (r : Z ⟶ Y)
-    {ψ : Z ⟶ X} (e : ψ = r ≫ φ)
-    : LBIso (M.pull r) (L.pull ψ) :=
-  h.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull M r r rfl)
-    (chartPullSame L (fun _ => ψ) (fun _ => φ) _ r fun _ => e)
 
 theorem sec_of_pt
     {o K : Type} [CommRing o] [Field K] [Algebra o K]
@@ -130,8 +124,9 @@ theorem combine
   ⟩
   · refine LBIso.trans P₀.isLB (pull_isLB ρ.P.isLB _) (pull_isLB ρ₂.P.isLB _) hLa ?_
     refine LBIso.trans (pull_isLB ρ.P.isLB _) (pull_isLB P₀'.isLB θ.hom.left)
-      (pull_isLB ρ₂.P.isLB _) (lbIso_pull_along hLb θ.hom.left hθ.symm).symm
-      (lbIso_pull_along hLb₂ θ.hom.left rfl)
+      (pull_isLB ρ₂.P.isLB _)
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hLb θ.hom.left hθ.symm).symm
+      (_root_.GlobalTheory.Ex.GenericFibre.lbIso_pull hLb₂ θ.hom.left rfl)
   · have key : (ε₀ E).left ≫ θ.hom.left = θ.hom.left ≫ (ε₀' E).left := by
       apply ext
       · rw [Category.assoc, hθ, (hε E).1, Category.assoc, (hε' E).1, ← Category.assoc, hθ]

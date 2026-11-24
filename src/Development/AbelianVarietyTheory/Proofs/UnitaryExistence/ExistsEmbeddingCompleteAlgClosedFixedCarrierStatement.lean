@@ -56,6 +56,7 @@ open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLoca
   Formalism.MainNotions.DIV.Cons
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.exists_embedding_completeAlgClosed_fixedCarrier
     : ∀ (T : CDVR) (p : ℕ),
       p.Prime → T.FinRes → (p : T.V) ∈ maximalIdeal T.V
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.exists_embedding_completeAlgClosed_fixedCarrier
               → ∃ g' : T'.V →+* intO ↥C.S,
                 g'.comp φ = g ∧ Function.Injective g'
                   ∧ ∀ a ∈ maximalIdeal T'.V, ‖((g' a : intO ↥C.S) : ↥C.S)‖ < 1 := by
-  first
-  | exact @GlobalTheory.SmallClosedField.exists_embedding_and_extension
-  | exact GlobalTheory.SmallClosedField.exists_embedding_and_extension
-  | (intros; apply GlobalTheory.SmallClosedField.exists_embedding_and_extension <;> assumption)
+  first | exact @GlobalTheory.SmallClosedField.exists_embedding_and_extension

@@ -71,7 +71,4 @@ theorem _root_.GlobalTheory.T.thetaKernelFiniteAdelic_laws
                     (GlobalTheory.TraceIncl.kern R i t (h * q) w v)
                   = ((((levEnv (Vc D i) (R.βV i) (R.datVt i t)).ch q)⁻¹ : ℂˣ) : ℂ)
                     • GlobalTheory.TraceIncl.kern R i t h w v := by
-  first
-  | exact @GlobalTheory.TraceIncl.kern_laws
-  | exact GlobalTheory.TraceIncl.kern_laws
-  | (intros; apply GlobalTheory.TraceIncl.kern_laws <;> assumption)
+  first | exact @GlobalTheory.TraceIncl.kern_laws

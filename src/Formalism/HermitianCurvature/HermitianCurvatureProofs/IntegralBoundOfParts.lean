@@ -226,6 +226,4 @@ end Formalism.FourierDecayAlt.P.PBASM
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem integral_bound_of_parts : PBASM.IntBOfParts := PBASM.intBOfParts
-
 end Formalism.FourierDecayAlt.P

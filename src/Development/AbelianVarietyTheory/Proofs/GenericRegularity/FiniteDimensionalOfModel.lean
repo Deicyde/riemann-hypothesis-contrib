@@ -44,9 +44,6 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.CurveComp
 
 @[expose] public section
 
-
-
-
 noncomputable section
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions

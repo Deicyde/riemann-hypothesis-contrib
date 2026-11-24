@@ -137,8 +137,7 @@ theorem exists_scalar_mod_level
           = ((t : ℤ) : ZMod (M * N * l ^ a))
             • (1 : Matrix (Fin 2) (Fin 2) (ZMod (M * N * l ^ a))) := by
       ext i j
-      fin_cases i <;> fin_cases j
-        <;> simp [φ, Matrix.SpecialLinearGroup.map_apply_coe, h00, h01, h10, h11, mK, uK]
+      fin_cases i <;> fin_cases j <;> simp [φ, h00, h01, h10, h11, mK, uK]
     have hcomm : φ c * φ g = φ g * φ c := by
       apply Subtype.ext
       simp only [Matrix.SpecialLinearGroup.coe_mul]

@@ -54,6 +54,7 @@ open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Dict
+
 theorem _root_.GlobalTheory.T.jet_translate_projected_vacuum_le
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ)
         (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
@@ -95,7 +96,4 @@ theorem _root_.GlobalTheory.T.jet_translate_projected_vacuum_le
                                                     * rdE E)
                                                   / (Real.sqrt Real.pi * lam))
                                               ^ (g * n) := by
-  first
-  | exact @GlobalTheory.Dict.VacJet.jet_projA_le
-  | exact GlobalTheory.Dict.VacJet.jet_projA_le
-  | (intros; apply GlobalTheory.Dict.VacJet.jet_projA_le <;> assumption)
+  first | exact @GlobalTheory.Dict.VacJet.jet_projA_le

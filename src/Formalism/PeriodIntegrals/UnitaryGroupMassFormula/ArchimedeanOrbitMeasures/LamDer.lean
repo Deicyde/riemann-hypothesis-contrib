@@ -283,8 +283,7 @@ theorem lamDet_of
     rw [e1, e2, ← reimV_smul, ← reimV_add]
     congr 1
     funext v
-    simp only [Pi.add_apply, hw, Matrix.mul_add, Matrix.mul_assoc, ← Matrix.smul_mul, hcc,
-      Matrix.one_mul]
+    simp only [Pi.add_apply, hw, Matrix.mul_add, Matrix.mul_assoc, ← Matrix.smul_mul]
     norm_num
     rw [← Matrix.mul_assoc, hcc, Matrix.one_mul]
   · have hTw : (0 : ℝ) < Tw u' := by

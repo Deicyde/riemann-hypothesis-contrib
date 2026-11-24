@@ -2,7 +2,8 @@ module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsGrpPullback
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsAlgClosedJoinOfTwoFieldExtensions
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsCommonAlgClosedExtension
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ConnectedSpaceSpecOfIsLocalRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -84,7 +85,7 @@ theorem geometricallyConnected_of_isPullback
   refine ⟨fun K' _ y Z fst snd h => ?_⟩
   obtain ⟨ψ, rfl⟩ := Spec.map_surjective y
   obtain ⟨Ω, _, _, j, j', e⟩ :=
-    GlobalTheory.exists_algClosed_join_of_two_field_extensions K₀ K K' i ψ.hom
+    _root_.GlobalTheory.CommonAlgClosedExtension.exists_common_algClosed_extension K₀ K K' i ψ.hom
   have e' : spMap j ≫ spMap i = spMap j' ≫ Spec.map ψ := by
     rw [← Spec.map_comp, ← Spec.map_comp]
     congr 1

@@ -1,7 +1,7 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HasStepCharts
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricGrassmannChartLocalStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockMetricGrassmannChartLocal
 import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsValueAtOfTorus
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -86,8 +86,8 @@ theorem main
             + Real.log ‖baseMono M (BM.F l) p z * plk M (BM.F l) k₀ z I₀‖ := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n BM p k₀ l x₀ z I₀ C B hp hC hx hz hor hw
   obtain ⟨h, a, hb, hd, ha, hstep, hzk⟩ :=
-    GlobalTheory.T.block_metric_grassmann_chart_local K ι Φ y Ψ N j M n BM p k₀ l x₀ z hp hx.1 hz
-      hor
+    _root_.GlobalTheory.CompanionTheory.Ar.PB.StepW.FlagPoint.main K ι Φ y Ψ N j M n BM p k₀ l x₀ z
+      hp hx.1 hz hor
   obtain ⟨hHb, hHd, hHm⟩ := hC h a _ hb hd ha hstep hw
   have hL : BM.Rb.lift x₀ x₀ ∈ mcPts (mCoordIdeal M.x) := BM.Rb.mem x₀ x₀ (BM.Rb.mem_U x₀)
   have hor' := hor

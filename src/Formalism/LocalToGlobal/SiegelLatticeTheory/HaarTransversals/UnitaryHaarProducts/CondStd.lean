@@ -48,7 +48,8 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Topology Filter
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Topology
+  Filter
 
 namespace Formalism.L2.SG.Pf.CondStd
 
@@ -85,8 +86,11 @@ theorem dense_F : DenseRange (algebraMap F (Af F)) := by
   have hu : IsUnit ((m : ℕ) : Af F) := by
     rw [hcast]
     exact (isUnit_iff_ne_zero.2 hmF).map _
-  have e1 : ((m : ℕ) : Af F) * (a - (N : Af F) * y) = ((m : ℕ) : Af F) * algebraMap F (Af F) ((β : F) / m) := by
-    rw [mul_sub, hβ, hcast, ← map_mul, mul_div_cancel₀ _ hmF, IsScalarTower.algebraMap_apply (𝓞 F) F (Af F)]
+  have e1
+      : ((m : ℕ) : Af F) * (a - (N : Af F) * y)
+        = ((m : ℕ) : Af F) * algebraMap F (Af F) ((β : F) / m) := by
+    rw [mul_sub, hβ, hcast, ← map_mul, mul_div_cancel₀ _ hmF,
+      IsScalarTower.algebraMap_apply (𝓞 F) F (Af F)]
     push_cast
     ring
   have e2 := hu.mul_left_cancel e1
@@ -96,54 +100,55 @@ theorem dense_F : DenseRange (algebraMap F (Af F)) := by
 
 variable [IsTotallyReal F]
 
-
 open Formalism.L2.SG.Pf.StdChar in
-theorem eq_psiStd (ψ : AddChar (AF F) ℂ) (h1 : IsCharAF F ψ) (h2 : Formalism.L2.SG.LocVol.IsStdChar ψ) (x : AF F) :
-    ψ x = psiStd F x := by
+theorem eq_psiStd
+    (ψ : AddChar (AF F) ℂ) (h1 : IsCharAF F ψ) (h2 : Formalism.L2.SG.LocVol.IsStdChar ψ) (x : AF F)
+    : ψ x = psiStd F x := by
   obtain ⟨hcont, -, htriv, -⟩ := h1
   have hinf : ∀ y : Ainf F, ψ (pairA F y 0) = psiA F y := fun y => h2 y
-  have hA : ∀ a : F, psiA F (algebraMap F (Ainf F) a) =
-      Complex.exp (2 * Real.pi * Complex.I * ((trR F a : ℝ) : ℂ)) := by
+  have hA
+      : ∀ a : F,
+        psiA F (algebraMap F (Ainf F) a)
+          = Complex.exp (2 * Real.pi * Complex.I * ((trR F a : ℝ) : ℂ)) := by
     intro a
-    have hw : ∀ w : InfinitePlace F, InfinitePlace.Completion.extensionEmbedding w
-        ((algebraMap F (Ainf F) a) w) = w.embedding a := by
+    have hw
+        : ∀ w : InfinitePlace F,
+          InfinitePlace.Completion.extensionEmbedding w ((algebraMap F (Ainf F) a) w)
+            = w.embedding a := by
       intro w
       first
-        | exact InfinitePlace.Completion.extensionEmbedding_coe w a
-        | exact InfinitePlace.Completion.extensionEmbedding_coe a
-        | simp [InfiniteAdeleRing, AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply]
+      | exact InfinitePlace.Completion.extensionEmbedding_coe w a
+      | exact InfinitePlace.Completion.extensionEmbedding_coe a
+      | simp [InfiniteAdeleRing, AbsoluteValue.Completion.algebraMap_def,
+          WithAbs.algebraMap_right_apply]
     simp only [psiA, hw]
-    first
-      | rfl
+    first | rfl
   have hsplit : ∀ z : AF F, z = pairA F z.1 0 + pairA F 0 z.2 := by
     intro z
     first
-      | exact Prod.ext (add_zero _).symm (zero_add _).symm
-      | (show z = (z.1 + 0, 0 + z.2); rw [add_zero, zero_add]; rfl)
-      | (simp [pairA]; done)
+    | exact Prod.ext (add_zero _).symm (zero_add _).symm
+    | (show z = (z.1 + 0, 0 + z.2); rw [add_zero, zero_add]; rfl)
+    | (simp [pairA]; done)
   have hF : ∀ a : F, ψ (pairA F 0 (algebraMap F (Af F) a)) = psiFin F (algebraMap F (Af F) a) := by
     intro a
-    have e2 : algebraMap F (AF F) a =
-        pairA F (algebraMap F (Ainf F) a) 0 + pairA F 0 (algebraMap F (Af F) a) := by
-      first
-        | exact hsplit _
-        | (rw [hsplit (algebraMap F (AF F) a)]; rfl)
+    have e2
+        : algebraMap F (AF F) a
+          = pairA F (algebraMap F (Ainf F) a) 0 + pairA F 0 (algebraMap F (Af F) a) := by
+      first | exact hsplit _ | (rw [hsplit (algebraMap F (AF F) a)]; rfl)
     have h3 : psiA F (algebraMap F (Ainf F) a) * ψ (pairA F 0 (algebraMap F (Af F) a)) = 1 := by
       rw [← hinf, ← AddChar.map_add_eq_mul, ← e2]
       exact htriv a
     rw [psiFin_alg, Complex.exp_neg, ← hA a]
     exact eq_inv_of_mul_eq_one_right h3
   have hp : Continuous (fun z : Af F => pairA F 0 z) := by
-    first
-      | exact continuous_const.prodMk continuous_id
-      | (unfold pairA; fun_prop)
+    first | exact continuous_const.prodMk continuous_id | (unfold pairA; fun_prop)
   have hc : Continuous (fun z : Af F => ψ (pairA F 0 z)) := hcont.comp hp
-  have hcf : Continuous (psiFin F) := by
-    first
-      | exact continuous_psiFin F
+  have hcf : Continuous (psiFin F) := by first | exact continuous_psiFin F
   have hfin : (fun z : Af F => ψ (pairA F 0 z)) = psiFin F :=
     (dense_F (F := F)).equalizer hc hcf (funext fun a => hF a)
-  calc ψ x = ψ (pairA F x.1 0 + pairA F 0 x.2) := by rw [← hsplit x]
+  calc
+    ψ x
+      = ψ (pairA F x.1 0 + pairA F 0 x.2) := by rw [← hsplit x]
     _ = ψ (pairA F x.1 0) * ψ (pairA F 0 x.2) := AddChar.map_add_eq_mul ψ _ _
     _ = psiA F x.1 * psiFin F x.2 := by rw [hinf, ← congrFun hfin x.2]
     _ = psiStd F x := rfl
@@ -155,27 +160,25 @@ namespace Formalism.L2.SG.Pf.CondStd
 def LocTrDual : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v),
     (∀ y ∈ v.adicCompletionIntegers F, ∀ q : F,
-        singleV F v (x * y) - algebraMap F (Af F) q ∈ Formalism.UG.intAd F → ∃ n : ℤ, Algebra.trace ℚ F q = n) ↔
-      Formalism.L2.SG.LocVol.dV v * x ∈ v.adicCompletionIntegers F
-
+        singleV F v (x * y) - algebraMap F (Af F) q ∈ Formalism.UG.intAd F
+          → ∃ n : ℤ, Algebra.trace ℚ F q = n)
+      ↔ Formalism.L2.SG.LocVol.dV v * x ∈ v.adicCompletionIntegers F
 
 open Formalism.L2.SG.Pf.StdChar in
-theorem condAllTR_of (hL : LocTrDual) (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+theorem condAllTR_of
+    (hL : LocTrDual)
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
     (ψ : AddChar (AF F) ℂ) (h1 : IsCharAF F ψ) (h2 : Formalism.L2.SG.LocVol.IsStdChar ψ)
-    (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v) :
-    (∀ y ∈ v.adicCompletionIntegers F, psiV F ψ v (x * y) = 1) ↔
-      Formalism.L2.SG.LocVol.dV v * x ∈ v.adicCompletionIntegers F := by
-
+    (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v)
+    : (∀ y ∈ v.adicCompletionIntegers F, psiV F ψ v (x * y) = 1)
+      ↔ Formalism.L2.SG.LocVol.dV v * x ∈ v.adicCompletionIntegers F := by
   have htr : ∀ q : F, trR F q = ((Algebra.trace ℚ F q : ℚ) : ℝ) := by
     intro q
     have hsum : ((Algebra.trace ℚ F q : ℚ) : ℂ) = ∑ σ : F →ₐ[ℚ] ℂ, σ q := by
       have h : algebraMap ℚ ℂ (Algebra.trace ℚ F q) = ∑ σ : F →ₐ[ℚ] ℂ, σ q := by
-        first
-          | exact trace_eq_sum_embeddings ℂ (x := q)
+        first | exact trace_eq_sum_embeddings ℂ (x := q)
       rw [← h]
-      first
-        | rfl
-        | (simp; done)
+      first | rfl | (simp; done)
     have hbij : Function.Bijective (fun w : InfinitePlace F => w.embedding.toRatAlgHom) := by
       constructor
       · intro w w' h
@@ -191,16 +194,22 @@ theorem condAllTR_of (hL : LocTrDual) (F : Type) [Field F] [NumberField F] [IsTo
           rcases InfinitePlace.embedding_mk_eq σ.toRingHom with h | h
           · exact h
           · rw [h] at hr ⊢
-            have h2 : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom) =
-                ComplexEmbedding.conjugate σ.toRingHom := hr
+            have h2
+                : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom)
+                  = ComplexEmbedding.conjugate σ.toRingHom :=
+              hr
             first
-              | exact ComplexEmbedding.isReal_conjugate_iff.mp hr
-              | (simp only [ComplexEmbedding.conjugate, star_star] at h2; exact h2.symm)
-              | (rw [star_star] at h2; exact h2.symm)
-              | (have h3 : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom) =
-                    σ.toRingHom := RingHom.ext fun z => by simp [ComplexEmbedding.conjugate_coe_eq]
-                 rw [h3] at h2
-                 exact h2.symm)
+            | exact ComplexEmbedding.isReal_conjugate_iff.mp hr
+            | (simp only [ComplexEmbedding.conjugate, star_star] at h2; exact h2.symm)
+            | (rw [star_star] at h2; exact h2.symm)
+            | (
+                have h3
+                    : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom)
+                      = σ.toRingHom :=
+                  RingHom.ext fun z => by simp [ComplexEmbedding.conjugate_coe_eq]
+                rw [h3] at h2
+                exact h2.symm
+              )
         apply AlgHom.ext
         intro z
         show (InfinitePlace.mk σ.toRingHom).embedding z = σ z
@@ -212,8 +221,7 @@ theorem condAllTR_of (hL : LocTrDual) (F : Type) [Field F] [NumberField F] [IsTo
       rw [Complex.re_sum]
       rfl
     rw [hre, hs, ← hsum]
-    first
-      | simp
+    first | simp
   have hψ : ∀ z, ψ z = psiStd F z := fun z => eq_psiStd ψ h1 h2 z
   have hV : ∀ y : Fv F v, psiV F ψ v y = psiFin F (singleV F v y) := by
     intro y
@@ -225,10 +233,11 @@ theorem condAllTR_of (hL : LocTrDual) (F : Type) [Field F] [NumberField F] [IsTo
     intro c hc
     show ((AddCircle.toCircle (-((exists_psiF F).choose c)) : Circle) : ℂ) = 1
     rw [(exists_psiF F).choose_spec.1 c hc, neg_zero]
-    first
-      | simp
-  have hshift : ∀ (s : Af F) (q : F), s - algebraMap F (Af F) q ∈ Formalism.UG.intAd F →
-      psiFin F s = Complex.exp (-(2 * Real.pi * Complex.I * ((trR F q : ℝ) : ℂ))) := by
+    first | simp
+  have hshift
+      : ∀ (s : Af F) (q : F),
+        s - algebraMap F (Af F) q ∈ Formalism.UG.intAd F
+          → psiFin F s = Complex.exp (-(2 * Real.pi * Complex.I * ((trR F q : ℝ) : ℂ))) := by
     intro s q hq
     rw [← sub_add_cancel s (algebraMap F (Af F) q), psiFin_add, hint _ hq, one_mul, psiFin_alg]
   have hexp : ∀ t : ℝ, Complex.exp (-(2 * Real.pi * Complex.I * (t : ℂ))) = 1 ↔ ∃ n : ℤ, t = n := by
@@ -237,9 +246,7 @@ theorem condAllTR_of (hL : LocTrDual) (F : Type) [Field F] [NumberField F] [IsTo
     constructor
     · rintro ⟨n, hn⟩
       refine ⟨-n, ?_⟩
-      have h2pi : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := by
-        first
-          | exact Complex.two_pi_I_ne_zero
+      have h2pi : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := by first | exact Complex.two_pi_I_ne_zero
       have ht : (t : ℂ) = ((-n : ℤ) : ℂ) := by
         apply mul_left_cancel₀ h2pi
         push_cast

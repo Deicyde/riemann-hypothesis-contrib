@@ -159,15 +159,6 @@ section Unif
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 variable {K : Type} [Field K] [NumberField K]
 
-theorem lt_one_le_exp {x : WithZero (Multiplicative ℤ)} (h : x < 1)
-    : x ≤ WithZero.exp (-1 : ℤ) := by
-  by_cases hx : x = 0
-  · rw [hx]; exact zero_le'
-  · rw [← WithZero.exp_log hx] at h ⊢
-    rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at h
-    rw [WithZero.exp_le_exp]
-    omega
-
 theorem isUnif_of
     (P : HeightOneSpectrum (𝓞 K)) (ι : K →+* k)
     (hint : ∀ a, ι a ∈ 𝒪[k] ↔ Formalism.L2.Col.IntAt P a) (hd : DenseRange ι)
@@ -194,7 +185,7 @@ theorem isUnif_of
       exact not_le.2 ha this
     have hPa : P.valuation K a < 1 :=
       lt_of_le_of_ne ((hI a).1 ha.le) (fun h => h1 (by rw [map_inv₀, h, inv_one]))
-    have hle := lt_one_le_exp hPa
+    have hle := _root_.GlobalTheory.Proof.IntegralPowerExpansion.le_exp_neg_one_of_lt_one hPa
     have hdiv : P.valuation K (a / N) ≤ 1 := by
       calc
         P.valuation K (a / N)

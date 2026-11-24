@@ -116,7 +116,7 @@ theorem pointOf_base
       rw [hfr]
       simp only [Matrix.map_apply] at hkP
       rw [hkP]
-      simp [Matrix.one_apply, Pi.single_apply, eq_comm]
+      simp [Matrix.one_apply, Pi.single_apply]
   · rw [hr'1]; exact hqN
   · intro c hc
     obtain ⟨h1, h2⟩ := (hR.key c c₀).1 (hc.trans hc₀.symm)

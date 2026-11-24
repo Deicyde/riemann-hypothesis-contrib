@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.splitPlace_matrix_coordinate_on_half
                 ∧ ∀ (g : GA D S) (h : GA D T) (t : WO S T),
                   mapCo φ S T BS BT (actO S T g⁻¹ h⁻¹ t)
                     = ((grpCo φ T BT h)⁻¹).val * mapCo φ S T BS BT t * (grpCo φ S BS g).val := by
-  first
-  | exact @GlobalTheory.PlaceCoord.isCoord_mapCo
-  | exact GlobalTheory.PlaceCoord.isCoord_mapCo
-  | (intros; apply GlobalTheory.PlaceCoord.isCoord_mapCo <;> assumption)
+  first | exact @GlobalTheory.PlaceCoord.isCoord_mapCo

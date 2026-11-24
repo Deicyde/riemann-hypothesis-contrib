@@ -69,7 +69,7 @@ variable {ε : Fin n → Bool} {Λ : Fin n → ℝ}
 theorem op_inv_eq_adjoint (T : KType ε Λ) (k : KG ε)
     : T.op k⁻¹ = ContinuousLinearMap.adjoint (T.op k) := by
   rw [KType.op, map_inv, ← ContinuousLinearMap.star_eq_adjoint]
-  first | rfl | simp [Unitary.star_eq_inv] | simp [unitary.star_eq_inv]
+  first | rfl
 
 private lemma commute_Jm_of_isBlock {Y : Matrix (Fin n) (Fin n) ℂ} (hY : IsBlock ε Y) :
     Y * Jm ε = Jm ε * Y := by

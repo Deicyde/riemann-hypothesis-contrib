@@ -57,9 +57,6 @@ variable
   {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
   {β : O →+* c.F} (Y : Model Xo c β)
 
-theorem j_s : Y.j ≫ Y.s = pullback.snd _ _ ≫ spMap β := by
-  rw [Model.j, Category.assoc, pullback.condition, ← Category.assoc, Y.jQ_over]
-
 theorem exists_generic
     {S T : Scheme.{0}} {i : T ⟶ S} {χ : S ⟶ Y.X} {t : SAB H S} (m : SABMap t Y.t χ)
     {v : T ⟶ Xo.XF c} (hv : v ≫ Y.j = i ≫ χ)

@@ -255,7 +255,6 @@ theorem mem_periodLattice_of_theta_translate_eq_unit_mul
       L z
         = L (∑ i, Pi.single i (z i)) := by rw [Finset.univ_sum_single]
       _ = ∑ i, z i * L (Pi.single i 1) := by
-
         rw [map_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         have hsi : (Pi.single i (z i) : Fin g → ℂ) = z i • (Pi.single i 1 : Fin g → ℂ) := by

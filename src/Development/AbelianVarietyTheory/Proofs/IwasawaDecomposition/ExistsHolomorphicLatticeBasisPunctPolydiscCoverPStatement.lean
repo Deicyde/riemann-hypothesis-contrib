@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -47,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
   GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_holomorphic_latticeBasis_punctPolydiscCover_polyGrowth
     : ∀ (n a g r₀ : ℕ) (K : (Fin n → ℂ) → Set (Fin g → ℂ)) (ζ : (Fin n → ℂ) → Fin r₀ → Fin g → ℂ)
         (Pair : ℕ → (Fin n → ℂ) → (Fin g → ℂ) → (Fin g → ℂ) → ℂˣ → Prop),
@@ -90,7 +92,4 @@ theorem _root_.GlobalTheory.T.exists_holomorphic_latticeBasis_punctPolydiscCover
             ∧ ∃ (C : ℝ) (k : ℕ), ∀ s ∈ logDom n a,
               ‖logExp a s‖ ≤ 1 / 2 → (∀ j : Fin n, (j : ℕ) < a → |(s j).im| ≤ Real.pi)
                 → ‖lam s‖ ≤ C * (1 + ‖s‖) ^ k := by
-  first
-  | exact @GlobalTheory.ShFam.Hor.LogCh.Core.core
-  | exact GlobalTheory.ShFam.Hor.LogCh.Core.core
-  | (intros; apply GlobalTheory.ShFam.Hor.LogCh.Core.core <;> assumption)
+  first | exact @GlobalTheory.ShFam.Hor.LogCh.Core.core

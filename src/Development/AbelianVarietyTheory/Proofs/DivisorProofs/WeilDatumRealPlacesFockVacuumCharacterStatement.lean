@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   NumberField Matrix
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilDatum_realPlaces_fockVacuum_character
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -76,7 +77,4 @@ theorem _root_.GlobalTheory.T.weilDatum_realPlaces_fockVacuum_character
                                         : ℂ)
                                       * ∏ τ, detPlus (sS τ) (sT τ) (compAt θ τ (Formalism.L2.Theta.mt S g⁻¹)) (compAt θ τ (Formalism.L2.Theta.mt T h)))
                                     • f := by
-  first
-  | exact @GlobalTheory.WeilVacChar.vacuum_character
-  | exact GlobalTheory.WeilVacChar.vacuum_character
-  | (intros; apply GlobalTheory.WeilVacChar.vacuum_character <;> assumption)
+  first | exact @GlobalTheory.WeilVacChar.vacuum_character

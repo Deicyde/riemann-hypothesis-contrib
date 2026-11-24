@@ -53,12 +53,6 @@ open GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc.EqNormAt
 
-theorem spectrumMap_comp
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) := by
-  simp only [spMap, ← Spec.map_comp]
-  rfl
-
 theorem norm_val_eqAt
     : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω)
         (D : GlobalTheory.EffCartierData M.Z) (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V]
@@ -81,7 +75,7 @@ theorem norm_val_eqAt
   have hval
       : M.val (gPt p ≫ spMap j ≫ ξ) (valF M.pt (D.U i) (D.f i))
         = ((j e : OO p) : PadicAlgCl p) := by
-    rw [← Category.assoc, gPt, spectrumMap_comp,
+    rw [← Category.assoc, gPt, _root_.GlobalTheory.spMap_comp_ring,
       RatModel.val_spMap_comp _ ξ (specializes_rfl : z ⤳ z)
         ⟨valF M.pt (D.U i) (D.f i), RatModel.valF_mem_O hxi _⟩]
     have hv
@@ -89,7 +83,7 @@ theorem norm_val_eqAt
           = e := by
       simp only [RatModel.valLoc, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe,
         RingEquiv.coe_toRingHom, ← RatModel.stalkEquiv_germ hxi, RingEquiv.symm_apply_apply,
-        TopCat.Presheaf.stalkSpecializes_refl, Category.id_comp, he]
+        TopCat.Presheaf.stalkSpecializes_refl, he]
       rw [Category.id_comp]
     rw [RingHom.comp_apply, hv]
     rfl

@@ -46,6 +46,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.CoeEqAlgebraMapZeroEquiv
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -116,7 +117,7 @@ private theorem exists_integral_bezout_of_separable
     rw [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_mul,
       ← Polynomial.derivative_map, hq, hu, hv, Polynomial.map_C, Polynomial.derivative_C_mul,
       map_pow, map_intCast, C_pow]
-    simp only [map_intCast, C_eq_intCast]
+    simp only [map_intCast]
     linear_combination ((y : F[X])) ^ 2 * hab
 
 private theorem isSemisimple_of_commute_of_integral_bezout
@@ -221,7 +222,6 @@ theorem UpperTheory.Gal.W2.hSep_of : UpperTheory.Gal.W2.HSep := by
     have hk := hkill q hdvd
     rw [eval₂_eq_sum]
     have e2 : (q.sum fun i b => f b * (e H) ^ i) = e (q.sum fun i b => ρ (a b) * H ^ i) := by
-
       simp only [Polynomial.sum, map_sum, map_mul, map_pow]
       rfl
     rw [e2, hk, map_zero]

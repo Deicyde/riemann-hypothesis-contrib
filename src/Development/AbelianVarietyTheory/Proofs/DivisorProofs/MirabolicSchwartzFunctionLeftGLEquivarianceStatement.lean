@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.mirabolic_schwartzFunction_left_GL_equivariance
       fFun μ σ ν Ψ (g.val * (X0 k σ * (invT h).val)) * (ν (gdet g) : ℂ)
           * apow (gdet g) ((Fintype.card C : ℂ) / 2)
         = fFun μ σ ν Ψ (X0 k σ * (invT h).val) := by
-  first
-  | exact @GlobalTheory.fFun_mul_left
-  | exact GlobalTheory.fFun_mul_left
-  | (intros; apply GlobalTheory.fFun_mul_left <;> assumption)
+  first | exact @GlobalTheory.fFun_mul_left

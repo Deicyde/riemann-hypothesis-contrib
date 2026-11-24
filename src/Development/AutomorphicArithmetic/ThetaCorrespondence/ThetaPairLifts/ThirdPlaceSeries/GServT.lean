@@ -40,8 +40,6 @@ import Formalism.SharpRestriction.SmoothDesignExistence.DGamSmooth
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace Formalism.L2.G.ServT

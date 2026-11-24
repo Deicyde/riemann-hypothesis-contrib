@@ -1,11 +1,11 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TriIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CarriesFlagsIffAdaptedFrameAtImageStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CarriesFlagsIffAdaptedFrameAtImage
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EigenFrameBasePointLiftsUniqueFlagSpace
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LieEigenspaceFrameCoordinatesCompStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LieEigenspaceFrameCoordinatesComp
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LieEigenspaceFrameCoordinatesUniqueInvertibleStatement
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LieEigenspaceFrameStableOfIsLocalRingStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LieEigenspaceFrameStableOfIsLocalRing
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsLieBase
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.InterPolyProdSum
+import Mathlib.Algebra.Azumaya.Basic
 
 @[expose] public section
 
@@ -63,11 +64,6 @@ theorem comp_closedPoint
     {K L : Type} [Field K] [Field L] (ι : K →+* L) {X : Scheme.{0}} (p : Sp K ⟶ X)
     : (spMap ι ≫ p) (IsLocalRing.closedPoint L) = p (IsLocalRing.closedPoint K) := by
   exact congrArg p (Subsingleton.elim (α := PrimeSpectrum K) _ _)
-
-theorem spMap_comp'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) :=
-  (Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)).symm
 
 theorem spMap_comp_ofField
     {L L' : Type} [Field L] [Field L']
@@ -217,10 +213,10 @@ theorem coord_iff_of_hom
       exact φ.commutes (e.symm a)
     exact e1.trans e2.symm
   have hSA : fA.Stable :=
-    GlobalTheory.T.lie_eigenspace_frame_stable_of_isLocalRing E H Dw l Xo c O β Z _ φA _ fA
+    _root_.GlobalTheory.ShFam.EigStable.stable_of_isLocalRing E H Dw l Xo c O β Z _ φA _ fA
       inferInstance
   have hS₁ : f₁.Stable :=
-    GlobalTheory.T.lie_eigenspace_frame_stable_of_isLocalRing E H Dw l Xo c O β Z _ φ₁ _ f₁
+    _root_.GlobalTheory.ShFam.EigStable.stable_of_isLocalRing E H Dw l Xo c O β Z _ φ₁ _ f₁
       inferInstance
   have e0
       : stalkPt C.Y (p (IsLocalRing.closedPoint K)) ≫ f
@@ -244,12 +240,12 @@ theorem coord_iff_of_hom
   have c1 : fA.Coord
       ((algebraMap _ C.Y.X.functionField).comp (f.stalkMap (p (IsLocalRing.closedPoint K))).hom)
       C.f0 ((A₁ * A'⁻¹) * G.map (algebraMap _ C.Y.X.functionField)) :=
-    GlobalTheory.T.lie_eigenspace_frame_coordinates_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₁ _ _ _
-      C.f0 _ _ _ _ inferInstance hG hf₁
+    _root_.GlobalTheory.ShFam.CoordComp.coord_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₁ _ _ _ C.f0
+      _ _ _ _ inferInstance hG hf₁
   have c2 : fA.Coord ((φ : B.Fn →+* C.Y.Fn).comp (algebraMap _ B.X.functionField)) C.f0
       ((A₁ * (A₀.map (φ : B.Fn →+* C.Y.Fn))⁻¹) * (A₀ * A⁻¹).map (φ : B.Fn →+* C.Y.Fn)) :=
-    GlobalTheory.T.lie_eigenspace_frame_coordinates_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₀ _ _ _
-      C.f0 _ _ _ _ inferInstance hfA hC
+    _root_.GlobalTheory.ShFam.CoordComp.coord_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₀ _ _ _ C.f0
+      _ _ _ _ inferInstance hfA hC
   have hcomp
       : (algebraMap _ C.Y.X.functionField).comp (f.stalkMap (p (IsLocalRing.closedPoint K))).hom
         = (φ : B.Fn →+* C.Y.Fn).comp (algebraMap _ B.X.functionField) :=
@@ -302,8 +298,8 @@ theorem coord_iff_of_hom
         f₁.Coord (Scheme.stalkClosedPointTo (R := .of K) p).hom g h'
           → h = h' * G.map (Scheme.stalkClosedPointTo (R := .of K) p).hom := fun h' hh' => by
     have c3 :=
-      GlobalTheory.T.lie_eigenspace_frame_coordinates_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₁ _ _
-        _ g _ _ _ _ inferInstance hG hh'
+      _root_.GlobalTheory.ShFam.CoordComp.coord_comp E H Dw l Xo c O β Z _ _ _ fA _ _ _ f₁ _ _ _ g _
+        _ _ _ inferInstance hG hh'
     rw [← hxK] at c3
     exact ((GlobalTheory.T.lie_eigenspace_frame_coordinates_unique_invertible E H Dw l Xo c O β Z _
       φA _ fA _ χ _ _ inferInstance hSA hh.1 hh.2.1).1 g).1.unique hh c3
@@ -358,14 +354,14 @@ theorem lifts_closed
     spMap_stalkClosedPointTo x
   obtain ⟨χ, hχ⟩ : ∃ χ : c.F →+* K, x ≫ j ≫ genStr Z = spMap χ := ⟨_, (Spec.map_preimage _).symm⟩
   have hχ' : χ = (Scheme.stalkClosedPointTo (R := .of K) x).hom.comp φA := by
-    apply spMap_inj'
+    apply _root_.GlobalTheory.ZM.DenseFib.spMap_inj
     rw [← hχ]
     conv_lhs => rw [← hx'']
     simp only [Category.assoc]
     rw [hst]
     exact (Spec.map_comp _ _).symm
   have hSA : fA.Stable :=
-    GlobalTheory.T.lie_eigenspace_frame_stable_of_isLocalRing E H Dw l Xo c O β Z _ φA _ fA
+    _root_.GlobalTheory.ShFam.EigStable.stable_of_isLocalRing E H Dw l Xo c O β Z _ φA _ fA
       inferInstance
   have hxg
       : x ≫ j ≫ genι Z
@@ -378,8 +374,7 @@ theorem lifts_closed
       K χ _ _ inferInstance hSA hxg hχ').2 h fun τ => (hh τ).2.1.isUnit
   refine (existsUnique_congr fun p => and_congr_right fun hp => ?_).2 (hL K χ x hχ g)
   subst hp
-  rw [GlobalTheory.T.carriesFlags_iff_adaptedFrame_at_image E H Dw l Xo c O β Z F e C S' A₁ K χ _ g
-    p hT']
+  rw [_root_.GlobalTheory.ShFam.CarriesAt.carries_iff E H Dw l Xo c O β Z F e C S' A₁ K χ _ g p hT']
   constructor
   · rintro ⟨A', hA', hP⟩
     obtain ⟨φ₁, f₁, hf₁⟩ := hT'.2 _ A' hA'
@@ -448,7 +443,7 @@ theorem lifts_of_closed
           = algebraMap K (AlgebraicClosure K) :=
       RingHom.ext fun a => σ.commutes a
     refine hqu _ ⟨?_, ?_⟩
-    · rw [Category.assoc, hq1, ← Category.assoc, GlobalTheory.FieldPts.spMap_comp', hσι]
+    · rw [Category.assoc, hq1, ← Category.assoc, _root_.GlobalTheory.spMap_comp_ring, hσι]
     · have e1
           : (h.map (algebraMap K (AlgebraicClosure K))).map
               (σ : AlgebraicClosure K →+* AlgebraicClosure K)

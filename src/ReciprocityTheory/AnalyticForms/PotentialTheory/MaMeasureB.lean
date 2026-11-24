@@ -210,8 +210,7 @@ theorem chartMeasure_integrable_integral
     image_closed_compact (A.chart j) (isClosed_tsupport (P.χ j)) (P.tsupport_subset j)
   refine integrableOn_target_of_closed (A.chart j) (Z := tsupport (P.χ j)) ?_ ?_
   · intro y _ hz
-    have h0 : P.χ j ((A.chart j).symm y) = 0 := by
-      first | exact image_eq_zero_of_notMem_tsupport hz | exact image_eq_zero_of_nmem_tsupport hz
+    have h0 : P.χ j ((A.chart j).symm y) = 0 := by first | exact image_eq_zero_of_notMem_tsupport hz
     rw [h0]
     ring
   · have hgK := hgi j _ hKs hK
@@ -220,10 +219,7 @@ theorem chartMeasure_integrable_integral
     have hm : IntegrableOn
         (fun y => P.χ j ((A.chart j).symm y) * (g ((A.chart j).symm y) * locDens A Φ j y))
         (A.chart j '' tsupport (P.χ j)) := by
-      first
-      | exact hgK.continuousOn_mul hc hK
-      | exact IntegrableOn.continuousOn_mul hc hgK hK
-      | exact hgK.continuousOn_mul hc hK.measurableSet
+      first | exact hgK.continuousOn_mul hc hK
     refine hm.congr_fun (fun y _ => by ring) hK.measurableSet
 
 theorem chartMeasure_finite
@@ -238,9 +234,7 @@ theorem chartMeasure_finite
     (chartMeasure_integrable_integral A P Φ hΦ hPsh j
       (g := fun _ => (1 : ℝ))
       measurable_const hgi).1
-  first
-  | exact (integrable_const_iff.1 hi).resolve_left one_ne_zero
-  | exact ⟨(integrable_const_iff.1 hi).resolve_left one_ne_zero⟩
+  first | exact (integrable_const_iff.1 hi).resolve_left one_ne_zero
 
 theorem maMeasure_forward
     (A : FinHolAtlas e X) (Φ : Fin e → LocPot X)
@@ -272,9 +266,7 @@ private theorem absDet_clm_fin {e : ℕ} (f : (Fin e → ℂ) →L[ℂ] (Fin e �
   have h
       : (f.restrictScalars ℝ).det
         = Algebra.norm ℝ (LinearMap.det (f : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))) := by
-    first
-    | exact LinearMap.det_restrictScalars
-    | exact LinearMap.det_restrictScalars (f := (f : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))
+    first | exact LinearMap.det_restrictScalars
   rw [h, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq]
   exact abs_of_nonneg (by positivity)
 
@@ -353,9 +345,7 @@ theorem maMeasure_converse
     have hyt : y ∈ (A.chart j).target := hKs hy.1
     have hnot : (A.chart j).symm y ∉ (A.chart k).source := fun h => hy.2 ⟨hy.1, hyt, h⟩
     have h0 : hne.some.χ k ((A.chart j).symm y) = 0 := by
-      first
-      | exact image_eq_zero_of_notMem_tsupport (fun h => hnot (hne.some.tsupport_subset k h))
-      | exact image_eq_zero_of_nmem_tsupport (fun h => hnot (hne.some.tsupport_subset k h))
+      first | exact image_eq_zero_of_notMem_tsupport (fun h => hnot (hne.some.tsupport_subset k h))
     rw [h0, zero_mul]
   have hsum : IntegrableOn
       (fun y =>

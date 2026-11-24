@@ -59,9 +59,6 @@ noncomputable section
 
 open scoped TensorProduct
 
-
-
-
 namespace GlobalTheory.SeriesTie
 
 theorem linearIndependent_rows_map

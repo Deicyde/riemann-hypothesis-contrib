@@ -119,9 +119,8 @@ theorem denom_mul_conjTranspose
     ring
   rw [h3]
   generalize (I * δ : ℂ) = t at h2 ⊢
-  simp only [conjTranspose_add, conjTranspose_mul, conjTranspose_smul, conjTranspose_one, hX.eq, h2,
-    Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one,
-    Matrix.one_mul, Matrix.mul_assoc, h1]
+  simp only [conjTranspose_add, conjTranspose_mul, conjTranspose_smul, hX.eq, h2, Matrix.mul_add,
+    Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.mul_assoc, h1]
   module
 
 theorem norm_det_mul_conjTranspose (A : Matrix (Fin N) (Fin N) ℂ)
@@ -205,8 +204,7 @@ theorem norm_det_denom_compare
     rw [denom_mul_conjTranspose C D X h hX]
     push_cast
     simp only [conjTranspose_add, conjTranspose_mul, Matrix.mul_add, Matrix.add_mul, Matrix.mul_sub,
-      Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.one_mul,
-      Matrix.mul_assoc]
+      Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.mul_assoc]
     module
   rw [he, norm_det_mul_conjTranspose, det_smul, hG, ← ofReal_pow, ← ofReal_mul, norm_real,
       norm_real, Fintype.card_fin, Real.norm_of_nonneg (by positivity),

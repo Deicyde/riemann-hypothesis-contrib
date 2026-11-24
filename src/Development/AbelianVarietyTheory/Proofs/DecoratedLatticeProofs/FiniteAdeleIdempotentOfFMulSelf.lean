@@ -167,13 +167,11 @@ theorem sig_eps
   rw [Algebra.TensorProduct.map_tmul, map_one]
   rfl
 
-
 theorem infPart_eps : infPart D (eps D) = 0 := by
   have h1 : infPart D (eps D) = fstA D.host.F (e0 D) ⊗ₜ[D.host.F] (AlgHom.id D.host.F D.host.E 1) :=
     Algebra.TensorProduct.map_tmul _ _ _ _
   have : fstA D.host.F (e0 D) = 0 := rfl
   rw [h1, this, TensorProduct.zero_tmul]
-
 
 theorem finPart_eps : finPart D (eps D) = 1 := by
   have h1 : finPart D (eps D) = sndA D.host.F (e0 D) ⊗ₜ[D.host.F] (AlgHom.id D.host.F D.host.E 1) :=

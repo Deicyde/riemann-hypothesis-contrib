@@ -124,7 +124,7 @@ theorem comp_eq_of_mem
     GlobalTheory.isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field c.F (Xo.XF c)
       strK hs
   have hN' : GlobalTheory.IsNormalScheme (Xo.XF c) := by
-    first | exact hN | exact GlobalTheory.IsNormalScheme.of_pred hN
+    first | exact GlobalTheory.IsNormalScheme.of_pred hN
   have ho : IsOpen (Z : Set (Xo.XF c)) :=
     GlobalTheory.IsNormalScheme.isOpen_of_mem_irreducibleComponents Z.2
   have hg :=

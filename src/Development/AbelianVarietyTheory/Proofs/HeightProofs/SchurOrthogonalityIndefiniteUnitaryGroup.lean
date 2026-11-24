@@ -1,9 +1,12 @@
 module
 
 public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HilbertSchurUnitaryIrreducibleScalarStatement
-import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.InnerProductSpace.Defs
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HilbertSchurUnitaryIrreducibleScalar
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneOnExpHermitian
+public import Mathlib.MeasureTheory.Function.L2Space
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -14,7 +17,6 @@ import Mathlib.Combinatorics.Enumerative.DyckWord
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Data.NNRat.Floor
 import Mathlib.Geometry.Euclidean.Volume.Basic
-public import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.NumberTheory.Chebyshev
 import Mathlib.NumberTheory.Height.NumberField
 import Mathlib.NumberTheory.Height.Projectivization
@@ -70,12 +72,12 @@ theorem exists_coefMap
       rw [← MemLp.toLp_add]
       congr 1
       ext g
-      simp [inner_add_right]
+      simp
     map_smul' := fun c a => by
       rw [RingHom.id_apply, ← MemLp.toLp_const_smul]
       congr 1
       ext g
-      simp [inner_smul_right]
+      simp
   }
   have hL : ∀ v, (L v : G → ℂ) =ᵐ[μ] fun g => ⟪w, π g v⟫_ℂ := fun v => (h v).coeFn_toLp
   have hc : Continuous L := by
@@ -135,7 +137,7 @@ theorem schur_orthogonality
   have hsc : ∀ w w', ∃ c : ℂ, ∀ v v', I v w v' w' = c * ⟪v', v⟫_ℂ := by
     intro w w'
     obtain ⟨c, hc⟩ :=
-      GlobalTheory.T.hilbert_schur_unitary_irreducible_scalar H G π hπ hirr
+      _root_.GlobalTheory.hilbert_schur H G π hπ hirr
         ((ContinuousLinearMap.adjoint (T w')).comp (T w))
         (by
           intro g
@@ -150,7 +152,7 @@ theorem schur_orthogonality
             map_mul, ContinuousLinearMap.mul_apply])
     refine ⟨c, fun v v' => ?_⟩
     rw [← hI, hc]
-    simp [inner_smul_right]
+    simp
   choose c hcI using hsc
   have hsym : ∀ v w v' w', I v w v' w' = I w' v' w v := by
     intro v w v' w'
@@ -159,7 +161,7 @@ theorem schur_orthogonality
     congr 1
     ext x
     rw [inner_rep π hπ x⁻¹, inner_rep π hπ x⁻¹, inv_inv, mul_comm]
-    simp [inner_conj_symm]
+    simp
   obtain ⟨u, hu⟩ : ∃ u : H, ‖u‖ = 1 := exists_norm_eq H zero_le_one
   have huu : ⟪u, u⟫_ℂ = 1 := by rw [inner_self_eq_norm_sq_to_K, hu]; simp
   have hpt : ∀ g, ⟪u, π g u⟫_ℂ * star ⟪u, π g u⟫_ℂ = ((‖⟪u, π g u⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by

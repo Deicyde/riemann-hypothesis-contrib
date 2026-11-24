@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaChainStage_level_spherical_off_set
     : ∀ D : D7,
       ForStage D fun c _ s =>
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.thetaChainStage_level_spherical_off_set
           ∧ ∀ P : HeightOneSpectrum (𝓞 D.host.E), ∃ x : 𝓞 D.host.F, ∃ y : 𝓞 D.host.E,
             (y : D.host.E) = algebraMap D.host.F D.host.E (x : D.host.F) ∧ y ∈ P.asIdeal
               ∧ y ∉ P.asIdeal ^ 2 := by
-  first
-  | exact @GlobalTheory.ChainOntoSph.level_spherical_off_S
-  | exact GlobalTheory.ChainOntoSph.level_spherical_off_S
-  | (intros; apply GlobalTheory.ChainOntoSph.level_spherical_off_S <;> assumption)
+  first | exact @GlobalTheory.ChainOntoSph.level_spherical_off_S

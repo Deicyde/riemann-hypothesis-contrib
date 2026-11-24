@@ -56,8 +56,6 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
-
 open UpperTheory.V.Z.J.D
 
 namespace UpperTheory.V.Z.Desc.V0

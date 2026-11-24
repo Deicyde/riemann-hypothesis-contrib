@@ -78,8 +78,8 @@ theorem famφB_pr (pD : IsPowDeg D' D j) (α' : D'.X) (i : Fin j) (a : Fin 4)
       )
     | (
         congr 1
-        simp [CartesianMonoidalCategory.comp_lift_assoc, CartesianMonoidalCategory.comp_lift, hc,
-          IsMonHom.mul_hom, CartesianMonoidalCategory.comp_toUnit_assoc]
+        simp [CartesianMonoidalCategory.comp_lift_assoc,
+          CartesianMonoidalCategory.comp_toUnit_assoc]
       )
 
 def boxFamB (pD : IsPowDeg D' D j) (k : ℕ) (f : Fin j → ∀ α : D.X, D.SecB k α) (α' : D'.X)

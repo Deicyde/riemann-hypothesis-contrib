@@ -113,7 +113,7 @@ theorem twisted_norm_local_step
       : a * (β : A)
         = ((k⁻¹ : Aˣ) : A) * ((k : A) * (a * β) * (σ (k : A)).unop)
           * (σ ((k⁻¹ : Aˣ) : A)).unop := by
-    simp only [mul_assoc, shinv', shc, mul_one, Units.inv_mul_cancel_left]
+    simp only [mul_assoc, shinv', mul_one, Units.inv_mul_cancel_left]
   rw [hk, ← Algebra.commutes (lam : K), hkz, Units.val_mul, shmul] at e
   have ha
       : a

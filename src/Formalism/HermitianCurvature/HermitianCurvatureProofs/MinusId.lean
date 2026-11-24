@@ -392,7 +392,9 @@ theorem main
     have hr1 : star (l.pt + 1) = l.pt + 1 := by rw [star_add, hr, star_one]
     have hrm : star (l.pt - 1) = l.pt - 1 := by rw [star_sub, hr, star_one]
     obtain ⟨hx, hxi⟩ := x_kMat L st w
-    have hrec := Formalism.FourierDecayAlt.P.admissible_rec_of_admissible A S r L st (l :: w) hA0
+    have hrec :=
+      _root_.Formalism.FourierDecayAlt.P.Fr2.admissible_rec_of_admissible_word A S r L st (l :: w)
+        hA0
     have h01 := eU_sum (A := A) l.intersection_update_fsHerm_neg_one
     have kE
         : ∀ i j,

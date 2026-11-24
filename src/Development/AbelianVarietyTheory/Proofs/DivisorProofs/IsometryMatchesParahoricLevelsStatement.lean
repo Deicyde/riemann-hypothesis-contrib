@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR For
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CuspMult
+
 theorem _root_.GlobalTheory.T.isometry_matches_parahoric_levels
     : ∀ {D : D7} (V V' : HSp D) (β : GL (Fin V.rank) (EAf D)) (β' : GL (Fin V'.rank) (EAf D))
         (r t : ℕ) (hr : r ≤ V.rank) (hr' : r ≤ V'.rank) (Pg : Finset (Pl D.host.E))

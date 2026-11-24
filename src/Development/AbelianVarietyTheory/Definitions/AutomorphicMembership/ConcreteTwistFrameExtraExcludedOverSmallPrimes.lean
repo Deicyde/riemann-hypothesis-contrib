@@ -211,7 +211,6 @@ structure RingSpec
                 ∧ algebraMap (T.O0 s) (FractionRing (T.O0 s)) ((T.delta s σ : (T.O0 s)ˣ) : T.O0 s)
                   = T.emb0 s x
 
-
 structure TwFrameC (D : D7) where
   K0 : ∀ i, Loc.FinExt (D.ntw.l i)
   eO0 : ∀ i, D.ntw.O0 i ≃+* intOf (D.ntw.l i) (K0 i).1

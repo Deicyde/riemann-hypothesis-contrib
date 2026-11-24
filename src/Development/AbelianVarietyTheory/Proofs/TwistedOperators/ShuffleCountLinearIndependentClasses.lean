@@ -248,7 +248,6 @@ theorem separates_of_shuffle_count
     by_contra hki
     set y : I →₀ ℤ := ∑ j, Finsupp.single (p j) (k j) with hy
     have hRy : ∀ w, Rh w y = 0 := fun w => by
-
       rw [hy, map_sum]
       simp only [hRs]
       exact hk w

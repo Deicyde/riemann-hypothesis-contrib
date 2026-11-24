@@ -328,12 +328,12 @@ theorem gauss_decomp
       have : u • b = (u • G).toBlocks₁₂ := rfl
       rw [this, hG1]
       ext i j
-      simp [Matrix.toBlocks₁₂, Matrix.one_apply]
+      simp [Matrix.toBlocks₁₂]
     have e3 : u • c = 0 := by
       have : u • c = (u • G).toBlocks₂₁ := rfl
       rw [this, hG1]
       ext i j
-      simp [Matrix.toBlocks₂₁, Matrix.one_apply]
+      simp [Matrix.toBlocks₂₁]
     have e4 : u • e = u • (1 : Matrix (Fin d) (Fin d) (AE F E)) := by
       have : u • e = (u • G).toBlocks₂₂ := rfl
       rw [this, hG1]

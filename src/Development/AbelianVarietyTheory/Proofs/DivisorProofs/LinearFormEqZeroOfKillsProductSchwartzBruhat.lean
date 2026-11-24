@@ -47,6 +47,8 @@ import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DiagWZero
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLagrAt
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 
 @[expose] public section
 
@@ -89,7 +91,7 @@ theorem schr_boxFun
       = boxFun (schr ψ (w.1 ∘ Sum.inl, w.2 ∘ Sum.inl) φ₁)
         (schr ψ (w.1 ∘ Sum.inr, w.2 ∘ Sum.inr) φ₂) := by
   funext x
-  simp only [schr, boxFun, dotProduct, Fintype.sum_sum_type, Function.comp_apply, Pi.add_apply]
+  simp only [schr, boxFun, dotProduct, Fintype.sum_sum_type, Function.comp_apply]
   rw [show (∑ i, x (Sum.inl i) * w.2 (Sum.inl i)) + (∑ i, x (Sum.inr i) * w.2 (Sum.inr i))
           + ⅟(2 : R)
             * ((∑ i, w.1 (Sum.inl i) * w.2 (Sum.inl i)) + (∑ i, w.1 (Sum.inr i) * w.2 (Sum.inr i)))
@@ -156,7 +158,7 @@ theorem GlobalTheory.BoxSpan.boxSpan_ker
   have hne : boxFun i₁ i₂ ≠ 0 := by
     intro h
     have := congrFun h 0
-    simp [boxFun, i₁, i₂, Set.indicator, zero_mem] at this
+    simp [boxFun, i₁, i₂, zero_mem] at this
   have hall := GlobalTheory.SchrIrred.schr_irreducible v ψ hψ h1 N hN hS _ h0 hne
   have hk : N ≤ LinearMap.ker Λ := by
     refine Submodule.span_le.2 ?_

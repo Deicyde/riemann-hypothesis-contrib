@@ -4,13 +4,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TrMMemFr
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalDensitiesBoundedAlmostAll
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalLatticeCompactOpenUnitVolumeStatement
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.RankOneLocalDensityAlmostAllStatement
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SummableOneDivAbsNormSq
-import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HaarMeasureNonunitsNull
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.IsFibreFamilyLength
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalVolumeRankOneIsotropicStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalVolumeRankOneIsotropic
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ContinuousHermScal
+import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalLatticeCompactOpenUnitVolume
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.RankOneLocalDensityAlmostAll
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Development.AutomorphicSpectrum.Proofs.GlobalProofs.FibreMassEq
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerOrbitVolume.DetAdmA
 import Mathlib.Algebra.Order.Floor.Extended
@@ -52,7 +54,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ContinuousHermScal
 import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HypOneZeroZero
 
 @[expose] public section
@@ -153,7 +154,7 @@ theorem density_close
       Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.qR (Fv F v) σ J (X 0) :=
     GlobalTheory.CompanionTheory.SW.LenFib.continuous_qR (Fv F v) hσ J
   obtain ⟨hLc, hLo, -, -⟩ :=
-    GlobalTheory.T.local_lattice_compact_open_unit_volume F E σ hσ d b 1 M v
+    _root_.GlobalTheory.CompanionTheory.SW.latV_compact_open_mass F E σ hσ d b 1 M v
   have hLm : MeasurableSet (latV (M := M) (n := 1) b v) := hLo.measurableSet
 
   let φ : (Fin 1 → Fin M → Fv F v ⊗[F] E) → ℝ := (latV b v).indicator fun _ => 1
@@ -239,28 +240,28 @@ theorem GlobalTheory.CompanionTheory.WeilSiegel.FreeMass.mass_free_summable
                       → (∀ v,
                           m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) (latV b v) < ⊤)
                         ∧ Summable fun v =>
-                          |(m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) (latV b v)).toReal - 1| :=
-  by
-    intro F E _ _ _ _ _ σ hσ M J hJ hM h₀ d b lam hlam m hm
-    have hL := fun v => GlobalTheory.T.local_lattice_compact_open_unit_volume F E σ hσ d b 1 M v
-    have avg := fun v =>
-      GlobalTheory.T.local_volume_rank_one_isotropic F E σ hσ M J hJ hM h₀ d b v (lam v) (hlam v)
-        (m v) (hm v) (latV b v) (hL v).1 (hL v).2.1
-    refine ⟨fun v => (avg v).1, ?_⟩
-    refine Summable.of_norm_bounded_eventually
-      (g := fun v : HeightOneSpectrum (𝓞 F) => 2 * (1 / (Ideal.absNorm v.asIdeal : ℝ) ^ 2))
-      ((GlobalTheory.CompanionTheory.SW.Primes.summable_one_div_absNorm_sq F).mul_left 2) ?_
-    filter_upwards [GlobalTheory.T.rank_one_local_density_almost_all F E σ hσ M J hJ hM d b] with v hv
-    obtain ⟨m', hm'⟩ :=
-      GlobalTheory.CompanionTheory.SW.GoodMass.exists_family hσ hJ b v (lam v) (hlam v) 1
-    have hq : (1 : ℝ) ≤ (Ideal.absNorm v.asIdeal : ℝ) :=
-      GlobalTheory.CompanionTheory.SW.GoodMass.absNorm_one_le v
-    have hd :=
-      GlobalTheory.CompanionTheory.WeilSiegel.FreeMass.density_close hσ hJ hM b v (lam v) (hlam v)
-        m' hm' (x := (m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) (latV b v)).toReal)
-        (δ := 2 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1)) (by positivity)
-        (hv (lam v) (hlam v) m' hm') (avg v).2
-    rw [Real.norm_eq_abs, abs_abs]
-    refine hd.trans ?_
-    rw [mul_one_div]
-    exact div_le_div_of_nonneg_left (by norm_num) (by positivity) (pow_le_pow_right₀ hq (by omega))
+                          |(m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) (latV b v)).toReal - 1| := by
+  intro F E _ _ _ _ _ σ hσ M J hJ hM h₀ d b lam hlam m hm
+  have hL := fun v =>
+    _root_.GlobalTheory.CompanionTheory.SW.latV_compact_open_mass F E σ hσ d b 1 M v
+  have avg := fun v =>
+    _root_.GlobalTheory.CompanionTheory.SW.AvgZero.avg_zero F E σ hσ M J hJ hM h₀ d b v (lam v)
+      (hlam v) (m v) (hm v) (latV b v) (hL v).1 (hL v).2.1
+  refine ⟨fun v => (avg v).1, ?_⟩
+  refine Summable.of_norm_bounded_eventually
+    (g := fun v : HeightOneSpectrum (𝓞 F) => 2 * (1 / (Ideal.absNorm v.asIdeal : ℝ) ^ 2))
+    ((GlobalTheory.CompanionTheory.SW.Primes.summable_one_div_absNorm_sq F).mul_left 2) ?_
+  filter_upwards [_root_.GlobalTheory.CompanionTheory.SW.LocGood.density_standard_lattice F E σ hσ M J hJ hM d b] with v hv
+  obtain ⟨m', hm'⟩ :=
+    GlobalTheory.CompanionTheory.SW.GoodMass.exists_family hσ hJ b v (lam v) (hlam v) 1
+  have hq : (1 : ℝ) ≤ (Ideal.absNorm v.asIdeal : ℝ) :=
+    GlobalTheory.CompanionTheory.SW.GoodMass.absNorm_one_le v
+  have hd :=
+    GlobalTheory.CompanionTheory.WeilSiegel.FreeMass.density_close hσ hJ hM b v (lam v) (hlam v) m'
+      hm' (x := (m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) (latV b v)).toReal)
+      (δ := 2 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1)) (by positivity)
+      (hv (lam v) (hlam v) m' hm') (avg v).2
+  rw [Real.norm_eq_abs, abs_abs]
+  refine hd.trans ?_
+  rw [mul_one_div]
+  exact div_le_div_of_nonneg_left (by norm_num) (by positivity) (pow_le_pow_right₀ hq (by omega))

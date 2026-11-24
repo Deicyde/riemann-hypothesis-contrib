@@ -50,27 +50,33 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
 
-open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms NumberField Classical
+open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms
+  NumberField Classical
 open scoped Matrix
 
-theorem substitution_one {ι : Type} {n : ℕ} (P : MvPolynomial (ι × Fin n × Fin n) ℂ) :
-    subP (fun _ => (1 : Matrix (Fin n) (Fin n) ℂ)) P = P := by
-  have h : (subP (fun _ : ι => (1 : Matrix (Fin n) (Fin n) ℂ)) :
-      MvPolynomial (ι × Fin n × Fin n) ℂ →ₐ[ℂ] MvPolynomial (ι × Fin n × Fin n) ℂ) = AlgHom.id ℂ _ := by
+theorem substitution_one {ι : Type} {n : ℕ} (P : MvPolynomial (ι × Fin n × Fin n) ℂ)
+    : subP (fun _ => (1 : Matrix (Fin n) (Fin n) ℂ)) P = P := by
+  have h
+      : (subP (fun _ : ι => (1 : Matrix (Fin n) (Fin n) ℂ))
+          : MvPolynomial (ι × Fin n × Fin n) ℂ →ₐ[ℂ] MvPolynomial (ι × Fin n × Fin n) ℂ)
+        = AlgHom.id ℂ _ := by
     apply MvPolynomial.algHom_ext
     intro x
     simp [subP, Matrix.one_apply]
   rw [h]
   rfl
 
-theorem substitution_substitution {ι : Type} {n : ℕ} (o o' : ι → Matrix (Fin n) (Fin n) ℂ) (P : MvPolynomial (ι × Fin n × Fin n) ℂ) :
-    subP o (subP o' P) = subP (fun τ => o' τ * o τ) P := by
+theorem substitution_substitution
+    {ι : Type} {n : ℕ}
+    (o o' : ι → Matrix (Fin n) (Fin n) ℂ) (P : MvPolynomial (ι × Fin n × Fin n) ℂ)
+    : subP o (subP o' P) = subP (fun τ => o' τ * o τ) P := by
   have h : (subP o).comp (subP o') = subP (fun τ => o' τ * o τ) := by
     apply MvPolynomial.algHom_ext
     intro x
 
-    simp only [AlgHom.comp_apply, subP, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.aeval_C,
-    MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
+    simp only [AlgHom.comp_apply, subP, MvPolynomial.aeval_X, map_sum, map_mul,
+      MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum,
+      Finset.sum_mul, mul_assoc]
     rw [Finset.sum_comm]
   show ((subP o).comp (subP o')) P = _
   rw [h]
@@ -78,19 +84,27 @@ theorem substitution_substitution {ι : Type} {n : ℕ} (o o' : ι → Matrix (F
 variable (D : D7)
 
 def BwGLStab (w : D.what₂.places.Pl) : Prop :=
-  ∀ (n : ℕ) (ν : DomWeight n) (s : ℤ) (M M' : Matrix (Fin n) (Fin n) ℂ), M * M' = 1 →
-    (∀ a b, M a b ∈ bwA_Ow D w) → (∀ a b, M' a b ∈ bwA_Ow D w) →
-    ∀ g ∈ delSq ℤ n ν, M.det ^ s • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g) ∈
-      bwA_span (bwA_Ow D w) le_rfl ν.natW
+  ∀ (n : ℕ) (ν : DomWeight n) (s : ℤ) (M M' : Matrix (Fin n) (Fin n) ℂ),
+    M * M' = 1 → (∀ a b, M a b ∈ bwA_Ow D w) → (∀ a b, M' a b ∈ bwA_Ow D w)
+      → ∀ g ∈ delSq ℤ n ν,
+        M.det ^ s
+            • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g)
+          ∈ bwA_span (bwA_Ow D w) le_rfl ν.natW
 
-theorem bwG_intSpan_allSubP (w : D.what₂.places.Pl) {n : ℕ} (lam : D.what₂.Tau → DomWeight n)
-    (N : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ) (s : D.what₂.Tau → ℤ)
-    (hB : ∀ τ, ∀ g ∈ delSq ℤ n (lam τ), (N τ).det ^ s τ • Formalism.GradedWeylDivisibility.rowAct ℂ (N τ) (MvPolynomial.map (Int.castRingHom ℂ) g) ∈
-      bwA_span (bwA_Ow D w) le_rfl (lam τ).natW)
-    (Q : MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ) (hQ : Q ∈ Formalism.L2.Forms.IntSpan D w lam) :
-    MvPolynomial.C (∏ τ, (N τ).det ^ s τ) * subP N Q ∈ Formalism.L2.Forms.IntSpan D w lam := by
-  have key : ∀ S : Finset D.what₂.Tau, MvPolynomial.C (∏ τ ∈ S, (N τ).det ^ s τ) *
-      subP (fun τ => if τ ∈ S then N τ else 1) Q ∈ Formalism.L2.Forms.IntSpan D w lam := by
+theorem bwG_intSpan_allSubP
+    (w : D.what₂.places.Pl)
+    {n : ℕ} (lam : D.what₂.Tau → DomWeight n) (N : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ)
+    (s : D.what₂.Tau → ℤ)
+    (hB : ∀ τ, ∀ g ∈ delSq ℤ n (lam τ),
+      (N τ).det ^ s τ
+          • Formalism.GradedWeylDivisibility.rowAct ℂ (N τ) (MvPolynomial.map (Int.castRingHom ℂ) g)
+        ∈ bwA_span (bwA_Ow D w) le_rfl (lam τ).natW)
+    (Q : MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ) (hQ : Q ∈ Formalism.L2.Forms.IntSpan D w lam)
+    : MvPolynomial.C (∏ τ, (N τ).det ^ s τ) * subP N Q ∈ Formalism.L2.Forms.IntSpan D w lam := by
+  have key
+      : ∀ S : Finset D.what₂.Tau,
+        MvPolynomial.C (∏ τ ∈ S, (N τ).det ^ s τ) * subP (fun τ => if τ ∈ S then N τ else 1) Q
+          ∈ Formalism.L2.Forms.IntSpan D w lam := by
     intro S
     induction S using Finset.induction_on with
     | empty =>
@@ -101,7 +115,9 @@ theorem bwG_intSpan_allSubP (w : D.what₂.places.Pl) {n : ℕ} (lam : D.what₂
       set U : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ := Function.update 1 τ0 (N τ0) with hU
       have hU1 : ∀ τ, τ ≠ τ0 → U τ = 1 := fun τ hτ => by rw [hU, Function.update_of_ne hτ]; rfl
       have hUτ : U τ0 = N τ0 := by rw [hU, Function.update_self]
-      have hcomp : (fun τ => (if τ ∈ S then N τ else 1) * U τ) = fun τ => if τ ∈ insert τ0 S then N τ else 1 := by
+      have hcomp
+          : (fun τ => (if τ ∈ S then N τ else 1) * U τ)
+            = fun τ => if τ ∈ insert τ0 S then N τ else 1 := by
         funext τ
         by_cases hτ : τ = τ0
         · subst hτ
@@ -110,13 +126,16 @@ theorem bwG_intSpan_allSubP (w : D.what₂.places.Pl) {n : ℕ} (lam : D.what₂
           by_cases hS : τ ∈ S
           · rw [if_pos hS, if_pos (Finset.mem_insert_of_mem hS)]
           · rw [if_neg hS, if_neg (by simp [hτ, hS])]
-      have e : MvPolynomial.C (∏ τ ∈ insert τ0 S, (N τ).det ^ s τ) *
-          subP (fun τ => if τ ∈ insert τ0 S then N τ else 1) Q =
-          (N τ0).det ^ s τ0 • subP U (MvPolynomial.C (∏ τ ∈ S, (N τ).det ^ s τ) *
-            subP (fun τ => if τ ∈ S then N τ else 1) Q) := by
+      have e
+          : MvPolynomial.C (∏ τ ∈ insert τ0 S, (N τ).det ^ s τ)
+              * subP (fun τ => if τ ∈ insert τ0 S then N τ else 1) Q
+            = (N τ0).det ^ s τ0 • subP U
+              (MvPolynomial.C (∏ τ ∈ S, (N τ).det ^ s τ)
+                * subP (fun τ => if τ ∈ S then N τ else 1) Q) := by
         have hC : ∀ x, subP U (MvPolynomial.C x) = MvPolynomial.C x := fun x => by
           rw [← MvPolynomial.algebraMap_eq, AlgHom.commutes]
-        rw [map_mul, substitution_substitution, hcomp, Finset.prod_insert h0, map_mul, MvPolynomial.smul_eq_C_mul, hC, mul_assoc]
+        rw [map_mul, substitution_substitution, hcomp, Finset.prod_insert h0, map_mul,
+          MvPolynomial.smul_eq_C_mul, hC, mul_assoc]
       rw [e]
       refine bwA_intSpan_subP D w lam τ0 U hU1 _ ?_ _ ih
       intro g hg
@@ -146,17 +165,24 @@ theorem local_GL_stabilises_lattice (w : D.what₂.places.Pl) : BwGLStab D w := 
         exact inv_eq_of_mul_eq_one_right hdet
       rw [e]
       exact pow_mem hdM' _
-  have e : M.det ^ s • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g) =
-      (⟨M.det ^ s, hds⟩ : bwA_Ow D w) • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g) := rfl
+  have e
+      : M.det ^ s
+          • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g)
+        = (⟨M.det ^ s, hds⟩ : bwA_Ow D w)
+          • Formalism.GradedWeylDivisibility.rowAct ℂ M (MvPolynomial.map (Int.castRingHom ℂ) g) :=
+    rfl
   rw [e]
   exact Submodule.smul_mem _ _ hrow
 
 variable (u : D.what₂.Word)
 
-theorem bwG_change_mem (w : D.what₂.places.Pl) (hw : OverT D u w) (τ : D.what₂.Tau) {n : ℕ}
-    {L : Set (Fin n → D.host.E)} {B B₂ : GL (Fin n) D.host.E}
-    (hB : IsLocBasis (D.mem u).A.T L B) (hB₂ : IsLocBasis (D.mem u).A.T L B₂) (a b : Fin n) :
-    atInf (embT D) ((B₂⁻¹ * B : GL (Fin n) D.host.E) : Matrix (Fin n) (Fin n) D.host.E) τ a b ∈ bwA_Ow D w := by
+theorem bwG_change_mem
+    (w : D.what₂.places.Pl) (hw : OverT D u w)
+    (τ : D.what₂.Tau)
+    {n : ℕ} {L : Set (Fin n → D.host.E)} {B B₂ : GL (Fin n) D.host.E}
+    (hB : IsLocBasis (D.mem u).A.T L B) (hB₂ : IsLocBasis (D.mem u).A.T L B₂) (a b : Fin n)
+    : atInf (embT D) ((B₂⁻¹ * B : GL (Fin n) D.host.E) : Matrix (Fin n) (Fin n) D.host.E) τ a b
+      ∈ bwA_Ow D w := by
   obtain ⟨s, hs, hx⟩ := bwE_col_loc D u w hw hB b
   have h := bwE_locBasis_int D u w hw τ hB₂ _ s hs hx a
   rw [bwE_mulVec_col, ← Units.val_mul] at h

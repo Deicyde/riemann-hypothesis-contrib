@@ -411,7 +411,7 @@ theorem exists_affine_lieBasis_baseChange
     ?_
   ⟩
   · have s : (algebraMap Γ(X, U) R' ∘ Pi.single j (1 : Γ(X, U)) : Fin n → R') = Pi.single j 1 := by
-      funext i; by_cases hij : i = j <;> simp [hij, Pi.single_apply]
+      funext i; by_cases hij : i = j <;> simp [hij]
     have := e' (Pi.single j 1)
     rw [s] at this
     rw [← haφ, ← Category.assoc, ← Over.comp_left, Category.assoc, a.inv_hom_id, Category.comp_id,

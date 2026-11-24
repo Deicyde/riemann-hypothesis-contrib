@@ -55,26 +55,33 @@ theorem totallyComplex (I : AutInst) : IsTotallyComplex I.E := I.cm.cmUnram.1
 theorem frm_det (I : AutInst) (x : I.GA) (w : InfinitePlace I.E) : IsUnit (frm I x w).det := by
   apply GlobalTheory.NearLowerCompare.frm_isUnit <;> assumption
 
-theorem least_pos (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG) (h0 : lamX I x ≠ ⊥) : 0 < least I x := by
+theorem least_pos (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG) (h0 : lamX I x ≠ ⊥)
+    : 0 < least I x := by
   have := totallyComplex I
-  obtain ⟨-, -, -, h4, -⟩ := Formalism.HN.sizeMu I.E (Fin I.n → I.E) (Fin I.n) (bas I) (frm I x) (frm_det I x)
-    (lamX I x) hfg h0
+  obtain ⟨-, -, -, h4, -⟩ :=
+    Formalism.HN.sizeMu I.E (Fin I.n → I.E) (Fin I.n) (bas I) (frm I x) (frm_det I x) (lamX I x) hfg
+      h0
   unfold least
   rw [h4]
   exact Real.exp_pos _
 
-private theorem fg_of_le_lamX (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG)
-    {S : Submodule (𝓞 I.E) (Fin I.n → I.E)} (h : S ≤ lamX I x) : S.FG := by
+private theorem fg_of_le_lamX
+    (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG)
+    {S : Submodule (𝓞 I.E) (Fin I.n → I.E)} (h : S ≤ lamX I x)
+    : S.FG := by
   have : IsNoetherian (𝓞 I.E) (lamX I x) := isNoetherian_of_fg_of_noetherian _ hfg
   have : IsNoetherian (𝓞 I.E) S := isNoetherian_of_le h
   exact Module.Finite.iff_fg.mp inferInstance
 
-theorem htQ_pos (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG) (S S' : Submodule (𝓞 I.E) (Fin I.n → I.E))
-    (hS : GlobalTheory.IndefiniteRowSideFullHecke.SaturatedPerpDuality.SatIn I x S) (hS' : S' ≤ lamX I x) (h : S ≤ S') :
-    0 < Formalism.HN.htQ (bas I) (frm I x) S' S := by
+theorem htQ_pos
+    (I : AutInst) (x : I.GA) (hfg : (lamX I x).FG) (S S' : Submodule (𝓞 I.E) (Fin I.n → I.E))
+    (hS : GlobalTheory.IndefiniteRowSideFullHecke.SaturatedPerpDuality.SatIn I x S)
+    (hS' : S' ≤ lamX I x) (h : S ≤ S')
+    : 0 < Formalism.HN.htQ (bas I) (frm I x) S' S := by
   have := totallyComplex I
-  obtain ⟨κ, _, _, b'', X'', hX'', -, hq⟩ := Formalism.HN.quotRealize I.E (Fin I.n → I.E) (Fin I.n) (bas I)
-    (frm I x) (frm_det I x) (lamX I x) S hfg hS
+  obtain ⟨κ, _, _, b'', X'', hX'', -, hq⟩ :=
+    Formalism.HN.quotRealize I.E (Fin I.n → I.E) (Fin I.n) (bas I) (frm I x) (frm_det I x)
+      (lamX I x) S hfg hS
   rw [(hq S' h hS').1]
   exact (Formalism.HN.plLat I.E _ κ b'' X'' hX'' _ ((fg_of_le_lamX I x hfg hS').map _)).2.2
 

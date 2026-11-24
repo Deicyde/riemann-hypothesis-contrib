@@ -68,18 +68,6 @@ section Geo
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
   ReciprocityTheory.ChartRestriction.G.Out
 
-theorem powGen_isGen
-    {X Y : Scheme.{0}} (L : LB X)
-    {K : Type} [Fintype K]
-    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
-    (n : ℕ)
-    : (GeneratorPullback.powGen L φ ε t n).IsGen := fun i j => by
-  refine ((map_pow _ _ _).trans ((congrArg (· ^ n) (ht i j)).trans (mul_pow _ _ _))).trans
-    (congrArg₂ (· * ·) ?_ (map_pow _ _ _).symm)
-  exact (Finset.prod_pow _ _ _).symm.trans
-    (Finset.prod_congr rfl fun k _ =>
-      (zpow_natCast _ n).symm.trans ((zpow_mul _ _ _).symm.trans (congrArg _ (mul_comm _ _))))
-
 theorem val_powGen
     {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K]
     {φ : K → (Y ⟶ X)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb L φ ε))
@@ -190,7 +178,8 @@ theorem exists_gen_pull
           (LB.mulGen Lr.L _ _ _ _ (LB.pullGen Lr.L _ _ ρ (act.act a).left)
             (LB.mulGen Lr.L _ _ _ _ (LB.pullGen Lr.L _ _ u (lift (𝟙 G) (act.act (w0 * a))).left)
               t))))
-      (DVR.mulGen_isGen _ _ _ _ _ _ _ (powGen_isGen _ _ _ _ hρ N)
+      (DVR.mulGen_isGen _ _ _ _ _ _ _
+        (_root_.ReciprocityTheory.ChartRestriction.G.DVR.powGen_isGen _ _ _ _ hρ N)
         (DVR.invGen_isGen _ _ _ _
           (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.pullGen_isGen _ _ _ _ hρ _)
             (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.pullGen_isGen _ _ _ _ hu _) ht))))

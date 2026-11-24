@@ -65,7 +65,7 @@ theorem GlobalTheory.ColNorms.familyVectors : GlobalTheory.ColNorms.FamilyVector
   have hQ : ∀ α, Formalism.MainNotions.TaylorLogMetric.taylor D (B.eNat χ N N' L L') α ∈ Qbar := by
     intro α
     have :=
-      GlobalTheory.ThLoc.algTAll D cc δ B χ hc hδ hχ N N' L L' hA 0
+      _root_.GlobalTheory.ThLoc.Alg.algTAll D cc δ B χ hc hδ hχ N N' L L' hA 0
         ⟨1, one_pos, by simpa using zero_mem _⟩ α
     have hU : U D B.tor 0 (B.eNat χ N N' L L') = B.eNat χ N N' L L' := by funext z; simp [U, Hf]
     rwa [hU] at this

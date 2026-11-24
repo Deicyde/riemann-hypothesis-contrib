@@ -62,9 +62,7 @@ variable {R : Type} [CommRing R] {d : ℕ} {O : Type} [CommRing O] [StarRing O]
 variable {k : Type} [CommRing k] [Algebra ℚ k] [Algebra R k]
 
 theorem liftX_hasSubst : HasSubst (fun p : Fin 1 × Fin d => (X (Sum.inl p.2) : AA k d)) := by
-  first
-  | exact hasSubst_of_constantCoeff_zero (fun p => by simp)
-  | exact ⟨fun p => by simp, fun e => Set.toFinite _⟩
+  first | exact hasSubst_of_constantCoeff_zero (fun p => by simp)
 
 theorem liftX_add (f g : PS k 1 d) : liftX k (f + g) = liftX k f + liftX k g :=
   MvPowerSeries.subst_add liftX_hasSubst f g
@@ -82,14 +80,9 @@ theorem nabla_add (B : FB R d O) (h : PS k 2 d) (m : ℕ) (u u' φ φ' : Fin d �
   first
   | (
       unfold nabla Dx
-      simp only [Pi.add_apply, Prod.fst_add, Prod.snd_add, map_add (f := _), add_mul, mul_add,
-        Finset.sum_add_distrib, Dof_add, liftX_add, smul_add, add_smul]
+      simp only [Pi.add_apply, map_add (f := _), add_mul, mul_add, Finset.sum_add_distrib, Dof_add,
+        liftX_add]
       ring
-    )
-  | (
-      unfold nabla
-      revert G u u' φ φ' m h B
-      done
     )
 
 def nablaL (B : FB R d O) (h : PS k 2 d) (m : ℕ) (u φ : Fin d → k) : Module.End k (AA k d) where
@@ -121,14 +114,7 @@ theorem nablaL_bracket
   apply LinearMap.ext
   intro G
   simp only [LinearMap.sub_apply, Module.End.mul_apply, nablaL_apply, Module.algebraMap_end_apply]
-  first
-  | exact hN2 B h m ξ η G
-  | exact hN2 B h m ξ.1 ξ.2 η.1 η.2 G
-  | exact hN2 B h m G ξ η
-  | simpa using hN2 B h m ξ η G
-  | simpa using hN2 B h m ξ.1 ξ.2 η.1 η.2 G
-  | (apply hN2; done)
-  | (simp only [Algebra.smul_def] at *; apply hN2; done)
+  first | (simp only [Algebra.smul_def] at *; apply hN2; done)
 
 theorem nablaL_comm
     (hN2 : ConnectionCommutator) (B : FB R d O) (h : PS k 2 d) (m : ℕ)
@@ -177,16 +163,13 @@ theorem foldr_eq_prod
     first
     | simp only [List.foldr_cons, List.map_cons, List.prod_cons, Module.End.mul_apply,
         Module.End.pow_apply, hF, ih]
-    | simp only [List.foldr_cons, List.map_cons, List.prod_cons, LinearMap.mul_apply,
-        LinearMap.pow_apply, hF, ih]
 
 theorem perm_inl (s : ι → Bool)
     : ((Finset.univ : Finset ι).toList.filter (fun l => s l)).Perm
       (List.ofFn fun i => (sideE s).symm (Sum.inl i)) := by
   rw [List.perm_ext_iff_of_nodup ((Finset.nodup_toList _).filter _) ?_]
   · intro x
-    simp only [List.mem_filter, Finset.mem_toList, Finset.mem_univ, true_and, List.mem_ofFn,
-      Set.mem_range]
+    simp only [List.mem_filter, Finset.mem_toList, Finset.mem_univ, true_and, List.mem_ofFn]
     constructor
     · intro hx
       exact ⟨Fintype.equivFin _ ⟨x, hx⟩, by rw [sideE_symm_inl]; simp⟩
@@ -202,7 +185,7 @@ theorem perm_inr (s : ι → Bool)
   rw [List.perm_ext_iff_of_nodup ((Finset.nodup_toList _).filter _) ?_]
   · intro x
     simp only [List.mem_filter, Finset.mem_toList, Finset.mem_univ, true_and, List.mem_ofFn,
-      Set.mem_range, Bool.not_eq_true']
+      Bool.not_eq_true']
     constructor
     · intro hx
       exact ⟨Fintype.equivFin _ ⟨x, by simp [hx]⟩, by rw [sideE_symm_inr]; simp⟩

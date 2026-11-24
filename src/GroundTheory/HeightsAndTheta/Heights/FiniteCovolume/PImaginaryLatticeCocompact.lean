@@ -206,7 +206,6 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
   refine ⟨⟨x, hx⟩, ?_, fun w => ?_⟩
   · change (m : E) * x + conj F E ((m : E) * x) = 0
     have : conj F E x = -x := by
-
       simp only [x, map_sum, map_mul, map_intCast, conj_algebraMap, htc]
       rw [← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_

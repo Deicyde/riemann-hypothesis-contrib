@@ -61,7 +61,4 @@ theorem _root_.GlobalTheory.T.threeTermComplex_of_projective_cech_model
               (((ModuleCat.extendScalars.{0, 0, 0} (algebraMap R R')).mapHomologicalComplex _).map
                 φ))
         → Nonempty (Perf f M) := by
-  first
-  | exact @GlobalTheory.AbLaw.perf_of_projective_model
-  | exact GlobalTheory.AbLaw.perf_of_projective_model
-  | (intros; apply GlobalTheory.AbLaw.perf_of_projective_model <;> assumption)
+  first | exact @GlobalTheory.AbLaw.perf_of_projective_model

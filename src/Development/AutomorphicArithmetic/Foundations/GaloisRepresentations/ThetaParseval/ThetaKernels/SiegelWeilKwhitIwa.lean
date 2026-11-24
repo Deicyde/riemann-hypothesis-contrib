@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ThetaParseval.ThetaKernels.SiegelWeilKwhitCut
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.WhittakerCovolume.ParabolicLowerBlockZero
 import Mathlib.Algebra.Order.Floor.Extended
@@ -45,8 +44,6 @@ import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
-
-
 
 section
 noncomputable section
@@ -101,7 +98,7 @@ theorem om_mem_sch_k
 theorem constantTerm_mul_right
     (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (Φ : d.Fn) (g k : d.G)
     : d.sec0 Φ (g * k) = d.sec0 (d.om k Φ) g := by
-  simp [_root_.PositivityTheory.SiegelWeilFormula.SD_k.sec0, map_mul, Module.End.mul_apply]
+  simp [_root_.PositivityTheory.SiegelWeilFormula.SD_k.sec0, map_mul]
 theorem a_mul_K_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (g k : d.G) (hk : k ∈ d.K)
     : d.a (g * k) = d.a g := by
   obtain ⟨p, t, hp, k', hk', rfl⟩ := d.ok.hgt.iwa g
@@ -117,7 +114,7 @@ theorem kfin_om_k
     (S₂ := Submodule.span ℂ (Set.range fun k : d.K => d.om k.1 Φ)) (Submodule.span_le.2 ?_)
   rintro _ ⟨k', rfl⟩
   refine Submodule.subset_span ⟨⟨k'.1 * k, d.K.mul_mem k'.2 hk⟩, ?_⟩
-  simp [map_mul, Module.End.mul_apply]
+  simp [map_mul]
 section Forms
 variable {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
 end Forms

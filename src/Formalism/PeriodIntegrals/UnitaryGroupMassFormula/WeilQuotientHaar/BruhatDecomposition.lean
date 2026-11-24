@@ -78,7 +78,7 @@ theorem gf_meas (μ : Measure G) [SFinite μ] (K : ℕ → Set G) (hK : ∀ n, I
     : Measurable (gf μ K n) := by
   have hs : MeasurableSet ((fun p : G × G => p.2 * p.1) ⁻¹' K n) :=
     (hK n).measurableSet.preimage (measurable_snd.mul measurable_fst)
-  first | exact measurable_measure_prodMk_left hs | exact measurable_measure_prod_mk_left hs
+  first | exact measurable_measure_prodMk_left hs
 
 theorem gf_lt_top
     (μ : Measure G) [IsFiniteMeasureOnCompacts μ]
@@ -187,14 +187,14 @@ theorem bruhat_decomposition' : Bruhat := by
     · intro k hk
       have hk' : s * x ∉ Eset μ K k := fun hk' =>
         hk (Eset_unique ((Eset_inv μ K hKcl S hr k hs x).1 hk') hn)
-      first | exact Set.indicator_of_notMem hk' _ | exact Set.indicator_of_not_mem hk' _
+      first | exact Set.indicator_of_notMem hk' _
   have hmeas : Measurable fun s => (K n).indicator (1 : G → ℝ≥0∞) (s * x) :=
     (measurable_one.indicator (hKcl n).measurableSet).comp (measurable_mul_const x)
   have e1
       : (fun s => (K n).indicator (1 : G → ℝ≥0∞) (s * x))
         = ((fun s => s * x) ⁻¹' K n).indicator 1 := by
     ext s
-    first | rfl | simp [Set.indicator_apply]
+    first | rfl
   rw [lintegral_congr_ae hae, lintegral_mul_const _ hmeas, e1,
     lintegral_indicator_one ((hKcl n).measurableSet.preimage (measurable_mul_const x))]
   exact ENNReal.mul_inv_cancel hn.1 (gf_lt_top μ K hKc n x).ne

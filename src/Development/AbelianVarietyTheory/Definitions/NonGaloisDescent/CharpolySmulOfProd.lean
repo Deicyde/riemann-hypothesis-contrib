@@ -1,5 +1,6 @@
 module
 
+import Lemmata.CharpolySmul
 public import Formalism.LocalToGlobal.UnitaryNorms.CharTied
 public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.TameGeneratorProjectors
 public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.JumpDictionary
@@ -427,28 +428,11 @@ theorem charpoly_smul_of_prod
     (m : Multiset ℂ)
     (c : ℂ) (h : M.charpoly = (m.map fun a => X - C a).prod)
     : (c • M).charpoly = (m.map fun a => X - C (a * c)).prod := by
-  have hn : Multiset.card m = n := by
-    have := congrArg natDegree h
-    rwa [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin,
-        natDegree_multiset_prod_X_sub_C_eq_card, eq_comm]
-      at this
-  rcases eq_or_ne c 0 with rfl | hc
-  · simp [hn]
-  · apply Polynomial.funext
-    intro z
-    have h1 := congrArg (eval (z / c)) h
-    rw [Matrix.eval_charpoly, eval_multiset_prod, Multiset.map_map] at h1
-    have e : Matrix.scalar (Fin n) z - c • M = c • (Matrix.scalar (Fin n) (z / c) - M) := by
-      rw [smul_sub, Matrix.scalar_apply, Matrix.scalar_apply, ← Matrix.diagonal_smul]
-      congr 2
-      funext x
-      simp [mul_div_cancel₀ _ hc]
-    rw [Matrix.eval_charpoly, eval_multiset_prod, Multiset.map_map, e, Matrix.det_smul, h1,
-      Fintype.card_fin, ← hn, ← Multiset.prod_replicate, ← Multiset.map_const',
-      ← Multiset.prod_map_mul]
-    refine congrArg _ (Multiset.map_congr rfl fun a _ => ?_)
-    simp only [Function.comp_apply, eval_sub, eval_X, eval_C]
-    field_simp
+  rw [Matrix.charpoly_smul, h]
+  clear h
+  induction m using Multiset.induction_on with
+  | empty => simp
+  | cons a m ih => simp [mul_scaleRoots_of_noZeroDivisors, X_sub_C_scaleRoots, ih]
 
 variable
   {C : CharFrame D} {art : Ideles D.host.E →* Gab D.host.E D.nd.Om}

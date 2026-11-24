@@ -116,14 +116,7 @@ theorem coprod_adjoin
       (∀ i, a i ∈ Algebra.adjoin ℂ S ∧ b i ∈ Algebra.adjoin ℂ S)
         ∧ ∀ x k, p (x * k) = ∑ i, a i x * b i k := by
   first
-  | exact @_root_.GlobalTheory.SplittingAdditive.main
-  | exact _root_.GlobalTheory.SplittingAdditive.main
   | (apply _root_.GlobalTheory.SplittingAdditive.main <;> assumption)
-  | (intros; apply _root_.GlobalTheory.SplittingAdditive.main <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.SplittingAdditive.main <;> first | assumption | infer_instance
-    )
   | (intros; exact _root_.GlobalTheory.SplittingAdditive.main ..)
 
 theorem poly_infU
@@ -160,14 +153,6 @@ theorem poly_infU
               ∧ ∀ x k, p (x * k) = ∑ i, a i x * b i k := by
   first
   | exact @_root_.GlobalTheory.CoordinateEmbeddingSplits.main
-  | exact _root_.GlobalTheory.CoordinateEmbeddingSplits.main
-  | (apply _root_.GlobalTheory.CoordinateEmbeddingSplits.main <;> assumption)
-  | (intros; apply _root_.GlobalTheory.CoordinateEmbeddingSplits.main <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.CoordinateEmbeddingSplits.main
-        <;> first | assumption | infer_instance
-    )
   | (intros; exact _root_.GlobalTheory.CoordinateEmbeddingSplits.main ..)
 
 end GlobalTheory.PolyRealU

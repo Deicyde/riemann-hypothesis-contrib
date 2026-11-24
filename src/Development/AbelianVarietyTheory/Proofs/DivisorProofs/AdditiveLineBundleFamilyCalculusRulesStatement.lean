@@ -50,6 +50,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.additiveLineBundleFamily_calculus_rules
     : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A],
       (∀ (T Y : Over S) (N : LB (A ⊗ T).left) (y : Y ⟶ T),
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.additiveLineBundleFamily_calculus_rules
             (u : Z ⟶ U),
           N.IsLB → M.IsLB
             → (Same A (ev N (fst A Y) (snd A Y ≫ y)) M z u ↔ Same A N M (z ≫ y) u)) := by
-  first
-  | exact @GlobalTheory.FamCalc.famCalc
-  | exact GlobalTheory.FamCalc.famCalc
-  | (intros; apply GlobalTheory.FamCalc.famCalc <;> assumption)
+  first | exact @GlobalTheory.FamCalc.famCalc

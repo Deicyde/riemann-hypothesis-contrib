@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting
@@ -136,6 +134,7 @@ structure CharFrameHostEmbedding (D : D7) (cf : CharFrame D) (jE : D.host.E →+
   chiT : ChiTOk D cf
 section Loc
 variable {D : D7}
+
 structure AutomorphicSpecialisation
     {cf : CharFrame D} {jE : D.host.E →+* Qb}
     (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE)

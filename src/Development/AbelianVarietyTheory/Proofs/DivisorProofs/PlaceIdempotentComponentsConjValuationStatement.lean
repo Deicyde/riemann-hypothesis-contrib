@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   Formalism.L2.JoinChr Formalism.L2.Host
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.placeIdempotent_components_conj_valuation
     : ∀ (D : D7) (ι : (Af D.host.F ⊗[D.host.F] D.host.E) ≃+* FiniteAdeleRing (𝓞 D.host.E) D.host.E),
       (∀ x : D.host.E,
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.placeIdempotent_components_conj_valuation
           ∧ ∀ (z : AE D) (Q : HeightOneSpectrum (𝓞 D.host.E)),
             Valued.v (ι (finPart D (cA D z)) (GlobalTheory.IdemSupport.cP Q))
               = Valued.v (ι (finPart D z) Q) := by
-  first
-  | exact @GlobalTheory.ConjVal.components_and_conj_valuation
-  | exact GlobalTheory.ConjVal.components_and_conj_valuation
-  | (intros; apply GlobalTheory.ConjVal.components_and_conj_valuation <;> assumption)
+  first | exact @GlobalTheory.ConjVal.components_and_conj_valuation

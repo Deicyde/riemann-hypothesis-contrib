@@ -2,9 +2,10 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.ThetaValues.Generic
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.TheoremZeroOfReducedInputs
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.GenericSectionsPolynomialDictionaryStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.InBasisIffPointValuesLinearIndependentSpanStatement
-import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.IndepSpanRankTransferLargeFieldComplexStatement
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.GenericSectionsPolynomialDictionary
+public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.PublishedIntClosHolds
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.InBasisIffPointValuesLinearIndependentSpan
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.IndepSpanRankTransferLargeFieldComplex
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -52,15 +53,6 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps GlobalTheory.Shares
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
-
-theorem addL_zero (u wL : WeightFamilies.Wt D j) : addL u wL 0 = u := by
-  unfold addL wadd wsmul
-  cases u
-  simp only [WeightFamilies.Wt.mk.injEq]
-  refine ⟨?_, ?_, ?_⟩
-  · funext τ i; simp
-  · funext τ i; simp
-  · simp
 
 def secP
     (X : PJ D B P j)
@@ -119,10 +111,10 @@ theorem inContainMR_of_anFacts
             → ∀ la, InBasis G la → InContainMR G la S CR T c := by
   intro D B P j X ka wL wF G R t T CR c δ xs hgen hA hka hDT S hTh la hB
   obtain ⟨hsec, hC, hCw, hmul, -, -, hsp, -⟩ :=
-    GlobalTheory.T.genericSections_polynomial_dictionary D B P j X R la G.N wL G.w t
+    _root_.GlobalTheory.Shares.polyDictionary D B P j X R la G.N wL G.w t
   obtain ⟨hli, hdel⟩ :=
-    (GlobalTheory.T.inBasis_iff_pointValues_linearIndependent_span D B P j X ka wL wF G R t T _ δ xs
-      hgen hA hka la).1 hB
+    (_root_.GlobalTheory.Shares.inBasis_iff_vals D B P j X ka wL wF G R t T _ δ xs hgen hA hka la).1
+      hB
   have hs1 : ∀ i, toRp X la G.N (secP X G.w i) = sec X la G.w i := fun i => (hsec i).1
   have hs2 : ∀ i, R.toFn t (secP X G.w i) = R.s G.w t i := fun i => (hsec i).2.1
   have hs3 : ∀ i, OfWt X wL (secP X G.w i) := fun i => (hsec i).2.2
@@ -152,7 +144,7 @@ theorem inContainMR_of_anFacts
       ⟩
       · have h0 : OfWt X (addL wF wL 0)
             (MvPolynomial.C (X.inc wF (G.th' i)) : MvPolynomial (Idx D j G.N) X.Forms) := by
-          rw [addL_zero]; exact hCw _ _
+          rw [_root_.Formalism.MainNotions.Gaps.EtaleWeightGaps.addL_zero]; exact hCw _ _
         have h1 :=
           ofWt_prod_mul hs3 hmul al wF _ (ofWt_pow_mul hs3 hmul 0 wF 0 (T - ∑ k, al k) h0)
             Finset.univ
@@ -193,8 +185,8 @@ theorem inContainMR_of_anFacts
   obtain ⟨n, a, g, hsum⟩ := Submodule.mem_span_set'.1 hmem
   choose p hp hpg using fun i => (g i).2
   have htr :=
-    (GlobalTheory.T.indep_span_rank_transfer_largeField_complex D B P j X R la G.N t hgen ka (Fin n)
-      p (fun i => (hp i).1)).2.1 (MvPolynomial.C (X.inc ka F)) (hCw _ _)
+    (_root_.GlobalTheory.reading_transfer D B P j X R la G.N t hgen ka (Fin n) p
+      (fun i => (hp i).1)).2.1 (MvPolynomial.C (X.inc ka F)) (hCw _ _)
   rw [(hC _).1, (hC _).2] at htr
   have h2 : R.ev (X.inc ka F) ∈ Submodule.span ℂ (Set.range fun i => R.toFn t (p i)) := by
     rw [← hsum]

@@ -143,8 +143,7 @@ theorem fixed_ne_bot_of_fix
     MonoidHom.ext fun x => (he x).symm
   have hirr : Representation.IsIrreducible (σ.ρ.comp ((cLoc w).comp (locU a w).subtype)) := by
     rw [hp]; exact GlobalTheory.CuspMult.isIrreducible_comp_mulEquiv σ.ρ e.toMulEquiv σ.irred
-  have hsup :=
-    GlobalTheory.T.autRepDefiniteUnitary_spanned_by_split_component E a U hU w hw σ hc φ hφU
+  have hsup := _root_.GlobalTheory.Cong.span_comp_of_split E a U hU w hw σ hc φ hφU
   let ι :=
     {f : σ.V →ₗ[ℂ] (UA E a → ℂ)
       // (∀ v, f v ∈ U) ∧ ∀ (x : locU a w) v, f (σ.ρ (cLoc w x) v) = RU E a x (f v)}

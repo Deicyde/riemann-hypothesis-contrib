@@ -80,15 +80,6 @@ theorem exp_lt_one (m : ℕ) : (WithZero.exp (-((m : ℤ) + 1)) : WithZero (Mult
   rw [← WithZero.exp_zero, WithZero.exp_lt_exp]
   omega
 
-private theorem valued_v_algebraMap_adicCompletion' (v : HeightOneSpectrum (𝓞 E)) (a : E)
-    : Valued.v (algebraMap E (v.adicCompletion E) a) = v.valuation E a := by
-  first
-  | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v a
-  | (
-      rw [HeightOneSpectrum.algebraMap_adicCompletion]
-      exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v a
-    )
-
 theorem locK_eq_of_level
     (χ : HChar E)
     {v : HeightOneSpectrum (𝓞 E)} {m : ℕ} (h : χ.LevelLe v m)
@@ -105,7 +96,7 @@ theorem locK_eq_of_level
     calc
       v.valuation E ((y : E) - x) * (v.valuation E (x : E))⁻¹
           ≤ WithZero.exp (-((m : ℤ) + 1)) * v.valuation E (x : E) * (v.valuation E (x : E))⁻¹ := by
-        first | gcongr | exact mul_le_mul_right' hxy _
+        first | gcongr
       _ = WithZero.exp (-((m : ℤ) + 1)) := by rw [mul_assoc, mul_inv_cancel₀ hv0, mul_one]
   have hlt : v.valuation E (((y * x⁻¹ : Eˣ) : E) - 1) < v.valuation E 1 := by
     rw [map_one]
@@ -115,14 +106,14 @@ theorem locK_eq_of_level
 
   have hA : IsUnitAt v (atFin v (y * x⁻¹)) := by
     show Valued.v (algebraMap E (v.adicCompletion E) ((y * x⁻¹ : Eˣ) : E)) = 1
-    rw [valued_v_algebraMap_adicCompletion']
+    rw [_root_.Formalism.UG.P.levelaf_valued_algebraMap]
     exact hu
   have hB
       : Valued.v (((atFin v (y * x⁻¹) : (v.adicCompletion E)ˣ) : v.adicCompletion E) - 1)
         ≤ WithZero.exp (-(m : ℤ)) := by
     show Valued.v (algebraMap E (v.adicCompletion E) ((y * x⁻¹ : Eˣ) : E) - 1) ≤ _
     rw [← map_one (algebraMap E (v.adicCompletion E)), ← map_sub,
-      valued_v_algebraMap_adicCompletion']
+      _root_.Formalism.UG.P.levelaf_valued_algebraMap]
     exact le_trans hle (WithZero.exp_le_exp.mpr (by omega))
   have h1 : χ.locK v (y * x⁻¹) = 1 := h _ hA hB
   calc
@@ -153,7 +144,7 @@ theorem exists_approx
   have h1 := (v.intValuation_le_pow_iff_mem (y - t v) _).mpr (hy v hv)
   have h2 : v.valuation E ((y : E) - (t v : E)) = v.intValuation (y - t v) := by
     have h := v.valuation_of_algebraMap (K := E) (y - t v)
-    first | (push_cast at h; exact h) | exact h | simpa using h
+    first | (push_cast at h; exact h)
   have h3 : v.valuation E (t v : E) = v.intValuation (t v) :=
     v.valuation_of_algebraMap (K := E) (t v)
   rw [h2, h3, ← hk v, ← WithZero.exp_add]
@@ -276,23 +267,3 @@ end
 end
 
 end HeckeCharacterValueBounds
-section
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open scoped Pointwise TensorProduct InnerProductSpace ComplexOrder
-attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.Grid GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle
-  GlobalTheory.ConstRatio
-theorem _root_.GlobalTheory.Adopt.heckeCharacter_finiteOrder_values_in_field
-    : ∀ (D : D7) (c : (AE D)ˣ →* Circle) (χ : Formalism.L2.Host.HChar D.host.E) (n : ℕ) (L : Type)
-        [Field L] (σ : L →+* ℂ),
-      ChrEq c χ → 0 < n → χ.OrderDvd n → χ.ValuesIn 0 σ
-        → ∀ x : (AE D)ˣ, ∃ y : Lˣ, σ y = (c x : ℂ) := by
-  intro D c χ n L _ σ h₁ h₂ h₃ h₄ x
-  exact HeckeCharacterValueBounds.GlobalTheory.CompanionTheory.CharValues.main D c χ n L σ h₁ h₂ h₃
-    h₄ x
-
-end

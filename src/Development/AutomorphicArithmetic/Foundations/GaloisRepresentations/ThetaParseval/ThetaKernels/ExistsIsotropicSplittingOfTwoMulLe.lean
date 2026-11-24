@@ -42,8 +42,6 @@ import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-
-
 section
 open scoped Matrix TensorProduct
 open NumberField IsDedekindDomain Filter Topology

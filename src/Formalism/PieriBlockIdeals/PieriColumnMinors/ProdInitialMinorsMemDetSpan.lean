@@ -68,7 +68,8 @@ namespace Formalism.CohomologicalDescent.LA
 
 open Formalism.GradedWeylDivisibility
 
-theorem la_posPairs_two : Formalism.RankGapBounds.JumpSetsAlt.posPairs 2 = {((0 : Fin 2), (1 : Fin 2))} := by
+theorem la_posPairs_two
+    : Formalism.RankGapBounds.JumpSetsAlt.posPairs 2 = {((0 : Fin 2), (1 : Fin 2))} := by
   decide
 
 theorem exact_exponent_rank_two : ExactExponentRankTwo := by
@@ -80,14 +81,20 @@ theorem exact_exponent_rank_two : ExactExponentRankTwo := by
   simp only [lamU, Fin.val_zero, Fin.val_one]
   omega
 
-theorem la_word_mem (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (w : List (Fin r × Fin r × ℕ)) : applyWord R w (hw R hn ν) ∈ weyl R r n hn ν := Submodule.subset_span ⟨w, rfl⟩
+theorem la_word_mem
+    (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (w : List (Fin r × Fin r × ℕ))
+    : applyWord R w (hw R hn ν) ∈ weyl R r n hn ν :=
+  Submodule.subset_span ⟨w, rfl⟩
 
-theorem la_hw_mem (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    hw R hn ν ∈ weyl R r n hn ν := la_word_mem R hn ν []
+theorem la_hw_mem (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : hw R hn ν ∈ weyl R r n hn ν :=
+  la_word_mem R hn ν []
 
-theorem la_incl_of_le {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (l e : ℕ) (hl : l.Prime)
-    (h : dualWeyl ℤ r n ν ≤ weyl ℤ r n hn ν) : InclZ r n hn ν l e := by
+theorem la_incl_of_le
+    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    (l e : ℕ) (hl : l.Prime)
+    (h : dualWeyl ℤ r n ν ≤ weyl ℤ r n hn ν)
+    : InclZ r n hn ν l e := by
   unfold InclZ
   exact ⟨1, hl.not_dvd_one, fun x hx => Submodule.smul_mem _ _ (h hx)⟩
 
@@ -108,33 +115,38 @@ theorem lattice_z_zero_columns : LatticeInclusionTrivialWeight := by
 def la_xy (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (p q : ℕ) : MvPolynomial (Fin 2 × Fin n) R :=
   X ((0 : Fin 2), s) ^ p * X ((1 : Fin 2), s) ^ q
 
-def la_monLat (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ) :
-    Submodule R (MvPolynomial (Fin 2 × Fin n) R) :=
+def la_monLat (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
+    : Submodule R (MvPolynomial (Fin 2 × Fin n) R) :=
   Submodule.span R {f | ∃ p q, p + q = d ∧ f = la_xy R s p q}
 
-def la_binLat (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ) :
-    Submodule R (MvPolynomial (Fin 2 × Fin n) R) :=
-  Submodule.span R {f | ∃ p q, p + q = d ∧
-    f = ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q}
+def la_binLat (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
+    : Submodule R (MvPolynomial (Fin 2 × Fin n) R) :=
+  Submodule.span R
+    {f | ∃ p q, p + q = d ∧
+      f = ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q}
 
-theorem la_mem_of_dvd (R : Type) [CommRing R] {n : ℕ} (s : Fin n) {d p q N : ℕ} (h : p + q = d)
-    (hN : (p + q).choose q ∣ N) :
-    (N : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q ∈ la_binLat R s d := by
+theorem la_mem_of_dvd
+    (R : Type) [CommRing R]
+    {n : ℕ} (s : Fin n)
+    {d p q N : ℕ} (h : p + q = d) (hN : (p + q).choose q ∣ N)
+    : (N : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q ∈ la_binLat R s d := by
   obtain ⟨c, rfl⟩ := hN
-  have hmem : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q ∈
-      la_binLat R s d := Submodule.subset_span ⟨p, q, h, rfl⟩
+  have hmem
+      : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q ∈ la_binLat R s d :=
+    Submodule.subset_span ⟨p, q, h, rfl⟩
   have h2 := Submodule.smul_mem _ (c : R) hmem
   rw [MvPolynomial.smul_eq_C_mul, map_natCast] at h2
   rw [Nat.cast_mul, mul_comm ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R), mul_assoc]
   exact h2
 
-theorem la_coeff (A : Type) [CommRing A] (u v w : A) (p k : ℕ) :
-    ((Polynomial.C u + Polynomial.X * Polynomial.C v) ^ p * Polynomial.C w).coeff k =
-      (p.choose k : A) * (u ^ (p - k) * v ^ k * w) := by
+theorem la_coeff (A : Type) [CommRing A] (u v w : A) (p k : ℕ)
+    : ((Polynomial.C u + Polynomial.X * Polynomial.C v) ^ p * Polynomial.C w).coeff k
+      = (p.choose k : A) * (u ^ (p - k) * v ^ k * w) := by
   rw [Polynomial.coeff_mul_C]
-  have h : (Polynomial.C u + Polynomial.X * Polynomial.C v) ^ p =
-      ∑ m ∈ Finset.range (p + 1),
-        Polynomial.C (v ^ m * u ^ (p - m) * (p.choose m : A)) * Polynomial.X ^ m := by
+  have h
+      : (Polynomial.C u + Polynomial.X * Polynomial.C v) ^ p
+        = ∑ m ∈ Finset.range (p + 1),
+            Polynomial.C (v ^ m * u ^ (p - m) * (p.choose m : A)) * Polynomial.X ^ m := by
     rw [add_comm (Polynomial.C u), add_pow]
     refine Finset.sum_congr rfl (fun m _ => ?_)
     simp only [mul_pow, map_mul, map_pow, map_natCast]
@@ -148,77 +160,89 @@ theorem la_coeff (A : Type) [CommRing A] (u v w : A) (p k : ℕ) :
     rw [Nat.choose_eq_zero_of_lt (by omega)]
     simp
 
-theorem la_rowGen_X (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (v : Fin r × Fin n) :
-    rowGen R a b (X v) = Polynomial.C (X v) +
-      (if v.1 = b then Polynomial.X * Polynomial.C (X (a, v.2)) else 0) := by
+theorem la_rowGen_X (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (v : Fin r × Fin n)
+    : rowGen R a b (X v)
+      = Polynomial.C (X v) + (if v.1 = b then Polynomial.X * Polynomial.C (X (a, v.2)) else 0) := by
   simp only [rowGen, MvPolynomial.aeval_X]
 
-theorem la_rowDiv_xy_zero (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (a : Fin 2) (p q k : ℕ) :
-    rowDiv R a 0 k (la_xy R s p q) =
-      (p.choose k : MvPolynomial (Fin 2 × Fin n) R) *
-        (X ((0 : Fin 2), s) ^ (p - k) * X (a, s) ^ k * X ((1 : Fin 2), s) ^ q) := by
-  have h0 : rowGen R a (0 : Fin 2) (X ((0 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R) =
-      Polynomial.C (X ((0 : Fin 2), s)) + Polynomial.X * Polynomial.C (X (a, s)) := by
+theorem la_rowDiv_xy_zero (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (a : Fin 2) (p q k : ℕ)
+    : rowDiv R a 0 k (la_xy R s p q)
+      = (p.choose k : MvPolynomial (Fin 2 × Fin n) R)
+        * (X ((0 : Fin 2), s) ^ (p - k) * X (a, s) ^ k * X ((1 : Fin 2), s) ^ q) := by
+  have h0
+      : rowGen R a (0 : Fin 2) (X ((0 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R)
+        = Polynomial.C (X ((0 : Fin 2), s)) + Polynomial.X * Polynomial.C (X (a, s)) := by
     rw [la_rowGen_X, if_pos rfl]
-  have h1 : rowGen R a (0 : Fin 2) (X ((1 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R) =
-      Polynomial.C (X ((1 : Fin 2), s)) := by
-    rw [la_rowGen_X, if_neg (show ¬ ((1 : Fin 2) = 0) by decide), add_zero]
+  have h1
+      : rowGen R a (0 : Fin 2) (X ((1 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R)
+        = Polynomial.C (X ((1 : Fin 2), s)) := by
+    rw [la_rowGen_X, if_neg (show ¬((1 : Fin 2) = 0) by decide), add_zero]
   simp only [rowDiv]
   rw [la_xy, map_mul, map_pow, map_pow, h0, h1, ← Polynomial.C_pow, la_coeff]
 
-theorem la_rowDiv_xy_one (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (a : Fin 2) (p q k : ℕ) :
-    rowDiv R a 1 k (la_xy R s p q) =
-      (q.choose k : MvPolynomial (Fin 2 × Fin n) R) *
-        (X ((1 : Fin 2), s) ^ (q - k) * X (a, s) ^ k * X ((0 : Fin 2), s) ^ p) := by
-  have h0 : rowGen R a (1 : Fin 2) (X ((1 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R) =
-      Polynomial.C (X ((1 : Fin 2), s)) + Polynomial.X * Polynomial.C (X (a, s)) := by
+theorem la_rowDiv_xy_one (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (a : Fin 2) (p q k : ℕ)
+    : rowDiv R a 1 k (la_xy R s p q)
+      = (q.choose k : MvPolynomial (Fin 2 × Fin n) R)
+        * (X ((1 : Fin 2), s) ^ (q - k) * X (a, s) ^ k * X ((0 : Fin 2), s) ^ p) := by
+  have h0
+      : rowGen R a (1 : Fin 2) (X ((1 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R)
+        = Polynomial.C (X ((1 : Fin 2), s)) + Polynomial.X * Polynomial.C (X (a, s)) := by
     rw [la_rowGen_X, if_pos rfl]
-  have h1 : rowGen R a (1 : Fin 2) (X ((0 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R) =
-      Polynomial.C (X ((0 : Fin 2), s)) := by
-    rw [la_rowGen_X, if_neg (show ¬ ((0 : Fin 2) = 1) by decide), add_zero]
+  have h1
+      : rowGen R a (1 : Fin 2) (X ((0 : Fin 2), s) : MvPolynomial (Fin 2 × Fin n) R)
+        = Polynomial.C (X ((0 : Fin 2), s)) := by
+    rw [la_rowGen_X, if_neg (show ¬((0 : Fin 2) = 1) by decide), add_zero]
   simp only [rowDiv]
   rw [la_xy, map_mul, map_pow, map_pow, h0, h1, ← Polynomial.C_pow,
     mul_comm (Polynomial.C (X ((0 : Fin 2), s) ^ p)), la_coeff]
 
-theorem la_rowDiv_nat (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (k N : ℕ)
-    (f : MvPolynomial (Fin r × Fin n) R) :
-    rowDiv R a b k ((N : MvPolynomial (Fin r × Fin n) R) * f) =
-      (N : MvPolynomial (Fin r × Fin n) R) * rowDiv R a b k f := by
+theorem la_rowDiv_nat
+    (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (k N : ℕ) (f : MvPolynomial (Fin r × Fin n) R)
+    : rowDiv R a b k ((N : MvPolynomial (Fin r × Fin n) R) * f)
+      = (N : MvPolynomial (Fin r × Fin n) R) * rowDiv R a b k f := by
   simp only [rowDiv, map_mul, map_natCast]
   rw [← Polynomial.C_eq_natCast, Polynomial.coeff_C_mul]
 
-theorem choose_dvd_choose_mul_right (p k q : ℕ) :
-    (p + (k + q)).choose (k + q) ∣ (p + k + q).choose q * (p + k).choose k := by
+theorem choose_dvd_choose_mul_right (p k q : ℕ)
+    : (p + (k + q)).choose (k + q) ∣ (p + k + q).choose q * (p + k).choose k := by
   have key := Nat.choose_mul (n := p + k + q) (k := k + q) (s := q) (by omega)
   rw [show p + k + q - q = p + k by omega, show k + q - q = k by omega] at key
   rw [show p + (k + q) = p + k + q by omega]
   exact ⟨(k + q).choose q, by linarith [key]⟩
 
-theorem choose_dvd_choose_mul_left (p k q : ℕ) :
-    (p + k + q).choose q ∣ (p + (q + k)).choose (q + k) * (q + k).choose k := by
+theorem choose_dvd_choose_mul_left (p k q : ℕ)
+    : (p + k + q).choose q ∣ (p + (q + k)).choose (q + k) * (q + k).choose k := by
   have key := Nat.choose_mul (n := p + k + q) (k := q + k) (s := q) (by omega)
   rw [show p + k + q - q = p + k by omega, show q + k - q = k by omega] at key
   have hs : (q + k).choose k = (q + k).choose q := (Nat.choose_symm_add).symm
   rw [show p + (q + k) = p + k + q by omega, hs]
   exact ⟨(p + k).choose k, by linarith [key]⟩
 
-theorem fin_two_eq_zero_or_one : ∀ c : Fin 2, c = 0 ∨ c = 1 := by
-  decide
+theorem fin_two_eq_zero_or_one : ∀ c : Fin 2, c = 0 ∨ c = 1 := by decide
 
-theorem la_binLat_stable (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ) (a b : Fin 2) (k : ℕ)
-    (f : MvPolynomial (Fin 2 × Fin n) R) (hf : f ∈ la_binLat R s d) :
-    rowDiv R a b k f ∈ la_binLat R s d := by
+theorem la_binLat_stable
+    (R : Type) [CommRing R]
+    {n : ℕ} (s : Fin n)
+    (d : ℕ)
+    (a b : Fin 2) (k : ℕ)
+    (f : MvPolynomial (Fin 2 × Fin n) R) (hf : f ∈ la_binLat R s d)
+    : rowDiv R a b k f ∈ la_binLat R s d := by
   rw [la_binLat] at hf ⊢
   induction hf using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨p, q, hpq, rfl⟩ := hx
     rw [la_rowDiv_nat]
-    rcases fin_two_eq_zero_or_one b with rfl | rfl <;> rcases fin_two_eq_zero_or_one a with rfl | rfl
+    rcases fin_two_eq_zero_or_one b with rfl | rfl
+      <;> rcases fin_two_eq_zero_or_one a with rfl | rfl
     · rw [la_rowDiv_xy_zero]
       by_cases hk : k ≤ p
-      · have e : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * (((p.choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R) *
-            (X ((0 : Fin 2), s) ^ (p - k) * X ((0 : Fin 2), s) ^ k * X ((1 : Fin 2), s) ^ q)) =
-            (p.choose k : R) • (((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q) := by
+      · have e
+            : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R)
+                * (((p.choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R)
+                  * (X ((0 : Fin 2), s) ^ (p - k) * X ((0 : Fin 2), s) ^ k
+                    * X ((1 : Fin 2), s) ^ q))
+              = (p.choose k : R)
+                • (((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q) := by
           rw [← pow_add, Nat.sub_add_cancel hk, MvPolynomial.smul_eq_C_mul, map_natCast, la_xy]
           ring
         rw [e]
@@ -228,10 +252,13 @@ theorem la_binLat_stable (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
     · rw [la_rowDiv_xy_zero]
       by_cases hk : k ≤ p
       · obtain ⟨p', rfl⟩ : ∃ p', p = p' + k := ⟨p - k, by omega⟩
-        have e : ((p' + k + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * ((((p' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R) *
-            (X ((0 : Fin 2), s) ^ (p' + k - k) * X ((1 : Fin 2), s) ^ k * X ((1 : Fin 2), s) ^ q)) =
-            (((p' + k + q).choose q * (p' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R) *
-              la_xy R s p' (k + q) := by
+        have e
+            : ((p' + k + q).choose q : MvPolynomial (Fin 2 × Fin n) R)
+                * ((((p' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R)
+                  * (X ((0 : Fin 2), s) ^ (p' + k - k) * X ((1 : Fin 2), s) ^ k
+                    * X ((1 : Fin 2), s) ^ q))
+              = (((p' + k + q).choose q * (p' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R)
+                * la_xy R s p' (k + q) := by
           rw [Nat.add_sub_cancel, la_xy]
           push_cast
           ring
@@ -242,11 +269,14 @@ theorem la_binLat_stable (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
     · rw [la_rowDiv_xy_one]
       by_cases hk : k ≤ q
       · obtain ⟨q', rfl⟩ : ∃ q', q = q' + k := ⟨q - k, by omega⟩
-        have e : ((p + (q' + k)).choose (q' + k) : MvPolynomial (Fin 2 × Fin n) R) *
-            ((((q' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R) *
-            (X ((1 : Fin 2), s) ^ (q' + k - k) * X ((0 : Fin 2), s) ^ k * X ((0 : Fin 2), s) ^ p)) =
-            (((p + (q' + k)).choose (q' + k) * (q' + k).choose k : ℕ) :
-              MvPolynomial (Fin 2 × Fin n) R) * la_xy R s (p + k) q' := by
+        have e
+            : ((p + (q' + k)).choose (q' + k) : MvPolynomial (Fin 2 × Fin n) R)
+                * ((((q' + k).choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R)
+                  * (X ((1 : Fin 2), s) ^ (q' + k - k) * X ((0 : Fin 2), s) ^ k
+                    * X ((0 : Fin 2), s) ^ p))
+              = (((p + (q' + k)).choose (q' + k) * (q' + k).choose k : ℕ)
+                  : MvPolynomial (Fin 2 × Fin n) R)
+                * la_xy R s (p + k) q' := by
           rw [Nat.add_sub_cancel, la_xy]
           push_cast
           ring
@@ -256,9 +286,13 @@ theorem la_binLat_stable (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
         simp
     · rw [la_rowDiv_xy_one]
       by_cases hk : k ≤ q
-      · have e : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * (((q.choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R) *
-            (X ((1 : Fin 2), s) ^ (q - k) * X ((1 : Fin 2), s) ^ k * X ((0 : Fin 2), s) ^ p)) =
-            (q.choose k : R) • (((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q) := by
+      · have e
+            : ((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R)
+                * (((q.choose k : ℕ) : MvPolynomial (Fin 2 × Fin n) R)
+                  * (X ((1 : Fin 2), s) ^ (q - k) * X ((1 : Fin 2), s) ^ k
+                    * X ((0 : Fin 2), s) ^ p))
+              = (q.choose k : R)
+                • (((p + q).choose q : MvPolynomial (Fin 2 × Fin n) R) * la_xy R s p q) := by
           rw [← pow_add, Nat.sub_add_cancel hk, MvPolynomial.smul_eq_C_mul, map_natCast, la_xy]
           ring
         rw [e]
@@ -278,19 +312,21 @@ theorem la_binLat_stable (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (d : ℕ)
 def la_mono {n : ℕ} (s : Fin n) (p q : ℕ) : Fin 2 × Fin n →₀ ℕ :=
   Finsupp.single ((0 : Fin 2), s) p + Finsupp.single ((1 : Fin 2), s) q
 
-theorem la_xy_eq (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (p q : ℕ) :
-    la_xy R s p q = monomial (la_mono s p q) 1 := by
+theorem la_xy_eq (R : Type) [CommRing R] {n : ℕ} (s : Fin n) (p q : ℕ)
+    : la_xy R s p q = monomial (la_mono s p q) 1 := by
   rw [la_xy, la_mono, X_pow_eq_monomial, X_pow_eq_monomial, monomial_mul, mul_one]
 
-theorem la_mono_inj {n : ℕ} (s : Fin n) {p q p' q' : ℕ} (h : la_mono s p q = la_mono s p' q') :
-    p = p' ∧ q = q' := by
+theorem la_mono_inj {n : ℕ} (s : Fin n) {p q p' q' : ℕ} (h : la_mono s p q = la_mono s p' q')
+    : p = p' ∧ q = q' := by
   constructor
   · simpa [la_mono, Finsupp.single_apply] using congrArg (fun m => m ((0 : Fin 2), s)) h
   · simpa [la_mono, Finsupp.single_apply] using congrArg (fun m => m ((1 : Fin 2), s)) h
 
-theorem la_coeff_binLat {n : ℕ} (s : Fin n) (d : ℕ) (f : MvPolynomial (Fin 2 × Fin n) ℤ)
-    (hf : f ∈ la_binLat ℤ s d) (p q : ℕ) :
-    ((p + q).choose q : ℤ) ∣ AddMonoidAlgebra.coeff f (la_mono s p q) := by
+theorem la_coeff_binLat
+    {n : ℕ} (s : Fin n)
+    (d : ℕ) (f : MvPolynomial (Fin 2 × Fin n) ℤ) (hf : f ∈ la_binLat ℤ s d)
+    (p q : ℕ)
+    : ((p + q).choose q : ℤ) ∣ AddMonoidAlgebra.coeff f (la_mono s p q) := by
   rw [la_binLat] at hf
   induction hf using Submodule.span_induction with
   | mem x hx =>
@@ -300,7 +336,8 @@ theorem la_coeff_binLat {n : ℕ} (s : Fin n) (d : ℕ) (f : MvPolynomial (Fin 2
     · obtain ⟨rfl, rfl⟩ := la_mono_inj s h
       simp
     · simp
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [MvPolynomial.coeff_add]
     exact dvd_add hx hy
@@ -308,8 +345,9 @@ theorem la_coeff_binLat {n : ℕ} (s : Fin n) (d : ℕ) (f : MvPolynomial (Fin 2
     rw [MvPolynomial.coeff_smul, smul_eq_mul]
     exact Dvd.dvd.mul_left hx a
 
-theorem la_arith (l d : ℕ) (hl : l.Prime) :
-    ∃ m : ℕ, ¬ l ∣ m ∧ ∀ i ≤ d, d.choose i ∣ m * l ^ Formalism.RankGapBounds.JumpSetsAlt.maxVal l d := by
+theorem la_arith (l d : ℕ) (hl : l.Prime)
+    : ∃ m : ℕ,
+      ¬ l ∣ m ∧ ∀ i ≤ d, d.choose i ∣ m * l ^ Formalism.RankGapBounds.JumpSetsAlt.maxVal l d := by
   refine ⟨∏ i ∈ Finset.range (d + 1), d.choose i / l ^ ((d.choose i).factorization l), ?_, ?_⟩
   · rw [Prime.dvd_finsetProd_iff hl.prime]
     push_neg
@@ -317,17 +355,21 @@ theorem la_arith (l d : ℕ) (hl : l.Prime) :
     exact Nat.not_dvd_ordCompl hl (Nat.choose_pos (by rw [Finset.mem_range] at hi; omega)).ne'
   · intro i hi
     have hmem : i ∈ Finset.range (d + 1) := Finset.mem_range.mpr (by omega)
-    calc d.choose i = l ^ ((d.choose i).factorization l) *
-          (d.choose i / l ^ ((d.choose i).factorization l)) :=
-          (Nat.ordProj_mul_ordCompl_eq_self _ _).symm
-      _ ∣ l ^ Formalism.RankGapBounds.JumpSetsAlt.maxVal l d *
-          ∏ j ∈ Finset.range (d + 1), d.choose j / l ^ ((d.choose j).factorization l) :=
-        mul_dvd_mul (Nat.pow_dvd_pow l (Finset.le_sup (f := fun j => (d.choose j).factorization l) hmem))
+    calc
+      d.choose i
+          = l ^ ((d.choose i).factorization l)
+            * (d.choose i / l ^ ((d.choose i).factorization l)) :=
+        (Nat.ordProj_mul_ordCompl_eq_self _ _).symm
+      _ ∣ l ^ Formalism.RankGapBounds.JumpSetsAlt.maxVal l d
+          * ∏ j ∈ Finset.range (d + 1), d.choose j / l ^ ((d.choose j).factorization l) :=
+        mul_dvd_mul
+          (Nat.pow_dvd_pow l (Finset.le_sup (f := fun j => (d.choose j).factorization l) hmem))
           (Finset.dvd_prod_of_mem _ hmem)
       _ = _ := mul_comm _ _
 
-theorem la_arith_conv (l d m e : ℕ) (hl : l.Prime) (hm : ¬ l ∣ m)
-    (h : ∀ i ≤ d, d.choose i ∣ m * l ^ e) : Formalism.RankGapBounds.JumpSetsAlt.maxVal l d ≤ e := by
+theorem la_arith_conv
+    (l d m e : ℕ) (hl : l.Prime) (hm : ¬ l ∣ m) (h : ∀ i ≤ d, d.choose i ∣ m * l ^ e)
+    : Formalism.RankGapBounds.JumpSetsAlt.maxVal l d ≤ e := by
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (dvd_zero l)
@@ -343,9 +385,11 @@ theorem la_arith_conv (l d m e : ℕ) (hl : l.Prime) (hm : ¬ l ∣ m)
   rw [h2] at h1
   exact h1
 
-theorem la_smul_monLat {n : ℕ} (s : Fin n) (d N : ℕ) (hN : ∀ i ≤ d, d.choose i ∣ N)
-    (y : MvPolynomial (Fin 2 × Fin n) ℤ) (hy : y ∈ la_monLat ℤ s d) :
-    ((N : ℕ) : ℤ) • y ∈ la_binLat ℤ s d := by
+theorem la_smul_monLat
+    {n : ℕ} (s : Fin n)
+    (d N : ℕ) (hN : ∀ i ≤ d, d.choose i ∣ N)
+    (y : MvPolynomial (Fin 2 × Fin n) ℤ) (hy : y ∈ la_monLat ℤ s d)
+    : ((N : ℕ) : ℤ) • y ∈ la_binLat ℤ s d := by
   rw [la_monLat] at hy
   induction hy using Submodule.span_induction with
   | mem x hx =>
@@ -362,11 +406,16 @@ theorem la_smul_monLat {n : ℕ} (s : Fin n) (d N : ℕ) (hN : ∀ i ≤ d, d.ch
     rw [smul_comm]
     exact Submodule.smul_mem _ a hx
 
-theorem la_core {n : ℕ} (s : Fin n) (d : ℕ) (g : MvPolynomial (Fin 2 × Fin n) ℤ) (hg : g ≠ 0)
-    (l e : ℕ) (hl : l.Prime) :
-    (∃ m : ℕ, ¬ l ∣ m ∧ ∀ x ∈ (la_monLat ℤ s d).map (LinearMap.mulLeft ℤ g),
-      ((m * l ^ e : ℕ) : ℤ) • x ∈ (la_binLat ℤ s d).map (LinearMap.mulLeft ℤ g)) ↔
-      Formalism.RankGapBounds.JumpSetsAlt.maxVal l d ≤ e := by
+theorem la_core
+    {n : ℕ} (s : Fin n)
+    (d : ℕ)
+    (g : MvPolynomial (Fin 2 × Fin n) ℤ) (hg : g ≠ 0)
+    (l e : ℕ) (hl : l.Prime)
+    : (∃ m : ℕ,
+        ¬ l ∣ m
+          ∧ ∀ x ∈ (la_monLat ℤ s d).map (LinearMap.mulLeft ℤ g),
+            ((m * l ^ e : ℕ) : ℤ) • x ∈ (la_binLat ℤ s d).map (LinearMap.mulLeft ℤ g))
+      ↔ Formalism.RankGapBounds.JumpSetsAlt.maxVal l d ≤ e := by
   constructor
   · rintro ⟨m, hm, h⟩
     refine la_arith_conv l d m e hl hm (fun i hi => ?_)
@@ -379,37 +428,45 @@ theorem la_core {n : ℕ} (s : Fin n) (d : ℕ) (g : MvPolynomial (Fin 2 × Fin 
       rw [hgz, mul_smul_comm]
     have hc := la_coeff_binLat s d z hz (d - i) i
     rw [hz', la_xy_eq, MvPolynomial.coeff_smul, coeff_monomial, if_pos rfl, smul_eq_mul, mul_one,
-      show d - i + i = d by omega] at hc
+        show d - i + i = d by omega]
+      at hc
     exact_mod_cast hc
   · intro he
     obtain ⟨m, hm, hdiv⟩ := la_arith l d hl
     refine ⟨m, hm, fun x hx => ?_⟩
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hx
-    refine Submodule.mem_map.mpr ⟨((m * l ^ e : ℕ) : ℤ) • y,
+    refine Submodule.mem_map.mpr ⟨
+      ((m * l ^ e : ℕ) : ℤ) • y,
       la_smul_monLat s d (m * l ^ e)
-        (fun i hi => (hdiv i hi).trans (Nat.mul_dvd_mul_left m (Nat.pow_dvd_pow l he))) y hy, ?_⟩
+        (fun i hi => (hdiv i hi).trans (Nat.mul_dvd_mul_left m (Nat.pow_dvd_pow l he)))
+        y hy,
+      ?_
+    ⟩
     simp only [LinearMap.mulLeft_apply]
     exact mul_smul_comm _ _ _
 
-theorem la_lpMinor_one (R : Type) [CommRing R] {r n : ℕ} (s : ℕ) (hs : s = 1) (hr : s ≤ r)
-    (hn : s ≤ n) :
-    lpMinor R s hr hn = X ((⟨0, by omega⟩ : Fin r), (⟨0, by omega⟩ : Fin n)) := by
+theorem la_lpMinor_one
+    (R : Type) [CommRing R] {r n : ℕ} (s : ℕ) (hs : s = 1) (hr : s ≤ r) (hn : s ≤ n)
+    : lpMinor R s hr hn = X ((⟨0, by omega⟩ : Fin r), (⟨0, by omega⟩ : Fin n)) := by
   subst hs
   show Matrix.det (Matrix.of fun p q : Fin 1 =>
     (X (Fin.castLE hr p, Fin.castLE hn q) : MvPolynomial (Fin r × Fin n) R)) = _
   rw [Matrix.det_fin_one]
   rfl
 
-theorem highest_weight_one_column (R : Type) [CommRing R] {r : ℕ} (hn : 1 ≤ r) (ν : Fin 1 → ℕ) :
-    hw R hn ν = X ((⟨0, hn⟩ : Fin r), (0 : Fin 1)) ^ ν 0 := by
+theorem highest_weight_one_column (R : Type) [CommRing R] {r : ℕ} (hn : 1 ≤ r) (ν : Fin 1 → ℕ)
+    : hw R hn ν = X ((⟨0, hn⟩ : Fin r), (0 : Fin 1)) ^ ν 0 := by
   show ∏ s : Fin 1, (lpMinor R (s.val + 1) (by omega) (by omega)) ^ (ν s - nuNext ν s) = _
   rw [Fin.prod_univ_one, show nuNext ν 0 = 0 from dif_neg (by decide), Nat.sub_zero]
   exact congrArg (· ^ ν 0) (la_lpMinor_one R _ rfl _ _)
 
-theorem la_weyl_le_of_stable (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (L : Submodule R (MvPolynomial (Fin r × Fin n) R)) (h0 : hw R hn ν ∈ L)
-    (hs : ∀ (a b : Fin r) (k : ℕ) (f : MvPolynomial (Fin r × Fin n) R), f ∈ L →
-      rowDiv R a b k f ∈ L) : weyl R r n hn ν ≤ L := by
+theorem la_weyl_le_of_stable
+    (R : Type) [CommRing R]
+    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (L : Submodule R (MvPolynomial (Fin r × Fin n) R))
+    (h0 : hw R hn ν ∈ L)
+    (hs
+      : ∀ (a b : Fin r) (k : ℕ) (f : MvPolynomial (Fin r × Fin n) R), f ∈ L → rowDiv R a b k f ∈ L)
+    : weyl R r n hn ν ≤ L := by
   show Submodule.span R (Set.range fun w : List (Fin r × Fin r × ℕ) => applyWord R w (hw R hn ν)) ≤ L
   rw [Submodule.span_le]
   rintro _ ⟨w, rfl⟩
@@ -417,38 +474,40 @@ theorem la_weyl_le_of_stable (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) 
   | nil => exact h0
   | cons x w ih => exact hs x.1 x.2.1 x.2.2 _ ih
 
-theorem la_weyl_r2n1 (R : Type) [CommRing R] (hn : 1 ≤ 2) (ν : Fin 1 → ℕ) :
-    weyl R 2 1 hn ν = la_binLat R (0 : Fin 1) (ν 0) := by
+theorem la_weyl_r2n1 (R : Type) [CommRing R] (hn : 1 ≤ 2) (ν : Fin 1 → ℕ)
+    : weyl R 2 1 hn ν = la_binLat R (0 : Fin 1) (ν 0) := by
   have hhw : hw R hn ν = la_xy R (0 : Fin 1) (ν 0) 0 := by
     rw [highest_weight_one_column, la_xy, pow_zero, mul_one]
     try rfl
   apply le_antisymm
-  · refine la_weyl_le_of_stable R hn ν _ ?_ (fun a b k f hf => la_binLat_stable R 0 (ν 0) a b k f hf)
+  · refine la_weyl_le_of_stable R hn ν _ ?_
+      (fun a b k f hf => la_binLat_stable R 0 (ν 0) a b k f hf)
     rw [hhw, la_binLat]
     exact Submodule.subset_span ⟨ν 0, 0, by simp, by simp⟩
   · rw [la_binLat, Submodule.span_le]
     rintro f ⟨p, q, hpq, rfl⟩
     have h := la_word_mem R hn ν [((1 : Fin 2), (0 : Fin 2), q)]
-    have e : applyWord R [((1 : Fin 2), (0 : Fin 2), q)] (hw R hn ν) =
-        ((p + q).choose q : MvPolynomial (Fin 2 × Fin 1) R) * la_xy R 0 p q := by
+    have e
+        : applyWord R [((1 : Fin 2), (0 : Fin 2), q)] (hw R hn ν)
+          = ((p + q).choose q : MvPolynomial (Fin 2 × Fin 1) R) * la_xy R 0 p q := by
       show rowDiv R 1 0 q (hw R hn ν) = _
       rw [hhw, ← hpq, la_rowDiv_xy_zero]
       simp [la_xy]
     rw [e] at h
     exact h
 
-theorem la_mono_of_weight {m : Fin 2 × Fin 1 →₀ ℕ} {ν : Fin 1 → ℕ}
-    (h : Finsupp.weight (colW 2 1) m = ν) :
-    m = la_mono (0 : Fin 1) (m (0, 0)) (m (1, 0)) ∧ m (0, 0) + m (1, 0) = ν 0 := by
+theorem la_mono_of_weight
+    {m : Fin 2 × Fin 1 →₀ ℕ} {ν : Fin 1 → ℕ} (h : Finsupp.weight (colW 2 1) m = ν)
+    : m = la_mono (0 : Fin 1) (m (0, 0)) (m (1, 0)) ∧ m (0, 0) + m (1, 0) = ν 0 := by
   have h0 := congrFun h 0
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp)] at h0
   simp [Fintype.sum_prod_type, Fin.sum_univ_two, colW] at h0
   refine ⟨?_, h0⟩
   ext ⟨i, j⟩
-  fin_cases i <;> fin_cases j <;> simp [la_mono, Finsupp.single_apply]
+  fin_cases i <;> fin_cases j <;> simp [la_mono]
 
-theorem la_nabla_r2n1 (R : Type) [CommRing R] (ν : Fin 1 → ℕ) :
-    dualWeyl R 2 1 ν = la_monLat R (0 : Fin 1) (ν 0) := by
+theorem la_nabla_r2n1 (R : Type) [CommRing R] (ν : Fin 1 → ℕ)
+    : dualWeyl R 2 1 ν = la_monLat R (0 : Fin 1) (ν 0) := by
   apply le_antisymm
   · intro x hx
     have hx' : x ∈ weightedHomogeneousSubmodule R (colW 2 1) ν := (Submodule.mem_inf.mp hx).1
@@ -456,7 +515,9 @@ theorem la_nabla_r2n1 (R : Type) [CommRing R] (ν : Fin 1 → ℕ) :
     rw [x.as_sum]
     refine Submodule.sum_mem _ (fun d hd => ?_)
     obtain ⟨hd', hsum⟩ := la_mono_of_weight (hx' (mem_support_iff.mp hd))
-    have e : monomial d (AddMonoidAlgebra.coeff x d) = AddMonoidAlgebra.coeff x d • la_xy R (0 : Fin 1) (d (0, 0)) (d (1, 0)) := by
+    have e
+        : monomial d (AddMonoidAlgebra.coeff x d)
+          = AddMonoidAlgebra.coeff x d • la_xy R (0 : Fin 1) (d (0, 0)) (d (1, 0)) := by
       rw [la_xy_eq, ← hd', smul_monomial, smul_eq_mul, mul_one]
     rw [e, la_monLat]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, _, hsum, rfl⟩)
@@ -474,8 +535,9 @@ theorem la_nabla_r2n1 (R : Type) [CommRing R] (ν : Fin 1 → ℕ) :
       intro a b hab
       exact ((ne_of_lt hab) (Subsingleton.elim a b)).elim
 
-theorem la_eExp_r2n1 (ν : Fin 1 → ℕ) (l : ℕ) :
-    Formalism.RankGapBounds.JumpSetsAlt.eExp (lamU 2 1 ν) l = Formalism.RankGapBounds.JumpSetsAlt.maxVal l (ν 0) := by
+theorem la_eExp_r2n1 (ν : Fin 1 → ℕ) (l : ℕ)
+    : Formalism.RankGapBounds.JumpSetsAlt.eExp (lamU 2 1 ν) l
+      = Formalism.RankGapBounds.JumpSetsAlt.maxVal l (ν 0) := by
   rw [exact_exponent_rank_two 1 ν l]
   have h0 : rowNu (r := 2) ν 0 = ν 0 := dif_pos (by decide)
   have h1 : rowNu (r := 2) ν 1 = 0 := dif_neg (by decide)
@@ -517,70 +579,80 @@ theorem lattice_z_rank_one : LatticeInclusionRankOne := by
       fin_cases i
       fin_cases j
       simpa using h0
-    have e : monomial (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0))
-        (AddMonoidAlgebra.coeff x (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0))) =
-        AddMonoidAlgebra.coeff x (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0)) • hw ℤ hn ν := by
+    have e
+        : monomial (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0))
+            (AddMonoidAlgebra.coeff x (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0)))
+          = AddMonoidAlgebra.coeff x (Finsupp.single ((0 : Fin 1), (0 : Fin 1)) (ν 0))
+            • hw ℤ hn ν := by
       rw [hhw, X_pow_eq_monomial, smul_monomial, smul_eq_mul, mul_one]
     rw [hd0, e]
     exact Submodule.smul_mem _ _ (la_hw_mem ℤ hn ν)
 
 def la_det (R : Type) [CommRing R] : MvPolynomial (Fin 2 × Fin 2) R :=
-  X ((0 : Fin 2), (0 : Fin 2)) * X ((1 : Fin 2), (1 : Fin 2)) -
-    X ((0 : Fin 2), (1 : Fin 2)) * X ((1 : Fin 2), (0 : Fin 2))
+  X ((0 : Fin 2), (0 : Fin 2)) * X ((1 : Fin 2), (1 : Fin 2))
+    - X ((0 : Fin 2), (1 : Fin 2)) * X ((1 : Fin 2), (0 : Fin 2))
 
-theorem la_lpMinor_two (R : Type) [CommRing R] (s : ℕ) (hs : s = 2) (hr : s ≤ 2) (hn : s ≤ 2) :
-    lpMinor R s hr hn = la_det R := by
+theorem la_lpMinor_two (R : Type) [CommRing R] (s : ℕ) (hs : s = 2) (hr : s ≤ 2) (hn : s ≤ 2)
+    : lpMinor R s hr hn = la_det R := by
   subst hs
   show Matrix.det (Matrix.of fun p q : Fin 2 =>
     (X (Fin.castLE hr p, Fin.castLE hn q) : MvPolynomial (Fin 2 × Fin 2) R)) = _
   rw [Matrix.det_fin_two]
   rfl
 
-theorem highest_weight_rank_two (R : Type) [CommRing R] (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) :
-    hw R hn ν = la_det R ^ ν 1 * la_xy R (0 : Fin 2) (ν 0 - ν 1) 0 := by
+theorem highest_weight_rank_two (R : Type) [CommRing R] (hn : 2 ≤ 2) (ν : Fin 2 → ℕ)
+    : hw R hn ν = la_det R ^ ν 1 * la_xy R (0 : Fin 2) (ν 0 - ν 1) 0 := by
   show ∏ s : Fin 2, (lpMinor R (s.val + 1) (by omega) (by omega)) ^ (ν s - nuNext ν s) = _
   rw [Fin.prod_univ_two, show nuNext ν 0 = ν 1 from dif_pos (by decide),
     show nuNext ν 1 = 0 from dif_neg (by decide), Nat.sub_zero]
-  have e1 := la_lpMinor_one R (r := 2) (n := 2) ((0 : Fin 2).val + 1) (by decide) (by decide) (by decide)
+  have e1 :=
+    la_lpMinor_one R (r := 2) (n := 2) ((0 : Fin 2).val + 1) (by decide) (by decide) (by decide)
   have e2 := la_lpMinor_two R ((1 : Fin 2).val + 1) (by decide) (by decide) (by decide)
   rw [e1, e2, la_xy, pow_zero, mul_one]
   exact mul_comm _ _
 
-theorem la_rowGen_det_ne (R : Type) [CommRing R] (a b : Fin 2) (hab : a ≠ b) :
-    rowGen R a b (la_det R) = Polynomial.C (la_det R) := by
+theorem la_rowGen_det_ne (R : Type) [CommRing R] (a b : Fin 2) (hab : a ≠ b)
+    : rowGen R a b (la_det R) = Polynomial.C (la_det R) := by
   rcases fin_two_eq_zero_or_one a with rfl | rfl <;> rcases fin_two_eq_zero_or_one b with rfl | rfl
   · exact absurd rfl hab
   · simp [la_det, la_rowGen_X] <;> ring
   · simp [la_det, la_rowGen_X] <;> ring
   · exact absurd rfl hab
 
-theorem la_rowGen_det_eq (R : Type) [CommRing R] (a : Fin 2) :
-    rowGen R a a (la_det R) = Polynomial.C (la_det R) * (1 + Polynomial.X) := by
+theorem la_rowGen_det_eq (R : Type) [CommRing R] (a : Fin 2)
+    : rowGen R a a (la_det R) = Polynomial.C (la_det R) * (1 + Polynomial.X) := by
   rcases fin_two_eq_zero_or_one a with rfl | rfl
   · simp [la_det, la_rowGen_X] <;> ring
   · simp [la_det, la_rowGen_X] <;> ring
 
-theorem la_rowDiv_tw_ne (R : Type) [CommRing R] (a b : Fin 2) (hab : a ≠ b) (k c : ℕ)
-    (f : MvPolynomial (Fin 2 × Fin 2) R) :
-    rowDiv R a b k (la_det R ^ c * f) = la_det R ^ c * rowDiv R a b k f := by
+theorem la_rowDiv_tw_ne
+    (R : Type) [CommRing R]
+    (a b : Fin 2) (hab : a ≠ b)
+    (k c : ℕ) (f : MvPolynomial (Fin 2 × Fin 2) R)
+    : rowDiv R a b k (la_det R ^ c * f) = la_det R ^ c * rowDiv R a b k f := by
   simp only [rowDiv]
   rw [map_mul, map_pow, la_rowGen_det_ne R a b hab, ← Polynomial.C_pow, Polynomial.coeff_C_mul]
 
-theorem la_rowDiv_tw_eq (R : Type) [CommRing R] (a : Fin 2) (k c : ℕ)
-    (f : MvPolynomial (Fin 2 × Fin 2) R) :
-    rowDiv R a a k (la_det R ^ c * f) = la_det R ^ c *
-      ∑ x ∈ Finset.HasAntidiagonal.antidiagonal k, (c.choose x.1 : MvPolynomial (Fin 2 × Fin 2) R) *
-        rowDiv R a a x.2 f := by
+theorem la_rowDiv_tw_eq
+    (R : Type) [CommRing R] (a : Fin 2) (k c : ℕ) (f : MvPolynomial (Fin 2 × Fin 2) R)
+    : rowDiv R a a k (la_det R ^ c * f)
+      = la_det R ^ c
+        * ∑ x ∈ Finset.HasAntidiagonal.antidiagonal k, (c.choose x.1 : MvPolynomial (Fin 2 × Fin 2) R) *
+            rowDiv R a a x.2 f := by
   simp only [rowDiv]
   rw [map_mul, map_pow, la_rowGen_det_eq, mul_pow, ← Polynomial.C_pow, mul_assoc,
     Polynomial.coeff_C_mul, Polynomial.coeff_mul]
   simp only [Polynomial.coeff_one_add_X_pow]
 
-theorem la_tw_stable (R : Type) [CommRing R] (L : Submodule R (MvPolynomial (Fin 2 × Fin 2) R))
-    (hs : ∀ (a b : Fin 2) (k : ℕ) (f : MvPolynomial (Fin 2 × Fin 2) R), f ∈ L →
-      rowDiv R a b k f ∈ L) (c : ℕ) (a b : Fin 2) (k : ℕ) (f : MvPolynomial (Fin 2 × Fin 2) R)
-    (hf : f ∈ L.map (LinearMap.mulLeft R (la_det R ^ c))) :
-    rowDiv R a b k f ∈ L.map (LinearMap.mulLeft R (la_det R ^ c)) := by
+theorem la_tw_stable
+    (R : Type) [CommRing R]
+    (L : Submodule R (MvPolynomial (Fin 2 × Fin 2) R))
+    (hs
+      : ∀ (a b : Fin 2) (k : ℕ) (f : MvPolynomial (Fin 2 × Fin 2) R), f ∈ L → rowDiv R a b k f ∈ L)
+    (c : ℕ)
+    (a b : Fin 2) (k : ℕ)
+    (f : MvPolynomial (Fin 2 × Fin 2) R) (hf : f ∈ L.map (LinearMap.mulLeft R (la_det R ^ c)))
+    : rowDiv R a b k f ∈ L.map (LinearMap.mulLeft R (la_det R ^ c)) := by
   obtain ⟨g, hg, rfl⟩ := Submodule.mem_map.mp hf
   simp only [LinearMap.mulLeft_apply]
   by_cases hab : a = b
@@ -592,13 +664,16 @@ theorem la_tw_stable (R : Type) [CommRing R] (L : Submodule R (MvPolynomial (Fin
   · rw [la_rowDiv_tw_ne R a b hab]
     exact Submodule.mem_map.mpr ⟨_, hs _ _ _ _ hg, rfl⟩
 
-theorem la_weyl_r2n2 (R : Type) [CommRing R] (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) :
-    weyl R 2 2 hn ν =
-      (la_binLat R (0 : Fin 2) (ν 0 - ν 1)).map (LinearMap.mulLeft R (la_det R ^ ν 1)) := by
-  have hhw : hw R hn ν = la_det R ^ ν 1 * la_xy R (0 : Fin 2) (ν 0 - ν 1) 0 := highest_weight_rank_two R hn ν
+theorem la_weyl_r2n2 (R : Type) [CommRing R] (hn : 2 ≤ 2) (ν : Fin 2 → ℕ)
+    : weyl R 2 2 hn ν
+      = (la_binLat R (0 : Fin 2) (ν 0 - ν 1)).map (LinearMap.mulLeft R (la_det R ^ ν 1)) := by
+  have hhw : hw R hn ν = la_det R ^ ν 1 * la_xy R (0 : Fin 2) (ν 0 - ν 1) 0 :=
+    highest_weight_rank_two R hn ν
   apply le_antisymm
-  · refine la_weyl_le_of_stable R hn ν _ ?_ (fun a b k f hf => la_tw_stable R _
-      (fun a b k f hf => la_binLat_stable R 0 (ν 0 - ν 1) a b k f hf) (ν 1) a b k f hf)
+  · refine la_weyl_le_of_stable R hn ν _ ?_ (fun a b k f hf =>
+      la_tw_stable R _
+        (fun a b k f hf => la_binLat_stable R 0 (ν 0 - ν 1) a b k f hf)
+        (ν 1) a b k f hf)
     rw [hhw]
     refine Submodule.mem_map.mpr ⟨la_xy R 0 (ν 0 - ν 1) 0, ?_, rfl⟩
     rw [la_binLat]
@@ -606,19 +681,22 @@ theorem la_weyl_r2n2 (R : Type) [CommRing R] (hn : 2 ≤ 2) (ν : Fin 2 → ℕ)
   · rw [la_binLat, Submodule.map_span, Submodule.span_le]
     rintro _ ⟨f, ⟨p, q, hpq, rfl⟩, rfl⟩
     have h := la_word_mem R hn ν [((1 : Fin 2), (0 : Fin 2), q)]
-    have e : applyWord R [((1 : Fin 2), (0 : Fin 2), q)] (hw R hn ν) =
-        LinearMap.mulLeft R (la_det R ^ ν 1)
-          (((p + q).choose q : MvPolynomial (Fin 2 × Fin 2) R) * la_xy R 0 p q) := by
+    have e
+        : applyWord R [((1 : Fin 2), (0 : Fin 2), q)] (hw R hn ν)
+          = LinearMap.mulLeft R (la_det R ^ ν 1)
+            (((p + q).choose q : MvPolynomial (Fin 2 × Fin 2) R) * la_xy R 0 p q) := by
       show rowDiv R 1 0 q (hw R hn ν) = _
-      rw [hhw, la_rowDiv_tw_ne R 1 0 (by decide), ← hpq, la_rowDiv_xy_zero,
-        LinearMap.mulLeft_apply]
+      rw [hhw, la_rowDiv_tw_ne R 1 0 (by decide), ← hpq, la_rowDiv_xy_zero, LinearMap.mulLeft_apply]
       simp [la_xy]
     rw [e] at h
     exact h
 
-theorem la_monLat_mul (R : Type) [CommRing R] {n : ℕ} (s : Fin n) {d d' : ℕ}
-    {u u' : MvPolynomial (Fin 2 × Fin n) R} (hu : u ∈ la_monLat R s d)
-    (hu' : u' ∈ la_monLat R s d') : u * u' ∈ la_monLat R s (d + d') := by
+theorem la_monLat_mul
+    (R : Type) [CommRing R]
+    {n : ℕ} (s : Fin n)
+    {d d' : ℕ} {u u' : MvPolynomial (Fin 2 × Fin n) R}
+    (hu : u ∈ la_monLat R s d) (hu' : u' ∈ la_monLat R s d')
+    : u * u' ∈ la_monLat R s (d + d') := by
   have h := Submodule.mul_mem_mul hu hu'
   rw [la_monLat, la_monLat, Submodule.span_mul_span] at h
   rw [la_monLat]
@@ -629,8 +707,10 @@ theorem la_monLat_mul (R : Type) [CommRing R] {n : ℕ} (s : Fin n) {d d' : ℕ}
 def detPowMulMonomialSpan (c d : ℕ) : Submodule ℤ (MvPolynomial (Fin 2 × Fin 2) ℤ) :=
   (la_monLat ℤ (0 : Fin 2) d).map (LinearMap.mulLeft ℤ (la_det ℤ ^ c))
 
-theorem la_T_mul {c d c' d' : ℕ} {f f' : MvPolynomial (Fin 2 × Fin 2) ℤ} (hf : f ∈ detPowMulMonomialSpan c d)
-    (hf' : f' ∈ detPowMulMonomialSpan c' d') : f * f' ∈ detPowMulMonomialSpan (c + c') (d + d') := by
+theorem la_T_mul
+    {c d c' d' : ℕ} {f f' : MvPolynomial (Fin 2 × Fin 2) ℤ}
+    (hf : f ∈ detPowMulMonomialSpan c d) (hf' : f' ∈ detPowMulMonomialSpan c' d')
+    : f * f' ∈ detPowMulMonomialSpan (c + c') (d + d') := by
   rw [detPowMulMonomialSpan] at hf hf' ⊢
   obtain ⟨u, hu, rfl⟩ := Submodule.mem_map.mp hf
   obtain ⟨u', hu', rfl⟩ := Submodule.mem_map.mp hf'
@@ -638,12 +718,14 @@ theorem la_T_mul {c d c' d' : ℕ} {f f' : MvPolynomial (Fin 2 × Fin 2) ℤ} (h
   simp only [LinearMap.mulLeft_apply]
   ring
 
-theorem la_T_xy (c p q : ℕ) : la_det ℤ ^ c * la_xy ℤ (0 : Fin 2) p q ∈ detPowMulMonomialSpan c (p + q) := by
+theorem la_T_xy (c p q : ℕ)
+    : la_det ℤ ^ c * la_xy ℤ (0 : Fin 2) p q ∈ detPowMulMonomialSpan c (p + q) := by
   rw [detPowMulMonomialSpan]
   exact Submodule.mem_map.mpr ⟨la_xy ℤ (0 : Fin 2) p q, Submodule.subset_span ⟨p, q, rfl, rfl⟩, rfl⟩
 
-theorem initial_minor_mem_det_span (s : ℕ) (I : Fin s → Fin 2) (hs : s ≤ 2) :
-    initMinor ℤ I hs ∈ detPowMulMonomialSpan (if s = 2 then 1 else 0) (if s = 1 then 1 else 0) := by
+theorem initial_minor_mem_det_span (s : ℕ) (I : Fin s → Fin 2) (hs : s ≤ 2)
+    : initMinor ℤ I hs
+      ∈ detPowMulMonomialSpan (if s = 2 then 1 else 0) (if s = 1 then 1 else 0) := by
   obtain rfl | rfl | rfl : s = 0 ∨ s = 1 ∨ s = 2 := by omega
   · have h : initMinor ℤ I hs = 1 := Matrix.det_isEmpty
     rw [h]
@@ -659,29 +741,37 @@ theorem initial_minor_mem_det_span (s : ℕ) (I : Fin s → Fin 2) (hs : s ≤ 2
     simp only [la_xy, pow_zero, pow_one, mul_one, add_zero] at h2
     show initMinor ℤ I hs ∈ detPowMulMonomialSpan 1 0
     rw [h]
-    rcases fin_two_eq_zero_or_one (I 0) with h0 | h0 <;> rcases fin_two_eq_zero_or_one (I 1) with h1 | h1 <;> rw [h0, h1]
-    · have e : X ((0 : Fin 2), (0 : Fin 2)) * X ((0 : Fin 2), (1 : Fin 2)) -
-          X ((0 : Fin 2), (1 : Fin 2)) * X ((0 : Fin 2), (0 : Fin 2)) =
-          (0 : MvPolynomial (Fin 2 × Fin 2) ℤ) := by ring
+    rcases fin_two_eq_zero_or_one (I 0) with h0 | h0
+      <;> rcases fin_two_eq_zero_or_one (I 1) with h1 | h1 <;> rw [h0, h1]
+    · have e
+          : X ((0 : Fin 2), (0 : Fin 2)) * X ((0 : Fin 2), (1 : Fin 2))
+              - X ((0 : Fin 2), (1 : Fin 2)) * X ((0 : Fin 2), (0 : Fin 2))
+            = (0 : MvPolynomial (Fin 2 × Fin 2) ℤ) := by
+        ring
       rw [e]
       exact Submodule.zero_mem _
     · exact h2
-    · have e : X ((1 : Fin 2), (0 : Fin 2)) * X ((0 : Fin 2), (1 : Fin 2)) -
-          X ((1 : Fin 2), (1 : Fin 2)) * X ((0 : Fin 2), (0 : Fin 2)) = -la_det ℤ := by
+    · have e
+          : X ((1 : Fin 2), (0 : Fin 2)) * X ((0 : Fin 2), (1 : Fin 2))
+              - X ((1 : Fin 2), (1 : Fin 2)) * X ((0 : Fin 2), (0 : Fin 2))
+            = - la_det ℤ := by
         simp only [la_det]
         ring
       rw [e]
       exact Submodule.neg_mem _ h2
-    · have e : X ((1 : Fin 2), (0 : Fin 2)) * X ((1 : Fin 2), (1 : Fin 2)) -
-          X ((1 : Fin 2), (1 : Fin 2)) * X ((1 : Fin 2), (0 : Fin 2)) =
-          (0 : MvPolynomial (Fin 2 × Fin 2) ℤ) := by ring
+    · have e
+          : X ((1 : Fin 2), (0 : Fin 2)) * X ((1 : Fin 2), (1 : Fin 2))
+              - X ((1 : Fin 2), (1 : Fin 2)) * X ((1 : Fin 2), (0 : Fin 2))
+            = (0 : MvPolynomial (Fin 2 × Fin 2) ℤ) := by
+        ring
       rw [e]
       exact Submodule.zero_mem _
 
-theorem prod_initial_minors_mem_det_span {K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ 2) (I : ∀ k, Fin (sz k) → Fin 2)
-    (S : Finset (Fin K)) :
-    ∏ k ∈ S, initMinor ℤ (I k) (hsz k) ∈
-      detPowMulMonomialSpan (∑ k ∈ S, if sz k = 2 then 1 else 0) (∑ k ∈ S, if sz k = 1 then 1 else 0) := by
+theorem prod_initial_minors_mem_det_span
+    {K : ℕ}
+    (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ 2) (I : ∀ k, Fin (sz k) → Fin 2) (S : Finset (Fin K))
+    : ∏ k ∈ S, initMinor ℤ (I k) (hsz k) ∈ detPowMulMonomialSpan
+      (∑ k ∈ S, if sz k = 2 then 1 else 0) (∑ k ∈ S, if sz k = 1 then 1 else 0) := by
   induction S using Finset.induction_on with
   | empty =>
     simp only [Finset.prod_empty, Finset.sum_empty]
@@ -692,12 +782,12 @@ theorem prod_initial_minors_mem_det_span {K : ℕ} (sz : Fin K → ℕ) (hsz : �
 
 theorem la_det_ne : la_det ℤ ≠ 0 := by
   intro h
-  have h1 := congrArg
-    (MvPolynomial.eval (fun v : Fin 2 × Fin 2 => if v.1 = v.2 then (1 : ℤ) else 0)) h
+  have h1 :=
+    congrArg (MvPolynomial.eval (fun v : Fin 2 × Fin 2 => if v.1 = v.2 then (1 : ℤ) else 0)) h
   simp [la_det] at h1
 
-theorem la_nabla_r2n2 (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) (hν : Antitone ν) :
-    dualWeyl ℤ 2 2 ν = detPowMulMonomialSpan (ν 1) (ν 0 - ν 1) := by
+theorem la_nabla_r2n2 (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) (hν : Antitone ν)
+    : dualWeyl ℤ 2 2 ν = detPowMulMonomialSpan (ν 1) (ν 0 - ν 1) := by
   apply le_antisymm
   · rw [standardMonomialSpan 2 2 ν hν]
     apply Submodule.span_le.2
@@ -714,8 +804,9 @@ theorem la_nabla_r2n2 (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) (hν : Antitone ν) :
         simp only [Fin.val_one]
         omega
       simp only [e]
-    have c0 : (∑ k : Fin K, if sz k = 1 then 1 else 0) + (∑ k : Fin K, if sz k = 2 then 1 else 0)
-        = ν 0 := by
+    have c0
+        : (∑ k : Fin K, if sz k = 1 then 1 else 0) + (∑ k : Fin K, if sz k = 2 then 1 else 0)
+          = ν 0 := by
       rw [← hshape]
       unfold shapeDeg
       rw [Finset.card_filter, ← Finset.sum_add_distrib]
@@ -741,8 +832,9 @@ theorem la_nabla_r2n2 (hn : 2 ≤ 2) (ν : Fin 2 → ℕ) (hν : Antitone ν) :
     rw [MvPolynomial.smul_eq_C_mul, map_natCast]
     ring
 
-theorem la_eExp_r2n2 (ν : Fin 2 → ℕ) (l : ℕ) :
-    Formalism.RankGapBounds.JumpSetsAlt.eExp (lamU 2 2 ν) l = Formalism.RankGapBounds.JumpSetsAlt.maxVal l (ν 0 - ν 1) := by
+theorem la_eExp_r2n2 (ν : Fin 2 → ℕ) (l : ℕ)
+    : Formalism.RankGapBounds.JumpSetsAlt.eExp (lamU 2 2 ν) l
+      = Formalism.RankGapBounds.JumpSetsAlt.maxVal l (ν 0 - ν 1) := by
   rw [exact_exponent_rank_two 2 ν l]
   have h0 : rowNu (r := 2) ν 0 = ν 0 := dif_pos (by decide)
   have h1 : rowNu (r := 2) ν 1 = ν 1 := dif_pos (by decide)
@@ -782,8 +874,8 @@ theorem la_dualWeyl_fg (r n : ℕ) (ν : Fin n → ℕ) : (dualWeyl ℤ r n ν).
     rw [← lclosedeq_weight_sum, h1 hm]
   exact Submodule.FG.of_le (homogeneousSubmodule_fg _ _ _) h
 
-theorem la_uniform (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν) :
-    ∃ N : ℕ, N ≠ 0 ∧ ∀ x ∈ dualWeyl ℤ r n ν, ((N : ℕ) : ℤ) • x ∈ weyl ℤ r n hn ν := by
+theorem la_uniform (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : ∃ N : ℕ, N ≠ 0 ∧ ∀ x ∈ dualWeyl ℤ r n ν, ((N : ℕ) : ℤ) • x ∈ weyl ℤ r n hn ν := by
   classical
   obtain ⟨S, hS⟩ := la_dualWeyl_fg r n ν
   have hc := weylRational r n hn ν hν
@@ -822,26 +914,28 @@ theorem exact_z_specialization : ExZSpec := by
     exact hN x hx
   exact Nat.sInf_mem (s := {e : ℕ | InclZ r n hn ν l e}) ⟨v, hv⟩
 
-private theorem la_rowGen_map_lemma (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r)
-    (g : MvPolynomial (Fin r × Fin n) ℤ) :
-    rowGen R a b (map (Int.castRingHom R) g) =
-      Polynomial.map (map (Int.castRingHom R)) (rowGen ℤ a b g) := by
+private theorem la_rowGen_map_lemma
+    (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (g : MvPolynomial (Fin r × Fin n) ℤ)
+    : rowGen R a b (map (Int.castRingHom R) g)
+      = Polynomial.map (map (Int.castRingHom R)) (rowGen ℤ a b g) := by
   induction g using MvPolynomial.induction_on
   next z => simp [rowGen]
-  next p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _), Polynomial.map_add (f := _)]
+  next p q hp hq =>
+    rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _), Polynomial.map_add (f := _)]
   next p v hp =>
     simp only [map_mul, MvPolynomial.map_X, hp, Polynomial.map_mul, la_rowGen_X]
     congr 1
     split_ifs <;> simp
 
-private theorem la_rowDiv_map_lemma_2 (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (k : ℕ)
-    (g : MvPolynomial (Fin r × Fin n) ℤ) :
-    rowDiv R a b k (map (Int.castRingHom R) g) = map (Int.castRingHom R) (rowDiv ℤ a b k g) := by
+private theorem la_rowDiv_map_lemma_2
+    (R : Type) [CommRing R] {r n : ℕ} (a b : Fin r) (k : ℕ) (g : MvPolynomial (Fin r × Fin n) ℤ)
+    : rowDiv R a b k (map (Int.castRingHom R) g) = map (Int.castRingHom R) (rowDiv ℤ a b k g) := by
   simp only [rowDiv, la_rowGen_map_lemma, Polynomial.coeff_map]
 
-private theorem la_applyWord_map_lemma_3 (R : Type) [CommRing R] {r n : ℕ}
-    (w : List (Fin r × Fin r × ℕ)) (g : MvPolynomial (Fin r × Fin n) ℤ) :
-    applyWord R w (map (Int.castRingHom R) g) = map (Int.castRingHom R) (applyWord ℤ w g) := by
+private theorem la_applyWord_map_lemma_3
+    (R : Type) [CommRing R]
+    {r n : ℕ} (w : List (Fin r × Fin r × ℕ)) (g : MvPolynomial (Fin r × Fin n) ℤ)
+    : applyWord R w (map (Int.castRingHom R) g) = map (Int.castRingHom R) (applyWord ℤ w g) := by
   induction w with
   | nil => rfl
   | cons x w ih =>
@@ -849,19 +943,23 @@ private theorem la_applyWord_map_lemma_3 (R : Type) [CommRing R] {r n : ℕ}
       map (Int.castRingHom R) (rowDiv ℤ x.1 x.2.1 x.2.2 (applyWord ℤ w g))
     rw [ih, la_rowDiv_map_lemma_2]
 
-private theorem la_hw_map_lemma_4 (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    map (Int.castRingHom R) (hw ℤ hn ν) = hw R hn ν := by
+private theorem la_hw_map_lemma_4 (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : map (Int.castRingHom R) (hw ℤ hn ν) = hw R hn ν := by
   simp only [hw, lpMinor, map_prod, map_pow, RingHom.map_det, RingHom.mapMatrix_apply]
   refine Finset.prod_congr rfl (fun s _ => ?_)
   congr 2
   ext p q
   simp
 
-theorem la_map_weyl (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (f : MvPolynomial (Fin r × Fin n) ℤ) (hf : f ∈ weyl ℤ r n hn ν) :
-    map (Int.castRingHom R) f ∈ weyl R r n hn ν := by
-  have hf' : f ∈ Submodule.span ℤ
-      (Set.range fun w : List (Fin r × Fin r × ℕ) => applyWord ℤ w (hw ℤ hn ν)) := hf
+theorem la_map_weyl
+    (R : Type) [CommRing R]
+    {r n : ℕ}
+    (hn : n ≤ r) (ν : Fin n → ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ) (hf : f ∈ weyl ℤ r n hn ν)
+    : map (Int.castRingHom R) f ∈ weyl R r n hn ν := by
+  have hf'
+      : f ∈ Submodule.span ℤ
+        (Set.range fun w : List (Fin r × Fin r × ℕ) => applyWord ℤ w (hw ℤ hn ν)) :=
+    hf
   clear hf
   induction hf' using Submodule.span_induction with
   | mem x hx =>
@@ -878,10 +976,12 @@ theorem la_map_weyl (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin
     rw [map_zsmul]
     exact zsmul_mem hx z
 
-theorem la_incl_R_of_Z (R : Type) [CommRing R] [IsDomain R] (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ)
+theorem la_incl_R_of_Z
+    (R : Type) [CommRing R] [IsDomain R]
+    (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ)
     (l e : ℕ) (hu : ∀ m : ℕ, ¬ l ∣ m → IsUnit (m : R)) (hZ : InclZ r n hn ν l e)
-    (x : MvPolynomial (Fin r × Fin n) R) (hx : x ∈ dualWeyl R r n ν) :
-    (l : R) ^ e • x ∈ weyl R r n hn ν := by
+    (x : MvPolynomial (Fin r × Fin n) R) (hx : x ∈ dualWeyl R r n ν)
+    : (l : R) ^ e • x ∈ weyl R r n hn ν := by
   obtain ⟨m, hm, h⟩ := hZ
   rw [standardMonomialSpanDomain R r n ν] at hx
   induction hx using Submodule.span_induction with
@@ -902,8 +1002,8 @@ theorem la_incl_R_of_Z (R : Type) [CommRing R] [IsDomain R] (r n : ℕ) (hn : n 
   | add x y _ _ hx hy => rw [smul_add]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
 
-theorem la_map_smul (R : Type) [CommRing R] {σ : Type} (z : ℤ) (f : MvPolynomial σ ℤ) :
-    map (Int.castRingHom R) (z • f) = (z : R) • map (Int.castRingHom R) f := by
+theorem la_map_smul (R : Type) [CommRing R] {σ : Type} (z : ℤ) (f : MvPolynomial σ ℤ)
+    : map (Int.castRingHom R) (z • f) = (z : R) • map (Int.castRingHom R) f := by
   rw [map_zsmul]
   exact (Int.cast_smul_eq_zsmul R z _).symm
 

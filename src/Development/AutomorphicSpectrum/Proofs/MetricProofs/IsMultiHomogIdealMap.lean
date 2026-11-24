@@ -48,10 +48,15 @@ import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.Per
 import ReciprocityTheory.AnalyticForms.LeviForms.IsRegFamilyInhabitStatement
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.RationalSections.IsRatSectionOn
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticSeventh
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -59,32 +64,36 @@ namespace GlobalTheory.CompanionTheory.Ar.PB.CovMap
 
 section Forms
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
 
-theorem isMultiHomog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem isMultiHomog_mul
+    {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   intro m hm k
   obtain ⟨m1, hm1, m2, hm2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul _ _ hm)
   have h1 := hf m1 hm1 k
   have h2 := hg m2 hm2 k
   simp [Finset.sum_add_distrib, h1, h2]
 
-theorem isMultiHomog_rename {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v) {f : MRing ι}
-    {a : K → ℕ} (hf : IsMultiHomog f a) : IsMultiHomog (rename v f : MRing ι') (Function.extend κ a 0) := by
-  apply PositivityTheory.UnitarySelfGeneration.ialg_rename <;> assumption
-
-theorem eval_map_rename (zt : (Σ k, ι' k) → ℂ) (v : (Σ k, ι k) → (Σ k, ι' k)) (s : MRing ι) :
-    eval zt (map (Int.castRingHom ℂ) (rename v s : MRing ι')) = eval (fun p => zt (v p)) (map (Int.castRingHom ℂ) s) := by
+theorem eval_map_rename (zt : (Σ k, ι' k) → ℂ) (v : (Σ k, ι k) → (Σ k, ι' k)) (s : MRing ι)
+    : eval zt (map (Int.castRingHom ℂ) (rename v s : MRing ι'))
+      = eval (fun p => zt (v p)) (map (Int.castRingHom ℂ) s) := by
   rw [map_rename, eval_rename]
   rfl
 
-theorem mem_mcPts_map {v : (Σ k, ι k) → (Σ k, ι' k)} {J : Ideal (MRing ι)} {zt : (Σ k, ι' k) → ℂ}
-    (h0 : ∀ k, ∃ i, zt ⟨k, i⟩ ≠ 0) (hz : ∀ f ∈ J, eval (fun p => zt (v p)) (map (Int.castRingHom ℂ) f) = 0) :
-    zt ∈ mcPts (J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom) := by
+theorem mem_mcPts_map
+    {v : (Σ k, ι k) → (Σ k, ι' k)} {J : Ideal (MRing ι)} {zt : (Σ k, ι' k) → ℂ}
+    (h0 : ∀ k, ∃ i, zt ⟨k, i⟩ ≠ 0)
+    (hz : ∀ f ∈ J, eval (fun p => zt (v p)) (map (Int.castRingHom ℂ) f) = 0)
+    : zt ∈ mcPts (J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom) := by
   refine ⟨h0, ?_⟩
-  have hle : J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom ≤
-      RingHom.ker ((eval zt).comp (map (Int.castRingHom ℂ)) : MRing ι' →+* ℂ) := by
+  have hle
+      : J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom
+        ≤ RingHom.ker ((eval zt).comp (map (Int.castRingHom ℂ)) : MRing ι' →+* ℂ) := by
     rw [Ideal.map_le_iff_le_comap]
     intro s hs
     rw [Ideal.mem_comap, RingHom.mem_ker]
@@ -94,29 +103,32 @@ theorem mem_mcPts_map {v : (Σ k, ι k) → (Σ k, ι' k)} {J : Ideal (MRing ι)
   intro f hf
   exact RingHom.mem_ker.mp (hle hf)
 
-theorem isMultiHomogIdeal_map {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v)
-    {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J) :
-    IsMultiHomogIdeal (J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom) := by
+theorem isMultiHomogIdeal_map
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v)
+    {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J)
+    : IsMultiHomogIdeal (J.map (rename v : MRing ι →ₐ[ℤ] MRing ι').toRingHom) := by
   obtain ⟨S, hS, rfl⟩ := hJ
   refine ⟨_ '' S, ?_, Ideal.map_span _ _⟩
   rintro _ ⟨s, hs, rfl⟩
   obtain ⟨a, ha⟩ := hS s hs
-  exact ⟨_, isMultiHomog_rename hv ha⟩
+  exact ⟨_, _root_.GlobalTheory.CompanionTheory.Ar.PB.BaseEtale.isMultiHomog_rename_block hv ha⟩
 
 end Forms
 
-theorem holoMap_comp {e₁ e₂ e₃ : ℕ} {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
+theorem holoMap_comp
+    {e₁ e₂ e₃ : ℕ} {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
     {C : FinHolAtlas e₁ Z} {B : FinHolAtlas e₂ Y} {A : FinHolAtlas e₃ X} {g : Z → Y} {f : Y → X}
-    (hg : HoloMap C B g) (hf : HoloMap B A f) : HoloMap C A (f ∘ g) := by
+    (hg : HoloMap C B g) (hf : HoloMap B A f)
+    : HoloMap C A (f ∘ g) := by
   refine ⟨hf.1.comp hg.1, fun j k t ht => ?_⟩
   obtain ⟨ht1, ht2⟩ := ht
   obtain ⟨m, hm⟩ := B.cover (g ((C.chart j).symm t))
   have h1 : AnalyticAt ℂ (B.chart m ∘ g ∘ (C.chart j).symm) t := hg.2 j m t ⟨ht1, hm⟩
   have hu : (B.chart m).symm ((B.chart m ∘ g ∘ (C.chart j).symm) t) = g ((C.chart j).symm t) :=
     (B.chart m).left_inv hm
-  have h2 : AnalyticAt ℂ (A.chart k ∘ f ∘ (B.chart m).symm) ((B.chart m ∘ g ∘ (C.chart j).symm) t) :=
-    hf.2 m k _ ⟨(B.chart m).map_source hm, by
-      rw [Set.mem_preimage, hu]; exact ht2⟩
+  have h2
+      : AnalyticAt ℂ (A.chart k ∘ f ∘ (B.chart m).symm) ((B.chart m ∘ g ∘ (C.chart j).symm) t) :=
+    hf.2 m k _ ⟨(B.chart m).map_source hm, by rw [Set.mem_preimage, hu]; exact ht2⟩
   refine (h2.comp h1).congr ?_
   have hc : ContinuousAt (g ∘ (C.chart j).symm) t :=
     hg.1.continuousAt.comp ((C.chart j).continuousAt_symm ht1)
@@ -129,15 +141,6 @@ end GlobalTheory.CompanionTheory.Ar.PB.CovMap
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.PB.CovMap
-
-section Corr
-
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ] {y : (Σ k, ι k) → Φ}
-  {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N j : ℕ} {M : FlagModel y Ψ N j} {K' : Type} [Fintype K']
-  {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Φ' : Type} [Field Φ'] {y' : (Σ k, ι' k) → Φ'}
-  {M' : FlagModel y' Ψ N j}
-
-end Corr
 
 end GlobalTheory.CompanionTheory.Ar.PB.CovMap
 

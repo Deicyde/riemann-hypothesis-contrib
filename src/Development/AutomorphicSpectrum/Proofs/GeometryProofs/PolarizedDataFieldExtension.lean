@@ -3,15 +3,21 @@ module
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsThetaMeanSquareNorm
 public import GroundTheory.HeightsAndTheta.Heights.LatticeLemmas.StatementsBundles
 public import Development.AbelianVarietyTheory.Counterexamples.JetSurvey.ExistsPullbackPrescribed
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductPullbackUniqueStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPrincipalBaseChangeIffStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelComplexBaseChangeStatement
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueSemilinear
-import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChangeStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HodgeIPIffHodgeFormConj
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductPullbackUnique
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.SlopeBoundSt
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPrincipalBaseChangeIff
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import GroundTheory.HeightsAndTheta.Heights.HermitianLattice
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelComplexBaseChange
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelPullbackEquivalence
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrincipalHermitianFibreStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrincipalHermitianFibre
 public import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.DegreeTopEqArithDegree
 public import GroundTheory.HeightsAndTheta.Heights.LatticeLemmas.PBaseChange
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueSemilinear
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChange
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -146,10 +152,7 @@ theorem hodge_congr
   obtain rfl : w = w' := Over.OverMorphism.ext hw
   exact hc
 
-theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (d : A →+* B) (c : B →+* C)
-    : spMap c ≫ spMap d = spMap (c.comp d) := by
-  simp only [spMap, ← Spec.map_comp]
-  rfl
+alias spMap_comp := _root_.GlobalTheory.spMap_comp_ring
 
 theorem dualMap_comp
     {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (d : A →+* B) (c : B →+* C)
@@ -160,11 +163,7 @@ theorem dualMap_comp
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem exists_pull {S S' : Scheme.{0}} (f : S' ⟶ S) (t : SAB H S)
-    : ∃ t' : SAB H S', Nonempty (SABMap t' t f) := by
-  obtain ⟨P, h⟩ := GlobalTheory.SabBaseChange.exists_prescribed f t
-  obtain ⟨c, s, a, p, m, -⟩ := GlobalTheory.SabBaseChange.exists_pullback_prescribed f t P h
-  exact ⟨_, ⟨m⟩⟩
+alias exists_pull := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_sab
 
 variable {L : Type} [Field L] [NumberField L] {L' : Type} [Field L'] [NumberField L'] [Algebra L L']
 
@@ -186,8 +185,10 @@ theorem exists_ext (D : PPData H L) (L' : Type) [Field L'] [NumberField L'] [Alg
   obtain ⟨m₃, -⟩ :=
     sabCancel pullCubCancel E H _ _ _ D.t D.tK tK' _ (spMap (algebraMap L L')) D.m (hsq ▸ n)
   have pr : IsPrincipal tK' :=
-    (GlobalTheory.T.isPrincipal_base_change_iff E H L L' (algebraMap L L') D.tK tK' m₃).2 D.princ
-  obtain ⟨B, MB, fib⟩ := GlobalTheory.T.principal_hermitian_fibre E H L' t' tK' m₂ pr
+    (_root_.GlobalTheory.CompanionTheory.Ar.isPrincipal_iff_of_sabMap_field E H L L'
+      (algebraMap L L') D.tK tK' m₃).2 D.princ
+  obtain ⟨B, MB, fib⟩ :=
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeFibre.exists_hermitianBundle E H L' t' tK' m₂ pr
   exact ⟨⟨⟨t', tK', m₂, pr, B, MB, fib⟩, m₁⟩⟩
 
 theorem ext_props (D : PPData H L) (D' : PPData H L') (m : D.Ext D')
@@ -232,7 +233,7 @@ theorem ext_props (D : PPData H L) (D' : PPData H L') (m : D.Ext D')
     map_smul' := fun r x => j.map_smulₛₗ r x
   }
   have hb : IsBaseChange (𝓞 L') jl :=
-    GlobalTheory.T.lie_model_isBaseChange _ D.t.G _ _ (𝟙 _) _ _ D.MB Mq jl hj
+    _root_.GlobalTheory.CompanionTheory.Ar.lieModel_isBaseChange _ D.t.G _ _ (𝟙 _) _ _ D.MB Mq jl hj
   have hΦ : ∀ x, hb.equiv ((1 : 𝓞 L') ⊗ₜ[𝓞 L] x) = j x := fun x => by
     rw [hb.equiv_tmul, one_smul]
     rfl
@@ -246,10 +247,11 @@ theorem ext_props (D : PPData H L) (D' : PPData H L') (m : D.Ext D')
             : ℂ) := by
     intro σ' x y
     obtain ⟨M₁, h₁⟩ :=
-      GlobalTheory.T.lie_model_complex_base_change _ D.t.G L (𝟙 _) D.B.carrier D.MB
-        (σ'.comp (algebraMap L L'))
+      _root_.GlobalTheory.CompanionTheory.Ar.LieSigma.lieModel_fibre _ D.t.G L (𝟙 _) D.B.carrier
+        D.MB (σ'.comp (algebraMap L L'))
     obtain ⟨M₂, h₂⟩ :=
-      GlobalTheory.T.lie_model_complex_base_change _ D'.t.G L' (𝟙 _) D'.B.carrier D'.MB σ'
+      _root_.GlobalTheory.CompanionTheory.Ar.LieSigma.lieModel_fibre _ D'.t.G L' (𝟙 _) D'.B.carrier
+        D'.MB σ'
     have a := D.fib (σ'.comp (algebraMap L L')) x y _ _ (h₁ x) (h₁ y)
     have b := D'.fib σ' (j x) (j y) _ _ (h₂ (j x)) (h₂ (j y))
     have hring
@@ -278,7 +280,7 @@ theorem ext_props (D : PPData H L) (D' : PPData H L') (m : D.Ext D')
       change lf _ ≫ m.φ = lf _
       rw [h₃, c₁, c₂, Category.assoc, hj', ← Category.assoc, spMap_comp, dualMap_comp, hring]
     have T :=
-      GlobalTheory.T.hodge_inner_product_pullback_unique E H _ _ D'.t D.t _ m
+      _root_.GlobalTheory.CompanionTheory.Ar.HodgeUnique.main E H _ _ D'.t D.t _ m
         (spMap (σ'.comp (algebraMap (𝓞 L') L')) ≫ 𝟙 _) _ _ _ _ (hv x) (hv y)
     exact T.2 _ _ ((T.1 _).1 b) (hodge_congr _ hz (h₃ _).symm (h₃ _).symm a)
   refine ⟨hb.finrank_eq, ?_, j, ?_, ?_, hmet⟩

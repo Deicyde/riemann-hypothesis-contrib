@@ -1,7 +1,10 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PullbackPullback
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentSwapVarietiesArithmeticStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenericBlockMatrixIsBlockDiag
+public import Mathlib.FieldTheory.RatFunc.AsPolynomial
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentSwapVarietiesArithmetic
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogResolutionFunctorialHolomorphic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -221,8 +224,8 @@ theorem two_projections
                       ∧ ∀ t, FA.S.phT (some p) t ∘ q 0 = FA.S.phT (some p) t ∘ q 1 := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n d BM FA τ a b k₀ ca cb hb hab hk ha hcb hy RW pr hpr hbase
   obtain ⟨-, -, -, hi₀, hi₁⟩ :=
-    GlobalTheory.T.flag_adjacent_swap_varieties_arithmetic K ι Φ y Ψ N j M d τ a b k₀ ca cb hb hab
-      hk ha hcb hy
+    _root_.GlobalTheory.CompanionTheory.Relay.flag_adjacent_swap_varieties_arithmetic K ι Φ y Ψ N j
+      M d τ a b k₀ ca cb hb hab hk ha hcb hy
   have hi₁' := hi₁ (v₁ k₀) (fun p hp => v₁_ne hp) (fun m => v₁_self k₀ m)
   obtain ⟨h₀, hh₀, ho₀⟩ :=
     exists_holo_of_centre some (v₀ k₀) FA.J_top FA.Re.R RW (isBlockMap_v₀ k₀) hi₀.ge

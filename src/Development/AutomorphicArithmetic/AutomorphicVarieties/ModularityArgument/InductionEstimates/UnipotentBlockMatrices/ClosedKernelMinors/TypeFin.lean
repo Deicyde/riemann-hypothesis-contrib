@@ -175,7 +175,6 @@ private theorem leftRight
     funext x
     have h1 : a (x * u) = (L x ⟨a, ha⟩ : H → ℂ) u := rfl
     have h2 : L x ⟨a, ha⟩ = ∑ i, ∑ j, (B.repr ⟨a, ha⟩ j * c (i, j) x) • B i := by
-
       conv_lhs => rw [← B.sum_repr ⟨a, ha⟩, map_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => ?_

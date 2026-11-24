@@ -276,7 +276,8 @@ theorem sxF_GV
     {Bj : B.RealPlaceData k ρ Wp Wq} (e : p + ρ = n) {x : PBQ.XP k p ρ} (hx : PBQ.GoodP Bj x)
     : sxF e x ∈ GV k n := by
   refine Formalism.FourierDecayAlt.P.PBE.castM_GV e
-    (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (LeftFubiniLemmas.rn_nset _).1 ?_)
+    (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+      (_root_.Formalism.FourierDecayAlt.P.Ux3.rn_nset _).1 ?_)
   rw [← Formalism.FourierDecayAlt.P.Dx2.Tower.lev_eq_embG]
   exact Formalism.FourierDecayAlt.P.Dx2.Tower.lev_GV p ρ _
     (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul

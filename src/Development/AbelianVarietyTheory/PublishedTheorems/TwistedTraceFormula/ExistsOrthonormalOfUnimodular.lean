@@ -64,9 +64,14 @@ open ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.LocalQuad GlobalTheory
 
 namespace GlobalTheory.HermLocal
 
-theorem exists_zero_coord {F : Type*} [Field F] (h2 : (2 : F) ≠ 0) {ι : Type*} [Fintype ι]
-    {a : ι → F} (ha : ∀ i, a i ≠ 0) {z : ι → F} (hz : z ≠ 0) (h : ∑ i, a i * z i ^ 2 = 0)
-    (i : ι) : ∃ w : ι → F, w i ≠ 0 ∧ ∑ k, a k * w k ^ 2 = 0 := by
+theorem exists_zero_coord
+    {F : Type*} [Field F]
+    (h2 : (2 : F) ≠ 0)
+    {ι : Type*} [Fintype ι]
+    {a : ι → F} (ha : ∀ i, a i ≠ 0)
+    {z : ι → F} (hz : z ≠ 0) (h : ∑ i, a i * z i ^ 2 = 0)
+    (i : ι)
+    : ∃ w : ι → F, w i ≠ 0 ∧ ∑ k, a k * w k ^ 2 = 0 := by
   classical
   by_cases hi : z i = 0
   swap
@@ -80,9 +85,10 @@ theorem exists_zero_coord {F : Type*} [Field F] (h2 : (2 : F) ≠ 0) {ι : Type*
   set t : F := -(a i + a j) / (2 * a j * z j) with ht
   refine ⟨fun k => (if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k, ?_, ?_⟩
   · simp [hij, hi]
-  · have : ∀ k, a k * ((if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k) ^ 2 =
-        (if k = i then a i else 0) + (if k = j then a j + 2 * t * a j * z j else 0) +
-          t ^ 2 * (a k * z k ^ 2) := by
+  · have : ∀ k,
+        a k * ((if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k) ^ 2
+          = (if k = i then a i else 0) + (if k = j then a j + 2 * t * a j * z j else 0)
+            + t ^ 2 * (a k * z k ^ 2) := by
       intro k
       by_cases h1 : k = i
       · subst h1
@@ -103,12 +109,14 @@ section Abstract
 
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] {c : L →+* L}
 
-theorem exists_represent_of_five (h2 : (2 : K) ≠ 0)
-    (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
-    (hF : ∀ t : L, c t = t ↔ ∃ s : K, algebraMap K L s = t) {θ : L} (h0 : θ ≠ 0) (hθ : c θ = -θ)
-    {r : ℕ} (hr : 2 ≤ r) {g : Fin r → L}
-    (hg : ∀ i, c (g i) = g i) (hg0 : ∀ i, g i ≠ 0) {b : L} (hb : c b = b) (hb0 : b ≠ 0) :
-    ∃ z : Fin r → L, z ⬝ᵥ Matrix.diagonal g *ᵥ (c ∘ z) = b := by
+theorem exists_represent_of_five
+    (h2 : (2 : K) ≠ 0) (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
+    (hF : ∀ t : L, c t = t ↔ ∃ s : K, algebraMap K L s = t)
+    {θ : L} (h0 : θ ≠ 0) (hθ : c θ = -θ)
+    {r : ℕ} (hr : 2 ≤ r)
+    {g : Fin r → L} (hg : ∀ i, c (g i) = g i) (hg0 : ∀ i, g i ≠ 0)
+    {b : L} (hb : c b = b) (hb0 : b ≠ 0)
+    : ∃ z : Fin r → L, z ⬝ᵥ Matrix.diagonal g *ᵥ (c ∘ z) = b := by
   obtain ⟨d, hd⟩ := (hF (θ * θ)).1 (by rw [map_mul, hθ]; ring)
   choose γ hγ' using fun i => (hF (g i)).1 (hg i)
   obtain ⟨κ, hκ'⟩ := (hF b).1 hb
@@ -130,19 +138,27 @@ theorem exists_represent_of_five (h2 : (2 : K) ≠ 0)
   have hw1 := congrArg (algebraMap K L) hw0
   have hw2 : algebraMap K L (w none) ≠ 0 := (map_ne_zero _).2 hw
 
-  simp only [a, Option.elim, Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_mul, map_neg, map_pow, map_sum,
-  hγ', hκ', hd, map_zero] at hw1
+  simp only [a, Option.elim, Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_mul, map_neg,
+      map_pow, map_sum, hγ', hκ', hd, map_zero]
+    at hw1
   have hs : ∀ s : K, c (algebraMap K L s) = algebraMap K L s := fun s => (hF _).2 ⟨s, rfl⟩
-  refine ⟨fun i => (algebraMap K L (w (some (Sum.inl i))) +
-    algebraMap K L (w (some (Sum.inr i))) * θ) / algebraMap K L (w none), ?_⟩
-  simp only [dotProduct, Matrix.mulVec_diagonal, Function.comp_apply, map_div₀, map_add (f := _), map_mul,
-    hs, hθ]
-  have : ∀ i, (algebraMap K L (w (some (Sum.inl i))) + algebraMap K L (w (some (Sum.inr i))) * θ) /
-      algebraMap K L (w none) * (g i * ((algebraMap K L (w (some (Sum.inl i))) +
-        algebraMap K L (w (some (Sum.inr i))) * -θ) / algebraMap K L (w none))) =
-      (g i * algebraMap K L (w (some (Sum.inl i))) ^ 2 +
-        -(θ * θ) * g i * algebraMap K L (w (some (Sum.inr i))) ^ 2) /
-          algebraMap K L (w none) ^ 2 := by
+  refine ⟨
+    fun i =>
+      (algebraMap K L (w (some (Sum.inl i))) + algebraMap K L (w (some (Sum.inr i))) * θ)
+        / algebraMap K L (w none),
+    ?_
+  ⟩
+  simp only [dotProduct, Matrix.mulVec_diagonal, Function.comp_apply, map_div₀, map_add (f := _),
+    map_mul, hs, hθ]
+  have : ∀ i,
+      (algebraMap K L (w (some (Sum.inl i))) + algebraMap K L (w (some (Sum.inr i))) * θ)
+          / algebraMap K L (w none)
+          * (g i
+            * ((algebraMap K L (w (some (Sum.inl i))) + algebraMap K L (w (some (Sum.inr i))) * -θ)
+              / algebraMap K L (w none)))
+        = (g i * algebraMap K L (w (some (Sum.inl i))) ^ 2
+            + -(θ * θ) * g i * algebraMap K L (w (some (Sum.inr i))) ^ 2)
+          / algebraMap K L (w none) ^ 2 := by
     intro i
     field_simp
     ring
@@ -150,13 +166,15 @@ theorem exists_represent_of_five (h2 : (2 : K) ≠ 0)
   rw [div_eq_iff (pow_ne_zero 2 hw2)]
   linear_combination hw1
 
-theorem congr_diagonal_of_five (h2 : (2 : K) ≠ 0)
-    (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0) (hc : ∀ t, c (c t) = t)
-    (hF : ∀ t : L, c t = t ↔ ∃ s : K, algebraMap K L s = t) {θ : L} (hθ0 : θ ≠ 0) (hθ : c θ = -θ)
-    (r : ℕ) : ∀ g g' : Fin r → L,
-    (∀ i, c (g i) = g i) → (∀ i, c (g' i) = g' i) → (∀ i, g i ≠ 0) → (∀ i, g' i ≠ 0) →
-    (∃ x : L, ∏ i, g i = x * c x * ∏ i, g' i) →
-    Congr c (Matrix.diagonal g) (Matrix.diagonal g') := by
+theorem congr_diagonal_of_five
+    (h2 : (2 : K) ≠ 0) (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
+    (hc : ∀ t, c (c t) = t) (hF : ∀ t : L, c t = t ↔ ∃ s : K, algebraMap K L s = t)
+    {θ : L} (hθ0 : θ ≠ 0) (hθ : c θ = -θ)
+    (r : ℕ)
+    : ∀ g g' : Fin r → L,
+      (∀ i, c (g i) = g i) → (∀ i, c (g' i) = g' i) → (∀ i, g i ≠ 0) → (∀ i, g' i ≠ 0)
+        → (∃ x : L, ∏ i, g i = x * c x * ∏ i, g' i)
+        → Congr c (Matrix.diagonal g) (Matrix.diagonal g') := by
   have h2L : (2 : L) ≠ 0 := by
     rw [← map_ofNat (algebraMap K L) 2]
     exact (map_ne_zero _).2 h2
@@ -190,22 +208,23 @@ theorem congr_diagonal_of_five (h2 : (2 : K) ≠ 0)
     have hk0 := hk0 (by rwa [Matrix.det_diagonal])
     have hcg : Congr c (Matrix.diagonal g) (Matrix.diagonal k) := ⟨P, hP, hPk.symm⟩
     have hk2 : k 0 = g' 0 := hk1.trans hz
-    refine hcg.trans (congr_diagonal_of_tail hk2 (ih _ _ (fun i => hk _) (fun i => hg' _)
-      (fun i => hk0 _) (fun i => h0' _) ?_))
+    refine hcg.trans (congr_diagonal_of_tail hk2
+      (ih _ _ (fun i => hk _) (fun i => hg' _) (fun i => hk0 _) (fun i => h0' _) ?_))
     obtain ⟨y, -, hy⟩ := hcg.det
-    rw [Matrix.det_diagonal, Matrix.det_diagonal, hx, Fin.prod_univ_succ, Fin.prod_univ_succ,
-      hk2] at hy
+    rw [Matrix.det_diagonal, Matrix.det_diagonal, hx, Fin.prod_univ_succ, Fin.prod_univ_succ, hk2]
+      at hy
     refine ⟨y * x, mul_left_cancel₀ (h0' 0) ?_⟩
     rw [hy, map_mul]
     ring
 
-theorem congr_iff_of_five (h2 : (2 : K) ≠ 0)
-    (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
-    [Algebra.IsQuadraticExtension K L] (σ : L ≃ₐ[K] L) (hσ : σ ≠ 1) {r : ℕ}
-    {G G' : Matrix (Fin r) (Fin r) L} (hG : ∀ a b, σ (G a b) = G b a)
-    (hG' : ∀ a b, σ (G' a b) = G' b a) (hd : G.det ≠ 0) (hd' : G'.det ≠ 0) :
-    (∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ) ↔
-      ∃ x : L, G.det / G'.det = x * σ x := by
+theorem congr_iff_of_five
+    (h2 : (2 : K) ≠ 0) (H : ∀ a : Fin 5 → K, ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
+    [Algebra.IsQuadraticExtension K L]
+    (σ : L ≃ₐ[K] L) (hσ : σ ≠ 1)
+    {r : ℕ} {G G' : Matrix (Fin r) (Fin r) L} (hG : ∀ a b, σ (G a b) = G b a)
+    (hG' : ∀ a b, σ (G' a b) = G' b a) (hd : G.det ≠ 0) (hd' : G'.det ≠ 0)
+    : (∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ)
+      ↔ ∃ x : L, G.det / G'.det = x * σ x := by
   have h2L : (2 : L) ≠ 0 := by
     rw [← map_ofNat (algebraMap K L) 2]
     exact (map_ne_zero _).2 h2
@@ -215,8 +234,9 @@ theorem congr_iff_of_five (h2 : (2 : K) ≠ 0)
       simpa using AlgEquiv.card_le (F := K) (K := L)
     · have : Nontrivial (L ≃ₐ[K] L) := ⟨σ, 1, hσ⟩
       exact Finite.one_lt_card
-  have : IsGalois K L := IsGalois.of_card_aut_eq_finrank K L
-    (hcard.trans (Algebra.IsQuadraticExtension.finrank_eq_two K L).symm)
+  have : IsGalois K L :=
+    IsGalois.of_card_aut_eq_finrank K L
+      (hcard.trans (Algebra.IsQuadraticExtension.finrank_eq_two K L).symm)
   obtain ⟨τ, -, hτ⟩ := (Nat.card_eq_two_iff' (1 : L ≃ₐ[K] L)).1 hcard
   have hall : ∀ ρ : L ≃ₐ[K] L, ρ = 1 ∨ ρ = σ := fun ρ => by
     by_cases h : ρ = 1
@@ -247,8 +267,10 @@ theorem congr_iff_of_five (h2 : (2 : K) ≠ 0)
     obtain ⟨x, -, hx⟩ := (show Congr (σ : L →+* L) G G' from h).symm.det
     exact ⟨x, by rw [hx, mul_div_cancel_right₀ _ hd']; rfl⟩
   · rintro ⟨x, hx⟩
-    obtain ⟨P, g, hP, hPg, hg, hg0⟩ := GlobalTheory.HermDiag.exists_congr_diagonal h2L hc (G := G) hG
-    obtain ⟨P', g', hP', hPg', hg', hg0'⟩ := GlobalTheory.HermDiag.exists_congr_diagonal h2L hc (G := G') hG'
+    obtain ⟨P, g, hP, hPg, hg, hg0⟩ :=
+      GlobalTheory.HermDiag.exists_congr_diagonal h2L hc (G := G) hG
+    obtain ⟨P', g', hP', hPg', hg', hg0'⟩ :=
+      GlobalTheory.HermDiag.exists_congr_diagonal h2L hc (G := G') hG'
     have h1 : Congr (σ : L →+* L) G (Matrix.diagonal g) := ⟨P, hP, hPg.symm⟩
     have h1' : Congr (σ : L →+* L) G' (Matrix.diagonal g') := ⟨P', hP', hPg'.symm⟩
     refine (h1.trans (congr_diagonal_of_five h2 H hc hF (sub_ne_zero.2 hu.symm) hθ r g g' hg hg'
@@ -264,14 +286,15 @@ theorem congr_iff_of_five (h2 : (2 : K) ≠ 0)
 
 end Abstract
 
-
 open ValuativeRel in
-theorem isotropic_five_of_localField (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (h2 : (2 : K) ≠ 0) (a : Fin 5 → K) :
-    ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0 := by
+theorem isotropic_five_of_localField
+    (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (h2 : (2 : K) ≠ 0) (a : Fin 5 → K)
+    : ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0 := by
   classical
   let e := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt K
-  let w : Valuation K ℤᵐ⁰ := Valuation.map ⟨e.toMonoidWithZeroHom, e.strictMono.monotone⟩ (valuation K)
+  let w : Valuation K ℤᵐ⁰ :=
+    Valuation.map ⟨e.toMonoidWithZeroHom, e.strictMono.monotone⟩ (valuation K)
   have hw : ∀ x, w x = e (valuation K x) := fun _ => rfl
   have hlt : ∀ x y, w x < w y ↔ valuation K x < valuation K y := fun x y => by
     rw [hw, hw]; exact e.strictMono.lt_iff_lt
@@ -287,17 +310,15 @@ theorem isotropic_five_of_localField (K : Type*) [Field K] [ValuativeRel K] [Top
     exact ⟨x, by rw [hw, hx]; simp⟩
   · letI := IsTopologicalAddGroup.rightUniformSpace K
     haveI := isUniformAddGroup_of_addCommGroup (G := K)
-    have h4 : (4 : K) ≠ 0 := by
-      rw [show (4 : K) = 2 * 2 by norm_num]; exact mul_ne_zero h2 h2
+    have h4 : (4 : K) ≠ 0 := by rw [show (4 : K) = 2 * 2 by norm_num]; exact mul_ne_zero h2 h2
     have hu : valuation K ((x - 1) / 4) < 1 := by
       rw [map_div₀, div_lt_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 h4))]
       exact (hlt _ _).1 hx
     let u : 𝒪[K] := ⟨(x - 1) / 4, hu.le⟩
     have hum : u ∈ 𝓂[K] := (hmax u).2 hu
-    obtain ⟨ρ, hρ, -⟩ := HenselianRing.is_henselian (I := 𝓂[K])
-      (Polynomial.X ^ 2 + (Polynomial.X - Polynomial.C u))
-      (by monicity!) 0
-      (by simpa using hum) (by simp)
+    obtain ⟨ρ, hρ, -⟩ :=
+      HenselianRing.is_henselian (I := 𝓂[K]) (Polynomial.X ^ 2 + (Polynomial.X - Polynomial.C u))
+        (by monicity!) 0 (by simpa using hum) (by simp)
     have h1 : ρ ^ 2 + (ρ - u) = 0 := by simpa using hρ
     have h3 : (ρ : K) ^ 2 + (ρ - (x - 1) / 4) = 0 := by
       simpa [u] using congrArg (Subtype.val : 𝒪[K] → K) h1
@@ -307,8 +328,9 @@ theorem isotropic_five_of_localField (K : Type*) [Field K] [ValuativeRel K] [Top
       field_simp
     linear_combination this
   · let r : Fin 3 → Fin 3 → 𝒪[K] := fun i j => ⟨c i j, (hle1 _).1 (hc i j)⟩
-    obtain ⟨x, hx0, hx⟩ := TernaryResidue.exists_ne_zero_sum_eq_zero
-      (k := 𝓀[K]) fun i j => IsLocalRing.residue 𝒪[K] (r i j)
+    obtain ⟨x, hx0, hx⟩ :=
+      TernaryResidue.exists_ne_zero_sum_eq_zero (k := 𝓀[K]) fun i j =>
+        IsLocalRing.residue 𝒪[K] (r i j)
     choose y hy using fun i => IsLocalRing.residue_surjective (x i)
     refine ⟨fun i => y i, fun i => (hle1 _).2 (y i).2, ?_, ?_⟩
     · obtain ⟨i, hi⟩ := Function.ne_iff.1 hx0
@@ -322,39 +344,45 @@ theorem isotropic_five_of_localField (K : Type*) [Field K] [ValuativeRel K] [Top
       rw [hlt1]
       simpa [r] using (hmax _).1 hmem
 
-theorem congr_iff_adicCompletion (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (L : Type*) [Field L] [Algebra (v.adicCompletion F) L]
-    [Algebra.IsQuadraticExtension (v.adicCompletion F) L] (σ : L ≃ₐ[v.adicCompletion F] L)
-    (hσ : σ ≠ 1) {r : ℕ} {G G' : Matrix (Fin r) (Fin r) L} (hG : ∀ a b, σ (G a b) = G b a)
-    (hG' : ∀ a b, σ (G' a b) = G' b a) (hd : G.det ≠ 0) (hd' : G'.det ≠ 0) :
-    (∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ) ↔
-      ∃ x : L, G.det / G'.det = x * σ x := by
+theorem congr_iff_adicCompletion
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (L : Type*)
+    [Field L] [Algebra (v.adicCompletion F) L] [Algebra.IsQuadraticExtension (v.adicCompletion F) L]
+    (σ : L ≃ₐ[v.adicCompletion F] L) (hσ : σ ≠ 1)
+    {r : ℕ} {G G' : Matrix (Fin r) (Fin r) L} (hG : ∀ a b, σ (G a b) = G b a)
+    (hG' : ∀ a b, σ (G' a b) = G' b a) (hd : G.det ≠ 0) (hd' : G'.det ≠ 0)
+    : (∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ)
+      ↔ ∃ x : L, G.det / G'.det = x * σ x := by
   haveI : CharZero (v.adicCompletion F) :=
     charZero_of_injective_algebraMap (algebraMap F (v.adicCompletion F)).injective
-  exact congr_iff_of_five two_ne_zero (isotropic_adicCompletion_of_five_le F v (by simp)) σ hσ
-    hG hG' hd hd'
+  exact congr_iff_of_five two_ne_zero (isotropic_adicCompletion_of_five_le F v (by simp)) σ hσ hG
+    hG' hd hd'
 
 section Global
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-noncomputable abbrev ccBase (E : Type) [Field E] [NumberField E] [IsCMField E] (A : Type*)
-    [CommRing A] [Algebra (maximalRealSubfield E) A] :
-    A ⊗[maximalRealSubfield E] E →ₐ[A] A ⊗[maximalRealSubfield E] E :=
+noncomputable abbrev ccBase
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (A : Type*) [CommRing A] [Algebra (maximalRealSubfield E) A]
+    : A ⊗[maximalRealSubfield E] E →ₐ[A] A ⊗[maximalRealSubfield E] E :=
   Algebra.TensorProduct.map (AlgHom.id A A) (IsCMField.complexConj E).toAlgHom
 
-def CongrOver (A : Type*) [CommRing A] [Algebra (maximalRealSubfield E) A] {r : ℕ}
-    (G G' : Matrix (Fin r) (Fin r) E) : Prop :=
-  ∃ P : Matrix (Fin r) (Fin r) (A ⊗[maximalRealSubfield E] E), IsUnit P.det ∧
-    G'.map (fun x => (1 : A) ⊗ₜ[maximalRealSubfield E] x) =
-      Pᵀ * G.map (fun x => (1 : A) ⊗ₜ[maximalRealSubfield E] x) * P.map (ccBase E A)
+def CongrOver
+    (A : Type*) [CommRing A] [Algebra (maximalRealSubfield E) A]
+    {r : ℕ} (G G' : Matrix (Fin r) (Fin r) E)
+    : Prop :=
+  ∃ P : Matrix (Fin r) (Fin r) (A ⊗[maximalRealSubfield E] E),
+    IsUnit P.det
+      ∧ G'.map (fun x => (1 : A) ⊗ₜ[maximalRealSubfield E] x)
+        = Pᵀ * G.map (fun x => (1 : A) ⊗ₜ[maximalRealSubfield E] x) * P.map (ccBase E A)
 
-variable {A : Type*} [CommRing A] [Algebra (maximalRealSubfield E) A] {r : ℕ}
-  {G G' : Matrix (Fin r) (Fin r) E}
+variable
+  {A : Type*} [CommRing A] [Algebra (maximalRealSubfield E) A]
+  {r : ℕ} {G G' : Matrix (Fin r) (Fin r) E}
 
-theorem CongrOver.of_congr
-    (h : ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc) :
-    CongrOver A G G' := by
+theorem CongrOver.of_congr (h : ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc)
+    : CongrOver A G G' := by
   obtain ⟨P, hP, rfl⟩ := h
   let ι : E →+* A ⊗[maximalRealSubfield E] E := Algebra.TensorProduct.includeRight.toRingHom
   refine ⟨P.map ι, ?_, ?_⟩
@@ -364,8 +392,8 @@ theorem CongrOver.of_congr
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map]
     rfl
 
-theorem CongrOver.det_norm (hd' : G'.det ≠ 0) (h : CongrOver A G G') :
-    ∃ z : A ⊗[maximalRealSubfield E] E,
+theorem CongrOver.det_norm (hd' : G'.det ≠ 0) (h : CongrOver A G G')
+    : ∃ z : A ⊗[maximalRealSubfield E] E,
       (1 : A) ⊗ₜ[maximalRealSubfield E] (G.det / G'.det) = z * ccBase E A z := by
   obtain ⟨P, ⟨p, hp⟩, h⟩ := h
   let ι : E →+* A ⊗[maximalRealSubfield E] E := Algebra.TensorProduct.includeRight.toRingHom
@@ -382,45 +410,50 @@ theorem CongrOver.det_norm (hd' : G'.det ≠ 0) (h : CongrOver A G G') :
   rw [h2, h1]
   linear_combination (-ι G.det) * p.mul_inv - (p * (p⁻¹ : (A ⊗[maximalRealSubfield E] E)ˣ) * ι G.det) * h3
 
-theorem congr_of_local (hG : ∀ a b, cc (G a b) = G b a) (hG' : ∀ a b, cc (G' a b) = G' b a)
-    (hd : G.det ≠ 0) (hd' : G'.det ≠ 0)
+theorem congr_of_local
+    (hG : ∀ a b, cc (G a b) = G b a) (hG' : ∀ a b, cc (G' a b) = G' b a) (hd : G.det ≠ 0)
+    (hd' : G'.det ≠ 0)
     (hf : ∀ v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)),
       CongrOver (v.adicCompletion (maximalRealSubfield E)) G G')
-    (hs : ∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
-      G'.map τ = Qᵀ * G.map τ * Q.map conj) :
-    ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc := by
+    (hs : ∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin r) (Fin r) ℂ,
+      Q.det ≠ 0 ∧ G'.map τ = Qᵀ * G.map τ * Q.map conj)
+    : ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc := by
   refine landherr_of_hasseNormSt GlobalTheory.QNorm.hasseNormSt E r G G' hG hG' hd hd' hs ?_
   have hm : G.det / G'.det ∈ maximalRealSubfield E := by
     rw [← IsCMField.complexConj_eq_self_iff, map_div₀]
-    exact congrArg₂ (· / ·) (GlobalTheory.Published.cc_det_of_herm hG) (GlobalTheory.Published.cc_det_of_herm hG')
+    exact congrArg₂ (· / ·) (GlobalTheory.Published.cc_det_of_herm hG)
+      (GlobalTheory.Published.cc_det_of_herm hG')
   let a : maximalRealSubfield E := ⟨_, hm⟩
   obtain ⟨θ, h0, hθ⟩ := GlobalTheory.Published.exists_cc_eq_neg E
   obtain ⟨b, hb0, hb1⟩ := GlobalTheory.Published.exists_basis_one_imaginary h0 hθ
   obtain ⟨d, hdθ⟩ := GlobalTheory.Published.exists_sq_real hθ
   have hd0 : d ≠ 0 := fun h => mul_ne_zero h0 h0 (hdθ.symm.trans (congrArg Subtype.val h))
   have ha0 : a ≠ 0 := fun h => div_ne_zero hd hd' (congrArg Subtype.val h)
-  obtain ⟨x, y, hxy⟩ := GlobalTheory.QNorm.hasseNormSt (maximalRealSubfield E) d a hd0 ha0
-    (fun ρ => by
-      let τ := ComplexEmbedding.lift E (Complex.ofRealHom.comp ρ)
-      have h1 : τ (a : E) = (Complex.ofRealHom.comp ρ) a :=
-        ComplexEmbedding.lift_algebraMap_apply E _ a
-      have h2 : 0 < (τ (a : E)).re := GlobalTheory.Published.Landherr.re_det_div_pos hd τ (hs τ)
-      rw [h1] at h2
-      exact ⟨√(ρ a), 0, by rw [Real.sq_sqrt (le_of_lt (by simpa using h2))]; ring⟩)
-    (fun v => by
-      obtain ⟨z, hz⟩ := (hf v).det_norm hd'
-      let B := Algebra.TensorProduct.basis (v.adicCompletion (maximalRealSubfield E)) b
-      have hzB : z = B.repr z 0 ⊗ₜ[maximalRealSubfield E] (1 : E) +
-          B.repr z 1 ⊗ₜ[maximalRealSubfield E] θ := by
-        conv_lhs => rw [← B.sum_repr z, Fin.sum_univ_two]
-        simp only [B, Algebra.TensorProduct.basis_apply, hb0, hb1, TensorProduct.smul_tmul',
-          smul_eq_mul, mul_one]
-      refine ⟨B.repr z 0, B.repr z 1, ?_⟩
-      rw [← GlobalTheory.Published.norm_tmul_add_tmul _ h0 hθ hdθ, ← hzB]
-      refine (algebraMap _
-        (v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] E)).injective ?_
-      rw [GlobalTheory.Published.algebraMap_norm_tensor, ← hz, ← IsScalarTower.algebraMap_apply]
-      exact Algebra.TensorProduct.algebraMap_apply' a)
+  obtain ⟨x, y, hxy⟩ :=
+    GlobalTheory.QNorm.hasseNormSt (maximalRealSubfield E) d a hd0 ha0
+      (fun ρ => by
+        let τ := ComplexEmbedding.lift E (Complex.ofRealHom.comp ρ)
+        have h1 : τ (a : E) = (Complex.ofRealHom.comp ρ) a :=
+          ComplexEmbedding.lift_algebraMap_apply E _ a
+        have h2 : 0 < (τ (a : E)).re := GlobalTheory.Published.Landherr.re_det_div_pos hd τ (hs τ)
+        rw [h1] at h2
+        exact ⟨√(ρ a), 0, by rw [Real.sq_sqrt (le_of_lt (by simpa using h2))]; ring⟩)
+      (fun v => by
+        obtain ⟨z, hz⟩ := (hf v).det_norm hd'
+        let B := Algebra.TensorProduct.basis (v.adicCompletion (maximalRealSubfield E)) b
+        have hzB
+            : z
+              = B.repr z 0 ⊗ₜ[maximalRealSubfield E] (1 : E)
+                + B.repr z 1 ⊗ₜ[maximalRealSubfield E] θ := by
+          conv_lhs => rw [← B.sum_repr z, Fin.sum_univ_two]
+          simp only [B, Algebra.TensorProduct.basis_apply, hb0, hb1, TensorProduct.smul_tmul',
+            smul_eq_mul, mul_one]
+        refine ⟨B.repr z 0, B.repr z 1, ?_⟩
+        rw [← GlobalTheory.Published.norm_tmul_add_tmul _ h0 hθ hdθ, ← hzB]
+        refine (algebraMap _
+          (v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] E)).injective ?_
+        rw [GlobalTheory.Published.algebraMap_norm_tensor, ← hz, ← IsScalarTower.algebraMap_apply]
+        exact Algebra.TensorProduct.algebraMap_apply' a)
   refine ⟨x + y * θ, ?_⟩
   have h1 := congrArg (Subtype.val : maximalRealSubfield E → E) hxy
   have h2 : IsCMField.complexConj E θ = -θ := hθ
@@ -438,24 +471,26 @@ open GlobalTheory.HermLocal
 
 def HermitianLocalGlobal : Prop :=
   (∀ (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K],
-    (2 : K) ≠ 0 →
-    ∀ (L : Type) [Field L] [Algebra K L] [Algebra.IsQuadraticExtension K L] (σ : L ≃ₐ[K] L), σ ≠ 1 →
-    ∀ (r : ℕ) (G G' : Matrix (Fin r) (Fin r) L),
-      (∀ a b, σ (G a b) = G b a) → (∀ a b, σ (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0 →
-      ((∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ) ↔
-        ∃ x : L, G.det / G'.det = x * σ x)) ∧
-  (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (G G' : Matrix (Fin r) (Fin r) E),
-    (∀ a b, cc (G a b) = G b a) → (∀ a b, cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0 →
-    (∀ v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)),
-      CongrOver (v.adicCompletion (maximalRealSubfield E)) G G') →
-    (∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
-      G'.map τ = Qᵀ * G.map τ * Q.map conj) →
-    ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc)
+      (2 : K) ≠ 0
+        → ∀ (L : Type) [Field L] [Algebra K L] [Algebra.IsQuadraticExtension K L] (σ : L ≃ₐ[K] L),
+          σ ≠ 1
+            → ∀ (r : ℕ) (G G' : Matrix (Fin r) (Fin r) L),
+              (∀ a b, σ (G a b) = G b a) → (∀ a b, σ (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0
+                → ((∃ P : Matrix (Fin r) (Fin r) L, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map σ)
+                  ↔ ∃ x : L, G.det / G'.det = x * σ x))
+    ∧ (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+        (G G' : Matrix (Fin r) (Fin r) E),
+      (∀ a b, cc (G a b) = G b a) → (∀ a b, cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0
+        → (∀ v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)),
+          CongrOver (v.adicCompletion (maximalRealSubfield E)) G G')
+        → (∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin r) (Fin r) ℂ,
+          Q.det ≠ 0 ∧ G'.map τ = Qᵀ * G.map τ * Q.map conj)
+        → ∃ P : Matrix (Fin r) (Fin r) E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map cc)
 
-theorem hermitianLocalGlobal_holds : HermitianLocalGlobal :=
-  ⟨fun K _ _ _ _ h2 _ _ _ _ σ hσ _ _ _ hG hG' hd hd' =>
-      congr_iff_of_five h2 (isotropic_five_of_localField K h2) σ hσ hG hG' hd hd',
-    fun _ _ _ _ _ _ _ hG hG' hd hd' hf hs => congr_of_local hG hG' hd hd' hf hs⟩
+theorem hermitianLocalGlobal_holds : HermitianLocalGlobal := ⟨
+  fun K _ _ _ _ h2 _ _ _ _ σ hσ _ _ _ hG hG' hd hd' =>
+    congr_iff_of_five h2 (isotropic_five_of_localField K h2) σ hσ hG hG' hd hd',
+  fun _ _ _ _ _ _ _ hG hG' hd hd' hf hs => congr_of_local hG hG' hd hd' hf hs
+⟩
 
 end GlobalTheory.Published

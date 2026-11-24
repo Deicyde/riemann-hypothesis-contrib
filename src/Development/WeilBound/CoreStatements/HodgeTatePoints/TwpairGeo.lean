@@ -66,17 +66,6 @@ namespace PositivityTheory.HtPt.Twpair
 
 variable {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T]
 
-omit [IsDomain R] in
-theorem mem_of_finite
-    [IsLocalRing R]
-    {X : Over (Spec (CommRingCat.of R))}
-    (W : X.left.Opens) (hW : ∀ x : X.left, X.hom x = IsLocalRing.closedPoint R → x ∈ W)
-    (Y : Over (Spec (CommRingCat.of R))) (hY : IsFinite Y.hom) (h : Y ⟶ X) (z : Y.left)
-    : h.left z ∈ W := by
-  have : IsFinite (h.left ≫ X.hom) := by rw [Over.w h]; exact hY
-  exact (GlobalTheory.preimage_eq_top_of_closedFibre_subset (R := CommRingCat.of R) X.hom W hW
-    h.left).ge (Set.mem_univ z)
-
 theorem isFinOpenSub
     [IsLocalRing R]
     (Γ : QFGroup R T) (U : Γ.G.left.Opens) (hfin : IsFinite (U.ι ≫ Γ.G.hom))
@@ -85,7 +74,8 @@ theorem isFinOpenSub
   have hV : IsFinite (openOver Γ.G U).hom := hfin
   refine ⟨hfin, ?_, ?_, ?_⟩
   · intro x
-    refine mem_of_finite U hU (𝟙_ _) ?_ η[Γ.G] x
+    refine _root_.GlobalTheory.CompanionTheory.Ar.BT.mem_of_finite_of_closedFibre U hU (𝟙_ _) ?_
+      η[Γ.G] x
     show IsFinite (𝟙 _)
     infer_instance
   · intro S x y hx hy z
@@ -94,7 +84,9 @@ theorem isFinOpenSub
     have hP : IsFinite (openOver Γ.G U ⊗ openOver Γ.G U).hom := by
       rw [Over.tensorObj_hom]
       infer_instance
-    have key := mem_of_finite U hU _ hP ((fst _ _ ≫ openIncl Γ.G U) * (snd _ _ ≫ openIncl Γ.G U))
+    have key :=
+      _root_.GlobalTheory.CompanionTheory.Ar.BT.mem_of_finite_of_closedFibre U hU _ hP
+        ((fst _ _ ≫ openIncl Γ.G U) * (snd _ _ ≫ openIncl Γ.G U))
     have heq
         : x' ≫ openIncl Γ.G U * y' ≫ openIncl Γ.G U
           = lift x' y' ≫ ((fst _ _ ≫ openIncl Γ.G U) * (snd _ _ ≫ openIncl Γ.G U)) := by
@@ -104,7 +96,9 @@ theorem isFinOpenSub
     simpa using key ((lift x' y').left z)
   · intro S x hx z
     obtain ⟨x', rfl⟩ := exists_factor_openIncl U x hx
-    have key := mem_of_finite U hU _ hV (openIncl Γ.G U)⁻¹
+    have key :=
+      _root_.GlobalTheory.CompanionTheory.Ar.BT.mem_of_finite_of_closedFibre U hU _ hV
+        (openIncl Γ.G U)⁻¹
     have heq : (x' ≫ openIncl Γ.G U)⁻¹ = x' ≫ (openIncl Γ.G U)⁻¹ := by simp [Hom.inv_def]
     rw [heq]
     simpa using key (x'.left z)

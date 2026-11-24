@@ -51,8 +51,6 @@ open Formalism.IndefR.Links (PolF)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
 namespace GlobalTheory.IdemFin
 
 theorem toEAf_mem_intAf_of_idem

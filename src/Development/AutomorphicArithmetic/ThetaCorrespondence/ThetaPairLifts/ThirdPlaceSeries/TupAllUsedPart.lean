@@ -40,8 +40,6 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.TupleReadBas
 
 @[expose] public section
 
-
-
 section
 open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB
   GlobalTheory.Mem.Top GlobalTheory.Fc

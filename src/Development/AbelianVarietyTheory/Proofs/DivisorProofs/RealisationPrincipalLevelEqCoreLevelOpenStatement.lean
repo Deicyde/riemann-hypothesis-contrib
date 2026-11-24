@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Fo
   Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.realisation_principalLevel_eq_coreLevel_open
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.realisation_principalLevel_eq_coreLevel_open
                   IsOpen (U : Set (GA D (Wc D i)))
                     ∧ ∀ k ∈ U,
                       k ∈ GfC (Wc D i) → k ∈ (levG (Wc D i) (R.βW i) (R.datWp i R.triv)) := by
-  first
-  | exact @GlobalTheory.HolDict.PrincLev.principal_level
-  | exact GlobalTheory.HolDict.PrincLev.principal_level
-  | (intros; apply GlobalTheory.HolDict.PrincLev.principal_level <;> assumption)
+  first | exact @GlobalTheory.HolDict.PrincLev.principal_level

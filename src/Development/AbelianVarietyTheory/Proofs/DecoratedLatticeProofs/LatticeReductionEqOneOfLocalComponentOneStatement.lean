@@ -50,6 +50,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.latticeReduction_eq_one_of_local_component_one
     : ∀ (D : D7) (V : HSp D) (β : GL (Fin V.rank) (Lev.EAf D)) (g : GA D V) (PP : Pl D.host.E),
       Lev.finE V g ∈ Formalism.L2.DIV.St β
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.latticeReduction_eq_one_of_local_component_one
             ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) g
           = 1
         → Formalism.L2.DIV.redFn β PP (Lev.finE V g) = 1 := by
-  first
-  | exact @GlobalTheory.ChainOnto.RedOne.redFn_eq_one
-  | exact GlobalTheory.ChainOnto.RedOne.redFn_eq_one
-  | (intros; apply GlobalTheory.ChainOnto.RedOne.redFn_eq_one <;> assumption)
+  first | exact @GlobalTheory.ChainOnto.RedOne.redFn_eq_one

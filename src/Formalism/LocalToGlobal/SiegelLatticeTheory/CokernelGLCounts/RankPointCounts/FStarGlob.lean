@@ -214,7 +214,6 @@ theorem starGlob
     rw [← hZ]
     rfl
   have homh : FsLA.om (VS D) F₂.fvec h = g (starOmL f f₁) := by
-
     simp only [FsLA.om, starOmL, map_sum, map_smul]
     have e : FsLA.gram (VS D) h F₂.fvec = Z₁ᴴ := hZ3
     rw [e]

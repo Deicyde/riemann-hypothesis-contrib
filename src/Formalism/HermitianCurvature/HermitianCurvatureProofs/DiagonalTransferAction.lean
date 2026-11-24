@@ -135,7 +135,7 @@ theorem EB_adj
   rw [e1, e2, hlin]
   simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, inner_add_left,
     inner_add_right, inner_smul_left, inner_smul_right, dOp_skew hπ hc hu l1, dOp_skew hπ hc hu l2]
-  simp only [Complex.conj_I, neg_smul, one_smul, ContinuousLinearMap.neg_apply, inner_neg_right]
+  simp only [Complex.conj_I, neg_smul, one_smul, inner_neg_right]
   ring
 
 end Skew
@@ -289,7 +289,7 @@ theorem interp_exists
     show Polynomial.eval (id (node i)) (Lagrange.interpolate s id val) = f i
     rw [Lagrange.eval_interpolate_at_node val (Set.injOn_id _) hi]
     have hex : ∃ j, node j = node i := ⟨i, rfl⟩
-    simp only [val, id, dif_pos hex]
+    simp only [val, dif_pos hex]
     rw [hinj hex.choose_spec]
   · intro μ hμ
     show 0 < Polynomial.eval (id μ) (Lagrange.interpolate s id val)
@@ -411,7 +411,7 @@ theorem kappaFibrePos : KappaFibrePos := by
     have h : d.x (Y₀ : ℂ) = d.L.GGi * X.QQ (Y₀ : ℂ) 1 1 := by
       rw [hQ]
       simp only [NFData.QQ, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one,
-        Matrix.head_cons, Matrix.cons_val_fin_one, Matrix.empty_val', Matrix.cons_val_zero]
+        Matrix.cons_val_fin_one, Matrix.empty_val']
       rw [← mul_assoc, d.L.GGi_GG, one_mul]
     rw [h, hL.2.2.2.2.2.2.2.2.2.2.2.1]
     rfl

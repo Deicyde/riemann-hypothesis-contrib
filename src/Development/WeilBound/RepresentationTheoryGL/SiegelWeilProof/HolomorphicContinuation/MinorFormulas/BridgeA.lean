@@ -95,7 +95,7 @@ theorem hasDerivAt_eval
       rw [Finset.sum_eq_single k0]
       · simp
       · intro b _ hb
-        simp [Pi.single_apply, Ne.symm hb]
+        simp [Ne.symm hb]
       · simp
     rw [e, Finset.sum_mul]
     have e2

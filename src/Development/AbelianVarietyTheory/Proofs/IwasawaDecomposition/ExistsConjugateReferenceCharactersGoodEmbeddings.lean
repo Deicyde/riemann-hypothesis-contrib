@@ -179,8 +179,7 @@ theorem hasInfExp_of_type
   rw [zpow_ofNat, div_pow, h1]
   field_simp
 
-theorem tauE_injective (D : D7) : Function.Injective (tauE D) := fun _ _ h =>
-  D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
+alias tauE_injective := _root_.GlobalTheory.StdRat.tauE_injective
 
 theorem exists_conj
     (D : D7) (Q : Par D) (χ₀ : (AE D)ˣ →* Circle) (hH : IsHeckeChar D χ₀)

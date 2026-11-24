@@ -213,7 +213,7 @@ theorem shellSum_indicator
     refine mem_shellSet.2 ⟨g * g₁ * x, mul_mem hg hx, y, hy, ?_⟩
     calc
       g = g * g₁ * g₁⁻¹ := by group
-      _ = _ := by rw [e]; simp only [mul_assoc]; try rfl
+      _ = _ := by rw [e]; simp only [mul_assoc]
   rw [shellSum, finsum_eq_single _ ⟨m₀, hm₀⟩]
   · rw [hshell, Set.inter_eq_right.2 hsub, hS1, one_smul]
   · intro m hm
@@ -225,7 +225,7 @@ theorem shellSum_indicator
       calc
         g₁⁻¹
           = (g * g₁)⁻¹ * g := by group
-        _ = _ := by rw [e]; simp only [mul_assoc]; try rfl
+        _ = _ := by rw [e]; simp only [mul_assoc]
     simp [this]
 
 theorem integral_indicator_KO

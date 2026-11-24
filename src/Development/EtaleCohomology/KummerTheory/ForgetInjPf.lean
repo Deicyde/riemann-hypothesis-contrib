@@ -113,7 +113,6 @@ def zNat {P Q : (Over U)ᵒᵖ ⥤ A} (φ : P ⟶ Q) : zPre P ⟶ zPre Q where
     apply Sigma.hom_ext
     intro s
     rw [ι_zMap_assoc, ι_zNatApp, ι_zNatApp_assoc, ι_zMap, ← φ.naturality_assoc]
-    all_goals rfl
 
 def zFun : ((Over U)ᵒᵖ ⥤ A) ⥤ (Cᵒᵖ ⥤ A) where
   obj := zPre
@@ -159,7 +158,6 @@ def zCounit (Q : Cᵒᵖ ⥤ A) : zPre ((Over.forget U).op ⋙ Q) ⟶ Q where
     rw [ι_zMap_assoc]
     erw [ι_zCoApp, ι_zCoApp_assoc]
     simp
-    all_goals rfl
 
 def zAdj
     : (zFun : ((Over U)ᵒᵖ ⥤ A) ⥤ (Cᵒᵖ ⥤ A))
@@ -189,7 +187,7 @@ def zAdj
     left_triangle := by
       ext P X
       simp only [NatTrans.comp_app, Functor.whiskerRight_app, Functor.associator_hom_app,
-        Functor.whiskerLeft_app, NatTrans.id_app, Category.id_comp]
+        Functor.whiskerLeft_app]
       erw [Category.id_comp]
       show zNatApp (zUnit P) X.unop ≫ zCoApp (zPre P) X.unop = 𝟙 _
       apply Sigma.hom_ext
@@ -201,7 +199,7 @@ def zAdj
     right_triangle := by
       ext Q V
       simp only [NatTrans.comp_app, Functor.whiskerRight_app, Functor.associator_inv_app,
-        Functor.whiskerLeft_app, NatTrans.id_app, Category.id_comp]
+        Functor.whiskerLeft_app, Category.id_comp]
       try erw [Category.id_comp]
       change Sigma.ι
             (fun s : V.unop.left ⟶ U => ((Over.forget U).op ⋙ Q).obj (op (Over.mk s)))

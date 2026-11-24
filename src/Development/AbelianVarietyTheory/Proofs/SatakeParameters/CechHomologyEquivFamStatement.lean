@@ -50,6 +50,7 @@ import Mathlib.Topology.Sheaves.Presheaf
 
 open CategoryTheory AlgebraicGeometry KaehlerDifferential GlobalTheory GlobalTheory.PD
   GlobalTheory.CechDR GlobalTheory.HodgeCoh ReciprocityTheory.ChartRestriction.G.Geo.Tor
+
 theorem _root_.GlobalTheory.T.cechHomologyEquivFamAlt
     : ∀ (R : Type) [Field R] (ι : Type) [LinearOrder ι] (E : Type) [AddCommGroup E] [Module R E]
         (A : Finset ι → Submodule R E) (C : GlobalTheory.Cube ι R) (g : ∀ s, C.obj s →ₗ[R] E),
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.cechHomologyEquivFamAlt
             ∧ (∀ (x : Cube.Term C (n + 1)) (w : (GlobalTheory.PD.cech A).Z (n : ℤ)),
               (∀ t : {s : Finset ι // s.card = n + 1}, (w : Finset ι → E) t.1 = g t.1 (x t))
                 → Cube.d C (n + 1) x = 0) := by
-  first
-  | (exact @GlobalTheory.cechHomologyEquivFam)
-  | (exact GlobalTheory.cechHomologyEquivFam)
-  | (intros; apply GlobalTheory.cechHomologyEquivFam <;> assumption)
+  first | (exact @GlobalTheory.cechHomologyEquivFam)

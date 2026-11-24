@@ -50,13 +50,14 @@ import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem exists_isOpen_common_generization {Y : Type*} [TopologicalSpace Y]
-    [TopologicalSpace.NoetherianSpace Y] [QuasiSober Y] (p : Y) :
-    ∃ V : Set Y, IsOpen V ∧ p ∈ V ∧ ∀ q ∈ V, ∃ z : Y, z ⤳ p ∧ z ⤳ q := by
+theorem exists_isOpen_common_generization
+    {Y : Type*} [TopologicalSpace Y] [TopologicalSpace.NoetherianSpace Y] [QuasiSober Y] (p : Y)
+    : ∃ V : Set Y, IsOpen V ∧ p ∈ V ∧ ∀ q ∈ V, ∃ z : Y, z ⤳ p ∧ z ⤳ q := by
   have hF : (irreducibleComponents Y).Finite :=
     TopologicalSpace.NoetherianSpace.finite_irreducibleComponents
   refine ⟨⋂ Z ∈ {Z ∈ irreducibleComponents Y | p ∉ Z}, Zᶜ, ?_, ?_, ?_⟩
@@ -69,34 +70,40 @@ theorem exists_isOpen_common_generization {Y : Type*} [TopologicalSpace Y]
     have hpZ : p ∈ irreducibleComponent q := by
       by_contra hp
       exact (Set.mem_iInter₂.1 hq _ ⟨hmem, hp⟩) mem_irreducibleComponent
-    obtain ⟨z, hz⟩ := QuasiSober.sober (isIrreducible_irreducibleComponent (x := q))
-      isClosed_irreducibleComponent
+    obtain ⟨z, hz⟩ :=
+      QuasiSober.sober (isIrreducible_irreducibleComponent (x := q)) isClosed_irreducibleComponent
     exact ⟨z, hz.specializes hpZ, hz.specializes mem_irreducibleComponent⟩
 
-theorem genPt_specializes_of_specializes {X : Scheme.{0}} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ) {p z : X}
-    (hp : genPt ξ ⤳ p) (hz : z ⤳ p) : genPt ξ ⤳ z := by
+theorem genPt_specializes_of_specializes
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ)
+    {p z : X} (hp : genPt ξ ⤳ p) (hz : z ⤳ p)
+    : genPt ξ ⤳ z := by
   apply GlobalTheory.CompanionTheory.Ar.Flat.genPt_specializes_of_specializes <;> assumption
 
-theorem isClopen_setOf_genPt_specializes (X : Scheme.{0}) (Ω : Type) [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) [IsLocallyNoetherian X] (h : IsCptGen ξ) :
-    IsClopen {q : X | genPt ξ ⤳ q} := by
+theorem isClopen_setOf_genPt_specializes
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    [IsLocallyNoetherian X]
+    (h : IsCptGen ξ)
+    : IsClopen {q : X | genPt ξ ⤳ q} := by
   refine ⟨?_, ?_⟩
-  · have : {q : X | genPt ξ ⤳ q} = closure {genPt ξ} := by
-      ext q; exact specializes_iff_mem_closure
-    rw [this]; exact isClosed_closure
+  · have : {q : X | genPt ξ ⤳ q} = closure {genPt ξ} := by ext q; exact specializes_iff_mem_closure
+    rw [this]
+    exact isClosed_closure
   · rw [isOpen_iff_mem_nhds]
     intro p hp
     obtain ⟨U, hU, hpU, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := p) trivial
     haveI : IsNoetherianRing Γ(X, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
-    obtain ⟨V, hV, hpV, hVq⟩ := @exists_isOpen_common_generization U _
-      (noetherianSpace_of_isAffineOpen U hU) U.isOpen.isOpenEmbedding_subtypeVal.quasiSober
-      ⟨p, hpU⟩
+    obtain ⟨V, hV, hpV, hVq⟩ :=
+      @exists_isOpen_common_generization U _ (noetherianSpace_of_isAffineOpen U hU)
+        U.isOpen.isOpenEmbedding_subtypeVal.quasiSober ⟨p, hpU⟩
     have hopen : IsOpen (Subtype.val '' V : Set X) := U.isOpen.isOpenMap_subtype_val V hV
     refine Filter.mem_of_superset (hopen.mem_nhds ⟨_, hpV, rfl⟩) ?_
     rintro _ ⟨q, hq, rfl⟩
     obtain ⟨z, hzp, hzq⟩ := hVq q hq
-    exact (genPt_specializes_of_specializes ξ h (p := p) hp
-      (hzp.map continuous_subtype_val)).trans (hzq.map continuous_subtype_val)
+    exact (genPt_specializes_of_specializes ξ h (p := p) hp (hzp.map continuous_subtype_val)).trans
+      (hzq.map continuous_subtype_val)
 
 end GlobalTheory.CompanionTheory.Ar

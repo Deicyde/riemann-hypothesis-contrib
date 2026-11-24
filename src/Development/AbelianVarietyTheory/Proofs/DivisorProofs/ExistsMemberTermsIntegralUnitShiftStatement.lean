@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -50,6 +51,7 @@ open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
+
 theorem _root_.GlobalTheory.T.exists_member_terms_integral_unit_shift
     : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (Z : Scheme.{0})
         (i : F.X ⟶ Z) (X₁ : Setup F W i) (z₁ : X₁.M.Z)
@@ -63,7 +65,4 @@ theorem _root_.GlobalTheory.T.exists_member_terms_integral_unit_shift
             → ∃ u : (Fin 8 → X) → C → V,
               𝔪.Terms x₀ lab (fun mu c => u mu c * mono W t δ mu) ∧ (∀ mu, ∃ c, IsUnit (u mu c))
                 ∧ ∀ c, lab c = x₀ → IsUnit (u 0 c) := by
-  first
-  | exact @GlobalTheory.Poinc.IntTerm.exists_terms
-  | exact GlobalTheory.Poinc.IntTerm.exists_terms
-  | (intros; apply GlobalTheory.Poinc.IntTerm.exists_terms <;> assumption)
+  first | exact @GlobalTheory.Poinc.IntTerm.exists_terms

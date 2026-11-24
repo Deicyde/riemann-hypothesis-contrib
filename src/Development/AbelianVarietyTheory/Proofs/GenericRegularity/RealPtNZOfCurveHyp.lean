@@ -50,8 +50,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
   Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
   ReciprocityTheory.ChartRestriction.G.Geo.Tor

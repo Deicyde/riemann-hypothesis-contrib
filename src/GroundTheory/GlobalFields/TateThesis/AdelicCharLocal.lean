@@ -237,7 +237,9 @@ theorem exists_sub_mem_adicCompletionIntegers_and_forall_ne
     (Valued.isOpen_valuationSubring (v.adicCompletion K)).preimage
       (continuous_const.sub continuous_id)
   obtain ⟨z, hz⟩ := (denseRange_algebraMap (K := K) v).exists_mem_open hU ⟨y, by simp⟩
-  obtain ⟨k, hkS, hkn⟩ := exists_valuation_sub_le_one {v} (fun _ => z)
+  obtain ⟨k, hkS, hkn⟩ :=
+    _root_.UpperTheory.Reformulated.B.ExistsValuationSubLeOne.exists_valuation_sub_le_one {v}
+      (fun _ => z)
   refine ⟨k, ?_, fun u hu => ?_⟩
   · have h1 :=
       (coe_mem_adicCompletionIntegers_iff v (k - z)).mpr (hkS v (Finset.mem_singleton_self v))
@@ -375,7 +377,6 @@ theorem adelicChar_eq_prod (x : 𝔸[K])
         rw [finiteAdeleInr_snd]; exact hrest)),
       finiteAdeleInr_fst, map_zero, neg_zero, AddChar.map_zero_eq_one]
   have h2 : adelicChar K (finiteAdeleInr f) = ∏ v ∈ S, localAdelicChar K v (x.2 v) := by
-
     rw [hfdef, map_sum, addChar_map_finsetSum]
     rfl
   have h3 : ∏ᶠ v, localAdelicChar K v (x.2 v) = ∏ v ∈ S, localAdelicChar K v (x.2 v) := by

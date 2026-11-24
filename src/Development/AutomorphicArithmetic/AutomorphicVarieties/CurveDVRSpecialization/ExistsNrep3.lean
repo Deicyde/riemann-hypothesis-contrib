@@ -167,7 +167,6 @@ private theorem z_diag
       | linear_combination -h01
       | linear_combination h10
       | linear_combination -h10
-      | exact absurd rfl h
 
 private theorem upl_compact
     (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
@@ -208,8 +207,7 @@ private theorem conj_mat
     (h : GL (Fin 3) A)
     (r : G →* GG (m := 3) (R := A)) (s : G) (hs : (r s).right = 1)
     : (conjBy h⁻¹ r s).mat = (h⁻¹ : GL (Fin 3) A).val * (r s).mat * h.val := by
-  simp [conjBy, GG.mat, MulAut.conj_apply, hs, SemidirectProduct.mul_left,
-    SemidirectProduct.mul_right, mul_assoc]
+  simp [conjBy, GG.mat, hs, SemidirectProduct.mul_left, mul_assoc]
 
 private theorem local_chars
     {G H O A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
@@ -251,7 +249,7 @@ private theorem local_chars
   let R' := conjBy h⁻¹ (r.comp D.subtype)
   have hright : ∀ x : D, (R' x).right = (r x).right := by
     intro x
-    simp [R', conjBy, MulAut.conj_apply]
+    simp [R', conjBy]
   have hrd : ∀ g, (r ((d g : D) : G)).right = 1 := fun g => by rw [hmult]; exact hd_eta g
   let Tm : H →* Matrix (Fin 3) (Fin 3) A := {
     toFun := fun g => (R' (d g)).mat

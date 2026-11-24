@@ -213,11 +213,7 @@ theorem const_compL
     (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0) (g : MvPowerSeries (Fin 1 × Fin d') S)
     : MvPowerSeries.constantCoeff (compL φ g) = MvPowerSeries.constantCoeff g := by
   have ha : MvPowerSeries.HasSubst (fun p : Fin 1 × Fin d' => φ p.2) := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hφ p.2)
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_zero' (fun p => hφ p.2)
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun p => by
-        rw [hφ p.2]; exact IsNilpotent.zero)
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hφ p.2)
   unfold compL
   rw [MvPowerSeries.constantCoeff_subst ha, finsum_eq_single _ 0]
   · simp
@@ -236,11 +232,7 @@ theorem const_expS_neg
     : MvPowerSeries.constantCoeff (Germ.FB.expS S (-g)) = 1 := by
   have hg' : MvPowerSeries.constantCoeff (-g) = 0 := by rw [map_neg, hg, neg_zero]
   have ha : PowerSeries.HasSubst (-g) := by
-    first
-    | exact PowerSeries.HasSubst.of_constantCoeff_zero hg'
-    | exact PowerSeries.hasSubst_of_constantCoeff_zero hg'
-    | exact PowerSeries.HasSubst.of_constantCoeff_zero' hg'
-    | exact PowerSeries.HasSubst.of_constantCoeff_nilpotent (by rw [hg']; exact IsNilpotent.zero)
+    first | exact PowerSeries.HasSubst.of_constantCoeff_zero hg'
   show MvPowerSeries.constantCoeff (PowerSeries.subst (-g) (PowerSeries.exp S)) = 1
   rw [PowerSeries.constantCoeff_subst ha, finsum_eq_single _ 0]
   · simp [PowerSeries.coeff_exp]

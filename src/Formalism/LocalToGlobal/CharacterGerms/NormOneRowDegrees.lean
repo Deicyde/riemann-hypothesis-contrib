@@ -141,7 +141,7 @@ theorem isWH_minorK_row
     by_cases hP : P
     · simp only [hP, true_and, Fin.coe_castLE]
       rw [sum_fin_ite]
-      simp [h.1, h.2, hP]
+      simp [h.1, h.2]
     · simp [hP]
   · unfold minorK
     rw [dite_eq_right h, if_neg (fun hc => h ⟨hc.1, hc.2.1⟩)]

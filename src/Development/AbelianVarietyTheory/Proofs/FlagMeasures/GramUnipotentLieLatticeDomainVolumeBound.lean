@@ -453,7 +453,8 @@ theorem exists_rows
     (β : Matrix P S K) (h : Function.Injective β.mulVec)
     : ∃ e : S → P, (β.submatrix e id).det ≠ 0 := by
   have hrank : β.rank = Fintype.card S := by
-    rw [← Matrix.finrank_range_mulVecLin, LinearMap.finrank_range_of_inj (by simpa [Matrix.coe_mulVecLin] using h),
+    rw [← Matrix.finrank_range_mulVecLin,
+      LinearMap.finrank_range_of_inj (by simpa [Matrix.coe_mulVecLin] using h),
       Module.finrank_fintype_fun_eq_card]
   have hspan : Submodule.span K (Set.range β.row) = ⊤ := by
     apply Submodule.eq_top_of_finrank_eq

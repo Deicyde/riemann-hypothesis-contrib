@@ -164,7 +164,7 @@ theorem move_mem
       omega
     have ht : m' (i0, t) = m (i0, t) + 1 := by
       have h3 := congrArg (fun f : Fin N × Fin r →₀ ℕ => f (i0, t)) heq
-      simp [Finsupp.single_apply, hat] at h3
+      simp [hat] at h3
       omega
     have hmem := ih m' (by omega) hsum
     have hX := hst a _ hmem

@@ -2,7 +2,10 @@ module
 
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsLatFamilyCongr
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyCoordIdealStatement
+public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LaurentCechNerveLevelSpecTensorPower
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.InstFintypeSumElim
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyCoordIdeal
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SpecStalkSpecializesComp
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -44,7 +47,6 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.CompactGapsGE
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LaurentCechNerveLevelSpecTensorPower
 
 @[expose] public section
 
@@ -157,7 +159,8 @@ theorem PositivityTheory.Xgn.exists_function_at_point
   intro E _ _ _ H D l Xo c O₀ _ β Y S Ω _ K _ _ J _ y 𝔐 d hd p _ _ A _ _ _ m _ _ O _ _ _ _ _ _ _ G
     c' hc' P z
   have hC : HasConstants ℤ A y :=
-    (GlobalTheory.T.arith_variety_coord_ideal E H D l Xo c O₀ β Y S Ω K J y 𝔐 d hd A).2.2.2.1
+    (_root_.GlobalTheory.CompanionTheory.Ar.Num.ConstClosure.const_closure E H D l Xo c O₀ β Y S Ω K
+      J y 𝔐 d hd A).2.2.2.1
   have hφ : Function.Injective (algebraMap (CR O y c') Ω) := Subtype.val_injective
   have hinv := fun {b : Ω} (hb : b ∈ regAt 𝔐.ξ ⟨P.x z, 𝔐.all _⟩) (w : CR O y c') =>
     PositivityTheory.Xgn.FunctionAtPoint.inv_reg 𝔐.ξ _ hφ P.x P.x_gen z (𝔐.all _) hb w

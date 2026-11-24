@@ -112,19 +112,15 @@ theorem stdL_isSD (N : ℕ)
       rw [mem_stdL] at hx hy
       simp only [stdH]
       refine Subring.sum_mem _ (fun i _ => ?_)
-      first
-      | exact Subring.mul_mem _ (star_mem_range D _ (hx i)) (hy i)
-      | exact Subring.mul_mem _ (hx i) (star_mem_range D _ (hy i))
-      | exact Subring.mul_mem _ (hy i) (star_mem_range D _ (hx i))
-      | exact Subring.mul_mem _ (star_mem_range D _ (hy i)) (hx i)
+      first | exact Subring.mul_mem _ (star_mem_range D _ (hx i)) (hy i)
     · intro h
       rw [mem_stdL]
       intro i
       have := h _ (single_mem_stdL D i)
       simp only [stdH] at this
       rw [Fintype.sum_eq_single i (fun j hj => by simp [Pi.single_eq_of_ne hj])] at this
-      simp only [Pi.single_eq_same, star_one, one_mul, mul_one] at this
-      first | exact this | simpa using star_mem_range D _ this
+      simp only [Pi.single_eq_same, star_one, one_mul] at this
+      first | exact this
 
 theorem Adm_std (N N' : ℕ) (h : Even N) (h' : Even N')
     : Formalism.L2.Ker.Cd.TaylorLogMetric.admitted D N N'

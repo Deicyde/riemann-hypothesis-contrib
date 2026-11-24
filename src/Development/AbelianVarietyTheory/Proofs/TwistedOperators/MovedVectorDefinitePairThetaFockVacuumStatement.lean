@@ -49,6 +49,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.MinorOrderedEntries
 open scoped TensorProduct Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.movedVector_definitePair_theta_fockVacuum
     : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} (W : G.Weil)
         {U : Set T} (S : GridChoice W U) (t : T) (p : Pair T),
@@ -59,7 +60,4 @@ theorem _root_.GlobalTheory.T.movedVector_definitePair_theta_fockVacuum
               ∧ ∀ ρ,
                 IsFockVacAt (heisO W.ψ (G.pS p) (G.pT p)) W.θ ρ
                   (cplxO (G.cartS W.cart p ρ) (G.onT W.cart p ρ)) (movedVec t S d) := by
-  first
-  | exact @GlobalTheory.RowReal.movedVec_theta_fockVac
-  | exact GlobalTheory.RowReal.movedVec_theta_fockVac
-  | (intros; apply GlobalTheory.RowReal.movedVec_theta_fockVac <;> assumption)
+  first | exact @GlobalTheory.RowReal.movedVec_theta_fockVac

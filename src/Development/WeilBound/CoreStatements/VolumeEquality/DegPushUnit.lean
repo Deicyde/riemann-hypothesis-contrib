@@ -257,15 +257,7 @@ theorem rep_of_mem (y : (Σ b, ι b) → Ω) {t : Ω} (ht : t ∈ fnField k y)
         exact homog_X q
       · simp [div_mul_cancel₀ _ hq]
   · intro c
-    exact ⟨
-      0,
-      C c,
-      1,
-      isWeightedHomogeneous_C _ _,
-      isWeightedHomogeneous_one k _,
-      by simp,
-      by simp [aeval_C]
-    ⟩
+    exact ⟨0, C c, 1, isWeightedHomogeneous_C _ _, isWeightedHomogeneous_one k _, by simp, by simp⟩
   · rintro a b - - ⟨d1, F1, G1, hF1, hG1, hG1ne, h1⟩ ⟨d2, F2, G2, hF2, hG2, hG2ne, h2⟩
     refine ⟨
       d1 + d2,
@@ -391,7 +383,6 @@ private theorem zpow_mem_valuationSubring_of_unit
     rw [zpow_negSucc, ← inv_pow]
     exact V.pow_mem h2 _
 
-
 open UnitZ in
 theorem unitZero : PtDim → UnitZero := by
   intro hpt k _ Ω _ _ K _ ι _ y n a b hy htop hval
@@ -470,7 +461,7 @@ theorem unitZero : PtDim → UnitZero := by
         change algebraMap (MvPolynomial K Ω) L (C (algebraMap k Ω x))
           = algebraMap (MvPolynomial K Ω) L (pointConeMap k y (C x))
         congr 1
-        simp [pointConeMap, MvPolynomial.algebraMap_eq]
+        simp [pointConeMap]
       rw [e]
       exact hVS _
     have hv' := hv O hkO
@@ -504,7 +495,7 @@ theorem unitZero : PtDim → UnitZero := by
       rw [mul_div_mul_comm, mul_div_cancel_right₀ _ hψg, ← mul_assoc, div_mul_cancel₀ _ hψY]
     have hprod' : φ g / φ f = ψ ((ρ / Y)⁻¹) * ∏ j, (φ (X ⟨j, c j⟩))⁻¹ ^ b j := by
       rw [← inv_div, hprod, mul_inv, map_inv₀, ← Finset.prod_inv_distrib]
-      simp [inv_zpow]
+      simp
     constructor
     · rw [hprod]
       exact mul_mem hwO

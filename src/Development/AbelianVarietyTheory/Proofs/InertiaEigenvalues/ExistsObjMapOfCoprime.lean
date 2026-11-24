@@ -6,15 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Surject
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.EqIffIsometry
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsMonHomOfMapLattice
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSabCancel
-import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsPullCubicalOfIso
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LambdaBundleIsoOfPrimeToPWeilPairingsStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LambdaBundleIsoOfPrimeToPWeilPairings
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliRepOfBase
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianSchemeDimRigidifiedSym
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjPull
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PointEqIffIsometry
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ArithmeticCMKnownTheoremsProof
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ObjMapUniqueOfIsDominant
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.PointExpEqOfIsometry
+public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.ModelsAt
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsPullCubicalOfIso
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ObjMapUniqueOfIsDominant
 import Development.AbelianVarietyTheory.Proofs.ToricGeometry.IsReducedSchemeOfSmoothOfIsIntegrallyClosed
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInjectiveOfCommRing
 import Mathlib.Algebra.Order.Floor.Extended
@@ -51,7 +54,6 @@ import Mathlib.Tactic.NormNum.NatSqrt
 import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.ModelsAt
 
 @[expose] public section
 
@@ -88,7 +90,7 @@ theorem exists_sabMap_types
   have hL := GlobalTheory.ArcCM.known_holds.laws
   have hG := hL.globalFns
   have hA : HomAlg := GlobalTheory.exists_isMonHom_of_map_lattice hT hL
-  have hD : WeilDet := GlobalTheory.T.lambdaBundleIso_of_primeToP_weilPairings hL
+  have hD : WeilDet := _root_.GlobalTheory.lam_iso_of_weil_pairings hL
   have p₁ := GlobalTheory.obj_isAbelianScheme_dim_rigidified_sym E H D l _ _ _ _ o₁
   have p₂ := GlobalTheory.obj_isAbelianScheme_dim_rigidified_sym E H D l _ _ _ _ o₂
   obtain ⟨α, hα, hα'⟩ : ∃ α : o₁.t.G ⟶ o₂.t.G, IsMonHom α ∧ ∀ z, e₂ (h z) = e₁ z ≫ α :=
@@ -196,23 +198,10 @@ theorem isExp_family
     : GlobalTheory.UnifPoint.IsExp (F.ex i P) := ⟨
   F.ex_add i P hP,
   F.ex_onto i P hP,
-  GlobalTheory.ArcCM.isHolTo_exp_of_isPeriod F i P hP,
+  _root_.GlobalTheory.ExpUniqFamily.isHolTo_ex F i P hP,
   (F.ex_diff i P hP).1,
   (F.ex_diff i P hP).2
 ⟩
-
-theorem pow_of_add
-    {V Q : Type} [AddCommGroup V] [Group Q]
-    {e : V → Q} (he : ∀ z w, e (z + w) = e z * e w)
-    (n : ℕ) (z : V)
-    : e (n • z) = e z ^ n := by
-  induction n with
-  | zero =>
-    have := he 0 0
-    rw [add_zero] at this
-    rw [zero_smul, pow_zero]
-    exact left_eq_mul.1 this
-  | succ n ih => rw [succ_nsmul, he, ih, pow_succ]
 
 theorem ex_comp_eq
     {D : Datum H} {l l₂ : Level H} {Xo : Moduli D l} {Xo₂ : Moduli D l₂} {r : Xo₂.X ⟶ Xo.X}
@@ -259,7 +248,8 @@ theorem ex_comp_eq
       (fun a ha => by
         have j₂ := F.ex_eta k P hP a (Submodule.smul_mono_left hmap ha)
         have j₁ : toUnit _ ≫ Xo₂.univ.eta a ^ pd = F₂.ex k₂ P₂ ((l.M : ℂ)⁻¹ • P₂ (F₂.t k₂ a)) := by
-          rw [MonObj.comp_pow, F₂.ex_eta k₂ P₂ hP₂ a ha, ← pow_of_add (F₂.ex_add k₂ P₂ hP₂), hM,
+          rw [MonObj.comp_pow, F₂.ex_eta k₂ P₂ hP₂ a ha,
+            ← _root_.GlobalTheory.LevCover.add_map_nsmul (F₂.ex_add k₂ P₂ hP₂), hM,
             ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, Nat.cast_mul, mul_inv, mul_left_comm,
             mul_inv_cancel₀ (Nat.cast_ne_zero.2 hp0), _root_.mul_one]
         have c₁ : (o₁.eta a).left = (e₁ ((l.M : ℂ)⁻¹ • P₂ (F₂.t k₂ a))).left := by

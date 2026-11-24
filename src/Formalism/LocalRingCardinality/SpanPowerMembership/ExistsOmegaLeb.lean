@@ -204,7 +204,6 @@ theorem psiE_coe
     : ⇑(psiE P Q)
       = fun ab : lieU P Q × lieU P Q =>
         entries ((ab.1 : MM P Q) + Complex.I • (ab.2 : MM P Q)) := by
-  funext ab
   rfl
 
 theorem exists_omegaLeb : ∃ lam : Measure (lieU P Q), IsOmegaLeb lam := by
@@ -239,8 +238,7 @@ theorem isOpen_ballU (r : ℝ) : IsOpen (ballU P Q r) := by
   exact isOpen_lt this continuous_const
 
 theorem zero_mem_ballU {r : ℝ} (hr : 0 < r) : (0 : lieU P Q) ∈ ballU P Q r := by
-  show ∑ i, ∑ j, ‖((0 : lieU P Q) : MM P Q) i j‖ < r
-  simpa using hr
+  simpa [ballU] using hr
 
 theorem entry_le_sum (X : MM P Q) (i j : Fin P ⊕ Fin Q) : ‖X i j‖ ≤ ∑ i, ∑ j, ‖X i j‖ :=
   (Finset.single_le_sum

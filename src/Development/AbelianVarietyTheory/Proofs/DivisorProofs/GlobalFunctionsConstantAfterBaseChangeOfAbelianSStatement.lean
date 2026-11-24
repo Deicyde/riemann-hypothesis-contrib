@@ -48,9 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
   GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.globalFunctionsConstantAfterBaseChange_of_abelianScheme
     : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A], IsAbelianScheme A → UConst A.hom := by
-  first
-  | exact @GlobalTheory.AbCoh.uConst_of_isAbelianScheme
-  | exact GlobalTheory.AbCoh.uConst_of_isAbelianScheme
-  | (intros; apply GlobalTheory.AbCoh.uConst_of_isAbelianScheme <;> assumption)
+  first | exact @GlobalTheory.AbCoh.uConst_of_isAbelianScheme

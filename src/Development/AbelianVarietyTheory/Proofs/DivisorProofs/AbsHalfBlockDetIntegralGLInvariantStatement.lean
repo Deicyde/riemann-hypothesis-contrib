@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep 
   GlobalTheory.BCT.CtLevel
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.absHalf_blockDet_integralGL_invariant
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E)
         (m k : GLw a w × GLw b w),
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.absHalf_blockDet_integralGL_invariant
             = absHalf w (m.1.val.det ^ b / m.2.val.det ^ a)
           ∧ absHalf w ((m * k).1.val.det ^ b / (m * k).2.val.det ^ a)
             = absHalf w (m.1.val.det ^ b / m.2.val.det ^ a) := by
-  first
-  | exact @GlobalTheory.BCT.absHalf_blockDet_KGL_invariant
-  | exact GlobalTheory.BCT.absHalf_blockDet_KGL_invariant
-  | (intros; apply GlobalTheory.BCT.absHalf_blockDet_KGL_invariant <;> assumption)
+  first | exact @GlobalTheory.BCT.absHalf_blockDet_KGL_invariant

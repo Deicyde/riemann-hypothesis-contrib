@@ -48,44 +48,53 @@ import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsGenOfIsV
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits NumberField GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace PositivityTheory.Xgn.AdaptedEigenbasis
 
 variable {E : Type} [Field E] [NumberField E] {K W : Type} [Field K] [AddCommGroup W] [Module K W]
 
-theorem exists_dual {q : ℕ} {w : Fin q → W} (hw : LinearIndependent K w) :
-    ∃ f : Fin q → Module.Dual K W, ∀ j j', f j (w j') = if j = j' then 1 else 0 := by
-  obtain ⟨g, hg⟩ := (Fintype.linearCombination K w).exists_leftInverse_of_injective
-    (LinearMap.ker_eq_bot'.2 fun c hc => funext (Fintype.linearIndependent_iff.1 hw c hc))
+theorem exists_dual {q : ℕ} {w : Fin q → W} (hw : LinearIndependent K w)
+    : ∃ f : Fin q → Module.Dual K W, ∀ j j', f j (w j') = if j = j' then 1 else 0 := by
+  obtain ⟨g, hg⟩ :=
+    (Fintype.linearCombination K w).exists_leftInverse_of_injective
+      (LinearMap.ker_eq_bot'.2 fun c hc => funext (Fintype.linearIndependent_iff.1 hw c hc))
   refine ⟨fun j => LinearMap.proj j ∘ₗ g, fun j j' => ?_⟩
   have h := LinearMap.congr_fun hg (Pi.single j' 1)
-  simp only [LinearMap.comp_apply, Fintype.linearCombination_apply_single, one_smul, LinearMap.id_apply] at h
+  simp only [LinearMap.comp_apply, Fintype.linearCombination_apply_single, one_smul,
+      LinearMap.id_apply]
+    at h
   simp [h, Pi.single_apply]
 
-theorem form_eigProj {ρ : 𝓞 E →+* Module.End K W} {τ : E →+* K} {φ : Module.Dual K W}
-    (h : ∀ (b : 𝓞 E) x, φ (ρ b x) = τ (b : E) * φ x) (x : W) : φ (HT.eigProj ρ τ x) = φ x := by
-
-  simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h, smul_eq_mul,
-  ← mul_assoc]
+theorem form_eigProj
+    {ρ : 𝓞 E →+* Module.End K W} {τ : E →+* K} {φ : Module.Dual K W}
+    (h : ∀ (b : 𝓞 E) x, φ (ρ b x) = τ (b : E) * φ x)
+    (x : W)
+    : φ (HT.eigProj ρ τ x) = φ x := by
+  simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h,
+    smul_eq_mul, ← mul_assoc]
   rw [← Finset.sum_mul]
   have : ∑ k, τ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) = 1 := by
-
     rw [← map_one τ, ← HT.LatBasic.sum_dualInt_mul, map_sum]
     simp
   rw [this, one_mul]
 
-theorem eigProj_fst {ρ : 𝓞 E →+* Module.End K W} {ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)}
-    (h : ∀ a y, (ρH a y).1 = ρ a y.1) (σ : E →+* K) (y : W × Module.Dual K W) :
-    (HT.eigProj ρH σ y).1 = HT.eigProj ρ σ y.1 := by
+theorem eigProj_fst
+    {ρ : 𝓞 E →+* Module.End K W} {ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)}
+    (h : ∀ a y, (ρH a y).1 = ρ a y.1)
+    (σ : E →+* K) (y : W × Module.Dual K W)
+    : (HT.eigProj ρH σ y).1 = HT.eigProj ρ σ y.1 := by
   simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, Prod.fst_sum, Prod.smul_fst, h]
 
-
 omit [NumberField E] in
-theorem inr_mem_iff {ρ : 𝓞 E →+* Module.End K W} {ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)}
+theorem inr_mem_iff
+    {ρ : 𝓞 E →+* Module.End K W} {ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)}
     {bar : 𝓞 E ≃+* 𝓞 E} {σ σ' : E →+* K} (h : ∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a)))
-    (hσ : ∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) (hb : ∀ a, bar (bar a) = a) (φ : Module.Dual K W) :
-    ((0, φ) : W × Module.Dual K W) ∈ HT.eigSp ρH σ ↔ ∀ (b : 𝓞 E) x, φ (ρ b x) = σ' (b : E) * φ x := by
+    (hσ : ∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) (hb : ∀ a, bar (bar a) = a)
+    (φ : Module.Dual K W)
+    : ((0, φ) : W × Module.Dual K W) ∈ HT.eigSp ρH σ
+      ↔ ∀ (b : 𝓞 E) x, φ (ρ b x) = σ' (b : E) * φ x := by
   simp only [HT.eigSp, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
     LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero]
   constructor
@@ -104,7 +113,18 @@ theorem inr_mem_iff {ρ : 𝓞 E →+* Module.End K W} {ρH : 𝓞 E →+* Modul
 end PositivityTheory.Xgn.AdaptedEigenbasis
 
 open PositivityTheory.Xgn.AdaptedEigenbasis in
-theorem PositivityTheory.Xgn.adapted_eigenbasis_exists : ∀ (E : Type) [Field E] [NumberField E] (K W : Type) [Field K] [CharZero K] [AddCommGroup W] [Module K W] [FiniteDimensional K W] (ρ : 𝓞 E →+* Module.End K W) (ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)) (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* K) (p q : ℕ) (v : Fin p → W) (w : Fin q → W), (∀ a y, (ρH a y).1 = ρ a y.1) → (∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a))) → (∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) → (∀ a, bar (bar a) = a) → LinearIndependent K v → Submodule.span K (Set.range v) = HT.eigSp ρ σ → LinearIndependent K w → Submodule.span K (Set.range w) = HT.eigSp ρ σ' → ∃ u, IsAdapted ρH σ v w u ∧ LinearIndependent K u ∧ Submodule.span K (Set.range u) = HT.eigSp ρH σ := by
+theorem PositivityTheory.Xgn.adapted_eigenbasis_exists
+    : ∀ (E : Type) [Field E] [NumberField E] (K W : Type) [Field K] [CharZero K] [AddCommGroup W]
+        [Module K W] [FiniteDimensional K W] (ρ : 𝓞 E →+* Module.End K W)
+        (ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)) (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* K)
+        (p q : ℕ) (v : Fin p → W) (w : Fin q → W),
+      (∀ a y, (ρH a y).1 = ρ a y.1) → (∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a)))
+        → (∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) → (∀ a, bar (bar a) = a) → LinearIndependent K v
+        → Submodule.span K (Set.range v) = HT.eigSp ρ σ → LinearIndependent K w
+        → Submodule.span K (Set.range w) = HT.eigSp ρ σ'
+        → ∃ u,
+          IsAdapted ρH σ v w u ∧ LinearIndependent K u
+            ∧ Submodule.span K (Set.range u) = HT.eigSp ρH σ := by
   intro E _ _ K W _ _ _ _ _ ρ ρH bar σ σ' p q v w h1 h2 hσ hb hv hvs hw hws
   obtain ⟨f, hf⟩ := exists_dual hw
   have hvm : ∀ i, v i ∈ HT.eigSp ρ σ := fun i => hvs ▸ Submodule.subset_span ⟨i, rfl⟩
@@ -118,14 +138,23 @@ theorem PositivityTheory.Xgn.adapted_eigenbasis_exists : ∀ (E : Type) [Field E
   have hl1 : ∀ i, (l i).1 = v i := fun i => by
     simp only [hl, eigProj_fst h1, HT.LatBasic.eigProj_of_mem (hvm i)]
   have hlm : ∀ i, l i ∈ HT.eigSp ρH σ := fun i => HT.LatBasic.eigProj_mem _ _ _
-  have hum : ∀ i, Fin.addCases (motive := fun _ => W × Module.Dual K W) l (fun j => (0, φ j)) i ∈
-      HT.eigSp ρH σ := fun i => by
+  have hum
+      : ∀ i,
+        Fin.addCases (motive := fun _ => W × Module.Dual K W) l (fun j => (0, φ j)) i
+          ∈ HT.eigSp ρH σ := fun i => by
     refine Fin.addCases (fun i => ?_) (fun j => ?_) i
     · simpa only [Fin.addCases_left] using hlm i
     · simpa only [Fin.addCases_right] using (inr_mem_iff h2 hσ hb _).2 (hφe j)
-  refine ⟨Fin.addCases (motive := fun _ => W × Module.Dual K W) l (fun j => (0, φ j)),
-    ⟨hum, fun i => by simp only [Fin.addCases_left, hl1],
-      fun j => by simp only [Fin.addCases_right, hφw, implies_true, and_self]⟩, ?_, ?_⟩
+  refine ⟨
+    Fin.addCases (motive := fun _ => W × Module.Dual K W) l (fun j => (0, φ j)),
+    ⟨
+      hum,
+      fun i => by simp only [Fin.addCases_left, hl1],
+      fun j => by simp only [Fin.addCases_right, hφw, implies_true, and_self]
+    ⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [Fintype.linearIndependent_iff]
     intro c hc
     rw [Fin.sum_univ_add] at hc
@@ -155,7 +184,8 @@ theorem PositivityTheory.Xgn.adapted_eigenbasis_exists : ∀ (E : Type) [Field E
       rw [hz1, inr_mem_iff h2 hσ hb] at hzm
       have hz2 : z.2 = ∑ j, z.2 (w j) • φ j := by
         refine LinearMap.ext fun x => ?_
-        have hx : HT.eigProj ρ σ' x ∈ Submodule.span K (Set.range w) := hws ▸ HT.LatBasic.eigProj_mem _ _ _
+        have hx : HT.eigProj ρ σ' x ∈ Submodule.span K (Set.range w) :=
+          hws ▸ HT.LatBasic.eigProj_mem _ _ _
         obtain ⟨d, hd⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hx
         have hd' : ∀ j, φ j x = d j := fun j => by
           rw [← form_eigProj (hφe j) x, ← hd]
@@ -170,6 +200,10 @@ theorem PositivityTheory.Xgn.adapted_eigenbasis_exists : ∀ (E : Type) [Field E
         · rw [Prod.snd_sum]
           exact hz2
       rw [e]
-      refine add_mem (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span
-        ⟨Fin.castAdd q i, by simp only [Fin.addCases_left]⟩)) (Submodule.sum_mem _ fun j _ =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨Fin.natAdd p j, by simp only [Fin.addCases_right]⟩))
+      refine add_mem
+        (Submodule.sum_mem _ fun i _ =>
+          Submodule.smul_mem _ _
+            (Submodule.subset_span ⟨Fin.castAdd q i, by simp only [Fin.addCases_left]⟩))
+        (Submodule.sum_mem _ fun j _ =>
+          Submodule.smul_mem _ _
+            (Submodule.subset_span ⟨Fin.natAdd p j, by simp only [Fin.addCases_right]⟩))

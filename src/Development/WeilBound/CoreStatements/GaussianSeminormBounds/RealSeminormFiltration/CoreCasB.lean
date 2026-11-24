@@ -223,7 +223,7 @@ theorem wordX_comm
         : ∀ j, List.ofFn (Function.update w 0 j) = j :: List.ofFn (fun i : Fin n => w i.succ) := by
       intro j
       rw [List.ofFn_succ]
-      simp [Function.update_of_ne (Fin.succ_ne_zero _)]
+      simp
     have us
         : ∀ (i : Fin n) j,
           List.ofFn (Function.update w i.succ j)

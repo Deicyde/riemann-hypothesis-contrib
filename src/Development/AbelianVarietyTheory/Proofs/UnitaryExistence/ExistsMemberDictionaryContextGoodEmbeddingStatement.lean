@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.exists_memberDictionaryContext_goodEmbedding
     : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H)
         (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ)
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.exists_memberDictionaryContext_goodEmbedding
                   → gram τ (- (Matrix.reindex (finCongr hr) (finCongr hr) V.gram)ᵀ) (x₀ τ)
                     = Matrix.diagonal fun a : Fin r => ((sgn Dw.q (a : ℕ) : ℝ) : ℂ))
               → ∃ C : Ctx Xo c σ V r, C.OK ∧ C.ι = ι ∧ C.x₀ = x₀ := by
-  first
-  | exact @GlobalTheory.Member.exists_ctx
-  | exact GlobalTheory.Member.exists_ctx
-  | (intros; apply GlobalTheory.Member.exists_ctx <;> assumption)
+  first | exact @GlobalTheory.Member.exists_ctx

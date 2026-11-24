@@ -51,7 +51,7 @@ namespace UpperTheory.Deg2
 
 abbrev T (q : ℕ) : Shv ℤ := (restr (Int.castRingHom (ZMod q))).obj (tw q 1)
 
-def kap (q : ℕ) [NeZero q] : T q ⟶ Gm := (GlobalTheory.T.kummer_sequence_etale_tateTwist q).choose
+def kap (q : ℕ) [NeZero q] : T q ⟶ Gm := (_root_.GlobalTheory.EtC.kummer_sequence q).choose
 
 theorem kap_spec (q : ℕ) [NeZero q]
     : Mono (kap q) ∧ kap q ≫ ((q : ℤ) • 𝟙 Gm) = 0
@@ -64,7 +64,7 @@ theorem kap_spec (q : ℕ) [NeZero q]
         IsUnit (q : Γ(U, ⊤))
           → ∀ b : Sec Gm U,
             Loc U fun V g => ∃ c : Sec Gm V, Sec.map ((q : ℤ) • 𝟙 Gm) c = Sec.res g b :=
-  (GlobalTheory.T.kummer_sequence_etale_tateTwist q).choose_spec
+  (_root_.GlobalTheory.EtC.kummer_sequence q).choose_spec
 
 section MV
 variable (R : Type) [CommRing R] (A A' : Type) [CommRing A] [CommRing A'] [Algebra A A'] (f : A)

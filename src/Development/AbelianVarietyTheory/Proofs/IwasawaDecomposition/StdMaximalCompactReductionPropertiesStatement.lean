@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.stdMaximalCompact_reduction_properties
                 ∃ h : (s.loc n κ).val a b
                     ∈ s.v.adicCompletionIntegers (maximalRealSubfield D.host.E),
                   (redFn (1 : GL (Fin n) (EAf D)) s.w (km D n κ)).val a b = φ ⟨_, h⟩ := by
-  first
-  | exact @GlobalTheory.MtRed.km_reduction
-  | exact GlobalTheory.MtRed.km_reduction
-  | (intros; apply GlobalTheory.MtRed.km_reduction <;> assumption)
+  first | exact @GlobalTheory.MtRed.km_reduction

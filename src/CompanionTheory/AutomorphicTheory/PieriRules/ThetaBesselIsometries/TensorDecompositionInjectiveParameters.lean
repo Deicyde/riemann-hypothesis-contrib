@@ -1,10 +1,10 @@
 module
 
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.IsDSOfIsDG
-public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesParameterUniqueStatement
+public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesParameterUnique
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesUnitarySmoothBasicStatement
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.SmoothMapsClosureStatement
-public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.TensorDecompositionParametersStatement
+public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.TensorDecompositionParameters
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -176,7 +176,8 @@ theorem tensH_of_raw
   have hK : PI.KFinSmooth := hH.1.2.2.1
   have hP : PoulsenG := hH.2.2.2.2.2.1
   have hform :=
-    GlobalTheory.T.tensor_decomposition_parameters hK k r ι κ ρ Γ d R RI io pr ε mu muI hR hRI hF hT
+    _root_.Gp91.GlobalTheory.TensForm.pulledBack_isInvForm hK k r ι κ ρ Γ d R RI io pr ε mu muI hR
+      hRI hF hT
   have horth
       : ∀ I J,
         I ≠ J
@@ -186,8 +187,8 @@ theorem tensH_of_raw
     rcases (hP k r ε _ _ _ _ (hRI I) (hRI J)).2 _ (hform I J) with h | ⟨U, hU⟩
     · exact h
     · exact absurd
-        (hinj (GlobalTheory.T.discrete_series_parameter_unique hH k r ε _ _ _ _ (hRI I) (hRI J) U
-          hU))
+        (hinj (_root_.Gp91.GlobalTheory.DSInequiv.param_eq_of_equiv hH k r ε _ _ _ _ (hRI I) (hRI J)
+          U hU))
         hIJ
   choose cI hc using fun I => (hP k r ε _ _ _ _ (hRI I) (hRI I)).1 _ (hform I I)
   have hunit : ∀ I, ∃ w ∈ (RI I).sm, ‖w‖ = 1 := fun I => by
@@ -233,7 +234,8 @@ theorem tensH_of_raw
           → ∀ (T : S.H → S'.H) (a : ℂ), SmMap S S' T → SmMap S S' (fun v => a • T v) := by
     intro m m' S S' hS hS' T a h
     have :=
-      (GlobalTheory.T.smooth_maps_closure hK k r ε _ _ _ S S' S' hS hS' hS').2.2.1 T T (a - 1) h h
+      (_root_.Gp91.GlobalTheory.SmMapAct.smMap_act hK k r ε _ _ _ S S' S' hS hS' hS').2.2.1 T T
+        (a - 1) h h
     simpa only [sub_smul, one_smul, sub_add_cancel] using this
   set a : κ → ℂ := fun I => (((Real.sqrt |(cI I).re|)⁻¹ : ℝ) : ℂ) with ha
   have hane : ∀ I, a I ≠ 0 := fun I => by

@@ -51,8 +51,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
 
 namespace Formalism.IndefR.Mi
 
-
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [-instance] CStarMatrix.instHMulOfFintypeOfMulOfAddCommMonoid
 

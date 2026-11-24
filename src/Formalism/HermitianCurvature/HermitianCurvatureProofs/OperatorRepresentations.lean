@@ -128,9 +128,9 @@ def hrmL (k r : ℕ) (w x : Fin (2 * r + k + 1) → ℂ) : Mx k r →L[ℝ] ℂ 
   }
 
 theorem inv_of_uh {g : Mx k r} (hg : g ∈ UH (Hpk k r)) : g⁻¹ = Hpk k r * gᴴ * Hpk k r := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   apply Matrix.inv_eq_left_inv
-  rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, hg', Qx2.hpk_sq']
+  rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ,
+    show gᴴ * Hpk k r * g = Hpk k r from hg, Qx2.hpk_sq']
 
 theorem smooth_yv (z : Fin (2 * r + k + 1) → ℂ) (c : Fin (mdim k r i))
     : SmoothLev k r i D (fun g => yv k r z i g c) := fun _ _ => ⟨
@@ -265,16 +265,12 @@ theorem rep_sum
   induction s using Finset.induction_on with
   | empty => simpa using rep_zero
   | insert j s hj ih =>
-    have := (h j (by simp)).add (ih fun l hl => h l (by simp [hl]))
-    simpa only [Finset.sum_insert hj] using this
+    simpa only [Finset.sum_insert hj] using (h j (by simp)).add (ih fun l hl => h l (by simp [hl]))
 
 theorem Rep.intCast_mul
     {X : Module.End ℂ (SV k r i D E)} {T : (Mx k r → E) → Mx k r → E} (hX : Rep X T) (n : ℤ)
     : Rep (((n : ℤ) : Module.End ℂ (SV k r i D E)) * X) (fun f x => (n : ℂ) • T f x) := by
-  have e : ((n : ℤ) : Module.End ℂ (SV k r i D E)) * X = (n : ℂ) • X := by
-    rw [← zsmul_eq_mul, Int.cast_smul_eq_zsmul]
-  rw [e]
-  exact hX.smul _
+  simpa only [← zsmul_eq_mul, Int.cast_smul_eq_zsmul] using hX.smul (n : ℂ)
 
 theorem rep_prod
     : ∀ (t : ℕ) (X : Fin t → Module.End ℂ (SV k r i D E)) (T : Fin t → (Mx k r → E) → Mx k r → E),
@@ -321,10 +317,7 @@ theorem rep_Tm (hD : IsOpen D) (u : ℂ) (a b : Fin (mdim k r i))
   have h :=
     (((rep_algebraMap (k := k) (r := r) (i := i) (D := D) (E := E) u).ite (a = b)).add
       (rep_EV hD a b)).2 φ g hg
-  have e : (posL k r i a = posL k r i b) = (a = b) := propext (Qx2.posL_inj i).eq_iff
-  unfold Tm
-  rw [h]
-  simp only [QuantumDeterminants.Top, e]
+  simpa only [Tm, QuantumDeterminants.Top, propext (Qx2.posL_inj i).eq_iff] using h
 
 theorem rep_qminor (hD : IsOpen D) {t : ℕ} (a b : Fin t → Fin (mdim k r i)) (u : ℂ)
     : Rep (qminor (EV k r i D E) a b u)
@@ -334,9 +327,7 @@ theorem rep_qminor (hD : IsOpen D) {t : ℕ} (a b : Fin t → Fin (mdim k r i)) 
     (rep_sum Finset.univ _ _ fun (σ : Equiv.Perm (Fin t)) _ =>
       (rep_prod t _ _ fun l : Fin t => rep_Tm (E := E) hD (u - (l : ℂ)) (a (σ l)) (b l)).intCast_mul
         (Equiv.Perm.sign σ : ℤ)).2 φ g hg
-  unfold qminor
-  rw [h]
-  simp only [qminorOp, Finset.sum_apply, Pi.smul_apply, Function.comp]
+  simpa only [qminor, qminorOp, Finset.sum_apply, Pi.smul_apply, Function.comp] using h
 
 theorem rep_chX (hD : IsOpen D) (z : Fin (2 * r + k + 1) → ℂ) (u : ℂ) (x : Fin (mdim k r i) → ℂ)
     : Rep (chX (EV k r i D E) u x (etaV k r z i D E))
@@ -404,22 +395,19 @@ theorem relation_representation : Formalism.FourierDecayAlt.Qr.BridgeRel := by
   intro E _ _ k r z i D hD
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro a b c d
-    refine
-      (((OperatorRepresentations.rep_EV hD a b).mul (OperatorRepresentations.rep_EV hD c d)).sub
-          ((OperatorRepresentations.rep_EV hD c d).mul (OperatorRepresentations.rep_EV hD a b))).ext
-        (((OperatorRepresentations.rep_EV hD a d).ite (b = c)).sub
-          ((OperatorRepresentations.rep_EV hD c b).ite (d = a)))
-        fun φ g hg => ?_
-    exact generator_gl_level E k r i D a b c d φ.1 hD φ.2.1 g hg
+    exact (((OperatorRepresentations.rep_EV hD a b).mul (OperatorRepresentations.rep_EV hD c d)).sub
+        ((OperatorRepresentations.rep_EV hD c d).mul (OperatorRepresentations.rep_EV hD a b))).ext
+      (((OperatorRepresentations.rep_EV hD a d).ite (b = c)).sub
+        ((OperatorRepresentations.rep_EV hD c b).ite (d = a)))
+      fun φ g hg => generator_gl_level E k r i D a b c d φ.1 hD φ.2.1 g hg
   · intro a b c
     refine
       (((OperatorRepresentations.rep_EV hD a b).mul (OperatorRepresentations.rep_yV hD z c)).sub
           ((OperatorRepresentations.rep_yV hD z c).mul (OperatorRepresentations.rep_EV hD a b))).ext
         ((OperatorRepresentations.rep_yV hD z b).neg.ite (a = c)) fun φ g hg => ?_
-    have h := (twisted_leibniz_rule E k r z i D a b c φ.1 hD φ.2.1 g hg).1
     show EH k r (posL k r i a) (posL k r i b) (fun x => yv k r z i x c • φ.1 x) g -
       yv k r z i g c • EH k r (posL k r i a) (posL k r i b) φ.1 g = if a = c then -(yv k r z i g b • φ.1 g) else 0
-    rw [h]
+    rw [(twisted_leibniz_rule E k r z i D a b c φ.1 hD φ.2.1 g hg).1]
     split_ifs <;> simp
   · intro a b c
     refine
@@ -427,10 +415,9 @@ theorem relation_representation : Formalism.FourierDecayAlt.Qr.BridgeRel := by
           ((OperatorRepresentations.rep_etaV hD z c).mul
             (OperatorRepresentations.rep_EV hD a b))).ext
         ((OperatorRepresentations.rep_etaV hD z a).ite (b = c)) fun φ g hg => ?_
-    have h := (twisted_leibniz_rule E k r z i D a b c φ.1 hD φ.2.1 g hg).2
     show EH k r (posL k r i a) (posL k r i b) (fun x => ybv k r z i x c • φ.1 x) g -
       ybv k r z i g c • EH k r (posL k r i a) (posL k r i b) φ.1 g = if b = c then ybv k r z i g a • φ.1 g else 0
-    rw [h]
+    rw [(twisted_leibniz_rule E k r z i D a b c φ.1 hD φ.2.1 g hg).2]
     split_ifs <;> simp
   · intro a b
     exact ((OperatorRepresentations.rep_yV hD z a).mul (OperatorRepresentations.rep_yV hD z b)).ext

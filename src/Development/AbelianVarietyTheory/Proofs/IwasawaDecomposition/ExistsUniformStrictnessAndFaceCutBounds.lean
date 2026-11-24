@@ -2,15 +2,18 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBaryStageStart
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsStrictIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellGeneratorMemConeOfSmulCombinationStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEqAddOfRedVEq
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellGeneratorMemConeOfSmulCombination
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellGeneratorsSmulMemOtherCellConeStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCommonDenominatorStrictnessSmoothFan
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsFinRepsProjectiveFinrankLeNumberFieldStatement
+public import Mathlib.Algebra.Category.ModuleCat.Basic
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsFinRepsProjectiveFinrankLeNumberField
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsMultCellsAmongOfIsPolyFan
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinearFormFromFinsupp
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonnegSumSmulIntBilinFormToRealMemPsdCone
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PolyFanFaceCutByIntLinearFormIsCell
 public import Mathlib.Algebra.Group.Submonoid.Finsupp
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinearFormFromFinsupp
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonnegSumSmulIntBilinFormToRealMemPsdCone
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -238,7 +241,7 @@ theorem perModule_bound (hP : IsPolyFanOn bar φ X)
     refine LinearMap.ext₂ fun y z => ?_
     have := LinearMap.congr_fun₂ hsum (e.symm y) (e.symm z)
     simpa [LinearMap.sum_apply, γ'] using this
-  choose k a hk hka using fun i => GlobalTheory.T.cell_generators_smul_mem_other_cellCone bar φ δ γ' c hδ hγ' hc hsum' i
+  choose k a hk hka using fun i => _root_.GlobalTheory.PolFan.exists_smul_eq_sum_of_sum_toReal_eq bar φ δ γ' c hδ hγ' hc hsum' i
   let J := Finset.univ.filter fun j => ∃ i, 0 < a i j
   let T := J.image γ
   have hTS : T ∈ hS.toFinset.powerset := by
@@ -269,8 +272,8 @@ theorem perModule_bound (hP : IsPolyFanOn bar φ X)
     intro t
     obtain ⟨j, ⟨i, hij⟩, hj⟩ := hwj t
     obtain ⟨k', b, hk', hb⟩ :=
-      GlobalTheory.T.cell_generator_mem_cone_of_smul_combination bar φ δ γ' i (k i) (a i) hδ hγ'
-        (hk i) (hka i) j hij
+      _root_.GlobalTheory.PolFan.cell_gen_mem_cone_of_smul bar φ δ γ' i (k i) (a i) hδ hγ' (hk i)
+        (hka i) j hij
     rw [hj]
     exact mem_ratCone_of_eq_sum hk' b hb
   have hwb : ∀ t, w t ∈ balForms bar X := fun t => by
@@ -306,7 +309,7 @@ theorem uniform_bound
               → ∃ (N : ℕ) (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
                 0 < N ∧ N ≤ N₀ ∧ StrictWith H.bar ψ N ℓ γ := by
   classical
-  obtain ⟨n, R, hR, hcls⟩ := GlobalTheory.T.exists_fin_reps_projective_finrank_le_numberField E q
+  obtain ⟨n, R, hR, hcls⟩ := _root_.GlobalTheory.exists_fin_reps_projective_finrank_le E q
   have key
       : ∀ k,
         letI := (hR k).1
@@ -379,7 +382,6 @@ theorem faceCut_data
         · linarith
       obtain ⟨k, c, hk, hkc⟩ := hF.2.2 (γ j) (hγ.mem j) (hγ.nonneg j) he
       have hk0 : h (k • γ j) = 0 := by
-
         rw [hkc, map_sum]
         refine Finset.sum_eq_zero fun i _ => ?_
         rw [map_nsmul, (hh.2 (s i)).2 ⟨i, rfl⟩, smul_zero]

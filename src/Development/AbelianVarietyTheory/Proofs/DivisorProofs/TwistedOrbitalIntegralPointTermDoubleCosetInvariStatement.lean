@@ -53,7 +53,4 @@ theorem _root_.GlobalTheory.T.twistedOrbitalIntegralPointTerm_doubleCoset_invari
         → ∀ t ∈ twCent θ δ, ∀ y, ∀ k ∈ K,
           GlobalTheory.EulerAbs.twTerm θ K δ f (t * y * k)
             = GlobalTheory.EulerAbs.twTerm θ K δ f y := by
-  first
-  | exact @GlobalTheory.EulerAbs.twTerm_inv
-  | exact GlobalTheory.EulerAbs.twTerm_inv
-  | (intros; apply GlobalTheory.EulerAbs.twTerm_inv <;> assumption)
+  first | exact @GlobalTheory.EulerAbs.twTerm_inv

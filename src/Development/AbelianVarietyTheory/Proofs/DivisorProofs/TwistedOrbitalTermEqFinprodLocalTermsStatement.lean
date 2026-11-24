@@ -69,7 +69,4 @@ theorem _root_.GlobalTheory.T.twistedOrbitalTerm_eq_finprod_localTerms
                 → ∀ x,
                   GlobalTheory.EulerAbs.twTerm θ (⨅ v, (K v).comap (pf v)) δ f x
                     = ∏ᶠ v, GlobalTheory.EulerAbs.twTerm (θv v) (K v) (pf v δ) (fv v) (pf v x) := by
-  first
-  | exact @GlobalTheory.EulerAbs.twTerm_eq_finprod
-  | exact GlobalTheory.EulerAbs.twTerm_eq_finprod
-  | (intros; apply GlobalTheory.EulerAbs.twTerm_eq_finprod <;> assumption)
+  first | exact @GlobalTheory.EulerAbs.twTerm_eq_finprod

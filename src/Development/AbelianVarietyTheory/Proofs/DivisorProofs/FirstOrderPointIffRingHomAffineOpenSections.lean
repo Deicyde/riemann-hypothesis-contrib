@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.OneArc
 
 @[expose] public section
 
@@ -59,11 +60,6 @@ set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.SchRing
-
-theorem spMap_comp'
-    {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  simp only [spMap, CommRingCat.ofHom_comp, Spec.map_comp]
 
 theorem spMap_inj {R S : Type} [CommRing R] [CommRing S] {a b : R →+* S} (h : spMap a = spMap b)
     : a = b := by
@@ -160,7 +156,7 @@ theorem deformation_on_sections
       : ∀ (D : Type) [CommRing D] (r : Γ(X, V) →+* D),
         spMap r ≫ hV.fromSpec ≫ s = spMap (r.comp (s.appLE U V e).hom) ≫ hU.fromSpec := by
     intro D _ r
-    rw [← key, spMap_comp']
+    rw [← key, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
     rfl
   have hbase
       : ∀ (D : Type) [CommRing D] (alg : k →+* D) (r : Γ(X, V) →+* D),
@@ -169,7 +165,8 @@ theorem deformation_on_sections
     intro D _ alg r
     rw [hφ]
     simp only [Category.assoc]
-    rw [hs, ← Category.assoc (spMap alg) (spMap φ), ← spMap_comp', hs]
+    rw [hs, ← Category.assoc (spMap alg) (spMap φ),
+      ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, hs]
     constructor
     · intro h; exact spMap_inj ((cancel_mono hU.fromSpec).mp h)
     · intro h; rw [h]
@@ -177,7 +174,7 @@ theorem deformation_on_sections
       : ∀ (D : Type) [CommRing D] (f : D →+* k) (r : Γ(X, V) →+* D),
         spMap f ≫ spMap r ≫ hV.fromSpec = x ↔ f.comp r = φ := by
     intro D _ f r
-    rw [hφ, ← Category.assoc, ← spMap_comp']
+    rw [hφ, ← Category.assoc, ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
     constructor
     · intro h; exact spMap_cancel hV.fromSpec h
     · intro h; rw [h]
@@ -190,10 +187,12 @@ theorem deformation_on_sections
     have h2 := (hbase _ _ _).mpr hv2
     obtain ⟨c, hc, hcu⟩ := huniq _ h1 h2
     refine ⟨c, ?_, ?_⟩
-    · rw [hψ, ← Category.assoc, ← spMap_comp'] at hc
+    · rw [hψ, ← Category.assoc, ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp]
+        at hc
       exact spMap_cancel hV.fromSpec hc
     · intro c' hc'
       apply hcu
-      rw [hψ, ← Category.assoc, ← spMap_comp', ← hc']
+      rw [hψ, ← Category.assoc, ← _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp,
+        ← hc']
 
 end GlobalTheory.SchRing

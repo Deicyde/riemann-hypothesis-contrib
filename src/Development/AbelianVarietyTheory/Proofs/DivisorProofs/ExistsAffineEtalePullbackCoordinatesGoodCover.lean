@@ -87,14 +87,7 @@ theorem algX_comp
   have e
       : (π ≫ p).appLE ⊤ V (le_top.trans (Scheme.Hom.preimage_top _).ge)
         = p.appLE ⊤ W (le_top.trans (Scheme.Hom.preimage_top _).ge) ≫ π.appLE W V h := by
-    first
-    | rw [Scheme.Hom.appLE_comp_appLE]
-    | (rw [Scheme.Hom.comp_appLE, Scheme.Hom.app_eq_appLE, ← Scheme.Hom.appLE_comp_appLE])
-    | (
-        simp only [Scheme.Hom.comp_appLE, Scheme.Hom.appLE, Category.assoc,
-          Scheme.Hom.naturality_assoc]
-        rfl
-      )
+    first | rw [Scheme.Hom.appLE_comp_appLE]
   ext r
   simp only [ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX, RingHom.comp_apply]
   rw [e, CommRingCat.comp_apply]

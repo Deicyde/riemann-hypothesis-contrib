@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.pureTensor_innerProduct_eq_finprod_localInnerProdu
           IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x₁ f₁ → IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x₂ f₂
             → (Function.mulSupport fun p => ipO μ 𝓕 (x₁ p) (x₂ p)).Finite
               ∧ ipO μ 𝓕 f₁ f₂ = ∏ᶠ p, ipO μ 𝓕 (x₁ p) (x₂ p) := by
-  first
-  | exact @GlobalTheory.PlaceTensor.PureScalar.ip_pure_eq_finprod
-  | exact GlobalTheory.PlaceTensor.PureScalar.ip_pure_eq_finprod
-  | (intros; apply GlobalTheory.PlaceTensor.PureScalar.ip_pure_eq_finprod <;> assumption)
+  first | exact @GlobalTheory.PlaceTensor.PureScalar.ip_pure_eq_finprod

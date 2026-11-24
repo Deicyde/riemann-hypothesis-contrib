@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.isVacuum_conj_of_negHermitianSpace
         (LT : Set (Fin T.rank → D.host.E)) (f : WO (negSp S) T → ℂ),
       IsVacO ψ θ (negSp S) T (fun τ => - sS τ) sT LS LT f
         → IsVacO ψ θ S T sS sT LS LT (fun w => starRingEnd ℂ (f w)) := by
-  first
-  | exact @GlobalTheory.VacConj.isVacO_conj_negSp
-  | exact GlobalTheory.VacConj.isVacO_conj_negSp
-  | (intros; apply GlobalTheory.VacConj.isVacO_conj_negSp <;> assumption)
+  first | exact @GlobalTheory.VacConj.isVacO_conj_negSp

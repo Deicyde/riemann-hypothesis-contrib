@@ -141,6 +141,6 @@ theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : Zh
 
 theorem unitriangular_inverse_bound (h : MonomialFactorizationBound)
     : UnitriangularInversePolynomialBound :=
-  unitriangular_inverse_bound_of h zhatBound
+  unitriangular_inverse_bound_of h _root_.PI.PolynomialProperness.GN.zhat_norm_linear_bound
 
 end PI.PolynomialProperness

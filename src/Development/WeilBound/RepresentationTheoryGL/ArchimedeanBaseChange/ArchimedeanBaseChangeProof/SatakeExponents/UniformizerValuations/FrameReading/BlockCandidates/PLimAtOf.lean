@@ -61,8 +61,6 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
   PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F.BC
 
 attribute [local instance]

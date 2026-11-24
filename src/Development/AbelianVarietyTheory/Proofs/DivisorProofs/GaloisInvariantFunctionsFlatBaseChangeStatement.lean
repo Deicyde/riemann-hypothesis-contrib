@@ -37,6 +37,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -47,6 +48,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
+
 theorem _root_.GlobalTheory.T.galois_invariant_functions_flat_baseChange
     : ∀ (R : Type) [CommRing R] [IsDomain R] (R' : Type) [CommRing R'] [IsDomain R']
         [IsLocalRing R'] (ρ : R →+* R'),
@@ -60,7 +62,4 @@ theorem _root_.GlobalTheory.T.galois_invariant_functions_flat_baseChange
                     ∧ ∀ u : Γ(Y', β ⁻¹ᵁ V),
                       (∀ σ (h : β ⁻¹ᵁ V ≤ act σ ⁻¹ᵁ (β ⁻¹ᵁ V)), ((act σ).appLE _ _ h).hom u = u)
                         → u ∈ Set.range (β.app V).hom := by
-  first
-  | exact @GlobalTheory.Mum.InvFun.invariant_functions
-  | exact GlobalTheory.Mum.InvFun.invariant_functions
-  | (intros; apply GlobalTheory.Mum.InvFun.invariant_functions <;> assumption)
+  first | exact @GlobalTheory.Mum.InvFun.invariant_functions

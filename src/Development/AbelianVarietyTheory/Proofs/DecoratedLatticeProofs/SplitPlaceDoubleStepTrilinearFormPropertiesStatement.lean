@@ -53,6 +53,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.splitPlace_doubleStep_trilinearForm_properties
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -83,7 +84,4 @@ theorem _root_.GlobalTheory.T.splitPlace_doubleStep_trilinearForm_properties
                                   T Ξ₁ Ξ₂ f
                                     = S.val (aconv [c₁, d₁]) (aconv [c₂, d₂]) (T₁ O₁) (T₂ O₂) φ f.1
                                       1 1 1 := by
-  first
-  | exact @GlobalTheory.TriStep.tri
-  | exact GlobalTheory.TriStep.tri
-  | (intros; apply GlobalTheory.TriStep.tri <;> assumption)
+  first | exact @GlobalTheory.TriStep.tri

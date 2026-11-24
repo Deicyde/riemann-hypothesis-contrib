@@ -228,7 +228,7 @@ private theorem map_heckeTj
     x)).trans (finsum_congr fun c => ?_)
   rw [h1, h2]
   congr 1
-  simp only [Formalism.UG.Tj, Formalism.UG.dosetInd, Set.indicator]
+  simp only [Formalism.UG.Tj, Set.indicator]
   split_ifs <;> simp
 
 theorem Sep.hasSatGL

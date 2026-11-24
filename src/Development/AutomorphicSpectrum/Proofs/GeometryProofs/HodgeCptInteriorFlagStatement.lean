@@ -46,6 +46,7 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
   ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
   GlobalTheory.CompanionTheory.Ar
+
 theorem _root_.GlobalTheory.T.hodge_cpt_interior_flag
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
         (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.hodge_cpt_interior_flag
                     ∧ ∀ (t' : Ω) (ν' : ℝ),
                       𝔐.M.IsGrNorm 𝔐.t.PP.L (𝔐.V s) (Fl.b s) i z t' ν'
                         ↔ ∃ u : ℂ, u ≠ 0 ∧ ValAt 𝔐.ξ z (t' / t) u ∧ ν' = ‖u‖ * ν := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.GrNorm.exists_norm
-  | exact GlobalTheory.CompanionTheory.Ar.GrNorm.exists_norm
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.GrNorm.exists_norm <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.GrNorm.exists_norm

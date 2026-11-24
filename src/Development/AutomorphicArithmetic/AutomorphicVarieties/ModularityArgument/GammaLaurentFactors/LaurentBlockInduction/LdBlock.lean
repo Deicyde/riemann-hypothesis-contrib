@@ -62,7 +62,8 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 noncomputable section
 
-open MeasureTheory Polynomial GroundTheory GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Parabolic
+open MeasureTheory Polynomial GroundTheory GroundTheory.Automorphic
+  GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Parabolic
 open GroundTheory.Automorphic.GodementJacquet
 open scoped NNReal Classical ValuativeRel
 
@@ -72,8 +73,9 @@ namespace UpperTheory.V.Z.Gam
 
 theorem ldBlock_of (hL : LdLaurent) (hM : LdMean) (hT : LdTate) : LdBlock := by
   intro F _ _ _ _ _ _ m _ _ _ μ _ H _ _ _ _ _ _ _ W _ _ σ hσ hirr α hα0 hα hsupp ψ hψ hψ1 γ hFE
-  have hShape := UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.gxBlock_of hL hM hT
-    F m μ H W σ hσ hirr α hα0 hα hsupp ψ hψ hψ1 γ hFE
+  have hShape :=
+    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.gxBlock_of hL hM hT F m μ H W σ hσ hirr α hα0 hα
+      hsupp ψ hψ hψ1 γ hFE
   obtain ⟨c, j, hc, hγ⟩ := hShape
   by_cases h : m = 1 ∧ ∀ g ∈ integralGL F m, σ (g, 1) = 1
   · refine ⟨1 - C α * X, c, j, by simp, ?_, hc, by simpa only [if_pos h] using hγ⟩

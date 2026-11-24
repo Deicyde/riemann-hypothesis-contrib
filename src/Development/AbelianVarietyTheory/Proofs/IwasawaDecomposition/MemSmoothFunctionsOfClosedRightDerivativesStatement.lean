@@ -49,6 +49,7 @@ open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace
   GlobalTheory.Mem.Lift
 open scoped TensorProduct ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_smoothFunctions_of_closed_rightDerivatives
     : ∀ (D : D7) (θ : InfF D),
       IsInfFam θ
@@ -57,7 +58,4 @@ theorem _root_.GlobalTheory.T.mem_smoothFunctions_of_closed_rightDerivatives
             → (∀ φ ∈ 𝒮, ∀ τ, ∀ X ∈ lieAt V τ, ∃ φ' ∈ 𝒮, ∀ g,
               HasDerivAt (fun t : ℝ => φ (g * oneP θ V τ X t)) (φ' g) 0)
             → ∀ φ ∈ 𝒮, φ ∈ SmFun θ V := by
-  first
-  | exact @GlobalTheory.Mem.DerClosed.mem_smFun_of_closed
-  | exact GlobalTheory.Mem.DerClosed.mem_smFun_of_closed
-  | (intros; apply GlobalTheory.Mem.DerClosed.mem_smFun_of_closed <;> assumption)
+  first | exact @GlobalTheory.Mem.DerClosed.mem_smFun_of_closed

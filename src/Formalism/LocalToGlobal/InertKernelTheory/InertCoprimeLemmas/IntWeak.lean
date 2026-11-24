@@ -230,7 +230,7 @@ theorem wa_unitary
   simp only [Matrix.star_apply, LinearMap.toMatrix'_apply, LinearEquiv.coe_coe]
   rw [hij]
   simp only [Pi.single_apply, apply_ite star, star_one, star_zero, mul_ite, ite_mul, one_mul,
-    zero_mul, mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    zero_mul, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   by_cases h : i = j
   · simp [h]
   · simp [h, Ne.symm h]

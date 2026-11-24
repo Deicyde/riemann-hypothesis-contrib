@@ -2,11 +2,13 @@ module
 
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsGivenStageEqOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchActionReadingsCompatibleStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExistStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartanEigenOrthonormalFrameExistsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockToSchrodingerMapExistsOfArchHeisenbergDerivaStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzFockVacuumLineUniqueOfHeisenbergDerivatiStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchActionReadingsCompatible
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchHeisenbergDerivativesExist
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartanEigenOrthonormalFrameExists
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockToSchrodingerMapExistsOfArchHeisenbergDeriva
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzFockVacuumLineUniqueOfHeisenbergDerivati
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.UnitaryConjugation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -43,7 +45,6 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.UnitaryConjugation
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLagrModelOfIsLin
 
 @[expose] public section
@@ -93,8 +94,8 @@ theorem gauss_eq_smul
             → ∀ g, Γ.M.IsGauss B.ψ B.emb g → ∃ c : ℂ, g = c • f₀ := by
   intro F E _ _ _ _ _ σ a a' B Γ X om om' h f₀ hf₀ hG₀ g hg
   obtain ⟨hb, hgeo, -, -, -⟩ := h
-  choose A hA hAθ using fun w => GlobalTheory.T.cartanEigen_orthonormalFrame_exists _ _ _ _ _ (hgeo.hV.sig w) (hgeo.hV.cartan w)
-  choose C hC hCθ using fun w => GlobalTheory.T.cartanEigen_orthonormalFrame_exists _ _ _ _ _ (hgeo.hW.sig w) (hgeo.hW.cartan w)
+  choose A hA hAθ using fun w => _root_.GlobalTheory.RealLift.frameEx_holds _ _ _ _ _ (hgeo.hV.sig w) (hgeo.hV.cartan w)
+  choose C hC hCθ using fun w => _root_.GlobalTheory.RealLift.frameEx_holds _ _ _ _ _ (hgeo.hW.sig w) (hgeo.hW.cartan w)
   have hA1
       : ∀ w,
         GlobalTheory.RealLift.IsFrame
@@ -114,9 +115,8 @@ theorem gauss_eq_smul
       (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM F Γ.W.J) 1 Complex.I A C :=
     ⟨one_mul _, hA1, hC1⟩
   obtain ⟨Φ, hΦ⟩ :=
-    GlobalTheory.T.fockToSchrodingerMapExists_of_archHeisenbergDerivatives
-      GlobalTheory.T.archHeisenbergDerivatives_exist F E σ _ _ _ _ _ _ _ B.ψ B.emb _ _ Γ.M.co 1
-      Complex.I A C hb.cm hb.std fr
+    _root_.GlobalTheory.FockMapEx.fockEx_of_derEx _root_.GlobalTheory.HeisDer.derEx F E σ _ _ _ _ _
+      _ _ B.ψ B.emb _ _ Γ.M.co 1 Complex.I A C hb.cm hb.std fr
   have hz0
       : ∀ (u : Matrix (Fin a) (Fin (a + a'))
           (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
@@ -134,7 +134,7 @@ theorem gauss_eq_smul
           → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ActsD
             (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (Γ.M.heisLine B.ψ u) f
             f₁ := fun u f f₁ h =>
-    (GlobalTheory.T.archActionReadings_compatible F (Fin a × Fin (a + a')) f f₁ f₁).1 _ (hz0 u) h
+    (_root_.GlobalTheory.RealLift.actsLaws F (Fin a × Fin (a + a')) f f₁ f₁).1 _ (hz0 u) h
   have tw
       : ∀ w (c : Matrix (Ix (a - Γ.p) Γ.p) (Ix (a + a' - (Γ.p + Γ.q)) (Γ.p + Γ.q)) ℂ) (e : ℂ),
         A w * (e • (Jm (a - Γ.p) Γ.p * c * Jm (a + a' - (Γ.p + Γ.q)) (Γ.p + Γ.q))) * (C w)ᵀ
@@ -152,9 +152,8 @@ theorem gauss_eq_smul
   have line
       : ∀ f, Γ.M.IsGauss B.ψ B.emb f → ∃ z : ℂ, f = z • Φ (PiTensorProduct.tprod ℂ fun _ => 1) := by
     rintro f ⟨ε, hε⟩
-    exact GlobalTheory.T.schwartzFockVacuumLineUnique_of_heisenberg_derivatives
-      GlobalTheory.T.archHeisenbergDerivatives_exist F E σ _ _ _ _ _ _ _ B.ψ B.emb _ _ Γ.M.co 1
-      Complex.I A C Φ hb.cm hb.std fr hΦ f ε
+    exact _root_.GlobalTheory.VacLn.vacLine_of_derEx _root_.GlobalTheory.HeisDer.derEx F E σ _ _ _ _
+      _ _ _ B.ψ B.emb _ _ Γ.M.co 1 Complex.I A C Φ hb.cm hb.std fr hΦ f ε
       (fun u u' hu hu' c hc hc' f1 f1' hf hf' =>
         hε u u' hu hu' (fun w => by rw [hc' w, tw, ← hc w]) f1 f1' (toD _ _ _ hf) (toD _ _ _ hf'))
   obtain ⟨z, hz⟩ := line f₀ hG₀

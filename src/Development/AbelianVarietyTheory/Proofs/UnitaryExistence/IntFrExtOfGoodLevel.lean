@@ -4,8 +4,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
 public import Formalism.LocalToGlobal.ProjectiveLattices.CoreProofs
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralFramesModelInvertiblePushforwardStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsModelPushInvertibleOverCompleteDVRStatement
+public import Formalism.LocalToGlobal.ProjectiveLattices.IntFrames
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIntegralFramesModelInvertiblePushforward
+public import Formalism.LocalToGlobal.ProjectiveLattices.OneLtAbsNormReal
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsModelPushInvertibleOverCompleteDVR
 public import Formalism.LocalToGlobal.ProjectiveLattices.GenFrPf
 public import Formalism.LocalToGlobal.ProjectiveLattices.RealPtGeo
 import Mathlib.Algebra.Order.Floor.Extended
@@ -77,9 +79,9 @@ theorem intFrExt_of_good
   have : Finite (IsLocalRing.ResidueField T.V) := hfin
   obtain ⟨p, hp, hpm⟩ := exists_prime_mem_maximalIdeal_of_finite_residue T.V
   obtain ⟨O, _, β, Y, hPI, b, hb⟩ :=
-    GlobalTheory.T.exists_model_pushInvertible_over_completeDVR hP hN E H Dw l Xo c hpq T io p hp
-      hpm (hgood p hp)
-  have hIF := GlobalTheory.T.exists_integralFrames_model_invertible_pushforward hB hT E H Dw l Xo c
+    _root_.GlobalTheory.exists_model_pushInvertible_under_cdvr hP hN E H Dw l Xo c hpq T io p hp hpm
+      (hgood p hp)
+  have hIF := _root_.GlobalTheory.intFrames_of_laws hB hT E H Dw l Xo c
   let _ := io.toAlgebra
   obtain ⟨y₀, -, h0, -, -⟩ :=
     gfp_frPt_gen (Xo := Xo) (c := c) (L := T.Fr) (L' := T.Fr) hT

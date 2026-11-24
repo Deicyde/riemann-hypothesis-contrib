@@ -1,7 +1,7 @@
 module
 
 public import Formalism.SharpRestriction.ParConsts
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ScaleFamilySizeRelationsEventuallyStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ScaleFamilySizeRelationsEventually
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -87,7 +87,7 @@ theorem wPl_windows
               → (Fm.L x i).sc.b' ≤ wPl (Fm.D x i) (j + 1) z
                 ∧ wPl (Fm.D x i) (j + 1) z ≤ 2 * (Fm.L x i).sc.b') := by
   intro eps Fm
-  obtain ⟨x0, h0⟩ := GlobalTheory.T.scale_family_size_relations_eventually Fm
+  obtain ⟨x0, h0⟩ := _root_.GlobalTheory.ShNums.size_rel Fm
   refine ⟨x0, fun x hx hx1 i j hj z => ?_⟩
   obtain ⟨-, -, -, heta, hw, h4, h2b, -, -, -⟩ := h0 x hx hx1 i
   have P := Fm.params x hx1 i

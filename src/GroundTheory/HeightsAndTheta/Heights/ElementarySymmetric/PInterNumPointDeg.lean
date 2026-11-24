@@ -204,7 +204,7 @@ theorem finrank_funField_pt (hrel : ∃ i, (X i : Poly k N) ∉ pp)
         ⟩,
         ?_
       ⟩
-      simp only [AlgEquiv.coe_toAlgHom, AlgHom.coe_coe, map_div₀, hΦ, aeval_pt_oneBlock]
+      simp only [AlgEquiv.coe_toAlgHom, map_div₀, hΦ, aeval_pt_oneBlock]
       rfl
   unfold FieldNumbers.resDeg
   rw [dite_eq_left (inferInstance : P.IsPrime), ← hmap]

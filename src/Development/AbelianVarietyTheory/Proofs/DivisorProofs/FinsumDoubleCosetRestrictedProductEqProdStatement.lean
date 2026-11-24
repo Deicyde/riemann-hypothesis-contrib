@@ -71,8 +71,4 @@ theorem _root_.GlobalTheory.T.finsum_doubleCoset_restrictedProduct_eq_prod
                 → (∀ᶠ v in cofinite, Fv v 1 = 1 ∧ ∀ y, Fv v y ≠ 0 → ∃ t ∈ Tv v, ∃ k ∈ K v, y = t * k)
                 → ∑ᶠ q : DoubleCoset.Quotient (T : Set X) ((⨅ v, (K v).comap (pf v) : Subgroup X) : Set X), F (Quotient.out q)
                   = ∏ᶠ v, ∑ᶠ q : DoubleCoset.Quotient (Tv v : Set (Y v)) (K v : Set (Y v)), Fv v (Quotient.out q) :=
-  by
-    first
-    | exact @GlobalTheory.EulerAbs.finsum_doubleCoset_restr
-    | exact GlobalTheory.EulerAbs.finsum_doubleCoset_restr
-    | (intros; apply GlobalTheory.EulerAbs.finsum_doubleCoset_restr <;> assumption)
+  by first | exact @GlobalTheory.EulerAbs.finsum_doubleCoset_restr

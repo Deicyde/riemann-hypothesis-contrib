@@ -116,8 +116,8 @@ theorem hOF_dbl
           = ∑ a, g (finSumFinEquiv (Sum.inl a)) + ∑ a, g (finSumFinEquiv (Sum.inr a)) := fun g => by
     rw [← finSumFinEquiv.sum_comp, Fintype.sum_sum_type]
   simp only [hs]
-  simp [-finSumFinEquiv_apply_left, -finSumFinEquiv_apply_right, dblG, GlobalTheory.WeilM.dbl, topH,
-    topR, botR, Finset.sum_add_distrib, Finset.sum_sub_distrib, sub_eq_add_neg]
+  simp [-finSumFinEquiv_apply_left, -finSumFinEquiv_apply_right, dblG, GlobalTheory.WeilM.dbl, topR,
+    botR, Finset.sum_add_distrib, sub_eq_add_neg]
 
 theorem symplOHF_dbl
     (σ : E →ₐ[F] E)

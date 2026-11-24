@@ -51,6 +51,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.isLevelStructure_of_generic_of_fibrewise_indep
     : Laws
       → ∀ (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [Field K] [Algebra R K]
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.isLevelStructure_of_generic_of_fibrewise_indep
                           (fun i => (c' i : ℕ))
                       → c = c')
                   → ∃ lev : Out.Level P M (unitOn ze), lev.pt = y := by
-  first
-  | exact @GlobalTheory.level_of_generic_of_indep
-  | exact GlobalTheory.level_of_generic_of_indep
-  | (intros; apply GlobalTheory.level_of_generic_of_indep <;> assumption)
+  first | exact @GlobalTheory.level_of_generic_of_indep

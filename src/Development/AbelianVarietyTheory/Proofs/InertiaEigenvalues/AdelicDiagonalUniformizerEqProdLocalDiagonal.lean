@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EquivOfISupRange
 
 @[expose] public section
 
@@ -51,15 +52,6 @@ noncomputable section
 open Matrix
 
 namespace GlobalTheory.CellDecNat
-
-theorem glExt
-    {E : Type} [Field E] [NumberField E]
-    {n : ℕ} {x y : GL (Fin n) (Af E)}
-    (h : ∀ w, GeneralLinearGroup.map (pLoc E w) x = GeneralLinearGroup.map (pLoc E w) y)
-    : x = y :=
-  Units.ext (Matrix.ext fun i k =>
-    IsDedekindDomain.FiniteAdeleRing.ext _ fun v =>
-      congrArg (fun x : GL (Fin n) (v.adicCompletion E) => x.val i k) (h v))
 
 theorem tl_eq_jsw_tl
     (E : Type) [Field E] [NumberField E]
@@ -81,7 +73,7 @@ theorem tl_eq_jsw_tl
     rw [map_list_prod, List.map_map]; rfl
   rw [hm]
   congr 1
-  apply glExt
+  apply _root_.GlobalTheory.CuspRep.LocUniq.gl_ext
   intro w
   rw [map_list_prod, List.map_map,
     List.prod_map_eq_pow_single w _

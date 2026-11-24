@@ -48,14 +48,16 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
 
 namespace GlobalTheory.Reg
 
-theorem exists_valuationSubring_comap_eq_nonunits {K L : Type} [Field K] [Field L] (f : K →+* L)
-    (U : ValuationSubring K) :
-    ∃ W : ValuationSubring L, W.comap f = U ∧ ∀ x ∈ U.nonunits, f x ∈ W.nonunits := by
+theorem exists_valuationSubring_comap_eq_nonunits
+    {K L : Type} [Field K] [Field L] (f : K →+* L) (U : ValuationSubring K)
+    : ∃ W : ValuationSubring L, W.comap f = U ∧ ∀ x ∈ U.nonunits, f x ∈ W.nonunits := by
   classical
   obtain ⟨W, hW, hloc⟩ := IsLocalRing.exists_factor_valuationRing (f.comp U.subtype)
   refine ⟨W, ?_, ?_⟩
@@ -71,7 +73,8 @@ theorem exists_valuationSubring_comap_eq_nonunits {K L : Type} [Field K] [Field 
         obtain ⟨⟨y, hy⟩, hyx⟩ := isUnit_iff_exists_inv.mp hu
         have hyx' : x⁻¹ * y = 1 := congrArg Subtype.val hyx
         have : y = x := by
-          calc y = x * (x⁻¹ * y) := by rw [← _root_.mul_assoc, mul_inv_cancel₀ hx0, _root_.one_mul]
+          calc
+            y = x * (x⁻¹ * y) := by rw [← _root_.mul_assoc, mul_inv_cancel₀ hx0, _root_.one_mul]
             _ = x := by rw [hyx', _root_.mul_one]
         exact hxU (this ▸ hy)
       apply hnu
@@ -92,11 +95,17 @@ theorem exists_valuationSubring_comap_eq_nonunits {K L : Type} [Field K] [Field 
       exact hloc.map_nonunit (⟨x, hxU⟩ : U) hu
     exact (ValuationSubring.mem_nonunits_iff_exists_mem_maximalIdeal).mpr ⟨hfx, key⟩
 
-theorem exists_prime_natCast_mem {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K)) :
-    ∃ p : ℕ, p.Prime ∧ (p : 𝓞 K) ∈ la.asIdeal := by
+theorem exists_prime_natCast_mem {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
+    : ∃ p : ℕ, p.Prime ∧ (p : 𝓞 K) ∈ la.asIdeal := by
   apply GlobalTheory.Mem.FewPrimes.exists_prime_mem <;> assumption
 
-theorem modelAt_of_good_level : PartI → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H), 1 ≤ Dw.p + Dw.q → ∀ (Xo : ∀ l : Level H, Moduli Dw l) (l : Level H) (c : Coeff l) (la : HeightOneSpectrum (𝓞 c.F)), (∀ p : ℕ, p.Prime → (p : 𝓞 c.F) ∈ la.asIdeal → l.GoodAt p) → ModelAt (Xo l) c la := by
+theorem modelAt_of_good_level
+    : PartI
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
+        1 ≤ Dw.p + Dw.q
+          → ∀ (Xo : ∀ l : Level H, Moduli Dw l) (l : Level H) (c : Coeff l)
+              (la : HeightOneSpectrum (𝓞 c.F)),
+            (∀ p : ℕ, p.Prime → (p : 𝓞 c.F) ∈ la.asIdeal → l.GoodAt p) → ModelAt (Xo l) c la := by
   intro hI E _ _ _ H Dw hpq Xo l c la hgood
   obtain ⟨-, hI⟩ := hI
   obtain ⟨Y, hY, -⟩ := hI E H Dw hpq Xo

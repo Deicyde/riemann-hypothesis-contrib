@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.hasProperSmoothDualRepresentative_grpPullback_iff
     : ∀ (S S' : Scheme.{0}) (f : S' ⟶ S) (A : Over S) [GrpObj A] (A' : Over S') [GrpObj A']
         (φ : A'.left ⟶ A.left),
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.hasProperSmoothDualRepresentative_grpPullback_iff
         → ∀ (g : ℕ) (T : Over S'),
           (HasRep A' g T ↔ HasRep A g (Over.mk (T.hom ≫ f)))
             ∧ (HasRepAF A' g T ↔ HasRepAF A g (Over.mk (T.hom ≫ f))) := by
-  first
-  | exact @GlobalTheory.DualCon.hasRep_baseChange_iff
-  | exact GlobalTheory.DualCon.hasRep_baseChange_iff
-  | (intros; apply GlobalTheory.DualCon.hasRep_baseChange_iff <;> assumption)
+  first | exact @GlobalTheory.DualCon.hasRep_baseChange_iff

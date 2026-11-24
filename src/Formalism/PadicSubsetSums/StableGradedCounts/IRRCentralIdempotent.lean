@@ -58,9 +58,10 @@ section
 
 variable {G V : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 
-theorem isIrreducible_of [Nontrivial V] (ρ : Representation ℂ G V)
-    (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤) :
-    ρ.IsIrreducible := by
+theorem isIrreducible_of
+    [Nontrivial V]
+    (ρ : Representation ℂ G V) (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
+    : ρ.IsIrreducible := by
   unfold Representation.IsIrreducible
   refine { exists_pair_ne := ⟨⊥, ⊤, fun heq => ?_⟩, eq_bot_or_eq_top := fun W => ?_ }
   · have h1 := congrArg Subrepresentation.toSubmodule heq
@@ -74,10 +75,11 @@ theorem isIrreducible_of [Nontrivial V] (ρ : Representation ℂ G V)
       subst h1
       rfl
 
-theorem schur_scalar [Nontrivial V] (ρ : Representation ℂ G V)
-    (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (a : G → ℂ) (ha : ∀ g k, a (k * g * k⁻¹) = a g) :
-    ∃ μ : ℂ, (∑ g, a g • ρ g) = μ • (1 : Module.End ℂ V) := by
+theorem schur_scalar
+    [Nontrivial V]
+    (ρ : Representation ℂ G V) (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
+    (a : G → ℂ) (ha : ∀ g k, a (k * g * k⁻¹) = a g)
+    : ∃ μ : ℂ, (∑ g, a g • ρ g) = μ • (1 : Module.End ℂ V) := by
   set T : Module.End ℂ V := ∑ g, a g • ρ g with hT
   have hcomm : ∀ k, ρ k * T = T * ρ k := by
     intro k
@@ -93,13 +95,7 @@ theorem schur_scalar [Nontrivial V] (ρ : Representation ℂ G V)
     rw [← Module.End.mul_apply, ← hcomm g, Module.End.mul_apply, hx, map_smul]
   rcases h _ hW with h0 | h0
   · exfalso
-    first
-      | exact Module.End.hasEigenvalue_iff.1 hμ h0
-      | exact hμ h0
-      | (obtain ⟨v, hv⟩ := hμ.exists_hasEigenvector
-         have hv1 := hv.1
-         rw [h0] at hv1
-         exact hv.2 ((Submodule.mem_bot ℂ).1 hv1))
+    first | exact Module.End.hasEigenvalue_iff.1 hμ h0
   · refine LinearMap.ext fun x => ?_
     have hx : x ∈ Module.End.eigenspace T μ := by
       rw [h0]
@@ -108,23 +104,27 @@ theorem schur_scalar [Nontrivial V] (ρ : Representation ℂ G V)
     rw [hx]
     simp
 
-theorem conv_char [Nontrivial V] (ρ : Representation ℂ G V)
-    (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (a : G → ℂ) (ha : ∀ g k, a (k * g * k⁻¹) = a g) :
-    ∃ μ : ℂ, ∀ k, ∑ g, a g * ρ.character (g * k) = μ * ρ.character k := by
+theorem conv_char
+    [Nontrivial V]
+    (ρ : Representation ℂ G V) (h : ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
+    (a : G → ℂ) (ha : ∀ g k, a (k * g * k⁻¹) = a g)
+    : ∃ μ : ℂ, ∀ k, ∑ g, a g * ρ.character (g * k) = μ * ρ.character k := by
   obtain ⟨μ, hμ⟩ := schur_scalar ρ h a ha
   refine ⟨μ, fun k => ?_⟩
   have h2 := congrArg (fun T : Module.End ℂ V => LinearMap.trace ℂ V (T * ρ k)) hμ
 
-  simp only [Finset.sum_mul, smul_mul_assoc, ← map_mul, map_sum, map_smul, one_mul, smul_eq_mul] at h2
+  simp only [Finset.sum_mul, smul_mul_assoc, ← map_mul, map_sum, map_smul, one_mul, smul_eq_mul]
+    at h2
   exact h2
 
-theorem sum_of_mul_sum_of (A B : G → ℂ) :
-    (∑ g, A g • MonoidAlgebra.of ℂ G g) * (∑ g, B g • MonoidAlgebra.of ℂ G g) =
-      ∑ k, (∑ g, A g * B (g⁻¹ * k)) • MonoidAlgebra.of ℂ G k := by
+theorem sum_of_mul_sum_of (A B : G → ℂ)
+    : (∑ g, A g • MonoidAlgebra.of ℂ G g) * (∑ g, B g • MonoidAlgebra.of ℂ G g)
+      = ∑ k, (∑ g, A g * B (g⁻¹ * k)) • MonoidAlgebra.of ℂ G k := by
   rw [Finset.sum_mul_sum]
-  have key : ∀ g, ∑ h, (A g • MonoidAlgebra.of ℂ G g) * (B h • MonoidAlgebra.of ℂ G h) =
-      ∑ k, (A g * B (g⁻¹ * k)) • MonoidAlgebra.of ℂ G k := by
+  have key
+      : ∀ g,
+        ∑ h, (A g • MonoidAlgebra.of ℂ G g) * (B h • MonoidAlgebra.of ℂ G h)
+          = ∑ k, (A g * B (g⁻¹ * k)) • MonoidAlgebra.of ℂ G k := by
     intro g
     refine Fintype.sum_equiv (Equiv.mulLeft g) _ _ (fun h => ?_)
     simp only [Equiv.coe_mulLeft, inv_mul_cancel_left, smul_mul_smul_comm, ← map_mul]
@@ -133,21 +133,20 @@ theorem sum_of_mul_sum_of (A B : G → ℂ) :
 
 end
 
-theorem centralIdem_mul {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W]
-    (ρ : Representation ℂ G V) (σ : Representation ℂ G W)
-    (h : ∀ U : Submodule ℂ W, (∀ g, ∀ x ∈ U, σ g x ∈ U) → U = ⊥ ∨ U = ⊤) :
-    ∃ μ : ℂ, μ * (Module.finrank ℂ W : ℂ) = ∑ g, ρ.character g⁻¹ * σ.character g ∧
-      centralIdem ρ * centralIdem σ =
-        ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * μ) • centralIdem σ := by
+theorem centralIdem_mul
+    {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W]
+    (ρ : Representation ℂ G V)
+    (σ : Representation ℂ G W) (h : ∀ U : Submodule ℂ W, (∀ g, ∀ x ∈ U, σ g x ∈ U) → U = ⊥ ∨ U = ⊤)
+    : ∃ μ : ℂ,
+      μ * (Module.finrank ℂ W : ℂ) = ∑ g, ρ.character g⁻¹ * σ.character g
+        ∧ centralIdem ρ * centralIdem σ
+          = ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * μ) • centralIdem σ := by
   have ha : ∀ g k : G, ρ.character (k * g * k⁻¹)⁻¹ = ρ.character g⁻¹ := by
     intro g k
     simpa [mul_assoc] using ρ.char_conj g⁻¹ k
   obtain ⟨μ, hconv⟩ := conv_char σ h (fun g => ρ.character g⁻¹) ha
-  have hone : σ.character 1 = (Module.finrank ℂ W : ℂ) := by
-    first
-      | exact σ.char_one
-      | (unfold Representation.character; simp)
+  have hone : σ.character 1 = (Module.finrank ℂ W : ℂ) := by first | exact σ.char_one
   refine ⟨μ, ?_, ?_⟩
   · have h1 := hconv 1
     simp only [mul_one, hone] at h1
@@ -159,32 +158,36 @@ theorem centralIdem_mul {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [M
     congr 1
     have hcm : ∀ g : G, σ.character (k⁻¹ * g) = σ.character (g * k⁻¹) := fun g => by
       simpa [mul_assoc] using (σ.char_conj (k⁻¹ * g) g).symm
-    have e1 : ∀ g : G, ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * ρ.character g⁻¹) *
-        ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ) * σ.character (g⁻¹ * k)⁻¹) =
-        ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ))) *
-        (ρ.character g⁻¹ * σ.character (g * k⁻¹)) := by
+    have e1
+        : ∀ g : G,
+          ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * ρ.character g⁻¹)
+              * ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ) * σ.character (g⁻¹ * k)⁻¹)
+            = ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ)
+                * ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ)))
+              * (ρ.character g⁻¹ * σ.character (g * k⁻¹)) := by
       intro g
       rw [mul_inv_rev, inv_inv, hcm]
       ring
-    calc _ = ∑ g, ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) *
-            ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ))) *
-            (ρ.character g⁻¹ * σ.character (g * k⁻¹)) := Finset.sum_congr rfl (fun g _ => e1 g)
+    calc
+      _ = ∑ g, ((Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) *
+          ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ))) *
+          (ρ.character g⁻¹ * σ.character (g * k⁻¹)) :=
+        Finset.sum_congr rfl (fun g _ => e1 g)
       _ = _ := by
         rw [← Finset.mul_sum, hconv k⁻¹]
         ring
 
-theorem centralIdem_comm_of {G V : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (k : G) :
-    centralIdem ρ * MonoidAlgebra.of ℂ G k = MonoidAlgebra.of ℂ G k * centralIdem ρ := by
+theorem centralIdem_comm_of
+    {G V : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (k : G)
+    : centralIdem ρ * MonoidAlgebra.of ℂ G k = MonoidAlgebra.of ℂ G k * centralIdem ρ := by
   have hc : ∀ h : G, ρ.character (k⁻¹ * (h * k)) = ρ.character h := by
-    first
-      | exact fun h => by simpa [mul_assoc] using ρ.char_conj h k⁻¹
-      | (intro h; unfold Representation.character; done)
+    first | exact fun h => by simpa [mul_assoc] using ρ.char_conj h k⁻¹
   unfold centralIdem
   rw [Finset.sum_mul, Finset.mul_sum]
   refine Fintype.sum_equiv (MulAut.conj k⁻¹).toEquiv _ _ (fun g => ?_)
-  simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply, inv_inv, smul_mul_assoc,
-    mul_smul_comm, ← map_mul, mul_inv_rev, mul_assoc, hc, mul_inv_cancel_left]
+  simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply, inv_inv,
+    smul_mul_assoc, mul_smul_comm, ← map_mul, mul_inv_rev, mul_assoc, hc, mul_inv_cancel_left]
 
 theorem central_idempotent_holds : CentralIdempotent := by
   intro G V _ _ _ _ _ _ ρ h
@@ -206,7 +209,8 @@ theorem central_idempotent_holds : CentralIdempotent := by
     have h4 : (Module.finrank ℂ V : ℂ) / (Fintype.card G : ℂ) * μ = 1 := by
       rw [h3] at h1
       field_simp
-      rw [mul_comm]; exact h1
+      rw [mul_comm]
+      exact h1
     rw [h4, one_smul]
   · intro x
     induction x using MonoidAlgebra.induction_linear with

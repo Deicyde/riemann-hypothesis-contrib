@@ -157,7 +157,7 @@ theorem exists_intertwining_ne_zero
     have h2 : lam.w i.succ ≤ mu.w i := (hI i).2
     constructor <;> omega
   obtain ⟨io, hmem, heq, hhw, -⟩ :=
-    Formalism.BranchingDeterminantCap.branchMap ℂ n
+    _root_.Formalism.BranchingDeterminantCap.branch_map_formula ℂ n
       (fun i : Fin n => lam.natW i.castSucc)
       (fun i => mu.natW i + c)
       hI'

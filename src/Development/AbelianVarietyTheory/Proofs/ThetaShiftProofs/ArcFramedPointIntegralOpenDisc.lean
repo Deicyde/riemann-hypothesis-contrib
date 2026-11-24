@@ -3,10 +3,15 @@ module
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsFramedPointChangedByLetters
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThetaFramePf
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIntegralGeneratorOfChartPointCdvr
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ConstantArcEigenbasisFlatBaseChangeStatement
-import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArcStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.PolarisationSectionGeneratesOfSpecialFibreStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ThetaSectionOfArcNonzeroOnFibresStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ConstantArcEigenbasisFlatBaseChange
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsCombAt
+public import Formalism.LocalToGlobal.ProjectiveLattices.OneLtAbsNormReal
+public import Mathlib.Tactic.ENatToNat
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.PolarisationSectionGeneratesOfSpecialFibre
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ThetaSectionOfArcNonzeroOnFibres
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueConstantTangentVectorsAlongArc
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -49,12 +54,9 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AmplePt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
 import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.ArcLineFunctions.ArcSPin
 
 @[expose] public section
-
-
 
 noncomputable section
 
@@ -66,10 +68,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.L2.Pj.QAt GlobalTheory.ArcQ
   GlobalTheory.Frames
 
-theorem sp_comp {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T)
-    : spMap (g.comp f) = spMap g ≫ spMap f := by
-  show Spec.map _ = Spec.map _ ≫ Spec.map _
-  rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
+alias sp_comp := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp
 
 theorem dual_alg {S T : Type} [CommRing S] [CommRing T] (φ : S →+* T)
     : spMap (dualMap φ) ≫ spMap (algebraMap S (DualNumber S))
@@ -197,8 +196,8 @@ theorem integral_of_isArcFr
       exact sabCancel pullCubCancel E H _ _ _ _ _ _ _ _ m k
     exact key _ k hb
   obtain ⟨u, hu1, hu2⟩ :=
-    GlobalTheory.T.constant_arc_eigenbasis_flat_baseChange hL.globalFns E H Dw l Xo c O β Y A b a χ
-      W ρ e hB T.V ev (flat_of_injective _ hinj) G m
+    _root_.GlobalTheory.ArcQ.arcBasis_baseChange hL.globalFns E H Dw l Xo c O β Y A b a χ W ρ e hB
+      T.V ev (flat_of_injective _ hinj) G m
   have eig
       : ∀ (τ : E →+* ℂ) (w : epsR T.V ⟶ G.G),
         IsEigV c io G τ w
@@ -225,11 +224,11 @@ theorem integral_of_isArcFr
       fun τ i => ?_
     ⟩,
     θ',
-    GlobalTheory.T.polarisation_section_generates_of_special_fibre hL hL2 E H Dw l Xo c T G t' y.x
+    _root_.GlobalTheory.GenDvr.generates_of_nonzero_on_special_fibre hL hL2 E H Dw l Xo c T G t' y.x
       m1 n θ'
       (hnz _
-        (GlobalTheory.T.thetaSection_of_arc_nonzero_on_fibres hL hL2 E H Dw l Xo c O β Y A b a χ W
-          th θ hth hθ (Or.inr hPI) _).2),
+        (_root_.GlobalTheory.ThetaAllFibres.theta_nonzero_on_fibres hL hL2 E H Dw l Xo c O β Y A b a
+          χ W th θ hth hθ (Or.inr hPI) _).2),
     w1,
     w',
     σ,
@@ -245,8 +244,8 @@ theorem integral_of_isArcFr
   obtain ⟨v, p, h1, h2, h3, pb⟩ := hu τ i
   obtain ⟨v', h1', h3'⟩ := hu1 τ i
   obtain rfl : v = v' :=
-    (GlobalTheory.T.exists_unique_constant_tangent_vectors_along_arc hL.globalFns E H Dw l Xo c O β
-      Y A b a χ W (e τ i)).1.unique h1 h1'
+    (_root_.GlobalTheory.ConstLie.main hL.globalFns E H Dw l Xo c O β Y A b a χ W (e τ i)).1.unique
+      h1 h1'
   refine ⟨p, h2, ?_⟩
   apply m.cart.1.hom_ext
   · rw [Category.assoc, Category.assoc]

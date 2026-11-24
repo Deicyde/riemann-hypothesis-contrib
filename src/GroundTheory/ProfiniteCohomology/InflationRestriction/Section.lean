@@ -67,21 +67,29 @@ def cosetSelectors (N : Subgroup G) : Set (Set G) :=
     (∀ t ∈ T, ∀ t' ∈ T, (t : G ⧸ N) = t' → t⁻¹ * t' ∈ K)}
 
 omit [IsTopologicalGroup G] in
-theorem univ_mem_cosetSelectors (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G)) :
-    Set.univ ∈ cosetSelectors N :=
-  ⟨isClosed_univ, N, inferInstance, hN, le_rfl, fun _ _ _ _ => Set.mem_univ _,
-    fun x => ⟨x, Set.mem_univ _, rfl⟩, fun _ _ _ _ h => QuotientGroup.eq.mp h⟩
+theorem univ_mem_cosetSelectors (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G))
+    : Set.univ ∈ cosetSelectors N := ⟨
+  isClosed_univ,
+  N,
+  inferInstance,
+  hN,
+  le_rfl,
+  fun _ _ _ _ => Set.mem_univ _,
+  fun x => ⟨x, Set.mem_univ _, rfl⟩,
+  fun _ _ _ _ h => QuotientGroup.eq.mp h
+⟩
 
 variable [CompactSpace G]
 
-theorem sInter_mem_cosetSelectors (N : Subgroup G) (hN : IsClosed (N : Set G))
-    {c : Set (Set G)} (hcS : c ⊆ cosetSelectors N) (hc : IsChain (· ⊆ ·) c) (hne : c.Nonempty) :
-    ⋂₀ c ∈ cosetSelectors N := by
+theorem sInter_mem_cosetSelectors
+    (N : Subgroup G) (hN : IsClosed (N : Set G))
+    {c : Set (Set G)} (hcS : c ⊆ cosetSelectors N) (hc : IsChain (· ⊆ ·) c) (hne : c.Nonempty)
+    : ⋂₀c ∈ cosetSelectors N := by
   have : Nonempty c := hne.to_subtype
   choose K hKn hKc hKN hKmul hKex hKuniq using fun T : c => (hcS T.2).2
   refine ⟨isClosed_sInter fun T hT => (hcS hT).1, ⨅ T : c, K T, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · exact ⟨fun n hn g => Subgroup.mem_iInf.2 fun T =>
-      (hKn T).conj_mem _ (Subgroup.mem_iInf.1 hn T) g⟩
+  · exact ⟨fun n hn g =>
+      Subgroup.mem_iInf.2 fun T => (hKn T).conj_mem _ (Subgroup.mem_iInf.1 hn T) g⟩
   · rw [Subgroup.coe_iInf]
     exact isClosed_iInter hKc
   · exact (iInf_le _ (Classical.arbitrary c)).trans (hKN _)
@@ -101,7 +109,8 @@ theorem sInter_mem_cosetSelectors (N : Subgroup G) (hN : IsClosed (N : Set G))
         obtain ⟨t, ht, htx⟩ := hKex T x
         exact ⟨t, ht, htx⟩
       · intro T
-        exact ((hcS T.2).1.inter (isClosed_eq QuotientGroup.continuous_mk continuous_const)).isCompact
+        exact ((hcS T.2).1.inter (isClosed_eq QuotientGroup.continuous_mk
+          continuous_const)).isCompact
       · intro T
         exact (hcS T.2).1.inter (isClosed_eq QuotientGroup.continuous_mk continuous_const)
     obtain ⟨t, ht⟩ := hne'
@@ -114,13 +123,16 @@ theorem sInter_mem_cosetSelectors (N : Subgroup G) (hN : IsClosed (N : Set G))
 
 variable [TotallyDisconnectedSpace G]
 
-theorem exists_closed_transversal (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G)) :
-    ∃ T : Set G, IsClosed T ∧ (∀ x : G, ∃ t ∈ T, (t : G ⧸ N) = x) ∧
-      ∀ t ∈ T, ∀ t' ∈ T, (t : G ⧸ N) = t' → t = t' := by
-  obtain ⟨T, hTmin⟩ := zorn_superset (cosetSelectors N) fun c hcS hc => by
-    rcases c.eq_empty_or_nonempty with rfl | hne
-    · exact ⟨Set.univ, univ_mem_cosetSelectors N hN, fun s hs => absurd hs (Set.notMem_empty s)⟩
-    · exact ⟨⋂₀ c, sInter_mem_cosetSelectors N hN hcS hc hne, fun s hs => Set.sInter_subset_of_mem hs⟩
+theorem exists_closed_transversal (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G))
+    : ∃ T : Set G,
+      IsClosed T ∧ (∀ x : G, ∃ t ∈ T, (t : G ⧸ N) = x)
+        ∧ ∀ t ∈ T, ∀ t' ∈ T, (t : G ⧸ N) = t' → t = t' := by
+  obtain ⟨T, hTmin⟩ :=
+    zorn_superset (cosetSelectors N) fun c hcS hc => by
+      rcases c.eq_empty_or_nonempty with rfl | hne
+      · exact ⟨Set.univ, univ_mem_cosetSelectors N hN, fun s hs => absurd hs (Set.notMem_empty s)⟩
+      · exact
+          ⟨⋂₀c, sInter_mem_cosetSelectors N hN hcS hc hne, fun s hs => Set.sInter_subset_of_mem hs⟩
   obtain ⟨hTc, K, hKn, hKc, hKN, hKmul, hKex, hKuniq⟩ := hTmin.prop
   suffices hK : ∀ x ∈ K, x = 1 by
     refine ⟨T, hTc, hKex, fun t ht t' ht' h => ?_⟩
@@ -130,13 +142,11 @@ theorem exists_closed_transversal (N : Subgroup G) [N.Normal] (hN : IsClosed (N 
   intro x hxK
   by_contra hx1
 
-  have hxnhds : ({x}ᶜ : Set G) ∈ 𝓝 (1 : G) :=
-    isOpen_compl_singleton.mem_nhds (Ne.symm hx1)
+  have hxnhds : ({x}ᶜ : Set G) ∈ 𝓝 (1 : G) := isOpen_compl_singleton.mem_nhds (Ne.symm hx1)
   obtain ⟨U, -, hU⟩ := (OpenNormalSubgroup.hasBasis_nhds_one (G := G)).mem_iff.mp hxnhds
   have hxU : x ∉ (U : Subgroup G) := fun h => hU h rfl
   let W : Subgroup G := K ⊔ (U : Subgroup G)
-  have hWopen : IsOpen (W : Set G) :=
-    Subgroup.isOpen_mono le_sup_right U.toOpenSubgroup.isOpen
+  have hWopen : IsOpen (W : Set G) := Subgroup.isOpen_mono le_sup_right U.toOpenSubgroup.isOpen
   have : W.Normal := Subgroup.sup_normal K (U : Subgroup G)
   have : DiscreteTopology (G ⧸ W) := QuotientGroup.discreteTopology hWopen
   let r : G ⧸ W → G ⧸ (U : Subgroup G) := fun D => ((Quotient.out D : G) : G ⧸ (U : Subgroup G))
@@ -146,8 +156,16 @@ theorem exists_closed_transversal (N : Subgroup G) [N.Normal] (hN : IsClosed (N 
       ((continuous_of_discreteTopology (f := r)).comp QuotientGroup.continuous_mk))
   have hK'n : (K ⊓ (U : Subgroup G)).Normal := Subgroup.normal_inf_normal _ _
   have hT'mem : T' ∈ cosetSelectors N := by
-    refine ⟨hT'c, K ⊓ (U : Subgroup G), hK'n,
-      hKc.inter U.toOpenSubgroup.isClosed, inf_le_left.trans hKN, ?_, ?_, ?_⟩
+    refine ⟨
+      hT'c,
+      K ⊓ (U : Subgroup G),
+      hK'n,
+      hKc.inter U.toOpenSubgroup.isClosed,
+      inf_le_left.trans hKN,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · rintro t ⟨ht, htr⟩ k ⟨hkK, hkU⟩
       refine ⟨hKmul t ht k hkK, ?_⟩
       have h1 : ((t * k : G) : G ⧸ (U : Subgroup G)) = (t : G ⧸ (U : Subgroup G)) :=
@@ -192,8 +210,8 @@ theorem exists_closed_transversal (N : Subgroup G) [N.Normal] (hN : IsClosed (N 
   have : (t : G ⧸ (U : Subgroup G)) = (t * x : G) := by rw [h1, h2, hW]
   exact hxU (by simpa using QuotientGroup.eq.mp this)
 
-theorem exists_continuous_section (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G)) :
-    ∃ s : G ⧸ N → G, Continuous s ∧ (∀ c, (s c : G ⧸ N) = c) ∧ s 1 = 1 := by
+theorem exists_continuous_section (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G))
+    : ∃ s : G ⧸ N → G, Continuous s ∧ (∀ c, (s c : G ⧸ N) = c) ∧ s 1 = 1 := by
   have : IsClosed (N : Set G) := hN
   have : T2Space (G ⧸ N) := inferInstance
   obtain ⟨T, hTc, hex, huniq⟩ := exists_closed_transversal N hN
@@ -204,18 +222,24 @@ theorem exists_continuous_section (N : Subgroup G) [N.Normal] (hN : IsClosed (N 
     obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective c
     obtain ⟨t, ht, htx⟩ := hex x
     exact ⟨⟨t, ht⟩, htx⟩
-  let e : T ≃ₜ G ⧸ N := (QuotientGroup.continuous_mk.comp continuous_subtype_val :
-    Continuous f).homeoOfEquivCompactToT2 (f := Equiv.ofBijective f hf)
+  let e : T ≃ₜ G ⧸ N :=
+    (QuotientGroup.continuous_mk.comp continuous_subtype_val : Continuous f).homeoOfEquivCompactToT2
+      (f := Equiv.ofBijective f hf)
   let s₀ : G ⧸ N → G := fun c => (e.symm c : G)
   have hs₀ : ∀ c, (s₀ c : G ⧸ N) = c := fun c => e.apply_symm_apply c
   have h1 : s₀ 1 ∈ N := by
     have := hs₀ 1
     rw [← QuotientGroup.mk_one, QuotientGroup.eq] at this
     simpa using this
-  refine ⟨fun c => s₀ c * (s₀ 1)⁻¹,
-    (continuous_subtype_val.comp e.symm.continuous).mul continuous_const, fun c => ?_, ?_⟩
-  · calc ((s₀ c * (s₀ 1)⁻¹ : G) : G ⧸ N) = (s₀ c : G ⧸ N) :=
-          QuotientGroup.eq.mpr (by convert h1 using 1; group)
+  refine ⟨
+    fun c => s₀ c * (s₀ 1)⁻¹,
+    (continuous_subtype_val.comp e.symm.continuous).mul continuous_const,
+    fun c => ?_,
+    ?_
+  ⟩
+  · calc
+      ((s₀ c * (s₀ 1)⁻¹ : G) : G ⧸ N)
+        = (s₀ c : G ⧸ N) := QuotientGroup.eq.mpr (by convert h1 using 1; group)
       _ = c := hs₀ c
   · exact mul_inv_cancel _
 

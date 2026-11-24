@@ -195,7 +195,7 @@ theorem afsplit_inj
     intro z i
     induction z using TensorProduct.induction_on with
     | zero => simp
-    | tmul m n => simp [TensorProduct.equivFinsuppOfBasisLeft_apply_tmul_apply]
+    | tmul m n => simp
     | add x y hx hy => simp [hx, hy]
   apply (TensorProduct.equivFinsuppOfBasisLeft (N := (FiniteAdeleRing (𝓞 F) F)) b).injective
   rw [map_zero]

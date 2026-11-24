@@ -303,8 +303,6 @@ attribute [local instance]
   Formalism.BasicNotions.Host.cmStar Formalism.IndefR.principalLevelFrame.instCMHostI
   GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
-
 def Low (D : D7) (Sb : Finset (PlE D.host)) : Prop :=
   ∀ P : PlE D.host, ((2 * (D.host.g 0 * D.host.g 1) : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → P ∈ Sb
 

@@ -231,8 +231,9 @@ theorem GlobalTheory.ProdLength.prod₂_hasFiniteLength
         IsSmooth σ → σ.IsIrreducible
           → ∀ φ : Y →ₗ[ℂ] Y,
             (∀ g x, φ (σ g x) = σ g (φ x)) → ∃ c : ℂ, φ = c • LinearMap.id := fun n Y _ _ σ hs hi =>
-    GlobalTheory.SchurAdm.schur_admissible _ (KO k (Fin n)) GlobalTheory.SplitFlip.isOpen_KO
-      GlobalTheory.SplitFlip.isCompact_KO Y σ hi (hAdm (Fin n) Y σ hs hi)
+    _root_.GlobalTheory.SchurAdmissibility.schur_admissible _ (KO k (Fin n))
+      GlobalTheory.SplitFlip.isOpen_KO GlobalTheory.SplitFlip.isCompact_KO Y σ hi
+      (hAdm (Fin n) Y σ hs hi)
   have hT : HasFiniteLength (extTensor π₁ π₂) :=
     GlobalTheory.ProdLength.hasFiniteLength_extTensor_left π₁ π₂ h₁ fun Y _ _ σ hσ hsq =>
       GlobalTheory.ProdLength.hasFiniteLength_extTensor_right σ π₂ h₂ fun Z _ _ τ hτ hsq' =>

@@ -101,7 +101,6 @@ theorem commute_cap_lieS (τ : E →+* ℂ) (u : ℂ) (i j : Fin a) (x : Cinf E)
 
 theorem commute_cap_lie (τ : E →+* ℂ) (u : ℂ) (X : Lie E a) : Commute (cap τ u) (lie E a X) := by
   have hX : lie E a X = ∑ i, ∑ j, lieS E a i j (X i j) := by
-
     simp only [lieS_apply, ← map_sum]
     exact congrArg _ (Matrix.matrix_eq_sum_single (Matrix.of X))
   rw [hX]

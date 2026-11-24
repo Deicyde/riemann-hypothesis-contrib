@@ -2,7 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolyRep
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ConjugateNeSelf
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvalUnitaryCoordinateZeroOfRationalPointsStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvalUnitaryCoordinateZeroOfRationalPoints
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -184,7 +184,7 @@ theorem evM_mul
     intro γ₀ h₀ Y hY
     ext i j
     have e :=
-      GlobalTheory.T.eval_unitaryCoordinate_zero_of_rational_points L n
+      _root_.GlobalTheory.UDense.eval_eq_zero_of_rat L n
         (MvPolynomial.bind₁ (substL (ratPt (γ₀ : Matrix (Fin n) (Fin n) L))) (P i j)
           - ∑ m, MvPolynomial.C (evM P (upt (ratPt (γ₀ : Matrix (Fin n) (Fin n) L))) i m) * P m j)
         (fun γ₁ h₁ => by rw [defectL_eval, hrat γ₀ h₀ γ₁ h₁, sub_self])
@@ -194,7 +194,7 @@ theorem evM_mul
   refine ⟨h1, fun X Y hX hY => ?_⟩
   ext i j
   have e :=
-    GlobalTheory.T.eval_unitaryCoordinate_zero_of_rational_points L n
+    _root_.GlobalTheory.UDense.eval_eq_zero_of_rat L n
       (MvPolynomial.bind₁ (substR Y) (P i j) - ∑ m, P i m * MvPolynomial.C (evM P (upt Y) m j))
       (fun γ₀ h₀ => by rw [defectR_eval, hL γ₀ h₀ Y hY, sub_self])
       X hX

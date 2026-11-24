@@ -52,6 +52,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
   GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.conjIntertwiner_pointValue_sobolevContinuous
     : GlobalTheory.Published.DiscreteSeriesClassification
       → ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
@@ -75,7 +76,4 @@ theorem _root_.GlobalTheory.T.conjIntertwiner_pointValue_sobolevContinuous
                   ∧ ∀ w : M.sm τ,
                     ℓ w
                       = GlobalTheory.ConjRowMult.conjMap X M c Φ h t (Function.update v τ w) x := by
-  first
-  | exact @GlobalTheory.ConjRowCont.conjMap_cont
-  | exact GlobalTheory.ConjRowCont.conjMap_cont
-  | (intros; apply GlobalTheory.ConjRowCont.conjMap_cont <;> assumption)
+  first | exact @GlobalTheory.ConjRowCont.conjMap_cont

@@ -64,8 +64,6 @@ open GlobalTheory.DownLift.SplitCoef
 
 noncomputable section
 
-
-
 namespace GlobalTheory.DownLift.SplitCoef
 
 variable {D : D7}

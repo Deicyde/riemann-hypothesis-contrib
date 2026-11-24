@@ -48,7 +48,6 @@ import Mathlib.Tactic.TypeStar
 
 set_option backward.isDefEq.respectTransparency false
 
-
 noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC TensorProduct

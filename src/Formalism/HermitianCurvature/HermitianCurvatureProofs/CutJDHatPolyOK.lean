@@ -56,17 +56,24 @@ noncomputable section
 
 open scoped ContDiff
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+  Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem jdh_ckOn_of_contDiff {k r : ℕ} {E' : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] {f : B.Mat k r → E'}
-    (hf : ContDiff ℝ ∞ f) (UU : Set (B.Mat k r)) : B.CkOn ⊤ UU f :=
-  fun _ _ => ⟨Set.univ, f, isOpen_univ, trivial, hf.contDiffOn, fun _ _ _ => rfl⟩
+theorem jdh_ckOn_of_contDiff
+    {k r : ℕ} {E' : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E']
+    {f : B.Mat k r → E'} (hf : ContDiff ℝ ∞ f)
+    (UU : Set (B.Mat k r))
+    : B.CkOn ⊤ UU f := fun _ _ =>
+  ⟨Set.univ, f, isOpen_univ, trivial, hf.contDiffOn, fun _ _ _ => rfl⟩
 
-theorem jdh_opOrder_le {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (o : ℕ) (Θ : B.DiffOp k r Wp Wq)
-    (h : ∀ Tm ∈ Θ, Tm.word.length ≤ o) : B.opOrder Θ ≤ o := by
+theorem jdh_opOrder_le
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    (o : ℕ) (Θ : B.DiffOp k r Wp Wq) (h : ∀ Tm ∈ Θ, Tm.word.length ≤ o)
+    : B.opOrder Θ ≤ o := by
   unfold B.opOrder
   induction Θ with
   | nil => simp
@@ -74,8 +81,8 @@ theorem jdh_opOrder_le {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [Inner
     simp only [List.map_cons, List.foldr_cons]
     exact max_le (h T (List.mem_cons_self ..)) (ih fun Tm hTm => h Tm (List.mem_cons_of_mem _ hTm))
 
-theorem jdh_pd_star {N κ : ℕ} {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : U.IsPolyDeg κ P) :
-    U.IsPolyDeg κ (fun g => star (P g)) := by
+theorem jdh_pd_star {N κ : ℕ} {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : U.IsPolyDeg κ P)
+    : U.IsPolyDeg κ (fun g => star (P g)) := by
   obtain ⟨q, hq, he⟩ := h
   refine ⟨MvPolynomial.rename Sum.swap (MvPolynomial.map (starRingEnd ℂ) q), ?_, fun g => ?_⟩
   · refine (MvPolynomial.totalDegree_rename_le _ _).trans (le_trans ?_ hq)

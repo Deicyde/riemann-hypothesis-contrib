@@ -280,11 +280,7 @@ theorem bw_mulVec {c : Fin (2 * r + k + 1)} (hc : ¬ bl k r c) (h : Matrix (Fin 
 theorem mem_UW {h : Matrix (Fin k) (Fin k) ℂ} (hu : h ∈ Matrix.unitaryGroup (Fin k) ℂ)
     : Formalism.MainNotions.S.blockW k r h ∈ UWset k r (z0 k r) := by
   have hs : hᴴ * h = 1 := by
-    have hs' : star h * h = 1 := by
-      first
-      | exact Matrix.mem_unitaryGroup_iff'.mp hu
-      | exact Unitary.star_mul_self_of_mem hu
-      | exact hu.1
+    have hs' : star h * h = 1 := by first | exact Matrix.mem_unitaryGroup_iff'.mp hu
     rwa [Matrix.star_eq_conjTranspose] at hs'
   simp only [Formalism.QuantumDeterminants.UWset, Set.mem_setOf_eq]
   refine ⟨?_, fun a => ⟨?_, ?_⟩, ?_⟩

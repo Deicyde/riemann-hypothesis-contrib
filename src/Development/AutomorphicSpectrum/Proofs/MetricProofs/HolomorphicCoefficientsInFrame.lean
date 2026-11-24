@@ -62,18 +62,21 @@ set_option backward.isDefEq.respectTransparency false
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict.Chart
 
-theorem differentiableOn_coeff_of_linearIndependent (n m g : ℕ) (U : Set (Fin n → ℂ))
-    (d : Fin m → (Fin n → ℂ) → Fin g → ℂ) (x : (Fin n → ℂ) → Fin g → ℂ)
-    (w : (Fin n → ℂ) → Fin m → ℂ) (hU : IsOpen U)
-    (hd : ∀ b, DifferentiableOn ℂ (d b) U) (hx : DifferentiableOn ℂ x U)
-    (hli : ∀ t ∈ U, LinearIndependent ℂ (fun b => d b t))
-    (hw : ∀ t ∈ U, x t = ∑ b, w t b • d b t) : DifferentiableOn ℂ w U := by
+theorem differentiableOn_coeff_of_linearIndependent
+    (n m g : ℕ) (U : Set (Fin n → ℂ)) (d : Fin m → (Fin n → ℂ) → Fin g → ℂ)
+    (x : (Fin n → ℂ) → Fin g → ℂ) (w : (Fin n → ℂ) → Fin m → ℂ)
+    (hU : IsOpen U) (hd : ∀ b, DifferentiableOn ℂ (d b) U) (hx : DifferentiableOn ℂ x U)
+    (hli : ∀ t ∈ U, LinearIndependent ℂ (fun b => d b t)) (hw : ∀ t ∈ U, x t = ∑ b, w t b • d b t)
+    : DifferentiableOn ℂ w U := by
   intro t₀ ht₀
   apply DifferentiableAt.differentiableWithinAt
   have hUn : U ∈ 𝓝 t₀ := hU.mem_nhds ht₀
@@ -82,8 +85,9 @@ theorem differentiableOn_coeff_of_linearIndependent (n m g : ℕ) (U : Set (Fin 
   have hφ : LinearMap.ker φ = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro v hv
-    have h0 := Fintype.linearIndependent_iff.1 (hli t₀ ht₀) v
-      (by simpa [φ, Fintype.linearCombination_apply] using hv)
+    have h0 :=
+      Fintype.linearIndependent_iff.1 (hli t₀ ht₀) v
+        (by simpa [φ, Fintype.linearCombination_apply] using hv)
     exact funext h0
   obtain ⟨L0, hL0⟩ := φ.exists_leftInverse_of_injective hφ
   let L : (Fin g → ℂ) →L[ℂ] (Fin m → ℂ) := LinearMap.toContinuousLinearMap L0
@@ -107,11 +111,15 @@ theorem differentiableOn_coeff_of_linearIndependent (n m g : ℕ) (U : Set (Fin 
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
   have hTd : DifferentiableAt ℂ T t₀ := by
-    have hb : ∀ b ∈ (Finset.univ : Finset (Fin m)), DifferentiableAt ℂ (fun t =>
-        (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin m => ℂ) b).smulRight (L (d b t))) t₀ := by
+    have hb
+        : ∀ b ∈ (Finset.univ : Finset (Fin m)),
+          DifferentiableAt ℂ
+            (fun t =>
+              (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin m => ℂ) b).smulRight (L (d b t)))
+            t₀ := by
       intro b _
       exact (StrongDual.smulRightL ℂ (Fin m → ℂ) (Fin m → ℂ)
-        (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin m => ℂ) b)).differentiableAt.comp t₀
+          (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin m => ℂ) b)).differentiableAt.comp t₀
         (L.differentiableAt.comp t₀ ((hd b).differentiableAt hUn))
     exact DifferentiableAt.fun_sum hb
   have hTu : ∀ᶠ t in 𝓝 t₀, IsUnit (T t) := by
@@ -124,7 +132,6 @@ theorem differentiableOn_coeff_of_linearIndependent (n m g : ℕ) (U : Set (Fin 
     filter_upwards [hTu, hUn] with t hu ht
     obtain ⟨u, hu'⟩ := hu
     have h1 : L (x t) = T t (w t) := by
-
       rw [hw t ht, hTapply, map_sum]
       simp
     rw [h1, ← hu', Ring.inverse_unit, ← ContinuousLinearMap.mul_apply, u.inv_mul]

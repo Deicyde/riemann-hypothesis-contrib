@@ -111,8 +111,7 @@ theorem Rd_sum
     : Rd X (fun x => ∑ j, φ j x • b j) g = ∑ j, Rd X (φ j) g • b j := by
   have h : HasFDerivAt (fun x => ∑ j, φ j x • b j) (∑ j, (fderiv ℝ (φ j) g).smulRight (b j)) g :=
     HasFDerivAt.fun_sum fun j _ => (hd j).hasFDerivAt.smul_const (b j)
-  simp only [Rd, h.fderiv, ContinuousLinearMap.sum_apply, Finset.sum_apply,
-    ContinuousLinearMap.smulRight_apply]
+  simp only [Rd, h.fderiv, ContinuousLinearMap.sum_apply, ContinuousLinearMap.smulRight_apply]
 
 theorem Eu_sum
     {ι : Type} [Fintype ι]

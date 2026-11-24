@@ -51,9 +51,6 @@ open NumberField
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 namespace GlobalTheory.IwaPlace.SDBound
 
 variable {D : D7}

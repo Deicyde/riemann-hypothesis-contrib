@@ -52,17 +52,17 @@ open Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.MixModel MeasureTheo
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 public noncomputable abbrev source
-    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D T.rank ρ)) (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ)
-    : WO S₀ T → ℂ := fun w₀ =>
-  ∫ a in 𝓕, heisO ψ S T (a * d.pY)
+    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D)
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D T.rank ρ))
+    (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ) : WO S₀ T → ℂ :=
+  fun w₀ => ∫ a in 𝓕, heisO ψ S T (a * d.pY)
     (heisO ψ S T (x * d.pX) (heisO ψ S T (w₀ * d.p0) f)) 0 ∂μ
 
 public noncomputable abbrev target
-    {D : D7} {T T₀ : HSp D} {ρ : ℕ} (d : HypDec T T₀ ρ) (S : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D ρ S.rank)) (𝓕 : Set (Mx D ρ S.rank)) (f : WO S T → ℂ) (y : Mx D S.rank ρ)
-    : WO S T₀ → ℂ := fun w₀ =>
-  ∫ ξ in 𝓕, heisO ψ S T (d.jX * ξ)
+    {D : D7} {T T₀ : HSp D} {ρ : ℕ} (d : HypDec T T₀ ρ) (S : HSp D)
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D ρ S.rank))
+    (𝓕 : Set (Mx D ρ S.rank)) (f : WO S T → ℂ) (y : Mx D S.rank ρ) : WO S T₀ → ℂ :=
+  fun w₀ => ∫ ξ in 𝓕, heisO ψ S T (d.jX * ξ)
     (heisO ψ S T (d.jY * (incA D (-D.host.xi0⁻¹) • (adj y * gA S)))
       (heisO ψ S T (d.j0 * w₀) f)) 0 ∂μ
 
@@ -70,12 +70,8 @@ end I195MixedCoordinates_6e87f5aea1eb7b4a07c1c83e
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
-  IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
-  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
@@ -84,27 +80,18 @@ noncomputable section
 
 namespace GlobalTheory.FlatSup
 
-theorem lintegral_le_of_tsum
-    {G : Type}
-    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
-    (Γ : Subgroup G) [Countable Γ]
-    (ν : Measure G) [ν.IsMulLeftInvariant]
-    {𝓤 : Set G} (h : IsFundamentalDomain Γ 𝓤 ν) (h1 : ν 𝓤 = 1)
-    (f : G → ENNReal) (hf : Measurable f)
-    (B : ENNReal) (hB : ∀ u, ∑' γ : Γ, f (γ.1 * u) ≤ B)
-    : ∫⁻ u, f u ∂ν ≤ B := by
+theorem lintegral_le_of_tsum {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (Γ : Subgroup G) [Countable Γ] (ν : Measure G) [ν.IsMulLeftInvariant] {𝓤 : Set G} (h : IsFundamentalDomain Γ 𝓤 ν)
+    (h1 : ν 𝓤 = 1) (f : G → ENNReal) (hf : Measurable f) (B : ENNReal) (hB : ∀ u, ∑' γ : Γ, f (γ.1 * u) ≤ B) :
+    ∫⁻ u, f u ∂ν ≤ B := by
   rw [h.lintegral_eq_tsum'' f, ← lintegral_tsum]
-  · calc
-      _ ≤ ∫⁻ _ in 𝓤, B ∂ν := lintegral_mono fun u => hB u
+  · calc _ ≤ ∫⁻ _ in 𝓤, B ∂ν := lintegral_mono fun u => hB u
       _ = B := by rw [setLIntegral_const, h1, mul_one]
   · exact fun γ => (hf.comp (measurable_const_mul γ.1)).aemeasurable
 
-theorem rat_cancel
-    {D : D7} {m ρ : ℕ} {x : Matrix (Fin m) (Fin ρ) D.host.E}
-    (hx : LinearIndependent D.host.E x.transpose)
+theorem rat_cancel {D : D7} {m ρ : ℕ} {x : Matrix (Fin m) (Fin ρ) D.host.E} (hx : LinearIndependent D.host.E x.transpose)
     {a b : Mx D ρ ρ} (ha : a ∈ ratMx D ρ ρ) (hb : b ∈ ratMx D ρ ρ)
-    (h : (rat x : Mx D m ρ) ⬝ a = (rat x : Mx D m ρ) ⬝ b)
-    : a = b := by
+    (h : (rat x : Mx D m ρ) ⬝ a = (rat x : Mx D m ρ) ⬝ b) : a = b := by
   obtain ⟨a, rfl⟩ := mem_ratMx.1 ha
   obtain ⟨b, rfl⟩ := mem_ratMx.1 hb
   rw [← rat_mul, ← rat_mul] at h
@@ -174,33 +161,18 @@ theorem uni_bound (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V V₀ W W₀ : HSp
           mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hx0 hx1 _) hC₀0
       _ = _ := by rw [mul_pow, mul_assoc]
 
-theorem sfinite_haar
-    {G : Type} [Group G] [TopologicalSpace G] [MeasurableSpace G] [LocallyCompactSpace G]
-    [SecondCountableTopology G]
-    (ν : Measure G) [ν.IsHaarMeasure]
-    : SFinite ν :=
-  inferInstance
+theorem sfinite_haar {G : Type} [Group G] [TopologicalSpace G] [MeasurableSpace G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] (ν : Measure G) [ν.IsHaarMeasure] : SFinite ν := inferInstance
 
-theorem sfinite_fin {G : Type} [MeasurableSpace G] (ν : Measure G) [IsFiniteMeasure ν]
-    : SFinite ν :=
-  inferInstance
+theorem sfinite_fin {G : Type} [MeasurableSpace G] (ν : Measure G) [IsFiniteMeasure ν] : SFinite ν := inferInstance
 
-theorem flat_sup_growth
-    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V V₀ W W₀ : HSp D) (ρ σ : ℕ) (dV : HypDec V V₀ ρ)
-        (dW : HypDec W W₀ σ) (s : Step ψ V V₀ W W₀ ρ σ) (x : Matrix (Fin W.rank) (Fin ρ) D.host.E),
-      LinearIndependent D.host.E x.transpose
-        → ∀ Φ,
-          IsThetaFunO ψ V W Φ
-            → ∃ (C : ℝ) (A : ℕ), ∀ g h y w,
-              ‖flatS dV dW s (rat x) y (s.om (g, h) Φ) w‖ ≤ C * (height V g * height W h) ^ A := by
+theorem flat_sup_growth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V V₀ W W₀ : HSp D) (ρ σ : ℕ) (dV : HypDec V V₀ ρ) (dW : HypDec W W₀ σ) (s : Step ψ V V₀ W W₀ ρ σ) (x : Matrix (Fin W.rank) (Fin ρ) D.host.E), LinearIndependent D.host.E x.transpose → ∀ Φ, IsThetaFunO ψ V W Φ → ∃ (C : ℝ) (A : ℕ), ∀ g h y w, ‖flatS dV dW s (rat x) y (s.om (g, h) Φ) w‖ ≤ C * (height V g * height W h) ^ A := by
   intro D ψ V V₀ W W₀ ρ σ dV dW s x hx Φ hΦ
   obtain ⟨C, A, hC0, hC⟩ := uni_bound D ψ V V₀ W W₀ ρ σ dV dW s x hx Φ hΦ
   refine ⟨C, A, fun g h y w => ?_⟩
   have hn : ∀ a, ‖ψ a‖ = 1 := s.weil.std.1.2.1
   have hne : ∀ a, ‖ψ a‖ₑ = 1 := fun a => by rw [← ofReal_norm, hn, ENNReal.ofReal_one]
-  have hmix :=
-    (GlobalTheory.T.weilMixedCoordinates_continuous_bounded_supNorm D ψ V V₀ W W₀ ρ σ dV dW s.vS
-      s.vT s.χV s.χW s.om s.weil Φ hΦ).1
+  have hmix := (GlobalTheory.T.weilMixedCoordinates_continuous_bounded_supNorm D ψ V V₀ W W₀ ρ σ dV dW s.vS s.vT s.χV s.χW s.om s.weil Φ hΦ).1
   have hT := s.vT.covol
   obtain ⟨i1, i2, i3⟩ := GlobalTheory.UnitU.topology D ρ
   obtain ⟨j1, j2, j3, j4, -⟩ := lattice_Mx D σ V₀.rank
@@ -212,27 +184,19 @@ theorem flat_sup_growth
   haveI := sfinite_fin (s.vT.μ.restrict s.vT.𝓕)
   let F : UX D ρ → Mx D σ V₀.rank → ENNReal := fun u ξ =>
     ‖dV.mixS W ψ s.vS.μ s.vS.𝓕 (s.om (g, h) Φ) ((rat x : Mx D W.rank ρ) ⬝ u.1.1) (dW.incX V₀ ξ + dW.incAdj V₀ y + dW.inc0 V₀ w)‖ₑ
-  have hval : Continuous fun u : UX D ρ => (u.1.1 : Mx D ρ ρ) :=
-    Units.continuous_val.comp continuous_subtype_val
-  have hxu : Continuous fun u : UX D ρ => (rat x : Mx D W.rank ρ) ⬝ u.1.1 :=
-    continuous_const.matrix_mul hval
+  have hval : Continuous fun u : UX D ρ => (u.1.1 : Mx D ρ ρ) := Units.continuous_val.comp continuous_subtype_val
+  have hxu : Continuous fun u : UX D ρ => (rat x : Mx D W.rank ρ) ⬝ u.1.1 := continuous_const.matrix_mul hval
   have hX : Continuous (dW.incX V₀) := continuous_const.matrix_mul continuous_id
   have hFm : Measurable (Function.uncurry F) := by
-    have hf : Continuous fun p : UX D ρ × Mx D σ V₀.rank =>
-        ((
-           (g, h),
-           ((rat x : Mx D W.rank ρ) ⬝ p.1.1.1, dW.incX V₀ p.2 + dW.incAdj V₀ y + dW.inc0 V₀ w)
-         )
-          : (GA D V × GA D W) × Mx D W.rank ρ × WO V₀ W) :=
+    have hf : Continuous fun p : UX D ρ × Mx D σ V₀.rank => (((g, h), ((rat x : Mx D W.rank ρ) ⬝ p.1.1.1,
+        dW.incX V₀ p.2 + dW.incAdj V₀ y + dW.inc0 V₀ w)) : (GA D V × GA D W) × Mx D W.rank ρ × WO V₀ W) :=
       continuous_const.prodMk ((hxu.comp continuous_fst).prodMk
         (((hX.comp continuous_snd).add continuous_const).add continuous_const))
     have h2 := hmix.comp hf
     simp only [Function.comp_def] at h2
     exact h2.enorm.measurable
-  have h1
-      : ∀ u : UX D ρ,
-        ‖flatFun ψ dV dW s.vS.μ s.vS.𝓕 s.vT.μ s.vT.𝓕 (rat x) y (s.om (g, h) Φ) w u‖ₑ
-          ≤ ∫⁻ ξ in s.vT.𝓕, F u ξ ∂s.vT.μ := by
+  have h1 : ∀ u : UX D ρ, ‖flatFun ψ dV dW s.vS.μ s.vS.𝓕 s.vT.μ s.vT.𝓕 (rat x) y (s.om (g, h) Φ) w u‖ₑ ≤
+      ∫⁻ ξ in s.vT.𝓕, F u ξ ∂s.vT.μ := by
     intro u
     unfold flatFun evalAt
     have e1 : ‖star (psiUni ψ u.1)‖ₑ = 1 := by
@@ -241,22 +205,17 @@ theorem flat_sup_growth
     unfold _root_.I195MixedCoordinates_14b5fd3aa93c7f4842f1a892.target
     refine (enorm_integral_le_lintegral_enorm _).trans (lintegral_mono fun ξ => le_of_eq ?_)
     simp only [F]
-    change
-      ‖heisO ψ V₀ W (dW.incX V₀ ξ) (heisO ψ V₀ W (dW.incAdj V₀ y) (heisO ψ V₀ W (dW.inc0 V₀ w) (dV.mixS W ψ s.vS.μ s.vS.𝓕 (s.om (g, h) Φ) ((rat x : Mx D W.rank ρ) ⬝ u.1.1)))) 0‖ₑ
-        = _
+    change ‖heisO ψ V₀ W (dW.incX V₀ ξ) (heisO ψ V₀ W (dW.incAdj V₀ y) (heisO ψ V₀ W (dW.inc0 V₀ w) (dV.mixS W ψ s.vS.μ s.vS.𝓕 (s.om (g, h) Φ) ((rat x : Mx D W.rank ρ) ⬝ u.1.1)))) 0‖ₑ = _
     rw [dW.integrandT_eq, enorm_mul, hne, one_mul]
-  have h2
-      : ‖flatS dV dW s (rat x) y (s.om (g, h) Φ) w‖ₑ
-        ≤ ENNReal.ofReal (C * (height V g * height W h) ^ A) := by
+  have h2 : ‖flatS dV dW s (rat x) y (s.om (g, h) Φ) w‖ₑ ≤ ENNReal.ofReal (C * (height V g * height W h) ^ A) := by
     unfold flatS flatAt
     refine (enorm_integral_le_lintegral_enorm _).trans ((lintegral_mono h1).trans ?_)
     rw [lintegral_lintegral_swap hFm.aemeasurable]
-    calc
-      _ ≤ ∫⁻ _ in s.vT.𝓕, ENNReal.ofReal (C * (height V g * height W h) ^ A) ∂s.vT.μ :=
-        lintegral_mono fun ξ => hC g h _
+    calc _ ≤ ∫⁻ _ in s.vT.𝓕, ENNReal.ofReal (C * (height V g * height W h) ^ A) ∂s.vT.μ :=
+          lintegral_mono fun ξ => hC g h _
       _ = _ := by rw [setLIntegral_const, hT.2.2, mul_one]
   rw [← ofReal_norm] at h2
-  exact (ENNReal.ofReal_le_ofReal_iff (mul_nonneg hC0
-    (pow_nonneg (mul_nonneg (height_pos V g).le (height_pos W h).le) _))).1 h2
+  exact (ENNReal.ofReal_le_ofReal_iff (mul_nonneg hC0 (pow_nonneg
+    (mul_nonneg (height_pos V g).le (height_pos W h).le) _))).1 h2
 
 end GlobalTheory.FlatSup

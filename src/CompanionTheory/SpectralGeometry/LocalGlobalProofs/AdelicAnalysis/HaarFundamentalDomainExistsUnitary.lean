@@ -2,7 +2,8 @@ module
 
 public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountable
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompactStatement
+public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompact
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ArithmeticUnitaryGroupDiscrete
 public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExistsStrictMeasurableFundamentalSetOfDiscrete
 import Mathlib.Algebra.Order.Floor.Extended
@@ -75,7 +76,7 @@ theorem haar_fundamental_exist
   haveI := hsc
   haveI := ht2
   obtain ⟨htg, hlcH, hscH, ht2H, hbH, -⟩ :=
-    GlobalTheory.T.adelic_unitary_group_locally_compact F E σ hσ M J hJ (AF F)
+    _root_.GlobalTheory.CompanionTheory.SW.TopH.topH_props F E σ hσ M J hJ (AF F)
   haveI := htg
   haveI := hlcH
   haveI := hscH

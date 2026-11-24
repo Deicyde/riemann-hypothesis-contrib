@@ -118,10 +118,7 @@ private theorem appr_den_lemma_2 (k : F) (hk : v.valuation F k ≤ 1)
     (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 F) F)).mpr hd0
   have hB : ∀ r : 𝓞 F, v.valuation F (algebraMap (𝓞 F) F r) = v.intValuation r := by
     intro r
-    first
-    | exact HeightOneSpectrum.valuation_of_algebraMap v r
-    | exact v.valuation_of_algebraMap r
-    | simp
+    first | exact HeightOneSpectrum.valuation_of_algebraMap v r
   have hιd0 : v.intValuation d ≠ 0 := by
     rw [← hB]
     exact (Valuation.ne_zero_iff _).mpr hdF

@@ -151,7 +151,7 @@ theorem block_step
     have := ha k
     by_cases hk : k = b
     · subst hk; simp; omega
-    · simp [Pi.single_apply, hk]
+    · simp [hk]
   have hstep :=
     lg_step hWm hs (q := W)
       (fun g => ⟨fun h => W.mul_mem_right _ h, fun h => (hWp.mem_or_mem h).resolve_right hi⟩)

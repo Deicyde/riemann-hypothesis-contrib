@@ -65,9 +65,6 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem mem_orth_iff' {U : Submodule E S.V} {v : S.V} : v ∈ orth S U ↔ ∀ x ∈ U, S.hT x v = 0 := by
-  simp [orth, Submodule.mem_iInf]
-
 theorem frame_mapLF
     {T : E} {γ : S.V ≃ₗ[E] S.V}
     (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : LFlag S r T)
@@ -159,7 +156,7 @@ theorem conj_nlam_top
   · intro x hx
     have hXs := Xsp_mapLF hγ G
     have hy : γ.symm x ∈ orth (VS D) (Xsp G) := by
-      rw [mem_orth_iff'] at hx ⊢
+      rw [_root_.Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth] at hx ⊢
       intro w hw
       have h1 := hx (γ w) (by rw [hXs]; exact Submodule.mem_map_of_mem hw)
       have h2 := hγ w (γ.symm x)
@@ -245,7 +242,7 @@ theorem nml_eq
       ?_
     ⟩
     rw [h]
-    simp only [mul_assoc, inv_mul_cancel_left]
+    simp only [mul_assoc]
   · rintro ⟨a, ha, b, hb, rfl⟩
     refine ⟨
       a * n,
@@ -295,7 +292,7 @@ theorem pt_eq
     (hrl : t.relevant ↔ t₀.relevant) (hat : ∀ w, t.toTerm.atPt w ↔ t₀.toTerm.atPt w)
     : Formalism.L2.SG.PairVal.ptOf t.toTerm = Formalism.L2.SG.PairVal.ptOf t₀.toTerm := by
   have hCP :=
-    Formalism.L2.SG.Pf.cell_point_unique_of_term_fun (Formalism.L2.SG.Closed.TermFun_holds D u u')
+    Formalism.L2.SG.Pf.cell_point_unique_of_term_fun (_root_.term_function_const D u u')
       (Y.rowsOK u)
   by_cases hx : ∃ w, t₀.toTerm.atPt w ∧ t₀.toTerm.relevant
   · have hx' : ∃ w, t.toTerm.atPt w ∧ t.toTerm.relevant := by

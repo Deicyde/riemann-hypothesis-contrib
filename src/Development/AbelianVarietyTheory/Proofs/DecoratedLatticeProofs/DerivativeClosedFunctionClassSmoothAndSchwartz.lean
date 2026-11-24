@@ -3,7 +3,9 @@ module
 public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HasFDerivAtOfContinuousCoordinatePartialsStatement
+public import Mathlib.Analysis.Calculus.Deriv.Basic
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HasFDerivAtOfContinuousCoordinatePartials
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SobolevBoundedThetaFormMatrixCoeffSmooth
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -77,7 +79,7 @@ theorem smooth_schwartz
     intro φ hφ
     funext x
     have h :=
-      GlobalTheory.T.hasFDerivAt_of_continuous_coordinate_partials k φ
+      _root_.GlobalTheory.hasFDerivAt_of_continuous_coordinate_line_derivs k φ
         (fun i => φ' φ hφ i)
         (fun i => hc _ (hφ' φ hφ i))
         (fun i t => hD φ hφ i t)

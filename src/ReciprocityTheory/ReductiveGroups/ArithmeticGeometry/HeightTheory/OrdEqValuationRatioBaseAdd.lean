@@ -46,6 +46,8 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.NormFactorizationClause
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.X4v4RatioSpec
 
 @[expose] public section
 
@@ -153,7 +155,7 @@ theorem eq_ratio_smul_of_mem
     have h1 := congrArg Subtype.val ha
     simp only [SetLike.val_smul] at h1
     exact h1.symm
-  rw [ratio_eq_of_eq_smul_field hg0 hfa]
+  rw [_root_.ReciprocityTheory.ChartRestriction.G.T0.Data.x4v4_ratio_spec hg0 hfa]
   exact hfa
 
 theorem ratio_ne_zero_of_ne_zero
@@ -184,12 +186,8 @@ theorem ratio_mul_ratio_height
     : ratio (Ω := Ω c) f e = ratio (Ω := Ω c) f g * ratio (Ω := Ω c) g e := by
   have h1 := d.eq_ratio_smul_of_mem hd c hf hg hg0
   have h2 := d.eq_ratio_smul_of_mem hd c hg he he0
-  apply ratio_eq_of_eq_smul_field he0
+  apply _root_.ReciprocityTheory.ChartRestriction.G.T0.Data.x4v4_ratio_spec he0
   rw [mul_smul, ← h2, ← h1]
-
-theorem coe_untopD_of_ne_top {v : WithTop ℤ} (hv : v ≠ ⊤) : ((v.untopD 0 : ℤ) : WithTop ℤ) = v := by
-  obtain ⟨x, rfl⟩ := WithTop.ne_top_iff_exists.1 hv
-  rw [WithTop.untopD_coe]
 
 theorem ordMinMax_eq_ratio_untop_sub
     (hd : d.AxH 𝒜)
@@ -211,7 +209,7 @@ theorem ordMinMax_eq_ratio_untop_sub
     have hne : v (ratio (Ω := Ω c) g (d.w (d.jc c) c)) ≠ ⊤ := by
       rw [Ne, AddValuation.top_iff]
       exact d.ratio_base_ne_zero hd c hg hg0
-    rw [← coe_untopD_of_ne_top hne, ← WithTop.coe_add] at h
+    rw [← _root_.ReciprocityTheory.ChartRestriction.G.T0.Data.untopD_eq hne, ← WithTop.coe_add] at h
     exact WithTop.coe_inj.1 h
   have hinf : (⨅ j : {j // d.w j c ≠ 0}, d.ord c v d.wL (d.w j c)) = d.ord c v d.wL (d.w j0 c) := by
     apply le_antisymm
@@ -223,9 +221,10 @@ theorem ordMinMax_eq_ratio_untop_sub
       have hne : v (ratio (Ω := Ω c) (d.w j.1 c) (d.w j0 c)) ≠ ⊤ := by
         rw [Ne, AddValuation.top_iff]
         exact d.ratio_ne_zero_of_ne_zero hd c (hd.w_mem j.1 c) (hd.w_mem j0 c) hj0 j.2
-      rw [← coe_untopD_of_ne_top hne, ← WithTop.coe_add] at h
+      rw [← _root_.ReciprocityTheory.ChartRestriction.G.T0.Data.untopD_eq hne, ← WithTop.coe_add]
+        at h
       have h' := WithTop.coe_inj.1 h
-      rw [← coe_untopD_of_ne_top hne] at hnn
+      rw [← _root_.ReciprocityTheory.ChartRestriction.G.T0.Data.untopD_eq hne] at hnn
       have h0 : 0 ≤ (v (ratio (Ω := Ω c) (d.w j.1 c) (d.w j0 c))).untopD 0 := by exact_mod_cast hnn
       omega
   unfold ordMM

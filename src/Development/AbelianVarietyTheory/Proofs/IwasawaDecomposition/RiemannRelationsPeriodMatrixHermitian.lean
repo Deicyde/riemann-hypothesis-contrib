@@ -48,6 +48,7 @@ import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsAd
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLatBasisZero
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
 import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -105,8 +106,7 @@ theorem GlobalTheory.riemann_relations_period_matrix
     ext j k
     have h := hFE j k
     rw [hF j, lin1] at h
-    simp only [hAr, Complex.im_sum, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im, mul_zero,
-        add_zero]
+    simp only [hAr, Complex.im_sum, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im, mul_zero]
       at h
     simpa [Matrix.mul_apply, Matrix.one_apply, Y] using h
   have hAY : a * Y = 1 := by

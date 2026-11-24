@@ -47,6 +47,7 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
   ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.AnPer
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.exists_small_chart_pair_along_linear_map
     : ∀ {I₁ : Type} [Fintype I₁] {g₁ : ℕ} {Λ₁ : Type} [AddCommGroup Λ₁] {F₁ : Fam I₁ g₁ Λ₁}
         {B₁ : Type} [CommRing B₁] {X₁ : Scheme.{0}} {s₁ : X₁ ⟶ Sp B₁} {σ₁ : B₁ →+* Hol F₁.V}
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.exists_small_chart_pair_along_linear_map
             ∧ (∀ k, ∃ U, IsAffineOpen U ∧ ∀ p ∈ K₂.W k, ⊤ ≤ u₂.E p ⁻¹ᵁ U)
             ∧ (∀ k, ∀ p ∈ K₁.W k, ((b p.1, M p.2) : Tot I₂ g₂) ∈ K₂.W (κ k))
             ∧ ∀ l k' k, K₁.le l k' k → K₂.le (A l) (κ k') (κ k) := by
-  first
-  | exact @GlobalTheory.AnPer.ChartPair.exists_pair
-  | exact GlobalTheory.AnPer.ChartPair.exists_pair
-  | (intros; apply GlobalTheory.AnPer.ChartPair.exists_pair <;> assumption)
+  first | exact @GlobalTheory.AnPer.ChartPair.exists_pair

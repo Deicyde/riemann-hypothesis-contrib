@@ -8,12 +8,14 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsStandardLocalMeasures
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdelesLocalRingTotallyReal
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilMeasureAddRankOneBlock
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilMeasureOfRankSmallOrZeroStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilMeasureOfRankSmallOrZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBoundUnitary
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanGramFibreMeasureFormulaStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EulerProductMeasureEventuallyStandardStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalGramFibreMeasureStandardVolumeStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SchwartzBruhatFiniteSumOfProductsStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanGramFibreMeasureFormula
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsUnitHermOfDet
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EulerProductMeasureEventuallyStandard
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalGramFibreMeasureStandardVolume
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SchwartzBruhatFiniteSumOfProducts
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.ModerateGrowthSchwartz
 import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
 import GroundTheory.AutomorphicForms.HermitianOrthogonal
 import Mathlib.Algebra.Order.Floor.Extended
@@ -51,7 +53,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.ModerateGrowthSchwartz
 import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitarySchrodingerModel.CoefDataExists
 import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.BigCellDefs
 
@@ -91,7 +92,7 @@ theorem thInt
     (hΦ : GlobalTheory.Published.SiegelOneVector.IsSchwartzBruhat (F := D.host.F) (E := D.host.E) Φ)
     : Integrable Φ (thM V μH 𝓕 T) := by
   classical
-  have hCM := GlobalTheory.DefiniteQuotient.cmExt D
+  have hCM := _root_.Formalism.MainNotions.UnusedSlot34.isCMExt_D D
   have hJ := GlobalTheory.DefiniteQuotient.gram_hermND V
   let b := Module.finBasis D.host.F D.host.E
   obtain ⟨laminf, hinf⟩ := GlobalTheory.CompanionTheory.SW.StdEx.exists_isStdInf D.host.F
@@ -108,14 +109,14 @@ theorem thInt
   have hEu : GlobalTheory.CompanionTheory.SW.IsEulerProd b (thM V μH 𝓕 T) 1
       (minf (hermOf (Ainf D.host.F) D.sp.cm.sig T hT))
       (fun v => m v (hermOf (Fv D.host.F v) D.sp.cm.sig T hT)) :=
-    GlobalTheory.T.siegel_weil_measure_of_rank_small_or_zero D.host.F D.host.E D.sp.cm.sig hCM r
+    _root_.GlobalTheory.CompanionTheory.SW.AllFrames.swMeas_all D.host.F D.host.E D.sp.cm.sig hCM r
       V.rank V.gram hJ (by omega) T hT hdet _ b laminf lam hinf hlam μH 𝓕 hμH h𝓕 minf m hminf hm
   obtain ⟨N, φ, A, S, hφ, hA, hAl, hsum⟩ :=
-    GlobalTheory.T.schwartz_bruhat_finite_sum_of_products D.host.F D.host.E D.sp.cm.sig hCM V.rank
-      V.gram hJ r hr _ b Φ hΦ
+    _root_.GlobalTheory.CompanionTheory.SiegelND.Coef.schwartzBruhat_eq_sum_pureTuples D.host.F
+      D.host.E D.sp.cm.sig hCM V.rank V.gram hJ r hr _ b Φ hΦ
   obtain ⟨S₁, hS₁⟩ :=
-    GlobalTheory.T.euler_product_measure_eventually_standard D.host.F D.host.E V.rank r _ b _ 1 _ _
-      hEu
+    _root_.GlobalTheory.CompanionTheory.SiegelND.Coef.Euler.integrable_integral_pureN D.host.F
+      D.host.E V.rank r _ b _ 1 _ _ hEu
   have hu
       : ∀ (R : Type) [CommRing R] [Algebra D.host.F R],
         IsUnit (HeckeCharacterZeroLocus.SiegelWeilU.hermOf R D.sp.cm.sig T hT).1.det := by
@@ -132,11 +133,11 @@ theorem thInt
           (thM V μH 𝓕 T) := by
     intro i
     obtain ⟨hφm, hφi, -⟩ :=
-      GlobalTheory.T.archimedean_gram_fibre_measure_formula D.host.F D.host.E D.sp.cm.sig hCM V.rank
-        V.gram hJ r hr _ b laminf hinf minf hminf _ (hu _) (φ i) (hφ i)
+      _root_.GlobalTheory.CompanionTheory.SiegelND.Coef.FibN.fibre_schwartzN D.host.F D.host.E
+        D.sp.cm.sig hCM V.rank V.gram hJ r hr _ b laminf hinf minf hminf _ (hu _) (φ i) (hφ i)
     have hfin := fun v =>
-      GlobalTheory.T.local_gram_fibre_measure_standard_volume D.host.F D.host.E D.sp.cm.sig hCM
-        V.rank V.gram hJ r hr _ b v (lam v) (hlam v) (m v) (hm v)
+      _root_.GlobalTheory.CompanionTheory.SiegelND.Coef.finV_compactOpenN D.host.F D.host.E
+        D.sp.cm.sig hCM V.rank V.gram hJ r hr _ b v (lam v) (hlam v) (m v) (hm v)
         (hermOf (Fv D.host.F v) D.sp.cm.sig T hT) (hu _) (A i v) (hA i v).1 (hA i v).2
     exact (hS₁ (S ∪ S₁) Finset.subset_union_right (φ i) hφm hφi.self_of_nhds (A i)
       (fun v => (hfin v).1)

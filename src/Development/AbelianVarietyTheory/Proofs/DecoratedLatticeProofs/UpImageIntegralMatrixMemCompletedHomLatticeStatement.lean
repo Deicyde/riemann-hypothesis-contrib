@@ -46,6 +46,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx
   GlobalTheory.SeeSaw GlobalTheory.LocMod
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.up_image_integral_matrix_mem_completed_hom_lattice
     : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
         [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k),
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.up_image_integral_matrix_mem_completed_hom_lattice
               (∀ r s, x r s ∈ 𝒪[k])
                 → (ofSplit q).up FS FT x ∈ latO S T (LS : Set (Fin S.rank → D.host.E))
                   (LT : Set (Fin T.rank → D.host.E)) (· = q.v) := by
-  first
-  | exact @GlobalTheory.UpMem.up_mem_latO
-  | exact GlobalTheory.UpMem.up_mem_latO
-  | (intros; apply GlobalTheory.UpMem.up_mem_latO <;> assumption)
+  first | exact @GlobalTheory.UpMem.up_mem_latO

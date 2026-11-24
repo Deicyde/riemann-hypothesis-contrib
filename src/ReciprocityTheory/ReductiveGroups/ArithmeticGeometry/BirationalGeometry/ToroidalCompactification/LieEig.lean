@@ -60,7 +60,7 @@ theorem isTan_comp {w : sp (R₀ := R) (DualNumber R) ⟶ G} (hw : IsTan w) (f :
     : IsTan (w ≫ f) := by
   unfold IsTan at hw ⊢
   rw [← Category.assoc, hw]
-  first | simp only [Hom.one_def, Category.assoc, IsMonHom.one_hom] | simp [Hom.one_def]
+  first | simp only [Hom.one_def, Category.assoc, IsMonHom.one_hom]
 
 variable {n : ℕ} {x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G} (hx : IsUnivChart G n x)
 
@@ -71,9 +71,7 @@ theorem isTan_tvec (c : Fin n → R) : IsTan (tvec (x := x) c) := isTan_dualLift
 
 private lemma sp_tangent_ext {w w' : sp (R₀ := R) (DualNumber R) ⟶ G} (hw : IsTan w) (hw' : IsTan w')
     (h : tcoord hx w hw = tcoord hx w' hw') : w = w' := by
-  calc w = spMap (dualLift (tcoord hx w hw)) ≫ x 1 := tcoord_spec hx w hw
-    _ = spMap (dualLift (tcoord hx w' hw')) ≫ x 1 := by rw [h]
-    _ = w' := (tcoord_spec hx w' hw').symm
+  rw [tcoord_spec hx w hw, h, ← tcoord_spec hx w' hw']
 
 theorem tcoord_tvec (c : Fin n → R) : tcoord hx (tvec (x := x) c) (isTan_tvec hx c) = c :=
   (exists_coord hx (tvec (x := x) c) (isTan_tvec hx c)).unique (tcoord_spec hx _ _) rfl

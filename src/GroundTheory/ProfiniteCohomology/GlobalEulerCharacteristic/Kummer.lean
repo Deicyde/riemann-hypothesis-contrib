@@ -131,7 +131,7 @@ theorem sUnitsToGsInvariants_injective : Function.Injective (sUnitsToGsInvariant
             : (maxUnramifiedOutside F Ω S)ˣ)
           : maxUnramifiedOutside F Ω S))
       hxy
-  simp only [coe_sUnitsToGsInvariants_apply] at h
+  simp only at h
   exact Additive.toMul.injective (Subtype.ext (Units.ext ((gsEmbedding hL).injective h)))
 
 theorem exists_gsEmbedding_eq_of_forall

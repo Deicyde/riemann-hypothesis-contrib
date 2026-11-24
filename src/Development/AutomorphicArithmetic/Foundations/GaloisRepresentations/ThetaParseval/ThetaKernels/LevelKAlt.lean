@@ -40,8 +40,6 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace PositivityTheory.ThKEst

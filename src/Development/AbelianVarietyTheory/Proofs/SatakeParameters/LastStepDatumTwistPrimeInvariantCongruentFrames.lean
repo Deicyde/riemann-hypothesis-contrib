@@ -136,8 +136,6 @@ variable
   (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
   {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
 
-theorem k_le_N (i : ℕ) : R.k ≤ R.N i := by unfold Ranks.N; omega
-
 theorem k_le_N_pred (i : ℕ) : R.k ≤ R.N (i + 1) - 1 := by
   have h : 1 ≤ (i + 1) * (R.t + 1) := Nat.one_le_iff_ne_zero.mpr (by positivity)
   unfold Ranks.N
@@ -155,7 +153,7 @@ theorem lam_of_topDat_ne
   have hne2 := right_ne_zero_of_mul h
   unfold PhiTopG at hne
   rw [if_neg hP] at hne
-  have hint := twAn_phiQ_int _ _ (k_le_N i) (k_le_N_pred i) _ hne
+  have hint := twAn_phiQ_int _ _ (_root_.Formalism.L2.Col.twAn_k_le i) (k_le_N_pred i) _ hne
   unfold ftY at hne2
   rw [if_neg hP] at hne2
   have hlast

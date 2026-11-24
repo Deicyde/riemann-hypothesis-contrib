@@ -155,7 +155,7 @@ theorem exists_nat_conj
     : ∃ m : ℕ,
       (m : 𝓞 D.host.E) ∉ w.asIdeal ∧ ∀ a ∈ D.host.AA, star ((m : D.host.E) * a) ∈ D.host.AA := by
   obtain ⟨p, hp, hP⟩ := GlobalTheory.HalfCompare.exists_prime_under w
-  have hb := ReciprocityTheory.ChartRestriction.G.PullbackSections.MLI.bb_ne_bot D
+  have hb := _root_.Formalism.L2.Pj.b_ne_bot D
   have h0
       : ((D.host.𝔟 : Ideal (𝓞 D.host.E)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
         ≠ 0 :=
@@ -415,14 +415,14 @@ theorem adj_surj
           * ((S.gram.map (incA D)).map (atW w) * βS.val.map (cpt w))
         = 1 := by
     rw [Matrix.mul_assoc, ← Matrix.mul_assoc (Matrix.map _ (atW w)), ← Matrix.map_mul,
-      GlobalTheory.SquareAgree.HeisCov.gram_inv_mul, Matrix.map_one _ (map_zero _) (map_one _),
+      _root_.GlobalTheory.RouteCoords.inv_mul_gram, Matrix.map_one _ (map_zero _) (map_one _),
       Matrix.one_mul, ← Matrix.map_mul, Units.inv_mul, Matrix.map_one _ (map_zero _) (map_one _)]
   have h2
       : ((βX⁻¹).val.map (cpt w) * ((X.gram⁻¹).map (incA D)).map (atW w))
           * ((X.gram.map (incA D)).map (atW w) * βX.val.map (cpt w))
         = 1 := by
     rw [Matrix.mul_assoc, ← Matrix.mul_assoc (Matrix.map _ (atW w)), ← Matrix.map_mul,
-      GlobalTheory.SquareAgree.HeisCov.gram_inv_mul, Matrix.map_one _ (map_zero _) (map_one _),
+      _root_.GlobalTheory.RouteCoords.inv_mul_gram, Matrix.map_one _ (map_zero _) (map_one _),
       Matrix.one_mul, ← Matrix.map_mul, Units.inv_mul, Matrix.map_one _ (map_zero _) (map_one _)]
   obtain ⟨y₀, hy₀⟩
       : ∃ y₀ : Matrix (Fin S.rank) (Fin X.rank) (Kw w),

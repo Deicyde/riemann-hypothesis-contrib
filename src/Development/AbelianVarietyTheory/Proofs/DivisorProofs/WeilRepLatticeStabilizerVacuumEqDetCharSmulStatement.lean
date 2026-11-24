@@ -52,6 +52,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta Formalism.IndefR.Datum
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilRep_lattice_stabilizer_vacuum_eq_det_char_smul
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (V W : HSp D)
         (χV χW : (AE D)ˣ →* Circle) (om : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)),
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.weilRep_lattice_stabilizer_vacuum_eq_det_char_smul
                                 ↔ actO V W 1 k u ∈ (latO V W (ΛV : Set (Fin V.rank → D.host.E))
                                   (ΛW : Set (Fin W.rank → D.host.E)) fun _ => True))
                             → om (1, k) f = mu k • f := by
-  first
-  | exact @GlobalTheory.VacStab.om_vacuum_eq_smul
-  | exact GlobalTheory.VacStab.om_vacuum_eq_smul
-  | (intros; apply GlobalTheory.VacStab.om_vacuum_eq_smul <;> assumption)
+  first | exact @GlobalTheory.VacStab.om_vacuum_eq_smul

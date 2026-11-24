@@ -58,7 +58,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -74,26 +75,28 @@ theorem isMultiHomog_zero (a : K → ℕ) : IsMultiHomog (0 : MRing ι) a := by
   intro m hm
   simp at hm
 
-theorem isMultiHomog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem isMultiHomog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm
   rcases Finset.mem_union.mp (support_add hm) with h | h
   · exact hf m h
   · exact hg m h
 
-theorem isMultiHomog_neg {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) : IsMultiHomog (-f) a := by
+theorem isMultiHomog_neg {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : IsMultiHomog (-f) a := by
   intro m hm
   rw [support_neg] at hm
   exact hf m hm
 
-theorem isMultiHomog_sub {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f - g) a := by
+theorem isMultiHomog_sub {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f - g) a := by
   rw [sub_eq_add_neg]
   exact isMultiHomog_add hf (isMultiHomog_neg hg)
 
-theorem isMultiHomog_sum {α : Type*} (s : Finset α) {f : α → MRing ι} {a : K → ℕ}
-    (hf : ∀ t ∈ s, IsMultiHomog (f t) a) : IsMultiHomog (∑ t ∈ s, f t) a := by
+theorem isMultiHomog_sum
+    {α : Type*} (s : Finset α) {f : α → MRing ι} {a : K → ℕ} (hf : ∀ t ∈ s, IsMultiHomog (f t) a)
+    : IsMultiHomog (∑ t ∈ s, f t) a := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using isMultiHomog_zero a
@@ -102,8 +105,9 @@ theorem isMultiHomog_sum {α : Type*} (s : Finset α) {f : α → MRing ι} {a :
     exact isMultiHomog_add (hf t (Finset.mem_insert_self _ _))
       (ih fun t' h => hf t' (Finset.mem_insert_of_mem h))
 
-theorem isMultiHomog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem isMultiHomog_mul
+    {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m₁, h₁, m₂, h₂, rfl⟩ := Finset.mem_add.mp (support_mul f g hm)
@@ -114,8 +118,10 @@ theorem isMultiHomog_one : IsMultiHomog (1 : MRing ι) 0 := by
   rw [support_one, Finset.mem_singleton] at hm
   simp [hm]
 
-theorem isMultiHomog_prod {α : Type*} (s : Finset α) {f : α → MRing ι} {a : α → K → ℕ}
-    (hf : ∀ t ∈ s, IsMultiHomog (f t) (a t)) : IsMultiHomog (∏ t ∈ s, f t) (∑ t ∈ s, a t) := by
+theorem isMultiHomog_prod
+    {α : Type*} (s : Finset α)
+    {f : α → MRing ι} {a : α → K → ℕ} (hf : ∀ t ∈ s, IsMultiHomog (f t) (a t))
+    : IsMultiHomog (∏ t ∈ s, f t) (∑ t ∈ s, a t) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using isMultiHomog_one
@@ -124,18 +130,19 @@ theorem isMultiHomog_prod {α : Type*} (s : Finset α) {f : α → MRing ι} {a 
     exact isMultiHomog_mul (hf t (Finset.mem_insert_self _ _))
       (ih fun t' h => hf t' (Finset.mem_insert_of_mem h))
 
-theorem isMultiHomog_pow {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ) :
-    IsMultiHomog (f ^ n) (n • a) := by
+theorem isMultiHomog_pow {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ)
+    : IsMultiHomog (f ^ n) (n • a) := by
   have := isMultiHomog_prod (Finset.range n) (f := fun _ => f) (a := fun _ => a) (fun _ _ => hf)
   simpa using this
 
-theorem isMultiHomog_C_mul {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (c : ℤ) :
-    IsMultiHomog (C c * f) a := by
+theorem isMultiHomog_C_mul {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (c : ℤ)
+    : IsMultiHomog (C c * f) a := by
   intro m hm
   rw [C_mul'] at hm
   exact hf m (support_smul hm)
 
-theorem isMultiHomog_X' [DecidableEq K] (p : Σ k, ι k) : IsMultiHomog (X p : MRing ι) (blockDeg p.1 1) := by
+theorem isMultiHomog_X' [DecidableEq K] (p : Σ k, ι k)
+    : IsMultiHomog (X p : MRing ι) (blockDeg p.1 1) := by
   classical
   intro m hm k
   rw [support_X, Finset.mem_singleton] at hm
@@ -156,9 +163,12 @@ theorem isMultiHomog_X' [DecidableEq K] (p : Σ k, ι k) : IsMultiHomog (X p : M
     intro h
     exact hk (congrArg Sigma.fst h).symm
 
-theorem isMultiHomog_bind₁ {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-    {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (τ : (Σ k, ι k) → MRing ι') (δ : K → K' → ℕ)
-    (hτ : ∀ p, IsMultiHomog (τ p) (δ p.1)) : IsMultiHomog (bind₁ τ f) (∑ k, a k • δ k) := by
+theorem isMultiHomog_bind₁
+    {K' : Type} [Fintype K']
+    {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+    {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    (τ : (Σ k, ι k) → MRing ι') (δ : K → K' → ℕ) (hτ : ∀ p, IsMultiHomog (τ p) (δ p.1))
+    : IsMultiHomog (bind₁ τ f) (∑ k, a k • δ k) := by
   rw [bind₁, aeval_def, eval₂_eq']
   refine isMultiHomog_sum _ fun m hm => ?_
   rw [MvPolynomial.algebraMap_eq]
@@ -169,26 +179,33 @@ theorem isMultiHomog_bind₁ {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k
   rw [hsum]
   exact isMultiHomog_C_mul (isMultiHomog_prod _ fun p _ => isMultiHomog_pow (hτ p) _) _
 
-theorem isMultiHomog_blockDeg_mul [DecidableEq K] {k₀ : K} {f g : MRing ι} {n m : ℕ}
-    (hf : IsMultiHomog f (blockDeg k₀ n)) (hg : IsMultiHomog g (blockDeg k₀ m)) :
-    IsMultiHomog (f * g) (blockDeg k₀ (n + m)) := by
+theorem isMultiHomog_blockDeg_mul
+    [DecidableEq K]
+    {k₀ : K} {f g : MRing ι} {n m : ℕ}
+    (hf : IsMultiHomog f (blockDeg k₀ n)) (hg : IsMultiHomog g (blockDeg k₀ m))
+    : IsMultiHomog (f * g) (blockDeg k₀ (n + m)) := by
   have := isMultiHomog_mul hf hg
   convert this using 1
   ext k
-  simp only [blockDeg, Pi.add_apply, Finset.sum_apply]
+  simp only [blockDeg, Pi.add_apply]
   split_ifs <;> simp
 
-theorem isMultiHomog_blockDeg_prod [DecidableEq K] {k₀ : K} {α : Type*} (s : Finset α) {f : α → MRing ι}
-    {n : α → ℕ} (hf : ∀ t ∈ s, IsMultiHomog (f t) (blockDeg k₀ (n t))) :
-    IsMultiHomog (∏ t ∈ s, f t) (blockDeg k₀ (∑ t ∈ s, n t)) := by
+theorem isMultiHomog_blockDeg_prod
+    [DecidableEq K]
+    {k₀ : K} {α : Type*} (s : Finset α)
+    {f : α → MRing ι} {n : α → ℕ} (hf : ∀ t ∈ s, IsMultiHomog (f t) (blockDeg k₀ (n t)))
+    : IsMultiHomog (∏ t ∈ s, f t) (blockDeg k₀ (∑ t ∈ s, n t)) := by
   have := isMultiHomog_prod s hf
   convert this using 1
   ext k
-  simp only [blockDeg, Pi.add_apply, Finset.sum_apply]
+  simp only [blockDeg, Finset.sum_apply]
   split_ifs <;> simp
 
-theorem aeval_smul {S : Type*} [CommRing S] [Algebra ℤ S] {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (c : K → S)
-    (v : (Σ k, ι k) → S) : aeval (fun p => c p.1 * v p) f = (∏ k, c k ^ a k) * aeval v f := by
+theorem aeval_smul
+    {S : Type*} [CommRing S] [Algebra ℤ S]
+    {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    (c : K → S) (v : (Σ k, ι k) → S)
+    : aeval (fun p => c p.1 * v p) f = (∏ k, c k ^ a k) * aeval v f := by
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun d hd => ?_
   have hprod : ∏ p, (c p.1 * v p) ^ d p = (∏ k, c k ^ a k) * ∏ p, v p ^ d p := by
@@ -201,9 +218,12 @@ theorem aeval_smul {S : Type*} [CommRing S] [Algebra ℤ S] {f : MRing ι} {a : 
   rw [hprod]
   ring
 
-theorem aeval_congr_block [DecidableEq K] {S : Type*} [CommRing S] [Algebra ℤ S] {h : MRing ι} {k₀ : K} {n : ℕ}
-    (hh : IsMultiHomog h (blockDeg k₀ n)) {v w : (Σ k, ι k) → S} (hvw : ∀ i, v ⟨k₀, i⟩ = w ⟨k₀, i⟩) :
-    aeval v h = aeval w h := by
+theorem aeval_congr_block
+    [DecidableEq K]
+    {S : Type*} [CommRing S] [Algebra ℤ S]
+    {h : MRing ι} {k₀ : K} {n : ℕ} (hh : IsMultiHomog h (blockDeg k₀ n))
+    {v w : (Σ k, ι k) → S} (hvw : ∀ i, v ⟨k₀, i⟩ = w ⟨k₀, i⟩)
+    : aeval v h = aeval w h := by
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq']
   refine Finset.sum_congr rfl fun d hd => congrArg _ (Finset.prod_congr rfl fun p _ => ?_)
   obtain ⟨k, i⟩ := p
@@ -216,14 +236,15 @@ theorem aeval_congr_block [DecidableEq K] {S : Type*} [CommRing S] [Algebra ℤ 
       exact (Finset.sum_eq_zero_iff.mp this) i (Finset.mem_univ _)
     rw [h0, pow_zero, pow_zero]
 
-theorem eval_map_int {σ : Type*} (z : σ → ℂ) (f : MvPolynomial σ ℤ) :
-    eval z (map (Int.castRingHom ℂ) f) = aeval z f := by
+theorem eval_map_int {σ : Type*} (z : σ → ℂ) (f : MvPolynomial σ ℤ)
+    : eval z (map (Int.castRingHom ℂ) f) = aeval z f := by
   rw [eval_map, aeval_def, algebraMap_int_eq]
 
 variable {Ω : Type} [Field Ω]
 
-theorem mConeMap_of_isMultiHomog (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) :
-    mConeMap y f = (∏ k, (X k : MvPolynomial K Ω) ^ a k) * C (aeval y f) := by
+theorem mConeMap_of_isMultiHomog
+    (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : mConeMap y f = (∏ k, (X k : MvPolynomial K Ω) ^ a k) * C (aeval y f) := by
   have h1 : mConeMap y f = aeval (fun p => (X p.1 : MvPolynomial K Ω) * C (y p)) f := by
     rw [mConeMap]
     exact congrArg (fun φ => aeval φ f) (funext fun p => mul_comm _ _)
@@ -231,8 +252,8 @@ theorem mConeMap_of_isMultiHomog (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K
   have h2 : aeval (fun p => (C (y p) : MvPolynomial K Ω)) f = C (aeval y f) := aeval_C_comp_left y f
   rw [h2]
 
-theorem mem_mCoordIdeal_iff (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) :
-    f ∈ mCoordIdeal y ↔ aeval y f = 0 := by
+theorem mem_mCoordIdeal_iff (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : f ∈ mCoordIdeal y ↔ aeval y f = 0 := by
   rw [mCoordIdeal, RingHom.mem_ker]
   rw [mConeMap_of_isMultiHomog y hf]
   constructor
@@ -243,11 +264,16 @@ theorem mem_mCoordIdeal_iff (y : (Σ k, ι k) → Ω) {f : MRing ι} {a : K → 
   · intro h
     rw [h, C_0, mul_zero]
 
-theorem coneMap_of_isMultiHomog {r : ℕ} (x : Ix (Fin r) → Ω) {F : MRing (GlobalTheory (Fin r))} {e : ℕ}
-    (hF : IsMultiHomog (ι := GlobalTheory (Fin r)) F (fun _ => e)) :
-    aeval (fun i => Polynomial.C (x i) * Polynomial.X) F = Polynomial.X ^ e * Polynomial.C (aeval x F) := by
-  have h1 : (fun i => Polynomial.C (x i) * Polynomial.X) =
-      fun p : Ix (Fin r) => (fun _ : Unit => (Polynomial.X : Polynomial Ω)) p.1 * Polynomial.C (x p) := by
+theorem coneMap_of_isMultiHomog
+    {r : ℕ} (x : Ix (Fin r) → Ω)
+    {F : MRing (GlobalTheory (Fin r))} {e : ℕ}
+    (hF : IsMultiHomog (ι := GlobalTheory (Fin r)) F (fun _ => e))
+    : aeval (fun i => Polynomial.C (x i) * Polynomial.X) F
+      = Polynomial.X ^ e * Polynomial.C (aeval x F) := by
+  have h1
+      : (fun i => Polynomial.C (x i) * Polynomial.X)
+        = fun p : Ix (Fin r) =>
+          (fun _ : Unit => (Polynomial.X : Polynomial Ω)) p.1 * Polynomial.C (x p) := by
     funext p
     ring
   rw [h1, aeval_smul hF (fun _ => (Polynomial.X : Polynomial Ω)) (fun p => Polynomial.C (x p))]
@@ -257,8 +283,11 @@ theorem coneMap_of_isMultiHomog {r : ℕ} (x : Ix (Fin r) → Ω) {F : MRing (Gl
     exact aeval_algebraMap_apply (B := Polynomial Ω) x F
   rw [h2]
 
-theorem mem_coordIdeal_iff {r : ℕ} (x : Ix (Fin r) → Ω) {F : MRing (GlobalTheory (Fin r))} {e : ℕ}
-    (hF : IsMultiHomog (ι := GlobalTheory (Fin r)) F (fun _ => e)) : F ∈ coordIdeal ℤ x ↔ aeval x F = 0 := by
+theorem mem_coordIdeal_iff
+    {r : ℕ} (x : Ix (Fin r) → Ω)
+    {F : MRing (GlobalTheory (Fin r))} {e : ℕ}
+    (hF : IsMultiHomog (ι := GlobalTheory (Fin r)) F (fun _ => e))
+    : F ∈ coordIdeal ℤ x ↔ aeval x F = 0 := by
   rw [coordIdeal, RingHom.mem_ker]
   change aeval (fun i => Polynomial.C (x i) * Polynomial.X) F = 0 ↔ _
   rw [coneMap_of_isMultiHomog x hF]
@@ -270,28 +299,30 @@ theorem mem_coordIdeal_iff {r : ℕ} (x : Ix (Fin r) → Ω) {F : MRing (GlobalT
   · intro h
     rw [h, Polynomial.C_0, mul_zero]
 
-theorem aeval_linear {σ α : Type*} [Fintype α] {S : Type*} [CommRing S] [Algebra ℤ S] (v : σ → S)
-    (A : α → ℤ) (q : α → σ) : aeval v (∑ j, C (A j) * X (q j) : MvPolynomial σ ℤ) = ∑ j, (A j : S) * v (q j) := by
-
+theorem aeval_linear
+    {σ α : Type*} [Fintype α]
+    {S : Type*} [CommRing S] [Algebra ℤ S]
+    (v : σ → S) (A : α → ℤ) (q : α → σ)
+    : aeval v (∑ j, C (A j) * X (q j) : MvPolynomial σ ℤ) = ∑ j, (A j : S) * v (q j) := by
   simp [map_sum]
 
-theorem sum_mul_sum {α β γ : Type*} [Fintype β] [Fintype γ] {S : Type*} [CommRing S] (N : Matrix α β ℤ)
-    (M : Matrix β γ ℤ) (w : γ → S) (i : α) :
-    ∑ j, (N i j : S) * ∑ l, (M j l : S) * w l = ∑ l, ((N * M) i l : S) * w l := by
-  simp only [Matrix.mul_apply, Int.cast_sum, Int.cast_mul, Finset.mul_sum, Finset.sum_mul, mul_assoc]
+theorem sum_mul_sum
+    {α β γ : Type*} [Fintype β] [Fintype γ]
+    {S : Type*} [CommRing S]
+    (N : Matrix α β ℤ) (M : Matrix β γ ℤ) (w : γ → S) (i : α)
+    : ∑ j, (N i j : S) * ∑ l, (M j l : S) * w l = ∑ l, ((N * M) i l : S) * w l := by
+  simp only [Matrix.mul_apply, Int.cast_sum, Int.cast_mul, Finset.mul_sum, Finset.sum_mul,
+    mul_assoc]
   exact Finset.sum_comm
 
 end Forms
 
 end BlockImageInverse
 
-
-
 open BlockImageInverse in
 theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
   intro D K _ _ ι _ Ω _ _ y k₀ r M N x J hA hB hI _ hJ hJy
   classical
-
   have hrel : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0 := by
     intro k
     obtain ⟨i, hi⟩ := hA.2.1.2.2 k
@@ -300,15 +331,18 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
     exact h0
   choose c hc using hrel
 
-  have hrat : ∀ k i, ∃ (n : ℕ) (g' h' : MRing ι), IsMultiHomog g' (blockDeg k₀ n) ∧
-      IsMultiHomog h' (blockDeg k₀ n) ∧ aeval y h' ≠ 0 ∧
-      aeval y (X ⟨k, i⟩ : MRing ι) * aeval y h' = aeval y g' * aeval y (X ⟨k, c k⟩ : MRing ι) :=
-    fun k i => hB (blockDeg k 1) (X ⟨k, i⟩) (X ⟨k, c k⟩) (isMultiHomog_X' _) (isMultiHomog_X' _)
+  have hrat
+      : ∀ k i, ∃ (n : ℕ) (g' h' : MRing ι),
+        IsMultiHomog g' (blockDeg k₀ n) ∧ IsMultiHomog h' (blockDeg k₀ n) ∧ aeval y h' ≠ 0
+          ∧ aeval y (X ⟨k, i⟩ : MRing ι) * aeval y h'
+            = aeval y g' * aeval y (X ⟨k, c k⟩ : MRing ι) := fun k i =>
+    hB (blockDeg k 1) (X ⟨k, i⟩) (X ⟨k, c k⟩) (isMultiHomog_X' _) (isMultiHomog_X' _)
       (by rw [aeval_X]; exact hc k)
   choose nn gg hh hgg hhh hhy hgh using hrat
   simp only [aeval_X] at hgh
 
-  obtain ⟨g, a, hgJ, hga, hgy⟩ : ∃ (g : MRing ι) (a : K → ℕ), g ∈ J ∧ IsMultiHomog g a ∧ aeval y g ≠ 0 := by
+  obtain ⟨g, a, hgJ, hga, hgy⟩
+      : ∃ (g : MRing ι) (a : K → ℕ), g ∈ J ∧ IsMultiHomog g a ∧ aeval y g ≠ 0 := by
     obtain ⟨S, hS, rfl⟩ := hJ
     by_contra hno
     push Not at hno
@@ -320,14 +354,18 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
 
   obtain ⟨ma, hma⟩ : ∃ ma : MRing ι, ma = ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ a k := ⟨_, rfl⟩
   have hmaH : IsMultiHomog ma a := by
-    have := isMultiHomog_prod Finset.univ (f := fun k => (X ⟨k, c k⟩ : MRing ι) ^ a k)
-      (a := fun k => a k • blockDeg k 1) (fun k _ => isMultiHomog_pow (isMultiHomog_X' _) _)
+    have :=
+      isMultiHomog_prod Finset.univ
+        (f := fun k => (X ⟨k, c k⟩ : MRing ι) ^ a k)
+        (a := fun k => a k • blockDeg k 1)
+        (fun k _ => isMultiHomog_pow (isMultiHomog_X' _) _)
     rw [hma]
     convert this using 1
     funext k'
     simp [blockDeg, Finset.sum_apply]
-  have hmaz : ∀ {S : Type} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S),
-      aeval v ma = ∏ k, v ⟨k, c k⟩ ^ a k := by
+  have hmaz
+      : ∀ {S : Type} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S),
+        aeval v ma = ∏ k, v ⟨k, c k⟩ ^ a k := by
     intro S _ _ v
     simp [hma, map_prod]
   have hmay : aeval y ma ≠ 0 := by
@@ -339,18 +377,23 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
     rw [h0, zero_mul] at hgh₀
     exact mul_ne_zero hgy hh₀y hgh₀
 
-  obtain ⟨Bf, hBf⟩ : ∃ Bf : MRing ι, Bf = g₀ * X ⟨k₀, c k₀⟩ * ∏ k, (gg k (c k) * ∏ i, hh k i) := ⟨_, rfl⟩
+  obtain ⟨Bf, hBf⟩ : ∃ Bf : MRing ι, Bf = g₀ * X ⟨k₀, c k₀⟩ * ∏ k, (gg k (c k) * ∏ i, hh k i) :=
+    ⟨_, rfl⟩
   have hBH : IsMultiHomog Bf (blockDeg k₀ (n₀ + 1 + ∑ k, (nn k (c k) + ∑ i, nn k i))) := by
     rw [hBf]
     refine isMultiHomog_blockDeg_mul (isMultiHomog_blockDeg_mul hg₀ (isMultiHomog_X' _))
-      (isMultiHomog_blockDeg_prod _ fun k _ => isMultiHomog_blockDeg_mul (hgg k (c k))
-        (isMultiHomog_blockDeg_prod _ fun i _ => hhh k i))
-  have hBfac : ∀ v : (Σ k, ι k) → ℂ, aeval v Bf ≠ 0 → aeval v g₀ ≠ 0 ∧ v ⟨k₀, c k₀⟩ ≠ 0 ∧
-      (∀ k, aeval v (gg k (c k)) ≠ 0) ∧ ∀ k i, aeval v (hh k i) ≠ 0 := by
+      (isMultiHomog_blockDeg_prod _ fun k _ =>
+        isMultiHomog_blockDeg_mul (hgg k (c k)) (isMultiHomog_blockDeg_prod _ fun i _ => hhh k i))
+  have hBfac
+      : ∀ v : (Σ k, ι k) → ℂ,
+        aeval v Bf ≠ 0
+          → aeval v g₀ ≠ 0 ∧ v ⟨k₀, c k₀⟩ ≠ 0 ∧ (∀ k, aeval v (gg k (c k)) ≠ 0)
+            ∧ ∀ k i, aeval v (hh k i) ≠ 0 := by
     intro v hv
     rw [hBf] at hv
     simp only [map_mul, map_prod, aeval_X, ne_eq, mul_eq_zero, not_or, Finset.prod_eq_zero_iff,
-      Finset.mem_univ, true_and, not_exists] at hv
+        Finset.mem_univ, true_and, not_exists]
+      at hv
     exact ⟨hv.1.1, hv.1.2, fun k => (hv.2 k).1, fun k i => (hv.2 k).2 i⟩
   have hgg_c : ∀ k, aeval y (gg k (c k)) = aeval y (hh k (c k)) := fun k =>
     (mul_left_cancel₀ (hc k) ((hgh k (c k)).trans (mul_comm _ _))).symm
@@ -361,18 +404,25 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
     rw [hgg_c k]
     exact mul_ne_zero (hhy k (c k)) (Finset.prod_ne_zero_iff.mpr fun i _ => hhy k i)
 
-  obtain ⟨σ, hσ⟩ : ∃ σ : (Σ k, ι k) → MRing (GlobalTheory (Fin r)), σ = fun p =>
-      if h : p.1 = k₀ then ∑ j, C (N (cast (congrArg ι h) p.2) j) * X j else 0 := ⟨_, rfl⟩
+  obtain ⟨σ, hσ⟩
+      : ∃ σ : (Σ k, ι k) → MRing (GlobalTheory (Fin r)),
+        σ = fun p => if h : p.1 = k₀ then ∑ j, C (N (cast (congrArg ι h) p.2) j) * X j else 0 :=
+    ⟨_, rfl⟩
   have hσ0 : ∀ i, σ ⟨k₀, i⟩ = ∑ j, C (N i j) * X j := by
     intro i
     simp [hσ]
-  have hXu : ∀ j : Ix (Fin r), IsMultiHomog (ι := GlobalTheory (Fin r)) (X j : MRing (GlobalTheory (Fin r))) (fun _ => 1) := by
+  have hXu
+      : ∀ j : Ix (Fin r),
+        IsMultiHomog (ι := GlobalTheory (Fin r)) (X j : MRing (GlobalTheory (Fin r)))
+          (fun _ => 1) := by
     intro j
     convert isMultiHomog_X' (ι := GlobalTheory (Fin r)) j using 1
     funext u
     simp [blockDeg]
-  have hσH : ∀ p : (Σ k, ι k), IsMultiHomog (ι := GlobalTheory (Fin r)) (σ p)
-      ((fun k (_ : Unit) => if k = k₀ then 1 else 0) p.1) := by
+  have hσH
+      : ∀ p : (Σ k, ι k),
+        IsMultiHomog (ι := GlobalTheory (Fin r)) (σ p)
+          ((fun k (_ : Unit) => if k = k₀ then 1 else 0) p.1) := by
     rintro ⟨k, i⟩
     by_cases hk : k = k₀
     · subst hk
@@ -381,8 +431,10 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
       exact isMultiHomog_sum _ fun j _ => isMultiHomog_C_mul (hXu j) _
     · simp only [hσ, dif_neg hk, if_neg hk]
       exact isMultiHomog_zero _
-  have hpull : ∀ {P : MRing ι} {n : ℕ}, IsMultiHomog P (blockDeg k₀ n) →
-      IsMultiHomog (ι := GlobalTheory (Fin r)) (bind₁ σ P) (fun _ => n) := by
+  have hpull
+      : ∀ {P : MRing ι} {n : ℕ},
+        IsMultiHomog P (blockDeg k₀ n)
+          → IsMultiHomog (ι := GlobalTheory (Fin r)) (bind₁ σ P) (fun _ => n) := by
     intro P n hP
     have := isMultiHomog_bind₁ hP σ (fun k (_ : Unit) => if k = k₀ then 1 else 0) hσH
     convert this using 1
@@ -392,9 +444,11 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
     · intro b _ hb
       simp [blockDeg, hb]
     · simp
-  have heval : ∀ {S : Type} [CommRing S] [Algebra ℤ S] {P : MRing ι} {n : ℕ}, IsMultiHomog P (blockDeg k₀ n) →
-      ∀ (u : Ix (Fin r) → S) (v : (Σ k, ι k) → S), (∀ i, v ⟨k₀, i⟩ = ∑ j, (N i j : S) * u j) →
-      aeval u (bind₁ σ P) = aeval v P := by
+  have heval
+      : ∀ {S : Type} [CommRing S] [Algebra ℤ S] {P : MRing ι} {n : ℕ},
+        IsMultiHomog P (blockDeg k₀ n)
+          → ∀ (u : Ix (Fin r) → S) (v : (Σ k, ι k) → S),
+            (∀ i, v ⟨k₀, i⟩ = ∑ j, (N i j : S) * u j) → aeval u (bind₁ σ P) = aeval v P := by
     intro S _ _ P n hP u v hv
     rw [aeval_bind₁]
     refine aeval_congr_block hP fun i => ?_
@@ -424,20 +478,25 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
 
     simp [hρ, hI.1 j, map_sum]
 
-  obtain ⟨Q, hQ⟩ : ∃ Q : ∀ k, ι k → MRing ι, Q = fun k i => gg k i * ∏ i' ∈ Finset.univ.erase i, hh k i' :=
+  obtain ⟨Q, hQ⟩
+      : ∃ Q : ∀ k, ι k → MRing ι, Q = fun k i => gg k i * ∏ i' ∈ Finset.univ.erase i, hh k i' :=
     ⟨_, rfl⟩
   have hQH : ∀ k i, IsMultiHomog (Q k i) (blockDeg k₀ (∑ i', nn k i')) := by
     intro k i
     rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i), hQ]
     exact isMultiHomog_blockDeg_mul (hgg k i) (isMultiHomog_blockDeg_prod _ fun i' _ => hhh k i')
-  have hQv : ∀ {S : Type} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S) k i,
-      aeval v (Q k i) = aeval v (gg k i) * ∏ i' ∈ Finset.univ.erase i, aeval v (hh k i') := by
+  have hQv
+      : ∀ {S : Type} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S) k i,
+        aeval v (Q k i) = aeval v (gg k i) * ∏ i' ∈ Finset.univ.erase i, aeval v (hh k i') := by
     intro S _ _ v k i
     simp [hQ, map_prod]
   obtain ⟨Dg, hDg⟩ : ∃ Dg : K → ℕ, Dg = fun k => if k = k₀ then 1 else ∑ i', nn k i' := ⟨_, rfl⟩
-  obtain ⟨τ, hτ⟩ : ∃ τ : (Σ k, ι k) → MRing (GlobalTheory (Fin r)),
-      τ = fun p => if p.1 = k₀ then σ p else bind₁ σ (Q p.1 p.2) := ⟨_, rfl⟩
-  have hτH : ∀ p : (Σ k, ι k), IsMultiHomog (ι := GlobalTheory (Fin r)) (τ p) (fun _ => Dg p.1) := by
+  obtain ⟨τ, hτ⟩
+      : ∃ τ : (Σ k, ι k) → MRing (GlobalTheory (Fin r)),
+        τ = fun p => if p.1 = k₀ then σ p else bind₁ σ (Q p.1 p.2) :=
+    ⟨_, rfl⟩
+  have hτH
+      : ∀ p : (Σ k, ι k), IsMultiHomog (ι := GlobalTheory (Fin r)) (τ p) (fun _ => Dg p.1) := by
     rintro ⟨k, i⟩
     by_cases hk : k = k₀
     · subst hk
@@ -445,26 +504,30 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
       simpa using hσH ⟨k, i⟩
     · simp only [hτ, hDg, if_neg hk]
       exact hpull (hQH k i)
-  obtain ⟨lam, hlam⟩ : ∃ lam : K → Ω,
-      lam = fun k => if k = k₀ then 1 else (∏ i, aeval y (hh k i)) / y ⟨k, c k⟩ := ⟨_, rfl⟩
+  obtain ⟨lam, hlam⟩
+      : ∃ lam : K → Ω, lam = fun k => if k = k₀ then 1 else (∏ i, aeval y (hh k i)) / y ⟨k, c k⟩ :=
+    ⟨_, rfl⟩
   have hτx : ∀ p : (Σ k, ι k), aeval x (τ p) = lam p.1 * y p := by
     rintro ⟨k, i⟩
     by_cases hk : k = k₀
     · subst hk
       simp only [hτ, hlam, if_true, one_mul, hσ0]
-      rw [show aeval x (∑ j, C (N i j) * X j : MRing (GlobalTheory (Fin r))) = ∑ j, (N i j : Ω) * x j from
+      rw [show aeval x (∑ j, C (N i j) * X j : MRing (GlobalTheory (Fin r)))
+          = ∑ j, (N i j : Ω) * x j from
         aeval_linear _ _ _]
       exact (hI.2 i).symm
     · simp only [hτ, hlam, if_neg hk]
-      rw [heval (hQH k i) x y (fun i => hI.2 i), hQv, ← Finset.mul_prod_erase _ _ (Finset.mem_univ i),
-        div_mul_eq_mul_div, eq_div_iff (hc k)]
+      rw [heval (hQH k i) x y (fun i => hI.2 i), hQv,
+        ← Finset.mul_prod_erase _ _ (Finset.mem_univ i), div_mul_eq_mul_div, eq_div_iff (hc k)]
       linear_combination (-(∏ i' ∈ Finset.univ.erase i, aeval y (hh k i'))) * hgh k i
 
-  have key : ∀ (ψ : MvPolynomial K Ω →+* Polynomial Ω) (f : MRing ι),
-      ψ (mConeMap y f) = aeval (fun p => ψ (C (y p) * X p.1)) f := by
+  have key
+      : ∀ (ψ : MvPolynomial K Ω →+* Polynomial Ω) (f : MRing ι),
+        ψ (mConeMap y f) = aeval (fun p => ψ (C (y p) * X p.1)) f := by
     intro ψ f
     rw [mConeMap, aeval_def, aeval_def, eval₂_comp_left,
-      show ψ.comp (algebraMap ℤ (MvPolynomial K Ω)) = algebraMap ℤ (Polynomial Ω) from RingHom.ext_int _ _]
+      show ψ.comp (algebraMap ℤ (MvPolynomial K Ω)) = algebraMap ℤ (Polynomial Ω) from
+        RingHom.ext_int _ _]
     rfl
   have hZ1 : ∀ f ∈ mCoordIdeal y, bind₁ τ f ∈ coordIdeal ℤ x := by
     intro f hf
@@ -473,19 +536,22 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
     change aeval (fun i => Polynomial.C (x i) * Polynomial.X) (bind₁ τ f) = 0
     rw [aeval_bind₁]
     let ψ : MvPolynomial K Ω →+* Polynomial Ω :=
-      (aeval (fun k => Polynomial.C (lam k) * Polynomial.X ^ Dg k) : MvPolynomial K Ω →ₐ[Ω] Polynomial Ω).toRingHom
-    have hc' : (fun p => aeval (fun i => Polynomial.C (x i) * Polynomial.X) (τ p)) =
-        fun p : (Σ k, ι k) => ψ (C (y p) * X p.1) := by
+      (aeval (fun k => Polynomial.C (lam k) * Polynomial.X ^ Dg k)
+        : MvPolynomial K Ω →ₐ[Ω] Polynomial Ω).toRingHom
+    have hc'
+        : (fun p => aeval (fun i => Polynomial.C (x i) * Polynomial.X) (τ p))
+          = fun p : (Σ k, ι k) => ψ (C (y p) * X p.1) := by
       funext p
       rw [coneMap_of_isMultiHomog x (hτH p), hτx p]
       simp [ψ, Polynomial.C_mul]
       ring
     rw [hc', ← key ψ f, hf0, map_zero]
 
-  have hvan : ∀ z ∈ mcPts (mCoordIdeal y), ∀ f ∈ mCoordIdeal y, aeval z f = 0 :=
-    fun z hz f hf => by rw [← eval_map_int]; exact hz.2 f hf
-  have hRz : ∀ z ∈ mcPts (mCoordIdeal y), ∀ k i,
-      z ⟨k, i⟩ * aeval z (hh k i) = aeval z (gg k i) * z ⟨k, c k⟩ := by
+  have hvan : ∀ z ∈ mcPts (mCoordIdeal y), ∀ f ∈ mCoordIdeal y, aeval z f = 0 := fun z hz f hf => by
+    rw [← eval_map_int]; exact hz.2 f hf
+  have hRz
+      : ∀ z ∈ mcPts (mCoordIdeal y), ∀ k i,
+        z ⟨k, i⟩ * aeval z (hh k i) = aeval z (gg k i) * z ⟨k, c k⟩ := by
     intro z hz k i
     have h1 := isMultiHomog_mul (isMultiHomog_X' ⟨k, i⟩) (hhh k i)
     have h2 := isMultiHomog_mul (hgg k i) (isMultiHomog_X' ⟨k, c k⟩)
@@ -507,24 +573,34 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
         rw [hgh₀, sub_self])
     have := hvan z hz _ hmem
     simpa [sub_eq_zero] using this
-  have hLz : ∀ z ∈ mcPts (mCoordIdeal y), ∀ i, z ⟨k₀, i⟩ = ∑ j, (N i j : ℂ) * blockMapC k₀ M z j := by
+  have hLz
+      : ∀ z ∈ mcPts (mCoordIdeal y), ∀ i, z ⟨k₀, i⟩ = ∑ j, (N i j : ℂ) * blockMapC k₀ M z j := by
     intro z hz i
-    have hL : IsMultiHomog (X ⟨k₀, i⟩ - ∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι) (blockDeg k₀ 1) :=
-      isMultiHomog_sub (isMultiHomog_X' _) (isMultiHomog_sum _ fun l _ => isMultiHomog_C_mul (isMultiHomog_X' _) _)
+    have hL
+        : IsMultiHomog (X ⟨k₀, i⟩ - ∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι) (blockDeg k₀ 1) :=
+      isMultiHomog_sub (isMultiHomog_X' _)
+        (isMultiHomog_sum _ fun l _ => isMultiHomog_C_mul (isMultiHomog_X' _) _)
     have hyNM : y ⟨k₀, i⟩ = ∑ l, ((N * M) i l : Ω) * y ⟨k₀, l⟩ := by
       rw [← sum_mul_sum N M (fun l => y ⟨k₀, l⟩) i, hI.2 i]
       exact Finset.sum_congr rfl fun j _ => by rw [hI.1 j]
-    have hmem := (mem_mCoordIdeal_iff y hL).mpr (by
-      rw [map_sub, aeval_X, show aeval y (∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι) =
-        ∑ l, ((N * M) i l : Ω) * y ⟨k₀, l⟩ from aeval_linear _ _ _]
-      exact sub_eq_zero.mpr hyNM)
+    have hmem :=
+      (mem_mCoordIdeal_iff y hL).mpr (by
+        rw [map_sub, aeval_X,
+          show aeval y (∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι)
+              = ∑ l, ((N * M) i l : Ω) * y ⟨k₀, l⟩ from
+            aeval_linear _ _ _]
+        exact sub_eq_zero.mpr hyNM)
     have := hvan z hz _ hmem
-    rw [map_sub, aeval_X, show aeval z (∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι) =
-      ∑ l, ((N * M) i l : ℂ) * z ⟨k₀, l⟩ from aeval_linear _ _ _, sub_eq_zero] at this
+    rw [map_sub, aeval_X,
+        show aeval z (∑ l, C ((N * M) i l) * X ⟨k₀, l⟩ : MRing ι)
+            = ∑ l, ((N * M) i l : ℂ) * z ⟨k₀, l⟩ from
+          aeval_linear _ _ _,
+        sub_eq_zero]
+      at this
     rw [this, ← sum_mul_sum N M (fun l => z ⟨k₀, l⟩) i]
     rfl
-  have hFz : ∀ z ∈ mcPts (mCoordIdeal y), aeval (blockMapC k₀ M z) F = aeval z Bf :=
-    fun z hz => hF ▸ heval hBH _ z (hLz z hz)
+  have hFz : ∀ z ∈ mcPts (mCoordIdeal y), aeval (blockMapC k₀ M z) F = aeval z Bf := fun z hz =>
+    hF ▸ heval hBH _ z (hLz z hz)
   have hcz : ∀ z ∈ mcPts (mCoordIdeal y), aeval z Bf ≠ 0 → ∀ k, z ⟨k, c k⟩ ≠ 0 := by
     intro z hz hBz k h0
     obtain ⟨i, hi⟩ := hz.1 k
@@ -575,17 +651,24 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
       rwa [aeval_bind₁, ← hz] at this
     have hMN : blockMapC k₀ M z = u := by
       funext j
-      have hLx : (X j - ∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r))) ∈ coordIdeal ℤ x := by
-        refine (mem_coordIdeal_iff x (e := 1) (isMultiHomog_sub (hXu j) (isMultiHomog_sum _ fun l _ =>
-          isMultiHomog_C_mul (hXu l) _))).mpr ?_
-        rw [map_sub, aeval_X, show aeval x (∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r))) =
-          ∑ l, ((M * N) j l : Ω) * x l from aeval_linear _ _ _, sub_eq_zero,
-          ← sum_mul_sum M N x j, hI.1 j]
+      have hLx
+          : (X j - ∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r))) ∈ coordIdeal ℤ x := by
+        refine (mem_coordIdeal_iff x (e := 1)
+          (isMultiHomog_sub (hXu j)
+            (isMultiHomog_sum _ fun l _ => isMultiHomog_C_mul (hXu l) _))).mpr ?_
+        rw [map_sub, aeval_X,
+          show aeval x (∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r)))
+              = ∑ l, ((M * N) j l : Ω) * x l from
+            aeval_linear _ _ _,
+          sub_eq_zero, ← sum_mul_sum M N x j, hI.1 j]
         exact Finset.sum_congr rfl fun i _ => by rw [hI.2 i]
       have := hu0 _ hLx
-      rw [map_sub, aeval_X, show aeval u (∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r))) =
-        ∑ l, ((M * N) j l : ℂ) * u l from aeval_linear _ _ _, sub_eq_zero,
-        ← sum_mul_sum M N u j] at this
+      rw [map_sub, aeval_X,
+          show aeval u (∑ l, C ((M * N) j l) * X l : MRing (GlobalTheory (Fin r)))
+              = ∑ l, ((M * N) j l : ℂ) * u l from
+            aeval_linear _ _ _,
+          sub_eq_zero, ← sum_mul_sum M N u j]
+        at this
       rw [this]
       simp only [blockMapC, hzk₀]
     refine ⟨z, hzmem, fun hzJ => hgz z hzmem (hzB ▸ hFu) ?_, ⟨fun _ => 1, fun _ => one_ne_zero, ?_⟩⟩
@@ -608,11 +691,14 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
       obtain ⟨⟨⟩, j⟩ := j
       dsimp only
       ring
-    have hscale : ∀ {P : MRing ι} {n : ℕ}, IsMultiHomog P (blockDeg k₀ n) →
-        aeval z P = cc () ^ n * aeval z' P := by
+    have hscale
+        : ∀ {P : MRing ι} {n : ℕ},
+          IsMultiHomog P (blockDeg k₀ n) → aeval z P = cc () ^ n * aeval z' P := by
       intro P n hP
-      rw [aeval_congr_block hP (v := z) (w := fun p => (fun k => if k = k₀ then cc () else 1) p.1 * z' p)
-        (by intro i; simp [hk₀]), aeval_smul hP (fun k => if k = k₀ then cc () else 1) z']
+      rw [aeval_congr_block hP (v := z)
+          (w := fun p => (fun k => if k = k₀ then cc () else 1) p.1 * z' p)
+          (by intro i; simp [hk₀]),
+        aeval_smul hP (fun k => if k = k₀ then cc () else 1) z']
       congr 1
       rw [Finset.prod_eq_single k₀]
       · simp [blockDeg]
@@ -639,7 +725,10 @@ theorem BlockImageInverse.proof : BlockImageInverse.Statement := by
         rw [hscale (hhh k i), hscale (hgg k i)] at h1
         have hh' := (hBfac z' hB').2.2.2 k i
         have hc' := hcz z' hz' hB' k
-        have h3 : (z ⟨k, i⟩ * z' ⟨k, c k⟩ - z ⟨k, c k⟩ * z' ⟨k, i⟩) * (cc () ^ nn k i * aeval z' (hh k i)) = 0 := by
+        have h3
+            : (z ⟨k, i⟩ * z' ⟨k, c k⟩ - z ⟨k, c k⟩ * z' ⟨k, i⟩)
+                * (cc () ^ nn k i * aeval z' (hh k i))
+              = 0 := by
           linear_combination z' ⟨k, c k⟩ * h1 - cc () ^ nn k i * z ⟨k, c k⟩ * h2
         have h4 := (mul_eq_zero.mp h3).resolve_right (mul_ne_zero (pow_ne_zero _ ht) hh')
         rw [div_mul_eq_mul_div, eq_div_iff hc']

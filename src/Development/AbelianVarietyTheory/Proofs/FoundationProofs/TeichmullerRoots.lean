@@ -53,7 +53,8 @@ open Polynomial
 
 namespace GlobalTheory.Compare.TeichmullerRoots
 
-open Formalism.BasicNotions Formalism.CyclotomicNorms GlobalTheory.IndefiniteRowSideFullHecke.FactorSeriesSupport
+open Formalism.BasicNotions Formalism.CyclotomicNorms
+  GlobalTheory.IndefiniteRowSideFullHecke.FactorSeriesSupport
 
 section Roots
 
@@ -64,8 +65,8 @@ theorem zero_mem_rootsBar {f : (ZMod g)[X]} (hf : f.Monic) : 0 ∈ rootsBar f �
   rw [mem_roots (hf.map _).ne_zero, IsRoot, ← coeff_zero_eq_eval_zero, coeff_map]
   exact map_eq_zero_iff _ (RingHom.injective _)
 
-theorem exists_monic_of_stable (S : Multiset (Fbar g)) (hS : S.map (fun x => x ^ g) = S) :
-    ∃ f : (ZMod g)[X], f.Monic ∧ rootsBar f = S := by
+theorem exists_monic_of_stable (S : Multiset (Fbar g)) (hS : S.map (fun x => x ^ g) = S)
+    : ∃ f : (ZMod g)[X], f.Monic ∧ rootsBar f = S := by
   set P : (Fbar g)[X] := (S.map fun x => X - C x).prod with hP
   have hm : P.Monic := monic_multiset_prod_of_monic _ _ fun x _ => monic_X_sub_C x
   have hfix : P.map (frobenius (Fbar g) g) = P := by
@@ -89,8 +90,9 @@ theorem exists_monic_of_stable (S : Multiset (Fbar g)) (hS : S.map (fun x => x ^
   unfold rootsBar
   rw [hq, hP, roots_multiset_prod_X_sub_C]
 
-theorem root_pow_rootExp {N : ℕ} {f : (ZMod g)[X]} (hf : IsLabel N f) {x : Fbar g} (hx : x ∈ rootsBar f) :
-    x ^ rootExp N g = 1 := by
+theorem root_pow_rootExp
+    {N : ℕ} {f : (ZMod g)[X]} (hf : IsLabel N f) {x : Fbar g} (hx : x ∈ rootsBar f)
+    : x ^ rootExp N g = 1 := by
   have hx0 : x ≠ 0 := fun h => hf.2.2 ((zero_mem_rootsBar hf.1).1 (h ▸ hx))
   have hint : IsIntegral (ZMod g) x := Algebra.IsIntegral.isIntegral x
   have hroot : aeval x f = 0 := by
@@ -117,19 +119,21 @@ theorem root_pow_rootExp {N : ℕ} {f : (ZMod g)[X]} (hf : IsLabel N f) {x : Fba
     Finset.dvd_lcm (f := fun d => g ^ d - 1) (Finset.mem_Icc.2 ⟨hd1, hd⟩)
   rw [hc, pow_mul, h2, one_pow]
 
-theorem roots_reverse_prod {F : Type} [Field F] (S : Multiset F) (hS : 0 ∉ S) :
-    ((S.map fun x => X - C x).prod.reverse).roots = S.map fun x => x⁻¹ := by
+theorem roots_reverse_prod {F : Type} [Field F] (S : Multiset F) (hS : 0 ∉ S)
+    : ((S.map fun x => X - C x).prod.reverse).roots = S.map fun x => x⁻¹ := by
   apply GlobalTheory.DualLabel.roots_reverse_prod <;> assumption
 
-theorem dual_spec {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
-    (C (f.coeff 0)⁻¹ * f.reverse).Monic ∧ IsPowLabel (-1) f (C (f.coeff 0)⁻¹ * f.reverse) := by
+theorem dual_spec {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0)
+    : (C (f.coeff 0)⁻¹ * f.reverse).Monic ∧ IsPowLabel (-1) f (C (f.coeff 0)⁻¹ * f.reverse) := by
   constructor
   · apply monic_C_mul_of_mul_leadingCoeff_eq_one
     rw [reverse_leadingCoeff, trailingCoeff_eq_coeff_zero h0, inv_mul_cancel₀ h0]
   · have e : f.map (algebraMap (ZMod g) (Fbar g)) = ((rootsBar f).map fun x => X - C x).prod :=
       (Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq (hm.map _)
         (IsAlgClosed.card_roots_eq_natDegree)).symm
-    have e2 : f.reverse.map (algebraMap (ZMod g) (Fbar g)) = (f.map (algebraMap (ZMod g) (Fbar g))).reverse := by
+    have e2
+        : f.reverse.map (algebraMap (ZMod g) (Fbar g))
+          = (f.map (algebraMap (ZMod g) (Fbar g))).reverse := by
       rw [reverse, reverse, natDegree_map, reflect_map]
     unfold IsPowLabel
     simp only [zpow_neg_one]
@@ -138,8 +142,8 @@ theorem dual_spec {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
     rw [Polynomial.map_mul, map_C, roots_C_mul]
     exact (_root_.map_ne_zero _).2 (inv_ne_zero h0)
 
-theorem teich_injective (t : Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y) :
-    Function.Injective t := by
+theorem teich_injective (t : Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
+    : Function.Injective t := by
   have hne : ∀ x, x ≠ 0 → t x ≠ 0 := fun x hx => ((IsUnit.mk0 x hx).map t).ne_zero
   have h0 : t 0 = 0 := by
     classical
@@ -158,7 +162,9 @@ theorem teich_injective (t : Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0
     · exact ht x y hx hy h
 
 theorem teich_zpow (t : Fbar g →* ℂ) {x : Fbar g} (hx : x ≠ 0) (a : ℤ) : t (x ^ a) = t x ^ a := by
-  have h1 : t ((Units.mk0 x hx ^ a : (Fbar g)ˣ) : Fbar g) = ((Units.map t (Units.mk0 x hx) ^ a : ℂˣ) : ℂ) := by
+  have h1
+      : t ((Units.mk0 x hx ^ a : (Fbar g)ˣ) : Fbar g)
+        = ((Units.map t (Units.mk0 x hx) ^ a : ℂˣ) : ℂ) := by
     rw [← map_zpow]; rfl
   rw [Units.val_zpow_eq_zpow_val, Units.val_zpow_eq_zpow_val] at h1
   exact h1
@@ -167,25 +173,30 @@ end Roots
 
 variable (D : D7)
 
-theorem labAct_eq (k : Fin 2) (α : ℂ ≃+* ℂ) (a : ℤ)
+theorem labAct_eq
+    (k : Fin 2) (α : ℂ ≃+* ℂ) (a : ℤ)
     (ha : ∀ ζ : ℂ, ζ ^ rootExp D.R.r (D.host.g k) = 1 → α ζ = ζ ^ a)
     {f f' : (ZMod (D.host.g k))[X]} (hf : IsLabel D.R.r f) (hm : f'.Monic)
-    (hp : haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩; IsPowLabel a f f') :
-    Formalism.MainNotions.ArithmeticCylinders.labAct D α k f = f' := by
+    (hp : haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩; IsPowLabel a f f')
+    : Formalism.MainNotions.ArithmeticCylinders.labAct D α k f = f' := by
   haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
   have hinj := teich_injective (D.ntypes.teichC k) (D.ntypes.teichC_inj k)
-  have e : (rootsBar f).map
-      (fun x => Function.invFun (D.ntypes.teichC k) (α (D.ntypes.teichC k x))) =
-      (rootsBar f).map fun x => x ^ a := by
+  have e
+      : (rootsBar f).map (fun x => Function.invFun (D.ntypes.teichC k) (α (D.ntypes.teichC k x)))
+        = (rootsBar f).map fun x => x ^ a := by
     apply Multiset.map_congr rfl
     intro x hx
     have hx0 : x ≠ 0 := fun h => hf.2.2 ((zero_mem_rootsBar hf.1).1 (h ▸ hx))
     rw [ha _ (by rw [← map_pow, root_pow_rootExp hf hx, map_one]), ← teich_zpow _ hx0]
     exact Function.leftInverse_invFun hinj _
-  have hs := Classical.epsilon_spec (p := fun q : (ZMod (D.host.g k))[X] => q.Monic ∧
-    rootsBar q = (rootsBar f).map
-      (fun x => Function.invFun (D.ntypes.teichC k) (α (D.ntypes.teichC k x))))
-    ⟨f', hm, hp.trans e.symm⟩
+  have hs :=
+    Classical.epsilon_spec
+      (p := fun q : (ZMod (D.host.g k))[X] =>
+        q.Monic
+          ∧ rootsBar q
+            = (rootsBar f).map
+              (fun x => Function.invFun (D.ntypes.teichC k) (α (D.ntypes.teichC k x))))
+      ⟨f', hm, hp.trans e.symm⟩
   exact IsPowLabel.unique (a := a) (f := f) (hs.2.trans e) hp hs.1 hm
 
 end GlobalTheory.Compare.TeichmullerRoots

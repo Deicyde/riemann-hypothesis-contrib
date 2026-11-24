@@ -73,7 +73,4 @@ theorem _root_.GlobalTheory.T.adelicTrace_supportedAtSplitPlace
               = GlobalTheory.LatVac.liftV v
                 (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piW τ z
                   + GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piW (τ.comp σ) z) := by
-  first
-  | exact @GlobalTheory.SplitAdeleTrace.trace_at_split
-  | exact GlobalTheory.SplitAdeleTrace.trace_at_split
-  | (intros; apply GlobalTheory.SplitAdeleTrace.trace_at_split <;> assumption)
+  first | exact @GlobalTheory.SplitAdeleTrace.trace_at_split

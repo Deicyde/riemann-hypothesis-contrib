@@ -76,7 +76,4 @@ theorem _root_.GlobalTheory.T.weilRep_preserves_fockDegree_of_commute_cartan
                         (fun p f => annih (heisO ψ S T) θ p.1 (cplxO (sS p.1) (sT p.1)) p.2 f)
                         (om (k, 1) f)
                       = 0 := by
-  first
-  | exact @GlobalTheory.CartanFockDeg.om_keeps_fockDeg
-  | exact GlobalTheory.CartanFockDeg.om_keeps_fockDeg
-  | (intros; apply GlobalTheory.CartanFockDeg.om_keeps_fockDeg <;> assumption)
+  first | exact @GlobalTheory.CartanFockDeg.om_keeps_fockDeg

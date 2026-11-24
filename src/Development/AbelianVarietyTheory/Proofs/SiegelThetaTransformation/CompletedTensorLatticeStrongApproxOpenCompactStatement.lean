@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.completedTensorLattice_strongApprox_open_compact
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (Λ : Lt D.host.E S.rank) (L : Lt D.host.E T.rank),
       (Λ.FG ∧ Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) = ⊤)
@@ -68,7 +69,4 @@ theorem _root_.GlobalTheory.T.completedTensorLattice_strongApprox_open_compact
             IsOpen (U : Set (WO S T)) → ∃ N : ℕ, 0 < N ∧ ∀ u ∈ hatA S T (tens Λ L), N • u ∈ U)
           ∧ (∀ N : ℕ, 0 < N → IsOpen {w : WO S T | ∃ u ∈ hatA S T (tens Λ L), IsRealPt (w - N • u)})
           ∧ IsCompact (hatA S T (tens Λ L) : Set (WO S T)) := by
-  first
-  | exact @GlobalTheory.Ker.HatLat.hatA_tens
-  | exact GlobalTheory.Ker.HatLat.hatA_tens
-  | (intros; apply GlobalTheory.Ker.HatLat.hatA_tens <;> assumption)
+  first | exact @GlobalTheory.Ker.HatLat.hatA_tens

@@ -161,7 +161,7 @@ theorem jj_add
     : ∀ k : ℕ, jj (a + (k : ZMod d)) = jj a + Fin.ofNat n k
   | 0 => by
     have : Fin.ofNat n 0 = 0 := by apply Fin.ext; simp [Fin.ofNat]
-    simp [this]
+    simp
   | k + 1 => by
     have e : a + ((k + 1 : ℕ) : ZMod d) = (a + (k : ZMod d)) + 1 := by push_cast; ring
     rw [e, h, jj_add jj h a k, ofNat_succ, add_assoc]

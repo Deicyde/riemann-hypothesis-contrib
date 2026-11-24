@@ -54,50 +54,68 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace PositivityTheory.HtPt.Twhopf
 
-theorem finite_part : ∀ (R : Type) [CommRing R] [HenselianLocalRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) [LocallyQuasiFinite f] [LocallyOfFiniteType f] [IsSeparated f] [QuasiCompact f], ∃ U : X.Opens, IsFinite (U.ι ≫ f) ∧ ∀ x : X, f x = IsLocalRing.closedPoint R → x ∈ U := by
+theorem finite_part
+    : ∀ (R : Type) [CommRing R] [HenselianLocalRing R] (X : Scheme.{0})
+        (f : X ⟶ Spec (CommRingCat.of R)) [LocallyQuasiFinite f] [LocallyOfFiniteType f]
+        [IsSeparated f] [QuasiCompact f],
+      ∃ U : X.Opens,
+        IsFinite (U.ι ≫ f) ∧ ∀ x : X, f x = IsLocalRing.closedPoint R → x ∈ U := by
   intro R _ _ X f _ _ _ _
-  exact ⟨GlobalTheory.finitePart f, GlobalTheory.isFinite_finitePart (R := CommRingCat.of R) f,
-    GlobalTheory.mem_finitePart_of_eq_closedPoint (R := CommRingCat.of R) f⟩
+  exact ⟨
+    GlobalTheory.finitePart f,
+    GlobalTheory.isFinite_finitePart (R := CommRingCat.of R) f,
+    GlobalTheory.mem_finitePart_of_eq_closedPoint (R := CommRingCat.of R) f
+  ⟩
 
-theorem finite_le : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) (U U' : X.Opens), IsFinite (U.ι ≫ f) → (∀ x : X, f x = IsLocalRing.closedPoint R → x ∈ U') → U ≤ U' := by
+theorem finite_le
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R))
+        (U U' : X.Opens),
+      IsFinite (U.ι ≫ f) → (∀ x : X, f x = IsLocalRing.closedPoint R → x ∈ U') → U ≤ U' := by
   intro R _ _ X f U U' hU hU' x hx
   exact (GlobalTheory.preimage_eq_top_of_closedFibre_subset (R := CommRingCat.of R) f U' hU' U.ι).ge
     (Set.mem_univ ⟨x, hx⟩)
 
-theorem mem_of_finite {R : Type} [CommRing R] [IsLocalRing R]
-    {X : Over (Spec (CommRingCat.of R))} (W : X.left.Opens)
-    (hW : ∀ x : X.left, X.hom x = IsLocalRing.closedPoint R → x ∈ W)
-    (Y : Over (Spec (CommRingCat.of R))) (hY : IsFinite Y.hom) (h : Y ⟶ X) (z : Y.left) :
-    h.left z ∈ W := by
-  haveI : IsFinite (h.left ≫ X.hom) := by rw [Over.w h]; exact hY
-  exact (GlobalTheory.preimage_eq_top_of_closedFibre_subset (R := CommRingCat.of R) X.hom W hW h.left).ge
-    (Set.mem_univ z)
+alias mem_of_finite := _root_.GlobalTheory.CompanionTheory.Ar.BT.mem_of_finite_of_closedFibre
 
-theorem finite_sub : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (T : Type) [CommGroup T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), IsFinite (U.ι ≫ Γ.G.hom) → (∀ x : Γ.G.left, Γ.G.hom x = IsLocalRing.closedPoint R → x ∈ U) → Γ.IsFinOpenSub U := by
+theorem finite_sub
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (T : Type) [CommGroup T]
+        (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      IsFinite (U.ι ≫ Γ.G.hom) → (∀ x : Γ.G.left, Γ.G.hom x = IsLocalRing.closedPoint R → x ∈ U)
+        → Γ.IsFinOpenSub U := by
   apply GlobalTheory.CompanionTheory.Ar.BT.QFGroup.isFinOpenSub_of_closedFibre <;> assumption
 
-theorem mem_iff_section : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsLocalRing R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), IsFinite (U.ι ≫ Γ.G.hom) → (∀ g : Γ.G.left, Γ.G.hom g = IsLocalRing.closedPoint R → g ∈ U) → ∀ t, (⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U ↔ ∃ σ : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ Γ.G, toUnit (genPt R) ≫ σ = Γ.pt t) := by
+theorem mem_iff_section
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsLocalRing R] (T : Type)
+        [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      IsFinite (U.ι ≫ Γ.G.hom) → (∀ g : Γ.G.left, Γ.G.hom g = IsLocalRing.closedPoint R → g ∈ U)
+        → ∀ t,
+          (⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U
+            ↔ ∃ σ : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ Γ.G, toUnit (genPt R) ≫ σ = Γ.pt t) := by
   intro R _ _ _ _ T _ _ Γ U hfin hU t
   constructor
   · intro ht
     obtain ⟨σ, -, hσ⟩ := exists_section_of_generic_point R T Γ U hfin t ht
     exact ⟨σ, hσ⟩
   · rintro ⟨σ, hσ⟩ z _
-    have key := mem_of_finite U hU (𝟙_ _) (show IsFinite (𝟙 _) from inferInstance) σ
-      ((toUnit (genPt R)).left z)
+    have key :=
+      mem_of_finite U hU (𝟙_ _) (show IsFinite (𝟙 _) from inferInstance) σ
+        ((toUnit (genPt R)).left z)
     rw [← hσ]
     simpa using key
 
-
 open Polynomial in
-theorem exists_root_near (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
-    (a₀ : V) (n : ℕ) : ∀ f : V[X], f.Monic → f.natDegree = n → f.eval a₀ ∈ IsLocalRing.maximalIdeal V →
-      ∃ a, f.IsRoot a ∧ a - a₀ ∈ IsLocalRing.maximalIdeal V := by
+theorem exists_root_near
+    (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
+    (a₀ : V) (n : ℕ)
+    : ∀ f : V[X],
+      f.Monic → f.natDegree = n → f.eval a₀ ∈ IsLocalRing.maximalIdeal V
+        → ∃ a, f.IsRoot a ∧ a - a₀ ∈ IsLocalRing.maximalIdeal V := by
   induction n with
   | zero =>
     intro f hf hn h
@@ -106,9 +124,11 @@ theorem exists_root_near (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] 
   | succ n ih =>
     intro f hf hn h
     have hinj := IsFractionRing.injective V (FractionRing V)
-    obtain ⟨x, hx⟩ := IsAlgClosed.exists_aeval_eq_zero_of_injective (FractionRing V) hinj f
-      (by rw [degree_eq_natDegree hf.ne_zero, hn]; exact_mod_cast n.succ_ne_zero)
-    obtain ⟨r, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 (⟨f, hf, by rwa [← aeval_def]⟩ : IsIntegral V x)
+    obtain ⟨x, hx⟩ :=
+      IsAlgClosed.exists_aeval_eq_zero_of_injective (FractionRing V) hinj f
+        (by rw [degree_eq_natDegree hf.ne_zero, hn]; exact_mod_cast n.succ_ne_zero)
+    obtain ⟨r, rfl⟩ :=
+      IsIntegrallyClosed.isIntegral_iff.1 (⟨f, hf, by rwa [← aeval_def]⟩ : IsIntegral V x)
     have hr : f.IsRoot r := hinj (by rw [map_zero, ← hx, aeval_algebraMap_apply_eq_algebraMap_eval])
     obtain ⟨g, rfl⟩ := dvd_iff_isRoot.2 hr
     have hg : g.Monic := (monic_X_sub_C r).of_mul_monic_left hf
@@ -123,21 +143,37 @@ theorem exists_root_near (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] 
       obtain ⟨a, ha, ha'⟩ := ih g hg hd h
       exact ⟨a, ha.dvd (dvd_mul_left _ _), ha'⟩
 
-theorem henselian_of_algClosed : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)], HenselianLocalRing V := by
+theorem henselian_of_algClosed
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)],
+      HenselianLocalRing V := by
   intro V _ _ _ _
   exact ⟨fun f hf a₀ h _ => exists_root_near V a₀ _ f hf rfl h⟩
 
-theorem padic_alg : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [IsDomain O] [Algebra O C] (hv : v.Integers O) (hp : v (p : C) < 1) (hO : IsAdicComplete (Ideal.span {(p : O)}) O), Nonempty (Algebra ℤ_[p] O) ∧ HenselianLocalRing O ∧ IsIntegrallyClosed O ∧ ValuationRing O ∧ IsAlgClosed (FractionRing O) ∧ IsFractionRing O C := by
+theorem padic_alg
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [IsDomain O] [Algebra O C]
+        (hv : v.Integers O) (hp : v (p : C) < 1) (hO : IsAdicComplete (Ideal.span {(p : O)}) O),
+      Nonempty (Algebra ℤ_[p] O) ∧ HenselianLocalRing O ∧ IsIntegrallyClosed O ∧ ValuationRing O
+        ∧ IsAlgClosed (FractionRing O) ∧ IsFractionRing O C := by
   intro p _ C _ _ _ v O _ _ _ hv _ hO
   haveI := hO
   haveI hval : ValuationRing O := ValuationRing.of_integers v hv
   haveI hfr : IsFractionRing O C := hv.isFractionRing
   haveI hac : IsAlgClosed (FractionRing O) :=
     IsAlgClosed.of_ringEquiv C _ (FractionRing.algEquiv O C).symm.toRingEquiv
-  exact ⟨(GlobalTheory.ChF.padicInt_algebra_of_isAdicComplete_and_matrix_unique p O).1,
-    henselian_of_algClosed O, inferInstance, hval, hac, hfr⟩
+  exact ⟨
+    (GlobalTheory.ChF.padicInt_algebra_of_isAdicComplete_and_matrix_unique p O).1,
+    henselian_of_algClosed O,
+    inferInstance,
+    hval,
+    hac,
+    hfr
+  ⟩
 
-theorem prime_eq_bot_or_max : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [IsDomain O] [Algebra O C] [IsLocalRing O], v.Integers O → ∀ P : Ideal O, P.IsPrime → P = ⊥ ∨ P = IsLocalRing.maximalIdeal O := by
+theorem prime_eq_bot_or_max
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [IsDomain O]
+        [Algebra O C] [IsLocalRing O],
+      v.Integers O → ∀ P : Ideal O, P.IsPrime → P = ⊥ ∨ P = IsLocalRing.maximalIdeal O := by
   intro C _ v O _ _ _ _ hv P hP
   by_cases h0 : P = ⊥
   · exact .inl h0

@@ -1,11 +1,13 @@
 module
 
-import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralWittElementOfEvaluation
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfDivisibilityBreuilKisinFactsStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinOEModPrimeLaurentFieldStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsResidueTiltInjectiveRetractStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WittVectorTeichmullerIsAdicCompleteOfPerfectStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfDivisibilityBreuilKisinFacts
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinOEModPrimeLaurentField
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsResidueTiltInjectiveRetract
+public import Mathlib.RingTheory.AdicCompletion.Basic
+public import Mathlib.RingTheory.WittVector.Teichmuller
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WittVectorTeichmullerIsAdicCompleteOfPerfect
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralWittElementOfEvaluation
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -51,7 +53,9 @@ import Mathlib.Topology.Sheaves.Init
 
 noncomputable section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.OEStable
@@ -61,11 +65,13 @@ variable {l : ℕ} [hl : Fact l.Prime]
 theorem perfect_Cb : PerfectRing (Cb l) l := by
   refine PerfectRing.ofSurjective _ _ fun x => ?_
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := OCb l) x
-  refine ⟨algebraMap _ _ ((frobeniusEquiv (OCb l) l).symm a) /
-    algebraMap _ _ ((frobeniusEquiv (OCb l) l).symm b), ?_⟩
+  refine ⟨
+    algebraMap _ _ ((frobeniusEquiv (OCb l) l).symm a)
+      / algebraMap _ _ ((frobeniusEquiv (OCb l) l).symm b),
+    ?_
+  ⟩
   rw [frobenius_def, div_pow, ← map_pow (algebraMap (OCb l) (Cb l)),
-    ← map_pow (algebraMap (OCb l) (Cb l)), frobeniusEquiv_symm_pow_p,
-    frobeniusEquiv_symm_pow_p]
+    ← map_pow (algebraMap (OCb l) (Cb l)), frobeniusEquiv_symm_pow_p, frobeniusEquiv_symm_pow_p]
 
 theorem eq_zero_of_forall_dvd (z : WCb l) (h : ∀ n, ((l : ℕ) : WCb l) ^ n ∣ z) : z = 0 := by
   ext m
@@ -73,7 +79,8 @@ theorem eq_zero_of_forall_dvd (z : WCb l) (h : ∀ n, ((l : ℕ) : WCb l) ^ n �
   rw [hy, mul_comm, WittVector.mul_pow_charP_coeff_zero _ (Nat.lt_succ_self m)]
   simp
 
-private theorem sigmaA_eq_map_pt (g : GQ l) (a : Ainf l) : Per.σA g a = WittVector.map (Per.σF g) a := by
+private theorem sigmaA_eq_map_pt (g : GQ l) (a : Ainf l)
+    : Per.σA g a = WittVector.map (Per.σF g) a := by
   apply GlobalTheory.Prism.inclW_injective
   rw [← galW_inclW]
   exact WittVector.ext fun n => autCb_alg l (galTilt l g) (a.coeff n)
@@ -83,7 +90,8 @@ variable {K : FinExt l} (bk : BK K)
 theorem sat (w : WCb l) (hw : ((l : ℕ) : WCb l) * w ∈ bk.OE) : w ∈ bk.OE := by
   apply GlobalTheory.BSP.HeightSInt.mem_of_l_mul_mem <;> assumption
 
-theorem closed (w : WCb l) (h : ∀ n : ℕ, ∃ v ∈ bk.OE, ((l : ℕ) : WCb l) ^ n ∣ w - v) : w ∈ bk.OE := by
+theorem closed (w : WCb l) (h : ∀ n : ℕ, ∃ v ∈ bk.OE, ((l : ℕ) : WCb l) ^ n ∣ w - v)
+    : w ∈ bk.OE := by
   intro n
   obtain ⟨v, hv, z, hz⟩ := h n
   obtain ⟨m, s, y, hy⟩ := hv n
@@ -100,10 +108,13 @@ theorem frob (w : WCb l) (hw : w ∈ bk.OE) : frobW l w ∈ bk.OE := by
   rw [pow_mul]
   linear_combination h'
 
-theorem gal (g : ↥(GK K)) (hg : bk.FixFlat g) (w : WCb l) (hw : w ∈ bk.OE) : galW l (g : GQ l) w = w := by
-  obtain ⟨-, -, -, hflat, -, hcomp, -⟩ := GlobalTheory.T.ainf_divisibility_breuilKisin_facts l K bk
-  haveI := (GlobalTheory.T.wittVector_teichmuller_isAdicComplete_of_perfect l (OCb l) bk.flat hflat hcomp).1
-  have hteich : Per.σA (g : GQ l) (WittVector.teichmuller l bk.flat) = WittVector.teichmuller l bk.flat := by
+theorem gal (g : ↥(GK K)) (hg : bk.FixFlat g) (w : WCb l) (hw : w ∈ bk.OE)
+    : galW l (g : GQ l) w = w := by
+  obtain ⟨-, -, -, hflat, -, hcomp, -⟩ := _root_.GlobalTheory.BSP.AinfDiv.main l K bk
+  haveI := (_root_.GlobalTheory.WittTeichComplete.main l (OCb l) bk.flat hflat hcomp).1
+  have hteich
+      : Per.σA (g : GQ l) (WittVector.teichmuller l bk.flat)
+        = WittVector.teichmuller l bk.flat := by
     rw [sigmaA_eq_map_pt, WittVector.map_teichmuller]
     exact congrArg _ hg
   have hfix : (Per.σA (g : GQ l)).comp bk.ev = bk.ev := by
@@ -113,12 +124,13 @@ theorem gal (g : ↥(GK K)) (hg : bk.FixFlat g) (w : WCb l) (hw : w ∈ bk.OE) :
     · intro x hx
       rw [RingHom.comp_apply, bk.ev_X, hteich] at hx
       refine IsHausdorff.haus' (I := Ideal.span {WittVector.teichmuller l bk.flat}) x fun n => ?_
-      simp only [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+      simp only [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+        Ideal.mem_span_singleton]
       exact hx n
   have hW : ∀ t : bk.S, galW l (g : GQ l) (bk.evW t) = bk.evW t := fun t => by
     change galW l _ (inclW l (bk.ev t)) = inclW l (bk.ev t)
     rw [galW_inclW, ← RingHom.comp_apply (Per.σA _) bk.ev, hfix]
-  obtain ⟨-, -, hu, -, -⟩ := GlobalTheory.T.breuilKisin_OE_mod_prime_laurent_field l K bk
+  obtain ⟨-, -, hu, -, -⟩ := _root_.GlobalTheory.BSP.oe_mod_l l K bk
   apply sub_eq_zero.1
   apply eq_zero_of_forall_dvd
   intro n
@@ -126,20 +138,24 @@ theorem gal (g : ↥(GK K)) (hg : bk.FixFlat g) (w : WCb l) (hw : w ∈ bk.OE) :
   have h' := congrArg (galW l (g : GQ l)) h
   simp only [map_mul, map_add (f := _), map_pow, map_natCast, hW] at h'
   obtain ⟨u, hu'⟩ := hu.pow m
-  have e : (u : WCb l) * (galW l (g : GQ l) w - w) =
-      ((l : ℕ) : WCb l) ^ n * (galW l (g : GQ l) y - y) := by
+  have e
+      : (u : WCb l) * (galW l (g : GQ l) w - w)
+        = ((l : ℕ) : WCb l) ^ n * (galW l (g : GQ l) y - y) := by
     rw [hu']; linear_combination h' - h
   refine ⟨(↑u⁻¹ : WCb l) * (galW l (g : GQ l) y - y), ?_⟩
-  calc galW l (g : GQ l) w - w = (↑u⁻¹ : WCb l) * ((u : WCb l) * (galW l (g : GQ l) w - w)) := by
-        rw [← mul_assoc, Units.inv_mul, one_mul]
+  calc
+    galW l (g : GQ l) w - w = (↑u⁻¹ : WCb l) * ((u : WCb l) * (galW l (g : GQ l) w - w)) := by
+      rw [← mul_assoc, Units.inv_mul, one_mul]
     _ = _ := by rw [e]; ring
 
 theorem inv (w : WCb l) (hw : w ∈ bk.OE) (hu : IsUnit w) : ∃ w' ∈ bk.OE, w * w' = 1 := by
   haveI := perfect_Cb (l := l)
-  obtain ⟨-, -, -, -, hinv⟩ := GlobalTheory.T.breuilKisin_OE_mod_prime_laurent_field l K bk
+  obtain ⟨-, -, -, -, hinv⟩ := _root_.GlobalTheory.BSP.oe_mod_l l K bk
   obtain ⟨u, rfl⟩ := hu
-  have hy : WittVector.constantCoeff (p := l) (R := Cb l) u ∈
-      bk.OE.map (WittVector.constantCoeff (p := l) (R := Cb l)) := Subring.mem_map.2 ⟨u, hw, rfl⟩
+  have hy
+      : WittVector.constantCoeff (p := l) (R := Cb l) u
+        ∈ bk.OE.map (WittVector.constantCoeff (p := l) (R := Cb l)) :=
+    Subring.mem_map.2 ⟨u, hw, rfl⟩
   obtain ⟨v, hv, hvy⟩ := Subring.mem_map.1 (hinv _ hy)
   have hne : WittVector.constantCoeff (p := l) (R := Cb l) u ≠ 0 := by
     intro h0
@@ -150,13 +166,18 @@ theorem inv (w : WCb l) (hw : w ∈ bk.OE) (hu : IsUnit w) : ∃ w' ∈ bk.OE, w
     rw [RingHom.mem_ker, RingHom.map_sub, map_mul, hvy, map_one, mul_inv_cancel₀ hne, sub_self]
   rw [WittVector.ker_constantCoeff, Ideal.mem_span_singleton] at h1
   obtain ⟨z, hz⟩ := h1
-  have hz' : z ∈ bk.OE := sat bk z (by
-    rw [← hz]; exact sub_mem (mul_mem hw hv) (one_mem _))
+  have hz' : z ∈ bk.OE := sat bk z (by rw [← hz]; exact sub_mem (mul_mem hw hv) (one_mem _))
   have huv : (u : WCb l) * v = 1 - (-((l : ℕ) : WCb l) * z) := by linear_combination hz
   have hi : (↑u⁻¹ : WCb l) * u = 1 := Units.inv_mul u
-  refine ⟨↑u⁻¹, closed bk _ fun n => ⟨v * ∑ i ∈ Finset.range n, (-((l : ℕ) : WCb l) * z) ^ i,
-    mul_mem hv (sum_mem fun i _ => pow_mem (mul_mem (neg_mem (natCast_mem _ l)) hz') i),
-    ⟨(↑u⁻¹ : WCb l) * (-z) ^ n, ?_⟩⟩, u.mul_inv⟩
+  refine ⟨
+    ↑u⁻¹,
+    closed bk _ fun n => ⟨
+      v * ∑ i ∈ Finset.range n, (-((l : ℕ) : WCb l) * z) ^ i,
+      mul_mem hv (sum_mem fun i _ => pow_mem (mul_mem (neg_mem (natCast_mem _ l)) hz') i),
+      ⟨(↑u⁻¹ : WCb l) * (-z) ^ n, ?_⟩
+    ⟩,
+    u.mul_inv
+  ⟩
   have hgeom := geom_sum_mul_neg (-((l : ℕ) : WCb l) * z) n
   have hq : (-((l : ℕ) : WCb l) * z) ^ n = ((l : ℕ) : WCb l) ^ n * (-z) ^ n := by
     rw [neg_mul, ← mul_neg, mul_pow]
@@ -164,7 +185,13 @@ theorem inv (w : WCb l) (hw : w ∈ bk.OE) (hu : IsUnit w) : ∃ w' ∈ bk.OE, w
     (-((l : ℕ) : WCb l) * z) ^ i) * huv + (v * ∑ i ∈ Finset.range n, (-((l : ℕ) : WCb l) * z) ^ i) * hi
     - (↑u⁻¹ : WCb l) * hq
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), (∀ w : WCb l, ((l : ℕ) : WCb l) * w ∈ bk.OE → w ∈ bk.OE) ∧ (∀ w : WCb l, (∀ n : ℕ, ∃ v ∈ bk.OE, ((l : ℕ) : WCb l) ^ n ∣ w - v) → w ∈ bk.OE) ∧ (∀ w ∈ bk.OE, frobW l w ∈ bk.OE) ∧ (∀ g : ↥(GK K), bk.FixFlat g → ∀ w ∈ bk.OE, galW l (g : GQ l) w = w) ∧ ∀ w ∈ bk.OE, IsUnit w → ∃ w' ∈ bk.OE, w * w' = 1 := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
+      (∀ w : WCb l, ((l : ℕ) : WCb l) * w ∈ bk.OE → w ∈ bk.OE)
+        ∧ (∀ w : WCb l, (∀ n : ℕ, ∃ v ∈ bk.OE, ((l : ℕ) : WCb l) ^ n ∣ w - v) → w ∈ bk.OE)
+        ∧ (∀ w ∈ bk.OE, frobW l w ∈ bk.OE)
+        ∧ (∀ g : ↥(GK K), bk.FixFlat g → ∀ w ∈ bk.OE, galW l (g : GQ l) w = w)
+        ∧ ∀ w ∈ bk.OE, IsUnit w → ∃ w' ∈ bk.OE, w * w' = 1 := by
   intro l _ K bk
   exact ⟨sat bk, closed bk, frob bk, fun g hg w hw => gal bk g hg w hw, inv bk⟩
 

@@ -63,9 +63,6 @@ namespace PositivityTheory.Rg.Sw.Glob.RhoH
 
 variable {D : D7} {n : ℕ}
 
-
-
-
 def ptX {m : ℕ} (u : Matrix (Fin m) (Fin n) ℂ) : Fin m × Fin n × Bool → ℂ := fun k =>
   if k.2.2 then star (u k.1 k.2.1) else u k.1 k.2.1
 
@@ -88,7 +85,6 @@ theorem gAway_add_dirAt
     intro τ' h
     rw [Pi.add_apply, Pi.smul_apply, dirAt_ne h, smul_zero, add_zero]
   delta gAway
-  beta_reduce
   congr 2
   refine Finset.sum_congr rfl fun τ' hτ' => ?_
   rw [hz τ' (by simpa using hτ')]
@@ -209,8 +205,6 @@ private theorem hasDerivAt_gs_line_zero {m : ℕ} (c : ℝ) (U W : Matrix (Fin m
     first
     | exact HasDerivAt.fun_sum fun a _ =>
         HasDerivAt.fun_sum fun i _ => hasDerivAt_norm_sq_add_smul_zero (U a i) (W a i)
-    | exact HasDerivAt.sum fun a _ =>
-        HasDerivAt.sum fun i _ => hasDerivAt_norm_sq_add_smul_zero (U a i) (W a i)
   have hn : HasDerivAt
       (fun t : ℝ => -((c * ∑ a, ∑ i, ‖U a i + (t : ℂ) * W a i‖ ^ 2 : ℝ) : ℂ))
       (-((c * ∑ a, ∑ i, 2 * (star (U a i) * W a i).re : ℝ) : ℂ)) 0 :=

@@ -2,8 +2,10 @@ module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionPointsFieldExtensionStatement
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilPairingFieldExtensionIffStatement
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionPointsFieldExtension
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.WeilPairingFieldExtensionIff
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -45,7 +47,6 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 
 @[expose] public section
 
@@ -211,7 +212,7 @@ theorem tateIso_fieldExt
                           = (Over.homMk (spMap i) rfl : Over.mk (spMap i ≫ x) ⟶ Over.mk x)
                             ≫ I.ev n v := by
   intro hL E _ _ _ H D S P act K Ω _ _ _ _ _ i x
-  obtain ⟨hinj, honto⟩ := GlobalTheory.T.torsion_points_descend_field_extension hL S P K Ω i x
+  obtain ⟨hinj, honto⟩ := _root_.GlobalTheory.torsion_points_field_extension hL S P K Ω i x
   let g : Over.mk (spMap i ≫ x) ⟶ Over.mk x := Over.homMk (spMap i) rfl
   have honto'
       : ∀ n,
@@ -224,14 +225,14 @@ theorem tateIso_fieldExt
       up D i (precomp g P.A) hinj honto'
         (fun c y => (Category.assoc g y (act c)).symm)
         (fun n y y' c =>
-          GlobalTheory.T.weilPairing_fieldExtension_iff S P.A K Ω i x P.L n y y' c P.isAb P.isLB)
+          _root_.GlobalTheory.weilIs_fieldExt_iff S P.A K Ω i x P.L n y y' c P.isAb P.isLB)
         I,
     fun I' hm =>
       down D i (precomp g P.A) hinj honto'
         (fun c y => (Category.assoc g y (act c)).symm)
         (fun c => ?_)
         (fun n y y' c =>
-          GlobalTheory.T.weilPairing_fieldExtension_iff S P.A K Ω i x P.L n y y' c P.isAb P.isLB)
+          _root_.GlobalTheory.weilIs_fieldExt_iff S P.A K Ω i x P.L n y y' c P.isAb P.isLB)
         I'
   ⟩
   haveI := hm c

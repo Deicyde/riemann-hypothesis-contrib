@@ -78,23 +78,14 @@ theorem finset_functions_recovered_from_values
   have hev : ∀ x (w : W), ev x w = (w : X → ℂ) x := fun x w => rfl
   set S : Submodule ℂ (Module.Dual ℂ W) := Submodule.span ℂ (Set.range ev) with hSdef
   have hcoan : S.dualCoannihilator = ⊥ := by
-    rw [eq_bot_iff]
-    intro w hw
-    rw [Submodule.mem_dualCoannihilator] at hw
-    have h0 : (w : X → ℂ) = 0 := by
-      funext x
-      have := hw (ev x) (Submodule.subset_span ⟨x, rfl⟩)
-      simpa [hev] using this
-    rw [Submodule.mem_bot]
-    exact Subtype.ext h0
+    refine (Submodule.eq_bot_iff _).mpr fun w hw => Subtype.ext (funext fun x => ?_)
+    exact (Submodule.mem_dualCoannihilator w).mp hw (ev x) (Submodule.subset_span ⟨x, rfl⟩)
   have hS : S = ⊤ := by
-    have := Subspace.dualCoannihilator_dualAnnihilator_eq (W := S)
-    rw [← this, hcoan, Submodule.dualAnnihilator_bot]
+    rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := S), hcoan,
+      Submodule.dualAnnihilator_bot]
   let b := Module.finBasis ℂ W
-  have hμ : ∀ i, ∃ c : X →₀ ℂ, (c.sum fun x a => a • ev x) = b.coord i := by
-    intro i
-    have : b.coord i ∈ S := by rw [hS]; trivial
-    exact Finsupp.mem_span_range_iff_exists_finsupp.mp this
+  have hμ : ∀ i, ∃ c : X →₀ ℂ, (c.sum fun x a => a • ev x) = b.coord i := fun i =>
+    Finsupp.mem_span_range_iff_exists_finsupp.mp (by rw [← hSdef, hS]; trivial)
   choose μ hμ using hμ
   set s : Finset X := Finset.univ.biUnion (fun i => (μ i).support) with hsdef
   have hsub : ∀ i, (μ i).support ⊆ s := fun i x hx =>
@@ -105,20 +96,16 @@ theorem finset_functions_recovered_from_values
   · intro u hu
     let w : W := ⟨u, Submodule.subset_span hu⟩
     have hw : (w : X → ℂ) = u := rfl
-    have hrep : ∀ i, b.repr w i = ∑ x ∈ s, μ i x * u x := by
-      intro i
-      have h1 : b.repr w i = b.coord i w := rfl
-      rw [h1, ← hμ i, Finsupp.sum_of_support_subset (μ i) (hsub i)]
-      · simp [LinearMap.sum_apply, hev, hw]
-      · intro x _; simp
+    have hrep : ∀ i, b.repr w i = ∑ x ∈ s, μ i x * u x := fun i => by
+      rw [show b.repr w i = b.coord i w from rfl, ← hμ i,
+          Finsupp.sum_of_support_subset (μ i) (hsub i)]
+        <;> simp [LinearMap.sum_apply, hev, hw]
     calc
       u = ((∑ i, b.repr w i • b i : W) : X → ℂ) := by rw [b.sum_repr w]
       _ = ∑ i, b.repr w i • ((b i : W) : X → ℂ) := by
         rw [Submodule.coe_sum]; simp only [Submodule.coe_smul]
-      _ = _ := by
-        simp_rw [hrep, Finset.smul_sum, Finset.sum_smul, smul_smul]
+      _ = ∑ x ∈ s, u x • ∑ i, μ i x • ((b i : W) : X → ℂ) := by
+        simp only [hrep, Finset.smul_sum, Finset.sum_smul, smul_smul, mul_comm]
         rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun i _ => ?_))
-        rw [mul_comm]
 
 end GlobalTheory

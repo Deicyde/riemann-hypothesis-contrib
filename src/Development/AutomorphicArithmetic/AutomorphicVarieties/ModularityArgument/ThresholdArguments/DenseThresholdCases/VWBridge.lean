@@ -38,9 +38,6 @@ import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.Admis
 
 @[expose] public section
 
-
-
-
 section
 open UpperTheory.GalN.V
 open NumberField GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af

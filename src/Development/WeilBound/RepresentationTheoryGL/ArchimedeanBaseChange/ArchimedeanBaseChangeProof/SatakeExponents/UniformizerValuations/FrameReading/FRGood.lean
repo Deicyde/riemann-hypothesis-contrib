@@ -50,8 +50,6 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.Bc
   PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig
 open scoped Classical
 
-
-
 namespace PositivityTheory.Rg.BcB.F.FG
 
 attribute [local instance]

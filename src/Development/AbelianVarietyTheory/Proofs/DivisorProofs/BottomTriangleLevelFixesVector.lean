@@ -77,9 +77,6 @@ open GlobalTheory.NormSum (Pair Tup)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.BotFinLevel

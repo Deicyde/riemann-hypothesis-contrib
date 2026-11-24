@@ -105,14 +105,12 @@ theorem sx_eq
     : SX K B f T w Z Wt p0 r col = (pkOf r).SAt fun u => (col.C.forms u).to0 :=
   (Eq.refl (SX K B f T w Z Wt p0 r col))
 
-
 def LevelThreeCondition (𝒮 : Slots) : Prop :=
   ∀ (K : Ctx) (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z : w.Lt)
       (l : Lv3 𝒮 K w Z) (S' : SStage B w.C Z.W) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V)
       (h : B.Word → ℝ),
     ∃ l' : Lv3 𝒮 K w (upL Z S' N h),
       pkOf l'.what₂ = (pkOf l.what₂).up Z S' N h
-
 
 def SxMv : Prop :=
   ∀ (K : Ctx) (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z : w.Lt)
@@ -123,13 +121,11 @@ def SxMv : Prop :=
     HEq (pkOf t) ((pkOf r).up Z Z.S N h) → Nonempty (SX K B f T w Z Wt p0 r col)
       → Nonempty (SX K B f T w (Db.setDivZ Z N h) Wt p0' t col')
 
-
 def SameCar {D : D7} (F F' : ∀ u, Forms0 D u) : Prop :=
   ∀ u : D.what₂.Word,
     (F' u).cls0.lev.Lb = (F u).cls0.lev.Lb ∧ (F' u).cls0.lev.U = (F u).cls0.lev.U
       ∧ HEq (F' u).cls0.lev.chi (F u).cls0.lev.chi ∧ (F' u).cls0.y = (F u).cls0.y
       ∧ (F' u).val0.eY = (F u).val0.eY
-
 
 def SameStd : Prop :=
   ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z : w.Lt) (Zn : New (Late.D Z))

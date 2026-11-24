@@ -164,7 +164,6 @@ theorem crossOp_position_bound
     · rw [slt_eq_slice i r p P]
       exact hP _
   have h1 : ‖P‖ ^ 2 = ∑ r, ‖slt i r P‖ ^ 2 := by
-
     rw [@norm_sq_eq_re_inner ℂ, slt_inner_eq_sum i P P, map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [@norm_sq_eq_re_inner ℂ]

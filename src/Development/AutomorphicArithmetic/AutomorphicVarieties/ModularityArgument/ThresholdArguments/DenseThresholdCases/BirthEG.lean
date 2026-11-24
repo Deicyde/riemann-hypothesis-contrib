@@ -61,9 +61,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-attribute [-instance]
-  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
-
 section
 open UpperTheory.V.Z.Win.Birth
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial

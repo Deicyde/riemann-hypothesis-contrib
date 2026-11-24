@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
   Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR GlobalTheory.WeilParts
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.weilRep_theta_datum_half_eq_smul
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
         (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.weilRep_theta_datum_half_eq_smul
                 → ∀ c c' : ℂ,
                   c ≠ 0 → om (g, h) f₀ = c • f₀ → (∀ x, Φ (actO S T g⁻¹ h⁻¹ x) = c' * Φ x)
                     → om (g, h) f = (c * c') • f := by
-  first
-  | exact @GlobalTheory.ThetaMove.om_theta_eq_smul
-  | exact GlobalTheory.ThetaMove.om_theta_eq_smul
-  | (intros; apply GlobalTheory.ThetaMove.om_theta_eq_smul <;> assumption)
+  first | exact @GlobalTheory.ThetaMove.om_theta_eq_smul

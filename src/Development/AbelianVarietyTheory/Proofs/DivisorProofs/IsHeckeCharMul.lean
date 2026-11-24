@@ -72,13 +72,6 @@ theorem isHeckeChar_mul' {c c' : (AE D)ˣ →* Circle} (h : IsHeckeChar D c) (h'
     : IsHeckeChar D (c * c') :=
   ⟨h.1.mul h'.1, fun x => by rw [MonoidHom.mul_apply, h.2 x, h'.2 x, mul_one]⟩
 
-theorem isHeckeChar_pow' {c : (AE D)ˣ →* Circle} (h : IsHeckeChar D c) (n : ℕ)
-    : IsHeckeChar D (c ^ n) :=
-  ⟨h.1.pow n, fun x => by rw [MonoidHom.pow_apply, h.2 x, one_pow]⟩
-
-theorem resEta_pow' {c : (AE D)ˣ →* Circle} (h : ResEta D c 1) (n : ℕ) : ResEta D (c ^ n) n :=
-  ⟨h.1, fun e he a => by rw [MonoidHom.pow_apply, h.2 e he a, pow_one]⟩
-
 theorem chi_hecke_res (G : GridData L sc) {μ₀ : T} (hL : L.Is μ₀) (i : Fin D.R.m)
     : IsHeckeChar D (G.ch.chi (D.R.m - i)) ∧ ResEta D (G.ch.chi (D.R.m - i)) 0 := by
   have h1 : 1 ≤ D.R.m - (i : ℕ) := by omega
@@ -138,9 +131,11 @@ theorem square_chars
   have hμ := GlobalTheory.HeckeCharacterRestriction.isHecke_mu hL t j
   have hμ0 := GlobalTheory.HeckeCharacterRestriction.resEta_mu hL t j
   have hη :=
-    isHeckeChar_pow' hL.eta.1 (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.eps G i j)
+    _root_.GlobalTheory.WeilProduct.isHeckeChar_pow hL.eta.1
+      (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.eps G i j)
   have hη1 :=
-    resEta_pow' (GlobalTheory.HeckeCharacterRestriction.resEta_eta hL)
+    _root_.GlobalTheory.WeilProduct.resEta_pow
+      (GlobalTheory.HeckeCharacterRestriction.resEta_eta hL)
       (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.eps G i j)
   obtain ⟨p1, p2⟩ := rank_parity G hL i j
   have hβ : ResEta D (beta G i j) (spW G i j).rank :=

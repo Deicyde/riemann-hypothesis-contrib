@@ -158,7 +158,8 @@ theorem of_flat_isPullback
         SequenceOfBlowups.projectionToBase_succ, Category.assoc]
   have hcen'
       : ∀ i : ℕ, ∀ hi : i < s'.length,
-        t'.center i = imageIdealSheaf (σ' i hi.le) (s'.center i) := by
+        t'.center i
+          = _root_.FunctorialResolution.Blowup.schemeImageIdeal (σ' i hi.le) (s'.center i) := by
     intro i hi
     have hit : i < t'.length := by omega
     have his : i < s.length := by omega

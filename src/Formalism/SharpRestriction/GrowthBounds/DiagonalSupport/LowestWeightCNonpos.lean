@@ -250,7 +250,7 @@ theorem sum_of_span
         ← Finset.mul_prod_erase _
           (fun j => if j = j0 then c • A i j else A i j)
           (Finset.mem_univ j0)]
-      simp only [if_pos rfl, eq_self_iff_true, if_true]
+      simp only [if_true]
       rw [Finset.prod_congr rfl (fun j hj => if_neg (Finset.ne_of_mem_erase hj)), smul_mul_assoc]
 
 theorem decGen

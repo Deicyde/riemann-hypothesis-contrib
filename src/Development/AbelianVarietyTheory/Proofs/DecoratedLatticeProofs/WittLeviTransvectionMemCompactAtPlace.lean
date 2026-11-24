@@ -75,7 +75,6 @@ theorem hermAt_colMul_jY (d : HypDec S S₀ ρ) (l : Fin ρ) (b : AE D) (x : Fin
     : hermAt S (colMul d.jY l b) x = b * cA D ((d.pX *ᵥ x) l) := by
   have hg : ∀ k m, cA D (gA S k m) = gA S m k := fun k m => congrFun (congrFun (adj_gA S) m) k
   have hp : ∀ m, cA D (d.pX l m) = ∑ k, gA S m k * d.jY k l := fun m => by
-
     rw [d.pX_eq, Matrix.mul_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [RingHom.map_mul, hg, mul_comm]

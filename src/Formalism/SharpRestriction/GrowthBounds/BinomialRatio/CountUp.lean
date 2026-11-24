@@ -390,14 +390,12 @@ theorem chainCount_eq
       refine finsum_eq_zero_of_forall_eq_zero fun ka => ?_
       unfold Fs SrcOK
       dsimp only
-      rw [if_neg]
-      exact fun h => hL h.2.1
+      rw [if_neg (fun h => hL h.2.1)]
   · symm
     refine finsum_eq_zero_of_forall_eq_zero fun x => finsum_eq_zero_of_forall_eq_zero fun ka => ?_
     unfold Fs SrcOK
     dsimp only
-    rw [if_neg]
-    exact fun h => hK h.1
+    rw [if_neg (fun h => hK h.1)]
 
 def mmLetters
     (C0 CE1 CE2 : ℝ)

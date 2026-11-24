@@ -140,7 +140,7 @@ private theorem fd_norm
       have e : (Matrix.SpecialLinearGroup.mapGL ℝ γ)⁻¹ = Matrix.SpecialLinearGroup.mapGL ℝ γ⁻¹ :=
         (map_inv _ _).symm
       refine IsBigO.trans ?_ (isBigO_const_const (1 : ℝ) (one_ne_zero (α := ℂ)) atImInfty)
-      simp only [Subgroup.coe_mk, e]
+      simp only [e]
       exact hbd
   have hP
       : (fun τ => ∏ q ∈ Finset.univ.erase ⟦(1 : 𝒮ℒ)⟧,

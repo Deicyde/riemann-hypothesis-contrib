@@ -190,7 +190,7 @@ theorem _root_.GlobalTheory.differentials_iff_trdegD_and_genericSection
   have key := _root_.GlobalTheory.exists_linearIndependent_D_iff_trdeg_adjoin_eq hD (d.x c)
   refine ⟨key.trans htr.symm, fun hT => ?_⟩
   obtain ⟨hind, hfin⟩ :=
-    _root_.ReciprocityTheory.MultiplicativeHeights.Closed.fieldOfS K (Ω c) d.D d.N (d.x c) hfg hD
+    _root_.ReciprocityTheory.MultiplicativeHeights.genericImageFinite K (Ω c) d.D d.N (d.x c) hfg hD
       (key.mpr (htr.mp hT))
   let e := (finSuccEquiv' (d.jc c)).trans (finSuccEquiv d.N).symm
   let σ

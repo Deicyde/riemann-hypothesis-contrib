@@ -45,9 +45,6 @@ import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-
-
-
 noncomputable section
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
@@ -110,7 +107,6 @@ theorem range_aeval
     : y * MvPolynomial.aeval (fun i => X.inc wL (w i)) Pw
       ∈ LinearMap.range (X.inc (addL (wt0 D j) wL (m + k))) := by
   classical
-
   rw [Pw.as_sum, map_sum, Finset.mul_sum]
   refine Submodule.sum_mem _ fun d hd => ?_
   rw [MvPolynomial.aeval_monomial, mul_left_comm, ← Algebra.smul_def]

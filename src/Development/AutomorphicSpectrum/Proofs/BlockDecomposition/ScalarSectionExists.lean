@@ -211,9 +211,7 @@ theorem tScal : TScal := by
             * (PositivityTheory.RgEis.pos Γ' P' (fun x => a * η x) (Φ g)
               + PositivityTheory.RgEis.pos Γ' P' (fun x => N * η x - b * η x) (Φ g)) :=
         key
-      _ = _ := by
-        rw [e3, e1, e2]
-        try rfl
+      _ = _ := by rw [e3, e1, e2]
 
 end GlobalTheory.CompanionTheory.ScalWall
 

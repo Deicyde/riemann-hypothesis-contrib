@@ -62,10 +62,14 @@ noncomputable section
 
 namespace GlobalTheory.KSp
 
-theorem mem_box_of_forall_dot {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {d : Type} [Fintype d] [DecidableEq d] (ψ : AddChar F ℂ) {t₀ : Fˣ}
-    (ht : ψ t₀ ≠ 1) (s : Fˣ) {v : d → F} (hv : ∀ u ∈ box d s, ψ (u ⬝ᵥ v) = 1) :
-    v ∈ box d (t₀ * s⁻¹) := by
+theorem mem_box_of_forall_dot
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {d : Type} [Fintype d] [DecidableEq d]
+    (ψ : AddChar F ℂ)
+    {t₀ : Fˣ} (ht : ψ t₀ ≠ 1)
+    (s : Fˣ)
+    {v : d → F} (hv : ∀ u ∈ box d s, ψ (u ⬝ᵥ v) = 1)
+    : v ∈ box d (t₀ * s⁻¹) := by
   intro i _
   by_contra h
   simp only [GlobalTheory.SplitWeil.cball, Set.mem_setOf_eq, not_le] at h
@@ -82,15 +86,19 @@ theorem mem_box_of_forall_dot {F : Type} [Field F] [ValuativeRel F] [Topological
       have e : (t₀ : F) / v j = ((t₀ * s⁻¹ : Fˣ) : F) * s / v j := by
         push_cast
         field_simp
-      have hpos : 0 < valuation F (v j) := by
-        rw [zero_lt_iff]; exact (map_ne_zero _).mpr hw
+      have hpos : 0 < valuation F (v j) := by rw [zero_lt_iff]; exact (map_ne_zero _).mpr hw
       rw [e, map_div₀, map_mul, div_le_iff₀ hpos, mul_comm (valuation F (s : F))]
       exact mul_le_mul' h.le le_rfl
     · simp [Pi.single_eq_of_ne hj, GlobalTheory.SplitWeil.cball]
   have h2 := hv _ hu
   rwa [single_dotProduct, div_mul_cancel₀ _ hw] at h2
 
-theorem isPair_addChar_form : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V] [TopologicalSpace V] [IsModuleTopology F V] (ψ : AddChar F ℂ) (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) (β : V →ₗ[F] V →ₗ[F] F), (∀ x y, β x y = β y x) → (∀ y, (∀ x, β x y = 0) → y = 0) → IsPair fun x y => ψ (β x y) := by
+theorem isPair_addChar_form
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] (V : Type) [AddCommGroup V] [Module F V]
+        [FiniteDimensional F V] [TopologicalSpace V] [IsModuleTopology F V] (ψ : AddChar F ℂ)
+        (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) (β : V →ₗ[F] V →ₗ[F] F),
+      (∀ x y, β x y = β y x) → (∀ y, (∀ x, β x y = 0) → y = 0) → IsPair fun x y => ψ (β x y) := by
   intro F _ _ _ _ _ V _ _ _ _ _ ψ hψ hn h1 β hs hnd
   haveI := GlobalTheory.WeilM.nonarch_field F
   haveI := IsModuleTopology.toContinuousAdd F V
@@ -122,11 +130,15 @@ theorem isPair_addChar_form : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRe
     intro u y
 
     simp [e₁, e₂, f₂, Module.Basis.equivFun_symm_apply, map_sum, map_smul, dotProduct]
-  have cont : ∀ g : V ≃ₗ[F] (Fin (Module.finrank F V) → F), Continuous g ∧ Continuous g.symm := fun g =>
-    ⟨IsModuleTopology.continuous_of_linearMap g.toLinearMap,
-      IsModuleTopology.continuous_of_linearMap g.symm.toLinearMap⟩
-  have ann : ∀ (s : Fˣ) y, (∀ u ∈ box (Fin (Module.finrank F V)) s, ψ (β (e₁.symm u) y) = 1) →
-      e₂ y ∈ box (Fin (Module.finrank F V)) (T * s⁻¹) := by
+  have cont
+      : ∀ g : V ≃ₗ[F] (Fin (Module.finrank F V) → F), Continuous g ∧ Continuous g.symm := fun g => ⟨
+    IsModuleTopology.continuous_of_linearMap g.toLinearMap,
+    IsModuleTopology.continuous_of_linearMap g.symm.toLinearMap
+  ⟩
+  have ann
+      : ∀ (s : Fˣ) y,
+        (∀ u ∈ box (Fin (Module.finrank F V)) s, ψ (β (e₁.symm u) y) = 1)
+          → e₂ y ∈ box (Fin (Module.finrank F V)) (T * s⁻¹) := by
     intro s y h
     exact mem_box_of_forall_dot ψ hT s fun u hu => by rw [← key]; exact h u hu
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -142,17 +154,25 @@ theorem isPair_addChar_form : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRe
     have hU' : e₂.symm ⁻¹' U ∈ 𝓝 (0 : Fin (Module.finrank F V) → F) :=
       (cont e₂).2.continuousAt.preimage_mem_nhds (by simpa using hU)
     obtain ⟨r, hr⟩ := exists_box_subset hU'
-    refine ⟨e₁.symm '' box (Fin (Module.finrank F V)) (T * r⁻¹), (isCompact_box _).image (cont e₁).2,
-      fun y hy => ?_⟩
+    refine ⟨
+      e₁.symm '' box (Fin (Module.finrank F V)) (T * r⁻¹),
+      (isCompact_box _).image (cont e₁).2,
+      fun y hy => ?_
+    ⟩
     have h2 := ann (T * r⁻¹) y fun u hu => hy _ ⟨u, hu, rfl⟩
-    rw [show T * (T * r⁻¹)⁻¹ = r by rw [_root_.mul_inv_rev, inv_inv, mul_comm r, mul_inv_cancel_left]] at h2
+    rw [show T * (T * r⁻¹)⁻¹ = r by
+        rw [_root_.mul_inv_rev, inv_inv, mul_comm r, mul_inv_cancel_left]]
+      at h2
     simpa using hr h2
   · intro U hU
     have hU' : e₁.symm ⁻¹' U ∈ 𝓝 (0 : Fin (Module.finrank F V) → F) :=
       (cont e₁).2.continuousAt.preimage_mem_nhds (by simpa using hU)
     obtain ⟨s, hs'⟩ := exists_box_subset hU'
-    exact ⟨e₂.symm '' box (Fin (Module.finrank F V)) (T * s⁻¹), (isCompact_box _).image (cont e₂).2,
-      fun y hy => ⟨e₂ y, ann s y fun u hu => hy _ (hs' hu), by simp⟩⟩
+    exact ⟨
+      e₂.symm '' box (Fin (Module.finrank F V)) (T * s⁻¹),
+      (isCompact_box _).image (cont e₂).2,
+      fun y hy => ⟨e₂ y, ann s y fun u hu => hy _ (hs' hu), by simp⟩
+    ⟩
 
 end GlobalTheory.KSp
 

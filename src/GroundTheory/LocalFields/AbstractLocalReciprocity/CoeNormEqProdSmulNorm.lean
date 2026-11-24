@@ -56,37 +56,33 @@ open ProfiniteInteger
 
 variable {G : Type*} [Group G] {A : Type*} [CommGroup A] [MulDistribMulAction G A]
 
-theorem coe_norm_eq_prod_smul_norm
-    (d : G →* Multiplicative ℤ̂)
-    {K S J : Subgroup G} {f n : ℕ} (hn : 0 < n) (hf : 0 < f) (hSK : S ≤ K)
+theorem coe_norm_eq_prod_smul_norm (d : G →* Multiplicative ℤ̂) {K S J : Subgroup G} {f n : ℕ}
+    (hn : 0 < n) (hf : 0 < f) (hSK : S ≤ K)
     (hdS : ∀ s ∈ S, Multiplicative.toAdd (d s) ∈ multiples (n * f))
     (hsurj : ∀ k ∈ K, Multiplicative.toAdd (d k) ∈ multiples (n * f) → ∃ s ∈ S, d s = d k)
-    (hdK : ∀ k ∈ K, Multiplicative.toAdd (d k) ∈ multiples f) (hJ : ∀ q ∈ K ⊓ d.ker, q ∈ S ↔ q ∈ J)
+    (hdK : ∀ k ∈ K, Multiplicative.toAdd (d k) ∈ multiples f)
+    (hJ : ∀ q ∈ K ⊓ d.ker, q ∈ S ↔ q ∈ J)
     {φ : G} (hφK : φ ∈ K) (hdφ : d φ = Multiplicative.ofAdd (f : ℤ̂))
     [(S.subgroupOf K).FiniteIndex] [(J.subgroupOf (K ⊓ d.ker)).FiniteIndex]
-    (a : fixedModule A S) (ha : (a : A) ∈ fixedModule A J)
-    : (norm A K S a : A) = ∏ ν : Fin n, φ ^ (ν : ℕ) • (norm A (K ⊓ d.ker) J ⟨a, ha⟩ : A) := by
+    (a : fixedModule A S) (ha : (a : A) ∈ fixedModule A J) :
+    (norm A K S a : A) =
+      ∏ ν : Fin n, φ ^ (ν : ℕ) • (norm A (K ⊓ d.ker) J ⟨a, ha⟩ : A) := by
   classical
   set Q := K ⊓ d.ker with hQ
   have hQK : Q ≤ K := inf_le_left
 
   let incl : Q ⧸ J.subgroupOf Q → K ⧸ S.subgroupOf K :=
-    Quotient.map'
-      (fun q : Q => (⟨q, hQK q.2⟩ : K))
-      fun q q' h => by
-        rw [QuotientGroup.leftRel_apply, Subgroup.mem_subgroupOf] at h ⊢
-        have hq : ((q⁻¹ * q' : Q) : G) ∈ Q := (q⁻¹ * q').2
-        simpa using (hJ _ hq).2 h
+    Quotient.map' (fun q : Q => (⟨q, hQK q.2⟩ : K)) fun q q' h => by
+      rw [QuotientGroup.leftRel_apply, Subgroup.mem_subgroupOf] at h ⊢
+      have hq : ((q⁻¹ * q' : Q) : G) ∈ Q := (q⁻¹ * q').2
+      simpa using (hJ _ hq).2 h
   let φK : K := ⟨φ, hφK⟩
   let F : Fin n × (Q ⧸ J.subgroupOf Q) → K ⧸ S.subgroupOf K := fun p => (φK ^ (p.1 : ℕ)) • incl p.2
-  have hFmk
-      : ∀ (ν : Fin n) (q : Q),
-        F (ν, (q : Q ⧸ J.subgroupOf Q))
-          = ((φK ^ (ν : ℕ) * ⟨q, hQK q.2⟩ : K) : K ⧸ S.subgroupOf K) := fun _ _ =>
-    rfl
+  have hFmk : ∀ (ν : Fin n) (q : Q), F (ν, (q : Q ⧸ J.subgroupOf Q)) =
+      ((φK ^ (ν : ℕ) * ⟨q, hQK q.2⟩ : K) : K ⧸ S.subgroupOf K) := fun _ _ => rfl
 
-  have hdeg
-      : ∀ (m : ℤ) (q : G), q ∈ Q → Multiplicative.toAdd (d (φ ^ m * q)) = ((m * f : ℤ) : ℤ̂) := by
+  have hdeg : ∀ (m : ℤ) (q : G), q ∈ Q →
+      Multiplicative.toAdd (d (φ ^ m * q)) = ((m * f : ℤ) : ℤ̂) := by
     intro m q hq
     rw [map_mul, map_zpow, hdφ, (MonoidHom.mem_ker).1 hq.2, mul_one, ← ofAdd_zsmul, toAdd_ofAdd,
       zsmul_eq_mul]
@@ -97,39 +93,37 @@ theorem coe_norm_eq_prod_smul_norm
     · rintro ⟨ν, x⟩ ⟨μ, y⟩ hxy
       induction x using QuotientGroup.induction_on with
       | H q =>
-        induction y using QuotientGroup.induction_on with
-        | H q' =>
-          rw [hFmk, hFmk, QuotientGroup.eq, Subgroup.mem_subgroupOf] at hxy
-          simp only [Subgroup.coe_mul, Subgroup.coe_inv, SubmonoidClass.coe_pow] at hxy
+      induction y using QuotientGroup.induction_on with
+      | H q' =>
+        rw [hFmk, hFmk, QuotientGroup.eq, Subgroup.mem_subgroupOf] at hxy
+        simp only [Subgroup.coe_mul, Subgroup.coe_inv, SubmonoidClass.coe_pow] at hxy
 
-          have hx
-              : ((φ ^ (ν : ℕ) * (q : G))⁻¹ * (φ ^ (μ : ℕ) * q') : G)
-                = (q : G)⁻¹ * (φ ^ ((μ : ℤ) - ν) * q') := by
-            rw [zpow_sub, zpow_natCast, zpow_natCast]
-            group
-          have hdq
-              : Multiplicative.toAdd (d ((q : G)⁻¹ * (φ ^ ((μ : ℤ) - ν) * q')))
-                = ((((μ : ℤ) - ν) * f : ℤ) : ℤ̂) := by
-            rw [map_mul, map_inv, (MonoidHom.mem_ker).1 q.2.2, inv_one, one_mul]
-            exact hdeg _ _ q'.2
-          have hmem := hdS _ hxy
-          rw [hx, hdq] at hmem
-          have hdvd := (intCast_mem_multiples_iff (Nat.mul_pos hn hf)).1 hmem
-          push_cast at hdvd
-          have hdvd' : (n : ℤ) ∣ (μ : ℤ) - ν :=
-            (mul_dvd_mul_iff_right (by exact_mod_cast hf.ne')).1 hdvd
-          have hνμ : ν = μ := by
-            have hμ := μ.2
-            have hν := ν.2
-            have h0 : ((μ : ℤ) - ν) = 0 :=
-              Int.eq_zero_of_abs_lt_dvd hdvd' (abs_sub_lt_iff.2 ⟨by omega, by omega⟩)
-            exact Fin.ext (by omega)
-          subst hνμ
-          have hqq : (q : G)⁻¹ * q' ∈ S := by simpa [mul_assoc] using hxy
-          have hqQ : (q : G)⁻¹ * q' ∈ Q := Q.mul_mem (Q.inv_mem q.2) q'.2
-          refine Prod.ext rfl ?_
-          rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
-          simpa using (hJ _ hqQ).1 hqq
+        have hx : ((φ ^ (ν : ℕ) * (q : G))⁻¹ * (φ ^ (μ : ℕ) * q') : G) =
+            (q : G)⁻¹ * (φ ^ ((μ : ℤ) - ν) * q') := by
+          rw [zpow_sub, zpow_natCast, zpow_natCast]
+          group
+        have hdq : Multiplicative.toAdd (d ((q : G)⁻¹ * (φ ^ ((μ : ℤ) - ν) * q'))) =
+            ((((μ : ℤ) - ν) * f : ℤ) : ℤ̂) := by
+          rw [map_mul, map_inv, (MonoidHom.mem_ker).1 q.2.2, inv_one, one_mul]
+          exact hdeg _ _ q'.2
+        have hmem := hdS _ hxy
+        rw [hx, hdq] at hmem
+        have hdvd := (intCast_mem_multiples_iff (Nat.mul_pos hn hf)).1 hmem
+        push_cast at hdvd
+        have hdvd' : (n : ℤ) ∣ (μ : ℤ) - ν :=
+          (mul_dvd_mul_iff_right (by exact_mod_cast hf.ne')).1 hdvd
+        have hνμ : ν = μ := by
+          have hμ := μ.2
+          have hν := ν.2
+          have h0 : ((μ : ℤ) - ν) = 0 :=
+            Int.eq_zero_of_abs_lt_dvd hdvd' (abs_sub_lt_iff.2 ⟨by omega, by omega⟩)
+          exact Fin.ext (by omega)
+        subst hνμ
+        have hqq : (q : G)⁻¹ * q' ∈ S := by simpa [mul_assoc] using hxy
+        have hqQ : (q : G)⁻¹ * q' ∈ Q := Q.mul_mem (Q.inv_mem q.2) q'.2
+        refine Prod.ext rfl ?_
+        rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
+        simpa using (hJ _ hqQ).1 hqq
     · intro y
       induction y using QuotientGroup.induction_on with
       | H k =>
@@ -138,9 +132,8 @@ theorem coe_norm_eq_prod_smul_norm
         set ν : ℕ := (proj N w).val with hνdef
         have hνn : ν < n := ZMod.val_lt _
         have hw' : w - (ν : ℤ̂) ∈ multiples n := by
-          have :=
-            (proj_eq_zero_iff (n := N) (x := w - (ν : ℤ̂))).1
-              (by rw [map_sub, map_natCast, hνdef, ZMod.natCast_zmod_val, sub_self])
+          have := (proj_eq_zero_iff (n := N) (x := w - (ν : ℤ̂))).1 (by
+            rw [map_sub, map_natCast, hνdef, ZMod.natCast_zmod_val, sub_self])
           simpa [hNdef] using this
         obtain ⟨z, hz⟩ := mem_multiples.1 hw'
         have hdk : Multiplicative.toAdd (d (φ ^ (-(ν : ℤ)) * k)) ∈ multiples (n * f) := by
@@ -178,50 +171,48 @@ theorem coe_norm_eq_prod_smul_norm
 
 namespace ClassFieldData
 
-variable
-  [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G]
+variable [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G]
   {D : ClassFieldData G A} {K L : OpenSubgroup G}
 
+
 omit [TotallyDisconnectedSpace G] in
-instance finiteIndex_inf_ker (d : G →* Multiplicative ℤ̂) (K L : OpenSubgroup G)
-    : (((L : Subgroup G) ⊓ d.ker).subgroupOf ((K : Subgroup G) ⊓ d.ker)).FiniteIndex := by
-  have h
-      : ((L : Subgroup G) ⊓ d.ker).subgroupOf ((K : Subgroup G) ⊓ d.ker)
-        = (L : Subgroup G).subgroupOf ((K : Subgroup G) ⊓ d.ker) := by
+instance finiteIndex_inf_ker (d : G →* Multiplicative ℤ̂) (K L : OpenSubgroup G) :
+    (((L : Subgroup G) ⊓ d.ker).subgroupOf ((K : Subgroup G) ⊓ d.ker)).FiniteIndex := by
+  have h : ((L : Subgroup G) ⊓ d.ker).subgroupOf ((K : Subgroup G) ⊓ d.ker) =
+      (L : Subgroup G).subgroupOf ((K : Subgroup G) ⊓ d.ker) := by
     ext x
     simp only [Subgroup.mem_subgroupOf, Subgroup.mem_inf, and_iff_left_iff_imp]
     exact fun _ => x.2.2
   rw [h]
   infer_instance
 
+
 omit [TotallyDisconnectedSpace G] in
-theorem toAdd_deg_mem_multiples (K : OpenSubgroup G) {k : G} (hk : k ∈ (K : Subgroup G))
-    : Multiplicative.toAdd (D.deg k) ∈ multiples (inertiaDegree D.deg K) := by
+theorem toAdd_deg_mem_multiples (K : OpenSubgroup G) {k : G} (hk : k ∈ (K : Subgroup G)) :
+    Multiplicative.toAdd (D.deg k) ∈ multiples (inertiaDegree D.deg K) := by
   obtain ⟨y, hy⟩ := (D.mem_map_deg_iff K).1 ⟨k, hk, rfl⟩
   refine mem_multiples.2 ⟨Multiplicative.toAdd y, ?_⟩
   rw [← hy, toAdd_pow]
 
 variable (hLK : L ≤ K) [((L : Subgroup G).subgroupOf K).Normal] (s : D.FrobeniusLift K)
 
-theorem coe_norm_field_eq
-    {φ : G}
-    (hφK : φ ∈ (K : Subgroup G)) (hdφ : D.deg φ = Multiplicative.ofAdd (inertiaDegree D.deg K : ℤ̂))
-    (a : fixedModule A ((s.field L hLK : OpenSubgroup G) : Subgroup G))
-    : (norm A (K : Subgroup G) (s.field L hLK : Subgroup G) a : A)
-      = ∏ ν : Fin s.deg, φ ^ (ν : ℕ) •
-          (norm A ((K : Subgroup G) ⊓ D.deg.ker) ((L : Subgroup G) ⊓ D.deg.ker)
-            ⟨a, fixedModule_anti le_frobeniusClosure a.2⟩ : A) := by
+theorem coe_norm_field_eq {φ : G} (hφK : φ ∈ (K : Subgroup G))
+    (hdφ : D.deg φ = Multiplicative.ofAdd (inertiaDegree D.deg K : ℤ̂))
+    (a : fixedModule A ((s.field L hLK : OpenSubgroup G) : Subgroup G)) :
+    (norm A (K : Subgroup G) (s.field L hLK : Subgroup G) a : A) =
+      ∏ ν : Fin s.deg, φ ^ (ν : ℕ) •
+        (norm A ((K : Subgroup G) ⊓ D.deg.ker) ((L : Subgroup G) ⊓ D.deg.ker)
+          ⟨a, fixedModule_anti le_frobeniusClosure a.2⟩ : A) := by
   have hnormalizer := FrobeniusLift.mem_normalizer (D := D) hLK s.mem
   have hmap := map_frobeniusClosure D.continuous_deg hnormalizer s.deg_eq (L := (L : Subgroup G))
   have hfield_le : (s.field L hLK : Subgroup G) ≤ (K : Subgroup G) :=
     frobeniusClosure_le K.isClosed s.mem (inf_le_left.trans hLK)
-  have hfield_inf_ker : (s.field L hLK : Subgroup G) ⊓ D.deg.ker = (L : Subgroup G) ⊓ D.deg.ker :=
+  have hfield_inf_ker :
+      (s.field L hLK : Subgroup G) ⊓ D.deg.ker = (L : Subgroup G) ⊓ D.deg.ker :=
     frobeniusClosure_inf_ker D.continuous_deg L.isOpen hnormalizer
       (mul_ne_zero s.deg_pos.ne' (D.inertiaDegree_ne_zero K)) s.deg_eq
   refine coe_norm_eq_prod_smul_norm D.deg s.deg_pos (Nat.pos_of_ne_zero (D.inertiaDegree_ne_zero K))
-    hfield_le ?_ ?_
-    (fun k hk => toAdd_deg_mem_multiples K hk)
-    ?_ hφK hdφ a _
+    hfield_le ?_ ?_ (fun k hk => toAdd_deg_mem_multiples K hk) ?_ hφK hdφ a _
   · intro x hx
     have : D.deg x ∈ (frobeniusClosure D.deg L s.elt).map D.deg := ⟨x, hx, rfl⟩
     rw [hmap] at this

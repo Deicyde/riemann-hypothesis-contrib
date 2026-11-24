@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
+
 theorem _root_.GlobalTheory.T.exists_complete_isAlgClosed_cExt'
     : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] (K : Type) [Field K]
         [Algebra (FractionRing W) K] [Algebra.IsAlgebraic (FractionRing W) K],
@@ -56,7 +57,4 @@ theorem _root_.GlobalTheory.T.exists_complete_isAlgClosed_cExt'
           (_ : IsAlgClosed C) (_ : Algebra (FractionRing W) C) (gam : K →+* C),
         (∀ x, gam (algebraMap (FractionRing W) K x) = algebraMap (FractionRing W) C x)
           ∧ CExt W (IsLocalRing.maximalIdeal W) C := by
-  first
-  | exact @GlobalTheory.Ex.exists_complete_isAlgClosed_cExt
-  | exact GlobalTheory.Ex.exists_complete_isAlgClosed_cExt
-  | (intros; apply GlobalTheory.Ex.exists_complete_isAlgClosed_cExt <;> assumption)
+  first | exact @GlobalTheory.Ex.exists_complete_isAlgClosed_cExt

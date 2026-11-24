@@ -46,6 +46,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
   GlobalTheory.LocOver
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.rational_isometry_extends_local_isometry
     : ∀ (D : D7) (Z : LocDat D), ∀ (p : PlF D),
       ∀ γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT, ∃ g,
@@ -55,7 +56,4 @@ theorem _root_.GlobalTheory.T.rational_isometry_extends_local_isometry
               = lattice₂ D Z.M p (Formalism.HermitianLatticesTheory.gmap γ Λ))
           ∧ ∀ {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T),
             γ ∈ Formalism.L2.SG.NGData.NRat F → g ∈ NU (locH Z p) (scaled Z p (frame F)) := by
-  first
-  | exact @GlobalTheory.LocExt.ext_isometry
-  | exact GlobalTheory.LocExt.ext_isometry
-  | (intros; apply GlobalTheory.LocExt.ext_isometry <;> assumption)
+  first | exact @GlobalTheory.LocExt.ext_isometry

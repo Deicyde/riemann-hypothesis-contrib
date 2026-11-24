@@ -149,7 +149,7 @@ theorem det_jacobian_mobius_first
       have ht : (Fin.tail (z + t • (Pi.single 0 1 : Fin (d + 1) → ℂ)) : Fin d → ℂ) = y := by
         rw [← htail]
         funext i
-        simp [Fin.tail, Pi.single_apply, Fin.succ_ne_zero]
+        simp [Fin.tail, Fin.succ_ne_zero]
       simp only [Function.comp, mob1, Fin.cons_zero, ht]
       simp [hz0]
     have h3 : HasDerivAt
@@ -160,7 +160,7 @@ theorem det_jacobian_mobius_first
   rw [Matrix.det_succ_column_zero, Fin.sum_univ_succ]
   have hz1 : ∀ i : Fin d, ReciprocityTheory.AnForm.A.jacC (mob1 g) z i.succ 0 = 0 := by
     intro i
-    simp [ReciprocityTheory.AnForm.A.jacC, hrow, Pi.single_apply, Fin.succ_ne_zero]
+    simp [ReciprocityTheory.AnForm.A.jacC, hrow, Fin.succ_ne_zero]
   have hminor
       : (ReciprocityTheory.AnForm.A.jacC (mob1 g) z).submatrix (Fin.succAbove 0) Fin.succ = 1 := by
     ext i j

@@ -54,9 +54,6 @@ public import Mathlib.NumberTheory.LocalField.Basic
 
 @[expose] public section
 
-
-
-
 noncomputable section
 
 open Polynomial IntermediateField ValuativeRel

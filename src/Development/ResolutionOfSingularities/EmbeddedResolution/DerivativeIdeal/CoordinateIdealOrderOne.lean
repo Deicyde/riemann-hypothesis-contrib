@@ -148,13 +148,7 @@ theorem orderAt_eq_one_of_restrictIdeal_eq_coordIdeal_singleton
       D hD y hy)
     ((one_le_orderAt_iff_mem_support D y).mpr hys)
 
-theorem orderAt_le_one_of_restrictIdeal_eq_coordIdeal
-    {V : X.Opens} (hV : IsAffineOpen V)
-    {n : ℕ} (c : EtaleChart p V n) (S : Finset (Fin n)) (j : Fin n) (hj : j ∈ S)
-    (D : X.IdealSheafData) (hD : restrictIdeal D V = c.coordIdeal S)
-    (y : X) (hy : y ∈ V)
-    : orderAt D y ≤ 1 :=
-  orderAt_le_one_of_mem_of_restrictIdeal_eq_coordIdeal p hV c S j hj D hD y hy
+alias orderAt_le_one_of_restrictIdeal_eq_coordIdeal := _root_.FunctorialResolution.EmbeddedResolution.orderAt_le_one_of_mem_of_restrictIdeal_eq_coordIdeal
 
 theorem orderAt_eq_one_of_restrictIdeal_eq_coordIdeal
     {V : X.Opens} (hV : IsAffineOpen V)

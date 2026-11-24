@@ -48,6 +48,7 @@ open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
+
 theorem _root_.GlobalTheory.T.completedLattice_eq_adelicCompletion_and_gram
     : ∀ (D : D7) (V : HSp D),
       latHat V = GlobalTheory.AdLat.hat D.host.F (latC V : Set (Fin V.rank → D.host.E))
@@ -61,7 +62,4 @@ theorem _root_.GlobalTheory.T.completedLattice_eq_adelicCompletion_and_gram
               (∑ a, ∑ b, v a * V.gramᵀ a b * cF D (y b))
                 ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))
             ↔ v ∈ latC V := by
-  first
-  | exact @GlobalTheory.Member.latHat_eq_hat_and_gram
-  | exact GlobalTheory.Member.latHat_eq_hat_and_gram
-  | (intros; apply GlobalTheory.Member.latHat_eq_hat_and_gram <;> assumption)
+  first | exact @GlobalTheory.Member.latHat_eq_hat_and_gram

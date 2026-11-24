@@ -48,6 +48,7 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaChainStage_conjugate_values_hecke_operators
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ D : D7,
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.thetaChainStage_conjugate_values_hecke_operators
                   c.S P d R)
             ∧ ∀ (R : Finset (GA D s.V)) (f : GA D s.V → ℂ),
               heckeLin s.V R (fun g => conj (f g)) = fun g => conj (heckeLin s.V R f g) := by
-  first
-  | exact @GlobalTheory.ConjVal.conj_values_hecke
-  | exact GlobalTheory.ConjVal.conj_values_hecke
-  | (intros; apply GlobalTheory.ConjVal.conj_values_hecke <;> assumption)
+  first | exact @GlobalTheory.ConjVal.conj_values_hecke

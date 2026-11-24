@@ -48,6 +48,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
+
 theorem _root_.GlobalTheory.T.integral_strip_eq_zero_of_real_modulation_vanishing
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V V₀ W : HSp D) (ρ : ℕ) (Y : Type)
         [TopologicalSpace Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.integral_strip_eq_zero_of_real_modulation_vanishin
                     → ∀ C : Set (GA D W),
                       IsCompact C → C ⊆ GinfC W
                         → ∫ h in 𝓑 ∩ strip W (Rgrp W (rat a.x₀)) C, a.ker G Φ h ∂a.vW.μ = 0 := by
-  first
-  | exact @GlobalTheory.StripVanish.integral_strip_eq_zero
-  | exact GlobalTheory.StripVanish.integral_strip_eq_zero
-  | (intros; apply GlobalTheory.StripVanish.integral_strip_eq_zero <;> assumption)
+  first | exact @GlobalTheory.StripVanish.integral_strip_eq_zero

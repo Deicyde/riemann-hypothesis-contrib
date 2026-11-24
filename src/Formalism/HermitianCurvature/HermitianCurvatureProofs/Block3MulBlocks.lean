@@ -126,7 +126,7 @@ lemma entry_le_mx {m n : Type*} [Fintype m] [Fintype n] (A : Matrix m n ℂ) (i 
 
 lemma det_norm_le {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix n n ℂ) {m : ℝ} (h : EB A m) :
     ‖A.det‖ ≤ (Fintype.card n).factorial * m ^ Fintype.card n := by
-  first | exact UpperTheory.Reformulated.B.Qi39.det_norm_le .. | (apply UpperTheory.Reformulated.B.Qi39.det_norm_le <;> assumption) | (intros; apply UpperTheory.Reformulated.B.Qi39.det_norm_le <;> assumption) | (apply @UpperTheory.Reformulated.B.Qi39.det_norm_le <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.Qi39.det_norm_le <;> assumption) | (apply @UpperTheory.Reformulated.B.Qi39.det_norm_le <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A m h | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A m | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n
+  first | (apply UpperTheory.Reformulated.B.Qi39.det_norm_le <;> assumption) | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A m h | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A m | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› A | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› ‹_› | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n ‹_› | exact @UpperTheory.Reformulated.B.Qi39.det_norm_le n
 
 lemma inv_entry_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) {m : ℝ} (h : EB A m) :
     EB A⁻¹ ((n - 1).factorial * m ^ (n - 1) / ‖A.det‖) := by
@@ -776,7 +776,6 @@ lemma EB_mulF {l n : Type*} {m : ℕ} {A : Matrix l (Fin m) ℂ} {B : Matrix (Fi
     (hA : EB A a) (hB : EB B b) : EB (A * B) ((m : ℝ) * (a * b)) := by
   have := EB_mul hA hB
   rwa [Fintype.card_fin] at this
-
 
 theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoordinateSizes := by
   intro k j ρ hj

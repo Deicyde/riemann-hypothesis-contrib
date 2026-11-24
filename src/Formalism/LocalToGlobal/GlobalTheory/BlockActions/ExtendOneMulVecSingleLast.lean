@@ -78,7 +78,7 @@ theorem extM_spec
     congr 1
     by_cases hk : k = Fin.last n
     · subst hk; simp
-    · simp [Pi.single_apply, hk]
+    · simp [hk]
   refine ⟨?_, ?_, ?_⟩
   · rw [hA, extM, Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc (B.map φ)⁻¹, hinv,
       Matrix.one_mul, extendOne_mul_inclusion, ← Matrix.mul_assoc]

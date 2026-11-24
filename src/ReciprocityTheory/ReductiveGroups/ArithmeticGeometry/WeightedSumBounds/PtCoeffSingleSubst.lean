@@ -165,7 +165,7 @@ theorem pt_degree_eq_one {σ : Type*} {α : σ →₀ ℕ} (h : α.degree = 1)
       Finset.single_le_sum (f := fun i => α i) (fun _ _ => Nat.zero_le _) hs
     omega
   · have hst : s ≠ t := Ne.symm hts
-    simp only [Finsupp.single_apply, hst, hts, if_false]
+    simp only [Finsupp.single_apply, hst, if_false]
     by_contra hne
     have ht : t ∈ α.support := Finsupp.mem_support_iff.mpr hne
     have hsub : ({s, t} : Finset _) ⊆ α.support := by
@@ -185,15 +185,14 @@ private theorem vmul_lemma
   rw [coeff_mul]
   refine Finset.sum_eq_zero fun x hx => ?_
   have hx' : x.1 + x.2 = e := Finset.HasAntidiagonal.mem_antidiagonal.mp hx
-  have hdeg : (x.1 + x.2).degree = x.1.degree + x.2.degree := by
-    first | exact Finsupp.degree_add _ _ | exact map_add _ _ _
+  have hdeg : (x.1 + x.2).degree = x.1.degree + x.2.degree := by first | exact map_add _ _ _
   rw [hx'] at hdeg
   by_cases h1 : x.1.degree < m
   · rw [hP _ h1, zero_mul]
   · rw [hQ _ (by omega), mul_zero]
 
 private theorem vzero_lemma_2 {ρ : Type*} {e : ρ →₀ ℕ} (h : e.degree = 0) : e = 0 := by
-  first | exact (Finsupp.degree_eq_zero_iff _).mp h | exact Finsupp.degree_eq_zero_iff.mp h
+  first | exact (Finsupp.degree_eq_zero_iff _).mp h
 
 private theorem vpow_lemma_3
     {ρ K : Type*} [CommRing K] {A : MvPowerSeries ρ K} (hA : constantCoeff A = 0) (k : ℕ)
@@ -226,8 +225,7 @@ theorem pt_coeff_single_subst
       = ∑ s, coeff (Finsupp.single s 1) f * coeff (Finsupp.single i 1) (A s) := by
   classical
   rw [MvPowerSeries.coeff_subst hA f (Finsupp.single i 1)]
-  have hi1 : (Finsupp.single i 1 : τ →₀ ℕ).degree = 1 := by
-    first | exact Finsupp.degree_single i 1 | simp [Finsupp.degree]
+  have hi1 : (Finsupp.single i 1 : τ →₀ ℕ).degree = 1 := by first | exact Finsupp.degree_single i 1
   have hsupp
       : (Function.support fun d : σ →₀ ℕ =>
           coeff d f • coeff (Finsupp.single i 1) (d.prod fun s e => A s ^ e))
@@ -285,24 +283,19 @@ variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ}
 theorem pt_F_lin (G : LogFGL v d) (a : Fin d) (i : Fin d ⊕ Fin d)
     : coeff (Finsupp.single i 1) (G.F a)
       = (if i = Sum.inl a then 1 else 0) + (if i = Sum.inr a then 1 else 0) := by
-  have hF : HasSubst G.F := by
-    first
-    | exact HasSubst.of_constantCoeff_zero G.F_const
-    | exact hasSubst_of_constantCoeff_zero G.F_const
+  have hF : HasSubst G.F := by first | exact hasSubst_of_constantCoeff_zero G.F_const
   have hX
       : ∀ e : Fin d → Fin d ⊕ Fin d,
         HasSubst (fun b => (X (e b) : MvPowerSeries (Fin d ⊕ Fin d) C)) := by
     intro e
-    first
-    | exact HasSubst.of_constantCoeff_zero fun b => constantCoeff_X _
-    | exact hasSubst_of_constantCoeff_zero fun b => constantCoeff_X _
+    first | exact hasSubst_of_constantCoeff_zero fun b => constantCoeff_X _
   have key := congrArg (coeff (Finsupp.single i 1)) (G.lg_F a)
   rw [map_add (f := _), pt_coeff_single_subst hF G.F_const (G.lg_const a),
       pt_coeff_single_subst (hX Sum.inl) (fun b => constantCoeff_X _) (G.lg_const a),
       pt_coeff_single_subst (hX Sum.inr) (fun b => constantCoeff_X _) (G.lg_const a)]
     at key
   simp only [G.lg_lin, pt_coeff_single_X, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      Finset.mem_univ, if_true]
     at key
   convert key
 

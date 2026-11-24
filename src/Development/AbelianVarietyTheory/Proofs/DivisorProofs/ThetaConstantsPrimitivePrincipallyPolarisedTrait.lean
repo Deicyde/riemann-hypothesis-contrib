@@ -47,6 +47,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AmplePt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
 import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -149,11 +150,6 @@ theorem thList_move
   obtain rfl : h₁ = h₂ := Over.OverMorphism.ext hl
   exact ⟨pt, hT⟩
 
-theorem spMap_comp_eq'
-    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
-    : spMap g ≫ spMap f = spMap (g.comp f) := by
-  rw [← Spec.map_comp]; rfl
-
 theorem prim_of_polFib
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Scheme.{0})
         (t : SAB H S) (g : ℕ) (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
@@ -218,7 +214,8 @@ theorem prim_of_polFib
   have e₂
       : SecAt.pull t.G t.PP.L (SecAt.pull t.G t.PP.L σ gW) i' = VVRank.pullS t.G _ (b₁ ≫ b₂) σ :=
     GlobalTheory.ThetaRuleCompare.pullS_comp _ _ _
-  have hx : spMap i' ≫ spMap gW = spMap k ≫ spMap i := by rw [spMap_comp_eq', spMap_comp_eq', hi'c]
+  have hx : spMap i' ≫ spMap gW = spMap k ≫ spMap i := by
+    rw [_root_.GlobalTheory.spMap_comp_ring, _root_.GlobalTheory.spMap_comp_ring, hi'c]
   rw [e₁] at hT₁
   obtain ⟨pt₂, hT₂⟩ :=
     thList_move t.G t.PP.L t.PP.rig m σ (by rw [← Category.assoc, ← hx, Category.assoc]) (a₁ ≫ a₂)

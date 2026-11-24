@@ -53,10 +53,11 @@ open Matrix Finset
 
 namespace Formalism.FourierDecayAlt.P.CutMP.TVG
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C3 Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.SignAntidiagonal
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C3 Formalism.REAL
+  Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.SignAntidiagonal
 
-theorem colsVm_castSucc {k r m : ℕ} (hm : m + 1 ≤ r) :
-    colsVm k r (m + 1) ∘ Fin.castSucc = colsVm k r m := by
+theorem colsVm_castSucc {k r m : ℕ} (hm : m + 1 ≤ r)
+    : colsVm k r (m + 1) ∘ Fin.castSucc = colsVm k r m := by
   funext j; ext; simp [colsVm]
 
 theorem mirror_chain_expansion_holds : MirrorChainExpansion := by
@@ -72,9 +73,14 @@ theorem mirror_chain_expansion_holds : MirrorChainExpansion := by
   have ha2 : a (Fin.last (m + 1)) = esI k r ⟨r - m - 2, by omega⟩ := by
     ext; rw [hav]; simp [esI]; omega
 
-  have hzero : ∀ l : Fin m, La ((((-1 : ℤ) ^ (m + 1 + ((Fin.castSucc (Fin.castSucc l) : Fin (m + 2)) : ℕ)) : ℤ) : A) *
-      (qminor E (a ∘ (Fin.castSucc (Fin.castSucc l)).succAbove) (a ∘ Fin.castSucc) u *
-        Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.castSucc (Fin.castSucc l))) (a (Fin.last (m + 1))))) = 0 := by
+  have hzero
+      : ∀ l : Fin m,
+        La
+            ((((-1 : ℤ) ^ (m + 1 + ((Fin.castSucc (Fin.castSucc l) : Fin (m + 2)) : ℕ)) : ℤ) : A)
+              * (qminor E (a ∘ (Fin.castSucc (Fin.castSucc l)).succAbove) (a ∘ Fin.castSucc) u
+                * Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.castSucc (Fin.castSucc l)))
+                  (a (Fin.last (m + 1)))))
+          = 0 := by
     intro l
     rw [la_intmul]
     have hne : a (Fin.castSucc (Fin.castSucc l)) ≠ a (Fin.last (m + 1)) := by
@@ -85,19 +91,24 @@ theorem mirror_chain_expansion_holds : MirrorChainExpansion := by
     rw [ha1, ha2, hR0 _ ⟨r - 1 - l.val, by omega⟩ (by simp; omega), smul_zero]
   rw [Finset.sum_eq_zero (fun l _ => hzero l), zero_add]
 
-  have hlast : La ((((-1 : ℤ) ^ (m + 1 + ((Fin.last (m + 1) : Fin (m + 2)) : ℕ)) : ℤ) : A) *
-      (qminor E (a ∘ (Fin.last (m + 1)).succAbove) (a ∘ Fin.castSucc) u *
-        Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.last (m + 1))) (a (Fin.last (m + 1))))) =
-      La (qminor E (colsVm k r (m + 1)) (colsVm k r (m + 1)) u *
-        Tm E (u - ((m + 1 : ℕ) : ℂ)) (esI k r ⟨r - m - 2, by omega⟩) (esI k r ⟨r - m - 2, by omega⟩)) := by
+  have hlast
+      : La
+          ((((-1 : ℤ) ^ (m + 1 + ((Fin.last (m + 1) : Fin (m + 2)) : ℕ)) : ℤ) : A)
+            * (qminor E (a ∘ (Fin.last (m + 1)).succAbove) (a ∘ Fin.castSucc) u
+              * Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.last (m + 1))) (a (Fin.last (m + 1)))))
+        = La
+          (qminor E (colsVm k r (m + 1)) (colsVm k r (m + 1)) u * Tm E (u - ((m + 1 : ℕ) : ℂ))
+            (esI k r ⟨r - m - 2, by omega⟩) (esI k r ⟨r - m - 2, by omega⟩)) := by
     rw [la_intmul, Fin.succAbove_last, hcs, ha2]
     have h2 : ((-1 : ℤ) ^ (m + 1 + ((Fin.last (m + 1) : Fin (m + 2)) : ℕ))) = 1 := by
       simp only [Fin.val_last]; rw [← two_mul, pow_mul]; norm_num
-    rw [h2]; simp
+    rw [h2]
+    simp
   rw [hlast]
 
   set rowsP : Fin (m + 1) → Fin (2 * r + k + 1) := Fin.cons (esI k r ⟨r - m - 2, by omega⟩) (colsVm k r m) with hrP
-  have hrows : a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove = rowsP ∘ (finRotate (m + 1)) := by
+  have hrows
+      : a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove = rowsP ∘ (finRotate (m + 1)) := by
     funext q
     ext
     simp only [Function.comp_apply]
@@ -105,17 +116,23 @@ theorem mirror_chain_expansion_holds : MirrorChainExpansion := by
     · subst hq
       rw [finRotate_last]
       simp only [rowsP, Fin.cons_zero]
-      rw [hav, succAbove_val]; simp [esI]; omega
+      rw [hav, succAbove_val]
+      simp [esI]
+      omega
     · have hq' : q.val < m := by
         have := q.isLt; have : q.val ≠ m := fun h' => hq (Fin.ext (by simp [h'])); omega
       have hr1 : finRotate (m + 1) q = Fin.succ ⟨q.val, hq'⟩ := by
         ext; rw [coe_finRotate_of_ne_last hq]; simp
       rw [hr1]
       simp only [rowsP, Fin.cons_succ]
-      rw [hav, succAbove_val]; simp [colsVm, hq']; omega
-  have hQm : La (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u) =
-      ρ • La (qminor E (colsVm k r m) (colsVm k r m) u) := by
-    rw [hrows, Formalism.REAL.quantumMinorRowSkew_holds A _ (m + 1) E rowsP _ (finRotate (m + 1)) u, la_intmul, sign_finRotate]
+      rw [hav, succAbove_val]
+      simp [colsVm, hq']
+      omega
+  have hQm
+      : La (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u)
+        = ρ • La (qminor E (colsVm k r m) (colsVm k r m) u) := by
+    rw [hrows, Formalism.REAL.quantumMinorRowSkew_holds A _ (m + 1) E rowsP _ (finRotate (m + 1)) u,
+      la_intmul, sign_finRotate]
 
     rw [Formalism.FourierDecayAlt.P.expansion_first_line A _ m E hG rowsP _ u, map_sum]
     rw [Fin.sum_univ_castSucc, Finset.sum_eq_zero, zero_add]
@@ -142,21 +159,29 @@ theorem mirror_chain_expansion_holds : MirrorChainExpansion := by
         ext; simp [colsVm, esI]
       have hne : esI k r ⟨r - m - 2, by omega⟩ ≠ colsVm k r (m + 1) (Fin.castSucc q) := by
         rw [hx]; intro h'; have := congrArg Fin.val h'; simp [esI] at this; omega
-      rw [tm_offdiag _ _ hne, hx, hL _ ⟨r - 1 - q.val, by omega⟩ (by simp; omega), if_neg (by simp; omega),
-        zero_smul, smul_zero]
-  have hmT : La (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u *
-      Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.castSucc (Fin.last m))) (a (Fin.last (m + 1)))) =
-      La (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u) := by
+      rw [tm_offdiag _ _ hne, hx, hL _ ⟨r - 1 - q.val, by omega⟩ (by simp; omega),
+        if_neg (by simp; omega), zero_smul, smul_zero]
+  have hmT
+      : La
+          (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u
+            * Tm E (u - ((m + 1 : ℕ) : ℂ)) (a (Fin.castSucc (Fin.last m))) (a (Fin.last (m + 1))))
+        = La (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc)
+          u) := by
     have hne : a (Fin.castSucc (Fin.last m)) ≠ a (Fin.last (m + 1)) := by
       intro h'; have := congrArg Fin.val h'; rw [hav, hav] at this; simp at this
     rw [tm_offdiag _ _ hne]
-    have ha1 : a (Fin.castSucc (Fin.last m)) = esI k r ⟨r - m - 1, by omega⟩ := by ext; rw [hav]; simp [esI]; omega
+    have ha1 : a (Fin.castSucc (Fin.last m)) = esI k r ⟨r - m - 1, by omega⟩ := by
+      ext; rw [hav]; simp [esI]; omega
     rw [ha1, ha2, hR1]
   rw [la_intmul, hmT, hQm]
-  have h3 : ((((-1 : ℤ) ^ (m + 1 + ((Fin.castSucc (Fin.last m) : Fin (m + 2)) : ℕ))) : ℤ) : ℂ) = -1 := by
+  have h3
+      : ((((-1 : ℤ) ^ (m + 1 + ((Fin.castSucc (Fin.last m) : Fin (m + 2)) : ℕ))) : ℤ) : ℂ)
+        = -1 := by
     simp only [Fin.val_castSucc, Fin.val_last]
     push_cast
-    rw [show m + 1 + m = 2 * m + 1 by ring, pow_succ, pow_mul]; norm_num
-  rw [h3, neg_one_smul]; abel
+    rw [show m + 1 + m = 2 * m + 1 by ring, pow_succ, pow_mul]
+    norm_num
+  rw [h3, neg_one_smul]
+  abel
 
 end Formalism.FourierDecayAlt.P.CutMP.TVG

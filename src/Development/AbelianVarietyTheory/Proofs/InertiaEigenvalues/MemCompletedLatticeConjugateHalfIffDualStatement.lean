@@ -53,6 +53,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
+
 theorem _root_.GlobalTheory.T.mem_completedLattice_conjugateHalf_iff_dual
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
         (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
@@ -64,7 +65,4 @@ theorem _root_.GlobalTheory.T.mem_completedLattice_conjugateHalf_iff_dual
               IsHalf (cA D e) u
                 → (u ∈ latO S T ΛS ΛT (fun _ => True)
                   ↔ ∀ l ∈ latO S T ΛS ΛT (fun _ => True), IsHalf e l → ψ (symplO S T l u) = 1) := by
-  first
-  | exact @GlobalTheory.ConjHalfDual.mem_latO_iff_of_conjHalf
-  | exact GlobalTheory.ConjHalfDual.mem_latO_iff_of_conjHalf
-  | (intros; apply GlobalTheory.ConjHalfDual.mem_latO_iff_of_conjHalf <;> assumption)
+  first | exact @GlobalTheory.ConjHalfDual.mem_latO_iff_of_conjHalf

@@ -52,9 +52,7 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
 theorem exists_under (v : PlF E) : ∃ w : Pl E, w.under (𝓞 (maximalRealSubfield E)) = v := by
   have hinj : Function.Injective (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) := by
-    first
-    | exact FaithfulSMul.algebraMap_injective _ _
-    | exact NoZeroSMulDivisors.algebraMap_injective _ _
+    first | exact FaithfulSMul.algebraMap_injective _ _
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   obtain ⟨Q, hQmax, hQ⟩ :=
     Ideal.exists_ideal_over_maximal_of_isIntegral v.asIdeal

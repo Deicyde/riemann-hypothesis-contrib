@@ -84,7 +84,6 @@ private theorem flat_quotient_of_mem_ideal_smul_imp_mem_map_smul
   choose n hn using fun i => Submodule.Quotient.mk_surjective K (x i)
   have hzK : ∑ i, f i • n i ∈ K := by
     have h1 : (K.mkQ.restrictScalars V) (∑ i, f i • n i) = 0 := by
-
       rw [map_sum, ← hsum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, LinearMap.restrictScalars_apply, Submodule.mkQ_apply, hn]

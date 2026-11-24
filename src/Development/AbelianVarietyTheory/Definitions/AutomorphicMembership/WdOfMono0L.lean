@@ -87,8 +87,6 @@ structure PlSide (D : D7) where
       IsLocalRing.ResidueField (plB lam)
         ≃+* Formalism.CyclotomicNorms.Fbar (D.what₂.places.resChar lam)
 
-
-
 structure WDSide (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut) where
   wdOf
     : ∀ (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {a},

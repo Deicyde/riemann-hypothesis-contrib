@@ -39,6 +39,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -51,6 +52,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.lattice_trivial_at_prime_indices_and_units
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (c : Coeff l) (n : ℕ) (Λ : GenLat E n) (N M ℓ : ℕ),
@@ -62,7 +64,4 @@ theorem _root_.GlobalTheory.T.lattice_trivial_at_prime_indices_and_units
               → (∀ β : c.F, β ≠ 0 → BetaIs (Dw := Dw) c Λ β → vV T.V (io β) = 0)
                 ∧ ∀ (w : (E →+* ℂ) × ℕ → ℕ) (P : MvPolynomial (LtN Dw n) c.F),
                   P ∈ harmL c Λ w → MvPolynomial.map io P ∈ FFV (Dw := Dw) T w n := by
-  first
-  | exact @GlobalTheory.TrivLattice.trivAt_units
-  | exact GlobalTheory.TrivLattice.trivAt_units
-  | (intros; apply GlobalTheory.TrivLattice.trivAt_units <;> assumption)
+  first | exact @GlobalTheory.TrivLattice.trivAt_units

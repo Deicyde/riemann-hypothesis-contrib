@@ -3,17 +3,29 @@ module
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsRegularSectionGenerator
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApplyOfNotInFibre
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.TowerOrigin
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenspaceDecompositionInternalStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LieModel
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenspaceDecompositionInternal
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FlagModelStatementHoldsStatement
+public import Development.AutomorphicSpectrum.Statements.GeometryStatements.FlagModelStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FlagModelStatementHolds
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptBlockRefinement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LabelEmbeddingInjective
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EtaleLocalizationAtPrimeTensorOfLowHeight
+public import Mathlib.NumberTheory.NumberField.Discriminant.Defs
+public import Mathlib.Order.CompletePartialOrder
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeEigenVectorBundle
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelDominantHodge
+public import Mathlib.AlgebraicGeometry.Morphisms.Smooth
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieOmegaLatticeVectorBundle
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SegreRefineLineBundles
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.LawsProved
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapStalkMap
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptBlockRefinementStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LabelEmbeddingInjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeEigenVectorBundleStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelDominantHodgeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieOmegaLatticeVectorBundleStatement
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtIsLocalRingIsFractionRingStalk
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SegreRefineLineBundlesStatement
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,7 +71,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabPull
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.LawsProved
 import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
@@ -77,15 +88,6 @@ namespace GlobalTheory.CompanionTheory.Ar.SatModel
 variable
   {X : Scheme.{0}} {Ω : Type} [Field Ω]
   {ξ : Spec (CommRingCat.of Ω) ⟶ X} {Li : Type} [AddCommGroup Li] [Module Ω Li]
-
-theorem flagStep_self {r : ℕ} (b : Fin r → Li)
-    : flagStep Ω b r = Submodule.span Ω (Set.range b) := by
-  have : b '' {k | (k : ℕ) < r} = Set.range b := by
-    rw [← Set.image_univ]
-    congr 1
-    ext k
-    simp [k.2]
-  rw [flagStep, this]
 
 theorem spMap_dualMap_id : spMap (dualMap (RingHom.id Ω)) = 𝟙 (Sp (DualNumber Ω)) := by
   have : dualMap (RingHom.id Ω) = RingHom.id (DualNumber Ω) := by ext a <;> simp [dualMap]
@@ -105,7 +107,15 @@ theorem isVBOn_of_isFlagVBOn
     : L.IsVBOn T r (Submodule.span Ω (Set.range b₀)) := by
   intro p hp
   obtain ⟨U, hU, b, hb, hf⟩ := h p hp
-  exact ⟨U, hU, b, by rw [← flagStep_self, ← flagStep_self, hb], hf⟩
+  exact ⟨
+    U,
+    hU,
+    b,
+    by
+      rw [← _root_.GlobalTheory.CompanionTheory.Ar.FlagGr.step_top,
+        ← _root_.GlobalTheory.CompanionTheory.Ar.FlagGr.step_top, hb],
+    hf
+  ⟩
 
 theorem mem_span_gp_iff (hg : IsCptGen ξ) (S : Set Li) (x : Li)
     : x ∈ Submodule.span (regAt ξ (Flat.ZLat.gp ξ)) S ↔ x ∈ Submodule.span Ω S := by
@@ -127,7 +137,8 @@ theorem span_eq_of_isFlagVBOn
   obtain ⟨-, hfr⟩ := hf _ hT hU
   obtain ⟨U', hU', c, hc, hf'⟩ := hL (Flat.ZLat.gp ξ) trivial
   obtain ⟨-, hfr'⟩ := hf' _ trivial hU'
-  rw [← flagStep_self, ← hb, flagStep_self]
+  rw [← _root_.GlobalTheory.CompanionTheory.Ar.FlagGr.step_top, ← hb,
+    _root_.GlobalTheory.CompanionTheory.Ar.FlagGr.step_top]
   ext x
   rw [← mem_span_gp_iff hg, ← hfr]
   show x ∈ L (Flat.ZLat.gp ξ) ⊓ V.restrictScalars _ ↔ _
@@ -338,8 +349,8 @@ theorem exists_lieModel_pull
         ∧ M'.lat = M.lat.pull ξ' g (AddMonoidHom.id Li) ∧ M'.IsActOf t'.act.act ρ := by
   obtain ⟨E', _, _, ⟨M₁⟩⟩ := lieModel_exists X' t'.G Ω ξ'
   obtain ⟨j, hj₁, hj₂, hj₃, hj₄, -⟩ :=
-    GlobalTheory.T.lie_model_dominant_hodge E H X t X' t' g m Ω Ω ξ ξ' (RingHom.id Ω) Li E' M M₁ hg
-      hg' hd
+    _root_.GlobalTheory.CompanionTheory.Ar.LiePullSab.lie_pull_lat E H X t X' t' g m Ω Ω ξ ξ'
+      (RingHom.id Ω) Li E' M M₁ hg hg' hd
   have hinj : Function.Injective j := by
     refine (injective_iff_map_eq_zero j).2 fun e he => ?_
     by_contra h0
@@ -373,8 +384,8 @@ theorem exists_lieModel_pull
     refine m.cart.1.hom_ext h ?_
     rw [Over.w v, Over.w w]
   obtain ⟨j₂, hj₂₁, -, -, -, hlat⟩ :=
-    GlobalTheory.T.lie_model_dominant_hodge E H X t X' t' g m Ω Ω ξ ξ' (RingHom.id Ω) Li Li M M₂ hg
-      hg' hd
+    _root_.GlobalTheory.CompanionTheory.Ar.LiePullSab.lie_pull_lat E H X t X' t' g m Ω Ω ξ ξ'
+      (RingHom.id Ω) Li Li M M₂ hg hg' hd
   have hid : j₂ = AddMonoidHom.id Li := by
     ext e
     exact M₂.inj (hcanc _ _ ((hj₂₁ e).trans (hj₁ e).symm))
@@ -406,19 +417,21 @@ theorem lat_eq_iSup_of_char0
           → M.lat q
             = ⨆ s : CMType H ⊕ CMType H, M.lat.inter (eigSp ρ (cst.comp (labelEmb c s))) q := by
   haveI : Fintype (CMType H ⊕ CMType H) := Fintype.ofFinite _
-  have hl := GlobalTheory.T.label_embedding_injective E H l c
+  have hl := _root_.GlobalTheory.CompanionTheory.Ar.labels_all_once E H l c
   have hinj : Function.Injective fun s : CMType H ⊕ CMType H => cst.comp (labelEmb c s) := by
     intro s s' h
     exact hl.1 (RingHom.ext fun a => cst.injective (congrArg (fun φ : 𝓞 E →+* Ω => φ a) h))
   have hcard : Fintype.card (CMType H ⊕ CMType H) = Module.finrank ℚ E := by
     rw [← Nat.card_eq_fintype_card]; exact hl.2
   refine ⟨
-    (GlobalTheory.T.eigenspace_decomposition_internal Ω Li E ρ _ _ hinj hcard).submodule_iSupIndep,
+    (_root_.GlobalTheory.CompanionTheory.Ar.isInternal_eigSp Ω Li E ρ _ _ hinj
+      hcard).submodule_iSupIndep,
     ?_
   ⟩
-  have hvb := (GlobalTheory.T.lie_omega_lattice_vector_bundle X Ω ξ t.G Li M hg t.semi.smooth).1
+  have hvb :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.lieLat_isVB_of_smooth X Ω ξ t.G Li M hg t.semi.smooth).1
   have :=
-    (GlobalTheory.T.lattice_eigen_vector_bundle X Ω ξ Li E ρ M.lat
+    (_root_.GlobalTheory.CompanionTheory.Ar.EigSplit.isVBOn_eigSp X Ω ξ Li E ρ M.lat
       {q | ∀ r : ℕ, r.Prime → ¬ InFibre ξ r q} (Module.finrank Ω Li) _
       (fun s : CMType H ⊕ CMType H => cst.comp (labelEmb c s))
       hg hinj hcard ?_ ?_ ?_ ?_).2
@@ -487,7 +500,8 @@ theorem SatModel.exists_flagged_model
           (∀ r : ℕ, r.Prime → ¬ InFibre 𝔐.ξ r q₁) → g q₁.1 = g q₂.1 → q₁ = q₂ := by
   classical
   have hg : IsCptGen ξ := htie.gen
-  have hvb := (GlobalTheory.T.lie_omega_lattice_vector_bundle X Ω ξ t.G Li M hg t.semi.smooth).1
+  have hvb :=
+    (_root_.GlobalTheory.CompanionTheory.Ar.lieLat_isVB_of_smooth X Ω ξ t.G Li M hg t.semi.smooth).1
   obtain ⟨c₀, u, hc₀, hsemi, hjc, hbind, -⟩ := id hgf
 
   have hgp : Flat.ZLat.gp ξ ∈ {q : Cpt ξ | ∀ r : ℕ, r.Prime → ¬ InFibre ξ r q} := by
@@ -503,7 +517,7 @@ theorem SatModel.exists_flagged_model
     obtain ⟨l, hl⟩ := htie.cover (Flat.ZLat.gp ξ)
     exact ⟨l, hl.1⟩
   obtain ⟨κ', _, y0, M', g, hd, hN, hch, hflag, -, hnorm⟩ :=
-    GlobalTheory.T.FlagModelStatement_holds ℤ Ω ((k : K) → J k) x
+    _root_.GlobalTheory.CompanionTheory.Ar.FlagModel.flagModel ℤ Ω ((k : K) → J k) x
       (PModel.mk X ξ (specZIsTerminal.from X) hover hall htie) Unit
       (fun _ => (k : K) → J k)
       (fun _ => x)
@@ -524,8 +538,8 @@ theorem SatModel.exists_flagged_model
     simp
   have hg' : IsCptGen M'.ξ := M'.tie.gen
   obtain ⟨K₁, _, J₁, _, y₁, bk, bx, -, hbk, hy₁, tie₁, -⟩ :=
-    GlobalTheory.T.segre_refine_line_bundles ℤ Ω κ' y0 M' K J y Empty Empty.elim (hch ())
-      (fun a => a.elim)
+    _root_.GlobalTheory.CompanionTheory.Ar.ExtraBlocks.exists_blocks_of_lines ℤ Ω κ' y0 M' K J y
+      Empty Empty.elim (hch ()) (fun a => a.elim)
   obtain ⟨t', ⟨m₁⟩⟩ : ∃ t' : SAB H M'.X, Nonempty (SABMap t' t g) := by
     obtain ⟨_, _, _, _, _, m₁, -⟩ := sabPull Out.proved_CubePullSt g t
     exact ⟨_, ⟨m₁⟩⟩
@@ -682,7 +696,8 @@ theorem exists_sat_model
     SatModel.exists_flagged_model E H D l Xo c Y Ω K J y X ξ f Ω₀ ξ₀ cst t m Li M ρ Li₀ M₀ j V₀ b d
       hall htie hint hgen₀ hdom hcst hact hj hV₀ hgf hfl
   obtain ⟨K', _, J', _, y', κ, v, tie', xdeg, e, hκ, hy', hroot⟩ :=
-    GlobalTheory.T.hodge_cpt_block_refinement E H D l Xo c _ _ Y ∅ Ω K₁ J₁ y₁ 𝔐 Fl
+    _root_.GlobalTheory.CompanionTheory.Ar.HodgeCpt.Flag.exists_recoord_rootLines E H D l Xo c _ _ Y
+      ∅ Ω K₁ J₁ y₁ 𝔐 Fl
   let 𝔑 : HodgeCpt Y ∅ y' := { 𝔐 with tie := tie' }
   let Fl' : 𝔑.Flag := { Fl with }
   refine ⟨

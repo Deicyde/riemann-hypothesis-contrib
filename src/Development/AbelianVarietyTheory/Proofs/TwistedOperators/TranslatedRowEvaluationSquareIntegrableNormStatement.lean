@@ -51,6 +51,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Fo
   NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.translatedRowEvaluation_squareIntegrable_norm
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -72,7 +73,4 @@ theorem _root_.GlobalTheory.T.translatedRowEvaluation_squareIntegrable_norm
                     ∧ ∫ x, ‖(fun x => ev (MP R) v₀ S (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t)) x‖ ^ 2 ∂(muX X)
                       = c * (ipM (MP R) R.ν0 R.fd0 S S).re
                     ∧ ((ipM (MP R) R.ν0 R.fd0 S S).re = 0 → S = 0) := by
-  first
-  | exact @GlobalTheory.EvalNormTransfer.evalTranslate_norm
-  | exact GlobalTheory.EvalNormTransfer.evalTranslate_norm
-  | (intros; apply GlobalTheory.EvalNormTransfer.evalTranslate_norm <;> assumption)
+  first | exact @GlobalTheory.EvalNormTransfer.evalTranslate_norm

@@ -36,6 +36,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
+
 theorem _root_.GlobalTheory.T.formal_group_points_of_integral_chart_spec
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)],
@@ -67,7 +69,4 @@ theorem _root_.GlobalTheory.T.formal_group_points_of_integral_chart_spec
                     → FormPt C (a ≫ Xo.univ.t.act.act o) δ)
                 ∧ ∀ al : Fin (chD C.ch) → T.V,
                   Small al → ∃ a : (ptO Xo (xOf y) ⟶ Xo.univ.t.G), FormPt C a al := by
-  first
-  | exact @GlobalTheory.PlaceFormPt.formPt_spec
-  | exact GlobalTheory.PlaceFormPt.formPt_spec
-  | (intros; apply GlobalTheory.PlaceFormPt.formPt_spec <;> assumption)
+  first | exact @GlobalTheory.PlaceFormPt.formPt_spec

@@ -58,8 +58,9 @@ section One
 
 variable {E : Type*} [AddCommGroup E] [Module Ω E]
 
-def loc (R : Subalgebra o Ω) (f : Ω) (hf : f ∈ R) (L : AddSubgroup E)
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) : AddSubgroup E where
+def loc
+    (R : Subalgebra o Ω) (f : Ω) (hf : f ∈ R) (L : AddSubgroup E) (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    : AddSubgroup E where
   carrier := {e | ∃ n : ℕ, f ^ n • e ∈ L}
   zero_mem' := ⟨0, by simp⟩
   add_mem' := by
@@ -73,14 +74,18 @@ def loc (R : Subalgebra o Ω) (f : Ω) (hf : f ∈ R) (L : AddSubgroup E)
     rintro x ⟨n, hn⟩
     exact ⟨n, by rw [smul_neg]; exact L.neg_mem hn⟩
 
-theorem mem_loc {R : Subalgebra o Ω} {f : Ω} {hf : f ∈ R} {L : AddSubgroup E}
-    {hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L} {e : E} :
-    e ∈ loc R f hf L hL ↔ ∃ n : ℕ, f ^ n • e ∈ L := Iff.rfl
+theorem mem_loc
+    {R : Subalgebra o Ω} {f : Ω} {hf : f ∈ R} {L : AddSubgroup E}
+    {hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L} {e : E}
+    : e ∈ loc R f hf L hL ↔ ∃ n : ℕ, f ^ n • e ∈ L :=
+  Iff.rfl
 
-theorem sum_mem_loc {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) {L : AddSubgroup E}
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) {r : ℕ} (a : Fin r → Ω) (b : Fin r → E)
-    (ha : ∀ q, ∃ n : ℕ, f ^ n * a q ∈ R) (hb : ∀ q, ∃ n : ℕ, f ^ n • b q ∈ L) :
-    ∃ n : ℕ, f ^ n • (∑ q, a q • b q) ∈ L := by
+theorem sum_mem_loc
+    {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R)
+    {L : AddSubgroup E} (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    {r : ℕ} (a : Fin r → Ω) (b : Fin r → E) (ha : ∀ q, ∃ n : ℕ, f ^ n * a q ∈ R)
+    (hb : ∀ q, ∃ n : ℕ, f ^ n • b q ∈ L)
+    : ∃ n : ℕ, f ^ n • (∑ q, a q • b q) ∈ L := by
   rw [← mem_loc (hf := hf) (hL := hL)]
   refine AddSubgroup.sum_mem _ fun q _ => ?_
   obtain ⟨n, hn⟩ := ha q
@@ -93,12 +98,15 @@ theorem sum_mem_loc {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) {L : AddSubgro
   ring
 
 def FreeOn (R : Subalgebra o Ω) (f : Ω) (L : AddSubgroup E) {r : ℕ} (b : Fin r → E) : Prop :=
-  LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = ⊤ ∧
-    ∀ e, (∃ n : ℕ, f ^ n • e ∈ L) ↔
-      ∃ a : Fin r → Ω, (∀ q, ∃ n : ℕ, f ^ n * a q ∈ R) ∧ e = ∑ q, a q • b q
+  LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = ⊤
+    ∧ ∀ e,
+      (∃ n : ℕ, f ^ n • e ∈ L)
+        ↔ ∃ a : Fin r → Ω, (∀ q, ∃ n : ℕ, f ^ n * a q ∈ R) ∧ e = ∑ q, a q • b q
 
-theorem FreeOn.basis_mem {R : Subalgebra o Ω} {f : Ω} {L : AddSubgroup E} {r : ℕ} {b : Fin r → E}
-    (h : FreeOn R f L b) (q : Fin r) : ∃ n : ℕ, f ^ n • b q ∈ L := by
+theorem FreeOn.basis_mem
+    {R : Subalgebra o Ω} {f : Ω} {L : AddSubgroup E} {r : ℕ} {b : Fin r → E}
+    (h : FreeOn R f L b) (q : Fin r)
+    : ∃ n : ℕ, f ^ n • b q ∈ L := by
   classical
   refine (h.2.2 _).2 ⟨Pi.single q 1, fun p => ⟨0, ?_⟩, ?_⟩
   · by_cases hp : p = q
@@ -106,15 +114,17 @@ theorem FreeOn.basis_mem {R : Subalgebra o Ω} {f : Ω} {L : AddSubgroup E} {r :
     · simp [Pi.single_eq_of_ne hp]
   · simp [Pi.single_apply, ite_smul]
 
-theorem exists_coord {r : ℕ} {b : Fin r → E} (h : Submodule.span Ω (Set.range b) = ⊤) (e : E) :
-    ∃ a : Fin r → Ω, e = ∑ q, a q • b q := by
+theorem exists_coord {r : ℕ} {b : Fin r → E} (h : Submodule.span Ω (Set.range b) = ⊤) (e : E)
+    : ∃ a : Fin r → Ω, e = ∑ q, a q • b q := by
   have he : e ∈ Submodule.span Ω (Set.range b) := h ▸ Submodule.mem_top
   obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun Ω).1 he
   exact ⟨a, ha.symm⟩
 
-theorem FreeOn.mul {R : Subalgebra o Ω} {f g : Ω} (hf : f ∈ R) (hg : g ∈ R) {L : AddSubgroup E}
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) {r : ℕ} {b : Fin r → E}
-    (h : FreeOn R f L b) : FreeOn R (f * g) L b := by
+theorem FreeOn.mul
+    {R : Subalgebra o Ω} {f g : Ω} (hf : f ∈ R) (hg : g ∈ R)
+    {L : AddSubgroup E} (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    {r : ℕ} {b : Fin r → E} (h : FreeOn R f L b)
+    : FreeOn R (f * g) L b := by
   refine ⟨h.1, h.2.1, fun e => ⟨?_, ?_⟩⟩
   · rintro ⟨n, hn⟩
     by_cases hg0 : g = 0
@@ -141,15 +151,18 @@ theorem FreeOn.mul {R : Subalgebra o Ω} {f g : Ω} (hf : f ∈ R) (hg : g ∈ R
 
 end One
 
-variable {E E₁ E₂ : Type*} [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁]
-  [AddCommGroup E₂] [Module Ω E₂]
+variable
+  {E E₁ E₂ : Type*}
+  [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] [AddCommGroup E₂] [Module Ω E₂]
 
-theorem freeOn_ext {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂)
-    (hi : Function.Injective i) (hq : Function.Surjective q)
-    (hiq : LinearMap.range i = LinearMap.ker q) {L : AddSubgroup E}
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) {r₁ r₂ : ℕ} {b₁ : Fin r₁ → E₁} {b₂ : Fin r₂ → E₂}
-    (h₁ : FreeOn R f (L.comap i.toAddMonoidHom) b₁) (h₂ : FreeOn R f (L.map q.toAddMonoidHom) b₂) :
-    ∃ b : Fin (r₁ + r₂) → E, FreeOn R f L b := by
+theorem freeOn_ext
+    {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R)
+    (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂) (hi : Function.Injective i) (hq : Function.Surjective q)
+    (hiq : LinearMap.range i = LinearMap.ker q)
+    {L : AddSubgroup E} (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    {r₁ r₂ : ℕ} {b₁ : Fin r₁ → E₁} {b₂ : Fin r₂ → E₂}
+    (h₁ : FreeOn R f (L.comap i.toAddMonoidHom) b₁) (h₂ : FreeOn R f (L.map q.toAddMonoidHom) b₂)
+    : ∃ b : Fin (r₁ + r₂) → E, FreeOn R f L b := by
   have hlift : ∀ p, ∃ t : E, q t = b₂ p ∧ ∃ n : ℕ, f ^ n • t ∈ L := by
     intro p
     by_cases hf0 : f = 0
@@ -164,15 +177,16 @@ theorem freeOn_ext {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) (i : E₁ →�
   have hqi : ∀ x, q (i x) = 0 := fun x => by
     have : i x ∈ LinearMap.ker q := hiq ▸ LinearMap.mem_range_self i x
     exact this
-  have hsum : ∀ (a₁ : Fin r₁ → Ω) (a₂ : Fin r₂ → Ω),
-      ∑ p, Fin.append a₁ a₂ p • Fin.append (fun p => i (b₁ p)) t p
-        = i (∑ p, a₁ p • b₁ p) + ∑ p, a₂ p • t p := by
+  have hsum
+      : ∀ (a₁ : Fin r₁ → Ω) (a₂ : Fin r₂ → Ω),
+        ∑ p, Fin.append a₁ a₂ p • Fin.append (fun p => i (b₁ p)) t p
+          = i (∑ p, a₁ p • b₁ p) + ∑ p, a₂ p • t p := by
     intro a₁ a₂
     rw [Fin.sum_univ_add]
 
     simp [map_sum]
-  have hker : ∀ (e : E) (a₂ : Fin r₂ → Ω), q e = ∑ p, a₂ p • b₂ p →
-      ∃ x, i x = e - ∑ p, a₂ p • t p := by
+  have hker
+      : ∀ (e : E) (a₂ : Fin r₂ → Ω), q e = ∑ p, a₂ p • b₂ p → ∃ x, i x = e - ∑ p, a₂ p • t p := by
     intro e a₂ he
     have : e - ∑ p, a₂ p • t p ∈ LinearMap.range i := by
       rw [hiq, LinearMap.mem_ker, map_sub, he]
@@ -210,8 +224,7 @@ theorem freeOn_ext {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) (i : E₁ →�
       rw [hx]
       exact AddSubgroup.sub_mem _ ⟨n, hn⟩ (sum_mem_loc hf hL a₂ t ha₂R htL)
     obtain ⟨m, hm⟩ := hxL
-    obtain ⟨a₁, ha₁R, ha₁⟩ := (h₁.2.2 x).1 ⟨m, by
-      rw [AddSubgroup.mem_comap]; simpa using hm⟩
+    obtain ⟨a₁, ha₁R, ha₁⟩ := (h₁.2.2 x).1 ⟨m, by rw [AddSubgroup.mem_comap]; simpa using hm⟩
     refine ⟨Fin.append a₁ a₂, fun p => ?_, ?_⟩
     · refine Fin.addCases (fun p => ?_) (fun p => ?_) p
       · simpa using ha₁R p
@@ -225,16 +238,30 @@ theorem freeOn_ext {R : Subalgebra o Ω} {f : Ω} (hf : f ∈ R) (i : E₁ →�
       exact ⟨n, by simpa using hn⟩
     · simpa using htL p
 
-theorem main : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) {E E₁ E₂ : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] [AddCommGroup E₂] [Module Ω E₂] (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂), Function.Injective i → Function.Surjective q → LinearMap.range i = LinearMap.ker q → ∀ (L : AddSubgroup E) (r₁ r₂ : ℕ), (∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) → LocFree R r₁ (L.comap i.toAddMonoidHom) → LocFree R r₂ (L.map q.toAddMonoidHom) → LocFree R (r₁ + r₂) L := by
+theorem main
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) {E E₁ E₂ : Type}
+        [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] [AddCommGroup E₂]
+        [Module Ω E₂] (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂),
+      Function.Injective i → Function.Surjective q → LinearMap.range i = LinearMap.ker q
+        → ∀ (L : AddSubgroup E) (r₁ r₂ : ℕ),
+          (∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) → LocFree R r₁ (L.comap i.toAddMonoidHom)
+            → LocFree R r₂ (L.map q.toAddMonoidHom)
+            → LocFree R (r₁ + r₂) L := by
   intro o Ω _ _ _ R E E₁ E₂ _ _ _ _ _ _ i q hi hq hiq L r₁ r₂ hL
   rintro ⟨hL₁, k₁, f₁, c₁, hf₁, hc₁, hs₁, hb₁⟩ ⟨hL₂, k₂, f₂, c₂, hf₂, hc₂, hs₂, hb₂⟩
-  refine ⟨hL, k₁ * k₂,
+  refine ⟨
+    hL,
+    k₁ * k₂,
     fun l => f₁ (finProdFinEquiv.symm l).1 * f₂ (finProdFinEquiv.symm l).2,
     fun l => c₁ (finProdFinEquiv.symm l).1 * c₂ (finProdFinEquiv.symm l).2,
-    fun l => R.mul_mem (hf₁ _) (hf₂ _), fun l => R.mul_mem (hc₁ _) (hc₂ _), ?_, fun l => ?_⟩
+    fun l => R.mul_mem (hf₁ _) (hf₂ _),
+    fun l => R.mul_mem (hc₁ _) (hc₂ _),
+    ?_,
+    fun l => ?_
+  ⟩
   · rw [Equiv.sum_comp finProdFinEquiv.symm
-      (fun p : Fin k₁ × Fin k₂ => c₁ p.1 * c₂ p.2 * (f₁ p.1 * f₂ p.2)), Fintype.sum_prod_type,
-      ← mul_one (1 : Ω)]
+        (fun p : Fin k₁ × Fin k₂ => c₁ p.1 * c₂ p.2 * (f₁ p.1 * f₂ p.2)),
+      Fintype.sum_prod_type, ← mul_one (1 : Ω)]
     conv_rhs => rw [← hs₁]; enter [2]; rw [hs₁, ← hs₂]
     rw [Finset.sum_mul_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_

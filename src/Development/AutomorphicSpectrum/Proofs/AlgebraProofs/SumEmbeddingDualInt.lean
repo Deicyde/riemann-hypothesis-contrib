@@ -108,7 +108,6 @@ theorem finrank_eigSp_mul
   have h3 : ∀ τ : E →+* K, finrank K (eigSp ρ τ) = finrank K (eigSp ρ σ) := fun τ =>
     Nat.cast_injective ((h2 τ).trans (h2 σ).symm)
   have h4 : (finrank K V : K) = ∑ τ : E →+* K, (finrank K (eigSp ρ τ) : K) := by
-
     rw [← LinearMap.trace_one, ← sum_eigProj ρ, map_sum]
     exact Finset.sum_congr rfl fun τ _ => trace_eigProj ρ τ
   simp_rw [h3] at h4

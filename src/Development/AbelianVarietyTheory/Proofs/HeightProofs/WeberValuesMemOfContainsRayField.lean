@@ -3,7 +3,8 @@ module
 public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.XiValIffXiAt
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.RayFieldTheta
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.RingOfIntegersSqrtNegThreeModFour
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.WeberInvariantTorsionValuesSubsetOfContainsRayFiStatement
+public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.FiniteDimensionalOfSz
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.WeberInvariantTorsionValuesSubsetOfContainsRayFi
 import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.DedekindZetaEqSumRealEisenstein
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -153,7 +154,7 @@ theorem weberIn_of_containsRayField
     simp
   refine ⟨fun P hP => ?_, hle hr0⟩
   have hW :=
-    GlobalTheory.T.weberInvariantTorsionValues_subset_of_containsRayField K₀ F hle h2 (by omega) P
+    _root_.GlobalTheory.FieldSize.WeberIn.weberSet_subset K₀ F hle h2 (by omega) P
       (fun z => ?_)
       n hn hC'
   · exact ⟨

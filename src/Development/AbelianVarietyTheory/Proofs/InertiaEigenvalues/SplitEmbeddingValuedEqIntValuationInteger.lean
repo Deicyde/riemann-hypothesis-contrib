@@ -321,11 +321,6 @@ theorem prod_idem
     rw [Finset.prod_insert hQ, Finset.sum_insert hQ, ih hs']
     linear_combination (c - 1) ^ 2 * hQS
 
-theorem absFin_one'
-    : GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin D 1 = 1 := by
-  simp [GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin,
-    GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absV]
-
 theorem absFin_idemSum
     : ∀ (D : D7) (P1 : Finset (Formalism.L2.DIV.Pl D.host.E)) (a : AE D),
       IsIdemSum a P1
@@ -351,7 +346,10 @@ theorem absFin_idemSum
       rw [Finset.prod_attach P1 (fun PP => es PP * (m : AE D) + (1 - es PP)),
         prod_idem hes _ P1 subset_rfl, hae]
     let A : (AE D)ˣ →* ℝ := ⟨
-      ⟨GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin D, absFin_one'⟩,
+      ⟨
+        GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin D,
+        _root_.GlobalTheory.SplitLinear.absFin_one
+      ⟩,
       GlobalTheory.SplitLinear.absFin_mul
     ⟩
     have hA : GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin D x = A x := rfl

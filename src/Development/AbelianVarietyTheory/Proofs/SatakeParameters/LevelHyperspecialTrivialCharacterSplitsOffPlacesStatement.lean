@@ -47,6 +47,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.NTheta Formalism.IndefR.Mult
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.level_hyperspecial_trivialCharacter_splits_off_places
     : ∀ {D : D7} (V : HSp D) (β : GL (Fin V.rank) (Formalism.IndefR.Lev.EAf D))
         (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) (N : ℕ)
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.level_hyperspecial_trivialCharacter_splits_off_pla
                 ∧ ∀ k ∈ Formalism.IndefR.Lev.levG V β L, ∃ k₁ ∈ Formalism.IndefR.Lev.levG V β L,
                   ∃ k₂ ∈ Formalism.IndefR.Lev.levG V β L,
                     SuppF V f k₁ ∧ SuppF V (1 - f) k₂ ∧ k = k₁ * k₂ := by
-  first
-  | exact @GlobalTheory.LevSplit.lev_split
-  | exact GlobalTheory.LevSplit.lev_split
-  | (intros; apply GlobalTheory.LevSplit.lev_split <;> assumption)
+  first | exact @GlobalTheory.LevSplit.lev_split

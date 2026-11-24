@@ -166,9 +166,8 @@ theorem comap_span_coe
     {I : Type} (Vs : Submodule Kf X) (f : I → Vs)
     : (Submodule.span O (Set.range fun i => (f i : X))).comap (Vs.subtype.restrictScalars O)
       = Submodule.span O (Set.range f) := by
-  have h : (Set.range fun i => (f i : X)) = (Vs.subtype.restrictScalars O) '' Set.range f := by
-    ext y
-    simp
+  have h : (Set.range fun i => (f i : X)) = (Vs.subtype.restrictScalars O) '' Set.range f :=
+    Set.range_comp (Vs.subtype.restrictScalars O) f
   rw [h, ← Submodule.map_span, Submodule.comap_map_eq_of_injective]
   exact Subtype.val_injective
 
@@ -226,8 +225,7 @@ theorem dualLat_span
           inv_mul_cancel₀ (ha k)]
       · refine ⟨0, ?_⟩
         rw [LinearMap.smul_apply, map_smul, Module.Basis.coord_apply, Module.Basis.repr_self,
-          Finsupp.single_eq_of_ne (by first | exact hik | exact Ne.symm hik), map_zero, smul_zero,
-          smul_zero]
+          Finsupp.single_eq_of_ne (by first | exact Ne.symm hik), map_zero, smul_zero, smul_zero]
     | zero =>
       exact ⟨0, by simp⟩
     | add u v _ _ hu hv =>
@@ -324,12 +322,9 @@ theorem w_ne (h : HidaSetting p n' W Qq O Kf ι σ j w) : algebraMap O Kf w ≠ 
   have hpK : (p : Kf) = algebraMap O Kf w ^ 2 := by rw [← map_pow, h.w_sq, map_natCast]
   have hpW : (p : W) ≠ 0 := h.p_unif.ne_zero
   haveI := h.frac_alt
-  have hpQ : (p : Qq) ≠ 0 := by
-    rw [← map_natCast (algebraMap W Qq)]
-    exact (map_ne_zero_iff _ (IsFractionRing.injective W Qq)).2 hpW
   have hpK' : (p : Kf) ≠ 0 := by
-    rw [← map_natCast ι]
-    exact (map_ne_zero ι).2 hpQ
+    rw [← map_natCast ι, ← map_natCast (algebraMap W Qq)]
+    exact (map_ne_zero ι).2 ((map_ne_zero_iff _ (IsFractionRing.injective W Qq)).2 hpW)
   exact hpK' (by rw [hpK, h0]; simp)
 
 theorem p_eq (h : HidaSetting p n' W Qq O Kf ι σ j w) : (p : Kf) = algebraMap O Kf w ^ 2 := by
@@ -348,9 +343,7 @@ theorem edgeLat
   lb_edgeLat_of_basis (mkG h m r (fun _ _ => 0) (fun _ _ _ _ => le_rfl)) (0 : Fin 1)
     (restEdgeBasis _ _) e he
 
-theorem lb_D_one {K : Type} [Field K] (k r : ℕ) : lb_D k r (1 : K) = 1 := by
-  unfold lb_D
-  simp
+theorem lb_D_one {K : Type} [Field K] (k r : ℕ) : lb_D k r (1 : K) = 1 := by simp [lb_D]
 
 theorem lb_D_sq {K : Type} [Field K] (k r : ℕ) (c : K)
     : lb_D k r c * lb_D k r c = lb_D k r (c ^ 2) := by
@@ -358,7 +351,7 @@ theorem lb_D_sq {K : Type} [Field K] (k r : ℕ) (c : K)
   rw [Matrix.diagonal_mul_diagonal]
   congr 1
   funext a
-  split_ifs <;> simp [sq, mul_inv]
+  split_ifs <;> simp [sq]
 
 theorem elementary_divisor_basis
     (h : HidaSetting p n' W Qq O Kf ι σ j w)

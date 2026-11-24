@@ -164,8 +164,7 @@ theorem pairA_eq_iff (x y : Ainf F) (α β : Af F) : pairA F x α = pairA F y β
     exact ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩
   · rintro ⟨rfl, rfl⟩
     rfl
-theorem fa_ext {x y : Af F} (h : ∀ w, x w = y w) : x = y := by
-  first | exact RestrictedProduct.ext h | exact Subtype.ext (funext h)
+theorem fa_ext {x y : Af F} (h : ∀ w, x w = y w) : x = y := by first | exact Subtype.ext (funext h)
 theorem fa_mul (x y : Af F) (w : HeightOneSpectrum (𝓞 F)) : (x * y) w = x w * y w := rfl
 theorem fa_add (x y : Af F) (w : HeightOneSpectrum (𝓞 F)) : (x + y) w = x w + y w := rfl
 theorem fa_zero (w : HeightOneSpectrum (𝓞 F)) : (0 : Af F) w = 0 := rfl

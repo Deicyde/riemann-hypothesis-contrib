@@ -40,14 +40,13 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField
   IsDedekindDomain Formalism.L2 Formalism.L2.NT
+
 structure NAllCAlt (D : D7) (C : NChoice D) where
   gal : _root_.Formalism.L2.NGalTiedAlt D
   n : _root_.GlobalTheory.HeightCounting.NTiedGPlaceholder D

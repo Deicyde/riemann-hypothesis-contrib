@@ -89,7 +89,4 @@ theorem _root_.GlobalTheory.T.exists_conjugateModel_same_thetaFunctions
                           ((ctxOf hS.1 hS.2.1 hS.2.2.2.1 X' m hq' bas' idx' hs).xB
                             (fun ρ => (Z ρ).submatrix id π))
                         = thP X hq bas idx φ (toP S hr eT hq Q) (frOf hr eT Z)) := by
-  first
-  | exact @GlobalTheory.OneMapRef.Flip.exists_flip_model
-  | exact GlobalTheory.OneMapRef.Flip.exists_flip_model
-  | (intros; apply GlobalTheory.OneMapRef.Flip.exists_flip_model <;> assumption)
+  first | exact @GlobalTheory.OneMapRef.Flip.exists_flip_model

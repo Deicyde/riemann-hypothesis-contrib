@@ -107,7 +107,7 @@ theorem eventually_char_eq_one (μ : Fˣ →* Circle) (hμ : Continuous μ)
       rw [map_mul, hv, one_mul]
       exact ih
   refine ⟨
-    Circle.coe_eq_one.mp (eq_one_of_forall_pow_near fun n => ?_),
+    Circle.coe_eq_one.mp (_root_.GlobalTheory.PowerTwoNormLowerBound.main fun n => ?_),
     NNReal.coe_injective (SplitWeil.nabs_eq_one_of_valuation_eq_one hv)
   ⟩
   have : t ^ n ∈ Units.val ⁻¹' U := by simpa using (hs (hn n)).1

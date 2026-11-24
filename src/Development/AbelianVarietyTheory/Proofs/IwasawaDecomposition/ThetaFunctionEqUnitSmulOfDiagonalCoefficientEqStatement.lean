@@ -51,6 +51,7 @@ open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace
   GlobalTheory.Mem.Lift
 open scoped TensorProduct ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.thetaFunction_eq_unitSmul_of_diagonalCoefficient_eq
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
       IsStdChar D ψ (-1)
@@ -62,7 +63,4 @@ theorem _root_.GlobalTheory.T.thetaFunction_eq_unitSmul_of_diagonalCoefficient_e
                   ∫ x in 𝓕, heisO ψ S T w f' x * star (f' x) ∂μ
                     = ∫ x in 𝓕, heisO ψ S T w f x * star (f x) ∂μ)
                 → ∃ c : ℂ, ‖c‖ = 1 ∧ f' = c • f := by
-  first
-  | exact @GlobalTheory.ThetaCoefficient.exists_unit_smul_of_coefficient_eq
-  | exact GlobalTheory.ThetaCoefficient.exists_unit_smul_of_coefficient_eq
-  | (intros; apply GlobalTheory.ThetaCoefficient.exists_unit_smul_of_coefficient_eq <;> assumption)
+  first | exact @GlobalTheory.ThetaCoefficient.exists_unit_smul_of_coefficient_eq

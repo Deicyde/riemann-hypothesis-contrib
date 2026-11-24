@@ -44,6 +44,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsClassSumPairingFormsLat
+import Formalism.LocalToGlobal.Columns.CoefficientsModP
 
 @[expose] public section
 
@@ -122,8 +123,8 @@ theorem pair_integral
     haveI := hfin
     exact_mod_cast Nat.card_pos.ne'
   have hint :=
-    ((GlobalTheory.PeriodClassSum.pairBDual E K ι _ emb Q.sgT _
-        (hQ.step.lsh_full_lat c.1 (Q.S'.rep c)) (x.1 c)).1.1 (hx c))
+    ((_root_.Formalism.L2.DIV.pairBDual E K ι _ emb Q.sgT _ (hQ.step.lsh_full_lat c.1 (Q.S'.rep c))
+        (x.1 c)).1.1 (hx c))
       y hy
   obtain ⟨a, ha⟩ := hint
   refine ⟨a, ?_⟩

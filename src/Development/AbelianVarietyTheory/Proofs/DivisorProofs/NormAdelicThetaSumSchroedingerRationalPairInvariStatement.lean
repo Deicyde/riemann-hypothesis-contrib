@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.norm_adelicThetaSum_schroedinger_rationalPair_inva
           ∀ γ ∈ GlobalTheory.WeilUnitaryTransport.ratPair F κ, ∀ w : (κ → AF F) × (κ → AF F),
             ‖GlobalTheory.WeilM.thetaSum F (GlobalTheory.WeilM.schr ψ (γ + w) Φ)‖
               = ‖GlobalTheory.WeilM.thetaSum F (GlobalTheory.WeilM.schr ψ w Φ)‖ := by
-  first
-  | exact @GlobalTheory.ThetaRatInv.norm_thetaSum_schr_ratPair_add
-  | exact GlobalTheory.ThetaRatInv.norm_thetaSum_schr_ratPair_add
-  | (intros; apply GlobalTheory.ThetaRatInv.norm_thetaSum_schr_ratPair_add <;> assumption)
+  first | exact @GlobalTheory.ThetaRatInv.norm_thetaSum_schr_ratPair_add

@@ -170,30 +170,25 @@ theorem isClosedImmersion_of_baseChange_extension
   have hk2
       : φk ≫ pullback.snd W.hom (Spec.map (CommRingCat.ofHom (algebraMap R k)))
         = pullback.snd V.hom (Spec.map (CommRingCat.ofHom (algebraMap R k))) := by
-    simp only [φk, Over.pullback_map_left, pullback.lift_fst, pullback.lift_snd, Category.comp_id,
-      Category.assoc]
+    simp only [φk, Over.pullback_map_left, pullback.lift_snd]
   have hk1
       : φk ≫ pullback.fst W.hom (Spec.map (CommRingCat.ofHom (algebraMap R k)))
         = pullback.fst V.hom (Spec.map (CommRingCat.ofHom (algebraMap R k))) ≫ f.left := by
-    simp only [φk, Over.pullback_map_left, pullback.lift_fst, pullback.lift_snd, Category.comp_id,
-      Category.assoc]
+    simp only [φk, Over.pullback_map_left, pullback.lift_fst]
   have hΩ2
       : φΩ ≫ pullback.snd W.hom (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))
         = pullback.snd V.hom (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) := by
-    simp only [φΩ, Over.pullback_map_left, pullback.lift_fst, pullback.lift_snd, Category.comp_id,
-      Category.assoc]
+    simp only [φΩ, Over.pullback_map_left, pullback.lift_snd]
   have hΩ1
       : φΩ ≫ pullback.fst W.hom (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))
         = pullback.fst V.hom (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) ≫ f.left := by
-    simp only [φΩ, Over.pullback_map_left, pullback.lift_fst, pullback.lift_snd, Category.comp_id,
-      Category.assoc]
+    simp only [φΩ, Over.pullback_map_left, pullback.lift_fst]
   have comm : φΩ ≫ vY = vX ≫ φk := by
     apply pullback.hom_ext
     · simp only [vX, vY, Category.assoc, hk1, pullback.lift_fst, pullback.lift_fst_assoc,
         Category.comp_id]
       exact hΩ1
-    · simp only [vX, vY, Category.assoc, hk2, pullback.lift_snd, pullback.lift_snd_assoc,
-        Category.comp_id]
+    · simp only [vX, vY, Category.assoc, hk2, pullback.lift_snd]
       rw [← Category.assoc, hΩ2]
   have sq : IsPullback φΩ vX vY φk := by
     refine IsPullback.of_right ?_ comm sY

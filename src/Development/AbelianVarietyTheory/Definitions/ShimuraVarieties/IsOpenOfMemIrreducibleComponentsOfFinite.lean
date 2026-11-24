@@ -234,15 +234,6 @@ theorem eq_of_mem_irreducibleComponents_of_isDomain
       revert X x h_2 Z W hZ hW hxZ hxW
       exact @_root_.GlobalTheory.IrreducibleGeneralizations.main
     )
-  | exact @_root_.GlobalTheory.IrreducibleGeneralizations.main
-  | exact _root_.GlobalTheory.IrreducibleGeneralizations.main
-  | (apply _root_.GlobalTheory.IrreducibleGeneralizations.main <;> assumption)
-  | (intros; apply _root_.GlobalTheory.IrreducibleGeneralizations.main <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.IrreducibleGeneralizations.main
-        <;> first | assumption | infer_instance
-    )
   | (intros; exact _root_.GlobalTheory.IrreducibleGeneralizations.main ..)
 
 theorem eq_of_mem_irreducibleComponents

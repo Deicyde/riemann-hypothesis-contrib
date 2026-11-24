@@ -101,7 +101,7 @@ theorem stabK_one' {y : G} : stabK ι (1 : stab ι J y) = 1 := by apply Subtype.
 
 theorem stabK_mul' {y : G} (a b : stab ι J y) : stabK ι (a * b) = stabK ι b * stabK ι a := by
   apply Subtype.ext
-  simp only [stabK, Subgroup.coe_mul, map_mul, Subgroup.coe_inv, InvMemClass.coe_inv]
+  simp only [stabK, Subgroup.coe_mul, map_mul]
   group
 
 variable

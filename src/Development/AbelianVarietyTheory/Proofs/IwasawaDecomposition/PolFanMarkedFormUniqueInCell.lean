@@ -3,11 +3,11 @@ module
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MarkValEqZeroOrOne
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBaryStageStart
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CarrierDimLeOfAddCellGenerators
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellLeastDimVanishesWhereFormVanishesDiagonalStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeCellOfInFaceOfCellFormCMFieldStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeSummandsOfEvalZAdditiveCellStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InvFunEvalZAddOfLinearOnRealConeStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanRankLeOfInRealConePolyhedralCellStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CellLeastDimVanishesWhereFormVanishesDiagonal
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeCellOfInFaceOfCellFormCMField
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeSummandsOfEvalZAdditiveCell
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InvFunEvalZAddOfLinearOnRealCone
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanRankLeOfInRealConePolyhedralCell
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -173,10 +173,10 @@ theorem genRank_le_of_label_le
     rw [← toReal_sum', evalR_toReal] at this
     simpa using this
   have hin :=
-    GlobalTheory.T.inRealCone_summands_of_evalZ_additive_cell (𝓞 E) H.bar ψ X m' γ hγ m v hv.mem
+    _root_.GlobalTheory.PolFan.Mark.inRCone_of_evalZ_sum_le (𝓞 E) H.bar ψ X m' γ hγ m v hv.mem
       hv.nonneg hσγ hψσ.le
   have hr :=
-    GlobalTheory.T.spanRank_le_of_inRealCone_polyhedralCell (𝓞 E) H.bar ψ X m' m γ v hγ hv.mem
+    _root_.GlobalTheory.PolFan.genRank_le_of_inRCone_cell (𝓞 E) H.bar ψ X m' m γ v hγ hv.mem
       hv.nonneg hin
   have h2
       : sInf
@@ -207,14 +207,14 @@ theorem inFace_iff_of_isMarked
     exact ⟨
       hx1,
       hx2,
-      GlobalTheory.T.inRealCone_cell_of_inFace_of_cellForm_CMField E H q ψ lab hψ hlab X hX hDom m v
-        hv β hβ1 hβ2 hβv x hx1 hx2 hx4 hx5
+      _root_.GlobalTheory.PolFan.Mark.FaceIn.inRCone_of_add E H q ψ lab hψ hlab X hX hDom m v hv β
+        hβ1 hβ2 hβv x hx1 hx2 hx4 hx5
     ⟩
   · rintro ⟨hx1, hx2, hxv⟩
     have hrk := genRank_le_of_label_le H q ψ lab i hlab X hX v hv hb
     have hvan :=
-      GlobalTheory.T.cell_leastDim_vanishes_where_form_vanishes_diagonal E H q ψ lab hψ hlab X hX
-        hDom m v hv β hβ1 hβ2 hβv (by rw [hβl]; exact_mod_cast hrk)
+      _root_.GlobalTheory.PolFan.Mark.vanish_of_inRCone_of_genRank_le E H q ψ lab hψ hlab X hX hDom
+        m v hv β hβ1 hβ2 hβv (by rw [hβl]; exact_mod_cast hrk)
     have hsum := inRCone_add' hβv hxv
     have hs1 : β + x ∈ balForms H.bar X := add_mem hβ1 hx1
     have hs2 : ∀ y, 0 ≤ (β + x) y y := fun y => by
@@ -223,7 +223,8 @@ theorem inFace_iff_of_isMarked
       hx1,
       hx2,
       fun y hy => inRCone_apply_self_eq_zero hxv y fun j => hvan j y hy,
-      GlobalTheory.T.invFun_evalZ_add_of_linearOn_realCone (𝓞 E) ψ X m v hv.linear β x hβv hxv,
+      _root_.GlobalTheory.PolFan.Mark.evalZ_add_of_linearOn_inRCone (𝓞 E) ψ X m v hv.linear β x hβv
+        hxv,
       le_antisymm ?_ ?_
     ⟩
     · rw [hβl]; exact hb _ hs1 hs2 hsum

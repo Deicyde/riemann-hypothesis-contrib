@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsThetaSystemOfPolarisedLevel
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsFractionRingOfForallDiv
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsBigThetaSysWithAction
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ZarhinNormalProjectiveModelExistsProofStatement
+public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.ImmersedBy
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ZarhinNormalProjectiveModelExistsProof
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -73,12 +74,7 @@ theorem exists_factor
     h.cancel (n.congr rfl (h.1.lift_fst _ _ w).symm) (h.1.lift_snd _ _ w)
   ⟩
 
-theorem isProper_of_isProjOver
-    {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R} (h : IsProjOver f)
-    : IsProper f := by
-  obtain ⟨m, i, hi, rfl⟩ := h
-  have := isProper_str R m
-  infer_instance
+alias isProper_of_isProjOver := _root_.GlobalTheory.SpreadAb.isProper_of_isProjOver
 
 theorem finite_ratios
     {o Ω I : Type} [CommRing o] [Field Ω] [Algebra o Ω]
@@ -145,8 +141,8 @@ theorem exists_proper_semiAbelian_family
     ThetaReal.exists_thetaSys_real hL hL₂ o Ω R hR hΩ' P' n k j ze hn ho hk hj hun hS' lev'
   obtain ⟨s, rfl⟩ := hR₀
   obtain ⟨M, U₀, EE, hO, -, -, ⟨out⟩⟩ :=
-    T.zarhinNormalProjectiveModelExists_proof o Ω S ρ
-      (big j le_rfl o Ω S (hgS.trans (hg'.trans hg)) hN hr) (Option s)
+    _root_.GlobalTheory.zhSt_holds o Ω S ρ (big j le_rfl o Ω S (hgS.trans (hg'.trans hg)) hN hr)
+      (Option s)
       (fun i => i.elim 1 Subtype.val)
       ⟨none, one_ne_zero⟩ (finite_ratios s hΩ S.th S.th_ne)
   obtain ⟨ψ, hψ⟩ :=

@@ -68,8 +68,4 @@ theorem _root_.GlobalTheory.T.eventually_integralPointsIndicator_isVacuum
               M.co.e (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM F x)
                 = (fun k => algebraMap F (AF F) (y k), fun k => algebraMap F (AF F) (z k)))
             → ∀ᶠ v in Filter.cofinite, M.IsVac B.ψ v (Set.indicator {x : Fin n × Fin d → Fv F v | ∀ k, x k ∈ v.adicCompletionIntegers F} 1) :=
-  by
-    first
-    | exact @GlobalTheory.StdVacuum.eventually_isVac_indicator
-    | exact GlobalTheory.StdVacuum.eventually_isVac_indicator
-    | (intros; apply GlobalTheory.StdVacuum.eventually_isVac_indicator <;> assumption)
+  by first | exact @GlobalTheory.StdVacuum.eventually_isVac_indicator

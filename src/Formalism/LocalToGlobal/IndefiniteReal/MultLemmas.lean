@@ -139,7 +139,7 @@ theorem rder_smul
     : Rder θ V τ X (c • φ) = c • Rder θ V τ X φ := by
   funext g
   simp only [Rder, Pi.smul_apply, smul_eq_mul]
-  first | exact deriv_const_mul_field c | simp
+  first | exact deriv_const_mul_field c
 
 variable (V) in
 theorem foldr_rder_smul

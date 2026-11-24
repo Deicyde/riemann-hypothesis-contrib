@@ -131,7 +131,7 @@ abbrev extLat
       (IsModuleTopology.continuous_of_linearMap (b.coord i)).comp (T.cont (b j))
     have h2 : Continuous (incl h) := continuous_subtype_val.subtype_mk _
     refine (h2.comp h1).congr fun g => ?_
-    simp [matRepExt, matRep, LinearMap.toMatrixAlgEquiv_apply, LinearMap.toMatrix_apply]
+    simp [matRepExt, matRep, LinearMap.toMatrixAlgEquiv_apply]
   L := {
     T := intVec LL' k
     stable := fun g x hx i => by
@@ -149,7 +149,7 @@ abbrev extLat
       rw [Pi.basisFun_apply]
       by_cases hij : i = j
       · subst hij; simp [one_mem]
-      · simp [Pi.single_apply, Ne.symm hij, zero_mem]
+      · simp [Ne.symm hij, zero_mem]
   }
 
 theorem hom_integral

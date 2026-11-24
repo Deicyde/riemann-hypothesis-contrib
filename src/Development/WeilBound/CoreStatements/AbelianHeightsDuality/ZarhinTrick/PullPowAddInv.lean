@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.WeilBound.CoreStatements.AbelianHeightsDuality.ZarhinTrick.FibLamB
 
 @[expose] public section
 
@@ -94,23 +95,12 @@ variable
   {P : LB (A ⊗ B).left} (hD : IsDual A B P) (hD' : IsDual B A (swap P))
   {Y : Over S}
 
-private theorem evc_mul_left' (a a' : Y ⟶ A) (b : Y ⟶ B)
-    : evc hD.isLB (a * a') b = evc hD.isLB a b + evc hD.isLB a' b := by
-  have hP := hD.isLB
-  have hm := hD.additive Y a a' b
-  have h1 : (ev P a b).IsLB := ReciprocityTheory.ChartRestriction.G.Geo.Tor.pull_isLB hP _
-  have h2 : (ev P a' b).IsLB := ReciprocityTheory.ChartRestriction.G.Geo.Tor.pull_isLB hP _
-  have h3 : (ev P (a * a') b).IsLB := ReciprocityTheory.ChartRestriction.G.Geo.Tor.pull_isLB hP _
-  change cls (ev P (a * a') b) h3 = cls (ev P a b) h1 + cls (ev P a' b) h2
-  rw [← cls_tens h1 h2 (isLB_tens h1 h2)]
-  exact (cls_eq_iff _ _).2 hm
-
 include hD in
 theorem evc_pow_left (a : Y ⟶ A) (b : Y ⟶ B) (n : ℕ)
     : evc hD.isLB (a ^ n) b = n • evc hD.isLB a b := by
   induction n with
   | zero => simpa using IsAdditive.evc_one hD.isLB hD.additive b
-  | succ k ih => rw [pow_succ, evc_mul_left' hD, ih, succ_nsmul]
+  | succ k ih => rw [pow_succ, _root_.PositivityTheory.PrwZar.evc_mul_left hD, ih, succ_nsmul]
 
 include hD hD' in
 theorem evc_pow_right (a : Y ⟶ A) (b : Y ⟶ B) (n : ℕ)
@@ -165,7 +155,8 @@ private theorem lam_mul_left'
     : lam (cls L hL) (x * x') y = lam (cls L hL) x y + lam (cls L hL) x' y := by
   rw [lam_eq_evc_toBase_of_isDual (hD := hD0) (e' := e'),
     lam_eq_evc_toBase_of_isDual (hD := hD0) (e' := e'),
-    lam_eq_evc_toBase_of_isDual (hD := hD0) (e' := e'), toBase_mul, evc_mul_left' hD0]
+    lam_eq_evc_toBase_of_isDual (hD := hD0) (e' := e'), toBase_mul,
+    _root_.PositivityTheory.PrwZar.evc_mul_left hD0]
 
 private theorem lam_mul_right_zarhin_trick
     (hD0 : IsDual A B P) (hD1 : IsDual B A (swap P))
@@ -178,8 +169,8 @@ private theorem lam_mul_right_zarhin_trick
     lam_eq_evc_toBase_of_isDual (hD := hD0) (e' := e'), toBase_mul]
   have hm : (toBase A s y * toBase A s y') ≫ l = (toBase A s y ≫ l) * (toBase A s y' ≫ l) :=
     map_mul (IsMonHom.monoidHom l _) _ _
-  rw [hm, ← evc_swap hD0.isLB hD1.isLB, evc_mul_left' hD1, evc_swap hD0.isLB hD1.isLB,
-    evc_swap hD0.isLB hD1.isLB]
+  rw [hm, ← evc_swap hD0.isLB hD1.isLB, _root_.PositivityTheory.PrwZar.evc_mul_left hD1,
+    evc_swap hD0.isLB hD1.isLB, evc_swap hD0.isLB hD1.isLB]
 
 private theorem lam_pow_left'
     (hD0 : IsDual A B P)

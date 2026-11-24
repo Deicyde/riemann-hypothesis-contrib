@@ -45,8 +45,6 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsAHE
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.ThK.Dbl.Frame

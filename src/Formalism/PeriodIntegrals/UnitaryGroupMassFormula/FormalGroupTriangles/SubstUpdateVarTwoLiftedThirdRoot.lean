@@ -116,8 +116,7 @@ theorem subst_updateVar_two_liftedThirdRoot
   have hz3 : ∀ i, MvPowerSeries.constantCoeff (upd 2 t i) = 0 := fun i => by
     fin_cases i <;> simp [upd, Function.update, ht]
   have hu : MvPowerSeries.HasSubst (upd 2 t) := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz3
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz3
   have hz2
       : ∀ i,
         MvPowerSeries.constantCoeff
@@ -126,8 +125,7 @@ theorem subst_updateVar_two_liftedThirdRoot
     fin_cases i <;> simp
   have h2 : MvPowerSeries.HasSubst
       ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) ℂ_[p]), MvPowerSeries.X 1] := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz2
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz2
   unfold s3 pr
   rw [MvPowerSeries.subst_comp_subst_apply h2 hu]
   congr 1
@@ -167,8 +165,7 @@ theorem pr_zero_zero (g : MvPowerSeries (Fin 2) ℂ_[p]) (hg : MvPowerSeries.con
         MvPowerSeries.constantCoeff (![(0 : MvPowerSeries (Fin 3) ℂ_[p]), 0] i) = 0 := fun i => by
     fin_cases i <;> simp
   have ha : MvPowerSeries.HasSubst ![(0 : MvPowerSeries (Fin 3) ℂ_[p]), 0] := by
-    first
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz
   rw [MvPowerSeries.coeff_subst ha, finsum_eq_single _ 0]
   · simp [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hg]
   · intro d hd

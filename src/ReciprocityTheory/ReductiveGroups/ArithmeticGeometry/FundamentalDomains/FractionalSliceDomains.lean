@@ -180,7 +180,7 @@ theorem hfun_periodic
         simp [Finset.sum_apply, zsmul_eq_mul]
       rw [e]
       exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
-    first | exact h1 | exact (AddSubgroup.mem_toIntSubmodule _).mp h1
+    first | exact h1
   have hsum
       : (fun τ => ∑ j, (s + fun k => (m k : ℂ)) j * (ω j τ : ℂ))
         = TransvectionPeriodicity.cR X (fun τ => ∑ j, (m j : ℝ) * ω j τ)
@@ -192,9 +192,7 @@ theorem hfun_periodic
     exact Finset.sum_congr rfl fun j _ => by ring
   show P (X.flow ξ (fun τ => ∑ j, (s + fun k => (m k : ℂ)) j * (ω j τ : ℂ)) x) =
     P (X.flow ξ (fun τ => ∑ j, s j * (ω j τ : ℂ)) x)
-  first
-  | rw [hsum, ← EmbeddingHermitianPairs.flow_flow (X := X) hξ.2.1]
-  | rw [hsum, ← AdmissibleHermitianColumns.flow_flow (X := X) hξ.2.1]
+  first | rw [hsum, ← EmbeddingHermitianPairs.flow_flow (X := X) hξ.2.1]
   exact TransvectionPeriodicity.sec_periodic X la P hP hξ.1 hξ.2.1 hp _ hS
 
 theorem slice_fract

@@ -49,6 +49,7 @@ open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.Conju
   ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
   GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
 theorem _root_.GlobalTheory.T.epsilon_factor_rec_compatible
     : LanglandsExhaustionGL → LanglandsMultisegments → StandardCosocleGL → ZelevinskyPolynomialRing
       → GeometricLemma → BernsteinZelevinskyFiniteness
@@ -60,7 +61,4 @@ theorem _root_.GlobalTheory.T.epsilon_factor_rec_compatible
         LawsLit a ha e rc
           → ∀ (x : IrrGL (k := w.adicCompletion E)) (α : Fin x.1 → ℂˣ),
             HasSatake x.rep α → rc x = WD.mk (WDRep.diag h fun i => (α i)⁻¹) := by
-  first
-  | exact @GlobalTheory.LocLanglands.SatakeLaw.sat_of_lawsLit
-  | exact GlobalTheory.LocLanglands.SatakeLaw.sat_of_lawsLit
-  | (intros; apply GlobalTheory.LocLanglands.SatakeLaw.sat_of_lawsLit <;> assumption)
+  first | exact @GlobalTheory.LocLanglands.SatakeLaw.sat_of_lawsLit

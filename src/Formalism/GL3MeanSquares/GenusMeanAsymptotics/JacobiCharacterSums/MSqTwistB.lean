@@ -164,8 +164,7 @@ theorem sum_jac_cls_eq_zero
   have hN : 0 < m₀ * s := Nat.pos_of_ne_zero (NeZero.ne _)
   obtain ⟨u, hu1, hus, hJu⟩ := exists_jacobiSym_neg_one_in_residue_class m₀ s h1 hodd hsq hcop
   have hre := sum_clsB_mul_mod_eq_sum m₀ s a₀ u hN hu1 hus (fun x => (jacobiSym (x : ℤ) s : ℝ))
-  simp only [jacobiSym_mul_mod_eq_mul, hJu, Int.cast_mul, Int.cast_neg, Int.cast_one, mul_neg,
-      mul_one, Finset.sum_neg_distrib]
+  simp only [jacobiSym_mul_mod_eq_mul, hJu, Int.cast_neg, mul_neg, mul_one, Finset.sum_neg_distrib]
     at hre
   linarith
 
@@ -316,7 +315,6 @@ theorem twist_one
       ≤ (4 * r + 2 * |k|) * (((PPset m₀ a₀ X).card : ℝ) + X ^ (1 / 2 : ℝ)) + X ^ (1 / 2 : ℝ) := by
   have hs : 0 < s := by omega
   obtain ⟨hd, hsumabs⟩ := twist_decomp m₀ s a₀ X hm hs hX (fun b => mainAP e b X) k hk hb
-  beta_reduce at hd hsumabs
   have hmain := main_twist_bound m₀ s a₀ hm h1 hodd hsq hcop ha X r e hr0 hr hli hG
   have h2
       : 2 * r * ∑ b ∈ clsB m₀ s a₀, |mainAP e b X|

@@ -40,11 +40,9 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InertialOrderFifteenCharAuxiliaryPrimeSpec
 
 @[expose] public section
-
-
-
 
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
@@ -55,14 +53,6 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
   UpperTheory.V.Th
 open scoped Pointwise
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-private theorem cont_units
-    {Γ R : Type}
-    [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Monoid R] [TopologicalSpace R]
-    (f : Γ →* Rˣ) (h : Continuous fun s => (f s : R))
-    : Continuous f := by
-  refine Units.continuous_iff.2 ⟨h, ?_⟩
-  simp only [← map_inv]
-  exact h.comp continuous_inv
 private theorem conj_tw
     {Γ k : Type} [Group Γ] [Field k]
     {n : ℕ} (r : Γ →* GL (Fin n) k)
@@ -129,9 +119,10 @@ theorem UpperTheory.V.Z.J.free_at_of_unlinked_of_automorphic_cyclotomic_twist
     Units.continuous_val.comp (continuous_cycZ F Ω l)
   have hcyc : Continuous fun s : G F Ω => (cycBar F Ω l s : Qbar l) :=
     (continuous_algebraMap ℚ_[l] (PadicAlgCl l)).comp (continuous_subtype_val.comp hz)
-  have hχ : Continuous fun s : G F Ω => cycBar F Ω l s ^ a := (cont_units _ hcyc).zpow a
+  have hχ : Continuous fun s : G F Ω => cycBar F Ω l s ^ a :=
+    (_root_.GlobalTheory.GalChar.continuous_units _ hcyc).zpow a
   have hc : Continuous (tw r (cycBar F Ω l ^ a)) := by
-    refine cont_units _ ?_
+    refine _root_.GlobalTheory.GalChar.continuous_units _ ?_
     simp only [tw_val]
     exact (Units.continuous_val.comp hχ).smul (Units.continuous_val.comp hr)
   obtain ⟨s, hs1, hs2⟩ :=

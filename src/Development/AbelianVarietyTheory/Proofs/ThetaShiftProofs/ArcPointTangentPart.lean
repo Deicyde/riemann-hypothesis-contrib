@@ -72,7 +72,7 @@ variable {S : Type} [CommRing S]
 
 theorem fst_alg
     : (TrivSqZeroExt.fstHom S S S).toRingHom.comp (algebraMap S (DualNumber S)) = RingHom.id S :=
-  RingHom.ext fun x => by simp [TrivSqZeroExt.algebraMap_eq_inl]
+  RingHom.ext fun x => by simp
 
 end Eps
 

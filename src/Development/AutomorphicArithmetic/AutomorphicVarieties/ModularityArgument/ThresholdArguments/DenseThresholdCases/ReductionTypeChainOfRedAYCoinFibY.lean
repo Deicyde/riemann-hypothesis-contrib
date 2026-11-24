@@ -50,9 +50,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
   IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
@@ -95,37 +92,13 @@ private theorem ent_of
     exact hn ⟨g, i, j, hw _ hy hwS, by simpa [mapRep_apply] using h0⟩
   · exact hY (Ideal.subset_span ⟨g, i, j, hij, hy, rfl⟩)
 private theorem w1 : ∀ u ∈ yY, u ∉ ({wBe, -wBe, -wAl, -wTh, -wPs} : Finset (ℤ × ℤ)) → u = wTh := by
-  first
-  | decide
-  | (
-      intro u hu hS
-      simp only [yY, Finset.mem_insert, Finset.mem_singleton] at hu
-      rcases hu with rfl | rfl | rfl | rfl <;> first | rfl | (exfalso; exact hS (by simp))
-    )
+  first | decide
 private theorem w2 : ∀ u ∈ yY, u ∉ ({wBe, -wBe, wAl, wTh, wPs} : Finset (ℤ × ℤ)) → u = -wTh := by
-  first
-  | decide
-  | (
-      intro u hu hS
-      simp only [yY, Finset.mem_insert, Finset.mem_singleton] at hu
-      rcases hu with rfl | rfl | rfl | rfl <;> first | rfl | (exfalso; exact hS (by simp))
-    )
+  first | decide
 private theorem w3 : ∀ u ∈ yY, u ∉ ({wTh, -wTh, wPs, wBe, -wAl} : Finset (ℤ × ℤ)) → u = -wBe := by
-  first
-  | decide
-  | (
-      intro u hu hS
-      simp only [yY, Finset.mem_insert, Finset.mem_singleton] at hu
-      rcases hu with rfl | rfl | rfl | rfl <;> first | rfl | (exfalso; exact hS (by simp))
-    )
+  first | decide
 private theorem w4 : ∀ u ∈ yY, u ∉ ({wTh, -wTh, -wPs, -wBe, wAl} : Finset (ℤ × ℤ)) → u = wBe := by
-  first
-  | decide
-  | (
-      intro u hu hS
-      simp only [yY, Finset.mem_insert, Finset.mem_singleton] at hu
-      rcases hu with rfl | rfl | rfl | rfl <;> first | rfl | (exfalso; exact hS (by simp))
-    )
+  first | decide
 private theorem t1
     : ({wBe, -wBe, -wAl, -wTh, -wPs} : Finset (ℤ × ℤ)) ∈ redTypes
       ∧ ({wBe, -wBe, -wAl, -wTh, -wPs} : Finset (ℤ × ℤ)) ≠ yY := ⟨

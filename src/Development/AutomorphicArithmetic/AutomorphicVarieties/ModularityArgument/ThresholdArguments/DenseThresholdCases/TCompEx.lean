@@ -40,9 +40,6 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument
 
 @[expose] public section
 
-
-
-
 section
 open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
   GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL

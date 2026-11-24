@@ -171,7 +171,8 @@ theorem framepf_phi_coordΔ
 
       conv_rhs => rw [ha, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [Formalism.MainNotions.LiftingTheory.wmap_γD_smul, ← W.φγ_comm, (Bs.mem j).2 δ hδ]
+      rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ← W.φγ_comm,
+        (Bs.mem j).2 δ hδ]
     exact congrFun (framepf_phi_uniq Bs hT e) k
   · have e : ∑ j, ((letE c : LetA O n) * a j) • W.φD T (Bs.b j) = ∑ j, a j • W.φD T (Bs.b j) := by
       rw [← ha, ← hc]
@@ -204,7 +205,8 @@ theorem framepf_mem_Pc
   · show a k • W.φD T (Bs.b k) ∈ DelS W T
     rw [mem_DelS]
     intro δ hδ
-    rw [Formalism.MainNotions.LiftingTheory.wmap_γD_smul, ← W.φγ_comm, (Bs.mem k).2 δ hδ, ha k δ hδ]
+    rw [_root_.Formalism.MainNotions.LiftingTheory.gammaD_semilinear, ← W.φγ_comm,
+      (Bs.mem k).2 δ hδ, ha k δ hδ]
   · show a k • W.φD T (Bs.b k) ∈ letS W T c
     rw [mem_letS, smul_smul, hc k]
 

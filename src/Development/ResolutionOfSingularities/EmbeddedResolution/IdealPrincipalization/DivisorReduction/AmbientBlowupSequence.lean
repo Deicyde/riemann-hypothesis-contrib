@@ -106,7 +106,8 @@ theorem ambientBlowupSeq_center_eq_imageIdealSheaf
       s).toBlowupSequenceData.CentersContainNoComponent)
     (n : ℕ)
     : (ambientBlowupSeq hres hno T j hj I₀ E₀ s hpr).center n
-      = imageIdealSheaf (embeddingIntoAmbient hres hno T j hj I₀ E₀ s hpr n) (s.center n) :=
+      = _root_.FunctorialResolution.Blowup.schemeImageIdeal
+        (embeddingIntoAmbient hres hno T j hj I₀ E₀ s hpr n) (s.center n) :=
   ambientBlowupSequence_center (T.boundary.get ⟨j, hj⟩).subschemeι
     (MarkedBlowupSequenceData.ofMarkedSequence s).toBlowupSequenceData hres hno hpr n
 
@@ -410,7 +411,9 @@ structure DivisorReductionTerminationProperties
               ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) J
               ((T.boundary.eraseIdx j).map
                 (fun D => D.comap (T.boundary.get ⟨j, hj⟩).subschemeι))).IsAdmissible
-            → T.ideal = imageIdealSheaf (T.boundary.get ⟨j, hj⟩).subschemeι J
+            → T.ideal
+              = _root_.FunctorialResolution.Blowup.schemeImageIdeal
+                (T.boundary.get ⟨j, hj⟩).subschemeι J
             → DivisorReduction.containedComponentsIdeal T j hj = ⊤
   isOpen_preLocus
     : ∀ (T : MarkedIdealWithBoundary.{u}),

@@ -62,7 +62,6 @@ theorem ep_eq_reL
           exact ((letI := alg (reL a Z) iK; EP (real (reL a Z) R) (face (reL a Z) F)) :)) :=
   (congrFun (eeat_eq (reL a Z) R) (R.levR F true))
 
-
 theorem mvEv_holds : MvEv := by
   intro B C a Z G' _ _ Pl0 T A Ks _ _ iK R F X h G t c hj
   exact (by

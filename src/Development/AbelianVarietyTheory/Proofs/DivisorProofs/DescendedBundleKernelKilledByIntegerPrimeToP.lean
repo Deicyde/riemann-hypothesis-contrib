@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsGalois
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsAdditiveOfUniversal
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FrobeniusOnTorsion
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NearIsIsoOfIsProperOfFinitePresentation
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TheoremOfCubeAbelianSchemeOverArbitraryBase
+public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CubeTheorem
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.CubeTheorem.CubeTheoremHolds
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -65,11 +66,13 @@ theorem evc_pow_left
     (n : ℕ)
     : evc hP (a ^ n) t = n • evc hP a t := by
   have hadd :=
-    (isAdditive_iff hP).1 (additive_of_cube GlobalTheory.CubeTop.cubeTheorem hA hA hP h₁ h₂).1
+    (isAdditive_iff hP).1
+      (additive_of_cube _root_.GlobalTheory.SpreadingModels.cubeTheorem_holds hA hA hP h₁ h₂).1
   induction n with
   | zero =>
     rw [pow_zero, zero_smul]
-    exact (additive_of_cube GlobalTheory.CubeTop.cubeTheorem hA hA hP h₁ h₂).1.evc_one hP t
+    exact (additive_of_cube _root_.GlobalTheory.SpreadingModels.cubeTheorem_holds hA hA hP h₁
+      h₂).1.evc_one hP t
   | succ n ih => rw [pow_succ, hadd, ih, succ_nsmul]
 
 theorem kernel_descent

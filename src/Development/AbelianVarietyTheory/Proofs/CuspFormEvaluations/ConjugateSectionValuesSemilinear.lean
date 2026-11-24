@@ -50,7 +50,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 set_option autoImplicit false
 
-
 noncomputable section
 
 namespace GlobalTheory.GalTw

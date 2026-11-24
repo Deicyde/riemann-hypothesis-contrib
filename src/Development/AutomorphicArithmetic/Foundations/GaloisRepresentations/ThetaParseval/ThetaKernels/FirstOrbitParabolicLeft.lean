@@ -57,8 +57,6 @@ import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
@@ -158,7 +156,7 @@ theorem not_first_orbit_weyl
       Finset.sum_eq_single (Sum.inl L.i₀)]
     at h1
   · rw [hg, Matrix.one_apply_eq, mul_one, hW] at h1
-    simp [Matrix.single_apply, Matrix.one_apply] at h1
+    simp at h1
     exact hb (kfour.inclR_injective (F := F) (by rw [h1, map_zero]))
   · intro j _ hj; rw [hg j, Matrix.one_apply_ne hj, mul_zero]
   · simp
@@ -205,7 +203,7 @@ theorem weyl_commutes_embedding
     rw [Matrix.sub_apply, hW]
     simp only [P, not_and_or] at hrc
     rcases hrc with hr | hr <;> push_neg at hr
-      <;> simp [Matrix.single_apply, Matrix.one_apply, hr.1, hr.2, Ne.symm hr.1, Ne.symm hr.2]
+      <;> simp [Matrix.one_apply, Ne.symm hr.1, Ne.symm hr.2]
   have hJo : ∀ r c, (P r ∨ P c) → (J - 1) r c = 0 := by
     intro r c hrc
     rw [Matrix.sub_apply, sub_eq_zero]
@@ -288,8 +286,7 @@ theorem fix_cM'_k
   intro k
   rw [_root_.PositivityTheory.SiegelWeilFormula.Act.C6.cM_frame_k h]
   rcases k with k | k
-  · simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C5.uA_k, Matrix.one_apply,
-      Matrix.single_apply, Matrix.sum_apply,
+  · simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C5.uA_k, Matrix.one_apply, Matrix.sum_apply,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C4.em_ne_k L]
   · simp
 theorem cM_rat'_k
@@ -340,10 +337,9 @@ theorem emS_cM_k
     <;> simp [_root_.PositivityTheory.SiegelWeilFormula.Act.C6.cM_frame_k h,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C4.emS_k,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.uA_k,
-      _root_.PositivityTheory.SiegelWeilFormula.Act.C5.aB_k, Matrix.one_apply, Matrix.single_apply,
-      Matrix.sum_apply, _root_.PositivityTheory.SiegelWeilFormula.Act.C4.em_ne_k L, L.inj.eq_iff,
-      Ne.symm (_root_.PositivityTheory.SiegelWeilFormula.Act.C4.em_ne_k L _)]
-    <;> split_ifs <;> simp
+      _root_.PositivityTheory.SiegelWeilFormula.Act.C5.aB_k, Matrix.one_apply, Matrix.sum_apply,
+      L.inj.eq_iff, Ne.symm (_root_.PositivityTheory.SiegelWeilFormula.Act.C4.em_ne_k L _)]
+    <;> split_ifs
 end PositivityTheory.SiegelWeilFormula.Act.C6
 end
 end

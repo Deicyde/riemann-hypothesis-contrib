@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.realPoints_classicalModel_realVectorSpace
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∃ R : WR C.X S.rank →+ WO S T,
       Continuous R ∧ Continuous C.realPt ∧ (∀ w w', C.realPt (w + w') = C.realPt w + C.realPt w')
@@ -63,7 +64,4 @@ theorem _root_.GlobalTheory.T.realPoints_classicalModel_realVectorSpace
             ∧ ∀ τ,
               compAt C.θ τ (actO S T h g w)
                 = compAt C.θ τ (mt T g) * compAt C.θ τ w * compAt C.θ τ (mt S h⁻¹) := by
-  first
-  | exact @GlobalTheory.KerReal.real_points
-  | exact GlobalTheory.KerReal.real_points
-  | (intros; apply GlobalTheory.KerReal.real_points <;> assumption)
+  first | exact @GlobalTheory.KerReal.real_points

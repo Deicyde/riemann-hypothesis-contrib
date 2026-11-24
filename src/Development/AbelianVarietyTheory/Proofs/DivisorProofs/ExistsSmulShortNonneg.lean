@@ -63,6 +63,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Std.Tactic.BVDecide.Normalize.Prop
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -117,7 +118,7 @@ theorem ell_part
           (io (((Λ.mIdx N (Dw.p + Dw.q) : c.F))⁻¹ * ((N : c.F) ^ P.totalDegree)⁻¹)
             * ∑ i, hv Xo c nab y.1 (N ^ 2) (F i) P) := by
   letI := io.toAlgebra
-  obtain ⟨A, hsim⟩ := GlobalTheory.T.exists_adapted_similitude_data_at_prime E H n Λ N M ℓ hU hL hp
+  obtain ⟨A, hsim⟩ := _root_.GlobalTheory.PlaceInt.AdaptExists.exists_adapt E H n Λ N M ℓ hU hL hp
   have hN : Odd N := hL.1
   have hkN : Odd (A.k * N) := A.odd.mul hN
   have hlev : (A.k * N) ^ 2 = N ^ 2 * A.k ^ 2 := by ring
@@ -152,7 +153,7 @@ theorem ell_part
   have hkN0 : ((A.k * N : ℕ) : c.F) ^ P.totalDegree ≠ 0 :=
     pow_ne_zero _ (Nat.cast_ne_zero.2 hkN.pos.ne')
   obtain ⟨z, hz1, hz2⟩ :=
-    GlobalTheory.T.sum_hv_primary_kernel_alt E H Dw l Xo c hst T io y C hC nab hnab e ρ w n he hB ℓ
+    _root_.GlobalTheory.sum_hv_primary_kernel E H Dw l Xo c hst T io y C hC nab hnab e ρ w n he hB ℓ
       hp hl (A.k * N) (A.k ^ 2) (N ^ 2) A.k₁ A.p A.q ((A.k : 𝓞 E) • A.g) hkN hsim (mul_pow _ _ _)
       (A.cop.pow_left 2) hR A.cop₁
       (by rw [Matrix.smul_mul, A.gq, smul_smul]; congr 1; push_cast; ring) J a hinj ha'
@@ -325,7 +326,7 @@ theorem bound_of_trivAt
     letI := io.toAlgebra
     have hN : Odd N := hL.1
     obtain ⟨hfz, hm0, hT⟩ :=
-      GlobalTheory.T.lattice_trivial_at_prime_indices_and_units E H Dw l c n Λ N M ℓ hU hL hℓ htr
+      _root_.GlobalTheory.TrivLattice.trivAt_units E H Dw l c n Λ N M ℓ hU hL hℓ htr
     obtain ⟨-, hFF⟩ := hT T io hlu
     obtain ⟨J, J', _, _, a, a', σ, -, haZ, ⟨m, hm, ha'⟩, hzs, hcard⟩ :=
       GlobalTheory.T.isotropic_group_primary_decomposition E H Dw l Xo T.Fr (xOf y) n Λ N M ℓ hU hL
@@ -369,9 +370,8 @@ theorem bound_of_trivAt
             ≤ nval T.V e
               (io (nrm Dw c w α * ((N : c.F) ^ P.totalDegree)⁻¹)
                 * hv Xo c nab y.1 (N ^ 2) (fun b => sqN Xo N (F (σ (i₀, i')) b)) P) := fun i' => by
-      refine GlobalTheory.T.harmonicValue_translated_product_valuation_bound E H Dw l Xo c hst T io
-        y C hC nab hnab e ρ w n he hb N n' A Bn α β₀ hN hfac hA hB (isUnit_of_coprime T hn' hlu)
-        (a' i') tp _
+      refine _root_.GlobalTheory.PlaceInt.TermBound.term_bound E H Dw l Xo c hst T io y C hC nab
+        hnab e ρ w n he hb N n' A Bn α β₀ hN hfac hA hB (isUnit_of_coprime T hn' hlu) (a' i') tp _
         (fun b => ⟨(ha' i' b).2, ht b, ?_, htp b, hUU i₀ i' b⟩)
         P hP.1 (hFF w P hP)
       have h1 : (a' i' b ^ (n' ^ 2)) ^ m = 1 := by

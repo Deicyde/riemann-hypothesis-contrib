@@ -144,5 +144,5 @@ theorem UpperTheory.V.AlgebraTools.hkDdProps
     },
     fun x => rfl
   ⟩
-  simp only [RingHom.id_apply, Subalgebra.smul_def, SetLike.val_smul]
+  simp only [RingHom.id_apply, Subalgebra.smul_def]
   exact hmul _ _ ((mem_symmetricSubalgebra _).mp c.2)

@@ -83,9 +83,7 @@ theorem mem_of_smul_mem_of_add_eq_one
     {R V : Type} [CommRing R] [AddCommGroup V] [Module R V]
     {A : Submodule R V} {x : V} {a b : R} (hab : a + b = 1) (ha : a • x ∈ A) (hb : b • x ∈ A)
     : x ∈ A := by
-  have : x = a • x + b • x := by rw [← add_smul, hab, one_smul]
-  rw [this]
-  exact A.add_mem ha hb
+  simpa only [← add_smul, hab, one_smul] using A.add_mem ha hb
 
 end Gen
 
@@ -144,10 +142,8 @@ theorem smul_mem_ideal_smul_comm
     {q : Sp E n} (hq : q ∈ I • X)
     : r • q ∈ I • (J • X) := by
   refine Submodule.smul_induction_on hq (fun s hs x hx => ?_) (fun x y hx hy => ?_)
-  · rw [show r • s • x = s • r • x from smul_comm r s x]
-    exact Submodule.smul_mem_smul hs (Submodule.smul_mem_smul hr hx)
-  · rw [smul_add]
-    exact Submodule.add_mem _ hx hy
+  · simpa only [smul_comm r s x] using Submodule.smul_mem_smul hs (Submodule.smul_mem_smul hr hx)
+  · simpa only [smul_add] using Submodule.add_mem _ hx hy
 
 theorem neighbour_path_transfer
     {P Q : HeightOneSpectrum (𝓞 E)}

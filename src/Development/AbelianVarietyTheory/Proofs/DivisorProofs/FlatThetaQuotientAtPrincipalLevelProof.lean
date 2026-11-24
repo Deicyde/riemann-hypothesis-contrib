@@ -60,9 +60,6 @@ open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie Glo
   GlobalTheory.OnCmp
 open scoped TensorProduct
 
-
-
-
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BaseCmp

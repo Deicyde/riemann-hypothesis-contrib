@@ -39,8 +39,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
@@ -127,6 +125,7 @@ structure RealInAlt
 variable
   {x : TwIn ex} {Rc : _root_.Formalism.L2.RecTAlt ex}
   {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc}
+
 def realisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S)
     : _root_.Formalism.IndefR.IndefiniteRealisation Rc (divisionPairOfAdelicFormsFaceColumnsData x)
       x.F.Dc x.F.Sp x.F.Zsc S x.core.Q.c.F where
@@ -173,6 +172,7 @@ def realisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S)
   host := y.host
   err_eq := (x.err)
   vpos := y.vpos
+
 def boundedRealisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S)
     : _root_.Formalism.IndefR.RealTBAlt Rc (divisionPairOfAdelicFormsFaceColumnsData x) x.F.Dc
       x.F.Sp x.F.Zsc S where
@@ -198,7 +198,6 @@ def boundedRealisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S)
     exact (h)
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-
 structure RecursiveInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : Type 1 where
   E : EigIdx D Yd
   labPi : E.Pi → x.A3.A.fam.base.Ix
@@ -214,6 +213,7 @@ structure RecursiveInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : Typ
       (fun i => (x.A3.indefDown (s0Of x.R x.F)).dW i)
       (fun i v => x.Z.jW i v)
       ((indefiniteDownJoin (realisationOfInput y)))
+
 def realisationRecursionOfInput
     {y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S}
     (r : _root_.GlobalTheory.Mem.R3.RecursiveInput y)

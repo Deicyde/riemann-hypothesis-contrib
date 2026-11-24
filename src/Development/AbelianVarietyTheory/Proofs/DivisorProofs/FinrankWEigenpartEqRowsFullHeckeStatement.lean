@@ -50,6 +50,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Hk3 (Core Good IsSF SchurAll TwoSided FixAll EEc Wcc eH IsLab HoweUnram)
+
 theorem _root_.GlobalTheory.T.finrank_W_eigenpart_eq_rows_full_hecke
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
@@ -66,7 +67,4 @@ theorem _root_.GlobalTheory.T.finrank_W_eigenpart_eq_rows_full_hecke
                 = Module.finrank ℂ
                   (EEc R SF c ⊓ (R.EEat (levPOf R.eG D.what₂.embLL P ψ)).comap R.HE.e
                     : Submodule ℂ _) := by
-  first
-  | exact @GlobalTheory.DimFull.dim_parts_full
-  | exact GlobalTheory.DimFull.dim_parts_full
-  | (intros; apply GlobalTheory.DimFull.dim_parts_full <;> assumption)
+  first | exact @GlobalTheory.DimFull.dim_parts_full

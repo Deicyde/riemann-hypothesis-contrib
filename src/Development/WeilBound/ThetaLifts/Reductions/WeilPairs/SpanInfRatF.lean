@@ -2,10 +2,13 @@ module
 
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.AutDef
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.GoodLat
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicHomActionRealCoordinatesEqStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HalvedSymplecticFormFiniteRealOrthogonalStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTopologicalRingAE
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicHomActionRealCoordinatesEq
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumF
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HalvedSymplecticFormFiniteRealOrthogonal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardTraceAddCharIsStandardCharOfAdmissibleCM
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StdCharHalfSymplecticFormRealCoordinatesStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StdCharHalfSymplecticFormRealCoordinates
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.ContinuousTheta
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.LatRepC
 import Mathlib.Algebra.Module.StablyFree.Basic
@@ -49,6 +52,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.SumFourEqTrace
 
 @[expose] public section
 
@@ -162,12 +166,12 @@ theorem beta_iota_right (C : Ctx σ B JS JT ξ₀ θ ι) (x : WOF F E nS nT) (v 
       = Complex.exp (-(Real.pi * Complex.I) * (omV (HMF JS JT ξ₀ (tauB B)) (piWF θ x) v : ℝ)) := by
   have hx := finIdem_add_iota C.chart x
   have h0 :=
-    (GlobalTheory.T.halvedSymplecticForm_finite_real_orthogonal F E σ nS nT JS JT ξ₀
-      (finIdem F E • x) (iotaVF ι v) (finIdem_smul_fin x) (real_iotaVF C.chart v)).1
+    (_root_.GlobalTheory.WeilDatumF.symplOHF_fin_real_orth F E σ nS nT JS JT ξ₀ (finIdem F E • x)
+      (iotaVF ι v) (finIdem_smul_fin x) (real_iotaVF C.chart v)).1
   conv_lhs => rw [hx]
   rw [GlobalTheory.RealWeilF.symplOHF_add_left, h0, zero_add,
-    GlobalTheory.T.stdChar_half_symplecticForm_real_coordinates F E σ B C.good nS nT JS JT C.hS C.hT
-      ξ₀ C.h0 C.hξ θ C.inf ι C.chart,
+    _root_.GlobalTheory.RealCharF.psi_symplOHF_iotaVF F E σ B C.good nS nT JS JT C.hS C.hT ξ₀ C.h0
+      C.hξ θ C.inf ι C.chart,
     omV_apply]
   congr 1
   push_cast
@@ -178,12 +182,12 @@ theorem beta_iota_left (C : Ctx σ B JS JT ξ₀ θ ι) (v : IxF F nS nT → ℂ
       = Complex.exp (-(Real.pi * Complex.I) * (omV (HMF JS JT ξ₀ (tauB B)) v (piWF θ x) : ℝ)) := by
   have hx := finIdem_add_iota C.chart x
   have h0 :=
-    (GlobalTheory.T.halvedSymplecticForm_finite_real_orthogonal F E σ nS nT JS JT ξ₀
-      (finIdem F E • x) (iotaVF ι v) (finIdem_smul_fin x) (real_iotaVF C.chart v)).2
+    (_root_.GlobalTheory.WeilDatumF.symplOHF_fin_real_orth F E σ nS nT JS JT ξ₀ (finIdem F E • x)
+      (iotaVF ι v) (finIdem_smul_fin x) (real_iotaVF C.chart v)).2
   conv_lhs => rw [hx]
   rw [GlobalTheory.RealWeilF.symplOHF_add_right, h0, zero_add,
-    GlobalTheory.T.stdChar_half_symplecticForm_real_coordinates F E σ B C.good nS nT JS JT C.hS C.hT
-      ξ₀ C.h0 C.hξ θ C.inf ι C.chart,
+    _root_.GlobalTheory.RealCharF.psi_symplOHF_iotaVF F E σ B C.good nS nT JS JT C.hS C.hT ξ₀ C.h0
+      C.hξ θ C.inf ι C.chart,
     omV_apply]
   congr 1
   push_cast
@@ -208,14 +212,9 @@ theorem piWF_actOF (C : Ctx σ B JS JT ξ₀ θ ι) (g : GAF σ JS) (h : GAF σ 
   conv_lhs => rw [hx]
   rw [GlobalTheory.RealWeilF.actOF_add, piWF_add, piWF_of_fin (actOF_fin g h (finIdem_smul_fin x)),
     zero_add,
-    GlobalTheory.T.adelicHomAction_realCoordinates_eq F E σ B C.good nS nT JS JT C.hS C.hT ξ₀ C.h0
-      C.hξ θ C.inf ι C.chart g h,
+    _root_.GlobalTheory.RealWeilF.actOF_iotaVF F E σ B C.good nS nT JS JT C.hS C.hT ξ₀ C.h0 C.hξ θ
+      C.inf ι C.chart g h,
     piWF_iotaVF C.chart]
-
-theorem hOF_rat (x y : Matrix (Fin nT) (Fin nS) E)
-    : hOF σ JS JT (ratWF (F := F) x) (ratWF (F := F) y) = incAF F E (hRatF σ JS JT x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [hOF, hRatF, ratWF, Matrix.map_apply, cAF_inc, map_sum, map_mul]
 
 theorem trace_inc (e : E)
     : Algebra.trace (AF F) (AEF F E) (incAF F E e) = algebraMap F (AF F) (Algebra.trace F E e) := by
@@ -227,7 +226,7 @@ theorem trace_inc (e : E)
 theorem symplOHF_rat (x y : Matrix (Fin nT) (Fin nS) E)
     : symplOHF σ JS JT ξ₀ (ratWF (F := F) x) (ratWF (F := F) y)
       = algebraMap F (AF F) (1 / 2 * Algebra.trace F E (ξ₀ * hRatF σ JS JT x y)) := by
-  rw [symplOHF, symplOF, hOF_rat, ← map_mul, trace_inc, ← map_mul]
+  rw [symplOHF, symplOF, _root_.PositivityTheory.ThKW.LatC.hOF_rat, ← map_mul, trace_inc, ← map_mul]
 
 theorem psi_rat (C : Ctx σ B JS JT ξ₀ θ ι) (x y : Matrix (Fin nT) (Fin nS) E)
     : B.ψ (symplOHF σ JS JT ξ₀ (ratWF x) (ratWF y)) = 1 := by
@@ -268,56 +267,10 @@ theorem hOF_trace (x y : WOF F E nS nT)
     Matrix.map_apply, Finset.sum_mul]
   exact Finset.sum_congr rfl fun a _ => sum3 _
 
-theorem hOF_actOF (hS : IsHermND σ JS) (g : GAF σ JS) (h : GAF σ JT) (x y : WOF F E nS nT)
-    : hOF σ JS JT (actOF σ JS JT g h x) (actOF σ JS JT g h y) = hOF σ JS JT x y := by
-  have hu : IsUnit JS.det := isUnit_iff_ne_zero.mpr hS.2
-  have hg
-      : (((mtF σ JS g⁻¹).map (cAF σ))ᵀ * JS.map (incAF F E)) * mtF σ JS g⁻¹ = JS.map (incAF F E) :=
-    (g⁻¹).2
-  have hh : (((mtF σ JT h).map (cAF σ))ᵀ * JT.map (incAF F E)) * mtF σ JT h = JT.map (incAF F E) :=
-    h.2
-  rw [hOF_trace, hOF_trace]
-  unfold actOF
-  set G := mtF σ JS g⁻¹
-  set H := mtF σ JT h
-  set Si := JS⁻¹.map (incAF F E)
-  set Sm := JS.map (incAF F E)
-  set Tm := JT.map (incAF F E)
-  have hi1 : Si * Sm = 1 := by
-    rw [← Matrix.map_mul, Matrix.nonsing_inv_mul _ hu, Matrix.map_one _ (map_zero _) (map_one _)]
-  have hi2 : Sm * Si = 1 := by
-    rw [← Matrix.map_mul, Matrix.mul_nonsing_inv _ hu, Matrix.map_one _ (map_zero _) (map_one _)]
-  have hK' : (Si * (G.map (cAF σ))ᵀ * Sm) * G = 1 := by
-    have e : Si * (G.map (cAF σ))ᵀ * Sm * G = Si * ((G.map (cAF σ))ᵀ * Sm * G) := by
-      simp only [Matrix.mul_assoc]
-    rw [e, hg, hi1]
-  have hK : G * (Si * (G.map (cAF σ))ᵀ * Sm) = 1 := by
-    first
-    | exact mul_eq_one_comm.1 hK'
-    | exact Matrix.mul_eq_one_comm.1 hK'
-    | exact Matrix.mul_eq_one_comm_of_equiv (Equiv.refl _) hK'
-  have hGJ : G * Si * (G.map (cAF σ))ᵀ = Si := by
-    calc
-      G * Si * (G.map (cAF σ))ᵀ = G * (Si * (G.map (cAF σ))ᵀ * Sm) * Si := by
-        simp only [Matrix.mul_assoc, hi2, Matrix.mul_one]
-      _ = Si := by rw [hK, Matrix.one_mul]
-  rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_mul, Matrix.transpose_mul]
-  have e1
-      : Si * ((G.map (cAF σ))ᵀ * ((y.map (cAF σ))ᵀ * (H.map (cAF σ))ᵀ)) * Tm * (H * x * G)
-        = (Si * (G.map (cAF σ))ᵀ * (y.map (cAF σ))ᵀ * ((H.map (cAF σ))ᵀ * Tm * H) * x) * G := by
-    simp only [Matrix.mul_assoc]
-  rw [e1, hh, Matrix.trace_mul_comm]
-  have e2
-      : G * (Si * (G.map (cAF σ))ᵀ * (y.map (cAF σ))ᵀ * Tm * x)
-        = (G * Si * (G.map (cAF σ))ᵀ) * ((y.map (cAF σ))ᵀ * Tm * x) := by
-    simp only [Matrix.mul_assoc]
-  rw [e2, hGJ]
-  simp only [Matrix.mul_assoc]
-
 theorem symplOF_actOF (C : Ctx σ B JS JT ξ₀ θ ι) (g : GAF σ JS) (h : GAF σ JT) (x y : WOF F E nS nT)
     : symplOF σ JS JT ξ₀ (actOF σ JS JT g h x) (actOF σ JS JT g h y) = symplOF σ JS JT ξ₀ x y := by
   unfold symplOF
-  rw [hOF_actOF C.hS]
+  rw [_root_.PositivityTheory.ThKW.LatA.hOF_actOF C.hS]
 
 theorem symplOF_eq_add (x y : WOF F E nS nT)
     : symplOF σ JS JT ξ₀ x y = symplOHF σ JS JT ξ₀ x y + symplOHF σ JS JT ξ₀ x y := by
@@ -336,8 +289,8 @@ theorem gamQF_eq_one_iff (C : Ctx σ B JS JT ξ₀ θ ι) (x y : Matrix (Fin nT)
         a.map (infPartF F E) = 0
           → symplOHF σ JS JT ξ₀ a (iotaVF ι b) = 0
             ∧ symplOHF σ JS JT ξ₀ (iotaVF ι b) a = 0 := fun a b ha =>
-    GlobalTheory.T.halvedSymplecticForm_finite_real_orthogonal F E σ nS nT JS JT ξ₀ a (iotaVF ι b)
-      ha (real_iotaVF C.chart b)
+    _root_.GlobalTheory.WeilDatumF.symplOHF_fin_real_orth F E σ nS nT JS JT ξ₀ a (iotaVF ι b) ha
+      (real_iotaVF C.chart b)
   have hr := psi_rat C x y
   rw [hx, hy, GlobalTheory.RealWeilF.symplOHF_add_left, GlobalTheory.RealWeilF.symplOHF_add_right,
       GlobalTheory.RealWeilF.symplOHF_add_right, (cross _ _ (finIdem_smul_fin _)).1,
@@ -387,14 +340,6 @@ theorem dot_mul (s H : Matrix κ κ ℂ) (x y : κ → ℂ)
   first
   | rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.dotProduct_mulVec,
       Matrix.vecMul_vecMul]
-  | (
-      simp only [dotProduct, mulVec, Matrix.mul_apply, conjTranspose_apply, star_sum, star_mul',
-        Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
-      rw [Finset.sum_comm]
-      refine Finset.sum_congr rfl fun _ _ => ?_
-      rw [Finset.sum_comm]
-      exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-    )
 
 theorem omV_laws
     [DecidableEq κ] {H s : Matrix κ κ ℂ} (hH : Hᴴ = H) (hs : s * s = 1) (hQ : (H * s).PosDef)
@@ -420,8 +365,7 @@ theorem omV_laws
     rw [hM] at this
     rw [this, Complex.star_def, Complex.conj_re]
   · rw [hj]
-    have hp : 0 < star v ⬝ᵥ ((H * s) *ᵥ v) := by
-      first | exact hQ.2 v hv | exact hQ.dotProduct_mulVec_pos hv | exact hQ.2 hv
+    have hp : 0 < star v ⬝ᵥ ((H * s) *ᵥ v) := by first | exact hQ.dotProduct_mulVec_pos hv
     exact (Complex.pos_iff.1 hp).1
 
 end Lin
@@ -432,7 +376,7 @@ theorem sig_sig (hB : B.IsGood σ) (x : E) : σ (σ x) = x := by
 
 theorem trace_places [IsTotallyReal F] (t : F)
     : algebraMap ℚ ℂ (Algebra.trace ℚ F t) = ∑ w : InfinitePlace F, w.embedding t := by
-  first | rw [trace_eq_sum_embeddings (E := ℂ)] | rw [trace_eq_sum_embeddings ℂ]
+  first | rw [trace_eq_sum_embeddings (E := ℂ)]
   symm
   refine Fintype.sum_equiv
     (Equiv.ofBijective (fun w : InfinitePlace F => w.embedding.toRatAlgHom) ⟨?_, ?_⟩) _ _
@@ -445,10 +389,7 @@ theorem trace_places [IsTotallyReal F] (t : F)
     have hr : ComplexEmbedding.IsReal (φ : F →+* ℂ) :=
       InfinitePlace.isReal_mk_iff.1 (IsTotallyReal.isReal _)
     have he : (InfinitePlace.mk (φ : F →+* ℂ)).embedding = (φ : F →+* ℂ) := by
-      first
-      | exact InfinitePlace.embedding_mk_eq_of_isReal hr
-      | exact (InfinitePlace.embedding_mk_eq (φ : F →+* ℂ)).elim id
-          (fun e => e.trans (ComplexEmbedding.isReal_iff.1 hr))
+      first | exact InfinitePlace.embedding_mk_eq_of_isReal hr
     ext x
     show (InfinitePlace.mk (φ : F →+* ℂ)).embedding x = φ x
     rw [he]

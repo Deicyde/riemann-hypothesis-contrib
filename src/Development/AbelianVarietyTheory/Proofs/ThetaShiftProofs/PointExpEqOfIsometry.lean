@@ -68,26 +68,6 @@ theorem isHolTo_comp_univ
   rw [hset]
   exact ⟨ho.preimage hφ.continuous, hd.comp hφ.differentiableOn (fun b hb => hb)⟩
 
-theorem isHolTo_exp_of_isPeriod
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {D : Datum H} {l : Level H}
-    {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ} {ty : Fin g → (E →+* ℂ)} (Fu : FamilyUnif Xo σ ty)
-    (i : Fin Fu.n) (P : (Fu.Di i).La →+ (Fin g → ℂ)) (hP : IsPeriod (Fu.Di i) ty P)
-    : IsHolTo Set.univ (fun z => (Fu.ex i P z).left) := by
-  have hper : IsHolPeriods (Fu.Di i) ty (Set.univ : Set (Fin 0 → ℂ)) (fun _ => P) :=
-    ⟨fun _ _ => hP, fun _ => differentiableOn_const _⟩
-  have hjoint : IsHolTo ((Set.univ : Set (Fin 0 → ℂ)) ×ˢ (Set.univ : Set (Fin g → ℂ)))
-      (fun bz : (Fin 0 → ℂ) × (Fin g → ℂ) => (Fu.ex i P bz.2).left) :=
-    (Fu.21 i 0 Set.univ (fun _ => P) isOpen_univ hper).2
-  have hφ : Differentiable ℂ (fun z : Fin g → ℂ => ((0 : Fin 0 → ℂ), z)) :=
-    (differentiable_const _).prodMk differentiable_id
-  have hmem
-      : ∀ z : Fin g → ℂ,
-        ((0 : Fin 0 → ℂ), z) ∈ (Set.univ : Set (Fin 0 → ℂ)) ×ˢ (Set.univ : Set (Fin g → ℂ)) :=
-    fun z => Set.mk_mem_prod (Set.mem_univ _) (Set.mem_univ _)
-  have hcomp := isHolTo_comp_univ hjoint hφ hmem
-  exact hcomp
-
 theorem point_exp_eq_of_isometry
     : Known
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
@@ -115,7 +95,7 @@ theorem point_exp_eq_of_isometry
         ⟨
           Fu.ex_add i P hP,
           Fu.ex_onto i P hP,
-          isHolTo_exp_of_isPeriod Fu i P hP,
+          _root_.GlobalTheory.ExpUniqFamily.isHolTo_ex Fu i P hP,
           (Fu.22 i P hP).1,
           (Fu.22 i P hP).2
         ⟩,
@@ -131,7 +111,7 @@ theorem point_exp_eq_of_isometry
         ⟨
           Fu.ex_add i' P' hP',
           Fu.ex_onto i' P' hP',
-          isHolTo_exp_of_isPeriod Fu i' P' hP',
+          _root_.GlobalTheory.ExpUniqFamily.isHolTo_ex Fu i' P' hP',
           (Fu.22 i' P' hP').1,
           (Fu.22 i' P' hP').2
         ⟩,

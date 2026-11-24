@@ -60,74 +60,88 @@ open scoped Pointwise
 
 namespace CompanionTheory.FamInh
 
-variable {K L Ω : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L] [Algebra L Ω]
-  [Algebra K Ω] [IsScalarTower K L Ω] [IsAlgClosure K Ω] [IsAlgClosure L Ω]
-
+variable
+  {K L Ω : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L]
+  [Algebra L Ω] [Algebra K Ω] [IsScalarTower K L Ω] [IsAlgClosure K Ω] [IsAlgClosure L Ω]
 
 omit [IsAlgClosure K Ω] in
-theorem exists_place_between {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v) :
-    ∃ w : HeightOneSpectrum (𝓞 L), IsPlaceOver A w ∧ w.asIdeal.LiesOver v.asIdeal := by
+theorem exists_place_between
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v)
+    : ∃ w : HeightOneSpectrum (𝓞 L), IsPlaceOver A w ∧ w.asIdeal.LiesOver v.asIdeal := by
   apply PositivityTheory.FamInh.exists_place_between <;> assumption
 
-theorem mem_Ine_of_integral {A : ValuationSubring Ω} {σ : G K Ω} (hσ : σ ∈ Dec (F := K) A)
-    (h : ∀ b : Ω, IsIntegral ℤ b → A.valuation (σ b - b) < 1) : σ ∈ Ine (F := K) A := by
+theorem mem_Ine_of_integral
+    {A : ValuationSubring Ω} {σ : G K Ω}
+    (hσ : σ ∈ Dec (F := K) A) (h : ∀ b : Ω, IsIntegral ℤ b → A.valuation (σ b - b) < 1)
+    : σ ∈ Ine (F := K) A := by
   apply PositivityTheory.FamInh.mem_Ine_of_integral <;> assumption
 
 variable [IsGalois K L]
 
 omit [NumberField K] [NumberField L] [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem coe_res_smul (σ : G K Ω) (x : 𝓞 L) :
-    algebraMap L Ω ((AlgEquiv.restrictNormalHom L σ • x : 𝓞 L) : L) = σ (algebraMap L Ω (x : L)) := by
+theorem coe_res_smul (σ : G K Ω) (x : 𝓞 L)
+    : algebraMap L Ω ((AlgEquiv.restrictNormalHom L σ • x : 𝓞 L) : L)
+      = σ (algebraMap L Ω (x : L)) := by
   apply PositivityTheory.FamInh.coe_res_smul <;> assumption
 
 omit [NumberField K] [NumberField L] [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem res_restrictScalars (g : Ω ≃ₐ[L] Ω) : AlgEquiv.restrictNormalHom L (g.restrictScalars K : G K Ω) = 1 := by
+theorem res_restrictScalars (g : Ω ≃ₐ[L] Ω)
+    : AlgEquiv.restrictNormalHom L (g.restrictScalars K : G K Ω) = 1 := by
   apply PositivityTheory.FamInh.res_restrictScalars <;> assumption
 
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)}
 
 omit [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem res_mem_stabilizer (hw : IsPlaceOver A w) {σ : G K Ω} (hσ : σ ∈ Dec (F := K) A) :
-    AlgEquiv.restrictNormalHom L σ ∈ MulAction.stabilizer (L ≃ₐ[K] L) w.asIdeal := by
+theorem res_mem_stabilizer (hw : IsPlaceOver A w) {σ : G K Ω} (hσ : σ ∈ Dec (F := K) A)
+    : AlgEquiv.restrictNormalHom L σ ∈ MulAction.stabilizer (L ≃ₐ[K] L) w.asIdeal := by
   apply PositivityTheory.FamInh.res_mem_stabilizer <;> assumption
 
 omit [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem val_int_le_one (A : ValuationSubring Ω) (x : 𝓞 L) : A.valuation (algebraMap L Ω (x : L)) ≤ 1 := by
+theorem val_int_le_one (A : ValuationSubring Ω) (x : 𝓞 L)
+    : A.valuation (algebraMap L Ω (x : L)) ≤ 1 := by
   apply PositivityTheory.FamInh.val_int_le_one <;> assumption
 
 omit [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem res_mem_inertia (hw : IsPlaceOver A w) {σ : G K Ω} (hσ : σ ∈ Ine (F := K) A) :
-    AlgEquiv.restrictNormalHom L σ ∈ w.asIdeal.inertia (L ≃ₐ[K] L) := by
+theorem res_mem_inertia (hw : IsPlaceOver A w) {σ : G K Ω} (hσ : σ ∈ Ine (F := K) A)
+    : AlgEquiv.restrictNormalHom L σ ∈ w.asIdeal.inertia (L ≃ₐ[K] L) := by
   apply PositivityTheory.FamInh.res_mem_inertia <;> assumption
 
 omit [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem res_isArithFrobAt {v : HeightOneSpectrum (𝓞 K)} (hw : IsPlaceOver A w) [h : w.asIdeal.LiesOver v.asIdeal]
-    {σ : G K Ω} (hσ : IsFrob (F := K) A (normV v) σ) :
-    IsArithFrobAt (𝓞 K) (AlgEquiv.restrictNormalHom L σ) w.asIdeal := by
+theorem res_isArithFrobAt
+    {v : HeightOneSpectrum (𝓞 K)}
+    (hw : IsPlaceOver A w)
+    [h : w.asIdeal.LiesOver v.asIdeal]
+    {σ : G K Ω} (hσ : IsFrob (F := K) A (normV v) σ)
+    : IsArithFrobAt (𝓞 K) (AlgEquiv.restrictNormalHom L σ) w.asIdeal := by
   apply PositivityTheory.FamInh.res_isArithFrobAt (v := v) <;> assumption
 
-theorem exists_lift_dec (hw : IsPlaceOver A w) {τ : L ≃ₐ[K] L}
-    (hτ : τ ∈ MulAction.stabilizer (L ≃ₐ[K] L) w.asIdeal) :
-    ∃ σ ∈ Dec (F := K) A, AlgEquiv.restrictNormalHom L σ = τ := by
+theorem exists_lift_dec
+    (hw : IsPlaceOver A w) {τ : L ≃ₐ[K] L} (hτ : τ ∈ MulAction.stabilizer (L ≃ₐ[K] L) w.asIdeal)
+    : ∃ σ ∈ Dec (F := K) A, AlgEquiv.restrictNormalHom L σ = τ := by
   apply PositivityTheory.FamInh.exists_lift_dec <;> assumption
 
-def intAut (L : Type) [Field L] [NumberField L] [Algebra L Ω] (σ : G K Ω) : IntCl L Ω ≃+* IntCl L Ω where
-  toFun b := ⟨σ b, ((isIntegral_int_of_isIntegral b.2).map (σ.toAlgHom.restrictScalars ℤ)).tower_top⟩
-  invFun b := ⟨σ.symm b, ((isIntegral_int_of_isIntegral b.2).map (σ.symm.toAlgHom.restrictScalars ℤ)).tower_top⟩
+def intAut (L : Type) [Field L] [NumberField L] [Algebra L Ω] (σ : G K Ω)
+    : IntCl L Ω ≃+* IntCl L Ω where
+  toFun b :=
+    ⟨σ b, ((isIntegral_int_of_isIntegral b.2).map (σ.toAlgHom.restrictScalars ℤ)).tower_top⟩
+  invFun b := ⟨
+    σ.symm b,
+    ((isIntegral_int_of_isIntegral b.2).map (σ.symm.toAlgHom.restrictScalars ℤ)).tower_top
+  ⟩
   left_inv b := Subtype.ext (σ.symm_apply_apply _)
   right_inv b := Subtype.ext (σ.apply_symm_apply _)
   map_mul' a b := Subtype.ext (map_mul σ _ _)
   map_add' a b := Subtype.ext (map_add σ _ _)
 
-theorem exists_lift_ine (hw : IsPlaceOver A w) {τ : L ≃ₐ[K] L} (hτ : τ ∈ w.asIdeal.inertia (L ≃ₐ[K] L)) :
-    ∃ σ ∈ Ine (F := K) A, AlgEquiv.restrictNormalHom L σ = τ := by
+theorem exists_lift_ine
+    (hw : IsPlaceOver A w) {τ : L ≃ₐ[K] L} (hτ : τ ∈ w.asIdeal.inertia (L ≃ₐ[K] L))
+    : ∃ σ ∈ Ine (F := K) A, AlgEquiv.restrictNormalHom L σ = τ := by
   apply PositivityTheory.FamInh.exists_lift_ine <;> assumption
 
-
 omit [IsAlgClosure K Ω] [IsAlgClosure L Ω] in
-theorem inertia_eq_bot_iff (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L))
-    [w.asIdeal.LiesOver v.asIdeal] :
-    w.asIdeal.inertia (L ≃ₐ[K] L) = ⊥ ↔ w.asIdeal.ramificationIdx (𝓞 K) = 1 := by
+theorem inertia_eq_bot_iff
+    (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L)) [w.asIdeal.LiesOver v.asIdeal]
+    : w.asIdeal.inertia (L ≃ₐ[K] L) = ⊥ ↔ w.asIdeal.ramificationIdx (𝓞 K) = 1 := by
   apply PositivityTheory.FamInh.inertia_eq_bot_iff v w <;> assumption
 
 end CompanionTheory.FamInh

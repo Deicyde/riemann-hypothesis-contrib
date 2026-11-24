@@ -69,24 +69,24 @@ def rowAdd (a b : Fin p) (t : K) (M : Matrix (Fin p) (Fin p) K) : Matrix (Fin p)
   Matrix.of fun i k => M i k + if i = b then t * M a k else 0
 
 def BiInvariant (f : Matrix (Fin p) (Fin p) K → K) : Prop :=
-  (∀ a b : Fin p, a < b → ∀ t M, f (rowAdd a b t M) = f M) ∧
-  (∀ a b : Fin p, a < b → ∀ t M, f (rowAdd a b t M)ᵀ = f Mᵀ)
+  (∀ a b : Fin p, a < b → ∀ t M, f (rowAdd a b t M) = f M)
+    ∧ (∀ a b : Fin p, a < b → ∀ t M, f (rowAdd a b t M)ᵀ = f Mᵀ)
 
-theorem BiInvariant.transpose {f : Matrix (Fin p) (Fin p) K → K} (h : BiInvariant f) :
-    BiInvariant fun M => f Mᵀ :=
+theorem BiInvariant.transpose {f : Matrix (Fin p) (Fin p) K → K} (h : BiInvariant f)
+    : BiInvariant fun M => f Mᵀ :=
   ⟨h.2, fun a b hab t M => by simpa using h.1 a b hab t M⟩
 
 def leadMinor (i : Fin p) (M : Matrix (Fin p) (Fin p) K) : K :=
   (Matrix.of fun a b : Fin (i.val + 1) => M (Fin.castLE i.isLt a) (Fin.castLE i.isLt b)).det
 
-theorem leadMinor_transpose (i : Fin p) (M : Matrix (Fin p) (Fin p) K) :
-    leadMinor i Mᵀ = leadMinor i M := by
+theorem leadMinor_transpose (i : Fin p) (M : Matrix (Fin p) (Fin p) K)
+    : leadMinor i Mᵀ = leadMinor i M := by
   unfold leadMinor
   rw [← det_transpose]
   rfl
 
-theorem leadMinor_rowAdd (i a b : Fin p) (hab : a < b) (t : K) (M : Matrix (Fin p) (Fin p) K) :
-    leadMinor i (rowAdd a b t M) = leadMinor i M := by
+theorem leadMinor_rowAdd (i a b : Fin p) (hab : a < b) (t : K) (M : Matrix (Fin p) (Fin p) K)
+    : leadMinor i (rowAdd a b t M) = leadMinor i M := by
   unfold leadMinor
   by_cases hb : b.val < i.val + 1
   · have ha : a.val < i.val + 1 := lt_trans hab hb
@@ -116,13 +116,17 @@ theorem leadMinor_rowAdd (i a b : Fin p) (hab : a < b) (t : K) (M : Matrix (Fin 
       exact u.isLt
     simp [rowAdd, this]
 
-theorem biInvariant_leadMinor (i : Fin p) : BiInvariant (K := K) (leadMinor i) :=
-  ⟨leadMinor_rowAdd i, fun a b hab t M => by
-    rw [leadMinor_transpose, leadMinor_transpose, leadMinor_rowAdd i a b hab]⟩
+theorem biInvariant_leadMinor (i : Fin p) : BiInvariant (K := K) (leadMinor i) := ⟨
+  leadMinor_rowAdd i,
+  fun a b hab t M => by rw [leadMinor_transpose, leadMinor_transpose, leadMinor_rowAdd i a b hab]
+⟩
 
-theorem BiInvariant.what₂ {f : Matrix (Fin p) (Fin p) K → K} (h : BiInvariant f) (n : Fin p)
-    (t : Fin p → K) (M : Matrix (Fin p) (Fin p) K) (S : Finset (Fin p)) (hS : ∀ b ∈ S, n < b) :
-    f (Matrix.of fun b k => M b k + if b ∈ S then t b * M n k else 0) = f M := by
+theorem BiInvariant.what₂
+    {f : Matrix (Fin p) (Fin p) K → K} (h : BiInvariant f)
+    (n : Fin p)
+    (t : Fin p → K) (M : Matrix (Fin p) (Fin p) K)
+    (S : Finset (Fin p)) (hS : ∀ b ∈ S, n < b)
+    : f (Matrix.of fun b k => M b k + if b ∈ S then t b * M n k else 0) = f M := by
   induction S using Finset.induction_on with
   | empty =>
     congr 1
@@ -140,12 +144,17 @@ theorem BiInvariant.what₂ {f : Matrix (Fin p) (Fin p) K → K} (h : BiInvarian
       simp [rowAdd, hb, hn]
     · simp [rowAdd, hu]
 
-theorem exists_clear_col (n : Fin p) (M : Matrix (Fin p) (Fin p) K) (hn : M n n ≠ 0) :
-    ∃ M' : Matrix (Fin p) (Fin p) K, (∀ f, BiInvariant f → f M' = f M) ∧
-      (∀ b, n < b → M' b n = 0) ∧ (∀ b k, b ≤ n → M' b k = M b k) ∧
-      (∀ b k, M n k = 0 → M' b k = M b k) := by
-  refine ⟨Matrix.of fun b k => M b k +
-      if b ∈ Finset.Ioi n then (- M b n / M n n) * M n k else 0, fun f hf => ?_, ?_, ?_, ?_⟩
+theorem exists_clear_col (n : Fin p) (M : Matrix (Fin p) (Fin p) K) (hn : M n n ≠ 0)
+    : ∃ M' : Matrix (Fin p) (Fin p) K,
+      (∀ f, BiInvariant f → f M' = f M) ∧ (∀ b, n < b → M' b n = 0)
+        ∧ (∀ b k, b ≤ n → M' b k = M b k) ∧ (∀ b k, M n k = 0 → M' b k = M b k) := by
+  refine ⟨
+    Matrix.of fun b k => M b k + if b ∈ Finset.Ioi n then (- M b n / M n n) * M n k else 0,
+    fun f hf => ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact hf.what₂ n (fun b => - M b n / M n n) M _ (by simp)
   · intro b hb
     simp only [of_apply, Finset.mem_Ioi, hb, if_true]
@@ -156,9 +165,10 @@ theorem exists_clear_col (n : Fin p) (M : Matrix (Fin p) (Fin p) K) (hn : M n n 
   · intro b k hk
     simp [hk]
 
-theorem exists_cleared (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0) (n : ℕ) :
-    ∃ M' : Matrix (Fin p) (Fin p) K, (∀ f, BiInvariant f → f M' = f M) ∧
-      ∀ i j : Fin p, i ≠ j → (i.val < n ∨ j.val < n) → M' i j = 0 := by
+theorem exists_cleared (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0) (n : ℕ)
+    : ∃ M' : Matrix (Fin p) (Fin p) K,
+      (∀ f, BiInvariant f → f M' = f M)
+        ∧ ∀ i j : Fin p, i ≠ j → (i.val < n ∨ j.val < n) → M' i j = 0 := by
   induction n with
   | zero => exact ⟨M, fun _ _ => rfl, by simp⟩
   | succ n ih =>
@@ -227,8 +237,8 @@ theorem exists_cleared (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M
           have : i.val ≠ n := fun hh => hiN (Fin.ext hh)
           omega
 
-theorem exists_diagonal (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0) :
-    ∃ d : Fin p → K, ∀ f, BiInvariant f → f (diagonal d) = f M := by
+theorem exists_diagonal (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0)
+    : ∃ d : Fin p → K, ∀ f, BiInvariant f → f (diagonal d) = f M := by
   obtain ⟨M', h, hz⟩ := exists_cleared M hM p
   refine ⟨fun i => M' i i, fun f hf => ?_⟩
   rw [← h f hf]
@@ -239,12 +249,12 @@ theorem exists_diagonal (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i 
     simp
   · rw [diagonal_apply_ne _ hij, hz i j hij (Or.inl i.isLt)]
 
-theorem leadMinor_diagonal (i : Fin p) (d : Fin p → K) :
-    leadMinor i (diagonal d) = ∏ a ∈ Finset.Iic i, d a := by
+theorem leadMinor_diagonal (i : Fin p) (d : Fin p → K)
+    : leadMinor i (diagonal d) = ∏ a ∈ Finset.Iic i, d a := by
   unfold leadMinor
   have : (Matrix.of fun a b : Fin (i.val + 1) =>
-      diagonal d (Fin.castLE i.isLt a) (Fin.castLE i.isLt b)) =
-      diagonal fun a => d (Fin.castLE i.isLt a) := by
+        diagonal d (Fin.castLE i.isLt a) (Fin.castLE i.isLt b))
+      = diagonal fun a => d (Fin.castLE i.isLt a) := by
     ext a b
     simp [diagonal_apply]
   rw [this, det_diagonal]
@@ -260,50 +270,57 @@ theorem leadMinor_diagonal (i : Fin p) (d : Fin p → K) :
   · intro a _
     rfl
 
-theorem prod_leadMinor_diagonal (d : Fin p → K) (c : Fin p → ℕ) :
-    ∏ i, leadMinor i (diagonal d) ^ c i = ∏ a, d a ^ ∑ i ∈ Finset.Ici a, c i := by
+theorem prod_leadMinor_diagonal (d : Fin p → K) (c : Fin p → ℕ)
+    : ∏ i, leadMinor i (diagonal d) ^ c i = ∏ a, d a ^ ∑ i ∈ Finset.Ici a, c i := by
   simp only [leadMinor_diagonal, ← Finset.prod_pow, ← Finset.prod_pow_eq_pow_sum]
   refine Finset.prod_comm' ?_
   intro x y
   simp
 
-theorem BiInvariant.eq_mul_prod {f : Matrix (Fin p) (Fin p) K → K} (hf : BiInvariant f)
-    (c : Fin p → ℕ)
-    (hd : ∀ d, f (diagonal d) = f 1 * ∏ a, d a ^ ∑ i ∈ Finset.Ici a, c i)
-    (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0) :
-    f M = f 1 * ∏ i, leadMinor i M ^ c i := by
+theorem BiInvariant.eq_mul_prod
+    {f : Matrix (Fin p) (Fin p) K → K} (hf : BiInvariant f)
+    (c : Fin p → ℕ) (hd : ∀ d, f (diagonal d) = f 1 * ∏ a, d a ^ ∑ i ∈ Finset.Ici a, c i)
+    (M : Matrix (Fin p) (Fin p) K) (hM : ∀ i, leadMinor i M ≠ 0)
+    : f M = f 1 * ∏ i, leadMinor i M ^ c i := by
   obtain ⟨d, h⟩ := exists_diagonal M hM
   rw [← h f hf, hd, ← prod_leadMinor_diagonal]
   simp only [h _ (biInvariant_leadMinor _)]
 
 variable {σ : Type*} [DecidableEq σ]
 
-noncomputable def setBlock (z : Fin p × Fin p → σ) (x : σ → K) (M : Matrix (Fin p) (Fin p) K) :
-    σ → K :=
+noncomputable def setBlock (z : Fin p × Fin p → σ) (x : σ → K) (M : Matrix (Fin p) (Fin p) K)
+    : σ → K :=
   Function.extend z (fun w => M w.1 w.2) x
 
 omit [Field K] [DecidableEq σ] in
-theorem setBlock_apply {z : Fin p × Fin p → σ} (hz : Function.Injective z) (x : σ → K)
-    (M : Matrix (Fin p) (Fin p) K) (w : Fin p × Fin p) : setBlock z x M (z w) = M w.1 w.2 :=
+theorem setBlock_apply
+    {z : Fin p × Fin p → σ} (hz : Function.Injective z)
+    (x : σ → K) (M : Matrix (Fin p) (Fin p) K) (w : Fin p × Fin p)
+    : setBlock z x M (z w) = M w.1 w.2 :=
   hz.extend_apply _ _ _
 
 omit [Field K] [DecidableEq σ] in
-theorem setBlock_of_not {z : Fin p × Fin p → σ} (x : σ → K)
-    (M : Matrix (Fin p) (Fin p) K) {s : σ} (hs : ¬ ∃ w, z w = s) : setBlock z x M s = x s :=
+theorem setBlock_of_not
+    {z : Fin p × Fin p → σ} (x : σ → K) (M : Matrix (Fin p) (Fin p) K) {s : σ} (hs : ¬ ∃ w, z w = s)
+    : setBlock z x M s = x s :=
   Function.extend_apply' _ _ _ hs
 
 omit [DecidableEq σ] in
-theorem eval_bind₁' (y : σ → K) (g : σ → MvPolynomial σ K) (P : MvPolynomial σ K) :
-    eval y (bind₁ g P) = eval (fun s => eval y (g s)) P := by
+theorem eval_bind₁' (y : σ → K) (g : σ → MvPolynomial σ K) (P : MvPolynomial σ K)
+    : eval y (bind₁ g P) = eval (fun s => eval y (g s)) P := by
   exact MvPolynomial.eval₂Hom_bind₁ (RingHom.id K) y g P
 
-theorem biInvariant_eval {z : Fin p × Fin p → σ} (hz : Function.Injective z)
+theorem biInvariant_eval
+    {z : Fin p × Fin p → σ} (hz : Function.Injective z)
     (P : MvPolynomial σ K)
-    (hr : ∀ a b : Fin p, a < b → ∀ t : K,
-      bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
-    (hc : ∀ k l : Fin p, k < l → ∀ t : K,
-      bind₁ (fun s => X s + ∑ a, if s = z (a, l) then C t * X (z (a, k)) else 0) P = P)
-    (x : σ → K) : BiInvariant fun M => eval (setBlock z x M) P := by
+    (hr : ∀ a b : Fin p,
+      a < b
+        → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
+    (hc : ∀ k l : Fin p,
+      k < l
+        → ∀ t : K, bind₁ (fun s => X s + ∑ a, if s = z (a, l) then C t * X (z (a, k)) else 0) P = P)
+    (x : σ → K)
+    : BiInvariant fun M => eval (setBlock z x M) P := by
   constructor
   · intro a b hab t M
     beta_reduce
@@ -314,7 +331,7 @@ theorem biInvariant_eval {z : Fin p × Fin p → σ} (hz : Function.Injective z)
     · obtain ⟨⟨u, v⟩, rfl⟩ := hs
 
       simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
-      apply_ite (eval (setBlock z x M)), map_mul, eval_C, map_zero, rowAdd, of_apply]
+        apply_ite (eval (setBlock z x M)), map_mul, eval_C, map_zero, rowAdd, of_apply]
       by_cases hu : u = b <;> simp [hu]
     · have : ∀ w, s ≠ z w := fun w h => hs ⟨w, h.symm⟩
       simp [setBlock_of_not _ _ hs, this]
@@ -327,16 +344,17 @@ theorem biInvariant_eval {z : Fin p × Fin p → σ} (hz : Function.Injective z)
     · obtain ⟨⟨u, v⟩, rfl⟩ := hs
 
       simp only [setBlock_apply hz, map_add (f := _), eval_X, map_sum, hz.eq_iff, Prod.mk.injEq,
-      apply_ite (eval (setBlock z x Mᵀ)), map_mul, eval_C, map_zero, rowAdd, of_apply,
-      transpose_apply]
+        apply_ite (eval (setBlock z x Mᵀ)), map_mul, eval_C, map_zero, rowAdd, of_apply,
+        transpose_apply]
       by_cases hu : v = b <;> simp [hu]
     · have : ∀ w, s ≠ z w := fun w h => hs ⟨w, h.symm⟩
       simp [setBlock_of_not _ _ hs, this]
 
-theorem eval_setBlock_diagonal {z : Fin p × Fin p → σ} (hz : Function.Injective z)
-    (P : MvPolynomial σ K) (l : Fin p → ℕ)
-    (hrow : ∀ a, ∀ m ∈ P.support, ∑ k, m (z (a, k)) = l a) (x : σ → K) (d : Fin p → K) :
-    eval (setBlock z x (diagonal d)) P = eval (setBlock z x 1) P * ∏ a, d a ^ l a := by
+theorem eval_setBlock_diagonal
+    {z : Fin p × Fin p → σ} (hz : Function.Injective z)
+    (P : MvPolynomial σ K) (l : Fin p → ℕ) (hrow : ∀ a, ∀ m ∈ P.support, ∑ k, m (z (a, k)) = l a)
+    (x : σ → K) (d : Fin p → K)
+    : eval (setBlock z x (diagonal d)) P = eval (setBlock z x 1) P * ∏ a, d a ^ l a := by
   let w : σ → K := setBlock z 1 (Matrix.of fun a _ => d a)
   have hw : ∀ s, setBlock z x (diagonal d) s = setBlock z x 1 s * w s := by
     intro s
@@ -344,7 +362,7 @@ theorem eval_setBlock_diagonal {z : Fin p × Fin p → σ} (hz : Function.Inject
     · obtain ⟨⟨u, v⟩, rfl⟩ := hs
       simp only [w, setBlock_apply hz]
       change diagonal d u v = (1 : Matrix (Fin p) (Fin p) K) u v * d u
-      by_cases h : u = v <;> simp [diagonal_apply, Matrix.one_apply, h]
+      by_cases h : u = v <;> simp [Matrix.one_apply, h]
     · simp [w, setBlock_of_not _ _ hs]
   rw [eval_eq, eval_eq, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
@@ -364,70 +382,81 @@ theorem eval_setBlock_diagonal {z : Fin p × Fin p → σ} (hz : Function.Inject
 
 end UnipotentInvariant
 
-
 open UnipotentInvariant in
-theorem eq_mul_prod_minors {K σ : Type*} [Field K] [CharZero K] [DecidableEq σ] {p : ℕ} (z : Fin p × Fin p → σ) (hz : Function.Injective z)
+theorem eq_mul_prod_minors
+    {K σ : Type*} [Field K] [CharZero K] [DecidableEq σ]
+    {p : ℕ} (z : Fin p × Fin p → σ) (hz : Function.Injective z)
     (P : MvPolynomial σ K) (c : Fin p → ℕ)
     (hrow : ∀ a, ∀ m ∈ P.support, ∑ k, m (z (a, k)) = ∑ i ∈ Finset.Ici a, c i)
-    (hr : ∀ a b : Fin p, a < b → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
-    (hc : ∀ k l : Fin p, k < l → ∀ t : K, bind₁ (fun s => X s + ∑ a, if s = z (a, l) then C t * X (z (a, k)) else 0) P = P) :
-    ∃ Q : MvPolynomial σ K, (∀ w, z w ∉ Q.vars) ∧
-      P = Q * ∏ i : Fin p, (Matrix.of fun a b : Fin (i.val + 1) => (X (z (Fin.castLE i.isLt a, Fin.castLE i.isLt b)) : MvPolynomial σ K)).det ^ c i := by
-  let g : σ → MvPolynomial σ K :=
-    Function.extend z (fun w => C ((1 : Matrix (Fin p) (Fin p) K) w.1 w.2)) X
-  let Δ : Fin p → MvPolynomial σ K := fun i => (Matrix.of fun a b : Fin (i.val + 1) =>
-    (X (z (Fin.castLE i.isLt a, Fin.castLE i.isLt b)) : MvPolynomial σ K)).det
-  have hΔ : ∀ (x : σ → K) i, eval x (Δ i) = leadMinor i (Matrix.of fun a b => x (z (a, b))) := by
-    intro x i
-    simp only [Δ, leadMinor]
-    rw [RingHom.map_det]
-    congr 1
-    ext a b
-    simp
-  have hg : ∀ x : σ → K, eval x (bind₁ g P) = eval (setBlock z x 1) P := by
-    intro x
-    rw [eval_bind₁']
-    congr 2
-    funext s
-    by_cases hs : ∃ w, z w = s
-    · obtain ⟨w, rfl⟩ := hs
-      simp [g, setBlock_apply hz, hz.extend_apply]
-    · simp [g, setBlock_of_not _ _ hs, Function.extend_apply' _ _ _ hs]
-  refine ⟨bind₁ g P, ?_, ?_⟩
-  · intro w hw
-    obtain ⟨s, -, hs'⟩ := mem_vars_bind₁ g P hw
-    by_cases hs : ∃ w, z w = s
-    · obtain ⟨w', rfl⟩ := hs
-      simp [g, hz.extend_apply] at hs'
-    · simp only [g, Function.extend_apply' _ _ _ hs, vars_X, Finset.mem_singleton] at hs'
-      exact hs ⟨w, hs'⟩
-  · have hne : ∏ i, Δ i ≠ 0 := by
-      refine Finset.prod_ne_zero_iff.mpr fun i _ h => ?_
-      have := hΔ (setBlock z 0 1) i
-      rw [h, map_zero] at this
-      have h1 : (Matrix.of fun a b => setBlock z (0 : σ → K) 1 (z (a, b))) = diagonal fun _ => 1 := by
-        ext a b
-        simp [setBlock_apply hz]
-      rw [h1, leadMinor_diagonal] at this
-      simp at this
-    apply mul_left_cancel₀ hne
-    apply MvPolynomial.funext
-    intro x
-    change eval x (_ * P) = eval x (_ * (_ * ∏ i, Δ i ^ c i))
-    simp only [map_mul, map_prod, map_pow, hΔ, hg]
-    by_cases h : ∀ i, leadMinor i (Matrix.of fun a b => x (z (a, b))) ≠ 0
-    · congr 1
-      have hx : setBlock z x (Matrix.of fun a b => x (z (a, b))) = x := by
-        funext s
-        by_cases hs : ∃ w, z w = s
-        · obtain ⟨w, rfl⟩ := hs
+    (hr : ∀ a b : Fin p,
+      a < b
+        → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
+    (hc : ∀ k l : Fin p,
+      k < l
+        → ∀ t : K, bind₁ (fun s => X s + ∑ a, if s = z (a, l) then C t * X (z (a, k)) else 0) P = P)
+    : ∃ Q : MvPolynomial σ K,
+      (∀ w, z w ∉ Q.vars)
+        ∧ P
+          = Q
+            * ∏ i : Fin p, (Matrix.of fun a b : Fin (i.val + 1) => (X (z (Fin.castLE i.isLt a, Fin.castLE i.isLt b)) : MvPolynomial σ K)).det ^ c i :=
+  by
+    let g : σ → MvPolynomial σ K :=
+      Function.extend z (fun w => C ((1 : Matrix (Fin p) (Fin p) K) w.1 w.2)) X
+    let Δ : Fin p → MvPolynomial σ K := fun i =>
+      (Matrix.of fun a b : Fin (i.val + 1) =>
+        (X (z (Fin.castLE i.isLt a, Fin.castLE i.isLt b)) : MvPolynomial σ K)).det
+    have hΔ : ∀ (x : σ → K) i, eval x (Δ i) = leadMinor i (Matrix.of fun a b => x (z (a, b))) := by
+      intro x i
+      simp only [Δ, leadMinor]
+      rw [RingHom.map_det]
+      congr 1
+      ext a b
+      simp
+    have hg : ∀ x : σ → K, eval x (bind₁ g P) = eval (setBlock z x 1) P := by
+      intro x
+      rw [eval_bind₁']
+      congr 2
+      funext s
+      by_cases hs : ∃ w, z w = s
+      · obtain ⟨w, rfl⟩ := hs
+        simp [g, setBlock_apply hz, hz.extend_apply]
+      · simp [g, setBlock_of_not _ _ hs, Function.extend_apply' _ _ _ hs]
+    refine ⟨bind₁ g P, ?_, ?_⟩
+    · intro w hw
+      obtain ⟨s, -, hs'⟩ := mem_vars_bind₁ g P hw
+      by_cases hs : ∃ w, z w = s
+      · obtain ⟨w', rfl⟩ := hs
+        simp [g, hz.extend_apply] at hs'
+      · simp only [g, Function.extend_apply' _ _ _ hs, vars_X, Finset.mem_singleton] at hs'
+        exact hs ⟨w, hs'⟩
+    · have hne : ∏ i, Δ i ≠ 0 := by
+        refine Finset.prod_ne_zero_iff.mpr fun i _ h => ?_
+        have := hΔ (setBlock z 0 1) i
+        rw [h, map_zero] at this
+        have h1
+            : (Matrix.of fun a b => setBlock z (0 : σ → K) 1 (z (a, b))) = diagonal fun _ => 1 := by
+          ext a b
           simp [setBlock_apply hz]
-        · exact setBlock_of_not _ _ hs
-      have := (biInvariant_eval hz P hr hc x).eq_mul_prod c
-        (eval_setBlock_diagonal hz P _ hrow x) _ h
-      simpa only [hx] using this
-    · push_neg at h
-      obtain ⟨i, hi⟩ := h
-      rw [Finset.prod_eq_zero (Finset.mem_univ i) hi, zero_mul, zero_mul]
+        rw [h1, leadMinor_diagonal] at this
+        simp at this
+      apply mul_left_cancel₀ hne
+      apply MvPolynomial.funext
+      intro x
+      change eval x (_ * P) = eval x (_ * (_ * ∏ i, Δ i ^ c i))
+      simp only [map_mul, map_prod, map_pow, hΔ, hg]
+      by_cases h : ∀ i, leadMinor i (Matrix.of fun a b => x (z (a, b))) ≠ 0
+      · congr 1
+        have hx : setBlock z x (Matrix.of fun a b => x (z (a, b))) = x := by
+          funext s
+          by_cases hs : ∃ w, z w = s
+          · obtain ⟨w, rfl⟩ := hs
+            simp [setBlock_apply hz]
+          · exact setBlock_of_not _ _ hs
+        have :=
+          (biInvariant_eval hz P hr hc x).eq_mul_prod c (eval_setBlock_diagonal hz P _ hrow x) _ h
+        simpa only [hx] using this
+      · push_neg at h
+        obtain ⟨i, hi⟩ := h
+        rw [Finset.prod_eq_zero (Finset.mem_univ i) hi, zero_mul, zero_mul]
 
 end GlobalTheory

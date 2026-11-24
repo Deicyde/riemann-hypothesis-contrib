@@ -75,7 +75,9 @@ def hsLE
   LinearMap.toContinuousLinearMap {
     toFun := fun X => B.hsVec (Eρ.comp X)
     map_add' := fun X Y => by rw [ContinuousLinearMap.comp_add]; unfold B.hsVec; rfl
-    map_smul' := fun c X => by rw [ContinuousLinearMap.comp_smul]; exact PBL.hsVec_smul c _
+    map_smul' := fun c X => by
+      rw [ContinuousLinearMap.comp_smul]
+      exact _root_.PI.UnitaryGroupMassFormula.UsCompose.hsVec_smul c _
   }
 
 theorem hsLE_apply

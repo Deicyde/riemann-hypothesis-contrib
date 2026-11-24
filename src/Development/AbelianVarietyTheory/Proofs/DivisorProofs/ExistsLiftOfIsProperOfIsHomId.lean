@@ -55,8 +55,7 @@ theorem exists_lift_of_isProper_of_isHom_id
       M.IsHom Y (AlgHom.id o Ω) q → IsProper q
         → ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), ∃ y' : Sp (OO p) ⟶ Y.Z, y' ≫ q = y := by
   intro o Ω _ _ _ Y M q hq hp p _ y
-  have hq' : Y.pt ≫ q = spMap (AlgHom.id o Ω).toRingHom ≫ M.pt := by
-    first | exact hq | exact hq.1 | exact hq.2
+  have hq' : Y.pt ≫ q = spMap (AlgHom.id o Ω).toRingHom ≫ M.pt := by first | exact hq
   have hsurj : Function.Surjective q := by
     have hc : IsClosed (Set.range q) := q.isClosedMap.isClosed_range
     have hg : genericPoint M.Z ∈ Set.range q := by

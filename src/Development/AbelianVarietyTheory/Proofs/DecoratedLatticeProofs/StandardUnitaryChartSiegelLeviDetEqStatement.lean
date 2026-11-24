@@ -58,7 +58,4 @@ theorem _root_.GlobalTheory.T.standardUnitaryChart_siegelLeviDet_eq
           IsChart A μ κ
             → ∀ (p : siegel A) (a : GL (Fin A.rank) (AE D)),
               blkA (mat (κ p)) = a.1 → aP A p = Matrix.GeneralLinearGroup.det a := by
-  first
-  | exact @GlobalTheory.StdUnn.chart_aP_eq_det
-  | exact GlobalTheory.StdUnn.chart_aP_eq_det
-  | (intros; apply GlobalTheory.StdUnn.chart_aP_eq_det <;> assumption)
+  first | exact @GlobalTheory.StdUnn.chart_aP_eq_det

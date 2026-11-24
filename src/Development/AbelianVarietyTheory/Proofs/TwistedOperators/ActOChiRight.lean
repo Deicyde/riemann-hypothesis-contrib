@@ -38,6 +38,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.InvolutionSphericalHeckeAnti
 
 @[expose] public section
 
@@ -52,7 +53,6 @@ attribute [local instance]
 noncomputable section
 
 open GlobalTheory.StdFrames
-
 
 namespace GlobalTheory.RowMoveAt
 variable
@@ -127,7 +127,7 @@ theorem actO_chi_left
     (x : WO (G.pS (.chi (j + 1) D.R.m : Pair T)) (G.pT (.chi (j + 1) D.R.m : Pair T)))
     : actO _ _ (G.toPair (.chi (j + 1) D.R.m) M 1)⁻¹.1 (G.toPair (.chi (j + 1) D.R.m) M 1)⁻¹.2 x
       = mt (G.V (.grid (j + 1) D.R.m)) M⁻¹ * (x : Matrix _ _ (AE D)) := by
-  simp only [actO, GridData.toPair, Prod.fst_inv, Prod.snd_inv, inv_inv, map_one, inv_one]
+  simp only [actO, GridData.toPair, Prod.fst_inv, Prod.snd_inv, map_one, inv_one]
   rw [show mt (G.pS (.chi (j + 1) D.R.m : Pair T)) 1 = 1 from rfl, Matrix.mul_one]
 
 theorem sub_mul_cast
@@ -204,7 +204,7 @@ theorem rowAt_move
   obtain ⟨P, e, he, hsupp, hoff⟩ := S.N.u_supp _ hX
   have hn := notOff S ht hw
   have hu := map_mt_eq_one hn he hoff hsupp
-  have hu' := map_mt_eq_one hn he hoff (GlobalTheory.StdHalfLat.suppAt_inv' hsupp)
+  have hu' := map_mt_eq_one hn he hoff (_root_.GlobalTheory.SplitPlace.suppAt_inv hsupp)
   have hM
       : (mt _ (moved S j k)).map ((cpt w).comp (toEAf D))
         = (loc w (finG (G.V (.grid (j + 1) D.R.m)) k)).val := by

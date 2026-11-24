@@ -47,6 +47,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
   GlobalTheory.Mem.ColAd Matrix
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.mem_framedLevel_iff_two_adelic_points
     : ∀ (F E K : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E]
         [Algebra F E] [Field K] (hc : CMData F E) (n : ℕ) [NeZero n]

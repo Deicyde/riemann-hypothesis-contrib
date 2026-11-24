@@ -59,10 +59,7 @@ theorem freeGen_res
       : (((freeP R).obj P).map g.op).hom (ModuleCat.freeMk (ULift.up x))
         = ModuleCat.freeMk (ULift.up ((P.map g.op) x)) := by
     simp [freeP, ModuleCat.freeMk]
-    first
-    | (rw [Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]; rfl)
-    | (erw [Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]; rfl)
-    | (simp [Finsupp.mapDomain_single]; rfl)
+    first | (erw [Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]; rfl)
   erw [ConcreteCategory.comp_apply, ConcreteCategory.comp_apply, hm] at this
   exact this.symm
 

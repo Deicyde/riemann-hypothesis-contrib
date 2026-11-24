@@ -76,7 +76,7 @@ theorem exists_compact_open_subgroup
   have hO : (⋂ i, t i) ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 F) F) := Filter.iInter_mem.2 ht
   have hbox : ∀ u : κ → FiniteAdeleRing (𝓞 F) F, (∀ i, u i ∈ ⋂ i, t i) → u ∈ S := fun u hu =>
     hsub fun i _ => Set.mem_iInter.1 (hu i) i
-  obtain ⟨N, hN, hNO⟩ := GlobalTheory.AdLat.OpenLat.exists_nsmul_adele F _ hO
+  obtain ⟨N, hN, hNO⟩ := _root_.GlobalTheory.LocalNormBound.main F _ hO
   let c : FiniteAdeleRing (𝓞 F) F := algebraMap F _ ((N : F)⁻¹)
   have hcN : (N : FiniteAdeleRing (𝓞 F) F) * c = 1 := by
     rw [← map_natCast (algebraMap F (FiniteAdeleRing (𝓞 F) F)) N, ← map_mul,

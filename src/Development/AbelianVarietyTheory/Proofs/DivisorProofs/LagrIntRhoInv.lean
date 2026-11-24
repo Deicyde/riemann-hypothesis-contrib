@@ -115,7 +115,7 @@ theorem hTens_dC
   simp only [← finSumFinEquiv.sum_comp, Matrix.of_apply, Equiv.symm_apply_apply, incM,
     Matrix.map_apply, Matrix.transpose_apply, dblG_apply]
   simp only [Fintype.sum_sum_type]
-  simp [dbl, Finset.sum_add_distrib, Finset.sum_neg_distrib, dC_mul_castAdd, dC_mul_addNat]
+  simp [dbl, Finset.sum_neg_distrib]
 
 end GlobalTheory.LagrThetaInv
 

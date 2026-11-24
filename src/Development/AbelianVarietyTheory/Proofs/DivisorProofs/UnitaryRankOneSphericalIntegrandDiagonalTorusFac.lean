@@ -221,7 +221,7 @@ theorem torus_factor
     rw [dite_eq_right hk]
     by_cases hi : i = k
     · subst hi; simp [Function.update_self, Units.val_inv_eq_inv_val]
-    · simp [Function.update_of_ne hi, hi]
+    · simp [hi]
   have key
       : chiDeltaU q (fun i => (α i : ℂ)) b * (q : ℂ) ^ (-4 * ordL (T (lo k) (lo k)))
         = chiDeltaU q (fun i => (actU k α i : ℂ)) t := by

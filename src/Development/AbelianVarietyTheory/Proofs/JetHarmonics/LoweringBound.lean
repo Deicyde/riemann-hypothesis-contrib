@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Jets.SideFam
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFamilyShapeGapsStatement
+public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFamilyShapeGaps
 public import Formalism.FlagUnipotentLattices.AlgebraicIdentityHigherDegree
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -74,7 +75,7 @@ theorem bound_cast
   have hmem : ∀ i : Fin k, (i : ℕ) + 1 ∈ Icc 1 k := fun i => by
     rw [Finset.mem_Icc]; have := i.2; omega
   have key :=
-    Formalism.HermitianLatticeCounting.Final.ExpansionTerms.sup_l2_ratio_majorant k M lam mu
+    _root_.Formalism.HermitianLatticeCounting.P.first_operator_norm_bound k M lam mu
       (fun i => u (i.val + 1))
       b bv ga q0 s hk hM
       ⟨
@@ -119,8 +120,7 @@ theorem lowering_bound
                   / ∏ t ∈ univ.erase s, |lam s + (ν s : ℝ) - 1 - (lam t + (ν t : ℝ))|
                 ≤ b ^ 4 := by
   intro k r lam u b bv ga h q0 hN ν hν s
-  obtain ⟨⟨hb, hbv, -, hq, -⟩, hf⟩ :=
-    GlobalTheory.T.numericalFamily_shape_gaps k r lam u b bv ga h q0 hN
+  obtain ⟨⟨hb, hbv, -, hq, -⟩, hf⟩ := _root_.GlobalTheory.NumFam.num_fam k r lam u b bv ga h q0 hN
   obtain ⟨-, -, -, hgap⟩ := hf ν hν
   obtain ⟨hk, hHC, h3, h4, h5, h6, h7, h8, h9, h10, -, -, hga, -, hbig⟩ := hN
   have hq0 : (0 : ℝ) ≤ q0 := Nat.cast_nonneg _

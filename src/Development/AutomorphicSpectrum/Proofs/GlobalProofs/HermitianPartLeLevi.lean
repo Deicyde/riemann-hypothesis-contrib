@@ -101,7 +101,7 @@ theorem comm_onPart
 theorem mul_onPart_inv {Q G H : Matrix (Fin n) (Fin n) A} (hQ : Q * Q = Q) (hGH : G * H = 1)
     : G * onPart Q H * Q = Q := by
   simp only [onPart, Matrix.mul_add, Matrix.add_mul, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one,
-    Matrix.one_mul, Matrix.mul_assoc, hQ, sub_self, zero_add]
+    Matrix.mul_assoc, hQ, sub_self, zero_add]
   rw [← Matrix.mul_assoc, hGH, Matrix.one_mul]
 
 end Abstract
@@ -125,15 +125,14 @@ theorem P_sq (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J 
     : P σ J X Y I * P σ J X Y I = P σ J X Y I := by
   rw [P,
     GlobalTheory.CompanionTheory.LeviGen.prj_mul_prj hW.xx hW.yy hW.xy
-      (GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.Comm.yJx hCM hJ hW),
+      (_root_.GlobalTheory.StdPar.yx hCM hJ hW),
     GlobalTheory.CompanionTheory.LeviGen.ind_mul_self]
 
 theorem proj_mul_X
     (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J X Y) (I : Set (Fin r))
     : P σ J X Y I * X = X * diagonal (ind I : Fin r → E) := by
   rw [P, prj, Matrix.add_mul,
-    GlobalTheory.CompanionTheory.LeviGen.prX_mul_X
-      (GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.Comm.yJx hCM hJ hW),
+    GlobalTheory.CompanionTheory.LeviGen.prX_mul_X (_root_.GlobalTheory.StdPar.yx hCM hJ hW),
     GlobalTheory.CompanionTheory.LeviGen.prY_mul_X hW.xx, add_zero]
 
 theorem proj_mul_Y (hW : IsWittFrame σ J X Y) (I : Set (Fin r))
@@ -272,8 +271,8 @@ theorem comm_Q
     try rfl
   have h1 :=
     GlobalTheory.CompanionTheory.LeviGen.comm_of_frame
-      (frame_one (GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart.Comm.yJx hCM hJ hW) k)
-      (matHom_unitary g) (matHom_mul_inv g) (matHom_inv_mul g) hB hC
+      (frame_one (_root_.GlobalTheory.StdPar.yx hCM hJ hW) k) (matHom_unitary g) (matHom_mul_inv g)
+      (matHom_inv_mul g) hB hC
   have h2 :=
     GlobalTheory.CompanionTheory.LeviGen.comm_of_frame (frame_one hW.xy k) (matHom_unitary g)
       (matHom_mul_inv g) (matHom_inv_mul g) hC hB

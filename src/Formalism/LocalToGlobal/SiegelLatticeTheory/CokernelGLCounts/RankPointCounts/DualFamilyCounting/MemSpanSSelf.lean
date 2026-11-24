@@ -122,7 +122,6 @@ private theorem span_ne_eq_cutW_of_orthogonal
     obtain ⟨hv1, hv2⟩ := Submodule.mem_inf.1 hv'
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hv1
     have ha0 : a i₀ = 0 := by
-
       rw [LinearMap.mem_ker, map_sum, Finset.sum_eq_single i₀] at hv2
       · rw [map_smul, smul_eq_mul] at hv2
         exact (mul_eq_zero.1 hv2).resolve_right hf0

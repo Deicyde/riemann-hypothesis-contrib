@@ -87,7 +87,7 @@ theorem val_res'
   erw [ModuleCat.hom_comp, ModuleCat.hom_comp, LinearMap.comp_apply, LinearMap.comp_apply] at e2
   unfold freeGen
   refine e2.symm.trans (congrArg _ ?_)
-  first | rfl | exact Finsupp.mapDomain_single
+  first | exact Finsupp.mapDomain_single
 end LateralTheory.KummerTheory
 
 namespace LateralTheory.KummerTheory
@@ -114,7 +114,7 @@ theorem free_gen_map
     at e
   unfold freeGen
   refine e.symm.trans (congrArg _ ?_)
-  first | rfl | exact Finsupp.mapDomain_single
+  first | exact Finsupp.mapDomain_single
 
 theorem chainsXIso_nat (R : Type) [CommRing R] {E' E : Spc} (f : E' ⟶ E) (p : ℕ)
     : (chainsXIso R E' p).inv ≫ ((chains R).map f).f (-(p : ℤ))

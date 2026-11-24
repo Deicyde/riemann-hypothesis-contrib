@@ -93,8 +93,7 @@ theorem ellTop_apply
       = ε * (Nat.card ((I.fm l u a).stabilizer₂ c) : ℂ)
         * (I.per l u a).period (eW.symm (Pi.single c (fun y : FrP (I.rec7 l Z) => φ ⟨y.1, y.2⟩)))
           (G' f) := by
-  simp only [ellT, LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.funLeft_apply,
-    LinearMap.flip_apply, LinearEquiv.coe_coe, LinearMap.coe_single, smul_eq_mul]
+  simp only
   rfl
 
 @[reducible]

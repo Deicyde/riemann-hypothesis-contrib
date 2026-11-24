@@ -49,6 +49,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
   ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
   Formalism.L2.Pj Formalism.L2.PjFree GlobalTheory.EtaForm GlobalTheory.EtaAn GlobalTheory.ArcQ
 attribute [local instance] Over.cartesianMonoidalCategory
+
 theorem _root_.GlobalTheory.T.appellHumbert_section_entire_with_factor
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ))
@@ -65,7 +66,4 @@ theorem _root_.GlobalTheory.T.appellHumbert_section_entire_with_factor
                     * Complex.exp
                       (Real.pi * hermForm Hm z (Pm a) + Real.pi / 2 * hermForm Hm (Pm a) (Pm a))
                     * θ z := by
-  first
-  | exact @GlobalTheory.EtaAn.isFnOf_entire_factor
-  | exact GlobalTheory.EtaAn.isFnOf_entire_factor
-  | (intros; apply GlobalTheory.EtaAn.isFnOf_entire_factor <;> assumption)
+  first | exact @GlobalTheory.EtaAn.isFnOf_entire_factor

@@ -70,7 +70,4 @@ theorem _root_.GlobalTheory.T.exists_embedding_splitPrime_gridLocalTensorPlaces
       (∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v)
         → ∃ τ : D.host.E →ₐ[D.host.F] Fv D.host.F v, ∀ w ∈ locPl G t,
           w.under (𝓞 D.host.F) = v → splitPrime τ = w := by
-  first
-  | exact @GlobalTheory.LocPlTau.exists_splitPrime_locPl
-  | exact GlobalTheory.LocPlTau.exists_splitPrime_locPl
-  | (intros; apply GlobalTheory.LocPlTau.exists_splitPrime_locPl <;> assumption)
+  first | exact @GlobalTheory.LocPlTau.exists_splitPrime_locPl

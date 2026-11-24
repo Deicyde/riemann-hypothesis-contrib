@@ -95,6 +95,7 @@ theorem kerOp_integrable_continuous
       rw [norm_mul]
       exact mul_le_mul_of_nonneg_left (hC _) (norm_nonneg _)
   refine ⟨fun g => Integrable.mono' hint (hm g) (hbd g), ?_⟩
+
   exact continuous_of_dominated hm hbd hint
     (Filter.Eventually.of_forall fun x =>
       continuous_const.mul (hφc.comp (continuous_id.mul continuous_const)))

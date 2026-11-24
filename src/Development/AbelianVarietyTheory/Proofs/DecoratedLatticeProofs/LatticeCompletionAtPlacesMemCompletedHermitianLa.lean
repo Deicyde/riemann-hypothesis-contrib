@@ -49,9 +49,6 @@ open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.LatVHat

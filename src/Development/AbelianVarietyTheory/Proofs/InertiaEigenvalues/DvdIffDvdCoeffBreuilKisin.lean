@@ -1,7 +1,8 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopologicalBasisBasicFactsStatement
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MemBallOfGaugeLt
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TopologicalBasisBasicFacts
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -59,7 +60,7 @@ theorem GlobalTheory.BSP.TopBasis.dvd_iff_dvd_c
       s a ∣ x ↔ ∀ i, a ∣ TB.c i x := by
   intro l _ K bk A _ s ι TB a x
   haveI hH : IsHausdorff bk.J bk.S := bk.complete.toIsHausdorff
-  obtain ⟨h1, -, -, h4, -⟩ := GlobalTheory.T.topologicalBasis_basic_facts bk.S A s bk.J ι TB hH
+  obtain ⟨h1, -, -, h4, -⟩ := _root_.GlobalTheory.BSP.TopBasis.basic_facts bk.S A s bk.J ι TB hH
   constructor
   · rintro ⟨y, rfl⟩ i
     exact ⟨TB.c i y, TB.c_mul i a y⟩

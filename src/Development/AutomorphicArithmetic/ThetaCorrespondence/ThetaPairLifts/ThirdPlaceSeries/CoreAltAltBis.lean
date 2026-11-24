@@ -42,8 +42,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.Mem.Top.Bl
@@ -55,11 +53,10 @@ structure Parameters (hL : _root_.UpperTheory.Zero.LLC.RecTExists) : Type 2 wher
   R : RPosition
   N : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceExtension hL
   S : SExt
-  Γ : GeoP
 variable {hL : _root_.UpperTheory.Zero.LLC.RecTExists}
 @[reducible]
 def Parameters.s (p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL) : Slots :=
-  ⟨p.R, _root_.GlobalTheory.Mem.Top.Bl.normChoiceOfExtension hL p.N, SXE p.S, OX p.Γ⟩
+  ⟨p.R, _root_.GlobalTheory.Mem.Top.Bl.normChoiceOfExtension hL p.N, SXE p.S, OX⟩
 def WPt.core_data_of_point
     {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL} {K : Ctx} (q : WPt p.s K)
     : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceCore hL q.x.what₂ q.x.n :=
@@ -118,10 +115,9 @@ def ReciprocityLinkage (p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL)
   linkOf (𝒮 := p.s) (Bd := _root_.GlobalTheory.Mem.Top.Bl.BoundaryReciprocity) fun _ q _ R =>
     _root_.GlobalTheory.Mem.Top.Bl.RecordCompatibleExtended (p := p) q R
 @[reducible]
-def parametersOfExtension
-    (N : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceExtension hL) (S : SExt) (Γ : GeoP)
+def parametersOfExtension (N : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceExtension hL) (S : SExt)
     : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL :=
-  ⟨RX, N, S, Γ⟩
+  ⟨RX, N, S⟩
 end GlobalTheory.Mem.Top.Bl
 end
 end

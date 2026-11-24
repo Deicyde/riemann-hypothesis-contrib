@@ -220,7 +220,7 @@ theorem cpow_step (r : ℕ)
             = ‖p.1‖ ^ 2 + ∑ a, ‖p.2 a‖ ^ 2 := by
       intro p
       rw [Fin.sum_univ_succ]
-      simp [MeasurableEquiv.piFinSuccAbove, Fin.insertNth_zero']
+      simp [MeasurableEquiv.piFinSuccAbove]
     simp_rw [hsplit]
     rw [lintegral_prod _ ?meas]
     · have inner

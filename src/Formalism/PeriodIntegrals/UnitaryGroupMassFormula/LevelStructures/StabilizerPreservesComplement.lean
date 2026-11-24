@@ -91,10 +91,7 @@ theorem rational_vector_mem_span
     exact Submodule.add_mem _ hu hw
   | smul c u _ hu =>
     have e0 : ratV (F := F) R (c • u) = inclR (F := F) R c • ratV (F := F) R u :=
-      funext fun i => by
-        first
-        | (simp only [ratV, Pi.smul_apply, smul_eq_mul]; exact map_mul _ _ _)
-        | (simp [ratV, map_mul]; rfl)
+      funext fun i => by first | (simp only [ratV, Pi.smul_apply, smul_eq_mul]; exact map_mul _ _ _)
     rw [e0]
     exact Submodule.smul_mem _ _ hu
 

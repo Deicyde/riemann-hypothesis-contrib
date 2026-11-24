@@ -5,7 +5,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsUniqueRealLinearOfEventuallyAddModDiscrete
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.HolDifferentiableAt
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsDerivAt0OfIsPullback
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsHolToFibPtAndCompFibreStatement
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsHolToFibPtAndCompFibre
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -165,8 +165,8 @@ theorem existsUnique_linear_lift_fibre
       hsm'
       (fun z => by rw [Category.assoc, hψ, fibPt_snd])
       (fun z => fibPt_snd _ _)
-      ((T.isHolTo_fibPt_and_comp_fibre X G y g e hol).2 _ ψ)
-      (T.isHolTo_fibPt_and_comp_fibre X' G' y' g' e' hol').1 hd
+      ((_root_.GlobalTheory.HolFibre.isHolTo_fibPt_and_comp X G y g e hol).2 _ ψ)
+      (_root_.GlobalTheory.HolFibre.isHolTo_fibPt_and_comp X' G' y' g' e' hol').1 hd
       (by simp only [hψp, map_zero_eq_one e he, map_zero_eq_one e' he', map_one])
   exact existsUnique_linearMap_lift_of_germ
     (ex := toAddHom (fun z => ψp (e z)) fun z w => by rw [he, map_mul]) (ex' := toAddHom e' he')

@@ -3,7 +3,8 @@ module
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LMulBeta
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KummerNotCoboundary
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AcrisLogTeichmullerUniqueGaloisFrobeniusBdR
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CanonicalAcrisToBdRPlusUniqueEquivariantApproxStatement
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CanonicalAcrisToBdRPlusUniqueEquivariantApprox
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLogTeichmullerAcrisEqMuMulUnit
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ThetaBdRPlusSurjectiveKerUnitsEquivariant
 import Mathlib.Algebra.Order.Floor.Extended
@@ -106,7 +107,7 @@ theorem isLogP_map
               (algebraMap (Per.Ainf l) (Per.AinfP l) (GlobalTheory.MemLoc.mu e)) ^ (k + 1) :=
     ⟨d * _, by rw [← mul_assoc, hd, one_mul]⟩
   have key :=
-    (GlobalTheory.T.canonicalAcrisToBdRPlus_unique_equivariant_approx l j hj).2.2 n t
+    (_root_.GlobalTheory.MemLoc.crisP_unique_equivariant l j hj).2.2 n t
       (algebraMap (Per.AinfP l) (Per.BdRp l) c)
       (by
         intro r

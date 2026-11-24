@@ -57,6 +57,7 @@ import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
 public import Formalism.HermitianCurvature.FrameExists2
+import Formalism.FormalDegreeBessel.FinalDS
 
 @[expose] public section
 
@@ -298,7 +299,7 @@ theorem qdet_eigen
   obtain ⟨-, -, hU, -, -, -, ⟨v, -, hv, hw⟩, hdom⟩ := hπ
   have hw' := isWeight_of_isWtOn E hE _ v hw
   refine ⟨v, hv, fun Y => ?_⟩
-  rw [Formalism.QuantumDeterminants.capelliHW W k E
+  rw [_root_.Formalism.QuantumDeterminants.capelliHighestWeight_holds W k E
     (fun a => (lowK (allPos k) u a : ℂ))
     v hgl ⟨hw', fun a b hab => ?_⟩ Y]
   · simp only [Formalism.QuantumDeterminants.capP, ← Complex.ofReal_add, lowK_add_rho]
@@ -380,7 +381,7 @@ theorem prod_eq
     · rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.conjTranspose_conjTranspose,
         ← neg_smul, add_comm]
       congr 1
-      simp [Complex.conj_ofNat]
+      simp
     · rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_sub, Matrix.conjTranspose_conjTranspose,
         ← smul_neg, neg_sub]
       congr 1

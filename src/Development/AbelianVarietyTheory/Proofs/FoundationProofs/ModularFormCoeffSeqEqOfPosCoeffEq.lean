@@ -115,11 +115,11 @@ theorem eq_of_coeff_pos_eq
   have hlt : ‖(L : ℂ) * τ₁ + 1‖ < ‖(L : ℂ) * τ₂ + 1‖ := by
     have s1 : ‖(L : ℂ) * τ₁ + 1‖ ^ 2 = 1 + (L : ℝ) ^ 2 := by
       rw [Complex.sq_norm, Complex.normSq_apply]
-      simp [τ₁, UpperHalfPlane.coe_mk]
+      simp [τ₁]
       ring
     have s2 : ‖(L : ℂ) * τ₂ + 1‖ ^ 2 = 1 + 4 * (L : ℝ) ^ 2 := by
       rw [Complex.sq_norm, Complex.normSq_apply]
-      simp [τ₂, UpperHalfPlane.coe_mk]
+      simp [τ₂]
       ring
     have : ‖(L : ℂ) * τ₁ + 1‖ ^ 2 < ‖(L : ℂ) * τ₂ + 1‖ ^ 2 := by rw [s1, s2]; nlinarith
     exact lt_of_pow_lt_pow_left₀ 2 (norm_nonneg _) this

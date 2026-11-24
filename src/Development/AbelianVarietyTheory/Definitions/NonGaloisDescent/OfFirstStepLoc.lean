@@ -46,9 +46,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-
-
 noncomputable section
 
 namespace GlobalTheory.TwInputs

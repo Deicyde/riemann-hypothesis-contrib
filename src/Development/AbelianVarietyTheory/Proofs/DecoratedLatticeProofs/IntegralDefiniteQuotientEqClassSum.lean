@@ -122,7 +122,7 @@ def swapL
               = (1 : E) ⊗ₜ a from
             rfl,
           Algebra.TensorProduct.tmul_mul_tmul, one_mul]
-        simp [mul_comm]
+        simp
         rw [TensorProduct.smul_tmul', smul_eq_mul]
       | add x y hx hy => simp_all [smul_add]
   }

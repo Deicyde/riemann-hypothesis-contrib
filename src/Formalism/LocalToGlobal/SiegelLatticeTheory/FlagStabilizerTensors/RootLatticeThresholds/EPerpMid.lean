@@ -73,7 +73,7 @@ theorem Qi_spanLt (hT : TrHyp F Qm Qim c) {a : ℕ} {v : Fin n → ℂ} (hv : v 
       simp only [Formalism.QuantumDeterminants.eI] at this
       simp only [Set.mem_setOf_eq] at hb
       omega
-    simp [Formalism.QuantumDeterminants.bvec, Pi.single_apply, hne]
+    simp [Formalism.QuantumDeterminants.bvec, hne]
   | zero =>
     intro i _; simp
   | add x y _ _ hx hy =>
@@ -113,7 +113,7 @@ theorem fwd_N
         (Qim * g * Qm) i j = (Qim *ᵥ (g *ᵥ (Qm *ᵥ Formalism.QuantumDeterminants.bvec j))) i := by
     intro j i
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
-    simp [Formalism.QuantumDeterminants.bvec, Matrix.mulVec_single_one]
+    simp [Formalism.QuantumDeterminants.bvec]
   refine ⟨?_, fun a i hi => ?_, fun i j hj1 hj2 hi => ?_⟩
   · show (Qim * g * Qm)ᴴ * Formalism.QuantumDeterminants.Hpk k r * (Qim * g * Qm) = Formalism.QuantumDeterminants.Hpk k r
     rw [← hT.hH]

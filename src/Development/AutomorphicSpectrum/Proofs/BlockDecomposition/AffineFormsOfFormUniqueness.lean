@@ -153,17 +153,6 @@ end Alg
 section Rp
 variable {R : Type} [CommRing R] {C : Type 1} [Category.{0} C]
 
-theorem rep_unique
-    {A : C ⥤ CommAlgCat.{0} R} {a b : IdF A} {j : ℕ}
-    {z : ∀ s : ComposableArrows C j, A.obj (s.obj (Fin.last j))} {c c' : CH.H (sq a b) j}
-    (h : Rep a b z c) (h' : Rep a b z c')
-    : c = c' := by
-  obtain ⟨f, hf, rfl, e⟩ := h
-  obtain ⟨f', hf', rfl, e'⟩ := h'
-  have : f = f' := funext fun s => Subtype.ext ((e s).trans (e' s).symm)
-  subst this
-  rfl
-
 theorem rep_sum
     {A : C ⥤ CommAlgCat.{0} R} {a b : IdF A} {j : ℕ} {ι : Type} (S : Finset ι)
     (z : ι → ∀ s : ComposableArrows C j, A.obj (s.obj (Fin.last j))) (c : ι → CH.H (sq a b) j)
@@ -292,17 +281,6 @@ theorem form_smul
     : E.form σ I (r • x) s = r • E.form σ I x s := by
   simp only [Frame.form, map_smul, mul_smul_comm]
 
-theorem rep_smul
-    {A : C ⥤ CommAlgCat.{0} R} {a b : IdF A} {j : ℕ}
-    {z : ∀ s : ComposableArrows C j, A.obj (s.obj (Fin.last j))} {c : CH.H (sq a b) j}
-    (r : R) (h : Rep a b z c)
-    : Rep a b (fun s => r • z s) (r • c) := by
-  obtain ⟨f, hf, rfl, e⟩ := h
-  refine ⟨r • f, by rw [map_smul, hf, smul_zero], rfl, fun s => ?_⟩
-  change r • (show sqM a b _ from f s).1 = _
-  rw [e s]
-  rfl
-
 theorem frame_cl
     (hF : IsFil Φ Fil) (E : Frame Φ d) (σ : ∀ T : C, E.D ⟶ T) (hc : E.GrConst Fil) (a : ℕ)
     : ∃ Cl : (Fin a → Fin d) → Φ.A.obj E.D →ₗ[R] CH.H (gr Fil (a : ℤ)) a,
@@ -321,23 +299,23 @@ theorem frame_cl
   let Cl : (Fin a → Fin d) → Φ.A.obj E.D →ₗ[R] CH.H (gr Fil (a : ℤ)) a := fun I => {
     toFun := c I
     map_add' := fun x y =>
-      rep_unique (hcr I (x + y))
+      _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_unique (hcr I (x + y))
         (GlobalTheory.CompanionTheory.GrForm.rep_add
           (fun s => by
             rw [form_add, sub_self]
             exact zero_mem _)
           (hcr I x) (hcr I y))
     map_smul' := fun r x =>
-      rep_unique (hcr I (r • x)) (by
+      _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_unique (hcr I (r • x)) (by
         have e : E.form σ I (r • x) = fun s => r • E.form σ I x s := funext (form_smul E σ I r x)
         rw [e]
-        exact rep_smul r (hcr I x))
+        exact _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_smul r (hcr I x))
   }
   refine ⟨Cl, hcr, fun I hI => ?_, fun I π x => ?_⟩
   · ext x
     exact (GlobalTheory.CompanionTheory.AltForm.form_alternating hF E σ hc a 0 (a : ℤ) (by simp) I x
       (hx0 x) _ (hcr I x)).1 hI
-  · exact rep_unique (hcr (I ∘ π) x)
+  · exact _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_unique (hcr (I ∘ π) x)
       ((GlobalTheory.CompanionTheory.AltForm.form_alternating hF E σ hc a 0 (a : ℤ) (by simp) I x
         (hx0 x) _ (hcr I x)).2.1 π)
 
@@ -384,7 +362,7 @@ theorem frame_bij
         exact sub_eq_zero.2 hxy)
     exact sub_eq_zero.1 this
   · obtain ⟨x, -, hx⟩ := h2 c
-    exact ⟨x, rep_unique (hrep x) hx⟩
+    exact ⟨x, _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_unique (hrep x) hx⟩
 end Frame
 
 section Rule
@@ -605,7 +583,8 @@ theorem frame_main
       (fun I => Cl I (θ (g₀ * ∏ k, b.repr (KaehlerDifferential.D R A (g k)) (I k))))
       (fun I _ => hCl I _)
       ⟨0, map_zero _, rfl, fun s => rfl⟩
-  refine rep_unique hsum (GlobalTheory.CompanionTheory.GrForm.rep_congr (fun s => hrule s) hrep)
+  refine _root_.GlobalTheory.CompanionTheory.ConeLocal.rep_unique hsum
+    (GlobalTheory.CompanionTheory.GrForm.rep_congr (fun s => hrule s) hrep)
 
 end FrameMain
 

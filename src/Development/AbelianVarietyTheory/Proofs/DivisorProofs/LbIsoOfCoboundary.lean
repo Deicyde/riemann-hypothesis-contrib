@@ -41,6 +41,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -225,8 +226,7 @@ theorem lbIso_detOm_Llam : LBIso X.detOm (X.Llam (mu0 Dw)) := by
     rfl
   have e₃ := X.F.ev_LL_g (fun ix => ix.elim 0 fun _ => 1) k k' z hh
   rw [Fintype.prod_option] at e₃
-  simp only [Option.elim, neg_zero, zpow_zero, one_mul, zpow_neg, zpow_one, Finset.prod_inv_distrib]
-    at e₃
+  simp only [Option.elim, neg_zero, zpow_zero, zpow_neg, zpow_one, Finset.prod_inv_distrib] at e₃
   let a : Sˣ :=
     Units.map (ev (z ≫ X.π) _ hM).toMonoidHom (detChg (X.F.M k).toMChart (X.F.M k').toMChart)
   have e₄ : ev z _ hh (X.F.detOm.g k k').val = (a⁻¹).val :=

@@ -49,6 +49,7 @@ open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.Inde
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.level_operators_at_prime_off_level_datum
     : ∀ {D : D7} (V : HSp D) (β : GL (Fin V.rank) (Lev.EAf D))
         (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) (N : ℕ) (L : LevDat D.host.E ℂ V.rank),
@@ -67,7 +68,4 @@ theorem _root_.GlobalTheory.T.level_operators_at_prime_off_level_datum
                 IsInfFam θ
                   → ∀ U ∈ Mult θ M (levS V β L) (levChi V β L),
                     postOn M (hk V P c) U ∈ Mult θ M (levS V β L) (levChi V β L) := by
-  first
-  | exact @GlobalTheory.LevOp.level_operators
-  | exact GlobalTheory.LevOp.level_operators
-  | (intros; apply GlobalTheory.LevOp.level_operators <;> assumption)
+  first | exact @GlobalTheory.LevOp.level_operators

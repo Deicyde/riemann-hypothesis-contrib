@@ -52,8 +52,6 @@ namespace Formalism.L2.Fam.NPC.LatticeFinitenessFree
 
 open Formalism.L2.Fam.NPC
 
-
-
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (B : LocBase0 H what₂)
 
 theorem jMt_injective (μ : what₂.Tup) (j : ℕ) : Function.Injective (what₂.jMt μ j) := by

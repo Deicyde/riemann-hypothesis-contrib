@@ -38,8 +38,6 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-
-
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up
@@ -75,25 +73,24 @@ def GeometricNormExtension
     × PLift (GoodO (w.D Z) nch xd)
 def SpectralFiniteness : Prop :=
   AllSt fun K _ _ _ w P x =>
-    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt)
-        (Γ : GeoP),
+    ∀ (l : _root_.GlobalTheory.HeightCounting.Up.StrictHenselianAcyclicLevel hL x) (S : SExt),
       (ListSt cDep x ∧ SatU P)
         → ∃ (Z : w.Lt)
             (v : Lv3
               (_root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension
-                (_root_.GlobalTheory.HeightCounting.Up.extensionWithOrigin hL cDep) S Γ).s
+                (_root_.GlobalTheory.HeightCounting.Up.extensionWithOrigin hL cDep) S).s
               K w Z),
           v.Wt = P.Wt ∧ Kept l.c.ch v.nch
 def SecondNonvanishing : Prop :=
-  ∀ (S : SExt) (Γ : GeoP),
+  ∀ (S : SExt),
     Pass KPx
       (IsBuiltE (_root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension
-        (_root_.GlobalTheory.HeightCounting.Up.extensionWithOrigin hL cDep) S Γ).s)
+        (_root_.GlobalTheory.HeightCounting.Up.extensionWithOrigin hL cDep) S).s)
       fun K B f T =>
         ∃ w : ColW B f T,
           Start K B f T w ∧ Has3
             (_root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension
-              (_root_.GlobalTheory.HeightCounting.Up.GeometricNormExtension hL cDep) S Γ).s
+              (_root_.GlobalTheory.HeightCounting.Up.GeometricNormExtension hL cDep) S).s
             K B f T w
 end Slot
 variable (hL : _root_.UpperTheory.Zero.LLC.RecTExists)

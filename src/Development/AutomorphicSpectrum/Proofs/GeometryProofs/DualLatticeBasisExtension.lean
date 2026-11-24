@@ -181,7 +181,6 @@ theorem dual_pull
           rw [hω'']
           exact Submodule.subset_span ⟨wl l, hwl l, rfl⟩)
       have h2 : jd (wl l) (∑ k, a k • j (c k : V)) = a l := by
-
         rw [map_sum]
         have : ∀ k, jd (wl l) (a k • j (c k : V)) = a k * (if l = k then 1 else 0) := by
           intro k

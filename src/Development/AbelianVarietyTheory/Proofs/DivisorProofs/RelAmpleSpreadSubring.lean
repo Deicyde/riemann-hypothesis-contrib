@@ -49,6 +49,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.BCTools
 import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+import Mathlib.CategoryTheory.Monoidal.Opposite.Mon
 
 @[expose] public section
 
@@ -151,11 +152,7 @@ theorem relAmple_spread_subring
   have hrange : Set.range (U.ι ≫ spMap (Subring.inclusion h)) ⊆ Set.range D.ι := by
     rw [Scheme.Opens.range_ι]
     rintro _ ⟨z, rfl⟩
-    have hz : U.ι z ∈ (U : Set (Sp R₂)) := by
-      first
-      | exact (Scheme.Opens.range_ι U) ▸ ⟨z, rfl⟩
-      | (rw [← Scheme.Opens.range_ι U]; exact ⟨z, rfl⟩)
-      | exact z.2
+    have hz : U.ι z ∈ (U : Set (Sp R₂)) := by first | exact (Scheme.Opens.range_ι U) ▸ ⟨z, rfl⟩
     exact hz
   have hA' :=
     FibreAmple.relAmple_of_factor hM (IsPullback.of_hasPullback A₀.hom D.ι) sq

@@ -61,6 +61,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
   GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+
 theorem _root_.GlobalTheory.T.potSemistable_of_potCrystalline_decompositionGroup
     : ∀ (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
         (hw : w ∈ placesOver D.host.E (D.nd.l i)) (K' : FinExt (D.nd.l i))
@@ -74,7 +75,4 @@ theorem _root_.GlobalTheory.T.potSemistable_of_potCrystalline_decompositionGroup
         → (pc (D.loc (D.nd.l i)) h hN hF hS).IsPotCrys ((D.nbr i w hw).rep (r.comp (decS D.nd w)))
         → GlobalTheory.Pst.IsPstAt (D.loc (D.nd.l i)) (D.nbr i w hw)
           (GlobalTheory.Pst.resDec D.nd.plOm.1 (mapRep (iotaOQ D.nd D.naut i) r) w) := by
-  first
-  | exact @GlobalTheory.PstOfCrys.pst_of_pc
-  | exact GlobalTheory.PstOfCrys.pst_of_pc
-  | (intros; apply GlobalTheory.PstOfCrys.pst_of_pc <;> assumption)
+  first | exact @GlobalTheory.PstOfCrys.pst_of_pc

@@ -2,8 +2,11 @@ module
 
 public import Development.WeilBound.ThetaLifts.Reductions.WeilPairs.DCdE
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHalfAbstract
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralAdelicGLMulVecHaarEqModulusDetStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RationalMatricesDiscreteCocompactAdelicMatrixSpaStatement
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralAdelicGLMulVecHaarEqModulusDet
+public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceTensorProductFiniteExtension
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumF
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RationalMatricesDiscreteCocompactAdelicMatrixSpa
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaFunctionHeisenbergInvariant
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -87,8 +90,7 @@ theorem dC_dual (J : Matrix (Fin nT) (Fin nT) E) (hJ : J.det ≠ 0)
     Matrix.submatrix_id_id, diagCols, dbl, Matrix.transpose_fromRows,
     Matrix.fromCols_mul_fromBlocks, Matrix.fromCols_mul_fromRows]
   simp only [Matrix.transpose_one, Matrix.one_mul, Matrix.mul_zero, add_zero, zero_add, neg_mul_neg,
-    Matrix.neg_mul, Matrix.mul_neg, neg_neg, Matrix.mul_smul,
-    Matrix.mul_nonsing_inv _ (Ne.isUnit hJ), ← add_smul]
+    Matrix.mul_neg, Matrix.mul_smul, Matrix.mul_nonsing_inv _ (Ne.isUnit hJ), ← add_smul]
   norm_num
 
 theorem dC_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) (n : ℕ)
@@ -148,8 +150,7 @@ theorem integral_mul
             : ℝ)
           : ℂ)
         * ∫ w, g w ∂ν := by
-  obtain ⟨i1, i2, i3, i4, i5, -⟩ :=
-    GlobalTheory.T.rationalMatrices_discrete_cocompact_adelicMatrixSpace F E nS nT
+  obtain ⟨i1, i2, i3, i4, i5, -⟩ := _root_.GlobalTheory.AdelicMatrixLatticeF.lattice F E nS nT
   have := GlobalTheory.HeisThetaF.isTopologicalRing_AEF (F := F) (E := E)
   have : BorelSpace (WOF F E nS nT) := ⟨rfl⟩
   letI : MeasurableSpace (Fin (nT * nS) → AF F ⊗[F] E) := borel _
@@ -193,7 +194,7 @@ theorem integral_mul
       Matrix.one_apply]
     simp
   have h :=
-    GlobalTheory.T.integral_adelicGL_mulVec_haar_eq_modulus_det F E _ t (ν.map em)
+    _root_.GlobalTheory.JacSubst.integral_mulVec F E _ t (ν.map em)
       ((vecE F E nS nT).isAddHaarMeasure_map ν c1 c2) (fun u => g ((vecE F E nS nT).symm u))
   rw [integral_map_equiv, integral_map_equiv, hd, map_pow, map_pow, NNReal.coe_pow] at h
   refine Eq.trans ?_ (h.trans ?_)
@@ -225,8 +226,7 @@ theorem change
                               = ((mfac F E nS s : ℝ) : ℂ) ^ 2
                                 * ∫ w, phase σ JS JT ξ₀ B.ψ y w * N ((s.1.map (cAF σ))ᵀ * w) ∂ν := by
   intro F E _ _ _ _ _ σ B hB nS nT JS JT hS hT ξ₀ hξ hσ ν 𝓕 hν h𝓕 s N hN hI
-  obtain ⟨i1, i2, i3, i4, i5, -⟩ :=
-    GlobalTheory.T.rationalMatrices_discrete_cocompact_adelicMatrixSpace F E nS nT
+  obtain ⟨i1, i2, i3, i4, i5, -⟩ := _root_.GlobalTheory.AdelicMatrixLatticeF.lattice F E nS nT
   have := GlobalTheory.HeisThetaF.isTopologicalRing_AEF (F := F) (E := E)
   have : BorelSpace (WOF F E nS nT) := ⟨rfl⟩
   have hA

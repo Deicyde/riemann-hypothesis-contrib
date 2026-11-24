@@ -56,11 +56,15 @@ open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg Uppe
 section
 variable {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E)
 
-private theorem chiS_map (S T : Type) [CommRing S] [Algebra A S] [CommRing T] [Algebra A T] (f : S →ₐ[A] T)
-    (y : S ⊗[A] E) :
-    D.chiS T (Algebra.TensorProduct.map f (AlgHom.id A E) y) = (D.chiS S y).map (f : S →+* T) := by
-  have h := D.nat (Polynomial S) (Polynomial T) (Polynomial.mapAlgHom f) (Polynomial.X ⊗ₜ 1 -
-    Algebra.TensorProduct.map (IsScalarTower.toAlgHom A S (Polynomial S)) (AlgHom.id A E) y)
+private theorem chiS_map
+    (S T : Type) [CommRing S] [Algebra A S] [CommRing T] [Algebra A T]
+    (f : S →ₐ[A] T) (y : S ⊗[A] E)
+    : D.chiS T (Algebra.TensorProduct.map f (AlgHom.id A E) y)
+      = (D.chiS S y).map (f : S →+* T) := by
+  have h :=
+    D.nat (Polynomial S) (Polynomial T) (Polynomial.mapAlgHom f)
+      (Polynomial.X ⊗ₜ 1
+        - Algebra.TensorProduct.map (IsScalarTower.toAlgHom A S (Polynomial S)) (AlgHom.id A E) y)
   refine Eq.trans ?_ h
   unfold Det.chiS
   congr 1
@@ -72,25 +76,33 @@ private theorem chiS_map (S T : Type) [CommRing S] [Algebra A S] [CommRing T] [A
     | tmul s x => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-private theorem F_map (S T : Type) [CommRing S] [Algebra A S] [CommRing T] [Algebra A T] (f : S →ₐ[A] T)
-    (y : S ⊗[A] E) :
-    Polynomial.aeval (Algebra.TensorProduct.map f (AlgHom.id A E) y)
-      (D.chiS T (Algebra.TensorProduct.map f (AlgHom.id A E) y)) =
-      Algebra.TensorProduct.map f (AlgHom.id A E) (Polynomial.aeval y (D.chiS S y)) := by
+private theorem F_map
+    (S T : Type) [CommRing S] [Algebra A S] [CommRing T] [Algebra A T]
+    (f : S →ₐ[A] T) (y : S ⊗[A] E)
+    : Polynomial.aeval (Algebra.TensorProduct.map f (AlgHom.id A E) y)
+        (D.chiS T (Algebra.TensorProduct.map f (AlgHom.id A E) y))
+      = Algebra.TensorProduct.map f (AlgHom.id A E) (Polynomial.aeval y (D.chiS S y)) := by
   rw [chiS_map]
   generalize D.chiS S y = p
   induction p using Polynomial.induction_on' with
   | add p q hp hq => simp only [Polynomial.map_add (f := _), map_add (f := _), hp, hq]
-  | monomial k a =>
-    simp [Polynomial.aeval_monomial, Algebra.TensorProduct.algebraMap_apply]
+  | monomial k a => simp [Polynomial.aeval_monomial, Algebra.TensorProduct.algebraMap_apply]
 
-private theorem expand {ι : Type} (S : Type) [CommRing S] [Algebra A S] (f : MvPolynomial ι A →ₐ[A] S)
+private theorem expand
+    {ι : Type}
+    (S : Type) [CommRing S] [Algebra A S]
+    (f : MvPolynomial ι A →ₐ[A] S)
     (N : Set E) (w : MvPolynomial ι A ⊗[A] E)
-    (h : ∀ α, TensorProduct.lid A E ((MvPolynomial.lcoeff A α).rTensor E w) ∈ N) :
-    Algebra.TensorProduct.map f (AlgHom.id A E) w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) := by
+    (h : ∀ α, TensorProduct.lid A E ((MvPolynomial.lcoeff A α).rTensor E w) ∈ N)
+    : Algebra.TensorProduct.map f (AlgHom.id A E) w
+      ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) := by
   classical
-  have hw : ∃ s : Finset (ι →₀ ℕ), ∀ t, s ⊆ t → w = ∑ α ∈ t, (MvPolynomial.monomial α (1 : A)) ⊗ₜ[A]
-      TensorProduct.lid A E ((MvPolynomial.lcoeff A α).rTensor E w) := by
+  have hw
+      : ∃ s : Finset (ι →₀ ℕ), ∀ t,
+        s ⊆ t
+          → w
+            = ∑ α ∈ t, (MvPolynomial.monomial α (1 : A)) ⊗ₜ[A]
+              TensorProduct.lid A E ((MvPolynomial.lcoeff A α).rTensor E w) := by
     clear h
     induction w with
     | add a b ha hb =>
@@ -101,8 +113,8 @@ private theorem expand {ι : Type} (S : Type) [CommRing S] [Algebra A S] (f : Mv
       rw [← hs t (Finset.subset_union_left.trans ht), ← hs' t (Finset.subset_union_right.trans ht)]
     | tmul p z =>
       refine ⟨p.support, fun t ht => ?_⟩
-      simp only [LinearMap.rTensor_tmul, TensorProduct.lid_tmul, MvPolynomial.lcoeff_apply, ← smul_tmul,
-        ← sum_tmul, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
+      simp only [LinearMap.rTensor_tmul, TensorProduct.lid_tmul, MvPolynomial.lcoeff_apply,
+        ← smul_tmul, ← sum_tmul, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
       congr 1
       conv_lhs => rw [p.as_sum]
       refine Finset.sum_subset ht fun α _ hα => ?_
@@ -114,21 +126,23 @@ private theorem expand {ι : Type} (S : Type) [CommRing S] [Algebra A S] (f : Mv
   rw [Algebra.TensorProduct.map_tmul, ← mul_one (f _), ← smul_eq_mul, ← smul_tmul']
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, h α, rfl⟩)
 
-private theorem part1 (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E) :
-    Polynomial.aeval y (D.chiS S y) ∈
-      Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)) := by
+private theorem part1 (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E)
+    : Polynomial.aeval y (D.chiS S y)
+      ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)) := by
   obtain ⟨k, s, x, rfl⟩ := TensorProduct.exists_sum_tmul_eq y
-  have : ∑ j, s j ⊗ₜ[A] x j =
-      Algebra.TensorProduct.map (MvPolynomial.aeval s) (AlgHom.id A E) (Det.gen (A := A) x) := by
-
+  have : ∑ j, s j ⊗ₜ[A] x j
+      = Algebra.TensorProduct.map (MvPolynomial.aeval s) (AlgHom.id A E) (Det.gen (A := A) x) := by
     simp [Det.gen, map_sum]
   rw [this, F_map]
   exact expand S _ _ _ fun α => TwoSidedIdeal.subset_span ⟨k, x, α, rfl⟩
 
-private theorem rT_mem (P S : Type) [CommRing P] [Algebra A P] [CommRing S] [Algebra A S] (g : P →ₗ[A] S)
-    (N : Set E) (w : P ⊗[A] E) (h : w ∈ Submodule.span P ((fun z : E => (1 : P) ⊗ₜ[A] z) '' N)) :
-    g.rTensor E w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) := by
-  suffices H : ∀ p : P, g.rTensor E (p • w) ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) by
+private theorem rT_mem
+    (P S : Type) [CommRing P] [Algebra A P] [CommRing S] [Algebra A S]
+    (g : P →ₗ[A] S)
+    (N : Set E) (w : P ⊗[A] E) (h : w ∈ Submodule.span P ((fun z : E => (1 : P) ⊗ₜ[A] z) '' N))
+    : g.rTensor E w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) := by
+  suffices H
+      : ∀ p : P, g.rTensor E (p • w) ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' N) by
     simpa using H 1
   induction h using Submodule.span_induction with
   | mem x hx =>
@@ -140,14 +154,17 @@ private theorem rT_mem (P S : Type) [CommRing P] [Algebra A P] [CommRing S] [Alg
   | add x y _ _ hx hy => intro p; rw [smul_add, map_add (f := _)]; exact add_mem (hx p) (hy p)
   | smul a x _ hx => intro p; rw [smul_smul]; exact hx _
 
-private theorem chElt_bc (S : Type) [CommRing S] [Algebra A S] {k : ℕ} (x : Fin k → S ⊗[A] E) (α : Fin k →₀ ℕ) :
-    (D.baseChange S).chElt x α = ((MvPolynomial.lcoeff S α).restrictScalars A).rTensor E
-      (Polynomial.aeval (Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen x))
-        (D.chiS _ (Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen x)))) := by
+private theorem chElt_bc
+    (S : Type) [CommRing S] [Algebra A S] {k : ℕ} (x : Fin k → S ⊗[A] E) (α : Fin k →₀ ℕ)
+    : (D.baseChange S).chElt x α
+      = ((MvPolynomial.lcoeff S α).restrictScalars A).rTensor E
+        (Polynomial.aeval (Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen x))
+          (D.chiS _ (Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen x)))) := by
   unfold Det.chElt
   generalize Det.gen (A := S) x = y
-  have h1 : (D.baseChange S).chiS (MvPolynomial (Fin k) S) y =
-      D.chiS _ (Det.cancel A E S (MvPolynomial (Fin k) S) y) := by
+  have h1
+      : (D.baseChange S).chiS (MvPolynomial (Fin k) S) y
+        = D.chiS _ (Det.cancel A E S (MvPolynomial (Fin k) S) y) := by
     unfold Det.chiS
     rw [(d_bc D S).1]
     congr 1
@@ -171,47 +188,53 @@ private theorem chElt_bc (S : Type) [CommRing S] [Algebra A S] {k : ℕ} (x : Fi
       rw [Det.cancel_tmul, mul_comm]
       simp [smul_tmul', MvPolynomial.coeff_C_mul, mul_comm b]
 
-private theorem chElt_one (S : Type) [CommRing S] [Algebra A S] {k : ℕ} (x : Fin k → E) (α : Fin k →₀ ℕ) :
-    (D.baseChange S).chElt (fun i => (1 : S) ⊗ₜ[A] x i) α = (1 : S) ⊗ₜ[A] D.chElt x α := by
+private theorem chElt_one
+    (S : Type) [CommRing S] [Algebra A S] {k : ℕ} (x : Fin k → E) (α : Fin k →₀ ℕ)
+    : (D.baseChange S).chElt (fun i => (1 : S) ⊗ₜ[A] x i) α = (1 : S) ⊗ₜ[A] D.chElt x α := by
   rw [chElt_bc]
-  have : Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen fun i => (1 : S) ⊗ₜ[A] x i) =
-      Algebra.TensorProduct.map (MvPolynomial.mapAlgHom (Algebra.ofId A S)) (AlgHom.id A E)
+  have : Det.cancel A E S (MvPolynomial (Fin k) S) (Det.gen fun i => (1 : S) ⊗ₜ[A] x i)
+      = Algebra.TensorProduct.map (MvPolynomial.mapAlgHom (Algebra.ofId A S)) (AlgHom.id A E)
         (Det.gen (A := A) x) := by
-
     simp [Det.gen, map_sum, Det.cancel_tmul]
   rw [this, F_map]
   unfold Det.chElt
   generalize Polynomial.aeval (Det.gen (A := A) x) (D.chiS (MvPolynomial (Fin k) A) (Det.gen x)) = w
   induction w with
   | add a b ha hb => simp only [map_add (f := _), tmul_add, ha, hb]
-  | tmul s y =>
-    simp [MvPolynomial.coeff_map, Algebra.ofId_apply, Algebra.algebraMap_eq_smul_one, smul_tmul]
+  | tmul s y => simp [MvPolynomial.coeff_map, Algebra.algebraMap_eq_smul_one, smul_tmul]
 
-private theorem span_mul (S : Type) [CommRing S] [Algebra A S] (I : TwoSidedIdeal E) (w : S ⊗[A] E)
-    (h : w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E))) (u : S ⊗[A] E) :
-    u * w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)) ∧
-    w * u ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)) := by
+private theorem span_mul
+    (S : Type) [CommRing S] [Algebra A S]
+    (I : TwoSidedIdeal E) (w : S ⊗[A] E)
+    (h : w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)))
+    (u : S ⊗[A] E)
+    : u * w ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E))
+      ∧ w * u ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)) := by
   induction h using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨z, hz, rfl⟩ := hx
     induction u with
     | add a b ha hb => rw [add_mul, mul_add]; exact ⟨add_mem ha.1 hb.1, add_mem ha.2 hb.2⟩
     | tmul s e =>
-      have key : ∀ t ∈ I, s ⊗ₜ[A] t ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)) := by
+      have key
+          : ∀ t ∈ I,
+            s ⊗ₜ[A] t ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (I : Set E)) := by
         intro t ht
         rw [← mul_one s, ← smul_eq_mul, ← smul_tmul']
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, ht, rfl⟩)
       simp only [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
       exact ⟨key _ (I.mul_mem_left _ _ hz), key _ (I.mul_mem_right _ _ hz)⟩
-  | zero => simp
-  | add x y _ _ hx hy => rw [add_mul, mul_add]; exact ⟨add_mem hx.1 hy.1, add_mem hx.2 hy.2⟩
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    rw [add_mul, mul_add]; exact ⟨add_mem hx.1 hy.1, add_mem hx.2 hy.2⟩
   | smul a x _ hx =>
     rw [mul_smul_comm, smul_mul_assoc]
     exact ⟨Submodule.smul_mem _ _ hx.1, Submodule.smul_mem _ _ hx.2⟩
 
-private theorem part2 (S : Type) [CommRing S] [Algebra A S] :
-    ((D.baseChange S).CH : Set (S ⊗[A] E)) =
-      Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)) := by
+private theorem part2 (S : Type) [CommRing S] [Algebra A S]
+    : ((D.baseChange S).CH : Set (S ⊗[A] E))
+      = Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)) := by
   ext w
   simp only [SetLike.mem_coe]
   constructor
@@ -236,9 +259,12 @@ private theorem part2 (S : Type) [CommRing S] [Algebra A S] :
       | mem x hx =>
         obtain ⟨k, x, α, rfl⟩ := hx
         exact TwoSidedIdeal.subset_span ⟨k, _, α, (chElt_one D S x α).symm⟩
-      | zero => simp
-      | add x y _ _ hx hy => simp only [tmul_add]; exact add_mem hx hy
-      | neg x _ hx => simp only [tmul_neg]; exact neg_mem hx
+      | zero =>
+        simp
+      | add x y _ _ hx hy =>
+        simp only [tmul_add]; exact add_mem hx hy
+      | neg x _ hx =>
+        simp only [tmul_neg]; exact neg_mem hx
       | left_absorb a x _ hx =>
         have := TwoSidedIdeal.mul_mem_left _ ((1 : S) ⊗ₜ[A] a) _ hx
         simpa using this
@@ -251,12 +277,20 @@ private theorem part2 (S : Type) [CommRing S] [Algebra A S] :
 
 end
 
-theorem UpperTheory.V.CA.d_chS :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (S : Type) [CommRing S] [Algebra A S], (∀ y : S ⊗[A] E, Polynomial.aeval y (D.chiS S y) ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E))) ∧ ((D.baseChange S).CH : Set (S ⊗[A] E)) = Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)) ∧ (D.IsCH → (D.baseChange S).IsCH ∧ ∀ x : E, Polynomial.aeval x (D.chi x) = 0) := by
+theorem UpperTheory.V.CA.d_chS
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (S : Type)
+        [CommRing S] [Algebra A S],
+      (∀ y : S ⊗[A] E,
+          Polynomial.aeval y (D.chiS S y)
+            ∈ Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E)))
+        ∧ ((D.baseChange S).CH : Set (S ⊗[A] E))
+          = Submodule.span S ((fun z : E => (1 : S) ⊗ₜ[A] z) '' (D.CH : Set E))
+        ∧ (D.IsCH → (D.baseChange S).IsCH ∧ ∀ x : E, Polynomial.aeval x (D.chi x) = 0) := by
   intro n A E _ _ _ D S _ _
   refine ⟨part1 D S, part2 D S, fun h => ?_⟩
-  have hb : ∀ (T : Type) [CommRing T] [Algebra A T],
-      Submodule.span T ((fun z : E => (1 : T) ⊗ₜ[A] z) '' (D.CH : Set E)) = ⊥ := by
+  have hb
+      : ∀ (T : Type) [CommRing T] [Algebra A T],
+        Submodule.span T ((fun z : E => (1 : T) ⊗ₜ[A] z) '' (D.CH : Set E)) = ⊥ := by
     intro T _ _
     rw [Submodule.span_eq_bot]
     rintro _ ⟨z, hz, rfl⟩

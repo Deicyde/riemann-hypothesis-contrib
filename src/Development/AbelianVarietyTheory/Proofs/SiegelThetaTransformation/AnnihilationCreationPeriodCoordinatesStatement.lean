@@ -50,6 +50,7 @@ open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
 open scoped TensorProduct ComplexConjugate Real Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
 theorem _root_.GlobalTheory.T.annihilation_creation_periodCoordinates
     : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ B,
       C.IsB B
@@ -76,7 +77,4 @@ theorem _root_.GlobalTheory.T.annihilation_creation_periodCoordinates
                               + (1 / 2 : ℂ)
                                 * (fderiv ℝ Φ (C.zOf (C.xB B) w) u
                                   - I * fderiv ℝ Φ (C.zOf (C.xB B) w) (I • u)))) := by
-  first
-  | exact @GlobalTheory.Ker.annih_crea_coord
-  | exact GlobalTheory.Ker.annih_crea_coord
-  | (intros; apply GlobalTheory.Ker.annih_crea_coord <;> assumption)
+  first | exact @GlobalTheory.Ker.annih_crea_coord

@@ -60,7 +60,4 @@ theorem _root_.GlobalTheory.T.weilQk_pairing_existsUnique_torus
                 ∧ ∀ t,
                   p.y = 0 → IsTor t p.g
                     → WeilQkIs D.toPre F k p p' (t (Multiplicative.ofAdd p'.y)).val := by
-  first
-  | exact @GlobalTheory.weilQk_existsUnique
-  | exact GlobalTheory.weilQk_existsUnique
-  | (intros; apply GlobalTheory.weilQk_existsUnique <;> assumption)
+  first | exact @GlobalTheory.weilQk_existsUnique

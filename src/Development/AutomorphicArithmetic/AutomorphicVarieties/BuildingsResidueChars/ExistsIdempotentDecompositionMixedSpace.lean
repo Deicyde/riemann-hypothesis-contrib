@@ -73,7 +73,7 @@ private theorem one_tmul_add_tmul_mul_I_eq_smul_of_sq_eq_one
   simp only [TensorProduct.tmul_add, TensorProduct.tmul_smul]
   rw [hc (σ * Complex.I) (g 1), hc (σ * Complex.I) (g Complex.I)]
   simp only [← algebraMap_smul ℂ z.re, ← algebraMap_smul ℂ z.im, ← algebraMap_smul ℂ (-z.im)]
-  match_scalars <;> simp only [Complex.coe_algebraMap, Complex.ofReal_neg]
+  match_scalars <;> simp only [Complex.coe_algebraMap]
     <;> first | ring1 | linear_combination (z.im * σ * σ) * Complex.I_mul_I - z.im * hσ
 
 private theorem idem_lemma_2 (A B : Type) [Fintype A] [DecidableEq A] [Fintype B] [DecidableEq B]
@@ -200,10 +200,7 @@ private theorem idem_lemma_2 (A B : Type) [Fintype A] [DecidableEq A] [Fintype B
               Bool.true_eq_false]
             at hs
           <;> simp only [σ, if_true, Bool.false_eq_true, if_false] <;> match_scalars
-          <;> first
-            | ring1
-            | linear_combination (1 / 4 : ℂ) * Complex.I_mul_I
-            | linear_combination (-1 / 4 : ℂ) * Complex.I_mul_I
+          <;> first | ring1 | linear_combination (1 / 4 : ℂ) * Complex.I_mul_I
       · simp only [hgmul' b b' _ _ hb, TensorProduct.tmul_zero, add_zero, smul_zero]
   · rw [Fintype.sum_sum_type, Fintype.sum_prod_type]
     simp only [Sum.elim_inl, Sum.elim_inr, Fintype.sum_bool]

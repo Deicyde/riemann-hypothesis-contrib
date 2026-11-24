@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
   GlobalTheory.EtC
+
 theorem _root_.GlobalTheory.T.etaleCochainEvalOnSimplex_basic_properties
     : ∀ (R : Type) [CommRing R] {E : Spc} {I : Cx R} {n : ℤ},
       (∀ (α β : Cochain ((chains R).obj E) I n) p s h U x,
