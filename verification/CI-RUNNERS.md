@@ -5,6 +5,12 @@
 - **Use a dedicated account:** jobs run untrusted PR code.
 - **Prerequisites:** Git, Python 3.11+ with tarfile extraction filters (upstream CPython 3.11.4+; Debian 12's own python3 lacks them), C compiler, Bubblewrap, Elan.
 - Download [ci-runner.py](https://raw.githubusercontent.com/leanprover-community/riemann-hypothesis/main/scripts/ci-runner.py).
-- Run `python3 ci-runner.py doctor` and send Kim the output.
+- Check the filesystem that will hold the runner's build state, and send Kim the output:
+
+  ```bash
+  python3 ci-runner.py doctor --work-directory "${RH_CI_STATE_DIR:-$HOME/.local/share/riemann-build-state}"
+  ```
+
+  If the runner service sets `RH_CI_STATE_DIR` to use a separate disk, use the same value for this check and make sure the disk is mounted.
 - Run `python3 ci-runner.py install`.
 - Kim supplies private enrollment files and the start command.
