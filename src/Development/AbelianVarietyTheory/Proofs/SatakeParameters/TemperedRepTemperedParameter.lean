@@ -557,7 +557,7 @@ theorem tempered_lpChar_lpSp
         (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (x : WD h),
       x.mono0 → (∀ φ : Weil h, deg φ = 1 → ∀ α ∈ x.eig φ, ‖α‖ = 1)
         → ∀ l : ℕ, (x.lpChar (WD.lpSp (h := h) l)).tempered := by
-  apply GlobalTheory.WeilDeligne.WD.tempered_lpChar_lpSp_of_mono0 <;> assumption
+  apply GlobalTheory.WeilDeligne.WD.tempered_lpChar_lpSp_of_mono0
 
 theorem norm_eig_eq_of_isIrrWD
     : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]

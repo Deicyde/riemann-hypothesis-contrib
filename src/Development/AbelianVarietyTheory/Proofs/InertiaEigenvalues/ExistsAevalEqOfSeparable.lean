@@ -126,7 +126,7 @@ theorem trace_nondeg
 
 theorem trace_σ (K : UQ) (B : InvAlg K) (a : B.A)
     : Algebra.trace K.E B.A (B.σ a) = K.c (Algebra.trace K.E B.A a) := by
-  apply GlobalTheory.SesqAsym.trace_σ <;> assumption
+  apply GlobalTheory.SesqAsym.trace_σ
 
 theorem exists_degreeLT_equiv
     (F V : Type) [Field F] [AddCommGroup V] [Module F V] [FiniteDimensional F V]

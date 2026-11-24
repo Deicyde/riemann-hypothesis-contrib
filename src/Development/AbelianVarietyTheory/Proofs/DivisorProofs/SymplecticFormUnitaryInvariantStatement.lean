@@ -72,7 +72,4 @@ theorem _root_.GlobalTheory.T.symplectic_form_unitary_invariant
                 (AF F)))
             W.J)
           x u := by
-  first
-  | exact @GlobalTheory.SympInv.symp_act
-  | exact GlobalTheory.SympInv.symp_act
-  | (intros; apply GlobalTheory.SympInv.symp_act <;> assumption)
+  first | exact @GlobalTheory.SympInv.symp_act

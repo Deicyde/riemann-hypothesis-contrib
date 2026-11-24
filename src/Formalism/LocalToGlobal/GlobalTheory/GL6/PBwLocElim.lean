@@ -286,7 +286,7 @@ open scoped Matrix
 variable (D : D7) (u : D.what₂.Word)
 
 theorem bwE_loc_Ow (w : D.what₂.places.Pl) : bwE_Loc (bwA_Ow D w) := by
-  apply Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.bwD_loc_Ow <;> assumption
+  apply Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.bwD_loc_Ow
 
 theorem bwE_mem_Ow
     (w : D.what₂.places.Pl) (hw : OverT D u w)

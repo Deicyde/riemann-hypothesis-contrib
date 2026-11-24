@@ -339,7 +339,7 @@ theorem σ_τ
     {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
     {ε : PreTilt O p} (F : BFrame ε)
     : F.σ F.τ = p * F.τ := by
-  apply GlobalTheory.WindowIso.σ_τ <;> assumption
+  apply GlobalTheory.WindowIso.σ_τ
 
 end GlobalTheory.FLam
 

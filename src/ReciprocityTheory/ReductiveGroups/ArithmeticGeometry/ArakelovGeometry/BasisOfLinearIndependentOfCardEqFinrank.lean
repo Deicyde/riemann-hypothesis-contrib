@@ -611,11 +611,7 @@ theorem chartGen_indep
     have h1 := hF (MvPolynomial.mem_support_iff.1 hd)
     have hdeg : ∑ i, d i = n := by
       rw [← h1]
-      first
-      | simp [Finsupp.weight_apply, Finsupp.sum_fintype]
-      | simp [Finsupp.degree_eq_sum]
-      | exact (Finsupp.sum_fintype _ _ (by simp)).symm
-      | simp [Finsupp.degree, Finsupp.sum_fintype]
+      first | simp [Finsupp.weight_apply, Finsupp.sum_fintype]
     rw [mul_div_assoc]
     congr 1
     simp_rw [div_pow]
@@ -893,11 +889,7 @@ theorem sec_div_isIntegral
     have h1 := hph (MvPolynomial.mem_support_iff.1 hd)
     have hdeg : ∑ i, d i = n := by
       rw [← h1]
-      first
-      | simp [Finsupp.weight_apply, Finsupp.sum_fintype]
-      | simp [Finsupp.degree_eq_sum]
-      | exact (Finsupp.sum_fintype _ _ (by simp)).symm
-      | simp [Finsupp.degree, Finsupp.sum_fintype]
+      first | simp [Finsupp.weight_apply, Finsupp.sum_fintype]
     rw [mul_div_assoc]
     congr 1
     simp_rw [div_pow]

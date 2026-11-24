@@ -38,22 +38,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
-
-namespace I195MixedCoordinates_6f24fc13148e8b26f9b44878
-
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.MixModel MeasureTheory
-attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
-public noncomputable abbrev source
-    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D T.rank ρ)) (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ)
-    : WO S₀ T → ℂ := fun w₀ =>
-  ∫ a in 𝓕, heisO ψ S T (a * d.pY)
-    (heisO ψ S T (x * d.pX) (heisO ψ S T (w₀ * d.p0) f)) 0 ∂μ
-
-end I195MixedCoordinates_6f24fc13148e8b26f9b44878
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.MixedCoordinates
 
 @[expose] public section
 
@@ -83,9 +68,7 @@ theorem mixS_support_inBox
             → ∃ K : Set (Mx D T.rank ρ),
               IsCompact K
                 ∧ ∀ f ∈ GlobalTheory.Size.thetaLevel ψ S T U, ∀ x w,
-                  (_root_.I195MixedCoordinates_6f24fc13148e8b26f9b44878.source d) T ψ v.μ v.𝓕 f x w
-                      ≠ 0
-                    → InBox K x := by
+                  (_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕 f x w ≠ 0 → InBox K x := by
   intro D ψ hψ S S₀ T ρ d v U hU
   obtain ⟨K, hK, hbox⟩ :=
     GlobalTheory.T.finiteAnnihilator_open_subgroup_in_box D ψ hψ S S₀ T ρ d U hU
@@ -98,7 +81,7 @@ theorem mixS_support_inBox
   rw [Pi.smul_apply, smul_eq_mul] at hw
   have h1
       : (ψ (symplO S T (d.extX T x) (d.extY T a)) - 1)
-          * (_root_.I195MixedCoordinates_6f24fc13148e8b26f9b44878.source d) T ψ v.μ v.𝓕 f x w
+          * (_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕 f x w
         = 0 := by
     rw [sub_mul, one_mul, ← hw, sub_self]
   exact sub_eq_zero.mp ((mul_eq_zero.mp h1).resolve_right hne)

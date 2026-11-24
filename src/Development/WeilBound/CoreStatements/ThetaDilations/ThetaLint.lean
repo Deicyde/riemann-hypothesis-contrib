@@ -110,7 +110,7 @@ theorem theta_int
                 → ∀ (n : ℕ) (S : Set (Fin n → Fin M → E)) (Φ : (Fin n → Fin M → AF F ⊗[F] E) → ℂ),
                   Measurable Φ → Integrable Φ (thetaMeas σ J μ 𝓕 S)
                     → meanC μ 𝓕 (thetaS F E σ M J Φ S) = ∫ X, Φ X ∂(thetaMeas σ J μ 𝓕 S) := by
-  apply CompanionTheory.PlacePermOperatorBicommutantSpan.theta_int <;> assumption
+  apply CompanionTheory.PlacePermOperatorBicommutantSpan.theta_int
 
 theorem act_rat
     {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
@@ -139,6 +139,6 @@ theorem theta_inv
                     ∧ thetaMeas σ J μ 𝓕 {X | gramE σ J X = T}
                         {X | gramR (AF F) σ J X = T.map (inclR (AF F))}ᶜ
                       = 0 := by
-  apply CompanionTheory.PlacePermOperatorBicommutantSpan.theta_inv <;> assumption
+  apply CompanionTheory.PlacePermOperatorBicommutantSpan.theta_inv
 
 end PositivityTheory.PlacePermOperatorBicommutantSpan

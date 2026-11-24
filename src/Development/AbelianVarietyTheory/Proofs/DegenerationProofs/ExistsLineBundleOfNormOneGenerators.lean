@@ -106,7 +106,7 @@ theorem exists_point_norm_valF_eq
                   ⊤ hy φ)
               : K)
             : PadicAlgCl p) := by
-  apply _root_.GlobalTheory.BoundedRegular.exists_point_norm_valF_eq <;> assumption
+  apply _root_.GlobalTheory.BoundedRegular.exists_point_norm_valF_eq
 
 theorem existsUnique_resG_eq
     {X : Scheme.{0}} [IsIntegral X]
@@ -158,7 +158,7 @@ theorem regular_of_bounded_at_padicAlgCl_points
                   → (∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ X),
                     y (cPt p) ∈ W → Set.range (gPt p ≫ y) ⊆ U → ‖valF (gPt p ≫ y) U φ‖ = 1)
                   → ∃ ψ : Γ(X, W), IsUnit ψ ∧ resG X h ψ = φ)) := by
-  apply _root_.GlobalTheory.regular_of_bounded_at_padicAlgCl_points <;> assumption
+  apply _root_.GlobalTheory.regular_of_bounded_at_padicAlgCl_points
 
 end RegularSupport
 

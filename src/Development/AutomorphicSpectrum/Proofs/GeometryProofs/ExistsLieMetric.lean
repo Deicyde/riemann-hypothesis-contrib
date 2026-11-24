@@ -112,7 +112,7 @@ theorem lat_val
         (∀ (e : E) (w : ER), M.ValAt z e (MR.pt w) ↔ ∃ he : e ∈ M.lat ⟨centre z, h⟩, ev ⟨e, he⟩ = w)
           ∧ (∀ (a : regAt ξ ⟨centre z, h⟩) (r : R) e, ValAt ξ z (a : Ω) r → ev (a • e) = r • ev e)
           ∧ Submodule.span R (Set.range ev) = ⊤ := by
-  apply GlobalTheory.CompanionTheory.Ar.lieLat_val <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.lieLat_val
 
 variable
   {X : Scheme.{0}} {Ω : Type} [Field Ω]

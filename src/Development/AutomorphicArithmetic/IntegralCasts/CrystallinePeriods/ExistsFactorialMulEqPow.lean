@@ -251,6 +251,12 @@ variable (p) in
 def map (f : R →+* S) : Acris p R →+* Acris p S := extend (AcrisZero.map p f)
 
 variable (p R) in
+/--
+The Frobenius endomorphism of `Acris p R`, defined by extending the Witt vector Frobenius
+on `Ainf p R`.
+
+TODO: Unify this with `GroundTheory.PAdicHodge.ACris.phi`.
+-/
 def frob : Acris p R →+* Acris p R := extend (AcrisZero.frob p R)
 
 @[simp]

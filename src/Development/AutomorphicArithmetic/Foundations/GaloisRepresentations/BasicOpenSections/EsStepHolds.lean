@@ -1066,7 +1066,7 @@ theorem UpperTheory.Gal.Mod.hopOp : GalEx → CorrOpEq → HopOp := by
     simp only [LinearMap.comp_apply, LinearMap.sum_apply] at h1 ⊢
 
     simp only [T, pullTot, DirectSum.lmap_lof, LinearMap.comp_apply, h1, map_sum, Functor.map_comp,
-      pullQ_comp, LinearMap.sum_apply]
+      pullQ_comp]
   have hT : IsCorrOp l (H.sΩ Ω g) (H.tΩ Ω g) T := ⟨
     W,
     c,

@@ -56,7 +56,7 @@ namespace GlobalTheory.BSP
 theorem eval_derivative_scaleRoots_mul {R : Type*} [CommRing R] (P : Polynomial R) (s x : R)
     : (Polynomial.derivative (P.scaleRoots s)).eval (s * x)
       = s ^ (P.natDegree - 1) * (Polynomial.derivative P).eval x := by
-  apply GlobalTheory.Henselisation.eval_derivative_scaleRoots_mul <;> assumption
+  apply GlobalTheory.Henselisation.eval_derivative_scaleRoots_mul
 
 theorem exists_approx_root_scaleRoots
     {R : Type*} [CommRing R]

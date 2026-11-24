@@ -448,7 +448,7 @@ theorem horiz_eq_xi_red
         [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime]
         [NormedAlgebra ℚ_[l] K] (P : PhiMod O K l e a ι) (v : Vec K a ι),
       P.conn v = 0 → v = P.xi (red v) := by
-  apply GlobalTheory.BK.PhiMod.eq_xi_red_of_conn_eq_zero <;> assumption
+  apply GlobalTheory.BK.PhiMod.eq_xi_red_of_conn_eq_zero
 
 end GlobalTheory
 end -- clump:auto

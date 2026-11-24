@@ -503,7 +503,7 @@ theorem recentre_mem_ball
 
 theorem exists_perm {n : ℕ} (S : Finset (Fin n))
     : ∃ π : Equiv.Perm (Fin n), ∀ j, ((π j : Fin n) : ℕ) < S.card ↔ j ∈ S := by
-  apply GlobalTheory.CompanionTheory.Ar.ChartGeo.exists_perm_prefix <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.ChartGeo.exists_perm_prefix
 
 private theorem analyticAt_lift_chart_symm
     {P : Ideal (MRing ι)} {n : ℕ}

@@ -712,11 +712,7 @@ theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors
       simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
       refine Finset.sum_congr rfl fun l _ => ?_
       show IsLocalRing.residue O (if (∅ : Finset (Fin g)) = ∅ then ev₀ 0 a l else 0) * wf ∅ l = _
-      first
-      | (simp [wf]; done)
-      | (simp [wf]; rfl)
-      | rfl
-      | (simp only [wf, ↓ reduceDIte, ↓ reduceIte]; rfl)
+      first | (simp [wf]; done) | (simp [wf]; rfl) | rfl
     · intro I _ hI
       refine Finset.sum_eq_zero fun l _ => ?_
       show IsLocalRing.residue O (if I = ∅ then ev₀ I.card a l else 0) * _ = 0

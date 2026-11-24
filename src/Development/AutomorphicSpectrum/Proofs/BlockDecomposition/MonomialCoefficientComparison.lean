@@ -62,7 +62,6 @@ namespace GlobalTheory.CompanionTheory.CoefId
 
 theorem unitCircle_infinite : {z : ℂ | ‖z‖ = 1}.Infinite := by
   apply GroundTheory.Heights₂.Heights.ComplexSets.UnitaryZariskiDense.unit_circle_infinite
-    <;> assumption
 
 theorem poly_zero_of_torus
     {n : ℕ} (p : MvPolynomial (Fin n) ℂ)

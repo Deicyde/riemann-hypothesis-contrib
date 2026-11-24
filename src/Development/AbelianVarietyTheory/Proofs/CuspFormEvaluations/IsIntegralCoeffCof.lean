@@ -602,9 +602,7 @@ theorem cof_image
                       → cof Dw pl c.F n (letAct Dw pl c.F g P)
                         = (∏ t, ((g t : Matrix (Fin n) (Fin n) c.F).det) ^ (-(s t)))
                           • (detFac Dw pl c.F a s lam * actP lam g F) := by
-  first
-  | exact @_root_.GlobalTheory.WeightOrderLemmas.main
-  | (intros; exact _root_.GlobalTheory.WeightOrderLemmas.main ..)
+  first | exact @_root_.GlobalTheory.WeightOrderLemmas.main
 
 end GlobalTheory.FrameRead
 end -- clump:auto

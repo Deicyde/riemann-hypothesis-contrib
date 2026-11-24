@@ -170,7 +170,6 @@ theorem fill_eq
         | (have hl' : l = lρ := Fin.ext (by omega); subst hl'; simp)
         | simp
         | omega
-        | trace_state
   · have hF : ¬ Free (ρ + 1) (r, q) := fun hF => hI ((mem_transSet_union_upSet ρ _).2 hF)
     rw [dite_eq_right hI, dite_eq_right hF]
     by_cases hE : (r, q) ∈ (fixSet ρ ∪ lowSet ρ : Finset ((n ⊕ Fin c) × (n' ⊕ Fin (c + 1))))
@@ -185,7 +184,6 @@ theorem fill_eq
           | (have hl' : l = lρ := Fin.ext (by omega); subst hl'; simp)
           | simp
           | omega
-          | trace_state
     · rw [if_neg hE]
       simp only [fixSet, lowSet, Finset.mem_union, Finset.mem_filter, Finset.mem_univ, true_and]
         at hE
@@ -195,9 +193,6 @@ theorem fill_eq
           | rfl
           | (exfalso; omega)
           | (have hl' : l = lρ := Fin.ext (by omega); subst hl'; simp)
-          | simp
-          | omega
-          | trace_state
 
 theorem ch_add_rowAt (p : ℕ) (A : Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k) (u : n' → k)
     : ch (A + rowAt n c p u) = ch A := by

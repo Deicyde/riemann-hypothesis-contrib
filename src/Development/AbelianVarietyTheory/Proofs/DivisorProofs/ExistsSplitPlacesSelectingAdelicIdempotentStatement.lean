@@ -167,7 +167,7 @@ theorem tensor_sq
 
 theorem field_decomp (D : D7) (x : D.host.E)
     : ∃ u w : D.host.F, x = u • (1 : D.host.E) + w • D.host.sqrtMinusD := by
-  apply GlobalTheory.FockCompare.RealChart.host_span <;> assumption
+  apply GlobalTheory.FockCompare.RealChart.host_span
 
 theorem exists_half_abstract
     {F T T' : Type} [Field F] [NumberField F] [CommRing T] [CommRing T']

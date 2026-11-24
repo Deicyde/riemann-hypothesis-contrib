@@ -98,8 +98,6 @@ theorem gm_cont_of_smoothR
 private lemma natCast_le_coe_infty (k : ℕ) : (k : ℕ∞ω) ≤ ((⊤ : ℕ∞) : ℕ∞ω) := by
   first
     | exact WithTop.coe_le_coe.2 le_top
-    | exact_mod_cast le_top
-    | (norm_cast; exact le_top)
 
 theorem gm_exp_ck (n : ℕ) (z : M → V n) (ph : M → ℝ) (hph : SmoothR n z ph) (s : ℝ) (k : ℕ)
     : Ck n z k (fun y => (Real.exp (s * ph y) : ℂ)) := by
@@ -274,7 +272,6 @@ private lemma ck_one_of_ck_two {n : ℕ} {z : M → V n} {f : M → ℂ} (h : Ck
   refine (h e he).of_le ?_
   first
     | norm_num
-    | exact_mod_cast (show (1 : ℕ) ≤ 2 by norm_num)
 
 theorem gm_tstar_add
     (n : ℕ) (z : M → V n)
@@ -660,7 +657,7 @@ theorem locL2_sub_weightedL2
   rw [gm_memLp_two_iff _ hsub.aestronglyMeasurable] at hsub
   have e2 : ∀ x, ‖F0 x - u x‖ₑ ^ (2 : ℝ) = ‖F0 x - u x‖ₑ ^ 2 := by
     intro x
-    first | exact ENNReal.rpow_two _ | exact_mod_cast ENNReal.rpow_natCast _ 2
+    first | exact ENNReal.rpow_two _
   simpa [e2] using hsub
 
 end loc

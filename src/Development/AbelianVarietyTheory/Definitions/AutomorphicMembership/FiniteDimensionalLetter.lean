@@ -100,9 +100,7 @@ theorem letterMk_mul (c : U) (x : D) : letterMk m F τ (m c x) = τ c • letter
   exact Submodule.mem_iSup_of_mem c ⟨1 ⊗ₜ x, rfl⟩
 
 theorem span_letterMk : Submodule.span F (Set.range (letterMk m F τ)) = ⊤ := by
-  first
-  | (apply _root_.GlobalTheory.SpanQuotientTensor.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SpanQuotientTensor.main ..)
+  first | (apply _root_.GlobalTheory.SpanQuotientTensor.main <;> assumption)
 
 theorem letter_hom_ext
     {M : Type*} [AddCommGroup M] [Module F M]

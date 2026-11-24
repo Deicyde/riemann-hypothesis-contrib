@@ -491,9 +491,7 @@ theorem blk_mul
     (hαa : α * a = 1) (hβb : β * b = 1) (hαb : α * b = 0) (hβa : β * a = 0)
     (H K H' K' : Matrix (Fin d) (Fin d) R)
     : blk a b α β H K * blk a b α β H' K' = blk a b α β (H * H') (K * K') := by
-  first
-  | (apply _root_.GlobalTheory.SquareDistanceExpansion.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SquareDistanceExpansion.main ..)
+  first | (apply _root_.GlobalTheory.SquareDistanceExpansion.main <;> assumption)
 
 theorem blk_unitary
     (s : R →+* R)

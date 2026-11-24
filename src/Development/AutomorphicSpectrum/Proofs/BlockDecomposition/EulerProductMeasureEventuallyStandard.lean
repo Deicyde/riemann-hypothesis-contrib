@@ -98,6 +98,6 @@ theorem integrable_integral_pureN
                       ∧ ∫ X, pureN φ A X ∂I
                         = (c : ℂ) * (∫ X, φ X ∂minf) * (∏ v ∈ S, ((m v (A v)).toReal : ℂ))
                           * ((∏' v : {v // v ∉ S}, (m v.1 (latV b v.1)).toReal : ℝ) : ℂ) := by
-  apply _root_.GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN <;> assumption
+  apply _root_.GlobalTheory.CompanionTheory.WhitFree.Euler.integrable_integral_pureN
 
 end GlobalTheory.CompanionTheory.SiegelND.Coef.Euler

@@ -94,6 +94,6 @@ end OrderFree
 theorem cs_orderfree
     : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
       GlobalTheory.Published.IrreducibleAdmissibleGL → LUnlinkedComm k → LOrderFree k := by
-  apply CompanionTheory.PfEss.Zc2.cs_orderfree <;> assumption
+  apply CompanionTheory.PfEss.Zc2.cs_orderfree
 
 end PositivityTheory.PfEss.Zc2

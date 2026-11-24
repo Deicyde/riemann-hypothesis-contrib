@@ -132,7 +132,7 @@ theorem exists_den (b : FiniteAdeleRing R K)
   have hc
       : (algebraMap R (FiniteAdeleRing R K) (∏ v ∈ hfin.toFinset, s v) * b) w
         = algebraMap K (w.adicCompletion K) (algebraMap R K (∏ v ∈ hfin.toFinset, s v)) * b w := by
-    first | rfl | (rw [← IsScalarTower.algebraMap_apply]; rfl)
+    first | rfl
   rw [hc]
   by_cases hw : w ∈ hfin.toFinset
   · rw [← Finset.mul_prod_erase _ _ hw, map_mul, map_mul, mul_assoc, mul_left_comm]
@@ -165,7 +165,7 @@ theorem exists_approx_adele (b : FiniteAdeleRing R K)
   have e2
       : (algebraMap R (FiniteAdeleRing R K) r * b) v
         = algebraMap K (v.adicCompletion K) (algebraMap R K r) * b v := by
-    first | rfl | (rw [← IsScalarTower.algebraMap_apply]; rfl)
+    first | rfl
   have h1 := ha v
   rw [e2] at h1
   have e3

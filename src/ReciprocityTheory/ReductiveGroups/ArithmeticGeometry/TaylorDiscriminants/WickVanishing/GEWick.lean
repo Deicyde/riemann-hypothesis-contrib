@@ -234,8 +234,6 @@ theorem degLt_pderiv {n : ℕ} {P : MvPolynomial ι k} (h : DegLt (n + 1) P) (l 
         first
         | rw [← hs', Finsupp.degree_add, Finsupp.degree_single]
         | rw [← hs', map_add (f := _), Finsupp.degree_single]
-        | (rw [← hs']; simp [Finsupp.degree_add])
-        | (rw [← hs']; simp)
       exact hc (h s (by omega))
   · rw [if_neg hsm]
 
@@ -320,7 +318,6 @@ theorem exp_cut (t : k) (q : PS k 1 d) (hq0 : constantCoeff q = 0) (N : ℕ)
           smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, hm', if_true, sub_self]
         done
       )
-    | (simp [PowerSeries.coeff_exp, PowerSeries.coeff_X_pow, hm']; done)
   obtain ⟨R, hR⟩ := hdvd
   have hexp
       : PowerSeries.exp k
@@ -331,22 +328,20 @@ theorem exp_cut (t : k) (q : PS k 1 d) (hq0 : constantCoeff q = 0) (N : ℕ)
     ring
   have hc : constantCoeff (t • q) = 0 := by rw [MvPowerSeries.smul_eq_C_mul, map_mul, hq0, mul_zero]
   have hs : PowerSeries.HasSubst (t • q) := by
-    first
-    | exact PowerSeries.HasSubst.of_constantCoeff_zero hc
-    | (show IsNilpotent _; rw [hc]; exact IsNilpotent.zero)
+    first | exact PowerSeries.HasSubst.of_constantCoeff_zero hc
   have key : ∀ f : PowerSeries k, PowerSeries.subst (t • q) f = PowerSeries.substAlgHom hs f := by
     intro f
     first | rw [PowerSeries.coe_substAlgHom]
   have hX : PowerSeries.substAlgHom hs (PowerSeries.X : PowerSeries k) = t • q := by
-    first | exact PowerSeries.substAlgHom_X hs | (rw [← key]; exact PowerSeries.subst_X hs)
+    first | exact PowerSeries.substAlgHom_X hs
   refine ⟨C (t ^ (N + 1)) * PowerSeries.subst (t • q) R, ?_⟩
   unfold FB.expS
   rw [hexp]
 
   simp only [key, map_add (f := _), map_sum, map_mul, map_pow, map_smul, hX]
-  simp only [smul_pow, smul_smul, MvPowerSeries.smul_eq_C_mul, map_mul, map_pow]
+  simp only [MvPowerSeries.smul_eq_C_mul]
   congr 1
-  all_goals first | rfl | ring1 | (refine Finset.sum_congr rfl fun n _ => ?_; ring1)
+  all_goals first | ring1 | (refine Finset.sum_congr rfl fun n _ => ?_; ring1)
 
 theorem wickExp_of (hH : HalfSt) : WickExpSt := by
   intro k _ _ d F ι _ u c P q hc hq0 hq1 hq2 t G
@@ -404,16 +399,9 @@ theorem gauge_exp_identity
         (∀ j i, constantCoeff (a j i) = 0) → ∀ f g : PS k 2 d, ev a (f + g) = ev a f + ev a g := by
     intro a hz f g
     have hs : MvPowerSeries.HasSubst (fun p : Fin 2 × Fin d => a p.1 p.2) := by
-      first
-      | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hz p.1 p.2)
-      | exact MvPowerSeries.hasSubst_of_constantCoeff_nilpotent (fun p => by
-          rw [hz p.1 p.2]; exact IsNilpotent.zero)
-      | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun p => by
-          rw [hz p.1 p.2]; exact IsNilpotent.zero)
+      first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => hz p.1 p.2)
     unfold ev
-    first
-    | exact MvPowerSeries.subst_add hs f g
-    | (rw [← MvPowerSeries.coe_substAlgHom hs]; exact map_add _ f g)
+    first | exact MvPowerSeries.subst_add hs f g
   have hsplit
       : B.hL k h' w0
         = B.hL k h w0 + ev (n := 1) ![pt k d 0, comp1 (B.actK k w0) (pt k d 0)] (h' - h) := by

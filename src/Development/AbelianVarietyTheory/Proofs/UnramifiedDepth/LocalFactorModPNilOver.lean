@@ -106,7 +106,7 @@ private theorem exists_localFactor_lemma
     _root_.ReciprocityTheory.PGsh.LAlg.mk (A.carrier ⧸ I)
   let μ : _root_.ReciprocityTheory.PGsh.LHom A Λ := ⟨
     Ideal.Quotient.mkₐ R₀ I,
-    _root_.ReciprocityTheory.PGsh.TowerExample.isLocalHom_of_surj
+    _root_.IsLocalHom.of_surjective
       ((Ideal.Quotient.mkₐ R₀ I : A.carrier →ₐ[R₀] A.carrier ⧸ I) : A.carrier →+* A.carrier ⧸ I)
       (Ideal.Quotient.mkₐ_surjective R₀ I)
   ⟩

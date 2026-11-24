@@ -455,7 +455,7 @@ theorem exists_unitary_of_mod
     rw [map_mul, map_one] at h1
     refine (forall_sub_mem_iff_mapMatrix_eq S _ _).2 ?_
     rw [map_mul, map_one]
-    first | exact Matrix.mul_eq_one_comm.1 h1 | exact mul_eq_one_comm.1 h1
+    first | exact mul_eq_one_comm.1 h1
   let e :=
     LinearEquiv.ofBijective (GlobalTheory.RepTrivial.inc E n)
       ⟨GlobalTheory.RepTrivial.inc_injective, GlobalTheory.RepTrivial.inc_surjective⟩
@@ -524,7 +524,6 @@ theorem exists_unitary_of_mod
           have h1' := h1
           push_cast at hbk h1' ⊢
           rw [h1', Pi.smul_apply, ← hbk, smul_eq_mul]
-          all_goals first | rfl | simp
         have h2 : a k = (M : 𝓞 E) * b k := by
           first | exact NumberField.RingOfIntegers.coe_injective h3
         rw [h2]
@@ -728,7 +727,7 @@ theorem exists_unitary_mod
       simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.of_apply, Matrix.transpose_apply,
           Matrix.map_apply, Matrix.one_apply, map_sub, map_sum, map_mul, map_add, map_one, bar_bar,
           apply_ite (H.bar), map_zero, apply_ite (Ideal.Quotient.mk l.Mb), e1, e2, sub_self,
-          zero_mul, one_mul, add_zero, zero_add, mul_zero, mul_one, sub_zero]
+          zero_mul, one_mul, add_zero, zero_add, sub_zero]
         at key ⊢
       exact key
     · rw [← Ideal.Quotient.eq_zero_iff_mem]
@@ -748,7 +747,7 @@ theorem exists_unitary_mod
       simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.of_apply, Matrix.transpose_apply,
           Matrix.map_apply, Matrix.one_apply, map_sub, map_sum, map_mul, map_add, map_one, bar_bar,
           map_zero, apply_ite (Ideal.Quotient.mk (Mfr l)), e1, e2, sub_self, zero_mul, one_mul,
-          add_zero, zero_add, mul_zero, mul_one, sub_zero]
+          add_zero, zero_add, sub_zero]
         at key ⊢
       simpa [mul_comm] using key
   · show cSep l * H.bar (g i j) + (1 - cSep l) * g' j i - H.bar (g i j) ∈ l.Mb

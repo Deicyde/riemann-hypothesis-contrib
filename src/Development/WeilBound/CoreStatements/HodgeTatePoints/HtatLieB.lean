@@ -220,6 +220,6 @@ theorem lieChart_of_smooth_chart
           (1 : Over.mk (spMap (algebraMap R (Localization.Away f)) ≫ x) ⟶ G).left
               = spMap u ≫ hU.fromSpec
             → LieChart G x f := by
-  apply GlobalTheory.CompanionTheory.Ar.ChartDer.lieChart_of_smooth_chart <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.ChartDer.lieChart_of_smooth_chart
 
 end PositivityTheory.HtPt.Htat.Lie

@@ -428,7 +428,7 @@ theorem exists_repr_le (E : Type) [Field E] [NumberField E]
       0 ≤ C
         ∧ ∀ (x : 𝓞 E) (j : Module.Free.ChooseBasisIndex ℤ (𝓞 E)),
           |(((RingOfIntegers.basis E).repr x j : ℤ) : ℝ)| ≤ C * house (x : E) := by
-  apply _root_.GlobalTheory.IntCount.exists_abs_repr_le_mul_house <;> assumption
+  apply _root_.GlobalTheory.IntCount.exists_abs_repr_le_mul_house
 
 theorem house_le_of_isType
     {E : Type} [Field E] [NumberField E] [IsCMField E]

@@ -291,7 +291,6 @@ theorem exists_unit_norm_eq
         rw [h1, map_pow, hπ]
         first
         | (rw [← WithZero.exp_nsmul]; congr 1; simp)
-        | (rw [← WithZero.exp_nsmul]; simp)
       rw [adicInt_max_eq_span π hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
         adicInt_dvd_iff, hpow]
 
@@ -314,7 +313,6 @@ theorem exists_unit_norm_eq
       have hx0 : Valued.v x ≠ 0 := (lt_of_le_of_lt zero_le' hx').ne'
       have hmem : {y : Kv | Valued.v y = Valued.v x} ∈ 𝓝 x := by
         first
-        | exact Valuation.loc_const hx0
         | exact Valued.locally_const hx0
       filter_upwards [hmem] with y hy
       show ¬ Valued.v y ≤ r

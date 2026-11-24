@@ -1391,7 +1391,6 @@ theorem span_inner
     exact @_root_.GlobalTheory.InnerSumZeroSpan.main
   | (run_tac Lean.Elab.Tactic.liftMetaTactic (fun g => do pure [← g.revertAll]))
     exact _root_.GlobalTheory.InnerSumZeroSpan.main
-  | (intros; exact _root_.GlobalTheory.InnerSumZeroSpan.main ..)
 
 theorem sp_orth
     (w : InfinitePlace I.E)

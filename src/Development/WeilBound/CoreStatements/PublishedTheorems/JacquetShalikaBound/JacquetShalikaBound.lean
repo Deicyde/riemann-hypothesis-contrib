@@ -704,7 +704,7 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchim
 
 open GroundTheory.Automorphic.GLnLocal in
 theorem exists_pow_mul_mem_integer (a : F) : ∃ M : ℕ, (uniformizer F : F) ^ M * a ∈ 𝒪[F] := by
-  apply GlobalTheory.CompanionTheory.SatakeBound.LargeLattice.exists_pow_mul_mem <;> assumption
+  apply GlobalTheory.CompanionTheory.SatakeBound.LargeLattice.exists_pow_mul_mem
 
 open GroundTheory.Automorphic.GLnLocal in
 theorem pow_mul_mem_of_le {M M' : ℕ} (h : M ≤ M') {a : F} (ha : (uniformizer F : F) ^ M * a ∈ 𝒪[F])

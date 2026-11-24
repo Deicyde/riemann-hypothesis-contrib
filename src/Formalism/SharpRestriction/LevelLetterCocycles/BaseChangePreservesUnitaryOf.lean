@@ -1670,8 +1670,7 @@ theorem lone_K_mem (c : K) (a : ℤ) (ha : a ≤ 0) : algebraMap K BdR c ∈ PD.
   exact (PD.Fil 0).smul_mem c PD.one_mem
 
 include PD in
-theorem lone_one_notMem : (1 : BdR) ∉ PD.Fil 1 := by
-  apply PI.HodgeOfFon.W.Triv.one_not_mem_fil_one <;> assumption
+theorem lone_one_notMem : (1 : BdR) ∉ PD.Fil 1 := by apply PI.HodgeOfFon.W.Triv.one_not_mem_fil_one
 
 include PD in
 theorem lone_K_inter (c : K) (a : ℤ) (ha : 1 ≤ a) (h : algebraMap K BdR c ∈ PD.Fil a) : c = 0 := by

@@ -53,7 +53,7 @@ open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts For
 variable (D : D7) (u : D.what₂.Word)
 
 theorem bwA_natW_anti {N : ℕ} (lam : DomWeight N) : Antitone lam.natW := by
-  apply PI.WGL.lm_natW_anti <;> assumption
+  apply PI.WGL.lm_natW_anti
 
 theorem bwA_val_locInt
     (w : D.what₂.places.Pl)

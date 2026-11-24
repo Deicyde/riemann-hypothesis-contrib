@@ -368,11 +368,7 @@ theorem weighted_homogeneous_cancel
     split_ifs with he
     · refine Finset.sum_congr rfl ?_
       rintro ⟨x, y⟩ hxy
-      have hxy' : x + y = e := by
-        first
-        | simpa using hxy
-        | exact Finset.mem_antidiagonal.mp hxy
-        | exact Finsupp.mem_antidiagonal.mp hxy
+      have hxy' : x + y = e := by first | simpa using hxy
       dsimp only
       rw [coeff_weightedHomogeneousComponent]
       split_ifs with hy
@@ -386,11 +382,7 @@ theorem weighted_homogeneous_cancel
           exact add_left_cancel he
     · refine Finset.sum_eq_zero ?_
       rintro ⟨x, y⟩ hxy
-      have hxy' : x + y = e := by
-        first
-        | simpa using hxy
-        | exact Finset.mem_antidiagonal.mp hxy
-        | exact Finsupp.mem_antidiagonal.mp hxy
+      have hxy' : x + y = e := by first | simpa using hxy
       dsimp only
       rw [coeff_weightedHomogeneousComponent]
       split_ifs with hy

@@ -444,11 +444,6 @@ theorem rowBr_nonneg {l : ℕ} (hl : 2 ≤ l) : 0 ≤ rowBr L l := by
 
 end Signs
 
-theorem ge_five {l : ℕ} (hp : l.Prime) (h2 : l ≠ 2) (h3 : l ≠ 3) : 5 ≤ l := by
-  by_contra h
-  push_neg at h
-  interval_cases l <;> simp_all (config := { decide := true })
-
 theorem flatCD_le
     (L : SizeData₂ D) (tb : Tab L)
     (C : ℝ) (hBand : BandPlaceWeightApproximation L tb C)
@@ -510,7 +505,7 @@ theorem loc_le_lamB
   rw [if_neg he]
   · have hq : l ≠ D.host.q := fun h => hqd (Or.inl h)
     have hd : l ≠ D.host.d := fun h => hqd (Or.inr h)
-    have h5l := ge_five hp h2 h3
+    have h5l := Nat.Prime.five_le_of_ne_two_of_ne_three hp h2 h3
     have hle : (l : ℝ) ≤ lStar L ∨ l ∈ tb.exc := by
       by_contra hc
       push_neg at hc
@@ -847,7 +842,6 @@ alias nLam_pos := Formalism.MainNotions.TwistedPlaces.nLam_pos
 alias flatB := Formalism.MainNotions.TwistedPlaces.flatB
 alias flatB_nonneg := Formalism.MainNotions.TwistedPlaces.flatB_nonneg
 alias w''_nonneg := Formalism.MainNotions.TwistedPlaces.w''_nonneg
-alias ge_five := Formalism.MainNotions.TwistedPlaces.ge_five
 alias lamB_nonneg := Formalism.MainNotions.TwistedPlaces.lamB_nonneg
 alias rowBr := Formalism.MainNotions.TwistedPlaces.rowBr
 alias bbB := Formalism.MainNotions.TwistedPlaces.bbB

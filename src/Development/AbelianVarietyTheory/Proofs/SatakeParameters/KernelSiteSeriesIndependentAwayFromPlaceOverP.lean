@@ -1466,10 +1466,7 @@ theorem away_of_pos_pair
     exact Q.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
   have hab' : (b : D.host.E) = D.host.conj (a : D.host.E) := by
     rw [hab]
-    first
-    | exact Formalism.L2.PairingIndexBounds.F.sig_conj D _
-    | exact Formalism.L2.Fam.sig_eq_conj D.host D.sp.cm _
-    | exact Formalism.MainNotions.GlobalTheoryTheory.jnt_sig_eq_conj D _
+    first | exact Formalism.MainNotions.GlobalTheoryTheory.jnt_sig_eq_conj D _
   refine ⟨
     P,
     ⟨a, b, hab', ha, hb⟩,

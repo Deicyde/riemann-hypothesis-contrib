@@ -101,7 +101,7 @@ theorem sub_single_inj {n : ℕ} (mu : Fin n → ℝ)
   intro s t hst
   by_contra hne
   have h := congrFun hst s
-  simp [Pi.single_apply, hne] at h
+  simp [hne] at h
 
 theorem tens_exists
     : HypsG

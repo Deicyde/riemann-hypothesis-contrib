@@ -1033,9 +1033,7 @@ theorem finite_injective_localHom_and_extend
     (ρ : V →+* R)
     : Function.Injective ρ → ρ.Finite
       → IsLocalHom ρ ∧ ∀ ev : V →+* K, ∃ ev₁ : R →+* K, ev₁.comp ρ = ev := by
-  first
-  | (apply _root_.GlobalTheory.ValuationExtensionExistence.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.ValuationExtensionExistence.main ..)
+  first | (apply _root_.GlobalTheory.ValuationExtensionExistence.main <;> assumption)
 
 end GlobalTheory
 end -- clump:auto

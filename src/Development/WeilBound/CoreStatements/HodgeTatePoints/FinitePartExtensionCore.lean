@@ -743,7 +743,7 @@ theorem lTensor_map_injective
     [Module A M] [IsScalarTower R A M] [Module.Flat R M]
     (p : Ideal R)
     : Function.Injective ((p.map (algebraMap R A)).subtype.lTensor M) := by
-  apply GlobalTheory.FiniteFibreFlat.lTensor_map_injective <;> assumption
+  apply GlobalTheory.FiniteFibreFlat.lTensor_map_injective
 
 section Devissage
 

@@ -106,8 +106,7 @@ theorem orbit_unfold
     : IntegrableOn (fun y => ∑' c, F c y) Ω μ
       ∧ ∫ y in Ω, ∑' c, F c y ∂μ = ∑' j, ∫ y in ΩJ j, F (r j) y ∂μ := by
   classical
-  have hsm : ∀ (n : N) (y : H), n⁻¹ • y = (n : H)⁻¹ * y := fun n y => by
-    first | rfl | simp [Subgroup.smul_def]
+  have hsm : ∀ (n : N) (y : H), n⁻¹ • y = (n : H)⁻¹ * y := fun n y => by first | rfl
   have hFeq' : ∀ (n : N) (j : J) (y : H), F (act n (r j)) y = F (r j) (n⁻¹ • y) := by
     intro n j y; rw [hFeq, hsm]
   have hrinj : Function.Injective r := fun j j' h => huniq j j' 1 (by rw [h1, h])
@@ -142,7 +141,7 @@ theorem orbit_unfold
         refine hJu j _ hy1 _ e1 ?_
         have hh : ((n'⁻¹ * n : N) : H) * (n⁻¹ • y) = n'⁻¹ • y := by
           simp only [hsm]
-          first | simp [mul_assoc] | group
+          first | simp [mul_assoc]
         rw [hh]
         exact hy2
       obtain rfl : n = n' := (inv_mul_eq_one.mp e2).symm
@@ -153,7 +152,7 @@ theorem orbit_unfold
       have hmem : (n0 * s⁻¹)⁻¹ • y ∈ ΩJ j := by
         have hh : (n0 * s⁻¹)⁻¹ • y = (s : H) * (n0⁻¹ • y) := by
           simp only [hsm]
-          first | simp [mul_assoc] | group
+          first | simp [mul_assoc]
         rw [hh]
         exact hs2
       refine ⟨⟨(j, n0 * s⁻¹), hmem⟩, ?_⟩
@@ -235,10 +234,6 @@ theorem orbit_unfold
           rw [hrow]
           exact hlt
         )
-      | (
-          rw [hasFiniteIntegral_iff_enorm, hrow]
-          exact hlt
-        )
     calc
       ∫ y in ΩJ j, F (r j) y ∂μ
         = ∫ x, (ΩJ j).indicator (F (r j)) x ∂μ := (integral_indicator (hJm j)).symm
@@ -269,7 +264,7 @@ theorem orbit_unfold
       integrable_toReal_of_lintegral_ne_top hEm.aemeasurable hint.ne
     have hbound : ∀ᵐ y ∂(μ.restrict Ω), ‖∑' c, F c y‖ ≤ (∑' c, ‖F c y‖ₑ).toReal := by
       filter_upwards [hfin_ae] with y hy
-      rw [ENNReal.tsum_toReal_eq (fun c => by first | exact enorm_ne_top | simp)]
+      rw [ENNReal.tsum_toReal_eq (fun c => by first | exact enorm_ne_top)]
       simp only [toReal_enorm]
       exact norm_tsum_le_tsum_norm (hsN y hy)
     have hgm : AEStronglyMeasurable (fun y => ∑' c, F c y) (μ.restrict Ω) := by
@@ -280,14 +275,11 @@ theorem orbit_unfold
         filter_upwards [hfin_ae] with y hy
         exact (Summable.of_norm (hsN y hy)).hasSum
       have hfs : ∀ s : Finset C, Measurable fun y => ∑ c ∈ s, F c y := fun s => by
-        first | exact Finset.measurable_sum s (fun c _ => hFm c) | fun_prop
+        first | exact Finset.measurable_sum s (fun c _ => hFm c)
       first
       | exact aestronglyMeasurable_of_tendsto_ae Filter.atTop
           (fun s => (hfs s).aestronglyMeasurable)
           hlim
-      | exact (aemeasurable_of_tendsto_metrizable_ae Filter.atTop
-          (fun s => (hfs s).aemeasurable)
-          hlim).aestronglyMeasurable
     exact Integrable.mono' hgint hgm hbound
   · rw [hmain, hsplit]
     exact tsum_congr fun j => (hIJ j).symm

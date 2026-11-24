@@ -540,8 +540,7 @@ theorem meas_fib : ∀ A, MeasurableSet A → Measurable fun b => fib b A := by
 
 end
 
-theorem disintStep_holds : DisintStep := by
-  apply PI.VolStabSW.DiscreteGroups.disintStep_holds <;> assumption
+theorem disintStep_holds : DisintStep := by apply PI.VolStabSW.DiscreteGroups.disintStep_holds
 
 theorem fibOfDens_holds : FibOfDens := fibOfDens_of disintStep_holds
 

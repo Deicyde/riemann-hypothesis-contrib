@@ -142,7 +142,7 @@ def cut (a : FiniteAdeleRing (𝓞 F) F) (T : Finset (HeightOneSpectrum (𝓞 F)
 
 theorem tendsto_cut (a : FiniteAdeleRing (𝓞 F) F)
     : Filter.Tendsto (cut a) Filter.atTop (nhds a) := by
-  apply GlobalTheory.Mem.Chr.CharModel.tendsto_cut <;> assumption
+  apply GlobalTheory.Mem.Chr.CharModel.tendsto_cut
 
 theorem prod_local (k : Fˣ) (T : Finset (HeightOneSpectrum (𝓞 F)))
     : ((infDiag k * ∏ v ∈ T, localIdele F v (atFin v k) : Ideles F) : AdeleRing (𝓞 F) F)
@@ -183,7 +183,7 @@ theorem tendsto_prod_local (k : Fˣ)
     : Filter.Tendsto
       (fun T : Finset (HeightOneSpectrum (𝓞 F)) => infDiag k * ∏ v ∈ T, localIdele F v (atFin v k))
       Filter.atTop (nhds (diagUnits F k)) := by
-  apply GlobalTheory.Mem.Chr.CharModel.tendsto_prod_local <;> assumption
+  apply GlobalTheory.Mem.Chr.CharModel.tendsto_prod_local
 
 theorem locK_unr (χ : HChar F) {v : HeightOneSpectrum (𝓞 F)} (h : χ.UnrAt v) (k : Fˣ)
     : χ.locK v k = χ.val v ^ ordF v k := by
@@ -205,7 +205,7 @@ theorem finite_ordF (k : Fˣ) : {v : HeightOneSpectrum (𝓞 F) | ordF v k ≠ 0
   exact h0
 
 theorem productRule (χ : HChar F) : χ.ProductRule := by
-  apply GlobalTheory.Mem.Chr.CharModel.productRule <;> assumption
+  apply GlobalTheory.Mem.Chr.CharModel.productRule
 
 end Product
 

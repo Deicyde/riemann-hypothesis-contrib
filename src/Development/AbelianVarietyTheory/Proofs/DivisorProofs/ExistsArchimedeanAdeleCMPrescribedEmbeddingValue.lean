@@ -109,6 +109,6 @@ theorem exists_at_inf_values
           ∃ a : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
               (E := E),
             At (evI F) a ∧ ∀ w, piInf (τ w) a = z w := by
-  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf <;> assumption
+  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf
 
 end GlobalTheory.PolRangeInf

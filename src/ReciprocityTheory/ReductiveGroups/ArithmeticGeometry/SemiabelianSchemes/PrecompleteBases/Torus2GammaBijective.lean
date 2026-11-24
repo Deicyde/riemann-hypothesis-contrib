@@ -81,17 +81,13 @@ theorem isUnit_eq_single
   obtain ⟨v, huv⟩ := hu.exists_right_inv
   have coeffInj : ∀ p q : AddMonoidAlgebra R A, p.coeff = q.coeff → p = q := by
     intro p q hpq
-    first | exact AddMonoidAlgebra.coeff_injective hpq | (cases p; cases q; simp_all)
+    first | exact AddMonoidAlgebra.coeff_injective hpq
   have key
       : ∀ a0 b0 : A,
         UniqueAdd u.coeff.support v.coeff.support a0 b0
           → (u * v).coeff (a0 + b0) = u.coeff a0 * v.coeff b0 := by
     intro a0 b0 h
-    first
-    | exact AddMonoidAlgebra.coeff_mul_apply_add_eq_mul_of_uniqueAdd h
-    | exact AddMonoidAlgebra.mul_coeff_add_eq_mul_of_uniqueAdd h
-    | exact AddMonoidAlgebra.coeff_mul_of_uniqueAdd h
-    | exact AddMonoidAlgebra.coeff_mul_add_of_uniqueAdd h
+    first | exact AddMonoidAlgebra.coeff_mul_add_of_uniqueAdd h
   have hone : (u * v).coeff = Finsupp.single 0 1 := by
     rw [huv]
     first | (simp [AddMonoidAlgebra.one_def]; done)
@@ -123,10 +119,8 @@ theorem isUnit_eq_single
     le_antisymm hcard
       (Nat.mul_pos (Finsupp.support_nonempty_iff.2 (nz u (Or.inl huv))).card_pos
         (Finsupp.support_nonempty_iff.2 (nz v (Or.inr huv))).card_pos)
-  have cu : u.coeff.support.card = 1 := by
-    first | exact Nat.eq_one_of_mul_eq_one_right hprod | nlinarith
-  have cv : v.coeff.support.card = 1 := by
-    first | exact Nat.eq_one_of_mul_eq_one_left hprod | nlinarith
+  have cu : u.coeff.support.card = 1 := by first | exact Nat.eq_one_of_mul_eq_one_right hprod
+  have cv : v.coeff.support.card = 1 := by first | exact Nat.eq_one_of_mul_eq_one_left hprod
   obtain ⟨a, hc0, hca⟩ := Finsupp.card_support_eq_one.1 cu
   obtain ⟨b, hd0, hdb⟩ := Finsupp.card_support_eq_one.1 cv
   have hu' : u = single a (u.coeff a) := coeffInj _ _ (by simpa using hca)
@@ -140,8 +134,7 @@ theorem isUnit_eq_single
     rcases (Finsupp.single_eq_single_iff _ _ _ _).1 h4 with h5 | h5
     · exact h5.2
     · exact absurd h5.2 one_ne_zero
-  have hcu : IsUnit (u.coeff a) := by
-    first | exact isUnit_of_mul_eq_one _ _ hcd | exact IsUnit.of_mul_eq_one _ hcd
+  have hcu : IsUnit (u.coeff a) := by first | exact IsUnit.of_mul_eq_one _ hcd
   exact ⟨a, u.coeff a, hcu, hu'⟩
 
 theorem isUnit_single_one {R A : Type*} [CommRing R] [AddCommGroup A] (a : A)
@@ -175,7 +168,7 @@ theorem isIso_appTop_bij {A B : Scheme.{u}} (e : A ≅ B) : Function.Bijective e
 
 private theorem comp_appTop_lemma {A B C : Scheme.{u}} (f : A ⟶ B) (g : B ⟶ C)
     : (f ≫ g).appTop = g.appTop ≫ f.appTop := by
-  first | rfl | (simp; done)
+  first | rfl
 
 theorem appTop_comp_apply {A B C : Scheme.{u}} (f : A ⟶ B) (g : B ⟶ C) (x : Γ(C, ⊤))
     : (f ≫ g).appTop.hom x = f.appTop.hom (g.appTop.hom x) := by
@@ -210,7 +203,7 @@ theorem coord_injective
   · exact (Over.w g).trans (Over.w g').symm
 
 theorem toUnit_left (Z : Over S) : (toUnit Z).left = Z.hom := by
-  first | simpa using Over.w (toUnit Z) | (simp; done)
+  first | simpa using Over.w (toUnit Z)
 
 theorem over_appTop_comp {W Z V : Over S} (p : W ⟶ Z) (q : Z ⟶ V) (x : Γ(V.left, ⊤))
     : p.left.appTop.hom (q.left.appTop.hom x) = (p ≫ q).left.appTop.hom x := by
@@ -266,12 +259,6 @@ theorem isPushout_torusRing
   first
   | exact CommRingCat.isPushout_of_isPushout ZU.{u} (AddMonoidAlgebra ZU.{u} X) K
       (AddMonoidAlgebra K X)
-  | (
-      haveI := Algebra.IsPushout.symm
-         (inferInstance : Algebra.IsPushout ZU.{u} K (AddMonoidAlgebra ZU.{u} X) (AddMonoidAlgebra K X))
-      exact CommRingCat.isPushout_of_isPushout ZU.{u} (AddMonoidAlgebra ZU.{u} X) K
-        (AddMonoidAlgebra K X)
-    )
 
 theorem isPullback_torus
     : IsPullback
@@ -365,11 +352,8 @@ theorem torus_const_mul_chi
   have hc : (Scheme.ΓSpecIso (.of K)).hom.hom c₁ ≠ 0 :=
     (h1.map (Scheme.ΓSpecIso (.of K)).hom.hom).ne_zero
   first
-  | exact (((AddMonoidAlgebra.single_eq_single_iff _ _ _ _).1 h').resolve_right (fun h => hc h.1)).1
-  | exact ((AddMonoidAlgebra.single_eq_single_iff.1 h').resolve_right (fun h => hc h.1)).1
-  | (simp [AddMonoidAlgebra.single_eq_single_iff, hc] at h'; exact h'.1)
-  | (simp [hc] at h'; exact h'.1)
-  | (simp [hc] at h'; exact h')
+  | (simp at h'; exact h'.1)
+  | (simp at h'; exact h')
   | (
       by_contra ha
       have h2 := congrArg (fun p => AddMonoidAlgebra.coeff p a) h'
@@ -382,9 +366,7 @@ theorem torus_const_injective
   intro c₁ c₂ h
   have h' := congrArg (torusGamma K X).hom h
   rw [torusGamma_const, torusGamma_const] at h'
-  first
-  | exact (cr_iso_bij (Scheme.ΓSpecIso (.of K))).1 (AddMonoidAlgebra.single_injective (0 : X) h')
-  | exact (cr_iso_bij (Scheme.ΓSpecIso (.of K))).1 (by simpa using h')
+  first | exact (cr_iso_bij (Scheme.ΓSpecIso (.of K))).1 (by simpa using h')
 
 theorem isPullback_torus2
     : IsPullback
@@ -408,8 +390,6 @@ theorem isPullback_torus2
     by
       first
       | exact CommRingCat.isPushout_tensorProduct K (AddMonoidAlgebra K X) (AddMonoidAlgebra K X)
-      | exact CommRingCat.isPushout_of_isPushout K (AddMonoidAlgebra K X) (AddMonoidAlgebra K X)
-          (AddMonoidAlgebra K X ⊗[K] AddMonoidAlgebra K X)
   have h : IsPullback
       (Spec.map (CommRingCat.ofHom
         (Algebra.TensorProduct.includeLeftRingHom

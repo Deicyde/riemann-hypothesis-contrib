@@ -141,7 +141,7 @@ theorem coeff_det_eq
     split_ifs with h
     · subst h
       refine Finset.sum_congr rfl (fun σ _ => ?_)
-      simp only [Units.smul_def, MvPolynomial.coeff_smul, coeff_monomial, if_pos rfl]
+      simp only [Units.smul_def, MvPolynomial.coeff_smul, coeff_monomial]
       rfl
     · refine Finset.sum_eq_zero (fun σ _ => ?_)
       simp only [Units.smul_def, MvPolynomial.coeff_smul, coeff_monomial, if_neg h, smul_zero]

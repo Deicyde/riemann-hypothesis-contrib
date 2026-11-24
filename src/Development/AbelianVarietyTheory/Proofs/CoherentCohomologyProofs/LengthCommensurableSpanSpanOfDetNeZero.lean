@@ -581,13 +581,6 @@ theorem addVal_finset_prod {ι : Type*} (s : Finset ι) (a : ι → R)
       revert R h_1 h_2 h_3 ι s a
       exact @_root_.GlobalTheory.AdditiveValuationProduct.addVal_prod
     )
-  | (apply _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod <;> assumption)
-  | (intros; apply _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.AdditiveValuationProduct.addVal_prod
-        <;> first | assumption | infer_instance
-    )
   | (intros; exact _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod ..)
 
 theorem length_quotient_range_eq_addVal_det [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M)
@@ -653,13 +646,6 @@ theorem signedLength_span_eq_of_det_eq_unit_mul_zpow
       rename_i h_1 h_2 h_3 h_5 h_6 h_7 h_9 h_10 h_11 h_12 h_14 h_15
       revert R h_1 h_2 h_3 K h_5 h_6 h_7 V h_9 h_10 h_11 h_12 ι h_14 h_15 a b ha g hb ϖ hϖ u n hg
       exact @_root_.GlobalTheory.SignedLengthTower.signedLength_span_eq
-    )
-  | (apply _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq <;> assumption)
-  | (intros; apply _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.SignedLengthTower.signedLength_span_eq
-        <;> first | assumption | infer_instance
     )
   | (intros; exact _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq ..)
 

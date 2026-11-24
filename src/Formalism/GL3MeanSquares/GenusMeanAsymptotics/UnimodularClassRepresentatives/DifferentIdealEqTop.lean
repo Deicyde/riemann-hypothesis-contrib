@@ -213,9 +213,8 @@ theorem minpoly_eq
     Polynomial.eq_of_monic_of_dvd_of_natDegree_le (minpoly.monic hint) hqm hdvd
       (by rw [hqdeg]; exact hdeg2)
   rw [← heq, hq]
-  simp only [derivative_add, derivative_sub, derivative_mul, derivative_X_pow, derivative_C,
-    derivative_X, zero_mul, mul_one, zero_add, add_zero, map_add, map_sub, map_mul, map_pow,
-    aeval_X, aeval_C, map_natCast, hs]
+  simp only [derivative_mul, derivative_X_pow, derivative_C, derivative_X, zero_mul, mul_one,
+    zero_add, add_zero, map_add, map_sub, map_mul, map_pow, aeval_X, aeval_C, map_natCast, hs]
   first | ring
 
 theorem differentIdeal_eq_top
@@ -273,11 +272,7 @@ theorem discrTower : DiscrTower := by
     have e2 := Module.finrank_mul_finrank ℚ F K
     have e3 := NumberField.InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces (K := K)
     have e4 : NumberField.InfinitePlace.nrRealPlaces K = 0 := by
-      first
-      | exact NumberField.IsTotallyComplex.nrRealPlaces_eq_zero
-      | exact IsTotallyComplex.nrRealPlaces_eq_zero
-      | exact NumberField.InfinitePlace.nrRealPlaces_eq_zero_iff.mpr hTC
-      | exact NumberField.nrRealPlaces_eq_zero_iff.mpr hTC
+      first | exact NumberField.nrRealPlaces_eq_zero_iff.mpr hTC
     rw [QuadraticExtensionConjugation.finrank_eq_two hK hF] at e2
     unfold Formalism.HermitianLatticesTheory.fDeg
     omega

@@ -320,7 +320,7 @@ theorem eval_fwd
       rw [map_mul, map_mul, map_mul, map_mul, map_mul, hp, back, MvPolynomial.bind₁_X_right,
         MvPolynomial.map_X, MvPolynomial.eval_X]
       congr 1
-      first | (simp [blockForms, blockMapC]; done) | (simp [blockForms, blockMapC, mul_comm]; done)
+      first | (simp [blockForms, blockMapC]; done)
   rw [e]
   have h0 := hz.2 _ (back_fwd_sub_mem h hf)
   rw [map_sub, map_sub, sub_eq_zero] at h0

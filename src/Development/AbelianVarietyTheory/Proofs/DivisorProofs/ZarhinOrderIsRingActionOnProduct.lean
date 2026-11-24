@@ -237,7 +237,7 @@ theorem actZ_add (N N' : ord d)
     funext j
     exact Int.add_ediv_of_dvd_left (N.2 j i)
   · rw [MonObj.mul_comp, actZ_pb, actZ_pb, actZ_pb, ← E_add]
-    congr 1 <;> funext j
+    congr 1
 
 theorem actZ_mul
     [IsMonHom la] [IsMonHom mu]

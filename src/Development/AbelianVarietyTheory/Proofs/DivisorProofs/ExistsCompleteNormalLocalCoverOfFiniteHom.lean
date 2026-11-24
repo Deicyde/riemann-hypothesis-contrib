@@ -308,9 +308,7 @@ theorem exists_isCN_cover_of_finite
         → ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsLocalRing R') (ρ : R →+* R')
             (σ : C →+* R'),
           IsCN R' ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ ∧ σ.comp φ = ρ := by
-  first
-  | exact @_root_.GlobalTheory.FiniteLocalCompleteness.main
-  | (intros; exact _root_.GlobalTheory.FiniteLocalCompleteness.main ..)
+  first | exact @_root_.GlobalTheory.FiniteLocalCompleteness.main
 
 end GlobalTheory.LocExt
 end -- clump:auto

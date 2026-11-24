@@ -184,9 +184,7 @@ theorem heckeVec_dosetInd
     {a : G} {R : Finset G} (hR : ∀ γ ∈ R, γ ∈ DoubleCoset.doubleCoset a (K : Set G) K)
     (hR' : ∀ g ∈ DoubleCoset.doubleCoset a (K : Set G) K, ∃! γ, γ ∈ R ∧ γ⁻¹ * g ∈ K)
     : heckeVec ρ K (dosetInd ℂ K a) x = ∑ γ ∈ R, ρ γ x := by
-  first
-  | (apply _root_.GlobalTheory.DoubleCosetIndicatorSum.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.DoubleCosetIndicatorSum.main ..)
+  first | (apply _root_.GlobalTheory.DoubleCosetIndicatorSum.main <;> assumption)
 
 theorem heckeVec_rightReg (hK : IsCommensurated K) (hh : h ∈ Hecke ℂ K) (φ : G → W)
     : heckeVec (rightReg ℂ G W) K h φ = hAct K h φ := by

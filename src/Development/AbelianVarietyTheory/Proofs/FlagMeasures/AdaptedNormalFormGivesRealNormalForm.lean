@@ -508,8 +508,8 @@ theorem gram
 
   simp only [map_add (f := _), map_sum, map_smul, map_smulₛₗ, LinearMap.add_apply,
     LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, mul_zero, Finset.sum_const_zero,
-    add_zero, zero_add, mul_ite, mul_one, one_mul, Finset.sum_ite_eq, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true, starRingEnd_apply, hee, hff, hef, hfe, hez, hfz, hze, hzf]
+    add_zero, zero_add, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+    starRingEnd_apply, hee, hff, hef, hfe, hez, hfz, hze, hzf]
   simp only [mul_comm (star _)]
   ring
 
@@ -579,8 +579,7 @@ theorem nil_isom
 
   simp only [nil_apply, map_sub, map_sum, map_smul, map_smulₛₗ, LinearMap.sub_apply,
     LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, mul_zero, Finset.sum_const_zero,
-    sub_zero, mul_ite, ite_mul, mul_one, one_mul, Finset.sum_ite_eq, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true, starRingEnd_apply, hee, hw, hw'', sub_self]
+    sub_zero, starRingEnd_apply, hee, hw, hw'', sub_self]
 
 theorem rem_all
     (e f e' f' : Fin r → V)

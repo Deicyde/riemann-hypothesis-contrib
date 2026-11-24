@@ -205,11 +205,9 @@ theorem beta_eq_integral_inner_tv
         hw).1
     have e : ∀ c, tv p (x + a • y) w c = tv p x w c + a • tv p y w c := fun c =>
       GlobalTheory.TopVec.tv_add_smul Wp Wq P p Cb a x y w c hD hw hx hy
-    beta_reduce
     simp only [e]
     exact integral_inner_expand hx2 hy2 a
   · intro x hx
-    beta_reduce
     rw [(_root_.GlobalTheory.TopVec.levelZero_eq_integral_topVector_of_cpt hP Wp Wq P p Cb x w hD hx
         hw).2,
       ← integral_complex_ofReal]

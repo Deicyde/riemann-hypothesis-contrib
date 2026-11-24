@@ -910,9 +910,7 @@ theorem isNilpotent_of_trace_pow_eq_zero
     {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
     (f : Module.End K V) (h : ∀ k, 1 ≤ k → LinearMap.trace K V (f ^ k) = 0)
     : IsNilpotent f := by
-  first
-  | (apply _root_.GlobalTheory.NilpotentOfTracePowers.isNilpotent_of_trace_pow <;> assumption)
-  | (intros; exact _root_.GlobalTheory.NilpotentOfTracePowers.isNilpotent_of_trace_pow ..)
+  first | (apply _root_.GlobalTheory.NilpotentOfTracePowers.isNilpotent_of_trace_pow <;> assumption)
 
 end GlobalTheory.UnipNormalTrace
 end -- clump:auto

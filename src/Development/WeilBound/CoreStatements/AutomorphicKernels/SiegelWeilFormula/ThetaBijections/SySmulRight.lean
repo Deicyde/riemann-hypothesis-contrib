@@ -120,7 +120,7 @@ theorem incM_dbl {β : Type} [DecidableEq β] (J : Matrix β β E)
 
 theorem incM_diagCols {β : Type} [DecidableEq β]
     : incM F (diagCols β : Matrix (β ⊕ β) β E) = diagCols β := by
-  ext (i | i) j <;> simp [incM, diagCols, Matrix.one_apply] <;> split_ifs
+  ext (i | i) j <;> simp [incM, diagCols, Matrix.one_apply]
 
 namespace Adp
 

@@ -1098,7 +1098,7 @@ variable
 theorem measurePreserving_curry (μ : ∀ i j, Measure (Y i j)) [∀ i j, SigmaFinite (μ i j)]
     : MeasurePreserving (MeasurableEquiv.piCurry Y) (Measure.pi fun p : (i : ι) × κ i => μ p.1 p.2)
       (Measure.pi fun i => Measure.pi fun j => μ i j) := by
-  apply _root_.GlobalTheory.ColFourier.measurePreserving_piCurry <;> assumption
+  apply _root_.GlobalTheory.ColFourier.measurePreserving_piCurry
 
 end Curry
 

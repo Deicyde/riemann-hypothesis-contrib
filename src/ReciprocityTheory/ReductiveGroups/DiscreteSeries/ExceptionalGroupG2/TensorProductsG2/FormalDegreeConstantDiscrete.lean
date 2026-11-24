@@ -1014,7 +1014,6 @@ theorem cns_zuck_cpt
             = ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)), j s ((Ts s).op k (a s)) from
         Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
       cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
-    all_goals rfl
   · intro s hs v w hv hw
     refine ⟨
       Fin n × Fin n,
@@ -1142,7 +1141,6 @@ theorem cns_zuckd_cpt
             = ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)), j s ((Ts s).op k (a s)) from
         Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
       cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
-    all_goals rfl
   · intro s hs v w hv hw
     refine ⟨
       Fin n × Fin n,

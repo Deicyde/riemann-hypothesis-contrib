@@ -33,11 +33,16 @@ theorem extendOne_mul_inclusion (g : Matrix (Fin n) (Fin n) R)
 
 theorem extendOne_mulVec_single_last (g : Matrix (Fin n) (Fin n) R)
     : blk1 g *ᵥ Pi.single (Fin.last n) 1 = Pi.single (Fin.last n) 1 := by
-  ext i
   rw [Matrix.mulVec_single_one]
+  funext i
   induction i using Fin.lastCases with
-  | last => simp [blk1]
-  | cast i => simp [blk1, Fin.castSucc_ne_last]
+  | last =>
+    simp only [blk1, col_apply, submatrix_apply, finSumFinEquiv_symm_last, fromBlocks_apply₂₂,
+      one_apply_eq, Pi.single_eq_same]
+  | cast i =>
+    simp only [blk1, col_apply, submatrix_apply, finSumFinEquiv_symm_apply_castSucc,
+      finSumFinEquiv_symm_last, fromBlocks_apply₁₂, Matrix.zero_apply,
+      Pi.single_eq_of_ne (Fin.castSucc_ne_last i)]
 
 theorem det_extendOne (g : Matrix (Fin n) (Fin n) R) : (blk1 g).det = g.det := by
   simp [blk1, Matrix.det_submatrix_equiv_self, Matrix.det_fromBlocks_zero₂₁]
@@ -70,15 +75,8 @@ theorem extM_spec
   have hinv : (B.map φ)⁻¹ * B.map φ = 1 := Matrix.nonsing_inv_mul _ hBu
   have hA : A.map φ = B.map φ * inclusionAlt := by rw [← hBA, Matrix.map_mul, eN_map]
   have hz : (fun a => φ (z a)) = B.map φ *ᵥ Pi.single (Fin.last n) 1 := by
-    rw [← hBz]
-    ext a
-
-    simp only [Matrix.mulVec, dotProduct, map_apply, map_sum, map_mul]
-    refine Finset.sum_congr rfl fun k _ => ?_
-    congr 1
-    by_cases hk : k = Fin.last n
-    · subst hk; simp
-    · simp [hk]
+    rw [← hBz, Matrix.mulVec_single_one, Matrix.mulVec_single_one]
+    rfl
   refine ⟨?_, ?_, ?_⟩
   · rw [hA, extM, Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc (B.map φ)⁻¹, hinv,
       Matrix.one_mul, extendOne_mul_inclusion, ← Matrix.mul_assoc]
@@ -109,9 +107,9 @@ theorem ext_general
     simp only [hBdef, inclusionAlt, of_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
       Finset.mem_univ, if_true, Fin.coe_castSucc, b.isLt, dif_pos]
   have hBz : B *ᵥ Pi.single (Fin.last n) 1 = z := by
-    ext a
     rw [Matrix.mulVec_single_one]
-    simp [hBdef]
+    funext a
+    simp only [hBdef, col_apply, of_apply, Fin.val_last, dite_eq_right (Nat.lt_irrefl n)]
   exact ⟨extM φ B g, extM_spec φ A z B hBA hBz hB g⟩
 
 end Formalism.L2.GlobalTheoryTheory.Br

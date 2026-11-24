@@ -250,8 +250,6 @@ theorem mass_eq_finprod
     have happrox := by
       first
       | exact _root_.GlobalTheory.HL.StrongSt.strong_approx_stab A r k G Λ hΛ c hc g hgSt hgfin
-      | exact _root_.GlobalTheory.HL.StrongSt.strong_approx_stab A r k G Λ hΛ.toIsLattice c hc g
-          hgSt hgfin
     obtain ⟨γ, -, hγ⟩ := happrox
     refine ⟨γ, ?_⟩
     have key : ∀ p, (g p)⁻¹ * φ γ p ∈ K p ⊓ U p := by

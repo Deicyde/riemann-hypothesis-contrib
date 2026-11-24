@@ -72,7 +72,7 @@ theorem acris_lim_pt
   exact hz
 
 theorem frobenius_surjective_modP : Function.Surjective (frobenius (ModP (Per.OC l) l) l) := by
-  apply _root_.GlobalTheory.MemLoc.ThetaD.frob_surj <;> assumption
+  apply _root_.GlobalTheory.MemLoc.ThetaD.frob_surj
 
 theorem θ_surjective : Function.Surjective (Per.θ l) :=
   surjective_fontaineTheta frobenius_surjective_modP

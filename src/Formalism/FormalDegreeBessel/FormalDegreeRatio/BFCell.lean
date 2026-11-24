@@ -172,7 +172,7 @@ lemma sum_mid (f : Fin (2 * r + k + 1) → ℂ)
 end BruhatBigCell
 
 open GBasic BruhatBigCell in
-theorem big_cell_mem_holds : BigCellMem := by apply GlobalTheory.bigCell_mem_unitary <;> assumption
+theorem big_cell_mem_holds : BigCellMem := by apply GlobalTheory.bigCell_mem_unitary
 
 namespace BruhatBigCell
 

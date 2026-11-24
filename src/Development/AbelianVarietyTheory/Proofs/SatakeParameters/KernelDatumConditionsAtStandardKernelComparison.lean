@@ -1418,8 +1418,6 @@ theorem kerEntTied_hyp
     first
     | exact _root_.GlobalTheory.kernel_datum_of_hecke_character_values D L hT Gi Gl K Y cX ex t h1
         h2 hQ
-    | exact _root_.GlobalTheory.kernel_datum_of_hecke_character_values D L hT Gi Gl K Y cX ex t h1
-        h2
   exact hypotheses_of_base_hypotheses D L hT Gi Gl K Y cX ex t h0
     (hypFree_of_top_int D L hT Gi Gl K Y cX ex t hTop
       (_root_.GlobalTheory.TopInt.topInt D L hT Gi Gl K Y cX ex t hTop))

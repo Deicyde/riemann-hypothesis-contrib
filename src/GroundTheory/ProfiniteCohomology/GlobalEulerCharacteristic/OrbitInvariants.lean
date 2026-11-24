@@ -200,10 +200,6 @@ theorem orbitMover_smul (x : X)
   rw [orbitMover, inv_smul_eq_iff]
   exact (Classical.choose_spec (exists_smul_eq_out (Γ := Γ) x)).symm
 
-theorem orbitRel_mk_smul (g : Γ) (x : X)
-    : Quotient.mk (orbitRel Γ X) (g • x) = Quotient.mk (orbitRel Γ X) x :=
-  Quotient.sound (mem_orbit x g)
-
 theorem apply_out_mem_invariants
     {F : X → N} (hF : F ∈ equivariantFunctions (X := X) σ) (ω : orbitRel.Quotient Γ X)
     : F ω.out
@@ -238,11 +234,11 @@ theorem equivariantFunctionsToPi_bijective
       intro g x
       set ω := Quotient.mk (orbitRel Γ X) x
       have h1 := orbitMover_smul (Γ := Γ) (g • x)
-      rw [orbitRel_mk_smul] at h1
+      rw [MulAction.orbitRel.Quotient.quotient_smul_eq] at h1
       have h2 := orbitMover_smul (Γ := Γ) x
       change σ (orbitMover (g • x)) (m (Quotient.mk (orbitRel Γ X) (g • x)))
         = σ g (σ (orbitMover x) (m ω))
-      rw [orbitRel_mk_smul]
+      rw [MulAction.orbitRel.Quotient.quotient_smul_eq]
       have hstab : ((g * orbitMover x)⁻¹ * orbitMover (g • x)) • ω.out = ω.out := by
         rw [mul_smul, h1, mul_inv_rev, mul_smul, inv_smul_smul, inv_smul_eq_iff, h2]
       calc

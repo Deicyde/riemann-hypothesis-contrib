@@ -84,7 +84,7 @@ theorem cokPO_transfer
       : cokernel.map f' r' f' l' h'.w.symm ≫ cokernel.map r' r b m wr.symm
         = cokernel.map f' f a b w.symm ≫ cokernel.map f r f l h.w.symm := by
     ext
-    simp [Category.assoc, wl]
+    simp [Category.assoc]
     simpa only [Category.assoc] using congrArg (fun k => k ≫ cokernel.π r) wl
   have : cokernel.map r' r b m wr.symm
       = inv (cokernel.map f' r' f' l' h'.w.symm)

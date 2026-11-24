@@ -84,7 +84,7 @@ theorem isCombAt_spMap
           (fun i => spMap (Formalism.L2.Pj.dualMap φ) ≫ v i)
           (fun i => φ (cf i))
           (spMap (Formalism.L2.Pj.dualMap φ) ≫ w) := by
-  apply GlobalTheory.RawChartBC.isCombAt_map <;> assumption
+  apply GlobalTheory.RawChartBC.isCombAt_map
 
 end GlobalTheory.CompanionTheory.Ar.CombMap
 end -- clump:auto

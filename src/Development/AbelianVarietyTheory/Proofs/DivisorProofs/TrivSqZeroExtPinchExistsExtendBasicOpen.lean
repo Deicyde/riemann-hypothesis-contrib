@@ -191,7 +191,6 @@ theorem locPullback
     exact @_root_.GlobalTheory.QuotientMapComposition.main
   | (run_tac Lean.Elab.Tactic.liftMetaTactic (fun g => do pure [← g.revertAll]))
     exact _root_.GlobalTheory.QuotientMapComposition.main
-  | (intros; exact _root_.GlobalTheory.QuotientMapComposition.main ..)
 
 end GlobalTheory
 end -- clump:auto

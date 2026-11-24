@@ -151,7 +151,7 @@ theorem exists_closed_pow_local
                     (GlobalTheory.CechDR.cmpZZ s f).1.1 U V a)
                   ^ p
                 = u V - GlobalTheory.CechDR.Sec.res s (leOfHom a.unop) (u U) := by
-  apply GlobalTheory.CechDR.FrobKill.exists_closed_pow <;> assumption
+  apply GlobalTheory.CechDR.FrobKill.exists_closed_pow
 
 end GlobalTheory.CechDR.FrobKill
 

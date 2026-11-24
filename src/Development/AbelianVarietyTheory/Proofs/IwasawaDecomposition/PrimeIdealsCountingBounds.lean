@@ -91,9 +91,7 @@ variable {K : Type} [Field K] [NumberField K]
 
 theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 K))
     : ∃ p : ℕ, p.Prime ∧ (p : 𝓞 K) ∈ v.asIdeal := by
-  first
-  | (apply _root_.GlobalTheory.PrimeInHeightOneSpectrum.target <;> assumption)
-  | (intros; exact _root_.GlobalTheory.PrimeInHeightOneSpectrum.target ..)
+  first | (apply _root_.GlobalTheory.PrimeInHeightOneSpectrum.target <;> assumption)
 
 end GlobalTheory.Mem.FewPrimes
 end -- clump:auto

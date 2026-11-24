@@ -609,7 +609,7 @@ variable
   {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
 lemma inPsi_conj_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
-  apply GlobalTheory.InertLabelling.inPsi_conj_iff <;> assumption
+  apply GlobalTheory.InertLabelling.inPsi_conj_iff
 
 lemma embK_conj_bar {lv : Level H} (c : Coeff lv) (τ : E →+* ℂ) (x : 𝓞 E) :
     embK c τ (H.bar x) = embK c (ComplexEmbedding.conjugate τ) x := by

@@ -334,6 +334,6 @@ theorem frame_baseChange_eigen_basis
         (w : Sp (DualNumber T) ⟶ Xo.univ.t.G.left),
       IsTanAt (spMap ψ.toRingHom ≫ y.x) w → IsEigAt c τ w
         → ∃! a : Fin (Dw.mult τ) → T, IsCombAt (spMap ψ.toRingHom ≫ y.x) (fun i => spMap (dualMap ψ.toRingHom) ≫ y.u τ i) a w :=
-  by apply ReciprocityTheory.ChartRestriction.G.PullbackSections.bcLieAll <;> assumption
+  by apply ReciprocityTheory.ChartRestriction.G.PullbackSections.bcLieAll
 
 end GlobalTheory

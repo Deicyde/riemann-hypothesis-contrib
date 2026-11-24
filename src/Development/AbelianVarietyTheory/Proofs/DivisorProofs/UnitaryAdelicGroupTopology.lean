@@ -66,6 +66,6 @@ theorem lcsc_UA
         (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
       IsTopologicalGroup (UA σ J) ∧ LocallyCompactSpace (UA σ J) ∧ SecondCountableTopology (UA σ J)
         ∧ T2Space (UA σ J) := by
-  apply GlobalTheory.LeviModulus.topUA <;> assumption
+  apply GlobalTheory.LeviModulus.topUA
 
 end GlobalTheory.UnitaryAdelicTop

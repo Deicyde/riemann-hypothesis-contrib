@@ -86,14 +86,7 @@ theorem loc_d_congr
     set e := Classical.choose hc with he_def
     have he : IsChart n z e ∧ x ∈ e.source := Classical.choose_spec hc
     have hzx : z x = e x := he.1 he.2
-    have ht : Tendsto e.symm (𝓝 (e x)) (𝓝 x) := by
-      first
-      | exact e.tendsto_symm he.2
-      | (
-          have hc' : Tendsto e.symm (𝓝 (e x)) (𝓝 (e.symm (e x))) :=
-            e.continuousAt_symm (e.map_source he.2)
-          rwa [e.left_inv he.2] at hc'
-        )
+    have ht : Tendsto e.symm (𝓝 (e x)) (𝓝 x) := by first | exact e.tendsto_symm he.2
     have hfg : f ∘ e.symm =ᶠ[𝓝 (z x)] g ∘ e.symm := by
       rw [hzx]
       exact ht.eventually h
@@ -111,14 +104,7 @@ theorem loc_db_congr
     set e := Classical.choose hc with he_def
     have he : IsChart n z e ∧ x ∈ e.source := Classical.choose_spec hc
     have hzx : z x = e x := he.1 he.2
-    have ht : Tendsto e.symm (𝓝 (e x)) (𝓝 x) := by
-      first
-      | exact e.tendsto_symm he.2
-      | (
-          have hc' : Tendsto e.symm (𝓝 (e x)) (𝓝 (e.symm (e x))) :=
-            e.continuousAt_symm (e.map_source he.2)
-          rwa [e.left_inv he.2] at hc'
-        )
+    have ht : Tendsto e.symm (𝓝 (e x)) (𝓝 x) := by first | exact e.tendsto_symm he.2
     have hfg : f ∘ e.symm =ᶠ[𝓝 (z x)] g ∘ e.symm := by
       rw [hzx]
       exact ht.eventually h

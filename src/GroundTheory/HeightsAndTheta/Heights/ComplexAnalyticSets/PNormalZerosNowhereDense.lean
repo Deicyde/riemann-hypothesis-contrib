@@ -69,8 +69,7 @@ open MvPolynomial Topology Filter
 theorem isAnalyticNear_zeroSetIn {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ)
     : IsAnalyticNear (zeroSetIn I) w := by
   apply
-      GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn_isAnalyticNear
-    <;> assumption
+    GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn_isAnalyticNear
 
 theorem analyticOnNhd_of_differentiableOn_scalar_fin
     {d : ℕ} {U : Set (Fin d → ℂ)} {F : (Fin d → ℂ) → ℂ}

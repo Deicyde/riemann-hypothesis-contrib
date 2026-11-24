@@ -196,7 +196,7 @@ theorem psEntry
       ← integral_inner (h4.apply_continuousLinearMap u)]
     congr 2
     funext k
-    simp [inner_smul_right, mul_comm]
+    simp [mul_comm]
 
 theorem muConj
     : ∀ (n : ℕ) (ε : Fin n → Bool) (F : Matrix (Fin n) (Fin n) ℂ → ℂ),

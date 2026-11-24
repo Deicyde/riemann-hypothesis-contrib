@@ -352,9 +352,7 @@ private theorem isUp_mid
     : IsUp (a • (nA (-s') * tn m t * nA s)) := by
   intro i j hij
   fin_cases i <;> fin_cases j
-    <;> simp [nA, tn, Matrix.mul_apply, Fin.sum_univ_succ, hm01, hm10, ht01, ht10, -smul_eq_zero,
-        -mul_eq_zero]
-      at hij ⊢
+    <;> simp [nA, tn, hm01, hm10, ht01, ht10, -smul_eq_zero, -mul_eq_zero] at hij ⊢
     <;> first
       | linear_combination (a * m 0 0) * hs1
       | linear_combination (-(a * m 0 0)) * hs1

@@ -558,9 +558,7 @@ theorem exists_mem_inertia_eq_on
         → ∀ (L : IntermediateField K Ω) [FiniteDimensional K L] [IsGalois K L] (τ : L ≃ₐ[K] L),
           τ ∈ inertia K (V.comap (algebraMap L Ω))
             → ∃ σ ∈ inertia K V, ∀ y : L, σ (y : Ω) = (τ y : Ω) := by
-  first
-  | exact @_root_.GlobalTheory.IntegralFractionLift.inertia_surjective
-  | (intros; exact _root_.GlobalTheory.IntegralFractionLift.inertia_surjective ..)
+  first | exact @_root_.GlobalTheory.IntegralFractionLift.inertia_surjective
 
 end GlobalTheory.InertiaRestrict
 end -- clump:auto

@@ -288,10 +288,7 @@ theorem cmpt_casU (he : ∀ a b, ε a = ε b) (v : T.V)
       ContinuousLinearMap.mul_apply, ContinuousLinearMap.neg_apply]
     at hs
   simp only [casU, hd, hs, neg_neg, casimir, HW.kunits]
-  first
-  | simp only [LinearMap.coeFn_sum, Finset.sum_apply, Module.End.mul_apply,
-      ContinuousLinearMap.coe_coe]
-  | simp only [LinearMap.sum_apply, Module.End.mul_apply, ContinuousLinearMap.coe_coe]
+  first | simp only [LinearMap.sum_apply, Module.End.mul_apply, ContinuousLinearMap.coe_coe]
 
 end Cas
 

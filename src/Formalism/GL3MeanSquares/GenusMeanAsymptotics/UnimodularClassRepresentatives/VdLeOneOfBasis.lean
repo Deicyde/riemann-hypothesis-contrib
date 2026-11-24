@@ -134,14 +134,13 @@ theorem exists_full_lattice
   have hm : 0 < finrank K V := Module.finrank_pos_iff_exists_ne_zero.2 ⟨x₀, hx0⟩
   obtain ⟨r, hr⟩ : ∃ r, finrank K V = r + 1 := ⟨finrank K V - 1, by omega⟩
   have symm0 {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {x y : V} (hxy : h x y = 0) : h y x = 0 := by
-    have e : starRingEnd K (h x y) = h y x := by first | exact hs.eq x y | exact hs x y
+    have e : starRingEnd K (h x y) = h y x := by first | exact hs.eq x y
     rw [hxy, map_zero] at e
     exact e.symm
 
   have form_smul_smul (h : V →ₗ⋆[K] V →ₗ[K] K) (μ ν : K) (x y : V)
       : h (μ • x) (ν • y) = star μ * ν * h x y := by
-    simp only [LinearMap.map_smulₛₗ₂, LinearMap.smul_apply, map_smul, smul_eq_mul,
-      starRingEnd_apply]
+    simp only [LinearMap.map_smulₛₗ₂, map_smul, smul_eq_mul, starRingEnd_apply]
     ring
 
   have exists_normalise
@@ -151,7 +150,7 @@ theorem exists_full_lattice
       : ∃ μ : K, ∃ a : 𝓞 F, h (μ • e) (μ • e) = κ (ι a) ∧ a ∉ 𝔭 ^ 2 := by
     have hd0 : h e e ≠ 0 := fun h0 => he (han e h0)
     have hds : star (h e e) = h e e := by
-      have e' : starRingEnd K (h e e) = h e e := by first | exact hs.eq e e | exact hs e e
+      have e' : starRingEnd K (h e e) = h e e := by first | exact hs.eq e e
       rwa [starRingEnd_apply] at e'
     obtain ⟨μ, -, hμs, a, ha, ha2⟩ := exists_scale_fixed hF h𝔭 hd0 hds
     exact ⟨μ, a, by rw [form_smul_smul, hμs, ha], ha2⟩

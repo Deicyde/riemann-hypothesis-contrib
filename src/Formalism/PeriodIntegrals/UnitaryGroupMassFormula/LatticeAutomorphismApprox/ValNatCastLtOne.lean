@@ -62,16 +62,13 @@ theorem val_natCast_lt_one
       : ((g : v.adicCompletion F))
         = (((algebraMap (𝓞 F) F (g : 𝓞 F)) : F) : v.adicCompletion F) := by
     rw [map_natCast (algebraMap (𝓞 F) F)]
-    first
-    | exact (map_natCast (algebraMap F (v.adicCompletion F)) g).symm
-    | (rw [← map_natCast (algebraMap F (v.adicCompletion F)) g]; rfl)
+    first | exact (map_natCast (algebraMap F (v.adicCompletion F)) g).symm
   rw [h1]
   first
   | rw [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
     exact (IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem v _).mpr hg
   | rw [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation]
     exact (IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem v _).mpr hg
-  | simpa [IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem] using hg
 
 theorem natCast_mem_max
     (F : Type) [Field F] [NumberField F]

@@ -470,7 +470,7 @@ theorem main
                           ∧ IsLatFamily O x (fun c =>
                             (D c).imH (chartRing O (mseg x) c) p τ
                               (fun a => algebraMap O Ω (χ τ a)))) := by
-  apply PositivityTheory.Xgn.t_fam_constr <;> assumption
+  apply PositivityTheory.Xgn.t_fam_constr
 
 end GlobalTheory.CompanionTheory.Ar.Num.FamConstr
 end -- clump:auto

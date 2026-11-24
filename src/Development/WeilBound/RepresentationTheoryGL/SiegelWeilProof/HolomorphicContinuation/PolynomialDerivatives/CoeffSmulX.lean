@@ -245,7 +245,7 @@ theorem symK_tr (ε : Fin m → Bool) (i j : Fin n) (v u)
       = star ((symK ε i j (X v : Sym m n)).coeff (Finsupp.single u 1)) := by
   rcases v with ⟨a, i', b⟩ | ⟨a, i', b⟩ <;> rcases u with ⟨a', i'', b'⟩ | ⟨a', i'', b'⟩
     <;> simp only [symK, mkDerivation_X, Sum.elim_inl, Sum.elim_inr] <;> split_ifs
-    <;> simp_all [coeff_X', Finsupp.single_left_inj, MvPolynomial.coeff_neg] <;> aesop
+    <;> simp_all [coeff_X', Finsupp.single_left_inj] <;> aesop
 
 end CoreC
 

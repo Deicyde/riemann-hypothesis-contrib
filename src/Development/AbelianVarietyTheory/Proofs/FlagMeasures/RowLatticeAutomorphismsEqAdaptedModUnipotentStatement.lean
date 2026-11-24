@@ -127,9 +127,9 @@ theorem witt_partners
   · intro a b
 
     simp only [map_sub, map_sum, map_smulₛₗ, LinearMap.sub_apply, LinearMap.sum_apply,
-      RingHom.id_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul, hee, hge, hg'e,
-      mul_zero, Finset.sum_const_zero, sub_zero, mul_ite, mul_one, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true, starRingEnd_apply]
+      RingHom.id_apply, LinearMap.smul_apply, smul_eq_mul, hee, hge, hg'e, mul_zero,
+      Finset.sum_const_zero, sub_zero, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ,
+      if_true, starRingEnd_apply]
     have hM : star (h (g b) (g a)) = h (g a) (g b) := hsymm _ _
     have h2 : star (2 : E) = 2 := by simp
     rw [star_div₀, hM, h2]

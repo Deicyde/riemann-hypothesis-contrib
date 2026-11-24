@@ -368,8 +368,8 @@ theorem phiX_equiv
     rfl
 
   simp [Formalism.NG.uElt, hsm, hr, hu, hrep, MrTw, twistM, TruncatedSeriesCountingIdentities.locC,
-    TruncatedSeriesCountingIdentities.chi1C, mapM, loc_apply, locChi_apply, Matrix.mulVec,
-    dotProduct, Matrix.smul_apply, Matrix.map_apply, map_sum, map_mul]
+    TruncatedSeriesCountingIdentities.chi1C, mapM, Matrix.mulVec, dotProduct, Matrix.smul_apply,
+    Matrix.map_apply, map_sum, map_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   refine congrArg₂ (· * ·) (congrArg₂ (· * ·) ?_ ?_) ?_
   · exact ((Units.val_inv_eq_inv_val

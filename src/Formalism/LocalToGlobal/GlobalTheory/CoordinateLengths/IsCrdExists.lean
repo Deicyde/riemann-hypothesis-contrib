@@ -129,7 +129,7 @@ theorem length_quotient_map_equiv
     : Module.length O
         (A.map (e : M →ₗ[O] M) ⧸ (B.map (e : M →ₗ[O] M)).comap (A.map (e : M →ₗ[O] M)).subtype)
       = Module.length O (A ⧸ B.comap A.subtype) := by
-  apply Formalism.DivisionValues.imageLcv_len_map <;> assumption
+  apply Formalism.DivisionValues.imageLcv_len_map
 
 theorem length_quotient_map_of_inverse
     {O M : Type*} [CommRing O] [AddCommGroup M] [Module O M]

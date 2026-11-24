@@ -173,9 +173,7 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 theorem exists_eq_of_mem_adjoin_quadratic_generator
     (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0})
     : ∃ u v : ℤ, a = (u : 𝓞 E) + (v : 𝓞 E) * H.w0 := by
-  first
-  | (apply _root_.GlobalTheory.CMGeneratorSquareModuli.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.CMGeneratorSquareModuli.main ..)
+  first | (apply _root_.GlobalTheory.CMGeneratorSquareModuli.main <;> assumption)
 
 theorem bar_mem_of_mem
     (H : Host E)

@@ -156,7 +156,7 @@ theorem continuous_ell (z : Fin (2 * r + k + 1) → ℂ)
     : Continuous fun x : Mt k r => ell k r z (Matrix.of x) := by
   unfold ell
   refine continuous_finsetSum _ fun a _ => ?_
-  first | (split_ifs <;> fun_prop) | (by_cases h : a.val + 1 < r <;> simp [h] <;> fun_prop)
+  first | (split_ifs <;> fun_prop)
 
 theorem continuous_lam (z : Fin (2 * r + k + 1) → ℂ)
     : Continuous fun x : Mt k r => lam k r z (Matrix.of x) := by
@@ -856,7 +856,7 @@ theorem d_emb_S (s : ℝ) (hs : 0 < s) : MeasurableEmbedding (d_S r s) := by
   have hs0 : s ≠ 0 := hs.ne'
   have hm : ∀ u : ℝ, Measurable (d_S r u) := fun u => by
     show Measurable fun q : (Fin r → ℂ) × ℂ => ((fun a : Fin r => ((u ^ (r - a.val) : ℝ) : ℂ) * q.1 a), q.2)
-    first | fun_prop | measurability
+    first | fun_prop
   have key : ∀ (u v : ℝ), u * v = 1 → ∀ q, d_S r u (d_S r v q) = q := by
     intro u v huv q
     refine Prod.ext (funext fun a => ?_) rfl
@@ -1301,7 +1301,7 @@ theorem measurable_PhiM (D : RealPlaceData k r Wp Wq) : Measurable (PhiM D) := b
 
 theorem sfNu (D : RealPlaceData k r Wp Wq) : SigmaFinite (nuQ D) := by
   unfold nuQ
-  first | exact SigmaFinite.withDensity_ofReal _ | infer_instance
+  first | exact SigmaFinite.withDensity_ofReal _
 
 theorem u_meas_w (D : RealPlaceData k r Wp Wq)
     : Measurable fun q : (Fin r → ℂ) × ℂ =>
@@ -1401,9 +1401,9 @@ theorem u_norm_hsInner_le (A B : Wq →L[ℂ] Wp)
 theorem u_sgs_eq (p : SS k r) (g : Mat k r)
     : sgs p g
       = (Matrix.of p.1.2 * Matrix.of p.1.1)⁻¹ * g * (Matrix.of p.2.2 * Matrix.of p.2.1) := by
-  first | rw [sgs] | unfold sgs
+  first | rw [sgs]
   rw [Matrix.mul_inv_rev]
-  first | (simp only [Matrix.mul_assoc]; done) | (simp only [mul_assoc]; done)
+  first | (simp only [Matrix.mul_assoc]; done)
 
 theorem u_enorm_KM_le
     (D : RealPlaceData k r Wp Wq)

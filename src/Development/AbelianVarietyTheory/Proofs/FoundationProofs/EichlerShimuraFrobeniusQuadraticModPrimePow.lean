@@ -1199,7 +1199,7 @@ private theorem hahnSeries_coeff_algebra_smul
 
 theorem Tower.jK_transcendental {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε)
     : Transcendental Ω X.jK := by
-  apply GlobalTheory.K4.jK_transcendental <;> assumption
+  apply GlobalTheory.K4.jK_transcendental
 
 end GlobalTheory.KZ
 end -- clump:auto

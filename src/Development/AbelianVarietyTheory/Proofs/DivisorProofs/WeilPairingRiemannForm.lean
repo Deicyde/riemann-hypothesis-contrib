@@ -5,6 +5,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.CubicalOfNormalised
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ExistsGenTranslEqPairing
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.GlobalFnsHolds
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAHOfIsFactorAH
 public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.EqZeroOfForallAlgHomComplex
 public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.ExistsConstOfCover
 public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.ExistsUniquePointOfRingHom
@@ -124,14 +125,14 @@ theorem exists_chart_at
   obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 this
   exact ⟨i, ((hv _ x.left).1 _).2 hi⟩
 
-theorem im_hermForm_int
+theorem im_hermForm_int_of_isFactorAH
     {A : Over (Sp ℂ)} [GrpObj A]
     {L : LB A.left} (hL : L.IsLB)
     {n : ℕ} (u : HolUnif A L n)
-    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (h : u.IsAH Hm χ)
+    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (h : GlobalTheory.TorusRM.IsFactorAH u Hm χ)
     (l m : u.Λ)
     : ∃ e : ℤ, (e : ℝ) = ((l : Fin n → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin n → ℂ))).im := by
-  obtain ⟨hH, -, hχ, hfr⟩ := h
+  obtain ⟨hH, hχ, hfr⟩ := h
   obtain ⟨i, hi⟩ := exists_chart_at hL (u.ex 0)
   have hl : ∀ z, ∀ w ∈ u.Λ, u.ex (z + w) = u.ex z := fun z w hw => by
     rw [u.ex_add, (u.ker w).2 hw, _root_.mul_one]
@@ -182,11 +183,11 @@ theorem im_hermForm_int
   · exact absurd h3 hp.ne'
   · linarith
 
-theorem thetaGrp_in_frame
+theorem thetaGrp_in_frame_of_isFactorAH
     {A : Over (Sp ℂ)} [GrpObj A]
     {L : LB A.left} (hL : L.IsLB)
     {n : ℕ} (u : HolUnif A L n)
-    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (hAH : u.IsAH Hm χ)
+    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (hAH : GlobalTheory.TorusRM.IsFactorAH u Hm χ)
     (k : ℕ)
     (a : u.Λ)
     (hk : 0 < k)
@@ -200,9 +201,9 @@ theorem thetaGrp_in_frame
           = C * cexp (-(Real.pi * (z ⬝ᵥ Hm.mulVec (star (a : Fin n → ℂ))))) * u.fr (j 0) z ^ k := by
   have hv := GlobalTheory.valAt'_rules
   have hp := GlobalTheory.holFamily_lift hv
-  have hint := im_hermForm_int hL u hAH
+  have hint := im_hermForm_int_of_isFactorAH hL u hAH
   have hk' : (k : ℂ) ≠ 0 := by exact_mod_cast hk.ne'
-  obtain ⟨hH, -, hχ, hfr⟩ := hAH
+  obtain ⟨hH, hχ, hfr⟩ := hAH
   set b : Fin n → ℂ := (k : ℂ)⁻¹ • (a : Fin n → ℂ) with hb
   have h₀ : ∀ z, (lift p (u.ex z)).left ≫ (snd T A).left = (u.ex z).left := fun z => by
     rw [← Over.comp_left, lift_snd]
@@ -309,13 +310,13 @@ theorem thetaGrp_in_frame
   field_simp
 
 open GlobalTheory.WeilExp in
-theorem weilIs_exp_riemannForm
+theorem weilIs_exp_riemannForm_of_isFactorAH
     : ∀ (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A],
       IsAbelianScheme A
         → ∀ (L : LB A.left),
           L.IsLB
             → ∀ (n : ℕ) (u : HolUnif A L n) (Hm : Matrix (Fin n) (Fin n) ℂ) (χ : u.Λ → ℂ),
-              u.IsAH Hm χ
+              GlobalTheory.TorusRM.IsFactorAH u Hm χ
                 → ∀ (k : ℕ) (a b : Fin n → ℂ) (c : ℂˣ),
                   0 < k → a ∈ u.Λ → b ∈ u.Λ
                     → (c : ℂ)
@@ -341,7 +342,7 @@ theorem weilIs_exp_riemannForm
     intro l
     rw [hpow, smul_smul, mul_inv_cancel₀ hk0, one_smul]
     exact (u.ker _).2 l.2
-  obtain ⟨E, hE⟩ := im_hermForm_int hL u hAH a b
+  obtain ⟨E, hE⟩ := im_hermForm_int_of_isFactorAH hL u hAH a b
   have hcE : (c : ℂ) = cexp (-(2 * Real.pi * Complex.I) * (E : ℂ) / k) := by
     rw [hc, ← hE, Complex.ofReal_intCast]
   refine ⟨⊤, trivial, ?_, fun θx θy hx hy => ?_⟩
@@ -373,8 +374,8 @@ theorem weilIs_exp_riemannForm
     rw [← Category.assoc, Subsingleton.elim (p ≫ Out.overResι _) (𝟙 _), Category.id_comp]
   have hpx : p ≫ θx.pt = u.ex ((k : ℂ)⁻¹ • (a : Fin n → ℂ)) := by rw [hx, hp]
   have hpy : p ≫ θy.pt = u.ex ((k : ℂ)⁻¹ • (b : Fin n → ℂ)) := by rw [hy, hp]
-  obtain ⟨Ca, hCa⟩ := thetaGrp_in_frame hL u hAH k a hk _ p θx hpx
-  obtain ⟨Cb, hCb⟩ := thetaGrp_in_frame hL u hAH k b hk _ p θy hpy
+  obtain ⟨Ca, hCa⟩ := thetaGrp_in_frame_of_isFactorAH hL u hAH k a hk _ p θx hpx
+  obtain ⟨Cb, hCb⟩ := thetaGrp_in_frame_of_isFactorAH hL u hAH k b hk _ p θy hpy
   have tr
       : ∀ (θ : Out.ThetaGrp A L k (Out.overRes (⊤ : (𝟙_ (Over (Sp ℂ))).left.Opens)))
           (v : Fin n → ℂ),
@@ -435,5 +436,52 @@ theorem weilIs_exp_riemannForm
     (Eq.trans ?_ (congrArg (_ * · * (c : ℂ)) (val_pullGen hv _ _ _ _ _ _ _ n₃).symm))
   rw [(tr θx _ hpx z).1, (tr θy _ hpy z).1]
   exact key
+
+theorem im_hermForm_int
+    {A : Over (Sp ℂ)} [GrpObj A]
+    {L : LB A.left} (hL : L.IsLB)
+    {n : ℕ} (u : HolUnif A L n)
+    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (h : u.IsAH Hm χ)
+    (l m : u.Λ)
+    : ∃ e : ℤ, (e : ℝ) = ((l : Fin n → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin n → ℂ))).im := by
+  exact im_hermForm_int_of_isFactorAH hL u (GlobalTheory.TorusRM.isFactorAH_of_isAH h) l m
+
+theorem thetaGrp_in_frame
+    {A : Over (Sp ℂ)} [GrpObj A]
+    {L : LB A.left} (hL : L.IsLB)
+    {n : ℕ} (u : HolUnif A L n)
+    {Hm : Matrix (Fin n) (Fin n) ℂ} {χ : u.Λ → ℂ} (hAH : u.IsAH Hm χ)
+    (k : ℕ)
+    (a : u.Λ)
+    (hk : 0 < k)
+    (T : Over (Sp ℂ)) (p : 𝟙_ (Over (Sp ℂ)) ⟶ T) (θ : Out.ThetaGrp A L k T)
+    (hθ : p ≫ θ.pt = u.ex ((k : ℂ)⁻¹ • (a : Fin n → ℂ)))
+    : ∃ C : ℂ, ∀ (j : Fin 2 → L.ι) z,
+      ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U (j 0)
+        → ⊤ ≤ (u.ex (z + (k : ℂ)⁻¹ • (a : Fin n → ℂ))).left ⁻¹ᵁ L.U (j 1)
+        → valAt' (lift p (u.ex z)).left _ (θ.φ.s j).val
+            * u.fr (j 1) (z + (k : ℂ)⁻¹ • (a : Fin n → ℂ)) ^ k
+          = C * cexp (-(Real.pi * (z ⬝ᵥ Hm.mulVec (star (a : Fin n → ℂ))))) * u.fr (j 0) z ^ k := by
+  exact thetaGrp_in_frame_of_isFactorAH hL u (GlobalTheory.TorusRM.isFactorAH_of_isAH hAH) k a hk T
+    p θ hθ
+
+open GlobalTheory.WeilExp in
+theorem weilIs_exp_riemannForm
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (L : LB A.left),
+          L.IsLB
+            → ∀ (n : ℕ) (u : HolUnif A L n) (Hm : Matrix (Fin n) (Fin n) ℂ) (χ : u.Λ → ℂ),
+              u.IsAH Hm χ
+                → ∀ (k : ℕ) (a b : Fin n → ℂ) (c : ℂˣ),
+                  0 < k → a ∈ u.Λ → b ∈ u.Λ
+                    → (c : ℂ)
+                      = Complex.exp
+                        (-(2 * Real.pi * Complex.I) * (((a ⬝ᵥ Hm.mulVec (star b)).im : ℝ) : ℂ) / k)
+                    → Out.WeilIs A L k (u.ex ((k : ℂ)⁻¹ • a)) (u.ex ((k : ℂ)⁻¹ • b))
+                      (unitOn c) := by
+  intro A _ _ hA L hL n u Hm χ h
+  exact weilIs_exp_riemannForm_of_isFactorAH A hA L hL n u Hm χ
+    (GlobalTheory.TorusRM.isFactorAH_of_isAH h)
 
 end GlobalTheory.AHWeilAny

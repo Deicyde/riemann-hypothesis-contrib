@@ -81,8 +81,7 @@ theorem ofReal_normSq_sum_mul (a ξ : Fin n → ℂ)
   rw [map_mul]
   ring
 
-theorem leviChain : LeviChainStatement := by
-  apply ReciprocityTheory.L2DbarEstimates.leviChain <;> assumption
+theorem leviChain : LeviChainStatement := by apply ReciprocityTheory.L2DbarEstimates.leviChain
 
 theorem wd_ofReal_sum
     {m : ℕ} {j : Fin n} {u : Fin m → V n → ℝ} {x : V n} (hu : ∀ i, DifferentiableAt ℝ (u i) x)

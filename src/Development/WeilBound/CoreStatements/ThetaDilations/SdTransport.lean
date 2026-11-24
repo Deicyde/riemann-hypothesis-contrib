@@ -106,6 +106,6 @@ theorem up_alg
           ∧ (∀ n : ℕ, IsUnitProd (a ^ n) (fun v => c v ^ n))
           ∧ ∃ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S,
             S₀ ⊆ S → (∀ v, v ∉ S → c v = 1) ∧ a * ∏ v ∈ S, c v = 1 := by
-  apply GlobalTheory.CompanionTheory.SW.UnitProdAlg.main <;> assumption
+  apply GlobalTheory.CompanionTheory.SW.UnitProdAlg.main
 
 end PositivityTheory.PlacePermOperatorBicommutantSpan

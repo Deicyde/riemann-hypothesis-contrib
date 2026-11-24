@@ -58,6 +58,6 @@ theorem goal1
       Membership.mem.{0, 0} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) v
         → Exists.{1} fun (m : Int) ↦
           And (Ne.{1} m 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} m v)) := by
-  apply GlobalTheory.FiniteQuotientComap.exists_int_smul_mem <;> assumption
+  apply GlobalTheory.FiniteQuotientComap.exists_int_smul_mem
 
 end Bl.IntegerMulIntegral

@@ -906,8 +906,7 @@ variable
   {e : ℕ} [NeZero e]
   (ϖ : GlobalTheory.BKReal.PiSys l e)
 
-theorem ev_injective : Function.Injective (ϖ.ev a) := by
-  apply GlobalTheory.BKCoord.ev_injective <;> assumption
+theorem ev_injective : Function.Injective (ϖ.ev a) := by apply GlobalTheory.BKCoord.ev_injective
 
 theorem σA_frobenius (g : GQ l) (x : Ainf l)
     : Per.σA g (WittVector.frobenius x) = WittVector.frobenius (Per.σA g x) := by

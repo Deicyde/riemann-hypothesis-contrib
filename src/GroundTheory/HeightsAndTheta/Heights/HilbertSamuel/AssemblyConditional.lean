@@ -629,7 +629,6 @@ theorem continuous_diff
     {X : Type} [TopologicalSpace X] {A : FinHolAtlas D X} {L : HolLineBundle A} (W₁ W₀ : Weight L)
     : Continuous (Weight.diff W₁ W₀) := by
   apply GroundTheory.Heights₂.Heights.HilbertSamuel.BlockComplexGramMetricChange.continuous_diff
-    <;> assumption
 
 theorem eventually_pow_le (C ε : ℝ) (hε : 0 < ε) (hD : 1 ≤ D)
     : ∀ᶠ n : ℕ in atTop, C * ((n : ℝ) + 1) ^ (D - 1) ≤ ε * (n : ℝ) ^ D := by

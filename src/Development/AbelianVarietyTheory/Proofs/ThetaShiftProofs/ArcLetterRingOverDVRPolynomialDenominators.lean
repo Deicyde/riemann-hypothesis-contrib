@@ -116,7 +116,7 @@ theorem exists_map_eq_of_eval
         MvPolynomial.bind₁ (fun i => MvPolynomial.map φ (t i)) (MvPolynomial.map φ (s x)))
       = MvPolynomial.X := by
     funext x
-    simp [s, t, MvPolynomial.bind₁_X_right, MvPolynomial.bind₁_C_right]
+    simp [s, t, MvPolynomial.bind₁_X_right]
   rw [this, MvPolynomial.bind₁_X_left]
   rfl
 

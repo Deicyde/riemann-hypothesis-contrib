@@ -447,10 +447,7 @@ theorem core
       rw [hKe]
       linear_combination (B ^ 2 * T - (A * B + A * B)) * e2 + (B ^ 2 + B ^ 2 + B ^ 2 + B ^ 2) * e1
   ⟩
-  have h2 : ϖ ∣ B ^ 4 := by
-    first
-    | exact (hK.dvd_mul_right).1 h1
-    | (obtain ⟨u, rfl⟩ := hK; exact (Units.dvd_mul_right).1 h1)
+  have h2 : ϖ ∣ B ^ 4 := by first | exact (hK.dvd_mul_right).1 h1
   have hB : ϖ ∣ B := hpr.dvd_of_dvd_pow h2
   obtain ⟨b, rfl⟩ := hB
   exact

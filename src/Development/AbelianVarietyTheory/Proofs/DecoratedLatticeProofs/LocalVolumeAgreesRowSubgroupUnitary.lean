@@ -125,7 +125,7 @@ theorem vol_agree
       ← _root_.GlobalTheory.RankOneMatrix.mem_rationalFirstParabolic_iff_localGL_mem_rootExchange ι
         e hcc heR x,
       (hLev j (c + 1) h _ _ (hIsGL x)).1]
-    simp [Loc.Cbe, Subgroup.mem_comap, MulAut.conj_apply]
+    simp [Loc.Cbe, Subgroup.mem_comap]
   have hN1 := _root_.GlobalTheory.UnipRead.mem_N1_iff_local_hom ι e hcc heR
   have hlam : lamYat (Pr := Pr) (R := R) j P.1 = stdAt X.E _ P.1 := by
     ext v

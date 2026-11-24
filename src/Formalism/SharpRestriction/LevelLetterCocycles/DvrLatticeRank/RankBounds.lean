@@ -190,11 +190,7 @@ theorem step
       exact (rank_quotient_add_rank_of_isDomain _).symm
     _ ≤ (if c = 1 then Module.rank O (Gr F0 F1) else 0) + Module.rank O (InvQ γ K' F1) :=
       add_le_add hquot (by
-        first
-        | exact LinearMap.rank_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict
-        | exact LinearMap.rank_le_of_surjective f.rangeRestrict (fun y => by
-            obtain ⟨x, hx⟩ := LinearMap.mem_range.mp y.2
-            exact ⟨x, Subtype.ext hx⟩))
+        first | exact LinearMap.rank_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict)
     _ = _ := add_comm _ _
 
 end Formalism.MainNotions.N.Ln34.RankInverseBounds

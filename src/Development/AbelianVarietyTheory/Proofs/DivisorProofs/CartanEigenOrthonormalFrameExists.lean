@@ -154,7 +154,7 @@ theorem frameEx_holds : FrameEx := by
       : ∀ p q : ℕ,
         (fromBlocks 1 0 0 (-1) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ).map star
           = fromBlocks 1 0 0 (-1) := by
-    intro p q; ext (i | i) (j | j) <;> simp [Matrix.one_apply] <;> split_ifs
+    intro p q; ext (i | i) (j | j) <;> simp [Matrix.one_apply]
   have hA : A0ᴴ * G * A0 = fromBlocks 1 0 0 (-1) := by rw [← map_star_trip, hA0, hJ]
 
   obtain ⟨L, hLdef⟩

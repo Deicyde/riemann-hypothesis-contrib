@@ -395,15 +395,7 @@ theorem divT_setDiv
           }
           Nonempty (DivT n' (divXTr w Z N h Y)) := by
   intro B f T w Z Wt nch n Y N h d
-  refine ⟨{
-    Qp := d.Qp
-    chr := { d.chr with }
-    loc := ?_
-    inK := d.inK
-    geo := geoTiedP_divTr w Z N h d.geo
-  }⟩
-  obtain ⟨h1, h2⟩ := d.loc
-  exact ⟨h1, { h2 with }⟩
+  refine ⟨{ Qp := d.Qp, chr := { d.chr with }, inK := d.inK, geo := geoTiedP_divTr w Z N h d.geo }⟩
 
 end GlobalTheory.Mem.Top.Bl.WitTr
 
@@ -565,22 +557,6 @@ theorem isThetaFun_tr
     : IsThetaFun (D := w.D Z) ψ V W f ↔ IsThetaFun (D := w.D (setDivZ Z N h)) ψ V W f :=
   ⟨fun x => ⟨x.quasi, x.level, x.cont, x.smooth⟩, fun x => ⟨x.quasi, x.level, x.cont, x.smooth⟩⟩
 
-theorem isPolFock_tr
-    {ψ : AddChar (GlobalTheoryTheory.GenusMassVolumes.AF (w.D Z).host.F) ℂ}
-    {θ : (w.D Z).what₂.Tau
-      → (GlobalTheoryTheory.GenusMassVolumes.Ainf (w.D Z).host.F ⊗[(w.D Z).host.F] (w.D Z).host.E
-        →+* ℂ)}
-    {V W : TH.HSp (w.D Z)}
-    {A : ∀ τ : (w.D Z).what₂.Tau,
-      Matrix (Fin (V.sig (tauE (w.D Z) τ)).1 ⊕ Fin (V.sig (tauE (w.D Z) τ)).2) (Fin V.rank) ℂ}
-    {B : ∀ τ : (w.D Z).what₂.Tau,
-      Matrix (Fin (W.sig (tauE (w.D Z) τ)).1 ⊕ Fin (W.sig (tauE (w.D Z) τ)).2) (Fin W.rank) ℂ}
-    {f : WA V W → ℂ}
-    : IsPolFock (D := w.D Z) ψ θ V W A B f ↔ IsPolFock (D := w.D (setDivZ Z N h)) ψ θ V W A B f := ⟨
-  fun ⟨J, x, rest⟩ => ⟨J, ⟨x.cont, x.real, x.sq, x.symp, x.kcomm, x.defin⟩, rest⟩,
-  fun ⟨J, x, rest⟩ => ⟨J, ⟨x.cont, x.real, x.sq, x.symp, x.kcomm, x.defin⟩, rest⟩
-⟩
-
 @[reducible]
 def besDatTr {A B : TH.HSp (w.D Z)} {ι : A.V →ₗ[(w.D Z).host.E] B.V} (d : BesDat (D := w.D Z) A B ι)
     : BesDat (D := w.D (setDivZ Z N h)) A B ι := {
@@ -616,13 +592,7 @@ def allTiedTr {X : ThetaX (w.D Z)} {A : TH.ProvA} (a : AllTied (w.D Z) X A)
   ty := { a.ty with }
   W := weilTiedTr w Z N h a.W
   unr := a.unr
-  kf := {
-    a.kf with
-    kfin := ⟨
-      a.kf.kfin.1,
-      fun θ hθ V W h1 h2 h3 Φ => (a.kf.kfin.2 θ hθ V W h1 h2 h3 Φ).trans (isPolFock_tr w Z N h)
-    ⟩
-  }
+  kf := { a.kf with }
   phiUp := a.phiUp
   B := { a.B with dat := fun A B ι ho p => besDatTr w Z N h (a.B.dat A B ι ho p) }
   real := { a.real with }

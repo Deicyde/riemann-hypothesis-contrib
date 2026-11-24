@@ -1760,7 +1760,7 @@ theorem integral_chernF_mul_grF
       (fun τ j p =>
         _root_.GlobalTheory.ChernCalc.chernFld_ldPart_eq_esymm_grF F σ X ι m E H hH τ j p)
       R]
-  simp only [evalF, LineForm.fld, map_mul]
+  simp only [evalF, map_mul]
   rfl
 
 end GlobalTheory.ChernCalc

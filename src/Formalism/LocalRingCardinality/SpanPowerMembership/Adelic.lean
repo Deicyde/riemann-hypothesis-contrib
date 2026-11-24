@@ -77,23 +77,11 @@ theorem wz_lt_one_iff (γ : ℤᵐ⁰) : γ < 1 ↔ γ ≤ exp (-1 : ℤ) := by
         rw [← WithZero.exp_log hγ, ← WithZero.exp_zero, WithZero.exp_lt_exp, WithZero.exp_le_exp]
         omega
       )
-    | (
-        obtain ⟨a, rfl⟩ := WithZero.ne_zero_iff_exists.mp hγ
-        rw [← WithZero.coe_one, WithZero.exp, WithZero.coe_lt_coe, WithZero.coe_le_coe,
-          ← ofAdd_toAdd a, ← ofAdd_zero, Multiplicative.ofAdd_lt, Multiplicative.ofAdd_le]
-        omega
-      )
 
 theorem adicInt_integers
     : Valuation.Integers (Valued.v : Valuation (v.adicCompletion K) ℤᵐ⁰)
       (v.adicCompletionIntegers K) := by
-  first
-  | exact Valuation.integer.integers _
-  | (
-      refine ⟨Subtype.val_injective, fun x => ?_, fun r hr => ⟨⟨r, ?_⟩, rfl⟩⟩
-      · exact (mem_adicCompletionIntegers R K v).mp x.2
-      · exact (mem_adicCompletionIntegers R K v).mpr hr
-    )
+  first | exact Valuation.integer.integers _
 
 theorem adicInt_exists_unif
     : ∃ π : v.adicCompletionIntegers K, Valued.v (π : v.adicCompletion K) = exp (-1 : ℤ) := by
@@ -139,7 +127,7 @@ theorem adicInt_mem_pow_iff (n : ℕ) (x : Ov)
   have h1 : ((π ^ n : Ov) : Kv) = (π : Kv) ^ n := by first | rfl | push_cast; rfl
   have hpow : Valued.v ((π ^ n : Ov) : Kv) = exp (-(n : ℤ)) := by
     rw [h1, map_pow, hπ]
-    first | (rw [← WithZero.exp_nsmul]; congr 1; simp) | (rw [← WithZero.exp_nsmul]; simp)
+    first | (rw [← WithZero.exp_nsmul]; congr 1; simp)
   rw [adicInt_max_eq_span v π hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
     adicInt_dvd_iff v, hpow]
 
@@ -158,8 +146,7 @@ theorem adicCompl_isClosed_le (r : ℤᵐ⁰) : IsClosed {x : Kv | Valued.v x �
   intro x hx
   have hx' : r < Valued.v x := not_le.mp hx
   have hx0 : Valued.v x ≠ 0 := (lt_of_le_of_lt zero_le' hx').ne'
-  have hmem : {y : Kv | Valued.v y = Valued.v x} ∈ 𝓝 x := by
-    first | exact Valuation.loc_const hx0 | exact Valued.locally_const hx0
+  have hmem : {y : Kv | Valued.v y = Valued.v x} ∈ 𝓝 x := by first | exact Valued.locally_const hx0
   filter_upwards [hmem] with y hy
   show ¬ Valued.v y ≤ r
   rw [show Valued.v y = Valued.v x from hy]
@@ -286,13 +273,7 @@ theorem adicInt_isUnit_of_not_mem (r : R) (hr : r ∉ v.asIdeal) : IsUnit (algeb
   have h1 : algebraMap Ov Kv (algebraMap R Ov r) = algebraMap K Kv (algebraMap R K r) := by
     first | rfl
   rw [h1, adicCompl_val_algebraMap, valuation_of_algebraMap]
-  first
-  | exact (intValuation_eq_one_iff v r).mpr hr
-  | exact v.intValuation_eq_one_iff.mpr hr
-  | (
-      refine le_antisymm (v.intValuation_le_one r) (not_lt.mp fun h => hr ?_)
-      exact Ideal.dvd_span_singleton.mp ((v.intValuation_lt_one_iff_dvd r).mp h)
-    )
+  first | exact v.intValuation_eq_one_iff.mpr hr
 
 theorem adicInt_exists_norm
     [Finite (R ⧸ v.asIdeal)] (T N : ℤ) (hD : ((T ^ 2 - 4 * N : ℤ) : R) ∉ v.asIdeal)
@@ -318,20 +299,14 @@ variable {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R)
 theorem adel_conj_aE : H.conj (H.sqq) = -H.sqq := by
   rw [H.gal_sqq]
   have hc : (((H.gal H.conj).1.1 : ℤˣ) : ℤ) = -1 := by
-    first
-    | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
-    | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; decide)
-    | (rw [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
+    first | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
   rw [hc]
   simp
 
 theorem adel_conj_bE : H.conj (H.sqd) = -H.sqd := by
   rw [H.gal_sqd]
   have hc : (((H.gal H.conj).1.2 : ℤˣ) : ℤ) = -1 := by
-    first
-    | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
-    | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; decide)
-    | (rw [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
+    first | (simp only [Formalism.HC.HostRaw.conj, MulEquiv.apply_symm_apply]; rfl)
   rw [hc]
   simp
 
@@ -340,13 +315,7 @@ theorem adel_mem_F (x : H.E) (hx : H.conj x = x) : x ∈ H.F := by
     have h1 := Formalism.HC.HostAx.conjE_apply (H := H.toHostAx) φ x
     rw [hx] at h1
     exact h1.symm
-  first
-  | exact (NumberField.mem_maximalRealSubfield_iff x).mpr key
-  | (intro φ; exact key φ)
-  | (
-      show ∀ φ : H.E →+* ℂ, star (φ x) = φ x
-      exact key
-    )
+  first | exact (NumberField.mem_maximalRealSubfield_iff x).mpr key
 
 end Global
 
@@ -442,7 +411,6 @@ theorem adel_local (v : HeightOneSpectrum (𝓞 H.F))
   haveI : Finite (𝓞 H.F ⧸ v.asIdeal) := by
     first
     | exact Ideal.finiteQuotientOfFreeOfNeBot v.asIdeal v.ne_bot
-    | infer_instance
   have hI3
       : 2 * algebraMap H.F (v.adicCompletion H.F) (adelAlpha H)
           + algebraMap H.F (v.adicCompletion H.F) (adelBeta H)
@@ -476,7 +444,7 @@ theorem adel_local (v : HeightOneSpectrum (𝓞 H.F))
             + ((adelNq H : ℤ) : v.adicCompletion H.F) * (t : v.adicCompletion H.F) ^ 2
           = -1 := by
       have h := congrArg (fun z : v.adicCompletionIntegers H.F => (z : v.adicCompletion H.F)) hst
-      first | (push_cast at h; linear_combination h) | (simp at h; linear_combination h)
+      first | (push_cast at h; linear_combination h)
     refine ⟨
       (s : v.adicCompletion H.F)
         + algebraMap H.F (v.adicCompletion H.F) (adelAlpha H) * (t : v.adicCompletion H.F),
@@ -496,7 +464,7 @@ theorem adel_local (v : HeightOneSpectrum (𝓞 H.F))
             + ((adelNd H : ℤ) : v.adicCompletion H.F) * (t : v.adicCompletion H.F) ^ 2
           = -1 := by
       have h := congrArg (fun z : v.adicCompletionIntegers H.F => (z : v.adicCompletion H.F)) hst
-      first | (push_cast at h; linear_combination h) | (simp at h; linear_combination h)
+      first | (push_cast at h; linear_combination h)
     refine ⟨(s : v.adicCompletion H.F), (t : v.adicCompletion H.F), fun _ => ⟨s.2, t.2⟩, ?_⟩
     linear_combination hst'
 

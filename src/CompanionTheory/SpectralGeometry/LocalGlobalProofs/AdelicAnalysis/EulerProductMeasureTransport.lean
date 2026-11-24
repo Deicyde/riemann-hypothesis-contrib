@@ -116,6 +116,6 @@ theorem euler_move
                 → (∀ v, (m v).map (ev v) = c v • m' v) → (∀ v, m' v (latV b v) < ⊤)
                 → IsEulerProd b I 1 minf m
                 → IsEulerProd b (I.map e) 1 minf' m' := by
-  apply PositivityTheory.PlacePermOperatorBicommutantSpan.euler_move <;> assumption
+  apply PositivityTheory.PlacePermOperatorBicommutantSpan.euler_move
 
 end GlobalTheory.CompanionTheory.SW.EulerMove

@@ -63,12 +63,7 @@ variable (A : Type) [CommRing A] [Algebra ℚ A]
 
 theorem gt_coeff_X_pow (i : Fin 2) (n : ℕ) (e : Fin 2 →₀ ℕ)
     : coeff e ((X i : MvPowerSeries (Fin 2) A) ^ n) = if e = single i n then 1 else 0 := by
-  first
-  | exact MvPowerSeries.coeff_X_pow e i n
-  | (
-      classical
-      exact MvPowerSeries.coeff_X_pow e i n
-    )
+  first | exact MvPowerSeries.coeff_X_pow e i n
 
 theorem gt_coeff_expX (i : Fin 2) (e : Fin 2 →₀ ℕ)
     : coeff e (PowerSeries.subst (X i : MvPowerSeries (Fin 2) A) (PowerSeries.exp A))
@@ -270,9 +265,7 @@ theorem gp_addOf
     : GP (addOf F a b) := by
   show ∀ i, _
   intro i
-  exact gt_const_ev ![a, b]
-    (fun j => by fin_cases j <;> first | assumption | simpa using ha)
-    (F i) (hF i)
+  exact gt_const_ev ![a, b] (fun j => by fin_cases j <;> first | assumption) (F i) (hF i)
 
 theorem gt_ev_expS
     [Algebra ℚ k]

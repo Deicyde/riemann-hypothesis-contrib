@@ -220,9 +220,7 @@ theorem placeModel_onto_local
                     ∧ ∀ x,
                       IsLocal ψ θ S T sS sT ΛS ΛT (.inl v) x
                         → ∃ Φ, IsSBHalf a (latO S T ΛS ΛT fun _ => True) Φ ∧ Tm Φ = x := by
-  first
-  | exact @_root_.GlobalTheory.SymmetricBilinearHalf.placeModel_onto_local
-  | (intros; exact _root_.GlobalTheory.SymmetricBilinearHalf.placeModel_onto_local ..)
+  first | exact @_root_.GlobalTheory.SymmetricBilinearHalf.placeModel_onto_local
 
 end GlobalTheory.PlaceModelOnto
 

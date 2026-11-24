@@ -436,7 +436,7 @@ theorem main
         (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E)),
       ∀ x ∈ Submodule.span E (↑L : Set (Fin n → E)), ∃ (d : NumberField.RingOfIntegers E),
         d ≠ (0 : NumberField.RingOfIntegers E) ∧ d • x ∈ L := by
-  apply ReciprocityTheory.MultiplicativeHeights.SemiPt.clear_denom <;> assumption
+  apply ReciprocityTheory.MultiplicativeHeights.SemiPt.clear_denom
 
 end GlobalTheory.HermitianEigenvalueInequality
 end -- clump:auto
@@ -460,9 +460,7 @@ theorem exists_ne_zero_smul_mem_of_mem_span
     {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
     (hx : x ∈ Submodule.span E (L : Set (Fin n → E)))
     : ∃ d : 𝓞 E, d ≠ 0 ∧ d • x ∈ L := by
-  first
-  | (apply _root_.GlobalTheory.HermitianEigenvalueInequality.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.HermitianEigenvalueInequality.main ..)
+  first | (apply _root_.GlobalTheory.HermitianEigenvalueInequality.main <;> assumption)
 
 theorem isLattice_lowLat
     : ∀ (E : Type) [Field E] [NumberField E] (n n₁ : ℕ) (L : Submodule (𝓞 E) (Fin n → E))

@@ -406,9 +406,8 @@ theorem coboundary_cup1
   simp only [hk]
 
   simp only [hface, GlobalTheory.CompanionTheory.HopfLe.cup1, map_add (f := _), map_neg, map_sum,
-    map_smul, map_zsmul, mul_add, Finset.mul_sum, mul_smul_comm, Fin.val_zero, Fin.val_one,
-    Fin.val_succ, pow_zero, pow_succ, one_smul, neg_smul, mul_neg, mul_one, neg_neg,
-    Finset.sum_neg_distrib]
+    map_smul, mul_add, Finset.mul_sum, mul_smul_comm, Fin.val_zero, Fin.val_one, Fin.val_succ,
+    pow_zero, pow_succ, one_smul, neg_smul, mul_neg, mul_one, neg_neg, Finset.sum_neg_distrib]
   rw [key]
   abel
 

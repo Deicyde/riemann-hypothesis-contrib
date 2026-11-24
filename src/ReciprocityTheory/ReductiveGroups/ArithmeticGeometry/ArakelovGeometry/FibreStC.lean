@@ -146,9 +146,7 @@ private theorem eval₂_deh_eq_zero_of_mem_roots
     rw [h1, Polynomial.eval₂_one] at h2
     exact one_ne_zero h2
   have hdecomp : H %ₘ G.P + G.P * (H /ₘ G.P) = H := by
-    first
-    | exact Polynomial.modByMonic_add_div H G.monic
-    | exact Polynomial.modByMonic_add_div H G.P
+    first | exact Polynomial.modByMonic_add_div H G.P
   have hr : (H %ₘ G.P).eval₂ (deh (x ∘ e) 0) (deh x (e 0) G.Θ) = 0 := by
     have h1 := congrArg (Polynomial.eval₂ (deh (x ∘ e) 0) (deh x (e 0) G.Θ)) hdecomp
     rw [Polynomial.eval₂_add, Polynomial.eval₂_mul, G.root, zero_mul, add_zero, hH] at h1
@@ -285,7 +283,6 @@ theorem exists_int_primitive
   classical
   haveI hfinite : Finite (IntermediateField F E) := by
     first
-    | exact inferInstance
     | exact Field.finite_intermediateField_of_exists_primitive_element F E
         (Field.exists_primitive_element F E)
   have key : ∀ s : Finset ι, ∃ c : ι → ℤ, ∀ i ∈ s, v i ∈ F⟮∑ j, (c j : E) * v j⟯ := by

@@ -1470,8 +1470,8 @@ open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp GlobalTheory.
 theorem _root_.GlobalTheory.T.kernel_rationality_of_reciprocity_hypotheses_alt
     : GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.GlobalArtinReciprocity
       → GlobalTheory.Published.RayClassFieldSt → GlobalTheory.SerStd.SeriesRatS
-      → _root_.GlobalTheory.BigOn.Exp.SerBase.KernelRationalAt := by
-  first | exact @_root_.GlobalTheory.BigOn.Exp.SerBase.kerRatAt_alt
+      → _root_.GlobalTheory.BigOn.Exp.SerBase.KernelRationalAt :=
+  @_root_.GlobalTheory.BigOn.Exp.SerBase.kerRatAt_alt
 end
 end -- clump:auto
 end -- clump:auto

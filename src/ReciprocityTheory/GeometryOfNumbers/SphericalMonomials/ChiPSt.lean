@@ -505,7 +505,7 @@ theorem exists_chiP_succ_sub_le (D : ℕ)
     intro t ht
     have e : c₀ = L * Real.log 2 := by
       rw [hL]
-      first | exact (div_mul_cancel₀ c₀ hl2.ne').symm | field_simp
+      first | exact (div_mul_cancel₀ c₀ hl2.ne').symm
     rw [e]
     exact mul_le_mul_of_nonneg_left ht hL0
   refine ⟨(1 / 2) * (2 ^ D + 3 ^ D * (2 + (D : ℝ))) * (1 + L), fun n hn => ?_⟩

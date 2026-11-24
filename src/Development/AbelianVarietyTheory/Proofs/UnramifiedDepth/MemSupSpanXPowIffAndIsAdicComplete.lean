@@ -257,9 +257,7 @@ private theorem mem_sup_pow_iff (n : ℕ) (f : MvPowerSeries κ R)
     : f ∈ (I.map (C : R →+* MvPowerSeries κ R) ⊔ Ideal.span (Set.range (X : κ → MvPowerSeries κ R)))
         ^ n
       ↔ ∀ e : κ →₀ ℕ, coeff e f ∈ I ^ (n - e.degree) := by
-  first
-  | (apply _root_.GlobalTheory.IdealPowerCoefficients.mem_pow_iff_coeff_mem <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IdealPowerCoefficients.mem_pow_iff_coeff_mem ..)
+  first | (apply _root_.GlobalTheory.IdealPowerCoefficients.mem_pow_iff_coeff_mem <;> assumption)
 
 private theorem smodEq_pow_iff {S : Type*} [CommRing S] (J : Ideal S) (n : ℕ) (x y : S)
     : x ≡ y [SMOD (J ^ n • ⊤ : Submodule S S)] ↔ x - y ∈ J ^ n := by

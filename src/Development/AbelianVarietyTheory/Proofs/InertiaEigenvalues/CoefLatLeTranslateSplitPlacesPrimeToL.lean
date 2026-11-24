@@ -180,15 +180,8 @@ theorem lat_translate
   obtain ⟨a, ha⟩ :=
     _root_.GlobalTheory.NabScale.nabAtr_smul_pow_mem _ _ _ _ (labLL0 D) (ρ.B i j b).w.lam _ _
       (normProd Q ^ c) hN0
-      (by
-        first
-        | exact GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b h
-        | exact (GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b h).toIsLattice)
-      (by
-        first
-        | exact GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b (h * hQ)
-        | exact (GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b (h * hQ)).toIsLattice)
-      h1 h2
+      (by first | exact GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b h)
+      (by first | exact GlobalTheory.LatFull.latAt_isFullLattice D ρ hρ i j b (h * hQ)) h1 h2
   have hu : ((normProd Q : ℕ) : ℂ)⁻¹ ∈ (ρ.eOk i b k).range :=
     hρ.range_le i b k (GlobalTheory.T.inv_place_norm_product_mem_coefficient_ring D ρ i b Q hD)
   have hinv : (((normProd Q ^ c) ^ a : ℕ) : ℂ)⁻¹ ∈ (ρ.eOk i b k).range := by

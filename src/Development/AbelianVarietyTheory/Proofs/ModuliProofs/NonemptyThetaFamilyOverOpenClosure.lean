@@ -1966,7 +1966,7 @@ theorem exists_fac_away
         (Ideal.eq_top_of_isUnit_mem _ h1 (IsLocalization.Away.algebraMap_isUnit f))
     obtain ⟨r, hr⟩ := hVsub hq
     refine ⟨r, ?_⟩
-    first | simp [hr] | (rw [hr]; simp)
+    first | simp [hr]
   obtain ⟨y, hy⟩ := exists_spMap (IsOpenImmersion.lift x _ hsub)
   exact ⟨y, by rw [← hy]; exact IsOpenImmersion.lift_fac x _ hsub⟩
 

@@ -947,9 +947,7 @@ theorem ndS_mul_int (D : D7) (a : Fin D.R.rS) (t : D.host.E) (ht : t ∈ aaS D a
       = 0
   · rw [hJ] at ht
     have ht0 : t = 0 := by
-      first
-      | (rw [FractionalIdeal.inv_zero', FractionalIdeal.mem_zero_iff] at ht; exact ht)
-      | (rw [inv_zero, FractionalIdeal.mem_zero_iff] at ht; exact ht)
+      first | (rw [FractionalIdeal.inv_zero', FractionalIdeal.mem_zero_iff] at ht; exact ht)
     exact ⟨0, by rw [ht0, map_zero, mul_zero]⟩
   · rw [FractionalIdeal.inv_eq] at ht
     first | rw [FractionalIdeal.mem_div_iff_of_ne_zero hJ] at ht
@@ -1005,16 +1003,7 @@ theorem fInt_holds : FInt := by
   refine ⟨?_, ?_⟩
   · have hd : differentIdeal ℤ (𝓞 D.host.F) ≠ ⊥ := by first | exact differentIdeal_ne_bot
     have hinj : Function.Injective (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) := by
-      first
-      | exact FaithfulSMul.algebraMap_injective _ _
-      | (
-          have h1 : Function.Injective (algebraMap (𝓞 D.host.F) D.host.E) := by
-            rw [IsScalarTower.algebraMap_eq (𝓞 D.host.F) D.host.F D.host.E, RingHom.coe_comp]
-            exact (algebraMap D.host.F D.host.E).injective.comp (IsFractionRing.injective _ _)
-          rw [IsScalarTower.algebraMap_eq (𝓞 D.host.F) (𝓞 D.host.E) D.host.E, RingHom.coe_comp]
-            at h1
-          exact h1.of_comp
-        )
+      first | exact FaithfulSMul.algebraMap_injective _ _
     have hmap
         : (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)))
           ≠ ⊥ := by

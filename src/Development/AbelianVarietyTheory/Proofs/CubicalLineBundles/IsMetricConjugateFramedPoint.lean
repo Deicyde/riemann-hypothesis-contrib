@@ -215,8 +215,6 @@ theorem isMetric_conj
   refine isMetricAt_conj hpq y.x y'.x y.s y'.s y.u y'.u N Gr hx ?_ y'.gen y.tan y'.tan hu hM
   refine ⟨pm, h1, h2, fun i h => ?_⟩
   have h4 := h3 i h
-  first
-  | exact (congrArg _ (scal_one_mul_sec (S := ℂ) y.x y.s i)).trans h4
-  | (erw [scal_one_mul_sec]; exact h4)
+  first | exact (congrArg _ (scal_one_mul_sec (S := ℂ) y.x y.s i)).trans h4
 
 end GlobalTheory.LamT

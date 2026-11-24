@@ -117,31 +117,26 @@ theorem eq_psiStd
             = w.embedding a := by
       intro w
       first
-      | exact InfinitePlace.Completion.extensionEmbedding_coe w a
-      | exact InfinitePlace.Completion.extensionEmbedding_coe a
       | simp [InfiniteAdeleRing, AbsoluteValue.Completion.algebraMap_def,
           WithAbs.algebraMap_right_apply]
     simp only [psiA, hw]
     first | rfl
   have hsplit : ∀ z : AF F, z = pairA F z.1 0 + pairA F 0 z.2 := by
     intro z
-    first
-    | exact Prod.ext (add_zero _).symm (zero_add _).symm
-    | (show z = (z.1 + 0, 0 + z.2); rw [add_zero, zero_add]; rfl)
-    | (simp [pairA]; done)
+    first | exact Prod.ext (add_zero _).symm (zero_add _).symm
   have hF : ∀ a : F, ψ (pairA F 0 (algebraMap F (Af F) a)) = psiFin F (algebraMap F (Af F) a) := by
     intro a
     have e2
         : algebraMap F (AF F) a
           = pairA F (algebraMap F (Ainf F) a) 0 + pairA F 0 (algebraMap F (Af F) a) := by
-      first | exact hsplit _ | (rw [hsplit (algebraMap F (AF F) a)]; rfl)
+      first | exact hsplit _
     have h3 : psiA F (algebraMap F (Ainf F) a) * ψ (pairA F 0 (algebraMap F (Af F) a)) = 1 := by
       rw [← hinf, ← AddChar.map_add_eq_mul, ← e2]
       exact htriv a
     rw [psiFin_alg, Complex.exp_neg, ← hA a]
     exact eq_inv_of_mul_eq_one_right h3
   have hp : Continuous (fun z : Af F => pairA F 0 z) := by
-    first | exact continuous_const.prodMk continuous_id | (unfold pairA; fun_prop)
+    first | exact continuous_const.prodMk continuous_id
   have hc : Continuous (fun z : Af F => ψ (pairA F 0 z)) := hcont.comp hp
   have hcf : Continuous (psiFin F) := by first | exact continuous_psiFin F
   have hfin : (fun z : Af F => ψ (pairA F 0 z)) = psiFin F :=
@@ -178,7 +173,7 @@ theorem condAllTR_of
       have h : algebraMap ℚ ℂ (Algebra.trace ℚ F q) = ∑ σ : F →ₐ[ℚ] ℂ, σ q := by
         first | exact trace_eq_sum_embeddings ℂ (x := q)
       rw [← h]
-      first | rfl | (simp; done)
+      first | rfl
     have hbij : Function.Bijective (fun w : InfinitePlace F => w.embedding.toRatAlgHom) := by
       constructor
       · intro w w' h
@@ -198,18 +193,7 @@ theorem condAllTR_of
                 : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom)
                   = ComplexEmbedding.conjugate σ.toRingHom :=
               hr
-            first
-            | exact ComplexEmbedding.isReal_conjugate_iff.mp hr
-            | (simp only [ComplexEmbedding.conjugate, star_star] at h2; exact h2.symm)
-            | (rw [star_star] at h2; exact h2.symm)
-            | (
-                have h3
-                    : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ.toRingHom)
-                      = σ.toRingHom :=
-                  RingHom.ext fun z => by simp [ComplexEmbedding.conjugate_coe_eq]
-                rw [h3] at h2
-                exact h2.symm
-              )
+            first | exact ComplexEmbedding.isReal_conjugate_iff.mp hr
         apply AlgHom.ext
         intro z
         show (InfinitePlace.mk σ.toRingHom).embedding z = σ z

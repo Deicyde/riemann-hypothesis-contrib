@@ -88,7 +88,7 @@ theorem finite_sub
         (Γ : QFGroup R T) (U : Γ.G.left.Opens),
       IsFinite (U.ι ≫ Γ.G.hom) → (∀ x : Γ.G.left, Γ.G.hom x = IsLocalRing.closedPoint R → x ∈ U)
         → Γ.IsFinOpenSub U := by
-  apply GlobalTheory.CompanionTheory.Ar.BT.QFGroup.isFinOpenSub_of_closedFibre <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.BT.QFGroup.isFinOpenSub_of_closedFibre
 
 theorem mem_iff_section
     : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsLocalRing R] (T : Type)

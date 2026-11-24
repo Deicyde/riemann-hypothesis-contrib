@@ -374,7 +374,7 @@ theorem arith
   have he0 : e ≠ 0 := ne_of_gt he
   have hsq : (Real.sqrt (A * A') ^ n) ^ 2 = A ^ n * A' ^ n := by
     rw [← pow_mul, mul_comm n 2, pow_mul, Real.sq_sqrt (mul_nonneg hA hA'), mul_pow]
-  have hprod : (a' * a * d / e) ^ 2 = (a ^ 2 * d / e) * (a' ^ 2 * d / e) := by field_simp <;> ring
+  have hprod : (a' * a * d / e) ^ 2 = (a ^ 2 * d / e) * (a' ^ 2 * d / e) := by field_simp
   have key : (a' * a * d / e) ^ 2 ≤ (Real.sqrt (A * A') ^ n) ^ 2 := by
     rw [hprod, hsq]
     exact mul_le_mul h h' (by positivity) (pow_nonneg hA n)
@@ -628,10 +628,7 @@ theorem _root_.Gp91.GlobalTheory.T.tensor_weighted_bessel_sum
                 (∀ v ∈ R.sm, lI I (∑ c, pr I c (tm R om v c)) = κ₀ • l v)
                   → (∀ v ∈ R.sm, lI' I (∑ c, pr I c (tm R om' v c)) = κ₁ • l' v)
                   → st I = (ep I : ℂ) * κ₁ * star κ₀ * s := by
-  first
-  | exact @GlobalTheory.coef_mul_split
-  | exact GlobalTheory.coef_mul_split
-  | (intros; apply GlobalTheory.coef_mul_split <;> assumption)
+  first | exact @GlobalTheory.coef_mul_split
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto

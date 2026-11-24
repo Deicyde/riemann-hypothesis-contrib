@@ -84,7 +84,7 @@ theorem main
         (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E)),
       Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤
         → ∀ (w : Fin r → E), ∃ (k : ℕ), (0 : ℕ) < k ∧ (↑k : E) • w ∈ Λ := by
-  apply GlobalTheory.AlgDirMom.exists_nat_smul_mem <;> assumption
+  apply GlobalTheory.AlgDirMom.exists_nat_smul_mem
 
 end GlobalTheory.NatMulIntegralExists
 end -- clump:auto
@@ -127,9 +127,7 @@ theorem exists_nat_smul_mem
     {r : ℕ} (Λ : Submodule (𝓞 E) (Fin r → E)) (hsp : Submodule.span E (Λ : Set (Fin r → E)) = ⊤)
     (w : Fin r → E)
     : ∃ k : ℕ, 0 < k ∧ (k : E) • w ∈ Λ := by
-  first
-  | (apply _root_.GlobalTheory.NatMulIntegralExists.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.NatMulIntegralExists.main ..)
+  first | (apply _root_.GlobalTheory.NatMulIntegralExists.main <;> assumption)
 
 theorem exists_nat_den {r : ℕ} (Λ : Submodule (𝓞 E) (Fin r → E)) (hfg : Λ.FG)
     : ∃ d : ℕ, 0 < d ∧ ∀ w ∈ Λ, ∀ i, (d : E) * w i ∈ intOE E := by

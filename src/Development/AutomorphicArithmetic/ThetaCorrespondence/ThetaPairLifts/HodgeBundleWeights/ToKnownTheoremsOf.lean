@@ -3,7 +3,6 @@ module
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.HodgeBundleWeights.Hypotheses2
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CanonicalOfAbelianDeRham
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ExistsAlgClosedBaseChange
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ExistsHorizontalGeneratorOfCharts
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.FormalAlgebraisation
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GeometricallyConnectedOfIsIsoRestrict
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.InjectiveOfSmulMemRange
@@ -81,10 +80,6 @@ theorem PublishedHodgeBundleTheorems.p18
     (_h : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems)
     : GlobalTheory.Published.FinitenessOfHermitianClasses :=
   GlobalTheory.Published.finitenessOfHermitianClasses_holds
-theorem PublishedHodgeBundleTheorems.q2
-    (_h : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems)
-    : GlobalTheory.Published.CanonicalExtensionRankOne :=
-  GlobalTheory.Published.canonicalExtensionRankOne_holds
 theorem PublishedHodgeBundleTheorems.toClassicalTheoremsOf
     (h : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems)
     (hM : GlobalTheory.Published.GoodChernWeil → GlobalTheory.Published.MumfordProportionality)

@@ -263,11 +263,6 @@ def provisionalDivX
     qv_gt := fun _ v => v.elim
     qv_char := fun _ _ v => v.elim
     nu := fun _ v => v.elim
-    nu_ne := fun _ v => v.elim
-    nu_abs := fun _ v => v.elim
-    ZQ := fun _ v => v.elim
-    quotientLocalValueFirst := fun _ v => v.elim
-    typeDim := fun _ v => v.elim
     Comp := fun _ => Unit
     degHH := fun _ _ _ => 0
     Yv := fun _ _ => Y

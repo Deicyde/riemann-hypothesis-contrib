@@ -177,7 +177,6 @@ variable
 
 theorem uniformizer_mem_delta_invariants : W.π₀ ∈ W.AΔ := by
   apply Formalism.MainNotions.RamifiedCoefficientChains.S9.LD.uniformizer_mem_delta_invariants
-    <;> assumption
 
 theorem ps_mem (s : ℕ) : Formalism.MainNotions.ArcLiftingSetup.ps W s ∈ W.AΔ :=
   Formalism.MainNotions.UnusedSlot80.PhiPowers.ps_mem_AΔ W (uniformizer_mem_delta_invariants W) s

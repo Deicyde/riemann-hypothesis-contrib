@@ -68,11 +68,6 @@ theorem fold_map {P' P : Arrow Spc} (ψ : P' ⟶ P)
           erw [pushout.inr_desc, pushout.inr_desc_assoc]
           simp
         )
-      | (
-          erw [pushout.inl_desc_assoc, Category.assoc, Category.assoc]
-          erw [pushout.inl_desc, pushout.inl_desc]
-          simp
-        )
     )
 
 theorem proj_pull (q : ℕ) {P' P : Arrow Spc} (ψ : P' ⟶ P) (n i : ℤ) (c : Ht q (dbl P) n i)

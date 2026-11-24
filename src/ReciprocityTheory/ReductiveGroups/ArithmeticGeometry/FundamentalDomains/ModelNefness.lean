@@ -487,10 +487,7 @@ theorem reductionTheory_holds : MahlerCompactnessCriterion (E := E) := by
               *ᵥ Data.emb τ.1 (Pi.single k 1))
             c := by
       rw [hemb]
-      first
-      | (simp; done)
-      | (simp [Matrix.mulVec, dotProduct, Pi.single_apply]; done)
-      | (simp [Matrix.mulVec, Matrix.dotProduct, Pi.single_apply]; done)
+      first | (simp; done)
     rw [hcol, CompactEntryBounds.inv_lact]
     have hginv
         : (((s⁻¹ * γ)⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ Pi.single k 1

@@ -112,10 +112,7 @@ theorem type_count_exact : TypeCountExact := by
       exact Polynomial.X_dvd_iff.mp ((Polynomial.X_dvd_iff.mpr h0).trans hdvd)
     · by_contra hlt
       have hz : q.natDegree = 0 := by omega
-      have h1 : q = 1 := by
-        first
-        | exact hmon.natDegree_eq_zero_iff_eq_one.mp hz
-        | exact Polynomial.eq_one_of_monic_natDegree_zero hmon hz
+      have h1 : q = 1 := by first | exact Polynomial.eq_one_of_monic_natDegree_zero hmon hz
       apply hirr.not_isUnit
       rw [h1]
       exact isUnit_one

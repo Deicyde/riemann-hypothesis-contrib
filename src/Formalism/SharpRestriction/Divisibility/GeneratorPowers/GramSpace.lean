@@ -549,8 +549,7 @@ private theorem normb_lemma_2 {t : E} (ht : t ∈ Dinv E * Dinv E) (ht0 : t ≠ 
     | (rw [FractionalIdeal.coeIdeal_absNorm, NumberField.absNorm_differentIdeal (K := E)])
   rw [h, map_inv₀] at h3
   have hdinv : FractionalIdeal.absNorm (Dinv E) = ((discr E).natAbs : ℚ)⁻¹ := by rw [← h3, inv_inv]
-  have hd : discr E ≠ 0 := by
-    first | exact NumberField.discr_ne_zero E | exact NumberField.discr_ne_zero
+  have hd : discr E ≠ 0 := by first | exact NumberField.discr_ne_zero E
   have hd' : ((discr E).natAbs : ℚ) ≠ 0 := by exact_mod_cast Int.natAbs_ne_zero.mpr hd
   have hD : Dinv E ≠ 0 := by
     intro h0
@@ -566,11 +565,7 @@ private theorem normb_lemma_2 {t : E} (ht : t ∈ Dinv E * Dinv E) (ht0 : t ≠ 
     rw [hJ]
     calc
       (Dinv E * Dinv E)⁻¹ * FractionalIdeal.spanSingleton (𝓞 E)⁰ t
-          ≤ (Dinv E * Dinv E)⁻¹ * (Dinv E * Dinv E) := by
-        first
-        | exact mul_le_mul_left' hle _
-        | exact FractionalIdeal.mul_le_mul_left hle _
-        | exact mul_right_mono hle
+        ≤ (Dinv E * Dinv E)⁻¹ * (Dinv E * Dinv E) := by first | exact mul_right_mono hle
       _ = 1 := inv_mul_cancel₀ hD2
   obtain ⟨I, hI⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.mp hJ1
   have hJ0 : J ≠ 0 := by
@@ -581,7 +576,7 @@ private theorem normb_lemma_2 {t : E} (ht : t ∈ Dinv E * Dinv E) (ht0 : t ≠ 
     rintro rfl
     apply hJ0
     rw [← hI]
-    first | exact FractionalIdeal.coeIdeal_bot | simp
+    first | exact FractionalIdeal.coeIdeal_bot
   have hJn : (1 : ℚ) ≤ FractionalIdeal.absNorm J := by
     rw [← hI]
     have hI1 : 1 ≤ Ideal.absNorm I :=
@@ -630,7 +625,7 @@ private theorem normprod_lemma_4 (t : E) (w : (E →+* ℂ) → ℝ) (hw : ∀ �
   rw [h2, Finset.prod_congr rfl (fun σ _ => hw σ), ← Complex.ofReal_prod] at h
   apply Complex.ofReal_injective
   rw [← h]
-  first | simp | (rw [eq_ratCast]; simp) | norm_cast
+  first | simp
 
 theorem lower_bound
     {cj : E → E} (hcj : ∀ (φ : E →+* ℂ) (z : E), φ (cj z) = star (φ z)) (l : SymB cj Y →ₗ[ℝ] ℝ)

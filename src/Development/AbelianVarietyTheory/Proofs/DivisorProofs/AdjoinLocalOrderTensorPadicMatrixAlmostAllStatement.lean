@@ -1074,7 +1074,7 @@ theorem exists_den_coords
       Module.Finite ℤ Λ
         → ∀ (ι : Type) [Fintype ι] (e : Module.Basis ι F B), ∃ D : ℕ,
           0 < D ∧ ∀ x ∈ Λ, ∀ k, IsIntegral ℤ ((D : F) * e.repr x k) := by
-  apply GlobalTheory.LocMatrix.exists_den <;> assumption
+  apply GlobalTheory.LocMatrix.exists_den
 theorem exists_coords_of_mem_locOrder
     : ∀ (ℓ : ℕ) [Fact ℓ.Prime] (F B : Type) [Field F] [NumberField F] [Ring B] [Algebra F B]
         [Algebra ℚ B] [IsScalarTower ℚ F B] (Λ : Subring B) (ι : Type) [Fintype ι]

@@ -351,9 +351,7 @@ theorem exists_local_denom
                   y' ∈ V'
                     → ∀ (h : genericPoint M ∈ f ⁻¹ᵁ V') (z : Γ(M, f ⁻¹ᵁ V')) (j : Fin r),
                       RegAt y' (fnOf V (gen_mem hy) d * co j (fnOf (f ⁻¹ᵁ V') h z)) := by
-  first
-  | exact @_root_.GlobalTheory.DenominatorExistenceLemmas.exists_local_denominator
-  | (intros; exact _root_.GlobalTheory.DenominatorExistenceLemmas.exists_local_denominator ..)
+  first | exact @_root_.GlobalTheory.DenominatorExistenceLemmas.exists_local_denominator
 
 end GlobalTheory.ProperDenom
 end -- clump:auto

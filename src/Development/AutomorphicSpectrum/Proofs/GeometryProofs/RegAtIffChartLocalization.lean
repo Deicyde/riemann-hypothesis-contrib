@@ -83,6 +83,6 @@ theorem regAt_iff_exists_chart_fraction
               a ∈ regAt ξ p
                 ↔ ∃ s ∈ Algebra.adjoin o (Set.range fun j => x j / x c),
                   unitAt ξ p s ∧ s * a ∈ Algebra.adjoin o (Set.range fun j => x j / x c) := by
-  apply SheetDecomposition.regular_function_chart_adjoin <;> assumption
+  apply SheetDecomposition.regular_function_chart_adjoin
 
 end GlobalTheory.CompanionTheory.Ar

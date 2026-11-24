@@ -268,9 +268,7 @@ theorem exists_extension_pow
     : ∃ f : v.adicCompletion K →+* v'.adicCompletion L,
       Continuous f ∧ (∀ x : K, f (algebraMap K _ x) = algebraMap L _ (algebraMap K L x))
         ∧ ∀ y, Valued.v (f y) = Valued.v y ^ e := by
-  first
-  | (apply _root_.GlobalTheory.CompletionHomContinuous.exists_completion_hom <;> assumption)
-  | (intros; exact _root_.GlobalTheory.CompletionHomContinuous.exists_completion_hom ..)
+  first | (apply _root_.GlobalTheory.CompletionHomContinuous.exists_completion_hom <;> assumption)
 
 end GlobalTheory.DenseCompl
 end -- clump:auto

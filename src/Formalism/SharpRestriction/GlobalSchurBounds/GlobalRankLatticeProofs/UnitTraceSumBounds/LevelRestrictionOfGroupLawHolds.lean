@@ -1961,7 +1961,6 @@ theorem phGramG_holds : PhGramG := by
 
 theorem gramUnitEq_holds : GramUnitEq := by
   first
-  | exact _root_.PI.UnitaryGroupMassFormula.GramUnit.gramUnit
   | (
       intro p _ g
       intros

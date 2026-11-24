@@ -312,9 +312,7 @@ theorem exists_eig_factor
         → (∀ g ∈ KO k (m a), τ (Pi.mulSingle a g) y = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • y)
         → ∃ z : X a,
           z ≠ 0 ∧ ∀ g ∈ KO k (m a), ρ a g z = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • z := by
-  first
-  | exact @_root_.GlobalTheory.AugmentationEigenvector.exists_eigenvector
-  | (intros; exact _root_.GlobalTheory.AugmentationEigenvector.exists_eigenvector ..)
+  first | exact @_root_.GlobalTheory.AugmentationEigenvector.exists_eigenvector
 
 end GlobalTheory.EigenFactor
 end -- clump:auto

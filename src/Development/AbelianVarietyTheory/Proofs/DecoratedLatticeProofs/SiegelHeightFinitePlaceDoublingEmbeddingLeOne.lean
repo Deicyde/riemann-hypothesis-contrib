@@ -69,7 +69,6 @@ theorem absFin_latLoc_le
     exact @_root_.GlobalTheory.LocalLatticeBound.exists_bound_latLoc
   | (run_tac Lean.Elab.Tactic.liftMetaTactic (fun g => do pure [← g.revertAll]))
     exact _root_.GlobalTheory.LocalLatticeBound.exists_bound_latLoc
-  | (intros; exact _root_.GlobalTheory.LocalLatticeBound.exists_bound_latLoc ..)
 
 end GlobalTheory
 end -- clump:auto

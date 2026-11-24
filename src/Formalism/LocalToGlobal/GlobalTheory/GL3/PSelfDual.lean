@@ -556,8 +556,7 @@ alias K_repr := _root_.UpperTheory.Reformulated.B.CanonicalTranslateJets.K_repr
 theorem embedding_sqrt_neg_d : D.host.φ₀ (D.host.sqd) = Complex.I * (Real.sqrt D.host.d : ℂ) :=
   D.host.φ₀_mem
 
-theorem finrank_K : Module.finrank ℚ D.host.K = 2 := by
-  apply Formalism.L2.Pj.LPb.finrank_K <;> assumption
+theorem finrank_K : Module.finrank ℚ D.host.K = 2 := by apply Formalism.L2.Pj.LPb.finrank_K
 
 theorem cc_basis (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥)
     : ∃ c1 ∈ cc, ∃ c2 ∈ cc,

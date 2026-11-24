@@ -100,10 +100,7 @@ theorem eq_sum_of_uElt_mul
     calc
       e = e * (uElt U f e * v) := by rw [hv, mul_one]
       _ = cU U f * e * v := by rw [← mul_assoc, h1]
-      _ = _ := by
-        simp only [cU, Finset.sum_mul]
-        refine Finset.sum_congr rfl fun g _ => ?_
-        simp only [mul_assoc]
+      _ = _ := by simp only [cU, Finset.sum_mul, mul_assoc]
 
 end GlobalTheory.MeetsGen
 

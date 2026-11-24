@@ -113,7 +113,7 @@ theorem reference_repr_mem_lattice {v : VA X.B.I} (hv : v ∈ X.B.I.Lf) : repr0 
       · rw [SetLike.mem_coe, Subring.mem_comap]
         refine Subring.subset_closure (Or.inl
           ⟨⟨_, RingOfIntegers.mapRingEquiv (starRingAut : RingAut X.B.I.E) a, rfl⟩, ?_⟩)
-        first | rfl | simp [sigA, Formalism.UG.sigR, Formalism.BasicNotions.CMData.sig]
+        first | rfl
       · rw [SetLike.mem_coe, Subring.mem_comap]
         refine Subring.subset_closure (Or.inr ⟨⟨y, hy⟩, ?_⟩)
         simp [sigA, Formalism.UG.sigR]
@@ -286,7 +286,7 @@ theorem Z_of_sym
       · rw [SetLike.mem_coe, Subring.mem_comap]
         refine Subring.subset_closure (Or.inl
           ⟨⟨_, RingOfIntegers.mapRingEquiv (starRingAut : RingAut X.B.I.E) a, rfl⟩, ?_⟩)
-        first | rfl | simp [sigA, Formalism.UG.sigR, Formalism.BasicNotions.CMData.sig]
+        first | rfl
       · rw [SetLike.mem_coe, Subring.mem_comap]
         refine Subring.subset_closure (Or.inr ⟨⟨y, hy⟩, ?_⟩)
         simp [sigA, Formalism.UG.sigR]

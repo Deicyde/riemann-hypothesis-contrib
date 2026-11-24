@@ -108,18 +108,6 @@ theorem isCharH_iff (H : Host R) {N : ℕ} (χ : DirichletCharacter ℂ N)
   · rintro ⟨ψ, h1, h2⟩
     exact ⟨h1, ψ, fun a ha => (h2 a ha).trans (key ψ a ha)⟩
 
-def ThinOK (s : Scale) (c : ℝ) (H : Host R) : Prop :=
-  ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
-    IsCharH H χ
-      → ∀ y : ℝ,
-        Real.exp (s.x ^ (s.eps / 3)) / 3 ≤ y
-          → ‖GlobalTheoryTheory.gChi χ y‖ ≤ y * Real.exp (-(c * s.x ^ (s.eps / 8)))
-
-theorem thinScales_iff_hostBound (s : Scale) (c : ℝ) (H : Host R)
-    : ThinOK s c H ↔ H.ChebyshevCharacterBound s.x s.eps c :=
-  forall_congr' fun _ =>
-    forall_congr' fun _ => forall_congr' fun χ => imp_congr (isCharH_iff H χ) Iff.rfl
-
 def BoxH (H : Host R) (Y eps : ℝ) : Prop :=
   ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
     IsCharH H χ → GlobalTheoryTheory.IsRealChar χ
@@ -148,7 +136,7 @@ theorem BoxW.qdRowsW {s : Scale} {D : D7} (h : BoxW s D.host) : QDRowsW D s := h
 
 def HostGood (s : Scale) (C8 C5 c6 Cb : ℝ) (H : Host R) (q0 : ℕ) : Prop :=
   HostVal s C8 H ∧ HostArith H ∧ H.secondSet_card_lower_bound ∧ 4 * H.Lw * H.T2.card ≤ R.n0
-    ∧ QDq s.x s.eps C5 H.q H.d ∧ BoxW s H ∧ |dlogH H| ≤ s.x ^ s.eps ∧ ThinOK s c6 H ∧ BadOK s Cb H
+    ∧ QDq s.x s.eps C5 H.q H.d ∧ BoxW s H ∧ |dlogH H| ≤ s.x ^ s.eps ∧ BadOK s Cb H
     ∧ Disjoint (Formalism.CyclotomicNorms.BB R.r (H.g 0)) (Formalism.CyclotomicNorms.BB R.r (H.g 1))
     ∧ (∀ i, ∃ π : 𝓞 H.E,
       (π : H.E) ∈ H.K ∧ (π : H.E) * H.conj (π : H.E) = (H.g i : H.E)

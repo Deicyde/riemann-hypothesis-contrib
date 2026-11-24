@@ -173,13 +173,7 @@ theorem modK_natUnit
     rw [h0, map_zero] at hv
     exact zero_ne_one hv
   have hinv : (((n : ℕ) : (D.s.atP p).Fp))⁻¹ ∈ 𝒪[(D.s.atP p).Fp] := by
-    first
-    | (rw [Valuation.mem_integer_iff, map_inv₀, hv, inv_one])
-    | (
-        show valuation _ _ ≤ 1
-        rw [map_inv₀, hv, inv_one]
-      )
-    | (simp only [Valuation.mem_integer_iff, map_inv₀, hv, inv_one, le_refl])
+    first | (rw [Valuation.mem_integer_iff, map_inv₀, hv, inv_one])
   obtain ⟨w, hw⟩ : ∃ w : 𝒪[(D.s.atP p).Fp], (w : (D.s.atP p).Fp) * ((n : ℕ) : (D.s.atP p).Fp) = 1 :=
     ⟨⟨_, hinv⟩, inv_mul_cancel₀ hn0⟩
   have hnO : ((n : ℕ) : (D.s.atP p).Fp) ∈ 𝒪[(D.s.atP p).Fp] := by first | exact natCast_mem _ n
@@ -375,11 +369,7 @@ theorem norm_nat (n : ℕ) : Algebra.norm ℚ ((n : ℕ) : D.host.E) = (n : ℚ)
   have h : ((n : ℕ) : D.host.E) = algebraMap ℚ D.host.E (n : ℚ) := by simp
   rw [h, Algebra.norm_algebraMap]
   congr 1
-  first
-  | exact Formalism.L2.Pj.hostSize_finrank D
-  | exact Formalism.MainNotions.TwistedPlaces.finrank_E_host D
-  | exact Formalism.MainNotions.LatticeGluingRadicals.j_finrank D
-  | exact Formalism.MainNotions.BridgeLemma.szf_finrankE D
+  first | exact Formalism.MainNotions.LatticeGluingRadicals.j_finrank D
 
 theorem modNorm_of (hDP : DeltaProd D) : ModNorm D := by
   intro δ M hA ν s t ht

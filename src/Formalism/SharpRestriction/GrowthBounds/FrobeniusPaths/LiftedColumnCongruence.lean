@@ -158,7 +158,7 @@ theorem lifted_column_congruence
     induction F using MvPolynomial.induction_on with
     | C a => simp [powSubst, MvPolynomial.algebraMap_eq]
     | add F G hF hG => simp only [map_add (f := _), hF, hG]
-    | mul_X F v hF => simp [powSubst, hF, P] at hF ⊢ <;> assumption
+    | mul_X F v hF => simp [powSubst, P] at hF ⊢ <;> assumption
   have hres
       : ∀ F : MvPolynomial (Fin N × Fin (r + K)) ℤ,
         MvPolynomial.map (IsLocalRing.residue O) (aeval P (MvPolynomial.map (Int.castRingHom O) F))

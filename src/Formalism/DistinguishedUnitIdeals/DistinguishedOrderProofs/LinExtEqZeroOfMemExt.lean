@@ -442,7 +442,7 @@ theorem exists_const_decomp
     rw [e]
 
     simp only [map_sum, map_smul, Module.Basis.equivFun_self, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul, Pi.single_apply]
+      smul_eq_mul]
   let Φ : _ → (Fin r → O) →ₗ[O] O := fun j =>
     LinearMap.proj j ∘ₗ snf.bM.equivFun.toLinearMap ∘ₗ F.mkQ
   have hΦ : ∀ j v, Φ j v = snf.bM.equivFun (F.mkQ v) j := fun j v => rfl

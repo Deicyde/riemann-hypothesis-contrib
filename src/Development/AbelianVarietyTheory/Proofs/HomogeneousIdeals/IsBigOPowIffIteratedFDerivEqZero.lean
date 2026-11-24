@@ -155,9 +155,7 @@ theorem eq_cexp_fderiv_of_map_add
     {f : E → ℂ} (hf : DifferentiableAt ℂ f 0) (h0 : f 0 ≠ 0) (hm : ∀ x y, f (x + y) = f x * f y)
     (z : E)
     : f z = cexp (fderiv ℂ f 0 z) := by
-  first
-  | (apply _root_.GlobalTheory.ExpOfFrechetDerivative.eq_exp_fderiv <;> assumption)
-  | (intros; exact _root_.GlobalTheory.ExpOfFrechetDerivative.eq_exp_fderiv ..)
+  first | (apply _root_.GlobalTheory.ExpOfFrechetDerivative.eq_exp_fderiv <;> assumption)
 
 end Character
 

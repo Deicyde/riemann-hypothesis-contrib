@@ -703,8 +703,7 @@ theorem isSBHalf_cosLoc_top
       (cosLoc (locPl G t) e (S.βp (j + 1)) (S.βp j) N r) :=
   _root_.GlobalTheory.FunObj.CosSB.isSBHalf_cosLoc (G.V (.top j)) (G.V (.top (j + 1)))
     (G.Λ (.top j)) (G.Λ (.top (j + 1))) (S.βp j) (S.βp (j + 1)) (locPl G t) e N r
-    (by first | exact isFullLattice_top G j.2.le | exact (isFullLattice_top G j.2.le).toIsLattice)
-    (by first | exact isFullLattice_top G j.2 | exact (isFullLattice_top G j.2).toIsLattice)
+    (by first | exact isFullLattice_top G j.2.le) (by first | exact isFullLattice_top G j.2)
     (S.βp_is j j.2.le) (S.βp_is (j + 1) j.2) he hr
 
 theorem isSBHalf_cosLoc_chi
@@ -725,13 +724,8 @@ theorem isSBHalf_cosLoc_chi
     · exact isFullLattice_grid_succ G hi.le
   exact _root_.GlobalTheory.FunObj.CosSB.isSBHalf_cosLoc (G.pS (.chi i D.R.m)) (G.pT (.chi i D.R.m))
     (G.Λ (.grid (i + 1) D.R.m)) (G.Λ (.grid i D.R.m)) (S.B.β (i + 1) D.R.m) (S.B.β i D.R.m)
-    (locPl G t) e N r
-    (by
-      first
-      | exact isFullLattice_grid_succ G i.2
-      | exact (isFullLattice_grid_succ G i.2).toIsLattice)
-    (by first | exact hT | exact hT.toIsLattice) (S.B.isFrame_β hL i.2 le_rfl)
-    (S.B.isFrame_β hL i.2.le le_rfl) he hr
+    (locPl G t) e N r (by first | exact isFullLattice_grid_succ G i.2) (by first | exact hT)
+    (S.B.isFrame_β hL i.2 le_rfl) (S.B.isFrame_β hL i.2.le le_rfl) he hr
 
 end SBs
 

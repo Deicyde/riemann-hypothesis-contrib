@@ -307,7 +307,7 @@ theorem chval_fin_iff (φ : A →+* V) (e : ℕ) (f : FractionRing A) (u : ℝ)
       ↔ ∃ x s : A,
         φ s ≠ 0 ∧ φ x ≠ 0 ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) x
           ∧ u = vr e (φ x) - vr e (φ s) := by
-  apply GlobalTheory.Reg.TrivBound.chval_fin_iff <;> assumption
+  apply GlobalTheory.Reg.TrivBound.chval_fin_iff
 
 theorem chval_fin_mul
     (φ : A →+* V) (e : ℕ)

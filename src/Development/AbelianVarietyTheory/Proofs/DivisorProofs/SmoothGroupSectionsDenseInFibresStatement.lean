@@ -652,7 +652,7 @@ theorem _root_.GlobalTheory.T.etaleChart_localization_finiteType_formallyUnramif
               (Localization.Away (Ideal.Quotient.mk I (1 ⊗ₜ[R] h)))
             ∧ Algebra.FormallyUnramified (MvPolynomial (Fin g) Ω)
               (Localization.Away (Ideal.Quotient.mk I (1 ⊗ₜ[R] h))) := by
-  apply _root_.GlobalTheory.DenseSec.locQuot_finiteType_formallyUnramified <;> assumption
+  apply _root_.GlobalTheory.DenseSec.locQuot_finiteType_formallyUnramified
 
 end
 end -- clump:auto

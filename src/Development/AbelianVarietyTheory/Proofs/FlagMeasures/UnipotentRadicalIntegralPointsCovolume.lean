@@ -1851,8 +1851,7 @@ theorem layer_covolume
   }
   have hM := fun b : Fin m =>
     _root_.GlobalTheory.HomCovolumeFamily.homCovolume_family E hE ι φ hX.1 _ _ (Λ b) (Λ (b + c + 1))
-      (by first | exact hΛ _ | exact (hΛ _).toIsLattice)
-      (by first | exact hΛ _ | exact (hΛ _).toIsLattice)
+      (by first | exact hΛ _) (by first | exact hΛ _)
       (fun v => G v b)
       (fun v => G v (b + c + 1))
       (fun v => hdet v _)
@@ -1890,7 +1889,7 @@ theorem layer_covolume
     positivity
   have hp :=
     _root_.GlobalTheory.PieceCov.main E hE ι n m φ P X hX hP F r T T' Λ hT
-      (by intro b; first | exact hΛ b | exact (hΛ b).toIsLattice) hF U hU hW
+      (by intro b; first | exact hΛ b) hF U hU hW
   rw [h, hp, hp, div_mul_cancel_left₀ (pow_pos hv _).ne', mul_pow, ← pow_mul, inv_pow, mul_assoc,
     mul_assoc, div_eq_mul_inv]
 

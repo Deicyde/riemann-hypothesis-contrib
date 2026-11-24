@@ -199,13 +199,7 @@ theorem isSt_cut
 
 theorem le_iff_lt_colH {μ : Fin r → ℤ} (hμ : Antitone μ) (c : ℤ) (m : Fin r)
     : c ≤ μ m ↔ m.val < colH μ c := by
-  first
-  | (apply UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH <;> assumption)
-  | exact @UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH r μ hμ c m
-  | exact @UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH r μ hμ c
-  | exact @UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH r μ hμ
-  | exact @UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH r μ
-  | exact @UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH r
+  first | (apply UpperTheory.Reformulated.B.Qk46.le_iff_lt_colH <;> assumption)
 
 theorem eq_of_colH
     {μ μ' : Fin r → ℤ} (hμ : Antitone μ) (hμ' : Antitone μ') (h : ∀ c, colH μ c = colH μ' c)

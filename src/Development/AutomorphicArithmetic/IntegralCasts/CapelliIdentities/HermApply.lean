@@ -79,8 +79,7 @@ private noncomputable def herm
     (by intro v w w'; simp only [map_add (f := _), LinearMap.add_apply]; ring)
     (by
       intro a v w
-      simp only [map_smul, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply, map_mul,
-        Complex.conj_conj]
+      simp only [map_smul, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul]
       ring)
 
 private lemma herm_apply {V : Type} [AddCommGroup V] [Module ℂ V]

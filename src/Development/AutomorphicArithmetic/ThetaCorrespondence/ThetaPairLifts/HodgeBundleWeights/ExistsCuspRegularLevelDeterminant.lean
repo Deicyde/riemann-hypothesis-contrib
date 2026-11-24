@@ -271,7 +271,6 @@ theorem isOpenImmersion_toNormalization
       revert V P X c p h_5 j h_7 h_8 h_9 h
       exact @_root_.GlobalTheory.NormalizationOpenImmersion.main
     )
-  | (intros; exact _root_.GlobalTheory.NormalizationOpenImmersion.main ..)
 
 theorem isQProjOver_of_isProjOver'
     {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R} (h : IsProjOver f)

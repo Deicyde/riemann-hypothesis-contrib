@@ -733,9 +733,7 @@ theorem pfil_succ_le_theta_image_sup (j : ℕ)
       w.reverse.get ⟨i, by rw [List.length_reverse, hl]; exact i.isLt⟩
     have hα0 : (List.ofFn α0).reverse = w := by
       rw [List.reverse_eq_iff]
-      first
-      | (apply List.ext_get (by simp [hl]); intro k h1 h2; rw [List.get_ofFn]; rfl)
-      | (apply List.ext_getElem (by simp [hl]); intro k h1 h2; rw [List.getElem_ofFn]; rfl)
+      first | (apply List.ext_get (by simp [hl]); intro k h1 h2; rw [List.get_ofFn]; rfl)
     have hnc0 : ∀ i, ε (α0 i).1 ≠ ε (α0 i).2 := by
       intro i
       have hm : α0 i ∈ w.reverse := by first | exact List.get_mem _ _

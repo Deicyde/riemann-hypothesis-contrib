@@ -191,7 +191,7 @@ theorem precomplete_of_finite
 
 theorem exists_pow_idem (M : Type) [Monoid M] [Finite M] (x : M)
     : ∃ n : ℕ, 0 < n ∧ x ^ n * x ^ n = x ^ n := by
-  apply PositivityTheory.ThKG.Loc.Cone.Vf.exists_pow_idem <;> assumption
+  apply PositivityTheory.ThKG.Loc.Cone.Vf.exists_pow_idem
 
 theorem isLocalRing_of_finite
     (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]

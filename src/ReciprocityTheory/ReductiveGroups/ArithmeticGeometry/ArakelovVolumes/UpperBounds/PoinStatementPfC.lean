@@ -124,7 +124,7 @@ private theorem gram_continuous_comp
     Matrix.of_apply]
   refine continuous_finsetSum _ fun k _ => continuous_finsetSum _ fun l _ => ?_
   refine ((hf.matrix_elem k a).mul continuous_const).mul ?_
-  first | exact Complex.continuous_conj.comp (hf.matrix_elem l b) | fun_prop
+  first | exact Complex.continuous_conj.comp (hf.matrix_elem l b)
 
 theorem isOpen_Bset (X : Data E r) (x : Frame X.Ψ r) (ρ : ℝ) : IsOpen (Bset X x ρ) := by
   have hdom : IsOpen X.dom := by
@@ -288,7 +288,7 @@ theorem key_int
       calc
         e / W (cpt X x w)
           = ((e / W (cpt X x w)) ^ (1 / 2 : ℝ)) ^ 2 := (pow_half_sq _).symm
-        _ ≤ supR X la W ρ x ^ 2 := by first | exact pow_le_pow_left' h1 2 | gcongr
+        _ ≤ supR X la W ρ x ^ 2 := by first | exact pow_le_pow_left' h1 2
     have he : e ≤ supR X la W ρ x ^ 2 * W (cpt X x w) := by
       calc
         e = e / W (cpt X x w) * W (cpt X x w) := (ENNReal.div_mul_cancel hW0 hWT).symm

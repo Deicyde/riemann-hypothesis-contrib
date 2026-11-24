@@ -1494,9 +1494,7 @@ theorem leviWh_eq_one
         → ∀ (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (b : Fin r → ℕ)
             (σ : Representation ℂ (blockTri (κ := F) b) V),
           IsCuspDatum b σ → leviWh ψ b σ = 1 := by
-  first
-  | exact @_root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one
-  | (intros; exact _root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one ..)
+  first | exact @_root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one
 
 end Main
 

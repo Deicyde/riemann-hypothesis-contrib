@@ -917,8 +917,7 @@ theorem chGood_of_host
   have hH' : HostGood s C.P.Cpde C5 c6 Cb (setUnipotentTranslate H u0)
       (DC.q0H (setUnipotentTranslate H u0)) :=
     hH
-  obtain
-      ⟨hv, har, hT2, hT3, -, -, hdl, -, -, hBB, hgn, hpde, ⟨hp0, hmod0, hq0le, hq1, hq2⟩, hlev⟩ :=
+  obtain ⟨hv, har, hT2, hT3, -, -, hdl, -, hBB, hgn, hpde, ⟨hp0, hmod0, hq0le, hq1, hq2⟩, hlev⟩ :=
     hH
   have hN2 : 2 ≤ H.QS * H.q * H.d := by
     have h1 : 0 < H.QS * H.q := Nat.mul_pos H.QS_pos H.hyp.1.pos

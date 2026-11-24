@@ -1104,17 +1104,13 @@ omit [Group G] [TopologicalSpace G] in
 theorem decays_span_left
     {ρ : G → (H →L[ℂ] H)} {D : G → ℝ} {c : ℝ} {S : Set H} {u : H} (h : ∀ v ∈ S, Decays ρ D c v u)
     : ∀ v ∈ Submodule.span ℂ S, Decays ρ D c v u := by
-  first
-  | (apply _root_.GlobalTheory.DecayOfMemSpan.decay_of_mem_span <;> assumption)
-  | (intros; exact _root_.GlobalTheory.DecayOfMemSpan.decay_of_mem_span ..)
+  first | (apply _root_.GlobalTheory.DecayOfMemSpan.decay_of_mem_span <;> assumption)
 
 omit [Group G] [TopologicalSpace G] in
 theorem decays_span_right
     {ρ : G → (H →L[ℂ] H)} {D : G → ℝ} {c : ℝ} {S : Set H} {v : H} (h : ∀ u ∈ S, Decays ρ D c v u)
     : ∀ u ∈ Submodule.span ℂ S, Decays ρ D c v u := by
-  first
-  | (apply _root_.GlobalTheory.SpanDecay.span_decay <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SpanDecay.span_decay ..)
+  first | (apply _root_.GlobalTheory.SpanDecay.span_decay <;> assumption)
 
 theorem decays_translate
     {ρ : G → (H →L[ℂ] H)} (hρ : IsURep ρ)

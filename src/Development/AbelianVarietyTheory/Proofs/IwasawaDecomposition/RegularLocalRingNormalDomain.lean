@@ -277,9 +277,7 @@ theorem dvd_of_not_dvd
     {a b : A} (hb : ¬ x ∣ b)
     {I : Ideal A} (hI : I ≠ ⊥) (hst : ∀ r ∈ I, ∃ s ∈ I, a * r = b * s)
     : b ∣ a := by
-  first
-  | (apply _root_.GlobalTheory.SaturatedNotDvd.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SaturatedNotDvd.main ..)
+  first | (apply _root_.GlobalTheory.SaturatedNotDvd.main <;> assumption)
 
 omit [IsLocalRing A] in
 theorem prime_dvd_of_stable

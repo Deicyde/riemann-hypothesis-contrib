@@ -457,19 +457,7 @@ theorem iotaF_mem_cof (D : Formalism.BasicNotions.D7) (x : D.host.F)
     exact h
   have hvb : p.valuation D.host.F (algebraMap (𝓞 D.host.F) D.host.F b) = 1 := by
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
-    first
-    | exact (IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff (v := p)).2 hbp
-    | (
-        apply le_antisymm (p.intValuation_le_one _)
-        rw [← not_lt, IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem]
-        exact hbp
-      )
-    | (
-        apply le_antisymm (p.intValuation_le_one _)
-        rw [← not_lt, IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_dvd,
-          Ideal.dvd_span_singleton]
-        exact hbp
-      )
+    first | exact (IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff (v := p)).2 hbp
   have hva : p.valuation D.host.F (algebraMap (𝓞 D.host.F) D.host.F a) ≤ 1 := by
     first | exact p.valuation_le_one a
   rw [memO_iff, ← map_one (D.s.atP p).ιF, (D.s.atP p).val, map_one, map_div₀, hvb, div_one]
@@ -1452,9 +1440,7 @@ def thTriv (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
 
 theorem autP_thTriv (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
     : autP M p (thTriv M p) = 1 := by
-  first
-  | (simp only [autP, thTriv]; rw [nAut_triv]; simp)
-  | (show (((M p).nAut (trivCls (M p) D.R.rS) : ℕ) : ℂ) = 1; rw [nAut_triv]; simp)
+  first | (simp only [autP, thTriv]; rw [nAut_triv]; simp)
 
 theorem bbtop_good
     {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
@@ -1598,9 +1584,7 @@ theorem prod_bounds
       Real.exp (-(4 * x ^ a))
         ≤ Real.exp (-(2 * ∑ i ∈ Finset.Icc a b, x ^ i)) := by apply Real.exp_le_exp.2; linarith
       _ = ∏ i ∈ Finset.Icc a b, Real.exp (-(2 * x ^ i)) := by
-        first
-        | (rw [← Real.exp_sum]; congr 1; rw [Finset.mul_sum, ← Finset.sum_neg_distrib])
-        | (rw [← Real.exp_sum]; congr 1; simp [Finset.mul_sum])
+        first | (rw [← Real.exp_sum]; congr 1; rw [Finset.mul_sum, ← Finset.sum_neg_distrib])
       _ ≤ ∏ i ∈ Finset.Icc a b, (1 - η ^ i * x ^ i) := by
         apply Finset.prod_le_prod₀
         · intro i _; exact (Real.exp_pos _).le

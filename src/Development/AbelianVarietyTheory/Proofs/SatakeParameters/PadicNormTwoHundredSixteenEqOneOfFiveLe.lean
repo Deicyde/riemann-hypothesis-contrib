@@ -186,7 +186,7 @@ theorem isWq_scale (W : WeierstrassCurve ℂ_[p]) (wq : PowerSeries ℂ_[p]) (h 
 theorem omegaW_scale (W : WeierstrassCurve ℂ_[p]) (wq : PowerSeries ℂ_[p])
     : omegaW (scC ν hν • W) (PowerSeries.rescale ν⁻¹ wq)
       = PowerSeries.rescale ν⁻¹ (omegaW W wq) := by
-  apply _root_.Formalism.L2.KerInert.WeierstrassScaling.omegaW_scale <;> assumption
+  apply _root_.Formalism.L2.KerInert.WeierstrassScaling.omegaW_scale
 
 theorem flog_scale (W : WeierstrassCurve ℂ_[p]) (wq : PowerSeries ℂ_[p])
     : flog (scC ν hν • W) (PowerSeries.rescale ν⁻¹ wq)
@@ -241,7 +241,7 @@ theorem ePhi1_scale
     (ν : ℂ_[p]) (hν : ν ≠ 0)
     : ePhi1 lam Λ (scC ν hν * C) (PowerSeries.rescale ν⁻¹ wq)
       = PowerSeries.rescale ν⁻¹ (ePhi1 lam Λ C wq) := by
-  apply _root_.Formalism.L2.KerInert.WeierstrassScaling.ePhi1_scale <;> assumption
+  apply _root_.Formalism.L2.KerInert.WeierstrassScaling.ePhi1_scale
 
 theorem isModel_scale
     (lam : Qbar →+* ℂ_[p]) (Λ : AddSubgroup ℂ) (C : WeierstrassCurve.VariableChange ℂ_[p])

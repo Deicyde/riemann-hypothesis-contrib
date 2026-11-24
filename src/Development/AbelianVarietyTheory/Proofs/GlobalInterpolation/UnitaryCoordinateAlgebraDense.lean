@@ -115,9 +115,7 @@ theorem coprod_adjoin
     : ∀ p ∈ Algebra.adjoin ℂ S, ∃ (m : ℕ) (a b : Fin m → G → ℂ),
       (∀ i, a i ∈ Algebra.adjoin ℂ S ∧ b i ∈ Algebra.adjoin ℂ S)
         ∧ ∀ x k, p (x * k) = ∑ i, a i x * b i k := by
-  first
-  | (apply _root_.GlobalTheory.SplittingAdditive.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SplittingAdditive.main ..)
+  first | (apply _root_.GlobalTheory.SplittingAdditive.main <;> assumption)
 
 theorem poly_infU
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ),
@@ -151,8 +149,6 @@ theorem poly_infU
                   ∧ b i ∈ Algebra.adjoin ℂ
                     {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j})
               ∧ ∀ x k, p (x * k) = ∑ i, a i x * b i k := by
-  first
-  | exact @_root_.GlobalTheory.CoordinateEmbeddingSplits.main
-  | (intros; exact _root_.GlobalTheory.CoordinateEmbeddingSplits.main ..)
+  first | exact @_root_.GlobalTheory.CoordinateEmbeddingSplits.main
 
 end GlobalTheory.PolyRealU

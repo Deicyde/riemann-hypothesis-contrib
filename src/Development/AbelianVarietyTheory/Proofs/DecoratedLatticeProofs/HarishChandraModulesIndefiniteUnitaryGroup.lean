@@ -362,7 +362,7 @@ theorem iE_memD (a : Formalism.BasicNotions.TH.Ix p q) : Complex.I • Eab a a �
 
 theorem exp_twoPiD (a : Formalism.BasicNotions.TH.Ix p q)
     : NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) • rx (Complex.I • Eab a a)) = 1 := by
-  apply CompanionTheory.D.gk.HC.exp_twoPiD <;> assumption
+  apply CompanionTheory.D.gk.HC.exp_twoPiD
 
 theorem signD
     (h : IsHCMod πU M io)

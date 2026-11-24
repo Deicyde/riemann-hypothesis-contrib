@@ -480,7 +480,7 @@ theorem alV_mul_self_halfA
   have key :=
     GlobalTheory.SemiTrace.alV_embH_eq_neg_one_zpow D ψ θ S T S.rank T.rank rfl rfl δ sc hP x' n (by
       rw [← hn]
-      congr 3 <;> ext i j)
+      congr 3)
   rw [key, ← mul_zpow]
   norm_num
 

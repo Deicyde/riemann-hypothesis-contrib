@@ -1062,7 +1062,7 @@ def evA (v : HeightOneSpectrum (𝓞 F)) : Af F →+* v.adicCompletion F where
 theorem evA_apply (v : HeightOneSpectrum (𝓞 F)) (a : Af F) : evA v a = a v := rfl
 
 theorem eq_of_evA {a b : Af F} (h : ∀ v, evA v a = evA v b) : a = b := by
-  first | (ext v; exact h v) | exact Subtype.ext (funext h) | exact RestrictedProduct.ext h
+  first | (ext v; exact h v) | exact Subtype.ext (funext h)
 
 def mkA (c : ∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletion F) (hc : ∀ v, Valued.v (c v) ≤ 1)
     : Af F :=

@@ -918,9 +918,7 @@ theorem eigSum_mul_proj_eq
     : PairComm (fun i => h i * e)
       ∧ ∀ Q : (I → ℂ) → Prop,
         ¬ Q 0 → eigSum (fun i => h i * e) Q = ⨆ (c : C) (_ : Q (lab c)), Ec c := by
-  first
-  | (apply _root_.GlobalTheory.IndependentInfimum.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IndependentInfimum.main ..)
+  first | (apply _root_.GlobalTheory.IndependentInfimum.main <;> assumption)
 
 end GlobalTheory.Hk3
 end -- clump:auto

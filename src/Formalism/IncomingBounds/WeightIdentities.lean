@@ -612,7 +612,7 @@ namespace Formalism.IncomingBounds
 
 open MvPolynomial Matrix
 
-theorem cayleyIdentity : CayleyId := by apply GlobalTheory.CayleyCapelli.cayleyId <;> assumption
+theorem cayleyIdentity : CayleyId := by apply GlobalTheory.CayleyCapelli.cayleyId
 
 end Formalism.IncomingBounds
 end -- clump:auto

@@ -158,9 +158,7 @@ theorem finite_lift_fractionField
     (Z P : Scheme.{0}) (p : Z ⟶ P) (ξ₀ : Sp R ⟶ P) (y : Sp (FractionRing R) ⟶ Z)
     (hp : IsFinite p) (hy : y ≫ p = jK R ≫ ξ₀)
     : ∃ ξ : Sp R ⟶ Z, jK R ≫ ξ = y ∧ ξ ≫ p = ξ₀ := by
-  first
-  | (apply _root_.GlobalTheory.RetractionLiftSection.lift_finite <;> assumption)
-  | (intros; exact _root_.GlobalTheory.RetractionLiftSection.lift_finite ..)
+  first | (apply _root_.GlobalTheory.RetractionLiftSection.lift_finite <;> assumption)
 
 end GlobalTheory
 end -- clump:auto

@@ -936,7 +936,6 @@ theorem relIndex_parahoric_conj_mtor
     exact @_root_.GlobalTheory.ParahoricConjugateOpen.relIndex_conj_parahoric
   | (run_tac Lean.Elab.Tactic.liftMetaTactic (fun g => do pure [← g.revertAll]))
     exact _root_.GlobalTheory.ParahoricConjugateOpen.relIndex_conj_parahoric
-  | (intros; exact _root_.GlobalTheory.ParahoricConjugateOpen.relIndex_conj_parahoric ..)
 
 end GlobalTheory.ParIdx
 end -- clump:auto

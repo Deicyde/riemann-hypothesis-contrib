@@ -102,7 +102,7 @@ theorem main
         ↔ Nontrivial V
           ∧ ∀ (U : Submodule ℂ V),
             (∀ (g : G), ∀ v ∈ U, ((ρ : G → V →ₗ[ℂ] V) g : V → V) v ∈ U) → U = ⊥ ∨ U = ⊤ := by
-  apply GlobalTheory.CuspRep.isIrreducible_iff <;> assumption
+  apply GlobalTheory.CuspRep.isIrreducible_iff
 
 end GlobalTheory.SubrepTopBot
 end -- clump:auto

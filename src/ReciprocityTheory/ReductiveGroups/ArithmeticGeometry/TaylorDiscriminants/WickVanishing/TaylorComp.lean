@@ -226,7 +226,7 @@ theorem isTayF_tay {θ : (Fin g → ℂ) → ℂ} (hθ : ContDiffAt ℂ ω θ 0)
         push_cast
         ring
       · rw [if_neg hp, Finsupp.add_apply, mul_one]
-        simp [Finsupp.single_apply, Ne.symm hp]
+        simp [Ne.symm hp]
     unfold fct
     rw [Finset.prod_congr rfl (fun p _ => h p), Finset.prod_mul_distrib, Finset.prod_ite_eq']
     simp
@@ -238,7 +238,6 @@ theorem isTayF_tay {θ : (Fin g → ℂ) → ℂ} (hθ : ContDiffAt ℂ ω θ 0)
   · ext k
     have h1 : ((k q : ℂ) + 1) ≠ 0 := Nat.cast_add_one_ne_zero _
     have h2 := hf0 k
-    beta_reduce
     rw [MvPowerSeries.coeff_pderiv, hc, hc, hd, hf, Multiset.cons_add, ← Multiset.add_cons]
     field_simp
   · rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hc]
@@ -253,9 +252,7 @@ theorem cc_subst
     : constantCoeff (subst L F) = constantCoeff F := by
   classical
   have hL : MvPowerSeries.HasSubst L := by
-    first
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_zero hL0
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hL0
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hL0
   rw [MvPowerSeries.constantCoeff_subst hL, finsum_eq_single _ 0]
   · simp [MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
   · intro e he
@@ -301,7 +298,7 @@ private theorem pderiv_tay_eq_tay_cons_single
         push_cast
         ring
       · rw [if_neg hp, Finsupp.add_apply, mul_one]
-        simp [Finsupp.single_apply, Ne.symm hp]
+        simp [Ne.symm hp]
     unfold fct
     rw [Finset.prod_congr rfl (fun p _ => h p), Finset.prod_mul_distrib, Finset.prod_ite_eq']
     simp
@@ -322,9 +319,7 @@ theorem isTayF_subst
     (hL0 : ∀ p, constantCoeff (L p) = 0) (hLd : ∀ p q, pderiv q (L p) = C (a p q))
     : IsTayF f (fun q => ∑ p, a p q • (Pi.single p.2 1 : Fin g → ℂ)) (subst L (tay f 0)) := by
   have hL : MvPowerSeries.HasSubst L := by
-    first
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_zero hL0
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hL0
+    first | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hL0
   have hcf
       : ∀ (s : Multiset (Fin g → ℂ)) (k : Fin 1 × Fin g →₀ ℕ),
         coeff k (tay f s) = mD f 0 (dirs k + s) / fct k := fun _ _ =>
@@ -446,7 +441,7 @@ theorem partA (f : (Fin g → ℂ) → ℂ) (hf : ContDiffAt ℂ ω f 0) (c : Fi
         by_cases h : p = q
         · subst h
           simp [MvPowerSeries.smul_eq_C_mul]
-        · simp [h, Pi.single_apply, Ne.symm h])
+        · simp [h])
   have hv
       : ∀ q : Fin 1 × Fin g,
         diagCLM c (Pi.single q.2 1)
@@ -455,7 +450,7 @@ theorem partA (f : (Fin g → ℂ) → ℂ) (hf : ContDiffAt ℂ ω f 0) (c : Fi
     rw [diagCLM_apply]
     simp only [ite_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     funext i
-    by_cases h : i = q.2 <;> simp [Pi.single_apply, h]
+    by_cases h : i = q.2 <;> simp [h]
   have h3 :=
     isTayF_comp hf (diagCLM c) (w := fun p : Fin 1 × Fin g => (Pi.single p.2 1 : Fin g → ℂ)) hv h2
   rw [← e] at h3

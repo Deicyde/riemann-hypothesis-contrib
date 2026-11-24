@@ -519,9 +519,7 @@ theorem kerInf_mem_regSpan
 theorem IsLocModerate.bound_of_isCompact
     {F : GA E a → ℂ} (hF : IsLocModerate F) {K : Set (GA E a)} (hK : IsCompact K)
     : ∃ (C : ℝ) (N : ℕ), 0 ≤ C ∧ ∀ g ∈ K, ∀ y, ‖F (g * infGL E a y)‖ ≤ C * height y ^ N := by
-  first
-  | (apply _root_.GlobalTheory.CompactUniformHeightBound.compact_uniform_bound <;> assumption)
-  | (intros; exact _root_.GlobalTheory.CompactUniformHeightBound.compact_uniform_bound ..)
+  first | (apply _root_.GlobalTheory.CompactUniformHeightBound.compact_uniform_bound <;> assumption)
 
 theorem locSpan_le_regSpan
     {π : CuspSub E a} {φ : Sm E a} (hφ : φ ∈ π.V) (S : Finset (HeightOneSpectrum (𝓞 E)))

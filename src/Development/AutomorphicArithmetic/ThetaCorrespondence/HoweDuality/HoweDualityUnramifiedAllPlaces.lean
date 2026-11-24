@@ -1452,7 +1452,7 @@ theorem decomp
     (t : M₀ ⊗[ℂ] (⨂[ℂ] i, M i))
     : ∃ (m : ℕ) (f : Fin m → M₀) (φ : Fin m → ∀ i, M i),
       t = ∑ j, f j ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (φ j) := by
-  apply GlobalTheory.HoweGlobal.decomp <;> assumption
+  apply GlobalTheory.HoweGlobal.decomp
 
 theorem det_ne_sig_map
     {E : Type} [Field E]

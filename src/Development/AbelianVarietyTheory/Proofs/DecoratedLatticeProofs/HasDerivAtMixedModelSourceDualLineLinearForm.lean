@@ -40,22 +40,7 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
-
-namespace I195MixedCoordinates_9421736abf21ec81fbe38545
-
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.MixModel MeasureTheory
-attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
-public noncomputable abbrev source
-    {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (T : HSp D) (ψ : AddChar (AF D.host.F) ℂ)
-    (μ : Measure (Mx D T.rank ρ)) (𝓕 : Set (Mx D T.rank ρ)) (f : WO S T → ℂ) (x : Mx D T.rank ρ)
-    : WO S₀ T → ℂ := fun w₀ =>
-  ∫ a in 𝓕, heisO ψ S T (a * d.pY)
-    (heisO ψ S T (x * d.pX) (heisO ψ S T (w₀ * d.p0) f)) 0 ∂μ
-
-end I195MixedCoordinates_9421736abf21ec81fbe38545
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.MixedCoordinates
 
 @[expose] public section
 
@@ -85,9 +70,8 @@ theorem hasDerivAt_mixS_extY
                       HasDerivAt
                         (fun t : ℝ =>
                           ψ (symplO S T (d.extX T x) (d.extY T (L t)))
-                            * (_root_.I195MixedCoordinates_9421736abf21ec81fbe38545.source d) T ψ
-                              v.μ v.𝓕 f x w)
-                        ((_root_.I195MixedCoordinates_9421736abf21ec81fbe38545.source d) T ψ v.μ v.𝓕
+                            * (_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕 f x w)
+                        ((_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕
                           (fun p => deriv (fun t : ℝ => heisO ψ S T (d.extY T (L t)) f p) 0)
                           x w)
                         0 := by
@@ -105,10 +89,9 @@ theorem hasDerivAt_mixS_extY
   have e1
       : (fun t : ℝ =>
           ψ (symplO S T (d.extX T x) (d.extY T (L t)))
-            * (_root_.I195MixedCoordinates_9421736abf21ec81fbe38545.source d) T ψ v.μ v.𝓕 f x w)
+            * (_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕 f x w)
         = fun t =>
-          (_root_.I195MixedCoordinates_9421736abf21ec81fbe38545.source d) T ψ v.μ v.𝓕
-            (heisO ψ S T (M t) f) x w := by
+          (_root_.I195MixedCoordinates.source d) T ψ v.μ v.𝓕 (heisO ψ S T (M t) f) x w := by
     funext t
     have h :=
       congrFun

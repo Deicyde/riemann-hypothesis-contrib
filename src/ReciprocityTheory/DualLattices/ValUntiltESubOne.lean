@@ -179,14 +179,12 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
   have hpow : ∀ (x : PreTilt O p) (n : ℕ), (x ^ n).untilt = x.untilt ^ n := by
     intro x n
     first
-    | exact PreTilt.untilt_pow x n
     | exact map_pow _ x n
   rcases hp.out.eq_two_or_odd' with h2 | hodd
   · subst h2
     set e' := (frobeniusEquiv (PreTilt O 2) 2).symm e with he'
     have hep : e' ^ 2 = e := by
       first
-      | exact frobeniusEquiv_symm_pow_p 2 e
       | (have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O 2) 2 e
          rwa [frobenius_def] at h3)
     have hsub : (e' - 1) ^ 2 = e - 1 := by rw [sub_pow_char, one_pow, hep]
@@ -263,7 +261,6 @@ theorem xiNu
   set e := (frobeniusEquiv (PreTilt O p) p).symm ε with he
   have hep : e ^ p = ε := by
     first
-    | exact frobeniusEquiv_symm_pow_p p ε
     | (
         have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O p) p ε
         rwa [frobenius_def] at h3
@@ -297,10 +294,10 @@ theorem xiNu
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.mp hxi
   have hmul : ∀ x y : PreTilt O p, (x * y).untilt = x.untilt * y.untilt := by
     intro x y
-    first | exact PreTilt.untilt_mul x y | exact map_mul _ x y
+    first | exact map_mul _ x y
   have hpow : ∀ (x : PreTilt O p) (n : ℕ), (x ^ n).untilt = x.untilt ^ n := by
     intro x n
-    first | exact PreTilt.untilt_pow x n | exact map_pow _ x n
+    first | exact map_pow _ x n
   have hone : (1 : PreTilt O p).untilt = 1 := by
     have h5 := hpow (1 : PreTilt O p) 0
     rwa [pow_zero, pow_zero] at h5

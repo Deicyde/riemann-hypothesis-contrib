@@ -217,24 +217,10 @@ theorem thetaV_sigR
     intro c
     first
     | (
-        refine InfinitePlace.Completion.induction_on c
-          (isClosed_eq (Complex.continuous_conj.comp hc) hc) ?_
-        intro y
-        first
-        | (rw [InfinitePlace.Completion.extensionEmbedding_coe]; exact hK _)
-        | (simp only [InfinitePlace.Completion.extensionEmbedding_coe]; exact hK _)
-        | (simp [InfinitePlace.Completion.extensionEmbedding_coe, hK]; done)
-        | (simp [hK]; done)
-      )
-    | (
         refine (InfinitePlace.Completion.denseRange_coe (v := v)).induction_on c
           (isClosed_eq (Complex.continuous_conj.comp hc) hc) ?_
         intro y
-        first
-        | (rw [InfinitePlace.Completion.extensionEmbedding_coe]; exact hK _)
-        | (simp only [InfinitePlace.Completion.extensionEmbedding_coe]; exact hK _)
-        | (simp [InfinitePlace.Completion.extensionEmbedding_coe, hK]; done)
-        | (simp [hK]; done)
+        first | (rw [InfinitePlace.Completion.extensionEmbedding_coe]; exact hK _)
       )
   have hreal
       : ∀ a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F,

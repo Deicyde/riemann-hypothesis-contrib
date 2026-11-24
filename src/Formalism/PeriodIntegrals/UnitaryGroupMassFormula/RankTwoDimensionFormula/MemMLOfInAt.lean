@@ -137,8 +137,7 @@ theorem leviM_mul_par {x y : X.B.I.Gf} (hx : Par X x) (hy : Par X y) (v : TR.Pl)
     : leviM TR (x * y) v = leviM TR x v * leviM TR y v :=
   leviM_mul TR hx.1 hy.1 hy.2.2 hx.2.1 v
 
-theorem leviM_one (v : TR.Pl) : leviM TR 1 v = 1 := by
-  apply Formalism.L2.SG.NormCut.leviM_one <;> assumption
+theorem leviM_one (v : TR.Pl) : leviM TR 1 v = 1 := by apply Formalism.L2.SG.NormCut.leviM_one
 
 end Par
 

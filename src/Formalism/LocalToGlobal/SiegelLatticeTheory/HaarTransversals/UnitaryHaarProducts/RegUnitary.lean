@@ -424,14 +424,13 @@ theorem reg_norm (g : I.Ginf) (F : I.L2 μf fund) : ‖R (g, 1) F‖ = ‖F‖ :
   haveI hli : (I.muA μf).IsMulLeftInvariant := by
     unfold AutInst.muA
     first
-    | infer_instance
     | (unfold Formalism.REAL.muG; infer_instance)
   have hFD : rr_FD (I.muA μf) Γ fund := by
     refine ⟨hfd.1, ?_, hfd.2.2⟩
     simpa only [Γ, rr_GF_coe, AutInst.GFset] using hfd.2.1
   have hReg : rr_IsReg (I.muA μf) Γ fund R := by
     intro g' F'
-    first | exact hR g' F' | (filter_upwards [hR g' F'] with x hx; rw [hx]; rfl)
+    first | exact hR g' F'
   exact rp_norm hFD hReg (rp_inst I μf g) (rp_inst_inv I μf g) F
 
 include hfd hR in
@@ -440,12 +439,11 @@ theorem reg_mul (a b : I.Ginf) : R (a * b, 1) = (R (a, 1)).comp (R (b, 1)) := by
   haveI hli : (I.muA μf).IsMulLeftInvariant := by
     unfold AutInst.muA
     first
-    | infer_instance
     | (unfold Formalism.REAL.muG; infer_instance)
   have hFD : rr_FD (I.muA μf) Γ fund := ⟨hfd.1, hfd.2.1, hfd.2.2⟩
   have hReg : rr_IsReg (I.muA μf) Γ fund R := by
     intro g' F'
-    first | exact hR g' F' | (filter_upwards [hR g' F'] with x hx; rw [hx]; rfl)
+    first | exact hR g' F'
   have e : ((a * b, 1) : I.GA) = ((a, 1) : I.GA) * ((b, 1) : I.GA) := Prod.ext (by simp) (by simp)
   rw [e]
   exact rp_mul hFD hReg (rp_inst I μf a) (rp_inst_inv I μf a)
@@ -460,12 +458,11 @@ theorem ind_tendsto {s : Set I.GA} (hs : MeasurableSet s) (hμs : (I.muA μf).re
   haveI hli : (I.muA μf).IsMulLeftInvariant := by
     unfold AutInst.muA
     first
-    | infer_instance
     | (unfold Formalism.REAL.muG; infer_instance)
   have hFD : rr_FD (I.muA μf) Γ fund := ⟨hfd.1, hfd.2.1, hfd.2.2⟩
   have hReg : rr_IsReg (I.muA μf) Γ fund R := by
     intro g' F'
-    first | exact hR g' F' | (filter_upwards [hR g' F'] with x hx; rw [hx]; rfl)
+    first | exact hR g' F'
   classical
   have hrep := rr_rep_spec hFD
   have hN0 := rr_N_null hFD
@@ -500,15 +497,15 @@ theorem ind_tendsto {s : Set I.GA} (hs : MeasurableSet s) (hμs : (I.muA μf).re
       have F7 : ∀ᵐ x ∂(I.muA μf).restrict fund, x * ((g, 1) : I.GA) ∉ rr_N Γ fund := by
         refine ae_restrict_of_ae ?_
         filter_upwards [compl_mem_ae_iff.mpr (rp_N_pre hFD (rp_inst I μf g))] with x hx
-        first | simpa only [Set.mem_compl_iff, Set.mem_preimage] using hx | exact hx
+        first | simpa only [Set.mem_compl_iff, Set.mem_preimage] using hx
       have F6 : ∀ᵐ x ∂(I.muA μf).restrict fund, x ∉ rr_N Γ fund := by
         refine ae_restrict_of_ae ?_
         filter_upwards [compl_mem_ae_iff.mpr hN0] with x hx
-        first | simpa only [Set.mem_compl_iff] using hx | exact hx
+        first | simpa only [Set.mem_compl_iff] using hx
       filter_upwards [Lp.coeFn_sub (R (g, 1) X) X, hReg (g, 1) X, F3, hXs, ae_restrict_mem hfd.1, F6, F7]
         with x e1 e2 e3 e4 hxD hx6 hx7
       rw [e1]
-      first | rw [Pi.sub_apply] | skip
+      first | rw [Pi.sub_apply]
       rw [e2, e3, e4]
       obtain ⟨c, hc, hcy, hcD⟩ := hrep (x * ((g, 1) : I.GA))
       rw [hcy]
@@ -550,9 +547,9 @@ theorem ind_tendsto {s : Set I.GA} (hs : MeasurableSet s) (hμs : (I.muA μf).re
       by_cases h1 : c * (x * ((g, 1) : I.GA)) ∈ s <;> by_cases h0 : x ∈ s
       · simp [Set.indicator_apply, h1, h0]
       · have hxE : x ∈ E g := hEx.mpr (Or.inl ⟨hP1.mp h1, fun h => h0 (hP0.mpr h)⟩)
-        simp [Set.indicator_apply, h1, h0, hxE]
+        simp [h1, h0, hxE]
       · have hxE : x ∈ E g := hEx.mpr (Or.inr ⟨hP0.mp h0, fun h => h1 (hP1.mpr h)⟩)
-        simp [Set.indicator_apply, h1, h0, hxE]
+        simp [h1, h0, hxE]
       · simp [Set.indicator_apply, h1, h0]
   have hET : ∀ g : I.Ginf, (I.muA μf).restrict fund (E g) ≤ I.muA μf (T g) := by
     intro g
@@ -666,10 +663,7 @@ theorem ind_tendsto {s : Set I.GA} (hs : MeasurableSet s) (hμs : (I.muA μf).re
       (fun g : I.Ginf => (eLpNorm ⇑(R (g, 1) X - X) 2 ((I.muA μf).restrict fund)).toReal)
       (𝓝 1) (𝓝 0) := by
     have h3 := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp he
-    first
-    | rw [ENNReal.zero_toReal] at h3
-    | rw [ENNReal.toReal_zero] at h3
-    | simp only [ENNReal.zero_toReal] at h3
+    first | rw [ENNReal.toReal_zero] at h3
     exact h3
   refine h2.congr (fun g => ?_)
   exact (Lp.norm_def _).symm

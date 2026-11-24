@@ -129,7 +129,7 @@ theorem exists_atInf_piInf_eq
           ∃ z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
               (E := E),
             At (evI F) z ∧ ∀ w, piInf (emb w) z = f w := by
-  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf <;> assumption
+  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf
 
 end GlobalTheory.RealLift
 end -- clump:auto

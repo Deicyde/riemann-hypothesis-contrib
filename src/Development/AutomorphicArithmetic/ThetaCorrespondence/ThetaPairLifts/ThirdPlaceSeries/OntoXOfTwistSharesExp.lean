@@ -1385,10 +1385,7 @@ theorem _root_.GlobalTheory.T.finiteGroup_levelStructure_action_fixedRuns
           ∀ (r : GlobalTheory.RealIndexBound.RunData J) (h : LawsFull r.full) (i : Fin D.R.m),
             letI : Algebra r.full.J.Q.c.F D.what₂.LL := ‹Algebra J.Q.c.F D.what₂.LL›
             LevelPin (T := r.full) R i (ℓ i) ∧ ActionPin (T := r.full) (R := R) h.p fw i (ℓ i) := by
-  first
-  | exact @GlobalTheory.LevelActionOnto.levelPin_actionPin
-  | exact GlobalTheory.LevelActionOnto.levelPin_actionPin
-  | (intros; apply GlobalTheory.LevelActionOnto.levelPin_actionPin <;> assumption)
+  first | exact @GlobalTheory.LevelActionOnto.levelPin_actionPin
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteGroupLevelStructureActionFixedRunsStatement =====

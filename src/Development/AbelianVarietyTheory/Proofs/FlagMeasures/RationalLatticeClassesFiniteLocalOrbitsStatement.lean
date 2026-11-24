@@ -1889,7 +1889,7 @@ theorem _root_.GlobalTheory.T.orbitLattice_between_frameAndComplementParts
                             (N : D.host.E) • x
                               ∈ Λ ⊓ toO (VS D) (Xplus F ⊔ Xplus F')
                                 ⊔ Λ ⊓ toO (VS D) (orth (VS D) (Xplus F ⊔ Xplus F')) := by
-  first | exact @GlobalTheory.FrameProj.lattice_between_parts | intros
+  first | exact @GlobalTheory.FrameProj.lattice_between_parts
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitLatticeBetweenFrameAndComplementPartsStatement =====

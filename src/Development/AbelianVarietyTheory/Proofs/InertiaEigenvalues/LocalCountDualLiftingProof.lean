@@ -1236,9 +1236,7 @@ theorem hasRelCompl_sup
     {X U : Submodule K V}
     (hXs : StableUnder f X) (hUs : StableUnder f U) (hX : HasRelCompl f X) (hU : HasRelCompl f U)
     : HasRelCompl f (X ⊔ U) := by
-  first
-  | (apply _root_.GlobalTheory.ComplementedSup.complemented_sup <;> assumption)
-  | (intros; exact _root_.GlobalTheory.ComplementedSup.complemented_sup ..)
+  first | (apply _root_.GlobalTheory.ComplementedSup.complemented_sup <;> assumption)
 
 end General
 

@@ -543,9 +543,7 @@ theorem lieEigen_rank_cover
               ∧ ∀ u : Fin D.g → ℂ,
                 ρ (algebraMap (𝓞 D.F) D.O D.ω) *ᵥ u = σ b.ρ • u
                   → u ∈ ⨆ i, eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) (τ i) := by
-  first
-  | exact @_root_.GlobalTheory.LieEigenspaceFinrank.lie_type_of_unif
-  | (intros; exact _root_.GlobalTheory.LieEigenspaceFinrank.lie_type_of_unif ..)
+  first | exact @_root_.GlobalTheory.LieEigenspaceFinrank.lie_type_of_unif
 
 end GlobalTheory.UPel.HT.LieType
 end -- clump:auto

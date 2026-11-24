@@ -417,7 +417,7 @@ theorem linForm
 
 theorem PN_cover (k : Type) [Field k] (d : ℕ) (y : PN (k := k) d)
     : ∃ i : Fin (d + 1), y ∈ Proj.basicOpen (homogeneousSubmodule (Fin (d + 1)) k) (X i) := by
-  apply LateralTheory.EtaleTrace.Cov.pn_cover <;> assumption
+  apply LateralTheory.EtaleTrace.Cov.pn_cover
 
 theorem FSAffine_pf : FSAffine := by
   intro k _ X _ p N d ι π v w hι cv cw hlin hx

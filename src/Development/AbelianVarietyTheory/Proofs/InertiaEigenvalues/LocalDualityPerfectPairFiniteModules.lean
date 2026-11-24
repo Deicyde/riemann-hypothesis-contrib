@@ -54,6 +54,15 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 
 namespace GlobalTheory.LocalPair
 
+/-- A nondegenerate pairing valued in `ZMod n` forces the source to be killed by `n`. -/
+theorem nsmul_eq_zero_of_nondegenerate_pairing
+    {n : ℕ} {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
+    (P : X →+ Y →+ ZMod n) (h : ∀ x, (∀ y, P x y = 0) → x = 0)
+    (x : X)
+    : n • x = 0 := by
+  refine h _ fun y => ?_
+  rw [map_nsmul, AddMonoidHom.nsmul_apply, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+
 theorem exists_dual_equiv
     {n : ℕ} [NeZero n]
     {M : Type} [AddCommGroup M] [Module (ZMod n) M] [Finite M]
@@ -73,24 +82,15 @@ theorem exists_dual_equiv
     refine h2 y fun x => ?_
     rw [← hf, hy]
     rfl
-  have c1 : Nat.card (TDual (ZMod n) M) = Nat.card M := GlobalTheory.ZModDual.card_dual_eq n M
-  have : Finite (TDual (ZMod n) M) :=
-    Nat.finite_of_card_ne_zero (by rw [c1]; exact Nat.card_pos.ne')
-  have c2 : Nat.card (Module.Dual (ZMod n) M') = Nat.card M' :=
-    GlobalTheory.ZModDual.card_dual_eq n M'
-  have : Finite (Module.Dual (ZMod n) M') :=
-    Nat.finite_of_card_ne_zero (by rw [c2]; exact Nat.card_pos.ne')
-  have c3 : Nat.card M ≤ Nat.card M' := by
-    rw [← c2]
-    refine Nat.card_le_card_of_injective
-      (fun x => ((P x).toZModLinearMap n : Module.Dual (ZMod n) M'))
-      ?_
+  let g : M → Module.Dual (ZMod n) M' := fun x => (P x).toZModLinearMap n
+  have hg : Function.Injective g := by
     intro x x' hx
     rw [← sub_eq_zero]
     refine h1 _ fun y => ?_
     rw [map_sub, AddMonoidHom.sub_apply, sub_eq_zero]
     exact DFunLike.congr_fun hx y
-  exact ⟨AddEquiv.ofBijective f (inj.bijective_of_nat_card_le (c1 ▸ c3)), hf⟩
+  have bij := (GlobalTheory.ZModDual.bijective_of_mutual_dual_injections n M M' f g inj hg).1
+  exact ⟨AddEquiv.ofBijective f bij, hf⟩
 
 theorem dual_equivariant
     {n : ℕ} {Λ D : Type} [CommRing Λ] [Group D]
@@ -105,39 +105,6 @@ theorem dual_equivariant
   rw [twDual_apply, he, he]
   change _ = _ * P (ρ g⁻¹ x) y
   rw [← hP, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
-
-section Transport
-
-variable
-  {R R' : Type} [CommRing R] [CommRing R']
-  {D : Type} [Group D] [TopologicalSpace D]
-  {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
-  {M' : Type} [AddCommGroup M'] [Module R' M'] [TopologicalSpace M'] [DiscreteTopology M']
-  (ρ : Representation R D M) (ρ' : Representation R' D M') (e : M ≃+ M')
-  (he : ∀ g m, e (ρ g m) = ρ' g (e m))
-
-private def cocycleTransport : Z1 ρ ≃+ Z1 ρ' where
-  toFun z := ⟨
-    fun g => e (z.1 g),
-    continuous_of_discreteTopology.comp z.2.1,
-    fun g h => by
-      beta_reduce
-      rw [z.2.2, map_add (f := _), he]
-  ⟩
-  invFun z := ⟨
-    fun g => e.symm (z.1 g),
-    continuous_of_discreteTopology.comp z.2.1,
-    fun g h => by
-      apply e.injective
-      rw [map_add (f := _), he]
-      simp only [AddEquiv.apply_symm_apply]
-      exact z.2.2 g h
-  ⟩
-  left_inv z := Subtype.ext (funext fun g => e.symm_apply_apply _)
-  right_inv z := Subtype.ext (funext fun g => e.apply_symm_apply _)
-  map_add' z w := Subtype.ext (funext fun g => map_add e _ _)
-
-end Transport
 
 theorem local_pair
     : LocalFiniteness → LocalTateDuality → LocalEulerChar
@@ -168,12 +135,9 @@ theorem local_pair
     hP
   have : NeZero (l ^ n) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   have : Module (ZMod (l ^ n)) W :=
-    AddCommGroup.zmodModule fun x =>
-      h1 _ fun y => by
-        rw [map_nsmul, AddMonoidHom.nsmul_apply, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+    AddCommGroup.zmodModule (nsmul_eq_zero_of_nondegenerate_pairing P h1)
   have : Module (ZMod (l ^ n)) W' :=
-    AddCommGroup.zmodModule fun y =>
-      h2 _ fun x => by rw [map_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+    AddCommGroup.zmodModule (nsmul_eq_zero_of_nondegenerate_pairing P.flip h2)
   let χ := (cycMod F Ω l n).comp (Dec (F := F) A).subtype
   refine ⟨fun y => ⟨fun H => ?_, ?_⟩, fun hv => ?_⟩
   · obtain ⟨e, he⟩ := exists_dual_equiv P.flip h2 h1
@@ -187,8 +151,8 @@ theorem local_pair
         induction x using Submodule.Quotient.induction_on with
         | H x =>
           obtain ⟨x, rfl⟩ :=
-            (cocycleTransport ρ ((twDual χ (zmodRep (l ^ n) ρ')).comp (MonoidHom.id _)) e
-              hee).surjective x
+            (_root_.GlobalTheory.DualPairFormula.cocycleEquiv ρ
+              ((twDual χ (zmodRep (l ^ n) ρ')).comp (MonoidHom.id _)) e hee).surjective x
           obtain ⟨f, hf1, hf2⟩ := H x
           refine (Submodule.Quotient.mk_eq_zero _).2
             ((separated_dvr_second_cohomology_mem _ _).2 ⟨f, hf1.continuous, funext fun p => ?_⟩)

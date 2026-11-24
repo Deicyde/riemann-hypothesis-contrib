@@ -627,9 +627,7 @@ theorem order_prod_sub_prod
     (ha : ∀ i ∈ s, (k i : ℕ∞) ≤ (a i).order) (hb : ∀ i ∈ s, (k i : ℕ∞) ≤ (b i).order)
     (hab : ∀ i ∈ s, (k i : ℕ∞) + 1 ≤ (a i - b i).order)
     : (∑ i ∈ s, (k i : ℕ∞)) + 1 ≤ (∏ i ∈ s, a i - ∏ i ∈ s, b i).order := by
-  first
-  | (apply _root_.GlobalTheory.OrderProductDifference.target <;> assumption)
-  | (intros; exact _root_.GlobalTheory.OrderProductDifference.target ..)
+  first | (apply _root_.GlobalTheory.OrderProductDifference.target <;> assumption)
 
 theorem order_pow_sub_pow
     {R τ : Type} [CommRing R]
@@ -737,7 +735,7 @@ theorem coeff_subst_sub_mem
                   coeff w (MvPowerSeries.subst (QLog.up (Q := Q) u) c)
                       - coeff w (MvPowerSeries.subst (QLog.up (Q := Q) ℓ) c)
                     = algebraMap B Q r := by
-  apply GlobalTheory.SubstMod.subst_coeff_sub_mem <;> assumption
+  apply GlobalTheory.SubstMod.subst_coeff_sub_mem
 
 theorem coeff_op_of_degree_le_one
     : ∀ {B O : Type} [CommRing B] [CommRing O] (θ : B →+* O) {d : ℕ}

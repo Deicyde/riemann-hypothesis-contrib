@@ -554,7 +554,7 @@ theorem local_theorem_of_statement
     : SmallInertPrimeSmallOrderLengthBound D W := by
   intro μ _ u w hg Xs Ys hXs hA
   obtain ⟨std, vp, unif, eO, eO_spec, dG, dG_spec, om, rfl⟩ := hXs
-  exact (@h u w ⟨D.what₂.places.resChar_prime w⟩ hg _ Ys rfl hA).2.2.2.2.2.2.2.2.2.2
+  exact (@h u w ⟨D.what₂.places.resChar_prime w⟩ hg _ Ys rfl hA).2.2.2.2.2
 
 theorem serv_of
     {C : ℝ}

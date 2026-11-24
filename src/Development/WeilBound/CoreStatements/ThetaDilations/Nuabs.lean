@@ -110,6 +110,6 @@ theorem nuabs
               nn z.1 * ι z.2.1 * mm z.2.2).map (fun g => nn p * ι u * mm t * g)
             = (μN.prod (μH.prod (μT.withDensity fun s => (χ s : ℝ≥0∞)))).map fun z =>
               nn z.1 * ι z.2.1 * mm z.2.2 := by
-  apply GlobalTheory.CompanionTheory.Adelic.tripleProduct_map_leftInvariant <;> assumption
+  apply GlobalTheory.CompanionTheory.Adelic.tripleProduct_map_leftInvariant
 
 end PositivityTheory.PlacePermOperatorBicommutantSpan

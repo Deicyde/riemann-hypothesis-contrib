@@ -1201,7 +1201,7 @@ theorem split_case
     ?_
   ⟩
   · intro k l
-    simp only [Units.val_mk]
+    simp only
     rw [huy]
     exact int_ef w he_int hf_int (hle _ _ (hi k) hpi') (hle _ _ (hj k) hqj') l
   · intro k l
@@ -1211,11 +1211,11 @@ theorem split_case
       intro g m hg
       by_cases hk : k = m
       · subst hk; simpa using hg l
-      · simp [Pi.single_apply, hk]
+      · simp [hk]
     simp only [Pi.add_apply, map_add (f := _), Finsupp.add_apply]
     exact (w.map_add _ _).trans (max_le (h1' e i he_int) (h1' f j hf_int))
-  · simp only [Units.val_mk, Pi.add_apply, add_mul, Finset.sum_add_distrib, Pi.single_apply,
-      ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true, huy]
+  · simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, Pi.single_apply, ite_mul, zero_mul,
+      Finset.sum_ite_eq', Finset.mem_univ, if_true, huy]
     have a1 : e * (((p i)⁻¹ * p i) • e + ((q j)⁻¹ * q i) • f) = e := by
       rw [inv_mul_cancel₀ hpi', one_smul, mul_add, hee, mul_smul_comm, hef, smul_zero, add_zero]
     have a2 : f * (((p i)⁻¹ * p j) • e + ((q j)⁻¹ * q j) • f) = f := by

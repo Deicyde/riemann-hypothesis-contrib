@@ -1366,7 +1366,7 @@ theorem L_inv
                       IsInt (p := p) y
                         ∧ (∃ N, ∀ g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y)
                         ∧ Cong (p := p) k ((T.ζ j - 1) * x) y := by
-  apply GlobalTheory.K5.geo_invariants_from_finite_level <;> assumption
+  apply GlobalTheory.K5.geo_invariants_from_finite_level
 
 theorem L_decomp
     : ∀ (p : ℕ) [Fact p.Prime],

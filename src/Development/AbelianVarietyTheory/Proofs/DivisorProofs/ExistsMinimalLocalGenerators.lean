@@ -268,9 +268,7 @@ theorem exists_minimal_local_generators
         g ∉ Q ∧ (∀ j, f j ∈ Q) ∧ (∀ x ∈ Q, g * x ∈ Ideal.span (Set.range f))
           ∧ h = (maximalIdeal (Localization.AtPrime Q)).spanFinrank
           ∧ ∀ (a : Fin h → S) (u : S), u ∉ Q → u * ∑ j, a j * f j ∈ Q ^ 2 → ∀ j, a j ∈ Q := by
-  first
-  | exact @_root_.GlobalTheory.MultipleMembershipForAll.main
-  | (intros; exact _root_.GlobalTheory.MultipleMembershipForAll.main ..)
+  first | exact @_root_.GlobalTheory.MultipleMembershipForAll.main
 
 end GlobalTheory
 end -- clump:auto

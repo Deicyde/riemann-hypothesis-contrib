@@ -207,6 +207,6 @@ theorem halves_free_and_adjoint
                         ∣ Dw.EF (qRep (kst (Submodule.Quotient.mk u))) (cHalf H d.I • v)
                           - Dw.EF u (cHalf H d.I • qRep (k (Submodule.Quotient.mk v)))))
                     ↔ k = adj kst := by
-  apply GlobalTheory.ShortVal.Halves.halves_free_and_adjoint <;> assumption
+  apply GlobalTheory.ShortVal.Halves.halves_free_and_adjoint
 
 end GlobalTheory.HalfPairing

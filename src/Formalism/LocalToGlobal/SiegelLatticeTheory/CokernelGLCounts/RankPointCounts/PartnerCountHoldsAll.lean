@@ -161,7 +161,7 @@ variable
 include hu in
 theorem unit_cancel {r : R} (h : (r : E) * u = 0) : r = 0 := by
   have h' : (r : E) = 0 := by first | exact hu.mul_left_eq_zero.1 h
-  first | exact Subtype.ext h' | exact_mod_cast h' | simpa using h'
+  first | exact Subtype.ext h'
 
 include hu in
 theorem uniq_N
@@ -234,7 +234,7 @@ theorem Phi_fst
     {x x' : NF α₁} (h : (x : C₁ × E).1 = (x' : C₁ × E).1)
     : ((Phi hu ψ hψl x : NF α₂) : C₂ × E).1 = ((Phi hu ψ hψl x' : NF α₂) : C₂ × E).1 := by
   obtain ⟨r, hr⟩ := diff_of_fst α₁ h
-  have hx : x = x' + r • e0 α₁ := by first | exact sub_eq_iff_eq_add'.1 hr | (rw [← hr]; abel)
+  have hx : x = x' + r • e0 α₁ := by first | exact sub_eq_iff_eq_add'.1 hr
   rw [hx, Phi_add, Phi_smul, fiberMap_fiberUnit hu ψ hψl hψe]
   first | (simp [e0]; done)
 

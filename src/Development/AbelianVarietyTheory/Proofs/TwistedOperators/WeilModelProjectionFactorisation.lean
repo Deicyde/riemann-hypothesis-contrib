@@ -361,9 +361,7 @@ theorem exists_sep
         (∀ᶠ v in Filter.cofinite, φ v = vac v)
           → Λ (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ)
             = lam f * ∏ᶠ v, l v (φ v) := by
-  first
-  | (apply _root_.GlobalTheory.FiniteAdelicPoints.exists_functional_pure <;> assumption)
-  | (intros; exact _root_.GlobalTheory.FiniteAdelicPoints.exists_functional_pure ..)
+  first | (apply _root_.GlobalTheory.FiniteAdelicPoints.exists_functional_pure <;> assumption)
 
 theorem exists_pureLift
     : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]

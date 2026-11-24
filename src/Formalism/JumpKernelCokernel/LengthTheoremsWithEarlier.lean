@@ -1096,7 +1096,7 @@ section -- clump:auto
 namespace Formalism.KernelCokernelLengths.KernelCokernelEqualityLemmas
 
 theorem main
-    (O : Type) [CommRing O]
+    (O : Type) [Ring O]
     (M : Type) [AddCommGroup M] [Module O M]
     (hM : Module.length O M ≠ ⊤) (f : Module.End O M)
     : Module.length O (LinearMap.ker f) = Module.length O (M ⧸ LinearMap.range f) := by
@@ -1119,7 +1119,7 @@ theorem main
   exact ENat.add_left_injective_of_ne_top hr (h1.symm.trans (h3.trans (add_comm _ _)))
 
 theorem coker
-    (O : Type) [CommRing O]
+    (O : Type) [Ring O]
     (M M' : Type) [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
     (f : Module.End O M) (f' : Module.End O M') (g : M →ₗ[O] M')
     (hg : Function.Surjective g) (hc : g ∘ₗ f = f' ∘ₗ g)

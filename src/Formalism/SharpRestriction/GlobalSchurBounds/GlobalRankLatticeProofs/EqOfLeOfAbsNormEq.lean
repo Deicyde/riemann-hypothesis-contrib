@@ -243,7 +243,7 @@ theorem gen_top (H : Host R) (x : H.K) (hx : (x : H.E) = H.sqd)
     : IntermediateField.adjoin ℚ {x} = ⊤ := by
   apply IntermediateField.map_injective (IsScalarTower.toAlgHom ℚ H.K H.E)
   rw [IntermediateField.adjoin_map, Set.image_singleton]
-  first | rw [IntermediateField.map_top] | rw [← AlgHom.fieldRange_eq_map]
+  first | rw [IntermediateField.map_top]
   ext z
   rw [AlgHom.mem_fieldRange, show IsScalarTower.toAlgHom ℚ H.K H.E x = H.sqd from hx]
   exact ⟨

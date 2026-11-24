@@ -137,7 +137,7 @@ theorem skL_isom
 
   simp only [map_add (f := _), map_sum, LinearMap.add_apply, LinearMap.sum_apply,
     LinearMap.map_smulₛₗ₂, map_smul, D.sp.hyp_ee, hue, smul_eq_mul, mul_zero, Finset.sum_const_zero,
-    add_zero, starRingEnd_apply, star_sum, star_mul', hS]
+    add_zero, starRingEnd_apply, star_mul', hS]
   linear_combination key
 
 theorem hE_int

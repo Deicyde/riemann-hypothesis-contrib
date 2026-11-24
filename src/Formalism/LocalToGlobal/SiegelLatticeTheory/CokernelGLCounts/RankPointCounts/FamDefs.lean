@@ -236,7 +236,7 @@ theorem hp_nonneg
   unfold FPair.Hp
   apply Real.rpow_nonneg
   refine mul_nonneg (mul_nonneg ?_ ?_) (Finset.prod_nonneg fun l _ => ?_)
-  all_goals first | exact M.modK_nonneg _ | (unfold Loc.Model.modK; positivity)
+  all_goals first | (unfold Loc.Model.modK; positivity)
 
 def HTie : Prop :=
   ∀ Cg cb Cw cT CT C0 : ℝ, ∃ C'₀ Cl₀ : ℝ, ∀ C' Cl : ℝ,

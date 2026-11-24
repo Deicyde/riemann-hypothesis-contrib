@@ -483,9 +483,7 @@ theorem good_coeff_integers
           ∧ IsCompact (Set.range (algebraMap O LL))
           ∧ (∀ n : ℕ, Finite (O ⧸ Ideal.span {((l : ℕ) : O) ^ n}))
           ∧ IsAdicComplete (Ideal.span {((l : ℕ) : O)}) O := by
-  first
-  | exact @_root_.GlobalTheory.PowerImageOpen.main
-  | (intros; exact _root_.GlobalTheory.PowerImageOpen.main ..)
+  first | exact @_root_.GlobalTheory.PowerImageOpen.main
 
 end GlobalTheory.GoodCoeff
 end -- clump:auto

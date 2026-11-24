@@ -1411,6 +1411,8 @@ open scoped TensorProduct
 section
 variable {B : Base} {X : PreX B.toPre} (I : TC B X) (l : I.Laws) (Z : Later B (I.cols l))
 
+set_option genInjectivity false in
+set_option genSizeOfSpec false in
 structure TwStep
     (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z))
     (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u))
@@ -1694,6 +1696,8 @@ theorem twStep_mid
         (hC.carC u i h1 h2 (g β)).Lb_eq
     · exact (hoU β v hv).trans ((hC.carC u i h1 h2 (g β)).Uloc_eq v)
 
+set_option genInjectivity false in
+set_option genSizeOfSpec false in
 structure TopP
     {H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)}
     {F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)}
@@ -1796,6 +1800,8 @@ theorem twStep_top
         (fun _ h2 => (hno h2).elim)
     exact ⟨S, ⟨fun _ _ => hchi, fun _ _ _ => htop, fun _ _ => hk⟩⟩
 
+set_option genInjectivity false in
+set_option genSizeOfSpec false in
 structure TwPack
     (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z))
     (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u))

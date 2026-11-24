@@ -138,14 +138,9 @@ theorem simple_transp (e : ι ≃ κ) {τ : FDRep ℂ (GL ι K)} (h : Simple τ)
     simp only [character_transp]
     symm
     refine Fintype.sum_equiv (glEquiv K e).toEquiv _ _ (fun g => ?_)
-    first | simp | simp [map_inv] | rfl
+    first | simp
   rw [hs]
-  first
-  | (rw [hc]; exact h)
-  | (simp only [hc]; exact h)
-  | (simp only [invOf_eq_inv] at h ⊢; rw [hc]; exact h)
-  | (convert h using 3; simp [hc])
-  | (convert h using 2; simp [hc])
+  first | (convert h using 3; simp [hc]) | (convert h using 2; simp [hc])
 
 theorem mem_unip_glEquiv {s : ℕ} (b : κ → Fin s) (e : ι ≃ κ) {u : GL ι K} (hu : u ∈ unip K (b ∘ e))
     : glEquiv K e u ∈ unip K b := by

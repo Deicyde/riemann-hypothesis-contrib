@@ -71,7 +71,7 @@ theorem main
     (L : Submodule (NumberField.RingOfIntegers E) W)
     : ∀ v ∈ Submodule.span E (↑L : Set W), ∃ (c : NumberField.RingOfIntegers E),
       c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • v ∈ L := by
-  apply Formalism.L2.SG.Pf.LatEx.exists_smul_mem_of_mem_span <;> assumption
+  apply Formalism.L2.SG.Pf.LatEx.exists_smul_mem_of_mem_span
 
 end GlobalTheory.ClearingDenominatorsInOrder
 end -- clump:auto
@@ -116,7 +116,7 @@ theorem exists_rep
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
 theorem exists_vec (S : HSpace E) (φ : S.V →ₗ[E] E) : ∃ w, ∀ x, φ x = S.hT w x := by
-  apply _root_.GlobalTheory.LoopC.FunIdx.exists_vec <;> assumption
+  apply _root_.GlobalTheory.LoopC.FunIdx.exists_vec
 
 theorem span_eq_top_of_unimodular
     {S : HSpace E} (L : Submodule (𝓞 E) S.V) (hL : Submodule.IsLattice E L)

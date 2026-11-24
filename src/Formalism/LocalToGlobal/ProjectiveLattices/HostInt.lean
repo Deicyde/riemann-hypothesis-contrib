@@ -313,7 +313,7 @@ theorem riesz
     {E : Type} [Field E] [NumberField E] [StarRing E]
     (S : Formalism.BasicNotions.HSpace E) (l : S.V →ₗ[E] E)
     : ∃ x, ∀ v, S.hT x v = l v := by
-  apply Formalism.L2.SG.Pf.FrameGlobalPatching.FStar.BwdNA.riesz <;> assumption
+  apply Formalism.L2.SG.Pf.FrameGlobalPatching.FStar.BwdNA.riesz
 
 end Unimod
 

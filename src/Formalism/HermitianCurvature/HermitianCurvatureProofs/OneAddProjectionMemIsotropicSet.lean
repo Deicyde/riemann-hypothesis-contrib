@@ -370,7 +370,7 @@ theorem mul_mem_isotropic_unipotent_set
 
 theorem herm_bvec_esI (v : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
     : herm (Hpk k r) v (bvec (esI k r b)) = v (eI k r b) := by
-  apply PI.StabPairsW.herm_es <;> assumption
+  apply PI.StabPairsW.herm_es
 
 end N2
 

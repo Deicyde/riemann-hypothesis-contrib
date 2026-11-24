@@ -48,6 +48,6 @@ theorem isUniUp_mul
       Formalism.MainNotions.ArithmeticCylinders.IsUniUp M
         → Formalism.MainNotions.ArithmeticCylinders.IsUniUp M'
         → Formalism.MainNotions.ArithmeticCylinders.IsUniUp (M * M') := by
-  apply GlobalTheory.BadCount.Inh.isUniUp_mul <;> assumption
+  apply GlobalTheory.BadCount.Inh.isUniUp_mul
 
 end GlobalTheory.UnipotentUpperMul

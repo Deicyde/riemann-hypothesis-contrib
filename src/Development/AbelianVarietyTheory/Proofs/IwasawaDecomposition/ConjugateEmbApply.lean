@@ -118,7 +118,7 @@ theorem sum_emb_bijective
     : Function.Bijective (Sum.elim
       (fun t : Tau R => H.emb t)
       fun t : Tau R => ComplexEmbedding.conjugate (H.emb t)) := by
-  apply _root_.GlobalTheory.Mem.BaseEx.sum_emb_bijective <;> assumption
+  apply _root_.GlobalTheory.Mem.BaseEx.sum_emb_bijective
 
 open Classical in
 def typeExp (p q : ℕ) (σ : H.E →+* ℂ) : ℕ := if ∃ t : Tau R, H.emb t = σ then p else q
@@ -153,7 +153,7 @@ theorem exists_gens (E : Type) [Field E] [NumberField E]
     : ∃ S : Finset ℂ,
       (∀ z ∈ S, IsAlgebraic ℚ z)
         ∧ ∀ K : IntermediateField ℚ ℂ, (∀ z ∈ S, z ∈ K) → ∀ (τ : E →+* ℂ) x, τ x ∈ K := by
-  apply _root_.GlobalTheory.Mem.BaseField.exists_gens <;> assumption
+  apply _root_.GlobalTheory.Mem.BaseField.exists_gens
 
 @[instance_reducible]
 def starOf (K : IntermediateField ℚ ℂ) (h : ∀ z ∈ K, starRingEnd ℂ z ∈ K) : StarRing K where

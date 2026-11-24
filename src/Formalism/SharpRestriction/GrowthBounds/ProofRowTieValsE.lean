@@ -1109,9 +1109,7 @@ theorem GK.add {κ κ' : WVO (IS I0) → C} (h : GK Y p κ) (h' : GK Y p κ') : 
 theorem GK.zero : GK Y p 0 := by
   unfold GK
   rw [EK_zero]
-  first
-  | exact GImg.zero (V := V) (A := AA Y p)
-  | exact GImg.zero (V := V) (A := AA Y p) (cc_AA Y p)
+  first | exact GImg.zero (V := V) (A := AA Y p) (cc_AA Y p)
 
 theorem GK.sum {ι : Type} (s : Finset ι) {κ : ι → WVO (IS I0) → C} (h : ∀ i ∈ s, GK Y p (κ i))
     : GK Y p (∑ i ∈ s, κ i) := by

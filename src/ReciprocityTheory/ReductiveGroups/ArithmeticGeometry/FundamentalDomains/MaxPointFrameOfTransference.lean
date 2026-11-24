@@ -380,7 +380,7 @@ theorem latticeBoundAtMaximum_of_transference (hD5 : CoveringRadiusStatement)
         have hw : ∀ k : Fin r, X.p0 ≤ (k : ℕ) → (Pi.single j (1 : ℂ) : Fin r → ℂ) k = 0 := by
           intro k hk
           have hkj : k ≠ j := fun h => by rw [h] at hk; omega
-          first | exact Pi.single_eq_of_ne hkj 1 | simp [Pi.single_apply, hkj]
+          first | exact Pi.single_eq_of_ne hkj 1
         have hw0 : (Pi.single j (1 : ℂ) : Fin r → ℂ) ≠ 0 := by
           intro h
           have h' := congrFun h j
@@ -393,7 +393,7 @@ theorem latticeBoundAtMaximum_of_transference (hD5 : CoveringRadiusStatement)
         have hw : ∀ k : Fin r, (k : ℕ) < X.p0 → (Pi.single j (1 : ℂ) : Fin r → ℂ) k = 0 := by
           intro k hk
           have hkj : k ≠ j := fun h => by rw [h] at hk; omega
-          first | exact Pi.single_eq_of_ne hkj 1 | simp [Pi.single_apply, hkj]
+          first | exact Pi.single_eq_of_ne hkj 1
         have hw0 : (Pi.single j (1 : ℂ) : Fin r → ℂ) ≠ 0 := by
           intro h
           have h' := congrFun h j

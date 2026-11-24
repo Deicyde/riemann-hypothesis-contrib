@@ -93,6 +93,11 @@ def TiePts (pt : φ.A → Fm.Ix x) (av bv : ℕ → ℤ) : Prop :=
 
 variable {φ m f}
 
+/--
+Ties the global scalar parameters (`a`, `b`, `b'`, `k`, `L`, `La`, `B0`, `Nc`, `lg`, `logGam`,
+and the scale thresholds `Xpp`, `η`, `X'`) of an abstract `Data` record to those of the arithmetic
+family `Fm` at scale `x`.
+-/
 def TieGlobal
     (pt : φ.A → Fm.Ix x)
     {Top : Type} (Dd : Data φ.A (fun u0 => (Fm.D x (pt u0)).what₂.Word) Top m f)
@@ -109,6 +114,12 @@ def TieGlobal
       ∧ Xpp = (Fm.L x (pt u0)).sc.X'' (Fm.D x (pt u0)).R.n ∧ η = (Fm.L x (pt u0)).etaSz
       ∧ X' = (Fm.L x (pt u0)).sc.X'
 
+/--
+Ties the per-word and per-lift arithmetic invariants of `Fm` (lattice ranks, word moduli `T`,
+slopes `μ`/`μMax` of `Nu` and `lat 0`, heights `h`, dual slopes of the common lattice `RR`, and
+the per-lift local energies `EeJ u0 u j = ∑_w sz w (E u (j + 1) w)`) to the abstract `Data`
+record `Dd`.
+-/
 def TieLocal
     (pt : φ.A → Fm.Ix x)
     {Top : Type} (Dd : Data φ.A (fun u0 => (Fm.D x (pt u0)).what₂.Word) Top m f)
@@ -153,6 +164,11 @@ def TieArith
 
 end
 
+/--
+Main bridge predicate tying the arithmetic family `Fm` at scale `x` to an abstract `Data`
+record satisfying the size, energy, slope, and divisibility hypotheses used to derive the
+`x^(1/2 + O(eps))` square-root bound.
+-/
 def ChainTied {eps : ℝ} (Fm : FamP eps) (eD eL K cHH eK CL x : ℝ) : Prop :=
   ∃ (i0 : Fm.Ix x) (m f : ℕ) (pt : (Fm.D x i0).R.A → Fm.Ix x) (av bv : ℕ → ℤ) (Top : Type)
       (_ : Fintype Top) (Dd : Data (Fm.D x i0).R.A (fun u0 => (Fm.D x (pt u0)).what₂.Word) Top m f)

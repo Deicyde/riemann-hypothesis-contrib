@@ -375,11 +375,6 @@ theorem exists_sub_mem_pow_succ
           _root_.GlobalTheory.exists_mem_pow_sub_mem_pow_succ_facts.exists_mem_pow_sub_mem_pow_succ
         <;> assumption
     )
-  | (
-      intros
-      exact
-        _root_.GlobalTheory.exists_mem_pow_sub_mem_pow_succ_facts.exists_mem_pow_sub_mem_pow_succ ..
-    )
 
 theorem quotientMap_pow_surjective
     (hle : I ≤ J.comap φ) (h₀ : ∀ b, ∃ a, φ a - b ∈ J) (h₁ : ∀ y ∈ J, ∃ x ∈ I, φ x - y ∈ J ^ 2)

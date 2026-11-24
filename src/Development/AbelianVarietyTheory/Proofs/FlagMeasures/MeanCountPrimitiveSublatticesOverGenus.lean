@@ -618,7 +618,7 @@ theorem exists_smul_mem
     (L : Submodule (NumberField.RingOfIntegers K) V) (hL : Submodule.IsFullLattice K L)
     (x : V)
     : ∃ (r : NumberField.RingOfIntegers K), r ≠ (0 : NumberField.RingOfIntegers K) ∧ r • x ∈ L := by
-  apply Bl.general_b_fact_third_ter_form.goal1 <;> assumption
+  apply Bl.general_b_fact_third_ter_form.goal1
 
 end GlobalTheory.SmulMemSpan
 end -- clump:auto

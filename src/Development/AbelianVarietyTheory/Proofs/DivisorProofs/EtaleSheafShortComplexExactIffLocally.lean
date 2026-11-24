@@ -90,6 +90,6 @@ theorem exactIff
       S.Exact
         ↔ ∀ U (b : Sec S.X₂ U),
           Sec.map S.g b = 0 → Loc U fun V g => ∃ a : Sec S.X₁ V, Sec.map S.f a = Sec.res g b := by
-  apply LateralTheory.EtaleFoundations.acycIffPf.exact_iff <;> assumption
+  apply LateralTheory.EtaleFoundations.acycIffPf.exact_iff
 
 end GlobalTheory.EtC

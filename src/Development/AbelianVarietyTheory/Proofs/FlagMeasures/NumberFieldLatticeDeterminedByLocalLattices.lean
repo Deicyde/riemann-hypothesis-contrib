@@ -78,7 +78,7 @@ theorem main
       Submodule.span E (↑Λ : Set (Fin n → E)) = ⊤
         → ∀ (v : Fin n → E), ∃ (D : NumberField.RingOfIntegers E),
           D ≠ (0 : NumberField.RingOfIntegers E) ∧ D • v ∈ Λ := by
-  apply ReciprocityTheory.MultiplicativeHeights.sc_scale <;> assumption
+  apply ReciprocityTheory.MultiplicativeHeights.sc_scale
 
 end GlobalTheory.SaturatedSublattice
 end -- clump:auto

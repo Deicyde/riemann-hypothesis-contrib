@@ -218,7 +218,7 @@ theorem gI_self {z : Frame X.Ψ r} (hz : z ∈ X.dom) (u : X.Ψ → Fin r → �
   simp only [gI, X.Hf_self hz, Complex.ofReal_re]
 
 theorem trace_eq_sum (a : E) : ((Algebra.trace ℚ E a : ℚ) : ℝ) = ∑ τ : X.Ψ, 2 * (τ.1 a).re := by
-  apply GlobalTheory.ArcQ.IsoTime.trace_cm <;> assumption
+  apply GlobalTheory.ArcQ.IsoTime.trace_cm
 
 private theorem hermC_ucomp_ucomp_of_herm_eq_zero
     {z : Frame X.Ψ r} {ξ : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0)

@@ -58,6 +58,6 @@ theorem eq_zero_of_piInf_eq_zero
             (z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
               (E := E)),
           At (evI F) z → (∀ w, piInf (emb w) z = 0) → z = 0 := by
-  apply GlobalTheory.RealLift.KLineProof.eq_zero_of_piInf <;> assumption
+  apply GlobalTheory.RealLift.KLineProof.eq_zero_of_piInf
 
 end GlobalTheory.AdeleInfInj

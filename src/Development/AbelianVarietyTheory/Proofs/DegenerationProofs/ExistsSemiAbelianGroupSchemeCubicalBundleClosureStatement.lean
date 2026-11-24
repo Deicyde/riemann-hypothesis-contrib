@@ -1165,7 +1165,7 @@ theorem isPullback_cube
     {A : Over U} [GrpObj A] [IsCommMonObj A]
     {F : A.left ⟶ G.left} (gp : IsGrpPullback A G j F)
     : IsPullback (cubeMapOf gp).F3 (G3 A).hom (G3 G).hom j := by
-  apply GlobalTheory.NormalCubeExt.isPullback_tripleProduct_groupPullback <;> assumption
+  apply GlobalTheory.NormalCubeExt.isPullback_tripleProduct_groupPullback
 
 theorem sum_thε : ∑ I : thK.{0}, thε I = 0 := by decide
 

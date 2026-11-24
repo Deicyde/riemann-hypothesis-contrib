@@ -66,6 +66,6 @@ theorem exists_fractionalIdeal_smul_mem_lattice
     : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)),
       L.IsLattice E
         → ∀ x : Fin n → E, x ≠ 0 → ∃ 𝔟 : FractionalIdeal (𝓞 E)⁰ E, ∀ s : E, s ∈ 𝔟 ↔ s • x ∈ L := by
-  apply GlobalTheory.latticeLine_fractionalIdeal <;> assumption
+  apply GlobalTheory.latticeLine_fractionalIdeal
 
 end GlobalTheory

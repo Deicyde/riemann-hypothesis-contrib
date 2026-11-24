@@ -125,8 +125,7 @@ theorem eq_zero_of_forall_pow_dvd (w : Wq l bk.a) (h : ∀ n : ℕ, (l : Wq l bk
   have := congrArg (WittVector.constantCoeff (p := l) (R := Fq l bk.a)) hbc
   rwa [map_mul, map_natCast, CharP.cast_eq_zero, zero_mul, WittVector.constantCoeff_apply] at this
 
-theorem ev_injective : Function.Injective bk.ev := by
-  apply GlobalTheory.BSP.BK.ev_injective_galPer <;> assumption
+theorem ev_injective : Function.Injective bk.ev := by apply GlobalTheory.BSP.BK.ev_injective_galPer
 
 end Red
 

@@ -211,7 +211,7 @@ theorem wt_Eab
         : pderiv ((a, d) : Ln p q r s) (X ((b, d) : Ln p q r s) * P)
           = X ((b, d) : Ln p q r s) * pderiv ((a, d) : Ln p q r s) P := by
       rw [Derivation.leibniz, pderiv_X, Pi.single_apply, if_neg hne'.symm]
-      simp [mul_comm]
+      simp
     simp only [raiB, lowB, hl1, hl2, Bool.false_eq_true, if_false, LinearMap.mulLeft_apply,
         LinearMap.neg_apply, Derivation.coeFn_coe, e, MvPolynomial.coeff_neg, ne_eq, neg_eq_zero]
       at hd

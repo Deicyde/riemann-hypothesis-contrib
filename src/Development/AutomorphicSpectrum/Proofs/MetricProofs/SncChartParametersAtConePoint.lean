@@ -579,7 +579,7 @@ theorem map_mem_chartIdeal_of_aeval_eq_zero
               (ReciprocityTheory.ChartRestriction.G.Geo.pC
                 (ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal y))
               p := by
-  apply GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Reg.ker_le_chart <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Reg.ker_le_chart
 
 end GlobalTheory.CompanionTheory.Ar.Cmp.KerChart
 end -- clump:auto

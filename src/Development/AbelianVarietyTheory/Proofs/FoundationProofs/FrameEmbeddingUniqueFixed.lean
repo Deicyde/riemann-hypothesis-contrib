@@ -68,7 +68,7 @@ theorem exists_prime_dvd_mem
       Ideal.IsPrime P
         → ∀ (n : ℕ),
           n ≠ (0 : ℕ) → (↑n : R) ∈ P → ∃ (q : ℕ), Nat.Prime q ∧ q ∣ n ∧ (↑q : R) ∈ P := by
-  apply Bl.general_b_fact_right_variant.goal1 <;> assumption
+  apply Bl.general_b_fact_right_variant.goal1
 
 end GlobalTheory.PrimeDivisorMembership
 end -- clump:auto

@@ -373,8 +373,6 @@ theorem card_diag
             refine Finset.prod_congr rfl (fun j _ => ?_)
             simp only [Fin.val_succ, hsub j]
           )
-        | simp only [Fin.val_zero, Nat.sub_zero]
-        | rfl
 
 end PI.VolStabS.FFHS
 end -- clump:auto
@@ -404,7 +402,7 @@ private theorem ffH_single_right {M : ℕ} (J : Matrix (Fin M) (Fin M) K) (x : F
   rw [Fintype.sum_eq_single j]
   · simp
   · intro b hb
-    simp [Pi.single_apply, hb]
+    simp [hb]
 
 theorem ffH_isHS
     (hσ : ∀ x, σ (σ x) = x)
@@ -439,7 +437,7 @@ theorem ffH_single {n : ℕ} (T : Matrix (Fin n) (Fin n) K) (i j : Fin n)
   rw [ffH_single_right, Fintype.sum_eq_single i]
   · simp
   · intro b hb
-    simp [Pi.single_apply, hb]
+    simp [hb]
 
 end matrix
 

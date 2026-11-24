@@ -94,7 +94,7 @@ private theorem minpoly_natDegree_eq_two_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 =
     : (minpoly ℚ b).natDegree = 2 := by
   have hint : IsIntegral ℚ b := isIntegral_b
   have hmon : (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)).Monic := by
-    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero | monicity!
+    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero
   have hle : (minpoly ℚ b).natDegree ≤ 2 := by
     have h1 :=
       Polynomial.natDegree_le_of_dvd (minpoly.dvd ℚ b (aeval_X_sq_add_C_eq_zero_of_sq_eq_neg hb))
@@ -108,12 +108,6 @@ private theorem minpoly_natDegree_eq_two_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 =
         obtain ⟨q, hq⟩ := h1
         exact b_not_rat hd hb (IntermediateField.mem_bot.mpr ⟨q, hq⟩)
       )
-    | (
-        have h2 : Module.finrank ℚ ℚ⟮b⟯ = 1 := by rw [IntermediateField.adjoin.finrank hint, h1]
-        exact b_not_rat hd hb
-          (IntermediateField.adjoin_simple_eq_bot_iff.mp (IntermediateField.finrank_eq_one_iff.mp
-            h2))
-      )
   have hpos := minpoly.natDegree_pos hint
   omega
 
@@ -122,9 +116,7 @@ theorem finrank_K (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Module.finrank ℚ (Kd 
   rw [IntermediateField.adjoin.finrank isIntegral_b, minpoly_natDegree_eq_two_of_sq_eq_neg hd hb]
 
 theorem quad_K (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Algebra.IsQuadraticExtension ℚ (Kd b) := by
-  first
-  | exact ⟨finrank_K hd hb⟩
-  | (constructor <;> first | exact finrank_K hd hb | exact inferInstance)
+  first | exact ⟨finrank_K hd hb⟩
 
 private theorem Kd_algEquiv_ext_of_apply_bK_eq (σ τ : Kd b ≃ₐ[ℚ] Kd b) (h : σ (bK b) = τ (bK b))
     : σ = τ := by
@@ -136,7 +128,7 @@ private theorem Kd_algEquiv_ext_of_apply_bK_eq (σ τ : Kd b ≃ₐ[ℚ] Kd b) (
 
 theorem gal_eq_one_of_fix (σ : Kd b ≃ₐ[ℚ] Kd b) (h : σ (bK b) = bK b) : σ = 1 := by
   apply Kd_algEquiv_ext_of_apply_bK_eq σ 1
-  first | (rw [h]; rfl) | (rw [AlgEquiv.one_apply]; exact h)
+  first | (rw [h]; rfl)
 
 private theorem Kd_algEquiv_bK_eq_or_eq_neg (hb : b ^ 2 = -(d : L)) (σ : Kd b ≃ₐ[ℚ] Kd b)
     : σ (bK b) = bK b ∨ σ (bK b) = - bK b := by
@@ -152,7 +144,7 @@ private theorem minpoly_eq_X_sq_add_C_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(
     : minpoly ℚ b = Polynomial.X ^ 2 + Polynomial.C (d : ℚ) := by
   have hint : IsIntegral ℚ b := isIntegral_b
   have hmon : (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)).Monic := by
-    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero | monicity!
+    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero
   obtain ⟨r, hr⟩ := minpoly.dvd ℚ b (aeval_X_sq_add_C_eq_zero_of_sq_eq_neg hb)
   have hr0 : r ≠ 0 := by
     rintro rfl
@@ -164,54 +156,29 @@ private theorem minpoly_eq_X_sq_add_C_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(
     at hdeg
   have hrm : r.Monic := (minpoly.monic hint).of_mul_monic_left (hr ▸ hmon)
   have hr0d : r.natDegree = 0 := by omega
-  have hr1 : r = 1 := by
-    first
-    | exact (Polynomial.Monic.natDegree_eq_zero hrm).mp hr0d
-    | (
-        rw [Polynomial.eq_C_of_natDegree_eq_zero hr0d]
-        have h5 := hrm.leadingCoeff
-        rw [Polynomial.leadingCoeff, hr0d] at h5
-        rw [h5, map_one]
-      )
+  have hr1 : r = 1 := by first | exact (Polynomial.Monic.natDegree_eq_zero hrm).mp hr0d
   rw [hr, hr1, mul_one]
 
 private theorem Kd_exists_algEquiv_bK_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L))
     : ∃ σ : Kd b ≃ₐ[ℚ] Kd b, σ (bK b) = - bK b := by
   have hint : IsIntegral ℚ b := isIntegral_b
   set pb : PowerBasis ℚ (Kd b) := IntermediateField.adjoin.powerBasis hint with hpb
-  have hgen : pb.gen = bK b := by
-    first | rfl | (rw [hpb, IntermediateField.adjoin.powerBasis_gen]; rfl)
+  have hgen : pb.gen = bK b := by first | rfl
   have hmin : minpoly ℚ pb.gen = minpoly ℚ b := by
-    first
-    | exact (minpoly.algebraMap_eq (algebraMap (Kd b) L).injective pb.gen).symm
-    | (rw [hpb, IntermediateField.adjoin.powerBasis_gen]; exact IntermediateField.minpoly_gen b)
-    | (rw [hpb, IntermediateField.adjoin.powerBasis_gen]; exact IntermediateField.minpoly_gen ℚ b)
+    first | exact (minpoly.algebraMap_eq (algebraMap (Kd b) L).injective pb.gen).symm
   have hroot : Polynomial.aeval (-pb.gen) (minpoly ℚ pb.gen) = 0 := by
     rw [hmin, minpoly_eq_X_sq_add_C_of_sq_eq_neg hd hb, hgen]
     first
     | (
-        simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C, map_natCast]
+        simp only [map_add (f := _), map_pow, Polynomial.aeval_X, map_natCast]
         linear_combination bK_sq hb
       )
-    | (simp; linear_combination bK_sq hb)
-    | (simp; rw [neg_sq, bK_sq hb]; ring)
-    | (
-        simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C]
-        rw [neg_sq, bK_sq hb]
-        simp
-      )
-  have hbij : Function.Bijective (pb.lift (-pb.gen) hroot) := by
-    first
-    | exact AlgHom.bijective _
-    | exact ⟨
-        (pb.lift (-pb.gen) hroot).toRingHom.injective,
-        LinearMap.injective_iff_surjective.mp (pb.lift (-pb.gen) hroot).toRingHom.injective
-      ⟩
+  have hbij : Function.Bijective (pb.lift (-pb.gen) hroot) := by first | exact AlgHom.bijective _
   refine ⟨AlgEquiv.ofBijective _ hbij, ?_⟩
   have hl : pb.lift (-pb.gen) hroot (bK b) = - bK b := by
     rw [← hgen]
     exact pb.lift_gen _ hroot
-  first | exact hl | (rw [AlgEquiv.ofBijective_apply]; exact hl)
+  first | exact hl
 
 private theorem bK_ne_neg_bK_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ - bK b := by
   intro h
@@ -249,7 +216,7 @@ theorem card_gal (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Nat.card (Kd b ≃ₐ[�
 
 theorem bK_sq_int (hb : b ^ 2 = -(d : L)) : bK b ^ 2 = ((-(d : ℤ) : ℤ) : Kd b) := by
   rw [bK_sq hb]
-  first | simp | (push_cast; rfl)
+  first | simp
 
 theorem bK_ne_zero (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ 0 := by
   intro h
@@ -316,9 +283,7 @@ theorem ncard_one
   haveI : Finite (Kd b ≃ₐ[ℚ] Kd b) := Nat.finite_of_card_ne_zero (by rw [card_gal hd0 hb]; norm_num)
   haveI := span_prime p
   have hP : P ∈ primesOver (span {(p : ℤ)}) (𝓞 (Kd b)) := by
-    first
-    | exact ⟨inferInstance, inferInstance⟩
-    | (simp only [Ideal.primesOver, Set.mem_setOf_eq]; exact ⟨inferInstance, inferInstance⟩)
+    first | exact ⟨inferInstance, inferInstance⟩
   rw [Set.ncard_eq_one]
   refine ⟨P, Set.eq_singleton_iff_unique_mem.mpr ⟨hP, fun Q hQ => ?_⟩⟩
   have hex : ∃ σ : Kd b ≃ₐ[ℚ] Kd b, σ • P = Q := by
@@ -351,13 +316,9 @@ theorem ncard_two
   haveI : Finite (Kd b ≃ₐ[ℚ] Kd b) := Nat.finite_of_card_ne_zero (by rw [card_gal hd0 hb]; norm_num)
   haveI := span_prime p
   have hP : P ∈ primesOver (span {(p : ℤ)}) (𝓞 (Kd b)) := by
-    first
-    | exact ⟨inferInstance, inferInstance⟩
-    | (simp only [Ideal.primesOver, Set.mem_setOf_eq]; exact ⟨inferInstance, inferInstance⟩)
+    first | exact ⟨inferInstance, inferInstance⟩
   have hσP : σ • P ∈ primesOver (span {(p : ℤ)}) (𝓞 (Kd b)) := by
-    first
-    | exact (σ • (⟨P, hP⟩ : primesOver (span {(p : ℤ)}) (𝓞 (Kd b)))).2
-    | exact ⟨inferInstance, inferInstance⟩
+    first | exact ⟨inferInstance, inferInstance⟩
   have hdvd : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard ∣ 2 := Dvd.intro _ hf
   have hle : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard ≤ 2 := Nat.le_of_dvd two_pos hdvd
   have hne1 : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard ≠ 1 := by
@@ -377,9 +338,7 @@ theorem smul_mem_of_eq
   first | (have h1 := Ideal.smul_mem_pointwise_smul σ y P hy; rwa [h] at h1)
 
 theorem smul_intCast (σ : Kd b ≃ₐ[ℚ] Kd b) (n : ℤ) : σ • (n : 𝓞 (Kd b)) = n := by
-  first
-  | exact map_intCast (MulSemiringAction.toRingHom (Kd b ≃ₐ[ℚ] Kd b) (𝓞 (Kd b)) σ) n
-  | (rw [← MulSemiringAction.toRingHom_apply, map_intCast])
+  first | exact map_intCast (MulSemiringAction.toRingHom (Kd b ≃ₐ[ℚ] Kd b) (𝓞 (Kd b)) σ) n
 
 theorem two_case
     (hd0 : 0 < d) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L))
@@ -549,18 +508,6 @@ private theorem Kd_exists_isPrime_liesOver (p : ℕ) [hp : Fact p.Prime]
   | (
       obtain ⟨P, hP⟩ := Ideal.nonempty_primesOver (S := 𝓞 (Kd b)) (span {(p : ℤ)})
       exact ⟨P, hP.1, hP.2⟩
-    )
-  | (
-      obtain ⟨P, hP, hPl⟩ :=
-        Ideal.exists_ideal_liesOver_maximal_of_isIntegral (span {(p : ℤ)}) (𝓞 (Kd b))
-      exact ⟨P, hP.isPrime, hPl⟩
-    )
-  | (
-      obtain ⟨Q, hQ, hQc⟩ :=
-        Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 (Kd b)) (span {(p : ℤ)}) (by
-          rw [(RingHom.injective_iff_ker_eq_bot _).mp (algebraMap ℤ (𝓞 (Kd b))).injective_int]
-          exact bot_le)
-      exact ⟨Q, hQ.isPrime, ⟨hQc.symm⟩⟩
     )
 
 theorem clause (hd : d.Prime) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ) (hp : p.Prime)

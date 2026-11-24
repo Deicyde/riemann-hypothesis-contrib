@@ -161,7 +161,7 @@ theorem pull_preserve
         → (LatLE O x E E' → LatLE O (joinCoord x z) EB E'B)
           ∧ (SameGeneric O x E E' → SameGeneric O (joinCoord x z) EB E'B)
           ∧ (∀ c : Ω, IsScaled x c E.lat E'.lat → IsScaled (joinCoord x z) c EB.lat E'B.lat) := by
-  apply PositivityTheory.Xgn.t_pull_preserve <;> assumption
+  apply PositivityTheory.Xgn.t_pull_preserve
 
 end GlobalTheory.CompanionTheory.Ar.Num.PullPreserve
 end -- clump:auto

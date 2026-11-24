@@ -164,8 +164,8 @@ theorem chain_first_identity : LastColumnChain := by
       rw [tm_offdiag _ _ hne]
       have hx : xR k r (m + 1) (by omega) (Fin.castSucc q) = eI k r ⟨q.val, by omega⟩ := by
         ext; simp [xR, eI]
-      rw [hx, hL _ ⟨m + 1, by omega⟩ ⟨q.val, by omega⟩ (by simp <;> omega),
-        if_neg (by simp <;> omega), zero_smul, smul_zero]
+      rw [hx, hL _ ⟨m + 1, by omega⟩ ⟨q.val, by omega⟩ (by simp), if_neg (by simp <;> omega),
+        zero_smul, smul_zero]
   have hmT
       : La
           (qminor E (a ∘ (Fin.castSucc (Fin.last m) : Fin (m + 2)).succAbove) (a ∘ Fin.castSucc) u

@@ -92,7 +92,7 @@ private theorem exists_int_bezout_of_coprime (p m : ℕ) (h : Nat.Coprime p m)
   have h2 := Nat.gcd_eq_gcd_ab p m
   rw [Nat.Coprime.gcd_eq_one h] at h2
   push_cast at h2
-  first | linear_combination -h2 | nlinarith
+  first | linear_combination -h2
 
 theorem v_nat_eq_zero (p : ℕ) (hp : p.Prime) (hvp : 0 < v (p : LL)) (m : ℕ) (hm : ¬ p ∣ m)
     : v (m : LL) = 0 := by
@@ -100,9 +100,7 @@ theorem v_nat_eq_zero (p : ℕ) (hp : p.Prime) (hvp : 0 < v (p : LL)) (m : ℕ) 
   obtain ⟨a, b, hab⟩ : ∃ a b : ℤ, a * (p : ℤ) + b * (m : ℤ) = 1 := by
     first | exact Nat.isCoprime_iff_coprime.mpr hcop
   have h1 : (a : LL) * (p : LL) + (b : LL) * (m : LL) = 1 := by
-    first
-    | exact_mod_cast congrArg (Int.cast : ℤ → LL) hab
-    | (have h := congrArg (Int.cast : ℤ → LL) hab; push_cast at h; exact h)
+    first | exact_mod_cast congrArg (Int.cast : ℤ → LL) hab
   refine le_antisymm ?_ (v_nat_nonneg v m)
   by_contra hlt
   push_neg at hlt
@@ -188,13 +186,10 @@ theorem v_pow_coprime
   rw [pow_sub_one_eq_sub_one_mul_geom_sum w m, AddValuation.map_mul, hS, add_zero]
 
 private theorem withTop_rat_zero_lt_one : (0 : WithTop ℚ) < 1 := by
-  first | exact WithTop.coe_lt_coe.mpr zero_lt_one | exact_mod_cast (zero_lt_one : (0 : ℚ) < 1)
+  first | exact WithTop.coe_lt_coe.mpr zero_lt_one
 
 private theorem withTop_rat_one_lt_one_add_one : (1 : WithTop ℚ) < 1 + 1 := by
-  first
-  | exact WithTop.coe_lt_coe.mpr (by norm_num : (1 : ℚ) < 1 + 1)
-  | exact_mod_cast (by norm_num : (1 : ℚ) < 1 + 1)
-  | (rw [← WithTop.coe_one, ← WithTop.coe_add, WithTop.coe_lt_coe]; norm_num)
+  first | exact WithTop.coe_lt_coe.mpr (by norm_num : (1 : ℚ) < 1 + 1)
 
 private theorem exists_eq_two_mul_add_one_of_prime_ne_two (p : ℕ) (hp : p.Prime) (hodd : p ≠ 2)
     : ∃ k, p = 2 * k + 1 := by
@@ -267,14 +262,10 @@ theorem v_pow_prime_pow
           have h0 : (0 : ℚ) ≤ n := Nat.cast_nonneg n
           linarith
         )
-      | (
-          have h0 : (0 : ℚ) ≤ n := Nat.cast_nonneg n
-          exact_mod_cast (by linarith : (1 : ℚ) ≤ c + n)
-        )
     rw [hpow, v_pow_prime v p hp hodd hvp (w ^ (p ^ n)) h1, ih]
     have e' : (c + ((n + 1 : ℕ) : ℚ)) = (c + n) + 1 := by push_cast; ring
     rw [e']
-    first | rfl | (rw [WithTop.coe_add (c + n) 1, WithTop.coe_one]) | norm_cast
+    first | rfl
 
 private theorem exists_eq_prime_pow_mul_not_dvd' (p : ℕ) (hp : p.Prime) (k : ℕ) (hk : 0 < k)
     : ∃ a m : ℕ, ¬ p ∣ m ∧ k = p ^ a * m := by
@@ -301,15 +292,12 @@ theorem pow_ne_one
     : u ^ k ≠ 1 := by
   obtain ⟨a, m, hm, hkm⟩ := exists_eq_prime_pow_mul_not_dvd' p hp k hk
   have hvp' : 0 < v (p : LL) := by rw [hvp]; exact withTop_rat_zero_lt_one
-  have hu' : v (u - 1) = ((1 : ℚ) : WithTop ℚ) := by
-    first | exact hu.trans WithTop.coe_one.symm | (rw [hu]; rfl)
+  have hu' : v (u - 1) = ((1 : ℚ) : WithTop ℚ) := by first | exact hu.trans WithTop.coe_one.symm
   have h1 : v (u ^ (p ^ a) - 1) = ((1 + a : ℚ) : WithTop ℚ) :=
     v_pow_prime_pow v p hp hodd hvp u 1 le_rfl hu' a
   have h2 : 0 < v (u ^ (p ^ a) - 1) := by
     rw [h1]
-    first
-    | (rw [← WithTop.coe_zero, WithTop.coe_lt_coe]; positivity)
-    | exact_mod_cast (by positivity : (0 : ℚ) < 1 + a)
+    first | (rw [← WithTop.coe_zero, WithTop.coe_lt_coe]; positivity)
   have h3 : v ((u ^ (p ^ a)) ^ m - 1) = v (u ^ (p ^ a) - 1) :=
     v_pow_coprime v p hp hvp' (u ^ (p ^ a)) h2 m hm
   intro heq

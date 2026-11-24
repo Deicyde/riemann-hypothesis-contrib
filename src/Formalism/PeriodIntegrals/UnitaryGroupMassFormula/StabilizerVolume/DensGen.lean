@@ -113,10 +113,7 @@ theorem eq_zero_of_setIntegral
     have hfin : ν K < ⊤ := hKc.measure_lt_top
     have hint : IntegrableOn E K ν := (hE.mono hKW).integrableOn_compact hKc
     have hconst : IntegrableOn (fun _ => E b0 / 2) K ν := by
-      first
-      | exact integrableOn_const hfin.ne
-      | exact integrableOn_const.2 (Or.inr hfin)
-      | exact (integrableOn_const (C := E b0 / 2)).2 (Or.inr hfin)
+      first | exact integrableOn_const hfin.ne
     have hmono : ∫ b in K, E b0 / 2 ∂ν ≤ ∫ b in K, E b ∂ν :=
       setIntegral_mono_on hconst hint hKc.measurableSet (fun x hx => (hKsub hx).1.le)
     rw [h0E K hKc hKW, setIntegral_const] at hmono

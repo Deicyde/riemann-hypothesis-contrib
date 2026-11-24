@@ -172,6 +172,6 @@ theorem isRegularLocalRing_quotient
   exact_mod_cast (by omega : k + 1 = (maximalIdeal R).spanFinrank)
 
 theorem IsRegularLocalRing.isDomain [IsRegularLocalRing R] : IsDomain R := by
-  apply PI.UnitaryGroupMassFormula.RLRS.IsRegularLocalRing.isDomain <;> assumption
+  apply PI.UnitaryGroupMassFormula.RLRS.IsRegularLocalRing.isDomain
 
 end GroundTheory.Arith.SchemeCoh

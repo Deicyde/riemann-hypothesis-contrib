@@ -95,8 +95,7 @@ theorem jdh_pd_star {N κ : ℕ} {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : U
     funext x
     rcases x with x | x <;> simp
 
-theorem polynomial_decay_admissible : JDPolyOK := by
-  apply GlobalTheory.HatNF.polyOp_ok <;> assumption
+theorem polynomial_decay_admissible : JDPolyOK := by apply GlobalTheory.HatNF.polyOp_ok
 
 end
 

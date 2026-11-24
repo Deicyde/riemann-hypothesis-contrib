@@ -149,9 +149,7 @@ theorem tri_det (q : ℕ) (x : Option (Fin q)) : (tri q x).det = q := by
 
 theorem tri_exists {q : ℕ} (hp : q.Prime) (δ : Matrix (Fin 2) (Fin 2) ℤ) (hδ : δ.det = q)
     : ∃ (γ : SL(2, ℤ)) (y : Option (Fin q)), δ = γ.1 * tri q y := by
-  first
-  | (apply _root_.GlobalTheory.DetZeroFactorization.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.DetZeroFactorization.main ..)
+  first | (apply _root_.GlobalTheory.DetZeroFactorization.main <;> assumption)
 
 def rep (q : ℕ) (w : SL(2, ℤ)) : Option (Fin q) → Matrix (Fin 2) (Fin 2) ℤ
   | none => w.1 * tri q none

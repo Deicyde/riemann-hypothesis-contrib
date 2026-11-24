@@ -258,9 +258,7 @@ theorem GlobalTheory.LawDer.constantCoeff_iterate_invDer_sub_linear
           constantCoeff ((invDer μ u)^[p] F)
               - ∑ j, constantCoeff ((invDer μ u)^[p] (X j)) * coeff (Finsupp.single j 1) F
             = p * r := by
-  first
-  | exact @_root_.GlobalTheory.LinearPartIteration.iterate_linear_part
-  | (intros; exact _root_.GlobalTheory.LinearPartIteration.iterate_linear_part ..)
+  first | exact @_root_.GlobalTheory.LinearPartIteration.iterate_linear_part
 end -- clump:auto
 end -- clump:auto
 end -- clump:auto

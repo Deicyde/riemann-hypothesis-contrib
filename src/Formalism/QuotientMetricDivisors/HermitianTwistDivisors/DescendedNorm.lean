@@ -76,7 +76,7 @@ theorem cnorm_nonneg {n : ℕ} (u : Fin n → ℂ) : 0 ≤ Formalism.HermitianLa
 theorem cnorm_star {n : ℕ} (u : Fin n → ℂ)
     : Formalism.HermitianLatticesTheory.cnorm (star u)
       = Formalism.HermitianLatticesTheory.cnorm u := by
-  first | simp [Formalism.HermitianLatticesTheory.cnorm, norm_star]
+  first | simp [Formalism.HermitianLatticesTheory.cnorm]
 
 theorem norm_dot_le {n : ℕ} (y w : Fin n → ℂ)
     : ‖y ⬝ᵥ w‖
@@ -93,7 +93,7 @@ theorem star_dot_self {n : ℕ} (w : Fin n → ℂ)
   push_cast
   first | simp only [dotProduct, Pi.star_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
-  first | exact Complex.conj_mul' (w i) | exact_mod_cast Complex.conj_mul' (w i)
+  first | exact Complex.conj_mul' (w i)
 
 theorem opNorm_le_iff {a D : ℕ} (A : Matrix (Fin D) (Fin a) ℂ) (c : ℝ) (hc : 0 ≤ c)
     : ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin A)‖ ≤ c
@@ -675,7 +675,7 @@ theorem place_bound
     by_cases h : i = j
     · subst h
       simp
-    · simp [Pi.single_apply, h]
+    · simp [h]
   have heig
       : ∀ q, ∀ x ∈ Qp q,
         A *ᵥ (fun i => v.embedding (x i))
@@ -746,7 +746,7 @@ theorem place_bound
       by_cases h : j = i
       · subst h
         simp
-      · simp [Pi.single_apply, h]
+      · simp [h]
     obtain ⟨W, hW⟩ : ∃ W : Ix → Fin D → ℂ, ∀ q, W q = ∑ i, w i • fun j => v.embedding (f i q j) :=
       ⟨_, fun q => rfl⟩
     have hWsum : ∑ q, W q = w := by
@@ -968,10 +968,7 @@ theorem height_constant_first : HeightBoundConstant := by
     have hkUnn : ∀ j, 0 ≤ kU j v := fun j => (opNormAt_nonneg _ _ _ _ _ _).trans (hkU j v)
     have hsq : 0 < Real.sqrt (κ v * minOver (fun p => ∏ j, lamL j p v)) := Real.sqrt_pos.2 S1
     have hnum : 0 < pU v * ∏ j, kU j v := (div_pos_iff_of_pos_right hsq).mp (hpos.trans_le hpl)
-    have hprod : 0 < ∏ j, kU j v := by
-      first
-      | exact pos_of_mul_pos_right hnum hpUnn
-      | nlinarith [Finset.prod_nonneg fun j (_ : j ∈ Finset.univ) => hkUnn j]
+    have hprod : 0 < ∏ j, kU j v := by first | exact pos_of_mul_pos_right hnum hpUnn
     have hpUpos : 0 < pU v := by
       rcases lt_or_eq_of_le hpUnn with h | h
       · exact h

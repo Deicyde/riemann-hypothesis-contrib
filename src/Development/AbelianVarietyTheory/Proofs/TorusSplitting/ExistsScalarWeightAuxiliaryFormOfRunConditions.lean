@@ -125,7 +125,7 @@ variable
 
 theorem phiC_nonneg (X : WeightAlgebra.PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la)
     : 0 ≤ X.phiC la y := by
-  apply Formalism.MainNotions.Gaps.T0.phiC_nonneg <;> assumption
+  apply Formalism.MainNotions.Gaps.T0.phiC_nonneg
 
 theorem mem_Mlat
     (X : WeightAlgebra.PJ D B P j) (i : ℕ)
@@ -808,10 +808,7 @@ theorem _root_.GlobalTheory.T.exists_product_cuspForm_ne_zero_arch_supNorm_bound
                             (i * p16 E r q m R
                               (max 1 (Fintype.card (U σ₀).Comp)
                                 * R ^ (8 * I2.PT.f E * r ^ 2))) := by
-  first
-  | exact @GlobalTheory.EtaAn.exists_etaRule_cusp_ne_zero_bounds
-  | exact GlobalTheory.EtaAn.exists_etaRule_cusp_ne_zero_bounds
-  | (intros; apply GlobalTheory.EtaAn.exists_etaRule_cusp_ne_zero_bounds <;> assumption)
+  first | exact @GlobalTheory.EtaAn.exists_etaRule_cusp_ne_zero_bounds
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.TorusSplitting.ExistsProductCuspFormNeZeroArchSupNormBoundsStatement =====

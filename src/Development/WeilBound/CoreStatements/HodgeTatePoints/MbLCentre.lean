@@ -79,7 +79,7 @@ theorem exists_centre
               ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a)
             ∧ (∀ p : Cpt M.ξ, (∀ a ∈ regAt M.ξ p, i a ∈ regAt ξ' p') → p₀.1 ⤳ p.1)
             ∧ ∀ c, x c ≠ 0 → (∀ j, i (x j / x c) ∈ regAt ξ' p') → InChart M.ξ x c p₀ := by
-  apply GlobalTheory.CompanionTheory.Ar.Centre.exists_centre <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.Centre.exists_centre
 
 end PositivityTheory.HtPt.Mb.LCentre.Centre
 

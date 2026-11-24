@@ -62,7 +62,7 @@ theorem exists_approx (c : FiniteAdeleRing R K) (hc : IsInt c) (r : R) (hr : r â
 
 private theorem algKApp_lemma_6 (k : K) (v : HeightOneSpectrum R)
     : (algebraMap K (FiniteAdeleRing R K) k) v = algebraMap K (v.adicCompletion K) k := by
-  first | rfl | (simp; rfl)
+  first | rfl
 
 theorem exists_approx_adele (b : FiniteAdeleRing R K)
     : âˆƒ u : K, IsInt (b - algebraMap K (FiniteAdeleRing R K) u) :=
@@ -76,7 +76,5 @@ theorem mem_of_isInt (k : K) (h : IsInt (algebraMap K (FiniteAdeleRing R K) k))
   first
   | exact (IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v k).symm.le.trans
       h1
-  | (rwa [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at h1)
-  | (erw [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at h1; exact h1)
 
 end Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory.AdeleIntA

@@ -126,7 +126,7 @@ namespace PositivityTheory.RgFd
 
 open ReciprocityTheory.ChartRestriction.DS
 
-theorem degPsi : DegPsi := by apply CompanionTheory.RgFd.degPsi <;> assumption
+theorem degPsi : DegPsi := by apply CompanionTheory.RgFd.degPsi
 
 end PositivityTheory.RgFd
 end -- clump:auto
@@ -801,7 +801,7 @@ theorem momA : MomA := by
   · simpa only [← pow_mul, mul_comm t0] using he j hj
   · simpa only [← pow_mul, mul_comm t0] using hf j hj
 
-theorem momB : MomB := by apply CompanionTheory.RgFd.momB <;> assumption
+theorem momB : MomB := by apply CompanionTheory.RgFd.momB
 
 theorem momW_of : MomA → MomB → MomW := by
   intro hA hB Ω _ P h U I _ α β c t0 hh hU h01 hα hβ hc hm
@@ -850,7 +850,7 @@ theorem pl_opNorm_le
     {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
     (A : V →L[ℂ] V)
     : ‖A‖ ^ 2 ≤ (Module.finrank ℂ V : ℝ) * hsOp A := by
-  apply CompanionTheory.RgFd.pl_opNorm_le <;> assumption
+  apply CompanionTheory.RgFd.pl_opNorm_le
 
 theorem square_integrable_of_norm
     : PsiNorm → PositivityTheory.RgDs.ExplicitFunctionSquareIntegrable := by
@@ -1087,7 +1087,7 @@ theorem hsOp_op_mul
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [ContinuousLinearMap.mul_apply, KType_norm_op_apply]
 
-theorem hsPol : HsPol := by apply _root_.CompanionTheory.RgFd.hsPol <;> assumption
+theorem hsPol : HsPol := by apply _root_.CompanionTheory.RgFd.hsPol
 
 end PositivityTheory.RgFd
 end -- clump:auto
@@ -1119,7 +1119,7 @@ theorem continuous_pP (ε : Fin n → Bool) : Continuous fun g : UJ ε => pP (to
 theorem pP_posDef {ε : Fin n → Bool} (g : UJ ε) : (pP (toM g)).PosDef :=
   exp_noncompactPart_posDef (PolarDecomposition.polar_L_inP (ε := ε) g.2)
 
-theorem phiCont : PhiCont := by apply _root_.CompanionTheory.RgFd.phiCont <;> assumption
+theorem phiCont : PhiCont := by apply _root_.CompanionTheory.RgFd.phiCont
 
 end PositivityTheory.RgFd
 end -- clump:auto

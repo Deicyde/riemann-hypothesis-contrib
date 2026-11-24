@@ -91,7 +91,7 @@ private lemma cc_psTrunc_lemma {κ : Type} [Fintype κ] [DecidableEq κ] (m : �
 theorem const_coeff_coe_zero
     {κ : Type} (P : MvPolynomial κ R) (hP : MvPolynomial.constantCoeff P = 0)
     : MvPowerSeries.constantCoeff (P : MvPowerSeries κ R) = 0 := by
-  first | (rw [MvPolynomial.constantCoeff_coe]; exact hP) | exact hP
+  first | exact hP
 
 private lemma mono_mem_lemma_2 {κ : Type} (m : ℕ) (e : κ →₀ ℕ) (c : R) (he : m + 1 ≤ e.sum fun _ k => k) :
     MvPolynomial.monomial e c ∈ orig R κ ^ (m + 1) := by
@@ -208,7 +208,7 @@ theorem jetSubstPS_trunc'
   | (simp only [Ideal.Quotient.factorₐ_apply_mk]; rw [jetSubstPS_X_lemma_6, Ideal.Quotient.eq])
   apply mem_of_coeff_lemma_3
   intro e he
-  simp [MvPolynomial.coeff_sub, coeff_psTrunc_lemma_4, (mem_degLE_lemma_5 m e).mpr he,
+  simp [coeff_psTrunc_lemma_4, (mem_degLE_lemma_5 m e).mpr he,
     (mem_degLE_lemma_5 (m + 1) e).mpr (by omega)]
 
 theorem aug_psJet {κ : Type} [Fintype κ] [DecidableEq κ] (m : ℕ) (f : MvPowerSeries κ R)

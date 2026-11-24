@@ -81,6 +81,5 @@ theorem cmEmbeddings_integral_and_distinct_mod_maximal'
         → (∀ τ x, V.Ge 0 (emA3 io ι τ x))
           ∧ ∀ τ τ' : E →+* ℂ, τ ≠ τ' → ∃ a : 𝓞 E, V.v (emA3 io ι τ a - emA3 io ι τ' a) = 0 := by
   apply _root_.UpperTheory.G2.RowLab.Sep.cmEmbeddings_integral_and_distinct_mod_maximal'
-    <;> assumption
 
 end GlobalTheory.EmbSep

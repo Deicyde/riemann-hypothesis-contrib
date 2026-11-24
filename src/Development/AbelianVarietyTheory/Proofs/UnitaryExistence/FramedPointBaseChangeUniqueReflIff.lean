@@ -86,7 +86,7 @@ theorem frMapUniq_refl
     [CommRing S] [Algebra c.F S]
     (y : FrPt Xo c S)
     : FrMap (AlgHom.id c.F S) y y := by
-  apply GlobalTheory.FramedBaseChange.refl <;> assumption
+  apply GlobalTheory.FramedBaseChange.refl
 
 theorem frMap_unique_refl_iff
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)

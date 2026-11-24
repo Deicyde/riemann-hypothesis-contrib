@@ -114,7 +114,7 @@ theorem isAdicComplete_span_iff {M : Type} [AddCommGroup M] [Module A M]
         ∧ ∀ u : ℕ → M,
           (∀ n : ℕ, ∃ z : M, π ^ n • z = u n - u (n + 1))
             → ∃ L : M, ∀ n : ℕ, ∃ z : M, π ^ n • z = u n - L := by
-  apply GlobalTheory.XiQuotient.isAdicComplete_iff <;> assumption
+  apply GlobalTheory.XiQuotient.isAdicComplete_iff
 
 variable {π}
 

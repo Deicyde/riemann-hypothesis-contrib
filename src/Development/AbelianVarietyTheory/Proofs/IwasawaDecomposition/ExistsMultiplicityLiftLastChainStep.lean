@@ -958,9 +958,7 @@ theorem exists_sub_perp
 theorem totalDegree_aeval_le
     {σ : Type*} (f : σ → MvPolynomial σ ℂ) (hf : ∀ v, (f v).totalDegree ≤ 1) (P : MvPolynomial σ ℂ)
     : (aeval f P).totalDegree ≤ P.totalDegree := by
-  first
-  | (apply _root_.GlobalTheory.AevalTotalDegreeBound.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.AevalTotalDegreeBound.main ..)
+  first | (apply _root_.GlobalTheory.AevalTotalDegreeBound.main <;> assumption)
 
 variable {ι : Type} {m n : ℕ}
 

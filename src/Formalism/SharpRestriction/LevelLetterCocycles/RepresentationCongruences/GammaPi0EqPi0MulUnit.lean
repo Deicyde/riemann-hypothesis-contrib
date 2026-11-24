@@ -67,9 +67,7 @@ namespace Formalism.MainNotions.N.WachTwistedLattices.PowerSeriesTruncation
 variable {O : Type*} [CommRing O]
 
 theorem coeff_X_pow_mul_lt {n d : ℕ} (h : d < n) (p : PowerSeries O) : coeff d (X ^ n * p) = 0 := by
-  first
-  | rw [PowerSeries.coeff_X_pow_mul', if_neg (not_le.mpr h)]
-  | (rw [mul_comm, PowerSeries.coeff_mul_X_pow', if_neg (not_le.mpr h)])
+  first | rw [PowerSeries.coeff_X_pow_mul', if_neg (not_le.mpr h)]
 
 theorem coeff_pow_mul_lt
     {Y : PowerSeries O} (hY : constantCoeff Y = 0) {n d : ℕ} (h : d < n) (p : PowerSeries O)
@@ -96,7 +94,7 @@ theorem algHom_coe (ψ : PowerSeries O →ₐ[O] PowerSeries O) (p : Polynomial 
     simp only [Polynomial.coe_mul, Polynomial.coe_pow, Polynomial.coe_C, Polynomial.coe_X, map_mul,
       map_pow, Polynomial.aeval_C, Polynomial.aeval_X]
     congr 1
-    first | exact ψ.commutes c | (rw [← ψ.commutes c]; rfl)
+    first | exact ψ.commutes c
 
 private theorem natDegree_trunc_lt_of_pos (a : PowerSeries O) {N : ℕ} (hN : 0 < N)
     : (trunc N a).natDegree < N := by
@@ -129,7 +127,7 @@ private theorem coeff_subst_eq_sum_range_of_lt
   have hs := hasSubst_of_constantCoeff_eq_zero_level_letter_cocycles hY
   let σ : PowerSeries O →ₐ[O] PowerSeries O := PowerSeries.substAlgHom hs
   have h1 : ∀ f : PowerSeries O, σ f = f.subst Y := fun f => by
-    first | rfl | simp [σ, PowerSeries.coe_substAlgHom]
+    first | simp [σ, PowerSeries.coe_substAlgHom]
   have h2 : σ X = Y := by
     rw [h1]
     first | exact PowerSeries.subst_X hs
@@ -255,7 +253,7 @@ theorem delF_iff (g : W.Gam) : g ∈ W.DelF ↔ IsOfFinOrder g := by
   rw [W.DelF_def, isOfFinOrder_iff_pow_eq_one]
 
 theorem π₀_mem : W.π₀ ∈ W.AΔ := by
-  apply Formalism.MainNotions.N.FrobeniusPowerSeries.TypesA.pi0_mem_ADelta <;> assumption
+  apply Formalism.MainNotions.N.FrobeniusPowerSeries.TypesA.pi0_mem_ADelta
 
 theorem qA_mem : qA W ∈ W.AΔ := W.AΔ.add_mem (π₀_mem W) (natCast_mem _ _)
 

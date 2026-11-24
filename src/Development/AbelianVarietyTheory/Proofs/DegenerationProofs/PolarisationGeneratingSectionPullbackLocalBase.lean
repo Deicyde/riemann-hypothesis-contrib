@@ -94,7 +94,7 @@ theorem exists_down {X : Scheme.{0}} {L : LB X} (s : H0 L 1)
 theorem exists_up {X : Scheme.{0}} {L : LB X} (t : L.Sec)
     : ∃ s : H0 L 1, ∀ (Z : Scheme.{0}) (r : Z ⟶ X) (z : Z) (J : (Z ⟶ X) → L.ι),
       Good L z J → sval s r z J = gs r z (L.U (J r)) (t.f (J r)) := by
-  apply GlobalTheory.GenSecField.exists_pow_one <;> assumption
+  apply GlobalTheory.GenSecField.exists_pow_one
 
 theorem exists_generator_pull
     : Laws

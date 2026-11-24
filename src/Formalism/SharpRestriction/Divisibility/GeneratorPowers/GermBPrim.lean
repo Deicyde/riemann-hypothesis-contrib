@@ -141,7 +141,7 @@ theorem prod_cube3
       = (h 1)⁻¹ * h (xs 0 * 1) * h (xs 1 * 1) * h (xs 2 * 1) * (h (xs 0 * (xs 1 * 1)))⁻¹
         * (h (xs 0 * (xs 2 * 1)))⁻¹ * (h (xs 1 * (xs 2 * 1)))⁻¹
         * h (xs 0 * (xs 1 * (xs 2 * 1))) := by
-  apply GlobalTheory.SecondPartialLaw.prod_cube3 <;> assumption
+  apply GlobalTheory.SecondPartialLaw.prod_cube3
 
 theorem eta_one {X0 : Scheme.{0}} (G : Over X0) [GrpObj G] : (η[G] : 𝟙_ (Over X0) ⟶ G) = 1 := by
   show η[G] = toUnit _ ≫ η[G]

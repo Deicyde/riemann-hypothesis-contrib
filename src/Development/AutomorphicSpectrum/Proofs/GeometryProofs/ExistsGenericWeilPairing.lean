@@ -86,7 +86,7 @@ theorem exists_common_closed
     : ∀ (Ω k K : Type) [Field Ω] [Field k] [Field K] (i : Ω →+* k) (i' : Ω →+* K),
       ∃ (M : Type) (_ : Field M) (_ : IsAlgClosed M) (j : k →+* M) (j' : K →+* M),
         j.comp i = j'.comp i' := by
-  apply GlobalTheory.CommonAlgClosedExtension.exists_common_algClosed_extension <;> assumption
+  apply GlobalTheory.CommonAlgClosedExtension.exists_common_algClosed_extension
 
 theorem ef_dvd
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (n : ℕ),

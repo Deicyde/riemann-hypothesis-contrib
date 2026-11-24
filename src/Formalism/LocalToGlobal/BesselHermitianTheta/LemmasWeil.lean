@@ -234,8 +234,7 @@ theorem splitFac_swap
   · rw [if_neg (show ¬ W.rank ≤ V.rank by omega), if_pos (show V.rank ≤ W.rank by omega), mul_comm]
   · rw [if_pos (show W.rank ≤ V.rank by omega), if_neg (show ¬ V.rank ≤ W.rank by omega), mul_comm]
 
-theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by
-  apply GlobalTheory.SplitOnto.gram_det_ne <;> assumption
+theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by apply GlobalTheory.SplitOnto.gram_det_ne
 
 theorem det_conj_mul (V : HSp D) (g : GA D V) : cA D (mt V g).det * (mt V g).det = 1 := by
   have h := congrArg Matrix.det (mt_rel V g)

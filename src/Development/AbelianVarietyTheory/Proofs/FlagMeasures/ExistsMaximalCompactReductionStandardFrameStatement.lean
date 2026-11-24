@@ -1569,9 +1569,7 @@ theorem exists_int_sub_mem_pow
     (hP : P.IsMaximal) (hm : (p : 𝓞 E) ∈ P) (hN : Ideal.absNorm P = p) (h2 : (p : 𝓞 E) ∉ P ^ 2)
     (k : ℕ) (a : 𝓞 E)
     : ∃ m : ℤ, a - m ∈ P ^ k := by
-  first
-  | (apply _root_.GlobalTheory.IntSubMemPow.exists_int_sub_mem_pow <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IntSubMemPow.exists_int_sub_mem_pow ..)
+  first | (apply _root_.GlobalTheory.IntSubMemPow.exists_int_sub_mem_pow <;> assumption)
 
 theorem not_isConj_self
     (I : AutInst)

@@ -90,7 +90,6 @@ theorem inst_sign_real (l : ℝ) (hl : l ≠ 0)
 theorem inst_rank_add_le {n : ℕ} (X Y : Matrix (Fin n) (Fin n) ℂ)
     : (X + Y).rank ≤ X.rank + Y.rank := by
   first
-  | exact Matrix.rank_add_le X Y
   | (
       simp only [← Matrix.finrank_range_mulVecLin]
       rw [Matrix.mulVecLin_add]
@@ -326,7 +325,7 @@ theorem adapted_basis_instance : InstAdaptBasis := by
           hQP, Matrix.zero_mulVec]
       have h2 := LinearMap.finrank_range_add_finrank_ker Q.mulVecLin
       have h3 := Submodule.finrank_mono h1
-      have h4 : Module.finrank ℂ (Fin n → ℂ) = n := by first | exact Module.finrank_fin_fun ℂ | simp
+      have h4 : Module.finrank ℂ (Fin n → ℂ) = n := by first | exact Module.finrank_fin_fun ℂ
       simp only [← Matrix.finrank_range_mulVecLin]
       omega
     · have h := inst_rank_add_le Q P

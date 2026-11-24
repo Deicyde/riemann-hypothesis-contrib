@@ -65,8 +65,8 @@ theorem aeval_mulVec_eq_krylov
       = GlobalTheory.ClassParam.krylov A v *ᵥ c := by
   ext i
 
-  simp [GlobalTheory.ClassParam.krylov, map_sum, aeval_monomial, Matrix.sum_mulVec,
-    Algebra.algebraMap_eq_smul_one, Matrix.mulVec, dotProduct, Matrix.sum_apply, Finset.sum_mul]
+  simp [GlobalTheory.ClassParam.krylov, map_sum, aeval_monomial, Algebra.algebraMap_eq_smul_one,
+    Matrix.mulVec, dotProduct, Matrix.sum_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 

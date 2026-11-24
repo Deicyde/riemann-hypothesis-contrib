@@ -81,16 +81,12 @@ variable {A : Type} [CommRing A] [IsDedekindDomain A]
 theorem pow_le_span_sup
     {Q : Ideal A} [Q.IsPrime] (hQ : Q ≠ ⊥) {π : A} (hπ : π ∈ Q) (hπ2 : π ∉ Q ^ 2)
     : ∀ m : ℕ, Q ^ m ≤ Ideal.span {π ^ m} ⊔ Q ^ (m + 1) := by
-  first
-  | (apply _root_.GlobalTheory.SpanPowerSupremum.pow_le_span_pow_sup <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SpanPowerSupremum.pow_le_span_pow_sup ..)
+  first | (apply _root_.GlobalTheory.SpanPowerSupremum.pow_le_span_pow_sup <;> assumption)
 
 theorem pow_not_mem
     {Q : Ideal A} [Q.IsPrime] (hQ : Q ≠ ⊥) {π : A} (hπ : π ∈ Q) (hπ2 : π ∉ Q ^ 2) (m : ℕ)
     : π ^ m ∉ Q ^ (m + 1) := by
-  first
-  | (apply _root_.GlobalTheory.AlgebraicIntegerNormBound.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.AlgebraicIntegerNormBound.main ..)
+  first | (apply _root_.GlobalTheory.AlgebraicIntegerNormBound.main <;> assumption)
 
 end Dedekind
 

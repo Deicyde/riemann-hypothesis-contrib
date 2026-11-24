@@ -643,9 +643,7 @@ theorem GlobalTheory.fixed_eq_span_of_gelfandPair
             → (∀ g, ∃ a ∈ K, ∃ b ∈ K, θ g = a * g * b)
             → ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G W),
               ρ.IsIrreducible → IsAdmissible ρ → ∀ x ∈ fixed ρ K, x ≠ 0 → fixed ρ K = ℂ ∙ x := by
-  first
-  | exact @_root_.GlobalTheory.GroupAverageProjection.main
-  | (intros; exact _root_.GlobalTheory.GroupAverageProjection.main ..)
+  first | exact @_root_.GlobalTheory.GroupAverageProjection.main
 end -- clump:auto
 end -- clump:auto
 end -- clump:auto

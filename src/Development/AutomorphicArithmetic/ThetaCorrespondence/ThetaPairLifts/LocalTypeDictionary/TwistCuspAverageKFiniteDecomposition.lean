@@ -305,9 +305,7 @@ theorem kFinAt_avg
               GlobalTheory.TypeSum.KFinFun (N.M.ε τ) e
                 → GlobalTheory.CuspKFin.KFinAt θ N τ
                   (GlobalTheory.SeriesToClosure.avg θ N.V τ (N.M.ε τ) (N.M.fr τ) e ψ) := by
-  first
-  | exact @_root_.GlobalTheory.LeftRegularRepresentation.kFinAt_avg
-  | (intros; exact _root_.GlobalTheory.LeftRegularRepresentation.kFinAt_avg ..)
+  first | exact @_root_.GlobalTheory.LeftRegularRepresentation.kFinAt_avg
 
 end GlobalTheory.CuspKFin
 

@@ -155,11 +155,9 @@ section Wt
 
 theorem rhoN_tw (ε : Fin n → Bool) (a : Fin n) : rhoN (ε ∘ Fin.rev) a = - rhoN ε (Fin.rev a) := by
   apply ReciprocityTheory.ChartRestriction.DS.Lap.LemK.DualRepresentationReversal.rhoN_rev
-    <;> assumption
 
 theorem rhoC_tw (ε : Fin n → Bool) (a : Fin n) : rhoC (ε ∘ Fin.rev) a = - rhoC ε (Fin.rev a) := by
   apply ReciprocityTheory.ChartRestriction.DS.Lap.LemK.DualRepresentationReversal.rhoC_rev
-    <;> assumption
 
 theorem lowK_tw (ε : Fin n → Bool) (ν : Fin n → ℝ)
     : lowK (ε ∘ Fin.rev) (fun a => - ν (Fin.rev a)) = fun a => - lowK ε ν (Fin.rev a) := by

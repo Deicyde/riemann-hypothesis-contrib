@@ -1984,13 +1984,7 @@ theorem _root_.GlobalTheory.T.good_origin_root_weight_bound
                             + (T.M B b₀).weight (Top.scale s) (lam - s • T.nu) s z
                           ≤ C * s + Real.log
                             (∏ r, ((o.toTowerOrigin.Or B b₀).sing r).h z ^ n' (some r)) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Small.good_origin_root_coefficients
-  | exact GlobalTheory.CompanionTheory.Ar.Small.good_origin_root_coefficients
-  | (
-      intros
-      apply GlobalTheory.CompanionTheory.Ar.Small.good_origin_root_coefficients <;> assumption
-    )
+  first | exact @GlobalTheory.CompanionTheory.Ar.Small.good_origin_root_coefficients
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.GoodOriginRootWeightBoundStatement =====

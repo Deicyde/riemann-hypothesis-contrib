@@ -109,7 +109,7 @@ namespace GlobalTheory.ChartCmp
 theorem inPsi_or_conjugate
     {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) (τ : E →+* ℂ)
     : InPsi H τ ∨ InPsi H (ComplexEmbedding.conjugate τ) := by
-  apply GlobalTheory.LabSelf.inPsi_or_conj <;> assumption
+  apply GlobalTheory.LabSelf.inPsi_or_conj
 
 theorem nuAlg_le_of_jrel
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)

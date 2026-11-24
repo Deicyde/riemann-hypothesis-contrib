@@ -194,7 +194,7 @@ theorem mem_Wp_of_kur
   apply _root_.Formalism.L2.KerInert.GenusOneDatumExistence.mem_Wp_of_kur <;> assumption
 
 theorem logF_eq : logF p = Formalism.L2.Th1.CM.ltLog ℂ_[p] p := by
-  apply _root_.Formalism.L2.KerInert.GenusOneDatumExistence.logF_eq <;> assumption
+  apply _root_.Formalism.L2.KerInert.GenusOneDatumExistence.logF_eq
 
 theorem isWq_wU (W : WeierstrassCurve ℂ_[p])
     : Formalism.MainNotions.TaylorLogMetric.IsWq W (Formalism.L2.Th1.A.wU W) := by

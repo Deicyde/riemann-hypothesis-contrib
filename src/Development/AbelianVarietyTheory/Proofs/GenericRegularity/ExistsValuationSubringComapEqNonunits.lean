@@ -97,7 +97,7 @@ theorem exists_valuationSubring_comap_eq_nonunits
 
 theorem exists_prime_natCast_mem {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
     : ∃ p : ℕ, p.Prime ∧ (p : 𝓞 K) ∈ la.asIdeal := by
-  apply GlobalTheory.Mem.FewPrimes.exists_prime_mem <;> assumption
+  apply GlobalTheory.Mem.FewPrimes.exists_prime_mem
 
 theorem modelAt_of_good_level
     : PartI

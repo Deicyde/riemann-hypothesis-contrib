@@ -611,7 +611,7 @@ theorem fou_mq_fouInv (B : Matrix l l ℝ) (f : Sch l)
       = (4 * π * I : ℂ)⁻¹
         • ∑ j, ∑ k, (B j k : ℂ) • (∂_{(EuclideanSpace.single j 1 : Eu l)}
           (∂_{(EuclideanSpace.single k 1 : Eu l)} f)) := by
-  apply CompanionTheory.ThKR.LL.fou_mq_fouInv <;> assumption
+  apply CompanionTheory.ThKR.LL.fou_mq_fouInv
 
 theorem quad_eq {X : Matrix (l ⊕ l) (l ⊕ l) ℝ} (hX : X ∈ LieAlgebra.Symplectic.sp l ℝ) (f : Sch l)
     : quad X f

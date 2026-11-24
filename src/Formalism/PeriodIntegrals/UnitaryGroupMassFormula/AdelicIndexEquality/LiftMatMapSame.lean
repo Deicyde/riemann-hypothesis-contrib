@@ -97,9 +97,9 @@ private theorem equivFinsuppOfBasisRight_psiV_eq_evalV
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul e a =>
-    simp only [PI.FinKW.psiV, AlgHom.comp_apply, AlgEquiv.coe_toAlgHom, AlgHom.coe_coe,
-      AlgEquiv.coe_algHom, Algebra.TensorProduct.comm_tmul, Algebra.TensorProduct.map_tmul,
-      AlgHom.coe_id, id_eq, TensorProduct.equivFinsuppOfBasisRight_apply_tmul,
+    simp only [PI.FinKW.psiV, AlgHom.comp_apply, AlgEquiv.coe_toAlgHom,
+      Algebra.TensorProduct.comm_tmul, Algebra.TensorProduct.map_tmul, AlgHom.coe_id, id_eq,
+      TensorProduct.equivFinsuppOfBasisRight_apply_tmul,
       TensorProduct.equivFinsuppOfBasisLeft_apply_tmul, Finsupp.mapRange_apply]
     first
     | exact (map_smul (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV I.F w) _

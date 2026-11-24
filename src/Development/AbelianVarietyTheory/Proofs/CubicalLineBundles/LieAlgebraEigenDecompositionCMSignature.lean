@@ -170,7 +170,7 @@ theorem finrank_eigenSub
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
 
-theorem bar_rt : H.bar H.rt = -H.rt := by apply GlobalTheory.QuadTrace.bar_rt <;> assumption
+theorem bar_rt : H.bar H.rt = -H.rt := by apply GlobalTheory.QuadTrace.bar_rt
 
 theorem card_half
     {K : Type} [Field K] [NumberField K] {ρ : 𝓞 K} (hs : Splits E K) (hρ : ρ ^ 2 = -(H.d : 𝓞 K))

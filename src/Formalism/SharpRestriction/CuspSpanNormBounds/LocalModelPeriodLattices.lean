@@ -740,7 +740,7 @@ theorem nontrivial_E (L : LocE F E) : Nontrivial E := by
 
 theorem exists_theta
     : ∃ θ ∈ L.O, L.cj θ = -θ ∧ ∃ D : 𝒪[F], (D : F) ≠ 0 ∧ θ * θ = algebraMap F E D := by
-  apply PI.LocHerm.SlopeTestRemainingChoices.exists_theta <;> assumption
+  apply PI.LocHerm.SlopeTestRemainingChoices.exists_theta
 
 end Top2
 

@@ -55,7 +55,7 @@ def Gram0Def (D : D7) : Prop :=
 
 theorem _root_.Formalism.MainNotions.flipTwoThree.stabiliser_family_of_definite
     {eps : ℝ} (Fm : FamP eps)
-    (C₄ C₅ : ℝ) (h : UnusedSlot33.ConclusionOnFamily Fm C₄ C₅)
+    (h : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, UnusedSlot33.division_rows_rational_lattice (Fm.D x i))
     (hD : ∀ x (i : Fm.Ix x), Gram0Def (Fm.D x i))
     (hP : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x),
       StandardLattice.Conclusion4p (Fm.D x i) (Fm.ex x hx i).lev)
@@ -65,8 +65,8 @@ theorem _root_.Formalism.MainNotions.flipTwoThree.stabiliser_family_of_definite
   exact ⟨
     x0,
     fun x hx hx1 i =>
-      flipTwoThree.stabiliser_condition_of_level _ (Fm.ex x hx1 i).lev (h x hx1 i).2.2.2.2.2.2.2.1
-        (hD x i) (hP x hx1 i) (hg x hx hx1 i)
+      flipTwoThree.stabiliser_condition_of_level _ (Fm.ex x hx1 i).lev (h x hx1 i) (hD x i)
+        (hP x hx1 i) (hg x hx hx1 i)
   ⟩
 
 def SettingEventually {eps : ℝ} (Fm : FamP eps) : Prop :=

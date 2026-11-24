@@ -163,7 +163,7 @@ theorem spanFinrank_maximalIdeal_quotient_succ_le
           (↑((Finset.univ.erase j).image
               (fun i => Ideal.Quotient.mk (Ideal.span ({x} : Set R)) (y i : R)))
             : Set (R ⧸ Ideal.span ({x} : Set R))) := by
-    simp only [Set.image_insert_eq, Set.image_image, Finset.coe_image, Subtype.coe_mk, hx0]
+    simp only [Set.image_insert_eq, Set.image_image, Finset.coe_image, hx0]
   rw [hmax, Ideal.map_span, hset]
   have hz
       : Ideal.span (insert (0 : (R ⧸ Ideal.span ({x} : Set R)))
@@ -200,17 +200,15 @@ theorem eq_natCast_and_add_one_eq_of_le
       have h2' : ((⊤ : ℕ∞) : WithBot ℕ∞) ≤ ((d : ℕ∞) : WithBot ℕ∞) := h2
       exact absurd (WithBot.coe_le_coe.mp h2') (not_le.mpr (ENat.coe_lt_top d))
     | coe m =>
-      have h1' : n ≤ m + 1 := by
-        first | exact_mod_cast h1 | (have h1'' := WithBot.coe_le_coe.mp h1; exact_mod_cast h1'')
-      have h2' : m ≤ d := by
-        first | exact_mod_cast h2 | (have h2'' := WithBot.coe_le_coe.mp h2; exact_mod_cast h2'')
+      have h1' : n ≤ m + 1 := by first | exact_mod_cast h1
+      have h2' : m ≤ d := by first | exact_mod_cast h2
       have hm : m = d := by omega
       have hn : m + 1 = n := by omega
       subst hm
       constructor
-      · first | rfl | norm_cast | simp
+      · first | rfl
       · rw [← hn]
-        first | rfl | norm_cast | simp
+        first | rfl
 
 theorem spanFinrank_quotient_eq_and_ringKrullDim_add_one
     (R : Type*) [CommRing R] [IsRegularLocalRing R]
@@ -224,20 +222,15 @@ theorem spanFinrank_quotient_eq_and_ringKrullDim_add_one
   have hlink
       : Submodule.spanFinrank (maximalIdeal R)
         = Module.finrank (ResidueField R) (CotangentSpace R) := by
-    first
-    | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace
-    | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace (R := R)
+    first | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace (R := R)
   have h5 := spanFinrank_maximalIdeal_quotient_succ_le R hx hx2
   have hxj : (((({x} : Finset R)) : Set R)) ⊆ (Ring.jacobson R : Set R) := by
     intro z hz
     have hz' : z = x := by simpa using hz
     rw [hz']
-    first
-    | exact (Ideal.jacobson_bot (R := R)) ▸ IsLocalRing.maximalIdeal_le_jacobson ⊥ hx
-    | (rw [← Ideal.jacobson_bot]; exact IsLocalRing.maximalIdeal_le_jacobson ⊥ hx)
-    | (rw [← Ideal.jacobson_bot, IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]; exact hx)
+    first | exact (Ideal.jacobson_bot (R := R)) ▸ IsLocalRing.maximalIdeal_le_jacobson ⊥ hx
   have hd := ringKrullDim_le_ringKrullDim_quotient_add_card ({x} : Finset R) hxj
-  simp only [Finset.coe_singleton, Finset.card_singleton, Nat.cast_one] at hd
+  simp only [Finset.card_singleton, Nat.cast_one] at hd
   have hle := ringKrullDim_le_spanFinrank_maximalIdeal (R ⧸ Ideal.span ({x} : Set R))
   obtain ⟨e1, e2⟩ :=
     eq_natCast_and_add_one_eq_of_le (a := ringKrullDim (R ⧸ Ideal.span ({x} : Set R)))
@@ -245,10 +238,7 @@ theorem spanFinrank_quotient_eq_and_ringKrullDim_add_one
       (n := Submodule.spanFinrank (maximalIdeal R))
       (by
         rw [hreg]
-        first
-        | exact hd
-        | (rw [Finset.coe_singleton] at hd; exact hd)
-        | (convert hd using 3 <;> simp))
+        first | (rw [Finset.coe_singleton] at hd; exact hd))
       hle (by omega)
   exact ⟨e1.symm, e2.trans hreg⟩
 
@@ -333,7 +323,7 @@ theorem quotient_span_singleton
     : IsRegularLocalRing (R ⧸ Ideal.span ({x} : Set R)) := by
   haveI := isLocalRing_quotient_span_singleton hx
   have h := (spanFinrank_quotient_eq_and_ringKrullDim_add_one R hx hx2).1
-  first | exact ⟨h⟩ | constructor
+  first | exact ⟨h⟩
 
 theorem ringKrullDim_quotient_span_singleton_add_one
     {R : Type*} [CommRing R] [IsRegularLocalRing R]
@@ -365,9 +355,7 @@ theorem isDomain_of_forall_spanFinrank_lt
   have hlink
       : Submodule.spanFinrank (maximalIdeal R)
         = Module.finrank (ResidueField R) (CotangentSpace R) := by
-    first
-    | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace
-    | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace (R := R)
+    first | exact IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace (R := R)
   by_cases hmin : ∃ p ∈ minimalPrimes R, maximalIdeal R ≤ p
   · exfalso
     obtain ⟨p, hp, hle⟩ := hmin
@@ -376,7 +364,7 @@ theorem isDomain_of_forall_spanFinrank_lt
       have h2 : p ≤ q.asIdeal := le_of_le_of_mem_minimalPrimes hp q.isPrime (h1.trans hle)
       exact le_antisymm h1 (hle.trans h2)
     have hdim : ringKrullDim R ≤ 0 := by
-      first | apply iSup_le | (unfold ringKrullDim Order.krullDim; apply iSup_le)
+      first | apply iSup_le
       intro l
       have hl : l.length = 0 := by
         by_contra hl
@@ -389,7 +377,7 @@ theorem isDomain_of_forall_spanFinrank_lt
     have h0' : ((Submodule.spanFinrank (maximalIdeal R) : ℕ) : WithBot ℕ∞) ≤ 0 := by
       rw [hreg]; exact hdim
     have h0 : Submodule.spanFinrank (maximalIdeal R) = 0 := by
-      first | exact Nat.le_zero.mp (by exact_mod_cast h0') | (norm_cast at h0'; omega)
+      first | exact Nat.le_zero.mp (by exact_mod_cast h0')
     exact hsq (maximalIdeal_le_sq_of_finrank_cotangent_zero R (hlink.symm.trans h0))
   obtain ⟨x, hx, hx2, hxmin⟩ := exists_mem_maximalIdeal_notMem_sq_notMem_minimalPrimes R hsq hmin
   haveI hR' : IsRegularLocalRing (R ⧸ Ideal.span ({x} : Set R)) := quotient_span_singleton hx hx2

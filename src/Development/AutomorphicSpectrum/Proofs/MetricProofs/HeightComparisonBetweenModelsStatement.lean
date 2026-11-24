@@ -561,7 +561,6 @@ theorem tendstoUniformlyOn_regWeight_of_isTied
       S.IsTied
         → ∀ K' ⊆ S.R.Yo, IsCompact K' → TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) K' := by
   apply GlobalTheory.CompanionTheory.Ar.Giv.Mix.tendstoUniformlyOn_regWeight_of_isCompact_subset_Yo
-    <;> assumption
 
 end GlobalTheory.CompanionTheory.Ar.Cusp
 end -- clump:auto

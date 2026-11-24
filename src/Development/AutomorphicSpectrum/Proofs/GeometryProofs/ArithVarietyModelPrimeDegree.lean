@@ -1938,7 +1938,7 @@ theorem exists_labelEmbedding
         (∀ a : 𝓞 E, σ (a : E) = 𝔐.emb t a)
           ∧ (∀ a : 𝓞 E, (σ.comp (HT.cmConj E).toRingHom) (a : E) = 𝔐.emb t.swap a)
           ∧ ∀ σ' : E →+* Ω, (∀ a : 𝓞 E, σ' (a : E) = 𝔐.emb t a) → σ' = σ := by
-  apply PositivityTheory.Xgn.exists_cm_type_embedding <;> assumption
+  apply PositivityTheory.Xgn.exists_cm_type_embedding
 
 end GlobalTheory.CompanionTheory.Ar.Num.FamEx.Lab
 end -- clump:auto

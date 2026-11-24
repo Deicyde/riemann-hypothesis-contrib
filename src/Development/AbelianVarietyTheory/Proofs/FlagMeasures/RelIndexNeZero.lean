@@ -83,7 +83,7 @@ theorem main
         [IsScalarTower (NumberField.RingOfIntegers K) K V]
         {A : Submodule (NumberField.RingOfIntegers K) V},
       Submodule.span K (↑A : Set V) = ⊤ → ∀ (x : V), ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ N • x ∈ A := by
-  apply GlobalTheory.IntegerMultipleIntegral.exists_int_smul_mem <;> assumption
+  apply GlobalTheory.IntegerMultipleIntegral.exists_int_smul_mem
 
 end GlobalTheory.IntMulIntegral
 end -- clump:auto
@@ -106,9 +106,7 @@ variable
 
 theorem exists_mul_mem {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤) (x : V)
     : ∃ N : ℤ, N ≠ 0 ∧ N • x ∈ A := by
-  first
-  | (apply _root_.GlobalTheory.IntMulIntegral.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IntMulIntegral.main ..)
+  first | (apply _root_.GlobalTheory.IntMulIntegral.main <;> assumption)
 
 theorem finite_between {Λ : Submodule (𝓞 K) V} (hΛ : Λ.FG) {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
     : {M : Submodule (𝓞 K) V | (∀ x ∈ Λ, a • x ∈ M) ∧ ∀ x ∈ M, b • x ∈ Λ}.Finite := by

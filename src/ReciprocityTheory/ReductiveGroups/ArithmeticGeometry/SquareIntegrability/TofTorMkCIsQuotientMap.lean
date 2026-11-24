@@ -71,15 +71,13 @@ theorem tof_torMk_isQuotientMap (d : ℕ) : IsQuotientMap (tof_torMk d) := by
   have hc : Continuous (tof_torMk d) := by
     refine continuous_pi fun i => ?_
     show Continuous fun x : Fin d → ℝ => ((x i : ℝ) : UnitAddCircle)
-    first | exact continuous_quotient_mk'.comp (continuous_apply i) | fun_prop | continuity
+    first | exact continuous_quotient_mk'.comp (continuous_apply i)
   have hsurj : Function.Surjective (tof_torMk d) := by
     intro t
     choose x hx using fun i => QuotientAddGroup.mk_surjective (t i)
     exact ⟨x, funext hx⟩
   have ho : IsOpenMap (tof_torMk d) := by
     first
-    | exact IsOpenMap.piMap (fun _ => QuotientAddGroup.isOpenMap_coe)
-    | exact IsOpenMap.piMap (fun _ => QuotientAddGroup.isOpenMap_coe _)
     | exact IsOpenMap.piMap
         (fun _ => QuotientAddGroup.isOpenMap_coe)
         (Filter.Eventually.of_forall fun _ => QuotientAddGroup.mk_surjective)
@@ -127,8 +125,6 @@ theorem tof_torLift_mk
   first
   | exact ContinuousMap.congr_fun
       ((tof_torMkC_isQuotientMap d).lift_comp ⟨F, hF⟩ (tof_torMk_factors F hF hper)) y
-  | exact ContinuousMap.congr_fun
-      ((tof_torMkC_isQuotientMap d).lift_comp (g := ⟨F, hF⟩) (h := tof_torMk_factors F hF hper)) y
 
 theorem tof_box_measurable (d : ℕ)
     : MeasurableSet {x : Fin d → ℝ | ∀ i, x i ∈ Set.Ioc (0 : ℝ) 1} := by
@@ -192,9 +188,7 @@ theorem tof_coeff_eq
     intro x _
     rw [hfx, tof_mFourier_torMk, smul_eq_mul]
     congr 2
-    first
-    | simp only [Pi.neg_apply, Int.cast_neg, neg_mul, Finset.sum_neg_distrib, mul_neg]
-    | (simp [Finset.sum_neg_distrib]; ring)
+    first | simp only [Pi.neg_apply, Int.cast_neg, neg_mul, Finset.sum_neg_distrib, mul_neg]
   have e : mFourierCoeff f n = ∫ t, mFourier (-n) t • f t := rfl
   rw [e]
   refine (integral_torus_eq_setIntegral_Ioc_torMk
@@ -208,7 +202,7 @@ private theorem hasSum_norm_sq_mFourierCoeff_eq_integral_norm_sq
   have hae
       : (ContinuousMap.toLp (E := ℂ) 2 (volume : Measure (UnitAddTorus (Fin d))) ℂ f :
         UnitAddTorus (Fin d) → ℂ) =ᵐ[volume] f := by
-    first | exact ContinuousMap.coeFn_toLp f | exact ContinuousMap.coeFn_toLp (μ := volume) f
+    first | exact ContinuousMap.coeFn_toLp (μ := volume) f
   have h :=
     hasSum_sq_mFourierCoeff (ContinuousMap.toLp (E := ℂ) 2 (volume : Measure (UnitAddTorus (Fin d)))
       ℂ f)
@@ -269,20 +263,14 @@ theorem tof_box_shift
     intro x
     funext i
     show ((x i : ℝ) : UnitAddCircle) + ((s i : ℝ) : UnitAddCircle) = ((x i + s i : ℝ) : UnitAddCircle)
-    first | exact (QuotientAddGroup.mk_add _ _).symm | rfl
+    first | rfl
   have e1 :=
     integral_torus_eq_setIntegral_Ioc_torMk
       (fun t => f (t + tof_torMk d s))
       (f.continuous.comp (continuous_id.add continuous_const))
   have e2 := integral_torus_eq_setIntegral_Ioc_torMk (fun t => f t) f.continuous
   have e3 : ∫ t, f (t + tof_torMk d s) = ∫ t, f t := by
-    first
-    | exact integral_add_right_eq_self (fun t => f t) (tof_torMk d s)
-    | (
-        rw [show (fun t => f (t + tof_torMk d s)) = fun t => f (tof_torMk d s + t) from
-          funext fun t => by rw [add_comm]]
-        exact integral_add_left_eq_self (fun t => f t) (tof_torMk d s)
-      )
+    first | exact integral_add_right_eq_self (fun t => f t) (tof_torMk d s)
   calc
     ∫ x in {x : Fin d → ℝ | ∀ i, x i ∈ Set.Ioc (0 : ℝ) 1}, F (x + s)
         = ∫ x in {x : Fin d → ℝ | ∀ i, x i ∈ Set.Ioc (0 : ℝ) 1}, f (tof_torMk d x + tof_torMk d s) :=
@@ -317,10 +305,7 @@ theorem tof_torus_inversion
     exact hsum
   have hpt
       : HasSum (fun n => mFourierCoeff f n • mFourier n (tof_torMk d 0)) (f (tof_torMk d 0)) := by
-    first
-    | exact hasSum_mFourier_series_apply_of_summable hs (tof_torMk d 0)
-    | exact (hasSum_mFourier_series_of_summable hs).map (ContinuousMap.evalCLM ℂ (tof_torMk d 0))
-        (ContinuousMap.evalCLM ℂ (tof_torMk d 0)).continuous
+    first | exact hasSum_mFourier_series_apply_of_summable hs (tof_torMk d 0)
   have h1 : ∀ n : Fin d → ℤ, mFourier n (tof_torMk d 0) = 1 := by
     intro n
     rw [tof_mFourier_torMk]

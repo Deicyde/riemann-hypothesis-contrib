@@ -182,7 +182,7 @@ end General
 
 theorem lamX_eq_globLat (I : AutInst) (x : I.GA)
     : lamX I x = Formalism.UG.CS.globLat (x.2 : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) I.L := by
-  apply GlobalTheory.PointEquivariance.lamX_eq <;> assumption
+  apply GlobalTheory.PointEquivariance.lamX_eq
 
 theorem lamX_selfDual
     : ∀ (I : AutInst) (x : I.GA),

@@ -1442,9 +1442,7 @@ theorem hf_sm
 
 theorem exists_bound {ι : Type} [Fintype ι] (f : ι → R)
     : ∃ e ∈ 𝒪[K], e ≠ 0 ∧ ∀ i, Sm L e⁻¹ (f i) := by
-  first
-  | (apply _root_.GlobalTheory.SmulIntegralDenominator.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.SmulIntegralDenominator.main ..)
+  first | (apply _root_.GlobalTheory.SmulIntegralDenominator.main <;> assumption)
 
 def piL
     {N r : ℕ}

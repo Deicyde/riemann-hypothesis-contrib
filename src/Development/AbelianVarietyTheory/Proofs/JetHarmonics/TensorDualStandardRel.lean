@@ -90,7 +90,7 @@ theorem _root_.GlobalTheory.tensor_dual_standard_rel
         | abel1
         | (exfalso; tauto)
         | (simp_all; done)
-        | (split_ifs <;> subst_vars <;> first | abel1 | (exfalso; tauto) | (simp_all; done))
+        | (split_ifs <;> subst_vars <;> first | abel1 | (exfalso; tauto))
   · intro a b x y
     simp only [PiLp.inner_apply, hEt, inner_sub_left, inner_sub_right, Finset.sum_sub_distrib, hsym]
     have h1

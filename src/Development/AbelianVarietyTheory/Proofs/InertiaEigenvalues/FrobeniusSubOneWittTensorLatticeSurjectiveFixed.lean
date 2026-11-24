@@ -175,7 +175,6 @@ theorem baseChange_flat
 theorem algebraMap_WCb_injective (l : ℕ) [Fact l.Prime]
     : Function.Injective (algebraMap ℤ_[l] (WCb l)) := by
   apply Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.zl_WCb_injective
-    <;> assumption
 
 theorem flat_lattice
     {G : Type} [Group G] [TopologicalSpace G]

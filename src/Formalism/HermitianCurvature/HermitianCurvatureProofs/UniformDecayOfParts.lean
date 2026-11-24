@@ -520,10 +520,7 @@ theorem norm_le_integral_fsv
     exact (hmp.integrable_comp_emb hme).mp h1
   have hint : Integrable (𝓕 φ) := by
     first | exact (integrable_comp_smul_iff volume (𝓕 φ) hc).mp hint1
-  have hinv : 𝓕⁻ (𝓕 φ) t = φ t := by
-    first
-    | exact hi.fourier_inversion hint hφ.continuousAt
-    | exact hi.fourierInv_fourier_eq hint hφ.continuousAt
+  have hinv : 𝓕⁻ (𝓕 φ) t = φ t := by first | exact hi.fourierInv_fourier_eq hint hφ.continuousAt
   have hb : ‖φ t‖ ≤ ∫ w : ℂ, ‖𝓕 φ w‖ := by
     rw [← hinv]
     first | rw [fourierInv_eq]

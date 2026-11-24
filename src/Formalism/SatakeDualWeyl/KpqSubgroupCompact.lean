@@ -1238,8 +1238,7 @@ theorem InclInj : Formalism.UG.InclInj := by
     congrArg (fun u : GL n (TensorProduct F E R) => (u : Matrix n n (TensorProduct F E R)) i j) hgh
 alias SphericalExists := _root_.Formalism.UG.P.exists_spherical_function
 theorem SplitIso : Formalism.UG.SplitIso := Formalism.UG.P.split_unitary_group_iso
-theorem StabStd : Formalism.UG.StabStd := by
-  apply Formalism.UG.P.stabilizer_standard_lattice <;> assumption
+theorem StabStd : Formalism.UG.StabStd := by apply Formalism.UG.P.stabilizer_standard_lattice
 alias StdFormDef := _root_.Formalism.UG.P.standard_hermitian_form_definite
 alias TjCosets := _root_.Formalism.UG.P.Tj_double_coset_decomposition
 theorem TjEq : Formalism.UG.TjEq := by

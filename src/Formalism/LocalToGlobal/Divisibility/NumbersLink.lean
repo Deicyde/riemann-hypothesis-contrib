@@ -431,8 +431,7 @@ theorem apRows_split (j : ℕ) (z : RPl N.R)
   rw [univ_map_fin (N.R.k - 2 + 1) (N.apN (j + 1) z)]
   have hk : N.R.k - 2 + 1 = N.R.k - 1 := by have := N.k_two; omega
   rw [hk]
-  have hs : (N.R.sigW (j + 1)).1 = N.R.k - 1 + (j + 1) := by
-    first | rfl | (simp [Ranks.sigW]; omega)
+  have hs : (N.R.sigW (j + 1)).1 = N.R.k - 1 + (j + 1) := by first | (simp [Ranks.sigW]; omega)
   rw [hs, Multiset.range_add, Multiset.map_add (f := _), Multiset.map_map]
   rfl
 

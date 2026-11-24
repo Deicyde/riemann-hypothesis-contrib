@@ -173,7 +173,6 @@ theorem exists_cov
   have hJc : (Formalism.UG.Jpq p q).map (starRingEnd ℂ) = Formalism.UG.Jpq p q := by
     ext a b
     rcases a with a | a <;> rcases b with b | b <;> simp [Formalism.UG.Jpq, Matrix.one_apply]
-      <;> split_ifs
   set Z : Mat p q := Y.map (starRingEnd ℂ) with hZ
   have hZJ : Zᴴ * Formalism.UG.Jpq p q * Z = Formalism.UG.Jpq p q := by
     have := congrArg (fun A : Mat p q => A.map (starRingEnd ℂ)) hYJ

@@ -58,6 +58,6 @@ theorem combLine_smooth_conj
       ((∀ j, IsSmoothHerm (ℓ j)) → IsSmoothHerm (combLine ℓ n))
         ∧ ((∀ j, IsConjInvariantH (ℓ j)) → IsConjInvariantH (combLine ℓ n))
         ∧ IsSmoothHerm (trivLine ι) := by
-  apply RootFieldNumerics.combLine_smooth_conj_invariant <;> assumption
+  apply RootFieldNumerics.combLine_smooth_conj_invariant
 
 end GlobalTheory.CompanionTheory.Ar.Top

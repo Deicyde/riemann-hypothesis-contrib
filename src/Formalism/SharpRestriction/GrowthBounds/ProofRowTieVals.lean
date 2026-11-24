@@ -902,7 +902,7 @@ theorem hRow_eqS (o : Orb)
     congr 1
     funext q
     rcases q with ⟨g, i⟩
-    fin_cases g <;> first | rfl | simp [VP.P2]
+    fin_cases g <;> first | rfl
 
 theorem toAllS_hRow (o : Orb)
     : toAllS (I := IS I0) o (mvExp (Y.rawSelf (p o)).hRow)

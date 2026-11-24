@@ -126,6 +126,12 @@ variable
   (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
   (n : ℕ) [NeZero n]
 
+attribute [local irreducible]
+  compactCohomology compactCohomologyMap mackeyCompactCohomologyIso compactCores
+  compactZmodDualityMap zmodCompactDualityMap gsMackeyCompactIso cohomologyIsoOfContinuousMulEquiv
+  gsFinFamily gsOpenSubgroup gsBaseChange gsMackeyEmbeddings placesOver gsRootsOfUnityIso
+  compactCupRes
+
 def GsBaseBijective
     (U : OpenSubgroup (galUnramifiedOutside K.1 ℚ̄ S))
     (t : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 3 →+ ZMod n)
@@ -162,10 +168,8 @@ theorem bijective_zmodCompactDualityMap_gsOpenSubgroup
   let f := (gsRootsOfUnityIso S hL n).symm
   let eW := (gsMackeyCompactIso hL ιs f 3).toLinearEquiv.toAddEquiv
   have hex :=
-    exists_isUnit_mul_of_surjective_of_bijective
-      (t.comp (compactCores (gsFinFamily S ιs) (gsOpenSubgroup S hL) (gsRoots S n)
-        3).hom.toAddMonoidHom)
-      (TL.comp eW.symm.toAddMonoidHom) hsurj (hTL.comp eW.symm.bijective)
+    exists_isUnit_mul_of_surjective_of_bijective _ (TL.comp eW.symm.toAddMonoidHom) hsurj
+      (hTL.comp eW.symm.bijective)
   refine hex.elim fun c hc => ?_
   let U := gsOpenSubgroup (F := K.1) (L := L.1) (Ω := ℚ̄) S hL
   let θ := gsBaseChange (F := K.1) (L := L.1) (Ω := ℚ̄) S hL

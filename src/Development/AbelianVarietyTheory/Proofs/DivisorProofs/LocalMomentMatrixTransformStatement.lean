@@ -59,7 +59,4 @@ theorem _root_.GlobalTheory.T.local_moment_matrix_transform
           * (mat h).map (piW t)
         = -((1 : GL (Fin n) (Fv F v)).1ᵀ * X.J.map t * (x).map (piW (t.comp σ)) * (W.J.map t)ᵀ
           * (1 : GL (Fin d) (Fv F v)).1) := by
-  first
-  | exact @GlobalTheory.Div.CoordOpp.coord_opp_conj
-  | exact GlobalTheory.Div.CoordOpp.coord_opp_conj
-  | (intros; apply GlobalTheory.Div.CoordOpp.coord_opp_conj <;> assumption)
+  first | exact @GlobalTheory.Div.CoordOpp.coord_opp_conj

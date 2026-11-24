@@ -207,16 +207,6 @@ theorem card_quot_le
         rw [ho, ho]
         ring
       )
-    | (
-        simp only [map_mul]
-        rw [ho, ho]
-        ring
-      )
-    | (
-        push_cast
-        rw [ho, ho]
-        ring
-      )
   have hsum0 : ∑ i, o i • y i = 0 := by
     have h1 : c j • ∑ i, o i • y i = o j • ∑ i, c i • y i := by
       rw [Finset.smul_sum, Finset.smul_sum]
@@ -231,7 +221,7 @@ theorem card_quot_le
     rw [← h3]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← hy i, Submodule.mkQ_apply, Submodule.Quotient.mk_smul]
-    first | rfl | (rw [← Ideal.Quotient.algebraMap_eq, algebraMap_smul])
+    first | rfl
   have h4 := (Fintype.linearIndependent_iff.mp hv) _ h2 i₀
   exact hi₀ (o i₀) (ho i₀) (Ideal.Quotient.eq_zero_iff_mem.mp h4)
 
@@ -280,15 +270,7 @@ private theorem relIndex_smul_eq_card_quotient_smul (I : Ideal (𝓞 K)) (N : Su
       = Nat.card (N ⧸ I • (⊤ : Submodule (𝓞 K) N)) := by
   have hmap : AddSubgroup.map N.subtype.toAddMonoidHom ⊤ = N.toAddSubgroup := by
     ext x
-    first
-    | simp
-    | (
-        constructor
-        · rintro ⟨y, -, rfl⟩
-          exact y.2
-        · intro hx
-          exact ⟨⟨x, hx⟩, trivial, rfl⟩
-      )
+    first | simp
   have hc
       : AddSubgroup.comap N.subtype.toAddMonoidHom (I • N).toAddSubgroup
         = (I • (⊤ : Submodule (𝓞 K) N)).toAddSubgroup := by
@@ -347,18 +329,7 @@ theorem relIndex_principal
         = (LinearMap.range ι).toAddSubgroup.relIndex N.toAddSubgroup := by
     rw [smul_toAddSubgroup π (LinearMap.range ι), smul_toAddSubgroup π N,
       ← AddSubgroup.relIndex_comap]
-    first
-    | rw [AddSubgroup.comap_map_eq_self_of_injective (smul_inj π hπ)]
-    | (
-        congr 1
-        ext x
-        rw [AddSubgroup.mem_comap, AddSubgroup.mem_map]
-        constructor
-        · rintro ⟨y, hy, hyx⟩
-          rwa [← smul_inj π hπ hyx]
-        · intro hx
-          exact ⟨x, hx, rfl⟩
-      )
+    first | rw [AddSubgroup.comap_map_eq_self_of_injective (smul_inj π hπ)]
   have hCB0 : (LinearMap.range ι).toAddSubgroup.relIndex N.toAddSubgroup ≠ 0 := by
     have hdC : (Ideal.span {d} • N).toAddSubgroup ≤ (LinearMap.range ι).toAddSubgroup := fun x hx =>
       hdN hx
@@ -414,15 +385,7 @@ theorem HDep.mono {n : ℕ} {N N' : Submodule (𝓞 K) M} (h : HDep n N) (hle : 
   exact h y (fun i => hle (hy i))
 
 theorem fg_smul (I : Ideal (𝓞 K)) (N : Submodule (𝓞 K) M) (hN : N.FG) : (I • N).FG := by
-  first
-  | exact Submodule.FG.smul (IsNoetherian.noetherian I) hN
-  | (
-      haveI : IsNoetherian (𝓞 K) N := isNoetherian_of_fg_of_noetherian N hN
-      have e : Submodule.map N.subtype (I • (⊤ : Submodule (𝓞 K) N)) = I • N := by
-        rw [Submodule.map_smul'', Submodule.map_subtype_top]
-      rw [← e]
-      exact (IsNoetherian.noetherian _).map _
-    )
+  first | exact Submodule.FG.smul (IsNoetherian.noetherian I) hN
 
 theorem relIndex_prime_le
     (𝔭 : Ideal (𝓞 K)) [𝔭.IsMaximal] (n : ℕ) (N : Submodule (𝓞 K) M) (hN : N.FG) (hD : HDep n N)
@@ -445,9 +408,7 @@ theorem relIndex_prime_le
 
 private theorem ideal_mul_smul_submodule (I J : Ideal (𝓞 K)) (N : Submodule (𝓞 K) M)
     : (I * J) • N = I • J • N := by
-  first
-  | exact Submodule.mul_smul I J N
-  | (rw [← Ideal.smul_eq_mul]; exact Submodule.smul_assoc I J N)
+  first | exact Submodule.mul_smul I J N
 
 private theorem relIndex_smul_le_absNorm_pow_of_hDep (n k : ℕ)
     : ∀ (𝔞 : Ideal (𝓞 K)),

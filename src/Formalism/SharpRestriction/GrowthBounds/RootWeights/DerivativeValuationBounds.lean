@@ -510,7 +510,7 @@ theorem flt_twist_monomial_mem
   rwa [AddMonoidHom.neg_apply] at h1
 
 theorem flt_gL_mul_gLinv (R : Type*) [CommRing R] (n : ℕ) : gL R n * gLinv R n = 1 := by
-  apply Formalism.MainNotions.G.Joints.genericMatrix_mul_inverse_eq_one <;> assumption
+  apply Formalism.MainNotions.G.Joints.genericMatrix_mul_inverse_eq_one
 
 theorem flt_gLinv_mul_gL (R : Type*) [CommRing R] (n : ℕ) : gLinv R n * gL R n = 1 := by
   have key

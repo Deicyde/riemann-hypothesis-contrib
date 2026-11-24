@@ -82,7 +82,7 @@ theorem root_eq
   have hprim : IsPrimitiveRoot (1 + x₀) l := by
     have h := IsPrimitiveRoot.orderOf (1 + x₀)
     rwa [orderOf_eq_prime hrx hζ1] at h
-  have hζu : IsUnit (1 + x₀) := by first | exact hprim.isUnit hl0 | exact hprim.isUnit hl0.ne'
+  have hζu : IsUnit (1 + x₀) := by first | exact hprim.isUnit hl0.ne'
   have hwu : ¬ IsUnit w := (IsLocalRing.mem_maximalIdeal w).1 hw
   obtain ⟨i, hil, hi⟩ : ∃ i < l, (1 + x₀) ^ i = 1 + y := by
     first | exact hprim.eq_pow_of_pow_eq_one hry

@@ -158,9 +158,7 @@ theorem eval_map_splitFirst
     · intro a
       simp [splitFirst, MvPolynomial.algebraMap_eq]
     · rintro ⟨i, m⟩
-      induction i using Fin.cases
-        <;> simp [splitFirst, specFirstVar, MvPolynomial.algebraMap_eq, MvPolynomial.bind₁_X_right]
-        <;> rfl
+      induction i using Fin.cases <;> simp [splitFirst, specFirstVar, MvPolynomial.bind₁_X_right]
   exact RingHom.congr_fun h f
 
 end ChartChoiceAlgClosed

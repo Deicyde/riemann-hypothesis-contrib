@@ -137,9 +137,7 @@ theorem sumAbs_neg (A : Matrix n n ℂ) : sumAbs (-A) = sumAbs A := by simp [sum
 
 omit [DecidableEq n] in
 theorem sumAbs_mul_le (A B : Matrix n n ℂ) : sumAbs (A * B) ≤ sumAbs A * sumAbs B := by
-  first
-  | (apply _root_.GlobalTheory.EntrySumMulBound.entrySum_mul_le <;> assumption)
-  | (intros; exact _root_.GlobalTheory.EntrySumMulBound.entrySum_mul_le ..)
+  first | (apply _root_.GlobalTheory.EntrySumMulBound.entrySum_mul_le <;> assumption)
 
 section Op
 open scoped Matrix.Norms.Operator

@@ -235,9 +235,7 @@ theorem exists_residue_pow_pow_eq
     {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
     (A : ValuationSubring Ω) (hl1 : A.valuation (l : Ω) < 1) (xA : A)
     : ∃ N : ℕ, 0 < N ∧ residue A xA ^ (l ^ N) = residue A xA := by
-  first
-  | (apply _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed <;> assumption)
-  | (intros; exact _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed ..)
+  first | (apply _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed <;> assumption)
 
 theorem fixA_eq_pow_add_mul
     : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]

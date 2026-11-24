@@ -131,7 +131,7 @@ theorem pureA_schrInf
     : GlobalTheory.WeilM.pureA F (schrInf F ψ v f) g
       = GlobalTheory.WeilM.schr ψ (mixedSpaceVecPairAsAdeles F v)
         (GlobalTheory.WeilM.pureA F f g) := by
-  apply _root_.GlobalTheory.WeilAdm.pureA_schrInf <;> assumption
+  apply _root_.GlobalTheory.WeilAdm.pureA_schrInf
 
 theorem pureA_add
     {κ : Type}

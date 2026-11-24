@@ -1295,7 +1295,7 @@ theorem form_zv {Y V : HSp D} (d : HermitianOrthogonalExtensionData Y V 1 1) (τ
   have hg := congrArg (fun M => tauE D τ (M 0 0)) d.gram
 
   simp only [antiDiagonalSignGramMatrix, Formalism.UG.cT, Matrix.mul_apply, Matrix.transpose_apply,
-      Matrix.map_apply, map_sum, map_mul, tauE_sig]
+      Matrix.map_apply, map_sum, map_mul]
     at hg
   simp only [dotProduct, Matrix.mulVec, gramAt, Matrix.map_apply, Pi.star_apply, Complex.star_def,
     Finset.mul_sum, zv]

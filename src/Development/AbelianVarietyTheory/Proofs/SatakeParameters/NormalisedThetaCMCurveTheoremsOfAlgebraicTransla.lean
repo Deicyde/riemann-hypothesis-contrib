@@ -101,7 +101,7 @@ namespace GlobalTheory.ThLoc.GoodTwo
 open PI.GoodTwo
 
 theorem isIntegral_jInv : Formalism.L2.Th1.CM.JInvariantIntegrality := by
-  apply GlobalTheory.ThLoc.cm1 <;> assumption
+  apply GlobalTheory.ThLoc.cm1
 
 theorem norm_jInv_le_one
     (d : ℕ) (L : PeriodPair)

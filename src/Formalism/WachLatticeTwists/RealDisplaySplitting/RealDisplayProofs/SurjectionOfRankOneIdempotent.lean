@@ -119,7 +119,7 @@ theorem rank_one_factor
       Pi.single j 1,
       by
         ext i
-        simp [Matrix.mulVecLin_apply, Matrix.mulVec, dotProduct, Pi.single_apply]
+        simp [Matrix.mulVec, dotProduct, Pi.single_apply]
     ⟩
     have hnz
         : (⟨_, hcol j0⟩ : LinearMap.range (e.map (algebraMap O (FractionRing O))).mulVecLin)

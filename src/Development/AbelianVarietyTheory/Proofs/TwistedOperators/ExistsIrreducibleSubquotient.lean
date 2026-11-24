@@ -100,7 +100,7 @@ theorem deltaHalf_scalar
     [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)]
     (z : kˣ)
     : deltaHalf k m (fun a => GeneralLinearGroup.scalar (m a) z) = 1 := by
-  apply GlobalTheory.CompanionTheory.ZCentre.deltaHalf_scalar <;> assumption
+  apply GlobalTheory.CompanionTheory.ZCentre.deltaHalf_scalar
 
 theorem multiProd_scalar
     {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]

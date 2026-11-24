@@ -63,7 +63,7 @@ namespace PositivityTheory.HtPt.Mh
 theorem emb
     : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T),
       ∃! j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤)), Γ.IsEmb (Γ.btOrder ⊤) j := by
-  apply GlobalTheory.CompanionTheory.Ar.BT.exists_unique_emb_btOrder_top <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.BT.exists_unique_emb_btOrder_top
 
 theorem emb_square
     : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)

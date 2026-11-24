@@ -982,11 +982,7 @@ theorem fix_tuple
     have h0 : (t : V) = 0 := eq_zero_of_mem_of_disjoint hTΨ t.2 (LinearMap.mem_ker.mpr ht)
     first | exact Subtype.ext h0
   have hfsurj : Function.Surjective f := by
-    first
-    | exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hTdim).mp hfinj
-    | exact LinearMap.range_eq_top.mp
-        ((LinearMap.ker_eq_bot_iff_range_eq_top_of_finrank_eq_finrank hTdim).mp
-          (LinearMap.ker_eq_bot.mpr hfinj))
+    first | exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hTdim).mp hfinj
   let eT : T ≃ₗ[K] (Fin a → K) := LinearEquiv.ofBijective f ⟨hfinj, hfsurj⟩
   let s : (Fin a → K) →ₗ[K] V := T.subtype ∘ₗ eT.symm.toLinearMap
   have hs : ∀ t, Ψ (s t) = t := by

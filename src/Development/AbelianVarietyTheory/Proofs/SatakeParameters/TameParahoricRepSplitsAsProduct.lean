@@ -779,9 +779,7 @@ theorem jacquet_mk_ne_zero
     (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (n : ℕ) (π : Irr k n) (v : π.V) (θ : Fin n → kˣ →* ℂˣ) (hv : v ≠ 0) (hI : IsIwVec θ π.π v)
     : (Submodule.Quotient.mk v : Jacquet π.π (unipB k (Fin n))) ≠ 0 := by
-  first
-  | (apply _root_.GlobalTheory.PointStabilizer.mk_ne_zero <;> assumption)
-  | (intros; exact _root_.GlobalTheory.PointStabilizer.mk_ne_zero ..)
+  first | (apply _root_.GlobalTheory.PointStabilizer.mk_ne_zero <;> assumption)
 
 end GlobalTheory.TameIwahori.JacquetNonzero
 end -- clump:auto

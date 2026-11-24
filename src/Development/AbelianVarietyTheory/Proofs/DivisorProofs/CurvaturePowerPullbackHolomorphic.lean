@@ -214,7 +214,6 @@ theorem curvPoly_comp
     : curvPoly (fun x => G (φ x)) w = (subst (fderiv ℂ φ w)).mapMatrix (curvPoly G (φ w)) := by
   first
   | (apply _root_.GlobalTheory.CurvatureSesquilinearExpansion.curvPoly_pullback <;> assumption)
-  | (intros; exact _root_.GlobalTheory.CurvatureSesquilinearExpansion.curvPoly_pullback ..)
 
 theorem curvEv_eq (G : V n → Matrix r r ℂ) (v : V n)
     : curvEv G v

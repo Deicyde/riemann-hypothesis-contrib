@@ -174,7 +174,6 @@ theorem poly_eq_zero
             map_add, map_mul, hψC, hψX]
           ring
         )
-      | (simp [hψC, hψX]; ring)
     have hX : PowerSeries.X ∣ ψ (r : PowerSeries O) :=
       (dvd_pow_self _ (Nat.succ_ne_zero k)).trans hdvd
     rw [hψr, PowerSeries.X_dvd_iff] at hX
@@ -209,10 +208,7 @@ theorem dvd_of_dvd_image
     have h := hdiv.degree_lt
     have hz : Ideal.Quotient.mk (IsLocalRing.maximalIdeal O) l = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.mpr hlm
-    first
-    | simpa [hz, PowerSeries.order_X_pow] using h
-    | (rw [hres, PowerSeries.order_X_pow, ENat.toNat_coe] at h; exact h)
-    | (simp only [hres, PowerSeries.order_X_pow, ENat.toNat_coe] at h; exact h)
+    first | simpa [hz, PowerSeries.order_X_pow] using h
   have hψa : ψ a = (PowerSeries.X * u) ^ k * ψ q + ψ (r : PowerSeries O) := by
     rw [hdiv.eq_mul_add, map_add (f := _), map_mul, map_pow, hψ]
   have h1 : PowerSeries.X ^ k ∣ (PowerSeries.X * u) ^ k * ψ q :=

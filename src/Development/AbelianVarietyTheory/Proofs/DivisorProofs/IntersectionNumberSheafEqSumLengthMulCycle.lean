@@ -159,7 +159,6 @@ theorem interNum_eq_sum_length_mul_interNumRed
                       = ∑ w ∈ S, ((Module.length (X.presheaf.stalk w) (F.presheaf.stalk w :)).toNat : ℤ) * interNumRed κ (⟨closure {w}, isClosed_closure⟩ : Closeds _) P :=
   by
     apply
-        _root_.GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.interNum_eq_sum_length_mul_interNumRed
-      <;> assumption
+      _root_.GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.interNum_eq_sum_length_mul_interNumRed
 
 end GlobalTheory.SheafCycle

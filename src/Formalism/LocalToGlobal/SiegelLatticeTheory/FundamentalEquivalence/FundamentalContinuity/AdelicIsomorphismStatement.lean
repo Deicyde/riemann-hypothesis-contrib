@@ -78,7 +78,7 @@ def KgS (g : ℕ) : Set I.Gf :=
 
 theorem exists_beta
     : ∃ β : I.E, β ∈ Formalism.UG.intOE I.E ∧ β ∉ Set.range (algebraMap I.F I.E) := by
-  apply PI.InvTopW.exists_beta <;> assumption
+  apply PI.InvTopW.exists_beta
 
 def beta : I.E := (exists_beta I).choose
 

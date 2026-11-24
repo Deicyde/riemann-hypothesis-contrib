@@ -652,12 +652,12 @@ theorem reading_of_runModel
     apply Subtype.ext
     funext c' x'
     simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-      TwoLevels.res, hRd, rdLin_apply]
+      TwoLevels.res, hRd]
     exact hGe c' x'.1 x'.2
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hy, map_sum]
   simp only [map_smul, hρR, Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
-    smul_eq_mul, hRd, rdLin_apply]
+    smul_eq_mul, hRd]
   rw [TwoLevels.pull,
     hGe (g • c) _ (_root_.GlobalTheory.TwoLevelsDom.lact_tr_mem_dom M g c x.1 x.2), Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -999,7 +999,7 @@ theorem finrank_E (H : Host R) : Module.finrank ℚ H.E = 2 * R.f := by
 theorem eq_plGw_or_isConjPl
     : ∀ (D : D7) (k : Fin 2), ∀ w ∈ placesOver D.host.E (D.host.g k), ∃ v : D.nd.PlG k,
       w = D.naut.plGw k v ∨ IsConjPl D.host (D.naut.plGw k v) w := by
-  apply GlobalTheory.TypePlaceCover.place_cover <;> assumption
+  apply GlobalTheory.TypePlaceCover.place_cover
 
 end GlobalTheory.TypePlacesExhaust
 end -- clump:auto

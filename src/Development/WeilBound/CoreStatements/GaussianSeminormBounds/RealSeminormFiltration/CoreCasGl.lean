@@ -426,8 +426,8 @@ theorem cas_tensor
     have h' := hA w (Ψ w)
 
     simp only [map_sub, LinearMap.sum_apply, map_sum, Module.End.mul_apply, hk, map_add (f := _),
-        map_smul, smul_eq_mul, hΨ', hΨe, h3, Matrix.conjTranspose_apply, starRingEnd_apply,
-        star_star, Finset.mul_sum, mul_add, Finset.sum_add_distrib]
+        map_smul, smul_eq_mul, hΨ', hΨe, h3, Matrix.conjTranspose_apply, Finset.mul_sum, mul_add,
+        Finset.sum_add_distrib]
       at h
     simp only [PositivityTheory.KReal.positionA, sum_inner, inner_smul_left, h3,
       Matrix.conjTranspose_apply, starRingEnd_apply, star_star, Finset.mul_sum,

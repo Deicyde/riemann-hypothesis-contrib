@@ -71,7 +71,6 @@ theorem mem_can {n : ℕ} {μN : Fin n → ℤ} (h : Antitone μN) (c : ℤ) (m 
 
 theorem isIndex_can {n : ℕ} (μN : Fin n → ℤ) : IsIndex μN (canIdx μN) := by
   apply Formalism.InvariantFactorPaths.GelfandTsetlinBases.SignTwistStarLemmas.canIdx_isIndex
-    <;> assumption
 
 theorem map_step
     {A A' : Type*} [CommRing A] [CommRing A']

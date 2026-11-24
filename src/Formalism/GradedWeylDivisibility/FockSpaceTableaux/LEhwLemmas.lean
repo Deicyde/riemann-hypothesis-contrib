@@ -75,7 +75,6 @@ theorem lehw_dom
     simp only [u, map_sum, map_monomial, smul_monomial]
     refine Finset.sum_congr rfl fun d hd => ?_
     congr 1
-    push_cast
     have hN
         : (N : ℚ)
           = (∏ d' ∈ f.support.erase d, ((AddMonoidAlgebra.coeff f d').den : ℚ))

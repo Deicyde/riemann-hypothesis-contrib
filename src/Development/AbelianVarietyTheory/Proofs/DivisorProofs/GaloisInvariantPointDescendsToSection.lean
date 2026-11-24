@@ -200,9 +200,7 @@ theorem galoisFixed_point_of_finite
               (∀ σ : AlgebraicClosure (FractionRing V) ≃ₐ[FractionRing V] AlgebraicClosure (FractionRing V),
                   spMap σ.toAlgHom.toRingHom ≫ nb.left = nb.left)
                 → ∃ s : 𝟙_ (Over (Sp V)) ⟶ N, nb = toUnit _ ≫ s := by
-  first
-  | exact @_root_.GlobalTheory.GaloisFixedSectionExtension.exists_section_of_galoisFixed
-  | (intros; exact _root_.GlobalTheory.GaloisFixedSectionExtension.exists_section_of_galoisFixed ..)
+  first | exact @_root_.GlobalTheory.GaloisFixedSectionExtension.exists_section_of_galoisFixed
 
 end GlobalTheory.FinDescent
 end -- clump:auto

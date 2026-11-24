@@ -254,7 +254,7 @@ theorem sum_fam_mul_bar {d : ℕ} (hd : 0 < d)
       : ∑ t, famM d t * form d * (famM d t)ᵀ * formInv d
         = ((8 * d : ℕ) : ℤ) • (1 : Matrix _ _ ℤ) := by
     rw [← Finset.sum_mul, sum_famM hd, Matrix.smul_mul, form_mul_formInv hd]
-  simp only [fam, bar_coe, Subring.coe_mul, Matrix.mul_assoc] at h ⊢
+  simp only [fam, Matrix.mul_assoc] at h ⊢
   simp only [AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, bar_coe, Matrix.mul_assoc]
   rw [h]
   simp only [Subring.coe_natCast]
@@ -725,7 +725,6 @@ theorem lo_inl (d : ℕ) (i : Fin 4) : lo d (Sum.inl i) = (d : ℤ) • erow d i
   ext a b
   rcases a with a | a <;> rcases b with b | b
     <;> simp [-zsmul_eq_mul, -nsmul_eq_mul, Matrix.smul_apply, lo, erow, single_apply, ite_and]
-    <;> (try split_ifs)
 
 theorem up_inr (d : ℕ) (i : Fin 4) : up d (Sum.inr i) = polUnit d * ecol d (Sum.inr 0) i := by
   ext1
@@ -782,7 +781,6 @@ theorem mul_lo (d : ℕ) (o : ord d) (k : Fin 4 ⊕ Fin 4)
     <;> simp [-zsmul_eq_mul, -nsmul_eq_mul, AddSubgroupClass.coe_zsmul,
       AddSubmonoidClass.coe_finsetSum, lo, Matrix.mul_apply, single_apply, Fintype.sum_sum_type,
       Matrix.sum_apply, ite_and, Finset.sum_ite_eq, Finset.sum_ite_eq']
-    <;> (try split_ifs)
 
 theorem up_mul (d : ℕ) (o : ord d) (k : Fin 4 ⊕ Fin 4)
     : up d k * o = ∑ j, (o : Matrix _ _ ℤ) k j • up d j := by
@@ -792,7 +790,6 @@ theorem up_mul (d : ℕ) (o : ord d) (k : Fin 4 ⊕ Fin 4)
     <;> simp [-zsmul_eq_mul, -nsmul_eq_mul, AddSubgroupClass.coe_zsmul,
       AddSubmonoidClass.coe_finsetSum, up, Matrix.mul_apply, single_apply, Fintype.sum_sum_type,
       Matrix.sum_apply, ite_and, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.sum_ite_irrel]
-    <;> (try split_ifs)
 
 end GlobalTheory.ZarhinUniqIso
 

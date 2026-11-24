@@ -104,14 +104,9 @@ theorem lUnlinkedIrr_nu
     (hN : GlobalTheory.BZSeg.NuPair k)
     : GlobalTheory.BZSeg.LUnlinkedIrr k := by
   have hA : GlobalTheory.Published.IrreducibleAdmissibleGL := by
-    first
-    | exact PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
-    | exact PositivityTheory.Exh.irreducibleAdmissibleGL
-    | exact GlobalTheory.RgGu.irreducibleAdmissibleGL
+    first | exact PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
   have hF : GlobalTheory.BZSeg.ProdIrrFiniteLength k := by
-    first
-    | exact GlobalTheory.RgGu.prodIrrFiniteLength k
-    | exact fun h N x hd => GlobalTheory.CompanionTheory.ProdFL.hasFiniteLength_prodIrr hA x hd
+    first | exact GlobalTheory.RgGu.prodIrrFiniteLength k
   exact _root_.GlobalTheory.CompanionTheory.BZSeg.NuPairIrr.lUnlinkedIrr k hA hJ hG hN
     (whitRankStd k) hF
 

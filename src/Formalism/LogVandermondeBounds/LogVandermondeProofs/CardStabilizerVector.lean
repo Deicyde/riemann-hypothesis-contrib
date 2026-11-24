@@ -281,7 +281,6 @@ theorem cardStabilizerVector : CardStabilizerVector := by
           * Nat.card (@MulAction.orbit (GL (Fin n) F) (RowVec F n) _ v)
         = Nat.card (GL (Fin n) F) := by
     first
-    | (rw [← MulAction.index_stabilizer]; exact Subgroup.card_mul_index _)
     | (rw [mul_comm]; exact MulAction.card_orbit_mul_card_stabilizer_eq_card_group _ _)
     | (
         rw [mul_comm, ← Nat.card_prod]

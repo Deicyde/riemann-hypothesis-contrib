@@ -1879,8 +1879,6 @@ theorem hasPeriod_add_smul
     : c.HasPeriod F.θ t (f + algebraMap F.B F.Q b • g) (y + b * y') := by
   first
   | exact (_root_.GlobalTheory.QLog.hasPeriod_linear p C v O hv ε hε F G d c μ' hL hμ f g t y y' b
-      hg h1 h2).1
-  | exact (_root_.GlobalTheory.QLog.hasPeriod_linear p C v O hv ε hε F G d c μ' hL hμ f g t y y' b
       h1 h2).1
 
 theorem hasPeriod_map_zero (t : G.Tate) (s : MvPowerSeries (Fin d) F.B) (hs : constantCoeff s = 0)
@@ -1888,8 +1886,6 @@ theorem hasPeriod_map_zero (t : G.Tate) (s : MvPowerSeries (Fin d) F.B) (hs : co
   have hz := hasPeriod_zero c F.frame t
   have hd : DIn (⊤ : Ideal F.B) (0 : MvPowerSeries (Fin d) F.Q) := din_of_in (in_zero ⊤)
   first
-  | exact (_root_.GlobalTheory.QLog.hasPeriod_linear p C v O hv ε hε F G d c μ' hL hμ 0 0 t 0 0 0 hd
-      hz hz).2 s hs
   | exact (_root_.GlobalTheory.QLog.hasPeriod_linear p C v O hv ε hε F G d c μ' hL hμ 0 0 t 0 0 0 hz
       hz).2 s hs
 

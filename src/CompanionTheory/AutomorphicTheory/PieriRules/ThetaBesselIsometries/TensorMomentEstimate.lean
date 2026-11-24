@@ -258,10 +258,7 @@ theorem _root_.Gp91.GlobalTheory.T.isBes_tensor_projection_and_ev_equivariant_sm
               ∧ (∀ s ∈ Formalism.QuantumDeterminants.Sset k r z, ∀ y ∈ (RI I).sm,
                 ev Γ R om (fun c => io I c ((RI I).σ s y)) = R.σ s (ev Γ R om (fun c => io I c y)))
               ∧ SmMap (RI I) R (fun y => ev Γ R om (fun c => io I c y)) := by
-  first
-  | exact @GlobalTheory.KapBes.main
-  | exact GlobalTheory.KapBes.main
-  | (intros; apply GlobalTheory.KapBes.main <;> assumption)
+  first | exact @GlobalTheory.KapBes.main
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -301,11 +298,7 @@ theorem _root_.Gp91.GlobalTheory.T.frep_discrete_series_sum
             ∧ ∀ (a a' : ι → ℂ), ∀ v ∈ R.sm, ∀ v' ∈ R.sm, ∀ g ∈ GG k r,
               Formalism.QuantumDeterminants.herm Γ (ρ g *ᵥ a') a * ⟪v, R.σ g v'⟫_ℂ
                 = ∑ I, (ep I : ℂ) * ⟪∑ c, pr I c (tm R a v c), (RI I).σ g (∑ c, pr I c (tm R a' v' c))⟫_ℂ :=
-  by
-    first
-    | exact @GlobalTheory.TensAdj.tens_adj
-    | exact GlobalTheory.TensAdj.tens_adj
-    | (intros; apply GlobalTheory.TensAdj.tens_adj <;> assumption)
+  by first | exact @GlobalTheory.TensAdj.tens_adj
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -338,10 +331,7 @@ theorem _root_.Gp91.GlobalTheory.T.tensor_raw_of_frep
             ∧ (∀ I c x, R.KFin x → (RI I).KFin (pr I c x))
             ∧ (∀ I c, ∀ y ∈ (RI I).TK, io I c y ∈ R.TK)
             ∧ (∀ I c, ∀ x ∈ R.TK, pr I c x ∈ (RI I).TK) := by
-  first
-  | exact @GlobalTheory.tensor_decomposition_kfinite
-  | exact GlobalTheory.tensor_decomposition_kfinite
-  | (intros; apply GlobalTheory.tensor_decomposition_kfinite <;> assumption)
+  first | exact @GlobalTheory.tensor_decomposition_kfinite
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto

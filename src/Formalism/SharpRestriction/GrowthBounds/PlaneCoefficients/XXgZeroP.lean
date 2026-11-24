@@ -362,7 +362,7 @@ theorem Fdig_der_lt
                 w
               = mo w := by
       intro w hw
-      simp [Finsupp.single_apply, Ne.symm hw]
+      simp [Ne.symm hw]
     have hv1
         : (mo - Finsupp.single ((⟨j0, Sum.inr m0⟩, a0) : TL J Dt.nL r × Fin r) 1
               : TL J Dt.nL r × Fin r →₀ ℕ)
@@ -465,7 +465,7 @@ theorem Fdig_der_eq
                 w
               = mo w := by
       intro w hw
-      simp [Finsupp.single_apply, Ne.symm hw]
+      simp [Ne.symm hw]
     have hv1
         : (mo - Finsupp.single ((⟨j0, Sum.inr m0⟩, a0) : TL J Dt.nL r × Fin r) 1
               : TL J Dt.nL r × Fin r →₀ ℕ)

@@ -553,19 +553,8 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
 theorem linearIndependent_mulVec
     {M n : ℕ} (A : GL (Fin M) E) {X : Fin n → Fin M → E} (hX : LinearIndependent E X)
-    : LinearIndependent E (fun a => (A : Matrix (Fin M) (Fin M) E) *ᵥ X a) := by
-  have hinj : Function.Injective (Matrix.mulVecLin (A : Matrix (Fin M) (Fin M) E)) := by
-    intro x y hxy
-    have h
-        : ∀ z : Fin M → E,
-          ((A⁻¹ : GL (Fin M) E) : Matrix (Fin M) (Fin M) E) *ᵥ ((A : Matrix (Fin M) (Fin M) E) *ᵥ z)
-            = z := by
-      intro z
-      rw [Matrix.mulVec_mulVec, ← Units.val_mul]
-      simp
-    have hxy' : (A : Matrix (Fin M) (Fin M) E) *ᵥ x = (A : Matrix (Fin M) (Fin M) E) *ᵥ y := hxy
-    rw [← h x, ← h y, hxy']
-  exact hX.map' (Matrix.mulVecLin (A : Matrix (Fin M) (Fin M) E)) (LinearMap.ker_eq_bot.2 hinj)
+    : LinearIndependent E (fun a => (A : Matrix (Fin M) (Fin M) E) *ᵥ X a) :=
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep.Unf.Basic.linearIndependent_mulVec_GL A hX
 
 theorem linearIndependent_gact
     (σ : E →ₐ[F] E)
@@ -985,14 +974,8 @@ theorem free_v
     (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) (hlam : lam.IsAddHaarMeasure)
     (n : ℕ)
     : ∃ m,
-      IsGramFibFree (Fv F v) σ J n (coordW (Fv F v) b lam n M) (coordHerm (Fv F v) σ b lam n)
-        m := by
-  have := PI.VolStabS.secondCountable_Fv F v
-  have := PI.VolStabS.locallyCompact_Fv F v
-  have hB : BorelSpace (Fv F v) := ⟨rfl⟩
-  obtain ⟨-, hW, hH⟩ :=
-    _root_.GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hCM (Fv F v) _ b lam hlam
-  exact PI.OmFibreUniq.W.gram_map_fibre_existence σ J v n hCM hJ _ _ (hW n M) (hH n)
+      IsGramFibFree (Fv F v) σ J n (coordW (Fv F v) b lam n M) (coordHerm (Fv F v) σ b lam n) m :=
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep.fam_fin σ hCM J hJ b v lam hlam n
 
 theorem good_mass_free : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ t : F, t ≠ 0 → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a b, σ (T b a) = T a b) (hT' : ∀ a b, σ (blockOne (algebraMap F E t) T b a) = blockOne (algebraMap F E t) T a b) (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ lam : Measure (Fv F v), lam.IsAddHaarMeasure → ∀ m m₁ m', IsGramFibFree (Fv F v) σ (blockOne (algebraMap F E t) J) (n + 1) (coordW (Fv F v) b lam (n + 1) (M + 1)) (coordHerm (Fv F v) σ b lam (n + 1)) m → IsGramFib (Fv F v) σ (blockOne (algebraMap F E t) J) 1 (coordW (Fv F v) b lam 1 (M + 1)) (coordHerm (Fv F v) σ b lam 1) m₁ → IsGramFibFree (Fv F v) σ J n (coordW (Fv F v) b lam n M) (coordHerm (Fv F v) σ b lam n) m' → ∀ c : ℝ≥0, (coordK (Fv F v) b lam).map (fun y => inclR (Fv F v) (algebraMap F E t) * y) = c • coordK (Fv F v) b lam → m (hermOf (Fv F v) σ _ hT') (latV b v) = (c : ℝ≥0∞) ^ n * (m' (hermOf (Fv F v) σ T hT) (latV b v) * m₁ (hermScal (Fv F v) σ (algebraMap F (Fv F v) t)) (latV b v)) := by
   intro F E _ _ _ _ _ σ hCM M J hJ t ht n T hT hT' d b
@@ -1461,45 +1444,9 @@ theorem local_rescale
     (n : ℕ) (m : HermR R σ n → Measure (Fin n → Fin M → R ⊗[F] E))
     (hm : IsGramFibFree R σ J n (coordW R b lam n M) (coordHerm R σ b lam n) m)
     : ∃ r : ℝ≥0,
-      r ≠ 0 ∧ IsGramFibFree R σ J n (coordW R b' lam n M) (coordHerm R σ b' lam n)
-        (fun S => r • m S) := by
-  have h1 := haar_of_loc σ hCM R hR b lam hlam n M
-  have h2 := haar_of_loc σ hCM R hR b' lam hlam n M
-  obtain ⟨r1, r2, r3, r4, -⟩ := hR
-  haveI := r1
-  haveI := r2
-  haveI := r3
-  haveI := r4
-  obtain ⟨t1, t2, t3, t4, -, -, -, t8, t9, -⟩ :=
-    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM R
-  haveI := t1
-  haveI := t2
-  haveI := t3
-  haveI := t4
-  haveI : BorelSpace (Fin n → Fin M → R ⊗[F] E) := t8 n M
-  haveI : BorelSpace (HermR R σ n) := ⟨rfl⟩
-  haveI : LocallyCompactSpace (Matrix (Fin n) (Fin n) (R ⊗[F] E)) :=
-    inferInstanceAs (LocallyCompactSpace (Fin n → Fin n → R ⊗[F] E))
-  haveI : SecondCountableTopology (Matrix (Fin n) (Fin n) (R ⊗[F] E)) :=
-    inferInstanceAs (SecondCountableTopology (Fin n → Fin n → R ⊗[F] E))
-  haveI : LocallyCompactSpace (HermR R σ n) :=
-    (t9 n).isClosedEmbedding_subtypeVal.locallyCompactSpace
-  haveI : SecondCountableTopology (HermR R σ n) :=
-    (t9 n).isClosedEmbedding_subtypeVal.isEmbedding.secondCountableTopology
-  haveI := h1.1
-  haveI := h1.2
-  haveI := h2.1
-  haveI := h2.2
-  set a := Measure.addHaarScalarFactor (coordW R b' lam n M) (coordW R b lam n M) with ha
-  set k := Measure.addHaarScalarFactor (coordHerm R σ b' lam n) (coordHerm R σ b lam n) with hk
-  have ea : coordW R b' lam n M = a • coordW R b lam n M := Measure.isAddLeftInvariant_eq_smul _ _
-  have ek : coordHerm R σ b' lam n = k • coordHerm R σ b lam n :=
-    Measure.isAddLeftInvariant_eq_smul _ _
-  have a0 : a ≠ 0 := (Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _).ne'
-  have k0 : k ≠ 0 := (Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _).ne'
-  refine ⟨a / k, div_ne_zero a0 k0, ?_⟩
-  rw [ea, ek]
-  exact fibre_scale a k (a / k) (div_mul_cancel₀ a k0) hm
+      r ≠ 0
+        ∧ IsGramFibFree R σ J n (coordW R b' lam n M) (coordHerm R σ b' lam n) (fun S => r • m S) :=
+  GlobalTheory.CompanionTheory.WeilSiegel.Free.Scale.coord_rescale σ hCM J R hR b b' lam hlam n m hm
 
 end Loc
 

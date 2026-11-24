@@ -150,7 +150,7 @@ theorem cnt_toList (α : σ →₀ ℕ) (i : σ)
           α.toMultiset.toList.get ⟨j, by simpa using j.2⟩)
         i
       = α i := by
-  apply _root_.Formalism.L2.KerInert.AlgP.cnt_toList <;> assumption
+  apply _root_.Formalism.L2.KerInert.AlgP.cnt_toList
 
 def cntF {m : ℕ} (f : Fin m → σ) : σ →₀ ℕ := ∑ j, Finsupp.single (f j) 1
 

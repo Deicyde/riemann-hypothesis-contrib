@@ -139,6 +139,6 @@ theorem exists_flat_chart
         (κ : O →+* R ⧸ I) {V : X.Opens} {d : ℕ} (c : Coord q V d),
       ∃ c' : Chart γ p q κ V d,
         FlatT c'.D ∧ ∀ i, ev c'.D c'.inV (c.t i) = Ideal.Quotient.mk _ (c'.t i) := by
-  apply GlobalTheory.CompanionTheory.ChartP.exists_chart <;> assumption
+  apply GlobalTheory.CompanionTheory.ChartP.exists_chart
 
 end GlobalTheory.CompanionTheory.FlatChartP

@@ -107,7 +107,7 @@ theorem coeffMap_mem_weyl
     | add x y _ _ hx hy =>
       intro s
       have : coeffMap c (s • (x + y)) = coeffMap c (s • x) + coeffMap c (s • y) := by
-        ext m; simp [coeff_coeffMap, mul_add]
+        ext m; simp [coeff_coeffMap]
       rw [this]
       exact Submodule.add_mem _ (hx s) (hy s)
     | smul a x _ hx =>

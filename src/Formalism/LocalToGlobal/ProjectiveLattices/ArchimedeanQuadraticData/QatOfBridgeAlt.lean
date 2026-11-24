@@ -497,9 +497,7 @@ attribute [local instance] algLaK
 
 theorem towerLaK (la : HeightOneSpectrum (𝓞 K))
     : IsScalarTower (𝓞 K) (Localization.AtPrime la.asIdeal) K := by
-  first
-  | exact IsLocalization.localization_isScalarTower_of_submonoid_le _ _ _ _ _
-  | (apply IsScalarTower.of_algebraMap_eq; intro x; exact (IsLocalization.map_eq _ x).symm)
+  first | exact IsLocalization.localization_isScalarTower_of_submonoid_le _ _ _ _ _
 
 attribute [local instance] towerLaK
 
@@ -541,7 +539,7 @@ theorem mapLaT_coe
     ext x
     simp only [RingHom.comp_apply, mapLaT, IsLocalization.map_eq]
     rw [← IsScalarTower.algebraMap_apply (𝓞 K) (Localization.AtPrime la.asIdeal) K]
-    first | rfl | (norm_cast; simp)
+    first | rfl
   exact RingHom.congr_fun key r
 
 theorem ramificationIdx_ne_zero'

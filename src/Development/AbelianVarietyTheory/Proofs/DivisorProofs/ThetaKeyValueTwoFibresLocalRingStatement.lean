@@ -235,9 +235,7 @@ theorem GlobalTheory.MBLow.coords_integral_of_closed_indep
             → ∀ (w : I → W) (z : Λ → K₀),
               (∀ i, i₀ (w i) = ∑ l, z l * i₀ (u i l))
                 → ∃ z₀ : Λ → W, (∀ l, i₀ (z₀ l) = z l) ∧ ∀ i, w i = ∑ l, z₀ l * u i l := by
-  first
-  | exact @_root_.GlobalTheory.NonzeroDeterminantIntegrality.integral_coefficients
-  | (intros; exact _root_.GlobalTheory.NonzeroDeterminantIntegrality.integral_coefficients ..)
+  first | exact @_root_.GlobalTheory.NonzeroDeterminantIntegrality.integral_coefficients
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoordinatesIntegralOfLinearlyIndependentReductio =====

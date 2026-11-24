@@ -112,25 +112,19 @@ theorem inW_mul {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt �
   have h := (F.taylorRing.1 f g hf hg).2
   unfold inW
   rw [h, map_mul]
-  first
-  | exact PowerSeries.subst_mul (lgS (W := W)) _ _
-  | (rw [← PowerSeries.coe_substAlgHom (lgS (W := W))]; exact map_mul _ _ _)
+  first | exact PowerSeries.subst_mul (lgS (W := W)) _ _
 
 theorem inW_add {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0)
     : inW l ι W (fun z => f z + g z) = inW l ι W f + inW l ι W g := by
   have h := (F.taylorRing.1 f g hf hg).1
   unfold inW
   rw [h, map_add (f := _)]
-  first
-  | exact PowerSeries.subst_add (lgS (W := W)) _ _
-  | (rw [← PowerSeries.coe_substAlgHom (lgS (W := W))]; exact map_add _ _ _)
+  first | exact PowerSeries.subst_add (lgS (W := W)) _ _
 
 theorem inW_const (c : ℂ) : inW l ι W (fun _ => c) = C (ι c) := by
   unfold inW
   rw [F.taylorRing.2.1 c, PowerSeries.map_C]
   first
-  | exact PowerSeries.subst_C (lgS (W := W)) _
-  | exact PowerSeries.subst_C (ha := lgS (W := W)) _
   | (
       rw [← PowerSeries.coe_substAlgHom (lgS (W := W))]
       exact (PowerSeries.substAlgHom _).commutes _
@@ -156,10 +150,7 @@ theorem cc_inW (f : ℂ → ℂ) : constantCoeff (inW l ι W f) = ι (f 0) := by
     first | exact PowerSeries.subst_X ha
   have hC : ∀ c : ℂ_[l], PowerSeries.subst (A.logSer W) (C c : PowerSeries ℂ_[l]) = C c := by
     intro c
-    first
-    | exact PowerSeries.subst_C ha c
-    | exact PowerSeries.subst_C (ha := ha) c
-    | (rw [← PowerSeries.coe_substAlgHom ha]; exact (PowerSeries.substAlgHom ha).commutes c)
+    first | (rw [← PowerSeries.coe_substAlgHom ha]; exact (PowerSeries.substAlgHom ha).commutes c)
   rw [PowerSeries.eq_shift_mul_X_add_const (PowerSeries.map (ι : ℂ →+* ℂ_[l]) (F.taylor0 f)),
     ← PowerSeries.coe_substAlgHom ha, map_add, map_mul, PowerSeries.coe_substAlgHom, hX, hC]
   simp [h0, hS]
@@ -298,14 +289,9 @@ theorem nonsing (hU : Unif l L ι W) (t : ℂ) (ht : t ∉ L.lattice)
     simp only [xc, yc, WeierstrassCurve.b₂]
     linear_combination he + (ι (L.weierstrassP t) / 4) * h1 + (1 / 4) * h2
   first
-  | exact WeierstrassCurve.Affine.nonsingular_of_Δ_ne_zero heq hΔ
   | (
       haveI : W.IsElliptic := ⟨isUnit_iff_ne_zero.mpr hΔ⟩
       exact (WeierstrassCurve.Affine.equation_iff_nonsingular).mp heq
-    )
-  | (
-      haveI : W.IsElliptic := ⟨isUnit_iff_ne_zero.mpr hΔ⟩
-      exact (WeierstrassCurve.Affine.equation_iff_nonsingular (W := W)).mp heq
     )
 
 theorem ptW_notMem (hU : Unif l L ι W) (t : ℂ) (ht : t ∉ L.lattice)
@@ -401,13 +387,13 @@ def yf : ℂ → ℂ := fun z => (1 / 2) * (L.derivWeierstrassP (z + t) + (-V.a�
 theorem T_xf (ht : t ∉ L.lattice) : T (xf L V t) (F.taylor0 (xf L V t)) := by
   refine ⟨?_, rfl⟩
   have h : AnalyticAt ℂ (fun z => L.weierstrassP (z + t)) 0 := by
-    first | exact (AnaSys.T_wp ht).1 | exact (AnaSys.T_wp (L := L) (t := t) ht).1
+    first | exact (AnaSys.T_wp (L := L) (t := t) ht).1
   exact h.add analyticAt_const
 
 theorem T_yf (ht : t ∉ L.lattice) : T (yf L V t) (F.taylor0 (yf L V t)) := by
   refine ⟨?_, rfl⟩
   have h : AnalyticAt ℂ (fun z => L.derivWeierstrassP (z + t)) 0 := by
-    first | exact (AnaSys.T_dwp ht).1 | exact (AnaSys.T_dwp (L := L) (t := t) ht).1
+    first | exact (AnaSys.T_dwp (L := L) (t := t) ht).1
   have hx := (T_xf L V t ht).1
   exact analyticAt_const.mul (h.add ((analyticAt_const.mul hx).add analyticAt_const))
 

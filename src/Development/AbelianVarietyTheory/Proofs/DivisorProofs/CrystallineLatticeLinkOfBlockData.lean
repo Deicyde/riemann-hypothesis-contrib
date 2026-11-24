@@ -780,7 +780,7 @@ theorem adapted_bases_of_redFilt
       have h0 :=
         _root_.GlobalTheory.adapted_coords_vanish_stmt F n (V i (rs s).castSucc) (g i)
           (fun j' hj' => hg i _ j' hj')
-          _ (hyz ▸ hy) (pos s) (by rw [hdi] <;> exact Nat.le_of_not_lt (hpos_nlt s))
+          _ (hyz ▸ hy) (pos s) (by rw [hdi])
       have h1
           : (((g i)⁻¹ : (Matrix (Fin n) (Fin n) F⟦X⟧)ˣ) : Matrix (Fin n) (Fin n) F⟦X⟧).mulVec
               (fun a => (g i : Matrix (Fin n) (Fin n) F⟦X⟧) a (pos s))

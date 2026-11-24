@@ -14070,17 +14070,7 @@ variable {R : Type} [Ring R] [Algebra ℂ R]
 
 theorem polyIn_mul {f g : ℂ → R} {d₁ d₂ : ℕ} (hf : PolyIn f d₁) (hg : PolyIn g d₂)
     : PolyIn (fun t => f t * g t) (d₁ + d₂) := by
-  first
-  | (apply UpperTheory.Reformulated.B.Qk18.polyIn_mul <;> assumption)
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f g d₁ d₂ hf hg
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f g d₁ d₂ hf
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f g d₁ d₂
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f g d₁
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f g
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_› f
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_› ‹_›
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R ‹_›
-  | exact @UpperTheory.Reformulated.B.Qk18.polyIn_mul R
+  first | (apply UpperTheory.Reformulated.B.Qk18.polyIn_mul <;> assumption)
 
 theorem lagrange
     {M : Type} [AddCommGroup M] [Module ℂ M]

@@ -1154,10 +1154,7 @@ theorem _root_.GlobalTheory.T.tower_components_compatible_laws
           CompOf o κ
             → ∀ (B : ℕ) (Z : Comp Xo c), ∃ Fr : Small.GenFrame (o.Or B (κ Z)),
               Nonempty (Reading Fr h Z) := by
-  first
-  | exact @GlobalTheory.CompanionTheory.Ar.Rec.read_exists
-  | exact GlobalTheory.CompanionTheory.Ar.Rec.read_exists
-  | (intros; apply GlobalTheory.CompanionTheory.Ar.Rec.read_exists <;> assumption)
+  first | exact @GlobalTheory.CompanionTheory.Ar.Rec.read_exists
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AutomorphicSpectrum.Proofs.GeometryProofs.TowerComponentsCompatibleLawsStatement =====

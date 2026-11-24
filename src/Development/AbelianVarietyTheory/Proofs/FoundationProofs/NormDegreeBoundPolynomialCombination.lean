@@ -260,9 +260,7 @@ theorem natDegree_norm_of_coord_degree
               → (∑ i, (C (lam i) * X ^ d + p i) • b i) ≠ 0
                 ∧ (Algebra.norm k[X] (∑ i, (C (lam i) * X ^ d + p i) • b i)).natDegree
                   = n * d + c) := by
-  first
-  | exact @_root_.GlobalTheory.NormFormBound.norm_degree
-  | (intros; exact _root_.GlobalTheory.NormFormBound.norm_degree ..)
+  first | exact @_root_.GlobalTheory.NormFormBound.norm_degree
 
 end
 

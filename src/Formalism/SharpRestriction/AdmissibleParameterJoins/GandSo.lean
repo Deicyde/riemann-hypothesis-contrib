@@ -189,9 +189,7 @@ theorem coeff_pow_zero {f : MvPowerSeries ι R} (hf : constantCoeff f = 0)
     · rw [h2, MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hf, mul_zero]
     · have hdeg : p.1.degree + p.2.degree = n.degree := by
         rw [← hp]
-        first
-        | exact (Finsupp.degree_add p.1 p.2).symm
-        | exact (map_add Finsupp.degree p.1 p.2).symm
+        first | exact (map_add Finsupp.degree p.1 p.2).symm
       have hpos : p.2.degree ≠ 0 := by
         intro h
         apply h2
@@ -351,7 +349,7 @@ theorem Ex_biv : Ex (X 0 + X 1 : MvPowerSeries (Fin 2) K) = Ex (X 0) * Ex (X 1) 
   rw [Nat.cast_add_choose]
   have hne : ((n 0 + n 1).factorial : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
   first | (rw [div_mul_div_comm, one_mul, div_mul_cancel_left₀ hne]; simp)
-  all_goals first | ring | exact mul_comm _ _
+  all_goals first | ring
 
 theorem Ex_add {f g : MvPowerSeries ι K} (hf : constantCoeff f = 0) (hg : constantCoeff g = 0)
     : Ex (f + g) = Ex f * Ex g := by

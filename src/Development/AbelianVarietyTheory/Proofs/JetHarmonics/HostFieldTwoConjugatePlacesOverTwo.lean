@@ -1069,7 +1069,7 @@ theorem UpperTheory.trace_form_decomposition_CMDatum
                 (Fin (Module.finrank ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] e)))
                   ≃ Emb (O := O) e)
               ∧ Nat.card (𝓞 E →+* O) = Module.finrank ℚ E := by
-  apply GlobalTheory.EmbCount.card_emb <;> assumption
+  apply GlobalTheory.EmbCount.card_emb
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AutomorphicArithmetic.CMTraceForms.TraceFormDecompositionCMDatum =====

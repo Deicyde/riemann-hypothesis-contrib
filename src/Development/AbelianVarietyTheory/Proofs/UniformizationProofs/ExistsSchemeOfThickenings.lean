@@ -63,7 +63,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.ThickGlue
 
 set_option backward.isDefEq.respectTransparency false in
-theorem exists_glue
+/-- Glue the scheme with control of open preimages and descent of morphisms. -/
+theorem exists_glue_with_desc
     (B₀ : Scheme.{0}) (𝒰 : Set B₀.Opens)
     (hbas : ∀ U ∈ 𝒰, ∀ (W : B₀.Opens) (x : B₀), x ∈ U → x ∈ W → ∃ V ∈ 𝒰, x ∈ V ∧ V ≤ U ∧ V ≤ W)
     (hcov : sSup 𝒰 = ⊤) (F : 𝒰 ⥤ Scheme.{0})
@@ -74,7 +75,9 @@ theorem exists_glue
     : ∃ (B : Scheme.{0}) (j : B₀ ⟶ B) (_ : IsClosedImmersion j) (_ : Surjective j)
         (κ : ∀ U, F.obj U ⟶ B) (_ : ∀ U, IsOpenImmersion (κ U)),
       (∀ U, U.1.ι ≫ j = e U ≫ κ U) ∧ (∀ U, j ⁻¹ᵁ (κ U).opensRange = U.1)
-        ∧ ∀ {U V : 𝒰} (f : U ⟶ V), F.map f ≫ κ V = κ U :=
+        ∧ (∀ {U V : 𝒰} (f : U ⟶ V), F.map f ≫ κ V = κ U)
+        ∧ ∀ (T : Scheme.{0}) (t : ∀ U, F.obj U ⟶ T),
+          (∀ {U V : 𝒰} (f : U ⟶ V), F.map f ≫ t V = t U) → ∃ s : B ⟶ T, ∀ U, κ U ≫ s = t U :=
   set_option backward.isDefEq.respectTransparency false in
     by
       have hnat'
@@ -162,7 +165,21 @@ theorem exists_glue
           exact h2 ▸ y.2
         · intro hx
           exact ⟨_, (hj' U ⟨x, hx⟩).symm⟩
-      refine ⟨colimit F, j, ?_, ⟨?_⟩, colimit.ι F, inferInstance, hj, hpre, fun f ↦ colimit.w F f⟩
+      refine ⟨
+        colimit F,
+        j,
+        ?_,
+        ⟨?_⟩,
+        colimit.ι F,
+        inferInstance,
+        hj,
+        hpre,
+        fun f ↦ colimit.w F f,
+        fun T t ht ↦ ⟨
+          colimit.desc F ⟨T, ⟨fun U ↦ t U, fun U V f ↦ (ht f).trans (Category.comp_id _).symm⟩⟩,
+          fun U ↦ colimit.ι_desc _ _
+        ⟩
+      ⟩
       · rw [IsZariskiLocalAtTarget.iff_of_openCover (P := @IsClosedImmersion)
           (Scheme.IsLocallyDirected.openCover F)]
         intro U
@@ -176,6 +193,22 @@ theorem exists_glue
         obtain ⟨U, x, rfl⟩ := Scheme.IsLocallyDirected.ι_jointly_surjective F b
         obtain ⟨x, rfl⟩ := (e U).surjective x
         exact ⟨_, hj' U x⟩
+
+theorem exists_glue
+    (B₀ : Scheme.{0}) (𝒰 : Set B₀.Opens)
+    (hbas : ∀ U ∈ 𝒰, ∀ (W : B₀.Opens) (x : B₀), x ∈ U → x ∈ W → ∃ V ∈ 𝒰, x ∈ V ∧ V ≤ U ∧ V ≤ W)
+    (hcov : sSup 𝒰 = ⊤) (F : 𝒰 ⥤ Scheme.{0})
+    (hF : ∀ {U V : 𝒰} (f : U ⟶ V), IsOpenImmersion (F.map f)) (e : ∀ U : 𝒰, U.1.toScheme ⟶ F.obj U)
+    (he : ∀ U, IsClosedImmersion (e U)) (hs : ∀ U, Surjective (e U))
+    (hnat
+      : ∀ {U V : 𝒰} (h : U.1 ≤ V.1), B₀.homOfLE h ≫ e V = e U ≫ F.map (homOfLE (show U ≤ V from h)))
+    : ∃ (B : Scheme.{0}) (j : B₀ ⟶ B) (_ : IsClosedImmersion j) (_ : Surjective j)
+        (κ : ∀ U, F.obj U ⟶ B) (_ : ∀ U, IsOpenImmersion (κ U)),
+      (∀ U, U.1.ι ≫ j = e U ≫ κ U) ∧ (∀ U, j ⁻¹ᵁ (κ U).opensRange = U.1)
+        ∧ ∀ {U V : 𝒰} (f : U ⟶ V), F.map f ≫ κ V = κ U := by
+  obtain ⟨B, j, hj, hs, κ, hκ, hjκ, hpre, hmap, _⟩ :=
+    exists_glue_with_desc B₀ 𝒰 hbas hcov F hF e he hs hnat
+  exact ⟨B, j, hj, hs, κ, hκ, hjκ, hpre, hmap⟩
 
 noncomputable def specDiagram
     {B₀ : Scheme.{0}} (𝒰 : Set B₀.Opens) (𝒜 : B₀.Opensᵒᵖ ⥤ CommRingCat.{0})

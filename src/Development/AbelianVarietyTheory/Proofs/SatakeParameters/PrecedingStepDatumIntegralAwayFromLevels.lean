@@ -85,9 +85,5 @@ theorem xiCpl1_intOff
         P _ 1
         (fun hP => ⟨(t.idx_ok μ).stabG t.m2 al P hP, one_mem _⟩)
         _
-    | exact _root_.GlobalTheory.OmPhiInt.intOff_omPhi D L hT Gi Gl K Y cX ex t h1 h2 u μ t.m2 hm P _
-        1
-        (fun hP => ⟨(t.idx_ok μ).stabG t.m2 al P hP, one_mem _⟩)
-        _
 
 end GlobalTheory

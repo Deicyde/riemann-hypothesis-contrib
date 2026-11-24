@@ -80,7 +80,7 @@ theorem exists_sub_sum
     (S : LB.Sec (LB.LinComb L φ ε)) (p : Ix → LB.Sec (LB.LinComb L φ ε)) (s : Finset Ix)
     : ∃ d : LB.Sec (LB.LinComb L φ ε), ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (J),
       Good L z J → sval d r z J = sval S r z J - ∑ i ∈ s, sval (p i) r z J := by
-  apply GlobalTheory.MulSupp.exists_sub_sum <;> assumption
+  apply GlobalTheory.MulSupp.exists_sub_sum
 
 variable
   {R : Type} [CommRing R] [IsDomain R]

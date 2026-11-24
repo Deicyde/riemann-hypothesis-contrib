@@ -201,7 +201,6 @@ structure DivT
     : Type 1 where
   Qp : TC.QpIs w.I Y.Qp
   chr : DivisorCharacterCompatibility (w.D Z) (TC.cf w.I w.l Z) nch n.tp Y
-  loc : Formalism.L2.DIV.QLocTiedC chr w.I.sel
   inK : Y.Lev → ℕ → Prop
   geo : Formalism.L2.Geo.GeoTiedP Y inK
 

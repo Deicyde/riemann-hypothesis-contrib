@@ -234,7 +234,6 @@ theorem eq_of_mem_irreducibleComponents_of_isDomain
       revert X x h_2 Z W hZ hW hxZ hxW
       exact @_root_.GlobalTheory.IrreducibleGeneralizations.main
     )
-  | (intros; exact _root_.GlobalTheory.IrreducibleGeneralizations.main ..)
 
 theorem eq_of_mem_irreducibleComponents
     {X : Scheme.{u}} [IsNormalScheme X]

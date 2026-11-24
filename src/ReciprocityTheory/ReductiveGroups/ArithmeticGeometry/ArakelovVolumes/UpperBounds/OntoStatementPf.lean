@@ -223,9 +223,7 @@ theorem onto_of
     hPoin r X x0 hx0 hPD la W bb hW hWL hbb4 F P hD.1 hD.2.1 hD.2.2.1 hD.2.2.2
   have hae : ∀ᵐ z ∂(OntoI.nuF X x0 W FF), z ∈ FF := by
     have h1 : ∀ᵐ z ∂((muF X x0).restrict FF), z ∈ FF := ae_restrict_mem hFF.1
-    first
-    | exact (withDensity_absolutelyContinuous _ _).ae_le h1
-    | (unfold OntoI.nuF; exact (withDensity_absolutelyContinuous _ _).ae_le h1)
+    first | exact (withDensity_absolutelyContinuous _ _).ae_le h1
   have hmemP
       : ∀ (F : V (nd X) → ℂ) (P : Frame X.Ψ r → ℂ),
         OntoJ.Dt X x0 W bb la F P
@@ -335,24 +333,18 @@ theorem onto_of
   haveI hfD2 : FiniteDimensional ℂ D2 := by
     first
       | exact Submodule.finiteDimensional_of_le hD2le
-      | exact Module.Finite.of_injective (Submodule.inclusion hD2le)
-          (Submodule.inclusion_injective hD2le)
   haveI hfR : FiniteDimensional ℂ (LinearMap.range Φ) := by
     first
       | exact LinearMap.finiteDimensional_range Φ
   haveI hfM : FiniteDimensional ℂ M := by
     first
       | exact Submodule.finiteDimensional_of_le hMle
-      | exact Module.Finite.of_injective (Submodule.inclusion hMle)
-          (Submodule.inclusion_injective hMle)
   haveI : CompleteSpace M := by
     first
       | exact FiniteDimensional.complete ℂ M
 
   obtain ⟨y, hyM, w, hw, hvyw⟩ : ∃ y ∈ M, ∃ w ∈ M.orthogonal, hmemf.toLp _ = y + w := by
-    first
-    | exact Submodule.exists_add_mem_mem_orthogonal M _
-    | exact Submodule.exists_add_mem_mem_orthogonal _
+    first | exact Submodule.exists_add_mem_mem_orthogonal _
   obtain ⟨F, P, hD, rfl⟩ := (hMmem y).1 hyM
   have hmemf0
       : MemLp (fun z => f (cpt X x0 z) - poin X la P (cpt X x0 z)) 2 (OntoI.nuF X x0 W FF) :=

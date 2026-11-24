@@ -219,9 +219,7 @@ def sig (a b : ℕ) : cat1 a b ⟶ pglCat (a + b) where
   naturality A B f := by
     apply Cat.Hom.ext
     refine CategoryTheory.Functor.hext (fun _ => rfl) (fun v w p => heq_of_eq ?_)
-    first
-    | exact Subtype.ext (Prod.ext (blockGL_map a b f.hom p.1.1.1 p.1.1.2).symm rfl)
-    | exact Subtype.ext (Prod.ext (blockGL_map a b f.hom p.1.1.1 p.1.1.2) rfl)
+    first | exact Subtype.ext (Prod.ext (blockGL_map a b f.hom p.1.1.1 p.1.1.2) rfl)
 
 def rho (a b : ℕ) : cat1 a b ⟶ pglCat a where
   app A := (toFirst a b A).toCatHom
@@ -457,9 +455,6 @@ theorem LeafHalf1_of : LeafHalf1 := by
       show (G ⋙ toUm a b _ : Fin (n + 1) ⥤ Um (a + b) _) = F
       refine CategoryTheory.Functor.ext (fun _ => rfl) (fun i j f => ?_)
       apply Subtype.ext
-      first
-      | (rw [Um_eqToHom_comp, Um_comp_eqToHom]; exact Prod.ext (hb f) rfl)
-      | (simp only [Um_eqToHom_comp, Um_comp_eqToHom]; exact Prod.ext (hb f) rfl)
-      | (erw [Um_eqToHom_comp, Um_comp_eqToHom]; exact Prod.ext (hb f) rfl)
+      first | (erw [Um_eqToHom_comp, Um_comp_eqToHom]; exact Prod.ext (hb f) rfl)
 
 end LateralTheory.E.LeafHalf1Pf

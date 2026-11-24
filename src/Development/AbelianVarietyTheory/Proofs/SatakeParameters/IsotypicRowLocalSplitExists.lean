@@ -751,7 +751,6 @@ theorem isLocS_of_irr
     : ∃ τ, IsLocS π.S s τ := by
   first
   | (apply _root_.GlobalTheory.blockFieldPairProjections.exists_local_component <;> assumption)
-  | (intros; exact _root_.GlobalTheory.blockFieldPairProjections.exists_local_component ..)
 
 end Asm
 end GlobalTheory.RowLocal

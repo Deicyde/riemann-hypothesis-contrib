@@ -216,10 +216,7 @@ theorem _root_.Gp91.GlobalTheory.T.dual_tensor_cayley_weighted
                   ∧ ∀ s x,
                     ((pr' s x : (RI s).smSub) : (RI s).H)
                       = ∑ c, pr s c (∑ d, Q d c • ((x d : R.smSub) : R.H)) := by
-  first
-  | exact @GlobalTheory.CayleyTens.algTens_cayley
-  | exact GlobalTheory.CayleyTens.algTens_cayley
-  | (intros; apply GlobalTheory.CayleyTens.algTens_cayley <;> assumption)
+  first | exact @GlobalTheory.CayleyTens.algTens_cayley
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -374,10 +371,7 @@ theorem _root_.Gp91.GlobalTheory.T.bessel_frame_entry_relation
                         ((fun i : Fin k => (⟨r + i.val, by omega⟩ : Fin (2 * r + k + 1))) j) 1
                       * g⁻¹)
                     (l v) := by
-  first
-  | exact @GlobalTheory.BesselIntertwine.bessel_intertwines_glW
-  | exact GlobalTheory.BesselIntertwine.bessel_intertwines_glW
-  | (intros; apply GlobalTheory.BesselIntertwine.bessel_intertwines_glW <;> assumption)
+  first | exact @GlobalTheory.BesselIntertwine.bessel_intertwines_glW
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -665,10 +659,7 @@ theorem _root_.Gp91.GlobalTheory.T.bessel_functional_lie_triangular_eq_character
                             (-((Formalism.QuantumDeterminants.Hpk k r) * Yᴴ
                               * (Formalism.QuantumDeterminants.Hpk k r)))))
                         • l v := by
-  first
-  | exact @GlobalTheory.BesselNilp.bessel_dC
-  | exact GlobalTheory.BesselNilp.bessel_dC
-  | (intros; apply GlobalTheory.BesselNilp.bessel_dC <;> assumption)
+  first | exact @GlobalTheory.BesselNilp.bessel_dC
 end Gp91 -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -707,7 +698,7 @@ lemma ev_flat {k r : ℕ} (R : Rep k r) (f : Fin (2 * r + k + 1) → ℂ) (x : F
   congr 1
   have h1 : ∀ i, star (flat k r f i) = ∑ p, f p * Formalism.QuantumDeterminants.Hpk k r p i := by
     intro i
-    simp [flat, Formalism.QuantumDeterminants.herm, dotProduct, Matrix.mulVec_single_one, Matrix.col, star_Hpk]
+    simp [flat, Formalism.QuantumDeterminants.herm, dotProduct, Matrix.col, star_Hpk]
   simp only [h1, Finset.sum_mul]
   rw [Finset.sum_comm]
   have h2 : ∀ p, ∑ i, f p * Formalism.QuantumDeterminants.Hpk k r p i * Formalism.QuantumDeterminants.Hpk k r i j = f p * (1 : Mx k r) p j := by

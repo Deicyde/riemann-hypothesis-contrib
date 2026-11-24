@@ -1270,7 +1270,7 @@ theorem exists_cubical_addition_factor_generator
       κ.IsGen
         ∧ ∀ (T : Over S) (ρ : T ⟶ Y) (z : T.left) (J),
           Good P.L.L z J → val κ ρ.left z J = kap0 P.c P.sym z J (ρ ≫ a) (ρ ≫ b) := by
-  apply GlobalTheory.AddGeneric.exists_additionFactor_generator_value <;> assumption
+  apply GlobalTheory.AddGeneric.exists_additionFactor_generator_value
 
 theorem exists_addSec
     : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (P : CP G) (T₀ : Over S)

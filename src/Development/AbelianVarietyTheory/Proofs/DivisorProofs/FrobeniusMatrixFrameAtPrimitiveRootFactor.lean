@@ -1752,15 +1752,6 @@ theorem frame_at_root
           rw [hu, map_add (algebraMap ℤ_[l] ↥(OL LL)), map_add (algebraMap ↥(OL LL) ↥LL.1), map_one,
             map_one, Nat.cast_one, add_sub_cancel_left, map_mul, map_mul, map_natCast, map_natCast]
         )
-      | (
-          rw [hu, ← RingHom.comp_apply, map_add, map_one, map_mul, map_natCast, Nat.cast_one,
-            add_sub_cancel_left, RingHom.comp_apply]
-        )
-      | (
-          rw [hu, RingHom.map_add, RingHom.map_add, RingHom.map_one, RingHom.map_one, Nat.cast_one,
-            add_sub_cancel_left, RingHom.map_mul, RingHom.map_mul, map_natCast, map_natCast]
-        )
-      | (rw [hu]; simp)
     rw [hχ, hsub, Nat.cast_one, AddValuation.map_mul, (D.loc l).v_l]
     exact le_add_of_nonneg_right h0
   obtain ⟨G, H, h1, h2⟩ :=

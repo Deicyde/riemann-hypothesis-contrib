@@ -253,9 +253,7 @@ theorem intAE_mul
     {s t : FiniteAdeleRing (𝓞 F) F ⊗[F] E} (hs : s ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E)
     (ht : t ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E)
     : s * t ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by
-  first
-  | (apply _root_.GlobalTheory.IntegralAdeleProducts.intAE_mul_mem <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IntegralAdeleProducts.intAE_mul_mem ..)
+  first | (apply _root_.GlobalTheory.IntegralAdeleProducts.intAE_mul_mem <;> assumption)
 
 theorem intAE_one
     : (1 : FiniteAdeleRing (𝓞 F) F ⊗[F] E) ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by

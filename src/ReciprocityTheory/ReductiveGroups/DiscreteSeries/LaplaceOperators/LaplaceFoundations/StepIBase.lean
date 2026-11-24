@@ -1490,7 +1490,7 @@ theorem psiM_K
 
 theorem psiGen_cont (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ)
     : Continuous (Formalism.MainNotions.S.psiGen k r z c) := by
-  apply ReciprocityTheory.ChartRestriction.DS.Lap.CurveContinuity.psiGen_cont <;> assumption
+  apply ReciprocityTheory.ChartRestriction.DS.Lap.CurveContinuity.psiGen_cont
 
 theorem norm_psiGen
     (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ)

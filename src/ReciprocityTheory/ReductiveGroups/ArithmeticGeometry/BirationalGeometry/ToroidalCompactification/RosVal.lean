@@ -254,7 +254,7 @@ theorem prod_ros
     first | (simp only [padd, comp_lift_assoc]; rfl)
   simp only [Fin.prod_univ_succ, Fin.prod_univ_zero, rosatiφ, rosatiε, Matrix.cons_val_zero,
     Matrix.cons_val_succ, e, m1, lift_fst, lift_snd, lift_fst_assoc, lift_snd_assoc, zpow_one,
-    zpow_neg, mul_one]
+    zpow_neg]
   first | ac_rfl
 
 theorem exists_ros

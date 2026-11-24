@@ -52,7 +52,7 @@ namespace GlobalTheory.HeckeComp
 
 theorem smooth_loc {E : Type} [Field E] [NumberField E] (χ : HChar E) (w : HeightOneSpectrum (𝓞 E))
     : GlobalTheory.SmGL.IsSmoothChar (χ.loc w) := by
-  apply _root_.GlobalTheory.Published.ParamAboveModel.smooth_loc <;> assumption
+  apply _root_.GlobalTheory.Published.ParamAboveModel.smooth_loc
 
 theorem eq_of_isComp
     {E : Type} [Field E] [NumberField E]

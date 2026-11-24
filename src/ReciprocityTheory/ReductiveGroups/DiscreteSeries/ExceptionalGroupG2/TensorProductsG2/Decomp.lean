@@ -89,16 +89,7 @@ theorem dc_aeval_intertwine
     (ψ : Y →ₗ[ℂ] Z) (A : Module.End ℂ Y) (B : Module.End ℂ Z) (h : ∀ y, ψ (A y) = B (ψ y))
     (p : ℂ[X]) (y : Y)
     : ψ (aeval A p y) = aeval B p (ψ y) := by
-  first
-  | exact UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine ..
-  | (apply UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine <;> assumption)
-  | (intros; apply UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine <;> assumption)
-  | (apply @UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine <;> assumption)
-  | (intros; apply @UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine <;> assumption)
-  | (
-      apply @UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine
-        <;> first | assumption | infer_instance
-    )
+  first | (apply UpperTheory.Reformulated.B.Qk13.dc_aeval_intertwine <;> assumption)
 
 end ReciprocityTheory.ChartRestriction.DS.G2
 

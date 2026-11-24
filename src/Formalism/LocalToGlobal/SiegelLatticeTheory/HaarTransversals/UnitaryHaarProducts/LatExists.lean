@@ -253,7 +253,7 @@ theorem hsmulL (c : E) (x y : S.V) : S.hT (c • x) y = star c * S.hT x y := by
 theorem mem_latSpan
     {r : ℕ} (c : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (v : Fin r → S.V) (y : S.V)
     : y ∈ latSpan c v ↔ ∃ x : Fin r → E, (∀ i, x i ∈ c i) ∧ y = ∑ i, x i • v i := by
-  apply GlobalTheory.St.Lat.mem_latSpan <;> assumption
+  apply GlobalTheory.St.Lat.mem_latSpan
 
 theorem latSpan_le
     {r : ℕ} (c : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (v : Fin r → S.V)
@@ -464,7 +464,7 @@ theorem fi_intm
   rw [Algebra.smul_def] at h1
   exact FractionalIdeal.mem_coe.1 h1
 
-theorem genFrame_holds : GenFrame := by apply GlobalTheory.St.Lat.genFrame_holds <;> assumption
+theorem genFrame_holds : GenFrame := by apply GlobalTheory.St.Lat.genFrame_holds
 
 end GF
 

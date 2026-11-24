@@ -73,4 +73,4 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.stable_hopf_order_subgroup_cha
                       (OmType (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))) χ) b
                     → HasLen v R (OmType AA.carrier χ) c
                     → a * b ≤ c := by
-  apply PositivityTheory.HtPt.Rc.om_step <;> assumption
+  apply PositivityTheory.HtPt.Rc.om_step

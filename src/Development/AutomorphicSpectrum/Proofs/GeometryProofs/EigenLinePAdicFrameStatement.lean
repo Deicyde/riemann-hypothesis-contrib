@@ -1048,7 +1048,7 @@ theorem ιMulti_matrix_transform
         (P : Matrix (Fin p) (Fin p) Ω) (v : Fin p → Vs),
       exteriorPower.ιMulti Ω p (fun i => ∑ k, P i k • v k)
         = P.det • exteriorPower.ιMulti Ω p v := by
-  apply GlobalTheory.CompanionTheory.Ar.Flat.GenAgree.iotaMulti_rows <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.Flat.GenAgree.iotaMulti_rows
 
 end GlobalTheory.CompanionTheory.Ar.Flat.CPoint
 end -- clump:auto

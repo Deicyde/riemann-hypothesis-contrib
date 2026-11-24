@@ -543,7 +543,7 @@ end Group
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
 theorem cmHostUnit_add_conj_eq_one (H : Host E) : H.w0 + H.bar H.w0 = 1 := by
-  apply GlobalTheory.Ex.Arch.AbVal.cmField_host_element_add_conj_eq_one <;> assumption
+  apply GlobalTheory.Ex.Arch.AbVal.cmField_host_element_add_conj_eq_one
 
 theorem spMap_comp
     {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']

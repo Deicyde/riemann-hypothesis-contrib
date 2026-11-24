@@ -290,9 +290,7 @@ theorem exists_local_inverse
     : ∃ Φ : OpenPartialHomeomorph (E × (J → ℂ)) (E × (σ → ℂ)),
       (∀ w, Φ w = (w.1, fun r => MvPolynomial.eval₂Hom (χ w.1) w.2 (rel r))) ∧ (z₀, u₀) ∈ Φ.source
         ∧ AnalyticOnNhd ℂ Φ.symm Φ.target := by
-  first
-  | (apply _root_.GlobalTheory.AnalyticLineDerivative.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.AnalyticLineDerivative.main ..)
+  first | (apply _root_.GlobalTheory.AnalyticLineDerivative.main <;> assumption)
 
 theorem exists_holomorphic_sections
     : ∀ (m g : ℕ) (A R : Type) [CommRing A] [CommRing R] (ψ : MvPolynomial (Fin g) A →+* R)

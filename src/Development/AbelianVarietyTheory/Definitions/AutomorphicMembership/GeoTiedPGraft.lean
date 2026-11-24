@@ -69,11 +69,6 @@ def graft
   qv_gt := X₀.qv_gt
   qv_char := X₀.qv_char
   nu := X₀.nu
-  nu_ne := X₀.nu_ne
-  nu_abs := X₀.nu_abs
-  ZQ := X₀.ZQ
-  quotientLocalValueFirst := X₀.quotientLocalValueFirst
-  typeDim := X₀.typeDim
   iMj := iM
   iMj_mem := hiM
   logLam := X₀.logLam

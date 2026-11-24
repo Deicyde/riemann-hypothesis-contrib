@@ -594,7 +594,7 @@ theorem rho_bounds (hOK : P.OK) (ρ : M.Ty P) (i : ℕ) (hi1 : 1 ≤ i) (hi2 : i
   simp only [M.Par.wid, Fin.val_mk, he] at hw
   have hfl : ((⌊P.hi i - P.lo i⌋₊ : ℕ) : ℝ) ≤ P.hi i - P.lo i := Nat.floor_le (by linarith)
   have hv' : ((ρ ⟨i - 1, by omega⟩ : ℕ)) ≤ ⌊P.hi i - P.lo i⌋₊ := by
-    first | exact Nat.lt_succ_iff.mp hw | omega
+    first | exact Nat.lt_succ_iff.mp hw
   have hv : ((ρ ⟨i - 1, by omega⟩ : ℕ) : ℝ) ≤ ((⌊P.hi i - P.lo i⌋₊ : ℕ) : ℝ) := by
     exact_mod_cast hv'
   unfold M.rho

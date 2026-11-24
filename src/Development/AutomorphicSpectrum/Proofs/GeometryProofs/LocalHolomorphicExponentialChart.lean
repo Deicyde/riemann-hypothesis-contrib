@@ -1070,7 +1070,7 @@ variable {R C D : Type} [CommRing R] [CommRing C] [CommRing D]
 
 theorem surj_fstC (q : Sp (DualNumber C))
     : ∃ p : Sp C, spMap (TrivSqZeroExt.fstHom C C C).toRingHom p = q := by
-  apply GlobalTheory.CompanionTheory.Ar.InvDer.surj_fst <;> assumption
+  apply GlobalTheory.CompanionTheory.Ar.InvDer.surj_fst
 
 theorem le_dual
     {X : Scheme.{0}} {v : Sp (DualNumber C) ⟶ X} {x : Sp C ⟶ X}

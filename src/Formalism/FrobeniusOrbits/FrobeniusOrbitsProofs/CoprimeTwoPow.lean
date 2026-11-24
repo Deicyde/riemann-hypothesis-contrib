@@ -239,7 +239,6 @@ private lemma orderOf_hcl_u5_eq_two_pow (e : ℕ) : orderOf (hcl e (u5 (e + 2)))
         ((5 : ℤ) : ZMod (2 ^ (j + 1 + 2))) := by
       first
         | (unfold u5; rw [ZMod.coe_unitOfCoprime]; norm_num)
-        | (unfold u5; simp)
     have h5 : Odd (5 : ℤ) := ⟨2, by norm_num⟩
     have e3 : 3 + j = j + 1 + 2 := by omega
     rcases hle with h | h
@@ -260,10 +259,8 @@ private lemma orderOf_hcl_u5_eq_two_pow (e : ℕ) : orderOf (hcl e (u5 (e + 2)))
 theorem hostGroup : HostGroup := by
   unfold HostGroup
   intro e
-  have hne : (-1 : ℤˣ) ≠ 1 := by
-    first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
-  have hU : Nat.card ℤˣ = 2 := by
-    first | (rw [Nat.card_eq_fintype_card]; rfl) | (rw [Nat.card_eq_fintype_card]; decide)
+  have hne : (-1 : ℤˣ) ≠ 1 := by first | decide
+  have hU : Nat.card ℤˣ = 2 := by first | (rw [Nat.card_eq_fintype_card]; rfl)
   have hfin : Finite (HGrp e) := Nat.finite_of_card_ne_zero (by rw [card_H]; positivity)
   have h5 := orderOf_hcl_u5_eq_two_pow e
   unfold GG Psi cc sg chD G0 c0
@@ -292,9 +289,7 @@ theorem hostGroup : HostGroup := by
       zmultiplesHom (Additive (HGrp e)) (Additive.ofMul (hcl e (u5 (e + 2))))
     have hf0 : f0 ((2 ^ e : ℕ) : ℤ) = 0 := by
       show ((2 ^ e : ℕ) : ℤ) • Additive.ofMul (hcl e (u5 (e + 2))) = 0
-      first
-      | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
-      | (rw [natCast_zsmul, ← ofMul_pow, hg, ofMul_one])
+      first | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
     let f1 : ZMod (2 ^ e) →+ Additive (HGrp e) := ZMod.lift (2 ^ e) ⟨f0, hf0⟩
     let f : Multiplicative (ZMod (2 ^ e)) →* HGrp e := {
       toFun := fun x => Additive.toMul (f1 (Multiplicative.toAdd x))
@@ -351,8 +346,7 @@ theorem hostOrders : HostOrders := by
       rw [hM, show M + j - j = M by omega]
       exact ind l hl M (by omega) j
   · unfold GG cc G0 c0
-    have hne : (-1 : ℤˣ) ≠ 1 := by
-      first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
+    have hne : (-1 : ℤˣ) ≠ 1 := by first | decide
     intro g
     constructor
     · rw [Subgroup.mem_zpowers_iff]

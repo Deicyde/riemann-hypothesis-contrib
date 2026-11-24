@@ -83,7 +83,7 @@ theorem polAt_open
     {K : Type} [Field K]
     (y : Sp K ⟶ Xo.XF c)
     : PolAt Y.t (y ≫ Y.j) := by
-  apply GlobalTheory.LN.ArcExtends.polAt_moduli <;> assumption
+  apply GlobalTheory.LN.ArcExtends.polAt_moduli
 
 theorem exists_rigPull
     {S S' : Scheme.{0}} {t' : SAB H S'} {t : SAB H S} {χ : S' ⟶ S} (m : SABMap t' t χ)

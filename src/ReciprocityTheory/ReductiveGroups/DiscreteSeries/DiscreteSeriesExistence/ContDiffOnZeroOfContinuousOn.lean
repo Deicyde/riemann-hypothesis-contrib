@@ -66,10 +66,10 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 variable {n : ℕ} {ε : Fin n → Bool}
 
 theorem slm_le_inf (N : ℕ) : (N : WithTop ℕ∞) + 1 ≤ ∞ := by
-  first | exact_mod_cast (le_top : ((N + 1 : ℕ) : ℕ∞) ≤ ⊤) | (norm_cast; exact le_top)
+  first | exact_mod_cast (le_top : ((N + 1 : ℕ) : ℕ∞) ≤ ⊤)
 
 theorem slm_le_inf' (N : ℕ) : (N : WithTop ℕ∞) ≤ ∞ := by
-  first | exact_mod_cast (le_top : ((N : ℕ) : ℕ∞) ≤ ⊤) | (norm_cast; exact le_top)
+  first | exact_mod_cast (le_top : ((N : ℕ) : ℕ∞) ≤ ⊤)
 
 theorem slm_hd_iff {f : ℝ → Matrix (Fin n) (Fin n) ℂ} {f' : Matrix (Fin n) (Fin n) ℂ} {s : ℝ}
     : HasDerivAt f f' s ↔ ∀ i j, HasDerivAt (fun t => f t i j) (f' i j) s := by
@@ -152,9 +152,7 @@ theorem slmG_cd
     : ContDiffOn ℝ N (fun q => slmG C (fderiv ℝ γ q) (fun i => w i q)) V := by
   have hfd : ContDiffOn ℝ N (fun q => fderiv ℝ γ q) V := hγ.fderiv_of_isOpen hV (slm_le_inf N)
   unfold slmG
-  first
-  | exact ContDiffOn.sum fun i _ => (contDiffOn_const.clm_comp hfd).smulRight (hw i)
-  | simp only [ContinuousLinearMap.sum_apply]
+  first | exact ContDiffOn.sum fun i _ => (contDiffOn_const.clm_comp hfd).smulRight (hw i)
 
 theorem contDiffOn_zero_of_continuousOn {V : Set X} {f : X → E} (h : ContinuousOn f V)
     : ContDiffOn ℝ ((0 : ℕ) : WithTop ℕ∞) f V := by

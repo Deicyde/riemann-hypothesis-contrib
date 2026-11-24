@@ -460,7 +460,7 @@ theorem algebraMap_norm_mem_span
     {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Module.Free R S] [Module.Finite R S]
     (g : S)
     : algebraMap R S (Algebra.norm R g) ∈ Ideal.span {g} := by
-  apply _root_.GlobalTheory.SquarefreeFibre.algebraMap_norm_mem_span <;> assumption
+  apply _root_.GlobalTheory.SquarefreeFibre.algebraMap_norm_mem_span
 
 theorem main
     : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
@@ -697,7 +697,7 @@ def coeffMap {n : ℕ} (b : Module.Basis (Fin n) k[X] A) (D : Ideal A) (d : ℕ)
 
 theorem coeffMap_injective {n : ℕ} (b : Module.Basis (Fin n) k[X] A) (D : Ideal A) (d : ℕ)
     : Function.Injective (coeffMap b D d) := by
-  apply _root_.GlobalTheory.LinSys.coeffMap_injective <;> assumption
+  apply _root_.GlobalTheory.LinSys.coeffMap_injective
 
 instance finiteDimensional_boundedIn {n : ℕ} (b : Module.Basis (Fin n) k[X] A) (D : Ideal A) (d : ℕ)
     : FiniteDimensional k (boundedIn b D d) :=

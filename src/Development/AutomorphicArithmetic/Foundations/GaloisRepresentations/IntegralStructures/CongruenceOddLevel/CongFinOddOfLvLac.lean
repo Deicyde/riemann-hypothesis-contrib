@@ -1158,7 +1158,7 @@ theorem exists_type_surj
     have hxx : x * x = 0 := by
       simp only [x, Matrix.smul_mul, Matrix.mul_smul, vecMulVec_mul_vecMulVec, hfw, zero_smul]
       ext i j
-      simp [vecMulVec_apply]
+      simp
     have hyy
         : (((l : w.adicCompletionIntegers E) ^ m) • x)
             * (((l : w.adicCompletionIntegers E) ^ m) • x)
@@ -1236,7 +1236,7 @@ theorem exists_type_surj
     have hxx : x * x = 0 := by
       simp only [x, Matrix.smul_mul, Matrix.mul_smul, vecMulVec_mul_vecMulVec, hfw, zero_smul]
       ext i j
-      simp [vecMulVec_apply]
+      simp
     have hyy
         : (((l : w.adicCompletionIntegers E) ^ m) • x)
             * (((l : w.adicCompletionIntegers E) ^ m) • x)

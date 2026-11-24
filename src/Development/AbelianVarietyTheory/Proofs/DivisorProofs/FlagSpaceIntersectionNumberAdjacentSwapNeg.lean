@@ -1216,7 +1216,7 @@ theorem exists_dbl_of_genPair
       hci.isClosedEmbedding.isClosed_range
     refine hsp.mem_closed hcl ⟨ζ (IsLocalRing.closedPoint K), ?_⟩
     rw [← hcomp]
-    first | rfl | exact (Scheme.Hom.comp_apply _ _ _).symm | simp
+    first | rfl
   obtain ⟨hproj, δ, hδc, hδ₁, hδ₂, hdiag⟩ :=
     _root_.GlobalTheory.FlagPush.dbl_of_isClosedImmersion_lift F Y Z p₁ p₂ hZ hci hmem
   let W : Dbl Y := {

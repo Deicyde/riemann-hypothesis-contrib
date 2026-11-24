@@ -74,7 +74,7 @@ theorem isoMaps_iff
       ↔ ∀ (Z : Scheme.{0}) (r : Z ⟶ X') (z : Z) (j : L.ι) (k : L'.ι),
         F (r z) ∈ L.U j → r z ∈ L'.U k
           → gs r z _ (s.f (fun _ => j)) = (gw w r z j k).val * gs r z _ (σ.f k) := by
-  apply _root_.GlobalTheory.ArcQ.FrAgree.isoMaps_iff <;> assumption
+  apply _root_.GlobalTheory.ArcQ.FrAgree.isoMaps_iff
 
 variable
   {E : Type} [Field E] [NumberField E] [IsCMField E]

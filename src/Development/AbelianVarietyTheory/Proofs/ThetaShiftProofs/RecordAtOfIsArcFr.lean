@@ -316,7 +316,7 @@ theorem integral_scal (T : CDVR) (io : c.F →+* T.Fr)
           (hg : ∀ s'' : LB.Sec (PPx y.x), ∃! b : T.Fr, ∀ i, s''.f i = scal y.x b i * s'.f i),
         (∀ i, s'.f i = scal y.x (algebraMap T.V T.Fr a) i * y.s.f i) → Integral T io y
           → Integral T io { y with s := s', gen := hg } := by
-  apply GlobalTheory.Reg.GenInt.integral_scal <;> assumption
+  apply GlobalTheory.Reg.GenInt.integral_scal
 
 theorem integral_chg (T : CDVR) (io : c.F →+* T.Fr)
     : letI := io.toAlgebra

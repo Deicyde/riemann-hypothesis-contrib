@@ -112,7 +112,7 @@ theorem normForm_eq_det
     (b : Module.Basis ι R A) (x : Fin n → A)
     : normForm A x
       = (∑ j, (X j : MvPolynomial (Fin n) R) • (Algebra.leftMulMatrix b (x j)).map C).det := by
-  apply GroundTheory.Heights₂.Heights.Vertical.normForm_eq_det <;> assumption
+  apply GroundTheory.Heights₂.Heights.Vertical.normForm_eq_det
 
 section Embeddings
 

@@ -79,7 +79,7 @@ theorem exists_GL_lastRow_eq
       a ≠ 0
         → ∃ m : GL (Fin (n + 1)) K,
           vecMul (Pi.single (Fin.last n) 1) (m : Matrix (Fin (n + 1)) (Fin (n + 1)) K) = a := by
-  apply GlobalTheory.CompanionTheory.RowSect.exists_GL_last_row <;> assumption
+  apply GlobalTheory.CompanionTheory.RowSect.exists_GL_last_row
 
 end GlobalTheory.CompanionTheory.LinAlg
 end -- clump:auto

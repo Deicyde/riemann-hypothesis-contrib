@@ -136,7 +136,7 @@ theorem squareTriple_sig_rank_lt
               : Matrix (Fin ((G.V (.grid (↑i + 1) (↑j + 1))).rank - Γ.p) ⊕ Fin Γ.p)
                 (Fin ((G.V (.grid (↑i + 1) (↑j + 1))).rank - Γ.p) ⊕ Fin Γ.p) ℂ).map (starRingEnd ℂ)
             = Matrix.fromBlocks 1 0 0 (-1) := by
-        ext (k | k) (l | l) <;> simp [Matrix.one_apply] <;> split_ifs
+        ext (k | k) (l | l) <;> simp [Matrix.one_apply]
       rw [e1, e2, e3] at this
       simpa only [Matrix.transpose_map] using this
     let f

@@ -1310,7 +1310,7 @@ theorem comb_a {J : Type} [Fintype J] (ℓ : J → HermLine ι) (n : J → ℤ)
   rfl
 
 theorem exists_smooth (b : K → ℤ) : ∃ B : HermLine ι, IsSmoothHerm B ∧ B.a = b := by
-  apply PositivityTheory.UnitarySelfGeneration.RC.exists_line <;> assumption
+  apply PositivityTheory.UnitarySelfGeneration.RC.exists_line
 
 theorem smooth_snoc
     {e : ℕ} {L : Fin e → HermLine ι} {X : HermLine ι}

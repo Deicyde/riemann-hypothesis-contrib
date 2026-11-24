@@ -70,7 +70,7 @@ theorem card_strictLower (r : ℕ)
 
 theorem two_mul_card_Psi {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
     : 2 * X.Ψ.card = Module.finrank ℚ E := by
-  apply GlobalTheory.TwoLines.two_mul_card_cmType <;> assumption
+  apply GlobalTheory.TwoLines.two_mul_card_cmType
 
 theorem fdeg_and_nd
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),

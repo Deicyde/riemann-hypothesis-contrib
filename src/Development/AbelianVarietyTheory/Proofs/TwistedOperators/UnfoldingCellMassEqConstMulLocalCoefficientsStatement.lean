@@ -1246,9 +1246,7 @@ theorem vol_mul_colCoef
                           {n | (⟨b j, hb⟩ : GfC _)⁻¹ * n.1 * ⟨b j, hb⟩ ∈ (latGrp ch.G j).subgroupOf (GfC _)}
                         * (GlobalTheory.RowWt.colCoef ch t β j : ℝ)
                       = V₀ := by
-  first
-  | (exact @_root_.GlobalTheory.SymmetricJacobianSignature.cell_volume_mul_coef)
-  | (intros; exact _root_.GlobalTheory.SymmetricJacobianSignature.cell_volume_mul_coef ..)
+  first | (exact @_root_.GlobalTheory.SymmetricJacobianSignature.cell_volume_mul_coef)
 
 end GlobalTheory.CellIdx
 

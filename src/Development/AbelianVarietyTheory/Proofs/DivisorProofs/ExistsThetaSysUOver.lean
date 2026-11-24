@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsCop
 import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditional
 import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsWithoutCohomology
 import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.PolBaseChangeOfRelAmpleLocal
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverIffIsProperAndExistsIsAmpleLB
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsSymplecticLevelBaseChangePolarisedAbelian
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsThetaSystemGenusOne
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsThetaSystemOfPolarisedLevel
@@ -419,12 +420,13 @@ theorem exists_fibre (Xo : Moduli D l) (c : Coeff l) {K : Type} [CommRing K] (y 
       (PolBaseChange.lbIso_refl (pull_isLB P.isLB _)))
     hL
 
-theorem exists_uSetup
+/-- Construct a projective unitary theta setup above the given generic point. -/
+theorem exists_projective_uSetup
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
       1 ≤ Dw.p + Dw.q
         → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (C : UCompact Xo c),
           ∀ η ∈ genericPoints (Xo.XF c), ∀ B : ℕ, ∃ X₁ : USetup C,
-            B ≤ X₁.S.N ∧ ∀ w, X₁.uΩ w = η := by
+            B ≤ X₁.S.N ∧ IsProjOver X₁.M.s ∧ ∀ w, X₁.uΩ w = η := by
   intro E _ _ _ H Dw hpq l Xo c C η hη B
   haveI := c.fin
   haveI : NumberField c.F := {}
@@ -520,6 +522,16 @@ theorem exists_uSetup
   have hgen : ∀ w, (spMap (ratHull S.R).val.toRingHom ≫ u) w = η := fun w => by
     rw [hp]
     exact hy _
+  have hsc : Mdl.s ≫ spMap κ = π ≫ C.z := by
+    refine ext_of_isDominant Mdl.pt ?_
+    rw [← Category.assoc, Mdl.pt_s, ← Category.assoc, hMp, hpz]
+    exact (Spec.map_comp (CommRingCat.ofHom κ) (CommRingCat.ofHom (algebraMap o₁ Ω))).symm
+  have hproj : IsProjOver Mdl.s := by
+    haveI := hπ
+    obtain ⟨h1, L, hL⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB C.z).1 C.proj
+    haveI : IsProper (Mdl.s ≫ spMap κ) := by rw [hsc]; infer_instance
+    haveI : IsProper Mdl.s := IsProper.of_comp Mdl.s (spMap κ)
+    exact (isProjOver_iff_isProper_and_exists_isAmpleLB _).2 ⟨this, _, hL.pull_of_isFinite π⟩
   exact ⟨
     ⟨
       o₁,
@@ -537,7 +549,18 @@ theorem exists_uSetup
       hMp
     ⟩,
     hN ▸ hBk,
+    hproj,
     hgen
   ⟩
+
+theorem exists_uSetup
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
+      1 ≤ Dw.p + Dw.q
+        → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (C : UCompact Xo c),
+          ∀ η ∈ genericPoints (Xo.XF c), ∀ B : ℕ, ∃ X₁ : USetup C,
+            B ≤ X₁.S.N ∧ ∀ w, X₁.uΩ w = η := by
+  intro E _ _ _ H Dw hpq l Xo c C η hη B
+  obtain ⟨S, hlevel, _, hgen⟩ := exists_projective_uSetup E H Dw hpq l Xo c C η hη B
+  exact ⟨S, hlevel, hgen⟩
 
 end GlobalTheory.UPoinc.GSetup

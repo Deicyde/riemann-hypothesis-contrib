@@ -1331,8 +1331,7 @@ theorem inertiaFixed_strictlyHenselian
     refine isUnit_iff_exists_inv.2 ⟨⟨_, hmem⟩, ?_⟩
     apply Subtype.ext
     apply Subtype.ext
-    simp only [MulMemClass.coe_mul, IntermediateField.coe_mul, IntermediateField.coe_inv,
-      OneMemClass.coe_one, IntermediateField.coe_one]
+    simp only [MulMemClass.coe_mul, IntermediateField.coe_inv, OneMemClass.coe_one]
     exact mul_inv_cancel₀ h0
   have hfπ : ∀ π : R, Irreducible π → Irreducible (f π) := by
     intro π hπ
@@ -1389,8 +1388,7 @@ theorem inertiaFixed_strictlyHenselian
     refine ⟨m, (unitV' ⟨y, hyV'⟩ hyU).unit, ?_⟩
     apply Subtype.ext
     apply Subtype.ext
-    simp only [IsUnit.unit_spec, MulMemClass.coe_mul, IntermediateField.coe_mul,
-      SubmonoidClass.coe_pow, IntermediateField.coe_pow]
+    simp only [IsUnit.unit_spec, MulMemClass.coe_mul, SubmonoidClass.coe_pow]
     rw [hf, hyΩ]
     field_simp [pow_ne_zero m (hc0 π hπ)]
   exact ⟨

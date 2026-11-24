@@ -1282,7 +1282,7 @@ theorem UpperTheory.rowBound_le_Fnum_sum_add_error
         = ∑ o : ↥Pk.Z, (pl o).bound (P.k - 1) P.m := by
     rw [← Finset.sum_coe_sort Pk.Z]
     refine Finset.sum_congr rfl fun o _ => ?_
-    simp only [y, u, dif_pos o.2, Subtype.coe_eta, Plan.bound]
+    simp only [y, u, dif_pos o.2, Plan.bound]
   have hT0 : 0 < Pk.T := by linarith [hdeg.T_one]
   have hbound
       : Pk.T * Pk.ν

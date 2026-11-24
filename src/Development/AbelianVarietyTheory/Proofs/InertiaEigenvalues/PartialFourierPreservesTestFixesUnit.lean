@@ -951,7 +951,7 @@ theorem trace_eq_add_star
         [StarRing E] [Unram F E],
       ∀ y : E,
         algebraMap F E (Algebra.trace F E y) = y + star y := by
-  apply GlobalTheory.JR.NormInt.traceE <;> assumption
+  apply GlobalTheory.JR.NormInt.traceE
 
 end GlobalTheory
 end -- clump:auto

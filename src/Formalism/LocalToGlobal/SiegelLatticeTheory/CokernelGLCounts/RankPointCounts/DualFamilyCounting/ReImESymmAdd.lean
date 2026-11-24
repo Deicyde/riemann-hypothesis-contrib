@@ -169,7 +169,7 @@ theorem omg_int : IsIntegral ℤ (omg D) := by
   have hk' : ((((D.host.d + 1) / 4 : ℕ) : ℤ) : D.host.E) * 4 = (D.host.d : D.host.E) + 1 := by
     exact_mod_cast hk
   refine ⟨Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (((D.host.d + 1) / 4 : ℕ) : ℤ), ?_, ?_⟩
-  · first | monicity! | monicity
+  · first | monicity!
   · rw [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_X,
       Polynomial.eval₂_C]
     show ((1 + D.host.sqrtMinusD) / 2) ^ 2 - (1 + D.host.sqrtMinusD) / 2 +
@@ -209,7 +209,7 @@ theorem IIm_mul_int (a : Fin D.R.rS) {t : D.host.E} (ht : t ∈ IIm a) (o : 𝓞
 theorem int_mem_IIm (a : Fin D.R.rS) (o : 𝓞 D.host.E) : (o : D.host.E) ∈ IIm a := by
   refine (mem_inv_coe (dI_ne_bot (D := D) (nIm a)) _).2 ?_
   intro y _
-  exact ⟨o * y, by first | rfl | push_cast | simp⟩
+  exact ⟨o * y, by first | rfl | simp⟩
 
 theorem conj_mem_IIm (a : Fin D.R.rS) {t : D.host.E} (ht : t ∈ IIm a) : D.host.conj t ∈ IIm a := by
   have h := star_mem_inv (D := D) (nIm a) ht
@@ -405,8 +405,7 @@ def bbSub (a : Fin D.R.rS) : Submodule (𝓞 D.host.F) D.host.F where
     rw [this, mul_left_comm]
     exact IIm_mul_int a hy _
 
-theorem coeF_nat (n : ℕ) : ((n : D.host.F) : D.host.E) = (n : D.host.E) := by
-  first | simp | norm_cast
+theorem coeF_nat (n : ℕ) : ((n : D.host.F) : D.host.E) = (n : D.host.E) := by first | simp
 
 theorem bb_le (a : Fin D.R.rS)
     : bbSub a

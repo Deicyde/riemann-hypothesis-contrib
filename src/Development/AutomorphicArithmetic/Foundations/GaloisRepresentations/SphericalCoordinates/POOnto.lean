@@ -61,7 +61,7 @@ private theorem tens_inj (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Fr
   have h3 := congrArg (TensorProduct.rid ℤ O) h2
   simpa using h3
 
-private theorem comm_of_split
+theorem mul_comm_of_padic_split
     (p : ℕ) [Fact p.Prime]
     {O : Type} [Ring O] [Module.Free ℤ O]
     {R : Type} [CommRing R]
@@ -81,7 +81,7 @@ private theorem comm_of_split
   have h2 := f.injective this
   simpa using h2
 
-private theorem a_inj
+theorem algebraMap_injective_of_free
     {F : Type} [Field F] [NumberField F]
     {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O]
     : Function.Injective (algebraMap (𝓞 F) O) := by
@@ -106,7 +106,7 @@ private theorem a_inj
   · exact hN0 (by exact_mod_cast h)
   · exact one_ne_zero h
 
-private theorem a_onto
+theorem algebraMap_surjective_of_exists_zsmul
     {F : Type} [Field F] [NumberField F]
     {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O] [Module.Finite ℤ O]
     (hcomm : ∀ x y : O, x * y = y * x)
@@ -120,7 +120,7 @@ private theorem a_onto
     rw [Polynomial.scaleRoots_eval₂_mul, hPx, mul_zero]
   have hex : algebraMap ℤ O e * x = algebraMap (𝓞 F) O c := by rw [← hx]; simp [zsmul_eq_mul]
   have hQ2 : Polynomial.eval₂ (algebraMap ℤ (𝓞 F)) c (P.scaleRoots e) = 0 := by
-    apply a_inj (O := O)
+    apply algebraMap_injective_of_free (O := O)
     rw [map_zero, Polynomial.hom_eval₂, ← hex, ← hQ]
     congr 1
     exact RingHom.ext_int _ _
@@ -157,7 +157,7 @@ theorem oOnto_of : OOnto := by
     rw [D.rankO, hm]
     simpa using hd
   obtain ⟨f⟩ := D.splitP
-  have hcomm : ∀ x y : D.O, x * y = y * x := comm_of_split p hm f.toRingEquiv
-  exact a_onto hcomm fun x => D.central x (hcomm x)
+  have hcomm : ∀ x y : D.O, x * y = y * x := mul_comm_of_padic_split p hm f.toRingEquiv
+  exact algebraMap_surjective_of_exists_zsmul hcomm fun x => D.central x (hcomm x)
 
 end UpperTheory.Gal.W2

@@ -224,10 +224,7 @@ theorem v_small {g y : K} (hg : O.valuation g < 1) (hy : y ∈ O) : O.valuation 
 theorem v_add_small {e m : K} (he : O.valuation e = 1) (hm : O.valuation m < 1)
     : O.valuation (e + m) = 1 := by
   have h : O.valuation m < O.valuation e := by rw [he]; exact hm
-  first
-  | exact (Valuation.map_add_eq_of_lt_left _ h).trans he
-  | (rw [add_comm]; exact (Valuation.map_add_eq_of_lt_right _ h).trans he)
-  | (rw [add_comm]; exact (O.valuation.map_add_eq_of_lt_right h).trans he)
+  first | exact (Valuation.map_add_eq_of_lt_left _ h).trans he
 
 theorem v_neg_one : O.valuation (-1 : K) = 1 := by first | simp
 
@@ -348,9 +345,7 @@ private theorem exists_isAdmissible_of_chain_lemma_8
   · rw [hcoe, ← Matrix.mulVec_mulVec, hT1u, hT2u]
   · rw [hcoe, ← Matrix.vecMul_vecMul, hT2φ, smul_vecMul_field, hT1φ, smul_smul]
     congr 1
-    first
-    | rw [div_mul_div_comm, mul_comm (pr P φm um) (pr P φp up), mul_div_mul_right _ _ hm0]
-    | (field_simp; try ring)
+    first | rw [div_mul_div_comm, mul_comm (pr P φm um) (pr P φp up), mul_div_mul_right _ _ hm0]
 
 theorem existsLatticeAutomorphismApprox : LocLin := by
   unfold LocLin
@@ -444,7 +439,7 @@ theorem existsLatticeAutomorphismApprox : LocLin := by
   · rw [hTinv, hu1e, smul_neg]
     abel
   · rw [hTφ, hc, hφ0e, add_vecMul_field, sub_vecMul_field, smul_vecMul_field, smul_vecMul_field]
-    first | module | (simp only [add_smul, one_smul, smul_sub, mul_smul]; abel)
+    first | module
 
 end PI.UnitaryGroupMassFormula.ScXuExists
 end -- clump:auto

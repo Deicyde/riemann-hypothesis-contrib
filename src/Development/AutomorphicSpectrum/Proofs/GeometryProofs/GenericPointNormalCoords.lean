@@ -172,7 +172,7 @@ theorem generic_points_range_local
         (β : O →+* c.F) (Y : Model Xo c β),
       IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F)
         → genericPoints Y.X ⊆ Set.range Y.j := by
-  apply PositivityTheory.HtPt.Ml.generic_points_range <;> assumption
+  apply PositivityTheory.HtPt.Ml.generic_points_range
 
 end GenericFibreProof
 

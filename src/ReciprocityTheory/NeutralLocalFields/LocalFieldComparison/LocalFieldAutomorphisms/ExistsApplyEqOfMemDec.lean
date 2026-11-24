@@ -60,14 +60,7 @@ variable
   {p : ℕ} [Fact p.Prime]
 
 theorem norm_natCast_padicAlgCl : ‖((p : ℕ) : PadicAlgCl p)‖ = (p : ℝ)⁻¹ := by
-  first
-  | (rw [← map_natCast (algebraMap ℚ_[p] (PadicAlgCl p)) p, norm_algebraMap', Padic.norm_p])
-  | (rw [← map_natCast (algebraMap ℚ_[p] (PadicAlgCl p)) p, PadicAlgCl.norm_extends, Padic.norm_p])
-  | (
-      have h1 := PadicAlgCl.norm_extends p (p : ℚ_[p])
-      rw [map_natCast] at h1
-      rw [h1, Padic.norm_p]
-    )
+  first | (rw [← map_natCast (algebraMap ℚ_[p] (PadicAlgCl p)) p, norm_algebraMap', Padic.norm_p])
 
 theorem norm_apply_le_of_mem_dec
     {A : ValuationSubring Ω} {ι : Ω →+* PadicAlgCl p} (h : Compat p A ι)
@@ -79,10 +72,7 @@ theorem norm_apply_le_of_mem_dec
     have h2 := ValuationSubring.smul_mem_pointwise_smul τ y A hy
     letI : MulAction (Ω ≃ₐ[F] Ω) (ValuationSubring Ω) := ValuationSubring.pointwiseMulAction
     have hsA := MulAction.mem_stabilizer_iff.mp hτ
-    first
-    | (rw [hsA] at h2; exact h2)
-    | (simp only [hsA] at h2; exact h2)
-    | (erw [hsA] at h2; exact h2)
+    first | (rw [hsA] at h2; exact h2)
   have key : ∀ y, ‖ι y‖ ≤ 1 → ‖ι (τ y)‖ ≤ 1 := fun y hy => (h (τ y)).1 (hs y ((h y).2 hy))
   by_contra hlt
   push_neg at hlt
@@ -129,10 +119,7 @@ theorem norm_apply_of_mem_dec
     : ‖ι (τ x)‖ = ‖ι x‖ := by
   refine le_antisymm (norm_apply_le_of_mem_dec h hτ x) ?_
   have h1 := norm_apply_le_of_mem_dec (τ := τ⁻¹) h (inv_mem hτ) (τ x)
-  have e : τ⁻¹ (τ x) = x := by
-    first
-    | exact τ.symm_apply_apply x
-    | (rw [← AlgEquiv.mul_apply, inv_mul_cancel, AlgEquiv.one_apply])
+  have e : τ⁻¹ (τ x) = x := by first | exact τ.symm_apply_apply x
   rwa [e] at h1
 
 theorem norm_sum_mul_pow_le
@@ -169,7 +156,7 @@ theorem minpoly_aeval_of_mem_dec
       refine ⟨ι (algebraMap F Ω (r : F)), ⟨(r : F), rfl⟩, ?_⟩
       rw [dist_eq_norm, map_ratCast, map_ratCast, ← map_ratCast (algebraMap ℚ_[p] (PadicAlgCl p)) r,
         ← map_sub]
-      first | (rw [norm_algebraMap']; exact hr) | (rw [PadicAlgCl.norm_extends]; exact hr)
+      first | (rw [norm_algebraMap']; exact hr)
     let C : Subalgebra ℚ_[p] (PadicAlgCl p) := { R.topologicalClosure with algebraMap_mem' := hQ }
     have hKC : (Kloc F ι).toSubalgebra ≤ C := by
       have halg : ∀ y ∈ Set.range (ι.comp (algebraMap F Ω)), IsAlgebraic ℚ_[p] y := fun y _ =>
@@ -179,17 +166,6 @@ theorem minpoly_aeval_of_mem_dec
       | (
           rw [IntermediateField.adjoin_toSubalgebra_of_isAlgebraic halg]
           exact Algebra.adjoin_le fun y hy => R.le_topologicalClosure hy
-        )
-      | (
-          rw [IntermediateField.adjoin_algebraic_toSubalgebra halg]
-          exact Algebra.adjoin_le fun y hy => R.le_topologicalClosure hy
-        )
-      | (
-          rw [IntermediateField.adjoin_eq_algebra_adjoin]
-          · exact Algebra.adjoin_le fun y hy => R.le_topologicalClosure hy
-          · intro y hy
-            exact (Algebra.adjoin ℚ_[p] (Set.range (ι.comp (algebraMap F Ω)))).inv_mem_of_algebraic
-              (Algebra.IsAlgebraic.isAlgebraic _) hy
         )
     have hcC : c ∈ closure (R : Set (PadicAlgCl p)) := hKC hc
     rw [Metric.mem_closure_iff] at hcC
@@ -202,7 +178,7 @@ theorem minpoly_aeval_of_mem_dec
               (((minpoly (Kloc F ι) (ι x)).coeff i : Kloc F ι) : PadicAlgCl p) * w ^ i := by
     intro w
     rw [Polynomial.aeval_eq_sum_range]
-    first | rfl | (refine Finset.sum_congr rfl fun i _ => ?_; rw [Algebra.smul_def]; rfl)
+    first | rfl
   obtain ⟨N, hN⟩ : ∃ N : ℕ, N = (minpoly (Kloc F ι) (ι x)).natDegree + 1 := ⟨_, rfl⟩
   rw [← hN] at hsum
   obtain ⟨c, hc⟩
@@ -275,7 +251,7 @@ theorem exists_apply_eq_of_mem_dec
   have hc : IsConjRoot (Kloc F ι) (ι x) (ι (τ x)) :=
     isConjRoot_of_aeval_eq_zero hint (minpoly_aeval_of_mem_dec h hτ x)
   obtain ⟨σ, hσ⟩ := isConjRoot_iff_exists_algEquiv.mp hc
-  first | exact ⟨σ, hσ⟩ | exact ⟨σ.symm, by rw [← hσ]; simp⟩
+  first | exact ⟨σ.symm, by rw [← hσ]; simp⟩
 
 theorem exists_res_eqOn_of_mem_dec
     {A : ValuationSubring Ω} {ι : Ω →+* PadicAlgCl p} (h : Compat p A ι)
@@ -330,9 +306,7 @@ theorem exists_res_eq
       apply hσ
       show σ a = b
       have e : σ ((σ⁻¹ * ρ) a) = ρ a := by
-        first
-        | (rw [← AlgEquiv.mul_apply, ← mul_assoc, mul_inv_cancel, one_mul])
-        | (rw [← AlgEquiv.mul_apply, ← mul_assoc, mul_right_inv, one_mul])
+        first | (rw [← AlgEquiv.mul_apply, ← mul_assoc, mul_inv_cancel, one_mul])
       rw [← hρb, ← e, hfix]
     · show σ⁻¹ * σ ∈ (IntermediateField.adjoin (Kloc F ι) {a}).fixingSubgroup
       rw [inv_mul_cancel]

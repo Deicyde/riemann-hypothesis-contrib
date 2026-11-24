@@ -407,7 +407,7 @@ theorem isMulRightInvariant_of_compact
     [MeasurableSpace G] [BorelSpace G]
     (μ : Measure G) [IsHaarMeasure μ]
     : IsMulRightInvariant μ := by
-  apply GlobalTheory.isMulRightInvariant_of_compactSpace <;> assumption
+  apply GlobalTheory.isMulRightInvariant_of_compactSpace
 
 theorem unitary_haar_measure : HaarU := by
   intro N

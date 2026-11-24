@@ -686,7 +686,7 @@ theorem isInvInvariant
     [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
     (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
     : μ.IsInvInvariant := by
-  apply GlobalTheory.CartanInt.isInvInvariant_of_right <;> assumption
+  apply GlobalTheory.CartanInt.isInvInvariant_of_right
 
 private lemma exists_nhds_one_inter_discrete_subgroup_eq_one {H : Type} [Group H] [TopologicalSpace H] (Γ : Subgroup H)
     [DiscreteTopology Γ] : ∃ V ∈ nhds (1 : H), ∀ γ ∈ Γ, γ ∈ V → γ = 1 := by

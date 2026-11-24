@@ -149,9 +149,7 @@ theorem zd_iteratedFDeriv_comp_perm
       have hc : ContDiffAt ℂ 2 (iteratedFDeriv ℂ k f) y :=
         (hf.contDiffAt (hU.mem_nhds hy)).iteratedFDeriv_right (by
           first
-          | exact_mod_cast (le_top : ((2 + k : ℕ) : ℕ∞) ≤ ⊤)
           | (norm_cast; exact le_top)
-          | exact le_top
           | (
               rw [← WithTop.coe_natCast, ← WithTop.coe_ofNat, ← WithTop.coe_add]
               exact WithTop.coe_le_coe.2 le_top

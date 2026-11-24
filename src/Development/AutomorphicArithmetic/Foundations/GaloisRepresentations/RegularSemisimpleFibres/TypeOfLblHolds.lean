@@ -2098,7 +2098,7 @@ private theorem cusp_one {F : Type} [Field F] [Finite F] (θ : AlgebraicClosure 
   have hcp
       : Matrix.charpoly (x : Matrix (Fin 1) (Fin 1) F)
         = X - C ((x : Matrix (Fin 1) (Fin 1) F) 0 0) := by
-    simp [Matrix.charpoly, Matrix.charmatrix, Matrix.det_fin_one]
+    simp [Matrix.charpoly, Matrix.charmatrix]
   have hval :=
     _root_.GlobalTheory.CuspGL.psi_of_irreducible_charpoly F (Fin 1 → F) _
       (_root_.GlobalTheory.CuspGL.rootSum_isAdditive_and_pow_X_sub_one F θ k).1

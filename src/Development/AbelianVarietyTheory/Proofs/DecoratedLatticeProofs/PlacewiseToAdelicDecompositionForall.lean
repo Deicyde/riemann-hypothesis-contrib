@@ -167,9 +167,7 @@ theorem latV_eq_ae
       Submodule.IsFullLattice D.host.E L → Submodule.IsFullLattice D.host.E M
         → ∃ T : Finset (Pl D), ∀ v, v ∉ T → latV S L (· = v) = latV S M (· = v) := by
   intro D S L M hL hM
-  first
-  | exact _root_.GlobalTheory.FinPl.latV_eq_off_finite D S L M hL hM
-  | exact _root_.GlobalTheory.FinPl.latV_eq_off_finite D S L M hL.toIsLattice hM.toIsLattice
+  first | exact _root_.GlobalTheory.FinPl.latV_eq_off_finite D S L M hL hM
 
 end GlobalTheory.FinPl.PlacesAdeles
 

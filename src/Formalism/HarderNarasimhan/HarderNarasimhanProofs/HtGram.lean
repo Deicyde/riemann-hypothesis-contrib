@@ -195,8 +195,8 @@ theorem det_bmat (G : P → Matrix (Fin j) (Fin j) ℂ)
   have h : (bmat G).submatrix f.symm f.symm = Matrix.blockDiagonal fun v => realif (G v) := by
     ext ⟨⟨s, k⟩, v⟩ ⟨⟨t, k'⟩, w⟩
     simp only [Matrix.submatrix_apply, Matrix.blockDiagonal_apply, bmat, Matrix.of_apply, f,
-        Equiv.coe_fn_symm_mk]
-      <;> split_ifs
+      Equiv.coe_fn_symm_mk]
+
   rw [← Matrix.det_submatrix_equiv_self f.symm (bmat G), h, Matrix.det_blockDiagonal]
   simp only [det_realif]
 

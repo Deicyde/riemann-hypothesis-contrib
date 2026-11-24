@@ -178,7 +178,7 @@ theorem mem_upq_of
   show Yᴴ * Jm R S + Jm R S * Y = 0
   exact h5
 
-theorem genEx : GlobalTheory.RealLift.GenEx := by apply PositivityTheory.RL.genEx <;> assumption
+theorem genEx : GlobalTheory.RealLift.GenEx := by apply PositivityTheory.RL.genEx
 
 end GlobalTheory.RealLiftGen
 end -- clump:auto

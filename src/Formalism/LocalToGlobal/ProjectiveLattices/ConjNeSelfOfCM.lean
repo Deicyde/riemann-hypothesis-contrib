@@ -93,8 +93,8 @@ theorem Lin_linForm (b b' : Fin n) (v w : Fin d → k)
   by_cases h : b = b'
   · subst h
 
-    simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, Finset.mul_sum,
-      map_sum, Pi.single_apply, Prod.ext_iff]
+    simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, map_sum,
+      Pi.single_apply, Prod.ext_iff]
   · simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, Prod.ext_iff, h]
 
 theorem div_Lin_aeval

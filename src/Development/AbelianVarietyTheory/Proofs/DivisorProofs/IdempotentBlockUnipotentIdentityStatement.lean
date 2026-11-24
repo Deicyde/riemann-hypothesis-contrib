@@ -457,9 +457,7 @@ theorem diag_decomp
                             ∧ (p₁.1.1 : Matrix (β ⊕ β) (β ⊕ β) A) * diagCols β = diagCols β * t₁.val
                             ∧ (p₂.1.1 : Matrix (β ⊕ β) (β ⊕ β) A) * diagCols β = diagCols β * t₂.val
                             ∧ gd = kd * p₁ * kd⁻¹ * p₂ := by
-  first
-  | exact @_root_.GlobalTheory.UnipotentCongruenceInverse.decomposition
-  | (intros; exact _root_.GlobalTheory.UnipotentCongruenceInverse.decomposition ..)
+  first | exact @_root_.GlobalTheory.UnipotentCongruenceInverse.decomposition
 
 end GlobalTheory.SiegelDiagDecomp
 end -- clump:auto

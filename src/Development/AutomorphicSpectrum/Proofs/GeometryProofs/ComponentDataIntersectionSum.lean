@@ -176,7 +176,7 @@ theorem detLat_isGenAt
         (T : Matrix (Fin r) (Fin r) Ω) (p : Cpt ξ),
       LinearIndependent Ω s → L.IsFrameAt b p → (∀ k, b k = ∑ k', T k' k • s k')
         → (Cusp.detLat L s).IsGenAt p T.det := by
-  apply LevelTowerAlt.determinant_lattice_generator <;> assumption
+  apply LevelTowerAlt.determinant_lattice_generator
 
 theorem exists_block_frame
     : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (P Wv : Type)

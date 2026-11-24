@@ -1951,10 +1951,7 @@ theorem strong_approx_stab
       show valuation (A.loc p).Fp (c₁ p : (A.loc p).Fp)⁻¹ ≤ 1
       rw [map_inv₀]
       exact inv_le_one_of_one_le₀ (le_of_lt (not_le.1 h'))
-  have hclose := by
-    first
-    | exact _root_.GlobalTheory.HL.FrameClose.close_lattice A r k G Λ hΛ
-    | exact _root_.GlobalTheory.HL.FrameClose.close_lattice A r k G Λ hΛ.toIsLattice
+  have hclose := by first | exact _root_.GlobalTheory.HL.FrameClose.close_lattice A r k G Λ hΛ
   obtain ⟨d, hd0, hdfin, hd⟩ := hclose
   choose s hsP hsf hsI using fun p => _root_.GlobalTheory.HL.LocPattern.local_pattern A r k G p (n p) (hnSt p)
   let c' : ∀ p, ((A.loc p).Fp)ˣ := fun p => c p * Units.mk0 (d p) (hd0 p)

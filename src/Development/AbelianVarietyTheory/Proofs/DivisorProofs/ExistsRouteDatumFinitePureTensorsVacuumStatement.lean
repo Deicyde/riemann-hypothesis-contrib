@@ -230,9 +230,7 @@ theorem IsPureSum.add
     {φ₀ : (κ → Fv F v₁) → ℂ} {Φ Ψ : (κ → AF F) → ℂ}
     (h : IsPureSum vac v₁ φ₀ Φ) (h' : IsPureSum vac v₁ φ₀ Ψ)
     : IsPureSum vac v₁ φ₀ (Φ + Ψ) := by
-  first
-  | (apply _root_.GlobalTheory.ClosingLemmaThird.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.ClosingLemmaThird.main ..)
+  first | (apply _root_.GlobalTheory.ClosingLemmaThird.main <;> assumption)
 
 theorem IsPureSum.sum
     {κ : Type} [Fintype κ]

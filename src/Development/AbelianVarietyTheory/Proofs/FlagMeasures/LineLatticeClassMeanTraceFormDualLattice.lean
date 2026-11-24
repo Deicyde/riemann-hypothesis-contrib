@@ -159,7 +159,6 @@ theorem det_real_mul_mul
     exact @_root_.GlobalTheory.DeterminantRealSandwich.det_real_family
   | (run_tac Lean.Elab.Tactic.liftMetaTactic (fun g => do pure [← g.revertAll]))
     exact _root_.GlobalTheory.DeterminantRealSandwich.det_real_family
-  | (intros; exact _root_.GlobalTheory.DeterminantRealSandwich.det_real_family ..)
 
 end GlobalTheory.MatMulDet
 end -- clump:auto

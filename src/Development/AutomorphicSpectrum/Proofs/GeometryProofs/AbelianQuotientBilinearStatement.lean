@@ -591,7 +591,7 @@ theorem double_substitution_first_axis
   fin_cases l
   · simp [Function.comp_def]
     have h0 : MvPolynomial.constantCoeff (psTrunc m (Qs j)) = 0 := by rw [cc_psTrunc, hQ]
-    first | exact bind_zero _ h0 | simp [cc_psTrunc, hQ]
+    first | simp [cc_psTrunc, hQ]
   · simp [Function.comp_def, _root_.Formalism.MainNotions.ModuliIntegralCharts.H1.FBIdPh.cc_psTrunc,
       hQ]
     exact bind_fst _
@@ -610,7 +610,7 @@ theorem double_substitution_second_axis
     exact bind_fst _
   · simp [Function.comp_def]
     have h0 : MvPolynomial.constantCoeff (psTrunc m (Qs j)) = 0 := by rw [cc_psTrunc, hQ]
-    first | exact bind_zero _ h0 | simp [cc_psTrunc, hQ]
+    first | simp [cc_psTrunc, hQ]
 
 theorem first_axis_comp_jet_inclusion (m : ℕ)
     : (jAx0 R d m).comp (jetCopy d m (0 : Fin 2))

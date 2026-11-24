@@ -269,9 +269,7 @@ theorem cech_one_away_natural
                   IsUnit (ψ (s a)) → e a E' (θ.comp ψ) = θ (e a E ψ))
                 ∧ ∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
                   IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E ψ = e b E ψ - e a E ψ := by
-  first
-  | exact @_root_.GlobalTheory.CocycleCoboundaryNumerator.cocycle_is_coboundary
-  | (intros; exact _root_.GlobalTheory.CocycleCoboundaryNumerator.cocycle_is_coboundary ..)
+  first | exact @_root_.GlobalTheory.CocycleCoboundaryNumerator.cocycle_is_coboundary
 
 end GlobalTheory.CechAway
 end -- clump:auto
@@ -850,7 +848,7 @@ theorem existsUnique_of_natural
               Sm W (D := E) (spOver ψ ≫ y) → τ E' (θ.comp ψ) = θ (τ E ψ))
             → ∃! d : D, ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
                 Sm W (D := E) (spOver ψ ≫ y) → τ E ψ = ψ d := by
-  apply GlobalTheory.PtExt.natFamily_existsUnique <;> assumption
+  apply GlobalTheory.PtExt.natFamily_existsUnique
 
 end GlobalTheory.PtExt.NatGlue
 end -- clump:auto

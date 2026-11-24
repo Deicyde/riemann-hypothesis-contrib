@@ -113,9 +113,7 @@ theorem coeFn_sum_smul
     {μ : Measure α} {ι : Type} [Fintype ι]
     (c : ι → ℂ) (u : ι → Lp ℂ 2 μ)
     : ((∑ i, c i • u i : Lp ℂ 2 μ) : α → ℂ) =ᵐ[μ] fun x => ∑ i, c i * (u i : α → ℂ) x := by
-  first
-  | (apply _root_.GlobalTheory.FinsetSumSmulCoe.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.FinsetSumSmulCoe.main ..)
+  first | (apply _root_.GlobalTheory.FinsetSumSmulCoe.main <;> assumption)
 
 theorem sum_smul_apply
     {ι α : Type} [Fintype ι] (L : ι → (α → ℂ) →ₗ[ℂ] (α → ℂ)) (c : ι → ℂ) (φ : α → ℂ) (y : α)

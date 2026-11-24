@@ -397,7 +397,7 @@ theorem kStable_iff
 
 theorem diag_inK (ε : Fin n → Bool) (θ : Fin n → ℝ)
     : inK ε (Matrix.diagonal fun a => (θ a : ℂ) * Complex.I) := by
-  apply GlobalTheory.KTypeHighest.inK_diag <;> assumption
+  apply GlobalTheory.KTypeHighest.inK_diag
 
 theorem exp_diag (θ : Fin n → ℝ) (t : ℝ)
     : NormedSpace.exp ((t : ℂ) • Matrix.diagonal fun a => (θ a : ℂ) * Complex.I)

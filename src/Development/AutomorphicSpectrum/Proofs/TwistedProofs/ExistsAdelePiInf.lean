@@ -76,7 +76,7 @@ theorem exists_adele_piInf
                 (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) x
               ∧ ∀ w,
                 GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piInf (emb w) x = z w := by
-  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf <;> assumption
+  apply PositivityTheory.ThKG.CayleyTransformDarboux.exists_inf
 
 end GlobalTheory.CompanionTheory.RealPlaceAdele
 

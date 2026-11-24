@@ -400,7 +400,7 @@ theorem hasSig_map_conj_of_hasSignature
           * (P : Matrix _ _ ℂ)).map (starRingEnd ℂ) := by
     ext i j; simp [Matrix.mul_apply, map_sum, Formalism.UG.cT]
   rw [hL, h3, hP]
-  ext (a | a) (b | b) <;> simp [Formalism.UG.Jpq, Matrix.one_apply] <;> split_ifs
+  ext (a | a) (b | b) <;> simp [Formalism.UG.Jpq, Matrix.one_apply]
 
 theorem gram_conj
     {k l : Type} [Fintype k] [Fintype l]

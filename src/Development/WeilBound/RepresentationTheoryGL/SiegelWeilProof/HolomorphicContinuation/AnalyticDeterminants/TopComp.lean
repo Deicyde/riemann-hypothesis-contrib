@@ -499,7 +499,7 @@ theorem rhs_eq
     have h1 : ContDiffAt ℂ (Fintype.card (blkA (n := n) j))
         (iteratedFDeriv ℂ (Fintype.card (blkB (n := n) j)) ψ) (embL (blkA (n := n) j) 0) := by
       rw [map_zero]
-      exact hψ0.iteratedFDeriv_right (by first | exact_mod_cast le_top | simp [← Nat.cast_add])
+      exact hψ0.iteratedFDeriv_right (by first | exact_mod_cast le_top)
     have h2 :=
       h1.comp (0 : Matrix (blkA (n := n) j) (blkA (n := n) j) ℂ)
         (embL (blkA (n := n) j)).contDiff.contDiffAt

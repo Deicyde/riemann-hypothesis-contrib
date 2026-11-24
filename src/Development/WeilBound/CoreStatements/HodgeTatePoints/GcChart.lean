@@ -146,7 +146,7 @@ theorem bc_iso
         → Submodule.span O (Set.range ι) = L → Module.finrank K Ω = Module.finrank C Ω'
         → ∃ j : O ⊗[A] M →ₗ[O] Ω',
           Function.Injective j ∧ LinearMap.range j = L ∧ ∀ x, j (1 ⊗ₜ x) = ι x := by
-  apply PositivityTheory.HtPt.Gb.bc_iso <;> assumption
+  apply PositivityTheory.HtPt.Gb.bc_iso
 
 end PositivityTheory.HtPt.Gc
 end -- clump:auto

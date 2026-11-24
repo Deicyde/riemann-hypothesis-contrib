@@ -156,12 +156,12 @@ theorem hasSig_map_conj
   have e1
       : (A.map star)ᵀ * M.map (starRingEnd ℂ) * (A.map star).map star
         = (Aᵀ).map (starRingEnd ℂ) * M.map (starRingEnd ℂ) * (A.map star).map (starRingEnd ℂ) := by
-    congr 2 <;> ext i j
+    congr 2
   have e2
       : (Matrix.fromBlocks 1 0 0 (-1) : Matrix (Fin r ⊕ Fin s) (Fin r ⊕ Fin s) ℂ).map
           (starRingEnd ℂ)
         = Matrix.fromBlocks 1 0 0 (-1) := by
-    ext (i | i) (j | j) <;> simp [Matrix.fromBlocks, Matrix.one_apply] <;> split_ifs
+    ext (i | i) (j | j) <;> simp [Matrix.fromBlocks, Matrix.one_apply]
   rw [e1, this, e2]
 
 theorem hasSig_neg

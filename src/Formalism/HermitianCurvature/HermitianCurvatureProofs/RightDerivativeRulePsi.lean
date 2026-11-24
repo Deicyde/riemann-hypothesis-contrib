@@ -122,6 +122,6 @@ theorem herm_bvec_eI {k r : ℕ} (v : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
     exact hp (Fin.ext (by simp [esI, h]))
   · simp
 
-theorem xi_Y_zhat_identity : XiYZhat := by apply CovecW.covec_entries <;> assumption
+theorem xi_Y_zhat_identity : XiYZhat := by apply CovecW.covec_entries
 
 end Formalism.FourierDecayAlt.P.SignAntidiagonal

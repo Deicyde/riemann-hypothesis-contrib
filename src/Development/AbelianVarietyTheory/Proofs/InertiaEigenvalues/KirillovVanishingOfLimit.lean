@@ -1095,7 +1095,7 @@ theorem wS_nS_wS_eq_unit {k : Type} [CommRing k] (z : kˣ)
     rfl
   ext i j
   simp only [Matrix.SpecialLinearGroup.coe_mul, cw, cn, cm]
-  fin_cases i <;> fin_cases j <;> simp <;> ring_nf
+  fin_cases i <;> fin_cases j <;> simp
 
 theorem lam_flip_eq_zero
     : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]

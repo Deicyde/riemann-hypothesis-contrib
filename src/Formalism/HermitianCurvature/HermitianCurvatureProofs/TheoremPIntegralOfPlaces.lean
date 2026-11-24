@@ -330,14 +330,7 @@ private theorem psdOn_hadamard_mul_of_psdOn
   have hA' : Matrix.PosSemidef (Matrix.of fun x y : F => A x y) := hA
   have hB' : Matrix.PosSemidef (Matrix.of fun x y : F => B x y) := hB
   show Matrix.PosSemidef (Matrix.of fun x y : F => A x y * B x y)
-  first
-  | exact hA'.hadamard hB'
-  | obtain ⟨C, hC⟩
-        : ∃ C : Matrix F F ℂ, (Matrix.of fun x y : F => A x y) = C.conjTranspose * C := by
-      first
-      | exact ⟨hA'.sqrt, by rw [hA'.posSemidef_sqrt.1.eq, hA'.sqrt_mul_self]⟩
-      | exact Matrix.posSemidef_iff_eq_conjTranspose_mul_self.1 hA'
-      | exact Matrix.posSemidef_iff_exists_eq_conjTranspose_mul_self.1 hA'
+  first | exact hA'.hadamard hB'
 
 theorem nst_diag_nonneg
     (hG : D.GramPSD) (hW : D.WordsPos)

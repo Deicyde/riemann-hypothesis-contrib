@@ -502,7 +502,7 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
         = dh (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) := by
     have h := congrArg (fun r => Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) r x) hdiv
     simp only [map_mul, map_sub, Polynomial.aeval_X, Polynomial.aeval_C, Module.End.mul_apply,
-        LinearMap.sub_apply, Module.algebraMap_end_apply, map_one, Module.End.one_apply, one_smul]
+        LinearMap.sub_apply, Module.algebraMap_end_apply, map_one, Module.End.one_apply]
       at h
     rw [← h, ← hE, hA, map_sub]
     rfl
@@ -1150,7 +1150,7 @@ theorem cat_fc_lo
   have hl := l.isLt
   simp only [cat]
   split_ifs with h1 h2 h3 h4 h5 h6 <;> first
-    | (congr 1; ext; simp only [fc_val, Fin.val_mk]; split_ifs <;> omega)
+    | (congr 1; ext; simp only [fc_val]; split_ifs <;> omega)
     | (exfalso; split_ifs at hv <;> omega)
     | rfl
 

@@ -96,4 +96,4 @@ theorem UpperTheory.V.Pa.Det.selSub
         (w wi : F.Vl → Matrix (Fin n) (Fin n) R) (V : Submodule A (Matrix (Fin n) (Fin n) R)),
       (∃ S : Submodule A (F.G₀ → Matrix (Fin n) (Fin n) R), (S : Set _) = SelZ F t ρ w wi V)
         ∧ ∃ S : Submodule A (F.G₀ → Matrix (Fin n) (Fin n) R), (S : Set _) = Bd F ρ V := by
-  apply UpperTheory.V.Pa.sel_lin <;> assumption
+  apply UpperTheory.V.Pa.sel_lin

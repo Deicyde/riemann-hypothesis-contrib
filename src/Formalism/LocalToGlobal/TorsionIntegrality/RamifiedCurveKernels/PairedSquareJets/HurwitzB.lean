@@ -127,9 +127,7 @@ def blockEmb (B ι : Type) (k : B) : ι ↪ B × ι := ⟨fun i => (k, i), fun _
 theorem inBlock_eq_rename {K : Type} [Field K] {ι B : Type} (k : B) (f : MvPowerSeries ι K)
     : inBlock k f = MvPowerSeries.rename (blockEmb B ι k) f := by
   unfold inBlock
-  first
-  | exact (MvPowerSeries.rename_eq_subst (blockEmb B ι k) f).symm
-  | (rw [MvPowerSeries.rename_eq_subst]; rfl)
+  first | exact (MvPowerSeries.rename_eq_subst (blockEmb B ι k) f).symm
 
 theorem coeff_inBlock_embDomain
     {K : Type} [Field K] {ι B : Type} (k : B) (f : MvPowerSeries ι K) (κ : ι →₀ ℕ)

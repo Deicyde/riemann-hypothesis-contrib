@@ -56,6 +56,6 @@ variable
 
 theorem inPsi_conjugate_iff (τ : E →+* ℂ)
     : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
-  apply GlobalTheory.InertLabelling.inPsi_conj_iff <;> assumption
+  apply GlobalTheory.InertLabelling.inPsi_conj_iff
 
 end GlobalTheory.ThetaRuleCheck

@@ -269,7 +269,7 @@ theorem isOp2_reix (ψ : AddChar (AF F) ℂ) (e : κ' ≃ κ)
   · rw [dblAct_reix]; exact isOp_reix ψ _
   · funext x
     simp only [reix_apply, boxFun, Pi.star_apply, star_star]
-    congr 2 <;> funext i
+    congr 2
 
 theorem realised_comp_reix
     : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),

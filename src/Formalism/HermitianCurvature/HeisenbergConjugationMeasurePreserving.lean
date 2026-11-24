@@ -1226,7 +1226,7 @@ theorem theta_lower_bound : ThetaLower := by
     have e
         : I / (Real.pi * Ct * C ^ 2 * A0 * Real.sqrt k * N)
           = (Ct * (C * A0 * Real.sqrt k * (C * Real.pi * N / I)))⁻¹ := by
-      field_simp; try ring
+      field_simp
     rw [e]
     exact hinv _ (by positivity) h'
   rcases h with h | h | h | h
@@ -1417,7 +1417,7 @@ theorem final_smallness : FinalSmall := by
     rw [div_le_iff₀ hThpos]
     calc
       C ≤ T / 2 := by linarith
-      _ = (2 * T ^ 15)⁻¹ * T ^ 16 := by field_simp; try ring
+      _ = (2 * T ^ 15)⁻¹ * T ^ 16 := by field_simp
       _ ≤ (2 * T ^ 15)⁻¹ * Th :=
         mul_le_mul_of_nonneg_left (by rw [← hkc]; exact hTh) (by positivity)
   have hu0 : 0 ≤ C / Th := by positivity

@@ -113,7 +113,6 @@ theorem isPrecomplete_of_le_of_pow_le
       revert A h_1 I J hJ e he h_7
       exact @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le
     )
-  | (intros; exact _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le ..)
 
 theorem isAdicComplete_of_finite_local
     (R S : Type*)

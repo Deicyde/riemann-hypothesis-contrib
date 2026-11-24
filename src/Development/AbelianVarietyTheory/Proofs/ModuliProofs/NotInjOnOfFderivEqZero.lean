@@ -392,9 +392,7 @@ theorem analyticAt_det
     [FiniteDimensional ℂ E]
     {A : X → E →L[ℂ] E} {a : X} (hA : AnalyticAt ℂ A a)
     : AnalyticAt ℂ (fun z => LinearMap.det (A z : E →ₗ[ℂ] E)) a := by
-  first
-  | (apply _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det <;> assumption)
-  | (intros; exact _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det ..)
+  first | (apply _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det <;> assumption)
 
 def LocalStatement (n : ℕ) : Prop :=
   ∀ (E F : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]

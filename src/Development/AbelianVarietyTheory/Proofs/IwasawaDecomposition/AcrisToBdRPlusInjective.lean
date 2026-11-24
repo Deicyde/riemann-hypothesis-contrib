@@ -195,9 +195,7 @@ theorem low_inter
 
 theorem split_low (N : ℕ) (w : A) (hw : w ∈ Submodule.span R (Set.range γ))
     : ∃ w₁ ∈ low R γ N, algebraMap R A ξ ^ N ∣ w - w₁ := by
-  first
-  | (apply _root_.GlobalTheory.IsolatedTheoremThree.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.IsolatedTheoremThree.main ..)
+  first | (apply _root_.GlobalTheory.IsolatedTheoremThree.main <;> assumption)
 
 end
 

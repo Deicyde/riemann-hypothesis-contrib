@@ -129,7 +129,7 @@ theorem E_liftX (h : PS k 2 d) (hax : ev (n := 1) ![0, pt k d 0] h = 0) (f : PS 
     subst hq
     rfl
   rw [e]
-  first | (rw [subst_self]; rfl) | (rw [← map_algebraMap_eq_subst_X]; simp)
+  first | (rw [subst_self]; rfl)
 
 section Inter
 
@@ -168,9 +168,7 @@ theorem E_nabla
     intro d hd
     rw [MvPowerSeries.coeff_pderiv, hg, zero_mul]
     have e : Finsupp.degree (d + Finsupp.single t 1) = Finsupp.degree d + 1 := by
-      first
-      | rw [map_add (f := _), Finsupp.degree_single]
-      | (unfold Finsupp.degree; rw [Finsupp.sum_add_index' (by simp) (by simp)]; simp)
+      first | rw [map_add (f := _), Finsupp.degree_single]
     omega
   have low_mul_lemma {τ : Type} {m n : ℕ} {f g : MvPowerSeries τ k} (hf : Low m f) (hg : Low n g)
       : Low (m + n) (f * g) := by
@@ -237,8 +235,7 @@ theorem E_nabla
         Finset.mul_sum]
       simp only [Derivation.leibniz, MvPolynomial.pderiv_X, Pi.single_apply, smul_eq_mul,
         map_add (f := _), map_mul, MvPolynomial.aeval_X, add_mul, Finset.sum_add_distrib, mul_ite,
-        mul_one, mul_zero, map_one, map_zero, ite_mul, zero_mul, Finset.sum_ite_eq,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        mul_one, mul_zero]
       simp only [apply_ite (MvPolynomial.aeval a), map_zero, ite_mul, zero_mul, Finset.sum_ite_eq,
         Finset.mem_univ, if_true, mul_assoc]
       try ring
@@ -278,7 +275,7 @@ theorem E_nabla
       rw [Finsupp.le_def]
       intro s
       have h1 := finsupp_apply_le_degree' m s
-      first | (change m s ≤ M; omega) | (simp; omega)
+      first | (change m s ≤ M; omega)
     ext d
     obtain ⟨p, hp⟩ := hpoly (d.degree + 1 + 1)
     have hf : f = (f - (p : MvPowerSeries σ k)) + (p : MvPowerSeries σ k) :=
@@ -296,9 +293,8 @@ theorem E_nabla
     rw [h1 d (by omega), h2 d (by omega)]
   simp only [pderiv_subst hc, Finset.mul_sum]
   simp only [Fintype.sum_sum_type, Finset.sum_add_distrib]
-  simp only [bE, Sum.elim_inl, Sum.elim_inr, pderiv_X, Pi.single_apply, ite_mul, mul_ite, mul_zero,
-    mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-  simp only [Prod.mk.injEq, true_and, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  simp only [bE, Sum.elim_inl, Sum.elim_inr, pderiv_X, Pi.single_apply, mul_ite, mul_zero, mul_one]
+  simp only [Prod.mk.injEq, true_and]
   simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
   congr 1
   rw [Finset.sum_comm]

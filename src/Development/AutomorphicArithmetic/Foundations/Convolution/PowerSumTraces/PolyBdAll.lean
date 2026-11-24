@@ -124,7 +124,7 @@ private theorem lastRow
     ideleModule_posIdele]
   exact mul_le_mul_of_nonneg_right h1 (pow_nonneg (hr _).le _)
 
-theorem siegelHeight : SiegelHeight := by apply UpperTheory.siegelSet_height_bound <;> assumption
+theorem siegelHeight : SiegelHeight := by apply UpperTheory.siegelSet_height_bound
 
 end UpperTheory.V.Fb
 end -- clump:auto

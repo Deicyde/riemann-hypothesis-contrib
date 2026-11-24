@@ -409,17 +409,17 @@ theorem diagonal_decomposition_transvections
   by_cases hxi : i = x
   · subst x
     by_cases hyi : i = y
-    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp) <;> (try ring))
+    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp))
     by_cases hyj : j = y
-    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp) <;> (try ring))
-    (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp) <;> (try ring))
+    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp))
+    (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp))
   by_cases hxj : j = x
   · subst x
     by_cases hyi : i = y
-    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp) <;> (try ring))
+    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp))
     by_cases hyj : j = y
-    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp) <;> (try ring))
-    (simp [Matrix.add_apply, *] <;> (try field_simp) <;> (try ring))
+    · subst y; (simp [Matrix.add_apply, hij.symm, *] <;> (try field_simp))
+    (simp [Matrix.add_apply, *] <;> (try field_simp))
   by_cases hyi : i = y
   · subst y
     (

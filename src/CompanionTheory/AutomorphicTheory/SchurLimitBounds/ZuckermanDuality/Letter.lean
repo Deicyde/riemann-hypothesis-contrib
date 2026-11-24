@@ -268,7 +268,6 @@ theorem mul_mem_spanBox_of_gap
     · rw [add_mul]
       exact Submodule.add_mem _ ha hb
 
-theorem capelli_inequivalence : Inequiv := by
-  apply CompanionTheory.CapEig.capelli_inequivalence <;> assumption
+theorem capelli_inequivalence : Inequiv := by apply CompanionTheory.CapEig.capelli_inequivalence
 
 end CompanionTheory.LimBd.Main

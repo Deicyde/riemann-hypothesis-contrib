@@ -90,9 +90,7 @@ theorem stImA_of (p : TypX X) (h : LevelReductionImage X hb p) : StImA X hb p :=
         Nat.card (A.map f) = Nat.card (↥A ⧸ (f.comp A.subtype).ker) := by
     intro f
     have hr : A.map f = (f.comp A.subtype).range := by
-      first
-      | rw [MonoidHom.range_comp, Subgroup.range_subtype]
-      | rw [MonoidHom.range_comp, Subgroup.subtype_range]
+      first | rw [MonoidHom.range_comp, Subgroup.range_subtype]
     rw [hr]
     exact Nat.card_congr (QuotientGroup.quotientKerEquivRange (f.comp A.subtype)).toEquiv.symm
   have hk2 : (ρ.comp A.subtype).ker = (ρ₀.comp A.subtype).ker := by
@@ -118,9 +116,7 @@ theorem stImB_of (u : D.what₂.Word) (p : TypX X) (h : ParabolicReductionImage 
         Nat.card (A.map f) = Nat.card (↥A ⧸ (f.comp A.subtype).ker) := by
     intro f
     have hr : A.map f = (f.comp A.subtype).range := by
-      first
-      | rw [MonoidHom.range_comp, Subgroup.range_subtype]
-      | rw [MonoidHom.range_comp, Subgroup.subtype_range]
+      first | rw [MonoidHom.range_comp, Subgroup.range_subtype]
     rw [hr]
     exact Nat.card_congr (QuotientGroup.quotientKerEquivRange (f.comp A.subtype)).toEquiv.symm
   have hk2 : (ρ.comp A.subtype).ker = (ρ₀.comp A.subtype).ker := by

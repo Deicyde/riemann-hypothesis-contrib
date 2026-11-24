@@ -320,9 +320,7 @@ theorem frame_facts
     det_at β
   ⟩
   intro L Λ hL hΛ
-  first
-  | exact _root_.GlobalTheory.FrameGlob.main D k p S n β L Λ hL hΛ
-  | exact _root_.GlobalTheory.FrameGlob.main D k p S n β L Λ hL hΛ.toIsLattice
+  first | exact _root_.GlobalTheory.FrameGlob.main D k p S n β L Λ hL hΛ
 
 end GlobalTheory.FrameAt
 end -- clump:auto

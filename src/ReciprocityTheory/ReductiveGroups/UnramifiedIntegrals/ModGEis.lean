@@ -91,8 +91,7 @@ theorem G_eq
   rw [h1, tsum_mul_left, H, hE]
   ring
 
-theorem sixVal : riemannZeta 6 = (Real.pi : ℂ) ^ 6 / 945 := by
-  apply DiscrNeWork.zeta6 <;> assumption
+theorem sixVal : riemannZeta 6 = (Real.pi : ℂ) ^ 6 / 945 := by apply DiscrNeWork.zeta6
 
 theorem g₂_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ)
     : L.g₂ = (c ^ 4)⁻¹ * (4 * (Real.pi : ℂ) ^ 4 / 3) * E₄ τ := by

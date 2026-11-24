@@ -1208,8 +1208,7 @@ private theorem wData_prism_ps_tcup_lR_iota_eq_neg
           (fun z : Fin (q + 1) → P => Y (fun i => W.ρ (z i)))
           (Fin.cons (W.ι (g 0)) fun i => W.ps (W.ι (g i)))
         = - Y g := by
-    simp only [tcup, Fin.cons_zero, Fin.cons_one, Fin.tail_cons, wData_rho_ps_eq_rho, W.ρι,
-      wData_ps_iota_eq_t_inv_mul]
+    simp only [tcup, Fin.cons_zero, Fin.cons_one, Fin.tail_cons, wData_ps_iota_eq_t_inv_mul]
     rw [htc, ← mul_assoc, inv_mul_cancel, one_mul, wData_lR_ofMul_t_inv_eq_neg_one]
     simp [W.ρt, W.ρι]
   have h2

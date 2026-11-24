@@ -74,7 +74,7 @@ theorem stab_hatL_mapsTo
     : Formalism.L2.DIV.IsFrame β Λ
       → ∀ x ∈ Formalism.L2.DIV.St β, ∀ v ∈ Formalism.L2.Herm.hatL (F := F) Λ,
         x.1 *ᵥ v ∈ Formalism.L2.Herm.hatL (F := F) Λ := by
-  apply GlobalTheory.IndefiniteRowSideFullHecke.SplitSumStabLattice.mulVec_mem_hatL <;> assumption
+  apply GlobalTheory.IndefiniteRowSideFullHecke.SplitSumStabLattice.mulVec_mem_hatL
 
 end GlobalTheory
 end -- clump:auto

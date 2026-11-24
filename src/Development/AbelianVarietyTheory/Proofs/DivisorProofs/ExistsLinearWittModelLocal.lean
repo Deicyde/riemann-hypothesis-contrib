@@ -183,16 +183,12 @@ theorem pairM_chart
     (c : GL (Fin d) K) (P Q : Matrix (Fin n) (Fin d) K)
     : GlobalTheory.FlipMatch.pairM ((b⁻¹).1 * P * (c⁻¹).1ᵀ) (-(b.1ᵀ * A * Q * Bᵀ * c.1))
       = - ∑ i : Fin n, ∑ j : Fin d, ∑ k : Fin n, ∑ l : Fin d, P i j * A i k * B j l * Q k l := by
-  first
-  | (apply _root_.GlobalTheory.PairingTraceExpansion.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.PairingTraceExpansion.main ..)
+  first | (apply _root_.GlobalTheory.PairingTraceExpansion.main <;> assumption)
 
 theorem sum_four_swap_pairs_alt
     {R α β : Type} [AddCommMonoid R] [Fintype α] [Fintype β] (f : α → β → α → β → R)
     : ∑ a, ∑ b, ∑ c, ∑ e, f a b c e = ∑ c, ∑ e, ∑ a, ∑ b, f a b c e := by
-  first
-  | (apply _root_.GlobalTheory.FourTermSumSwap.sum_four_swap <;> assumption)
-  | (intros; exact _root_.GlobalTheory.FourTermSumSwap.sum_four_swap ..)
+  first | (apply _root_.GlobalTheory.FourTermSumSwap.sum_four_swap <;> assumption)
 
 theorem piW_cA
     {σ : E →ₐ[F] E} {v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)}

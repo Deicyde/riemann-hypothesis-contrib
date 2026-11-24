@@ -605,7 +605,7 @@ theorem meas_iterDeriv
     : ∀ (p : ℕ) (s : ℝ), Measurable (fun ω => iteratedDeriv p (fun s => F s ω) s) := by
   apply Formalism.FourierDecayAlt.P.LEx2.A3.meas_iterDeriv <;> assumption
 
-theorem dsMeas : DsMeas := by apply Formalism.FourierDecayAlt.P.LEx2.A3.dsMeas <;> assumption
+theorem dsMeas : DsMeas := by apply Formalism.FourierDecayAlt.P.LEx2.A3.dsMeas
 
 theorem stepClaimFromSteps (hDs : DsMeas) : StepClaimFromSteps := by
   intro hCauchy hMarkovV hTF hTR hTS hTB hTL hCT hLeib hTZ hCI hAdj hEF hCS hSh hMk hTermB hGeom hES

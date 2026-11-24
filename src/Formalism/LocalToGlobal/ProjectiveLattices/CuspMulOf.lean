@@ -86,22 +86,7 @@ theorem holSub_mul
     {Comp : Type} {X : Comp → Data E r} {la la' : ∀ k, Wt (X k).Ψ r} {P Q : FDSec X}
     (hP : P ∈ holSub X la) (hQ : Q ∈ holSub X la')
     : P * Q ∈ holSub X (la + la') := by
-  first
-  | (apply UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q hP hQ
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q hP
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P Q
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la' P
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la la'
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X la
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp X
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM Comp
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r hM
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_› r
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_› ‹_›
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_› ‹_›
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E ‹_›
-  | exact @UpperTheory.Reformulated.B.Qe28.holSub_mul E
+  first | (apply UpperTheory.Reformulated.B.Qe28.holSub_mul <;> assumption)
 
 theorem cusp_mul_of_M5 (hM : SiegelSpaceAlgebra (E := E)) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
     : CuspMul Xo c U := by

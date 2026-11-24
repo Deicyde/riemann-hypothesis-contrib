@@ -503,10 +503,7 @@ theorem denom_global
     : ∃ d : ℕ,
       0 < d ∧ (d : NNReal) ≤ ∏ᶠ v, H v
         ∧ ∀ v, ∀ y : v.adicCompletion F, ‖y‖₊ ≤ H v → ‖(d : v.adicCompletion F) * y‖ ≤ 1 := by
-  first
-  | exact @_root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator
-  | exact _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator
-  | (apply _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator <;> assumption)
+  first | (apply _root_.GlobalTheory.AdicNormZpowEstimates.exists_denominator <;> assumption)
 
 open GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies Formalism.L2.Pj in
 theorem denomBound

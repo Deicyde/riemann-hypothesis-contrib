@@ -114,6 +114,6 @@ theorem det_gram_two_frames
           - T * T'
             * ((Z.submatrix Fin.castSucc Fin.castSucc).det
               * (W.submatrix Fin.castSucc Fin.castSucc).det)) := by
-  apply GlobalTheory.SA.TransvG.det_fromBlocks_last <;> assumption
+  apply GlobalTheory.SA.TransvG.det_fromBlocks_last
 
 end GlobalTheory

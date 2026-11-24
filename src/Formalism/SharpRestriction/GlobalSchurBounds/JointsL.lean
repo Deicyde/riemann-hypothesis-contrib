@@ -1311,11 +1311,11 @@ theorem tuSize_fam
 
 theorem _root_.Formalism.MainNotions.flipTwoThree.stabiliser_family_of_column_lemma
     {eps : ℝ} (Fm : FamP eps)
-    (C₄ C₅ : ℝ) (h : UnusedSlot33.ConclusionOnFamily Fm C₄ C₅)
+    (h : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, UnusedSlot33.division_rows_rational_lattice (Fm.D x i))
     (hP : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x),
       StandardLattice.Conclusion4p (Fm.D x i) (Fm.ex x hx i).lev)
     : flipTwoThree.admF3 Fm :=
-  flipTwoThree.stabiliser_family_of_definite Fm C₄ C₅ h
+  flipTwoThree.stabiliser_family_of_definite Fm h
     (fun _ _ => gram0Def _)
     hP ⟨3, fun x h3 hx i => JDB.gBig_fam Fm x h3 hx i⟩
 

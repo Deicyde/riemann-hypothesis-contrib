@@ -86,7 +86,7 @@ theorem qminor_bE_eq
     {n t : ℕ} (E : Fin n → Fin n → A) (e : Fin n) (f : Fin t → Fin n) (b : Fin (t + 1) → Fin n)
     (u : ℂ)
     : qminor E (PI.bE e f) b u = (((-1 : ℤ) ^ t : ℤ) : A) * qminor E (PI.bS f e) b u := by
-  apply PI.UnitaryGroupMassFormula.QmBorderFull.Four.qminor_bE_eq <;> assumption
+  apply PI.UnitaryGroupMassFormula.QmBorderFull.Four.qminor_bE_eq
 
 theorem qminor_bS_eq
     {A : Type} [Ring A] [Algebra ℂ A]

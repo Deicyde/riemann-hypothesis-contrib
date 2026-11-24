@@ -777,7 +777,7 @@ theorem exists_flag
   have p1 : IsPull O x z B' (EB 1) := (hEB 1).1
   have tri : ∀ i j : Fin M, i < j → w.repr (w i) j = 0 := by
     intro i j hij
-    simp [Module.Basis.repr_self, Finsupp.single_apply, ne_of_lt hij]
+    simp [Module.Basis.repr_self, ne_of_lt hij]
   have s01 :=
     (_root_.GlobalTheory.CompanionTheory.Ar.Num.PullPreserve.pull_preserve O Ω K ι x M W B B' K' ι'
       z (EB 0) (EB 1) p0 p1).2.1 hs

@@ -72,8 +72,7 @@ theorem mem_std (v : Fin n → E) : v ∈ Formalism.L2.Pj.stdLat E n ↔ ∀ i, 
     Submodule.mem_one]
   exact forall_congr' fun i => mem_range_iff (v i)
 
-theorem std_eq : Formalism.L2.Pj.stdLat E n = stdL E n := by
-  apply GlobalTheory.Dict.ZLat.stdLat_eq <;> assumption
+theorem std_eq : Formalism.L2.Pj.stdLat E n = stdL E n := by apply GlobalTheory.Dict.ZLat.stdLat_eq
 
 theorem span_smul_le (k : ℕ) (A B : Lt E n)
     : Ideal.span {(k : 𝓞 E)} • A ≤ B ↔ ∀ v ∈ A, (k : E) • v ∈ B := by

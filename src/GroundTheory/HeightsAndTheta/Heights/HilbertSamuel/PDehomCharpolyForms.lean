@@ -120,9 +120,7 @@ theorem dehom_homog
 
   simp only [PullFormsGeneric.dehom, homog, map_sum]
   refine Finset.sum_congr rfl fun e _ => ?_
-  first
-  | rw [map_mul, map_pow, bind₁_X_right, dif_pos rfl, one_pow, one_mul]
-  | rw [map_mul, map_pow, aeval_X, dif_pos rfl, one_pow, one_mul]
+  first | rw [map_mul, map_pow, bind₁_X_right, dif_pos rfl, one_pow, one_mul]
 
 theorem ne_zero_of_generic
     {Ω : Type} [Field Ω] [CharZero Ω]

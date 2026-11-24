@@ -344,7 +344,7 @@ theorem casArr_of (hk : KCasSpan) : CasArr := by
       have hre
           : (⟪positionsE V n j b a F, positionsE V n j b a F⟫_ℂ).re
             = ‖positionsE V n j b a F‖ ^ 2 := by
-        first | exact inner_self_eq_norm_sq _ | exact inner_self_eq_norm_sq (𝕜 := ℂ) _
+        first | exact inner_self_eq_norm_sq (𝕜 := ℂ) _
       rw [hre]
       positivity
     · simp
@@ -639,7 +639,7 @@ section U3NPos
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n j : ℕ}
 
 theorem re_inner_self_indexArray (F : Arr V n j) : (⟪F, F⟫_ℂ).re = ‖F‖ ^ 2 := by
-  first | exact inner_self_eq_norm_sq F | exact inner_self_eq_norm_sq (𝕜 := ℂ) F
+  first | exact inner_self_eq_norm_sq (𝕜 := ℂ) F
 
 theorem norm_sq_eq_sum_firstPositionSlice (F : Arr V n (j + 1))
     : ‖F‖ ^ 2 = ∑ α' : Fin j → Fin n × Fin n, ‖sliceLin V n α' F‖ ^ 2 := by

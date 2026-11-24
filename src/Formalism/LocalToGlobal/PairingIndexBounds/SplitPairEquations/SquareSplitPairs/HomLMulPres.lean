@@ -65,7 +65,7 @@ theorem mem_homL
     {N N' : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
     {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} {A : Matrix (Fin N') (Fin N) D.host.E}
     : A ∈ TaylorLogMetric.homL D L L' ↔ ∀ x ∈ L, A *ᵥ x ∈ L' := by
-  apply Formalism.L2.PairingIndexBounds.Rec.mem_homL <;> assumption
+  apply Formalism.L2.PairingIndexBounds.Rec.mem_homL
 
 theorem homL_mul_pres
     {N N' : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}

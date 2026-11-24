@@ -630,7 +630,7 @@ theorem four_orbit_conditions_of_proof
         sp
       ∧ Formalism.MainNotions.WeilJacquetShalikaLaw.LossAtDiscriminant D L K Dx T lev Xe ce sp
       ∧ Formalism.MainNotions.WeilJacquetShalikaLaw.IsotypicPartsInternalDirectSum D Dx T sp := by
-  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, h1, h2, h3, h4⟩ := h
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, h1, h2, h3, h4⟩ := h
   exact ⟨h1, h2, h3, h4⟩
 
 end Formalism.MainNotions.J
@@ -945,7 +945,7 @@ theorem mem_intW_of
   exact_mod_cast h
 
 theorem vAdd_one (D : D7) (w : D.what₂.places.Pl) : vAdd (D.plEq w) (1 : D.what₂.LL) = 0 := by
-  first | rfl | (simp [vAdd]; done)
+  first | (simp [vAdd]; done)
 
 theorem div_mem_intW
     (D : D7) (w : D.what₂.places.Pl)
@@ -1110,7 +1110,7 @@ theorem sum_bounds (m : ℕ) (hm : 1 ≤ m) (sp v : ℝ)
   ring
 
 theorem card_lifts (D : D7) : ((SizeData₂.lifts D).card : ℝ) = (D.R.m : ℝ) := by
-  first | rfl | (simp [SizeData₂.lifts]; done)
+  first | (simp [SizeData₂.lifts]; done)
 
 theorem base_map_mem_local_lattice
     {D : D7} (T : TwForms D) (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl)
@@ -1582,9 +1582,9 @@ theorem unit_bound_of_sum_over_primes
     dG_spec,
     om,
     Y5,
-    hP.2.2.2.2.2.1,
+    hP.2.1,
     hA.2.2.2.2.2.2.2.2.2.2.2.2,
-    hP.2.2.2.2.2.2.2.2.2.2,
+    hP.2.2.2.2.2,
     IsFractionRing.injective _ _,
     Fn,
     h1,

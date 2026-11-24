@@ -142,7 +142,7 @@ theorem copy_square (d m n : ℕ) (i : Fin n)
         ≫ rjBC ψ x0 d m 1
       = rjBC ψ x0 d m n
         ≫ homAt x0 (jetCopy d m i : Jet S (Fin 1 × Fin d) m →ₐ[S] Jet S (Fin n × Fin d) m) := by
-  apply GlobalTheory.RawChartBC.sq_copy <;> assumption
+  apply GlobalTheory.RawChartBC.sq_copy
 
 variable
   {ψ x0} {d : ℕ}

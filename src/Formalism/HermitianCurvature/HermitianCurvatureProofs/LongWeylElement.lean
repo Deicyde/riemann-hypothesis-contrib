@@ -296,10 +296,6 @@ theorem t_bigcellrec : BigCellRec := by
               | (exfalso; omega)
               | (simp only [mul_one, mul_zero]; done)
               | (exact matrix_apply_congr_of_eq _ (by omega) (by omega))
-              | (
-                  congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                    <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
-                )
           · have hB' : ¬(j.val - 1 ≤ r' + k) := by omega
             simp only [hA, hA', hB, hB', dite_false]
             split_ifs <;> first
@@ -318,13 +314,7 @@ theorem t_bigcellrec : BigCellRec := by
                 )
       · rw [lev_mn k r' _ i j hmi hmj]
         simp only [bigCell, esI, Fin.ext_iff]
-        split_ifs <;> first
-          | rfl
-          | (exfalso; omega)
-          | (
-              congr 3 <;> (try dsimp only [Fin.val_mk, Fin.coe_natAdd] at *)
-                <;> first | omega | (ext; simp only [Fin.coe_natAdd, Fin.val_mk]; omega)
-            )
+        split_ifs <;> first | rfl | (exfalso; omega)
 
 end PartW
 

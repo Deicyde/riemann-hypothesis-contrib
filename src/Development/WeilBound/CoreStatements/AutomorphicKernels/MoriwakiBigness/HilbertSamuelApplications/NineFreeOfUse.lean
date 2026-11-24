@@ -459,8 +459,7 @@ theorem borel_word
               : ℝ) := by
   rintro hI ⟨II, hII⟩ Ψ _ _ _ N w hN
   refine ptsIntegral_word_eq _ ?_ rfl (fun l => ?_) w
-  · simp [Top.dimFl, GroundTheory.Heights₂.Heights.LowerBoundFree.dimFl,
-      GroundTheory.Heights₂.Heights.antisymDegree, Nat.choose_two_right]
+  · simp [Top.dimFl, GroundTheory.Heights₂.Heights.antisymDegree, Nat.choose_two_right]
   · exact _root_.GlobalTheory.CompanionTheory.Relay.flag_degree_polynomial_eval hI II hII Ψ N
       (fun τ i => l (τ, i))
       hN
@@ -839,7 +838,7 @@ theorem nineFree_of_use
     hZ,
     hD,
     trivial,
-    _root_.GlobalTheory.CompanionTheory.Ar.Giv.pushDown hI,
+    trivial,
     GlobalTheory.CompanionTheory.Ar.Giv.grassmannian_height_bound_of_systems hI hU hBig hRes
   ⟩
 

@@ -286,7 +286,7 @@ theorem all
     rw [norm_inv, norm_two hU, inv_one]
   have hu2 : IsUnit (2 : Osub σ) := ⟨
     unitO (a := 2) (norm_two hU) (by simp [map_ofNat]),
-    Subtype.ext (by show (2 : K) = _; first | rfl | push_cast)
+    Subtype.ext (by show (2 : K) = _; first | rfl)
   ⟩
   have hDn
       : ∀ a ∈ Set.range (fun u : (Osub σ)ˣ => (u : Osub σ)),

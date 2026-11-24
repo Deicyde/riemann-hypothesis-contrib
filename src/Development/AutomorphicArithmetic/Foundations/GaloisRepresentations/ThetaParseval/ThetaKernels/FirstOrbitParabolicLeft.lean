@@ -339,7 +339,6 @@ theorem emS_cM_k
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.uA_k,
       _root_.PositivityTheory.SiegelWeilFormula.Act.C5.aB_k, Matrix.one_apply, Matrix.sum_apply,
       L.inj.eq_iff, Ne.symm (_root_.PositivityTheory.SiegelWeilFormula.Act.C4.em_ne_k L _)]
-    <;> split_ifs
 end PositivityTheory.SiegelWeilFormula.Act.C6
 end
 end

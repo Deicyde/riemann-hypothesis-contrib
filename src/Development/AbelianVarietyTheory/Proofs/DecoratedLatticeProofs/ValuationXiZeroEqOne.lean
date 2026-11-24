@@ -223,7 +223,7 @@ theorem exists_modify
     obtain ⟨M, hM, h1, h2⟩ := ih
     obtain ⟨M', hM', h3, h4⟩ :=
       (_root_.GlobalTheory.FrameAt.frame_facts D k (p i) S n (β i)).2.2.2.2.1 M (Λ i) hM
-        (by first | exact hΛ i | exact (hΛ i).toIsLattice)
+        (by first | exact hΛ i)
     refine ⟨M', hM', fun i' hi' => ?_, fun v hv => (latV_eq_at h4 (hv i)).trans (h2 v hv)⟩
     by_cases e : i' = i
     · subst e; exact h3

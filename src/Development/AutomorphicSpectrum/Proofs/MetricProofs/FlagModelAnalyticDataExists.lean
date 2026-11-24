@@ -427,7 +427,7 @@ theorem entry
     : ∀ (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (t : ℝ),
       G.PosSemidef → (((t : ℝ) : ℂ) • (1 : Matrix (Fin N) (Fin N) ℂ) - G).PosSemidef
         → ∀ p q, ‖G p q‖ ≤ t := by
-  apply AnalyticReference.An.norm_entry_le <;> assumption
+  apply AnalyticReference.An.norm_entry_le
 
 theorem detpos
     : ∀ (k : ℕ) (M : Matrix (Fin k) (Fin k) ℂ) (a : ℝ),

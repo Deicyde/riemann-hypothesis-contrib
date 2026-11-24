@@ -166,15 +166,6 @@ def EstimatedPrimesExceedScale (D : D7) (L : SizeData₂ D) : Prop :=
 def MertensBound (_D : D7) : Prop :=
   ∀ y : ℝ, 1 ≤ y → ∑ p ∈ (Finset.range ⌈y⌉₊).filter Nat.Prime, Real.log p / p ≤ 2 * Real.log y
 
-open Classical in
-def OrdersSmallPrimeBound (D : D7) (L : SizeData₂ D) : Prop :=
-  ∑ p ∈ (Finset.range ⌈L.sc.X'' D.R.n⌉₊).filter (fun p => p.Prime ∧ p ≠ 2 ∧
-      (addOrderOf (Formalism.MainNotions.GlobalTheoryTheory.hOf D.R.e p) : ℝ) < L.sc.x ^ (L.sc.eps / 4)), Real.log p / p
-    ≤ L.sc.x ^ (- hG L.sc + L.sc.eps)
-
-def GlobalOrderEstimate (D : D7) (C₄ : ℝ) : Prop :=
-  Formalism.MainNotions.UnusedSlot33.Conclusion4 D C₄
-
 def FrobeniusClassCompatibility (D : D7) : Prop :=
   ∀ p : ℕ,
     p.Prime → IsResidueClassZero D p
@@ -311,9 +302,6 @@ def FamilyOrbitPositionsAndSizeBounds : Prop :=
 def FamilyLargeScale : Prop :=
   ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, LargeScaleConditions (Fm.D x i) (Fm.L x i)
 
-def FamilyOrdersSmallPrimeBoundConstant : Prop :=
-  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, OrdersSmallPrimeBound (Fm.D x i) (Fm.L x i)
-
 def FamilyOrdersLargePrimeBoundConstant : Prop :=
   ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, OrdersLargePrimeBound (Fm.D x i) (Fm.L x i) Fm.GK
 
@@ -324,9 +312,6 @@ def FamilyInertPrimesLarge : Prop :=
   ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, EstimatedPrimesExceedScale (Fm.D x i) (Fm.L x i)
 
 def FamilyMertensBound : Prop := ∀ x (i : Fm.Ix x), MertensBound (Fm.D x i)
-
-def FamilyGlobalOrderEstimate (C₄ : ℝ) : Prop :=
-  ∀ x (i : Fm.Ix x), GlobalOrderEstimate (Fm.D x i) C₄
 
 def FamilyCutSizes : Prop :=
   ∃ C x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, CutSizes (Fm.D x i) (Fm.L x i) (Fm.Gx x i) Fm.GK C
@@ -339,9 +324,6 @@ def FamilyWeightSumBound : Prop :=
 def FamilyWeightSum : Prop := FamilyMertensBound Fm → FamilyCutSizes Fm → FamilyWeightSumBound Fm
 
 def FamilyLargeScaleOfInertPrimesLarge : Prop := FamilyInertPrimesLarge Fm → FamilyLargeScale Fm
-
-def FamilyOrdersSmallPrimeBound (C₄ : ℝ) : Prop :=
-  FamilyGlobalOrderEstimate Fm C₄ → FamilyOrdersSmallPrimeBoundConstant Fm
 
 def FamilyOrdersLargePrimeBound : Prop :=
   FamilyOrbitPositionsAndSizeBounds Fm → FamilyWindowLogBound Fm

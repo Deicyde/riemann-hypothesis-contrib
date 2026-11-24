@@ -689,9 +689,7 @@ theorem pivot_w
     {n : Type} [Fintype n] [DecidableEq n] [Nonempty n]
     (G : Matrix n n E) (hG : G.IsHermitian) (hGi : Intg G) (hGd : ‖G.det‖ = 1)
     : ∃ i, ∃ w : n → E, (∀ a, ‖w a‖ ≤ 1) ∧ w i = 1 ∧ ‖star w ⬝ᵥ (G *ᵥ w)‖ = 1 := by
-  first
-  | (apply _root_.GlobalTheory.UnitValueExistence.main <;> assumption)
-  | (intros; exact _root_.GlobalTheory.UnitValueExistence.main ..)
+  first | (apply _root_.GlobalTheory.UnitValueExistence.main <;> assumption)
 
 end Piv
 

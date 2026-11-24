@@ -932,7 +932,7 @@ theorem _root_.GlobalTheory.T.unramifiedHeight_lattice_index_identity
                     → (∀ v, v ∈ large₂ ↔ (g⁻¹).1.mulVec v ∈ L)
                     → (((Lm ⊓ large₂).relIndex (Lm ⊓ L) : ℕ) : ℝ) ^ 2 * H (m * g)
                       = (resCard k : ℝ) ^ s.card * H m := by
-  apply _root_.GlobalTheory.HeckeLatIndex.index_identity <;> assumption
+  apply _root_.GlobalTheory.HeckeLatIndex.index_identity
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnramifiedHeightLatticeIndexIdentityStatement =====

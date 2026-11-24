@@ -90,7 +90,7 @@ theorem herm_comb
     {E : Type} [Field E] [NumberField E] [IsCMField E]
     {r ρ : ℕ} {X : Data E r} (cu : CuspFD X ρ) (η : Fin ρ → E)
     : herm X.Gm (∑ a, η a • cu.e a) (∑ a, η a • cu.e a) = 0 := by
-  apply GlobalTheory.CuspFlow.herm_comb_eq_zero <;> assumption
+  apply GlobalTheory.CuspFlow.herm_comb_eq_zero
 
 theorem coefFn_eq_zero_of_killed
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r),

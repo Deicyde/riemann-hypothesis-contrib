@@ -619,9 +619,7 @@ theorem exists_finite_of_isFinSub
                 → ∀ x ∈ F V, ∃ c : Γ(S', h ⁻¹ᵁ V),
                   (gp'.appLE (h ⁻¹ᵁ V) (gp ⁻¹ᵁ V) (le_preimage_of_comp_eq gp gp' h hgp V)).hom c
                     = x := by
-  first
-  | exact @_root_.GlobalTheory.RelativeSpectrum.exists_finite_cover
-  | (intros; exact _root_.GlobalTheory.RelativeSpectrum.exists_finite_cover ..)
+  first | exact @_root_.GlobalTheory.RelativeSpectrum.exists_finite_cover
 
 end
 
@@ -1066,9 +1064,7 @@ theorem finFam_finite
               (∀ y ∈ s, y ∈ finFam gp V t W)
                 ∧ ∀ x ∈ finFam gp V t W, ∃ c : Γ(Sp K, gp ⁻¹ᵁ W) → Γ(S, W),
                   x = ∑ y ∈ s, (gp.app W).hom (c y) * y := by
-  first
-  | exact @_root_.GlobalTheory.FinitePowerAnnihilation.finFam_finite
-  | (intros; exact _root_.GlobalTheory.FinitePowerAnnihilation.finFam_finite ..)
+  first | exact @_root_.GlobalTheory.FinitePowerAnnihilation.finFam_finite
 
 end GlobalTheory.Mum
 end -- clump:auto

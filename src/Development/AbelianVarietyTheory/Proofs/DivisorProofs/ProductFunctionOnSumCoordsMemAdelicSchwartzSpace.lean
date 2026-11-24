@@ -113,7 +113,7 @@ theorem exists_schwartz_box
     {κ κ' : Type} [Fintype κ] [Fintype κ']
     (f₁ : SchwartzMap (κ → V) ℂ) (f₂ : SchwartzMap (κ' → V) ℂ)
     : ∃ f : SchwartzMap (κ ⊕ κ' → V) ℂ, ∀ x, f x = f₁ (x ∘ Sum.inl) * f₂ (x ∘ Sum.inr) := by
-  apply GlobalTheory.CompanionTheory.ThetaBox.exists_schwartz_box <;> assumption
+  apply GlobalTheory.CompanionTheory.ThetaBox.exists_schwartz_box
 
 theorem sb_box
     {X : Type} [TopologicalSpace X]
