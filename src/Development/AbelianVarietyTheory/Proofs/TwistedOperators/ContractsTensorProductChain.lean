@@ -66,14 +66,9 @@ theorem exists_piTensor_succ_equiv_map (m : ℕ) (F : Fin (m + 1) → Type) [∀
 private theorem factor_dual_lemma {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
     (p : X →ₗ[ℂ] Y) (hp : Function.Surjective p) (l : Module.Dual ℂ X) (hl : ∀ x, p x = 0 → l x = 0) :
     ∃ l' : Module.Dual ℂ Y, ∀ x, l x = l' (p x) := by
-  obtain ⟨s, hs⟩ := p.exists_rightInverse_of_surjective (LinearMap.range_eq_top.2 hp)
-  refine ⟨l ∘ₗ s, fun x => ?_⟩
-  have hps : p (s (p x)) = p x := by rw [← LinearMap.comp_apply p s, hs, LinearMap.id_apply]
-  have h0 : p (x - s (p x)) = 0 := by rw [map_sub, hps, sub_self]
-  have h1 := hl _ h0
-  rw [map_sub, sub_eq_zero] at h1
-  rw [LinearMap.comp_apply]
-  exact h1
+  obtain ⟨l', hl'⟩ := (p.range_dualMap_eq_dualAnnihilator_ker_of_surjective hp).ge
+    ((Submodule.mem_dualAnnihilator l).2 fun x hx => hl x (LinearMap.mem_ker.1 hx))
+  exact ⟨l', fun x => (LinearMap.congr_fun hl' x).symm⟩
 
 private theorem lTensor_ker_lemma_2 {Q N P : Type} [AddCommGroup Q] [Module ℂ Q] [AddCommGroup N] [Module ℂ N]
     [AddCommGroup P] [Module ℂ P] (g : N →ₗ[ℂ] P) (hg : Function.Surjective g)
