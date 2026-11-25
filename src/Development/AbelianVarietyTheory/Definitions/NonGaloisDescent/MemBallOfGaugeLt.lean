@@ -375,16 +375,8 @@ theorem _root_.GlobalTheory.BSP.IsDiscMap.unique {f : A →+* A'}
       _root_.GlobalTheory.BSP.ofPre l u ρ (algebraMap A _ (l : A))) = 1
     rw [← map_mul, mul_comm, IsLocalization.Away.mul_invSelf, map_one, map_one]
   have hinvEq : F (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) =
-      G (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) := by
-    calc _ = F (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) *
-          (_root_.GlobalTheory.BSP.toDisc l u' ρ' (l : A') *
-            G (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A)))) := by
-          rw [mul_comm (_root_.GlobalTheory.BSP.toDisc l u' ρ' (l : A')), hinv G hG, mul_one]
-      _ = (F (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) *
-          _root_.GlobalTheory.BSP.toDisc l u' ρ' (l : A')) *
-            G (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) := by
-          rw [mul_assoc]
-      _ = _ := by rw [hinv F hF, one_mul]
+      G (_root_.GlobalTheory.BSP.ofPre l u ρ (IsLocalization.Away.invSelf (l : A))) :=
+    left_inv_eq_right_inv (hinv F hF) ((mul_comm _ _).trans (hinv G hG))
   have hpre : ∀ y, F (_root_.GlobalTheory.BSP.ofPre l u ρ y) =
       G (_root_.GlobalTheory.BSP.ofPre l u ρ y) := by
     intro y
