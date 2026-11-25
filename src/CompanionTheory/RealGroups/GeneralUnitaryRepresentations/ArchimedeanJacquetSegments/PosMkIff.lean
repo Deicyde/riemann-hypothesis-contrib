@@ -305,17 +305,9 @@ theorem lim_form {I : Type} (ι : I → I) (T : ℝ → I → Module.End ℂ W)
   obtain ⟨M, hM, φ, hφ, hlim0⟩ := (isCompact_sphere (0 : Fin (finrank ℂ W) → Fin (finrank ℂ W) → ℂ) 1).tendsto_subseq
     hmem
   have hMn : ‖M‖ = 1 := mem_sphere_zero_iff_norm.1 hM
-  have hcoord : ∀ i j, Tendsto (fun k => gram (B (φ k)) i j) atTop (𝓝 (M i j)) := by
-    intro i j
-    have h0 : Tendsto (fun k => ‖gram (B (φ k)) - M‖) atTop (𝓝 0) := tendsto_iff_norm_sub_tendsto_zero.1 hlim0
-    rw [tendsto_iff_norm_sub_tendsto_zero]
-    refine squeeze_zero (fun _ => norm_nonneg _) (fun k => ?_) h0
-    have h1 := norm_le_pi_norm ((gram (B (φ k)) - M) i) j
-    have h2 := norm_le_pi_norm (gram (B (φ k)) - M) i
-    simp only [Pi.sub_apply] at h1 h2
-    exact h1.trans h2
-  have hlim : Tendsto (fun k => gram (B (φ k))) atTop (𝓝 M) :=
-    tendsto_pi_nhds.2 fun i => tendsto_pi_nhds.2 fun j => hcoord i j
+  have hlim : Tendsto (fun k => gram (B (φ k))) atTop (𝓝 M) := hlim0
+  have hcoord : ∀ i j, Tendsto (fun k => gram (B (φ k)) i j) atTop (𝓝 (M i j)) := fun i j =>
+    tendsto_pi_nhds.1 (tendsto_pi_nhds.1 hlim i) j
   have hcT : ∀ i v, Continuous fun t => ef W (T t i v) := fun i v => by
     refine continuous_pi fun j => ?_
     have h := hc i v ((Module.finBasis ℂ W).coord j)
