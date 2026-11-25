@@ -71,23 +71,9 @@ theorem noVar_of_pderiv_eq_zero {P : MvPolynomial σ ℂ} {v : σ} (h : pderiv v
   intro e he
   by_contra hev
   have hc : AddMonoidAlgebra.coeff (pderiv v P) (e - Finsupp.single v 1) = AddMonoidAlgebra.coeff P e * (e v : ℂ) := by
-    conv_lhs => rw [P.as_sum]
-
-    rw [map_sum, coeff_sum]
-    simp only [pderiv_monomial, coeff_monomial]
-    rw [Finset.sum_eq_single e]
-    · rw [ite_eq_left rfl]
-    · intro b _ hbe
-      by_cases hbv : b v = 0
-      · simp [hbv]
-      · rw [ite_eq_right]
-        intro hb
-        apply hbe
-        have h1 : Finsupp.single v 1 ≤ b := Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hbv)
-        have h2 : Finsupp.single v 1 ≤ e := Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hev)
-        rw [← tsub_add_cancel_of_le h1, ← tsub_add_cancel_of_le h2, hb]
-    · intro h'
-      exact absurd he h'
+    rw [coeff_pderiv, tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hev)),
+      Finsupp.tsub_apply, Finsupp.single_eq_same, Nat.cast_sub (Nat.one_le_iff_ne_zero.mpr hev),
+      Nat.cast_one, sub_add_cancel]
   simp only [h, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply] at hc
   exact mul_ne_zero (mem_support_iff.mp he) (Nat.cast_ne_zero.mpr hev) hc.symm
 
