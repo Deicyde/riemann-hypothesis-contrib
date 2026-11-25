@@ -184,13 +184,8 @@ theorem exists_frame {c : Coeff l} {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) {r 
       simp at this
       linarith
   let ψ : D.La →ₗ[𝓞 E] (Fin r → E) := X.Λ.subtype ∘ₗ φ.toLinearMap
-  have hψ : Set.range ψ = (X.Λ : Set (Fin r → E)) := by
-    ext y
-    constructor
-    · rintro ⟨a, rfl⟩
-      exact (φ a).2
-    · intro hy
-      exact ⟨φ.symm ⟨y, hy⟩, by simp [ψ]⟩
+  have hψ : Set.range ψ = (X.Λ : Set (Fin r → E)) :=
+    (φ.surjective.range_comp _).trans Subtype.range_coe
   obtain ⟨x, hx, hPx⟩ := GlobalTheory.exists_frame_of_isPeriod E H D r (-X.ξ0) X.Gm ψ X.Ψ hty g idx _
     (by rw [hq]; exact hi) hξ hpos
     ⟨fun a b hab => φ.injective (Subtype.ext hab), by rw [hψ]; exact X.Λ_span, X.Gm_herm, X.Gm_det, hEF⟩
