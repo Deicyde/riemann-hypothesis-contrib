@@ -131,17 +131,8 @@ private theorem exists_linearEquiv_diagonal_chars_of_eigenbasis {G : Type} [Grou
     exact_mod_cast hφ
   let π : Fin m ≃ Fin n := Equiv.ofFiberEquiv (f := ψ) (g := χ') fun φ => Fintype.equivOfCardEq (hcount φ)
   have hπ : ∀ j, χ' (π j) = ψ j := fun j => Equiv.ofFiberEquiv_map _ j
-  have hcoord : ∀ g v k, b.repr (T g v) k = c k g * b.repr v k := by
-    intro g v k
-    have := b.ext (f₁ := (Finsupp.lapply k).comp (b.repr.toLinearMap.comp (T g)))
-      (f₂ := c k g • (Finsupp.lapply k).comp b.repr.toLinearMap) (by
-        intro j
-        simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, hT, map_smul, b.repr_self,
-          Finsupp.lapply_apply, LinearMap.smul_apply, Finsupp.single_apply, smul_eq_mul]
-        by_cases h : j = k
-        · subst h; simp
-        · simp [h])
-    simpa using LinearMap.congr_fun this v
+  have hcoord : ∀ g v k, b.repr (T g v) k = c k g * b.repr v k := fun g v k => by
+    rw [← LinearMap.toMatrix_mulVec_repr b b, hdiag, Matrix.mulVec_diagonal]
   refine ⟨b.equivFun.trans (LinearEquiv.funCongrLeft ℂ ℂ π.symm), fun g v => ?_⟩
   ext i
   simp only [LinearEquiv.trans_apply, LinearEquiv.funCongrLeft_apply, LinearMap.funLeft_apply,
