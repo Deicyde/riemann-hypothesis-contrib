@@ -224,10 +224,7 @@ theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationS
   have hroot : ∀ n : ℕ, ∃ r : Ωˣ, (r : Ω) ^ n.factorial = p := by
     intro n
     obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (p : Ω) n.factorial_pos
-    have hz0 : z ≠ 0 := by
-      rintro rfl
-      rw [zero_pow n.factorial_ne_zero] at hz
-      exact hp0 (by exact_mod_cast hz.symm)
+    have hz0 : z ≠ 0 := ne_zero_pow n.factorial_ne_zero (by rw [hz]; exact_mod_cast hp0)
     exact ⟨Units.mk0 z hz0, hz⟩
   choose r hr using hroot
   have hvr : ∀ n, A.valuation (p : Ω) = A.valuation (r n : Ω) ^ (n.factorial : ℤ) := fun n => by
