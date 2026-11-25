@@ -145,11 +145,8 @@ theorem exists_hom_ker {A : Type} [CommRing A] [Countable A] (P : Ideal A) [P.Is
   let F := FractionRing B
   have hinj : Function.Injective (algebraMap B F) := IsFractionRing.injective B F
   have hB : Countable B := Quotient.countable
-  have hF : Countable F := by
-    refine Function.Surjective.countable (f := fun q : B × B => algebraMap B F q.1 / algebraMap B F q.2) ?_
-    intro x
-    obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := B) x
-    exact ⟨(a, b), rfl⟩
+  have hF : Countable F :=
+    Cardinal.mk_le_aleph0_iff.1 ((Cardinal.mk_fractionRing B).trans_le Cardinal.mk_le_aleph0)
   have hc : CharZero F := by
     obtain ⟨q, hq⟩ := CharP.exists F
     rcases CharP.char_is_prime_or_zero F q with h | h
