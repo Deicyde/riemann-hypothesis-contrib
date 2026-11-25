@@ -96,12 +96,8 @@ theorem blockRat_apply (b : Module.Basis ι F E) (g : Matrix n n E) (i j : n × 
     blockRat b g i j = Algebra.leftMulMatrix b (g i.1 j.1) i.2 j.2 := rfl
 
 theorem blockRat_injective (b : Module.Basis ι F E) :
-    Function.Injective (blockRat (n := n) b) := by
-  intro g h e
-  ext i j
-  apply Algebra.leftMulMatrix_injective b
-  ext k l
-  exact congrFun (congrFun e (i, k)) (j, l)
+    Function.Injective (blockRat (n := n) b) :=
+  (Matrix.compRingEquiv n ι F).injective.comp (Matrix.map_injective (Algebra.leftMulMatrix_injective b))
 
 theorem blockRep_map (b : Module.Basis ι F E) (R : Type) [CommRing R] [Algebra F R]
     (g : Matrix n n E) :
