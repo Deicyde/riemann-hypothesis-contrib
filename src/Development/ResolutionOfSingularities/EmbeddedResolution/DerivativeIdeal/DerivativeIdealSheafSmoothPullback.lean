@@ -35,21 +35,9 @@ theorem sectionsAlgebraMap_appLE_apply (k : Type u) [CommRing k] {X Y : Scheme.{
 private theorem exists_pow_mul_mem_of_mem_map {R S : Type*} [CommRing R] [CommRing S]
     [Algebra R S] (f : R) [IsLocalization.Away f S] (N : Ideal R) (x : R)
     (hx : algebraMap R S x ∈ N.map (algebraMap R S)) : ∃ n : ℕ, f ^ n * x ∈ N := by
-  obtain ⟨⟨a, t⟩, hmul⟩ :=
-    (IsLocalization.mem_map_algebraMap_iff (M := Submonoid.powers f) (S := S)).mp hx
-  have hmul' : algebraMap R S (x * (t : R)) = algebraMap R S (a : R) := by
-    rw [map_mul]
-    exact hmul
-  obtain ⟨c, hceq⟩ :=
-    (IsLocalization.eq_iff_exists (M := Submonoid.powers f) (S := S)).mp hmul'
-  obtain ⟨i, hi⟩ := t.2
-  obtain ⟨j, hj⟩ := c.2
-  have hi' : f ^ i = (t : R) := hi
-  have hj' : f ^ j = (c : R) := hj
-  refine ⟨i + j, ?_⟩
-  have key : f ^ (i + j) * x = f ^ j * (x * f ^ i) := by ring
-  rw [key, hi', hj', hceq]
-  exact N.mul_mem_left _ a.2
+  obtain ⟨_, ⟨n, rfl⟩, h⟩ :=
+    (IsLocalization.algebraMap_mem_map_algebraMap_iff (Submonoid.powers f) S N x).mp hx
+  exact ⟨n, h⟩
 
 private theorem idealSheafData_ideal_le_congr {Y : Scheme.{u}} (J₁ J₂ : Y.IdealSheafData)
     {A B : Y.affineOpens} (hAB : A = B) (h : J₁.ideal B ≤ J₂.ideal B) :
