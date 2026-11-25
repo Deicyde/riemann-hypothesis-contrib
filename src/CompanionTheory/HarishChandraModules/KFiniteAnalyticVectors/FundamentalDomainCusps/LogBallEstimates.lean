@@ -304,23 +304,18 @@ theorem covolume_orthogonal_complement : Transp → CovPerp := by
         simp only [hf, star_smul, smul_dotProduct, vecAt]
         simp [co]
       have hqX : ∀ x ∈ X, ⟪q - z, x⟫_ℝ = 0 := fun x hx => by
-        induction hx using Submodule.span_induction with
-        | mem x hx => obtain ⟨u, hu, rfl⟩ := hx; rw [inner_sub_left, hq ⟨u, hu⟩, sub_self]
-        | zero => simp
-        | add _ _ _ _ h1 h2 => rw [inner_add_right, h1, h2, add_zero]
-        | smul a _ _ h1 => rw [inner_smul_right, h1, mul_zero]
+        refine LinearMap.mem_ker.1 (Submodule.span_le.2 ?_ hx : x ∈ LinearMap.ker (innerₛₗ ℝ (q - z)))
+        rintro _ ⟨u, hu, rfl⟩
+        rw [SetLike.mem_coe, LinearMap.mem_ker, innerₛₗ_apply_apply, inner_sub_left, hq ⟨u, hu⟩, sub_self]
       have hu₀W : (c : I.E) • u₀ ∉ W := fun hW => hz0 (by
         have hW' : u₀ ∈ W := (W.smul_mem_iff (s := (c : I.E)) (by exact_mod_cast hc0.ne')).1 hW
         have h1 : ∀ x ∈ X, ⟪(z : VR I), x⟫_ℝ = 0 := fun x hx => by
-          induction hx using Submodule.span_induction with
-          | mem x hx =>
-            obtain ⟨u, hu, rfl⟩ := hx
-            have h2 := hgc u
-            rw [← hu₀f, show hf I.J u₀ _ = 0 from hu u₀ hW', map_zero] at h2
-            rw [← hgF ⟨u, hu⟩, show g u = 0 by exact_mod_cast h2, Int.cast_zero]
-          | zero => simp
-          | add _ _ _ _ h1 h2 => rw [inner_add_right, h1, h2, add_zero]
-          | smul a _ _ h1 => rw [inner_smul_right, h1, mul_zero]
+          refine LinearMap.mem_ker.1 (Submodule.span_le.2 ?_ hx : x ∈ LinearMap.ker (innerₛₗ ℝ (z : VR I)))
+          rintro _ ⟨u, hu, rfl⟩
+          have h2 := hgc u
+          rw [← hu₀f, show hf I.J u₀ _ = 0 from hu u₀ hW', map_zero] at h2
+          rw [SetLike.mem_coe, LinearMap.mem_ker, innerₛₗ_apply_apply, ← hgF ⟨u, hu⟩,
+            show g u = 0 by exact_mod_cast h2, Int.cast_zero]
         exact Subtype.ext (inner_self_eq_zero.1 (h1 _ z.2)))
 
       let zJ : InfinitePlace I.F → Fin I.n → ℂ := fun v => Formalism.REAL.Jm (I.ε v) *ᵥ fun i => (z : VR I) (v, i)
