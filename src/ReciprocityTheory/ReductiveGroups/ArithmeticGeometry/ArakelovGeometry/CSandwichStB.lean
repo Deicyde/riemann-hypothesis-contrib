@@ -175,11 +175,8 @@ theorem psd_sub_of_quad_le {r : ℕ} {P Q : Matrix (Fin r) (Fin r) ℂ} (hP : P.
 
 open Matrix in
 theorem isHermitian_sq_smul {r : ℕ} {G : Matrix (Fin r) (Fin r) ℂ} (hG : G.IsHermitian) (A : ℝ) :
-    (((A : ℂ) ^ 2) • G).IsHermitian := by
-  unfold Matrix.IsHermitian
-  rw [Matrix.conjTranspose_smul, hG.eq]
-  congr 1
-  simp [← Complex.ofReal_pow, Complex.conj_ofReal]
+    (((A : ℂ) ^ 2) • G).IsHermitian :=
+  hG.smul (IsSelfAdjoint.pow (Complex.conj_ofReal A) 2)
 
 open Matrix in
 theorem quad_conj {r s : ℕ} (M : Matrix (Fin s) (Fin r) ℂ) (G : Matrix (Fin s) (Fin s) ℂ)
