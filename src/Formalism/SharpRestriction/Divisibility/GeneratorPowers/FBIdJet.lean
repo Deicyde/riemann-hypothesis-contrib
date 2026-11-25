@@ -146,22 +146,12 @@ theorem psTrunc_mem_orig {τ : Type} [Fintype τ] [DecidableEq τ] (m : ℕ) (g 
   · subst he
     first
     | simp [hg]
-  · obtain ⟨i, hi⟩ : ∃ i, e i ≠ 0 := by
-      by_contra! h
-      exact he (Finsupp.ext fun j => by simp [h j])
+  · obtain ⟨i, hi⟩ := Finsupp.ne_iff.1 he
     have key : MvPolynomial.monomial e (MvPowerSeries.coeff e g) =
         MvPolynomial.monomial (e - Finsupp.single i 1) (MvPowerSeries.coeff e g) *
           MvPolynomial.X i := by
-      have hs : e - Finsupp.single i 1 + Finsupp.single i 1 = e := by
-        ext j
-        by_cases h : j = i
-        · subst h
-          first
-          | (simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply,
-              Finsupp.single_eq_same]; omega)
-        · first
-          | (simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply,
-              Finsupp.single_eq_of_ne h]; omega)
+      have hs : e - Finsupp.single i 1 + Finsupp.single i 1 = e :=
+        tsub_add_cancel_of_le (Finsupp.single_le_iff.2 (Nat.one_le_iff_ne_zero.2 hi))
       rw [MvPolynomial.X, MvPolynomial.monomial_mul, mul_one, hs]
     rw [key]
     refine Ideal.mul_mem_left _ _ ?_
