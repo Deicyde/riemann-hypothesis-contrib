@@ -40,24 +40,11 @@ theorem sum_eSer (k : Fin 2) :
     ∑ c : Fin D.R.r → ZMod (D.host.g k), D.ntypes.eSer k (Formalism.CyclotomicNorms.monicOf c) = 1 := by
   classical
   obtain ⟨S, hS, hsum⟩ := D.ntypes.eSer_sum k
-  have hcoeff : ∀ (c : Fin D.R.r → ZMod (D.host.g k)) (i : Fin D.R.r),
-      (Formalism.CyclotomicNorms.monicOf c).coeff (i : ℕ) = c i := by
-    intro c i
-    unfold Formalism.CyclotomicNorms.monicOf
-    rw [Polynomial.coeff_add, Polynomial.coeff_X_pow, ite_eq_right i.isLt.ne, zero_add,
-      Polynomial.finsetSum_coeff]
-    simp only [Polynomial.coeff_C_mul_X_pow]
-    rw [Finset.sum_eq_single i]
-    · simp
-    · intro j _ hj
-      rw [ite_eq_right]
-      exact fun h => hj (Fin.ext h).symm
-    · simp
   have hinj : Function.Injective (fun c : Fin D.R.r → ZMod (D.host.g k) => Formalism.CyclotomicNorms.monicOf c) := by
     intro c c' h
     funext i
     have := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p (i : ℕ)) h
-    simpa [hcoeff] using this
+    simpa [Formalism.CyclotomicNorms.Sqf.coeff_monicOf_lt] using this
   have hsurj : ∀ f ∈ S, f = Formalism.CyclotomicNorms.monicOf (fun i : Fin D.R.r => f.coeff (i : ℕ)) := by
     intro f hf
     obtain ⟨hm, hdeg, -⟩ := (hS f).1 hf
