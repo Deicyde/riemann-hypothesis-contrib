@@ -140,17 +140,8 @@ theorem dt_kappa (κ : GA E k) (hκ : jumpWindows.cInf κ = 1)
   rw [ex]
   set x : v.adicCompletion E := ((d : 𝒪[v.adicCompletion E]) : v.adicCompletion E) with hx
   have hx0 : x ≠ 0 := fun h => d.ne_zero (Subtype.ext h)
-  have hv1 : Valued.v x ≤ 1 := GroundTheory.BlockD.SatakeBound.valued_le_one_of_mem (w := v) (d : 𝒪[v.adicCompletion E]).2
-  have hxy : x * ((d⁻¹ : (𝒪[v.adicCompletion E])ˣ) : v.adicCompletion E) = 1 := by
-    rw [hx, ← Subring.coe_mul, Units.mul_inv]; rfl
-  have hv2 : Valued.v ((d⁻¹ : (𝒪[v.adicCompletion E])ˣ) : v.adicCompletion E) ≤ 1 :=
-    GroundTheory.BlockD.SatakeBound.valued_le_one_of_mem (w := v) ((d⁻¹ : (𝒪[v.adicCompletion E])ˣ) : 𝒪[v.adicCompletion E]).2
-  have hv : Valued.v x = 1 := by
-    refine le_antisymm hv1 ?_
-    calc (1 : WithZero (Multiplicative ℤ)) = Valued.v x * Valued.v ((d⁻¹ : (𝒪[v.adicCompletion E])ˣ) : v.adicCompletion E) := by
-          rw [← map_mul, hxy, map_one]
-      _ ≤ Valued.v x * 1 := by gcongr
-      _ = Valued.v x := mul_one _
+  have hv : Valued.v x = 1 := Valuation.Integers.one_of_isUnit' d.isUnit fun y =>
+    GroundTheory.BlockD.SatakeBound.valued_le_one_of_mem (w := v) y.2
   rw [← GroundTheory.Global.normalizedAbv_apply, GroundTheory.Global.normalizedAbv_eq_zpow v hx0, hv, WithZero.log_one, zpow_zero]
 
 end BaseRankDimension
