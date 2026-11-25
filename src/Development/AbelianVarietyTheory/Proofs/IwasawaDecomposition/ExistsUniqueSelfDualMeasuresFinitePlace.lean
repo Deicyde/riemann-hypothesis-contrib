@@ -114,13 +114,8 @@ theorem existsUnique_selfDual (B : V → V → ℂ)
         hcl.continuous_indicator continuous_const
       have hχs : HasCompactSupport ((M k : Set V).indicator (fun _ => (1 : ℂ))) :=
         HasCompactSupport.intro (hMc k) fun x hx => by simp [hx]
-      have hlc : IsLocallyConstant ((M k : Set V).indicator (fun _ => (1 : ℂ))) := by
-        refine (IsLocallyConstant.iff_eventually_eq _).mpr fun x => ?_
-        by_cases hx : x ∈ (M k : Set V)
-        · filter_upwards [hcl.isOpen.mem_nhds hx] with y hy
-          rw [Set.indicator_of_mem hy, Set.indicator_of_mem hx]
-        · filter_upwards [hcl.isClosed.isOpen_compl.mem_nhds hx] with y hy
-          rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
+      have hlc : IsLocallyConstant ((M k : Set V).indicator (fun _ => (1 : ℂ))) :=
+        ((LocallyConstant.const V (1 : ℂ)).indicator hcl).isLocallyConstant
       have e1 := hinv _ ⟨hlc, hχs⟩ 0
       rw [GlobalTheory.JR.AbsInv.fourB_fourB μ B hB hs ha (M k) (N k) (hMo k) (hNo k) (hNc k) (hN k) (hM k) _ hχc hχs
         (fun x m hm => ?_)] at e1
