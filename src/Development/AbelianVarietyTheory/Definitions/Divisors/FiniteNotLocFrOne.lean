@@ -311,9 +311,8 @@ theorem denseIn_of_initial {K : Type} [Field K] [NumberField K] (w : HeightOneSp
     by_cases h0 : algebraMap T.V T.Fr h = 0
     · simp [h0, vV]
     · have := (WithZero.log_le_log (valV_ne_zero h0) one_ne_zero).2 (GlobalTheory.PlaceCompletion.valV_algebraMap_le_one h)
-      simp only [vV]
       rw [WithZero.log_one] at this
-      omega
+      exact neg_nonneg.2 this
   rw [e1, Nat.cast_one, one_mul] at e3
   obtain ⟨h', e5⟩ := Formalism.L2.PjFree.mem_range_of_vV_nonneg (e3 ▸ e4)
   refine ⟨k, h', ?_⟩
