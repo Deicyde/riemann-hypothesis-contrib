@@ -494,7 +494,7 @@ include h2S in
 theorem gsTateCompactCohomology_zmodRep_two_eq_zero {r : ℕ} (hr : 4 ≤ r)
     (x : gsTateCompactCohomology S ιr ιs (zmodRep.{0} (galUnramifiedOutside K.1 ℚ̄ S) 2) r) : x = 0 := by
   obtain ⟨e⟩ := nonempty_rootsOfUnity_two_iso_zmodRep S h2S
-  exact eq_zero_tateCompactCohomologyRes_of_retract (gsFinFamily S ιs) (gsRealFamily S ιr) e.inv e.hom
+  exact eq_zero_tateCompactCohomologyRes_of_retract _ _ e.inv e.hom
     e.inv_hom_id r (gsTateCompactCohomology_rootsOfUnity_two_eq_zero S ιr ιs h2S hr) x
 
 instance isDiscreteRep_res_zmodRep_two_fin (v : S) :
