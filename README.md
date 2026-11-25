@@ -8,7 +8,7 @@ The purpose of this repo is to create an artifact that is:
 
 - **accessible**: we want to improve build performance and modularity to enable researchers to feasibly engage with the proof even without access to massive amounts of compute.
 - **readable**: we want to improve code quality while preserving the "logic" of the proof, aspirationally to Mathlib levels. This includes lemma organization, formatting and idiomatic style, eliminating linter warnings, slop-free documentation, and more.
-- **integrated with the community**: we would like to add bibliographic references to prior work where appropriate, checked against the source by someone who has read it, and rely on existing formalization projects when possible.
+- **integrated with the community**: we would like to add bibliographic references to prior work where appropriate and checked by a human, and rely on existing formalization projects when possible.
 
 Please note: we are **not** looking for:
 
