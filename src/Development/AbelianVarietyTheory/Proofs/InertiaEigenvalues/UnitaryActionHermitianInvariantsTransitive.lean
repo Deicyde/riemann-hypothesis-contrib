@@ -174,13 +174,8 @@ theorem starU_mul (g : Matrix.unitaryGroup (Fin r) E) : star g.1 * g.1 = 1 := Ma
 theorem mul_starU (g : Matrix.unitaryGroup (Fin r) E) : g.1 * star g.1 = 1 := Matrix.mem_unitaryGroup_iff.1 g.2
 
 theorem unit_conj_pow (g : Matrix.unitaryGroup (Fin r) E) (A : Matrix (Fin r) (Fin r) E) (k : ℕ) :
-    (g.1 * A * star g.1) ^ k = g.1 * A ^ k * star g.1 := by
-  induction k with
-  | zero => simp [mul_starU g]
-  | succ k ih =>
-    rw [pow_succ, ih, pow_succ]
-    simp only [mul_assoc]
-    rw [← mul_assoc (star g.1) g.1, starU_mul g, one_mul]
+    (g.1 * A * star g.1) ^ k = g.1 * A ^ k * star g.1 :=
+  Units.conj_pow (Unitary.toUnits g) A k
 
 theorem unit_form (g : Matrix.unitaryGroup (Fin r) E) (v w : Fin r → E) :
     star (g.1 *ᵥ v) ⬝ᵥ (g.1 *ᵥ w) = star v ⬝ᵥ w := by
