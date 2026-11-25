@@ -25,14 +25,9 @@ namespace GlobalTheory.CompanionTheory.SW.Fact
 
 theorem exists_test_set {α : Type} [MeasurableSpace α] (μ : Measure α) [SigmaFinite μ] (h : μ ≠ 0) :
     ∃ s, MeasurableSet s ∧ μ s ≠ 0 ∧ μ s ≠ ⊤ := by
-  by_contra hcon
-  push Not at hcon
-  apply h
-  apply Measure.measure_univ_eq_zero.mp
-  rw [← iUnion_spanningSets μ]
-  refine measure_iUnion_null fun i => ?_
-  by_contra h0
-  exact (measure_spanningSets_lt_top μ i).ne (hcon _ (measurableSet_spanningSets μ i) h0)
+  obtain ⟨s, hs, -, h0, ht⟩ :=
+    Measure.exists_subset_measure_lt_top MeasurableSet.univ (Measure.measure_univ_pos.2 h)
+  exact ⟨s, hs, h0.ne', ht.ne⟩
 
 theorem fib_facts {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
