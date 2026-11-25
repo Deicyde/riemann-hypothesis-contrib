@@ -66,11 +66,8 @@ theorem tens_mem_relD (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorMod
   have hφstd : ∀ᶠ v in Filter.cofinite, φ v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1 := by
     filter_upwards [hcof, hstd] with v h1 h2
     rw [h1, h2]
-  have hupd : ∀ φ₀ ∈ SB (Fin n × Fin d → Fv F v₁), ∀ w, Function.update φ v₁ φ₀ w ∈ SB _ := by
-    intro φ₀ hφ₀ w
-    by_cases hw : w = v₁
-    · subst hw; rw [Function.update_self]; exact hφ₀
-    · rw [Function.update_of_ne hw]; exact hSB w
+  have hupd : ∀ φ₀ ∈ SB (Fin n × Fin d → Fv F v₁), ∀ w, Function.update φ v₁ φ₀ w ∈ SB _ := fun φ₀ hφ₀ =>
+    (Function.forall_update_iff φ fun w ψ => ψ ∈ SB (Fin n × Fin d → Fv F w)).2 ⟨hφ₀, fun w _ => hSB w⟩
   intro δ hδ
   induction hδ using Submodule.span_induction with
   | mem z hz =>
@@ -110,11 +107,8 @@ theorem exists_So (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.
     have hφoSB : φo ∈ SB _ := hφo.1
     have hδ : φ v₁ - φo ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.augAt om v₁ :=
       (hco _ (sub_mem (hSB v₁) hφoSB)).1 (by rw [map_sub, hp, sub_self])
-    have hupd : ∀ w, Function.update φ v₁ φo w ∈ SB _ := by
-      intro w
-      by_cases hw : w = v₁
-      · subst hw; rw [Function.update_self]; exact hφoSB
-      · rw [Function.update_of_ne hw]; exact hSB w
+    have hupd : ∀ w, Function.update φ v₁ φo w ∈ SB _ :=
+      (Function.forall_update_iff φ fun w ψ => ψ ∈ SB (Fin n × Fin d → Fv F w)).2 ⟨hφoSB, fun w _ => hSB w⟩
     have hcof' : ∀ᶠ w in Filter.cofinite, Function.update φ v₁ φo w = M.vac w := by
       filter_upwards [hcof, Filter.eventually_cofinite_ne v₁] with w h1 hne
       rw [Function.update_of_ne hne]; exact h1
