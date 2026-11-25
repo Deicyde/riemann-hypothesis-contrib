@@ -32,18 +32,11 @@ theorem span_secCoord_eq_top (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n �
 
 theorem eq_zero_of_secCoord_pow_mul (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R)
     (b : SecAlg Q y) (h : ∀ j, ∃ N : ℕ, secCoord Q y j ^ N * b = 0) : b = 0 := by
-  choose N hN using h
-  have htop := Ideal.span_pow_eq_top _ (span_secCoord_eq_top Q y) (∑ j, N j)
-  have hle : Ideal.span ((fun z => z ^ (∑ j, N j)) '' Set.range (secCoord Q y)) ≤
-      LinearMap.ker (LinearMap.mulRight (SecAlg Q y) b) := by
-    rw [Ideal.span_le]
-    rintro _ ⟨_, ⟨j, rfl⟩, rfl⟩
-    simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.mulRight_apply]
-    rw [← Nat.sub_add_cancel (Finset.single_le_sum (fun k _ => Nat.zero_le (N k)) (Finset.mem_univ j)),
-      pow_add, mul_assoc, hN j, mul_zero]
-  have h1 : (1 : SecAlg Q y) ∈ LinearMap.ker (LinearMap.mulRight (SecAlg Q y) b) :=
-    hle (by rw [htop]; exact Submodule.mem_top)
-  simpa using h1
+  refine (Submodule.mem_bot (SecAlg Q y)).1 (Submodule.mem_of_span_eq_top_of_smul_pow_mem ⊥ _
+    (span_secCoord_eq_top Q y) b ?_)
+  rintro ⟨_, j, rfl⟩
+  obtain ⟨N, hN⟩ := h j
+  exact ⟨N, by rw [smul_eq_mul, hN]; exact Submodule.zero_mem _⟩
 
 end Coordinates
 
