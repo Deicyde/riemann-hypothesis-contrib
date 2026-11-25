@@ -75,12 +75,7 @@ private theorem isIntegral_of_isIntegral_one_tmul' {y : L}
   have hdvd : f' ∣ g := by
     rw [← modByMonic_eq_zero_iff_dvd hfm]
     set r := g %ₘ f' with hr
-    have hrt : aeval t r = 0 := by
-      have := modByMonic_add_div g f'
-      rw [← hr] at this
-      have h2 := congrArg (aeval t) this
-      rw [map_add (f := _), map_mul, hft, zero_mul, add_zero, hgt] at h2
-      exact h2
+    have hrt : aeval t r = 0 := (aeval_modByMonic_eq_self_of_root hft).trans hgt
     have hdeg : r.degree < f.natDegree := by
       have := degree_modByMonic_lt g hfm
       rwa [hf', degree_map, degree_eq_natDegree (minpoly.ne_zero hyF)] at this
