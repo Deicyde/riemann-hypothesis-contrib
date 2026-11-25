@@ -28,9 +28,7 @@ theorem subst_zeroPt {σ τ : Type} [Finite σ] (f : MvPowerSeries σ C) :
   rw [MvPowerSeries.coeff_subst (hs (fun _ => MvPowerSeries.constantCoeff_zero)), finsum_eq_single _ 0]
   · by_cases he : e = 0 <;> simp [he, MvPowerSeries.coeff_C, MvPowerSeries.coeff_one]
   · intro d hd
-    obtain ⟨s, hs'⟩ : ∃ s, d s ≠ 0 := by
-      by_contra! h
-      exact hd (Finsupp.ext h)
+    obtain ⟨s, hs'⟩ : ∃ s, d s ≠ 0 := Finsupp.ne_iff.mp hd
     have h0 : (d.prod fun _ n => (0 : MvPowerSeries τ C) ^ n) = 0 :=
       Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs') (zero_pow hs')
     simp [h0]
@@ -238,10 +236,7 @@ theorem expODE {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing
     by_cases h : n = k
     · subst h; simp
     · simp [h, Ne.symm h]
-  have hDA : D = A := calc
-    D = (A * Jt) * D := by rw [hAJ, Matrix.one_mul]
-    _ = A * (Jt * D) := Matrix.mul_assoc A Jt D
-    _ = A := by rw [hJD, Matrix.mul_one]
+  have hDA : D = A := (left_inv_eq_right_inv hAJ hJD).symm
   exact congrFun (congrFun hDA i) j
 
 end Formalism.L2.FormalSeriesBounds
