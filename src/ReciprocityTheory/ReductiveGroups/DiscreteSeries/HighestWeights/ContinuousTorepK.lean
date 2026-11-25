@@ -352,14 +352,8 @@ lemma torep_dτ_of_wt {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε �
   have hX : inK ε (Matrix.diagonal d) :=
     torep_inK_diag ε d (fun b => by by_cases hb : b = a <;> simp [hd, hb])
   have hXs : Matrix.diagonal d = Complex.I • Matrix.single a a (1 : ℂ) := by
-    ext i j
-    by_cases hij : i = j
-    · subst hij
-      by_cases hia : i = a
-      · simp [hd, hia]
-      · simp [hd, hia, Ne.symm hia]
-    · rw [Matrix.diagonal_apply_ne _ hij, Matrix.smul_apply, Matrix.single_apply,
-        ite_eq_right (fun h' => hij (h'.1.symm.trans h'.2)), smul_zero]
+    rw [Matrix.smul_single, smul_eq_mul, mul_one, ← Matrix.diagonal_single, hd]
+    exact congrArg Matrix.diagonal (funext fun b => (Pi.single_apply a Complex.I b).symm)
   let γ : ℝ → KG ε := fun t => torepK ε (hmem t)
   have hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Matrix.diagonal d) := fun t => by
     rw [hexp t]
