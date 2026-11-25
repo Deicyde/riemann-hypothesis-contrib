@@ -85,20 +85,11 @@ theorem not_lt_lt_of_mem_minimalPrimes' {V W W' : Ideal R} [V.IsPrime] [W'.IsPri
       Ideal.comap_map_of_surjective' q Ideal.Quotient.mk_surjective, hker,
       sup_eq_left.mpr hVW'.le, sup_eq_left.mpr (hVW'.le.trans hW'W.le)] at this
   have h2 := Ideal.height_add_one_le_of_lt_of_isPrime hlt
-  have h0 : (W'.map q).height = 0 := by
-    have h3 := h2.trans h1
-    generalize (W'.map q).height = a at h3
-    cases a with
-    | top => simp at h3
-    | coe a => norm_cast at h3 ⊢; omega
+  have h0 : (W'.map q).height = 0 := nonpos_iff_eq_zero.1
+    ((ENat.add_le_add_iff_right ENat.one_ne_top).1 ((h2.trans h1).trans_eq (zero_add 1).symm))
   have : IsDomain (R ⧸ V) := Ideal.Quotient.isDomain V
   rw [Ideal.height_eq_zero_iff_eq_bot] at h0
-  apply hVW'.ne
-  apply le_antisymm hVW'.le
-  intro y hy
-  have : q y ∈ W'.map q := Ideal.mem_map_of_mem q hy
-  rw [h0, Ideal.mem_bot, Ideal.Quotient.eq_zero_iff_mem] at this
-  exact this
+  exact hVW'.ne (le_antisymm hVW'.le (((Ideal.map_eq_bot_iff_le_ker q).1 h0).trans hker.le))
 
 theorem mem_minimalPrimes_of_mem {P W : Ideal R} [P.IsPrime] {s t : R}
     (hW : W ∈ (P ⊔ Ideal.span {s}).minimalPrimes) (htP : t ∉ P) (htW : t ∈ W) :
