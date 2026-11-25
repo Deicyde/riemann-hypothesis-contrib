@@ -69,14 +69,7 @@ theorem mem_isot_iff (Y : Read (A3 := A3) R F X0) (i : Fin D.R.m) (σ : D.what�
   rw [Y.tied.lift.isot, Y.prtWE, ← lift_readW]
   change PiTensorProduct.lift (readW Y i y) ∈ (partR Y i σ).map
     (PiTensorProduct.lift : Formalism.IndefR.Mult.MMap (R.MW i (sg0 D A3.A)) ≃ₗ[ℂ] _).toLinearMap ↔ _
-  constructor
-  · intro h
-    obtain ⟨a, ha, e⟩ := Submodule.mem_map.1 h
-    have h' := (PiTensorProduct.lift : Formalism.IndefR.Mult.MMap (R.MW i (sg0 D A3.A)) ≃ₗ[ℂ] _).injective e
-    rw [h'] at ha
-    exact ha
-  · intro h
-    exact Submodule.mem_map_of_mem h
+  rw [Submodule.mem_map_equiv, LinearEquiv.symm_apply_apply]
 
 theorem exists_readW (Y : Read (A3 := A3) R F X0) (i : Fin D.R.m) {x : Formalism.IndefR.Mult.MMap (R.MW i (sg0 D A3.A))}
     (hx : x ∈ goodW R F i) : ∃ y, readW Y i y = x := by
