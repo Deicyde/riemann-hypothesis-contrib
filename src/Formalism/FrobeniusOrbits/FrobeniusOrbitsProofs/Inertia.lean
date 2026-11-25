@@ -219,12 +219,8 @@ theorem sub_h (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : ℕ) (hp 
     (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (hσ : ∀ x : 𝓞 (hostE ζ a b), σ • x - x ∈ P) :
     (galE e ζ a b σ).2 = 1 := by
   haveI := (layer_galois hqd h).1
-  have hinj : Function.Injective (algebraMap (𝓞 (hostE ζ a b)) (𝓞 L)) := by
-    intro x y hxy
-    have h1 := congrArg (fun z : 𝓞 L => (z : L)) hxy
-    apply NumberField.RingOfIntegers.ext
-    apply Subtype.ext
-    exact h1
+  have hinj : Function.Injective (algebraMap (𝓞 (hostE ζ a b)) (𝓞 L)) :=
+    RingOfIntegers.algebraMap.injective _ _
   obtain ⟨Q, -, hQp, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral P (⊥ : Ideal (𝓞 L))
     (by rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
   haveI := hQp
@@ -268,12 +264,8 @@ theorem sup (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : ℕ)
       [Q.LiesOver (span {(p : ℤ)})], ∀ y : 𝓞 L, τ • y - y ∈ Q) :
     ∀ x : 𝓞 (hostE ζ a b), σ • x - x ∈ P := by
   haveI := (layer_galois hqd h).1
-  have hinj : Function.Injective (algebraMap (𝓞 (hostE ζ a b)) (𝓞 L)) := by
-    intro x y hxy
-    have h1 := congrArg (fun z : 𝓞 L => (z : L)) hxy
-    apply NumberField.RingOfIntegers.ext
-    apply Subtype.ext
-    exact h1
+  have hinj : Function.Injective (algebraMap (𝓞 (hostE ζ a b)) (𝓞 L)) :=
+    RingOfIntegers.algebraMap.injective _ _
   obtain ⟨Q, -, hQp, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral P (⊥ : Ideal (𝓞 L))
     (by rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
   haveI := hQp
