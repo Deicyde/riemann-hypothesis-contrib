@@ -37,15 +37,8 @@ theorem mah_neg (f : ℕ → ℚ) (j : ℕ) : mah (-f) j = - mah f j := by
   rw [show mah (0 : ℕ → ℚ) j = 0 from mah_zero_fn j] at h
   linarith
 
-theorem mah_smul (a : ℚ) (f : ℕ → ℚ) (j : ℕ) : mah (fun n => a * f n) j = a * mah f j := by
-  induction j generalizing f with
-  | zero => rfl
-  | succ j ih =>
-    rw [mah_succ, mah_succ, ← ih]
-    congr 1
-    ext n
-    simp only [fwdDiff]
-    ring
+theorem mah_smul (a : ℚ) (f : ℕ → ℚ) (j : ℕ) : mah (fun n => a * f n) j = a * mah f j :=
+  congrFun (fwdDiff_iter_const_smul 1 a f j) 0
 
 theorem mah_sum {ι : Type*} (s : Finset ι) (F : ι → ℕ → ℚ) (j : ℕ) :
     mah (fun n => ∑ l ∈ s, F l n) j = ∑ l ∈ s, mah (F l) j := by
