@@ -29,16 +29,7 @@ theorem exists_lift (C : Core l) (hA : C.AwayT) {d : ℕ} (U : Matrix (Fin d) (F
     ∃ N₀ : ℕ, ∀ N : ℕ, N₀ ≤ N → ∃ Z : Matrix (Fin d) (Fin d) (Per.Acris l),
       Z.map (algebraMap (Per.Acris l) (Per.Bcris l)) = algebraMap (Per.Acris l) (Per.Bcris l) C.t ^ N • U := by
   haveI : IsLocalization.Away C.t (Per.Bcris l) := hA
-  have h : ∀ i j, ∃ k : ℕ, ∃ a : Per.Acris l,
-      U i j * algebraMap (Per.Acris l) (Per.Bcris l) C.t ^ k = algebraMap (Per.Acris l) (Per.Bcris l) a := by
-    intro i j
-    obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers C.t) (U i j)
-    obtain ⟨k, hk⟩ := s.2
-    refine ⟨k, a, ?_⟩
-    have hk' : C.t ^ k = (s : Per.Acris l) := hk
-    rw [← map_pow, hk']
-    exact hs
-  choose k a ha using h
+  choose k a ha using fun i j => IsLocalization.Away.surj C.t (U i j)
   refine ⟨Finset.univ.sup fun p : Fin d × Fin d => k p.1 p.2, fun N hN =>
     ⟨Matrix.of fun i j => a i j * C.t ^ (N - k i j), ?_⟩⟩
   ext i j
