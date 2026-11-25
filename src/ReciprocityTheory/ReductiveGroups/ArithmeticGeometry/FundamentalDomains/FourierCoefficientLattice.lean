@@ -142,13 +142,8 @@ lemma finite_small (hg : 0 < g) : {y | y ∈ Lc X g ∧ ‖y‖ < 1}.Finite := b
     have h11 : |(τ.1 (β 1 1)).re| < 1 := by
       first | exact hk τ 1 1
     have e2 : τ.1 (β 1 0) = conj (τ.1 (β 0 1)) := hb τ 0 1
-    have im_zero : ∀ k : Fin 2, τ.1 (β k k) = conj (τ.1 (β k k)) → |(τ.1 (β k k)).im| < 1 := by
-      intro k hk
-      have h := congrArg Complex.im hk
-      rw [Complex.conj_im] at h
-      have h' : (τ.1 (β k k)).im = 0 := by linarith
-      rw [h']
-      norm_num
+    have im_zero : ∀ k : Fin 2, τ.1 (β k k) = conj (τ.1 (β k k)) → |(τ.1 (β k k)).im| < 1 :=
+      fun k hk => by rw [Complex.conj_eq_iff_im.mp hk.symm]; norm_num
     have i0 := im_zero 0 (hb τ 0 0)
     have i1 := im_zero 1 (hb τ 1 1)
     have r2 : |(τ.1 (β 1 0)).re| < 1 := by rw [e2, Complex.conj_re]; exact h01
