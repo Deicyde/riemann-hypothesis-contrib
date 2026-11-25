@@ -120,10 +120,7 @@ theorem det_one_add_movM_ne (R : Finset (Fin N)) (e : Fin m → Fin N) (ε : Fin
   have h2 := movM_sq R e ε u hR
   have hinv : (1 + movM R e ε u) * (1 - movM R e ε u) = 1 := by
     rw [add_mul, one_mul, mul_sub, mul_one, h2, sub_zero, sub_add_cancel]
-  intro h0
-  have hd := congrArg Matrix.det hinv
-  rw [Matrix.det_mul, h0, zero_mul, Matrix.det_one] at hd
-  exact zero_ne_one hd
+  exact Matrix.det_ne_zero_of_right_inverse hinv
 
 private theorem core_lemma (R : Finset (Fin N)) (e : Fin m → Fin N) (ε : Fin N → Fin m → ℂ)
     (π : Equiv.Perm (Fin N)) (I₀ : Finset (Fin N)) (w : Finset (Fin N) → ℂ) :
