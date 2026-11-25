@@ -14,12 +14,8 @@ namespace GlobalTheory.MemLoc.LogEx
 
 theorem mul_pred_lt_pow (l v : ℕ) (hl : 1 ≤ l) : v * (l - 1) + 1 ≤ l ^ v := by
   obtain ⟨d, rfl⟩ : ∃ d, l = d + 1 := ⟨l - 1, by omega⟩
-  rw [Nat.add_sub_cancel]
-  induction v with
-  | zero => simp
-  | succ v ih =>
-    rw [pow_succ]
-    nlinarith [Nat.zero_le (v * d * d)]
+  rw [Nat.add_sub_cancel, add_comm _ 1, add_comm d 1]
+  exact one_add_le_pow_of_two_add_nonneg (Nat.zero_le _) v
 
 theorem exists_term {R : Type} [CommRing R] (l : ℕ) (hl : l.Prime)
     (hu : ∀ a : ℕ, ¬ l ∣ a → IsUnit (a : R)) (m w : R) (hw : (l : R) * w = m ^ (l - 1))
