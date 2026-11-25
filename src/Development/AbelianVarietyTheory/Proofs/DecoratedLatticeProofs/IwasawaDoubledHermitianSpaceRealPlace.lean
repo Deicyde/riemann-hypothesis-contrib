@@ -89,10 +89,7 @@ theorem isUnit_of_isotropic (x y x' y' : Matrix n n ℂ) (h1 : xᴴ * x = yᴴ *
   intro v w hvw
   have hd : x *ᵥ (v - w) = 0 := by rw [mulVec_sub, hvw, sub_self]
   have hy : y *ᵥ (v - w) = 0 := by
-    have : (v - w) ∈ LinearMap.ker (yᴴ * y).mulVecLin := by
-      rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, ← h1, ← mulVec_mulVec, hd, mulVec_zero]
-    rw [ker_mulVecLin_conjTranspose_mul_self, LinearMap.mem_ker, Matrix.mulVecLin_apply] at this
-    exact this
+    rw [← conjTranspose_mul_self_mulVec_eq_zero, ← h1, ← mulVec_mulVec, hd, mulVec_zero]
   have h3 : (1 + 1 : Matrix n n ℂ) *ᵥ (v - w) = 0 := by
     rw [← h2, sub_mulVec, ← mulVec_mulVec, ← mulVec_mulVec, hd, hy, mulVec_zero, mulVec_zero, sub_zero]
   rw [add_mulVec, one_mulVec] at h3
