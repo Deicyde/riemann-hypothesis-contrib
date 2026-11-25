@@ -170,23 +170,6 @@ theorem exists_integral_base (hd : d.AxH 𝒜) (c : ι) (v : AddValuation (Ω c)
   have hq1 : q (d.jc c) = 1 := by
     rw [← hqdef]
     exact uniq _ _ 1 (hd.w_base c) (one_smul _ _).symm
-  have key : ∀ a b : WithTop ℤ, b ≠ ⊤ → b ≤ a + b → 0 ≤ a := by
-    intro a b hb h
-    induction a using WithTop.recTopCoe with
-    | top => exact le_top
-    | coe a =>
-      induction b using WithTop.recTopCoe with
-      | top => exact absurd rfl hb
-      | coe b =>
-        have h1 : (b : WithTop ℤ) ≤ ((a + b : ℤ) : WithTop ℤ) := by exact_mod_cast h
-        have h2 : b ≤ a + b := WithTop.coe_le_coe.mp h1
-        exact_mod_cast (show (0 : ℤ) ≤ a by omega)
-  have smul_ne : ∀ (a : Ω c) (g : A c), a ≠ 0 → g ≠ 0 → a • g ≠ 0 := by
-    intro a g ha hg h
-    apply hg
-    have h1 := congrArg (fun y => a⁻¹ • y) h
-    simp only [smul_zero] at h1
-    rwa [inv_smul_smul₀ ha] at h1
   obtain ⟨j0, -, hj0⟩ := Finset.exists_min_image Finset.univ (fun j => v (q j)) ⟨d.jc c, Finset.mem_univ _⟩
   have hvle : v (q j0) ≤ 0 := by
     have h1 := hj0 (d.jc c) (Finset.mem_univ _)
@@ -198,7 +181,7 @@ theorem exists_integral_base (hd : d.AxH 𝒜) (c : ι) (v : AddValuation (Ω c)
     | exact absurd hvle (by simp)
   have hw0 : d.w j0 c ≠ 0 := by
     rw [hx j0]
-    exact smul_ne _ _ hq0 (hd.w_base c)
+    exact smul_ne_zero hq0 (hd.w_base c)
   have hrat : ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w j0 c) = q j / q j0 := by
     intro j
     apply uniq _ _ _ hw0
@@ -209,11 +192,8 @@ theorem exists_integral_base (hd : d.AxH 𝒜) (c : ι) (v : AddValuation (Ω c)
     rw [← AddValuation.map_mul, div_mul_cancel₀ _ hq0]
   have hle := hj0 j (Finset.mem_univ _)
   rw [hmul] at hle
-  have hnt : v (q j0) ≠ ⊤ := by
-    intro h
-    rw [AddValuation.top_iff] at h
-    exact hq0 h
-  exact key _ _ hnt hle
+  exact (WithTop.add_le_add_iff_right ((AddValuation.ne_top_iff v).2 hq0)).1
+    ((zero_add _).trans_le hle)
 
 theorem genericHomAt_relation (hd : d.AxH 𝒜) (c : ι) (j0 : Fin (d.N + 1)) (hw0 : d.w j0 c ≠ 0)
     (hq : ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w j0 c) =
