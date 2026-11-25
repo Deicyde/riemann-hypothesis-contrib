@@ -128,21 +128,9 @@ section Borel
 
 theorem isSigmaCompact_of_isOpen {X : Type*} [TopologicalSpace X]
     [SecondCountableTopology X] [LocallyCompactSpace X] {U : Set X} (hU : IsOpen U) :
-    IsSigmaCompact U := by
-  have h : ∀ x ∈ U, ∃ t ∈ 𝓝 x, t ⊆ U ∧ IsCompact t := fun x hx ↦
-    local_compact_nhds (hU.mem_nhds hx)
-  choose! t ht using h
-  obtain ⟨T, hTU, hTc, hT⟩ := isOpen_biUnion_countable U (fun x ↦ interior (t x))
-    fun _ _ ↦ isOpen_interior
-  have hcov : ⋃ x ∈ T, t x = U := by
-    refine subset_antisymm (Set.iUnion₂_subset fun x hx ↦ (ht x (hTU hx)).2.1) fun y hy ↦ ?_
-    have hy' : y ∈ ⋃ x ∈ U, interior (t x) :=
-      Set.mem_biUnion hy (mem_interior_iff_mem_nhds.2 (ht y hy).1)
-    rw [← hT] at hy'
-    obtain ⟨x, hx, hyx⟩ := Set.mem_iUnion₂.1 hy'
-    exact Set.mem_biUnion hx (interior_subset hyx)
-  rw [← hcov]
-  exact isSigmaCompact_biUnion hTc fun x hx ↦ (ht x (hTU hx)).2.2.isSigmaCompact
+    IsSigmaCompact U :=
+  haveI := hU.locallyCompactSpace
+  isSigmaCompact_iff_sigmaCompactSpace.2 inferInstance
 
 theorem comap_eq_borel_of_continuous_injective {X Y : Type*}
     [TopologicalSpace X] [SecondCountableTopology X] [LocallyCompactSpace X]
