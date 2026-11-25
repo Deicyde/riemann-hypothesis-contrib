@@ -162,6 +162,14 @@ theorem card_le_finrank_jacSpanAt (K : Type) [Fintype K] (ι : K → Type) [∀ 
     (fun g hg => Submodule.subset_span ⟨_, hkerC g hg, rfl⟩) (hsm p hp) e htr
 
 
+theorem isUnit_algebraMap_locRing' {n : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (pt : Fin n → ℂ)
+    (g : MvPolynomial (Fin n) ℂ) (hg : eval pt g ≠ 0) :
+    IsUnit (algebraMap _ (ReciprocityTheory.AnForm.R.locRing I pt) g) := by
+  have := (IsLocalization.map_units (ReciprocityTheory.AnForm.R.locPt pt)
+    (⟨g, fun h => hg (RingHom.mem_ker.mp h)⟩ : (ReciprocityTheory.AnForm.R.ptIdeal pt).primeCompl)).map
+    (algebraMap (ReciprocityTheory.AnForm.R.locPt pt) (ReciprocityTheory.AnForm.R.locRing I pt))
+  rwa [← IsScalarTower.algebraMap_apply] at this
+
 open ReciprocityTheory.AnForm.R ReciprocityTheory.AnForm.R.JacobianCriterionAlt in
 theorem exists_params_of_regular {m : ℕ} (I : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
     (hI : ∀ h ∈ I, eval t h = 0) (e : ℕ) (hreg : IsRegularLocalRing (locRing I t))
@@ -190,11 +198,8 @@ theorem exists_params_of_regular {m : ℕ} (I : Ideal (MvPolynomial (Fin m) ℂ)
     refine ⟨a, c, fun h0 => c.2 (RingHom.mem_ker.2 h0), ?_⟩
     exact congrArg (Ideal.Quotient.mk _) h
   choose a c hc hac using fun l : Fin e => hex (E.symm l : s)
-  have hu : ∀ l, IsUnit (algebraMap _ (locRing I t) (c l)) := fun l => by
-    have := (IsLocalization.map_units (locPt t)
-      (⟨c l, fun h => hc l (RingHom.mem_ker.mp h)⟩ : (ptIdeal t).primeCompl)).map
-      (algebraMap (locPt t) (locRing I t))
-    rwa [← IsScalarTower.algebraMap_apply] at this
+  have hu : ∀ l, IsUnit (algebraMap _ (locRing I t) (c l)) := fun l =>
+    isUnit_algebraMap_locRing' I t (c l) (hc l)
   refine ⟨a, ?_⟩
   rw [← hmax, ← hspan]
   apply le_antisymm
@@ -253,14 +258,6 @@ theorem isRegularLocalRing_chart (K : Type) [Fintype K] (ι : K → Type) [∀ k
 theorem not_mem_conePts_top' {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (z : (Σ k, ι k) → ℂ) :
     z ∉ ReciprocityTheory.AnForm.R.conePts (⊤ : Ideal (MvPolynomial (Σ k, ι k) ℂ)) :=
   fun hz => by simpa using hz.2 1 Submodule.mem_top
-
-theorem isUnit_algebraMap_locRing' {n : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (pt : Fin n → ℂ)
-    (g : MvPolynomial (Fin n) ℂ) (hg : eval pt g ≠ 0) :
-    IsUnit (algebraMap _ (ReciprocityTheory.AnForm.R.locRing I pt) g) := by
-  have := (IsLocalization.map_units (ReciprocityTheory.AnForm.R.locPt pt)
-    (⟨g, fun h => hg (RingHom.mem_ker.mp h)⟩ : (ReciprocityTheory.AnForm.R.ptIdeal pt).primeCompl)).map
-    (algebraMap (ReciprocityTheory.AnForm.R.locPt pt) (ReciprocityTheory.AnForm.R.locRing I pt))
-  rwa [← IsScalarTower.algebraMap_apply] at this
 
 
 open GlobalTheory.CompanionTheory.Ar.Cmp.SncRes in
