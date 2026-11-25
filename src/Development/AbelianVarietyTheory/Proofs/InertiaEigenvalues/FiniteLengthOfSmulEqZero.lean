@@ -227,12 +227,8 @@ theorem exists_pow_smul_le (L : Lattice (O := O) ρ) {lam : O} (hlam : Irreducib
 theorem lattice_reduction_sameSS {lam : O} (hlam : Irreducible lam) (L L' : Lattice (O := O) ρ) :
     SameSS (modRep (latRep L) lam) (modRep (latRep L') lam) := by
   have h0 : lam ≠ 0 := hlam.ne_zero
-  have hreg : IsSMulRegular V lam := by
-    intro x y hxy
-    have h1 : algebraMap O LL lam ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective O LL)).mpr h0
-    have h2 : algebraMap O LL lam • x = algebraMap O LL lam • y := by
-      rw [algebraMap_smul, algebraMap_smul]; exact hxy
-    exact smul_right_injective V h1 h2
+  have hreg : IsSMulRegular V lam := (isSMulRegular_algebraMap_iff LL).mp
+    (IsUnit.isSMulRegular V ((map_ne_zero_iff _ (IsFractionRing.injective O LL)).mpr h0).isUnit)
   obtain ⟨m, hm⟩ := exists_pow_smul_le L' hlam L.fg
   obtain ⟨n, hn⟩ := exists_pow_smul_le L hlam L'.fg
   exact ((modRep_sameSS_subquot L h0).symm.trans
