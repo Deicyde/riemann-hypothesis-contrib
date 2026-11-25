@@ -205,11 +205,8 @@ theorem term_bound : ∀ (D : D7), Inp D → ∀ (S : Finset ℕ) (dl : ℕ → 
   have hp0 : (0 : ℝ) < p := by exact_mod_cast hp.pos
   have hQn := norm_natCast_inv p hQ.1.ne'
   have hN : ‖((M * Q : ℕ) : ℂ_[p])‖⁻¹ = (p : ℝ) ^ (padicValNat p Q : ℝ) := by
-    have hval : padicValNat p M = 0 := by
-      simpa only [Nat.padicValNat_def] using
-        (multiplicity_eq_zero_of_not_dvd (hp.coprime_iff_not_dvd.1 hMp.symm))
-    rw [norm_natCast_inv p (Nat.mul_pos hM hQ.1).ne', (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hM.ne' hQ.1.ne',
-      hval, zero_add]
+    rw [norm_natCast_inv p (Nat.mul_pos hM hQ.1).ne', Nat.padicValNat_def, Nat.multiplicity_mul hM.ne' hQ.1.ne',
+      multiplicity_eq_zero_of_not_dvd (hp.coprime_iff_not_dvd.1 hMp.symm), zero_add, ← Nat.padicValNat_def]
   have hsp : p ∣ M * Q → SplitIn D p := fun h =>
     hQ.2 p hp (hMp.symm.dvd_of_dvd_mul_left h)
   have he0 : 0 ≤ (if p = D.host.d then (p : ℝ) ^ (((P.a * ∑ τ, P.n τ : ℕ) : ℝ) / 4) else 1) := by
