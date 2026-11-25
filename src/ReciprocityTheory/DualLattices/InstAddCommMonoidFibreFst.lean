@@ -18,17 +18,12 @@ namespace BX
 variable (B : BX R₀) {R : LAlg R₀}
 
 lemma smul_eq_self {x y : B.G R} {l : (R : Type u)ˣ} {u : B.P R x y} (h : B.smul l u = u) :
-    l = 1 := by
-  obtain ⟨m, -, hm⟩ := B.trans u u
-  exact (hm l h).trans (hm 1 (B.one_smul u)).symm
+    l = 1 :=
+  (B.trans u u).unique h (B.one_smul u)
 
 lemma smul_inj {x y : B.G R} {l l' : (R : Type u)ˣ} {u : B.P R x y}
-    (h : B.smul l u = B.smul l' u) : l = l' := by
-  have h1 : B.smul (l'⁻¹ * l) u = u := by
-    rw [B.mul_smul, h, ← B.mul_smul, inv_mul_cancel, B.one_smul]
-  have h2 := B.smul_eq_self h1
-  calc l = l' * (l'⁻¹ * l) := (mul_inv_cancel_left l' l).symm
-    _ = l' := by rw [h2, mul_one]
+    (h : B.smul l u = B.smul l' u) : l = l' :=
+  (B.trans u _).unique h rfl
 
 lemma exists_smul {x y : B.G R} (u w : B.P R x y) : ∃ l, B.smul l u = w :=
   (B.trans u w).exists
