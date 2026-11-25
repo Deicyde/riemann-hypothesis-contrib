@@ -18,11 +18,8 @@ namespace GlobalTheory.RealCoordCusp
 
 theorem normSq_det_UJ {n : ℕ} {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) : Complex.normSq (uMat g).det = 1 := by
   have hg : (uMat g)ᴴ * Formalism.REAL.Jm ε * uMat g = Formalism.REAL.Jm ε := g.2
-  have hJ : (Formalism.REAL.Jm ε).det ≠ 0 := by
-    intro h
-    have := congrArg Matrix.det (Formalism.REAL.Jm_mul_self ε)
-    rw [Matrix.det_mul, h, zero_mul, Matrix.det_one] at this
-    exact zero_ne_one this
+  have hJ : (Formalism.REAL.Jm ε).det ≠ 0 :=
+    Matrix.det_ne_zero_of_left_inverse (Formalism.REAL.Jm_mul_self ε)
   have h1 := congrArg Matrix.det hg
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose] at h1
   have h2 : star (uMat g).det * (uMat g).det = 1 := by
