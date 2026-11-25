@@ -130,10 +130,7 @@ theorem exists_cdvr_ext_rational : ∀ (T : Formalism.L2.Pj.CDVR) (D : DegPre T.
     simp [hπ₂]⟩
   have hwN : w ^ N = algebraMap T.V W ϖ := IsFractionRing.injective W M₂ (by
     rw [map_pow, hw, hπ₂]; exact (RingHom.congr_fun hc ϖ).symm)
-  have hw0 : w ≠ 0 := by
-    rintro rfl
-    rw [zero_pow hN.ne'] at hwN
-    exact hϖ.ne_zero (hinj (hwN.symm.trans (map_zero _).symm))
+  have hw0 : w ≠ 0 := ne_zero_pow hN.ne' (hwN ▸ (map_ne_zero_iff _ hinj).2 hϖ.ne_zero)
   obtain ⟨ϖ', hϖ'⟩ := IsDiscreteValuationRing.exists_irreducible W
   obtain ⟨m, hm⟩ := IsDiscreteValuationRing.associated_pow_irreducible hw0 hϖ'
   let ε := FractionRing.algEquiv W M₂
