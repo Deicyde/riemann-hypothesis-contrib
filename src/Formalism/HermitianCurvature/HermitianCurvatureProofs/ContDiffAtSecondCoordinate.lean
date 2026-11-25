@@ -30,14 +30,7 @@ theorem cd_div {f g : E → ℂ} (hf : ContDiffAt ℝ ∞ f x) (hg : ContDiffAt 
   simpa [div_eq_mul_inv] using hf.mul (cd_inv hg h0)
 
 theorem cd_normSq {f : E → ℂ} (hf : ContDiffAt ℝ ∞ f x) : ContDiffAt ℝ ∞ (fun y => Complex.normSq (f y)) x := by
-  have hre : ContDiffAt ℝ ∞ (fun y => (f y).re) x := by
-    simpa [Function.comp_def] using Complex.reCLM.contDiff.contDiffAt.comp x hf
-  have him : ContDiffAt ℝ ∞ (fun y => (f y).im) x := by
-    simpa [Function.comp_def] using Complex.imCLM.contDiff.contDiffAt.comp x hf
-  have h : (fun y => Complex.normSq (f y)) = fun y => (f y).re * (f y).re + (f y).im * (f y).im :=
-    funext fun y => Complex.normSq_apply _
-  rw [h]
-  exact (hre.mul hre).add (him.mul him)
+  simpa only [Complex.normSq_eq_norm_sq] using hf.norm_sq ℂ
 
 variable {m n : Type*} [Fintype m] [Fintype n]
 
