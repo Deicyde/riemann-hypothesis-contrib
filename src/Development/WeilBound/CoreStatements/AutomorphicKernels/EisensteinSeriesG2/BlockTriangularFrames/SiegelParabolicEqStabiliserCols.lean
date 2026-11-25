@@ -165,10 +165,7 @@ theorem isPar_of_mem_siegelS {b : GL (Fin n ⊕ Fin n) E} {t0 : GL (Fin n) E}
     refine block_inclusion_left_cancel ?_
     rw [Matrix.mul_one, ← Matrix.mul_assoc, ← hM, Matrix.mul_assoc, ← hM', ← Matrix.mul_assoc, inFrame_mul_inv,
       Matrix.one_mul]
-  have hAA' : (inFrame b p⁻¹).toBlocks₁₁ * (inFrame b p).toBlocks₁₁ = 1 := by
-    refine block_inclusion_left_cancel ?_
-    rw [Matrix.mul_one, ← Matrix.mul_assoc, ← hM', Matrix.mul_assoc, ← hM, ← Matrix.mul_assoc, inFrame_inv_mul,
-      Matrix.one_mul]
+  have hAA' : (inFrame b p⁻¹).toBlocks₁₁ * (inFrame b p).toBlocks₁₁ = 1 := mul_eq_one_comm.mp hAA
   let Au : GL (Fin n) (AE F E) := ⟨(inFrame b p).toBlocks₁₁, (inFrame b p⁻¹).toBlocks₁₁, hAA, hAA'⟩
   refine ⟨glA (F := F) t0 * Au * (glA (F := F) t0)⁻¹, ?_, ?_⟩
   · rw [isPar_iff, matrix_eq_frame_conjugate b p, diagCols_eq hb]
