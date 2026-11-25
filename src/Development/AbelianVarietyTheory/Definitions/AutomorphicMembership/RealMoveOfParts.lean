@@ -72,9 +72,9 @@ def FormsCl (X : RealSide D) (X' : RealSide D') (ι : D.what₂.LL →+* D'.what
 theorem realMove_of_parts {X : RealSide D} {X' : RealSide D'} {ι : D.what₂.LL →+* D'.what₂.LL} {eK : X.core.Q.c.F ≃+* X'.core.Q.c.F}
     {γ : X.Γ ≃* X'.Γ} (a : Frames X X') (b : Chars X X') (c : Grps X X' ι γ) (q : PlCl X X') (o : IoCl X X' ι)
     (s : FormsCl X X' ι eK γ) : Nonempty (RealMove X X' ι) :=
-  let ⟨forms, hr⟩ := s
-  ⟨{ eK := eK, γ := γ, forms := forms, read := hr, Q := q, io := o, Pg := a.Pg, ψ := a.ψ, θ := a.θ, ΛV := a.ΛV, ΛW := a.ΛW, βV := a.βV, βW := a.βW, BV := a.BV, vacP := a.vacP, MW := a.MW, v₀ := a.v₀,
-     eta := b.eta, mu0 := b.mu0, Cmu0 := b.Cmu0, delAt := b.delAt, eG := c.eG, cG := c.cG, P0 := c.P0, ψ0 := c.ψ0 }⟩
+  s.elim fun forms hr =>
+    ⟨{ eK := eK, γ := γ, forms := forms, read := hr, Q := q, io := o, Pg := a.Pg, ψ := a.ψ, θ := a.θ, ΛV := a.ΛV, ΛW := a.ΛW, βV := a.βV, βW := a.βW, BV := a.BV, vacP := a.vacP, MW := a.MW, v₀ := a.v₀,
+       eta := b.eta, mu0 := b.mu0, Cmu0 := b.Cmu0, delAt := b.delAt, eG := c.eG, cG := c.cG, P0 := c.P0, ψ0 := c.ψ0 }⟩
 
 end GlobalTheory.HeightCounting.SerMove
 
