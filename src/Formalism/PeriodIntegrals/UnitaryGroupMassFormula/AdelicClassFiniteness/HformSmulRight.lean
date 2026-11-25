@@ -67,16 +67,8 @@ theorem hform_exists_ne (hdet : J.det ≠ 0) (S : Set (Fin m → E)) (hS : Submo
     { toFun := fun y => hform (starRingEnd E) J x y
       map_add' := fun y y' => hform_add_right' J x y y'
       map_smul' := fun c y => by simpa using hform_smul_right' J c x y }
-  have hle : Submodule.span E S ≤ LinearMap.ker f := by
-    rw [Submodule.span_le]
-    intro z hz
-    exact LinearMap.mem_ker.mpr (h z hz)
-  have hall : ∀ y, hform (starRingEnd E) J x y = 0 := by
-    intro y
-    have hy : y ∈ Submodule.span E S := by
-      rw [hS]
-      exact Submodule.mem_top
-    exact LinearMap.mem_ker.mp (hle hy)
+  have hall : ∀ y, hform (starRingEnd E) J x y = 0 :=
+    LinearMap.congr_fun (LinearMap.ext_on (f := f) (g := 0) hS fun ⦃z⦄ hz => h z hz)
   have hv : (fun i => starRingEnd E (x i)) ᵥ* J = 0 := by
     funext j
     have hj := hall (Pi.single j 1)
