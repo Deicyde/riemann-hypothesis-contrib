@@ -102,11 +102,8 @@ theorem eq_zero_of_forall_pow_dvd {K : Type*} [Field K] [ValuativeRel K] [Topolo
     [IsNonarchimedeanLocalField K] {π : 𝒪[K]} (hπ : Irreducible π) {x : 𝒪[K]}
     (h : ∀ n, π ^ n ∣ x) : x = 0 := by
   by_contra hx
-  obtain ⟨k, w, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx hπ
-  obtain ⟨c, hc⟩ := h (k + 1)
-  have h1 : (w : 𝒪[K]) * π ^ k = (π * c) * π ^ k := by rw [hc]; ring
-  have h2 := mul_right_cancel₀ (pow_ne_zero k hπ.ne_zero) h1
-  exact hπ.not_isUnit (isUnit_of_mul_isUnit_left (h2 ▸ w.isUnit))
+  obtain ⟨n, hn⟩ := FiniteMultiplicity.of_not_isUnit hπ.not_isUnit hx
+  exact hn (h _)
 
 section Limit
 
