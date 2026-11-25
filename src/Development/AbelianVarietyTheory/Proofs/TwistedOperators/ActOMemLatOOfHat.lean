@@ -172,7 +172,9 @@ theorem isSBHalf_stdLat : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} 
       have m2 := hat_moves S.N h2
       have m1 := hat_moves S.N h1
       exact (mem_latO_iff_of_half (negGA _ (S.N.u (.grid (i + 1) j)).1) (S.N.u (.grid i j)).1
-        m2.1 (fun v hv => by rw [← map_inv]; exact m2.2 v hv) m1.1 m1.2 ha hb hga hgb hx).symm
+        (fun v hv => by rw [mt_negGA]; exact m2.1 v hv)
+        (fun v hv => by rw [← map_inv, mt_negGA]; exact m2.2 v hv) m1.1 m1.2 ha hb
+        (fun i j => by rw [mt_negGA]; exact hga i j) hgb hx).symm
     · exact hp.elim
     · exact hp.elim
     · obtain ⟨a, ha, hga⟩ := exists_kill S.N ht d h1
