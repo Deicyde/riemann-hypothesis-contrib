@@ -39,14 +39,9 @@ theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : 
     (hL : Algebra.adjoin K {z} = ⊤) : (k : 𝓞 L) ∈ differentIdeal (𝓞 K) (𝓞 L) := by
   classical
   have hy' : algebraMap K L y ≠ 0 := (_root_.map_ne_zero _).mpr hy
-  have hz0 : z ≠ 0 := by
-    rintro rfl
-    rw [zero_pow hk.ne'] at hz
-    exact hy' hz.symm
+  have hz0 : z ≠ 0 := ne_zero_pow hk.ne' (hz ▸ hy')
   have hzk : z ^ k ≠ 0 := pow_ne_zero k hz0
-  have htop : K⟮z⟯ = ⊤ := by
-    rw [← IntermediateField.toSubalgebra_inj, IntermediateField.top_toSubalgebra, eq_top_iff, ← hL]
-    exact IntermediateField.algebra_adjoin_le_adjoin K {z}
+  have htop : K⟮z⟯ = ⊤ := IntermediateField.adjoin_eq_top_of_algebra K {z} hL
   have hpow : ∀ b ∈ I, ∃ r : 𝓞 K, b ^ k = algebraMap (𝓞 K) K r * y := by
     intro b hb
     have hbk : b ^ k ∈ Submodule.span (𝓞 K) {y} := by
@@ -179,9 +174,7 @@ theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root : ∀ (F : Intermediate
     exact hw'w ▸ hw'
   have hdiff := _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root k hk y hy I hI z' hz' hL
   have hroot := _root_.GlobalTheory.log_rootDiscr_le_of_natCast_mem_differentIdeal F E k hk hdiff
-  have hFE : IntermediateField.adjoin F {z'} = ⊤ := by
-    rw [← IntermediateField.toSubalgebra_inj, IntermediateField.top_toSubalgebra, eq_top_iff, ← hL]
-    exact IntermediateField.algebra_adjoin_le_adjoin F {z'}
+  have hFE : IntermediateField.adjoin F {z'} = ⊤ := IntermediateField.adjoin_eq_top_of_algebra F {z'} hL
   have hz'int : IsIntegral F z' := IsIntegral.of_pow hk (by rw [hz']; exact isIntegral_algebraMap)
   have hdegFE : Module.finrank F E ≤ k := by
     have h1 := IntermediateField.adjoin.finrank hz'int
