@@ -191,11 +191,7 @@ theorem dl_indep {O Kf : Type} [CommRing O] [Field Kf] [Algebra O Kf]
   let γ : GL (Fin (m + 1)) O := ⟨U2, U, mul_eq_one_comm.1 hUU, hUU⟩
   have hdU : (U.map (algebraMap O Kf)).det = algebraMap O Kf U.det := by
     rw [RingHom.map_det]; rfl
-  have hc : algebraMap O Kf U.det ≠ 0 := by
-    intro h0
-    have := congrArg (algebraMap O Kf) hdet
-    rw [map_mul, h0, zero_mul, map_one] at this
-    exact zero_ne_one this
+  have hc : algebraMap O Kf U.det ≠ 0 := (u.isUnit.map (algebraMap O Kf)).ne_zero
   have hz : ∀ e : ℤ, algebraMap O Kf ((u ^ e : Oˣ) : O) = (algebraMap O Kf U.det) ^ e := by
     intro e
     have h1 : ((Units.map (algebraMap O Kf : O →* Kf) u ^ e : Kfˣ) : Kf) = (algebraMap O Kf U.det) ^ e := by
