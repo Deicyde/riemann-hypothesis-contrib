@@ -45,9 +45,7 @@ theorem maDens_euclPot_comp {n D : ℕ} (s : (Fin D → ℂ) → Fin n → ℂ) 
     simp [Matrix.mul_apply, mul_comm]
   have hnn : 0 ≤ (Mᴴ * M).det := (Matrix.posSemidef_conjTranspose_mul_self M).det_nonneg
   have hre : (starRingEnd ℂ (Mᴴ * M).det).re = ‖(Mᴴ * M).det‖ := by
-    obtain ⟨h1, h2⟩ := Complex.nonneg_iff.1 hnn
-    have e : (Mᴴ * M).det = (((Mᴴ * M).det.re : ℝ) : ℂ) := Complex.ext rfl (by simp [← h2])
-    rw [e, Complex.conj_ofReal, Complex.ofReal_re, Complex.norm_real, Real.norm_of_nonneg h1]
+    rw [Complex.conj_re, ← Complex.ofReal_re ‖(Mᴴ * M).det‖, Complex.norm_of_nonneg' hnn]
   rw [SheetComassAlt.sheetJac_eq_norm_det s y hs.differentiableAt, ← hre, ← hdet, ← hH]
   unfold maDens
   rw [ReciprocityTheory.AnForm.A.mdisc_const]
