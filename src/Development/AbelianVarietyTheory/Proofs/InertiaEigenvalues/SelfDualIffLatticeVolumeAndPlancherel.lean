@@ -24,16 +24,8 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 namespace GlobalTheory.JR.SelfDualLat
 
 theorem isLC_indicator_one {X : Type} [TopologicalSpace X] (s : Set X) (h : IsClopen s) :
-    IsLocallyConstant (s.indicator (fun _ => (1 : ℂ))) := by
-  classical
-  intro B
-  rw [Set.indicator_preimage, Set.ite]
-  refine (IsOpen.inter ?_ h.isOpen).union ?_
-  · rw [Set.preimage_const]; split_ifs <;> simp
-  · rw [Set.diff_eq]
-    refine IsOpen.inter ?_ h.isClosed.isOpen_compl
-    change IsOpen ((fun _ : X => (0:ℂ)) ⁻¹' B)
-    rw [Set.preimage_const]; split_ifs <;> simp
+    IsLocallyConstant (s.indicator (fun _ => (1 : ℂ))) :=
+  ((LocallyConstant.const X (1 : ℂ)).indicator h).isLocallyConstant
 
 theorem topo : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V] [IsModuleTopology F V], LocallyCompactSpace V ∧ SecondCountableTopology V ∧ T2Space V ∧ IsTopologicalAddGroup V := by
   intro F E _ _ _ _ _ V _ _ _ _ _
