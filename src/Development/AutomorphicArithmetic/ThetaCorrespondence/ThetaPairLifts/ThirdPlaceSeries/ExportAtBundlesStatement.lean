@@ -395,7 +395,7 @@ open GlobalTheory.TwInputs GlobalTheory.SeriesTie Formalism.MainNotions
 theorem faithful_serSide {D : D7} (X : RealSide D) {E : IntegralHeckeForms.XD D} (Y : SerSide X E) (i : D.ntw.Tw) (j : Fin D.R.m)
     (b : Bool) : Faithful (Y.Z.rd i j b) :=
   realRd_faithful D X.Γ X.Pl0 X.I0 X.T X.A3 _ X.R X.cG Y.S Y.YS X.geo.v₀ Y.Z.ρ Y.Z.good i j b (Y.Z.ν i j b)
-    (Y.Z.scalar i j b).ne X.unif X.char.models.HW (Y.Z.vec j) ((GlobalTheory.T.rational_datum_small_field_form_hecke_scalar_unit D X E Y).1 _ (Nat.le_add_left _ _) j.2)
+    (Y.Z.scalar i j b).ne X.unif X.char.models.HW (Y.Z.vec j) ((_root_.GlobalTheory.TwUnit.isKsForm_and_unit D X E Y).1 _ (Nat.le_add_left _ _) j.2)
 
 theorem rank_of_ties : GlobalTheory.Published.CuspRapidDecay → ∀ (D : D7) (X : RealSide D) (E : IntegralHeckeForms.XD D) (Y : SerSide X E), ∀ i,
     BaseTup Y i → (∀ j b, RatRow Y.YS X.geo.v₀ Y.Z.good i j b) → ∀ j ∈ Finset.Icc 1 D.R.m, ∀ b,
@@ -404,7 +404,7 @@ theorem rank_of_ties : GlobalTheory.Published.CuspRapidDecay → ∀ (D : D7) (X
   have hG : ∀ j t, GlobalTheory.IndefiniteRowSideFullHecke.ThetaTranslateSize.GoodRangeAt X.R.toRealDat j t :=
     GlobalTheory.AdSpan.goodRangeAt X.R.toRealDat hP X.size X.char.lev X.char.grp.record X.char.fam X.char.models X.char.thP
   exact GlobalTheory.T.averaged_series_full_rank_of_complex_span_good D Y.Z.ρ Y.Z.good Y.Z.rd Y.Z.tie (faithful_serSide X Y) E i (fun j b => (Y.Z.rat (hR j b)).1)
-    (fun j hj b a => Y.all i j hj b a) (GlobalTheory.T.goodForms_spanned_by_thetaSeries_of_classSums D Y.Z.ρ Y.Z.good Y.Z.rd i (GlobalTheory.T.goodForms_classSums_of_projectedLift_range D X E Y hG i hB))
+    (fun j hj b a => Y.all i j hj b a) (GlobalTheory.T.goodForms_spanned_by_thetaSeries_of_classSums D Y.Z.ρ Y.Z.good Y.Z.rd i (_root_.GlobalTheory.RankOnto.sumOnto_of_goodRange D X E Y hG i hB))
 
 end Target
 
@@ -1145,26 +1145,8 @@ section Ideals
 variable {E : Type} [Field E] [NumberField E]
 
 theorem exists_order_nat (T : Finset (HeightOneSpectrum (𝓞 E))) (n : HeightOneSpectrum (𝓞 E) → ℕ) :
-    ∃ α : Eˣ, ∀ v ∈ T, v.valuation E (α : E) = exp (-(n v : ℤ)) := by
-  choose π hπ using fun v : HeightOneSpectrum (𝓞 E) => v.intValuation_exists_uniformizer
-  obtain ⟨y, hy⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := T) (fun v => v.asIdeal) (fun v => n v + 1)
-    (fun v _ => v.prime) (fun v _ w _ h e => h (HeightOneSpectrum.ext e)) (fun v => π v.1 ^ n v.1)
-  have key : ∀ v ∈ T, v.intValuation y = exp (-(n v : ℤ)) := fun v hv => by
-    have h1 := (v.intValuation_le_pow_iff_mem _ _).2 (hy v hv)
-    have h2 : v.intValuation (π v ^ n v) = exp (-(n v : ℤ)) := by
-      rw [map_pow, hπ, ← exp_nsmul]; simp
-    rw [← h2]
-    refine Valuation.map_eq_of_sub_lt _ (h1.trans_lt ?_)
-    rw [h2, exp_lt_exp]
-    push_cast
-    omega
-  by_cases h0 : y = 0
-  · refine ⟨1, fun v hv => ?_⟩
-    have := key v hv
-    rw [h0, map_zero] at this
-    exact absurd this.symm exp_ne_zero
-  · exact ⟨Units.mk0 (y : E) (by exact_mod_cast h0), fun v hv => by
-      rw [← key v hv]; exact v.valuation_of_algebraMap y⟩
+    ∃ α : Eˣ, ∀ v ∈ T, v.valuation E (α : E) = exp (-(n v : ℤ)) :=
+  by apply _root_.GlobalTheory.EtaProduct.exists_val_eq
 
 theorem exists_order (T : Finset (HeightOneSpectrum (𝓞 E))) (n : HeightOneSpectrum (𝓞 E) → ℤ) :
     ∃ α : Eˣ, ∀ v ∈ T, v.valuation E (α : E) = exp (-n v) := by
@@ -1806,8 +1788,8 @@ theorem exportAt_bundles_alt : Cheb → PoitouTateTotallyComplex → CohDimTwo �
   intro hCheb hPT hCD hTame hLF hLTD hLEC hGF hGEC hUO hadm hGW hRCA hCusp hCheb1 hGAR hTor hSR hSI hHI hHT hHRT
   intro D nch xd X Y G hF hGH hconds hTie hBase
   exact _root_.GlobalTheory.T.realization_of_published_alt hCheb hPT hCD hTame hLF hLTD hLEC hGF hGEC hUO hadm hGW hRCA hCusp hCheb1 hGAR hTor D nch xd X Y G
-    (GlobalTheory.T.thetaSeries_rationality_and_coefficientBound hCusp hGAR hSR hSI D X (twEOf xd) Y hF).1
-    (GlobalTheory.T.thetaSeries_rationality_and_coefficientBound hCusp hGAR hSR hSI D X (twEOf xd) Y hF).2
+    (_root_.GlobalTheory.Unframe.rat_and_xiBdd hCusp hGAR hSR hSI D X (twEOf xd) Y hF).1
+    (_root_.GlobalTheory.Unframe.rat_and_xiBdd hCusp hGAR hSR hSI D X (twEOf xd) Y hF).2
     (GlobalTheory.T.heckeOperator_preserves_supLattice_realSide hCusp hHI hHT hHRT D X)
     hGH hconds hF.galois hF.roots hTie hBase
 end GlobalTheory.ExportClose0

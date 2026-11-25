@@ -21,65 +21,12 @@ public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PPolyMaxLowerB
 public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PTruncPsh
 public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PTruncTransfer
 import GroundTheory.HeightsAndTheta.Heights.Regularisation.PRiemannExtensionSlices
-import Mathlib.Algebra.Order.Floor.Extended
-import Mathlib.Algebra.Order.Floor.Semifield
-import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Algebra.Order.Star.Real
-import Mathlib.Analysis.Calculus.FDeriv.Pi
-import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
-import Mathlib.Analysis.InnerProductSpace.Calculus
-import Mathlib.Analysis.Normed.Algebra.GelfandRadius
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Combinatorics.Enumerative.DyckWord
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
-import Mathlib.Data.NNRat.Floor
-import Mathlib.Data.Nat.Choose.Multinomial
-import Mathlib.Geometry.Euclidean.Volume.Basic
-import Mathlib.NumberTheory.Chebyshev
-import Mathlib.NumberTheory.Height.Projectivization
-import Mathlib.NumberTheory.LucasLehmer
-import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.RingTheory.WittVector.IsPoly
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
-import Mathlib.Tactic.Echelon.Zsqrtd
-import Mathlib.Tactic.Inclusion.Extension.Core.Core
-import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
 import Mathlib.Tactic.Linter.Style
-import Mathlib.Tactic.NormNum.Irrational
-import Mathlib.Tactic.NormNum.IsCoprime
-import Mathlib.Tactic.NormNum.IsSquare
-import Mathlib.Tactic.NormNum.LegendreSymbol
-import Mathlib.Tactic.NormNum.ModEq
-import Mathlib.Tactic.NormNum.NatFib
-import Mathlib.Tactic.NormNum.NatLog
-import Mathlib.Tactic.NormNum.NatSqrt
-import Mathlib.Tactic.NormNum.Ordinal
-import Mathlib.Tactic.NormNum.Parity
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.ReduceModChar
-import Mathlib.Tactic.TypeStar
-import Mathlib.Topology.Sheaves.Init
-import Mathlib.Order.CompletePartialOrder
-import Mathlib.RingTheory.Etale.Weakly
-import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
-import Mathlib.RingTheory.PiTensorProduct
-import Mathlib.RingTheory.TotallySplit
 import ReciprocityTheory.AnalyticForms.AnalyticCharts.Osgood
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ExistsIntSmulIsAdicIntegralInTensorBasis
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 import Aesop.Main
-import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
 import GroundTheory.HeightsAndTheta.Heights.Regularisation.PCutoffs
 import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.PshBasic
 
@@ -296,25 +243,13 @@ def IsPiece (S : Finset (Fin D.n)) (g : (Fin D.n → ℂ) → (Σ k, J k) → �
       g y = torusSmul c (g y') → y = y') ∧
     ∀ y ∈ Metric.ball (0 : Fin D.n → ℂ) 2, g y ∈ D.Bd ↔ y ∈ coordDiv S
 
-private theorem star_mem_ball_lemma_2 {e : ℕ} {y : Fin e → ℂ} (hy : y ∈ Metric.ball (0 : Fin e → ℂ) 2) :
-    star y ∈ Metric.ball (0 : Fin e → ℂ) 2 := by
-  rw [mem_ball_zero_iff] at hy ⊢
-  rw [pi_norm_lt_iff (by norm_num)] at hy ⊢
-  intro i
-  simpa [Pi.star_apply, Complex.star_def, Complex.norm_conj] using hy i
-
-private theorem conjVec_torusSmul_lemma_4 {K : Type} {κ : K → Type} (c : K → ℂ) (z : (Σ k, κ k) → ℂ) :
-    conjVec (torusSmul c z) = torusSmul (fun k => starRingEnd ℂ (c k)) (conjVec z) := by
-  funext p
-  simp [conjVec, torusSmul]
-
 theorem IsPiece.conj {S : Finset (Fin D.n)} {g : (Fin D.n → ℂ) → (Σ k, J k) → ℂ} (h : IsPiece D S g) :
     IsPiece D S fun y => conjVec (g (star y)) := by
   obtain ⟨h1, h2, h3, h4⟩ := h
   refine ⟨?_, ?_, ?_, ?_⟩
   · have hd : DifferentiableOn ℂ (fun y => conjVec (g (star y))) (Metric.ball 0 2) := by
       intro y hy
-      have h0 : DifferentiableAt ℂ g (star y) := (h1 _ (star_mem_ball_lemma_2 hy)).differentiableAt
+      have h0 : DifferentiableAt ℂ g (star y) := (h1 _ (Charts.star_mem_ball.2 hy)).differentiableAt
       have h5 := h0.star_star
       rw [star_star] at h5
       exact h5.differentiableWithinAt
@@ -324,23 +259,26 @@ theorem IsPiece.conj {S : Finset (Fin D.n)} {g : (Fin D.n → ℂ) → (Σ k, J 
       (fun y hy => (differentiableAt_pi.1 ((hd y hy).differentiableAt
         (Metric.isOpen_ball.mem_nhds hy)) p).differentiableWithinAt)
   · intro y hy
-    exact _root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_mem (h2 _ (star_mem_ball_lemma_2 hy))
+    exact _root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_mem
+      (h2 _ (Charts.star_mem_ball.2 hy))
   · intro y hy y' hy' c hc hyy
     have h6 := congrArg conjVec hyy
-    rw [_root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj, conjVec_torusSmul_lemma_4, _root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj] at h6
-    have h7 := h3 _ (star_mem_ball_lemma_2 hy) _ (star_mem_ball_lemma_2 hy') _
+    rw [_root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj, Charts.conj_torus,
+      _root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj] at h6
+    have h7 := h3 _ (Charts.star_mem_ball.2 hy) _ (Charts.star_mem_ball.2 hy') _
       (fun k => by simpa using hc k) h6
     simpa using congrArg star h7
   · intro y hy
     constructor
     · intro hm
       have h8 := D.bd_conj _ hm
-      rw [_root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj, h4 _ (star_mem_ball_lemma_2 hy)] at h8
+      rw [_root_.GlobalTheory.CompanionTheory.Ar.Cusp.SncPiece.conj_conj,
+        h4 _ (Charts.star_mem_ball.2 hy)] at h8
       obtain ⟨i, hi, hi0⟩ := h8
       exact ⟨i, hi, by simpa using hi0⟩
     · intro hm
       apply D.bd_conj
-      rw [h4 _ (star_mem_ball_lemma_2 hy)]
+      rw [h4 _ (Charts.star_mem_ball.2 hy)]
       obtain ⟨i, hi, hi0⟩ := hm
       exact ⟨i, hi, by simp [hi0]⟩
 

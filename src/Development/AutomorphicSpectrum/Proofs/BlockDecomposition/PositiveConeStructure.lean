@@ -753,8 +753,6 @@ open PositivityTheory.RgBcC
 open GlobalTheory.CompanionTheory.ConeHaar
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem _root_.GlobalTheory.T.smooth_positive_definite_sqrt : ∀ n : ℕ, ∃ σ₀ : Mat n → Mat n, ContDiffOn ℝ ∞ σ₀ {P | P.PosDef} ∧ ∀ P : Mat n, P.PosDef → σ₀ P * (σ₀ P)ᴴ = P := by
-  first | exact @GlobalTheory.CompanionTheory.ConeHaar.Chol.exists_smooth_section
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothCholeskyFactorStatement =====
@@ -778,9 +776,6 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem cone_open (n : ℕ) : IsOpen (cone n) := GlobalTheory.T.positive_cone_isOpen n
-theorem cone_chol (n : ℕ) : ∃ σ₀ : Mat n → Mat n, ContDiffOn ℝ ∞ σ₀ {P | P.PosDef} ∧ ∀ P : Mat n, P.PosDef → σ₀ P * (σ₀ P)ᴴ = P :=
-  GlobalTheory.T.smooth_positive_definite_sqrt n
 theorem cone_lin (n : ℕ) (g : Mat n) (hg : g.det ≠ 0) : ∃ T : (Fin n × Fin n → ℝ) →ₗ[ℝ] (Fin n × Fin n → ℝ),
     (∀ v, hOf (T v) = g * hOf v * gᴴ) ∧ LinearMap.det T = ‖g.det‖ ^ (2 * n) := GlobalTheory.T.congruence_action_determinant n g hg
 theorem cone_fin (n : ℕ) (C : Set (Fin n × Fin n → ℝ)) (hC : IsCompact C) (hCc : C ⊆ cone n) : coneMeas n C < ⊤ :=
@@ -850,23 +845,9 @@ theorem cone_unit (n : ℕ) (a b : Mat n) (ha : a.det ≠ 0) (hab : a * aᴴ = b
     rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.one_mul]
 
 theorem cone_congr (n : ℕ) (g P : Mat n) (hg : g.det ≠ 0) (hP : P.PosDef) : (g * P * gᴴ).PosDef := by
-  have hh : (g * P * gᴴ).IsHermitian := by
-    show (g * P * gᴴ)ᴴ = _
-    simp only [conjTranspose_mul, conjTranspose_conjTranspose, hP.isHermitian.eq, Matrix.mul_assoc]
-  refine Matrix.PosDef.of_dotProduct_mulVec_pos hh fun x hx => ?_
-  have hinj : gᴴ *ᵥ x ≠ 0 := by
-    intro h0
-    have hu : IsUnit gᴴ.det := by
-      rw [Matrix.det_conjTranspose]; exact isUnit_iff_ne_zero.2 (star_ne_zero.2 hg)
-    apply hx
-    have := congrArg (fun w => gᴴ⁻¹ *ᵥ w) h0
-    simpa [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu] using this
-  have h := Matrix.PosDef.dotProduct_mulVec_pos hP hinj
-  have e : star x ⬝ᵥ (g * P * gᴴ) *ᵥ x = star (gᴴ *ᵥ x) ⬝ᵥ P *ᵥ (gᴴ *ᵥ x) := by
-    rw [star_mulVec, conjTranspose_conjTranspose, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
-      Matrix.dotProduct_mulVec]
-  rw [e]
-  exact h
+  simpa [Matrix.star_eq_conjTranspose] using
+    (Matrix.IsUnit.posDef_star_right_conjugate_iff (x := P)
+      ((Matrix.isUnit_iff_isUnit_det g).2 (isUnit_iff_ne_zero.2 hg))).2 hP
 
 theorem cone_gram (n : ℕ) (g : Mat n) (hg : g.det ≠ 0) : (g * gᴴ).PosDef := by
   have := cone_congr n g 1 hg Matrix.PosDef.one

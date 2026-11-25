@@ -1,5 +1,7 @@
 module
 
+
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.ToPtsInj
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PlacesOf
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SemidefG
@@ -94,7 +96,6 @@ import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFramesCompl
 import Formalism.LocalToGlobal.SiegelLatticeTheory.SiegelMassRatios.GramJoint
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RowTermAmplitudeEqMassMulPhaseStatement
 import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.WeightConstT
-
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGlobalCoordinatesRationalFlagPair, Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGlobalCoordinatesRationalFlagPairStatement, Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsScaleNormalisedLocalReadingStatement, Development.AbelianVarietyTheory.Proofs.FlagMeasures.FinprodEqProdMulFinprodIte, Development.AbelianVarietyTheory.Proofs.FlagMeasures.AmplitudeExpansionOverFinitePlaces, Development.AbelianVarietyTheory.Proofs.FlagMeasures.LocalDatumOfTermInMovedLatticeOrbit, Development.AbelianVarietyTheory.Proofs.FlagMeasures.LocalDatumOfTermInMovedLatticeOrbitStatement, Development.AbelianVarietyTheory.Proofs.FlagMeasures.GlobalAmplitudeEqLocalAmplitudes, Development.AbelianVarietyTheory.Proofs.FlagMeasures.GlobalAmplitudeEqLocalAmplitudesStatement, Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermMovesToBaseFramesUpToUnitriangular, Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermMovesToBaseFramesUpToUnitriangularStatement, Development.AbelianVarietyTheory.Proofs.FlagMeasures.FamilyGroupSumFactorsRowWeightAmplitudeProof
 
@@ -1520,23 +1521,7 @@ namespace GlobalTheory.FamilyNormRational
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem toPts_inj' {K : Type} [Zero K] {i : ℕ} (p q : Point K (i + 1)) (h : toPts p = toPts q) : p = q := by
-  have hb : p.1.map Prod.snd = q.1.map Prod.snd := congrArg (fun x => x.1.blocks) h
-  have hl : p.1.length = q.1.length := by simpa using congrArg List.length hb
-  have hv : ∀ k (hk : k < p.1.length) (hk' : k < q.1.length), (p.1[k]).1 = (q.1[k]).1 := by
-    intro k hk hk'
-    have key := congrArg (fun x : (Σ c : Composition (i + 1), (Fin c.length → K)) =>
-      if hk : k < x.1.length then x.2 ⟨k, hk⟩ else 0) h
-    have e1 : k < (toPts p).1.length := by simpa [toPts, Composition.length] using hk
-    have e2 : k < (toPts q).1.length := by simpa [toPts, Composition.length] using hk'
-    simp only [dif_pos e1, dif_pos e2] at key
-    simpa [toPts] using key
-  apply Subtype.ext
-  apply List.ext_getElem hl
-  intro k hk hk'
-  have hs := congrArg (fun l => l[k]?) hb
-  simp only [List.getElem?_map, List.getElem?_eq_getElem hk, List.getElem?_eq_getElem hk', Option.map_some,
-    Option.some.injEq] at hs
-  exact Prod.ext (hv k hk hk') hs
+  first | exact _root_.Formalism.L2.SG.NGCut.NormalVectorPairings.toPts_inj | exact @_root_.Formalism.L2.SG.NGCut.NormalVectorPairings.toPts_inj | apply _root_.Formalism.L2.SG.NGCut.NormalVectorPairings.toPts_inj <;> assumption
 
 theorem squaredGroupSum_classDoubleCoset_eq_rowWeight : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), Formalism.MainNotions.S.Cnt.Stand D u u' → 4 * D.R.rS + 7 ≤ D.R.k →
     ConcTie X Y → ∀ ν, Formalism.L2.SG.RealObj.NuQPin X u u' ν → ∀ s : X.B.I.Ginf → NNReal, (∀ γ, 0 < s γ) →
@@ -1605,7 +1590,7 @@ theorem squaredGroupSum_classDoubleCoset_eq_rowWeight : ∀ (D : D7) (X : HidaSe
       ⟨hAtB p, (GlobalTheory.T.localisedBaseFrames_relevantPair D (zOf Y) u u' w1 F00 F'0 hZ hGv p).2 _ (hAtB p)⟩
     obtain ⟨G, ⟨cc⟩⟩ := GlobalTheory.T.exists_global_coordinates_rational_flagPair D X Y u u' hSt w1 F00 F'0 Fm.FP hZ hGv hBase
     obtain ⟨ρ, U, U', hmv⟩ := GlobalTheory.T.term_moves_to_baseFrames_up_to_unitriangular D X Y u u' hSt w1 F00 F'0 Fm.FP hZ hGv hBase t0 hat0
-    have hcore := GlobalTheory.T.row_doubleCoset_sum_norm_sq_bound D X Y u u' hSt hk w1 F00 F'0 Fm.FP hZ hGv hBase G cc ν hνP t0 ρ U U' hmv hrel0 hpt0 S
+    have hcore := _root_.GlobalTheory.HL.RowCoset.row_coset_sum_norm_sq D X Y u u' hSt hk w1 F00 F'0 Fm.FP hZ hGv hBase G cc ν hνP t0 ρ U U' hmv hrel0 hpt0 S
     have hamp := GlobalTheory.T.globalAmplitude_eq_localAmplitudes D X Y u u' hSt hk w1 F00 F'0 Fm.FP hZ hGv hBase G cc t0 ρ U U' hmv Fm.R Fm.P Fm.Om
       (fun p => (d p).1) hgood hOm (fun p => hOv p.1 p.2) S
     have hset : (TS ∩ {t | cls t = c ∧ ptPN t = γ ∧ nmlOf Y u u' t = n}) =

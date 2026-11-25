@@ -126,19 +126,6 @@ theorem H_subsingleton (F : C ⥤ ModuleCat.{0} R) (h : ∀ T, Subsingleton (F.o
   subst e
   rfl
 
-theorem sqM_rep (a b : IdF A) (T : C) (x : sqM a b T) :
-    ∃ (y : A.obj T) (hy : y ∈ a.S T), x = sqMk a b y hy := by
-  obtain ⟨x, hx⟩ := x
-  obtain ⟨y, hy, rfl⟩ := (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).1 hx
-  exact ⟨y, hy, rfl⟩
-
-theorem sq_self_subsingleton (a : IdF A) (T : C) : Subsingleton ((sq a a).obj T) := by
-  refine ⟨fun x y => ?_⟩
-  obtain ⟨x', hx, rfl⟩ := sqM_rep a a T x
-  obtain ⟨y', hy, rfl⟩ := sqM_rep a a T y
-  refine Subtype.ext ?_
-  change Ideal.Quotient.mk _ x' = Ideal.Quotient.mk _ y'
-  rw [Ideal.Quotient.eq_zero_iff_mem.2 hx, Ideal.Quotient.eq_zero_iff_mem.2 hy]
 
 variable {a b c : IdF A}
 
@@ -155,7 +142,7 @@ theorem finite_dev [IsNoetherianRing R] (a : ℕ → IdF A) (hanti : ∀ k l, k 
   | zero =>
     intro r h
     obtain rfl : r = s := by omega
-    have := H_subsingleton _ (sq_self_subsingleton (a r)) n
+    have := H_subsingleton _ (GlobalTheory.CompanionTheory.KFin.sq_self_subsingleton (a r)) n
     exact Module.Finite.of_finite
   | succ d ih =>
     intro r h
@@ -359,18 +346,8 @@ theorem cochain_exact (a b : IdF A) (ha : ∀ T, a.S T = ⊤) :
 
 theorem pull_toSq_bijective (a b : IdF A) (ha : ∀ T, a.S T = ⊤) :
     (∀ j, Subsingleton (CH.H (sq b (IdF.bot A)) j)) →
-      ∀ j, Function.Bijective ((toSq a b ha).pull j) := by
-  intro hv j
-  obtain ⟨hf, hfg, hg⟩ := cochain_exact a b ha
-  obtain ⟨δ, -, -, hex, hex2, -⟩ := CrystallineSemistableComparison.P.les _ _ hf hfg hg
-  constructor
-  · rw [injective_iff_map_eq_zero]
-    intro x hx
-    obtain ⟨y, rfl⟩ := (hex j x).1 hx
-    rw [(hv j).elim y 0, map_zero]
-  · intro y
-    obtain ⟨x, hx⟩ := (hex2 j y).1 ((hv (j + 1)).elim _ _)
-    exact ⟨x, hx⟩
+      ∀ j, Function.Bijective ((toSq a b ha).pull j) :=
+  by intros; apply _root_.GlobalTheory.CompanionTheory.KIso.toSq_bij; assumption
 
 end GlobalTheory.CompanionTheory.LengthOneCochainExactness
 end -- clump:auto

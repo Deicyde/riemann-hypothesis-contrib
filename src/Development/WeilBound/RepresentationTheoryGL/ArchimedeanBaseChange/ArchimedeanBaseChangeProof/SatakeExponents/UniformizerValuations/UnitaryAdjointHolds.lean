@@ -35,44 +35,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Spherica
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteClassSetHermitianUnitaryOpenLevel
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ExistsCompactLatticeStabilizerBoundedReal
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdelicUnitaryGroup
-import Mathlib.Algebra.Order.Floor.Extended
-import Mathlib.Algebra.Order.Floor.Semifield
-import Mathlib.Algebra.Order.Interval.Basic
-import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Combinatorics.Enumerative.DyckWord
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
-import Mathlib.Data.NNRat.Floor
-import Mathlib.Geometry.Euclidean.Volume.Basic
-import Mathlib.NumberTheory.Chebyshev
-import Mathlib.NumberTheory.Height.NumberField
-import Mathlib.NumberTheory.Height.Projectivization
-import Mathlib.NumberTheory.LucasLehmer
-import Mathlib.NumberTheory.SelbergSieve
-import Mathlib.RingTheory.Radical.NatInt
-import Mathlib.Tactic.Echelon.Zsqrtd
-import Mathlib.Tactic.Inclusion.Extension.Core.Core
-import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
-import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
 import Mathlib.Tactic.Linter.HaveILetI
-import Mathlib.Tactic.NormNum.Irrational
-import Mathlib.Tactic.NormNum.IsCoprime
-import Mathlib.Tactic.NormNum.IsSquare
-import Mathlib.Tactic.NormNum.LegendreSymbol
-import Mathlib.Tactic.NormNum.ModEq
-import Mathlib.Tactic.NormNum.NatFib
-import Mathlib.Tactic.NormNum.NatLog
-import Mathlib.Tactic.NormNum.NatSqrt
-import Mathlib.Tactic.NormNum.Ordinal
-import Mathlib.Tactic.NormNum.Parity
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.RealSqrt
-import Mathlib.Tactic.Polynomial.Basic
-import Mathlib.Tactic.ReduceModChar
-import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 import Development.AbelianVarietyTheory.Definitions.Divisors.HilbertNinetyQuotientHomEqIff
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsWeilFormulas
@@ -80,20 +43,10 @@ import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
 import Development.AbelianVarietyTheory.Definitions.Foundations.EventuallyNormFinLeOne
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsIwasawaOfIsCompact
 import Development.AbelianVarietyTheory.Definitions.Foundations.NormEulerPolySubOneLe
-import Mathlib.Tactic.TypeStar
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.DiscreteTopologyRationalPointsHermitianSpace
-import Mathlib.Dynamics.Ergodic.Action.Regular
-import Mathlib.Tactic.Basify
-import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Linter.Style
-import Mathlib.Analysis.Normed.Algebra.GelfandRadius
 import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Heckecomm
 import Formalism.SatakeDualWeyl.KpqSubgroupCompact
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
-import Mathlib.Data.Nat.Choose.Multinomial
-import Mathlib.RingTheory.SimpleRing.Principal
-import Mathlib.RingTheory.WittVector.IsPoly
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralAdaptedTriangularBounded, Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCompactImageEqUniv, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactUnitHolds, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InverseDoubleCosetNonsplit, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InverseDoubleCosetNonsplitStatement, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FixedSpaceRankOne.SphOne, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FixedSpaceRankOne.TraceMulOfFinrankOne, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FixedSpaceRankOne.SphStar, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.QuadraticCharacterNorms.SphStarUPlug, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.SphericalHeckeUnitary.PuSphHecke, Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.UnitaryAdjointHolds
@@ -587,37 +540,18 @@ theorem inv_mem_doubleCoset : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
     (hconj _).1 (by rw [show b * (b⁻¹ * g.1 * b) * b⁻¹ = g.1 by group]; exact g.2)
   have hbi := (GlobalTheory.LFun.KGL w (n := n)).inv_mem hbK
   have hO : Ov E w = intL (w.adicCompletion E) := Subring.ext fun _ => Iff.rfl
-  have hKU : ∀ k ∈ KU (cj w) n, (k.1 : GLw n w) ∈ GlobalTheory.LFun.KGL w (n := n) := fun k hk => by
-    have h : k.1 ∈ intPts (intL (w.adicCompletion E)).subtype (GU (cj w) n) := Subgroup.mem_subgroupOf.1 hk
-    show k.1 ∈ (bc (Ov E w).subtype).range
-    rw [hO]
-    exact (Subgroup.mem_inf.1 h).2
-  obtain ⟨d, t, ht, k₁, hk₁, k₂, hk₂, e⟩ := GlobalTheory.ChainOnto.CayleyVac.exists_cartanU hUI ⟨_, hback⟩
-  have e' : b⁻¹ * g.1 * b = k₁.1 * t.1 * k₂.1 := congrArg Subtype.val e
-  have hinv : (t.1)⁻¹ = wJ _ n * t.1 * wJ _ n := (wJ_conj_diag hUI.2.2.1 d t ht).symm
-
-  set c : GLw n w := (k₂.1 : GLw n w)⁻¹ * wJ _ n * (k₁.1 : GLw n w)⁻¹ with hc
-  have hcU : c ∈ UJ (cj w) (antiJ _ n) :=
-    mul_mem (mul_mem (inv_mem k₂.2) (wJ_mem_GU _)) (inv_mem k₁.2)
-  have hcK : c ∈ GlobalTheory.LFun.KGL w (n := n) :=
-    mul_mem (mul_mem (inv_mem (hKU k₂ hk₂)) (wJ_mem_GLint _)) (inv_mem (hKU k₁ hk₁))
-  have hx : b * c * b⁻¹ ∈ UL n w := (hconj _).2 hcU
-  have hxK : (⟨b * c * b⁻¹, hx⟩ : UL n w) ∈ KL n w :=
-    Subgroup.mem_subgroupOf.2 (mul_mem (mul_mem hbK hcK) hbi)
-  refine ⟨_, hxK, _, hxK, Subtype.ext ?_⟩
-  show (g.1)⁻¹ = b * c * b⁻¹ * g.1 * (b * c * b⁻¹)
-  have hg : g.1 = b * (k₁.1 * t.1 * k₂.1) * b⁻¹ := by
-    rw [← e']
-    group
-  have hti : (k₁.1 * t.1 * k₂.1 : GLw n w)⁻¹ = c * (k₁.1 * t.1 * k₂.1) * c := by
-    rw [_root_.mul_inv_rev, _root_.mul_inv_rev, hinv, hc]
-    group
-  calc (g.1)⁻¹ = b * (k₁.1 * t.1 * k₂.1 : GLw n w)⁻¹ * b⁻¹ := by
-        rw [hg]
-        group
-    _ = b * c * b⁻¹ * g.1 * (b * c * b⁻¹) := by
-        rw [hti, hg]
-        group
+  obtain ⟨k₁, hk₁, k₂, hk₂, he⟩ := GlobalTheory.UnitarySwap.inv_mem_doubleCoset hUI
+    (wJ_mem_GLint _) (fun i j => by simp only [wJ, antiJ, add_comm i.val j.val]; split_ifs <;> simp)
+    hback
+  have hkK : ∀ k, k ∈ GLint (Fin n) (intL (w.adicCompletion E)) →
+      b * k * b⁻¹ ∈ GlobalTheory.LFun.KGL w (n := n) := fun k hk =>
+    mul_mem (mul_mem hbK (by show k ∈ (bc (Ov E w).subtype).range; rw [hO]; exact hk)) hbi
+  refine ⟨⟨b * k₁ * b⁻¹, (hconj _).2 hk₁.1⟩, Subgroup.mem_subgroupOf.2 (hkK _ hk₁.2),
+    ⟨b * k₂ * b⁻¹, (hconj _).2 hk₂.1⟩, Subgroup.mem_subgroupOf.2 (hkK _ hk₂.2), Subtype.ext ?_⟩
+  show (g.1)⁻¹ = b * k₁ * b⁻¹ * g.1 * (b * k₂ * b⁻¹)
+  have he' : b⁻¹ * (g.1)⁻¹ * b = k₁ * (b⁻¹ * g.1 * b) * k₂ := by rw [← he]; group
+  calc (g.1)⁻¹ = b * (b⁻¹ * (g.1)⁻¹ * b) * b⁻¹ := by group
+    _ = b * k₁ * b⁻¹ * g.1 * (b * k₂ * b⁻¹) := by rw [he']; group
 
 end GlobalTheory.CompanionTheory.InvDoubleCoset
 end -- clump:auto

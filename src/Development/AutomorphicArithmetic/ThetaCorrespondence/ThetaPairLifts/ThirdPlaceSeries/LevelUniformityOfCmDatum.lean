@@ -221,7 +221,7 @@ theorem compAt_baseCharacter_mul_unramified_eq_typeCharacter_alt : GlobalTheory.
         push_cast
         rw [map_sub, map_natCast]
       rw [e, map_sub, map_natCast, ZMod.natCast_zmod_val, hxv, sub_self]
-    have h61 := GlobalTheory.T.levelCharacters_typePlaces_eq_local_components hGAR D cf Rw low Pq S hL eig θ Bs hV τ hτ j kv x a ha0 hmem
+    have h61 := _root_.GlobalTheory.TwInputs.tau_eq_locK hGAR D cf Rw low Pq S hL eig θ Bs hV τ hτ j kv x a ha0 hmem
     have hunit : IsUnitAt s.w (atFin s.w k) := by
       have e := _root_.Formalism.UG.P.levelaf_valued_algebraMap s.w (k : D.host.E)
       show Valued.v (algebraMap D.host.E (s.w.adicCompletion D.host.E) (k : D.host.E)) = 1
@@ -838,10 +838,6 @@ theorem gVal_one (i : D.ntw.Tw) (k : ℕ) (b : Bool) (kv : Σ kk : Fin 2, D.nd.P
   rw [this, map_one]
   exact map_one _
 
-theorem loc_one_eq {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (s : SplitPlace L) :
-    NX.locM s (1 : GAf L n) = 1 := by
-  simp [NX.locM]
-
 theorem chi_eq_at : ∀ (D : D7) (i : D.ntw.Tw) (j : ℕ) (b : Bool) (k : ℕ) (Q : Finset (PlE D.host))
     (ψ : G D.host.E D.nd.Om →* (D.ntw.Ok i k)ˣ) (e : ℤ) (W₀ : Type) [AddCommGroup W₀] [Module (FractionRing (D.ntw.O i)) W₀]
     (ρ₀ : Representation (FractionRing (D.ntw.O i)) (GQ D.host.E D.R.nV) W₀)
@@ -859,7 +855,7 @@ theorem chi_eq_at : ∀ (D : D7) (i : D.ntw.Tw) (j : ℕ) (b : Bool) (k : ℕ) (
   have h1 := M.chi_eq 1 M.J.one_mem
   have e1 : (⟨1, M.J.one_mem⟩ : M.J) = 1 := rfl
   rw [e1, map_one, Units.val_one] at h1
-  simp only [loc_one_eq, gVal_one, Finset.prod_const_one, one_mul] at h1
+  simp only [GlobalTheory.LevGChar.locM_one, gVal_one, Finset.prod_const_one, one_mul] at h1
   rw [M.chi_eq κ h, Fintype.prod_eq_single kv0 (fun kv hne => by rw [hG kv hne, gVal_one]), mul_assoc]
   conv_rhs => rw [← mul_one (NX.gVal D i k b kv0 (M.sp (NX.pG D kv0)) (M.redG kv0) (τ kv0) (NX.locM (M.sp (NX.pG D kv0)) κ))]
   congr 1

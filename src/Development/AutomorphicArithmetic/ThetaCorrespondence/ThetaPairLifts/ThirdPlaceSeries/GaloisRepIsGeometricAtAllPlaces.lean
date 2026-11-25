@@ -1114,15 +1114,6 @@ theorem isoLoc_twist (hL : CharSum N A) (S : List (Part A.CG)) (χ : A.CG 1) (w 
       A.lpChar (A.lpSum (spehLoc N A p w) (isoLoc N A S w)) (A.locG χ w)
     rw [spehLoc_twist N A hL p χ w, ih, (hL w _ _ _ 0 hχ).1]
 
-theorem isoLoc_append_singleton (S : List (Part A.CG)) (q : Part A.CG) (w : PlE H) :
-    isoLoc N A (S ++ [q]) w = A.lpSum (isoLoc N A S w) (spehLoc N A q w) := by
-  induction S with
-  | nil => exact A.lpSum_comm _ _
-  | cons p S ih =>
-    change A.lpSum (spehLoc N A p w) (isoLoc N A (S ++ [q]) w) =
-      A.lpSum (A.lpSum (spehLoc N A p w) (isoLoc N A S w)) (spehLoc N A q w)
-    rw [ih, A.lpSum_assoc]
-
 end GlobalTheory.LocCongrRoad
 end -- clump:auto
 end -- clump:auto
@@ -1200,7 +1191,7 @@ theorem main_alt_alt : ∀ D : D7, Formalism.MainNotions.SumRepresentations.tie0
   rw [GlobalTheory.LocCongrRoad.isoLoc_twist _ _ hL, GlobalTheory.LocCongrRoad.isoLoc_twist _ _ hL] at e1
   have e2 := congrArg (fun b => D.naut.lpChar b (D.naut.locG D.naut.etaT (D.naut.plGw k v))) e1
   simp only [lpChar_eta_back D hT.1] at e2
-  rw [GlobalTheory.LocCongrRoad.isoLoc_append_singleton, GlobalTheory.LocCongrRoad.isoLoc_append_singleton] at e2
+  rw [GlobalTheory.ParUpRoad.isoLoc_append_singleton, GlobalTheory.ParUpRoad.isoLoc_append_singleton] at e2
   rw [hc _ _ _ _ e2]
   exact GlobalTheory.PointIrredCompare.fullLabels_of_good D.nd D.naut hSig' hgood k v
 end GlobalTheory.GoodDepthZero
@@ -1604,7 +1595,7 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
     (∀ i, PairLift D.nd D.naut i ∧ SplitBC D.nd D.naut i ∧ RepOfLoc D.nd D.naut i) → GlobalTheory.NRows.RowsC D := by
   intro hL D P J hA hB a1 a8 p1 hi
   obtain ⟨p41, _, p42⟩ := p1
-  obtain ⟨tl, lt, io, rb⟩ := _root_.GlobalTheory.TieLabAt.main_alt_alt hL D P
+  obtain ⟨tl, -, -, -⟩ := _root_.GlobalTheory.TieLabAt.main_alt_alt hL D P
   have iface := _root_.GlobalTheory.AdmIface.main_alt_alt D
   have bc : ∀ i, BCEx D.nd D.naut i := iface.1 a1
   have lift : ∀ i, GlobalTheory.ThetaExh.LiftParam D.nd D.naut i := iface.2.2.1 p42
@@ -1612,11 +1603,8 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
   have rho : GlobalDatumResidualRepCondition D :=
     _root_.GlobalTheory.ParamRep.jointCond_33_rho_of_signature_adm5 D hA.tie0 hA.a2 hB.a4 hA.a5 p41 (GlobalTheory.GoodCuspPoint.main D tl)
       (_root_.GlobalTheory.XiOver.main_alt_alt_alt D P.cf P.C P.tp P.chr P.val hA.tie0 hA.a2 hA.a5)
-  have rp : _root_.UpperTheory.GalS.RowRepAtGN D :=
-    _root_.GlobalTheory.RowRepOcc.repAtGN_of_point_split D hA.tie0 hA.a2 hA.a5 p42 rho hA.gsp (_root_.GlobalTheory.RowPointLoc.main_alt_alt hL D P p42 p41)
   exact
-    { c4b := _root_.GlobalTheory.RowTie.tameGenerator_residual_alt_alt D rb io lt rp
-      rho := rho
+    { rho := rho
       dz := _root_.GlobalTheory.GoodDepthZero.main_alt_alt D hA.tie0 hB.a4 p41 hA.gsp
       parUp := GlobalTheory.RowTie.parUpRec_of_ties D P.T hB.thetaOne (fun i => (hi i).1) bc (fun i => (hi i).2.1)
         (fun i => (hi i).2.2)

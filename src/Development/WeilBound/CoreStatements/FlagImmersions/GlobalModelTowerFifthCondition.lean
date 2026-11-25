@@ -470,19 +470,11 @@ theorem isVal_inv (hw : w ∈ ptsOver L (mCoordIdeal y)) {a : Ω} {v : L} (hv : 
   · rw [hy]; field_simp
   · rw [hv']; field_simp
 
-theorem prod_toNat {F : Type} [Field F] (x : K → F) (hx : ∀ k, x k ≠ 0) (a : K → ℤ) :
-    ∏ k, x k ^ (a k).toNat = (∏ k, x k ^ a k) * ∏ k, x k ^ (-a k).toNat := by
-  rw [← Finset.prod_mul_distrib]
-  refine Finset.prod_congr rfl fun k _ => ?_
-  rw [← zpow_natCast, ← zpow_natCast, ← zpow_add₀ (hx k)]
-  congr 1
-  omega
-
 theorem hasVal_of_isVal {c : ∀ k, ι k} (hy : ∀ k, y ⟨k, c k⟩ ≠ 0) (hz : ∀ k, w ⟨k, c k⟩ ≠ 0) (a : K → ℤ) {t : Ω} {v : L}
     (h : IsVal y w t v) : HasVal y a (t * ∏ k, y ⟨k, c k⟩ ^ a k) w (v * ∏ k, w ⟨k, c k⟩ ^ a k) := by
   obtain ⟨d, g, h', hg, hh, hn, e₁, e₂⟩ := h
-  have hy₁ := prod_toNat (fun k => y ⟨k, c k⟩) hy a
-  have hz₁ := prod_toNat (fun k => w ⟨k, c k⟩) hz a
+  have hy₁ := GlobalTheory.CompanionTheory.Ar.ChartTwist.prod_pow_toNat (fun k => y ⟨k, c k⟩) hy a
+  have hz₁ := GlobalTheory.CompanionTheory.Ar.ChartTwist.prod_pow_toNat (fun k => w ⟨k, c k⟩) hz a
   have hz₂ : ∏ k, w ⟨k, c k⟩ ^ (-a k).toNat ≠ 0 := Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hz k)
   refine ⟨d + fun k => (a k).toNat, d + fun k => (-a k).toNat,
     g * GroundTheory.Heights₂.Heights.HilbertSamuel.GenOnFibres.cmon c fun k => (a k).toNat,
@@ -1345,24 +1337,8 @@ theorem recR_map (e : ∀ k, ι k ≃ Fin (n k + 1)) {x : Cone n (AlgebraicClosu
 
 end Recursion
 
-theorem heightRecR : GroundTheory.Heights₂.Heights.HeightRecR.Statement := by
-  open GroundTheory.Heights₂.Heights in
-  have hM : OrbitChartMax.Statement := OrbitChartMax.proof
-  open GroundTheory.Heights₂.Heights in
-  have hQ : OrbitChartQuot.Statement := OrbitChartQuot.proof
-  open GroundTheory.Heights₂.Heights in
-  have hIff : OrbitCenterMemIff.Statement := OrbitCenterMemIff.proof
-  open GroundTheory.Heights₂.Heights in
-  exact HeightRecR.proof OrbitDivVertical.proof
-    (OrbitFiniteSum.proof OrbitDegreeRatio.proof
-      (OrbitLocalSum.proof OrbitChartRing.proof hM (OrbitChartResidue.proof hM hQ (OrbitChartDehom.proof hM hQ))
-        OrbitChartMult.proof
-        (LocalLengthPlaces.proof LocalQuotCard.proof CentredPlacesFinite.proof
-          (LocalQuotCentred.proof CentredRingNormal.proof LocalNormalIndex.proof) PlacesRingQuot.proof)
-        OrbitCenterChart.proof PlaceCentredSum.proof OrbitChartTerm.proof)
-      (OrbitCenterZero.proof OrbitCenterLe.proof hIff
-        (OrbitCenterDivSupp.proof hIff (OrbitCenterPrime.proof hIff) SubringPrimeMaximal.proof)))
-    (OrbitArchSum.of_conjSum OrbitConjSum.proof)
+theorem heightRecR : GroundTheory.Heights₂.Heights.HeightRecR.Statement :=
+  _root_.CoverDenseAlt.heightRecR_full
 
 theorem mem_mCoordIdeal_iff {Ω : Type} [Field Ω] (w : (Σ k, ι k) → Ω) (f : MRing ι) (a : K → ℕ)
     (hf : IsMultiHomog f a) : f ∈ mCoordIdeal w ↔ aeval w f = 0 := by

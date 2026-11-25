@@ -1068,18 +1068,6 @@ open GlobalTheory.TwistChoice (Reading ReadsAt)
 open Formalism.L2.DIV GlobalTheory.CoefModel
 
 
-theorem _root_.GlobalTheory.T.weightMatrices_match_of_coeffSpace_iso :
-    ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
-    {ι : Type} [Fintype ι] {K : Type} [Field K] (φ : K →+* ℂ) (emb : ι → L →+* K)
-    (lam : ι → DomWeight n) {W₀ W' : Type} [AddCommGroup W₀] [Module K W₀]
-    [AddCommGroup W'] [Module ℂ W'] (ρ₀ : Representation K (GQ L n) W₀)
-    (ρ' : Representation ℂ (GQ L n) W') (T : W₀ ≃ₗ[K] VV K lam),
-    (∀ γ x, T (ρ₀ γ x) = rhoVr emb lam (Formalism.L2.Col.mtwRat (L := L) (n := n) γ) (T x)) →
-    ∀ (T' : W' ≃ₗ[ℂ] VV ℂ lam),
-    (∀ γ x, T' (ρ' γ x) =
-      rhoVr (fun t => φ.comp (emb t)) lam (Formalism.L2.Col.mtwRat (L := L) (n := n) γ) (T' x)) →
-    GlobalTheory.LevCmp.WtMatch φ ρ₀ ρ' :=
-  @GlobalTheory.CoefMatch.wtMatch_of_coef
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WeightMatricesMatchOfCoeffSpaceIsoStatement =====
@@ -1173,7 +1161,7 @@ theorem cellWt_of_sideRead_of_admTw : _root_.GlobalTheory.HeightCounting.Up.Publ
   have hj1 : 1 ≤ j.1 + 1 := by omega
   have hj2 : j.1 + 1 ≤ (Dof x).R.m := by omega
   choose lam0 hlam0 using fun t => l.b.Bs.exp.rhoW_hw i (j.1 + 1) b t hj1 hj2
-  obtain ⟨lamK, hlamK, TK, hTK⟩ := GlobalTheory.T.irreducible_weight_descends_to_polynomial_module (Dof x).host.E (Dof x).R.nV (Dof x).what₂.Tau
+  obtain ⟨lamK, hlamK, TK, hTK⟩ := _root_.GlobalTheory.WtDescent.weight_descends (Dof x).host.E (Dof x).R.nV (Dof x).what₂.Tau
     (FractionRing ((Dof x).ntw.O i)) (e.comp (NX.toKk (Dof x) i (T.k v))) (NX.kEmb (Dof x) i b)
     (by intro t t' h; beta_reduce at h; rw [hke, hke] at h; exact hinj h)
     (by intro t t'; beta_reduce; rw [hke, hke]; exact hcm t t')
@@ -1195,7 +1183,7 @@ theorem cellWt_of_sideRead_of_admTw : _root_.GlobalTheory.HeightCounting.Up.Publ
       rhoVr (NX.kEmb (Dof x) i b) lamK (Formalism.L2.Col.mtwRat.toFun γ) (TK y) := fun γ y => hTK γ _ (match_mtwRat γ) y
   have hfun : (fun t => (e.comp (NX.toKk (Dof x) i (T.k v))).comp (NX.kEmb (Dof x) i b t)) = Formalism.L2.embT (Dof x) :=
     funext hke
-  have h1 := GlobalTheory.T.weightMatrices_match_of_coeffSpace_iso (e.comp (NX.toKk (Dof x) i (T.k v))) (NX.kEmb (Dof x) i b) lamK _ (mtAt l.mt.M v j).wt.ρ TK hTK'
+  have h1 := GlobalTheory.CoefMatch.wtMatch_of_coef (e.comp (NX.toKk (Dof x) i (T.k v))) (NX.kEmb (Dof x) i b) lamK _ (mtAt l.mt.M v j).wt.ρ TK hTK'
     T' (by rw [hfun]; exact hT'r)
   unfold CellWt
   letI := (GlobalTheory.LevCmp.cell l.b.Bs.exp b hA j).acg

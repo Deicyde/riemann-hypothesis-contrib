@@ -52,7 +52,6 @@ import Mathlib.Tactic.ReduceModChar
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
 
@@ -145,7 +144,7 @@ theorem le_preimage_G_iff_test : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Alge
     exact ((spMap (algebraMap (FractionRing t.u.V) (PadicAlgCl p)) ≫ c.yK) a).2
   have hcen : M.Cen U₀ (y (cPt p)) y := ⟨rfl, hU⟩
   have hcl := GlobalTheory.ZH.isClosed_centre o Ω M U₀ _ p y hcen
-  obtain ⟨hker, -, hspan⟩ := GlobalTheory.T.span_rows_classZero_eq_invariant o Ω S ρ p y₀ t fun a => by
+  obtain ⟨hker, -, hspan⟩ := _root_.GlobalTheory.ZH.span_rows_class_zero o Ω S ρ p y₀ t fun a => by
     rw [hy₀]
     exact (mem_OO_iff _).1 (ψ a).2
   have hT : S.TT M (y (cPt p)) = S.perp t.l.yy.ker := by
