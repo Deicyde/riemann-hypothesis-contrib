@@ -228,10 +228,7 @@ theorem _root_.GlobalTheory.BorelUMod.exists_trace_one {ϖ : L} {σ : L →+* L}
     have ht : Valued.v (x + σ x) = 1 := by
       have e : x + σ x = (σ x - x) + 2 * x := by ring
       rw [e, Valuation.map_add_eq_of_lt_left _ hlt, hxu]
-    have ht0 : x + σ x ≠ 0 := by
-      intro e
-      rw [e, Valuation.map_zero] at ht
-      exact zero_ne_one ht
+    have ht0 : x + σ x ≠ 0 := (Valuation.ne_zero_iff _).1 (ht ▸ one_ne_zero)
     refine ⟨x / (x + σ x), ?_, ?_⟩
     · rw [map_div₀, ht, div_one]
       exact hx1
@@ -239,10 +236,7 @@ theorem _root_.GlobalTheory.BorelUMod.exists_trace_one {ϖ : L} {σ : L →+* L}
   · refine ⟨1 / 2, ?_, ?_⟩
     · rw [map_div₀, Valuation.map_one, h2, div_one]
     · rw [map_div₀, map_one, map_ofNat]
-      have h20 : (2 : L) ≠ 0 := by
-        intro e
-        rw [e, Valuation.map_zero] at h2
-        exact zero_ne_one h2
+      have h20 : (2 : L) ≠ 0 := (Valuation.ne_zero_iff _).1 (h2 ▸ one_ne_zero)
       rw [← add_div, one_add_one_eq_two, div_self h20]
 
 end GlobalTheory.BorelUMod
