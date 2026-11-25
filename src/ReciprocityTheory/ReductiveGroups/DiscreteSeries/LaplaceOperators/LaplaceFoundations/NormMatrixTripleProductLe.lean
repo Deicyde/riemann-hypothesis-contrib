@@ -142,13 +142,8 @@ attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNorm
 
 variable {n : ℕ}
 
-theorem entry_le_op (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) : ‖A i j‖ ≤ ‖A‖ := by
-  have h : ‖A i j‖₊ ≤ ‖A‖₊ := by
-    rw [Matrix.linfty_opNNNorm_def]
-    refine le_trans ?_ (Finset.le_sup (f := fun i : Fin n => ∑ j : Fin n, ‖A i j‖₊)
-      (Finset.mem_univ i))
-    exact Finset.single_le_sum (f := fun j => ‖A i j‖₊) (fun _ _ => bot_le) (Finset.mem_univ j)
-  exact_mod_cast h
+theorem entry_le_op (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) : ‖A i j‖ ≤ ‖A‖ :=
+  Matrix.norm_apply_le_linfty_opNorm A i j
 
 theorem op_le_of_entry (A : Matrix (Fin n) (Fin n) ℂ) (c : ℝ) (hc : 0 ≤ c)
     (h : ∀ i j, ‖A i j‖ ≤ c) : ‖A‖ ≤ n * c := by
