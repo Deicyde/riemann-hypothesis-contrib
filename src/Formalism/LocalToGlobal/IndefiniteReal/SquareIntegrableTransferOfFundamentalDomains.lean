@@ -30,16 +30,8 @@ theorem lintegral_comp_symm_mul_eq_ofReal_mul_setLIntegral (μ : Measure (GA D (
   let e : X.B.I.GA ≃ᵐ GA D (D.sp.Y 0) :=
     { toEquiv := ι.symm.toEquiv, measurable_toFun := hιs, measurable_invFun := hι }
   have he : (e : X.B.I.GA → GA D (D.sp.Y 0)) = ι.symm := rfl
-  set 𝓕' : Set (GA D (D.sp.Y 0)) := ι.symm '' X.B.fund with h𝓕'def
-  have hpre : e ⁻¹' 𝓕' = X.B.fund := by
-    ext x
-    simp only [Set.mem_preimage, h𝓕'def, Set.mem_image]
-    constructor
-    · rintro ⟨y, hy, hxy⟩
-      have : y = x := ι.symm.injective (by rw [hxy]; rfl)
-      exact this ▸ hy
-    · intro hx
-      exact ⟨x, hx, rfl⟩
+  set 𝓕' : Set (GA D (D.sp.Y 0)) := ι.symm '' X.B.fund
+  have hpre : e ⁻¹' 𝓕' = X.B.fund := Set.preimage_image_eq _ ι.symm.injective
 
   have h1 : ∫⁻ x, f (ι.symm x * t) ∂(muX X) = ENNReal.ofReal c * ∫⁻ y in 𝓕', f (y * t) ∂μ := by
     have hm : Measure.map e (muX X) = (ENNReal.ofReal c • μ).restrict 𝓕' := by
@@ -53,14 +45,8 @@ theorem lintegral_comp_symm_mul_eq_ofReal_mul_setLIntegral (μ : Measure (GA D (
     (MeasurableEquiv.mulRight t).measurableEmbedding
   have h2 : ∫⁻ y in 𝓕', f (y * t) ∂μ = ∫⁻ y in (fun y => y * t) '' 𝓕', f y ∂μ :=
     hmp.setLIntegral_comp_emb hemb f 𝓕'
-  have himg : (fun y : GA D (D.sp.Y 0) => y * t) '' 𝓕' = (fun y => y * t⁻¹) ⁻¹' 𝓕' := by
-    ext z
-    simp only [Set.mem_image, Set.mem_preimage]
-    constructor
-    · rintro ⟨y, hy, rfl⟩
-      simpa using hy
-    · intro hz
-      exact ⟨z * t⁻¹, hz, by simp⟩
+  have himg : (fun y : GA D (D.sp.Y 0) => y * t) '' 𝓕' = (fun y => y * t⁻¹) ⁻¹' 𝓕' :=
+    Set.image_mul_right
   have hFD : IsFundamentalDomain (GQ (D.sp.Y 0)) ((fun y => y * t) '' 𝓕') μ := by
     rw [himg]
     refine h𝓕'.preimage_of_equiv (measurePreserving_mul_right μ t⁻¹).quasiMeasurePreserving
@@ -111,14 +97,7 @@ theorem fund_image_of (μ : Measure (GA D (D.sp.Y 0)))
   obtain ⟨hmf, hcov, hdis⟩ := X.B.fund_spec
   let e : X.B.I.GA ≃ᵐ GA D (D.sp.Y 0) :=
     { toEquiv := ι.symm.toEquiv, measurable_toFun := hιs, measurable_invFun := hι }
-  have hset : ι.symm '' X.B.fund = ι ⁻¹' X.B.fund := by
-    ext y
-    simp only [Set.mem_image, Set.mem_preimage]
-    constructor
-    · rintro ⟨x, hx, rfl⟩
-      simpa using hx
-    · intro hy
-      exact ⟨ι y, hy, by simp⟩
+  have hset : ι.symm '' X.B.fund = ι ⁻¹' X.B.fund := ι.toEquiv.image_symm_eq_preimage X.B.fund
 
   have hnull : ∀ A : Set X.B.I.GA, X.B.I.muA X.B.μf A = 0 → μ (ι ⁻¹' A) = 0 := by
     intro A hA
