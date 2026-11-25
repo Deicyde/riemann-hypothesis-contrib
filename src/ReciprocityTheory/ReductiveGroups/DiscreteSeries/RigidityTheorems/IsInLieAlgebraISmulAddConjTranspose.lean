@@ -47,13 +47,8 @@ theorem rq_K_unit {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k
 
 theorem rq_K_JH {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε) :
     kᴴ * Jm ε = Jm ε * kᴴ := by
-  obtain ⟨h1, h2⟩ := rq_K_unit hk
-  have hc : k * Jm ε = Jm ε * k := hk.2
-  calc kᴴ * Jm ε = kᴴ * Jm ε * (k * kᴴ) := by rw [h2, mul_one]
-    _ = kᴴ * (Jm ε * k) * kᴴ := by simp only [mul_assoc]
-    _ = kᴴ * (k * Jm ε) * kᴴ := by rw [hc]
-    _ = kᴴ * k * Jm ε * kᴴ := by simp only [mul_assoc]
-    _ = Jm ε * kᴴ := by rw [h1, one_mul]
+  have h := (show Commute k (Jm ε) from hk.2).star_star
+  rwa [Matrix.star_eq_conjTranspose, Matrix.star_eq_conjTranspose, rq_JH] at h
 
 theorem rq_K_UJ {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε) :
     k ∈ UJset ε := by
