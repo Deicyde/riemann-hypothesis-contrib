@@ -94,13 +94,8 @@ theorem cAct_mem_Sha (D : LData E Ω l) (e : ℤ) {x : H1 (qzTw D e)} (hx : x �
 
 theorem shaLen_eq_add (hl : l ≠ 2) (D : LData E Ω l) (e : ℕ) : shaLen D e = plusLen D e + minusLen D e := by
   have h2 : IsUnit (2 : ℤ_[l]) := by
-    by_contra hn
-    have hmem : (2 : ℤ_[l]) ∈ IsLocalRing.maximalIdeal ℤ_[l] :=
-      (IsLocalRing.mem_maximalIdeal _).mpr hn
-    rw [← PadicInt.ker_toZMod, RingHom.mem_ker, map_ofNat] at hmem
-    have h3 : ((2 : ℕ) : ZMod l) = 0 := by simpa using hmem
-    rw [ZMod.natCast_eq_zero_iff] at h3
-    exact hl ((Nat.prime_dvd_prime_iff_eq Fact.out Nat.prime_two).mp h3)
+    rw [PadicInt.isUnit_iff, ← Nat.cast_two, PadicInt.norm_natCast_eq_one_iff]
+    exact (Nat.coprime_primes Fact.out Nat.prime_two).2 hl
   have hs : ((-1 : ℤ_[l]) ^ e) * ((-1) ^ e) = 1 := by
     rw [← mul_pow, neg_one_mul, neg_neg, one_pow]
   have key := length_eq_add_eigen h2 (Sha D e) (cAct D e) (fun x hx => cAct_mem_Sha D e hx)
