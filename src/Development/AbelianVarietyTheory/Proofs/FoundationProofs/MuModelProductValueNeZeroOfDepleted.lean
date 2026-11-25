@@ -70,13 +70,8 @@ lemma coprime_right {a b : ℕ} (d : ℤ) (h : IsCoprime d ((a * b : ℕ) : ℤ)
 
 lemma chi_neg_one {k N : ℕ} (hk : Odd k) (χ : DirichletCharacter ℂ N) (g : ℕ → ℂ) (h : Prim k N χ⁻¹ g) :
     χ (-1) = -1 := by
-  have hsq := sq_neg_one χ
   by_contra hne
-  have h1 : χ (-1) = 1 := by
-    have : (χ (-1) - 1) * (χ (-1) + 1) = 0 := by linear_combination hsq
-    rcases mul_eq_zero.1 this with h | h
-    · linear_combination h
-    · exact absurd (by linear_combination h) hne
+  have h1 : χ (-1) = 1 := χ.even_or_odd.resolve_right hne
   have hinv : χ⁻¹ (-1) = 1 := by rw [dc_inv_neg_one, h1]
   have hq : ∀ τ : ℍ, qs g τ = 0 := by
     intro τ
