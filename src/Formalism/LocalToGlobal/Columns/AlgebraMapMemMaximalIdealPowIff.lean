@@ -42,13 +42,8 @@ instance owDVR (w : HeightOneSpectrum (𝓞 K)) : IsDiscreteValuationRing (Ow w)
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 K) w.ne_bot _
 
 def owToK (w : HeightOneSpectrum (𝓞 K)) : Ow w →+* K :=
-  IsLocalization.lift (M := w.asIdeal.primeCompl) (g := algebraMap (𝓞 K) K) (fun y => by
-    refine IsUnit.mk0 _ ?_
-    intro h
-    have h0 : (y : 𝓞 K) = 0 := by
-      apply FaithfulSMul.algebraMap_injective (𝓞 K) K
-      rw [h, map_zero]
-    exact y.2 (h0 ▸ w.asIdeal.zero_mem))
+  IsLocalization.lift (M := w.asIdeal.primeCompl) (g := algebraMap (𝓞 K) K) fun y =>
+    (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (w.asIdeal.primeCompl_le_nonZeroDivisors y.2)).isUnit
 
 instance owAlgebra (w : HeightOneSpectrum (𝓞 K)) : Algebra (Ow w) K := (owToK w).toAlgebra
 
