@@ -166,9 +166,7 @@ theorem mirabolic_mackey_pair : MirabolicMackey := by
   have hc0 : c ≠ 0 := by
     rw [hc]
     exact sub_ne_zero.2 (Ne.symm hbad)
-  obtain ⟨x, hx⟩ : ∃ x, ψ x ≠ 1 := by
-    by_contra! hno
-    exact hψ (AddChar.ext ψ 1 fun y => by rw [hno y, AddChar.one_apply])
+  obtain ⟨x, hx⟩ := AddChar.ne_one_iff.1 hψ
   obtain ⟨t, ht⟩ : ∃ t : k, t = x / c := ⟨_, rfl⟩
   have htc : t * c = x := by rw [ht]; field_simp
   obtain ⟨g, hgM⟩ := exists_gl_of_isUniU _ (pairU_isUniU (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) s l hl hg t)
@@ -184,13 +182,7 @@ theorem mirabolic_mackey_pair : MirabolicMackey := by
       t * (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) s.castSucc l.castSucc + x := by
     linear_combination htc - t * hc
   rw [e, AddChar.map_add_eq_mul] at heq
-  obtain ⟨v, hv⟩ : IsUnit (ψ (t * (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) s.castSucc l.castSucc)) :=
-    IsUnit.of_mul_eq_one (ψ (-(t * (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) s.castSucc l.castSucc)))
-      (by rw [← AddChar.map_add_eq_mul, add_neg_cancel, AddChar.map_zero_eq_one])
-  rw [← hv] at heq
-  calc ψ x = ↑v⁻¹ * (↑v * ψ x) := by rw [← mul_assoc, Units.inv_mul, one_mul]
-    _ = ↑v⁻¹ * ↑v := by rw [heq]
-    _ = 1 := Units.inv_mul v
+  exact (AddChar.val_isUnit ψ _).mul_left_cancel (heq.trans (mul_one _).symm)
 
 theorem supd_one : supd (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) k) = 0 := by
   simp [supd, one_castSucc_succ]
