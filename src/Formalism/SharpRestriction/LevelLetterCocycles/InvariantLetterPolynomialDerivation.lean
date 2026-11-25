@@ -61,15 +61,8 @@ theorem delta_fixes_inverse (a : LetA O n) (ha : a ∈ W.AΔ) (hU : IsUnit (alge
     (δ : W.Gam) (hδ : δ ∈ W.DelF) :
     W.γE δ (Ring.inverse (algebraMap (LetA O n) W.EE a)) = Ring.inverse (algebraMap (LetA O n) W.EE a) := by
   have ha' : ∀ δ ∈ W.DelF, W.γA δ a = a := ha
-  have hfix : W.γE δ (algebraMap (LetA O n) W.EE a) = algebraMap (LetA O n) W.EE a := by
-    rw [W.γE_ext]
-    exact congrArg (algebraMap (LetA O n) W.EE) (ha' δ hδ)
-  obtain ⟨u, hu⟩ := hU
-  rw [← hu] at hfix ⊢
-  rw [Ring.inverse_unit]
-  have h1 : (u : W.EE) * W.γE δ ↑u⁻¹ = 1 := by
-    rw [← hfix, ← map_mul, Units.mul_inv, map_one]
-  exact (Units.inv_eq_of_mul_eq_one_right h1).symm
+  rw [hU.map_ringInverse (W.γE δ), W.γE_ext]
+  exact congrArg (fun y => Ring.inverse (algebraMap (LetA O n) W.EE y)) (ha' δ hδ)
 
 theorem invariantLetter_fixed_smul {c : ZMod n} (e : W.EE) (he : ∀ δ ∈ W.DelF, W.γE δ e = e) {x : W.DD T}
     (h : Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x) : Formalism.MainNotions.CrystallineLiftingInputs.DL W T c (e • x) := by
