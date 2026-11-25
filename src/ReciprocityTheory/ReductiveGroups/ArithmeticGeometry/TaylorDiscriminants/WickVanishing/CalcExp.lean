@@ -129,14 +129,8 @@ theorem exp_add {a b : MvPowerSeries σ k} (ha : constantCoeff a = 0) (hb : cons
   simpa using e1.symm
 
 theorem constantCoeff_psubst {a : MvPowerSeries σ k} (ha : constantCoeff a = 0) (f : PowerSeries k) :
-    constantCoeff (PowerSeries.subst a f) = PowerSeries.constantCoeff f := by
-  have hs := PowerSeries.HasSubst.of_constantCoeff_zero ha
-  have h1 : f = PowerSeries.C (PowerSeries.constantCoeff f) +
-      (f - PowerSeries.C (PowerSeries.constantCoeff f)) := by ring
-  conv_lhs => rw [h1]
-  rw [PowerSeries.subst_add hs, PowerSeries.subst_C, map_add (f := _),
-    PowerSeries.constantCoeff_subst_eq_zero ha _ (by simp), add_zero]
-  simp
+    constantCoeff (PowerSeries.subst a f) = PowerSeries.constantCoeff f :=
+  PowerSeries.constantCoeff_subst_of_constantCoeff_zero ha f
 
 theorem constantCoeff_exp {a : MvPowerSeries σ k} (ha : constantCoeff a = 0) :
     constantCoeff (PowerSeries.subst a (PowerSeries.exp k)) = 1 := by
