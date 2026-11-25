@@ -141,15 +141,7 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
 
   have hsmul : ∀ (γ : h.unitaryGroup) (c : E) (x : W), γ • (c • x) = c • (γ • x) := fun γ c x =>
     map_smul (γ : W ≃ₗ[E] W) c x
-  have hmem : ∀ x : W, x ∈ gm⁻¹ • La₁ ↔ gm • x ∈ La₁ := fun x => by
-    constructor
-    · intro hx
-      obtain ⟨y, hy, rfl⟩ := (AddSubgroup.mem_smul_pointwise_iff_exists _ _ _).1 hx
-      simpa using hy
-    · intro hx
-      have := AddSubgroup.smul_mem_pointwise_smul _ gm⁻¹ La₁ hx
-      rw [inv_smul_smul] at this
-      exact this
+  have hmem : ∀ x : W, x ∈ gm⁻¹ • La₁ ↔ gm • x ∈ La₁ := fun _ => AddSubgroup.mem_inv_pointwise_smul_iff
   refine ⟨(gm⁻¹ • La₁, Submodule.span E {v₀}), ⟨?_, rfl⟩, g * gm, ?_, ?_⟩
   · refine Set.mem_iUnion₂.2 ⟨_, hK, Set.mem_iUnion₂.2 ⟨L, hL, ?_, ?_, ?_⟩⟩
     · refine sup_le (sup_le ?_ ?_) ?_
