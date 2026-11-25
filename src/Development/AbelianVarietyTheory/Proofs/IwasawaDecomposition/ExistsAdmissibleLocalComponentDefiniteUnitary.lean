@@ -49,18 +49,8 @@ theorem continuous_inclusion_locU (w : HeightOneSpectrum (𝓞 E)) :
 theorem isClosed_of_retract (w : HeightOneSpectrum (𝓞 E)) (r : UA E n →* locU n w) (hr : Continuous r)
     (hx : ∀ x : locU n w, r x = x) : IsClosed ((locU n w : Subgroup (UA E n)) : Set (UA E n)) := by
   haveI := t2Space_adelicGL_cmField (E := E) (n := n)
-  have e : ((locU n w : Subgroup (UA E n)) : Set (UA E n)) = {x | ((r x : locU n w) : UA E n) = x} := by
-    ext x
-    constructor
-    · intro h
-      exact congrArg Subtype.val (hx ⟨x, h⟩)
-    · intro h
-      change x ∈ locU n w
-      rw [← show ((r x : locU n w) : UA E n) = x from h]
-      exact (r x).2
-
-  rw [e]
-  exact isClosed_eq (continuous_subtype_val.comp hr) continuous_id
+  have h := Function.LeftInverse.isClosed_range (f := ⇑r) (g := Subtype.val) hx hr continuous_subtypeVal
+  rwa [Subtype.range_coe_subtype] at h
 
 theorem isSmooth_loc (π : AutSub E n) (w : HeightOneSpectrum (𝓞 E)) :
     IsSmooth (π.rep.comp (locU n w).subtype) := fun v => by
