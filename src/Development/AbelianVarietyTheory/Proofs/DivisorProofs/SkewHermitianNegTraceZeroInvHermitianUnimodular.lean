@@ -224,11 +224,7 @@ theorem skew_to_herm (hY : Y.IsSkew D.sp.cm.sig B r s) :
     rw [hY.dual y]
     refine forall₂_congr fun z _ => ?_
     rw [hG'def, herm_smul, ← mul_assoc, mul_inv_cancel₀ hξ, one_mul, mem_Dinv_iff]
-  have hdetG : G.det ≠ 0 := by
-    intro h0
-    have h1 := congrArg Matrix.det hMN
-    rw [Matrix.det_mul, Matrix.det_one, h0, mul_zero] at h1
-    exact zero_ne_one h1
+  have hdetG : G.det ≠ 0 := Matrix.det_ne_zero_of_left_inverse hMN
   refine ⟨latQ D G (lattice₂ D Y.L), latQ_isLattice D hMN hNM _ (localLattice_isLattice D hP Y.L hY.lat.toIsLattice), ?_, ?_, ?_⟩
   ·
     refine ⟨fun x y => ?_⟩
