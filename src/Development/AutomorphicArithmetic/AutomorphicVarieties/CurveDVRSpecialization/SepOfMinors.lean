@@ -34,13 +34,7 @@ private lemma exists_weight {ι : Type} [Finite ι] (x : ι → κˣ) (hx : ∀ 
     have h1 : x i ^ c = 1 := by
       have := congrArg Additive.toMul hc0
       simpa using this
-    rcases Int.natAbs_eq c with h | h
-    · apply hx i c.natAbs (Int.natAbs_pos.mpr hc')
-      rw [h, zpow_natCast] at h1
-      exact h1
-    · apply hx i c.natAbs (Int.natAbs_pos.mpr hc')
-      rw [h, _root_.zpow_neg, inv_eq_one, zpow_natCast] at h1
-      exact h1
+    exact hx i c.natAbs (Int.natAbs_pos.mpr hc') (pow_natAbs_eq_one.mpr h1)
   haveI : Infinite (FractionRing ℤ) :=
     Infinite.of_injective (algebraMap ℤ (FractionRing ℤ)) (IsFractionRing.injective ℤ _)
   obtain ⟨f, hf⟩ := Module.exists_dual_forall_apply_ne_zero (K := FractionRing ℤ)
