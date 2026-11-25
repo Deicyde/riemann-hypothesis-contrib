@@ -25,15 +25,11 @@ variable (L : PeriodPair)
 
 theorem hasDerivAt_P (z : ℂ) (hz : z ∉ L.lattice) :
     HasDerivAt L.weierstrassP (L.derivWeierstrassP z) z := by
-  haveI : DiscreteTopology L.lattice.toAddSubgroup := inferInstanceAs (DiscreteTopology L.lattice)
-  have ho := ((L.lattice.toAddSubgroup).isClosed_of_discreteTopology).isOpen_compl.mem_nhds hz
-  have hd := (L.differentiableOn_weierstrassP z hz).differentiableAt ho
   rw [← L.deriv_weierstrassP]
-  exact hd.hasDerivAt
+  exact (L.analyticOnNhd_weierstrassP z hz).differentiableAt.hasDerivAt
 
-theorem notMem_nhds (z : ℂ) (hz : z ∉ L.lattice) : ∀ᶠ w in nhds z, w ∉ L.lattice := by
-  haveI : DiscreteTopology L.lattice.toAddSubgroup := inferInstanceAs (DiscreteTopology L.lattice)
-  exact ((L.lattice.toAddSubgroup).isClosed_of_discreteTopology).isOpen_compl.mem_nhds hz
+theorem notMem_nhds (z : ℂ) (hz : z ∉ L.lattice) : ∀ᶠ w in nhds z, w ∉ L.lattice :=
+  L.isClosed_lattice.isOpen_compl.mem_nhds hz
 
 theorem P_sub_ne (z w : ℂ) (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (hp : z + w ∉ L.lattice)
     (hm : z - w ∉ L.lattice) : L.weierstrassP z - L.weierstrassP w ≠ 0 := by
