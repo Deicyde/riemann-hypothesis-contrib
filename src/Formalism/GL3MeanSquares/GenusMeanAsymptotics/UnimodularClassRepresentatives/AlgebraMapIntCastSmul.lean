@@ -22,18 +22,9 @@ variable {W : Type} [AddCommGroup W] [Module (𝓞 K) W]
 
 theorem mem_closure_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (s : 𝓞 K) :
     s ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s} ↔
-      ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s := by
-  constructor
-  · intro hs
-    induction hs using Submonoid.closure_induction with
-    | mem x hx => exact hx
-    | one => exact ⟨1, (Ideal.ne_top_iff_one 𝔭).mp hp.ne_top, map_one _⟩
-    | mul a b _ _ iha ihb =>
-      obtain ⟨t, ht, rfl⟩ := iha
-      obtain ⟨u, hu, rfl⟩ := ihb
-      exact ⟨t * u, fun h => (hp.mem_or_mem h).elim ht hu, map_mul _ _ _⟩
-  · intro hs
-    exact Submonoid.subset_closure hs
+      ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s :=
+  haveI := hp
+  SetLike.ext_iff.mp (Submonoid.closure_eq (𝔭.primeCompl.map (algebraMap (𝓞 F) (𝓞 K)))) s
 
 theorem mem_locF_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (L : Submodule (𝓞 K) W) (x : W) :
     x ∈ locF 𝔭 L ↔ ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t • x ∈ L := by
