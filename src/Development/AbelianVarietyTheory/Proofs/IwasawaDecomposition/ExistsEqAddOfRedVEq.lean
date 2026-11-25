@@ -108,14 +108,8 @@ theorem mean_comp {A A' : Type} [AddCommGroup A] [AddCommGroup A'] [Fintype A] [
     (hf : Function.Surjective f) (g : A' → ℝ) :
     (Fintype.card A : ℝ)⁻¹ * ∑ y, g (f y) = (Fintype.card A' : ℝ)⁻¹ * ∑ y, g y := by
   classical
-  have hfib : ∀ y' : A', (Finset.univ.filter fun y => f y = y').card = (Finset.univ.filter fun y => f y = 0).card := by
-    intro y'
-    obtain ⟨a, rfl⟩ := hf y'
-    refine Finset.card_bij (fun y _ => y - a) (fun y hy => ?_) (fun _ _ _ _ h => sub_left_injective h) fun z hz => ?_
-    · simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hy ⊢
-      simp [hy]
-    · simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hz
-      exact ⟨z + a, by simp [hz], by simp⟩
+  have hfib : ∀ y' : A', (Finset.univ.filter fun y => f y = y').card = (Finset.univ.filter fun y => f y = 0).card :=
+    fun y' => AddMonoidHom.card_fiber_eq_of_mem_range f (hf y') ⟨0, map_zero f⟩
   set k := (Finset.univ.filter fun y => f y = 0).card with hk
   have hsum : ∀ g : A' → ℝ, ∑ y, g (f y) = k * ∑ y, g y := fun g => by
     rw [← Finset.sum_fiberwise Finset.univ f, Finset.mul_sum]
