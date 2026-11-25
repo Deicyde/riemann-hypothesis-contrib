@@ -139,10 +139,8 @@ theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L}
   rw [mem_max_VA_iff] at hdiff
   have hcv : Valued.v (c : L) = 1 := (isUnit_VA_iff c).1 hc
   have hdiff' : Valued.v (σ (y : L) * (y : L) - c) < 1 := hdiff
-  have hav : Valued.v (σ (y : L) * (y : L)) = 1 := by
-    have h1 : Valued.v ((c : L) + (σ (y : L) * (y : L) - c)) = Valued.v (c : L) :=
-      Valuation.map_add_eq_of_lt_left _ (by rw [hcv]; exact hdiff')
-    rwa [add_sub_cancel, hcv] at h1
+  have hav : Valued.v (σ (y : L) * (y : L)) = 1 :=
+    (Valuation.map_eq_of_sub_lt _ (x := (c : L)) (by rwa [hcv])).trans hcv
   have ha0 : σ (y : L) * (y : L) ≠ 0 := fun h => by
     rw [h, map_zero] at hav
     exact zero_ne_one hav
@@ -157,10 +155,8 @@ theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L}
   have hσc : σ (c : L) = c := congrArg Subtype.val hcσ
   have hσu : σ ((c : L) * (σ (y : L) * (y : L))⁻¹) = (c : L) * (σ (y : L) * (y : L))⁻¹ := by
     rw [map_mul, map_inv₀, map_mul, hσσ, hσc, mul_comm (y : L)]
-  have hvs : Valued.v s = 1 := by
-    have h1 : Valued.v ((1 : L) + (s - 1)) = Valued.v (1 : L) :=
-      Valuation.map_add_eq_of_lt_left _ (by rw [map_one]; exact hs1)
-    rwa [add_sub_cancel, map_one] at h1
+  have hvs : Valued.v s = 1 :=
+    (Valuation.map_eq_of_sub_lt _ (x := (1 : L)) (by rwa [map_one])).trans (map_one _)
   have hσs : σ s = s := by
     have hsq : (σ s - s) * (σ s + s) = 0 := by
       have h1 : σ s * σ s = s * s := by rw [← map_mul, hss, hσu]
@@ -170,13 +166,9 @@ theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L}
       exact hs1
     have hsmall : Valued.v ((σ s - 1) + (s - 1)) < 1 :=
       lt_of_le_of_lt (Valuation.map_add _ _ _) (max_lt hσs1 hs1)
-    have hsum : Valued.v (σ s + s) = 1 := by
-      have h1 : Valued.v ((2 : L) + ((σ s - 1) + (s - 1))) = Valued.v (2 : L) :=
-        Valuation.map_add_eq_of_lt_left _ (by rw [h2v]; exact hsmall)
-      rw [h2v] at h1
-      rw [← h1]
-      congr 1
-      ring
+    have hsum : Valued.v (σ s + s) = 1 :=
+      (Valuation.map_eq_of_sub_lt _ (x := (2 : L)) (by
+        rw [h2v, show σ s + s - 2 = (σ s - 1) + (s - 1) by ring]; exact hsmall)).trans h2v
     have hne0 : σ s + s ≠ 0 := fun h => by
       rw [h, map_zero] at hsum
       exact zero_ne_one hsum
