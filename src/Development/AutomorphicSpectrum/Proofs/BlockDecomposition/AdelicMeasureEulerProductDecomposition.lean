@@ -176,10 +176,8 @@ theorem dx_coordN (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {M d n : ℕ} (J :
   haveI : FiniteDimensional F E := Module.Finite.of_basis b
   have hσ : ∀ x, σ (σ x) = x := GlobalTheory.CompanionTheory.SW.BB.RatCoord.sigma_sigma hCM
   have hT := traceGram_isSymm σ hσ J hJ.1 b
-  have hs0 : (gramN σ J b n).IsSymm := by
-    refine Matrix.IsSymm.ext fun p q => ?_
-    simp only [gramN, Matrix.kroneckerMap_apply]
-    rw [hT.apply, (Matrix.isSymm_one (n := Fin n) (α := F)).apply]
+  have hs0 : (gramN σ J b n).IsSymm := (Matrix.kroneckerMap_transpose _ _ _).symm.trans
+    (congrArg₂ (Matrix.kroneckerMap (· * ·)) (Matrix.isSymm_one (n := Fin n) (α := F)).eq hT.eq)
   have hs : (ξ • gramN σ J b n).IsSymm := hs0.smul ξ
   have hdet : (ξ • gramN σ J b n).det ≠ 0 := by
     rw [Matrix.det_smul, gramN, Matrix.det_kronecker, Matrix.det_one, one_pow, one_mul]
