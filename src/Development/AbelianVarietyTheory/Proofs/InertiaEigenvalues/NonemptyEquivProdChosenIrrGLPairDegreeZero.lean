@@ -18,14 +18,8 @@ theorem exists_linearEquiv_of_subsingleton {G V : Type} [Group G] [Subsingleton 
     rw [Subsingleton.elim g 1, map_one]
     exact hv
   have := hi
-  obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 := by
-    by_contra h
-    simp only [ne_eq, not_exists, not_not] at h
-    apply (bot_ne_top : (⊥ : Subrepresentation π) ≠ ⊤)
-    apply Subrepresentation.ext
-    ext w
-    rw [h w]
-    exact ⟨fun _ => Submodule.zero_mem _, fun _ => Submodule.zero_mem _⟩
+  obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 :=
+    @exists_ne _ (IsSimpleModule.nontrivial (MonoidAlgebra ℂ G) π.asModule) 0
   have htop : Submodule.span ℂ {v} = ⊤ := by
     rcases eq_bot_or_eq_top (⟨Submodule.span ℂ {v}, hst _⟩ : Subrepresentation π) with h | h
     · exact absurd (Submodule.span_singleton_eq_bot.mp (congrArg Subrepresentation.toSubmodule h)) hv
