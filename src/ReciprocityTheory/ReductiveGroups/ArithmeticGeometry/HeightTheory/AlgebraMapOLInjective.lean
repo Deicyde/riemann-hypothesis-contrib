@@ -74,11 +74,7 @@ theorem addv_nonneg (s : S) : 0 ≤ addv L v (algebraMap S L s) := by
   by_cases hs : s = 0
   · subst hs
     simp
-  have hx : algebraMap S L s ≠ 0 := by
-    intro h
-    apply hs
-    apply IsFractionRing.injective S L
-    rw [h, map_zero]
+  have hx : algebraMap S L s ≠ 0 := mt IsFractionRing.to_map_eq_zero_iff.1 hs
   have hv : v.valuation L (algebraMap S L s) ≠ 0 := by simpa using hx
   rw [addv_apply v hx]
   have h1 := (log_le_log hv one_ne_zero).mpr (v.valuation_le_one s)
@@ -250,11 +246,7 @@ theorem addv_count (v : HeightOneSpectrum (integralClosure O L)) (b : integralCl
     addv L v (algebraMap (integralClosure O L) L b) =
       ((Multiset.count v.asIdeal
         (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {b})) : ℕ) : WithTop ℤ) := by
-  have hx : algebraMap (integralClosure O L) L b ≠ 0 := by
-    intro h
-    apply hb
-    apply IsFractionRing.injective (integralClosure O L) L
-    rw [h, map_zero]
+  have hx : algebraMap (integralClosure O L) L b ≠ 0 := mt IsFractionRing.to_map_eq_zero_iff.1 hb
   have hI : Ideal.span {b} ≠ 0 := by
     first
     | (rw [Ne, Submodule.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hb)
