@@ -483,14 +483,12 @@ theorem ReducedBasisBound.proof : ReducedBasisBound.Statement := by
   refine ⟨R, fun L _ _ hmin hcov => ?_⟩
   have hrk : finrank ℤ L = d := by rw [ZLattice.rank ℝ L, finrank_euclideanSpace_fin]
   let e : Basis (Fin d) ℤ L := Module.finBasisOfFinrankEq ℤ L hrk
-  have hspan : span ℤ (Set.range fun i => (e i : EuclideanSpace ℝ (Fin d))) = L := by
-    rw [show (Set.range fun i => (e i : EuclideanSpace ℝ (Fin d))) = L.subtype '' Set.range e by
-      rw [← Set.range_comp]; rfl, ← Submodule.map_span, e.span_eq, Submodule.map_top,
-      Submodule.range_subtype]
-  have hli : LinearIndependent ℝ fun i => (e i : EuclideanSpace ℝ (Fin d)) := by
-    have h := (e.ofZLatticeBasis ℝ L).linearIndependent
-    rwa [show ⇑(e.ofZLatticeBasis ℝ L) = fun i => (e i : EuclideanSpace ℝ (Fin d)) from
-      funext fun i => e.ofZLatticeBasis_apply ℝ L i] at h
+  have he : ⇑(e.ofZLatticeBasis ℝ L) = fun i => (e i : EuclideanSpace ℝ (Fin d)) :=
+    funext fun i => e.ofZLatticeBasis_apply ℝ L i
+  have hspan : span ℤ (Set.range fun i => (e i : EuclideanSpace ℝ (Fin d))) = L :=
+    he ▸ e.ofZLatticeBasis_span ℝ
+  have hli : LinearIndependent ℝ fun i => (e i : EuclideanSpace ℝ (Fin d)) :=
+    he ▸ (e.ofZLatticeBasis ℝ L).linearIndependent
   have hdet : (gram ℝ fun i => (e i : EuclideanSpace ℝ (Fin d))).det ≤ c ^ 2 := by
     have h1 := GroundTheory.Heights₂.Heights.covolume_eq_sqrt_det_gram L e
     rcases le_or_gt 0 (gram ℝ fun i => (e i : EuclideanSpace ℝ (Fin d))).det with h | h
