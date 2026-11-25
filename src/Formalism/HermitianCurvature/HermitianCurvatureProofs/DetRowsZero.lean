@@ -138,11 +138,8 @@ theorem prod_expand {X : Type*} [Fintype X] :
 theorem rowsum_det {t : ℕ} (P : Matrix (Fin n) (Fin n) ℂ) (e : Fin t ≃ Fin n) (α : Fin t → Fin n) :
     ∑ σ : Equiv.Perm (Fin t), ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ j, P (α j) (e (σ j)) =
       (Matrix.of fun i j : Fin t => P (α i) (e j)).det := by
-  rw [Matrix.det_apply]
-  refine Fintype.sum_equiv (Equiv.inv (Equiv.Perm (Fin t))) _ _ (fun σ => ?_)
-  simp only [Equiv.inv_apply, Equiv.Perm.sign_inv, Matrix.of_apply, Units.smul_def, zsmul_eq_mul]
-  congr 1
-  exact Fintype.prod_equiv σ _ _ (fun j => by simp)
+  rw [← Matrix.det_transpose, Matrix.det_apply']
+  rfl
 
 theorem det_rows_perm {t : ℕ} (P : Matrix (Fin n) (Fin n) ℂ) (e : Fin t ≃ Fin n) (γ : Equiv.Perm (Fin t)) :
     (Matrix.of fun i j : Fin t => P (e (γ i)) (e j)).det = ((Equiv.Perm.sign γ : ℤ) : ℂ) * P.det := by
