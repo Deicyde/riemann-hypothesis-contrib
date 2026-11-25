@@ -143,14 +143,10 @@ private theorem subst_diff_lemma {σ τ : Type*} [Fintype σ] [Finite τ] (N : �
     intro z a b ha hb hab
     have hsa : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha
     have hsb : MvPowerSeries.HasSubst b := MvPowerSeries.hasSubst_of_constantCoeff_zero hb
-    have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w := by
-      intro w
-      first
-        | rw [MvPowerSeries.coe_substAlgHom]
-    have hφb : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst b w = MvPowerSeries.substAlgHom (R := K) hsb w := by
-      intro w
-      first
-        | rw [MvPowerSeries.coe_substAlgHom]
+    have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w :=
+      fun w => (MvPowerSeries.substAlgHom_apply hsa w).symm
+    have hφb : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst b w = MvPowerSeries.substAlgHom (R := K) hsb w :=
+      fun w => (MvPowerSeries.substAlgHom_apply hsb w).symm
     obtain ⟨c, hc⟩ : ∃ c, c = MvPowerSeries.constantCoeff z := ⟨_, rfl⟩
     have hcz : MvPowerSeries.constantCoeff (algebraMap K (MvPowerSeries σ K) c) = c := by
       first
@@ -188,10 +184,8 @@ private theorem low_one_subst_lemma_2 {σ τ : Type*} [Fintype σ] [Finite τ] (
   classical
   letI : LinearOrder σ := LinearOrder.lift' (Fintype.equivFin σ) (Fintype.equivFin σ).injective
   have hsa : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha
-  have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w := by
-      intro w
-      first
-        | rw [MvPowerSeries.coe_substAlgHom]
+  have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w :=
+      fun w => (MvPowerSeries.substAlgHom_apply hsa w).symm
   obtain ⟨y, -, hy⟩ := decomp 0 w hw
 
   rw [hy, hφa, map_sum]
@@ -211,14 +205,10 @@ theorem low_subst_diff {σ τ : Type*} [Fintype σ] [Finite τ] (g : MvPowerSeri
   letI : LinearOrder σ := LinearOrder.lift' (Fintype.equivFin σ) (Fintype.equivFin σ).injective
   have hsa : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha
   have hsb : MvPowerSeries.HasSubst b := MvPowerSeries.hasSubst_of_constantCoeff_zero hb
-  have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w := by
-      intro w
-      first
-        | rw [MvPowerSeries.coe_substAlgHom]
-  have hφb : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst b w = MvPowerSeries.substAlgHom (R := K) hsb w := by
-      intro w
-      first
-        | rw [MvPowerSeries.coe_substAlgHom]
+  have hφa : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst a w = MvPowerSeries.substAlgHom (R := K) hsa w :=
+      fun w => (MvPowerSeries.substAlgHom_apply hsa w).symm
+  have hφb : ∀ w : MvPowerSeries σ K, MvPowerSeries.subst b w = MvPowerSeries.substAlgHom (R := K) hsb w :=
+      fun w => (MvPowerSeries.substAlgHom_apply hsb w).symm
   obtain ⟨y, hy1, hy⟩ := decomp 1 g hg
 
   rw [hy, hφa, hφb, map_sum, map_sum, ← Finset.sum_sub_distrib]
