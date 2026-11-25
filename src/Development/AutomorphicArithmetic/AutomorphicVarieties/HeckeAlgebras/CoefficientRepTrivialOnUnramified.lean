@@ -67,13 +67,7 @@ def iwS : Iwa (GV n S) := piIwa fun v : V => glIwa ((S v).adicCompletion L) n
 
 def eV (v : V) (i : Fin n) (y : Uo ((S v).adicCompletion L)) : (iwS n S).T := by
   classical
-  exact ⟨Pi.mulSingle v (eT _ n i y : GLw n (S v)), fun v' _ => by
-    by_cases h : v' = v
-    · subst h
-      rw [Pi.mulSingle_eq_same]
-      exact (eT _ n i y).2
-    · rw [Pi.mulSingle_eq_of_ne h]
-      exact (glIwa ((S v').adicCompletion L) n).T.one_mem⟩
+  exact ⟨Pi.mulSingle v (eT _ n i y : GLw n (S v)), (Subgroup.mulSingle_mem_pi v _).2 fun _ => (eT _ n i y).2⟩
 
 
 omit [Fintype V] in
