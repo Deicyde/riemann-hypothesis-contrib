@@ -40,11 +40,8 @@ theorem isHermPos_scale (h : IsHermPos C ip) {s : ℝ} (hs : 0 < s) :
 
 theorem IsHermPos.map_equiv {N' : Type} [AddCommGroup N'] [Module ℂ N'] (h : IsHermPos C ip) (e : N ≃ₗ[ℂ] N') :
     IsHermPos (C.map (e : N →ₗ[ℂ] N')) (fun x y => ip (e.symm x) (e.symm y)) := by
-  have hm : ∀ z : C.map (e : N →ₗ[ℂ] N'), e.symm (z : N') ∈ C := by
-    intro z
-    obtain ⟨y, hy, hyz⟩ := Submodule.mem_map.mp z.2
-    rw [← hyz]
-    simpa using hy
+  have hm : ∀ z : C.map (e : N →ₗ[ℂ] N'), e.symm (z : N') ∈ C := fun z =>
+    (Submodule.mem_map_equiv C).mp z.2
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · haveI := h.fd
     infer_instance
