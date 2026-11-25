@@ -192,13 +192,8 @@ theorem rFamMatch : RFamMatch := by
         · simp only [fam, ite_eq_right hz, ite_eq_right hwT]
           exact hH2 E a b w Ex.one
     choose K₁ K₂ hk1 hk2 hk3 hk4 using hlev
-    have hev : ∀ᶠ w : Pl E in cofinite, w ∉ Z :=
-      Filter.eventually_cofinite.2 (Z.finite_toSet.subset fun w hw => by simpa using hw)
-    have hev2 : ∀ᶠ w : Pl E in cofinite, w ∉ Z ∧ w ∉ T :=
-      Filter.eventually_cofinite.2 ((Z ∪ T).finite_toSet.subset fun w hw => by
-        by_contra hc
-        simp only [Finset.coe_union, Set.mem_union, Finset.mem_coe, not_or] at hc
-        exact hw hc)
+    have hev : ∀ᶠ w : Pl E in cofinite, w ∉ Z := Z.eventually_cofinite_notMem
+    have hev2 : ∀ᶠ w : Pl E in cofinite, w ∉ Z ∧ w ∉ T := hev.and T.eventually_cofinite_notMem
     refine ⟨⟨K₁, K₂, ⟨hk1, hev.mono fun w hw => (hk4 w hw).1⟩, ⟨hk2, hev.mono fun w hw => (hk4 w hw).2⟩,
       hk3, hev2.mono fun w hw => ?_⟩, ?_⟩
     · simp only [fam, ite_eq_right hw.1, ite_eq_right hw.2]
