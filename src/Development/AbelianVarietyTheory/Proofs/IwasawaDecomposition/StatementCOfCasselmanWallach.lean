@@ -1398,7 +1398,8 @@ theorem grpShape_of {η : HChar D.host.E} {J : Subgroup (GAf D.host.E D.R.nV)} {
     (h2 : ParaShape D η J χ)
     (h3 : ∀ k v (s : SplitPlace D.host.E), s.w = D.naut.plGw k v → ∃ ψ₀ ξ, NG.LevelUni J χ s D.R.r ψ₀ ξ)
     (h4 : NG.HypOutside J χ (gPl D ∪ qPl D η)) : GrpShape D η J :=
-  ⟨h1, fun v hv => let ⟨s, _, a, _, c⟩ := h2 v hv; ⟨s, a, c.mem⟩, fun k v s hs => let ⟨_, _, c⟩ := h3 k v s hs; c.mem,
+  ⟨h1, fun v hv => (h2 v hv).elim fun s h => h.elim fun _ h => ⟨s, h.1, h.2.2.mem⟩,
+    fun k v s hs => (h3 k v s hs).elim fun _ h => h.elim fun _ c => c.mem,
     fun κ hκ => (h4 κ hκ).1⟩
 
 theorem exists_form {η : HChar D.host.E} {J : Subgroup (GAf D.host.E D.R.nV)} (hG : GPlaces D) (h : GrpShape D η J)
