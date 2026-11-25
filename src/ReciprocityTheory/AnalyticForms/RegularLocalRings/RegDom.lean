@@ -39,10 +39,7 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
   have hxle : Ideal.span {x} ≤ maximalIdeal R := (Ideal.span_singleton_le_iff_mem _).mpr hx
   have hxne : Ideal.span {x} ≠ ⊤ := fun htop =>
     (IsLocalRing.maximalIdeal.isMaximal R).ne_top (top_le_iff.mp (htop ▸ hxle))
-  haveI : Nontrivial (R ⧸ Ideal.span {x}) := by
-    refine ⟨⟨0, 1, fun h => hxne ((Ideal.eq_top_iff_one _).mpr ?_)⟩⟩
-    rw [← Ideal.Quotient.eq_zero_iff_mem, map_one]
-    exact h.symm
+  haveI : Nontrivial (R ⧸ Ideal.span {x}) := Ideal.Quotient.nontrivial_iff.mpr hxne
   haveI : IsLocalRing (R ⧸ Ideal.span {x}) :=
     IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
 
@@ -84,10 +81,7 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
     have h2 : c i0 • (i0 : R) ∈ Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x} := by
       rw [h1]
       exact Submodule.sub_mem _ (Submodule.mem_sup_right (Ideal.mem_span_singleton_self x)) hrest
-    have h3 : (i0 : R) = ↑hi0.unit⁻¹ * (c i0 • (i0 : R)) := by
-      rw [smul_eq_mul, ← mul_assoc, hi0.val_inv_mul, one_mul]
-    have h4 := Ideal.mul_mem_left _ (↑hi0.unit⁻¹ : R) h2
-    rwa [← h3] at h4
+    exact (Submodule.smul_mem_iff_of_isUnit _ hi0).mp h2
   have hmJ : maximalIdeal R ≤ Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x} := by
     rw [← hs_span]
     refine Submodule.span_le.mpr (fun y hy => ?_)
