@@ -191,11 +191,9 @@ theorem actM_coe {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z) (v : V) :
   · simp only [inK_apply_eq_zero hZ h, zero_smul]
 
 theorem actM_pow_coe {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z) (v : V) (m : ℕ) :
-    ((actM E Z) ^ m) (v : M) = ((((resZ E V hst Z) ^ m) v : V) : M) := by
-  induction m with
-  | zero => rw [pow_zero, pow_zero]; rfl
-  | succ m ih =>
-    rw [pow_succ', Module.End.mul_apply, ih, actM_coe (hst := hst) hZ, pow_succ', Module.End.mul_apply]
+    ((actM E Z) ^ m) (v : M) = ((((resZ E V hst Z) ^ m) v : V) : M) :=
+  LinearMap.congr_fun (Module.End.commute_pow_left_of_commute (f := V.subtype) (g := resZ E V hst Z)
+    (g₂ := actM E Z) (LinearMap.ext fun v => actM_coe (hst := hst) hZ v) m) v
 
 end Restrict
 
@@ -247,13 +245,9 @@ theorem phi_K (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) {V : S
     intro v
 
     simp only [resZ, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hc]
-  have hZp : ∀ m v, φ (((resZ E V hst Z) ^ m) v) = ((resZ E₂ V₂ hst₂ Z) ^ m) (φ v) := by
-    intro m
-    induction m with
-    | zero => intro v; rw [pow_zero, pow_zero]; rfl
-    | succ m ih =>
-      intro v
-      rw [pow_succ', Module.End.mul_apply, hZc, ih, pow_succ', Module.End.mul_apply]
+  have hZp : ∀ m v, φ (((resZ E V hst Z) ^ m) v) = ((resZ E₂ V₂ hst₂ Z) ^ m) (φ v) := fun m v =>
+    (LinearMap.congr_fun (Module.End.commute_pow_left_of_commute (f := φ) (g := resZ E V hst Z)
+      (g₂ := resZ E₂ V₂ hst₂ Z) (LinearMap.ext fun v => (hZc v).symm) m) v).symm
   let ι₁ : V →L[ℂ] H := D.subtypeL.comp V.subtypeL
   let ι₂ : V₂ →L[ℂ] H₂ := D₂.subtypeL.comp V₂.subtypeL
   have hi : Topology.IsInducing ι₁ :=
