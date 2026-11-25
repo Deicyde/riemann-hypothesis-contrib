@@ -62,7 +62,7 @@ theorem key {S T : HSp D} (ω : GlobalTheory.Grid.WRep S T) (p : GA D S × GA D 
 
 theorem actO_negS' (S T : HSp D) (g : GA D (negSp S)) (h : GA D T) (w : WO S T) :
     actO (negSp S) T g h w = actO S T (ofSgn true S g) h w := by
-  unfold actO; rfl
+  unfold actO; rw [← map_inv, ← mt_negGA S (ofSgn true S g⁻¹)]; rfl
 
 theorem ofSgn_symm_mem_GQ (S : HSp D) (γ : GA D S) (h : γ ∈ GQ S) : (ofSgn true S).symm γ ∈ GQ (negSp S) := by
   unfold GQ HFinIn HFin at *
@@ -118,7 +118,8 @@ theorem weil_conjRep_of_neg : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T
     exact hu
   · intro e he g h hg hh x y hx hy
     obtain ⟨r, hr, H⟩ := hw.om_split e he ((ofSgn true S).symm g) h
-      (by unfold SuppAt; exact hg) hh x y (by unfold IsDetAt; exact hx) hy
+      (by unfold SuppAt; rw [show mt (negSp S) ((ofSgn true S).symm g) = mt S g from mt_negGA S g]; exact hg) hh x y
+      (by unfold IsDetAt; rw [show mt (negSp S) ((ofSgn true S).symm g) = mt S g from mt_negGA S g]; exact hx) hy
     refine ⟨r, hr, fun ℓ hℓ f hf => ?_⟩
     let ℓ' : (WO S T → ℂ) →ₗ[ℂ] ℂ :=
       { toFun := fun f => starRingEnd ℂ (ℓ (cj id f))
