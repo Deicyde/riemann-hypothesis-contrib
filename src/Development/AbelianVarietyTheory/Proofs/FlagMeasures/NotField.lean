@@ -178,15 +178,8 @@ lemma dual_eq {H : HermSp M V} {r : ℕ} (A : LocNG.FrameD H r) (a : Fin (r + 1)
     simp only [Fin.castSucc_inj]
 
 lemma unit_of {T : F} (hT : T ∈ 𝒪[F]) (u : 𝒪[F]) (h : (u : F) * T = 1) :
-    ∃ v : (𝒪[F])ˣ, ((v : 𝒪[F]) : F) = T := by
-  refine ⟨⟨⟨T, hT⟩, u, ?_, ?_⟩, rfl⟩
-  · apply Subtype.ext
-    show T * (u : F) = 1
-    rw [mul_comm]
-    exact h
-  · apply Subtype.ext
-    show (u : F) * T = 1
-    exact h
+    ∃ v : (𝒪[F])ˣ, ((v : 𝒪[F]) : F) = T :=
+  ⟨(IsUnit.of_mul_eq_one_right (b := (⟨T, hT⟩ : 𝒪[F])) u (Subtype.ext h)).unit, rfl⟩
 
 end
 
