@@ -39,16 +39,12 @@ theorem topo : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
   intro F E _ _ _ _ _ V _ _ _ _ _
   haveI := (inferInstance : Unram F E).lcF
   haveI : ProperSpace F := ProperSpace.of_locallyCompactSpace F
-  haveI : ContinuousAdd V := IsModuleTopology.toContinuousAdd F V
-  haveI : ContinuousNeg V := ⟨by
-    have := IsModuleTopology.continuous_of_linearMap (R := F) (A := V) (B := V) (-LinearMap.id)
-    exact this⟩
+  have hV := IsModuleTopology.isTopologicalAddGroup F V
   let e : V ≃ₗ[F] (Fin (Module.finrank F V) → F) := (Module.finBasis F V).equivFun
   have hc : Continuous e := IsModuleTopology.continuous_of_linearMap e.toLinearMap
   have hc' : Continuous e.symm := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
   let h : V ≃ₜ (Fin (Module.finrank F V) → F) := ⟨e.toEquiv, hc, hc'⟩
-  exact ⟨h.isOpenEmbedding.locallyCompactSpace, h.isEmbedding.secondCountableTopology, h.isEmbedding.t2Space,
-    IsTopologicalAddGroup.mk⟩
+  exact ⟨h.isOpenEmbedding.locallyCompactSpace, h.isEmbedding.secondCountableTopology, h.isEmbedding.t2Space, hV⟩
 theorem orth : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V] [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V] [IsTopologicalAddGroup V] (β : LinearMap.BilinForm F V) (μ : Measure V), μ.IsAddHaarMeasure → ∀ M : AddSubgroup V, IsOpen (M : Set V) → IsCompact (M : Set V) → ∀ y, ∫ x in (M : Set V), ψ (β x y) ∂μ = Set.indicator {y | ∀ x ∈ M, ψ (β x y) = 1} (fun _ => ((μ M).toReal : ℂ)) y := by
   intro F E _ _ _ _ _ ψ hψ V _ _ _ _ _ _ _ _ β μ hμ M hMo hMc y
   classical
