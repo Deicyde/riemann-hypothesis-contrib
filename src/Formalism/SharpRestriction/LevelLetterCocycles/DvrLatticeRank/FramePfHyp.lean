@@ -15,12 +15,8 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
 
 theorem framepf_hyp_cc_subst {O : Type} [CommRing O] (p F : PowerSeries O)
     (hp : PowerSeries.constantCoeff p = 0) :
-    PowerSeries.constantCoeff (PowerSeries.subst p F) = PowerSeries.constantCoeff F := by
-  have hS := PowerSeries.HasSubst.of_constantCoeff_zero' hp
-  conv_lhs => rw [PowerSeries.eq_X_mul_shift_add_const F]
-  rw [PowerSeries.subst_add hS, PowerSeries.subst_mul hS, PowerSeries.subst_X hS, PowerSeries.subst_C,
-    map_add, map_mul, hp, zero_mul, zero_add]
-  exact PowerSeries.constantCoeff_C _
+    PowerSeries.constantCoeff (PowerSeries.subst p F) = PowerSeries.constantCoeff F :=
+  PowerSeries.constantCoeff_subst_of_constantCoeff_zero hp F
 
 section Local
 
