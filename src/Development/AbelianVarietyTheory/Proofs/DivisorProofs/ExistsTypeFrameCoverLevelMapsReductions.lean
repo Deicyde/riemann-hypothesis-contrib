@@ -154,10 +154,8 @@ theorem exists_frame {l₂ : Level H} (hl₂ : IsTypeLevel l₂) (hr : Dw.p + Dw
     rw [Pi.smul_apply, Pi.zero_apply, Algebra.smul_def, Ideal.Quotient.algebraMap_eq,
       Ideal.Quotient.eq_zero_iff_mem.2 ha, zero_mul]
   let ψ := (typePrime l₂ v • (⊤ : Submodule (𝓞 D.host.E) Dw.La)).liftQ φ hker
-  have hψs : Function.Surjective ψ := by
-    intro y
-    obtain ⟨x, rfl⟩ := hφ y
-    exact ⟨Submodule.Quotient.mk x, rfl⟩
+  have hψs : Function.Surjective ψ :=
+    LinearMap.range_eq_top.1 ((Submodule.range_liftQ ..).trans (LinearMap.range_eq_top.2 hφ))
   have hc : Nat.card (𝓞 D.host.E ⧸ typePrime l₂ v) = D.host.g v.1 := by
     rw [← (hl₂.typePrime_spec v).2, Ideal.absNorm_apply, Submodule.cardQuot_apply]
   haveI : Finite (𝓞 D.host.E ⧸ typePrime l₂ v) := Nat.finite_of_card_ne_zero (hc ▸ (D.host.g_prime _).ne_zero)
