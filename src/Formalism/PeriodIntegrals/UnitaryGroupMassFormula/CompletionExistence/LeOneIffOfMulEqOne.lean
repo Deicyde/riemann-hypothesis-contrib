@@ -20,17 +20,8 @@ theorem val_eq_of_le_one_iff {K : Type*} [Field K] (μ ν : Valuation K (WithZer
     (h : ∀ x, μ x ≤ 1 ↔ ν x ≤ 1) {ϖ π : K} (hϖ : ν ϖ = WithZero.exp (-1))
     (hπ : μ π = WithZero.exp (-1)) (x : K) : μ x = ν x := by
   have hunit : ∀ (μ' ν' : Valuation K (WithZero (Multiplicative ℤ))), (∀ x, μ' x ≤ 1 ↔ ν' x ≤ 1) →
-      ∀ y, ν' y = 1 → μ' y = 1 := by
-    intro μ' ν' h' y hy
-    have hy0 : y ≠ 0 := by
-      rintro rfl
-      simp at hy
-    have h1 : μ' y ≤ 1 := (h' y).2 hy.le
-    have h2 : μ' y⁻¹ ≤ 1 := (h' y⁻¹).2 (by rw [map_inv₀, hy, inv_one])
-    have hm : μ' y⁻¹ * μ' y = 1 := by rw [← map_mul, inv_mul_cancel₀ hy0, map_one]
-    have hle : μ' y⁻¹ * μ' y ≤ 1 * μ' y := mul_le_mul' h2 le_rfl
-    rw [hm, one_mul] at hle
-    exact le_antisymm h1 hle
+      ∀ y, ν' y = 1 → μ' y = 1 := fun _ _ h' _ hy =>
+    (Valuation.isEquiv_of_val_le_one h').eq_one_iff_eq_one.2 hy
   have hϖ0 : ϖ ≠ 0 := by
     rintro rfl
     rw [map_zero] at hϖ
