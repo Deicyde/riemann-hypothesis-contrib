@@ -19,10 +19,8 @@ theorem cj_apply {R : Type} [CommRing R] (s : R →+* R) {m p : Type} (M : Matri
     cj s M i j = s (M j i) := rfl
 
 theorem det_prod_transvec {K : Type} [CommRing K] (L : List (TransvectionStruct n K)) :
-    (L.map TransvectionStruct.toMatrix).prod.det = 1 := by
-  induction L with
-  | nil => simp
-  | cons t L ih => simp [List.map_cons, List.prod_cons, det_mul, ih, TransvectionStruct.det]
+    (L.map TransvectionStruct.toMatrix).prod.det = 1 :=
+  TransvectionStruct.det_toMatrix_prod L
 
 theorem fieldB {K : Type} [Field K] (c d X Y : Matrix n n K) (h : c * X + d * Y = 1) :
     ∃ B : Matrix n n K, (d + c * B).det ≠ 0 := by
