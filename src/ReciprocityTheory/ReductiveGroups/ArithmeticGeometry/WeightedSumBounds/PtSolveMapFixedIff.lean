@@ -68,14 +68,7 @@ theorem pt_low_of_lin {σ : Type*} [Fintype σ] {Φ : MvPowerSeries σ C}
       simp at h
     obtain ⟨s, hs⟩ := Finsupp.ne_iff.mp hne
     simp only [Finsupp.coe_zero, Pi.zero_apply] at hs
-    have hle : Finsupp.single s 1 ≤ α := by
-      rw [Finsupp.le_def]
-      intro i
-      by_cases hi : i = s
-      · subst hi
-        simp only [Finsupp.single_eq_same]
-        omega
-      · simp [Ne.symm hi]
+    have hle : Finsupp.single s 1 ≤ α := Finsupp.single_le_iff.2 (Nat.one_le_iff_ne_zero.2 hs)
     have hadd := add_tsub_cancel_of_le hle
     have hd := congrArg Finsupp.degree hadd
     rw [map_add (f := _), Finsupp.degree_single, h] at hd
