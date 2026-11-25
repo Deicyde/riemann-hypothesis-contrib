@@ -226,7 +226,7 @@ theorem single_mulVec' {m n l : ℕ} (x : Mx D m n) (i : Fin n) (j : Fin l) (s :
     (x ⬝ (Matrix.single i j s : Mx D n l)) *ᵥ y = colMul x i (s * y j) := by
   rw [← Matrix.mulVec_mulVec, Matrix.single_mulVec]
   funext k
-  simp [Matrix.mulVec, dotProduct, colMul, Function.update_apply, mul_comm]
+  exact (dotProduct_single (v := x k) (x := s * y j) (i := i)).trans (mul_comm _ _)
 
 theorem mulVec_colMul {l m n : ℕ} (A : Mx D l m) (x : Mx D m n) (i : Fin n) (a : AE D) :
     A *ᵥ colMul x i a = colMul (A ⬝ x) i a := by
