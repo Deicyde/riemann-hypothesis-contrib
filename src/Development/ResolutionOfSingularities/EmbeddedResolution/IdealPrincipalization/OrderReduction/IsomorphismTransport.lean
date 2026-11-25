@@ -49,26 +49,8 @@ theorem ker_comp_eq_imageIdealSheaf_ker {W A B : Scheme.{u}} (g : W ⟶ A) (w : 
 private theorem exists_iso_subscheme_comap_of_isIso {A B : Scheme.{u}} (w : A ⟶ B) [IsIso w]
     (I : B.IdealSheafData) :
     ∃ θ : (I.comap w).subscheme ≅ I.subscheme,
-      θ.hom ≫ I.subschemeι = (I.comap w).subschemeι ≫ w := by
-  have e1 : ((I.comap w).subschemeι ≫ w).ker = I := by
-    rw [ker_comp_eq_imageIdealSheaf_ker, AlgebraicGeometry.Scheme.IdealSheafData.ker_subschemeι,
-      imageIdealSheaf_comap]
-  have e2 : (I.subschemeι ≫ inv w).ker = I.comap w := by
-    rw [ker_comp_eq_imageIdealSheaf_ker, AlgebraicGeometry.Scheme.IdealSheafData.ker_subschemeι,
-      imageIdealSheaf_eq_comap_inv, IsIso.inv_inv]
-  have h1 : I.subschemeι.ker ≤ ((I.comap w).subschemeι ≫ w).ker :=
-    le_of_eq (by rw [e1, AlgebraicGeometry.Scheme.IdealSheafData.ker_subschemeι])
-  have h2 : (I.comap w).subschemeι.ker ≤ (I.subschemeι ≫ inv w).ker :=
-    le_of_eq (by rw [e2, AlgebraicGeometry.Scheme.IdealSheafData.ker_subschemeι])
-  refine ⟨⟨IsClosedImmersion.lift I.subschemeι ((I.comap w).subschemeι ≫ w) h1,
-    IsClosedImmersion.lift (I.comap w).subschemeι (I.subschemeι ≫ inv w) h2, ?_, ?_⟩, ?_⟩
-  · rw [← cancel_mono (I.comap w).subschemeι, Category.assoc, IsClosedImmersion.lift_fac,
-      ← Category.assoc, IsClosedImmersion.lift_fac, Category.assoc, IsIso.hom_inv_id,
-      Category.comp_id, Category.id_comp]
-  · rw [← cancel_mono I.subschemeι, Category.assoc, IsClosedImmersion.lift_fac,
-      ← Category.assoc, IsClosedImmersion.lift_fac, Category.assoc, IsIso.inv_hom_id,
-      Category.comp_id, Category.id_comp]
-  · exact IsClosedImmersion.lift_fac ..
+      θ.hom ≫ I.subschemeι = (I.comap w).subschemeι ≫ w :=
+  ⟨I.comapIso w ≪≫ asIso (Limits.pullback.snd w I.subschemeι), by simp⟩
 
 theorem imageIdealSheaf_comp_comap_of_isIso {A B C : Scheme.{u}} (w : A ⟶ B) [IsIso w] (g : B ⟶ C)
     (I : B.IdealSheafData) :
@@ -88,26 +70,11 @@ private theorem opens_map_comp {A B C : Scheme.{u}} (f : A ⟶ B) (g : B ⟶ C) 
   ext x
   simp
 
-private theorem opens_map_id {B : Scheme.{u}} (W : B.Opens) :
-    (TopologicalSpace.Opens.map (𝟙 B : B ⟶ B).base).obj W = W := by
-  ext x
-  exact Iff.rfl
-
 private theorem exists_iso_opens_preimage {A B : Scheme.{u}} (θ : A ≅ B) (V' : A.Opens) (V : B.Opens)
     (hVV' : V' = (TopologicalSpace.Opens.map θ.hom.base).obj V) :
     ∃ c : (↑V' : Scheme.{u}) ≅ (↑V : Scheme.{u}), c.hom ≫ V.ι = V'.ι ≫ θ.hom := by
-  have hcomp : (TopologicalSpace.Opens.map θ.inv.base).obj V'
-      = (TopologicalSpace.Opens.map (θ.inv ≫ θ.hom).base).obj V := by
-    rw [hVV', opens_map_comp]
-  have hle : V ≤ (TopologicalSpace.Opens.map θ.inv.base).obj V' :=
-    le_of_eq (by rw [hcomp, Iso.inv_hom_id, opens_map_id])
-  refine ⟨⟨Scheme.Hom.resLE θ.hom V V' (le_of_eq hVV'),
-    Scheme.Hom.resLE θ.inv V' V hle, ?_, ?_⟩, ?_⟩
-  · rw [← cancel_mono V'.ι, Category.assoc, Scheme.Hom.resLE_comp_ι, ← Category.assoc,
-      Scheme.Hom.resLE_comp_ι, Category.assoc, Iso.hom_inv_id, Category.comp_id, Category.id_comp]
-  · rw [← cancel_mono V.ι, Category.assoc, Scheme.Hom.resLE_comp_ι, ← Category.assoc,
-      Scheme.Hom.resLE_comp_ι, Category.assoc, Iso.inv_hom_id, Category.comp_id, Category.id_comp]
-  · exact Scheme.Hom.resLE_comp_ι ..
+  subst hVV'
+  exact ⟨θ.hom.preimageIso V, θ.hom.preimageIso_hom_ι V⟩
 
 private theorem ker_eq_of_iso_comp {P Q T : Scheme.{u}} (c : Q ≅ P) (h₁ : P ⟶ T) (h₂ : Q ⟶ T)
     (hc : c.hom ≫ h₁ = h₂) : h₁.ker = h₂.ker := by
