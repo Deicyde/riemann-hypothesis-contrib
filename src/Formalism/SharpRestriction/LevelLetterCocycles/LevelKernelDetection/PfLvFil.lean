@@ -22,14 +22,8 @@ variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field 
     {LL : Type} [Field LL] [Algebra Qp LL]
     {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
-theorem lvFil_Fil_anti {a b : ℤ} (hab : a ≤ b) : PD.Fil b ≤ PD.Fil a := by
-  obtain ⟨k, rfl⟩ := Int.le.dest hab
-  clear hab
-  induction k with
-  | zero => simp
-  | succ k ih =>
-    rw [show a + ((k + 1 : ℕ) : ℤ) = a + k + 1 by push_cast; ring]
-    exact (PD.Fil_anti (a + k)).trans ih
+theorem lvFil_Fil_anti {a b : ℤ} (hab : a ≤ b) : PD.Fil b ≤ PD.Fil a :=
+  antitone_int_of_succ_le PD.Fil_anti hab
 
 theorem lvFil_FilV_anti : Antitone (FilV PD (LL := LL) (V := V)) := by
   apply _root_.Formalism.MainNotions.N.Ln03.Pf.jb_FilV_anti <;> assumption
@@ -40,15 +34,8 @@ theorem lvFil_FilCris_anti (ρ : Representation LL G V) : Antitone (FilCris PD �
 
 theorem lvFil_tensor_injective {N₁ N₂ : Type} [AddCommGroup N₁] [Module Qp N₁] [AddCommGroup N₂] [Module Qp N₂]
     (g : N₁ →ₗ[Qp] N₂) (hg : Function.Injective g) :
-    Function.Injective (AlgebraTensorModule.map (LinearMap.id : V →ₗ[LL] V) g) := by
-  have e : ⇑(AlgebraTensorModule.map (LinearMap.id : V →ₗ[LL] V) g) = ⇑(g.lTensor V) := by
-    funext x
-    induction x using TensorProduct.induction_on with
-    | zero => simp
-    | tmul a b => simp
-    | add x y hx hy => simp only [map_add (f := _), hx, hy]
-  rw [e]
-  exact Module.Flat.lTensor_preserves_injective_linearMap g hg
+    Function.Injective (AlgebraTensorModule.map (LinearMap.id : V →ₗ[LL] V) g) :=
+  Module.Flat.lTensor_preserves_injective_linearMap (M := V) g hg
 
 theorem lvFil_ιV_injective : Function.Injective (ιV PD (LL := LL) (V := V)) := by
   unfold ιV
