@@ -164,12 +164,8 @@ theorem vacFix_of_inert (ψ : AddChar (AF D.host.F) ℂ) {S T : HSp D} {χS χT 
   have eT : GlobalTheory.PlaceModel.latFrame T = GlobalTheory.LevSplit.L0sub T := SetLike.coe_injective (GlobalTheory.PlaceModel.coe_latFrame T)
   have hsS : IsSelfDualC S (GlobalTheory.LevSplit.L0sub S) := eS ▸ GlobalTheory.PlaceModel.isSelfDualC_latFrame S
   have hsT : IsSelfDualC T (GlobalTheory.LevSplit.L0sub T) := eT ▸ GlobalTheory.PlaceModel.isSelfDualC_latFrame T
-  have hfull : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
-      IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
-    intro V Λ hΛ
-    exact Formalism.IndefR.Datum.IsSelfDualC.isFullLattice V Λ hΛ
-  obtain ⟨βS, hβS⟩ := GlobalTheory.latticeFrame.exists_frame D.host.F D.host.E _ _ (hfull _ _ hsS)
-  obtain ⟨βT, hβT⟩ := GlobalTheory.latticeFrame.exists_frame D.host.F D.host.E _ _ (hfull _ _ hsT)
+  obtain ⟨βS, hβS⟩ := GlobalTheory.latticeFrame.exists_frame D.host.F D.host.E _ _ (Formalism.IndefR.Datum.IsSelfDualC.isFullLattice _ _ hsS)
+  obtain ⟨βT, hβT⟩ := GlobalTheory.latticeFrame.exists_frame D.host.F D.host.E _ _ (Formalism.IndefR.Datum.IsSelfDualC.isFullLattice _ _ hsT)
   rintro f hf k ⟨hk, a, a', ha, sk⟩ k' ⟨hk', b, b', hb, sk'⟩
   rw [(hpi a a' ha).2] at sk
   rw [(hpi b b' hb).2] at sk'
