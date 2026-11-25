@@ -3,6 +3,7 @@ module
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RepUnique
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DFormMem
 import Std.Tactic.BVDecide.Normalize.Prop
+public import Lemmata.FinSuccAbovePredAbove
 
 @[expose] public section
 
@@ -107,8 +108,8 @@ theorem alt_sum_form {j : ℕ} (I : Fin j → Fin d) (x : Φ.A.obj E.D) (s : Com
       · refine Finset.prod_congr rfl fun k hk => ?_
         have hki : (k : ℕ) ≠ i := fun h => Finset.ne_of_mem_erase hk (Fin.ext h)
         split_ifs with h
-        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp [sa_val] <;> (try split_ifs) <;> simp_all <;> omega
-        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp [sa_val] <;> (try split_ifs) <;> simp_all <;> omega
+        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp [Fin.val_succAbove_eq_ite] <;> (try split_ifs) <;> simp_all <;> omega
+        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp [Fin.val_succAbove_eq_ite] <;> (try split_ifs) <;> simp_all <;> omega
     have hE : ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i + 1 then u k else v k) =
         ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i then u k else v k) := by
       refine Finset.prod_congr rfl fun k hk => ?_
@@ -123,7 +124,7 @@ theorem alt_sum_form {j : ℕ} (I : Fin j → Fin d) (x : Φ.A.obj E.D) (s : Com
       have h1 : (i : ℕ) ≠ j + 1 := fun h => hi (Fin.ext h)
       have h2 := i.2
       apply Fin.ext
-      rw [sa_val]
+      rw [Fin.val_succAbove_eq_ite]
       simp only [Fin.val_last]
       split_ifs <;> omega
     calc W i = (Φ.A.map (σ _ ≫ toLast i s)).hom x := map_map _ _ _

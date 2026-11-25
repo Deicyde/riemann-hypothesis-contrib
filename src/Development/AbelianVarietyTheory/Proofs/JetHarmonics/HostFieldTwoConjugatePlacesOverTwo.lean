@@ -82,6 +82,7 @@ import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.DepthCond
 import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.ExampleSatisfiesConditionsAtFive
 import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsCoprimeTwoSubRtTwoAddRt
 import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.OneAddZeta21PowSevenAddPowFourteenEqZero
+public import Lemmata.DetBlockDiagonal
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.CMTraceForms.DiscrCMDatumEqProdPlaces, Development.AutomorphicArithmetic.CMTraceForms.ExistsPrimitiveOrthogonalIdempotentsSumEqOfNoeth, Development.AutomorphicArithmetic.CMTraceForms.ExistsSplitIdempotentOfSplitAt, Development.AutomorphicArithmetic.CMTraceForms.TraceFormDecompositionCMDatum, Development.AutomorphicArithmetic.CMTraceForms.SplitPlacesDiscriminantDepthOfSplitAt, Development.AbelianVarietyTheory.Proofs.JetHarmonics.HostFieldTwoConjugatePlacesOverTwo
@@ -471,7 +472,7 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
           rw [tauExt_comp_star_eq_tauExt_sig, UpperTheory.PlacesDiscr.sig_sig]
           exact hz2 _ i (hE i b) j hij (B j a)
     have hdetN : (Matrix.of fun m k => tauExt (ρ k) (γs m)).det = ∏ i, ((A i).det * (A i).det) := by
-      rw [hblock, GroundTheory.Global.SemiLocal.det_blockDiagonal']
+      rw [hblock, Matrix.det_blockDiagonal']
       simp only [Matrix.det_fromBlocks_zero₂₁]
     have hcι : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 E))
         = Fintype.card (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) := by

@@ -2,6 +2,7 @@ module
 
 public import GroundTheory.ProfiniteCohomology.LocalClassFormation.CupSymbolBridge
 public import GroundTheory.ProfiniteCohomology.LocalClassFormationAlt
+public import Lemmata.SubgroupContinuousInclusion
 
 @[expose] public section
 
@@ -29,7 +30,7 @@ noncomputable def PreClassFormation.toInt (F : PreClassFormation A) :
   inv_res U V h x := by
     obtain ⟨y, rfl⟩ := (cohomologyULiftIntAddEquiv (Rep.res (U : Subgroup G).subtype A) 2).surjective x
     have e := cohomologyULiftIntAddEquiv_cohomologyMapAlong (Rep.res (U : Subgroup G).subtype A)
-      (Subgroup.inclusion (show (V : Subgroup G) ≤ U from h)) (continuous_subgroup_inclusion _)
+      (Subgroup.inclusion (show (V : Subgroup G) ≤ U from h)) (Subgroup.continuous_inclusion _)
       (resResHom A (show (V : Subgroup G) ≤ U from h))
       (resResHom (uliftIntToIntRep A) (show (V : Subgroup G) ≤ U from h)) (fun _ => rfl) 2 y
     simp only [AddMonoidHom.comp_apply, AddEquiv.coe_toAddMonoidHom, AddEquiv.symm_apply_apply]

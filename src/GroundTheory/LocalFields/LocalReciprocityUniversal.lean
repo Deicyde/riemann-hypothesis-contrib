@@ -10,6 +10,7 @@ import Mathlib.Topology.Compactness.Paracompact
 import Mathlib.Topology.InductiveDimension.Functions
 import Mathlib.Topology.Separation.Connected
 import GroundTheory.LocalFields.AbstractLocalReciprocity.Functoriality
+public import Lemmata.SubgroupContinuousInclusion
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: GroundTheory.LocalFields.AbstractLocalReciprocity.ReciprocityAbelianizationRestrictReciprocityLimi, GroundTheory.LocalFields.LocalReciprocityLimitAbstract, GroundTheory.LocalFields.LocalReciprocityUniversal
@@ -351,14 +352,9 @@ section Maps
 
 variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-omit [IsTopologicalGroup G] in
-theorem continuous_inclusion {K K' : Subgroup G} (hK : K' ≤ K) :
-    Continuous (Subgroup.inclusion hK) :=
-  continuous_subtype_val.subtype_mk _
-
 def limitRestrict {K K' : OpenSubgroup G} (hK : K' ≤ K) :
     TopologicalAbelianization (K' : Subgroup G) →* TopologicalAbelianization (K : Subgroup G) :=
-  topologicalAbelianizationMap (Subgroup.inclusion hK) (continuous_inclusion hK)
+  topologicalAbelianizationMap (Subgroup.inclusion hK) (Subgroup.continuous_inclusion hK)
 
 @[simp]
 theorem limitRestrict_mk {K K' : OpenSubgroup G} (hK : K' ≤ K) (g : (K' : Subgroup G)) :

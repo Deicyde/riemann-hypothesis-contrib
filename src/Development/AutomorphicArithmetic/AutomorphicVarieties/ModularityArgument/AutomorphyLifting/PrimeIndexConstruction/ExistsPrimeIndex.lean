@@ -48,6 +48,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSubquotientComp
 import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.PrimeIndexConstruction.LocTrans
+public import Lemmata.SolvableNormalPrimeIndex
 
 @[expose] public section
 
@@ -195,30 +196,6 @@ private theorem allW_step [IsAlgClosure F Ω] [IsGalois F E] (hp : (Module.finra
 
 end Step
 
-private theorem exists_prime_index (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial Γ] [Group.IsSolvable Γ] :
-    ∃ M : Subgroup Γ, M.Normal ∧ M.index.Prime := by
-  obtain ⟨M, hM, hle⟩ := (eq_top_or_exists_le_coatom (commutator Γ)).resolve_left
-    (Group.IsSolvable.commutator_lt_top_of_nontrivial Γ).ne
-  have hn : M.Normal := ⟨fun n hn g => by
-    have h1 : g * n * g⁻¹ * n⁻¹ ∈ M := hle (Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n))
-    simpa using M.mul_mem h1 hn⟩
-  refine ⟨M, hn, ?_⟩
-  obtain ⟨p, hp, hd⟩ := Nat.exists_prime_and_dvd (n := Nat.card (Γ ⧸ M)) (mt Subgroup.index_eq_one.1 hM.1)
-  haveI := Fact.mk hp
-  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hd
-  have h1 : (Subgroup.zpowers g).comap (QuotientGroup.mk' M) = ⊤ := by
-    refine hM.2 _ (lt_of_le_of_ne (fun x hx => ?_) fun e => ?_)
-    · rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).2 hx]
-      exact one_mem _
-    · obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective M g
-      have hx : x ∈ M := e ▸ Subgroup.mem_zpowers _
-      rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).2 hx, orderOf_one] at hg
-      exact hp.one_lt.ne hg
-  have h2 : Subgroup.zpowers g = ⊤ :=
-    Subgroup.comap_injective (QuotientGroup.mk'_surjective M) (h1.trans (Subgroup.comap_top _).symm)
-  rw [Subgroup.index, ← Subgroup.card_top, ← h2, Nat.card_zpowers, hg]
-  exact hp
-
 end UpperTheory.V.Z.Win.Birth.UnramifiedPlaceWindow
 
 open UpperTheory.V.Z.Win.Birth.UnramifiedPlaceWindow in
@@ -234,7 +211,7 @@ theorem UpperTheory.V.Z.Win.Birth.awUp :
     rw [← Finite.one_lt_card_iff_nontrivial, IsGalois.card_aut_eq_finrank]
     have := Module.finrank_pos (R := F) (M := E)
     omega
-  obtain ⟨M, hM, hp⟩ := exists_prime_index (E ≃ₐ[F] E)
+  obtain ⟨M, hM, hp⟩ := Group.IsSolvable.exists_normal_subgroup_index_prime (E ≃ₐ[F] E)
   let K := IntermediateField.fixedField M
   haveI : IsGalois F K := IsGalois.of_fixedField_normal_subgroup M
   haveI : IsTotallyComplex K := isTotallyComplex_of_algebra F K

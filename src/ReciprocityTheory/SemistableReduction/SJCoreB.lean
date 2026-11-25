@@ -16,15 +16,6 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MeasureTheory Metric Set Real
 
-theorem integral_volumeIoiPow (k : ℕ) (g : ℝ → ℝ) :
-    ∫ r : Ioi (0 : ℝ), g r ∂(Measure.volumeIoiPow k) = ∫ r in Ioi (0 : ℝ), r ^ k * g r := by
-  rw [Measure.volumeIoiPow, integral_withDensity_eq_integral_toReal_smul (by fun_prop)
-    (Filter.Eventually.of_forall fun _ => ENNReal.ofReal_lt_top)]
-  rw [← integral_subtype_comap measurableSet_Ioi (fun r : ℝ => r ^ k * g r)]
-  refine integral_congr_ae (Filter.Eventually.of_forall fun r => ?_)
-  simp only [smul_eq_mul]
-  rw [ENNReal.toReal_ofReal (pow_nonneg (le_of_lt r.2) k)]
-
 theorem integrable_volumeIoiPow {k : ℕ} {g : ℝ → ℝ}
     (h : IntegrableOn (fun r ↦ r ^ k * g r) (Ioi 0)) :
     Integrable (fun r : Ioi (0 : ℝ) ↦ g r) (Measure.volumeIoiPow k) := by

@@ -40,6 +40,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+public import Lemmata.StrictPeriodsGamma1
 
 @[expose] public section
 
@@ -55,14 +56,10 @@ private theorem coe_comb {N : ℕ} {k : ℤ} {I : Type} (s : Finset I) (c : I �
   | empty => simp
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, ← ih]; rfl
 
-private theorem one_mem_per (N : ℕ) :
-    (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)).strictPeriods := by
-  rw [strictPeriods_Gamma1]; exact AddSubgroup.mem_zmultiples 1
-
 private theorem coef_smul {N : ℕ} {k : ℤ} (c : ℂ) (f : ModularForm (Gamma1 N) k) (n : ℕ) :
     coef (c • (f : ℍ → ℂ)) n = c * coef f n := by
   unfold coef
-  rw [ModularForm.qExpansion_smul one_pos (one_mem_per N) c f]
+  rw [ModularForm.qExpansion_smul one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 N) c f]
   simp
 
 private theorem coef_comb {N : ℕ} {k : ℤ} {I : Type} (s : Finset I) (c : I → ℂ) (f : I → ModularForm (Gamma1 N) k) (n : ℕ) :

@@ -63,6 +63,7 @@ import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.RingTheory.PowerSeries.Inverse
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompletedLocalisationInvariants, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoordInjectiveRangeMem, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsMatrixGamma, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsPrimitiveRootCoeffRingOfGood, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsUniqueAlgHomOfPadicLocalization, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SemilinearMatrixComm, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SumMulVecSmul, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachDeltaInvariantCoboundaries
@@ -78,21 +79,16 @@ namespace GlobalTheory
 
 namespace CompletedInvariants
 
-theorem smodEq_iff {R : Type} [CommRing R] (q : R) (n : ℕ) (a b : R) :
-    a ≡ b [SMOD ((Ideal.span {q}) ^ n • ⊤ : Submodule R R)] ↔ q ^ n ∣ a - b := by
-  rw [SModEq.sub_mem, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top,
-    Ideal.mem_span_singleton]
-
 theorem eq_zero_of_dvd {R : Type} [CommRing R] (q : R) (h : IsAdicComplete (Ideal.span {q}) R)
     (z : R) (hz : ∀ k : ℕ, q ^ k ∣ z) : z = 0 := by
   refine IsHausdorff.haus h.toIsHausdorff z fun n => ?_
-  rw [smodEq_iff, sub_zero]; exact hz n
+  rw [SModEq.span_singleton_pow_iff_dvd, sub_zero]; exact hz n
 
 theorem exists_lim {R : Type} [CommRing R] (q : R) (h : IsAdicComplete (Ideal.span {q}) R)
     (f : ℕ → R) (hf : ∀ m n, m ≤ n → q ^ m ∣ f m - f n) : ∃ L, ∀ n, q ^ n ∣ f n - L := by
   obtain ⟨L, hL⟩ := IsPrecomplete.prec h.toIsPrecomplete (f := f)
-    (fun {m n} hmn => (smodEq_iff q m _ _).2 (hf m n hmn))
-  exact ⟨L, fun n => (smodEq_iff q n _ _).1 (hL n)⟩
+    (fun {m n} hmn => (SModEq.span_singleton_pow_iff_dvd q _ _ m).2 (hf m n hmn))
+  exact ⟨L, fun n => (SModEq.span_singleton_pow_iff_dvd q _ _ n).1 (hL n)⟩
 
 theorem map_dvd' {O R S : Type} [CommRing O] [CommRing R] [CommRing S] [Algebra O R] [Algebra O S]
     (f : R →ₐ[O] S) (p k : ℕ) {z : R} (h : (p : R) ^ k ∣ z) : (p : S) ^ k ∣ f z := by

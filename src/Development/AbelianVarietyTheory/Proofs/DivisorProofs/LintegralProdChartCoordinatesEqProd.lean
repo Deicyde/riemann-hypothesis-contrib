@@ -5,6 +5,7 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IntegrableM
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LintegralFintypeProdEqProd
 import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.ExhaustionFrames
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.IsOrth
+public import Lemmata.MeasurePi
 
 @[expose] public section
 
@@ -50,7 +51,7 @@ theorem lintegral_prod_zOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   have s3 : ∫⁻ f : Ent X → ℂ, K (MeasurableEquiv.curry X.Ψ (Low r) ℂ f) = ∫⁻ g, K g :=
     (measurePreserving_curry_lowCoord X.Ψ (Low r)).lintegral_comp hKm
   rw [s1, s2, s3, hK, volume_pi]
-  exact GlobalTheory.RestrMeas.lintegral_fintype_prod_eq_prod fun _ => hh.aemeasurable
+  exact MeasureTheory.lintegral_fintype_prod_eq_prod fun _ => hh.aemeasurable
 
 end
 

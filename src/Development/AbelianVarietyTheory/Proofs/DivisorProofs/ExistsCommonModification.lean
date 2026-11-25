@@ -66,6 +66,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaCore
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
+public import Lemmata.IsIntegralAppUniversallyClosed
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PolarizationBaseChangeModels, Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PolarizationTransferBaseChange, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCommonModification
@@ -333,7 +334,7 @@ theorem bijective_app {U N X : Scheme.{0}} [GlobalTheory.IsNormalScheme X] [IsLo
   have : IsSchemeTheoreticallyDominant p := .of_isDominant p
   refine ⟨p.app_injective V, fun t => mem_range_app_of_forall_isAffineOpen p V t fun W hW _ => ?_⟩
   generalize N.presheaf.map _ t = t
-  have ht : (p.app W).hom.IsIntegralElem t := GenPush.isIntegral_app_of_universallyClosed p W hW t
+  have ht : (p.app W).hom.IsIntegralElem t := AlgebraicGeometry.isIntegral_app_of_universallyClosed p W hW t
   have hs : ((u ≫ p).app W).hom.IsIntegralElem (u.app (p ⁻¹ᵁ W) t) := by
     change ((u.app (p ⁻¹ᵁ W)).hom.comp (p.app W).hom).IsIntegralElem _
     exact RingHom.IsIntegralElem.map ht _

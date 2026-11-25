@@ -53,6 +53,7 @@ import Mathlib.Tactic.NormNum.Ordinal
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValSubLtIff
+public import Lemmata.SolvableNormalPrimeIndex
 
 @[expose] public section
 
@@ -90,9 +91,6 @@ private theorem upCycI (hP : _root_.UpperTheory.V.Af.Hypotheses') (hL : CyclicBa
       have h3 := (UpperTheory.frobenius_power_compatibility F E Ω l ι w _ (_root_.GlobalTheory.DelEps.WeilRes.normV_eq_pow (K := F) w)).1 2 r _ hF
       rw [← algSat_pow, ← _root_.GlobalTheory.DelEps.WeilRes.normV_eq_pow] at h3
       exact h3
-private theorem exists_prime_index (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial Γ] [Group.IsSolvable Γ] :
-    ∃ M : Subgroup Γ, M.Normal ∧ M.index.Prime := by
-  apply _root_.UpperTheory.V.Z.Win.Birth.UnramifiedPlaceWindow.exists_prime_index <;> assumption
 private theorem closure_tower (K E Ω : Type) [Field K] [Field E] [Field Ω] [Algebra K E] [Algebra K Ω] [Algebra E Ω]
     [IsScalarTower K E Ω] [Algebra.IsAlgebraic K E] [IsAlgClosure E Ω] : IsAlgClosure K Ω :=
   { isAlgClosed := IsAlgClosure.isAlgClosed E, isAlgebraic := Algebra.IsAlgebraic.trans K E Ω }
@@ -135,7 +133,7 @@ theorem UpperTheory.V.Z.Bc.upSolI_of_alt :
     rw [← Finite.one_lt_card_iff_nontrivial, IsGalois.card_aut_eq_finrank]
     have := Module.finrank_pos (R := F) (M := E)
     omega
-  obtain ⟨M, hM, hp⟩ := exists_prime_index (E ≃ₐ[F] E)
+  obtain ⟨M, hM, hp⟩ := Group.IsSolvable.exists_normal_subgroup_index_prime (E ≃ₐ[F] E)
   let K := IntermediateField.fixedField M
   haveI : IsGalois F K := IsGalois.of_fixedField_normal_subgroup M
   haveI : IsTotallyComplex K := isTotallyComplex_of_algebra F K

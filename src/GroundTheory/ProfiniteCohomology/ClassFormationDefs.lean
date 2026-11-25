@@ -3,6 +3,7 @@ module
 public import GroundTheory.ProfiniteCohomology.CohomologyFunctoriality
 public import GroundTheory.ProfiniteCohomology.TorsionDualDefs
 public import Mathlib.GroupTheory.Torsion
+public import Lemmata.SubgroupContinuousInclusion
 
 @[expose] public section
 
@@ -19,11 +20,6 @@ variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologic
 section ResLE
 
 
-omit [IsTopologicalGroup G] in
-theorem continuous_subgroup_inclusion {U V : Subgroup G} (h : V ≤ U) :
-    Continuous (Subgroup.inclusion h) :=
-  continuous_induced_rng.2 continuous_subtype_val
-
 variable (A : Rep.{u} k G)
 
 def resResHom {U V : Subgroup G} (h : V ≤ U) :
@@ -35,11 +31,11 @@ variable [IsDiscreteRep A]
 
 noncomputable def cohomologyResLE {U V : Subgroup G} (h : V ≤ U) (n : ℕ) :
     cohomology (Rep.res U.subtype A) n ⟶ cohomology (Rep.res V.subtype A) n :=
-  cohomologyMapAlong (Subgroup.inclusion h) (continuous_subgroup_inclusion h) (resResHom A h) n
+  cohomologyMapAlong (Subgroup.inclusion h) (Subgroup.continuous_inclusion h) (resResHom A h) n
 
 theorem cohomologyResLE_eq {U V : Subgroup G} (h : V ≤ U) (n : ℕ) :
     cohomologyResLE A h n = cohomologyMapAlong (Subgroup.inclusion h)
-      (continuous_subgroup_inclusion h) (resResHom A h) n :=
+      (Subgroup.continuous_inclusion h) (resResHom A h) n :=
   rfl
 
 instance isDiscreteRep_res_quotientToInvariants (W : Subgroup G) (N : Subgroup W) [N.Normal] :

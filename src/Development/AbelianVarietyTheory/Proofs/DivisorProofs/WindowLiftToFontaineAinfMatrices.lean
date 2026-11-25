@@ -55,6 +55,7 @@ import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Mathlib.RingTheory.PiTensorProduct
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.DivisorProofs.AinfFrameSolutionCongrEqTransposeMul, Development.AbelianVarietyTheory.Proofs.DivisorProofs.AinfFrameSolutionMulCongrGmTranspose, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ApproxStep, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAinfFrameLiftTwistedFrobenius, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAinfSolutionOfApproxModPhiXiMu, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitMatrixLiftModTauAinf, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobXiEigenvectorEqOfFrameImageEq, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusLiftSolvesModFrobXiMu, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusXiEqPMulUnit, Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsNilpotentBlockFrobeniusXiAinfOfFrameBlockP, Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsNilpotentInvTransposeBlockFrobeniusAinfOfFrame, Development.AbelianVarietyTheory.Proofs.DivisorProofs.MuDvdLiftOfFrameMatrixEquation, Development.AbelianVarietyTheory.Proofs.DivisorProofs.TransposeLiftSolvesModFrobXiMu, Development.AbelianVarietyTheory.Proofs.DivisorProofs.WindowLiftToFontaineAinfMatrices
@@ -217,21 +218,16 @@ theorem approx_dvd {B : Type} [CommRing B] (q : B) (σ : B →+* B) (hq : σ q =
     rw [e]
     exact dvd_sub ih h2
 
-theorem smodEq_iff {B : Type} [CommRing B] (q : B) (n : ℕ) (x y : B) :
-    x ≡ y [SMOD ((Ideal.span {q}) ^ n • ⊤ : Submodule B B)] ↔ q ^ n ∣ x - y := by
-  rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton]
-
 theorem exists_fixed {B : Type} [inst : CommRing B] (q : B)
     [h : IsAdicComplete (Ideal.span {q}) B] (σ : B →+* B) (hq : σ q = q) (w : B) :
     ∃ c : B, c = -w + q * σ c := by
   obtain ⟨c, hc⟩ := h.toIsPrecomplete.prec (f := approx q σ w) fun {m n} hmn =>
-    (smodEq_iff q m _ _).mpr (approx_dvd q σ hq w m n hmn)
+    (SModEq.span_singleton_pow_iff_dvd q _ _ m).mpr (approx_dvd q σ hq w m n hmn)
   refine ⟨c, ?_⟩
   have hd : ∀ n, q ^ n ∣ c - (-w + q * σ c) := by
     intro n
-    have h1 : q ^ n ∣ approx q σ w n - c := (smodEq_iff q n _ _).mp (hc n)
-    have h2 : q ^ (n + 1) ∣ approx q σ w (n + 1) - c := (smodEq_iff q (n + 1) _ _).mp (hc (n + 1))
+    have h1 : q ^ n ∣ approx q σ w n - c := (SModEq.span_singleton_pow_iff_dvd q _ _ n).mp (hc n)
+    have h2 : q ^ (n + 1) ∣ approx q σ w (n + 1) - c := (SModEq.span_singleton_pow_iff_dvd q _ _ (n + 1)).mp (hc (n + 1))
     obtain ⟨t, ht⟩ := h1
     have e : c - (-w + q * σ c) = -(approx q σ w (n + 1) - c) + q * σ (approx q σ w n - c) := by
       rw [map_sub]
@@ -240,7 +236,7 @@ theorem exists_fixed {B : Type} [inst : CommRing B] (q : B)
     rw [e, ht, map_mul, map_pow, hq]
     exact dvd_add (dvd_neg.mpr ((pow_dvd_pow q (Nat.le_succ n)).trans h2)) ⟨q * σ t, by ring⟩
   have h0 := h.toIsHausdorff.haus (c - (-w + q * σ c)) fun n =>
-    (smodEq_iff q n _ _).mpr (by simpa using hd n)
+    (SModEq.span_singleton_pow_iff_dvd q _ _ n).mpr (by simpa using hd n)
   exact sub_eq_zero.mp h0
 
 end GlobalTheory.FixedPointApproximation

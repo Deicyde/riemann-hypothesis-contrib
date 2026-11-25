@@ -39,6 +39,7 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.
 import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.IntegralMomentReduction.SMomOf
 import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.StokesSimplices.SStokesOf
 import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.WhittakerSmoothForms.ActHomApply
+public import Lemmata.FinSuccAbovePredAbove
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.AutomorphicVarieties.TensorHomCubes.GrpHComp, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.BaseChangeStability.BaseChangeBijective, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.BaseChangeStability.SStabOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.CycleBoundaryInjectivity.ICyclesInjective, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.CycleBoundaryInjectivity.ThEqZeroIff, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.CycleBoundaryInjectivity.SBridgeOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.EvaluationSums.SEvOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.FinitelyGeneratedTorsion.FgShift, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.FinitelyGeneratedTorsion.HglFGOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.FiniteIndexCase.SFinOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.PrimitiveSubmatrices.GlobalTheory, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.PrimitiveSubmatrices.PrimPush, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.RationalSuccAbove.RatSuccAboveSucc, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.RationalSuccAbove.SChainOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.SeparationCase.SSepOf, Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureResults.KTheoryStability.ReductionBoundsTorsion.SBridge
@@ -544,14 +545,6 @@ namespace PositivityTheory.KB
 
 open ChainCochainPairing
 
-private theorem val_succAbove_eq_ite_lt {n : ℕ} (q : Fin (n + 1)) (j : Fin n) :
-    ((q.succAbove j : Fin (n + 1)) : ℕ) = if (j : ℕ) < q then (j : ℕ) else (j : ℕ) + 1 := by
-  by_cases h : (j : ℕ) < q
-  · rw [Fin.succAbove_of_castSucc_lt _ _ (by simpa [Fin.lt_def] using h)]
-    simp [h]
-  · rw [Fin.succAbove_of_le_castSucc _ _ (by simp [Fin.le_def]; omega)]
-    simp [h]
-
 private theorem ev_eq_linearCombination {G H Y : Type} [Group G] [Group H] [MulAction H Y] (ρ : G →* H) {m : ℕ}
     (F : (Fin (m + 1) → Y) → ℝ) (y : Y) (z : Chn G m) :
     ev ρ F y z = Finsupp.linearCombination ℝ (fun g : Fin m → G ↦ F fun j ↦ ρ (Fin.partialProd g j) • y) z := by
@@ -593,7 +586,7 @@ private theorem dC_prism_sum_eq_snd_sub_fst {Y : Type} {n : ℕ} (F : (Fin (n + 
     congr 1
     funext p
     simp only [FP, uu, s]
-    split_ifs <;> (congr 2; apply Fin.ext; rw [val_succAbove_eq_ite_lt]; simp only; split_ifs <;> omega)
+    split_ifs <;> (congr 2; apply Fin.ext; rw [Fin.val_succAbove_eq_ite]; simp only; split_ifs <;> omega)
   let M : ℕ → Fin (n + 2) → Y := fun i r ↦ if (r : ℕ) < i then (uu r).1 else (uu r).2
   have hstep : ∀ i, i < n + 2 → F (M i) - F (M (i + 1)) =
       ∑ p ∈ Finset.range i, S p (i - 1) + ∑ q ∈ Finset.Ico (i + 1) (n + 2), S q i := by
@@ -608,7 +601,7 @@ private theorem dC_prism_sum_eq_snd_sub_fst {Y : Type} {n : ℕ} (F : (Fin (n + 
       simp only [c]
       congr 2
       funext r
-      rw [val_succAbove_eq_ite_lt]
+      rw [Fin.val_succAbove_eq_ite]
     rw [← Finset.sum_range_add_sum_Ico _ (show i ≤ n + 3 by omega),
       Finset.sum_eq_sum_Ico_succ_bot (show i < n + 3 by omega),
       Finset.sum_eq_sum_Ico_succ_bot (show i + 1 < n + 3 by omega)] at hc

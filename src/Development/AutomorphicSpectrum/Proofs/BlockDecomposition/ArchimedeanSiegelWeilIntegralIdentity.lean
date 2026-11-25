@@ -110,6 +110,7 @@ import Formalism.LocalRingCardinality.DataTheta
 import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
 import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
 import Mathlib.Tactic.Linter.Style
+public import Lemmata.MeasurePi
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanOrbitalIntegralContinuous, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TupCoordApply, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousSeminormDiffSLe, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DetConjUnitary, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanOrbitalIntegralHuaBound, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianArchimedeanComplexCoordinatesStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DetWBlockMatrixFormula, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DetWEqNormSqDetOneAddI, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianHaarBlockDecomposition, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LintegralComplexPowerFinite, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LintegralLinearChangeVariablesComplex, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LintegralPowerLineScaling, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OneLeDetW, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HuaDeterminantIntegrableOfLt, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductHuaDeterminantIntegrable, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TupleArchimedeanComplexCoordinates, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TupleArchimedeanComplexCoordinatesStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanSiegelWeilIntegralIdentity
@@ -621,7 +622,7 @@ theorem pi_bound {n : ℕ} (l : Fin n → ℝ) :
     ∫⁻ z : Fin n → ℂ, ∏ i, wt (l i) (z i) ≤
       ENNReal.ofReal ((2 * I0.toReal) ^ n * (∏ i, (1 + l i ^ 2))⁻¹) := by
   have hI0 : 0 ≤ I0.toReal := ENNReal.toReal_nonneg
-  rw [volume_pi, GlobalTheory.RestrMeas.lintegral_fintype_prod_eq_prod
+  rw [volume_pi, MeasureTheory.lintegral_fintype_prod_eq_prod
     (f := fun i => wt (l i)) fun i => (measurable_wt (l i)).aemeasurable]
   refine (Finset.prod_le_prod' fun i _ => one_var (l i)).trans (le_of_eq ?_)
   rw [← ENNReal.ofReal_prod_of_nonneg fun i _ => by positivity, Finset.prod_mul_distrib,

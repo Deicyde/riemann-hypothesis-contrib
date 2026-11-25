@@ -54,17 +54,13 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsFirstChernClassOfLineBundle
 public import Mathlib.FieldTheory.Galois.Infinite
+public import Lemmata.PowZModVal
 
 @[expose] public section
 
 open GlobalTheory.NeedB Polynomial
 
 namespace GlobalTheory
-
-theorem zeta_pow_val_add {Ω : Type} [Field Ω] {N : ℕ} [NeZero N] {ζ : Ω} (hζN : ζ ^ N = 1) (x y : ZMod N) :
-    ζ ^ (x + y).val = ζ ^ x.val * ζ ^ y.val := by
-  rw [ZMod.val_add, ← pow_add]
-  conv_rhs => rw [← Nat.div_add_mod (x.val + y.val) N, pow_add, pow_mul, hζN, one_pow, one_mul]
 
 theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (N : ℕ) (ζ : Ω), 0 < N →
   IsPrimitiveRoot ζ N → (∀ g : Ω ≃ₐ[K] Ω, g ζ = ζ) → ∀ (E : IntermediateField K Ω) (χ : (Ω ≃ₐ[K] Ω) → ZMod N),
@@ -111,7 +107,7 @@ theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Fie
   have ha0 : ∀ g, a g ≠ 0 := fun g => pow_ne_zero _ hζ0
   have hamul : ∀ g ∈ H, ∀ h ∈ H, a (g * h) = a g * a h := by
     intro g hg h hh
-    simp only [a, hadd g hg h hh, zeta_pow_val_add hζN]
+    simp only [a, hadd g hg h hh, ZMod.pow_val_add_of_pow_eq_one hζN]
   have hafix : ∀ (g h : Ω ≃ₐ[K] Ω), g (a h) = a h := by
     intro g h; simp only [a, map_pow, hfix]
   let w : ι → Ω := fun i => (a (s i))⁻¹

@@ -13,6 +13,7 @@ public import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.Tactic.Linter.HaveILetI
 import Mathlib.Tactic.Linter.Style
 import Std.Tactic.BVDecide.Normalize.Prop
+public import Lemmata.MeasurePi
 
 @[expose] public section
 
@@ -654,14 +655,6 @@ theorem d_weight (T T' s : ℝ) (hs : 0 < s) (q : (Fin r → ℂ) × ℂ) :
     rw [norm_mul, mul_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (pow_pos hs _), ← pow_mul]
   · simp
 
-theorem d_pi_smul {ι : Type*} [Fintype ι] {α : ι → Type*} [∀ i, MeasurableSpace (α i)]
-    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (c : ι → NNReal) :
-    Measure.pi (fun i => c i • μ i) = (∏ i, c i) • Measure.pi μ := by
-  refine Measure.pi_eq fun s _ => ?_
-  first
-    | simp only [Measure.smul_apply, Measure.pi_pi, ENNReal.smul_def, smul_eq_mul, ENNReal.ofNNReal_finsetProd,
-        Finset.prod_mul_distrib]
-
 theorem d_map_mul (ρ : ℝ) (hρ : 0 < ρ) :
     (volume : Measure ℂ).map (fun x => (ρ : ℂ) * x) = (Real.toNNReal ((ρ ^ 2)⁻¹)) • (volume : Measure ℂ) := by
   have h := Measure.map_addHaar_smul (volume : Measure ℂ) hρ.ne'
@@ -676,7 +669,7 @@ theorem map_volume_triangular_scaling (s : ℝ) (hs : 0 < s) :
     (fun a : Fin r => (Real.toNNReal (((s ^ (r - a.val)) ^ 2)⁻¹)) • (volume : Measure ℂ))
     (f := fun a x => ((s ^ (r - a.val) : ℝ) : ℂ) * x)
     (fun a => ⟨(continuous_const.mul continuous_id).measurable, d_map_mul _ (by positivity)⟩)
-  rw [volume_pi, h.map_eq, d_pi_smul]
+  rw [volume_pi, h.map_eq, MeasureTheory.Measure.pi_nnreal_smul]
 
 theorem d_map_S (s : ℝ) (hs : 0 < s) :
     (volume : Measure ((Fin r → ℂ) × ℂ)).map (d_S r s) =

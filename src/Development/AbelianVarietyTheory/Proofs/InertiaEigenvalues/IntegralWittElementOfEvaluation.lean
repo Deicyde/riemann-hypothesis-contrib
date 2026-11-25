@@ -2,6 +2,7 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinFlatRadiusIdealFacts
+public import Lemmata.SModEqSpanSingletonPow
 
 @[expose] public section
 
@@ -13,10 +14,6 @@ noncomputable section
 
 namespace GlobalTheory.BSP.HeightSInt
 variable {l : ℕ} [hl : Fact l.Prime] {K : FinExt l}
-
-theorem smod_iff {R : Type} [CommRing R] (p x y : R) (n : ℕ) :
-    x ≡ y [SMOD (Ideal.span {p} ^ n • ⊤ : Submodule R R)] ↔ p ^ n ∣ x - y := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
 
 theorem l_ne_zero_WCb : ((l : ℕ) : WCb l) ≠ 0 := by
   intro h
@@ -172,13 +169,13 @@ theorem exists_lim {a : ℕ} [NeZero a] (T : ℕ → (Wq l a)⟦X⟧)
     intro i
     have hpc : IsPrecomplete (Ideal.span {(l : Wq l a)}) (Wq l a) := inferInstance
     obtain ⟨L, hL⟩ := hpc.prec (f := fun n => coeff i (T n)) (fun {m n} hmn' => by
-      rw [smod_iff]
+      rw [SModEq.span_singleton_pow_iff_dvd]
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn'
       obtain ⟨q, hq⟩ := hmn m k
       refine ⟨-coeff i q, ?_⟩
       have : T m - T (m + k) = -(T (m + k) - T m) := by ring
       rw [← map_sub, this, hq, hl', map_neg, coeff_C_mul]; ring)
-    exact ⟨L, fun n => (smod_iff _ _ _ _).1 (hL n)⟩
+    exact ⟨L, fun n => (SModEq.span_singleton_pow_iff_dvd _ _ _ _).1 (hL n)⟩
   choose L hL using hc
   refine ⟨mk L, fun n => ?_⟩
   choose q hq using fun i => hL i n
@@ -207,7 +204,7 @@ theorem main (w : WCb l) (hw : w ∈ bk.OE) (a : Ainf l) (ha : w = inclW l a) : 
   obtain ⟨s, hs⟩ := exists_lim T (fun n => ⟨σ (A n), by simp [T, Finset.sum_range_succ]⟩)
   refine ⟨s, ?_⟩
   rw [← sub_eq_zero]
-  refine (IsHausdorff.eq_iff_smodEq (I := Ideal.span {(l : Ainf l)})).2 fun n => (smod_iff _ _ _ _).2 ?_
+  refine (IsHausdorff.eq_iff_smodEq (I := Ideal.span {(l : Ainf l)})).2 fun n => (SModEq.span_singleton_pow_iff_dvd _ _ _ _).2 ?_
   obtain ⟨q, hq⟩ := hs n
   have : T n = s + (l : bk.S) ^ n * q := by rw [← hq]; ring
   refine ⟨bk.ev q + (A n).1, ?_⟩

@@ -1,6 +1,7 @@
 module
 
 public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.LocalRestriction
+public import Lemmata.SubgroupContinuousInclusion
 
 @[expose] public section
 
@@ -22,7 +23,7 @@ def fixingIncl : E.1.fixingSubgroup →* K.1.fixingSubgroup :=
   Subgroup.inclusion (IntermediateField.fixingSubgroup_le (Fact.out : K ≤ E))
 
 theorem continuous_fixingIncl : Continuous (fixingIncl K E) :=
-  continuous_subgroup_inclusion _
+  Subgroup.continuous_inclusion _
 
 def unitsResMor : Rep.res (fixingIncl K E) (unitsLimitRep K) ⟶ unitsLimitRep E :=
   Rep.ofHom ⟨LinearMap.id, fun _ => rfl⟩

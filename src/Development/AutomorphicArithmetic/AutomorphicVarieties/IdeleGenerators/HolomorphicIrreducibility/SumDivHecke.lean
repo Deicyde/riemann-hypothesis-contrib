@@ -11,6 +11,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 import Mathlib.Tactic.Linter.HaveILetI
 import Mathlib.Tactic.Linter.Style
 import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenerators.HolomorphicIrreducibility.EPrim
+public import Lemmata.StrictPeriodsGamma1
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenerators.HolomorphicIrreducibility.EigLift, Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenerators.HolomorphicIrreducibility.SumDivHecke
@@ -27,25 +28,15 @@ noncomputable section
 
 namespace UpperTheory.V.Sd
 
-theorem one_mem_per (N : ℕ) :
-    (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)).strictPeriods := by
-  rw [Subgroup.mem_strictPeriods_iff]
-  refine ⟨ModularGroup.T, ?_, ?_⟩
-  · rw [SetLike.mem_coe, Gamma1_mem]
-    simp [ModularGroup.T]
-  · ext i j
-    change ((ModularGroup.T : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ).map (fun x : ℤ => (x : ℝ)) i j = _
-    fin_cases i <;> fin_cases j <;> simp [ModularGroup.T, Matrix.GeneralLinearGroup.upperRightHom]
-
 theorem coef_smul {N : ℕ} {k : ℤ} (c : ℂ) (f : CuspForm (Gamma1 N) k) (n : ℕ) :
     coef (c • f : CuspForm (Gamma1 N) k) n = c * coef f n := by
   unfold coef
-  rw [CuspForm.coe_smul, ModularForm.qExpansion_smul one_pos (one_mem_per N) c f, map_smul, smul_eq_mul]
+  rw [CuspForm.coe_smul, ModularForm.qExpansion_smul one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 N) c f, map_smul, smul_eq_mul]
 
 theorem coef_add {N : ℕ} {k : ℤ} (f g : CuspForm (Gamma1 N) k) (n : ℕ) :
     coef (f + g : CuspForm (Gamma1 N) k) n = coef f n + coef g n := by
   unfold coef
-  rw [CuspForm.coe_add, ModularForm.qExpansion_add one_pos (one_mem_per N) f g, map_add (f := _)]
+  rw [CuspForm.coe_add, ModularForm.qExpansion_add one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 N) f g, map_add (f := _)]
 
 theorem norm_chi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
     (a : ZMod N) : ‖ι.symm (χ a)‖ ≤ 1 := by

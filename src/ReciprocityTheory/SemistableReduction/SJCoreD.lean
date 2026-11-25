@@ -9,6 +9,7 @@ import Mathlib.MeasureTheory.Measure.RegularityCompacts
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Tactic.Lemma
 import Mathlib.Topology.UniformSpace.Uniformizable
+public import Lemmata.IntegralVolumeIoiPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: ReciprocityTheory.SemistableReduction.SJCoreC, ReciprocityTheory.SemistableReduction.SJCoreD
@@ -221,7 +222,7 @@ theorem polar_mean {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc :
           integral_congr_ae (ae_of_all _ fun r => log_norm_sum_smul_sphere_mul_exp_eq c z r.1 r.2 hz)
       _ = ∫ t in Ioi (0 : ℝ), t ^ (2 * n - 1) * ((log t + log ‖∑ i, WithLp.ofLp c i * spherePoint z i‖) * exp (-t ^ 2)) := by
           rw [hk]
-          exact integral_volumeIoiPow (2 * n - 1)
+          exact MeasureTheory.Measure.integral_volumeIoiPow (2 * n - 1)
             (fun t : ℝ => (log t + log ‖∑ i, WithLp.ofLp c i * spherePoint z i‖) * exp (-t ^ 2))
       _ = ∫ t in Ioi (0 : ℝ), (t ^ (2 * n - 1) * log t * exp (-t ^ 2) +
             log ‖∑ i, WithLp.ofLp c i * spherePoint z i‖ * (t ^ (2 * n - 1) * exp (-t ^ 2))) := by

@@ -55,6 +55,7 @@ import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.TensorL
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.UniformisationComponentLatticesMarkings
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.CmHostUnitAddConjEqOne
 import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ValuesAlgIffValuesUnitOfNe
+public import Lemmata.MeasurePi
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormAdelicClassicalVacuumFactorEq, Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormAdelicClassicalVacuumFactorEqStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.InnerThetaFunctionsReadingTestFunctionFramesStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaReadingLinearInjectiveAtOrthonormalFrameStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockVacAtOfReads, Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilDatumCompactVacuumReadsDetCharacter, Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilDatumCompactVacuumReadsDetCharacterStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresentationRealMovesFrameDetChar, Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresentationRealMovesFrameDetCharStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsVacuumMultiplierConstantPerLattice, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsVacuumMultiplierConstantPerLatticeStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowGeneratorEqConstMulVacuumThetaStatement, Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesFirst
@@ -105,7 +106,7 @@ theorem integral_prod_eq {V U : Type} [NormedAddCommGroup V] [MeasurableSpace V]
   have hsw := lintegral_lintegral_swap (μ := μ.restrict F') (ν := Measure.pi fun _ : Fin n => ν.restrict F)
     (f := fun s t => G (e s + t)) (hG.comp ((he.comp continuous_fst).add continuous_snd).measurable).aemeasurable
   have e1 : ∀ s, ∫⁻ t, G (e s + t) ∂(Measure.pi fun _ : Fin n => ν.restrict F) = ν F ^ n := fun s => by
-    have := GlobalTheory.RestrMeas.lintegral_fin_prod_eq_prod (μ := fun _ : Fin n => ν.restrict F)
+    have := MeasureTheory.lintegral_fintype_prod_eq_prod (μ := fun _ : Fin n => ν.restrict F)
       (f := fun k t => ENNReal.ofReal (φ (e s k + t)))
       fun k => (hφ.comp (continuous_const.add continuous_id)).measurable.aemeasurable
     refine this.trans ?_

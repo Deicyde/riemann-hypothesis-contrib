@@ -35,6 +35,7 @@ import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ModelDescentIntegra
 import Mathlib.Tactic.Linter.Style
 import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.CompactGapsGE
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsSemipositiveOn
+public import Lemmata.FinsuppDegreeCard
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.DegreeEqCardToMultiset, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FinitePlacesModelFamily, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagM3PadicGlobal, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsometricFamilyIntersectionEq, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LocalPairPowerSumValue, Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.LocPairValLinear, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LocalPairValueLinear, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FibreComponentDivisorProperties, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.VerticalPairPowerSumVanish, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.PowerSumTermDiscreteValuation, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LogIntegralEqGenericIntersection, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RootModelGeometricGenericNumber, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.ExistsMixedDifferenceExpansion, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.PowerSumMixedExpansion, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RootPowerSumMixedExpansion, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.PowerSumHeightChangeModel
@@ -48,11 +49,6 @@ open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.Compan
 open ReciprocityTheory.ChartRestriction.G.Geo (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle chartRing)
 
 namespace GlobalTheory.CompanionTheory.Ar.Num
-
-theorem degree_eq_card_toMultiset {α : Type} (d : α →₀ ℕ) :
-    d.degree = Multiset.card (Finsupp.toMultiset d) := by
-  rw [Finsupp.card_toMultiset]
-  rfl
 
 theorem ofFn_monoLines_perm {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {J J' : Type}
     (ℓ : J' → HermLine ι) (e : J → J') (μ : J →₀ ℕ) (m : J' →₀ ℕ) (d : ℕ)
@@ -78,9 +74,9 @@ theorem arMono_mapDomain_some {Ψ : Type} [Fintype Ψ] {N : ℕ} (M : RootModel 
   have hms : Finsupp.toMultiset (Finsupp.mapDomain some μ) = (Finsupp.toMultiset μ).map some :=
     (Finsupp.toMultiset_map _ _).symm
   have hcard : Multiset.card (Finsupp.toMultiset μ) = dimFl Ψ N + 1 := by
-    rw [← degree_eq_card_toMultiset, hμ]
+    rw [← Finsupp.degree_eq_card_toMultiset, hμ]
   have hdeg : (Finsupp.mapDomain some μ).degree = dimFl Ψ N + 1 := by
-    rw [degree_eq_card_toMultiset, hms, Multiset.card_map, hcard]
+    rw [Finsupp.degree_eq_card_toMultiset, hms, Multiset.card_map, hcard]
   have hnone : (Finsupp.mapDomain some μ) none = 0 :=
     Finsupp.mapDomain_notin_range _ _ (by simp)
   have hlen : (Finsupp.toMultiset (Finsupp.mapDomain some μ)).toList.length = dimFl Ψ N + 1 := by

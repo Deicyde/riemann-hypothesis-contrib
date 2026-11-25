@@ -5,6 +5,7 @@ import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Tactic.TypeStar
+public import Lemmata.FinSuccAbovePredAbove
 
 @[expose] public section
 
@@ -85,11 +86,6 @@ theorem face_form {j : ℕ} (I : Fin j → Fin d) (x : Φ.A.obj E.D) (s : Compos
   rw [e]
   rfl
 
-theorem sa_val {n : ℕ} (i : Fin (n + 1)) (m : Fin n) :
-    ((i.succAbove m : Fin (n + 1)) : ℕ) = if (m : ℕ) < i then (m : ℕ) else m + 1 := by
-  unfold Fin.succAbove
-  split_ifs <;> simp_all [Fin.lt_def]
-
 theorem ga_congr (i : Fin d) {n : ℕ} (s : ComposableArrows C n) {p q p' q' : Fin (n + 1)} (h : p ≤ q) (h' : p' ≤ q')
     (hp : (p : ℕ) = p') (hq : (q : ℕ) = q') : ga E σ i s p q h = ga E σ i s p' q' h' := by
   obtain rfl := Fin.ext hp
@@ -144,12 +140,12 @@ theorem d_form_mem {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil) (hc : E.GrConst 
       · rw [hu, hv]
         dsimp only
         rw [← ga_add]
-        refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [sa_val, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
+        refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
       · refine Finset.prod_congr rfl fun k hk => ?_
         have hki : (k : ℕ) ≠ i := fun h => Finset.ne_of_mem_erase hk (Fin.ext h)
         split_ifs with h
-        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [sa_val, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
-        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [sa_val, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
+        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
+        · refine ga_congr E σ _ s _ _ ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_succ] <;> split_ifs <;> omega
     have hE : ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i + 1 then u k else v k) =
         ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i then u k else v k) := by
       refine Finset.prod_congr rfl fun k hk => ?_
@@ -164,7 +160,7 @@ theorem d_form_mem {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil) (hc : E.GrConst 
       have h1 : (i : ℕ) ≠ j + 1 := fun h => hi (Fin.ext h)
       have h2 := i.2
       apply Fin.ext
-      rw [sa_val]
+      rw [Fin.val_succAbove_eq_ite]
       simp only [Fin.val_last]
       split_ifs <;> omega
     calc W i = (Φ.A.map (σ _ ≫ toLast i s)).hom x := map_map _ _ _

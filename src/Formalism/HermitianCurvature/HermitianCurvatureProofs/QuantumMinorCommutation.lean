@@ -5,6 +5,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LemmaDDeterm
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.GeneratorCommutatorQuantumDet
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.QuantumDetHighestWeightHolds
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ShiftedGeneratorEqIteSmulAdd
+public import Lemmata.FinSuccAbovePredAbove
 
 @[expose] public section
 
@@ -136,12 +137,6 @@ theorem minorCov_gen (hE : GlRel E) (η : Fin n → A) (hη : IsCov E η) {m : �
 
 end alg
 
-theorem sa_val {m : ℕ} (q : Fin (m + 1)) (l : Fin m) :
-    ((q.succAbove l : Fin (m + 1)) : ℕ) = if (l : ℕ) < (q : ℕ) then (l : ℕ) else (l : ℕ) + 1 := by
-  unfold Fin.succAbove
-  simp only [Fin.lt_def, Fin.val_castSucc]
-  split_ifs <;> simp
-
 theorem skip_one_eq_succAbove {m : ℕ} (q : Fin (m + 1)) : (skip1 q : Fin m → Fin (m + 1)) = q.succAbove :=
   funext (skip_succ_identity m q)
 
@@ -149,13 +144,13 @@ theorem skip_comp {m : ℕ} (q : Fin (m + 2)) (l : Fin (m + 1)) :
     (q.succAbove ∘ l.succAbove : Fin m → Fin (m + 2)) = skip2 (min (q.succAbove l) q) (max (q.succAbove l) q) := by
   funext k
   apply Fin.ext
-  simp only [Function.comp, skip2, Fin.coe_min, Fin.coe_max, sa_val]
+  simp only [Function.comp, skip2, Fin.coe_min, Fin.coe_max, Fin.val_succAbove_eq_ite]
   split_ifs <;> simp only [] <;> omega
 
 theorem eps_sa {m : ℕ} (q : Fin (m + 1)) (l : Fin m) :
     eps (q.succAbove l) q * (-1) ^ ((q.succAbove l : Fin (m + 1)) : ℕ) = (-1) ^ (l : ℕ) := by
   unfold eps
-  rw [sa_val]
+  rw [Fin.val_succAbove_eq_ite]
   split_ifs
   · simp
   · omega

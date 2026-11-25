@@ -45,6 +45,7 @@ import Mathlib.Topology.Separation.CompletelyRegular
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.LatticeFrames.HeckeFormNSOfHeckeForm
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MixSDblDecZero
+public import Lemmata.NormIteratedFDerivExp
 
 @[expose] public section
 
@@ -92,13 +93,6 @@ theorem norm_iteratedFDeriv_diag_le (B : E →L[ℝ] E →L[ℝ] ℝ) (n : ℕ) 
         congr 1
         exact_mod_cast Nat.sum_range_choose n
 
-theorem norm_iteratedFDeriv_rexp (i : ℕ) (y : ℝ) : ‖iteratedFDeriv ℝ i Real.exp y‖ = Real.exp y := by
-  rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv]
-  have h := congrFun (iteratedDeriv_exp_const_mul i 1) y
-  simp only [one_mul, one_pow] at h
-  rw [show (fun s => Real.exp s) = Real.exp from rfl] at h
-  rw [h, Real.norm_eq_abs, abs_of_pos (Real.exp_pos y)]
-
 theorem exists_coercive [FiniteDimensional ℝ E] (B : E →L[ℝ] E →L[ℝ] ℝ) (hB : ∀ x, x ≠ 0 → B x x < 0) :
     ∃ c > 0, ∀ x, B x x ≤ -(c * ‖x‖ ^ 2) := by
   rcases subsingleton_or_nontrivial E with hE | hE
@@ -139,7 +133,7 @@ theorem exists_schwartz_exp_diag [FiniteDimensional ℝ E] (B : E →L[ℝ] E �
   rw [LinearIsometry.norm_iteratedFDeriv_comp_left _ hg.contDiffAt hn]
   have hfb := norm_iteratedFDeriv_comp_le (g := Real.exp) (f := fun y : E => B y y)
     Real.contDiff_exp hq hn x (C := Real.exp (B x x)) (D := 2 * (‖B‖ + 1) * (1 + ‖x‖) ^ 2)
-    (fun i _ => (norm_iteratedFDeriv_rexp i _).le) (fun i hi _ => by
+    (fun i _ => (Real.norm_iteratedFDeriv_exp i _).le) (fun i hi _ => by
       have hB0 := norm_nonneg B
       have hx0 := norm_nonneg x
       have a1 : ‖B‖ ≤ (‖B‖ + 1) ^ i :=

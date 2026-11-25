@@ -3,13 +3,14 @@ module
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StCocycle
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CohomologyVanishingAlongIdealFiltration
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DFormMem
+public import Lemmata.FinSuccAbovePredAbove
 
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
 open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 open GlobalTheory.CatH (face toLast)
-open GlobalTheory.CompanionTheory.CocProd (tele sa_val)
+open GlobalTheory.CompanionTheory.CocProd (tele)
 open GlobalTheory.CompanionTheory.TowerEnd (Q dQ val Vals cl d_cl dQ_apply)
 
 noncomputable section
@@ -31,11 +32,11 @@ theorem alt_sum {B : Type*} [CommRing B] {j : ℕ} (w : Fin j → Fin (j + 2) �
   have hT0 : T (Fin.castSucc 0) = P 0 := by
     refine Finset.prod_congr rfl fun k _ => ?_
     simp only [Nat.not_lt_zero, ite_false]
-    refine cg k ?_ ?_ <;> simp only [sa_val, Fin.val_succ, Fin.val_castSucc, Fin.val_zero] <;> split_ifs <;> omega
+    refine cg k ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc, Fin.val_zero] <;> split_ifs <;> omega
   have hTl : T (Fin.last (j + 1)) = P j := by
     refine Finset.prod_congr rfl fun k _ => ?_
     simp only [k.2, ite_true]
-    refine cg k ?_ ?_ <;> simp only [sa_val, Fin.val_succ, Fin.val_castSucc, Fin.val_last] <;> split_ifs <;> omega
+    refine cg k ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc, Fin.val_last] <;> split_ifs <;> omega
   have hTi : ∀ i : Fin j, T i.succ.castSucc = P (i + 1) + P i := by
     intro i
     have hPa : P (i + 1) = u i * ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i + 1 then u k else v k) := by
@@ -54,12 +55,12 @@ theorem alt_sum {B : Type*} [CommRing B] {j : ℕ} (w : Fin j → Fin (j + 2) �
       · have e : u i + v i = w i i.succ.succ - w i i.castSucc.castSucc := by
           rw [hu, hv]; ring
         rw [e]
-        refine cg i ?_ ?_ <;> simp only [sa_val, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
+        refine cg i ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
       · refine Finset.prod_congr rfl fun k hk => ?_
         have hki : (k : ℕ) ≠ i := fun h => Finset.ne_of_mem_erase hk (Fin.ext h)
         split_ifs with h
-        · refine cg k ?_ ?_ <;> simp only [sa_val, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
-        · refine cg k ?_ ?_ <;> simp only [sa_val, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
+        · refine cg k ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
+        · refine cg k ?_ ?_ <;> simp only [Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc] <;> split_ifs <;> omega
     have hE : ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i + 1 then u k else v k) =
         ∏ k ∈ Finset.univ.erase i, (if (k : ℕ) < i then u k else v k) := by
       refine Finset.prod_congr rfl fun k hk => ?_
@@ -137,7 +138,7 @@ theorem d_mem {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil) {d j : ℕ} (u : Fin 
     intro i
     refine vt_last y s _ (Fin.ext ?_)
     have := i.2
-    rw [sa_val]
+    rw [Fin.val_succAbove_eq_ite]
     simp only [Fin.val_last, Fin.val_castSucc]
     split_ifs <;> omega
   have hsum : ∑ i : Fin (j + 2), (-1 : ℤ) ^ (i : ℕ) • (Φ.A.map (toLast i s)).hom

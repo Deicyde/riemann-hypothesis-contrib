@@ -65,6 +65,7 @@ import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.Linter.HaveILetI
 import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsCounitDerivationCounitComp
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.DivisorProofs.Cob1FormalLogMapMemKer, Development.AbelianVarietyTheory.Proofs.DivisorProofs.DlogEqSumLinearCoefficientsFormExplicit, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUniqueOfCompatible, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCharSeries, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusSubstMapCongrPowModP, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusFormalLogSubSmulIntegral, Development.AbelianVarietyTheory.Proofs.DivisorProofs.DiffCoeffsInIdealTopFormalLogConstOne, Development.AbelianVarietyTheory.Proofs.DivisorProofs.DiffCoeffsInIdealTopPowerSeriesLog, Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasValLogOfHasValFormalLog, Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasValLogOfMulSelfEqZero, Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubstOneAddXPowLogEqNsmul, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaEvalChar, Development.AbelianVarietyTheory.Proofs.DivisorProofs.PeriodFormalLogLiftCharacterSeries, Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowerSeriesLinearCoefficientsMvPowerSeriesFormal, Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubstGroupLawEqMulOfDualTateCharacter, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsQuasiLogarithmOfDualCharacter
@@ -364,10 +365,6 @@ noncomputable section
 
 namespace GlobalTheory.Limits
 
-theorem smod_pow_iff {R : Type} [CommRing R] (a x y : R) (m : ℕ) :
-    x ≡ y [SMOD (Ideal.span {a} ^ m • ⊤ : Submodule R R)] ↔ a ^ m ∣ x - y := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-
 theorem eval_eq_of_le {O σ : Type} [CommRing O] (A : ℕ → Type) [∀ n, CommRing (A n)]
     [∀ n, Algebra O (A n)] (r : ∀ n, A (n + 1) →ₐ[O] A n) (E : ∀ n, MvPowerSeries σ O →ₐ[O] A n)
     (hr : ∀ n f, r n (E (n + 1) f) = E n f) {n k : ℕ} (hnk : n ≤ k) (x y : MvPowerSeries σ O)
@@ -384,7 +381,7 @@ theorem exists_unique_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [
     fun hnk => eval_eq_of_le A r E hr hnk
   refine ⟨fun f hf => ?_, fun hsurj a ha => ?_⟩
   · ext α
-    refine hausO.haus _ fun m => (smod_pow_iff _ _ _ _).2 ?_
+    refine hausO.haus _ fun m => (SModEq.span_singleton_pow_iff_dvd _ _ _ _).2 ?_
     obtain ⟨n, hn⟩ := hker m (α.degree + 1)
     simpa using hn f (hf n) α (Nat.lt_succ_self _)
   · choose nk hnk using fun m => hker m m
@@ -426,11 +423,11 @@ theorem exists_unique_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [
       intro α
       obtain ⟨L, hL⟩ := precO.prec (f := fun j => coeff α (h (j + (α.degree + 1)))) (by
         intro j j' hjj'
-        rw [smod_pow_iff]
+        rw [SModEq.span_singleton_pow_iff_dvd]
         have := hD (j + (α.degree + 1)) (j' + (α.degree + 1)) (by omega) α (by omega)
         rw [← neg_sub, dvd_neg]
         exact (pow_dvd_pow _ (by omega)).trans this)
-      exact ⟨L, fun j => (smod_pow_iff _ _ _ _).1 (hL j)⟩
+      exact ⟨L, fun j => (SModEq.span_singleton_pow_iff_dvd _ _ _ _).1 (hL j)⟩
     choose L hLs using hL
     let f : MvPowerSeries σ O := fun α => L α
     have hf : ∀ m M (α : σ →₀ ℕ), m ≤ M → α.degree < M →
@@ -447,7 +444,7 @@ theorem exists_unique_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [
     refine ⟨f, fun n => ?_⟩
     rw [← sub_eq_zero]
     refine IsHausdorff.haus (I := Ideal.span {(p : A n)}) inferInstance _ fun m => ?_
-    rw [smod_pow_iff, sub_zero]
+    rw [SModEq.span_singleton_pow_iff_dvd, sub_zero]
     obtain ⟨N₀, hN₀⟩ := (hev n).2 m
     set M := max (max m N₀) n with hM
     have hEM : E n (h M) = a n := hga _ _ ((le_max_right _ _).trans (hνm M))

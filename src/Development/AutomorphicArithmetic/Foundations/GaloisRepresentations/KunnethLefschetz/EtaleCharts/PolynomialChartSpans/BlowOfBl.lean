@@ -11,6 +11,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 import Mathlib.Tactic.Linter.HaveILetI
 import Std.Tactic.BVDecide.Normalize.Prop
 import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.KunnethLefschetz.EtaleCharts.PolynomialChartSpans.DCoord
+public import Lemmata.FlatNonZeroDivisors
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.KunnethLefschetz.EtaleCharts.PolynomialChartSpans.ExistsUnit, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.KunnethLefschetz.EtaleCharts.PolynomialChartSpans.LineEx, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.KunnethLefschetz.EtaleCharts.PolynomialChartSpans.BlowOfBl
@@ -31,17 +32,6 @@ namespace UpperTheory.Gal.KunnethLefschetz.G
 section
 variable {Y : Scheme.{0}}
 
-private lemma flat_nzd {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (h : φ.Flat) {a : A}
-    (ha : a ∈ nonZeroDivisors A) : φ a ∈ nonZeroDivisors B := by
-  algebraize [φ]
-  have hr := Module.Flat.isSMulRegular_of_nonZeroDivisors (M := B) ha
-  rw [mem_nonZeroDivisors_iff_right]
-  intro y hy
-  apply hr
-  change a • y = a • 0
-  rw [Algebra.smul_def, Algebra.smul_def, mul_zero, mul_comm]
-  exact hy
-
 private abbrev rs {U V : Y.Opens} (h : V ≤ U) : Γ(Y, U) →+* Γ(Y, V) := (Y.presheaf.map (homOfLE h).op).hom
 
 private theorem rs_rs {U V T : Y.Opens} (h : V ≤ U) (h' : T ≤ V) (x : Γ(Y, U)) :
@@ -54,7 +44,7 @@ private theorem nzd_rs {U V : Y.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen 
     {s : Γ(Y, U)} (hs : s ∈ nonZeroDivisors Γ(Y, U)) : rs h s ∈ nonZeroDivisors Γ(Y, V) := by
   have hf : (Scheme.Hom.appLE (𝟙 Y) U V h).hom.Flat :=
     HasRingHomProperty.appLE (P := @Flat) (Q := RingHom.Flat) (𝟙 Y) inferInstance ⟨U, hU⟩ ⟨V, hV⟩ h
-  exact flat_nzd _ hf hs
+  exact RingHom.Flat.map_mem_nonZeroDivisors _ hf hs
 
 private theorem exists_unit (J : Y.IdealSheafData) {U₁ U₂ T : Y.Opens}
     (a₁ : IsAffineOpen U₁) (a₂ : IsAffineOpen U₂) (aT : IsAffineOpen T) (h₁ : T ≤ U₁) (h₂ : T ≤ U₂)
@@ -186,7 +176,7 @@ private def Reg {X : Scheme.{0}} (b : Γ(X, ⊤)) : Prop :=
 private lemma reg_flat {X Z : Scheme.{0}} (φ : X ⟶ Z) [Flat φ] {b : Γ(Z, ⊤)} (hb : Reg b) :
     Reg (φ.appTop.hom b) := by
   intro x
-  have h := flat_nzd (φ.stalkMap x).hom (Flat.stalkMap φ x) (hb (φ x))
+  have h := RingHom.Flat.map_mem_nonZeroDivisors (φ.stalkMap x).hom (Flat.stalkMap φ x) (hb (φ x))
   have e := Scheme.Hom.germ_stalkMap_apply φ ⊤ x trivial b
   rw [e] at h
   exact h
@@ -200,7 +190,7 @@ private lemma reg_of_affine {X : Scheme.{0}} [IsAffine X] {b : Γ(X, ⊤)} (hb :
   have hl := hU.isLocalization_stalk x'
   have hf : (X.presheaf.germ ⊤ x trivial).hom.Flat :=
     IsLocalization.flat (X.presheaf.stalk x'.1) (hU.primeIdealOf x').asIdeal.primeCompl
-  exact flat_nzd _ hf hb
+  exact RingHom.Flat.map_mem_nonZeroDivisors _ hf hb
 
 private lemma reg_cancel {X : Scheme.{0}} {b : Γ(X, ⊤)} (hb : Reg b) (O : X.Opens) (z : Γ(X, O))
     (h : z * (X.presheaf.map (homOfLE le_top : O ⟶ ⊤).op).hom b = 0) : z = 0 := by

@@ -5,6 +5,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Tactic.TypeStar
+public import Lemmata.DetBlockDiagonal
 
 @[expose] public section
 
@@ -15,21 +16,6 @@ open IsDedekindDomain NumberField TensorProduct Module Matrix
 noncomputable section
 
 namespace SemiLocal
-
-theorem det_blockDiagonal' {α : Type*} [Fintype α] [DecidableEq α] {m : α → Type*}
-    [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)] {R : Type*} [CommRing R]
-    (d : ∀ i, Matrix (m i) (m i) R) : (blockDiagonal' d).det = ∏ k, (d k).det := by
-  classical
-  let _ : LinearOrder α := LinearOrder.lift' (Fintype.equivFin α) (Fintype.equivFin α).injective
-  rw [(blockTriangular_blockDiagonal' d).det_fintype]
-  refine Finset.prod_congr rfl fun k _ ↦ ?_
-  have : (blockDiagonal' d).toSquareBlock Sigma.fst k =
-      (d k).submatrix (Equiv.sigmaSubtype k) (Equiv.sigmaSubtype k) := by
-    ext ⟨⟨i, a⟩, hi⟩ ⟨⟨j, b⟩, hj⟩
-    dsimp only at hi hj
-    subst hi hj
-    simp [toSquareBlock_def, Equiv.sigmaSubtype]
-  rw [this, det_submatrix_equiv_self]
 
 variable {R : Type*} [Field R] {ι : Type*} [Fintype ι] {S : ι → Type*} [∀ i, CommRing (S i)]
   [∀ i, Algebra R (S i)] [∀ i, Module.Finite R (S i)]
@@ -49,7 +35,7 @@ theorem leftMulMatrix_pi [DecidableEq ι] {κ : ι → Type*} [∀ i, Fintype (�
 theorem norm_pi (x : ∀ i, S i) : Algebra.norm R x = ∏ i, Algebra.norm R (x i) := by
   classical
   let b := fun i ↦ Module.finBasis R (S i)
-  rw [Algebra.norm_eq_matrix_det (Pi.basis b), leftMulMatrix_pi, det_blockDiagonal']
+  rw [Algebra.norm_eq_matrix_det (Pi.basis b), leftMulMatrix_pi, Matrix.det_blockDiagonal']
   exact Finset.prod_congr rfl fun i _ ↦ (Algebra.norm_eq_matrix_det (b i) (x i)).symm
 
 theorem trace_pi (x : ∀ i, S i) :

@@ -82,6 +82,7 @@ import Mathlib.Tactic.Linter.HaveILetI
 import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboundarySmul
 import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsCounitDerivationCounitComp
 import Mathlib.RingTheory.MvPowerSeries.Basic
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.DivisorProofs.AssocEval, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstantCoeffEqZeroOfEvalEqComul, Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvalSwapEq, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSpanSubMemSq, Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffAnnihilatedOfAevalMemKerPow, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompatiblePDivGroupLevelCoordinates, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsInvariantDerivationsQuotientBialgebra, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTruncationCongrOfPadicContinuousEvalEqZero, Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaximalIdealPowNatCastDvdFiniteIntegersAlgebra, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCoordinatesOfIsConnected, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSeriesOfCompatible, Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalChartGroupLawEvalRightUnit, Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAdicCompleteSpanNatCast, Development.AbelianVarietyTheory.Proofs.DivisorProofs.SurjectiveEvalTmul, Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPDivGroupFormalChartOfConnected
@@ -1174,10 +1175,6 @@ open TensorProduct
 
 namespace GlobalTheory.CChartLimit
 
-theorem smod_span_iff {R : Type} [CommRing R] (a x y : R) (n : ℕ) :
-    x ≡ y [SMOD ((Ideal.span {a}) ^ n • ⊤ : Submodule R R)] ↔ a ^ n ∣ x - y := by
-  rw [SModEq.sub_mem, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, Ideal.mem_span_singleton]
-
 theorem exists_series_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [Fintype σ]
     [IsAdicComplete (Ideal.span {(p : O)}) O] (A : ℕ → Type) [∀ n, CommRing (A n)]
     [∀ n, Algebra O (A n)], (∀ n, IsHausdorff (Ideal.span {(p : A n)}) (A n)) →
@@ -1218,10 +1215,10 @@ theorem exists_series_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [
     have hpre : IsPrecomplete (Ideal.span {(p : O)}) O := inferInstance
     obtain ⟨L, hL⟩ := hpre.prec (f := fun n => coeff α (h (n + α.degree + 1))) (by
       intro m n hmn
-      rw [smod_span_iff]
+      rw [SModEq.span_singleton_pow_iff_dvd]
       have := hcau (m + α.degree + 1) (n + α.degree + 1) (by omega) α (by omega)
       exact (pow_dvd_pow _ (by omega)).trans this)
-    exact ⟨L, fun n => (smod_span_iff _ _ _ _).1 (hL n)⟩
+    exact ⟨L, fun n => (SModEq.span_singleton_pow_iff_dvd _ _ _ _).1 (hL n)⟩
   choose L hL using hc
   let μ : MvPowerSeries σ O := L
   have hμ : ∀ α, coeff α μ = L α := fun α => rfl
@@ -1229,7 +1226,7 @@ theorem exists_series_of_compatible : ∀ (p : ℕ) (O σ : Type) [CommRing O] [
   haveI := hH n
   apply (IsHausdorff.eq_iff_smodEq (I := Ideal.span {(p : A n)})).2
   intro m
-  rw [smod_span_iff]
+  rw [SModEq.span_singleton_pow_iff_dvd]
   obtain ⟨N, hN⟩ := (hE n).2 m
   have hj : E n (h (m + N + n)) = t n :=
     hgk n (K' (m + N + n)) (le_trans (by omega) (hK'ge (m + N + n)).1)

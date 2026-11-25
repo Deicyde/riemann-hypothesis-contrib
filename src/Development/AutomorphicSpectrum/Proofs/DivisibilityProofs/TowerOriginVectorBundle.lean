@@ -26,6 +26,7 @@ import ReciprocityTheory.AnalyticForms.PotentialTheory.IsPotentialOfFun
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.RationalSections.IsRatSectionOn
 import Mathlib.Tactic.Linter.Style
+public import Lemmata.FinsuppDegreeCard
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.TowerSymmetryLimitCompat, Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUniqueHostAutEmbedding, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.HodgeTieGalois, Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTiesDistinctGeneric, Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimeDivisorsOfOmegaBundle, Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.TowerOriginVectorBundle
@@ -51,14 +52,10 @@ theorem exists_word_multiset {α : Type} (s : Multiset α) :
     rw [Fin.sum_univ_succ]
     simp [hw, Multiset.singleton_add]
 
-theorem degree_eq_card {α : Type} (μ : α →₀ ℕ) : μ.degree = Multiset.card (Finsupp.toMultiset μ) := by
-  rw [Finsupp.card_toMultiset]
-  rfl
-
 theorem exists_word {α : Type} (μ : α →₀ ℕ) (d : ℕ) (h : μ.degree = d) :
     ∃ w : Fin d → α, ∑ k, Finsupp.single (w k) 1 = μ := by
   subst h
-  have hc : Multiset.card (Finsupp.toMultiset μ) = μ.degree := (degree_eq_card μ).symm
+  have hc : Multiset.card (Finsupp.toMultiset μ) = μ.degree := (Finsupp.degree_eq_card_toMultiset μ).symm
   obtain ⟨w, hw⟩ := exists_word_multiset (Finsupp.toMultiset μ)
   refine ⟨fun k => w (Fin.cast hc.symm k), ?_⟩
   classical
@@ -71,7 +68,7 @@ theorem exists_word {α : Type} (μ : α →₀ ℕ) (d : ℕ) (h : μ.degree = 
 
 theorem degree_mapDomain {α β : Type} (f : α → β) (μ : α →₀ ℕ) :
     (Finsupp.mapDomain f μ).degree = μ.degree := by
-  rw [degree_eq_card, degree_eq_card, ← Finsupp.toMultiset_map, Multiset.card_map]
+  rw [Finsupp.degree_eq_card_toMultiset, Finsupp.degree_eq_card_toMultiset, ← Finsupp.toMultiset_map, Multiset.card_map]
 
 variable {Ψ : Type} [Fintype Ψ] {N : ℕ}
 

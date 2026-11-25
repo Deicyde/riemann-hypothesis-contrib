@@ -48,6 +48,7 @@ public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
 public import Development.WeilBound.SimpleEigenvalues.SimpleEigenvalueExtension.SimEig
+public import Lemmata.StrictPeriodsGamma1
 
 @[expose] public section
 
@@ -58,15 +59,11 @@ noncomputable section
 
 namespace UpperTheory.V.Br.EigenformExistence
 
-private theorem one_mem_per (N : ℕ) :
-    (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)).strictPeriods := by
-  rw [strictPeriods_Gamma1]; exact AddSubgroup.mem_zmultiples 1
-
 private theorem coef_smul {N : ℕ} {k : ℤ} (c : ℂ) (f : CuspForm (Gamma1 N) k) (n : ℕ) :
     coef (c • f : CuspForm (Gamma1 N) k) n = c * coef f n := by
   unfold coef
   rw [show ((c • f : CuspForm (Gamma1 N) k) : ℍ → ℂ) = c • (f : ℍ → ℂ) from rfl,
-    ModularForm.qExpansion_smul one_pos (one_mem_per N) c f]
+    ModularForm.qExpansion_smul one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 N) c f]
   simp
 
 private theorem coef_add {N : ℕ} {k : ℤ} (f g : CuspForm (Gamma1 N) k) (n : ℕ) :
@@ -74,7 +71,7 @@ private theorem coef_add {N : ℕ} {k : ℤ} (f g : CuspForm (Gamma1 N) k) (n : 
   unfold coef
   rw [← map_add (f := _)]
   congr 1
-  exact ModularForm.qExpansion_add one_pos (one_mem_per N) f g
+  exact ModularForm.qExpansion_add one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 N) f g
 
 private def fT {K : Type} [Field K] (p : ℕ) (e : K) : Module.End K (ℕ → K) where
   toFun c n := c (p * n) + e * (if p ∣ n then c (n / p) else 0)

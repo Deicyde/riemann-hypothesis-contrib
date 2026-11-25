@@ -71,6 +71,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemElt
 import Mathlib.Tactic.Basify
 import Mathlib.Tactic.ENatToNat
+public import Lemmata.MeasurePi
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ConeIntegralFiniteLargeExponent, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ConeIntegralFiniteLargeExponentStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegrableDescendOfCover, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemParabolicOfFlagPreserving, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemParabolicOfFlagPreservingStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RegularSemisimpleConjugateUnipotentTranslate, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RegularSemisimpleConjugateUnipotentTranslateStatement, Development.WeilBound.RepresentationTheoryGL.LimitMultiplicityWeights.RegularClassIntegrals.ContinuousClassKernel, Development.WeilBound.RepresentationTheoryGL.LimitMultiplicityWeights.RegularClassIntegrals.RegClassIntHolds
@@ -180,7 +181,7 @@ theorem lintegral_cone_lt_top : ∀ (F : Type) [Field F] [NumberField F] (n r : 
           integrand_eq F n m fun i => hb.trans_le (ht i (mem_univ i))
     _ = ∏ i, ∫⁻ x in Ici (min c 1 ^ r), ENNReal.ofReal (x ^ a i) := by
         rw [volume_pi, Measure.restrict_pi_pi]
-        exact GlobalTheory.RestrMeas.lintegral_fin_prod_eq_prod (E := fun _ => ℝ)
+        exact MeasureTheory.lintegral_fintype_prod_eq_prod (E := fun _ => ℝ)
           (f := fun i x => ENNReal.ofReal (x ^ a i))
           fun i => ((measurable_id.pow_const (a i)).ennreal_ofReal).aemeasurable
     _ < ⊤ := ENNReal.prod_lt_top fun i _ => setLIntegral_Ici_rpow_lt_top (ha i) hb

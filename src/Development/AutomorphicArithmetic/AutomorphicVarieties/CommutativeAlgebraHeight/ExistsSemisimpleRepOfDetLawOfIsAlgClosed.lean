@@ -78,6 +78,7 @@ import Mathlib.Algebra.AffineMonoid.UniqueSums
 import Mathlib.Tactic.Linter.Style
 import Mathlib.RingTheory.Congruence.Hom
 import Mathlib.Tactic.TypeStar
+public import Lemmata.DetBlockDiagonal
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.LeftInvOfJac, Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DFaithfulSs, Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DMatrix, Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DProd, Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.ExistsSemisimpleRepOfDetLawOfIsAlgClosed
@@ -648,21 +649,6 @@ section -- clump:auto
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem det_bd {α : Type*} [Fintype α] [DecidableEq α] {m : α → Type*}
-    [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)] {R : Type*} [CommRing R]
-    (d : ∀ i, Matrix (m i) (m i) R) : (Matrix.blockDiagonal' d).det = ∏ k, (d k).det := by
-  classical
-  let _ : LinearOrder α := LinearOrder.lift' (Fintype.equivFin α) (Fintype.equivFin α).injective
-  rw [(Matrix.blockTriangular_blockDiagonal' d).det_fintype]
-  refine Finset.prod_congr rfl fun k _ ↦ ?_
-  have : (Matrix.blockDiagonal' d).toSquareBlock Sigma.fst k =
-      (d k).submatrix (Equiv.sigmaSubtype k) (Equiv.sigmaSubtype k) := by
-    ext ⟨⟨i, a⟩, hi⟩ ⟨⟨j, b⟩, hj⟩
-    dsimp only at hi hj
-    subst hi hj
-    simp [Matrix.toSquareBlock_def, Equiv.sigmaSubtype]
-  rw [this, Matrix.det_submatrix_equiv_self]
-
 private theorem ofRep_comp {n : ℕ} {A E E' ι : Type} [CommRing A] [Ring E] [Algebra A E] [Ring E'] [Algebra A E']
     [Fintype ι] [DecidableEq ι] (h : Fintype.card ι = n) (r : E →ₐ[A] Matrix ι ι A) (g : E' →ₐ[A] E) :
     Det.ofRep h (r.comp g) = (Det.ofRep h r).pull g := by
@@ -729,7 +715,7 @@ private theorem pi_case {n N : ℕ} {k : Type} [Field k] (d : Fin N → ℕ)
   refine ⟨r, hr.trans (Det.ext' fun S _ _ y => ?_)⟩
   rw [hD]
   change (Det.repS (bdRep (k := k) (fun i => Fin (d i + 1)) (fun j : (Σ i, Fin (μ i)) => j.1)) S y).det = _
-  rw [bdRep_repS, det_bd, Fintype.prod_sigma]
+  rw [bdRep_repS, Matrix.det_blockDiagonal', Fintype.prod_sigma]
   refine Finset.prod_congr rfl fun i _ => ?_
   refine Eq.trans ?_ (hDs i S _).symm
   exact Fin.prod_const (M := S) (μ i) (Det.repS (AlgHom.id k _) S (Algebra.TensorProduct.map (AlgHom.id S S)

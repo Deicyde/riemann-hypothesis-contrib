@@ -14,6 +14,7 @@ public import Mathlib.NumberTheory.Padics.HeightOneSpectrum
 import Mathlib.Tactic.Linter.Style
 import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsCongrIffTraceFormsIsometricCm
 import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PSplitCongr
+public import Lemmata.LocalRingIsUnitAdd
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PAdFour, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PBlockMat, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PCongrScale, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PDefSign, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PFinCls, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PFinCongr, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PHenselV, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PInfCongr, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PIsoEx, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PLocFour, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PLocRoot, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PLocUnit, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PNormTwo, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PPadMap, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PPadicSqFin, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PPadicUnitNorm, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PRelOf, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PScale, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PSplitRep, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PTrivMat, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PUnitCls, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PZSqFin, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PZUnitNorm, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicHensel.PadicUnitNormHolds
@@ -826,14 +827,6 @@ section -- clump:auto
 open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
 open scoped TensorProduct
 
-private lemma unit_add_nonunit {R : Type*} [CommRing R] [IsLocalRing R] {x y : R}
-    (hx : IsUnit x) (hy : ¬ IsUnit y) : IsUnit (x + y) := by
-  by_contra h
-  have hy' : ¬ IsUnit (-y) := by rwa [IsUnit.neg_iff]
-  have := IsLocalRing.nonunits_add h hy'
-  rw [add_neg_cancel_right] at this
-  exact this hx
-
 private lemma natCast_not_isUnit (F : Type) [Field F] [NumberField F]
     (v : HeightOneSpectrum (𝓞 F)) (q : ℕ) (hq : (q : 𝓞 F) ∈ v.asIdeal) :
     ¬ IsUnit (q : v.adicCompletionIntegers F) := by
@@ -865,7 +858,7 @@ theorem UpperTheory.Gal.G1.pLocRoot :
     have hnu : ¬ IsUnit (-((a : v.adicCompletionIntegers F) * (q : v.adicCompletionIntegers F))) := by
       rw [IsUnit.neg_iff]
       exact fun h => hq (isUnit_of_mul_isUnit_right h)
-    have hbn := unit_add_nonunit isUnit_one hnu
+    have hbn := IsLocalRing.isUnit_add_of_isUnit_of_not_isUnit isUnit_one hnu
     rw [← hab', add_neg_cancel_comm] at hbn
     exact isUnit_of_mul_isUnit_right hbn
   have hder : ¬ (q : ℤ) ∣ 2 * r - tr := by
@@ -908,7 +901,7 @@ theorem UpperTheory.Gal.G1.pLocRoot :
     exact hρ
   · have h2 : ¬ IsUnit (2 * (ρ - (r : v.adicCompletionIntegers F))) :=
       fun h => hρr (isUnit_of_mul_isUnit_right h)
-    have h3 := unit_add_nonunit ((hdev _) ▸ h1) h2
+    have h3 := IsLocalRing.isUnit_add_of_isUnit_of_not_isUnit ((hdev _) ▸ h1) h2
     have e : 2 * (r : v.adicCompletionIntegers F) - tr + 2 * (ρ - r) = 2 * ρ - tr := by ring
     rw [e] at h3
     exact h3

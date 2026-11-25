@@ -18,6 +18,7 @@ import Mathlib.Tactic.Linter.Style
 import Std.Tactic.BVDecide.Normalize.Prop
 public import Mathlib.Analysis.Calculus.LineDeriv.Basic
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.CasChainA
+public import Lemmata.NormIteratedFDerivExp
 
 @[expose] public section
 
@@ -868,10 +869,6 @@ theorem D_exp_decay (n : ℕ) (s : ℝ) (hs : 0 ≤ s) :
     _ = 2 ^ n * n.factorial * (Real.exp (1 + s ^ 2) * Real.exp (-s ^ 2)) := by ring
     _ = 2 ^ n * n.factorial * Real.exp 1 := by rw [← Real.exp_add]; congr 2; ring
 
-theorem D_norm_iter_exp (i : ℕ) (y : ℝ) : ‖iteratedFDeriv ℝ i Real.exp y‖ = Real.exp y := by
-  rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv, iteratedDeriv_eq_iterate, Real.iter_deriv_exp,
-    Real.norm_of_nonneg (Real.exp_pos y).le]
-
 theorem D_gau_one_eq (d : ℕ) : D_gau d 1 = Real.exp ∘ (fun x => - D_nsq d x) := by
   funext x
   simp [D_gau, D_nsq]
@@ -885,7 +882,7 @@ theorem D_gau_one_bound (d n : ℕ) : ∃ M : ℝ, 0 ≤ M ∧ ∀ x : Fin d →
       n.factorial * Real.exp (- D_nsq d x) * ((K + 1) * (1 + ‖x‖)) ^ n := by
     rw [D_gau_one_eq]
     refine norm_iteratedFDeriv_comp_le (N := (n : ℕ)) Real.contDiff_exp hS'.1 le_rfl x
-      (fun i _ => (D_norm_iter_exp i _).le) (fun i hi1 hin => ?_)
+      (fun i _ => (Real.norm_iteratedFDeriv_exp i _).le) (fun i hi1 hin => ?_)
     have h1 := hS'.2 x (Set.mem_univ x) i hin
     have hw1 : (1 : ℝ) ≤ 1 + ‖x‖ := by linarith [norm_nonneg x]
     have h2 : wt (1 : ℝ) x ^ ((2 : ℤ) - (i : ℤ)) ≤ (1 + ‖x‖) ^ i := by

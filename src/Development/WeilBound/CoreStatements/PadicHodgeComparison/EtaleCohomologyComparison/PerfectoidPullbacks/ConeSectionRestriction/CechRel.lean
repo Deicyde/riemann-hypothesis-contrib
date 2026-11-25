@@ -7,6 +7,7 @@ public import Mathlib.RingTheory.Ideal.BigOperators
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.DpZeroRight
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.CechPairings.MapHComp
 import Mathlib.Tactic.Linter.Style
+public import Lemmata.FinSuccAbovePredAbove
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NegOneSmulCancel, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ConeZigzagCompat, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Mk2EqZeroIffMemS, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GradedCoverVanishingInduction, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.ConeSectionRestriction.CechRel
@@ -191,19 +192,19 @@ theorem BB_dh (p q : ℕ) (x : (KK A W).X p q) :
       have := j.2
       have := t.2
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     have ha : (fc j.castSucc.castSucc i).1 (Fin.last p).castSucc = i.1 (Fin.last (p + 1)).castSucc := by
       refine congrArg i.1 ?_
       have := j.2
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     have hc : (fc j.castSucc.castSucc i).1 (Fin.last (p + 1)) = i.1 (Fin.last (p + 2)) := by
       refine congrArg i.1 ?_
       have := j.2
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     rw [BB_apply, res_bm _ _ (fun _ h _ => h _), res_LL b i _ _ _ _ _ _ ha hc]
     exact bm_congr (f := fun i : Idx (p + 1) N => capT W i.1) x e _ _ _
@@ -214,17 +215,17 @@ theorem BB_dh (p q : ℕ) (x : (KK A W).X p q) :
       refine Subtype.ext (funext fun t => congrArg i.1 ?_)
       have := t.2
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     have ha : (fc (Fin.last (p + 1)).castSucc i).1 (Fin.last p).castSucc = i.1 (Fin.last p).castSucc.castSucc := by
       refine congrArg i.1 ?_
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     have hc : (fc (Fin.last (p + 1)).castSucc i).1 (Fin.last (p + 1)) = i.1 (Fin.last (p + 2)) := by
       refine congrArg i.1 ?_
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     rw [BB_apply, res_bm _ _ (fun _ h _ => h _), res_LL b i _ _ _ _ _ _ ha hc]
     exact bm_congr (f := fun i : Idx (p + 1) N => capT W i.1) x e _ _ _
@@ -234,12 +235,12 @@ theorem BB_dh (p q : ℕ) (x : (KK A W).X p q) :
     have ha : (fc (Fin.last (p + 2)) i).1 (Fin.last p).castSucc = i.1 (Fin.last p).castSucc.castSucc := by
       refine congrArg i.1 ?_
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     have hc : (fc (Fin.last (p + 2)) i).1 (Fin.last (p + 1)) = i.1 (Fin.last (p + 1)).castSucc := by
       refine congrArg i.1 ?_
       apply Fin.ext
-      simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last]
+      simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last]
       split_ifs <;> omega
     rw [BB_apply, res_bm _ _ (fun _ h _ => h _), res_LL b i _ _ _ _ _ _ ha hc]
   simp only [hS]
@@ -612,7 +613,7 @@ theorem PP_eq {A : C ⥤ CommAlgCat.{0} R} {N : ℕ} {W : Fin N → ObjectProper
         refine res_LL b i _ _ _ _ _ _ (congrArg i.1 ?_) (congrArg i.1 ?_) <;>
         · have := j.2
           apply Fin.ext
-          simp only [CrystallineSemistableComparison.Auxff.sa_val, Fin.val_castSucc, Fin.val_last, Fin.val_succ]
+          simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc, Fin.val_last, Fin.val_succ]
           split_ifs <;> omega
       rw [BB_apply, h, map_zsmul, bm_apply, res_cupList, mul_smul]
       simp only [hLL]

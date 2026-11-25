@@ -24,6 +24,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.RingTheory.Valuation.LocalSubring
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.CardQuotSpanAlgebraMap, Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.RelIndexOneUnitsMulEqCardQuotient, Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SubgroupPowImageUnitsCongruentOneModOfIsAdicComp, Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SubgroupPowRelIndexUnitsOfIsAdicComplete, Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.PIdxUnitsFiniteExtensionAdicCompletion
@@ -172,11 +173,6 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem deep_smod_iff {O : Type} [CommRing O] (π a b : O) (n : ℕ) :
-    a ≡ b [SMOD (Ideal.span {π} ^ n • ⊤ : Submodule O O)] ↔ π ^ n ∣ a - b := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton]
-
 theorem deep_exists_solution {O : Type} [CommRing O] (π : O)
     [IsAdicComplete (Ideal.span {π}) O] (h : O[X]) (y : O) :
     ∃ x : O, x + π * h.eval x = y := by
@@ -205,11 +201,11 @@ theorem deep_exists_solution {O : Type} [CommRing O] (π : O)
       have := dvd_add ih ((pow_dvd_pow π hmn).trans (h1 n))
       simpa using this
   obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := Ideal.span {π}) (M := O) inferInstance (f := s)
-    (fun {m n} hmn => (deep_smod_iff π _ _ m).2 (h2 m n hmn))
-  have hL' : ∀ n, π ^ n ∣ s n - L := fun n => (deep_smod_iff π _ _ n).1 (hL n)
+    (fun {m n} hmn => (SModEq.span_singleton_pow_iff_dvd π _ _ m).2 (h2 m n hmn))
+  have hL' : ∀ n, π ^ n ∣ s n - L := fun n => (SModEq.span_singleton_pow_iff_dvd π _ _ n).1 (hL n)
   have h0 : L - T L = 0 := by
     refine IsHausdorff.haus (I := Ideal.span {π}) (M := O) inferInstance _ (fun n => ?_)
-    rw [deep_smod_iff]
+    rw [SModEq.span_singleton_pow_iff_dvd]
     have a1 := hT n _ _ (hL' n)
     rw [← hs] at a1
     have a2 := dvd_sub a1 (hL' (n + 1))

@@ -55,6 +55,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Algebra.Group.Units
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
+public import Lemmata.MeasurePi
 
 @[expose] public section
 
@@ -191,13 +192,6 @@ theorem covol_smul {G : Type} [Mul G] [MeasurableSpace G] (Γ : Set G) (μ : Mea
   unfold covol
   simp only [ENNReal.mul_iInf_of_ne h0 ht, Measure.smul_apply, smul_eq_mul]
 
-theorem pi_smul {ι : Type} [Fintype ι] {α : ι → Type} [∀ i, MeasurableSpace (α i)] (μ : ∀ i, Measure (α i))
-    [∀ i, SigmaFinite (μ i)] (c : ι → ℝ≥0) :
-    Measure.pi (fun i => c i • μ i) = (∏ i, c i) • Measure.pi μ := by
-  refine Measure.pi_eq fun s _ => ?_
-  simp only [Measure.coe_nnreal_smul_apply, Measure.pi_pi]
-  simp [Finset.prod_mul_distrib]
-
 theorem map_pi_smul {ι ι' : Type} [Fintype ι] [Fintype ι'] {α : ι → Type} {α' : ι' → Type}
     [∀ i, MeasurableSpace (α i)] [∀ i, MeasurableSpace (α' i)] (μ : ∀ i, Measure (α i))
     (μ' : ∀ i, Measure (α' i)) [∀ i, SigmaFinite (μ i)] [∀ i, SigmaFinite (μ' i)] (c : ι → ℝ≥0) (c' : ι' → ℝ≥0)
@@ -205,7 +199,7 @@ theorem map_pi_smul {ι ι' : Type} [Fintype ι] [Fintype ι'] {α : ι → Type
     ∃ Φ : (∀ i, α' i) ≃ᵐ (∀ i, α i), (∀ g i, Φ g i = T i (g (τ i))) ∧
       ((∏ i, c' i) • Measure.pi μ').map Φ = (∏ i, c i) • Measure.pi μ := by
   refine ⟨(MeasurableEquiv.piCongrLeft α' τ).symm.trans (MeasurableEquiv.piCongrRight T), fun g i => rfl, ?_⟩
-  rw [← pi_smul, ← pi_smul]
+  rw [← MeasureTheory.Measure.pi_nnreal_smul, ← MeasureTheory.Measure.pi_nnreal_smul]
   have h1 := (measurePreserving_piCongrLeft (fun i => c' i • μ' i) τ).symm
   have h2 := measurePreserving_pi (fun i => c' (τ i) • μ' (τ i)) (fun i => c i • μ i)
     (f := fun i => T i) (fun i => ⟨(T i).measurable, hT i⟩)

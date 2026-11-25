@@ -13,6 +13,7 @@ import Mathlib.RingTheory.HopfAlgebra.Basic
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.UniformSpace.Uniformizable
+public import Lemmata.IntegralVolumeIoiPow
 
 @[expose] public section
 
@@ -50,19 +51,10 @@ theorem sphMonom_polar_mul (μ : Measure E) [μ.IsAddHaarMeasure] (G : E → ℂ
 
 end polar
 
-theorem sphMonom_volumeIoiPow_integral (m : ℕ) (φ : ℝ → ℝ) :
-    ∫ r : Ioi (0 : ℝ), φ r ∂(Measure.volumeIoiPow m) = ∫ r in Ioi (0 : ℝ), r ^ m * φ r := by
-  rw [Measure.volumeIoiPow, integral_withDensity_eq_integral_toReal_smul
-    ((measurable_subtype_coe.pow_const m).ennreal_ofReal) (ae_of_all _ fun _ => ENNReal.ofReal_lt_top)]
-  rw [integral_subtype_comap measurableSet_Ioi (fun r : ℝ => (ENNReal.ofReal (r ^ m)).toReal • φ r)]
-  refine setIntegral_congr_fun measurableSet_Ioi fun r hr => ?_
-  simp only [smul_eq_mul]
-  rw [ENNReal.toReal_ofReal (pow_nonneg (le_of_lt hr) m)]
-
 theorem sphMonom_radial (m k : ℕ) :
     ∫ r : Ioi (0 : ℝ), r.1 ^ k * Real.exp (-(r.1 ^ 2)) ∂(Measure.volumeIoiPow m) =
       Real.Gamma ((((m + k : ℕ) : ℝ) + 1) / 2) / 2 := by
-  have hv := sphMonom_volumeIoiPow_integral m (fun x : ℝ => x ^ k * Real.exp (-(x ^ 2)))
+  have hv := MeasureTheory.Measure.integral_volumeIoiPow m (fun x : ℝ => x ^ k * Real.exp (-(x ^ 2)))
   rw [hv]
   have hq : (-1 : ℝ) < ((m + k : ℕ) : ℝ) := by
     have : (0 : ℝ) ≤ ((m + k : ℕ) : ℝ) := Nat.cast_nonneg _

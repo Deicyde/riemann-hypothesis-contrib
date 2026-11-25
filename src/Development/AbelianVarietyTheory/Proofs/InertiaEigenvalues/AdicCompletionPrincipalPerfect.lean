@@ -4,6 +4,7 @@ public import Mathlib.FieldTheory.Perfect
 public import Mathlib.RingTheory.AdicCompletion.Algebra
 public import Mathlib.RingTheory.AdicCompletion.Completeness
 import Mathlib.Tactic.Linter.HaveILetI
+public import Lemmata.SModEqSpanSingletonPow
 
 @[expose] public section
 
@@ -49,11 +50,6 @@ theorem dvd_iff (s : V) (r : ℕ) :
   have : AdicCompletion.eval (Ideal.span {x}) V r (algebraMap V _ s) =
       Submodule.Quotient.mk s := rfl
   rw [this, Submodule.Quotient.mk_eq_zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton]
-
-theorem sModEq_iff {C : Type} [CommRing C] (c : C) (n : ℕ) (u v : C) :
-    u ≡ v [SMOD (Ideal.span {c} ^ n • ⊤ : Submodule C C)] ↔ c ^ n ∣ u - v := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
     Ideal.mem_span_singleton]
 
 end General
@@ -116,7 +112,7 @@ theorem perfect : ∀ (l : ℕ) [Fact l.Prime] (V : Type) [CommRing V] [CharP V 
     have hcau : ∀ {m n : ℕ}, m ≤ n →
         algebraMap V C (b m) ≡ algebraMap V C (b n) [SMOD (Ideal.span {X} ^ m • ⊤ : Submodule C C)] := by
       intro m n hmn
-      rw [sModEq_iff, ← map_sub, dvd_iff]
+      rw [SModEq.span_singleton_pow_iff_dvd, ← map_sub, dvd_iff]
       refine dvd_of_pow_dvd_pow l x _ m ?_
       rw [sub_pow_char, hbs, hbs, ← dvd_iff, map_sub]
       have e : algebraMap V C (s m) - algebraMap V C (s n) = X ^ (l * n) * t n - X ^ (l * m) * t m := by
@@ -129,8 +125,8 @@ theorem perfect : ∀ (l : ℕ) [Fact l.Prime] (V : Type) [CommRing V] [CharP V 
     simp only
     rw [← sub_eq_zero]
     refine (complete x).toIsHausdorff.haus _ fun n => ?_
-    rw [sModEq_iff, sub_zero]
-    obtain ⟨u, hu⟩ := (sModEq_iff _ _ _ _).1 (hL n)
+    rw [SModEq.span_singleton_pow_iff_dvd, sub_zero]
+    obtain ⟨u, hu⟩ := (SModEq.span_singleton_pow_iff_dvd _ _ _ _).1 (hL n)
     have e : L ^ l - y = -((X ^ n) ^ l * u ^ l) - X ^ (l * n) * t n := by
       have hL' : L = algebraMap V C (b n) - X ^ n * u := by rw [← hu]; ring
       rw [hL', sub_pow_char, ← map_pow, hbs, mul_pow]

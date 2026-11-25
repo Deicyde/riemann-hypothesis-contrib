@@ -20,6 +20,7 @@ public import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
 import Mathlib.Tactic.Linter.Style
 import Std.Tactic.BVDecide.Normalize.Prop
 public import Mathlib.RingTheory.PowerSeries.Inverse
+public import Lemmata.SModEqSpanSingletonPow
 
 @[expose] public section
 
@@ -4172,11 +4173,6 @@ end PhiBW
 
 section PhiBC
 
-theorem phib_smodeq {M : Type} [CommRing M] (c x y : M) (k : ℕ) :
-    x ≡ y [SMOD ((Ideal.span {c}) ^ k • ⊤ : Submodule M M)] ↔ c ^ k ∣ x - y := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton]
-
 theorem phib_complete {R M : Type} [CommRing R] [CommRing M] [Algebra R M] (ϖ : R)
     [IsAdicComplete (Ideal.span {ϖ}) R] {ι : Type} [Fintype ι] (b : Module.Basis ι R M) :
     IsAdicComplete (Ideal.span {algebraMap R M ϖ}) M := by
@@ -4203,9 +4199,9 @@ theorem phib_complete {R M : Type} [CommRing R] [CommRing M] [Algebra R M] (ϖ :
     funext j
     apply IsHausdorff.haus (inferInstance : IsHausdorff (Ideal.span {ϖ}) R)
     intro k
-    rw [phib_smodeq, sub_zero]
+    rw [SModEq.span_singleton_pow_iff_dvd, sub_zero]
     have h := hx k
-    rw [phib_smodeq, sub_zero] at h
+    rw [SModEq.span_singleton_pow_iff_dvd, sub_zero] at h
     exact (key x k).1 h j
   · intro f hf
     have hc : ∀ j, ∃ L : R, ∀ k,
@@ -4213,17 +4209,17 @@ theorem phib_complete {R M : Type} [CommRing R] [CommRing M] [Algebra R M] (ϖ :
       intro j
       apply IsPrecomplete.prec (inferInstance : IsPrecomplete (Ideal.span {ϖ}) R)
       intro m k hmk
-      rw [phib_smodeq]
+      rw [SModEq.span_singleton_pow_iff_dvd]
       have h := hf hmk
-      rw [phib_smodeq] at h
+      rw [SModEq.span_singleton_pow_iff_dvd] at h
       have h' := (key _ m).1 h j
       rwa [map_sub] at h'
     choose L hL using hc
     refine ⟨b.equivFun.symm L, fun k => ?_⟩
-    rw [phib_smodeq, key]
+    rw [SModEq.span_singleton_pow_iff_dvd, key]
     intro j
     rw [map_sub, LinearEquiv.apply_symm_apply, Pi.sub_apply]
-    exact (phib_smodeq _ _ _ _).1 (hL j k)
+    exact (SModEq.span_singleton_pow_iff_dvd _ _ _ _).1 (hL j k)
 
 theorem phib_OL_complete {l : ℕ} [Fact l.Prime] (LL : FinExt l) :
     IsAdicComplete (Ideal.span {((l : ℕ) : ↥(OL LL))}) ↥(OL LL) := by
@@ -4439,7 +4435,7 @@ theorem phii_EE (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : 
   have hH : IsHausdorff (Ideal.span {((PD.p : ℕ) : W.EE)}) W.EE := W.EE_complete.toIsHausdorff
   apply hH.haus
   intro j
-  rw [phib_smodeq, sub_zero]
+  rw [SModEq.span_singleton_pow_iff_dvd, sub_zero]
   exact claim j k
 
 end PhiI2

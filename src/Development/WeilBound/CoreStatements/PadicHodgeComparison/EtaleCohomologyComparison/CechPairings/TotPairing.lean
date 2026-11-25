@@ -4,6 +4,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.CechPairings.MapHComp
 import Mathlib.Tactic.Linter.Style
 import Std.Tactic.BVDecide.Normalize.Prop
+public import Lemmata.FinSuccAbovePredAbove
 
 @[expose] public section
 
@@ -49,11 +50,6 @@ theorem sum_split {M : Type*} [AddCommMonoid M] {N a b : ℕ} (e : N = a + b) (�
     ∑ i, φ i = ∑ j : Fin a, φ (Fin.cast e.symm (Fin.castAdd b j)) + ∑ k : Fin b, φ (Fin.cast e.symm (Fin.natAdd a k)) := by
   subst e; simp [Fin.sum_univ_add]
 
-theorem sa_val {N : ℕ} (i : Fin (N + 1)) (t : Fin N) : (i.succAbove t : ℕ) = if (t : ℕ) < i then (t : ℕ) else t + 1 := by
-  rcases lt_or_ge (t : ℕ) i with h | h
-  · rw [Fin.succAbove_of_castSucc_lt _ _ (by simpa [Fin.lt_def] using h)]; simp [h]
-  · rw [Fin.succAbove_of_le_castSucc _ _ (by simpa [Fin.le_def] using h)]; simp; omega
-
 theorem four {M : Type*} [AddCommGroup M] {x y A B a b : M} (h1 : x = A) (h2 : y = B) (h3 : a + b = 0) :
     x + y = (A + a) + (b + B) := by
   subst h1 h2; rw [eq_neg_of_add_eq_zero_left h3]; abel
@@ -78,17 +74,17 @@ theorem CrystallineSemistableComparison.P.leibniz : ∀ {R : Type} [CommRing R] 
   refine CrystallineSemistableComparison.Auxff.four (Finset.sum_congr rfl fun j _ => ?_) (Finset.sum_congr rfl fun k _ => ?_) ?_
   · congr 1
     refine congrArg₂ (fun x y => P.μ _ x y) (term_congr _ _ _ _ _ ?_) (term_congr _ _ _ _ _ ?_) <;>
-        funext t <;> apply Fin.ext <;> simp only [Function.comp, CrystallineSemistableComparison.Auxff.sa_val, front, back, Fin.val_cast, Fin.val_castAdd, Fin.val_castSucc] <;> split_ifs <;> omega
+        funext t <;> apply Fin.ext <;> simp only [Function.comp, Fin.val_succAbove_eq_ite, front, back, Fin.val_cast, Fin.val_castAdd, Fin.val_castSucc] <;> split_ifs <;> omega
   · rw [smul_smul, ← pow_add]
     congr 1
     · congr 1; simp; omega
     · refine congrArg₂ (fun x y => P.μ _ x y) (term_congr _ _ _ _ _ ?_) (term_congr _ _ _ _ _ ?_) <;>
-        funext t <;> apply Fin.ext <;> simp only [Function.comp, CrystallineSemistableComparison.Auxff.sa_val, front, back, Fin.val_cast, Fin.val_natAdd, Fin.val_succ] <;> split_ifs <;> omega
+        funext t <;> apply Fin.ext <;> simp only [Function.comp, Fin.val_succAbove_eq_ite, front, back, Fin.val_cast, Fin.val_natAdd, Fin.val_succ] <;> split_ifs <;> omega
   · rw [smul_smul, ← pow_add, add_eq_zero_iff_eq_neg, ← neg_smul]
     congr 1
     · simp [pow_succ]
     · refine congrArg₂ (fun x y => P.μ _ x y) (term_congr _ _ _ _ _ ?_) (term_congr _ _ _ _ _ ?_) <;>
-        funext t <;> apply Fin.ext <;> simp only [Function.comp, CrystallineSemistableComparison.Auxff.sa_val, front, back, Fin.val_last, Fin.val_zero] <;> split_ifs <;> omega
+        funext t <;> apply Fin.ext <;> simp only [Function.comp, Fin.val_succAbove_eq_ite, front, back, Fin.val_last, Fin.val_zero] <;> split_ifs <;> omega
 
 namespace CrystallineSemistableComparison.Auxff
 

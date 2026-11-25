@@ -27,6 +27,7 @@ import ReciprocityTheory.SemistableReduction.SphereTorusC
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinSubstLinSubst
 import ReciprocityTheory.SemistableReduction.LagrangeIdealLiftsFact
 import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
+public import Lemmata.IntegralVolumeIoiPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SphereMeanEqMahler, Development.AbelianVarietyTheory.Proofs.DivisorProofs.GaussianFirstCoordsMeasurePreserving, Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlockSphereProbZeroSetEqZero, Development.AbelianVarietyTheory.Proofs.DivisorProofs.GaussianRadialLawProbabilityLogIntegrableMean, Development.AbelianVarietyTheory.Proofs.DivisorProofs.MeasurePreservingPolarGaussianProbabilityComplex, Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsMultiHomogeneousRenameCastLE, Development.WeilBound.CoreStatements.HomogeneousNonvanishing.FormHeightGen, Development.WeilBound.CoreStatements.HomogeneousNonvanishing.TotalDegreeLinSubstLe, Development.WeilBound.CoreStatements.MinimalPrimeDimensions.FormHeightOneEq
@@ -512,9 +513,9 @@ theorem radProb_log_mean : ∀ (n : ℕ), 0 < n → IsProbabilityMeasure (radPro
   have hKi : Integrable (fun r : Ioi (0 : ℝ) ↦ Real.log r * Real.exp (-(r : ℝ) ^ 2)) μ0 :=
     integrable_volumeIoiPow (k := 2 * n - 1) (g := fun r ↦ Real.log r * Real.exp (-r ^ 2)) hKo
   have hJv : ∫ r : Ioi (0 : ℝ), Real.exp (-(r : ℝ) ^ 2) ∂μ0 = radJ (2 * n - 1) := by
-    rw [hμ0, integral_volumeIoiPow (2 * n - 1) (fun r ↦ Real.exp (-r ^ 2))]; rfl
+    rw [hμ0, MeasureTheory.Measure.integral_volumeIoiPow (2 * n - 1) (fun r ↦ Real.exp (-r ^ 2))]; rfl
   have hKv : ∫ r : Ioi (0 : ℝ), Real.log r * Real.exp (-(r : ℝ) ^ 2) ∂μ0 = radK (2 * n - 1) := by
-    rw [hμ0, integral_volumeIoiPow (2 * n - 1) (fun r ↦ Real.log r * Real.exp (-r ^ 2)), radK]
+    rw [hμ0, MeasureTheory.Measure.integral_volumeIoiPow (2 * n - 1) (fun r ↦ Real.log r * Real.exp (-r ^ 2)), radK]
     refine setIntegral_congr_fun measurableSet_Ioi fun r _ ↦ ?_
     ring
 

@@ -2,6 +2,7 @@ module
 
 public import GroundTheory.ProfiniteCohomology.ClassFormationDefs
 public import GroundTheory.ProfiniteCohomology.ClassFormations.IsIsoCohomologyMapAlongResSubgroupOfHom
+public import Lemmata.SubgroupContinuousInclusion
 
 @[expose] public section
 
@@ -100,7 +101,7 @@ variable [TopologicalSpace G] [IsTopologicalGroup G]
 omit [IsTopologicalGroup G] in
 theorem continuous_quotPreimageHom (S : Subgroup (U ⧸ V.subgroupOf U)) :
     Continuous (quotPreimageHom S) :=
-  (QuotientGroup.continuous_mk.comp (continuous_subgroup_inclusion (quotPreimage_le S))).subtype_mk
+  (QuotientGroup.continuous_mk.comp (Subgroup.continuous_inclusion (quotPreimage_le S))).subtype_mk
     _
 
 

@@ -99,6 +99,7 @@ import GroundTheory.LocalFields.AbstractLocalReciprocity.ExistsEqNsmulOfProjEqZe
 import GroundTheory.ProfiniteCohomology.CupProducts.ExistsCocycleMapFEqD
 import GroundTheory.ProfiniteCohomology.GaloisCohomology.Kummer
 import Mathlib.Tactic.Linter.HaveILetI
+public import Lemmata.PowZModVal
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalBrauerRootsUnityEquiv, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DecompositionGroupFrobeniusFactor, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FrobeniusPowerFixesRootUnique, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.KummerCocycleNormCriterion, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormFromKummerUnramifiedUnit, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ResidueFieldCardEqNorm, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UniformizerRatioValuationZero, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalInvariantCupKummer, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DecompositionGroupLocalGalois, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.KummerCharacterTameFormula, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UniformizerOrderEqOne, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnramifiedCharacterContinuous, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalInvariantCupUniformizer, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormalisedLocalInvariantExists, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsInvFamNormalised
@@ -685,11 +686,6 @@ open ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.KapChi
 
-theorem pow_val_add {Ω : Type} [Field Ω] {N : ℕ} [NeZero N] {ζ : Ω} (hζ : ζ ^ N = 1) (a b : ZMod N) :
-    ζ ^ (a + b).val = ζ ^ a.val * ζ ^ b.val := by
-  rw [ZMod.val_add, ← pow_add]
-  conv_rhs => rw [← Nat.div_add_mod (a.val + b.val) N, pow_add, pow_mul, hζ, one_pow, one_mul]
-
 def addHom {D : Type} [Group D] {N : ℕ} (χ : D → ZMod N) (h : ∀ g k, χ (g * k) = χ g + χ k) :
     D →* Multiplicative (ZMod N) :=
   MonoidHom.mk' (fun g => Multiplicative.ofAdd (χ g)) (fun g k => by rw [h]; rfl)
@@ -858,7 +854,7 @@ theorem cup_class_eq : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [A
   have ht : (y' / y) ^ l ^ r * algebraMap F Ω (ϖ : F) = algebraMap F Ω (ϖ' : F) := by
     rw [div_pow, hy, hy', div_mul_cancel₀ _ hϖ0]
   have hκt : ∀ g : Dec (F := F) A, (g : G F Ω) (y' / y) = ζ ^ (κ' g - κ g).val * (y' / y) := fun g => by
-    have e := pow_val_add hζ.pow_eq_one (κ' g - κ g) (κ g)
+    have e := ZMod.pow_val_add_of_pow_eq_one hζ.pow_eq_one (κ' g - κ g) (κ g)
     rw [sub_add_cancel] at e
     have hgy : ζ ^ (κ g).val ≠ 0 := pow_ne_zero _ (hζ.ne_zero hN.ne')
     rw [map_div₀, hκ, hκ', e]

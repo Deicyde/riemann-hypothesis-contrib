@@ -17,6 +17,7 @@ import Mathlib.Tactic.Linter.HaveILetI
 import Std.Tactic.BVDecide.Normalize.Prop
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GaussQ
 import Development.AbelianVarietyTheory.PublishedTheorems.GlobalTheta.IsSchwartzBruhatOfProd
+public import Lemmata.MeasurePi
 
 @[expose] public section
 
@@ -139,7 +140,7 @@ theorem lint_fin (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {d : ℕ} (b : Modu
     rw [lintegral_map hG hρ]
     refine lintegral_congr fun Y => ?_
     rw [← Finset.prod_coe_sort S]
-  rw [e1, hmap, GlobalTheory.RestrMeas.lintegral_fintype_prod_eq_prod (f := fun v : S => φ v.1) fun v => (hφ v.1).aemeasurable,
+  rw [e1, hmap, MeasureTheory.lintegral_fintype_prod_eq_prod (f := fun v : S => φ v.1) fun v => (hφ v.1).aemeasurable,
     ← Finset.prod_coe_sort S]
 
 section Meas

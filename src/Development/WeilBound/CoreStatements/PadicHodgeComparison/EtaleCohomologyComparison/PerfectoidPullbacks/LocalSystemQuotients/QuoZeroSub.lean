@@ -75,6 +75,7 @@ import Mathlib.Tactic.Linter.HaveILetI
 import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FlatThickeningQuotient
 import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.PolynomialSiteTraces.AdmissibleMap
 import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.LocalSystemQuotients.QuoDMk
+public import Lemmata.FinSuccAbovePredAbove
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompareQuotientBijective, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PullEqOfNatTrans, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MapHBijOfRes, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittChartDescendLevel, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittChartDescendLevelStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittCoordQuotientPullBijective, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittCoordQuotientPullBijectiveStatement, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittLevelMorphismCoverCompat, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittSiteQuotientRestrictBijective, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WittSiteRestrictBijective, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.LocalSystemQuotients.BijOfSub, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.LocalSystemQuotients.BijCov, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.LocalSystemQuotients.QuoZeroSub
@@ -242,7 +243,7 @@ def skip {m : ℕ} (i : Fin (m + 1)) (l : Fin m) : Fin (m + 2) := i.castSucc.suc
 theorem skip_val {m : ℕ} (i : Fin (m + 1)) (l : Fin m) :
     (skip i l : ℕ) = if (l : ℕ) < i then (l : ℕ) else l + 2 := by
   unfold skip
-  simp only [_root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_castSucc]
+  simp only [Fin.val_succAbove_eq_ite, Fin.val_castSucc]
   split_ifs <;> omega
 
 theorem prism_tele {A : Type*} [AddCommGroup A] (m : ℕ) (X : Fin (m + 1) → Fin (m + 2) → A)
@@ -283,7 +284,7 @@ theorem prism_cancel {A : Type*} [AddCommGroup A] (n : ℕ) (X : Fin (n + 2) →
   rintro ⟨i, l⟩ _
   simp only [Function.Involutive.coe_toPerm, smul_smul]
   rw [h, sign_of_odd (i : ℕ) (skip i l : ℕ) (i.succAbove l : ℕ) (l.predAbove i : ℕ), neg_smul, neg_add_cancel]
-  rw [Nat.odd_iff, skip_val, _root_.CrystallineSemistableComparison.Auxfc.vsA, _root_.CrystallineSemistableComparison.Auxfc.vpA]
+  rw [Nat.odd_iff, skip_val, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite]
   split_ifs <;> omega
 
 end Combinatorics
@@ -308,49 +309,49 @@ theorem sa_mono {m : ℕ} (k : Fin (m + 1)) : Monotone k.succAbove := (Fin.stric
 
 theorem pa_diag {m : ℕ} (i : Fin m) : pa i.succ ∘ i.succ.castSucc.succAbove = pa i.castSucc ∘ i.castSucc.succ.succAbove := by
   funext x
-  simp only [Function.comp, pa, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_succ, Fin.val_castSucc]
+  simp only [Function.comp, pa, Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem pt_diag {m : ℕ} (i : Fin m) : i.succ.predAbove ∘ i.succ.castSucc.succAbove = i.castSucc.predAbove ∘ i.castSucc.succ.succAbove := by
   funext x
   apply Fin.ext
-  simp only [Function.comp, _root_.CrystallineSemistableComparison.Auxfc.vpA, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_succ, Fin.val_castSucc]
+  simp only [Function.comp, Fin.val_predAbove_eq_ite, Fin.val_succAbove_eq_ite, Fin.val_succ, Fin.val_castSucc]
   split_ifs <;> omega
 
 theorem pa_first {m : ℕ} : pa (0 : Fin (m + 1)) ∘ (0 : Fin (m + 2)).succAbove = fun _ => Fin.last 1 := by
   funext x
-  simp only [Function.comp, pa, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_zero]
+  simp only [Function.comp, pa, Fin.val_succAbove_eq_ite, Fin.val_zero]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem pt_first {m : ℕ} : (0 : Fin (m + 1)).predAbove ∘ (0 : Fin (m + 2)).succAbove = id := by
   funext x
   apply Fin.ext
-  simp only [Function.comp, _root_.CrystallineSemistableComparison.Auxfc.vpA, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_zero, id]
+  simp only [Function.comp, Fin.val_predAbove_eq_ite, Fin.val_succAbove_eq_ite, Fin.val_zero, id]
   split_ifs <;> omega
 
 theorem prism_last_comp_succAbove_zero {m : ℕ} : pa (Fin.last m) ∘ (Fin.last (m + 1)).succAbove = fun _ => 0 := by
   funext x
   have := x.2
-  simp only [Function.comp, pa, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_last]
+  simp only [Function.comp, pa, Fin.val_succAbove_eq_ite, Fin.val_last]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem predAbove_last_comp_succAbove_id {m : ℕ} : (Fin.last m).predAbove ∘ (Fin.last (m + 1)).succAbove = id := by
   funext x
   have := x.2
   apply Fin.ext
-  simp only [Function.comp, _root_.CrystallineSemistableComparison.Auxfc.vpA, _root_.CrystallineSemistableComparison.Auxfc.vsA, Fin.val_last, id]
+  simp only [Function.comp, Fin.val_predAbove_eq_ite, Fin.val_succAbove_eq_ite, Fin.val_last, id]
   split_ifs <;> omega
 
 theorem pa_skip {m : ℕ} (i : Fin (m + 2)) (l : Fin (m + 1)) : pa i ∘ (skip i l).succAbove = pa (l.predAbove i) := by
   funext x
-  simp only [Function.comp, pa, _root_.CrystallineSemistableComparison.Auxfc.vsA, _root_.CrystallineSemistableComparison.Auxfc.vpA, skip_val]
+  simp only [Function.comp, pa, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite, skip_val]
   split_ifs <;> first | rfl | (exfalso; omega)
 
 theorem pt_skip {m : ℕ} (i : Fin (m + 2)) (l : Fin (m + 1)) :
     i.predAbove ∘ (skip i l).succAbove = (i.succAbove l).succAbove ∘ (l.predAbove i).predAbove := by
   funext x
   apply Fin.ext
-  simp only [Function.comp, _root_.CrystallineSemistableComparison.Auxfc.vsA, _root_.CrystallineSemistableComparison.Auxfc.vpA, skip_val]
+  simp only [Function.comp, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite, skip_val]
   split_ifs <;> omega
 
 end Prism

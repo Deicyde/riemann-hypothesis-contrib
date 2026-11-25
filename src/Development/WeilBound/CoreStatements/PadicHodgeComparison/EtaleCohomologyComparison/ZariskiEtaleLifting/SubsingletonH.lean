@@ -34,6 +34,7 @@ import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.IsDPMorphismB
 import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.ValuationSquareOfValuationMod
 import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.Linter.HaveILetI
+public import Lemmata.SModEqSpanSingletonPow
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.ZariskiEtaleLifting.FChart, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.ZariskiEtaleLifting.FGlob, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsLine, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IdempotentLocalizationUniversal, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IdempotentRefinementOfUnimodular, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AcrTeichProd, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsUniqueHom, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CrystallinePointUniversalLift, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsQuot, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GammaComp, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IncPtInjective, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DescOfDes, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StepDesc, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.ZariskiEtaleLifting.PropsE, Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.ZariskiEtaleLifting.SubsingletonH
@@ -302,18 +303,18 @@ theorem complete_quot (he : IsIdempotentElem e) {π : R} (hc : IsAdicComplete (I
   have hH : IsHausdorff (Ideal.span {Ideal.Quotient.mk (Ideal.span {1 - e}) π}) (Q e) := ⟨fun x hx => by
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
     refine (mk_eq_zero_iff he x).2 (hc.toIsHausdorff.haus' _ fun n => ?_)
-    have := (_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ n).1 (hx n)
+    have := (SModEq.span_singleton_pow_iff_dvd _ _ _ n).1 (hx n)
     rw [sub_zero] at this
-    exact (_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ n).2 (by rw [sub_zero]; exact dvd_of_mk_dvd he n this)⟩
+    exact (SModEq.span_singleton_pow_iff_dvd _ _ _ n).2 (by rw [sub_zero]; exact dvd_of_mk_dvd he n this)⟩
   have hP : IsPrecomplete (Ideal.span {Ideal.Quotient.mk (Ideal.span {1 - e}) π}) (Q e) := ⟨fun f hf => by
     choose g hg using fun n => Ideal.Quotient.mk_surjective (f n)
-    obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec' (fun n => e * g n) fun {m n} hmn => (_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ m).2 (by
-      have := (_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ m).1 (hf hmn)
+    obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec' (fun n => e * g n) fun {m n} hmn => (SModEq.span_singleton_pow_iff_dvd _ _ _ m).2 (by
+      have := (SModEq.span_singleton_pow_iff_dvd _ _ _ m).1 (hf hmn)
       rw [← hg m, ← hg n, ← map_sub] at this
       rw [← mul_sub]
       exact dvd_of_mk_dvd he m this)
-    refine ⟨Ideal.Quotient.mk _ L, fun n => (_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ n).2 ?_⟩
-    have h1 := map_dvd (Ideal.Quotient.mk (Ideal.span {1 - e})) ((_root_.GlobalTheory.CompanionTheory.PowComp.smodEq_span_iff _ _ _ n).1 (hL n))
+    refine ⟨Ideal.Quotient.mk _ L, fun n => (SModEq.span_singleton_pow_iff_dvd _ _ _ n).2 ?_⟩
+    have h1 := map_dvd (Ideal.Quotient.mk (Ideal.span {1 - e})) ((SModEq.span_singleton_pow_iff_dvd _ _ _ n).1 (hL n))
     rw [map_pow, map_sub, map_mul, mk_e, one_mul, hg n] at h1
     exact h1⟩
   exact { hH, hP with }

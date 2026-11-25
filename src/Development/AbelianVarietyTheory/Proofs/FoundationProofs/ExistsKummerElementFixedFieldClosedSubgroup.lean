@@ -5,17 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 public import Mathlib.RingTheory.AdicCompletion.Noetherian
 import Mathlib.Tactic.Linter.HaveILetI
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsLocallyConstantCycMod
+public import Lemmata.PowZModVal
 
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries
 
 namespace GlobalTheory.KumFix
-
-theorem pow_val_add {Ω : Type} [Field Ω] {n : ℕ} [NeZero n] {ζ : Ω} (h : ζ ^ n = 1) (a b : ZMod n) :
-    ζ ^ (a + b).val = ζ ^ a.val * ζ ^ b.val := by
-  rw [ZMod.val_add, ← pow_add]
-  conv_rhs => rw [← Nat.mod_add_div (a.val + b.val) n, pow_add, pow_mul, h, one_pow, mul_one]
 
 theorem isClosed_of_le {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (H N U : Subgroup Γ)
     (hH : IsClosed (H : Set Γ)) (hU : IsOpen (U : Set Γ)) (hNH : N ≤ H) (hUN : ∀ s ∈ H, s ∈ U → s ∈ N) :
@@ -108,7 +104,7 @@ theorem exists_eigen {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ �
     rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply] at this
     rw [← this]
     exact ((r (e k)).apply_symm_apply _).symm
-  rw [map_mul, map_pow, hfix s hs, hx2, ← mul_assoc, ← pow_val_add hζ]
+  rw [map_mul, map_pow, hfix s hs, hx2, ← mul_assoc, ← ZMod.pow_val_add_of_pow_eq_one hζ]
   congr 3
   change -(k : ZMod n) = χ s + -(χ s + k)
   ring

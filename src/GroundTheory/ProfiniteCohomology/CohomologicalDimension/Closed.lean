@@ -8,6 +8,7 @@ import GroundTheory.ProfiniteCohomology.Factor
 import GroundTheory.ProfiniteCohomology.FilteredHomology
 public import GroundTheory.ProfiniteCohomology.IsProPGroupSubgroupIffIsPGroupMap
 import Mathlib.Tactic.TypeStar
+public import Lemmata.SubgroupContinuousInclusion
 
 @[expose] public section
 
@@ -178,7 +179,7 @@ theorem exists_cohomologyResLE_eq {H : Subgroup G} (hH : IsClosed (H : Set G)) (
   obtain ⟨zF, hzF⟩ := exists_iCycles_eq (cochainsComplex (Rep.res U.subtype M)) F hF
   refine ⟨U, hUo, le_sup_left, ((cochainsComplex _).homologyπ q).hom zF, ?_⟩
   change (HomologicalComplex.homologyMap (cochainsMapAlong (Subgroup.inclusion (le_sup_left : H ≤ U))
-    (continuous_subgroup_inclusion _) (resResHom M _)) q).hom
+    (Subgroup.continuous_inclusion _) (resResHom M _)) q).hom
       (((cochainsComplex _).homologyπ q).hom zF) = _
   rw [homologyMap_homologyπ_apply]
   congr 1

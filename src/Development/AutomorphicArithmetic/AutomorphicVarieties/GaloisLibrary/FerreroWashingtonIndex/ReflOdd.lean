@@ -19,6 +19,7 @@ import Mathlib.Tactic.Linter.Style
 import Mathlib.NumberTheory.NumberField.ClassNumber
 import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.PullMem
 import Mathlib.GroupTheory.Nilpotent
+public import Lemmata.PowZModVal
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.ReflMap, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.ReflRoot, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.RadClMap, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.RadConj, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.ReflTw, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.UnitMinus, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.Reflect, Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.FerreroWashingtonIndex.ReflOdd
@@ -50,11 +51,6 @@ private theorem card_parity_sign_length_of_eq {A B : Type} [Group A] [CommGroup 
   rw [h1]
   exact Subgroup.card_dvd_of_injective (j.codRestrict f.range hm)
     fun x y h => hj (congrArg Subtype.val h)
-
-private theorem pow_val_add {Ω : Type} [Field Ω] {n : ℕ} [NeZero n] {ζ : Ω} (hζ : ζ ^ n = 1) (x y : ZMod n) :
-    ζ ^ (x + y).val = ζ ^ x.val * ζ ^ y.val := by
-  rw [ZMod.val_add, ← pow_add]
-  conv_rhs => rw [← Nat.mod_add_div (x.val + y.val) n, pow_add, pow_mul, hζ, one_pow, mul_one]
 
 theorem UpperTheory.V.Kum.reflMap :
     ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type) [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω] [IsAlgClosure K Ω] (U : Subgroup (G F Ω)) (n : ℕ) [NeZero n] (N : ℕ) (ζ : K), U = galOf F K Ω → IsPrimitiveRoot ζ n → ∃ κ : XDual N U (ZMod n) (ZMod n) →+ Additive (ClassGroup (𝓞 K)),
@@ -117,7 +113,7 @@ theorem UpperTheory.V.Kum.reflMap :
     refine hwd (φ + ψ) (β φ * β ψ) _ ⟨mul_ne_zero (hrad φ).1 (hrad ψ).1, fun u => ?_⟩ ?_
     · rw [map_mul, (hrad φ).2 u, (hrad ψ).2 u]
       change _ = algebraMap K Ω ζ ^ (φ.1 u + ψ.1 u).val * _
-      rw [pow_val_add hζ'.pow_eq_one]
+      rw [ZMod.pow_val_add_of_pow_eq_one hζ'.pow_eq_one]
       ring
     · rw [mul_pow, hβ, hβ]
       simp

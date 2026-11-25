@@ -47,6 +47,7 @@ import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheorems
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.TrivialOnInertiaOfUnr
 import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.DirichletPrimeToLPartMulLPowerPart
+public import Lemmata.StrictPeriodsGamma1
 
 @[expose] public section
 
@@ -59,12 +60,6 @@ open scoped MatrixGroups ModularForm
 noncomputable section
 
 namespace GlobalTheory.HeckeBd
-
-private theorem one_mem_strictPeriods_map_gamma1 (M : ℕ) :
-    (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 M)).strictPeriods := by
-  rw [show (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 M)) =
-    ((Gamma1 M : Subgroup (GL (Fin 2) ℝ))) from rfl, strictPeriods_Gamma1]
-  exact AddSubgroup.mem_zmultiples 1
 
 theorem no_weight_zero (g : Newform 0) : False := by
   haveI : NeZero g.M := ⟨g.pos.ne'⟩
@@ -88,12 +83,12 @@ theorem no_weight_zero (g : Newform 0) : False := by
 theorem expand (k : ℕ) (g : Newform k) (τ : ℍ) :
     HasSum (fun m : ℕ => g.a m * Function.Periodic.qParam 1 τ ^ m) (g.f τ) := by
   haveI : NeZero g.M := ⟨g.pos.ne'⟩
-  have := ModularForm.hasSum_qExpansion (f := g.f) one_pos (one_mem_strictPeriods_map_gamma1 g.M) τ
+  have := ModularForm.hasSum_qExpansion (f := g.f) one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 g.M) τ
   simpa [Newform.a, UpperTheory.V.Af.coef, Nat.cast_one] using this
 
 theorem a_zero (k : ℕ) (g : Newform k) : g.a 0 = 0 := by
   haveI : NeZero g.M := ⟨g.pos.ne'⟩
-  simpa [Newform.a, UpperTheory.V.Af.coef] using CuspFormClass.qExpansion_coeff_zero g.f one_pos (one_mem_strictPeriods_map_gamma1 g.M)
+  simpa [Newform.a, UpperTheory.V.Af.coef] using CuspFormClass.qExpansion_coeff_zero g.f one_pos (CongruenceSubgroup.one_mem_strictPeriods_map_Gamma1 g.M)
 
 theorem im_shift (z : ℍ) (b p : ℕ) (hp : 0 < p) : (((z : ℂ) + b) / p).im = z.im / p := by
   simp [Complex.div_natCast_im]

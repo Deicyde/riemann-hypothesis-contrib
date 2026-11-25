@@ -13,6 +13,7 @@ import Mathlib.Tactic.Linter.HaveILetI
 import Development.AbelianVarietyTheory.Definitions.Divisors.CommAlgFunctorCoboundaryZeroMemCocyclesOne
 import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DnCompDn
 import Std.Tactic.BVDecide.Normalize.Prop
+public import Lemmata.FinSuccAbovePredAbove
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoboundaryCup0, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoboundaryCup1, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsDualFunctionalsOfLinearIndependent, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsFactorOfExactIsField, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SlantProductSecondAction, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ValSuccAbove, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Cup1BoundaryOfBoundary
@@ -569,37 +570,29 @@ theorem th_apply (q : ℕ) (i : Fin (q + 1)) (x : Fin (q + 2)) :
   change (if x ≤ i.castSucc then (0 : Fin 2) else 1) = _
   simp only [Fin.le_def, Fin.val_castSucc]
 
-theorem val_succAbove {n : ℕ} (j : Fin (n + 1)) (x : Fin n) :
-    ((j.succAbove x : Fin (n + 1)) : ℕ) = if (x : ℕ) < j then (x : ℕ) else x + 1 := by
-  unfold Fin.succAbove; simp only [Fin.lt_def, Fin.val_castSucc]; split_ifs <;> simp
-
-theorem val_predAbove {n : ℕ} (i : Fin n) (x : Fin (n + 1)) :
-    ((Fin.predAbove i x : Fin n) : ℕ) = if (i : ℕ) < x then (x : ℕ) - 1 else x := by
-  unfold Fin.predAbove; simp only [Fin.lt_def, Fin.val_castSucc]; split_ifs <;> simp
-
 theorem val_sg (q : ℕ) (i : Fin (q + 1)) (x : Fin (q + 2)) :
     ((sg q i x : Fin (q + 1)) : ℕ) = if (i : ℕ) < x then (x : ℕ) - 1 else x :=
-  val_predAbove i x
+  Fin.val_predAbove_eq_ite i x
 
 theorem th_diag (q : ℕ) (i : Fin (q + 2)) :
     (th (q + 1) i).comp (Fin.succAboveOrderEmb i.castSucc).toOrderHom = stepMap q i := by
   ext x; change (th (q + 1) i (i.castSucc.succAbove x) : ℕ) = ((if (x : ℕ) < i then (0 : Fin 2) else 1 : Fin 2) : ℕ)
-  rw [th_apply, val_succAbove]; simp only [Fin.val_castSucc]; split_ifs <;> first | rfl | lia
+  rw [th_apply, Fin.val_succAbove_eq_ite]; simp only [Fin.val_castSucc]; split_ifs <;> first | rfl | lia
 
 theorem th_next (q : ℕ) (i : Fin (q + 2)) :
     (th (q + 1) i).comp (Fin.succAboveOrderEmb i.succ).toOrderHom = stepMap q (i + 1) := by
   ext x; change (th (q + 1) i (i.succ.succAbove x) : ℕ) = ((if (x : ℕ) < i + 1 then (0 : Fin 2) else 1 : Fin 2) : ℕ)
-  rw [th_apply, val_succAbove]; simp only [Fin.val_succ]; split_ifs <;> first | rfl | lia
+  rw [th_apply, Fin.val_succAbove_eq_ite]; simp only [Fin.val_succ]; split_ifs <;> first | rfl | lia
 
 theorem sg_diag (q : ℕ) (i : Fin (q + 2)) :
     (sg (q + 1) i).comp (Fin.succAboveOrderEmb i.castSucc).toOrderHom = OrderHom.id := by
   ext x; change (sg (q + 1) i (i.castSucc.succAbove x) : ℕ) = x
-  rw [val_sg, val_succAbove]; simp only [Fin.val_castSucc]; split_ifs <;> lia
+  rw [val_sg, Fin.val_succAbove_eq_ite]; simp only [Fin.val_castSucc]; split_ifs <;> lia
 
 theorem sg_next (q : ℕ) (i : Fin (q + 2)) :
     (sg (q + 1) i).comp (Fin.succAboveOrderEmb i.succ).toOrderHom = OrderHom.id := by
   ext x; change (sg (q + 1) i (i.succ.succAbove x) : ℕ) = x
-  rw [val_sg, val_succAbove]; simp only [Fin.val_succ]; split_ifs <;> lia
+  rw [val_sg, Fin.val_succAbove_eq_ite]; simp only [Fin.val_succ]; split_ifs <;> lia
 
 theorem stepMap_zero (q : ℕ) : stepMap q 0 = cst (q + 1) 1 := by ext x; simp [stepMap, cst]; rfl
 
@@ -612,7 +605,7 @@ theorem th_off (q : ℕ) (i : Fin (q + 2)) (k : Fin (q + 1)) :
   ext x
   have e : ((th (q + 1) i).comp (Fin.succAboveOrderEmb (i.castSucc.succAbove (i.succAbove k))).toOrderHom) x =
       th (q + 1) i ((i.castSucc.succAbove (i.succAbove k)).succAbove x) := rfl
-  rw [e, th_apply, th_apply]; congr 2; simp only [val_succAbove, val_predAbove, Fin.val_castSucc, eq_iff_iff]
+  rw [e, th_apply, th_apply]; congr 2; simp only [Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite, Fin.val_castSucc, eq_iff_iff]
   split_ifs <;> lia
 
 theorem sg_off (q : ℕ) (i : Fin (q + 2)) (k : Fin (q + 1)) :
@@ -621,13 +614,13 @@ theorem sg_off (q : ℕ) (i : Fin (q + 2)) (k : Fin (q + 1)) :
   ext x
   change (sg (q + 1) i ((i.castSucc.succAbove (i.succAbove k)).succAbove x) : ℕ) =
     ((i.succAbove k).succAbove (sg q (Fin.predAbove k i) x) : ℕ)
-  simp only [val_sg, val_succAbove, val_predAbove, Fin.val_castSucc]
+  simp only [val_sg, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite, Fin.val_castSucc]
   split_ifs <;> lia
 
 theorem sign_off (q : ℕ) (i : Fin (q + 2)) (k : Fin (q + 1)) :
     ((-1 : ℤ) ^ ((i : ℕ) + ((i.castSucc.succAbove (i.succAbove k) : Fin (q + 3)) : ℕ))) =
       -((-1 : ℤ) ^ (((Fin.predAbove k i : Fin (q + 1)) : ℕ) + ((i.succAbove k : Fin (q + 2)) : ℕ))) := by
-  simp only [val_succAbove, val_predAbove, Fin.val_castSucc]
+  simp only [Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite, Fin.val_castSucc]
   by_cases h : (k : ℕ) < i
   · obtain ⟨m, hm⟩ : ∃ m, (i : ℕ) = m + 1 := ⟨(i : ℕ) - 1, by lia⟩
     rw [ite_eq_left h, ite_eq_left h, ite_eq_left (by lia), hm]; simp [pow_add, pow_succ]
@@ -641,10 +634,10 @@ def bwd (q : ℕ) (p : Fin (q + 1) × Fin (q + 2)) : Fin (q + 2) × Fin (q + 1) 
    ⟨if (p.2 : ℕ) ≤ p.1 then p.2 else (p.2 : ℕ) - 1, by have := p.1.2; have := p.2.2; split_ifs <;> lia⟩)
 
 theorem bwd_fwd (q : ℕ) (p : Fin (q + 2) × Fin (q + 1)) : bwd q (fwd q p) = p := by
-  refine Prod.ext (Fin.ext ?_) (Fin.ext ?_) <;> · simp only [bwd, fwd, val_succAbove, val_predAbove]; split_ifs <;> lia
+  refine Prod.ext (Fin.ext ?_) (Fin.ext ?_) <;> · simp only [bwd, fwd, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite]; split_ifs <;> lia
 
 theorem fwd_bwd (q : ℕ) (p : Fin (q + 1) × Fin (q + 2)) : fwd q (bwd q p) = p := by
-  refine Prod.ext (Fin.ext ?_) (Fin.ext ?_) <;> · simp only [bwd, fwd, val_succAbove, val_predAbove]; split_ifs <;> lia
+  refine Prod.ext (Fin.ext ?_) (Fin.ext ?_) <;> · simp only [bwd, fwd, Fin.val_succAbove_eq_ite, Fin.val_predAbove_eq_ite]; split_ifs <;> lia
 
 theorem prism_faces {A : Type} [AddCommGroup A] (q : ℕ)
     (B : (Fin (q + 2) →o Fin 2) → (Fin (q + 2) →o Fin (q + 2)) → A) :

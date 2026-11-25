@@ -5,6 +5,7 @@ public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 public import Mathlib.Analysis.Calculus.ContDiff.Bounds
 public import Mathlib.Analysis.InnerProductSpace.Calculus
 public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+public import Lemmata.NormIteratedFDerivExp
 
 @[expose] public section
 
@@ -38,11 +39,6 @@ theorem contDiff_gaussianFun : ContDiff ℝ ∞ (gaussianFun (E := E)) :=
   Complex.ofRealCLM.contDiff.comp
     (Real.contDiff_exp.comp (contDiff_const.mul (contDiff_norm_sq ℝ)))
 
-theorem norm_iteratedFDeriv_exp (i : ℕ) (y : ℝ) :
-    ‖iteratedFDeriv ℝ i Real.exp y‖ = Real.exp y := by
-  rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv, iteratedDeriv_eq_iterate, Real.iter_deriv_exp,
-    Real.norm_eq_abs, abs_of_pos (Real.exp_pos y)]
-
 theorem norm_iteratedFDeriv_gaussian_le (n : ℕ) :
     ∃ (C : ℝ) (k : ℕ), 0 ≤ C ∧ ∀ x : E, ‖iteratedFDeriv ℝ n (gaussianFun (E := E)) x‖ ≤
       C * (1 + ‖x‖) ^ k * Real.exp (-π * ‖x‖ ^ 2) := by
@@ -56,7 +52,7 @@ theorem norm_iteratedFDeriv_gaussian_le (n : ℕ) :
   have hD1 : 1 ≤ D := one_le_mul_of_one_le_of_one_le (le_max_right _ _) hx1
   have hcomp : ‖iteratedFDeriv ℝ n (Real.exp ∘ q) x‖ ≤ n ! * Real.exp (q x) * D ^ n := by
     refine norm_iteratedFDeriv_comp_le Real.contDiff_exp hqs (by exact_mod_cast le_top) x
-      (fun i _ ↦ (norm_iteratedFDeriv_exp i (q x)).le) fun i hi1 hin ↦ ?_
+      (fun i _ ↦ (Real.norm_iteratedFDeriv_exp i (q x)).le) fun i hi1 hin ↦ ?_
     calc ‖iteratedFDeriv ℝ i q x‖ ≤ C * (1 + ‖x‖) ^ k := hb i hin x
       _ ≤ D := mul_le_mul_of_nonneg_right (le_max_left _ _) (by positivity)
       _ ≤ D ^ i := le_self_pow₀ hD1 (Nat.ne_of_gt hi1)

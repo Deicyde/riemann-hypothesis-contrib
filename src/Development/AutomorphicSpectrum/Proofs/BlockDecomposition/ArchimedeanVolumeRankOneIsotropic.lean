@@ -29,6 +29,7 @@ import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HypOneZeroZero
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHomeomorphRankOneTuples
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianRankOneHomeomorphBase
 import Mathlib.Tactic.Linter.Style
+public import Lemmata.MeasurePi
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanRankOneFreeOfPlaces, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanRankOneVolumeBound, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DisintegrationInjectiveOpenMap, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.QuadraticBoxIntegralSmallBall, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.QuadraticBoxVolumeBound, Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanVolumeRankOneIsotropic
@@ -969,14 +970,6 @@ open scoped ENNReal NNReal Matrix
 noncomputable section
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Inf0.RealBox
 
-theorem pi_smul_const_family {P : Type} [Fintype P] {X : P → Type} [∀ i, MeasurableSpace (X i)]
-    (μ : ∀ i, Measure (X i)) [∀ i, SigmaFinite (μ i)] (c : P → ℝ≥0) :
-    Measure.pi (fun i => c i • μ i) = (∏ i, c i) • Measure.pi μ := by
-  haveI : ∀ i, SigmaFinite (c i • μ i) := fun i => inferInstance
-  refine Measure.pi_eq fun s _ => ?_
-  simp only [Measure.smul_apply, Measure.pi_pi, ENNReal.smul_def, smul_eq_mul,
-    Finset.prod_mul_distrib, ENNReal.ofNNReal_finsetProd]
-
 theorem map_pi_smul {P : Type} [Fintype P] (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E]
     [MeasureSpace E] [BorelSpace E] [FiniteDimensional ℝ E]
     [(volume : Measure E).IsAddHaarMeasure] (r : P → ℝ) (hr : ∀ w, 0 < r w) :
@@ -995,7 +988,7 @@ theorem map_pi_smul {P : Type} [Fintype P] (E : Type) [NormedAddCommGroup E] [No
   beta_reduce at hmap
   rw [volume_pi, hmap]
   simp only [hc]
-  rw [GlobalTheory.CompanionTheory.WeilSiegel.Inf0.RealBox.pi_smul_const_family, ← Real.toNNReal_prod_of_nonneg
+  rw [MeasureTheory.Measure.pi_nnreal_smul, ← Real.toNNReal_prod_of_nonneg
     (fun w _ => (inv_pos.mpr (pow_pos (hr w) (Module.finrank ℝ E))).le)]
   ext s _
   rw [Measure.smul_apply, Measure.smul_apply, ENNReal.smul_def, ENNReal.ofReal]

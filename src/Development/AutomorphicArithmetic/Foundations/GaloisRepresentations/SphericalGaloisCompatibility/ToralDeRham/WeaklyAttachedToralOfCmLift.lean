@@ -54,6 +54,7 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
 import GroundTheory.GlobalFields.ExistenceTheorem.ExistsIsAbelianGaloisRangeIdeleClassNormEqOfFini
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZTypeD
 import Mathlib.Tactic.Linter.Style
+public import Lemmata.SolvableNormalPrimeIndex
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpenGaloisSubgroupTraceNeZero, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpenGaloisSubgroupTraceNeZeroStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.EqOneOfCharpoly, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpenSubgroupWeilElementCharacterKernel, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpenSubgroupWeilElementCharacterKernelStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSolvableCmExtensionAbelianCompletionStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSolvableCmExtensionSplitPlaceStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsWeilGroupRestrictExtensionStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemWeilGroupAtPlaceOfFixesExtensionStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsCharacterSupportBaseChangeLiftDegreeOneStatement, Development.AbelianVarietyTheory.Proofs.SatakeParameters.SolvableAscentInduction, Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteOrderHeckeCharGalois, Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContinuousResI, Development.AbelianVarietyTheory.Proofs.SatakeParameters.NormCharacterGaloisCofinite, Development.AbelianVarietyTheory.Proofs.SatakeParameters.TraceEqZeroOffSubgroupOfSelfTwist, Development.AbelianVarietyTheory.Proofs.SatakeParameters.TraceEqZeroOffSubgroupOfSelfTwistStatement, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.SphericalGaloisCompatibility.ToralDeRham.ExistsCuspidalCharLiftOfSolvableCmExtension, Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.SphericalGaloisCompatibility.ToralDeRham.WeaklyAttachedToralOfCmLift
@@ -461,31 +462,6 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.SolvUp
-
-theorem exists_normal_prime_index (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial Γ] [Group.IsSolvable Γ] :
-    ∃ H : Subgroup Γ, H.Normal ∧ H.index.Prime := by
-  obtain ⟨H, hH, hle⟩ := (eq_top_or_exists_le_coatom (commutator Γ)).resolve_left
-    (Group.IsSolvable.commutator_lt_top_of_nontrivial Γ).ne
-  have hn : H.Normal := ⟨fun n hn g => by
-    have h1 : g * n * g⁻¹ * n⁻¹ ∈ H :=
-      hle (Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n))
-    simpa using H.mul_mem h1 hn⟩
-  refine ⟨H, hn, ?_⟩
-  obtain ⟨p, hp, hd⟩ := Nat.exists_prime_and_dvd (n := Nat.card (Γ ⧸ H)) (mt Subgroup.index_eq_one.1 hH.1)
-  haveI := Fact.mk hp
-  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hd
-  have h1 : (Subgroup.zpowers g).comap (QuotientGroup.mk' H) = ⊤ := by
-    refine hH.2 _ (lt_of_le_of_ne (fun x hx => ?_) fun e => ?_)
-    · rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).2 hx]
-      exact one_mem _
-    · obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective H g
-      have hx : x ∈ H := e ▸ Subgroup.mem_zpowers _
-      rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).2 hx, orderOf_one] at hg
-      exact hp.one_lt.ne hg
-  have h2 : Subgroup.zpowers g = ⊤ :=
-    Subgroup.comap_injective (QuotientGroup.mk'_surjective H) (h1.trans (Subgroup.comap_top _).symm)
-  rw [Subgroup.index, ← Subgroup.card_top, ← h2, Nat.card_zpowers, hg]
-  exact hp
 
 theorem isCMField_of_ringEquiv {A B : Type} [Field A] [NumberField A] [Field B] [NumberField B] [IsCMField A]
     (e : A ≃+* B) : IsCMField B := by
@@ -901,7 +877,7 @@ theorem isWeaklyAttached_of_cmBaseChange_of_finrank (hI : UpperTheory.Gal.ToralG
     rw [← Finite.one_lt_card_iff_nontrivial, IsGalois.card_aut_eq_finrank]
     have := Module.finrank_pos (R := K) (M := M)
     omega
-  obtain ⟨H, hH, hp⟩ := GlobalTheory.SolvUp.exists_normal_prime_index (M ≃ₐ[K] M)
+  obtain ⟨H, hH, hp⟩ := Group.IsSolvable.exists_normal_subgroup_index_prime (M ≃ₐ[K] M)
   let K₁ := IntermediateField.fixedField H
   haveI : IsGalois K K₁ := IsGalois.of_fixedField_normal_subgroup H
   haveI : IsCMField K₁ := GlobalTheory.SolvUp.isCMField_intermediate Ω K M K₁
