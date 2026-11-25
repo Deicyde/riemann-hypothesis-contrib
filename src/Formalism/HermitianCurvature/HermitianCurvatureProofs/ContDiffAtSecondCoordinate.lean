@@ -66,11 +66,7 @@ variable [DecidableEq m]
 
 theorem cd_det {f : E → Matrix m m ℂ} (hf : MS f x) : ContDiffAt ℝ ∞ (fun y => (f y).det) x := by
   simp only [Matrix.det_apply']
-  refine ContDiffAt.sum fun σ _ => contDiffAt_const.mul ?_
-  have key : ContDiffAt ℝ ∞ (∏ i, fun y => f y (σ i) i) x :=
-    Finset.prod_induction _ (fun g => ContDiffAt ℝ ∞ g x) (fun a b ha hb => ha.mul hb)
-      contDiffAt_const (fun i _ => hf _ _)
-  rwa [Finset.prod_fn] at key
+  exact ContDiffAt.sum fun σ _ => contDiffAt_const.mul (contDiffAt_prod fun i _ => hf _ _)
 
 theorem ms_updateRow {f : E → Matrix m m ℂ} (hf : MS f x) (j : m) (v : m → ℂ) :
     MS (fun y => (f y).updateRow j v) x := fun i k => by
