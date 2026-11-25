@@ -110,21 +110,16 @@ theorem polySlices : ∀ (T M ι : Type) [AddCommGroup T] [Module ℂ T] [AddCom
       rintro _ ⟨i, x, hx, rfl⟩
       exact Submodule.subset_span ⟨i, C x, hN x hx, hs i x⟩)
     exact fun y hy => this hy
-  have hpow : ∀ i (n : ℕ) x, s i ((C ^ n) x) = (D ^ n) (s i x) := by
-    intro i n
-    induction n with
-    | zero => intro x; rfl
-    | succ n ih => intro x; rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, ih, hs]
+  have hpow : ∀ i (n : ℕ) x, s i ((C ^ n) x) = (D ^ n) (s i x) := fun i n x =>
+    (LinearMap.congr_fun (Module.End.commute_pow_left_of_commute (f := s i) (g := C) (g₂ := D)
+      (LinearMap.ext (hs i)) n) x).symm
   have hev : ∀ i (q : Polynomial ℂ) x, s i (Polynomial.aeval C q x) = Polynomial.aeval D q (s i x) := by
     intro i q x
     rw [Polynomial.aeval_eq_sum_range, Polynomial.aeval_eq_sum_range]
 
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hpow]
-  have hpow2 : ∀ (n : ℕ) (y : U), (((D.restrict hD ^ n) y : U) : M) = (D ^ n) y := by
-    intro n
-    induction n with
-    | zero => intro x; rfl
-    | succ n ih => intro x; rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, ih]; rfl
+  have hpow2 : ∀ (n : ℕ) (y : U), (((D.restrict hD ^ n) y : U) : M) = (D ^ n) y := fun n y => by
+    rw [Module.End.pow_restrict]; rfl
   have hev2 : ∀ (q : Polynomial ℂ) (y : U), ((Polynomial.aeval (D.restrict hD) q y : U) : M) = Polynomial.aeval D q y := by
     intro q y
     rw [Polynomial.aeval_eq_sum_range, Polynomial.aeval_eq_sum_range]
