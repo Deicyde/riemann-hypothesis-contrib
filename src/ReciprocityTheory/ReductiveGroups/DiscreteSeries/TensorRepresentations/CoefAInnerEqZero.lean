@@ -43,12 +43,9 @@ theorem coefA_decomp {T : X →ₗ[ℂ] X} (hT : ∀ x y, inner ℂ (T x) y = in
 
 theorem coefA_inner_eq_zero {T : X →ₗ[ℂ] X} (hT : ∀ x y, inner ℂ (T x) y = inner ℂ x (T y))
     {u v : X} {α β : ℝ} (hu : T u = (α : ℂ) • u) (hv : T v = (β : ℂ) • v) (hne : α ≠ β) :
-    inner ℂ u v = 0 := by
-  have h := hT u v
-  rw [hu, hv, inner_smul_left, inner_smul_right, Complex.conj_ofReal] at h
-  have hne' : (α : ℂ) - β ≠ 0 := sub_ne_zero.mpr (by exact_mod_cast hne)
-  have h0 : ((α : ℂ) - β) * inner ℂ u v = 0 := by rw [sub_mul, h, sub_self]
-  exact (mul_eq_zero.mp h0).resolve_left hne'
+    inner ℂ u v = 0 :=
+  LinearMap.IsSymmetric.orthogonalFamily_eigenspaces hT (Complex.ofReal_injective.ne hne)
+    ⟨u, Module.End.mem_eigenspace_iff.2 hu⟩ ⟨v, Module.End.mem_eigenspace_iff.2 hv⟩
 
 end Spec
 
