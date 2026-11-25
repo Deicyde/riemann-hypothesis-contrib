@@ -138,44 +138,8 @@ theorem unique (hM : M.IsLB) (h : SecCoord M th x v) {v' : I → R} (h' : SecCoo
     ∃ u : Rˣ, ∀ i, v' i = u * v i := by
   obtain ⟨τ, hτ, h⟩ := h
   obtain ⟨τ', hτ', h'⟩ := h'
-  have hcov : (⊤ : (Sp R).Opens) ≤ iSup (M.pull x).U := by
-    intro y _
-    obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 (hM.cover.ge (show x y ∈ (⊤ : X.Opens) from trivial))
-    exact TopologicalSpace.Opens.mem_iSup.2 ⟨fun _ => i, mem_pull.2 hi⟩
-  have global : ∃ w : Γ(Sp R, ⊤)ˣ, ∀ j, τ.s j = res (le_top : (M.pull x).U j ≤ ⊤) w * τ'.s j := by
-    let u : ∀ j, Γ((Sp R), (M.pull x).U j)ˣ := fun j => τ.s j * (τ'.s j)⁻¹
-    have compat : ∀ i j, res (inf_le_left : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U i) (u i) =
-        res (inf_le_right : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U j) (u j) := by
-      intro i j
-      simp only [u, map_mul, map_inv, hτ i j, hτ' i j, mul_inv]
-      simp only [_root_.mul_mul_mul_comm, mul_inv_cancel, _root_.one_mul]
-    have glue : ∀ (v : ∀ j, Γ((Sp R), (M.pull x).U j)ˣ),
-        (∀ i j, res (inf_le_left : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U i) (v i) =
-          res (inf_le_right : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U j) (v j)) →
-        ∃ s : Γ((Sp R), ⊤), ∀ j, resG (Sp R) (le_top : (M.pull x).U j ≤ ⊤) s = (v j).val := by
-      intro v hv
-      exact (TopCat.Sheaf.existsUnique_gluing' (Sp R).sheaf (M.pull x).U ⊤ (fun _ => homOfLE le_top) hcov _ (by
-          intro i j
-          exact congrArg Units.val (hv i j))).exists
-    obtain ⟨s, hs⟩ := glue u compat
-    have compaτ' : ∀ i j, res (inf_le_left : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U i) ((u i)⁻¹) =
-        res (inf_le_right : (M.pull x).U i ⊓ (M.pull x).U j ≤ (M.pull x).U j) ((u j)⁻¹) := by
-      intro i j
-      rw [map_inv, map_inv, compat]
-    obtain ⟨s', hs'⟩ := glue (fun j => (u j)⁻¹) compaτ'
-    have hss : s * s' = 1 := by
-      apply (Sp R).sheaf.eq_of_locally_eq' (M.pull x).U ⊤ (fun _ => homOfLE le_top) hcov
-      intro j
-      change resG (Sp R) (le_top : (M.pull x).U j ≤ ⊤) (s * s') = resG (Sp R) (le_top : (M.pull x).U j ≤ ⊤) 1
-      rw [map_mul, map_one, hs, hs']
-      exact Units.mul_inv (u j)
-    let w : Γ((Sp R), ⊤)ˣ := ⟨s, s', hss, by simpa [mul_comm] using hss⟩
-    refine ⟨w, fun j => ?_⟩
-    have hw : res (le_top : (M.pull x).U j ≤ ⊤) w = u j := Units.ext (hs j)
-    rw [hw]
-    change τ.s j = (τ.s j * (τ'.s j)⁻¹) * τ'.s j
-    simp
-  obtain ⟨w, hw⟩ := global
+  have hcov := le_iSup_chart (pull_isLB hM x)
+  obtain ⟨w, hw⟩ := exists_global_unit (pull_isLB hM x) hτ hτ'
   refine ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom.toMonoidHom w, fun i => ?_⟩
   have key : (Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom (v' i) =
       w.val * (Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom (v i) := by
