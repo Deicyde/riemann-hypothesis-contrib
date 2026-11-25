@@ -195,31 +195,13 @@ theorem w_eq_count (ψ : E →+* k) (hψ : Function.Injective ψ) (hP0 : primeOf
     rw [map_mul, WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ ha))
       ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ hb))]
     ring
-  have hspan : ∀ z : 𝓞 E, z ≠ 0 → Ideal.span {z} ≠ 0 := fun z hz => by
-    rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hz
-  have hP2 : P ^ 2 < P := by
-    refine lt_of_le_of_ne (Ideal.pow_le_self two_ne_zero) fun heq => ?_
-    have h1 : P * P = P * ⊤ := by rw [← sq, heq, Ideal.mul_top]
-    exact hPp.ne_top (mul_left_cancel₀ (by rwa [Ne, Ideal.zero_eq_bot]) h1)
+  have hP2 : P ^ 2 < P := Ideal.pow_lt_self P hP0 hPp.ne_top 2 le_rfl
 
   obtain ⟨π, hπP, hπ2⟩ := SetLike.exists_of_lt hP2
   have hπ0 : π ≠ 0 := by rintro rfl; exact hπ2 (Submodule.zero_mem _)
-  have hcπ : (normalizedFactors (Ideal.span {π})).count P = 1 := by
-    have h1 := mem_factors_of_mem hPp hP0 hπ0 hπP
-    by_contra hne
-    apply hπ2
-    have h2 : Multiset.replicate 2 P ≤ normalizedFactors (Ideal.span {π}) := by
-      rw [Multiset.le_iff_count]
-      intro Q
-      rw [Multiset.count_replicate]
-      split_ifs with hQ
-      · subst hQ; omega
-      · exact Nat.zero_le _
-    have h3 : P ^ 2 ∣ Ideal.span {π} := by
-      have := Multiset.prod_dvd_prod_of_le h2
-      rw [Multiset.prod_replicate] at this
-      exact this.trans (UniqueFactorizationMonoid.prod_normalizedFactors (hspan π hπ0)).dvd
-    exact (Ideal.le_of_dvd h3) (Ideal.mem_span_singleton_self π)
+  have hcπ : (normalizedFactors (Ideal.span {π})).count P = 1 :=
+    Ideal.count_normalizedFactors_eq (by rwa [pow_one, Ideal.span_singleton_le_iff_mem])
+      fun h => hπ2 ((Ideal.span_singleton_le_iff_mem _).1 h)
 
   obtain ⟨A, hA⟩ := Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hπP)
   have hAP : ¬ A ≤ P := by
@@ -269,11 +251,7 @@ theorem exists_delta_count {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ �
   set Dif := differentIdeal ℤ (𝓞 E) with hDif
   have hD0 : Dif ≠ ⊥ := differentIdeal_ne_bot
 
-  have hlt : Dif * P < Dif := by
-    refine lt_of_le_of_ne Ideal.mul_le_left fun heq => ?_
-    have h1 : Dif * P = Dif * ⊤ := by rw [heq, Ideal.mul_top]
-    have := mul_left_cancel₀ (by rwa [Ne, Ideal.zero_eq_bot]) h1
-    exact hP.ne_top this
+  have hlt : Dif * P < Dif := Ideal.dvdNotUnit_iff_lt.mp ⟨hD0, P, mt Ideal.isUnit_iff.mp hP.ne_top, rfl⟩
   obtain ⟨δ, hδD, hδP⟩ := SetLike.exists_of_lt hlt
   have hδ0 : δ ≠ 0 := by rintro rfl; exact hδP (Submodule.zero_mem _)
   refine ⟨δ, hδD, hδ0, ?_⟩
