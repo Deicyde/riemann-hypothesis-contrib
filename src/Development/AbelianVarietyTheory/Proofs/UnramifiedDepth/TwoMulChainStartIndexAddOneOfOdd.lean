@@ -239,10 +239,8 @@ variable {G : _root_.Formalism.L2.FormalSeriesBounds.Cart V d I J} {S : _root_.F
 theorem _root_.GlobalTheory.MainTerm.isSat_tan (S : _root_.Formalism.L2.FormalSeriesBounds.Sys G) {N : ℕ} (em : Fin N ↪ I) :
     _root_.Formalism.L2.FormalSeriesBounds.IsSat V (fun δ => S.tan (em δ)) := by
   have hu : V.v (Matrix.of S.tan).det = 0 := S.unimod
-  have hdet : (Matrix.of S.tan).det ≠ 0 := by
-    intro h0
-    rw [h0, AddValuation.map_zero] at hu
-    simp at hu
+  have hdet : (Matrix.of S.tan).det ≠ 0 :=
+    (AddValuation.ne_top_iff V.v).1 (ne_of_eq_of_ne hu WithTop.zero_ne_top)
   have hint : ∀ x y, V.Ge 0 (Matrix.of S.tan x y) :=
     fun x y => _root_.GlobalTheory.MainTerm.tan_int S x y
   unfold _root_.Formalism.L2.FormalSeriesBounds.IsSat
