@@ -118,7 +118,7 @@ theorem exists_nStage_act {B : Base} {C C₀ : Cols B} {W₀ : RowsRest B C₀} 
   choose e hee using hy
   let tw := GaloisStage.nTw B.LL0 nd
   have hT' : IsEmpty tw.Tw := ⟨fun i : Empty => i.elim⟩
-  obtain ⟨Y, hY, ⟨th⟩⟩ := exists_nexp_nth_of_isEmpty B C W nd tw hT' e
+  obtain ⟨Y, rfl, ⟨th⟩⟩ := exists_nexp_nth_of_isEmpty B C W nd tw hT' e
   exact ⟨{
     toLocStage := L
     nd := nd
@@ -128,7 +128,7 @@ theorem exists_nStage_act {B : Base} {C C₀ : Cols B} {W₀ : RowsRest B C₀} 
     nexp := Y
     ntypes := T
     nStage_trivialCharacter_compat := htie
-    nStage_trivialCharacter_coeff_eq := fun g => by rw [hY]; exact hee g
+    nStage_trivialCharacter_coeff_eq := hee
     nth := th
     nbr := fun i => hE.elim i
     nbr_ind := fun i => hE.elim i
