@@ -276,12 +276,7 @@ omit [NumberField E] [_root_.NumberField.IsTotallyComplex E] in
 theorem rpow_inv_le_one_add (y : ℝ) (hy : 0 ≤ y) (k : ℕ) : y ^ ((k : ℝ)⁻¹) ≤ 1 + y := by
   rcases le_total y 1 with h | h
   · have := Real.rpow_le_one hy h (by positivity : (0 : ℝ) ≤ (k : ℝ)⁻¹); linarith
-  · have hr : (k : ℝ)⁻¹ ≤ 1 := by
-      rcases Nat.eq_zero_or_pos k with rfl | hk
-      · simp
-      · exact inv_le_one_of_one_le₀ (by exact_mod_cast hk)
-    have := Real.rpow_le_rpow_of_exponent_le h hr
-    rw [Real.rpow_one] at this; linarith
+  · have := Real.rpow_le_self_of_one_le h (Nat.cast_inv_le_one k); linarith
 
 theorem infinite_place_prod_le (L T : ℝ) (hL : 0 ≤ L) (hLT : L ≤ T) :
     (∏ w : InfinitePlace E, (√k * (k * L)) ^ w.mult) ≤
