@@ -18,11 +18,7 @@ private theorem exists_conj (K : Type) [Field K] [NumberField K] (h : Module.fin
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h⟩
   have hc : Fintype.card (K ≃ₐ[ℚ] K) = 2 := by
     rw [← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank, h]
-  obtain ⟨t, ht⟩ : ∃ t : K ≃ₐ[ℚ] K, t ≠ 1 := by
-    by_contra! hne
-    have : Fintype.card (K ≃ₐ[ℚ] K) ≤ 1 := Fintype.card_le_one_iff.mpr fun a b => by
-      rw [hne a, hne b]
-    omega
+  obtain ⟨t, ht⟩ := Fintype.exists_ne_of_one_lt_card (by omega) (1 : K ≃ₐ[ℚ] K)
   have huniq : ∀ s : K ≃ₐ[ℚ] K, s ≠ 1 → s = t := by
     intro s hs
     by_contra hst
