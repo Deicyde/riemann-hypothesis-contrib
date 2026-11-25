@@ -16,13 +16,8 @@ section Chars
 
 variable {O k : Type} [CommRing O] [StarRing O] [CommRing k] [Algebra ℚ k]
 
-theorem two_mul_eq_zero {x : k} (h : 2 * x = 0) : x = 0 := by
-  have h2 : algebraMap ℚ k (1 / 2) * 2 = 1 := by
-    rw [show (2 : k) = algebraMap ℚ k 2 from (map_ofNat (algebraMap ℚ k) 2).symm, ← map_mul]
-    norm_num
-  calc x = (algebraMap ℚ k (1 / 2) * 2) * x := by rw [h2, one_mul]
-    _ = algebraMap ℚ k (1 / 2) * (2 * x) := by ring
-    _ = 0 := by rw [h, mul_zero]
+theorem two_mul_eq_zero {x : k} (h : 2 * x = 0) : x = 0 :=
+  ((two_ne_zero : (2 : ℚ) ≠ 0).isUnit.map (algebraMap ℚ k)).mul_right_eq_zero.1 (by rwa [map_ofNat])
 
 theorem pair_prod (c : k) (s s' : O →+* k)
     (h : ∀ a, c * (s a * s (star a) + s' a * s' (star a) - 2 * s a * s' a) = 0) (a : O) :
@@ -134,14 +129,9 @@ theorem eq_zero_of_pow_sub {n : ℕ} (hn : n ≠ 2) {x : k} (h : ((2 : k) ^ n - 
     intro h0
     have h4 : (2 : ℚ) ^ n = 2 ^ 2 := by linarith
     exact hn (Nat.pow_right_injective (le_refl 2) (by exact_mod_cast h4))
-  have e : algebraMap ℚ k ((2 : ℚ) ^ n - 4) * x = 0 := by
-    rw [map_sub, map_pow, map_ofNat (algebraMap ℚ k) 2, map_ofNat (algebraMap ℚ k) 4]
-    exact h
-  calc x = algebraMap ℚ k (((2 : ℚ) ^ n - 4)⁻¹ * ((2 : ℚ) ^ n - 4)) * x := by
-        rw [inv_mul_cancel₀ hq, map_one, one_mul]
-    _ = algebraMap ℚ k (((2 : ℚ) ^ n - 4)⁻¹) * (algebraMap ℚ k ((2 : ℚ) ^ n - 4) * x) := by
-        rw [map_mul, mul_assoc]
-    _ = 0 := by rw [e, mul_zero]
+  refine (hq.isUnit.map (algebraMap ℚ k)).mul_right_eq_zero.1 ?_
+  rw [map_sub, map_pow, map_ofNat (algebraMap ℚ k) 2, map_ofNat (algebraMap ℚ k) 4]
+  exact h
 
 end Series
 
