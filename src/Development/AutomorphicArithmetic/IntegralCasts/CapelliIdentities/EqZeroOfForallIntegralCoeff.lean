@@ -172,11 +172,7 @@ private noncomputable def detPow (m : ℤ) : C(U2, ℂ) :=
 
 private theorem star_eq (k : U2) :
     star k.1 = (k.1.det)⁻¹ • k.1.adjugate := by
-  have h1 : star k.1 * k.1 = 1 := Matrix.mem_unitaryGroup_iff'.1 k.2
-  have h2 : star k.1 * (k.1 * k.1.adjugate) = k.1.adjugate := by
-    rw [← mul_assoc, h1, one_mul]
-  rw [Matrix.mul_adjugate, Matrix.mul_smul, mul_one] at h2
-  rw [← h2, smul_smul, inv_mul_cancel₀ (det_ne k), one_smul]
+  rw [← Matrix.inv_eq_left_inv (Matrix.mem_unitaryGroup_iff'.1 k.2), Matrix.inv_def, Ring.inverse_eq_inv]
 
 open UpperTheory.Reformulated.B.Gwa7 in
 private theorem entry_lin [CompactSpace U2] (i j : Fin 2) : ∃ a b c d : ℂ,
