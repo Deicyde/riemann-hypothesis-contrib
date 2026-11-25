@@ -38,11 +38,8 @@ theorem lword_cons (p : Fin n × Fin n) (r : List (Fin n × Fin n)) (y : M) :
 theorem isRaising_nil : IsRaising ([] : List (Fin n × Fin n)) := fun _ h => by simp at h
 
 theorem isRaising_cons {p : Fin n × Fin n} {r : List (Fin n × Fin n)} (hp : p.1 < p.2)
-    (hr : IsRaising r) : IsRaising (p :: r) := by
-  intro q hq
-  rcases List.mem_cons.mp hq with h | h
-  · subst h; exact hp
-  · exact hr q h
+    (hr : IsRaising r) : IsRaising (p :: r) :=
+  List.forall_mem_cons.2 ⟨hp, hr⟩
 
 theorem word_mem {r : List (Fin n × Fin n)} (hr : IsRaising r) : lword L r Φ ∈ raiseSpan L Φ :=
   Submodule.subset_span ⟨r, hr, rfl⟩
