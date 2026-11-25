@@ -57,14 +57,8 @@ theorem ae_UH_of_quot {μG μS νq : Measure (Formalism.QuantumDeterminants.Mt k
   have hBm : MeasurableSet B := uh_measurableSet
   have key := hq (B.indicator 1) (measurable_one.indicator hBm)
   rw [lintegral_indicator_one hBm, hG] at key
-  have hc : μS Bᶜ ≠ 0 := by
-    intro h0
-    apply hS0
-    rw [← Measure.measure_univ_eq_zero]
-    refine le_antisymm ?_ zero_le
-    calc μS Set.univ = μS (B ∪ Bᶜ) := by rw [Set.union_compl_self]
-      _ ≤ μS B + μS Bᶜ := measure_union_le _ _
-      _ = 0 := by rw [hS, h0, add_zero]
+  have hc : μS Bᶜ ≠ 0 := fun h0 => hS0 (Measure.measure_univ_eq_zero.mp (by
+    rw [← Set.union_compl_self B]; exact measure_union_null hS h0))
   have hle : ∀ x, μS Bᶜ * B.indicator 1 x ≤
       ∫⁻ s, B.indicator 1 (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS := by
     intro x
