@@ -332,16 +332,7 @@ theorem rapid_of_compact {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
 theorem hermGroup {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (R : Type) [CommRing R]
     [Algebra F R] [TopologicalSpace R] (n : ℕ) : IsTopologicalAddGroup (HermR R σ n) := by
   have : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
-  have : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R (R ⊗[F] E)
-  have : ContinuousSMul R (R ⊗[F] E) := IsModuleTopology.toContinuousSMul R (R ⊗[F] E)
-  have : ContinuousNeg (R ⊗[F] E) := by
-    refine ⟨?_⟩
-    have hn : (fun x : R ⊗[F] E => -x) = fun x => (-1 : R) • x :=
-      funext fun x => (neg_one_smul R x).symm
-    rw [hn]
-    exact continuous_const_smul _
-  have : IsTopologicalAddGroup (R ⊗[F] E) :=
-    { toContinuousAdd := inferInstance, toContinuousNeg := inferInstance }
+  have := IsModuleTopology.isTopologicalAddGroup R (R ⊗[F] E)
   infer_instance
 
 section Sd
