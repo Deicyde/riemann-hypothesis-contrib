@@ -116,12 +116,7 @@ theorem shifted_points_integral : ShiftPtsInt := by
     exact Formalism.ELL.formal_group_points_no_torsion.{0} K W hM hΔ
   refine ⟨fun Q hQ hQ0 => hTor Q _ hcard (card_kill A Q hQ) hQ0, fun P hP => ?_⟩
   have hS0 : S ≠ 0 := fun h => hSA (h ▸ A.zero_mem)
-  have hPS0 : P + S ≠ 0 := by
-    intro h
-    apply hSA
-    have : S = -P := by rw [eq_neg_iff_add_eq_zero, add_comm]; exact h
-    rw [this]
-    exact A.neg_mem hP
+  have hPS0 : P + S ≠ 0 := fun h => hSA ((add_mem_cancel_left hP).1 (by rw [h]; exact A.zero_mem))
   have hx : ‖px W (P + S)‖ ≤ 1 := by
     by_contra hx
     push Not at hx
@@ -152,12 +147,8 @@ theorem shift_unit' : ShiftUnit := by
   intro K _ _ _ W hW A _ hcard S hSA hAint hSint H c hsys
   obtain ⟨hH0, hc0, hid⟩ := hsys
   obtain ⟨-, -, -, -, uC⟩ := unitAtRules K
-  have hS0 : ∀ P ∈ A, P + S ≠ 0 := by
-    intro P hP h
-    apply hSA
-    have : S = -P := by rw [eq_neg_iff_add_eq_zero, add_comm]; exact h
-    rw [this]
-    exact A.neg_mem hP
+  have hS0 : ∀ P ∈ A, P + S ≠ 0 := fun P hP h =>
+    hSA ((add_mem_cancel_left hP).1 (by rw [h]; exact A.zero_mem))
   have hfac : ∀ P ∈ A, ∀ Q ∈ A, Q ≠ 0 → UnitAt 0 (C (px W Q) - xT W (P + S)) := by
     intro P hP Q hQ hQ0
     have e1 : P + S + Q = (P + Q) + S := by abel
