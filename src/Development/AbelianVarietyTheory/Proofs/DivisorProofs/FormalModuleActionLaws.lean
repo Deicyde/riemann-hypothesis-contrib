@@ -46,11 +46,8 @@ theorem exists_mem_pow_add_eq_one : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (
   have hpQ : ((p : 𝓞 D.F ⧸ w0)) = 0 := by
     rw [← map_natCast (Ideal.Quotient.mk w0), Ideal.Quotient.eq_zero_iff_mem]; exact hw.2.1
   haveI : CharP (𝓞 D.F ⧸ w0) p := (CharP.charP_iff_prime_eq_zero (Fact.out)).mpr hpQ
-  have hne : w0 ≠ ⊥ := by
-    intro h
-    have h1 := hw.2.1
-    rw [h, Ideal.mem_bot] at h1
-    exact (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) h1
+  have hne : w0 ≠ ⊥ :=
+    (Submodule.ne_bot_iff w0).2 ⟨_, hw.2.1, Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero⟩
   haveI : Finite (𝓞 D.F ⧸ w0) := Ideal.finiteQuotientOfFreeOfNeBot w0 hne
   letI : Algebra (ZMod p) (𝓞 D.F ⧸ w0) := ZMod.algebra _ p
   letI : Algebra (ZMod p) k := ZMod.algebra _ p
@@ -79,9 +76,7 @@ theorem exists_mem_pow_add_eq_one : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (
       push_cast
       linear_combination (-((D.tr : k) - 2 * β b.ρ)) * hmem - 4 * hρ
     exact D.disc_p ((CharP.intCast_eq_zero_iff k p _).mp hd)
-  have hJr : w0 ^ r ⊔ J = ⊤ := by
-    have h := Ideal.isCoprime_iff_sup_eq.mpr hJ
-    exact Ideal.isCoprime_iff_sup_eq.mp h.pow_left
+  have hJr : w0 ^ r ⊔ J = ⊤ := Ideal.pow_sup_eq_top hJ
   obtain ⟨c, hc, j, hj, hcj⟩ := Submodule.mem_sup.mp (hJr ▸ Submodule.mem_top : (1 : 𝓞 D.F) ∈ w0 ^ r ⊔ J)
   obtain ⟨e, f, hef⟩ := Ideal.mem_span_pair.mp hj
   exact ⟨c, hc, e, f, by rw [add_assoc, hef, hcj]⟩
