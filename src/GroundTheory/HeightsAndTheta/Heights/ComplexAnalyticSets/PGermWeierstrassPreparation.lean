@@ -41,13 +41,8 @@ theorem natCast_eq_of_norm_sub_lt_one {m n : ℕ} (h : ‖(m : ℂ) - n‖ < 1) 
   omega
 
 theorem esymm_replicate_zero {n k : ℕ} (hk : 1 ≤ k) : (Multiset.replicate n (0 : ℂ)).esymm k = 0 := by
-  unfold Multiset.esymm
-  refine Multiset.sum_eq_zero fun x hx => ?_
-  obtain ⟨t, ht, rfl⟩ := Multiset.mem_map.1 hx
-  obtain ⟨hle, hcard⟩ := Multiset.mem_powersetCard.1 ht
-  have : t = Multiset.replicate k 0 :=
-    Multiset.eq_replicate.2 ⟨hcard, fun b hb => Multiset.eq_of_mem_replicate (Multiset.mem_of_le hle hb)⟩
-  rw [this, Multiset.prod_replicate, zero_pow (by omega)]
+  have h := Multiset.pow_smul_esymm (0 : ℂ) k (Multiset.replicate n (0 : ℂ))
+  rwa [zero_pow (by omega), zero_smul, Multiset.map_replicate, smul_zero, eq_comm] at h
 
 theorem weierstrassPolynomial_eq_prod {σ : Type} {d : ℕ} (c : Fin d → (σ → ℂ) → ℂ) (z : σ → ℂ)
     (Z : Multiset ℂ) (hZ : Multiset.card Z = d)
