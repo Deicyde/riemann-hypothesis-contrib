@@ -53,10 +53,7 @@ private theorem finiteRing_sq_sub_mul_sq_eq_of_card (σ : SmIrr (GL (Fin 2) k)) 
       ((μ₁ a * μ₂ d : ℂˣ) : ℂ) * L v) :
     IsSmoothChar μ₁ ∧ IsSmoothChar μ₂ ∧ IsSubquotient σ.ρ (Hi.PS ![μ₁ * absPow k (-1), μ₂]) ∧
       ∀ (z : kˣ) v, σ.ρ (GeneralLinearGroup.scalar (Fin 2) z) v = ((μ₁ z * μ₂ z : ℂˣ) : ℂ) • v := by
-  obtain ⟨v₀, hv₀⟩ : ∃ v, L v ≠ 0 := by
-    by_contra hc
-    push Not at hc
-    exact hL (LinearMap.ext hc)
+  obtain ⟨v₀, hv₀⟩ : ∃ v, L v ≠ 0 := DFunLike.ne_iff.mp hL
   have hst : ∀ a d : kˣ, σ.ρ (diagT k (Fin 2) ![a, d]) v₀ = v₀ → μ₁ a * μ₂ d = 1 := by
     intro a d had
     have := h a d 0 v₀
