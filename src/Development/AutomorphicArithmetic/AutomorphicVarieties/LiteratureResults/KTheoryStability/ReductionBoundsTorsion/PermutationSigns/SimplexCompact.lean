@@ -61,17 +61,7 @@ theorem actL_sec {h : HS L N} (hh : h ∈ Pos L N) : actL (sec h) h = (one L N).
   Classical.epsilon_spec (trans_pos hh)
 
 private theorem actL_inv_actL' (g : Gp L N) (h : HS L N) : actL g⁻¹ (actL g h) = h := by
-  refine HS_ext fun w => ?_
-  rw [mat_actL_eq_conjTranspose_inv_mul_mul_inv, mat_actL_eq_conjTranspose_inv_mul_mul_inv]
-  have e : ((g⁻¹ w : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)⁻¹ = (g w : Matrix (Fin N) (Fin N) ℂ) := by
-    rw [Pi.inv_apply, Matrix.coe_units_inv, Matrix.nonsing_inv_nonsing_inv _
-      ((Matrix.isUnit_iff_isUnit_det _).mp (g w).isUnit)]
-  rw [e]
-  calc _ = ((g w : Matrix (Fin N) (Fin N) ℂ)⁻¹ * (g w : Matrix (Fin N) (Fin N) ℂ))ᴴ * mat h w *
-        ((g w : Matrix (Fin N) (Fin N) ℂ)⁻¹ * (g w : Matrix (Fin N) (Fin N) ℂ)) := by
-          rw [Matrix.conjTranspose_mul]
-          simp only [Matrix.mul_assoc]
-    _ = mat h w := by rw [gl_coe_inv_mul_coe_eq_one]; simp
+  rw [← actL_mul, inv_mul_cancel, actL_one]
 
 theorem actL_inv_sec {h : HS L N} (hh : h ∈ Pos L N) : actL (sec h)⁻¹ (one L N).1 = h := by
   rw [← actL_sec hh, actL_inv_actL']
