@@ -73,11 +73,7 @@ theorem algebraic_isogenyConstant_of_isogenyFormula (e : PowerSeries ℂ) (he : 
   apply _root_.Formalism.L2.KerInert.Sigma.ChartWirtingerDerivatives.mul_s2_mem_Qbar_of_isogenyFormula <;> assumption
 
 theorem alpha_sq (dK : ℕ) :
-    (((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * Formalism.L2.Th1.CM.omegaK dK) ^ 2 = -(dK : ℂ) := by
-  have h : (((Real.sqrt dK : ℝ) : ℂ)) ^ 2 = (dK : ℂ) := by
-    rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _)]; simp
-  have e : (((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * Formalism.L2.Th1.CM.omegaK dK) = Complex.I * ((Real.sqrt dK : ℝ) : ℂ) := by
-    unfold Formalism.L2.Th1.CM.omegaK; push_cast; ring
-  rw [e, mul_pow, h, Complex.I_sq]; ring
+    (((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * Formalism.L2.Th1.CM.omegaK dK) ^ 2 = -(dK : ℂ) :=
+  _root_.Formalism.L2.KerInert.Sigma.ChartWirtingerDerivatives.alpha_sq dK
 
 end GlobalTheory.IsogConst
