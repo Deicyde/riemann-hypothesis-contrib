@@ -16,13 +16,8 @@ open scoped TensorProduct
 theorem UpperTheory.V.Cj.S.hkLocal :
     UpperTheory.V.Cj.S.SumInner → UpperTheory.V.Cj.S.MatBlock → UpperTheory.V.Cj.S.HkLocal := by
   intro hSum hMat E _ _ w r s ϖ hϖ hu _ j Φ hΦ
-  have hπ0 : ((⟨ϖ, hϖ⟩ : Ov E w) : HeightOneSpectrum.adicCompletion E w) ≠ 0 := by
-    intro h0
-    have h1 : Valued.v ϖ = 0 := by
-      have h2 : ϖ = 0 := h0
-      rw [h2, map_zero]
-    rw [hu] at h1
-    exact WithZero.coe_ne_zero h1
+  have hπ0 : ((⟨ϖ, hϖ⟩ : Ov E w) : HeightOneSpectrum.adicCompletion E w) ≠ 0 :=
+    (Valuation.ne_zero_iff Valued.v (x := ϖ)).1 (by rw [hu]; exact WithZero.coe_ne_zero)
   have hq : Fintype.card (satakeRes (Ov E w) ⟨ϖ, hϖ⟩) = qV E w := by
     have key : ∀ z : WithZero (Multiplicative ℤ), z < 1 → z ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
       intro z hz
