@@ -26,14 +26,8 @@ theorem dt_pos (g : GA E k) : 0 < Dt g := (GroundTheory.Global.IdeleGroup.ideleM
 theorem dt_mul (g h : GA E k) : Dt (g * h) = Dt g * Dt h := by
   simp only [Dt, map_mul, Positive.val_mul]
 
-theorem continuous_det' : Continuous (GeneralLinearGroup.det : GA E k → (Ad E)ˣ) := by
-  refine Units.continuous_iff.2 ⟨?_, ?_⟩
-  · exact Units.continuous_val.matrix_det
-  · have : (fun g : GA E k => (((GeneralLinearGroup.det g)⁻¹ : (Ad E)ˣ) : Ad E)) =
-        fun g : GA E k => ((g⁻¹ : GA E k) : Matrix (Fin k) (Fin k) (Ad E)).det := by
-      funext g; rw [← map_inv]; rfl
-    rw [this]
-    exact (Units.continuous_val.comp continuous_inv).matrix_det
+theorem continuous_det' : Continuous (GeneralLinearGroup.det : GA E k → (Ad E)ˣ) :=
+  (Continuous.units_map Matrix.detMonoidHom continuous_id.matrix_det).congr fun _ => Units.ext rfl
 
 theorem dt_cont : Continuous (Dt : GA E k → ℝ) :=
   continuous_subtype_val.comp (GroundTheory.Global.IdeleGroup.continuous_ideleModule.comp continuous_det')
