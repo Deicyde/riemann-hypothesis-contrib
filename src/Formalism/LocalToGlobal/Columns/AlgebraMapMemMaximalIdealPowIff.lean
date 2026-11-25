@@ -184,10 +184,8 @@ theorem mem_range_ow_iff (w : HeightOneSpectrum (𝓞 K)) (x : K) :
   · intro hx
     obtain ⟨n, d, h⟩ := w.exists_primeCompl_mul_eq_of_integer x hx
     refine ⟨IsLocalization.mk' (Ow w) n d, ?_⟩
-    have hd : algebraMap (𝓞 K) K (d : 𝓞 K) ≠ 0 := by
-      intro h0
-      have : (d : 𝓞 K) = 0 := FaithfulSMul.algebraMap_injective (𝓞 K) K (by rw [h0, map_zero])
-      exact d.2 (this ▸ w.asIdeal.zero_mem)
+    have hd : algebraMap (𝓞 K) K (d : 𝓞 K) ≠ 0 :=
+      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (w.asIdeal.primeCompl_le_nonZeroDivisors d.2)
     apply mul_right_cancel₀ hd
     rw [h, IsScalarTower.algebraMap_apply (𝓞 K) (Ow w) K, ← map_mul, IsLocalization.mk'_spec,
       ← IsScalarTower.algebraMap_apply]
@@ -341,10 +339,8 @@ theorem mem_atW_one_iff (w : HeightOneSpectrum (𝓞 K)) (x : K) :
     obtain ⟨s, hs, hx'⟩ := mem_atW_iff.1 hx
     obtain ⟨a, ha⟩ := Submodule.mem_one.1 hx'
     refine ⟨IsLocalization.mk' (Ow w) a (⟨s, hs⟩ : w.asIdeal.primeCompl), ?_⟩
-    have hs0 : algebraMap (𝓞 K) K s ≠ 0 := by
-      intro h0
-      have : s = 0 := FaithfulSMul.algebraMap_injective (𝓞 K) K (by rw [h0, map_zero])
-      exact hs (this ▸ w.asIdeal.zero_mem)
+    have hs0 : algebraMap (𝓞 K) K s ≠ 0 :=
+      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (w.asIdeal.primeCompl_le_nonZeroDivisors hs)
     apply mul_right_cancel₀ hs0
     have e : algebraMap (𝓞 K) K s = algebraMap (Ow w) K (algebraMap (𝓞 K) (Ow w) s) :=
       IsScalarTower.algebraMap_apply _ _ _ _
