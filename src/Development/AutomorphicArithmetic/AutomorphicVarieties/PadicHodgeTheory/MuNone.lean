@@ -101,11 +101,7 @@ private theorem mn_map {G H : Type} [Group G] [TopologicalSpace G] [IsTopologica
 private theorem mn_cyc {l : ℕ} [Fact l.Prime] (σ : GQ l) {ζ : Om l} (h1 : ζ ^ l = 1) (h2 : ζ ≠ 1)
     (h : σ ζ = ζ) : PadicInt.toZMod ((cyc l l σ : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
   have hp : l.Prime := Fact.out
-  have hprim : IsPrimitiveRoot ζ l := by
-    rw [IsPrimitiveRoot.iff_orderOf]
-    rcases (Nat.dvd_prime hp).1 (orderOf_dvd_of_pow_eq_one h1) with h | h
-    · exact absurd (orderOf_eq_one_iff.1 h) h2
-    · exact h
+  have hprim : IsPrimitiveRoot ζ l := IsPrimitiveRoot.iff_orderOf.2 (orderOf_eq_prime h1 h2)
   have hs := cyclotomicCharacter.spec (L := Om l) l (n := 1)
     (MulSemiringAction.toRingAut (GQ l) (Om l) σ) ζ (by rw [pow_one]; exact h1)
   have hcyc : (cyc l l σ : ℤ_[l]ˣ) =
