@@ -41,9 +41,9 @@ theorem GlobalTheory.MovedDict.moved_lattice_action_compat : _root_.GlobalTheory
       (Formalism.UG.CS.globLat (Formalism.IndefR.Lev.finE (ch.G.V (.grid (i + 1) j)) ky) (colLat (N.fr (.grid (i + 1) j))))
       (colLat (N.fr (.grid i j)))
       (Formalism.UG.CS.globLat (Formalism.IndefR.Lev.finE (ch.G.V (.grid i j)) kx) (colLat (N.fr (.grid i j))))
-      (fwd (ch.G.V (.grid (i + 1) j)) ky _ (colLat_fin _) (colLat_span _))
+      (by rw [mt_negGA]; exact fwd (ch.G.V (.grid (i + 1) j)) ky _ (colLat_fin _) (colLat_span _))
       (fwd (ch.G.V (.grid i j)) kx _ (colLat_fin _) (colLat_span _))
-      (bwd (ch.G.V (.grid (i + 1) j)) ky _)
+      (by rw [← map_inv (negGA _) ky, mt_negGA]; exact bwd (ch.G.V (.grid (i + 1) j)) ky _)
       (bwd (ch.G.V (.grid i j)) kx _)
     exact H
   | top t j =>
