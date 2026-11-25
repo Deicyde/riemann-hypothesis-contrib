@@ -249,15 +249,9 @@ theorem vBB_add (S : UniformizedDVR p O) (F G : MvPolynomial σ (KK O)) :
   exact Finset.le_inf key
 
 theorem vBB_sum (S : UniformizedDVR p O) {κ : Type} (T : Finset κ) (f : κ → MvPolynomial σ (KK O)) :
-    T.inf (fun i => vBB (O := O) p (f i)) ≤ vBB (O := O) p (∑ i ∈ T, f i) := by
-  classical
-  refine Finset.induction_on T ?_ ?_
-  · simp [vBB]
-  · intro a s ha ih
-    rw [Finset.inf_insert, Finset.sum_insert ha]
-    calc vBB (O := O) p (f a) ⊓ s.inf (fun i => vBB (O := O) p (f i))
-        ≤ vBB (O := O) p (f a) ⊓ vBB (O := O) p (∑ i ∈ s, f i) := inf_le_inf_left _ ih
-      _ ≤ vBB (O := O) p (f a + ∑ i ∈ s, f i) := vBB_add S _ _
+    T.inf (fun i => vBB (O := O) p (f i)) ≤ vBB (O := O) p (∑ i ∈ T, f i) :=
+  Finset.sum_induction f (fun x => T.inf (fun i => vBB (O := O) p (f i)) ≤ vBB (O := O) p x)
+    (fun a b ha hb => (le_min ha hb).trans (vBB_add S a b)) (by simp [vBB]) fun _ hi => Finset.inf_le hi
 
 end VBB
 
