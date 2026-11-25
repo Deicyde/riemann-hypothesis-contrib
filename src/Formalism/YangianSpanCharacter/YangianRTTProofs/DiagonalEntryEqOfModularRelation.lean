@@ -15,19 +15,15 @@ section Alg
 variable {𝕜 A : Type*} [Field 𝕜] [Ring A] [Algebra 𝕜 A]
 
 theorem comm_of_inv {a b bi : A} (h1 : b * bi = 1) (h2 : bi * b = 1) (hab : a * b = b * a) :
-    a * bi = bi * a := by
-  calc a * bi = (bi * b) * (a * bi) := by rw [h2, one_mul]
-    _ = bi * (a * b) * bi := by rw [hab]; simp only [mul_assoc]
-    _ = bi * a := by simp only [mul_assoc]; rw [h1, mul_one]
+    a * bi = bi * a :=
+  Commute.units_inv_right (u := ⟨b, bi, h1, h2⟩) hab
 
 theorem smul_cancel {c : 𝕜} (hc : c ≠ 0) {x y : A} (h : c • x = c • y) : x = y := by
   have h' := congrArg (fun z => c⁻¹ • z) h
   simpa [smul_smul, inv_mul_cancel₀ hc] using h'
 
-theorem left_cancel {b bi x y : A} (h2 : bi * b = 1) (h : b * x = b * y) : x = y := by
-  calc x = bi * b * x := by rw [h2, one_mul]
-    _ = bi * (b * y) := by rw [mul_assoc, h]
-    _ = y := by rw [← mul_assoc, h2, one_mul]
+theorem left_cancel {b bi x y : A} (h2 : bi * b = 1) (h : b * x = b * y) : x = y :=
+  isLeftRegular_of_mul_eq_one h2 h
 
 theorem from_comm {a l e : A} (h : a * l - l * a = -(a * e)) : l * a = a * (l + e) := by
   rw [mul_add]
