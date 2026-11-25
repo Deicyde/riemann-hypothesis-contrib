@@ -33,7 +33,8 @@ To check that it compiles, bring your branch up to date with `main`, fetch the c
 catches a lemma you removed that is still used somewhere else. It must finish without errors.
 
 Keep each pull request to one change. Small pull requests are quicker to review and easier to
-combine into a batch than one large one.
+combine into a batch than one large one. You can also fix linter warnings in the files you
+edit; that doesn't count as a second change.
 
 Titles follow [Mathlib's convention](https://leanprover-community.github.io/contribute/commit.html):
 
