@@ -105,11 +105,8 @@ theorem isUnit_invTL {x : Fin a → Fin a → A} (hx : IsUnit (Matrix.of x)) : I
 
 
 omit [NormedAlgebra ℝ A] in
-theorem norm_transpose (x : Matrix (Fin a) (Fin a) A) : ‖Matrix.of.symm xᵀ‖ = ‖Matrix.of.symm x‖ := by
-  have h : ∀ x : Matrix (Fin a) (Fin a) A, ‖Matrix.of.symm xᵀ‖ ≤ ‖Matrix.of.symm x‖ := fun x =>
-    (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun i => (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun j =>
-      (norm_le_pi_norm (Matrix.of.symm x j) i).trans (norm_le_pi_norm (Matrix.of.symm x) j)
-  exact le_antisymm (h x) (h xᵀ)
+theorem norm_transpose (x : Matrix (Fin a) (Fin a) A) : ‖Matrix.of.symm xᵀ‖ = ‖Matrix.of.symm x‖ :=
+  Matrix.norm_transpose x
 
 private theorem contDiff_det : ContDiff ℝ ∞ fun x : Fin a → Fin a → A => (Matrix.of x).det := by
   simp only [Matrix.det_apply', Matrix.of_apply]
