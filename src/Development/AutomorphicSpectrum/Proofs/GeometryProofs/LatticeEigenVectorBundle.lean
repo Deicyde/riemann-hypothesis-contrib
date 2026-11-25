@@ -236,15 +236,9 @@ theorem injective_of_charZero {Ω : Type} [Field Ω] [CharZero Ω] (σ : 𝓞 F 
 theorem discr_mem_differentIdeal : (((discr F : ℤ) : 𝓞 F)) ∈ differentIdeal ℤ (𝓞 F) := by
   have h := Ideal.absNorm_mem (differentIdeal ℤ (𝓞 F))
   rw [NumberField.absNorm_differentIdeal F (𝓞 F)] at h
-  rcases Int.natAbs_eq (discr F) with h' | h'
-  · have : ((discr F : ℤ) : 𝓞 F) = (((discr F).natAbs : ℕ) : 𝓞 F) := by
-      conv_lhs => rw [h']
-      simp
-    rw [this]; exact h
-  · have : ((discr F : ℤ) : 𝓞 F) = -(((discr F).natAbs : ℕ) : 𝓞 F) := by
-      conv_lhs => rw [h']
-      simp
-    rw [this]; exact neg_mem h
+  have hd := Int.cast_dvd_cast (α := 𝓞 F) _ _ (Int.natAbs_dvd_self (a := discr F))
+  rw [Int.cast_natCast] at hd
+  exact Ideal.mem_of_dvd _ hd h
 
 end Field
 
