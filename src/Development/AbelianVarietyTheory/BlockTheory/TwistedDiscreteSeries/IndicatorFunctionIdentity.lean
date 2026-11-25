@@ -215,10 +215,7 @@ theorem valuation_det_of_fix (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice 
   have v2 := (Valuation.mem_integer_iff _ _).1 h2
   have v3 : valuation k u.val.det * valuation k (u⁻¹ : GL n k).val.det = 1 := by
     rw [← map_mul, hp, map_one]
-  refine le_antisymm v1 ?_
-  calc (1 : ValueGroupWithZero k) = valuation k u.val.det * valuation k (u⁻¹ : GL n k).val.det := v3.symm
-    _ ≤ valuation k u.val.det * 1 := by gcongr
-    _ = valuation k u.val.det := mul_one _
+  exact eq_one_of_one_le_mul_left v1 v2 v3.ge
 
 variable {V' V : Type} [AddCommGroup V'] [Module ℂ V'] [AddCommGroup V] [Module ℂ V]
 
