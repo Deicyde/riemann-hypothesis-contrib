@@ -151,11 +151,7 @@ theorem locGlob (v : PlX X) (x : Fin X.B.I.n → X.B.I.E)
     fun g hgS => denom X v _ (hx g (hSL g hgS))
   choose! s hs c hc using hg
   set t : 𝓞 X.B.I.F := ∏ g ∈ S, s g with ht_def
-  have ht : t ∉ v.asIdeal := by
-    intro h
-    have := v.isPrime
-    obtain ⟨g, hgS, hg⟩ := Ideal.IsPrime.prod_mem_iff.1 h
-    exact hs g hgS hg
+  have ht : t ∉ v.asIdeal := (Ideal.primeCompl v.asIdeal).prod_mem hs
   set T : X.B.I.E := algebraMap X.B.I.F X.B.I.E (t : X.B.I.F) with hT
   have hkey : ∀ g ∈ S, Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J g (T • x) ∈
       (algebraMap (𝓞 X.B.I.E) X.B.I.E).range := by
