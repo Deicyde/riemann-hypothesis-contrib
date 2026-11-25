@@ -137,10 +137,8 @@ theorem one_sub_frob_bij : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [Ch
         apply Subtype.ext
         simp [map_add (f := _)] }
   have : ∀ i, Module.Finite k⟦X⟧ (P i) := fun i => Module.Finite.iff_fg.mpr (hP i).1
-  have hXtop : Ideal.span {(PowerSeries.X : k⟦X⟧)} ≠ ⊤ := by
-    intro h
-    have h1 := (Ideal.span_singleton_eq_top.mp h).map (PowerSeries.constantCoeff (R := k))
-    simp at h1
+  have hXtop : Ideal.span {(PowerSeries.X : k⟦X⟧)} ≠ ⊤ :=
+    Ideal.span_singleton_ne_top PowerSeries.prime_X.not_isUnit
   have : IsHausdorff (Ideal.span {(PowerSeries.X : k⟦X⟧)}) ((i : ZMod n) → P i) :=
     IsHausdorff.of_isLocalRing _ _ hXtop
   have : IsPrecomplete (Ideal.span {(PowerSeries.X : k⟦X⟧)}) ((i : ZMod n) → P i) :=
