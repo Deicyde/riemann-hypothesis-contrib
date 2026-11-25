@@ -79,28 +79,18 @@ theorem isSemisimple_of_sq [FiniteDimensional ℂ U] (S : Module.End ℂ U)
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply] at hv ⊢
     rw [sub_eq_zero] at hv ⊢
     exact h μ v hv
-  have step : ∀ k v, ((S - μ • 1 : Module.End ℂ U) ^ (k + 1)) v = 0 → (S - μ • 1 : Module.End ℂ U) v = 0 := by
-    intro k
-    induction k with
-    | zero => intro v hv; simpa using hv
-    | succ k ih =>
-      intro v hv
-      apply ih
-      have e1 : ((S - μ • 1 : Module.End ℂ U) ^ (k + 1 + 1)) v =
-          (S - μ • 1 : Module.End ℂ U) ((S - μ • 1 : Module.End ℂ U) (((S - μ • 1 : Module.End ℂ U) ^ k) v)) := by
-        rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply]
-      have e2 : ((S - μ • 1 : Module.End ℂ U) ^ (k + 1)) v =
-          (S - μ • 1 : Module.End ℂ U) (((S - μ • 1 : Module.End ℂ U) ^ k) v) := by
-        rw [pow_succ', Module.End.mul_apply]
-      rw [e2]
-      exact hA _ (e1 ▸ hv)
+  have hker : LinearMap.ker ((S - μ • 1 : Module.End ℂ U) ^ 1) =
+      LinearMap.ker ((S - μ • 1 : Module.End ℂ U) ^ (1 : ℕ).succ) :=
+    le_antisymm (fun v hv => LinearMap.mem_ker.2 (Module.End.pow_map_zero_of_le (Nat.le_succ 1)
+      (LinearMap.mem_ker.1 hv))) fun v hv => by
+        rw [LinearMap.mem_ker, pow_one]
+        exact hA v (by rwa [LinearMap.mem_ker, pow_succ, pow_one, mul_apply_eq_comp] at hv)
   rw [Module.End.mem_maxGenEigenspace] at hu
   obtain ⟨k, hk⟩ := hu
   rw [Module.End.mem_eigenspace_iff]
   have hz : (S - μ • 1 : Module.End ℂ U) u = 0 := by
-    cases k with
-    | zero => simp at hk; simp [hk]
-    | succ k => exact step k u hk
+    rw [← pow_one (S - μ • 1 : Module.End ℂ U), ← LinearMap.mem_ker, Module.End.ker_pow_constant hker k]
+    exact LinearMap.mem_ker.2 (Module.End.pow_map_zero_of_le (Nat.le_add_left k 1) hk)
   simpa [sub_eq_zero] using hz
 
 theorem apply_eq_zero_of_sq [FiniteDimensional ℂ U] {A : Module.End ℂ U} (hA : A.IsSemisimple) {u : U}
