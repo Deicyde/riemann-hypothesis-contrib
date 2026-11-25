@@ -82,12 +82,8 @@ theorem exists_det_add_mul_ne_zero_of_ker_inf {k : Type} [Field k] {n : ℕ}
     intro x hx hax
     rw [LinearMap.mem_ker] at hx
     exact h x (by simpa [ha] using hax) (by simpa [hc] using hx)
-  have hinj : Function.Injective (a.domRestrict (LinearMap.ker c)) := by
-    intro x y hxy
-    have hxy' : a ((x : Fin n → k) - y) = 0 := by
-      rw [map_sub]; exact sub_eq_zero.mpr (by simpa using hxy)
-    have := hkey _ (Submodule.sub_mem _ x.2 y.2) hxy'
-    exact Subtype.ext (sub_eq_zero.mp this)
+  have hinj : Function.Injective (a.domRestrict (LinearMap.ker c)) :=
+    (injective_iff_map_eq_zero _).2 fun x hx => Subtype.ext (hkey x x.2 hx)
   have hrank : Module.finrank k L' = Module.finrank k U := by
     have h1 := Submodule.finrank_add_eq_of_isCompl hL'
     have h2 := Submodule.finrank_add_eq_of_isCompl hU
