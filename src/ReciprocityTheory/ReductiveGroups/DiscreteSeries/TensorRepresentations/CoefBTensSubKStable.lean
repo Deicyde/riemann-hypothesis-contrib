@@ -93,11 +93,7 @@ theorem coefB_adm (hE : IsGlRep E) (hU : IsInfUnitary ε E)
   have hSd : FiniteDimensional ℂ S := Submodule.finiteDimensional_of_le inf_le_left
   have hSs : IsKStableSub ε E S := fun a b hab x hx =>
     ⟨hTs a b hab x hx.1, orthogonal_kStable hUk hT0s a b hab x hx.2⟩
-  have hne : S ≠ ⊥ := by
-    intro h
-    have := hrS
-    rw [h, Submodule.mem_bot] at this
-    exact hr this
+  have hne : S ≠ ⊥ := (Submodule.ne_bot_iff S).2 ⟨r, hrS, hr⟩
   obtain ⟨w, hwS, hw0, μ, hμ⟩ := exists_khw hE hUk hSd hSs hne
   have hwT := (memT w).1 hwS.1
   have h1 := casimirK_khwVec ε hE hμ
