@@ -170,10 +170,7 @@ theorem le_ker_of_simple_commuting {M W : Type} [AddCommGroup M] [Module ℂ M] 
   have hint : ∀ g ∈ Op, ∀ x, φ (g x) = act g (φ x) := fun g hg x =>
     LinearMap.congr_fun (hφ g hg) x
   by_cases hφ0 : LinearMap.range φ = ⊥
-  · intro x _
-    have hx : φ x ∈ LinearMap.range φ := LinearMap.mem_range_self φ x
-    rw [hφ0] at hx
-    exact (Submodule.mem_bot ℂ).mp hx
+  · exact le_top.trans_eq (LinearMap.ker_eq_top.mpr (LinearMap.range_eq_bot.mp hφ0)).symm
   have hrange : Stab (act '' Op) (LinearMap.range φ) := by
     intro a ha y hy
     obtain ⟨g, hg, rfl⟩ := ha
