@@ -62,12 +62,8 @@ theorem rq_K_UJ {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k �
   rw [mul_assoc, ← hc, ← mul_assoc, (rq_K_unit hk).1, one_mul]
 
 theorem rq_KH {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε) :
-    kᴴ ∈ Kset ε := by
-  refine ⟨?_, rq_K_JH hk⟩
-  rw [Matrix.mem_unitaryGroup_iff]
-  show kᴴ * kᴴᴴ = 1
-  rw [Matrix.conjTranspose_conjTranspose]
-  exact (rq_K_unit hk).1
+    kᴴ ∈ Kset ε :=
+  ⟨Unitary.star_mem hk.1, rq_K_JH hk⟩
 
 theorem rq_UJ_mul {ε : Fin n → Bool} {a b : Matrix (Fin n) (Fin n) ℂ} (ha : a ∈ UJset ε)
     (hb : b ∈ UJset ε) : a * b ∈ UJset ε := by
