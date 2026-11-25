@@ -195,18 +195,8 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
       · exact AddSubgroup.mem_sup_right ⟨b, hb, rfl⟩
     · have hLa₁ : La₁ = g⁻¹ • La := by
         rw [← hgLa, inv_smul_smul]
-      have hfg : ∀ (γ : h.unitaryGroup) (S : AddSubgroup W), S.FG → (γ • S).FG := by
-        intro γ S hS
-        have : γ • S = S.map (((γ : W ≃ₗ[E] W) : W →ₗ[E] W).toAddMonoidHom) := by
-          ext x
-          constructor
-          · intro hx
-            obtain ⟨y, hy, rfl⟩ := (AddSubgroup.mem_smul_pointwise_iff_exists _ _ _).1 hx
-            exact ⟨y, hy, rfl⟩
-          · rintro ⟨y, hy, rfl⟩
-            exact AddSubgroup.smul_mem_pointwise_smul y γ S hy
-        rw [this]
-        exact fg_map_of_fg hS _
+      have hfg : ∀ (γ : h.unitaryGroup) (S : AddSubgroup W), S.FG → (γ • S).FG := fun γ S hS =>
+        fg_map_of_fg hS (DistribMulAction.toAddMonoidEnd _ _ γ)
       exact hfg _ _ (hLa₁ ▸ hfg _ _ hLa.isLattice.fg)
   · rw [mul_smul, smul_inv_smul, hgLa]
   · have hgv0 : (g : W ≃ₗ[E] W) v₀ ≠ 0 := fun h0 =>
