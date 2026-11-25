@@ -26,12 +26,8 @@ theorem position_level_zero_coord (a : Fin (2 * r + k + 1)) : Q.posL k r 0 (c0 a
   ext
   simp [Q.posL, c0]
 
-theorem baseIndexConstant_injective {a b : Fin (2 * r + k + 1)} : c0 (k := k) a = c0 b ↔ a = b := by
-  constructor
-  · intro h
-    exact Fin.ext (by simpa [c0] using congrArg Fin.val h)
-  · intro h
-    rw [h]
+theorem baseIndexConstant_injective {a b : Fin (2 * r + k + 1)} : c0 (k := k) a = c0 b ↔ a = b :=
+  Fin.cast_inj _
 
 def E0 (hD : IsOpen D) (a b : Fin (2 * r + k + 1)) : Module.End ℂ (VS k r 0 D E) := Eh hD (c0 a) (c0 b)
 
