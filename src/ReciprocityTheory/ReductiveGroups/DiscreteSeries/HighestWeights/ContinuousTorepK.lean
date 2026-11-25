@@ -134,14 +134,8 @@ lemma torep_exp_eigen {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [Co
 
 lemma torep_diag_sum (d : Fin n → ℂ) :
     Matrix.diagonal d = ∑ a, d a • Matrix.single a a (1 : ℂ) := by
-  ext i j
-  rw [Matrix.sum_apply]
-  by_cases h : i = j
-  · subst h
-    simp [Matrix.single_apply]
-  · rw [Matrix.diagonal_apply_ne _ h]
-    refine (Finset.sum_eq_zero fun a _ => ?_).symm
-    rw [Matrix.smul_apply, Matrix.single_apply, ite_eq_right (fun h' => h (h'.1.symm.trans h'.2)), smul_zero]
+  simp only [Matrix.smul_single, smul_eq_mul, mul_one]
+  exact (Matrix.sum_single_eq_diagonal d).symm
 
 lemma torep_inK_diag (ε : Fin n → Bool) (d : Fin n → ℂ) (hd : ∀ a, star (d a) = -d a) :
     inK ε (Matrix.diagonal d) := by
