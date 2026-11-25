@@ -95,17 +95,8 @@ private theorem bK_ne_neg_bK (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ -bK
   exact hd.ne' (by exact_mod_cast hd0)
 
 theorem card_gal (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Nat.card (Kd b ≃ₐ[ℚ] Kd b) = 2 := by
-  obtain ⟨τ, hτ⟩ := Kd_exists_algEquiv_neg hd hb
-  have hne := bK_ne_neg_bK hd hb
-  let f : (Kd b ≃ₐ[ℚ] Kd b) → ({bK b, -bK b} : Set (Kd b)) := fun σ =>
-    ⟨σ (bK b), by rcases Kd_algEquiv_bK_eq_or_neg hb σ with h | h <;> simp [h]⟩
-  have hinj : Function.Injective f := fun _ _ h => Kd_algEquiv_ext _ _ (congrArg Subtype.val h)
-  have : Finite (Kd b ≃ₐ[ℚ] Kd b) := Finite.of_injective f hinj
-  have : Nontrivial (Kd b ≃ₐ[ℚ] Kd b) := ⟨⟨τ, 1, fun h1 => hne (by simpa [h1] using hτ)⟩⟩
-  refine le_antisymm ?_ Finite.one_lt_card
-  calc Nat.card (Kd b ≃ₐ[ℚ] Kd b) ≤ Nat.card ({bK b, -bK b} : Set (Kd b)) :=
-        Nat.card_le_card_of_injective f hinj
-    _ = 2 := by rw [Nat.card_coe_set_eq, Set.ncard_pair hne]
+  have := quad_K hd hb
+  rw [IsGalois.card_aut_eq_finrank, finrank_K hd hb]
 
 theorem bK_sq_int (hb : b ^ 2 = -(d : L)) : bK b ^ 2 = ((-(d : ℤ) : ℤ) : Kd b) := by
   rw [bK_sq hb]; simp
