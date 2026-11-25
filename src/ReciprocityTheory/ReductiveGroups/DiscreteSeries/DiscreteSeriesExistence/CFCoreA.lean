@@ -80,21 +80,14 @@ private lemma mem_kLowSpan_of_map_lowWord_mem {y : M} (T : Module.End ℂ M)
 
 theorem kLowSpan_low_stable {y : M} {c d : Fin n} (hcd : IsKLow ε (c, d)) :
     ∀ x ∈ kLowSpan ε E y, E c d x ∈ kLowSpan ε E y := by
-  exact mem_kLowSpan_of_map_lowWord_mem (E c d) (fun l hl => lowWord_mem (ε := ε) (E := E) (y := y) (l := (c, d) :: l) (by
-    intro p hp
-    rcases List.mem_cons.mp hp with h | h
-    · rw [h]; exact hcd
-    · exact hl p h))
+  exact mem_kLowSpan_of_map_lowWord_mem (E c d) (fun l hl => lowWord_mem (ε := ε) (E := E) (y := y) (l := (c, d) :: l)
+    (List.forall_mem_cons.2 ⟨hcd, hl⟩))
 
 theorem lowWord_mem_of_ge (hE : IsGlRep E) {μ : Fin n → ℝ} {y : M} (hy : ∀ a, E a a y = (μ a : ℂ) • y)
     {l : List (Fin n × Fin n)} (hl : ∀ p ∈ l, IsKLow ε p) {a b : Fin n} (hab : b ≤ a) (hε : ε a = ε b) :
     E a b (lowWord E y l) ∈ kLowSpan ε E y := by
   rcases hab.lt_or_eq with h | h
-  · exact lowWord_mem (ε := ε) (E := E) (y := y) (l := (a, b) :: l) (by
-      intro p hp
-      rcases List.mem_cons.mp hp with hp | hp
-      · rw [hp]; exact And.intro h hε
-      · exact hl p hp)
+  · exact lowWord_mem (ε := ε) (E := E) (y := y) (l := (a, b) :: l) (List.forall_mem_cons.2 ⟨And.intro h hε, hl⟩)
   · rw [h, lowWord_wt hE hy l a]
     exact Submodule.smul_mem _ _ (lowWord_mem hl)
 
@@ -107,8 +100,7 @@ theorem lowWord_raise (hE : IsGlRep E) {μ : Fin n → ℝ} {y : M} (hy : IsKHWV
     exact Submodule.zero_mem _
   | p :: l, hl, a, b, hab, hε => by
     obtain ⟨c, d⟩ := p
-    have hcd : IsKLow ε (c, d) := hl _ (List.mem_cons_self ..)
-    have hl' : ∀ p ∈ l, IsKLow ε p := fun p hp => hl p (List.mem_cons_of_mem _ hp)
+    obtain ⟨hcd, hl'⟩ := List.forall_mem_cons.1 hl
     have ih := lowWord_raise hE hy l hl'
     have key : ∀ a' b' : Fin n, ε a' = ε b' → E a' b' (lowWord E y l) ∈ kLowSpan ε E y := by
       intro a' b' h'
