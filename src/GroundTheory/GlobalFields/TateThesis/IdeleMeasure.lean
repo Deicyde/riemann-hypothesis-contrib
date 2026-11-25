@@ -474,14 +474,8 @@ section Preserving
 
 theorem measurePreserving_prodEquiv :
     MeasurePreserving (IdeleGroup.prodEquiv K) (ideleMeasure K)
-      ((infiniteIdeleMeasure K).prod (finiteIdeleMeasure K)) := by
-  have h1 : Measurable (IdeleGroup.prodEquiv K) := (map_continuous _).measurable
-  have h2 : Measurable (IdeleGroup.prodEquiv K).symm := (map_continuous _).measurable
-  refine ⟨h1, ?_⟩
-  rw [ideleMeasure, Measure.map_map h1 h2]
-  convert Measure.map_id
-  funext x
-  exact (IdeleGroup.prodEquiv K).apply_symm_apply x
+      ((infiniteIdeleMeasure K).prod (finiteIdeleMeasure K)) :=
+  (IdeleGroup.prodEquiv K).symm.toHomeomorph.toMeasurableEquiv.measurePreserving_symm _
 
 theorem integral_ideleMeasure {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     (f : IdeleGroup K → E) :
