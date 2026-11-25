@@ -899,7 +899,7 @@ theorem nfTieGen_of (hK : GCore) : NFTieGen := by
     have : Ct s ≤ Cs := Finset.single_le_sum (f := Ct) (fun s _ => hCt s) (Finset.mem_univ s)
     have h4 : 0 ≤ MA.Gq P q ^ (2 * (s : ℕ)) * Dn⁻¹ ^ w.length * Rs s :=
       mul_nonneg (by positivity) (hRs0 s)
-    nlinarith [mul_le_mul_of_nonneg_right this h4]
+    linarith [mul_le_mul_of_nonneg_right this h4]
   have h5 := dH_sq_le p w a ρ c hG
   have h6 := hsVec_proj_le (p.TP.E ρ) (p.TP.idem ρ) (p.TP.selfAdj ρ) (p.V (B.opApply (Lq qq) F) γ)
   have hW0 : 0 ≤ Cw * (Dn / TBB.Gp p γ) ^ w.length := by positivity
