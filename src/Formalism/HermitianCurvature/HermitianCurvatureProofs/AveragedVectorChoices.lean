@@ -60,9 +60,8 @@ theorem finite_cosets {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologica
   exact ⟨Quotient.out y, hy, QuotientAddGroup.out_eq' y⟩
 
 theorem out_sub_mem {K : Type} [CommRing K] (Λ : AddSubgroup K) (z : K) :
-    (Quotient.out ((z : K) : K ⧸ Λ) : K) - z ∈ Λ := by
-  simpa [sub_eq_add_neg, add_comm] using
-    Λ.neg_mem (QuotientAddGroup.eq.mp (QuotientAddGroup.out_eq' ((z : K) : K ⧸ Λ)))
+    (Quotient.out ((z : K) : K ⧸ Λ) : K) - z ∈ Λ :=
+  QuotientAddGroup.eq_iff_sub_mem.1 (QuotientAddGroup.out_eq' _)
 
 open Classical in
 theorem uGram_eq_sum {K : Type} [CommRing K] (R : Subring K) (ψ : AddChar K ℂ) (m : ℕ)
@@ -413,11 +412,7 @@ theorem cutNormEval_main : CutNormEval := by
     exact D.nsInv h hh h' hh' z₁ hz₁ _ hout
   · intro y _ hy
     rw [ite_eq_right, mul_zero]
-    intro hm
-    apply hy
-    rw [← QuotientAddGroup.out_eq' y, QuotientAddGroup.eq]
-    have := (perp ψ D.L₂).neg_mem hm
-    simpa [sub_eq_add_neg, add_comm] using this
+    exact fun hm => hy ((QuotientAddGroup.out_eq' y).symm.trans (QuotientAddGroup.eq_iff_sub_mem.2 hm))
   · intro hn'
     exfalso
     apply hn'
