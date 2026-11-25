@@ -179,17 +179,10 @@ theorem blkOf_ixFin {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridD
 
 theorem mem_stepGroup_map_iff : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (t : T) (w : Pl D.host.E), w ∈ L.Pg → ∀ (j : ℕ) (g : GL (Fin ((locGrid G t w).rank (0, j))) (Kw w)), g ∈ (stepGroup L t w j).map (reGL (ixFin G t w j)).toMonoidHom ↔ g ∈ KO (Kw w) (Fin ((locGrid G t w).rank (0, j))) ∧ (∀ a b, Formalism.L2.DIV.blkOf D.R.r D.R.t b < Formalism.L2.DIV.blkOf D.R.r D.R.t a → valuation (Kw w) (g.1 a b) < 1) ∧ ∀ a b : Fin ((locGrid G t w).rank (0, j)), a.val < D.R.r → b.val < D.R.r → valuation (Kw w) ((g.1 - 1) a b) < 1 := by
   intro D T L sc G t w hw j g
-  have hmap : g ∈ (stepGroup L t w j).map (reGL (ixFin G t w j)).toMonoidHom ↔
-      (reGL (ixFin G t w j)).symm g ∈ stepGroup L t w j := by
-    constructor
-    · rintro ⟨x, hx, rfl⟩
-      simpa using hx
-    · intro hx
-      exact ⟨_, hx, by simp⟩
   have hK : (reGL (ixFin G t w j)).symm g ∈ KO (Kw w) (Ix (Fin D.R.r) (Fin D.R.t) j) ↔
       g ∈ KO (Kw w) (Fin ((locGrid G t w).rank (0, j))) := by
     rw [← reGL_mem_KO_iff (ixFin G t w j), MulEquiv.apply_symm_apply]
-  rw [hmap, stepGroup, ite_eq_left hw, mem_iter_J, hK]
+  rw [Subgroup.mem_map_equiv, stepGroup, ite_eq_left hw, mem_iter_J, hK]
   refine and_congr_right fun _ => and_congr ?_ ?_
   · constructor
     · intro h a b hab
