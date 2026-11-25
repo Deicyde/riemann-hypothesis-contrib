@@ -232,21 +232,8 @@ lemma gX {x : Fin n → ℂ} (hx : x ∈ L.X) : g *ᵥ x ∈ L.X := by
       abel
     rw [h1]
     exact L.X.add_mem (L.e_mem a) (L.spanLt_le a.1 a.isLt.le (hS.1 a))
-  have hx' : x ∈ Submodule.span ℂ (L.e '' {b | b.1 < r}) := hx
-  clear hx
-  induction hx' using Submodule.span_induction with
-  | mem v hv =>
-    obtain ⟨a, _, rfl⟩ := hv
-    exact key a
-  | zero =>
-    rw [Matrix.mulVec_zero]
-    exact L.X.zero_mem
-  | add u v _ _ hu hv =>
-    rw [Matrix.mulVec_add]
-    exact L.X.add_mem hu hv
-  | smul c u _ hu =>
-    rw [Matrix.mulVec_smul]
-    exact L.X.smul_mem c hu
+  exact (Submodule.span_le (s := L.e '' {b | b.1 < r}) (p := L.X.comap (Matrix.mulVecLin g))).2
+    (by rintro _ ⟨a, _, rfl⟩; exact key a) hx
 
 omit hS in
 lemma g_inj {x : Fin n → ℂ} (hx : g *ᵥ x = 0) : x = 0 :=
