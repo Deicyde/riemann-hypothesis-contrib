@@ -110,14 +110,9 @@ theorem real_bounds (f r m ρ w D q t : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) (hm :
 
 theorem runOK_of_le : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r DF q m : ℕ), 1 ≤ DF → 2 ≤ I2.PT.f E * r → 1 ≤ m → m ^ 4 ≤ I2.PT.f E → (I2.PT.f E : ℝ) ^ 2 ≤ I2.PT.rd E → 16 ≤ I2.PT.rd E → I2.RR (E := E) ^ 4 * (90 * (I2.PT.f E * r + DF)) * DF * r ≤ q → RunOK E r DF q (Real.sqrt (90 * (I2.PT.f E * r + DF))) m := by
   intro E _ _ _ r DF q m hDF hfr hm1 hmf hf2 hrd hlo
-  have hf : 1 ≤ I2.PT.f E := by
-    rcases Nat.eq_zero_or_pos (I2.PT.f E) with h | h
-    · rw [h] at hfr; omega
-    · exact h
-  have hr : 1 ≤ r := by
-    rcases Nat.eq_zero_or_pos r with h | h
-    · rw [h] at hfr; omega
-    · exact h
+  have hfr0 : I2.PT.f E * r ≠ 0 := (two_pos.trans_le hfr).ne'
+  have hf : 1 ≤ I2.PT.f E := Nat.pos_of_ne_zero (left_ne_zero_of_mul hfr0)
+  have hr : 1 ≤ r := Nat.pos_of_ne_zero (right_ne_zero_of_mul hfr0)
   have hmf' : m ≤ I2.PT.f E := (Nat.le_self_pow (by norm_num) m).trans hmf
   have hfR : (1 : ℝ) ≤ I2.PT.f E := by exact_mod_cast hf
   have hrR : (1 : ℝ) ≤ r := by exact_mod_cast hr
