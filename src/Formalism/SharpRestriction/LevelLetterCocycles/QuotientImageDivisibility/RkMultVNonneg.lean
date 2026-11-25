@@ -211,11 +211,7 @@ theorem rk_corank_zero₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.
   haveI := rk_fd_letter₂ W hS i
   have hbot : (DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ = ⊥ :=
     Submodule.finrank_eq_zero.mp (by omega)
-  intro x hx
-  have hmem : (FilCris PD T₂.ρ (b i : ℤ)).mkQ x ∈
-      (DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ := Submodule.mem_map_of_mem hx
-  rw [hbot] at hmem
-  exact (Submodule.Quotient.mk_eq_zero _).mp ((Submodule.mem_bot LL).mp hmem)
+  exact (LinearMap.le_ker_iff_map.2 hbot).trans (Submodule.ker_mkQ _).le
 
 end Out
 
