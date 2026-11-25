@@ -156,11 +156,7 @@ theorem qLift_isMulLeftInvariant {G : Type} [Group G] [TopologicalSpace G] [IsTo
           (lintegral_map hF (measurable_smul_quot (H := H) g)).symm
       _ = ∫⁻ y, hAvg ν f y.out ∂ρ := by rw [hmap]
       _ = ∫⁻ x, f x ∂qLift ν ρ := (lintegral_qLift ν ρ hf).symm
-  ext s hs
-  have e1 := lintegral_indicator_one (μ := Measure.map (fun x => g * x) (qLift ν ρ)) hs
-  have e2 := lintegral_indicator_one (μ := qLift ν ρ) hs
-  rw [← e1, ← e2]
-  exact key _ (measurable_one.indicator hs)
+  exact Measure.ext_of_lintegral (qLift ν ρ) key
 
 theorem qLift_finite {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
     [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] {H : Subgroup G}
