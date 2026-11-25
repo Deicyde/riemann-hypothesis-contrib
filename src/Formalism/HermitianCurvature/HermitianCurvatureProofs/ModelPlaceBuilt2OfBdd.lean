@@ -1271,20 +1271,22 @@ theorem weight_budget_L2_inequality (k r N : ℕ) (A₀ : ℝ) (hk : 2 ≤ k) (j
   have hR1 : (1 : ℝ) ≤ (r : ℝ) + 1 := by linarith
   have h4 : (r : ℝ) + 1 ≤ ((r : ℝ) + 1) ^ 4 := by
     have : (1 : ℝ) ≤ ((r : ℝ) + 1) ^ 3 := one_le_pow₀ hR1
-    nlinarith
+    linarith [mul_le_mul_of_nonneg_left this (by linarith : (0 : ℝ) ≤ (r : ℝ) + 1)]
 
   have hkr : 2 * ((k : ℝ) + r) ≤ 2 * n := by rw [hn]; linarith
   have hb : 2 * ((k : ℝ) + r) + 1 + 2 * (j + n * ℓ) ≤ 100 * ((N : ℝ) * n ^ 2 + n ^ 3) := by
     have h1 : 2 * n * ℓ ≤ (N : ℝ) * n ^ 2 := by
       have : (ℓ : ℝ) * (2 * n) ≤ N * (n * n) := by
-        apply mul_le_mul hℓ' (by nlinarith) (by positivity) (by positivity)
-      nlinarith
-    have h2 : 2 * n + 1 + 10 ≤ 100 * n ^ 3 := by nlinarith
+        apply mul_le_mul hℓ' (by nlinarith only [hn3]) (by positivity) (by positivity)
+      linarith
+    have h2 : 2 * n + 1 + 10 ≤ 100 * n ^ 3 := by
+      linarith [mul_le_mul_of_nonneg_left hn3 (by positivity : (0 : ℝ) ≤ n ^ 2),
+        mul_le_mul_of_nonneg_left hn3 (by positivity : (0 : ℝ) ≤ n)]
     have hNn : 0 ≤ (N : ℝ) * n ^ 2 := by positivity
-    nlinarith
+    linarith
   have hpos : 0 ≤ 100 * ((N : ℝ) * n ^ 2 + n ^ 3) := by positivity
   calc 2 * ((k : ℝ) + r) * ((r : ℝ) + 1) + 1 + 2 * ((r : ℝ) + 1) * (j + n * ℓ)
-      ≤ ((r : ℝ) + 1) * (2 * ((k : ℝ) + r) + 1 + 2 * (j + n * ℓ)) := by nlinarith
+      ≤ ((r : ℝ) + 1) * (2 * ((k : ℝ) + r) + 1 + 2 * (j + n * ℓ)) := by linarith
     _ ≤ ((r : ℝ) + 1) * (100 * ((N : ℝ) * n ^ 2 + n ^ 3)) := by gcongr
     _ ≤ ((r : ℝ) + 1) ^ 4 * (100 * ((N : ℝ) * n ^ 2 + n ^ 3)) := by gcongr
     _ = 100 * ((r : ℝ) + 1) ^ 4 * ((N : ℝ) * n ^ 2 + n ^ 3) := by ring
