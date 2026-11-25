@@ -17,30 +17,16 @@ private theorem height_eq_order_height_lemma {R : Type*} [CommRing R] (I : Ideal
   exact PrimeSpectrum.height_eq_orderHeight ⟨I, hI⟩
 
 private theorem height_le_height_Iic_lemma_2 {α β : Type*} [PartialOrder α] [Preorder β] (a : α)
-    (f : Set.Iic a → β) (hf : StrictMono f) : Order.height a ≤ Order.height (f ⟨a, le_rfl⟩) := by
-  have hmono : ∀ s : LTSeries α, Monotone s := fun s => by
-    first
-    | exact s.monotone
-  have H : ∀ s : LTSeries α, s.last ≤ a → (s.length : ℕ∞) ≤ Order.height (f ⟨a, le_rfl⟩) := by
-    intro s hs
-    let t : LTSeries β :=
-      { length := s.length
-        toFun := fun i => f ⟨s i, (hmono s (Fin.le_last i)).trans hs⟩
-        step := fun i => hf (Subtype.mk_lt_mk.mpr (s.step i)) }
-    have ht : t.last ≤ f ⟨a, le_rfl⟩ := by
-      show f ⟨s (Fin.last s.length), _⟩ ≤ f ⟨a, le_rfl⟩
-      exact hf.monotone (show s (Fin.last s.length) ≤ a from hs)
-    exact Order.length_le_height ht
-  first
-  | exact Order.height_le fun s hs => H s hs.le
+    (f : Set.Iic a → β) (hf : StrictMono f) : Order.height a ≤ Order.height (f ⟨a, le_rfl⟩) :=
+  WithBot.coe_le_coe.1 <| (Order.height_eq_krullDim_Iic a).trans_le <|
+    (Order.height_top_eq_krullDim (α := Set.Iic a)).symm.trans_le <|
+      WithBot.coe_le_coe.2 (Order.height_le_height_apply_of_strictMono f hf ⊤)
 
 private theorem krullDim_le_height_lemma_3 {α β : Type*} [Preorder α] [Preorder β] (f : α → β)
     (hf : StrictMono f) (b : β) (hb : ∀ x, f x ≤ b) :
-    Order.krullDim α ≤ (Order.height b : WithBot ℕ∞) := by
-  unfold Order.krullDim
-  refine iSup_le fun s => ?_
-  have h := Order.length_le_height (p := s.map f hf) (x := b) (hb s.last)
-  exact_mod_cast h
+    Order.krullDim α ≤ (Order.height b : WithBot ℕ∞) :=
+  (Order.krullDim_le_of_strictMono (fun x => (⟨f x, hb x⟩ : Set.Iic b)) fun _ _ h => hf h).trans
+    (Order.height_eq_krullDim_Iic b).ge
 
 theorem ringKrullDim_localization_quotient_eq_height {P : Type*} [CommRing P] (p q : Ideal P)
     [p.IsPrime] [q.IsPrime] (hpq : p ≤ q) :
