@@ -68,17 +68,9 @@ theorem ball_subset_range (ϖ : O) (n : ℕ) : (ball ϖ n : Set LL) ⊆ Set.rang
   exact ⟨_, rfl⟩
 
 theorem eq_zero_of_forall_dvd {ϖ : O} (hϖ : Irreducible ϖ) {y : O} (h : ∀ n, ϖ ^ n ∣ y) : y = 0 := by
-  have hne : Ideal.span {ϖ} ≠ (⊤ : Ideal O) := by
-    rw [Ne, Ideal.span_singleton_eq_top]
-    exact hϖ.not_isUnit
-  have h0 := Ideal.iInf_pow_eq_bot_of_isLocalRing (Ideal.span {ϖ}) hne
-  have : y ∈ (⨅ i : ℕ, Ideal.span {ϖ} ^ i : Ideal O) := by
-    rw [Ideal.mem_iInf]
-    intro n
-    rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-    exact h n
-  rw [h0] at this
-  simpa using this
+  by_contra hy
+  obtain ⟨n, hn⟩ := FiniteMultiplicity.of_not_isUnit hϖ.not_isUnit hy
+  exact hn (h _)
 
 theorem basis_nhds (hop : IsOpen (Set.range (algebraMap O LL)))
     (hc : IsCompact (Set.range (algebraMap O LL))) {ϖ : O} (hϖ : Irreducible ϖ) :
