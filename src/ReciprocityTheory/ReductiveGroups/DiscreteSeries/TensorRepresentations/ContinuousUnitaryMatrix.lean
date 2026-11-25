@@ -97,16 +97,9 @@ theorem smoothOnG_inner_rep (w : H) {v : H} (hv : IsSmoothVecU ε σ v) :
   simp only [hFU g hg hgJ]
 
 theorem smoothOnG_tensor_phi (dual : Bool) (c d : Fin n) : Formalism.REAL.SmoothOnG ε (fun g => oa1Phi dual g c d) := by
-  have hent : ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => g c d) := by
-    let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℂ :=
-      { toFun := fun M => M c d, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
-    exact (LinearMap.toContinuousLinearMap L).contDiff
-  have hst : ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => star (g c d)) := by
-    let L' : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℂ :=
-      { toFun := fun M => star (M c d)
-        map_add' := fun _ _ => by simp
-        map_smul' := fun r M => by simp [Complex.real_smul, Complex.conj_ofReal] <;> ring }
-    exact (LinearMap.toContinuousLinearMap L').contDiff
+  have hent : ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => g c d) := contDiff_apply_apply ℝ c d
+  have hst : ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => star (g c d)) :=
+    Complex.conjCLE.contDiff.comp hent
   unfold Formalism.REAL.SmoothOnG
   intro g₀ _
   cases dual
