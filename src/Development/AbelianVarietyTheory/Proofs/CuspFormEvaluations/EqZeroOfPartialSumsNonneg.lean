@@ -143,19 +143,9 @@ theorem _root_.GlobalTheory.Harm.antitone_mixedWeight (m : ℕ) {p q : ℕ} {a :
 open Finset in
 theorem _root_.GlobalTheory.Harm.sum_dite_lt {m p : ℕ} (hp : p ≤ m) (f : Fin p → ℤ) :
     ∑ k : Fin m, (if h : (k : ℕ) < p then f ⟨k, h⟩ else 0) = ∑ k, f k := by
-  have hfin := Fin.sum_univ_eq_sum_range (fun j => if h : j < p then f ⟨j, h⟩ else 0) m
-  have hfin' := Fin.sum_univ_eq_sum_range (fun j => if h : j < p then f ⟨j, h⟩ else 0) p
-  beta_reduce at hfin
-  simp only [Fin.is_lt, ↓reduceDIte, Fin.eta] at hfin'
-  rw [hfin, hfin']
   symm
-  apply Finset.sum_subset
-  · intro j hj
-    simp only [Finset.mem_range] at hj ⊢
-    omega
-  · intro j _ hj
-    simp only [Finset.mem_range] at hj
-    simp [hj]
+  exact Fintype.sum_of_injective (Fin.castLE hp) (Fin.castLE_injective hp) f _
+    (fun k hk => dite_eq_right fun h => hk ⟨⟨k, h⟩, rfl⟩) fun k => by simp
 
 
 open Finset in
