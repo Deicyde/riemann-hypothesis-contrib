@@ -114,11 +114,8 @@ theorem muV_int_eq_one_iff (s : SplitPlace L) (r : 𝓞 L) :
 theorem muV_le_one_iff (s : SplitPlace L) (x : L) : muV s x ≤ 1 ↔ s.w.valuation L x ≤ 1 := by
   have hμint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → muV s (algebraMap (𝓞 L) L r) = 1 :=
     fun r hr => (muV_int_eq_one_iff s r).2 hr
-  have hνint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → s.w.valuation L (algebraMap (𝓞 L) L r) = 1 := by
-    intro r hr
-    rw [s.w.valuation_of_algebraMap]
-    exact le_antisymm (s.w.intValuation_le_one r)
-      (not_lt.1 fun h => hr ((s.w.intValuation_lt_one_iff_mem r).1 h))
+  have hνint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → s.w.valuation L (algebraMap (𝓞 L) L r) = 1 :=
+    fun _ hr => (s.w.valuation_eq_one_iff_notMem (K := L)).2 hr
   constructor
   · intro hμ
     by_contra hν
