@@ -68,11 +68,8 @@ theorem smulLat_mem (H : Loc.HermSp M V) (c : E) (Λ : Submodule M.L.O V) (y : V
     exact Submodule.subset_span ⟨w, hw, rfl⟩
 
 theorem coord_unique {n : ℕ} {b : Fin n → V} (hb : LinearIndependent E b) {c c' : Fin n → E}
-    (h : ∑ k, c k • b k = ∑ k, c' k • b k) : c = c' := by
-  have := Fintype.linearIndependent_iff.1 hb (c - c') (by
-    simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib, h, sub_self])
-  funext k
-  exact sub_eq_zero.1 (this k)
+    (h : ∑ k, c k • b k = ∑ k, c' k • b k) : c = c' :=
+  hb.fintypeLinearCombination_injective h
 
 theorem comb_mem {n : ℕ} {b : Fin n → V} {Λ : Submodule M.L.O V} (hbΛ : ∀ k, b k ∈ Λ)
     (c : Fin n → E) (hc : ∀ k, c k ∈ M.L.O) : ∑ k, c k • b k ∈ Λ := by
