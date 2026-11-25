@@ -846,8 +846,8 @@ theorem exists_of_mem_Q (z : Dat (w.st Z) w.I hX T Wt) {t : TupU w.I (usedOf w.I
   · rw [h, w.I.twistPrimes_reference_tuple_eq_empty] at hq
     exact absurd hq (Finset.notMem_empty _)
   · refine ⟨v, hv, fun hu => hr ?_⟩
-    have e : z.R.xiH t = T.xiTw f v := (z.lev.xiH t).trans (h.trans (congrArg (T.xiTw · v) w.C_eq))
-    exact (iff_of_eq (congrArg (fun c : HChar B.host.E => c.UnrAt Q) e)).2 hu
+    rw [z.lev.xiH t, h, w.C_eq]
+    exact hu
 
 theorem exists_mem_Q (z : Dat (w.st Z) w.I hX T Wt) {v : B.places.Pl} (hv : v ∈ Wt) {Q : HeightOneSpectrum (𝓞 B.host.E)}
     (hr : ¬ (T.xiTw f v).UnrAt Q) (hu : ∃ u, w.I.sel u = Q) : ∃ t, Q ∈ z.R.Q t := by
