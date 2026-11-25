@@ -116,20 +116,13 @@ theorem mat_inv_mem (K : IntermediateField ℚ ℂ) {m : Type} [Fintype m] [Deci
   have hmap : AK.map φ = A := by
     ext i j
     rfl
-  have hdA : A.det ≠ 0 := by
-    intro h
-    have h1 := congrArg Matrix.det hAB
-    rw [Matrix.det_mul, h, zero_mul, Matrix.det_one] at h1
-    exact zero_ne_one h1
+  have hdA : A.det ≠ 0 := Matrix.det_ne_zero_of_right_inverse hAB
   have hdet : IsUnit AK.det := by
     refine isUnit_iff_ne_zero.2 fun h => hdA ?_
     rw [← hmap, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h, map_zero]
   have h2 : A * (AK⁻¹).map φ = 1 := by
     rw [← hmap, ← Matrix.map_mul, Matrix.mul_nonsing_inv _ hdet, Matrix.map_one _ (map_zero φ) (map_one φ)]
-  have h3 : Bm * A = 1 := mul_eq_one_comm.mp hAB
-  have hB : Bm = (AK⁻¹).map φ := by
-    calc Bm = Bm * (A * (AK⁻¹).map φ) := by rw [h2, Matrix.mul_one]
-      _ = (AK⁻¹).map φ := by rw [← Matrix.mul_assoc, h3, Matrix.one_mul]
+  have hB : Bm = (AK⁻¹).map φ := left_inv_eq_right_inv (mul_eq_one_comm.mp hAB) h2
   intro i j
   rw [hB]
   exact (AK⁻¹ i j).2
