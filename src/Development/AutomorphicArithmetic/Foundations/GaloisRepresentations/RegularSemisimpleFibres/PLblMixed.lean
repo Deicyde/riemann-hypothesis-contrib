@@ -14,28 +14,9 @@ open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published U
 open scoped Classical
 
 private theorem perm_lift {α β : Type*} (f : α → β) {m m' : List β} (h : m.Perm m') :
-    ∀ l : List α, l.map f = m' → ∃ l' : List α, l'.Perm l ∧ l'.map f = m := by
-  induction h with
-  | nil => intro l hl; exact ⟨l, .refl _, hl⟩
-  | cons b _ ih =>
-    intro l hl
-    cases l with
-    | nil => simp at hl
-    | cons a l =>
-      simp only [List.map_cons, List.cons.injEq] at hl
-      obtain ⟨l', hp, hm⟩ := ih l hl.2
-      exact ⟨a :: l', hp.cons a, by simp [hm, hl.1]⟩
-  | swap a b t =>
-    intro l hl
-    match l, hl with
-    | u :: v :: l, hl =>
-      simp only [List.map_cons, List.cons.injEq] at hl
-      exact ⟨v :: u :: l, .swap _ _ _, by simp [hl.1, hl.2.1, hl.2.2]⟩
-  | trans _ _ ih₁ ih₂ =>
-    intro l hl
-    obtain ⟨l₂, hp₂, hm₂⟩ := ih₂ l hl
-    obtain ⟨l₁, hp₁, hm₁⟩ := ih₁ l₂ hm₂
-    exact ⟨l₁, hp₁.trans hp₂, hm₁⟩
+    ∀ l : List α, l.map f = m' → ∃ l' : List α, l'.Perm l ∧ l'.map f = m := fun l hl => by
+  obtain ⟨l', e, hp⟩ := (congrFun (congrFun (List.eq_map_comp_perm f) m) l).mpr (hl ▸ h)
+  exact ⟨l', hp, e.symm⟩
 
 private theorem pairwise_filter_sym {α : Type*} (r : α → α → Prop) (p : α → Prop) [DecidablePred p] (l : List α)
     (h : (Multiset.filter p (l : Multiset α)).Pairwise r) :
