@@ -234,12 +234,6 @@ theorem approx_pow {V : HSp D} {La : Type} [AddCommGroup La] [Module (𝓞 D.hos
       finVec V (ι (((f - 1) ^ n) a)) - ((K - 1) ^ n) *ᵥ finVec V (ι a) = M • w := by
   have hm : ∀ a, finVec V (ι a) ∈ latGHat V 1 := fun a =>
     (GlobalTheory.Member.LatMove.mem_lat_iff V 1 _).1 (hι.2 ▸ LinearMap.mem_range_self ι a)
-  have hJ : ∀ (g : La →ₗ[𝓞 D.host.E] La) a, a ∈ J • (⊤ : Submodule (𝓞 D.host.E) La) →
-      g a ∈ J • (⊤ : Submodule (𝓞 D.host.E) La) := by
-    intro g a ha
-    have : g a ∈ (J • (⊤ : Submodule (𝓞 D.host.E) La)).map g := Submodule.mem_map_of_mem ha
-    rw [Submodule.map_smul''] at this
-    exact Submodule.smul_mono le_rfl le_top this
   intro n
   induction n with
   | zero =>
@@ -248,7 +242,7 @@ theorem approx_pow {V : HSp D} {La : Type} [AddCommGroup La] [Module (𝓞 D.hos
   | succ n ih =>
     intro a ha
     obtain ⟨w₂, hw₂, e₂⟩ := ih a ha
-    obtain ⟨w₁, hw₁, e₁⟩ := hf _ (hJ ((f - 1) ^ n) a ha)
+    obtain ⟨w₁, hw₁, e₁⟩ := hf _ (Submodule.smul_top_le_comap_smul_top J ((f - 1) ^ n) ha)
     refine ⟨w₁ + (K - 1) *ᵥ w₂, add_mem hw₁ (hK _ hw₂), ?_⟩
     have ex : ((f - 1) ^ (n + 1)) a = f (((f - 1) ^ n) a) - ((f - 1) ^ n) a := by
       rw [pow_succ', Module.End.mul_apply]; rfl
