@@ -156,12 +156,7 @@ theorem exists_integral_base (hd : d.AxH 𝒜) (c : ι) (v : AddValuation (Ω c)
     have hex : ∃ b : Ω c, f = b • g := ⟨a, hfa⟩
     unfold ratio
     rw [dite_eq_left hex]
-    by_contra hne
-    apply hg
-    have h0 : (hex.choose - a) • g = 0 := by rw [sub_smul, ← hex.choose_spec, ← hfa, sub_self]
-    have h1 := congrArg (fun y => (hex.choose - a)⁻¹ • y) h0
-    simp only [smul_zero] at h1
-    rwa [inv_smul_smul₀ (sub_ne_zero.mpr hne)] at h1
+    exact smul_left_injective (Ω c) hg (hex.choose_spec.symm.trans hfa)
   obtain ⟨q, hqdef⟩ : ∃ q : Fin (d.N + 1) → Ω c, ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) = q j :=
     ⟨_, fun _ => rfl⟩
   have hx : ∀ j, d.w j c = q j • d.w (d.jc c) c := fun j => by
@@ -226,12 +221,7 @@ theorem genericHomAt_relation (hd : d.AxH 𝒜) (c : ι) (j0 : Fin (d.N + 1)) (h
     have hex : ∃ b : Ω c, f = b • g := ⟨a, hfa⟩
     unfold ratio
     rw [dite_eq_left hex]
-    by_contra hne
-    apply hg
-    have h0 : (hex.choose - a) • g = 0 := by rw [sub_smul, ← hex.choose_spec, ← hfa, sub_self]
-    have h1 := congrArg (fun y => (hex.choose - a)⁻¹ • y) h0
-    simp only [smul_zero] at h1
-    rwa [inv_smul_smul₀ (sub_ne_zero.mpr hne)] at h1
+    exact smul_left_injective (Ω c) hg (hex.choose_spec.symm.trans hfa)
   classical
   obtain ⟨q, hqdef⟩ : ∃ q : Fin (d.N + 1) → Ω c, ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) = q j :=
     ⟨_, fun _ => rfl⟩
