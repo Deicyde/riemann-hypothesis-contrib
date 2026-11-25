@@ -292,7 +292,7 @@ theorem compact_preimage (hN : IsClosed (N k n c p : Set (GL (n ⊕ Fin c) k))) 
   have h1 := hC.image hb
   have h2 := hC.image (MulOpposite.continuous_op.comp (hb.comp continuous_inv))
   have h3 := (Units.isClosedEmbedding_embedProduct (α := Matrix n n k)).isCompact_preimage (h1.prod h2)
-  have h4 := (h3.prod hC).image (f := fun z => (embX c z.1)⁻¹ * z.2)
+  have h4 := (h3.prod hC).image (f := fun z : GL n k × GL (n ⊕ Fin c) k => (embX c z.1)⁻¹ * z.2)
     ((continuous_embX.comp continuous_fst).inv.mul continuous_snd)
   have h5 := hN.isClosedEmbedding_subtypeVal.isCompact_preimage h4
   refine ⟨_, h3.prod h5, fun z hz => ?_⟩
