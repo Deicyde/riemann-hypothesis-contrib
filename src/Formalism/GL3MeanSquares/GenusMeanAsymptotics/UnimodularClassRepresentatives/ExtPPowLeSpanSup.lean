@@ -97,15 +97,8 @@ local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
 
 theorem ne_bot {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : 𝔭 ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField h𝔭 (NumberField.RingOfIntegers.not_isField F)
 
-theorem map_ne_bot_of_isMaximal {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : extP K 𝔭 ≠ ⊥ := by
-  intro h
-  apply ne_bot h𝔭
-  have h1 : Ideal.comap ι (Ideal.map ι 𝔭) = 𝔭 := Ideal.comap_map_eq_self_of_faithfullyFlat _
-  have h3 : Ideal.comap ι (Ideal.map ι (⊥ : Ideal (𝓞 F))) = ⊥ :=
-    Ideal.comap_map_eq_self_of_faithfullyFlat _
-  rw [Ideal.map_bot] at h3
-  change Ideal.map ι 𝔭 = ⊥ at h
-  rw [← h1, h, h3]
+theorem map_ne_bot_of_isMaximal {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : extP K 𝔭 ≠ ⊥ :=
+  Ideal.map_ne_bot_of_ne_bot (ne_bot h𝔭)
 
 theorem mem_pow_iff (𝔭 : Ideal (𝓞 F)) (k : ℕ) (a : 𝓞 F) : ι a ∈ extP K 𝔭 ^ k ↔ a ∈ 𝔭 ^ k := by
   have h : Ideal.comap ι (Ideal.map ι (𝔭 ^ k)) = 𝔭 ^ k :=
@@ -210,16 +203,8 @@ theorem exists_tr (hF : IsFixF K F) (z : 𝓞 K) : ∃ a : 𝓞 F, ι a = z + co
     rfl
   rw [e, star_add, star_star, add_comm]
 
-theorem ι_inj : Function.Injective (ι) := by
-  intro a b hab
-  have h : Ideal.comap ι (Ideal.map ι (⊥ : Ideal (𝓞 F))) = ⊥ :=
-    Ideal.comap_map_eq_self_of_faithfullyFlat _
-  rw [Ideal.map_bot] at h
-  have h1 : a - b ∈ Ideal.comap ι (⊥ : Ideal (𝓞 K)) := by
-    rw [Ideal.mem_comap, map_sub, hab, sub_self]
-    exact Ideal.zero_mem _
-  rw [h, Ideal.mem_bot, sub_eq_zero] at h1
-  exact h1
+theorem ι_inj : Function.Injective (ι) :=
+  FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 K)
 
 def trf (hF : IsFixF K F) (z : 𝓞 K) : 𝓞 F := Classical.choose (exists_tr hF z)
 
