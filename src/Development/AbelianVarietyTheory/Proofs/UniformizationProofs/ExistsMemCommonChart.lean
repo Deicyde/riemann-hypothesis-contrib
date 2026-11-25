@@ -88,21 +88,8 @@ theorem exists_mem_commonChart (E : SplitExt S) (x : E.B.left) : ∃ j, x ∈ E.
 
 private theorem gm_res_pullU_eq_gm_comp {Z P Y : Scheme.{0}} (p : Z ⟶ P) (a : P ⟶ Y) {U : Y.Opens} {W : P.Opens}
     (h : W ≤ a ⁻¹ᵁ U) {z : Z} (hz : p z ∈ W) (w : Γ(Y, U)ˣ) :
-    gm p z W (res h (pullU a U w)) = gm (p ≫ a) z U w := by
-  have hz' : (p ≫ a) z ∈ U := h hz
-  ext
-  simp only [gm, dif_pos hz, dif_pos hz', pullU, res, MonoidHom.comp_apply, Units.coe_map]
-  erw [← Scheme.Hom.germ_stalkMap_apply p W z hz, TopCat.Presheaf.germ_res_apply,
-    Scheme.Hom.germ_stalkMap_apply]
-  rfl
-
-private theorem gm_id_pullU_eq_gm {Z P Y : Scheme.{0}} (p : Z ⟶ P) (a : P ⟶ Y) {U : Y.Opens} {z : Z}
-    (hz : p z ∈ a ⁻¹ᵁ U) (w : Γ(Y, U)ˣ) :
-    gm p z (a ⁻¹ᵁ U) (pullU a U w) = gm (p ≫ a) z U w := by
-  have hz' : (p ≫ a) z ∈ U := hz
-  ext
-  simp only [gm, dif_pos hz, dif_pos hz', pullU, MonoidHom.comp_apply, Units.coe_map]
-  rfl
+    gm p z W (res h (pullU a U w)) = gm (p ≫ a) z U w :=
+  (gm_res p z h hz _).trans (gm_pull p a z U (h hz) w)
 
 theorem isWt_coordinate (d : E.GtDatum G) (j : E.ChartIdx) (k : Module.Free.ChooseBasisIndex ℤ E.X) :
     IsWt d.i _ (d.u j k).val (E.basis k) := by
@@ -120,7 +107,7 @@ theorem isWt_coordinate (d : E.GtDatum G) (j : E.ChartIdx) (k : Module.Free.Choo
   have key := congrArg (gm (lift t g).left z _) (d.equiv j k)
   rw [map_mul] at key
   rw [gm_res_pullU_eq_gm_comp (a := (lift (fst (splitTorus S E.X) G ≫ d.i) (snd (splitTorus S E.X) G) ≫ μ).left) _ _ hp,
-    gm_id_pullU_eq_gm (a := (snd (splitTorus S E.X) G).left) _ hp] at key
+    gm_pull (lift t g).left (snd (splitTorus S E.X) G).left z (d.q.left ⁻¹ᵁ E.chart j) hp] at key
   rw [← Over.comp_left, ← Over.comp_left, lift_snd, ← hf] at key
   rw [key]
   congr 1
