@@ -44,11 +44,8 @@ private theorem squarefree_map_minpoly_int (C : Type) [Field C] [CharZero C] (OE
 private theorem aeval_map_minpoly_int (C : Type) [Field C] (OE : Type)
     [CommRing OE] (A : Type) [Ring A] [Algebra C A] (ρ : OE →+* A) (a : OE) :
     Polynomial.aeval (ρ a) ((minpoly ℤ a).map (Int.castRingHom C)) = 0 := by
-  have h4 : Int.castRingHom C = algebraMap ℤ C := RingHom.ext_int _ _
-  rw [h4, Polynomial.aeval_map_algebraMap]
-  have := Polynomial.aeval_algHom_apply ρ.toIntAlgHom a (minpoly ℤ a)
-  rw [minpoly.aeval, map_zero] at this
-  exact this
+  rw [← algebraMap_int_eq, Polynomial.aeval_map_algebraMap]
+  exact minpoly.aeval_algHom ℤ ρ.toIntAlgHom a
 
 private theorem finite_ringHom_order (C : Type) [Field C] [CharZero C] (OE : Type)
     [CommRing OE] [IsDomain OE] [Module.Free ℤ OE] [Module.Finite ℤ OE] :
