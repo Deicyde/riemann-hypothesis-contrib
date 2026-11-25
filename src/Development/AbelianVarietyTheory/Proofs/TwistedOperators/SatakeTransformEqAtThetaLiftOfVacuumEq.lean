@@ -562,16 +562,14 @@ theorem pairing_unitary (h : GU σ n') (x y : Matrix (Fin n') (Fin n) L) :
     pairing σ δ ψ (h.1.1 * x) (h.1.1 * y) = pairing σ δ ψ x y := by
   have hu : cT σ h.1.1 * antiJ L n' * h.1.1 = antiJ L n' := h.2
   have hl : locH σ δ (antiG L n) (antiG L n') (h.1.1 * x) (h.1.1 * y) = locH σ δ (antiG L n) (antiG L n') x y := by
-    unfold locH
-    congr 1
     have e1 : ((h.1.1 * y).map σ)ᵀ = (y.map σ)ᵀ * cT σ h.1.1 := by
       rw [Matrix.map_mul, Matrix.transpose_mul]; rfl
     have e2 : ((antiG L n' : GL (Fin n') L) : Matrix (Fin n') (Fin n') L) = antiJ L n' := rfl
+    unfold locH
     rw [e1, e2]
-    congr 1
-    calc _ = (((antiG L n)⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) * (y.map σ)ᵀ * (cT σ h.1.1 * antiJ L n' * h.1.1) * x := by
-          simp only [Matrix.mul_assoc]
-      _ = _ := by rw [hu]
+    simp only [Matrix.mul_assoc]
+    rw [← Matrix.mul_assoc (antiJ L n') h.1.1 x, ← Matrix.mul_assoc (cT σ h.1.1),
+      ← Matrix.mul_assoc (cT σ h.1.1) (antiJ L n'), hu]
   have e3 : ∀ a b : Matrix (Fin n') (Fin n) L, pairing σ δ ψ a b =
       ψ (locH σ δ (antiG L n) (antiG L n') a b + σ (locH σ δ (antiG L n) (antiG L n') a b)) := by
     intro a b; rw [locH_antiG]; rfl
