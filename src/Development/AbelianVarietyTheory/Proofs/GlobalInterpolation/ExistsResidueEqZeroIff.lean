@@ -35,14 +35,8 @@ open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
 theorem _root_.GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
     IsOpen {x : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v | Valued.v x < 1} := by
-  rw [isOpen_iff_mem_nhds]
-  intro x hx
-  rw [Valued.mem_nhds]
-  refine ⟨1, fun y hy => ?_⟩
-  simp only [Set.mem_setOf_eq] at hx hy ⊢
-  have hy' : y = (y - x) + x := by ring
-  rw [hy']
-  exact Valuation.map_add_lt _ (by simpa using hy) hx
+  simpa only [Valuation.restrict_lt_one_iff] using
+    Valued.isOpen_ball (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) 1
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
