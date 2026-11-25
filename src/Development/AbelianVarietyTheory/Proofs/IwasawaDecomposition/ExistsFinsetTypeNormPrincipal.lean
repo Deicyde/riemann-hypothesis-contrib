@@ -50,12 +50,7 @@ theorem extendIdealHom_fg {E K : Type} [Field E] [Field K] [NumberField K]
 theorem span_singleton_prod_pow {R K ι : Type} [CommRing R] [CommRing K] [Algebra R K]
     (s : Finset ι) (x : ι → K) (r : ι → ℕ) :
     ∏ i ∈ s, Submodule.span R {x i} ^ r i = Submodule.span R {∏ i ∈ s, x i ^ r i} := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [Submodule.one_eq_span]
-  | insert i s hi ih =>
-    rw [Finset.prod_insert hi, Finset.prod_insert hi, ih, Submodule.span_pow, Set.singleton_pow,
-      Submodule.span_mul_span, Set.singleton_mul_singleton]
+  simp only [Submodule.span_pow, Set.singleton_pow, Submodule.prod_span_singleton]
 
 theorem fg_prod_pow {R K ι : Type} [CommRing R] [CommRing K] [Algebra R K]
     (s : Finset ι) (I : ι → Submodule R K) (r : ι → ℕ) (h : ∀ i, (I i).FG) :
