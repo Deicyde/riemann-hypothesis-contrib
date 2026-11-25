@@ -57,12 +57,8 @@ theorem lc_of_inv {f : V → ℂ} {L : AddSubgroup V} (h : IsOpen (L : Set V)) (
     rwa [add_sub_cancel] at this⟩
 
 theorem sb_ind [T2Space V] (a : V) {L : AddSubgroup V} (h : CO L) : SB (ind a L) := by
-  refine ⟨lc_of_inv h.2 fun x l hl => ?_, HasCompactSupport.intro (K := (fun y => y + a) '' L)
+  exact ⟨lc_of_inv h.2 fun x l hl => ind_add x hl, HasCompactSupport.intro (K := (fun y => y + a) '' L)
     (h.1.image (continuous_id.add continuous_const)) fun x hx => ind_of_not fun h' => hx ⟨_, h', by simp⟩⟩
-  by_cases hx : x - a ∈ L
-  · rw [ind_of_mem hx, ind_of_mem (by rw [add_sub_right_comm]; exact L.add_mem hx hl)]
-  · rw [ind_of_not hx, ind_of_not fun h' => hx (by
-      rw [add_sub_right_comm] at h'; exact (L.add_mem_cancel_right hl).1 h')]
 
 end top
 
