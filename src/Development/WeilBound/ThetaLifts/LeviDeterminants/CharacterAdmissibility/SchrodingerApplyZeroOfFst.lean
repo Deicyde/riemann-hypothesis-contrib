@@ -139,21 +139,13 @@ theorem extend_dot {j : κ₁ → κ} (hj : Function.Injective j) (a : κ₁ →
   · rw [hj.extend_apply]; rfl
 
 omit [Invertible (2 : R)] [Fintype κ] [Fintype κ₁] in
-theorem extend_add {j : κ₁ → κ} (hj : Function.Injective j) (a b : κ₁ → R) :
+theorem extend_add {j : κ₁ → κ} (_hj : Function.Injective j) (a b : κ₁ → R) :
     Function.extend j (a + b) 0 = Function.extend j a 0 + Function.extend j b 0 := by
-  funext k
-  by_cases h : ∃ x, j x = k
-  · obtain ⟨x, rfl⟩ := h
-    simp [hj.extend_apply]
-  · simp [Function.extend_apply' _ _ _ h]
+  rw [← Function.extend_add, add_zero]
 
 omit [Invertible (2 : R)] [Fintype κ] [Fintype κ₁] in
-theorem extend_zero' {j : κ₁ → κ} (hj : Function.Injective j) : Function.extend j (0 : κ₁ → R) 0 = 0 := by
-  funext k
-  by_cases h : ∃ x, j x = k
-  · obtain ⟨x, rfl⟩ := h
-    simp [hj.extend_apply]
-  · simp [Function.extend_apply' _ _ _ h]
+theorem extend_zero' {j : κ₁ → κ} (_hj : Function.Injective j) : Function.extend j (0 : κ₁ → R) 0 = 0 :=
+  Function.extend_zero j
 
 omit [Invertible (2 : R)] [Fintype κ] [Fintype κ₁] in
 theorem rel_lift {S : V R κ ≃ₗ[R] V R κ} {j : κ₁ → κ} (hj : Function.Injective j) (w₁ : V R κ₁) :
