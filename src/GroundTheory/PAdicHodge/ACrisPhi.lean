@@ -274,10 +274,7 @@ theorem phi_periodT_eq_mul {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) :
 theorem periodT_pow_mem' {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) : periodT hε ^ (p - 1) ∈ 𝔭 := by
   by_cases hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) = 1
   · set ε' := (_root_.frobeniusEquiv 𝒪♭ p).symm ε
-    have hε' : ε = ε' ^ p := by
-      have h := (_root_.frobeniusEquiv 𝒪♭ p).apply_symm_apply ε
-      rw [_root_.frobeniusEquiv_apply, frobenius_def] at h
-      exact h.symm
+    have hε' : ε = ε' ^ p := (_root_.frobeniusEquiv_symm_pow_p 𝒪♭ p ε).symm
     have hμ : AInf.mu (K := K) ε = φ (AInf.mu ε') := by
       rw [frobenius_mu, AInf.mu, AInf.mu, hε', map_pow, add_sub_cancel]
     have hφ : φ (AInf.mu (K := K) ε') ∈ RingHom.ker θ := hμ ▸ mu_mem_ker hε
