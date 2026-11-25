@@ -94,12 +94,8 @@ theorem planch : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorme
     rw [← integral_complex_ofReal]
     congr 1; ext y
     rw [Complex.mul_conj, Complex.normSq_eq_norm_sq]
-  have hconj : ∀ t : F, (starRingEnd ℂ) (ψ t) = ψ (-t) := by
-    intro t
-    rw [AddChar.map_neg_eq_inv]
-    have h1 : ‖ψ t‖ = 1 := hψ'.2.1 t
-    have h0 : ψ t ≠ 0 := by intro h; rw [h, norm_zero] at h1; exact zero_ne_one h1
-    rw [Complex.inv_def, Complex.normSq_eq_norm_sq, h1]; simp
+  have hconj : ∀ t : F, (starRingEnd ℂ) (ψ t) = ψ (-t) := fun t => by
+    rw [AddChar.map_neg_eq_inv, Complex.inv_eq_conj (hψ'.2.1 t)]
   have hinner : ∀ x, ∫ y, ψ (β x y) * (starRingEnd ℂ) (g y) ∂μ = (starRingEnd ℂ) (f x) := by
     intro x
     have := hsd.2 f hf (-x)
