@@ -83,11 +83,8 @@ theorem norm_quasiChar_unifUnit_mul_qpow_lt_one {s : ℂ} (hs : -quasiCharExpone
 
 theorem one_sub_quasiChar_unifUnit_mul_qpow_ne_zero {s : ℂ}
     (hs : -quasiCharExponent χ < s.re) :
-    1 - ((χ (unifUnit K) : ℂˣ) : ℂ) * (residueCard K : ℂ) ^ (-s) ≠ 0 := by
-  intro h
-  have := norm_quasiChar_unifUnit_mul_qpow_lt_one hχ hs
-  rw [← sub_eq_zero.mp h, norm_one] at this
-  exact lt_irrefl _ this
+    1 - ((χ (unifUnit K) : ℂˣ) : ℂ) * (residueCard K : ℂ) ^ (-s) ≠ 0 :=
+  (isUnit_one_sub_of_norm_lt_one (norm_quasiChar_unifUnit_mul_qpow_lt_one hχ hs)).ne_zero
 
 theorem localLFactor_ne_zero {s : ℂ} (hs : -quasiCharExponent χ < s.re) :
     localLFactor χ s ≠ 0 := by
