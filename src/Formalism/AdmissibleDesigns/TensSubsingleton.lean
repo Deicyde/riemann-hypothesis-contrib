@@ -26,11 +26,8 @@ variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp]
     {O : Type} [CommRing O] [Algebra O LL]
 
 theorem tens_subsingleton {V C : Type} [AddCommGroup V] [Module Qp V] [AddCommGroup C] [Module Qp C]
-    [Subsingleton V] (z : V ⊗[Qp] C) : z = 0 := by
-  induction z using TensorProduct.induction_on with
-  | zero => rfl
-  | tmul v c => rw [Subsingleton.elim v 0, TensorProduct.zero_tmul]
-  | add x y hx hy => rw [hx, hy, add_zero]
+    [Subsingleton V] (z : V ⊗[Qp] C) : z = 0 :=
+  Subsingleton.elim z 0
 
 section Fil
 
