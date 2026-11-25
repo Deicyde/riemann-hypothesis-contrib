@@ -145,12 +145,8 @@ theorem colon_int : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ 
     ⟨(evQ Q).comp Φ, fun _ => rfl⟩
   have hψinc : ∀ e : D.host.E, ψ (incA D e) = algebraMap D.host.E _ e := fun e => by
     rw [hψ, hΦ.inc]; rfl
-  have hεQ : ψ ε = 0 ∨ ψ ε = 1 := by
-    have h := congrArg ψ hεε
-    rw [map_mul] at h
-    rcases mul_eq_zero.1 (show ψ ε * (ψ ε - 1) = 0 by rw [mul_sub, h, mul_one, sub_self]) with h0 | h1
-    · exact Or.inl h0
-    · exact Or.inr (sub_eq_zero.1 h1)
+  have hεQ : ψ ε = 0 ∨ ψ ε = 1 :=
+    IsIdempotentElem.iff_eq_zero_or_one.1 (IsIdempotentElem.map hεε ψ)
   rw [← hψ]
   rcases hεQ with h0 | h1
   · rw [← hεa _ hx, map_mul, h0, zero_mul]; exact zero_mem _
