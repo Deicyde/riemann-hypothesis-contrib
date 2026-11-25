@@ -57,32 +57,18 @@ namespace GlobalTheory.Tw.Model
 variable {n : ℕ} {R : Type} [CommRing R] [StarRing R]
 
 omit [StarRing R] in
-theorem Phi_apply' (i j : Fin n) : Phi n R i j = if j = i.rev then (-1) ^ (i : ℕ) else 0 := by
-  simp only [Phi, Matrix.of_apply]
-  congr 1
-  apply propext
-  rw [Fin.ext_iff, Fin.val_rev]
-  have := i.2
-  have := j.2
-  omega
+theorem Phi_apply' (i j : Fin n) : Phi n R i j = if j = i.rev then (-1) ^ (i : ℕ) else 0 :=
+  GlobalTheory.Tw.PhiConjugateTranspose.phi_apply i j
 
 omit [StarRing R] in
-theorem Phi_mul_transpose : Phi n R * (Phi n R)ᵀ = 1 := by
-  ext i j
-  simp only [Matrix.mul_apply, Matrix.transpose_apply, Phi_apply', ite_mul, zero_mul,
-    Finset.sum_ite_eq', Finset.mem_univ, ite_true, Fin.rev_inj, Matrix.one_apply]
-  split_ifs with h
-  · subst h
-    rw [← pow_add, ← two_mul, pow_mul]; simp
-  · simp
+theorem Phi_mul_transpose : Phi n R * (Phi n R)ᵀ = 1 :=
+  GlobalTheory.Tw.PhiConjugateTranspose.phi_mul_transpose
 
 omit [StarRing R] in
 theorem transpose_mul_Phi : (Phi n R)ᵀ * Phi n R = 1 := mul_eq_one_comm.mp Phi_mul_transpose
 
-theorem Phi_conjTranspose : (Phi n R)ᴴ = (Phi n R)ᵀ := by
-  ext i j
-  simp only [Matrix.conjTranspose_apply, Matrix.transpose_apply, Phi_apply']
-  split_ifs <;> simp
+theorem Phi_conjTranspose : (Phi n R)ᴴ = (Phi n R)ᵀ :=
+  GlobalTheory.Tw.PhiConjugateTranspose.phi_conjTranspose
 
 omit [StarRing R] in
 theorem Phi_transpose : (Phi n R)ᵀ = ((-1 : R) ^ (n - 1)) • Phi n R := by
@@ -94,12 +80,11 @@ theorem Phi_transpose : (Phi n R)ᵀ = ((-1 : R) ^ (n - 1)) • Phi n R := by
     rw [this, ← pow_add, show (i : ℕ) + j + i = 2 * i + j by ring, pow_add, pow_mul]; simp
   · rw [ite_eq_right h, ite_eq_right (by omega)]; simp
 
-theorem theta_one : theta (1 : Matrix (Fin n) (Fin n) R) = 1 := by
-  simp [theta, Phi_mul_transpose]
+theorem theta_one : theta (1 : Matrix (Fin n) (Fin n) R) = 1 :=
+  GlobalTheory.Tw.PhiConjugateTranspose.theta_one
 
-theorem theta_mul (g h : Matrix (Fin n) (Fin n) R) : theta (g * h) = theta g * theta h := by
-  simp only [theta, Matrix.mul_inv_rev, Matrix.conjTranspose_mul, Matrix.mul_assoc]
-  rw [← Matrix.mul_assoc (Phi n R)ᵀ (Phi n R), transpose_mul_Phi, Matrix.one_mul]
+theorem theta_mul (g h : Matrix (Fin n) (Fin n) R) : theta (g * h) = theta g * theta h :=
+  GlobalTheory.Tw.PhiConjugateTranspose.theta_mul g h
 
 theorem theta_mul_theta_inv {g : Matrix (Fin n) (Fin n) R} (hg : IsUnit g) :
     theta g * theta g⁻¹ = 1 := by
