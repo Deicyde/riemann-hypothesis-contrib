@@ -80,13 +80,7 @@ theorem diagEnergy_mul (hI : ChartEnergyLinearInvariant.Statement) (hC : ChartEn
 theorem diagEnergy_perm (hI : ChartEnergyLinearInvariant.Statement) {e : ℕ} {l : Fin (e + 1) → ℝ}
     (hl : ∀ j, 0 < l j) (σ : Equiv.Perm (Fin (e + 1))) : diagEnergy (l ∘ σ) = diagEnergy l := by
   set C : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ := σ.symm.toPEquiv.toMatrix with hCdef
-  have hCH : Cᴴ = σ.toPEquiv.toMatrix := by
-    ext i j
-    rw [hCdef, conjTranspose_apply, PEquiv.toMatrix_apply, PEquiv.toMatrix_apply]
-    simp only [Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq, Equiv.symm_apply_eq]
-    by_cases h : σ i = j
-    · simp [h]
-    · simp [h, Ne.symm h]
+  have hCH : Cᴴ = σ.toPEquiv.toMatrix := Matrix.conjTranspose_permMatrix (R := ℂ) σ.symm
   have hconj : ∀ A : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ, Cᴴ * A * C = A.submatrix σ σ := by
     intro A
     rw [hCH, PEquiv.toMatrix_toPEquiv_mul, hCdef, PEquiv.mul_toMatrix_toPEquiv, Equiv.symm_symm]
