@@ -191,14 +191,8 @@ theorem map_tDen : PowerSeries.map φ (tDen W xP) = tDen (W.map φ) (φ xP) := b
 
 theorem map_inv : PowerSeries.map φ (invOfUnit (tDen W xP) 1)
     = invOfUnit (tDen (W.map φ) (φ xP)) 1 := by
-  have h1 : tDen (W.map φ) (φ xP) * PowerSeries.map φ (invOfUnit (tDen W xP) 1) = 1 := by
-    rw [← Plus.map_tDen W xP φ, ← map_mul, tDen_mul_inv, map_one]
-  have h2 := tDen_mul_inv (W.map φ) (φ xP)
-  calc PowerSeries.map φ (invOfUnit (tDen W xP) 1)
-      = (invOfUnit (tDen (W.map φ) (φ xP)) 1 * tDen (W.map φ) (φ xP))
-          * PowerSeries.map φ (invOfUnit (tDen W xP) 1) := by
-        rw [mul_comm (invOfUnit (tDen (W.map φ) (φ xP)) 1) (tDen (W.map φ) (φ xP)), h2, one_mul]
-    _ = invOfUnit (tDen (W.map φ) (φ xP)) 1 := by rw [mul_assoc, h1, mul_one]
+  refine inv_unique ?_ (tDen_mul_inv (W.map φ) (φ xP))
+  rw [← Plus.map_tDen W xP φ, ← map_mul, tDen_mul_inv, map_one]
 
 theorem map_tS : PowerSeries.map φ (tS W xP) = tS (W.map φ) (φ xP) := by
   simp only [tS, map_mul, map_pow, PowerSeries.map_X, Plus.map_inv W xP φ]
