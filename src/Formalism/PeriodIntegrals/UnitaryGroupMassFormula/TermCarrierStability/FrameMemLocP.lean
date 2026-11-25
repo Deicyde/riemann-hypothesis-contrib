@@ -155,12 +155,7 @@ theorem frE_map {n : ℕ} (β : S.V ≃ₗ[E] S.V) (f : Fin n → S.V) (A : Matr
 def UT {n : ℕ} (A : Matrix (Fin n) (Fin n) E) : Prop := (∀ a b, b < a → A a b = 0) ∧ ∀ a, A a a = 1
 
 theorem UT.mul {n : ℕ} {A B : Matrix (Fin n) (Fin n) E} (hA : UT A) (hB : UT B) : UT (A * B) := by
-  refine ⟨fun a b hba => ?_, fun a => ?_⟩
-  · rw [Matrix.mul_apply]
-    refine Finset.sum_eq_zero fun c _ => ?_
-    rcases lt_or_ge c a with h | h
-    · rw [hA.1 a c h, zero_mul]
-    · rw [hB.1 c b (lt_of_lt_of_le hba h), mul_zero]
+  refine ⟨fun a b hba => Matrix.BlockTriangular.mul (b := id) hA.1 hB.1 hba, fun a => ?_⟩
   · rw [Matrix.mul_apply, Finset.sum_eq_single a]
     · rw [hA.2, hB.2, one_mul]
     · intro c _ hca
