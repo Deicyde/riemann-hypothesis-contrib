@@ -27,21 +27,10 @@ private theorem dim_lt {R : Type*} [CommRing R] {p q : Ideal R} [p.IsPrime] [q.I
     ringKrullDim (R ⧸ q) ≤ ((m : ℕ) : WithBot ℕ∞) := by
   have hr : Ideal.Quotient.mk p r ∈ nonZeroDivisors (R ⧸ p) :=
     mem_nonZeroDivisors_of_ne_zero (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem])
-  have h1 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hr
-  let φ : (R ⧸ p) →+* (R ⧸ q) := Ideal.Quotient.factor hpq
-  have hφ : Function.Surjective φ := Ideal.Quotient.factor_surjective hpq
-  let ψ : ((R ⧸ p) ⧸ Ideal.span {Ideal.Quotient.mk p r}) →+* (R ⧸ q) :=
-    Ideal.Quotient.lift _ φ (by
-      intro a ha
-      obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.mp ha
-      have : φ (Ideal.Quotient.mk p r) = 0 := by
-        change Ideal.Quotient.mk q r = 0
-        exact Ideal.Quotient.eq_zero_iff_mem.mpr hrq
-      rw [map_mul, this, mul_zero])
-  have hψ : Function.Surjective ψ := Ideal.Quotient.lift_surjective_of_surjective _ _ hφ
-  have h2 := ringKrullDim_le_of_surjective ψ hψ
   have h3 : ringKrullDim (R ⧸ q) + 1 ≤ ((m + 1 : ℕ) : WithBot ℕ∞) :=
-    (add_le_add_left h2 1).trans (h1.trans h)
+    (ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hpq)
+      (Ideal.Quotient.factor_surjective hpq) hr
+      (by simpa using Ideal.Quotient.eq_zero_iff_mem.mpr hrq)).trans h
   have h0 : (0 : WithBot ℕ∞) ≤ ringKrullDim (R ⧸ q) := ringKrullDim_nonneg_of_nontrivial
   generalize ringKrullDim (R ⧸ q) = a at h3 h0
   induction a with
