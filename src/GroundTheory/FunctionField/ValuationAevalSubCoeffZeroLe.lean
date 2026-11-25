@@ -77,12 +77,8 @@ theorem valuation_aeval_sub_coeff_zero_le (v : Place k K) {x : K} (hx : v.valuat
 theorem valuation_aeval_eq_one (v : Place k K) {x : K} (hx : v.valuation x < 1) {s : k[X]}
     (hs : s.coeff 0 ≠ 0) : v.valuation (aeval x s) = 1 := by
   have h1 := v.valuation_algebraMap' hs
-  have hlt : v.valuation (aeval x s - algebraMap k K (s.coeff 0)) <
-      v.valuation (algebraMap k K (s.coeff 0)) := by
-    rw [h1]; exact lt_of_le_of_lt (v.valuation_aeval_sub_coeff_zero_le hx.le s) hx
-  have : aeval x s = algebraMap k K (s.coeff 0) + (aeval x s - algebraMap k K (s.coeff 0)) := by
-    ring
-  rw [this, Valuation.map_add_eq_of_lt_left _ hlt, h1]
+  refine (Valuation.map_eq_of_sub_lt _ ?_).trans h1
+  rw [h1]; exact lt_of_le_of_lt (v.valuation_aeval_sub_coeff_zero_le hx.le s) hx
 
 theorem valuation_mul_aeval_div_le (v : Place k K) {x : K} (hx : v.valuation x < 1)
     (r : k[X]) {s : k[X]} (hs : s.coeff 0 ≠ 0) :
