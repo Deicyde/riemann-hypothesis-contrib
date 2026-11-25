@@ -144,12 +144,7 @@ theorem rt0_ne_zero (H : Host E) : H.rt0 ≠ 0 := by
 theorem emb_rt (H : Host E) (τ : E →+* ℂ) : τ (H.rt : E) = H.rt0 ∨ τ (H.rt : E) = -H.rt0 := by
   have h1 : τ (H.rt : E) ^ 2 = -(H.d : ℂ) := by
     rw [← map_pow, rt_sq H, map_neg, map_natCast]
-  have h2 := H.sqrt_neg_disc_sq
-  have h3 : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = 0 := by
-    linear_combination h1 - h2
-  rcases mul_eq_zero.mp h3 with h | h
-  · exact Or.inl (sub_eq_zero.mp h)
-  · exact Or.inr (eq_neg_of_add_eq_zero_left h)
+  exact sq_eq_sq_iff_eq_or_eq_neg.1 (h1.trans H.sqrt_neg_disc_sq.symm)
 
 def conjEquiv (H : Host E) :
     {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} ≃ {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} where
