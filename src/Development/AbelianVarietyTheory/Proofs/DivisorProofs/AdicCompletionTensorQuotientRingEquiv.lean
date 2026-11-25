@@ -190,13 +190,6 @@ theorem GlobalTheory.adicCompletion_tensor_quotient_ringEquiv :
   intro R₀ R K _ _ _ _ _ _ _ _ _ _ hs
   have hk : RingHom.ker (algebraMap R₀ R) ≤ maximalIdeal R₀ :=
     le_maximalIdeal (RingHom.ker_ne_top _)
-  have hmax : ((maximalIdeal R₀).map (algebraMap R₀ R)).IsMaximal := by
-    rcases Ideal.map_eq_top_or_isMaximal_of_surjective (hf := hs) (H := maximalIdeal.isMaximal R₀) with h | h
-    · exfalso
-      have h1 : (1 : R) ∈ (maximalIdeal R₀).map (algebraMap R₀ R) := h ▸ Submodule.mem_top
-      obtain ⟨a, ha, hfa⟩ := (Ideal.mem_map_iff_of_surjective _ hs).mp h1
-      have h2 : 1 - a ∈ maximalIdeal R₀ := hk (by rw [RingHom.mem_ker, map_sub, hfa, map_one, sub_self])
-      have h3 : (1 : R₀) ∈ maximalIdeal R₀ := by simpa using add_mem h2 ha
-      exact (maximalIdeal.isMaximal R₀).ne_top ((Ideal.eq_top_iff_one _).mpr h3)
-    · exact h
+  have hmax : ((maximalIdeal R₀).map (algebraMap R₀ R)).IsMaximal :=
+    Ideal.IsMaximal.map_of_surjective_of_ker_le hs hk
   exact GlobalTheory.AdicSurj.tensor_ringEquiv (maximalIdeal R₀) hs _ (eq_maximalIdeal hmax).symm K
