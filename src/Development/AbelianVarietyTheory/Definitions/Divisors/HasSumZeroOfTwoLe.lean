@@ -11,21 +11,14 @@ open NumberField IsDedekindDomain
 namespace GlobalTheory.CMVal.ObjModel
 variable {E : Type} [Field E] [NumberField E]
 
-theorem coord_ne (y : (Af E)ˣ) (v : HeightOneSpectrum (𝓞 E)) : Valued.v ((y : Af E) v) ≠ 0 := by
-  have := (FiniteAdeleRing.isUnit_iff.1 y.isUnit).1 v
-  simpa using this
+theorem coord_ne (y : (Af E)ˣ) (v : HeightOneSpectrum (𝓞 E)) : Valued.v ((y : Af E) v) ≠ 0 :=
+  GlobalTheory.CMVal.IdeleModule.coord_ne y v
 
-theorem absNorm_pos (v : HeightOneSpectrum (𝓞 E)) : (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
-  have : Ideal.absNorm v.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
-  positivity
+theorem absNorm_pos (v : HeightOneSpectrum (𝓞 E)) : (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) :=
+  GlobalTheory.CMVal.IdeleModule.absNorm_pos v
 
-theorem modF_mul (y y' : (Af E)ˣ) : modF (y * y') = modF y * modF y' := by
-  unfold modF
-  rw [← finprod_mul_distrib (GlobalTheory.CMVal.IdeleModule.modF_finite y) (GlobalTheory.CMVal.IdeleModule.modF_finite y')]
-  refine finprod_congr fun v => ?_
-  have : ((y * y' : (Af E)ˣ) : Af E) v = (y : Af E) v * (y' : Af E) v := rfl
-  rw [this, map_mul, WithZero.log_mul (coord_ne y v) (coord_ne y' v), zpow_add₀ (absNorm_pos v).ne']
+theorem modF_mul (y y' : (Af E)ˣ) : modF (y * y') = modF y * modF y' :=
+  GlobalTheory.CMVal.IdeleModule.modF_mul y y'
 
 theorem modF_pos (y : (Af E)ˣ) : 0 < modF y :=
   finprod_induction (fun x : ℝ => 0 < x) one_pos (fun _ _ => mul_pos) fun v => zpow_pos (absNorm_pos v) _
