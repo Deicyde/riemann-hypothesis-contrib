@@ -3,6 +3,7 @@ module
 public import GroundTheory.PAdicHodge.ThetaPlus
 public import Development.AutomorphicArithmetic.IntegralCasts.CrystallinePeriods.ExistsFactorialMulEqPow
 public import GroundTheory.PAdicHodge.KerFontaineThetaCompFrobeniusEquivSymmPow
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -243,11 +244,10 @@ variable (K p) in
 /-- The period ring `A_{cris}`, defined as the `p`-adic completion of `ACrisZero K` (i.e. the
 divided power completion of `AInf K = W(K♭)`).
 
-See [Fontaine, *Le corps des périodes p-adiques* (§2.2.2, p. 76)][fontaine1994] and
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018],
-where the latter denotes this ring by `A_{crys}`.
-
 This is `Reformulated.AutPerF.Acris` specialized to `normInteger K`. -/
+@[cite "fontaine1994" "§2.2.2, p. 76" (checked := "David Loeffler"),
+  cite "bhattMorrowScholze2018" "§1.2, p. 223" "denoted `A_{crys}` there"
+    (checked := "David Loeffler")]
 abbrev ACris [Fact (¬ IsUnit (p : normInteger K))] : Type _ :=
   Reformulated.AutPerF.Acris p (normInteger K)
 

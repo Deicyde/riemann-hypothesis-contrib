@@ -5,8 +5,8 @@
 #
 # Please only use alphanumeric characters, '-', '_', and ':' for the key of bibliography items.
 #
-# To cite an entry in a docstring, use the format
-#   [Author, *Title* (optional location)][bibkey]
+# To cite an entry, give the declaration the attribute `cite "bibkey" "location"` (see
+# `src/Lemmata/Cite.lean`). A cited entry needs a `doi`, `zbl`, `mrnumber` or arXiv `eprint`.
 
 @Article{         bhattMorrowScholze2018,
   author        = {Bhatt, Bhargav and Morrow, Matthew and Scholze, Peter},
@@ -29,5 +29,6 @@
   pages         = {59--101},
   year          = {1994},
   publisher     = {Soci\'et\'e math\'ematique de France},
+  zbl           = {0940.14012},
   url           = {https://numdam.org/book-part/AST_1994__223__59_0/}
 }

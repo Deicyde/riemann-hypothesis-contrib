@@ -2,6 +2,7 @@ module
 
 public import GroundTheory.PAdicHodge.PerfectoidField
 public import Development.AutomorphicArithmetic.IntegralCasts.CrystallinePeriods.TruncLogEqOfPowEqZero
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -176,14 +177,12 @@ theorem WittVector.frobeniusEquiv_pow_teichmuller (a : R) (n : ℕ) :
 
 end Frobenius
 
-/-- The period ring `A_{inf} = W(R♭)` for `R = normInteger K`.
-
-See [Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory*
-(§3.1, Definition 3.1, p. 244)][bhattMorrowScholze2018]. In the classical case
-`R = 𝒪_[ℂ_[p]]`, see [Fontaine, *Le corps des périodes p-adiques*
-(§1.3.3, p. 66, with `K = ℚ_[p]`)][fontaine1994].
+/-- The period ring `A_{inf} = W(R♭)` for `R = normInteger K`, as defined by Bhatt, Morrow and
+Scholze, and by Fontaine in the classical case `R = 𝒪_[ℂ_[p]]`.
 
 This is `Reformulated.AutPerF.Ainf` specialized to `normInteger K`. -/
+@[cite "bhattMorrowScholze2018" "§3.1, Definition 3.1, p. 244" (checked := "David Loeffler"),
+  cite "fontaine1994" "§1.3.3, p. 66" "with `K = ℚ_[p]`" (checked := "David Loeffler")]
 abbrev AInf (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K] (p : ℕ) [Fact p.Prime] :=
   Reformulated.AutPerF.Ainf p (normInteger K)
 
