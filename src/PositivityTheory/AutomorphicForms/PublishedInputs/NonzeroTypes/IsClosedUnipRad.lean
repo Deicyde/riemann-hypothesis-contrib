@@ -131,11 +131,7 @@ theorem zinv_mat (ϖ : kˣ) (m : ℕ) :
     congr 1
     funext i
     exact mul_inv_cancel₀ (dz_ne G ϖ m i)
-  calc (((G.zEl ϖ ^ m)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
-      = (((G.zEl ϖ ^ m)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) *
-          (((G.zEl ϖ ^ m : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * diagonal (fun i => (dz G ϖ m i)⁻¹)) := by
-        rw [h, mul_one]
-    _ = diagonal fun i => (dz G ϖ m i)⁻¹ := by rw [← mul_assoc, Units.inv_mul, one_mul]
+  exact left_inv_eq_right_inv (Units.inv_mul _) h
 
 theorem conj_apply (ϖ : kˣ) (m : ℕ) (g : GL (Fin n) k) (i j : Fin n) :
     (((G.zEl ϖ ^ m)⁻¹ * g * G.zEl ϖ ^ m : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j =
