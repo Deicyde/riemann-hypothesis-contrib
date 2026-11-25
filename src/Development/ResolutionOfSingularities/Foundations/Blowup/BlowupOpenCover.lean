@@ -32,12 +32,9 @@ private theorem isIso_appLE_of_image_eq {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpen
   infer_instance
 
 private theorem exists_affineOpen_mem_le {X : Scheme.{u}} (x : X) (W : X.Opens) (hx : x ∈ W) :
-    ∃ V : X.affineOpens, x ∈ (V : X.Opens) ∧ (V : X.Opens) ≤ W := by
-  obtain ⟨Vs, hVs, hxV, hVW⟩ :=
-    (Scheme.isBasis_affineOpens X).exists_subset_of_mem_open
-      (show x ∈ (W : Set X) from hx) W.isOpen
-  obtain ⟨V, hVmem, rfl⟩ := hVs
-  exact ⟨⟨V, hVmem⟩, hxV, fun y hy => hVW hy⟩
+    ∃ V : X.affineOpens, x ∈ (V : X.Opens) ∧ (V : X.Opens) ≤ W :=
+  let ⟨V, hV, hxV, hVW⟩ := exists_isAffineOpen_mem_and_subset hx
+  ⟨⟨V, hV⟩, hxV, fun _ hy => hVW hy⟩
 
 theorem IsLocallyGeneratedByNonZeroDivisor.comap_of_isOpenImmersion {X U : Scheme.{u}}
     {I : X.IdealSheafData} (hI : IsLocallyGeneratedByNonZeroDivisor I) (f : U ⟶ X) [IsOpenImmersion f] :
