@@ -165,16 +165,8 @@ theorem card_le_of_orth' (ε : Fin n → Bool) (q : ℕ) (nv : Fin q → Fin n �
   · simpa using hne
 
 theorem card_odd_range (s : ℕ) : ((range (2 * s)).filter fun t => t % 2 = 1).card = s := by
-  induction s with
-  | zero => simp
-  | succ s ih =>
-    have e : 2 * (s + 1) = 2 * s + 1 + 1 := by ring
-    have h1 : (2 * s + 1) % 2 = 1 := by omega
-    have h2 : ¬ (2 * s) % 2 = 1 := by omega
-    have h3 : 2 * s + 1 ∉ (range (2 * s)).filter fun t => t % 2 = 1 := by
-      simp only [Finset.mem_filter, Finset.mem_range]; omega
-    rw [e, Finset.range_add_one, Finset.range_add_one, Finset.filter_insert, Finset.filter_insert, ite_eq_left h1,
-      ite_eq_right h2, Finset.card_insert_eq_ite, ite_eq_right h3, ih]
+  rw [Finset.filter_congr fun t _ => (by lia : t % 2 = 1 ↔ 2 ∣ t + 1), Nat.card_multiples,
+    Nat.mul_div_cancel_left s two_pos]
 
 end Pure2
 
