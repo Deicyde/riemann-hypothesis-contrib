@@ -144,14 +144,8 @@ theorem linIndep_cpts [CharZero K] (σ : K →+* ℂ) (p : TRing K) {m : ℕ} (a
   letI : Module Kb ℂ := Module.compHom ℂ (ι.toRingHom : Kb →+* ℂ)
   have hsm : ∀ (c : Kb) (z : ℂ), c • z = ι c * z := fun _ _ => rfl
   by_contra hw
-  obtain ⟨j, hj⟩ : ∃ j, w j ≠ 0 := by
-    by_contra hne
-    push Not at hne
-    exact hw (funext hne)
-  obtain ⟨ℓ, hℓ⟩ : ∃ ℓ : Module.Dual Kb ℂ, ℓ (w j) ≠ 0 := by
-    by_contra hne
-    push Not at hne
-    exact hj ((Module.forall_dual_apply_eq_zero_iff Kb (w j)).1 hne)
+  obtain ⟨j, hj⟩ : ∃ j, w j ≠ 0 := Function.ne_iff.mp hw
+  obtain ⟨ℓ, hℓ⟩ := Module.Projective.exists_dual_ne_zero Kb hj
   have hv := linIndep_alg_pts (Kb := AlgebraicClosure K) p a ha (fun i => ℓ (w i)) fun φ => by
     have h1 := congrArg ℓ (h (ι.comp φ : p.R →ₐ[K] ℂ))
 
