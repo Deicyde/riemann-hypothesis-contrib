@@ -196,11 +196,7 @@ theorem coordW_holds : CoordW := by
       rw [gv_cs] at hG
       have hp : 0 ≤ ∏ a : Fin r, ‖lam r sc a * q.1 a‖ ^ 2 :=
         Finset.prod_nonneg fun _ _ => by positivity
-      have hN : T * T' < Complex.normSq q.2 := by
-        by_contra h
-        rw [not_lt] at h
-        have := mul_nonpos_of_nonneg_of_nonpos hp (by linarith : Complex.normSq q.2 - T * T' ≤ 0)
-        linarith
+      have hN : T * T' < Complex.normSq q.2 := sub_pos.1 (pos_of_mul_pos_right hG hp)
       unfold Formalism.QuantumDeterminants.bcWeight
       rw [ite_eq_left hN.le]
     · rw [Set.indicator_of_notMem hg]
