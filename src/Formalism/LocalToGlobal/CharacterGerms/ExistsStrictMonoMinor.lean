@@ -30,13 +30,8 @@ def fitt0 {m h : ℕ} (B : Matrix (Fin m) (Fin h) R) : Ideal R :=
   Ideal.span (Set.range fun g : Fin m → Fin h => (B.submatrix id g).det)
 
 theorem le_v_sum (v : AddValuation R (WithTop ℝ)) {ι : Type*} [DecidableEq ι] (s : Finset ι)
-    (f : ι → R) (g : WithTop ℝ) (hg : ∀ i ∈ s, g ≤ v (f i)) : g ≤ v (∑ i ∈ s, f i) := by
-  revert hg
-  refine Finset.induction_on s (fun _ => by simp) ?_
-  intro i s hi ih hg
-  rw [Finset.sum_insert hi]
-  exact le_trans (le_min (hg i (Finset.mem_insert_self i s))
-    (ih fun j hj => hg j (Finset.mem_insert_of_mem hj))) (v.map_add _ _)
+    (f : ι → R) (g : WithTop ℝ) (hg : ∀ i ∈ s, g ≤ v (f i)) : g ≤ v (∑ i ∈ s, f i) :=
+  v.map_le_sum hg
 
 theorem lenCoker_le_of_mem (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x)
     {m h : ℕ} (B : Matrix (Fin m) (Fin h) R) {x : R} (hx : x ∈ fitt0 B) :
