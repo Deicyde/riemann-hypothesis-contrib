@@ -107,10 +107,6 @@ private theorem deep_add {a : ℤ} {x y : k} (hx : Deep a x) (hy : Deep a y) : D
   unfold Deep at hx hy ⊢
   exact ((valuation k).map_add x y).trans (max_le hx hy)
 
-private theorem deep_of_le' {a b : ℤ} (hab : a ≤ b) {x : k} (h : Deep b x) : Deep a x := by
-  unfold Deep at h ⊢
-  exact h.trans (zpow_le_zpow_right_of_le_one₀ uniformizer_pos uniformizer_lt_one.le hab)
-
 private theorem exists_deep_neg_natCast (x : k) : ∃ N : ℕ, Deep (-(N : ℤ)) x := by
   unfold Deep
   by_cases hx : valuation k x = 0
@@ -138,13 +134,11 @@ theorem exists_bound_period : ∀ (k : Type) [Field k] [ValuativeRel k] [Topolog
   have hΦ' : IsLocallyConstant Φ ∧ HasCompactSupport Φ := hΦ
   obtain ⟨hlc, hcs⟩ := hΦ'
   have hC : IsCompact (tsupport Φ) := hcs
-  have hzero : ∀ z, z ∉ tsupport Φ → Φ z = 0 := fun z hz => by
-    by_contra h
-    exact hz (subset_tsupport Φ h)
+  have hzero : ∀ z, z ∉ tsupport Φ → Φ z = 0 := fun _ hz => image_eq_zero_of_notMem_tsupport hz
 
   let U : ℕ → Set (Matrix n n k) := fun N => {x | ∀ i j, Deep (-(N : ℤ)) (x i j)}
   have hUm : Monotone U := fun N N' h x hx i j =>
-    deep_of_le' (neg_le_neg (by exact_mod_cast h)) (hx i j)
+    (hx i j).mono (neg_le_neg (by exact_mod_cast h))
   have hUcov : tsupport Φ ⊆ ⋃ N, U N := by
     intro x _
     have hev : ∀ᶠ N : ℕ in atTop, ∀ i j, Deep (-(N : ℤ)) (x i j) := by
@@ -154,7 +148,7 @@ theorem exists_bound_period : ∀ (k : Type) [Field k] [ValuativeRel k] [Topolog
       intro j
       obtain ⟨N₀, hN₀⟩ := exists_deep_neg_natCast (x i j)
       filter_upwards [eventually_ge_atTop N₀] with N hN
-      exact deep_of_le' (neg_le_neg (by exact_mod_cast hN)) hN₀
+      exact hN₀.mono (neg_le_neg (by exact_mod_cast hN))
     obtain ⟨N, hN⟩ := hev.exists
     exact Set.mem_iUnion.2 ⟨N, hN⟩
   obtain ⟨N, hN⟩ := hC.elim_directed_cover U (fun N => isOpen_setOf_forall_deep _) hUcov hUm.directed_le
@@ -162,7 +156,7 @@ theorem exists_bound_period : ∀ (k : Type) [Field k] [ValuativeRel k] [Topolog
   let W : ℕ → Set (Matrix n n k) :=
     fun M => {x | ∀ y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → Φ (x + y) = Φ x}
   have hWm : Monotone W := fun M M' h x hx y hy =>
-    hx y fun i j => deep_of_le' (by exact_mod_cast h) (hy i j)
+    hx y fun i j => (hy i j).mono (by exact_mod_cast h)
   have hWo : ∀ M, IsOpen (W M) := by
     intro M
     rw [isOpen_iff_mem_nhds]
