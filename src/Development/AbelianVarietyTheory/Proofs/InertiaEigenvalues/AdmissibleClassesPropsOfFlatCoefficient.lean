@@ -155,11 +155,8 @@ theorem finite_quot_pow {lam p : O} (hl : Irreducible lam) (hp : ¬ IsUnit p) (a
   have hdvd : lam ∣ p := by
     have hm : p ∈ IsLocalRing.maximalIdeal O := (IsLocalRing.mem_maximalIdeal p).mpr hp
     rwa [(IsDiscreteValuationRing.irreducible_iff_uniformizer lam).mp hl, Ideal.mem_span_singleton] at hm
-  have hs : Function.Surjective (lower (pow_dvd_pow_of_dvd hdvd a)) := by
-    intro q
-    obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective q
-    exact ⟨Ideal.Quotient.mk _ y, lower_mk _ y⟩
-  exact Finite.of_surjective _ hs
+  exact Finite.of_surjective (lower (pow_dvd_pow_of_dvd hdvd a))
+    (Submodule.factor_surjective (Ideal.span_singleton_le_span_singleton.mpr (pow_dvd_pow_of_dvd hdvd a)))
 
 end Ring
 
