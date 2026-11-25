@@ -59,13 +59,9 @@ theorem span_singleton_prod_pow {R K ι : Type} [CommRing R] [CommRing K] [Algeb
 
 theorem fg_prod_pow {R K ι : Type} [CommRing R] [CommRing K] [Algebra R K]
     (s : Finset ι) (I : ι → Submodule R K) (r : ι → ℕ) (h : ∀ i, (I i).FG) :
-    (∏ i ∈ s, I i ^ r i).FG := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => rw [Finset.prod_empty, Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
-  | insert i s hi ih =>
-    rw [Finset.prod_insert hi]
-    exact ((h i).pow _).mul ih
+    (∏ i ∈ s, I i ^ r i).FG :=
+  Finset.prod_induction _ Submodule.FG (fun _ _ => Submodule.FG.mul) (Submodule.fg_of_isUnit isUnit_one)
+    fun i _ => (h i).pow _
 
 theorem exists_rep_pow_classNumber (E : Type) [Field E] [NumberField E] (c : ClassGroup (𝓞 E)) :
     ∃ (𝔠 : (Ideal (𝓞 E))⁰) (γ : 𝓞 E), ClassGroup.mk0 𝔠 = c ∧ γ ≠ 0 ∧
