@@ -43,13 +43,7 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.ordCancel :
     ∀ {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M] {I : Ideal R} {U e : Module.End R M}, IsOrdProj I U e → ∀ (J : Ideal R) (n : ℕ) (z : M), e z = z → (U ^ n) z ∈ (J • ⊤ : Submodule R M) → z ∈ (J • ⊤ : Submodule R M) := by
   intro R _ M _ _ I U e h J n
   have hm : ∀ x ∈ LinearMap.range e, U x ∈ LinearMap.range e := fun x hx => h.bij.mapsTo hx
-  have hb : Function.Bijective (U.restrict hm) := by
-    constructor
-    · intro x y hxy
-      exact Subtype.ext (h.bij.injOn x.2 y.2 (congrArg Subtype.val hxy))
-    · intro y
-      obtain ⟨x, hx, hxy⟩ := h.bij.surjOn y.2
-      exact ⟨⟨x, hx⟩, Subtype.ext hxy⟩
+  have hb : Function.Bijective (U.restrict hm) := h.bij.bijective
   let E := LinearEquiv.ofBijective _ hb
   let V : Module.End R M := (LinearMap.range e).subtype ∘ₗ E.symm.toLinearMap ∘ₗ e.rangeRestrict
   have hc : ∀ x, U (e x) = e (U x) := fun x => LinearMap.congr_fun h.comm.eq x
