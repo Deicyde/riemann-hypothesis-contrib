@@ -1295,7 +1295,7 @@ theorem isSubquotient_multiProd : ∀ (F : Type) [Field F] [ValuativeRel F] [Top
   obtain ⟨z, hz⟩ := exists_ne (0 : (s true).V)
   let x₀ : ∀ j, (s j).V := fun j => Bool.rec (motive := fun j => (s j).V) 0 z j
   refine ⟨(falseEquiv f hc).symm, ?_⟩
-  exact (IsSubquotient.of_injective (evOne f hc _) (evOne_injective f hc _)).trans
+  exact (IsSubquotient.of_injective (evOne f hc (piTensor fun j => (s j).ρ)) (evOne_injective f hc _)).trans
     (IsSubquotient.of_surjective (tensorMap f hc s x₀) (tensorMap_surjective f hc s x₀ hz))
 
 end GlobalTheory.EmptySecondBlockProd
