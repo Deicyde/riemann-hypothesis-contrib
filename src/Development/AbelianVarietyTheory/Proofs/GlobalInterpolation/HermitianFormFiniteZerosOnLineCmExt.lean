@@ -83,16 +83,9 @@ theorem _root_.GlobalTheory.HermLineZeros.exists_of_fixed (h : _root_.Formalism.
     intro hS
     have hdS : d ∈ S := hS ▸ Algebra.mem_top
     exact hd hdS
-  have hle : Module.finrank F S ≤ 2 :=
-    h.2.2.1 ▸ Submodule.finrank_le (Subalgebra.toSubmodule S)
-  have hne : Module.finrank F S ≠ 2 := by
-    intro h2
-    apply hS
-    apply Subalgebra.toSubmodule.injective
-    rw [Algebra.top_toSubmodule]
-    exact Submodule.eq_top_of_finrank_eq (h2.trans h.2.2.1.symm)
-  have hpos : 0 < Module.finrank F S := Module.finrank_pos
-  have hbot : S = ⊥ := Subalgebra.finrank_eq_one_iff.mp (by omega)
+  have : IsSimpleOrder (Subalgebra F E) :=
+    Subalgebra.isSimpleOrder_of_finrank_prime F E (h.2.2.1 ▸ Nat.prime_two)
+  have hbot : S = ⊥ := (eq_bot_or_eq_top S).resolve_right hS
   have heS : e ∈ S := he
   rw [hbot] at heS
   exact Algebra.mem_bot.mp heS
