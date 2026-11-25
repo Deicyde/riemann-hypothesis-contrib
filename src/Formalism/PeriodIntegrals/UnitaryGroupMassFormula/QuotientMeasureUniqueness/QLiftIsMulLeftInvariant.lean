@@ -13,11 +13,8 @@ open scoped ENNReal
 namespace PI.QuotMeasUniqW
 
 theorem indicator_preimage_one {α β : Type*} (f : α → β) (s : Set β) (x : α) :
-    (f ⁻¹' s).indicator (1 : α → ℝ≥0∞) x = s.indicator 1 (f x) := by
-  by_cases h : f x ∈ s
-  · rw [Set.indicator_of_mem h, Set.indicator_of_mem (show x ∈ f ⁻¹' s from h)]
-    rfl
-  · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem (show x ∉ f ⁻¹' s from h)]
+    (f ⁻¹' s).indicator (1 : α → ℝ≥0∞) x = s.indicator 1 (f x) :=
+  Set.indicator_comp_right (g := 1) f
 
 def hAvg {G : Type} [Group G] [MeasurableSpace G] {H : Subgroup G} (ν : Measure H) (f : G → ℝ≥0∞)
     (g : G) : ℝ≥0∞ :=
