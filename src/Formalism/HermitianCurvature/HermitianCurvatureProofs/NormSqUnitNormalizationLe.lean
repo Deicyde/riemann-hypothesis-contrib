@@ -315,13 +315,8 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
   have hn32 : (d.n : ℝ) ^ (3 / 2 : ℝ) = d.n * Real.sqrt d.n := by
     rw [show (3 / 2 : ℝ) = 1 + 1 / 2 by norm_num, Real.rpow_add' hn0 (by norm_num), Real.rpow_one,
       Real.sqrt_eq_rpow]
-  have hse : Real.sqrt (Real.exp 1) ≤ 2 := by
-    have h4 : Real.exp 1 ≤ 2 ^ 2 := by
-      have := Real.exp_one_lt_d9
-      norm_num at this ⊢
-      linarith
-    calc Real.sqrt (Real.exp 1) ≤ Real.sqrt (2 ^ 2) := Real.sqrt_le_sqrt h4
-      _ = 2 := Real.sqrt_sq (by norm_num)
+  have hse : Real.sqrt (Real.exp 1) ≤ 2 :=
+    (Real.sqrt_le_left zero_le_two).2 (Real.exp_one_lt_three.trans (by norm_num)).le
   have hcard : ((S.card : ℕ) : ℝ) ≤ (d.n : ℝ) ^ (P.r + 1) := by
     rw [hS, Finset.card_powersetCard, Finset.card_univ, Fintype.card_fin]
     exact_mod_cast (Nat.choose_le_descFactorial _ _).trans (Nat.descFactorial_le_pow _ _)
