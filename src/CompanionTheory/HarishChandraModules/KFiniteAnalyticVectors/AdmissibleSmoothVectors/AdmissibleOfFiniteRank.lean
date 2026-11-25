@@ -137,11 +137,8 @@ theorem smoothOnH_conj {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A 
           simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = ((P⁻¹)ᴴ * Pᴴ) * A * (P * P⁻¹) := by rw [hAB, hg, ← hAB]; simp only [Matrix.mul_assoc]
       _ = A := by rw [h3, h1, Matrix.one_mul, Matrix.mul_one]
-  let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ :=
-    { toFun := fun g => P * g * P⁻¹
-      map_add' := fun a b => by rw [Matrix.mul_add, Matrix.add_mul]
-      map_smul' := fun c a => by rw [Matrix.mul_smul, Matrix.smul_mul]; rfl }
-  have hL : ContDiff ℝ ∞ fun g : Matrix (Fin n) (Fin n) ℂ => P * g * P⁻¹ := (LinearMap.toContinuousLinearMap L).contDiff
+  have hL : ContDiff ℝ ∞ fun g : Matrix (Fin n) (Fin n) ℂ => P * g * P⁻¹ :=
+    (LinearMap.toContinuousLinearMap (LinearMap.mulLeftRight ℝ (P, P⁻¹))).contDiff
   intro g₀ hg₀
   obtain ⟨V, F, hV, hgV, hF, hfF⟩ := h _ (hmem g₀ hg₀)
   refine ⟨(fun g => P * g * P⁻¹) ⁻¹' V, fun g => F (P * g * P⁻¹), hV.preimage hL.continuous, hgV,
