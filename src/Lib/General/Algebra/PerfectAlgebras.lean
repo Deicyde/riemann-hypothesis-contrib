@@ -520,6 +520,7 @@ lemma bijective_of_etale_of_inverse_up_to_pow [Etale C D] {E : Type} [CommRing E
   exact (IsEffective.of_faithfullyFlat D E y).mp (sub_eq_zero.mpr h_eq :)
 
 /-- An étale algebra over a perfect ring in which p = 0 is perfect. -/
+@[stacks 0EBS "consequence: an étale algebra over a perfect ring is perfect"]
 lemma perfectRing_of_etale [Etale C D] [k : PerfectRing C p] (hp : (p : C) = 0) :
     PerfectRing D p := by
   have hD : (p : D) = 0 := natCast_eq_zero_of_algebra hp D
