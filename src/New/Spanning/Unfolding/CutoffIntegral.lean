@@ -1,7 +1,14 @@
 module
 
-public import Lib.DiscreteSeries.Bessel.UnipotentHaarMeasure
-public import New.Spanning.Unfolding.Packing
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Topology.UniformSpace.Uniformizable
+public import Lib.General.NumberTheory.LatticeCovolumes
+public import New.Spanning.RemainingTerms.SiegelLemma
+public import New.Spanning.Unfolding.BesselLevelStructure
+import Lib.Cohomology.Etale.Basic
+import Lib.DiscreteSeries.Bessel.UnipotentHaarMeasure
+import New.Spanning.Unfolding.Packing
+import New.Spanning.Unfolding.ReducedPoints
 
 /-!
 # The Bessel kernel and the integral of a class cutoff over the real unipotent group
@@ -594,12 +601,12 @@ lemma exists_rowCoords_fst_eq (c : S.Classes) (a : Fin 𝔰.ϱ)
       h_col, hd.ne']
   · simp [funext_iff, imRowCoords, coe_classUnipotentToInf_apply, hγ, hd.ne']
 
-/-- Let `E` contain a primitive 5040th root of unity and let `S` be admissible. Suppose that at the
-place `v`, right multiplication by the image `classUnipotentToInf c γ v` of `γ ∈ S.classUnipotent c`
+/-- Let `E` contain a primitive 5040th root of unity. Suppose that at the place `v`, right
+multiplication by the image `classUnipotentToInf c γ v` of `γ ∈ S.classUnipotent c`
 adds its (e_a, e*_a) entry to that of every `x` in `besselU`. Then the imaginary parts of this entry
 of `classUnipotentToInf c γ` at all places form a vector `(S.M / S.frameScaleSq w a * Im Φ_w(s))_w`
 for an integer `s` of `E` with `star s = -s` (`imSkewLattice`). -/
-lemma rowCoords_snd_mem_imSkewLattice [S.IsAdmissible] (c : S.Classes) (a : Fin 𝔰.ϱ) (γ : S.classUnipotent c)
+lemma rowCoords_snd_mem_imSkewLattice (c : S.Classes) (a : Fin 𝔰.ϱ) (γ : S.classUnipotent c)
     (v : InfinitePlace E)
     (h_add : ∀ x : (𝔰.middleGram (1 : ℂ)).besselU,
       (↑(x * classUnipotentToInf c γ v) : Matrix 𝔰.BesselIndex 𝔰.BesselIndex ℂ) (inl a) (eStar a) =
@@ -649,7 +656,7 @@ entries of each row e_a and the imaginary parts of the entries at (e_a, e*_a), a
 places. There are measurable sets `F a` and `F' a` such that each coset `u Γ` has exactly one point
 with coordinates in the box over them. The product of the volumes of all `F a` and `F' a` is the
 explicit number `S.unipotentCovolume`, which does not depend on `c`. -/
-lemma exists_box_existsUnique_rowCoords_mem [HasPrimitiveRoot5040 E] [S.IsAdmissible]
+lemma exists_box_existsUnique_rowCoords_mem [HasPrimitiveRoot5040 E]
     (c : S.Classes) :
     ∃ (F : ∀ a : Fin 𝔰.ϱ, Set ({j : 𝔰.BesselIndex // IsFreeEntry (a, j)} → InfinitePlace E → ℂ))
       (F' : Fin 𝔰.ϱ → Set (InfinitePlace E → ℝ)),

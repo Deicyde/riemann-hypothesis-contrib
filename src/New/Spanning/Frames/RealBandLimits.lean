@@ -1,7 +1,20 @@
 module
 
-public import Lib.Cohomology.Etale.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Dynamics.Ergodic.Action.Regular
+import Mathlib.MeasureTheory.Function.SpecialFunctions.Inner
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import New.Spanning.Frames.RealShells
+import Lib.Cohomology.Etale.Basic
+import Lib.DiscreteSeries.Bessel.SchurBound
+import Lib.DiscreteSeries.Bessel.UnipotentHaarMeasure
+import Lib.DiscreteSeries.Haar.TotalMass
+import Lib.General.Analysis.GaussianIntegral
+import Lib.Shimura.ComplexTheta.AppellHumbertData
+import New.Spanning.Frames.Gains
 
 /-!
 # The normalized cell integral Ξ and the local bounds at ℂ for cut Bessel functions
@@ -122,7 +135,7 @@ lemma IsCutBessel.inner_embedH_mul (hF : IsCutBessel F rep ρ s b W f)
     (k : U (1 : Matrix 𝔰.κ 𝔰.κ ℂ)) (x y : 𝔰.G₁) :
     ⟪F (embedH k * x), F (embedH k * y)⟫_ℂ = ⟪F x, F y⟫_ℂ := by
   simp [(hF.isBesselFunction .cut).map_unitary_mul, Unitary.map_mem,
-    ContinuousLinearMap.inner_map_map_of_mem_unitary]
+    ContinuousLinearMap.inner_map_map_of_mem_unitary, -Matrix.toEuclideanCLM_apply]
 
 -- Keeps definitional checks from unfolding the finite sums.
 seal Finset.sum in

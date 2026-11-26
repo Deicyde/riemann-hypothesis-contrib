@@ -1,11 +1,23 @@
 module
 
-public import Mathlib.Algebra.Order.Star.Int
-public import Mathlib.Topology.Algebra.Ring.Compact
-public import Mathlib.Topology.Algebra.Valued.WithZeroMulInt
+public import Mathlib.LinearAlgebra.Matrix.Permutation
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.Topology.Algebra.Group.Units
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.LinearAlgebra.Matrix.IsDiag
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.Topology.Algebra.Group.Matrix
+import Mathlib.Topology.Algebra.Ring.Compact
+import Mathlib.Topology.Algebra.Valued.LocallyCompact
+import Mathlib.Topology.Algebra.Valued.WithZeroMulInt
+import Mathlib.Topology.UniformSpace.Uniformizable
 public import Lib.Adelic.Hecke.ClassSums
-public import Lib.Adelic.Unitary.Defs
-public import Lib.General.LinearAlgebra.HermiteForm
+public import Lib.General.Groups.BesselGroups
+public import Lib.General.Topology
+import Lib.Adelic.Unitary.Defs
+import Lib.General.LinearAlgebra.HermiteForm
 
 /-!
 # Parahoric and pro-p Iwahori subgroups of GL_n over a local field and U_t operators
@@ -92,9 +104,6 @@ lemma permGL_mul_transvectionGL (hij : i ≠ j) (a : R) :
     permGL σ * transvectionGL hij a = transvectionGL (σ.injective.ne hij) a * permGL σ := by
   aesop (add simp [Perm.inv_def, transvection, Matrix.single, toMatrix_mul_apply, Matrix.one_apply,
     mul_toMatrix_toPEquiv])
-
-open scoped Classical in
-instance : IsLocalRing 𝒪[F] := inferInstance
 
 @[simp high]
 lemma residue_eq_zero_iff_valuation_lt_one {a : 𝒪[F]} : residue 𝒪[F] a = 0 ↔ v a.val < 1 :=

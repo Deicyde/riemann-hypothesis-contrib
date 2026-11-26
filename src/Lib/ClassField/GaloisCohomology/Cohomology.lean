@@ -1,8 +1,8 @@
 module
 
-public import TauCeti.RepresentationTheory.Homological.ContCohomology.Additive
 public import TauCeti.RepresentationTheory.Homological.ContCohomology.ContinuousCohomologyIso
 public import Mathlib.Combinatorics.Quiver.ReflQuiver
+import TauCeti.RepresentationTheory.Homological.ContCohomology.Additive
 public import Lib.ClassField.GaloisCohomology.ClassCounts
 
 /-!
@@ -68,8 +68,6 @@ abbrev smulMor (r : R) : A.toTopRep ⟶ A.toTopRep :=
   TauCeti.ofDiscreteModuleMap (A.smulHom r).toAddMonoidHom.toIntLinearMap
     fun g m ↦ map_smul (A.smulHom r) g m
 
-omit [IsTopologicalGroup Γ] in
-lemma smulMor_hom_apply (r : R) (m : A) : (A.smulMor r).hom m = r • m := rfl
 
 -- This belongs in Tau Ceti: the action of `R` on cohomology through coefficient maps.
 /-- The action of `R` on `Hⁿ(Γ, A)`: `r` acts by the map induced by `m ↦ r • m`. -/
@@ -306,7 +304,5 @@ def H2EquivH : A.H2 ≃ₗ[R] A.H 2 :=
   (Submodule.quotEquivOfEq _ _ A.ker_π₂.symm).trans
     (A.π₂.quotKerEquivOfSurjective A.π₂_surjective)
 
-@[simp]
-lemma H2EquivH_mk (z : Z2 A.ρ) : A.H2EquivH (Submodule.Quotient.mk z) = A.π₂ z := rfl
 
 end New.DiscreteModule

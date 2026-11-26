@@ -1,8 +1,13 @@
 module
 
 public import Lib.GaloisRep.BaseChange.CongruenceLevelMatching
-public import Lib.GaloisRep.BaseChange.StepMatchingPairs
 public import Lib.GaloisRep.BaseChange.TwistedTraceIdentity
+import Lib.Adelic.AutomorphicForms.HeckeEigenforms
+import Lib.GaloisRep.BaseChange.GlobalRoot
+import Lib.GaloisRep.BaseChange.StepMatchingPairs
+import Lib.General.LinearAlgebra.Eigenvalues
+import Lib.General.LinearAlgebra.MatrixPolynomials
+import Lib.General.NumberTheory.FrobeniusOrbits
 
 /-!
 # Base change in prime degree for definite U(n): a weak base change eigenform
@@ -777,7 +782,8 @@ private lemma exists_eigenvector_of_isTransferLevel [hμ : IsStep (E := E) E' μ
       let u' : X' := above (U w) (U_mem w)
       exact ⟨k, hk, _, D_stable w d hd (X_split w) (X'_split u') j,
         hR.spherical_mul hq w j (fun g hg ↦ h_level.supportedOn_placesAbove_le
-          (baseChangeGf_mem_supportedOn (supportedOn_mono (singleton_subset_iff.mpr w.property) hg))),
+          (baseChangeGf_mem_supportedOn
+              (supportedOn_mono (singleton_subset_iff.mpr w.property) hg))),
         hR'.spherical_mul hq' u' j
           ((supportedOn_mono (by simp [u', above, placesAbove, U_mem w])).trans
             h_level.supportedOn_placesAbove_le)⟩

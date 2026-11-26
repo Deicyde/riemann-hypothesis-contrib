@@ -1,7 +1,11 @@
 module
 
+import Mathlib.CategoryTheory.Countable
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.DiscreteSeries.Bruhat.FloorMeasures
 public import New.Spanning.Frames.Lengths
+import Lib.Base
 
 /-!
 # Place data, floor measures and depth
@@ -116,11 +120,6 @@ variable {ι T m} {ν ρ : Measure T.G} [SFinite ν] [SFinite ρ]
 namespace PlaceData
 
 attribute [instance] sFinite_topFloorMeasure sFinite_measureH neZero_measureH
-
-/-- The measure `F.topFloorMeasure` of the top floor is carried by G^(ϱ) = `floorGroup 𝔰.ϱ`. -/
-lemma ae_topFloorMeasure_mem_floorGroup (F : PlaceData ι T m) : ∀ᵐ x : T.G ∂F.topFloorMeasure,
-  x ∈ floorGroup 𝔰.ϱ :=
-  F.topFloorMeasure_mem_and_map_eq.left
 
 /-- The measure `F.measureH` is carried by H = `besselH`, the fixer of the hyperbolic pairs and the
 last frame vector. -/
@@ -479,7 +478,7 @@ lemma ae_floorMeasure_mem : ∀ᵐ x : T.G ∂F.floorMeasure l, x ∈ floorGroup
     exact ae_mem_mconv h_weyl h_heisenberg measurableSet_floorGroup
   -- floors ϱ and ϱ + 1 carry `F.topFloorMeasure` and `F.measureH`, the higher ones the Dirac
   -- measure at 1
-  case case2 h_floor => simp [ae_topFloorMeasure_mem_floorGroup, h_floor]
+  case case2 h_floor => simp [F.topFloorMeasure_mem_and_map_eq.left, h_floor]
   case case3 h_floor => simp [ae_measureH_mem_besselH, h_floor]
   case case4 => simp
 

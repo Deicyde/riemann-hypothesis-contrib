@@ -1,8 +1,17 @@
 module
 
-public import New.Spanning.Bessel.Orthonormality
+import TauCeti.Analysis.Matrix.L2OpNorm
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.RingTheory.PiTensorProduct
 public import New.Spanning.Frames.RealPlaceGauge
 public import New.Spanning.Frames.Shells
+import Lib.General.Analysis.GaussianIntegral
+import Lib.Shimura.ComplexTheta.AppellHumbertData
+import New.Spanning.Bessel.Orthonormality
+import New.Spanning.Frames.Gains
+import New.Spanning.Frames.QuadricPlancherel
+import New.Spanning.Frames.TwoGauges
 
 /-!
 # Cut Bessel functions at ℂ: integration of the local estimates over shells
@@ -98,7 +107,7 @@ def dyadicShell (𝔰 : Shape) (i : ℕ) : Set 𝔰.G₁ :=
 lemma exists_mem_dyadicShell (x : 𝔰.G₁) : ∃ i : ℕ, x ∈ dyadicShell 𝔰 i := by
   let X : Matrix 𝔰.BesselIndex 𝔰.BesselIndex ℂ := x - 1
   obtain ⟨B, hB⟩ : ∃ B : ℝ, ∀ a c : 𝔰.BesselIndex, ‖X a c‖ ≤ B :=
-    ⟨_, fun a c ↦ norm_apply_le_l2_opNorm ..⟩
+    ⟨_, fun a c ↦ Matrix.norm_apply_le_l2_opNorm ..⟩
   obtain ⟨l, hl⟩ : ∃ l : ℕ, B < 2 ^ l := pow_unbounded_of_one_lt B _root_.one_lt_two
   have h_bound : ∃ l : ℕ, ∀ a c : 𝔰.BesselIndex, ‖X a c‖ ≤ 2 ^ l :=
     ⟨l, fun a c ↦ (hB a c).trans hl.le⟩
@@ -141,12 +150,6 @@ lemma isCut_complexData (hF : IsCutBessel F rep ρ s b F₀ f) : hF.complexData.
 lemma mem_ofSize_gauge (hF : IsCutBessel F rep ρ s b F₀ f) (hL : ρ ≤ L) {i : ℕ} {z : ℂ} :
     z ∈ (hF.gauge hL).ofSize i ↔ ‖z‖ ≤ L ^ i :=
   Iff.rfl
-
-/-- For the gauge of size `L`, the list `p` is a head of length `j` if the products of its first
-`l ≤ j` entries have inverse modulus at most `L`. -/
-lemma isHead_gauge_iff (hF : IsCutBessel F rep ρ s b F₀ f) (hL : ρ ≤ L) :
-    (hF.gauge hL).IsHead j p ↔ ∀ l ≤ j, ‖(∏ a ∈ range l, p a).val‖⁻¹ ≤ L := by
-  simp only [IsHead, hF.mem_ofSize_gauge, Units.val_inv_eq_inv_val, norm_inv, pow_one]
 
 /-- The exponent `s` is at least `10 ^ 10 * 𝔰.n ^ 4`, since the hypotheses carried by `hF` give
 `s + 3 𝔰.n + 6 ≥ 𝔰.n ^ 7` and `𝔰.n > 10 ^ 8`. -/
@@ -193,7 +196,7 @@ lemma exists_gauge_isHead (hF : IsCutBessel F rep ρ s b F₀ f) (j : ℕ) (p q 
   -- Induction on `j`: `L` is the largest of `ρ` and the inverse norms of the partial products.
   -- Each step enlarges `L` once for `p` and once for `q` (`max_pow_le_mul_max_one_pow`).
   have one_le_ρ : 1 ≤ ρ := by linarith [hF.four_le]
-  simp only [hF.isHead_gauge_iff, exists_prop]
+  simp only [IsHead, hF.mem_ofSize_gauge, Units.val_inv_eq_inv_val, norm_inv, pow_one, exists_prop]
   induction j with
   | zero => exact ⟨ρ, le_rfl, by simpa, by simpa, fun R _ ↦ by simp [headWeight]⟩
   | succ j ih =>

@@ -1,8 +1,12 @@
 module
 
-public import Mathlib.RingTheory.Frobenius
+import Mathlib.RingTheory.Frobenius
+import Mathlib.Topology.Algebra.Group.Units
+import TauCeti.RepresentationTheory.Subrepresentation
 public import Lib.GaloisRep.BaseChange.PrimeDegreeTransfer
-public import Lib.LocalGL.Shintani.LiftingGreenCharacters
+public import Lib.LocalGL.Shintani.CosetDescent
+import Lib.LocalGL.Shintani.LiftingGreenCharacters
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Base change at an inert place carries a label to its Shintani lift
@@ -366,11 +370,10 @@ lemma exists_baseChange_hasLabel [HasPrimitiveRoot5040 E'] {κ : Weight E}
       obtain ⟨hk_int, hk_red⟩ := mem_localCongruence_zero.mp k.prop
       obtain ⟨h_fix, -⟩ := h_label
       simpa [π, Subtype.ext_iff] using h_fix ⟨k, hk_int⟩ hk_red
-    have h_op : T.restrict h_maps = ρ.asAlgebraHom (groupAlgElem fun g ↦ conj (Ξ.evalGL g)) :=
+    have h_op : T.restrict h_maps = ρ.asAlgebraHom (groupAlgElem (conj ∘ Ξ.evalGL)) :=
       LinearMap.ext fun x ↦ Subtype.ext (hρ _ x).1
     have h_orth : classInner Ξ.evalGL ρ.character = 0 := by
-      simpa [h_op, classInner, character, asAlgebraHom_eq_sum, finMean,
-        ↓ finsum_eq_sum_of_fintype] using h_zero
+      rw [← trace_asAlgebraHom_groupAlgElem_conj Ξ.evalGL, ← h_op, h_zero, zero_div]
     have h_kill : ρ.asAlgebraHom (groupAlgElem (starRingEnd ℂ ∘ Ξ.evalGL)) = 0 :=
       hΞ.asAlgebraHom_groupAlgElem_eq_zero_iff.2 h_orth
     obtain ⟨-, h_label_iff⟩ := hρ _ ⟨_, hf_fixed, hV⟩

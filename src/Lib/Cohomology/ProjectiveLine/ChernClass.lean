@@ -1,8 +1,11 @@
 module
 
-public import Mathlib.Algebra.Order.Ring.Opposite
-public import Mathlib.Tactic.Linter.Style
+import Mathlib.Algebra.Order.Ring.Opposite
+import Mathlib.Algebra.Order.Star.Rat
 public import Lib.Cohomology.TorsionTheories
+public import Lib.Cohomology.LerayHirsch
+public import Lib.PadicComparison.HodgeTate.ExtCocycles
+import Lib.Cohomology.Etale.DenseSubfunctors
 
 /-!
 # Tate module, Kummer sequence and the first Chern class of O(1) on the projective line
@@ -250,11 +253,10 @@ lemma isCohomEquiv_tensorPoint_tateGen (hS : ∀ (c : C) (x : S c), ℓ • x = 
     -- pair s ⊗ t with l (tateRoot ψ t) ∈ ZMod ℓ, which acts on S c
     let pairing : S c →ₗ[ℤ] tateModule g c →ₗ[ℤ] S c :=
       ((l.toAddMonoidHom.comp (tateRoot ψ)).toIntLinearMap.smulRight 1).flip
-    have h_tmul : s ⊗ₜ[ℤ] ε = 0 := hs
     have h_smul : l (tateRoot ψ ε) • s = 0 := by
-      have h0 := congrArg (lift pairing) h_tmul
-      rw [lift.tmul, map_zero] at h0
-      exact h0
+      change pairing s ε = 0
+      simpa only [lift.tmul, map_zero] using
+        congrArg (lift pairing) (show s ⊗ₜ[ℤ] ε = 0 from hs)
     obtain rfl : s = 0 := (smul_eq_zero_iff_right hl).mp h_smul
     exact ⟨1, m.one_notMem, fun b f' _ ↦ map_zero (S.map _).hom⟩
   · -- Cokernel: t (1 / ℓ) = ζ ^ i at m, so y = t' (1 / ℓ) is 1 at m for t' = t - i • ε.
@@ -413,7 +415,8 @@ lemma TorsionCoeff.mulClass_naturality [HasFlatValues S] (ξ : TotalH P (tateMod
       (congrArg₂ (fun a b ↦ TotalH.comp a b) h_ξ
         (congrArg₂ (fun a b ↦ TotalH.comp a b) h_y (K.tateAction_comm φ M' T)))
   exact h_step1.trans
-    (congrArg _ (map_comp_assoc (abTensor.flip.obj (tateModule (φ ⋙ g))) M'.tateAction.toTotalH).symm)
+    (congrArg _
+      (map_comp_assoc (abTensor.flip.obj (tateModule (φ ⋙ g))) M'.tateAction.toTotalH).symm)
 
 /-- Let Θ be a theory along g (an ℓ-torsion coefficient F = Θ.functor with Zariski descent that
 behaves well on closed loci). Let J be a compatible family of ideals J_c of the rings g(c), and
@@ -856,7 +859,7 @@ lemma map_etaClass_eq_zero_of_coboundary (b : freeAb Y ⟶ freeAb (projLineAlong
   have h_nat (c d : C) (f : c ⟶ d) (x : Y c) :
       s d (Y.map f x) = (cocycle g).extension.X₂.map f (s c x) := by
     refine Prod.ext ?_ (b.naturality_apply f (.of x))
-    show -u d (Y.map f x) = (ringOf g ⋙ Gm).map f (-u c x) + (cocycle g).component f (b c (.of x))
+    change -u d (Y.map f x) = (ringOf g ⋙ Gm).map f (-u c x) + (cocycle g).component f (b c (.of x))
     rw [map_neg, h_coboundary c d f x]
     abel
   let b' : freeAb Y ⟶ (cocycle g).extension.X₂ := freeAb.desc s h_nat
