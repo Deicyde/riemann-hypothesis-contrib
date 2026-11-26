@@ -1,11 +1,21 @@
 module
 
-public import Mathlib.Algebra.AlgebraicCard
-public import Mathlib.Algebra.Polynomial.Basis
 public import Mathlib.NumberTheory.Padics.AddChar
+import Mathlib.Algebra.AlgebraicCard
+import Mathlib.Algebra.Polynomial.Basis
+import Mathlib.Algebra.Ring.IsFormallyReal
+public import Mathlib.Topology.Algebra.Ring.Compact -- shake: keep (needed public by an exposed definition)
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import TauCeti.NumberTheory.NumberField.Countable
+import TauCeti.RingTheory.Huber.Normed
 public import Lib.GaloisRep.Main.SelmerModules
-public import Lib.General.Geometry.GaloisCovers
 public import Lib.General.NumberTheory.CoefficientRings
+public import Lib.Cohomology.Etale.Basic
+public import Lib.General.NumberTheory.ImaginaryQuadraticField
+import Lib.General.Geometry.GaloisCovers
+import Lib.PadicComparison.Descent.TestCategory
+import Lib.PadicHodge.Crystalline.Basic
 
 /-!
 # Algebraicity from ℓ-adic bounds, roots of unity as limits, and the ℓ-adic valuation
@@ -306,10 +316,6 @@ noncomputable def normLength : ℕ∞ →+ ℝ≥0∞ :=
 
 lemma normLength_top : O.normLength ⊤ = ∞ := rfl
 
-/-- The normalised length of `n` is `-n log_ℓ ‖ϖ‖`, with `ϖ` the chosen uniformiser of `O`. -/
-lemma normLength_natCast (n : ℕ) :
-    O.normLength n = n * ENNReal.ofReal (-logb ℓ ‖O.uniformizer.val‖) := rfl
-
 /-- Let `O` be a coefficient ring, the ring of integers of a finite Galois extension of ℚ_ℓ inside
 ℚ̄_ℓ, with chosen uniformiser ϖ. For x ∈ O, let `addVal O x` be the number of factors of ϖ in x, and
 let the normalised length `normLength` send n to n·v(ϖ) (and ∞ to ∞). Then the normalised length of
@@ -326,7 +332,7 @@ lemma normLength_addVal (x : ↑O) : O.normLength (addVal O x) = ellVal x.val :=
   have h_ellVal : ellVal (u * O.uniformizer ^ n : ↑O).val =
       n * ENNReal.ofReal (-logb ℓ ‖O.uniformizer.val‖) := by
     simp [← mul_neg, hϖ.ne_zero, hu_norm, ellVal, logb_pow]
-  rw [addVal_def' u hϖ n, h_ellVal, normLength_natCast]
+  rw [addVal_def' u hϖ n, h_ellVal]; rfl
 
 @[simp]
 lemma normLength_natCast_mul (k : ℕ) (g : ℕ∞) : O.normLength (k * g) = k * O.normLength g := by

@@ -1,11 +1,12 @@
 module
 
-public import Mathlib.Algebra.Order.Ring.Opposite
-public import Mathlib.Algebra.Order.Star.Int
-public import Mathlib.Algebra.TrivSqZeroExt.Basic
-public import Mathlib.Data.Finset.Slice
-public import Lib.GLn.SchurModule.MinorBasis
-public import Lib.General.Groups.CongruenceSubgroups
+import Mathlib.Algebra.Order.Ring.Opposite
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.TrivSqZeroExt.Basic
+import Mathlib.Data.Finset.Slice
+public import Lib.GLn.SchurModule.Basic
+import Lib.GLn.SchurModule.MinorBasis
+import Lib.General.Groups.CongruenceSubgroups
 
 /-!
 # Schur matrices, the standard basis of ∇, its weights and the highest vector
@@ -88,7 +89,7 @@ lemma prod_tableauPoly_mem_nabla
     {M : Φ → ℕ} {T : ∀ τ : Φ, Tableau (n' τ) (M τ) (κ τ)} :
     ∏ τ : Φ, tableauPoly R (Sigma.mk τ) (T τ) ∈ nabla R Sigma.fst (diagramWeight M κ) := by
   -- The product is the product `minorProduct` of the minors over all columns of all colours.
-  let I : ColouredTableau (J := Σ τ : Φ, Σ h : Fin (M τ), Fin (κ τ h)) fst (fun j ↦ j.fst)
+  let I : ColoredTableau (J := Σ τ : Φ, Σ h : Fin (M τ), Fin (κ τ h)) fst (fun j ↦ j.fst)
       (fun j ↦ j.snd.fst) :=
     fun j s ↦ ⟨⟨j.fst, T j.fst j.snd.fst j.snd.snd s⟩, rfl⟩
   have h_prod : minorProduct R I = ∏ τ : Φ, tableauPoly R (Sigma.mk τ) (T τ) := by
@@ -123,7 +124,7 @@ lemma exists_isTableauBasis {ι : Type} [Fintype ι] {M : ℕ} {k : ℕ → ℕ}
     .of_linearIndepOn_of_mem_span_of_character (fun R _ ↦ ?_) (fun R _ T ↦ ?_) ?_⟩
   · simpa using (linearIndepOn_univ_iff.mpr (h_indep R)).image_of_comp
   · -- The minor product of any filling `T` lies in `nabla` for this weight, so in the span.
-    let cols_T : ColouredTableau (J := J) 0 fst (fun j ↦ j.snd.fst) :=
+    let cols_T : ColoredTableau (J := J) 0 fst (fun j ↦ j.snd.fst) :=
       fun j s ↦ ⟨T j.snd.fst j.snd.snd s, rfl⟩
     have h_tableau : tableauPoly R id T = minorProduct R cols_T := by
       simp [tableauPoly, minorProduct, cols_T, J, Fintype.prod_sigma]
@@ -246,8 +247,8 @@ lemma GL.rowSubst_minor (z : ∀ τ : Φ, Matrix (n' τ) (n τ) R) (τ : Φ)
       det ((z τ).submatrix I (rowEquivFin n τ).symm) •
         minor R fun a : Fin (Fintype.card (n τ)) ↦ ⟨τ, (rowEquivFin n τ).symm a⟩ := by
   -- The substitution multiplies the matrix of variables on the left by the rows `I` of `z τ`.
-  simp [rowSubst, reindex_equiv (rowEquivFin n τ).symm, ← C_mul', minor, AlgHom.map_det, Matrix.map,
-    RingHom.map_det, ← det_mul]
+  simp only [rowSubst, reindex_equiv (rowEquivFin n τ).symm, ← C_mul', minor, AlgHom.map_det,
+    AlgHom.mapMatrix_apply, Matrix.map, of_apply, aeval_X, RingHom.map_det, ← det_mul]
   -- Both sides are the determinant of the same matrix: once entrywise, once as a product.
   change (of fun (a b : Fin (Fintype.card (n τ))) ↦ ∑ c : Fin (Fintype.card (n τ)),
         C (z τ (I a) ((rowEquivFin n τ).symm c)) *
@@ -292,7 +293,7 @@ lemma nabla_le_span_nablaBasis_mul_detPow (e : Φ → ℕ) :
     simp_rw [← Fin.sum_const, ← Fintype.sum_sigma', diagramWeight_eq_columnWeight]
     exact sum_sum_type _
   obtain ⟨ι, h_fintype, I, hI⟩ : ∃ (ι : Type) (_ : Fintype ι)
-      (I : ι → ColouredTableau (fst : (Σ τ : Φ, n τ) → Φ) colour height), IsStdMinorFamily I :=
+      (I : ι → ColoredTableau (fst : (Σ τ : Φ, n τ) → Φ) colour height), IsStdMinorFamily I :=
     exists_isStdMinorFamily (m := Σ τ : Φ, n τ) fst colour height
   rw [← h_weight]
   refine (hI.nabla_le_span R).trans ?_
@@ -904,7 +905,8 @@ lemma exists_equiv_schur_one_row_eq_symPowMatrix {a : ℕ} {m σ : Type} [Fintyp
       aeval (R := ℂ) (fun b ↦ X (⟨(), q b⟩, 0)) (monomial (φ i) 1) := by
     -- Unfolded, the left side is the product of the minors of the columns, the right side the
     -- product of the variables `X (entry, 0)` over all entries.
-    simp [φ, nablaBasis, monomial_sum_one, ← X.eq_1, tableauPoly, minor]
+    simp only [φ, nablaBasis, monomial_sum_one, ← X.eq_1, tableauPoly, minor, univ_unique,
+      prod_singleton, map_prod, aeval_X]
     -- Compare column by column, by the height of the column: minors of size `0` and `1` are the
     -- products of their variables, and there are no columns of height at least `2`.
     congr! with ⟨_ | _ | _⟩
@@ -923,14 +925,17 @@ lemma exists_equiv_schur_one_row_eq_symPowMatrix {a : ℕ} {m σ : Type} [Fintyp
     have h_mem : aeval (R := ℂ) (fun b ↦ X (⟨(), q b⟩, 0)) (monomial d 1) ∈
         nablaFamily ℂ (fun _ ↦ m) fun () ↦ k := by
       -- Only columns of height `1` count, `k 1 = a` of them: the weight is `a` at `((), 0)`.
+      have h_wt : diagramWeight (rankAt fun _ : Unit ↦ m) (fun () ↦ k) =
+          Finsupp.single ((), 0) a := by
+        simp only [diagramWeight, Fintype.sum_unique, PUnit.default_eq_unit]
+        rw [sum_eq_ite 1]
+        · simp [h_card, h_k_eq 1 one_pos h_card]
+        · intro h h_mem_range h_ne_one
+          rcases Nat.eq_zero_or_pos h with h_zero | h_pos
+          · simp [h_zero]
+          · simp [h_k_eq h h_pos (mem_range.mp h_mem_range), h_ne_one]
       simp_all [mem_nabla, monomial_eq, borelMul, mul_pow, prod_pow_eq_pow_sum,
-        prod_mul_distrib, diagramWeight]
-      rw [sum_eq_ite 1]
-      · simp [h_card, h_k_eq 1 one_pos h_card, mul_comm]
-      · intro h h_mem_range h_ne_one
-        rcases Nat.eq_zero_or_pos h with h_zero | h_pos
-        · simp [h_zero]
-        · simp [h_k_eq h h_pos (mem_range.mp h_mem_range), h_ne_one]
+        prod_mul_distrib, mul_comm]
     -- so it is a combination `Σ_i c_i b_i` of the basis vectors, which are the monomials `φ i`.
     by_contra h_miss
     -- Rename the first-column variables back to σ and take the coefficient of the missing monomial.

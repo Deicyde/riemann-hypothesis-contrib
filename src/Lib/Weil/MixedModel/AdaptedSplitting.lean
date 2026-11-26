@@ -1,6 +1,7 @@
 module
 
 public import Lib.Weil.DualPair.MixedModel
+import Lib.Weil.DualPair.WeilAction
 
 /-!
 # Adapted splittings: hyperbolic polarisation, Hom spaces, composition and stages
@@ -198,7 +199,6 @@ lemma isAdapted_homSource [h : IsBaseAdapted A] :
   have h_kron : IsOrthoIntegral
       ((stdForm E fun x : r × n' ↦ s' x.2) * (1 : Matrix r r (𝔸 E)) ⊗ₖ Fᴴᵀ) :=
     .mul (.of_stdForm fun x : r × n' ↦ s' x.2) (.kronecker .one h.isOrthoIntegral)
-
   have h_frame : (A.homSource T).frameAt 1 (adaptedHomBasis p T) =
       ((stdForm E fun x : r × n' ↦ s' x.2) * (1 : Matrix r r (𝔸 E)) ⊗ₖ Fᴴᵀ).submatrix id e *
         stdForm E ε := by
