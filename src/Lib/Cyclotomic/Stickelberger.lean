@@ -125,7 +125,7 @@ lemma exists_galUnitsRep_gaussSum_eq {ψ : AddChar (ZMod p) (𝓞 Ω)}
 
 /-- Let `B` be a place of `Ω` above the prime `p`. An algebraic integer `x` with `x ^ p = 1` is
 congruent to `1` modulo the prime ideal `centrePrime Ω B` of `𝓞 Ω` that `B` defines. -/
-lemma mk_centrePrime_eq_one_of_pow_eq_one (hB : B.valuation p < 1) {x : 𝓞 Ω} (hx : x ^ p = 1) :
+lemma mk_centerPrime_eq_one_of_pow_eq_one (hB : B.valuation p < 1) {x : 𝓞 Ω} (hx : x ^ p = 1) :
     ↑x = (1 : 𝓞 Ω ⧸ centrePrime Ω B) := by
   -- Otherwise the residue of `x` is a primitive `p`-th root of unity in a domain where `p = 0`.
   by_contra h_ne
@@ -167,7 +167,7 @@ lemma stickelberger (hB : B.valuation p < 1) {ψ : AddChar (ZMod p) (𝓞 Ω)}
   have ord_pos (u : DiscreteUnits Ω) {χ' : MulChar (ZMod p) (𝓞 Ω)} {ψ' : AddChar (ZMod p) (𝓞 Ω)}
       (hu : u.toMul.val = gaussSum χ' ψ') (hχ' : χ' ≠ 1) : 0 < ordRat ℚ B u := by
     have h_cen : gaussSum χ' ψ' - gaussSum χ' 1 ∈ centrePrime Ω B := by
-      simp [gaussSum, mk_centrePrime_eq_one_of_pow_eq_one hB, ← Submodule.Quotient.mk_eq_zero]
+      simp [gaussSum, mk_centerPrime_eq_one_of_pow_eq_one hB, ← Submodule.Quotient.mk_eq_zero]
     rw [gaussSum_one_right hχ', sub_zero, mem_centrePrime] at h_cen
     rw [lt_iff_le_and_ne, ne_comm, Ne, hv.ordRat_nonneg_iff, hv.ordRat_eq_zero_iff, hu]
     exact ⟨algebraMap_ringOfIntegers_mem B (gaussSum χ' ψ'), h_cen.ne⟩
@@ -319,11 +319,11 @@ lemma exists_addChar_isPrimitive_and_mulChar_isPrimitive :
 `t ↦ χ t` a homomorphism from `ZMod n` to the multiplicative characters of `𝔽_p`. If `q • u = 0`,
 the Gauss sums of `χ (w + u)` and of `χ w` with `ψ` are congruent modulo the prime ideal
 `centrePrime Ω A`: the values of `χ u` on units are `q`-th roots of unity, so `≡ 1` at `A`. -/
-lemma gaussSum_add_sub_gaussSum_mem_centrePrime_of_nsmul_eq_zero {n q : ℕ} [Fact q.Prime]
+lemma gaussSum_add_sub_gaussSum_mem_centerPrime_of_nsmul_eq_zero {n q : ℕ} [Fact q.Prime]
     {A : ClosurePlace} (hA : A.valuation q < 1) (ψ : AddChar (ZMod p) (𝓞 Ω))
     (χ : AddChar (ZMod n) (MulChar (ZMod p) (𝓞 Ω))) (w u : ZMod n) (hu : q • u = 0) :
     gaussSum (χ (w + u)) ψ - gaussSum (χ w) ψ ∈ centrePrime Ω A := by
-  simp [gaussSum, mk_centrePrime_eq_one_of_pow_eq_one hA, hu, sum_eq_add_sum_units,
+  simp [gaussSum, mk_centerPrime_eq_one_of_pow_eq_one hA, hu, sum_eq_add_sum_units,
     map_add_eq_mul, ← Submodule.Quotient.mk_eq_zero, ← pow_apply_coe, ← map_nsmul_eq_pow]
 
 /-- Let `B` be a place of `Ω` above the prime `p` and let `c : ℕ`. There is a family `J : ℚ/ℤ → Ωˣ`
@@ -402,7 +402,7 @@ lemma exists_isJacobiFamily (hB : B.valuation p < 1) (c : ℕ) :
   have G_congr (w u : ZMod n) (hu : q • u = 0) :
       (G (w + u) : DiscreteUnits Ω ⧸ principalUnits A) = G w := by
     have h_val : valuationVia Ω A (gaussSum (χ (w + u)) ψ - gaussSum (χ w) ψ) < 1 :=
-      mem_centrePrime.mp (gaussSum_add_sub_gaussSum_mem_centrePrime_of_nsmul_eq_zero hA ψ χ w u hu)
+      mem_centrePrime.mp (gaussSum_add_sub_gaussSum_mem_centerPrime_of_nsmul_eq_zero hA ψ χ w u hu)
     refine eq_iff_sub_mem.mpr (show A.valuation (((G (w + u) - G w).toMul : Ω) - 1) < 1 from ?_)
     simpa [toMul_sub, valuationVia, div_sub_one, gauss_ne, map_div₀, hG,
       valuation_gaussSum_eq_one_of_valuation_eq_one hA_p hψ] using h_val
