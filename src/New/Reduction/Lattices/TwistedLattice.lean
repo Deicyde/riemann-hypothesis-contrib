@@ -119,7 +119,9 @@ the prime of `ι`, products of vectors integral at `ῑ` with vectors integral a
 structure TwistedLattice (V T : Type) [AddCommGroup V] [Module ℂ V] [One T] where
   /-- The inner product space for the twist `ξ`. -/
   Space : T → Type
+  /-- The instance that the space for the twist `ξ` is a normed additive commutative group. -/
   [normedAddCommGroup (ξ : T) : NormedAddCommGroup (Space ξ)]
+  /-- The instance that the space for the twist `ξ` is a complex inner product space. -/
   [innerProductSpace (ξ : T) : InnerProductSpace ℂ (Space ξ)]
   /-- The map `Θ_ξ`. -/
   lift (ξ : T) : V →ₗ[ℂ] Space ξ
@@ -133,6 +135,7 @@ structure TwistedLattice (V T : Type) [AddCommGroup V] [Module ℂ V] [One T] wh
     ∀ φ ∈ lattice ξ ι.conj, ∀ φ' ∈ lattice ξ ι, ‖ι.iso ⟪φ, φ'⟫_ℂ‖ ≤ 1
   /-- The set of coordinates on the space for the trivial twist. -/
   Coord : Type
+  /-- The instance that the set of coordinates is finite. -/
   [fintypeCoord : Fintype Coord]
   /-- The coordinates of a vector. -/
   coord : Space 1 →ₗ[ℂ] Coord → ℂ
@@ -288,7 +291,8 @@ lemma CovolumeLe.norm_map_det_gram_le {y : S → V} {c : ℝ} (hy : L.CovolumeLe
   have h_pair :
       σ (gram ℂ (L.lift 1 ∘ y)).det = (of fun i k : S ↦ star (v i) ⬝ᵥ G *ᵥ w k).det := by
     rw [σ.map_det]
-    exact congrArg det (Matrix.ext fun i k ↦ by simp [v, w, G, conjCoord, inner_eq, dotProduct, mulVec])
+    exact congrArg det
+      (Matrix.ext fun i k ↦ by simp [v, w, G, conjCoord, inner_eq, dotProduct, mulVec])
   refine le_of_sq_le_sq ?_ (exp_nonneg c)
   rw [h_pair]
   calc _ ≤ ‖(formGram G v).det‖ * ‖(formGram G w).det‖ :=
