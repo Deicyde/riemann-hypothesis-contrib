@@ -1,8 +1,9 @@
 module
 
-public import Lib.GLn.SchurModule.SchurMatrix
 public import New.Derivatives.Divisibility.NullFrames
 public import New.Derivatives.FormalGroup.ThetaProducts
+import Lib.GLn.SchurModule.SchurMatrix
+import Lib.General.Algebra.SeriesCongruences
 
 /-!
 # Divisibility of the jets of a series with the normal form along products of minors
@@ -314,10 +315,6 @@ def IsChargeExponent (partner : Φ → Φ) (ev : Finset Φ) (w : Φ → ℕ → 
 diagrams `κ τ`, where `r` is the row that the filling `i'` puts into the box. -/
 def fillingCharge {κ : Φ → ℕ → ℕ} (w : Φ → ℕ → n' → ℕ) (i' : WeylIndex n' κ) : ℕ :=
   ∑ τ : Φ, ∑ h : Fin (card n'), ∑ j : Fin (κ τ h), ∑ b : Fin h, w τ h ((i' τ).val h j b)
-
-omit [DecidableEq Φ] in
-lemma fillingCharge_zero {κ : Φ → ℕ → ℕ} (i' : WeylIndex n' κ) :
-    fillingCharge (0 : Φ → ℕ → n' → ℕ) i' = 0 := by simp [fillingCharge]
 
 omit [DecidableEq Φ] in
 /-- The sum `fillingCharge w i'` of the exponents `w` over the filling `i'` depends only on the
@@ -710,7 +707,7 @@ theorem norm_jet_minorProd_le_of_hasNormalForm [DecidableEq n'] (hp : chiK P.d p
       p ^ (-(predictedDivisibility P.d p (P.partner s p) κ N -
         card (P.Φ s) * N ^ 3 * (1 + Real.logb p (max (boxes κ N) 1 : ℕ))) : ℝ) := by
   -- With no marked places and all charges equal to one, no column is removed.
-  simpa [eraseHeightOne_empty, fillingCharge_zero] using
+  simpa [eraseHeightOne_empty, fillingCharge] using
     P.norm_jet_minorProd_le_of_charges s hp hϖ hF ∅ 0 (by simp) i' y
 
 end Parameters

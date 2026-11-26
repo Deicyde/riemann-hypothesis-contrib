@@ -1,10 +1,19 @@
 module
 
-public import Mathlib.Analysis.Calculus.Deriv.Star
-public import Mathlib.Data.Set.Finite.List
-public import Mathlib.RingTheory.Finiteness.Lattice
-public import Lib.DiscreteSeries.Holomorphic.HighestVectorExtension
-public import Lib.General.LinearAlgebra.Eigenvalues
+import TauCeti.Analysis.Matrix.L2OpNorm
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Calculus.Deriv.Star
+import Mathlib.Data.Set.Finite.List
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.RegularLocalRing.Defs
+public import Lib.DiscreteSeries.Rigidity.RepresentationsAndCasimirs
+import Lib.DiscreteSeries.FlenstedJensen.RightDerivatives
+import Lib.DiscreteSeries.Holomorphic.HighestVectorExtension
+import Lib.General.Analysis.GaussianIntegral
+import Lib.General.Analysis.HolomorphicIntegrals
+import Lib.General.LinearAlgebra.Eigenvalues
 
 /-!
 # K-highest vectors, norm bounds, Casimir growth on the filtration, and analytic vectors
@@ -454,7 +463,7 @@ theorem HCParam.IsKHighest.norm_apply_le_mul_norm (hx : l.IsKHighest ρ ν x)
   -- Bound each `‖X a b‖` by `‖X‖`, square, and apply Cauchy–Schwarz over the pairs `(a, b)`.
   have h_norm : ‖ρ X y‖ ≤ ‖X‖ * ∑ p : n × n, ‖ρ.E p.1 p.2 y‖ := by
     simp only [ρ.apply_eq_sum X, LinearMap.sum_apply, LinearMap.smul_apply]
-    grw [← sum_prod_type', norm_sum_le, norm_smul_le, norm_apply_le_l2_opNorm, ← mul_sum]
+    grw [← sum_prod_type', norm_sum_le, norm_smul_le, Matrix.norm_apply_le_l2_opNorm, ← mul_sum]
   refine (sq_le_sq₀ (norm_nonneg _) (by positivity)).1 ?_
   calc ‖ρ X y‖ ^ 2 ≤ ‖X‖ ^ 2 * (∑ p : n × n, ‖ρ.E p.1 p.2 y‖) ^ 2 := by grw [h_norm, mul_pow]
     _ ≤ ‖X‖ ^ 2 * (#(univ : Finset (n × n)) * (C * ‖y‖ ^ 2)) := by

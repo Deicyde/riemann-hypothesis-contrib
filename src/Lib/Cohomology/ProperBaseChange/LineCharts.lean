@@ -1,12 +1,15 @@
 module
 
-public import Mathlib.Algebra.Order.Star.Int
-public import Mathlib.Data.Finset.Functor
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.Order.Filter.AtTopBot.Interval
-public import Mathlib.Tactic.Linter.Style
-public import Lib.General.Algebra.MultivariatePolynomials
-public import Lib.PadicComparison.Descent.TestCategory
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Data.Finset.Functor
+import Mathlib.Order.Filter.AtTopBot.Interval
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.Tactic.Linter.Style
+public import Lib.Cohomology.Etale.Basic
+public import Lib.General.Algebra.AdicCompletion
+import Lib.General.Algebra.MultivariatePolynomials
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Mayer–Vietoris for two charts of a line modulo an ideal
@@ -340,7 +343,7 @@ lemma exists_pow_eq_mul_of_local (hts : (t * s : D) = 1)
         have h_mem : 1 ^ m * c * (κ G + m • c) ∈ T N ^ m * T N * T N :=
           mul_mem_mul (mul_mem_mul (pow_mem_pow _ h_one m) hc) (add_mem hG (nsmul_mem hc m))
         rwa [one_pow, one_mul, ← pow_succ, ← pow_succ] at h_mem
-      · simp [pow_succ', mul_assoc, ih]
+      · simp only [pow_succ', mul_assoc, ih]
         algebra
   obtain ⟨Φ, hΦ, h_expand⟩ := h_binom ℓ
   -- `Φ` and `L a * L b` lie in the spans of `N ^ (ℓ + 1)` and `P * Q`, hence in the span of `e`.

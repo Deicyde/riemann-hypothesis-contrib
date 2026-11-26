@@ -1,9 +1,18 @@
 module
 
-public import Mathlib.RingTheory.ZMod.Torsion
-public import Lib.ClassField.Global.Chebotarev
-public import Lib.Cyclotomic.Kolyvagin.DerivativeCocycles
-public import Lib.PadicComparison.Descent.TestCategory
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.RingTheory.ZMod.Torsion
+public import Lib.Cyclotomic.Stickelberger
+public import Lib.Cyclotomic.Voronoi
+import Lib.Adelic.Adeles.LocalFactors
+import Lib.ClassField.Global.AlbertBrauerHasseNoether
+import Lib.ClassField.Global.ArtinMap
+import Lib.ClassField.Global.ArtinReciprocity
+import Lib.ClassField.Global.Chebotarev
+import Lib.ClassField.Global.ExistenceTheorem
+import Lib.ClassField.GreenbergWiles.SelmerLevels
+import Lib.Cyclotomic.Kolyvagin.DerivativeCocycles
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Reciprocity laws and Stickelberger and Kolyvagin bounds for odd-part cocycles
@@ -618,7 +627,8 @@ lemma sum_floorDiff_dvd (h : IsStickelbergerBound N e X)
     simp only [floorDiff, ↓← map_neg, ofZMod_apply, QZ.fracRep_mk, mul_div, mod_eq_of_lt, val_lt,
       Int.fract_div_natCast_eq_div_natCast_mod]
     norm_cast
-    simp [-natCast_val, U, two_mul, sub_mul]
+    simp only [Int.cast_subNatNat, sub_mul, sum_sub_distrib, map_sub, map_sum, map_mul, map_natCast,
+      map_pow, two_mul, U]
     nth_rw 2 [← neg_bijective.sum_comp]
     simp [← h_odd, ← mul_assoc, ← mul_pow, h_char]
   -- Use `IsStickelbergerBound` at the levels `lⁿ⁺¹` and `lⁿ`. As `e ≠ 0`, the factor `l ^ e` turns
@@ -895,11 +905,6 @@ lemma isUnit_natCast_of_pow_factorization_succ_dvd (hX : X ≠ 0)
     simpa [pow_succ, NeZero.ne, mul_dvd_mul_iff_left] using h_dvd
   exact (X.coprime_ordCompl L.out hX).cast.isUnit_of_dvd h_dvd_compl
 
-lemma finite_component : Finite (component l e ψ ν) :=
-  finite_vanishingCocycles (n := ν)
-    (fun g y ↦ (cyclotomicPowDirichlet_smul_eq_self g.prop (nsmul_quot_eq_zero dvd_rfl y)).right)
-    fun _ ⟨h_fix, h_inertia⟩ ↦ .inr ⟨h_fix, .inl h_inertia⟩
-
 /-- There are finitely many cocycles for `cyc ^ e ψ` modulo `l ^ m` that are unramified off `l`
 over `ℚ(ζ_N)`. -/
 lemma finite_vanishingCocycles_inertiaOff_empty (m : ℕ) :
@@ -939,7 +944,9 @@ lemma exists_finset_forall_exists_isFrob (hc : cyclotomicPowDirichlet l e ψ cmC
   -- Choose a prime for each pair; there are finitely many pairs.
   have h_finite_y : Finite (vanishingCocycles (cyclotomicPowDirichlet l (e + 1) ψ)
       (QuotSpan (l ^ m : O)) (inertiaOff N l ∅)) := finite_vanishingCocycles_inertiaOff_empty m
-  have h_finite_z : Finite (component l e ψ ν) := finite_component
+  have h_finite_z : Finite (component l e ψ ν) := finite_vanishingCocycles (n := ν)
+    (fun g y ↦ (cyclotomicPowDirichlet_smul_eq_self g.prop (nsmul_quot_eq_zero dvd_rfl y)).right)
+    fun _ ⟨h_fix, h_inertia⟩ ↦ .inr ⟨h_fix, .inl h_inertia⟩
   have h_pair (y : {y : vanishingCocycles (cyclotomicPowDirichlet l (e + 1) ψ)
       (QuotSpan (l ^ m : O)) (inertiaOff N l ∅) // ¬cycloGalGroup f ≤ openCocycleKer y.prop})
       (z : {z : component l e ψ ν // z ≠ 0}) :
@@ -1096,7 +1103,8 @@ lemma exists_detecting_points_component (h_bound : IsStickelbergerBound N e X)
   by_contra! h_blind
   set m : ℕ := X.factorization l + 1
   have h_two : IsUnit (2 : O) := by
-    exact_mod_cast isUnit_natCast_of_not_dvd (O := O) (not_dvd_of_pos_of_lt two_pos (by lia : 2 < l))
+    exact_mod_cast isUnit_natCast_of_not_dvd (O := O)
+      (not_dvd_of_pos_of_lt two_pos (by lia : 2 < l))
   have h_totient : IsUnit (φ (N * l) : O) := isUnit_totient_mul (by lia)
   obtain ⟨a, ha, hla, h_pow, h_pow_succ⟩ :=
     exists_modEq_one_coprime_isUnit_pow_sub_one (O := O) he_ne_zero hl

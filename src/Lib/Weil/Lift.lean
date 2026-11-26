@@ -1,9 +1,18 @@
 module
 
-public import Lib.Adelic.AutomorphicForms.Cuspidality
+import Mathlib.MeasureTheory.Integral.CompactlySupported
+import Mathlib.MeasureTheory.Integral.Pi
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.DiscreteSeries.Theta.BlockRule
-public import Lib.DiscreteSeries.Theta.LocalCorrespondence
 public import Lib.Weil.DualPair.ThetaLiftConvergence
+public import Lib.Adelic.AutomorphicForms.RealConvolution
+public import Lib.DiscreteSeries.Rigidity.KernelFixes
+public import Lib.Weil.DualPair.WeilAction
+import Lib.Adelic.AutomorphicForms.Cuspidality
+import Lib.DiscreteSeries.FlenstedJensen.PsiKTypes
+import Lib.DiscreteSeries.Theta.FockJointHarmonics
+import Lib.DiscreteSeries.Theta.LocalCorrespondence
 
 /-!
 # Theta lifts of forms: products of minors, edges, arrows between spaces of forms
@@ -133,7 +142,6 @@ theorem New.sign_eq_of_ne_zero_of_lt {N : ℕ} {k : ℤˣ → ℕ → ℕ}
     (hx : ∀ η : ℤˣ, x (-η) = (x η).rev) {η μ : ℤˣ} {p q : ℕ} (hp : k η p ≠ 0) (hq : k μ q ≠ 0)
     (hxp : x η < p) (hxq : x μ < q) : η = μ := by
   -- For opposite signs the two places add up to `N - 1`, so `N < p + q`.
-  have h_sum : (x (-1) : ℕ) + x 1 + 1 = N := by grind
   rcases Int.units_eq_one_or η with rfl | rfl <;> rcases Int.units_eq_one_or μ with rfl | rfl <;>
     grind
 

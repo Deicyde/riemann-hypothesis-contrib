@@ -1,7 +1,11 @@
 module
 
-public import Lib.ClassField.GreenbergWiles.CocycleCounts
-public import Lib.ClassField.GreenbergWiles.SelmerRelations
+import Mathlib.FieldTheory.Galois.Profinite
+import Mathlib.Topology.Sheaves.Presheaf
+public import Lib.ClassField.GreenbergWiles.SelmerLevels
+import Lib.ClassField.GreenbergWiles.CocycleCounts
+import Lib.ClassField.GreenbergWiles.SelmerRelations
+import Lib.ClassField.Places.TameInertia
 
 /-!
 # Relations at split primes
@@ -245,7 +249,7 @@ lemma exists_cocycle_three_values (hS : ∀ v ∈ D.localPrimes, ↑q ∈ v.asId
   let : Module (ZMod m) M := AddCommGroup.zmodModule D.nsmul_eq_zero
   obtain ⟨⟨P₀, z⟩, hP, z_val⟩ := selmerZ1.exists_three_values s hγ D.apply_eq_of_mem
     D.notMem_of_isComplexConj hφ a
-  refine ⟨z, selmerZ1.trivialised_mem_selmer D.unramified D.isPlaceOver D.allowed D.coboundary_le
+  refine ⟨z, selmerZ1.trivialized_mem_selmer D.unramified D.isPlaceOver D.allowed D.coboundary_le
     D.ρ_eq_one_of_isComplexConj s hS hP, fun n ↦ ?_⟩
   simpa [← Nat.cast_smul_eq_nsmul (ZMod m)] using z_val n
 

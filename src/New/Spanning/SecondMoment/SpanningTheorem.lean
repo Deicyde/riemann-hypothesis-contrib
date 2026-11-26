@@ -1,10 +1,12 @@
 module
 
-public import New.Determinant.AuxiliaryForms.RegularParameters
-public import New.Spanning.MainTerm.BadTypes
-public import New.Spanning.Multiplicities.EqualMultiplicities
+import Mathlib.Data.Rat.Cast.OfScientific
 public import New.Spanning.Unfolding.Moments
 public import New.Spanning.Unfolding.SeriesPeriod
+import Lib.DiscreteSeries.Character.FormalDegree
+import New.Determinant.AuxiliaryForms.RegularParameters
+import New.Spanning.MainTerm.BadTypes
+import New.Spanning.Multiplicities.EqualMultiplicities
 
 /-!
 # The dimension of the target and one good translate of the Poincaré map
@@ -207,7 +209,7 @@ lemma levelRepresentation_goodIdempotentAbove_eq :
         ∏ i : Fin 2, ∏ w : D.ChosenPlace i,
           (labelIdem D.RowIndex (c i w)).coeff (t ⟨i, w⟩) := by
     simp [e₀, goodTupleFamilies, tupleIdem, prod_sigma, Sigma.uncurry]
-  simp_rw [asAlgebraHom_eq_sum]
+  simp_rw [Representation.asAlgebraHom_eq_sum]
   refine Fintype.sum_equiv (κ := D.chosenGL) (Equiv.piCurry _).symm _ _ fun s ↦ ?_
   rw [h_tensor, h_proj, levelRepresentation_apply]
   rfl -- the definition of `Sigma.uncurry`
