@@ -285,7 +285,7 @@ theorem kTypeNormSq_pos (w : HCParam ε) : 0 < w.kTypeNormSq := by
   unfold HCParam.kTypeNormSq
   exact integral_pos_of_integrable_nonneg_ne_zero (x := 1) h_cont
     (h_cont.integrable_of_hasCompactSupport (.of_compactSpace _)) (fun k ↦ sq_nonneg _) (by
-      show ‖weightMinors w (1 : Matrix n n ℂ)‖ ^ 2 ≠ 0
+      change ‖weightMinors w (1 : Matrix n n ℂ)‖ ^ 2 ≠ 0
       rw [weightMinors_one, norm_one, one_pow]
       exact one_ne_zero)
 
@@ -351,7 +351,7 @@ theorem IsHolOfWeight.apply_mul_diagTorus {u : Φ → n → ℤ} {F : (Φ → US
   let z (τ : Φ) : Matrix n n ℂ := h τ * diagTorus ε t
   have h_borel : IsBorelMatrix o (diagTorus ε t : Matrix n n ℂ) :=
     ⟨blockTriangular_diagonal _, by
-      show (diagonal fun i : n ↦ (t i : ℂ)).det ≠ 0
+      change (diagonal fun i : n ↦ (t i : ℂ)).det ≠ 0
       rw [det_diagonal]
       exact Finset.prod_ne_zero_iff.2 fun i _ ↦ Circle.coe_ne_zero (t i)⟩
   have as_triangular : F' z = (∏ τ : Φ, ∏ i : n, (t i : ℂ) ^ u τ i) * F h := by
