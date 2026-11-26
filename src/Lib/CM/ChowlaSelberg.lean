@@ -197,7 +197,6 @@ lemma eulerFactor_mul_eq_prod_inv {p : ℕ} [hp : Fact p.Prime] {w J : FinPlace 
     simp [h_chi.resolve_right (hq.1 hwq), hwJ_ne, hwq, hJq]
 
 -- Keeps definitional checks from unfolding the finite products.
-seal Finset.prod in
 /-- The Euler product over the primes of `K = ℚ(√-d)` with all coefficients `1`, that is, the
 Dedekind zeta function of `K`, is `ζ(s) L(s, χ)` for real `s > 1`. Here `quadTwist (N := 1) 1 d` is
 the trivial character modulo `1` twisted by the Legendre symbol, that is, the character

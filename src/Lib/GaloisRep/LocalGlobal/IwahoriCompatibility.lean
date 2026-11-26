@@ -158,7 +158,6 @@ lemma GaloisRep.PolyKillsAt.of_mul_frob_pow [EmbeddedNumberField E] {r : GalRep 
   exact ((hpow m hm).2 (hs.mul (hφW.pow m))).2
 
 -- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- Let the eigenform `f` for the system `P` of Hecke polynomials be a pro-`p` Iwahori eigenvector
 at `w` with eigencharacter `torusChar ξ`. If the `ξ i` are unramified and `‖ξ i ϖ‖` is antitone in
 `i` for a uniformiser `ϖ`, then some eigenform for the same system `P` is spherical at `w` with

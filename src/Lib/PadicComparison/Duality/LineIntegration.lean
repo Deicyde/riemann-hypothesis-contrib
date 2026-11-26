@@ -393,7 +393,6 @@ lemma map_foldr_etaAt {X : C ⥤ Type 1} {J : Type*}
 variable (h : M.HasLineFormula) {φ} {M' : TorsionCoeff (φ ⋙ g)} (β : φ ⋙ M.functor ⟶ M'.functor)
 
 -- Keeps definitional checks from unfolding the Ext groups.
-seal CategoryTheory.Abelian.Ext in
 /-- Restriction along `φ` followed by the product with a class `T` from `M.functor` restricted along
 `φ` to `M'.functor` commutes with the two maps `x ↦ x · 1` and `x ↦ x · η` to the cohomology over
 the points of the line. -/
@@ -707,7 +706,6 @@ lemma isFiniteLerayHirsch_iff_of_isCohomEquiv (α : N ⟶ N')
   exact (h_bij_iff.and h_const.finite_iff).symm
 
 -- Without the seal, unification unfolds `Abelian.Ext` into the derived category and is slow.
-seal Abelian.Ext in
 /-- `D.IsFiniteLerayHirsch` passes to retracts by natural operations. Let `N` have flat values,
 write `N / ℓ` for `abCoker (ℓ • 𝟙 N)`, and let `r i : N / ℓ → N'` and `ρ i : N' → N` be operations
 without parameters (`NaturalOp 0`). If `∑ i, ρ i (r i x)` is always the pull-back of `x` along
@@ -802,7 +800,6 @@ lemma isFiniteLerayHirsch_of_retract [HasFlatValues N] (r : ι → NaturalOp 0 (
 /-! ### Pairs in a power of the projective line -/
 
 -- Without the seal, unification unfolds `Abelian.Ext` into the derived category and is slow.
-seal Abelian.Ext in
 /-- `D.IsFiniteLerayHirsch` passes from `N` to `ℤ[(ℙ¹)^m]/ℤ[U]`, `U = I.topPoints`, given classes
 `β i` from it to `N`, operations `T i` with `d` parameters in `ℙ¹` from its quotient by `ℓ` to `N`,
 and `σ` sending parameters to coordinates, such that (`h_sum_eq_foldr`) for every stage `t` with
@@ -899,7 +896,6 @@ lemma isFiniteLerayHirsch_of_integrate_params (β : ι → TotalH (relFreeAb I.t
       _)
 
 -- Without the seal, unification unfolds `Abelian.Ext` into the derived category and is slow.
-seal Abelian.Ext in
 /-- Let I be a compatible family of ideals on points of (P¹)^m, U the locus where I is the unit
 ideal, and Q = ℤ[(P¹)^m]/ℤ[U]. Let `θ i` be classes of degree `d i`, over the points of (P¹)^m, from
 N to the locally constant ℤ/ℓ-valued functions modulo those dying where I = 0 (`I.zerosCoeff`).
