@@ -142,10 +142,10 @@ lemma constantRows_mul_transpose_eq_mul_fromBlocks (j : D.LiftIndex) (i : D.RowC
   · -- A row that is a standard basis vector, in a block where the matrix is the identity.
     obtain z | z | z | z := z
     all_goals
-      simp [constantRows, inclMatrix, one_apply]
-      split <;> simp [one_apply, eq_comm]
+      simp [constantRows, inclMatrix, Matrix.one_apply]
+      split <;> simp [Matrix.one_apply, eq_comm]
   · -- A row of τ(Y), supported on the block of B.
-    obtain z | z | z | z := z <;> simp [constantRows, mul_apply]
+    obtain z | z | z | z := z <;> simp [constantRows, Matrix.mul_apply]
 
 /-- Let `q` be the bound on the number of determinants, `n ≤ (10 m + 1) q` a degree with `n ≤ D.M`
 and `0 < H ≤ (n ^ n) ^ 3` a denominator. Then the constant `chosenGroupOrder ^ 2`, the two class
@@ -176,7 +176,16 @@ lemma firstFactorSize_sq_le_exp {q n : ℕ} {H : ℤ}
             (n * 3 * 2 * log D.M / 2 + 9 * ((12 * D.m + 1) * q) * log D.M / 2))))) ≤
       D.f * D.m * D.b * D.logB ^ 2 := by
     grw [hn, hq]
-    exact D.le_of_hasLogBound
+    -- `scale_arith` does not split the nested `max` of the default proof, and the kernel cannot
+    -- check `grind` with the large numerals of `scale_inequalities'`: derive small ones for `grind`.
+    exact D.le_of_hasLogBound (by
+      obtain ⟨⟨h64, -, -, -⟩, hc, hL, hX, hX₁, -⟩ := New.Data.scale_inequalities' D
+      have hcL : 1000 * P.constantBound ≤ Real.log D.logB := by linarith
+      have hXX₁ : 1000 * D.logX ≤ D.logX₁ := by linarith
+      have hX₁B : 1000 * D.logX₁ ≤ D.logB := by linarith
+      clear hc hX hX₁
+      simp only [Bool.false_eq_true, ↓reduceIte, Nat.cast_ofNat]
+      grind)
   have h_carrier : card D.CarrierIndex ≤ D.n D.m := by simpa using D.nat_le_of_hasLogBound
   have h_fin : card (Fin D.m) ≤ D.n D.m := by simpa using D.nat_le_of_hasLogBound
   grw [D.card_stdClasses_le_exp principalLevel_le_stdLevel h_carrier,

@@ -396,7 +396,7 @@ lemma theta_normalisedTorus_le (hm : 2 * card p < card m) :
     (hB.isClosed.preimage_of_continuous
       (f := fun h : G E t ↦ T.x.val * (h⁻¹.adeleMatrix * T.x⁻¹.val) * ξ.map toAdele)).measurableSet
   have meas : Measurable fun h : G E t ↦ ((near h).encard : ℝ≥0∞) :=
-    .comp .of_discrete (measurable_encard.comp (measurable_pi_iff.2 fun ξ ↦ (meas_mem ξ).mem))
+    .comp .of_discrete (measurable_encard.comp (Measurable.of_mem fun ξ ↦ (meas_mem ξ).mem))
   refine ⟨fun h ↦ (near h).encard * (‖θ ((stdSpace E Empty).hom T)‖ₑ * M), meas.mul_const _, ?_,
     fun h x f ↦ ?_⟩
   · -- The count has a finite integral by reduction theory; here the rank condition is used.

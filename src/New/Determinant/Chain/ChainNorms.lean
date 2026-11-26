@@ -756,8 +756,9 @@ lemma exists_stdLevelIndex_lastLevel_eq {P : Parameters} (D : Data P) :
     card_levelModulus_residueRing, card_ResField, relIndex_levelOf, Nat.card_pi,
       Seesaw.index_pi_univ,
     div_pow, prod_eq_zero_iff, zpow_sub₀, zpow_add₀, zpow_mul, prod_pow,
-    -Nat.card_eq_fintype_card, prod_mul_distrib]
-  field_simp [prod_eq_zero_iff, NeZero.ne, index_ne_zero_of_finite]
+    -Nat.card_eq_fintype_card, prod_mul_distrib, IsDedekindDomain.HeightOneSpectrum.ne_bot]
+  field_simp [prod_eq_zero_iff, NeZero.ne, index_ne_zero_of_finite,
+    IsDedekindDomain.HeightOneSpectrum.ne_bot]
   -- The factors at the chosen places for `ϑ` and for the trivial twist agree by definition.
   ring!
 

@@ -157,7 +157,7 @@ lemma New.Variety.injective_aeval_of_isNoetherNormalization {k A F ι : Type} [F
     rw [evalForms_map, Function.comp_def, ← comp_aeval_apply]
     simp [aeval_rename, h_eval, hw₁, hP]
   -- By `hΛ` the form `G` is zero; setting `X 0 = 1` in it gives back `P`.
-  simpa [h_eval, comp_def, bind₁_rename] using
+  simpa [h_eval, comp_def, aeval_rename, aeval_X_left_apply] using
     h_indep.map (aeval (cons (1 : MvPolynomial (Fin n) k) X)) hG hGw
 
 /-- The fibre of a linear projection over a general point lies in a given open set. Let `L` embed
@@ -543,8 +543,10 @@ lemma New.Variety.exists_map_separating_class {p : ℕ} {k : Type} [Field k] [Em
   let Q : (projSpace k n).obj (of k k) := projSpace.affinePoint 0 q
   -- `Γ` is the graph of the projection; its first projection `π` is injective.
   let Γ : Subfunctor (algPointsOf k R Y ⊗ projSpace k n) :=
-    ⟨fun _ x ↦ ∃ v h, IsCoordsWithUnit L x.1 v ∧ x.2 = projSpace.mk (evalForms Λ v) h,
-      fun φ _ ⟨v, _, hv, e⟩ ↦ ⟨φ ∘ v, evalForms_map Λ φ.hom' _ ▸ ⟨_, hv.comp φ, congrArg _ e⟩⟩⟩
+    ⟨fun _ ↦ {x | ∃ v h, IsCoordsWithUnit L x.1 v ∧ x.2 = projSpace.mk (evalForms Λ v) h},
+      fun φ _ ⟨v, _, hv, e⟩ ↦ by
+        rw [Set.mem_setOf_eq]
+        exact ⟨φ ∘ v, evalForms_map Λ φ.hom' _ ▸ ⟨_, hv.comp φ, congrArg _ e⟩⟩⟩
   let π : Γ.toFunctor ⟶ algPointsOf k R Y := Γ.ι ≫ fst (algPointsOf k R Y) (projSpace k n)
   have h_mono : Mono π := mono_of_app_injective <| by
     rintro A ⟨⟨⟩, v, _, hv, ⟨⟩⟩ ⟨⟨⟩, v', _, hv', ⟨⟩⟩ ⟨⟩

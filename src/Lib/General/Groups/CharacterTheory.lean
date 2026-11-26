@@ -322,7 +322,7 @@ characters is an `S`-linear combination of characters. -/
 lemma comp_mem_virtualChars (hf : f ∈ virtualChars S G) {H : Type*} [Group H] [Finite H]
     (p : H →* G) : f ∘ p ∈ virtualChars S H :=
   -- precomposition with `p` is linear and maps characters to characters
-  mapsTo_span (f := funLeft S ℂ p) (fun _ hχ ↦ hχ.comp p) hf
+  mapsTo_span (f := funLeft S ℂ p) (s := {χ | IsChar χ}) (fun _ hχ ↦ IsChar.comp hχ p) hf
 
 omit [Finite G] in
 lemma isClassFunction_of_mem_virtualChars (hf : f ∈ virtualChars S G) : IsClassFunction f := by

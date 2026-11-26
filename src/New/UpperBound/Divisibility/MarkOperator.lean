@@ -285,7 +285,8 @@ lemma IsExceptional.card_residueField (h_served : D.IsExceptional p)
       p ^ orderOf (D.placeOfInt (-p)) := by
   have h_even : 2 ∣ orderOf (D.placeOfInt (-p)) := D.m_even.two_dvd.trans h_served.m_dvd_orderOf
   calc Nat.card (IsLocalRing.ResidueField (l.valuationSubringAtPrime D.E))
-      = l.q := (Nat.card_congr (equivQuotMaximalIdeal l.asIdeal _).toEquiv).symm
+      = l.q := (Nat.card_congr (equivQuotMaximalIdeal l.asIdeal _).toEquiv).symm.trans
+        (Ideal.absNorm_eq_natCard _).symm
     _ = p ^ (orderOf (D.placeOfInt (-p))).lcm 2 :=
       q_eq_pow_lcm_of_inert hpl h_served.chiK_eq_neg_one
     _ = p ^ orderOf (D.placeOfInt (-p)) := by rw [Nat.lcm_eq_left h_even]

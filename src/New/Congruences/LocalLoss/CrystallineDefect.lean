@@ -330,8 +330,9 @@ lemma New.Selmer.two_mul_tame_exponent_le_defectBound {P : Parameters} (D : Data
     2 * ((3 * (D.r ^ 2 * ((D.r + D.t) * D.r + 1) ^ 2) +
       150 * (D.halfGap ^ 2 + 1 + 4 * D.t + 1) : ℕ) : NNReal) ≤
       defectBound D (D.levelPrime n) / x := by
-  have h_val : 1 ≤ padicValNat (D.levelPrime n) D.M :=
-    one_le_padicValNat_of_dvd out (by fin_cases n <;> simp [M])
+  have h_val : 1 ≤ padicValNat (D.levelPrime n) D.M := by
+    rw [Nat.padicValNat_def]
+    exact one_le_multiplicity_of_dvd out (by fin_cases n <;> simp [M])
   calc _ ≤ (10 ^ 6 * (D.m / D.k * (D.natB * 1)) / D.t : NNReal) := by
          -- A comparison of sizes, read off the logarithmic scales of the data.
          rify

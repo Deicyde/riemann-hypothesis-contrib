@@ -382,7 +382,8 @@ lemma theta_pairThetaKernel_omega_fockDatum (X : LValueData E n) (x : GInf E X.d
     dotProduct_schurJet_mulVec]
   -- The simp lemma `jet_jetSeries_eq_theta` turns the jet into a theta value. Then compare the
   -- vectors: `y⁻¹` moves the covector, and `x` acts trivially.
-  simp [fockPoly_eq_schurCoeffPoly, realPairWeil_schurCoeffPoly X.isLiftWeight]
+  simp [fockPoly_eq_schurCoeffPoly, realPairWeil_schurCoeffPoly X.isLiftWeight,
+    MvPolynomial.aeval_X_left_apply]
 
 -- Keeps definitional checks from unfolding the finite sums.
 seal Finset.sum in
@@ -415,8 +416,13 @@ lemma kernelForm_of_rowLength_eq_zero (X : LValueData E n) (g : Gf E Unit) (h : 
   -- In degree zero all basis polynomials are `1`, so `sum_schur_smul_nablaBasis` says that the
   -- row sums to `1`.
   apply C_injective ((Σ _ : InfinitePlace E, Unit) × ℕ)
+  have h_eval {σ : Type} (p : MvPolynomial σ ℂ) :
+      eval₂ (C.comp C) (fun i ↦ C (MvPolynomial.X i)) p =
+        (C p : MvPolynomial ((Σ _ : InfinitePlace E, Unit) × ℕ) (MvPolynomial σ ℂ)) := by
+    rw [show (fun i ↦ C (MvPolynomial.X i)) = C ∘ MvPolynomial.X from rfl, ← eval₂_comp_left,
+      eval₂_eta]
   simpa [nablaBasis_eq_one, schurDetExp, h_rowLength, smul_eq_C_mul, columnCount, mixedWeight,
-    detPow] using sum_schur_smul_nablaBasis X.isLiftWeight.1 _ i
+    detPow, h_eval] using sum_schur_smul_nablaBasis X.isLiftWeight.1 _ i
 
 /-- The form `X.kernelForm g` is the kernel `New.DescentPair.vectorKernelForm` of the pair
 `X.descentPair` at the point `(x, g)` of `U(1)`, for every real component `x`. -/
@@ -544,7 +550,7 @@ lemma DescentPair.heckePolyOnForms_liftHeckeRoot_eq_zero {O : DescentPair E r n}
   have h_zero : SiegelWeil.qPochhammer w.q O.rankDiff (O.charW.frobValue r w * O.liftHeckeRoot w) =
     0 := by
     simp [liftHeckeRoot, rankDiff, hk, Finset.prod_range_succ, add_assoc, AutChar.frobValue,
-      HeckeChar.atUniformizer, field]
+      HeckeChar.atUniformizer, field, w.ne_bot]
   rw [O.heckePolyOnForms_eq_smul _ _ (h_lifts w hw hw_level), h_zero, zero_mul, zero_smul]
 
 end DescentPairHecke

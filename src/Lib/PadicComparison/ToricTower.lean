@@ -65,7 +65,7 @@ is bijective for all n.
 
 section WangSequence
 
-open CategoryTheory Function FreeAbelianGroup AddCommGrpCat
+open CategoryTheory Function FreeAddCommGroup AddCommGrpCat
 
 namespace New.Variety
 
@@ -127,7 +127,7 @@ lemma TimesBNat.isLine_fst {X : C ⥤ Type 1} :
 
 /-- The retraction in the Wang sequence at one object, for a map `t` of a set `X` to itself: it
 sends `(x, 0)` to `0` and `(x, k + 1)` to its value at `(t x, k)` minus `(x, k)`. -/
-private def wangRetraction {X : Type 1} (t : X → X) : ℕ → X → FreeAbelianGroup (X × ULift.{1} ℕ)
+private def wangRetraction {X : Type 1} (t : X → X) : ℕ → X → FreeAddCommGroup (X × ULift.{1} ℕ)
   | 0, _ => 0
   | k + 1, x => wangRetraction t k (t x) - of (x, ⟨k⟩)
 
@@ -277,9 +277,11 @@ lemma IsLine.of_acyclic {Y : TimesBNat C ⥤ Type 1} {ψ : C ⥤ C'} {A : C} {E 
     calc (S.f ≫ r z).app D (.of (x, k))
         = (r z).app D (.of ((shiftEnd Y 1).asHom.app D.1 x, k)) -
             (r z).app D (.of (x, k.map .succ)) :=
-          map_sub ((r z).app D).hom _ _
+          (congrArg ((r z).app D) (congrArg₂ HSub.hSub (freeAb.map_of _ _ _)
+            (freeAb.map_of _ _ _))).trans (map_sub ((r z).app D).hom _ _)
       _ = (r (F'.map g z - z)).app D (.of (x, k)) := by
-          rw [r_app, r_app, r_app D x (k.map .succ), h_square, map_sub, F'.map_comp_apply]
+          refine (congrArg₂ HSub.hSub (r_app D _ k z) (r_app D x (k.map .succ) z)).trans ?_
+          rw [r_app, h_square, map_sub, F'.map_comp_apply]
   have hq (y : (ψ ⋙ F').obj A) : S.g ≫ homOfValue (.restrict _ (ψ ⋙ F')) q y = r (F'.map i y) := by
     refine hom_ext fun D ⟨x, k⟩ ↦ (homOfValue_app (c := .restrict ..) q y D _).trans ?_
     -- Move `γ^k` across `q` (naturality; `ℕ` acts trivially on `reprBy A`), then use `hq_eq_comp`

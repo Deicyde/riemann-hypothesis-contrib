@@ -344,6 +344,9 @@ lemma frameImage_eq_frameImage_one_of_close {g : S.G E} {d : S.Classes} {r : S.R
 
 variable [HasPrimitiveRoot5040 E]
 
+-- Lean v4.37.0-rc1: side goals `0 < S.b ^ (c * 𝔰.n ^ 2)` of `bound`/`gcongr` (`Shape.n` is an
+-- abbrev) exceed the default recursion depth.
+set_option maxRecDepth 2000 in
 omit [HasPrimitiveRoot5040 E] in
 /-- **Packing of frames.** Let `E` be a CM field, `𝔰` a shape (`𝔰.ϱ` hyperbolic planes), and `S`
 admissible data of the filling theorem over `E` (`IsAdmissible`), with parameter `b = S.b`. Let
@@ -397,7 +400,7 @@ theorem encard_image_frameImage_le {c : S.Classes} {y : NumberField.InfinitePlac
       h_over q q.2
     -- The inverse of the term `p⁻¹ q` sends `p⁻¹ y` to `q⁻¹ y`, whose frame vectors are close.
     refine frameImage_inv_mul_eq_iff.1 (frameImage_eq_frameImage_one_of_close
-      (.mul (.inv hp_over) hq_over) hR
+      (termsOver.mul (termsOver.inv hp_over) hq_over) hR
       (h_box p p.2) (h_size p p.2) fun v a ↦ lt_of_le_of_lt ?_ h_close)
     have h_point : (S.ratToInf (p.val⁻¹ * q.val) v)⁻¹ * ((S.ratToInf p.val)⁻¹ * y) v =
         ((S.ratToInf q.val)⁻¹ * y) v := by

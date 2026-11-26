@@ -80,7 +80,7 @@ lemma New.exists_val_coeff_le_val_eval {K σ : Type*} {n : ℕ} [Field K] [IsAlg
       obtain rfl | hkd := eq_or_ne k d <;> simp [g, coeff_monomial, eq_comm, *]
     refine ⟨q.coeff k, g, ne_of_apply_ne (·.coeff k) (by simp [coeff_map, h_coeff]), ?_⟩
     ext d
-    rw [coeff_smul, coeff_map, h_coeff]
+    rw [MvPolynomial.coeff_smul, coeff_map, h_coeff]
     split_ifs with hkd hd
     · simp [hkd]
     · simp [← hw d hd, mul_comm]
@@ -102,8 +102,8 @@ lemma New.exists_val_coeff_le_val_eval {K σ : Type*} {n : ℕ} [Field K] [IsAlg
   -- The factor `c i` is common, and the unit `eval y (g i)` divides every coefficient of `g i`.
   have h_le : v (algebraMap V K ((g i).coeff m)) ≤ v (algebraMap V K (eval y (g i))) :=
     (Valuation.integer.integers v).le_of_dvd (h_unit i).dvd
-  grw [hfg i, coeff_smul, coeff_map, smul_eval, eval_map, ← eval₂_comp, smul_eq_mul, map_mul,
-    map_mul, h_le]
+  grw [hfg i, MvPolynomial.coeff_smul, coeff_map, smul_eval, eval_map, ← eval₂_comp, smul_eq_mul,
+    map_mul, map_mul, h_le]
 
 end IntegralityPrinciple
 
@@ -280,8 +280,9 @@ integral, as `v((j + 1)!) ≤ j / (p - 1)`. -/
 lemma norm_pow_le_norm_factorial_succ {c : ℂ_[p]} (hc : ‖c‖ ≤ p ^ (-(1 / (p - 1)) : ℝ)) (j : ℕ) :
     ‖c‖ ^ j ≤ ‖((j + 1).factorial : ℂ_[p])‖ := by
   have hp : (1 : ℝ) < p := Nat.one_lt_cast.2 (Fact.out : p.Prime).one_lt
-  have h_val : (p - 1) * padicValNat p (j + 1).factorial ≤ j :=
-    Nat.le_of_lt_succ (sub_one_mul_padicValNat_factorial_lt_of_ne_zero p j.succ_ne_zero)
+  have h_val : (p - 1) * padicValNat p (j + 1).factorial ≤ j := by
+    rw [Nat.padicValNat_def]
+    exact Nat.le_of_lt_succ (sub_one_mul_padicValNat_factorial_lt_of_ne_zero p j.succ_ne_zero)
   have h_real : (padicValNat p (j + 1).factorial : ℝ) ≤ j / (p - 1) := by
     rw [le_div_iff₀' (sub_pos.2 hp), ← Nat.cast_pred (Fact.out : p.Prime).pos]
     exact_mod_cast h_val

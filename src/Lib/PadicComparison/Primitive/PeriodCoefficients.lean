@@ -594,7 +594,9 @@ lemma PadicTest.le_ker_of_tiltNearZeros_le_ker {d : PadicTest} (f : c ⟶ d)
   -- Then `f e` lies in the Jacobson radical, `1 - f e` is a unit, and `p ^ n ∣ (1 - f e) * f r`
   -- gives `p ^ n ∣ f r`.
   have h_unit : IsUnit (1 - f.toRingHom e) := by
-    simpa [neg_add_eq_sub] using mem_jacobson_bot.mp (HenselianRing.jac h_mod) (-1)
+    have h_jac :=
+      mem_jacobson_bot.mp (jacobson_bot (R := d.ProdRing) ▸ HenselianRing.jac h_mod) (-1)
+    rwa [mul_neg_one, neg_add_eq_sub] at h_jac
   exact h_unit.dvd_mul_left.mp (by simpa using map_dvd f.toRingHom h_dvd')
 
 /-- For an ideal `I` of the generic ring `R[1/p]` of `c`, the quotient of the tilt `R♭` by the

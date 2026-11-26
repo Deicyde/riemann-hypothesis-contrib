@@ -94,7 +94,8 @@ lemma IsSplitPrimeToDisc.exists_place_above_ne [U : HasPrimitiveRoot5040 E]
       have h_sub : (span {(u.q : ℤ)}).primesOver (𝓞 K) ⊆
           ↑(({a, b, star a, star b} : Finset (FinPlace E)).image fun v ↦ (v.below K).asIdeal) := by
         rintro P ⟨hP_prime, ⟨hP_over⟩⟩
-        have hP_ne : P ≠ ⊥ := by aesop
+        have hP_ne : P ≠ ⊥ :=
+          ne_bot_of_mem_primesOver (by simpa using hp.ne_zero) ⟨hP_prime, ⟨hP_over⟩⟩
         -- `P = v.below K` for some place `v` of `E`
         obtain ⟨v, ⟨⟩⟩ := FinPlace.comap_surjective (algebraMap K E) ⟨P, hP_prime, hP_ne⟩
         exact mem_image_of_mem _ (h_four v (by simpa using hP_over.le))

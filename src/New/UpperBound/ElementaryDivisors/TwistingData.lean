@@ -344,7 +344,7 @@ lemma letterRep_map : (T.map φ).letterRep n g = (T.letterRep n g).map φ := by
       (T.map φ).letterMatrix s g = (T.letterMatrix s g).map φ := rfl
   ext β α
   simp [h_letterMatrix_map, letterRep, kroneckerPi, symPowMatrix, linSubst, smul_eq_C_mul,
-    map_bind₁, ← coeff_map]
+    map_bind₁, ← coeff_map, aeval_monomial, Finsupp.prod_fintype]
 
 @[simp]
 lemma one_add_val_sub_one_sub : 1 + (s - 1 - i).val = if s = i then N else (s - i).val := by

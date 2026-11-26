@@ -193,7 +193,7 @@ lemma realPairWeil_stackedDetProd {γ : InfinitePlace E → ℤ}
         (∏ τ, (u τ : Matrix a a ℂ).det ^ card (ι τ))⁻¹ • posFockVector j
           (twoSidedSubst (fun τ ↦ (u τ : Matrix a a ℂ)) (fun τ ↦ (k⁻¹ τ : Matrix m m ℂ)) P) := by
     simp [hγ, rename_eq_aeval, reindex_equiv j, principalMinor_of_forall,
-      DiscreteSeries.principalMinor_of_forall_not, ↓bind₁_bind₁, ↓coe_inv_posBlockEmb,
+      DiscreteSeries.principalMinor_of_forall_not, ↓comp_aeval_apply, ↓coe_inv_posBlockEmb,
       ↓posBlockEmb_mem_blockDiagAlg, ↓principalMinor_posBlockEmb_eq_det,
       ↓principalMinor_posBlockEmb_eq_one, ↓realPairWeil_polyVector, ↓prod_pair,
       ↓Nat.card_eq_fintype_card, ↓val_posBlockEmb_apply_coe]
@@ -345,8 +345,8 @@ lemma exists_mul_eq_circle_mean (j : m ⊕ l ≃ n) (e : p ⊕ a ≃ m)
     have h_det : ∏ τ, (u τ : Matrix a a ℂ).det ^ card (ι τ) ≠ 0 :=
       prod_ne_zero_iff.2 fun τ _ ↦ pow_ne_zero _ (GeneralLinearGroup.det_ne_zero _)
     simp [hγ, field, rename_eq_aeval, evalCols, P₀, principalMinor_of_forall,
-      DiscreteSeries.principalMinor_of_forall_not, ↓bind₁_bind₁, ↓realPairWeil_polyVector,
-      ↓prod_pair, ↓Nat.card_eq_fintype_card, Matrix.one_apply]
+      DiscreteSeries.principalMinor_of_forall_not, ← aeval_eq_bind₁, ↓comp_aeval_apply,
+      ↓realPairWeil_polyVector, ↓prod_pair, ↓Nat.card_eq_fintype_card, Matrix.one_apply]
     -- Both substitutions keep the columns `cols`, mixed by `u`, and kill the other variables.
     congr
     simp [reindex_equiv j, reindex_equiv e, cols, extend, ↓_root_.funext_iff]

@@ -497,7 +497,8 @@ lemma exists_tameChart_e_eq_lcm (h_surj : Surjective Γ.overGp.toGp) (hr : r < p
 /-- The number `differentBound` of a tame chart is at most `1`, since `p` does not divide the
 ramification index. -/
 lemma TameChart.differentBound_le_one (d : TameChart Γ) : d.differentBound ≤ 1 := by
-  grind [KummerChart.differentBound, padicValNat.eq_zero_of_not_dvd d.tame]
+  grind [KummerChart.differentBound, Nat.padicValNat_def,
+    multiplicity_eq_zero_of_not_dvd d.tame]
 
 /-- If `b + n < q`, then `q` divides no nonzero integer within distance `n` of `0`, `b` or `-b`. -/
 lemma noMultipleNear_of_add_lt {q n b : ℕ} (h_lt : b + n < q) : NoMultipleNear q n b :=

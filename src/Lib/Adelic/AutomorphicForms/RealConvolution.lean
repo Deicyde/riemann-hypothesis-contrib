@@ -66,8 +66,10 @@ noncomputable def bumpProduct (α : NumberField.InfinitePlace E → DiscreteSeri
     C_c(GInf E s, ℂ) where
   toFun x := ∏ w : NumberField.InfinitePlace E, (α w).val.val (x w)⁻¹
   continuous_toFun := by fun_prop
-  hasCompactSupport' := HasCompactSupport.intro (isCompact_univ_pi fun w ↦ (α w).2.inv) (by
-    grind [prod_eq_zero_iff, image_eq_zero_of_notMem_tsupport, Set.mem_inv])
+  hasCompactSupport' := HasCompactSupport.intro (isCompact_univ_pi fun w ↦ (α w).2.inv)
+    (fun x hx ↦ by
+    obtain ⟨w, hw⟩ := not_forall.1 fun h ↦ hx (Set.mem_univ_pi.2 h)
+    exact prod_eq_zero (mem_univ w) (image_eq_zero_of_notMem_tsupport hw))
 
 /-- For `n` nonempty and `g` in G_∞, the product over the infinite places of the operator norms
 ‖g_w‖ is at least 1 and at least each of its factors. -/
@@ -147,8 +149,11 @@ theorem isCuspKernel_typeKernel [Nonempty n] {l : NumberField.InfinitePlace E �
       ‖typeKernel l s x‖ * (∏ w, ‖(x w).val.val‖) ^ (B + 1) := by
     have h_loc : Integrable fun x : GInf E s ↦
         ∏ w, e w (x w) * (‖(x w).val.val‖ : ℂ) ^ (B + 1) :=
-      .fintype_prod fun w ↦ (h w).integrable_dsKernel_mul_norm_pow (B + 1) le_rfl
-    simpa [h_prod, prod_mul_distrib, prod_pow] using h_loc.norm
+      .fintype_prod (f := fun w g ↦ e w g * (‖g.val.val‖ : ℂ) ^ (B + 1)) fun w ↦ by
+        simpa [e] using (h w).integrable_dsKernel_mul_norm_pow (B + 1) le_rfl
+    refine h_loc.norm.congr (.of_forall fun x ↦ ?_)
+    simp only [h_prod, norm_prod, norm_mul, norm_pow, Complex.norm_real, norm_norm,
+      prod_mul_distrib, prod_pow]
   have h_bump (w : NumberField.InfinitePlace E) : ∃ α : DiscreteSeries.Bumps s,
       ∀ g : USign s, ∫ x : USign s, α.val.val x⁻¹ * e w (x⁻¹ * g) = e w g :=
     (h w).exists_bump_conv_dsKernel
@@ -289,11 +294,9 @@ theorem realConv_realConv (hF : IsBoundedMeasurable F) (hα : Integrable α) {p 
   ext ⟨g, k⟩
   -- Fubini's theorem and a left translation of the inner variable by `x * a`.
   have h_meas : Measurable fun x : GInf E s ↦ ((g * x, k) : G E s) := by fun_prop
-  have h_conv : ∫ x, α x * ∫ y, p y * F (g * (x * a * y), k) =
-      ∫ y, (∫ x, α x * p ((x * a)⁻¹ * y)) * F (g * y, k) :=
-    integral_smul_integral_eq_integral_conv_smul (fun x : GInf E s ↦ x * a) hα hp
+  have h_conv := integral_smul_integral_eq_integral_conv_smul (fun x : GInf E s ↦ x * a) hα hp
       (hF.comp h_meas) (by fun_prop)
-  simpa [realConv, mul_assoc, Prod.mul_def] using h_conv
+  simpa [realConv, mul_assoc, Prod.mul_def, smul_eq_mul] using h_conv
 
 /-- For a cusp kernel e (an integrable idempotent kernel on G_∞ with decay, `IsCuspKernel`) there is
 a continuous compactly supported α on G_∞ with α ∗ e = e, and so R(α)R(e)F = R(e)F for every bounded

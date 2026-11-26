@@ -720,7 +720,7 @@ lemma IsLiftSetting.range_typeProjection_mem_invtSubmodule {O : DescentPair D.E 
     commute_supportedOn_trivialOn hu h_off
   -- The action of `g` is a scalar multiple of this translation, so both pass through the operator.
   refine (map_smul ..).trans (congrArg _ (map_heckePolyOp (algFormRep _ _ _) x fun u hu ↦ ?_).symm)
-  rw [← mul_apply, ← (h_comm u hu).map, mul_apply]
+  rw [← Module.End.mul_apply, ← (h_comm u hu).map, Module.End.mul_apply]
 
 /-- Infinitely many places of `E` are split and are, with their conjugates, outside the places of
 the descent pair `O`. -/

@@ -577,8 +577,15 @@ omit [IsFullRankLattice L] in
 /-- The pull-back `c^* B` of `B` along the action of `c ≠ 0` (the form `B.pullForm (F c)`) is again
 a hermitian form for the action of `R`, with the same `β`. -/
 private lemma isHermitianAction_pullForm : IsHermitianAction L (B.pullForm (F c)) F β := by
-  grind [IsHermitianAction, pullForm_apply_apply, action_comm, riemannForm_def,
-    (action_injective c).ne]
+  refine ⟨h.map_mem, fun x y ↦ ?_, fun x hx ↦ ?_, fun a x y ↦ ?_, fun l hl m hm ↦ ?_,
+    h.star_eq_one_sub⟩
+  · simpa [pullForm_apply_apply] using h.conj_symm (F c x) (F c y)
+  · simpa [pullForm_apply_apply] using
+      h.pos (F c x) fun h0 ↦ hx (action_injective c (h0.trans (map_zero (F c)).symm))
+  · simp only [pullForm_apply_apply]
+    rw [action_comm, h.adjoint, action_comm]
+  · simpa [riemannForm_def, pullForm_apply_apply] using
+      h.riemannForm_integral _ (h.map_mem c l hl) _ (h.map_mem c m hm)
 
 /-- Descent along `c ≠ 0`. Say that a torsion point `x` has the constant `C` in degree `A` (a form
 on `V`) when `A.HasShiftBound v x C` holds: for the size function `φ` (taken with `v`) of every

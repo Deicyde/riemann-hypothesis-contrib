@@ -315,7 +315,16 @@ lemma sqrt_weylNormSq_lastPathKernel_le (σ : ℂ ≃+* ℂ) (S : EdgeTuple (1 :
   -- 'le_of_hasLogBound' uses these two bounds for the ranks as local instances.
   have := D.hasLogUpper_of_le (card_lastPathIndex_le z hj)
   have := D.hasLogUpper_of_le (card_lastPathIndex_le z hj.le)
-  simpa using D.le_of_hasLogBound
+  -- `scale_arith` does not split the nested `max` of the default proof, and the kernel cannot
+  -- check `grind` with the large numerals of `scale_inequalities'`: derive small ones for `grind`.
+  simpa using D.le_of_hasLogBound (by
+    obtain ⟨⟨h64, -, -, -⟩, hc, hL, hX, hX₁, -⟩ := New.Data.scale_inequalities' D
+    have hcL : 1000 * P.constantBound ≤ Real.log D.logB := by linarith
+    have hXX₁ : 1000 * D.logX ≤ D.logX₁ := by linarith
+    have hX₁B : 1000 * D.logX₁ ≤ D.logB := by linarith
+    clear hc hX hX₁
+    simp only [Bool.false_eq_true, ↓reduceIte, Nat.cast_ofNat]
+    grind)
 
 /-- Conjugates of `Ξ = lastPathPeriod Ψ y` for the trivial twist. Let `Ψ` be a path datum on the
 last path and `y` a pair of forms fixed by the levels at the outer ends of the two halves, whose
@@ -375,7 +384,17 @@ lemma norm_lastPathPeriod_le {Ψ : EdgeTuple (1 : D.MFoldTwist) → ℂ}
     grw [hL, ← le_exp_of_log_le]
     simpa [C, log_mul, G, NeZero.ne, card_residueRing_twistModulus, prod_q_chosenPlace,
       toAutChar_one_and_toTwist_one_and_Q_one] using
-      D.le_of_hasLogBound
+      -- `scale_arith` does not split the nested `max` of the default proof, and the kernel cannot
+      -- check `grind` with the large numerals of `scale_inequalities'`: derive small ones for
+      -- `grind`.
+      D.le_of_hasLogBound (by
+        obtain ⟨⟨h64, -, -, -⟩, hc, hL, hX, hX₁, -⟩ := New.Data.scale_inequalities' D
+        have hcL : 1000 * P.constantBound ≤ Real.log D.logB := by linarith
+        have hXX₁ : 1000 * D.logX ≤ D.logX₁ := by linarith
+        have hX₁B : 1000 * D.logX₁ ≤ D.logB := by linarith
+        clear hc hX hX₁
+        simp only [Bool.false_eq_true, ↓reduceIte, Nat.cast_ofNat]
+        grind)
   obtain ⟨a, ha, ha_sum⟩ := Set.mem_nsmul_iff_sum.1 h_sum
   calc _ = ‖∑ i, σ (a i)‖ := by rw [← ha_sum, map_sum]
     _ ≤ n * R := by

@@ -271,7 +271,7 @@ lemma exists_bordering (h : J → ℕ) (hγ : γ ∈ interlacing ((columnWeight 
     ext i
     have h_chosen (j : J) : (if j ∈ S i then 1 else 0) = Finsupp.single (k j) (e j) i := by
       grind [Pi.add_apply]
-    simp [Finsupp.finsetSum_apply, ← h_chosen, card_S]
+    simp [Finsupp.finsetSum_apply, ← h_chosen, card_S, Finset.univ_inter]
   subst h_γ_eq
   refine ⟨k, ?weights, fun I ↦
     ⟨fun j s ↦ ⟨if hs : s < k j then I j ⟨s, hs⟩ else x, ?colour⟩, fun R _ ↦ ?lead, ?entries⟩⟩
@@ -512,7 +512,8 @@ lemma degree_rowExpansion_mem_interlacing (hf : f ∈ nabla R c l) :
             (if i + 1 = a then γ i else 0) + ((if i = a then γ (i + 1) else 0) + γ a)) →
           n i ≤ γ i → ((θ ((rowExpansion x f).coeff n)).coeff (γ i - n i)).coeff 0 = 0 by
         simpa [P, δ, X_pow_eq_monomial, Polynomial.coeff_mul_X_pow', Finsupp.ext_iff,
-          apply_ite Polynomial.coeff, DFunLike.ite_apply, single_apply, ite_apply] using h_vanish
+          apply_ite AddMonoidAlgebra.coeff, DFunLike.ite_apply, single_apply, ite_apply] using
+          h_vanish
       intro h_shape h_le
       exact absurd (columnOrder_lt_of_forall_add_ite_eq h_shape h_le hne) h_not_lt
     · intro hγ
@@ -736,7 +737,7 @@ lemma nabla_le_span_of_hasLeadingTerm {c : m → Φ} {l : Φ × ℕ →₀ ℕ}
       rw [map_sub]
       exact degree_sub_le.trans (sup_le le_rfl hg_lead.degree_le)
     have h_coeff : (rowExpansion y (f - g)).coeff γ = 0 := by
-      rw [map_sub, coeff_sub, hg_lead.coeff_eq]
+      rw [map_sub, MvPolynomial.coeff_sub, hg_lead.coeff_eq]
       exact sub_self _
     refine (sub_mem_iff_left _ hg_span).mp ?_
     rcases h_le.lt_or_eq with h_lt | h_eq

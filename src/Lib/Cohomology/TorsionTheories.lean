@@ -95,7 +95,7 @@ def tensorPoint (ρ : freeAb.obj (onePointFunctor C) ⟶ K) :
   app S :=
     { app c :=
         ofHom ((TensorProduct.mk ℤ (S.obj c) (K.obj c)).flip
-          (ρ.app c (FreeAbelianGroup.of ⟨⟩))).toAddMonoidHom
+          (ρ.app c (FreeAddCommGroup.of ⟨⟩))).toAddMonoidHom
       naturality c c' f := by
         -- The elements `ρ.app c (.of ⟨⟩)` are compatible with the maps of `K`; so on `x` both
         -- sides are `S.map f x ⊗ K.map f (ρ [pt])`, by the definition of `abTensor`.
@@ -898,7 +898,7 @@ lemma IdealFamily.constToZeros_zsmul_mk (c : C) (n : ℤ) :
     I.constToZeros c ⟦n • relFreeAb.mk I.topLocus ⟨⟩⟧ = ⟦⟨.const _ n⟩⟧ := by
   refine congrArg (⟦·⟧) ?_
   -- `oneLocConst` sends the generator to the constant function `1`
-  show ((oneLocConst (g := g)).app c).hom' (n • FreeAbelianGroup.of PUnit.unit) = _
+  show ((oneLocConst (g := g)).app c).hom' (n • FreeAddCommGroup.of PUnit.unit) = _
   have h_one : ((oneLocConst (g := g)).app c).hom' (.of PUnit.unit) =
       ⟨LocallyConstant.const _ (1 : ZMod ℓ)⟩ := freeAb.desc_of ..
   rw [map_zsmul, h_one, ← zsmul_one]

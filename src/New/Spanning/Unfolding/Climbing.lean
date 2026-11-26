@@ -196,11 +196,11 @@ lemma reducedImage_besselH_le_vectorFixer {i : Fin 2} (w : S.chosenPlaces i)
   -- The columns of `k` at the frame are those of `1`, and this passes to the residue field.
   have h_frame (a : 𝔰.BesselIndex) (b : Fin (𝔰.ϱ + 1)) :
       (k : S.GFin).val a (𝔰.besselFrame b) = if a = 𝔰.besselFrame b then 1 else 0 := by
-    simpa [one_apply] using congrFun₂ (frameImage_mul_of_mem_agreeWithOneOn hk 1) a b
+    simpa [Matrix.one_apply] using congrFun₂ (frameImage_mul_of_mem_agreeWithOneOn hk 1) a b
   have h_action : frameImage (S.actionAt (S.reduction k) (⟨i, w⟩, d.1)) = frameImage 1 := by
     rw [actionAt, ← intGL_map_reduceAboveM]
     ext a b
-    by_cases h_eq : a = 𝔰.besselFrame b <;> simp [intGL.map_apply, h_frame, h_eq, one_apply,
+    by_cases h_eq : a = 𝔰.besselFrame b <;> simp [intGL.map_apply, h_frame, h_eq, Matrix.one_apply,
       ← Submonoid.one_def, ← ZeroMemClass.zero_def]
   rw [mem_vectorFixer, mulVec_frameImage_one_mulVec, h_action]
 

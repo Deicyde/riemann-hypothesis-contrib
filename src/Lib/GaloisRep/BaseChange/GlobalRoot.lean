@@ -206,7 +206,8 @@ lemma New.IsStep.exists_isSelfAdjoint_of_mem_kerCompNorm {E E' L : Type} [Field 
       χ_ker.le hf_ker ⟨algebraMap E' Ω t, Set.mem_range_self t⟩
     let f' : L →ₐ[E'] Ω := ⟨f.toRingHom.comp (algebraMap L Ω), hf_E'⟩
     have hf_L (t : L) : f (algebraMap L Ω t) = algebraMap L Ω t :=
-      AlgHom.adjoin_le_equalizer f' (algHom E' L Ω) (forall_eq.mpr (f.commutes x)) (hL.ge trivial)
+      AlgHom.adjoin_le_equalizer f' (algHom E' L Ω) (Set.eqOn_singleton.mpr (f.commutes x))
+        (hL.ge trivial)
     rw [← hf]
     exact ψ_ker.ge fun ⟨_, t, rfl⟩ ↦ hf_L t
   -- so `w = b * N s` with `b` in `Kˣ` and `s` an idele of `L`, and `N (s * star s / u)` is in `Kˣ`
@@ -338,7 +339,10 @@ lemma IsMatchingPair.mul {A : Type*} {j : A → U (1 : Matrix n n R)}
       rw [hz_off, hw_off]
     grind [smul_mul_smul]
   · -- The determinant of `(z * w)(γ)` is a product of two elements of `D`.
-    grind [mul_mem, det_mul]
+    intro m A hA
+    obtain ⟨a, ha, ha_eq⟩ := (hz_root γ hγ).1 m A hA
+    obtain ⟨b, hb, hb_eq⟩ := (hw_root γ hγ).1 m A hA
+    exact ⟨a * b, D.mul_mem ha hb, by simp_all [det_mul]⟩
   · -- `(1 + u (γ - 1)) (1 + v (γ - 1)) = 1 + (u + v) (γ - 1)`.
     obtain ⟨-, hz_norm⟩ := hz_root γ hγ
     obtain ⟨-, hw_norm⟩ := hw_root γ hγ

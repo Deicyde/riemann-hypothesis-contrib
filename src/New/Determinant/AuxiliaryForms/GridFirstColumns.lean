@@ -111,7 +111,7 @@ lemma exists_triangleGLCard_eq_mul_levelIndex (D : Data P) (j : ℕ) :
   have h_ratio : (card (D.triangleModulus false 1).ResidueRing / card
     (D.gridModulus 1).ResidueRing : ℂ) =
       card R₀ / card R := by simp [R₀, R, card_residueRing_twistModulus, mul_div_mul_right,
-        prod_eq_zero_iff]
+        prod_eq_zero_iff, IsDedekindDomain.HeightOneSpectrum.ne_bot]
   rw [h_index, h_ratio, div_pow, div_mul_comm, ← h_share, div_mul_cancel₀ _ (by simp)]
 
 /-- The period of a conjugate form `y` on `Y^j_j` (grid `false`) and a form `φ` on `Ỹ^j_j` (grid

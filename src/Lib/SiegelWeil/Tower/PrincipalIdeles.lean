@@ -62,7 +62,7 @@ lemma integrable_prod_inv_one_add_log_sq [Fintype ι] :
     exact h_eval.norm.log
   have h_polar : Continuous polar.uncurry := by
     rw [Units.isOpenEmbedding_val.isInducing.continuous_iff]
-    simp only [polar]
+    simp only [polar, Function.comp_def, Function.uncurry_def, IsUnit.unit_spec]
     fun_prop
   -- `L` turns multiplication by `polar t 1` into translation by `t`
   have h_conj (t : ι → ℝ) : Function.Semiconj L (polar t 1 * ·) (t + ·) := by
@@ -81,13 +81,15 @@ lemma integrable_prod_inv_one_add_log_sq [Fintype ι] :
       ext x
       simp [polar, L, exp_log, ofReal_log]
     rw [map_apply hL hK.measurableSet]
-    have h_compact : IsCompact (polar.uncurry '' K ×ˢ Set.univ) :=
-      (hK.prod isCompact_univ).image h_polar
+    have h_prod : IsCompact (K ×ˢ (Set.univ : Set (ι → Circle))) := hK.prod isCompact_univ
+    have h_compact : IsCompact (polar.uncurry '' K ×ˢ Set.univ) := h_prod.image h_polar
     exact (measure_mono h_sub).trans_lt h_compact.measure_lt_top
   have h_int : Integrable (fun t : ι → ℝ ↦ ∏ x : ι, (1 + t x ^ 2)⁻¹) (haar.map L) := by
     rw [(haar.map L).isAddLeftInvariant_eq_smul volume]
-    have h_volume : Integrable (fun t : ι → ℝ ↦ ∏ x : ι, (1 + t x ^ 2)⁻¹) :=
-      Integrable.fintype_prod fun _ ↦ integrable_inv_one_add_sq
+    have h_volume : Integrable (fun t : ι → ℝ ↦ ∏ x : ι, (1 + t x ^ 2)⁻¹) := by
+      rw [volume_pi]
+      exact Integrable.fintype_prod (f := fun _ (s : ℝ) ↦ (1 + s ^ 2)⁻¹)
+        fun _ ↦ integrable_inv_one_add_sq
     exact h_volume.smul_measure_nnreal
   exact h_int.comp_measurable hL
 

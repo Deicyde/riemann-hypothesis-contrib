@@ -91,7 +91,7 @@ lemma mk_one_snd_mem_unipotent {u : G E ε} (hu : u ∈ Y.unipotent) : (1, u.2) 
     sub_eq_zero.mp (Y.mem_unipotent.mp hu i j hij)
   rw [Matrix.sub_apply, sub_eq_zero, V.ratCoordMatrix_inr, V.ratCoordMatrixFin_snd, map_apply,
     h_entry]
-  by_cases h_eq : i = j <;> simp [h_eq, one_apply]
+  by_cases h_eq : i = j <;> simp [h_eq, Matrix.one_apply]
 
 /-- The inclusion of `H` sends the finite part `(1, a_fin)` of `a` to the finite part of the
 inclusion of `a`. -/
@@ -101,7 +101,7 @@ lemma inclX_mk_one_snd (a : G E (1 : X → ℤˣ)) : Y.inclX (1, a.2) = (1, (Y.i
     V.ratCoordMatrixFin_snd, ratCoordMatrix_inclX]
   -- Compare the entries block by block along `Y.indexEquiv`.
   obtain ⟨x | k, rfl⟩ := Y.indexEquiv.surjective i <;>
-    obtain ⟨y | l, rfl⟩ := Y.indexEquiv.surjective j <;> simp [one_apply, apply_ite]
+    obtain ⟨y | l, rfl⟩ := Y.indexEquiv.surjective j <;> simp [Matrix.one_apply, apply_ite]
 
 /-- The factor in `H` of a real point of `R` (a point with finite part `1`) is a real point. -/
 lemma leviPart_snd_eq_one {r : Y.besselGroup} (hr : (r : G E ε).2 = 1) :

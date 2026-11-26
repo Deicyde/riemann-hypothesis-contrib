@@ -187,7 +187,7 @@ lemma isIntegral_sharedVectors {γ : S.G E} {s : S.ResidueGL} {c' : S.Classes}
       termsOver.isIntMatrix_translateByClassReps h_over (.inl i) (𝔰.besselFrame b)
     -- The change to the lattice basis keeps the coordinates in the isotropic space.
     rw [frameImage_translateByClassReps, classCoord_eq_fromBlocks] at h_entry
-    simpa [O, mul_apply, Matrix.one_apply] using h_entry
+    simpa [O, Matrix.mul_apply, Matrix.one_apply] using h_entry
   rw [sharedVectors, of_apply]
   split_ifs
   · exact algebraMap_mem_Ô.1 (h_frame.mul hY.adjugate a k)
@@ -243,7 +243,7 @@ private lemma exists_frameImage_mul_eq_of_sub_mem {γ γ' : S.G E} {c' c'' : S.C
   -- The change to the lattice basis keeps the coordinates in the isotropic space.
   have h_diff : (frameImage (S.translateByClassReps c c'' γ').val.val).toRows₁ -
       (frameImage (S.translateByClassReps c c' γ).val.val).toRows₁ = finAdeleMatrix ξ := by
-    simp [ξ, frameImage_translateByClassReps, classCoord_eq_fromBlocks, ← ext_iff, mul_apply,
+    simp [ξ, frameImage_translateByClassReps, classCoord_eq_fromBlocks, ← ext_iff, Matrix.mul_apply,
       Matrix.one_apply]
   have hξ : IsIntMatrix ((Ô E).comap (algebraMap E (𝔸f E)))
       ((S.frameModulus j (S.frameProducts γ))⁻¹ • ξ) := by
@@ -410,7 +410,8 @@ lemma IsFrameSet.encard_le_of_conjTranspose_mul_eq (hB : S.IsFrameSet c B)
       obtain ⟨v, hv, h_value⟩ : ∃ v ∈ P, d.val • v =
           ((↑) : E → 𝔸f E) ∘ (x p - x p₀).col i - ((↑) : E → 𝔸f E) ∘ (x p₁ - x p₀).col i :=
         (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 (h_congr p hp p₁ hp₁ i)
-      exact ⟨v, saturatedLattice_le _ _ hv, h_value.trans (by ext a; simp)⟩
+      exact ⟨v, saturatedLattice_le _ _ (by simpa only [P, complementLattice] using hv),
+        h_value.trans (by ext a; simp)⟩
     have h_moved_cellRank (q : S.Classes × S.G E) (hq : q ∈ B) : S.HasCellRank j (u q * q.2) :=
       (h_cellRank q hq).mul_of_mem_classUnipotent₀ (hu q hq)
     have hZ₁ : S.frameProducts (u p₁ * p₁.2) = Z := hZ_moved p₁ (hD hp₁)

@@ -464,7 +464,7 @@ noncomputable def filling : Filling D.E D.shape where
   piN := D.piNIdele
   deltaE := P.deltaE D.towerExp
   b := D.b
-  chosenPlaces i := fun w ↦ D.piM ∈ w.1 ∧ ↑(D.levelPrime i) ∈ w.1
+  chosenPlaces i := {w | D.piM ∈ w.1 ∧ ↑(D.levelPrime i) ∈ w.1}
   fintypeChosen i := inferInstanceAs (Fintype (D.ChosenPlace i))
   sourceLevel := D.levelX 0
   classAut_eq_bot := D.classAut_levelX_zero_eq_bot

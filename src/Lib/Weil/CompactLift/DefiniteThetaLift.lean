@@ -316,8 +316,9 @@ lemma isThetaLift_thetaKernel [Nonempty n] [Nonempty n'] [DecidableEq n'] [Decid
       (realPairWeil ea eb (x, 1) (Fock.polyVector _ P))
       (by simp [realPairWeil_polyVector, ← map_smul])
     let T (u : GInf E (1 : n' → ℤˣ)) : (WeylIndex n' κ → ℂ) →L[ℂ] ℂ :=
-      .mk <| (α u * (β / stdLevelIndex K)) •
-        gramForm (highestVector κ l') ∘ₗ conjWeylRep κ ea (s := 1) u⁻¹
+      .mk ((α u * (β / stdLevelIndex K)) •
+        gramForm (highestVector κ l') ∘ₗ conjWeylRep κ ea (s := 1) u⁻¹)
+        (LinearMap.continuous_of_finiteDimensional _)
     refine ⟨(strongIntegral volume T).toLinearMap, fun o Φ φ h ↦ ?_⟩
     have h_realPart : HasRealPart (pairThetaKer (stdSpace E n) (stdSpace E n') (a o n) (a o n'))
         (realPairWeil ea eb) := pairWeil_integrated _ _ (a o n) (a o n')

@@ -230,7 +230,7 @@ lemma exists_period_map [Algebra ℤ_[p] S] [IsScalarTower ℤ_[p] Ainf S] [IsSc
         exact congrArg (fun φ ↦ Comparison.pull ⟨_, φ⟩ _ n x) h_coeff
       case h_maps =>
         refine freeAb.hom_ext fun c y ↦
-          congrArg FreeAbelianGroup.of (baseChangeOf.ext ?_ fun z ↦ ?_)
+          congrArg FreeAddCommGroup.of (baseChangeOf.ext ?_ fun z ↦ ?_)
         · exact congrArg ULift.up (Spec.map_comp_assoc (𝟙 _) ..)
         · -- `genericStructureMap_twist` matches the structure map of the twisted test only up to
           -- instances
@@ -355,7 +355,7 @@ lemma New.Variety.exists_hasHodgeTateWeight {p h : ℕ} {R : CommRingCat} {E k :
         refine (Comparison.map_pull_eq_pull_map (hom_ext fun c _ ↦ ?_) ..).symm.trans
           (congrArg (B Y) h_weight)
         -- The twist of points is compatible with passing to `c[1/p]`: functoriality of `Spec`.
-        refine congrArg FreeAbelianGroup.of (congrArg ULift.up (Over.OverMorphism.ext ?_))
+        refine congrArg FreeAddCommGroup.of (congrArg ULift.up (Over.OverMorphism.ext ?_))
         exact
           (Spec.map_comp_assoc (CommRingCat.ofHom (algebraMap c.ProdRing c.GenericRing)) (𝟙 _)
             _).symm.trans

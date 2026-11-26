@@ -72,7 +72,7 @@ lemma New.Variety.cancels_moebius_of_factorsThrough_sup {E n : Type} {X : Type*}
   have F_eq_zero (B : Submodule (ResField w) (n → ResField w)) : F B = 0 := by
     simpa using moebius_inversion_bot F 0 sum_F B
   -- `F B` is the coefficient of `B` in the formal sum of the `μ A • [A ⊔ W]`
-  refine .mono ((FreeAbelianGroup.equivFinsupp _).injective (ext fun B ↦ ?_)) hv
+  refine .mono ((FreeAddCommGroup.equivFinsupp _).injective (ext fun B ↦ ?_)) hv
   simpa [sum_ite, single_apply, filter_filter, -zsmul_eq_mul] using F_eq_zero B
 
 /-- Suppose `D.β` is the image of (1 + √−d₀)/2, and `c` sends the complex point of each `a` in the

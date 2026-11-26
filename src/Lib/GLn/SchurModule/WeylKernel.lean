@@ -218,7 +218,7 @@ section
 omit [DecidableEq Φ] [∀ τ : Φ, DecidableEq (n τ)]
 
 lemma map_weylKernel : MvPolynomial.map φ (weylKernel n κ y) = weylKernel n κ (φ ∘ y) := by
-  simp [weylKernel, rowSubst, map_bind₁, ← C_mul']
+  simp [weylKernel, rowSubst, map_aeval_eq_aeval_map_map, -map_aeval, ← C_mul']
 
 /-- `f(yᵀ x)` as a polynomial in `x`: the product of the leading minors of `yᵀ x`. -/
 lemma rowSubst_highestPoly :

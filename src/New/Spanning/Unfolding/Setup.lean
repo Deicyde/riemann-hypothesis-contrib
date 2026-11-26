@@ -696,8 +696,8 @@ lemma realFrameGram_ratToInf (γ : S.G E) (v : InfinitePlace E) :
     ∀ a b : Fin (𝔰.ϱ + 1),
       realFrameGram (S.ratToInf γ v) a b =
         ↑(S.realM v ^ (𝔰.ϱ - a) * S.realM v ^ (𝔰.ϱ - b) / S.N) * Φ v (S.frameProducts γ a b) := by
-  simp [frameGram, mul_apply, basisScale, ← ofReal_pow, splitGram, middleGram, Nat.Prime.ne_zero,
-    forall_fin_succ', Matrix.one_apply, fieldEq]
+  simp [frameGram, Matrix.mul_apply, basisScale, ← ofReal_pow, splitGram, middleGram,
+    Nat.Prime.ne_zero, forall_fin_succ', Matrix.one_apply, fieldEq]
 
 /-- Let γ be rational, v an infinite place with chosen embedding `Φ v : E →+* ℂ`, and `e` a finite
 family of frame indices. On rows and columns `e`, the minor of the frame products of the rescaled

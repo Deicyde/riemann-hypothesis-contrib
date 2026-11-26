@@ -320,13 +320,13 @@ lemma log_mul_div_two_pi_mem_Icc {M R L : ℝ} (hL : 7 ≤ L) (hM : M ∈ Icc (e
   · rw [le_log_iff_exp_le (by positivity), le_div_iff₀ (by positivity)]
     calc exp (19 * L) * (2 * π) ≤ exp (19 * L) * exp L := by gcongr
       _ = exp L ^ 20 * 1 := by
-        rw [← exp_add, ← exp_nat_mul]
+        rw [← exp_add, ← exp_natCast_mul]
         ring_nf
       _ ≤ M * R := by gcongr
   · rw [log_le_iff_le_exp (by positivity)]
     calc M * R / (2 * π) ≤ M * R := div_le_self (by positivity) (by linarith [two_le_pi])
       _ ≤ exp L ^ 22 * exp L := by gcongr
-      _ = exp (23 * L) := mod_cast (exp_nat_mul L 23).symm
+      _ = exp (23 * L) := mod_cast (exp_natCast_mul 23 L).symm
 
 /-- The bounds `m log b ≤ log N₋ ≤ 24 m log b` for `log N₋ = P.logLevelMin s m κ M L`, the logarithm
 of `N₋ = κ̄ ^ m (M rd_E / 2π) ^ (m - 1) b ^ (-15 / 2)`, where `b = exp L`. The parameters `P`

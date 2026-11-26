@@ -312,8 +312,9 @@ lemma New.integral_tsum_orbit_of_lt_top_or_integrable (hi : Function.Injective i
   obtain rfl : D = orbit Λ y := Set.ext fun z ↦ (h_orbit z).trans mem_orbit_symm
   subst hΓ h_stab
   -- The sum over the orbit is at most the sum over all of `Y`.
-  exact integral_tsum_orbit_eq_integral_stabilizer hi hk_meas hk <| h_fin.imp_left <|
-    (lintegral_mono fun x ↦ ENNReal.tsum_comp_le_tsum_of_injective Subtype.val_injective _).trans_lt
+  refine integral_tsum_orbit_eq_integral_stabilizer hi hk_meas hk (h_fin.imp_left fun h ↦ ?_)
+  exact (lintegral_mono fun x ↦ ENNReal.tsum_comp_le_tsum_of_injective Subtype.val_injective
+    fun z ↦ ‖k z x‖ₑ).trans_lt h
 
 /-- Left invariance of `k y` and unfolding over the orbit `D` of `y`, as one statement. Here `i`
 maps `Λ` isomorphically onto the discrete subgroup `Γ`, `S` is the image under `i` of the stabiliser

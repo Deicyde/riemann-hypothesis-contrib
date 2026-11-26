@@ -65,7 +65,7 @@ natural number `a` are at most `log b` for every natural number `b ≥ a`. -/
 lemma New.Selmer.sum_padicValNat_mul_log_le (T : Finset ℕ) (hT : ∀ l ∈ T, l.Prime) {a b : ℕ}
     (hab : a ≤ b) : ∑ l ∈ T, (padicValNat l a : ℝ) * log l ≤ log b :=
   calc ∑ l ∈ T, (padicValNat l a : ℝ) * log l = ∑ l ∈ T, a.factorization l * log l :=
-      sum_congr rfl fun l hl ↦ by rw [a.factorization_def (hT l hl)]
+      sum_congr rfl fun l hl ↦ by rw [a.factorization_def (hT l hl), Nat.padicValNat_def]
     _ ≤ ∑ l ∈ T ∪ a.factorization.support, a.factorization l * log l := by
       grw [← T.subset_union_left]
     _ = log a := by

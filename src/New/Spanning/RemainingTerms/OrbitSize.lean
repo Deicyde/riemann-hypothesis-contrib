@@ -190,6 +190,9 @@ lemma prod_frameScaleSq_bounds [S.IsAdmissible] (v : NumberField.InfinitePlace E
     grw [prod_le_prod₀ (fun a _ ↦ pow_nonneg (h_pos a) _) fun a _ ↦ h_factor a]
     simp [← pow_mul, mul_assoc, ← pow_succ]
 
+-- Lean v4.37.0-rc1: elaborating side goals `0 < S.b ^ (60 * 𝔰.n ^ 2)` (`Shape.n` is an abbrev)
+-- exceeds the default recursion depth.
+set_option maxRecDepth 2000 in
 /-- For admissible data, `pairingBoundConst ≤ 2 ^ (k f) τ d² / (deg c_G ^ f Λ²)`. The left side is
 the factor of the product over the infinite places of the open-cell bounds `pairingBoundSq` that
 does not depend on the rational element at which they are taken. The numbers `d = card BesselCoord`
@@ -237,8 +240,13 @@ lemma pairingBoundConst_le_mul [S.IsAdmissible] :
       _ ≤ 2 ^ 𝔰.k * (S.b ^ (453 * 𝔰.n ^ 2)) ^ (10 ^ 5 * 𝔰.n ^ 4) * (S.b ^ (46 * 𝔰.n ^ 2)) ^ 2 *
           (card (S.besselSystem v).Index ^ 2 /
             ((S.besselSystem v).deg * 𝔰.openCellConst * (s ^ 𝔰.k) ^ 2)) := by
-        gcongr
-        exacts [one_le_two, k₀.le_succ.trans_eq hk₀.symm]
+        -- `gcongr` hits the maximum recursion depth here (Lean v4.37.0-rc1, see above), so the
+        -- monotonicity step is spelled out.
+        have h_two : (2 : ℝ) ^ k₀ ≤ 2 ^ 𝔰.k :=
+          pow_le_pow_right₀ one_le_two (k₀.le_succ.trans_eq hk₀.symm)
+        refine mul_le_mul_of_nonneg_right (mul_le_mul (mul_le_mul_of_nonneg_right h_two
+          (pow_pos (pow_pos b_pos _) _).le) (pow_le_pow_left₀ hs.le h_upper 2) (by positivity)
+          (by positivity)) (by positivity)
       _ = _ := by
         simp only [e, pow_add, ← pow_mul]
         field_simp

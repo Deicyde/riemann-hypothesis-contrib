@@ -290,7 +290,7 @@ lemma exists_fillingMatrix_leftInverse :
     rw [fillingMatrixOver_int, mulVec_transpose, mul_apply_eq_vecMul]
     rfl
   rw [h_row, nablaCombination_transpose_mulVec, hv]
-  simp [one_apply, Fintype.linearCombination_apply]
+  simp [Matrix.one_apply, Fintype.linearCombination_apply]
 
 variable (n κ) in
 /-- Over an infinite field `K`, the image of the Weyl module in tensors under `fillingMatrixOver`

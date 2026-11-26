@@ -127,7 +127,7 @@ jobs:
           fi
           # Lake replays the saved messages of the modules it did not compile, so this covers
           # restored modules too.
-          if grep -n "declaration uses 'sorry'" build.log; then
+          if grep -n -e 'declaration uses `sorry`' -e "declaration uses 'sorry'" build.log; then
             echo "::error::The build reports declarations that use sorry."
             exit 1
           fi

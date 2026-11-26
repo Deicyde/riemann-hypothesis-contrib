@@ -243,7 +243,17 @@ lemma sqrt_weylNormSq_jetMap_le {P : Parameters} (D : Data P) (σ : ℂ ≃+* �
     grw [D.diagramWeight_le_rowMainLength_add_rowSlack hj, D.rowMainLength_add_rowSlack_le]
     simp only [n, sum_const, card_univ, card_range, nsmul_eq_mul]
     push_cast
-    exact D.le_of_hasLogBound
+    refine D.le_of_hasLogBound (h_exp := ?_)
+    -- `scale_arith D` splits the `max`es into too many cases; distribute them instead
+    clear_aux_decl
+    clear * - D
+    obtain ⟨⟨_, _, _, _⟩, _, _, _, _, _⟩ := New.Data.scale_inequalities' D
+    simp only [Bool.false_eq_true, ↓reduceIte, Nat.cast_ofNat, neg_zero, ← max_add_add_right,
+      ← max_add_add_left, ← max_sub_sub_right, mul_max_of_nonneg, Nat.ofNat_nonneg, max_lt_iff]
+    constructorm* _ ∧ _
+    all_goals try simp only [max_def, min_def]
+    all_goals try split_ifs
+    all_goals linarith
   have h_kernel : √(weylNormSq (σ ∘ (D.liftKernel TameChar.one j).jetMap
       ((D.liftKernel TameChar.one j).ω (g, g') (D.translateDatum t j)) ξ)) ≤
       exp (const + (count + (lengths + D.rowSizeSum j) / 2)) * √(weylNormSq (σ ∘ ξ)) := by
@@ -301,7 +311,7 @@ lemma sum_rowSizeSum_le {P : Parameters} (D : Data P) :
     grw [D.jetSize_le_add (D.diagramWeight_le_rowMainLength_add_rowSlack hj τ i),
       D.rowMainLength_add_rowSlack_le τ i, h_box]
   have h_first : ∑ τ : D.Φ, D.jetSize (D.columnCount τ 1) = #D.aPlaces * D.jetSize D.a := by
-    simp [columnCount, apply_ite D.jetSize, D.jetSize_zero]
+    simp [columnCount, apply_ite D.jetSize, D.jetSize_zero, Finset.univ_inter]
   let main : ℝ :=
     ∑ τ : D.Φ, D.jetSize (D.columnCount τ 1) + (D.k - 1) * ∑ τ : D.Φ, D.jetSize (D.weight τ)
   let slack : ℝ := D.f * (25 * D.logB * (D.natB + D.offWeight + D.n D.m * D.halfGap ^ 2))

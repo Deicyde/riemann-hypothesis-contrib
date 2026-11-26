@@ -101,7 +101,8 @@ lemma isCompact_setOf_le_ideleAbs_det {M : Set (Matrix n n (𝔸 E))} (hM : IsCo
     (fun (A, b) ↦ (A, MulOpposite.op ((t * b) • A.adjugate))) '' M ×ˢ T
   have hK : IsCompact K := (hM.prod (hB.mul (hF.image _).isCompact)).image_of_continuous _
   refine (Units.isClosedEmbedding_embedProduct.isCompact_preimage hK).of_isClosed_subset
-    (.and hM.isClosed.preimage_of_continuous (.preimage_of_continuous isClosed_Ici)) ?_
+    (.and hM.isClosed.preimage_of_continuous
+      (isClosed_Ici.preimage_of_continuous (f := fun A : GL n (𝔸 E) ↦ ideleAbs A.det))) ?_
   rintro (A : GL n (𝔸 E)) ⟨hA, hdet⟩
   have h_lt : (2 * NumberField.rootDiscr E) ^ numInfPlaces E <
       ideleAbs A.det * (2 ^ (2 * numInfPlaces E)) ^ N := by grw [← hdet, ← div_lt_iff₀' hc, hN]
@@ -488,7 +489,7 @@ lemma Core.two_pow_sq_le_encard_profileBases {M : Set (GL n (𝔸 E))} {x : n �
   -- So `1 + uᵀ` is unitriangular for the order of the `x i`.
   have h_det : (1 + (of u.curry)ᵀ).det = 1 :=
     det_eq_one_of_unitriangular fun i j (h_le : x j ≤ x i) ↦ by simp [u_zero (j, i) h_le]
-  let Z : GL n E := .mk'' (1 + (of u.curry)ᵀ) (by simp [h_det])
+  let Z : GL n E := .mk'' (1 + (of u.curry)ᵀ) (by simp [h_det, -transpose_of])
   -- The conjugate of `Z` by the diagonal matrix of `x` has its entries in the unit box.
   have h_conj : dyadicDiag x * Z.map toAdele * (dyadicDiag x)⁻¹ ∈ unitBoxGL E n := by
     refine ⟨fun i j ↦ ?_, by simp [Z, field]⟩
@@ -502,7 +503,8 @@ lemma Core.two_pow_sq_le_encard_profileBases {M : Set (GL n (𝔸 E))} {x : n �
     simpa [h_ne, h_le, Z, D, Core.dyadicDiag, ← map_inv diagGL, -map_inv, mul_comm,
       _root_.zpow_sub, mul_assoc, mulVec_diagonal] using h_box
   -- The basis `Y * Z` has profile `x` for `M * unitBoxGL E n`, and `Y⁻¹ * (Y * Z) - 1 = uᵀ`.
-  exact ⟨Y * Z, mem_mul.2 ⟨_, hY, _, h_conj, by simp [mul_assoc]⟩, by simp [Z, funext_iff]⟩
+  exact ⟨Y * Z, mem_mul.2 ⟨_, hY, _, h_conj, by simp [mul_assoc]⟩,
+    by simp [Z, funext_iff, -transpose_of]⟩
 
 /-- For a compact `M` there is a compact set `S` of adeles that holds the Gram entries
 `(Yᴴ V.J Y) i j`, divided by `2 ^ (x i + x j)` at the infinite places, for every space `V` with
@@ -650,10 +652,21 @@ lemma Space.lintegral_ne_top_of_le_encard_profileBases {N : Set (GL n (𝔸 E))}
   have bases_le (g : G E s) (x : n → ℤ) :
       (profileBases N x (V.move g).x).encard * ω x ≤ ∫⁻ γ : V.Γ, ∑' p, F p (γ • g) ∂.count := by
     calc
-      _ ≤ ∫⁻ γ : V.Γ, ∑' T : gram x, F ⟨x, T⟩ (γ • g) ∂.count :=
-        V.encard_profileBases_mul_le_lintegral (𝒯 := gram x) subset_rfl
-          (fun h Z hZ ↦ ⟨IsSelfAdjoint.conjugate' V.conjTranspose_J _, gram_mem (V.move h) hZ⟩)
-          (fun h Z hZ ↦ hr x _ ⟨h, Z, hZ, rfl⟩) (fun h Z hZ ↦ gram_r x _ ⟨h, Z, hZ, rfl⟩) _ g
+      _ ≤ ∫⁻ γ : V.Γ, ∑' T : gram x, F ⟨x, T⟩ (γ • g) ∂.count := by
+        have h1 : ∀ h : G E s, ∀ Z ∈ profileBases N x (V.move h).x,
+            Z.valᴴ * V.J * Z.val ∈ gram x :=
+          fun h Z hZ ↦ ⟨IsSelfAdjoint.conjugate' V.conjTranspose_J _, gram_mem (V.move h) hZ⟩
+        have h2 : ∀ h : G E s, ∀ Z ∈ profileBases N x (V.move h).x,
+            r x (Z.valᴴ * V.J * Z.val) ∈
+              profileBases N x (V.move (A x (Z.valᴴ * V.J * Z.val))).x :=
+          fun h Z hZ ↦ hr x _ ⟨h, Z, hZ, rfl⟩
+        have h3 : ∀ h : G E s, ∀ Z ∈ profileBases N x (V.move h).x,
+            (r x (Z.valᴴ * V.J * Z.val)).valᴴ * V.J * (r x (Z.valᴴ * V.J * Z.val)).val =
+              Z.valᴴ * V.J * Z.val :=
+          fun h Z hZ ↦ gram_r x _ ⟨h, Z, hZ, rfl⟩
+        have h4 := V.encard_profileBases_mul_le_lintegral (𝒯 := gram x) (A := A x) (r := r x)
+          (B := B) subset_rfl h1 h2 h3 (ω x) g
+        exact h4
       _ ≤ ∫⁻ γ : V.Γ, ∑' p, F p (γ • g) ∂.count :=
         lintegral_mono fun γ ↦ tsum_comp_le_tsum_of_injective sigma_mk_injective fun p ↦ F p (γ • g)
   refine ne_top_of_le_ne_top (mul_ne_top (mul_ne_top hC hω) (hB.measure_ne_top (μ := volume))) ?_
@@ -688,7 +701,9 @@ lemma Space.exists_encard_le_of_mem_profileBases {t : Type*} [Fintype t] {M : Se
   -- Row `i` of `Y⁻¹ ξ` is `2 ^ (-x i)` times row `i` of some `A⁻¹ * V.x⁻¹ * η` with `A ∈ M` and
   -- `η ∈ Ω`; these products lie in a compact set `B`.
   let B : Set (t × n → 𝔸 E) := (fun (A, η) (j, i) ↦ (A.inv * V.x.inv * η) i j) '' M ×ˢ Ω
-  have hB : IsCompact B := (hM.prod hΩ).image_of_continuous _
+  have hB : IsCompact B := (hM.prod hΩ).image_of_continuous _ <| by
+    have : Continuous fun u : GL n (𝔸 E) ↦ u.inv := Units.continuous_coe_inv
+    fun_prop
   obtain ⟨C, hC, h_count⟩ := encard_le_of_dyadic_box (α := Matrix n t E) hB
   refine ⟨C, hC, fun {g x Y} hY ↦ ?_⟩
   have h_inj : Injective fun ξ : Matrix n t E ↦ (Y⁻¹.val * ξ).vec :=

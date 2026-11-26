@@ -124,7 +124,8 @@ lemma IsHomogeneousSolution.aeval_eq_zero_of_transcendental [Algebra B L] [IsSca
   have hP : P = 0 := transcendental_iff.mp ht P (h_sum.trans h_zero)
   refine sum_eq_zero fun n hn ↦ h_sol (homogeneousComponent_mem n F) ?_
   -- the value `F_n(g)` is the `n`-th coefficient of `P = 0`
-  simpa [P, Polynomial.coeff_monomial, hn] using congrArg (Polynomial.coeff · n) hP
+  simpa [P, Polynomial.coeff_monomial, Finsupp.single_apply, hn] using
+    congrArg (fun p : Polynomial B ↦ p.coeff n) hP
 
 lemma IsHomogeneousSolution.refl : IsHomogeneousSolution k v v := by tauto
 
@@ -213,7 +214,7 @@ lemma aeval_eq_zero_of_eliminated_forms {m : ℕ} {f : MvPolynomial (Fin (d + 1)
     (Λ j).val.aeval x = 0 := by
   -- the relation is a homogeneous equation of `g`, so it holds at `x`
   have h_relx : aeval (evalForms Λ x) f = 0 := by
-    simpa [aeval_bind₁, h_rel] using hx (hf.aeval _ fun j ↦ (Λ j).prop)
+    simpa [comp_aeval_apply, h_rel] using hx (hf.aeval _ fun j ↦ (Λ j).prop)
   -- the values of `Λ` at `x` are proportional to `a`
   obtain ⟨c, h_prop⟩ : ∃ c : K, evalForms Λ x = c • algebraMap k K ∘ a := by
     refine ⟨(a 0)⁻¹ • evalForms Λ x 0, funext (forall_fin_succ.mpr ?_)⟩
@@ -315,7 +316,7 @@ lemma exists_isNoetherNormalization [CharZero k] [Finite ι] (hg : g ≠ 0) :
         exact isIntegralElem_of_no_common_zero h_base φ p v hv_g
     · obtain ⟨m, f, hf, h_rel, hf₀⟩ : ∃ (m : ℕ) (f : MvPolynomial (Fin (n + 1)) k),
           f.IsHomogeneous m ∧ aeval (evalForms Λ g) f = 0 ∧ f ≠ 0 := by
-        simpa [IsHomogeneousSolution] using h_ind
+        simpa [IsHomogeneousSolution, aeval_X_left_apply] using h_ind
       -- `k` is infinite, so the non-zero polynomial `f * X 0` has a non-zero value
       obtain ⟨a, ha⟩ : ∃ a : Fin (n + 1) → k, MvPolynomial.eval a (f * X 0) ≠ 0 := by
         by_contra! h_all
@@ -472,7 +473,7 @@ lemma IsNoetherNormalization.nonempty_galoisClosure (hΛ : IsNoetherNormalizatio
   have h_faithful : FaithfulSMul A Ω := by
     refine (faithfulSMul_iff_algebraMap_injective A Ω).mpr
       (algebraicIndependent_iff.mpr fun F ↦ ?_)
-    simpa using! h_no_rel.aeval_eq_zero_of_transcendental ht
+    simpa [aeval_X_left_apply] using! h_no_rel.aeval_eq_zero_of_transcendental ht
   have h_forms_X : evalForms Λ (t • inc ∘ g) = aeval (R := k) (evalForms Λ (t • inc ∘ g)) ∘ X :=
     funext fun l ↦ (aeval_X _ l).symm
   have h_int (i : ι) : IsIntegral A ((t • inc ∘ g) i) := h_integral (aeval _) X _ h_tg h_forms_X i

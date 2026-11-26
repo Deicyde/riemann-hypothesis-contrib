@@ -205,10 +205,23 @@ lemma torusEval_alternant (x : n → Circle) :
       det (Matrix.of fun a b : n ↦ if ε a = ε b then (x a : ℂ) ^ ν b else 0) := by
   calc torusEval x (alternant ε ν)
     _ = ∑ w : Perm n, if ε ∘ w = ε then (w.sign : ℂ) * ∏ a : n, (x a : ℂ) ^ ν (w a) else 0 := by
-      simp [alternant, torusEval, apply_ite (lift ℂ ℂ (n → ℤ) _)]
+      simp only [alternant, map_sum, apply_ite (torusEval x), map_zero]
+      refine sum_congr rfl fun w _ ↦ ?_
+      split_ifs
+      · rw [torusEval_eq_sum, AddMonoidAlgebra.coeff_single, Finsupp.sum_single_index (by simp)]
+        simp
+      · rfl
     _ = ∑ w : Perm n, (w.sign : ℂ) * ∏ a : n, if ε a = ε (w a) then (x a : ℂ) ^ ν (w a) else 0 := by
-      simp [prod_ite_zero, funext_iff, eq_comm]
-    _ = _ := by simp [← det_transpose (Matrix.of _), det_apply']
+      refine sum_congr rfl fun w _ ↦ ?_
+      by_cases h : ε ∘ w = ε
+      · rw [if_pos h, Finset.prod_ite_zero,
+          if_pos (show ∀ a ∈ (univ : Finset n), ε a = ε (w a) from fun a _ ↦ (congrFun h a).symm)]
+      · rw [if_neg h, Finset.prod_ite_zero,
+          if_neg (show ¬∀ a ∈ (univ : Finset n), ε a = ε (w a) from
+            fun h' ↦ h (funext fun a ↦ (h' a (mem_univ a)).symm)), mul_zero]
+    _ = _ := by
+      rw [← det_transpose, det_apply']
+      simp [transpose_apply]
 
 section
 
@@ -684,7 +697,7 @@ lemma exists_kTypeChar_diagTorusK_eq_trace_schur (hl : l.Injective) (hν : IsKDo
   let m (τ : ℤˣ) : Type := {i // ε i = τ}
   have h_enum (τ : ℤˣ) : ∃ q : Fin (Fintype.card (m τ)) ≃ m τ,
       ∀ a b : Fin (Fintype.card (m τ)), l (q a).1 < l (q b).1 ↔ a < b :=
-    exists_equiv_fin_lt_iff (n := m τ) hl.injOn.injective
+    exists_equiv_fin_lt_iff (n := m τ) (l := fun a ↦ l a.1) (hl.comp Subtype.val_injective)
   choose q hq using h_enum
   obtain ⟨κ, e, h_partition⟩ := exists_eq_const_add_partition hν q hq
   have hν_q (τ : ℤˣ) (j : Fin (Fintype.card (m τ))) :

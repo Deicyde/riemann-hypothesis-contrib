@@ -480,6 +480,7 @@ lemma image_inv_const_mul_Ioo {b r : ℝ} (hb : 0 < b) (hr : 0 < r) (h_fix : (b 
   ext v
   refine ⟨?_, fun (hv : r < v) ↦ ?_⟩
   · rintro ⟨u, ⟨hu, hur⟩, rfl⟩
+    show r < (b * u)⁻¹
     exact h_fix.ge.trans_lt (inv_strictAnti₀ (by positivity) (by gcongr))
   have hv_pos : 0 < v := hr.trans hv
   exact ⟨(b * v)⁻¹, ⟨by positivity, (inv_strictAnti₀ (by positivity) (by gcongr)).trans_eq h_fix⟩,

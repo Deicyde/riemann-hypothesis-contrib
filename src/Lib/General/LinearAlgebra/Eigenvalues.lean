@@ -121,7 +121,7 @@ lemma New.det_one_sub_smul_eq_prod_roots {ι : Type*} [Fintype ι] [DecidableEq 
 lemma New.trace_eq_rank_of_isIdempotentElem {k n : Type*} [Field k] [Fintype n] [DecidableEq n]
     {p : Matrix n n k} (hp : IsIdempotentElem p) : p.trace = p.rank := by
   -- `p` is a projection, so its trace is the dimension of its range.
-  rw [← p.trace_toLin'_eq]
+  rw [← p.trace_toLin'_eq, ← p.finrank_range_mulVecLin]
   exact (LinearMap.IsIdempotentElem.isProj_range _ (hp.map Matrix.toLinAlgEquiv')).trace
 
 /-! ## Sorting by adjacent swaps and common eigenvectors -/
@@ -138,7 +138,7 @@ lemma New.exists_antitone_of_swap {α : Type*} {N : ℕ} [LinearOrder α] (f : F
     ∃ σ : Equiv.Perm (Fin N), P σ ∧ Antitone (f ∘ σ) := by
   -- Among the permutations with `P` take one for which `f ∘ σ` is lexicographically largest.
   obtain ⟨τ, hτ, τ_max⟩ : ∃ τ, P τ ∧ ∀ σ, P σ → toLex (f ∘ σ) ≤ toLex (f ∘ τ) :=
-    Set.exists_max_image P _ Subtype.finite h_exists
+    Set.exists_max_image {σ | P σ} _ Subtype.finite h_exists
   refine ⟨τ, hτ, (antitone_iff_forall_covBy _).2 fun i j hij ↦ le_of_not_gt fun hlt ↦ ?_⟩
   -- Swapping an increasing pair of neighbours `i`, `j` would give a larger one: the two agree
   -- before `i`.

@@ -193,8 +193,8 @@ lemma det_linearCombination_sub_one_eq_zero {r : Type} {t : ℕ} [NeZero t]
   have h_column (g : G) (i : σ) :
       u x g i (blockEquiv (inr 0)) = (1 : Matrix σ σ O) i (blockEquiv (inr 0)) := by
     obtain ⟨i | i, rfl⟩ := blockEquiv.surjective i
-    · simp [hu, one_apply]
-    · simp +contextual [hu, hξ₀, one_apply, diagonal_apply]
+    · simp [hu, Matrix.one_apply]
+    · simp +contextual [hu, hξ₀, Matrix.one_apply, diagonal_apply]
   refine det_eq_zero_of_column_eq_zero (blockEquiv (inr 0)) fun i ↦ ?_
   simp [Finsupp.linearCombination_apply, Finsupp.sum, Matrix.sum_apply, h_column]
 

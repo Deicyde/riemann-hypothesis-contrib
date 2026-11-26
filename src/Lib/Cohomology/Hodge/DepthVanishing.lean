@@ -300,7 +300,7 @@ lemma hodge_vanishing_along_diagonal {x : Fin (d + d) → c.baseAlg} (hx_etale :
   -- It is the image of the first `d` variables under a flat map: a linear change of variables
   -- `σ` followed by the étale map `polyEval x`.
   let σ : MvPolynomial (Fin (d + d)) k →ₐ[k] MvPolynomial (Fin (d + d)) k :=
-    bind₁ (append (X ∘ castAdd d - X ∘ natAdd d) (-X ∘ natAdd d))
+    aeval (append (X ∘ castAdd d - X ∘ natAdd d) (-X ∘ natAdd d))
   -- on the variables `σ` is the involution `(u, v) ↦ (u - v, -v)` of the two halves
   have hσ_X (i : Fin (d + d)) : σ (σ (X i)) = X i := by
     -- without `-natAdd_eq_addNat` the lemma `append_right` would not apply

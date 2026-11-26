@@ -567,7 +567,7 @@ theorem exists_tsum_classCutoff_mul_prod_enorm_le {E : Type} [Field E] [CMType E
             ((S.scaledBesselLengthProd ((S.ratToInf γ)⁻¹ * y))⁻¹ ^
               (𝔰.r ^ 3 * numInfPlaces E))) := by
       grw [h_decay]
-    _ ≤ bound := tsum_classCutoff_mul_const_mul_inv_pow_le T c s (∏ v, a v) y
+    _ ≤ bound := by exact tsum_classCutoff_mul_const_mul_inv_pow_le T c s (∏ v, a v) y
     _ = bound.toNNReal := (coe_toNNReal h_bound_fin).symm
 
 -- Keeps definitional checks from unfolding the finite sums.
@@ -594,7 +594,7 @@ theorem tsum_amplitudeMajorant_lt_top (T : Set (S.G E)) (c : S.Classes) (s : S.R
       grw [h_majorant, h_decay]
     _ ≤ .ofReal S.unipotentCovolume * .ofReal (2 * S.b ^ (12 * 𝔰.n ^ 3 * 𝔰.r * numInfPlaces E)) *
           (.ofReal (S.b ^ (400 * 𝔰.r ^ 2)) ^ numInfPlaces E * card S.BesselCoord) :=
-      tsum_lintegral_classCutoff_mul_majorant_le T c s hw
+      by exact tsum_lintegral_classCutoff_mul_majorant_le T c s hw
     _ < ∞ := by finiteness
 
 /-- Let `S` be admissible, let `d` run over all classes and `γ` over the elements of `T` that are
@@ -642,8 +642,8 @@ omit [HasPrimitiveRoot5040 E] [S.IsAdmissible] in
 lemma mem_termsOver_iff_mul_mul_inv_mem {c c₁ c' c₁' : S.Classes} {t t' s : S.ResidueGL}
     {σ σ' γ : S.G E} (hσ_over : σ ∈ S.termsOver c t c₁) (hσ'_over : σ' ∈ S.termsOver c' t' c₁') :
     γ ∈ S.termsOver c₁ s c₁' ↔ σ * γ * σ'⁻¹ ∈ S.termsOver c (t * s * t'⁻¹) c' :=
-  ⟨fun hγ ↦ termsOver.mul (.mul hσ_over hγ) (.inv hσ'_over),
-    fun hγ ↦ by simpa using termsOver.mul (.inv hσ_over) (.mul hγ hσ'_over)⟩
+  ⟨fun hγ ↦ termsOver.mul (termsOver.mul hσ_over hγ) (termsOver.inv hσ'_over),
+    fun hγ ↦ by simpa using termsOver.mul (termsOver.inv hσ_over) (termsOver.mul hγ hσ'_over)⟩
 
 /-- Let `E` contain a primitive 5040th root of unity and let `S` be admissible. Let `σ` be a
 rational isometry of the form with middle Gram matrix `S.ratMiddle E`. Assume that `σ` lies in the
@@ -688,7 +688,7 @@ lemma mul_mul_inv_mem_inter_termsOver (hT : S.IsStable T) {c : S.Classes} {s : S
   obtain ⟨hu, hu_over⟩ := u.2
   obtain ⟨hu', hu'_over⟩ := (u'⁻¹).2
   exact ⟨by simpa using (hT u.1⁻¹ (inv_mem hu) u'.1⁻¹ hu' γ).2 hγ_mem.1,
-    by simpa [mul_assoc] using termsOver.mul (.mul hu_over hγ_mem.2) hu'_over⟩
+    by simpa [mul_assoc] using termsOver.mul (termsOver.mul hu_over hγ_mem.2) hu'_over⟩
 
 /-- Let the group `H`, with an s-finite inversion invariant measure `η`, act measurably on `Z` and
 preserve the s-finite measure `μ`. A cutoff (`IsCutoff η β`) is a measurable `β : Z → [0, ∞]` with

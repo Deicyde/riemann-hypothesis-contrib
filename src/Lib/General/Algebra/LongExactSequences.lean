@@ -519,10 +519,10 @@ lemma exists_acyclic_cover (M : C ⥤ Ab) :
   have hg (A : C) : Surjective (g.app A) := by
     intro x
     -- `x` is the image of the identity of A in the copy indexed by (A, x)
-    refine ⟨FreeAbelianGroup.of ⟨⟨A, x⟩, ULift.up (𝟙 A)⟩, ?_⟩
-    calc g.app A (FreeAbelianGroup.of ⟨⟨A, x⟩, ULift.up (𝟙 A)⟩)
+    refine ⟨FreeAddCommGroup.of ⟨⟨A, x⟩, ULift.up (𝟙 A)⟩, ?_⟩
+    calc g.app A (FreeAddCommGroup.of ⟨⟨A, x⟩, ULift.up (𝟙 A)⟩)
       _ = (pointMap (Y := M ⋙ forget Ab) x).app A (ULift.up (𝟙 A)) :=
-        FreeAbelianGroup.lift_apply_of _ _
+        FreeAddCommGroup.lift_apply_of _ _
       _ = x := (uliftCoyonedaEquiv (F := M ⋙ forget Ab)).apply_symm_apply x
   refine ⟨Σ A : C, M.obj A, c, g, kerComplex_shortExact hg, fun F n x ↦ ?_⟩
   -- on each summand ℤ[h_A] the pull-back of `x` vanishes, as this summand is projective

@@ -98,7 +98,8 @@ lemma exists_three_term_free {n H L o : ℕ} (hL : 0 < L) (ho : (L * H) ^ n ≤ 
   have h_digit (v : Fin n → ℕ) (hv : v ∈ sphere n H k) (l : Fin n) : v l < L * H :=
     ((h_sphere.1 hv).1 l).trans_le (Nat.le_mul_of_pos_left H hL)
   refine ⟨(sphere n H k).image (map (L * H)), forall_mem_image.2 fun v hv ↦ h_lt v (h_digit v hv),
-    by simpa [card_image_of_injOn (map_injOn.mono h_digit)] using hk, ?_⟩
+    by simpa [card_image_of_injOn (map_injOn.mono (s₁ := (sphere n H k : Set (Fin n → ℕ)))
+      fun v hv ↦ h_digit v (Finset.mem_coe.1 hv))] using hk, ?_⟩
   simp only [forall_mem_image, h_sphere]
   rintro u ⟨hu, hu_sq⟩ v ⟨hv, hv_sq⟩ w ⟨hw, hw_sq⟩ α α' hα hα' h_sum h_cong
   -- both sides of the congruence have digits below `L * H`, so they are equal digit by digit
@@ -128,7 +129,7 @@ lemma Parameters.exists_orderOf_placeClass_eq (P : Parameters) (s : ℕ) :
   set a : ℕ := 3 * l₀ s * u with ha
   have ha_odd : Odd a := by simp [ha, l₀, Nat.odd_mul, Nat.odd_pow_iff, hu, Nat.odd_iff.2]
   have h_order : orderOf (1 + 2 ^ v * (a : ℤ) : ZMod (2 ^ (s + v))) = 2 ^ s :=
-    ZMod.orderOf_one_add_mul_prime_pow Nat.prime_two v (by omega) (by omega) a
+    ZMod.orderOf_one_add_mul_prime_pow Nat.prime_two v (by omega) a
       (mod_cast ha_odd.not_two_dvd_nat) s
   refine ⟨v, ⟨a, by grind [towerDeg_eq]⟩, ?_⟩
   rw [← orderOf_units, P.placeClass_placeOfInt (by simp [isCoprime_one_left]), ← h_order, hq₀, ha]
@@ -326,8 +327,8 @@ lemma Parameters.exists_prime_pair_norm (P : Parameters) (s : ℕ) {W L : ℝ} (
   have h_level (i : Fin (classNumber P.K + 1)) : P.IsPrincipalLevelPrime s L (p i) := by
     have hp_pos : (0 : ℝ) < p i := mod_cast (hp i).pos
     refine ⟨hp i, h_mod i, ?_⟩
-    simp only [Set.mem_Icc, ← exp_nat_mul, ← le_log_iff_exp_le hp_pos, ← log_le_iff_le_exp hp_pos,
-      Nat.cast_ofNat]
+    simp only [Set.mem_Icc, ← exp_natCast_mul, ← le_log_iff_exp_le hp_pos,
+      ← log_le_iff_le_exp hp_pos, Nat.cast_ofNat]
     exact ⟨by linarith [h_shift i, (h_log i).1], by linarith [h_shift i, (h_log i).2]⟩
   have h_inj : p.Injective := .of_lt_imp_ne fun i j (hij : i.val + 1 ≤ j) h_eq ↦ by
     rify at hij
@@ -416,7 +417,7 @@ lemma mul_rank_lt_two_pow {y : ℝ} {m r s : ℕ} (hy : 0 < y) (h_large : 1e6 * 
     _ < 1e6 * y * exp (5 * y) ^ 2 := by nlinarith [mul_pos hy (pow_pos (exp_pos (5 * y)) 2)]
     _ ≤ exp y * exp (5 * y) ^ 2 := by gcongr
     _ = exp (y / 2) ^ 22 := by
-      rw [← exp_nat_mul, ← exp_nat_mul, ← exp_add]
+      rw [← exp_natCast_mul, ← exp_natCast_mul, ← exp_add]
       ring_nf
     _ ≤ m ^ 22 := by gcongr
 
@@ -459,7 +460,7 @@ lemma pow_mul_exp_le_exp_pow_six {n : ℕ} {W : ℝ} (hW : 1 ≤ W) (hn : n + 1 
   calc W ^ n * exp W ≤ exp W ^ n * exp W := by
         gcongr
         linarith [add_one_le_exp W]
-    _ = exp ((n + 1) * W) := by rw [← exp_nat_mul, ← exp_add, add_one_mul]
+    _ = exp ((n + 1) * W) := by rw [← exp_natCast_mul, ← exp_add, add_one_mul]
     _ ≤ exp (W ^ 6) := by grw [hn, ← sq, pow_le_pow_right₀ hW (by norm_num : 2 ≤ 6)]
 
 /-- The scale `b`, the least multiple of `q x₁` above `exp (W ^ 6)`, where `x₁ = ⌊exp W⌋` and
@@ -537,7 +538,7 @@ lemma ite_mul_div_mem_Icc {x x₁ b : ℕ} (hx : 1 ≤ x) (hx₁ : x ≤ x₁) (
     Nat.div_le_of_le_mul (Nat.mul_le_mul_right b hx₁)⟩]
 
 lemma exp_five_mul_log {x : ℝ} (hx : 0 < x) : exp (5 * log x) = x ^ 5 := by
-  simpa [exp_log hx] using exp_nat_mul (log x) 5
+  simpa [exp_log hx] using exp_natCast_mul 5 (log x)
 
 lemma rpow_div_six_pow_six (x : ℕ) (ε : ℝ) : ((x : ℝ) ^ (ε / 6)) ^ 6 = (x : ℝ) ^ ε := by
   simp [← rpow_mul_natCast x.cast_nonneg]

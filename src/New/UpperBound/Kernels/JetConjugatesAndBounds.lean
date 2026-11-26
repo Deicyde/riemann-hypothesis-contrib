@@ -573,7 +573,7 @@ lemma Parameters.jet_jetSeries_mul (V : Space (P.E s) (n' × n) (homSigns 1 1)) 
     jet ℂ Q (V.jetSeries (c * a) F) = jet ℂ (aeval (c • X) Q) (V.jetSeries a F) := by
   have h_scale : bind₁ (fun i ↦ (c * a) • X i) Q = bind₁ (fun i ↦ a • X i) (aeval (c • X) Q) := by
     rw [Q.as_sum]
-    simp [monomial_eq, ← C_mul', mul_assoc]
+    simp [monomial_eq, ← C_mul', mul_assoc, bind₁]
   rw [jet_jetSeries_eq_theta, jet_jetSeries_eq_theta, aeval_eq_bind₁, aeval_eq_bind₁, h_scale]
 
 /-- Conjugates of jets as Gaussian integrals, on a space `V` whose signs `homSigns 1 1` are all

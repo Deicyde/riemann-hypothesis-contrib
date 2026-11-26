@@ -326,10 +326,17 @@ theorem exists_tsum_majorant_le (φ : TestFunction (Gf E n)) : ∃ C ≥ (0 : �
   set B : Set (G E s) := levelBox E s (c * V.height x ^ 2)⁻¹ J
   set cover : ℝ := (12 * (c * V.height x ^ 2)) ^ d
   have h_sum : S * volume B ≤ bound := by
-    refine tsum_mul_measure_le_lintegral volume (measurableSet_levelBox _ hJ.isOpen)
-      (h_disjoint g x) (f := fun y ↦ .ofReal (majorant φ A y)) ofReal_ne_top fun y z hz ↦ ?_
-    rw [← ofReal_mul (by positivity)]
-    exact ofReal_le_ofReal (majorant_le_mul_majorant_mul hJ_fix A (inv_le_one_of_one_le₀ hD) y hz)
+    have hB : MeasurableSet B := measurableSet_levelBox _ hJ.isOpen
+    have hBd : ∀ i j : U V.J, ∀ z ∈ B, ∀ z' ∈ B,
+        g⁻¹ * V.ratEmbed i * x * z = g⁻¹ * V.ratEmbed j * x * z' → i = j := h_disjoint g x
+    have h_le' : ∀ y : G E s, ∀ z ∈ B, ENNReal.ofReal (majorant φ A y) ≤
+        .ofReal factor * .ofReal (majorant φ A (y * z)) := fun y z hz ↦ by
+      rw [← ofReal_mul (by positivity)]
+      exact ofReal_le_ofReal (majorant_le_mul_majorant_mul hJ_fix A (inv_le_one_of_one_le₀ hD) y hz)
+    have key := tsum_mul_measure_le_lintegral (volume : Measure (G E s)) hB
+      (y := fun γ : U V.J ↦ g⁻¹ * V.ratEmbed γ * x) hBd
+      (f := fun y ↦ .ofReal (majorant φ A y)) (c := .ofReal factor) ofReal_ne_top h_le'
+    exact key
   have h_le : S * v ≤ .ofReal cover * bound :=
     calc S * v ≤ S * (.ofReal cover * volume B) := by gcongr; exact h_volume _ hD
       _ = .ofReal cover * (S * volume B) := mul_left_comm _ _ _

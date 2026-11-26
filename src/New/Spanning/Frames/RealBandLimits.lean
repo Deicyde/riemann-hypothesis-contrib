@@ -110,7 +110,10 @@ lemma IsCutBessel.continuous_normalizedCellIntegral (hF : IsCutBessel F rep ρ s
         (Γ.hasMatrixSize_of_ne_zero hF.isCut_complexData hc cellChart_mem_floorGroup hy hy')
     rcases h_zero with h | h <;> rw [h] <;> simp
   -- `normalizedCellIntegral` is `besselOrbitalIntegral` times a continuous real factor.
-  exact .smul (M := ℝ) (by fun_prop) (J_cont.continuousAt heads)
+  have c_cont : Continuous fun c : ℕ → ℂˣ ↦ √𝔰.openCellConst * √(‖(c 𝔰.ϱ).val‖ ^ 2 - 1) ^ (𝔰.k - 1) /
+      Fintype.card I * ∏ a ∈ Finset.range 𝔰.ϱ, ‖(c a).val‖ ^ (𝔰.k + 1 + 2 * (𝔰.ϱ - (a + 1))) := by
+    fun_prop
+  exact c_cont.continuousAt.smul (J_cont.continuousAt heads)
 
 /-- The compact group U(κ), embedded in G₁ by `embedH`, acts on the values of a cut Bessel function
 by unitary maps, so left translation by it keeps the inner products of these values. -/
@@ -445,8 +448,13 @@ lemma IsCutBessel.norm_le_of_mem_positionBall (hF : IsCutBessel F rep ρ s b W f
       refine pow_le_pow_right₀ one_le_b ?_
       -- Exponents: `14 n + 7623 n ^ 3 ≤ 106 n r`, as `10 ^ 9 n ^ 3 ≤ r`.
       have one_le_n : 1 ≤ 𝔰.n := Nat.succ_pos _
+      have h_sq : 100 * 𝔰.n ^ 2 ≤ 𝔰.r :=
+        (Nat.mul_le_mul (by norm_num) (Nat.pow_le_pow_right one_le_n (by norm_num))).trans cube_le
+      have one_le_r : 1 ≤ 𝔰.r := (one_le_n.trans (Nat.le_self_pow two_ne_zero _)).trans
+        ((Nat.le_mul_of_pos_left _ (by norm_num)).trans h_sq)
       generalize 𝔰.n = n, 𝔰.r = r at *
-      nlinarith [Nat.le_self_pow three_ne_zero n]
+      clear * - h_sq one_le_r
+      nlinarith [Nat.mul_le_mul_left n h_sq, Nat.mul_le_mul_left n one_le_r]
 
 /-- For `2 ≤ b`, `n, r ≥ 1` and `f ≥ 4000 n`, the square of the error `2 b ^ (-r ^ 3 f)` times the
 volume bound `T ^ (9 r²) b ^ (99 r²)` at the radius `T = b ^ (700 n r)` is at most `b ^ (-24)`. -/

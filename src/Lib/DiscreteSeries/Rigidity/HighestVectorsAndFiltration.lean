@@ -351,9 +351,14 @@ theorem HCParam.IsKHighest.casimirK_bound_of_highest (hx : l.IsKHighest ρ ν x)
   -- `W` is `𝔨`-stable: `ρ.E a b` commutes with `T`, and its adjoint `ρ.E b a` preserves `U`.
   have hW_stable (a b : n) (hab : ε a = ε b) : W ∈ (ρ.E a b).invtSubmodule := by
     refine fun z ⟨hzU, hz_orth⟩ ↦ ⟨hU_stable a b hab hzU, fun u hu ↦ ?_⟩
-    simpa [T, hρ.inner_E_left, ← End.mul_apply, (hD_comm ..).eq, hab,
-      ((hD_comm ..).mul_right (commute_E_casimirK ..)).eq] using
+    have hT : Commute (ρ.E a b) (T - (e : ℂ) • 1) :=
+      ((((hD_comm a b hab).smul_right α).mul_right (commute_E_casimirK hab)).sub_right
+        ((hD_comm a b hab).smul_right β)).sub_right ((Commute.one_right _).smul_right _)
+    have h : ⟪ρ.E b a u, (T - (e : ℂ) • 1) z⟫_ℂ = 0 :=
       hz_orth (ρ.E b a u) (hU_stable b a hab.symm hu)
+    show ⟪u, (T - (e : ℂ) • 1) (ρ.E a b z)⟫_ℂ = 0
+    rw [← mul_apply_eq_comp, ← hT.eq, mul_apply_eq_comp]
+    simpa [hρ.inner_E_left] using h
   have : FiniteDimensional ℂ W := finiteDimensional_of_le inf_le_left
   obtain ⟨μ, z, ⟨hzU, hz_orth⟩, hz_ne, hz_wt, hz_high⟩ := l.exists_highest_vector W hW_ne hW_stable
   -- `z` is not orthogonal to all words of length `≤ s`: the orthogonal complement of `z` is stable

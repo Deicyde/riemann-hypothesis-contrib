@@ -893,7 +893,7 @@ theorem eq_zero_of_integral_choiceFn_thetaKernelPairing (F : D.goodForms (D.spac
     obtain ⟨c, close⟩ := near x (peak_min hx)
     refine ⟨fun h ↦ ∑ i, c i * choiceFn j i (x * (h, 1)),
       .sum _ fun i ↦ isAdelicHol_choiceFn i x, close, ?_⟩
-    simpa only [star_star] using integral_mul_sum_choiceFn_eq_zero F h_orth
+    simpa only [Pi.star_apply, star_star] using integral_mul_sum_choiceFn_eq_zero F h_orth
       (integrable_holMinorsPi h_rank isPosFirstOrder_orderW (isKDominant_kernelWeight j)
         (hasHolGap_kernelWeight j)) c x
   -- This is absurd: with `B = b ^ n_* > 10` we have `(4 B + 1) 2 < B ^ 2 ≤ B ^ 19`.

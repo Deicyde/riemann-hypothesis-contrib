@@ -481,7 +481,9 @@ lemma New.Patching.chain_lemma (hB : IsUnitary ρ.ρ B)
     simpa [partialHecke_zero_eq_heckeGL, ht] using dual_last
   have rec_U' (i : ℕ) (hi : i < n) :
       u ϖ⁻¹ (T i.succ) = (w.q : ℂ) ^ (n - i.succ) • ((t i.succ / w.q ^ n) • u ϖ⁻¹ x - T i) := by
-    simpa [u, T, mulSingle_inv, partialHecke_zero_eq_heckeGL, ht, avg_T, avg_x, smul_smul] using
+    simpa [u, T, mulSingle_inv, partialHecke_zero_eq_heckeGL, ht, avg_T, avg_x, smul_smul,
+      div_mul_cancel₀ _
+        (pow_ne_zero n ((Nat.cast_ne_zero (R := ℂ)).2 (zero_lt_one.trans w.one_lt_q).ne'))] using
       dual i (n - i.succ) (by lia)
   have U'_x : u ϖ⁻¹ x = (w.q : ℂ) ^ n • (t n.succ)⁻¹ • T n := by
     rw [← avg_T, ← dual_last]

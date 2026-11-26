@@ -277,7 +277,9 @@ lemma exists_iwahori_hecke_element (π : Representation ℂ (GL (Fin a) (𝔸f E
   · have hx_fix (g : GL (Fin a) (LocField w.val)) (hg : g ∈ proIwahori) :
         π (conjAtSplit w g) x = x := by simpa using hx ⟨g, hg⟩
     let x' : levelSpace ρ.ρ proIwahori :=
-      ⟨⟨x, .mono (residuePreimage ..).mem_nhds_one hx_fix⟩, fun k ↦ Subtype.ext (hx k)⟩
+      ⟨⟨x, Filter.mem_of_superset
+        ((isOpen_proIwahori (n := Fin a) (F := LocField w.val)).mem_nhds (one_mem _)) hx_fix⟩,
+        fun k ↦ Subtype.ext (hx k)⟩
     -- Extend the `proIwahori`-average to a linear map `T` on `W`; then `T z⁻¹ b x = U_t x ≠ 0`.
     obtain ⟨T, hT⟩ := (Submodule.subtype _ ∘ₗ compactMean ρ.ρ proIwahori).exists_extend
     -- `ρ` acts on the smooth vectors of `π` through `conjAtSplit w`, and `U_t` is the mean

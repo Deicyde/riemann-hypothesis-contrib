@@ -358,9 +358,9 @@ lemma rank_conjTranspose_eq {F m n : Type} [Field F] [StarRing F] [Fintype m] [F
     rank_eq_of_equiv_equiv star (e.submoduleMap W).toAddEquiv star_involutive.bijective
       (e.submoduleMap W).map_smulₛₗ
   calc Aᴴ.rank = (A.map star).rank := rank_transpose (A.map star)
-    _ = finrank F (W.map e.toLinearMap) := by rw [rank_eq_finrank_span_cols, h_span]
+    _ = finrank F (W.map e.toLinearMap) := by rw [← finrank_span_range_col, h_span]
     _ = finrank F W := (congrArg Cardinal.toNat h_rank).symm
-    _ = A.rank := (rank_eq_finrank_span_cols A).symm
+    _ = A.rank := finrank_span_range_col A
 
 /-- The columns of two matrices set side by side span the sum of the two column spaces. -/
 lemma colSpan_fromCols {K m n₁ n₂ : Type*} [CommRing K] [Fintype n₁] [Fintype n₂]
@@ -585,7 +585,7 @@ lemma rank_isotropicFramePair_add_finrank_commonIsotropic (γ : S.G E) :
     (isotropicFramePair γ).rank + finrank E (commonIsotropic γ) = 2 * 𝔰.ϱ := by
   have h_one : finrank E (isotropicSpan (1 : Matrix 𝔰.BesselIndex 𝔰.BesselIndex E)) = 𝔰.ϱ :=
     finrank_isotropicSpan_coe (1 : S.G E)
-  rw [rank, ← colSpan, colSpan_isotropicFramePair, commonIsotropic,
+  rw [← finrank_range_mulVecLin, ← colSpan, colSpan_isotropicFramePair, commonIsotropic,
     Submodule.finrank_sup_add_finrank_inf_eq, h_one, finrank_isotropicSpan_coe, two_mul]
 
 /-- Let `A = ⟨e_1, …, e_ϱ⟩`. The rank of `A + γ A`, which is the column space of
@@ -596,7 +596,7 @@ lemma rank_add_finrank_isotropicPerp (γ : S.G E) :
   have h_unit : IsUnit S.ratGram.det := (isUnit_iff_isUnit_det _).1 Floors.IsHermitianUnit.isUnit
   have h_rank : ((isotropicFramePair γ)ᴴ * S.ratGram).rank = (isotropicFramePair γ).rank := by
     rw [rank_mul_eq_left_of_isUnit_det _ _ h_unit, rank_conjTranspose_eq]
-  rw [← h_rank, Shape.r, ← finrank_fintype_fun_eq_card E]
+  rw [← h_rank, Shape.r, ← finrank_fintype_fun_eq_card E, ← finrank_range_mulVecLin]
   exact ((isotropicFramePair γ)ᴴ * S.ratGram).mulVecLin.finrank_range_add_finrank_ker
 
 /-- The rank of `link γ` plus the rank of `commonIsotropic γ` (the space `I_γ = A ∩ γ A`, with

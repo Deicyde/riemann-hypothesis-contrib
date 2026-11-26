@@ -365,10 +365,10 @@ lemma eventually_trace_frob_eq_of_hasLiftHeckePolynomial (ι : PadicIso ℓ) [De
       heckeCoeff θ₀.val.1 ∅ x.place * heckeCoeff θ.val.1 ∅ x.place := by
     simp [θ₀, θ, HasWeight.toAlgebraic, field, HeckeChar.atUniformizer, heckeCoeff, hμ, ← ha,
       AutChar.frobValue, zpow_sub₀, Exchange.spaceChar_rankTwist n_even, FinPlace.coe_q_eq_sq_sqrt,
-      pow_sub₀, O.rank_lt.le]
+      pow_sub₀, O.rank_lt.le, IsDedekindDomain.HeightOneSpectrum.ne_bot]
     ring
   have ν_ne : V.charW.frobValue r x.place ≠ 0 := by
-    simp [AutChar.frobValue, HeckeChar.atUniformizer]
+    simp [AutChar.frobValue, HeckeChar.atUniformizer, IsDedekindDomain.HeightOneSpectrum.ne_bot]
   have normalised_eq : (V.charW.frobValue r x.place)⁻¹ * -(H x.place).coeff (card n - 1) =
       heckeCoeff θ₀.val.1 ∅ x.place * heckeCoeff θ.val.1 ∅ x.place * b x.place 1 +
         ∑ e ∈ .range V.rankDiff, (x.place.q : ℂ) ^ e := by

@@ -605,7 +605,7 @@ instance [IsMulRightInvariant μ] : IsInvInvariant μ := by
   -- `K = K₀ ∪ K₀⁻¹`; the factors agree because `K` is symmetric.
   obtain ⟨K₀⟩ : Nonempty (TopologicalSpace.PositiveCompacts G) := inferInstance
   let K : TopologicalSpace.PositiveCompacts G := K₀ ⊔ K₀.map _ continuous_inv (isOpenMap_inv G)
-  have h_mass : μ.inv K = μ K := by simp [K, union_comm]
+  have h_mass : μ.inv K = μ K := by simp [K, union_comm, ← Set.inv_preimage, preimage_preimage]
   constructor
   calc
     μ.inv = μ.inv K • haarMeasure K := haarMeasure_unique _ K

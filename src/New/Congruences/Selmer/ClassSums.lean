@@ -333,7 +333,7 @@ theorem exists_isTwistMeasure_of_z_eq_one {p : D.CriticalPair} (h_ram : p.IsRami
         ((p.character * ϑ.toAutChar * upsilonU1 ^ 1).frobValue (Fin 2) v)⁻¹ * Λ ϑ :=
       detPeriod_mul_upsilonU1_insert hv hQ hχ hψ
     simp [h_period, ↓← mul_conj', AutChar.frobValue, AutChar.spaceChar, ← ofReal_pow,
-      prod_range, inv_eq_conj, prod_mul_distrib]
+      prod_range, inv_eq_conj, prod_mul_distrib, IsDedekindDomain.HeightOneSpectrum.ne_bot]
     ring
   · -- Compare `Λ_twist` at `ϑ` and at `1`: the two values of `lValueProd` differ by the factor
     -- in `lValueProd_eq_mul_prod_ratio_sq`, and `C ≠ 0` cancels.

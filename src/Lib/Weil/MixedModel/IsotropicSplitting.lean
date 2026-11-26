@@ -744,7 +744,7 @@ lemma exists_levi_mul_radicalElement_eq :
   refine ⟨two, toAdele (3⁻¹ : E) • b, ?_⟩
   rw [levi_conj_radicalElement, radicalElement_mul]
   -- Both sides are a unipotent element times `levi (two, 1)`; compare the unipotent factors.
-  congr 1
+  refine congrArg (· * D.levi (two, 1)) ?_
   refine ext_adeleMatrix ?_
   -- Expand both matrices and compare the scalar coefficients of each term.
   simp [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc, two]

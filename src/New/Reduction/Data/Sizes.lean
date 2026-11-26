@@ -44,13 +44,13 @@ variable {P : Parameters} (D : Data P)
 /-- The scales `x = exp logX` (the length of the prime sum) and `x₁ = exp logX₁` of admissible data
 satisfy `x ^ 10⁶ ≤ x₁`. -/
 lemma x_pow_le_x₁ : D.x ^ 1000000 ≤ D.x₁ := by
-  rw [← exp_nat_mul, exp_le_exp]
+  rw [← exp_natCast_mul, exp_le_exp]
   push_cast
   linarith [D.logX_le_logX₁]
 
 /-- The scales `x₁ = exp logX₁` and `b = exp logB` of admissible data satisfy `x₁ ^ 10⁶ ≤ b`. -/
 lemma x₁_pow_le_b : D.x₁ ^ 1000000 ≤ D.b := by
-  rw [← exp_nat_mul, exp_le_exp]
+  rw [← exp_natCast_mul, exp_le_exp]
   push_cast
   linarith [D.logX₁_le_logB]
 
@@ -87,7 +87,7 @@ power of `3` above `27 s` and `s` is the exponent of the tower. -/
 lemma x₁_pow_le_sqrt_b : D.x₁ ^ (3 * l₀ D.towerExp ^ 2) ≤ √D.b := by
   have hl₀_le : (l₀ D.towerExp : ℝ) ≤ 81 * D.towerExp := mod_cast l₀_le_mul D.towerExp_ne_zero
   have h_logX₁_pos : 0 < D.logX₁ := HasLogBound.pos D
-  rw [x₁, b, ← exp_nat_mul, ← exp_half, exp_le_exp]
+  rw [x₁, b, ← exp_natCast_mul, ← exp_half, exp_le_exp]
   push_cast
   -- By sizes: `s ≤ 32 log x`, `log x ≤ log x₁`, `(log x₁) ^ 6 ≤ log b`, and `log x₁` is large.
   calc 3 * (l₀ D.towerExp : ℝ) ^ 2 * D.logX₁ ≤ 3 * (81 * D.towerExp) ^ 2 * D.logX₁ := by gcongr
@@ -152,9 +152,9 @@ lemma q₂_le : (P.q₂ D.towerExp : ℝ) ≤ D.x ^ (33 * (P.q₀ * P.d)) := by
       gcongr
       linarith [add_one_le_exp ((P.q₀ * P.d : ℕ) : ℝ)]
     _ = exp ((D.towerExp + 6) * (P.q₀ * P.d : ℕ)) := by
-      rw [← exp_nat_mul, Nat.cast_add, Nat.cast_ofNat]
+      rw [← exp_natCast_mul, Nat.cast_add, Nat.cast_ofNat]
     _ ≤ exp (33 * D.logX * (P.q₀ * P.d : ℕ)) := by gcongr
-    _ = D.x ^ (33 * (P.q₀ * P.d)) := by simp [← exp_nat_mul, mul_right_comm]
+    _ = D.x ^ (33 * (P.q₀ * P.d)) := by simp [← exp_natCast_mul, mul_right_comm]
 
 /-- The class number `h_E` of the CM field `E` of admissible data satisfies `log h_E ≤ x ^ 30`,
 where `x = exp logX` is the length of the prime sum. -/
@@ -187,12 +187,12 @@ lemma a_div_x₁_mem_Icc : (D.a : ℝ) / D.x₁ ∈ Icc (D.x ^ 999) (D.b / D.x ^
   -- The logarithms of the three terms are linear in `log x`, `log x₁` and `log b`.
   rw [h_quotient]
   constructor
-  · calc D.x ^ 999 = exp (999 * D.logX) := by simp [← exp_nat_mul]
+  · calc D.x ^ 999 = exp (999 * D.logX) := by simp [← exp_natCast_mul]
       _ ≤ exp (D.logX + D.logB - D.logX₁) :=
         exp_le_exp.2 (by linarith [D.logX_le_logX₁, D.logX₁_le_logB])
   · calc exp (D.logX + D.logB - D.logX₁)
         ≤ exp (D.logB - 999 * D.logX) := exp_le_exp.2 (by linarith [D.logX_le_logX₁])
-      _ = D.b / D.x ^ 999 := by simp [exp_sub, ← exp_nat_mul]
+      _ = D.b / D.x ^ 999 := by simp [exp_sub, ← exp_natCast_mul]
 
 /-! ### Primes, levels and the number `Ω`
 

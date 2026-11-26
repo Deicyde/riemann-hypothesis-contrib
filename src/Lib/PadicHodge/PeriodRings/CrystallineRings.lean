@@ -808,7 +808,6 @@ lemma BPlus.eq_zero_of_forall_pow_dvd (a : Ainf)
         rfl
       exact (BPlus.isUnit_p.pow l).mul_left_cancel h_mul
     refine ⟨e, injective_Amax_BPlus ?_⟩
-    show (c : BPlus) = ((aeval Amax.xiDivP ((.X - C a) ^ m) * e : Amax) : BPlus)
     rw [hw, hw_eq, algebraMap.coe_mul]
   -- a nonzero polynomial is not divisible by `X - a` to its root multiplicity plus one
   have hFc_ne : F c ≠ 0 := fun h_zero ↦ hc ((hF_ker c).mpr h_zero)

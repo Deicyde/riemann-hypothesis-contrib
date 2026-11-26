@@ -252,7 +252,7 @@ lemma norm_weylRep_mulVec_det_smul_weylEval_le_one {p : ℕ} [Fact p.Prime] [Pad
     exact norm_adeleExtension_le_one _ (hY τ).det_mem
   have h_entry (τ : InfinitePlace E) (i j : n) : ‖((gInv τ).val * (Y₀p τ).val) i j‖ ≤ 1 := by
     -- Without `map_inv` the inverse of `g` stays inside the image under the embedding.
-    simpa [gInv, Y₀p, mul_apply, -map_inv] using
+    simpa [gInv, Y₀p, Matrix.mul_apply, -map_inv] using
       norm_adeleExtension_le_one (weightEmbedding ιₚ τ) (hY₀ i j)
   have h_prod : ∏ τ, ‖(d τ).val‖ ≤ 1 :=
     Finset.prod_le_one₀ (fun τ _ ↦ norm_nonneg _) fun τ _ ↦ h_det τ
@@ -913,7 +913,13 @@ lemma ramifyingOp_empty {P : Parameters} (D : Data P) : D.ramifyingOp ∅ = 1 :=
 lemma ramifyingOp_cons {P : Parameters} (D : Data P) (w : D.piNPlaces) {s : Finset D.piNPlaces}
     (hw : w ∉ s) :
     D.ramifyingOp (cons w s hw) = (1 - D.centralRep (D.scalingGenerator w)) * D.ramifyingOp s := by
-  simp [ramifyingOp]
+  -- The ring map lemmas are applied through `toRingHom`: the instance search behind `map_mul`
+  -- for `D.centralRep.asAlgebraHom` times out.
+  let φ := D.centralRep.asAlgebraHom
+  rw [ramifyingOp, ramifyingOp, Finset.prod_cons,
+    show ∀ x y, φ (x * y) = φ x * φ y from φ.toRingHom.map_mul,
+    show ∀ x y, φ (x - y) = φ x - φ y from φ.toRingHom.map_sub,
+    show φ 1 = 1 from φ.toRingHom.map_one, Representation.asAlgebraHom_of]
 
 /-- For admissible data `D`, let `s` be a finite set of primes of `E` dividing `π = D.piN`, where
 `π π̄ = N` is the prime `D.N`. For `w ∈ s` the chosen scaling `z_w = D.scalingGenerator w` acts on
@@ -989,7 +995,12 @@ lemma span_isShort_eq_top {P : Parameters} (D : Data P) :
     simp [n]
   have h_bound : 4 ^ D.f * (6 * (D.q₁ * P.d) * (D.f * D.k) ^ 2 : ℝ) ^
       (6 * (D.k * D.f + D.f * D.a)) ≤ D.errorUnit.exp :=
-    Real.le_exp_of_log_le D.le_of_hasLogBound
+    Real.le_exp_of_log_le <| D.le_of_hasLogBound (h_exp := by
+      obtain ⟨⟨_, _, _, _⟩, _, _, _, _, _⟩ := New.Data.scale_inequalities' D
+      -- `scale_arith D` splits the `max`es into too many cases; distribute them instead
+      simp only [Bool.false_eq_true, ↓reduceIte, Nat.cast_ofNat, neg_zero, ← max_add_add_right,
+        ← max_add_add_left, ← max_sub_sub_right, max_lt_iff]
+      constructorm* _ ∧ _ <;> linarith)
   have h_rank : Fintype.card (D.X 0) = D.k := by rw [card_X, n, zero_mul, add_zero]
   refine New.span_isShort_eq_top D.classAut_levelX_zero_eq_bot P.conductor_mem_differentIdeal
     (Nat.add_le_add_left h_boxes _) ?_

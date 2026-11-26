@@ -98,7 +98,7 @@ lemma New.IsBesselFunction.integral_mul_conj_eq {𝔰 : Shape} {I : Type} [Finty
       simp [R, hW.map_unitary_mul, mulVec, dotProduct, Finset.sum_mul, Finset.mul_sum, mul_assoc,
         mul_comm (conj (W y _))]
     calc (R * M * star R) p q
-        = ∑ l, ∑ k, R p k * M k l * conj (R q l) := by simp [mul_apply, Finset.sum_mul]
+        = ∑ l, ∑ k, R p k * M k l * conj (R q l) := by simp [Matrix.mul_apply, Finset.sum_mul]
       _ = ∫ y, ∑ l, ∑ k, R p k * (W y k * conj (W y l)) * conj (R q l) ∂besselQuotMeasure := by
         simp (disch := fun_prop) only [M, of_apply, integral_finsetSum, integral_mul_const,
           integral_const_mul]
@@ -213,5 +213,5 @@ theorem New.IsCutPair.lintegral_sq_inner_cut_le {𝔰 : Shape} {I : Type} [Finty
       _ = ∑ i, conj (v i) * v i * c := by simp [h_scalar]
       _ = ((c * ‖v‖ ^ 2 : ℝ) : ℂ) := by
           simp [conj_mul', PiLp.norm_sq_eq_of_L2, Finset.sum_mul, mul_comm (c : ℂ)]
-  grw [lintegral_enorm_sq (h_int.const_inner v) (h_memLp_top.const_inner v), h_integral, hc_le,
-    one_mul, ENNReal.ofReal_pow (norm_nonneg v), ofReal_norm]
+  grw [lintegral_enorm_sq (h_int.const_inner (𝕜 := ℂ) v) (h_memLp_top.const_inner (𝕜 := ℂ) v),
+    h_integral, hc_le, one_mul, ENNReal.ofReal_pow (norm_nonneg v), ofReal_norm]

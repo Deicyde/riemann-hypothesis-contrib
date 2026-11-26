@@ -416,12 +416,12 @@ lemma HasPartitions.isCohomDense_partition (hF : HasPartitions ι F) (e : ι A)
     hF.exists_quotient _ _ he.one_sub fun h_eq ↦ he_ne_zero (sub_eq_self.mp h_eq)
   obtain ⟨hπ_proj, hπ_rep⟩ : Projective (freeAb (elemKillingMaps e).toFunctor) ∧
       Bijective fun s : freeAb (elemKillingMaps e).toFunctor ⟶ F ↦
-        s B (FreeAbelianGroup.of ⟨⟨π⟩, π_kill⟩) :=
+        s B (FreeAddCommGroup.of ⟨⟨π⟩, π_kill⟩) :=
     projective_and_eval_bijective F _
       (pointMap_bijective_of_existsUnique (elemKillingMaps e) ⟨_, π_kill⟩ π_univ)
   obtain ⟨hρ_proj, hρ_rep⟩ : Projective (freeAb (elemKillingMaps (1 - e)).toFunctor) ∧
       Bijective fun s : freeAb (elemKillingMaps (1 - e)).toFunctor ⟶ F ↦
-        s E (FreeAbelianGroup.of ⟨⟨ρ⟩, ρ_kill⟩) :=
+        s E (FreeAddCommGroup.of ⟨⟨ρ⟩, ρ_kill⟩) :=
     projective_and_eval_bijective F _
       (pointMap_bijective_of_existsUnique (elemKillingMaps (1 - e)) ⟨_, ρ_kill⟩ ρ_univ)
   -- The ring of `A` is the product of the rings of `B` and `E`.

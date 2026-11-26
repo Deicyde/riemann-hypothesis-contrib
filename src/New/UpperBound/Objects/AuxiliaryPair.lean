@@ -1120,7 +1120,8 @@ lemma card_levelModulus_residueRing (X : LevelPlaces E) (e : ℕ) :
       (∏ i : X.ChosenIndex, (X.chosenPlace i).q) ^ e * ∏ i : X.TwistIndex, (X.twistPlace i).q := by
   -- The cardinality of the residue ring is the absolute norm of the ideal, which is multiplicative.
   rw [card_eq_nat_card]
-  change Ideal.absNorm (X.levelModulus e).ideal = _
+  change Nat.card (_ ⧸ (X.levelModulus e).ideal) = _
+  rw [← Ideal.absNorm_eq_natCard]
   simp [levelModulus]
 
 variable (N)

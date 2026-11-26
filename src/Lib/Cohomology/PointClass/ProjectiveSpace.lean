@@ -219,7 +219,7 @@ def stdChart : EtaleChart d (projSpace k d) where
   coordRing := of k (MvPolynomial (Fin d) k)
   point := affinePoint i X
   coordinate := X
-  etale := by simpa using .containsIdentities _
+  etale := by simpa [aeval_X_left] using .containsIdentities _
   injective A φ ψ h := by
     -- The `i`-th coordinate is `1`, so the minors that involve it compare the other coordinates.
     ext j

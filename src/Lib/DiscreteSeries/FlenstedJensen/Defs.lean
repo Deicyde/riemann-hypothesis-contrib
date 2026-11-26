@@ -83,7 +83,7 @@ def expU {J : Matrix n n ℂ} (X : unitaryLie J) : U J where
     have h_semiconj : SemiconjBy J X.1 (-X.1ᴴ) :=
       (eq_neg_of_add_eq_zero_right X.2).trans (neg_mul X.1ᴴ J).symm
     -- `using!`: the two sides differ in the topology instance under which `exp` is taken.
-    simpa [U, ← exp_conjTranspose] using! h_semiconj.exp_neg_mul_mul_exp_eq_self
+    simpa [mem_U, ← exp_conjTranspose] using! h_semiconj.exp_neg_mul_mul_exp_eq_self
 
 /-! ### Parameters and weights -/
 
@@ -426,7 +426,7 @@ def holMinorsPi (h : Φ → USign ε) : ℂ := ∏ τ : Φ, holMinors ε (u τ) 
 of U(diag ε). -/
 def diagTorus (t : n → Circle) : USign ε :=
   ⟨IsUnit.unit (a := diagonal fun i ↦ t i) (by simp [Pi.isUnit_iff]),
-    by simp [U, signMatrix, field, ← Circle.coe_inv_eq_conj]⟩
+    by simp [mem_U, signMatrix, field, ← Circle.coe_inv_eq_conj]⟩
 
 end New
 

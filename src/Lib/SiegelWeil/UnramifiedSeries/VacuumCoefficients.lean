@@ -475,7 +475,7 @@ lemma stepWeight_le {M : ℕ} (h_rank : 2 * card n < M) (w : FinPlace E) :
     _ ≤ √w.q / ((w.q - 1) * √w.q) := by
         gcongr
         exact Real.le_sqrt_of_sq_le (by exact_mod_cast card_neighbourResidues_sq_le)
-    _ = (w.q - 1 : ℝ)⁻¹ := by field_simp
+    _ = (w.q - 1 : ℝ)⁻¹ := by field_simp [(Real.sqrt_pos.2 (by linarith : (0 : ℝ) < w.q)).ne']
 
 omit [DecidableEq n] in
 /-- For `2 n < M` the weights `stepWeight n M` of the steps at a place `w` and its conjugate add up

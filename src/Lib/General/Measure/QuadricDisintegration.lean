@@ -513,7 +513,7 @@ lemma lintegral_iSup_fibre_lt_top {K : Set (Fin 2 ⊕ ι → A)} (hK : IsCompact
   let x (a : skewAdjoint A) : Fin 2 ⊕ ι → A := flatChart T b (p, a)
   by_cases hpK : p ∈ K₁ ×ˢ K₂
   · have h_vol : (P.modulus hp.unit)⁻¹ * volume C ≤ ‖g p.1 * √N‖ₑ ^ 2 := by
-      simpa [mul_pow, ← enorm_pow] using mul_le_mul' (hg hp.unit) hN.le
+      simpa [mul_pow, ← eNorm_pow] using mul_le_mul' (hg hp.unit) hN.le
     rw [indicator_of_mem hpK]
     refine skewMeasure_le_of_sub_mem hp.unit (fun a ha a' ha' ↦ ?_) h_vol
     -- The first coordinate of the chart point is affine in `a`, with slope `p.1`.

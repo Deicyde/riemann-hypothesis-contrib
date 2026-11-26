@@ -327,7 +327,8 @@ lemma Space.nonempty_cuspFrame (W : Space E n s) {θ κ : ℝ}
         (rank_of_apply_min e star_indep i.castSucc)
     have rank_right : (X i.rev).rank = i.rev + 1 :=
       (rank_transpose _).trans (rank_of_apply_min e hy_indep i.rev.castSucc)
-    rw [← card_sub_rank_eq_finrank_ker, rank_left, ← rank, rank_right, hk, Fin.val_rev]
+    rw [← card_sub_rank_eq_finrank_ker, rank_left, finrank_range_mulVecLin, rank_right, hk,
+      Fin.val_rev]
     omega
   exact ⟨{
     isotropicCols := X i, perpCols := X i.rev, lengthX := α i.castSucc, lengthY := α i.rev.castSucc

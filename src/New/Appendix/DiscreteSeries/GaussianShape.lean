@@ -283,7 +283,7 @@ lemma flenstedJensen_div_exp_sub {y : Matrix n n ℂ} {θ : ℂ} {r : maxCompact
       (‖weightMinors l.lowestKType k‖ ^ 2 * Real.exp (-q) : ℝ) * (cexp (r k) - 1) =
         F k / cexp θ - (‖weightMinors l.lowestKType k‖ ^ 2 : ℝ) * Real.exp (-q) := by
     simp only [F, h_denom, one_mul, mul_conj', exp_sub, ofReal_mul, ofReal_pow, ofReal_exp,
-      ofReal_neg, exp_neg]
+      ofReal_neg, Complex.exp_neg]
     field_simp
   have h_sq : Integrable (fun k : maxCompactU ε ↦
       ((‖weightMinors l.lowestKType k‖ ^ 2 : ℝ) * Real.exp (-q) : ℂ)) (haarK ε) :=

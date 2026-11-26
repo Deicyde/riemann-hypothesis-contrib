@@ -346,7 +346,8 @@ lemma integral_classCutoff_integral_mul [WeilData E]
   calc _ = ∫ x, (S.classCutoff c (h.realHomeomorph x)).toReal • ∫ s, F (s, x) ∂haar := by
         simp only [F, smul_mul_assoc, ← integral_mul_const, mul_assoc, mul_left_comm (W _)]
     _ = ∫ s, (S.classCutoff c (h.realHomeomorph s.1)).toReal • (∫ x, F (s, x)) ∂haar :=
-        integral_cutoff_swap volume haar (h.classUnipotentToReal c) (by fun_prop)
+        integral_cutoff_swap volume haar (h.classUnipotentToReal c)
+          (β := fun x ↦ S.classCutoff c (h.realHomeomorph x)) (by fun_prop)
           (h.tsum_classCutoff_realHomeomorph c) (by fun_prop) hF_inv hF_int
     _ = _ := by simp only [h_fix]
 

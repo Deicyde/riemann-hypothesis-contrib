@@ -300,7 +300,10 @@ lemma IsEigenQuotient.exists_sum_baseChange_eq_zero_of_jump_eq_zero [Fintype ι]
   let Φ (v : ℤ) (L : List σ) :
       End (PadicAlgCl ℓ) (∀ i, hodgeTateMaps (ρ i) (toAlgHom ..) v) :=
     piMap fun i ↦ hodgeTateMaps.pull (L.map (T i)).prod
-      (by simp [← End.mul_apply, (Commute.list_prod_left ..).eq, *])
+      (.of_forall fun g x ↦ by
+        rw [← mul_apply_eq_comp, ← mul_apply_eq_comp, (Commute.list_prod_left _ _ fun t ht ↦ by
+          obtain ⟨s, -, rfl⟩ := List.mem_map.1 ht
+          exact hTρ i s g).eq])
   have h_alg : Algebra.IsAlgebraic ℤ_[ℓ] ℚ_[ℓ] := IsLocalization.isAlgebraic ℚ_[ℓ] ℤ_[ℓ]⁰
   have h_no_eigen (f : ∀ i : ι, hodgeTateMaps (ρ i) (toAlgHom ℤ_[ℓ] ℚ_[ℓ] ℂ_[ℓ]) u)
       (hf : ∀ s : σ, Φ u [s] f = (a ∘ θ) s • f) : f = 0 := by
