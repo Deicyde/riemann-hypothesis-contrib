@@ -107,7 +107,6 @@ lemma integralFormsAt_one_le :
     _ ≤ 1 := h_integral g
 
 -- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- For every finite adelic point `c` there is a rational point `γ` such that `γ c δ_0^∨` is
 integral above `N` and `γ c δ_0` is `diag (1, …, 1, N)` at `Σ_N` times an element integral above
 `N`. Here `δ_0 = D.diagPointN 0` and `δ_0^∨ = D.dualPointN 0`. -/
@@ -179,7 +178,6 @@ lemma colengthDvd_integralFormsAt_diagPointN :
     _ ≤ 1 := (pi_norm_le_iff_of_nonempty _).2 fun w ↦ (y (c, w)).prop
 
 -- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- The operator `Up = upOperator (D.formRepAtN 0)`, a sum of right translates with roots of unity
 as coefficients (see `upOperator_mem_sourceForm`), maps `𝒜^L`, the source forms integral at
 `D.diagPointN 0`, to `𝒜^∨`, those integral at `D.dualPointN 0`. -/
