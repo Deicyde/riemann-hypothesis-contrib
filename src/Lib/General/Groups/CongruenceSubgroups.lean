@@ -135,7 +135,8 @@ deriving instance Countable, LocallyCompactSpace, BorelSpace for Matrix m n R
 end
 
 /-- The product measure on matrices, over Mathlib's `σ`-algebra `Matrix.instMeasurableSpace`. -/
-instance [Fintype m] [Fintype n] [MeasureSpace R] : MeasureSpace (Matrix m n R) where
+instance instMeasureSpaceMatrix [Fintype m] [Fintype n] [MeasureSpace R] :
+    MeasureSpace (Matrix m n R) where
   volume := (volume : Measure (m → n → R))
 
 /-! ### Special matrices -/
