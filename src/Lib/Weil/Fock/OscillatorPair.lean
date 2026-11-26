@@ -387,7 +387,8 @@ lemma isUnitaryRep_detTwist {a : ℝ}
     positivity
   · -- The determinant has modulus one, and the multiplier grows at most like `‖f g‖ ^ card C`.
     calc ‖detTwist f γ g‖ = ‖realWeil (f g)‖ := by simp [norm_smul]
-      _ ≤ ‖(vacVector : fockSpace ε')‖ * ‖realMultiplier (f g)‖ := norm_weilRep_le (realAction ε') (f g)
+      _ ≤ ‖(vacVector : fockSpace ε')‖ * ‖realMultiplier (f g)‖ :=
+        norm_weilRep_le (realAction ε') (f g)
       _ ≤ ‖(vacVector : fockSpace ε')‖ * a ^ card C * ‖(g : Matrix R R ℂ)‖ ^ card C := by
         grw [mul_assoc, ← mul_pow, norm_realMultiplier_le, h_norm]
 

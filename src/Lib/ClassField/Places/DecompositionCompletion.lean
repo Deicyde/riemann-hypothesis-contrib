@@ -500,12 +500,12 @@ def cocycleKer [Monoid R] [DistribMulAction R M] (a : G →* R)
   Subgroup.ofDiv (x ⁻¹' {0})
     -- `x 1 = x 1 + x 1` gives `x 1 = 0`
     ⟨1, by
-      show x 1 = 0
+      change x 1 = 0
       have h1 := c 1 1
       rwa [mul_one, map_one, one_smul, left_eq_add] at h1⟩
     -- `x g = x (g * k⁻¹) + a (g * k⁻¹) • x k`, with `x g = 0` and `x k = 0`
     (fun g (hg : x g = 0) k (hk : x k = 0) ↦ by
-      show x (g * k⁻¹) = 0
+      change x (g * k⁻¹) = 0
       have h := c (g * k⁻¹) k
       rw [inv_mul_cancel_right, hg, hk, smul_zero, add_zero] at h
       exact h.symm)
