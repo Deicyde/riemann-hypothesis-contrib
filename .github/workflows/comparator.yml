@@ -1,10 +1,12 @@
-name: formal-conjectures
+name: comparator
 
-# The second Comparator setup, comparator/formal-conjectures.json: see verification/NOTES.md.
-# This checks that the challenge files are unchanged and that the challenge is
-# formal-conjectures' text, exports it and compares the checksum, and rehearses the judge with a
-# placeholder for src/Main.lean. It is not a verdict on the proof, and it runs on GitHub-hosted
-# runners.
+# What can be checked of the two Comparator setups without the built proof. The first is
+# Challenge.lean, comparator.json and export-targets.txt at the root; the second is in
+# comparator/, and comparator/README.md describes it. This exports both challenges and compares
+# the checksums, checks that the second challenge is formal-conjectures' text, and rehearses the
+# judge for both setups with a placeholder for src/Main.lean. It is not a verdict on the proof,
+# and it runs on GitHub-hosted runners.
+# Whether a pull request changes a Comparator challenge file is checked in challenge-files.yml.
 
 # The job reads only the files listed under `paths`, so it runs when one of those changes: on
 # pull requests, on main, and by manual dispatch. Other changes cannot alter its result. Keep
@@ -15,33 +17,39 @@ on:
   push:
     branches: [main]
     paths:
+      - Challenge.lean
+      - comparator.json
+      - export-targets.txt
       - comparator/**
       - src/Statements.lean
       - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
-      - .github/workflows/formal-conjectures.yml
+      - .github/workflows/comparator.yml
   pull_request:
     branches: [main]
     paths:
+      - Challenge.lean
+      - comparator.json
+      - export-targets.txt
       - comparator/**
       - src/Statements.lean
       - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
-      - .github/workflows/formal-conjectures.yml
+      - .github/workflows/comparator.yml
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: formal-conjectures-${{ github.event.pull_request.number || github.ref }}
+  group: comparator-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  formal-conjectures:
-    name: formal-conjectures' text, the challenge's checksum, and a rehearsal of the judge
+  rehearsal:
+    name: Both challenges' checksums, formal-conjectures' text, and a rehearsal of the judge
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -49,7 +57,8 @@ jobs:
       MATHLIB_CACHE_GET_URL: https://cache.mathlib.org/mathlib4   # as in build.yml
       FC_REV: d8d031d4998c78575159ccab9a7a9e95ce043883
     steps:
-      # Of the proof's source, only Statements.lean, which the bridge imports.
+      # Of the proof's source, only Statements.lean, which holds the solution's copy of the
+      # definitions in Challenge.lean and which the bridge imports.
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -57,34 +66,16 @@ jobs:
             /lakefile.toml
             /lake-manifest.json
             /lean-toolchain
+            /Challenge.lean
+            /comparator.json
+            /export-targets.txt
             /comparator/
             /src/Statements.lean
           sparse-checkout-cone-mode: false
 
-      # These three files say what the proof is judged against in this setup, so a pull request
-      # may not change them. They are the files of branch `alpoge`, byte for byte: these are
-      # their Git blob hashes there.
-      - name: The challenge files are unchanged
-        run: |
-          status=0
-          while read -r want path; do
-            have=$(git hash-object "$path")
-            if [ "$have" = "$want" ]; then
-              echo "unchanged: $path"
-            else
-              echo "::error file=$path::This pull request changes $path, a Comparator challenge file."
-              status=1
-            fi
-          done <<'EOF'
-          290a2c6270f8da3852c7051d7da0f30032a70421 comparator/FormalConjecturesChallenge.lean
-          e3afddc98129d1d1183ff217d434165fd893a0fe comparator/formal-conjectures.json
-          80bbbf91461783bb8e7f0bb8061b792668d4140a comparator/formal-conjectures-export-targets.txt
-          EOF
-          exit "$status"
-
-      # The challenge is a copy, so that it is built against this project's Mathlib and not
-      # formal-conjectures'. This ties the copy to the text it was taken from.
-      - name: The challenge is formal-conjectures' text at the pinned commit
+      # The second challenge is a copy, so that it is built against this project's Mathlib and
+      # not formal-conjectures'. This ties the copy to the text it was taken from.
+      - name: The second challenge is formal-conjectures' text at the pinned commit
         run: |
           grep -q "$FC_REV" comparator/FormalConjecturesChallenge.lean
           python3 - <<'PY'
@@ -153,9 +144,14 @@ jobs:
       - name: Fetch Mathlib's official build cache
         run: lake exe mathlib/cache get
 
-      # The first step under "Checking it" in the notes.
-      - name: Compile and export the challenge
+      # Both are exported before either checksum is compared, so a change of pins shows both new
+      # checksums in one run. Lake warns that Challenge.lean has no `module` header; it is the
+      # file as it was written for the first version of this repository.
+      - name: Compile and export both challenges
         run: |
+          lake build Challenge
+          lake env leanexport Challenge -- $(cat export-targets.txt) > "$RUNNER_TEMP/challenge.export"
+
           mkdir -p .lake/comparator
           lake env lean --root=comparator \
             -o .lake/comparator/FormalConjecturesChallenge.olean comparator/FormalConjecturesChallenge.lean
@@ -163,62 +159,77 @@ jobs:
             -- $(cat comparator/formal-conjectures-export-targets.txt) > "$RUNNER_TEMP/fc-challenge.export"
 
           cd "$RUNNER_TEMP"
-          sum=$(sha256sum fc-challenge.export | cut -d' ' -f1)
-          echo "$sum  fc-challenge.export"
-          {
-            echo "### fc-challenge.export"
-            echo "- sha256: \`$sum\`"
-            echo "- size: $(wc -c < fc-challenge.export) bytes, $(wc -l < fc-challenge.export) lines"
-          } >> "$GITHUB_STEP_SUMMARY"
-          # The notes quote this checksum; fail if the export ever changes. A change of pins
-          # changes it, and the step summary then shows the new one.
-          # This is for Lean v4.37.0-rc1 and Mathlib 31ce06ea, the pins branch `alpoge` ended on:
-          # its CI checked the same value.
-          echo "d08f9a601253ac28f09d7a64f674fd4227e665d573eae437a582f41f0ecb262c  fc-challenge.export" \
+          for f in challenge.export fc-challenge.export; do
+            sum=$(sha256sum "$f" | cut -d' ' -f1)
+            echo "$sum  $f"
+            {
+              echo "### $f"
+              echo "- sha256: \`$sum\`"
+              echo "- size: $(wc -c < "$f") bytes, $(wc -l < "$f") lines"
+            } >> "$GITHUB_STEP_SUMMARY"
+          done
+          # comparator/README.md quotes these checksums; fail if either export ever changes. A
+          # change of pins changes them, and the step summary then shows the new ones.
+          # These are for Lean v4.37.0-rc1 and Mathlib 31ce06ea, the pins branch `alpoge` ended
+          # on: its CI checked the same two values.
+          printf '%s  %s\n' \
+            bb37c4bb518fe68a13f12aa3929dd62dfecb663f0c063ad8c338e39601f28a60 challenge.export \
+            d08f9a601253ac28f09d7a64f674fd4227e665d573eae437a582f41f0ecb262c fc-challenge.export \
             | sha256sum -c
 
-      # The other two steps, rehearsed: `Main.lean` is replaced by a placeholder that assumes
-      # the two theorems the solution uses.
-      - name: Compile the solution against a placeholder Main, and export
+      # `Main.lean` is replaced by a placeholder: a module, as the real one is, that states the
+      # five theorems and assumes them. Its export is the first setup's solution, and the second
+      # setup's solution is compiled against it.
+      - name: Compile both solutions against a placeholder Main, and export
         run: |
           out=.lake/comparator
           lake build +Statements
-          printf '%s\n' 'import Statements' \
+          printf '%s\n' 'module' '' 'public import Statements' '' '@[expose] public section' '' \
             'theorem riemannHypothesis : RiemannHypothesis := sorry' \
+            'theorem riemannZeta_eq_zero_re : RiemannZetaZerosOnLine := sorry' \
+            'theorem LFunction_ne_zero_of_half_lt_re : DirichletLNonvanishingRightOfHalf := sorry' \
+            'theorem LFunction_eq_zero_re : DirichletLZerosOnLine := sorry' \
             'theorem LFunction_eq_zero_re_of_isPrimitive : PrimitiveDirichletLZerosOnLine := sorry' > "$RUNNER_TEMP/Main.lean"
           lake env lean --root="$RUNNER_TEMP" -o "$out/Main.olean" "$RUNNER_TEMP/Main.lean"
+          LEAN_PATH="$PWD/$out" lake env leanexport Main \
+            -- $(cat export-targets.txt) > "$RUNNER_TEMP/rehearsal.export"
           for m in FormalConjecturesStatement FormalConjecturesBridge FormalConjecturesSolution; do
             LEAN_PATH="$PWD/$out" lake env lean -DwarningAsError=true --root=comparator \
               -o "$out/$m.olean" "comparator/$m.lean"
           done
           LEAN_PATH="$PWD/$out" lake env leanexport FormalConjecturesSolution \
             -- $(cat comparator/formal-conjectures-export-targets.txt) > "$RUNNER_TEMP/fc-rehearsal.export"
-      # Not a verdict on the proof. Both exports were made above from files we trust, so the
-      # judge runs without its sandbox.
-      - name: Judge the rehearsal
+      # Not a verdict on the proof. The exports were made above from files we trust, so the judge
+      # runs without its sandbox.
+      - name: Judge the rehearsals
         run: |
           # `lake comparator` looks for the checkers bundled with Lean on PATH.
           PATH="$(lean --print-prefix)/bin:$PATH"
-          config="$PWD/comparator/formal-conjectures.json"
+          first="$PWD/comparator.json"
+          second="$PWD/comparator/formal-conjectures.json"
           mkdir "$RUNNER_TEMP/judge"
           cd "$RUNNER_TEMP/judge"
           judge() {
             lake comparator --inadvisably-no-sandbox --config "$1" \
-              --challenge-from-export "$RUNNER_TEMP/fc-challenge.export" \
-              --solution-from-export "$RUNNER_TEMP/fc-rehearsal.export"
+              --challenge-from-export "$RUNNER_TEMP/$2" --solution-from-export "$RUNNER_TEMP/$3"
           }
+          # rehearse <name> <config> <challenge export> <solution export>
+          rehearse() {
+            # With the real config the placeholder's `sorry` must be the one thing rejected: the
+            # statements, and the definitions they use, already match the challenge's.
+            if judge "$2" "$3" "$4" > "$1.log" 2>&1; then
+              cat "$1.log"
+              echo "$2 accepted a solution that uses sorry"
+              exit 1
+            fi
+            cat "$1.log"
+            grep -q "Illegal axiom detected: 'sorryAx'" "$1.log"
 
-          # With the real config the placeholder's `sorry` must be the one thing rejected:
-          # the statements already match the challenge's.
-          if judge "$config" > real.log 2>&1; then
-            cat real.log
-            echo "formal-conjectures.json accepted a solution that uses sorry"
-            exit 1
-          fi
-          cat real.log
-          grep -q "Illegal axiom detected: 'sorryAx'" real.log
-
-          # With `sorryAx` permitted as well, every kernel must accept the bridge.
-          python3 -c 'import json, sys; c = json.load(open(sys.argv[1])); c["permitted_axioms"].append("sorryAx"); json.dump(c, sys.stdout)' \
-            "$config" > rehearsal.json
-          judge rehearsal.json
+            # With `sorryAx` permitted as well, every kernel must accept. For the second setup
+            # that checks the bridge.
+            python3 -c 'import json, sys; c = json.load(open(sys.argv[1])); c["permitted_axioms"].append("sorryAx"); json.dump(c, sys.stdout)' \
+              "$2" > "$1.json"
+            judge "$PWD/$1.json" "$3" "$4"
+          }
+          rehearse first "$first" challenge.export rehearsal.export
+          rehearse second "$second" fc-challenge.export fc-rehearsal.export

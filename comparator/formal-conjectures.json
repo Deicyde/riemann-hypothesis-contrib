@@ -5,9 +5,11 @@
     "RiemannHypothesis.riemannHypothesis",
     "GRH.generalized_riemann_hypothesis"
   ],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
-  "external_kernels": {
-    "Lean paranoid": ["leanchecker-paranoid", "--silent", "--from-export"],
-    "nanoda": ["nanoda_bin"]
-  }
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": true
 }

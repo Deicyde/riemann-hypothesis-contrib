@@ -42,7 +42,7 @@ November 2025, in formal-conjectures pull requests
 [1184](https://github.com/google-deepmind/formal-conjectures/pull/1184), and mirefek corrected the
 docstring of `trivialZeros` in
 [1677](https://github.com/google-deepmind/formal-conjectures/pull/1677).
-`verification/NOTES.md` has the rest of the history.
+`comparator/README.md` has the rest of the history.
 
 Like the files it copies from, this file uses Lean's module system. That matters for the proof
 `by rfl` below: in a `module` it becomes the constant

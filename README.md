@@ -39,17 +39,17 @@ It keeps the published Lean source unchanged and provides a prebuilt cache for i
 | `LFunction_eq_zero_re` | every zero of L(χ, s) with 0 < Re s < 1 has Re s = 1/2 |
 | `LFunction_eq_zero_re_of_isPrimitive` | the special case of `LFunction_eq_zero_re` for primitive characters |
 
-[`src/Statements.lean`](src/Statements.lean) provides the statements of all of these theorems, and only imports Mathlib to state them. It is imported by both [`src/Main.lean`](src/Main.lean) and [`Challenge.lean`](Challenge.lean)
+[`src/Statements.lean`](src/Statements.lean) provides the statements of all of these theorems, and only imports Mathlib to state them. It is imported by [`src/Main.lean`](src/Main.lean).
 
-[`Challenge.lean`](Challenge.lean) imports *only* [`src/Statements.lean`](src/Statements.lean), and declares the same five theorems with `sorry` in place of the proofs.
+[`Challenge.lean`](Challenge.lean) imports *only* Mathlib. It repeats the four definitions of [`src/Statements.lean`](src/Statements.lean), and declares the same five theorems with `sorry` in place of the proofs.
 
-Comparator checks that `Main.lean` proves exactly those statements, that it uses no axioms other than `propext`, `Quot.sound` and
+Comparator checks that `Main.lean` proves exactly those statements, with the definitions as `Challenge.lean` has them, that it uses no axioms other than `propext`, `Quot.sound` and
 `Classical.choice`, and that Lean's kernel and nanoda both accept the proof.
 
 A second Comparator setup, in [`comparator/`](comparator/), takes as its challenge the Riemann
 Hypothesis and the Generalized Riemann Hypothesis as
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) states them.
-[`verification/NOTES.md`](verification/NOTES.md#formal-conjectures) describes it.
+[`comparator/README.md`](comparator/README.md) describes it.
 
 ## Cache
 

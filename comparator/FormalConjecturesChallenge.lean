@@ -46,7 +46,7 @@ docstring of `trivialZeros` in
 [1677](https://github.com/google-deepmind/formal-conjectures/pull/1677); and franzhusch added
 `riemannHypothesis` in
 [2378](https://github.com/google-deepmind/formal-conjectures/pull/2378).
-`verification/NOTES.md` has the rest of the history.
+`comparator/README.md` has the rest of the history.
 
 The file is frozen: a pull request that changes it fails CI.
 
