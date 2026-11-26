@@ -88,12 +88,6 @@ private lemma coeff_oFlat_mul (n : ℕ) (a b : OFlat) :
       Perfection.coeff (ModP OC p) p n a * Perfection.coeff (ModP OC p) p n b :=
   map_mul (Perfection.coeff (ModP OC p) p n) a b
 
-/-- The `n`-th coordinate of `O^♭` is additive on differences. -/
-private lemma coeff_oFlat_sub (n : ℕ) (a b : OFlat) :
-    Perfection.coeff (ModP OC p) p n (a - b) =
-      Perfection.coeff (ModP OC p) p n a - Perfection.coeff (ModP OC p) p n b :=
-  map_sub (Perfection.coeff (ModP OC p) p n) a b
-
 /-- For `h` near `g`, the elements `h • x` and `g • x` of the tilt have the same `n`-th coordinate
 modulo `p`: it comes from the translate of `x.untiltRoot n`, whose orbit map is continuous. -/
 lemma eventually_coeff_smul_eq (x : OFlat) (g : Gp p) (n : ℕ) :
@@ -142,8 +136,9 @@ private lemma continuous_smul_cFlat (y : CFlat) :
     refine v.restrict_lt_iff.mpr (not_le.mp fun ⟨t, ht⟩ ↦ hn ?_)
     have c_eq : t * (h • x - g • x) * e = c := by
       simpa [eq_div_iff, Algebra.smul_def, ← map_mul, ← map_sub] using ht
-    rw [← c_eq, coeff_oFlat_mul, coeff_oFlat_mul, coeff_oFlat_sub, h_coeff, sub_self, mul_zero,
-      zero_mul, map_zero]
+    rw [← c_eq, coeff_oFlat_mul, coeff_oFlat_mul]
+    erw [map_sub (Perfection.coeff (ModP OC p) p n)]
+    rw [h_coeff, sub_self, mul_zero, zero_mul, map_zero]
   obtain ⟨⟨c, e⟩, rfl⟩ := mk'_surjective OFlat⁰ y
   have h_div :
       Continuous ((fun g : Gp p ↦ g • (c : CFlat)) / fun g ↦ g • ((e : OFlat) : CFlat)) :=
@@ -490,32 +485,6 @@ lemma TateTwist.eventually_map_smul_sub_mem_smallPart {m : ℕ} {ρ : Rep ℤ_[p
   | h_add v w hv hw =>
     filter_upwards [hv, hw] with g hv_mem hw_mem
     simpa [add_sub_add_comm] using add_mem hv_mem hw_mem
-
-/-- Five facts about `M = W(C^♭) ⊗ ℤ_p/p^m(1)` and `S = W(𝔪^♭) • (1 ⊗ 1)` (`New.Lift.smallPart`) in
-one statement; the elements `1 ⊗ k`, with `k` in ℤ_p/p^m(1) (in (c) and in (d)), are the constants.
-They are (a) `TateTwist.pow_smul_eq_zero`, (b) `TateTwist.exists_eq_phi_smul_sub`, (c)
-`TateTwist.exists_sub_mk_one_mem_smallPart_of_phi_smul_sub_mem`, (d)
-`TateTwist.eq_zero_of_mk_one_mem_smallPart` and (e)
-`TateTwist.eventually_map_smul_sub_mem_smallPart`. -/
-lemma TateTwist.smallPart_spec {m : ℕ} {ρ : Rep ℤ_[p] Γ}
-    (h_near : ∀ y : ρ, ∀ᶠ g : GroupOverGp.G in nearOne Γ, ∃ w : ρ, ρ.ρ g y - y = p ^ m • w)
-    (L : DiagTensor ρ →ₗ[WittCFlat] DiagTensor (Rep.of (charRep (QuotSpan (p ^ m : ℤ_[p])) χ))) :
-    let S := smallPart m
-    (∀ d : DiagTensor (Rep.of (charRep (QuotSpan ((p : ℤ_[p]) ^ m)) χ)),
-      -- (a)
-      p ^ m • d = 0 ∧
-      -- (b)
-      (∃ e : DiagTensor (Rep.of (charRep (QuotSpan ((p : ℤ_[p]) ^ m)) χ)), d = φ • e - e) ∧
-      -- (c)
-      (φ • d - d ∈ S →
-       ∃ k : (Rep.of (charRep (QuotSpan ((p : ℤ_[p]) ^ m)) χ) : Type), d - DiagTensor.mk 1 k ∈ S)) ∧
-    -- (d)
-    (∀ k, DiagTensor.mk 1 k ∈ S → k = 0) ∧
-    -- (e)
-    ∀ v : DiagTensor ρ, ∀ᶠ g : GroupOverGp.G in nearOne Γ, L (inr g • v - v) ∈ S :=
-  ⟨fun d ↦ ⟨pow_smul_eq_zero d, exists_eq_phi_smul_sub d,
-      exists_sub_mk_one_mem_smallPart_of_phi_smul_sub_mem⟩,
-    fun _ ↦ eq_zero_of_mk_one_mem_smallPart, eventually_map_smul_sub_mem_smallPart h_near L⟩
 
 end New.Lift
 

@@ -87,7 +87,7 @@ lemma mu_sq_dvd_smul_mu_sub (g : Gp p) : mu ^ 2 ∣ g • mu - (cyclotomicGp g :
   -- Let `u = [ε^{1/p^m}]` and let `a` be the cyclotomic character of `g` modulo `p ^ m`.
   let u : Ainf := teichmuller p ((frobeniusEquiv _ p).symm^[m] epsTilt)
   let a : ℕ := (cyclotomicCharMod ℂ_[p] (p ^ m) g : ZMod (p ^ m)).val
-  have hu : u ^ p ^ m = 1 + mu := by simp [u, mu, ← map_pow]
+  have hu : u ^ p ^ m = 1 + mu := by simp [u, mu_eq, ← map_pow]
   -- `θ u` is a `p ^ m`-th root of unity, as `u ^ p ^ m = 1 + μ` and `θ μ = 0`; `g` acts on it as
   -- the `a`-th power, and `ker θ = (ξ)`.
   have h_root : theta u ^ p ^ m = 1 := by
@@ -144,12 +144,6 @@ lemma Amax.exists_sub_mul_frobEnd_eq {u : Amax} (hp_dvd : (p : Amax) ∣ u) (w :
     exact ⟨v, y, by simp [f, ← hy]⟩
   simpa [f] using mem_range_of_approx f (map_zsmul f p) id h_step w
 
-/-- The Frobenius `frobEnd` of `Amax` is the action of the Frobenius element `(ofAdd 1, 1)` of
-`FrobGal`. -/
-private lemma frobEnd_eq_smul (x : Amax (p := p)) :
-    frobEnd x = ((Multiplicative.ofAdd 1, 1) : FrobGal) • x :=
-  rfl
-
 /-- There is an element `t` of Colmez's period ring `Amax` (the p-adic completion of
 `A_inf[X]/(pX − ξ)`) that is a unit multiple of `μ p`, where `μ = [ε] − 1` is the element `mu` of
 `A_inf`. It satisfies `φ t = p t` and `g t = χ(g) t` for all `g` in `G_p = Gal(Q̄_p/Q_p)`, where `χ`
@@ -189,7 +183,9 @@ lemma exists_tPeriod : ∃ t : Amax,
   set χ : ℤ_[p] := ↑(cyclotomicGp g)
   set δ : Amax := g • t - χ • t with hδ
   have phi_δ : frobEnd δ = p * δ := by
-    have phi_smul : frobEnd (χ • t) = χ • frobEnd t := by simp only [frobEnd_eq_smul, smul_comm]
+    have phi_smul : frobEnd (χ • t) = χ • frobEnd t := by
+      let φ : FrobGal := (Multiplicative.ofAdd 1, 1)
+      exact smul_comm φ χ t
     simp [hδ, ← smul_frobEnd, phi_smul, phi_t, mul_sub]
   have h_dvd (n : ℕ) : p ^ n * μ ^ 2 ∣ δ := by
     induction n with
@@ -220,7 +216,6 @@ times a unit of `Amax`. -/
 lemma associated_mu_mul_p_tPeriodAmax : Associated (mu * p : Amax) tPeriodAmax :=
   exists_tPeriod.choose_spec.1
 
-
 /-- For every `g` in the absolute Galois group G_p of Q_p, `g` acts on the chosen period
 `tPeriodAmax` in `Amax` by multiplication by χ(`g`) ∈ ℤ_p, where χ = `cyclotomicGp` is the p-adic
 cyclotomic character. -/
@@ -230,8 +225,6 @@ lemma smul_tPeriodAmax (g : Gp p) : g • tPeriodAmax = (cyclotomicGp g : ℤ_[p
 
 /-- The image of `tPeriodAmax` in `B_dR⁺`. It plays the role of `p` times Fontaine's period `t`. -/
 noncomputable def tPeriod : BdRPlus := algebraMap Amax BdRPlus tPeriodAmax
-
-lemma tPeriod_def : tPeriod = algebraMap Amax BdRPlus tPeriodAmax := rfl
 
 end PeriodT
 
@@ -312,7 +305,6 @@ instance : IsScalarTower ℤ_[p] (PadicAlgCl p) BdRPlus := to₁₃₄ _ ℚ_[p]
 This is Fontaine's result that the period t is a uniformiser of B_dR^+, in the form that t and ξ
 agree up to a unit. -/
 lemma BdRPlus.associated_xi_tPeriod : Associated (xi : BdRPlus) tPeriod := by
-  classical
   -- `tPeriod` is associated to `μ * p = ξ * τ * p`, and `τ`, `p` are units of `BdRPlus` since
   -- `thetaBdR` does not kill them.
   have h_xi : Associated (xi : BdRPlus) (algebraMap Amax BdRPlus (mu * p)) := by
@@ -324,7 +316,7 @@ lemma BdRPlus.associated_xi_tPeriod : Associated (xi : BdRPlus) tPeriod := by
 by χ(`g`) ∈ ℤ_p, where χ = `cyclotomicGp` is the p-adic cyclotomic character. Here `tPeriod` is the
 image of `tPeriodAmax` in B_dR⁺, which plays the role of p times Fontaine's t. -/
 lemma smul_tPeriod (g : Gp p) : g • tPeriod = (cyclotomicGp g : ℤ_[p]) • tPeriod := by
-  simp [tPeriod_def, smul_tPeriodAmax, smul_def, ← IsScalarTower.algebraMap_apply]
+  simp [tPeriod, smul_tPeriodAmax, smul_def, ← IsScalarTower.algebraMap_apply]
 
 /-! ### θ, the embedding of Q̄_p, and the fundamental sequence -/
 
@@ -397,34 +389,24 @@ lemma Bmax.exists_coe_eq_sub (β : BdR (p := p)) :
 of some `x` in `B_dR⁺`: the map `φ - 1` sends `B ∩ B_dR⁺` onto `B`. -/
 lemma Bmax.exists_frobEnd_sub_eq_and_coe_eq (a : Bmax (p := p)) :
     ∃ (y : Bmax) (x : BdRPlus), frobEnd y - y = a ∧ (x : BdR) = y := by
-  -- Write `a = b / μ ^ m` and `p ^ n b = e + p ^ n μ ^ (m + 1) w` with `e` in `A_inf`, `w` in `A`,
-  -- so that `a = e / (p ^ n μ ^ m) + μ w`.
-  obtain ⟨m, b, hb⟩ : ∃ (m : ℕ) (b : BPlus), a * ((mu : BPlus) : Bmax) ^ m = b :=
-    surj (mu : BPlus) a
-  obtain ⟨n, e, _, ⟨w, rfl⟩, h_dense⟩ :
-      ∃ (n : ℕ) (e : Ainf), ∃ w ∈ amaxImage, p ^ n * b = e + p ^ n * mu ^ (m + 1) * w :=
-    b.exists_Ainf_approx 0 (m + 1)
-  -- If `e = φ c - ξ ^ m c`, then `φ - 1` sends `c / (p ^ n τ ^ m)` to the first term, because
-  -- `φ τ = μ = ξ τ`. If `w = d - φ(ξ) φ(d)`, then it sends `-μ d` to the second: `φ μ = φ(ξ) μ`.
-  -- Such `d` exists because `p` divides `φ(ξ)` in `A`.
+  -- Write `a = b / μ ^ m` and `p ^ n b = e + p ^ n μ ^ (m + 1) w` with `e` in `A_inf`, `w` in `A`.
+  obtain ⟨m, b, hb⟩ := surj (mu : BPlus) a
+  obtain ⟨n, e, _, ⟨w, rfl⟩, h_dense⟩ := b.exists_Ainf_approx 0 (m + 1)
+  -- Solve `e = φ c - ξ ^ m c` and `w = d - φ(ξ) φ(d)` (since `p ∣ φ(ξ)` in `A`).
   obtain ⟨c, rfl⟩ := e.exists_frobEnd_sub_xi_pow_mul_eq m
   obtain ⟨d, rfl⟩ := exists_sub_mul_frobEnd_eq associated_p_frobEnd_xi.dvd w
   -- The denominator `p ^ n τ ^ m` is a unit `s` of `B` and a unit `v` of `B_dR⁺`.
-  have h_xi : IsUnit (xi : Bmax) := isUnit_coe_Bmax_of_dvd_mu (Dvd.intro tau xi_mul_tau)
   have h_tau : IsUnit (tau : Bmax) := isUnit_coe_Bmax_of_dvd_mu (Dvd.intro_left xi xi_mul_tau)
   obtain ⟨s, hs⟩ : IsUnit ((p : BPlus) ^ n • (tau : Bmax) ^ m) :=
     (h_tau.pow m).smul (isUnit_p.pow n).unit
   obtain ⟨v, hv⟩ : IsUnit (tau ^ m * p ^ n : BdRPlus) := by simp [ne]
   refine ⟨c • ↑s⁻¹ - mu * d, c • ↑v⁻¹ - mu * d, ?_, ?_⟩
-  · -- Multiply by the unit `s ξ ^ m = p ^ n μ ^ m` to clear the denominator.
-    apply (s * h_xi.unit ^ m).mul_right_inj.mp
-    have h_frob_s : frobEnd (c • ((s : Bmax) * ↑s⁻¹)) = frobEnd (c • (1 : Bmax)) := by
-      rw [s.mul_inv]
-    have h_xi_s : xi ^ m • c • ((s : Bmax) * ↑s⁻¹) = xi ^ m • c • (1 : Bmax) := by rw [s.mul_inv]
-    have hb_p : (p : Bmax) ^ n * (a * ((mu : BPlus) : Bmax) ^ m) = p ^ n * b := by rw [hb]
+  -- Multiply by the unit `s ξ ^ m = p ^ n μ ^ m` to clear the denominator.
+  · apply (s * (isUnit_coe_Bmax_of_dvd_mu (Dvd.intro tau xi_mul_tau)).unit ^ m).mul_right_inj.mp
     linear_combination (norm := skip)
-      h_frob_s - h_xi_s - hb_p - congrArg (algebraMap BPlus Bmax) h_dense
-    -- In `B` the unit `s` is `p ^ n τ ^ m` and `ξ τ = μ`; what remains is ring arithmetic.
+      congrArg (fun u : Bmax ↦ frobEnd (c • u)) s.mul_inv -
+      congrArg (fun u : Bmax ↦ xi ^ m • c • u) s.mul_inv -
+      congrArg ((p : Bmax) ^ n * ·) hb - congrArg (algebraMap BPlus Bmax) h_dense
     simp [smul_def, hs, ← xi_mul_tau, ← IsScalarTower.algebraMap_apply, sub_eq_zero]
     ring
   · simp [smul_def, hs, hv, mul_comm, ← IsScalarTower.algebraMap_apply]

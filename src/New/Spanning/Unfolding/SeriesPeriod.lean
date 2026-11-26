@@ -136,7 +136,7 @@ lemma shift_eq_smul_besselCharMatrix (h : S.Fits V l kw Y η) :
       Nat.Prime.ne_zero, Matrix.one_apply]
     -- Without the context, `grind` is much faster.
     clear * -
-    grind (splits := 20) [map_natCast]
+    grind [map_natCast]
 
 /-- Suppose `V` with the grading `Y` fits the filling data `S`, and let `h.besselChar r` be the
 standard additive character of `E` at `-(M ϖ)⁻¹ σ`. Here `M = S.M`, `ϖ = S.deltaE`, and `σ` is the
@@ -419,7 +419,7 @@ lemma sourceFn_mul_of_mem_stdPrincipalLevel [WeilData E] (h : S.Fits V l kw Y η
     Subtype.ext h_eq
   have h_fix : algFormRep kw 0 a (algFormRep kw 0 η ψ.1) = algFormRep kw 0 η ψ.1 := by
     have h_level : algFormRep kw 0 a ψ.1 = ψ.1 := by simpa using ψ.2 ⟨a, ha⟩
-    rw [← Module.End.mul_apply, ← map_mul, ← (h.central a).eq, map_mul, Module.End.mul_apply,
+    rw [← mul_apply_eq_comp, ← map_mul, ← (h.central a).eq, map_mul, mul_apply_eq_comp,
       h_level]
   rw [h_split, ← mul_assoc, Y.sourceFn_mul_inclX, h_fix,
     h.sourceFn_eq_besselChar_mul hj_genericConst, h.sourceFn_eq_besselChar_mul hj_genericConst,
@@ -700,36 +700,25 @@ theorem exists_poincareAt_eq_poincareMap_comp :
     ∃ (g : GInf D.E (D.signsY 0)) (t : (WeylIndex (D.X 0) D.columnCount → ℂ) →ₗ[ℂ] ℂ),
       D.poincareAt g t = D.filling_fits.poincareMap ∘ₗ D.sourceFormCoords.toLinearMap := by
   -- Both forms have the same inner product, the Bessel period, with every form `y`.
-  have hj_genericConst : WeilData.j * (D.gradingY 0).genericConst =
-      -(D.filling.M * D.filling.deltaE : D.E)⁻¹ := by
-    have hj_ne_zero : (WeilData.j : D.E) ≠ 0 := WeilData.j_ne_zero
-    simp [gradingY, filling, M, field]
-  obtain ⟨g, t, h_period⟩ :=
-    D.filling_fits.exists_integral_poincareSeries_eq_period hj_genericConst
+  obtain ⟨g, t, h_period⟩ := D.filling_fits.exists_integral_poincareSeries_eq_period
+    (by
+      simp [gradingY, filling, M, field]
+      rw [mul_assoc, mul_assoc, ← div_div, div_self WeilData.j_ne_zero, one_div]
+      simp only [mul_inv_rev]
+      ac_rfl)
   refine ⟨g, t, LinearMap.ext fun φ ↦ ext_inner_left ℂ fun y ↦ ?_⟩
-  -- `D.sourceFormCoords φ` are the coordinates of the translate `ψ` of `φ` by the central element
-  -- `D.latticeScale 0`; translating back by its inverse gives `φ`.
-  let ψ : D.SourceForm := D.centralRep (D.latticeScale 0) φ
-  have h_back : algFormRep D.columnCount 0 (scalarFin (D.X 0) (D.latticeScale 0))⁻¹ ψ.1 = φ.1 :=
+  have hf_level : HasLevel (star (y.1 : New.G D.E (D.signsY 0) → ℂ))
+      D.filling.stdPrincipalLevel.toSubgroup := fun k hk x ↦
+    congrArg star <| (congrFun (congrArg Subtype.val (y.2 ⟨k, hk⟩)) x).trans (by simp)
+  have h_back : algFormRep D.columnCount 0 (scalarFin (D.X 0) (D.latticeScale 0))⁻¹
+      (D.centralRep (D.latticeScale 0) φ).1 = φ.1 :=
     (algFormRep D.columnCount 0).inv_self_apply _ φ.1
-  let f : New.G D.E (D.signsY 0) → ℂ := y.1
-  have hf_form : (D.spaceY 0).IsForm (typeKernel D.paramW (D.signsY 0)) f := y.1.2
-  have hf_level : HasLevel (star f) D.filling.stdPrincipalLevel.toSubgroup := by
-    intro k hk x
-    have h_fix : f (x * (1, k)) = f x :=
-      (congrFun (congrArg Subtype.val (y.2 ⟨k, hk⟩)) x).trans (by simp [f])
-    exact congrArg star h_fix
-  calc inner ℂ y (D.poincareAt g t φ)
-      = ∫ r : (D.gradingY 0).besselGroup, (D.gradingY 0).sourceFn t φ.1 r *
-          star f (r.1 * (g, 1)) ∂(D.gradingY 0).besselMeasure := D.inner_poincareAt g t φ y
-    _ = ∫ x : New.G D.E (D.signsY 0), (star f *
-          D.filling_fits.poincareSeries (D.sourceFormCoords φ)) x
-          ∂(D.spaceY 0).Γ.quotMeasure := by
-        rw [← h_back]
-        exact (h_period ψ hf_form.conj hf_level).symm
-    _ = inner ℂ y (D.filling_fits.poincareMap (D.sourceFormCoords φ)) := by
-        rw [← D.filling_fits.coe_poincareMap]
-        rfl
+  refine (D.inner_poincareAt g t φ y).trans ?_
+  rw [← h_back]
+  refine (h_period (D.centralRep (D.latticeScale 0) φ) y.1.2.conj hf_level).symm.trans ?_
+  change _ = inner ℂ y (D.filling_fits.poincareMap (D.sourceFormCoords φ))
+  rw [← D.filling_fits.coe_poincareMap]
+  rfl
 
 /-- A chosen real point `g` at which, for a suitable linear form `t`, the form `D.poincareAt g t φ`
 that represents the Bessel period of every source form `φ` is the Poincaré series of the Bessel

@@ -77,20 +77,14 @@ noncomputable abbrev evalForms (v : ι → A) (j : Fin (d + 1)) : A := ((Λ j).v
 @[grind =>]
 lemma aeval_smul_of_isHomogeneous {n : ℕ} (hF : F.IsHomogeneous n) :
     aeval (u • v) F = u ^ n * aeval v F :=
-  eval₂_mul_of_isHomogeneous hF (algebraMap k A) u v
+  hF.eval₂_const_mul (algebraMap k A) v u
 
 /-- If `χ` kills the kernel of `φ` and `φ ∘ v` lies on the cone of `g`, then so does `χ ∘ v`. -/
 lemma IsHomogeneousSolution.of_ker {D : Type} [CommRing D] [Algebra k D] (χ : A →ₐ[k] D)
     (h_ker : ∀ r : A, φ r = 0 → χ r = 0) (h_sol : IsHomogeneousSolution k g (φ ∘ v)) :
-    IsHomogeneousSolution k g (χ ∘ v) := by
-  intro n F hF h_g
+    IsHomogeneousSolution k g (χ ∘ v) := fun _ F hF h_g ↦
   -- `F (χ ∘ v) = χ (F v)`, and `φ (F v) = F (φ ∘ v) = 0`
-  have h_φ : φ (aeval v F) = 0 := by
-    rw [comp_aeval_apply v φ F]
-    exact h_sol hF h_g
-  have h_χ : χ (aeval v F) = 0 := h_ker _ h_φ
-  rw [comp_aeval_apply v χ F] at h_χ
-  exact h_χ
+  (comp_aeval_apply v χ F).symm.trans (h_ker _ ((comp_aeval_apply v φ F).trans (h_sol hF h_g)))
 
 lemma IsHomogeneousSolution.map : IsHomogeneousSolution k g v → IsHomogeneousSolution k g (φ ∘ v) :=
   of_ker 1 φ (by simp)
@@ -190,7 +184,7 @@ domain `A` of characteristic zero, lie in a finite `A`-algebra `B` whose ring of
 lemma exists_galois_hull [Finite ι]
     [IsDomain A] [IsNoetherianRing A] [CharZero A] [IsIntegrallyClosed A]
     [IsAlgClosed L] [Algebra A L] [FaithfulSMul A L] (hg : ∀ i : ι, IsIntegral A (g i)) :
-    ∃ᵉ (B : CommAlgCat.{0} A) (_ : Fintype Gal(B/A)) (j : B →ₐ[A] L) (x : ι → B),
+    ∃ B : CommAlgCat.{0} A, ∃ _ : Fintype Gal(B/A), ∃ j : B →ₐ[A] L, ∃ x : ι → B,
       Algebra.IsInvariant A B Gal(B/A) ∧ (algebraMap A B).Finite ∧ Injective j ∧ j ∘ x = g := by
   -- `B` is the integral closure of `A` in a finite Galois extension `N` of `Frac A` in `L` that
   -- contains the `g i`.
@@ -379,7 +373,7 @@ private lemma ker_aeval_le_ker_aeval_smul_of_transcendental {κ B K Ω : Type} [
   have hwb : IsHomogeneousSolution k w b :=
     .of_ker j (AlgHom.id k B) (fun r hr ↦ by rw [hj_ker r hr, map_zero]) h_tw
   refine fun F hF ↦ (hwb.smul φ u).aeval_eq_zero_of_transcendental ht.integralClosure ?_
-  show aeval (t • toAlgHom k (integralClosure L Ω) Ω ∘ w) F = 0
+  change aeval (t • toAlgHom k (integralClosure L Ω) Ω ∘ w) F = 0
   rw [hw]
   exact (comp_aeval_apply b j F).symm.trans (by rw [RingHom.mem_ker.mp hF, map_zero])
 
@@ -391,13 +385,13 @@ private lemma isIntegral_aeval_of_evalForms_eq {G B : Type} [CommRing B] [Algebr
     (σ₀ : G) (hΛb : evalForms Λ (b σ₀) = f ∘ X) :
     (aeval (R := k) ↿b).IsIntegral := by
   let θ : MvPolynomial (Fin (d + 1)) k →ₐ[k] MvPolynomial (G × ι) k :=
-    bind₁ fun l ↦ rename (Prod.mk σ₀) (Λ l).val
+    aeval fun l ↦ rename (Prod.mk σ₀) (Λ l).val
   have hfactor : (aeval (R := k) ↿b).comp θ = f := by
     refine algHom_ext fun l ↦ ?_
-    simp only [θ, AlgHom.comp_apply, bind₁_X_right, aeval_rename]
+    simp only [θ, AlgHom.comp_apply, aeval_X, aeval_rename]
     exact congrFun hΛb l
   refine .tower_top θ.toRingHom _ ?_
-  show ((aeval (R := k) ↿b).comp θ).toRingHom.IsIntegral
+  change ((aeval (R := k) ↿b).comp θ).toRingHom.IsIntegral
   rw [hfactor]
   exact hf_fin.to_isIntegral
 
@@ -727,7 +721,7 @@ lemma IsCoordsWithUnit.exists_universal_chart (hξ : IsCoordsWithUnit L ξ g)
   have h_eval {C : CommAlg k} {w : ι → C} (u : IsUnit (w i)) :
       ∃ φ : MvPolynomial ι k →ₐ[k] C,
         w i • φ ∘ X = w ∧ ∀ P, Associated ((homog P).aeval w) (φ P) := by
-    refine ⟨aeval (u.unit⁻¹.1 • w), by simp [← mul_assoc, funext_iff], fun P ↦ ?_⟩
+    refine ⟨aeval (u.unit⁻¹.val • w), by simp [← mul_assoc, funext_iff], fun P ↦ ?_⟩
     simp [← h_chart P, aeval_smul_of_isHomogeneous (h_homog_deg _), associated_unit_mul_right,
       IsUnit.pow]
   -- (`@` keeps `C` and `w` implicit in the chosen functions)

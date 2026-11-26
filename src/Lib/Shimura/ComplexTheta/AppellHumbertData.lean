@@ -132,7 +132,7 @@ class IsAppellHumbert (B : ThetaTori.LatticeForm L) (χ : V → ℂ) where
   norm_eq_one : ∀ l ∈ L, ‖χ l‖ = 1
   /-- χ is a semicharacter of L for the Riemann form E of B:
   χ(l + m) = χ(l) χ(m) exp(π i E(m, l)). -/
-  semicharacter : ∀ᵉ (l ∈ L) (m ∈ L), χ (l + m) = χ l * χ m * exp (π * I * B.riemannForm m l)
+  semicharacter : ∀ l ∈ L, ∀ m ∈ L, χ (l + m) = χ l * χ m * exp (π * I * B.riemannForm m l)
 
 /-- The Riemann form E of B is positive: E(u, iu) > 0 for every u ≠ 0. -/
 @[mk_iff pr_iff]
@@ -202,7 +202,7 @@ lemma thetaShift_zero : B.thetaShift 0 f = f := by
 
 @[simp]
 lemma thetaShift_mul : (B + B').thetaShift u (f * g) = B.thetaShift u f * B'.thetaShift u g := by
-  simp [funext_iff, thetaShift_apply, add_div, add_right_comm, exp_add, exp_neg, fieldEq]
+  simp [funext_iff, thetaShift_apply, add_div, exp_add, exp_neg, fieldEq]
 
 @[simp]
 lemma thetaShift_pow : (n • B).thetaShift u (f ^ n) = B.thetaShift u f ^ n := by
@@ -303,7 +303,7 @@ instance IsAppellHumbert.nsmul : IsAppellHumbert (n • B) (χ ^ n) where
   re_symm u v := by simp [hB.re_symm u v]
   norm_eq_one l hl := by simp [hB.norm_eq_one l hl]
   semicharacter l hl m hm := by
-    simp [hB.semicharacter l hl m hm, mul_pow, ← exp_nat_mul, mul_left_comm]
+    simp [hB.semicharacter l hl m hm, mul_pow, ← exp_natCast_mul, mul_left_comm]
 
 /-- Multiplying `χ` by the unitary character `l ↦ exp (2πi E(l, a))`, with `E` the Riemann form of
 any `C` (by default `B`), keeps the Appell–Humbert conditions. -/
@@ -357,7 +357,7 @@ lemma IsAppellHumbert.exp_riemannForm_pow_eq_one {n m : ℕ} {b : V} (hna : n �
   have h_int : (n : ℂ) * m * B.riemannForm a b = k := by
     rw [← ofReal_intCast, ← hk]
     simp [mul_assoc]
-  rw [← exp_nat_mul, exp_eq_one_iff]
+  rw [← exp_natCast_mul, exp_eq_one_iff]
   refine ⟨k, ?_⟩
   push_cast
   linear_combination (2 * π * I) * h_int
@@ -474,7 +474,7 @@ lemma thetaSpace.mul (hf : f ∈ B.thetaSpace χ) (hg : g ∈ B'.thetaSpace χ')
 lemma thetaSpace.pow (hf : f ∈ B.thetaSpace χ) (n : ℕ) : f ^ n ∈ (n • B).thetaSpace (χ ^ n) := by
   refine ⟨(differentiable_of_mem_thetaSpace hf).pow n, fun l hl z ↦ ?_⟩
   have h_exp : exp (B l z + B l l / 2) ^ n = exp ((n • B) l z + (n • B) l l / 2) := by
-    simp [← exp_nat_mul, mul_add, mul_div_assoc]
+    simp [← exp_natCast_mul, mul_add, mul_div_assoc]
   simp only [Pi.pow_apply, apply_add_of_mem_thetaSpace hf hl z, ← h_exp]
   ring
 

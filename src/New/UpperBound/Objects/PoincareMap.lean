@@ -41,7 +41,7 @@ variable {M F : Type*} [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup F] [I
 /-- On an inner product space `F` of finite dimension, every conjugate linear form is `y ↦ ⟨y, z⟩`
 for a unique vector `z` (Riesz). -/
 lemma bijective_flip_innerₛₗ : Function.Bijective (innerₛₗ ℂ (E := F)).flip := by
-  have : CompleteSpace F := FiniteDimensional.complete ℂ F
+  have : CompleteSpace F := FiniteDimensional.completeSpace ℂ F
   refine ⟨fun z z' h_eq ↦ ext_inner_left ℂ (LinearMap.congr_fun h_eq), fun l ↦ ?_⟩
   -- Apply the Riesz theorem to the linear form `conj ∘ l`.
   let z : F := (InnerProductSpace.toDual ℂ F).symm

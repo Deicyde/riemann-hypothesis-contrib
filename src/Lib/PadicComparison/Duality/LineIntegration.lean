@@ -239,7 +239,7 @@ lemma exists_move_kernel_of_eq_imp_eq (K : TorsionCoeff g)
   -- the sections `s` and `s'` agree where `J` is zero, and so do `L s` and `L s'`
   have hs_eq (c : C) (hc : J.ideal c = ⊥) : s.val c = s'.val c := h_agree c (hJ c hc)
   have h_L_eq (c : C) (hc : J.ideal c = ⊥) : (L s).ideal c = (L s').ideal c := by
-    show I.ideal (X.elementsMk (g.obj c) (s.val c)) = I.ideal (X.elementsMk (g.obj c) (s'.val c))
+    change I.ideal (X.elementsMk (g.obj c) (s.val c)) = I.ideal (X.elementsMk (g.obj c) (s'.val c))
     rw [hs_eq c hc]
   -- Where `L s'` is the unit ideal, locally `L s` or `J` is the unit ideal too.
   have h_loc :

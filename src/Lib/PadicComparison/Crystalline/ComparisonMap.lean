@@ -126,6 +126,7 @@ lemma integersToPdQuotient_untilt [h : CrysPeriodAlgebra] (t : OFlat) :
   rw [← theta_teichmuller t]
   exact theta.liftOfSurjective_comp_apply ..
 
+open TauCeti.Perfectoid.IsIntegralPerfectoid in
 /-- For every N and every y in O_C with p dividing y^N, there is an A_inf-algebra structure on
 A_max, satisfying `New.Variety.CrysPeriodAlgebra`, such that (a) ℤ_p acts on A_max through A_inf as
 it does directly, (b) the structure map commutes with the action of the monoid
@@ -146,9 +147,9 @@ lemma exists_crysPeriodAlgebra {N : ℕ} {y : OC} (hy : ↑p ∣ y ^ N) :
     simpa using p_pow_dvd_of_mem_pow (n := 1) (by rwa [pow_one])
   let σ : FrobGal := (.ofAdd (N ⊔ 3), 1)
   -- `σ μ = [ε] ^ p ^ max N 3 - 1` lies in `(p, ξ) ^ max N 3`, as `[ε] ≡ 1` modulo `ξ`.
-  have h_xi_dvd : xi ∣ teichmuller p epsTilt - 1 := Dvd.intro tau xi_mul_tau
+  have h_xi_dvd : xi ∣ teichmuller p epsTilt - 1 := Dvd.intro tau (xi_mul_tau.trans mu_eq)
   have hmu : σ • mu ∈ span {↑p, xi} ^ (N ⊔ 3) := by
-    simpa [σ, mu, FrobGal.smul_def] using pow_p_pow_sub_mem_of_xi_dvd h_xi_dvd (N ⊔ 3)
+    simpa [σ, mu_eq, FrobGal.smul_def] using pow_p_pow_sub_mem_of_xi_dvd h_xi_dvd (N ⊔ 3)
   let twisted : Algebra Ainf Amax := compHom Amax (MulSemiringAction.toRingHom FrobGal Ainf σ)
   -- Both `τ` and `μ` divide `μ`, so their images under `σ` become units of B_max.
   let h : CrysPeriodAlgebra :=
@@ -169,7 +170,9 @@ lemma exists_crysPeriodAlgebra {N : ℕ} {y : OC} (hy : ↑p ∣ y ^ N) :
     obtain ⟨t, rfl⟩ := untilt_surjective_of_isAbsIntegrallyClosed (p := p) y
     have hσt : σ • (teichmuller p t : Ainf) ∈ span {↑p, xi} := by
       -- Compare constant coefficients, then their untilts; that of `ξ` divides `p`.
-      grw [Witt.mem_span_pair_iff, ← untilt_dvd_iff, untilt_constantCoeff_xi_dvd_p, hy]
+      have h_xi : (constantCoeff xi).untilt ∣ (p : OC) :=
+        (associated_untilt_coeff_zero ker_theta_eq_span_xi).dvd
+      grw [Witt.mem_span_pair_iff, ← untilt_dvd_iff, h_xi, hy]
       simp [σ, untilt_frobGal_smul, smul_teichmuller, pow_dvd_pow,
         (Nat.lt_pow_self Fact.out).le.trans']
     rw [integersToPdQuotient_untilt t]
@@ -208,9 +211,10 @@ def toPdReduction :
   app E :=
     CommAlg.homOfRingHom (pdQuotientMk _) fun a ↦ by
       -- An element `a` of `Ainf` acts on `E ⧸ pdIdeal E` through `integersToPdQuotient (θ a)`, the
-      -- image of `a` by the lift along `θ`. `erw`: the algebra structure needs unfolding.
-      erw [eq_comm, RingHom.comp_apply, RingHom.comp_apply, liftOfSurjective_comp_apply]
-      rfl
+      -- image of `a` by the lift along `θ`; the algebra structure needs unfolding.
+      exact .symm (congrArg (pdQuotientMap (algebraMap Amax E.obj))
+        (liftOfSurjective_comp_apply theta theta_surjective _ a :
+          integersToPdQuotient (theta a) = _))
 
 /-- For a p-adic test with ring S, the O_C-algebra map S → D/𝔡(D), where D is the p-adic completion
 of A_max ⊗ W(S^♭): the inverse of the isomorphism O_C ⊗ W(S^♭) ≅ S
@@ -325,7 +329,7 @@ lemma hasCrysComparison_of_witt (b : FullSubcategory IsPerfectTorsionFree)
       ((algBaseChangeAdj.homEquiv _ _).bijective.comp
         (bij_cpl.comp InducedCategory.homEquiv.bijective))))
     -- `p = 0` in `E / 𝔡`, so the `p`-adic topology there is discrete.
-    show IsAdicComplete (span {(p : E.obj ⧸ pdIdeal E.obj)}) (E.obj ⧸ pdIdeal E.obj)
+    change IsAdicComplete (span {(p : E.obj ⧸ pdIdeal E.obj)}) (E.obj ⧸ pdIdeal E.obj)
     rw [E.p_eq_zero_mod_pdIdeal, span_singleton_zero]
     infer_instance
   · -- `Hom(b, S^♭) = Hom(OC ⊗ W b, S) = Hom(W b, S) = Hom(T, S)`.
@@ -360,7 +364,7 @@ open AddMonoidAlgebra Algebra TensorProduct AlgebraMonoidAlgebra in
 algebra A_inf[G] (and an A_inf-algebra through it), and b = O^♭[G] ⊗_{A_inf[G]} T, assumed perfect.
 Then there is an A_inf-algebra map k : T → W(b) that induces a bijection of p-adic completions. -/
 private lemma exists_isCompletionBijective_witt_tensor (G : Type) [AddCommMonoid.{0} G]
-    [Module ℚ≥0 G] (T : CommAlg Ainf[G]) [Etale Ainf[G] T] [Algebra Ainf T]
+    (T : CommAlg Ainf[G]) [Etale Ainf[G] T] [Algebra Ainf T]
     [IsScalarTower Ainf Ainf[G] T]
     (h_perf : PerfectRing (CommAlgCat.of OFlat (OFlat[G] ⊗[Ainf[G]] T)) p) :
     ∃ k : CommAlgCat.of Ainf T ⟶ wittFunctor.obj (CommAlgCat.of OFlat (OFlat[G] ⊗[Ainf[G]] T)),
@@ -390,9 +394,8 @@ private lemma exists_isCompletionBijective_witt_tensor (G : Type) [AddCommMonoid
   obtain ⟨h_constantCoeff_surj, -⟩ := h_mod
   let e : (WittVector p b ⧸ ker coeff₀) ≃ₐ[W] b :=
     quotientKerAlgEquivOfSurjective h_constantCoeff_surj
-  have h_complete : IsAdicComplete (ker coeff₀) (WittVector p b) := by
-    rw [show ker coeff₀ = span {(p : WittVector p b)} from h_ker]
-    exact h_ct.complete
+  have h_complete : IsAdicComplete (ker coeff₀) (WittVector p b) :=
+    h_ker.symm ▸ h_ct.complete
   obtain ⟨κ, hκ⟩ : ∃ κ : T →ₐ[W] WittVector p b,
       (Ideal.Quotient.mkₐ W (ker coeff₀)).comp κ = e.symm.toAlgHom.comp includeRight :=
     FormallySmooth.exists_mkₐ_comp_eq_of_isAdicComplete (e.symm.toAlgHom.comp includeRight)
@@ -470,7 +473,7 @@ lemma hasCrysComparison_of_etale (G : Type) [AddCommMonoid.{0} G] [Module ℚ≥
     exists_isCompletionBijective_witt_tensor G T h_perf
   -- `B ≅ OC ⊗ T`, so `Hom(B, -)` on `OC`-algebras is `Hom(T, -)` over `Ainf`.
   let iso : reprBy B ≅ restrictAlg Ainf OC ⋙ reprBy (.of Ainf T) :=
-    reprFunctor.mapIso (isoMk ((bc _).symm.trans (liftIso.restrictScalars _))).op ≪≫
+    reprFunctor.mapIso (CommAlgCat.isoMk ((bc OC).symm.trans (liftIso.restrictScalars OC))).op ≪≫
       isoOfAppBijective _ (pointMap_algBaseChange_unit_bijective (.of Ainf T))
   have h_witt : HasCrysComparison (restrictAlg Ainf OC ⋙ reprBy (.of Ainf T)) :=
     hasCrysComparison_of_witt ⟨b, h_perf, h_reg⟩ k hk
@@ -523,7 +526,7 @@ lemma CrysPeriodAlgebra.p_mul_teichmuller_sub_one_dvd {p : ℕ} [ThePrime p] [h 
   have h_pow_num : ι x ^ a.num = ι (teichmuller p (epsPowNNRat (.ofAdd a))) := by
     simp [x, ι, ← map_pow, ← ofAdd_nsmul, ← cast_def, ← division_def]
   have h_pow_den : ι x ^ a.den - 1 = ι mu := by
-    simp [x, ι, ← epsPow_one, ← map_pow, ← ofAdd_nsmul, mu]
+    simp [x, ι, ← epsPow_one, ← map_pow, ← ofAdd_nsmul, mu_eq]
   rwa [h_pow_num, h_pow_den] at h_dvd_pow
 
 /-- The split of c ∈ ℚ≥0 into its fractional part c − ⌊c⌋, in [0, 1), and its integral part ⌊c⌋. -/
@@ -657,7 +660,7 @@ private lemma koszulExact_lineEnvelope {p : ℕ} [ThePrime p] [h : CrysPeriodAlg
   · -- `hγv`: `γ v = (μ + 1) • v`, as `[ε] = μ + 1`
     have h_one : γ' (v (.ofAdd 1)) = algebraMap Amax E (e (.ofAdd 1)) * v (.ofAdd 1) :=
       DFunLike.congr_fun hγ_v _
-    simpa [e, ← epsPow_one, mu, Algebra.smul_def] using h_one
+    simpa [e, ← epsPow_one, mu_eq, Algebra.smul_def] using h_one
   · -- `hγu`: `γ (v ^ a) = (η + 1) • v ^ a` with `η = [ε ^ a] - 1`
     have h_a : γ' (v (.ofAdd (a : ℚ≥0))) =
         algebraMap Amax E (e (.ofAdd (a : ℚ≥0))) * v (.ofAdd (a : ℚ≥0)) :=
@@ -856,10 +859,10 @@ lemma hasCrysComparison_chart [h : CrysPeriodAlgebra] {R : Type} [CommRing R] [A
   have tmul_eq (x : MvPolynomial (Fin d) R) : g x ⊗ₜ 1 = 1 ⊗ₜ polyEval t x := tmul_one_eq_one_tmul x
   -- Algebra maps from `OC[G]` are `d`-tuples of characters of `ℚ≥0`.
   let e (A : CommAlg OC) : (OC[G] →ₐ[OC] A) ≃ (Fin d → Multiplicative ℚ≥0 →* A) :=
-    (lift OC A G).symm.trans (Pi.monoidHomMulEquiv (fun _ ↦ Multiplicative _) A).1
+    (lift OC A G).symm.trans (Pi.monoidHomMulEquiv (fun _ ↦ Multiplicative _) A).toEquiv
   -- The universal point is `b ↦ 1 ⊗ b`; the universal root systems are `e _ includeLeft`.
   let x : (restrictAlg R _ ⋙ reprBy B).obj B' :=
-    ⟨CommAlg.homOfRingHom includeRight.1 fun c ↦ by simpa using! (tmul_eq (C c)).symm⟩
+    ⟨CommAlg.homOfRingHom includeRight.toRingHom fun c ↦ by simpa using! (tmul_eq (C c)).symm⟩
   refine .isBijectiveOn_of_compatibleRoots compatibleRootsAreLines_crysTest
     compatibleRootsAreLines_padicTest
     (hasCrysComparison_of_etale G B') (fun i ↦ {app _ := ↾fun y ↦ ⟨y.down.hom (t i)⟩}) x
@@ -881,7 +884,7 @@ lemma hasCrysComparison_chart [h : CrysPeriodAlgebra] {R : Type} [CommRing R] [A
     exact ConcreteCategory.congr_hom hf_left _
   · -- Uniqueness: `y` and `F` are the restrictions of `f'` to the two factors.
     rintro ⟨f'⟩ ⟨⟨⟩, hf'⟩
-    cases (e A).injective (a₁ := f'.1.comp includeLeft) (funext hf')
+    cases (e A).injective (a₁ := f'.hom'.comp includeLeft) (funext hf')
     cases pushout.hom_ext hf_left hf_right
     rfl
 
@@ -917,9 +920,9 @@ lemma HasFlatBaseChange.pdReduction_reprBy (G : CommAlg (S ⧸ pdIdeal S)) :
   -- `G ⟶ B / 𝔡` together with a lift to `B` of the image of each element of `G`.
   let ρ : CrysTest S ⥤ CommAlg (S ⧸ pdIdeal S) := pdReduction (.id (S ⧸ pdIdeal S))
   let L : CrysTest S ⥤ Type 1 := .mk
-    (fun B ↦ {x : ULift (G ⟶ ρ.obj B) × (G → B) // ∀ g, (x.2 g : B ⧸ pdIdeal B) = x.1.1 g})
+    (fun B ↦ {x : ULift (G ⟶ ρ.obj B) × (G → B) // ∀ g, (x.2 g : B ⧸ pdIdeal B) = x.1.down g})
     fun f ↦ ↾fun x ↦ ⟨(⟨x.1.1.1 ≫ ρ.map f⟩, f.1 ∘ x.1.2), fun g ↦ congr(ρ.map f $(x.2 g))⟩
-  let q : L ⟶ ρ ⋙ reprBy G := .mk fun B ↦ ↾fun x ↦ x.1.1
+  let q : L ⟶ ρ ⋙ reprBy G := .mk fun B ↦ ↾fun x ↦ x.val.1
   -- Lifts can always be chosen, so the image of `q` is everything.
   have h_onto (B : CrysTest S) : Bijective ((Subfunctor.range q).ι.app B) := by
     refine (Equiv.subtypeUnivEquiv fun y ↦ ?_).bijective
@@ -1067,7 +1070,7 @@ def toCrysPoints :
 S-algebra D to the p-adic completion of A_max ⊗_S D. As A_max is flat over S, this completion is
 again p-torsion-free. -/
 private def crysBaseChange [Module.Flat S Amax] : CrysTest S ⥤ CrysTest Amax :=
-  lift (fun B ↦ IsCompleteTorsionFree B.1) (ι _ ⋙ algBaseChange Amax ⋙ algCompletion Amax p)
+  lift (fun B ↦ IsCompleteTorsionFree B.carrier) (ι _ ⋙ algBaseChange Amax ⋙ algCompletion Amax p)
     fun D ↦
       isCompleteTorsionFree_completion fun _ _ h_smul ↦
         D.property.isSMulRegular_natCast.lTensor _ (mod_cast h_smul)
@@ -1207,8 +1210,7 @@ lemma span_range_crysComparison_pull_eq_top (hi_iso : IsIso i) [IsDomain S]
   have h_torsionFree : IsTorsionFree S Amax := by
     -- `p` is regular on `Amax`, and every nonzero element of `S` divides a power of `p`.
     refine isTorsionFree_of_dvd_pow h.isSMulRegular_natCast fun ht ↦ ?_
-    obtain ⟨k, hk⟩ := associated_pow_irreducible ht hp
-    exact ⟨k, hk.dvd⟩
+    exact (associated_pow_irreducible ht hp).imp fun _ hk ↦ hk.dvd
   algebraize [r, (algebraMap Amax Bmax).comp (algebraMap S Amax)]
   let N : CrysTest S ⥤ Ab := freeAb.obj (pdReduction r ⋙ V.toFunctor)
   -- Completed base change `L` along `S → Amax` is left adjoint to restriction of scalars.

@@ -88,7 +88,7 @@ lemma New.Data.abs_targetParameter_sub_lowestKType_le_and_eq {P : Parameters} (D
     | zero => simp
     | succ M ih =>
       rw [Finset.sum_range_succ]
-      grind (splits := 20) [targetParameter_eq]
+      grind [targetParameter_eq]
   -- `entrySign 0 0 i` depends only on the parity of `i`
   have h_sign (i i' : ℕ) : entrySign 0 0 i = entrySign 0 0 i' ↔ i % 2 = i' % 2 := by
     have h_ne : (-1 : ℤˣ) ≠ 1 := by decide
@@ -130,7 +130,7 @@ lemma New.Data.exists_isSteep {P : Parameters} (D : Data P) (z : Bool) :
   have h_entry (x : D.GridIndex z 0 0) :
       D.gridSigns z 0 0 0 x = entrySign 0 0 (ν x + 1 - D.k) ∧
       D.gridParam z 0 0 0 τ x = 2 * D.targetParameter τ (ν x) + z.toNat := by
-    cases z <;> aesop (add simp [gridSigns, gridParam, gridNumber])
+    cases z <;> aesop (add simp [gridSigns, gridNumber])
   -- The far entries of `D.targetParameter τ` are `Δ / 2 - κ_j` with `j ≤ Δ`, and `κ_j` lies between
   -- `B = D.liftWeight 0 τ` and `D.liftWeight D.gap τ ≤ 2 * B`.
   have h_sq_le : D.gap ^ 2 ≤ D.liftWeight 0 τ := D.nat_le_of_hasLogBound

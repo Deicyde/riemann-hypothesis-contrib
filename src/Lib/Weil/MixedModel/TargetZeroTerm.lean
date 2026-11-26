@@ -81,7 +81,7 @@ lemma frameAt_homTarget :
   have h_inv : (adaptedTargetBasis W)⁻¹.val = 1 ⊗ₖ W.dualFrame.valᵀ := rfl
   have h_dual : W.x.valᵀ * W.dualFrame.valᵀᴴ = stdForm E s := by
     have h_pair : W.dualFrame.valᴴ * W.x.val = stdForm E s := by
-      simp [dualFrame, Matrix.mul_assoc]
+      simp [dualFrame]
     rw [conjTranspose_transpose_eq_transpose_conjTranspose, ← transpose_mul, h_pair, stdForm,
       diagonal_transpose]
   rw [Splitting.frameAt, h_l, homTarget_kAdelic, homTarget_iAdelic, h_basis, h_inv,
@@ -235,30 +235,21 @@ lemma realSlice_realPairWeil [IsBaseAdapted A] (γ : InfinitePlace E → ℤ) (h
     (x : Matrix r' Unit (𝔸 E)) (v : PairFock E s' t') :
     realSlice A V' x (realPairWeil (fun w : InfinitePlace E ↦ γ w + 1) 0 (1, h) v) =
       realPairWeil γ 0 (1, h) (realSlice A V' (G.adeleMatrix ((h, 1) : G E t')⁻¹ * x) v) := by
-  -- Slices see only the real part `x₀` of `x`. The adelic law, for characters of weights `1` and
-  -- `0`, gives the case `γ = 0`; other weights differ by powers of `det h` on both sides.
+  -- Reduce to `γ = 0` via `realPairWeil_target_eq_smul`, and restrict `x` to its real part `x₀`.
+  rw [realPairWeil_target_eq_smul (fun w ↦ γ w + 1) 1, realPairWeil_target_eq_smul γ 0, map_smul]
+  simp only [Pi.one_apply, Pi.zero_apply, add_sub_cancel_right, sub_zero]
+  congr 1
   let x₀ : Matrix r' Unit (𝔸 E) := x.map fun a ↦ (a.1, 0)
   let y₀ : Matrix r' Unit (𝔸 E) := G.adeleMatrix ((h, 1) : G E t')⁻¹ * x₀
-  have hy₀ (i : r') (j : Unit) : (y₀ i j).2 = 0 := by simp [y₀, x₀, Matrix.mul_apply, Prod.snd_sum]
-  -- `realSlice` reads only the real parts of the entries of its point
-  have h_real : realSlice A V' x = realSlice A V' x₀ := rfl
-  have h_slice : realSlice A V' (G.adeleMatrix ((h, 1) : G E t')⁻¹ * x) = realSlice A V' y₀ := by
-    simp [realSlice, y₀, x₀, matrixToVec, Matrix.mul_apply, Prod.fst_sum]
-  have h_one : realSlice A V' x₀ (realPairWeil 1 0 (1, h) v) =
-      realPairWeil 0 0 (1, h) (realSlice A V' y₀ v) := by
-    refine eq_of_integrated_zeroTerm_eq (isAdapted_homSource A V') fun f ↦ ?_
-    have h_move (F : 𝒮 (W'.hom V')) :
-        A.homSlice V' (scaleIdele E • x₀) (pairWeil W' V' upsilonU1 1 (1, h, 1) F) =
-          pairWeil W V' 1 1 (1, h, 1) (A.homSlice V' (scaleIdele E • y₀) F) := by
-      simpa [y₀, Prod.mk_one_one] using A.homSlice_levi V' 1 1 1 1 (h, 1) (scaleIdele E • x₀) F
-    -- `pairWeil_integrated_right` finds the weight of the trivial character as an instance.
-    have h_weight : (1 : AutChar E).HasWeight 0 1 := AutChar.HasWeight.one
-    rw [← homSlice_integrated_of_real A (by simp [x₀]),
-      ← pairWeil_integrated_right (a := upsilonU1) (b := 1), h_move,
-      homSlice_integrated_of_real A hy₀, pairWeil_integrated_right]
-  rw [realPairWeil_target_eq_smul (fun w : InfinitePlace E ↦ γ w + 1) 1,
-    realPairWeil_target_eq_smul γ 0, map_smul, h_real, h_slice, h_one]
-  simp only [Pi.one_apply, Pi.zero_apply, add_sub_cancel_right, sub_zero]
+  change realSlice A V' x₀ _ = _
+  rw [show realSlice A V' (G.adeleMatrix ((h, 1) : G E t')⁻¹ * x) = realSlice A V' y₀ by
+    simp [realSlice, y₀, x₀, matrixToVec, Matrix.mul_apply, Prod.fst_sum]]
+  refine eq_of_integrated_zeroTerm_eq (isAdapted_homSource A V') fun f ↦ ?_
+  have : (1 : AutChar E).HasWeight 0 1 := AutChar.HasWeight.one
+  rw [← homSlice_integrated_of_real A (by simp [x₀]), ← pairWeil_integrated_right (a := upsilonU1)
+    (b := 1), ← pairWeil_integrated_right (a := 1) (b := 1),
+    ← homSlice_integrated_of_real A (by simp [y₀, x₀, Matrix.mul_apply, Prod.snd_sum])]
+  simpa [y₀, Prod.mk_one_one] using A.homSlice_levi V' 1 1 1 1 (h, 1) (scaleIdele E • x₀) _
 
 /-- The component at the infinite place `w` of the vector that spans the isotropic line of `X`. -/
 def lineVector (w : InfinitePlace E) : r' → ℂ := fun i : r' ↦ (X.kAdelic i ()).1 w
@@ -316,7 +307,6 @@ lemma exists_realTargetZeroTerm_realPairWeil [IsBaseAdapted X] (hn : 2 ∣ card 
     have h_adelic : G.det ((g, 1) : G E t') = divStar m.det * G.det ((h, 1) : G E t) :=
       X.det_eq_divStar_mul (g, 1) (h, 1) m h_frame h_block
     have h_div : (divStar m.det : 𝔸 E).1 w = u w ^ (2 : ℤ) := by
-      have h_inv : a⁻¹.val w = (a.val w)⁻¹ := eq_inv_of_mul_eq_one_left (congrFun a.inv_mul w)
       have h_quotient : (divStar m.det : 𝔸 E).1 w = a.val w / starRingEnd ℂ (a.val w) := by
         simp [coe_divStar, m, div_eq_mul_inv, ← map_inv]
       rw [h_quotient, zpow_two, div_mul_div_comm, ← sq (‖a.val w‖ : ℂ), ← Complex.mul_conj',

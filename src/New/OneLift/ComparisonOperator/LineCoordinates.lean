@@ -129,7 +129,7 @@ lemma New.HasWeightNormSqLeIf.prod {p : Prop} {ι : Type*} {s : Finset ι} {κ :
 open Matrix in
 /-- For the weight with one column of height `h < card N` at `τ`, the kernel `weylKernel` at `y`
 (the highest weight polynomial at `yᵀ x`) is the leading `h × h` minor of `yᵀ x` in block `τ`. -/
-lemma New.eval_weylKernel_single_eq_det {N : Type} [Fintype N] [DecidableEq N] (τ : Φ) {h : ℕ}
+lemma New.eval_weylKernel_single_eq_det {N : Type} [Fintype N] (τ : Φ) {h : ℕ}
     (h_lt : h < Fintype.card N) (y x : (Σ _ : Φ, N) × ℕ → ℂ) :
     (weylKernel (fun _ : Φ ↦ N) (Pi.single τ (Pi.single h 1)) y).eval x =
       (of fun a b : Fin h ↦ ∑ u : N, y (⟨τ, u⟩, a) * x (⟨τ, u⟩, b)).det := by
@@ -320,7 +320,7 @@ def addedDatum (u : Matrix D.CarrierIndex (FirstFactorIndex j) (D.untwistedModul
   if z.submatrix id (Sum.map id Sum.inl) = inclMatrix (D.twistModulus ϑ 2).ResidueRing
     (.map (inr ∘ inr) id)
     then
-    ∑ g : GL D.CarrierIndex _, traceChar u (z.toCols₂.toCols₂.map (forgetTwist ϑ) * g.1)
+    ∑ g : GL D.CarrierIndex _, traceChar u (z.toCols₂.toCols₂.map (forgetTwist ϑ) * g.val)
   else 0
 
 /-- The coordinate l of the series Υ at h, for the choice `i`: the kernel of ((E^j)⁻, V″)
@@ -391,17 +391,8 @@ lemma card_detIndex_le (j : D.LiftIndex) (τ : NumberField.InfinitePlace D.E) :
     Fintype.card (DetIndex j τ) ≤ D.natB + D.offWeight + D.gap + D.m * D.gap := by
   -- By `card_detIndex_add_firstFactorCharExp` the count is at most the weight `D.liftWeight j τ`,
   -- and `j ≤ m`.
-  have h_mul : j * D.gap ≤ D.m * D.gap := mul_le_mul_left j.2.2 D.gap
+  have h_mul : j * D.gap ≤ D.m * D.gap := mul_le_mul_left j.property.2 D.gap
   grind [card_detIndex_add_firstFactorCharExp j τ, D.weight_le_natB_add_offWeight τ]
-
-/-- The number `card (DetIndex j τ)` of determinants at the infinite place `τ` is the number of
-columns of μ⁺. This is the sum of `(untwistedDescentPair j).colsPlus τ h` over heights
-`h < card (FirstFactorIndex j)`. It is at most `D.natB + D.offWeight + D.gap + D.m * D.gap`. -/
-lemma card_detIndex (j : D.LiftIndex) (τ : NumberField.InfinitePlace D.E) :
-    Fintype.card (DetIndex j τ) =
-        ∑ h ∈ range (Fintype.card (FirstFactorIndex j)), (untwistedDescentPair j).colsPlus τ h ∧
-      Fintype.card (DetIndex j τ) ≤ D.natB + D.offWeight + D.gap + D.m * D.gap :=
-  ⟨card_detIndex_eq_sum j τ, card_detIndex_le j τ⟩
 
 /-- Let `Z` have the `2 m + card (FirstFactorIndex j)` rows of a determinant det(𝖼; X z) at `j`, and
 as columns the last `D.posRank j - h ≤ j` of the `D.posRank j` positive indices of W_j and the

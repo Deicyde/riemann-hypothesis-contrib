@@ -211,14 +211,11 @@ private lemma absNorm_span_natCast_rat {p : ℕ} : absNorm (span {(p : 𝓞 ℚ)
   -- `↓`: `absNorm_span_natCast` applies before simp turns the norm into `Algebra.norm`.
   simp [↓absNorm_span_natCast, rank]
 
-/-- For a prime number `p`, the ideal `(p)` of `𝓞 ℚ` is prime, as its norm `p` is prime. -/
-private lemma prime_span_natCast_rat {p : ℕ} (hp : p.Prime) : _root_.Prime (span {(p : 𝓞 ℚ)}) := by
-  have h_irred : Irreducible (absNorm (span {(p : 𝓞 ℚ)})) := by rwa [absNorm_span_natCast_rat]
-  exact (irreducible_of_irreducible_absNorm h_irred).prime
-
 /-- The place of `ℚ` at a prime number `p`: the prime ideal `(p)` of `𝓞 ℚ`. -/
 def ratPlace {p : ℕ} (hp : p.Prime) : FinPlace ℚ :=
-  ofPrime (p := span {(p : 𝓞 ℚ)}) (by exact prime_span_natCast_rat hp)
+  ofPrime (p := span {(p : 𝓞 ℚ)}) (by
+    apply (irreducible_of_irreducible_absNorm ?_).prime
+    rwa [absNorm_span_natCast_rat])
 
 lemma q_ratPlace {p : ℕ} (hp : p.Prime) : (ratPlace hp).q = p := absNorm_span_natCast_rat
 
@@ -473,7 +470,7 @@ lemma exists_placeOfEmb_extension :
   -- The field `L = ℚ_p(σ E)` is finite over `ℚ_p`, hence complete. The map `σ : E → L` is uniformly
   -- continuous for the norm of the place `placeOfEmb σ`, so it extends from `E` to the completion.
   set L : IntermediateField ℚ_[p] F := adjoin ℚ_[p] (Set.range σ)
-  have h_complete : CompleteSpace L := FiniteDimensional.complete ℚ_[p] L
+  have h_complete : CompleteSpace L := FiniteDimensional.completeSpace ℚ_[p] L
   let σL : E →+* L := σ.codRestrict L fun x ↦ subset_adjoin _ _ ⟨x, rfl⟩
   -- The norm of the completion and `‖σ ·‖` order the elements of `E` alike.
   have h_place_equiv : (place (algebraMap E (LocField (placeOfEmb σ)))).IsEquiv (place σ) := by
@@ -504,7 +501,7 @@ lemma exists_placeOfEmb_extension :
   have hφ_norm : ∀ y : LocField (placeOfEmb σ), ‖(φ y : F)‖ = ‖y‖ ^ c :=
     h_dense.eq (fun x ↦ (congrArg norm (hφ_ext x)).trans (congrFun h_pow x).symm) hφ_cont.norm
       (continuous_norm.rpow_const fun _ ↦ .inr hc_pos.le)
-  refine ⟨(algebraMap L F).comp φ, continuous_subtype_val.comp hφ_cont, hφ_ext,
+  refine ⟨(algebraMap L F).comp φ, continuous_subtypeVal.comp hφ_cont, hφ_ext,
     fun x ↦ (φ x).prop, fun x y ↦ ?_⟩
   -- `‖φ x‖ ≤ ‖φ y‖` holds iff `‖x‖ ^ c ≤ ‖y‖ ^ c`, iff `‖x‖ ≤ ‖y‖`, iff `v x ≤ v y`.
   simp [← coe_le_coe, hφ_norm, Real.rpow_le_rpow_iff, hc_pos, Valued.toNormedField.norm_le_iff]
@@ -515,11 +512,6 @@ def placeOfEmbExtension : LocField (placeOfEmb σ) →+* F := (exists_placeOfEmb
 
 lemma continuous_placeOfEmbExtension : Continuous (placeOfEmbExtension σ) :=
   (exists_placeOfEmb_extension σ).choose_spec.1
-
-lemma placeOfEmbExtension_algebraMap (x : E) :
-    placeOfEmbExtension σ (algebraMap E (LocField (placeOfEmb σ)) x) = σ x :=
-  let ⟨_, h_ext, _⟩ := (exists_placeOfEmb_extension σ).choose_spec
-  h_ext x
 
 /-- The norm valuation of `F` pulled back along `New.placeOfEmbExtension σ` is equivalent to the
 valuation `Valued.v` of the completion at `New.placeOfEmb σ`. -/
@@ -535,7 +527,8 @@ def adeleExtension : 𝔸f E →+* F :=
 
 @[simp]
 lemma adeleExtension_algebraMap (x : E) : adeleExtension σ x = σ x :=
-  placeOfEmbExtension_algebraMap σ x
+  let ⟨_, h_ext, _⟩ := (exists_placeOfEmb_extension σ).choose_spec
+  h_ext x
 
 @[fun_prop]
 lemma continuous_adeleExtension : Continuous (adeleExtension σ) :=

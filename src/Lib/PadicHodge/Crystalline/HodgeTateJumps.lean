@@ -1,5 +1,6 @@
 module
 
+public import Lib.General.Measure.HaarModulus
 public import Lib.PadicHodge.Crystalline.HodgeTateForms
 
 /-!
@@ -143,7 +144,7 @@ lemma isHodgeTateFrame_of_hodgeMatrix {W : Matrix ι ι BdRPlus} {k : ι → ℤ
   -- Apply `θ` and move the power of `χ(g)` to the other side.
   have h_theta : cyclotomicGp g ^ k l • ∑ m, ((N i m : PadicAlgCl p) : ℂ_[p]) *
       g • thetaBdR (W m l) = thetaBdR (W i l) := by
-    simp [← h_entry, Units.smul_def, mul_comm, mul_left_comm, PadicComplex.coe_eq, Algebra.cast,
+    simp [← h_entry, Units.smul_def, mul_comm, PadicComplex.coe_eq, Algebra.cast,
       smul_sum, Algebra.smul_def, sum_mul]
   rw [_root_.zpow_neg]
   exact eq_inv_smul_iff.2 h_theta
@@ -535,7 +536,7 @@ lemma jump_twist_of_period (a : Γ → R) {v : ℤ} {y : ℂ_[p]} (hy : y ≠ 0)
   have h_iff (F : T →ₛₗ[toRingHom γ] ℂ_[p]) :
       y • F ∈ hodgeTateMaps ρ' γ (u + v) ↔ F ∈ hodgeTateMaps ρ γ u := by
     refine forall_congr' fun x ↦ eventually_congr (h_period.mono fun g hg ↦ ?_)
-    show (y • F) (ρ' g x) = (χ g ^ (-(u + v))).val • toGp g • (y • F) x ↔
+    change (y • F) (ρ' g x) = (χ g ^ (-(u + v))).val • toGp g • (y • F) x ↔
       F (ρ g x) = (χ g ^ (-u)).val • toGp g • F x
     -- With `c = χ(g) ^ (-v) • g • y ≠ 0`, the condition for `y • F` is `c` times the one for `F`.
     set c : ℂ_[p] := (χ g ^ (-v)).val • toGp g • y with hc
@@ -545,7 +546,7 @@ lemma jump_twist_of_period (a : Γ → R) {v : ℤ} {y : ℂ_[p]} (hy : y ≠ 0)
     have h_rhs : (χ g ^ (-(u + v))).val • toGp g • (y • F) x =
         c * ((χ g ^ (-u)).val • toGp g • F x) :=
       calc _ = ((χ g ^ (-v)).val * (χ g ^ (-u)).val) • (toGp g • y * toGp g • F x) := by
-            simp [_root_.zpow_add, smul_mul', mul_comm]
+            simp [_root_.zpow_add, smul_mul']
         _ = _ := (smul_mul_smul_comm _ _ _ _).symm
     rw [h_lhs, h_rhs, mul_right_inj' hc_ne]
   have h_comap : (hodgeTateMaps ρ' γ (u + v)).comap mul_y.toLinearMap = hodgeTateMaps ρ γ u :=

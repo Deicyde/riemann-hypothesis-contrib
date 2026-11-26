@@ -87,7 +87,7 @@ lemma lintegral_ofReal_re_sum_sum_mul {X j : Type} [MeasurableSpace X] [Fintype 
 /-- Let `C` and `L` be compact sets of vectors over `A`, and let `φ` be locally constant along `Q`
 at the points of `C`. Then for all scalars `b` near `0` one has `φ (x + b • v) = φ x` whenever
 `x ∈ C`, `v ∈ L`, and both `x` and `x + b • v` lie in `Q`. -/
-lemma eventually_forall_apply_add_smul_eq {A n : Type} [SemilocalField A] [Fintype n]
+lemma eventually_forall_apply_add_smul_eq {A n : Type} [SemilocalField A]
     {Q C L : Set (n → A)} (hC : IsCompact C) (hL : IsCompact L) {φ : (n → A) → ℂ}
     (h_loc : ∀ e ∈ C, ∀ᶠ x : n → A in nhds e, x ∈ Q → φ x = φ e) :
     ∀ᶠ b : A in nhds 0, ∀ z ∈ C ×ˢ L,
@@ -107,7 +107,7 @@ lemma eventually_forall_apply_add_smul_eq {A n : Type} [SemilocalField A] [Finty
 constant along `Q` at the points of `C`. Then for some unit `u` one has `φ x = φ y` whenever
 `x ∈ Q`, `y ∈ C ∩ Q` and `x - y` lies in `u • L`. -/
 lemma exists_unit_forall_apply_eq_of_inv_smul_sub_mem {A n : Type} [SemilocalField A] [StarRing A]
-    [P : IntegralPlace A] [Fintype n] {Q C L : Set (n → A)} (hC : IsCompact C) (hL : IsCompact L)
+    [P : IntegralPlace A] {Q C L : Set (n → A)} (hC : IsCompact C) (hL : IsCompact L)
     {φ : (n → A) → ℂ} (h_loc : ∀ e ∈ C, ∀ᶠ x : n → A in nhds e, x ∈ Q → φ x = φ e) :
     ∃ u : Aˣ, ∀ x ∈ Q, ∀ y ∈ C ∩ Q, u⁻¹ • (x - y) ∈ L → φ x = φ y := by
   -- Units are dense, since almost every element is a unit.
@@ -344,7 +344,7 @@ lemma frameGram_top_eq_of_mem_besselH {g k : T.G} (hg : g ∈ T.besselH) (hk : k
 `weylElem 𝔰.ϱ r` (written `w_r`), one has `(w_r * (a * s⁻¹)⁻¹)⁻¹ * (s * x) = a * w_r⁻¹ * x` for all
 `a`, `x`. -/
 lemma inv_weylElem_mul_inv_mul {A : Type} {𝔰 : Shape} [SemilocalField A] [StarRing A]
-    {T : 𝔰.Form A} [IsHermitianUnit T.splitGram] {s : T.G} (hs : s ∈ T.floorGroup 𝔰.ϱ) (a x : T.G)
+    {T : 𝔰.Form A} {s : T.G} (hs : s ∈ T.floorGroup 𝔰.ϱ) (a x : T.G)
     (r : ℕ → Aˣ) :
     (weylElem 𝔰.ϱ r * (a * s⁻¹)⁻¹)⁻¹ * (s * x) = a * (weylElem 𝔰.ϱ r)⁻¹ * x :=
   calc (weylElem 𝔰.ϱ r * (a * s⁻¹)⁻¹)⁻¹ * (s * x)
@@ -463,7 +463,7 @@ lemma exists_isCompact_scaledOrbitalIntegral_support {F : PlaceData ι T (m + 1)
   have h_back : (weylElem 𝔰.ϱ (star p) * l)⁻¹ * y' = y := by
     simp [y', mul_assoc, (weylElem_mul_left_comm hl).1]
   have y'_mem : y' ∈ S := Γ.hasMatrixSize_of_ne_zero h_cut hp.star_head hl hy' (by rwa [h_back])
-  exact ⟨(y, y'), ⟨y_mem, y'_mem⟩, by simp [y', mul_assoc]⟩
+  exact ⟨(y, y'), ⟨y_mem, y'_mem⟩, by simp [y']⟩
 
 /-- At a large lattice datum `F` and for `l` in the floor group G^(ϱ), the pairing of the scaled
 orbital integrals with heads `p`, `q` at `l` is the density `F.headDensity 𝔰.ϱ p q` of the two heads
@@ -564,12 +564,12 @@ lemma integrable_unfoldedPairing {F : PlaceData ι T (m + 1)} (Z : F.Intermediat
     obtain ⟨k, hk, h_ne⟩ : ∃ k ∈ T.floorGroup i, ‖Φ k (y₁, y₂)‖ₑ ≠ 0 :=
       exists_ne_zero_of_ae (ae_descConv_mem ae_floorMeasure_mem) hy
     exact hasMatrixSize_of_unfoldedPairing_ne_zero Z hp.self_of_nhds hq.self_of_nhds
-      (mul_mem (floorGroup_anti hi hk) hl) (enorm_ne_zero.1 h_ne)
+      (mul_mem (floorGroup_anti hi hk) hl) (eNorm_ne_zero.1 h_ne)
   have hB_int : IntegrableOn B (S ×ˢ S) M₂ := hB.continuousOn.integrableOn_compact (hS.prod hS)
   refine ⟨hΦ.aestronglyMeasurable, ?_⟩
   calc ∫⁻ z, ‖uncurry Φ z‖ₑ ∂(F.quotientMeasureFrom i).prod M₂
     _ = ∫⁻ y, ∫⁻ k, ‖Φ k y‖ₑ ∂F.quotientMeasureFrom i ∂M₂ :=
-      lintegral_prod_symm _ hΦ.enorm.aemeasurable
+      lintegral_prod_symm _ hΦ.eNorm.aemeasurable
     _ = ∫⁻ y in S ×ˢ S, ∫⁻ k, ‖Φ k y‖ₑ ∂F.quotientMeasureFrom i ∂M₂ :=
       (setLIntegral_eq_of_support_subset h_supp).symm
     _ ≤ ∫⁻ y in S ×ˢ S, ‖B y‖ₑ * C ∂M₂ := lintegral_mono h_le

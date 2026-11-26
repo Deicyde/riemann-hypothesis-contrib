@@ -127,7 +127,7 @@ lemma ratToFin_mem_besselU_iff {γ : S.G E} : S.ratToFin γ ∈ besselU ↔ γ �
   -- The conditions on the entries are reflected by the injective map `E → 𝔸f E`.
   have h_one (i j : 𝔰.BesselIndex) : (1 : Matrix 𝔰.BesselIndex 𝔰.BesselIndex (𝔸f E)) i j =
       algebraMap E (𝔸f E) ((1 : Matrix 𝔰.BesselIndex 𝔰.BesselIndex E) i j) := by
-    simp [Matrix.one_apply, apply_ite]
+    simp [Matrix.one_apply]
   simp only [mem_besselU, h_entry, h_one, (algebraMap E (𝔸f E)).injective.eq_iff]
 
 /-- The inclusion `S.inclHFin` of the finite adelic points of the unitary group of `X₀` lands in
@@ -386,7 +386,7 @@ lemma isUnimodular_latticeMiddleGram [StarRing A] (𝔰 : Shape) {N : A} (hN : N
     ext i j
     aesop (add simp [latticeMiddleGram, diagonal, Function.swap])
   have h_mem (a b : 𝔰.MiddleIndex) : latticeMiddleGram 𝔰 N a b ∈ R ∧ inv a b ∈ R := by
-    aesop (add simp [inv, latticeMiddleGram, diagonal, Function.swap])
+    aesop (add simp [latticeMiddleGram, diagonal, Function.swap])
   let u : GL 𝔰.MiddleIndex A := ⟨latticeMiddleGram 𝔰 N, inv, h_inv, mul_eq_one_comm.1 h_inv⟩
   exact ⟨h_herm, u, mem_intGL.2 ⟨fun a b ↦ (h_mem a b).1, fun a b ↦ (h_mem a b).2⟩, rfl⟩
 
@@ -634,7 +634,7 @@ lemma reduction_eq_one_iff (k : S.latticeStabilizer) :
       simp only [intGL.map_eq_one, forall_comm (α := (Σ i : Fin 2, S.chosenPlaces i) × Bool)]
     _ ↔ _ := forall₂_congr fun a b ↦ by
       rw [← inv_ideleM_smul_mem_iff]
-      by_cases hab : a = b <;> simp [k', toMatrix, hab, Units.smul_def]
+      by_cases hab : a = b <;> simp [k', toMatrix, Units.smul_def]
 
 /-- The image `S.principalLevel` of the kernel of the reduction at the chosen places equals
 `unitaryLevel`: the isometries of the Gram matrix `(S.latticeMiddle (𝔸f E)).splitGram` that are
@@ -711,31 +711,24 @@ closure of the image of 𝖴(E). -/
 lemma New.besselU_dense {T : 𝔰.Form E} [IsHermitianUnit T] {T' : 𝔰.Form (𝔸f E)}
     (hT : T.splitGram.map (↑) = T'.splitGram) :
     T'.besselU ≤ (T.besselU.map (U.map (algebraMap E (𝔸f E)) (h := hT))).topologicalClosure := by
-  have : IsHermitianUnit T'.splitGram := by
-    rw [← hT]
-    exact ⟨IsHermitian.map conjTranspose_eq _ fun _ ↦ by simp, isUnit.map (mapMatrix _)⟩
-  set C : Subgroup T'.G :=
-    (T.besselU.map (U.map (algebraMap E (𝔸f E)) (h := hT))).topologicalClosure
-  -- `besselU` is built floor by floor from the groups `floorUnipotent l`, so it is enough that each
-  -- of them lies in the closure.
-  suffices h_floor : ∀ l : ℕ, ∀ x ∈ floorUnipotent l, x ∈ C by
-    rw [← unipotentBelow_eq_besselU (l := 𝔰.ϱ) le_rfl]
-    exact unipotentBelow_induction (C := fun _ x ↦ x ∈ C) (one_mem C)
-      (fun l x hx y hy ↦ mul_mem (h_floor l x hx) hy) 𝔰.ϱ
-  intro l x hx
+  have : IsHermitianUnit T'.splitGram :=
+    hT ▸ ⟨IsHermitian.map conjTranspose_eq _ fun _ ↦ by simp, isUnit.map (mapMatrix _)⟩
+  -- `besselU` is built floor by floor from `floorUnipotent l`.
+  rw [← unipotentBelow_eq_besselU (l := 𝔰.ϱ) le_rfl]
+  refine unipotentBelow_induction (C := fun _ x ↦ x ∈ _) (one_mem _)
+    (fun l x hx _ hy ↦ mul_mem ?_ hy) 𝔰.ϱ
   obtain hl | hl := le_or_gt 𝔰.ϱ l
-  · -- For `ϱ ≤ l` the group `floorUnipotent l` is trivial.
-    simp [eq_one_of_mem_floorGroup_inf hx (.inr hl)]
+  · simp [eq_one_of_mem_floorGroup_inf hx (.inr hl)]
   -- For `l < ϱ`, `x` is a Heisenberg element, and rational parameters are dense.
   let a : Fin 𝔰.ϱ := ⟨l, hl⟩
   obtain ⟨p, rfl⟩ : ∃ p, x = heisenbergElem a p := exists_eq_heisenbergElem_of_mem hx
-  have h_dense : DenseRange fun q : ({i : 𝔰.BesselIndex // a + 1 ≤ floorOf i} → E) × E ↦
-      (fun i ↦ (q.1 i : 𝔸f E), skewPart (q.2 : 𝔸f E)) :=
-    (DenseRange.piMap fun _ ↦ denseRange_algebraMap_finAdele).prodMap denseRange_skewPart_algebraMap
-  refine map_mem_closure (continuous_heisenbergElem_finAdele a) (h_dense p) ?_
+  refine map_mem_closure (continuous_heisenbergElem_finAdele a)
+    (((DenseRange.piMap fun _ ↦ denseRange_algebraMap_finAdele).prodMap
+      denseRange_skewPart_algebraMap) p) ?_
   rintro _ ⟨⟨v, t⟩, rfl⟩
-  obtain ⟨-, h_below⟩ := heisenbergElem_mem_floorUnipotent (T := T) a (v, skewPart t)
-  exact ⟨_, unipotentBelow_le_besselU h_below, map_heisenbergElem_finAdele hT a v t⟩
+  exact ⟨_, unipotentBelow_le_besselU
+    (heisenbergElem_mem_floorUnipotent (T := T) a (v, skewPart t)).2,
+    map_heisenbergElem_finAdele hT a v t⟩
 
 end Density
 
@@ -774,7 +767,7 @@ lemma exists_besselU_approx {x : S.GFin} (hx : x ∈ besselU) (y : S.GFin) :
     apply S.toLatticeBasis.symm.injective
     ext
     simp [φ, ratToFin, adelicToFin, ratToAdelic, U.map]
-  exact ⟨u, hu, by simpa [V, f, h_map] using hzV⟩
+  exact ⟨u, hu, by simpa [V, h_map] using hzV⟩
 
 /-- Let `u`, `v` lie in the unipotent group `besselU` inside the finite adelic unitary group
 `S.GFin`. Let `g` be a finite adelic point of U(X₀), the unitary group `U 1` of the identity form on
@@ -847,12 +840,12 @@ lemma eq_and_mem_classUnipotent_of_besselS [hS : S.IsAdmissible] {c d : S.Classe
     eq_and_eq_one_of_doubleCoset_rep Quotient.out_eq h_free η h_level
   exact ⟨rfl, by simpa using hu, by simpa [translateByClassReps] using hγ_level⟩
 
-/-- Let `S` be admissible (`S.IsAdmissible`), `c` a class in `S.Classes` with representative `h_c`,
-and `u` in `𝖴(𝔸_f)`. There is a rational `u₀ ∈ 𝖴` such that
+/-- Let `c` be a class in `S.Classes` with representative `h_c`, and let `u` belong to `𝖴(𝔸_f)`.
+There is a rational `u₀ ∈ 𝖴` such that
 `S.translateByClassReps c c u₀ = h_c⁻¹ u₀ h_c` lies in `u K(M)`, with `K(M) = S.principalLevel`.
 Moreover `S.unipotentChar`, the character u ↦ ψ_f(−σ(u)/(Mϖ)), takes the same value at
 `S.ratToFin u₀` and at `u`. -/
-lemma exists_rat_approx_unipotentChar_eq [_hS : S.IsAdmissible] (c : S.Classes) {u : S.GFin}
+lemma exists_rat_approx_unipotentChar_eq (c : S.Classes) {u : S.GFin}
     (hu : u ∈ besselU) :
     ∃ u₀ : S.G E, u₀ ∈ besselU ∧
       u⁻¹ * S.translateByClassReps c c u₀ ∈ S.principalLevel ∧
@@ -897,12 +890,12 @@ lemma exists_besselS_mem_termsOver [hS : S.IsAdmissible] (c : S.Classes) {s : S.
   exact mul_mem h_approx (inv_mem (hS.sourceLevel_eq.le a.property))
 
 /-- Freeness in rank at most `𝔰.k`, the rank of the definite space X₀. Let `E` be a CM field that
-contains a primitive 5040th root of unity, and let the filling data `S` over `E` satisfy the
-standing hypotheses `S.IsAdmissible`. For `i = 0, 1`, `S.chosenPlaces i` is the chosen set of finite
-places of `E` of norm the prime `S.levelPrime i`. Let `γ` be a rational point of the standard
-unitary group in `n` variables, `|n| ≤ 𝔰.k`, and `g` a finite adelic point. If `g⁻¹ γ g` is integral
-(lies in `stdLevel E n`) and reduces to `1` at every place of `S.chosenPlaces i`, then `γ = 1`. -/
-lemma eq_one_of_reduceAt_eq_one [_hS : S.IsAdmissible] [HasPrimitiveRoot5040 E] {n : Type}
+contains a primitive 5040th root of unity, and let `S` be filling data over `E`. For `i = 0, 1`,
+`S.chosenPlaces i` is the chosen set of finite places of `E` of norm the prime `S.levelPrime i`.
+Let `γ` be a rational point of the standard unitary group in `n` variables, `|n| ≤ 𝔰.k`, and `g` a
+finite adelic point. If `g⁻¹ γ g` is integral (lies in `stdLevel E n`) and reduces to `1` at every
+place of `S.chosenPlaces i`, then `γ = 1`. -/
+lemma eq_one_of_reduceAt_eq_one {n : Type}
     [Fintype n] [DecidableEq n] (hn : card n ≤ 𝔰.k) (i : Fin 2) {γ : U (stdSpace E n).J}
     {g : Gf E n} (h_int : g⁻¹ * (stdSpace E n).embFin γ * g ∈ stdLevel E n)
     (h_red : ∀ w : S.chosenPlaces i,

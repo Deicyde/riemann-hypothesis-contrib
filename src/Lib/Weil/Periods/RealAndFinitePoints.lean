@@ -94,8 +94,8 @@ lemma fst_mem_besselReal (r : Y.besselGroup) : (r : G E ε).1 ∈ Y.besselReal :
 times the finite points of the Bessel group to the Bessel group, as an isomorphism of
 topological groups. -/
 def besselProdEquiv : Y.besselReal × Y.besselFin ≃ₜ* Y.besselGroup where
-  toFun z := ⟨(z.1.1, z.2.1), Y.mk_mem_besselGroup z⟩
-  invFun r := (⟨r.1.1, Y.fst_mem_besselReal r⟩, ⟨r.1.2, Y.snd_mem_besselFin r.2⟩)
+  toFun z := ⟨(z.1.val, z.2.val), Y.mk_mem_besselGroup z⟩
+  invFun r := (⟨r.val.1, Y.fst_mem_besselReal r⟩, ⟨r.val.2, Y.snd_mem_besselFin r.property⟩)
   map_mul' _ _ := rfl
   continuous_toFun := by fun_prop
   continuous_invFun := by fun_prop
@@ -146,7 +146,7 @@ lemma exists_integral_eq_mul_integral_besselReal (K : Subgroup (Gf E ι)) [hK : 
   have h_emb : MeasurableEmbedding Y.besselProdEquiv :=
     Y.besselProdEquiv.toHomeomorph.measurableEmbedding
   let J : Set Y.besselFin := Subtype.val ⁻¹' K
-  have hJ_open : IsOpen J := hK.isOpen.preimage continuous_subtype_val
+  have hJ_open : IsOpen J := hK.isOpen.preimage continuous_subtypeVal
   have hJ_compact : IsCompact J :=
     (IsClosed.isClosedEmbedding_subtypeVal inferInstance).isCompact_preimage hK.isCompact
   have hJ_pos : haar J ≠ 0 := hJ_open.measure_ne_zero haar ⟨1, one_mem K⟩

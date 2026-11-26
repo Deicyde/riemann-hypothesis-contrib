@@ -190,7 +190,6 @@ theorem IsMatch.sign_mul_relWeight_nonneg (hm : IsMatch T l l') (r : R) (s : ℤ
   have card_le : #{j : R | v j ∈ S} ≤ #S :=
     card_le_card_of_injOn v (fun j hj ↦ by simpa using hj) fun i _ j _ hij ↦ by grind
   specialize parity r
-
   -- Termwise comparison. Column terms are `≤ 0`, and row terms with `v j ∈ S` are `≥ 0`. For
   -- `v j ∉ S` a matched row has the term of its column, and an unmatched row is close to `r`, so
   -- `ε j = ε r` by `gap` and its term is `0`.
@@ -325,7 +324,7 @@ the lowest `K`-type. Put `k = s * (Λ_a - v)`, where `v` is the weight of the va
 `k ≥ 0`, then `P` has degree `k` in the variables of sign `s` of row `a`, and it does not depend on
 the variables of sign `-s` of that row. -/
 theorem DiscreteSeries.polarisation_self_eq_smul_of_isCompactPrimitive [DecidableEq R]
-    [DecidableEq C] [Fintype ι] {P : MvPolynomial ι ℂ}
+    [DecidableEq C] {P : MvPolynomial ι ℂ}
     (hl : l.Injective) (h_prim : T.oscRows.IsCompactPrimitive l P)
     (h_harm : T.swap.IsLaplaceHarmonic P) {s : ℤˣ} {a : R}
     (h_wt : T.oscRows.E a a P = (l.lowestKType a : ℂ) • P) (h_nonneg : 0 ≤ s * T.relWeight l a) :
@@ -363,7 +362,7 @@ the rows and by the Laplacians of the columns. Fix a row `a` and a sign `s`. The
 `T.relWeight l a` relative to the vacuum has sign `s` or is zero, then `P` is homogeneous of degree
 `s * T.relWeight l a` in the variables of sign `s` of row `a` and free of those of sign `-s`. -/
 theorem DiscreteSeries.polarisation_eq_of_isCompactPrimitive [DecidableEq R] [DecidableEq C]
-    [Fintype ι] {P : MvPolynomial ι ℂ}
+    {P : MvPolynomial ι ℂ}
     (hl : l.Injective) (h_prim : T.oscRows.IsCompactPrimitive l P)
     (h_harm : T.swap.IsLaplaceHarmonic P) (a : R) (s : ℤˣ) :
     (∀ b : R, ε a = ε b → s * l b < s * l a → T.polarisation P a b s = 0) ∧
@@ -390,7 +389,7 @@ theorem FockDualPair.IsTermwiseHarmonic.isLaplaceHarmonic {Φ : MvPolynomial ι 
 the lowest `K`-type of `l` as weight for the row action and any weight `ν` for the column action.
 Then `Φ` is a pre-joint harmonic: nonzero, killed by the compact raising operators of the columns
 and by the Laplacians of both sides, and highest of weight `l.lowestKType` for the rows. -/
-lemma FockDualPair.IsJointHighest.isPreJointHarmonic [DecidableEq R] [DecidableEq C] [Fintype ι]
+lemma FockDualPair.IsJointHighest.isPreJointHarmonic [DecidableEq R] [DecidableEq C]
     {Φ : MvPolynomial ι ℂ} {ν : C → ℤ} (hΦ : T.IsJointHighest l l' Φ l.lowestKType ν) :
     T.IsPreJointHarmonic l l' Φ := by
   obtain ⟨-, raise_col⟩ := hΦ.isKHighest_cols
@@ -400,7 +399,7 @@ lemma FockDualPair.IsJointHighest.isPreJointHarmonic [DecidableEq R] [DecidableE
 /-- A combination `P - c • Q` of pre-joint harmonics (nonzero polynomials killed by the Laplacians
 and the compact raising operators of both sides, of weight `l.lowestKType` for the rows) is again
 one, unless it is zero. -/
-theorem FockDualPair.IsPreJointHarmonic.sub_smul [DecidableEq R] [DecidableEq C] [Fintype ι]
+theorem FockDualPair.IsPreJointHarmonic.sub_smul [DecidableEq R] [DecidableEq C]
     {P Q : MvPolynomial ι ℂ} {c : ℂ}
     (hP : T.IsPreJointHarmonic l l' P) (hQ : T.IsPreJointHarmonic l l' Q) (h_ne : P ≠ c • Q) :
     T.IsPreJointHarmonic l l' (P - c • Q) := by
@@ -441,10 +440,8 @@ inductive DiscreteSeries.IsEigenDirection (F : MvPolynomial ι ℂ) (x : ι → 
 
 /-- The translation `G ↦ G (X + x)` commutes with partial derivatives. -/
 theorem DiscreteSeries.bind₁_X_add_C_pderiv {τ : Type*} (x : τ → ℂ) (G : MvPolynomial τ ℂ) (i : τ) :
-    bind₁ (fun j : τ ↦ X j + MvPolynomial.C (x j)) (pderiv i G) =
-      pderiv i (bind₁ (fun j : τ ↦ X j + MvPolynomial.C (x j)) G) := by
-  change aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) (pderiv i G) =
-    pderiv i (aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) G)
+    aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) (pderiv i G) =
+      pderiv i (aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) G) := by
   induction G using induction_on with
   | C a => simp
   | add p q hp hq => simp only [map_add, hp, hq]
@@ -453,8 +450,7 @@ theorem DiscreteSeries.bind₁_X_add_C_pderiv {τ : Type*} (x : τ → ℂ) (G :
 
 /-- The constant coefficient of `G (X + x)` is the value of `G` at `x`. -/
 theorem DiscreteSeries.coeff_zero_bind₁_X_add_C {τ : Type*} (x : τ → ℂ) (G : MvPolynomial τ ℂ) :
-    (bind₁ (fun j : τ ↦ X j + MvPolynomial.C (x j)) G).coeff 0 = eval x G := by
-  change (aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) G).coeff 0 = eval x G
+    (aeval (fun j : τ ↦ X j + MvPolynomial.C (x j)) G).coeff 0 = eval x G := by
   rw [← constantCoeff_eq]
   induction G using induction_on with
   | C a => simp
@@ -534,7 +530,6 @@ theorem IsMatch.lt_or_exists_isMatchedPair (hm : IsMatch T l l') (r : R) (c : C)
   · obtain rfl : d = c := hm.hasGap_column.injective (mul_left_cancel₀ s.ne_zero h_eq)
     exact .inl ⟨((le_abs_self _).trans_eq (abs_sub_comm _ _)).trans_lt r_large, hrd⟩
   · -- The parameter of column `c` is further out than that of `d`, so `c` is matched too.
-    have param_rd : T.centredParam l r = -T.swap.centredParam l' d := hrd.1
     have c_not_free : ¬|T.swap.centredParam l' c| < card C - card R := by grind
     obtain ⟨a, hac⟩ : ∃ a : R, T.IsMatchedPair l l' a c := (hm.right c).resolve_right c_not_free
     have a_above : s * l r < s * l a := by grind
@@ -571,7 +566,7 @@ theorem IsMatch.isEigenDirection_of_swap_polarisation (hm : IsMatch T l l') {F :
   exact ⟨R, _, fun a ↦ T.varEquiv (a, d), fun a ↦ T.varEquiv (a, c), r, μ, by simp, rfl, only_r,
     field⟩
 
-variable [DecidableEq R] [DecidableEq C] [Fintype ι]
+variable [DecidableEq R] [DecidableEq C]
 
 /-- Let `l`, `l'` match. A pre-joint harmonic `F` (nonzero, killed by the Laplacians and the compact
 raising operators of both sides, of weight `l.lowestKType` for the rows) does not vanish at the
@@ -651,23 +646,6 @@ theorem IsJointHarmonic.exists_eq_smul_of_row_weight {Φ P : MvPolynomial ι ℂ
   · have hP : T.IsPreJointHarmonic l l' P := ⟨h_ne, h_cols, h_harmonic.isLaplaceHarmonic, h_rows,
       h_harmonic_swap.isLaplaceHarmonic⟩
     exact hΦ.unique hP hΦ.isJointHighest.isPreJointHarmonic
-
-/-- Let `T` be a dual pair in Fock space, whose variables in `ι` are indexed by rows `R` and columns
-`C`, and let `Φ` be a joint harmonic for matching `l`, `l'`. That is, `Φ ≠ 0` is `K`-highest, of the
-weights of the lowest `K`-types, for the row action `T.oscRows` and the column action
-`T.swap.oscRows`, and it is termwise harmonic for `T` and `T.swap`: no monomial has two variables of
-one column from rows of opposite signs, or two variables of one row from columns of opposite signs.
-Then every polynomial `P` satisfying both termwise harmonic conditions, killed by the compact
-raising operators of the row action for `l`, and `K`-highest of weight `l'.lowestKType` for the
-column action, is a scalar multiple of `Φ`. -/
-theorem IsJointHarmonic.exists_eq_smul_of_column_weight {Φ P : MvPolynomial ι ℂ}
-    (hΦ : IsJointHarmonic T l l' Φ) (h_harmonic : T.IsTermwiseHarmonic P)
-    (h_harmonic_swap : T.swap.IsTermwiseHarmonic P)
-    (h_rows : T.oscRows.IsCompactPrimitive l P)
-    (h_cols : l'.IsKHighest T.swap.oscRows l'.lowestKType P) :
-    ∃ c : ℂ, P = c • Φ :=
-  hΦ.swap.exists_eq_smul_of_row_weight h_harmonic_swap (by rwa [swap_swap]) h_cols
-    (by rwa [swap_swap])
 
 end New
 

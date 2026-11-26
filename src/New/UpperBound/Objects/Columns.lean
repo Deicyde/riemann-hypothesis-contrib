@@ -314,12 +314,11 @@ lemma pairWeilFinite_schrodingerOpAt [h : IsSplitLevel P N] (g : GL n (LocProd P
   simp [-atPlaces_embedGL, field]
 
 omit h [Fact N.Prime] in
-/-- Let `P` hold one place of each conjugate pair above `N`, all unramified of degree one
-(`IsSplitLevel P N`), and let the base change of `a` be unramified at every place of `P`. Let
+/-- Suppose the base change of `a` is unramified at every place of `P`. Let
 `χ = a.spaceChar i` be this base change divided by the `i`-th power of the splitting character `υ`.
 The character `detCharAt χ k: x ↦ χ (det x) |det x| ^ (-k / 2)` of the invertible matrices at `P` is
 trivial on those that are invertible over the integers, which `inclGL` includes. -/
-lemma detCharAt_inclGL [_h : IsSplitLevel P N] (a : AutChar E)
+lemma detCharAt_inclGL (a : AutChar E)
     (h_unr : ∀ w ∈ P, CharUnramifiedAt a.baseChange.finPart w) (i k : ℕ)
     (g : GL n (O (F := LocProd P))) : detCharAt (a.spaceChar i) k (inclGL g) = 1 := by
   -- The determinant is a unit at each place of `P`, where both characters in `spaceChar` are
@@ -468,12 +467,8 @@ lemma sum_translate_eq_gluedDatum [hP : IsSplitLevel P N] (hS : IsSplitLevel S N
   -- `t - b / N` and `r - b̄ / N` integral at `P`, and its term is `ψ₀ (-r ⬝ t)`.
   let j : 𝔸f E := idem P
   let p : 𝔸f E := 1 + idem S * ((N : 𝔸f E) - 1)
-  have h_class (i : n') : ∃ b : S → ZMod N, ∀ y : S → ZMod N,
-      j * (T (i, .inr ()) - residueOverN y) ∈ Ô E ∧
-        j * (R (.inr (), i) - star (residueOverN y)) ∈ Ô E ↔
-      (j * (T (i, .inr ()) * p) ∈ Ô E ∧ j * ((N + 1 - p) * R (.inr (), i)) ∈ Ô E) ∧ b = y :=
-    hP.exists_sub_mem_and_sub_star_mem_iff hS rfl _ _
-  choose b hb using h_class
+  choose b hb using fun i : n' ↦
+    hP.exists_sub_mem_and_sub_star_mem_iff hS (p := p) rfl (T (i, .inr ())) (R (.inr (), i))
   have hD_S : (diagN n S).val = diagonal fun i ↦ evalPlaces P (if i.isLeft then 1 else p) := by
     simp +contextual [diagN, funext_iff, apply_ite, p, idem_apply]
   have hD_PS : (diagN m (P \ S)).val =

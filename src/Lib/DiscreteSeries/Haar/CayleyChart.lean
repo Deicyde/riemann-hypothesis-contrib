@@ -260,7 +260,7 @@ exp(-π q) has lower integral 1. -/
 theorem lintegral_gaussian_eq_one : ∫⁻ x : V, ‖rexp (-π * q x)‖ₑ = 1 := by
   -- The Gaussian is integrable because its integral is `1 ≠ 0`, and it equals its norm.
   have h_one : ∫ x, rexp (-π * q x) = 1 := by simpa using h_gauss.integral_exp_eq pi_pos
-  rw [← ofReal_integral_norm_eq_lintegral_enorm
+  rw [← ofReal_integral_norm_eq_lintegral_eNorm
     (.of_integral_ne_zero (h_one.trans_ne one_ne_zero))]
   simpa using h_one
 
@@ -487,7 +487,7 @@ theorem measurableEmbedding_cayleyChart :
     MeasurableEmbedding
       ({y : Matrix n n ℝ | (cayleyDenom J y).det ≠ 0}.domRestrict (cayleyChart J)) := by
   have := (measurableSet_det_cayleyDenom_ne_zero (J := J)).standardBorel
-  exact (measurable_cayleyChart.comp measurable_subtype_coe).measurableEmbedding
+  exact (measurable_cayleyChart.comp measurable_subtypeVal).measurableEmbedding
     cayleyChart_injOn.injective
 
 /-- The integral of any f : U(J) → [0, ∞] (no measurability needed) for `volume` = `New.haarU` J,
@@ -770,7 +770,7 @@ instance : (volume (α := U J)).IsHaarMeasure := by
   -- A σ-finite left invariant measure is a multiple of Haar measure. The multiple is neither
   -- `0` nor `∞`, because some set has positive finite measure.
   have : SigmaFinite (haarU J) := by
-    apply_rules [(measurePreserving_subtype_coe _).sigmaFinite,
+    apply_rules [(measurePreserving_subtypeVal _).sigmaFinite,
       measurableEmbedding_cayleyChart.sigmaFinite_map, measurableSet_det_cayleyDenom_ne_zero]
   have : (haarU J).IsMulLeftInvariant :=
     ⟨fun g ↦ (measurePreserving_haarU g 1 1 (.mulLeft g) (by simp) (by simp)).map_eq⟩
@@ -781,11 +781,11 @@ instance : (volume (α := U J)).IsHaarMeasure := by
       exact continuous_cayleyDenom.matrix_det.isOpen_support.measure_pos _
         ⟨0, by simp [cayleyDenom]⟩
     · exact fun y (hy : (cayleyDenom J y).det ≠ 0) ↦ by simp [hy, det_ne_zero]
-    all_goals measurability
+    measurability
   obtain ⟨s, -, -, hs_pos, hs_fin⟩ := exists_subset_measure_lt_top .univ h_pos
   rw [haarMeasure_unique volume Classical.ofNonempty] at hs_pos hs_fin ⊢
   refine IsHaarMeasure.smul _ (fun h_zero ↦ by simp [h_zero] at hs_pos) fun h_top ↦ ?_
-  rw [h_top, Measure.smul_apply, smul_eq_mul] at hs_pos hs_fin
+  rw [h_top, smul_apply, smul_eq_mul] at hs_pos hs_fin
   exact hs_fin.ne (ENNReal.top_mul (right_ne_zero_of_mul hs_pos.ne'))
 
 end

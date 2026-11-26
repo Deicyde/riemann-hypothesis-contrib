@@ -119,22 +119,15 @@ lemma eq_of_pow_eq_one_of_val_sub_lt {x y : Ω} (hx : x ^ N = 1) (hy : y ^ N = 1
     (h_val_lt : A.valuation (x - y) < A.valuation N) : x = y := by
   -- Write `x = y + a N` with `a, y` in `A`. The binomial expansion of `x ^ (N + 1)` to second order
   -- gives `-(x - y) N = (x - y) ^ 2 b` with `b` in `A`, so `x - y` divides `N` if `x ≠ y`.
-  have hN_ne : N ≠ 0 := by
-    rintro rfl
-    simp at h_val_lt
-  have hy_mem : y ∈ A := by
+  have hN_ne : N ≠ 0 := fun h ↦ by simp [h] at h_val_lt
+  lift y to A using by
     rw [← A.valuation_le_one_iff, ← pow_le_one_iff hN_ne, ← map_pow, hy, map_one]
-  lift y to A using hy_mem
   obtain ⟨a, ha⟩ := (A.valuation_le_iff _ _).mp h_val_lt.le
-  obtain ⟨b, hb⟩ :
-      (a * N) ^ 2 ∣ (y + a * N) ^ (N + 1) - y ^ N * (a * N) * (N + 1 : ℕ) - y ^ (N + 1) :=
-    sq_dvd_add_pow_sub_sub (a * N) y (N + 1)
-  have h_expand : x ^ (N + 1) - (x - y) * (N + 1) - y ^ (N + 1) = (x - y) ^ 2 * b := by
-    simp_all [Subtype.ext_iff]
+  obtain ⟨b, hb⟩ := sq_dvd_add_pow_sub_sub (a * N) y (N + 1)
   contrapose! h_val_lt
-  -- so `N` is `-b` times `x - y`, with `-b` in `A`
-  have h_dvd : -(b * (x - y)) = N := by grind
-  exact (A.valuation_le_iff _ _).mpr ⟨-b, by simpa using h_dvd⟩
+  refine (A.valuation_le_iff _ _).mpr ⟨-b, ?_⟩
+  simp_all [Subtype.ext_iff]
+  grind
 
 /-- If `N` is a unit of `A` (`hN`), two `N`-th roots of unity that are congruent modulo the maximal
 ideal are equal. -/

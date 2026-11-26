@@ -91,11 +91,11 @@ variable {C} {Y E : D ⥤ Type 1} (p : E ⟶ Y) {J : Type 1} (X : J → C ⥤ Ty
 same image in Y(A). -/
 def cech (m : ℕ) : D ⥤ Type 1 where
   obj A := {e : Fin (m + 1) → E A // ∀ i j : Fin (m + 1), p.app A (e i) = p.app A (e j)}
-  map f := ↾fun e ↦ ⟨fun i ↦ E.map f (e.1 i), fun i j ↦ by simp [e.2 i j]⟩
+  map f := ↾fun e ↦ ⟨fun i ↦ E.map f (e.val i), fun i j ↦ by simp [e.property i j]⟩
 
 /-- The projection from the (m+1)-fold fibre power of p: E → Y to E taking the j-th coordinate. -/
 def cech.proj (m : ℕ) (j : Fin (m + 1)) : cech p m ⟶ E where
-  app _ := ↾fun e ↦ e.1 j
+  app _ := ↾fun e ↦ e.val j
 
 /-- For a family X_i of set-valued functors on C, the functor sending A to the disjoint union of
 the X_i(A). -/
@@ -201,15 +201,15 @@ def cechFunctor (m : ℕ) : Arrow (C ⥤ Type 1) ⥤ C ⥤ Type 1 :=
 /-- For u: W → Y and p: E → Y, the fibre product of W and E over Y. -/
 def fibreProd : C ⥤ Type 1 :=
   CategoryTheory.Functor.mk (fun A ↦ {x : W A × E A // u A x.1 = p A x.2}) fun f ↦
-    ↾fun x ↦ ⟨(W.map f x.1.1, E.map f x.1.2), by aesop⟩
+    ↾fun x ↦ ⟨(W.map f x.val.1, E.map f x.val.2), by aesop⟩
 
 /-- The first projection from the fibre product of W and E over Y to W. -/
 def fibreProd.fst : fibreProd u p ⟶ W where
-  app _ := ↾fun x ↦ x.1.1
+  app _ := ↾fun x ↦ x.val.1
 
 /-- The second projection from the fibre product of W and E over Y to E. -/
 def fibreProd.snd : fibreProd u p ⟶ E where
-  app _ := ↾fun x ↦ x.1.2
+  app _ := ↾fun x ↦ x.val.2
 
 /-- The map h_A → Y corresponding to a point y of Y(A) by the Yoneda lemma. -/
 def pointMap {A : C} (y : Y A) : reprBy A ⟶ Y := uliftCoyonedaEquiv.symm y
@@ -425,7 +425,7 @@ point x ∈ X(A) to the ring map R → A whose spectrum is s∘x. -/
 def pointsToBase {X : Scheme} {R : CommRingCat} (s : X ⟶ Spec R) :
     Scheme.Spec.rightOp ⋙ uliftYoneda.obj X ⟶ reprBy R where
   -- a point `x : Spec B ⟶ X` goes to the ring map `R ⟶ B` whose spectrum is `x ≫ s`
-  app B := ↾fun x ↦ ULift.up (Spec.preimage (x.1 ≫ s))
+  app B := ↾fun x ↦ ULift.up (Spec.preimage (x.down ≫ s))
   naturality := by
     -- the goal is the naturality of `Spec.preimage` under precomposition, after unfolding `h_R`
     delta reprBy reprFunctor
@@ -435,15 +435,11 @@ def pointsToBase {X : Scheme} {R : CommRingCat} (s : X ⟶ Spec R) :
 under s. -/
 def baseRingMap (x : X B) : R ⟶ B := (s B x).down
 
-/-- The map of `h_R` along `f : B ⟶ B'` sends a ring map `R ⟶ B` to its composite with `f`. -/
-private lemma reprBy_map_down {B' : CommRingCat} (f : B ⟶ B') (y : (reprBy R).obj B) :
-    ((reprBy R).map f y).down = y.down ≫ f :=
-  rfl
-
 @[simp]
 lemma baseRingMap_map {B' : CommRingCat} (f : B ⟶ B') (x : X.obj B) :
     baseRingMap s (X.map (X := B) (Y := B') f x) = baseRingMap s x ≫ f := by
-  simp [baseRingMap, NatTrans.naturality_apply, reprBy_map_down]
+  simp only [baseRingMap, NatTrans.naturality_apply]
+  rfl
 
 /-- For s: X → h_R and a subset I of R, the subfunctor of points x ∈ X(B) whose structure map
 R → B sends I to 0. -/
@@ -514,8 +510,7 @@ lemma locallyConstant_mem_of_indicator {Λ : Type*} [AddCommGroup Λ]
     ext x
     -- at `x` only the term of `a = y x` is non-zero
     change evalAddMonoidHom x y = evalAddMonoidHom x _
-    rw [map_sum]
-    simp [Set.indicator, ← h_fiber_eq]
+    simp [map_sum, Set.indicator, ← h_fiber_eq]
   rw [h_sum]
   exact sum_mem fun a _ ↦ h a (e a) (he_idem a)
 
@@ -737,26 +732,15 @@ lemma H.dimension_shift_induction {P : ∀ {F : AbFunctor C} {n : ℕ}, H N F n 
 
 
 lemma mapExactFunctor_mapExactFunctor :
-    (x.mapExactFunctor Φ).mapExactFunctor Θ = x.mapExactFunctor (Φ ⋙ Θ) := by
-  induction x with
-  | h₀ F f => simp [mapExactFunctor_mk₀]
-  | h S hS n x ih => simp [ih, mapExactFunctor_comp, mapExactFunctor_extClass]
+    (x.mapExactFunctor Φ).mapExactFunctor Θ = x.mapExactFunctor (Φ ⋙ Θ) :=
+  (x.comp_mapExactFunctor Φ Θ).symm
 
 /-- For a natural transformation η: Φ → Ψ of exact functors and x in Ext^n(N,F), pushing Φ(x)
 forward along η_F equals pulling Ψ(x) back along η_N, in Ext^n(ΦN,ΨF). -/
 lemma mapExactFunctor_naturality :
     push (Φ.obj N) (η F) n (x.mapExactFunctor Φ) =
-      H.map (Ψ.obj F) (η N) n (x.mapExactFunctor Ψ) := by
-  induction x with
-  | h₀ => simp [H.push, mapExactFunctor_mk₀, H.map]
-  | h S hS n x ih =>
-    -- The connecting classes of `Φ S` and `Ψ S` are compatible with `η` (`h_nat`). After
-    -- unfolding, reassociate the composites and use `h_nat`, then `ih`.
-    have h_nat : (hS.map_of_exact Φ).extClass.comp (mk₀ (η.app S.X₁)) (add_zero 1) =
-        (mk₀ (η.app S.X₃)).comp (hS.map_of_exact Ψ).extClass (zero_add 1) :=
-      extClass_naturality (hS.map_of_exact Φ) (hS.map_of_exact Ψ) (mapNatTrans S η)
-    simp_all [← comp_assoc_of_second_deg_zero, comp_assoc (h₂₃ := rfl), H.push, H.map,
-      mapExactFunctor_comp, mapExactFunctor_extClass]
+      H.map (Ψ.obj F) (η N) n (x.mapExactFunctor Ψ) :=
+  x.mapExactFunctor_comp_mk₀_natTransApp η
 
 namespace H
 
@@ -778,19 +762,15 @@ map. -/
 def mapₗ (F : AbFunctor C) [CoeffAction R F] (α : M ⟶ N) (n : ℕ) : H N F n →ₗ[R] H M F n :=
   { map F α n with map_smul' r := map_push α (CoeffAction.act r : End F).asHom }
 
-lemma mapExactFunctor_restrictAlong_id : x.mapExactFunctor (restrictAlong (𝟭 C)) = x := by
-  induction x with
-  | h₀ F f => simp [mapExactFunctor_mk₀, show (𝟭 C).whiskerLeft f = f from rfl]
-  | h S hS n x ih => simp [ih, mapExactFunctor_comp, mapExactFunctor_extClass]
+lemma mapExactFunctor_restrictAlong_id : x.mapExactFunctor (restrictAlong (𝟭 C)) = x :=
+  x.id_mapExactFunctor
 
 end H
 
 /-- An isomorphism `α : M ⟶ N` induces bijections `Ext^n(N,F) → Ext^n(M,F)` in every degree. -/
-lemma IsCohomEquiv.of_isIso [IsIso α] : IsCohomEquiv F α := by
-  intro n
-  -- pull-back along `inv α` is inverse to pull-back along `α`
-  refine bijective_iff_has_inverse.mpr ⟨map F (inv α) n, fun x ↦ ?_, fun x ↦ ?_⟩ <;>
-    simp [← H.map_comp]
+lemma IsCohomEquiv.of_isIso [IsIso α] : IsCohomEquiv F α := fun n ↦
+  -- pull-back along `α` is the value at `F` of the isomorphism `Ext^n(α, -)`
+  ConcreteCategory.bijective_of_isIso (((Abelian.extFunctor n).map α.op).app F)
 
 /-- If `γ : F ⟶ G` and `γ' : F' ⟶ G'` intertwine the coefficient maps of two comparisons with the
 same functor `c.functor`, then the comparison maps commute with push-forward along `γ` and `γ'`. The
@@ -805,7 +785,8 @@ lemma Comparison.pull_push (β : c.functor ⋙ G ⟶ G') (γ : F ⟶ G) (γ' : F
 @[simp]
 lemma Comparison.id_pull : (id F).pull α = H.map F α := by
   ext n x
-  simp [mapExactFunctor_restrictAlong_id, x.comp_mk₀_id, pull, H.map, H.push, mapExtAddHom]
+  change H.map F α n ((x.mapExactFunctor (restrictAlong (𝟭 C))).comp (mk₀ (𝟙 F)) rfl) = _
+  rw [mapExactFunctor_restrictAlong_id, x.comp_mk₀_id]
 
 /-- The composite of comparisons (φ,β) from F to F' and (φ',β') from F' to F'': the functor φ∘φ'
 with the map Fφφ' → F'φ' → F''. -/
@@ -827,8 +808,9 @@ namespace Comparison
 
 /-- The comparison map of `(𝟭 C, β)` along the identity of `N` is the push-forward along `β`. -/
 lemma pull_id_eq_push : pull ⟨𝟭 C, β⟩ (𝟙 N) n = push N β n := by
-  ext
-  simp [mapExactFunctor_restrictAlong_id, pull, H.map, H.push, mapExtAddHom]
+  ext x
+  change H.map _ (𝟙 N) n (push N β n (x.mapExactFunctor (restrictAlong (𝟭 C)))) = _
+  rw [mapExactFunctor_restrictAlong_id, H.map_id]
 
 /-- For `η : φ ⟶ ψ` and `β : ψ ⋙ F ⟶ F'`, moving `η` from the coefficient map (`η F` before
 `β`) to the source map (`η N` after `α`) does not change the comparison map. The target of `α` is
@@ -992,7 +974,7 @@ extension by the dual), which turns each `x ∈ T` into a point `f x ∈ W(k[ε]
 for all `t ∈ k`. -/
 def IsTangentPoly {W Z : CommAlg k ⥤ Type 1} (d : ℕ) (c u : W ⟶ Z) (y : W.obj (of k k))
     (P : Polynomial k) : Prop :=
-  ∃ᵉ (T : FGModuleCat k) (v : W.obj (of k (TrivSqZeroExt k (Dual k T)))) (A : Module.End k T),
+  ∃ T : FGModuleCat k, ∃ v : W.obj (of k (TrivSqZeroExt k (Dual k T))), ∃ A : Module.End k T,
     -- a vector `x : T` gives a point `f x` of `W` with values in `k ⊕ k`
     let f (x : T) := W.map (ofHom (TrivSqZeroExt.map (Dual.eval k T x))) v
     -- (a) `T` has dimension `d`
@@ -1084,7 +1066,7 @@ lemma freeAb.desc_of (s : (A : C) → Y.obj A → F.obj A)
     (A : C) (y : Y.obj A) :
     desc (F := F) (Y := Y) s h A (FreeAddCommGroup.of y) = s A y := by
   -- at `A` the map is the lift of `s A` to the free abelian group
-  show FreeAddCommGroup.lift (s A) (FreeAddCommGroup.of y) = s A y
+  change FreeAddCommGroup.lift (s A) (FreeAddCommGroup.of y) = s A y
   exact FreeAddCommGroup.lift_apply_of (s A) y
 
 /-- Two maps ℤ[Y] → F agree if they agree on every generator [y]. -/
@@ -1113,12 +1095,6 @@ def homReprEquiv (F : C ⥤ Ab) : (freeAb (reprBy A) ⟶ F) ≃+ F A :=
   -- The universal property of `freeAb`, then the Yoneda lemma.
   ⟨(freeAb.homEquiv (reprBy A) F).trans uliftCoyonedaEquiv, by tauto⟩
 
-/-- The additive Yoneda bijection is natural in the target: composing with `e : E ⟶ F` corresponds
-to applying `e` at `A`. -/
-private lemma homReprEquiv_comp {E : C ⥤ Ab} (f : freeAb (reprBy A) ⟶ E) (e : E ⟶ F) :
-    homReprEquiv A F (f ≫ e) = e.app A (homReprEquiv A E f) :=
-  rfl
-
 /-- The free abelian group ℤ[h_A] on a represented functor is projective. -/
 instance : Projective (freeAb (reprBy A)) where
   factors {E X} f e h_epi := by
@@ -1127,7 +1103,8 @@ instance : Projective (freeAb (reprBy A)) where
     obtain ⟨x, hx⟩ :=
       (AddCommGrpCat.epi_iff_surjective (e.app A)).mp inferInstance (homReprEquiv A X f)
     refine ⟨(homReprEquiv A E).symm x, (homReprEquiv A X).injective ?_⟩
-    rw [homReprEquiv_comp, AddEquiv.apply_symm_apply, hx]
+    change e.app A (homReprEquiv A E ((homReprEquiv A E).symm x)) = _
+    rw [AddEquiv.apply_symm_apply, hx]
 
 /-- The value at `x ∈ N(A)` of a finite sum of maps `N ⟶ F` is the sum of their values. -/
 lemma sum_app_apply {ι : Type*} {A : C} {x : N.obj A} [Fintype ι] {g : ι → (N ⟶ F)} :
@@ -1187,8 +1164,10 @@ lemma shortExact_of_app (h_inj : ∀ A : C, Function.Injective (α A))
     (h_exact : ∀ A : C, Function.Exact (α A) (g A)) (h_surj : ∀ A : C, Surjective (g A)) :
     ∃ w : α ≫ g = 0, ShortExact ⟨α, g, w⟩ := by
   obtain ⟨w, hw⟩ := exact_of_app h_exact
-  have h_mono : Mono α := by grind [mono_iff_mono_app, AddCommGrpCat.mono_iff_injective]
-  have h_epi : Epi g := by grind [epi_iff_epi_app, AddCommGrpCat.epi_iff_surjective]
+  have h_mono : Mono α := (mono_iff_mono_app _).2 fun A ↦
+    (AddCommGrpCat.mono_iff_injective _).2 (h_inj A)
+  have h_epi : Epi g := (epi_iff_epi_app _).2 fun A ↦
+    (AddCommGrpCat.epi_iff_surjective _).2 (h_surj A)
   exact ⟨w, .mk' hw h_mono h_epi⟩
 
 /-- For `f : N ⟶ F` with `α ≫ f = 0`, the induced morphism `coker α ⟶ F` through which `f`

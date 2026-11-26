@@ -14,8 +14,6 @@ projection `Λ⁺` to this span are sums of lines.
 * `New.Grading.SpansLattice.isGraded`: `Λ` is graded.
 * `New.Grading.SpansLattice.mem_latticeMinus_iff`, `New.Grading.SpansLattice.mem_latticePlus_iff`:
   the generators of the lines; they differ only by `N⁻¹` at the middle vector of the string.
-* `New.Grading.SpansLattice.mem_lattice_and_stringProj_eq_zero_iff`: for odd `s`, the
-  intersection of `Λ` with the span of `X ⊕ Unit`.
 * `New.Grading.SpansLattice.stringSum_mem_latticeMinus_iff`,
   `New.Grading.SpansLattice.stringSum_mem_latticePlus_iff`: the generators on the lines of the
   vectors `𝔢 ^ i`, for the scale `u = (a / ā) ^ ⌊(s + 2) / 2⌋` and when the constant `c` of `Y`
@@ -27,8 +25,7 @@ projection `Λ⁺` to this span are sums of lines.
 * `New.Grading.SpansLattice.exists_place_generates_of_notMem_latticeMinus`: such a vector
   generates `Λ⁺` over `Λ⁻` at some place above `N`.
 
-The results on `Λ⁺` and on the span of `X ⊕ Unit` assume that `N` is split and squarefree
-(`IsSplitSquarefree P N π`).
+The results on `Λ⁺` assume that `N` is split and squarefree (`IsSplitSquarefree P N π`).
 
 Notions from other files:
 * `Y.SpansLattice a π u`: the lattice `Λ = V.lattice 1` has the standard basis
@@ -514,7 +511,7 @@ lemma exists_place_generates_of_notMem_latticeMinus {y : ι → 𝔸f E} (hL : Y
     refine exists_eq_mul_iff_v_le.2 fun w' ↦ ?_
     obtain rfl | hw' := eq_or_ne w' w
     · simpa [finAdele_mul_apply] using h_le_pole
-    · simp [finAdele_mul_apply, hw']
+    · simp [hw']
   refine ⟨c, hc, hL.mem_latticeMinus_iff.2 ⟨by simp [hy_string, hz_string], fun b ↦ ?_⟩⟩
   suffices idem {w} * (coord z b - c * coord y b) ∈ Ô E by
     simpa [coord, mul_sub, mul_left_comm] using this

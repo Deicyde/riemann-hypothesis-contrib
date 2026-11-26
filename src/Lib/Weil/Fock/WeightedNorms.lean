@@ -67,17 +67,11 @@ Lebesgue measure divided by π^|ι|. -/
 noncomputable def fockMoment : ENNReal := ∫⁻ y : ι → ℂ,
   (1 + ‖y‖ₑ) ^ N * ‖v y‖ₑ ∂normalizedVolume ι
 
-private lemma integrable_fockVector (f : fockSpace ε) : Integrable (⇑f) (normalizedVolume ι) :=
-  f.prop.1
-
-private lemma enorm_eq_lintegral_enorm (f : fockSpace ε) :
-    ‖f‖ₑ = ∫⁻ x : ι → ℂ, ‖f x‖ₑ ∂normalizedVolume ι := by
-  rw [← ofReal_norm, Heisenberg.IsVacuum.norm_eq_integral_norm f,
-    ofReal_integral_norm_eq_lintegral_enorm (integrable_fockVector f)]
-
 /-- The moment of order 0 is the L¹ norm of the Fock vector `v`. -/
 lemma fockMoment_zero : fockMoment 0 v = ‖v‖ₑ := by
-  simp [fockMoment, enorm_eq_lintegral_enorm]
+  rw [← ofReal_norm, Heisenberg.IsVacuum.norm_eq_integral_norm v,
+    ofReal_integral_norm_eq_lintegral_eNorm (Model.integrable v)]
+  simp [fockMoment]
 
 lemma fockMoment_smul : fockMoment N (c • v) = ‖c‖ₑ * fockMoment N v := by
   simp [fockMoment, mul_comm, ← lintegral_const_mul', ← mul_assoc]
@@ -94,7 +88,7 @@ lemma fockMoment_realHeisenbergOp_le (y : ι → ℂ) :
   -- Substitute `x + y`: then `‖realHeisenbergOp y v (x + y)‖ = ‖v x‖`, and the weight is
   -- submultiplicative.
   have h_weight (x : ι → ℂ) : 1 + ‖x + y‖ₑ ≤ (1 + ‖y‖ₑ) * (1 + ‖x‖ₑ) := by
-    grw [enorm_add_le]
+    grw [eNorm_add_le]
     exact le_self_add.trans_eq (b := 1 + (‖x‖ₑ + ‖y‖ₑ) + ‖y‖ₑ * ‖x‖ₑ) (by ring)
   calc
     fockMoment N (realHeisenbergOp y v) = ∫⁻ x,
@@ -125,7 +119,7 @@ lemma enorm_le_mul_fockMoment {S : ℝ} {ℓ : fockSpace ε →L[ℂ] ℂ}
     (div_le_iff₀ (by positivity)).mp (h_bound z)
   calc
     ‖ℓ v‖ₑ ≤ ∫⁻ z, .ofReal ‖v z‖ * .ofReal (S * (1 + ‖z‖) ^ N) ∂normalizedVolume ι := by
-      grw [map_eq_integral, enorm_integral_le_lintegral_enorm, ← h_le]
+      grw [map_eq_integral, eNorm_integral_le_lintegral_eNorm, ← h_le]
       simp
     _ = .ofReal S * fockMoment N v := by
       rw [fockMoment_eq, ← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
@@ -152,7 +146,7 @@ lemma fockMoment_polyVector_ne_top (P : MvPolynomial ι ℂ) :
     _ ≤ Real.exp ‖y‖ ^ N * (|C| * Real.exp (k * ‖holomorphicCoord ε y‖)) * ‖realVac y‖ := by
       grw [h_eval, add_comm, add_one_le_exp]
     _ = |C| * (Real.exp ((N + k) * ‖y‖) * ‖realVac y‖) := by
-      simp only [norm_holomorphicCoord, add_mul, Real.exp_add, Real.exp_nat_mul]
+      simp only [norm_holomorphicCoord, add_mul, Real.exp_add, Real.exp_natCast_mul]
       ring
 
 lemma isSchwartzVector_vacVector : Exchange.IsSchwartzVector (vacVector : fockSpace ε) := fun N ↦ by
@@ -181,7 +175,7 @@ lemma fockMoment_integral_le :
     calc
       _ ≤ ∫⁻ y, (1 + ‖y‖ₑ) ^ N * ∫⁻ t, ‖F t y‖ₑ ∂ν ∂normalizedVolume ι := by
         simp only [fockMoment, h_apply]
-        grw [enorm_integral_le_lintegral_enorm]
+        grw [eNorm_integral_le_lintegral_eNorm]
       _ = ∫⁻ y, ∫⁻ t, (1 + ‖y‖ₑ) ^ N * ‖F t y‖ₑ ∂ν ∂normalizedVolume ι :=
         lintegral_congr fun y ↦ (lintegral_const_mul' _ _ (by finiteness)).symm
       _ = _ := (lintegral_lintegral_swap (by measurability)).symm
@@ -194,7 +188,7 @@ lemma isSchwartzVector_integral (hF_meas : AEStronglyMeasurable F ν)
     Integrable F ν ∧ Exchange.IsSchwartzVector (integral ν F) := by
   -- The moment of order 0 is the L¹ norm, so order 0 gives integrability.
   have h_int : Integrable F ν :=
-    ⟨hF_meas, hasFiniteIntegral_iff_enorm.mpr (by simpa [fockMoment_zero] using (h_fin 0).lt_top)⟩
+    ⟨hF_meas, hasFiniteIntegral_iff_eNorm.mpr (by simpa [fockMoment_zero] using (h_fin 0).lt_top)⟩
   exact ⟨h_int, fun N ↦ ne_top_of_le_ne_top (h_fin N) (fockMoment_integral_le N)⟩
 
 /-- Let `F y` be Fock vectors (for signs `η` on `κ`) whose moment of order `N'` is at most
@@ -223,7 +217,7 @@ lemma pow_mul_realVac_le {s t : ℝ} {u : ι → ℂ} (h_le_mul : s ≤ (‖u‖
     s ^ N * ‖realVac u‖ ≤ Real.exp (N ^ 2) * t ^ N := by
   -- Use `‖u‖ + 1 ≤ exp ‖u‖`; the exponents compare because `‖u‖ ^ 2 ≤ (star u ⬝ᵥ u).re`.
   have h_exp : -(Star.star u ⬝ᵥ u).re / 2 + N * ‖u‖ ≤ N ^ 2 := by
-    nlinarith [norm_sq_le_re_star_dotProduct_self u]
+    nlinarith only [norm_sq_le_re_star_dotProduct_self u]
   grw [h_le_mul, add_one_le_exp, mul_comm, mul_pow, ← h_exp]
   simp [realVac, norm_exp, ← Real.exp_nsmul, ← mul_assoc, ← Real.exp_add]
 
@@ -253,7 +247,7 @@ lemma pow_mul_realVac_mul_realVac_mul_exp_le (y w : ι → ℂ) :
       ‖realVac w‖ * ‖realVac y‖ * rexp ‖Star.star (holomorphicCoord ε y) ⬝ᵥ holomorphicCoord ε w‖ ≤
         ‖realVac u‖ := by
     simp only [h_norm_realVac, ← Real.exp_add, Real.exp_le_exp]
-    linarith [h_s_le, h_sum_u]
+    linarith only [h_s_le, h_sum_u]
   have h_tri : 1 + ‖w‖ ≤ (‖u‖ + 1) * (1 + ‖y‖) := by
     have h_norm_w_le : ‖w‖ ≤ ‖y‖ + ‖u‖ := by
       simpa [u, Pi.norm_def, ← ofReal_sub] using norm_le_insert (‖y ·‖) (‖w ·‖)
@@ -408,7 +402,7 @@ omit [DecidableEq ι] in
 `1 + ‖A y‖ ≤ (1 + ‖A‖) (1 + ‖y‖)`. -/
 lemma one_add_enorm_mulVec_le {p : Type*} [Fintype p] (A : Matrix ι p ℂ) (y : p → ℂ) :
     1 + ‖A *ᵥ y‖ₑ ≤ (1 + ‖A‖ₑ) * (1 + ‖y‖ₑ) := by
-  grw [enorm_eq_nnnorm, linfty_opNNNorm_mulVec, mul_one_add, ENNReal.coe_mul]
+  grw [eNorm_eq_nnNorm, linfty_opNNNorm_mulVec, mul_one_add, ENNReal.coe_mul]
   bound
 
 /-- The Weil operator of `u` as an integral: `realWeil u v` is `realMultiplier u` times
@@ -527,7 +521,7 @@ lemma New.Fock.exists_norm_realHeisenbergOp_polyVector_le {ι : Type*} [Fintype 
     choose C hC h_bound using ih
     let D : ℝ := ∑ i : ι, (2 * C P + C (raiseOp ε i P) + C (lowerOp ε i P))
     have hD : 0 ≤ D := Finset.sum_nonneg fun i _ ↦ by
-      linarith [hC P, hC (raiseOp ε i P), hC (lowerOp ε i P)]
+      linarith only [hC P, hC (raiseOp ε i P), hC (lowerOp ε i P)]
     refine ⟨D * 2 ^ N, by positivity, fun t ℓ ht ht_le hℓ z ↦ hℓ _ _ fun y hy ↦ ?_⟩
     -- On the segment, `ρ(s y) ρ(z)` is a phase times a translation of size at most `1 + ‖z‖`.
     let m : ℝ := ‖ℓ‖ * t ^ N * (2 * (1 + ‖z‖)) ^ N
@@ -535,7 +529,7 @@ lemma New.Fock.exists_norm_realHeisenbergOp_polyVector_le {ι : Type*} [Fintype 
         ‖ℓ (realHeisenbergOp (s • y) (realHeisenbergOp z (polyVector ε Q)))‖ ≤ C Q * m := by
       have h_norm : 1 + ‖s • y + z‖ ≤ 2 * (1 + ‖z‖) := by
         grw [norm_add_le, norm_smul, Real.norm_of_nonneg hs.1, hs.2, hy, ht_le]
-        linarith [norm_nonneg z]
+        linarith only [norm_nonneg z]
       rw [Heisenberg.Rep.mul, map_smul, norm_smul, Heisenberg.norm_eq_one, one_mul]
       grw [h_bound Q t ℓ ht ht_le hℓ, h_norm]
       · exact le_of_eq (by ring)

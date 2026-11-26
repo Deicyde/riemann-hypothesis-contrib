@@ -132,7 +132,7 @@ theorem ThetaLargeVanishes.of_add_plane {k : ℕ} {W : Space E n s} {W' : Space 
   have hε_ne : ε true ≠ 0 := norm_pos_iff.1 ((ha_pos true).trans_eq (hε_norm true).symm)
   have hP_pos : 0 < P (e + 1 : ℤ) := mul_pos (Real.rpow_pos_of_pos ideleAbs_pos _)
     (Finset.prod_pos fun w _ ↦ Real.rpow_pos_of_pos (by simp [FinPlace.q_bounds]) _)
-  show I = 0
+  change I = 0
   simpa only [R, mul_eq_zero, Complex.ofReal_eq_zero, hε_ne, hP_pos.ne', hΛ_ne _ h_lower,
     (hB_pos _).ne', false_or] using h_R_zero
 
@@ -172,9 +172,9 @@ theorem ThetaLargeVanishes.of_add_planes {k : ℕ} {W' : Space E n' s'} {V' : Sp
     have h_card_W : card ((Unit ⊕ Unit) ⊕ n) = card n + 2 := by simp +arith
     have h_card_V : card ((Unit ⊕ Unit) ⊕ r) = card r + 2 := by simp +arith
     have h_neg_W : negCount (Sum.elim (hyperbolicSigns Unit) s) = 1 + negCount s := by
-      simpa using negCount_sumElim_hyperbolicSigns (ι := Unit) s
+      simp
     have h_neg_V : negCount (Sum.elim (hyperbolicSigns Unit) t) = 1 + negCount t := by
-      simpa using negCount_sumElim_hyperbolicSigns (ι := Unit) t
+      simp
     have h_above : ThetaLargeVanishes 𝔠 (hyperbolicSum Unit W) (hyperbolicSum Unit V) τ :=
       ih (hyperbolicSum Unit W) (hyperbolicSum Unit V) τ (by omega) (by omega) (by omega)
         (by omega) (by omega)

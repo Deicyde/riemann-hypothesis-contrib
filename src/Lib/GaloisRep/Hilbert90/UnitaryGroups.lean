@@ -395,7 +395,7 @@ lemma unitary_hilbert90_at_level (hO : IsProfiniteRing O) {m c : O}
   obtain ⟨g, V, hg, hg_fix, hg_frame⟩ :=
     exists_fixed_orthonormal_frame hO h_tame_zero hc hc_unit hτ hkk_unit (by simp) h_fix
   have h_lev : k.valᴴ * k.val - 1 = m • (W + Wᴴ * k.val) := by
-    simp [hk, hm_star, mul_add, add_mul, smul_add, smul_smul, add_comm, add_left_comm, add_assoc,
+    simp [hk, hm_star, mul_add, add_mul, smul_add, smul_smul, add_left_comm, add_assoc,
       sub_eq_iff_eq_add']
   refine ⟨of isUnit_one (k.val * g) (by simpa [conjTranspose_mul, Matrix.mul_assoc] using hg_frame),
     W + k.val * V * (W + Wᴴ * k.val), ?_, ?_⟩
@@ -465,7 +465,7 @@ lemma exists_dvd_dvd_mul_adeleMap_eq {a b : 𝔸f L} (ha : u * adeleMap (σ : L 
     have h_choice : v (b w) ≤ v (a w) ↔
         v (b (FinPlace.comap (σ : L →+* L) w)) ≤ v (a (FinPlace.comap (σ : L →+* L) w)) := by
       rw [← haw, ← hbw]
-      simp [zero_lt_iff, hw, v_locMap_eq_of_surjective (σ : L →+* L) rfl σ.surjective]
+      simp [pos_iff_ne_zero, hw, v_locMap_eq_of_surjective (σ : L →+* L) rfl σ.surjective]
     rw [c_apply, c_apply, if_congr h_choice rfl rfl]
     split_ifs
     exacts [haw, hbw]

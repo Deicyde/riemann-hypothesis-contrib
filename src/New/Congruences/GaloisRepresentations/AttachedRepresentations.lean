@@ -111,7 +111,7 @@ theorem isLiftSetting_descentPair (j : D.LiftIndex)
     have h_not_root : ¬(c w).IsRoot x.val :=
       ((h_good w.1).1 w.2).not_isRoot
         (charName_pow_eq_one (k := ResField v) (D.chiMLocal_zpow_mul_pow_eq_one _ hϑ_one))
-    show ¬((c w).scaleRoots
+    change ¬((c w).scaleRoots
       (charName (faithfulChar (ResField v)) ((D.descentPair ϑ j).tamePart v)⁻¹).val).IsRoot 1
     rw [map_inv]
     exact not_isRoot_one_scaleRoots_inv h_not_root
@@ -170,7 +170,7 @@ theorem trivialLift_mem_range_typeProjection (hp : p.IsMainPair j) :
     (isLiftSetting_mainPair ϑ hp).isLabel i
   refine ⟨Y.trivialLift, ?_⟩
   -- The idempotent is the mean over the group, which fixes `Y.trivialLift`.
-  show typeProjection Y.descentPair (fun _ ↦ X - 1) Y.trivialLift = Y.trivialLift
+  change typeProjection Y.descentPair (fun _ ↦ X - 1) Y.trivialLift = Y.trivialLift
   simp_all [asAlgebraHom_eq_sum, tupleIdem, labelIdem, Y.formAction_trivialLift,
     ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, prod_ne_zero_iff]
 
@@ -628,7 +628,7 @@ theorem IsRepOfType.twist_avatar {O : DescentPair D.E r n} {ϑ : D.Twist}
     have hR_kill : PolyKillsAt R A s (((c i).aroots K).map fun x : K ↦ X - C (φ x)).prod :=
       hR.labelled hy
     -- So it acts on `μ • R` through the values of `φ` at these roots times `u`.
-    show PolyKillsAt (twistByChar μ R) A s
+    change PolyKillsAt (twistByChar μ R) A s
       ((((c i).scaleRoots u.val).aroots K).map fun x : K ↦ X - C (φ x)).prod
     exact (hR_kill.of_dvd (prod_aroots_dvd_prod_aroots_scaleRoots_comp φ (c i) u)).twist h_twist
       hμ_kill
@@ -658,8 +658,8 @@ theorem isRepOfType_of_hasProductLabel {O : DescentPair D.E r n} {ϑ : D.Twist}
     [Nonempty m] :
     IsRepOfType O (card m) (jumps κ (card m))
       (fun i : O.ChosenIndex ↦ c i * (X - 1) ^ (card m - card r)) S R := by
-  -- At the places over `O.chosenPlace i`: finite type, jumps, and the action of inertia through the
-  -- label.
+  -- At chosen places use the label to obtain finite type, jumps and annihilators on inertia.
+  -- The annihilator records the label without identifying the characteristic polynomial.
   have h_lab (i : O.ChosenIndex) {A : ClosurePlace} (hA : IsPlaceOver A (O.chosenPlace i)) :
       IsFiniteTypeAt R A ∧ HasJumpsAt R A (jumps κ (card m)) ∧
         IsLabelledAt A (faithfulChar (ResField (O.chosenPlace i))) (card r).factorial
@@ -687,8 +687,8 @@ theorem isRepOfType_of_hasProductLabel {O : DescentPair D.E r n} {ϑ : D.Twist}
       have h_above : v ∈ placesAboveM D := by
         simpa [hi] using (h_setting.isChosen_chosenPlace i).mem_placesAboveM
       exact ⟨h_fin', h_jump' κ h_jump, fun hg ↦ (hg h_above).elim⟩
-    · -- Elsewhere the form is spherical, and local-global compatibility `sphericalCompat_std`
-      -- applies.
+    · -- Elsewhere the form is spherical. Only goodness and jumps are needed from
+      -- `sphericalCompat_std`; the Frobenius annihilator is not used in this branch.
       obtain ⟨h_unr, h_jump, -⟩ :=
         (sphericalCompat_std v hf h_eigen).2 hR (h_spherical v hv hv') A hA
       exact ⟨(isGoodAt_iff.1 h_unr).1, h_jump, fun _ ↦ h_unr⟩

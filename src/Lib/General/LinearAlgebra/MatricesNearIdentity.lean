@@ -1,7 +1,6 @@
 module
 
 public import Lib.DiscreteSeries.FlenstedJensen.Defs
-public import Lib.Shimura.ComplexTheta.AppellHumbertData
 
 /-!
 # Matrices near the identity: Jacobi's formula and norm estimates

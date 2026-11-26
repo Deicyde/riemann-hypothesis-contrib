@@ -256,7 +256,7 @@ the basis given by `paramV`, the doubled Harish-Chandra parameter of this weight
 `P = fockPoly η` be the polynomial in the coordinates of `Hom(W, V)` at the infinite places that
 corresponds to `η`, with `W`, `V` the definite spaces of ranks `1` and `card n`. Then the squared
 Fock norm `⟨P̄, P⟩` is the hook number, where `⟨P, Q⟩ = fockPairing ℂ P Q = P(∂) Q (0)`. -/
-lemma LValueData.fockPairing_fockPoly_highestVector [WeilData E] :
+lemma LValueData.fockPairing_fockPoly_highestVector :
     fockPairing ℂ ((X.descentPair.fockPoly
       (highestVector X.descentPair.columnCount X.descentPair.paramV)).map conj)
         (X.descentPair.fockPoly (highestVector X.descentPair.columnCount X.descentPair.paramV)) =
@@ -281,7 +281,6 @@ lemma LValueData.fockPairing_fockPoly_highestVector [WeilData E] :
     fockPairing_rename_rename] at h_gram
 /-- The group `GL Unit (ResField w)` of invertible 1×1 matrices over the residue field `ResField w`
 at `w` has as many elements as the unit group `(ResField w)ˣ` of this field. -/
-
 lemma natCard_GL_unit_resField (w : FinPlace E) :
     Nat.card (GL Unit (ResField w)) = Nat.card (ResField w)ˣ :=
   Nat.card_congr (Units.mapEquiv uniqueRingEquiv.toMulEquiv).toEquiv
@@ -411,7 +410,7 @@ in which `(x, y)` acts by the Fock operator times `∏ τ, det (y τ) ^ γ τ * 
 `γ' τ = -X.rowLength τ`, so that `ω(x, 1)` fixes `v`. Then the integral over the real points `x` of
 `U(1)` of `⟨v, ω(x, 1) v⟩` times the Petersson product `⟨1, 1⟩` on `W` is the hook number times the
 volume of the adelic quotient `[U(1)]`, the total mass of `quotMeasure` of `stdSpace E Unit`. -/
-lemma LValueData.integral_fockInner_realPairWeil [WeilData E] :
+lemma LValueData.integral_fockInner_realPairWeil :
     ∫ x : GInf E X.descentPair.signs,
         fockInner (polyVector (realSigns E (homSigns 1 1))
             (X.descentPair.fockPoly (highestVector X.descentPair.columnCount X.descentPair.paramV)))
@@ -471,7 +470,6 @@ theorem LValueData.inner_thetaLift_constForm_self [WeilData E] (h_rank : 2 < Fin
     rfl
   have h_one : (fun _ : G E O.signs ↦ (1 : ℂ)) ∈ (stdSpace E Unit).rapidFunctions :=
     ((stdSpace E Unit).isAutomorphic_const 1).mem_rapidFunctions fun _ _ ↦ rfl
-
   have h_rallis : (stdSpace E n).petersson θ₁ θ₁ =
       (stdSpace E n).quotMeasure.real .univ * (X.blockMeanSquare / stdLevelIndex X.chosenLevel) *
         ∫ x : GInf E O.signs,

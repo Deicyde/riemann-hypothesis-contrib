@@ -207,8 +207,8 @@ then the trace of `z` from `E` to `K` is an integer of `K`. -/
 lemma exists_coe_eq_trace_of_isIntegral {z : P.E s}
     (hz : IsIntegral ℤ (z * (P.relDifferentGen s).val)) :
     ∃ c : 𝓞 P.K, (c : P.K) = Algebra.trace P.K (P.E s) z := by
-  obtain ⟨-, h_span, -⟩ := relDifferent_spec (isPrimitiveRoot_zetaInt (P := P) (s := s))
-  have h_le : differentIdeal (𝓞 P.K) (𝓞 (P.E s)) ≤ Ideal.span {P.relDifferentGen s} := h_span.ge
+  have h_le : differentIdeal (𝓞 P.K) (𝓞 (P.E s)) ≤ Ideal.span {P.relDifferentGen s} :=
+    differentIdeal_eq_span_relDifferentGen.le
   have h_bot : Ideal.span {P.relDifferentGen s} ≠ ⊥ :=
     Ideal.span_singleton_eq_bot.not.2 (mod_cast P.relDifferentGen_ne_zero s)
   have h_mem : z ∈ ((Ideal.span {P.relDifferentGen s} : Ideal (𝓞 (P.E s))) :
@@ -747,12 +747,11 @@ lemma IsResolutionProduct.norm_iota_apply_le_one {C : CMLattice P.d} {b : ℂ} {
   have h_value : F (finVec y) = ∏ i : I × n,
       C.twistedTranslate (m i.1) (resolutionShift b w γ i) (C.monomialSection (x i)) 0 := by
     rw [← theta_rho, ← hγ, hF.theta_translate γ]
+  -- Clear the denominators of the whole finite vector at once. Then `N * L` times
+  -- each shift is a period.
+  obtain ⟨L, hL, hLγ⟩ := exists_forall_mul_mem_Ô (finiteImage γ)
   rw [h_value, map_prod, norm_prod]
   refine prod_le_one₀ (by simp) fun i _ ↦ ?_
-  -- The shift is a torsion point: `L * finiteImage γ` is integral for some `L ≠ 0`, so `N * L`
-  -- times the shift is a period.
-  obtain ⟨L, hL, hLγ⟩ : ∃ L : ℕ, L ≠ 0 ∧ ∀ k : n, L * finiteImage γ k ∈ Ô (P.E s) :=
-    exists_forall_mul_mem_Ô (finiteImage γ)
   have h_integral : finiteImage id (L * γ i.2) ∈ Ô (P.E s) := by
     simpa [finiteImage, mul_left_comm] using hLγ i.2
   let t : ℂ := ∑ τ : InfinitePlace (P.E s), Φ τ (L * γ i.2) * conj (Φ τ (w i.1))

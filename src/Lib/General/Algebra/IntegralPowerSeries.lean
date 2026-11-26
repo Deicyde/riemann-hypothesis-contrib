@@ -1,6 +1,5 @@
 module
 
-public import Lib.CM.Sigma.Basic
 public import Lib.GLn.SchurModule.Basic
 public import Lib.General.Algebra.AdicCompletion
 public import TauCeti.RingTheory.MvPowerSeries.Derivative
@@ -15,7 +14,6 @@ with coefficients in the ring of integers of `ℂ_[p]`.
 
 * `New.mem_range_seriesToCp`: a series in one variable is integral iff all its coefficients have
   norm at most one.
-* `New.pderiv_subst`: the chain rule for partial derivatives of a substitution of power series.
 * `New.jet_subst_linearSeries`: for a linear substitution `M`, the jet `P(∂) (F ∘ M) (0)` is the jet
   of `F` along the polynomial `New.linSubst M P` obtained from `P` by the transposed substitution.
 * `New.expSubst`: the exponential `exp a` of a power series `a` in several variables without
@@ -64,6 +62,10 @@ open MvPowerSeries PowerSeries
 
 namespace New
 
+/-- The linear form ∑ c_i z_i, as a power series in the variables z_i. -/
+noncomputable def linearSeries {ι R : Type*} [Fintype ι] [CommSemiring R] (c : ι → R) : MvPowerSeries ι R :=
+  ∑ i : ι, c i • MvPowerSeries.X i
+
 variable {σ : Type*} {R S : Type*} [CommRing R] [CommRing S] {p : ℕ} [Fact p.Prime]
 
 /-- A power series `f` in one variable over `ℂ_[p]` comes from a series over the ring of integers
@@ -103,15 +105,6 @@ section JetChainRule
 
 open MvPowerSeries Finset WithPiTopology
 
-
-variable {ι : Type _} {κ : Type _} {R : Type _} [CommRing R] [Fintype ι] in
-/-- The chain rule for power series: if the family `a` can be substituted into series in the
-variables `ι`, then `∂_k F(a) = ∑_i (∂_i F)(a) * ∂_k a_i`. -/
-@[simp]
-lemma New.pderiv_subst {a : ι → MvPowerSeries κ R} (ha : HasSubst a) (k : κ)
-    (F : MvPowerSeries ι R) :
-    pderiv k (subst a F) = ∑ i : ι, (pderiv i F).subst a * pderiv k (a i) :=
-  MvPowerSeries.pderiv_subst ha F k
 
 /-- Jets of a linear substitution. Let `M` be a matrix and substitute the linear forms
 `(M z)_i = ∑_k M_(i k) z_k` into the series `F`. The jet `P(∂) F(M z) (0)` equals the jet of `F`
@@ -200,6 +193,13 @@ lemma norm_natCast_eq_inv_pow_padicValNat {n : ℕ} (hn : n ≠ 0) :
   simpa [Padic.norm_eq_zpow_neg_valuation, hn, Nat.padicValNat_def] using
     PadicComplex.norm_extends' p n
 
+/-- The `p`-adic norm of a finite product of nonzero natural numbers. -/
+lemma norm_prod_natCast_eq_rpow_neg_sum {X : Type*} [Fintype X] {n : X → ℕ}
+    (hn : ∀ x, n x ≠ 0) :
+    ‖∏ x, (n x : ℂ_[p])‖ = (p : ℝ) ^ (-∑ x, (padicValNat p (n x) : ℝ)) := by
+  simp [norm_natCast_eq_inv_pow_padicValNat, hn, Real.rpow_neg p.cast_nonneg,
+    ← Nat.cast_sum, Finset.prod_pow_eq_pow_sum]
+
 /-- For `p` prime and `n < p ^ K` one has `n / (p - 1) - K ≤ v_p(n!) ≤ n / (p - 1)`, a consequence
 of Legendre's formula. -/
 lemma padicValNat_factorial_mem_Icc {n K : ℕ} (hn : n < p ^ K) :
@@ -208,7 +208,7 @@ lemma padicValNat_factorial_mem_Icc {n K : ℕ} (hn : n < p ^ K) :
   -- are at most `K` digits, each at most `p - 1`.
   have hp1 : 1 < p := hp.out.one_lt
   have legendre : (p - 1) * padicValNat p n ! + (p.digits n).sum = n := by
-    rw [Nat.padicValNat_def, sub_one_mul_padicValNat_factorial,
+    rw [Nat.padicValNat_def, Nat.Prime.sub_one_mul_multiplicity_factorial,
       Nat.sub_add_cancel (digit_sum_le p n)]
     exact hp.out
   have digit_le : ∀ d ∈ p.digits n, d ≤ p - 1 :=

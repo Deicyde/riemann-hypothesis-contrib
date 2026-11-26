@@ -89,7 +89,7 @@ lemma eichler_apply_eq_zero_of_level_le {m : Type} [Fintype m] {p : m → Fin �
     ∀ i j : 𝔰.BesselIndex, BesselIndex.level j ≤ BesselIndex.level i →
       (x * (uᴴ * S.ratGram) - (u + x * (τ • (uᴴ * S.ratGram * u) - s)) * (xᴴ * S.ratGram)) i j =
         0 := by
-  simp [← hx, splitGram, BesselIndex.level, inclMatrix, Matrix.mul_assoc, Matrix.mul_sub,
+  simp [← hx, splitGram, BesselIndex.level, inclMatrix, Matrix.mul_sub,
     Matrix.add_mul, Matrix.sub_mul, Matrix.one_apply, Matrix.mul_apply, sub_eq_zero]
   grind [Finset.sum_eq_zero, star_zero]
 
@@ -106,7 +106,6 @@ lemma isIntMatrix_ideleM_inv_smul_eichler (c : S.Classes) {m : Type} [Fintype m]
     {γ : S.G E} (h_val : γ.val.val = 1 + (S.M : E) •
       (x * (uᴴ * S.ratGram) - (u + x * (τ • (uᴴ * S.ratGram * u) - s)) * (xᴴ * S.ratGram))) :
     IsIntMatrix (Ô E) (S.ideleM⁻¹ • ((S.translateByClassReps c c γ).val.val - 1)) := by
-  classical
   -- In the basis of the lattice this is the same expression in integral matrices, as
   -- `classCoord_conj_splitGram` moves `J` to that basis.
   have hJ : IsIntMatrix (Ô E) (S.latticeMiddle (𝔸f E)).splitGram :=
@@ -152,7 +151,6 @@ lemma exists_mem_classUnipotent_eq_one_add_smul [HasPrimitiveRoot5040 E] (c : S.
             (S.M : E) •
               (x * (uᴴ * S.ratGram) -
                 (u + x * (τ • (uᴴ * S.ratGram * u) - s)) * (xᴴ * S.ratGram)) := by
-  classical
   -- The matrix is an Eichler map along the isotropic columns `x`; take `τ = S.M * τ₀` with an
   -- integer `τ₀` such that `τ₀ + star τ₀ = 1`.
   obtain ⟨-, τ₀, -, -, hτ₀, -⟩ :=
@@ -411,7 +409,7 @@ lemma tsum_le_of_encard_range_le {A : Set α} {R : α → α → Prop} {N x : �
     exact h_rel a a' (congrArg Subtype.val (ha.trans ha'.symm))
   calc
     _ = ∑' (c : range φ) (a : rangeFactorization φ ⁻¹' {c}), w a := (tsum_fiberwise ..).symm
-    _ ≤ ∑' _ : range φ, x := ENNReal.tsum_le_tsum h_fibre
+    _ ≤ ∑' _ : range φ, x := tsum_le_tsum h_fibre
     _ ≤ N * x := by grw [tsum_set_const, h_colours]
 
 /-- Colouring by residue classes. Let `f a`, for `a ∈ A`, be a vector with entries in `K'`, and let

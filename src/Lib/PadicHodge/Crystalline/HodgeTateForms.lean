@@ -80,7 +80,7 @@ lemma mem_hodgeTateMaps_of_span [Algebra.IsAlgebraic ℤ_[p] R] {ι : Sort*} {s 
     (h_gen : ∀ i : ι,
       ∀ᶠ g : Γ in nearOne Γ, f (ρ g (s i)) = (χ g ^ (-u)).val • toGp g • f (s i)) :
     f ∈ hodgeTateMaps ρ γ u := by
-  show ∀ x : T, ∀ᶠ g : Γ in nearOne Γ, f (ρ g x) = (χ g ^ (-u)).val • toGp g • f x
+  change ∀ x : T, ∀ᶠ g : Γ in nearOne Γ, f (ρ g x) = (χ g ^ (-u)).val • toGp g • f x
   intro x
   obtain ⟨δ, hδ⟩ := exists_algHom_lift γ
   induction eq_top_iff'.mp hs x using span_induction with

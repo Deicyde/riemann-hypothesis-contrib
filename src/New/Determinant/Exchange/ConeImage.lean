@@ -216,7 +216,7 @@ lemma hasPosMellinTransform_comp_conePoint {β : (InfinitePlace E × r' × Unit 
       mul_le_mul_iff_left₀ (sum_norm_sq_lineVector_pos X w)] using
       hβ_shell (conePoint X (κ, a)) (left_ne_zero_of_mul h_ne) w
   refine ⟨fun z ↦ (hρ_cont z).integrable_of_hasCompactSupport (hρ_supp z), fun z ↦ ?_⟩
-  exact (hρ_cont z).integral_pos_of_hasCompactSupport_nonneg_nonzero (x := 1) (hρ_supp z)
+  exact (hρ_cont z).integral_pos_of_hasCompactSupport_nonneg_ne_zero (x := 1) (hρ_supp z)
     (fun _ ↦ mul_nonneg (hβ_nonneg _) (Real.rpow_nonneg ideleAbs_pos.le z))
     (by simpa [ρ] using hβ_ne_zero)
 
@@ -409,7 +409,7 @@ a Schwartz vector `v'` for `(W', V')` with this property: for all `z > 0`, the t
 ramified exactly at a non-empty set of split places, containing no place together with its
 conjugate, and for every standard datum `stdRowDatum σ 𝔠.semilocalChar y` at these places. -/
 theorem exists_thetaLarge_cone_eq_mul [IsBaseAdapted A] [IsBaseAdapted X]
-    (μ : InfinitePlace E → ℤ) {b : Type} [Fintype b] [DecidableEq b] (σ : b ⊕ r ≃ n)
+    (μ : InfinitePlace E → ℤ) {b : Type} (σ : b ⊕ r ≃ n)
     (hn : 2 ∣ card n) :
     ∃ B : ℝ → ℝ, (∀ z : ℝ, 0 < B z) ∧ AnalyticOnNhd ℝ (fun z : ℝ ↦ (B z : ℂ)) Set.univ ∧
       ∀ v : PairFock E s t, IsSchwartzVector v → ∃ v' : PairFock E s' t', IsSchwartzVector v' ∧
@@ -458,7 +458,7 @@ standard datum `stdRowDatum σ 𝔠.semilocalChar y` at these places: the functi
 `𝔠.semilocalChar⁻¹` of the determinant of the matrix with rows `y` and `x`, ordered by `σ`, if that
 matrix is integrally invertible, and to zero otherwise. -/
 theorem exists_thetaLarge_cone_eq [IsBaseAdapted A] [IsBaseAdapted X] (μ : InfinitePlace E → ℤ)
-    {b : Type} [Fintype b] [DecidableEq b] (σ : b ⊕ r ≃ n) (hn : 2 ∣ card n) {z : ℝ} (hz : 0 < z)
+    {b : Type} (σ : b ⊕ r ≃ n) (hn : 2 ∣ card n) {z : ℝ} (hz : 0 < z)
     {v : PairFock E s t} (hv : IsSchwartzVector v) :
     ∃ v' : PairFock E s' t', IsSchwartzVector v' ∧
       ∀ (𝔠 : SplitTameChar E μ) (y : Matrix b n (LocProd 𝔠.ramifiedPlaces)) (g : G E s),
@@ -468,7 +468,7 @@ theorem exists_thetaLarge_cone_eq [IsBaseAdapted A] [IsBaseAdapted X] (μ : Infi
   obtain ⟨B, hB, -, h_image⟩ := exists_thetaLarge_cone_eq_mul A X μ σ hn
   have hB_ne : (B z : ℂ) ≠ 0 := Complex.ofReal_ne_zero.2 (hB z).ne'
   have h_schwartz : IsSchwartzVector ((B z : ℂ)⁻¹ • v) := fun N ↦ by
-    simpa only [fockMoment_smul] using ENNReal.mul_ne_top enorm_ne_top (hv N)
+    simpa only [fockMoment_smul] using ENNReal.mul_ne_top eNorm_ne_top (hv N)
   obtain ⟨v', hv', h_cone⟩ := h_image ((B z : ℂ)⁻¹ • v) h_schwartz
   refine ⟨v', hv', fun 𝔠 y g ↦ ?_⟩
   calc _ = B z * thetaLarge W V 𝔠 ((B z : ℂ)⁻¹ • v) (stdRowDatum σ 𝔠.semilocalChar y) g :=

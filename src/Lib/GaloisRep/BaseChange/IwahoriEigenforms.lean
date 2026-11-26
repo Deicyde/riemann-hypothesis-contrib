@@ -681,7 +681,6 @@ lemma isLocalMatching_proIwahori
       {t : dominantTorus | StrictMono fun i : Fin (Fintype.card m) ↦ v (t.val i).val}
       (fun t : dominantTorus ↦ (iwahoriDoubleCoset (localNorm E u ∘ t)).indicator 1)
       fun t : dominantTorus ↦ (iwahoriDoubleCoset t.val).indicator 1 := by
-  classical
   -- Everything is read at `u`, where some `τ ≠ 1` acts by an isometry of order dividing `[E' : E]`
   -- whose fixed points come from the completion at `w`. The local results
   -- `cocyclesSplit_comap_proIwahori` and `isMatchingPairAbove_proIwahori` then give the splitting
@@ -811,7 +810,7 @@ lemma exists_baseChange_isIwahoriEigen
     intro s t ht
     refine ⟨s * t, ?_, fun x hx ↦ ?_,
       heckeFun_iwahoriDoubleCoset_mul (localFormRep (stdSpace E' m) κ.baseChange hu) s.prop t.prop⟩
-    · simpa [Pi.mul_def] using s.prop.mul_strictMono ht (by simp [zero_lt_iff]) (by simp)
+    · simpa [Pi.mul_def] using s.prop.mul_strictMono ht (by simp [pos_iff_ne_zero]) (by simp)
     · rw [id_eq, heckeFun_iwahoriDoubleCoset_mul (localFormRep (stdSpace E m) κ hw)
         ((h_dom _ s.val).mpr s.prop) ((h_dom _ t.val).mpr t.prop) x hx]
       simp [Function.comp_def, Pi.mul_def]

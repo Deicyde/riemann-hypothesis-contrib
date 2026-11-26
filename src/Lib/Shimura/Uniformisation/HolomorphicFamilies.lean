@@ -1,6 +1,5 @@
 module
 
-public import Lib.GLn.SchurModule.Basic
 public import Lib.General.Geometry.ProjectiveSpace
 public import Lib.PadicComparison.Descent.TestCategory
 public import Lib.Shimura.AbelianScheme.TangentCoordinates
@@ -365,13 +364,9 @@ lemma of_jointly_mono {W : Over (Spec R)} [h_proper : IsProper W.hom] {Z : ι �
     (h_over : ∀ w : T, φ w ≫ W.hom = b) : HasGermAt Q φ w₀ := by
   -- The Segre product of the embeddings of the `Z l` embeds `W`; its coordinates are products of
   -- coordinates of the points `φ w ≫ π l`.
-  have h_bundle (l : ι) : ∃ (ν : Type) (N : LineBundle (Z l).left ν),
-      Finite ν ∧ N.IsProjEmbedding (Z l).hom := (hasProjEmbedding_iff _).mp (h_emb l)
-  choose ν N ν_finite hN using h_bundle
-  have h_coords (l : ι) : ∃ p : T → ν l → ℂ, (∀ i : ν l, Q fun w ↦ p w i) ∧
-      ∀ᶠ w in 𝓝 w₀, (N l).IsHomogeneousCoords (φ w ≫ (π l).left) (p w) :=
+  choose ν N ν_finite hN using fun l : ι ↦ (hasProjEmbedding_iff _).mp (h_emb l)
+  choose p hp lifts using fun l : ι ↦
     (h_germ l).exists_isHomogeneousCoords (hN l).isLinearSystem
-  choose p hp lifts using h_coords
   refine of_isHomogeneousCoords (isProjEmbedding_pi π hN h_sep) (p := fun w i ↦ ∏ l, p l w (i l))
     (fun i ↦ ?_) ?_ h_over
   · -- A product is an analytic function of its factors.
@@ -729,7 +724,7 @@ lemma relIndex_comap_eq_det_mul_conj_det {L : Submodule ℤ V} [IsFullRankLattic
     b'.toMatrix fun i ↦ ⟨b i, hF_mem (b i) (b i).prop⟩
   -- `b` is read as a basis of `L.toAddSubgroup.toIntSubmodule`.
   have h_index : relIndex L.toAddSubgroup (L.toAddSubgroup.comap F) = M.det.natAbs := by
-    erw [relIndex_eq_natAbs_det _ _ hF_mem b b']
+    rw [relIndex_eq_natAbs_det _ _ hF_mem b b']
     rfl
   let bℝ : Basis (Fin (finrank ℤ L)) ℝ V := b.ofZLatticeBasis ℝ
   have h_matrix : M.map (↑) = toMatrix bℝ bℝ (F.restrictScalars ℝ) := by
@@ -873,7 +868,7 @@ lemma pull_translate (h : HasThetaCoords L e N B χ θ) {f : S ⟶ S} {a : V}
   mem_thetaSpace i := h.isAppellHumbert.thetaShift_mem (h.mem_thetaSpace i) a
   hasFieldCoords z := by
     -- The new coordinates at `z` are those at `z + a` times a nonzero exponential.
-    show N.IsHomogeneousCoords (e z ≫ f) (exp (-(B a z + B a a / 2)) • θ (z + a))
+    change N.IsHomogeneousCoords (e z ≫ f) (exp (-(B a z + B a a / 2)) • θ (z + a))
     rw [← he z]
     exact (h.hasFieldCoords (z + a)).smul (exp_ne_zero _).isUnit
 

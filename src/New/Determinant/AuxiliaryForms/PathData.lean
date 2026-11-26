@@ -177,11 +177,6 @@ def gridChar : AutChar D.E :=
   D.liftChar (bif c then ϑ.pow (l + 1) else TameChar.one) (l + 1) *
     WeilData.upsilonU1 ^ ((card n + (!c).toNat) / 2)
 
-lemma gridChar_true :
-    gridChar ϑ true l n =
-      D.liftChar (ϑ.pow (l + 1)) (l + 1) * WeilData.upsilonU1 ^ (card n / 2) :=
-  rfl
-
 
 /-- The tame part of `gridChar`: that of `liftChar` with the twist `ϑ ^ (l + 1)` if `c`, and with
 the trivial twist otherwise. -/
@@ -591,7 +586,7 @@ lemma sum_tuplesOn_insert {edges : Finset (GridNode × GridNode)} {e : GridNode 
   refine sum_nbij' (fun S ↦ (update S e 0, S e)) (fun p ↦ update p.1 e p.2)
     (fun S hS ↦ ?_) (fun p hp ↦ ?_) (fun S _ ↦ by simp) (fun p hp ↦ ?_) fun S _ ↦ by simp
   · refine mem_product.2 ⟨mem_tuplesOn.2 fun e' he' ↦ ?_, mem_univ _⟩
-    show update S e 0 e' = 0
+    change update S e 0 e' = 0
     grind [mem_tuplesOn]
   · refine mem_tuplesOn.2 fun e' he' ↦ ?_
     show update p.1 e p.2 e' = 0
@@ -756,21 +751,15 @@ namespace Data
 of `Γ` and are zero elsewhere. -/
 lemma card_tuplesOn_edges_le (Γ : TwoGridPath D.m) :
     #(tuplesOn ϑ Γ.edges) ≤ edgeMatrixCountBound ϑ ^ (2 * D.m) := by
-  have h_card : #Γ.edges ≤ 2 * D.m := by
-    have h_half (z : Bool) : #((Γ.half z).edges z) + 0 + Γ.diagonalIndex ≤ Γ.diagonalIndex + D.m :=
-      (Γ.half z).card_edges_le
-    have h_union : #Γ.edges ≤ #((Γ.half false).edges false) + #((Γ.half true).edges true) :=
-      card_union_le _ _
-    grind [TwoGridPath.diagonalIndex_le]
-  have h_ends (p q : GridNode) (hpq : (p, q) ∈ Γ.edges) :
-      p.2 ≤ (D.m, D.m) ∧ q.2 ≤ (D.m, D.m) := by
-    obtain ⟨z, hz⟩ : ∃ z : Bool, (p, q) ∈ (Γ.half z).edges z := by
-      simpa [TwoGridPath.edges] using hpq
-    obtain ⟨-, -, -, hp_le, hq_le⟩ := GridPath.eq_and_le_of_mem_edges hz
-    have hq : q.2 ≤ (D.m, D.m) := hq_le.trans ⟨Γ.diagonalIndex_le, le_rfl⟩
-    exact ⟨hp_le.trans hq, hq⟩
-  exact (card_tuplesOn_le h_ends).trans
-    (Nat.pow_le_pow_right (pow_pos Fintype.card_pos _) h_card)
+  refine (card_tuplesOn_le ?_).trans (Nat.pow_le_pow_right (pow_pos Fintype.card_pos _) ?_)
+  · intro p q hpq
+    obtain ⟨z, hz⟩ : ∃ z, (p, q) ∈ (Γ.half z).edges z := by simpa [TwoGridPath.edges] using hpq
+    obtain ⟨-, -, -, hp, hq⟩ := GridPath.eq_and_le_of_mem_edges hz
+    have hq' : q.2 ≤ (D.m, D.m) := hq.trans ⟨Γ.diagonalIndex_le, le_rfl⟩
+    exact ⟨hp.trans hq', hq'⟩
+  · have := (Γ.half false).card_edges_le (z := false)
+    have := (Γ.half true).card_edges_le (z := true)
+    exact (card_union_le _ _).trans (by omega)
 
 /-- The period of a conjugate form on `Y^j_j` and a form on `Ỹ^j_j` along `U(Y^j_j) → U(Ỹ^j_j)`. The
 second form is translated by a real point `g` of `U(Ỹ^j_j)` and, on the added line, by the `j`-th

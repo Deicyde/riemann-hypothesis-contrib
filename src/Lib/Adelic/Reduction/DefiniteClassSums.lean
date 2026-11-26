@@ -112,7 +112,7 @@ lemma exists_isCompact_of_bounded_frame {C : Set (Matrix n n (𝔸 E))} (hC : Is
   refine ⟨γ, ?_, (rep (gram r) * r⁻¹).prop⟩
   have h_mat : (V.x⁻¹.val • c) * rightFactor (gram r) = (V.ratEmbed γ * g)⁻¹.adeleMatrix := by
     simp [c, γ, rep, rightFactor, ratEmbed, toRatCoords, G.adeleMatrix, mul_assoc, U.map]
-  show (V.ratEmbed γ * g)⁻¹.adeleMatrix ∈ (V.x⁻¹.val • C) * rightFactor '' gramValues
+  change (V.ratEmbed γ * g)⁻¹.adeleMatrix ∈ (V.x⁻¹.val • C) * rightFactor '' gramValues
   rw [← h_mat]
   exact Set.mul_mem_mul (Set.smul_mem_smul_set hr) (Set.mem_image_of_mem _ ⟨c, hr, h_gram_map⟩)
 

@@ -3,8 +3,10 @@ module
 public import Lib.ClassField.Places.ProfiniteGalois
 public import Lib.General.Algebra.AbsIntegrallyClosed
 public import Lib.General.Algebra.AdicCompletion
+public import TauCeti.Analysis.Normed.Ring.Ultra
 public import TauCeti.NumberTheory.Padics.Complex.FixedPoints
-public import TauCeti.Topology.Algebra.Valued.NormedValued
+
+import TauCeti.RingTheory.RootsOfUnity.Ultrametric
 
 /-!
 # Tilting, Fontaine's θ, the ring O_C and Ax's theorem on Galois invariants in ℂ_p
@@ -27,7 +29,7 @@ elements fixed by `J`.
 * The continuous isometric action of `New.Gp` on `ℂ_p` (Tau Ceti's
   `UniformSpace.Completion.instMulSemiringAction`), which restricts to an action by ring
   automorphisms on the ring of integers `New.OC`.
-* `O_C` is `p`-adically complete and absolutely integrally closed, with `O_C[1/p] = ℂ_p`.
+* `O_C` is absolutely integrally closed, with `O_C[1/p] = ℂ_p`.
 * `New.Period.ax_mem_closure_fixedField`: Ax's theorem; an element fixed by a subgroup `J` is a
   limit of algebraic elements fixed by `J` (Tau Ceti's
   `PadicComplex.fixedPoints_eq_closure_fixedField`).
@@ -278,11 +280,6 @@ instance : Away (p : OC) ℂ_[p] := by
     (div_le_one (pow_pos (zero_lt_one.trans hp_one_lt) n)).mpr hz_lt.le
   simpa [norm_p_eq_inv] using h_norm_le
 
-/-- `O_C` is `p`-adically complete. -/
-instance : IsAdicComplete (span {(p : OC)}) OC :=
-  (Valuation.integer.integers (NormedField.valuation (K := ℂ_[p]))).isAdicComplete_span_singleton
-    (by change ‖(p : ℂ_[p])‖ < 1; exact PadicComplex.norm_p_lt_one p)
-
 /-- `O_C` is absolutely integrally closed: every monic polynomial of positive degree over `O_C`
 has a root in `O_C`. -/
 instance : IsAbsIntegrallyClosed OC := .of_isIntegrallyClosedIn ℂ_[p]
@@ -308,27 +305,11 @@ namespace New.Period
 variable {p : ℕ} [Fact p.Prime]
   {F : Type*} [NormedField F] [IsUltrametricDist F] {ζ : F}
 
-/-- In an ultrametric normed field, if `‖ζ‖ ≤ 1` then `‖ζ ^ a - 1‖ ≤ ‖ζ - 1‖` for every `a`. -/
-lemma norm_pow_sub_one_le_norm_sub_one (hζ_norm : ‖ζ‖ ≤ 1) (a : ℕ) : ‖ζ ^ a - 1‖ ≤ ‖ζ - 1‖ :=
-  -- `ζ - 1` divides `ζ ^ a - 1` in the ring of elements of norm at most one
-  (Valuation.integer.integers NormedField.valuation).le_of_dvd
-    (sub_one_dvd_pow_sub_one ⟨ζ, hζ_norm⟩ a)
-
 /-- If `ζ` is a primitive `p ^ (m + 1)`-th root of unity in an ultrametric normed field `F`, then
 `‖ζ - 1‖ ^ φ (p ^ (m + 1)) = ‖p‖`, where `φ (p ^ (m + 1)) = p ^ m (p - 1)`. -/
 lemma norm_zeta_sub_one_pow {m : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ (m + 1))) :
-    ‖ζ - 1‖ ^ φ (p ^ (m + 1)) = ‖(p : F)‖ := by
-  -- `p` is the value at `1` of the cyclotomic polynomial, the product of the `1 - ξ` over the
-  -- primitive roots `ξ`. Two primitive roots are powers of each other, so `‖1 - ξ‖ = ‖ζ - 1‖`.
-  have norm_le {ξ η : F} (hξ : IsPrimitiveRoot ξ (p ^ (m + 1)))
-      (hη : IsPrimitiveRoot η (p ^ (m + 1))) : ‖η - 1‖ ≤ ‖ξ - 1‖ := by
-    obtain ⟨a, -, rfl⟩ := hξ.eq_pow_of_pow_eq_one hη.pow_eq_one
-    exact norm_pow_sub_one_le_norm_sub_one (hξ.isOfFinOrder NeZero.out).norm_eq_one.le a
-  have norm_eq (ξ : F) (hξ : ξ ∈ primitiveRoots (p ^ (m + 1)) F) : ‖1 - ξ‖ = ‖ζ - 1‖ := by
-    rw [mem_primitiveRoots (NeZero.pos _)] at hξ
-    rw [norm_sub_rev, (norm_le hζ hξ).antisymm (norm_le hξ hζ)]
-  simp [← eval_one_cyclotomic_prime_pow m, cyclotomic_eq_prod_X_sub_primitiveRoots hζ, eval_prod,
-    prod_eq_pow_card norm_eq, hζ.card_primitiveRoots]
+    ‖ζ - 1‖ ^ φ (p ^ (m + 1)) = ‖(p : F)‖ :=
+  hζ.norm'_sub_one_pow_totient_prime_pow
 
 /-- Let K be algebraically closed, L a normed field over K, f in K[X] with leading coefficient
 a, x in L, r ≥ 0. If ‖x − w‖ ≥ r for every root w of f, then ‖f(x)‖ ≥ ‖a‖ r^(deg f). -/
@@ -368,7 +349,7 @@ lemma exists_algebraic_of_fixed_near_one {x : ℂ_[p]} (hx : ∀ᶠ g : Gp p in 
     simpa only [InfiniteGalois.fixedField_fixingSubgroup] using
       ax_mem_closure_fixedField E.fixingSubgroup hE
   obtain ⟨y, -, hy⟩ : ∃ y ∈ E.toSubmodule, (toComplL y : ℂ_[p]) = x :=
-    (E.toSubmodule.map toComplL.toLinearMap).closed_of_finiteDimensional.closure_subset h_closure
+    (E.toSubmodule.map toComplL.toLinearMap).isClosed_of_finiteDimensional.closure_subset h_closure
   exact ⟨y, hy.symm⟩
 
 end New.Period

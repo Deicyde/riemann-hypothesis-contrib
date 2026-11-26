@@ -66,10 +66,6 @@ def OccursInWeight (a ν : ℕ) (θ : SafePlace 𝔑 → ℕ → ℂ) (h : ℕ) 
     ∑ L ∈ s, c L * (L.map ↿θ).prod = 1 →
     ¬∀ b : heckeAlgebra (Fin a) ℂ 𝔑, IsNullHecke ν h (b * ∑ L ∈ s, c L • (L.map tauHecke).prod)
 
-private lemma realVecAction_eq_toLin' (B : Matrix n n E) :
-    realVecAction B = Matrix.toLin' (B.map cmEmbedding) :=
-  rfl
-
 /-- Let the rational matrix `z` be integral in the frame `x`, and let `β` be an integer of `E`. Then
 `B = 1 - 2 β z` maps the lattice `frameLattice x` into itself, `det B ≠ 0`, and the index of the
 lattice in its preimage under `B` is the product of the `σ (det B)` over the complex embeddings
@@ -110,7 +106,9 @@ lemma relIndex_comap_one_sub_two_smul {x : GL n (𝔸f E)} {z B : Matrix n n E}
     omega
   -- The complex determinant is the product of the `Φ v (det B)` over the infinite places.
   have h_det : F.det = ∏ v : InfinitePlace E, Φ v B.det := by
-    rw [det_restrictScalars, realVecAction_eq_toLin', det_toLin', ← RingHom.mapMatrix_apply,
+    rw [det_restrictScalars]
+    change Algebra.norm ℂ ((Matrix.toLin' (B.map cmEmbedding)).det) = _
+    rw [det_toLin', ← RingHom.mapMatrix_apply,
       ← cmEmbedding.map_det]
     -- The norm on `InfinitePlace E → ℂ` is the determinant of multiplication in each coordinate.
     change LinearMap.det (LinearMap.pi fun v ↦ mul ℂ ℂ (Φ v B.det) ∘ₗ LinearMap.proj v) = _
@@ -148,7 +146,7 @@ lemma triple_class_eq_iff {p p' : ModuliPoint E n ν} {t t' : GL n E × n}
 /-- At a neat level, let the vectors of `p` run through representatives `u` of the groups `L j`
 modulo the lattice of `p.frame`, and let `δ` run through the deck group. The points so obtained on
 level `i` are distinct. -/
-lemma Model.point_comp_deck_injective [Nonempty n] (h_neat : IsNeat n 𝔑)
+lemma Model.point_comp_deck_injective (h_neat : IsNeat n 𝔑)
     (i : Finset (nonZeroDivisors (𝓞 E) × GUPlus E n)) (p : ModuliPoint E n ν)
     (L : Fin ν → AddSubgroup (RealVectors E n)) :
     Function.Injective fun u : (∀ j : Fin ν, L j ⧸ (frameLattice p.frame).addSubgroupOf (L j)) ×

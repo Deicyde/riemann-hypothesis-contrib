@@ -108,7 +108,7 @@ class IsFillingData [P : IntegralPlace (LocProd T)]
 lemma eventually_mem_integralOff (a : 𝔸f E) :
     ∀ᶠ T : Finset (FinPlace E) in Filter.atTop, a ∈ integralOff T := by
   -- It suffices that `T` contain the finitely many places where `a` is not integral.
-  have h_fin : {w : FinPlace E | a w ∉ LocInt w}.Finite := a.2
+  have h_fin : {w : FinPlace E | a w ∉ LocInt w}.Finite := a.property
   filter_upwards [eventually_ge_atTop h_fin.toFinset] with T hT
   have h_int (w : FinPlace E) (hw : w ∉ T) : a w ∈ LocInt w :=
     by_contra fun h_not ↦ hw (hT (h_fin.mem_toFinset.2 h_not))
@@ -158,9 +158,10 @@ lemma ratToInf_weylElem (p : ℕ → Eˣ) (v : InfinitePlace E) :
   -- `basisScale` multiplies the entries on the pair of floor `a` by `S.frameScaleSq v a` or by its
   -- inverse, and keeps the others.
   ext i j
+  simp only [ratToInf_apply, weylElem, weylOn, Matrix.of_apply, Units.isUnit, and_true, and_self]
   rcases j with a | (a | a) | a
   all_goals
-    simp [weylElem, weylOn, BesselIndex.level, basisScale, frameScaleSq, unitOrOne, two_mul,
+    simp [BesselIndex.level, basisScale, frameScaleSq, unitOrOne, two_mul,
       pow_add, Nat.add_sub_assoc, Nat.Prime.ne_zero]
     split_ifs with hi
     · simp [field, ← Complex.ofReal_pow, hi, Nat.Prime.ne_zero]
@@ -392,8 +393,8 @@ lemma ofReal_genIndex_le_enorm_prod_sq (x : LocProd T) :
     _ ≤ ENNReal.ofReal (∏ w : T, (1 + √(‖x w‖⁻¹ - 1)) ^ 2) := by
       gcongr with w
       exact h_real _
-    _ ≤ ‖∏ w : T, (1 + √(‖x w‖⁻¹ - 1)) ^ 2‖ₑ := Real.ofReal_le_enorm _
-    _ = _ := by rw [Finset.prod_pow, enorm_pow]
+    _ ≤ ‖∏ w : T, (1 + √(‖x w‖⁻¹ - 1)) ^ 2‖ₑ := Real.ofReal_le_eNorm _
+    _ = _ := by rw [Finset.prod_pow, eNorm_pow]
 
 end
 
@@ -433,7 +434,7 @@ theorem exists_integralPlace : ∃ P : IntegralPlace (LocProd T), P.ψ = S.charO
       modulus := modulus
       ψ := S.charOnPlaces T
       kernelBound := 1
-      continuous_psi := continuous_ψf.subtype_val.comp ((continuous_adeleOfLocal T).const_mul _)
+      continuous_psi := continuous_ψf.subtypeVal.comp ((continuous_adeleOfLocal T).const_mul _)
       measurable_modulus := by
         simp [modulus, genIndex_eq_inv_prod_norm]
         fun_prop
@@ -496,8 +497,9 @@ theorem isMulLeftInvariant_haar_inv [P : IntegralPlace (LocProd T)] :
       (volume (stdLevel E 𝔰.BesselIndex : Set (Gf E 𝔰.BesselIndex)) •
         (haar (G := (S.latticeMiddle (LocProd T)).G)).inv).IsMulLeftInvariant := by
     rw [← h_int]
-    exact isMulLeftInvariant_measure_smul_inv volume haar (h_pr.comp hc).measurable
-      hX.measurableSet h_lift P.measurableSet_unitaryLevel
+    have hπ : Measurable π := (h_pr.comp hc).measurable
+    exact isMulLeftInvariant_measure_smul_inv volume haar (π := π) hπ hX.measurableSet
+      h_lift P.measurableSet_unitaryLevel
   simpa using h_inv
 
 section
