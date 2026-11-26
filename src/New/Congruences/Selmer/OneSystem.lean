@@ -1,8 +1,12 @@
 module
 
-public import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.FieldTheory.Galois.Profinite
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.Topology.Algebra.ClopenNhdofOne
+import Mathlib.Topology.Connected.Separation
 public import Lib.General.Algebra.SharpMinors
-public import New.Congruences.Selmer.SelmerData
+public import New.Congruences.Selmer.AuxiliaryPrimes
+import New.Congruences.Selmer.SelmerData
 
 /-!
 # The universal twist and one system of equations for all twists
@@ -142,9 +146,6 @@ section Relations
 variable {Γ 𝒢 n Λ O B : Type} [Fintype 𝒢] [Fintype n] [DecidableEq n] [CommRing Λ] [CommRing O]
   [AddCommGroup B] [Module O B]
 
-lemma mapRel_single (ev : Λ →+* O) (g : Γ) (m : Matrix n n Λ) :
-    mapRel ev (.single g m) = .single g (m.map ev) := Finsupp.mapRange_single
-
 /-- Mapping the entries of a relation by `e` and then by `ev` is mapping them by `ev ∘ e`. -/
 lemma mapRel_mapRel {Λ' : Type} [CommRing Λ'] (e : Λ' →+* Λ) (ev : Λ →+* O)
     (f : Γ →₀ Matrix n n Λ') : mapRel ev (mapRel e f) = mapRel (ev.comp e) f :=
@@ -264,11 +265,9 @@ lemma exists_openNormalSubgroup_forall_eq_zero (G' : OpenSubgroup Gal(Ω/E)) (m 
     simp [V, hz_add u u.property u' u'.property]
   have h_mem : (fun u : H ↦ χ (z u)) ∈ Y := by
     refine ⟨h_cocycle, fun w hw A hA u hu ↦ ?_⟩
-    have hz_zero : z u = 0 := hz_unr u ⟨w.below E, hw, A, hA.isPlaceOver_below, hu⟩
-    simp [hz_zero]
+    simp [hz_unr u ⟨w.below E, hw, A, hA.isPlaceOver_below, hu⟩]
   obtain ⟨hg_mem, h_const⟩ : ∃ hg : g ∈ H, ∀ y ∈ Y, y ⟨g, hg⟩ = y 1 := hG'' g hg
-  have h_value : χ (z g) = χ (z 1) := h_const _ h_mem
-  rw [h_value, hz_one, map_zero]
+  simpa only [Subgroup.coe_one, hz_one, map_zero] using h_const _ h_mem
 
 /-- Let `ρ` be a function from `Gal(Ω/E)` to matrices over a ring `Λ`, let `L` be a set of relations
 `∑ γ, f γ • c γ = 0` with matrix coefficients over `Λ`, let `G'` be an open subgroup, let `m ≠ 0`
@@ -312,7 +311,7 @@ theorem exists_matrix_selmerModule_equiv (ρ : Gal(Ω/E) → Matrix n n Λ)
   let pull : (𝒢 × n → B) →ₗ[O'] Gal(Ω/E) → n → B := .pi fun g ↦ .pi fun i ↦ .proj (π g, i)
   have h_rel : mapRel ev '' R = cocycleRelations (fun g ↦ (ρ g).map ev) ∪
       (fun g ↦ Finsupp.single g 1) '' inertiaAbove Sᶜ ∪ mapRel ev '' L := by
-    simp [R, Set.image_union, mapRel_image_cocycleRelations, Set.image_image, mapRel_single]
+    simp [R, Set.image_union, mapRel_image_cocycleRelations, Set.image_image, mapRel, Finsupp.mapRange_single]
   have h_mem (w : 𝒢 × n → B) : w ∈ Ker ↔ pull w ∈ Sel := by
     have h_const : IsLocallyConstant (pull w) :=
       (IsLocallyConstant.of_discrete w.curry).comp_continuous QuotientGroup.continuous_mk

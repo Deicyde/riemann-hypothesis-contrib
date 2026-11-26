@@ -1,6 +1,14 @@
 module
 
+import Mathlib.Dynamics.Ergodic.Action.Regular
+import Mathlib.Topology.Algebra.ProperAction.Torsor
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.UniformSpace.Uniformizable
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.Weil.Periods.BesselIntegral
+import Lib.Adelic.QuotientMeasure.UnfoldingInStages
+import Lib.DiscreteSeries.FlenstedJensen.PsiKTypes
 
 /-!
 # Integrals over a quotient as finite sums over cosets with controlled multiplicity
@@ -450,19 +458,8 @@ lemma _root_.New.Grading.exists_integral_eq_sum_over_cut (A : Subgroup (Gf E ι)
   have : ContinuousMul Y.besselGroup :=
     ⟨((continuous_subtypeVal.comp continuous_fst).mul
       (continuous_subtypeVal.comp continuous_snd)).subtype_mk _⟩
-  have : ProperSMul (G E ε) (G E ε) :=
-    ⟨({ toFun := fun gh : G E ε × G E ε ↦ (gh.1 * gh.2, gh.2)
-        invFun := fun gh ↦ (gh.1 * gh.2⁻¹, gh.2)
-        left_inv := fun ⟨g, h⟩ ↦ Prod.ext (mul_inv_cancel_right g h) rfl
-        right_inv := fun ⟨g, h⟩ ↦ Prod.ext (inv_mul_cancel_right g h) rfl
-        continuous_toFun := (continuous_fst.mul continuous_snd).prodMk continuous_snd
-        continuous_invFun :=
-          (continuous_fst.mul continuous_snd.inv).prodMk continuous_snd } :
-        G E ε × G E ε ≃ₜ G E ε × G E ε).isProperMap⟩
-  have : ProperSMul Y.besselGroup (G E ε) :=
-    properSMul_of_isClosedEmbedding Y.besselGroup.subtype
-      (inferInstance : IsClosed (Y.besselGroup : Set (G E ε))).isClosedEmbedding_subtypeVal
-      fun _ _ ↦ rfl
+  have : ProperSMul (G E ε) (G E ε) := inferInstance
+  have : ProperSMul Y.besselGroup (G E ε) := inferInstance
   have : NeZero (haar : Measure Y.besselGroup) :=
     ⟨fun h ↦ isOpen_univ.measure_ne_zero (haar : Measure Y.besselGroup)
       ⟨(1 : Y.besselGroup), trivial⟩ (by rw [h]; rfl)⟩

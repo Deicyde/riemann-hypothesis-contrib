@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.RingTheory.PicardGroup
 public import Lib.Adelic.TraceFormula.TestFunction
 public import Lib.LocalGL.Green.LabelCharacters
 
@@ -139,12 +140,12 @@ lemma sum_coeff_labelIdem_radicalHom {c : k[X]} (hc : IsLabel (Fintype.card n) c
     obtain ⟨hc_monic, -⟩ := hc
     exact finMean_labelChar_radicalHom hc_monic hc_irr hT_empty hT_univ
   have h_sum : ∑ Z : Matrix n n k, χ (U (ofAdd Z) * (z * y)) = 0 := by
-    obtain ⟨h_char, -⟩ : IsIrreducibleChar χ := hc.isIrreducibleChar_labelChar (faithfulChar k)
+    have h_char : IsChar χ := (hc.isIrreducibleChar_labelChar (faithfulChar k)).isChar
     have h_elem : (Representation.trivial ℂ (Multiplicative (Matrix n n k)) ℂ).asAlgebraHom
         (groupAlgElem fun Z : Multiplicative (Matrix n n k) ↦ χ (U Z * (z * y))) = 0 :=
       h_char.asAlgebraHom_groupAlgElem_eq_zero U (z * y) h_mean
     -- the trivial representation sends a group algebra element to the sum of its coefficients
-    simpa [asAlgebraHom_eq_sum, ← ofAdd.sum_comp] using LinearMap.congr_fun h_elem 1
+    simpa [Representation.asAlgebraHom_eq_sum, ← ofAdd.sum_comp] using LinearMap.congr_fun h_elem 1
   -- The coefficients are a multiple of the conjugate character, which is a class function.
   have h_coeff (u : GL n k) : (labelIdem n c).coeff (y * (u * z)) =
       χ 1 / Nat.card (GL n k) * starRingEnd ℂ (χ (u * (z * y))) := by

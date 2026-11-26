@@ -1,7 +1,9 @@
 module
 
-public import Lib.Weil.Periods.BesselIntegral
+public import TauCeti.Topology.Algebra.Group.Units
+public import TauCeti.Topology.Instances.Matrix
 public import Lib.Weil.Periods.Equivariant
+import Lib.Weil.Periods.BesselIntegral
 
 /-!
 # Real and finite points of the Bessel group
@@ -108,8 +110,8 @@ lemma isHaarMeasure_map_besselProdEquiv :
     prod.instIsHaarMeasure haar haar
   Y.besselProdEquiv.isHaarMeasure_map _
 
-/-- The group `R(F_∞)` of real points of the Bessel subgroup `R` is unimodular: its left Haar measure
-is right invariant. -/
+/-- The group `R(F_∞)` of real points of the Bessel subgroup `R` is unimodular: its left Haar
+measure is right invariant. -/
 theorem isMulRightInvariant_haar_besselReal [Fintype X] :
     (haar : Measure Y.besselReal).IsMulRightInvariant := by
   -- The group `R(𝔸)` is unimodular and is the product of the two groups.
@@ -173,8 +175,8 @@ lemma exists_integral_eq_mul_integral_besselReal (K : Subgroup (Gf E ι)) [hK : 
         simp only [integral_smul_nnreal_measure, ν, h_emb.integral_map, h_prod, NNReal.smul_def,
           Complex.real_smul]
     _ = (c * haar.real J : ℝ) * ∫ s : Y.besselReal, a s ∂haar := by
-        simp [integral_prod_mul, integral_indicator hJ_open.measurableSet, Set.univ_inter, mul_assoc,
-          mul_comm]
+        simp [integral_prod_mul, integral_indicator hJ_open.measurableSet, Set.univ_inter,
+          mul_assoc, mul_comm]
 
 end New.Grading
 
