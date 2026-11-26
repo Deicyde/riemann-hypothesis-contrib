@@ -1,7 +1,11 @@
 module
 
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.CStarAlgebra.CStarMatrix
 public import Lib.LocalGL.Green.LabelCharacters
 public import New.UpperBound.Objects.AuxiliaryPair
+import Lib.ClassField.HeckeCharacter.TameModulus
+import Lib.GLn.SchurModule.SchurNorm
 
 /-!
 # Point forms, Hecke adjoints and false lifts on the definite space of a descent pair
@@ -464,7 +468,7 @@ lemma range_groupAlgAction_mem_invtSubmodule {e₀ : MonoidAlgebra ℂ (O.Chosen
     LinearMap.congr_fun (h_comm g).eq y
   -- `O.groupAlgAction e₀` is a linear combination of the `O.formAction g`.
   have h_alg : O.groupAlgAction e₀ (f y) = f (O.groupAlgAction e₀ y) := by
-    simp [asAlgebraHom_eq_sum, h_apply]
+    simp [Representation.asAlgebraHom_eq_sum, h_apply]
   exact ⟨f y, h_alg⟩
 
 omit [WeilData E] in

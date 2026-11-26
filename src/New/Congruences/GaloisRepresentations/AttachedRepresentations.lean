@@ -1,7 +1,25 @@
 module
 
+import Mathlib.Algebra.Azumaya.Basic
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 public import New.Congruences.GaloisRepresentations.SelmerHypotheses
-public import New.OneLift.HeckeValues.TwistedRatio
+public import Lib.ClassField.Global.CMSplittingCharacters
+public import New.Determinant.Twist.FitTwists
+import Lib.ClassField.Avatar.LocalGlobalCompatibility
+import Lib.ClassField.Places.TameInertia
+import Lib.GaloisRep.Main.AllRanks
+import Lib.GaloisRep.Main.QuadraticStep
+import Lib.LocalGL.Shintani.LiftingGreenCharacters
+import Lib.PadicComparison.Descent.TestCategory
+import Lib.PadicHodge.Crystalline.HodgeTateForms
+import Lib.PadicHodge.Crystalline.HodgeTateJumps
+import Lib.PadicHodge.Crystalline.Regularity
+import New.OneLift.HeckeValues.TwistedRatio
 
 /-!
 # Lift settings and conjugate self-duality of attached Galois representations
@@ -171,7 +189,7 @@ theorem trivialLift_mem_range_typeProjection (hp : p.IsMainPair j) :
   refine ⟨Y.trivialLift, ?_⟩
   -- The idempotent is the mean over the group, which fixes `Y.trivialLift`.
   change typeProjection Y.descentPair (fun _ ↦ X - 1) Y.trivialLift = Y.trivialLift
-  simp_all [asAlgebraHom_eq_sum, tupleIdem, labelIdem, Y.formAction_trivialLift,
+  simp_all [Representation.asAlgebraHom_eq_sum, tupleIdem, labelIdem, Y.formAction_trivialLift,
     ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, prod_ne_zero_iff]
 
 end AptInstances
@@ -596,7 +614,7 @@ theorem IsRepOfType.twist_avatar {O : DescentPair D.E r n} {ϑ : D.Twist}
     have h_trace : (R (conjGal g)).val.trace =
         cyclotomicInv ℓ D.E (PadicAlgCl ℓ) g ^ (k - 1) * (R g⁻¹).val.trace := hR.trace_conj g
     simp [h_exp, h_trace, hμ_conj, zpow_sub₀, field, Units.smul_def, cyclotomicInv]
-  refine { toIsConjSelfDual := h_dual, local_conditions v hv A hA := ?_, labelled i A := ?_ }
+  refine { toIsConjSelfDual := h_dual, local_conditions v hv A hA := ?_, labeled i A := ?_ }
   · obtain ⟨hR_fin, hR_jumps, hR_good⟩ :
         IsFiniteTypeAt R A ∧ HasJumpsAt R A J ∧ (v ∉ placesAboveM D → IsGoodAt R A) :=
       hR.local_conditions v hv hA
@@ -624,9 +642,9 @@ theorem IsRepOfType.twist_avatar {O : DescentPair D.E r n} {ϑ : D.Twist}
     have hψ_star : ψ (star w) = 1 := hψ_off (star w) (h_setting.isChosen_chosenPlace i).not_star
     have hw_split : w.IsSplit := O.isConjApart_chosenPlace.star_ne i i
     have hμ_kill : PolyKillsAt μ₁ A s (X - C (φ (algebraMap (ResField w) K u.val))) := by
-      simpa [μ₁, μ, θ, φ, u, T] using isLabelledAt_avatar ha k' j hψ_star hw_split hy
+      simpa [μ₁, μ, θ, φ, u, T] using isLabeledAt_avatar ha k' j hψ_star hw_split hy
     have hR_kill : PolyKillsAt R A s (((c i).aroots K).map fun x : K ↦ X - C (φ x)).prod :=
-      hR.labelled hy
+      hR.labeled hy
     -- So it acts on `μ • R` through the values of `φ` at these roots times `u`.
     change PolyKillsAt (twistByChar μ R) A s
       ((((c i).scaleRoots u.val).aroots K).map fun x : K ↦ X - C (φ x)).prod

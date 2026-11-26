@@ -1,7 +1,12 @@
 module
 
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
 public import Lib.GaloisRep.LocalGlobal.LocalFormTypes
 public import Lib.GaloisRep.Main.AllRanks
+public import Lib.Adelic.AutomorphicForms.PAdicGauge
+import Lib.GaloisRep.Main.QuadraticStep
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Auxiliary places, base level, integral Hecke algebra and operators at the auxiliary places
@@ -201,20 +206,23 @@ lemma repOff_eq_of_mem_trivialOn (k : Gf E n) (hk : k ∈ trivialOn n D.places) 
 /-- The `New.Patching.EllAdicIntegers`-algebra of ℂ-linear endomorphisms of the space of forms
 `New.Patching.BaseLevel.formsOfLevel` attached to the base data D and the family of finite places
 L. -/
-def FormEnd [ThePrime ℓ] [PadicIso ℓ] : Type := End ℂ (D.formsOfLevel L)
-  deriving Semiring, Ring, Algebra EllAdicIntegers
+def FormEnd [ThePrime ℓ] : Type := End ℂ (D.formsOfLevel L)
+  deriving Semiring, Ring
 
-instance [ThePrime ℓ] [PadicIso ℓ] :
+instance [ThePrime ℓ] [PadicIso ℓ] : Algebra EllAdicIntegers (D.FormEnd L) :=
+  inferInstanceAs (Algebra EllAdicIntegers (End ℂ (D.formsOfLevel L)))
+
+instance [ThePrime ℓ] :
     FunLike (D.FormEnd L) (D.formsOfLevel L) (D.formsOfLevel L) :=
   inferInstanceAs (FunLike (End ℂ (D.formsOfLevel L)) _ _)
 
-instance [ThePrime ℓ] [PadicIso ℓ] :
+instance [ThePrime ℓ] :
     LinearMapClass (D.FormEnd L) ℂ (D.formsOfLevel L) (D.formsOfLevel L) :=
   inferInstanceAs (LinearMapClass (End ℂ (D.formsOfLevel L)) ℂ _ _)
 
 namespace FormEnd
 
-variable {L} [ThePrime ℓ] [PadicIso ℓ]
+variable {L} [ThePrime ℓ]
 
 /-- View a `ℂ`-linear endomorphism of `D.formsOfLevel L` as an element of `D.FormEnd L`. -/
 def ofEnd (T : End ℂ (D.formsOfLevel L)) : D.FormEnd L := T
@@ -249,7 +257,7 @@ lemma nsmul_apply (k : ℕ) (a : D.FormEnd L) (y : D.formsOfLevel L) : (k • a)
 
 
 @[simp]
-lemma smul_apply (r : EllAdicIntegers) (a : D.FormEnd L) (y : D.formsOfLevel L) :
+lemma smul_apply [PadicIso ℓ] (r : EllAdicIntegers) (a : D.FormEnd L) (y : D.formsOfLevel L) :
     (r • a) y = r • a y := rfl
 
 @[simp]
@@ -261,7 +269,7 @@ lemma intCast_apply (k : ℤ) (y : D.formsOfLevel L) : (k : D.FormEnd L) y = k �
   intCast_apply_eq_smul (F := Module.End ℂ ↥(D.formsOfLevel L)) k y
 
 @[simp]
-lemma algebraMap_apply (r : EllAdicIntegers) (y : D.formsOfLevel L) :
+lemma algebraMap_apply [PadicIso ℓ] (r : EllAdicIntegers) (y : D.formsOfLevel L) :
     algebraMap EllAdicIntegers (D.FormEnd L) r y = r • y := rfl
 
 @[simp]
@@ -493,6 +501,7 @@ lemma formsOfLevel_le_of_eigensystem {N : Submodule ℂ (V.forms κ)}
     have hx : x ∈ D.Eigensystem L := ⟨f, ⟨hfx, hf⟩, hf_ne⟩
     exact hN ⟨x, hx⟩ ⟨hfx, hf⟩
 
+omit [PadicIso ℓ] in
 /-- Two endomorphisms of the space `New.Patching.BaseLevel.formsOfLevel` L are equal if they agree
 on every form that lies in an isotypic space of a system of level L. -/
 lemma formEnd_ext {a b : D.FormEnd L}
@@ -698,7 +707,8 @@ lemma residueRep_mulSingle [DecidableEq J] (hQ : ∀ j : J, D.IsOffLevel (ℓ :=
 
 /-- Let the places `w j` be off the base level. An element `g` of GL_N(k_{w j}), placed at the
 index `j`, acts by an operator at `w j`. -/
-lemma residueRep_mem_localOperators [DecidableEq J] (hQ : ∀ j : J, D.IsOffLevel (ℓ := ℓ) ![] (Q.place j))
+lemma residueRep_mem_localOperators [DecidableEq J]
+    (hQ : ∀ j : J, D.IsOffLevel (ℓ := ℓ) ![] (Q.place j))
     (g : GL (Fin (card n)) (ResField (Q.place j))) :
     D.residueRep Q (Pi.mulSingle j g) ∈ D.localOperators Q j := by
   -- `g` is the reduction of an integral `k`, and acts as the translation by `k` at `w j`
@@ -723,7 +733,8 @@ private lemma reindexGL_atPlace_mem_proIwahori_of_mem_levelOf {k : Gf E n}
   grind
 
 omit [Fintype J] in
-/-- Let `w j = Q.place j` be the Taylor–Wiles places, all off the base level (`D.IsOffLevel (ℓ := ℓ) ![]`).
+/-- Let `w j = Q.place j` be the Taylor–Wiles places, all off the base level
+(`D.IsOffLevel (ℓ := ℓ) ![]`).
 Let `a` be an operator at `w j`, i.e. an element of `D.localOperators Q j`: an endomorphism of the
 forms `formsOfLevel Q.place` that keeps the integral forms and agrees with an
 `EllAdicIntegers`-combination of translations supported at `w j` and its conjugate. If the values of

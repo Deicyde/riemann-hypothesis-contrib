@@ -1,6 +1,12 @@
 module
 
-public import Lib.Cohomology.SmoothBaseChange
+public import Aesop.BuiltinRules
+public import Mathlib.AlgebraicGeometry.Morphisms.Proper
+public import Lib.Cohomology.Etale.EllAdicCohomology
+public import Lib.General.Geometry.EtaleCharts
+import Lib.Cohomology.Etale.DenseSubfunctors
+import Lib.Cohomology.SmoothBaseChange
+import Lib.General.Geometry.PointsOfProperSchemes
 
 /-!
 # The congruence relation and the trivial action of inertia on ℓ-adic cohomology
@@ -170,7 +176,7 @@ lemma congruence_relation [IsProper W.hom] {g : Γ} (hg : IsFrob A (p ^ f) g) {I
       (map_sum pullToA ..).symm.trans <| (congrArg pullToA h_sum).trans (map_zero pullToA)
   -- the special fibre: the points that kill the maximal ideal of `A`; they have characteristic `p`
   let s₀ : geomPoints R A W ⟶ reprBy (of A) :=
-    fibreProd.snd (pointsToBase W.hom) (reprMap (ofHom (algebraMap R A)))
+    fiberProd.snd (pointsToBase W.hom) (reprMap (ofHom (algebraMap R A)))
   let U₀ : Subfunctor (geomPoints R A W) := zeroPoints s₀ {a | A.valuation a < 1}
   have h_char (B : CommRingCat) (x : U₀.toFunctor.obj B) : (p : B) = 0 := by
     simpa using x.property p hp

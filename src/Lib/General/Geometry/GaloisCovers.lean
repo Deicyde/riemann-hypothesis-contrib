@@ -1,14 +1,27 @@
 module
 
-public import Mathlib.Algebra.Module.Card
-public import Mathlib.Algebra.MvPolynomial.Cardinal
-public import Mathlib.RingTheory.Localization.Cardinality
-public import Mathlib.Topology.Baire.BaireMeasurable
-public import Mathlib.Topology.Baire.LocallyCompactRegular
-public import Lib.General.Geometry.GeometricPoints
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Module.Card
+import Mathlib.Algebra.MvPolynomial.Cardinal
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.AlgebraicGeometry.ZariskisMainTheorem
+import Mathlib.CategoryTheory.ExtremalEpi
+import Mathlib.RingTheory.Algebraic.Cardinality
+import Mathlib.RingTheory.Artinian.Instances
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Localization.Cardinality
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.Topology.Baire.BaireMeasurable
 public import Lib.LocalGL.Green.TauFunctions
 public import Lib.Shimura.Uniformisation.HolomorphicFamilies
-public import Lib.PadicComparison.Descent.TestCategory
+public import Lib.Cohomology.Etale.Basic
+public import Lib.General.Geometry.DenseComplexPoints
+import Lib.General.Geometry.GeometricPoints
+import Lib.General.Geometry.PointsOfProperSchemes
+import Lib.LocalGL.Green.CuspidalFunctions
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Complex points over countable rings, Zariski generic members and Galois coverings
@@ -733,7 +746,7 @@ lemma IsGaloisCovering.etale_of_isPullback {R : CommRingCat} {W Z : Over (Spec R
   have h_point (m : MaximalSpectrum N) : Nonempty (B →ₐ[A] Ω m) := by
     obtain ⟨y, hy⟩ : ∃ y : Spec (of (Ω m)) ⟶ W.left,
         y ≫ c.left = specMap (algebraMap A (Ω m)) ≫ u :=
-      exists_point_over c.left (hG.surjective.surj _)
+      (Scheme.Hom.exists_comp_eq_iff_mem_range c.left _).2 (hG.surjective.surj _)
     exact (exists_algHom_specMap_comp_eq hp (Ω m) y hy).nonempty
   let χ : B →ₐ[A] ∀ m : MaximalSpectrum N, Ω m := .pi fun m ↦ (h_point m).some
   have hχ (x : A) : χ (algebraMap A B x) = algebraMap N _ (algebraMap A N x) := χ.commutes x

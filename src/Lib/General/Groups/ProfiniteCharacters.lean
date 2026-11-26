@@ -1,10 +1,13 @@
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
-public import Mathlib.GroupTheory.FiniteAbelian.Duality
-public import Mathlib.Tactic.ENatToNat
 public import Mathlib.Topology.Instances.ZMod
-public import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Topology.Compactness.Paracompact
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.Topology.Separation.Connected
 public import Lib.ClassField.GaloisCohomology.ContinuousCocycles
 public import Lib.General.Topology
 
@@ -210,8 +213,8 @@ attribute [instance] isClosed_topologicalClosure
 namespace QZChar
 
 /-- The additive map sending a continuous 1-cocycle of `G` with values in `ℤ/n` (trivial action)
-to the character `G → ℚ/ℤ` obtained by composing with the embedding `ofZMod n`. -/
-noncomputable abbrev ofZModCocycle (n : ℕ) [NeZero n] :
+to the character `G → ℚ/ℤ` obtained by composing with the map `ofZMod n`, which is zero when `n = 0`. -/
+noncomputable abbrev ofZModCocycle (n : ℕ) :
     Z1 (Representation.trivial ℤ G (ZMod n)) →+ QZChar G :=
   pairMapZ1 (ContinuousMonoidHom.id G) (ofZMod n).toIntLinearMap
 

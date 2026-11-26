@@ -1,7 +1,22 @@
 module
 
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.InnerProductSpace.Trace
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import TauCeti.Analysis.Normed.Ring.Ultra
+import TauCeti.NumberTheory.NumberField.Countable
 public import New.Spanning.SecondMoment.FewTranslates
-public import New.Spanning.Unfolding.MomentBounds
+public import Lib.General.Groups.CharacterTheory
+public import Lib.Shimura.ComplexTheta.AppellHumbertData
+public import New.Spanning.Frames.FixedLines
+public import New.Spanning.RemainingTerms.Size
+import Lib.Shimura.Uniformisation.HolomorphicFamilies
+import New.Spanning.Frames.FiniteDepth
+import New.Spanning.Frames.FiniteShells
+import New.Spanning.MainTerm.GlobalToLocal
+import New.Spanning.Unfolding.MomentBounds
+import New.Spanning.Unfolding.SquareExpansion
 
 /-!
 # The second moments of the operators `P* s P`, and good forms
@@ -1132,7 +1147,7 @@ lemma HasAmplitudeBlocks.hilbertSchmidtNorm_asAlgebraHom_comp_sq_le [WeilData E]
     have h_sum : P.adjoint ∘ₗ e ∘ₗ P =
         ∑ t, x.coeff t • (P.adjoint ∘ₗ ρ (Pi.mulSingle i t) ∘ₗ P) := by
       ext1 v
-      simp [he_def, asAlgebraHom_eq_sum]
+      simp [he_def, Representation.asAlgebraHom_eq_sum]
     rw [← ofReal_re (_ ^ 2), hilbertSchmidtNorm_sq_eq_trace, h_proj, h_sum, ← add_re, hP']
     simp [mul_sub]
   have h_bessel :

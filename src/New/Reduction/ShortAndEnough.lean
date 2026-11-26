@@ -1,10 +1,15 @@
 module
 
+import Mathlib.Data.Rat.Cast.OfScientific
+import TauCeti.NumberTheory.Padics.Complex.Basic
 public import New.Reduction.IntegralTargetForms
 public import New.Spanning.SecondMoment.SpanningTheorem
-public import New.UpperBound.Divisibility.LocalDivisibility
-public import New.UpperBound.Seesaw.SeesawIdentity
-public import New.UpperBound.Size.ArchimedeanSize
+public import New.Reduction.PrimeSums
+public import New.UpperBound.Divisibility.MarkedPrimes
+public import New.UpperBound.Size.Estimates
+import New.UpperBound.Divisibility.LocalDivisibility
+public import New.UpperBound.Seesaw.SeesawIdentity -- shake: keep (needed public by an exposed definition)
+import New.UpperBound.Size.ArchimedeanSize
 
 /-!
 # Theorem A (short forms) and Theorem B (enough forms)
@@ -178,8 +183,7 @@ lemma normSqAt_normalizedPoincare (s : D.chosenGL) (φ : D.ramifiedSourceForms) 
   have h_norm : ‖σ D.invGainFactor‖ ^ 2 = exp (2 * log D.invGainFactor) := by
     rw [two_mul, exp_add, exp_log (mod_cast D.invGainFactor_pos), ← sq]
     simp
-  simp only [normalizedPoincare, LinearMap.smul_apply, map_smul, normSqAt, mul_classSum, ← h_norm]
-  exact congrArg _ (funext fun g ↦ weylNormSq_comp_smul _ σ _)
+  rw [normalizedPoincare, LinearMap.smul_apply, map_smul, normSqAt_smul, h_norm]
 
 /-! ### Theorem A -/
 
