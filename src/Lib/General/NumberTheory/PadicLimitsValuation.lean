@@ -308,8 +308,7 @@ variable (O) in
 lemma irreducible_uniformizer : Irreducible O.uniformizer := (exists_irreducible O).choose_spec
 
 /-- Normalised length: the additive map sending n to n·v(ϖ) and ∞ to ∞, where ϖ is the chosen
-uniformiser `O.uniformizer` and v(ℓ) = 1. The value does not depend on the choice of ϖ
-(`normLength_natCast_of_irreducible`). -/
+uniformiser `O.uniformizer` and v(ℓ) = 1. -/
 noncomputable def normLength : ℕ∞ →+ ℝ≥0∞ :=
   AddMonoidHom.ENatMap
     { toFun n := n * (-logb ℓ ‖O.uniformizer.val‖).toNNReal
