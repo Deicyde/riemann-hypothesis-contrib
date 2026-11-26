@@ -1,0 +1,224 @@
+name: formal-conjectures
+
+# The second Comparator setup, comparator/formal-conjectures.json: see verification/NOTES.md.
+# This checks that the challenge files are unchanged and that the challenge is
+# formal-conjectures' text, exports it and compares the checksum, and rehearses the judge with a
+# placeholder for src/Main.lean. It is not a verdict on the proof, and it runs on GitHub-hosted
+# runners.
+
+# The job reads only the files listed under `paths`, so it runs when one of those changes: on
+# pull requests, on main, and by manual dispatch. Other changes cannot alter its result. Keep
+# the two lists the same, and the job's sparse checkout within them. GitHub looks at the first
+# 3,000 changed files only, so a larger pull request that changes one of these may need a manual
+# dispatch.
+on:
+  push:
+    branches: [main]
+    paths:
+      - comparator/**
+      - src/Statements.lean
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/formal-conjectures.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - comparator/**
+      - src/Statements.lean
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/formal-conjectures.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: formal-conjectures-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  formal-conjectures:
+    name: formal-conjectures' text, the challenge's checksum, and a rehearsal of the judge
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      LEAN_ABORT_ON_PANIC: "1"   # as Comparator sets it for builds and exports
+      MATHLIB_CACHE_GET_URL: https://cache.mathlib.org/mathlib4   # as in build.yml
+      FC_REV: d8d031d4998c78575159ccab9a7a9e95ce043883
+    steps:
+      # Of the proof's source, only Statements.lean, which the bridge imports.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            /lakefile.toml
+            /lake-manifest.json
+            /lean-toolchain
+            /comparator/
+            /src/Statements.lean
+          sparse-checkout-cone-mode: false
+
+      # These three files say what the proof is judged against in this setup, so a pull request
+      # may not change them. They are the files of branch `alpoge`, byte for byte: these are
+      # their Git blob hashes there.
+      - name: The challenge files are unchanged
+        run: |
+          status=0
+          while read -r want path; do
+            have=$(git hash-object "$path")
+            if [ "$have" = "$want" ]; then
+              echo "unchanged: $path"
+            else
+              echo "::error file=$path::This pull request changes $path, a Comparator challenge file."
+              status=1
+            fi
+          done <<'EOF'
+          290a2c6270f8da3852c7051d7da0f30032a70421 comparator/FormalConjecturesChallenge.lean
+          e3afddc98129d1d1183ff217d434165fd893a0fe comparator/formal-conjectures.json
+          80bbbf91461783bb8e7f0bb8061b792668d4140a comparator/formal-conjectures-export-targets.txt
+          EOF
+          exit "$status"
+
+      # The challenge is a copy, so that it is built against this project's Mathlib and not
+      # formal-conjectures'. This ties the copy to the text it was taken from.
+      - name: The challenge is formal-conjectures' text at the pinned commit
+        run: |
+          grep -q "$FC_REV" comparator/FormalConjecturesChallenge.lean
+          python3 - <<'PY'
+          import os, re, urllib.request
+
+          def upstream(path):
+              url = f"https://raw.githubusercontent.com/google-deepmind/formal-conjectures/{os.environ['FC_REV']}/{path}"
+              return urllib.request.urlopen(url, timeout=60).read().decode()
+
+          def cut(text, start, end):
+              i = text.index(start)
+              return text[i:text.index(end, i) + len(end)]
+
+          def squash(text):
+              return re.sub(r"\s+", " ", text).strip()
+
+          rh = upstream("FormalConjectures/Millennium/RiemannHypothesis.lean")
+          basic = upstream("FormalConjecturesForMathlib/NumberTheory/DirichletCharacter/Basic.lean")
+          copied = {
+              "instance": cut(basic, "instance {S : Type*}", "<| by rfl"),
+              "riemannHypothesis": cut(rh, "/-- The **Riemann Hypothesis**", "sorry"),
+              "trivialZeros": cut(rh, "/-- Let $\\chi$ be a Dirichlet character", "{ - 2 * n | (n : ℕ) }"),
+              "generalized_riemann_hypothesis": cut(rh, "/-- The **Generalized Riemann Hypothesis**", "sorry"),
+          }
+          # The three differences the challenge file declares: formal-conjectures' own attributes
+          # are left out, the instance has the name Lean generates for it upstream, and
+          # `trivialZeros` is marked `noncomputable`, which Lean 4.36 and later want.
+          copied = {k: re.sub(r"^@\[category[^\n]*\n", "", v, flags=re.M) for k, v in copied.items()}
+          assert copied["instance"].count("instance {S") == 1
+          assert copied["trivialZeros"].count("\ndef trivialZeros") == 1
+          copied["instance"] = copied["instance"].replace(
+              "instance {S", "instance instDecidablePredOddOfDecidableEq_formalConjecturesForMathlib {S")
+          copied["trivialZeros"] = copied["trivialZeros"].replace("\ndef trivialZeros", "\nnoncomputable def trivialZeros")
+
+          # A file must be this frame, with each <name> standing for that declaration as copied
+          # above, and comments. So it has no `open`, option or declaration of its own.
+          def check(file, frame):
+              rest = squash(open(file, encoding="utf-8").read())
+              for name in re.findall(r"<(\w+)>", frame):
+                  if rest.count(squash(copied[name])) != 1:
+                      raise SystemExit(f"{file}: `{name}` is not formal-conjectures' text")
+                  rest = rest.replace(squash(copied[name]), f"<{name}>")
+                  print(f"{file}: `{name}` matches")
+              rest = squash(re.sub(r"/-.*?-/", " ", rest))
+              if rest != squash(frame):
+                  raise SystemExit(f"{file}: more than the copied declarations and comments:\n{rest}")
+              print(f"{file}: nothing else but comments")
+
+          check("comparator/FormalConjecturesChallenge.lean", """
+              module public import Mathlib @[expose] public section
+              namespace DirichletCharacter <instance> end DirichletCharacter
+              namespace RiemannHypothesis <riemannHypothesis> end RiemannHypothesis
+              namespace GRH <trivialZeros> <generalized_riemann_hypothesis> end GRH""")
+          check("comparator/FormalConjecturesStatement.lean", """
+              module public import Mathlib.NumberTheory.LSeries.DirichletContinuation
+              @[expose] public section
+              namespace DirichletCharacter <instance> end DirichletCharacter
+              namespace GRH <trivialZeros> end GRH""")
+          PY
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch Mathlib's official build cache
+        run: lake exe mathlib/cache get
+
+      # The first step under "Checking it" in the notes.
+      - name: Compile and export the challenge
+        run: |
+          mkdir -p .lake/comparator
+          lake env lean --root=comparator \
+            -o .lake/comparator/FormalConjecturesChallenge.olean comparator/FormalConjecturesChallenge.lean
+          LEAN_PATH="$PWD/.lake/comparator" lake env leanexport FormalConjecturesChallenge \
+            -- $(cat comparator/formal-conjectures-export-targets.txt) > "$RUNNER_TEMP/fc-challenge.export"
+
+          cd "$RUNNER_TEMP"
+          sum=$(sha256sum fc-challenge.export | cut -d' ' -f1)
+          echo "$sum  fc-challenge.export"
+          {
+            echo "### fc-challenge.export"
+            echo "- sha256: \`$sum\`"
+            echo "- size: $(wc -c < fc-challenge.export) bytes, $(wc -l < fc-challenge.export) lines"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # The notes quote this checksum; fail if the export ever changes. A change of pins
+          # changes it, and the step summary then shows the new one.
+          # This is for Lean v4.37.0-rc1 and Mathlib 31ce06ea, the pins branch `alpoge` ended on:
+          # its CI checked the same value.
+          echo "d08f9a601253ac28f09d7a64f674fd4227e665d573eae437a582f41f0ecb262c  fc-challenge.export" \
+            | sha256sum -c
+
+      # The other two steps, rehearsed: `Main.lean` is replaced by a placeholder that assumes
+      # the two theorems the solution uses.
+      - name: Compile the solution against a placeholder Main, and export
+        run: |
+          out=.lake/comparator
+          lake build +Statements
+          printf '%s\n' 'import Statements' \
+            'theorem riemannHypothesis : RiemannHypothesis := sorry' \
+            'theorem LFunction_eq_zero_re_of_isPrimitive : PrimitiveDirichletLZerosOnLine := sorry' > "$RUNNER_TEMP/Main.lean"
+          lake env lean --root="$RUNNER_TEMP" -o "$out/Main.olean" "$RUNNER_TEMP/Main.lean"
+          for m in FormalConjecturesStatement FormalConjecturesBridge FormalConjecturesSolution; do
+            LEAN_PATH="$PWD/$out" lake env lean -DwarningAsError=true --root=comparator \
+              -o "$out/$m.olean" "comparator/$m.lean"
+          done
+          LEAN_PATH="$PWD/$out" lake env leanexport FormalConjecturesSolution \
+            -- $(cat comparator/formal-conjectures-export-targets.txt) > "$RUNNER_TEMP/fc-rehearsal.export"
+      # Not a verdict on the proof. Both exports were made above from files we trust, so the
+      # judge runs without its sandbox.
+      - name: Judge the rehearsal
+        run: |
+          # `lake comparator` looks for the checkers bundled with Lean on PATH.
+          PATH="$(lean --print-prefix)/bin:$PATH"
+          config="$PWD/comparator/formal-conjectures.json"
+          mkdir "$RUNNER_TEMP/judge"
+          cd "$RUNNER_TEMP/judge"
+          judge() {
+            lake comparator --inadvisably-no-sandbox --config "$1" \
+              --challenge-from-export "$RUNNER_TEMP/fc-challenge.export" \
+              --solution-from-export "$RUNNER_TEMP/fc-rehearsal.export"
+          }
+
+          # With the real config the placeholder's `sorry` must be the one thing rejected:
+          # the statements already match the challenge's.
+          if judge "$config" > real.log 2>&1; then
+            cat real.log
+            echo "formal-conjectures.json accepted a solution that uses sorry"
+            exit 1
+          fi
+          cat real.log
+          grep -q "Illegal axiom detected: 'sorryAx'" real.log
+
+          # With `sorryAx` permitted as well, every kernel must accept the bridge.
+          python3 -c 'import json, sys; c = json.load(open(sys.argv[1])); c["permitted_axioms"].append("sorryAx"); json.dump(c, sys.stdout)' \
+            "$config" > rehearsal.json
+          judge rehearsal.json
