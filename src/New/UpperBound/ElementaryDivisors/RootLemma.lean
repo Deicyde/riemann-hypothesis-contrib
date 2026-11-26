@@ -685,11 +685,11 @@ lemma C_monomial_mul_X_mem_iteratedGaussFiltration {T : FrobeniusCycle N W R} {z
     nsmul_eq_mul, tsub_le_iff_right, add_comm, add_zero] using hb)
 
 /-- Expansion at infinity. Let `w = T.sqrtPrime`, a square root of the prime `T.p` in `R`, let
-`i = D.letter` and let `q = D.card = P ^ N` with `P = T.primePow`. In each letter `s`, `X_s = D.varX
-s` and `Y_s = D.varY s` are the variables with index `D.fst`, `D.snd` if `s` is even, in reverse
-order if it is odd. Let the weights `c` rise from `X_s` to `Y_s` by amounts in `[1 / 2, 1]`, let
-each term of `f` have `w`-adic order plus `c`-weight at least `b`, and put `P_s = D.frobPower s = P
-^ (s - i).val` and `ρ = D.slope c = (c Y_i - c X_i) / q`.
+`i = D.letter` and let `q = D.card = P ^ N` with `P = T.primePow`. In each letter `s`,
+`X_s = D.varX s` and `Y_s = D.varY s` are the variables with index `D.fst`, `D.snd` if `s` is even,
+in reverse order if it is odd. Let the weights `c` rise from `X_s` to `Y_s` by amounts in
+`[1 / 2, 1]`, let each term of `f` have `w`-adic order plus `c`-weight at least `b`, and put
+`P_s = D.frobPower s = P ^ (s - i).val` and `ρ = D.slope c = (c Y_i - c X_i) / q`.
 
 In the filtration on polynomials in the variables `z` over `R[t]`, `w` weighs `1`, `t` weighs `-ρ`,
 `X_s` weighs `c X_s + q P_s ρ` and any other variable `z` weighs `c z`. The main part `D.mainSubst`
@@ -946,8 +946,8 @@ In `f`, substitute `D.mainSubst - D.crossSubst` (`Y_i ↦ X_i`,
 `X_s ↦ t ^ (q P_s) X_s - ε_s t ^ P_s Y_s`, `Y_s ↦ Y_s - ε_s X_s` for `s ≠ i`, with `q = D.card`,
 `P_s = D.frobPower s = T.primePow ^ (s - i).val` and `ε_s = D.sign Y_s`, which is `-1` if `s` has
 the parity of `i` and `1` otherwise), then replace `t` by `t + ι_i(r)`. The result has level `b`
-when `w` weighs `1`, `t` weighs `ρ = D.slope c = (c Y_i - c X_i) / q` and a variable `z` weighs `c z
-- D.zeroOrder z * ρ`. -/
+when `w` weighs `1`, `t` weighs `ρ = D.slope c = (c Y_i - c X_i) / q` and a variable `z` weighs
+`c z - D.zeroOrder z * ρ`. -/
 lemma HasBoundedIncrements.shiftCoeff_aeval_mem [NeZero N]
     {T : FrobeniusCycle N W R} {D : T.RootAt k}
     {c : Fin k × ZMod N → ℝ} (hc : D.HasBoundedIncrements c) (r : W) {b : ℝ}
@@ -1084,11 +1084,11 @@ lemma eq_of_mapDomain_merge_eq {T : FrobeniusCycle N W R} {D : T.RootAt k}
 
 /-- Put `i = D.letter`. In each letter `s`, `X_s = D.varX s` and `Y_s = D.varY s` are the two
 variables of the root. The weights `D.poleOrder` are `q P_s` at `X_s` and `0` at the other
-variables, where `q = D.card = P ^ N` and `P_s = D.frobPower s = P ^ (s - i).val` for `P =
-T.primePow`. In `f` substitute `D.mainSubst`, which sends `Y_i` to `X_i` and any other variable `z`
-to `t ^ D.poleOrder z * z`. Take the coefficient, a polynomial in `t`, of the monomial obtained from
-`x ^ α` by writing `X_i` for `Y_i` (`D.mergedCoeff α`). Its coefficient of `t ^ d`, with `d` the
-weight of `α` for `D.poleOrder`, is the coefficient of `x ^ α` in `f`: no other monomial of `f`
+variables, where `q = D.card = P ^ N` and `P_s = D.frobPower s = P ^ (s - i).val` for
+`P = T.primePow`. In `f` substitute `D.mainSubst`, which sends `Y_i` to `X_i` and any other variable
+`z` to `t ^ D.poleOrder z * z`. Take the coefficient, a polynomial in `t`, of the monomial obtained
+from `x ^ α` by writing `X_i` for `Y_i` (`D.mergedCoeff α`). Its coefficient of `t ^ d`, with `d`
+the weight of `α` for `D.poleOrder`, is the coefficient of `x ^ α` in `f`: no other monomial of `f`
 contributes to it. -/
 lemma coeff_mergedCoeff_aeval_mainSubst {T : FrobeniusCycle N W R} {D : T.RootAt k}
     (α : Fin k × ZMod N →₀ ℕ) (f : MvPolynomial (Fin k × ZMod N) R) :

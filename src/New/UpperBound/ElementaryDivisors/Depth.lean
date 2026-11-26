@@ -136,9 +136,9 @@ theorem residue_eq_of_embedding_eq {s : ZMod N} {u v : W}
 variable [NeZero N]
 
 /-- The degree given to the variable `v = (b, s)` in the count of common zeros behind
-`New.FrobeniusCycle.exists_le_weight_of_mem_deepForms`, a power of `P = T.primePow`: it is `P ^ (2
-r)` if `v` is deep for `r` (`T.deepIndicator r v = 1`) and `2 r ≤ b`, `P` if `v` is deep and `b < 2
-r`, and `1` if `v` is not deep. -/
+`New.FrobeniusCycle.exists_le_weight_of_mem_deepForms`, a power of `P = T.primePow`: it is
+`P ^ (2 r)` if `v` is deep for `r` (`T.deepIndicator r v = 1`) and `2 r ≤ b`, `P` if `v` is deep and
+`b < 2 r`, and `1` if `v` is not deep. -/
 def deepOrder (r : ℕ) (v : Fin k × ZMod N) : ℕ :=
   T.primePow ^ (T.deepIndicator r v * if 2 * r ≤ v.1 then 2 * r else 1)
 

@@ -403,10 +403,10 @@ lemma abs_indexWeight_le (b : Fin k) : |T.indexWeight ℓ a a' b| ≤ 1 / T.prim
 (`T.isEven`), `P = T.primePow` is its prime power and `q = T.q = P ^ N`. Let `a' = a + 1`. The
 defect weight `T.defectWeight j a a' (b, s)` at a letter `j` is `± P ^ ((s - j) mod N) / (q - 1)`
 for `b = a, a'` (positive at `a'` for even and at `a` for odd `s`, with `1` added to the positive
-weight if `s = j`) and `0` for other `b`. For `j = i + ℓ`, this weight times `1 - 1 / q` is `± ρ b /
-P ^ ℓ * P ^ (d + m) / q`, with `+` for even and `-` for odd `s`. Here `ρ b` is `1` at `a'`, `-1` at
-`a` and else `0`, `ρ b / P ^ ℓ` is the index weight of `b`, `m = (s - d - i) mod N`, and `d = ℓ + 1`
-or `ℓ` as `(b, s)` is deep for the cut at `a'` or not. -/
+weight if `s = j`) and `0` for other `b`. For `j = i + ℓ`, this weight times `1 - 1 / q` is
+`± ρ b / P ^ ℓ * P ^ (d + m) / q`, with `+` for even and `-` for odd `s`. Here `ρ b` is `1` at `a'`,
+`-1` at `a` and else `0`, `ρ b / P ^ ℓ` is the index weight of `b`, `m = (s - d - i) mod N`, and
+`d = ℓ + 1` or `ℓ` as `(b, s)` is deep for the cut at `a'` or not. -/
 lemma mul_defectWeight_eq_indexWeight_mul (ha : (a : ℕ) + 1 = (a' : ℕ)) (i : ZMod N) (b : Fin k) :
     (1 - 1 / T.q) * T.defectWeight (i + ℓ) a a' (b, s) =
       (if T.isEven s then 1 else -1) * T.indexWeight ℓ a a' b *
@@ -642,19 +642,19 @@ end
 
 variable {r ℓ n : ℕ} {a a' : Fin k}
 
-/-- Let `T` be a Frobenius cycle, with letters `s : ZMod N`, prime power `P = T.primePow`, `q = P ^
-N` and `w = T.sqrtPrime`, `w ^ 2 = p`. Let `a' = a + 1`, `ℓ ≤ N`, `|ε| ≤ 1 / 2` and `ρ = e_{a'} -
-e_a`. Take a generic matrix `X_j` for each `j : ZMod N`, and give its entry `(b, c)` the weight `ε`
-times `T.entryWeight ℓ a a' i (j, b, c)`, which is `ρ b / P ^ ℓ` if `j = i` and else `P ^ ((j - i)
-mod N) / q * (ρ b - ρ c) / P ^ ℓ`. The matrix `T.substitutionOperator` is the Kronecker product over
-`s` of `n`-th symmetric powers of products (transposed adjugates of products for odd `s`) of the
-entrywise powers `P ^ d`, `d ≤ ℓ` in deep rows and `d < ℓ` in the others, of the `X_{s - d}`, taken
-between conjugations by `h⁻¹` and `h`; its rows `β` are monomials of degree `n` in the variables
-`(b, s)` of each letter `s`. The defect of `β` at `i + ℓ` is the sum over its variables of
-`T.defectWeight`, which is `± P ^ ((s - i - ℓ) mod N) / (q - 1)` for `b = a, a'` (`+` at `a'` for
-even and at `a` for odd `s`, plus `1` there if `s = i + ℓ`) and else `0`. Then the entries of row
-`β` have level `t = ε (1 - 1 / q) defect - N n k (ℓ + 2) / (2 P ^ ℓ)`: the coefficient of a monomial
-`ν` is divisible by `w ^ ⌈t - weight of ν⌉₊`. -/
+/-- Let `T` be a Frobenius cycle, with letters `s : ZMod N`, prime power `P = T.primePow`,
+`q = P ^ N` and `w = T.sqrtPrime`, `w ^ 2 = p`. Let `a' = a + 1`, `ℓ ≤ N`, `|ε| ≤ 1 / 2` and
+`ρ = e_{a'} - e_a`. Take a generic matrix `X_j` for each `j : ZMod N`, and give its entry `(b, c)`
+the weight `ε` times `T.entryWeight ℓ a a' i (j, b, c)`, which is `ρ b / P ^ ℓ` if `j = i` and else
+`P ^ ((j - i) mod N) / q * (ρ b - ρ c) / P ^ ℓ`. The matrix `T.substitutionOperator` is the
+Kronecker product over `s` of `n`-th symmetric powers of products (transposed adjugates of products
+for odd `s`) of the entrywise powers `P ^ d`, `d ≤ ℓ` in deep rows and `d < ℓ` in the others, of the
+`X_{s - d}`, taken between conjugations by `h⁻¹` and `h`; its rows `β` are monomials of degree `n`
+in the variables `(b, s)` of each letter `s`. The defect of `β` at `i + ℓ` is the sum over its
+variables of `T.defectWeight`, which is `± P ^ ((s - i - ℓ) mod N) / (q - 1)` for `b = a, a'` (`+`
+at `a'` for even and at `a` for odd `s`, plus `1` there if `s = i + ℓ`) and else `0`. Then the
+entries of row `β` have level `t = ε (1 - 1 / q) defect - N n k (ℓ + 2) / (2 P ^ ℓ)`: the
+coefficient of a monomial `ν` is divisible by `w ^ ⌈t - weight of ν⌉₊`. -/
 lemma substitutionOperator_conj_mem_gaussFiltration (ha : (a : ℕ) + 1 = (a' : ℕ)) (i : ZMod N)
     (hℓ_le : ℓ ≤ N) (h : GL (Fin k) W) {ε : ℝ} (hε : |ε| ≤ 2⁻¹) (β γ : Exponents N k n) :
     T.substitutionOperator a' ℓ n (T.conjFrobGenericMatrix h) β γ ∈
@@ -718,8 +718,8 @@ with `w ^ 2 = p`. Let `a' = a + 1`, `N n k (ℓ + 2) ≤ P ^ ℓ`, `ℓ ≤ N` a
 generic matrix `X_j` for each `j : ZMod N` (a copy). The matrix `T.substitutionOperator a' ℓ n` is
 the Kronecker product over `s` of `n`-th symmetric powers of products (transposed adjugates of
 products for odd `s`) of the entrywise powers `P ^ d` of the `X_{s - d}`, taken between conjugations
-by `h⁻¹` and `h` (`T.conjFrobGenericMatrix h`); here `d ≤ ℓ` in the rows `b ≥ a'` for even and `b <
-a'` for odd `s`, and `d < ℓ` in the others. Its rows `β` are monomials of degree `n` in the
+by `h⁻¹` and `h` (`T.conjFrobGenericMatrix h`); here `d ≤ ℓ` in the rows `b ≥ a'` for even and
+`b < a'` for odd `s`, and `d < ℓ` in the others. Its rows `β` are monomials of degree `n` in the
 variables `(b, s)` of each letter `s`.
 
 * The defect of `β` at `i + ℓ` is the sum over its variables of `T.defectWeight`, which is

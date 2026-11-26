@@ -479,10 +479,10 @@ lemma mul_log_le_div (h_large : T.IsLargeDegree k n r θ) :
     N * k * Real.log T.q ≤ N * k * Real.log T.q / θ :=
   le_div_self (by positivity) h_large.proportion_pos h_large.proportion_le_one
 
-/-- Let `T` be a Frobenius cycle: a prime `p`, a power `P = T.primePow` of `p` and `N` ring maps `W
-→ O` (the letters), each the `P`-th power of the one before modulo `p`, where the residue field of
-`W` has `q = P ^ N` elements. Let the degree `n` be large: `0 < r ≤ k / 2`, `0 < θ ≤ 1`, `n ^ 4 ≤ q`
-and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n`. Then `(N k) ^ 5 ≤ n`, because `log q ≥ 1`. -/
+/-- Let `T` be a Frobenius cycle: a prime `p`, a power `P = T.primePow` of `p` and `N` ring maps
+`W → O` (the letters), each the `P`-th power of the one before modulo `p`, where the residue field
+of `W` has `q = P ^ N` elements. Let the degree `n` be large: `0 < r ≤ k / 2`, `0 < θ ≤ 1`,
+`n ^ 4 ≤ q` and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n`. Then `(N k) ^ 5 ≤ n`, because `log q ≥ 1`. -/
 lemma mul_pow_le_degree (h_large : T.IsLargeDegree k n r θ) : (N * k) ^ 5 ≤ n := by
   have h_log : 1 ≤ Real.log T.q := by
     have h_five : (5 : ℝ) ≤ T.q :=
@@ -508,11 +508,11 @@ lemma twenty_seven_le_log_q (h_large : T.IsLargeDegree k n r θ) : 27 ≤ Real.l
     _ = Real.log (2 ^ 40) := by simp
     _ ≤ Real.log T.q := Real.log_le_log (by positivity) (mod_cast h_two)
 
-/-- Let `T` be a Frobenius cycle: a prime `p`, a power `P = T.primePow` of `p` and `N` ring maps `W
-→ O` (the letters), each the `P`-th power of the one before modulo `p`, where the residue field of
-`W` has `q = P ^ N` elements. Let the degree `n` be large: `0 < r ≤ k / 2`, `0 < θ ≤ 1`, `n ^ 4 ≤ q`
-and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n`. For `2 ℓ = N` one has `N k (ℓ + 2) n + n + k < P ^ ℓ`,
-because `P ^ ℓ = √q ≥ n ^ 2` and `n ≥ (N k) ^ 2 + 2`. -/
+/-- Let `T` be a Frobenius cycle: a prime `p`, a power `P = T.primePow` of `p` and `N` ring maps
+`W → O` (the letters), each the `P`-th power of the one before modulo `p`, where the residue field
+of `W` has `q = P ^ N` elements. Let the degree `n` be large: `0 < r ≤ k / 2`, `0 < θ ≤ 1`,
+`n ^ 4 ≤ q` and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n`. For `2 ℓ = N` one has
+`N k (ℓ + 2) n + n + k < P ^ ℓ`, because `P ^ ℓ = √q ≥ n ^ 2` and `n ≥ (N k) ^ 2 + 2`. -/
 lemma mul_degree_add_lt_primePow_pow (h_large : T.IsLargeDegree k n r θ) {ℓ : ℕ} (hℓ : ℓ + ℓ = N) :
     N * k * (ℓ + 2) * n + n + k < T.primePow ^ ℓ := by
   have hN : 2 ≤ N := T.two_le_card_letters
@@ -543,8 +543,8 @@ lemma degree_lt_q (h_large : T.IsLargeDegree k n r θ) : n < T.q :=
 
 omit [NeZero N] in
 /-- Under the size conditions `h_large`, `(N k log T.q) ^ 5 T.primePow ^ (3 r) ≤ θ n`: clear the
-denominator in the degree condition `(N k log T.q / θ) ^ 5 T.primePow ^ (3 r) ≤ n` and use `θ ^ 5 ≤
-θ`. -/
+denominator in the degree condition `(N k log T.q / θ) ^ 5 T.primePow ^ (3 r) ≤ n` and use
+`θ ^ 5 ≤ θ`. -/
 lemma mul_log_pow_mul_le (h_large : T.IsLargeDegree k n r θ) :
     (N * k * Real.log T.q) ^ 5 * T.primePow ^ (3 * r) ≤ θ * n := by
   have hθ : 0 < θ := h_large.proportion_pos
@@ -689,13 +689,13 @@ lemma charP_residueField [IsLocalRing O] (hp : ¬IsUnit (T.p : O)) :
 /-- Let `W` be a local ring, `O` a valuation domain of characteristic zero and `T` a Frobenius cycle
 with `N` letters (ring maps `W → O`). Its prime `p = T.p = w ^ 2`, `w = T.sqrtPrime`, is not a unit
 of `O`, and the residue field of `W` has `q = P ^ N` elements for the power `P = T.primePow` of `p`.
-Forms have `k` variables and degree `n` in each letter and are given by their coefficients, and `g ∈
-GL_k(W)` acts on them by the matrix `ρ(g) = T.letterRep n g`. Let `0 < r ≤ k / 2`, `0 < θ ≤ 1`, `n ^
-4 ≤ q` and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n` (`h_large`). Let `b` be weights such that `ρ(g)` and
-`ρ(gᵀ)` are adjoint for `(h, h') ↦ h' ⬝ᵥ (b * h)`, with `b * b' = p ^ (N c₀)` for `c₀ =
-T.multinomialExponent k` (`hb`). Put `c = T.congruencePrecision k = 5 N c₀`, and let `M =
-T.allEdgesForms k n r` be the module of forms that lie in the halfway lattices of all edges from a
-lattice. Then there are
+Forms have `k` variables and degree `n` in each letter and are given by their coefficients, and
+`g ∈ GL_k(W)` acts on them by the matrix `ρ(g) = T.letterRep n g`. Let `0 < r ≤ k / 2`, `0 < θ ≤ 1`,
+`n ^ 4 ≤ q` and `(N k log q / θ) ^ 5 P ^ (3 r) ≤ n` (`h_large`). Let `b` be weights such that `ρ(g)`
+and `ρ(gᵀ)` are adjoint for `(h, h') ↦ h' ⬝ᵥ (b * h)`, with `b * b' = p ^ (N c₀)` for
+`c₀ = T.multinomialExponent k` (`hb`). Put `c = T.congruencePrecision k = 5 N c₀`, and let
+`M = T.allEdgesForms k n r` be the module of forms that lie in the halfway lattices of all edges
+from a lattice. Then there are
 * a module `C` of forms that contains `M`,
 * a matrix `Av` with values in `C` that, paired against `M`, is multiplication by `p ^ (N c₀)`
   modulo `w ^ c`,
@@ -893,13 +893,13 @@ variable {T} in
 /-- Let `T` be a Frobenius cycle with `N` letters (ring maps `W → O`) whose prime `p = w ^ 2`,
 `w = T.sqrtPrime`, is not a unit of `O`. Forms have `k` variables and degree `n` in each letter, and
 their monomials are indexed by `Exponents N k n`. Let `0 < r ≤ k / 2`, `0 < θ ≤ 1`, `n ^ 4 ≤ q` and
-`(N k log q / θ) ^ 5 P ^ (3 r) ≤ n` for `P = T.primePow` and `q = P ^ N` (`h_large`). The edge `e ∈
-E` has the origin `src e ∈ X` and the basis change `g e`, and every edge from every origin occurs:
-each pair of a point of `X` and a coset of the parahoric subgroup of `GL_k(W)` with blocks `r` and
-`k - r` is `(src e, (g e)⁻¹)` for some `e`. The functions on edges that depend only on the origin
-(`T.originFunctions`) are the image of a matrix `Q` with a left inverse, so its columns are a basis,
-and the inclusion `T.edgeRestriction` of the integral functions on origins is `Q * d`, where `det d`
-divides `w ^ l` and `l` is at most `c_div = T.divisorConstant k n r` times the rank. -/
+`(N k log q / θ) ^ 5 P ^ (3 r) ≤ n` for `P = T.primePow` and `q = P ^ N` (`h_large`). The edge
+`e ∈ E` has the origin `src e ∈ X` and the basis change `g e`, and every edge from every origin
+occurs: each pair of a point of `X` and a coset of the parahoric subgroup of `GL_k(W)` with blocks
+`r` and `k - r` is `(src e, (g e)⁻¹)` for some `e`. The functions on edges that depend only on the
+origin (`T.originFunctions`) are the image of a matrix `Q` with a left inverse, so its columns are a
+basis, and the inclusion `T.edgeRestriction` of the integral functions on origins is `Q * d`, where
+`det d` divides `w ^ l` and `l` is at most `c_div = T.divisorConstant k n r` times the rank. -/
 lemma IsLargeDegree.exists_basis_det_dvd {r : ℕ} {θ : ℝ} (h_large : T.IsLargeDegree k n r θ)
     (hp : ¬IsUnit (T.p : O)) {X E : Type*} [Fintype X] [DecidableEq X] [Fintype E] [DecidableEq E]
     {src : E → X} {g : E → GL (Fin k) W}

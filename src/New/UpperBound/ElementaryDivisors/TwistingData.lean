@@ -361,8 +361,8 @@ lemma one_add_val_sub_one_sub : 1 + (s - 1 - i).val = if s = i then N else (s - 
 /-! ### Bounds on the defect weights -/
 
 /-- For a Frobenius cycle `T`, let `P = T.primePow` be its prime power, which is at least `5`, and
-let `q = T.q = P ^ N`. For every letter `s` one has `5 P ^ s ≤ q`, where `s` is read in `{0, …, N -
-1}`. -/
+let `q = T.q = P ^ N`. For every letter `s` one has `5 P ^ s ≤ q`, where `s` is read in
+`{0, …, N - 1}`. -/
 lemma five_mul_primePow_pow_le_q : 5 * T.primePow ^ s.val ≤ T.q :=
   calc 5 * T.primePow ^ s.val ≤ T.primePow ^ (s.val + 1) := by grw [pow_succ', T.five_le_primePow]
     _ ≤ T.primePow ^ N := Nat.pow_le_pow_right (pow_pos T.prime.pos T.frobExp) s.val_lt

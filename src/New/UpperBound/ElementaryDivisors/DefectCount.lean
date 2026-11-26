@@ -609,18 +609,19 @@ elements, and the letters are alternately even and odd (`T.isEven`). A matrix `g
 polynomials in the variables `x (b, s)`, `b < k`, by the linear substitution `T.polyAction g`, given
 in the letter `s` by `ι s g` for even `s` and by `ι s` of the inverse transpose of `g` for odd `s`.
 The defect of a vector `β` indexed by `(b, s) ∈ Fin k × ZMod N`, at the letter `i` along the root
-`(b, b')`, is the linear form with coefficients `T.defectWeight i b b'`, namely `β v + ∑ s, ± P ^
-((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`, with the sign `+` at even `s`, and `v = (b',
-i)` for even `i`, `v = (b, i)` for odd `i`. Let `m` be a power of `q`, let `a' = a + 1` and `2 (k +
-1) ≤ t`, let `L = levi W (twoBlock k a')` be the group of block diagonal matrices with blocks `a'`
-and `k - a'`, and let `g ∈ L`. Let the `F u` lie in the space of forms of degree `n` in each letter
-whose translates by `L` have coefficient in the ideal `⊥`, that is `0`, at every exponent of defect
-above `3 t` along `(a, a')` at some letter. Pack them into `powerPacking a n m F = ∑ u, F u (x ^ m)
-* x ^ γ u`, where `γ u = residueExponent a u` is the vector `u` of residues modulo `m` with `m (k -
-⌊(∑ b, u (b, s)) / m⌋)` added at each index `(a, s)`. If an exponent `α` of the translate of this
-polynomial by `g` has defect at most `0` along the simple roots `(b, b + 1)` inside the blocks, then
-`α / m` has degree in `[n + k, n + k + 1]` in each letter and lies in `T.defectCone a (4 t)`: its
-defect is at most `4 t` along `(a, a')` and at most `0` along the other simple roots. -/
+`(b, b')`, is the linear form with coefficients `T.defectWeight i b b'`, namely
+`β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`, with the sign `+` at even
+`s`, and `v = (b', i)` for even `i`, `v = (b, i)` for odd `i`. Let `m` be a power of `q`, let
+`a' = a + 1` and `2 (k + 1) ≤ t`, let `L = levi W (twoBlock k a')` be the group of block diagonal
+matrices with blocks `a'` and `k - a'`, and let `g ∈ L`. Let the `F u` lie in the space of forms of
+degree `n` in each letter whose translates by `L` have coefficient in the ideal `⊥`, that is `0`, at
+every exponent of defect above `3 t` along `(a, a')` at some letter. Pack them into
+`powerPacking a n m F = ∑ u, F u (x ^ m) * x ^ γ u`, where `γ u = residueExponent a u` is the vector
+`u` of residues modulo `m` with `m (k - ⌊(∑ b, u (b, s)) / m⌋)` added at each index `(a, s)`. If an
+exponent `α` of the translate of this polynomial by `g` has defect at most `0` along the simple
+roots `(b, b + 1)` inside the blocks, then `α / m` has degree in `[n + k, n + k + 1]` in each letter
+and lies in `T.defectCone a (4 t)`: its defect is at most `4 t` along `(a, a')` and at most `0`
+along the other simple roots. -/
 lemma FrobeniusCycle.div_mem_defectCone_inter_degreeSlab (T : FrobeniusCycle N W K) [CharP K T.p]
     {a a' : Fin k} (ha : a.val + 1 = a') {n m j : ℕ} (hm : m = T.q ^ j)
     {t : ℝ} (ht : 2 * (k + 1) ≤ t) {F : (Fin k × ZMod N → Fin m) → Exponents N k n → K}
@@ -658,22 +659,23 @@ characteristic `T.p`. It consists of ring maps `ι s : W → K`, one for each le
 field of `W` has `q = T.q = P ^ N` elements, and the letters are alternately even and odd
 (`T.isEven`). A matrix `g ∈ GL_k(W)` acts on polynomials in the variables `x (b, s)`, `b < k`, by
 the linear substitution `T.polyAction g`. In the letter `s` it is given by `ι s g` for even `s` and
-by `ι s` of the inverse transpose of `g` for odd `s`. Let `β` be a vector indexed by `(b, s) ∈ Fin k
-× ZMod N`. Its defect at the letter `i` along the root `(b, b')` is the linear form with
-coefficients `T.defectWeight i b b'`, namely `β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b,
-s)) / (q - 1)`. The sign is `+` at even `s`, and `v = (b', i)` for even `i`, `v = (b, i)` for odd
-`i`. Let `m` be a power of `q`, let `a' = a + 1` and `t ≥ 2 (k + 1)`. Let `L = levi W (twoBlock k
-a')` be the group of block diagonal matrices with blocks `a'` and `k - a'`. Let `S =
-T.defectConditions n a a' ⊥ (3 t)` be the space of forms of degree `n` in each letter whose
-translates by `L` have coefficient in the ideal `⊥`, that is `0`, at every exponent whose defect
-along `(a, a')` is above `3 t` at some letter. Let `σ ≥ 0` be an integral vector of defect at most
-`-1` along `(a, a')` and at most `0` along the other simple roots. Let `D s` be `n + k + 1` plus the
-degree of `4 t σ` in the letter `s`. Then `m ^ (k N) * dim S` is at most a product of two factors.
-The first is the index in `L` of its intersection with the lower Iwahori subgroup `parahoric W
-Fin.val`: the matrices whose `(i, j)` entry lies in the maximal ideal when `i < j`. The second is
-the number of points of `m⁻¹ ℤ ^ (k N)` in the cone `T.defectCone a 0` of Pieri's inequalities, cut
-by the slab of vectors `β ≥ 0` with degrees in `[D s - 1, D s]`. This cone consists of the vectors
-whose defect is at most `0` along all simple roots `(b, b + 1)` at all letters. -/
+by `ι s` of the inverse transpose of `g` for odd `s`. Let `β` be a vector indexed by
+`(b, s) ∈ Fin k × ZMod N`. Its defect at the letter `i` along the root `(b, b')` is the linear form
+with coefficients `T.defectWeight i b b'`, namely
+`β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`. The sign is `+` at even `s`,
+and `v = (b', i)` for even `i`, `v = (b, i)` for odd `i`. Let `m` be a power of `q`, let
+`a' = a + 1` and `t ≥ 2 (k + 1)`. Let `L = levi W (twoBlock k a')` be the group of block diagonal
+matrices with blocks `a'` and `k - a'`. Let `S = T.defectConditions n a a' ⊥ (3 t)` be the space of
+forms of degree `n` in each letter whose translates by `L` have coefficient in the ideal `⊥`, that
+is `0`, at every exponent whose defect along `(a, a')` is above `3 t` at some letter. Let `σ ≥ 0` be
+an integral vector of defect at most `-1` along `(a, a')` and at most `0` along the other simple
+roots. Let `D s` be `n + k + 1` plus the degree of `4 t σ` in the letter `s`. Then
+`m ^ (k N) * dim S` is at most a product of two factors. The first is the index in `L` of its
+intersection with the lower Iwahori subgroup `parahoric W Fin.val`: the matrices whose `(i, j)`
+entry lies in the maximal ideal when `i < j`. The second is the number of points of `m⁻¹ ℤ ^ (k N)`
+in the cone `T.defectCone a 0` of Pieri's inequalities, cut by the slab of vectors `β ≥ 0` with
+degrees in `[D s - 1, D s]`. This cone consists of the vectors whose defect is at most `0` along all
+simple roots `(b, b + 1)` at all letters. -/
 lemma FrobeniusCycle.finrank_defectConditions_mul_pow_le (T : FrobeniusCycle N W K) [CharP K T.p]
     {a a' : Fin k} (ha : a.val + 1 = a') (n : ℕ) {t : ℕ} (ht : 2 * (k + 1) ≤ t)
     {m j : ℕ} (hm : m = T.q ^ j)
@@ -740,17 +742,18 @@ elements, and the letters are alternately even and odd (`T.isEven`). A matrix `g
 polynomials in the variables `x (b, s)`, `b < k`, by the linear substitution `T.polyAction g`, given
 in the letter `s` by `ι s g` for even `s` and by `ι s` of the inverse transpose of `g` for odd `s`.
 The defect of a vector `β` indexed by `(b, s) ∈ Fin k × ZMod N`, at the letter `i` along the root
-`(b, b')`, is the linear form with coefficients `T.defectWeight i b b'`, namely `β v + ∑ s, ± P ^
-((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`, with the sign `+` at even `s`, and `v = (b',
-i)` for even `i`, `v = (b, i)` for odd `i`. Let `a' = a + 1` and `t ≥ 2 (k + 1)`, and let `L = levi
-W (twoBlock k a')` be the group of block diagonal matrices with blocks `a'` and `k - a'`. Let `S =
-T.defectConditions n a a' ⊥ (3 t)` be the space of forms of degree `n` in each letter whose
-translates by `L` have coefficient in the ideal `⊥`, that is `0`, at every exponent of defect above
-`3 t` along `(a, a')` at some letter. There are degrees `D s` in `[1, n + 4 t P ^ (2 a')]` such that
-`dim S` is at most the index in `L` of its intersection with the lower Iwahori subgroup `parahoric W
-Fin.val` of matrices that are lower triangular modulo the maximal ideal, times the volume of the
-cone `T.defectCone a 0` of Pieri's inequalities (defect at most `0` along all simple roots `(b, b +
-1)` at all letters) cut by the slab of vectors `β ≥ 0` with degrees in `[D s - 1, D s]`. -/
+`(b, b')`, is the linear form with coefficients `T.defectWeight i b b'`, namely
+`β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`, with the sign `+` at even
+`s`, and `v = (b', i)` for even `i`, `v = (b, i)` for odd `i`. Let `a' = a + 1` and `t ≥ 2 (k + 1)`,
+and let `L = levi W (twoBlock k a')` be the group of block diagonal matrices with blocks `a'` and
+`k - a'`. Let `S = T.defectConditions n a a' ⊥ (3 t)` be the space of forms of degree `n` in each
+letter whose translates by `L` have coefficient in the ideal `⊥`, that is `0`, at every exponent of
+defect above `3 t` along `(a, a')` at some letter. There are degrees `D s` in
+`[1, n + 4 t P ^ (2 a')]` such that `dim S` is at most the index in `L` of its intersection with the
+lower Iwahori subgroup `parahoric W Fin.val` of matrices that are lower triangular modulo the
+maximal ideal, times the volume of the cone `T.defectCone a 0` of Pieri's inequalities (defect at
+most `0` along all simple roots `(b, b + 1)` at all letters) cut by the slab of vectors `β ≥ 0` with
+degrees in `[D s - 1, D s]`. -/
 lemma FrobeniusCycle.exists_finrank_defectConditions_le_volume (T : FrobeniusCycle N W K)
     [CharP K T.p] {a a' : Fin k} (ha : a.val + 1 = a') (n : ℕ) {t : ℕ} (ht : 2 * (k + 1) ≤ t) :
     ∃ D : ZMod N → ℝ,
@@ -910,18 +913,19 @@ lemma FrobeniusCycle.permStep_mem_defectCone_iff (T : FrobeniusCycle N W K) {a' 
 `ι (s + 1) ≡ ι s ^ P` modulo the prime `T.p`. Here `P = T.primePow` is a power of `T.p`, the residue
 field of `W` has `q = T.q = P ^ N` elements, and the letters are alternately even and odd
 (`T.isEven`). A matrix `g ∈ GL_k(W)` acts on polynomials in the variables `x (b, s)`, `b < k`, by
-the linear substitution `T.polyAction g`, given in the letter `s` by `ι s g` for even `s` and by `ι
-s` of the inverse transpose of `g` for odd `s`. The defect of a vector `β` indexed by `(b, s) ∈ Fin
-k × ZMod N`, at the letter `i` along the root `(b, b')`, is the linear form with coefficients
-`T.defectWeight i b b'`, namely `β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b, s)) / (q -
-1)`, with the sign `+` at even `s`, and `v = (b', i)` for even `i`, `v = (b, i)` for odd `i`. Let
-`a' = a + 1` and `t ≥ 2 (k + 1)`, and let `L = levi W (twoBlock k a')` be the group of block
-diagonal matrices with blocks `a'` and `k - a'`. Let `S = T.defectConditions n a a' ⊥ (3 t)` be the
-space of forms of degree `n` in each letter whose translates by `L` have coefficient in the ideal
-`⊥`, that is `0`, at every exponent of defect above `3 t` along `(a, a')` at some letter. Let `θ ≤
-1`, and let `n > 0` satisfy `8 N k t P ^ (2 a') ≤ θ n`. Then the index in `GL_k(W)` of the parahoric
-subgroup of these blocks (upper right block in the maximal ideal) times `dim S` is at most `1 + θ`
-times the number of `N`-tuples of monomials of degree `n` in `k` variables. -/
+the linear substitution `T.polyAction g`, given in the letter `s` by `ι s g` for even `s` and by
+`ι s` of the inverse transpose of `g` for odd `s`. The defect of a vector `β` indexed by
+`(b, s) ∈ Fin k × ZMod N`, at the letter `i` along the root `(b, b')`, is the linear form with
+coefficients `T.defectWeight i b b'`, namely
+`β v + ∑ s, ± P ^ ((s - i) mod N) * (β (b', s) - β (b, s)) / (q - 1)`, with the sign `+` at even
+`s`, and `v = (b', i)` for even `i`, `v = (b, i)` for odd `i`. Let `a' = a + 1` and `t ≥ 2 (k + 1)`,
+and let `L = levi W (twoBlock k a')` be the group of block diagonal matrices with blocks `a'` and
+`k - a'`. Let `S = T.defectConditions n a a' ⊥ (3 t)` be the space of forms of degree `n` in each
+letter whose translates by `L` have coefficient in the ideal `⊥`, that is `0`, at every exponent of
+defect above `3 t` along `(a, a')` at some letter. Let `θ ≤ 1`, and let `n > 0` satisfy
+`8 N k t P ^ (2 a') ≤ θ n`. Then the index in `GL_k(W)` of the parahoric subgroup of these blocks
+(upper right block in the maximal ideal) times `dim S` is at most `1 + θ` times the number of
+`N`-tuples of monomials of degree `n` in `k` variables. -/
 lemma FrobeniusCycle.index_mul_finrank_defectConditions_le (T : FrobeniusCycle N W K) {a a' : Fin k}
     [CharP K T.p] (ha : a.val + 1 = a') {n t : ℕ} {θ : ℝ} (hn : 0 < n) (ht : 2 * (k + 1) ≤ t)
     (hθ : θ ≤ 1) (h_large : 8 * N * k * t * T.primePow ^ (2 * a'.val) ≤ θ * n) :

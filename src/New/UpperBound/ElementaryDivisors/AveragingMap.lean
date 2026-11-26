@@ -457,10 +457,10 @@ lemma contractOtherCopies_one_mem_restrictTotalDegree {r ℓ : ℕ}
     tensorDualExcept_mem_restrictTotalDegree l j fun _ hν ↦
       T.degree_le_of_coeff_substitutionOperator hν j
 
-/-- Weight and defect in one copy. Let `T` be a Frobenius cycle (`P = T.primePow`, `w =
-T.sqrtPrime`, `w ^ 2 = p`) from a local ring `W` to a domain `O` of characteristic `0` in which `p`
-is not a unit. Let `r = a + 1`, `N n k (ℓ + 2) ≤ P ^ ℓ` and `ℓ ≤ N`. Let each linear form `l i` be
-invariant under conjugation, through `T.embedding i`, by the Levi subgroup of the blocks of sizes
+/-- Weight and defect in one copy. Let `T` be a Frobenius cycle (`P = T.primePow`,
+`w = T.sqrtPrime`, `w ^ 2 = p`) from a local ring `W` to a domain `O` of characteristic `0` in which
+`p` is not a unit. Let `r = a + 1`, `N n k (ℓ + 2) ≤ P ^ ℓ` and `ℓ ≤ N`. Let each linear form `l i`
+be invariant under conjugation, through `T.embedding i`, by the Levi subgroup of the blocks of sizes
 `r` and `k - r`. Let `β` be a monomial of degree `n` in each letter. The polynomial
 `T.contractOtherCopies r ℓ l j g h β` in one generic matrix is the entry `β` of the vector obtained
 from `T.letterRep n g *ᵥ h` by substituting the `N` generic matrices conjugated by `g` and applying
@@ -683,13 +683,13 @@ lemma pow_dvd_pairing_partialAverage_insert_sub [IsDomain O] [CharZero O] {a r :
     have h_lt : a < r := Fin.lt_def.2 (ha ▸ Nat.lt_succ_self a.val)
     exact (hb.pow_dvd_pairing_letterRep T h_lt hh' (inv_mem hg) h_defect).mul_left _
 
-/-- The averaging map. Let `T` be a Frobenius cycle (`P = T.primePow`, `w = T.sqrtPrime`, `w ^ 2 =
-p`) over a valuation domain `O` of characteristic `0` in which `p` is not a unit. Vectors are
-coefficient vectors of polynomials of degree `n` in each of `N` groups of `k` variables, on which
-`GL_k(W)` acts by `T.letterRep n`. Let `r = a + 1`, `N = 2 ℓ` and `N k (ℓ + 2) n + n + k < P ^ ℓ`.
-Put `c* = 3 k c` and `c₀ = T.multinomialExponent k = k² log_p P^N`. Let the weights `b` define a
-pairing `⟨h, h'⟩ = ∑_β h'_β b_β h_β` that makes the matrices of `g` and `gᵀ` adjoint, with `b b' = p
-^ (N c₀)`. For every `c` there is a matrix `Av` with two properties.
+/-- The averaging map. Let `T` be a Frobenius cycle (`P = T.primePow`, `w = T.sqrtPrime`,
+`w ^ 2 = p`) over a valuation domain `O` of characteristic `0` in which `p` is not a unit. Vectors
+are coefficient vectors of polynomials of degree `n` in each of `N` groups of `k` variables, on
+which `GL_k(W)` acts by `T.letterRep n`. Let `r = a + 1`, `N = 2 ℓ` and
+`N k (ℓ + 2) n + n + k < P ^ ℓ`. Put `c* = 3 k c` and `c₀ = T.multinomialExponent k = k² log_p P^N`.
+Let the weights `b` define a pairing `⟨h, h'⟩ = ∑_β h'_β b_β h_β` that makes the matrices of `g` and
+`gᵀ` adjoint, with `b b' = p ^ (N c₀)`. For every `c` there is a matrix `Av` with two properties.
 * For all `h` and all `g` in the Levi subgroup of the blocks of sizes `r` and `k - r`, `w ^ c`
   divides the coefficient in `g Av h` of each monomial with defect above `3 c*` at some letter `i`;
   the defect is the weighted degree for the weights `T.defectWeight i a r`.
