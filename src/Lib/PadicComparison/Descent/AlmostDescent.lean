@@ -458,7 +458,7 @@ private lemma exists_tensorPush_ne_zero_of_isChain {c : Set (a.obj → a.obj →
     -- project to a factor where `s t = 1`.
     obtain ⟨s, hs : tensorPush (mulLeft S s.val) (tensorPush Ψ.toLinearMap z) = 0⟩ :=
       (IsLocalizedModule.eq_zero_iff M (TensorProduct.mk (∀ t, (B t).obj) (Localization M) _ 1)).mp
-        (one_tmul_eq_zero_of_tensorPush φ (tensorPush Ψ.toLinearMap z)
+        (one_tmul_eq_zero_of_tensorPush (Φ := perfectAlmostCoeff N) φ (tensorPush Ψ.toLinearMap z)
           (tensorPush_comp.symm.trans h_zero))
     have h_neBot : (atTop : Filter c).NeBot :=
       atTop_neBot_iff.mpr ⟨hc_nonempty.to_subtype, hc_chain.directedOn.isDirectedOrder⟩
@@ -816,12 +816,12 @@ lemma isCover_of_points (hN : ∀ x : N, pFlat • x = 0) {b b' : PerfectAlg OFl
       h_rad (by rw [h_zero, zero_isRadical_iff]; infer_instance)
     -- a test `c` and `φ : V → c.TiltRing`, faithfully flat over `V ⧸ ker φ`, with `ker φ ⊆ p^♭ V`
     obtain ⟨c, φ, hφ_flat, hφ_ker⟩ := exists_faithfullyFlat_padicTest (CommAlgCat.of OFlat V.obj)
-      h_ne fun h_unit ↦ h_rad h_unit.squarefree.isRadical
+      h_ne fun h_unit ↦ h_rad fun _ _ _ ↦ h_unit.dvd
     -- The point `b → V → c.TiltRing` lifts to `g : b' → c.TiltRing`. The class survives in
     -- `V ⧸ ker φ`, and it vanishes there by descent along the faithfully flat map
     -- `V ⧸ ker φ → c.TiltRing`, where `c.TiltRing` is a `b`-algebra through `y ≫ g`.
     obtain ⟨⟨g⟩, hg⟩ := hy c ⟨⟨ofHom (φ.comp (algHom ..))⟩⟩
-    refine tensorPush_quotient_ne_zero i hN hα (ker φ) (.inl hφ_ker) ?_
+    refine tensorPush_quotient_ne_zero i hN hα (RingHom.ker φ) (.inl hφ_ker) ?_
     -- `φ` on `V ⧸ ker φ`, and `g` on `b'`, as maps of `b`-algebras
     exact faithfullyFlat_descent (a := perfectAlgAlong (y ≫ g))
       ⟨φ.kerLift, fun s ↦ congr($(hg.symm).down.hom s)⟩ hφ_flat i
