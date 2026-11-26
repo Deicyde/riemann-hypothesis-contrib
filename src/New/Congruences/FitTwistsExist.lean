@@ -169,7 +169,7 @@ lemma New.Selmer.isNegligible_padicValNat_oddClassBound {P : Parameters} (D : Da
         push_cast
         rw [log_mul (by positivity) (mod_cast NumberField.classNumber_ne_zero D.E), log_pow]
         push_cast
-        ring
+        rfl
     _ ≤ 4 * (D.cyclotomicConductor + D.t + 3) ^ 27 * log 2 + D.x ^ 30 := by
       grw [D.log_classNumber_le]
     _ ≤ D.x ^ 2000 := D.le_of_hasLogBound
