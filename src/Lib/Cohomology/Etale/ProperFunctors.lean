@@ -731,9 +731,9 @@ lemma _root_.New.Variety.isProperOver_id_reprBy {R : CommRingCat.{0}} :
   exact ULift.up_inj.trans h_iff
 
 /-- The base change of a proper functor along a ring map `φ : D ⟶ T` is proper over `T`. -/
-lemma baseChange (h : IsProperOver s) (φ : D ⟶ T) : IsProperOver (fibreProd.snd s (reprMap φ)) := by
+lemma baseChange (h : IsProperOver s) (φ : D ⟶ T) : IsProperOver (fiberProd.snd s (reprMap φ)) := by
   -- `reprBy T` is proper over itself; apply `of_isPullback` to the fibre product.
-  exact isProperOver_id_reprBy.of_isPullback isProperOver_id_reprBy isPullback_fibreProd h φ rfl
+  exact isProperOver_id_reprBy.of_isPullback isProperOver_id_reprBy isPullback_fiberProd h φ rfl
 
 /-- Let `c : Y ⟶ Z` be a map over `D`, with `Y` and `Z` proper over `D`, that is onto on points in
 every algebraically closed field. Then `c` has dense image, for locally constant `Λ`-valued

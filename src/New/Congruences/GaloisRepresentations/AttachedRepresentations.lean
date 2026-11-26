@@ -614,7 +614,7 @@ theorem IsRepOfType.twist_avatar {O : DescentPair D.E r n} {ϑ : D.Twist}
     have h_trace : (R (conjGal g)).val.trace =
         cyclotomicInv ℓ D.E (PadicAlgCl ℓ) g ^ (k - 1) * (R g⁻¹).val.trace := hR.trace_conj g
     simp [h_exp, h_trace, hμ_conj, zpow_sub₀, field, Units.smul_def, cyclotomicInv]
-  refine { toIsConjSelfDual := h_dual, local_conditions v hv A hA := ?_, labelled i A := ?_ }
+  refine { toIsConjSelfDual := h_dual, local_conditions v hv A hA := ?_, labeled i A := ?_ }
   · obtain ⟨hR_fin, hR_jumps, hR_good⟩ :
         IsFiniteTypeAt R A ∧ HasJumpsAt R A J ∧ (v ∉ placesAboveM D → IsGoodAt R A) :=
       hR.local_conditions v hv hA
@@ -642,9 +642,9 @@ theorem IsRepOfType.twist_avatar {O : DescentPair D.E r n} {ϑ : D.Twist}
     have hψ_star : ψ (star w) = 1 := hψ_off (star w) (h_setting.isChosen_chosenPlace i).not_star
     have hw_split : w.IsSplit := O.isConjApart_chosenPlace.star_ne i i
     have hμ_kill : PolyKillsAt μ₁ A s (X - C (φ (algebraMap (ResField w) K u.val))) := by
-      simpa [μ₁, μ, θ, φ, u, T] using isLabelledAt_avatar ha k' j hψ_star hw_split hy
+      simpa [μ₁, μ, θ, φ, u, T] using isLabeledAt_avatar ha k' j hψ_star hw_split hy
     have hR_kill : PolyKillsAt R A s (((c i).aroots K).map fun x : K ↦ X - C (φ x)).prod :=
-      hR.labelled hy
+      hR.labeled hy
     -- So it acts on `μ • R` through the values of `φ` at these roots times `u`.
     change PolyKillsAt (twistByChar μ R) A s
       ((((c i).scaleRoots u.val).aroots K).map fun x : K ↦ X - C (φ x)).prod

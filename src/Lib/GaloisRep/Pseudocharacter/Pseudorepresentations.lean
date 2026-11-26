@@ -83,15 +83,6 @@ private lemma mul_pow_eq_pow_mul_pow_pow_of_pow_eq_inv_mul_mul {M : Type*} [Grou
       _ = y ^ (k + 1) * (y⁻¹ * x * y) ^ q ^ k := by simpa using (conj_pow (a := y⁻¹)).symm
       _ = y ^ (k + 1) * x ^ q ^ (k + 1) := by rw [← h, ← pow_mul, ← pow_succ']
 
-/-- Let `R : G →* M` be a homomorphism of groups and `R (γ * φ ^ d) = R (φ ^ d * γ)`. Then every
-`R (φ ^ a * γ ^ b)` commutes with `R (φ⁻¹ ^ d)`. -/
-private lemma commute_map_pow_mul_pow_map_inv_pow {G M : Type*} [Group G] [Group M] (R : G →* M)
-    {γ φ : G} {d : ℕ} (h_comm : R (γ * φ ^ d) = R (φ ^ d * γ)) (a b : ℕ) :
-    Commute (R (φ ^ a * γ ^ b)) (R (φ⁻¹ ^ d)) := by
-  have h_γ : Commute (R γ) (R (φ ^ d)) := by simpa only [map_mul, commute_iff_eq] using h_comm
-  simp only [map_mul, map_pow, map_inv, inv_pow] at h_γ ⊢
-  exact ((Commute.pow_pow_self (R φ) a d).mul_left (h_γ.pow_left b)).inv_right
-
 /-- If the differences `ζ ^ q ^ i - ζ ^ q ^ j` for distinct `i, j < d` have norm `1`, then the
 residues of the `ζ ^ q ^ i`, `i < d`, are pairwise distinct: a difference of norm `1` is a unit of
 `O`, so its residue is not zero. -/
@@ -192,11 +183,12 @@ lemma New.Selmer.IsLatticeIn.span_range_eq_top_of_map_pow_eq_map_conj {G n : Typ
   -- By `h_conj` and `h_fix`, `R γ` commutes with `R φ ^ card n`, so `R (φ⁻¹ ^ card n)` commutes
   -- with every `R (w p)`. As `u` is `R` conjugated by `P`, read in `O`, also `u (φ⁻¹ ^ card n)`
   -- commutes with every `u (w p)`.
-  have h_comm_φ : R (γ * φ ^ card n) = R (φ ^ card n * γ) := by
-    rw [h_conj, map_mul, map_mul, h_fix]
+  have h_comm_φ : Commute (R γ) (R φ ^ card n) := by
+    rw [commute_iff_eq, ← map_pow, ← map_mul, ← map_mul, h_conj, map_mul, map_mul, h_fix]
   have h_comm (p : Fin (card n) × Fin (card n)) : Commute (u (w p)) (u (φ⁻¹ ^ card n)) := by
     have h_R : R (w p * φ⁻¹ ^ card n) = R (φ⁻¹ ^ card n * w p) := by
-      simpa only [w, map_mul] using (commute_map_pow_mul_pow_map_inv_pow R h_comm_φ _ _).eq
+      have h_pow := (Commute.pow_pow_self (R φ) p.1.val (card n)).mul_left (h_comm_φ.pow_left p.2.val)
+      simpa only [w, map_mul, map_pow, map_inv, inv_pow] using h_pow.inv_right.eq
     simpa only [map_mul, commute_iff_eq] using u_congr h_R
   exact Matrix.exists_eq_smul_one_of_commute_of_span_eq_top h_span h_comm
 

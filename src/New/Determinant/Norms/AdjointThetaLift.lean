@@ -648,7 +648,8 @@ lemma DescentPair.chosenFactor_ne_zero : O.chosenFactor ≠ 0 := by
   refine prod_ne_zero_iff.2 fun w _ ↦
     div_ne_zero (prod_ne_zero_iff.2 fun i hi ↦ ?_) (Nat.cast_ne_zero.2 Nat.card_pos.ne')
   rw [sub_ne_zero, inv_pow, ne_comm, Ne, inv_eq_one]
-  exact_mod_cast (one_lt_pow₀ (O.chosenPlace w).one_lt_q (by grind : i ≠ 0)).ne'
+  have hi_ne : i ≠ 0 := Nat.ne_zero_of_lt (Finset.mem_Icc.mp hi).1
+  exact_mod_cast (one_lt_pow₀ (O.chosenPlace w).one_lt_q hi_ne).ne'
 
 /-- The index of the level on `V`, times the order of `∏_{w ∈ Q} GL_r(k_w)`, is the product over all
 places `w` of `M` and `Q` of the index in `GL_n(k_w)` of the group that fixes the basis vectors

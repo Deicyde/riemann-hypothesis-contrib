@@ -734,7 +734,7 @@ lemma baseChangeOf.ext {A R : CommRingCat} {s : X ⟶ reprBy R} {φ : R ⟶ A} {
 /-- For s: X → Y, the base change functor from functors over Y to functors over X, sending E → Y
 to X ×_Y E → X. -/
 def pullbackOver : Over Y ⥤ Over X where
-  obj Z := Over.mk (fibreProd.fst s Z.hom)
+  obj Z := Over.mk (fiberProd.fst s Z.hom)
   map {Z Z'} f :=
     homMk
       { app B := ↾fun x ↦ ⟨(x.val.1, f.left.app B x.val.2), congr(($f.w) B _) ▸ x.property⟩
@@ -750,12 +750,12 @@ instance pullbackOver_isRightAdjoint : (pullbackOver s).IsRightAdjoint where
     ⟨_,
       ⟨(mapPullbackAdj s).ofNatIsoRight
         (NatIso.ofComponents (fun Z ↦
-          let h := isPullback_fibreProd (u := s) (p := Z.hom)
+          let h := isPullback_fiberProd (u := s) (p := Z.hom)
           isoMk h.isoPullback h.isoPullback_hom_snd)
           fun {Z Z'} f ↦ OverMorphism.ext (by
-            let m : fibreProd s Z.hom ⟶ fibreProd s Z'.hom := ((pullbackOver s).map f).left
-            let h := isPullback_fibreProd (u := s) (p := Z.hom)
-            let h' := isPullback_fibreProd (u := s) (p := Z'.hom)
+            let m : fiberProd s Z.hom ⟶ fiberProd s Z'.hom := ((pullbackOver s).map f).left
+            let h := isPullback_fiberProd (u := s) (p := Z.hom)
+            let h' := isPullback_fiberProd (u := s) (p := Z'.hom)
             change m ≫ h'.isoPullback.hom =
               h.isoPullback.hom ≫
                 pullback.lift (pullback.fst Z.hom s ≫ f.left) (pullback.snd Z.hom s) _
@@ -875,7 +875,7 @@ lemma IsCohomContinuous.isFilteredColimit_adjoin (h : IsCohomContinuous Λ X) (T
         (isLimitOfPreserves (opEquivOpUnder R).inverse h_colimit.op))).some
   exact isFilteredColimit_iff_bijective.mpr
     (allBijective_iff_forall_bijectiveUpTo.mpr
-      (h h_limit (fun _ ↦ .baseChange (.map uliftCoyoneda _) isPullback_fibreProd)) n)
+      (h h_limit (fun _ ↦ .baseChange (.map uliftCoyoneda _) isPullback_fiberProd)) n)
 
 /-- The `(m + 1)`-fold fibre power, as a functor on maps of sets, is corepresented by the map from
 `m + 1` points to one point; in particular it preserves limits. -/
@@ -910,18 +910,18 @@ lemma IsCohomContinuous.of_hasCohomDenseImage {T : CommRingCat} {q : reprBy T �
     obtain ⟨B, e⟩ : Σ B : J ⥤ CommRingCat,
         .op B ⋙ uliftCoyoneda ≅ D ⋙ pullbackOver q ⋙ forget (reprBy T) :=
       ⟨.unop _, liftFunctorCompIso _ uliftCoyoneda fun j ↦
-        ⟨_, ⟨((hD j).isPullback q).isoIsPullback _ _ isPullback_fibreProd⟩⟩⟩
+        ⟨_, ⟨((hD j).isPullback q).isoIsPullback _ _ isPullback_fiberProd⟩⟩⟩
     -- the rings `B j` and `colimit B`, indexed by `some j` and `none`
     let R' : Option J → CommRingCat := (·.elim (colimit B) B.obj)
     -- test envelopes `θ : A → E A`: each `E A` is a test ring (`h_test`), and every map to a test
     -- ring from some `B j` or from `colimit B` factors through `θ` (`h_univ`)
     obtain ⟨E, θ, h_test, h_univ⟩ := Envelope.exists_natTrans_isTest_and_factors R'
     -- the cover `p j` is `h_{E (B j)} → h_{B j} ≅ h_T ×_Y D j → D j`; `ε` is the last projection
-    let ε : pullbackOver q ⋙ forget (reprBy T) ⟶ forget Y := { app D := fibreProd.snd q D.hom }
+    let ε : pullbackOver q ⋙ forget (reprBy T) ⟶ forget Y := { app D := fiberProd.snd q D.hom }
     let p : (B ⋙ E).op ⋙ uliftCoyoneda ⟶ D ⋙ forget Y :=
       whiskerRight (NatTrans.op (B.whiskerLeft θ)) _ ≫ e.hom ≫ D.whiskerLeft ε
     have hp (j : Jᵒᵖ) : IsRelAffine (p.app j) := .comp (.map uliftCoyoneda _)
-      (.comp (.of_isIso ..) (hq_rep.baseChange isPullback_fibreProd.flip))
+      (.comp (.of_isIso ..) (hq_rep.baseChange isPullback_fiberProd.flip))
     -- if one of these rings represents the pull-back of `D'`, its envelope has dense image in `D'`:
     -- on tests the image holds the preimage of the image of `q`
     have h_dense {D' : Over Y} (o : Option J)

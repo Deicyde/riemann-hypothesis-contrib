@@ -627,10 +627,10 @@ lemma IsAppellHumbert.schur_lemma {Q : End ℂ (B.thetaSpace χ)}
 vector of the dual lattice into `L`. -/
 lemma IsAppellHumbert.exists_nsmul_mem_of_mem_dualLattice :
     ∃ N ≠ (0 : ℕ), ∀ a ∈ B.dualLattice, N • a ∈ L := by
-  -- Take for `N` the index of `L` in its dual, which is the square of a positive dimension.
-  refine ⟨L.toAddSubgroup.relIndex B.dualLattice.toAddSubgroup, ?_,
+  -- The index is the cardinality of the finite quotient of the dual lattice.
+  exact ⟨L.toAddSubgroup.relIndex B.dualLattice.toAddSubgroup,
+    Nat.card_ne_zero.mpr ⟨inferInstance, hB.finite_dualLattice_quotient⟩,
     fun a ha ↦ L.toAddSubgroup.nsmul_relIndex_mem ha⟩
-  simpa [← hB.finrank_thetaSpace_sq] using hB.finrank_thetaSpace_pos.ne'
 
 end New
 

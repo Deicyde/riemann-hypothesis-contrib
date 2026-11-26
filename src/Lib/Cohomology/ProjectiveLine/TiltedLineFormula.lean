@@ -1019,7 +1019,8 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
     let r : (tiltPointsSum pointOrTorus).obj c := ⟨⟨true⟩, q⟩
     change FreeAddCommGroup.lift (pow c)
       (((projFirst (B := pointOrTorus)).app c).hom (FreeAddCommGroup.of r)) = _
-    erw [projFirst_true (B := pointOrTorus) c q, FreeAddCommGroup.lift_apply_of]
+    exact (congrArg (FreeAddCommGroup.lift (pow c))
+      (projFirst_true (B := pointOrTorus) c q)).trans (FreeAddCommGroup.lift_apply_of ..)
   have h_torus : (α ≫ (kummerSeq (genericTestOver A)).g) ≫
       (cocycle (genericTestOver A)).extension.f = gluing ≫ f := by
     -- On the torus the frames `(X, 1)` and `(1, X⁻¹)` differ by the unit `X`.
@@ -1032,13 +1033,15 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
       have h_a : (α.app c).hom (FreeAddCommGroup.of y₀) = 0 := by
         change FreeAddCommGroup.lift (pow c)
           (((projFirst (B := pointOrTorus)).app c).hom (FreeAddCommGroup.of y₀)) = 0
-        erw [projFirst_false (B := pointOrTorus) c y, map_zero]
+        exact (congrArg (FreeAddCommGroup.lift (pow c))
+          (projFirst_false (B := pointOrTorus) c y)).trans (map_zero _)
       change ((cocycle _).extension.f.app c).hom
           (((kummerSeq (genericTestOver A)).g.app c).hom ((α.app c).hom (FreeAddCommGroup.of y₀))) =
         (f.app c).hom ((gluing.app c).hom (FreeAddCommGroup.of y₀))
-      erw [h_a, h_glue, h_f_app]
+      rw [h_a, h_glue, h_f_app]
       simp [z, evalZero]
-      erw [map_zero, sub_self]
+      exact (map_zero ((cocycle (genericTestOver A)).extension.f.app c).hom).trans
+        (sub_self _).symm
     · let X : R c := ρ c (y.down.hom (single 1 1))
       let X' : R c := ρ c (y.down.hom (single (-1) 1))
       let v : (cocycle (genericTestOver A)).extension.X₂ c :=

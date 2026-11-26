@@ -560,15 +560,6 @@ private lemma re_comp_symm_apply_self_pos {P : RealVectors E D.Index →ₗ[ℝ]
   intro u hu
   simpa [← hQ] using hA (Q.symm u) (by simpa using hu)
 
-/-- The period b ↦ `ballPeriod E e H (1, b) w` is affine in b; its derivative is v ↦
-`ballPeriod E e H (0, v) w`. -/
-private lemma hasFDerivAt_ballPeriod (e : (D.Index → ℂ) ≃L[ℂ] ℂ × BallBase D.Index)
-    (H : Matrix D.Index D.Index ℂ) (w : RealVectors E D.Index) (b : BallBase D.Index) :
-    HasFDerivAt (fun b' : BallBase D.Index ↦ ballPeriod E e H (1, b') w)
-      (((ballPeriod E e H).flip w).toContinuousLinearMap ∘L .inr ℂ ℂ (BallBase D.Index)) b :=
-  (ContinuousLinearMap.hasFDerivAt ((ballPeriod E e H).flip w).toContinuousLinearMap).comp b
-    (hasFDerivAt_prodMk_right (1 : ℂ) b)
-
 /-- The real vector spaces (E ⊗ ℝ)ⁿ and `New.Variety.BallFibre E D.Index` have the same
 dimension. -/
 lemma finrank_realVectors_eq_finrank_ballFibre :
@@ -635,7 +626,9 @@ lemma exists_analyticFamily_positiveBall (e : (D.Index → ℂ) ≃L[ℂ] ℂ ×
   have hderiv {w : RealVectors E D.Index} (b : BallBase D.Index) (hb : b ∈ positiveBall e H) :
       HasFDerivAt (fun b' : BallBase D.Index ↦ Q b' w)
         (((ballPeriod E e H).flip w).toContinuousLinearMap ∘L .inr ℂ ℂ (BallBase D.Index)) b := by
-    refine (hasFDerivAt_ballPeriod e H w b).congr_of_eventuallyEq ?_
+    have h_period := ((ballPeriod E e H).flip w).toContinuousLinearMap.hasFDerivAt.comp b
+      (hasFDerivAt_prodMk_right (1 : ℂ) b)
+    refine h_period.congr_of_eventuallyEq ?_
     filter_upwards [ball_open.mem_nhds hb] with b' hb'
     simp [hQ, P, hr_eq b' hb']
   have h_alt (b : BallBase D.Index) (y z : RealVectors E D.Index) :

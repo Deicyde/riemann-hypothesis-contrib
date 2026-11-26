@@ -931,7 +931,8 @@ lemma relLength_iInf_comap_deepConstants_le {k : KummerChart Γ} {O : k.Coeffs}
     simp [Equiv.sum_comp]
   grw [relLength_iInf_le]
   simp_rw [relLength_comap, Submodule.map_top]
-  grw [sum_le_sum fun i _ ↦ relLength_constantAt_deepConstants_le hk hp hb_le hb_gt hb_gap h_window hn hr i]
+  grw [sum_le_sum fun i _ ↦
+      relLength_constantAt_deepConstants_le hk hp hb_le hb_gt hb_gap h_window hn hr i]
   norm_cast
   simp only [sum_add_distrib, ← mul_sum, ← sum_mul, h_perm]
   exact le_of_eq (by ring)
