@@ -172,9 +172,9 @@ lemma isAdmissibleEval_doubleLiftEvalY (i : ℕ) (hi : i ≤ D.ϱ) :
   · apply isAdmissibleEval_finEval (hP := D.isSplitLevel_piNPlaces)
       (hκ := D.isScalingAtM_of_eq_one_or_eq (fun _ ↦ Or.inl rfl) fun _ ↦ rfl)
       (hπ := D.isSplitSquarefree_piNIdele) (hL := D.spansLattice_gradingY (2 * i + 1) _)
-    · apply liftsNeighbours_middleDoubleLift (h_scale := h_scale) <;> apply D.spansLattice_gradingY
+    · apply liftsNeighbors_middleDoubleLift (h_scale := h_scale) <;> apply D.spansLattice_gradingY
     · apply matchesDenominators_middleDoubleLift
-  · -- The last space is standard (an instance argument of `liftsNeighbours_lastDoubleLift`), and
+  · -- The last space is standard (an instance argument of `liftsNeighbors_lastDoubleLift`), and
     -- its factor `latticeScale` is `1`.
     subst h_last
     have h_std : (D.spaceY (2 * D.ϱ + 2)).IsStd := by
@@ -187,7 +187,7 @@ lemma isAdmissibleEval_doubleLiftEvalY (i : ℕ) (hi : i ≤ D.ϱ) :
       (hκ := D.isScalingAtM_lastScaling) (hπ := D.isSplitSquarefree_piNIdele)
       (hL := D.spansLattice_gradingY (2 * D.ϱ + 1) _)
     · -- `D.piNIdele` is by definition the principal idele of `π`.
-      apply liftsNeighbours_lastDoubleLift (hπ := rfl) (h_scale := h_scale)
+      apply liftsNeighbors_lastDoubleLift (hπ := rfl) (h_scale := h_scale)
       exact D.spansLattice_gradingY (2 * D.ϱ) _
     · apply matchesDenominators_lastDoubleLift (hδ := D.v_star_piM_mul_chosenRatio)
   · lia
