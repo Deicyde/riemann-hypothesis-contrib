@@ -348,9 +348,10 @@ omit [WeilData E]
 omit h in
 /-- Let `P` hold one place of each conjugate pair above the prime `N`, all unramified of degree one
 (`IsSplitLevel P N`). The character `detCharAt χ k` is `g ↦ χ (det g) |det g| ^ (-k / 2)` over the
-completions at `P`, and `diagN (P := P) (N := N) n S` is `diag (1, …, 1, N)` at `P ∩ S` and `1` at `P \ S`. For an
-embedding `ι` of `ℂ` into `ℂ_[N]` and `k ≤ k'`, the `N`-adic size of `detCharAt χ k'` at this matrix
-is at most that of `detCharAt χ k`, whatever the sizes of the two matrices. -/
+completions at `P`, and `diagN (P := P) (N := N) n S` is `diag (1, …, 1, N)` at `P ∩ S` and `1` at
+`P \ S`. For an embedding `ι` of `ℂ` into `ℂ_[N]` and `k ≤ k'`, the `N`-adic size of
+`detCharAt χ k'` at this matrix is at most that of `detCharAt χ k`, whatever the sizes of the two
+matrices. -/
 lemma norm_detCharAt_diagN_anti [h : IsSplitLevel P N] {ι : ℂ →+* ℂ_[N]} {χ : HeckeChar E}
     {k k' : ℕ} (hk : k ≤ k') :
     ‖ι (detCharAt χ k' (diagN (P := P) (N := N) n S))‖ ≤ ‖ι (detCharAt χ k (diagN (P := P) (N := N) n' S))‖ := by
@@ -529,8 +530,8 @@ Here `lastColDatum z` is the indicator of the matrices integral at `P` whose las
 `z` modulo `N`. The function `charDatum z` is zero off the integral matrices, and on these it is
 `ψ_N (r ⬝ᵥ z)`, with `r` the reduction of the last row and `ψ_N c = ψ₀ (-c / N)` (`psiN`) for the
 additive character `ψ₀ = stdLattice.selfDualAddChar E`. The matrices are first multiplied by
-`diagN (P := P) (N := N) n S` and `diagN (P := P) (N := N) m (P \ S)`, which are `diag (1, …, 1, N)` at `P ∩ S` and at `P \ S`
-respectively, and `1` at the other places of `P`. -/
+`diagN (P := P) (N := N) n S` and `diagN (P := P) (N := N) m (P \ S)`, which are `diag (1, …, 1, N)`
+at `P ∩ S` and at `P \ S` respectively, and `1` at the other places of `P`. -/
 lemma doubleLiftGluing_eq_sum_schrodingerOpAt [hP : IsSplitLevel P N] (hS : IsSplitLevel S N)
     (v : ((stdSpace E (n ⊕ Unit)).hom (stdSpace E n')).finitePart)
     (v' : ((stdSpace E n').hom (stdSpace E (m ⊕ Unit))).finitePart) :
@@ -866,7 +867,7 @@ abbrev homX : Space D.E (D.X (j + 1) × D.X j) (homSigns 1 1) :=
 `D.levelX j`. Its two characters are the twists `New.rankTwist`, by the ranks of X_j and X_{j+1}, of
 `D.chainChar ϑ (j + 1)`, the product of `D.untwistedLiftChar (j + 1)` and ϑ^{j+1}. Derivatives are
 scaled by π_M times the period `P.jetScale D.towerExp`, where π_M is the conjugate of the integer
-`D.piMBar` of K of norm `D.M`. -/
+`D.piMBar` of K of norm `D.level`. -/
 @[simps! -isSimp ω]
 def liftKernel :
     Kernel (D.X j) (D.X (j + 1)) D.columnCount (D.lastEntry j) (D.lastEntry (j + 1))
@@ -974,13 +975,13 @@ def supportedTranslations (q : ℕ) : Set D.Translations :=
 
 /-- `Ψ` is a chain datum for the twist `ϑ`, a character of weight 0 whose tame part is non-trivial
 exactly at the places of the finite set `ϑ.Q`. Let `q` be the product of their norms and `M` the
-principal level `D.M`. The translations in the support of `Ψ` vanish at the places prime to `M q`
-and lie in `admissibleTranslations q`; the values of `Ψ` are integral away from `q`, with
+principal level `D.level`. The translations in the support of `Ψ` vanish at the places prime to
+`M q` and lie in `admissibleTranslations q`; the values of `Ψ` are integral away from `q`, with
 denominator `1`; if `ϑ.Q` is empty, then `∑ x, |σ (Ψ x)| ≤ M ^ (3 f m n_m²)` for every automorphism
 `σ` of `ℂ`; and the glued tensor is jointly invariant. -/
 structure IsChainDatum (Ψ : D.Translations →₀ ℂ) : Prop extends IsAdmissibleCoeffs
-    (D.admissibleTranslations ϑ.normQ ∩ D.supportedTranslations (D.M * ϑ.normQ))
-    ϑ.normQ 1 (ϑ.Q = ∅) (D.M ^ (3 * D.f * D.m * D.n D.m ^ 2)) Ψ where
+    (D.admissibleTranslations ϑ.normQ ∩ D.supportedTranslations (D.level * ϑ.normQ))
+    ϑ.normQ 1 (ϑ.Q = ∅) (D.level ^ (3 * D.f * D.m * D.n D.m ^ 2)) Ψ where
   /-- The glued tensor is jointly invariant. -/
   isInvariant : (gluedTensor Ψ).IsInvariant ϑ
 
