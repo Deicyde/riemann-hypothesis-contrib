@@ -27,6 +27,10 @@ Frobenii. At a place of a number field, it proves the main properties of the loc
 * `New.algHeckeChars`, `New.AlgHeckeChar`: algebraic Hecke characters, as characters of the finite
   ideles (`New.AlgHeckeChar.character`) together with their infinity type
   (`New.AlgHeckeChar.infinityType`).
+* `New.IsLocalArtin`, `New.localArtin`: the defining formula `classOfInvariant (χ (f x)) =
+  −(δχ ∪ x)` of a local Artin map, and the local Artin map at a prime of a number field, a chosen
+  homomorphism from `K_w^×` to the abelianised decomposition group of `A` that satisfies it on
+  `K^×`.
 * `New.IsPlaceOver.isLocalArtin_localArtin`: the formula holds; the local theory in `ℚ̄_p` then
   applies.
 * `New.IsTameGenerator`, `New.IsPlaceOver.exists_eq_pow_and_apply_conj_eq_pow`: tame generators of
@@ -36,12 +40,8 @@ Frobenii. At a place of a number field, it proves the main properties of the loc
   whose symbol it is and whose residue generates the units of the residue field.
 
 Notions from other files:
-* `New.localArtin Γ A w`: a chosen homomorphism from `K_w^×` to the topological abelianisation of
-  the decomposition group of `A`, pinned down on `K^×` by `New.IsLocalArtin`.
 * `New.IsCompletionEmb w p Γ A j`: embeddings of `K_w` and of `Ω` (by `j`) in `ℚ̄_p` that induce `A`
   and make the decomposition group of `A` the Galois group of `ℚ̄_p` over `K_w`.
-* `New.IsLocalArtin`: The homomorphism `f : Lˣ → Γ^ab` satisfies `New.Cohomology.classOfInvariant (χ
-  (f x)) = −(δχ ∪ x)` for all continuous characters `χ` and all `x` in `Lˣ`.
 * `New.IsFrob`: `σ` stabilises the valuation subring `A` and `σ • x ≡ x ^ q` modulo the maximal
   ideal for all `x ∈ A`.
 * `New.IsPlaceOver`: The valuation subring `A` of `Ω` lies over the prime `w` of `K`: an integer of
@@ -62,6 +62,53 @@ See also `Lib.ClassField.Avatar.LocalGlobalCompatibility` and `Lib.ClassField.Pl
 @[expose] public section
 
 noncomputable section
+
+/-!
+## The local Artin map, by its defining formula
+-/
+
+namespace New
+
+open NumberField
+
+variable (Γ K : Type) {Ω : Type} [Group Γ] [Field K] [Field Ω] [Algebra K Ω]
+  [MulSemiringAction Γ Ω] (A : ValuationSubring Ω) [TopologicalSpace Γ] [hΓ : IsProGalois Γ K Ω]
+
+/-- The property that the homomorphism `f` from `Lˣ` to the topological abelianisation of `Γ`
+satisfies `classOfInvariant (χ (f x)) = -cyclicClass χ x` for every continuous character
+`χ : Γ → ℚ/ℤ` and every `x` in `Lˣ`, where `x` is viewed as an invariant of `Ωˣ`, and `χ (f x)` is
+the value at `f x` of `QZChar.abelianLift χ`, the map induced by `χ` on the topological
+abelianisation. -/
+def IsLocalArtin {L : Type*} [Field L] [Algebra L Ω] [SMulCommClass Γ L Ω]
+    (f : Lˣ →* TopologicalAbelianization Γ) : Prop :=
+  ∀ (χ : QZChar Γ) (x : Lˣ),
+    Cohomology.classOfInvariant Γ K A (QZChar.abelianLift χ (f x)).toAdd =
+      -(unitsModule Γ (K := K) (Ω := Ω)).cyclicClass χ
+        (DiscreteUnits.ofBase Γ Ω (Additive.ofMul x))
+
+variable {K} [NumberField K] (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+
+/-- The local Artin map at `v`: a chosen homomorphism from the units of the completion
+`v.adicCompletion K` of `K` at `v` to the abelianised decomposition group of `A`, whose
+restriction to `Kˣ` satisfies `New.IsLocalArtin` over the fixed field of the decomposition group;
+unspecified if there is none (see `New.isLocalArtin_localArtin_comp_of_exists` and
+`New.IsPlaceOver.isLocalArtin_localArtin`). -/
+def localArtin : (v.adicCompletion K)ˣ →* TopologicalAbelianization (decompGroup Γ A) :=
+  Classical.epsilon fun f : (v.adicCompletion K)ˣ →* TopologicalAbelianization (decompGroup Γ A) ↦
+    IsLocalArtin (decompGroup Γ A) (fixedFieldOf (decompGroup Γ A)) A
+      (f.comp (Units.map (algebraMap K (v.adicCompletion K)).toMonoidHom))
+
+/-- The restriction of `New.localArtin Γ A v` to `Kˣ` has its defining property as soon as the
+restriction of some homomorphism has it. -/
+lemma isLocalArtin_localArtin_comp_of_exists
+    (h_exists : ∃ f : (v.adicCompletion K)ˣ →* TopologicalAbelianization (decompGroup Γ A),
+      IsLocalArtin (decompGroup Γ A) (fixedFieldOf (decompGroup Γ A)) A
+        (f.comp (Units.map (algebraMap K (v.adicCompletion K)).toMonoidHom))) :
+    IsLocalArtin (decompGroup Γ A) (fixedFieldOf (decompGroup Γ A)) A
+      ((localArtin Γ A v).comp (Units.map (algebraMap K (v.adicCompletion K)).toMonoidHom)) :=
+  Classical.epsilon_spec h_exists
+
+end New
 
 /-!
 ## The global Artin map and algebraic Hecke characters

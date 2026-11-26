@@ -8,6 +8,8 @@ public import Lib.ClassField.LocalDuality.KummerFiniteness
 The invariant map of local class field theory, for a henselian local field `k` of characteristic `0`
 with absolute Galois group `Γ` acting on `Ω` (`New.IsLocalGalois`).
 
+* `New.IsClassOfInvariant`, `New.Cohomology.classOfInvariant`: the property of a map from ℚ/ℤ to
+  H²(Γ, Ωˣ) of sending `r` to the class of invariant `r`, and a map chosen with it.
 * `New.IsLocalGalois.isClassOfInvariant_classOfInvariant`: the chosen map
   `New.Cohomology.classOfInvariant` from ℚ/ℤ to H²(Γ, Ωˣ) is injective and computes the cyclic
   classes of unramified characters.
@@ -45,6 +47,43 @@ private lemma Nat.eq_of_pow_sub_one_mul_eq_mul_pow {R l c : ℕ} (hl : l.Prime)
       (mul_ne_zero (left_ne_zero_of_mul hlc) (pow_ne_zero l (right_ne_zero_of_mul hlc))) ?_
     rw [h, mul_pow, ← mul_assoc, pow_sub_one_mul hl.ne_zero]
   exact Nat.pow_left_injective (Nat.sub_ne_zero_of_lt hl.one_lt) (by exact_mod_cast h_pow)
+
+namespace New
+
+/-! ### The class of an invariant -/
+
+variable (Γ K : Type) {Ω : Type} [Group Γ] [Field K] [Field Ω] [Algebra K Ω]
+  [MulSemiringAction Γ Ω] (A : ValuationSubring Ω) [TopologicalSpace Γ] [hΓ : IsProGalois Γ K Ω]
+
+/-- The property that a map `b : ℚ/ℤ → H²(Γ, Ωˣ)` sends `r` to the class of invariant `r`. First,
+`b` is injective. Second, let the continuous character `χ : Γ → ℚ/ℤ` vanish on the inertia group
+of `A`, let `φ` be a Frobenius element for `q = residueCard K A`, the number of elements of the
+residue field, and let the invariant `w` of `Ωˣ` have normalised order `ordRat K A w = n`; then
+`cyclicClass χ w = n • b (χ φ)`. -/
+def IsClassOfInvariant (b : QZ →+ (unitsModule Γ (K := K) (Ω := Ω)).H 2) : Prop :=
+  Function.Injective b ∧
+  ∀ χ : QZChar Γ,
+    (∀ g ∈ inertiaGroup Γ A, (χ : Γ → QZ) g = 0) →
+    ∀ φ : Γ, IsFrob A (residueCard K A) φ →
+    ∀ (w : (unitsRep (Γ := Γ) (Ω := Ω)).invariants) (n : ℤ),
+      ordRat K A (w : DiscreteUnits Ω) = n →
+      (unitsModule Γ (K := K) (Ω := Ω)).cyclicClass χ w = n • b ((χ : Γ → QZ) φ)
+
+/-- A chosen additive map `ℚ/ℤ → H²(Γ, Ωˣ)` with the property `New.IsClassOfInvariant`; when such a
+map exists, it sends `r` to the class of invariant `r`. See
+`New.Cohomology.isClassOfInvariant_classOfInvariant_of_exists`, and for local fields
+`New.IsLocalGalois.isClassOfInvariant_classOfInvariant`. -/
+noncomputable def Cohomology.classOfInvariant : QZ →+ (unitsModule Γ (K := K) (Ω := Ω)).H 2 :=
+  Classical.epsilon (IsClassOfInvariant Γ K A)
+
+/-- `New.Cohomology.classOfInvariant` has the property `New.IsClassOfInvariant` as soon as some map
+has it. -/
+lemma Cohomology.isClassOfInvariant_classOfInvariant_of_exists
+    (h_exists : ∃ b : QZ →+ (unitsModule Γ (K := K) (Ω := Ω)).H 2, IsClassOfInvariant Γ K A b) :
+    IsClassOfInvariant Γ K A (Cohomology.classOfInvariant Γ K A) :=
+  Classical.epsilon_spec h_exists
+
+end New
 
 namespace New.IsLocalGalois
 

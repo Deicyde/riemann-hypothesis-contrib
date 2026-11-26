@@ -2,7 +2,6 @@ module
 
 public import Lib.Adelic.Hecke.ClassSums
 public import Lib.ClassField.GaloisCohomology.ShapiroCorestriction
-public import Lib.ClassField.Local.Definitions
 public import Lib.ClassField.Places.LocalFields
 
 /-!
@@ -122,7 +121,16 @@ open Function AddSubgroup QuotientAddGroup AddMonoidHom DFunLike Nat DiscreteMod
 variable {R R' S : Type}
   (Γ : Type) [CommRing R] [CommRing R'] [CommRing S] [Group Γ] [TopologicalSpace Γ]
   {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [MulSemiringAction Γ Ω] [IsAlgClosed Ω]
-  [IsProGalois Γ K Ω] {A B C : Type} [AddCommGroup A] [AddCommGroup B] [AddCommGroup C]
+  [hΓ : IsProGalois Γ K Ω] {A B C : Type} [AddCommGroup A] [AddCommGroup B] [AddCommGroup C]
+
+/-- The multiplicative group Ω^×, written additively, as a discrete module with its continuous
+action of Γ. -/
+abbrev unitsModule : DiscreteModule ℤ Γ :=
+  of (unitsRep (Γ := Γ) (Ω := Ω)) <|
+    -- the orbit map of each unit is locally constant
+    continuous_prod_of_discrete_right.2 fun x ↦
+      ((isLocallyConstant_smul x.val).desc (fun g ↦ unitsRep g x) Units.val
+        Units.val_injective).continuous
 
 /-- Additive maps from a finite group `A` to `Ωˣ` (written additively) form a finite set. -/
 instance [Finite A] : Finite (A →+ DiscreteUnits Ω) :=

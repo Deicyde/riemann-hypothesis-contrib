@@ -632,7 +632,6 @@ The heads of these files give an overview of a theory: `Lib/ClassField/Global/Ar
 
 **Local**: Local class field theory: invariant map and Artin map
 
-- `Lib/ClassField/Local/Definitions` (51): The classes of invariants in H²(Γ, Ωˣ) and the local Artin map, defined by their characteristic properties
 - `Lib/ClassField/Local/InvariantMap` (203): The local invariant Br(k) ≅ Q/Z and its behaviour under restriction and maps of local fields
 - `Lib/ClassField/Local/ArtinMap` (682): Local and global Artin maps, algebraic Hecke characters and tame inertia
 
