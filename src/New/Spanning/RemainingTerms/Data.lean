@@ -36,8 +36,8 @@ namespace New.Filling
 
 open NumberField Matrix Module Pointwise
 
-variable {E : Type} [Field E] [CMType E] [HasPrimitiveRoot5040 E] {𝔰 : Shape} (S : Filling E 𝔰)
-  (j : Fin (𝔰.ϱ + 2)) (c c' : S.Classes) (γ γ' : S.G E)
+variable {E : Type} [Field E] [CMType E] {𝔰 : Shape} (S : Filling E 𝔰) (j : Fin (𝔰.ϱ + 2))
+  (c c' : S.Classes) (γ γ' : S.G E)
 
 /-- The lattice `Λ ∩ X₀` of the class `c`, in rational coordinates: the vectors that
 `S.classCoordX₀ c` sends to integral vectors. -/
@@ -54,6 +54,10 @@ def termLattice : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
       (((frameMiddle (S.translateByClassReps c c' γ).val.val)ᴴ * S.latticeMiddle (𝔸f E) *
         S.classCoordX₀ c).mulVecLin.restrictScalars (Ô E))
 
+section
+
+variable [HasPrimitiveRoot5040 E]
+
 /-- The part of the lattice `L_γ` of the term `γ` in `commonLink γ γ'`, the vectors of `X₀` that
 are the first entry of a pair, orthogonal to `z`, lying in both links. -/
 def commonPart : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
@@ -67,6 +71,8 @@ def pairLattice : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
 
 /-- The discriminant of the common lattice `L₁₂` of two terms, a lattice in `commonLink γ γ'`. -/
 def pairDiscriminant : ℝ := discriminant (finrank E (commonLink γ γ')) (S.pairLattice c c' γ γ')
+
+end
 
 /-- The corank `c⁺` of two links: the codimension of their intersection in each of them, a link
 having the dimension `k + 1`. -/
@@ -109,7 +115,6 @@ def nearRepresentativesOver (T : Set (S.G E)) (c : S.Classes) (s : S.ResidueGL) 
 
 variable {S c}
 
-omit [HasPrimitiveRoot5040 E] in
 /-- If the rational element `γ` lies in some cell `j` (`S.HasCellRank j γ`:
 `New.NormOnePairOccursFrom` `j` holds, the leading minor `D_j` of `S.frameProducts γ` is nonzero,
 and `S.termDisc γ ≠ 0` exactly for `j = ϱ + 1`), then it lies in the cell of the index
@@ -118,7 +123,6 @@ lemma HasCellRank.hasCellRank_cellRank {j : Fin (𝔰.ϱ + 2)} {γ : S.G E}
     (h : S.HasCellRank j γ) : S.HasCellRank (S.cellRank γ) γ :=
   Classical.epsilon_spec (p := fun i : Fin (𝔰.ϱ + 2) ↦ S.HasCellRank i γ) ⟨j, h⟩
 
-omit [HasPrimitiveRoot5040 E] in
 /-- Vectors of `Λ ∩ X₀`, for the lattice `Λ` of the class `c` in the definite space `X₀`, have
 integral products. Here `S.classCoordX₀ c` changes from an orthonormal basis of `X₀` to the
 coordinates of `Λ`, and integral means with entries in the ring `Ô E` of integral elements of the
@@ -135,6 +139,8 @@ lemma isIntMatrix_conjTranspose_mul_of_classCoordX₀ {σ τ : Type} {m : Matrix
       _ = _ := by simp only [conjTranspose_mul, Matrix.mul_assoc]
   rw [h_gram]
   exact (hm.conjTranspose.mul S.isUnimodular_latticeMiddle.isIntMatrix).mul hm'
+
+variable [HasPrimitiveRoot5040 E]
 
 /-- For a subspace `V` of the definite space `X₀` and the lattice `Λ` of the class `c`, the real
 number `S.latticeDisc c V` is at least `1`. It is the square root of the generalised index

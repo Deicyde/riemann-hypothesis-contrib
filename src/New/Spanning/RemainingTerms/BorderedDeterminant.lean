@@ -360,7 +360,7 @@ open NumberField Matrix Fin Pointwise
 
 namespace New.Filling
 
-variable {E : Type} [Field E] [CMType E] [HasPrimitiveRoot5040 E] {𝔰 : Shape}
+variable {E : Type} [Field E] [CMType E] {𝔰 : Shape}
 
 section
 
@@ -402,7 +402,8 @@ abbrev frameMiddle (γ : Matrix 𝔰.BesselIndex 𝔰.BesselIndex R) :
 
 /-- The discriminant (`New.Filling.sublatticeDiscriminant`) of `Λ ∩ V`, for the lattice `Λ` of the
 class `c` and a subspace `V` of `X₀`. -/
-def latticeDisc : Submodule E (𝔰.κ → E) → ℝ := sublatticeDiscriminant (S.gram_classCoordX₀ c)
+def latticeDisc [HasPrimitiveRoot5040 E] : Submodule E (𝔰.κ → E) → ℝ :=
+  sublatticeDiscriminant (S.gram_classCoordX₀ c)
 
 /-- Among the products of `Λ ∩ A` with the frame of `k`, the index of those that
 come from the vectors `e_a` with `a < j`. -/
@@ -469,7 +470,6 @@ def IsNearTermAt (c : S.Classes) (t : S.reducedImage besselS) (p : S.Classes × 
   (S.IsNearRepresentative c p.1 p.2 ∧ ∃ j : Fin (𝔰.ϱ + 2), S.HasCellRank j p.2) ∧
     ∃ s : S.ResidueGL, p.2 ∈ S.termsOver c s p.1 ∧ (Subgroup.groupEquivQuotientProdSubgroup s).2 = t
 
-omit [HasPrimitiveRoot5040 E] in
 /-- At the top rank `j = ϱ + 1` all isotropic vectors of the frame are counted, so the index
 `isotropicRowsIndex` is `1`. -/
 lemma isotropicRowsIndex_top : S.isotropicRowsIndex ⊤ k = 1 :=
@@ -479,10 +479,6 @@ lemma isotropicRowsIndex_top : S.isotropicRowsIndex ⊤ k = 1 :=
 end
 
 /-! ### Terms of cell rank `j` -/
-
-section
-
-omit [HasPrimitiveRoot5040 E]
 
 /-- If `γ` has cell rank `j` (`S.HasCellRank j γ`), then `S.minorNorm j γ`, the absolute norm of the
 leading minor of order `j` of `S.frameProducts γ` (divided by a power of `N` when `j = ϱ + 1`), is
@@ -609,8 +605,6 @@ lemma HasCellRank.unique {S : Filling E 𝔰} {j : Fin (𝔰.ϱ + 2)} {γ : S.G 
   · have hj := h.lt_iff_termDisc_ne_zero.2 h_disc
     have hj' := h'.lt_iff_termDisc_ne_zero.2 h_disc
     omega
-
-end
 
 end New.Filling
 
