@@ -620,8 +620,8 @@ theorem New.sum_norm_sq_le_sum_re_inner_lie {n : Type} [Fintype n] [DecidableEq 
     ring
   have expand : (∑ p : n, ∑ q : n, ∑ c : n, ∑ d : n with ε c = ε d,
       ‖P (ρ.E q p (ρ.E d c y))‖ ^ 2) = l.casimirKValue l.lowestKType * N + 2 * C + R := by
-    simp +contextual [N, C, R, h_square, casimir_zero, sum_filter, ite_add_zero, sum_add_distrib,
-      mul_sum]
+    simp +contextual only [N, C, R, h_square, casimir_zero, sum_filter, ite_add_zero,
+      sum_add_distrib, mul_sum, mul_ite, mul_zero]
   linarith
 
 /-- A finite family `J` of operators detects step `k` of the filtration
