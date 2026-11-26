@@ -703,8 +703,9 @@ lemma Filling.frameGram_eq_frameImage (γ : Matrix 𝔰.BesselIndex 𝔰.BesselI
   simp [frameGram, Matrix.mul_apply, Matrix.one_apply]
 
 /-- If the split form `T.splitGram` is hermitian and invertible, then `Z(γ⁻¹) = Z(γ)ᴴ` for unitary
-`γ`, where `Z(γ) = T.frameGram γ` is the matrix of the products `h(f_j, γ f_l)`. -/
-@[simp]
+`γ`, where `Z(γ) = T.frameGram γ` is the matrix of the products `h(f_j, γ f_l)`. It is a `simp↓`
+lemma, so that `simp` uses it before it rewrites `↑γ⁻¹` to `(↑γ)⁻¹`. -/
+@[simp↓]
 lemma Filling.frameGram_inv [h : Floors.IsHermitianUnit T.splitGram] :
     T.frameGram ↑γ⁻¹ = (T.frameGram γ)ᴴ := by
   -- `J γ⁻¹ = γᴴ J` for unitary `γ`, and `J` is hermitian.

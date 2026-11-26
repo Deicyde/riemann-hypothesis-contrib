@@ -300,8 +300,9 @@ lemma weylNormSq_smul (t : ℂ) : weylNormSq (t • ξ) = ‖t‖ ^ 2 * weylNorm
   simp [weylNormSq, mulVec_smul, ← mul_assoc, mul_conj', sq]
 
 /-- The squared Gram norm of `σ ∘ (t • ξ)` is `‖σ t‖ ^ 2` times that of `σ ∘ ξ`, for multiplicative
-`σ`. -/
-@[simp]
+`σ`. It is a `simp↓` lemma, so that `simp` uses it before it rewrites `σ ∘ (t • ξ)` by
+`TauCeti.map_comp_smul`. -/
+@[simp↓]
 lemma weylNormSq_comp_smul {F : Type*} [FunLike F ℂ ℂ] [MulHomClass F ℂ ℂ] (σ : F) (t : ℂ) :
     weylNormSq (σ ∘ (t • ξ)) = ‖σ t‖ ^ 2 * weylNormSq (σ ∘ ξ) := by
   have h_comp : σ ∘ (t • ξ) = σ t • (σ ∘ ξ) := funext fun i ↦ map_mul σ t (ξ i)
