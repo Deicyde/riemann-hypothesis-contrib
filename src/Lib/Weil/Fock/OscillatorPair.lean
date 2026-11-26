@@ -1,5 +1,7 @@
-import Lib.DiscreteSeries.FlenstedJensen.RightDerivatives
-import Lib.Weil.Fock.PolynomialVectors
+module
+
+public import Lib.DiscreteSeries.FlenstedJensen.RightDerivatives
+public import Lib.Weil.Fock.PolynomialVectors
 
 /-!
 # Harmonic matrix coefficients of the Weil representation and oscillator pairs on matrices
@@ -49,6 +51,8 @@ of U(p,q) and its connection with the generalized unit disk, Pacific J. Math. 12
 Prop. 2.2; G. B. Folland, Harmonic Analysis in Phase Space (1989), ch. 1, 4; H. Reiter, Metaplectic
 Groups and Segal Algebras, LNM 1382 (1989).
 -/
+
+@[expose] public section
 
 /-!
 ## Matrix coefficients between harmonic polynomial vectors
@@ -157,23 +161,17 @@ lemma fockMatrixCoeff_pderiv (hd : ∀ i j : ι, d i ≠ d j → (u : Matrix ι 
     by_cases h_label : d k = d i
     · simp [hQ k h_label hk]
     · simp [hd k i h_label]
-  have h_raise : fockMatrixCoeff u Q (raiseOp ε i P) =
-      ∑ k : ι, (u : Matrix ι ι ℂ) k i * ε k * fockMatrixCoeff u (lowerOp ε k Q) P :=
-    fockMatrixCoeff_raiseOp u P Q i
-  have h_lower : ε i * fockMatrixCoeff u Q (lowerOp ε i P) =
-      ∑ k : ι, star ((u : Matrix ι ι ℂ) k i) * fockMatrixCoeff u (raiseOp ε k Q) P :=
-    fockMatrixCoeff_lowerOp u P Q i
   obtain hi | hi := units_eq_one_or (ε i)
   · have h_left : fockMatrixCoeff u Q (pderiv i P) = ε i * fockMatrixCoeff u Q (lowerOp ε i P) := by
       simp [lowerOp, hi]
-    rw [h_left, h_lower]
+    rw [h_left, fockMatrixCoeff_lowerOp]
     refine sum_congr rfl fun k _ ↦ ?_
     obtain hk | hk := units_eq_one_or (ε k)
     · simp [complexLinearPart_apply, raiseOp, hi, hk]
     · simpa [complexLinearPart_apply, raiseOp, hi, hk] using h_other k
   · have h_left : fockMatrixCoeff u Q (pderiv i P) = -fockMatrixCoeff u Q (raiseOp ε i P) := by
       simp [raiseOp, hi]
-    rw [h_left, h_raise, ← sum_neg_distrib]
+    rw [h_left, fockMatrixCoeff_raiseOp, ← sum_neg_distrib]
     refine sum_congr rfl fun k _ ↦ ?_
     obtain hk | hk := units_eq_one_or (ε k)
     · simpa [complexLinearPart_apply, lowerOp, hi, hk] using h_other k
@@ -356,13 +354,6 @@ variable {ε : R → ℤˣ} {ε' : C → ℤˣ} (f : USign ε →* USign ε') (�
 
 variable {f : USign ε →* USign ε'} {γ : ℤ}
 
-/-- For `g` in U(ε′), the operator norm of the Weil operator `realWeil g` on the Fock space is at
-most the norm of the vacuum vector times the modulus of `realMultiplier g`, the conjugate of the
-determinant of the negative block of `g`. -/
-lemma norm_realWeil_le (g : USign ε') :
-    ‖realWeil g‖ ≤ ‖(vacVector : fockSpace ε')‖ * ‖realMultiplier g‖ :=
-  norm_weilRep_le (realAction ε') g
-
 /-- Let `f` be a continuous homomorphism from U(ε) to U(ε′) with `‖f g‖ ≤ a * ‖g‖`. Then
 `detTwist f γ`, the Weil representation pulled back along `f` and twisted by `det ^ γ`, is strongly
 continuous, preserves the positive definite hermitian form `fockInner`, and has operator norm
@@ -388,7 +379,7 @@ lemma isUnitaryRep_detTwist {a : ℝ}
     positivity
   · -- The determinant has modulus one, and the multiplier grows at most like `‖f g‖ ^ card C`.
     calc ‖detTwist f γ g‖ = ‖realWeil (f g)‖ := by simp [norm_smul]
-      _ ≤ ‖(vacVector : fockSpace ε')‖ * ‖realMultiplier (f g)‖ := norm_realWeil_le (f g)
+      _ ≤ ‖(vacVector : fockSpace ε')‖ * ‖realMultiplier (f g)‖ := norm_weilRep_le (realAction ε') (f g)
       _ ≤ ‖(vacVector : fockSpace ε')‖ * a ^ card C * ‖(g : Matrix R R ℂ)‖ ^ card C := by
         grw [mul_assoc, ← mul_pow, norm_realMultiplier_le, h_norm]
 
@@ -529,27 +520,21 @@ lemma oscillatorRep_detTwist_inr (γ γ' : ℤ) :
     OscillatorRep (FockDualPair.std ε ε' γ γ')
       (detTwist ((pairHom ε ε').comp (MonoidHom.inr (USign ε') (USign ε))) γ) := by
   refine ⟨isUnitaryRep_detTwist (fun {z} ↦ norm_pairHom_le ε ε' 1 z) (by
-    rw [continuous_U_iff_matrix]; simp only [MonoidHom.comp_apply, MonoidHom.inr_apply, coe_pairHom]
-    fun_prop [kroneckerMap]), ?_,
-    fun P z hP_ne hP hz_pos ↦ ?_⟩
+    simp only [continuous_U_iff_matrix, MonoidHom.comp_apply, MonoidHom.inr_apply, coe_pairHom]
+    fun_prop [kroneckerMap]), ?_, ?_⟩
   · -- `Y` acts by `Y ⊗ 1`; compare the two actions on the matrix units.
     refine isDerivedAction_detTwist (kroneckerBilinear.flip 1) 1
-      (ext_linearMap ℂ fun a b ↦ LinearMap.ext_ring ?_) fun Y ↦ ?_
-    · suffices h_unit : (FockDualPair.std ε ε' γ γ').oscRows.E a b =
-          weilDeriv (pairSign 1 ε ε') (single a b 1 ⊗ₖ 1) +
-            (γ : ℂ) • (single a b (1 : ℂ)).trace • 1 by
-        simpa [GlModule.E, kroneckerBilinear] using h_unit
-      rw [weilDeriv_single_kronecker_one]
-      refine LinearMap.ext fun Q ↦ ?_
-      obtain rfl | h_ne := eq_or_ne a b <;>
-        simp [oscRows, oscRowsUnit, GlModule.E, smul_eq_C_mul, *]
-    · simp [coe_pairHom, kroneckerBilinear]
+      (ext_linearMap ℂ fun a b ↦ LinearMap.ext_ring <| LinearMap.ext fun Q ↦ ?_)
+      (fun Y ↦ by simp [coe_pairHom, kroneckerBilinear])
+    obtain rfl | h_ne := eq_or_ne a b <;>
+      simp [kroneckerBilinear, weilDeriv_single_kronecker_one,
+        oscRows, oscRowsUnit, smul_eq_C_mul, *]
   · -- `z ⊗ 1` is positive definite and keeps the columns.
-    refine fockInner_detTwist_pos Prod.snd hP_ne hz_pos ?_ (fun i j hij ↦ ?_) ?_
-    · simpa [coe_pairHom] using hz_pos.kronecker (PosDef.one (n := C))
-    · simp [coe_pairHom, one_apply_ne hij]
-    · rintro ⟨a, c⟩ ⟨b, -⟩ rfl h_sign
-      exact hP a b c (by simpa [pairSign] using h_sign)
+    refine fun P z hP_ne hP hz_pos ↦ fockInner_detTwist_pos Prod.snd hP_ne hz_pos
+      (by simpa [coe_pairHom] using hz_pos.kronecker (PosDef.one (n := C)))
+      (fun i j hij ↦ by simp [coe_pairHom, one_apply_ne hij]) ?_
+    rintro ⟨a, c⟩ ⟨b, -⟩ rfl h_sign
+    exact hP a b c (by simpa [pairSign] using h_sign)
 
 /-- For finite R, C with signs ε, ε′, let U(ε′) act on R × C matrices by x ↦ xg⁻¹ (`pairHom ε ε'` at
 (g, 1)). On the Fock space with sign ε_r ε′_c at the entry (r, c), the representation

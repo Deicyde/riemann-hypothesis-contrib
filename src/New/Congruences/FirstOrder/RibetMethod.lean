@@ -1,4 +1,7 @@
-import Lib.General.LinearAlgebra.Eigenvalues
+module
+
+public import Mathlib.RingTheory.TwoSidedIdeal.Instances
+public import Lib.General.LinearAlgebra.Eigenvalues
 
 /-!
 # Amitsur's formula and Ribet's method for matrices over an algebra
@@ -24,6 +27,8 @@ ideal whose traces are controlled.
   the constants from `O` and, as functions of `x`, the coefficients of the characteristic
   polynomials of the group elements.
 -/
+
+@[expose] public section
 
 namespace New
 
@@ -70,7 +75,7 @@ lemma amitsur_charpoly_comp_coeff_mem_range (ρ : Λ →ₐ[R] Matrix σ σ L)
     rw [hφ]
     obtain rfl | hi := eq_or_ne q i
     · simp [col, row, hφ, Matrix.one_apply, Matrix.sum_apply, Matrix.single, Matrix.mul_apply]
-    · simp [col, hi, hi.symm, Matrix.one_apply, Matrix.sum_apply, Matrix.mul_apply]
+    · simp [col, hi, hi.symm, Matrix.sum_apply, Matrix.mul_apply]
   have h_swap : row * col = ρ (Q q q) := by
     ext a b
     simp [col, row, hφ, Matrix.one_apply, Matrix.mul_apply]
@@ -133,7 +138,7 @@ lemma Selmer.exists_adjugate_polynomial (ρ : Λ →ₐ[R] Matrix σ σ L)
     ext i j
     by_cases h_ij : i = j
     · simp [h_ij, Algebra.smul_def]
-    · simp [h_ij, one_apply]
+    · simp [h_ij]
   refine ⟨P, B', ?_, fun i j m ↦ ?_⟩
   · -- The constant terms: `P(0)` and the determinant of `φX B` at `X = 0`.
     have h_map : (φX B).map constantCoeff = comp N N σ σ L (B.map fun p ↦ ρ (p.coeff 0)) := by

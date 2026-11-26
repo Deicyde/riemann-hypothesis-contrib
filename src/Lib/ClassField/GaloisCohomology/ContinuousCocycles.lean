@@ -1,4 +1,12 @@
-import Lib.ClassField.Places.GaloisDefs
+module
+
+public import Aesop.Frontend.Tactic
+public import Aesop.Main
+public import Mathlib.Algebra.Order.Star.Int
+public import Mathlib.FieldTheory.Galois.IsGaloisGroup
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.Topology.Algebra.Group.TopologicalAbelianization
+public import Lib.ClassField.Places.GaloisDefs
 
 /-!
 # Continuous cohomology of discrete modules: cocycles, H², cyclic classes, local Artin map
@@ -12,6 +20,7 @@ modules, and counts continuous 1-cocycles along exact sequences.
 
 ## Main definitions and results
 
+* `New.B1`: the 1-coboundaries among the continuous 1-cocycles `New.Z1`.
 * `New.Z2`, `New.B2`, `New.H2`: continuous 2-cocycles, coboundaries and their quotient.
 * `New.QZ`, `New.QZ.carry`, `New.QZChar`: the discrete group `ℚ/ℤ`, the carry of two representatives
   in `[0, 1)`, and continuous characters into `ℚ/ℤ`.
@@ -38,6 +47,8 @@ Known; see `Lib.ClassField.GaloisCohomology.KummerCyclicClasses`, `Lib.ClassFiel
 sources.
 -/
 
+@[expose] public section
+
 noncomputable section
 
 /-!
@@ -57,7 +68,6 @@ variable {R G M H N : Type*} [CommRing R] [Group G] [TopologicalSpace G] [AddCom
   [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R G M)
   [Group H] [TopologicalSpace H] [AddCommGroup N] [Module R N] [TopologicalSpace N]
   [DiscreteTopology N] {ρ' : Representation R H N} (φ : H →ₜ* G) (u : M →ₗ[R] N)
-  (h : ∀ (g : H) (m : M), u (ρ (φ g) m) = ρ' g (u m) := by bound)
 
 /-- On a discrete module, scalar multiplication by each constant of `R` is continuous. -/
 instance (priority := 100) : ContinuousConstSMul R M := ⟨by fun_prop⟩
@@ -75,6 +85,14 @@ def Z1 : Submodule R (G → M) :=
 /-- The coboundary map in degree 0: the `R`-linear map from `M` to functions `G → M` sending `m`
 to `g ↦ ρ g m - m`. -/
 abbrev coboundaryMap : M →ₗ[R] G → M := LinearMap.pi fun g ↦ ρ g - LinearMap.id
+
+/-- The 1-coboundaries of `ρ`, as a submodule of the continuous 1-cocycles: the cocycles of the form
+`g ↦ ρ g m - m` for some `m : M`. -/
+def B1 : Submodule R (Z1 ρ) := (LinearMap.range (coboundaryMap ρ)).comap (Z1 ρ).subtype
+
+variable {ρ} in
+lemma mem_B1_iff {z : Z1 ρ} : z ∈ B1 ρ ↔ ∃ m : M, ∀ g : G, ρ g m - m = (z : G → M) g := by
+  simp [B1, funext_iff]
 
 /-- The continuous 2-cocycles of `ρ`: continuous `f : G × G → M` with
 `f (g * h, k) = f (g, h * k) - f (g, h) + ρ g (f (h, k))`. -/
@@ -99,7 +117,12 @@ def B2 : Submodule R (G × G → M) :=
       module⟩
 
 /-- Continuous cohomology `H²(G, M)`: the continuous 2-cocycles of `ρ` modulo the coboundaries of
-continuous 1-cochains `G → M`. -/
+continuous 1-cochains `G → M`.
+
+For a discrete module `A`, this explicit quotient is identified with the cohomology `A.H 2`,
+Mathlib's `continuousCohomology 2`, by `New.DiscreteModule.H2EquivH`. It stays a separate definition
+until the class field theory built on it (`cyclicClass`, `IsLocalArtin`, `localArtin`) moves onto Tau
+Ceti's, which waits on Tau Ceti. -/
 @[instance_reducible]
 def H2 : Type _ := Z2 ρ ⧸ (B2 ρ).comap (Z2 ρ).subtype
   deriving AddCommGroup, Module R
@@ -111,8 +134,9 @@ variable {ρ}
 /-- For a continuous homomorphism `φ : H →ₜ* G` and an `R`-linear `u : M → N` with
 `u (ρ (φ g) m) = ρ' g (u m)` (the hypothesis `h`, proved by `bound` when it is not
 given), the additive map `f ↦ u ∘ f ∘ φ` from continuous 1-cocycles of `ρ` to those of `ρ'`. -/
-abbrev pairMapZ1 : Z1 ρ →+ Z1 ρ' where
-  toFun f := ⟨fun g ↦ u (f.1 (φ.1 g)), f.2.imp (by continuity) (by aesop)⟩
+abbrev pairMapZ1 (h : ∀ (g : H) (m : M), u (ρ (φ g) m) = ρ' g (u m) := by bound) :
+    Z1 ρ →+ Z1 ρ' where
+  toFun f := ⟨fun g ↦ u (f.val (φ.toMonoidHom g)), f.property.imp (by continuity) (by aesop)⟩
   map_zero' := by bound
   map_add' := by bound
 
@@ -120,7 +144,8 @@ abbrev pairMapZ1 : Z1 ρ →+ Z1 ρ' where
 `R`-linear `u : M → N` with `u (ρ (φ g) m) = ρ' g (u m)` (the hypothesis `h`, proved by
 `bound` when it is not given): the class of `f` goes to the class of
 `(g, g') ↦ u (f (φ g, φ g'))`. -/
-def pairMapH2 : H2 ρ →ₗ[R] H2 ρ' :=
+def pairMapH2 (h : ∀ (g : H) (m : M), u (ρ (φ g) m) = ρ' g (u m) := by bound) :
+    H2 ρ →ₗ[R] H2 ρ' :=
   mapQ (comap (Z2 ρ).subtype (B2 ρ)) (comap (Z2 ρ').subtype (B2 ρ'))
     { toFun f :=
         ⟨fun p ↦ u (f.1 (p.map φ φ)), by have := f.2.1; fun_prop, fun g g' g'' ↦ by simp [f.2.2, h]⟩
@@ -228,13 +253,13 @@ lemma carry_smul_mem_Z2 (χ : QZChar G) (w : ρ.invariants) :
   have hχ_cont : Continuous (χ : G → QZ) := χ.prop.left
   refine ⟨by fun_prop, fun g h k ↦ ?_⟩
   set f : G → QZ := (χ : G → QZ)
-  show (f (g * h)).carry (f k) • (w : M) =
+  change (f (g * h)).carry (f k) • (w : M) =
     (f g).carry (f (h * k)) • (w : M) - (f g).carry (f h) • (w : M) +
       ρ g ((f h).carry (f k) • (w : M))
   -- `w` is invariant, so this is the cocycle identity of the carry, times `w`
   have hf_mul (a b : G) : f (a * b) = f a + f b := QZChar.apply_mul χ a b
   have h_carry (a b c : QZ) : (a + b).carry c = a.carry (b + c) - a.carry b + b.carry c := by
-    linarith [QZ.carry_add_add_carry a b c]
+    linarith only [QZ.carry_add_add_carry a b c]
   have hw_inv : ρ g (w : M) = w := w.prop g
   rw [hf_mul, hf_mul, h_carry, map_zsmul, hw_inv, add_smul, sub_smul]
 
@@ -251,7 +276,7 @@ def cyclicClass : QZChar G →+ ρ.invariants →+ H2 ρ :=
       refine AddMonoidHom.ext fun w ↦ (Submodule.Quotient.eq _).mpr
         ⟨fun g ↦ (χ g).carry (ψ g) • -w, by fun_prop, fun g h ↦ ?_⟩
       have hw_inv : ρ g (w : M) = w := w.prop g
-      show (χ g + ψ g).carry (χ h + ψ h) • (w : M) -
+      change (χ g + ψ g).carry (χ h + ψ h) • (w : M) -
           ((χ g).carry (χ h) • (w : M) + (ψ g).carry (ψ h) • (w : M)) =
         ρ g ((χ h).carry (ψ h) • -(w : M)) - (χ (g * h)).carry (ψ (g * h)) • -(w : M) +
           (χ g).carry (ψ g) • -(w : M)
@@ -316,16 +341,9 @@ abbrev QZChar.ker : Subgroup Γ := (toHom χ).ker
 /-- `QZChar.toHom χ` sends `g` to `χ g`, written multiplicatively. -/
 lemma QZChar.toHom_apply (g : Γ) : toHom χ g = Multiplicative.ofAdd ((χ : Γ → QZ) g) := rfl
 
-/-- An element `g` lies in the kernel of the character `χ` exactly when `χ g = 0`. -/
-lemma QZChar.mem_ker_iff {g : Γ} : g ∈ QZChar.ker χ ↔ (χ : Γ → QZ) g = 0 := by
-  rw [QZChar.ker, MonoidHom.mem_ker, toHom_apply, ofAdd_eq_one]
-
 /-- The kernel of a continuous character `χ : Γ → ℚ/ℤ` is closed in `Γ`. -/
-lemma QZChar.isClosed_ker : IsClosed (QZChar.ker χ : Set Γ) := by
-  have h_ker : (QZChar.ker χ : Set Γ) = (χ : Γ → QZ) ⁻¹' {0} :=
-    Set.ext fun g ↦ QZChar.mem_ker_iff χ
-  rw [h_ker]
-  exact (isClosed_discrete {0}).preimage χ.prop.left
+lemma QZChar.isClosed_ker : IsClosed (QZChar.ker χ : Set Γ) :=
+  (isClosed_discrete {0}).preimage χ.prop.left
 
 /-- The homomorphism induced by the continuous character `χ` on the topological abelianisation of
 `Γ`, with values in `ℚ/ℤ` written multiplicatively. -/
@@ -333,7 +351,7 @@ def QZChar.abelianLift [IsTopologicalGroup Γ] (χ : QZChar Γ) :
     TopologicalAbelianization Γ →* Multiplicative QZ :=
   -- the kernel is closed and contains the commutators
   QuotientGroup.lift (commutator Γ).topologicalClosure (toHom χ)
-    (closure_minimal (Abelianization.commutator_subset_ker (toHom χ)) (QZChar.isClosed_ker χ))
+    (closure_minimal (Group.Abelianization.commutator_le_ker (toHom χ)) (QZChar.isClosed_ker χ))
 
 variable (Γ)
 
@@ -574,10 +592,6 @@ lemma IsShortExact.restrictAlong (h_exact : IsShortExact ι π) :
 restricted action. -/
 abbrev submodule : DiscreteModule R Γ := of (A.ρ.subrepresentation W h)
 
-private lemma discreteTopology_quotient : DiscreteTopology (A.V ⧸ W) :=
-  discreteTopology_iff_forall_isOpen.mpr fun s ↦
-    (W.isOpenQuotientMap_mkQ.isQuotientMap.isOpen_preimage (s := s)).mp (isOpen_discrete _)
-
 /-- For a Γ-stable R-submodule W of a discrete Γ-module A, the quotient A ⧸ W as a discrete
 Γ-module, with the action induced on cosets. -/
 abbrev quotient : DiscreteModule R Γ :=
@@ -585,7 +599,8 @@ abbrev quotient : DiscreteModule R Γ :=
     -- The action on cosets is continuous, as `Γ × A → Γ × (A ⧸ W)` is an open quotient map.
     ((IsOpenQuotientMap.id.prodMap W.isOpenQuotientMap_mkQ).continuous_comp_iff.mp
       (W.mkQL.cont.comp A.continuous))
-    (discrete := discreteTopology_quotient A W)
+    (discrete := discreteTopology_iff_forall_isOpen.mpr fun s ↦
+      (W.isOpenQuotientMap_mkQ.isQuotientMap.isOpen_preimage (s := s)).mp (isOpen_discrete _))
 
 /-- For a `Γ`-stable submodule `W` of `A`, the inclusion and the quotient map form a short exact
 sequence `0 → W → A → A ⧸ W → 0` of discrete `Γ`-modules. -/
@@ -685,12 +700,7 @@ private lemma mem_Z1_of_injective_of_comp_mem_Z1 (hι : Injective ι) (f : Γ �
       ∀ g g' : Γ, ι (f (g * g')) = ι (f g) + N.ρ g (ι (f g')) := hf
   refine ⟨?_, fun g g' ↦ hι ?_⟩
   · -- `M` is discrete, and each fibre of `f` is a fibre of `ι ∘ f` since `ι` is injective.
-    refine continuous_discrete_rng.mpr fun m ↦ ?_
-    have h_fibre : f ⁻¹' {m} = (⇑ι ∘ f) ⁻¹' {ι m} := by
-      ext x
-      simp [hι.eq_iff]
-    rw [h_fibre]
-    exact (isOpen_discrete {ι m}).preimage hf_cont
+    exact (((IsLocallyConstant.iff_continuous _).2 hf_cont).desc f ⇑ι hι).continuous
   · simpa [ι.isIntertwining] using hf_cocycle g g'
 
 /-- Let `ι : M → N` be injective and `π : N → P` have kernel the image of `ι`. Then for every

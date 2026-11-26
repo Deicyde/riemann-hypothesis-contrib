@@ -1,5 +1,7 @@
-import Lib.SiegelWeil.RallisInner.SharpData
-import Lib.Weil.CompactLift.DefiniteThetaLift
+module
+
+public import Lib.SiegelWeil.RallisInner.SharpData
+public import Lib.Weil.CompactLift.DefiniteThetaLift
 
 /-!
 # Theta lift of an algebraic form to a larger definite unitary group and its Hecke polynomials
@@ -30,6 +32,8 @@ string of a character of U(1). Source: Blasius, Rogawski, Motives for Hilbert mo
 Math. 114 (1993) and Shin, Ann. of Math. 173 (2011) for the idea (endoscopic transfer to odd rank);
 Harris, Soudry, Taylor, Invent. Math. 112 (1993) for theta lifts with a varying character.
 -/
+
+@[expose] public section
 
 /-!
 ## The monic Hecke polynomial and the reciprocal one
@@ -168,11 +172,11 @@ private lemma weilMatrixCoeff_finHeisenbergOp_eq_zero {m : Type} [Fintype m] [De
   have h_pt : (((1, g), 1) : G E (1 : n → ℤˣ) × G E (1 : m → ℤˣ)) = ((1, g), 1, 1) := rfl
   rw [weilMatrixCoeff, pairWeil_apply, h_pt, onHom_fin, omega_finHeisenbergOp, omega_vacElem,
     ← dataInner_finHeisenbergOp _ (-matrixToVec (z • x))]
-  simp [finHeisenbergOp_finHeisenbergOp, Prod.mk_one_one, onHom_snd, mulVec_smul]
+  simp [finHeisenbergOp_finHeisenbergOp, mulVec_smul]
   -- `simp` leaves a product of scalars and an inner product; it is enough that the last vanishes:
   -- the inner product of the vacuum with a translate of `ω(g) P ω(g⁻¹)` of the vacuum.
   refine .inr (.inr (.inr ?_))
-  show dataInner _ (vacElem _)
+  change dataInner _ (vacElem _)
       (finHeisenbergOp _ (-(z • matrixToVec x) + _) (ω _ _ (projOn _ univ (ω _ _ (vacElem _))))) = 0
   -- The inner projection is a mean over integral `u`, so it is enough that each term vanishes
   -- (`map_projOn_eq_const`). The projection that fixes the left vacuum, moved to the right, kills
@@ -185,7 +189,7 @@ private lemma weilMatrixCoeff_finHeisenbergOp_eq_zero {m : Type} [Fintype m] [De
   simp [rep_apply_apply, stdLattice.mem_stdLattice, onHom_snd, Prod.mk_one_one,
     finHeisenbergOp_finHeisenbergOp, matrixToVec, projOn_finHeisenbergOp, mem_integralBox,
     Set.conjClosure, idem_univ]
-  show ∀ u : m × n → 𝔸f E, (∀ (a : m) (b : n), u (a, b) ∈ Ô E) →
+  change ∀ u : m × n → 𝔸f E, (∀ (a : m) (b : n), u (a, b) ∈ Ô E) →
     (∀ (a : m) (b : n),
       -(z * x a b) +
           z * (kroneckerMap (fun y₁ y₂ ↦ y₁ * y₂) 1 (g.val.val)⁻¹ᵀ *ᵥ matrixToVec x) (a, b) +
@@ -332,25 +336,10 @@ private lemma frobValue_div_mul_heckeCoeff_eq_one {b : AutChar E} {c : InfiniteP
     (hb : b.HasWeight c 1) (s : ℕ) (w : FinPlace E) :
     w.q ^ s * frobValue 1 n w / b.frobValue (Fin (card n + s)) w *
       heckeCoeff (hb.toAlgebraic s s).val.fst ∅ w = 1 := by
-  have hq : ((√(w.q : ℝ) : ℝ) : ℂ) ≠ 0 :=
-    Complex.ofReal_ne_zero.2 (Real.sqrt_ne_zero'.2 (Nat.cast_pos.2 (zero_lt_one.trans w.one_lt_q)))
-  simp [HasWeight.toAlgebraic, frobValue, w.coe_q_eq_sq_sqrt, HeckeChar.atUniformizer, heckeCoeff,
-    AutChar.spaceChar, zpow_sub₀, zpow_mul (_ : ℂ), field, hq]
+  simp [HasWeight.toAlgebraic, frobValue, w.coe_q_eq_sq_sqrt, w.ne_bot, HeckeChar.atUniformizer,
+    heckeCoeff, AutChar.spaceChar, zpow_sub₀, zpow_mul (_ : ℂ), field]
   -- What is left is a rearrangement of powers of `√q_w` and of `υ` at a uniformiser.
   ring
-
-omit [DecidableEq n] in
-/-- For `l < s`, the value at `w` of the algebraic Hecke character `hb.toAlgebraic (card n + s)
-(s - l)` is `q_w ^ l * frobValue 1 n w` times that of `hb.toAlgebraic s s`. Here `b` is a character
-of `U(1)` of weight `c`. -/
-private lemma heckeCoeff_toAlgebraic_eq {b : AutChar E} {c : InfinitePlace E → ℤ}
-    (hb : b.HasWeight c 1) {s : ℕ} (w : FinPlace E) (l : Fin s) :
-    heckeCoeff (hb.toAlgebraic (card n + s) (s - l)).val.fst ∅ w =
-      w.q ^ (l : ℕ) * frobValue 1 n w * heckeCoeff (hb.toAlgebraic s s).val.fst ∅ w := by
-  have hq : ((√(w.q : ℝ) : ℝ) : ℂ) ≠ 0 :=
-    Complex.ofReal_ne_zero.2 (Real.sqrt_ne_zero'.2 (Nat.cast_pos.2 (zero_lt_one.trans w.one_lt_q)))
-  simp [HasWeight.toAlgebraic, frobValue, w.coe_q_eq_sq_sqrt, HeckeChar.atUniformizer, heckeCoeff,
-    AutChar.spaceChar, zpow_add₀, zpow_sub₀, zpow_mul (_ : ℂ), field, hq]
 
 /-- Rallis' inner product formula makes the theta lift injective on forms of level `J`. Let `b` be
 a character of `U(1)` of weight `c`, `v` an edge from type `l` to type `l'` (`IsEdge`), `Ψ` sharp
@@ -423,7 +412,10 @@ private lemma exists_hasHeckePolyAt_scaleRoots_eq {κ' : InfinitePlace E → ℕ
   exact scaleRoots_heckePoly_eq w
     (fun l ↦ heckeCoeff (hb.toAlgebraic (card n + s) (s - l)).val.fst ∅ w)
     (hF_eig.isMonicOfDegree hF_ne).natDegree_eq h_eigval
-    (frobValue_div_mul_heckeCoeff_eq_one hb s w) (heckeCoeff_toAlgebraic_eq hb w)
+    (frobValue_div_mul_heckeCoeff_eq_one hb s w) (by
+      intro l
+      simp [HasWeight.toAlgebraic, frobValue, w.coe_q_eq_sq_sqrt, w.ne_bot, HeckeChar.atUniformizer,
+        heckeCoeff, AutChar.spaceChar, zpow_add₀, zpow_sub₀, zpow_mul (_ : ℂ), field])
 
 /-- Theta lift by `s > n` steps. Let `f ≠ 0` be a form of rank `n ≥ 1` and weight `(κ, e)`, and let
 `b` be a character of `U(1)` of weight `c ≤ e` with trivial tame part (`b u = ∏ u_v^{c v}` for `u`

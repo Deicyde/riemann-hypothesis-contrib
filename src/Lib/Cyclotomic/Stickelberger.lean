@@ -1,5 +1,7 @@
-import Lib.GaloisRep.Main.SelmerModules
-import Lib.General.NumberTheory.FrobeniusOrbits
+module
+
+public import Lib.GaloisRep.Main.SelmerModules
+public import Lib.General.NumberTheory.FrobeniusOrbits
 
 /-!
 # A weak form of Stickelberger's theorem for Gauss sums, and a family of Jacobi-type quotients
@@ -34,6 +36,8 @@ The product relation is proved for Jacobi-type quotients of Gauss sums and only 
 unity. Source: L. Washington, Introduction to Cyclotomic Fields, 2nd ed. 1997, 6.2 and Thm 15.1; for
 the product relation, H. Davenport, H. Hasse, J. reine angew. Math. 172 (1935).
 -/
+
+@[expose] public section
 
 namespace New.OddPart
 
@@ -163,8 +167,7 @@ lemma stickelberger (hB : B.valuation p < 1) {ψ : AddChar (ZMod p) (𝓞 Ω)}
   have ord_pos (u : DiscreteUnits Ω) {χ' : MulChar (ZMod p) (𝓞 Ω)} {ψ' : AddChar (ZMod p) (𝓞 Ω)}
       (hu : u.toMul.val = gaussSum χ' ψ') (hχ' : χ' ≠ 1) : 0 < ordRat ℚ B u := by
     have h_cen : gaussSum χ' ψ' - gaussSum χ' 1 ∈ centrePrime Ω B := by
-      simp [gaussSum, mk_centrePrime_eq_one_of_pow_eq_one hB, ← Submodule.Quotient.mk_eq_zero,
-        ← map_nsmul_eq_pow, natCast_self]
+      simp [gaussSum, mk_centrePrime_eq_one_of_pow_eq_one hB, ← Submodule.Quotient.mk_eq_zero]
     rw [gaussSum_one_right hχ', sub_zero, mem_centrePrime] at h_cen
     rw [lt_iff_le_and_ne, ne_comm, Ne, hv.ordRat_nonneg_iff, hv.ordRat_eq_zero_iff, hu]
     exact ⟨algebraMap_ringOfIntegers_mem B (gaussSum χ' ψ'), h_cen.ne⟩

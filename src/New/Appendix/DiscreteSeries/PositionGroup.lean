@@ -1,5 +1,8 @@
-import New.Appendix.DiscreteSeries.Periods
-import New.Appendix.DiscreteSeries.StationaryPosition
+module
+
+public import Lib.General.LinearAlgebra.BlockEmbeddings
+public import New.Appendix.DiscreteSeries.Periods
+public import New.Appendix.DiscreteSeries.StationaryPosition
 
 /-!
 # The group of a position
@@ -29,6 +32,8 @@ Notions from other files:
   and decreases in `[-3 B, -B]` on the other coordinates, with alternating signs there.
 * `IsLaplaceDatum` collects the hypotheses of Laplace's method on a map into `U(ε) × U(η)`.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -347,7 +352,7 @@ theorem IsStationary.isLaplaceDatum [Fintype X] [DecidableEq X] {l : HCParam ε}
     rw [← formAdjoint_inclMatrix (τ := e' ∘ Sum.inl) h_sign_inl, ← formAdjoint_mul, h_inc,
       formAdjoint_inclMatrix (τ := e ∘ Sum.inl) h_steep.sign_inl]
   refine ⟨g, Prod.ext ?_ hy⟩
-  show (g : Matrix n n ℂ) - 1 =
+  change (g : Matrix n n ℂ) - 1 =
     inclMatrix ℂ (e ∘ Sum.inl) * (u - 1) * (inclMatrix ℂ (e ∘ Sum.inl))ᴴ
   rw [hg, hy, Matrix.mul_assoc, Matrix.mul_assoc, h_inc_adj, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
     h_inc]
@@ -456,7 +461,7 @@ theorem IsStationary.period_lower_bound_of_surjective [Fintype X] [DecidableEq X
     simp (disch := fun_prop) only [Measure.map_map, Function.comp_def, map_mul]⟩
   have : IsFiniteMeasureOnCompacts (ν.map f) := ⟨fun K hK ↦ by
     rw [Measure.map_apply hf hK.measurableSet, ← Set.preimage_image_eq K Subtype.val_injective]
-    exact (h_proper.isCompact_preimage (hK.image continuous_subtype_val)).measure_lt_top⟩
+    exact (h_proper.isCompact_preimage (hK.image continuous_subtypeVal)).measure_lt_top⟩
   obtain ⟨h_int, h_vol⟩ := hP.integrable_periodIntegrand_and_measure_le h_steep hB h_sign_inl
     h_weight_inl
     h_weight_nonneg h_weight_le hl_gap hk_gap hl_le hk_le hβ h_card hh (ν.map f)
@@ -734,7 +739,11 @@ theorem IsSteep.exists_volume_le_mul_norm_integral_dsCoeff [Nonempty n] {B β : 
     simp [j, mul_comm]
   have h_ball : {g : USign ε | ‖(g : Matrix n n ℂ) - 1‖ ≤ 1} ⊆ Large := fun g hg ↦
     ⟨(norm_conj_inl_le w hg).trans (by linarith),
-      norm_le_add_one_of_norm_sub_one_le (by linarith) hg⟩
+      by
+        change ‖(g : Matrix n n ℂ)‖ ≤ β + 1
+        refine (norm_le_norm_add_norm_sub' _ 1).trans ?_
+        rw [norm_one]
+        exact add_le_add (by linarith) hg⟩
   refine ⟨w⁻¹, by rwa [U.norm_inv], ENNReal.toReal_le_of_le_ofReal (by positivity) ?_⟩
   simpa only [h_integrand, inv_inv] using (measure_mono h_ball).trans h_period
 

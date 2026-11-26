@@ -1,4 +1,6 @@
-import New.Congruences.FirstOrder.FittingBlock
+module
+
+public import New.Congruences.FirstOrder.FittingBlock
 
 /-!
 # Tied rows and the matrices of Ribet's method to first order
@@ -30,6 +32,8 @@ Notions from other files:
   `c γ = 0`, then every `χ g - 1` kills `c a`.
 * `New.Selmer.IsDetectedBy` (`FittingBlock`): an element of the module that vanishes on `s` is zero.
 -/
+
+@[expose] public section
 
 section RibetFirstOrder
 
@@ -196,15 +200,6 @@ lemma map_augmentationIdeal_le_tieIdeal {p : O} {τ φ : J × Bool → G} {ε : 
     (augmentationIdeal (O := O) (G := G) J).map (.mulRight (MvPolynomial J O)[G] (p • 1)) ≤
       tieIdeal u p τ φ ε ρ₀ :=
   le_sup_right.trans (le_sup_left.trans le_sup_left)
-
-/-- The tie `τ k - 1 - X j * (ε j)(φ k) * (φ k - 1)` of index `k = (j, b)` lies in the tie
-ideal. -/
-lemma tie_mem_tieIdeal {p : O} {τ φ : J × Bool → G} {ε : J → O[X]} {ρ₀ : (MvPolynomial J O)[G]}
-    (k : J × Bool) :
-    MonoidAlgebra.single (τ k) 1 - 1 - (MvPolynomial.X k.1 : MvPolynomial J O) •
-      (aeval (MonoidAlgebra.of (MvPolynomial J O) G (φ k)) (ε k.1) *
-        (MonoidAlgebra.single (φ k) 1 - 1)) ∈ tieIdeal u p τ φ ε ρ₀ :=
-  mem_sup_left (mem_sup_right (subset_span ⟨k, rfl⟩))
 
 /-- For `r` in the augmentation ideal, `r ρ₀` lies in the tie ideal. -/
 lemma mul_mem_tieIdeal {p : O} {τ φ : J × Bool → G} {ε : J → O[X]} {ρ₀ : (MvPolynomial J O)[G]}
@@ -373,7 +368,7 @@ lemma coordRows_tau_sub_mem_tiedRows {ι : Type} [Fintype ι] {gen : ι → G} {
     simp only [map_sub, LinearMap.map_smul_of_tower, map_smul, smul_eq_mul, mul_sub, smul_sub]
     abel
   rw [mem_tiedRows, h_val]
-  refine add_mem (tie_mem_tieIdeal u i) (ker_le_tieIdeal u ?_)
+  refine add_mem (mem_sup_left (mem_sup_right (subset_span ⟨i, rfl⟩))) (ker_le_tieIdeal u ?_)
   exact sub_mem (h_ker (τ i))
     (Submodule.smul_of_tower_mem _ _ (Ideal.mul_mem_left _ c (h_ker (φ i))))
 
@@ -514,20 +509,7 @@ lemma exists_mem_tiedRows_polyActionAtZero_eq {r ι : Type} [Fintype r] [Decidab
       _ = A := by rw [hc₁, one_smul]
   refine ⟨(MonoidAlgebra.single γ (1 : MvPolynomial J O) - 1) • normaliserRow z γ a c₁,
     sub_one_smul_normaliserRow_mem_tiedRows u hz γ a c₁ γ, fun j ↦ ?_⟩
-  simp [normaliserRow, polyActionAtZero_single, hργ, h_one, mul_add, sub_mul, map_smul, sub_smul]
-
-/-- For a representation `ρ` on which `γ` acts as the scalar `y`, with `y - 1` a unit, a coboundary
-that vanishes at `γ` is zero: its value at `γ` is `(y - 1) m`. So a cohomology class has at most one
-cocycle that vanishes at `γ`, which is why such cocycles can stand for classes. The Selmer groups
-are defined through these cocycles. -/
-lemma coboundary_eq_zero_of_apply_eq_zero {n B : Type} [Fintype n] [DecidableEq n]
-    [AddCommGroup B] [Module O B] (ρ : G →* Matrix n n O) {γ : G} {y : O} (hργ : ρ γ = y • 1)
-    (hy : IsUnit (y - 1)) {m : n → B} (hγ : ρ γ • m - m = 0) (g : G) :
-    ρ g • m - m = 0 := by
-  have h_unit : (y - 1) • m = 0 :=
-    calc (y - 1) • m = ρ γ • m - m := by rw [hργ, smul_assoc, one_smul, sub_smul, one_smul]
-      _ = 0 := hγ
-  rw [hy.smul_eq_zero.1 h_unit, smul_zero, sub_zero]
+  simp [normaliserRow, polyActionAtZero_single, hργ, h_one, mul_add, sub_mul, map_smul]
 
 /-- Let `u x` (`x : Y`) be matrix representations of the group `G` over `O`, with
 `u x g - 1 = ∑ z g i (u x (gen i) - 1)` for all `g` and `x` (`AreCoordinates`). Let the matrices
@@ -536,7 +518,7 @@ length of the module of cocycles of `ρ` with values in `K/O` (`K` the fraction 
 linear relations among the families `(u x g - 1)_x` and vanish at the `τ k` and at `γ`. Then some
 square matrix of tied rows, for `ρ₀ = n + (1 - n) (a - 1)` with `n = c₁ (γ - 1)` (`tiedNormaliser`),
 has through `ρ` at `X j = 0` a determinant of valuation at most `b₀`. -/
-lemma exists_tiedRows_addVal_det_le [DVR O] [Fintype J] {r ι : Type} [Fintype r] [DecidableEq r]
+lemma exists_tiedRows_addVal_det_le [DVR O] {r ι : Type} [Fintype r] [DecidableEq r]
     [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix r r O) (hρ_span : span O (Set.range ρ) = ⊤)
     {γ : G} {y : O}
     (hργ : ρ γ = y • 1) {c₁ : O} (hc₁ : c₁ * (y - 1) = 1) (a : G) {gen : ι → G} {z : G → ι → O}
@@ -570,7 +552,7 @@ every linear form `Ψ` with values in `O / p` on coordinate vectors that kills t
 `K`, the function `Ψ ∘ z` is a cocycle for `ξ` in the sense of `IsCharacterCocycle`: it obeys the
 linear relations among the families `(u x g - 1)_x`, vanishes at the `δ w`, and if it vanishes at
 `γ` then every `ξ g - 1` kills its value at `a`. -/
-lemma isCharacterCocycle_of_tiedRows [DVR O] {ξ : G →* O}
+lemma isCharacterCocycle_of_tiedRows {ξ : G →* O}
     [Fintype W] {δ : W → G} {ι' : Type} [Fintype ι'] {gen' : ι' → G} {z : G → W ⊕ ι' → O}
     (hz : AreCoordinates u (δ ⊕ᵥ gen') z)
     {γ a : G} (hξγ : ξ γ = 1) (c₁ : O) {r' : Type}
@@ -608,69 +590,6 @@ lemma isCharacterCocycle_of_tiedRows [DVR O] {ξ : G →* O}
     simp [normaliserRow, polyChar_coordRows, polyChar_single, hξγ, AlgHom.map_smul_of_tower,
       MvPolynomial.smul_eq_C_mul]
   exact isCharacterCocycle_of_mem_formsMod u Φ z K ξ δ a γ c₁ h_cocycle h_δ h_rel h_fix
-
-/-- The relations on a character `ξ`. Let `u x` (`x : Y`) be matrix representations of the group `G`
-over `O`, and let the generators `gen` be the `δ w` and the `gen' i`. Let `b` be a row over `O[X j]`
-on the coordinates of the `gen' i`. It is the image of a tied row, read on `ξ` with the
-`δ`-coordinates forgotten (`evalRowAtChar`), if and only if the element `∑ b i (gen' i - 1)`
-(`rowValue`) lies in the sum of three left ideals: `tieIdeal`, the values of the rows with entries
-in the kernel of `polyChar J ξ`, and the values of the rows on the `δ`-coordinates (the left ideal
-of the `δ w - 1`). -/
-lemma mem_map_tiedRows_iff {W' ι' : Type} [Fintype W'] [Fintype ι'] {δ : W' → G} {gen' : ι' → G}
-    {ρ₀ : (MvPolynomial J O)[G]} (ξ : G →* O) (b : ι' → MvPolynomial J O) :
-    b ∈ ((tiedRows u (δ ⊕ᵥ gen') p τ φ ε ρ₀).restrictScalars (MvPolynomial J O)).map
-        (evalRowAtChar J ξ W' ι') ↔
-      rowValue J (δ ⊕ᵥ gen') (Sum.elim 0 fun i : ι' ↦ MonoidAlgebra.single 1 (b i)) ∈
-        tieIdeal u p τ φ ε ρ₀ ⊔
-          (Submodule.pi Set.univ fun _ : W' ⊕ ι' ↦ RingHom.ker (polyChar J ξ)).map
-            (rowValue J (δ ⊕ᵥ gen')) ⊔
-          (Submodule.pi (Set.range inr) fun _ : W' ⊕ ι' ↦ ⊥).map (rowValue J (δ ⊕ᵥ gen')) := by
-  let V : (W' ⊕ ι' → (MvPolynomial J O)[G]) →ₗ[(MvPolynomial J O)[G]] (MvPolynomial J O)[G] :=
-    rowValue J (δ ⊕ᵥ gen')
-  let b' : W' ⊕ ι' → (MvPolynomial J O)[G] := Sum.elim 0 fun i ↦ MonoidAlgebra.single 1 (b i)
-  let K : Submodule (MvPolynomial J O)[G] (W' ⊕ ι' → (MvPolynomial J O)[G]) :=
-    Submodule.pi Set.univ fun _ ↦ RingHom.ker (polyChar J ξ)
-  let D : Submodule (MvPolynomial J O)[G] (W' ⊕ ι' → (MvPolynomial J O)[G]) :=
-    Submodule.pi (Set.range inr) fun _ ↦ ⊥
-  change _ ↔ V b' ∈ tieIdeal u p τ φ ε ρ₀ ⊔ K.map V ⊔ D.map V
-  have h_char (c : MvPolynomial J O) : polyChar J ξ (MonoidAlgebra.single 1 c) = c := by
-    simp [polyChar_single]
-  constructor
-  · -- Split `w` into its `δ`-part `r₁`, a row `r₂` with entries in `ker ξ`, and the row `b'`.
-    rintro ⟨w, hw, hwb⟩
-    have hb (i : ι') : polyChar J ξ (w (inr i)) = b i := by rw [← evalRowAtChar_apply, hwb]
-    let r₁ : W' ⊕ ι' → (MvPolynomial J O)[G] := Sum.elim (fun x ↦ w (inl x)) 0
-    let r₂ : W' ⊕ ι' → (MvPolynomial J O)[G] :=
-      Sum.elim 0 fun i ↦ w (inr i) - MonoidAlgebra.single 1 (b i)
-    have h_split : b' = w - r₂ - r₁ := by
-      funext j
-      cases j <;> simp [b', r₁, r₂]
-    have hr₂ : r₂ ∈ K := by
-      rintro (x | i) -
-      · simp [r₂]
-      · simp [r₂, RingHom.mem_ker, h_char, hb]
-    have hr₁ : r₁ ∈ D := by
-      rintro _ ⟨i, rfl⟩
-      simp [r₁]
-    have hw_tie : V w ∈ tieIdeal u p τ φ ε ρ₀ := mem_comap.1 hw
-    rw [h_split, map_sub, map_sub]
-    exact sub_mem (sub_mem (mem_sup_left (mem_sup_left hw_tie))
-      (mem_sup_left (mem_sup_right (mem_map_of_mem hr₂)))) (mem_sup_right (mem_map_of_mem hr₁))
-  · -- Subtract the row with entries in `ker ξ` and the `δ`-row from `b'`.
-    intro h_mem
-    obtain ⟨t, ht, r₂, hr₂, r₁, hr₁, h_sum⟩ :
-        ∃ t ∈ tieIdeal u p τ φ ε ρ₀, ∃ r₂ ∈ K, ∃ r₁ ∈ D, t + V r₂ + V r₁ = V b' := by
-      obtain ⟨y, hy, _, ⟨r₁, hr₁, rfl⟩, h_sum⟩ := mem_sup.1 h_mem
-      obtain ⟨t, ht, _, ⟨r₂, hr₂, rfl⟩, rfl⟩ := mem_sup.1 hy
-      exact ⟨t, ht, r₂, hr₂, r₁, hr₁, h_sum⟩
-    have h_val : V (b' - r₂ - r₁) = t := by
-      rw [map_sub, map_sub, ← h_sum]
-      abel
-    have h_tie : V (b' - r₂ - r₁) ∈ tieIdeal u p τ φ ε ρ₀ := by rwa [h_val]
-    refine ⟨b' - r₂ - r₁, mem_comap.2 h_tie, funext fun i ↦ ?_⟩
-    have h₂ : polyChar J ξ (r₂ (inr i)) = 0 := RingHom.mem_ker.1 (hr₂ (inr i) (Set.mem_univ _))
-    have h₁ : r₁ (inr i) = 0 := (Submodule.mem_bot _).1 (hr₁ (inr i) ⟨i, rfl⟩)
-    simp [b', h₂, h₁, h_char, evalRowAtChar_apply]
 
 /-- The ties hold on the character `ξ e`. Let `u x` (`x : Y`) be matrix representations of the group
 `G` over `O`, let the generators `gen` be the `δ w` and the `gen' i`, with
@@ -969,14 +888,8 @@ lemma nonempty_characterRows [DVR O] [Fintype J] [LinearOrder J] [DecidableEq G]
       ∃ d ∈ fittingIdeal (K e), ∃ ζ ∈ 𝔮 e, d + ζ = Γ e * ∏ j with ty j = e, .X j :=
     mem_sup.1 (fittingIdeal.sup_smul_top_le (hΓ e))
   choose d hd ζ hζ hdζ using h_split
-  have h_expand (e : Fin t) : ∃ (l : ℕ) (w : Fin l → Λ) (B : Fin l → Matrix s s Λ)
-      (B' : Fin l → s → W ⊕ s₀ ⊕ s → Λ[G]),
-      (∀ (i : Fin l) (j : s), B' i j ∈ N) ∧
-      (∀ (i : Fin l) (j : s) (k : s₀), η e (B' i j (inr (inl k))) = 0) ∧
-      (∀ (i : Fin l) (j : s), (fun k : s ↦ η e (B' i j (inr (inr k)))) = B i j) ∧
-      ∑ i : Fin l, w i * (B i).det = d e :=
+  choose l w B B' hB' hB'_zero hB'_eq hw using fun e : Fin t ↦
     exists_sum_mul_det_of_mem_fittingIdeal_evalRowAtChar (ξ e) hν (hν_eq e) (hd e)
-  choose l w B B' hB' hB'_zero hB'_eq hw using h_expand
   -- Choose one `B e (i e)` for each `e`. Without the coordinates of the `δ v`, the rows `ν j` and
   -- `B' e (i e) j` meet the hypotheses of `exists_rows_det_eq_pow_mul_det`.
   let forget : (W ⊕ s₀ ⊕ s → Λ[G]) →ₗ[Λ[G]] s₀ ⊕ s → Λ[G] := LinearMap.funLeft _ _ inr

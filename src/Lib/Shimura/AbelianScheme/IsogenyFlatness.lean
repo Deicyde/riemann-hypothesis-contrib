@@ -1,5 +1,11 @@
-import Lib.General.Geometry.GeometricPoints
-import Lib.General.Geometry.PointsOfProperSchemes
+module
+
+import TauCeti.AlgebraicGeometry.Morphisms.Flat.Descent
+public import Mathlib.AlgebraicGeometry.ZariskisMainTheorem
+public import Mathlib.CategoryTheory.Limits.Shapes.Connected
+public import Mathlib.RingTheory.Etale.Weakly
+public import TauCeti.AlgebraicGeometry.Morphisms.Smooth.GeometricallyReduced
+public import Lib.General.Geometry.PointsOfProperSchemes
 
 /-!
 # Isogenies: factorisation of homomorphisms, finiteness and flatness
@@ -28,6 +34,8 @@ result and a local ring for the second. Source: B. Edixhoven, G. van der Geer, B
 Varieties (draft), ch. IV §3; The Stacks project, Section 0BF9; EGA IV and S. Bosch, W.
 Lütkebohmert, M. Raynaud, Néron Models (1990) 7.3, 8.1.
 -/
+
+@[expose] public section
 
 open CategoryTheory Category AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory
   Algebra TensorProduct HasRingHomProperty MorphismProperty RingHom Module Flat LinearMap
@@ -164,14 +172,6 @@ lemma isPullback_fst_comp_add {S : Scheme.{0}} {A B Z : Over S} [AddObj A] [AddO
     simp [← h_eq, AddGrpObj.sub_comp, comp_add]
   exact ⟨square.lift (b - c ≫ fst A Z) c h_sq, by simp [comp_add]⟩
 
-/-- Flatness of morphisms of schemes descends along fpqc covers, that is, along surjective, flat
-and quasi-compact morphisms. -/
-lemma flat_descendsAlong_fpqc :
-    DescendsAlong (@AlgebraicGeometry.Flat : MorphismProperty Scheme.{0})
-      (@Surjective ⊓ @AlgebraicGeometry.Flat ⊓ @QuasiCompact) := by
-  refine descendsAlong_flat (P := @Flat) <| .mk _ respectsIso <| ?_
-  simp_all [flat_algebraMap_iff, faithfullyFlat_algebraMap_iff, iff_flat_tensorProduct]
-
 /-- Let f : A → B be a surjective, quasi-compact homomorphism of abelian schemes over Spec R, and
 u : Spec D → B a flat map over Spec R, where D is an R-algebra and Spec D → Spec R is surjective.
 If the pull-back g : X → Spec D of f along u is flat, then f is flat, by descent along the fpqc
@@ -201,7 +201,7 @@ lemma flat_left_of_isPullback_flat {R : Type} [CommRing R] {A B : Over (Spec ⟨
   have base_flat : Flat (pullback.snd f v).left :=
     of_isPullback (((IsPullback.of_hasPullback f v).map (Over.forget _)).of_right' h_pb) hg
   -- Descend along the fpqc cover `m`.
-  exact flat_descendsAlong_fpqc.of_isPullback
+  exact AlgebraicGeometry.Flat.descendsAlong_surjective_inf_flat_inf_quasicompact.of_isPullback
     (translated.map (Over.forget _)) ⟨⟨m_surj, m_flat⟩, m_qc⟩ base_flat
 
 /-- Let f : A → B be a finite morphism of abelian schemes over the local ring R, and u : Spec D → B

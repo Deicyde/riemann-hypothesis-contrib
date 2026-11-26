@@ -1,4 +1,6 @@
-import New.Reduction.Data.Sizes
+module
+
+public import New.Reduction.Data.Sizes
 
 /-!
 # Prime sums: main amount, expected value and total remainder
@@ -25,6 +27,8 @@ Notions from other files:
   and the direction amount `D.directionAmount` is `∑_τ (s_∞(κ(τ)) - s_fin(κ(τ), τ))`.
 -/
 
+@[expose] public section
+
 noncomputable section
 
 open Real Finset
@@ -47,8 +51,7 @@ lemma sum_lambdaKResidueClass_mul_posPart [NeZero q] (A : ℕ) {z : ℝ} (hz : 0
       A * (primeRemainder d q z + log z / q.totient + (logDerivMean d q 1).re) := by
   have hA : (A : ℝ) ≠ 0 := (hz.trans_le hzA).ne'
   rw [primeRemainder_eq_sum A hz hzA, ← sum_div]
-  field_simp
-  ring
+  field
 
 namespace Data
 

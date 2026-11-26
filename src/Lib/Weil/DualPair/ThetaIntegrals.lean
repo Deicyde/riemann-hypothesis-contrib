@@ -1,7 +1,9 @@
-import Lib.SiegelWeil.SingularForms.CentreCoefficients
-import Lib.Weil.DualPair.FiniteAction
-import Lib.Weil.DualPair.KernelDecay
-import Lib.Weil.DualPair.MixedModel
+module
+
+public import Lib.SiegelWeil.SingularForms.CentreCoefficients
+public import Lib.Weil.DualPair.FiniteAction
+public import Lib.Weil.DualPair.KernelDecay
+public import Lib.Weil.DualPair.MixedModel
 
 /-!
 # Terms of theta kernels at rational matrices and basic laws of theta integrals
@@ -43,6 +45,8 @@ Notions from other files:
 
 Known; see `Lib.Weil.DualPair.ThetaLiftConvergence` for sources.
 -/
+
+@[expose] public section
 
 /-!
 ## Terms of the theta kernel at rational matrices
@@ -274,7 +278,7 @@ lemma exists_tsum_thetaTerm_schrodingerOp_le {P : Set (FinPlace E)} (hP : Set.Is
     refine (norm_sum_le _ _).trans ?_
     simp only [norm_mul, hu_norm, one_mul]
     rw [← ofReal_le_ofReal_iff (by bound [T.height_pos k]), ← h_sum_eq]
-    exact (ENNReal.sum_le_tsum t).trans (h_sum f k)
+    exact (sum_le_tsum t).trans (h_sum f k)
   have h_inv (z : Matrix n' (p ⊕ n₀) E) (f : 𝒮 (S.hom T)) :
       ℓ (ϱ (S.hom T) (matrixToVec (T.ratMap S (z * ((d : E) • D.k.fromCols D.i)ᴴ * S.J))) f) =
         ℓ f := by

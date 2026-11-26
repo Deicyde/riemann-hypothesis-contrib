@@ -1,5 +1,8 @@
-import New.UpperBound.ElementaryDivisors.Edges
-import New.UpperBound.ElementaryDivisors.FrobeniusFactors
+module
+
+public import Mathlib.LinearAlgebra.PiTensorProduct.Dual
+public import New.UpperBound.ElementaryDivisors.Edges
+public import New.UpperBound.ElementaryDivisors.FrobeniusFactors
 
 /-!
 # Averaging: removing the terms of large defect in all Levi translates at once
@@ -62,6 +65,8 @@ by weights are known in the literature. Related work: Benson–Doty, Schur–Wey
 fields, 2009; Green, Polynomial representations of GL_n, 1980; Donkin, On Schur algebras and related
 algebras I, 1986.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -511,7 +516,7 @@ vector `f` over `O` with `w ^ (-m) Δ g f` integral for all `g ∈ GL_k(W)`, whe
 `Δ = T.depthScaling k n r` is a diagonal matrix of powers of `w`. Then
 `⟨Av_{J ∪ {j}} h, h'⟩ ≡ ⟨Av_J h, h'⟩` modulo `w ^ c` for `j ∉ J`. -/
 lemma pow_dvd_pairing_partialAverage_insert_sub [IsDomain O] [CharZero O] {a r : Fin k} {ℓ c : ℕ}
-    [ValuationRing O] (hp : ¬IsUnit (T.p : O))
+    (hp : ¬IsUnit (T.p : O))
     (ha : a + 1 = r.val) (h_size : N * n * k * (ℓ + 2) ≤ T.P ^ ℓ) (hℓ : ℓ ≤ N)
     {I : ZMod N → Dual O (MvPolynomial (Fin k × Fin k) O)}
     (hI : ∀ j : ZMod N, IsAverage (twoBlock k r) (T.embedding j) (rootVector a r)

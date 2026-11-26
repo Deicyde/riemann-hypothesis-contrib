@@ -1,7 +1,9 @@
-import New.Derivatives.Divisibility.NormalForm
-import New.Derivatives.FormalGroup.Exponent
-import New.Derivatives.FormalGroup.Resolution
-import New.Derivatives.Vacuum.TightFrames
+module
+
+public import New.Derivatives.Divisibility.NormalForm
+public import New.Derivatives.FormalGroup.Exponent
+public import New.Derivatives.FormalGroup.Resolution
+public import New.Derivatives.Vacuum.TightFrames
 
 /-!
 # The normal form of theta products at non-split primes
@@ -36,6 +38,8 @@ Notions from other files:
 * `New.coupling`, `New.HasNormalForm`: `Γ_e = ∑ z_(τ,c) ^ p ^ e * z_(τ',c)` with `τ'` the partner
   of `τ`, and `F(ϖ z) = W exp (c_ϖ ∑ λ_{e j} Γ_e ^ p ^ j)` with `W` integral.
 -/
+
+@[expose] public section
 
 /-! ## Substitution of a linear form -/
 
@@ -95,7 +99,7 @@ namespace New
 exactly when its norm is at most that of `π_p`. -/
 lemma piPrimeInt_dvd_iff {d p : ℕ} [PrimeSevenModEight d] [Fact p.Prime] [PadicPlace p]
     {x : valRingCp p} : piPrimeInt d ∣ x ↔ ‖(x : ℂ_[p])‖ ≤ ‖ιₚ (piPrime d p)‖ :=
-  dvd_iff_norm_le
+  valRingCp.dvd_iff_norm_le
 
 namespace Parameters
 
@@ -138,7 +142,6 @@ the group `Gal(E/K) = (ℤ/q₁)ˣ` of places. Then `τ(α) ^ p ^ e ≡ conj (τ
 lemma norm_pow_sub_conj_partner_le {P : Parameters} {s p : ℕ} [Fact p.Prime] [PadicPlace p] {e : ℕ}
     (he : e ∈ partnerExponents P.d p) (τ : P.Φ s) (α : 𝓞 (P.E s)) :
     ‖ιₚ (Φ τ α) ^ p ^ e - ιₚ (conj (Φ (P.partner s p e τ) α))‖ ≤ ‖ιₚ (piPrime P.d p)‖ := by
-  classical
   -- Both sides are ring maps to `𝒪 / π_p`. By `forall_map_galOfPlaceInt_eq_pow_iff` it suffices
   -- that they agree at the root of unity, which holds by the choice of the partner, and at `√-d`.
   let toValRing : 𝓞 (P.E s) →+* valRingCp p :=
@@ -192,12 +195,9 @@ lemma norm_conj_pow_sub_partner_le {P : Parameters} {s p : ℕ} [Fact p.Prime] [
       norm_pow_sub_conj_partner_le he τ (star α)
   have h_fermat : piPrimeInt P.d ∣ (N : valRingCp p) ^ p ^ e - N := by
     have h_mod : (p : ℤ) ∣ (N : ℤ) ^ p ^ e - N :=
-      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1
-        (by rw [Int.cast_sub, Int.cast_pow, Int.cast_natCast, ZMod.pow_card_pow, sub_self])
-    have h_cast : ((p : ℤ) : valRingCp p) ∣ (((N : ℤ) ^ p ^ e - N : ℤ) : valRingCp p) :=
-      map_dvd (Int.castRingHom (valRingCp p)) h_mod
-    push_cast at h_cast
-    exact (piPrimeInt_dvd_natCast P.d).trans h_cast
+      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1 (by simp [ZMod.pow_card_pow])
+    exact (piPrimeInt_dvd_natCast P.d).trans
+      (mod_cast map_dvd (Int.castRingHom (valRingCp p)) h_mod)
   have h_unit : IsUnit ((N : valRingCp p) ^ p ^ e) :=
     (isUnit_integer_iff_norm_eq_one.2 (hN.norm_natCast_eq_one ℂ_[p])).pow _
   have h_mul : piPrimeInt P.d ∣ (N : valRingCp p) ^ p ^ e * (a ^ p ^ e - b) := by
@@ -229,15 +229,6 @@ lemma dvd_pow_sub_sum_partner {P : Parameters} {s p : ℕ} [Fact p.Prime] [Padic
   refine h_add.add (dvd_sum fun x _ ↦ ?_)
   rw [smul_pow, ← sub_smul, smul_eq_C_mul]
   exact (map_dvd C (h_coeff x)).mul_right _
-
-/-- For vectors `u_j` over `E = P.E s` integral above `p`, the linear forms `u_j† z`, whose
-coefficient at `z_(τ,c)` is `conj (τ(u_{j,c}))` read in `ℂ_p` through the embedding `ιₚ` of `ℂ`,
-have integral coefficients. -/
-lemma norm_daggerForms_le_one (P : Parameters) (s : ℕ) {p : ℕ} [Fact p.Prime] [PadicPlace p]
-    {n J : Type} {u : J → n → P.E s}
-    (hu : ∀ (j : J) (i : n), IsIntegralAbove p (u j i)) (j : J) (x : P.Φ s × n) :
-    ‖(daggerForms u j x : ℂ_[p])‖ ≤ 1 :=
-  (hu j x.2).norm_conj_le_one _
 
 /-- Let `E = P.E s` be `K = ℚ(√-d)` (`d = P.d`) with a root of unity of order `q₁ = P.q₁ s`
 adjoined, `s` being the tower level, and let `e` be in `I_p° = partnerExponents P.d p`. Let the
@@ -309,7 +300,6 @@ lemma dvd_sum_subst_sub_couplingSum {Φ n J : Type} [Fintype Φ] [Fintype n] [Fi
     {L : J → MvPowerSeries (Φ × n) (valRingCp p)} (hL : ∀ i : J, constantCoeff (L i) = 0)
     {m : J → ℕ} (hΓ : ∀ e ∈ S, C π ∣ ∑ i : J, m i * (L i ^ p ^ e * L i) - coupling partner e) :
     C π ∣ ∑ i : J, m i • Ξ.subst (L i) - couplingSum S partner l := by
-  classical
   have h_subst (i : J) : PowerSeries.HasSubst (L i) := .of_constantCoeff_zero (hL i)
   set T : PowerSeries (valRingCp p) :=
     ∑' x : S × ℕ, l x.1 x.2 • (PowerSeries.X ^ p ^ (x.1 : ℕ) * PowerSeries.X) ^ p ^ x.2
@@ -459,7 +449,7 @@ lemma exists_hasNormalForm (P : Parameters) (s : ℕ) [PadicPlace p] (hp : chiK 
   -- The linear forms `u† z` are integral, so at `ϖ z` the series is an integral series times
   -- the exponential of `c_ϖ ∑ m_j Ξ(u_j† z)`.
   let μ (j : J) (x : P.Φ s × n) : valRingCp p :=
-    ⟨daggerForms u j x, P.norm_daggerForms_le_one s hu j x⟩
+    ⟨daggerForms u j x, (hu j x.2).norm_conj_le_one _⟩
   have hL (j : J) : constantCoeff (linearSeries (μ j)) = 0 := constantCoeff_linearSeries _
   obtain ⟨V, hV⟩ : H.rescale (fun _ : P.Φ s × n ↦ ϖ) ∈ seriesToCp.range :=
     P.cmCurve.rescale_mem_range_of_mem_multiSeriesRing (μ := μ) hϖ.le hH

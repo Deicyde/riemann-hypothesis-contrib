@@ -1,5 +1,7 @@
-import New.Congruences.Selmer.Line
-import New.Congruences.Selmer.RootsOfUnity
+module
+
+public import New.Congruences.Selmer.Line
+public import New.Congruences.Selmer.RootsOfUnity
 
 /-!
 # Twisting, general form
@@ -30,6 +32,8 @@ Notions from other files:
 * `New.ellVal`: the valuation `v` on `PadicAlgCl ℓ` with `v(ℓ) = 1`, read in `[0, ∞]`.
 -/
 
+@[expose] public section
+
 noncomputable section
 
 namespace New.Selmer
@@ -41,7 +45,7 @@ open scoped NNReal ENNReal NNRat
 variable {ℓ : ℕ} [ThePrime ℓ] {E : Type} [Field E] [EmbeddedNumberField E] [NumberField.IsCMField E]
   {S₀ : Finset (FinPlace E)}
   {g₀ : Gal(Ω/E)} {ι κ : Type} {n : ι → Type} [∀ i : ι, Fintype (n i)] [∀ i : ι, DecidableEq (n i)]
-  {O : CoeffRing ℓ} (T : ∀ i : ι, SelmerDatum ℓ S₀ g₀ O.1 (n i))
+  {O : CoeffRing ℓ} (T : ∀ i : ι, SelmerDatum ℓ S₀ g₀ O.val (n i))
   (Y : κ → StickelbergerSystem ℓ S₀ g₀)
 
 open scoped Classical in
@@ -245,7 +249,7 @@ lemma ellVal_twist_tameGenerator_sub_one_le
     ‖(ζ v - 1).val‖ = ‖X.twist hζ γ ^ a - 1‖ := by
       rw [← ha, h_value, AddSubgroupClass.coe_sub, OneMemClass.coe_one]
     _ ≤ ‖X.twist hζ γ - 1‖ :=
-      Period.norm_pow_sub_one_le_norm_sub_one h_fin.norm_eq_one.le a
+      TauCeti.norm_pow_sub_one_le_norm_sub_one h_fin.norm_eq_one.le a
 
 open scoped Classical in
 /-- Let `X` be twist polynomials, with a set `X.auxPrimes` of at most `s₀ / 2` auxiliary primes and

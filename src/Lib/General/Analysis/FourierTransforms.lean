@@ -1,4 +1,15 @@
-import Lib.Adelic.QuotientMeasure.Basic
+module
+
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
+public import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Analysis.CStarAlgebra.ContinuousMap
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+public import Mathlib.Order.CompletePartialOrder
+public import Mathlib.RingTheory.PiTensorProduct
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.Topology.UniformSpace.Uniformizable
+public import Lib.Adelic.QuotientMeasure.Basic
 
 /-!
 # Fourier inversion for periodic functions and decay of Fourier transforms
@@ -28,6 +39,8 @@ The results of this file include the Stone–Weierstrass theorem for a monoid of
 inversion on a compact quotient of an abelian group, and the decay of Fourier transforms by
 integration by parts.
 -/
+
+@[expose] public section
 
 /-! ## Dual families of characters and Fourier inversion -/
 
@@ -257,7 +270,7 @@ the number `i + 2 π i ⟪b, v⟫` has norm at least `1 + ‖b‖`: its imaginar
 lemma New.one_add_norm_le_norm_I_add_inner {V : Type*} [NormedAddCommGroup V]
     [InnerProductSpace ℝ V] (b : V) :
     1 + ‖b‖ ≤ ‖(Complex.I + 2 * π * Complex.I * inner ℝ b (‖b‖⁻¹ • b) : ℂ)‖ := by
-  have h_inner : inner ℝ b (‖b‖⁻¹ • b) = ‖b‖ := by simp [inner_smul_right, field, sq]
+  have h_inner : inner ℝ b (‖b‖⁻¹ • b) = ‖b‖ := by simp [inner_smul_right, field]
   calc 1 + ‖b‖
     _ ≤ 1 + 2 * π * ‖b‖ := by nlinarith [norm_nonneg b, two_le_pi]
     _ = (Complex.I + 2 * π * Complex.I * inner ℝ b (‖b‖⁻¹ • b) : ℂ).im := by simp [h_inner]

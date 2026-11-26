@@ -1,7 +1,9 @@
-import Lib.Cohomology.TorsionTheories
-import Lib.PadicComparison.Descent.AlmostDescent
-import Lib.PadicComparison.HodgeTate.GenericFibre
-import Lib.PadicHodge.ArtinSchreierSequence
+module
+
+public import Lib.Cohomology.TorsionTheories
+public import Lib.PadicComparison.Descent.AlmostDescent
+public import Lib.PadicComparison.HodgeTate.GenericFibre
+public import Lib.PadicHodge.ArtinSchreierSequence
 
 /-!
 # Tilts and period coefficients of p-adic tests: products, comparisons, theories
@@ -46,6 +48,8 @@ Notions from other files:
 Known; see `Lib.PadicComparison.Descent.TestCovers` and `Lib.PadicComparison.HodgeTate.PeriodMap`
 for sources.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -145,7 +149,7 @@ lemma hasPartitions_periodAlg (θ : asModules (tilt ⋙ periodAlg S) ⋙ tensorW
     HasPartitions ringFunctor (moduleCoeff Ψ) := by
   refine ⟨exists_isQuotientByElem, fun {A B₁ B₂ : PadicTest} f g hfg ↦ ?_⟩
   -- Tilting keeps the product, and so do Witt vectors, which are sequences of coordinates.
-  let e {R : Type} : WittVector p R ≃ (ℕ → R) := mk WittVector.coeff .mk'
+  let e {R : Type} : WittVector p R ≃ (ℕ → R) := mk WittVector.coeff (.mk p)
   let W : PadicTest ⥤ ModuleCat Ainf := asModules (tilt ⋙ wittFunctor)
   have h_witt : Function.Bijective fun x : W.obj A ↦ (W.map f x, W.map g x) :=
     ((arrowProdEquivProdArrow ℕ (fun _ ↦ tilt.obj B₁) (fun _ ↦ tilt.obj B₂)).trans
@@ -189,13 +193,6 @@ section PeriodLifting
 open CategoryTheory TensorProduct Function Functor Module LinearMap AlgebraTensorModule Period Lift
   WittVector AdicCompletion Submodule ModuleCat Comparison AddCommGrpCat
 
-/-- If `p * y` lies in `W(𝔪) = wittOfMaxIdeal`, for `𝔪` the maximal ideal of `O♭`, so does `y`:
-`W(𝔪)` is the kernel of the map to the Witt vectors of the residue field, a domain in which
-`p ≠ 0`. -/
-private lemma mem_wittOfMaxIdeal_of_natCast_mul_mem {p : ℕ} [ThePrime p] {y : Ainf}
-    (h : (p : Ainf) * y ∈ wittOfMaxIdeal) : y ∈ wittOfMaxIdeal := by
-  aesop (add simp [wittOfMaxIdeal, p_nonzero])
-
 /-- There is a linear map `W(𝔪) → 𝔪` that is onto with kernel `p W(𝔪)`: the zeroth coordinate.
 Here `𝔪` is the maximal ideal of `O♭` and `W(𝔪) = wittOfMaxIdeal`. -/
 lemma exists_isReductionMod_wittOfMaxIdeal {p : ℕ} [ThePrime p] :
@@ -218,7 +215,8 @@ lemma exists_isReductionMod_wittOfMaxIdeal {p : ℕ} [ThePrime p] :
     simpa [Subtype.ext_iff] using h_iff
   constructor
   · rintro ⟨y, rfl⟩
-    exact ⟨y, mem_wittOfMaxIdeal_of_natCast_mul_mem hx, rfl⟩
+    -- The Witt vectors of the residue field form a domain, and `p` is nonzero there.
+    exact ⟨y, by simpa [wittOfMaxIdeal, p_ne_zero] using hx, rfl⟩
   · rintro ⟨y, -, rfl⟩
     exact ⟨y, rfl⟩
 
@@ -320,7 +318,7 @@ private lemma CoeffCompBijective.completion_wittOfMaxIdeal_of_almostCoeff {C C' 
     have h_rep_zero : y.val 1 = 0 ↔ x ∈ nsmulRange p _ := by
       rw [← hx, mkQ_apply, Submodule.Quotient.mk_eq_zero, nsmulRange.mem_span_pow_smul_top_iff,
         pow_one]
-    show redCompl.app b y = 0 ↔ ∃ z, p • z = y
+    change redCompl.app b y = 0 ↔ ∃ z, p • z = y
     rw [hxy, (h_red_mod b).right x]
     exact h_rep_zero.symm.trans h_ker
   -- So on values with `IsPerfectTorsionFree` the sequence of `p` and `redCompl` is short exact.
@@ -417,13 +415,17 @@ lemma CoeffCompBijective.periodAlg_of_almostCoeff {C C' : Type 1} [Category C] [
   obtain ⟨U⟩ : Nonempty (P ⋙ G ≅ asModules B ⋙ G) := nonempty_completion_wittOfMaxIdeal_iso hK
   -- Transport along `U` and along `moduleCompletionIso`, which compares the completions of
   -- modules and of algebras.
-  let V : P ⋙ G ≅ B ⋙ asModules (algCompletion S p) ⋙ tensorWith K K :=
+  let V : P ⋙ G ≅ asModules (periodAlg S) ⋙ tensorWith K K :=
     U ≪≫ B.isoWhiskerLeft (isoWhiskerRight (moduleCompletionIso S p) _)
-  let γ := isoWhiskerRight V (moduleCoeff (𝟭 (ModuleCat K)))
-  refine (isBijective_iff_of_coeff_iso (c := ⟨φ, _⟩) (ψ.whiskerLeft γ.hom) _
-    (whiskerLeft_comp_whiskerRight β γ.hom)).mp ?_
+  let γ {D : Type 1} [Category.{0} D] (χ : D ⥤ CommAlg OFlat) :
+      moduleCoeff (χ ⋙ P ⋙ G) ≅ moduleCoeff (χ ⋙ asModules (periodAlg S) ⋙ tensorWith K K) :=
+    isoWhiskerRight (isoWhiskerRight (χ.isoWhiskerLeft V) (forget₂ _ Ab)) uliftFunctor
   -- By `hN` and `hN'`, `K ⊗ –` carries `h_cpl` to the coefficients `P ⋙ G`.
-  exact (IsBijective.baseChangeMap_bijective_iff h_cpl hN).mp (hN' _)
+  refine (isBijective_iff_of_coeff_iso
+    (c := ofModuleHom φ (Φ := ψ ⋙ P ⋙ G) (whiskerRight β (P ⋙ G))) (γ ψ).hom (γ ψ').hom ?_).mp
+    ((IsBijective.baseChangeMap_bijective_iff h_cpl hN).mp (hN' _))
+  ext A x
+  exact congrArg ULift.up (ConcreteCategory.congr_hom (V.hom.naturality (β.app A)).symm x.down)
 
 end PeriodLifting
 
@@ -525,7 +527,7 @@ def locConstToTilt : genericTest ⋙ testIncl ⋙ locConstAlg ⟶ tilt ⋙ restr
   refine (NatIso.ofComponents (F := ringFunctor ⋙ locConstAlg)
       (G := genericTest ⋙ testIncl ⋙ locConstAlg)
       (fun c ↦ isoMk (.ofBijective
-        (locConstAlg.map (ofHom (algebraMap c.ProdRing c.GenericRing))).1
+        (locConstAlg.map (ofHom (algebraMap c.ProdRing c.GenericRing))).hom'
         c.bijective_locConstAlg_map_algebraMap))
       fun _ ↦ ?restrict).inv ≫
     { app c := ConcreteCategory.ofHom (.mk'
@@ -541,8 +543,18 @@ def locConstToTilt : genericTest ⋙ testIncl ⋙ locConstAlg ⟶ tilt ⋙ restr
     ext x
     refine ext fun n ↦ toPiLocalization_injective _ (funext fun q ↦ .trans ?_
       (Localization.localRingHom_to_map _ _ (quotientMap _ f.1 (by simp)) (comap_asIdeal ..) _))
-    erw [hφ, eq_comm, ← RingHom.comp_apply, ext_zmod (.comp ..)]
-    exact .symm (hφ ..)
+    let ρ := quotientMap (I := Ideal.span {(p : c.ProdRing)})
+      (Ideal.span {(p : d.ProdRing)}) f.1 (by simp)
+    let r := PrimeSpectrum.comap ρ q
+    let L := Localization.localRingHom r.asIdeal q.asIdeal ρ (comap_asIdeal ..)
+    let restrict (a : PadicTest) := locConstAlg.map (CommRingCat.ofHom (Ideal.Quotient.mk
+      (Ideal.span ({(p : a.ProdRing)} : Set a.ProdRing))))
+    change algebraMap _ (Localization.AtPrime q.asIdeal)
+        (φ d (restrict d ((ringFunctor ⋙ locConstAlg).map f x))) =
+      L (algebraMap _ (Localization.AtPrime r.asIdeal) (φ c (restrict c x)))
+    refine (hφ d _ q).trans (.trans ?_ (congrArg L (hφ c _ r).symm))
+    let α := (L.comp (algebraMap (ZMod p) (Localization.AtPrime r.asIdeal)))
+    exact (DFunLike.congr_fun (ext_zmod α (algebraMap _ _)) _).symm
 
 /-- The functor from test rings to `O♭`-algebras sending `A` to `O♭ ⊗_{𝔽_p} LC(A)`, where `LC(A)` is
 the ring of locally constant functions `Spec A → 𝔽_p`. -/
@@ -594,9 +606,7 @@ lemma PadicTest.le_ker_of_tiltNearZeros_le_ker {d : PadicTest} (f : c ⟶ d)
   -- Then `f e` lies in the Jacobson radical, `1 - f e` is a unit, and `p ^ n ∣ (1 - f e) * f r`
   -- gives `p ^ n ∣ f r`.
   have h_unit : IsUnit (1 - f.toRingHom e) := by
-    have h_jac :=
-      mem_jacobson_bot.mp (jacobson_bot (R := d.ProdRing) ▸ HenselianRing.jac h_mod) (-1)
-    rwa [mul_neg_one, neg_add_eq_sub] at h_jac
+    simpa [neg_add_eq_sub] using Ring.mem_jacobson_iff.mp (HenselianRing.jac h_mod) (-1)
   exact h_unit.dvd_mul_left.mp (by simpa using map_dvd f.toRingHom h_dvd')
 
 /-- For an ideal `I` of the generic ring `R[1/p]` of `c`, the quotient of the tilt `R♭` by the
@@ -640,6 +650,38 @@ lemma PadicTest.mem_nearZeros_of_rTensor_eq_zero (M : ModuleCat OFlat) (x : Tilt
 
 end
 
+/-- The support statement behind `tiltTheory`. Let `J = PadicTest.tiltNearZeros c I`, so the maps of
+tests killing `I` are those whose tilt factors, uniquely, through the perfect algebra `R♭ ⧸ J`.
+Then restriction of cohomology to these maps is onto as soon as `R♭ ⊗ M → (R♭ ⧸ J) ⊗ M` is, and a
+section that dies along these maps has image zero in `(R♭ ⧸ J) ⊗ M`. It is a separate lemma so that
+`tiltTheory` stays small for the kernel. -/
+lemma tiltTheory_supp {p : ℕ} (Ω : Type) [CommRing Ω] [InvertsPrime Ω p]
+    [Algebra Ω ℂ_[p]] (M : ModuleCat OFlat)
+    (ac : IsAcyclicOnPerfect (moduleCoeff (tensorCoeff M))) (c : PadicTest)
+    (I : Ideal c.GenericRing) :
+    let J : Ideal (TiltRing c) := c.nearZeros I fun f ↦ ker (tilt.map f).hom
+    let q : tilt.obj c ⟶ CommAlgCat.of OFlat (c.TiltRing ⧸ J) := CommAlgCat.ofHom (mkₐ OFlat J)
+    (Function.Surjective ((moduleCoeff (tensorCoeff M)).map q) → ∀ n : ℕ,
+      Function.Surjective (H.map (tilt ⋙ moduleCoeff (tensorCoeff M))
+        (freeAb.map (killingMaps (ringOf (genericTestOver Ω)) I).ι) n)) ∧
+    ∀ x : (tilt ⋙ moduleCoeff (tensorCoeff M)).obj c,
+      (∀ (d : PadicTest) (f : c ⟶ d), ⟨f⟩ ∈ (killingMaps (ringOf (genericTestOver Ω)) I) d →
+        (tilt ⋙ moduleCoeff (tensorCoeff M)).map f x = 0) →
+      (moduleCoeff (tensorCoeff M)).map q x = 0 := by
+  intro J q
+  refine surjective_and_map_eq_zero_of_quotient_sieve tilt
+    (R := killingMaps (ringOf (genericTestOver Ω)) I) q
+    (fun {d} f hf ↦ by
+      have h_kill : ∀ y ∈ J, (tilt.map f).hom y = 0 := fun y ⟨a, ha, hy⟩ ↦
+        hy d f (by simp [show mapGeneric f a = 0 from le_comap_of_map_le hf.le ha])
+      refine ⟨ofHom (liftₐ _ (tilt.map f).hom h_kill), rfl, fun g hg ↦ ?_⟩
+      ext ⟨y⟩
+      exact ConcreteCategory.congr_hom hg y)
+    (fun f g hg ↦ (map_eq_bot_iff_le_ker _).2 <| c.le_ker_of_tiltNearZeros_le_ker I f fun y hy ↦
+      RingHom.mem_ker.mpr <| (ConcreteCategory.congr_hom hg y).symm.trans
+        (mk_ker.ge.trans (ker_le_comap (K := ker g.hom) _) hy))
+    (@ac (CommAlgCat.of OFlat (c.TiltRing ⧸ J)) (c.perfectRing_quotient_tiltNearZeros I))
+
 /-- The theory (`New.Variety.Theory`, for the prime `ℓ = p`) on `p`-adic tests along `R ↦ R[1/p]`
 (`New.Variety.genericTestOver`), with coefficients `R ↦ R♭ ⊗_{O♭} M`. It needs `p` invertible in
 `Ω`, and every perfect `O♭`-algebra acyclic for these coefficients (`ac`,
@@ -652,24 +694,7 @@ ideal containing `I`. -/
 def tiltTheory {p : ℕ} (Ω : Type) [CommRing Ω] [InvertsPrime Ω p] [Algebra Ω ℂ_[p]]
     (M : ModuleCat OFlat) (ac : IsAcyclicOnPerfect (moduleCoeff (tensorCoeff M))) :
     Theory (genericTestOver Ω) :=
-  let J (c : PadicTest) (I : Ideal c.GenericRing) : Ideal (TiltRing c) :=
-    c.nearZeros I fun f ↦ ker (tilt.map f).hom
-  -- The maps that kill `I` are those whose tilt factors, uniquely, through the perfect algebra
-  -- `TiltRing c ⧸ J c I`.
-  have h_supp (c : PadicTest) (I : Ideal c.GenericRing) :=
-    surjective_and_map_eq_zero_of_quotient_sieve tilt
-      (R := killingMaps (ringOf (genericTestOver Ω)) I)
-      (CommAlgCat.ofHom (mkₐ OFlat (J c I)))
-      (fun {d} f hf ↦ by
-        have h_kill : ∀ y ∈ J c I, (tilt.map f).hom y = 0 := fun y ⟨a, ha, hy⟩ ↦
-          hy d f (by simp [show mapGeneric f a = 0 from le_comap_of_map_le hf.le ha])
-        refine ⟨ofHom (liftₐ _ (tilt.map f).hom h_kill), rfl, fun g hg ↦ ?_⟩
-        ext ⟨y⟩
-        exact ConcreteCategory.congr_hom hg y)
-      (fun f g hg ↦ (map_eq_bot_iff_le_ker _).2 <| c.le_ker_of_tiltNearZeros_le_ker I f fun y hy ↦
-        RingHom.mem_ker.mpr <| (ConcreteCategory.congr_hom hg y).symm.trans
-          (mk_ker.ge.trans (ker_le_comap (K := ker g.hom) _) hy))
-      (@ac (CommAlgCat.of OFlat (c.TiltRing ⧸ J c I)) (c.perfectRing_quotient_tiltNearZeros I))
+  have h_supp := tiltTheory_supp Ω M ac
   { functor := tilt ⋙ moduleCoeff (tensorCoeff M)
     prime_smul_eq_zero c x := ULift.down_injective (show p • x.down = 0 by
       simp [natCast_eq_zero_of_algebra_oFlat, ← Nat.cast_smul_eq_nsmul OFlat])

@@ -1,4 +1,17 @@
-import Lib.Base
+module
+
+public import TauCeti.Algebra.Group.AddChar.Basic
+public import Mathlib.NumberTheory.MulChar.Lemmas
+public import Mathlib.RingTheory.PiTensorProduct
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.RingTheory.WittVector.IsPoly
+public import Mathlib.Tactic.Basify
+public import Mathlib.Tactic.ENatToNat
+public import Mathlib.Tactic.Polynomial.Basic
+public import Mathlib.Tactic.ReduceModChar
+public import Std.Internal.Order.Automation
+public import Std.Tactic.BVDecide.Normalize.Prop
+public import Lib.Speed
 
 /-!
 # Orthogonality, Fourier inversion and matrix Gauss sums over a finite ring
@@ -6,7 +19,7 @@ import Lib.Base
 Finite Fourier analysis on matrices over a finite commutative ring `R`, for a primitive additive
 character `ψ` (no multiple `ψ (r * ·)` with `r ≠ 0` is trivial).
 
-* `New.exists_isPrimitive_apply_eq_of_surjective`, `New.exists_primitive_residue_addChar`: a
+* `New.exists_primitive_residue_addChar`: a
   character of a ring `F` for which the subring `O` is self-dual induces a primitive character of a
   suitable quotient ring of `O`.
 * `New.sum_addChar_dotProduct`, `New.sum_addChar_trace_mul`: orthogonality; the sum of `ψ` along
@@ -24,29 +37,23 @@ character `ψ` (no multiple `ψ (r * ·)` with `r ≠ 0` is trivial).
 Known; see `Lib.Weil.TameGaussSum` for sources.
 -/
 
-open Matrix Finset Fintype AddChar Function
+@[expose] public section
 
-/-- An additive character `ψ` sends a finite sum to the product of its values on the terms. -/
-lemma AddChar.map_sum_eq_prod {ι A M : Type*} [AddCommMonoid A] [CommMonoid M]
-    (ψ : AddChar A M) (s : Finset ι) (f : ι → A) :
-    ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp
-  | insert i s hi ih => rw [sum_insert hi, prod_insert hi, map_add_eq_mul, ih]
+open Matrix Finset Fintype AddChar Function
 
 namespace New
 
 variable {R F a N : Type*} [CommRing R]
 
-/-- Let `O` be a subring of `F`, `π : O → R` a surjective ring homomorphism (`hπ_surj`) with kernel
-`{x | g * x ∈ O}` (`hπ_ker`), and `ψ` an additive character of `F` such that `ψ (t * ·)` is
+/-- Let `O` be a subring of `F`, `π : O → R` a surjective ring homomorphism with kernel
+`{x | g * x ∈ O}` (`hπ`), and `ψ` an additive character of `F` such that `ψ (t * ·)` is
 trivial on `O` exactly when `t ∈ O` (`hψ`). Then `π x ↦ ψ (g * x)` is a well-defined primitive
 character of `R`. -/
-lemma exists_isPrimitive_apply_eq_of_surjective [CommRing F] {O : Subring F} {π : O →+* R}
-    {g : F} {ψ : AddChar F ℂ} (hπ_surj : Surjective π) (hπ_ker : ∀ x : O, π x = 0 ↔ g * x.val ∈ O)
+lemma exists_primitive_residue_addChar [CommRing F] {O : Subring F} {π : O →+* R} {g : F}
+    {ψ : AddChar F ℂ} (hπ : Surjective π ∧ ∀ x : O, π x = 0 ↔ g * x.val ∈ O)
     (hψ : ∀ t : F, (∀ s ∈ O, ψ (t * s) = 1) ↔ t ∈ O) :
     ∃ φ : AddChar R ℂ, φ.IsPrimitive ∧ ∀ x : O, φ (π x) = ψ (g * x) := by
+  obtain ⟨hπ_surj, hπ_ker⟩ := hπ
   -- `x ↦ ψ (g * x)` is constant on the fibres of `π`, since `π x = π y` puts `g * (x - y)` in `O`.
   have h_factors : Function.FactorsThrough (fun x : O ↦ ψ (g * x)) π := by
     intro x y hxy
@@ -67,15 +74,6 @@ lemma exists_isPrimitive_apply_eq_of_surjective [CommRing F] {O : Subring F} {π
   have h_triv_O : ∀ s ∈ O, ψ (g * x * s) = 1 := fun s hs ↦ by
     simpa [← map_mul, hφ, φ', mul_assoc] using DFunLike.congr_fun h_triv (π ⟨s, hs⟩)
   exact hr_ne ((hπ_ker x).mpr ((hψ _).mp h_triv_O))
-
-/-- `New.exists_isPrimitive_apply_eq_of_surjective` with its two conditions on `π` joined in
-one hypothesis `hπ`: `π` is surjective, and its kernel is `{x | g * x ∈ O}`. Then `π x ↦ ψ (g * x)`
-is a well-defined primitive character of `R`. -/
-lemma exists_primitive_residue_addChar [CommRing F] {O : Subring F} {π : O →+* R} {g : F}
-    {ψ : AddChar F ℂ} (hπ : Surjective π ∧ ∀ x : O, π x = 0 ↔ g * x.val ∈ O)
-    (hψ : ∀ t : F, (∀ s ∈ O, ψ (t * s) = 1) ↔ t ∈ O) :
-    ∃ φ : AddChar R ℂ, φ.IsPrimitive ∧ ∀ x : O, φ (π x) = ψ (g * x) :=
-  exists_isPrimitive_apply_eq_of_surjective hπ.left hπ.right hψ
 
 variable [Fintype R] [DecidableEq R] [Fintype a] [DecidableEq a] [Fintype N] [DecidableEq N]
 
@@ -210,21 +208,6 @@ lemma Exchange.star_matrixFourier_det_mul (hψ : ψ.IsPrimitive) (hχ : IsPrimit
       rw [← funext (matrixFourier_eq_inv_det_mul hχ S hS)]
     _ = S 1 * card (Matrix a a R) := by simpa using matrixFourier_matrixFourier hψ S (-1)
 
-/-- Gauss sums of matrices over a finite ring, both steps in one statement. Let `ψ` be primitive,
-`χ` primitive in the sense of `New.Exchange.IsPrimitiveMulChar`, and `S` a function on square
-matrices with `S (g d) = χ (det g) S d` for all invertible `g`. Write `Ŝ` for its Fourier transform
-`New.Exchange.matrixFourier ψ S`. Then (a) `Ŝ y = χ⁻¹ (det y) Ŝ 1` for every `y`, so `Ŝ` vanishes at
-non-invertible `y` (`New.Exchange.matrixFourier_eq_inv_det_mul`). (b) `γ Ŝ 1` equals `S 1` times
-the number of matrices, where `γ` is the complex conjugate of the transform of `χ ∘ det` at the
-matrix `1` (`New.Exchange.star_matrixFourier_det_mul`). -/
-lemma Exchange.matrixFourier_eq_and_star_mul_eq (hψ : ψ.IsPrimitive) (hχ : IsPrimitiveMulChar χ)
-    (S : Matrix a a R → ℂ)
-    (hS : ∀ (g : GL a R) (d : Matrix a a R), S (g.val * d) = χ g.val.det * S d) :
-    (∀ y : Matrix a a R, matrixFourier ψ S y = χ⁻¹ y.det * matrixFourier ψ S 1) ∧
-    star (matrixFourier ψ (fun d : Matrix a a R ↦ χ d.det) 1) * matrixFourier ψ S 1 =
-      S 1 * Fintype.card (Matrix a a R) :=
-  ⟨matrixFourier_eq_inv_det_mul hχ S hS, star_matrixFourier_det_mul hψ hχ S hS⟩
-
 /-- Gauss sums of square matrices over a finite ring `R`. Let `ψ` be primitive and `χ` primitive in
 the sense of `New.Exchange.IsPrimitiveMulChar`, and let `n` be the cardinality of `a`. There is a
 number `γ` with `|γ|² = #R ^ (n²)` such that every function `S` on `n × n` matrices with
@@ -252,7 +235,7 @@ lemma Exchange.exists_matrixFourier_eq_mul_inv_det (hψ : ψ.IsPrimitive)
   obtain ⟨h_formula, h_inversion⟩ :
       (∀ y : Matrix a a R, matrixFourier ψ S y = χ⁻¹ y.det * matrixFourier ψ S 1) ∧
         star γ * matrixFourier ψ S 1 = S 1 * Fintype.card (Matrix a a R) :=
-    matrixFourier_eq_and_star_mul_eq hψ hχ S hS
+    ⟨matrixFourier_eq_inv_det_mul hχ S hS, star_matrixFourier_det_mul hψ hχ S hS⟩
   have h_one : matrixFourier ψ S 1 = γ * S 1 :=
     mul_left_cancel₀ h_ne (by rw [h_inversion, ← mul_assoc, h_conj_mul, mul_comm])
   rw [h_formula y, h_one, mul_left_comm, mul_assoc]

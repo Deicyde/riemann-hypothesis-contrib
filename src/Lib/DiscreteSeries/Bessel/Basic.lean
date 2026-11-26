@@ -1,5 +1,7 @@
-import Lib.DiscreteSeries.Bruhat.FloorMeasures
-import Lib.DiscreteSeries.Haar.CayleyChart
+module
+
+public import Lib.DiscreteSeries.Bruhat.FloorMeasures
+public import Lib.DiscreteSeries.Haar.CayleyChart
 
 /-!
 # The real unitary group G₁, unipotent coordinates and Bessel functions
@@ -43,6 +45,8 @@ Known; see `Lib.DiscreteSeries.Bruhat.FloorGroups`, `Lib.DiscreteSeries.Bessel.U
 and `Lib.DiscreteSeries.Bruhat.ComplexPlace` for sources.
 -/
 
+@[expose] public section
+
 noncomputable section
 
 /-!
@@ -71,7 +75,8 @@ noncomputable def toBesselH (𝔰 : Shape) (N : A) : U (1 : Matrix 𝔰.κ 𝔰.
           map_mul' := by simp [fromBlocks_multiply] }).comp
       (U 1).subtype).codRestrict (𝔰.middleGram N).G
     -- `↓` unfolds membership in the unitary group before the group itself is simplified.
-    (by simp [↓mem_U, middleGram, fromBlocks_conjTranspose, splitGram, fromBlocks_multiply,
+    (by simp [↓mem_unitaryGroupOf_iff, star_eq_conjTranspose, middleGram, fromBlocks_conjTranspose,
+        splitGram, fromBlocks_multiply,
       fromBlocks_mul_fromRows, fromCols_mul_fromBlocks])
 
 @[simp]
@@ -93,7 +98,7 @@ lemma exists_eq_toBesselH {h : (𝔰.middleGram N).G} (hh : h ∈ besselH) (hN :
   -- to `z` (of norm `-N`, a unit) and orthonormal.
   let m : Matrix 𝔰.κ 𝔰.κ A := h.val.val.submatrix 𝔰.indexX₀ 𝔰.indexX₀
   have h_form : h.val.valᴴ * (𝔰.middleGram N).splitGram * h.val.val =
-      (𝔰.middleGram N).splitGram := mem_U.1 h.property
+      (𝔰.middleGram N).splitGram := mem_unitaryGroupOf_iff.1 h.property
   have h_row (a : 𝔰.κ) : h.val.val 𝔰.z (𝔰.indexX₀ a) = 0 := hN.mul_right_eq_zero.1 <| by
     simpa [apply_eq_one_apply_of_mem_floorGroup hh, middleGram, splitGram, Matrix.mul_apply,
       Matrix.one_apply]
@@ -104,7 +109,7 @@ lemma exists_eq_toBesselH {h : (𝔰.middleGram N).G} (hh : h ∈ besselH) (hN :
       Matrix.mul_apply, Matrix.one_apply]
       using congr_fun₂ h_form (𝔰.indexX₀ a) (𝔰.indexX₀ b)
   use U.of (by simp) m h_unitary
-  ext : 2
+  refine Subtype.ext (Units.ext ?_)
   simp [m, apply_eq_one_apply_of_mem_floorGroup hh, h_row, ← ext_iff, Matrix.one_apply]
 
 /-- Assume that A has a chosen element of trace one, that the form `(𝔰.middleGram N).splitGram` (ϱ
@@ -275,7 +280,7 @@ variable {j : ℕ} {𝔰 : Shape}
 /-- For y in G₁, the a-th vector y⁻¹f_a of the frame moved by y⁻¹, as a vector of the standard
 Euclidean space. -/
 def frameVector (y : 𝔰.G₁) (a : Fin (𝔰.ϱ + 1)) : EuclideanSpace ℂ 𝔰.BesselIndex :=
-  WithLp.toLp 2 fun i : 𝔰.BesselIndex ↦ y⁻¹.1 i (𝔰.besselFrame a)
+  WithLp.toLp 2 fun i : 𝔰.BesselIndex ↦ y⁻¹.val i (𝔰.besselFrame a)
 
 /-- For y∈G₁, the (ϱ+1)×(ϱ+1) complex matrix Z(y) of products h(f_j, y f_l) of the frame with
 its translate. -/
@@ -283,6 +288,12 @@ abbrev realFrameGram (y : 𝔰.G₁) : Matrix (Fin (𝔰.ϱ + 1)) (Fin (𝔰.ϱ 
   (𝔰.middleGram 1).frameGram y.val.val
 
 namespace RealPlace
+
+/-- For `γ ∈ G₁`, the matrix `Z(γ) = realFrameGram γ` equals `Fᴴ J₁ γ F`, with `F = 𝔰.frameCols` the
+frame (e₁, …, e_ϱ, z) and `J₁ = 𝔰.J₁`. -/
+lemma realFrameGram_eq_conjTranspose_mul (γ : 𝔰.G₁) :
+    realFrameGram γ = 𝔰.frameColsᴴ * 𝔰.J₁ * (γ.val.val * 𝔰.frameCols) := by
+  simp [← Matrix.ext_iff, inclMatrix, Shape.Form.frameGram, Matrix.mul_apply, Matrix.one_apply]
 
 /-- Coordinates on matrices, as a continuous `ℝ`-linear map. For a set `p` of positions `(a, i)`,
 a matrix `M` goes to its complex entries in row `e_a` and column `i` for `(a, i)` in `p`,
@@ -473,7 +484,8 @@ attribute [simps (attr := local simp) (rhsMd := .default) -isSimp coe_val, irred
 complement. -/
 theorem coe_embedH (h : U (1 : Matrix 𝔰.κ 𝔰.κ ℂ)) :
     (embedH h).val.val = actOnCols 𝔰.definiteCols h.val.val := by
-  simp [actOnCols, val_toBesselH_apply_coe, inclMatrix, ← ext_iff, Matrix.one_apply, Matrix.mul_apply]
+  simp [actOnCols, val_toBesselH_apply_coe, inclMatrix, ← ext_iff, Matrix.one_apply,
+    Matrix.mul_apply]
 
 /-- Each explicit isometry `unipotentOf q` lies in 𝖴⁰ = `besselU0`: it is block upper unitriangular
 for the levels `New.BesselIndex.level` and fixes the frame e_0, …, e_{ϱ-1}, z. -/
@@ -531,7 +543,7 @@ theorem liftUnitriangular_mem_besselU (x : UpperEntries 𝔰.n) : liftUnitriangu
     exact mem_partialUnitriangularGroup.1 h_mem _ _ h_level (.inl ⟨b.isLt, b.isLt⟩)
   case inr.inl.inr.inl =>
     rcases k with k | ⟨⟩ <;> rcases l with l | ⟨⟩ <;>
-      simp [inclMatrix, Matrix.add_mul, Matrix.mul_assoc, Matrix.mul_apply, Matrix.one_apply]
+      simp [inclMatrix, Matrix.mul_assoc, Matrix.mul_apply, Matrix.one_apply]
   all_goals
     simp [BesselIndex.level] at h_level -- the position is above the block diagonal
     lia
@@ -623,7 +635,7 @@ measure on `UpperEntries 𝔰.n` (the entries above the diagonal of a matrix of 
 `New.Shape.besselHaar₀`, under (x, u) ↦ u · `liftUnitriangular x`. -/
 def _root_.New.Shape.besselHaar : Measure (besselU (T := 𝔰.middleGram (1 : ℂ))) :=
   (volume.prod 𝔰.besselHaar₀).map (β := besselU) fun q ↦
-    ⟨q.2.1 * liftUnitriangular q.1, mul_mem q.2.2.1 (liftUnitriangular_mem_besselU q.1)⟩
+    ⟨q.2.val * liftUnitriangular q.1, mul_mem q.2.property.1 (liftUnitriangular_mem_besselU q.1)⟩
 
 /-- The measure on G₁ that computes integrals over 𝖴\G₁: Haar measure weighted by a cutoff for the
 measure `New.Shape.besselHaar` on 𝖴. -/

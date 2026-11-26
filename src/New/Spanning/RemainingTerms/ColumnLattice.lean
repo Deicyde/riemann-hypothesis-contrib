@@ -1,4 +1,6 @@
-import New.Spanning.RemainingTerms.FrameCount
+module
+
+public import New.Spanning.RemainingTerms.FrameCount
 
 /-!
 # The covolume of the lattice of columns
@@ -26,6 +28,8 @@ Notions from other files:
 
 See `New.Spanning.RemainingTerms.Sum` for related work.
 -/
+
+@[expose] public section
 
 open MeasureTheory Matrix Module Fintype NumberField
 
@@ -66,7 +70,7 @@ lemma denseRange_conjColumnsAtInfinity : DenseRange (conjColumnsAtInfinity E �
     fun y ↦ ⟨fun a l v ↦ star (y v l a), by simp [conjSwap]⟩
   have h_dense : DenseRange (Pi.map fun _ : 𝔰.κ ↦ Pi.map fun _ : ι ↦ RingHom.pi (Φ (E := E))) :=
     .piMap fun _ ↦ .piMap fun _ ↦ denseRange_Φ
-  show DenseRange (conjSwap ∘ Pi.map fun _ : 𝔰.κ ↦ Pi.map fun _ : ι ↦ RingHom.pi (Φ (E := E)))
+  change DenseRange (conjSwap ∘ Pi.map fun _ : 𝔰.κ ↦ Pi.map fun _ : ι ↦ RingHom.pi (Φ (E := E)))
   exact h_surjective.denseRange.comp h_dense (by fun_prop)
 
 variable (ι) in
@@ -100,8 +104,8 @@ instance {S : Filling E 𝔰} {c : S.Classes} : Countable (S.columnLattice ι c)
 omit [Fintype ι] in
 /-- If `q` and `q'` are matrices whose columns lie in `Λ ∩ X₀`, for the lattice `Λ` of the class
 `c`, then the hermitian products of their columns, the entries of `qᴴ * q'`, are algebraic
-integers. Here `E` contains a primitive root of unity of order `5040`. -/
-lemma isIntegral_conjTranspose_mul {S : Filling E 𝔰} {c : S.Classes} [HasPrimitiveRoot5040 E]
+integers. -/
+lemma isIntegral_conjTranspose_mul {S : Filling E 𝔰} {c : S.Classes}
     {q q' : Matrix 𝔰.κ ι E} (hq : IsIntMatrix (Ô E) (S.classCoordX₀ c * finAdeleMatrix q))
     (hq' : IsIntMatrix (Ô E) (S.classCoordX₀ c * finAdeleMatrix q')) (l l' : ι) :
     IsIntegral ℤ ((qᴴ * q') l l') := by
@@ -119,7 +123,7 @@ lemma isIntegral_conjTranspose_mul {S : Filling E 𝔰} {c : S.Classes} [HasPrim
 
 /-- A nonzero vector of `Λ ∩ X₀`, for the lattice `Λ` of the class `c`, has length at least `1` at
 some place, so the lattice of columns is discrete. -/
-instance {S : Filling E 𝔰} {c : S.Classes} [HasPrimitiveRoot5040 E] [S.IsAdmissible] :
+instance {S : Filling E 𝔰} {c : S.Classes} :
     DiscreteTopology (S.columnLattice ι c) := by
   refine discreteTopology_of_isOpen_singleton_zero ?_
   -- The tuples all of whose vectors are short at every place form a neighbourhood of zero.
@@ -129,7 +133,7 @@ instance {S : Filling E 𝔰} {c : S.Classes} [HasPrimitiveRoot5040 E] [S.IsAdmi
     isOpen_lt (by fun_prop) continuous_const
   suffices h_zero : ({0} : Set (S.columnLattice ι c)) = Subtype.val ⁻¹' U by
     rw [h_zero]
-    exact hU.preimage continuous_subtype_val
+    exact hU.preimage continuous_subtypeVal
   ext ⟨x, hx⟩
   obtain ⟨q, hq, rfl⟩ := mem_columnLattice.1 hx
   refine ⟨fun h_eq ↦ ?_, fun h_short ↦ Subtype.ext ?_⟩
@@ -176,7 +180,7 @@ lemma span_columnLattice {E : Type} [Field E] [CMType E] {𝔰 : Shape} {ι : Ty
         Set (InfinitePlace E → ι → 𝔰.κ → ℂ)) :=
     denseRange_conjColumnsAtInfinity.mono h_range
   rw [← Submodule.dense_iff_topologicalClosure_eq_top.1 h_dense,
-    (Submodule.closed_of_finiteDimensional _).submodule_topologicalClosure_eq]
+    (Submodule.isClosed_of_finiteDimensional _).submodule_topologicalClosure_eq]
 
 /-- Let the CM field `E` contain a primitive root of unity of order `5040`, hence a square root of
 `-1`. For an algebraic integer `x` of `E`, the sum over the infinite places `v` of the real parts of
@@ -188,7 +192,6 @@ lemma exists_int_eq_sum_re {E : Type} [Field E] [CMType E] [HasPrimitiveRoot5040
   -- `i` to `I`. The sum of the `t v` is an algebraic integer equal to `(p - q I) / 2`, for the
   -- traces `p` of `x` and `q` of `i x`. So its squared absolute value `(p² + q²) / 4` is an
   -- integer, and `p` is even.
-  classical
   obtain ⟨i, hi, -⟩ : ∃ i : 𝓞 E, i * i = -1 ∧ star i = -i :=
     HasPrimitiveRoot5040.exists_mul_self_eq_neg_one
   have h_trace {y : E} (hy : IsIntegral ℤ y) :
@@ -198,7 +201,7 @@ lemma exists_int_eq_sum_re {E : Type} [Field E] [CMType E] [HasPrimitiveRoot5040
     exact ⟨n, by rw [← trace_eq_sum_Φ, ← hn, eq_intCast, Rat.cast_intCast]⟩
   obtain ⟨p, hp⟩ : ∃ p : ℤ, ∑ v : InfinitePlace E, 2 * (Φ v x).re = p := h_trace hx
   obtain ⟨q, hq⟩ : ∃ q : ℤ, ∑ v : InfinitePlace E, 2 * (Φ v (i * x)).re = q :=
-    h_trace (i.2.mul hx)
+    h_trace (i.property.mul hx)
   let t (v : InfinitePlace E) : ℂ := if Φ v i = Complex.I then Φ v x else star (Φ v x)
   have h_term (v : InfinitePlace E) : t v = (Φ v x).re - (Φ v (i * x)).re * Complex.I := by
     have h_sq : Φ v i ^ 2 = Complex.I ^ 2 := by
@@ -270,6 +273,6 @@ theorem exists_isAddFundamentalDomain_columnLattice {E : Type} [Field E] [CMType
   obtain ⟨n, hn⟩ : ∃ n : ℤ, ∑ v : InfinitePlace E, (Φ v (∑ l : ι, (qᴴ * q') l l)).re = n :=
     exists_int_eq_sum_re h_int
   refine ⟨n, .trans ?_ hn⟩
-  simp [e, Fintype.sum_sigma, Matrix.mul_apply, Finset.sum_add_distrib]
+  simp [e, Fintype.sum_sigma, Matrix.mul_apply]
 
 end New.Filling

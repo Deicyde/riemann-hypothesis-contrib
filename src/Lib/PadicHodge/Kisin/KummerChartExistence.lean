@@ -1,5 +1,9 @@
-import Lib.PadicHodge.Crystalline.HodgeTateForms
-import Lib.PadicHodge.Kisin.Charts
+module
+
+public import Mathlib.GroupTheory.NoncommCoprod
+public import Lib.PadicHodge.Crystalline.HodgeTateForms
+public import Lib.PadicHodge.Kisin.Charts
+public import Lib.ClassField.Places.TameInertia
 
 /-!
 # Witt coefficients, the Frobenius group action and existence of Kummer charts
@@ -32,6 +36,8 @@ Notions from other files:
 Known; see `Lib.PadicHodge.Kisin.PeriodMatrixFrame` and `Lib.PadicHodge.PeriodRings.DeRhamPeriods`
 for sources.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -232,7 +238,7 @@ lemma exists_smul_teichmuller_eq (C : Subgroup (Gp p)) [hC : IsClosed (C : Set (
     refine Set.inter_subset_inter_right _ fun g h_next ↦ ?_
     have h_eq : ((g • b u (n + 1) : PadicAlgCl p) : ℂ_[p]) = (v.untiltRoot (n + 1)).val := h_next
     -- `↓`: with the plain lemma simp unfolds one Frobenius too many on each side
-    simpa [← smul_coe_Cp, hb, untiltRoot, ↓Function.iterate_succ',
+    simpa [← UniformSpace.Completion.algEquiv_smul_coe, hb, untiltRoot, ↓Function.iterate_succ',
       ← untilt_iterate_frobeniusEquiv_symm_pow (_^[n] _) 1] using congrArg (· ^ p) h_eq
   have hX_ne (n : ℕ) : (X n).Nonempty := by
     have h_pow_eq : b v n ^ (p ^ n * e) = b u n ^ (p ^ n * e) := by simp [hb_pow, hv]
@@ -248,12 +254,11 @@ lemma exists_smul_teichmuller_eq (C : Subgroup (Gp p)) [hC : IsClosed (C : Set (
   have hg_C : g ∈ C := (hg 0).left
   refine ⟨g, hg_C, (map_teichmuller ..).trans (congrArg _ (Perfection.ext fun n ↦ ?_))⟩
   -- the `n`-th coefficient is the class of the `n`-th component modulo `p`
-  -- `erw`: `OFlat` is the perfection of `O_C / p` only up to unfolding
   erw [map_pow, pow_one, ← coeff_tiltMap _ (mk_untiltRoot ..), ← mk_untiltRoot]
   have hg_n : ((g • b u n : PadicAlgCl p) : ℂ_[p]) = (v.untiltRoot n).val := (hg n).right
   have h_root_eq : g • untiltRoot n u = untiltRoot n v :=
-    Subtype.ext (by simpa [← hb, smul_coe_Cp] using hg_n)
-  exact congrArg _ h_root_eq
+    Subtype.ext (by simpa [← hb] using hg_n)
+  exact congrArg (Ideal.Quotient.mk (span {(p : OC)})) h_root_eq
 
 /-- A Kummer chart for j : Γ → G_p with open image: a chart S = Λ⟦z⟧ ⊂ A_inf, Λ = W(𝔽_{p^f}), and a
 subgroup Γ' (the field `subgroup`) of Γ of index prime to p, with four properties. The image j(Γ')
@@ -389,14 +394,12 @@ lemma exists_kummerChart (Γ : Type) [Group Γ] [𝒥 : OverGp Γ p] :
     ((algebraMap ..).comp (localFieldOf Γ).val.toRingHom).restrict _ _ (by simp [← coe_nnNorm])
   -- `ev : Λ⟦X⟧ → A_inf` has `θ (ev X) = π`; each unit series `A` with `θ (ev A) = v` gives a chart
   obtain ⟨ev, h_evX, h_chart⟩ :=
-    exists_chart_of_pow_mul_eq_neg f (x := κ π) (e := e) (v.map κ) (by
-      simpa only [map_mul, map_pow, map_neg, map_natCast, Units.coe_map, MonoidHom.coe_coe] using
-        congrArg κ hv)
+    exists_chart_of_pow_mul_eq_neg f (v.map κ) (by simpa using congrArg κ hv)
   -- `O_C` is `π`-adically separated, since `p ∣ π ^ e`
   have h_sep : IsHausdorff (span {κ π}) OC := by
     refine ⟨fun x h ↦ eq_of_forall_pow_dvd_sub ↑p fun n ↦ ?_⟩
     grw [← map_natCast κ, neg_dvd.mp (Associated.dvd' ⟨v, hv⟩), map_pow, ← pow_mul,
-      smodEq_span_pow_iff_dvd.mp (h _)]
+      (TauCeti.sModEq_span_singleton_pow_iff ..).mp (h _)]
   -- `θ` maps `Λ` into the integers of `K` (by `τ`), and every integer of `K` is a Teichmüller
   -- constant modulo `π` (`using!` below: the fact bounds `‖·‖`, the goal `‖·‖₊`)
   let τ : WittFq f →+* valRingBelow (localFieldOf Γ) (intQpBar p) :=

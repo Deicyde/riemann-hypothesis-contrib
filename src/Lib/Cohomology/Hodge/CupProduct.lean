@@ -1,4 +1,8 @@
-import Lib.Cohomology.Etale.BijectiveComparisons
+module
+
+public import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
+public import Lib.General.Algebra.LongExactSequences
+public import Lib.Cohomology.Etale.BijectiveComparisons -- shake: keep (instance attribute)
 
 /-!
 # Pointwise tensor product of functors, total Ext with Yoneda composition, external products
@@ -32,6 +36,8 @@ Notions from other files:
 
 Known; see `Lib.Cohomology.Hodge.FixedPointFormula` for sources.
 -/
+
+@[expose] public section
 
 noncomputable section
 
