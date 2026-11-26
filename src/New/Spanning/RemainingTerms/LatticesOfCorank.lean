@@ -273,10 +273,10 @@ lemma exists_mk_out_eq_embFin_mul [S.IsAdmissible] (u : Gf E 𝔰.κ) (φ : S.La
 
 /-! ### Forms and sublattices -/
 
-variable (S) in
 /-- The generalised index of `S.piN` is `N ^ f`, where `N = π π̄` and `f` is the number of
 infinite places of `E`. -/
-lemma genIndex_piN_eq_pow [HasPrimitiveRoot5040 E] : genIndex S.piN.val = S.N ^ numInfPlaces E := by
+lemma genIndex_piN_eq_pow [HasPrimitiveRoot5040 E] (S : Filling E 𝔰) :
+    genIndex S.piN.val = S.N ^ numInfPlaces E := by
   have h_sq : genIndex S.piN.val ^ 2 = (S.N ^ numInfPlaces E) ^ 2 := by
     rw [← genIndex_natCast, ← S.piN_mul_star, map_mul, genIndex_star, sq]
   exact (pow_left_inj₀ (genIndex_pos _).le (by positivity) two_ne_zero).1 h_sq

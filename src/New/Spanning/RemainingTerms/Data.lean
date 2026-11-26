@@ -36,8 +36,12 @@ namespace New.Filling
 
 open NumberField Matrix Module Pointwise
 
-variable {E : Type} [Field E] [CMType E] {𝔰 : Shape} (S : Filling E 𝔰) (j : Fin (𝔰.ϱ + 2))
-  (c c' : S.Classes) (γ γ' : S.G E)
+variable {E : Type} [Field E] [CMType E] {𝔰 : Shape}
+
+section
+
+variable [HasPrimitiveRoot5040 E] (S : Filling E 𝔰) (j : Fin (𝔰.ϱ + 2)) (c c' : S.Classes)
+  (γ γ' : S.G E)
 
 /-- The lattice `Λ ∩ X₀` of the class `c`, in rational coordinates: the vectors that
 `S.classCoordX₀ c` sends to integral vectors. -/
@@ -54,10 +58,6 @@ def termLattice : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
       (((frameMiddle (S.translateByClassReps c c' γ).val.val)ᴴ * S.latticeMiddle (𝔸f E) *
         S.classCoordX₀ c).mulVecLin.restrictScalars (Ô E))
 
-section
-
-variable [HasPrimitiveRoot5040 E]
-
 /-- The part of the lattice `L_γ` of the term `γ` in `commonLink γ γ'`, the vectors of `X₀` that
 are the first entry of a pair, orthogonal to `z`, lying in both links. -/
 def commonPart : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
@@ -71,8 +71,6 @@ def pairLattice : Submodule (Ô E) (𝔰.κ → 𝔸f E) :=
 
 /-- The discriminant of the common lattice `L₁₂` of two terms, a lattice in `commonLink γ γ'`. -/
 def pairDiscriminant : ℝ := discriminant (finrank E (commonLink γ γ')) (S.pairLattice c c' γ γ')
-
-end
 
 /-- The corank `c⁺` of two links: the codimension of their intersection in each of them, a link
 having the dimension `k + 1`. -/
@@ -113,7 +111,9 @@ def nearRepresentativesOver (T : Set (S.G E)) (c : S.Classes) (s : S.ResidueGL) 
     Set (S.G E) :=
   {γ : S.G E | γ ∈ T ∩ S.termsOver c s c' ∧ S.Agrees s ∧ S.IsNearRepresentativeAtCellRank c c' γ}
 
-variable {S c}
+end
+
+variable {S : Filling E 𝔰} {c : S.Classes}
 
 /-- If the rational element `γ` lies in some cell `j` (`S.HasCellRank j γ`:
 `New.NormOnePairOccursFrom` `j` holds, the leading minor `D_j` of `S.frameProducts γ` is nonzero,
