@@ -126,11 +126,9 @@ lemma star_aeval {A : Type*} [StarRing R] [Ring A] [StarRing A] [Algebra R A] [S
 /-- Applying the ring map `ψ` to the entries of `z(Y)` gives the value at the matrix `Y.map ψ` of
 the polynomial `z.map ψ`. -/
 lemma map_aeval_matrix (ψ : R →+* S) (Y : Matrix n n R) (z : R[X]) :
-    (aeval Y z).map ψ = aeval (Y.map ψ) (z.map ψ) := by
-  induction z using recOnHorner with
-  | M0 => simp
-  | MC p a _ _ ih => simp [algebraMap_eq_diagonal, Matrix.map_add, ih]
-  | MX p _ ih => simp [ih]
+    (aeval Y z).map ψ = aeval (Y.map ψ) (z.map ψ) :=
+  map_aeval_eq_aeval_map (ψ := ψ.mapMatrix) (RingHom.ext fun _ ↦ (diagonal_map (map_zero ψ)).symm)
+    z Y
 
 /-- The twisted norm `z · σ(z) ⋯ σ^(p-1)(z)` of a polynomial `z`, with `σ` acting on coefficients,
 is the product of the polynomials `z.map (σ ^ i)` for `i < p`. -/
