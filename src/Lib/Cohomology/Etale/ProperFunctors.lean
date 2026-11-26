@@ -917,7 +917,7 @@ lemma New.Variety.IsGaloisCovering.hasCohomDenseImage_geomPoints {R : CommRingCa
     ((isProperOver_pointsToBase _).baseChange _) fun k _ _ ⟨⟨⟨y_pt⟩, ω⟩, hy⟩ ↦ ?_
   -- lift the scheme point `y_pt` of `Y` to a point `x` of `W`, and keep the map `ω` out of `Ω`
   obtain ⟨x, hx⟩ : ∃ x : Spec (CommRingCat.of k) ⟶ W.left, x ≫ c.left = y_pt :=
-    exists_point_over _ (h.surjective.surj _)
+    (Scheme.Hom.exists_comp_eq_iff_mem_range _ _).2 (h.surjective.surj _)
   have h_over : x ≫ W.hom = y_pt ≫ Y.hom := by simp [← hx]
   have h_base : (pointsToBase W.hom).app (CommRingCat.of k) ⟨x⟩ =
       (pointsToBase Y.hom).app (CommRingCat.of k) ⟨y_pt⟩ :=
