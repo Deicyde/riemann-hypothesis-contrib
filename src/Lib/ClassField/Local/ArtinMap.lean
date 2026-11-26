@@ -11,7 +11,7 @@ public import Lib.Adelic.Adeles.IdeleModulus
 public import Lib.ClassField.GaloisCohomology.KummerCyclicClasses
 public import Lib.ClassField.Places.DecompositionCompletion
 import Lib.Adelic.Adeles.StrongApproximation
-import Lib.ClassField.Local.InvariantMap
+public import Lib.ClassField.Local.InvariantMap
 import Lib.ClassField.LocalDuality.DualityInequality
 import Lib.ClassField.Places.LocalFields
 import Lib.ClassField.Places.TameInertia
