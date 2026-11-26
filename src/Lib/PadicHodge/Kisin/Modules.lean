@@ -1,8 +1,14 @@
 module
 
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.Topology.Separation.CompletelyRegular
 public import Lib.ClassField.LocalDuality.CrystallineDuality
 public import Lib.PadicHodge.ArtinSchreierSequence
 public import Lib.PadicHodge.Kisin.KummerChartDeRham
+import Lib.PadicComparison.Descent.TestCategory
+import Lib.PadicHodge.Crystalline.HodgeTateForms
 
 /-!
 # Kisin modules of Kummer charts: lattices with jump sets, letter projectors, invariant forms
@@ -85,9 +91,6 @@ open Period WittVector Submodule Set FrobGroup Module Fintype Algebra
 
 variable {p : ℕ} [ThePrime p] [Γ : GroupOverGp p] [k : KummerChart Γ]
   {R X : Type*} [CommRing R] [AddCommGroup X] [Module R X] {Q : Submodule R X}
-
-/-- The actions of ℤ_p and of A_inf on W(C^♭) commute. -/
-instance : SMulCommClass ℤ_[p] Ainf WittCFlat := inferInstance
 
 /-! ### Saturation of a submodule -/
 

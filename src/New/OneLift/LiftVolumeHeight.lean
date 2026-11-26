@@ -1,8 +1,14 @@
 module
 
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Data.Rat.Cast.OfScientific
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
 public import New.Determinant.Chain.NormOfChain
 public import New.OneLift.ComparisonOperator.GluingMaps
-public import New.OneLift.HeckeValues.TwistedValueHeights
+import Lib.GLn.SchurModule.SchurNorm
+import Lib.General.LinearAlgebra.MatrixNormBounds
+import New.Congruences.GaloisRepresentations.SelmerHypotheses
+import New.OneLift.HeckeValues.TwistedValueHeights
 
 /-!
 # The cost of one lift: a height bound for Z_j(1)/Z_j(ξ^j)
@@ -87,15 +93,6 @@ lemma norm_map_det_le_pow {K L : Type} [NormedField K] [AddCommGroup L] [Module 
   obtain ⟨z, hz⟩ := ((End.hasEigenvalue_iff_isRoot_charpoly u α).2
     (Polynomial.isRoot_of_mem_roots hα)).exists_hasEigenvector
   exact h_eigen α z hz
-
-/-- Multiplying a form on the space `V` of a descent pair `O` by `c` multiplies its squared norm
-`normSqAt` at an automorphism `σ` of `ℂ` by `‖σ c‖ ^ 2`. -/
-lemma _root_.New.LevelPlaces.LevelForm.normSqAt_smul {E r n : Type} [Field E] [CMType E]
-    [Fintype r] [DecidableEq r] [Fintype n] [DecidableEq n] {O : DescentPair E r n}
-    (c : ℂ) (φ : O.FormV) (σ : ℂ ≃+* ℂ) :
-    (c • φ).normSqAt σ = ‖σ c‖ ^ 2 * φ.normSqAt σ := by
-  rw [normSqAt, normSqAt, mul_classSum]
-  exact congrArg _ (funext fun g ↦ weylNormSq_comp_smul (φ g) σ c)
 
 /-- The squared norm `φ.normSqAt σ` of a form (the weighted sum over classes of the squared norms
 of the values after applying `σ`) is not negative. -/

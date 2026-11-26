@@ -1,7 +1,13 @@
 module
 
-public import TauCeti.LinearAlgebra.Matrix.GeneralLinearGroup.Lift
-public import Lib.Adelic.Unitary.ComponentsAndBlockSums
+public import Mathlib.Analysis.Complex.Circle
+import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+import Mathlib.Topology.Sheaves.Presheaf
+import TauCeti.LinearAlgebra.Matrix.GeneralLinearGroup.Lift
+import TauCeti.RingTheory.DedekindDomain.AdicValuation.ResidueField
+public import Lib.Adelic.Unitary.Defs
+public import Lib.General.LinearAlgebra.IntegralLattices
+import Lib.Adelic.Unitary.ComponentsAndBlockSums
 
 /-!
 # Principal levels and levels defined by reductions in the finite adelic unitary group
@@ -197,19 +203,13 @@ def principalLevel : Subgroup (Gf E n) :=
 
 variable {n a}
 
-/-- An element g of G_f is in the principal level of a if and only if it lies in K₀ = `stdLevel E n`
-and every entry of g - 1 is a times an element of Ô. -/
-lemma mem_principalLevel {g : Gf E n} :
-    g ∈ principalLevel n a ↔ g ∈ stdLevel E n ∧ ∀ i j : n, ∃ y ∈ Ô E,
-      ((g.val : Matrix n n (𝔸f E)) - 1) i j = algebraMap (𝓞 E) (𝔸f E) a * y := Iff.rfl
-
 /-- If f : Ô → S kills the integer a, then an element k of the principal level of a maps to 1 in
 GL_n(S) under entrywise application of f. -/
 lemma map_eq_one_of_mem_principalLevel {k : Gf E n} (hk : k ∈ principalLevel n a) (ha : f a = 0) :
     stdLevel.map n f ⟨k, hk.1⟩ = 1 := by
   -- Each entry of `k - 1` is a multiple of `a`, which `f` kills.
   refine (map_eq_one n).2 fun i j ↦ (RingHom.ker f).mem_of_dvd ?_ ha
-  obtain ⟨y, hy, h_entry⟩ := (mem_principalLevel.1 hk).2 i j
+  obtain ⟨y, hy, h_entry⟩ := hk.2 i j
   exact ⟨⟨y, hy⟩, Subtype.ext h_entry⟩
 
 omit [IsCMField E] in

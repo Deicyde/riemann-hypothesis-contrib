@@ -1,7 +1,19 @@
 module
 
-public import Lib.DiscreteSeries.FlenstedJensen.RightDerivatives
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Basic
+import Mathlib.Analysis.Matrix.Order
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.RingTheory.MvPolynomial.EulerIdentity
+import Mathlib.Topology.Algebra.Group.Matrix
 public import Lib.Weil.Fock.PolynomialVectors
+public import Lib.DiscreteSeries.Theta.FockDualPair
+public import Lib.Weil.DualPair.Kronecker
+import Lib.Cohomology.Etale.Basic
+import Lib.DiscreteSeries.FlenstedJensen.RightDerivatives
+import Lib.DiscreteSeries.Haar.TotalMass
+import Lib.General.Analysis.HolomorphicIntegrals
+import Lib.General.LinearAlgebra.MatricesNearIdentity
+import Lib.General.Measure.HaarModulus
 
 /-!
 # Harmonic matrix coefficients of the Weil representation and oscillator pairs on matrices
@@ -100,19 +112,15 @@ lemma det_complexLinearPart :
   · simp [toSquareBlockProp, complexLinearPart_apply, units_ne_iff_eq_neg.1 hi,
       units_ne_iff_eq_neg.1 hj]
 
-/-- For u in U(ε), the conjugate `realMultiplier u` of the determinant of the negative block of u is
-not zero. -/
-lemma realMultiplier_ne_zero : realMultiplier u ≠ 0 := fun h_zero ↦ by
-  -- The cocycle identity at `(u, u)` writes `1` as a product with the factor `realMultiplier u`.
-  simpa [realAction, h_zero] using (realAction ε).cocycle u u
-
 /-- The matrix `complexLinearPart u` is invertible, since both diagonal blocks of u are. -/
 noncomputable instance : Invertible (complexLinearPart u) :=
   invertibleOfIsUnitDet (complexLinearPart u) <| by
     have h_pos : principalMinor (u : Matrix ι ι ℂ) (fun i : ι ↦ ¬ε i = -1) =
         (u : Matrix ι ι ℂ).det * realMultiplier u := U.principalMinor_compl u
     rw [det_complexLinearPart, h_pos]
-    simp [realMultiplier_ne_zero, GeneralLinearGroup.det_ne_zero]
+    have h_ne : realMultiplier u ≠ 0 := fun h_zero ↦ by
+      simpa [realAction, h_zero] using (realAction ε).cocycle u u
+    simp [h_ne, GeneralLinearGroup.det_ne_zero]
 
 omit [DecidableEq ι] in
 /-- Induction for polynomials P with ∂_i∂_j P = 0 whenever r(i, j). A subspace S contains all of

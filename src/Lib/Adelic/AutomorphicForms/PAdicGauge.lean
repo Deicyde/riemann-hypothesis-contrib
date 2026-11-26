@@ -1,9 +1,18 @@
 module
 
-public import Mathlib.Topology.MetricSpace.Ultra.Pi
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Matrix.Order
+import Mathlib.Topology.MetricSpace.Ultra.Pi
 public import Lib.Adelic.AutomorphicForms.HeckeEigenforms
-public import Lib.General.LinearAlgebra.MatrixNormBounds
-public import Lib.PadicComparison.Descent.TestCategory
+public import Lib.Adelic.Adeles.StrongApproximation
+public import Lib.Adelic.Reduction.DefiniteClassSums
+public import Lib.GLn.SchurModule.GramMatrix
+import Lib.Adelic.Unitary.WeakApproximation
+import Lib.Adelic.Witt.WittTheorem
+import Lib.GLn.SchurModule.SchurNorm
+import Lib.GLn.SchurModule.WeylKernel
+import Lib.General.LinearAlgebra.MatrixNormBounds
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # The p-adic gauge of algebraic forms, class sums, and integral forms of a level
@@ -222,10 +231,6 @@ namespace New
 variable {E n : Type} [Field E] [CMType E] [Fintype n] [DecidableEq n]
   {κ : InfinitePlace E → ℕ → ℕ} {e : InfinitePlace E → ℤ} (K : Subgroup (Gf E n)) {χ : K →* ℂ}
 
-/-- The set of classes of the standard space I_n for a subgroup K: double cosets of the finite
-adelic unitary group by its rational points on the left and K on the right. -/
-abbrev StdClasses : Type := DoubleCosets (stdSpace E n).Γf K
-
 variable {K}
 
 /-- The classes at level `K` have a system of representatives `r` whose members are all integral
@@ -244,8 +249,6 @@ lemma exists_reps_integralAbove (p : ℕ) [Fact p.Prime] :
   exact (c.eq_mk_iff_out.2 (rel_iff.2 ⟨_, ⟨γ c, rfl⟩, 1, K.one_mem, by simp⟩)).symm
 
 variable [HasFiniteType stdRatPoints K] [Fact (χ =ᶠ[nhds 1] 1)]
-
-noncomputable instance : Fintype (StdClasses K) := @.ofFinite _ HasFiniteType.finite_classes
 
 /-- For a level K (an open subgroup of the stabiliser of the standard lattice) and χ with values of
 finite order, the delta form attached to χ, x, v (the form supported on the double coset of x that
@@ -663,6 +666,12 @@ variable (φ φ' : S.LevelForm H χ κ e) (σ : ℂ ≃+* ℂ) {l : ℕ} [Fact l
 σ(φ(g)). -/
 def normSqAt : ℝ :=
   classSum stdRatPoints (levelOf S.placeAt H) fun g : Gf E n ↦ weylNormSq (σ ∘ φ g)
+
+/-- Multiplying a level form by `c` scales its squared norm at `σ` by `‖σ c‖ ^ 2`. -/
+lemma normSqAt_smul (c : ℂ) (φ : S.LevelForm H χ κ e) (σ : ℂ ≃+* ℂ) :
+    (c • φ).normSqAt σ = ‖σ c‖ ^ 2 * φ.normSqAt σ := by
+  rw [normSqAt, normSqAt, mul_classSum]
+  exact congrArg _ (funext fun g ↦ weylNormSq_comp_smul (φ g) σ c)
 
 /-- Cauchy–Schwarz for conjugates: for forms φ, φ' of one level and σ ∈ Aut ℂ, we have |σ⟨φ',
 φ⟩| ≤ ‖φ‖_σ·‖φ'‖_{σ'}, where σ' = conj ∘ σ ∘ conj and ‖φ‖²_σ = `φ.normSqAt σ` is the class sum of

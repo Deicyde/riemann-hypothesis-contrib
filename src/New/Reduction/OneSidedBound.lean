@@ -1,10 +1,13 @@
 module
 
-public import New.Reduction.Data.Existence
-public import New.Reduction.MainInequality
-public import New.Reduction.Zeros.Criterion
-public import New.Reduction.Zeros.PrimeNumberTheorem
 public import Statements
+public import New.Reduction.Data.AdmissibleData
+import New.Reduction.Data.Existence
+import New.Reduction.Data.Magnitudes
+import New.Reduction.MainInequality
+import New.Reduction.Zeros.Criterion
+import New.Reduction.Zeros.PrimeNumberTheorem
+public import TauCeti.NumberTheory.DirichletCharacter.LFunction.ZeroReflection -- shake: keep (`New.Main` uses it)
 
 /-!
 # The one-sided bound, and the theorem in half-plane form

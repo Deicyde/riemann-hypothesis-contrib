@@ -1,8 +1,13 @@
 module
 
-public import TauCeti.LinearAlgebra.Matrix.Rank
-public import Lib.DiscreteSeries.Bruhat.BigCell
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.TotallySplit
+import TauCeti.LinearAlgebra.Matrix.Rank
 public import New.Spanning.Unfolding.Terms
+import Lib.DiscreteSeries.Bruhat.BigCell
 
 /-!
 # Links of isometries, the link isometry Υ_γ, and invariance under `besselU`
@@ -34,7 +39,8 @@ vanishes if and only if the spans of the frame and of its image under `γ` share
   link as its graph.
 * `New.Filling.linkIsometry_frameImage_mulVec`, `New.Filling.mul_dotProduct_comp_indexX₀_eq_sub`:
   the link on combinations of the second frame, and the norm identity that follows.
-* `New.Filling.termDisc_eq_zero_of_inf_ne_bot`: the sufficient condition for the vanishing of `termDisc γ`.
+* `New.Filling.termDisc_eq_zero_of_inf_ne_bot`: the sufficient condition for the vanishing of
+  `termDisc γ`.
 
 Notions from other files:
 * `New.Shape.Form.splitGram`: the Gram matrix of `ϱ` hyperbolic planes and a middle space with Gram

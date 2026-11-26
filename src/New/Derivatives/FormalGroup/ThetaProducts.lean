@@ -1,9 +1,12 @@
 module
 
+import Mathlib.Algebra.Order.Star.Real
+import TauCeti.RingTheory.PowerSeries.Rescale
 public import New.Derivatives.Divisibility.NormalForm
-public import New.Derivatives.FormalGroup.Exponent
 public import New.Derivatives.FormalGroup.Resolution
 public import New.Derivatives.Vacuum.TightFrames
+public import Lib.CM.FormalGroup.PrimeNotation
+import New.Derivatives.FormalGroup.Exponent
 
 /-!
 # The normal form of theta products at non-split primes
@@ -75,8 +78,7 @@ open MvPolynomial
 @[simp] lemma rescale_subst_linearSeries {a : ℂ_[p]} (c : X → ℂ_[p]) (g : PowerSeries ℂ_[p]) :
     rescale (fun _ : X ↦ a) (g.subst (linearSeries c)) = (g.rescale a).subst (linearSeries c) := by
   ext D
-  simp [coeff_subst_linearSeries, prod_pow_eq_pow_sum, degree_eq_sum, field,
-    -subst_rescale_eq_subst_smul]
+  simp [coeff_subst_linearSeries, prod_pow_eq_pow_sum, degree_eq_sum, field]
 
 end New
 
