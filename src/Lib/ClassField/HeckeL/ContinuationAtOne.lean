@@ -1,9 +1,18 @@
 module
 
-public import Mathlib.Analysis.Complex.HalfPlane
+public import Mathlib.Topology.Algebra.Group.Units
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.AlgebraicTopology.FundamentalGroupoid.SimplyConnected
+import Mathlib.Analysis.Complex.HalfPlane
+import Mathlib.Analysis.Convex.Contractible
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Topology.UniformSpace.Uniformizable
+import TauCeti.Topology.Algebra.Group.Units
 public import Lib.ClassField.HeckeL.EulerProduct
 public import Lib.ClassField.HeckeL.IdelicThetaSum
-public import Lib.General.Analysis.HolomorphicIntegrals
+import Lib.Adelic.Adeles.StrongApproximation
+import Lib.General.Analysis.HolomorphicIntegrals
 
 /-!
 # Analyticity at 1 of L-functions of nontrivial Hecke characters
@@ -360,7 +369,8 @@ lemma integral_mul_finIdeleAbs_rpow_eq_eulerProd_mul (hψ : IsHeckeOfType ψ n)
       exists_divisor_eq_coeIdeal_of_supp hd_count hx_integral hx_unit
     simp [hI, coeIdeal_inj]
   have h_countable : Countable (Ideal (𝓞 K)) :=
-    .of_preimage_singleton fun N ↦ (Ring.HasFiniteQuotients.finite_absNorm_eq (S := 𝓞 K) N).countable
+    .of_preimage_singleton fun N ↦
+      (Ring.HasFiniteQuotients.finite_absNorm_eq (S := 𝓞 K) N).countable
   -- Integrate term by term; the coefficients `χ I * N I ^ (-s)` sum to the Euler product.
   have h_value : ∫ x, Z x ∂μ = eulerProd (heckeCoeff ψ S) s * μ.real W := by
     simp only [h_Z]

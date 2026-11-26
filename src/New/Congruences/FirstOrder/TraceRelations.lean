@@ -1,11 +1,22 @@
 module
 
-public import Lib.Cyclotomic.OddSha
-public import New.Congruences.FirstOrder.TateTwistCocycles
-public import New.Congruences.GaloisRepresentations.RowsAndColumnsFromLabels
-public import New.Congruences.LocalLoss.CrystallineDefect
+import Mathlib.Algebra.Azumaya.Basic
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Data.Rat.Cast.OfScientific
+import Mathlib.Topology.Algebra.Module.Compact
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 public import New.Congruences.LocalLoss.LocalLattices
-public import New.Congruences.LocalLoss.TateDualBound
+public import New.Congruences.FirstOrder.EvenClasses
+public import New.Congruences.FirstOrder.FittingBlock
+import Lib.ClassField.GaloisCohomology.TameSelmerCocycles
+public import Lib.Cyclotomic.OddSha -- shake: keep (needed public by an exposed definition)
+import New.Congruences.FirstOrder.TateTwistCocycles
+import New.Congruences.GaloisRepresentations.AttachedRepresentations
+import New.Congruences.GaloisRepresentations.RowsAndColumnsFromLabels
+import New.Congruences.LocalLoss.CrystallineDefect
+import New.Congruences.LocalLoss.TateDualBound
 
 /-!
 # Constants, trace relations, lattices and local defects for Ribet's method
@@ -202,13 +213,6 @@ variable {ℓ : ℕ} [ThePrime ℓ] {P : Parameters} {D : Data P}
   {K Y n r : Type} [Fintype n] [DecidableEq n] [Fintype r] [DecidableEq r]
   {t ν : ℕ} {w : K → FinPlace D.E} {τ φ : K → AbsGal D} {O : CoeffRing ℓ}
 
-/-- Ribet's cocycles vanish on the kernel of `u`: a cocycle `z` that obeys the linear relations
-among the `u x g - 1` vanishes at every `g` with `u x g = 1` for all `x`. -/
-lemma ribetCocycles.apply_eq_zero {u : Y → AbsGal D →* Matrix n n O}
-    {ρ : AbsGal D →* Matrix r r O} {b : ↑O} {z : AbsGal D → r → QuotSpan b}
-    (hz : z ∈ ribetCocycles u ρ b) {g : AbsGal D} (hg : ∀ x : Y, u x g = 1) : z g = 0 := by
-  simpa using (mem_ribetCocycles.1 hz).2 (.single g 1) (by simp [funext_iff, hg])
-
 open Ideal IsLocallyConstant in
 /-- Let `z` be a cocycle for `ρ` modulo `b` that obeys the linear relations among the `u x g - 1`
 (`ribetCocycles`), where the `u x` are continuous and trivial on the inertia groups outside
@@ -231,7 +235,9 @@ lemma ribetCocycles.mem_selmerModule [Fintype Y] {u : Y → AbsGal D →* Matrix
     exact congrArg Prod.snd h_pair
   have h_coc : ∀ g g' : AbsGal D, z (g * g') = z g + ρ g • z g' :=
     mem_obeying_cocycleRelations.1 hz.1
-  refine mem_selmerModule_iff.2 ⟨h_coc, fun g hg ↦ apply_eq_zero hz (h_unr g hg), hzL, ?_⟩
+  refine mem_selmerModule_iff.2 ⟨h_coc,
+    fun g hg ↦ by simpa using (mem_ribetCocycles.1 hz).2 (.single g 1) (by simp [funext_iff, h_unr g hg]),
+    hzL, ?_⟩
   -- So `z g` depends only on `u g` modulo `b ^ k`, which is locally constant in `g`.
   have h_red : IsLocallyConstant fun g x ↦ (u x g).map (span {b ^ k}).mkQ := (iff_continuous _).2
     (continuous_pi fun x ↦ (hu_cont x).matrix_map (span {b ^ k}).continuous_mkQ)

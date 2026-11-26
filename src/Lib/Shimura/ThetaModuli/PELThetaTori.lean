@@ -1,8 +1,14 @@
 module
 
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.RingTheory.PiTensorProduct
 public import Lib.Shimura.ThetaModuli.FlatClosure
 public import Lib.Shimura.ThetaNormality.NormalGeneration
 public import Lib.Shimura.Uniformisation.AdelicFrames
+public import Lib.Adelic.Adeles.AdditiveCharacter
+public import Lib.Shimura.ComplexTheta.DimensionFormula
+import Lib.Adelic.Adeles.StrongApproximation
+import Lib.Base
 
 /-!
 # PEL data, the adelic Riemann form and theta coordinates of polarised period maps
@@ -769,18 +775,16 @@ lemma lagrangianTheta_mem_thetaSpace_lagrangian :
       x.multiplier :=
   x.exists_generator_thetaSpace.choose.prop
 
-lemma lagrangianTheta_ne_zero : x.lagrangianTheta ≠ 0 := by
-  obtain ⟨h_ne, -⟩ := x.exists_generator_thetaSpace.choose_spec
-  exact fun h_zero ↦ h_ne (Subtype.ext h_zero)
+lemma lagrangianTheta_ne_zero : x.lagrangianTheta ≠ 0 :=
+  fun h_zero ↦ x.exists_generator_thetaSpace.choose_spec.1 (Subtype.ext h_zero)
 
 /-- Every theta function for the lattice over the Lagrangian subgroup is a complex multiple of
 `x.lagrangianTheta`. -/
 lemma exists_smul_lagrangianTheta_eq {f : V → ℂ}
     (hf : f ∈ x.automorphyForm.thetaSpace (L := x.latticeOver D.lagrangian) x.multiplier) :
-    ∃ c : ℂ, c • x.lagrangianTheta = f := by
-  obtain ⟨-, h_span⟩ := x.exists_generator_thetaSpace.choose_spec
-  obtain ⟨c, hc⟩ := h_span ⟨f, hf⟩
-  exact ⟨c, congrArg Subtype.val hc⟩
+    ∃ c : ℂ, c • x.lagrangianTheta = f :=
+  (x.exists_generator_thetaSpace.choose_spec.2 ⟨f, hf⟩).imp
+    fun _ hc ↦ congrArg Subtype.val hc
 
 /-- The theta coordinate at `t`: the normalised translate of `x.lagrangianTheta` by the chosen
 lift of `t`. -/
@@ -1031,7 +1035,8 @@ lemma formSpan_eq_normBall (v : Valuation ℂ NNReal)
     (hG : HasGoodReduction x.automorphyForm x.multiplier v D.paddedNorm)
     (c : D.dualTorsion) (j : ℕ) :
     formSpan v.valuationSubring x.thetaCoord (D.paddedNorm ^ j) =
-    (hG.pow j).normBall (x.thetaCoord c ^ D.paddedNorm ^ j) := by
+    HasGoodReduction.normBall (D.paddedNorm ^ j • x.automorphyForm) (x.multiplier ^ D.paddedNorm ^ j) v
+        (x.thetaCoord c ^ D.paddedNorm ^ j) := by
   -- The span of the `x.thetaCoord t` holds the translates of `x.thetaCoord c` by the dual lattice,
   -- by `thetaShift_thetaCoord`.
   have h_shift :
@@ -1045,12 +1050,12 @@ lemma formSpan_eq_normBall (v : Valuation ℂ NNReal)
     exact smul_mem _ (⟨_, (x.valuation_multiplier_mul_bicharacter_eq_one v _).le⟩ : v.integer)
       (subset_span ⟨_, rfl⟩)
   -- So it holds the ball of `x.thetaCoord c`; conversely all `x.thetaCoord t` have the same norm.
-  have h_range : range x.thetaCoord ⊆ hG.normBall (x.thetaCoord c) := by
+  have h_range : range x.thetaCoord ⊆ HasGoodReduction.normBall x.automorphyForm x.multiplier v (x.thetaCoord c) := by
     simp [hG.mem_normBall, thetaNorm_thetaCoord, range_subset_iff]
   have h_lattice (u : V) (hu : D.paddedNorm • u ∈ x.periodLattice) :
     u ∈ x.latticeOver D.lagrangian :=
     x.latticeOver_mono D.torsion_mem_lagrangian ((x.nsmul_mem_latticeOver hG.one_lt.ne_bot).mp hu)
-  have h_span : span v.valuationSubring (range x.thetaCoord) = hG.normBall (x.thetaCoord c) :=
+  have h_span : span v.valuationSubring (range x.thetaCoord) = HasGoodReduction.normBall x.automorphyForm x.multiplier v (x.thetaCoord c) :=
     span_eq_of_le _ h_range fun f hf ↦
       hG.mem_of_mem_normBall (x.thetaCoord_mem_thetaSpace c) le_rfl hG.isAppellHumbert
         (x.thetaCoord_mem_thetaSpace c) hf.left h_shift hf

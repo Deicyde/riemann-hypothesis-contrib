@@ -1,8 +1,23 @@
 module
 
-public import Lib.DiscreteSeries.Holomorphic.ModelFunction
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.CStarAlgebra.Spectrum
+import Mathlib.Data.Rat.Cast.OfScientific
+import Mathlib.MeasureTheory.Integral.Pi
+import Mathlib.RingTheory.Etale.Weakly
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.DiscreteSeries.Holomorphic.PeaksAwayFromCusp
 public import New.OneLift.ComparisonOperator.ExchangeData
+public import Lib.DiscreteSeries.Holomorphic.HighestVectorExtension
+import Lib.DiscreteSeries.FlenstedJensen.PsiKTypes
+import Lib.DiscreteSeries.Haar.TotalMass
+import Lib.DiscreteSeries.Holomorphic.MaximalCompactMinors
+import Lib.DiscreteSeries.Holomorphic.ModelFunction
+import Lib.General.Analysis.PackingAndSobolev
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Decay of Fock matrix coefficients, sparse theta sums and the isolation estimate
@@ -100,7 +115,8 @@ theorem New.Fock.norm_fockInner_realHeisenbergOp_le {ι : Type} [Fintype ι] [De
   -- takes a Gaussian factor out of `v`, which is small at `x` or at `σ x + y`; the rest is bounded
   -- by `2ab ≤ a² + b²`, which does the work of the Cauchy–Schwarz inequality as `a²` and `b²` have
   -- the same integral. The dilation costs the factor `c^(2(d + |ι|)) ≤ eⁿ`.
-  have A_ne : A ≠ 0 := by linarith [card_pos (α := ι)]
+  have A_ne : A ≠ 0 :=
+    (card_pos.trans_le ((Nat.le_add_left (card ι) d).trans hA)).ne'
   let c : ℝ := √(n / A + 1)
   let v_scaled : fockSpace ε := (c : ℂ) ^ d • v
   let G (x : ι → ℂ) : ℝ := ‖v_scaled (c⁻¹ • x)‖ ^ 2

@@ -1,11 +1,17 @@
 module
 
-public import New.Congruences.GaloisRepresentations.SelmerHypotheses
-public import New.Derivatives.Sharpness.BoundAttained
+import Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality
+import Mathlib.Data.Rat.Cast.OfScientific
 public import New.OneLift.ComparisonOperator.ThreeExchanges
-public import New.OneLift.FalseLifts.PeriodsOfFalseLifts
 public import New.OneLift.HeckeValues.AlgebraicPartSize
-public import New.OneLift.HeckeValues.CentralAction
+public import Lib.DiscreteSeries.Bruhat.ComplexPlace
+public import New.OneLift.HeckeValues.TwistedRatio
+public import New.UpperBound.Size.ShortColumns
+import New.Congruences.GaloisRepresentations.SelmerHypotheses
+import New.Derivatives.Sharpness.BoundAttained
+import New.OneLift.FalseLifts.PeriodsOfFalseLifts
+import New.OneLift.HeckeValues.CentralAction
+import New.UpperBound.Size.Estimates
 
 /-!
 # Heights of ratios of twisted to untwisted Hecke values via rank-one theta lifts
@@ -1116,7 +1122,7 @@ theorem heightLe_inv_ratio {θ : PrimePadicIso → D.MFoldTwist} (hθ : D.IsRegu
     set pairings := inner ℂ (Ξ ι) (φ ι) * inner ℂ (φ ι) (Ξ' ι)
     have h_cancel (a b : ℂ) : a * (pairings / b) * (ρ ι)⁻¹ ^ 2 * (ρ ι ^ 2 / pairings) = a / b := by
       rw [inv_pow, div_eq_mul_inv (ρ ι ^ 2), mul_assoc _ (ρ ι ^ 2)⁻¹,
-        ← mul_assoc (ρ ι ^ 2)⁻¹ (ρ ι ^ 2), inv_mul_cancel₀ (pow_ne_zero 2 (hρ ι)), one_mul,
+        inv_mul_cancel_left₀ (pow_ne_zero 2 (hρ ι)),
         ← mul_div_assoc, div_mul_eq_mul_div, mul_inv_cancel_right₀ h_ne]
     rw [h_value, h_norm, h_cancel]
   -- The power of `N(Q)` is an integer, so it has norm at most one.

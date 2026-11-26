@@ -1,8 +1,12 @@
 module
 
-public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.IsPullback.Kernels
+import Mathlib.Algebra.Category.Grp.Zero
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.IsPullback.Kernels
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
 public import Lib.Cohomology.ProjectiveLine.PerfectLine
 public import Lib.Cohomology.ProperBaseChange.Theorem
+public import Lib.PadicComparison.Primitive.PeriodCoefficients
+import Lib.Cohomology.Etale.DenseSubfunctors
 
 /-!
 # Leray–Hirsch bases and the projective line formula for the tilted theory
@@ -981,17 +985,20 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
       · let x := y.down.hom (single 1 1)
         change F d (0, 0) - F d (0, ρ d (tiltMap j.toRingHom x)) =
           ((cocycle _).extension.X₂.map j).hom (F c (0, 0) - F c (0, ρ c x))
-        erw [_root_.map_sub, F_nat c d j (0, 0), F_nat c d j (0, ρ c x)]
+        rw [_root_.map_sub, F_nat c d j (0, 0), F_nat c d j (0, ρ c x)]
         simp [ρ_nat]
       · let x := y.down.hom (single 1 1)
         let xc : R c := ρ c x
         let xd : R d := ρ d (tiltMap j.toRingHom x)
         change F d (0, 0) - F d (xd - 1, 1) =
           ((cocycle _).extension.X₂.map j).hom (F c (0, 0) - F c (xc - 1, 1))
-        erw [_root_.map_sub, F_nat c d j (0, 0), F_nat c d j (xc - 1, 1)]
+        rw [_root_.map_sub, F_nat c d j (0, 0), F_nat c d j (xc - 1, 1)]
         simp [xc, xd]
-        erw [map_sub, map_one, ρ_nat]
-        rfl)
+        have h_coordinate :
+            R.map j (xc - 1) = xd - 1 :=
+          (map_sub (R.map j).hom _ _).trans
+            (congrArg₂ (· - ·) (ρ_nat c d j x) (map_one (R.map j).hom))
+        exact congrArg (fun a : R d ↦ F d (a, 1)) h_coordinate.symm)
 
   -- `α` sends a point `t` of the torus to `pow c t`, the untilts of the powers of the coordinate.
   let pow (c : PadicTest) (t : (PadicTest.tilt ⋙ reprBy (monoidAlg ℚ)).obj c) :
@@ -1015,7 +1022,8 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
     let r : (tiltPointsSum pointOrTorus).obj c := ⟨⟨true⟩, q⟩
     change FreeAddCommGroup.lift (pow c)
       (((projFirst (B := pointOrTorus)).app c).hom (FreeAddCommGroup.of r)) = _
-    erw [projFirst_true (B := pointOrTorus) c q, FreeAddCommGroup.lift_apply_of]
+    exact (congrArg (FreeAddCommGroup.lift (pow c))
+      (projFirst_true (B := pointOrTorus) c q)).trans (FreeAddCommGroup.lift_apply_of ..)
   have h_torus : (α ≫ (kummerSeq (genericTestOver A)).g) ≫
       (cocycle (genericTestOver A)).extension.f = gluing ≫ f := by
     -- On the torus the frames `(X, 1)` and `(1, X⁻¹)` differ by the unit `X`.
@@ -1028,13 +1036,15 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
       have h_a : (α.app c).hom (FreeAddCommGroup.of y₀) = 0 := by
         change FreeAddCommGroup.lift (pow c)
           (((projFirst (B := pointOrTorus)).app c).hom (FreeAddCommGroup.of y₀)) = 0
-        erw [projFirst_false (B := pointOrTorus) c y, map_zero]
+        exact (congrArg (FreeAddCommGroup.lift (pow c))
+          (projFirst_false (B := pointOrTorus) c y)).trans (map_zero _)
       change ((cocycle _).extension.f.app c).hom
           (((kummerSeq (genericTestOver A)).g.app c).hom ((α.app c).hom (FreeAddCommGroup.of y₀))) =
         (f.app c).hom ((gluing.app c).hom (FreeAddCommGroup.of y₀))
-      erw [h_a, h_glue, h_f_app]
+      rw [h_a, h_glue, h_f_app]
       simp [z, evalZero]
-      erw [map_zero, sub_self]
+      exact (map_zero ((cocycle (genericTestOver A)).extension.f.app c).hom).trans
+        (sub_self _).symm
     · let X : R c := ρ c (y.down.hom (single 1 1))
       let X' : R c := ρ c (y.down.hom (single (-1) 1))
       let v : (cocycle (genericTestOver A)).extension.X₂ c :=
@@ -1063,7 +1073,7 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
           (discToTorus g ≫ y.down).hom (single 1 1) = y.down.hom (single (g 1) 1) := by
         change y.down.hom (mapDomain g (single 1 1)) = _
         exact congrArg y.down.hom (AddMonoidAlgebra.mapDomain_single ..)
-      simp only [z₀, z₁, Bool.cond_false, Bool.cond_true, h_coord]
+      simp only [Bool.cond_false, Bool.cond_true, h_coord]
       change v = (F c (0, 0) - F c (0, X')) - (F c (0, 0) - F c (X - 1, 1))
       simpa only [sub_sub_sub_cancel_left, eq_sub_iff_add_eq] using h_frame
 
@@ -1071,11 +1081,12 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
     -- `charTwist χ` fixes `X`, as the roots of unity are trivial at `1` and `-1`.
     refine freeAb.hom_ext fun c y ↦ ?_
     let y' : twoDiscs.obj c := ⟨y.fst, ⟨discTwist χ y.fst ≫ y.snd.down⟩⟩
-    erw [NatTrans.comp_app, AddCommGrpCat.comp_apply]
-    change (f.app c).hom (FreeAddCommGroup.lift _ (FreeAddCommGroup.of y)) = _
-    rw [FreeAddCommGroup.lift_apply_of]
-    change (f.app c).hom (FreeAddCommGroup.of y - FreeAddCommGroup.of y') = 0
-    erw [_root_.map_sub, h_f_app, h_f_app]
+    change (f.app c).hom (((oneSub (discTwist χ)).app c).hom (.of y)) = 0
+    have h_sub : ((oneSub (discTwist χ)).app c).hom (.of y) = .of y - .of y' :=
+      freeAb.desc_of ..
+    refine (congrArg (f.app c).hom h_sub).trans ?_
+    refine (_root_.map_sub (f.app c).hom _ _).trans ?_
+    refine (congrArg₂ (· - ·) (h_f_app c y) (h_f_app c y')).trans ?_
     rcases y with ⟨⟨_ | _⟩, y⟩ <;>
       simp [y', discTwist, charTwist, ρ_const, hχ, h_root, -coe_algebraMap, -Functor.comp_obj]
   have h_kummer : oneSub (pointOrTorusTwist χ) ≫ α =
@@ -1088,21 +1099,21 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
       have h_twist : ((oneSub (pointOrTorusTwist χ)).app c).hom
           (FreeAddCommGroup.of y₀) = 0 := by
         change FreeAddCommGroup.lift _ (FreeAddCommGroup.of y₀) = _
-        erw [FreeAddCommGroup.lift_apply_of]
+        rw [FreeAddCommGroup.lift_apply_of]
         change Sub.sub (FreeAddCommGroup.of y₀)
           (FreeAddCommGroup.of (⟨⟨false⟩, ⟨𝟙 _ ≫ y.down⟩⟩ : (tiltPointsSum pointOrTorus).obj c)) = 0
-        erw [Category.id_comp]
+        rw [Category.id_comp]
         exact sub_self _
       have h_glue : (gluing.app c).hom (FreeAddCommGroup.of y₀) = FreeAddCommGroup.of z := by
         simpa only [y₀, z, evalZero_comp] using gluing_apply_point c y
       change (α.app c).hom (((oneSub (pointOrTorusTwist χ)).app c).hom (FreeAddCommGroup.of y₀)) =
         ((kummerSeq (genericTestOver A)).f.app c).hom
           ((κ.app c).hom ((gluing.app c).hom (FreeAddCommGroup.of y₀)))
-      erw [h_twist, h_glue]
+      rw [h_twist, h_glue]
       change _ = ((kummerSeq (genericTestOver A)).f.app c).hom
         (((tateGen (genericTestOver A)).app c).hom ((freeAb.map (toUnit _)).app c
           (((projFirst (B := fun _ ↦ monoidAlg ℚ≥0)).app c).hom (FreeAddCommGroup.of z))))
-      erw [projFirst_false (B := fun _ ↦ monoidAlg ℚ≥0) c z.snd]
+      rw [projFirst_false (B := fun _ ↦ monoidAlg ℚ≥0) c z.snd]
       simp only [map_zero]
     · let y₁ : (tiltPointsSum pointOrTorus).obj c := ⟨⟨true⟩, y⟩
       let t : (PadicTest.tilt ⋙ reprBy (monoidAlg ℚ)).obj c :=
@@ -1115,15 +1126,15 @@ lemma exists_isTodaCancellation_etaClass [Algebra A ℂ_[ℓ]] :
       have h_zero : (κ.app c).hom (FreeAddCommGroup.of z₀) = 0 := by
         change τ (π (((projFirst (B := fun _ ↦ monoidAlg ℚ≥0)).app c).hom
           (FreeAddCommGroup.of z₀))) = 0
-        erw [projFirst_false (B := fun _ ↦ monoidAlg ℚ≥0) c z₀.snd]
+        rw [projFirst_false (B := fun _ ↦ monoidAlg ℚ≥0) c z₀.snd]
         simp only [map_zero]
       have h_one : (κ.app c).hom (FreeAddCommGroup.of z₁) = τ (FreeAddCommGroup.of PUnit.unit) := by
         change τ (π (((projFirst (B := fun _ ↦ monoidAlg ℚ≥0)).app c).hom
           (FreeAddCommGroup.of z₁))) = _
-        erw [projFirst_true (B := fun _ ↦ monoidAlg ℚ≥0) c z₁.snd]
+        rw [projFirst_true (B := fun _ ↦ monoidAlg ℚ≥0) c z₁.snd]
         change τ ((freeAb.map (toUnit (PadicTest.tilt ⋙ reprBy (monoidAlg ℚ≥0)))).app c
           (FreeAddCommGroup.of z₁.snd)) = _
-        erw [freeAb.map_of]
+        rw [freeAb.map_of]
         rfl
       change (α.app c).hom (((oneSub (pointOrTorusTwist χ)).app c).hom (FreeAddCommGroup.of y₁)) =
         ((kummerSeq (genericTestOver A)).f.app c).hom

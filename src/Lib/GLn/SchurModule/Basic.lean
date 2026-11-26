@@ -1,17 +1,8 @@
 module
 
-public import Aesop.Frontend.Tactic
-public import Aesop.Main
 public import Mathlib.Algebra.Module.LinearMap.Polynomial
 public import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
 public import Mathlib.RingTheory.MvPowerSeries.Derivative
-public import Mathlib.RingTheory.WittVector.IsPoly
-public import Mathlib.Tactic.Basify
-public import Mathlib.Tactic.ENatToNat
-public import Mathlib.Tactic.Polynomial.Basic
-public import Mathlib.Tactic.ReduceModChar
-public import Std.Internal.Order.Automation
-public import Std.Tactic.BVDecide.Normalize.Prop
 public import Lib.Speed
 
 /-!
@@ -190,9 +181,14 @@ lemma IsTableauBasis.of_linearIndepOn_of_mem_span_of_character {s : Finset (Tabl
 /-- The standard fillings: the members of a chosen finite set of fillings that satisfies
 `IsTableauBasis` as soon as some set does. This is the case for a finite alphabet `m`
 (`isTableauBasis_epsilon`). They need not be semistandard tableaux. -/
-def BasisTableau (m : Type) [DecidableEq m] (N : ℕ) (k : ℕ → ℕ) : Type :=
+def BasisTableau (m : Type) (N : ℕ) (k : ℕ → ℕ) : Type :=
   {T : Tableau m N k // T ∈ (Classical.epsilon IsTableauBasis : Finset (Tableau m N k))}
-deriving Fintype, DecidableEq
+deriving Fintype
+
+instance {m : Type} [DecidableEq m] {N : ℕ} {k : ℕ → ℕ} :
+    DecidableEq (BasisTableau m N k) := by
+  unfold BasisTableau
+  infer_instance
 
 /-- The number of elements of the finite row type n_τ at the place τ. -/
 abbrev rankAt : ℕ := Fintype.card (n τ)
@@ -307,16 +303,6 @@ lemma jet_monomial :
   classical
   aesop
 
-/-- Raising the exponent at `i` by one multiplies `d!` by `d i + 1`. -/
-private lemma prod_factorial_add_single (d : σ →₀ ℕ) (i : σ) :
-    ((d + Finsupp.single i 1).prod fun (_k : σ) (j : ℕ) ↦ (j ! : R)) =
-      ((d i : R) + 1) * d.prod fun (_k : σ) (j : ℕ) ↦ (j ! : R) := by
-  rw [← mul_prod_erase' (d + Finsupp.single i 1) i _ (by simp), ← mul_prod_erase' d i _ (by simp),
-    Finsupp.erase_add, Finsupp.erase_single, add_zero, Finsupp.add_apply, Finsupp.single_eq_same,
-    factorial_succ]
-  push_cast
-  ring
-
 /-- For the pairing `jet R f F = f(∂) F (0)` of a polynomial with a power series, multiplication of
 `f` by `X i` is adjoint to the derivative of `F` in `X i`. -/
 @[local simp↓]
@@ -325,7 +311,11 @@ lemma jet_mul_X : jet R (f * X i) F = jet R f (F.pderiv i) := by
   rw [jet_eq_sum, jet_eq_sum, support_mul_X, sum_map]
   refine sum_congr rfl fun x _ ↦ ?_
   -- At the exponent `x + single i 1`: `(x i + 1)! = (x i + 1) * (x i)!` matches the derivative.
-  rw [addRightEmbedding_apply, coeff_mul_X, prod_factorial_add_single, F.coeff_pderiv]
+  rw [addRightEmbedding_apply, coeff_mul_X, F.coeff_pderiv,
+    ← mul_prod_erase' (x + Finsupp.single i 1) i _ (by simp), ← mul_prod_erase' x i _ (by simp),
+    Finsupp.erase_add, Finsupp.erase_single, add_zero, Finsupp.add_apply, Finsupp.single_eq_same,
+    factorial_succ]
+  push_cast
   ring
 
 /-- The Fock pairing `⟨a * X ^ α, g⟩` is `α! * a * g.coeff α`, where `α!` is the product of the
@@ -358,6 +348,7 @@ def schur (z : ∀ τ : Φ, Matrix (n' τ) (n τ) R) :
     (Fintype.linearCombination R fun j ↦ nablaBasis R n κ j * detPow R n (schurDetExp n n' κ)) ∘
       rowSubst z ∘ nablaBasis R n' κ)
 
+omit [(τ : Φ) → DecidableEq (n τ)] [(τ : Φ) → DecidableEq (n' τ)] in
 /-- In the notation of `schur` (`n τ`, `n' τ` the finite row types and `κ τ h` the column counts at
 the place `τ`): if `b'_i(z y)` is a linear combination of the products
 `b_j(y) * ∏ τ, det(y_τ) ^ d τ`, then row `i` of the Schur matrix gives the coefficients of such a
@@ -692,11 +683,12 @@ lemma fockPairing_rowSubst [∀ τ : Φ, DecidableEq (n τ)] (p : MatrixPoly ((�
       obtain ⟨⟨τ', a'⟩, k'⟩ := j
       have h_X : w (X (⟨τ', a'⟩, k')) = ∑ d : n' τ', z τ' d a' • X (⟨τ', d⟩, k') := by
         simp [w, rowSubst]
-      simp [h_q, mul_sum (ι := n _), apply_ite, sum_add_distrib, Pi.single_apply, smul_add, h_X]
       -- Both sides are `z τ b a' • w q` if `τ' = τ` and `k' = k`, and `0` otherwise; `aesop`
       -- matches the dependent pairs.
-      change (w q * ∑ x : n' τ', if (τ' = τ ∧ x ≍ b) ∧ k' = k then z τ' x a' • 1 else 0) =
-          ∑ x : n τ, if (τ' = τ ∧ a' ≍ x) ∧ k' = k then z τ b x • w q else 0
+      suffices h : (w q * ∑ x : n' τ', if (τ' = τ ∧ x ≍ b) ∧ k' = k then z τ' x a' • 1 else 0) =
+          ∑ x : n τ, if (τ' = τ ∧ a' ≍ x) ∧ k' = k then z τ b x • w q else 0 by
+        simpa [h_q, mul_sum (ι := n _), apply_ite, sum_add_distrib, Pi.single_apply, smul_add, h_X]
+          using h
       aesop (add simp ite_and)
   -- Induction on `p`: multiplication by a variable is adjoint to the partial derivative.
   induction p using MvPolynomial.induction_on with

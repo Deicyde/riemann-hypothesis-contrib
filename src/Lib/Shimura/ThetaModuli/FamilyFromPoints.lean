@@ -1,9 +1,13 @@
 module
 
-public import Mathlib.AlgebraicGeometry.Morphisms.LocalFlatDescent
-public import Lib.General.Geometry.SerreTheorem
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.AlgebraicGeometry.Morphisms.LocalFlatDescent
+import Mathlib.CategoryTheory.EffectiveEpi.Comp
 public import Lib.Shimura.ThetaNormality.RiemannRelation
 public import Lib.Shimura.Uniformisation.TorusModel
+public import Lib.Adelic.Hecke.ClassSums
+import Lib.General.Geometry.SerreTheorem
+import Lib.Shimura.AbelianScheme.Pairings
 
 /-!
 # Linear systems and theta families from dense complex points carrying theta tori
@@ -942,7 +946,7 @@ noncomputable def Variety.fiberPointMap {E : Type} [Field E] {S : Scheme}
   ((isGroupBaseChange_counit (O := 𝓞 E) (A := A) η).pointEquiv (T := 𝟙_ _)).symm.toLinearMap
 
 /-- The point of the fibre given by `fiberPointMap A η u` is the pair of `u` and the point `η`. -/
-lemma Variety.fiberPointMap_left {E : Type} [Field E] [CMBase E] {S : Scheme}
+lemma Variety.fiberPointMap_left {E : Type} [Field E] {S : Scheme}
     {η : Spec (CommRingCat.of ℂ) ⟶ S} (A : Over S) [AddObj A] [ModuleObj (𝓞 E) A]
     (u : Over.mk η ⟶ A) :
     (fiberPointMap (E := E) A η u).left = (lift u (𝟙 (Over.mk η))).left :=
@@ -1103,9 +1107,8 @@ theorem Variety.exists_thetaFamily_of_points (j : ι → κ) (hη : IsDenseFamil
             eq_of_level_coords_eq t t' h_base h_coord := ?ext }, fun i ↦ ?model⟩
   case ext =>
     -- The lists agree, so do the pull-backs of the product of the `c l`.
-    have h_pi : pi (fun l : D.levelTorsion ↦ N.pull (t ≫ (ς l).left)) =
-        pi (fun l : D.levelTorsion ↦ N.pull (t' ≫ (ς l).left)) := congrArg pi (funext h_coord)
-    exact hπ.ext (by simpa [← hσ_pull, pull_pi] using h_pi) (hφ.right_cancellation _ _ h_base)
+    exact hπ.ext (by simpa [← hσ_pull, pull_pi] using congrArg pi (funext h_coord))
+      (hφ.right_cancellation _ _ h_base)
   case model =>
     refine ⟨⟨hη_base i, u i, _, _, hu_theta i, fun d w ↦ ?_, fun l ↦ ?_, hu_L i⟩, rfl⟩
     -- `using!`: the exponential map `u i` matches `fiberPointMap A (η i)` only up to unfolding.

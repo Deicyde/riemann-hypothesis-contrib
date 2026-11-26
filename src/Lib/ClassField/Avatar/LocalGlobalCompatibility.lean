@@ -1,6 +1,17 @@
 module
 
-public import Lib.GaloisRep.Main.OddRank
+import Mathlib.RingTheory.Ideal.Quotient.HasFiniteQuotients.Norm
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+public import Lib.ClassField.Avatar.HeckeBaseChange
+public import Lib.GaloisRep.Main.AttachedRepresentations
+import Lib.Adelic.Adeles.StrongApproximation
+import Lib.Adelic.AutomorphicForms.HeckeEigenforms
+import Lib.Adelic.Reduction.DefiniteClassSums
+import Lib.ClassField.Global.ArtinMap
+import Lib.GaloisRep.Main.OddRank
+import Lib.GaloisRep.Main.QuadraticStep
+import Lib.General.NumberTheory.FrobeniusOrbits
 
 /-!
 # Local-global compatibility for the ℓ-adic avatar of an algebraic Hecke character
@@ -202,7 +213,7 @@ lemma New.GaloisRep.avatarCompatAt_of_hasPrimitiveRoot5040 {ℓ : ℕ} [ThePrime
   obtain ⟨χ, D, _, h_quad⟩ := exists_isQuadraticStep E w.q w.one_lt_q.ne_bot
   let L : IntermediateField E Ω := QZChar.stepField χ
   let j : Gal(Ω/L) →* Gal(Ω/E) := restrictScalarsHom E
-  have h_fix : decompGroup Gal(Ω/E) A ≤ QZChar.ker (QZChar.symmetrise χ) :=
+  have h_fix : decompGroup Gal(Ω/E) A ≤ QZChar.ker (QZChar.symmetrize χ) :=
     h_quad.decompGroup_le_ker_symmetrise hA w.asIdeal.absNorm_mem
   obtain ⟨u, hu, rfl⟩ : ∃ u : FinPlace L, IsPlaceOver A u ∧ u.below E = w := hA.exists_above
   have hq : u.q = (u.below E).q := (hA.q_eq_and_comap_ne_self_of_decompGroup_le h_fix u rfl).1
