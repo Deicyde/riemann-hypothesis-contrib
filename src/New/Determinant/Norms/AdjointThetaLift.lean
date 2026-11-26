@@ -380,8 +380,7 @@ lemma DescentPair.ofAlgForm_vectorKernelForm [WeilData E] (g : G E O.signs) (h :
     simpa only [ζ, star_highestVector, map_one, one_smul, OneMemClass.coe_one] using
       O.omega_fockDatum_star x 1 ζ
   calc ofAlgForm O.paramV 1 (O.vectorKernelForm g).val (x, k)
-      = gramForm ζ (conjWeylRep O.columnCount O.detExp x⁻¹ (O.vectorKernel g k)) := by
-        rw [algFormCoeff_apply, vectorKernelForm_apply]
+      = gramForm ζ (conjWeylRep O.columnCount O.detExp x⁻¹ (O.vectorKernel g k)) := rfl
     _ = gramForm (conjWeylRep O.columnCount O.detExp x ζ) (O.vectorKernel g k) := by
         rw [← gramForm_conjWeylRep x, Representation.self_inv_apply]
     _ = pairTheta O.W (stdSpace E n) O.charW O.charV (O.fockDatum ζ) ((g, 1, k) * (1, x, 1)) := by
