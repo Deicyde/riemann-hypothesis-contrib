@@ -1,7 +1,12 @@
 module
 
-public import TauCeti.Analysis.Real.Sqrt
-public import New.Spanning.RemainingTerms.Sum
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import TauCeti.Analysis.Real.Sqrt
+public import New.Spanning.RemainingTerms.Size
+public import New.Spanning.Unfolding.Climbing
+import Lib.Adelic.Unitary.CongruenceLevels
+import New.Spanning.RemainingTerms.Sum
 
 /-!
 # The expansion of the squares and the second moment near the Bessel subgroup
@@ -499,8 +504,8 @@ lemma amplitudeSum_mul_inv_apply [HasPrimitiveRoot5040 E] [S.IsAdmissible] {T : 
   have h_kernel (γ : S.G E) (y : NumberField.InfinitePlace E → 𝔰.G₁) :
       S.besselKernel .full (1 * γ * δ⁻¹) (S.ratToInf 1 * y) = L (S.besselKernel .full γ y) := by
     ext ⟨a, b⟩
-    simp [hL, besselKernel, mul_assoc, hN, mulVec, dotProduct, mul_sum]
-    exact Finset.sum_congr rfl fun _ _ ↦ mul_left_comm ..
+    simpa [hL, besselKernel, mul_assoc, hN, mulVec, dotProduct, mul_sum] using
+      Finset.sum_congr rfl fun _ _ ↦ mul_left_comm ..
   have h_move : S.amplitudeSum .full T c (s * t⁻¹) d = L (S.amplitudeSum .full T c s d') := by
     simpa using amplitudeSum_mul_mul_inv hT (one_mem _) (S.classUnipotent c).one_mem.2 hδ hδ_over
       (by simpa using hT_mul_inv) L h_kernel s

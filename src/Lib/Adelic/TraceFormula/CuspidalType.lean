@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.RingTheory.PicardGroup
 public import Lib.Adelic.TraceFormula.TestFunction
 public import Lib.LocalGL.Green.LabelCharacters
 
@@ -139,7 +140,7 @@ lemma sum_coeff_labelIdem_radicalHom {c : k[X]} (hc : IsLabel (Fintype.card n) c
     obtain ⟨hc_monic, -⟩ := hc
     exact finMean_labelChar_radicalHom hc_monic hc_irr hT_empty hT_univ
   have h_sum : ∑ Z : Matrix n n k, χ (U (ofAdd Z) * (z * y)) = 0 := by
-    obtain ⟨h_char, -⟩ : IsIrreducibleChar χ := hc.isIrreducibleChar_labelChar (faithfulChar k)
+    have h_char : IsChar χ := (hc.isIrreducibleChar_labelChar (faithfulChar k)).isChar
     have h_elem : (Representation.trivial ℂ (Multiplicative (Matrix n n k)) ℂ).asAlgebraHom
         (groupAlgElem fun Z : Multiplicative (Matrix n n k) ↦ χ (U Z * (z * y))) = 0 :=
       h_char.asAlgebraHom_groupAlgElem_eq_zero U (z * y) h_mean

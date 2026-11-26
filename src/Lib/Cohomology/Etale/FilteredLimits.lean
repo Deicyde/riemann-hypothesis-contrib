@@ -1,16 +1,19 @@
 module
 
-public import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Colim
-public import Mathlib.CategoryTheory.Limits.Constructions.Over.Connected
-public import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Images
-public import Mathlib.CategoryTheory.Limits.Preserves.Over
-public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Over
 public import Mathlib.CategoryTheory.MorphismProperty.Representable
-public import Mathlib.CategoryTheory.Subfunctor.Subobject
-public import Mathlib.CategoryTheory.WithTerminal.Lemmas
-public import Mathlib.Tactic.Linter.HaveILetI
-public import Mathlib.Tactic.Polynomial.Basic
-public import Lib.Cohomology.Etale.DenseSubfunctors
+import Mathlib.Algebra.Category.Grp.AB
+import Mathlib.Algebra.Category.Grp.Zero
+import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Colim
+import Mathlib.CategoryTheory.Limits.Constructions.Over.Connected
+import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Images
+import Mathlib.CategoryTheory.Limits.Preserves.Over
+import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Over
+import Mathlib.CategoryTheory.Subfunctor.Subobject
+import Mathlib.CategoryTheory.WithTerminal.Lemmas
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.Tactic.Linter.HaveILetI
+public import Lib.Cohomology.Etale.BijectiveComparisons
+import Lib.Cohomology.Etale.DenseSubfunctors
 
 /-!
 # Continuity of cohomology along filtered limits, via test rings and relatively affine maps
@@ -861,7 +864,8 @@ lemma IsCohomContinuous.isFilteredColimit_adjoin (h : IsCohomContinuous Λ X) (T
       fun i x y h_eq ↦ ⟨i, 𝟙 _, Subtype.ext h_eq⟩
   let : (pullbackOver s).IsRightAdjoint := pullbackOver_isRightAdjoint s
   have h_preserves : PreservesLimitsOfShape (Finset T)ᵒᵖ (pullbackOver s) :=
-    (Adjunction.ofIsRightAdjoint (pullbackOver s)).rightAdjoint_preservesLimits.preservesLimitsOfShape
+    (Adjunction.ofIsRightAdjoint (pullbackOver s)).rightAdjoint_preservesLimits
+      |>.preservesLimitsOfShape
   let D' := ((D ⋙ Under.map a).op ⋙ (opEquivOpUnder R).inverse) ⋙
     Over.post (X := Opposite.op R) uliftCoyoneda
   have h_pullback : PreservesLimit D' (pullbackOver s) := h_preserves.preservesLimit

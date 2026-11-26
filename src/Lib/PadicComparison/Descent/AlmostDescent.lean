@@ -1,12 +1,24 @@
 module
 
-public import Mathlib.Algebra.Category.Grp.Ulift
-public import Mathlib.Algebra.Order.PUnit
-public import Mathlib.CategoryTheory.Limits.Types.Pushouts
-public import Mathlib.RingTheory.Flat.Equalizer
 public import Mathlib.RingTheory.RingHom.FaithfullyFlat
-public import Lib.Cohomology.Etale.RelativeChains
+import Mathlib.Algebra.Category.Grp.Ulift
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Order.PUnit
+import Mathlib.CategoryTheory.EffectiveEpi.Comp
+import Mathlib.CategoryTheory.ExtremalEpi
+import Mathlib.CategoryTheory.Limits.Types.Pushouts
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Flat.Equalizer
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.LocalProperties.Reduced
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.TotallySplit
 public import Lib.General.Algebra.PerfectAlgebras
+public import Lib.Cohomology.Hodge.CupProduct
+public import Lib.General.Algebra.CohomologyBaseChange
+import Lib.Cohomology.Etale.DenseSubfunctors
+import Lib.Cohomology.Etale.RelativeChains
+import Lib.PadicComparison.Descent.TestCovers
 
 /-!
 # Almost coefficients, v-descent for perfect algebras and acyclicity of tilt points
@@ -275,8 +287,6 @@ lemma exists_faithfullyFlat_padicTest (V : CommAlg OFlat) [IsDomain V] [Valuatio
   · have h_img_dvd : φ v ∣ φ (algebraMap OFlat V pFlat) := map_dvd φ h_dvd
     rw [hφv, zero_dvd_iff] at h_img_dvd
     exact absurd ((hφ_alg pFlat).symm.trans h_img_dvd) h_tilt_ne
-
-local instance : IsScalarTower S S M := inferInstance
 
 /-- For a functor Φ from C to S-modules, a functor K from C to abelian groups and a degree n: the
 additive map that sends an S-linear map f: M → M' to the induced homomorphism

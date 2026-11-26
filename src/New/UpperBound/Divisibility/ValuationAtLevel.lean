@@ -1,8 +1,15 @@
 module
 
-public import New.UpperBound.Divisibility.ChainDatumExpansion
+import Mathlib.Data.Rat.Cast.OfScientific
 public import New.UpperBound.Divisibility.SetupAtLevel
-public import New.UpperBound.Objects.CharactersAtLevel
+public import New.UpperBound.Kernels.ThetaLiftGauge
+import Lib.ClassField.HeckeCharacter.AlgebraicValues
+import Lib.ClassField.HeckeCharacter.TameModulus
+import Lib.General.Algebra.LevelModulus
+import New.Derivatives.Vacuum.JetIntegrality
+import New.UpperBound.Divisibility.ChainDatumExpansion
+import New.UpperBound.Divisibility.ChainValuation
+import New.UpperBound.Objects.CharactersAtLevel
 
 /-!
 # N-adic valuation of the lifts between the X_j at the level prime N
@@ -284,10 +291,6 @@ noncomputable def schrodingerOpAtN (j : ℕ)
     (Ψ : Matrix (D.X (j + 1)) (D.X j) (LocProd D.nonInducedPlaces) → ℂ) :
     Module.End ℂ (D.homX j).finitePart :=
   (D.liftKernel ϑ j).ω (D.diagPointN j, D.diagPointN (j + 1)) ∘ₗ schrodingerOpAt Ψ
-
-/-- Complex scalars on forms commute. A shortcut for instance search. -/
-local instance smulCommClass_formX (j : ℕ) : SMulCommClass ℂ ℂ (D.FormX j) :=
-  ⟨fun a b φ ↦ Subtype.ext (smul_comm a b φ.val)⟩
 
 /-- The lift from `X_j` to `X_{j+1}` by `v` with the function `Ψ` at `Σ_N`, written in bases of
 `L_j` and `L_{j+1}`, as a linear map in `Ψ`. -/

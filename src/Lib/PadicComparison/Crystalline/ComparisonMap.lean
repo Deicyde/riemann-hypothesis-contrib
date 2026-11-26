@@ -1,9 +1,20 @@
 module
 
-public import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
-public import Mathlib.RingTheory.RootsOfUnity.CyclotomicUnits
-public import Lib.PadicComparison.Crystalline.DividedPowerEnvelope
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.KrullDimension.PID
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Regular.IsSMulRegular
+import Mathlib.RingTheory.RootsOfUnity.CyclotomicUnits
+import Mathlib.RingTheory.TotallySplit
+import TauCeti.RingTheory.Perfectoid.Integral.Tilt
 public import Lib.PadicComparison.Primitive.PeriodCoefficients
+public import Lib.PadicComparison.Completion
+public import Lib.PadicComparison.Descent.TestCovers
+public import Lib.PadicComparison.ToricTower
+import Lib.Cohomology.Etale.DenseSubfunctors
+public import Lib.PadicComparison.Crystalline.DividedPowerEnvelope -- shake: keep (needed public by an exposed definition)
+import Lib.PadicHodge.PeriodRings.DeRhamPeriods
 
 /-!
 # Crystalline comparison: bijectivity on étale charts and spanning of period cohomology
@@ -1114,7 +1125,6 @@ private def crysBaseChangeAdj [Module.Flat S Amax] :
   ext
   exact congrArg _ (toCrysBaseChange.naturality_apply f (1 ⊗ₜ _))
 
-attribute [-instance] addCommGroupH in
 /-- Completing the coefficients is bijective on cohomology, under a finiteness condition. Let S be a
 p-torsion-free p-complete discrete valuation ring with uniformiser p, over which A_max is a flat
 algebra. Let N be a functor to abelian groups on p-torsion-free p-complete S-algebras D that has
@@ -1192,7 +1202,6 @@ private lemma bijective_pullₗ_toCrysBaseChange [IsDomain S] [IsDiscreteValuati
   exact hs_rank.ge.trans_lt
     (linearIndependent_one_tmul (S := Bmax) (h_indep m h_div s hs)).lt_aleph0_of_finite
 
-attribute [-instance] addCommGroupH in
 /-- Let S be a p-torsion-free p-complete discrete valuation ring with uniformiser p, and 𝔡(D) the
 ideal of x with n! ∣ xⁿ for all n. On p-torsion-free p-complete A_max-algebras D, let `i` be an
 isomorphism of R-algebras from D/𝔡(D), reduced along O_C → A_max/𝔡(A_max), to D viewed over S and

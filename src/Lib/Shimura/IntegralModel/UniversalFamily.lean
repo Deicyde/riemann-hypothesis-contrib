@@ -1,9 +1,15 @@
 module
 
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.AlgebraicGeometry.Morphisms.WeaklyEtale
+import Mathlib.AlgebraicGeometry.Sites.Fpqc
 public import Lib.General.Geometry.GaloisCovers
-public import Lib.General.Geometry.SerreTheorem
 public import Lib.Shimura.HeckeTower.Model
 public import Lib.Shimura.Uniformisation.TorusModel
+public import Lib.Shimura.Uniformisation.BallModel
+import Lib.General.Geometry.SerreTheorem
+import Lib.Shimura.AbelianScheme.Pairings
+import Lib.Shimura.ArcExtension
 
 /-!
 # The universal family: models along arcs, rigid fibres and points of linear data
@@ -582,10 +588,6 @@ variable {D : PEL E} {R : Subalgebra (𝓞 E) E} {κ : Sort _} {ν : ℕ} [Finit
   {T Z : Scheme} {τ : Z ⟶ Spec (CommRingCat.of (𝓞 E))} {X : ThetaFamily D Z τ}
   {O : Type} [CommRing O] [ValuativeArc O] {U : UniversalFamily D R} {𝔪 : (𝓞 E)⁰}
   {y : ThetaObject X T} {Q : κ → (𝟙_ (Over T) ⟶ y.groupScheme)} {a : ModuliPoint E D.Index ν}
-
-/-- Finite products exist in `Over S`: a diagram indexed by the finite discrete category of κ has a
-limit. -/
-instance {S : Scheme} {F : Discrete κ ⥤ Over S} : HasLimit F := inferInstance
 
 /-! ### Fibre powers and the points of linear data -/
 

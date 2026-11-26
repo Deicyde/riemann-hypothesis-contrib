@@ -1,6 +1,14 @@
 module
 
+public import Mathlib.LinearAlgebra.FreeModule.IdealQuotient -- shake: keep (needed public by an exposed definition)
+import Mathlib.Topology.Algebra.Group.Units
+public import Mathlib.Topology.Algebra.Star.Unitary -- shake: keep (needed public by an exposed definition)
 public import Lib.Weil.MixedModel.NamedData
+public import Lib.Adelic.Hecke.ClassSums
+public import Lib.Adelic.Unitary.GramMatrix
+public import Lib.DiscreteSeries.Theta.FockDualPair
+public import Lib.Weil.DualPair.Kronecker
+public import Lib.Adelic.Adeles.LocalFactors -- shake: keep (needed public by an exposed definition)
 
 /-!
 # Hom(S,T), the Weil representation and theta kernel of a pair, and data modulo an ideal
@@ -105,6 +113,23 @@ def G.onHom : G E s × G E s' →* G E (homSigns s s') :=
 adeles x of E with x x̄ = 1 (the determinant of the standard form is a unit). -/
 def G.det : G E s →* unitary (𝔸 E) :=
   (U.det (isUnit_stdForm.map detMonoidHom)).comp (toUnitary : G E s ≃* U (stdForm E s)).toMonoidHom
+
+variable (g : G E s) in
+@[simp]
+lemma G.coe_det : g.det.val = g.adeleMatrix.det := rfl
+
+variable (g : G E s) in
+@[simp↓]
+lemma G.det_snd : (g.det : 𝔸 E).2 = (g.2 : Matrix n n (𝔸f E)).det :=
+  (RingHom.snd (NumberField.InfinitePlace E → ℂ) (𝔸f E)).map_det g.adeleMatrix
+
+variable (g : G E s) in
+/-- The infinite component of `det g` is, at each infinite place `w`, the determinant of the
+component of `g` at `w`. -/
+@[simp↓]
+lemma det_fst : (g.det : 𝔸 E).1 =
+    fun w : NumberField.InfinitePlace E ↦ ((g.1 w : GL n ℂ) : Matrix n n ℂ).det :=
+  funext fun w ↦ (evalInf w).map_det g.adeleMatrix
 
 /-- For g in the finite adelic unitary group, the determinant of the element (1, g) of G, as an
 adele of norm one. -/

@@ -1,9 +1,9 @@
 module
 
-public import Mathlib.Algebra.Order.Star.Rat
-public import Mathlib.Algebra.Order.Star.Real
-public import Mathlib.RingTheory.PiTensorProduct
-public import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.SimpleRing.Principal
 public import Lib.Adelic.Hecke.Basic
 public import Lib.Adelic.QuotientMeasure.Basic
 
@@ -95,9 +95,9 @@ class HasFiniteType : Prop where
   isCompact : IsCompact (K : Set G)
 
 -- `open New.HasFiniteType` turns the two finiteness fields into instances and gives every finite
--- type a `Fintype` instance.
+-- type a `Fintype` instance, at low priority so that a structural `Fintype` instance wins.
 scoped[New.HasFiniteType] attribute [instance] HasFiniteType.finite_classes HasFiniteType.finite_aut
-  Fintype.ofFinite
+scoped[New.HasFiniteType] attribute [instance low] Fintype.ofFinite
 
 open HasFiniteType
 

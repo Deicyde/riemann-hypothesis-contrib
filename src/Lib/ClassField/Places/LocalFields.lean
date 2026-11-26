@@ -1,12 +1,22 @@
 module
 
-public import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
-public import Mathlib.Algebra.Module.StablyFree.Basic
-public import Mathlib.RingTheory.Etale.Weakly
-public import Mathlib.RingTheory.PicardGroup
-public import Lib.ClassField.Places.DecompositionCyclotomic
-public import Lib.ClassField.Places.ValuationSubrings
-public import Lib.General.Groups.ProfiniteCharacters
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Invariant.Profinite
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.Valuation.LocalSubring
+import Mathlib.Topology.Algebra.Group.SubmonoidClosure
+import Mathlib.Topology.Compactness.Paracompact
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.Separation.CompletelyRegular
+public import Lib.ClassField.GaloisCohomology.ContinuousCocycles
+import Lib.ClassField.Places.DecompositionCyclotomic
+import Lib.ClassField.Places.ProfiniteGalois
+import Lib.ClassField.Places.ValuationSubrings
+import Lib.General.Groups.ProfiniteCharacters
 
 /-!
 # Local fields: Frobenius, uniformisers, normalised valuation, extensions, unramified characters
@@ -243,8 +253,9 @@ lemma isUniformiser_iff_irreducible [IsDiscreteValuationRing (valRingBelow k A)]
   -- Unfold both sides to inequalities of the valuation `v` of `A` read on `k`: the maximal ideal of
   -- `A ∩ k` is `(π)` when `v a < 1 ↔ v a ≤ v π` for all `a` with `v a ≤ 1`.
   -- `↓`: the plain `mem_maximalIdeal_iff` is too late, simp first turns membership into `¬IsUnit`
-  simp [irreducible_iff_uniformizer, Ideal.ext_iff, ↓mem_maximalIdeal_iff, mem_span_singleton,
-    dvd_iff_valuationVia_le, ← comap_apply, IsUniformiser]
+  simp only [irreducible_iff_uniformizer, Ideal.ext_iff, ↓mem_maximalIdeal_iff, mem_span_singleton,
+    dvd_iff_valuationVia_le, ← comap_apply, IsUniformiser, Subtype.forall, mem_valuationSubring_iff,
+    exists_prop]
   set v : Valuation k A.ValueGroup := A.valuation.comap (algebraMap k Ω)
   change (∀ x : k, v x < 1 ↔ v x ≤ v π) ↔ v π ≤ 1 ∧ ∀ a : k, v a ≤ 1 → (v a < 1 ↔ v a ≤ v π)
   refine ⟨fun h_unif ↦ ⟨((h_unif π).mpr le_rfl).le, fun a _ ↦ h_unif a⟩,

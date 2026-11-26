@@ -1,7 +1,13 @@
 module
 
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.Tactic.Monotonicity.Lemmas
+import Mathlib.Topology.Sheaves.Presheaf
 public import New.Spanning.RemainingTerms.Count
 public import New.Spanning.RemainingTerms.Size
+public import New.Spanning.Unfolding.Climbing
+import New.Spanning.RemainingTerms.Gain
 
 /-!
 # The remaining terms: a bound for their sum
@@ -168,13 +174,13 @@ lemma termSize_sq_le {E : Type} [Field E] [CMType E] {𝔰 : Shape} {S : Filling
 
 -- Keeps definitional checks from unfolding the finite sums.
 seal Finset.univ in
-/-- Let `S` be data of the filling theorem that satisfy the standing hypotheses `S.IsAdmissible`.
+/-- Let `S` be data of the filling theorem.
 Let `(γ, γ')` be a near pair over the classes `c`, `c'` and `d` the discriminant of its common
 lattice `S.pairLattice`. Let `η > 0`. If `(d η)²` is at most the product of the two gauges and the
 constants `S.cellRankSecondMoment` of both cell ranks are at most `D`, then the product of the sizes
 `S.termSize` is at most `τ⁴ D η ^ (-k) d ^ (-k) / n_p`. -/
 lemma IsNearPairOverAgreeingBlock.termSize_mul_le {E : Type} [Field E] [CMType E]
-    {𝔰 : Shape} {S : Filling E 𝔰} [HasPrimitiveRoot5040 E] [S.IsAdmissible] {c c' : S.Classes}
+    {𝔰 : Shape} {S : Filling E 𝔰} [HasPrimitiveRoot5040 E] {c c' : S.Classes}
     {γ γ' : S.G E} (hq : S.IsNearPairOverAgreeingBlock c c' (γ, γ')) {η D : ℝ} (hη : 0 < η)
     (h_gain : (S.pairDiscriminant c c' γ γ' * η) ^ 2 ≤
       S.levelGauge (S.cellRank γ) c c' γ * S.levelGauge (S.cellRank γ') c c' γ')
@@ -496,13 +502,6 @@ noncomputable def piece {E : Type} [Field E] [CMType E] {𝔰 : Shape} (S : Fill
     (γ : S.G E) : Piece E 𝔰 :=
   if S.termDisc γ = 0 then none else some (link γ)
 
-/-- The piece of `γ` is the submodule `Λ` if and only if `𝗀(γ) = S.termDisc γ` is not zero and the
-link of `γ` is `Λ`. -/
-lemma piece_eq_some_iff {E : Type} [Field E] [CMType E] {𝔰 : Shape} {S : Filling E 𝔰}
-    {γ : S.G E} {Λ : Submodule E (𝔰.MiddleIndex ⊕ 𝔰.MiddleIndex → E)} :
-    S.piece γ = some Λ ↔ S.termDisc γ ≠ 0 ∧ link γ = Λ := by
-  by_cases h_disc : S.termDisc γ = 0 <;> simp [piece, h_disc]
-
 /-- The part `T ∩ S.piece ⁻¹' {κ}` of a stable set `T` in one piece `κ` is stable. A stable set is
 one invariant on both sides under the rational points of the Bessel unipotent group. This holds
 because `S.termDisc` and the link are invariant. -/
@@ -621,7 +620,7 @@ lemma enorm_amplitudeSum_sq_le {E : Type} [Field E] [CMType E] {𝔰 : Shape} {S
       ∑' Λ, ‖S.amplitudeSum .cut (T ∩ {γ | S.termDisc γ ≠ 0} ∩ link ⁻¹' {Λ}) c s c'‖ₑ ^ 2 := by
     refine (tsum_range product fun Λ Λ' h ↦ by simpa using h).trans (tsum_congr fun Λ ↦ ?_)
     have h_set : T ∩ S.piece ⁻¹' {some Λ} = T ∩ {γ | S.termDisc γ ≠ 0} ∩ link ⁻¹' {Λ} :=
-      Set.ext fun γ ↦ by simp [piece_eq_some_iff, and_assoc]
+      Set.ext fun γ ↦ by by_cases h_disc : S.termDisc γ = 0 <;> simp [piece, h_disc, and_assoc]
     simp only [product, part, h_set, sq]
   let nearRepsOfPiece (κ : Piece E 𝔰) : Set (S.G E) :=
     S.nearRepresentativesOver (T ∩ S.piece ⁻¹' {κ}) c s c'

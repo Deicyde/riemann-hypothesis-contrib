@@ -1,8 +1,17 @@
 module
 
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.NumberTheory.NumberField.Discriminant.Different
+import TauCeti.NumberTheory.NumberField.Countable
 public import New.Spanning.MainTerm.Frequencies
-public import New.Spanning.RemainingTerms.Box
 public import New.Spanning.Unfolding.BesselLevelStructure
+public import Lib.Adelic.Adeles.SemilocalProducts
+import Lib.Cohomology.Etale.Basic
+import Lib.Shimura.ComplexTheta.AppellHumbertData
+import New.Spanning.RemainingTerms.Box
 
 /-!
 # One-sided Poisson summation, sums over frequencies, and the sieve over all places
@@ -89,16 +98,14 @@ lemma charOnPlaces_evalPlaces {x : 𝔸f E} (hx : x ∈ integralOff T) :
   rw [charOnPlaces, AddChar.compAddMonoidHom_apply, ← S.selfDualChar.map_sub_eq_div]
   exact S.selfDualChar_eq_one_of_mem _ ((sub_adeleOfLocal_mem_iff T).2 hx)
 
-lemma continuous_charOnPlaces : Continuous (S.charOnPlaces T) :=
-  continuous_ψf.subtypeVal.comp ((continuous_adeleOfLocal T).const_mul _)
-
 /-- The character of the product of the infinite places and the completions at `T`: the product of
 the characters `wave c = exp (c - conj c)` at the infinite places and of `S.charOnPlaces T`. -/
 noncomputable def globalChar (x : (InfinitePlace E → ℂ) × LocProd T) : ℂ :=
   (∏ v : InfinitePlace E, wave (x.1 v)) * S.charOnPlaces T x.2
 
 lemma continuous_globalChar : Continuous (S.globalChar T) :=
-  .mul (by fun_prop [wave]) ((S.continuous_charOnPlaces T).comp continuous_snd)
+  .mul (by fun_prop [wave])
+    ((continuous_ψf.subtypeVal.comp ((continuous_adeleOfLocal T).const_mul _)).comp continuous_snd)
 
 /-- The decay factor at the places of `T` for a transform at the frequency `ξ`: the number
 `[O : ξ O] ^ ((k - n⁷) / 2) / [O : O ∩ ξ⁻¹ O] ^ 3 * b ^ (n⁹ f)`, with `f` the number of infinite

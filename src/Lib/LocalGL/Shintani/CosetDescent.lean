@@ -1,8 +1,11 @@
 module
 
+import Mathlib.FieldTheory.Finite.Extension
 public import Lib.Adelic.Unitary.ComponentsAndBlockSums
-public import Lib.LocalGL.Green.CuspidalFunctions
 public import Lib.LocalGL.Shintani.CosetRootChoice
+public import Lib.LocalGL.Green.HallAlgebra
+import Lib.General.LinearAlgebra.MatrixPolynomials
+import Lib.LocalGL.Green.CuspidalFunctions
 
 /-!
 # Descent of class functions along a coset and lifts from GL_n(k') ⋊ Gal(k'/k)
@@ -165,13 +168,6 @@ private lemma evalGL_sub (X Y : Hall k₀) (γ : GL n k₀) :
 
 private lemma evalGL_mulMoebius (X : Hall k₀) (γ : GL n k₀) :
     X.mulMoebius.evalGL γ = X.evalGL γ * moebius.evalGL γ := rfl
-
-omit [Finite k₀] in
-/-- If `Φ` descends to `X` (`New.DescendsTo`) and `Y` takes the same values as `X` on
-`GL n k₀`, then `Φ` descends to `Y`. -/
-private lemma DescendsTo.of_evalGL_eq {X Y : Hall k₀} (h_desc : DescendsTo Φ X)
-    (h_eq : ∀ γ : GL n k₀, X.evalGL γ = Y.evalGL γ) : DescendsTo Φ Y :=
-  fun σ hσ s γ hs hγ ↦ (h_desc σ hσ s γ hs hγ).trans (h_eq γ)
 
 /-- On `GL_m(k₀)`, the function `moebius + (1 - constOne) ^ (m + 1) * -moebius` agrees with
 `moebius`: its second term vanishes on classes of dimension at most `m`. -/
@@ -775,7 +771,7 @@ lemma exists_lift_brauerLift : ∃ B : Hall k', Lift ℤ (brauerLift k θ) B := 
     Lift.exists_lift_of_descendsTo fun m ↦ by
       obtain ⟨J, _, hJ, hJ0⟩ := h_approx (m + 1)
       obtain ⟨Φ, hΦ, hΦ_J, -⟩ := hJ m
-      refine ⟨Φ, hΦ, hΦ_J.of_evalGL_eq fun γ ↦ ?_⟩
+      refine ⟨Φ, hΦ, fun σ hσ s γ hs hγ ↦ (hΦ_J σ hσ s γ hs hγ).trans ?_⟩
       have h0 := hJ0 (simClassOf (Matrix.toLin' γ.val)) (by simp)
       simp only [Hall.evalGL, Hall.add_apply, Hall.neg_apply] at h0 ⊢
       linear_combination h0
