@@ -1,11 +1,12 @@
 module
 
-public import Lib.Adelic.AutomorphicForms.BlockPeriods
-public import Lib.DiscreteSeries.Bruhat.ComplexPlace
-public import New.UpperBound.Divisibility.ChainValuation
 public import New.UpperBound.Objects.PoincareMap
 public import New.UpperBound.Seesaw.Cut
-public import New.UpperBound.Seesaw.GoodDatum
+import Lib.Adelic.AutomorphicForms.BlockPeriods
+import Lib.Adelic.Unitary.WeakApproximation
+import Lib.DiscreteSeries.Bruhat.ComplexPlace
+import New.UpperBound.Divisibility.ChainValuation
+import New.UpperBound.Seesaw.GoodDatum
 
 /-!
 # The seesaw identity and the top of the chain
@@ -275,7 +276,7 @@ group of `Y`. -/
 def unfoldedPeriod (ϑ : D.TameChar)
     (t : (WeylIndex (D.X 0) D.columnCount → ℂ) →ₗ[ℂ] ℂ) (φ : D.SourceForm)
     (ξ : ∀ i : ℕ, GInf D.E (D.signsY i)) (y : ∀ i : ℕ, Gf D.E (D.Y i))
-    (k : ℕ) (hk : k ≤ 2 * D.ϱ + 1) {X : Type} {s : ℕ} [Fintype X] [DecidableEq X]
+    (k : ℕ) (hk : k ≤ 2 * D.ϱ + 1) {X : Type} {s : ℕ} [DecidableEq X]
     (Y : Grading (D.spaceY (k + 1)) D.N X s) (z : D.ConjFormY (k + 1)) : ℂ :=
   ∫ h : New.G D.E (D.signsY (k + 1)),
     (unfoldStage ϑ t φ ξ y k hk Y * z.val) h ∂Y.ratBessel.quotMeasure

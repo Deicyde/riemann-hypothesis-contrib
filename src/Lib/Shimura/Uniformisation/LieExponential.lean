@@ -1,12 +1,21 @@
 module
 
-public import Mathlib.Analysis.Calculus.InverseFunctionTheorem.ContDiff
-public import Mathlib.Analysis.Calculus.TangentCone.Seq
-public import Mathlib.Analysis.Normed.Module.ContinuousInverse
-public import Lib.General.Analysis.HolomorphicIntegrals
-public import Lib.General.Geometry.GeometricPoints
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.AlgebraicGeometry.Morphisms.Immersion
+import Mathlib.Analysis.Analytic.Polynomial
+import Mathlib.Analysis.Calculus.InverseFunctionTheorem.ContDiff
+import Mathlib.Analysis.Calculus.TangentCone.Seq
+import Mathlib.Analysis.Normed.Module.ContinuousInverse
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Topology.Algebra.Group.SubmonoidClosure
 public import Lib.Shimura.Uniformisation.HolomorphicFamilies
-public import Lib.PadicComparison.Descent.TestCategory
+import Lib.General.Analysis.HolomorphicIntegrals
+import Lib.General.Geometry.GeometricPoints
+import Lib.PadicComparison.Descent.TestCategory
 
 /-!
 # Exponential of compact commutative Lie groups and uniformisation of abelian varieties
@@ -757,7 +766,8 @@ lemma LineBundle.IsProjEmbedding.nonempty_uniformisation [IsAbelianScheme A]
     -- complex point `x`; then `y = m • x` lies in the image.
     obtain ⟨x, hx⟩ :
         ∃ x : Spec (CommRingCat.of ℂ) ⟶ A.left, x ≫ (e.range.index • 𝟙 A).left = y.left :=
-      exists_point_over _ ((IsAbelianScheme.nsmul_surjective _ h_index.index_ne_zero).surj _)
+      (Scheme.Hom.exists_comp_eq_iff_mem_range _ _).2
+        ((IsAbelianScheme.nsmul_surjective _ h_index.index_ne_zero).surj _)
     have hxy : homMk x (by simp [← y.w, ← hx]) ≫ (e.range.index • 𝟙 A) = y := OverMorphism.ext hx
     rw [← hxy]
     simpa [comp_nsmul] using e.range.nsmul_index_mem _

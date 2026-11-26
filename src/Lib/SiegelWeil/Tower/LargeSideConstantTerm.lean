@@ -1,8 +1,13 @@
 module
 
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.SiegelWeil.Tower.ConstantTerm
 public import Lib.SiegelWeil.Tower.FiniteTateIntegral
 public import Lib.SiegelWeil.Tower.LineGaussSums
+import Lib.ClassField.HeckeCharacter.TameModulus
+import Lib.DiscreteSeries.Haar.TotalMass
+import Lib.Shimura.Uniformisation.HolomorphicFamilies
 
 /-!
 # Removing a plane: the constant term on the side of the large space
@@ -161,9 +166,6 @@ theorem homSlice_zero_planeDatum (σ' : b ⊕ r' ≃ n') (v : PairFock E s' t')
     simp [h_zero w hw, IntegralFrame.stdDatum]
   simpa [localDatum, ← Pi.zero_def] using 𝔠.readsAt.homSlice_localDatum A V' (G := 0)
     (stdRowDatum_mem σ' 𝔠.semilocalChar) 0 v fun w hw ↦ h_std w (by simpa using hw)
-
-/-- A shortcut for instance search, for the Haar measures on `maxCompact E t` below. -/
-local instance : LocallyCompactSpace (maxCompact E t) := inferInstance
 
 /-- Let `A` and `X` be base-adapted splittings of a plane off `W'` and `V'`, let `v` be a Schwartz
 vector (all Fock moments finite), let `y` be a matrix over the completions at the places

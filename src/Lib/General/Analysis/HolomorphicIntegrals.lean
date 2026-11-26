@@ -1,23 +1,31 @@
 module
 
-public import TauCeti.Analysis.MvPolynomial.Jacobian
 import TauCeti.Analysis.Complex.CauchyIntegralPolydisc
 import TauCeti.Analysis.Complex.WeaklyHolomorphic
 import TauCeti.MeasureTheory.Function.StronglyMeasurable.FiniteDimensional
-public import Mathlib.AlgebraicTopology.FundamentalGroupoid.SimplyConnected
 public import Mathlib.Analysis.CStarAlgebra.ContinuousMap
-public import Mathlib.Analysis.Calculus.LineDeriv.Basic
-public import Mathlib.Analysis.Complex.Schwarz
-public import Mathlib.Analysis.Convex.Contractible
 public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
-public import Mathlib.Analysis.Real.Pi.Bounds
-public import Mathlib.MeasureTheory.Function.LpSpace.ContinuousFunctions
-public import Mathlib.RingTheory.Coalgebra.IsFrobenius
-public import Mathlib.RingTheory.HopfAlgebra.Basic
-public import Lib.General.Analysis.GaussianIntegral
-public import Lib.General.Groups.CongruenceSubgroups
-public import Lib.General.Measure.HaarNormalisation
-public import Lib.General.Topology
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.AlgebraicTopology.FundamentalGroupoid.SimplyConnected
+import Mathlib.Analysis.Calculus.LineDeriv.Basic
+import Mathlib.Analysis.Complex.Schwarz
+import Mathlib.Analysis.Convex.Contractible
+import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.Real.Pi.Bounds
+import Mathlib.MeasureTheory.Function.LpSpace.ContinuousFunctions
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Complex
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import TauCeti.Analysis.MvPolynomial.Jacobian
+import TauCeti.Topology.Instances.Matrix
+public import Lib.Speed
+import Lib.General.Analysis.GaussianIntegral
+import Lib.General.Groups.CongruenceSubgroups
+import Lib.General.Measure.HaarNormalisation
+import Lib.General.Topology
 
 /-!
 # Strong operator integrals, analyticity of parameter integrals, and Hua's integral bound
@@ -217,9 +225,9 @@ lemma isAnalyticFamily_of_differentiable
     (hf.mono fun _ hx k ↦ (hx k).2)
 
 /-- Let E be a finite-dimensional complex normed space and F a complex normed space. If ι : K → F is
-continuous, K is compact and R₁, and Θ is analytic at (p, ι k) for every k, then x ↦ Θ(x, ι ·) is
+continuous, K is compact, and Θ is analytic at (p, ι k) for every k, then x ↦ Θ(x, ι ·) is
 analytic at p ∈ E as a map to C(K, ℂ), that is, an `IsAnalyticFamily` at p. -/
-lemma DiscreteSeries.IsAnalyticFamily.of_analyticAt [R1Space K] {ι : K → F} (hι : Continuous ι)
+lemma DiscreteSeries.IsAnalyticFamily.of_analyticAt {ι : K → F} (hι : Continuous ι)
     (Θ : E × F → ℂ) (hΘ : ∀ k : K, AnalyticAt ℂ Θ (p, ι k)) :
     IsAnalyticFamily (fun (x : E) (k : K) ↦ Θ (x, ι k)) p := by
   -- By compactness of `K`, `Θ` is analytic at `(x, ι k)` for all `k` and all `x` near `p`.

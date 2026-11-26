@@ -1,8 +1,13 @@
 module
 
-public import Lib.Weil.CompactLift.DefiniteThetaLift
 public import New.Determinant.Norms.VectorKernel
-public import New.UpperBound.Kernels.JetConjugatesAndBounds
+public import Lib.Weil.CompactLift.ThetaKernelDefs
+public import Lib.Weil.DualPair.GaloisLaw
+public import New.Derivatives.Vacuum.TightFrames
+import Lib.Adelic.AutomorphicForms.AutomorphicAsAlgebraic
+import Lib.ClassField.HeckeCharacter.SplitTameCharacters
+import Lib.Weil.CompactLift.DefiniteThetaLift
+import New.UpperBound.Kernels.JetConjugatesAndBounds
 
 /-!
 # The lift of a character from U(1): kernel, descent and Galois conjugates
@@ -105,13 +110,9 @@ lemma LevelPlaces.LevelForm.inner_eq_petersson {s : n → ℤˣ} (V : Space E n 
 
 variable [WeilData E]
 
-/-- The one-point type `Unit` embeds in every non-empty type. -/
-lemma nonempty_unit_embedding {α : Type} [h : Nonempty α] : Nonempty (Unit ↪ α) :=
-  h.map Function.Embedding.punit
-
 /-- For non-empty `n`, an arbitrary embedding of the one-point type `Unit` into `n`, that is, an
 arbitrary index. -/
-def arbitraryIndexEmbedding [h : Nonempty n] : Unit ↪ n := (nonempty_unit_embedding (h := h)).some
+def arbitraryIndexEmbedding [h : Nonempty n] : Unit ↪ n := (h.map Function.Embedding.punit).some
 
 /-! ### The data and the theta kernel -/
 
