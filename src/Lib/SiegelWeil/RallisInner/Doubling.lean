@@ -1,7 +1,19 @@
 module
 
-public import Lib.SiegelWeil.Formula.WeilRange
+import Mathlib.Dynamics.Ergodic.Action.Regular
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.RingTheory.PicardGroup
+import TauCeti.LinearAlgebra.Matrix.Range
+import TauCeti.Topology.Algebra.Group.Units
+import TauCeti.Topology.Instances.Matrix
 public import Lib.SiegelWeil.UnramifiedSeries.VacuumCoefficients
+public import Lib.SiegelWeil.Formula.LagrangianZeroTerms
+public import Lib.Weil.DualPair.FiniteAction
+public import Lib.Weil.DualPair.ShortIsotropicVectors
+public import Lib.Weil.DualPair.ThetaLiftConvergence
+public import Lib.Weil.DualPair.WeilAction
+import Lib.DiscreteSeries.Haar.TotalMass
+import Lib.SiegelWeil.Formula.WeilRange
 
 /-!
 # Doubling: clean data, the doubling identity and the inner product formula
@@ -645,8 +657,8 @@ lemma exists_integral_isotropic_frame (h_rank : 2 * card n ≤ card m) :
   · -- Distinct columns have disjoint supports, and a column has norm `1 + ε̄ ε = 0`.
     refine Matrix.ext fun (j k : n) ↦ ?_
     have h_entry : ((of col)ᵀᴴ * (of col)ᵀ) j k = if j = k then 1 + star ε * ε else 0 := by
-      by_cases h_eq : j = k <;> simp [col, Function.swap, Matrix.mul_apply, apply_ite star, Pi.single_apply,
-        mul_add, add_mul, Finset.sum_add_distrib, h_eq, eq_comm (a := k)]
+      by_cases h_eq : j = k <;> simp [col, Function.swap, Matrix.mul_apply, apply_ite star,
+        Pi.single_apply, mul_add, add_mul, Finset.sum_add_distrib, h_eq, eq_comm (a := k)]
     exact h_entry.trans (by simp [ε, star_normNegOne_mul_self])
   · simp [col, Function.swap, funext_iff, eq_comm, Pi.single_apply]
 

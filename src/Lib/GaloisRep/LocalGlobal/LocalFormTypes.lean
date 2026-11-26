@@ -1,8 +1,13 @@
 module
 
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.NumberTheory.MulChar.Lemmas
 public import Lib.Adelic.AutomorphicForms.HeckeEigenforms
-public import Lib.General.LinearAlgebra.BlockEmbeddings
-public import Lib.LocalGL.Shintani.LiftingGreenCharacters
+public import Lib.General.Geometry.GaloisCovers
+public import Lib.LocalGL.Iwahori.ParahoricStructure
+import Lib.General.LinearAlgebra.BlockEmbeddings
+import Lib.LocalGL.Green.LabelCharacters
+import Lib.LocalGL.Shintani.LiftingGreenCharacters
 
 /-!
 # Local GL_N(E_w)-action on forms, parahoric types and labels at a split place
@@ -369,7 +374,7 @@ lemma HasParahoricType.hasProductLabel {f : Gf E n → M → ℂ} {hw : w.IsSpli
   -- vanishes.
   suffices h_or : (labelChar T c).evalGL 1 = 0 ∨
       ∑ x : GL ρ (ResField w), starRingEnd ℂ ((labelChar T c).evalGL x) * L (σ x y) g m = 0 by
-    simpa [T, labelIdem, hc, asAlgebraHom_eq_sum, mul_assoc, ← mul_sum] using h_or
+    simpa [T, labelIdem, hc, Representation.asAlgebraHom_eq_sum, mul_assoc, ← mul_sum] using h_or
   exact .inr h_sum_Φ
 
 end ParahoricTypeLabel

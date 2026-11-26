@@ -1,12 +1,14 @@
 module
 
-public import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
-public import Mathlib.RingTheory.RegularLocalRing.Defs
 public import Mathlib.RingTheory.RingHom.Etale
-public import Mathlib.RingTheory.TensorProduct.IsBaseChangeFree
-public import Mathlib.RingTheory.TotallySplit
-public import Mathlib.Tactic.Polynomial.Basic
-public import Lib.Cohomology.Etale.DenseSubfunctors
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.FunctorCategory
+public import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TensorProduct.IsBaseChangeFree
+import Mathlib.RingTheory.TotallySplit
+public import Lib.Cohomology.Etale.BijectiveComparisons
+import Lib.Cohomology.Etale.DenseSubfunctors
 
 /-!
 # Functors of points on algebras: open subfunctors, étale charts, atlases, charted schemes
@@ -111,7 +113,10 @@ abbrev structureMap : of k k ⟶ A := ofHom (Algebra.ofId k A)
 field K. -/
 def fieldLocus : Subfunctor X where
   obj _ := {x | ∀ (K : CommAlg k) φ, IsField K.carrier → P K (X.map φ x)}
-  map := by grind [=_ X.map_comp_apply]
+  map := by
+    intro A B f x hx K φ hK
+    rw [← X.map_comp_apply]
+    exact hx K (f ≫ φ) hK
 
 /-- A point `x` of `X(K)` comes from `s` if it is the image of some `k`-point `z` in `s` under the
 structure map `k → K`. -/

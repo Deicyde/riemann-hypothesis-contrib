@@ -1,10 +1,15 @@
 module
 
 import TauCeti.NumberTheory.ArithmeticFunction.VonMangoldt
-public import Mathlib.Dynamics.Newton
-public import Mathlib.NumberTheory.LSeries.Linearity
 public import Mathlib.NumberTheory.LSeries.PrimesInAP
-public import Lib.Analytic.PrimeNumberTheorem.ZeroFreeRegion
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Dynamics.Newton
+import Mathlib.NumberTheory.LSeries.Linearity
+import Mathlib.Order.CompletePartialOrder
+public import Lib.Analytic.PrimeNumberTheorem.LFunctionGrowth
+import Lib.Analytic.EntireLFunction
+import Lib.Analytic.PrimeNumberTheorem.ZeroFreeRegion
 
 /-!
 # Primes congruent to `1` modulo `M ^ k` with logarithm in a prescribed window

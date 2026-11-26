@@ -1,10 +1,17 @@
 module
 
-public import New.Congruences.FirstOrder.DenominatorBound
-public import New.Congruences.GaloisRepresentations.RowsFromEigensystems
-public import New.Congruences.Selmer.TwistingTheorem
-public import New.Determinant.Chain.NormOfChain
-public import New.OneLift.HeckeValues.CentralAction
+import Mathlib.Data.Rat.Cast.OfScientific
+public import New.Congruences.FirstOrder.TraceRelations
+public import New.Determinant.Twist.FitTwists
+import New.Congruences.FirstOrder.DenominatorBound
+import New.Congruences.GaloisRepresentations.AttachedRepresentations
+import New.Congruences.GaloisRepresentations.RowsFromEigensystems
+import New.Congruences.Selmer.ClassSums
+import New.Congruences.Selmer.TwistingTheorem
+import New.Determinant.Chain.NormOfChain
+import New.OneLift.HeckeValues.CentralAction
+import New.Reduction.Data.Sizes
+import New.UpperBound.Size.Estimates
 
 /-!
 # All data have regular families of m-fold twists
@@ -285,7 +292,7 @@ lemma New.Selmer.isRepOfType_one {P : Parameters} {D : Data P} {ℓ : ℕ} [TheP
       trace_conj := by simp
       local_conditions v _ A _ :=
         ⟨h_finite A, h_jumps A, fun _ ↦ isGoodAt_iff.2 ⟨h_finite A, fun s _ ↦ h_kills A s⟩⟩
-      labelled i A s a _ := ?_ }
+      labeled i A s a _ := ?_ }
   -- the only root of the label `X - 1` is `1`
   rw [← C_1, aroots_X_sub_C]
   simpa using h_kills A s

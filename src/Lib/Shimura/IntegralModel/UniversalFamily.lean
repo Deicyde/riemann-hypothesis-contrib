@@ -1,9 +1,15 @@
 module
 
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.AlgebraicGeometry.Morphisms.WeaklyEtale
+import Mathlib.AlgebraicGeometry.Sites.Fpqc
 public import Lib.General.Geometry.GaloisCovers
-public import Lib.General.Geometry.SerreTheorem
 public import Lib.Shimura.HeckeTower.Model
 public import Lib.Shimura.Uniformisation.TorusModel
+public import Lib.Shimura.Uniformisation.BallModel
+import Lib.General.Geometry.SerreTheorem
+import Lib.Shimura.AbelianScheme.Pairings
+import Lib.Shimura.ArcExtension
 
 /-!
 # The universal family: models along arcs, rigid fibres and points of linear data
@@ -513,10 +519,10 @@ lemma New.ThetaObject.TorusModel.hasSpanningCoords_of_specMap_comp_eq {E O W : T
   -- `m + 1` and `m + 2` differ by `1`, so they are not both zero in `k`
   obtain ⟨c, hmc, hc⟩ : ∃ c > m, (c : k) ≠ 0 := by
     by_cases h_succ : ((m + 1 : ℕ) : k) = 0
-    · refine ⟨m + 2, by omega, fun h_two ↦ one_ne_zero (α := k) ?_⟩
-      push_cast at h_two h_succ
-      linear_combination h_two - h_succ
-    · exact ⟨m + 1, by omega, h_succ⟩
+    · refine ⟨(m + 1).succ, Nat.lt_trans (Nat.lt_succ_self m) (Nat.lt_succ_self _), ?_⟩
+      rw [Nat.cast_succ, h_succ, zero_add]
+      exact one_ne_zero
+    · exact ⟨m + 1, Nat.lt_succ_self m, h_succ⟩
   -- the bundle `N ^ (c ^ 2)` of `y`, pulled back to `x`, is the one in Serre's theorem
   have h_pow_eq : (x₀.lineBundle.pull hx₀.schemeMap.left).pow (c ^ 2) =
       (y.lineBundle.pow (c ^ 2)).pull hx.schemeMap.left := by
@@ -582,10 +588,6 @@ variable {D : PEL E} {R : Subalgebra (𝓞 E) E} {κ : Sort _} {ν : ℕ} [Finit
   {T Z : Scheme} {τ : Z ⟶ Spec (CommRingCat.of (𝓞 E))} {X : ThetaFamily D Z τ}
   {O : Type} [CommRing O] [ValuativeArc O] {U : UniversalFamily D R} {𝔪 : (𝓞 E)⁰}
   {y : ThetaObject X T} {Q : κ → (𝟙_ (Over T) ⟶ y.groupScheme)} {a : ModuliPoint E D.Index ν}
-
-/-- Finite products exist in `Over S`: a diagram indexed by the finite discrete category of κ has a
-limit. -/
-instance {S : Scheme} {F : Discrete κ ⥤ Over S} : HasLimit F := inferInstance
 
 /-! ### Fibre powers and the points of linear data -/
 
