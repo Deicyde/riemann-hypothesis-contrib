@@ -587,9 +587,9 @@ The heads of these files give an overview of a theory: `Lib/ClassField/Global/Ar
 
 **GaloisCohomology**: Continuous Galois cohomology
 
-- `Lib/ClassField/GaloisCohomology/ContinuousCocycles` (340): Continuous cohomology of discrete modules: cocycles, H², cyclic classes, local Artin map
+- `Lib/ClassField/GaloisCohomology/ContinuousCocycles` (285): Continuous cocycles of discrete modules, characters into ℚ/ℤ and the cocycle of a cyclic class
 - `Lib/ClassField/GaloisCohomology/ClassCounts` (178): Counting cocycles through their cohomology classes
-- `Lib/ClassField/GaloisCohomology/Cohomology` (170): The cohomology of a discrete module as Mathlib's continuous cohomology, with its R-module structure and low-degree API
+- `Lib/ClassField/GaloisCohomology/Cohomology` (266): The cohomology of a discrete module as Mathlib's continuous cohomology, with its R-module structure, low-degree API, maps in degree two and cyclic classes
 - `Lib/ClassField/GaloisCohomology/ShapiroCorestriction` (230): Shapiro's lemma, corestriction and reduction of H² statements to steps of prime index
 - `Lib/ClassField/GaloisCohomology/TateIndexFormula` (311): Coker/ker indices and Tate's index formula for cyclic actions of prime order
 - `Lib/ClassField/GaloisCohomology/KummerCyclicClasses` (437): Cup products, Hilbert 90, Kummer cocycles and cyclic symbols in Galois cohomology
@@ -632,6 +632,7 @@ The heads of these files give an overview of a theory: `Lib/ClassField/Global/Ar
 
 **Local**: Local class field theory: invariant map and Artin map
 
+- `Lib/ClassField/Local/Definitions` (51): The classes of invariants in H²(Γ, Ωˣ) and the local Artin map, defined by their characteristic properties
 - `Lib/ClassField/Local/InvariantMap` (203): The local invariant Br(k) ≅ Q/Z and its behaviour under restriction and maps of local fields
 - `Lib/ClassField/Local/ArtinMap` (682): Local and global Artin maps, algebraic Hecke characters and tame inertia
 
