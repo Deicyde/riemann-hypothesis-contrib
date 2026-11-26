@@ -43,6 +43,11 @@ It keeps the published Lean source unchanged and provides a prebuilt cache for i
 proofs, in a file that imports only Mathlib. Comparator checks that `Main.lean` proves exactly those statements, that it uses no axioms other than `propext`, `Quot.sound` and
 `Classical.choice`, and that Lean's kernel and nanoda both accept the proof.
 
+A second Comparator setup, in [`comparator/`](comparator/), takes as its challenge the Riemann
+Hypothesis and the Generalized Riemann Hypothesis as
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures) states them.
+[`verification/NOTES.md`](verification/NOTES.md#formal-conjectures) describes it.
+
 ## Cache
 
 ```
@@ -69,9 +74,7 @@ About 300,000 lines of code; 433,000 non-blank lines with comments; 477,000 line
 
 The proof belongs to its author Levent Alpöge with Claude and was originally published without a license. The repo https://github.com/lsernau/grh-lean uses Apache 2.0, and so does this repo; see [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`ATTRIBUTION.md`](ATTRIBUTION.md).
 
-*Soon, we will re-integrate Formal Conjectures. This is out of date.*
-
-The declarations in `comparator/` that will be copied from
+The declarations in `comparator/` that are copied from
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) are copyright The Formal
 Conjectures Authors, under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 The files that hold them carry the notice.
