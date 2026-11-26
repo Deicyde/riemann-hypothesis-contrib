@@ -15,7 +15,7 @@ the fibre measure of the Gram map on tuples of vectors.
 Notions from other files:
 * `New.LeGramFibre J E m` says that the image of `m` under `g ↦ g E` is at most the fibre measure of
   the Gram map `E' ↦ E'ᴴ J E'` over the Gram matrix of `E`.
-* `New.LeFibreMeasure μ ν π b l` says that `l` is at most the fibre measure `dμ / dν` of `π` over
+* `New.LeFiberMeasure μ ν π b l` says that `l` is at most the fibre measure `dμ / dν` of `π` over
   `b`.
 * `New.volU j` is `vol U(j)`; the measure `volume` on G₁ is Haar measure, normalised through the
   compact dual, and on the unitary group H = U(X₀) it is the Haar measure of mass one.
@@ -79,11 +79,11 @@ theorem ae_map_mul_eq {X : Type} [MeasurableSpace X] {μ : Measure X} {f : X →
 
 /-- The definite case, with `k` the dimension of `X₀`. On `k`-tuples of vectors of `X₀`, the image
 under `h ↦ h (x_i)` of `vol U(k) / 2 ^ k` times the Haar probability measure of `H = U(X₀)`,
-embedded in `G₁` by `embedH`, is at most the fibre measure (`LeFibreMeasure`) of the Gram map
+embedded in `G₁` by `embedH`, is at most the fibre measure (`LeFiberMeasure`) of the Gram map
 `gramCoords` over the Gram matrix of the `x_i`, the columns of `definiteCols`. Here `volU k` is
 `vol U(k)`. -/
 theorem leFibreMeasure_definiteCols :
-    LeFibreMeasure (volume.map fun x : Matrix 𝔰.κ 𝔰.κ ℂ ↦ 𝔰.definiteCols * x) volume
+    LeFiberMeasure (volume.map fun x : Matrix 𝔰.κ 𝔰.κ ℂ ↦ 𝔰.definiteCols * x) volume
       (gramCoords 𝔰.J₁) (gramCoords 𝔰.J₁ 𝔰.definiteCols)
       ((ENNReal.ofReal (volU 𝔰.k / 2 ^ 𝔰.k) • volume.map embedH).map
         fun g : 𝔰.G₁ ↦ g.val.val * 𝔰.definiteCols) := by
@@ -93,7 +93,7 @@ theorem leFibreMeasure_definiteCols :
     rw [gramCoords, gram_mul, Matrix.mul_assoc _ 𝔰.J₁, J₁_mul_definiteCols,
       conjTranspose_definiteCols_mul_self,
       gramCoords]
-  have h_haar : LeFibreMeasure volume volume (gramCoords 𝔰.J₁ ∘ φ) (gramCoords 𝔰.J₁ (φ 1))
+  have h_haar : LeFiberMeasure volume volume (gramCoords 𝔰.J₁ ∘ φ) (gramCoords 𝔰.J₁ (φ 1))
       ((ENNReal.ofReal (volU 𝔰.k / 2 ^ 𝔰.k) • volume).map
         fun h : U (1 : Matrix 𝔰.κ 𝔰.κ ℂ) ↦ h.val.val * (1 : Matrix 𝔰.κ 𝔰.κ ℂ)) := by
     simpa only [LeGramFibre, Function.comp_def, h_gram] using leGramFibre_haar (J := 1)
@@ -125,7 +125,7 @@ theorem _root_.New.LeGramFibre.mconv_embedH_le (e : n ⊕ 𝔰.κ ≃ 𝔰.Besse
     simpa [Matrix.mul_assoc, J₁_mul_definiteCols] using congrArg conjTranspose hXE
   have h_basis : LeGramFibre 𝔰.J₁ (1 : Matrix 𝔰.BesselIndex 𝔰.BesselIndex ℂ)
       (m ∗ₘ (ENNReal.ofReal c • volume.map embedH)) := by
-    refine hm.append e ?_ (LeFibreMeasure.trans ?_ leFibreMeasure_definiteCols (by fun_prop))
+    refine hm.append e ?_ (LeFiberMeasure.trans ?_ leFibreMeasure_definiteCols (by fun_prop))
       (ae_smul_measure (ae_map_mul_eq (by fun_prop) fun u ↦ by
         simp [coe_embedH, actOnCols, Matrix.sub_mul, Matrix.add_mul, Matrix.mul_assoc, hXE]) _)
     · rw [← LinearEquiv.eq_symm_apply, Shape.definiteCols, ← funext he]
@@ -226,11 +226,11 @@ theorem lintegral_eq_unipotent_coords {K : Matrix 𝔰.BesselIndex (Fin 𝔰.ϱ)
 
 /-- The dual vectors `e*_a`, the columns of `dualCols`. On `ϱ`-tuples `y`, the image under
 `u ↦ u (e*_0, …, e*_{ϱ-1})` of `2^(-ϱ)` times Haar measure `New.Shape.besselHaar₀` of the unipotent
-group 𝖴⁰ is at most the fibre measure (`LeFibreMeasure`) of the map that sends `y` to its products
+group 𝖴⁰ is at most the fibre measure (`LeFiberMeasure`) of the map that sends `y` to its products
 with the frame `e_0, …, e_{ϱ-1}, z` (columns of `frameCols`), and to the coordinates `gramCoords` of
 its Gram matrix, over the image of `(e*_0, …, e*_{ϱ-1})`. -/
 theorem leFibreMeasure_dualCols :
-    LeFibreMeasure volume volume
+    LeFiberMeasure volume volume
       (fun y : Matrix 𝔰.BesselIndex (Fin 𝔰.ϱ) ℂ ↦ (𝔰.frameColsᴴ * 𝔰.J₁ * y, gramCoords 𝔰.J₁ y))
       (𝔰.frameColsᴴ * 𝔰.J₁ * 𝔰.dualCols, gramCoords 𝔰.J₁ 𝔰.dualCols)
       ((((2 : ℝ≥0∞) ^ 𝔰.ϱ)⁻¹ • 𝔰.besselHaar₀.map Subtype.val).map
@@ -240,7 +240,7 @@ theorem leFibreMeasure_dualCols :
     simp [← ext_iff, inclMatrix, Matrix.mul_apply, Matrix.one_apply, Fin.sum_univ_castSucc]
   let μ : Measure (Matrix 𝔰.BesselIndex (Fin 𝔰.ϱ) ℂ) :=
     volume.map fun p : Matrix (Fin 𝔰.ϱ ⊕ 𝔰.κ) (Fin 𝔰.ϱ) ℂ ↦ 𝔰.dualCols + 𝔰.freeCols * p
-  have h_linear : LeFibreMeasure volume volume (𝔰.frameColsᴴ * 𝔰.J₁ * ·)
+  have h_linear : LeFiberMeasure volume volume (𝔰.frameColsᴴ * 𝔰.J₁ * ·)
       (𝔰.frameColsᴴ * 𝔰.J₁ * 𝔰.dualCols) μ := by
     simpa only [h_dual] using leFibreMeasure_conjTranspose_mul_mul conjTranspose_frameCols_mul_self
       conjTranspose_freeCols_mul_self
@@ -260,7 +260,7 @@ theorem leFibreMeasure_dualCols :
     simp [ψ, hermOfReal]
   have h_base : gramCoords 𝔰.J₁ 𝔰.dualCols = 0 := by
     simpa [hψ_zero, gramCoords_U_mul] using hψ_gram 0 0
-  have h_gram : LeFibreMeasure μ volume (gramCoords 𝔰.J₁) 0
+  have h_gram : LeFiberMeasure μ volume (gramCoords 𝔰.J₁) 0
       ((volume.withDensity fun _ ↦ (2 ^ 𝔰.ϱ)⁻¹).map (ψ 0)) := by
     refine .of_coordinates (w := fun _ _ ↦ (2 ^ 𝔰.ϱ)⁻¹) (by fun_prop) (by fun_prop)
       measurable_const Filter.univ_mem (fun t _ ↦ .of_forall fun q _ ↦ hψ_gram t q)
