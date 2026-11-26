@@ -402,7 +402,7 @@ lemma carrierForm_mem_rapidOfLevel_and_isAdelicHol {m : ℕ} [NeZero m] (hm_even
     -- Level one: on `stdLevel` the factor `c (det k)⁻¹` cancels against `χ (det k)`.
     have h_level : HasLevel (θ g) (⟨stdLevel E _, isOpen_stdLevel⟩ : OpenSubgroup _) := by
       simp [θ, V, ↓Subtype.forall', modKernel_mul_stdLevel_left, h_tame.apply_det, Pi.smul_def,
-        mul_comm, χ.apply_eq_zero_iff]
+        inv_mul_eq_div, χ.apply_eq_zero_iff]
     -- Rapid decay: `χ (det y) ≠ 0` makes `y` invertible.
     have h_rapid : V.IsRapid (θ g) := isRapid_modKernel _ _ _ _ h𝔪
       (fun y hy ↦ ⟨y⁻¹, y.nonsing_inv_mul (χ.apply_ne_zero_iff.1 hy)⟩) _ _
@@ -739,8 +739,9 @@ lemma integral_carrierForm_mul_eq_card_mul_choiceFn (i : ChoiceIndex j)
       (isTameFor_twistedChiMPow (c := 2) j ϑ)).1 1
   have h_full : HasLevel (carrierForm D.E D.m) (stdLevel D.E D.CarrierIndex) := fun k hk ↦ congrFun
     (h_level ⟨k, ((unitModulus D.E).mem_principalLevel_iff (by simp) ⟨k, hk⟩).2 (by subsingleton)⟩)
-  exact integral_mul_modKernel_sum_translates _ (enlargedSpace j) (carrierChar_hasWeight j) h_rapid
-    h_full (𝔪' := D.twistModulus ϑ 2) levelModulus_ideal_le (traceChar i.matrix) _ _
+  exact integral_mul_modKernel_sum_translates (𝔪 := D.untwistedModulus 2) _ (enlargedSpace j)
+    (carrierChar_hasWeight j) h_rapid h_full (levelModulus_ideal_le (S := D.levelPlaces ϑ))
+    (traceChar i.matrix) _ _
 
 /-- The third exchange. There are a constant `C` and numbers `c ϑ`, one for each twist `ϑ`, with two
 properties. First, `‖c ϑ‖ ^ 2` is `C` divided by `heckeValueProd j ϑ`, the product over the three
