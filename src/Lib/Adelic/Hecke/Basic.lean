@@ -173,12 +173,6 @@ lemma finite_quotient_image_of_isCompact (hH : IsOpen (H : Set G)) {C : Set G} (
   have : DiscreteTopology (G ⧸ H) := QuotientGroup.discreteTopology hH
   exact (hC.image continuous_quotient_mk').finite_of_discrete
 
-/-- For a compact subgroup `K` and an open subgroup `H` of a topological group, the index
-`[K : H ∩ K]` is finite, so it is nonzero as a natural number. -/
-lemma _root_.IsCompact.relIndex_ne_zero (hK : IsCompact (K : Set G))
-    (hH : IsOpen (H : Set G)) : H.relIndex K ≠ 0 :=
-  relIndex_ne_zero_of_isOpen_of_isCompact hH hK
-
 /-- For `K` compact, `H` open and `μ` left invariant, `[K : H ∩ K] · μ (H ∩ K) = μ K`. -/
 @[to_additive]
 lemma relIndex_mul_measure_inf (hK : IsCompact (K : Set G)) (hH : IsOpen (H : Set G))

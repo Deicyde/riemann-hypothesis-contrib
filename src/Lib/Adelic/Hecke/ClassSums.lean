@@ -277,7 +277,7 @@ lemma classSum_eq_relIndex_smul [H : HasFiniteType Γ K] [J : HasFiniteType Γ K
   subst hL
   set L : Subgroup G := K'.comap (conj a) with hL
   have h_finite : Finite (K ⧸ L.subgroupOf K) := Nat.finite_of_card_ne_zero
-    (H.isCompact.relIndex_ne_zero (J.isOpen.preimage (continuous_conj a)))
+    (relIndex_ne_zero_of_isOpen_of_isCompact (J.isOpen.preimage (continuous_conj a)) H.isCompact)
   have h_transporter (U : Subgroup G) [HasFiniteType Γ U] (g h : G) : ∃ T : Finset G,
       (∀ γ : G, γ ∈ T ↔ γ ∈ Γ ∧ g⁻¹ * γ * h ∈ U) ∧
       #T = if mk Γ U g = mk Γ U h then Nat.card (classAut Γ U g) else 0 :=
