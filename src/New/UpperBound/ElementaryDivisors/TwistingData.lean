@@ -367,6 +367,9 @@ lemma five_mul_primePow_pow_le_q : 5 * T.primePow ^ s.val ≤ T.q :=
   calc 5 * T.primePow ^ s.val ≤ T.primePow ^ (s.val + 1) := by grw [pow_succ', T.five_le_primePow]
     _ ≤ T.primePow ^ N := Nat.pow_le_pow_right (pow_pos T.prime.pos T.frobExp) s.val_lt
 
+lemma five_le_q : (5 : ℝ) ≤ T.q :=
+  mod_cast T.five_le_primePow.trans (Nat.le_self_pow (NeZero.ne N) T.primePow)
+
 /-- Let `a ≠ a'`. In the letter `s` let `u = T.rootVar a a' s` be the variable `(a', s)` if `s` is
 even and `(a, s)` if `s` is odd, and let `ū = T.rootVar a' a s` be the other of these two variables.
 The defect of a monomial at the letter `i` along the root `(a, a')` is its weighted degree for the
@@ -389,9 +392,7 @@ lemma defectWeight_sub_mem_Icc (T : FrobeniusCycle N W R) {i : ZMod N} {a a' : F
   have h_second : (5 * T.primePow ^ (s - i).val : ℝ) ≤ T.q :=
     mod_cast T.five_mul_primePow_pow_le_q (s - i)
   rw [h_diff]
-  have hq : (5 : ℝ) ≤ T.q :=
-    mod_cast T.five_le_primePow.trans (Nat.le_self_pow (NeZero.ne N) T.primePow)
-  exact ⟨by positivity, (div_le_iff₀ q_sub_one_pos).2 (by linarith)⟩
+  exact ⟨by positivity, (div_le_iff₀ q_sub_one_pos).2 (by linarith [T.five_le_q])⟩
 
 /-- Let `P = T.primePow` be the prime power of the Frobenius cycle, which is at least `5`, and let
 `q = T.q = P ^ N`. As `s` runs over the letters, the exponent `1 + (s - 1 - i).val` runs over
