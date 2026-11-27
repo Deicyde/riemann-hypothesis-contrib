@@ -339,6 +339,78 @@ lemma AddMonoidHom.card_pow_succ_eq_card_mul_card_range_mul_card_ker {ι A B H :
     ← Nat.card_prod, ← j.ker.card_mul_index, index_ker, index_ker, j.range_eq_top.mpr hj,
     card_top, mul_rotate]
 
+/-- The count of the trivialised cocycles along a map `r` that vanishes on those whose cocycle is a
+coboundary `g ↦ g a - a`, and whose kernel consists of trivialised cocycles with cocycle zero on
+`U`. Here `V` is finite, killed by the prime `l`, fixed by `U` and Higman-projective over
+`Δ = G ⧸ U`, which acts through `W`, and `I ⊆ U`. Then
+`#trivializedCocycles = #H₀ * #(range d) * #(range r)`, for the coboundary map `d` and the group
+`H₀` of `Δ`-maps from (`N`-units) `× ℤ` to `V` that kill torsion. In `ker r` the trivialisation
+descends to the `U`-orbits of places, so that the cocycle is a coboundary by Higman-projectivity;
+by Dirichlet's theorem, the trivialisations of the zero cocycle are as many as the maps in `H₀`. -/
+private lemma New.IsLargeLevel.card_trivializedCocycles_eq {G K R : Type} [Group G]
+    [TopologicalSpace G] [Field K] [EmbeddedNumberField K] [MulSemiringAction G Ω]
+    [IsProGalois G K Ω] [CommRing R] {l N : ℕ} [Fact l.Prime] [NeZero N] {V : DiscreteModule R G}
+    {I : Set G} {U : OpenNormalSubgroup G} [Finite V] (h_tors : ∀ a : V, l • a = 0)
+    (h_triv : V.TrivialOn U.toOpenSubgroup.toSubgroup)
+    (hV_proj : V.IsHigmanProjective U.toOpenSubgroup.toSubgroup) (hI : ∀ g ∈ I, g ∈ U)
+    (W : Representation ℤ (G ⧸ U.toOpenSubgroup.toSubgroup) V) (hW : ∀ g : G, ⇑(V.ρ g) = W g)
+    {J : Type} [AddCommGroup J] (r : V.trivializedCocycles (PlaceAboveLevel N) I →+ J)
+    (hr_ker : ∀ P ∈ r.ker, ∀ g ∈ U, P.val.2 g = 0)
+    (hr_cob : ∀ (P : V.trivializedCocycles (PlaceAboveLevel N) I) (a : V),
+      P.val.2 = (V.ρ · a - a) → r P = 0) :
+    Nat.card (V.trivializedCocycles (PlaceAboveLevel N) I) =
+      Nat.card {x : ((fixedSUnitsRep N U).prod
+          (.trivial ℤ (G ⧸ U.toOpenSubgroup.toSubgroup) ℤ)).IntertwiningMap W //
+          torsion ℤ (fixedSUnits N U × ℤ) ≤ LinearMap.ker x.1} *
+        Nat.card (coboundaryMap V.ρ).toAddMonoidHom.range * Nat.card r.range := by
+  classical
+  -- Dirichlet: independent equivariant real forms `Λ` on (`N`-units) `× ℤ`, one for each
+  -- `U`-orbit of places; the rank is at most the number of orbits.
+  obtain ⟨h_units_fg, Λ, hΛ, h_indep, h_rank⟩ := dirichlet_fixedSUnits G N U
+  obtain ⟨τ, hτ_out⟩ := hV_proj
+  have hV_module : Module (ZMod l) V := AddCommGroup.zmodModule h_tors
+  have hτ (a : V) : ∑ δ, W δ (τ (W δ⁻¹ a)) = a := by simpa [hW] using hτ_out a
+  let d : V →+ G → V := (coboundaryMap V.ρ).toAddMonoidHom
+  -- In `ker r` the cocycle vanishes on `U`, so the trivialisation descends to `U`-orbits.
+  let f (P : r.ker) : MulAction.orbitRel.Quotient U.1.1 (PlaceAboveLevel N) → V :=
+    Quotient.lift P.val.val.1 fun _ x ⟨g, hg⟩ ↦ by
+      simpa [← hg, h_triv, hr_ker P.val P.property] using! (P.val.property.2.1 g x).symm
+  have hf (P : r.ker) (g : G) (x : MulAction.orbitRel.Quotient U.1.1 (PlaceAboveLevel N)) :
+      W g (f P x) = f P ((g : G ⧸ U.toOpenSubgroup.toSubgroup) • x) + P.val.val.2 g :=
+    x.ind' fun y ↦ by
+      rw [← hW g]
+      exact P.val.property.2.1 g y
+  -- There the cocycle is a coboundary: average `f P` with `τ` along the orbit of `x₀`.
+  have h_cob (P : r.ker) : P.val.val.2 ∈ d.range := by
+    let x₀ : PlaceAboveLevel N := Classical.arbitrary _
+    refine ⟨∑ δ, W δ (τ (W δ⁻¹ (f P (δ • ⟦x₀⟧)))), funext fun g ↦ sub_eq_of_eq_add' ?_⟩
+    rw [LinearMap.id_apply, hW g]
+    exact W.apply_sum_trace_eq_add τ hτ (f P) ⟦x₀⟧ g (P.val.val.2 g) (hf P g)
+  let p : r.ker →+ d.range := mk' (fun P ↦ ⟨P.val.val.2, h_cob P⟩) (by tauto)
+  -- `ker p` consists of the equivariant functions on the `U`-orbits of places; by Dirichlet's
+  -- theorem and `card_hom_lattice_eq_card_equivariant` there are as many as maps that kill
+  -- torsion.
+  have h_ker_p : Nat.card {x : ((fixedSUnitsRep N U).prod
+      (.trivial ℤ (G ⧸ U.toOpenSubgroup.toSubgroup) ℤ)).IntertwiningMap W //
+      torsion ℤ (fixedSUnits N U × ℤ) ≤ LinearMap.ker x.1} = Nat.card p.ker := by
+    rw [card_hom_lattice_eq_card_equivariant l hτ hΛ h_indep h_rank]
+    exact card_congr
+      { toFun F := ⟨⟨⟨⟨(F.val ⟦·⟧), 0⟩, by fun_prop,
+          fun g x ↦ by simpa [hW] using! (F.property g ⟦x⟧).symm, by simp⟩,
+          hr_cob _ 0 (funext fun g ↦ by simp)⟩, rfl⟩
+        invFun P := ⟨f P, fun δ ↦ δ.ind' (by simp [hf, Subtype.mk.inj P.property])⟩
+        left_inv F := Subtype.ext (funext fun x ↦ x.inductionOn fun _ ↦ rfl)
+        right_inv := fun ⟨⟨⟨⟨_, _⟩, _⟩, _⟩, rfl⟩ ↦ rfl }
+  -- `p` is onto: the constant function `a` trivialises the coboundary of `a`.
+  have h_range_p : p.range = ⊤ := by
+    have hI_triv : ∀ g ∈ I, ∀ a : V, V.ρ g a = a := fun g hg ↦ h_triv g (hI g hg)
+    refine p.range_eq_top.mpr fun ⟨_cocycle, a, ha⟩ ↦ ?_
+    have h_mem : ((fun _ ↦ a, (V.ρ · a - a)) : (PlaceAboveLevel N → V) × (G → V)) ∈
+        V.trivializedCocycles (PlaceAboveLevel N) I :=
+      ⟨by fun_prop, by simp +contextual [hI_triv]⟩
+    exact ⟨⟨⟨_, h_mem⟩, hr_cob ⟨_, h_mem⟩ a rfl⟩, Subtype.ext ha⟩
+  rw [h_ker_p, r.card_eq_card_ker_mul_card_mul_card_range p h_range_p]
+
 /-- Count of the trivialised cocycles, for split places indexed by `ι`. Let `V` be finite, killed by
 the prime `l`, fixed by `U`, Higman-projective over `G ⧸ U`, with `z - n` injective; let `U` fix
 `z r / r ^ n` whenever `r ^ l` is an `N`-unit fixed by `U` and every `s.φ i` fixes `r`. (a) There
@@ -363,16 +435,13 @@ lemma New.IsLargeLevel.SplitPlaces.card_trivialized_of_isHigmanProjective {G K R
         Nat.card V ^ (Fintype.card ι + 1)) := by
   classical
   -- Write `Δ = G ⧸ U` and `H` for the `Δ`-maps from (`N`-units) `× ℤ` to `V`. We count both sides
-  -- along the maps `r`, `p`, `j`, `d` below: with `H₀ ≤ H` the maps that kill torsion,
+  -- along the maps `r`, `j`, `d` below (and `p` in `card_trivializedCocycles_eq`): with `H₀ ≤ H`
+  -- the maps that kill torsion,
   -- `#trivializedCocycles = #H₀ * #range d * #range r`,
   -- `#V ^ (#ι + 1) = #H * #range d * #ker j`,
   -- and `range r ≤ ker j`. Under the two extra hypotheses both inclusions are equalities.
-  --
-  -- Dirichlet: independent equivariant real forms `Λ` on (`N`-units) `× ℤ`, one for each
-  -- `U`-orbit of places; the rank is at most the number of orbits.
-  obtain ⟨h_units_fg, Λ, hΛ, h_indep, h_rank⟩ := dirichlet_fixedSUnits G N U
   obtain ⟨hV_finite, h_tors, h_triv, h_inj⟩ := hV_fin
-  obtain ⟨τ, hτ_out⟩ := hV_proj
+  obtain ⟨τ, hτ_out⟩ := id hV_proj
   have hV_module : Module (ZMod l) V := AddCommGroup.zmodModule h_tors
   -- `γ i` is an element of inertia above `s.v i` that multiplies an `l`-th root of a uniformiser
   -- by the fixed primitive `l`-th root of unity.
@@ -400,47 +469,20 @@ lemma New.IsLargeLevel.SplitPlaces.card_trivialized_of_isHigmanProjective {G K R
           simpa [hW] using (h_rel _ P.property).2 y
         ext <;> simp [j, symbolIntertwiningMap, h_symbols]⟩)
       fun _ _ ↦ by ext <;> simp
-  -- In `ker r` the cocycle vanishes on `U`, so the trivialisation descends to `U`-orbits.
-  let f (P : r.ker) : MulAction.orbitRel.Quotient U.1.1 (PlaceAboveLevel N) → V :=
-    Quotient.lift P.val.val.1 fun _ x ⟨g, hg⟩ ↦ by
-      have h_gamma (i : ι) : P.val.val.2 (γ i) = 0 :=
-        congrArg (fun q : j.ker ↦ q.val.1 i) P.property
-      have h_zero : ∀ g ∈ U, P.val.val.2 g = 0 := (h_rel _ P.val.property).1 h_gamma
-      simpa [← hg, h_triv, h_zero] using! (P.val.property.2.1 g x).symm
-  have hf (P : r.ker) (g : G) (x : MulAction.orbitRel.Quotient U.1.1 (PlaceAboveLevel N)) :
-      W g (f P x) = f P ((g : G ⧸ U.toOpenSubgroup.toSubgroup) • x) + P.val.val.2 g :=
-    x.ind' (P.val.property.2.1 g)
-  -- There the cocycle is a coboundary: average `f P` with `τ` along the orbit of `x₀`.
-  have h_cob (P : r.ker) : P.val.val.2 ∈ d.range := by
-    let x₀ : PlaceAboveLevel N := Classical.arbitrary _
-    exact ⟨∑ δ, W δ (τ (W δ⁻¹ (f P (δ • ⟦x₀⟧)))), funext fun g ↦
-      sub_eq_of_eq_add' (W.apply_sum_trace_eq_add τ hτ (f P) ⟦x₀⟧ g (P.val.val.2 g) (hf P g))⟩
-  let p : r.ker →+ d.range := mk' (fun P ↦ ⟨P.val.val.2, h_cob P⟩) (by tauto)
   -- `j` is onto: every equivariant `x` is given by the symbols.
   have h_onto : Function.Surjective j :=
     mem_range_symbolIntertwiningMap W hW h_tors h_inj τ hτ s.φ β₀ hβ₀ h_fix
   have h_finite_maps : Finite (ρ.IntertwiningMap W) := .of_surjective j h_onto
-  -- `ker p` consists of the equivariant functions on the `U`-orbits of places; by Dirichlet's
-  -- theorem and `card_hom_lattice_eq_card_equivariant` there are as many as maps in `H₀`, those
-  -- that kill torsion.
+  -- The left side counts along `r` (`card_trivializedCocycles_eq`): in `ker r` the cocycle vanishes
+  -- on `U` by reciprocity, and `r` kills the coboundaries, as the `γ i` lie in `U`.
   let H₀ := {x : ρ.IntertwiningMap W // torsion ℤ (fixedSUnits N U × ℤ) ≤ LinearMap.ker x.1}
-  have h_ker_p : Nat.card H₀ = Nat.card p.ker := by
-    rw [card_hom_lattice_eq_card_equivariant l hτ hΛ h_indep h_rank]
-    exact card_congr
-      { toFun F := ⟨⟨⟨⟨(F.val ⟦·⟧), 0⟩, by fun_prop,
-          fun g x ↦ by simpa [hW] using! (F.property g ⟦x⟧).symm, by simp⟩, rfl⟩, rfl⟩
-        invFun P := ⟨f P, fun δ ↦ δ.ind' (by simp [hf, Subtype.mk.inj P.property])⟩
-        left_inv F := Subtype.ext (funext fun x ↦ x.inductionOn fun _ ↦ rfl)
-        right_inv := fun ⟨⟨⟨⟨_, _⟩, _⟩, _⟩, rfl⟩ ↦ rfl }
-  -- `p` is onto: the constant function `a` trivialises the coboundary of `a`.
-  have h_range_p : p.range = ⊤ := by
-    refine p.range_eq_top.mpr fun ⟨_cocycle, a, ha⟩ ↦
-      ⟨⟨⟨(fun _ ↦ a, (V.ρ · a - a)), by fun_prop, ?_⟩, ?_⟩, Subtype.ext ha⟩
-    · simp +contextual [h_triv _ (s.mem_and_conj_mem ..).1]
-    · simp [Subtype.ext_iff, funext_iff, r, h_triv, s.decompGroup_le (s.isPlaceOver _) (hγ _).1.1]
   have h_left : Nat.card (V.trivializedCocycles (PlaceAboveLevel N) I) =
-      Nat.card H₀ * Nat.card d.range * Nat.card r.range := by
-    rw [h_ker_p, r.card_eq_card_ker_mul_card_mul_card_range p h_range_p]
+      Nat.card H₀ * Nat.card d.range * Nat.card r.range :=
+    card_trivializedCocycles_eq h_tors h_triv hV_proj (fun g hg ↦ (s.mem_and_conj_mem g hg).1) W
+      hW r (fun P hP ↦ (h_rel _ P.property).1 fun i ↦ congrArg (fun q : j.ker ↦ q.val.1 i) hP)
+      fun P a ha ↦ by
+        simp [Subtype.ext_iff, funext_iff, r, ha, h_triv,
+          s.decompGroup_le (s.isPlaceOver _) (hγ _).1.1]
   have h_right : Nat.card V ^ (card ι + 1) =
       Nat.card (ρ.IntertwiningMap W) * Nat.card d.range * Nat.card j.ker :=
     d.card_pow_succ_eq_card_mul_card_range_mul_card_ker j h_onto
