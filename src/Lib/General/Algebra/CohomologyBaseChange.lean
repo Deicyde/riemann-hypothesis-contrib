@@ -1,5 +1,6 @@
 module
 
+import TauCeti.Algebra.Group.Submonoid.Membership
 public import Lib.Cohomology.Etale.BijectiveComparisons
 public import Lib.PadicComparison.Descent.TestCategory
 
@@ -297,8 +298,8 @@ induces a map of localisations `A[1/p] → B[1/p]`.
 -/
 
 /-- Every ring map f : A → B maps the powers of a natural number p in A into the powers of p
-in B. -/
+in B: Tau Ceti's `Submonoid.powers_le_comap_powers` for the element `p`, whose image is `p`. -/
 lemma New.Variety.powers_le_comap_powers (p : ℕ) {A B : Type*} [CommRing A] [CommRing B]
     (f : A →+* B) :
     Submonoid.powers (p : A) ≤ (Submonoid.powers (p : B)).comap f := by
-  simp [Submonoid.powers_le]
+  simpa using Submonoid.powers_le_comap_powers f (p : A)
