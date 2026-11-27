@@ -135,7 +135,6 @@ namespace DiscreteSeries
 
 variable {𝔰}
 
--- Keeps definitional checks from unfolding the finite sums.
 /-- For `s = (g, h)` in `R = besselGraph`, the element `g` lies in the Bessel subgroup
 `besselS`. -/
 @[simp]
