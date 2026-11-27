@@ -192,7 +192,7 @@ lemma exists_isTameExponent [IsFaithfulMulChar K T] (hA : IsPlaceOver A w) (f : 
   have tame_of_eq (s : inertiaGroup Gal(Ω/E) A) (a : ℕ)
       (hsa : ((hA.tameGenerator • z / z) ^ j) ^ a = s.val z / z) :
       IsTameExponent w A T f.factorial s a :=
-    ⟨hA, f.factorial_ne_zero, s.2, ρ, ⟨π, z, (hζ.toInteger ^ j) ^ a,
+    ⟨hA, f.factorial_ne_zero, s.property, ρ, ⟨π, z, (hζ.toInteger ^ j) ^ a,
       { centrePrime_le_ker := hρ_cen, commutes := hρ_int, isUniformiser := hπ,
         pow_eq := hz, coe_eq := hsa, map_eq := by simp only [map_pow, hTj, N] }⟩⟩
   refine ⟨⟨hA.tameGenerator ^ j, tame_of_eq _ 1 <|
