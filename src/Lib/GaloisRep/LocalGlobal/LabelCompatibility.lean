@@ -192,7 +192,7 @@ lemma exists_isTameExponent [IsFaithfulMulChar K T] (hA : IsPlaceOver A w) (f : 
   have tame_of_eq (s : inertiaGroup Gal(Ω/E) A) (a : ℕ)
       (hsa : ((hA.tameGenerator • z / z) ^ j) ^ a = s.val z / z) :
       IsTameExponent w A T f.factorial s a :=
-    ⟨hA, f.factorial_ne_zero, s.2, ρ, ⟨π, z, (hζ.toInteger ^ j) ^ a,
+    ⟨hA, f.factorial_ne_zero, s.property, ρ, ⟨π, z, (hζ.toInteger ^ j) ^ a,
       { centrePrime_le_ker := hρ_cen, commutes := hρ_int, isUniformiser := hπ,
         pow_eq := hz, coe_eq := hsa, map_eq := by simp only [map_pow, hTj, N] }⟩⟩
   refine ⟨⟨hA.tameGenerator ^ j, tame_of_eq _ 1 <|
@@ -226,7 +226,7 @@ private lemma IsTameExponent.of_unramified {L : Type} [Field L] [EmbeddedNumberF
           pow_eq := by rw [← hq, ← pow_mul, hw.pow_eq, IsScalarTower.algebraMap_apply E L Ω],
           coe_eq := hw.coe_eq, map_eq := by rw [← hq, ← pow_mul, hw.map_eq] }⟩⟩⟩
   obtain ⟨x, rfl⟩ := algebraMap_ResField_surjective _ y
-  show algebraMap (ResField (u.below E)) K _ = i _
+  change algebraMap (ResField (u.below E)) K _ = i _
   rw [hj, hi, comp_apply, ← IsScalarTower.algebraMap_apply (𝓞 E) (𝓞 L), hw.commutes]
 
 end New.GaloisRep
@@ -300,12 +300,9 @@ private lemma New.GaloisRep.Attached.isLabelledAt_one (hf : f ∈ (stdSpace E n)
   have h_act (g : GL n (LocField w)) : (ρ (reindexGL (Fintype.equivFin n) g) ⟨f, hf⟩).val =
       rightRegular ℂ (Gf E n) (WeylIndex n κ.1 → ℂ) (ofSplitPlace hw g) f := by
     simp [ρ, Patching.localFormRep, Patching.embedAtSplit]
-  let red := intGL.map (n := n) (IsLocalRing.residue (Valued.integer (LocField w)))
-  have h_red (k : intGL n (Valued.integer (LocField w))) : red k = reduceGL k := rfl
-  have h_fix : ∀ k, red k = 1 → ρ (reindexGL (Fintype.equivFin n) k.val) ⟨f, hf⟩ = ⟨f, hf⟩ :=
-    fun k hk ↦ Subtype.ext ((h_act k.val).trans (h_has.1 k (h_red k ▸ hk)))
-  have h_lift : ∀ g : GL n (ResField w), red (surjInv reduceGL_surjective g) = g :=
-    fun g ↦ (h_red _).trans (surjInv_eq reduceGL_surjective g)
+  have h_fix : ∀ k, reduceGL (w := w) k = 1 →
+      ρ (reindexGL (Fintype.equivFin n) k.val) ⟨f, hf⟩ = ⟨f, hf⟩ :=
+    fun k hk ↦ Subtype.ext ((h_act k.val).trans (h_has.1 k hk))
   have h_sum : ∑ᶠ g : GL n (ResField w),
       star ((∏ b, (detChar (append ψ χ b)).rankPart (append 1 t b)).evalGL g) •
         ρ (reindexGL (Fintype.equivFin n) (surjInv reduceGL_surjective g).val) ⟨f, hf⟩ ≠ 0 := by
@@ -315,7 +312,8 @@ private lemma New.GaloisRep.Attached.isLabelledAt_one (hf : f ∈ (stdSpace E n)
     exact h_has.2 (by simpa [h_act, prod_univ_add, labelChar_X_sub_C] using h1)
   obtain ⟨z, hz, ξ, h_z⟩ := exists_sorted_of_detChar (ρ := ρ) (x := ⟨f, hf⟩) (v_uniformizer w)
     isUnitary_localFormRep (Fintype.equivFin n) h_inj (m := append 1 t)
-    (by simpa [sum_univ_add] using h_deg) h_fix h_lift h_sum
+    (by simpa [sum_univ_add] using h_deg) h_fix (s := surjInv (reduceGL_surjective (w := w)))
+    (surjInv_eq (reduceGL_surjective (w := w))) h_sum
   obtain ⟨lab, h_eig, h_sorted, h_lab⟩ := h_z
   have hez : IsEigenform z.val P := he.of_mem_cyclicSpan hz h_eig.ne_zero
   obtain ⟨h_fin, h_jump, -⟩ := hr.local_global_of_eigencharacter h_eig hez h_sorted hA 1 1 0
@@ -359,7 +357,8 @@ private lemma New.GaloisRep.Attached.isLabelledAt_of_root_pow_eq_one {g : ℕ}
     algebraize [j₀]
     let j : ResField w →+* ResField u := algebraMap (ResField w) (ResField u)
     have h_res_rank : finrank (ResField w) (ResField u) = p := Nat.pow_right_injective w.one_lt_q <|
-      by show w.q ^ _ = w.q ^ p; rw [hq, ← card_ResField, ← card_ResField, ← natCard_eq_pow_finrank]
+      by change w.q ^ _ = w.q ^ p; rw [hq, ← card_ResField, ← card_ResField,
+        ← natCard_eq_pow_finrank]
     -- Given any `ResField w`-embedding `ResField u → K`, Shintani base change descends to `E`.
     have descend [Algebra (ResField u) K] [IsScalarTower (ResField w) (ResField u) K] :
         (IsFiniteTypeAt r A ∧ HasJumpsAt r A (jumps κ (Fintype.card n))) ∧
