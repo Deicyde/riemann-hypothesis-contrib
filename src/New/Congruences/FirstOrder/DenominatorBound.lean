@@ -364,7 +364,8 @@ lemma exists_taylorWilesPlaces_hasRootChain {P : Parameters} {D : Data P} {ℓ :
   let HasShape (x : B.Eigensystem ![]) (y : FrobeniusDatum D.E) (e : EllAdicIntegers[X]) : Prop :=
     HasRootChain (x.val.heckePolyAt y.place) (e.map (algebraMap EllAdicIntegers ℂ)) y.place.q
       (ιℓ.symm (normalizingAvatar O y.frob).val)⁻¹ O.rankDiff
-  let W : Set (FrobeniusDatum D.E) := {y | y.place ∉ badPlaces D ℓ ∧ B.IsOffLevel (ℓ := ℓ) ![] y.place ∧
+  let W : Set (FrobeniusDatum D.E) :=
+    {y | y.place ∉ badPlaces D ℓ ∧ B.IsOffLevel (ℓ := ℓ) ![] y.place ∧
     (∀ x : B.Eigensystem ![], IsWeakLift O x.val → ∀ S : (PadicAlgCl ℓ)[X], 1 ≤ ‖S.eval 1‖ →
       (∀ k : ℕ, ‖(χ x y.frob).coeff k - (S * chain y.frob).coeff k‖ < 1) →
       ∃ e : EllAdicIntegers[X], HasShape x y e ∧ e.eval 1 = 1) ∧
@@ -404,7 +405,7 @@ lemma exists_taylorWilesPlaces_hasRootChain {P : Parameters} {D : Data P} {ℓ :
     rw [← hx₀]
     exact h_congr _ k
   choose e h_string he using h_shape
-  have : Fintype Near := Fintype.ofFinite Near
+  let : Fintype Near := Fintype.ofFinite Near
   refine ⟨Q, h_triangle, h_good, h_offLevel, fun j ↦ ∏ x : Near, e j x,
     by simp [eval_prod, he], fun j x h_congr h_weak ↦ ?_⟩
   obtain ⟨S, hS, h_dvd⟩ := h_string j ⟨x, h_congr, h_weak⟩
@@ -642,22 +643,14 @@ lemma exists_ellVal_le_and_diagOp_mem_ellIntegralForms {P : Parameters} {D : Dat
         (Q.place j).q (algebraMap EllAdicIntegers ℂ (a (Q.frobData j).frob))⁻¹ O.rankDiff :=
     h_string j ⟨x, hx⟩ h_cong (not_not.1 (mt (h_factor ⟨x, hx⟩) h_ne))
   have h_rankDiff : O.rankDiff ≠ 0 := by simpa [Nat.sub_eq_zero_iff_le] using O.rank_lt
-  have h_ribet
-      (S : Subalgebra EllAdicIntegers (B.Eigensystem Q.place → MvPolynomial J (PadicAlgCl ℓ)))
-      (𝒥 : Submodule S (B.Eigensystem Q.place → MvPolynomial J (PadicAlgCl ℓ)))
-      (h𝒥 : IsTraceIdeal 𝒥 (fun x g ↦ (N x.val g).val) (ℓ ^ (ν + 1) : EllAdicIntegers)
-        (fun j ↦ (Q.frobData j).isPlaceOver.tameGenerator) (fun j ↦ (Q.frobData j).frob)
-        (fun j ↦ j) e) :
-      ∃ d : PadicAlgCl ℓ, IsCommonRibetElement 𝒥
-          (fun (g : Gal(Ω/D.E)) (x : B.Eigensystem Q.place) ↦ (1 - (N x.val g).val).det) x₁ d ∧
-        ellVal (ℓ := ℓ) (D.chosenGroupOrder ^ 2 * d) ≤ liftValuationBound ℓ O ram sel :=
-    exists_isCommonRibetElement_ellVal_le hc hϑ h_le h_tri (𝓧 := 𝓧)
-      (sys := fun x : B.Eigensystem Q.place ↦ x.val)
-      (fun x ↦ h_isRepOfType J Q.place h_good x x.prop) (fun x ↦ h_quad J Q.place h_good x x.prop)
-      x₁ h_lift h_sel_ne_top h𝒥 he
-  refine (B.exists_diagOp_mem_ellIntegralForms Q h_offLevel h_twist h_tame
+  obtain ⟨s, h_val, h_op⟩ := B.exists_diagOp_mem_ellIntegralForms Q h_offLevel h_twist h_tame
     (fun (g : Gal(Ω/D.E)) (x : B.Eigensystem Q.place) ↦ (1 - (N x.val g).val).det) elt value 𝓨 x₁ e
-    h_rankDiff (h_int h_good) h_string' h_dvd h_ribet).elim fun s ⟨h_val, h_op⟩ ↦ ?_
+    h_rankDiff (h_int h_good) h_string' h_dvd
+    (m := D.chosenGroupOrder ^ 2) (bound := liftValuationBound ℓ O ram sel) fun _ _ h𝒥 ↦
+      exists_isCommonRibetElement_ellVal_le hc hϑ h_le h_tri (𝓧 := 𝓧)
+        (sys := fun x : B.Eigensystem Q.place ↦ x.val)
+        (fun x ↦ h_isRepOfType J Q.place h_good x x.prop)
+        (fun x ↦ h_quad J Q.place h_good x x.prop) x₁ h_lift h_sel_ne_top h𝒥 he
   refine ⟨J, inferInstance, Q.place, s, fun x hx ↦ ?_, fun l hl hl_int y hy h_supp h_agree ↦ ?_⟩
   · obtain rfl : x = x₁ := Subtype.ext hx
     exact h_val
@@ -830,7 +823,8 @@ lemma IsLiftGenerator.typeProjection_eq_zero_or_mem_range {P : Parameters} {D : 
       have h_orth : typeProjection O c * typeProjection O c' = 0 := by
         rw [← map_mul, tupleIdem_orthogonal.ortho h_label_ne, map_zero]
       apply h_ne
-      rw [← typeProjection_eq_self_of_mem_range hc', ← mul_apply_eq_comp, h_orth, LinearMap.zero_apply]
+      rw [← typeProjection_eq_self_of_mem_range hc', ← mul_apply_eq_comp, h_orth,
+        LinearMap.zero_apply]
     exact hc'
   · -- Otherwise the line of `v` has no nonzero isotypic form, so it lies in the kernel.
     by_contra h_none
@@ -1227,8 +1221,9 @@ Hecke eigenvalues with main summands whose twisted Selmer groups have length at 
 `twistError ℓ D`. Then some operator `Λ` on `Z` has a determinant of `ℓ`-adic norm at least
 `exp (-(finrank ℂ Z * (card r * (β * log ℓ))))`, where `β = clearingBound D ℓ` adds the local
 losses, error terms and `v_ℓ(N)`. It takes the projection to `Z` of every form `y'` integral at `ιℓ`
-and orthogonal to the false lifts to a form integral at `ιℓ`, whose pairings with the forms integral
-at all places above `ℓ` are integral. -/
+and orthogonal to the false lifts to a form integral at `ιℓ`. Its pairings with test forms integral
+at the conjugate place `ιℓ ∘ conj` are integral at `ιℓ`: the first variable of the inner product is
+conjugate-linear. -/
 theorem exists_operator_det_clearingBound {P : Parameters} {D : Data P} {ℓ : ℕ} [ThePrime ℓ]
     [PadicIso ℓ] (ϑ : D.Twist) (hϑ : IsAuxTwist (badPlaces D ℓ) ϑ.Q ϑ.invAvatar (twistError ℓ D))
     {r n : Type} [Fintype r] [DecidableEq r] [Fintype n] [DecidableEq n] {O : DescentPair D.E r n}
@@ -1239,7 +1234,8 @@ theorem exists_operator_det_clearingBound {P : Parameters} {D : Data P} {ℓ : �
       (∀ y' : O.FormV, y' ∈ integralForms (PadicPlace.ofIso ιℓ) → O.IsOrthogonalToFalseLifts E Zᗮ y'
         →
         (Λ (Z.orthogonalProjectionOnto y') : O.FormV) ∈ integralForms (PadicPlace.ofIso ιℓ)) ∧
-      ∀ y y' : O.FormV, (∀ j : PadicPlace ℓ, y ∈ integralForms j) →
+      ∀ y y' : O.FormV,
+        y ∈ integralForms ({ ιₚ := (PadicPlace.ofIso ιℓ).ιₚ.comp (starRingEnd ℂ) } : PadicPlace ℓ) →
         y' ∈ integralForms (PadicPlace.ofIso ιℓ) → O.IsOrthogonalToFalseLifts E Zᗮ y' →
         ‖ιℓ (inner ℂ y (Λ (Z.orthogonalProjectionOnto y') : O.FormV))‖ ≤ 1 := by
   -- If no generator is nonzero, then `Z = ⊥` and the identity serves. Otherwise some generator
@@ -1277,11 +1273,12 @@ theorem exists_operator_det_clearingBound {P : Parameters} {D : Data P} {ℓ : �
     rw [LinearMap.smul_apply, Submodule.coe_smul, Nat.cast_smul_eq_nsmul ℂ]
     exact nsmul_mem (h_int y' hy' hy'_test) _
   · -- Projection integrality alone need not give an integral pairing: the class stabilizer
-    -- orders divide `D.chosenGroupOrder`, which clears their denominators.
+    -- orders divide `D.chosenGroupOrder`, which clears their denominators. The first variable
+    -- is integral at the conjugate place, as required by the Hermitian pairing.
     have h_pair : ‖(PadicPlace.ofIso ιℓ).ιₚ
         (D.chosenGroupOrder • inner ℂ y (Λ (Z.orthogonalProjectionOnto y') : O.FormV))‖ ≤ 1 :=
       y.norm_nsmul_inner_le_one _ (PadicPlace.ofIso ιℓ)
-        (D.card_classAut_dvd_chosenGroupOrder hc.card_le levelOf_le_stdLevel) (hy _)
+        (D.card_classAut_dvd_chosenGroupOrder hc.card_le levelOf_le_stdLevel) hy
         (h_int y' hy' hy'_test)
     rw [LinearMap.smul_apply, Submodule.coe_smul, inner_smul_right_eq_smul,
       Nat.cast_smul_eq_nsmul ℂ]
@@ -1311,6 +1308,6 @@ theorem denominatorLe_clearingBound {P : Parameters} {D : Data P} {ℓ : ℕ} [T
   obtain ⟨Λ, h_det, h_int, h_pair⟩ := exists_operator_det_clearingBound ϑ hϑ h_span
   refine ⟨Λ, h_det, fun y hy hy_test ↦ ⟨?_, fun y' hy' ↦ ?_⟩⟩
   · exact h_int y hy hy_test
-  · exact h_pair y' y hy' hy hy_test
+  · exact h_pair y' y (hy' _) hy hy_test
 
 end New.Selmer

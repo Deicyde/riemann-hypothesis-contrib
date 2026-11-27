@@ -1,5 +1,6 @@
 module
 
+import TauCeti.NumberTheory.NumberField.Ideal.DegreeOne
 public import Mathlib.RingTheory.Valuation.Extension
 import Mathlib.NumberTheory.RamificationInertia.Galois
 import Mathlib.RingTheory.Invariant.Profinite
@@ -215,17 +216,14 @@ lemma FinPlace.isPlaceOver_placeOver [NumberField K] [Algebra K New.Ω] (v : Fin
     (over_def (maximalIdeal _) v.asIdeal).le hx
   exact hx_max (h_loc.map_nonunit _ hx_unit)
 
-private lemma absNorm_span_natCast_rat {p : ℕ} : absNorm (span {(p : 𝓞 ℚ)}) = p := by
-  -- `↓`: `absNorm_span_natCast` applies before simp turns the norm into `Algebra.norm`.
-  simp [↓absNorm_span_natCast, rank]
-
 /-- The place of `ℚ` at a prime number `p`: the prime ideal `(p)` of `𝓞 ℚ`. -/
 def ratPlace {p : ℕ} (hp : p.Prime) : FinPlace ℚ :=
   ofPrime (p := span {(p : 𝓞 ℚ)}) (by
     apply (irreducible_of_irreducible_absNorm ?_).prime
-    rwa [absNorm_span_natCast_rat])
+    rwa [RingOfIntegers.absNorm_span_natCast_of_finrank_eq_one (Module.finrank_self ℚ)])
 
-lemma q_ratPlace {p : ℕ} (hp : p.Prime) : (ratPlace hp).q = p := absNorm_span_natCast_rat
+lemma q_ratPlace {p : ℕ} (hp : p.Prime) : (ratPlace hp).q = p :=
+  RingOfIntegers.absNorm_span_natCast_of_finrank_eq_one (Module.finrank_self ℚ) p
 
 /-- `p` is a unit at every place of `ℚ` other than the place at `p`. -/
 lemma valuation_eq_one_of_ne_ratPlace {p : ℕ} (hp : p.Prime) {w : FinPlace ℚ}
@@ -518,6 +516,9 @@ lemma exists_placeOfEmb_extension :
 `New.exists_placeOfEmb_extension`: continuous, extending `σ`, with values in `ℚ_p(σ E)`. -/
 def placeOfEmbExtension : LocField (placeOfEmb σ) →+* F := (exists_placeOfEmb_extension σ).choose
 
+lemma continuous_placeOfEmbExtension : Continuous (placeOfEmbExtension σ) :=
+  (exists_placeOfEmb_extension σ).choose_spec.1
+
 /-- The norm valuation of `F` pulled back along `New.placeOfEmbExtension σ` is equivalent to the
 valuation `Valued.v` of the completion at `New.placeOfEmb σ`. -/
 lemma valuation_comap_placeOfEmbExtension_isEquiv :
@@ -537,7 +538,7 @@ lemma adeleExtension_algebraMap (x : E) : adeleExtension σ x = σ x :=
 
 @[fun_prop]
 lemma continuous_adeleExtension : Continuous (adeleExtension σ) :=
-  (exists_placeOfEmb_extension σ).choose_spec.1.comp (by fun_prop)
+  (continuous_placeOfEmbExtension σ).comp (by fun_prop)
 
 /-- Two finite adeles `x` and `y` have images of the same norm under the extension of `σ`
 exactly when their components at the prime `New.placeOfEmb σ` have the same valuation. -/
