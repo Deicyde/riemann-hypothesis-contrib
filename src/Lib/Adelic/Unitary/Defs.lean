@@ -210,9 +210,6 @@ lemma Gf.coe_mul (g k : Gf E n) : (g * k).val = g.val * k.val := rfl
 lemma Gf.coe_inv (g : Gf E n) : g⁻¹.val = g.val⁻¹ := rfl
 
 @[simp]
-lemma Gf.coe_one : (1 : Gf E n).val = 1 := rfl
-
-@[simp]
 lemma Gf.subtype_eq_val (g : Gf E n) :
     DFunLike.coe (F := Gf E n →* GL n (𝔸f E)) (U (1 : Matrix n n (𝔸f E))).subtype g = g.val :=
   rfl
