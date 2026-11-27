@@ -354,7 +354,8 @@ completions at `P`, and `diagN (P := P) (N := N) n S` is `diag (1, …, 1, N)` a
 matrices. -/
 lemma norm_detCharAt_diagN_anti [h : IsSplitLevel P N] {ι : ℂ →+* ℂ_[N]} {χ : HeckeChar E}
     {k k' : ℕ} (hk : k ≤ k') :
-    ‖ι (detCharAt χ k' (diagN (P := P) (N := N) n S))‖ ≤ ‖ι (detCharAt χ k (diagN (P := P) (N := N) n' S))‖ := by
+    ‖ι (detCharAt χ k' (diagN (P := P) (N := N) n S))‖ ≤
+      ‖ι (detCharAt χ k (diagN (P := P) (N := N) n' S))‖ := by
   classical
   -- The local determinant `d w` is `N` or `1`, of norm `N⁻¹` or `1`; the square root of this norm
   -- has `N`-adic size at least `1`, and it occurs with the exponent `-k`.
@@ -483,7 +484,8 @@ lemma sum_translate_eq_gluedDatum [hP : IsSplitLevel P N] (hS : IsSplitLevel S N
   let p : 𝔸f E := 1 + idem S * ((N : 𝔸f E) - 1)
   choose b hb using fun i : n' ↦
     hP.exists_sub_mem_and_sub_star_mem_iff hS (p := p) rfl (T (i, .inr ())) (R (.inr (), i))
-  have hD_S : (diagN (P := P) (N := N) n S).val = diagonal fun i ↦ evalPlaces P (if i.isLeft then 1 else p) := by
+  have hD_S : (diagN (P := P) (N := N) n S).val =
+      diagonal fun i ↦ evalPlaces P (if i.isLeft then 1 else p) := by
     simp +contextual [diagN, funext_iff, apply_ite, p, idem_apply]
   have hD_PS : (diagN (P := P) (N := N) m (P \ S)).val =
       diagonal fun i ↦ evalPlaces P (if i.isLeft then 1 else N + 1 - p) := by
