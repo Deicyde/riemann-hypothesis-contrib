@@ -294,6 +294,329 @@ lemma flenstedJensen_shift_eq_conj (hl : l.HasGap h) {u : Matrix n n ℂ}
     simp [flenstedJensen, h_minors]
   rw [← conj_flenstedJensen_one, ← h_move, h_char]
 
+/-- Multiplying `g` on the left by `1 - u` and on the right by `1 - r`, where `‖u‖` and `‖r‖` are at
+most `‖g - 1‖ < 1 / 1000`, keeps it within `4 ‖g - 1‖` of `1`. -/
+lemma norm_one_sub_mul_mul_one_sub_sub_one_le {g u r : Matrix n n ℂ} (hg : ‖g - 1‖ < 1000⁻¹)
+    (hu : ‖u‖ ≤ ‖g - 1‖) (hr : ‖r‖ ≤ ‖g - 1‖) : ‖(1 - u) * g * (1 - r) - 1‖ ≤ 4 * ‖g - 1‖ := by
+  set X : Matrix n n ℂ := g - 1
+  have hX_nonneg : 0 ≤ ‖X‖ := norm_nonneg X
+  -- With `m = X - u - u X`, the matrix is `1 + m - r - m r`.
+  let m : Matrix n n ℂ := X - u - u * X
+  have hm : ‖m‖ ≤ ‖X‖ + ‖X‖ + ‖X‖ * ‖X‖ :=
+    norm_sub_le_of_le (norm_sub_le_of_le (le_refl ‖X‖) hu) (norm_mul_le_of_le hu le_rfl)
+  have h_eq : (1 - u) * g * (1 - r) - 1 = m - r - m * r := by
+    have hgX : g = 1 + X := by simp [X]
+    simp only [m, hgX]
+    noncomm_ring
+  rw [h_eq]
+  have := norm_sub_le_of_le (norm_sub_le_of_le hm hr) (norm_mul_le_of_le hm hr)
+  nlinarith [mul_le_mul_of_nonneg_right hg.le hX_nonneg,
+    mul_le_mul_of_nonneg_right hg.le (mul_nonneg hX_nonneg hX_nonneg)]
+
+/-- Let `u` and `r` be block diagonal and strictly triangular in opposite directions: `u i j = 0`
+unless `l i < l j` and `ε i = ε j`, and `r i j = 0` unless `l j < l i` and `ε i = ε j`. If `g`,
+`(1 - u) g` and `(1 - u) g (1 - r)` are accretive, then the coefficient `l.dsCoeff g` is
+`l.flenstedJensen 1` at `(1 - u) g (1 - r)`: removing either factor conjugates the value. -/
+lemma dsCoeff_eq_flenstedJensen_one_sub_mul_mul_one_sub (hl : l.HasGap h) {g : USign ε}
+    {u r : Matrix n n ℂ} (hu : ∀ i j, ¬(l i < l j ∧ ε i = ε j) → u i j = 0)
+    (hr : ∀ i j, ¬(l j < l i ∧ ε i = ε j) → r i j = 0) (hg : (g : Matrix n n ℂ).IsAccretive)
+    (hug : ((1 - u) * (g : Matrix n n ℂ)).IsAccretive)
+    (hy : ((1 - u) * (g : Matrix n n ℂ) * (1 - r)).IsAccretive) :
+    l.dsCoeff g = l.flenstedJensen 1 ((1 - u) * g * (1 - r)) := by
+  have h_left := flenstedJensen_shift_eq_conj hl hu hg hug
+  have h_right := flenstedJensen_shift_eq_conj hl (u := rᴴ)
+    (X := ((1 - u) * (g : Matrix n n ℂ))ᴴ) (fun i j hij ↦ by
+      simp [hr j i fun h ↦ hij ⟨h.1, h.2.symm⟩])
+    (by simpa [IsAccretive, add_comm] using hug)
+    (by simpa [IsAccretive, add_comm] using hy)
+  rw [dsCoeff_eq_flenstedJensen hl (one_mem _) (by simpa using hg)]
+  simpa using (h_right.trans (congrArg _ h_left)).symm
+
+/-- On a set `p` of highest entries of `l`, unipotent factors `1 - u` and `1 - r`, as in
+`dsCoeff_eq_flenstedJensen_one_sub_mul_mul_one_sub`, do not change the principal minor. -/
+lemma principalMinor_one_sub_mul_mul_one_sub (hl : l.HasGap h) {g u r : Matrix n n ℂ}
+    (hu : ∀ i j, ¬(l i < l j ∧ ε i = ε j) → u i j = 0)
+    (hr : ∀ i j, ¬(l j < l i ∧ ε i = ε j) → r i j = 0) {p : n → Prop} [DecidablePred p]
+    (hp : ∀ i j, p i → ¬p j → l j < l i) :
+    principalMinor ((1 - u) * g * (1 - r)) p = principalMinor g p := by
+  have hu_diag (i : n) : u i i = 0 := hu i i (by simp)
+  have hr_diag (i : n) : r i i = 0 := hr i i (by simp)
+  rw [principalMinor_mul, principalMinor_mul, principalMinor_eq_det,
+    det_eq_prod_diag_of_blockTriangular hl.injective, mul_comm, principalMinor_eq_det,
+    det_eq_prod_diag_of_blockTriangular hl.neg.injective] <;>
+    simp [BlockTriangular, Matrix.one_apply, hu_diag, hr_diag] <;> grind
+
+/-- Taking the commutator with the coordinate projection `coordProj p` commutes with keeping some
+entries of a matrix and putting `0` elsewhere (`entryMask`). -/
+lemma lie_coordProj_entryMask (p : n → Prop) [DecidablePred p] (rel : n → n → Prop)
+    [DecidableRel rel] (X : Matrix n n ℂ) :
+    ⁅coordProj p, entryMask rel X⁆ = entryMask rel ⁅coordProj p, X⁆ := by
+  ext i j
+  simp [diagonal_mul, mul_diagonal]
+  grind
+
+/-- Keeping some entries of a matrix does not increase the norm of its commutator with the
+coordinate projection `coordProj p`. -/
+lemma norm_lie_coordProj_entryMask_le (p : n → Prop) [DecidablePred p] (rel : n → n → Prop)
+    [DecidableRel rel] (X : Matrix n n ℂ) :
+    ‖⁅coordProj p, entryMask rel X⁆‖ ≤ ‖⁅coordProj p, X⁆‖ := by
+  rw [lie_coordProj_entryMask]
+  exact norm_entryMask_le
+
+/-- Let `p` be a set of lowest entries of `l`. The commutator `[coordProj p, X]` vanishes at the
+entries `(i, j)` with `l i = l j`, so its block diagonal part is the sum of its parts strictly below
+the diagonal for the orders `-l` and `l`. -/
+private lemma blockDiagPart_lie_coordProj {p : n → Prop} [DecidablePred p]
+    (hp : ∀ i j, p i → ¬p j → l i < l j) (X : Matrix n n ℂ) :
+    blockDiagPart ε ⁅coordProj p, X⁆ =
+      lowerMask ε (-l) ⁅coordProj p, X⁆ + lowerMask ε l ⁅coordProj p, X⁆ := by
+  ext i j
+  simp [blockDiagPart, diagonal_mul, mul_diagonal]
+  grind
+
+/-- The principal minor of `x` on the complement of `p` is `det (1 + (1 - coordProj p) (x - 1))`. -/
+lemma det_one_add_one_sub_coordProj_mul_sub_one (p : n → Prop) [DecidablePred p]
+    (x : Matrix n n ℂ) : (1 + (1 - coordProj p) * (x - 1)).det = principalMinor x (¬p ·) := by
+  -- `1 - coordProj p` is the coordinate projection onto the complement of `p`.
+  have h_compl : 1 - coordProj p = diagonal fun i ↦ if ¬p i then (1 : ℂ) else 0 := by
+    rw [coordProj, ← diagonal_one, diagonal_sub]
+    congr 1
+    ext i
+    by_cases hp : p i <;> simp [hp]
+  rw [principalMinor_eq_det, ← h_compl]
+  congr 1
+  noncomm_ring
+
+/-- For `kᴴ k = 1`, the principal minor of `kᴴ y k` on `p` is `det (1 + Q (y - 1))`, where
+`Q = k P kᴴ` is the conjugate of the projection `P = coordProj p`. -/
+lemma principalMinor_conjTranspose_mul_mul {k : Matrix n n ℂ} (hk : kᴴ * k = 1)
+    (y : Matrix n n ℂ) (p : n → Prop) [DecidablePred p] :
+    principalMinor (kᴴ * y * k) p = (1 + k * coordProj p * kᴴ * (y - 1)).det := by
+  simp only [mul_assoc, principalMinor_eq_det, coordProj, det_one_add_mul_comm k]
+  noncomm_ring [hk]
+
+/-- For `Pᴴ = P` and a unitary `k`, the conjugate `k P kᴴ` is within `‖[P, k]‖` of `P`. -/
+lemma norm_sub_mul_mul_conjTranspose_le {P k : Matrix n n ℂ} (hP : Pᴴ = P) (hk : kᴴ * k = 1) :
+    ‖P - k * P * kᴴ‖ ≤ ‖⁅P, k⁆‖ := by
+  have hk' : k * kᴴ = 1 := mul_eq_one_symm hk
+  have hkPk : k * ⁅P, k⁆ᴴ = P - k * P * kᴴ := by simp [mul_sub, ← mul_assoc, hk', hP]
+  exact (hkPk ▸ frobenius_norm_mul_of_unitary hk _).trans_le (norm_star _).le
+
+/-- Let `k` be block diagonal for `ε` with `kᴴ k = 1`, and `P = coordProj p`. The commutator of
+`k P kᴴ` with `P` is block diagonal, so it has trace zero against the part `Y - blockDiagPart ε Y`
+of a matrix `Y` off the blocks. -/
+lemma trace_lie_mul_sub_blockDiagPart_eq_zero {k : Matrix n n ℂ} (hk : kᴴ * k = 1)
+    (hk_mem : k ∈ blockDiagAlg ε) (p : n → Prop) [DecidablePred p] (Y : Matrix n n ℂ) :
+    (⁅k * coordProj p * kᴴ, coordProj p⁆ * (Y - blockDiagPart ε Y)).trace = 0 := by
+  set P : Matrix n n ℂ := coordProj p
+  let s : Matrix n n ℂ := signMatrix ε
+  have hsP : Commute s P := commute_diagonal ..
+  simp [s, blockDiagPart_eq, hsP.eq, trace_mul_comm P,
+    (mem_blockDiagAlg_iff_commute.1 hk_mem).left_comm,
+    inv_eq_left_inv hk ▸ blockDiagAlg.inv_mem hk_mem _ rfl, trace_mul_comm k,
+    trace_mul_comm kᴴ, trace_mul_comm s, signMatrix_mul_self, mul_sub, sub_mul]
+  ring_nf
+
+/-- Let `‖u‖, ‖r‖ ≤ ‖g - 1‖ ≤ 1 / 2`, and let the commutators `B = [P, u]` and `C = [P, r]` have
+norm at most that of `A = [P, g - 1]`. Then the commutator of `P` with `(1 - u) g (1 - r) - 1` is
+`A - B - C` up to a term of second order, of norm at most `8 ‖g - 1‖ ‖A‖`. -/
+lemma norm_lie_one_sub_mul_mul_one_sub_sub_le {P g u r : Matrix n n ℂ} (hg : ‖g - 1‖ ≤ 2⁻¹)
+    (hu : ‖u‖ ≤ ‖g - 1‖) (hr : ‖r‖ ≤ ‖g - 1‖) (hB : ‖⁅P, u⁆‖ ≤ ‖⁅P, g - 1⁆‖)
+    (hC : ‖⁅P, r⁆‖ ≤ ‖⁅P, g - 1⁆‖) :
+    ‖⁅P, (1 - u) * g * (1 - r) - 1⁆ - (⁅P, g - 1⁆ - ⁅P, u⁆ - ⁅P, r⁆)‖ ≤
+      8 * ‖g - 1‖ * ‖⁅P, g - 1⁆‖ := by
+  set X : Matrix n n ℂ := g - 1
+  set A : Matrix n n ℂ := ⁅P, X⁆
+  set B : Matrix n n ℂ := ⁅P, u⁆
+  set C : Matrix n n ℂ := ⁅P, r⁆
+  have hX_nonneg : 0 ≤ ‖X‖ := norm_nonneg X
+  have hA_nonneg : 0 ≤ ‖A‖ := norm_nonneg A
+  -- With `m = X - u - u X` and `G = B X + u A`, the difference is `-(G + m C - (G + B - A) r)`.
+  let m : Matrix n n ℂ := X - u - u * X
+  let G : Matrix n n ℂ := B * X + u * A
+  have hm' : ‖m‖ ≤ 3 * ‖X‖ := by
+    have : ‖m‖ ≤ ‖X‖ + ‖X‖ + ‖X‖ * ‖X‖ :=
+      norm_sub_le_of_le (norm_sub_le_of_le (le_refl ‖X‖) hu) (norm_mul_le_of_le hu le_rfl)
+    nlinarith [mul_le_mul_of_nonneg_right hg hX_nonneg]
+  have h_eq : ⁅P, (1 - u) * g * (1 - r) - 1⁆ - (A - B - C) = -(G + m * C - (G + B - A) * r) := by
+    have hgX : g = 1 + X := by simp [X]
+    simp only [A, B, C, G, m, hgX, lie_def]
+    noncomm_ring
+  rw [h_eq, norm_neg]
+  have hG : ‖G‖ ≤ ‖A‖ * ‖X‖ + ‖X‖ * ‖A‖ :=
+    norm_add_le_of_le (norm_mul_le_of_le hB le_rfl) (norm_mul_le_of_le hu le_rfl)
+  have := norm_sub_le_of_le (norm_add_le_of_le hG (norm_mul_le_of_le hm' hC))
+    (norm_mul_le_of_le (norm_sub_le_of_le (norm_add_le_of_le hG hB) (le_refl ‖A‖)) hr)
+  linarith [mul_nonneg hX_nonneg hA_nonneg,
+    mul_le_mul_of_nonneg_right hg (mul_nonneg hX_nonneg hA_nonneg)]
+
+/-- The minor of a conjugate. Let `k` be block diagonal for `ε` with `kᴴ k = 1`, `P = coordProj p`,
+and let `W = Y - blockDiagPart ε Y` be the part of a matrix `Y` off the blocks. If
+`‖y - 1‖ ≤ δ ≤ 1 / 2`, `‖[P, y - 1] - W‖ + 2 δ ‖[P, k]‖ ≤ δ c`, `‖W‖ ≤ c` and `‖[P, k]‖ ≤ c`, then
+the principal minor of `kᴴ y k` on `p` is `exp (tr (P logOneAdd (y - 1)) - tr (W ^ 2) / 4 + t)`
+with `|t| ≤ 100 δ c ^ 2`. -/
+lemma exists_principalMinor_conjTranspose_mul_mul_eq_exp {k y Y W : Matrix n n ℂ} {δ c : ℝ}
+    (hk : kᴴ * k = 1) (hk_mem : k ∈ blockDiagAlg ε) (p : n → Prop) [DecidablePred p]
+    (hW : W = Y - blockDiagPart ε Y) (hδ : δ ≤ 2⁻¹) (hy : ‖y - 1‖ ≤ δ)
+    (h_near : ‖⁅coordProj p, y - 1⁆ - W‖ + 2 * δ * ‖⁅coordProj p, k⁆‖ ≤ δ * c)
+    (hWc : ‖W‖ ≤ c) (hPk : ‖⁅coordProj p, k⁆‖ ≤ c) :
+    ∃ t : ℂ, principalMinor (kᴴ * y * k) p =
+        cexp ((coordProj p * logOneAdd (y - 1)).trace - 4⁻¹ * (W * W).trace + t) ∧
+      ‖t‖ ≤ 100 * δ * c ^ 2 := by
+  set P : Matrix n n ℂ := coordProj p
+  have hk' : k * kᴴ = 1 := mul_eq_one_symm hk
+  have hP : IsStarProjection P := isStarProjection_coordProj p
+  let Q : Matrix n n ℂ := k * P * kᴴ
+  have hPQ : ‖P - Q‖ ≤ ‖⁅P, k⁆‖ := norm_sub_mul_mul_conjTranspose_le hP.isSelfAdjoint hk
+  -- `[Q, y - 1]` differs from `[P, y - 1]` by at most `2 δ ‖P - Q‖`.
+  have h_near_Q : ‖⁅Q, y - 1⁆ - W‖ ≤ δ * c := by
+    rw [show ⁅Q, y - 1⁆ - W = (y - 1) * (P - Q) - (P - Q) * (y - 1) + (⁅P, y - 1⁆ - W) by
+      simp only [lie_def]; noncomm_ring]
+    have := norm_add_le_of_le (norm_sub_le_of_le (norm_mul_le_of_le hy hPQ)
+      (norm_mul_le_of_le hPQ hy)) (le_refl ‖⁅P, y - 1⁆ - W‖)
+    linarith
+  obtain ⟨t, ht_eq, ht⟩ := exists_det_compress_eq_exp_logOneAdd (P := Q) (Y := W)
+    (hP.map (Unitary.conjStarAlgAut ℂ _ ⟨k, hk, hk'⟩)) hP hδ hy
+    (hW ▸ trace_lie_mul_sub_blockDiagPart_eq_zero hk hk_mem p Y) h_near_Q hWc (hPQ.trans hPk)
+  exact ⟨t, (principalMinor_conjTranspose_mul_mul hk y p).trans ht_eq, ht⟩
+
+/-- Complementary minors. Let `P = coordProj p`, `X = g - 1` with `4 ‖X‖ ≤ 1 / 2` and `A = [P, X]`,
+and let `y` with `‖y - 1‖ ≤ 4 ‖X‖` have the same principal minor as `g` on the complement of `p`.
+If `[1 - P, y - 1]` is within `16 ‖X‖ ‖A‖` of a matrix `W` with `‖W‖ ≤ 4 ‖A‖`, then expanding both
+minors gives `exp (tr ((1 - P) logOneAdd X) - tr (A ^ 2) / 4 + x)` equal to
+`exp (tr ((1 - P) logOneAdd (y - 1)) - tr (W ^ 2) / 4 + z)`, with `|x| ≤ 100 ‖X‖ ‖A‖ ^ 2` and
+`|z| ≤ 100 (4 ‖X‖) (4 ‖A‖) ^ 2`. -/
+lemma exists_cexp_trace_one_sub_coordProj_eq {g y W : Matrix n n ℂ} (p : n → Prop)
+    [DecidablePred p] (hg : 4 * ‖g - 1‖ ≤ 2⁻¹) (hy : ‖y - 1‖ ≤ 4 * ‖g - 1‖)
+    (h_minor : principalMinor y (¬p ·) = principalMinor g (¬p ·))
+    (h_near : ‖⁅1 - coordProj p, y - 1⁆ - W‖ ≤ 4 * ‖g - 1‖ * (4 * ‖⁅coordProj p, g - 1⁆‖))
+    (hW : ‖W‖ ≤ 4 * ‖⁅coordProj p, g - 1⁆‖) :
+    ∃ x z : ℂ,
+      cexp (((1 - coordProj p) * logOneAdd (g - 1)).trace -
+          4⁻¹ * (-⁅coordProj p, g - 1⁆ * -⁅coordProj p, g - 1⁆).trace + x) =
+        cexp (((1 - coordProj p) * logOneAdd (y - 1)).trace - 4⁻¹ * (W * W).trace + z) ∧
+      ‖x‖ ≤ 100 * ‖g - 1‖ * ‖⁅coordProj p, g - 1⁆‖ ^ 2 ∧
+      ‖z‖ ≤ 100 * (4 * ‖g - 1‖) * (4 * ‖⁅coordProj p, g - 1⁆‖) ^ 2 := by
+  set X : Matrix n n ℂ := g - 1
+  set P : Matrix n n ℂ := coordProj p
+  set A : Matrix n n ℂ := ⁅P, X⁆
+  have hP_compl : IsStarProjection (1 - P) := (isStarProjection_coordProj p).one_sub
+  have hX_half : ‖X‖ ≤ 2⁻¹ := by linarith [norm_nonneg X]
+  obtain ⟨x, hx_eq, hx⟩ := exists_det_compress_eq_exp_logOneAdd (Y := -A) hP_compl hP_compl hX_half
+    (le_refl ‖X‖) (by simp) (by simp [A, mul_sub, sub_mul, mul_nonneg]) (norm_neg A).le (by simp)
+  obtain ⟨z, hz_eq, hz⟩ := exists_det_compress_eq_exp_logOneAdd (Y := W) hP_compl hP_compl hg hy
+    (by simp) h_near hW (by simp)
+  refine ⟨x, z, ?_, hx, hz⟩
+  rw [← hx_eq, ← hz_eq, det_one_add_one_sub_coordProj_mul_sub_one,
+    det_one_add_one_sub_coordProj_mul_sub_one, h_minor]
+
+/-- One minor. Let `l` have gap `h`, let `X = g - 1` have norm less than `1 / 1000`, and let
+`y = (1 - u) g (1 - r)`, where `u` and `r` are the parts of `X` strictly below the diagonal for the
+orders `-l` and `l`, inside the blocks of `ε` (`lowerMask`). For `k ∈ K = maxCompactU ε` and the
+diagonal projection `P = coordProj p` to a set `p` of lowest entries of `l`, the principal minor of
+`kᴴ y k` on `p` is `exp (tr (P logOneAdd X) + ‖[P, X]‖² / 4 + r')` with
+`|r'| ≤ 2 · 10⁵ ‖X‖ (‖[P, X]‖² + ‖[P, k]‖²)`. -/
+private lemma exists_principalMinor_one_sub_mul_mul_one_sub_eq_exp (hl : l.HasGap h)
+    {g : USign ε} (hg : ‖(g : Matrix n n ℂ) - 1‖ < 1000⁻¹) (p : n → Prop) [DecidablePred p]
+    (hp : ∀ i j, p i → ¬p j → l i < l j) (κ : maxCompactU ε) :
+    ∃ r : ℂ,
+      principalMinor ((κ : Matrix n n ℂ)ᴴ *
+          ((1 - lowerMask ε (-l) ((g : Matrix n n ℂ) - 1)) * (g : Matrix n n ℂ) *
+            (1 - lowerMask ε l ((g : Matrix n n ℂ) - 1))) * (κ : Matrix n n ℂ)) p =
+        cexp ((coordProj p * logOneAdd ((g : Matrix n n ℂ) - 1)).trace +
+          ‖⁅coordProj p, (g : Matrix n n ℂ) - 1⁆‖ ^ 2 / 4 + r) ∧
+      ‖r‖ ≤ 200000 * ‖(g : Matrix n n ℂ) - 1‖ *
+        (‖⁅coordProj p, (g : Matrix n n ℂ) - 1⁆‖ ^ 2 +
+          ‖⁅coordProj p, (κ : Matrix n n ℂ)⁆‖ ^ 2) := by
+  set X : Matrix n n ℂ := (g : Matrix n n ℂ) - 1
+  have hX_nonneg : 0 ≤ ‖X‖ := norm_nonneg X
+  have hX_half : ‖X‖ ≤ 2⁻¹ := by linarith
+  have hX_four : 4 * ‖X‖ ≤ 2⁻¹ := by linarith
+  -- `u` and `r` are the parts of `X` strictly below the diagonal for the orders `-l` and `l`,
+  -- inside the blocks of `ε`.
+  let u : Matrix n n ℂ := lowerMask ε (-l) X
+  let r : Matrix n n ℂ := lowerMask ε l X
+  let y : Matrix n n ℂ := (1 - u) * g * (1 - r)
+  have hu : ‖u‖ ≤ ‖X‖ := norm_entryMask_le
+  have hr : ‖r‖ ≤ ‖X‖ := norm_entryMask_le
+  have hy_near : ‖y - 1‖ ≤ 4 * ‖X‖ := norm_one_sub_mul_mul_one_sub_sub_one_le hg hu hr
+  -- On a set of highest entries of `l` the triangular factors do not change the minor.
+  have h_minor (q : n → Prop) [DecidablePred q] (hq : ∀ i j, q i → ¬q j → l j < l i) :
+      principalMinor y q = principalMinor (g : Matrix n n ℂ) q :=
+    principalMinor_one_sub_mul_mul_one_sub hl (fun i j h ↦ by simp [u]; grind)
+      (fun i j h ↦ by simp [r]; grind) hq
+  -- Notation: `P` projects to `p`, and `A`, `B`, `C` are the commutators of `P` with `X`, `u`, `r`.
+  set k : Matrix n n ℂ := (κ : Matrix n n ℂ)
+  let s : Matrix n n ℂ := signMatrix ε
+  have hk : kᴴ * k = 1 := (U_one_mem_unitaryGroup ⟨_, κ.property⟩).1
+  have hk_mem : k ∈ blockDiagAlg ε := mem_maxCompactU.1 κ.property
+  have hsP : Commute s (coordProj p) := commute_diagonal ..
+  set P : Matrix n n ℂ := coordProj p
+  set A : Matrix n n ℂ := ⁅P, X⁆
+  set B : Matrix n n ℂ := ⁅P, u⁆
+  set C : Matrix n n ℂ := ⁅P, r⁆
+  let V : Matrix n n ℂ := (1 + X)⁻¹ - 1
+  have h_mask (c : n → ℤ) : ⁅P, lowerMask ε c X⁆ = lowerMask ε c A :=
+    lie_coordProj_entryMask p _ X
+  have hB : B = blockDiagPart ε A - C := by
+    rw [eq_sub_iff_add_eq, blockDiagPart_lie_coordProj hp X]
+    exact congrArg₂ (· + ·) (h_mask (-l)) (h_mask l)
+  have hA_nonneg : 0 ≤ ‖A‖ := norm_nonneg A
+  have hPk_nonneg : 0 ≤ ‖⁅P, k⁆‖ := norm_nonneg _
+  have hP_star : Pᴴ = P := (isStarProjection_coordProj p).isSelfAdjoint
+  have hV : ‖V‖ ≤ 2 * ‖X‖ := norm_inv_one_add_sub_one_le hX_half
+  have hB_le : ‖B‖ ≤ ‖A‖ := norm_lie_coordProj_entryMask_le p _ X
+  have hC_le : ‖C‖ ≤ ‖A‖ := norm_lie_coordProj_entryMask_le p _ X
+  have hg_star : (g : Matrix n n ℂ)ᴴ = s * (g : Matrix n n ℂ)⁻¹ * s := by
+    grind [signMatrix_mul_self, U.inv_coe_eq_mul_conjTranspose_mul g]
+  -- `[P, y - 1]` is `A - B - C` up to a term of second order.
+  have h_lie : ‖⁅P, y - 1⁆ - (A - B - C)‖ ≤ 8 * ‖X‖ * ‖A‖ :=
+    norm_lie_one_sub_mul_mul_one_sub_sub_le hX_half hu hr hB_le hC_le
+  -- The complementary minors of `g` and of `y`, which agree.
+  obtain ⟨x, z, hz_eq, hx, hz⟩ : ∃ x z : ℂ,
+      cexp (((1 - P) * logOneAdd X).trace - 4⁻¹ * (-A * -A).trace + x) =
+        cexp (((1 - P) * logOneAdd (y - 1)).trace -
+          4⁻¹ * ((B + C - A) * (B + C - A)).trace + z) ∧
+      ‖x‖ ≤ 100 * ‖X‖ * ‖A‖ ^ 2 ∧ ‖z‖ ≤ 100 * (4 * ‖X‖) * (4 * ‖A‖) ^ 2 :=
+    exists_cexp_trace_one_sub_coordProj_eq p hX_four hy_near (h_minor _ (by tauto)) (by
+      rw [show ⁅1 - P, y - 1⁆ - (B + C - A) = -(⁅P, y - 1⁆ - (A - B - C)) by
+        simp only [lie_def]; noncomm_ring, norm_neg]
+      linarith [mul_nonneg hX_nonneg hA_nonneg])
+    (by linarith [norm_sub_le_of_le (norm_add_le_of_le hB_le hC_le) (le_refl ‖A‖)])
+  -- The minor of `kᴴ y k` on `p`.
+  obtain ⟨t, ht_eq, ht⟩ : ∃ t : ℂ, principalMinor (kᴴ * y * k) p =
+        cexp ((P * logOneAdd (y - 1)).trace - 4⁻¹ * ((A - B - C) * (A - B - C)).trace + t) ∧
+      ‖t‖ ≤ 100 * (4 * ‖X‖) * (4 * (‖A‖ + ‖⁅P, k⁆‖)) ^ 2 :=
+    exists_principalMinor_conjTranspose_mul_mul_eq_exp hk hk_mem p (Y := A) (by rw [hB]; abel)
+      hX_four hy_near
+      (by linarith [mul_nonneg hX_nonneg hA_nonneg, mul_nonneg hX_nonneg hPk_nonneg])
+      (by linarith [norm_sub_le_of_le (norm_sub_le_of_le (le_refl ‖A‖) hB_le) hC_le])
+      (by linarith)
+  have h_det : cexp (logOneAdd (y - 1)).trace = cexp (logOneAdd X).trace := by
+    rw [← det_one_add_eq_exp_trace_logOneAdd (hy_near.trans hX_four),
+      ← det_one_add_eq_exp_trace_logOneAdd hX_half]
+    simpa [principalMinor_of_forall, X] using h_minor ⊤
+  -- The remainder: those of the three determinants, and the difference between `‖A‖ ^ 2` and
+  -- `-tr (A ^ 2)`, which comes from `Xᴴ = s ((1 + X)⁻¹ - 1) s`.
+  have h_corr : ‖((4⁻¹ : ℝ) • (V * (A * V + A) + A * V) * (A - B - C - B - C)).trace‖ ≤
+      (2 * ‖X‖ * (‖A‖ * (2 * ‖X‖) + ‖A‖) + ‖A‖ * (2 * ‖X‖)) *
+        (‖A‖ + ‖A‖ + ‖A‖ + ‖A‖ + ‖A‖) :=
+    norm_trace_mul_le (norm_smul_le_of_le_one 4⁻¹ (norm_add_le_of_le (norm_mul_le_of_le hV
+      (norm_add_le_of_le (norm_mul_le_of_le le_rfl hV) le_rfl)) (norm_mul_le_of_le le_rfl hV))
+      ⟨by norm_num, by norm_num⟩) (norm_sub_le_of_le (norm_sub_le_of_le (norm_sub_le_of_le
+      (norm_sub_le_of_le le_rfl hB_le) hC_le) hB_le) hC_le)
+  refine ⟨t + z - x + ((4⁻¹ : ℝ) • (V * (A * V + A) + A * V) * (A - B - C - B - C)).trace, ?_, ?_⟩
+  · -- Multiply by the complementary minor and by `det y = det g`, and compare exponents.
+    refine ht_eq.trans (mul_right_cancel₀ (by simp) (congr(_ * ($hz_eq * $h_det)).trans ?_))
+    simp [V, s, hg_star, hP_star, hB, blockDiagPart_eq, hsP.eq, trace_mul_comm P,
+      ← ofReal_pow, A, X, trace_mul_comm s, signMatrix_mul_self, ← mul_assoc s s, ← exp_add,
+      mul_sub, sub_mul, ← trace_star_mul_self_eq_norm_sq]
+    ring_nf
+  · have := norm_add_le_of_le (norm_sub_le_of_le (norm_add_le_of_le ht hz) hx) h_corr
+    linarith [mul_nonneg hX_nonneg (sq_nonneg ‖A‖), mul_nonneg hX_nonneg (sq_nonneg ‖⁅P, k⁆‖),
+      mul_nonneg hX_nonneg (sq_nonneg (‖A‖ - ‖⁅P, k⁆‖)),
+      mul_le_mul_of_nonneg_right hX_half (mul_nonneg hX_nonneg (sq_nonneg ‖A‖))]
+
 /-- Let `l` have gap `h` and let `X = g - 1` have norm less than `1 / 1000`. There is a matrix `y`
 with `l.dsCoeff g = l.flenstedJensen 1 y` such that, for `k ∈ K = maxCompactU ε` and the diagonal
 projection `P = coordProj p` to a set `p` of lowest entries of `l`, the principal minor of
@@ -311,29 +634,13 @@ lemma exists_principalMinor_eq_exp (hl : l.HasGap h) (g : USign ε)
             (‖⁅coordProj p, (g : Matrix n n ℂ) - 1⁆‖ ^ 2 +
               ‖⁅coordProj p, (k : Matrix n n ℂ)⁆‖ ^ 2) := by
   set X : Matrix n n ℂ := (g : Matrix n n ℂ) - 1
-  have hX_nonneg : 0 ≤ ‖X‖ := norm_nonneg X
-  have hX_half : ‖X‖ ≤ 2⁻¹ := by linarith
-  have hX_four : 4 * ‖X‖ ≤ 2⁻¹ := by linarith
   -- `r c` is the part of `X` strictly below the diagonal for the order `c`, inside the blocks of
   -- `ε`. Multiply `g` by the unipotent factors `1 - u` and `1 - r c`.
   let r (c : n → ℤ) : Matrix n n ℂ := lowerMask ε c X
   let u : Matrix n n ℂ := r (-l)
   let y (c : n → ℤ) : Matrix n n ℂ := (1 - u) * g * (1 - r c)
-  let m : Matrix n n ℂ := X - u - u * X
-  have hu : ‖u‖ ≤ ‖X‖ := norm_entryMask_le
-  have hr (c : n → ℤ) : ‖r c‖ ≤ ‖X‖ := norm_entryMask_le
-  have hm : ‖m‖ ≤ ‖X‖ + ‖X‖ + ‖X‖ * ‖X‖ :=
-    norm_sub_le_of_le (norm_sub_le_of_le (le_refl ‖X‖) hu) (norm_mul_le_of_le hu le_rfl)
-  have hm' : ‖m‖ ≤ 3 * ‖X‖ := by nlinarith [mul_le_mul_of_nonneg_right hX_half hX_nonneg]
-  have hy_near (c : n → ℤ) : ‖y c - 1‖ ≤ 4 * ‖X‖ := by
-    have h_eq : y c - 1 = m - r c - m * r c := by
-      have hgX : (g : Matrix n n ℂ) = 1 + X := by simp [X]
-      simp only [y, m, hgX]
-      noncomm_ring
-    rw [h_eq]
-    have := norm_sub_le_of_le (norm_sub_le_of_le hm (hr c)) (norm_mul_le_of_le hm (hr c))
-    nlinarith [mul_le_mul_of_nonneg_right hg.le hX_nonneg,
-      mul_le_mul_of_nonneg_right hg.le (mul_nonneg hX_nonneg hX_nonneg)]
+  have hy_near (c : n → ℤ) : ‖y c - 1‖ ≤ 4 * ‖X‖ :=
+    norm_one_sub_mul_mul_one_sub_sub_one_le hg norm_entryMask_le norm_entryMask_le
   -- Step 1: the coefficient is `l.flenstedJensen 1 (y l)`. Removing either factor conjugates the
   -- value.
   have hy_acc (c : n → ℤ) : (y c).IsAccretive :=
@@ -342,131 +649,12 @@ lemma exists_principalMinor_eq_exp (hl : l.HasGap h) (g : USign ε)
     isAccretive_of_norm_sub_one_lt (hg.trans (by norm_num))
   have hug_acc : ((1 - u) * (g : Matrix n n ℂ)).IsAccretive := by
     simpa [y, show r 0 = 0 from rfl] using hy_acc 0
-  have h_coeff : l.dsCoeff g = l.flenstedJensen 1 (y l) := by
-    have h_left := flenstedJensen_shift_eq_conj hl (u := u) (by simp [u, r]; grind) hg_acc hug_acc
-    have h_right := flenstedJensen_shift_eq_conj hl (u := (r l)ᴴ)
-      (X := ((1 - u) * (g : Matrix n n ℂ))ᴴ) (by simp [r]; grind)
-      (by simpa [IsAccretive, add_comm] using hug_acc)
-      (by simpa [y, IsAccretive, add_comm] using hy_acc l)
-    rw [dsCoeff_eq_flenstedJensen hl (one_mem _) (by simpa using hg_acc)]
-    simpa [y] using (h_right.trans (congrArg _ h_left)).symm
-  -- Step 2: on a set of highest entries of `l` the triangular factors do not change the minor.
-  have h_minor (p : n → Prop) [DecidablePred p] (hp : ∀ i j, p i → ¬p j → l j < l i) :
-      principalMinor (y l) p = principalMinor (g : Matrix n n ℂ) p := by
-    clear * - hp hl
-    rw [principalMinor_mul, principalMinor_mul, principalMinor_eq_det,
-      det_eq_prod_diag_of_blockTriangular hl.injective, mul_comm, principalMinor_eq_det,
-      det_eq_prod_diag_of_blockTriangular hl.neg.injective] <;>
-      simp [u, r, BlockTriangular, Matrix.one_apply] <;> grind
-  refine ⟨y l, h_coeff, fun p _ hp κ ↦ ?_⟩
-  -- Step 3: one minor. Notation: `P` projects to `p`, `Q = k P kᴴ`, and `A`, `B`, `C` are the
-  -- commutators of `P` with `X`, `u`, `r l`.
-  set k : Matrix n n ℂ := (κ : Matrix n n ℂ)
-  let s : Matrix n n ℂ := signMatrix ε
-  have hk : kᴴ * k = 1 := (U_one_mem_unitaryGroup ⟨_, κ.property⟩).1
-  have hk' : k * kᴴ = 1 := mul_eq_one_symm hk
-  have hk_mem : k ∈ blockDiagAlg ε := mem_maxCompactU.1 κ.property
-  have hP : IsStarProjection (coordProj p) := isStarProjection_coordProj p
-  have hsP : Commute s (coordProj p) := commute_diagonal ..
-  set P : Matrix n n ℂ := coordProj p
-  set A : Matrix n n ℂ := ⁅P, X⁆
-  set B : Matrix n n ℂ := ⁅P, u⁆
-  set C : Matrix n n ℂ := ⁅P, r l⁆
-  set G : Matrix n n ℂ := B * X + u * A
-  let Q : Matrix n n ℂ := k * P * kᴴ
-  let V : Matrix n n ℂ := (1 + X)⁻¹ - 1
-  let H : Matrix n n ℂ := G + m * C - (G + B - A) * r l
-  have ⟨h_mask, hB⟩ : (∀ c, ⁅P, r c⁆ = lowerMask ε c A) ∧ B = blockDiagPart ε A - C := by
-    simp +zetaDelta [← ext_iff, blockDiagPart]
-    grind
-  have h_det_compl (x : Matrix n n ℂ) :
-      (1 + (1 - P) * (x - 1)).det = principalMinor x (¬p ·) := by
-    simp [P, det_apply, sub_mul]
-    grind
-  have hP_compl : IsStarProjection (1 - P) := hP.one_sub
-  have hA_nonneg : 0 ≤ ‖A‖ := norm_nonneg A
-  have hPk_nonneg : 0 ≤ ‖⁅P, k⁆‖ := norm_nonneg _
-  have hP_star : Pᴴ = P := hP.isSelfAdjoint
-  have hV : ‖V‖ ≤ 2 * ‖X‖ := norm_inv_one_add_sub_one_le hX_half
-  have hB_le : ‖B‖ ≤ ‖A‖ := by
-    rw [show B = lowerMask ε (-l) A from h_mask (-l)]
-    exact norm_entryMask_le
-  have hC_le : ‖C‖ ≤ ‖A‖ := by
-    rw [show C = lowerMask ε l A from h_mask l]
-    exact norm_entryMask_le
-  have hg_inv : (g : Matrix n n ℂ)⁻¹ = signMatrix ε * (g : Matrix n n ℂ)ᴴ * signMatrix ε := by
-    simp [← U.coe_inv (signMatrix_mul_self ε)]
-  have hg_star : (g : Matrix n n ℂ)ᴴ = s * (g : Matrix n n ℂ)⁻¹ * s := by
-    grind [signMatrix_mul_self]
-  have hkPk : k * ⁅P, k⁆ᴴ = P - Q := by simp [Q, mul_sub, ← mul_assoc, hk', hP_star]
-  have hPQ : ‖P - Q‖ ≤ ‖⁅P, k⁆‖ :=
-    (hkPk ▸ frobenius_norm_mul_of_unitary hk _).trans_le (norm_star _).le
-  -- `[P, y l - 1]` is `A - B - C` up to the second order term `H`.
-  have hH : ‖H‖ ≤ 8 * ‖X‖ * ‖A‖ := by
-    have hG : ‖G‖ ≤ ‖A‖ * ‖X‖ + ‖X‖ * ‖A‖ :=
-      norm_add_le_of_le (norm_mul_le_of_le hB_le le_rfl) (norm_mul_le_of_le hu le_rfl)
-    have := norm_sub_le_of_le (norm_add_le_of_le hG (norm_mul_le_of_le hm' hC_le))
-      (norm_mul_le_of_le (norm_sub_le_of_le (norm_add_le_of_le hG hB_le) (le_refl ‖A‖)) (hr l))
-    linarith [mul_nonneg hX_nonneg hA_nonneg,
-      mul_le_mul_of_nonneg_right hX_half (mul_nonneg hX_nonneg hA_nonneg)]
-  -- The complementary minor of `g`.
-  let ⟨x, hx_eq, hx⟩ := exists_det_compress_eq_exp_logOneAdd (Y := -A) hP_compl hP_compl hX_half
-    (le_refl ‖X‖) (by simp) (by simp [A, mul_sub, sub_mul, mul_nonneg]) (norm_neg A).le (by simp)
-  -- The complementary minor of `y l`, which is that of `g`.
-  have h_near_compl : ‖⁅1 - P, y l - 1⁆ - (B + C - A)‖ ≤ 4 * ‖X‖ * (4 * ‖A‖) := by
-    rw [show ⁅1 - P, y l - 1⁆ - (B + C - A) = H by simp +zetaDelta only [lie_def]; noncomm_ring]
-    linarith [mul_nonneg hX_nonneg hA_nonneg]
-  let ⟨z, hz_eq, hz⟩ := exists_det_compress_eq_exp_logOneAdd (Y := B + C - A) hP_compl hP_compl
-    hX_four (hy_near l) (by simp) h_near_compl
-    (by linarith [norm_sub_le_of_le (norm_add_le_of_le hB_le hC_le) (le_refl ‖A‖)]) (by simp)
-  -- The minor of `kᴴ (y l) k` on `p`, as `det (1 + Q (y l - 1))`.
-  have h_comm : (⁅Q, P⁆ * (A - B - C)).trace = 0 := by
-    simp [Q, s, hB, blockDiagPart_eq, hsP.eq, trace_mul_comm P,
-      (mem_blockDiagAlg_iff_commute.1 hk_mem).left_comm,
-      A, X, inv_eq_left_inv hk ▸ blockDiagAlg.inv_mem hk_mem _ rfl, trace_mul_comm k,
-      trace_mul_comm kᴴ, trace_mul_comm s, signMatrix_mul_self, mul_sub, sub_mul]
-    ring_nf
-  have h_near : ‖⁅Q, y l - 1⁆ - (A - B - C)‖ ≤ 4 * ‖X‖ * (4 * (‖A‖ + ‖⁅P, k⁆‖)) := by
-    rw [show ⁅Q, y l - 1⁆ - (A - B - C) = (y l - 1) * (P - Q) - (P - Q) * (y l - 1) - H by
-      simp +zetaDelta only [lie_def]; noncomm_ring]
-    have := norm_sub_le_of_le (norm_sub_le_of_le (norm_mul_le_of_le (hy_near l) hPQ)
-      (norm_mul_le_of_le hPQ (hy_near l))) hH
-    linarith [mul_nonneg hX_nonneg hA_nonneg, mul_nonneg hX_nonneg hPk_nonneg]
-  let ⟨t, ht_eq, ht⟩ := exists_det_compress_eq_exp_logOneAdd (P := Q) (Y := A - B - C)
-    (hP.map (Unitary.conjStarAlgAut ℂ _ ⟨k, hk, hk'⟩)) hP hX_four (hy_near l) h_comm h_near
-    (by linarith [norm_sub_le_of_le (norm_sub_le_of_le (le_refl ‖A‖) hB_le) hC_le])
-    (by linarith)
-  rw [h_det_compl, h_minor _ (by tauto), ← h_det_compl, hx_eq] at hz_eq
-  have h_conj : principalMinor (kᴴ * y l * k) p = (1 + Q * (y l - 1)).det := by
-    simp only [mul_assoc, principalMinor_eq_det, coordProj, det_one_add_mul_comm k, Q, P]
-    noncomm_ring [hk]
-  have h_det_y : (1 + (y l - 1)).det = (1 + X).det := by
-    simpa [principalMinor_of_forall, X] using h_minor ⊤
-  have h_det : cexp (logOneAdd (y l - 1)).trace = cexp (logOneAdd X).trace := by
-    rw [← det_one_add_eq_exp_trace_logOneAdd ((hy_near l).trans hX_four), h_det_y,
-      det_one_add_eq_exp_trace_logOneAdd hX_half]
-  -- The remainder: those of the three determinants, and the difference between `‖A‖ ^ 2` and
-  -- `-tr (A ^ 2)`, which comes from `Xᴴ = s ((1 + X)⁻¹ - 1) s`.
-  have h_corr : ‖((4⁻¹ : ℝ) • (V * (A * V + A) + A * V) * (A - B - C - B - C)).trace‖ ≤
-      (2 * ‖X‖ * (‖A‖ * (2 * ‖X‖) + ‖A‖) + ‖A‖ * (2 * ‖X‖)) *
-        (‖A‖ + ‖A‖ + ‖A‖ + ‖A‖ + ‖A‖) :=
-    norm_trace_mul_le (norm_smul_le_of_le_one 4⁻¹ (norm_add_le_of_le (norm_mul_le_of_le hV
-      (norm_add_le_of_le (norm_mul_le_of_le le_rfl hV) le_rfl)) (norm_mul_le_of_le le_rfl hV))
-      ⟨by norm_num, by norm_num⟩) (norm_sub_le_of_le (norm_sub_le_of_le (norm_sub_le_of_le
-      (norm_sub_le_of_le le_rfl hB_le) hC_le) hB_le) hC_le)
-  refine ⟨t + z - x + ((4⁻¹ : ℝ) • (V * (A * V + A) + A * V) * (A - B - C - B - C)).trace,
-    ?_, ?_⟩
-  · -- Multiply by the complementary minor and by `det (y l) = det g`, and compare exponents.
-    refine h_conj.trans (ht_eq.trans (mul_right_cancel₀ (by simp)
-      (congr(_ * ($hz_eq * $h_det)).trans ?_)))
-    simp [V, s, hg_star, hP_star, hB, blockDiagPart_eq, hsP.eq, trace_mul_comm P,
-      ← ofReal_pow, A, X, trace_mul_comm s, signMatrix_mul_self, ← mul_assoc s s, ← exp_add,
-      mul_sub, sub_mul, ← trace_star_mul_self_eq_norm_sq]
-    ring_nf
-  · have := norm_add_le_of_le (norm_sub_le_of_le (norm_add_le_of_le ht hz) hx) h_corr
-    linarith [mul_nonneg hX_nonneg (sq_nonneg ‖A‖), mul_nonneg hX_nonneg (sq_nonneg ‖⁅P, k⁆‖),
-      mul_nonneg hX_nonneg (sq_nonneg (‖A‖ - ‖⁅P, k⁆‖)),
-      mul_le_mul_of_nonneg_right hX_half (mul_nonneg hX_nonneg (sq_nonneg ‖A‖))]
+  have h_coeff : l.dsCoeff g = l.flenstedJensen 1 (y l) :=
+    dsCoeff_eq_flenstedJensen_one_sub_mul_mul_one_sub hl (fun i j h ↦ by simp [u, r]; grind)
+      (fun i j h ↦ by simp [r]; grind) hg_acc hug_acc (hy_acc l)
+  -- Steps 2 and 3: the minors of the conjugates of `y l` under `K`.
+  exact ⟨y l, h_coeff, fun p _ hp κ ↦
+    exists_principalMinor_one_sub_mul_mul_one_sub_eq_exp hl hg p hp κ⟩
 
 end New.DiscreteSeries
 
