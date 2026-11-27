@@ -252,6 +252,7 @@ def majorant (φ : Gf E n → ℂ) (A : ℕ) (y : G E s) : ℝ :=
   ‖φ y.2‖ * ((∏ w : InfinitePlace E, ‖(y.1 w).val.val‖) ^ A)⁻¹
 
 -- Keeps definitional checks from unfolding the finite products.
+seal Finset.prod in
 /-- If `φ` is invariant on the right under `J`, then the majorant of exponent `A` grows at most by
 the factor `2 ^ (f A)`, with `f` the number of infinite places, when it is evaluated at `y` instead
 of `y * z`, for `z` in a box `levelBox E s δ J` with `δ ≤ 1` (real components within distance `δ` of
@@ -279,6 +280,7 @@ lemma majorant_le_mul_majorant_mul {φ : Gf E n → ℂ} {J : Subgroup (Gf E n)}
         rw [majorant, Prod.snd_mul, h_invariant _ hz_fin, mul_left_comm]
 
 -- Sealed so that definitional checks do not unfold the products over the infinite places.
+seal Finset.univ in
 /-- The majorant `|φ(y_fin)| ‖y_∞‖ ^ (-A)` of a test function `φ` is integrable for the volume on
 the adelic group as soon as its exponent `A` exceeds `8 n²`. -/
 lemma integrable_majorant (φ : TestFunction (Gf E n)) {A : ℕ} (hA : 8 * card n ^ 2 < A) :

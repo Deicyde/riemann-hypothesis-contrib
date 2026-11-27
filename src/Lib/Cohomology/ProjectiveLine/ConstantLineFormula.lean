@@ -63,6 +63,7 @@ section
 variable [InvertsPrime A ℓ]
 
 -- Keeps definitional checks from unfolding the Ext groups, their group structure, and `projLine`.
+seal CategoryTheory.Abelian.Ext addCommGroupH projLine in
 /-- The projective line formula over a coefficient `S` with flat values, from a family that contains
 η. Let Θ be a theory along g and θ a family of classes on the points of ℙ¹ over g, of degrees `d`,
 whose member `θ i` is η (`hθ_eta`). If θ is a Leray–Hirsch basis over `S` (`h_base`) and over
@@ -155,6 +156,7 @@ lemma comp_restrict_pull_map {D D' : Type 1} [Category D] [Category D'] (φ : D'
           (mapThenComp (restrictAlong φ) T x.toTotalH) := comp_assoc ..
 
 -- Keeps definitional checks from unfolding the Ext groups, their group structure, and `projLine`.
+seal CategoryTheory.Abelian.Ext addCommGroupH projLine in
 /-- Let c be a test over A and u a map from the point to the functor d ↦ Hom(c, g(d)), that is, maps
 c → g(d) natural in the object d of C. Let T be a class in total Ext from the locally constant
 ℤ/ℓ coefficient to M, both restricted to the points of ℙ¹ over g. Pull `New.Variety.etaOneClass` c
@@ -206,6 +208,7 @@ private lemma comparison_pull_zero {D D' : Type 1} [Category D] [Category D']
   (c.pull α n).map_zero
 
 -- Keeps definitional checks from unfolding the Ext groups, their group structure, and `projLine`.
+seal CategoryTheory.Abelian.Ext addCommGroupH projLine in
 /-- Let c be a test over A and u a map from the point to the functor d ↦ Hom(c, g(d)) that has
 universal points for the restriction along g of the locally constant ℤ/ℓ coefficient. Suppose that
 this restriction is a coefficient along g (`h_torsion`, `h_descent`) and that its class η, pulled
@@ -313,6 +316,7 @@ end
 
 /-! ### The projective line formula over a valuation ring -/
 -- Without the seal, unification unfolds these functors, Ext groups, and their group structure.
+seal locConstCoeff projLine CategoryTheory.Abelian.Ext addCommGroupH in
 /-- If every non-zero element of A is a unit in every test g(d) (so every g(d) lies over the generic
 point of A) and `New.Variety.etaOneClass` vanishes at the residue field of A at its generic point
 (`residueTest (TestOver.ofSelf A) ⊥`, with A seen as a test over itself), then y · η = 0 over the

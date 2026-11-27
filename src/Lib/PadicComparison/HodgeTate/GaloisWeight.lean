@@ -144,6 +144,7 @@ def HodgeTatePair.twistForms [EmbeddedInQpBar p k] (g : Gp p) :
     (ExteriorAlgebra X.test.GenericRing ((toHodgeTest.obj X).Index → X.test.GenericRing))))
 
 -- Unsealed, the closing `rfl` unfolds `contraction` instead of comparing its arguments.
+seal contraction in
 /-- The class `contractionPow h` is compatible with the `g`-twist. Restrict it along the twist of
 pairs. Compose it with the identification `twistGenericCoeff g` of the coefficients. Then pull it
 back along the identification `twistForms g` of the exterior algebras. The result is the class

@@ -134,6 +134,7 @@ lemma New.Variety.map_scaledGraph_baseChange_cross {E k : Type} [Field E] [CharZ
       (whiskerLeft _ (freeAbMap g)) freeAb.hom_ext
 
 -- Keeps definitional checks from unfolding the Ext groups.
+seal CategoryTheory.Abelian.Ext in
 /-- The vanishing half of the Woods Hole argument. Let `u i : W ⟶ Y` be maps over `R` and `b i ∈ k`
 almost all zero. Assume that `Y` over `E` (`algPointsOf E R Y`, the functor of `E`-algebra points of
 `Y`) has an atlas of dimension `d`, and that `h > d` or the sum of the `b i • λ_h ((u i)^* x)` is

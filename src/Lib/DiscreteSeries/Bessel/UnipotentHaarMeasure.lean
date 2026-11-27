@@ -153,6 +153,7 @@ theorem exists_dilation {T : ℝ} (hT : 1 ≤ T) :
     _ ≤ 1 + 𝔰.r ^ 2 * (‖u.val.val‖ / T) := by grw [norm_one, l2_opNorm_le_of_apply h_entry, sq]
 
 -- Keeps definitional checks from unfolding the finite sums.
+seal Finset.sum Finset.prod Finset.univ in
 /-- Let `S` be a subgroup of G₁ cut out by asking that the entries at the positions `P` be those of
 `1`, and let the Bessel subgroup `New.Shape.Form.besselS` normalise `S`; each of its elements is an
 element of 𝖴 times an element `toBesselH w`. Conjugation by an element `s` of the Bessel subgroup
