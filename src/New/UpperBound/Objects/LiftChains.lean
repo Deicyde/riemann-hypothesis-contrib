@@ -60,72 +60,86 @@ namespace New
 
 open Finset Pointwise TensorProduct TensorChain Kernel
 
-variable {E : Type} {M : Type*} [Field E] [CMType E] [AddCommGroup M] [Module ℚ M]
-  [Module ℂ M] {n S : ℕ → Type} [∀ j, Fintype (n j)] [∀ j, DecidableEq (n j)]
-  [∀ j, AddCommGroup (S j)] [∀ j, Module ℂ (S j)] {κ : NumberField.InfinitePlace E → ℕ → ℕ}
-  {e : ℕ → NumberField.InfinitePlace E → ℤ} {K : (j : ℕ) → Subgroup (Gf E (n j))}
+variable
+  {E : Type} {M : Type*} [Field E] [CMType E] [AddCommGroup M] [Module ℚ M] [Module ℂ M]
+  {n S : ℕ → Type}
+  [∀ j, Fintype (n j)] [∀ j, DecidableEq (n j)] [∀ j, AddCommGroup (S j)] [∀ j, Module ℂ (S j)]
+  {κ : NumberField.InfinitePlace E → ℕ → ℕ} {e : ℕ → NumberField.InfinitePlace E → ℤ}
+  {K : (j : ℕ) → Subgroup (Gf E (n j))}
   (k : ∀ j : ℕ, Kernel (n j) (n (j + 1)) κ (e j) (e (j + 1)) (K j) (S j)) [∀ j, IsLevel (K j)]
 
-/-- The chain of j theta lifts with data Φ_0, …, Φ_{j−1}. It is the composite linear map from
+/--
+The chain of j theta lifts with data Φ_0, …, Φ_{j−1}. It is the composite linear map from
 algebraic forms of stage 0 to algebraic forms of stage j. The forms `AlgForm (n j) κ (e j)` of
 stage j are the smooth functions on `Gf E (n j)` that transform under the rational points by the
-weight with `κ τ h` columns of height `h` and the power `e j τ` of the determinant at `τ`. -/
+weight with `κ τ h` columns of height `h` and the power `e j τ` of the determinant at `τ`.
+-/
 def chain (Φ : (j : ℕ) → S j) : ∀ j : ℕ, AlgForm (n 0) κ (e 0) →ₗ[ℂ] AlgForm (n j) κ (e j) :=
   compUpTo fun j ↦ (k j).lift (Φ j)
 
-/-- Equivariance of the chain of lifts. For each `j`, `k j` is a theta kernel with data `S j` from
+/--
+Equivariance of the chain of lifts. For each `j`, `k j` is a theta kernel with data `S j` from
 algebraic forms on `Gf E (n j)` of weight `(κ, e j)` to forms on `Gf E (n (j + 1))` of weight
 `(κ, e (j + 1))`. Its lift `(k j).lift` sends a datum and a form to the lifted form. Its action
 `(k j).ω` is an action of `Gf E (n j) × Gf E (n (j + 1))` on `S j`. The chain `lift` applies the
 first `m` lifts in turn to a form `φ`, using the factors of a tensor `t` of data. Let `a j` lie in
 `Gf E (n j)` for every `j`, and move each factor `j` of `t` by `(k j).ω (a j, a (j + 1))`. The chain
 with the moved data, applied to the right translate of `φ` by `a 0`, is the right translate by `a m`
-of the chain with the data `t` applied to `φ`. -/
-theorem TensorChain.lift_kernelLift_map_omega (a : ∀ j : ℕ, Gf E (n j))
-    (φ : AlgForm (n 0) κ (e 0)) (m : ℕ) (t : TensorChain S m) :
-    lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (a 0) φ) m
-        (map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) m t) =
-      algFormRep κ (e m) (a m) (lift (fun i : ℕ ↦ (k i).lift) φ m t) := by
+of the chain with the data `t` applied to `φ`.
+-/
+theorem TensorChain.lift_kernelLift_map_omega
+    (a : ∀ j : ℕ, Gf E (n j)) (φ : AlgForm (n 0) κ (e 0)) (m : ℕ) (t : TensorChain S m)
+    : lift
+        (fun i : ℕ ↦ (k i).lift)
+        (algFormRep κ (e 0) (a 0) φ) m (map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) m t)
+      = algFormRep κ (e m) (a m) (lift (fun i : ℕ ↦ (k i).lift) φ m t) := by
   induction m with
   | zero =>
     -- A tensor of length `0` is a scalar `c`, and both sides are `c` times the translate of `φ`.
-    change ((show ℂ from t) * 1) • algFormRep κ (e 0) (a 0) φ =
-      algFormRep κ (e 0) (a 0) ((show ℂ from t) • φ)
+    change ((show ℂ from t) * 1) • algFormRep κ (e 0) (a 0) φ
+      = algFormRep κ (e 0) (a 0) ((show ℂ from t) • φ)
     rw [mul_one, map_smul]
   | succ m ih =>
     -- Both sides are linear in `t`; on `s ⊗ r` use the equivariance of the last lift.
-    have h_tmul (s : S m) (r : TensorChain S m) :
-        (k m).lift ((k m).ω (a m, a (m + 1)) s)
-            (lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (a 0) φ) m
-              (map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) m r)) =
-          algFormRep κ (e (m + 1)) (a (m + 1))
+    have h_tmul (s : S m) (r : TensorChain S m)
+        : (k m).lift ((k m).ω (a m, a (m + 1)) s)
+            (lift
+              (fun i : ℕ ↦ (k i).lift)
+              (algFormRep κ (e 0) (a 0) φ) m (map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) m r))
+          = algFormRep κ (e (m + 1)) (a (m + 1))
             ((k m).lift s (lift (fun i : ℕ ↦ (k i).lift) φ m r)) := by
       rw [ih r, lift_equivariant]
-    have h_maps : lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (a 0) φ) (m + 1) ∘ₗ
-          map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) (m + 1) =
-        algFormRep κ (e (m + 1)) (a (m + 1)) ∘ₗ lift (fun i : ℕ ↦ (k i).lift) φ (m + 1) :=
+    have h_maps
+        : lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (a 0) φ) (m + 1)
+            ∘ₗ map (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) (m + 1)
+          = algFormRep κ (e (m + 1)) (a (m + 1)) ∘ₗ lift (fun i : ℕ ↦ (k i).lift) φ (m + 1) :=
       TensorProduct.ext' (M := S m) (N := TensorChain S m) h_tmul
     exact LinearMap.congr_fun h_maps t
 
-/-- Moving an element to the source of a chain of lifts. Let `z i` lie in the group of stage `i`,
+/--
+Moving an element to the source of a chain of lifts. Let `z i` lie in the group of stage `i`,
 with `ω(z i, z (i + 1)) = 1` for every lift, let `t` be any tensor of the data of the first `m`
 lifts, and let `j < m`. If `ω(1, z (j + 1))`, acting alone on the factor of the lift from stage
 `j` to stage `j + 1`, fixes `t`, then the chain with data `t` has the same value at `φ` and at
-the right translate of `φ` by `z 0`. -/
-theorem TensorChain.lift_algFormRep_of_map_eq {z : ∀ i : ℕ, Gf E (n i)}
-    (hz : ∀ i : ℕ, (k i).ω (z i, z (i + 1)) = 1) {m j : ℕ} (hj : j < m) {t : TensorChain S m}
+the right translate of `φ` by `z 0`.
+-/
+theorem TensorChain.lift_algFormRep_of_map_eq
+    {z : ∀ i : ℕ, Gf E (n i)} (hz : ∀ i : ℕ, (k i).ω (z i, z (i + 1)) = 1)
+    {m j : ℕ} (hj : j < m)
+    {t : TensorChain S m}
     (h_fix : map (fun i : ℕ ↦ if i = j then (k i).ω (1, z (i + 1)) else 1) m t = t)
-    (φ : AlgForm (n 0) κ (e 0)) :
-    lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (z 0) φ) m t =
-      lift (fun i : ℕ ↦ (k i).lift) φ m t := by
+    (φ : AlgForm (n 0) κ (e 0))
+    : lift (fun i : ℕ ↦ (k i).lift) (algFormRep κ (e 0) (z 0) φ) m t
+      = lift (fun i : ℕ ↦ (k i).lift) φ m t := by
   -- As every `ω(z i, z (i + 1))` is trivial, `ω(1, z (j + 1))` on factor `j` is the action of the
   -- tuple `a` that is `(z i)⁻¹` up to stage `j` and `1` after it.
   set a : ∀ i : ℕ, Gf E (n i) := fun i ↦ if i ≤ j then (z i)⁻¹ else 1 with ha
-  have h_absorb (i : ℕ) (g : Gf E (n i)) (g' : Gf E (n (i + 1))) :
-      (k i).ω (g, g') = (k i).ω (g * z i, g' * z (i + 1)) := by
+  have h_absorb (i : ℕ) (g : Gf E (n i)) (g' : Gf E (n (i + 1)))
+      : (k i).ω (g, g') = (k i).ω (g * z i, g' * z (i + 1)) := by
     rw [← Prod.mk_mul_mk, map_mul, hz i, mul_one]
-  have h_factors : (fun i : ℕ ↦ (k i).ω (a i, a (i + 1))) =
-      fun i : ℕ ↦ if i = j then (k i).ω (1, z (i + 1)) else 1 := by
+  have h_factors
+      : (fun i : ℕ ↦ (k i).ω (a i, a (i + 1)))
+        = fun i : ℕ ↦ if i = j then (k i).ω (1, z (i + 1)) else 1 := by
     funext i
     rcases lt_trichotomy i j with h_lt | rfl | h_gt
     · simpa [ha, h_lt.le, h_lt.ne, Nat.succ_le_of_lt h_lt, Prod.mk_one_one] using
@@ -147,16 +161,20 @@ lemma chain_equivariant {φ : AlgForm (n 0) κ (e 0)}
   have h_fix : algFormRep κ (e 0) (a 0).val φ = φ := by simpa using hφ (a 0)
   simpa [chain, h_fix] using lift_kernelLift_map_omega k (fun i : ℕ ↦ (a i).val) φ j (pure Φ j)
 
-/-- The chain of p pairs of theta lifts, the i-th pair with datum Φ_i in S_{2i} ⊗ S_{2i+1}: a
-linear map from forms of stage 0 to forms of stage 2p. -/
-def doubleLiftChain (Φ : (j : ℕ) → S (2 * j) ⊗[ℂ] S (2 * j + 1)) :
-    ∀ p : ℕ, AlgForm (n (2 * 0)) κ (e (2 * 0)) →ₗ[ℂ] AlgForm (n (2 * p)) κ (e (2 * p)) :=
+/--
+The chain of p pairs of theta lifts, the i-th pair with datum Φ_i in S_{2i} ⊗ S_{2i+1}: a
+linear map from forms of stage 0 to forms of stage 2p.
+-/
+def doubleLiftChain (Φ : (j : ℕ) → S (2 * j) ⊗[ℂ] S (2 * j + 1))
+    : ∀ p : ℕ, AlgForm (n (2 * 0)) κ (e (2 * 0)) →ₗ[ℂ] AlgForm (n (2 * p)) κ (e (2 * p)) :=
   compUpTo fun i ↦ liftInPairs (fun j ↦ (k j).lift) i (Φ i)
 
-/-- For a_j in `Gf E (n j)`, the operator ω(a_{2i}, a_{2i+1}) ⊗ ω(a_{2i+1}, a_{2i+2}) on the space
-S_{2i} ⊗ S_{2i+1}. -/
-def twoKernelAction (a : ∀ j : ℕ, Gf E (n j)) (i : ℕ) :
-    S (2 * i) ⊗[ℂ] S (2 * i + 1) →ₗ[ℂ] S (2 * i) ⊗[ℂ] S (2 * i + 1) :=
+/--
+For a_j in `Gf E (n j)`, the operator ω(a_{2i}, a_{2i+1}) ⊗ ω(a_{2i+1}, a_{2i+2}) on the space
+S_{2i} ⊗ S_{2i+1}.
+-/
+def twoKernelAction (a : ∀ j : ℕ, Gf E (n j)) (i : ℕ)
+    : S (2 * i) ⊗[ℂ] S (2 * i + 1) →ₗ[ℂ] S (2 * i) ⊗[ℂ] S (2 * i + 1) :=
   map ((k (2 * i)).ω (a (2 * i), a (2 * i + 1)))
     ((k (2 * i + 1)).ω (a (2 * i + 1), a (2 * i + 1 + 1)))
 
@@ -169,30 +187,39 @@ lemma exists_linearMap_chain_eq_apply_pure (j : ℕ) (φ : AlgForm (n 0) κ (e 0
   -- `β` is the linear map `TensorChain.lift` of the lifts at `φ`, followed by evaluation at `g`
   ⟨.proj g ∘ₗ Submodule.subtype _ ∘ₗ lift (fun i : ℕ ↦ (k i).lift) φ j, by simp [chain]⟩
 
-/-- Joint invariance: the tensor ∑_{x∈s} L_x ⊗ Φ_{x,m−1} ⊗ ⋯ ⊗ Φ_{x,0} is unchanged by the joint
+/--
+Joint invariance: the tensor ∑_{x∈s} L_x ⊗ Φ_{x,m−1} ⊗ ⋯ ⊗ Φ_{x,0} is unchanged by the joint
 action of every tuple a with a_j ∈ K_j and a_j = 1 for j ≥ m, as tested against all linear maps β
 from S_{m−1} ⊗ ⋯ ⊗ S_0 to the Weyl module `WeylIndex (n m) κ → ℂ` of stage m. Here a acts on Φ_{x,j}
-by ω(a_j, a_{j+1}), and the coefficients L_x are linear maps from that Weyl module to `M`. -/
-def IsJointlyInvariant {X : Type*} (m : ℕ) (s : Finset X) (L : X → (WeylIndex (n m) κ → ℂ) →ₗ[ℂ] M)
-    (Φ : X → ∀ j : ℕ, S j) : Prop :=
-  ∀ a : ∀ j : ℕ, K j, (∀ j ≥ m, a j = 1) → ∀ β : TensorChain S m →ₗ[ℂ] WeylIndex (n m) κ → ℂ,
-    ∑ x ∈ s, L x (β (TensorChain.pure (fun j : ℕ ↦ (k j).ω (a j, a (j + 1)) (Φ x j)) m)) =
-      ∑ x ∈ s, L x (β (TensorChain.pure (Φ x) m))
+by ω(a_j, a_{j+1}), and the coefficients L_x are linear maps from that Weyl module to `M`.
+-/
+def IsJointlyInvariant
+    {X : Type*}
+    (m : ℕ)
+    (s : Finset X) (L : X → (WeylIndex (n m) κ → ℂ) →ₗ[ℂ] M) (Φ : X → ∀ j : ℕ, S j)
+    : Prop :=
+  ∀ a : ∀ j : ℕ, K j,
+    (∀ j ≥ m, a j = 1)
+      → ∀ β : TensorChain S m →ₗ[ℂ] WeylIndex (n m) κ → ℂ,
+        ∑ x ∈ s, L x (β (TensorChain.pure (fun j : ℕ ↦ (k j).ω (a j, a (j + 1)) (Φ x j)) m))
+          = ∑ x ∈ s, L x (β (TensorChain.pure (Φ x) m))
 
 /-- Representatives of the classes `c j` for `j < m`, followed by the points `g j` for `m ≤ j`. -/
-def classPoints {m : ℕ} (c : ∀ j : Fin m, StdClasses (K j)) (g : ∀ j : ℕ, Gf E (n j)) (j : ℕ) :
-    Gf E (n j) :=
+def classPoints {m : ℕ} (c : ∀ j : Fin m, StdClasses (K j)) (g : ∀ j : ℕ, Gf E (n j)) (j : ℕ)
+    : Gf E (n j) :=
   if h : j < m then (c ⟨j, h⟩).out else g j
 
 omit [∀ j, IsLevel (K j)] in
 lemma classPoints_of_le {m j : ℕ} (c : ∀ j : Fin m, StdClasses (K j)) (g : ∀ j : ℕ, Gf E (n j))
     (h_le : m ≤ j) : classPoints c g j = g j := dite_eq_right h_le.not_gt
 
-/-- The product of the first `m` kernels, applied to the value of `φ` at `g 0`. Factor `j` is the
+/--
+The product of the first `m` kernels, applied to the value of `φ` at `g 0`. Factor `j` is the
 linear map `jetMap` between the Weyl modules of stages `j` and `j + 1` that belongs to the datum
-`Φ j` moved by the action `ω` of the pair of points `(g j, g (j + 1))`. -/
-def kernelProduct (Φ : (j : ℕ) → S j) (φ : AlgForm (n 0) κ (e 0)) (g : ∀ j : ℕ, Gf E (n j))
-    (m : ℕ) : WeylIndex (n m) κ → ℂ :=
+`Φ j` moved by the action `ω` of the pair of points `(g j, g (j + 1))`.
+-/
+def kernelProduct (Φ : (j : ℕ) → S j) (φ : AlgForm (n 0) κ (e 0)) (g : ∀ j : ℕ, Gf E (n j)) (m : ℕ)
+    : WeylIndex (n m) κ → ℂ :=
   compUpTo (fun j ↦ (k j).jetMap ((k j).ω (g j, g (j + 1)) (Φ j))) m (φ.val (g 0))
 
 omit [Module ℚ M] [Module ℂ M] in
@@ -214,23 +241,24 @@ lemma sum_classPoints_succ (m : ℕ) (F : (∀ j : ℕ, Gf E (n j)) → M) (g : 
   · simp [classPoints, Fin.last]
   · simp [classPoints, h_gt.not_gt, Nat.not_lt.2 h_gt, h_gt.ne']
 
-/-- **A chain of lifts is a plain sum.** Let `k j` be theta kernels from stage `j` to stage `j + 1`,
+/--
+**A chain of lifts is a plain sum.** Let `k j` be theta kernels from stage `j` to stage `j + 1`,
 and let `φ : AlgForm (n 0) κ (e 0)` be an algebraic form of stage `0` fixed by the level `K 0`. Let
 `∑ x ∈ s, L x ⊗ Φ x` be jointly invariant: it is unchanged when elements `a j ∈ K j`, `j < m`, move
 each datum `Φ x j` by `ω(a j, a (j + 1))`, with `a m = 1`. Let the levels `K j`, `j < m`, have
 trivial stabilisers `classAut`. Then ∑_x L_x(value at `g m` of the chain with data `Φ x` applied to
 `φ`) is the sum, over tuples `c` of double cosets `StdClasses (K j)`, `j < m`, of ∑_x
-L_x(`kernelProduct`). -/
+L_x(`kernelProduct`).
+-/
 theorem IsJointlyInvariant.sum_chain_eq_sum_kernelProduct
-    {X : Type*} {m : ℕ} {s : Finset X}
-    {L : X → (WeylIndex (n m) κ → ℂ) →ₗ[ℂ] M} {Φ : X → ∀ j : ℕ, S j}
-    (h_inv : IsJointlyInvariant k m s L Φ)
+    {X : Type*} {m : ℕ} {s : Finset X} {L : X → (WeylIndex (n m) κ → ℂ) →ₗ[ℂ] M}
+    {Φ : X → ∀ j : ℕ, S j} (h_inv : IsJointlyInvariant k m s L Φ)
     (h_free : ∀ j < m, ∀ g : Gf E (n j), classAut stdRatPoints (K j) g = ⊥)
     {φ : AlgForm (n 0) κ (e 0)} (hφ : φ ∈ levelSpace (algFormRep κ (e 0)) (K 0))
-    (g : ∀ j : ℕ, Gf E (n j)) :
-    ∑ x ∈ s, L x ((chain k (Φ x) m φ).val (g m)) =
-      ∑ c : ∀ j : Fin m, StdClasses (K j), ∑ x ∈ s,
-        L x (kernelProduct k (Φ x) φ (classPoints c g) m) := by
+    (g : ∀ j : ℕ, Gf E (n j))
+    : ∑ x ∈ s, L x ((chain k (Φ x) m φ).val (g m))
+      = ∑ c : ∀ j : Fin m, StdClasses (K j), ∑ x ∈ s,
+          L x (kernelProduct k (Φ x) φ (classPoints c g) m) := by
   -- The integral over all points is taken one variable at a time, by induction on the length of
   -- the chain. The last lift is an integral whose integrand is constant on classes, and each class
   -- has volume `1`; each value of the integrand is a shorter chain.
@@ -239,21 +267,24 @@ theorem IsJointlyInvariant.sum_chain_eq_sum_kernelProduct
   | succ j ih =>
     -- `T a β` applies `β` to the first `j` factors, then the kernel at `(a, g (j + 1))` with the
     -- last one.
-    let T (a : Gf E (n j)) (β : TensorChain S j →ₗ[ℂ] WeylIndex (n j) κ → ℂ) :
-        TensorChain S (j + 1) →ₗ[ℂ] WeylIndex (n (j + 1)) κ → ℂ :=
+    let T (a : Gf E (n j)) (β : TensorChain S j →ₗ[ℂ] WeylIndex (n j) κ → ℂ)
+        : TensorChain S (j + 1) →ₗ[ℂ] WeylIndex (n (j + 1)) κ → ℂ :=
       lift ((k j).jetMap.compl₁₂ ((k j).ω (a, g (j + 1))) β)
-    have hT (a : Gf E (n j)) (β : TensorChain S j →ₗ[ℂ] WeylIndex (n j) κ → ℂ)
-        (f : ∀ i : ℕ, S i) :
-        T a β (pure f (j + 1)) = (k j).jetMap ((k j).ω (a, g (j + 1)) (f j)) (β (pure f j)) :=
+    have hT (a : Gf E (n j)) (β : TensorChain S j →ₗ[ℂ] WeylIndex (n j) κ → ℂ) (f : ∀ i : ℕ, S i)
+        : T a β (pure f (j + 1)) = (k j).jetMap ((k j).ω (a, g (j + 1)) (f j)) (β (pure f j)) :=
       lift.tmul _ (pure f j)
     -- `F` is the integrand of the last lift, summed over `x`.
     let integrand (x : X) (a : Gf E (n j)) : WeylIndex (n (j + 1)) κ → ℂ :=
       (k j).jetMap ((k j).ω (a, g (j + 1)) (Φ x j)) ((chain k (Φ x) j φ).val a)
     let F (a : Gf E (n j)) : M := ∑ x ∈ s, L x (integrand x a)
-    have h_integral : classIntegral stdRatPoints (K j) F =
-        ∑ x ∈ s, L x ((chain k (Φ x) (j + 1) φ).val (g (j + 1))) :=
-      classIntegral_sum (f := integrand) s (fun x : X ↦ (L x).toAddMonoidHom) (fun _ ↦ 1)
-        (fun x ↦ (k j).integrand_mem_smoothInvariants ..) (by simp [F])
+    have h_integral
+        : classIntegral stdRatPoints (K j) F
+          = ∑ x ∈ s, L x ((chain k (Φ x) (j + 1) φ).val (g (j + 1))) :=
+      classIntegral_sum (f := integrand) s
+        (fun x : X ↦ (L x).toAddMonoidHom)
+        (fun _ ↦ 1)
+        (fun x ↦ (k j).integrand_mem_smoothInvariants ..)
+        (by simp [F])
     -- The integrand is right `K j`-invariant: joint invariance for `b` in the slot `j` alone.
     have h_const : K j ≤ rightStabilizer F := fun b hb a ↦ by
       -- `β` is the linear map that gives the value at `a` of the chain of length `j`.
@@ -366,8 +397,10 @@ namespace New.Data
 
 open Parameters Real Finset Subgroup Fintype Function Embedding
 
-variable {P : Parameters} {D : Data P} (i : Fin 2) {w : FinPlace D.E} {n : Type} [Fintype n]
-  [DecidableEq n]
+variable
+  {P : Parameters} {D : Data P}
+  (i : Fin 2)
+  {w : FinPlace D.E} {n : Type} [Fintype n] [DecidableEq n]
 
 /-! ### Places above the level and chosen places -/
 
@@ -414,13 +447,15 @@ lemma intValuation_piM (hπ_mem : D.piM ∈ w.asIdeal) :
     D.exists_piM_mul_star_eq_levelPrime_mul_coprime
   exact intValuation_eq_of_mul_star (levelPrime_modEq_one D k) hp_mem h_norm h_coprime hπ_mem
 
-/-- The product, over the chosen places above `D.levelPrime 0` and `D.levelPrime 1`, of the orders
+/--
+The product, over the chosen places above `D.levelPrime 0` and `D.levelPrime 1`, of the orders
 of the groups `GL (r t)` over the residue fields, for the rank r = `D.r` and t = `D.t` = 5 r. It is
 a common multiple of the orders of the stabilisers in
-`New.Data.card_classAut_dvd_chosenGroupOrder`. -/
+`New.Data.card_classAut_dvd_chosenGroupOrder`.
+-/
 def chosenGroupOrder : ℕ :=
   Nat.card (∀ x : (i : Fin 2) × D.ChosenPlace i, GL (Fin (D.r * D.t)) (ResField (D.chosenPlace x)))
-  deriving NeZero
+deriving NeZero
 
 /-- The norms `w.q` of the chosen places `w` above p₀ and p₁ have product M^f, where
 M = `D.M` = p₀ p₁ and f = `D.f` is the number of infinite places of E. -/
@@ -459,8 +494,10 @@ lemma card_pi_GL_chosenPlace (l : ℕ) :
 
 /-! ### The principal level and the orders of stabilisers -/
 
-/-- The elements of the finite adelic unitary group on the index set `n` that are integral and
-reduce to `1` at every chosen place, that is, at every prime divisor of `D.piM`. -/
+/--
+The elements of the finite adelic unitary group on the index set `n` that are integral and
+reduce to `1` at every chosen place, that is, at every prime divisor of `D.piM`.
+-/
 abbrev chosenLevel : Subgroup (Gf D.E n) := levelOf (n := n) D.chosenPlace ⊥
 
 variable {K : Subgroup (Gf D.E n)}
@@ -481,8 +518,10 @@ lemma card_GL_dvd_chosenGroupOrder (hn : Fintype.card n ≤ D.r * D.t) :
   obtain ⟨u⟩ : Nonempty (n ↪ Fin (D.r * D.t)) := nonempty_of_card_le (by simpa)
   exact card_dvd_of_injective (.piMap fun _ ↦ extendGL u) (.piMap fun _ ↦ extendGL_injective u)
 
-/-- The chosen places, indexed by the pairs (i, w) with w a chosen place above p_i, are pairwise
-distinct, and none is the conjugate of one of them. -/
+/--
+The chosen places, indexed by the pairs (i, w) with w a chosen place above p_i, are pairwise
+distinct, and none is the conjugate of one of them.
+-/
 instance isConjApart_chosenPlace : IsConjApart D.chosenPlace where
   injective := by
     -- The norm of a chosen place above p_i is p_i, so the place determines `i`.
@@ -511,24 +550,27 @@ lemma principalLevel_le_chosenLevel {a : NumberField.RingOfIntegers D.E} (ha : D
     principalLevel n a ≤ D.chosenLevel :=
   principalLevel_le_levelOf fun ⟨_, w, hw, _⟩ ↦ Ideal.mem_of_dvd w.asIdeal ha hw
 
-/-- Let K be a subgroup of the integral points of the finite adelic unitary group on `n` whose
+/--
+Let K be a subgroup of the integral points of the finite adelic unitary group on `n` whose
 elements reduce to `1` at the chosen places above the prime `D.levelPrime i`. If `n` has at most
 `4 * D.n D.m` elements, four times the rank of the last stage, the stabiliser of each coset gK in
-the rational unitary group is trivial. -/
-theorem classAut_eq_bot_of_le_levelOf_chosenPlace (i : Fin 2)
-    (hK : K ≤ levelOf (n := n) (fun w : D.ChosenPlace i ↦ w.val) ⊥)
-    (hn : Fintype.card n ≤ 4 * D.n D.m) (g : Gf D.E n) : classAut stdRatPoints K g = ⊥ := by
+the rational unitary group is trivial.
+-/
+theorem classAut_eq_bot_of_le_levelOf_chosenPlace
+    (i : Fin 2) (hK : K ≤ levelOf (n := n) (fun w : D.ChosenPlace i ↦ w.val) ⊥)
+    (hn : Fintype.card n ≤ 4 * D.n D.m) (g : Gf D.E n)
+    : classAut stdRatPoints K g = ⊥ := by
   -- `Variety.classAut_eq_bot` asks that the norms of the places multiply to more than
   -- `(2 * card n) ^ [E : ℚ]`. The `f` places have norm p_i, and `[E : ℚ] = 2 * f`.
   have h_size : (2 * (4 * D.n D.m)) ^ 2 < D.levelPrime i := D.nat_lt_of_hasLogBound
   refine Variety.classAut_eq_bot Subtype.val_injective ?_ hK g
-  calc (2 * Fintype.card n) ^ Module.finrank ℚ D.E
-      ≤ ((2 * (4 * D.n D.m)) ^ 2) ^ D.f := by
-        rw [finrank_eq_two_mul_card_infinitePlace, pow_mul]
-        gcongr
+  calc
+    (2 * Fintype.card n) ^ Module.finrank ℚ D.E ≤ ((2 * (4 * D.n D.m)) ^ 2) ^ D.f := by
+      rw [finrank_eq_two_mul_card_infinitePlace, pow_mul]
+      gcongr
     _ < D.levelPrime i ^ D.f := by gcongr
     _ = ∏ w : D.ChosenPlace i, w.val.q := by
-        simp [fun w : D.ChosenPlace i ↦ D.q_eq_levelPrime w.property.right, D.card_chosenPlace]
+      simp [fun w : D.ChosenPlace i ↦ D.q_eq_levelPrime w.property.right, D.card_chosenPlace]
 
 /-- If n has at most `2 * D.n D.m` elements, every subgroup K of `New.Data.chosenLevel` is
 sufficiently small: the stabiliser of each point gK in the rational unitary group is trivial. -/
@@ -587,15 +629,18 @@ lemma chiMLocal_zpow_ne_one_iff_isChosen (n : ℤ) (hn_ne : n ≠ 0) (hn_le : n.
     exact iff_of_true h_ne hw
   · simp [hw]
 
-/-- The number `q₂ = (q₀ d) ^ (s + 6)` with `s = D.towerExp`, which is the order of the residue
+/--
+The number `q₂ = (q₀ d) ^ (s + 6)` with `s = D.towerExp`, which is the order of the residue
 characters `D.chiMLocal w` at the chosen places, is at most `exp (log b / 9)`, where
-`log b = D.logB`. -/
+`log b = D.logB`.
+-/
 instance : D.HasLogUpper (P.q₂ D.towerExp) (D.logB / 9) := by
   -- `q₂` is at most a fixed power of `x`, and `log x ≤ log x₁` is negligible against `log b`.
   have h_scale : D.logX ≤ D.logX₁ := by grind [D.scale_inequalities]
   have h_pow : D.x ^ (33 * (P.q₀ * P.d)) ≤ exp (D.logB / 9) := by
     rw [← exp_natCast_mul, exp_le_exp]
-    calc _ ≤ (33 * (P.q₀ * P.d) : ℕ) * D.logX₁ := by gcongr
+    calc
+      _ ≤ (33 * (P.q₀ * P.d) : ℕ) * D.logX₁ := by gcongr
       _ ≤ D.logB / 9 := D.le_of_hasLogBound
   exact hasLogUpper_of_le_of_nonneg (D.q₂_le.trans h_pow) (Nat.cast_nonneg _)
 
@@ -618,8 +663,10 @@ lemma log_chosenGroupOrder_le : log D.chosenGroupOrder ≤ D.x ^ 32 := by
     _ ≤ exp (32 * D.logX) := D.le_of_hasLogBound
     _ = D.x ^ 32 := exp_natCast_mul 32 D.logX
 
-/-- The bound `log chosenGroupOrder ≤ D.x ^ 32 = exp (32 * D.logX)`, as a logarithmic upper
-bound. -/
+/--
+The bound `log chosenGroupOrder ≤ D.x ^ 32 = exp (32 * D.logX)`, as a logarithmic upper
+bound.
+-/
 instance : D.HasLogUpper (log D.chosenGroupOrder) (32 * D.logX) :=
   hasLogUpper_of_le_of_nonneg D.log_chosenGroupOrder_le (log_natCast_nonneg _)
 

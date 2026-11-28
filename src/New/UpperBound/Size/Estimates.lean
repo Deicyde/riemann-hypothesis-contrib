@@ -54,8 +54,10 @@ variable {P : Parameters} (D : Data P)
 
 /-! ### The von Mangoldt sum, prime by prime -/
 
-/-- The set of primes `p < x₁` with Legendre symbol `(p / d) ≠ 1`, that is the primes below `x₁`
-that do not split in `K = ℚ(√-d)`. -/
+/--
+The set of primes `p < x₁` with Legendre symbol `(p / d) ≠ 1`, that is the primes below `x₁`
+that do not split in `K = ℚ(√-d)`.
+-/
 abbrev smallNonsplitPrimes : Finset ℕ := {p ∈ range ⌈D.x₁⌉₊ | Nat.Prime p ∧ chiK P.d p ≠ 1}
 
 /-- The admissible data `D : Data P` give a CM field `E = D.E`, a modulus `q₁`, the group `D.Φ` of
@@ -178,17 +180,25 @@ lemma sum_localPrimeSumTotal_mul_log_le (T : Finset ℕ) (hT : ∀ p ∈ T, p.Pr
 
 /-! ### Rows of the diagrams, the norm of `piMBar` and the size of jets -/
 
-/-- The main length of row `i` of a lift diagram at the place `τ`: the number `D.columnCount τ 1` of
+/--
+The main length of row `i` of a lift diagram at the place `τ`: the number `D.columnCount τ 1` of
 columns of height `1` for the first row (`i = 0`), the weight `κ(τ) = D.weight τ` for the next
-`k - 1` rows, and `0` for the others. -/
+`k - 1` rows, and `0` for the others.
+-/
 def rowMainLength (τ : D.Φ) (i : ℕ) : ℕ :=
-  if i = 0 then D.columnCount τ 1 else if i < D.k then D.weight τ else 0
+  if i = 0 then
+    D.columnCount τ 1
+  else if i < D.k then
+    D.weight τ
+  else
+    0
 
-/-- The number of boxes by which row `i` of a lift diagram may exceed its main length:
+/--
+The number of boxes by which row `i` of a lift diagram may exceed its main length:
 `b + offWeight + halfGap ^ 2` for the first row (`i = 0`) and `halfGap ^ 2` for the others. Here
-`b = D.natB`, `offWeight = ⌊a / ⌊x₁⌋⌋` and `halfGap = D.r ^ 8` is half the gap `D.gap`. -/
-def rowSlack (i : ℕ) : ℕ :=
-  (if i = 0 then D.natB + D.offWeight else 0) + D.halfGap ^ 2
+`b = D.natB`, `offWeight = ⌊a / ⌊x₁⌋⌋` and `halfGap = D.r ^ 8` is half the gap `D.gap`.
+-/
+def rowSlack (i : ℕ) : ℕ := (if i = 0 then D.natB + D.offWeight else 0) + D.halfGap ^ 2
 
 /-- The admissible data `D` give the number `m` of lifts, the rank `k` of the first space, index
 sets `D.X j` of sizes `n_j = k + j (t + 1)`, and a weight `κ = D.weight` on the set `D.Φ` of
@@ -294,10 +304,16 @@ lemma card_stdClasses_le_exp {n : Type} [Fintype n] [DecidableEq n] {K : Subgrou
 
 /-! ### The sum of the allowed losses -/
 
-/-- The allowed loss at `p`: it is `2 · D.loss p` for a non-split prime `p < x₁`, else `2 m f b` if
-`p` is the level `N`, and `0` otherwise. -/
+/--
+The allowed loss at `p`: it is `2 · D.loss p` for a non-split prime `p < x₁`, else `2 m f b` if
+`p` is the level `N`, and `0` otherwise.
+-/
 def allowedLoss (p : ℕ) : ℝ :=
-  if p ∈ D.smallNonsplitPrimes then 2 * D.loss p else if p = D.N then (2 * D.m * D.f * D.b : ℝ) else
+  if p ∈ D.smallNonsplitPrimes then
+    2 * D.loss p
+  else if p = D.N then
+    (2 * D.m * D.f * D.b : ℝ)
+  else
     0
 
 lemma allowedLoss_nonneg (p : ℕ) : 0 ≤ D.allowedLoss p := by

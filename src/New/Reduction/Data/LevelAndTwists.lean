@@ -126,11 +126,13 @@ instance : D.HasLogUpper (D.liftWeight 0 σ) (2 + D.logB) :=
   hasLogUpper_of_le_of_nonneg (D.liftWeight_le_two_mul_b (Nat.zero_le (2 * D.m)) σ)
     (D.liftWeight 0 σ).cast_nonneg
 
-/-- A lower bound `exp l ≤ κ` for the weight `κ = D.weight σ` gives `exp l ≤ κ_j` for the shifted
-weight `κ_j = D.liftWeight j σ`, because `κ ≤ κ_j`. -/
+/--
+A lower bound `exp l ≤ κ` for the weight `κ = D.weight σ` gives `exp l ≤ κ_j` for the shifted
+weight `κ_j = D.liftWeight j σ`, because `κ ≤ κ_j`.
+-/
 instance {l : ℝ} [D.HasLogLower (D.weight σ) l] : D.HasLogLower (D.liftWeight j σ) l :=
-  D.hasLogLower_of_le <| (D.weight_le_liftWeight_sub j σ).trans
-    (sub_le_self _ D.halfGap.cast_nonneg)
+  D.hasLogLower_of_le <|
+    (D.weight_le_liftWeight_sub j σ).trans (sub_le_self _ D.halfGap.cast_nonneg)
 
 /-- For `j ≤ 2 m` the shifted weight `κ_j = D.liftWeight j σ` has `log κ_j ≤ log κ + 1 / x`, with
 `κ = D.weight σ`. -/
@@ -157,14 +159,16 @@ open NumberField Set Nat WeilData Parameters
 
 variable {P : Parameters} (D : Data P)
 
-/-- The row parameter `(k/2 - 1, k/2 - 2, …; -κ_{1/2}, -κ_{3/2}, …)` at the infinite place `v` of
+/--
+The row parameter `(k/2 - 1, k/2 - 2, …; -κ_{1/2}, -κ_{3/2}, …)` at the infinite place `v` of
 `E`, the sequence from which the Harish-Chandra parameters at `v` of the unitary groups in the chain
 of lifts are read off. Entries are numbered from `0`, with `k - 1` entries before the semicolon.
 Here `k = D.k = r + 1 - m` is the rank of the source, for the rank `r = D.r` of the target and the
 number `m = D.m` of lifts; `k/2` is integer division; and `κ_s = D.shiftedWeight (2 s) v` is the
-shifted weight `κ + (s + 1/2) Δ`. The rank `k` is even (`New.Data.k_even`). -/
+shifted weight `κ + (s + 1/2) Δ`. The rank `k` is even (`New.Data.k_even`).
+-/
 def targetParameter (v : D.Φ) (i : ℕ) : ℤ :=
-  if i + 1 < D.k then D.k / 2 - 1 - i else -D.shiftedWeight (2 * (i + 1 - D.k) + 1) v
+  if i + 1 < D.k then D.k / 2 - 1 - i else - D.shiftedWeight (2 * (i + 1 - D.k) + 1) v
 
 /-- A formula for entry `i` of the row parameter `D.targetParameter v`, the integer sequence
 `(k/2 - 1, k/2 - 2, …, 1 - k/2; -κ_{1/2}, -κ_{3/2}, …)` at the infinite place `v` of `E = D.E` from
@@ -188,10 +192,12 @@ lemma targetParameter_sub_one_add (τ : D.Φ) (a : ℕ) :
     D.targetParameter τ (D.k - 1 + a) = D.halfGap - D.liftWeight (a + 1) τ := by
   grind [targetParameter_eq, D.k_pos]
 
-/-- The size of `Ω = exp (γ - Re L'/L(1, χ_K)) * (2 π / rd_E)`: one has `x⁻¹³ ≤ Ω ≤ 1` (upper bound
+/--
+The size of `Ω = exp (γ - Re L'/L(1, χ_K)) * (2 π / rd_E)`: one has `x⁻¹³ ≤ Ω ≤ 1` (upper bound
 for `u` true, lower for `u` false). Here `γ` is Euler's constant, `χ_K` is the quadratic character
 of `K = ℚ(√-d)` for the prime `d = P.d`, and `rd_E` is the root discriminant of the field
-`E = P.E s` of the data, where `s = D.towerExp` is the exponent with `2 ^ s = m ^ 22`. -/
+`E = P.E s` of the data, where `s = D.towerExp` is the exponent with `2 ^ s = m ^ 22`.
+-/
 instance {u : Bool} : D.HasLogBound u (P.bigOmega D.towerExp) (if u then 0 else -13 * D.logX) := by
   -- instance search finds `1 ≤ 2 π ≤ exp 6` and `x ^ 10 ≤ rd_E ≤ x ^ 12`; it remains to
   -- compare exponents, and the constants are small against `log x`
@@ -202,12 +208,13 @@ instance {u : Bool} : D.HasLogBound u (P.bigOmega D.towerExp) (if u then 0 else 
 
 /-! ### The size and the residue class of the level `N` -/
 
-/-- The logarithm of `N₋ = κ̄ ^ m (M rd_E / 2π) ^ (m - 1) b ^ (-15 / 2)`, the lower end of the range
+/--
+The logarithm of `N₋ = κ̄ ^ m (M rd_E / 2π) ^ (m - 1) b ^ (-15 / 2)`, the lower end of the range
 for the level. Here `κ̄` is the geometric mean of the weights at the `f = D.f` infinite places of
 `E`, the principal level `M = D.M` is the product of the two primes `D.levelPrime 0` and
-`D.levelPrime 1`, and `rd_E = D.rootDisc` is the root discriminant of `E`. -/
-def logLevelTarget : ℝ :=
-  P.logLevelMin D.towerExp D.m D.weight D.M D.logB
+`D.levelPrime 1`, and `rd_E = D.rootDisc` is the root discriminant of `E`.
+-/
+def logLevelTarget : ℝ := P.logLevelMin D.towerExp D.m D.weight D.M D.logB
 
 /-- The prime level `N` of the data is chosen with `log N₋ ≤ log N ≤ log N₋ + √(log b)`, where
 `log N₋ = D.logLevelTarget` is the logarithm of `κ̄ ^ m (M rd_E / 2π) ^ (m - 1) b ^ (-15 / 2)`. This
@@ -239,10 +246,12 @@ lemma log_N_mem_Icc : Real.log D.N ∈ Icc (D.m * D.logB) (30 * D.m * D.logB) :=
   obtain ⟨h_log_ge, h_log_le⟩ := D.log_N_mem_Icc_logLevelTarget
   constructor <;> linarith
 
-/-- The size of `log N`: `√x log b ≤ log N ≤ e³² √x log b` (upper bound for `u` true, lower for `u`
-false), from `m log b ≤ log N ≤ 30 m log b` and `√x ≤ m ≤ 2 √x`. -/
-instance {u : Bool} :
-    D.HasLogBound u (Real.log D.N) (D.logX / 2 + Real.log D.logB + (if u then 32 else 0)) :=
+/--
+The size of `log N`: `√x log b ≤ log N ≤ e³² √x log b` (upper bound for `u` true, lower for `u`
+false), from `m log b ≤ log N ≤ 30 m log b` and `√x ≤ m ≤ 2 √x`.
+-/
+instance {u : Bool}
+    : D.HasLogBound u (Real.log D.N) (D.logX / 2 + Real.log D.logB + (if u then 32 else 0)) :=
   .of_mem_Icc (D.m * D.logB) (30 * D.m * D.logB) D.log_N_mem_Icc
     (by cases u <;> grind [D.scale_inequalities])
 
@@ -256,9 +265,11 @@ instance : D.HasLogLower D.N (101 * D.logB) := by
 
 /-! ### Tame characters and twists -/
 
-/-- A character of U(1)(𝔸) of weight 0 whose tame part is supported on a finite set Q of places. The
+/--
+A character of U(1)(𝔸) of weight 0 whose tame part is supported on a finite set Q of places. The
 places of Q have norm prime to M N, with M = `D.M` and N the level, and Q is disjoint from its
-conjugate. -/
+conjugate.
+-/
 structure TameChar where
   /-- The automorphic character `ϑ` of `U(1)(𝔸)`. -/
   toAutChar : AutChar D.E
@@ -278,23 +289,26 @@ structure TameChar where
 /-- The product of the norms of the places in the finite set Q of the tame character ϑ. -/
 abbrev TameChar.normQ {D : Data P} (ϑ : D.TameChar) : ℕ := ∏ w ∈ ϑ.Q, w.q
 
-/-- A twist: a tame character (`New.Data.TameChar`) whose tame part is non-trivial at every place of
-its set Q. -/
+/--
+A twist: a tame character (`New.Data.TameChar`) whose tame part is non-trivial at every place of
+its set Q.
+-/
 structure Twist extends D.TameChar where
   /-- The tame part is non-trivial at every place of `Q`. -/
   tamePart_ne_one : ∀ w ∈ Q, tamePart w ≠ 1
 
 /-- The trivial twist, with empty set Q and trivial tame part. -/
 instance : One D.Twist where
-  one :=
-    { toAutChar := 1
-      Q := ∅
-      tamePart := 1
-      hasWeight := .one
-      tamePart_eq_one := by simp
-      star_notMem := by simp
-      coprime := by simp
-      tamePart_ne_one := by simp }
+  one := {
+    toAutChar := 1
+    Q := ∅
+    tamePart := 1
+    hasWeight := .one
+    tamePart_eq_one := by simp
+    star_notMem := by simp
+    coprime := by simp
+    tamePart_ne_one := by simp
+  }
 
 /-- A twist is read as its tame character. -/
 instance : Coe D.Twist D.TameChar := ⟨Twist.toTameChar⟩
@@ -304,9 +318,11 @@ abbrev TameChar.one {D : Data P} : D.TameChar := Twist.toTameChar 1
 
 /-! ### The characters of the lifts -/
 
-/-- The character μ_j⁰ = μ♭(υ^{−Δ}χ)^j of U(1)(𝔸). Here μ♭ = `D.chiZero` has weight −κ₀ and trivial
+/--
+The character μ_j⁰ = μ♭(υ^{−Δ}χ)^j of U(1)(𝔸). Here μ♭ = `D.chiZero` has weight −κ₀ and trivial
 tame part, χ = `D.chiM` has weight 0 and tame part `D.chiMLocal`, υ is the restricted splitting
-character `New.WeilData.upsilonU1` and Δ = `D.gap` is the gap. -/
+character `New.WeilData.upsilonU1` and Δ = `D.gap` is the gap.
+-/
 def untwistedLiftChar (j : ℕ) : AutChar D.E := D.chiZero * (upsilonU1 ^ (-D.gap : ℤ) * D.chiM) ^ j
 
 /-- The character μ_j⁰ = `D.untwistedLiftChar j` of U(1)(𝔸), for the field E = `D.E`, has weight
@@ -333,19 +349,24 @@ lemma untwistedLiftChar_hasWeight (j : ℕ) :
 /-- For a tame character ϑ and a natural number j, the character μ_j⁰ϑ of U(1)(𝔸). -/
 def liftChar (ϑ : D.TameChar) (j : ℕ) : AutChar D.E := D.untwistedLiftChar j * ϑ.toAutChar
 
-/-- The family of residue field characters ω_w^j ψ_w, with ω = `D.chiMLocal` and
-ψ = `ϑ.tamePart`; it is the tame part of μ_j⁰ϑ. -/
+/--
+The family of residue field characters ω_w^j ψ_w, with ω = `D.chiMLocal` and
+ψ = `ϑ.tamePart`; it is the tame part of μ_j⁰ϑ.
+-/
 def liftTamePart (ϑ : D.TameChar) (j : ℕ) : (w : New.FinPlace D.E) → MulChar (ResField w) ℂ :=
   D.chiMLocal ^ (j : ℤ) * ϑ.tamePart
 
-/-- For a tame character ϑ, the character μ_j⁰ϑ = `D.liftChar ϑ j` has weight −κ_j, with
+/--
+For a tame character ϑ, the character μ_j⁰ϑ = `D.liftChar ϑ j` has weight −κ_j, with
 κ_j = `D.liftWeight j`, and tame part `D.liftTamePart ϑ j`, the product of `D.chiMLocal ^ j` and
-`ϑ.tamePart`. -/
-instance hasWeight_liftChar {ϑ : D.TameChar} {j : ℕ} :
-    (D.liftChar ϑ j).HasWeight (fun v : InfinitePlace D.E ↦ -D.liftWeight j v)
+`ϑ.tamePart`.
+-/
+instance hasWeight_liftChar {ϑ : D.TameChar} {j : ℕ}
+    : (D.liftChar ϑ j).HasWeight
+      (fun v : InfinitePlace D.E ↦ - D.liftWeight j v)
       (D.liftTamePart ϑ j) := by
-  simpa only [liftChar, liftTamePart, add_zero] using (D.untwistedLiftChar_hasWeight j).mul
-    ϑ.hasWeight
+  simpa only [liftChar, liftTamePart, add_zero] using
+    (D.untwistedLiftChar_hasWeight j).mul ϑ.hasWeight
 
 /-- The natural numbers j with 1 ≤ j ≤ m, for the number m of the data; they index the lifts. -/
 abbrev LiftIndex : Set ℕ := Icc 1 D.m
@@ -358,8 +379,10 @@ section MFoldTwists
 
 variable {P : Parameters} (D : Data P)
 
-/-- For a tame character ϑ and a natural number n, the tame character ϑⁿ, with the same set Q and
-tame part `ϑ.tamePart ^ n`. -/
+/--
+For a tame character ϑ and a natural number n, the tame character ϑⁿ, with the same set Q and
+tame part `ϑ.tamePart ^ n`.
+-/
 def TameChar.pow {D : Data P} (ϑ : D.TameChar) (n : ℕ) : D.TameChar where
   toAutChar := ϑ.toAutChar ^ n
   Q := ϑ.Q
@@ -369,14 +392,18 @@ def TameChar.pow {D : Data P} (ϑ : D.TameChar) (n : ℕ) : D.TameChar where
   star_notMem := ϑ.star_notMem
   coprime := ϑ.coprime
 
-/-- An m-fold twist: a twist ϑ whose tame part has `tamePart w ^ n ≠ 1` for all w in Q and
-1 ≤ n ≤ m. -/
+/--
+An m-fold twist: a twist ϑ whose tame part has `tamePart w ^ n ≠ 1` for all w in Q and
+1 ≤ n ≤ m.
+-/
 structure MFoldTwist extends D.Twist where
   /-- For `1 ≤ n ≤ m` the `n`-th power of the tame part is non-trivial at every place of `Q`. -/
   pow_ne_one : ∀ n ∈ D.LiftIndex, ∀ w ∈ Q, tamePart w ^ n ≠ 1
 
-/-- For a tame character ϑ and a natural number j, the character μ_j⁰ϑ^j of U(1)(𝔸), used for
-lift j of a chain. -/
+/--
+For a tame character ϑ and a natural number j, the character μ_j⁰ϑ^j of U(1)(𝔸), used for
+lift j of a chain.
+-/
 abbrev chainChar (ϑ : D.TameChar) (j : ℕ) : AutChar D.E := D.liftChar (ϑ.pow j) j
 
 /-- The trivial twist is an m-fold twist, since its set Q is empty. -/

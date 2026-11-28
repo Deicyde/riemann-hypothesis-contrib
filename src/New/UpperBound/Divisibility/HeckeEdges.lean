@@ -88,8 +88,10 @@ lemma atPlace_embFin (v : FinPlace E) (γ : U (stdSpace E n).J) :
     ((stdSpace E n).embFin γ).atPlace v = localGL v γ :=
   congrArg (GeneralLinearGroup.map (evalAt v)) (stdSpace_embFin γ)
 
-/-- The group `GL_k(W)` over the valuation ring `W` of `v`, embedded in `GL_n(E)` by numbering the
-coordinates with `q`. -/
+/--
+The group `GL_k(W)` over the valuation ring `W` of `v`, embedded in `GL_n(E)` by numbering the
+coordinates with `q`.
+-/
 def latticeGL (q : n ≃ Fin k) (v : FinPlace E) : GL (Fin k) (valuationRingAt v) →* GL n E :=
   (GeneralLinearGroup.map (valuationRingAt v).subtype).comp (reindexGL q.symm).toMonoidHom
 
@@ -112,8 +114,10 @@ lemma localGL_latticeGL_mem_localIntGL (q : n ≃ Fin k) (v : FinPlace E)
   (localGL_mem_localIntGL_iff_mem_range q).2 ⟨g, rfl⟩
 
 variable (E) in
-/-- The matrix `diag(p, …, p, 1, …, 1)` with `p` at the first `r` coordinates in the numbering
-`q`. -/
+/--
+The matrix `diag(p, …, p, 1, …, 1)` with `p` at the first `r` coordinates in the numbering
+`q`.
+-/
 def blockScaling (q : n ≃ Fin k) (p r : ℕ) [Fact p.Prime] : GL n E :=
   diagGL fun i : n ↦ if q i < r then Units.mk0 (p : E) NeZero.out else 1
 
@@ -216,10 +220,16 @@ section Edges
 
 variable {E n : Type} [Field E] [CMType E] [Fintype n] [DecidableEq n] {k : ℕ}
 
-/-- The element `g_l⁻¹ β d` of `GL_n` over the completion at `l`, where `g_l` is the `l`-component
-of `g` and `d = diag(p, …, p, 1, …, 1)`. Multiplying `g_l` by it on the right gives `β d`. -/
-def edgeStep (q : n ≃ Fin k) (p r : ℕ) [Fact p.Prime] {l : FinPlace E} (g : Gf E n)
-    (β : GL (Fin k) (valuationRingAt l)) : GL n (LocField l) :=
+/--
+The element `g_l⁻¹ β d` of `GL_n` over the completion at `l`, where `g_l` is the `l`-component
+of `g` and `d = diag(p, …, p, 1, …, 1)`. Multiplying `g_l` by it on the right gives `β d`.
+-/
+def edgeStep
+    (q : n ≃ Fin k)
+    (p r : ℕ) [Fact p.Prime]
+    {l : FinPlace E}
+    (g : Gf E n) (β : GL (Fin k) (valuationRingAt l))
+    : GL n (LocField l) :=
   (g.atPlace l)⁻¹ * localGL l (latticeGL q l β * blockScaling E q p r)
 
 variable {p r : ℕ} [Fact p.Prime] {l : FinPlace E}
@@ -283,18 +293,22 @@ lemma exists_edgeStep_eq (q : n ≃ Fin k) (hl : l.IsSplit) (hp : l.valuation E 
     simp [edgeStep, hβ, d, mul_assoc]
   exact ⟨β⁻¹, QuotientGroup.eq.2 (by simpa only [h_eq] using mul_mem hη_conj_l hu₂)⟩
 
-/-- The edges at `l` and level `K`: pairs of a class at level `K`, the terminus of the edge, and a
+/--
+The edges at `l` and level `K`: pairs of a class at level `K`, the terminus of the edge, and a
 coset in `GL_k(W)` of the parahoric subgroup with blocks of sizes `r` and `k - r`, where `W` is the
-valuation ring of `l`. -/
+valuation ring of `l`.
+-/
 abbrev ClassEdges (K : Subgroup (Gf E n)) (l : FinPlace E) (k r : ℕ) : Type :=
   StdClasses K × ParahoricCosets (valuationRingAt l) k r
 
 variable (p k r) in
-/-- Coordinates for the cosets of the Hecke operator of index `r` at a split place `l`, at
+/--
+Coordinates for the cosets of the Hecke operator of index `r` at a split place `l`, at
 level `K`. Write `W` for the valuation ring of `l` and `d = diag(p, …, p, 1, …, 1)`. The origin
 of the edge `(x, b)` is the point obtained from the representative of `x` by replacing its
 `l`-component with `β d` (and the component at the conjugate place accordingly), where `β = b.out`
-represents the coset `b`. -/
+represents the coset `b`.
+-/
 structure HeckeEdges (K : Subgroup (Gf E n)) (hl : l.IsSplit) where
   /-- The numbering of the coordinates. -/
   numbering : n ≃ Fin k
@@ -306,22 +320,29 @@ structure HeckeEdges (K : Subgroup (Gf E n)) (hl : l.IsSplit) where
   rep_mem_integralAbove : ∀ x : StdClasses K, rep x ∈ integralAbove n p
   /-- The class of the origin of an edge. -/
   origin : ClassEdges K l k r → StdClasses K
-  /-- The rational part: a rational point that takes the representative of the class `origin e` to
-  the origin of `e`, up to right multiplication by `K`. -/
+  /--
+  The rational part: a rational point that takes the representative of the class `origin e` to
+  the origin of `e`, up to right multiplication by `K`.
+  -/
   rationalPart : ClassEdges K l k r → U (stdSpace E n).J
   /-- The remaining factor in `K`. -/
   levelPart : ClassEdges K l k r → K
   /-- The change of basis at the origin. -/
   originBasisChange : ClassEdges K l k r → GL (Fin k) (valuationRingAt l)
   /-- The origin is the rational part times the representative of its class times `levelPart`. -/
-  rep_mul_edgeStep_eq : ∀ (x : StdClasses K) (b : ParahoricCosets (valuationRingAt l) k r),
-    rep x * ofSplitPlace hl (edgeStep numbering p r (rep x) b.out) =
-      (stdSpace E n).embFin (rationalPart (x, b)) * rep (origin (x, b)) * levelPart (x, b)
-  /-- The inverse of the rational part is `g d⁻¹ β⁻¹`, with `g` the change of basis at the
-  origin. -/
-  rationalPart_inv : ∀ (x : StdClasses K) (b : ParahoricCosets (valuationRingAt l) k r),
-    (rationalPart (x, b)).val⁻¹ = latticeGL numbering l (originBasisChange (x, b)) *
-      (blockScaling E numbering p r)⁻¹ * latticeGL numbering l b.out⁻¹
+  rep_mul_edgeStep_eq
+    : ∀ (x : StdClasses K) (b : ParahoricCosets (valuationRingAt l) k r),
+      rep x * ofSplitPlace hl (edgeStep numbering p r (rep x) b.out)
+        = (stdSpace E n).embFin (rationalPart (x, b)) * rep (origin (x, b)) * levelPart (x, b)
+  /--
+  The inverse of the rational part is `g d⁻¹ β⁻¹`, with `g` the change of basis at the
+  origin.
+  -/
+  rationalPart_inv
+    : ∀ (x : StdClasses K) (b : ParahoricCosets (valuationRingAt l) k r),
+      (rationalPart (x, b)).val⁻¹
+        = latticeGL numbering l (originBasisChange (x, b)) * (blockScaling E numbering p r)⁻¹
+          * latticeGL numbering l b.out⁻¹
 
 variable {K : Subgroup (Gf E n)} [IsLevel K] {hl : l.IsSplit}
 
@@ -503,8 +524,10 @@ end Edges
 
 section Variables
 
-variable {E n : Type} [Field E] [CMType E] [Fintype n] [DecidableEq n] {k N p r : ℕ}
-  [Fact p.Prime] {l : FinPlace E} {O : ValuationSubring ℂ}
+variable
+  {E n : Type} [Field E] [CMType E] [Fintype n] [DecidableEq n]
+  {k N p r : ℕ} [Fact p.Prime]
+  {l : FinPlace E} {O : ValuationSubring ℂ}
 
 /-- The action on the variables of one letter `s`. Let `T` be a Frobenius cycle for `p` on the
 valuation ring `W` of `l`: it assigns to each letter a ring map `T.embedding s` from `W` to `O` and
@@ -710,15 +733,17 @@ lemma weightRep_column_apply (γ : U (stdSpace D.E (D.X 0)).J)
       schur D.columnCount (fun τ : D.Φ ↦ (γ : GL (D.X 0) D.E).val.map ((Φ τ).comp conj)) *ᵥ v := by
   simp [stdSpace_weightRep_apply, weylRep, lastEntry]
 
-/-- The source form with given values in `embValRing`, the `p`-integral complex numbers, at the
-representatives `ρ x` of the classes. -/
-def sourceFormOfValues {ρ : StdClasses (D.levelX 0) → Gf D.E (D.X 0)}
-    (hρ : ∀ x : StdClasses (D.levelX 0),
-      DoubleCoset.mk stdRatPoints (D.levelX 0) (ρ x) = x) :
-    (StdClasses (D.levelX 0) → WeylIndex (D.X 0) D.columnCount → embValRing) →ₗ[embValRing]
-      D.SourceForm :=
-  (freeLevelEquiv _ _ 1 D.classAut_levelX_zero_eq_bot hρ).symm.toLinearMap.restrictScalars _ ∘ₗ
-    ((Algebra.linearMap embValRing ℂ).compLeft _).compLeft _
+/--
+The source form with given values in `embValRing`, the `p`-integral complex numbers, at the
+representatives `ρ x` of the classes.
+-/
+def sourceFormOfValues
+    {ρ : StdClasses (D.levelX 0) → Gf D.E (D.X 0)}
+    (hρ : ∀ x : StdClasses (D.levelX 0), DoubleCoset.mk stdRatPoints (D.levelX 0) (ρ x) = x)
+    : (StdClasses (D.levelX 0) → WeylIndex (D.X 0) D.columnCount → embValRing) →ₗ[embValRing]
+        D.SourceForm :=
+  (freeLevelEquiv _ _ 1 D.classAut_levelX_zero_eq_bot hρ).symm.toLinearMap.restrictScalars _
+    ∘ₗ ((Algebra.linearMap embValRing ℂ).compLeft _).compLeft _
 
 /-- The source form with values `F` takes the value `F x` at the representative of the class `x`. -/
 lemma sourceFormOfValues_apply_rep {ρ : StdClasses (D.levelX 0) → Gf D.E (D.X 0)}

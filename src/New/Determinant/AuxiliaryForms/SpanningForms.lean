@@ -69,22 +69,26 @@ open Real Matrix Fintype Submodule LevelPlaces.LevelForm Space Rows Finset Funct
 variable {P : Parameters} (D : Data P)
 
 variable {D} in
-/-- The bound for the number of roots of unity in a value of the data on the last path: that for
+/--
+The bound for the number of roots of unity in a value of the data on the last path: that for
 the first path, times one factor for each of the `m ^ 2` turns. Here `vectorCountBound ϑ` bounds the
 number of column vectors modulo `𝔪` at a node of the grids and `edgeMatrixCountBound ϑ` the number
-of matrices modulo `𝔪` at an edge. -/
+of matrices modulo `𝔪` at an edge.
+-/
 abbrev lastPathBound (ϑ : D.MFoldTwist) : ℕ :=
   vectorCountBound ϑ ^ D.m ^ 2 * edgeMatrixCountBound ϑ ^ (2 * D.m)
 
 /-! ### Denominators on the last path -/
 
-/-- A product of powers of `M` and `P.d` that, at the primes not dividing `Nm Q`, clears the
+/--
+A product of powers of `M` and `P.d` that, at the primes not dividing `Nm Q`, clears the
 denominators of each kernel on the last path. The first factor takes the datum of an edge to
 standard data, and the second pays for the boxes of the diagram: `2 * D.n D.m` bounds the ranks on
-that path and `D.natB * D.r ^ 4` the numbers of boxes. -/
+that path and `D.natB * D.r ^ 4` the numbers of boxes.
+-/
 def liftDenominator : ℕ :=
-  (D.M ^ D.natB) ^ (2 * Core.numInfPlaces D.E * (2 * D.n D.m * (2 * D.n D.m))) *
-    (D.M ^ D.natB * P.d) ^ (D.natB * D.r ^ 4)
+  (D.M ^ D.natB) ^ (2 * Core.numInfPlaces D.E * (2 * D.n D.m * (2 * D.n D.m)))
+    * (D.M ^ D.natB * P.d) ^ (D.natB * D.r ^ 4)
 
 section Denominators
 
@@ -518,10 +522,12 @@ lemma exists_integral_lowerChainUpTo_eq_lastPathPeriod : ∃ c : D.MFoldTwist �
 /-- The space of values of the algebraic forms on `Y_m` of the dual weight. -/
 abbrev DualVector : Type := WeylIndex (D.Y D.m) (D.lastPathColumns false) → ℂ
 
-/-- The integer matrix of the invariant pairing of the dual weight on `Y_m`, that of the conjugate
-forms, with the weight on `Y_m`. -/
-def dualPairing : Matrix (WeylIndex (D.Y D.m) (D.lastPathColumns false))
-    (WeylIndex (D.Y D.m) D.columnsY) ℤ :=
+/--
+The integer matrix of the invariant pairing of the dual weight on `Y_m`, that of the conjugate
+forms, with the weight on `Y_m`.
+-/
+def dualPairing
+    : Matrix (WeylIndex (D.Y D.m) (D.lastPathColumns false)) (WeylIndex (D.Y D.m) D.columnsY) ℤ :=
   (exists_isDualPairing_of_isHCParam D.isHCParam_paramY
     (D.isHCParam_lastPathColumns false zero_le)).choose
 
@@ -533,8 +539,10 @@ lemma isDualPairing_dualPairing : IsDualPairing D.columnsY (D.lastPathColumns fa
   (exists_isDualPairing_of_isHCParam D.isHCParam_paramY
     (D.isHCParam_lastPathColumns false zero_le)).choose_spec
 
-/-- The hook number of the dual of the weight on `Y_m`: the square norm of the highest weight
-polynomial for the pairing by differentiation, a positive integer. -/
+/--
+The hook number of the dual of the weight on `Y_m`: the square norm of the highest weight
+polynomial for the pairing by differentiation, a positive integer.
+-/
 abbrev dualHook : ℤ := hookNumber (D.lastPathColumns false) (rankAt fun _ : D.Φ ↦ D.Y D.m)
 
 /-- The product of the hook number of the dual weight, `exp (x ^ 99 * b ^ 2)` and
@@ -569,7 +577,6 @@ lemma mem_embValRing_of_dualPairing_eq_dualHook_mul {p : ℕ} [Fact p.Prime] [Pa
   have h_coord : (D.dualHook : ℂ) * ζ i = D.dualHook * a := (congrFun (hC ζ) i).symm.trans h_pair
   rwa [mul_left_cancel₀ (by simp) h_coord]
 
-
 /-- Let `σ` be an automorphism of `ℂ`, `ζ` a vector of the weight on `Y_m` and `K ≥ 0`. Suppose that
 for each `v : D.DualVector`, the `σ`-conjugate of the pairing `v ⬝ᵥ dualPairing *ᵥ ζ` has absolute
 value at most `K * √(weylNormSq (σ ∘ v))`. Then `weylNormSq (σ ∘ ζ) ≤ K ^ 2`. -/
@@ -602,10 +609,13 @@ section Delta
 
 variable {P : Parameters} {D : Data P} (ϑ : D.MFoldTwist) (x : Gf D.E (D.Y D.m)) (v : D.DualVector)
 
-/-- The algebraic form `δ_x(v)` of the dual weight on `Y_m`, of level `levelY ϑ m`, supported on the
-class of `x`. -/
-def lastPathDelta :
-    levelSpace (algFormRep (D.lastPathColumns false) (D.lastPathDetExp false 0)) (D.levelY ϑ D.m) :=
+/--
+The algebraic form `δ_x(v)` of the dual weight on `Y_m`, of level `levelY ϑ m`, supported on the
+class of `x`.
+-/
+def lastPathDelta
+    : levelSpace (algFormRep (D.lastPathColumns false) (D.lastPathDetExp false 0))
+      (D.levelY ϑ D.m) :=
   deltaForm stdEmbFin
     ((stdSpace D.E (D.Y D.m)).weightRep (D.lastPathColumns false) (D.lastPathDetExp false 0)) 1 x v
 

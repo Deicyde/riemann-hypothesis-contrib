@@ -47,31 +47,39 @@ Notions from other files:
 
 noncomputable section
 
-/-- The bijection from κ plus a string of length 2ϱ + 1 to the basis indices
+/--
+The bijection from κ plus a string of length 2ϱ + 1 to the basis indices
 `New.Shape.BesselIndex`: κ goes to the x_i, and the string index a goes to e_a if a < ϱ, to z if
-a = ϱ and to e*_{2ϱ−a} if a > ϱ (e and e* numbered from 0). -/
+a = ϱ and to e*_{2ϱ−a} if a > ϱ (e and e* numbered from 0).
+-/
 def New.Shape.besselIndexEquiv (𝔰 : Shape) : 𝔰.κ ⊕ Fin (2 * 𝔰.ϱ + 1) ≃ 𝔰.BesselIndex :=
   -- The inverse sends `e_i` to `i`, keeps `κ`, sends `z` to `ϱ` and `e*_i` to `2 ϱ - i`.
   Equiv.symm <|
-    Equiv.ofBijective
-        (Sum.elim (fun i ↦ Sum.inr ⟨i, by grind⟩)
-          (Sum.elim (Sum.elim Sum.inl fun _ ↦ Sum.inr ⟨𝔰.ϱ, by grind⟩) fun i ↦
-            Sum.inr ⟨2 * 𝔰.ϱ - i, by grind⟩)) <| by
-      -- an injection between finite sets of the same size
-      simp [↓Fintype.bijective_iff_injective_and_card, Function.Injective]
-      grind
+    Equiv.ofBijective (Sum.elim
+        (fun i ↦ Sum.inr ⟨i, by grind⟩)
+        (Sum.elim (Sum.elim Sum.inl fun _ ↦ Sum.inr ⟨𝔰.ϱ, by grind⟩) fun i ↦
+          Sum.inr ⟨2 * 𝔰.ϱ - i, by grind⟩)) <|
+      by
+        -- an injection between finite sets of the same size
+        simp [↓ Fintype.bijective_iff_injective_and_card, Function.Injective]
+        grind
 
 namespace New.Data
 
 open Ideal Seesaw
 
-variable {P : Parameters} (D : Data P) (ϑ : D.TameChar) (j : ℕ) {s : D.RowIndex → ℤˣ}
-  (V : Space D.E D.RowIndex s) {w : FinPlace D.E}
+variable
+  {P : Parameters} (D : Data P) (ϑ : D.TameChar)
+  (j : ℕ)
+  {s : D.RowIndex → ℤˣ} (V : Space D.E D.RowIndex s)
+  {w : FinPlace D.E}
 
 /-! ### Sizes and places -/
 
-/-- The number ϱ lies between m/4 and m, so that `exp (logX / 2 - 4) ≤ ϱ ≤ exp (logX / 2 + 2)`;
-`u` chooses between the upper and the lower bound. -/
+/--
+The number ϱ lies between m/4 and m, so that `exp (logX / 2 - 4) ≤ ϱ ≤ exp (logX / 2 + 2)`;
+`u` chooses between the upper and the lower bound.
+-/
 instance {u : Bool} : D.HasLogBound u D.ϱ (D.logX / 2 + (if u then 2 else -4)) := by
   have h_mem : (D.ϱ : ℝ) ∈ Set.Icc (D.m / 4 : ℝ) D.m := by
     have h_nat : D.m ≤ 4 * D.ϱ ∧ D.ϱ ≤ D.m := by grind [ten_thousand_le_m]
@@ -94,8 +102,10 @@ lemma normQ_mem_and_notMem_of_mem_Q (hw : w ∈ ϑ.Q ∨ star w ∈ ϑ.Q) :
   exact ⟨h_mem, fun h ↦ h_notMem (mul_mem_right _ _ (mul_mem_right _ _ h)),
     fun h ↦ h_notMem (mul_mem_left _ _ h)⟩
 
-/-- The system of places (`New.LevelPlaces`) formed by the chosen places above p₀, p₁ and the places
-of the modulus Q of ϑ. -/
+/--
+The system of places (`New.LevelPlaces`) formed by the chosen places above p₀, p₁ and the places
+of the modulus Q of ϑ.
+-/
 def levelPlaces : LevelPlaces D.E where
   ChosenIndex := (i : Fin 2) × D.ChosenPlace i
   TwistIndex := ϑ.Q
@@ -103,18 +113,21 @@ def levelPlaces : LevelPlaces D.E where
   twistPlace := (↑)
   -- A chosen place contains `D.piM`; by `normQ_mem_and_notMem_of_mem_Q` a place of `ϑ.Q` or
   -- its conjugate does not.
-  apart :=
-    { injective := by
-        have h_ne (x : Σ i : Fin 2, D.ChosenPlace i) (u : ϑ.Q) : D.chosenPlace x ≠ u := by
-          grind [→ normQ_mem_and_notMem_of_mem_Q, Data.chosenPlace]
-        exact D.isConjApart_chosenPlace.injective.sumElim Subtype.val_injective h_ne
-      star_ne := by
-        grind [D.isConjApart_chosenPlace.star_ne, → normQ_mem_and_notMem_of_mem_Q, Data.chosenPlace,
-          ϑ.star_notMem, star_star] }
+  apart := {
+    injective := by
+      have h_ne (x : Σ i : Fin 2, D.ChosenPlace i) (u : ϑ.Q) : D.chosenPlace x ≠ u := by
+        grind [→ normQ_mem_and_notMem_of_mem_Q, Data.chosenPlace]
+      exact D.isConjApart_chosenPlace.injective.sumElim Subtype.val_injective h_ne
+    star_ne := by
+      grind [D.isConjApart_chosenPlace.star_ne, → normQ_mem_and_notMem_of_mem_Q, Data.chosenPlace,
+        ϑ.star_notMem, star_star]
+  }
 
-/-- The modulus `ϖ^c Q` if `b` is `true` (the default) and `ϖ^c` if `b` is `false`. Here `ϖ` is the
+/--
+The modulus `ϖ^c Q` if `b` is `true` (the default) and `ϖ^c` if `b` is `false`. Here `ϖ` is the
 product of the chosen places above p₀, p₁, and `Q` is the product of the places of the modulus of
-`ϑ` (`New.LevelPlaces.levelModulus`). -/
+`ϑ` (`New.LevelPlaces.levelModulus`).
+-/
 abbrev twistModulus (c : ℕ) (b : Bool := true) : Modulus D.E := (D.levelPlaces ϑ).levelModulus c b
 
 /-- For `c ≠ 0` some place divides the modulus `D.twistModulus ϑ c b`, which is `ϖ^c Q` or `ϖ^c`
@@ -131,14 +144,17 @@ lemma nonempty_modulus_places {D : Data P} {ϑ : D.TameChar} {c : ℕ} {b : Bool
 
 /-! ### Ideles, lattices and spaces -/
 
-/-- A finite idele that generates the ideal `(π̄₀ π̄₁)` and is `1` away from the chosen places;
+/--
+A finite idele that generates the ideal `(π̄₀ π̄₁)` and is `1` away from the chosen places;
 see `valued_chosenIdele` and `chosenIdele_apply_of_not_isChosen`. The ideal is a modulus because
-the conjugate of a chosen place is not chosen. -/
+the conjugate of a chosen place is not chosen.
+-/
 def chosenIdele : (𝔸f D.E)ˣ :=
-  Modulus.generator
-    { ideal := span {D.piM}
-      ne_bot := by simp
-      not_le_star := by simpa [IsChosen] using fun _ ↦ IsChosen.not_star }
+  Modulus.generator {
+    ideal := span {D.piM}
+    ne_bot := by simp
+    not_le_star := by simpa [IsChosen] using fun _ ↦ IsChosen.not_star
+  }
 
 /-- The order of `chosenIdele` at `w` is the multiplicity of `w` in the ideal `(π̄₀ π̄₁)`, where
 `π̄₀ π̄₁` is `D.piM`. -/
@@ -150,9 +166,11 @@ lemma chosenIdele_apply_of_not_isChosen (hw : ¬D.IsChosen w) : D.chosenIdele.va
   have h_not_le : ¬span {D.piM} ≤ w.asIdeal := by rwa [span_singleton_le_iff_mem]
   exact (Modulus.generator_spec _).right.left w h_not_le
 
-/-- The finite idele α/β, with α the idele of the Weil data (`New.WeilData`) and β the
+/--
+The finite idele α/β, with α the idele of the Weil data (`New.WeilData`) and β the
 conjugate of `chosenIdele`, which generates the ideal (π₀π₁); it generates the fractional ideal
-𝔞 = 𝔞₀/π₀π₁, where 𝔞₀ is the ideal of α. -/
+𝔞 = 𝔞₀/π₀π₁, where 𝔞₀ is the ideal of α.
+-/
 def ideleA : (𝔸f D.E)ˣ := WeilData.α / star D.chosenIdele
 
 /-- The principal finite idele of E given by the nonzero element π. -/
@@ -170,13 +188,17 @@ lemma isSplitSquarefree_piNIdele : IsSplitSquarefree D.piNPlaces D.N D.piNIdele 
     · exact D.intValuation_piN (by simpa [piNPlaces] using hw)
     · simpa [piNPlaces] using hw
 
-/-- For index j, the finite idele (a/ā) raised to ⌈(m−j)/2⌉, exponent zero for j ≥ m, where a is
-the idele `New.Data.ideleA`. -/
+/--
+For index j, the finite idele (a/ā) raised to ⌈(m−j)/2⌉, exponent zero for j ≥ m, where a is
+the idele `New.Data.ideleA`.
+-/
 def latticeScale : unitary (𝔸f D.E) := divStar D.ideleA ^ ((D.m - j + 1) / 2)
 
-/-- For j < m, a bijection from the indices of X_j plus 2ϱ + 1 − j string indices to those of Y_j:
+/--
+For j < m, a bijection from the indices of X_j plus 2ϱ + 1 − j string indices to those of Y_j:
 `New.Shape.besselIndexEquiv` for j = 0, an arbitrary one (the two sides have the same number of
-elements) otherwise. -/
+elements) otherwise.
+-/
 def indexEquivY : ∀ j < D.m, D.X j ⊕ Fin (2 * D.ϱ + 1 - j) ≃ D.Y j
   | 0, _ => D.shape.besselIndexEquiv
   | _ + 1, _ =>
@@ -248,9 +270,11 @@ lemma exists_space_isStd_of_le_and_gram_eq_of_lt :
     congrFun hk x
   rw [map_mul, hk', mul_inv_cancel]
 
-/-- The hermitian space `Y_j` with its lattice `𝖬_j`, chosen as in
+/--
+The hermitian space `Y_j` with its lattice `𝖬_j`, chosen as in
 `exists_space_isStd_of_le_and_gram_eq_of_lt`. Its properties are `isStd_spaceY_of_le`,
-`spaceY_gram_eq` and `exists_spaceY_xFin_eq`. -/
+`spaceY_gram_eq` and `exists_spaceY_xFin_eq`.
+-/
 def spaceY : Space D.E (D.Y j) (D.signsY j) :=
   (D.exists_space_isStd_of_le_and_gram_eq_of_lt j).choose
 
@@ -279,56 +303,68 @@ lemma exists_spaceY_xFin_eq (hj : j < D.m) :
 /-- The last space Y_m is standard: all its signs are +1 and its point is 1. -/
 instance isStd_spaceY_last : (D.spaceY D.m).IsStd := D.isStd_spaceY_of_le D.m le_rfl
 
-/-- For index j, the diagonal hermitian space W_j of rank r over E whose diagonal entries are the
-signs `D.signsW j`. -/
+/--
+For index j, the diagonal hermitian space W_j of rank r over E whose diagonal entries are the
+signs `D.signsW j`.
+-/
 abbrev spaceW : Space D.E D.RowIndex (D.signsW j) := signedSpace D.E (D.signsW j)
 
 /-! ### Forms and descent pairs -/
 
-/-- The forms on V of parameter ς (`New.Data.paramW` is 2ς) that are fixed by the principal level
+/--
+The forms on V of parameter ς (`New.Data.paramW` is 2ς) that are fixed by the principal level
 `levelOf D.chosenPlace ⊥` at the chosen places above p₀, p₁. The character is the trivial one,
-written as a composite with the reduction map of the level. -/
+written as a composite with the reduction map of the level.
+-/
 abbrev principalForms : Submodule ℂ (V.Form (typeKernel D.paramW s)) :=
   levelSpace (V.formRep (typeKernel D.paramW s)) (levelOf D.chosenPlace ⊥)
     (MonoidHom.comp 1 (levelOf.reduction D.chosenPlace ⊥))
 
-/-- The complex representation of 𝖦 = ∏ GL_r(𝔽_w), over the chosen places w, on the forms on V of
-principal level: an element acts through an integral lift with the given reductions. -/
+/--
+The complex representation of 𝖦 = ∏ GL_r(𝔽_w), over the chosen places w, on the forms on V of
+principal level: an element acts through an integral lift with the given reductions.
+-/
 def principalRep : Representation ℂ D.chosenGL (D.principalForms V) :=
   levelRep (V.formRep (typeKernel D.paramW s)) 1 (MonoidHom.id D.chosenGL) (by simp)
 
-/-- The good forms on V: the image of the idempotent e₀ of ℂ[𝖦] acting on forms of principal
-level at the chosen places above p₀, p₁. -/
-def goodForms : Submodule ℂ (D.principalForms V) :=
-  ((D.principalRep V).asAlgebraHom D.e₀).range
+/--
+The good forms on V: the image of the idempotent e₀ of ℂ[𝖦] acting on forms of principal
+level at the chosen places above p₀, p₁.
+-/
+def goodForms : Submodule ℂ (D.principalForms V) := ((D.principalRep V).asAlgebraHom D.e₀).range
 
 /-- The target forms: the good forms (`New.Data.goodForms`) on the space Y₀. -/
 abbrev targetForms : Submodule ℂ (D.principalForms (D.spaceY 0)) := D.goodForms (D.spaceY 0)
 
-/-- The complex dimension of the space of target forms (`New.Data.targetForms`), the good forms on
-Y₀. -/
+/--
+The complex dimension of the space of target forms (`New.Data.targetForms`), the good forms on
+Y₀.
+-/
 abbrev targetDim : ℕ := Module.finrank ℂ D.targetForms
 
-/-- The j-th descent pair (`New.DescentPair`) for ϑ: W = W_j of rank r, V = I_{r+t}, the character
+/--
+The j-th descent pair (`New.DescentPair`) for ϑ: W = W_j of rank r, V = I_{r+t}, the character
 μ_j⁰ϑ of weight −w_j, and the places `New.Data.levelPlaces`. The basis vectors of sign + are
 numbered by `New.Data.basisNumber`, those of sign − in the reverse order. Let ς_τ denote the target
 parameter `New.Data.targetParameter`. The column count `colsPlus` at height i (the bound variable
 `gap` below) is the positive part of ς_τ(i − 1) − max(ς_τ(i), (t − 1)/2 − w_j(τ)) − 1. The column
 count `colsMinus` at height i is the positive part of
-min(ς_τ(r − i − 1), −w_j(τ) − (t − 1)/2) − ς_τ(r − i) − 1. -/
+min(ς_τ(r − i − 1), −w_j(τ) − (t − 1)/2) − ς_τ(r − i) − 1.
+-/
 def descentPair : DescentPair D.E D.RowIndex (D.RowIndex ⊕ Fin D.t) where
   toLevelPlaces := D.levelPlaces ϑ
   signs := D.signsW j
   W := D.spaceW j
   incl := Function.Embedding.inl
   numbering c := if D.signsW j c = 1 then D.basisNumber c else D.r - 1 - D.basisNumber c
-  colsPlus τ gap := (D.targetParameter τ (gap - 1) - D.targetParameter τ gap ⊔
-    (D.t / 2 - D.liftWeight j τ) - 1).toNat
+  colsPlus τ gap :=
+    (D.targetParameter τ (gap - 1) - D.targetParameter τ gap ⊔ (D.t / 2 - D.liftWeight j τ)
+      - 1).toNat
   colsMinus τ gap :=
-      (D.targetParameter τ (D.r - gap - 1) ⊓ (-D.liftWeight j τ - D.t / 2) - D.targetParameter τ
-        (D.r - gap) - 1).toNat
+    (D.targetParameter τ (D.r - gap - 1) ⊓ (- D.liftWeight j τ - D.t / 2)
+      - D.targetParameter τ (D.r - gap) - 1).toNat
   u1Char := D.liftChar ϑ j
-  weight := (-D.liftWeight j ·)
+  weight := (- D.liftWeight j ·)
   tamePart := D.liftTamePart ϑ j
   hasWeight := D.hasWeight_liftChar
   -- Off the chosen places and `ϑ.Q` both factors of `D.liftTamePart ϑ j w` are trivial.
@@ -364,8 +400,10 @@ places. -/
 lemma liftTamePart_eq_of_mem_Q (w : ϑ.Q) : D.liftTamePart ϑ j w = ϑ.tamePart w := by
   simp [liftTamePart, IsChosen, (D.normQ_mem_and_notMem_of_mem_Q ϑ (.inl w.prop)).right.left]
 
-/-- The subgroup of the lattice stabiliser K₀ for Y_j of elements reducing to 1 at every level
-place: the chosen places and the places of the modulus Q of ϑ. -/
+/--
+The subgroup of the lattice stabiliser K₀ for Y_j of elements reducing to 1 at every level
+place: the chosen places and the places of the modulus Q of ϑ.
+-/
 abbrev levelY : Subgroup (Gf D.E (D.Y j)) := levelOf (n := D.Y j) (D.levelPlaces ϑ).placeAt ⊥
 
 /-- The group `levelY ϑ j` is contained in `D.chosenLevel`, that is, its elements reduce to 1 at the
@@ -373,30 +411,38 @@ chosen places. -/
 lemma levelY_le_chosenLevel : levelY ϑ j ≤ D.chosenLevel :=
   Subgroup.map_mono fun _ hk ↦ funext fun i ↦ congrFun hk (.inl i)
 
-/-- The group ∏_w GL(Y_j mod w) of families of invertible matrices indexed by the basis of Y_j, one
+/--
+The group ∏_w GL(Y_j mod w) of families of invertible matrices indexed by the basis of Y_j, one
 over the residue field of each level place w: the chosen places (the left summand of the index set)
 and the places of the modulus Q of ϑ (the right summand). The reductions of an integral point of
-U(Y_j) at the level places form such a family. -/
+U(Y_j) at the level places form such a family.
+-/
 abbrev LevelReductionsY : Type :=
   ∀ x : (D.levelPlaces ϑ).ChosenIndex ⊕ (D.levelPlaces ϑ).TwistIndex,
     GL (D.Y j) (ResField ((D.levelPlaces ϑ).placeAt x))
 
-/-- The datum `Υ_{j+1}` on `Hom(Y_j, Y_{j+1})`: at the level places (the chosen places and those of
+/--
+The datum `Υ_{j+1}` on `Hom(Y_j, Y_{j+1})`: at the level places (the chosen places and those of
 `ϑ.Q`) it is the indicator function of the inclusion matrix modulo their product, and at the other
-finite places it is the vacuum (`New.vacuumDatum`). -/
+finite places it is the vacuum (`New.vacuumDatum`).
+-/
 def pointDatumY : ((D.spaceY j).hom (D.spaceY (j + 1))).finitePart :=
   delta% vacuumDatum (D.spaceY j) (D.spaceY (j + 1)) (D.twistModulus ϑ 1)
     (Pi.single (inclMatrix (D.twistModulus ϑ 1).ResidueRing (D.inclY j)) 1)
 
-/-- The Weil representation of U(Y_j) × U(Y_{j+1}) on data on Hom(Y_j, Y_{j+1}), with splitting
-characters νυ^⌊n/2⌋ for the two ranks n, ν = μ⁰_{j+1}ϑ^{j+1}. -/
-abbrev thetaKernelY :
-    ThetaKernel (𝒮 ((D.spaceY j).hom (D.spaceY (j + 1)))) (D.spaceY j) (D.spaceY (j + 1)) :=
+/--
+The Weil representation of U(Y_j) × U(Y_{j+1}) on data on Hom(Y_j, Y_{j+1}), with splitting
+characters νυ^⌊n/2⌋ for the two ranks n, ν = μ⁰_{j+1}ϑ^{j+1}.
+-/
+abbrev thetaKernelY
+    : ThetaKernel (𝒮 ((D.spaceY j).hom (D.spaceY (j + 1)))) (D.spaceY j) (D.spaceY (j + 1)) :=
   pairThetaKer (D.spaceY j) (D.spaceY (j + 1)) (rankTwist (D.chainChar ϑ (j + 1)) (D.Y j))
     (rankTwist (D.chainChar ϑ (j + 1)) (D.Y (j + 1)))
 
-/-- The tame part of the character μ⁰_{j+1}ϑ^{j+1} of lift j + 1, a family of characters of the
-residue fields. -/
+/--
+The tame part of the character μ⁰_{j+1}ϑ^{j+1} of lift j + 1, a family of characters of the
+residue fields.
+-/
 abbrev chainTamePart : (w : New.FinPlace D.E) → MulChar (ResField w) ℂ :=
   D.liftTamePart (TameChar.pow ϑ (j + 1)) (j + 1)
 
@@ -480,32 +526,41 @@ instance : (D.spaceW D.m).IsStd :=
 
 grind_pattern targetParameter_add_liftWeight_gap => D.targetParameter τ p, D.liftWeight j τ
 
-/-- At each infinite place, the doubled target parameter 2ς is a parameter of gap h for the signs
-`New.Data.signsY` of Y₀. -/
-instance hasGap_signsY_paramW :
-    (toHCParam (n := D.RowIndex) (D.signsY 0) (D.paramW v)).HasGap D.gap :=
+/--
+At each infinite place, the doubled target parameter 2ς is a parameter of gap h for the signs
+`New.Data.signsY` of Y₀.
+-/
+instance hasGap_signsY_paramW
+    : (toHCParam (n := D.RowIndex) (D.signsY 0) (D.paramW v)).HasGap D.gap :=
   D.hasGap_gridParam v false 0 0 0
 
-/-- At each infinite place, the doubled target parameter 2ς is a parameter of gap h for the signs
-`New.Data.signsW` of W_j. -/
-instance hasGap_paramW : (toHCParam (D.signsW j) (D.paramW v)).HasGap D.gap :=
-  { D.hasGap_signsY_paramW v with
-    gap := by
-      -- Entries of `targetParameter` at indices of opposite sign lie on either side of `-w_j`, at
-      -- least `D.halfGap` from it.
-      have h_far (p : ℕ) :
-          if p < D.posRank j then D.halfGap ≤ D.targetParameter v p + D.liftWeight j v
-          else D.targetParameter v p + D.liftWeight j v ≤ -D.halfGap :=
-        D.targetParameter_add_liftWeight_gap j v p
-      grind [paramW, signsW] }
+/--
+At each infinite place, the doubled target parameter 2ς is a parameter of gap h for the signs
+`New.Data.signsW` of W_j.
+-/
+instance hasGap_paramW : (toHCParam (D.signsW j) (D.paramW v)).HasGap D.gap := {
+  D.hasGap_signsY_paramW v with
+  gap := by
+    -- Entries of `targetParameter` at indices of opposite sign lie on either side of `-w_j`, at
+    -- least `D.halfGap` from it.
+    have h_far (p : ℕ)
+        : if p < D.posRank j then
+            D.halfGap ≤ D.targetParameter v p + D.liftWeight j v
+          else
+            D.targetParameter v p + D.liftWeight j v ≤ -D.halfGap :=
+      D.targetParameter_add_liftWeight_gap j v p
+    grind [paramW, signsW]
+}
 
 variable {s : D.RowIndex → ℤˣ}
 
-/-- If at each infinite place `v` the doubled parameter `D.paramW v` (twice the target parameter)
+/--
+If at each infinite place `v` the doubled parameter `D.paramW v` (twice the target parameter)
 has gap `D.gap` for the signs `s`, then the product kernel `typeKernel D.paramW s` is a cusp kernel
-of order `D.halfGap`, half the gap. -/
-theorem isCuspKernel_typeKernel_paramW [hs : ∀ v : D.Φ, (toHCParam s (D.paramW v)).HasGap D.gap] :
-    IsCuspKernel D.halfGap (typeKernel D.paramW s) := by
+of order `D.halfGap`, half the gap.
+-/
+theorem isCuspKernel_typeKernel_paramW [hs : ∀ v : D.Φ, (toHCParam s (D.paramW v)).HasGap D.gap]
+    : IsCuspKernel D.halfGap (typeKernel D.paramW s) := by
   -- `isCuspKernel_typeKernel` asks for the gap `500 r³ + halfGap`, and `500 r³ ≤ halfGap`.
   have h_size : 500 * D.r ^ 3 ≤ D.halfGap := D.nat_le_of_hasLogBound
   refine isCuspKernel_typeKernel fun v ↦ (hs v).mono ?_
@@ -513,8 +568,10 @@ theorem isCuspKernel_typeKernel_paramW [hs : ∀ v : D.Φ, (toHCParam s (D.param
   omega
 
 variable [∀ v : D.Φ, (toHCParam s (D.paramW v)).HasGap D.gap] in
-/-- If at each infinite place 2ς is a parameter of gap h for the signs s of V, the forms on V of
-parameter ς and principal level at the chosen places make up a finite-dimensional space. -/
+/--
+If at each infinite place 2ς is a parameter of gap h for the signs s of V, the forms on V of
+parameter ς and principal level at the chosen places make up a finite-dimensional space.
+-/
 instance {V : Space D.E D.RowIndex s} : Module.Finite ℂ (D.principalForms V) :=
   V.finite_levelSpace D.isCuspKernel_typeKernel_paramW ⟨levelOf D.chosenPlace ⊥, isOpen_levelOf⟩
 
@@ -699,11 +756,15 @@ lemma hcParameter_descentPair (ϑ : D.TameChar) (τ : D.Φ) (j : D.LiftIndex) {p
     omega
   exact hcParameter_eq_of_steps τ L h_step ha h_agree p hp
 
-/-- The system of centres (`New.CentreSystem`) at τ for the j-th descent pair: its stem is the
+/--
+The system of centres (`New.CentreSystem`) at τ for the j-th descent pair: its stem is the
 doubled target parameter {2ς_p : p < r}, and its only centre is the down centre `.inr (j - 1)`, at
-−w_j and with a block of length t. -/
-def descentCentres (τ : D.Φ) (j : D.LiftIndex) : CentreSystem (ℕ ⊕ ℕ) :=
-  { D.gridCentres τ false with centres := {.inr (j - 1)} }
+−w_j and with a block of length t.
+-/
+def descentCentres (τ : D.Φ) (j : D.LiftIndex) : CentreSystem (ℕ ⊕ ℕ) := {
+  D.gridCentres τ false with
+  centres := {.inr (j - 1)}
+}
 
 /-- The value of the centre `.inr (j - 1)` of `D.descentCentres τ j` is `-D.liftWeight j τ`, minus
 the weight at `τ` of the character of the `j`-th lift. -/

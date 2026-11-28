@@ -73,7 +73,8 @@ abbrev hookNumberMinus : ℤ :=
   hookNumber (untwistedDescentPair j).colsMinus (rankAt fun _ ↦ D.SecondFactorIndex)
 
 /-- The values of the forms on `V°`, with the invariant metric. -/
-@[implicit_reducible] def SecondFactorFormValues : Type :=
+@[implicit_reducible]
+def SecondFactorFormValues : Type :=
   WeylIndex D.SecondFactorIndex (untwistedDescentPair j).colsMinus → ℂ
 
 instance : NormedAddCommGroup (SecondFactorFormValues j) :=
@@ -83,16 +84,20 @@ instance : InnerProductSpace ℂ (SecondFactorFormValues j) := .ofCore (F := _ �
 
 instance : Module.Finite ℂ (SecondFactorFormValues j) := .pi
 
-/-- `𝒜^⊕`: one copy of the forms on `V°` for each choice. The level `J (ϖ²)` is sufficiently small
+/--
+`𝒜^⊕`: one copy of the forms on `V°` for each choice. The level `J (ϖ²)` is sufficiently small
 (all stabilisers of classes are trivial), so a form is the table of its values at representatives
-of the classes, and an inner product is a plain sum over the classes. -/
-abbrev _root_.New.Data.FormTuples : Type := PiLp 2 fun _ : ChoiceIndex j × D.SecondFactorClasses ↦
-  SecondFactorFormValues j
+of the classes, and an inner product is a plain sum over the classes.
+-/
+abbrev _root_.New.Data.FormTuples : Type :=
+  PiLp 2 fun _ : ChoiceIndex j × D.SecondFactorClasses ↦ SecondFactorFormValues j
 
 variable {j} in
-/-- A tuple of forms on `V°` is integral at the place `φ` over `l` if all its values are, that is,
+/--
+A tuple of forms on `V°` is integral at the place `φ` over `l` if all its values are, that is,
 have `weylGauge` at most `1`. A matrix acts on the values by its inverse transpose, so the gauge is
-that of the conjugate vector at the conjugate place. -/
+that of the conjugate vector at the conjugate place.
+-/
 def IsIntegralFormTuple {l : ℕ} [Fact l.Prime] (φ : PadicPlace l) (ζ : FormTuples j) : Prop :=
   ∀ b : ChoiceIndex j × D.SecondFactorClasses,
     weylGauge (ι := ⟨φ.ιₚ.comp conj⟩) (untwistedDescentPair j).colsMinus 0 b.2.out (star (ζ b)) ≤ 1
@@ -179,30 +184,33 @@ lemma hasColumnsBelow_colsMinus :
     simp only [descentPair, h_index]
     omega
 
-/-- The splitting `V_j = V″ ⊕ V°` of the basis, for the pair `descentPair ϑ j`. The indices of `W_j`
+/--
+The splitting `V_j = V″ ⊕ V°` of the basis, for the pair `descentPair ϑ j`. The indices of `W_j`
 come first in `V″`. The divided directions are given by an arbitrary embedding of `D.CarrierIndex`
 in `FirstFactorIndex j`. The splitting and both embeddings in `FirstFactorIndex j` do not depend on
-the twist. -/
-def splittingV : DividedSplitting (FirstFactorIndex j) D.SecondFactorIndex D.CarrierIndex
-  (D.descentPair ϑ j)
-    Function.Embedding.inl where
+the twist.
+-/
+def splittingV
+    : DividedSplitting (FirstFactorIndex j) D.SecondFactorIndex D.CarrierIndex (D.descentPair ϑ j)
+      Function.Embedding.inl where
   -- keep the indices of `W_j`, which come first in `V″`, and number the remaining ones
-  ε := (Equiv.sumAssoc ..).trans <| (Equiv.sumAssoc ..).trans <|
-    Equiv.sumCongr 1 (Fintype.equivFinOfCardEq
-      (card_padIndex_sum_flatIndex_sum_secondFactorIndex j))
+  ε :=
+    (Equiv.sumAssoc ..).trans <| (Equiv.sumAssoc ..).trans <| Equiv.sumCongr 1
+      (Fintype.equivFinOfCardEq (card_padIndex_sum_flatIndex_sum_secondFactorIndex j))
   fixedEmb := inl.trans Function.Embedding.inl
   equiv_inl_fixedEmb _ := rfl
   dividedEmb := (nonempty_carrierIndex_embedding_firstFactorIndex j).some
   hasColumnsBelow := ⟨hasColumnsBelow_colsPlus j ϑ, hasColumnsBelow_colsMinus j ϑ⟩
 
-/-- The level `J_Λ` on `V″` of a matrix `Λ` modulo `ϖ²`. It is `rowFixingLevel` for the rows of `Λ`
+/--
+The level `J_Λ` on `V″` of a matrix `Λ` modulo `ϖ²`. It is `rowFixingLevel` for the rows of `Λ`
 and of `ϖ • 1`: its elements are `1` modulo `ϖ` and fix `Λ` modulo `ϖ²`, and modulo `ϖ² Q`, for `Q`
 the product of the twist places, their columns off the indices of `W_j` are those of the identity
-matrix. -/
+matrix.
+-/
 abbrev gluingLevel
-    (Λ : Matrix D.CarrierIndex (FirstFactorIndex j)
-      (D.descentPair ϑ j).chosenModulusSq.ResidueRing) :
-    Subgroup (Gf D.E (FirstFactorIndex j)) :=
+    (Λ : Matrix D.CarrierIndex (FirstFactorIndex j) (D.descentPair ϑ j).chosenModulusSq.ResidueRing)
+    : Subgroup (Gf D.E (FirstFactorIndex j)) :=
   rowFixingLevel (D.descentPair ϑ j).toLevelPlaces ((splittingV j ϑ).stackOverGenScalar Λ)
     (splittingV j ϑ).fixedEmb
 
@@ -217,11 +225,14 @@ lemma classAut_gluingLevel_eq_bot
 
 -- Keeps definitional checks from unfolding the finite sums.
 seal Finset.univ in
-/-- The lattice `L_Λ` of a choice `i` with matrix `Λ = i.1`, given by the matrix `𝗀` (the field
+/--
+The lattice `L_Λ` of a choice `i` with matrix `Λ = i.1`, given by the matrix `𝗀` (the field
 `point`) of a basis. It is chosen once, for the trivial twist, and read as a lattice for the twist
-`ϑ`. -/
-def glueLattice (i : ChoiceIndex j) : DividedLattice (D.descentPair ϑ j) :=
-  { ((splittingV j 1).exists_isGlued i.1).choose with }
+`ϑ`.
+-/
+def glueLattice (i : ChoiceIndex j) : DividedLattice (D.descentPair ϑ j) := {
+  ((splittingV j 1).exists_isGlued i.1).choose with
+}
 
 /-- A lattice that is glued for the twist `ϑ'` is glued for the twist `ϑ`. -/
 lemma isGlued_splittingV_of_isGlued {ϑ' : D.Twist}
@@ -240,27 +251,35 @@ lemma isGlued_glueLattice (i : ChoiceIndex j) : (splittingV j ϑ).IsGlued i.1 (g
 
 /-! ### The first factors -/
 
-/-- The constant `c″ ≠ 0` that makes the vectors `c″ Υ_{ϑ,i} (h)` integral away from `Q`, and small
+/--
+The constant `c″ ≠ 0` that makes the vectors `c″ Υ_{ϑ,i} (h)` integral away from `Q`, and small
 for `ϑ = 1`. Here `Υ_{ϑ,i}` is `leftSideSeries`, a theta kernel times a class sum of theta kernels
-formed from the choice `i`. The constant depends neither on the twist nor on the choice. -/
+formed from the choice `i`. The constant depends neither on the twist nor on the choice.
+-/
 def firstFactorScale : ℂ := (exists_isIntegralAndSmall_leftSideSeries j).choose
 
 lemma firstFactorScale_ne_zero : firstFactorScale j ≠ 0 :=
   (exists_isIntegralAndSmall_leftSideSeries j).choose_spec.1
 
-/-- The first factor `φ″_{ϑ,i}`, the complex conjugate of `c″ Υ_{ϑ,i}`, where `Υ_{ϑ,i}`
-(`leftSideSeries`) is a function on the finite points of `U(V″)` and `c″ = firstFactorScale j`. -/
-def firstFactor (i : ChoiceIndex j) (h : Gf D.E (FirstFactorIndex j)) :
-    WeylIndex (FirstFactorIndex j) (untwistedDescentPair j).colsPlus → ℂ :=
+/--
+The first factor `φ″_{ϑ,i}`, the complex conjugate of `c″ Υ_{ϑ,i}`, where `Υ_{ϑ,i}`
+(`leftSideSeries`) is a function on the finite points of `U(V″)` and `c″ = firstFactorScale j`.
+-/
+def firstFactor (i : ChoiceIndex j) (h : Gf D.E (FirstFactorIndex j))
+    : WeylIndex (FirstFactorIndex j) (untwistedDescentPair j).colsPlus → ℂ :=
   star (firstFactorScale j • leftSideSeries ϑ j i h)
 
-/-- The theta series `Ξ_{ϑ,i} (g) = ⟨φ″_{ϑ,i}, θ″_{ϑ,Λ} (g, ·)⟩` on `U(W_j)`. It is the sum
+/--
+The theta series `Ξ_{ϑ,i} (g) = ⟨φ″_{ϑ,i}, θ″_{ϑ,Λ} (g, ·)⟩` on `U(W_j)`. It is the sum
 (`kernelClassSum`) over the classes `h` of level `J_Λ` of the theta kernel `θ″_{ϑ,Λ}` of
 `(W_j, V″)` at `(g, h)`, with datum given by the rows of `Λ` stacked over those of `ϖ • 1`
-(`stackOverGenScalar`) and polynomial given by `φ″_{ϑ,i} (h)`. -/
+(`stackOverGenScalar`) and polynomial given by `φ″_{ϑ,i} (h)`.
+-/
 def firstFactorPairing (i : ChoiceIndex j) (g : G D.E (D.signsW j)) : ℂ :=
   kernelClassSum (D.descentPair ϑ j) (firstFactorChar ϑ j) ((splittingV j ϑ).stackOverGenScalar i.1)
-    (splittingV j ϑ).fixedEmb (fun h ↦ star (firstFactor j ϑ i h)) g
+    (splittingV j ϑ).fixedEmb
+    (fun h ↦ star (firstFactor j ϑ i h))
+    g
 
 /-- The series `Ξ_{ϑ,i}` is `c″` times the left side `thirdExchangeLeftSide` of the third exchange,
 the class sum over `U(V″)` whose multiple by a number is the twist-free function `choiceFn`. -/
@@ -351,45 +370,52 @@ lemma weylNormSq_firstFactor_le (i : ChoiceIndex j) (h : Gf D.E (FirstFactorInde
 
 /-! ### The gluing map and the slices of lifts -/
 
-/-- The gluing map `glue_ϑ`. For `ζ` in the copy `i` of the forms on `V°` it is `M ^ l₁` times the
+/--
+The gluing map `glue_ϑ`. For `ζ` in the copy `i` of the forms on `V°` it is `M ^ l₁` times the
 sum, over the classes `h` of level `J_Λ` and `h°` of level `J (ϖ²)`, of the forms supported on the
 class of `(h, h°) 𝗀` formed from the product vector `φ″ (h) · ζ (h°)` (`productForm`). Here `𝗀`
 is the matrix of `glueLattice j ϑ i`, `M = D.M`, and `l₁` is
-`DividedSplitting.denominatorExponent`, the exponent that repays the denominators of `𝗀`. -/
-@[simps -isSimp] def glue : FormTuples j →ₗ[ℂ] (D.descentPair ϑ j).FormV where
-  toFun ζ := (D.M ^ (splittingV j ϑ).denominatorExponent : ℂ) • ∑ b :
-    ChoiceIndex j × D.SecondFactorClasses,
-    stdClassSum (gluingLevel j ϑ b.1.1) fun h : Gf D.E (FirstFactorIndex j) ↦
-      (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h) (ζ b)
+`DividedSplitting.denominatorExponent`, the exponent that repays the denominators of `𝗀`.
+-/
+@[simps -isSimp]
+def glue : FormTuples j →ₗ[ℂ] (D.descentPair ϑ j).FormV where
+  toFun ζ :=
+    (D.M ^ (splittingV j ϑ).denominatorExponent : ℂ)
+      • ∑ b :
+        ChoiceIndex j × D.SecondFactorClasses,
+        stdClassSum (gluingLevel j ϑ b.1.1) fun h : Gf D.E (FirstFactorIndex j) ↦
+          (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h) (ζ b)
   map_add' x y := by
-    have h_sum_add {K : Subgroup (Gf D.E (FirstFactorIndex j))} [IsLevel K]
-        (f g : Gf D.E (FirstFactorIndex j) → (D.descentPair ϑ j).FormV) :
-        stdClassSum K (fun h ↦ f h + g h) = stdClassSum K f + stdClassSum K g := by
+    have h_sum_add
+        {K : Subgroup (Gf D.E (FirstFactorIndex j))} [IsLevel K]
+        (f g : Gf D.E (FirstFactorIndex j) → (D.descentPair ϑ j).FormV)
+        : stdClassSum K (fun h ↦ f h + g h) = stdClassSum K f + stdClassSum K g := by
       simp only [classSum, finsum_eq_sum_of_fintype, smul_add, sum_add_distrib]
     rw [← smul_add, ← sum_add_distrib]
     refine congrArg _ (sum_congr rfl fun b _ ↦ ?_)
-    have h_pt (h : Gf D.E (FirstFactorIndex j)) :
-        (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
-            ((x + y) b) =
-          (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
-            (x b) +
-          (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
-            (y b) :=
+    have h_pt (h : Gf D.E (FirstFactorIndex j))
+        : (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
+            ((x + y) b)
+          = (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
+              (x b)
+            + (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out)
+              (firstFactor j ϑ b.1 h) (y b) :=
       map_add _ (x b : WeylIndex _ (D.descentPair ϑ j).colsMinus → ℂ) (y b)
     exact (congrArg (stdClassSum _) (funext h_pt)).trans (h_sum_add _ _)
   map_smul' a x := by
-    have h_sum_smul {K : Subgroup (Gf D.E (FirstFactorIndex j))} [IsLevel K]
-        (f : Gf D.E (FirstFactorIndex j) → (D.descentPair ϑ j).FormV) :
-        stdClassSum K (fun h ↦ a • f h) = a • stdClassSum K f := by
+    have h_sum_smul
+        {K : Subgroup (Gf D.E (FirstFactorIndex j))} [IsLevel K]
+        (f : Gf D.E (FirstFactorIndex j) → (D.descentPair ϑ j).FormV)
+        : stdClassSum K (fun h ↦ a • f h) = a • stdClassSum K f := by
       simp only [classSum, finsum_eq_sum_of_fintype, smul_comm a, smul_sum]
     rw [RingHom.id_apply, smul_comm a]
     congr 1
     rw [smul_sum]
     refine sum_congr rfl fun b _ ↦ ?_
-    have h_pt (h : Gf D.E (FirstFactorIndex j)) :
-        (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
-            ((a • x) b) =
-          a • (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out)
+    have h_pt (h : Gf D.E (FirstFactorIndex j))
+        : (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out) (firstFactor j ϑ b.1 h)
+            ((a • x) b)
+          = a • (splittingV j ϑ).productForm (glueLattice j ϑ b.1) (h, b.2.out)
             (firstFactor j ϑ b.1 h) (x b) :=
       map_smul _ a (x b : WeylIndex _ (D.descentPair ϑ j).colsMinus → ℂ)
     exact (congrArg (stdClassSum _) (funext h_pt)).trans (h_sum_smul _)
@@ -987,11 +1013,13 @@ lemma thetaKernelPairing_adjoint_glue_eq_zero {w : FinPlace D.E} {hw : star w �
 
 /-! ### The map `Θ°`, the seesaw identity and the false lifts -/
 
-/-- The number `c°_i = M ^ l₁ c_𝗀 #J̄¹ c″` of the choice `i`, with `c_𝗀` the scalar of the lattice,
-`J̄¹` the group `congruenceGroup` and `c″ = firstFactorScale j`. It does not depend on the twist. -/
+/--
+The number `c°_i = M ^ l₁ c_𝗀 #J̄¹ c″` of the choice `i`, with `c_𝗀` the scalar of the lattice,
+`J̄¹` the group `congruenceGroup` and `c″ = firstFactorScale j`. It does not depend on the twist.
+-/
 def glueFactor (i : ChoiceIndex j) : ℂ :=
-  D.M ^ (splittingV j 1).denominatorExponent * (glueLattice j 1 i).weilScalar *
-    Nat.card (splittingV j 1).congruenceGroup * firstFactorScale j
+  D.M ^ (splittingV j 1).denominatorExponent * (glueLattice j 1 i).weilScalar
+    * Nat.card (splittingV j 1).congruenceGroup * firstFactorScale j
 
 lemma glueFactor_ne_zero (i : ChoiceIndex j) : glueFactor j i ≠ 0 := by
   simp [glueFactor, DividedLattice.weilScalar, NeZero.ne, firstFactorScale_ne_zero]
@@ -1020,9 +1048,11 @@ lemma twistFactor_mul_inner_adjoint_glue (y : D.goodForms (D.spaceW j)) (ζ : Fo
   linear_combination
     (y : G D.E (D.signsW j) → ℂ) g * thetaKernelPairing j (fun c ↦ ζ (i, c)) g * h_series
 
-/-- The map `Θ°` from the good forms on `W_j` to tuples of forms on `V°` whose copy `i` is
+/--
+The map `Θ°` from the good forms on `W_j` to tuples of forms on `V°` whose copy `i` is
 `c°_i ∫ y (g) 𝖥_i (g) θ° (g, ·) dg` (`inner_periodLift`). It is defined as `c′_1 glue_1* Θ_{j,1}`,
-the left side of the seesaw identity at the trivial twist. -/
+the left side of the seesaw identity at the trivial twist.
+-/
 def periodLift : D.goodForms (D.spaceW j) →ₗ[ℂ] FormTuples j :=
   twistFactor j 1 • (glue j 1).adjoint ∘ₗ D.goodLift (1 : D.Twist) j
 
@@ -1035,19 +1065,23 @@ lemma inner_periodLift (y : D.goodForms (D.spaceW j)) (ζ : FormTuples j) :
           ∂(D.spaceW j).quotMeasure := by
   simpa [periodLift] using twistFactor_mul_inner_adjoint_glue j 1 y ζ
 
-/-- The seesaw identity `c′_ϑ glue_ϑ* Θ_{j,ϑ} = Θ°`: the number `twistFactor j ϑ` times the
+/--
+The seesaw identity `c′_ϑ glue_ϑ* Θ_{j,ϑ} = Θ°`: the number `twistFactor j ϑ` times the
 composite of the lift `goodLift` with the adjoint of the gluing map `glue` is the map
-`periodLift`, which does not depend on the twist. -/
-theorem twistFactor_smul_adjoint_glue_comp :
-    twistFactor j ϑ • (glue j ϑ).adjoint ∘ₗ D.goodLift ϑ j = periodLift j := by
+`periodLift`, which does not depend on the twist.
+-/
+theorem twistFactor_smul_adjoint_glue_comp
+    : twistFactor j ϑ • (glue j ϑ).adjoint ∘ₗ D.goodLift ϑ j = periodLift j := by
   refine ext fun y ↦ ext_inner_left ℂ fun ζ ↦ ?_
   simpa [inner_periodLift, inner_smul_right] using twistFactor_mul_inner_adjoint_glue j ϑ y ζ
 
-/-- For a good form `y` on `W_j`, the glued form `glue j ϑ (periodLift j y)` is orthogonal to the
+/--
+For a good form `y` on `W_j`, the glued form `glue j ϑ (periodLift j y)` is orthogonal to the
 false lifts at every split place off the level: the forms in the image of `e₀` that are killed by
-the Hecke polynomial operator and are orthogonal to the lifts. -/
-theorem isOrthogonalToFalseLifts_glue_periodLift (y : D.goodForms (D.spaceW j)) :
-    IsOrthogonalToFalseLifts (D.descentPair ϑ j) D.e₀ (D.goodLift ϑ j).rangeᗮ
+the Hecke polynomial operator and are orthogonal to the lifts.
+-/
+theorem isOrthogonalToFalseLifts_glue_periodLift (y : D.goodForms (D.spaceW j))
+    : IsOrthogonalToFalseLifts (D.descentPair ϑ j) D.e₀ (D.goodLift ϑ j).rangeᗮ
       (glue j ϑ (periodLift j y)) := by
   intro w hw hS φ hφ
   -- `⟨φ, glue Θ° y⟩ = ⟨glue* φ, Θ° y⟩` is an integral against the products of the period of `φ`
@@ -1063,17 +1097,21 @@ theorem periodLift_injective : Function.Injective (periodLift j) := by
   refine (injective_iff_map_eq_zero _).2 fun y hy ↦
     eq_zero_of_integral_choiceFn_thetaKernelPairing y fun i ζ ↦ ?_
   -- Test `Θ° y = 0` against the tuple that is `ζ` in the copy `i` and zero elsewhere.
-  let η : FormTuples j := .toLp 2 fun b : ChoiceIndex j × D.SecondFactorClasses ↦
-    if b.1 = i then ζ b.2 else 0
+  let η : FormTuples j :=
+    .toLp 2 fun b : ChoiceIndex j × D.SecondFactorClasses ↦ if b.1 = i then ζ b.2 else 0
   have h_test := inner_periodLift j y η
   -- The copies other than `i` contribute nothing.
-  rw [hy, inner_zero_right, Fintype.sum_eq_single i fun i' hi' ↦ by
-    simp [η, hi', thetaKernelPairing, ← modKernelBilin_apply]] at h_test
+  rw [hy, inner_zero_right,
+      Fintype.sum_eq_single i fun i' hi' ↦ by
+        simp [η, hi', thetaKernelPairing, ← modKernelBilin_apply]]
+    at h_test
   -- What is left is `c°_i` times the integral to be shown `0`.
   simpa [η, glueFactor_ne_zero] using h_test.symm
 
-/-- The number `twistFactor j ϑ` is not `0`, since `Θ° = periodLift j` is injective and there is a
-nonzero good form. -/
+/--
+The number `twistFactor j ϑ` is not `0`, since `Θ° = periodLift j` is injective and there is a
+nonzero good form.
+-/
 theorem twistFactor_ne_zero : twistFactor j ϑ ≠ 0 := by
   intro h_zero
   have h_lift : periodLift j = 0 := by simp [← twistFactor_smul_adjoint_glue_comp j ϑ, h_zero]

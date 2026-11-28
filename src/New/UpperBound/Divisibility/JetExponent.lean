@@ -47,43 +47,56 @@ open Finset Real Nat
 
 variable {P : Parameters} {D : Data P}
 
-/-- The number of columns at τ of height below n_{j+1} and different from 1: the sum of
-`columnCount τ h` over h < n_{j+1}, h ≠ 1. -/
-def lowColumns (j : ℕ) (τ : D.Φ) : ℕ := ∑ h ∈ range (D.n (j + 1)),
-  if h = 1 then 0 else D.columnCount τ h
+/--
+The number of columns at τ of height below n_{j+1} and different from 1: the sum of
+`columnCount τ h` over h < n_{j+1}, h ≠ 1.
+-/
+def lowColumns (j : ℕ) (τ : D.Φ) : ℕ :=
+  ∑ h ∈ range (D.n (j + 1)),
+    if h = 1 then 0 else D.columnCount τ h
 
-/-- The number of boxes in the columns counted by `New.Data.lowColumns` j τ: the sum of
-h·`columnCount τ h` over h < n_{j+1}, h ≠ 1. -/
-def lowBoxes (j : ℕ) (τ : D.Φ) : ℕ := ∑ h ∈ range (D.n (j + 1)),
-  h * if h = 1 then 0 else D.columnCount τ h
+/--
+The number of boxes in the columns counted by `New.Data.lowColumns` j τ: the sum of
+h·`columnCount τ h` over h < n_{j+1}, h ≠ 1.
+-/
+def lowBoxes (j : ℕ) (τ : D.Φ) : ℕ :=
+  ∑ h ∈ range (D.n (j + 1)),
+    h * if h = 1 then 0 else D.columnCount τ h
 
-/-- The divisibility bound at `p` of stage `j`, for a set `ev` of places. Remove the columns of
+/--
+The divisibility bound at `p` of stage `j`, for a set `ev` of places. Remove the columns of
 height one at the places of `ev` from the diagrams `D.columnCount`, read at heights below
 `n = D.n (j + 1)`. The bound is the predicted divisibility of what remains, plus the full gain
 `γ_p = gammaPrime P.d p` for each removed box, less `f n ^ 3 (1 + log_p (max B 1))`. Here `B` is the
-number of boxes before the removal. -/
+number of boxes before the removal.
+-/
 noncomputable def divisibilityBound (p j : ℕ) (ev : Finset D.Φ) : ℝ :=
   predictedDivisibility P.d p (P.partner D.towerExp p) (eraseHeightOne D.columnCount ev)
-    (D.n (j + 1)) +
-    gammaPrime P.d p * (boxes D.columnCount (D.n (j + 1)) - boxes (eraseHeightOne D.columnCount ev)
-      (D.n (j + 1))) -
-    D.f * D.n (j + 1) ^ 3 * (1 + logb p (max (boxes D.columnCount (D.n (j + 1))) 1 : ℕ))
+      (D.n (j + 1))
+    + gammaPrime P.d p
+      * (boxes D.columnCount (D.n (j + 1)) - boxes (eraseHeightOne D.columnCount ev) (D.n (j + 1)))
+    - D.f * D.n (j + 1) ^ 3 * (1 + logb p (max (boxes D.columnCount (D.n (j + 1))) 1 : ℕ))
 
-/-- The length of the long row at `τ` (the `a` columns of height one at an `a`-place) after removing
-the long rows at the places of `ev`. -/
+/--
+The length of the long row at `τ` (the `a` columns of height one at an `a`-place) after removing
+the long rows at the places of `ev`.
+-/
 noncomputable def longRow (ev : Finset D.Φ) (τ : D.Φ) : ℝ := if τ ∈ D.aPlaces \ ev then D.a else 0
 
-/-- The term of the place `τ` and the exponent `e` in the predicted divisibility of stage `j`, after
+/--
+The term of the place `τ` and the exponent `e` in the predicted divisibility of stage `j`, after
 removing the long rows at the places of `ev` and without the factor `v(π_p)`. It is zero unless
 `e ∈ I_p = positivePartnerExponents P.d p`, and `P.partner D.towerExp p e τ` is the place
-`(-p ^ e) τ`. -/
+`(-p ^ e) τ`.
+-/
 noncomputable def partnerTerm (p j : ℕ) (ev : Finset D.Φ) (τ : D.Φ) (e : ℕ) : ℝ :=
   if e ∈ positivePartnerExponents P.d p then
-    (longRow ev τ / p ^ e - longRow ev (P.partner D.towerExp p e τ) -
-        D.lowColumns j (P.partner D.towerExp p e τ))⁺ +
-      (D.lowBoxes j τ / p ^ e - D.lowBoxes j (P.partner D.towerExp p e τ) : ℝ)⁺ - D.lowColumns j τ /
-        p ^ e
-  else 0
+    (longRow ev τ / p ^ e - longRow ev (P.partner D.towerExp p e τ)
+        - D.lowColumns j (P.partner D.towerExp p e τ))⁺
+      + (D.lowBoxes j τ / p ^ e - D.lowBoxes j (P.partner D.towerExp p e τ) : ℝ)⁺
+      - D.lowColumns j τ / p ^ e
+  else
+    0
 
 variable {p : ℕ} [q : Fact p.Prime]
 

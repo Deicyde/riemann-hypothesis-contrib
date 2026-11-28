@@ -65,19 +65,25 @@ attribute [local instance low] Fintype.ofFinite
 
 variable {P : Parameters} (D : Data P) {i : Fin 2} {w : FinPlace D.E}
 
-/-- The complex conjugate of the integer `D.piMBar` of K, of norm p₀p₁, as an integer of E; the
-chosen places are its prime divisors. -/
+/--
+The complex conjugate of the integer `D.piMBar` of K, of norm p₀p₁, as an integer of E; the
+chosen places are its prime divisors.
+-/
 abbrev piM : 𝓞 D.E := star (algebraMap (𝓞 P.K) (𝓞 D.E) D.piMBar)
 
-/-- The finite place w of E is chosen: it divides the complex conjugate of the integer `D.piMBar` of
-K, of norm p₀p₁. -/
+/--
+The finite place w of E is chosen: it divides the complex conjugate of the integer `D.piMBar` of
+K, of norm p₀p₁.
+-/
 def IsChosen (w : FinPlace D.E) : Prop := D.piM ∈ w.asIdeal
 
 /-! ### The chosen places -/
 
-/-- The chosen places above the prime p_i = `D.levelPrime i`: the finite places w of E that are
+/--
+The chosen places above the prime p_i = `D.levelPrime i`: the finite places w of E that are
 chosen, that is, divide the complex conjugate of `D.piMBar` (`New.Data.IsChosen`, written out), and
-divide p_i. -/
+divide p_i.
+-/
 protected abbrev ChosenPlace (i : Fin 2) : Type :=
   {w : FinPlace D.E // D.piM ∈ w.asIdeal ∧ ↑(D.levelPrime i) ∈ w.asIdeal}
 
@@ -157,8 +163,10 @@ lemma orderOf_chiMLocalRoot (hw : D.IsChosen w) :
   (D.exists_mulChar_orderOf_eq_sq_of_isChosen hw).choose_spec
 
 open scoped Classical in
-/-- The residue characters ω_w: at a chosen place the q₂-th power of the character
-`New.Data.chiMLocalRoot` of order q₂², and trivial elsewhere. -/
+/--
+The residue characters ω_w: at a chosen place the q₂-th power of the character
+`New.Data.chiMLocalRoot` of order q₂², and trivial elsewhere.
+-/
 def chiMLocal (w : FinPlace D.E) : MulChar (ResField w) ℂ :=
   if h : D.IsChosen w then D.chiMLocalRoot h ^ P.q₂ D.towerExp else 1
 
@@ -256,12 +264,16 @@ lemma exists_char_hasWeight (a n : ℕ) :
   obtain ⟨u, hu⟩ : IsUnit x := .of_pow_eq_one hx (NeZero.ne _)
   rw [← hu, Pi.pow_apply, pow_apply_coe, hu, D.chiMLocal_apply_eq_one_of_pow_q₁_eq_one hx, one_pow]
 
-/-- A fixed character of U(1)(𝔸), trivial on rational points, of weight −w₀ (`New.Data.liftWeight`
-at j = 0) and trivial tame part. -/
+/--
+A fixed character of U(1)(𝔸), trivial on rational points, of weight −w₀ (`New.Data.liftWeight`
+at j = 0) and trivial tame part.
+-/
 def chiZero : AutChar D.E := (D.exists_char_hasWeight 1 0).choose
 
-/-- A fixed character of U(1)(𝔸), trivial on rational points, of weight 0 and tame part ω
-(`New.Data.chiMLocal`). -/
+/--
+A fixed character of U(1)(𝔸), trivial on rational points, of weight 0 and tame part ω
+(`New.Data.chiMLocal`).
+-/
 def chiM : AutChar D.E := (D.exists_char_hasWeight 0 1).choose
 
 lemma chiZero_hasWeight :
@@ -271,10 +283,12 @@ lemma chiZero_hasWeight :
 lemma chiM_hasWeight : D.chiM.HasWeight 0 D.chiMLocal := by
   simpa [chiM, Pi.zero_def] using (D.exists_char_hasWeight 0 1).choose_spec
 
-/-- A pair: an integer 1 ≤ z ≤ t and a character ν of U(1)(𝔸) of weight −c, with z ≤ c(v) ≤ 4b at
+/--
+A pair: an integer 1 ≤ z ≤ t and a character ν of U(1)(𝔸) of weight −c, with z ≤ c(v) ≤ 4b at
 every infinite place v and tame part supported on the chosen places. Here t = `D.t` is the natural
 number 5r, r the rank of the target, and b = `D.b` is the real scale b of the data, the weight at
-the b-places. -/
+the b-places.
+-/
 structure CriticalPair where
   /-- The character ν of `U(1)(𝔸)`, trivial on rational points. -/
   character : AutChar D.E
@@ -285,9 +299,9 @@ structure CriticalPair where
   /-- The integer of the pair, a lower bound for c. -/
   z : ℕ
   /-- ν has weight -c and tame part ψ. -/
-  hasWeight : character.HasWeight (fun v : D.Φ ↦ -negWeight v) tamePart
+  hasWeight : character.HasWeight (fun v : D.Φ ↦ - negWeight v) tamePart
   /-- The tame part is trivial off the chosen places. -/
-  tamePart_eq_one (w : New.FinPlace D.E) (hw : ¬D.IsChosen w) : tamePart w = 1
+  tamePart_eq_one (w : New.FinPlace D.E) (hw : ¬ D.IsChosen w) : tamePart w = 1
   /-- `1 ≤ z ≤ t`. -/
   z_mem : z ∈ Set.Icc 1 D.t
   /-- c is at least `z` at every infinite place. -/
@@ -308,19 +322,22 @@ section FinitePairs
 
 open Set New AutChar Data CriticalPair
 
-/-- There are finitely many pairs for the data `D`: an integer `z ∈ [1, t]` with a character of
-`U(1)(𝔸)` of weight `-c`, `z ≤ c v ≤ 4 b`, whose tame part is trivial off the chosen places. -/
+/--
+There are finitely many pairs for the data `D`: an integer `z ∈ [1, t]` with a character of
+`U(1)(𝔸)` of weight `-c`, `z ≤ c v ≤ 4 b`, whose tame part is trivial off the chosen places.
+-/
 instance New.Data.finite_criticalPair {P : Parameters} {D : Data P} : Finite D.CriticalPair := by
   -- The weight, the integer `z` and the tame part range over finite sets, and there are finitely
   -- many characters of a given weight and tame part.
   let S : Finset (FinPlace D.E) := D.finite_isChosen.toFinset
-  let data (p : D.CriticalPair) :
-      Iic (fun _ : D.Φ ↦ ⌊4 * D.b⌋₊) × Icc 1 D.t × ∀ w : S, MulChar (ResField w.val) ℂ :=
+  let data (p : D.CriticalPair)
+      : Iic (fun _ : D.Φ ↦ ⌊4 * D.b⌋₊) × Icc 1 D.t × ∀ w : S, MulChar (ResField w.val) ℂ :=
     (⟨p.negWeight, fun v ↦ Nat.le_floor (p.negWeight_le v)⟩, ⟨p.z, p.z_mem⟩, S.restrict p.tamePart)
-  have h_data {p q : D.CriticalPair} (h_eq : data p = data q) :
-    p.negWeight = q.negWeight ∧ p.z = q.z ∧ p.tamePart = q.tamePart := by
-    obtain ⟨hc, hz, hψ⟩ : p.negWeight = q.negWeight ∧ p.z = q.z ∧ S.restrict p.tamePart = S.restrict
-      q.tamePart := by
+  have h_data {p q : D.CriticalPair} (h_eq : data p = data q)
+      : p.negWeight = q.negWeight ∧ p.z = q.z ∧ p.tamePart = q.tamePart := by
+    obtain ⟨hc, hz, hψ⟩
+        : p.negWeight = q.negWeight ∧ p.z = q.z
+          ∧ S.restrict p.tamePart = S.restrict q.tamePart := by
       simpa [data, Subtype.ext_iff] using h_eq
     refine ⟨hc, hz, funext fun w ↦ ?_⟩
     by_cases hw : D.IsChosen w
@@ -330,7 +347,7 @@ instance New.Data.finite_criticalPair {P : Parameters} {D : Data P} : Finite D.C
   refine .of_finite_fibers data (toFinite _) ?_
   rintro _ ⟨p, -, rfl⟩
   refine .of_finite_image (f := CriticalPair.character)
-    ((finite_setOf_hasWeight (fun v : D.Φ ↦ -p.negWeight v) p.tamePart).subset ?_) ?_
+    ((finite_setOf_hasWeight (fun v : D.Φ ↦ - p.negWeight v) p.tamePart).subset ?_) ?_
   · rintro _ ⟨q, ⟨-, hq⟩, rfl⟩
     obtain ⟨hc, -, hψ⟩ := h_data hq
     rw [← hc, ← hψ]
@@ -386,12 +403,14 @@ open Real Polynomial NeZero Parameters Finset
 
 variable {P : Parameters} (D : Data P)
 
-/-- At every infinite place `v : D.Φ` of the field `E` of exponent `s = D.towerExp`, the generator
+/--
+At every infinite place `v : D.Φ` of the field `E` of exponent `s = D.towerExp`, the generator
 `δ = P.deltaE s` of the different has `|δ|_v` in `[x ^ 10, x ^ 12]`, where `x = exp D.logX` is the
 smallest of the three scales `x`, `x₁`, `b` of the data: the upper bound for `u = true`, the lower
-bound for `u = false`. -/
-instance hasLogBound_deltaE (v : D.Φ) (u : Bool) :
-    D.HasLogBound u (v (P.deltaE D.towerExp)) ((if u then 12 else 10) * D.logX) := by
+bound for `u = false`.
+-/
+instance hasLogBound_deltaE (v : D.Φ) (u : Bool)
+    : D.HasLogBound u (v (P.deltaE D.towerExp)) ((if u then 12 else 10) * D.logX) := by
   -- The term `log A`, bounded by `P.constantBound`, is negligible against `log x`, while
   -- `towerDeg s` has size about `x ^ 11`.
   obtain ⟨A, hA, h_log, h_eq⟩ := exists_abs_log_le_and_apply_deltaE_eq v
@@ -416,10 +435,12 @@ lemma rootDisc_mem_Icc : D.rootDisc ∈ Set.Icc (D.x ^ 10) (D.x ^ 12) := by
   · refine le_of_pow_le_pow_left₀ (ne D.f) (by positivity) ?_
     grw [h_prod, h_upper, prod_const, card_univ]
 
-/-- The root discriminant of `E` has the upper exponent `12 log x` (`u = true`) and the lower
-exponent `10 log x` (`u = false`), where `log x = D.logX`. -/
-instance hasLogBound_rootDisc (u : Bool) :
-    D.HasLogBound u D.rootDisc ((if u then 12 else 10) * D.logX) :=
+/--
+The root discriminant of `E` has the upper exponent `12 log x` (`u = true`) and the lower
+exponent `10 log x` (`u = false`), where `log x = D.logX`.
+-/
+instance hasLogBound_rootDisc (u : Bool)
+    : D.HasLogBound u D.rootDisc ((if u then 12 else 10) * D.logX) :=
   .of_mem_Icc (D.x ^ 10) (D.x ^ 12) D.rootDisc_mem_Icc (by cases u <;> simp)
 
 end New.Data

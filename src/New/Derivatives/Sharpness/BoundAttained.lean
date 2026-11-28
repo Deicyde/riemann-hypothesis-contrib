@@ -63,8 +63,8 @@ lemma copyEmbedding_apply {X : Type} {k : ℕ} (b : Fin k) (x : X × Unit) :
     copyEmbedding b x = (x.1, b, ()) := rfl
 
 /-- The exponent in `k` copies of the variables whose part in the `b`-th copy is `α b`. -/
-noncomputable def copyExponent {X : Type} {k : ℕ} (α : Fin k → X × Unit →₀ ℕ) :
-    X × Fin k × Unit →₀ ℕ :=
+noncomputable def copyExponent {X : Type} {k : ℕ} (α : Fin k → X × Unit →₀ ℕ)
+    : X × Fin k × Unit →₀ ℕ :=
   ∑ b : Fin k, (α b).embDomain (copyEmbedding b)
 
 /-- The part of `copyExponent α` in the `b`-th copy is `α b`. -/
@@ -149,32 +149,39 @@ lemma norm_natCast_prod_eq_rpow_neg_sum {p : ℕ} [hp : Fact p.Prime] [PadicPlac
   rw [map_natCast, Nat.cast_prod]
   exact New.norm_prod_natCast_eq_rpow_neg_sum (p := p) hn
 
-/-- The hermitian space `Hom(E, E¹²)` of `12 × 1` matrices over `E = D.E`, where `E` and `E¹²` carry
+/--
+The hermitian space `Hom(E, E¹²)` of `12 × 1` matrices over `E = D.E`, where `E` and `E¹²` carry
 the sum of the norms of the coordinates (`stdSpace`). The sign of a coordinate is the product of
 the signs of its row and column, here always `+1` (`homSigns 1 1`). The vectors of this file lie
 in `𝒮 D.twelveSpace`, the space of functions on adelic vectors that models the adelic Heisenberg
-representation. -/
-noncomputable abbrev twelveSpace {P : Parameters} (D : Data P) :
-    Space D.E (Fin 12 × Unit) (homSigns 1 1) :=
+representation.
+-/
+noncomputable abbrev twelveSpace {P : Parameters} (D : Data P)
+    : Space D.E (Fin 12 × Unit) (homSigns 1 1) :=
   (stdSpace D.E Unit).hom (stdSpace D.E (Fin 12))
 
-/-- The series `Space.jetSeries` of a vector `F` on `Hom(E, E¹²)` at the scale `a = π_M * jetScale`:
+/--
+The series `Space.jetSeries` of a vector `F` on `Hom(E, E¹²)` at the scale `a = π_M * jetScale`:
 for `F` in the finite part it is the Taylor series at `0` of `z ↦ Θ_F(a z)`, where `Θ_F` is the
 theta function `Space.entireTheta F`. Here `π_M` is the conjugate of `D.piMBar` and
 `jetScale = periodFactor * areaScale / cmPeriod`, where `cmPeriod 𝓞_K` is the lattice of the curve
 `P.cmCurve`, `areaScale = √(2π / √d)` for `d = P.d`, and
 `periodFactor = vacuumRoot / chowlaSelbergUnit` is a constant of the field `D.E = P.E D.towerExp`,
-the cyclotomic extension of `K` at the level `D.towerExp` of the tower. -/
-noncomputable abbrev twelveTaylor {P : Parameters} (D : Data P) :
-    𝒮 D.twelveSpace →ₗ[ℂ] MvPowerSeries (D.Φ × Fin 12 × Unit) ℂ :=
+the cyclotomic extension of `K` at the level `D.towerExp` of the tower.
+-/
+noncomputable abbrev twelveTaylor {P : Parameters} (D : Data P)
+    : 𝒮 D.twelveSpace →ₗ[ℂ] MvPowerSeries (D.Φ × Fin 12 × Unit) ℂ :=
   D.twelveSpace.jetSeries (conj ↑D.piMBar * P.jetScale D.towerExp)
 
-/-- The vector on `Hom(E, E¹²)` whose part at infinity is the Gaussian `exp(-|x|² / 2)`
+/--
+The vector on `Hom(E, E¹²)` whose part at infinity is the Gaussian `exp(-|x|² / 2)`
 (`Fock.vacVector`), whose part at the places dividing `𝔪` is the indicator of the class `y₀` of
 matrices over the residue ring `𝔪.ResidueRing = O_E/𝔪`, and which agrees with the vacuum
-`Space.vacElem` at the other finite places. The three parts are put together by `modDatum`. -/
-noncomputable abbrev indicatorDatum {P : Parameters} (D : Data P) (𝔪 : Modulus D.E)
-    (y₀ : Matrix (Fin 12) Unit 𝔪.ResidueRing) : 𝒮 D.twelveSpace :=
+`Space.vacElem` at the other finite places. The three parts are put together by `modDatum`.
+-/
+noncomputable abbrev indicatorDatum
+    {P : Parameters} (D : Data P) (𝔪 : Modulus D.E) (y₀ : Matrix (Fin 12) Unit 𝔪.ResidueRing)
+    : 𝒮 D.twelveSpace :=
   modDatum (stdSpace D.E Unit) (stdSpace D.E (Fin 12)) 𝔪 (Pi.single y₀ 1) Fock.vacVector
 
 /-- Let `D` be admissible data for the parameters `P`, with `K = P.K = ℚ(√-d)` and `E = D.E` the
@@ -441,7 +448,8 @@ lemma norm_map_mul_intVacuum_le {P : Parameters} (D : Data P) {l : D.Φ → ℕ}
   exact (mul_le_mul h_int h_vac (norm_nonneg _) (exp_nonneg _)).trans
     (by rw [← exp_add]; exact Real.exp_le_exp.2 h_exponent)
 
-/-- Sharpness. Let `D` be admissible data for the parameters `P`, with `K = ℚ(√-d)` for the prime
+/--
+Sharpness. Let `D` be admissible data for the parameters `P`, with `K = ℚ(√-d)` for the prime
 `d = P.d` and `E = D.E = P.E D.towerExp` the extension of `K` by the roots of unity of order
 `q₁ = D.q₁`. For degrees `l` with `κ ≤ l ≤ κ + x ^ 42` at the weights `κ = D.weight` there is a
 number `t ≠ 0` with all conjugates at most `exp (f m b / k)` such that, at every prime `p` and
@@ -450,17 +458,22 @@ embedding `ιₚ : ℂ → ℂ_[p]`, for some exponent `γ` of degree `l` and so
 `vacuumScale ^ 12 ∏ l!`, is at most `S_p + v(t)`.
 
 The numbers `x`, `b` are scales and `m`, `r` ranks of `D`, `k = r + 1 - m`, and `π_M = D.piM` is an
-integer of `K` of norm `D.M`. -/
-theorem exists_rpow_neg_localPrimeSumTotal_le_norm_coeff {P : Parameters} (D : Data P) (l : D.Φ → ℕ)
-    (hl : ∀ τ : D.Φ, (D.weight τ : ℝ) ≤ l τ ∧ l τ ≤ (D.weight τ : ℝ) + D.x ^ 42) :
-    ∃ t : ℂ, t ≠ 0 ∧
-      (∀ σ : ℂ ≃+* ℂ, ‖σ t‖ ≤ exp (D.f * D.m / D.k * D.b)) ∧
-      ∀ 𝔪 : Modulus D.E, 𝔪.ideal = .span {D.piM} → ∀ (p : ℕ) [Fact p.Prime] [PadicPlace p],
-        ∃ (γ : D.Φ × Fin 12 × Unit →₀ ℕ) (y₀ : Matrix (Fin 12) Unit 𝔪.ResidueRing),
-          (∀ τ : D.Φ, ∑ b : Fin 12, γ (τ, b, ()) = l τ) ∧
-          p ^ (-D.localPrimeSumTotal p) ≤ ‖ιₚ
-            (P.vacuumScale D.towerExp ^ 12 / t * (∏ τ : D.Φ, (l τ)!) *
-            coeff γ (D.twelveTaylor (D.indicatorDatum 𝔪 y₀)))‖ := by
+integer of `K` of norm `D.M`.
+-/
+theorem exists_rpow_neg_localPrimeSumTotal_le_norm_coeff
+    {P : Parameters} (D : Data P) (l : D.Φ → ℕ)
+    (hl : ∀ τ : D.Φ, (D.weight τ : ℝ) ≤ l τ ∧ l τ ≤ (D.weight τ : ℝ) + D.x ^ 42)
+    : ∃ t : ℂ,
+      t ≠ 0 ∧ (∀ σ : ℂ ≃+* ℂ, ‖σ t‖ ≤ exp (D.f * D.m / D.k * D.b))
+        ∧ ∀ 𝔪 : Modulus D.E,
+          𝔪.ideal = .span {D.piM}
+            → ∀ (p : ℕ) [Fact p.Prime] [PadicPlace p],
+              ∃ (γ : D.Φ × Fin 12 × Unit →₀ ℕ) (y₀ : Matrix (Fin 12) Unit 𝔪.ResidueRing),
+                (∀ τ : D.Φ, ∑ b : Fin 12, γ (τ, b, ()) = l τ)
+                  ∧ p ^ (- D.localPrimeSumTotal p)
+                    ≤ ‖ιₚ
+                      (P.vacuumScale D.towerExp ^ 12 / t * (∏ τ : D.Φ, (l τ)!) *
+                      coeff γ (D.twelveTaylor (D.indicatorDatum 𝔪 y₀)))‖ := by
   -- Take `t = M ^ (12 f) c₀ ∏ B_τ ^ 2` for a nonzero value `c₀` of the integral vacuum; combine
   -- the reduction with the bound for `val₁₂(l)`.
   obtain ⟨y, hy⟩ := exists_intVacuum_ne_zero (V := D.twelveSpace)
@@ -469,18 +482,21 @@ theorem exists_rpow_neg_localPrimeSumTotal_le_norm_coeff {P : Parameters} (D : D
   let intFactor : ℕ := D.M ^ (D.f * 12) * ∏ τ : D.Φ, D.lossProduct (l τ) ^ 2
   set c₀ : ℂ := intVacuum D.twelveSpace (finVec y)
   have ht : intFactor * c₀ ≠ 0 :=
-    mul_ne_zero (Nat.cast_ne_zero.2 (mul_ne_zero (pow_ne_zero _ (NeZero.ne D.M))
-      (Finset.prod_ne_zero_iff.2 fun τ _ ↦ pow_ne_zero 2 (D.lossProduct_ne_zero _)))) hy
-  refine ⟨intFactor * c₀, ht, D.norm_map_mul_intVacuum_le (fun τ ↦ (hl τ).2) y,
-    fun 𝔪 h𝔪 p hp _ ↦ ?_⟩
+    mul_ne_zero
+      (Nat.cast_ne_zero.2 (mul_ne_zero (pow_ne_zero _ (NeZero.ne D.M))
+        (Finset.prod_ne_zero_iff.2 fun τ _ ↦ pow_ne_zero 2 (D.lossProduct_ne_zero _))))
+      hy
+  refine
+    ⟨intFactor * c₀, ht, D.norm_map_mul_intVacuum_le (fun τ ↦ (hl τ).2) y, fun 𝔪 h𝔪 p hp _ ↦ ?_⟩
   obtain ⟨ν, rfl⟩ : ∃ ν : D.Φ × Unit →₀ ℕ, (fun τ ↦ ν (τ, ())) = l :=
     ⟨equivFunOnFinite.symm fun x ↦ l x.1, rfl⟩
   obtain ⟨i₀, hi₀⟩ := h_unit p
   have h_degree (i : J) : ν.degree * 3 ≤ c i := by
     have h_sum : (ν.degree : ℝ) ≤ D.f * (2 * D.b) := by
       rw [degree_eq_sum, cast_sum, sum_prod_type_right, Fintype.sum_unique, PUnit.default_eq_unit]
-      refine (Finset.sum_le_sum (g := fun _ ↦ 2 * D.b) fun τ _ ↦
-        (hl τ).2.trans (weight_add_x_pow_le_two_mul_b D τ)).trans ?_
+      refine (Finset.sum_le_sum
+        (g := fun _ ↦ 2 * D.b)
+        fun τ _ ↦ (hl τ).2.trans (weight_add_x_pow_le_two_mul_b D τ)).trans ?_
       rw [sum_const, Finset.card_univ, nsmul_eq_mul]
     rify
     linarith [hc i]
@@ -496,41 +512,41 @@ theorem exists_rpow_neg_localPrimeSumTotal_le_norm_coeff {P : Parameters} (D : D
   set scaledVac : ℂ := D.M ^ (D.f * 12) * c₀ with h_scaledVac
   have hp_pos : (0 : ℝ) < p := mod_cast hp.out.pos
   have h_normVac : 0 < ‖(ιₚ scaledVac : ℂ_[p])‖ := by
-    have h_ne : scaledVac ≠ 0 :=
-      mul_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.2 (NeZero.ne D.M))) hy
+    have h_ne : scaledVac ≠ 0 := mul_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.2 (NeZero.ne D.M))) hy
     exact norm_pos_iff.2 fun h ↦ h_ne (ιₚ.injective (h.trans ιₚ.map_zero'.symm))
-  have h_factor :
-      intFactor * c₀ = scaledVac * (∏ τ : D.Φ, D.lossProduct (ν (τ, ())) : ℕ) ^ 2 := by
+  have h_factor : intFactor * c₀ = scaledVac * (∏ τ : D.Φ, D.lossProduct (ν (τ, ())) : ℕ) ^ 2 := by
     push_cast [h_scaledVac, intFactor, Finset.prod_pow]
     ring
   have h_normLoss : ‖(ιₚ (∏ τ : D.Φ, D.lossProduct (ν (τ, ())) : ℕ) : ℂ_[p])‖ = p ^ (-valLoss) :=
     norm_natCast_prod_eq_rpow_neg_sum fun τ ↦ D.lossProduct_ne_zero _
   have h_normFactorial : ‖(ιₚ (∏ τ : D.Φ, (ν (τ, ()))! : ℕ) : ℂ_[p])‖ = p ^ (-valFactorial) :=
     norm_natCast_prod_eq_rpow_neg_sum fun τ ↦ factorial_ne_zero _
-  calc (p : ℝ) ^ (-D.localPrimeSumTotal p)
-      = (‖(ιₚ scaledVac : ℂ_[p])‖ * (p ^ (-valLoss)) ^ 2)⁻¹ * p ^ (-valFactorial) *
-          (p ^ (-(D.localPrimeSumTotal p + 2 * valLoss - valFactorial)) *
-            ‖(ιₚ scaledVac : ℂ_[p])‖) := by
-        rw [mul_inv, ← rpow_natCast, ← rpow_mul hp_pos.le, ← rpow_neg hp_pos.le]
-        have h_cancel : ‖(ιₚ scaledVac : ℂ_[p])‖⁻¹ * ‖(ιₚ scaledVac : ℂ_[p])‖ = 1 :=
-          inv_mul_cancel₀ h_normVac.ne'
-        calc (p : ℝ) ^ (-D.localPrimeSumTotal p)
-            = ((p : ℝ) ^ (-(-valLoss * (2 : ℕ))) * p ^ (-valFactorial) *
-                p ^ (-(D.localPrimeSumTotal p + 2 * valLoss - valFactorial))) *
-                (‖(ιₚ scaledVac : ℂ_[p])‖⁻¹ * ‖(ιₚ scaledVac : ℂ_[p])‖) := by
-              rw [h_cancel, mul_one, ← rpow_add hp_pos, ← rpow_add hp_pos]
-              congr 1
-              push_cast
-              ring
-          _ = _ := by ring
-    _ ≤ (‖(ιₚ scaledVac : ℂ_[p])‖ * (p ^ (-valLoss)) ^ 2)⁻¹ * p ^ (-valFactorial) *
-          ‖ιₚ (P.vacuumScale D.towerExp ^ 12 * coeff γ
+  calc
+    (p : ℝ) ^ (- D.localPrimeSumTotal p)
+        = (‖(ιₚ scaledVac : ℂ_[p])‖ * (p ^ (-valLoss)) ^ 2)⁻¹ * p ^ (-valFactorial)
+          * (p ^ (-(D.localPrimeSumTotal p + 2 * valLoss - valFactorial))
+            * ‖(ιₚ scaledVac : ℂ_[p])‖) := by
+      rw [mul_inv, ← rpow_natCast, ← rpow_mul hp_pos.le, ← rpow_neg hp_pos.le]
+      have h_cancel : ‖(ιₚ scaledVac : ℂ_[p])‖⁻¹ * ‖(ιₚ scaledVac : ℂ_[p])‖ = 1 :=
+        inv_mul_cancel₀ h_normVac.ne'
+      calc
+        (p : ℝ) ^ (- D.localPrimeSumTotal p)
+            = ((p : ℝ) ^ (-(-valLoss * (2 : ℕ))) * p ^ (-valFactorial)
+                * p ^ (-(D.localPrimeSumTotal p + 2 * valLoss - valFactorial)))
+              * (‖(ιₚ scaledVac : ℂ_[p])‖⁻¹ * ‖(ιₚ scaledVac : ℂ_[p])‖) := by
+          rw [h_cancel, mul_one, ← rpow_add hp_pos, ← rpow_add hp_pos]
+          congr 1
+          push_cast
+          ring
+        _ = _ := by ring
+    _ ≤ (‖(ιₚ scaledVac : ℂ_[p])‖ * (p ^ (-valLoss)) ^ 2)⁻¹ * p ^ (-valFactorial)
+        * ‖ιₚ (P.vacuumScale D.towerExp ^ 12 * coeff γ
             (D.twelveTaylor (D.indicatorDatum 𝔪 y₀)))‖ := by
-        gcongr
+      gcongr
     _ = _ := by
-        rw [← h_normLoss, ← h_normFactorial, h_factor]
-        simp only [map_mul, map_div₀, map_pow, norm_mul, norm_div, norm_pow]
-        ring
+      rw [← h_normLoss, ← h_normFactorial, h_factor]
+      simp only [map_mul, map_div₀, map_pow, norm_mul, norm_div, norm_pow]
+      ring
 
 end Data
 

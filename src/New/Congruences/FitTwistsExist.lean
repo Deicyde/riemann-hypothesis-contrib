@@ -324,7 +324,8 @@ lemma New.Selmer.exists_isMainSummand_mainPair {P : Parameters} {D : Data P} {�
   simpa only [DescentPair.rankDiff, Fintype.card_unit, h_card, h_weight, h_shift,
     Multiset.map_singleton, h_jump] using isMainSummandWeights_mainPair hq
 
-/-- **Splitting, pairs of rank `r`.** Let `ϑ` be a twist and `1 ≤ j ≤ m`. The map `D.goodLift ϑ j`
+/--
+**Splitting, pairs of rank `r`.** Let `ϑ` be a twist and `1 ≤ j ≤ m`. The map `D.goodLift ϑ j`
 is the theta lift, for the data `D.descentPair ϑ j`, of the good forms on the rank `r` space
 `W_j = D.spaceW j`; good forms have principal level at the chosen places and lie in the image of the
 idempotent `D.e₀`. Its range, the space of lifts, is spanned by its forms `y` with two properties.
@@ -334,20 +335,23 @@ idempotent `D.e₀`. Its range, the space of lifts, is spanned by its forms `y` 
   of `c` (`typeProjection`), which is contained in that of `D.e₀`.
 * There is a system `q (w, i)` of Hecke eigenvalues, one for each finite place `w` and number `i` of
   the Hecke operator, that occurs in a good form on `W_m`, such that at the split places outside the
-  level the Hecke polynomial of `y` is that of a lift of `q`. -/
-theorem New.Selmer.range_goodLift_le_span_hasLiftHeckePolynomial {P : Parameters} {D : Data P}
-    (j : D.LiftIndex) (ϑ : D.Twist) :
-    (D.goodLift ϑ j).range ≤ span ℂ {y ∈ (D.goodLift ϑ j).range |
-      (∃ c : ∀ i : (D.descentPair ϑ j).ChosenIndex,
-        (ResField ((D.descentPair ϑ j).chosenPlace i))[X],
-        y ∈ (typeProjection (D.descentPair ϑ j) c).range ∧
-        IsLiftSetting (D.descentPair ϑ j) c ϑ ∧
-        (typeProjection (D.descentPair ϑ j) c).range ≤
-          ((D.descentPair ϑ j).groupAlgAction D.e₀).range) ∧
-      ∃ q : FinPlace D.E × ℕ → ℂ,
-        D.goodForms (D.spaceW D.m) ⊓ D.eigenPart (D.spaceW D.m) q ≠ ⊥ ∧
-        (D.descentPair ϑ j).HasLiftHeckePolynomial y fun (w : FinPlace D.E) (i : ℕ) ↦
-          q (w, i)} := by
+  level the Hecke polynomial of `y` is that of a lift of `q`.
+-/
+theorem New.Selmer.range_goodLift_le_span_hasLiftHeckePolynomial
+    {P : Parameters} {D : Data P} (j : D.LiftIndex) (ϑ : D.Twist)
+    : (D.goodLift ϑ j).range
+      ≤ span ℂ
+        {y ∈ (D.goodLift ϑ j).range |
+          (∃ c : ∀ i : (D.descentPair ϑ j).ChosenIndex,
+            (ResField ((D.descentPair ϑ j).chosenPlace i))[X],
+            y ∈ (typeProjection (D.descentPair ϑ j) c).range ∧
+            IsLiftSetting (D.descentPair ϑ j) c ϑ ∧
+            (typeProjection (D.descentPair ϑ j) c).range ≤
+              ((D.descentPair ϑ j).groupAlgAction D.e₀).range) ∧
+          ∃ q : FinPlace D.E × ℕ → ℂ,
+            D.goodForms (D.spaceW D.m) ⊓ D.eigenPart (D.spaceW D.m) q ≠ ⊥ ∧
+            (D.descentPair ϑ j).HasLiftHeckePolynomial y fun (w : FinPlace D.E) (i : ℕ) ↦
+              q (w, i)} := by
   -- the space of lifts is spanned by the lifts of good eigenforms `y` on `W_j`
   refine D.range_goodLift_le fun q y hy c hc hy_c ↦ ?_
   obtain rfl | hy_ne := eq_or_ne y 0
@@ -358,12 +362,16 @@ theorem New.Selmer.range_goodLift_le_span_hasLiftHeckePolynomial {P : Parameters
     hy_ne ((D.goodForms_inf_eigenPart_eq_bot_of_eq_bot (D.spaceW j) (D.spaceW jmax) h_bot).le hy)
   obtain ⟨hy_good : y ∈ D.goodForms (D.spaceW j), hy_eigen : y ∈ D.eigenPart (D.spaceW j) q⟩ := hy
   have h_range : D.singleLift ϑ j y ∈ (D.goodLift ϑ j).range := ⟨⟨y, hy_good⟩, rfl⟩
-  have h_lifts : (D.descentPair ϑ j).HasLiftHeckePolynomial (D.singleLift ϑ j y) fun w i ↦
-    q (w, i) :=
+  have h_lifts
+      : (D.descentPair ϑ j).HasLiftHeckePolynomial (D.singleLift ϑ j y) fun w i ↦ q (w, i) :=
     D.hasLiftHeckePolynomial_singleLift _ hy_eigen
-  exact subset_span ⟨h_range, ⟨c, hy_c, isLiftSetting_descentPair D ϑ j hc,
-    D.range_tupleIdem_le hc⟩,
-    q, hq, h_lifts⟩
+  exact subset_span ⟨
+    h_range,
+    ⟨c, hy_c, isLiftSetting_descentPair D ϑ j hc, D.range_tupleIdem_le hc⟩,
+    q,
+    hq,
+    h_lifts
+  ⟩
 
 /-- **The twisting theorem for two families of main summands.** Let `ℓ` be a prime,
 `ι : ℂ ≃ ℚ̄_ℓ`, and `e = twistError ℓ D = (4 f + 3) r v_ℓ(D.chosenGroupOrder) + 2 ^ (-ℓ)`, where

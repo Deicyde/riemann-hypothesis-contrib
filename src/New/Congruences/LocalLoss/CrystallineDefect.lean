@@ -54,14 +54,16 @@ section OnePlaceDefect
 
 open New Period Lift CoeffRing Module Nat NeZero NumberField Data Finset
 
-/-- The start of the far window at the embedding `σ` that holds the jumps near `∓ w_i`: it is
+/--
+The start of the far window at the embedding `σ` that holds the jumps near `∓ w_i`: it is
 `D.natB` if the place of `σ` lies in `D.bPlaces` and `D.offWeight` otherwise, plus `i Δ + h₂ - 2 t`
-with `Δ = D.gap`, `h₂ = D.halfGap` and `t = D.t`. -/
-noncomputable abbrev New.Selmer.farWindowStart {P : Parameters} (D : Data P) (i : ℕ)
-    (σ : D.E →+* ℂ) : ℕ :=
-  ite (InfinitePlace.mk σ ∈ D.bPlaces)
-  (h := Classical.dec (InfinitePlace.mk σ ∈ D.bPlaces)) D.natB D.offWeight +
-    (i * D.gap + D.halfGap - 2 * D.t)
+with `Δ = D.gap`, `h₂ = D.halfGap` and `t = D.t`.
+-/
+noncomputable abbrev New.Selmer.farWindowStart {P : Parameters} (D : Data P) (i : ℕ) (σ : D.E →+* ℂ)
+    : ℕ :=
+  ite (InfinitePlace.mk σ ∈ D.bPlaces) (h := Classical.dec (InfinitePlace.mk σ ∈ D.bPlaces)) D.natB
+      D.offWeight
+    + (i * D.gap + D.halfGap - 2 * D.t)
 
 /-- Let `w_i = D.liftWeight i` be the `i`-th weight at the place of `σ`, and let `ε = cmSign σ` be
 `1` if `σ` is in the CM type and `-1` otherwise. Let each member of `J` be low
@@ -385,28 +387,38 @@ lemma New.Selmer.crystalline_bound_le_defectBound {P : Parameters} (D : Data P) 
       rw [defectBound, ← hv]
       field_simp
 
-/-- The lattices `L i` are the summands at a place above `ℓ`, and `F`, `K`, `U` are the data of a
+/--
+The lattices `L i` are the summands at a place above `ℓ`, and `F`, `K`, `U` are the data of a
 class `New.Lift.InClass F K U` adapted to them. The summand `L none` is the main summand, of rank
 `r` and with jumps `J g` at `coefficientEmbedding O g`; the summand `L (some c)` has the single jump
-`c < t`. -/
-structure New.Selmer.IsSummandClass {P : Parameters} (D : Data P) {ℓ : ℕ} [ThePrime ℓ] {Γ : Type}
-    [Group Γ] [𝒥 : OverGp Γ ℓ] {O : CoeffRing ℓ} (r : ℕ) (J : Gp ℓ → Multiset ℤ) {t : ℕ}
-    (L : Option (Fin t) → GalLattice O Γ) (F : Filter Γ) (K : Γ → Polynomial O → Prop)
-    (U : (O →ₐ[ℤ_[ℓ]] ℂ_[ℓ]) → Finset ℤ) : Prop where
-  /-- The class is tame, with `ℓ` one of the primes `D.levelPrime n`, or crystalline with no
-  condition on inertia. -/
-  tame_or_crystalline :
-    (∃ n : Fin 2, ℓ = D.levelPrime n ∧
-      ∀ s : Γ, IsWeilPair (𝒥.toGp s) 0 → IsTameType ℓ D.r ((D.r + D.t) * D.r) (K s)) ∨
-    (F = ⊤ ∧ K = ⊥)
+`c < t`.
+-/
+structure New.Selmer.IsSummandClass
+    {P : Parameters} (D : Data P)
+    {ℓ : ℕ} [ThePrime ℓ]
+    {Γ : Type} [Group Γ] [𝒥 : OverGp Γ ℓ]
+    {O : CoeffRing ℓ}
+    (r : ℕ) (J : Gp ℓ → Multiset ℤ)
+    {t : ℕ} (L : Option (Fin t) → GalLattice O Γ)
+    (F : Filter Γ) (K : Γ → Polynomial O → Prop) (U : (O →ₐ[ℤ_[ℓ]] ℂ_[ℓ]) → Finset ℤ)
+    : Prop where
+  /--
+  The class is tame, with `ℓ` one of the primes `D.levelPrime n`, or crystalline with no
+  condition on inertia.
+  -/
+  tame_or_crystalline
+    : (∃ n : Fin 2,
+        ℓ = D.levelPrime n
+          ∧ ∀ s : Γ, IsWeilPair (𝒥.toGp s) 0 → IsTameType ℓ D.r ((D.r + D.t) * D.r) (K s))
+      ∨ (F = ⊤ ∧ K = ⊥)
   /-- Every jump allowed by `U` is a jump of one of the summands. -/
-  exists_jump_ne_zero (γ : O →ₐ[ℤ_[ℓ]] ℂ_[ℓ]) (u : ℤ) (hu : u ∈ U γ) :
-    ∃ i : Option (Fin t), jump (L i).ρ γ u ≠ 0
+  exists_jump_ne_zero (γ : O →ₐ[ℤ_[ℓ]] ℂ_[ℓ]) (u : ℤ) (hu : u ∈ U γ)
+    : ∃ i : Option (Fin t), jump (L i).ρ γ u ≠ 0
   /-- The main summand has the jumps `J`. -/
   hasJumps_none (g : Gp ℓ) : HasJumps (L none).ρ (coefficientEmbedding O g) (J g)
   /-- The summand `L (some c)` has the single jump `c`. -/
-  hasJumps_some (c : Fin t) (g : Gp ℓ) : HasJumps (L (some c)).ρ (coefficientEmbedding O g)
-    {(c : ℤ)}
+  hasJumps_some (c : Fin t) (g : Gp ℓ)
+    : HasJumps (L (some c)).ρ (coefficientEmbedding O g) {(c : ℤ)}
   /-- The main summand has rank `r`. -/
   finrank_none : finrank O (L none) = r
 

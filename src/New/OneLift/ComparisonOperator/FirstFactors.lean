@@ -540,18 +540,23 @@ lemma weylNormSq_stdClassSum_stdClassSum_le {j : D.LiftIndex} {q n : ℕ} {H : �
   grw (transparency := default) [weylNormSq_comp_smul, (sqrt_le_iff.1 h_sum).2]
   exact firstFactorSize_sq_le_exp hq hn hn_le_M H_pos H_le φ
 
-/-- The vector `y` of weight `(untwistedDescentPair j).colsPlus` is integral at `h` away from the
+/--
+The vector `y` of weight `(untwistedDescentPair j).colsPlus` is integral at `h` away from the
 norm `ϑ.normQ` of Q (the product of the norms of the places in `ϑ.Q`), and has small conjugates if
 `ϑ.Q` is empty: the bound is exp(f m b log² b), for the number f = `D.f` of infinite places, the
-weight b = `D.b` and log b = `D.logB`. -/
-structure IsIntegralAndSmall (ϑ : D.TameChar) (j : D.LiftIndex) (h : Gf D.E (FirstFactorIndex j))
-    (y : WeylIndex (FirstFactorIndex j) (untwistedDescentPair j).colsPlus → ℂ) : Prop where
+weight b = `D.b` and log b = `D.logB`.
+-/
+structure IsIntegralAndSmall
+    (ϑ : D.TameChar)
+    (j : D.LiftIndex) (h : Gf D.E (FirstFactorIndex j))
+    (y : WeylIndex (FirstFactorIndex j) (untwistedDescentPair j).colsPlus → ℂ)
+    : Prop where
   /-- `y` is `p`-integral at `h` for every prime `p` that does not divide `ϑ.normQ`. -/
-  weylGauge_le_one (p : ℕ) [Fact p.Prime] [PadicPlace p] (hp : p.Coprime ϑ.normQ) :
-    weylGauge (untwistedDescentPair j).colsPlus 0 h y ≤ 1
+  weylGauge_le_one (p : ℕ) [Fact p.Prime] [PadicPlace p] (hp : p.Coprime ϑ.normQ)
+    : weylGauge (untwistedDescentPair j).colsPlus 0 h y ≤ 1
   /-- If `ϑ.Q` is empty, all conjugates of `y` have squared norm at most exp(f m b log² b). -/
-  weylNormSq_le (hQ : ϑ.Q = ∅) (φ : ℂ ≃+* ℂ) :
-    weylNormSq (φ ∘ y) ≤ Real.exp (D.f * D.m * D.b * D.logB ^ 2)
+  weylNormSq_le (hQ : ϑ.Q = ∅) (φ : ℂ ≃+* ℂ)
+    : weylNormSq (φ ∘ y) ≤ Real.exp (D.f * D.m * D.b * D.logB ^ 2)
 
 /-- Let `ϑ` be a tame character and χ′ = χ^j ϑ, where χ = `D.chiM` is the fixed character of U(1)(𝔸)
 of weight `0` and tame part `D.chiMLocal`. Take the theta kernel of the standard definite spaces
