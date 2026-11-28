@@ -128,6 +128,10 @@ lemma principalMinor_posBlockEmb_eq_one (τ : InfinitePlace E) (k : GInf E (1 : 
   simp [← principalMinor_submatrix j, principalMinor_fromBlocks, principalMinor_of_forall,
     DiscreteSeries.principalMinor_of_forall_not]
 
+lemma continuous_posBlockEmb : Continuous (posBlockEmb (E := E) j) := by
+  simp only [continuous_pi_iff, continuous_U_iff_matrix, val_posBlockEmb_apply_coe]
+  fun_prop
+
 section
 
 variable [NumberField E]
@@ -273,8 +277,6 @@ end Blocks
 
 variable [NumberField E]
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.sum in
 /-- Let `γ τ = card l - card (ι τ)` and let `y` lie in `PairFock`, the Fock space of the pair
 U(signs on `n`) × U(`a`), on which `(x, u)` acts by the real Weil representation `realPairWeil γ 0`,
 twisted by `∏_τ (det u_τ) ^ γ τ` and not by `det x`.
@@ -318,8 +320,7 @@ lemma exists_mul_eq_circle_mean (j : m ⊕ l ≃ n) (e : p ⊕ a ≃ m)
     exact h_mem.imp fun κ hκ ℓ hℓ ↦ congrFun hκ ⟨ℓ, hℓ⟩
   -- A line of functions of `ℓ` is closed and `mean` is continuous, so it is enough to treat Fock
   -- vectors of polynomials.
-  have h_cont : Continuous (posBlockEmb (E := E) j) := by
-    simp only [continuous_pi_iff, continuous_U_iff_matrix, val_posBlockEmb_apply_coe]; fun_prop
+  have h_cont := continuous_posBlockEmb (E := E) j
   have h_cont_torus : Continuous (frameTorus E e) := by fun_prop [frameTorus]
   refine isClosed_property denseRange_polyVector
     ((isClosedMap_smul_left _).isClosed_range.preimage_of_continuous (f := mean)) (fun P ↦ ?_) y
@@ -889,7 +890,7 @@ lemma integral_one_quotMeasure_of_isEmpty [IsEmpty b] {t : b → ℤˣ} (V' : Sp
   obtain rfl : t = 1 := Subsingleton.elim t 1
   have h_sub : Subsingleton (DoubleCoset.Quotient (V'.Γf : Set (Gf E b)) (stdLevel E b)) :=
     Quotient.mk''_surjective.subsingleton
-  have h_class : Unique (DoubleCoset.Quotient (V'.Γf : Set (Gf E b)) (stdLevel E b)) :=
+  let h_class : Unique (DoubleCoset.Quotient (V'.Γf : Set (Gf E b)) (stdLevel E b)) :=
     uniqueOfSubsingleton (DoubleCoset.mk V'.Γf (stdLevel E b) 1)
   have h_left : V'.Γ.FixesLeft (fun _ : G E (1 : b → ℤˣ) ↦ (1 : ℂ)) := fun _ _ _ ↦ rfl
   have h_level : stdLevel E b ≤ rightStabilizer fun _ : Gf E b ↦ (1 : ℂ) := fun _ _ _ ↦ rfl

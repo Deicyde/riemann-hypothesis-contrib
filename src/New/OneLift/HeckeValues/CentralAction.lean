@@ -113,6 +113,13 @@ lemma LValueData.normalizedCentralOp_trivialLift (z : Gf D.E Unit) :
         simp [← normalizedCentralOp_kernelForm]
     _ = Y.trivialLift := (Y.trivialLift_eq_stdClassSum_translate z⁻¹).symm
 
+/-- On algebraic forms of the weight of `Y`, translation by a scalar matrix commutes with every
+translation. -/
+lemma LValueData.commute_algFormRep_scalarFin (ν : unitary (𝔸f D.E)) (g : Gf D.E n) :
+    Commute (algFormRep Y.descentPair.columnCount Y.descentPair.detExp (scalarFin n ν))
+      (algFormRep Y.descentPair.columnCount Y.descentPair.detExp g) :=
+  (commute_scalarFin g).map _
+
 /-- On an algebraic form `φ` of the weight of `Y`, translation (`algFormRep`) by the scalar matrix
 `scalarFin n ν` commutes with translation by `g`: applying the two in either order gives the same
 form. -/
@@ -122,7 +129,7 @@ lemma LValueData.algFormRep_scalarFin_apply_comm (ν : unitary (𝔸f D.E)) (g :
         (algFormRep Y.descentPair.columnCount Y.descentPair.detExp g φ) =
       algFormRep Y.descentPair.columnCount Y.descentPair.detExp g
         (algFormRep Y.descentPair.columnCount Y.descentPair.detExp (scalarFin n ν) φ) := by
-  rw [← mul_apply_eq_comp, ((commute_scalarFin g).map _).eq, mul_apply_eq_comp]
+  rw [← mul_apply_eq_comp, (Y.commute_algFormRep_scalarFin ν g).eq, mul_apply_eq_comp]
 
 /-- Central translations preserve the image of an element `e` of the group algebra of the residue
 units at the chosen places. -/
@@ -137,8 +144,6 @@ lemma LValueData.centralRep_mem_range_groupAlgAction (z : Gf D.E Unit)
     DescentPair.coe_formAction, coe_centralRep_apply, map_smul,
     algFormRep_scalarFin_apply_comm]
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- Let `Y` be data for a theta lift from `U(1)` to the definite `U(n)` over the CM field `D.E`,
 with space of algebraic forms `Y.descentPair.FormV` on `U(n)`. Translation `Y.centralRep z` by a
 scalar `z ∈ U(1)(𝔸_f)` commutes with the operator
