@@ -88,6 +88,13 @@ lemma formNegEquiv_apply_neg (l : NumberField.InfinitePlace E → N → ℤ)
       ((formNegEquiv S l).symm F).val g = F.val (G.neg g) := rfl
   rw [← h_symm, LinearIsometryEquiv.symm_apply_apply]
 
+/-- The isometry `formNegEquiv` commutes with right translation by the finite adelic group. -/
+lemma formNegEquiv_formRep (l : NumberField.InfinitePlace E → N → ℤ) (k : Gf E N)
+    (y : S.Form (typeKernel l s)) :
+    formNegEquiv S l (S.formRep (typeKernel l s) k y) =
+      S.neg.formRep (typeKernel l (-s)) k (formNegEquiv S l y) :=
+  rfl
+
 /-- The transposed lift `modTransposedLift S T α Φ Ψ e' e y` is linear in `Ψ`: it is the sum over
 matrices `x` of `Ψ x` times the transposed lift for the indicator function `Pi.single x 1` of
 `x`. -/
@@ -283,7 +290,8 @@ theorem triangleNegEquiv_triangleRep (k : Gf D.E (D.GridIndex z 0 0)) (y : D.Tri
   | zero => rfl
   | succ i ih =>
     rw [triangleNegEquiv_succ_apply, triangleNegEquiv_succ_apply, ih]
-    rfl
+    exact formNegEquiv_formRep (D.gridSpace i z 0 0) (D.gridParam z i 0 0) k
+      (D.triangleNegEquiv z i y)
 
 /-! ### The first lift -/
 
@@ -503,10 +511,6 @@ theorem exists_hasSum_inner_triangleFirstLift {P : Parameters} (D : Data P) (z :
   · -- if `v = 0` then the lift of `y` has norm zero
     apply (h_rallis ϑ y).1
     rw [← inner_self_eq_zero (𝕜 := ℂ), ← hv, hv_zero, inner_zero_left]
-
--- The index type of the node `(i, n + 1)` unfolds to a sum type, and `kernelPair l s false` to
--- `typeKernel l s`; rewriting below has to see through both.
-attribute [local implicit_reducible] Data.GridIndex BlockIndex kernelPair
 
 omit [CMType E] [WeilData E] [Fintype N] [DecidableEq N] [Fintype N'] [DecidableEq N'] in
 /-- Every polynomial `P` is the signed transpose `flipPoly s t` of the polynomial obtained from some

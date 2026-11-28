@@ -156,8 +156,6 @@ theorem U.principalMinor_sign_ne_zero (σ : ℤˣ) (g : USign ε) : principalMin
   intro h_zero
   simpa [h_zero] using norm_det_blockDiagPart σ g
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.sum in
 /-- For `g` in `U(diag ε)`, the determinant of the block diagonal part of `g` has absolute value at
 least `(‖g‖ / 2)²`, where `‖g‖` is the L² operator norm. -/
 theorem sq_le_norm_det_blockDiagPart (g : USign ε) [Nonempty n] :
@@ -928,6 +926,13 @@ theorem measure_ball_le_integral_dsCoeff [hg : l.HasLargeGap B] (hL : ∀ a : n,
   grw [← small_ball]
   simpa [δ] using measure_ball_le_covering ν j 1 (by bound) hr const_le
 
+/-- For a parameter `l` and a natural number `c > 8 n²`, the function
+`g ↦ deg_λ * (2 / ‖g‖) ^ c` is integrable on `U(diag ε)`, where `deg_λ = l.formalDegree`. -/
+theorem integrable_formalDegree_mul_two_div_norm_pow (l : HCParam ε) {c : ℕ}
+    (hc : 8 * card n ^ 2 < c) :
+    Integrable fun g : USign ε ↦ l.formalDegree * (2 / ‖(g : Matrix n n ℂ)‖) ^ c :=
+  (integrable_two_div_norm_pow hc).const_mul l.formalDegree
+
 /-- Let n = `card n` ≥ 1, and let `l = 2λ` be a parameter of gap `500 n³ + B`: its entries are
 distinct and congruent to n - 1 mod 2, and |λ i - λ j| ≥ 500 n³ + B whenever ε i ≠ ε j. Suppose all
 `|l a| ≤ L` and `c > 8 n²` is a natural number. Then the integral of `deg_λ * (2 / ‖g‖) ^ c` over
@@ -970,7 +975,7 @@ theorem integral_tail_le [hg : l.HasLargeGap B] (hL : ∀ a : n, |l a| ≤ L) (c
     Integrable (fun g : USign ε ↦ l.formalDegree * (2 / ‖(g : Matrix n n ℂ)‖) ^ c) ∧
     ∫ g : USign ε, l.formalDegree * (2 / ‖(g : Matrix n n ℂ)‖) ^ c ≤
       8 * (2000 * (card n + L + 1) ^ 6) ^ (2 * card n ^ 2) * 2 ^ c :=
-  ⟨(integrable_two_div_norm_pow hc).const_mul l.formalDegree,
+  ⟨integrable_formalDegree_mul_two_div_norm_pow l hc,
     integral_formalDegree_mul_two_div_norm_pow_le hL hc⟩
 
 end New
