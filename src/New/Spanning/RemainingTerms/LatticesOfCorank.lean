@@ -511,8 +511,6 @@ lemma sum_discWeightIfRowVanishes_eq_encard_mul [Fintype S.LatticeStabilizerCose
   refine Finset.sum_congr rfl fun φ _ ↦ ?_
   by_cases h_kills : S.RowVanishesModPiN u (y φ) L <;> simp [discWeightIfRowVanishes, h_kills]
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- Let `S` be filling data over `E` with shape `𝔰`, and let `u` be in `Gf E 𝔰.κ`. The set
 `S.LatticeStabilizerCoset` is the quotient of `stdLevel`, the group of integral unitary matrices on
 `κ`, by its subgroup of matrices whose row `k₀` is congruent to that of `1` modulo `S.piN`. Let
@@ -794,7 +792,7 @@ theorem sum_discriminant_inv_le {S : Filling E 𝔰} [S.IsAdmissible] {r l : ℕ
   have h_card : (S.N ^ 𝔰.k / S.b) ^ numInfPlaces E ≤ (Nat.card S.LatticeStabilizerCoset : ℝ) :=
     IsAdmissible.le_relIndex
   have h_card_pos : (0 : ℝ) < Nat.card S.LatticeStabilizerCoset := h_card.trans_lt' (by positivity)
-  have : Fintype S.LatticeStabilizerCoset :=
+  let : Fintype S.LatticeStabilizerCoset :=
     Subgroup.fintypeOfIndexNeZero (Nat.cast_pos.1 h_card_pos).ne'
   rw [mul_comm_div]
   refine sum_classes_le_of_sum_translates_le (fun φ : S.LatticeStabilizerCoset ↦ φ.out.val) _

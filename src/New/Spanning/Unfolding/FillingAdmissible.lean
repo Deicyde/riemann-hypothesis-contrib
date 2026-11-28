@@ -32,8 +32,7 @@ general filling theorem applies.
   the Bessel systems.
 * `New.Data.card_mul_card_classes_mul_prod_le`, `New.Data.card_sq_mul_mass_mul_prod_le`: two
   products built from group orders, class number, masses, dimensions and degrees are at most
-  `(1 + b⁻⁹)` times `New.Filling.mainSecondMoment`. `New.Data.card_mul_prod_frameMass_le` states
-  both.
+  `(1 + b⁻⁹)` times `New.Filling.mainSecondMoment`.
 
 Notions from other files:
 * `New.Data.spaceY`: for an index `j`, the hermitian space `Y_j` with its adelic frame, hence its
@@ -469,8 +468,6 @@ theorem card_mul_card_classes_mul_prod_le :
       rw [← D.prod_unitSphereMass_mul_div_eq]
       exact D.card_sq_mul_mass_mul_prod_le
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- For the filling data of admissible data `D`, the scaled Siegel constant `|S̄| |Ū| n_X c_S` is at
 most `(1 + b⁻⁹)` times the main second moment `(n_X d)² / (deg mass_r)` times
 `deg c^f / vol^n (cov Λ / d)²`. Here `S̄` is the reduced image of the Bessel subgroup `besselS`,

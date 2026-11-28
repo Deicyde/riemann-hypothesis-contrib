@@ -157,8 +157,6 @@ lemma GaloisRep.PolyKillsAt.of_mul_frob_pow [EmbeddedNumberField E] {r : GalRep 
   rw [← linearFrob_pow hpcr hφW, ← linearFrob_mul hpcr hs (hφW.pow m)]
   exact ((hpow m hm).2 (hs.mul (hφW.pow m))).2
 
--- Keeps definitional checks from unfolding the finite sums.
-seal Finset.univ in
 /-- Let the eigenform `f` for the system `P` of Hecke polynomials be a pro-`p` Iwahori eigenvector
 at `w` with eigencharacter `torusChar ξ`. If the `ξ i` are unramified and `‖ξ i ϖ‖` is antitone in
 `i` for a uniformiser `ϖ`, then some eigenform for the same system `P` is spherical at `w` with
@@ -731,7 +729,8 @@ lemma hecke_eq_frob_on_parahoricEigenspace (hA : IsPlaceOver A w)
         simpa only [compactMean_eq_self (ρ := ρ.ρ) y hy_type.1] using hl dominant y
       rw [U_eq, map_smul, hl.apply_compactMean, l_diag]
       simp [coe_normAbsChar_locField, norm_locField_eq_q_zpow, hϖ, field]
-      exact mul_div_cancel_left₀ _ (pow_ne_zero _ (by exact_mod_cast (zero_lt_one.trans w.one_lt_q).ne'))
+      exact mul_div_cancel_left₀ _
+          (pow_ne_zero _ (by exact_mod_cast (zero_lt_one.trans w.one_lt_q).ne'))
     have F_mul_T : F * T = ιℓ (θ 0 ϖ) • T :=
       mul_sub_one_eq_smul_sub_one (α := fun i ↦ ιℓ (θ i ϖ))
         (fun i hi ↦ by simp only [(χ_slot i).2 hi, map_one])
