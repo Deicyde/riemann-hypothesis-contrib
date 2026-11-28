@@ -538,8 +538,6 @@ lemma isLerayHirschBasis_freeAb_iff_of_bijective {C : Type 1} [Category.{0} C]
   exact (Comparison.bijective_iff_of_comm_sq (lerayHirsch_mapRange_comp θ map_homClass)
     (mapRange_bijective _ _ h_source.bijective_pullbackAlong) h_target.bijective_pullbackAlong).symm
 
--- Keeps definitional checks from unfolding the Ext groups.
-seal CategoryTheory.Abelian.Ext in
 /-- Leray–Hirsch bases at a test `c` lift along the quotient onto the special fibre: let `θ` be
 classes from the locally constant functions on the special fibre of `Spec A` to `F`, whose
 pull-backs `θ'` along `toZerosCoeff` to the locally constant functions form a Leray–Hirsch basis at
